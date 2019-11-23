@@ -1,0 +1,12 @@
+<form class="{{cssClass}}" autocomplete="off">
+    <header class="sheet-header">
+        <img class="profile-img" src="{{item.img}}" data-edit="img" title="{{item.name}}" height="64" width="64"/>
+        <div class="header-fields">
+            <h1 class="charname"><input name="name" type="text" value="{{item.name}}" placeholder="Name"/></h1>
+        </div>
+    </header>
+
+    <div class="editor-content" data-edit="data.description.value">{{{data.description.value}}}</div>
+
+    <button type="submit" name="submit" value="1"><i class="far fa-save"></i> Save Changes</button>
+</form>

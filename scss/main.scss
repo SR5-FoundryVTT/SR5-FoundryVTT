@@ -1,0 +1,406 @@
+@font-face {
+  font-family: "Nodesto";
+  src: url('../fonts/NodestoCapsCondensed.otf');
+}
+
+$nodesto: "Nodesto", "Signika", "Palatino Linotype", serif;
+
+$black: black;
+$green: green;
+$red: red;
+$grey: grey;
+$white: white;
+$darkblue: darkblue;
+$crimson: crimson;
+$darkred: darkred;
+
+$color: $black;
+$inner-color: $black;
+$outline-color: rgba($grey, 0.5);
+
+$groove-width: 2px;
+$groove-color: $grey;
+$groove: $groove-width groove $groove-color;
+$radius: .25em;
+
+$border-under: 1px groove $groove-color;
+
+$sheetbackground: url("../ui/parchment.jpg") repeat;
+
+@mixin rollable {
+  &:hover {
+    text-shadow: 0 0 $darkblue 0;
+    cursor: pointer;
+  }
+}
+
+@mixin nodesto {
+  font-family: $nodesto;
+}
+
+@mixin title {
+  font-size: 120%;
+  font-family: $nodesto;
+}
+
+@mixin textOutline {
+  color: $inner-color;
+  text-shadow: 
+    -1px -1px 0 $outline-color,
+    1px -1px 0 $outline-color,
+    -1px 1px 0 $outline-color,
+    1px 1px 0 $outline-color;
+}
+
+
+@mixin shortUnder {
+  position: relative;
+  &:after {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 50%;
+    transform: translateX(50%);
+    border-bottom: $border-under;
+  }
+}
+
+hr.divider {
+  margin: 0em;
+  border-width: .1em;
+}
+
+.border {
+  border: 1px solid black;
+}
+
+.flexrow {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  &.nowrap {
+    flex-wrap: nowrap;
+  }
+  &.align-start {
+    align-items: flex-start;
+  }
+  &.center {
+    justify-content: center;
+  }
+  &.flex-end {
+    justify-content: flex-end;
+  }
+  &.space-between {
+    justify-content: space-between;
+  }
+  &.space-around {
+    justify-content: space-around;
+  }
+  &.align-center {
+    align-items: center;
+  }
+}
+.flexcol {
+  display: flex;
+  flex-direction: col;
+  flex-wrap: nowrap;
+}
+.align-items-center {
+  align-items: 'center';
+}
+.align-content-center {
+  align-content: 'center';
+}
+.flex0 {
+  flex: 0;
+}
+.flex1 {
+  flex: 1;
+}
+.flex2 {
+  flex: 2;
+}
+.flex3 {
+  flex: 3;
+}
+.flex4 {
+  flex: 4;
+}
+
+.input {
+  position: relative;
+
+  &.right {
+    >input[type="text"] {
+      text-align: right;
+    }
+    .unit {
+      left: 50%;
+    }
+  }
+  .unit {
+    position: absolute;
+    display: block;
+    left: 15%;
+    top: 10%;
+    z-index: 9;
+  }
+}
+
+input[type="text"].display {
+  background: transparent;
+  border: none;
+  text-align: center;
+  &:hover {
+    background: transparent;
+    border: $groove;
+  }
+  &.mod-input {
+    font-size: .75em;
+    margin-top: -.5em;
+    margin-bottom: -.25em;
+    line-height: 10px;
+    padding: 0;
+  }
+}
+
+
+.white {
+  color: $white;
+}
+
+.text-outline {
+  @include textOutline;
+}
+
+.level {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  >.level-left {
+    order: 0;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+  }
+  >.level-right {
+    order: 1;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+  }
+  .level-item {
+
+  }
+}
+
+.text-center {
+  text-align: center;
+}
+
+.no-margin {
+  margin: 0;
+  margin-bottom: 0;
+}
+.size4 {
+  font-size: 1.5em;
+}
+.size5 {
+  font-size: 1.25em;
+}
+.size6 {
+  font-size: 1em;
+}
+.size7 {
+  font-size: .75em;
+}
+
+.sr5 {
+  .window-content {
+    font-size: 115%;
+    background: $sheetbackground;
+    color: $color;
+  }
+
+  .profile-img {
+    padding: .25em;
+    border-right: $groove;
+    border-bottom: $groove;
+  }
+  .character-name {
+    margin-bottom: 0;
+    border-bottom: $groove;
+    border-right: $groove;
+    font-size: 200%;
+    @include nodesto;
+  }
+  &.actor {
+    min-height: 56em;
+    min-width: 45em;
+    .sheet-header-row-2 {
+      > * {
+        text-align: center;
+      }
+
+      > *:not(:last-child) {
+        margin-right: 1em;
+      }
+      > *:not(:first-child) {
+        border-left: $groove;
+      }
+
+      .defense-icon {
+        margin-left: .25em;
+        margin-right: .25em;
+        &:hover {
+          color: $grey;
+          cursor: pointer;
+        }
+      }
+      .attribute-only-roll {
+        margin-left: .25em;
+        margin-right: .25em;
+        text-align: center;
+        margin-bottom: 0;
+        &:hover {
+          color: $grey;
+          cursor: pointer;
+        }
+      }
+    }
+    .limit {
+      @include nodesto;
+      padding: 0 .1rem;
+      border-right: $groove;
+      margin-top: -2px;
+      text-align: center;
+      align-items: center;
+      align-content: center;
+
+      border-bottom: $groove;
+    }
+    .track {
+      @include title;
+      border-bottom: $groove;
+      border-right: $groove;
+      min-width: 3em;
+      text-align: center;
+      padding: 0 .25em;
+      margin-left: -1px;
+
+      .track-max-value {
+        margin-bottom: 0;
+      }
+
+      .track-input {
+        font-size: 1.25em;
+        text-align: center;
+      }
+
+      .track-title {
+        width: 100%;
+        text-align: center;
+        margin-bottom: .15em;
+        @include shortUnder;
+      }
+
+      .track-slash {
+        transform: translateY(10%);
+      }
+    }
+    .tab {
+      max-height: 30em;
+      overflow-y: auto;
+      border-radius: $radius;
+      margin-top: 1em;
+    }
+    .tabs >a {
+      @include shortUnder;
+      margin: .25em;
+      position: relative;
+    }
+    .sheet-header-row-1 {
+      margin-bottom: .5em;
+    }
+    .sheet-header {
+      padding: 0;
+    }
+    .attributes {
+      border-top: $groove;
+      border-bottom: $groove;
+      .attribute {
+        @include title
+        align-items: center;
+        justify-content: space-around;
+        padding: 0 .25em;
+        &:not(:last-child) {
+          border-right: $groove;
+        }
+        >.attribute-name {
+          font-size: 115%;
+          width: 100%;
+          text-align: center;
+          margin-bottom: .15em;
+          @include shortUnder;
+          @include rollable;
+        }
+        >.attribute-input {
+          text-align: center;
+          margin-bottom: 0;
+        }
+      }
+    }
+
+    .skill-header {
+      @include nodesto;
+      border-bottom: $groove;
+      div {
+        &:last-child {
+          margin-right: 1em;
+        }
+      }
+      .skill-rtg {
+        margin-right: 1.5em;
+        text-align: left;
+      }
+    }
+    .skill {
+      border-bottom: 1px solid $black;
+      min-width: 16em;
+      padding: .1em;
+
+
+      .skill-name {
+        transform: translateY(40%);
+        @include rollable;
+      }
+
+      .skill-specs {
+        font-size: .75em;
+        line-height: 1em;
+        margin-left: .5em;
+        margin-right: 1.5em;
+        text-align: center;
+      }
+
+      .skill-dropdown {
+        font-size: 75%;
+        height: 2em;
+        margin-right: 1em;
+        margin-left: 1em;
+        text-align: center;
+      }
+
+      .skill-value {
+        font-size: 1.25em;
+        font-weight: semi-bold;
+        text-align: center;
+        margin-right: 1em;
+      }
+    }
+  }
+}

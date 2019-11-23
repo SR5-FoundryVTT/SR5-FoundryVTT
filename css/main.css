@@ -1,0 +1,289 @@
+@font-face {
+  font-family: "Nodesto";
+  src: url("../fonts/NodestoCapsCondensed.otf"); }
+
+hr.divider {
+  margin: 0em;
+  border-width: .1em; }
+
+.border {
+  border: 1px solid black; }
+
+.flexrow {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start; }
+  .flexrow.nowrap {
+    flex-wrap: nowrap; }
+  .flexrow.align-start {
+    align-items: flex-start; }
+  .flexrow.center {
+    justify-content: center; }
+  .flexrow.flex-end {
+    justify-content: flex-end; }
+  .flexrow.space-between {
+    justify-content: space-between; }
+  .flexrow.space-around {
+    justify-content: space-around; }
+  .flexrow.align-center {
+    align-items: center; }
+
+.flexcol {
+  display: flex;
+  flex-direction: col;
+  flex-wrap: nowrap; }
+
+.align-items-center {
+  align-items: 'center'; }
+
+.align-content-center {
+  align-content: 'center'; }
+
+.flex0 {
+  flex: 0; }
+
+.flex1 {
+  flex: 1; }
+
+.flex2 {
+  flex: 2; }
+
+.flex3 {
+  flex: 3; }
+
+.flex4 {
+  flex: 4; }
+
+.input {
+  position: relative; }
+  .input.right > input[type="text"] {
+    text-align: right; }
+  .input.right .unit {
+    left: 50%; }
+  .input .unit {
+    position: absolute;
+    display: block;
+    left: 15%;
+    top: 10%;
+    z-index: 9; }
+
+input[type="text"].display {
+  background: transparent;
+  border: none;
+  text-align: center; }
+  input[type="text"].display:hover {
+    background: transparent;
+    border: 2px groove grey; }
+  input[type="text"].display.mod-input {
+    font-size: .75em;
+    margin-top: -.5em;
+    margin-bottom: -.25em;
+    line-height: 10px;
+    padding: 0; }
+
+.white {
+  color: white; }
+
+.text-outline {
+  color: black;
+  text-shadow: -1px -1px 0 rgba(128, 128, 128, 0.5), 1px -1px 0 rgba(128, 128, 128, 0.5), -1px 1px 0 rgba(128, 128, 128, 0.5), 1px 1px 0 rgba(128, 128, 128, 0.5); }
+
+.level {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between; }
+  .level > .level-left {
+    order: 0;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start; }
+  .level > .level-right {
+    order: 1;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-end; }
+
+.text-center {
+  text-align: center; }
+
+.no-margin {
+  margin: 0;
+  margin-bottom: 0; }
+
+.size4 {
+  font-size: 1.5em; }
+
+.size5 {
+  font-size: 1.25em; }
+
+.size6 {
+  font-size: 1em; }
+
+.size7 {
+  font-size: .75em; }
+
+.sr5 .window-content {
+  font-size: 115%;
+  background: url("../ui/parchment.jpg") repeat;
+  color: black; }
+
+.sr5 .profile-img {
+  padding: .25em;
+  border-right: 2px groove grey;
+  border-bottom: 2px groove grey; }
+
+.sr5 .character-name {
+  margin-bottom: 0;
+  border-bottom: 2px groove grey;
+  border-right: 2px groove grey;
+  font-size: 200%;
+  font-family: "Nodesto", "Signika", "Palatino Linotype", serif; }
+
+.sr5.actor {
+  min-height: 56em;
+  min-width: 45em; }
+  .sr5.actor .sheet-header-row-2 > * {
+    text-align: center; }
+  .sr5.actor .sheet-header-row-2 > *:not(:last-child) {
+    margin-right: 1em; }
+  .sr5.actor .sheet-header-row-2 > *:not(:first-child) {
+    border-left: 2px groove grey; }
+  .sr5.actor .sheet-header-row-2 .defense-icon {
+    margin-left: .25em;
+    margin-right: .25em; }
+    .sr5.actor .sheet-header-row-2 .defense-icon:hover {
+      color: grey;
+      cursor: pointer; }
+  .sr5.actor .sheet-header-row-2 .attribute-only-roll {
+    margin-left: .25em;
+    margin-right: .25em;
+    text-align: center;
+    margin-bottom: 0; }
+    .sr5.actor .sheet-header-row-2 .attribute-only-roll:hover {
+      color: grey;
+      cursor: pointer; }
+  .sr5.actor .limit {
+    font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
+    padding: 0 .1rem;
+    border-right: 2px groove grey;
+    margin-top: -2px;
+    text-align: center;
+    align-items: center;
+    align-content: center;
+    border-bottom: 2px groove grey; }
+  .sr5.actor .track {
+    font-size: 120%;
+    font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
+    border-bottom: 2px groove grey;
+    border-right: 2px groove grey;
+    min-width: 3em;
+    text-align: center;
+    padding: 0 .25em;
+    margin-left: -1px; }
+    .sr5.actor .track .track-max-value {
+      margin-bottom: 0; }
+    .sr5.actor .track .track-input {
+      font-size: 1.25em;
+      text-align: center; }
+    .sr5.actor .track .track-title {
+      width: 100%;
+      text-align: center;
+      margin-bottom: .15em;
+      position: relative; }
+      .sr5.actor .track .track-title:after {
+        content: '';
+        display: block;
+        position: absolute;
+        width: 50%;
+        transform: translateX(50%);
+        border-bottom: 1px groove grey; }
+    .sr5.actor .track .track-slash {
+      transform: translateY(10%); }
+  .sr5.actor .tab {
+    max-height: 30em;
+    overflow-y: auto;
+    border-radius: 0.25em;
+    margin-top: 1em; }
+  .sr5.actor .tabs > a {
+    position: relative;
+    margin: .25em;
+    position: relative; }
+    .sr5.actor .tabs > a:after {
+      content: '';
+      display: block;
+      position: absolute;
+      width: 50%;
+      transform: translateX(50%);
+      border-bottom: 1px groove grey; }
+  .sr5.actor .sheet-header-row-1 {
+    margin-bottom: .5em; }
+  .sr5.actor .sheet-header {
+    padding: 0; }
+  .sr5.actor .attributes {
+    border-top: 2px groove grey;
+    border-bottom: 2px groove grey; }
+    .sr5.actor .attributes .attribute {
+      font-size: 120%;
+      font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 .25em; }
+      .sr5.actor .attributes .attribute:not(:last-child) {
+        border-right: 2px groove grey; }
+      .sr5.actor .attributes .attribute > .attribute-name {
+        font-size: 115%;
+        width: 100%;
+        text-align: center;
+        margin-bottom: .15em;
+        position: relative; }
+        .sr5.actor .attributes .attribute > .attribute-name:after {
+          content: '';
+          display: block;
+          position: absolute;
+          width: 50%;
+          transform: translateX(50%);
+          border-bottom: 1px groove grey; }
+        .sr5.actor .attributes .attribute > .attribute-name:hover {
+          text-shadow: 0 0 darkblue 0;
+          cursor: pointer; }
+      .sr5.actor .attributes .attribute > .attribute-input {
+        text-align: center;
+        margin-bottom: 0; }
+  .sr5.actor .skill-header {
+    font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
+    border-bottom: 2px groove grey; }
+    .sr5.actor .skill-header div:last-child {
+      margin-right: 1em; }
+    .sr5.actor .skill-header .skill-rtg {
+      margin-right: 1.5em;
+      text-align: left; }
+  .sr5.actor .skill {
+    border-bottom: 1px solid black;
+    min-width: 16em;
+    padding: .1em; }
+    .sr5.actor .skill .skill-name {
+      transform: translateY(40%); }
+      .sr5.actor .skill .skill-name:hover {
+        text-shadow: 0 0 darkblue 0;
+        cursor: pointer; }
+    .sr5.actor .skill .skill-specs {
+      font-size: .75em;
+      line-height: 1em;
+      margin-left: .5em;
+      margin-right: 1.5em;
+      text-align: center; }
+    .sr5.actor .skill .skill-dropdown {
+      font-size: 75%;
+      height: 2em;
+      margin-right: 1em;
+      margin-left: 1em;
+      text-align: center; }
+    .sr5.actor .skill .skill-value {
+      font-size: 1.25em;
+      font-weight: semi-bold;
+      text-align: center;
+      margin-right: 1em; }

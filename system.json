@@ -1,0 +1,18 @@
+{
+  "name": "shadowrun5e",
+  "title": "Shadowrun 5th Edition",
+  "description": "Shadowrun 5th Edition game",
+  "version": 0.1,
+  "templateVersion": 1,
+  "author": "n3rf_herder",
+  "esmodules": ["shadowrun5e.js"],
+  "scripts": [],
+  "styles": ["css/main.css"],
+  "minimumCoreVersion": "0.4.0",
+  "packs": [],
+  "initiative": "@attributes.rea",
+  "primaryTokenAttribute": "stun_track",
+  "secondaryTokenAttribute": "physical_track",
+  "gridDistance": 1,
+  "gridUnits": "m"
+}
