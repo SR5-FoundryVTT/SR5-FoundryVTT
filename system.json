@@ -10,9 +10,10 @@
   "styles": ["css/main.css"],
   "minimumCoreVersion": "0.4.0",
   "packs": [],
-  "initiative": "@attributes.rea",
-  "primaryTokenAttribute": "stun_track",
-  "secondaryTokenAttribute": "physical_track",
+  "initiative": "@attributes.reaction",
+  "primaryTokenAttribute": "track.physical",
+  "secondaryTokenAttribute": "track.stun",
   "gridDistance": 1,
-  "gridUnits": "m"
+  "gridUnits": "m",
+  "manifest": "https://raw.githubusercontent.com/smilligan93/SR5-FoundryVTT/master/system.json"
 }
