@@ -1,0 +1,28 @@
+<div class="inventory">
+  {{#each sections as |section sid|}}
+  <div class="item item-section">
+    <h3 class="item-name">
+      {{section.label}}
+    </h3>
+  </div>
+  {{#each section.items as |item iid|}}
+  <div class="item">
+    <h3 class="item-name">
+      {{item.name}}
+    </h3>
+    <h3 class="item-name">
+      {{item.data.technology.equipped}}
+    </h3>
+    <h3 class="item-name">
+      {{item.data.technology.rating}}
+    </h3>
+    <h3 class="item-name">
+      {{item.data.technology.quantity}}
+    </h3>
+    <h3 class="item-name item-edit" data-item='{{item.id}}'>
+      Edit
+    </h3>
+  </div>
+  {{/each}}
+  {{/each}}
+</div>

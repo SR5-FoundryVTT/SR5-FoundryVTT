@@ -20,7 +20,7 @@
           <div class="flexcol limit">
             <div class="limit-row">
               <span class="limit-title">{{toHeaderCase label}}</span>
-              <span class="limit-value">{{limit.value}}</span>
+              <span class="limit-value" value={{limit.value}}>{{limit.value}}</span>
             </div>
             <div class="">
               <div class="input">
@@ -45,8 +45,8 @@
         </div>
         <div class="flexrow">
           {{#each data.track as |track label|}}
-          <div class="track">
-            <div class="flexcol align-items-center text-center">
+          <div class="track groove">
+            <div class="track-inner">
               <div class="flexrow">
                 <div />
                 <h4 class="flex2 track-title">{{toHeaderCase label}}</h4>
@@ -68,7 +68,6 @@
                 </div>
               </div>
               <div class="flexrow nowrap center">
-                {{!-- Physical Track TODO REDO --}}
                 <div class="">
                   <input
                     class="display track-input"
@@ -80,7 +79,6 @@
                     data-dtype="Number"/>
                 </div>
                 <h3 class="track-slash flex0">
-                  /
                 </h3>
                 <div class="">
                   <h3 class="track-max-value">{{track.max}}</h3>
@@ -89,10 +87,10 @@
             </div>
           </div>
           {{/each}}
-          <div class="track">
+          <div class="track groove">
             <div class="flexcol align-items-center text-center">
               <h4 class="track-title">Edge</h4>
-              <div class="flexrow nowrap center">
+              <div class="track-bottom">
                 <div class="">
                   <input
                     class="display track-input"
@@ -104,7 +102,6 @@
                     data-dtype="Number"/>
                 </div>
                 <h3 class="track-slash flex0">
-                  /
                 </h3>
                 <div class="">
                   <input
@@ -119,7 +116,7 @@
               </div>
             </div>
           </div>
-          <div class="track flex1">
+          <div class="track groove flex1">
             <div class="flexcol align-items-center text-center">
               <div class="flexrow space-between">
                 <div class="input">
@@ -161,13 +158,11 @@
                   <h3>{{data.movement.walk.value}}<h3/>
                 </div>
                 <h3 class="track-slash flex0">
-                  /
                 </h3>
                 <div class="">
                   <h3>{{data.movement.run.value}}<h3/>
                 </div>
                 <h3 class="track-slash flex0">
-                  /
                 </h3>
                 <div class="input">
                   <input
@@ -192,41 +187,41 @@
       <div class="flex0">
         <div class="flexrow nowrap space-around">
           <div>
-            <h3 title="Defense" class="defense-icon fas fa-running"></h3>
+            <h3 title="Defense" class="defense-roll defense-icon fas fa-meteor" data-roll='defense'></h3>
           </div>
           <div>
-            <h3 title="Soak" class="defense-icon fas fa-shield-alt"></h3>
+            <h3 title="Soak" class="soak-roll defense-icon fas fa-shield-alt" data-soak='default'></h3>
           </div>
           <div>
-            <h3 title="Cold" class="defense-icon fas fa-snowflake"></h3>
+            <h3 title="Cold" class="soak-roll defense-icon fas fa-snowflake" data-soak='cold'></h3>
           </div>
           <div>
-            <h3 title="Fire" class="defense-icon fas fa-fire"></h3>
+            <h3 title="Fire" class="soak-roll defense-icon fas fa-fire" data-soak='fire'></h3>
           </div>
           <div>
-            <h3 title="Acid" class="defense-icon fas fa-vial"></h3>
+            <h3 title="Acid" class="soak-roll defense-icon fas fa-vial" data-soak='acid'></h3>
           </div>
           <div>
-            <h3 title="Electricity" class="defense-icon fas fa-bolt"></h3>
+            <h3 title="Electricity" class="soak-roll defense-icon fas fa-bolt" data-soak='electricity'></h3>
           </div>
           <div>
-            <h3 title="Radiation" class="defense-icon fas fa-radiation-alt"></h3>
+            <h3 title="Radiation" class="soak-roll defense-icon fas fa-radiation-alt" data-soak='radiation'></h3>
           </div>
         </div>
       </div>
       <div>
         <div class="flexrow space-around">
           <div>
-            <h4 class="attribute-only-roll">Composure</h4>
+            <h4 class="attribute-only-roll" data-roll='composure'>Composure</h4>
           </div>
           <div>
-            <h4 class="attribute-only-roll">J.Intentions</h4>
+            <h4 class="attribute-only-roll" data-roll='judge_intentions'>J.Intentions</h4>
           </div>
           <div>
-            <h4 class="attribute-only-roll">Lift&Carry</h4>
+            <h4 class="attribute-only-roll" data-roll='lift_carry'>Lift&Carry</h4>
           </div>
           <div>
-            <h4 class="attribute-only-roll">Memory</h4>
+            <h4 class="attribute-only-roll" data-roll='memory'>Memory</h4>
           </div>
         </div>
       </div>
@@ -234,9 +229,9 @@
     <div class="flexrow attributes">
       {{#each data.attributes as |attribute a|}}
         {{#unless attribute.hidden}}
-          <div class="flexcol attribute">
+          <div class="attribute">
             <h4 class="attribute-name" data-attribute={{a}}>{{toHeaderCase a}}</h4>
-            <h3 class="size5 text-center">
+            <h3 class="attribute-input-container">
               <input
                 class="display attribute-input"
                 type="text"
@@ -259,30 +254,28 @@
         <a class="item" data-tab="equipment">Equipment</a>
         <a class="item" data-tab="magic">Magic</a>
         <a class="item" data-tab="matrix">Matrix</a>
-        <a class="item" data-tab="matrix">Matrix</a>
         <a class="item" data-tab="info">Info</a>
       </nav>
       <div class="tab" data-group="primary" data-tab="skills">
         <div class="skill-header">
           <div class="flexrow space-around">
-            <div class="flex2">
+            <div class="">
               <h3>Name</h3>
             </div>
             <div class="flex0">
               <h3 class="skill-rtg">Rtg</h3>
             </div>
-            <div class="flex2">
+            <div class="">
               <h3 class="text-center">Specializations</h3>
-            </div>
-            <div class="flex0">
-              <h3>Limit</h3>
             </div>
           </div>
         </div>
         {{#each data.skills.active as |skill s|}}
         {{#unless skill.hidden}}
         <div class="skill flexrow space-around">
-          <i class="flex2 skill-name" data-skill={{s}}>{{toHeaderCase s}}</i>
+          <div class="">
+            <i class="skill-name" data-skill={{s}}>{{toHeaderCase s}}</i>
+          </div>
           <div class="flex0">
             <input
               class="skill-value display"
@@ -293,7 +286,7 @@
               value='{{skill.value}}'
               data-dtype="Number"/>
           </div>
-          <div class="flex2">
+          <div class="">
             <input
               class="skill-specs display"
               type="text"
@@ -301,18 +294,12 @@
               value='{{skill.specs}}'
               data-dtype="String"/>
           </div>
-          <div class="flex0">
-            <select class="skill-dropdown" name='data.skills.active.{{s}}.limit'>
-              {{#select skill.limit}}
-              <option value="physical">Physical</option>
-              <option value="mental">Mental</option>
-              <option value="social">Social</option>
-              {{/select}}
-            </select>
-          </div>
         </div>
         {{/unless}}
         {{/each}}
+      </div>
+      <div class="tab" data-group="primary" data-tab="equipment">
+        {{> "systems/shadowrun5e/templates/actor/parts/actor-equipment.html" sections=inventory}}
       </div>
     </div>
   </section>

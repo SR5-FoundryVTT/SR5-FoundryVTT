@@ -57,49 +57,53 @@
         "attributes": {
           "body": {
             "value": 1,
-            "min": 1
+            "min": 1,
+            "limit": "physical"
           },
           "agility": {
             "value": 1,
-            "min": 1
+            "min": 1,
+            "limit": "physical"
           },
           "reaction": {
             "value": 1,
-            "min": 1
+            "min": 1,
+            "limit": "physical"
           },
           "strength": {
             "value": 1,
-            "min": 1
+            "min": 1,
+            "limit": "physical"
           },
           "willpower": {
             "value": 1,
-            "min": 1
+            "min": 1,
+            "limit": "mental"
           },
           "logic": {
             "value": 1,
-            "min": 1
+            "min": 1,
+            "limit": "mental"
           },
           "intuition": {
             "value": 1,
-            "min": 1
+            "min": 1,
+            "limit": "mental"
           },
           "charisma": {
             "value": 1,
-            "base": 1,
-            "mod": 0,
-            "min": 1
+            "min": 1,
+            "limit": "social"
           },
           "magic": {
             "value": 0,
-            "base": 1,
-            "mod": 0,
-            "min": 0
+            "min": 0,
+            "limit": "mental"
           },
           "resonance": {
             "value": 0,
-            "base": 1,
-            "mod": 0,
             "min": 0,
+            "limit": "mental",
             "hidden": true
           },
           "edge": {
@@ -110,7 +114,8 @@
           },
           "essence": {
             "value": 6,
-            "min": 0
+            "min": 0,
+            "hidden": true
           }
         },
         "limits": {
@@ -190,7 +195,7 @@
               "value": 0,
               "attribute": "agility",
               "canDefault": true,
-              "group": null,
+              "group": "",
               "specs": ""
             },
             "automatics": {
@@ -220,7 +225,7 @@
               "weapons": [],
               "attribute": "agility",
               "canDefault": false,
-              "group": null
+              "group": ""
             },
             "exotic_range": {
               "value": 0,
@@ -228,14 +233,14 @@
               "weapons": [],
               "attribute": "agility",
               "canDefault": false,
-              "group": null,
+              "group": "",
               "specs": ""
             },
             "heavy_weapons": {
               "value": 0,
               "attribute": "agility",
               "canDefault": true,
-              "group": null,
+              "group": "",
               "specs": ""
             },
             "longarms": {
@@ -256,7 +261,7 @@
               "value": 0,
               "attribute": "agility",
               "canDefault": true,
-              "group": null,
+              "group": "",
               "specs": ""
             },
             "unarmed_combat": {
@@ -277,21 +282,21 @@
               "value": 0,
               "attribute": "body",
               "canDefault": true,
-              "group": null,
+              "group": "",
               "specs": ""
             },
             "escape_artist": {
               "value": 0,
               "attribute": "agility",
               "canDefault": true,
-              "group": null,
+              "group": "",
               "specs": ""
             },
             "free_fall": {
               "value": 0,
               "attribute": "body",
               "canDefault": true,
-              "group": null,
+              "group": "",
               "specs": ""
             },
             "gymnastics": {
@@ -374,14 +379,14 @@
             "instruction": {
               "value": 0,
               "canDefault": true,
-              "group": null,
+              "group": "",
               "specs": ""
             },
             "intimidation": {
               "value": 0,
               "attribute": "charisma",
               "canDefault": true,
-              "group": null,
+              "group": "",
               "specs": ""
             },
             "leadership": {
@@ -416,7 +421,7 @@
               "value": 0,
               "attribute": "logic",
               "canDefault": false,
-              "group": null,
+              "group": "",
               "specs": ""
             },
             "artificing": {
@@ -430,14 +435,14 @@
               "value": 0,
               "attribute": "intuition",
               "canDefault": false,
-              "group": null,
+              "group": "",
               "specs": ""
             },
             "astral_combat": {
               "value": 0,
               "attribute": "willpower",
               "canDefault": false,
-              "group": null,
+              "group": "",
               "specs": ""
             },
             "banishing": {
@@ -542,35 +547,35 @@
               "value": 0,
               "attribute": "charisma",
               "canDefault": true,
-              "group": null,
+              "group": "",
               "specs": ""
             },
             "armorer": {
               "value": 0,
               "attribute": "logic",
               "canDefault": true,
-              "group": null,
+              "group": "",
               "specs": ""
             },
             "artisan": {
               "value": 0,
               "attribute": "intuition",
               "canDefault": false,
-              "group": null,
+              "group": "",
               "specs": ""
             },
             "biotechnology": {
               "value": 0,
               "attribute": "logic",
               "canDefault": false,
-              "group": null,
+              "group": "",
               "specs": ""
             },
             "chemistry": {
               "value": 0,
               "attribute": "logic",
               "canDefault": false,
-              "group": null,
+              "group": "",
               "specs": ""
             },
             "computer": {
@@ -598,7 +603,7 @@
               "value": 0,
               "attribute": "logic",
               "canDefault": true,
-              "group": null,
+              "group": "",
               "specs": ""
             },
             "electronic_warfare": {
@@ -619,7 +624,7 @@
               "value": 0,
               "attribute": "logic",
               "canDefault": true,
-              "group": null,
+              "group": "",
               "specs": ""
             },
             "hacking": {
@@ -640,7 +645,7 @@
               "value": 0,
               "attribute": "agility",
               "canDefault": false,
-              "group": null,
+              "group": "",
               "specs": ""
             },
             "medicine": {
@@ -668,49 +673,49 @@
               "value": 0,
               "attribute": "agility",
               "canDefault": true,
-              "group": null,
+              "group": "",
               "specs": ""
             },
             "pilot_aerospace": {
               "value": 0,
               "attribute": "reaction",
               "canDefault": false,
-              "group": null,
+              "group": "",
               "specs": ""
             },
             "pilot_aircraft": {
               "value": 0,
               "attribute": "reaction",
               "canDefault": false,
-              "group": null,
+              "group": "",
               "specs": ""
             },
             "pilot_walker": {
               "value": 0,
               "attribute": "reaction",
               "canDefault": false,
-              "group": null,
+              "group": "",
               "specs": ""
             },
             "pilot_ground_craft": {
               "value": 0,
               "attribute": "reaction",
               "canDefault": false,
-              "group": null,
+              "group": "",
               "specs": ""
             },
             "pilot_water_craft": {
               "value": 0,
               "attribute": "reaction",
               "canDefault": false,
-              "group": null,
+              "group": "",
               "specs": ""
             },
             "pilot_exotic_vehicle": {
               "value": 0,
               "attribute": "reaction",
               "canDefault": false,
-              "group": null,
+              "group": "",
               "specs": ""
             }
           },
@@ -774,12 +779,11 @@
   "Item": {
     "types": ["spell", "armor", "range_weapon", "melee_weapon", "thrown_weapon", "adept_power", "critter_power", "quality", "commlink", "cyberware"],
     "templates": {
-      "itemDescription": {
-        "description": {
-          "value": "",
-          "chat": "",
-          "unidentified": ""
-        },
+      "name": "",
+      "description": {
+        "value": "",
+        "chat": "",
+        "unidentified": "",
         "source": ""
       },
       "technology": {
@@ -794,22 +798,21 @@
       },
       "action": {
         "type": "simple",
-        "attribute": null,
-        "skill": null,
+        "attribute": "",
+        "skill": "",
         "spec": false,
         "mod": 0,
-        "limit": null,
+        "limit": "",
         "extended": false,
         "damage": {
-          "type": "Stun",
+          "type": "stun",
           "element": "",
           "value": 0,
-          "attribute": null,
           "ap": 0
         },
         "opposed": {
-          "attribute": null,
-          "skill": null,
+          "attribute": "",
+          "skill": "",
           "mod": 0,
           "description": ""
         }
@@ -825,10 +828,10 @@
       }
     },
     "armor": {
-      "templates": ["itemDescription", "armor", "technology"]
+      "templates": ["description", "armor", "technology"]
     },
     "spell": {
-      "templates": ["itemDescription", "action"],
+      "templates": ["description", "action", "technology"],
       "drain": 0,
       "type": "physical",
       "range": "LOS",
@@ -855,7 +858,7 @@
       }
     },
     "range_weapon": {
-      "templates": ["itemDescription", "action", "technology"],
+      "templates": ["description", "action", "technology"],
       "modes": [],
       "mounts": [],
       "ammo": {
@@ -869,12 +872,12 @@
       "rc": 0
     },
     "melee_weapon": {
-      "templates": ["itemDescription", "action", "technology"],
+      "templates": ["description", "action", "technology"],
       "reach": 0,
       "accuracy": 0
     },
     "thrown_weapon": {
-      "templates": ["itemDescription", "action", "technology"],
+      "templates": ["description", "action", "technology"],
       "range": 0,
       "accuracy": 0,
       "blast": {
@@ -883,21 +886,21 @@
       }
     },
     "cyberware": {
-      "templates": ["itemDescription", "technology", "essenceCost"]
+      "templates": ["description", "technology", "essenceCost"]
     },
     "adept_power": {
-      "templates": ["itemDescription", "action", "armor"],
+      "templates": ["description", "action", "armor"],
       "pp": 0
     },
     "critter_power": {
-      "templates": ["itemDescription", "action", "armor"]
+      "templates": ["description", "action", "armor"]
     },
     "quality": {
-      "templates": ["itemDescription"],
+      "templates": ["description"],
       "type": "positive"
     },
     "commlink": {
-      "templates": ["itemDescription", "technology"],
+      "templates": ["description", "technology"],
       "attack": 0,
       "sleaze": 0,
       "firewall": 0,

@@ -14,20 +14,30 @@ hr.divider {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: flex-start; }
-  .flexrow.nowrap {
-    flex-wrap: nowrap; }
-  .flexrow.align-start {
-    align-items: flex-start; }
-  .flexrow.center {
-    justify-content: center; }
-  .flexrow.flex-end {
-    justify-content: flex-end; }
-  .flexrow.space-between {
-    justify-content: space-between; }
-  .flexrow.space-around {
-    justify-content: space-around; }
-  .flexrow.align-center {
-    align-items: center; }
+
+.nowrap {
+  flex-wrap: nowrap; }
+
+.align-stretch {
+  align-items: stretch; }
+
+.align-start {
+  align-items: flex-start; }
+
+.center {
+  justify-content: center; }
+
+.flex-end {
+  justify-content: flex-end; }
+
+.space-between {
+  justify-content: space-between; }
+
+.space-around {
+  justify-content: space-around; }
+
+.align-center {
+  align-items: center; }
 
 .flexcol {
   display: flex;
@@ -55,6 +65,9 @@ hr.divider {
 .flex4 {
   flex: 4; }
 
+.flexchild1 > * {
+  flex: 1 0 auto; }
+
 .input {
   position: relative; }
   .input.right > input[type="text"] {
@@ -68,19 +81,38 @@ hr.divider {
     top: 10%;
     z-index: 9; }
 
+input[type='checkbox'].display {
+  background: transparent;
+  border: none;
+  text-align: center;
+  font-size: 1em; }
+  input[type='checkbox'].display:hover {
+    background: transparent;
+    border: 2px groove white; }
+
 input[type="text"].display {
   background: transparent;
   border: none;
   text-align: center; }
   input[type="text"].display:hover {
     background: transparent;
-    border: 2px groove grey; }
+    border: 2px groove white; }
   input[type="text"].display.mod-input {
     font-size: .75em;
     margin-top: -.5em;
     margin-bottom: -.25em;
     line-height: 10px;
     padding: 0; }
+
+select.display {
+  background: transparent;
+  border: none;
+  text-align: center;
+  margin: 0 2px; }
+  select.display:hover {
+    background: transparent;
+    border: 2px groove white;
+    margin: 0; }
 
 .white {
   color: white; }
@@ -131,27 +163,143 @@ input[type="text"].display {
   background: url("../ui/parchment.jpg") repeat;
   color: black; }
 
+.sr5 .editor {
+  height: 10em;
+  width: 100%; }
+  .sr5 .editor .tox-toolbar-overlord,
+  .sr5 .editor .tox-toolbar__primary {
+    background: none; }
+
 .sr5 .profile-img {
   padding: .25em;
-  border-right: 2px groove grey;
-  border-bottom: 2px groove grey; }
+  border-right: 2px groove white;
+  border-bottom: 2px groove white; }
 
 .sr5 .character-name {
   margin-bottom: 0;
-  border-bottom: 2px groove grey;
-  border-right: 2px groove grey;
+  border-bottom: 2px groove white;
+  border-right: 2px groove white;
   font-size: 200%;
   font-family: "Nodesto", "Signika", "Palatino Linotype", serif; }
 
+.sr5 .track {
+  font-size: 120%;
+  font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
+  min-width: 3em;
+  text-align: center;
+  padding: 0 .25em;
+  margin-left: -1px; }
+  .sr5 .track.groove {
+    border-bottom: 2px groove white;
+    border-right: 2px groove white; }
+  .sr5 .track .track-inner {
+    display: flex;
+    flex-flow: column;
+    flex-wrap: nowrap;
+    align-items: center;
+    align-text: center; }
+  .sr5 .track .track-max-value {
+    margin-bottom: 0; }
+  .sr5 .track .track-input {
+    font-size: 1.25em;
+    text-align: center; }
+  .sr5 .track .track-bottom {
+    display: flex;
+    flex-flow: row;
+    flex-wrap: nowrap;
+    justify-content: center; }
+  .sr5 .track .track-title {
+    width: 100%;
+    text-align: center;
+    margin-bottom: .15em;
+    position: relative; }
+    .sr5 .track .track-title:after {
+      content: '';
+      display: block;
+      position: absolute;
+      width: 50%;
+      transform: translateX(50%);
+      border-bottom: 1px groove white; }
+  .sr5 .track .track-slash {
+    transform: translateY(10%);
+    flex: 0 0; }
+    .sr5 .track .track-slash:after {
+      content: '/'; }
+
+.sr5 .attributes {
+  border-top: 2px groove white;
+  display: flex;
+  flex-flow: row;
+  flex-wrap: nowrap; }
+  .sr5 .attributes:last-child {
+    border-bottom: 2px groove white; }
+  .sr5 .attributes .attribute {
+    font-size: 120%;
+    font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
+    display: flex;
+    text-align: center;
+    flex-flow: column;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 .25em;
+    min-width: 5rem; }
+    .sr5 .attributes .attribute:not(:last-child) {
+      border-right: 2px groove white; }
+    .sr5 .attributes .attribute > .attribute-name {
+      font-size: 115%;
+      width: 100%;
+      text-align: center;
+      margin-bottom: .15em;
+      position: relative; }
+      .sr5 .attributes .attribute > .attribute-name:after {
+        content: '';
+        display: block;
+        position: absolute;
+        width: 50%;
+        transform: translateX(50%);
+        border-bottom: 1px groove white; }
+      .sr5 .attributes .attribute > .attribute-name:hover {
+        text-shadow: 0 0 0.2em grey;
+        cursor: pointer; }
+    .sr5 .attributes .attribute > .attribute-input-container {
+      font-size: 1.25em;
+      align-text: center; }
+      .sr5 .attributes .attribute > .attribute-input-container > .attribute-input {
+        text-align: center;
+        margin-bottom: 0; }
+
+.sr5.item .item-name {
+  font-size: 120%;
+  font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
+  font-size: 1.5em; }
+
+.sr5.item .attribute {
+  font-size: 1em; }
+
+.sr5.item .technology {
+  font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
+  border-right: 2px groove white;
+  border-bottom: 2px groove white; }
+  .sr5.item .technology > * {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-contents: space-between; }
+
+.sr5.item .description {
+  padding: 2px;
+  min-height: 10em;
+  border-top: 2px groove white;
+  border-bottom: 2px groove white; }
+
 .sr5.actor {
   min-height: 56em;
-  min-width: 45em; }
+  min-width: 55em; }
   .sr5.actor .sheet-header-row-2 > * {
     text-align: center; }
   .sr5.actor .sheet-header-row-2 > *:not(:last-child) {
     margin-right: 1em; }
   .sr5.actor .sheet-header-row-2 > *:not(:first-child) {
-    border-left: 2px groove grey; }
+    border-left: 2px groove white; }
   .sr5.actor .sheet-header-row-2 .defense-icon {
     margin-left: .25em;
     margin-right: .25em; }
@@ -169,40 +317,12 @@ input[type="text"].display {
   .sr5.actor .limit {
     font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
     padding: 0 .1rem;
-    border-right: 2px groove grey;
+    border-right: 2px groove white;
     margin-top: -2px;
     text-align: center;
     align-items: center;
     align-content: center;
-    border-bottom: 2px groove grey; }
-  .sr5.actor .track {
-    font-size: 120%;
-    font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
-    border-bottom: 2px groove grey;
-    border-right: 2px groove grey;
-    min-width: 3em;
-    text-align: center;
-    padding: 0 .25em;
-    margin-left: -1px; }
-    .sr5.actor .track .track-max-value {
-      margin-bottom: 0; }
-    .sr5.actor .track .track-input {
-      font-size: 1.25em;
-      text-align: center; }
-    .sr5.actor .track .track-title {
-      width: 100%;
-      text-align: center;
-      margin-bottom: .15em;
-      position: relative; }
-      .sr5.actor .track .track-title:after {
-        content: '';
-        display: block;
-        position: absolute;
-        width: 50%;
-        transform: translateX(50%);
-        border-bottom: 1px groove grey; }
-    .sr5.actor .track .track-slash {
-      transform: translateY(10%); }
+    border-bottom: 2px groove white; }
   .sr5.actor .tab {
     max-height: 30em;
     overflow-y: auto;
@@ -218,63 +338,30 @@ input[type="text"].display {
       position: absolute;
       width: 50%;
       transform: translateX(50%);
-      border-bottom: 1px groove grey; }
+      border-bottom: 1px groove white; }
   .sr5.actor .sheet-header-row-1 {
     margin-bottom: .5em; }
   .sr5.actor .sheet-header {
     padding: 0; }
-  .sr5.actor .attributes {
-    border-top: 2px groove grey;
-    border-bottom: 2px groove grey; }
-    .sr5.actor .attributes .attribute {
-      font-size: 120%;
-      font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
-      align-items: center;
-      justify-content: space-around;
-      padding: 0 .25em; }
-      .sr5.actor .attributes .attribute:not(:last-child) {
-        border-right: 2px groove grey; }
-      .sr5.actor .attributes .attribute > .attribute-name {
-        font-size: 115%;
-        width: 100%;
-        text-align: center;
-        margin-bottom: .15em;
-        position: relative; }
-        .sr5.actor .attributes .attribute > .attribute-name:after {
-          content: '';
-          display: block;
-          position: absolute;
-          width: 50%;
-          transform: translateX(50%);
-          border-bottom: 1px groove grey; }
-        .sr5.actor .attributes .attribute > .attribute-name:hover {
-          text-shadow: 0 0 darkblue 0;
-          cursor: pointer; }
-      .sr5.actor .attributes .attribute > .attribute-input {
-        text-align: center;
-        margin-bottom: 0; }
   .sr5.actor .skill-header {
     font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
-    border-bottom: 2px groove grey; }
-    .sr5.actor .skill-header div:last-child {
-      margin-right: 1em; }
+    border-bottom: 2px groove white; }
     .sr5.actor .skill-header .skill-rtg {
       margin-right: 1.5em;
-      text-align: left; }
+      text-align: center; }
   .sr5.actor .skill {
     border-bottom: 1px solid black;
-    min-width: 16em;
+    width: 99%;
     padding: .1em; }
     .sr5.actor .skill .skill-name {
       transform: translateY(40%); }
       .sr5.actor .skill .skill-name:hover {
-        text-shadow: 0 0 darkblue 0;
+        text-shadow: 0 0 0.2em grey;
         cursor: pointer; }
     .sr5.actor .skill .skill-specs {
       font-size: .75em;
       line-height: 1em;
       margin-left: .5em;
-      margin-right: 1.5em;
       text-align: center; }
     .sr5.actor .skill .skill-dropdown {
       font-size: 75%;
@@ -287,3 +374,14 @@ input[type="text"].display {
       font-weight: semi-bold;
       text-align: center;
       margin-right: 1em; }
+  .sr5.actor .inventory {
+    display: flex;
+    flex-flow: column nowrap;
+    width: 100%; }
+    .sr5.actor .inventory .item {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: space-around; }
+      .sr5.actor .inventory .item.item-section {
+        font-size: 120%;
+        font-family: "Nodesto", "Signika", "Palatino Linotype", serif; }

@@ -14,12 +14,14 @@ $darkblue: darkblue;
 $crimson: crimson;
 $darkred: darkred;
 
+$rollcolor: $grey;
+
 $color: $black;
 $inner-color: $black;
 $outline-color: rgba($grey, 0.5);
 
 $groove-width: 2px;
-$groove-color: $grey;
+$groove-color: $white;
 $groove: $groove-width groove $groove-color;
 $radius: .25em;
 
@@ -29,7 +31,7 @@ $sheetbackground: url("../ui/parchment.jpg") repeat;
 
 @mixin rollable {
   &:hover {
-    text-shadow: 0 0 $darkblue 0;
+    text-shadow: 0 0 .2em $rollcolor;
     cursor: pointer;
   }
 }
@@ -79,27 +81,30 @@ hr.divider {
   flex-direction: row;
   flex-wrap: wrap;
   justify-content: flex-start;
-  &.nowrap {
-    flex-wrap: nowrap;
-  }
-  &.align-start {
-    align-items: flex-start;
-  }
-  &.center {
-    justify-content: center;
-  }
-  &.flex-end {
-    justify-content: flex-end;
-  }
-  &.space-between {
-    justify-content: space-between;
-  }
-  &.space-around {
-    justify-content: space-around;
-  }
-  &.align-center {
-    align-items: center;
-  }
+}
+.nowrap {
+  flex-wrap: nowrap;
+}
+.align-stretch {
+  align-items: stretch;
+}
+.align-start {
+  align-items: flex-start;
+}
+.center {
+  justify-content: center;
+}
+.flex-end {
+  justify-content: flex-end;
+}
+.space-between {
+  justify-content: space-between;
+}
+.space-around {
+  justify-content: space-around;
+}
+.align-center {
+  align-items: center;
 }
 .flexcol {
   display: flex;
@@ -127,6 +132,11 @@ hr.divider {
 .flex4 {
   flex: 4;
 }
+.flexchild1 {
+  > * {
+    flex: 1 0 auto;
+  }
+}
 
 .input {
   position: relative;
@@ -148,6 +158,17 @@ hr.divider {
   }
 }
 
+input[type='checkbox'].display {
+  background: transparent;
+  border: none;
+  text-align: center;
+  font-size: 1em;
+  &:hover {
+    background: transparent;
+    border: $groove;
+  }
+}
+
 input[type="text"].display {
   background: transparent;
   border: none;
@@ -165,6 +186,17 @@ input[type="text"].display {
   }
 }
 
+select.display {
+  background: transparent;
+  border: none;
+  text-align: center;
+  margin: 0 $groove-width;
+  &:hover {
+    background: transparent;
+    border: $groove;
+    margin: 0
+  }
+}
 
 .white {
   color: $white;
@@ -226,6 +258,15 @@ input[type="text"].display {
     color: $color;
   }
 
+  .editor {
+    height: 10em;
+    width: 100%;
+    .tox-toolbar-overlord,
+    .tox-toolbar__primary {
+      background: none;
+    }
+  }
+
   .profile-img {
     padding: .25em;
     border-right: $groove;
@@ -238,9 +279,122 @@ input[type="text"].display {
     font-size: 200%;
     @include nodesto;
   }
+  .track {
+    @include title;
+    &.groove {
+      border-bottom: $groove;
+      border-right: $groove;
+    }
+    min-width: 3em;
+    text-align: center;
+    padding: 0 .25em;
+    margin-left: -1px;
+
+    .track-inner {
+      display: flex;
+      flex-flow: column;
+      flex-wrap: nowrap;
+      align-items: center;
+      align-text: center;
+    }
+
+    .track-max-value {
+      margin-bottom: 0;
+    }
+
+    .track-input {
+      font-size: 1.25em;
+      text-align: center;
+    }
+
+    .track-bottom {
+      display: flex;
+      flex-flow: row;
+      flex-wrap: nowrap;
+      justify-content: center;
+    }
+
+    .track-title {
+      width: 100%;
+      text-align: center;
+      margin-bottom: .15em;
+      @include shortUnder;
+    }
+
+    .track-slash {
+      transform: translateY(10%);
+      flex: 0 0;
+      &:after {
+        content: '/';
+      }
+    }
+  }
+  .attributes {
+    border-top: $groove;
+    display: flex;
+    flex-flow: row;
+    flex-wrap: nowrap;
+    &:last-child {
+      border-bottom: $groove;
+    }
+    .attribute {
+      @include title
+      display: flex;
+      text-align: center;
+      flex-flow: column;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 .25em;
+      min-width: 5rem;
+      &:not(:last-child) {
+        border-right: $groove;
+      }
+      >.attribute-name {
+        font-size: 115%;
+        width: 100%;
+        text-align: center;
+        margin-bottom: .15em;
+        @include shortUnder;
+        @include rollable;
+      }
+      >.attribute-input-container {
+        font-size: 1.25em;
+        align-text: center;
+        >.attribute-input {
+          text-align: center;
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+  &.item {
+    .item-name {
+      @include title;
+      font-size: 1.5em;
+    }
+    .attribute {
+      font-size: 1em;
+    }
+    .technology {
+      @include nodesto;
+      > * {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-contents: space-between;
+      }
+      border-right: $groove;
+      border-bottom: $groove;
+    }
+    .description {
+      padding: 2px;
+      min-height: 10em;
+      border-top: $groove;
+      border-bottom: $groove;
+    }
+  }
   &.actor {
     min-height: 56em;
-    min-width: 45em;
+    min-width: 55em;
     .sheet-header-row-2 {
       > * {
         text-align: center;
@@ -283,35 +437,6 @@ input[type="text"].display {
 
       border-bottom: $groove;
     }
-    .track {
-      @include title;
-      border-bottom: $groove;
-      border-right: $groove;
-      min-width: 3em;
-      text-align: center;
-      padding: 0 .25em;
-      margin-left: -1px;
-
-      .track-max-value {
-        margin-bottom: 0;
-      }
-
-      .track-input {
-        font-size: 1.25em;
-        text-align: center;
-      }
-
-      .track-title {
-        width: 100%;
-        text-align: center;
-        margin-bottom: .15em;
-        @include shortUnder;
-      }
-
-      .track-slash {
-        transform: translateY(10%);
-      }
-    }
     .tab {
       max-height: 30em;
       overflow-y: auto;
@@ -329,48 +454,18 @@ input[type="text"].display {
     .sheet-header {
       padding: 0;
     }
-    .attributes {
-      border-top: $groove;
-      border-bottom: $groove;
-      .attribute {
-        @include title
-        align-items: center;
-        justify-content: space-around;
-        padding: 0 .25em;
-        &:not(:last-child) {
-          border-right: $groove;
-        }
-        >.attribute-name {
-          font-size: 115%;
-          width: 100%;
-          text-align: center;
-          margin-bottom: .15em;
-          @include shortUnder;
-          @include rollable;
-        }
-        >.attribute-input {
-          text-align: center;
-          margin-bottom: 0;
-        }
-      }
-    }
 
     .skill-header {
       @include nodesto;
       border-bottom: $groove;
-      div {
-        &:last-child {
-          margin-right: 1em;
-        }
-      }
       .skill-rtg {
         margin-right: 1.5em;
-        text-align: left;
+        text-align: center;
       }
     }
     .skill {
       border-bottom: 1px solid $black;
-      min-width: 16em;
+      width: 99%;
       padding: .1em;
 
 
@@ -383,7 +478,6 @@ input[type="text"].display {
         font-size: .75em;
         line-height: 1em;
         margin-left: .5em;
-        margin-right: 1.5em;
         text-align: center;
       }
 
@@ -400,6 +494,21 @@ input[type="text"].display {
         font-weight: semi-bold;
         text-align: center;
         margin-right: 1em;
+      }
+    }
+    .inventory {
+      display: flex;
+      flex-flow: column nowrap;
+      width: 100%;
+      .item {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-around;
+        &.item-section {
+          @include title;
+        }
+        .item-name {
+        }
       }
     }
   }
