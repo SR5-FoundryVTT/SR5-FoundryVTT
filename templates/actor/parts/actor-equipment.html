@@ -1,27 +1,54 @@
 <div class="inventory">
   {{#each sections as |section sid|}}
   <div class="item item-section">
-    <h3 class="item-name">
-      {{section.label}}
-    </h3>
+    <div class="item-left">
+      <div class="item-text item-name">
+        {{section.label}}
+      </div>
+    </div>
+    <div class="item-right">
+      <div class="item-text">
+        Equipped
+      </div>
+      <div class="item-text">
+        Qty.
+      </div>
+      <div class="item-text item-icons">
+        <i class="fas fa-plus"></i>
+        Add
+      </div>
+    </div>
   </div>
   {{#each section.items as |item iid|}}
-  <div class="item">
-    <h3 class="item-name">
-      {{item.name}}
-    </h3>
-    <h3 class="item-name">
-      {{item.data.technology.equipped}}
-    </h3>
-    <h3 class="item-name">
-      {{item.data.technology.rating}}
-    </h3>
-    <h3 class="item-name">
-      {{item.data.technology.quantity}}
-    </h3>
-    <h3 class="item-name item-edit" data-item='{{item.id}}'>
-      Edit
-    </h3>
+  <div class="item" data-item='{{item.id}}'>
+    <div class="item-left">
+      <div class="item-img">
+        <img src="{{item.img}}" data-edit="img" title="{{item.name}}" height='24px' width='24px'/>
+      </div>
+      <div class="item-text item-name">
+        {{item.name}}
+      </div>
+    </div>
+    <div class="item-right">
+      <div class="item-text">
+        <input class="checkbox" type="checkbox" name="item.data.technology.equipped" {{checked item.data.technology.equipped}} />
+      </div>
+      <div class="item-text">
+        <input
+          class="display"
+          type="text"
+          maxlength="3"
+          size='3'
+          value={{item.data.technology.quantity}}
+          name="{{item.data.technology.quantity}}"
+          placeholder="qty"
+          data-dtype="Number" />
+      </div>
+      <div class="item-text item-icons">
+        <i class="item-edit roll fas fa-edit" data-item='{{item.id}}'></i>
+        <i class="item-delete roll fas fa-trash" data-item='{{item.id}}'></i>
+      </div>
+    </div>
   </div>
   {{/each}}
   {{/each}}

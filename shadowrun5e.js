@@ -4,6 +4,7 @@ import { SR5ActorSheet } from "./module/actor/sheet.js";
 import { SR5Actor } from './module/actor/entity.js';
 import { SR5Item } from './module/item/entity.js';
 import { SR5 } from './module/config.js';
+import { Helpers } from './module/helpers.js';
 import { preloadHandlebarsTemplates } from './module/templates.js';
 
 /* -------------------------------------------- */
@@ -28,21 +29,17 @@ Hooks.once("init", async function() {
 
   // Register sheet application classes
   Actors.unregisterSheet("core", ActorSheet);
-  Actors.registerSheet("sR5", SR5ActorSheet, { types: ["character"], makeDefault: true });
+  Actors.registerSheet("sR5", SR5ActorSheet, { makeDefault: true });
   Items.unregisterSheet("core", ItemSheet);
-  Items.registerSheet("sR5", SR5ItemSheet, { types: ["range_weapon"], makeDefault: true});
+  Items.registerSheet("sR5", SR5ItemSheet, { makeDefault: true});
 });
 
-Handlebars.registerHelper("toHeaderCase", (str) => {
-  let items = str.split("_");
-  items = items.map((item) => {
-    item = item.charAt(0).toUpperCase() + item.substring(1);
-    return item;
-  });
-  return items.join(" ");
+Handlebars.registerHelper("toHeaderCase", function(str) {
+  if (str) return Helpers.label(str);
+  return "";
 });
 
-Handlebars.registerHelper("concat", (strs, c = ",") => {
+Handlebars.registerHelper("concat", function(strs, c = ",") {
   if (Array.isArray(strs)) {
     return strs.join(c);
   }
@@ -50,23 +47,17 @@ Handlebars.registerHelper("concat", (strs, c = ",") => {
 });
 
 // if greater than
-Handlebars.registerHelper("ifgt", (v1, v2, options) => {
+Handlebars.registerHelper("ifgt", function(v1, v2, options) {
  if (v1 > v2) return options.fn(this);
  else return options.inverse(this);
 });
 // if not equal
-Handlebars.registerHelper("ifne", (v1, v2, options) => {
+Handlebars.registerHelper("ifne", function(v1, v2, options) {
  if (v1 !== v2) return options.fn(this);
  else return options.inverse(this);
 });
-
-Handlebars.registerHelper("ifIncludes", (str, sub) => {
-  return str.includes(sub);
-});
-
-Handlebars.registerHelper("ifNotEmpty", (arr) => {
-  if (Array.isArray(arr)) {
-    return arr.length > 0;
-  }
-  return false;
+// if equal
+Handlebars.registerHelper("ife", function(v1, v2, options) {
+ if (v1 === v2) return options.fn(this);
+ else return options.inverse(this);
 });

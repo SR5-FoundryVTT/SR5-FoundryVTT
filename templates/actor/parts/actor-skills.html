@@ -1,0 +1,57 @@
+<div class="inventory">
+  <div class="scroll-area">
+    {{#each data.attributes as |attribute attId|}}
+    {{#if attribute.skills}}
+    <div>
+      <div class="item item-section skill-header" data-attribute="{{attId}}">
+        <div class="item-left">
+          <div class="item-text item-name">
+            {{toHeaderCase attId}}
+          </div>
+        </div>
+        <div class="item-right">
+          <div class="item-text skill-item">
+            Specializations
+          </div>
+          <div class="item-text">
+            Rating
+          </div>
+        </div>
+      </div>
+      {{#each attribute.skills as |skill sid|}}
+      <div class="item">
+        <div class="item-left">
+          <div class="item-text item-name skill-roll roll" data-skill='{{sid}}'>
+            {{toHeaderCase sid}}
+          </div>
+        </div>
+        <div class="item-right">
+          <div class="item-text skill-item">
+            <input
+              class="display"
+              type="text"
+              maxlength="20"
+              size="20"
+              value="{{skill.specs}}"
+              name="data.skills.active.{{sid}}.specs" />
+          </div>
+          <div class="item-text">
+            <input
+              class="display"
+              type="text"
+              maxlength="2"
+              size='2'
+              value="{{skill.value}}"
+              name="data.skills.active.{{sid}}.value"
+              placeholder="0"
+              data-dtype="Number"/>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+    {{/if}}
+    {{/each}}
+  </div>
+</div>
+

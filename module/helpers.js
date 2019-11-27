@@ -15,7 +15,7 @@ export class Helpers {
     return retObj;
   }
 
-  static addLabels(obj, label) {
+  static addLabels(obj, label, recurs = false) {
     if (typeof obj === 'object' && obj !== null) {
       if (!obj.hasOwnProperty('label') && obj.hasOwnProperty('value') && label !== '') {
         obj.label = label;

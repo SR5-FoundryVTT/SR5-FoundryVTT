@@ -1,0 +1,28 @@
+<form class="{{cssClass}}" autocomplete="off">
+  <div class="flexrow align-start">
+    {{> "systems/shadowrun5e/templates/item/parts/item-left.html" }}
+    <div class="flexcol">
+      {{> "systems/shadowrun5e/templates/item/parts/item-header.html" }}
+      <div class="attributes smooth">
+        <div class="attribute row">
+          <h4 class="attribute-name">Essence Cost</h4>
+          <h3 class="attribute-input-container">
+            <input
+              class="display attribute-input"
+              type="text"
+              maxlength="2"
+              size="2"
+              name="data.essence"
+              value="{{data.essence}}"
+              data-dtype="Number"
+              placeholder="1"/>
+          </h3>
+        </div>
+          </div>
+        </div>
+      </div>
+      {{> "systems/shadowrun5e/templates/item/parts/item-description.html"}}
+    </div>
+  </div>
+</form>
+

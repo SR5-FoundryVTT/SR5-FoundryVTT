@@ -1,0 +1,73 @@
+<div class="attributes smooth">
+  <div class="attribute row">
+    <h4 class="attribute-name">Drain</h4>
+    <select name="data.magic.attribute" class="display">
+      {{#select data.magic.attribute}}
+      {{#each config.spell.attributes}}
+      <option value="{{this}}">{{toHeaderCase this}}</option>
+      {{/each}}
+      {{/select}}
+    </select>
+  </div>
+</div>
+<div class="inventory">
+  <div class="scroll-area">
+    {{#each sections as |section sid|}}
+    <div class="item item-section">
+      <div class="item-left">
+        <div class="item-text item-name">
+          {{section.label}}
+        </div>
+      </div>
+      <div class="item-right">
+        <div class="item-text">
+          Type
+        </div>
+        <div class="item-text">
+          Range
+        </div>
+        <div class="item-text">
+          Duration
+        </div>
+        <div class="item-text">
+          Drain
+        </div>
+        <div class="item-text item-icons">
+          <i class="fas fa-plus"></i>
+          Add
+        </div>
+      </div>
+    </div>
+    {{#each section.items as |item iid|}}
+    <div class="item" data-item='{{item.id}}'>
+      <div class="item-left">
+        <div class="item-img">
+          <img src="{{item.img}}" data-edit="img" title="{{item.name}}" height='24px' width='24px'/>
+        </div>
+        <div class="item-text item-name">
+          {{item.name}}
+        </div>
+      </div>
+      <div class="item-right">
+        <div class="item-text">
+          {{toHeaderCase item.data.type}}
+        </div>
+        <div class="item-text">
+          {{toHeaderCase item.data.range}}
+        </div>
+        <div class="item-text">
+          {{toHeaderCase item.data.duration}}
+        </div>
+        <div class="item-text">
+          {{item.data.drain}}
+        </div>
+        <div class="item-text item-icons">
+          <i class="item-edit roll fas fa-edit" data-item='{{item.id}}'></i>
+          <i class="item-delete roll fas fa-trash" data-item='{{item.id}}'></i>
+        </div>
+      </div>
+    </div>
+    {{/each}}
+    {{/each}}
+  </div>
+</div>

@@ -6,11 +6,13 @@ export class SR5Actor extends Actor {
 
   prepareData(actorData) {
     actorData = super.prepareData(actorData);
-    Helpers.addLabels(actorData.data, '');
 
     const data = actorData.data;
     const attrs = data.attributes;
     const armor = data.armor;
+
+    Helpers.addLabels(data.skills);
+    Helpers.addLabels(data.attributes);
 
     const limits = data.limits;
     limits.physical.value = Math.ceil(((2 * attrs.strength.value)

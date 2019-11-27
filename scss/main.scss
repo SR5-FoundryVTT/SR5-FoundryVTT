@@ -67,6 +67,10 @@ $sheetbackground: url("../ui/parchment.jpg") repeat;
   }
 }
 
+.roll {
+  @include rollable;
+}
+
 hr.divider {
   margin: 0em;
   border-width: .1em;
@@ -171,8 +175,9 @@ input[type='checkbox'].display {
 
 input[type="text"].display {
   background: transparent;
-  border: none;
+  border: $groove-width solid transparent;
   text-align: center;
+  min-height: 1em;
   &:hover {
     background: transparent;
     border: $groove;
@@ -250,6 +255,12 @@ select.display {
 .size7 {
   font-size: .75em;
 }
+.groove-bottom {
+  border-bottom: $groove;
+}
+.groove-top {
+  border-top: $groove;
+}
 
 .sr5 {
   .window-content {
@@ -272,62 +283,11 @@ select.display {
     border-right: $groove;
     border-bottom: $groove;
   }
-  .character-name {
+  .name {
     margin-bottom: 0;
-    border-bottom: $groove;
     border-right: $groove;
     font-size: 200%;
     @include nodesto;
-  }
-  .track {
-    @include title;
-    &.groove {
-      border-bottom: $groove;
-      border-right: $groove;
-    }
-    min-width: 3em;
-    text-align: center;
-    padding: 0 .25em;
-    margin-left: -1px;
-
-    .track-inner {
-      display: flex;
-      flex-flow: column;
-      flex-wrap: nowrap;
-      align-items: center;
-      align-text: center;
-    }
-
-    .track-max-value {
-      margin-bottom: 0;
-    }
-
-    .track-input {
-      font-size: 1.25em;
-      text-align: center;
-    }
-
-    .track-bottom {
-      display: flex;
-      flex-flow: row;
-      flex-wrap: nowrap;
-      justify-content: center;
-    }
-
-    .track-title {
-      width: 100%;
-      text-align: center;
-      margin-bottom: .15em;
-      @include shortUnder;
-    }
-
-    .track-slash {
-      transform: translateY(10%);
-      flex: 0 0;
-      &:after {
-        content: '/';
-      }
-    }
   }
   .attributes {
     border-top: $groove;
@@ -337,34 +297,80 @@ select.display {
     &:last-child {
       border-bottom: $groove;
     }
+    &.smooth {
+      justify-content: space-between;
+
+      >.attribute {
+        flex: 1 0 auto;
+      }
+    }
     .attribute {
       @include title
       display: flex;
       text-align: center;
-      flex-flow: column;
+      flex-flow: column nowrap;
       align-items: center;
       justify-content: space-around;
       padding: 0 .25em;
       min-width: 5rem;
+      &.row {
+        flex-flow: row nowrap;
+        justify-content: center;
+        align-items: center;
+        align-content: center;
+        >.attribute-name {
+          width: auto;
+        }
+        .attribute-input {
+          transform: translateY(20%);
+        }
+      }
       &:not(:last-child) {
         border-right: $groove;
+      }
+      &:not(.row) > .attribute-name {
+        @include shortUnder;
       }
       >.attribute-name {
         font-size: 115%;
         width: 100%;
         text-align: center;
-        margin-bottom: .15em;
-        @include shortUnder;
-        @include rollable;
-      }
-      >.attribute-input-container {
-        font-size: 1.25em;
-        align-text: center;
-        >.attribute-input {
-          text-align: center;
-          margin-bottom: 0;
+        margin-bottom: 0;
+        &.roll {
+          @include rollable;
         }
       }
+      .attribute-input-container {
+        align-text: center;
+        position: relative;
+        >.attribute-input {
+          text-align: center;
+          margin: 2px;
+        }
+        .unit {
+          top: 0;
+          left: 0;
+        }
+      }
+      .track {
+        display: flex;
+        flex-flow: row;
+        flex-wrap: nowrap;
+        justify-content: center;
+        margin-bottom: 0;
+        .track-slash {
+          transform: translateY(10%);
+          flex: 0 0;
+          &:after {
+            content: '/';
+          }
+        }
+        .track-max-value {
+          margin-bottom: 0;
+          margin-left: .25em;
+        }
+      }
+
     }
   }
   &.item {
@@ -372,15 +378,12 @@ select.display {
       @include title;
       font-size: 1.5em;
     }
-    .attribute {
-      font-size: 1em;
-    }
     .technology {
       @include nodesto;
       > * {
         display: flex;
         flex-flow: row nowrap;
-        justify-contents: space-between;
+        justify-content: space-between;
       }
       border-right: $groove;
       border-bottom: $groove;
@@ -432,16 +435,19 @@ select.display {
       border-right: $groove;
       margin-top: -2px;
       text-align: center;
+      display: flex;
+      flex-flow: column nowrap;
+      justify-content: center;
       align-items: center;
       align-content: center;
-
-      border-bottom: $groove;
     }
     .tab {
-      max-height: 30em;
-      overflow-y: auto;
       border-radius: $radius;
       margin-top: 1em;
+      .scroll-area {
+        overflow-y: auto;
+        max-height: 28em;
+      }
     }
     .tabs >a {
       @include shortUnder;
@@ -454,60 +460,81 @@ select.display {
     .sheet-header {
       padding: 0;
     }
-
-    .skill-header {
-      @include nodesto;
-      border-bottom: $groove;
-      .skill-rtg {
-        margin-right: 1.5em;
-        text-align: center;
-      }
-    }
-    .skill {
-      border-bottom: 1px solid $black;
-      width: 99%;
-      padding: .1em;
-
-
-      .skill-name {
-        transform: translateY(40%);
-        @include rollable;
-      }
-
-      .skill-specs {
-        font-size: .75em;
-        line-height: 1em;
-        margin-left: .5em;
-        text-align: center;
-      }
-
-      .skill-dropdown {
-        font-size: 75%;
-        height: 2em;
-        margin-right: 1em;
-        margin-left: 1em;
-        text-align: center;
-      }
-
-      .skill-value {
-        font-size: 1.25em;
-        font-weight: semi-bold;
-        text-align: center;
-        margin-right: 1em;
-      }
-    }
     .inventory {
       display: flex;
       flex-flow: column nowrap;
       width: 100%;
+      font-size: 85%;
+      position: relative;
+      .item:not(.item-section) + .item:not(.item-section) {
+        border-top: 1px solid rgba($black, 0.5);
+      }
       .item {
         display: flex;
         flex-flow: row nowrap;
-        justify-content: space-around;
+        justify-content: space-between;
+        align-items: center;
+        align-content: center;
+        margin: .1em 0;
+        padding: .25em;
+        margin-right: $groove-width;
+        margin-left: $groove-width;
         &.item-section {
-          @include title;
+          border: $groove;
+          margin-right: 0;
+          margin-left: 0;
+          background: rgba($grey, 0.2);
         }
-        .item-name {
+        .item-left {
+          display: flex;
+          flex-flow: row nowrap;
+          justify-content: flex-start;
+          align-items: center;
+        }
+        .item-right {
+          display: flex;
+          flex-flow: row nowrap;
+          justify-content: flex-end;
+          align-items: center;
+        }
+        .item-img {
+          padding: 0 .25em;
+          flex: 0;
+          margin: -.25em 0;
+          >img {
+            margin: 0;
+          }
+          & + .item-name {
+            border-left: none !important;
+          }
+        }
+        .item-icons {
+          display: flex;
+          flex-flow: row nowrap;
+          justify-content: space-evenly;
+          align-items: center;
+          color: $grey;
+          font-size: .75em;
+          height: 100%;
+        }
+        .item-text {
+          &:not(:first-child) {
+            border-left: 1px solid rgba($grey, 0.5);
+          }
+          &.item-name {
+            text-align: left;
+          }
+          min-width: 5em;
+          margin-bottom: 0;
+          flex: 1 0 auto;
+          text-align: center;
+          height: 100%;
+        }
+        .skill-item {
+          min-width: 10em;
+        }
+        &.skill-header {
+          @include rollable;
         }
       }
     }

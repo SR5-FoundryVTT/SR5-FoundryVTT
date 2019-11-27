@@ -1,0 +1,110 @@
+<form class="{{cssClass}}" autocomplete="off">
+  <div class="flexrow align-start">
+    {{> "systems/shadowrun5e/templates/item/parts/item-left.html" }}
+    <div class="flexcol">
+      {{> "systems/shadowrun5e/templates/item/parts/spell-body.html" categories=config.spell.categories}}
+      {{#ife data.category config.spell.categories.COMBAT}}
+      <div class="attributes smooth">
+        <div class="attribute">
+          <select name="data.action.damage.type" class="display">
+            {{#select data.action.damage.type}}
+            {{#each config.damageTypes}}
+            <option value="{{this}}">{{toHeaderCase this}}</option>
+            {{/each}}
+            {{/select}}
+          </select>
+        </div>
+        <div class="attribute">
+          <select name="data.action.damage.element" class="display">
+            {{#select data.action.damage.element}}
+            <option value="">None</option>
+            {{#each config.elementTypes}}
+            <option value="{{this}}">{{toHeaderCase this}}</option>
+            {{/each}}
+            {{/select}}
+          </select>
+        </div>
+        <div class="attribute">
+          <select name="data.combat.type" class="display">
+            {{#select data.combat.type}}
+            {{#each config.spell.combatTypes}}
+            <option value="{{this}}">{{toHeaderCase this}}</option>
+            {{/each}}
+            {{/select}}
+          </select>
+        </div>
+      </div>
+      {{/ife}}
+      {{#ife data.category config.spell.categories.DETECTION}}
+      <div class="attributes smooth">
+        <div class="attribute">
+          <label class='checkbox'>
+            Passive <input class='display' type='checkbox' name='data.detection.active' {{checked data.detection.active}}/>
+          </label>
+        </div>
+        <div class="attribute">
+          <select name="data.detection.type" class="display">
+            {{#select data.detection.type}}
+            {{#each config.spell.detectionTypes}}
+            <option value="{{this}}">{{toHeaderCase this}}</option>
+            {{/each}}
+            {{/select}}
+          </select>
+        </div>
+        <div class="attribute">
+          <label class='checkbox'>
+            Extended <input class='display' type='checkbox' name='data.detection.extended' {{checked data.detection.extended}}/>
+          </label>
+        </div>
+      </div>
+      {{/ife}}
+      {{#ife data.category config.spell.categories.ILLUSION}}
+      <div class="attributes smooth">
+        <div class="attribute">
+          <select name="data.illusion.type" class="display">
+            {{#select data.illusion.type}}
+            {{#each config.spell.illusionTypes}}
+            <option value="{{this}}">{{toHeaderCase this}}</option>
+            {{/each}}
+            {{/select}}
+          </select>
+        </div>
+        <div class="attribute">
+          <select name="data.illusion.sense" class="display">
+            {{#select data.illusion.sense}}
+            {{#each config.spell.illusionSenses}}
+            <option value="{{this}}">{{toHeaderCase this}}</option>
+            {{/each}}
+            {{/select}}
+          </select>
+        </div>
+      </div>
+      {{/ife}}
+      {{#ife data.category config.spell.categories.MANIPULATION}}
+      <div class="attributes smooth">
+        <div class="attribute">
+          <label class='checkbox'>
+            Damaging <input class='display' type='checkbox' name='data.manipulation.damaging' {{checked data.manipulation.damaging}}/>
+          </label>
+        </div>
+        <div class="attribute">
+          <label class='checkbox'>
+            Mental <input class='display' type='checkbox' name='data.manipulation.mental' {{checked data.manipulation.mental}}/>
+          </label>
+        </div>
+        <div class="attribute">
+          <label class='checkbox'>
+            Environmental <input class='display' type='checkbox' name='data.manipulation.environmental' {{checked data.manipulation.environmental}}/>
+          </label>
+        </div>
+        <div class="attribute">
+          <label class='checkbox'>
+            Physical <input class='display' type='checkbox' name='data.manipulation.physical' {{checked data.manipulation.physical}}/>
+          </label>
+        </div>
+      </div>
+      {{/ife}}
+      {{> "systems/shadowrun5e/templates/item/parts/item-description.html"}}
+    </div>
+  </div>
+</form>

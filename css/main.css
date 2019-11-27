@@ -2,6 +2,10 @@
   font-family: "Nodesto";
   src: url("../fonts/NodestoCapsCondensed.otf"); }
 
+.roll:hover {
+  text-shadow: 0 0 0.2em grey;
+  cursor: pointer; }
+
 hr.divider {
   margin: 0em;
   border-width: .1em; }
@@ -92,8 +96,9 @@ input[type='checkbox'].display {
 
 input[type="text"].display {
   background: transparent;
-  border: none;
-  text-align: center; }
+  border: 2px solid transparent;
+  text-align: center;
+  min-height: 1em; }
   input[type="text"].display:hover {
     background: transparent;
     border: 2px groove white; }
@@ -158,6 +163,12 @@ select.display {
 .size7 {
   font-size: .75em; }
 
+.groove-bottom {
+  border-bottom: 2px groove white; }
+
+.groove-top {
+  border-top: 2px groove white; }
+
 .sr5 .window-content {
   font-size: 115%;
   background: url("../ui/parchment.jpg") repeat;
@@ -175,56 +186,11 @@ select.display {
   border-right: 2px groove white;
   border-bottom: 2px groove white; }
 
-.sr5 .character-name {
+.sr5 .name {
   margin-bottom: 0;
-  border-bottom: 2px groove white;
   border-right: 2px groove white;
   font-size: 200%;
   font-family: "Nodesto", "Signika", "Palatino Linotype", serif; }
-
-.sr5 .track {
-  font-size: 120%;
-  font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
-  min-width: 3em;
-  text-align: center;
-  padding: 0 .25em;
-  margin-left: -1px; }
-  .sr5 .track.groove {
-    border-bottom: 2px groove white;
-    border-right: 2px groove white; }
-  .sr5 .track .track-inner {
-    display: flex;
-    flex-flow: column;
-    flex-wrap: nowrap;
-    align-items: center;
-    align-text: center; }
-  .sr5 .track .track-max-value {
-    margin-bottom: 0; }
-  .sr5 .track .track-input {
-    font-size: 1.25em;
-    text-align: center; }
-  .sr5 .track .track-bottom {
-    display: flex;
-    flex-flow: row;
-    flex-wrap: nowrap;
-    justify-content: center; }
-  .sr5 .track .track-title {
-    width: 100%;
-    text-align: center;
-    margin-bottom: .15em;
-    position: relative; }
-    .sr5 .track .track-title:after {
-      content: '';
-      display: block;
-      position: absolute;
-      width: 50%;
-      transform: translateX(50%);
-      border-bottom: 1px groove white; }
-  .sr5 .track .track-slash {
-    transform: translateY(10%);
-    flex: 0 0; }
-    .sr5 .track .track-slash:after {
-      content: '/'; }
 
 .sr5 .attributes {
   border-top: 2px groove white;
@@ -233,48 +199,76 @@ select.display {
   flex-wrap: nowrap; }
   .sr5 .attributes:last-child {
     border-bottom: 2px groove white; }
+  .sr5 .attributes.smooth {
+    justify-content: space-between; }
+    .sr5 .attributes.smooth > .attribute {
+      flex: 1 0 auto; }
   .sr5 .attributes .attribute {
     font-size: 120%;
     font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
     display: flex;
     text-align: center;
-    flex-flow: column;
+    flex-flow: column nowrap;
     align-items: center;
     justify-content: space-around;
     padding: 0 .25em;
     min-width: 5rem; }
+    .sr5 .attributes .attribute.row {
+      flex-flow: row nowrap;
+      justify-content: center;
+      align-items: center;
+      align-content: center; }
+      .sr5 .attributes .attribute.row > .attribute-name {
+        width: auto; }
+      .sr5 .attributes .attribute.row .attribute-input {
+        transform: translateY(20%); }
     .sr5 .attributes .attribute:not(:last-child) {
       border-right: 2px groove white; }
-    .sr5 .attributes .attribute > .attribute-name {
-      font-size: 115%;
-      width: 100%;
-      text-align: center;
-      margin-bottom: .15em;
+    .sr5 .attributes .attribute:not(.row) > .attribute-name {
       position: relative; }
-      .sr5 .attributes .attribute > .attribute-name:after {
+      .sr5 .attributes .attribute:not(.row) > .attribute-name:after {
         content: '';
         display: block;
         position: absolute;
         width: 50%;
         transform: translateX(50%);
         border-bottom: 1px groove white; }
-      .sr5 .attributes .attribute > .attribute-name:hover {
+    .sr5 .attributes .attribute > .attribute-name {
+      font-size: 115%;
+      width: 100%;
+      text-align: center;
+      margin-bottom: 0; }
+      .sr5 .attributes .attribute > .attribute-name.roll:hover {
         text-shadow: 0 0 0.2em grey;
         cursor: pointer; }
-    .sr5 .attributes .attribute > .attribute-input-container {
-      font-size: 1.25em;
-      align-text: center; }
-      .sr5 .attributes .attribute > .attribute-input-container > .attribute-input {
+    .sr5 .attributes .attribute .attribute-input-container {
+      align-text: center;
+      position: relative; }
+      .sr5 .attributes .attribute .attribute-input-container > .attribute-input {
         text-align: center;
-        margin-bottom: 0; }
+        margin: 2px; }
+      .sr5 .attributes .attribute .attribute-input-container .unit {
+        top: 0;
+        left: 0; }
+    .sr5 .attributes .attribute .track {
+      display: flex;
+      flex-flow: row;
+      flex-wrap: nowrap;
+      justify-content: center;
+      margin-bottom: 0; }
+      .sr5 .attributes .attribute .track .track-slash {
+        transform: translateY(10%);
+        flex: 0 0; }
+        .sr5 .attributes .attribute .track .track-slash:after {
+          content: '/'; }
+      .sr5 .attributes .attribute .track .track-max-value {
+        margin-bottom: 0;
+        margin-left: .25em; }
 
 .sr5.item .item-name {
   font-size: 120%;
   font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
   font-size: 1.5em; }
-
-.sr5.item .attribute {
-  font-size: 1em; }
 
 .sr5.item .technology {
   font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
@@ -283,7 +277,7 @@ select.display {
   .sr5.item .technology > * {
     display: flex;
     flex-flow: row nowrap;
-    justify-contents: space-between; }
+    justify-content: space-between; }
 
 .sr5.item .description {
   padding: 2px;
@@ -320,14 +314,17 @@ select.display {
     border-right: 2px groove white;
     margin-top: -2px;
     text-align: center;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
     align-items: center;
-    align-content: center;
-    border-bottom: 2px groove white; }
+    align-content: center; }
   .sr5.actor .tab {
-    max-height: 30em;
-    overflow-y: auto;
     border-radius: 0.25em;
     margin-top: 1em; }
+    .sr5.actor .tab .scroll-area {
+      overflow-y: auto;
+      max-height: 28em; }
   .sr5.actor .tabs > a {
     position: relative;
     margin: .25em;
@@ -343,45 +340,67 @@ select.display {
     margin-bottom: .5em; }
   .sr5.actor .sheet-header {
     padding: 0; }
-  .sr5.actor .skill-header {
-    font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
-    border-bottom: 2px groove white; }
-    .sr5.actor .skill-header .skill-rtg {
-      margin-right: 1.5em;
-      text-align: center; }
-  .sr5.actor .skill {
-    border-bottom: 1px solid black;
-    width: 99%;
-    padding: .1em; }
-    .sr5.actor .skill .skill-name {
-      transform: translateY(40%); }
-      .sr5.actor .skill .skill-name:hover {
-        text-shadow: 0 0 0.2em grey;
-        cursor: pointer; }
-    .sr5.actor .skill .skill-specs {
-      font-size: .75em;
-      line-height: 1em;
-      margin-left: .5em;
-      text-align: center; }
-    .sr5.actor .skill .skill-dropdown {
-      font-size: 75%;
-      height: 2em;
-      margin-right: 1em;
-      margin-left: 1em;
-      text-align: center; }
-    .sr5.actor .skill .skill-value {
-      font-size: 1.25em;
-      font-weight: semi-bold;
-      text-align: center;
-      margin-right: 1em; }
   .sr5.actor .inventory {
     display: flex;
     flex-flow: column nowrap;
-    width: 100%; }
+    width: 100%;
+    font-size: 85%;
+    position: relative; }
+    .sr5.actor .inventory .item:not(.item-section) + .item:not(.item-section) {
+      border-top: 1px solid rgba(0, 0, 0, 0.5); }
     .sr5.actor .inventory .item {
       display: flex;
       flex-flow: row nowrap;
-      justify-content: space-around; }
+      justify-content: space-between;
+      align-items: center;
+      align-content: center;
+      margin: .1em 0;
+      padding: .25em;
+      margin-right: 2px;
+      margin-left: 2px; }
       .sr5.actor .inventory .item.item-section {
-        font-size: 120%;
-        font-family: "Nodesto", "Signika", "Palatino Linotype", serif; }
+        border: 2px groove white;
+        margin-right: 0;
+        margin-left: 0;
+        background: rgba(128, 128, 128, 0.2); }
+      .sr5.actor .inventory .item .item-left {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: flex-start;
+        align-items: center; }
+      .sr5.actor .inventory .item .item-right {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: flex-end;
+        align-items: center; }
+      .sr5.actor .inventory .item .item-img {
+        padding: 0 .25em;
+        flex: 0;
+        margin: -.25em 0; }
+        .sr5.actor .inventory .item .item-img > img {
+          margin: 0; }
+        .sr5.actor .inventory .item .item-img + .item-name {
+          border-left: none !important; }
+      .sr5.actor .inventory .item .item-icons {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-evenly;
+        align-items: center;
+        color: grey;
+        font-size: .75em;
+        height: 100%; }
+      .sr5.actor .inventory .item .item-text {
+        min-width: 5em;
+        margin-bottom: 0;
+        flex: 1 0 auto;
+        text-align: center;
+        height: 100%; }
+        .sr5.actor .inventory .item .item-text:not(:first-child) {
+          border-left: 1px solid rgba(128, 128, 128, 0.5); }
+        .sr5.actor .inventory .item .item-text.item-name {
+          text-align: left; }
+      .sr5.actor .inventory .item .skill-item {
+        min-width: 10em; }
+      .sr5.actor .inventory .item.skill-header:hover {
+        text-shadow: 0 0 0.2em grey;
+        cursor: pointer; }

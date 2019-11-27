@@ -142,6 +142,9 @@
           "sprint": 2,
           "swimming": 2
         },
+        "magic": {
+          "attribute": "logic"
+        },
         "armor": {
           "value": 0,
           "mod": 0,
@@ -378,6 +381,7 @@
             },
             "instruction": {
               "value": 0,
+              "attribute": "charisma",
               "canDefault": true,
               "group": "",
               "specs": ""
@@ -777,7 +781,17 @@
     }
   },
   "Item": {
-    "types": ["spell", "armor", "range_weapon", "melee_weapon", "thrown_weapon", "adept_power", "critter_power", "quality", "commlink", "cyberware"],
+    "types": [
+      "spell",
+      "armor",
+      "weapon",
+      "adept_power",
+      "critter_power",
+      "quality",
+      "device",
+      "cyberware",
+      "equipment"
+    ],
     "templates": {
       "name": "",
       "description": {
@@ -793,9 +807,6 @@
         "cost": 0,
         "equipped": false
       },
-      "essenceCost": {
-        "essence": 0
-      },
       "action": {
         "type": "simple",
         "attribute": "",
@@ -808,18 +819,19 @@
           "type": "stun",
           "element": "",
           "value": 0,
-          "ap": 0
+          "ap": 0,
+          "attribute": ""
         },
         "opposed": {
-          "attribute": "",
-          "skill": "",
+          "attributes": [],
+          "skills": [],
           "mod": 0,
           "description": ""
         }
       },
       "armor": {
         "value": 0,
-        "mod": 0,
+        "mod": false,
         "acid": 0,
         "cold": 0,
         "fire": 0,
@@ -831,23 +843,23 @@
       "templates": ["description", "armor", "technology"]
     },
     "spell": {
-      "templates": ["description", "action", "technology"],
       "drain": 0,
+      "category": "combat",
       "type": "physical",
       "range": "LOS",
       "area": false,
-      "duration": "instantaneous",
-      "category": "combat",
+      "duration": "instant",
+      "attribute": "logic",
       "combat": {
         "type": "indirect"
       },
       "detection": {
-        "active": true,
+        "passive": false,
         "type": "directional",
         "extended": false
       },
       "illusion": {
-        "realistic": true,
+        "type": "realistic",
         "sense": "single"
       },
       "manipulation": {
@@ -857,36 +869,36 @@
         "physical": false
       }
     },
-    "range_weapon": {
+    "weapon": {
       "templates": ["description", "action", "technology"],
-      "modes": [],
-      "mounts": [],
-      "ammo": {
-        "max": 0,
-        "value": 0,
-        "name": "Regular",
-        "damage": 0,
-        "ap": 0
+      "category": "range",
+      "range": {
+        "modes": [],
+        "mounts": [],
+        "ammo": {
+          "max": 0,
+          "value": 0,
+          "name": "Regular",
+          "damage": 0,
+          "ap": 0
+        },
+        "range": "",
+        "rc": 0
       },
-      "accuracy": 0,
-      "rc": 0
-    },
-    "melee_weapon": {
-      "templates": ["description", "action", "technology"],
-      "reach": 0,
-      "accuracy": 0
-    },
-    "thrown_weapon": {
-      "templates": ["description", "action", "technology"],
-      "range": 0,
-      "accuracy": 0,
-      "blast": {
-        "value": 0,
-        "dropoff": 0
+      "melee": {
+        "reach": 0
+      },
+      "thrown": {
+        "range": 0,
+        "blast": {
+          "value": 0,
+          "dropoff": 0
+        }
       }
     },
     "cyberware": {
-      "templates": ["description", "technology", "essenceCost"]
+      "templates": ["description", "technology", "armor"],
+      "essence": 0
     },
     "adept_power": {
       "templates": ["description", "action", "armor"],
@@ -899,12 +911,19 @@
       "templates": ["description"],
       "type": "positive"
     },
-    "commlink": {
+    "device": {
       "templates": ["description", "technology"],
       "attack": 0,
       "sleaze": 0,
       "firewall": 0,
-      "data_processing": 0
+      "data_processing": 0,
+      "condition_monitor": {
+        "value": 0,
+        "max": 9
+      }
+    },
+    "equipment": {
+      "templates": ["description", "technology"]
     }
   }
 }

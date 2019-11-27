@@ -7,7 +7,7 @@
       <div class="flexcol flex4">
         <div class="flexrow">
           <div class="flex4">
-            <h3 class="character-name">
+            <h3 class="name">
               <input
                 class="display"
                 name="name"
@@ -17,166 +17,97 @@
             </h3>
           </div>
           {{#each data.limits as |limit label|}}
-          <div class="flexcol limit">
+          <div class="limit">
             <div class="limit-row">
               <span class="limit-title">{{toHeaderCase label}}</span>
               <span class="limit-value" value={{limit.value}}>{{limit.value}}</span>
             </div>
-            <div class="">
-              <div class="input">
-                <input
-                  class="display mod-input"
-                  size='2'
-                  maxlength='2'
-                  type='text'
-                  name='data.limits.{{label}}.mod'
-                  value="{{limit.mod}}"
-                  placeholder='+Mod'
-                  data-dtype="Number"/>
-                {{#ifgt limit.mod 0}}
-                <span class="unit size7">
-                  +
-                </span>
-                {{/ifgt}}
-              </div>
-            </div>
           </div>
           {{/each}}
         </div>
-        <div class="flexrow">
+        <div class="attributes smooth">
           {{#each data.track as |track label|}}
-          <div class="track groove">
-            <div class="track-inner">
-              <div class="flexrow">
-                <div />
-                <h4 class="flex2 track-title">{{toHeaderCase label}}</h4>
-                <div class="input right">
-                  <input
-                    class="display mod-input"
-                    size='2'
-                    maxlength='2'
-                    type='text'
-                    name='data.track.{{label}}.mod'
-                    value="{{track.mod}}"
-                    placeholder='+Mod'
-                    data-dtype="Number"/>
-                  {{#ifgt track.mod 0}}
-                  <span class="unit size7">
-                    +
-                  </span>
-                  {{/ifgt}}
-                </div>
+          <div class="attribute">
+            <h4 class="attribute-name">{{toHeaderCase label}}</h4>
+            <div class="track">
+              <div class="attribute-input-container">
+                <input
+                  class="display attribute-input"
+                  size='2'
+                  maxlength='2'
+                  type='text'
+                  name='data.track.{{label}}.value'
+                  value="{{track.value}}"
+                  data-dtype="Number"/>
               </div>
-              <div class="flexrow nowrap center">
-                <div class="">
-                  <input
-                    class="display track-input"
-                    size='2'
-                    maxlength='2'
-                    type='text'
-                    name='data.track.{{label}}.value'
-                    value="{{track.value}}"
-                    data-dtype="Number"/>
-                </div>
-                <h3 class="track-slash flex0">
-                </h3>
-                <div class="">
-                  <h3 class="track-max-value">{{track.max}}</h3>
-                </div>
+              <h3 class="track-slash flex0">
+              </h3>
+              <div class="attribute-input-container">
+                <input
+                  class="display attribute-input"
+                  size='2'
+                  maxlength='2'
+                  type='text'
+                  name='data.track.{{label}}.max'
+                  value="{{track.max}}"
+                  disabled
+                  data-dtype="Number"/>
               </div>
             </div>
           </div>
           {{/each}}
-          <div class="track groove">
-            <div class="flexcol align-items-center text-center">
-              <h4 class="track-title">Edge</h4>
-              <div class="track-bottom">
-                <div class="">
-                  <input
-                    class="display track-input"
-                    size='2'
-                    maxlength='2'
-                    type='text'
-                    name='data.attributes.edge.value'
-                    value="{{data.attributes.edge.value}}"
-                    data-dtype="Number"/>
-                </div>
-                <h3 class="track-slash flex0">
-                </h3>
-                <div class="">
-                  <input
-                    class="display track-input"
-                    size='2'
-                    maxlength='2'
-                    type='text'
-                    name='data.attributes.edge.max'
-                    value="{{data.attributes.edge.max}}"
-                    data-dtype="Number"/>
-                </div>
+          <div class="attribute">
+            <h4 class="attribute-name roll" data-attribute='edge'>Edge</h4>
+            <div class="track">
+              <div class="attribute-input-container">
+                <input
+                  class="display attribute-input"
+                  size='2'
+                  maxlength='2'
+                  type='text'
+                  name='data.attributes.edge.value'
+                  value="{{data.attributes.edge.value}}"
+                  data-dtype="Number"/>
+              </div>
+              <h3 class="track-slash">
+              </h3>
+              <div class="attribute-input-container">
+                <input
+                  class="display attribute-input"
+                  size='2'
+                  maxlength='2'
+                  type='text'
+                  name='data.attributes.edge.max'
+                  value="{{data.attributes.edge.max}}"
+                  data-dtype="Number"/>
               </div>
             </div>
           </div>
-          <div class="track groove flex1">
-            <div class="flexcol align-items-center text-center">
-              <div class="flexrow space-between">
-                <div class="input">
-                  <input
-                    class="display mod-input"
-                    size='1'
-                    maxlength='1'
-                    type='text'
-                    name='data.movement.walk.mult'
-                    value="{{data.movement.walk.mult}}"
-                    placeholder='+Walk'
-                    data-dtype="Number"/>
-                  {{#if data.movement.walk.mult}}
-                  <span class="unit size7">
-                    x
-                  </span>
-                  {{/if}}
-                </div>
-                <h4 class="track-title">Movement</h4>
-                <div class="input right">
-                  <input
-                    class="display mod-input"
-                    size='1'
-                    maxlength='1'
-                    type='text'
-                    name='data.movement.run.mult'
-                    value="{{data.movement.run.mult}}"
-                    placeholder='+Run'
-                    data-dtype="Number"/>
-                  {{#if data.movement.run.mult}}
-                  <span class="unit size7">
-                    x
-                  </span>
-                  {{/if}}
-                </div>
+          <div class="attribute">
+            <h4 class="attribute-name">Movement</h4>
+            <div class="track">
+              <div class="">
+                <h3>{{data.movement.walk.value}}<h3/>
               </div>
-              <div class="flexrow nowrap center">
-                <div class="">
-                  <h3>{{data.movement.walk.value}}<h3/>
-                </div>
-                <h3 class="track-slash flex0">
-                </h3>
-                <div class="">
-                  <h3>{{data.movement.run.value}}<h3/>
-                </div>
-                <h3 class="track-slash flex0">
-                </h3>
-                <div class="input">
-                  <input
-                    class="display track-input"
-                    size='1'
-                    maxlength='1'
-                    type='text'
-                    name='data.movement.sprint'
-                    value="{{data.movement.sprint}}"
-                    data-dtype="Number"/>
-                  <span class="size6 unit">
-                    +
-                  </span>
-                </div>
+              <h3 class="track-slash">
+              </h3>
+              <div class="">
+                <h3>{{data.movement.run.value}}<h3/>
+              </div>
+              <h3 class="track-slash">
+              </h3>
+              <div class="input attribute-input-container">
+                <input
+                  class="display attribute-input"
+                  size='1'
+                  maxlength='1'
+                  type='text'
+                  name='data.movement.sprint'
+                  value="{{data.movement.sprint}}"
+                  data-dtype="Number"/>
+                <span class="size6 unit movement-unit">
+                  +
+                </span>
               </div>
             </div>
           </div>
@@ -230,7 +161,7 @@
       {{#each data.attributes as |attribute a|}}
         {{#unless attribute.hidden}}
           <div class="attribute">
-            <h4 class="attribute-name" data-attribute={{a}}>{{toHeaderCase a}}</h4>
+            <h4 class="attribute-name roll attribute-roll" data-attribute="{{a}}">{{toHeaderCase a}}</h4>
             <h3 class="attribute-input-container">
               <input
                 class="display attribute-input"
@@ -257,49 +188,13 @@
         <a class="item" data-tab="info">Info</a>
       </nav>
       <div class="tab" data-group="primary" data-tab="skills">
-        <div class="skill-header">
-          <div class="flexrow space-around">
-            <div class="">
-              <h3>Name</h3>
-            </div>
-            <div class="flex0">
-              <h3 class="skill-rtg">Rtg</h3>
-            </div>
-            <div class="">
-              <h3 class="text-center">Specializations</h3>
-            </div>
-          </div>
-        </div>
-        {{#each data.skills.active as |skill s|}}
-        {{#unless skill.hidden}}
-        <div class="skill flexrow space-around">
-          <div class="">
-            <i class="skill-name" data-skill={{s}}>{{toHeaderCase s}}</i>
-          </div>
-          <div class="flex0">
-            <input
-              class="skill-value display"
-              type="text"
-              maxlength='2'
-              size='2'
-              name='data.skills.active.{{s}}.value'
-              value='{{skill.value}}'
-              data-dtype="Number"/>
-          </div>
-          <div class="">
-            <input
-              class="skill-specs display"
-              type="text"
-              name='data.skills.active.{{s}}.specs'
-              value='{{skill.specs}}'
-              data-dtype="String"/>
-          </div>
-        </div>
-        {{/unless}}
-        {{/each}}
+        {{> "systems/shadowrun5e/templates/actor/parts/actor-skills.html" data=data config=config}}
       </div>
       <div class="tab" data-group="primary" data-tab="equipment">
         {{> "systems/shadowrun5e/templates/actor/parts/actor-equipment.html" sections=inventory}}
+      </div>
+      <div class="tab" data-group="primary" data-tab="magic">
+        {{> "systems/shadowrun5e/templates/actor/parts/actor-spellbook.html" sections=spellbook}}
       </div>
     </div>
   </section>

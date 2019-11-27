@@ -1,0 +1,85 @@
+<form class="{{cssClass}}" autocomplete="off">
+  <div class="flexrow align-start">
+    {{> "systems/shadowrun5e/templates/item/parts/item-left.html" }}
+    <div class="flexcol">
+      {{> "systems/shadowrun5e/templates/item/parts/item-header.html" }}
+      <div class="attributes smooth">
+        <div class="attribute">
+          <h4 class="attribute-name roll">Attack</h4>
+          <h3 class="attribute-input-container">
+            <input
+              class="display attribute-input"
+              type="text"
+              maxlength="2"
+              size="2"
+              name="data.attack"
+              value="{{data.attack}}"
+              data-dtype="Number"
+              placeholder="1"/>
+          </h3>
+        </div>
+        <div class="attribute">
+          <h4 class="attribute-name roll">Sleaze</h4>
+          <h3 class="attribute-input-container">
+            <input
+              class="display attribute-input"
+              type="text"
+              maxlength="2"
+              size="2"
+              name="data.sleaze"
+              value="{{data.sleaze}}"
+              data-dtype="Number"
+              placeholder="1"/>
+          </h3>
+        </div>
+        <div class="attribute">
+          <h4 class="attribute-name roll">Data Proc.</h4>
+          <h3 class="attribute-input-container">
+            <input
+              class="display attribute-input"
+              type="text"
+              maxlength="2"
+              size="2"
+              name="data.data_processing"
+              value="{{data.data_processing}}"
+              data-dtype="Number"
+              placeholder="1"/>
+          </h3>
+        </div>
+        <div class="attribute">
+          <h4 class="attribute-name roll">Firewall</h4>
+          <h3 class="attribute-input-container">
+            <input
+              class="display attribute-input"
+              type="text"
+              maxlength="2"
+              size="2"
+              name="data.firewall"
+              value="{{data.firewall}}"
+              data-dtype="Number"
+              placeholder="1"/>
+          </h3>
+        </div>
+        <div class="attribute">
+          <h4 class="attribute-name">Con. Mon.</h4>
+          <div class="track">
+            <div class="attribute-input-container">
+              <input
+                class="display track-input"
+                size='2'
+                maxlength='2'
+                type='text'
+                name='data.condition_monitor.value'
+                value="{{track.condition_monitor.value}}"
+                data-dtype="Number"/>
+            </div>
+            <h3 class="track-slash flex0">
+            </h3>
+            <h3 class="track-max-value">{{data.condition_monitor.max}}</h3>
+          </div>
+        </div>
+      </div>
+      {{> "systems/shadowrun5e/templates/item/parts/item-description.html"}}
+    </div>
+  </div>
+</form>

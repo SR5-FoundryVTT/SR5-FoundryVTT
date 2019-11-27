@@ -1,3 +1,4 @@
+import { SR5 } from '../config.js';
 /**
  * Extend the basic ItemSheet with some very simple modifications
  */
@@ -15,8 +16,8 @@ export class SR5ItemSheet extends ItemSheet {
   static get defaultOptions() {
     return mergeObject(super.defaultOptions, {
           classes: ["sr5", "sheet", "item"],
-          width: 520,
-          height: 370,
+          width: 550,
+          height: 400,
       });
   }
 
@@ -51,5 +52,13 @@ export class SR5ItemSheet extends ItemSheet {
    */
 	activateListeners(html) {
     super.activateListeners(html);
+
+    // Activate tabs
+    let tabs = html.find('.tabs');
+    let initial = this._sheetTab;
+    new Tabs(tabs, {
+      initial: initial,
+      callback: clicked => this._sheetTab = clicked.data("tab")
+    });
   }
 }
