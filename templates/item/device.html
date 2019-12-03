@@ -2,7 +2,8 @@
   <div class="flexrow align-start">
     {{> "systems/shadowrun5e/templates/item/parts/item-left.html" }}
     <div class="flexcol">
-      {{> "systems/shadowrun5e/templates/item/parts/item-header.html" }}
+      {{> "systems/shadowrun5e/templates/item/parts/item-header.html" categories=config.device.categories}}
+      {{#ife data.category config.device.categories.CYBERDECK}}
       <div class="attributes smooth">
         <div class="attribute">
           <h4 class="attribute-name roll">Attack</h4>
@@ -79,6 +80,7 @@
           </div>
         </div>
       </div>
+      {{/ife}}
       {{> "systems/shadowrun5e/templates/item/parts/item-description.html"}}
     </div>
   </div>

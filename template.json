@@ -28,7 +28,7 @@
           "locations": []
         },
         "matrix": {
-          "track": {
+          "condition_monitor": {
             "value": 0,
             "max": 0
           },
@@ -39,19 +39,19 @@
           "hot_sim": false,
           "firewall": {
             "value": 0,
-            "tmp": 0
+            "mod": 0
           },
           "data_processing": {
             "value": 0,
-            "tmp": 0
+            "mod": 0
           },
           "attack": {
             "value": 0,
-            "tmp": 0
+            "mod": 0
           },
           "sleaze": {
             "value": 0,
-            "tmp": 0
+            "mod": 0
           }
         },
         "attributes": {
@@ -491,7 +491,7 @@
               "group": "Sorcery",
               "specs": ""
             },
-            "summong": {
+            "summoning": {
               "value": 0,
               "attribute": "magic",
               "canDefault": false,
@@ -793,56 +793,64 @@
       "equipment"
     ],
     "templates": {
-      "name": "",
       "description": {
-        "value": "",
-        "chat": "",
-        "unidentified": "",
-        "source": ""
+        "description": {
+          "value": "",
+          "chat": "",
+          "unidentified": "",
+          "source": ""
+        }
       },
       "technology": {
-        "rating": 1,
-        "availability": "0",
-        "quantity": 1,
-        "cost": 0,
-        "equipped": false
+        "technology": {
+          "rating": 1,
+          "availability": "0",
+          "quantity": 1,
+          "cost": 0,
+          "equipped": false
+        }
       },
       "action": {
-        "type": "simple",
-        "attribute": "",
-        "skill": "",
-        "spec": false,
-        "mod": 0,
-        "limit": "",
-        "extended": false,
-        "damage": {
-          "type": "stun",
-          "element": "",
-          "value": 0,
-          "ap": 0,
-          "attribute": ""
-        },
-        "opposed": {
-          "attributes": [],
-          "skills": [],
+        "action": {
+          "type": "simple",
+          "attribute": "",
+          "skill": "",
+          "spec": false,
           "mod": 0,
-          "description": ""
+          "limit": "",
+          "extended": false,
+          "damage": {
+            "type": "stun",
+            "element": "",
+            "value": 0,
+            "ap": 0,
+            "attribute": ""
+          },
+          "opposed": {
+            "attributes": [],
+            "skills": [],
+            "mod": 0,
+            "description": ""
+          }
         }
       },
       "armor": {
-        "value": 0,
-        "mod": false,
-        "acid": 0,
-        "cold": 0,
-        "fire": 0,
-        "electricity": 0,
-        "radiation": 0
+        "armor": {
+          "value": 0,
+          "mod": false,
+          "acid": 0,
+          "cold": 0,
+          "fire": 0,
+          "electricity": 0,
+          "radiation": 0
+        }
       }
     },
     "armor": {
       "templates": ["description", "armor", "technology"]
     },
     "spell": {
+      "templates": ["description", "technology", "action"],
       "drain": 0,
       "category": "combat",
       "type": "physical",
@@ -913,6 +921,7 @@
     },
     "device": {
       "templates": ["description", "technology"],
+      "category": "commlink",
       "attack": 0,
       "sleaze": 0,
       "firewall": 0,

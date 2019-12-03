@@ -86,13 +86,29 @@
           <div class="attribute">
             <h4 class="attribute-name">Movement</h4>
             <div class="track">
-              <div class="">
-                <h3>{{data.movement.walk.value}}<h3/>
+              <div class="attribute-input-container">
+                <input
+                  class="display attribute-input"
+                  size='2'
+                  maxlength='2'
+                  type='text'
+                  name='data.movement.walk.value'
+                  value="{{data.movement.walk.value}}"
+                  data-dtype="Number"
+                  disabled/>
               </div>
               <h3 class="track-slash">
               </h3>
-              <div class="">
-                <h3>{{data.movement.run.value}}<h3/>
+              <div class="attribute-input-container">
+                <input
+                  class="display attribute-input"
+                  size='2'
+                  maxlength='2'
+                  type='text'
+                  name='data.movement.run.value'
+                  value="{{data.movement.run.value}}"
+                  data-dtype="Number"
+                  disabled/>
               </div>
               <h3 class="track-slash">
               </h3>
@@ -118,10 +134,10 @@
       <div class="flex0">
         <div class="flexrow nowrap space-around">
           <div>
-            <h3 title="Defense" class="defense-roll defense-icon fas fa-meteor" data-roll='defense'></h3>
+            <h3 title="Defense" class="defense-roll defense-icon fas fa-shield-alt" data-roll='defense'></h3>
           </div>
           <div>
-            <h3 title="Soak" class="soak-roll defense-icon fas fa-shield-alt" data-soak='default'></h3>
+            <h3 title="Soak" class="soak-roll defense-icon fas fa-fist-raised" data-soak='default'></h3>
           </div>
           <div>
             <h3 title="Cold" class="soak-roll defense-icon fas fa-snowflake" data-soak='cold'></h3>
@@ -188,13 +204,16 @@
         <a class="item" data-tab="info">Info</a>
       </nav>
       <div class="tab" data-group="primary" data-tab="skills">
-        {{> "systems/shadowrun5e/templates/actor/parts/actor-skills.html" data=data config=config}}
+        {{> "systems/shadowrun5e/templates/actor/parts/actor-skills.html" data=data}}
       </div>
       <div class="tab" data-group="primary" data-tab="equipment">
         {{> "systems/shadowrun5e/templates/actor/parts/actor-equipment.html" sections=inventory}}
       </div>
       <div class="tab" data-group="primary" data-tab="magic">
         {{> "systems/shadowrun5e/templates/actor/parts/actor-spellbook.html" sections=spellbook}}
+      </div>
+      <div class="tab" data-group="primary" data-tab="matrix">
+        {{> "systems/shadowrun5e/templates/actor/parts/actor-matrix.html"}}
       </div>
     </div>
   </section>

@@ -41,6 +41,7 @@ export class SR5ActorSheet extends ActorSheet {
    * The prepared data object contains both the actor data as well as additional sheet options
    */
   getData() {
+    this.actor.data = this.actor.prepareData(this.actor.data);
     const data = super.getData();
 
     // do some calculations
@@ -64,16 +65,29 @@ export class SR5ActorSheet extends ActorSheet {
   }
 
   _prepareSkills(data) {
-    for (const att of Object.values(data.data.attributes)) {
-      if (att.skills) delete att.skills;
-    }
-    for (const skill of Object.values(data.data.skills.active)) {
-      if (!data.data.attributes[skill.attribute].skills) {
-        data.data.attributes[skill.attribute].skills = {};
+    const categories = SR5.skills.categories;
+    const skillCategories = {};
+    for (let category of Object.values(categories)) {
+      skillCategories[category.label] = {
+        skills: {}
+      };
+      const skills = [];
+      for (let sid of category.skills) {
+        const skill = data.data.skills.active[sid];
+        skills.push(skill);
+        skill.css = skill.value > 0 ? '' : 'hidden';
+        // skillCategories[category.label].skills[sid] = skill;
       }
-      const att = data.data.attributes[skill.attribute];
-      att.skills[skill.label] = skill;
+      skills.sort((a,b) => {
+        let diff = b.value - a.value;
+        if (diff === 0) {
+          diff = a.label.charCodeAt(0) - b.label.charCodeAt(0);
+        }
+        return diff;
+      });
+      skills.forEach(skill => skillCategories[category.label].skills[skill.label] = skill);
     }
+    data.data.skillCategories = skillCategories;
   }
 
   _prepareItems(data) {
@@ -83,6 +97,13 @@ export class SR5ActorSheet extends ActorSheet {
         items: [],
         dataset: {
           type: 'weapon'
+        }
+      },
+      armor: {
+        label: "Armor",
+        items: [],
+        dataset: {
+          type: 'armor'
         }
       },
       device: {
@@ -161,7 +182,6 @@ export class SR5ActorSheet extends ActorSheet {
       inventory[item.type].items.push(item);
     });
     spells.forEach(spell => {
-      console.log(spell.data.category);
       spellbook[spell.data.category].items.push(spell);
     });
 
@@ -186,10 +206,11 @@ export class SR5ActorSheet extends ActorSheet {
       callback: clicked => this._sheetTab = clicked.data("tab")
     });
 
+    html.find('.hidden').hide();
+
     html.find('.skill-header').click(event => {
       event.preventDefault();
-      console.log(event);
-      const field = $(event.currentTarget).siblings('.item');
+      const field = $(event.currentTarget).siblings('.item.hidden');
       field.toggle();
       this._onSubmit(event);
     });
@@ -206,11 +227,19 @@ export class SR5ActorSheet extends ActorSheet {
     // Update Inventory Item
     html.find('.item-edit').click(event => {
       const iid = parseInt(event.currentTarget.dataset.item);
-      console.log(iid);
-      console.log(this.actor.items);
       const item = this.actor.getOwnedItem(iid);
-      console.log(item);
       item.sheet.render(true);
+    });
+
+    html.find('.item-equip-toggle').click(event => {
+      const iid = parseInt(event.currentTarget.dataset.item);
+      const item = this.actor.getOwnedItem(iid);
+      if (item) {
+        console.log(item);
+        const itemData = item.data.data;
+        if (itemData.technology) itemData.technology.equipped = !itemData.technology.equipped;
+        this.actor.updateOwnedItem(item.data);
+      }
     });
 
     // Delete Inventory Item

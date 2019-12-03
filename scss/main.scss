@@ -178,7 +178,7 @@ input[type="text"].display {
   border: $groove-width solid transparent;
   text-align: center;
   min-height: 1em;
-  &:hover {
+  &:hover:not(:disabled) {
     background: transparent;
     border: $groove;
   }
@@ -188,6 +188,9 @@ input[type="text"].display {
     margin-bottom: -.25em;
     line-height: 10px;
     padding: 0;
+  }
+  &:disabled {
+    color: $black;
   }
 }
 
@@ -365,6 +368,13 @@ select.display {
             content: '/';
           }
         }
+        .track-plus {
+          transform: translateY(10%);
+          flex: 0 0;
+          &:after {
+            content: '+';
+          }
+        }
         .track-max-value {
           margin-bottom: 0;
           margin-left: .25em;
@@ -396,7 +406,7 @@ select.display {
     }
   }
   &.actor {
-    min-height: 56em;
+    min-height: 50em;
     min-width: 55em;
     .sheet-header-row-2 {
       > * {
@@ -500,7 +510,6 @@ select.display {
         .item-img {
           padding: 0 .25em;
           flex: 0;
-          margin: -.25em 0;
           >img {
             margin: 0;
           }

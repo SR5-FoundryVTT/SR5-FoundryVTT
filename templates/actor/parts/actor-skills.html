@@ -1,12 +1,11 @@
 <div class="inventory">
   <div class="scroll-area">
-    {{#each data.attributes as |attribute attId|}}
-    {{#if attribute.skills}}
+    {{#each data.skillCategories as |cat cid|}}
     <div>
-      <div class="item item-section skill-header" data-attribute="{{attId}}">
+      <div class="item item-section skill-header" data-category="{{cid}}">
         <div class="item-left">
           <div class="item-text item-name">
-            {{toHeaderCase attId}}
+            {{cid}}
           </div>
         </div>
         <div class="item-right">
@@ -18,8 +17,8 @@
           </div>
         </div>
       </div>
-      {{#each attribute.skills as |skill sid|}}
-      <div class="item">
+      {{#each cat.skills as |skill sid|}}
+      <div class="item {{skill.css}}">
         <div class="item-left">
           <div class="item-text item-name skill-roll roll" data-skill='{{sid}}'>
             {{toHeaderCase sid}}
@@ -50,7 +49,6 @@
       </div>
       {{/each}}
     </div>
-    {{/if}}
     {{/each}}
   </div>
 </div>

@@ -7,6 +7,7 @@ export class SR5Actor extends Actor {
   prepareData(actorData) {
     actorData = super.prepareData(actorData);
 
+    const items = actorData.items;
     const data = actorData.data;
     const attrs = data.attributes;
     const armor = data.armor;
@@ -40,6 +41,15 @@ export class SR5Actor extends Actor {
     track.physical.overflow = attrs.body;
     track.stun.max = 8 + Math.ceil(attrs.willpower.value / 2)
       + (track.stun.mod ? track.stun.mod : 0);
+
+    armor.value = 0;
+    armor.mod = 0;
+    for (let item of Object.values(items)) {
+      if (item.type === 'armor' && item.data.technology.equipped) {
+        if (item.data.armor.mod) armor.mod += item.data.armor.value; // if it's a mod, add to the mod field
+        else armor.value = item.data.armor.value; // if not a mod, set armor.value to the items value
+      }
+    }
 
     const soak = attrs.body.value + armor.value + armor.mod;
     data.rolls = {

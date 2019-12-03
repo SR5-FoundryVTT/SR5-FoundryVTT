@@ -1,0 +1,140 @@
+<div class="attributes smooth">
+  <div class="attribute row">
+    <label class="checkbox">
+      <input type='checkbox' class='display' /> VR
+    </label>
+  </div>
+  <div class="attribute row">
+    <label class="checkbox">
+      <input type='checkbox' class='display' /> HotSim
+    </label>
+  </div>
+</div>
+<div class="attributes smooth">
+  <div class="attribute">
+    <h4 class="attribute-name roll">Attack</h4>
+    <h3 class="attribute-input-container">
+      <input
+        class="display attribute-input"
+        type="text"
+        maxlength="2"
+        size="2"
+        name="data.matrix.attack.value"
+        value="{{data.matrix.attack.value}}"
+        data-dtype="Number"
+        placeholder="1"
+        disabled/>
+    </h3>
+  </div>
+  <div class="attribute">
+    <h4 class="attribute-name roll">Sleaze</h4>
+    <h3 class="attribute-input-container">
+      <input
+        class="display attribute-input"
+        type="text"
+        maxlength="2"
+        size="2"
+        name="data.matrix.sleaze.value"
+        value="{{data.matrix.sleaze.value}}"
+        data-dtype="Number"
+        placeholder="1"
+        disabled/>
+    </h3>
+  </div>
+  <div class="attribute">
+    <h4 class="attribute-name roll">Data Proc.</h4>
+    <h3 class="attribute-input-container">
+      <input
+        class="display attribute-input"
+        type="text"
+        maxlength="2"
+        size="2"
+        name="data.matrix.data_processing.value"
+        value="{{data.matrix.data_processing.value}}"
+        data-dtype="Number"
+        placeholder="1"
+        disabled/>
+    </h3>
+  </div>
+  <div class="attribute">
+    <h4 class="attribute-name roll">Firewall</h4>
+    <h3 class="attribute-input-container">
+      <input
+        class="display attribute-input"
+        type="text"
+        maxlength="2"
+        size="2"
+        name="data.matrix.firewall.value"
+        value="{{data.matrix.firewall.value}}"
+        data-dtype="Number"
+        placeholder="1"
+        disabled/>
+    </h3>
+  </div>
+  <div class="attribute">
+    <h4 class="attribute-name">Con. Mon.</h4>
+    <div class="track">
+      <div class="attribute-input-container">
+        <input
+          class="display track-input"
+          size='2'
+          maxlength='2'
+          type='text'
+          name='data.matrix.condition_monitor.value'
+          value="{{data.matrix.condition_monitor.value}}"
+          data-dtype="Number"/>
+      </div>
+      <h3 class="track-slash flex0">
+      </h3>
+      <div class="attribute-input-container">
+        <input
+          class="display track-input"
+          size='2'
+          maxlength='2'
+          type='text'
+          name='data.matrix.condition_monitor.max'
+          value="{{data.matrix.condition_monitor.max}}"
+          data-dtype="Number"
+          disabled/>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="inventory">
+  <div class="scroll-area">
+    {{#each sections as |section sid|}}
+    <div class="item item-section">
+      <div class="item-left">
+        <div class="item-text item-name">
+          {{section.label}}
+        </div>
+      </div>
+      <div class="item-right">
+        <div class="item-text item-icons">
+          <i class="fas fa-plus"></i>
+          Add
+        </div>
+      </div>
+    </div>
+    {{#each section.items as |item iid|}}
+    <div class="item" data-item='{{item.id}}'>
+      <div class="item-left">
+        <div class="item-img">
+          <img src="{{item.img}}" data-edit="img" title="{{item.name}}" height='24px' width='24px'/>
+        </div>
+        <div class="item-text item-name">
+          {{item.name}}
+        </div>
+      </div>
+      <div class="item-right">
+        <div class="item-text item-icons">
+          <i class="item-edit roll fas fa-edit" data-item='{{item.id}}'></i>
+          <i class="item-delete roll fas fa-trash" data-item='{{item.id}}'></i>
+        </div>
+      </div>
+    </div>
+    {{/each}}
+    {{/each}}
+  </div>
+</div>
+

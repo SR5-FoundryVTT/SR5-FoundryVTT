@@ -70,7 +70,14 @@ SR5.spell = {
     LOGIC: 'logic',
     CHARISMA: 'charisma'
   }
-}
+};
+
+SR5.device = {
+  categories: {
+    COMMLINK: 'commlink',
+    CYBERDECK: 'cyberdeck'
+  }
+};
 
 SR5.weapon = {
   categories: {
@@ -78,7 +85,7 @@ SR5.weapon = {
     MELEE: 'melee',
     THROWN: 'thrown'
   }
-}
+};
 
 SR5.rangeWeapon = {
   skills: {
@@ -87,20 +94,131 @@ SR5.rangeWeapon = {
     LONGARMS: 'longarms',
     PISTOLS: 'pistols',
     GUNNERY: 'gunnery',
-    AUTOMATICS: 'automatics'
+    AUTOMATICS: 'automatics',
+    EXOTIC_RANGE: 'exotic_range'
   }
 };
 SR5.meleeWeapon = {
   skills: {
     BLADES: 'blades',
     CLUBS: 'clubs',
-    UNARMED_COMBAT: 'unarmed_combat'
+    UNARMED_COMBAT: 'unarmed_combat',
+    EXOTIC_MELEE: 'exotic_melee'
   }
 };
 
 SR5.skills = {
-  ...SR5.rangeWeapon.skills,
-  ...SR5.meleeWeapon.skills
+  active: {
+    ...SR5.rangeWeapon.skills,
+    ...SR5.meleeWeapon.skills
+  },
+  categories: {
+    combat: {
+      label: "Combat",
+      skills: [
+        'archery',
+        'heavy_weapons',
+        'longarms',
+        'pistols',
+        'gunnery',
+        'automatics',
+        'exotic_range',
+        'throwing_weapons',
+        'blades',
+        'clubs',
+        'unarmed_combat',
+        'exotic_melee'
+      ]
+    },
+    physical: {
+      label: 'Physical',
+      skills: [
+        'disguise',
+        'diving',
+        'escape_artist',
+        'free_fall',
+        'gymnastics',
+        'palming',
+        'perception',
+        'running',
+        'sneaking',
+        'survival',
+        'swimming',
+        'tracking'
+      ]
+    },
+    social: {
+      label: 'Social',
+      skills: [
+        'con',
+        'etiquette',
+        'impersonation',
+        'instruction',
+        'intimidation',
+        'leadership',
+        'negotiation',
+        'performance'
+      ]
+    },
+    technical: {
+      label: 'Technical',
+      skills: [
+        'aeronautics_mechanic',
+        'automotive_mechanic',
+        'industrial_mechanic',
+        'nautical_mechanic',
+        'animal_handling',
+        'armorer',
+        'artisan',
+        'biotechnology',
+        'chemistry',
+        'computer',
+        'cybercombat',
+        'cybertechnology',
+        'demolitions',
+        'electronic_warfare',
+        'first_aid',
+        'forgery',
+        'hacking',
+        'hardware',
+        'locksmith',
+        'medicine',
+        'navigation',
+        'software',
+        'pilot_aerospace',
+        'pilot_aircraft',
+        'pilot_walker',
+        'pilot_ground_craft',
+        'pilot_water_craft',
+        'pilot_exotic_vehicle'
+      ]
+    },
+    magic: {
+      label: 'Magic',
+      skills: [
+        'alchemy',
+        'arcana',
+        'artificing',
+        'assensing',
+        'astral_combat',
+        'banishing',
+        'binding',
+        'counterspelling',
+        'disenchanting',
+        'ritual_spellcasting',
+        'spellcasting',
+        'summoning'
+      ]
+    },
+    resonance: {
+      label: 'Resonance',
+      skills: [
+        'compiling',
+        'decompiling',
+        'registering'
+      ]
+    }
+  }
 };
 
 SR5.kbmod = {

@@ -35,11 +35,6 @@ export class SR5ItemSheet extends ItemSheet {
   getData() {
     const data = super.getData();
 
-    // const tech = data.data.technology;
-    // if (tech.rating === 0) delete tech.rating;
-    // if (tech.quantity === 0) delete tech.quantity;
-    // if (tech.cost === 0) delete tech.cost;
-
     data.config = CONFIG.SR5;
     return data;
   }

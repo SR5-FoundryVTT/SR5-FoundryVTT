@@ -99,7 +99,7 @@ input[type="text"].display {
   border: 2px solid transparent;
   text-align: center;
   min-height: 1em; }
-  input[type="text"].display:hover {
+  input[type="text"].display:hover:not(:disabled) {
     background: transparent;
     border: 2px groove white; }
   input[type="text"].display.mod-input {
@@ -108,6 +108,8 @@ input[type="text"].display {
     margin-bottom: -.25em;
     line-height: 10px;
     padding: 0; }
+  input[type="text"].display:disabled {
+    color: black; }
 
 select.display {
   background: transparent;
@@ -261,6 +263,11 @@ select.display {
         flex: 0 0; }
         .sr5 .attributes .attribute .track .track-slash:after {
           content: '/'; }
+      .sr5 .attributes .attribute .track .track-plus {
+        transform: translateY(10%);
+        flex: 0 0; }
+        .sr5 .attributes .attribute .track .track-plus:after {
+          content: '+'; }
       .sr5 .attributes .attribute .track .track-max-value {
         margin-bottom: 0;
         margin-left: .25em; }
@@ -286,7 +293,7 @@ select.display {
   border-bottom: 2px groove white; }
 
 .sr5.actor {
-  min-height: 56em;
+  min-height: 50em;
   min-width: 55em; }
   .sr5.actor .sheet-header-row-2 > * {
     text-align: center; }
@@ -375,8 +382,7 @@ select.display {
         align-items: center; }
       .sr5.actor .inventory .item .item-img {
         padding: 0 .25em;
-        flex: 0;
-        margin: -.25em 0; }
+        flex: 0; }
         .sr5.actor .inventory .item .item-img > img {
           margin: 0; }
         .sr5.actor .inventory .item .item-img + .item-name {

@@ -29,9 +29,9 @@ Hooks.once("init", async function() {
 
   // Register sheet application classes
   Actors.unregisterSheet("core", ActorSheet);
-  Actors.registerSheet("sR5", SR5ActorSheet, { makeDefault: true });
+  Actors.registerSheet("SR5", SR5ActorSheet, { makeDefault: true });
   Items.unregisterSheet("core", ItemSheet);
-  Items.registerSheet("sR5", SR5ItemSheet, { makeDefault: true});
+  Items.registerSheet("SR5", SR5ItemSheet, { makeDefault: true});
 });
 
 Handlebars.registerHelper("toHeaderCase", function(str) {
@@ -45,7 +45,10 @@ Handlebars.registerHelper("concat", function(strs, c = ",") {
   }
   return strs;
 });
-
+Handlebars.registerHelper("ifin", function(val, arr, options) {
+  if (arr.includes(val)) return options.fn(this);
+  else return options.inverse(this);
+});
 // if greater than
 Handlebars.registerHelper("ifgt", function(v1, v2, options) {
  if (v1 > v2) return options.fn(this);
@@ -60,4 +63,8 @@ Handlebars.registerHelper("ifne", function(v1, v2, options) {
 Handlebars.registerHelper("ife", function(v1, v2, options) {
  if (v1 === v2) return options.fn(this);
  else return options.inverse(this);
+});
+// if equal
+Handlebars.registerHelper("sum", function(v1, v2) {
+  return v1 + v2;
 });
