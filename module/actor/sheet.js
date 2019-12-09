@@ -16,6 +16,7 @@ export class SR5ActorSheet extends ActorSheet {
      * @type {string}
      */
     this._sheetTab = "skills";
+    this._shownUntrainedSkills = [];
   }
 
   /* -------------------------------------------- */
@@ -55,6 +56,12 @@ export class SR5ActorSheet extends ActorSheet {
     const track = data.data.track;
     if (track.physical.mod === 0) delete track.physical.mod;
     if (track.stun && track.stun.mod === 0) delete track.stun.mod;
+
+    const matrix = data.data.matrix;
+    if (matrix.attack.mod === 0) delete matrix.attack.mod;
+    if (matrix.sleaze.mod === 0) delete matrix.sleaze.mod;
+    if (matrix.data_processing.mod === 0) delete matrix.data_processing.mod;
+    if (matrix.firewall.mod === 0) delete matrix.firewall.mod;
 
     this._prepareItems(data);
     this._prepareSkills(data);
@@ -195,7 +202,7 @@ export class SR5ActorSheet extends ActorSheet {
    * Activate event listeners using the prepared sheet HTML
    * @param html {HTML}   The prepared HTML object ready to be rendered into the DOM
    */
-	activateListeners(html) {
+  activateListeners(html) {
     super.activateListeners(html);
 
     // Activate tabs
@@ -207,12 +214,20 @@ export class SR5ActorSheet extends ActorSheet {
     });
 
     html.find('.hidden').hide();
+    this._shownUntrainedSkills.forEach(cat => {
+      console.log(cat);
+      const field = $(`[data-category='${cat}']`);
+      console.log(field);
+      field.siblings('.item.hidden').show();
+    });
 
     html.find('.skill-header').click(event => {
       event.preventDefault();
+      const category = event.currentTarget.dataset.category;
       const field = $(event.currentTarget).siblings('.item.hidden');
       field.toggle();
-      this._onSubmit(event);
+      if (field.is(':visible')) this._shownUntrainedSkills.push(category);
+      else this._shownUntrainedSkills = this._shownUntrainedSkills.filter(val => val !== category);
     });
 
     html.find('.attribute-roll').click(this._onRollAttribute.bind(this));
@@ -220,35 +235,56 @@ export class SR5ActorSheet extends ActorSheet {
     html.find('.defense-roll').click(this._onRollDefense.bind(this));
     html.find('.attribute-only-roll').click(this._onRollAttributesOnly.bind(this));
     html.find('.soak-roll').click(this._onRollSoak.bind(this));
-
-    // Everything below here is only needed if the sheet is editable
-    if (!this.options.editable) return;
+    html.find('.item-roll').click(this._onRollItem.bind(this));
+    html.find('.item-equip-toggle').click(this._onEquipItem.bind(this));
 
     // Update Inventory Item
     html.find('.item-edit').click(event => {
+      event.preventDefault();
       const iid = parseInt(event.currentTarget.dataset.item);
       const item = this.actor.getOwnedItem(iid);
       item.sheet.render(true);
     });
 
-    html.find('.item-equip-toggle').click(event => {
-      const iid = parseInt(event.currentTarget.dataset.item);
-      const item = this.actor.getOwnedItem(iid);
-      if (item) {
-        console.log(item);
-        const itemData = item.data.data;
-        if (itemData.technology) itemData.technology.equipped = !itemData.technology.equipped;
-        this.actor.updateOwnedItem(item.data);
-      }
-    });
+
 
     // Delete Inventory Item
-    html.find('.item-delete').click(ev => {
+    html.find('.item-delete').click(event => {
+      event.preventDefault();
       const iid = parseInt(event.currentTarget.dataset.item);
-      const el = $(ev.currentTarget).parents(".item");
+      const el = $(event.currentTarget).parents(".item");
       this.actor.deleteOwnedItem(iid);
       el.slideUp(200, () => this.render(false));
     });
+  }
+
+  async _onEquipItem(event) {
+    event.preventDefault();
+    const iid = parseInt(event.currentTarget.dataset.item);
+    const item = this.actor.getOwnedItem(iid);
+    if (item) {
+      const itemData = item.data.data;
+      // if we will be equipping and it is a device
+      if (!itemData.technology.equipped && item.type === 'device') {
+        for (let ite of this.actor.items) {
+          if (ite.type === 'device' && ite.data.data.technology.equipped) {
+            ite.data.data.technology.equipped = false;
+            this.actor.updateOwnedItem(ite.data);
+          };
+        }
+      }
+      if (itemData.technology) itemData.technology.equipped = !itemData.technology.equipped;
+      this.actor.updateOwnedItem(item.data);
+    }
+
+  }
+
+  async _onRollItem(event) {
+    event.preventDefault();
+    const iid = parseInt(event.currentTarget.dataset.item);
+    const item = this.actor.getOwnedItem(iid);
+    console.log(item);
+    item.roll();
   }
 
   async _onRollDefense(event) {

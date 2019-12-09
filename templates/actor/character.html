@@ -130,47 +130,33 @@
         </div>
       </div>
     </div>
-    <div class="flexrow sheet-header-row-2 space-around">
-      <div class="flex0">
-        <div class="flexrow nowrap space-around">
-          <div>
-            <h3 title="Defense" class="defense-roll defense-icon fas fa-shield-alt" data-roll='defense'></h3>
-          </div>
-          <div>
-            <h3 title="Soak" class="soak-roll defense-icon fas fa-fist-raised" data-soak='default'></h3>
-          </div>
-          <div>
-            <h3 title="Cold" class="soak-roll defense-icon fas fa-snowflake" data-soak='cold'></h3>
-          </div>
-          <div>
-            <h3 title="Fire" class="soak-roll defense-icon fas fa-fire" data-soak='fire'></h3>
-          </div>
-          <div>
-            <h3 title="Acid" class="soak-roll defense-icon fas fa-vial" data-soak='acid'></h3>
-          </div>
-          <div>
-            <h3 title="Electricity" class="soak-roll defense-icon fas fa-bolt" data-soak='electricity'></h3>
-          </div>
-          <div>
-            <h3 title="Radiation" class="soak-roll defense-icon fas fa-radiation-alt" data-soak='radiation'></h3>
-          </div>
-        </div>
+    <div class="attributes no-border">
+      <div class="attribute row space-around">
+        <div title="Defense" class="attribute-name defense-roll roll defense-icon fas fa-shield-alt" data-roll='defense'></div>
+        <div title="Soak" class="attribute-name soak-roll roll defense-icon fas fa-fist-raised" data-soak='default'></div>
+        <div title="Cold" class="attribute-name soak-roll roll defense-icon fas fa-snowflake" data-soak='cold'></div>
+        <div title="Fire" class="attribute-name soak-roll roll defense-icon fas fa-fire" data-soak='fire'></div>
+        <div title="Acid" class="attribute-name soak-roll roll defense-icon fas fa-vial" data-soak='acid'></div>
+        <div title="Electricity" class="attribute-name soak-roll roll defense-icon fas fa-bolt" data-soak='electricity'></div>
+        <div title="Radiation" class="attribute-name soak-roll roll defense-icon fas fa-radiation-alt" data-soak='radiation'></div>
       </div>
-      <div>
-        <div class="flexrow space-around">
-          <div>
-            <h4 class="attribute-only-roll" data-roll='composure'>Composure</h4>
-          </div>
-          <div>
-            <h4 class="attribute-only-roll" data-roll='judge_intentions'>J.Intentions</h4>
-          </div>
-          <div>
-            <h4 class="attribute-only-roll" data-roll='lift_carry'>Lift&Carry</h4>
-          </div>
-          <div>
-            <h4 class="attribute-only-roll" data-roll='memory'>Memory</h4>
-          </div>
+      <div class="attribute row space-around">
+        <div class="attribute-only-roll roll attribute-name" data-roll='composure'>Composure</div>
+        <div class="attribute-only-roll roll attribute-name" data-roll='judge_intentions'>J.Intentions</div>
+        <div class="attribute-only-roll roll attribute-name" data-roll='lift_carry'>Lift&Carry</div>
+        <div class="attribute-only-roll roll attribute-name" data-roll='memory'>Memory</div>
+      </div>
+      <div class="attribute row">
+        <div class="attribute-name">
+          Initiative
         </div>
+        <select name="data.initiative.perception" class="display">
+          {{#select data.initiative.perception}}
+          <option value="meatspace">Meatspace</option>
+          <option value="matrix">Matrix</option>
+          <option value="astral">Astral</option>
+          {{/select}}
+        </select>
       </div>
     </div>
     <div class="flexrow attributes">
@@ -194,18 +180,17 @@
       {{/each}}
     </div>
   </header>
-  <section class="sheet-body">
-    <div class="flexcol flex4">
+  <section class="flexrow align-start nowrap">
+    <div class="flexcol flex1">
+      {{> "systems/shadowrun5e/templates/actor/parts/actor-skills.html" data=data}}
+    </div>
+    <div class="flexcol flex3">
       <nav class="tabs" data-group="primary">
-        <a class="item active" data-tab="skills">Skills</a>
-        <a class="item" data-tab="equipment">Equipment</a>
+        <a class="item active" data-tab="equipment">Equipment</a>
         <a class="item" data-tab="magic">Magic</a>
         <a class="item" data-tab="matrix">Matrix</a>
         <a class="item" data-tab="info">Info</a>
       </nav>
-      <div class="tab" data-group="primary" data-tab="skills">
-        {{> "systems/shadowrun5e/templates/actor/parts/actor-skills.html" data=data}}
-      </div>
       <div class="tab" data-group="primary" data-tab="equipment">
         {{> "systems/shadowrun5e/templates/actor/parts/actor-equipment.html" sections=inventory}}
       </div>

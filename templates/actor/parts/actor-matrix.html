@@ -1,18 +1,18 @@
 <div class="attributes smooth">
   <div class="attribute row">
     <label class="checkbox">
-      <input type='checkbox' class='display' /> VR
+      <input type='checkbox' class='display' name='data.matrix.silent' {{checked data.matrix.silent}}/> Silent
     </label>
   </div>
   <div class="attribute row">
     <label class="checkbox">
-      <input type='checkbox' class='display' /> HotSim
+      <input type='checkbox' class='display' name='data.matrix.hot_sim' {{checked data.matrix.hot_sim}}/> HotSim
     </label>
   </div>
 </div>
 <div class="attributes smooth">
   <div class="attribute">
-    <h4 class="attribute-name roll">Attack</h4>
+    <h4 class="attribute-name roll matrix-roll" data-attribute='attack'>Attack</h4>
     <h3 class="attribute-input-container">
       <input
         class="display attribute-input"
@@ -25,6 +25,17 @@
         placeholder="1"
         disabled/>
     </h3>
+    <div class="attribute-input-container">
+      <input
+        class="display track-input"
+        size='4'
+        maxlength='4'
+        type='text'
+        name='data.matrix.attack.mod'
+        value="{{data.matrix.attack.mod}}"
+        data-dtype="Number"
+        placeholder='+Mod'/>
+    </div>
   </div>
   <div class="attribute">
     <h4 class="attribute-name roll">Sleaze</h4>
@@ -40,6 +51,17 @@
         placeholder="1"
         disabled/>
     </h3>
+    <div class="attribute-input-container">
+      <input
+        class="display track-input"
+        size='4'
+        maxlength='4'
+        type='text'
+        name='data.matrix.sleaze.mod'
+        value="{{data.matrix.sleaze.mod}}"
+        data-dtype="Number"
+        placeholder='+Mod'/>
+    </div>
   </div>
   <div class="attribute">
     <h4 class="attribute-name roll">Data Proc.</h4>
@@ -55,6 +77,17 @@
         placeholder="1"
         disabled/>
     </h3>
+    <div class="attribute-input-container">
+      <input
+        class="display track-input"
+        size='4'
+        maxlength='4'
+        type='text'
+        name='data.matrix.data_processing.mod'
+        value="{{data.matrix.data_processing.mod}}"
+        data-dtype="Number"
+        placeholder='+Mod'/>
+    </div>
   </div>
   <div class="attribute">
     <h4 class="attribute-name roll">Firewall</h4>
@@ -70,6 +103,17 @@
         placeholder="1"
         disabled/>
     </h3>
+    <div class="attribute-input-container">
+      <input
+        class="display track-input"
+        size='4'
+        maxlength='4'
+        type='text'
+        name='data.matrix.firewall.mod'
+        value="{{data.matrix.firewall.mod}}"
+        data-dtype="Number"
+        placeholder='+Mod'/>
+    </div>
   </div>
   <div class="attribute">
     <h4 class="attribute-name">Con. Mon.</h4>

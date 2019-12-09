@@ -16,7 +16,7 @@ export class SR5ItemSheet extends ItemSheet {
   static get defaultOptions() {
     return mergeObject(super.defaultOptions, {
           classes: ["sr5", "sheet", "item"],
-          width: 550,
+          width: 660,
           height: 400,
       });
   }
@@ -34,6 +34,7 @@ export class SR5ItemSheet extends ItemSheet {
    */
   getData() {
     const data = super.getData();
+    if (data.data.action && (data.data.action.mod === 0 || data.data.action.mod === "0")) delete data.data.action.mod;
 
     data.config = CONFIG.SR5;
     return data;

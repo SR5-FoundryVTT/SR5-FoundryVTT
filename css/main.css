@@ -72,6 +72,9 @@ hr.divider {
 .flexchild1 > * {
   flex: 1 0 auto; }
 
+.groove-right {
+  border-right: 2px groove white; }
+
 .input {
   position: relative; }
   .input.right > input[type="text"] {
@@ -198,13 +201,13 @@ select.display {
   border-top: 2px groove white;
   display: flex;
   flex-flow: row;
-  flex-wrap: nowrap; }
+  flex-wrap: nowrap;
+  justify-content: space-between; }
+  .sr5 .attributes.no-border {
+    border-top: none;
+    border-bottom: none; }
   .sr5 .attributes:last-child {
     border-bottom: 2px groove white; }
-  .sr5 .attributes.smooth {
-    justify-content: space-between; }
-    .sr5 .attributes.smooth > .attribute {
-      flex: 1 0 auto; }
   .sr5 .attributes .attribute {
     font-size: 120%;
     font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
@@ -214,6 +217,7 @@ select.display {
     align-items: center;
     justify-content: space-around;
     padding: 0 .25em;
+    flex: 1 0 auto;
     min-width: 5rem; }
     .sr5 .attributes .attribute.row {
       flex-flow: row nowrap;
@@ -222,6 +226,8 @@ select.display {
       align-content: center; }
       .sr5 .attributes .attribute.row > .attribute-name {
         width: auto; }
+      .sr5 .attributes .attribute.row.space-around {
+        justify-content: space-around; }
       .sr5 .attributes .attribute.row .attribute-input {
         transform: translateY(20%); }
     .sr5 .attributes .attribute:not(:last-child) {
@@ -272,6 +278,54 @@ select.display {
         margin-bottom: 0;
         margin-left: .25em; }
 
+.sr5.chat-card {
+  font-style: normal;
+  font-size: 1rem; }
+  .sr5.chat-card .card-header {
+    padding: .25em 0;
+    border-top: 2px groove white;
+    border-bottom: 2px groove white; }
+    .sr5.chat-card .card-header img {
+      flex: 0 0 36px;
+      margin-right: .5em; }
+    .sr5.chat-card .card-header h3 {
+      font-size: 1.75em;
+      align-self: center;
+      flex: 1;
+      margin: 0;
+      font-family: "Nodesto", "Signika", "Palatino Linotype", serif; }
+  .sr5.chat-card .card-content {
+    padding: .5em 0;
+    border-bottom: 2px groove white; }
+    .sr5.chat-card .card-content h3 {
+      font-size: 1em;
+      margin: 0;
+      font-weight: bold; }
+  .sr5.chat-card .card-buttons {
+    margin: .5em 0; }
+    .sr5.chat-card .card-buttons span {
+      display: block;
+      line-height: 2em;
+      text-align: center; }
+    .sr5.chat-card .card-buttons button {
+      font-size: 1em;
+      height: 1.5em;
+      line-height: 1.25em;
+      margin: .25em 0;
+      color: #e6e6e6;
+      background: #4d4d4d; }
+  .sr5.chat-card .card-footer {
+    padding: .25em 0 0;
+    border-top: 2px groove white; }
+    .sr5.chat-card .card-footer span {
+      border-right: 2px groove white;
+      padding: 0;
+      padding-right: .3em;
+      font-size: .75em; }
+      .sr5.chat-card .card-footer span:last-child {
+        border-right: none;
+        padding-right: 0; }
+
 .sr5.item .item-name {
   font-size: 120%;
   font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
@@ -293,8 +347,8 @@ select.display {
   border-bottom: 2px groove white; }
 
 .sr5.actor {
-  min-height: 50em;
-  min-width: 55em; }
+  min-height: 45em;
+  min-width: 60em; }
   .sr5.actor .sheet-header-row-2 > * {
     text-align: center; }
   .sr5.actor .sheet-header-row-2 > *:not(:last-child) {
@@ -329,9 +383,9 @@ select.display {
   .sr5.actor .tab {
     border-radius: 0.25em;
     margin-top: 1em; }
-    .sr5.actor .tab .scroll-area {
-      overflow-y: auto;
-      max-height: 28em; }
+  .sr5.actor .scroll-area {
+    overflow-y: scroll;
+    max-height: 28em; }
   .sr5.actor .tabs > a {
     position: relative;
     margin: .25em;
@@ -343,8 +397,6 @@ select.display {
       width: 50%;
       transform: translateX(50%);
       border-bottom: 1px groove white; }
-  .sr5.actor .sheet-header-row-1 {
-    margin-bottom: .5em; }
   .sr5.actor .sheet-header {
     padding: 0; }
   .sr5.actor .inventory {
@@ -361,8 +413,7 @@ select.display {
       justify-content: space-between;
       align-items: center;
       align-content: center;
-      margin: .1em 0;
-      padding: .25em;
+      padding: 0 .25em;
       margin-right: 2px;
       margin-left: 2px; }
       .sr5.actor .inventory .item.item-section {
@@ -381,10 +432,11 @@ select.display {
         justify-content: flex-end;
         align-items: center; }
       .sr5.actor .inventory .item .item-img {
-        padding: 0 .25em;
+        padding-right: .25em;
         flex: 0; }
         .sr5.actor .inventory .item .item-img > img {
-          margin: 0; }
+          margin: 0;
+          transform: translateY(10%); }
         .sr5.actor .inventory .item .item-img + .item-name {
           border-left: none !important; }
       .sr5.actor .inventory .item .item-icons {
@@ -397,6 +449,7 @@ select.display {
         height: 100%; }
       .sr5.actor .inventory .item .item-text {
         min-width: 5em;
+        margin: 0 .1rem;
         margin-bottom: 0;
         flex: 1 0 auto;
         text-align: center;
@@ -404,9 +457,14 @@ select.display {
         .sr5.actor .inventory .item .item-text:not(:first-child) {
           border-left: 1px solid rgba(128, 128, 128, 0.5); }
         .sr5.actor .inventory .item .item-text.item-name {
-          text-align: left; }
+          text-align: left;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 9em; }
+        .sr5.actor .inventory .item .item-text.rtg {
+          min-width: 3em; }
       .sr5.actor .inventory .item .skill-item {
-        min-width: 10em; }
+        min-width: 8em; }
       .sr5.actor .inventory .item.skill-header:hover {
         text-shadow: 0 0 0.2em grey;
         cursor: pointer; }

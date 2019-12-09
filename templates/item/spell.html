@@ -3,8 +3,20 @@
     {{> "systems/shadowrun5e/templates/item/parts/item-left.html" }}
     <div class="flexcol">
       {{> "systems/shadowrun5e/templates/item/parts/spell-body.html" categories=config.spell.categories}}
-      {{#ife data.category config.spell.categories.COMBAT}}
       <div class="attributes smooth">
+        <div class="attribute">
+          <div class="attribute-input-container">
+            <input
+               class="display attribute-input"
+               size='4'
+               maxlength='3'
+               type='text'
+               name='data.action.mod'
+               value="{{data.action.mod}}"
+               placeholder="+Mod" />
+          </div>
+        </div>
+        {{#ife data.category config.spell.categories.COMBAT}}
         <div class="attribute">
           <select name="data.action.damage.type" class="display">
             {{#select data.action.damage.type}}
@@ -33,10 +45,8 @@
             {{/select}}
           </select>
         </div>
-      </div>
-      {{/ife}}
-      {{#ife data.category config.spell.categories.DETECTION}}
-      <div class="attributes smooth">
+        {{/ife}}
+        {{#ife data.category config.spell.categories.DETECTION}}
         <div class="attribute">
           <label class='checkbox'>
             Passive <input class='display' type='checkbox' name='data.detection.active' {{checked data.detection.active}}/>
@@ -56,10 +66,8 @@
             Extended <input class='display' type='checkbox' name='data.detection.extended' {{checked data.detection.extended}}/>
           </label>
         </div>
-      </div>
-      {{/ife}}
-      {{#ife data.category config.spell.categories.ILLUSION}}
-      <div class="attributes smooth">
+        {{/ife}}
+        {{#ife data.category config.spell.categories.ILLUSION}}
         <div class="attribute">
           <select name="data.illusion.type" class="display">
             {{#select data.illusion.type}}
@@ -78,10 +86,8 @@
             {{/select}}
           </select>
         </div>
-      </div>
-      {{/ife}}
-      {{#ife data.category config.spell.categories.MANIPULATION}}
-      <div class="attributes smooth">
+        {{/ife}}
+        {{#ife data.category config.spell.categories.MANIPULATION}}
         <div class="attribute">
           <label class='checkbox'>
             Damaging <input class='display' type='checkbox' name='data.manipulation.damaging' {{checked data.manipulation.damaging}}/>
@@ -102,8 +108,8 @@
             Physical <input class='display' type='checkbox' name='data.manipulation.physical' {{checked data.manipulation.physical}}/>
           </label>
         </div>
+        {{/ife}}
       </div>
-      {{/ife}}
       {{> "systems/shadowrun5e/templates/item/parts/item-description.html"}}
     </div>
   </div>

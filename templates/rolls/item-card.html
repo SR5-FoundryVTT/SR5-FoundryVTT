@@ -1,0 +1,24 @@
+<div class="sr5 chat-card item-card" data-actor-id='{{actor._id}}' data-item-id='{{item.id}}' {{#if tokenId}}data-token-id='{{tokenId}}'{{/if}}>
+  <header class='card-header flexrow'>
+    <img src='{{item.img}}' title='{{item.name}}' width='36' height='36'>
+    <h3>{{item.name}}</h3>
+  </header>
+
+  <div class="card-content">
+    {{data.description.value}}
+  </div>
+
+  <div class="card-buttons">
+    {{#if hasRoll}}<button data-action='roll'>{{labels.roll}}</button>{{/if}}
+    {{#if hasOpposedRoll}}
+    <span>Opposed Roll</span>
+    <button data-action='opposed-roll'>{{labels.opposedRoll}}</button>
+    {{/if}}
+  </div>
+
+  <footer class='card-footer'>
+    {{#each data.properties}}
+    <span>{{this}}</span>
+    {{/each}}
+  </footer>
+</div>

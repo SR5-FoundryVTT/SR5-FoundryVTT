@@ -10,7 +10,7 @@
   "styles": ["css/main.css"],
   "minimumCoreVersion": "0.4.0",
   "packs": [],
-  "initiative": "@attributes.reaction",
+  "initiative": "5d6",
   "primaryTokenAttribute": "track.physical",
   "secondaryTokenAttribute": "track.stun",
   "gridDistance": 1,

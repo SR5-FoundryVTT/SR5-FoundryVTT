@@ -1,6 +1,10 @@
 export class Helpers {
   static label(str) {
-    return str.replace('_',' ').replace(/^\w/, c => c.toUpperCase());
+    const frags = str.split('_');
+    for (let i=0; i<frags.length; i++) {
+      frags[i] = frags[i].charAt(0).toUpperCase() + frags[i].slice(1);
+    }
+    return frags.join(' ');
   }
 
   static hasModifiers(event) {

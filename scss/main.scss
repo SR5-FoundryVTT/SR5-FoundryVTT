@@ -13,6 +13,8 @@ $white: white;
 $darkblue: darkblue;
 $crimson: crimson;
 $darkred: darkred;
+$light: darken($white, 10%);
+$dark: darken($grey, 20%);
 
 $rollcolor: $grey;
 
@@ -140,6 +142,9 @@ hr.divider {
   > * {
     flex: 1 0 auto;
   }
+}
+.groove-right {
+  border-right: $groove;
 }
 
 .input {
@@ -297,15 +302,13 @@ select.display {
     display: flex;
     flex-flow: row;
     flex-wrap: nowrap;
+    justify-content: space-between;
+    &.no-border {
+      border-top: none;
+      border-bottom: none;
+    }
     &:last-child {
       border-bottom: $groove;
-    }
-    &.smooth {
-      justify-content: space-between;
-
-      >.attribute {
-        flex: 1 0 auto;
-      }
     }
     .attribute {
       @include title
@@ -315,6 +318,7 @@ select.display {
       align-items: center;
       justify-content: space-around;
       padding: 0 .25em;
+      flex: 1 0 auto;
       min-width: 5rem;
       &.row {
         flex-flow: row nowrap;
@@ -323,6 +327,9 @@ select.display {
         align-content: center;
         >.attribute-name {
           width: auto;
+        }
+        &.space-around {
+          justify-content: space-around;
         }
         .attribute-input {
           transform: translateY(20%);
@@ -383,6 +390,73 @@ select.display {
 
     }
   }
+  &.chat-card {
+    font-style: normal;
+    font-size: 1rem;
+
+    .card-header {
+      padding: .25em 0;
+      border-top: $groove;
+      border-bottom: $groove;
+
+      img {
+        flex: 0 0 36px;
+        margin-right: .5em;
+      }
+
+      h3 {
+        font-size: 1.75em;
+        align-self: center;
+        flex: 1;
+        margin: 0;
+        @include nodesto;
+      }
+    }
+    .card-content {
+      padding: .5em 0;
+      border-bottom: $groove;
+      h3 {
+        font-size: 1em;
+        margin: 0;
+        font-weight: bold;
+      }
+    }
+
+    .card-buttons {
+      margin: .5em 0;
+      span {
+        display: block;
+        line-height: 2em;
+        text-align: center;
+      }
+
+      button {
+        font-size: 1em;
+        height: 1.5em;
+        line-height: 1.25em;
+        margin: .25em 0;
+        color: $light;
+        background: $dark;
+      }
+    }
+
+    .card-footer {
+      padding: .25em 0 0;
+      border-top: $groove;
+
+      span {
+        border-right: $groove;
+        padding: 0;
+        padding-right: .3em;
+        font-size: .75em;
+
+        &:last-child {
+          border-right: none;
+          padding-right: 0;
+        }
+      }
+    }
+  }
   &.item {
     .item-name {
       @include title;
@@ -406,8 +480,8 @@ select.display {
     }
   }
   &.actor {
-    min-height: 50em;
-    min-width: 55em;
+    min-height: 45em;
+    min-width: 60em;
     .sheet-header-row-2 {
       > * {
         text-align: center;
@@ -454,18 +528,15 @@ select.display {
     .tab {
       border-radius: $radius;
       margin-top: 1em;
-      .scroll-area {
-        overflow-y: auto;
-        max-height: 28em;
-      }
+    }
+    .scroll-area {
+      overflow-y: scroll;
+      max-height: 28em;
     }
     .tabs >a {
       @include shortUnder;
       margin: .25em;
       position: relative;
-    }
-    .sheet-header-row-1 {
-      margin-bottom: .5em;
     }
     .sheet-header {
       padding: 0;
@@ -485,8 +556,7 @@ select.display {
         justify-content: space-between;
         align-items: center;
         align-content: center;
-        margin: .1em 0;
-        padding: .25em;
+        padding: 0 .25em;
         margin-right: $groove-width;
         margin-left: $groove-width;
         &.item-section {
@@ -508,10 +578,11 @@ select.display {
           align-items: center;
         }
         .item-img {
-          padding: 0 .25em;
+          padding-right: .25em;
           flex: 0;
           >img {
             margin: 0;
+            transform: translateY(10%);
           }
           & + .item-name {
             border-left: none !important;
@@ -532,15 +603,22 @@ select.display {
           }
           &.item-name {
             text-align: left;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 9em;
+          }
+          &.rtg {
+            min-width: 3em;
           }
           min-width: 5em;
+          margin: 0 .1rem;
           margin-bottom: 0;
           flex: 1 0 auto;
           text-align: center;
           height: 100%;
         }
         .skill-item {
-          min-width: 10em;
+          min-width: 8em;
         }
         &.skill-header {
           @include rollable;

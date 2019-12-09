@@ -23,7 +23,7 @@ Hooks.once("init", async function() {
    * Set an initiative formula for the system
    * @type {String}
    */
-  CONFIG.initiative.formula = "1d6";
+  CONFIG.initiative.formula = "@initiative.current.base.value + @initiative.current.dice.text";
 
   await preloadHandlebarsTemplates();
 
@@ -33,6 +33,8 @@ Hooks.once("init", async function() {
   Items.unregisterSheet("core", ItemSheet);
   Items.registerSheet("SR5", SR5ItemSheet, { makeDefault: true});
 });
+
+Hooks.on('renderChatMessage', (app, html, data) => SR5Item.chatListeners(html));
 
 Handlebars.registerHelper("toHeaderCase", function(str) {
   if (str) return Helpers.label(str);

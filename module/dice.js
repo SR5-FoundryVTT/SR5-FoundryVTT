@@ -10,7 +10,7 @@ import { SR5 } from './config.js';
  */
 
 export class DiceSR {
-  static d6({event, count, actor, limit, title}) {
+  static d6({event, count, actor, limit, title, prefix, suffix, after}) {
 
     const roll = (count, limit, explode) => {
       let formula = `${count}d6`;
@@ -22,6 +22,8 @@ export class DiceSR {
       }
 
       formula += 'cs>=5'
+      if (suffix) formula += suffix;
+      if (prefix) formula = prefix + formula;
 
       let roll = new Roll(formula);
 
@@ -33,13 +35,16 @@ export class DiceSR {
     };
 
     if (Helpers.hasModifiers(event)) {
-      if (event[SR5.kbmod.EDGE]) return roll(count, 0, true);
-      return roll(count, limit, false);
+      if (event[SR5.kbmod.EDGE]) return roll(count, undefined, true);
+      roll(count, limit, false);
+      if (after) after();
     }
 
     let dialogData = {
       dice_pool: count,
-      mod: ""
+      mod: "",
+      limit: limit,
+      limit_mod: ""
     };
     let template = 'systems/shadowrun5e/templates/rolls/roll-dialog.html';
     let edge = false;
@@ -62,10 +67,13 @@ export class DiceSR {
           default: 'roll',
           close: html => {
             let mod = parseInt(html.find('[name="mod"]').val());
+            let limitMod = parseInt(html.find('[name="limit_mod"]').val());
             if (!isNaN(mod)) count += mod;
+            if (!isNaN(limitMod)) limit += limitMod;
             if (edge) limit = undefined;
             let r = roll(count, limit, edge);
             resolve(r);
+            if (after) after();
           }
         }).render(true);
       });

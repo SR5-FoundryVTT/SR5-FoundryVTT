@@ -12,6 +12,8 @@ export class SR5Actor extends Actor {
     const attrs = data.attributes;
     const armor = data.armor;
 
+    console.log(data);
+
     Helpers.addLabels(data.skills);
     Helpers.addLabels(data.attributes);
 
@@ -19,15 +21,15 @@ export class SR5Actor extends Actor {
     limits.physical.value = Math.ceil(((2 * attrs.strength.value)
         + attrs.body.value
         + attrs.reaction.value) / 3)
-        + (limits.physical.mod ? limits.physical.mod : 0);
+        + (limits.physical.mod || 0);
     limits.mental.value = Math.ceil(((2 * attrs.logic.value)
       + attrs.intuition.value
       + attrs.willpower.value) / 3)
-      + (limits.mental.mod ? limits.mental.mod : 0);
+      + (limits.mental.mod || 0);
     limits.social.value = Math.ceil(((2 * attrs.charisma.value)
       + attrs.willpower.value
       + attrs.essence.value) / 3)
-      + (limits.social.mod ? limits.social.mod : 0);
+      + (limits.social.mod || 0);
 
     const movement = data.movement;
     movement.walk.value = attrs.agility.value
@@ -42,12 +44,55 @@ export class SR5Actor extends Actor {
     track.stun.max = 8 + Math.ceil(attrs.willpower.value / 2)
       + (track.stun.mod ? track.stun.mod : 0);
 
+    const init = data.initiative;
+
+    init.meatspace.base.base = attrs.intuition.value + attrs.reaction.value;
+    init.meatspace.dice.base = 1;
+
+    init.astral.base.base = attrs.intuition.value * 2;
+    init.astral.dice.base = 2;
+
+    init.matrix.base.base = attrs.intuition.value + data.matrix.data_processing.value;
+    init.matrix.dice.base = data.matrix.hot_sim ? 4 : 3;
+
+    if (data.initiative.perception === 'matrix') init.current = init.matrix;
+    else if (data.initiative.perception === 'astral') init.current = init.astral;
+    else {
+      init.current = init.meatspace;
+      data.initiative.perception = 'meatspace';
+    }
+
+    init.current.dice.value = init.current.dice.base + init.current.dice.mod;
+    init.current.dice.text = `${init.current.dice.value}d6`;
+    init.current.base.value = init.current.base.base + init.current.base.mod;
+
     armor.value = 0;
     armor.mod = 0;
+    const matrix = data.matrix;
+    matrix.firewall.value = matrix.firewall.mod;
+    matrix.data_processing.value = matrix.data_processing.mod;
+    matrix.attack.value = matrix.attack.mod;
+    matrix.sleaze.value = matrix.sleaze.mod;
     for (let item of Object.values(items)) {
       if (item.type === 'armor' && item.data.technology.equipped) {
         if (item.data.armor.mod) armor.mod += item.data.armor.value; // if it's a mod, add to the mod field
         else armor.value = item.data.armor.value; // if not a mod, set armor.value to the items value
+      } else if (item.type === 'device' && item.data.technology.equipped) {
+        matrix.condition_monitor.max = item.data.condition_monitor.max;
+        matrix.rating = item.data.technology.rating;
+        matrix.is_cyberdeck = item.category === 'cyberdeck';
+        matrix.name = item.name;
+        if (item.data.category === 'cyberdeck') {
+          matrix.firewall.value += item.data.firewall;
+          matrix.attack.value += item.data.attack;
+          matrix.sleaze.value += item.data.sleaze;
+          matrix.data_processing.value += item.data.data_processing;
+        } else {
+          matrix.attack.value += 0;
+          matrix.sleaze.value += 0;
+          matrix.firewall.value += matrix.rating;
+          matrix.data_processing.value += matrix.rating;
+        }
       }
     }
 

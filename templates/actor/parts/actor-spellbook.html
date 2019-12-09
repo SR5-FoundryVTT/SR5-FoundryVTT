@@ -1,10 +1,5 @@
 <div class="attributes smooth">
   <div class="attribute row">
-    <label class="checkbox">
-      <input type='checkbox' class='display' /> Astral Projection
-    </label>
-  </div>
-  <div class="attribute row">
     <div class="attribute-name">Drain</div>
     <select name="data.magic.attribute" class="display">
       {{#select data.magic.attribute}}
@@ -46,8 +41,8 @@
     {{#each section.items as |item iid|}}
     <div class="item" data-item='{{item.id}}'>
       <div class="item-left">
-        <div class="item-img">
-          <img src="{{item.img}}" data-edit="img" title="{{item.name}}" height='24px' width='24px'/>
+        <div class="item-img item-roll" data-item='{{item.id}}'>
+          <img src="{{item.img}}" title="{{item.name}}" height='24px' width='24px'/>
         </div>
         <div class="item-text item-name">
           {{item.name}}

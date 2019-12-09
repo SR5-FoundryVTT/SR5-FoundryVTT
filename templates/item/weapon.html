@@ -1,34 +1,64 @@
 <form class="{{cssClass}}" autocomplete="off">
-  <div class="flexrow align-start">
+  <div class="flexrow align-start nowrap">
     {{> "systems/shadowrun5e/templates/item/parts/item-left.html" }}
     <div class="flexcol">
       {{> "systems/shadowrun5e/templates/item/parts/item-header.html" spec=true categories=config.weapon.categories}}
+      {{#ife data.category config.weapon.categories.RANGE}}
       <div class="attributes smooth">
-        {{#ife data.category config.weapon.categories.RANGE}}
-        <div class="attribute">
-          <h4 class="attribute-name roll">SS/SA</h4>
+        <div class="attribute row">
+          <div class="attribute-name">Ammo</div>
+          <div class="attribute-input-container">
+            <input
+              class='display'
+              size='15'
+              maxlength='15'
+              type='text'
+              name='data.range.ammo.name'
+              value='{{data.range.ammo.name}}'
+              placeholder='Ammo' />
+          </div>
         </div>
-        <div class="attribute">
-          <h4 class="attribute-name roll">SB/BF</h4>
+        <div class="attribute row">
+          <div class="attribute-name">DV</div>
+          <div class="attribute-input-container">
+            <input
+              class='display'
+              size='4'
+              maxlength='4'
+              type='text'
+              name='data.range.ammo.damage'
+              value='{{data.range.ammo.damage}}'
+              placeholder='+Mod' />
+          </div>
         </div>
-        <div class="attribute">
-          <h4 class="attribute-name roll">LB/FA(s)</h4>
+        <div class="attribute row">
+          <div class="attribute-name">AP</div>
+          <div class="attribute-input-container">
+            <input
+              class='display'
+              size='4'
+              maxlength='4'
+              type='text'
+              name='data.range.ammo.ap'
+              value='{{data.range.ammo.ap}}'
+              placeholder='+Mod' />
+          </div>
         </div>
-        <div class="attribute">
-          <h4 class="attribute-name roll">FA(c)</h4>
+        <div class="attribute row">
+          <div class="attribute-name">Acc</div>
+          <div class="attribute-input-container">
+            <input
+              class='display'
+              size='4'
+              maxlength='4'
+              type='text'
+              name='data.range.ammo.acc'
+              value='{{data.range.ammo.acc}}'
+              placeholder='+Mod' />
+          </div>
         </div>
-        {{/ife}}
-        {{#ife data.category config.weapon.categories.MELEE}}
-        <div class="attribute">
-          <h4 class="attribute-name roll">Attack <i class='fas fa-khanda'></i></h4>
-        </div>
-        {{/ife}}
-        {{#ife data.category config.weapon.categories.THROWN}}
-        <div class="attribute">
-          <h4 class="attribute-name roll">Throw <i class='fas fa-bomb'></i></h4>
-        </div>
-        {{/ife}}
       </div>
+      {{/ife}}
       <div class="attributes smooth">
         <div class="attribute">
           <h4 class="attribute-name">Damage</h4>
@@ -81,8 +111,8 @@
               type="text"
               maxlength="2"
               size="2"
-              name="data.thrown.blast.value"
-              value="{{data.thrown.blast.value}}"
+              name="data.thrown.blast.radius"
+              value="{{data.thrown.blast.radius}}"
               data-dtype="Number"
               placeholder="1"/>
           </h3>
@@ -194,8 +224,8 @@
           <div class="attribute-input-container">
             <input
                class="display attribute-input"
-               size='10'
-               maxlength='10'
+               size='15'
+               maxlength='15'
                type='text'
                name='data.range.range'
                value="{{data.range.range}}"
@@ -221,6 +251,18 @@
           </select>
         </div>
         {{/ifne}}
+        <div class="attribute">
+          <div class="attribute-input-container">
+            <input
+               class="display attribute-input"
+               size='4'
+               maxlength='3'
+               type='text'
+               name='data.action.mod'
+               value="{{data.action.mod}}"
+               placeholder="+Mod" />
+          </div>
+        </div>
       </div>
       {{> "systems/shadowrun5e/templates/item/parts/item-description.html"}}
     </div>

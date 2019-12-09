@@ -1,7 +1,6 @@
 <div class="attributes smooth">
   <div class="attribute row">
     <h4 class="attribute-name">Armor {{sum data.armor.value data.armor.mod}}</h4>
-
   </div>
 </div>
 <div class="inventory">
@@ -27,10 +26,10 @@
       </div>
     </div>
     {{#each section.items as |item i|}}
-    <div class="item" data-item='{{item.id}}'>
+    <div class="item">
       <div class="item-left">
-        <div class="item-img">
-          <img src="{{item.img}}" data-edit="img" title="{{item.name}}" height='24px' width='24px'/>
+        <div class="item-img item-roll" data-item='{{item.id}}'>
+          <img src="{{item.img}}" title="{{item.name}}" height='24px' width='24px'/>
         </div>
         <div class="item-text item-name">
           {{item.name}}

@@ -221,6 +221,14 @@ SR5.skills = {
   }
 };
 
+SR5.initiative = {
+  categories: {
+    MEATSPACE: 'meatspace',
+    ASTRAL: 'astral',
+    MATRIX: 'matrix'
+  }
+};
+
 SR5.kbmod = {
   STANDARD: 'shiftKey',
   EDGE: 'altKey',
@@ -230,7 +238,7 @@ SR5.kbmod = {
 SR5.attributes = {
   ...SR5.spell.attributes,
   BODY: 'body',
-  AGILIGITY: 'agility',
+  AGILITY: 'agility',
   STRENGTH: 'strength',
   REACTION: 'reaction',
   WILLPOWER: 'willpower',

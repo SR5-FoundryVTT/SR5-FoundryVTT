@@ -1,11 +1,15 @@
 <form>
   <div class='form-group'>
     <label>Dice Pool</label>
-    <input type='text' name='dice_pool' size='3' maxlength='3' value='{{dice_pool}}' disabled data-dtype="Number"/>
+    <input style='flex: 1' type='text' name='dice_pool' size='3' maxlength='3' value='{{dice_pool}}' disabled data-dtype="Number"/>
+    <input style='flex: 1' type='text' name='mod' size='3' maxlength='3' value='{{mod}}' placeholder='+Modifiers' data-dtype="Number"/>
   </div>
   <div class='form-group'>
-    <label>Modifiers</label>
-    <input type='text' name='mod' size='3' maxlength='3' value='{{mod}}' placeholder = '+2' data-dtype="Number"/>
+    <label>Limit</label>
+    <input style='flex: 1' type='text' name='limit' size='3' maxlength='3' value='{{limit}}' disabled data-dtype="Number"/>
+    <input style='flex: 1' type='text' name='limit_mod' size='3' maxlength='3' value='{{limit_mod}}' placeholder='+LimitMod' data-dtype="Number"/>
+  </div>
+  <div class='form-group'>
   </div>
 </form>
 
