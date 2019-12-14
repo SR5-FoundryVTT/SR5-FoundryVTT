@@ -6,57 +6,89 @@
       {{#ife data.category config.device.categories.CYBERDECK}}
       <div class="attributes smooth">
         <div class="attribute">
-          <h4 class="attribute-name roll">Attack</h4>
+          <div class="attribute-name">
+            <select name="data.atts.att1.att" class="display">
+            {{#select data.atts.att1.att}}
+            {{#each config.matrix.attributes as |label l|}}
+            <option value="{{label}}">{{toHeaderCase label}}</option>
+            {{/each}}
+            {{/select}}
+            </select>
+          </div>
           <h3 class="attribute-input-container">
             <input
               class="display attribute-input"
               type="text"
               maxlength="2"
               size="2"
-              name="data.attack"
-              value="{{data.attack}}"
+              name="data.atts.att1.value"
+              value="{{data.atts.att1.value}}"
               data-dtype="Number"
               placeholder="1"/>
           </h3>
         </div>
         <div class="attribute">
-          <h4 class="attribute-name roll">Sleaze</h4>
+          <div class="attribute-name">
+            <select name="data.atts.att2.att" class="display">
+            {{#select data.atts.att2.att}}
+            {{#each config.matrix.attributes as |label l|}}
+            <option value="{{label}}">{{toHeaderCase label}}</option>
+            {{/each}}
+            {{/select}}
+            </select>
+          </div>
           <h3 class="attribute-input-container">
             <input
               class="display attribute-input"
               type="text"
               maxlength="2"
               size="2"
-              name="data.sleaze"
-              value="{{data.sleaze}}"
+              name="data.atts.att2.value"
+              value="{{data.atts.att2.value}}"
               data-dtype="Number"
               placeholder="1"/>
           </h3>
         </div>
         <div class="attribute">
-          <h4 class="attribute-name roll">Data Proc.</h4>
+          <div class="attribute-name">
+            <select name="data.atts.att3.att" class="display">
+            {{#select data.atts.att3.att}}
+            {{#each config.matrix.attributes as |label l|}}
+            <option value="{{label}}">{{toHeaderCase label}}</option>
+            {{/each}}
+            {{/select}}
+            </select>
+          </div>
           <h3 class="attribute-input-container">
             <input
               class="display attribute-input"
               type="text"
               maxlength="2"
               size="2"
-              name="data.data_processing"
-              value="{{data.data_processing}}"
+              name="data.atts.att3.value"
+              value="{{data.atts.att3.value}}"
               data-dtype="Number"
               placeholder="1"/>
           </h3>
         </div>
         <div class="attribute">
-          <h4 class="attribute-name roll">Firewall</h4>
+          <div class="attribute-name">
+            <select name="data.atts.att4.att" class="display">
+            {{#select data.atts.att4.att}}
+            {{#each config.matrix.attributes as |label l|}}
+            <option value="{{label}}">{{toHeaderCase label}}</option>
+            {{/each}}
+            {{/select}}
+            </select>
+          </div>
           <h3 class="attribute-input-container">
             <input
               class="display attribute-input"
               type="text"
               maxlength="2"
               size="2"
-              name="data.firewall"
-              value="{{data.firewall}}"
+              name="data.atts.att4.value"
+              value="{{data.atts.att4.value}}"
               data-dtype="Number"
               placeholder="1"/>
           </h3>

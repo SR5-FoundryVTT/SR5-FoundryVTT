@@ -4,6 +4,10 @@ export class Helpers {
     for (let i=0; i<frags.length; i++) {
       frags[i] = frags[i].charAt(0).toUpperCase() + frags[i].slice(1);
     }
+    frags.forEach((frag, idx) => {
+      if (frag === 'Processing') frags[idx] = 'Proc.';
+      if (frag === 'Mechanic') frags[idx] = 'Mech.';
+    });
     return frags.join(' ');
   }
 

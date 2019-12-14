@@ -195,7 +195,7 @@
         {{> "systems/shadowrun5e/templates/actor/parts/actor-equipment.html" sections=inventory}}
       </div>
       <div class="tab" data-group="primary" data-tab="magic">
-        {{> "systems/shadowrun5e/templates/actor/parts/actor-spellbook.html" sections=spellbook}}
+        {{> "systems/shadowrun5e/templates/actor/parts/actor-spellbook.html" spells=magic.spellbook powers=magic.powers}}
       </div>
       <div class="tab" data-group="primary" data-tab="matrix">
         {{> "systems/shadowrun5e/templates/actor/parts/actor-matrix.html"}}

@@ -145,12 +145,22 @@ export class SR5Item extends Item {
     labels['opposedRoll'] = 'Defend';
   }
 
+  _adept_powerChatData(data, labels, props) {
+    props.push(`PP ${data.pp}`);
+    props.push(Helpers.label(data.type));
+    if (data.type === 'active') {
+      props.push(`${Helpers.label(data.action.type)} Action`);
+    }
+    labels['roll'] = 'Roll';
+  }
+
   rollTest(ev) {
     const itemData = this.data.data;
     const actorData = this.actor.data.data;
 
     let skill = actorData.skills.active[itemData.action.skill];
     let attribute = actorData.attributes[itemData.action.attribute];
+    let attribute2 = actorData.attributes[itemData.action.attribute2];
     let limit = parseInt(itemData.action.limit);
     let spec = itemData.action.spec ? 2 : 0;
     let mod = parseInt(itemData.action.mod || 0);
@@ -167,9 +177,7 @@ export class SR5Item extends Item {
         limit: limit,
         title: title
       });
-    }
-
-    if (this.data.type === 'spell') {
+    } else if (this.data.type === 'spell') {
       let dialogData = {
         drain: (itemData.drain >= 0 ? `+${itemData.drain}` : itemData.drain),
         force: 2 - itemData.drain
@@ -200,21 +208,28 @@ export class SR5Item extends Item {
               limit: limit,
               title: `${this.data.name}`,
               after: () => {
-                const drainAtt = actorData.attributes[actorData.magic.attribute];
-                const magic = actorData.attributes.magic;
-                const resist = drainAtt.value + magic.value;
                 const drain = Math.max(itemData.drain + force + (reckless ? 3 : 0), 2);
-                DiceSR.d6({
-                  event: ev,
-                  count: resist,
-                  prefix: `${drain} - `,
-                  actor: this.actor,
-                  title: `Drain (${drain} Incoming)`
-                });
+                this.actor.rollDrain({event: ev}, drain);
               }
             });
           }
         }).render(true);
+      });
+    } else if (this.data.type === 'adept_power' || this.data.type === 'critter_power') {
+      title = this.data.name;
+      if (!limit || limit === 0) {
+        limit = actorData.limits[attribute.limit].value;
+      }
+      if (this.data.data.action.category === 'att+att') {
+        count = attribute.value + attribute2.value + spec + mod;
+        limit = undefined;
+      }
+      return DiceSR.d6({
+        event: ev,
+        count: count,
+        actor: this.actor,
+        limit: limit,
+        title: title
       });
     }
 
@@ -235,7 +250,7 @@ export class SR5Item extends Item {
       if (tokenKey) {
         const [sceneId, tokenId] = tokenKey.split('.');
         let token;
-        if (sceneId === canvas.scene._id) token = canvas.token.get(tokenId);
+        if (sceneId === canvas.scene._id) token = canvas.tokens.get(tokenId);
         else {
           const scene = game.scenes.get(sceneId);
           if (!scene) return;

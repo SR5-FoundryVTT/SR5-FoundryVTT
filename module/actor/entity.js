@@ -78,18 +78,16 @@ export class SR5Actor extends Actor {
         if (item.data.armor.mod) armor.mod += item.data.armor.value; // if it's a mod, add to the mod field
         else armor.value = item.data.armor.value; // if not a mod, set armor.value to the items value
       } else if (item.type === 'device' && item.data.technology.equipped) {
+        matrix.device = item;
         matrix.condition_monitor.max = item.data.condition_monitor.max;
         matrix.rating = item.data.technology.rating;
         matrix.is_cyberdeck = item.category === 'cyberdeck';
         matrix.name = item.name;
         if (item.data.category === 'cyberdeck') {
-          matrix.firewall.value += item.data.firewall;
-          matrix.attack.value += item.data.attack;
-          matrix.sleaze.value += item.data.sleaze;
-          matrix.data_processing.value += item.data.data_processing;
+          for (let att of Object.values(item.data.atts)) {
+            matrix[att.att].value += att.value;
+          }
         } else {
-          matrix.attack.value += 0;
-          matrix.sleaze.value += 0;
           matrix.firewall.value += matrix.rating;
           matrix.data_processing.value += matrix.rating;
         }
@@ -97,9 +95,11 @@ export class SR5Actor extends Actor {
     }
 
     const soak = attrs.body.value + armor.value + armor.mod;
+    const drainAtt = attrs[data.magic.attribute];
     data.rolls = {
       ...data.rolls,
       defense: attrs.reaction.value + attrs.intuition.value,
+      drain: attrs.magic.value + (drainAtt ? drainAtt.value : 0) + (data.magic.drain ? data.magic.drain.mod : 0),
       soak: {
         default: soak,
         cold: soak + armor.cold,
@@ -117,6 +117,17 @@ export class SR5Actor extends Actor {
     return actorData;
   }
 
+  rollDrain(options, incoming = -1) {
+    const resist = this.data.data.rolls.drain;
+    let title = 'Drain';
+    if (incoming >= 0) title += ` (${incoming} incoming)`;
+    DiceSR.d6({
+      event: options.event,
+      count: resist,
+      actor: this.actor,
+      title: title
+    });
+  }
 
   rollDefense(id, options) {
     const defense = this.data.data.rolls[id];
@@ -207,10 +218,9 @@ export class SR5Actor extends Actor {
         },
         close: (html) => {
           const newAtt = html.find('[name=attribute]').val();
-          console.log(newAtt);
           att = this.data.data.attributes[newAtt];
           limit = this.data.data.limits[att.limit];
-          let count = skill.value + att.value + (spec ? 2 : 0);
+          let count = (skill.value > 0 ? skill.value : -1) + att.value + (spec ? 2 : 0);
           return DiceSR.d6({
             event: options.event,
             actor: this.actor,
@@ -264,11 +274,15 @@ export class SR5Actor extends Actor {
             }
             title = `Defaulting with ${label}`;
           } else {
+            title = label;
+
             const att2Id = html.find('[name=attribute2]').val();
-            const att2 = atts[att2Id];
-            const att2IdLabel = Helpers.label(att2Id);
-            count += att2.value;
-            title = `${label} + ${att2IdLabel}`
+            if (att2Id !== 'none') {
+              const att2 = atts[att2Id];
+              const att2IdLabel = Helpers.label(att2Id);
+              count += att2.value;
+              title += ` + ${att2IdLabel}`
+            }
           }
           return DiceSR.d6({
             event: options.event,

@@ -9,6 +9,7 @@ export const preloadHandlebarsTemplates = async () => {
     "systems/shadowrun5e/templates/item/parts/item-left.html",
     "systems/shadowrun5e/templates/item/parts/spell-damage.html",
     "systems/shadowrun5e/templates/item/parts/spell-body.html",
+    "systems/shadowrun5e/templates/item/parts/power-body.html",
     "systems/shadowrun5e/templates/item/parts/item-header.html"
   ];
 

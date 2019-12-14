@@ -145,7 +145,10 @@
         },
         "magic": {
           "attribute": "logic",
-          "projecting": false
+          "projecting": false,
+          "drain": {
+            "mod": 0
+          }
         },
         "armor": {
           "value": 0,
@@ -816,7 +819,9 @@
       "action": {
         "action": {
           "type": "simple",
+          "category": "skill+att",
           "attribute": "",
+          "attribute2": "",
           "skill": "",
           "spec": false,
           "mod": 0,
@@ -914,10 +919,14 @@
     },
     "adept_power": {
       "templates": ["description", "action", "armor"],
-      "pp": 0
+      "pp": 0,
+      "type": "",
+      "drain": false,
+      "level": 1
     },
     "critter_power": {
-      "templates": ["description", "action", "armor"]
+      "templates": ["description", "action", "armor"],
+      "type": ""
     },
     "quality": {
       "templates": ["description"],
@@ -926,10 +935,24 @@
     "device": {
       "templates": ["description", "technology"],
       "category": "commlink",
-      "attack": 0,
-      "sleaze": 0,
-      "firewall": 0,
-      "data_processing": 0,
+      "atts": {
+        "att1": {
+          "value": 0,
+          "att": "attack"
+        },
+        "att2": {
+          "value": 0,
+          "att": "sleaze"
+        },
+        "att3": {
+          "value": 0,
+          "att": "data_processing"
+        },
+        "att4": {
+          "value": 0,
+          "att": "firewall"
+        }
+      },
       "condition_monitor": {
         "value": 0,
         "max": 9

@@ -63,6 +63,9 @@ export class SR5ActorSheet extends ActorSheet {
     if (matrix.data_processing.mod === 0) delete matrix.data_processing.mod;
     if (matrix.firewall.mod === 0) delete matrix.firewall.mod;
 
+    const magic = data.data.magic;
+    if (magic.drain && magic.drain.mod === 0) delete magic.drain.mod;
+
     this._prepareItems(data);
     this._prepareSkills(data);
 
@@ -193,7 +196,10 @@ export class SR5ActorSheet extends ActorSheet {
     });
 
     data.inventory = Object.values(inventory);
-    data.spellbook = Object.values(spellbook);
+    data.magic = {
+      spellbook: Object.values(spellbook),
+      powers: adept_powers
+    };
   }
 
   /* -------------------------------------------- */
@@ -215,9 +221,7 @@ export class SR5ActorSheet extends ActorSheet {
 
     html.find('.hidden').hide();
     this._shownUntrainedSkills.forEach(cat => {
-      console.log(cat);
       const field = $(`[data-category='${cat}']`);
-      console.log(field);
       field.siblings('.item.hidden').show();
     });
 
@@ -235,6 +239,7 @@ export class SR5ActorSheet extends ActorSheet {
     html.find('.defense-roll').click(this._onRollDefense.bind(this));
     html.find('.attribute-only-roll').click(this._onRollAttributesOnly.bind(this));
     html.find('.soak-roll').click(this._onRollSoak.bind(this));
+    html.find('.drain-roll').click(this._onRollDrain.bind(this));
     html.find('.item-roll').click(this._onRollItem.bind(this));
     html.find('.item-equip-toggle').click(this._onEquipItem.bind(this));
 
@@ -287,6 +292,11 @@ export class SR5ActorSheet extends ActorSheet {
     item.roll();
   }
 
+  async _onRollDrain(event) {
+    event.preventDefault();
+    this.actor.rollDrain({event: event});
+  }
+
   async _onRollDefense(event) {
     event.preventDefault();
     const defense = event.currentTarget.dataset.roll;
@@ -327,7 +337,6 @@ export class SR5ActorSheet extends ActorSheet {
    * @private
    */
   _updateObject(event, formData) {
-    console.log(formData);
     // Update the Actor
     return this.object.update(formData);
   }

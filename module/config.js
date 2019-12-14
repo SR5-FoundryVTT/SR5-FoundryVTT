@@ -221,6 +221,15 @@ SR5.skills = {
   }
 };
 
+SR5.matrix = {
+  attributes: {
+    ATTACK: 'attack',
+    SLEAZE: 'sleaze',
+    DATA_PROCESSING: 'data_processing',
+    FIREWALL: 'firewall'
+  }
+};
+
 SR5.initiative = {
   categories: {
     MEATSPACE: 'meatspace',

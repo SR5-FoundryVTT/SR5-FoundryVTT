@@ -1,0 +1,104 @@
+<div class="attributes">
+  <div class="attribute row">
+    <div class="attribute-name">
+      Type
+    </div>
+    <select name="data.type" class="display">
+      {{#select data.type}}
+      <option value=""></option>
+      <option value="active">Active</option>
+      <option value="passive">Passive</option>
+      {{/select}}
+    </select>
+  </div>
+  {{#ife data.type 'active'}}
+  <div class="attribute row">
+    <div class="attribute-name">
+      Action
+    </div>
+    <select name="data.action.type" class="display">
+    {{#select data.action.type}}
+      <option value=""></option>
+      <option value="free">Free</option>
+      <option value="simple">Simple</option>
+      <option value="complex">Complex</option>
+    {{/select}}
+    </select>
+  </div>
+  <div class="attribute row">
+    <div class="attribute-name">
+      Test
+    </div>
+    <select name="data.action.test" class="display">
+    {{#select data.action.test}}
+      <option value=""></option>
+      <option value="skill+att">Skil+Att</option>
+      <option value="att+att">Attributes</option>
+    {{/select}}
+    </select>
+  </div>
+  {{/ife}}
+</div>
+{{#ife data.type 'active'}}
+{{#ifne data.action.test ''}}
+<div class="attributes">
+  <div class="attribute row">
+    <div class="attribute-name">
+      Attribute
+    </div>
+    <select name="data.action.attribute" class="display">
+    {{#select data.action.attribute}}
+      {{#each config.attributes as |label l|}}
+      <option value="{{label}}">{{toHeaderCase label}}</option>
+      {{/each}}
+    {{/select}}
+    </select>
+  </div>
+  <div class="attribute row">
+    <div class="attribute-name">
+      {{#ife data.action.test 'skill+att'}}
+      Skill
+      {{/ife}}
+      {{#ife data.action.test 'att+att'}}
+      Attribute
+      {{/ife}}
+    </div>
+    {{#ife data.action.test 'skill+att'}}
+      <select name="data.action.skill" class="display">
+      {{#select data.action.skill}}
+        {{#each config.skills.categories}}
+        <option disabled>{{toHeaderCase this.label}}</option>
+        {{#each this.skills}}
+        <option value="{{this}}">{{toHeaderCase this}}</option>
+        {{/each}}
+        {{/each}}
+      {{/select}}
+      </select>
+    {{/ife}}
+    {{#ife data.action.test 'att+att'}}
+    <select name="data.action.attribute2" class="display">
+    {{#select data.action.attribute2}}
+      {{#each config.attributes as |label l|}}
+      <option value="{{label}}">{{toHeaderCase label}}</option>
+      {{/each}}
+    {{/select}}
+    </select>
+    {{/ife}}
+  </div>
+  <div class="attribute row">
+    <div class="attribute-input-container">
+      <input
+        class="display"
+        type="text"
+        maxlength="2"
+        size="3"
+        name="data.action.mod"
+        value="{{data.action.mod}}"
+        data-dtype="Number"
+        placeholder="Mod"
+        data-dtype="Number"/>
+    </div>
+  </div>
+</div>
+{{/ifne}}
+{{/ife}}
