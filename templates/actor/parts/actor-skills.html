@@ -1,55 +1,65 @@
-<div class="inventory groove-right">
-  <div class="scroll-area">
-    {{#each data.skillCategories as |cat cid|}}
-    <div>
-      <div class="item item-section skill-header" data-category="{{cid}}">
-        <div class="item-left">
-          <div class="item-text item-name">
-            {{cid}}
-          </div>
-        </div>
-        <div class="item-right">
-          <div class="item-text skill-item">
-            Specializations
-          </div>
-          <div class="item-text rtg">
-            Rtg
-          </div>
-        </div>
+<div class="skills">
+  <div class="inventory groove-right">
+    <div class="attributes no-border">
+      <div class="attribute row space-around flex0">
+        <div class="attribute-name roll armor-roll">Armor ({{data.armor.value}})</div>
+        <div title="Roll" class="attribute-name basic-roll roll defense-icon fas fa-dice-six" data-roll='basic'></div>
+        {{#ifne data.special 'mundane'}}
+        <div class="attribute-name roll drain-roll">Drain ({{data.rolls.drain}})</div>
+        {{/ifne}}
       </div>
-      {{#each cat.skills as |skill sid|}}
-      <div class="item {{skill.css}}">
-        <div class="item-left">
-          <div class="item-text item-name skill-roll roll" data-skill='{{sid}}'>
-            {{toHeaderCase sid}}
+    </div>
+    <div class="scroll-area">
+      {{#each data.skillCategories as |cat cid|}}
+      <div>
+        <div class="item item-section skill-header" data-category="{{cid}}">
+          <div class="item-left">
+            <div class="item-text item-name">
+              {{cid}}
+            </div>
+          </div>
+          <div class="item-right">
+            <div class="item-text skill-item">
+              Specializations
+            </div>
+            <div class="item-text rtg">
+              Rtg
+            </div>
           </div>
         </div>
-        <div class="item-right">
-          <div class="item-text skill-item">
-            <input
-              class="display"
-              type="text"
-              maxlength="16"
-              size="16"
-              value="{{skill.specs}}"
-              name="data.skills.active.{{sid}}.specs" />
+        {{#each cat.skills as |skill sid|}}
+        <div class="item {{skill.css}}">
+          <div class="item-left">
+            <div class="item-text item-name skill-roll roll" data-skill='{{sid}}'>
+              {{toHeaderCase sid}}
+            </div>
           </div>
-          <div class="item-text rtg">
-            <input
-              class="display"
-              type="text"
-              maxlength="2"
-              size='2'
-              value="{{skill.value}}"
-              name="data.skills.active.{{sid}}.value"
-              placeholder="0"
-              data-dtype="Number"/>
+          <div class="item-right">
+            <div class="item-text skill-item">
+              <input
+                class="display"
+                type="text"
+                maxlength="16"
+                size="16"
+                value="{{skill.specs}}"
+                name="data.skills.active.{{sid}}.specs" />
+            </div>
+            <div class="item-text rtg">
+              <input
+                class="display"
+                type="text"
+                maxlength="2"
+                size='2'
+                value="{{skill.value}}"
+                name="data.skills.active.{{sid}}.value"
+                placeholder="0"
+                data-dtype="Number"/>
+            </div>
           </div>
         </div>
+        {{/each}}
       </div>
       {{/each}}
     </div>
-    {{/each}}
   </div>
 </div>
-

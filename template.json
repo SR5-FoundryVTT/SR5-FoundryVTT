@@ -13,11 +13,7 @@
         "street_cred": 0,
         "notoriety": 0,
         "public_awareness": 0,
-        "modifiers": {
-          "wound": 0,
-          "soak": 0,
-          "global": 0
-        },
+        "special": "mundane",
         "karma": {
           "total": 0,
           "remaining": 0
@@ -104,8 +100,7 @@
           "resonance": {
             "value": 0,
             "min": 0,
-            "limit": "mental",
-            "hidden": true
+            "limit": "mental"
           },
           "edge": {
             "value": 1,
@@ -122,14 +117,17 @@
         "limits": {
           "physical": {
             "value": 1,
+            "mod": 0,
             "min": 1
           },
           "social": {
             "value": 1,
+            "mod": 0,
             "min": 1
           },
           "mental": {
             "value": 1,
+            "mod": 0,
             "min": 1
           }
         },
@@ -796,7 +794,8 @@
       "quality",
       "device",
       "cyberware",
-      "equipment"
+      "equipment",
+      "action"
     ],
     "templates": {
       "description": {
@@ -825,7 +824,8 @@
           "skill": "",
           "spec": false,
           "mod": 0,
-          "limit": "",
+          "limit": 0,
+          "limit_att": "",
           "extended": false,
           "damage": {
             "type": "stun",
@@ -931,6 +931,10 @@
     "quality": {
       "templates": ["description"],
       "type": "positive"
+    },
+    "action": {
+      "templates": ["description", "action"],
+      "type": "skill+att"
     },
     "device": {
       "templates": ["description", "technology"],

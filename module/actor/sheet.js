@@ -15,8 +15,9 @@ export class SR5ActorSheet extends ActorSheet {
      * Keep track of the currently active sheet tab
      * @type {string}
      */
-    this._sheetTab = "skills";
+    this._sheetTab = "equipment";
     this._shownUntrainedSkills = [];
+    this._shownDesc = [];
   }
 
   /* -------------------------------------------- */
@@ -30,7 +31,7 @@ export class SR5ActorSheet extends ActorSheet {
   	  classes: ["sr5", "sheet", "actor"],
   	  template: "systems/shadowrun5e/templates/actor/character.html",
       width: 600,
-      height: 600
+      height: 670
     });
   }
 
@@ -65,6 +66,11 @@ export class SR5ActorSheet extends ActorSheet {
 
     const magic = data.data.magic;
     if (magic.drain && magic.drain.mod === 0) delete magic.drain.mod;
+
+    const mods = data.data.modifiers;
+    for (let [key, value] of Object.entries(mods)) {
+      if (value === 0) mods[key] = "";
+    }
 
     this._prepareItems(data);
     this._prepareSkills(data);
@@ -176,7 +182,7 @@ export class SR5ActorSheet extends ActorSheet {
       }
     };
 
-    let [items, spells, qualities, adept_powers, critter_power] = data.items.reduce((arr, item) => {
+    let [items, spells, qualities, adept_powers, critter_powers, actions] = data.items.reduce((arr, item) => {
       item.img = item.img || DEFAULT_TOKEN;
       item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
 
@@ -184,9 +190,10 @@ export class SR5ActorSheet extends ActorSheet {
       else if (item.type === 'quality') arr[2].push(item);
       else if (item.type === 'adept_power') arr[3].push(item);
       else if (item.type === 'critter_power') arr[4].push(item);
+      else if (item.type === 'action') arr[5].push(item);
       else if (Object.keys(inventory).includes(item.type)) arr[0].push(item);
       return arr;
-    }, [[], [], [], [], []]);
+    }, [[], [], [], [], [], []]);
 
     items.forEach(item => {
       inventory[item.type].items.push(item);
@@ -200,6 +207,7 @@ export class SR5ActorSheet extends ActorSheet {
       spellbook: Object.values(spellbook),
       powers: adept_powers
     };
+    data.actions = actions;
   }
 
   /* -------------------------------------------- */
@@ -234,6 +242,17 @@ export class SR5ActorSheet extends ActorSheet {
       else this._shownUntrainedSkills = this._shownUntrainedSkills.filter(val => val !== category);
     });
 
+    html.find('.has-desc').click(event => {
+      event.preventDefault();
+      const iid = event.currentTarget.dataset.category;
+      const field = $(event.currentTarget).next();
+      field.toggle();
+      if (iid) {
+        if (field.is(':visible')) this._shownDesc.push(iid);
+        else this._shownDesc = this._shownDesc.filter(val => val !== iid);
+      }
+    });
+
     html.find('.attribute-roll').click(this._onRollAttribute.bind(this));
     html.find('.skill-roll').click(this._onRollActiveSkill.bind(this));
     html.find('.defense-roll').click(this._onRollDefense.bind(this));
@@ -242,6 +261,11 @@ export class SR5ActorSheet extends ActorSheet {
     html.find('.drain-roll').click(this._onRollDrain.bind(this));
     html.find('.item-roll').click(this._onRollItem.bind(this));
     html.find('.item-equip-toggle').click(this._onEquipItem.bind(this));
+    html.find('.item-qty').change(this._onChangeQty.bind(this));
+    html.find('.item-create').click(this._onItemCreate.bind(this));
+    html.find('.matrix-roll').click(this._onRollMatrixAttribute.bind(this));
+    html.find('.basic-roll').click(this._onRollPrompt.bind(this));
+    html.find('.armor-roll').click(this._onRollArmor.bind(this));
 
     // Update Inventory Item
     html.find('.item-edit').click(event => {
@@ -263,6 +287,29 @@ export class SR5ActorSheet extends ActorSheet {
     });
   }
 
+  _onItemCreate(event) {
+    event.preventDefault();
+    const header = event.currentTarget;
+    const type = header.dataset.type;
+    const itemData = {
+      name: `New ${Helpers.label(type)}`,
+      type: type,
+      data: duplicate(header.dataset)
+    };
+    delete itemData.data['type'];
+    return this.actor.createOwnedItem(itemData);
+  }
+
+  async _onChangeQty(event) {
+    const iid = parseInt(event.currentTarget.dataset.item);
+    const item = this.actor.getOwnedItem(iid);
+    const qty = parseInt(event.currentTarget.value);
+    if (item && qty) {
+      item.data.data.technology.quantity = qty;
+    }
+    this.actor.updateOwnedItem(item.data);
+  }
+
   async _onEquipItem(event) {
     event.preventDefault();
     const iid = parseInt(event.currentTarget.dataset.item);
@@ -281,15 +328,19 @@ export class SR5ActorSheet extends ActorSheet {
       if (itemData.technology) itemData.technology.equipped = !itemData.technology.equipped;
       this.actor.updateOwnedItem(item.data);
     }
+  }
 
+  async _onRollPrompt(event) {
+    event.preventDefault();
+    this.actor.promptRoll({event: event});
   }
 
   async _onRollItem(event) {
     event.preventDefault();
     const iid = parseInt(event.currentTarget.dataset.item);
     const item = this.actor.getOwnedItem(iid);
-    console.log(item);
-    item.roll();
+    if (item.type === 'action') item.rollTest(event);
+    else item.roll(event);
   }
 
   async _onRollDrain(event) {
@@ -297,10 +348,21 @@ export class SR5ActorSheet extends ActorSheet {
     this.actor.rollDrain({event: event});
   }
 
+  async _onRollArmor(event) {
+    event.preventDefault();
+    this.actor.rollArmor({event: event});
+  }
+
   async _onRollDefense(event) {
     event.preventDefault();
     const defense = event.currentTarget.dataset.roll;
     this.actor.rollDefense(defense, {event: event});
+  }
+
+  async _onRollMatrixAttribute(event) {
+    event.preventDefault();
+    const attr = event.currentTarget.dataset.attribute;
+    this.actor.rollMatrixAttribute(attr, {event: event});
   }
 
   async _onRollSoak(event) {

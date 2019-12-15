@@ -1,0 +1,60 @@
+<div class="inventory">
+  <div class="scroll-area">
+    <div class="item item-section">
+      <div class="item-left">
+        <div class="item-text item-name">
+          Action
+        </div>
+      </div>
+      <div class="item-right">
+        <div class="item-text">
+          Skill
+        </div>
+        <div class="item-text">
+          Attribute
+        </div>
+        <div class="item-text">
+          Limit
+        </div>
+        <div class="item-text">
+          Mod
+        </div>
+        <div class="item-text item-icons">
+          <a class="item-create" title="Create Item" data-type="action">
+            <i class="fas fa-plus"></i>
+            Add
+          </a>
+        </div>
+      </div>
+    </div>
+    {{#each actions as |action id|}}
+    <div class="item" data-item='{{action.id}}'>
+      <div class="item-left">
+        <div class="item-text item-name item-roll roll" data-item='{{action.id}}'>
+          {{action.name}}
+        </div>
+      </div>
+      <div class="item-right">
+        <div class="item-text">
+          {{toHeaderCase action.data.action.skill}}
+        </div>
+        <div class="item-text">
+          {{toHeaderCase action.data.action.attribute}}
+        </div>
+        <div class="item-text">
+          {{toHeaderCase action.data.action.limit_att}}
+        </div>
+        <div class="item-text">
+          {{toHeaderCase action.data.action.mod}}
+        </div>
+        <div class="item-text item-icons">
+          <i class="item-edit roll fas fa-edit" data-item='{{action.id}}'></i>
+          <i class="item-delete roll fas fa-trash" data-item='{{action.id}}'></i>
+        </div>
+      </div>
+    </div>
+    {{/each}}
+  </div>
+</div>
+
+

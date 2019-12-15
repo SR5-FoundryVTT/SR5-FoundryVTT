@@ -38,10 +38,14 @@ export class SR5Item extends Item {
     }
 
     this.labels = labels;
+    console.log(item);
     return item;
   }
 
-  async roll() {
+  async roll(event) {
+    if (Helpers.hasModifiers(event)) {
+      return this.rollTest(event);
+    }
     const data = this.data.data;
     const token = this.actor.token;
     const templateData = {
@@ -81,7 +85,7 @@ export class SR5Item extends Item {
     const data = duplicate(this.data.data);
     const labels = this.labels;
 
-    data.description.value = enrichHTML(data.description.value, htmlOptions);
+    if (data.description && data.description.value) data.description.value = enrichHTML(data.description.value, htmlOptions);
 
     const props = [];
     this[`_${this.data.type}ChatData`](data, labels, props);
@@ -89,6 +93,13 @@ export class SR5Item extends Item {
     data.properties = props.filter(p => !!p);
 
     return data;
+  }
+
+  _actionChatData(data, labels, props) {
+    props.push(Helpers.label(data.action.skill));
+    props.push(Helpers.label(data.action.attribute));
+    if (data.action.limit_att) props.push(Helpers.label(data.action.limit_att));
+    labels['roll'] = 'Roll';
   }
 
   _spellChatData(data, labels, props) {
@@ -162,6 +173,7 @@ export class SR5Item extends Item {
     let attribute = actorData.attributes[itemData.action.attribute];
     let attribute2 = actorData.attributes[itemData.action.attribute2];
     let limit = parseInt(itemData.action.limit);
+    let limit_att = itemData.action.limit_att;
     let spec = itemData.action.spec ? 2 : 0;
     let mod = parseInt(itemData.action.mod || 0);
 
@@ -169,13 +181,16 @@ export class SR5Item extends Item {
     let title = `${Helpers.label(skill.label)} + ${Helpers.label(attribute.label)}`;
 
     if (this.data.type === 'weapon') {
+      let range_mode = undefined;
       if (itemData.category === 'thrown') limit = actorData.limits.physical.value;
+      if (itemData.category === 'range') range_mode = true;
       return DiceSR.d6({
         event: ev,
         count: count,
         actor: this.actor,
         limit: limit,
-        title: title
+        title: title,
+        range_mode: range_mode
       });
     } else if (this.data.type === 'spell') {
       let dialogData = {
@@ -223,6 +238,18 @@ export class SR5Item extends Item {
       if (this.data.data.action.category === 'att+att') {
         count = attribute.value + attribute2.value + spec + mod;
         limit = undefined;
+      }
+      return DiceSR.d6({
+        event: ev,
+        count: count,
+        actor: this.actor,
+        limit: limit,
+        title: title
+      });
+    } else if (this.data.type === 'action') {
+      title = this.data.name;
+      if (limit_att) {
+        limit = actorData.limits[limit_att].value;
       }
       return DiceSR.d6({
         event: ev,

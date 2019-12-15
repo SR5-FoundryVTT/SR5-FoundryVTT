@@ -320,6 +320,10 @@ select.display {
       padding: 0 .25em;
       flex: 1 0 auto;
       min-width: 5rem;
+      &.flex0 {
+        min-width: 0;
+        width: 0;
+      }
       &.row {
         flex-flow: row nowrap;
         justify-content: center;
@@ -513,6 +517,9 @@ select.display {
         }
       }
     }
+    .skills {
+      width: 20em;
+    }
     .limit {
       @include nodesto;
       padding: 0 .1rem;
@@ -559,6 +566,9 @@ select.display {
         padding: 0 .25em;
         margin-right: $groove-width;
         margin-left: $groove-width;
+        &.has-desc {
+          @include rollable;
+        }
         &.item-section {
           border: $groove;
           margin-right: 0;
@@ -580,6 +590,7 @@ select.display {
         .item-img {
           padding-right: .25em;
           flex: 0;
+          @include rollable;
           >img {
             margin: 0;
             transform: translateY(10%);
@@ -587,6 +598,12 @@ select.display {
           & + .item-name {
             border-left: none !important;
           }
+        }
+        .item-desc {
+          padding: .25em;
+          font-size: .8em;
+          border-bottom: $groove;
+          width: 100%;
         }
         .item-icons {
           display: flex;
@@ -596,6 +613,12 @@ select.display {
           color: $grey;
           font-size: .75em;
           height: 100%;
+          .create-item {
+            @include rollable;
+          }
+          .create-matrix-action {
+            @include rollable;
+          }
         }
         .item-text {
           &:not(:first-child) {

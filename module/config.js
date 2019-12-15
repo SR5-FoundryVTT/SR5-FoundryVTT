@@ -12,6 +12,12 @@ SR5.quality = {
   }
 }
 
+SR5.limits = [
+  'physical',
+  'social',
+  'mental'
+];
+
 
 SR5.damageTypes = {
   PHYSICAL: 'physical',

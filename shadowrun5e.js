@@ -66,7 +66,6 @@ Handlebars.registerHelper("ife", function(v1, v2, options) {
  if (v1 === v2) return options.fn(this);
  else return options.inverse(this);
 });
-// if equal
 Handlebars.registerHelper("sum", function(v1, v2) {
   return v1 + v2;
 });

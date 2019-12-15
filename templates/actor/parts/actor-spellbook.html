@@ -1,35 +1,5 @@
-<div class="attributes smooth">
-  <div class="attribute row">
-    <div class="attribute-name roll drain-roll">Drain</div>
-    <select name="data.magic.attribute" class="display">
-      {{#select data.magic.attribute}}
-      {{#each config.spell.attributes}}
-      <option value="{{this}}">{{toHeaderCase this}}</option>
-      {{/each}}
-      <option value="willpower">Willpower</option>
-      {{/select}}
-    </select>
-  </div>
-  <div class="attribute row">
-    <div class="attribute-name">
-      Drain Mod
-    </div>
-    <div class="attribute-input-container">
-      <input
-        class="display"
-        size='4'
-        maxlength='2'
-        type='text'
-        name='data.magic.drain.mod'
-        value="{{data.magic.drain.mod}}"
-        placeholder="+Mod"
-        data-dtype="Number"/>
-    </div>
-  </div>
-</div>
 <div class="inventory">
   <div class="scroll-area">
-    {{#ifgt powers.length 0}}
     <div class="item item-section">
       <div class="item-left">
         <div class="item-text item-name">
@@ -41,8 +11,10 @@
           Type
         </div>
         <div class="item-text item-icons">
-          <i class="fas fa-plus"></i>
-          Add
+          <a class="item-create" title="Create Item" data-type="adept_power">
+            <i class="fas fa-plus"></i>
+            Add
+          </a>
         </div>
       </div>
     </div>
@@ -67,9 +39,7 @@
       </div>
     </div>
     {{/each}}
-    {{/ifgt}}
     {{#each spells as |section sid|}}
-    {{#ifgt section.items.length 0}}
     <div class="item item-section">
       <div class="item-left">
         <div class="item-text item-name">
@@ -90,13 +60,15 @@
           Drain
         </div>
         <div class="item-text item-icons">
-          <i class="fas fa-plus"></i>
-          Add
+          <a class="item-create" title="Create Item" data-type="spell">
+            <i class="fas fa-plus"></i>
+            Add
+          </a>
         </div>
       </div>
     </div>
     {{#each section.items as |item iid|}}
-    <div class="item" data-item='{{item.id}}'>
+    <div class="item has-desc" data-item='{{item.id}}'>
       <div class="item-left">
         <div class="item-img item-roll" data-item='{{item.id}}'>
           <img src="{{item.img}}" title="{{item.name}}" height='24px' width='24px'/>
@@ -124,8 +96,12 @@
         </div>
       </div>
     </div>
+    <div class="item">
+      <div class="item-description hidden">
+        {{item.data.description.value}}
+      </div>
+    </div>
     {{/each}}
-    {{/ifgt}}
     {{/each}}
   </div>
 </div>

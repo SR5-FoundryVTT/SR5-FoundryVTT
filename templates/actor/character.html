@@ -17,12 +17,14 @@
             </h3>
           </div>
           {{#each data.limits as |limit label|}}
+          {{#ifin label ../config.limits }}
           <div class="limit">
             <div class="limit-row">
               <span class="limit-title">{{toHeaderCase label}}</span>
               <span class="limit-value" value={{limit.value}}>{{limit.value}}</span>
             </div>
           </div>
+          {{/ifin}}
           {{/each}}
         </div>
         <div class="attributes smooth">
@@ -57,7 +59,7 @@
           </div>
           {{/each}}
           <div class="attribute">
-            <h4 class="attribute-name roll" data-attribute='edge'>Edge</h4>
+            <h4 class="attribute-name roll attribute-roll" data-attribute='edge'>Edge</h4>
             <div class="track">
               <div class="attribute-input-container">
                 <input
@@ -146,18 +148,6 @@
         <div class="attribute-only-roll roll attribute-name" data-roll='lift_carry'>Lift&Carry</div>
         <div class="attribute-only-roll roll attribute-name" data-roll='memory'>Memory</div>
       </div>
-      <div class="attribute row">
-        <div class="attribute-name">
-          Initiative
-        </div>
-        <select name="data.initiative.perception" class="display">
-          {{#select data.initiative.perception}}
-          <option value="meatspace">Meatspace</option>
-          <option value="matrix">Matrix</option>
-          <option value="astral">Astral</option>
-          {{/select}}
-        </select>
-      </div>
     </div>
     <div class="flexrow attributes">
       {{#each data.attributes as |attribute a|}}
@@ -184,10 +174,13 @@
     <div class="flexcol flex1">
       {{> "systems/shadowrun5e/templates/actor/parts/actor-skills.html" data=data}}
     </div>
-    <div class="flexcol flex3">
+    <div class="flexcol flex2">
       <nav class="tabs" data-group="primary">
+        <a class="item" data-tab="actions">Actions</a>
         <a class="item active" data-tab="equipment">Equipment</a>
+        {{#ife data.special 'magic'}}
         <a class="item" data-tab="magic">Magic</a>
+        {{/ife}}
         <a class="item" data-tab="matrix">Matrix</a>
         <a class="item" data-tab="info">Info</a>
       </nav>
@@ -198,7 +191,13 @@
         {{> "systems/shadowrun5e/templates/actor/parts/actor-spellbook.html" spells=magic.spellbook powers=magic.powers}}
       </div>
       <div class="tab" data-group="primary" data-tab="matrix">
-        {{> "systems/shadowrun5e/templates/actor/parts/actor-matrix.html"}}
+        {{> "systems/shadowrun5e/templates/actor/parts/actor-matrix.html" }}
+      </div>
+      <div class="tab" data-group="primary" data-tab="actions">
+        {{> "systems/shadowrun5e/templates/actor/parts/actor-actions.html" actions=actions }}
+      </div>
+      <div class="tab" data-group="primary" data-tab="info">
+        {{> "systems/shadowrun5e/templates/actor/parts/actor-info.html" }}
       </div>
     </div>
   </section>

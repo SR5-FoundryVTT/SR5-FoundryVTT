@@ -10,8 +10,7 @@ import { SR5 } from './config.js';
  */
 
 export class DiceSR {
-  static d6({event, count, actor, limit, title, prefix, suffix, after}) {
-
+  static d6({event, count=0, actor, limit, title="Roll", prefix, suffix, after, prompt, range_mode}) {
     const roll = (count, limit, explode) => {
       let formula = `${count}d6`;
       if (explode) {
@@ -35,16 +34,22 @@ export class DiceSR {
     };
 
     if (Helpers.hasModifiers(event)) {
-      if (event[SR5.kbmod.EDGE]) return roll(count, undefined, true);
-      roll(count, limit, false);
+      if (event[SR5.kbmod.EDGE]) {
+        roll(count, undefined, true);
+      } else {
+        roll(count, limit, false);
+      }
       if (after) after();
+      return;
     }
 
     let dialogData = {
       dice_pool: count,
       mod: "",
       limit: limit,
-      limit_mod: ""
+      limit_mod: "",
+      prompt: prompt,
+      range_mode: range_mode
     };
     let template = 'systems/shadowrun5e/templates/rolls/roll-dialog.html';
     let edge = false;
@@ -66,10 +71,15 @@ export class DiceSR {
           },
           default: 'roll',
           close: html => {
+            let dice_pool = parseInt(html.find('[name="dice_pool"]').val());
+            let limit = parseInt(html.find('[name="limit"]').val());
             let mod = parseInt(html.find('[name="mod"]').val());
             let limitMod = parseInt(html.find('[name="limit_mod"]').val());
-            if (!isNaN(mod)) count += mod;
-            if (!isNaN(limitMod)) limit += limitMod;
+            let range_mode = parseInt(html.find('[name="range_mode"]').val());
+            if (dice_pool) count = dice_pool;
+            if (mod) count += mod;
+            if (range_mode) count += range_mode;
+            if (limitMod) limit += limitMod;
             if (edge) limit = undefined;
             let r = roll(count, limit, edge);
             resolve(r);

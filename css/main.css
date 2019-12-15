@@ -219,6 +219,9 @@ select.display {
     padding: 0 .25em;
     flex: 1 0 auto;
     min-width: 5rem; }
+    .sr5 .attributes .attribute.flex0 {
+      min-width: 0;
+      width: 0; }
     .sr5 .attributes .attribute.row {
       flex-flow: row nowrap;
       justify-content: center;
@@ -369,6 +372,8 @@ select.display {
     .sr5.actor .sheet-header-row-2 .attribute-only-roll:hover {
       color: grey;
       cursor: pointer; }
+  .sr5.actor .skills {
+    width: 20em; }
   .sr5.actor .limit {
     font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
     padding: 0 .1rem;
@@ -416,6 +421,9 @@ select.display {
       padding: 0 .25em;
       margin-right: 2px;
       margin-left: 2px; }
+      .sr5.actor .inventory .item.has-desc:hover {
+        text-shadow: 0 0 0.2em grey;
+        cursor: pointer; }
       .sr5.actor .inventory .item.item-section {
         border: 2px groove white;
         margin-right: 0;
@@ -434,11 +442,19 @@ select.display {
       .sr5.actor .inventory .item .item-img {
         padding-right: .25em;
         flex: 0; }
+        .sr5.actor .inventory .item .item-img:hover {
+          text-shadow: 0 0 0.2em grey;
+          cursor: pointer; }
         .sr5.actor .inventory .item .item-img > img {
           margin: 0;
           transform: translateY(10%); }
         .sr5.actor .inventory .item .item-img + .item-name {
           border-left: none !important; }
+      .sr5.actor .inventory .item .item-desc {
+        padding: .25em;
+        font-size: .8em;
+        border-bottom: 2px groove white;
+        width: 100%; }
       .sr5.actor .inventory .item .item-icons {
         display: flex;
         flex-flow: row nowrap;
@@ -447,6 +463,12 @@ select.display {
         color: grey;
         font-size: .75em;
         height: 100%; }
+        .sr5.actor .inventory .item .item-icons .create-item:hover {
+          text-shadow: 0 0 0.2em grey;
+          cursor: pointer; }
+        .sr5.actor .inventory .item .item-icons .create-matrix-action:hover {
+          text-shadow: 0 0 0.2em grey;
+          cursor: pointer; }
       .sr5.actor .inventory .item .item-text {
         min-width: 5em;
         margin: 0 .1rem;

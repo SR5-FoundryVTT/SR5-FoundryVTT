@@ -11,24 +11,19 @@ Initiative
 Armor
 Drain
 Soak
+Matrix
+Mods
+Mundane/Special selection
+More info for table stuff on click
 
 Not Working:
-Matrix
-Mods for limits
-Mods for tracks
-Mods for initiative
-Mods for armor
-Mods for movement
-Mods for soak
 Wound modifiers
-Mundane/Special selection
 Complex Forms
 Vehicles
 
 Future:
 More options for powers and items
 Chummer import
-More info for table stuff on click
 better rolls
 
 Work in progress.

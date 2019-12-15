@@ -3,18 +3,9 @@
     <label>Attribute</label>
     <select name="attribute">
       {{#select attribute}}
+        <option value="">None</option>
       {{#each attributes as |att a|}}
         <option value="{{a}}">{{toHeaderCase a}}</option>
-      {{/each}}
-      {{/select}}
-    </select>
-  </div>
-  <div class="form-group">
-    <label>Limit</label>
-    <select name="attribute.limit">
-      {{#select attribute.limit}}
-      {{#each limits as |limit l|}}
-        <option value="{{l}}">{{toHeaderCase l}}</option>
       {{/each}}
       {{/select}}
     </select>

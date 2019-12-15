@@ -34,7 +34,10 @@ export class SR5ItemSheet extends ItemSheet {
    */
   getData() {
     const data = super.getData();
-    if (data.data.action && (data.data.action.mod === 0 || data.data.action.mod === "0")) delete data.data.action.mod;
+    if (data.data.action) {
+      if (data.data.action.mod === 0) delete data.data.action.mod;
+      if (data.data.action.limit === 0) delete data.data.action.limit;
+    }
 
     data.config = CONFIG.SR5;
     return data;

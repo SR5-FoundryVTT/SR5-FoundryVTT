@@ -1,0 +1,84 @@
+<form class="{{cssClass}}" autocomplete="off">
+  <div class="flexrow align-start nowrap">
+    <div class="flexcol">
+      {{> "systems/shadowrun5e/templates/item/parts/item-header.html" spec=true}}
+      <div class="attributes">
+        <div class="attribute">
+          <div class="attribute-name">
+            Skill
+          </div>
+          <select name="data.action.skill" class="display">
+          {{#select data.action.skill}}
+            <option value="">None</option>
+            {{#each config.skills.categories}}
+            <option disabled>{{toHeaderCase this.label}}</option>
+            {{#each this.skills}}
+            <option value="{{this}}">{{toHeaderCase this}}</option>
+            {{/each}}
+            {{/each}}
+          {{/select}}
+          </select>
+        </div>
+        <div class="attribute">
+          <div class="attribute-name">
+            Attribute
+          </div>
+          <select name="data.action.attribute" class="display">
+          {{#select data.action.attribute}}
+            <option value="">None</option>
+            {{#each config.attributes as |label l|}}
+            <option value="{{label}}">{{toHeaderCase label}}</option>
+            {{/each}}
+          {{/select}}
+          </select>
+        </div>
+        <div class="attribute">
+          <div class="attribute-name">
+            Limit
+          </div>
+          <select name="data.action.limit_att" class="display">
+            {{#select data.action.limit_att}}
+            <option value="">Manual</option>
+            {{#each config.matrix.attributes as |label l|}}
+            <option value="{{label}}">{{toHeaderCase label}}</option>
+            {{/each}}
+            {{#each config.limits}}
+            <option value="{{this}}">{{toHeaderCase this}}</option>
+            {{/each}}
+            {{/select}}
+          </select>
+          {{#ife data.action.limit_att ''}}
+            <div class="attribute-input-container">
+              <input
+                 class="display attribute-input"
+                 size='4'
+                 maxlength='3'
+                 type='text'
+                 name='data.action.limit'
+                 value="{{data.action.limit}}"
+                 placeholder="None"
+                 data-dtype='Number'/>
+            </div>
+          {{/ife}}
+        </div>
+        <div class="attribute">
+          <div class="attribute-name">
+            Mod
+          </div>
+          <div class="attribute-input-container">
+            <input
+               class="display attribute-input"
+               size='4'
+               maxlength='3'
+               type='text'
+               name='data.action.mod'
+               value="{{data.action.mod}}"
+               placeholder="+Mod"
+               data-dtype='Number'/>
+          </div>
+        </div>
+      </div>
+      {{> "systems/shadowrun5e/templates/item/parts/item-description.html"}}
+    </div>
+  </div>
+</form>

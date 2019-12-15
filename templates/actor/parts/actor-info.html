@@ -1,0 +1,103 @@
+<div class="inventory">
+  <div class="scroll-area">
+    <div class="flexrow align-start">
+      <div class="flexcol justify-start">
+        <div class="item">
+          <div class="item-left">
+            <div class="item-text item-name">
+              Spcecial
+            </div>
+          </div>
+          <div class="item-right">
+            <div class="item-text">
+              <select class='display' name='data.special'>
+                {{#select data.special}}
+                <option value="mundane">Mundane</option>
+                <option value="magic">Magic</option>
+                <option value="resonance">Resonance</option>
+                {{/select}}
+              </select>
+            </div>
+          </div>
+        </div>
+        {{#ifne data.special 'mundane'}}
+        <div class="item">
+          <div class="item-left">
+            <div class="item-text item-name">
+              Drain Resist
+            </div>
+          </div>
+          <div class="item-right">
+            <div class="item-text">
+              <select name="data.magic.attribute" class="display">
+                {{#select data.magic.attribute}}
+                {{#each config.spell.attributes}}
+                <option value="{{this}}">{{toHeaderCase this}}</option>
+                {{/each}}
+                <option value="willpower">Willpower</option>
+                {{/select}}
+              </select>
+            </div>
+          </div>
+        </div>
+        {{/ifne}}
+        <div class="item">
+          <div class="item-left">
+            <div class="item-text item-name">
+              Initiative
+            </div>
+          </div>
+          <div class="item-right">
+            <div class="item-text">
+              <select name="data.initiative.perception" class="display">
+                {{#select data.initiative.perception}}
+                <option value="meatspace">Meatspace</option>
+                <option value="matrix">Matrix</option>
+                <option value="astral">Astral</option>
+                {{/select}}
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flexcol justify-start">
+        <div class="item item-section">
+          <div class="item-left">
+            <div class="item-text item-name">
+              Modifier
+            </div>
+          </div>
+          <div class="item-right">
+            <div class="item-text rtg">
+              Value
+            </div>
+          </div>
+        </div>
+        {{#each data.modifiers as |value id|}}
+        {{#ifne id 'wound'}}
+        <div class="item">
+          <div class="item-left">
+            <div class="item-text item-name">
+              {{toHeaderCase id}}
+            </div>
+          </div>
+          <div class="item-right">
+            <div class="item-text rtg">
+              <input
+                 class="display attribute-input"
+                 size='4'
+                 maxlength='3'
+                 type='text'
+                 name='data.modifiers.{{id}}'
+                 value="{{value}}"
+                 placeholder="None"
+                 data-dtype='Number'/>
+            </div>
+          </div>
+        </div>
+        {{/ifne}}
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</div>
