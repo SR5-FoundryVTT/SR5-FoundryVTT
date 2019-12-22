@@ -29,18 +29,18 @@
     <div class="attribute-name">
       Test
     </div>
-    <select name="data.action.test" class="display">
-    {{#select data.action.test}}
+    <select name="data.action.category" class="display">
+    {{#select data.action.category}}
       <option value=""></option>
-      <option value="skill+att">Skil+Att</option>
-      <option value="att+att">Attributes</option>
+      <option value="skillatt">Skil+Att</option>
+      <option value="attatt">Attributes</option>
     {{/select}}
     </select>
   </div>
   {{/ife}}
 </div>
 {{#ife data.type 'active'}}
-{{#ifne data.action.test ''}}
+{{#ifne data.action.category ''}}
 <div class="attributes">
   <div class="attribute row">
     <div class="attribute-name">
@@ -56,14 +56,14 @@
   </div>
   <div class="attribute row">
     <div class="attribute-name">
-      {{#ife data.action.test 'skill+att'}}
+      {{#ife data.action.category 'skillatt'}}
       Skill
       {{/ife}}
-      {{#ife data.action.test 'att+att'}}
+      {{#ife data.action.category 'attatt'}}
       Attribute
       {{/ife}}
     </div>
-    {{#ife data.action.test 'skill+att'}}
+    {{#ife data.action.category 'skillatt'}}
       <select name="data.action.skill" class="display">
       {{#select data.action.skill}}
         {{#each config.skills.categories}}
@@ -75,7 +75,7 @@
       {{/select}}
       </select>
     {{/ife}}
-    {{#ife data.action.test 'att+att'}}
+    {{#ife data.action.category 'attatt'}}
     <select name="data.action.attribute2" class="display">
     {{#select data.action.attribute2}}
       {{#each config.attributes as |label l|}}

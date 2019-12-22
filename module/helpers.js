@@ -30,6 +30,18 @@ export class Helpers {
     return obj;
   }
 
+  static setNestedValue(obj, prop, val) {
+    console.log(obj);
+    console.log(prop);
+    console.log(val);
+    const props = prop.split('.');
+    props.forEach(p => obj = (p in obj ? obj[p] : null));
+    if (obj) {
+      console.log(`setting ${obj} to ${val}`);
+      obj = val;
+    }
+  }
+
   static hasModifiers(event) {
     return event && (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey);
   }

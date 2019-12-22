@@ -5,7 +5,7 @@
         <div class="item">
           <div class="item-left">
             <div class="item-text item-name">
-              Spcecial
+              Awakened/Emerged
             </div>
           </div>
           <div class="item-right">
@@ -13,8 +13,8 @@
               <select class='display' name='data.special'>
                 {{#select data.special}}
                 <option value="mundane">Mundane</option>
-                <option value="magic">Magic</option>
-                <option value="resonance">Resonance</option>
+                <option value="magic">Awakened</option>
+                <option value="resonance">Emerged</option>
                 {{/select}}
               </select>
             </div>
@@ -34,7 +34,7 @@
                 {{#each config.spell.attributes}}
                 <option value="{{this}}">{{toHeaderCase this}}</option>
                 {{/each}}
-                <option value="willpower">Willpower</option>
+                <option value="body">Body</option>
                 {{/select}}
               </select>
             </div>

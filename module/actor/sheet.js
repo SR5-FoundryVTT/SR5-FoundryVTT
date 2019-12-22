@@ -244,8 +244,9 @@ export class SR5ActorSheet extends ActorSheet {
 
     html.find('.has-desc').click(event => {
       event.preventDefault();
-      const iid = event.currentTarget.dataset.category;
-      const field = $(event.currentTarget).next();
+      const item = $(event.currentTarget).parents('.item');
+      const iid = $(item).data().item;
+      const field = item.next();
       field.toggle();
       if (iid) {
         if (field.is(':visible')) this._shownDesc.push(iid);
@@ -262,6 +263,7 @@ export class SR5ActorSheet extends ActorSheet {
     html.find('.item-roll').click(this._onRollItem.bind(this));
     html.find('.item-equip-toggle').click(this._onEquipItem.bind(this));
     html.find('.item-qty').change(this._onChangeQty.bind(this));
+    html.find('.item-rtg').change(this._onChangeRtg.bind(this));
     html.find('.item-create').click(this._onItemCreate.bind(this));
     html.find('.matrix-roll').click(this._onRollMatrixAttribute.bind(this));
     html.find('.basic-roll').click(this._onRollPrompt.bind(this));
@@ -298,6 +300,16 @@ export class SR5ActorSheet extends ActorSheet {
     };
     delete itemData.data['type'];
     return this.actor.createOwnedItem(itemData);
+  }
+
+  async _onChangeRtg(event) {
+    const iid = parseInt(event.currentTarget.dataset.item);
+    const item = this.actor.getOwnedItem(iid);
+    const rtg = parseInt(event.currentTarget.value);
+    if (item && rtg) {
+      item.data.data.technology.rating = rtg;
+    }
+    this.actor.updateOwnedItem(item.data);
   }
 
   async _onChangeQty(event) {

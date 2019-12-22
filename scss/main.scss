@@ -167,6 +167,19 @@ hr.divider {
   }
 }
 
+button.display {
+  background: transparent;
+  border: none;
+  text-align: center;
+  &:hover {
+    background: transparent;
+  }
+}
+
+input[type='checkbox'].hidden {
+  display: none;
+}
+
 input[type='checkbox'].display {
   background: transparent;
   border: none;
@@ -186,6 +199,9 @@ input[type="text"].display {
   &:hover:not(:disabled) {
     background: transparent;
     border: $groove;
+  }
+  &.left {
+    text-align: left;
   }
   &.mod-input {
     font-size: .75em;
@@ -297,6 +313,128 @@ select.display {
     font-size: 200%;
     @include nodesto;
   }
+  .tabs {
+    margin: .25em;
+    >a {
+      @include shortUnder;
+      margin: .25em;
+      position: relative;
+    }
+  }
+  .tab {
+    border-radius: $radius;
+    margin-top: .25em;
+  }
+  .inventory {
+    display: flex;
+    flex-flow: column nowrap;
+    width: 100%;
+    font-size: 85%;
+    position: relative;
+    .item:not(.item-section) + .item:not(.item-section) {
+      border-top: 1px solid rgba($black, 0.5);
+    }
+    .item {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: space-between;
+      align-items: center;
+      align-content: center;
+      padding: 0 .25em;
+      margin-right: $groove-width;
+      margin-left: $groove-width;
+      .has-desc {
+        @include rollable;
+      }
+      &.item-section {
+        border: $groove;
+        margin-right: 0;
+        margin-left: 0;
+        background: rgba($grey, 0.2);
+      }
+      .item-left {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: flex-start;
+        align-items: center;
+      }
+      .item-right {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: flex-end;
+        align-items: center;
+      }
+      .item-img {
+        padding-right: .25em;
+        flex: 0;
+        @include rollable;
+        >img {
+          margin: 0;
+          transform: translateY(10%);
+        }
+        & + .item-name {
+          border-left: none !important;
+        }
+      }
+      .item-desc {
+        padding: .25em;
+        font-size: .8em;
+        border-bottom: $groove;
+        width: 100%;
+      }
+      .item-icons {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-evenly;
+        align-items: center;
+        color: $grey;
+        font-size: .75em;
+        height: 100%;
+        .create-item {
+          @include rollable;
+        }
+        .create-matrix-action {
+          @include rollable;
+        }
+      }
+      .item-text {
+        min-width: 5em;
+        margin: 0 .1rem;
+        margin-bottom: 0;
+        flex: 1 0 auto;
+        text-align: center;
+        height: 100%;
+        &.six {
+          min-width: 6em;
+        }
+        &.center {
+          display: flex;
+          flex-flow: row;
+          justify-content: space-around;
+          align-items: center;
+          align-content: center;
+        }
+        &:not(:first-child) {
+          border-left: 1px solid rgba($grey, 0.5);
+        }
+        &.item-name {
+          text-align: left;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          max-width: 9em;
+        }
+        &.rtg {
+          min-width: 3em;
+        }
+      }
+      .skill-item {
+        min-width: 8em;
+      }
+      &.skill-header {
+        @include rollable;
+      }
+    }
+  }
   .attributes {
     border-top: $groove;
     display: flex;
@@ -306,6 +444,9 @@ select.display {
     &.no-border {
       border-top: none;
       border-bottom: none;
+    }
+    & + :not(.attributes) {
+      border-top: $groove;
     }
     &:last-child {
       border-bottom: $groove;
@@ -350,6 +491,9 @@ select.display {
         width: 100%;
         text-align: center;
         margin-bottom: 0;
+        &.icon {
+          font-size: .75em;
+        }
         &.roll {
           @include rollable;
         }
@@ -462,7 +606,7 @@ select.display {
     }
   }
   &.item {
-    .item-name {
+    .item-name-input {
       @include title;
       font-size: 1.5em;
     }
@@ -478,9 +622,11 @@ select.display {
     }
     .description {
       padding: 2px;
-      min-height: 10em;
-      border-top: $groove;
-      border-bottom: $groove;
+      height: 100%;
+      min-height: 16em;
+      border: $groove;
+      margin-left: -$groove-width;
+      overflow-y: auto;
     }
   }
   &.actor {
@@ -532,121 +678,9 @@ select.display {
       align-items: center;
       align-content: center;
     }
-    .tab {
-      border-radius: $radius;
-      margin-top: 1em;
-    }
     .scroll-area {
       overflow-y: scroll;
       max-height: 28em;
-    }
-    .tabs >a {
-      @include shortUnder;
-      margin: .25em;
-      position: relative;
-    }
-    .sheet-header {
-      padding: 0;
-    }
-    .inventory {
-      display: flex;
-      flex-flow: column nowrap;
-      width: 100%;
-      font-size: 85%;
-      position: relative;
-      .item:not(.item-section) + .item:not(.item-section) {
-        border-top: 1px solid rgba($black, 0.5);
-      }
-      .item {
-        display: flex;
-        flex-flow: row nowrap;
-        justify-content: space-between;
-        align-items: center;
-        align-content: center;
-        padding: 0 .25em;
-        margin-right: $groove-width;
-        margin-left: $groove-width;
-        &.has-desc {
-          @include rollable;
-        }
-        &.item-section {
-          border: $groove;
-          margin-right: 0;
-          margin-left: 0;
-          background: rgba($grey, 0.2);
-        }
-        .item-left {
-          display: flex;
-          flex-flow: row nowrap;
-          justify-content: flex-start;
-          align-items: center;
-        }
-        .item-right {
-          display: flex;
-          flex-flow: row nowrap;
-          justify-content: flex-end;
-          align-items: center;
-        }
-        .item-img {
-          padding-right: .25em;
-          flex: 0;
-          @include rollable;
-          >img {
-            margin: 0;
-            transform: translateY(10%);
-          }
-          & + .item-name {
-            border-left: none !important;
-          }
-        }
-        .item-desc {
-          padding: .25em;
-          font-size: .8em;
-          border-bottom: $groove;
-          width: 100%;
-        }
-        .item-icons {
-          display: flex;
-          flex-flow: row nowrap;
-          justify-content: space-evenly;
-          align-items: center;
-          color: $grey;
-          font-size: .75em;
-          height: 100%;
-          .create-item {
-            @include rollable;
-          }
-          .create-matrix-action {
-            @include rollable;
-          }
-        }
-        .item-text {
-          &:not(:first-child) {
-            border-left: 1px solid rgba($grey, 0.5);
-          }
-          &.item-name {
-            text-align: left;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 9em;
-          }
-          &.rtg {
-            min-width: 3em;
-          }
-          min-width: 5em;
-          margin: 0 .1rem;
-          margin-bottom: 0;
-          flex: 1 0 auto;
-          text-align: center;
-          height: 100%;
-        }
-        .skill-item {
-          min-width: 8em;
-        }
-        &.skill-header {
-          @include rollable;
-        }
-      }
     }
   }
 }

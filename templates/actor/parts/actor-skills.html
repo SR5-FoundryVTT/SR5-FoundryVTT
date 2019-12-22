@@ -1,14 +1,5 @@
 <div class="skills">
   <div class="inventory groove-right">
-    <div class="attributes no-border">
-      <div class="attribute row space-around flex0">
-        <div class="attribute-name roll armor-roll">Armor ({{data.armor.value}})</div>
-        <div title="Roll" class="attribute-name basic-roll roll defense-icon fas fa-dice-six" data-roll='basic'></div>
-        {{#ifne data.special 'mundane'}}
-        <div class="attribute-name roll drain-roll">Drain ({{data.rolls.drain}})</div>
-        {{/ifne}}
-      </div>
-    </div>
     <div class="scroll-area">
       {{#each data.skillCategories as |cat cid|}}
       <div>

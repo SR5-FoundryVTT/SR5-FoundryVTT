@@ -129,27 +129,24 @@
               </div>
             </div>
           </div>
+          <div class="attribute">
+            <h4 class="attribute-name roll attribute-roll" data-attribute="essence">Essence</h4>
+            <h3 class="attribute-input-container">
+              <input
+                class="display attribute-input"
+                type="text"
+                maxlength="2"
+                size="2"
+                name="data.attributes.essence.value"
+                value="{{data.attributes.essence.value}}"
+                data-dtype="Number"
+                placeholder="1"/>
+            </h3>
+          </div>
         </div>
       </div>
     </div>
-    <div class="attributes no-border">
-      <div class="attribute row space-around">
-        <div title="Defense" class="attribute-name defense-roll roll defense-icon fas fa-shield-alt" data-roll='defense'></div>
-        <div title="Soak" class="attribute-name soak-roll roll defense-icon fas fa-fist-raised" data-soak='default'></div>
-        <div title="Cold" class="attribute-name soak-roll roll defense-icon fas fa-snowflake" data-soak='cold'></div>
-        <div title="Fire" class="attribute-name soak-roll roll defense-icon fas fa-fire" data-soak='fire'></div>
-        <div title="Acid" class="attribute-name soak-roll roll defense-icon fas fa-vial" data-soak='acid'></div>
-        <div title="Electricity" class="attribute-name soak-roll roll defense-icon fas fa-bolt" data-soak='electricity'></div>
-        <div title="Radiation" class="attribute-name soak-roll roll defense-icon fas fa-radiation-alt" data-soak='radiation'></div>
-      </div>
-      <div class="attribute row space-around">
-        <div class="attribute-only-roll roll attribute-name" data-roll='composure'>Composure</div>
-        <div class="attribute-only-roll roll attribute-name" data-roll='judge_intentions'>J.Intentions</div>
-        <div class="attribute-only-roll roll attribute-name" data-roll='lift_carry'>Lift&Carry</div>
-        <div class="attribute-only-roll roll attribute-name" data-roll='memory'>Memory</div>
-      </div>
-    </div>
-    <div class="flexrow attributes">
+    <div class="flexrow attributes no-border">
       {{#each data.attributes as |attribute a|}}
         {{#unless attribute.hidden}}
           <div class="attribute">
@@ -168,6 +165,37 @@
           </div>
         {{/unless}}
       {{/each}}
+    </div>
+    <div class="attributes">
+      <div class="attribute row">
+        <div title="Defense" class="attribute-name defense-roll roll" data-roll='defense'>Defense</div>
+      </div>
+      <div class="attribute row">
+        <div title="Soak" class="attribute-name soak-roll roll defense-icon" data-soak='default'>Soak</div>
+      </div>
+      <div class="attribute row">
+        <div class="attribute-name roll armor-roll">Armor</div>
+      </div>
+      {{#ifne data.special 'mundane'}}
+      <div class="attribute row">
+        <div class="attribute-name roll drain-roll">Drain</div>
+      </div>
+      {{/ifne}}
+      <div class="attribute row">
+        <div title="Roll" class="attribute-name basic-roll roll defense-icon fas fa-dice-six" data-roll='basic'></div>
+      </div>
+      <div class="attribute row">
+        <div class="attribute-only-roll roll attribute-name" data-roll='composure'>Composure</div>
+      </div>
+      <div class="attribute row">
+        <div class="attribute-only-roll roll attribute-name" data-roll='judge_intentions'>J.Intentions</div>
+      </div>
+      <div class="attribute row">
+        <div class="attribute-only-roll roll attribute-name" data-roll='lift_carry'>Lift&Carry</div>
+      </div>
+      <div class="attribute row">
+        <div class="attribute-only-roll roll attribute-name" data-roll='memory'>Memory</div>
+      </div>
     </div>
   </header>
   <section class="flexrow align-start nowrap">

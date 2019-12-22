@@ -140,7 +140,7 @@ export class SR5Actor extends Actor {
     data.rolls = {
       ...data.rolls,
       defense: attrs.reaction.value + attrs.intuition.value + mods.defense,
-      drain: attrs.magic.value + (drainAtt ? drainAtt.value : 0) + (data.magic.drain ? data.magic.drain.mod : 0) + mods.drain,
+      drain: attrs.willpower.value + (drainAtt ? drainAtt.value : 0) + (data.magic.drain ? data.magic.drain.mod : 0) + mods.drain,
       soak: {
         default: soak,
         cold: soak + armor.cold,
@@ -313,8 +313,9 @@ export class SR5Actor extends Actor {
         title: `${Helpers.label(skill.label)} Test`
       });
     }
+    const attribute = this.data.data.attributes[skill.attribute];
     let dialogData = {
-      attribute: skill.attribute,
+      attribute: attribute,
       attributes: Helpers.filter(this.data.data.attributes, ([key, value]) => value.value > 0),
       limits: this.data.data.limits
     };
@@ -334,8 +335,8 @@ export class SR5Actor extends Actor {
           }
         },
         close: (html) => {
-          const newAtt = html.find('[name=attribute]').val();
-          const newLimit = html.find('[name=limit]').val();
+          const newAtt = html.find('[name="attribute"]').val();
+          const newLimit = html.find('[name="attribute.limit"]').val();
           att = this.data.data.attributes[newAtt];
           limit = this.data.data.limits[newLimit];
           let count = (skill.value > 0 ? skill.value : -1) + att.value + (spec ? 2 : 0);

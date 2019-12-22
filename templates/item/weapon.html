@@ -4,60 +4,6 @@
     <div class="flexcol">
       {{> "systems/shadowrun5e/templates/item/parts/item-header.html" spec=true categories=config.weapon.categories}}
       {{#ife data.category config.weapon.categories.RANGE}}
-      <div class="attributes smooth">
-        <div class="attribute row">
-          <div class="attribute-name">Ammo</div>
-          <div class="attribute-input-container">
-            <input
-              class='display'
-              size='15'
-              maxlength='15'
-              type='text'
-              name='data.range.ammo.name'
-              value='{{data.range.ammo.name}}'
-              placeholder='Ammo' />
-          </div>
-        </div>
-        <div class="attribute row">
-          <div class="attribute-name">DV</div>
-          <div class="attribute-input-container">
-            <input
-              class='display'
-              size='4'
-              maxlength='4'
-              type='text'
-              name='data.range.ammo.damage'
-              value='{{data.range.ammo.damage}}'
-              placeholder='+Mod' />
-          </div>
-        </div>
-        <div class="attribute row">
-          <div class="attribute-name">AP</div>
-          <div class="attribute-input-container">
-            <input
-              class='display'
-              size='4'
-              maxlength='4'
-              type='text'
-              name='data.range.ammo.ap'
-              value='{{data.range.ammo.ap}}'
-              placeholder='+Mod' />
-          </div>
-        </div>
-        <div class="attribute row">
-          <div class="attribute-name">Acc</div>
-          <div class="attribute-input-container">
-            <input
-              class='display'
-              size='4'
-              maxlength='4'
-              type='text'
-              name='data.range.ammo.acc'
-              value='{{data.range.ammo.acc}}'
-              placeholder='+Mod' />
-          </div>
-        </div>
-      </div>
       {{/ife}}
       <div class="attributes smooth">
         <div class="attribute">
@@ -264,7 +210,20 @@
           </div>
         </div>
       </div>
-      {{> "systems/shadowrun5e/templates/item/parts/item-description.html"}}
+      <nav class="tabs" data-group="primary">
+        <a class="item" data-tab="description">Description</a>
+        <a class="item" data-tab="ammo">Ammo</a>
+        <a class="item" data-tab="accessories">Accessories</a>
+      </nav>
+
+      <div class="tab" data-group="primary" data-tab="description">
+        {{> "systems/shadowrun5e/templates/item/parts/item-description.html"}}
+      </div>
+      <div class="tab" data-group="primary" data-tab="ammo">
+        {{> "systems/shadowrun5e/templates/item/parts/ammo.html"}}
+      </div>
+      <div class="tab" data-group="primary" data-tab="accessories">
+      </div>
     </div>
   </div>
 </form>

@@ -1,0 +1,135 @@
+<div class="inventory">
+  <div class="item item-section">
+    <div class="item-left">
+      <div class="item-text item-name">
+        Name
+      </div>
+    </div>
+    <div class="item-right">
+      <div class="item-text">
+        Equipped
+      </div>
+      <div class="item-text six">
+        Damage
+      </div>
+      <div class="item-text">
+        Element
+      </div>
+      <div class="item-text rtg">
+        AP
+      </div>
+      <div class="item-text">
+        Radius
+      </div>
+      <div class="item-text">
+        Dropoff
+      </div>
+      <div class="item-text item-icons">
+        <a class="add-new-ammo" title="Add New Ammo">
+          <i class="fas fa-plus"></i>
+          Add
+        </a>
+      </div>
+    </div>
+  </div>
+{{#each data.range.ammo.available}}
+  <div class="item">
+    <div class="item-left">
+      <div class="item-text item-name">
+        <input
+          class='display left'
+          size='15'
+          maxlength='15'
+          type='text'
+          name='data.range.ammo.available.{{@index}}.name'
+          value='{{this.name}}'
+          placeholder='' />
+      </div>
+    </div>
+    <div class="item-right">
+      <div class="item-text">
+        <span
+          class="ammo-equip"
+          data-index='{{@index}}'>
+          {{#if this.equipped}}
+          <i class="far fa-check-circle"></i>
+          {{else}}
+          <i class="far fa-circle"></i>
+          {{/if}}
+        </span>
+        <input class='hidden' type='checkbox' name="data.range.ammo.available.{{@index}}.equipped" {{checked this.equipped}}>
+      </div>
+      <div class="item-text center six">
+        <input
+          class='display'
+          size='2'
+          maxlength='2'
+          type='text'
+          name='data.range.ammo.available.{{@index}}.damage'
+          value='{{this.damage}}'
+          data-dtype="Number"
+          placeholder='0' />
+        <select class='display' name='data.range.ammo.available.{{@index}}.damageType'>
+          {{#select this.damageType}}
+          <option value=""></option>
+          <option value="physical">P</option>
+          <option value="stun">S</option>
+          {{/select}}
+        </select>
+      </div>
+      <div class="item-text">
+        <select class='display' name='data.range.ammo.available.{{@index}}.element'>
+          {{#select this.element}}
+          <option value=""></option>
+          <option value="acid">Acid</option>
+          <option value="fire">Fire</option>
+          <option value="cold">Cold</option>
+          <option value="electricity">Elec</option>
+          <option value="radiation">Rad</option>
+          {{/select}}
+        </select>
+      </div>
+      <div class="item-text rtg">
+        <input
+          class='display'
+          size='3'
+          maxlength='3'
+          type='text'
+          name='data.range.ammo.available.{{@index}}.ap'
+          value='{{this.ap}}'
+          data-dtype="Number"
+          placeholder='0' />
+      </div>
+      <div class="item-text center">
+        <input
+          class="display"
+          type="text"
+          maxlength="2"
+          size="2"
+          name="data.range.ammo.available.{{@index}}.blast.radius"
+          value="{{this.blast.radius}}"
+          data-dtype="Number"
+          placeholder="0"/>
+        <div class="track-max-value">m</div>
+      </div>
+      <div class="item-text center">
+        <input
+          class="display"
+          size='3'
+          maxlength='3'
+          type='text'
+          name='data.range.ammo.available.{{@index}}.blast.dropoff'
+          value='{{this.blast.dropoff}}'
+          data-dtype='Number'
+          placeholder='0'/>
+        <div class="track-max-value">/m</div>
+      </div>
+      <div class="item-text item-icons">
+        <a class="ammo-delete" title="Delete ammo">
+          <i class="fas fa-trash" data-index='{{@index}}'></i>
+        </a>
+      </div>
+    </div>
+  </div>
+{{/each}}
+</div>

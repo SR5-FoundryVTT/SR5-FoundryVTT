@@ -68,12 +68,12 @@
       </div>
     </div>
     {{#each section.items as |item iid|}}
-    <div class="item has-desc" data-item='{{item.id}}'>
+    <div class="item" data-item='{{item.id}}'>
       <div class="item-left">
         <div class="item-img item-roll" data-item='{{item.id}}'>
           <img src="{{item.img}}" title="{{item.name}}" height='24px' width='24px'/>
         </div>
-        <div class="item-text item-name">
+        <div class="item-text item-name has-desc">
           {{item.name}}
         </div>
       </div>

@@ -34,7 +34,26 @@ Hooks.once("init", async function() {
   Items.registerSheet("SR5", SR5ItemSheet, { makeDefault: true});
 });
 
+['renderSR5ActorSheet', 'renderSR5ItemSheet', 'renderDialog'].forEach(s => {
+  Hooks.on(s, (app, html, data) => html.find('input[type="checkbox"]').click(event => app._onSubmit(event)));
+  Hooks.on(s, (app, html, data) => html.find('input[type="text"]').change(event => app._onSubmit(event)));
+
+});
+
 Hooks.on('renderChatMessage', (app, html, data) => SR5Item.chatListeners(html));
+
+Hooks.on('updateCombat', (args) => {
+  console.log('previous' + JSON.stringify(args.previous));
+  console.log('current' + JSON.stringify(args.current));
+  if (args.previous.round && args.previous.round < args.current.round) {
+    console.log('hello');
+    // subtact 10 from all initiative, we just went into the next initiative pass
+    const combatants = args.data.combatants;
+    combatants.forEach(c => c.initiative -= 10);
+    args.data.combatants = combatants.filter(c => c.initiative > 0);
+    args.turns = combatants;
+  }
+});
 
 Handlebars.registerHelper("toHeaderCase", function(str) {
   if (str) return Helpers.label(str);

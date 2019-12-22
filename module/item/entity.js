@@ -22,10 +22,19 @@ export class SR5Item extends Item {
         action.skill = 'throwing_weapons';
       }
       action.attribute = CONFIG.SR5.attributes.AGILITY;
-      if (!action.opposed) action.opposed = {attributes: []};
-      const opposed = action.opposed;
-      opposed.attributes.push(CONFIG.SR5.attributes.REACTION);
-      opposed.attributes.push(CONFIG.SR5.attributes.INTUITION);
+      if (item.data.range && item.data.range.ammo) {
+        const ammo = item.data.range.ammo;
+        if (typeof ammo.available === 'object') {
+          ammo.available = Object.values(ammo.available);
+        }
+        if (ammo.available) {
+          ammo.available.forEach(v => {
+            if (v.equipped) {
+              ammo.equipped = v;
+            }
+          });
+        }
+      }
     }
 
     if (item.type === 'spell') {
@@ -85,7 +94,7 @@ export class SR5Item extends Item {
     const data = duplicate(this.data.data);
     const labels = this.labels;
 
-    if (data.description && data.description.value) data.description.value = enrichHTML(data.description.value, htmlOptions);
+    data.description.value = enrichHTML(data.description.value, htmlOptions);
 
     const props = [];
     this[`_${this.data.type}ChatData`](data, labels, props);
@@ -136,12 +145,12 @@ export class SR5Item extends Item {
     let damageType = data.action.damage.type.toUpperCase().charAt(0);
     let element = Helpers.label(data.action.damage.element);
     if (data.category === 'range') {
-      const ammo = data.range.ammo;
-      dv += +ammo.damage;
-      ap += +ammo.ap;
-      acc += +ammo.acc;
+      const curr = data.range.ammo.equipped;
+      dv += +curr.damage;
+      ap += +curr.ap;
+      acc += +curr.acc;
       if (data.range.range !== '') props.push(data.range.range);
-      if (ammo.name) props.push(`${ammo.name} Ammo`);
+      if (curr.name) props.push(`${curr.name} Ammo`);
     } else if (data.category === 'melee') {
       if (data.melee.reach !== '') props.push(`Reach ${data.melee.reach}`);
     } else if (data.category === 'thrown') {
@@ -163,6 +172,41 @@ export class SR5Item extends Item {
       props.push(`${Helpers.label(data.action.type)} Action`);
     }
     labels['roll'] = 'Roll';
+  }
+
+  equipAmmo(index) {
+    const data = duplicate(this.data);
+    const ammo = data.data.range.ammo;
+    ammo.available.forEach((v, i) => {
+      v.equipped = (i === index);
+    });
+    this.update(data);
+  }
+
+  removeAmmo(index) {
+    const data = duplicate(this.data);
+    const ammo = data.data.range.ammo;
+    ammo.available.splice(index, 1);
+    this.update(data);
+  }
+
+  addNewAmmo() {
+    const data = duplicate(this.data);
+    const ammo = data.data.range.ammo;
+    if (typeof ammo.available === 'object') {
+      ammo.available = Object.values(ammo.available);
+    }
+    ammo.available.push({
+      equipped: false,
+      name: '',
+      damage: 0,
+      ap: 0,
+      blast: {
+        radius: 0,
+        dropoff: 0
+      }
+    });
+    this.update(data);
   }
 
   rollTest(ev) {
@@ -298,7 +342,7 @@ export class SR5Item extends Item {
     });
     html.on('click', '.card-header', ev => {
       ev.preventDefault();
-      $('.card-content').toggle();
+      $(ev.currentTarget).siblings('.card-content').toggle();
     });
     $(html).find('.card-content').hide();
   }
