@@ -316,6 +316,8 @@ select.display {
         max-width: 9em; }
       .sr5 .inventory .item .item-text.rtg {
         min-width: 3em; }
+      .sr5 .inventory .item .item-text.desc {
+        min-width: 16em; }
     .sr5 .inventory .item .skill-item {
       min-width: 8em; }
     .sr5 .inventory .item.skill-header:hover {

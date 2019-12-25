@@ -35,20 +35,26 @@ export class SR5ItemSheet extends ItemSheet {
    */
   getData() {
     const data = super.getData();
-    const itemData = this.item.prepareData(data.data);
+    const itemData = data.data;
 
-    if (itemData.range && itemData.range.ammo) {
-      try {
-        const ammo = itemData.range.ammo;
-        ammo.available.forEach(a => {
-          if (a.damage === 0) delete a.damage;
-          if (a.ap === 0) delete a.ap;
-          if (a.blast.radius === 0) delete a.blast.radius;
-          if (a.blast.dropoff === 0) delete a.blast.dropoff;
-        });
-      } catch (e) {
-        console.error(e)
+    if (itemData.range) {
+      if (itemData.range.ammo) {
+        try {
+          const ammo = itemData.range.ammo;
+          ammo.available.forEach(a => {
+            if (a.damage === 0) delete a.damage;
+            if (a.ap === 0) delete a.ap;
+            if (a.blast.radius === 0) delete a.blast.radius;
+            if (a.blast.dropoff === 0) delete a.blast.dropoff;
+          });
+        } catch (e) {
+          console.error(e)
+        }
       }
+      itemData.range.mods.forEach(mod => {
+        if (mod.rc === 0) delete mod.rc;
+        if (mod.acc === 0) delete mod.acc;
+      });
     }
 
     if (itemData.action) {
@@ -85,6 +91,10 @@ export class SR5ItemSheet extends ItemSheet {
     html.find('.ammo-delete').click(this._onAmmoRemove.bind(this));
     html.find('.ammo-reload').click(this._onAmmoReload.bind(this));
 
+    html.find('.add-new-mod').click(this._onAddWeaponMod.bind(this));
+    html.find('.mod-equip').click(this._onWeaponModEquip.bind(this));
+    html.find('.mod-delete').click(this._onWeaponModRemove.bind(this));
+
     // Activate tabs
     let tabs = html.find('.tabs');
     let initial = this._sheetTab;
@@ -92,6 +102,21 @@ export class SR5ItemSheet extends ItemSheet {
       initial: initial,
       callback: clicked => this._sheetTab = clicked.data('tab')
     });
+  }
+
+  async _onWeaponModRemove(event) {
+    event.preventDefault();
+    this.item.removeWeaponMod(parseInt(event.currentTarget.dataset.index));
+  }
+
+  async _onWeaponModEquip(event) {
+    event.preventDefault();
+    this.item.equipWeaponMod(parseInt(event.currentTarget.dataset.index));
+  }
+
+  async _onAddWeaponMod(event) {
+    event.preventDefault();
+    this.item.addWeaponMod();
   }
 
   async _onAmmoReload(event) {

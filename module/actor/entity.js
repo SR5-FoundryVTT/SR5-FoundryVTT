@@ -4,9 +4,10 @@ import { SR5 } from '../config.js';
 
 export class SR5Actor extends Actor {
 
-  prepareData(actorData) {
-    actorData = super.prepareData(actorData);
+  prepareData() {
+    super.prepareData();
 
+    const actorData = this.data;
     const items = actorData.items;
     const data = actorData.data;
     const attrs = data.attributes;
@@ -190,10 +191,6 @@ export class SR5Actor extends Actor {
         value: stunWounds + physicalWounds
       }
     }
-
-    console.log(data);
-
-    return actorData;
   }
 
   rollDrain(options, incoming = -1) {

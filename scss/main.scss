@@ -426,6 +426,9 @@ select.display {
         &.rtg {
           min-width: 3em;
         }
+        &.desc {
+          min-width: 16em;
+        }
       }
       .skill-item {
         min-width: 8em;

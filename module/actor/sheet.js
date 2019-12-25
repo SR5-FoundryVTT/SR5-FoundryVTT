@@ -44,7 +44,6 @@ export class SR5ActorSheet extends ActorSheet {
    * The prepared data object contains both the actor data as well as additional sheet options
    */
   getData() {
-    this.actor.data = this.actor.prepareData(this.actor.data);
     const data = super.getData();
 
     // do some calculations

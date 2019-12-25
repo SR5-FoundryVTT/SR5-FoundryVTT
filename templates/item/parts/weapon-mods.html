@@ -1,0 +1,95 @@
+<div class="inventory">
+  <div class="item item-section">
+    <div class="item-left">
+      <div class="item-text item-name">
+        Name
+      </div>
+    </div>
+    <div class="item-right">
+      <div class="item-text rtg">
+        Equip
+      </div>
+      <div class="item-text rtg">
+        Acc
+      </div>
+      <div class="item-text rtg">
+        RC
+      </div>
+      <div class="item-text desc">
+        Description
+      </div>
+      <div class="item-text item-icons rtg">
+        <a class="add-new-mod" title="Add New Accessory">
+          <i class="fas fa-plus"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+{{#each data.range.mods as |mod id|}}
+  <div class="item">
+    <div class="item-left">
+      <div class="item-text item-name">
+        <input
+          class='display left'
+          size='15'
+          maxlength='15'
+          type='text'
+          name='data.range.mods.{{id}}.name'
+          value='{{mod.name}}'
+          placeholder='' />
+      </div>
+    </div>
+    <div class="item-right">
+      <div class="item-text rtg">
+        <span
+          class="mod-equip"
+          data-index='{{id}}'>
+          {{#if mod.equipped}}
+          <i class="far fa-check-circle"></i>
+          {{else}}
+          <i class="far fa-circle"></i>
+          {{/if}}
+        </span>
+        <input class='hidden' type='checkbox' name="data.range.mods.{{id}}.equipped" {{checked mod.equipped}}>
+      </div>
+      <div class="item-text rtg">
+        <input
+          class='display'
+          size='3'
+          maxlength='3'
+          type='text'
+          name='data.range.mods.{{id}}.acc'
+          value='{{mod.acc}}'
+          data-dtype="Number"
+          placeholder='0' />
+      </div>
+      <div class="item-text rtg">
+        <input
+          class='display'
+          size='3'
+          maxlength='3'
+          type='text'
+          name='data.range.mods.{{id}}.rc'
+          value='{{mod.rc}}'
+          data-dtype="Number"
+          placeholder='0' />
+      </div>
+      <div class="item-text desc">
+        <input
+          class='display'
+          size='16'
+          maxlength='16'
+          type='text'
+          name='data.range.mods.{{id}}.description'
+          value='{{mod.description}}'
+          placeholder='Description' />
+      </div>
+      <div class="item-text item-icons rtg">
+        <a class="mod-delete" title="Delete Accessory" data-index='{{id}}'>
+          <i class="fas fa-trash"></i>
+        </a>
+      </div>
+    </div>
+  </div>
+{{/each}}
+</div>

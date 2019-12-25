@@ -12,28 +12,49 @@ export class SR5Item extends Item {
     return !!(this.data.data.action && this.data.data.action.attribute !== '');
   }
 
-  prepareData(item) {
-    super.prepareData(item);
+  prepareData() {
+    super.prepareData();
     const labels = {};
+    const item = this.data;
 
     if (item.type === 'weapon') {
       const action = item.data.action;
+      if (typeof action.limit === 'number') action.limit = {value: action.limit};
+      action.limit.mod = 0;
       if (item.data.category === 'thrown') {
         action.skill = 'throwing_weapons';
       }
       action.attribute = CONFIG.SR5.attributes.AGILITY;
-      if (item.data.range && item.data.range.ammo) {
-        const ammo = item.data.range.ammo;
-        if (typeof ammo.available === 'object') {
-          ammo.available = Object.values(ammo.available);
+      if (item.data.range) {
+        const range = item.data.range;
+        if (typeof range.rc !== 'object') range.rc = {value: 0, base: 0, mod: 0};
+        range.rc.mod = 0;
+        if (!range.mods) range.mods = [];
+        if (typeof range.mods === 'object') {
+          range.mods = Object.values(range.mods);
         }
-        if (ammo.available) {
-          ammo.available.forEach(v => {
-            if (v.equipped) {
-              ammo.equipped = v;
-            }
-          });
+        range.mods.forEach(mod => {
+          console.log(mod);
+          if (mod.equipped) {
+            if (mod.rc) range.rc.mod += mod.rc;
+            if (mod.acc) action.limit.mod += mod.acc;
+          }
+        });
+        if (range.ammo) {
+          const ammo = range.ammo;
+          if (typeof ammo.available === 'object') {
+            ammo.available = Object.values(ammo.available);
+          }
+          if (ammo.available) {
+            ammo.available.forEach(v => {
+              if (v.equipped) {
+                ammo.equipped = v;
+              }
+            });
+          }
         }
+
+        range.rc.value = range.rc.base + range.rc.mod;
       }
     }
 
@@ -46,16 +67,16 @@ export class SR5Item extends Item {
       item.data.condition_monitor.max = 8 + Math.ceil(item.data.technology.rating / 2);
     }
 
-    // if (item.action) {
-    //   const action = item.action;
-    //   if (action.damage) action.damage.value = action.damage.base + action.damage.mod;
-    //   if (action.damage.ap) action.damage.ap.value = action.damage.ap.base + action.damage.ap.mod;
-    //   if (action.limit) action.limit.value = action.limit.base + action.limit.mod;
-    // }
+    if (item.data.action) {
+      const action = item.data.action;
+      // if (action.damage) action.damage.value = action.damage.base + action.damage.mod;
+      // if (action.damage.ap) action.damage.ap.value = action.damage.ap.base + action.damage.ap.mod;
+      if (action.limit) action.limit.value = action.limit.base + action.limit.mod;
+      console.log(action.limit);
+    }
 
     this.labels = labels;
     console.log(item);
-    return item;
   }
 
   async roll(event) {
@@ -195,6 +216,36 @@ export class SR5Item extends Item {
     labels['roll'] = 'Roll';
   }
 
+  addWeaponMod() {
+    const data = duplicate(this.data);
+    const range = data.data.range;
+    if (typeof range.mods === 'object') {
+      range.mods = Object.values(range.mods);
+    }
+    range.mods.push({
+      equipped: false,
+      name: '',
+      acc: 0,
+      rc: 0,
+      desc: ''
+    });
+    this.update(data);
+  }
+
+  equipWeaponMod(index) {
+    const data = duplicate(this.data);
+    const mods = data.data.range.mods;
+    mods[index].equipped = !mods[index].equipped;
+    this.update(data);
+  }
+
+  removeWeaponMod(index) {
+    const data = duplicate(this.data);
+    const mods = data.data.range.mods;
+    mods.splice(index, 1);
+    this.update(data);
+  }
+
   reloadAmmo() {
     const data = duplicate(this.data);
     const ammo = data.data.range.ammo;
@@ -259,7 +310,7 @@ export class SR5Item extends Item {
       if (itemData.category === 'thrown') limit = actorData.limits.physical.value;
       if (itemData.category === 'range') {
         let fireMode = true;
-        let rc = parseInt(itemData.range.rc) + parseInt(actorData.recoil_compensation);
+        let rc = parseInt(itemData.range.rc.value) + parseInt(actorData.recoil_compensation);
         let dialogData = {
           fireMode: fireMode,
           rc: rc,
@@ -294,7 +345,8 @@ export class SR5Item extends Item {
             close: (html) => {
               const fireMode = parseInt(html.find('[name="fireMode"]').val())
               title = this.data.name;
-              if (fireMode) title += ` - Defender ${Helpers.mapRoundsToDefenseMod(fireMode)}`
+              if (fireMode) title += ` - Defender - ${Helpers.mapRoundsToDefenseMod(fireMode)}`
+              if (fireMode > rc) count -= (fireMode - rc);
               DiceSR.d6({
                 event: ev,
                 count: count,

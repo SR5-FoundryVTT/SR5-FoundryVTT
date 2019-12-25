@@ -1,9 +1,9 @@
 export class Helpers {
   static mapRoundsToDefenseMod(rounds) {
     if (rounds === 1) return 0;
-    if (rounds === 3) return -2;
-    if (rounds === 6) return -5;
-    if (rounds === 10) return -9;
+    if (rounds === 3) return 2;
+    if (rounds === 6) return 5;
+    if (rounds === 10) return 9;
     if (rounds === 20) return 'Duck or Cover';
     return 0;
   }

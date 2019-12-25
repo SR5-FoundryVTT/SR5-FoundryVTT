@@ -13,7 +13,8 @@ export const preloadHandlebarsTemplates = async () => {
     "systems/shadowrun5e/templates/item/parts/spell-body.html",
     "systems/shadowrun5e/templates/item/parts/power-body.html",
     "systems/shadowrun5e/templates/item/parts/item-header.html",
-    "systems/shadowrun5e/templates/item/parts/ammo.html"
+    "systems/shadowrun5e/templates/item/parts/ammo.html",
+    "systems/shadowrun5e/templates/item/parts/weapon-mods.html"
   ];
 
   return loadTemplates(templatePaths);

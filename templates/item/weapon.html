@@ -49,16 +49,21 @@
         </div>
         <div class="attribute">
           <div class="attribute-name">Acc</div>
-          <div class="attribute-input-container">
-            <input
-              class="display attribute-input"
-              type="text"
-              maxlength="2"
-              size="2"
-              name="data.action.limit.value"
-              value="{{data.action.limit.value}}"
-              data-dtype="Number"
-              placeholder="1"/>
+          <div class="track">
+            <div class="attribute-input-container">
+              <input
+                class="display attribute-input"
+                type="text"
+                maxlength="2"
+                size="2"
+                name="data.action.limit.base"
+                value="{{data.action.limit.base}}"
+                data-dtype="Number"
+                placeholder="1"/>
+            </div>
+            {{#ifne data.action.limit.base data.action.limit.value}}
+            <div class="track-max-value">({{data.action.limit.value}})</div>
+            {{/ifne}}
           </div>
         </div>
         {{#ife data.category config.weapon.categories.THROWN}}
@@ -115,16 +120,21 @@
         {{#ife data.category config.weapon.categories.RANGE}}
         <div class="attribute">
           <div class="attribute-name">RC</div>
-          <div class="attribute-input-container">
-            <input
-              class="display attribute-input"
-              type="text"
-              maxlength="2"
-              size="2"
-              name='data.range.rc'
-              value='{{data.range.rc}}'
-              data-dtype="Number"
-              placeholder="1"/>
+          <div class="track">
+            <div class="attribute-input-container">
+              <input
+                class="display attribute-input"
+                type="text"
+                maxlength="2"
+                size="2"
+                name='data.range.rc.base'
+                value='{{data.range.rc.base}}'
+                data-dtype="Number"
+                placeholder="1"/>
+            </div>
+            {{#ifne data.range.rc.base data.range.rc.value}}
+            <div class="track-max-value">({{data.range.rc.value}})</div>
+            {{/ifne}}
           </div>
         </div>
         <div class="attribute">
@@ -229,7 +239,7 @@
         <a class="item" data-tab="description">Description</a>
         {{#ife data.category config.weapon.categories.RANGE}}
         <a class="item" data-tab="ammo">Ammo</a>
-        <a class="item" data-tab="accessories">Accessories</a>
+        <a class="item" data-tab="mods">Mods</a>
         {{/ife}}
       </nav>
 
@@ -240,7 +250,8 @@
       <div class="tab" data-group="primary" data-tab="ammo">
         {{> "systems/shadowrun5e/templates/item/parts/ammo.html"}}
       </div>
-      <div class="tab" data-group="primary" data-tab="accessories">
+      <div class="tab" data-group="primary" data-tab="mods">
+        {{> "systems/shadowrun5e/templates/item/parts/weapon-mods.html"}}
       </div>
       {{/ife}}
     </div>
