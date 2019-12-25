@@ -1,25 +1,37 @@
 <form>
   <div class='form-group'>
     <label>Dice Pool</label>
-    <input style='flex: 1' type='text' name='dice_pool' size='3' maxlength='3' value='{{dice_pool}}' {{#unless prompt}}disabled{{/unless}} data-dtype="Number"/>
-    {{#unless prompt}}<input style='flex: 1' type='text' name='mod' size='3' maxlength='3' value='{{mod}}' placeholder='+Modifiers' data-dtype="Number"/>{{/unless}}
+    <input style='flex: 1' type='text' name='dice_pool' size='3' maxlength='3' value='{{dice_pool}}' {{#unless options.prompt}}disabled{{/unless}} data-dtype="Number"/>
+    {{#unless options.prompt}}<input style='flex: 1' type='text' name='mod' size='3' maxlength='3' value='{{mod}}' placeholder='+Modifiers' data-dtype="Number"/>{{/unless}}
   </div>
   {{#if limit}}
   <div class='form-group'>
     <label>Limit</label>
-    <input style='flex: 1' type='text' name='limit' size='3' maxlength='3' value='{{limit}}' {{#unless prompt}}disabled{{/unless}} data-dtype="Number"/>
-    {{#unless prompt}}<input style='flex: 1' type='text' name='limit_mod' size='3' maxlength='3' value='{{limit_mod}}' placeholder='+LimitMod' data-dtype="Number"/>{{/unless}}
+    <input style='flex: 1' type='text' name='limit' size='3' maxlength='3' value='{{limit}}' {{#unless options.prompt}}disabled{{/unless}} data-dtype="Number"/>
+    {{#unless options.prompt}}<input style='flex: 1' type='text' name='limit_mod' size='3' maxlength='3' value='{{limit_mod}}' placeholder='+LimitMod' data-dtype="Number"/>{{/unless}}
   </div>
   {{/if}}
-  {{#if range_mode}}
+  {{#if wounds}}
   <div class="form-group">
-    <label>Mode</label>
-    <select style='flex: 2' name='range_mode'>
-    {{#select range_mode}}
-      <option value="0">SS/SA - 1 Round</option>
-      <option value="2">SB/BF - 3 Rounds</option>
-      <option value="4">LB/FA(s) - 6 Rounds</option>
-      <option value="6">FA(c) - 10 Rounds</option>
+    <label>Wounds (-{{wounds}})</label>
+    <select style='flex: 2' name='wounds'>
+    {{#select wounds}}
+      <option value="{{wounds}}">Apply Wounds</option>
+      <option value="0">Don't Apply Wounds</option>
+    {{/select}}
+    </select>
+  </div>
+  {{/if}}
+  {{#if options.environmental}}
+  <div class="form-group">
+    <label>Environment</label>
+    <select style='flex: 2' name='options.environmental'>
+    {{#select options.environmental}}
+      <option value="0">Nada</option>
+      <option value="1">Bit (-1)</option>
+      <option value="3">Drek (-3)</option>
+      <option value="6">Frag (-6)</option>
+      <option value="10">RIP (-10)</option>
     {{/select}}
     </select>
   </div>

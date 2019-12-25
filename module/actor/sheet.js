@@ -16,6 +16,7 @@ export class SR5ActorSheet extends ActorSheet {
      * @type {string}
      */
     this._sheetTab = "equipment";
+    this._sheetSkillTab = 'active';
     this._shownUntrainedSkills = [];
     this._shownDesc = [];
   }
@@ -84,6 +85,8 @@ export class SR5ActorSheet extends ActorSheet {
     const categories = SR5.skills.categories;
     const skillCategories = {};
     for (let category of Object.values(categories)) {
+      if (category.label.toLowerCase() === 'magic' && data.data.special !== 'magic') continue;
+      if (category.label.toLowerCase() === 'resonance' && data.data.special !== 'resonance') continue;
       skillCategories[category.label] = {
         skills: {}
       };
@@ -92,8 +95,9 @@ export class SR5ActorSheet extends ActorSheet {
         const skill = data.data.skills.active[sid];
         skills.push(skill);
         skill.css = skill.value > 0 ? '' : 'hidden';
-        // skillCategories[category.label].skills[sid] = skill;
       }
+      skills.sort();
+      /*
       skills.sort((a,b) => {
         let diff = b.value - a.value;
         if (diff === 0) {
@@ -101,6 +105,7 @@ export class SR5ActorSheet extends ActorSheet {
         }
         return diff;
       });
+      */
       skills.forEach(skill => skillCategories[category.label].skills[skill.label] = skill);
     }
     data.data.skillCategories = skillCategories;
@@ -220,11 +225,17 @@ export class SR5ActorSheet extends ActorSheet {
     super.activateListeners(html);
 
     // Activate tabs
-    let tabs = html.find('.tabs');
+    let tabs = html.find('.tabs').filter('nav[data-group=primary]');
     let initial = this._sheetTab;
     new Tabs(tabs, {
       initial: initial,
       callback: clicked => this._sheetTab = clicked.data("tab")
+    });
+    let skilltabs = html.find('.tabs').filter('nav[data-group=skills]');
+    let skillInitial = this._sheetSkillTab;
+    new Tabs(skilltabs, {
+      initial: skillInitial,
+      callback: clicked => this._sheetSkillTab = clicked.data('tab')
     });
 
     html.find('.hidden').hide();
@@ -268,6 +279,12 @@ export class SR5ActorSheet extends ActorSheet {
     html.find('.matrix-roll').click(this._onRollMatrixAttribute.bind(this));
     html.find('.basic-roll').click(this._onRollPrompt.bind(this));
     html.find('.armor-roll').click(this._onRollArmor.bind(this));
+    html.find('.add-knowledge').click(this._onAddKnowledgeSkill.bind(this));
+    html.find('.knowledge-skill').click(this._onRollKnowledgeSkill.bind(this));
+    html.find('.remove-knowledge').click(this._onRemoveKnowledgeSkill.bind(this));
+    html.find('.add-language').click(this._onAddLanguageSkill.bind(this));
+    html.find('.language-skill').click(this._onRollLanguageSkill.bind(this));
+    html.find('.remove-language').click(this._onRemoveLanguageSkill.bind(this));
 
     // Update Inventory Item
     html.find('.item-edit').click(event => {
@@ -300,6 +317,40 @@ export class SR5ActorSheet extends ActorSheet {
     };
     delete itemData.data['type'];
     return this.actor.createOwnedItem(itemData);
+  }
+
+  async _onAddLanguageSkill(event) {
+    event.preventDefault();
+    const data = duplicate(this.actor.data);
+    data.data.skills.language.value.push({name: '', specs: '', rating: 0});
+    this.actor.update(data);
+  }
+
+  async _onRemoveLanguageSkill(event) {
+    event.preventDefault();
+    const skillId = event.currentTarget.dataset.skill;
+    const data = duplicate(this.actor.data);
+    data.data.skills.language.value.splice(skillId, 1);
+    this.actor.update(data);
+  }
+
+  async _onAddKnowledgeSkill(event) {
+    event.preventDefault();
+    const category = event.currentTarget.dataset.category;
+    const data = duplicate(this.actor.data);
+    const cat = data.data.skills.knowledge[category];
+    if (cat) cat.value.push({name: '', specs: '', rating: 0});
+    this.actor.update(data);
+  }
+
+  async _onRemoveKnowledgeSkill(event) {
+    event.preventDefault();
+    const skillId = event.currentTarget.dataset.skill;
+    const category = event.currentTarget.dataset.category;
+    const data = duplicate(this.actor.data);
+    const cat = data.data.skills.knowledge[category];
+    if (cat) cat.value.splice(skillId, 1);
+    this.actor.update(data);
   }
 
   async _onChangeRtg(event) {
@@ -387,6 +438,19 @@ export class SR5ActorSheet extends ActorSheet {
     event.preventDefault();
     const roll = event.currentTarget.dataset.roll;
     this.actor.rollAttributesTest(roll, {event: event});
+  }
+
+  async _onRollKnowledgeSkill(event) {
+    event.preventDefault();
+    const skill = event.currentTarget.dataset.skill;
+    const category = event.currentTarget.dataset.category;
+    this.actor.rollKnowledgeSkill(category, skill, {event: event});
+  }
+
+  async _onRollLanguageSkill(event) {
+    event.preventDefault();
+    const skill = event.currentTarget.dataset.skill;
+    this.actor.rollLanguageSkill(skill, {event: event});
   }
 
   async _onRollActiveSkill(event) {

@@ -148,6 +148,9 @@
             "mod": 0
           }
         },
+        "wounds": {
+          "value": 0
+        },
         "armor": {
           "value": 0,
           "mod": 0,
@@ -746,16 +749,8 @@
             }
           },
           "language": {
-            "language": {
-              "attribute": "intuition",
-              "value": [],
-              "specs": [
-                "Read/Write",
-                "Speak",
-                "Dialect",
-                "Lingo"
-              ]
-            }
+            "attribute": "intuition",
+            "value": []
           }
         }
       }
@@ -824,14 +819,18 @@
           "skill": "",
           "spec": false,
           "mod": 0,
-          "limit": 0,
-          "limit_att": "",
+          "limit": {
+            "value": 0,
+            "attribute": ""
+          },
           "extended": false,
           "damage": {
             "type": "stun",
             "element": "",
             "value": 0,
-            "ap": 0,
+            "ap": {
+              "value": 0
+            },
             "attribute": ""
           },
           "opposed": {
@@ -890,7 +889,9 @@
       "templates": ["description", "action", "technology"],
       "category": "range",
       "range": {
-        "modes": [],
+        "range": "",
+        "rc": 0,
+        "modes": "",
         "accessories": [],
         "ammo": {
           "max": 0,
@@ -916,9 +917,7 @@
               }
             }
           ]
-        },
-        "range": "",
-        "rc": 0
+        }
       },
       "melee": {
         "reach": 0

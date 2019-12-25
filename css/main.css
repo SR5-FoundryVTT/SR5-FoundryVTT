@@ -346,6 +346,8 @@ select.display {
     padding: 0 .25em;
     flex: 1 0 auto;
     min-width: 5rem; }
+    .sr5 .attributes .attribute:hover .attribute-input-container.row {
+      visibility: visible; }
     .sr5 .attributes .attribute.flex0 {
       min-width: 0;
       width: 0; }
@@ -384,6 +386,9 @@ select.display {
     .sr5 .attributes .attribute .attribute-input-container {
       align-text: center;
       position: relative; }
+      .sr5 .attributes .attribute .attribute-input-container.row {
+        display: flex;
+        flex-flow: row; }
       .sr5 .attributes .attribute .attribute-input-container > .attribute-input {
         text-align: center;
         margin: 2px; }

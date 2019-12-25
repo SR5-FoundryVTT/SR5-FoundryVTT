@@ -35,21 +35,37 @@ export class SR5ItemSheet extends ItemSheet {
    */
   getData() {
     const data = super.getData();
-    if (data.data.action) {
-      if (data.data.action.mod === 0) delete data.data.action.mod;
-      if (data.data.action.limit === 0) delete data.data.action.limit;
+    const itemData = this.item.prepareData(data.data);
+
+    if (itemData.range && itemData.range.ammo) {
+      try {
+        const ammo = itemData.range.ammo;
+        ammo.available.forEach(a => {
+          if (a.damage === 0) delete a.damage;
+          if (a.ap === 0) delete a.ap;
+          if (a.blast.radius === 0) delete a.blast.radius;
+          if (a.blast.dropoff === 0) delete a.blast.dropoff;
+        });
+      } catch (e) {
+        console.error(e)
+      }
     }
 
-    try {
-      const ammo = data.data.range.ammo;
-      ammo.available.forEach(a => {
-        if (a.damage === 0) delete a.damage;
-        if (a.ap === 0) delete a.ap;
-        if (a.blast.radius === 0) delete a.blast.radius;
-        if (a.blast.dropoff === 0) delete a.blast.dropoff;
-      });
-    } catch (e) {
-      console.log(e);
+    if (itemData.action) {
+      try {
+        const action = itemData.action;
+        if (action.mod === 0) delete action.mod;
+        if (action.limit === 0) delete action.limit;
+        if (action.damage) {
+          if (action.damage.mod === 0) delete action.damage.mod;
+          if (action.damage.ap.mod === 0) delete action.damage.ap.mod;
+        }
+        if (action.limit) {
+          if (action.limit.mod === 0) delete action.limit.mod;
+        }
+      } catch (e) {
+        console.error(e)
+      }
     }
 
     data.config = CONFIG.SR5;
@@ -67,6 +83,7 @@ export class SR5ItemSheet extends ItemSheet {
     html.find('.add-new-ammo').click(this._onAddNewAmmo.bind(this));
     html.find('.ammo-equip').click(this._onAmmoEquip.bind(this));
     html.find('.ammo-delete').click(this._onAmmoRemove.bind(this));
+    html.find('.ammo-reload').click(this._onAmmoReload.bind(this));
 
     // Activate tabs
     let tabs = html.find('.tabs');
@@ -75,6 +92,11 @@ export class SR5ItemSheet extends ItemSheet {
       initial: initial,
       callback: clicked => this._sheetTab = clicked.data('tab')
     });
+  }
+
+  async _onAmmoReload(event) {
+    event.preventDefault();
+    this.item.reloadAmmo();
   }
 
   async _onAmmoRemove(event) {

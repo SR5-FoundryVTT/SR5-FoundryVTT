@@ -198,35 +198,34 @@
       </div>
     </div>
   </header>
-  <section class="flexrow align-start nowrap">
-    <div class="flexcol flex1">
-      {{> "systems/shadowrun5e/templates/actor/parts/actor-skills.html" data=data}}
+  <section class="flexcol">
+    <nav class="tabs" data-group="primary">
+      <a class="item" data-tab="actions">Actions</a>
+      <a class="item" data-tab="skills">Skills</a>
+      <a class="item active" data-tab="equipment">Equipment</a>
+      {{#ife data.special 'magic'}}
+      <a class="item" data-tab="magic">Magic</a>
+      {{/ife}}
+      <a class="item" data-tab="matrix">Matrix</a>
+      <a class="item" data-tab="info">Info</a>
+    </nav>
+    <div class="tab" data-group="primary" data-tab="skills">
+      {{> "systems/shadowrun5e/templates/actor/parts/actor-skills.html"}}
     </div>
-    <div class="flexcol flex2">
-      <nav class="tabs" data-group="primary">
-        <a class="item" data-tab="actions">Actions</a>
-        <a class="item active" data-tab="equipment">Equipment</a>
-        {{#ife data.special 'magic'}}
-        <a class="item" data-tab="magic">Magic</a>
-        {{/ife}}
-        <a class="item" data-tab="matrix">Matrix</a>
-        <a class="item" data-tab="info">Info</a>
-      </nav>
-      <div class="tab" data-group="primary" data-tab="equipment">
-        {{> "systems/shadowrun5e/templates/actor/parts/actor-equipment.html" sections=inventory}}
-      </div>
-      <div class="tab" data-group="primary" data-tab="magic">
-        {{> "systems/shadowrun5e/templates/actor/parts/actor-spellbook.html" spells=magic.spellbook powers=magic.powers}}
-      </div>
-      <div class="tab" data-group="primary" data-tab="matrix">
-        {{> "systems/shadowrun5e/templates/actor/parts/actor-matrix.html" }}
-      </div>
-      <div class="tab" data-group="primary" data-tab="actions">
-        {{> "systems/shadowrun5e/templates/actor/parts/actor-actions.html" actions=actions }}
-      </div>
-      <div class="tab" data-group="primary" data-tab="info">
-        {{> "systems/shadowrun5e/templates/actor/parts/actor-info.html" }}
-      </div>
+    <div class="tab" data-group="primary" data-tab="equipment">
+      {{> "systems/shadowrun5e/templates/actor/parts/actor-equipment.html" sections=inventory}}
+    </div>
+    <div class="tab" data-group="primary" data-tab="magic">
+      {{> "systems/shadowrun5e/templates/actor/parts/actor-spellbook.html" spells=magic.spellbook powers=magic.powers}}
+    </div>
+    <div class="tab" data-group="primary" data-tab="matrix">
+      {{> "systems/shadowrun5e/templates/actor/parts/actor-matrix.html" }}
+    </div>
+    <div class="tab" data-group="primary" data-tab="actions">
+      {{> "systems/shadowrun5e/templates/actor/parts/actor-actions.html" actions=actions }}
+    </div>
+    <div class="tab" data-group="primary" data-tab="info">
+      {{> "systems/shadowrun5e/templates/actor/parts/actor-info.html" }}
     </div>
   </section>
 

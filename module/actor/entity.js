@@ -34,7 +34,8 @@ export class SR5Actor extends Actor {
       'memory',
       'walk',
       'run',
-      'defense'
+      'defense',
+      'wound_tolerance'
     ];
     modifiers.sort();
     modifiers.unshift('global');
@@ -76,6 +77,8 @@ export class SR5Actor extends Actor {
     track.stun.max = 8 + Math.ceil(attrs.willpower.value / 2)
       + mods.stun_track;
 
+    data.recoil_compensation = 1 + Math.ceil(attrs.strength.value / 3);
+
     const init = data.initiative;
     init.meatspace.base.base = attrs.intuition.value + attrs.reaction.value;
     init.meatspace.dice.base = 1;
@@ -93,8 +96,13 @@ export class SR5Actor extends Actor {
     init.current.dice.text = `${init.current.dice.value}d6`;
     init.current.base.value = init.current.base.base + mods.initiative;
 
+
     armor.value = 0;
     armor.mod = 0;
+    const ELEMENTS = ['acid', 'cold', 'fire', 'electricity', 'radiation'];
+    ELEMENTS.forEach(element => {
+      armor[element] = 0;
+    });
     const matrix = data.matrix;
     matrix.firewall.value = matrix.firewall.mod;
     matrix.data_processing.value = matrix.data_processing.mod;
@@ -104,6 +112,9 @@ export class SR5Actor extends Actor {
       if (item.type === 'armor' && item.data.technology.equipped) {
         if (item.data.armor.mod) armor.mod += item.data.armor.value; // if it's a mod, add to the mod field
         else armor.value = item.data.armor.value; // if not a mod, set armor.value to the items value
+        ELEMENTS.forEach(element => {
+          armor[element] += item.data.armor[element];
+        });
       } else if (item.type === 'device' && item.data.technology.equipped) {
         matrix.device = item;
         matrix.condition_monitor.max = item.data.condition_monitor.max;
@@ -155,6 +166,31 @@ export class SR5Actor extends Actor {
       memory: attrs.willpower.value + attrs.logic.value + mods.memory
     }
 
+    const knowledgeSkills = data.skills.knowledge;
+    for (let [key, category] of Object.entries(knowledgeSkills)) {
+      if (typeof category.value === 'object') {
+        category.value = Object.values(category.value);
+      }
+    }
+    const language = data.skills.language;
+    if (language) {
+      if (!language.value) language.value = [];
+      if (typeof language.value === 'object') {
+        language.value = Object.values(language.value);
+      }
+      language.attribute = 'intution';
+    }
+
+    {
+      const count = 3 + mods.wound_tolerance;
+      const stunWounds = Math.floor((data.track.stun.max - data.track.stun.value) / count);
+      const physicalWounds = Math.floor((data.track.physical.max - data.track.physical.value) / count);
+
+      data.wounds = {
+        value: stunWounds + physicalWounds
+      }
+    }
+
     console.log(data);
 
     return actorData;
@@ -168,7 +204,8 @@ export class SR5Actor extends Actor {
       event: options.event,
       count: resist,
       actor: this,
-      title: title
+      title: title,
+      wounds: false
     });
   }
 
@@ -194,14 +231,53 @@ export class SR5Actor extends Actor {
   }
 
   rollSoak(id, options) {
-    const soak = this.data.data.rolls.soak[id];
-    const label = Helpers.label(id);
-    return DiceSR.d6({
-      event: options.event,
-      actor: this,
-      count: soak,
-      title: `Soak - ${label}`
-    });
+    new Dialog({
+      title: 'Soak Test',
+      buttons: {
+        default: {
+          label: 'Base',
+          icon: '<i class="fas fa-shield-alt"></i>',
+          callback: () => id = 'default'
+        },
+        acid: {
+          label: 'Acid',
+          icon: '<i class="fas fa-vial"></i>',
+          callback: () => id = 'acid'
+        },
+        cold: {
+          label: 'Cold',
+          icon: '<i class="fas fa-snowflake"></i>',
+          callback: () => id = 'cold'
+        },
+        electricity: {
+          label: 'Elec',
+          icon: '<i class="fas fa-bolt"></i>',
+          callback: () => id = 'electricity'
+        },
+        fire: {
+          label: 'Fire',
+          icon: '<i class="fas fa-fire"></i>',
+          callback: () => id = 'fire'
+        },
+        radiation: {
+          label: 'Rad',
+          icon: '<i class="fas fa-radiation"></i>',
+          callback: () => id = 'radiation'
+        },
+
+      },
+      close: (html) => {
+        const soak = this.data.data.rolls.soak[id];
+        const label = Helpers.label(id);
+        return DiceSR.d6({
+          event: options.event,
+          actor: this,
+          count: soak,
+          title: `Soak - ${label}`,
+          wounds: false
+        });
+      }
+    }).render(true);
   }
 
   rollSingleAttribute(attId, options) {
@@ -253,12 +329,10 @@ export class SR5Actor extends Actor {
         content: dlg,
         buttons: {
           roll: {
-            label: 'Roll',
-            icon: '<i class="fas fa-dice-six"></i>'
+            label: 'Normal'
           },
           spec: {
             label: 'Spec',
-            icon: '<i class="fas fa-plus"></i>',
             callback: () => spec = true
           }
         },
@@ -283,7 +357,9 @@ export class SR5Actor extends Actor {
     return DiceSR.d6({
       event: options.event,
       actor: this,
-      prompt: true
+      dialogOptions: {
+        prompt: true
+      }
     });
   }
 
@@ -299,7 +375,6 @@ export class SR5Actor extends Actor {
   }
 
   rollSkill(skill, options) {
-
     let att = this.data.data.attributes[skill.attribute];
     let spec = false;
     let limit = this.data.data.limits[att.limit];
@@ -313,10 +388,10 @@ export class SR5Actor extends Actor {
         title: `${Helpers.label(skill.label)} Test`
       });
     }
-    const attribute = this.data.data.attributes[skill.attribute];
     let dialogData = {
-      attribute: attribute,
+      attribute: skill.attribute,
       attributes: Helpers.filter(this.data.data.attributes, ([key, value]) => value.value > 0),
+      limit: att.limit,
       limits: this.data.data.limits
     };
     renderTemplate('systems/shadowrun5e/templates/rolls/skill-roll.html', dialogData).then(dlg => {
@@ -325,12 +400,10 @@ export class SR5Actor extends Actor {
         content: dlg,
         buttons: {
           roll: {
-            label: 'Roll',
-            icon: '<i class="fas fa-dice-six"></i>'
+            label: 'Normal'
           },
           spec: {
             label: 'Spec',
-            icon: '<i class="fas fa-plus"></i>',
             callback: () => spec = true
           }
         },
@@ -353,6 +426,21 @@ export class SR5Actor extends Actor {
     });
   }
 
+  rollKnowledgeSkill(catId, skillId, options) {
+    const category = this.data.data.skills.knowledge[catId];
+    const skill = duplicate(category.value[skillId]);
+    skill.attribute = category.attribute;
+    skill.label = skill.name;
+    this.rollSkill(skill, options);
+  }
+
+  rollLanguageSkill(skillId, options) {
+    const skill = duplicate(this.data.data.skills.language.value[skillId]);
+    skill.attribute = 'intuition';
+    skill.label = skill.name;
+    this.rollSkill(skill, options);
+  }
+
   rollActiveSkill(skillId, options) {
     const skill = this.data.data.skills.active[skillId];
     this.rollSkill(skill, options);
@@ -373,35 +461,21 @@ export class SR5Actor extends Actor {
         content: dlg,
         buttons: {
           roll: {
-            label: 'Roll',
-            icon: '<i class="fas fa-dice-six"></i>'
-          },
-          defaulting: {
-            label: 'Default',
-            callback: () => defaulting = true
+            label: 'Continue'
           }
         },
-        default: 'defaulting',
+        default: 'roll',
         close: html => {
           let count = att.value;
           let limit = undefined;
-          let title = "";
-          if (defaulting) {
-            count -= 1;
-            if (att.limit) {
-              limit = this.data.data.limits[att.limit].value;
-            }
-            title = `Defaulting with ${label}`;
-          } else {
-            title = label;
+          let title = label
 
-            const att2Id = html.find('[name=attribute2]').val();
-            if (att2Id !== 'none') {
-              const att2 = atts[att2Id];
-              const att2IdLabel = Helpers.label(att2Id);
-              count += att2.value;
-              title += ` + ${att2IdLabel}`
-            }
+          const att2Id = html.find('[name=attribute2]').val();
+          if (att2Id !== 'none') {
+            const att2 = atts[att2Id];
+            const att2IdLabel = Helpers.label(att2Id);
+            count += att2.value;
+            title += ` + ${att2IdLabel}`
           }
           return DiceSR.d6({
             event: options.event,

@@ -1,0 +1,20 @@
+<form>
+  {{#if ammo}}
+  <div class="form-group">
+    <label>Rounds Remaining</label>
+    <label>{{ammo.value}}/{{ammo.max}}</label>
+  </div>
+  {{/if}}
+  <div class="form-group">
+    <label>Fire Mode{{#if rc}} (RC {{rc}}){{/if}}</label>
+    <select name="fireMode">
+    {{#select fireMode}}
+      <option value="1">SingleShot/SemiAuto- 1 Round</option>
+      <option value="3">ShortBurst/BurstFire - 3 Rounds</option>
+      <option value="6">LongBurst/FullAuto(simple) - 6 Rounds</option>
+      <option value="10">FullAuto(complex) - 10 Rounds</option>
+      <option value="20">Suppressive - 20 Rounds</option>
+    {{/select}}
+    </select>
+  </div>
+</form>

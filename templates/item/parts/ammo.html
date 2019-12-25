@@ -6,8 +6,11 @@
       </div>
     </div>
     <div class="item-right">
-      <div class="item-text">
-        Equipped
+      <div class="item-text rtg">
+        Equip
+      </div>
+      <div class="item-text rtg">
+        Qty
       </div>
       <div class="item-text six">
         Damage
@@ -24,10 +27,9 @@
       <div class="item-text">
         Dropoff
       </div>
-      <div class="item-text item-icons">
+      <div class="item-text item-icons rtg">
         <a class="add-new-ammo" title="Add New Ammo">
           <i class="fas fa-plus"></i>
-          Add
         </a>
       </div>
     </div>
@@ -47,7 +49,7 @@
       </div>
     </div>
     <div class="item-right">
-      <div class="item-text">
+      <div class="item-text rtg">
         <span
           class="ammo-equip"
           data-index='{{@index}}'>
@@ -58,6 +60,17 @@
           {{/if}}
         </span>
         <input class='hidden' type='checkbox' name="data.range.ammo.available.{{@index}}.equipped" {{checked this.equipped}}>
+      </div>
+      <div class="item-text rtg">
+        <input
+          class='display'
+          size='3'
+          maxlength='3'
+          type='text'
+          name='data.range.ammo.available.{{@index}}.qty'
+          value='{{this.qty}}'
+          data-dtype="Number"
+          placeholder='0' />
       </div>
       <div class="item-text center six">
         <input
@@ -115,8 +128,8 @@
       <div class="item-text center">
         <input
           class="display"
-          size='3'
-          maxlength='3'
+          size='2'
+          maxlength='2'
           type='text'
           name='data.range.ammo.available.{{@index}}.blast.dropoff'
           value='{{this.blast.dropoff}}'
@@ -124,9 +137,9 @@
           placeholder='0'/>
         <div class="track-max-value">/m</div>
       </div>
-      <div class="item-text item-icons">
-        <a class="ammo-delete" title="Delete ammo">
-          <i class="fas fa-trash" data-index='{{@index}}'></i>
+      <div class="item-text item-icons rtg">
+        <a class="ammo-delete" title="Delete ammo" data-index='{{@index}}'>
+          <i class="fas fa-trash"></i>
         </a>
       </div>
     </div>

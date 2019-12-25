@@ -1,56 +1,191 @@
-<div class="skills">
-  <div class="inventory groove-right">
-    <div class="scroll-area">
-      {{#each data.skillCategories as |cat cid|}}
-      <div>
-        <div class="item item-section skill-header" data-category="{{cid}}">
-          <div class="item-left">
-            <div class="item-text item-name">
-              {{cid}}
+  <div class="inventory">
+    <div class="flexrow nowrap">
+      <div class="scroll-area">
+        {{#each data.skillCategories as |cat cid|}}
+        <div>
+          <div class="item item-section skill-header" data-category="{{cid}}">
+            <div class="item-left">
+              <div class="item-text item-name">
+                {{cid}}
+              </div>
+            </div>
+            <div class="item-right">
+              <div class="item-text skill-item">
+                Specializations
+              </div>
+              <div class="item-text rtg">
+                Rtg
+              </div>
             </div>
           </div>
-          <div class="item-right">
-            <div class="item-text skill-item">
-              Specializations
+          {{#each cat.skills as |skill sid|}}
+          <div class="item {{skill.css}}">
+            <div class="item-left">
+              <div class="item-text item-name skill-roll roll" data-skill='{{sid}}'>
+                {{toHeaderCase sid}}
+              </div>
             </div>
-            <div class="item-text rtg">
-              Rtg
-            </div>
-          </div>
-        </div>
-        {{#each cat.skills as |skill sid|}}
-        <div class="item {{skill.css}}">
-          <div class="item-left">
-            <div class="item-text item-name skill-roll roll" data-skill='{{sid}}'>
-              {{toHeaderCase sid}}
-            </div>
-          </div>
-          <div class="item-right">
-            <div class="item-text skill-item">
-              <input
-                class="display"
-                type="text"
-                maxlength="16"
-                size="16"
-                value="{{skill.specs}}"
-                name="data.skills.active.{{sid}}.specs" />
-            </div>
-            <div class="item-text rtg">
-              <input
-                class="display"
-                type="text"
-                maxlength="2"
-                size='2'
-                value="{{skill.value}}"
-                name="data.skills.active.{{sid}}.value"
-                placeholder="0"
-                data-dtype="Number"/>
+            <div class="item-right">
+              <div class="item-text skill-item">
+                <input
+                  class="display"
+                  type="text"
+                  maxlength="16"
+                  size="16"
+                  value="{{skill.specs}}"
+                  name="data.skills.active.{{sid}}.specs" />
+              </div>
+              <div class="item-text rtg">
+                <input
+                  class="display"
+                  type="text"
+                  maxlength="2"
+                  size='2'
+                  value="{{skill.value}}"
+                  name="data.skills.active.{{sid}}.value"
+                  placeholder="0"
+                  data-dtype="Number"/>
+              </div>
             </div>
           </div>
+          {{/each}}
         </div>
         {{/each}}
       </div>
-      {{/each}}
+      <div class="scroll-area">
+        <div>
+          <div class="item item-section">
+            <div class="item-left">
+              <div class="item-text item-name">
+                Languages
+              </div>
+            </div>
+            <div class="item-right">
+              <div class="item-text skill-item">
+                Specializations
+              </div>
+              <div class="item-text rtg">
+                Rtg
+              </div>
+              <div class="item-text item-icons rtg">
+                <a class="add-language">
+                  <i class="fas fa-plus"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          {{#each data.skills.language.value as |skill sid|}}
+          <div class="item {{skill.css}}">
+            <div class="item-left">
+              <div class="item-text skill-item item-name center">
+                <i class='roll language-skill fas fa-dice-six' data-skill='{{sid}}'></i>
+                <input
+                  class="display left"
+                  type="text"
+                  maxlength="16"
+                  size="16"
+                  value="{{skill.name}}"
+                  name="data.skills.language.value.{{sid}}.name" />
+              </div>
+            </div>
+            <div class="item-right">
+              <div class="item-text skill-item">
+                <input
+                  class="display"
+                  type="text"
+                  maxlength="16"
+                  size="16"
+                  value="{{skill.specs}}"
+                  name="data.skills.language.value.{{sid}}.specs" />
+              </div>
+              <div class="item-text rtg">
+                <input
+                  class="display"
+                  type="text"
+                  maxlength="2"
+                  size='2'
+                  value="{{skill.value}}"
+                  name="data.skills.language.value.{{sid}}.value"
+                  placeholder="0"
+                  data-dtype="Number"/>
+              </div>
+              <div class="item-text item-icons rtg">
+                <a class="remove-language" data-skill='{{sid}}'>
+                  <i class="fas fa-trash"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          {{/each}}
+        </div>
+        {{#each data.skills.knowledge as |cat cid|}}
+        <div>
+          <div class="item item-section" data-category="{{cid}}">
+            <div class="item-left">
+              <div class="item-text item-name">
+                {{toHeaderCase cid}}
+              </div>
+            </div>
+            <div class="item-right">
+              <div class="item-text skill-item">
+                Specializations
+              </div>
+              <div class="item-text rtg">
+                Rtg
+              </div>
+              <div class="item-text item-icons rtg">
+                <a class="add-knowledge" data-category='{{cid}}'>
+                  <i class="fas fa-plus"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          {{#each cat.value as |skill sid|}}
+          <div class="item {{skill.css}}">
+            <div class="item-left">
+              <div class="item-text skill-item item-name center">
+                <i class='roll knowledge-skill fas fa-dice-six' data-skill='{{sid}}' data-category='{{cid}}'></i>
+                <input
+                  class="display left"
+                  type="text"
+                  maxlength="16"
+                  size="16"
+                  value="{{skill.name}}"
+                  name="data.skills.knowledge.{{cid}}.value.{{sid}}.name" />
+              </div>
+            </div>
+            <div class="item-right">
+              <div class="item-text skill-item">
+                <input
+                  class="display"
+                  type="text"
+                  maxlength="16"
+                  size="16"
+                  value="{{skill.specs}}"
+                  name="data.skills.knowledge.{{cid}}.value.{{sid}}.specs" />
+              </div>
+              <div class="item-text rtg">
+                <input
+                  class="display"
+                  type="text"
+                  maxlength="2"
+                  size='2'
+                  value="{{skill.value}}"
+                  name="data.skills.knowledge.{{cid}}.value.{{sid}}.value"
+                  placeholder="0"
+                  data-dtype="Number"/>
+              </div>
+              <div class="item-text item-icons rtg">
+                <a class="remove-knowledge" data-skill='{{sid}}' data-category='{{cid}}'>
+                  <i class="fas fa-trash"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+          {{/each}}
+        </div>
+        {{/each}}
+      </div>
     </div>
   </div>
 </div>

@@ -10,7 +10,7 @@ import { SR5 } from './config.js';
  */
 
 export class DiceSR {
-  static d6({event, count=0, actor, limit, title="Roll", prefix, suffix, after, prompt, range_mode}) {
+  static d6({event, count, spec, mod, actor, limit, title="Roll", prefix, suffix, after, dialogOptions, wounds=true}) {
     const roll = (count, limit, explode) => {
       let formula = `${count}d6`;
       if (explode) {
@@ -33,23 +33,32 @@ export class DiceSR {
       return roll;
     };
 
+    if (wounds && actor) {
+      wounds = actor.data.data.wounds.value;
+    }
+
+    let total = parseInt(count) || 0;
+    total += parseInt(mod) || 0;
+    if (spec) total += 2;
+
     if (Helpers.hasModifiers(event)) {
+      total -= wounds;
       if (event[SR5.kbmod.EDGE]) {
-        roll(count, undefined, true);
+        roll(total, undefined, true);
       } else {
-        roll(count, limit, false);
+        roll(total, limit, false);
       }
       if (after) after();
       return;
     }
 
     let dialogData = {
-      dice_pool: count,
+      options: dialogOptions,
+      dice_pool: total,
       mod: "",
       limit: limit,
       limit_mod: "",
-      prompt: prompt,
-      range_mode: range_mode
+      wounds: wounds
     };
     let template = 'systems/shadowrun5e/templates/rolls/roll-dialog.html';
     let edge = false;
@@ -71,17 +80,24 @@ export class DiceSR {
           },
           default: 'roll',
           close: html => {
-            let dice_pool = parseInt(html.find('[name="dice_pool"]').val());
-            let limit = parseInt(html.find('[name="limit"]').val());
-            let mod = parseInt(html.find('[name="mod"]').val());
-            let limitMod = parseInt(html.find('[name="limit_mod"]').val());
-            let range_mode = parseInt(html.find('[name="range_mode"]').val());
-            if (dice_pool) count = dice_pool;
-            if (mod) count += mod;
-            if (range_mode) count += range_mode;
-            if (limitMod) limit += limitMod;
+            let dg = {
+              dice_pool: parseInt(html.find('[name="dice_pool"]').val()),
+              limit: parseInt(html.find('[name="limit"]').val()),
+              mod: parseInt(html.find('[name="mod"]').val()),
+              limitMod: parseInt(html.find('[name="limit_mod"]').val()),
+              wounds: parseInt(html.find('[name=wounds]').val()),
+              options: {
+                environmental: parseInt(html.find('[name="options.environmental"]').val()),
+              }
+            };
+
+            if (dg.dice_pool) total = dg.dice_pool;
+            if (dg.mod) total += dg.mod;
+            if (dg.limitMod) limit += dg.limitMod;
+            if (dg.wounds) total -= dg.wounds;
+            if (dg.options.environmental) total -= dg.options.environmental;
             if (edge) limit = undefined;
-            let r = roll(count, limit, edge);
+            let r = roll(total, limit, edge);
             resolve(r);
             if (after) after();
           }

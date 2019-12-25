@@ -7,8 +7,8 @@
       {{/ife}}
       <div class="attributes smooth">
         <div class="attribute">
-          <h4 class="attribute-name">Damage</h4>
-          <h3 class="attribute-input-container">
+          <div class="attribute-name">Damage</div>
+          <div class="attribute-input-container row">
             <input
               class="display attribute-input"
               type="text"
@@ -18,40 +18,53 @@
               value="{{data.action.damage.value}}"
               data-dtype="Number"
               placeholder="1"/>
-          </h3>
+            {{#ife data.category config.weapon.categories.MELEE}}
+            {{#if data.action.damage.attribute}}
+            +
+            {{/if}}
+            <select name="data.action.damage.attribute" class='display'>
+            {{#select data.action.damage.attribute}}
+              <option value=""></option>
+              {{#each config.attributes as |label id|}}
+              <option value="{{label}}">{{toHeaderCase label}}</option>
+              {{/each}}
+            {{/select}}
+            </select>
+            {{/ife}}
+          </div>
         </div>
         <div class="attribute">
-          <h4 class="attribute-name">AP</h4>
-          <h3 class="attribute-input-container">
+          <div class="attribute-name">AP</div>
+          <div class="attribute-input-container">
             <input
               class="display attribute-input"
               type="text"
               maxlength="2"
               size="2"
-              name="data.action.damage.ap"
-              value="{{data.action.damage.ap}}"
+              name="data.action.damage.ap.value"
+              value="{{data.action.damage.ap.value}}"
               data-dtype="Number"
               placeholder="1"/>
-          </h3>
+          </div>
         </div>
         <div class="attribute">
-          <h4 class="attribute-name">Acc</h4>
-          <h3 class="attribute-input-container">
+          <div class="attribute-name">Acc</div>
+          <div class="attribute-input-container">
             <input
               class="display attribute-input"
               type="text"
               maxlength="2"
               size="2"
-              name="data.action.limit"
-              value="{{data.action.limit}}"
+              name="data.action.limit.value"
+              value="{{data.action.limit.value}}"
               data-dtype="Number"
               placeholder="1"/>
-          </h3>
+          </div>
         </div>
         {{#ife data.category config.weapon.categories.THROWN}}
         <div class="attribute">
-          <h4 class="attribute-name">Blast</h4>
-          <h3 class="attribute-input-container">
+          <div class="attribute-name">Blast</div>
+          <div class="attribute-input-container">
             <input
               class="display attribute-input"
               type="text"
@@ -61,10 +74,10 @@
               value="{{data.thrown.blast.radius}}"
               data-dtype="Number"
               placeholder="1"/>
-          </h3>
+          </div>
         </div>
         <div class="attribute flex2">
-          <h4 class="attribute-name">Dropoff</h4>
+          <div class="attribute-name">Dropoff</div>
           <div class="track">
             <div class="attribute-input-container">
               <input
@@ -77,16 +90,16 @@
                 data-dtype='Number'
                 placeholder='-1'/>
             </div>
-            <h3 class="track-slash">
-            </h3>
-            <h3 class="track-max-value">m</h3>
+            <div class="track-slash">
+            </div>
+            <div class="track-max-value">m</div>
           </div>
         </div>
         {{/ife}}
         {{#ife data.category config.weapon.categories.MELEE}}
         <div class="attribute">
-          <h4 class="attribute-name">Reach</h4>
-          <h3 class="attribute-input-container">
+          <div class="attribute-name">Reach</div>
+          <div class="attribute-input-container">
             <input
               class="display attribute-input"
               type="text"
@@ -96,13 +109,13 @@
               value="{{data.melee.reach}}"
               data-dtype="Number"
               placeholder="1"/>
-          </h3>
+          </div>
         </div>
         {{/ife}}
         {{#ife data.category config.weapon.categories.RANGE}}
         <div class="attribute">
-          <h4 class="attribute-name">RC</h4>
-          <h3 class="attribute-input-container">
+          <div class="attribute-name">RC</div>
+          <div class="attribute-input-container">
             <input
               class="display attribute-input"
               type="text"
@@ -112,10 +125,10 @@
               value='{{data.range.rc}}'
               data-dtype="Number"
               placeholder="1"/>
-          </h3>
+          </div>
         </div>
         <div class="attribute">
-          <h4 class="attribute-name">Ammo</h4>
+          <div class="attribute-name roll ammo-reload">Ammo</div>
           <div class="track">
             <div class="attribute-input-container">
               <input
@@ -128,8 +141,8 @@
                 data-dtype='Number'
                 placeholder='0'/>
             </div>
-            <h3 class="track-slash">
-            </h3>
+            <div class="track-slash">
+            </div>
             <div class="attribute-input-container">
               <input
                 class="display attribute-input"
@@ -155,17 +168,19 @@
             {{/select}}
           </select>
         </div>
-        <div class="attribute">
-          <select name="data.action.damage.element" class="display">
-            {{#select data.action.damage.element}}
-            <option value="">None</option>
-            {{#each config.elementTypes}}
-            <option value="{{this}}">{{toHeaderCase this}}</option>
-            {{/each}}
-            {{/select}}
-          </select>
-        </div>
         {{#ife data.category config.weapon.categories.RANGE}}
+        <div class="attribute">
+          <div class="attribute-input-container">
+            <input
+               class="display attribute-input"
+               size='15'
+               maxlength='15'
+               type='text'
+               name='data.range.modes'
+               value="{{data.range.modes}}"
+               placeholder="Modes" />
+          </div>
+        </div>
         <div class="attribute">
           <div class="attribute-input-container">
             <input
@@ -212,18 +227,22 @@
       </div>
       <nav class="tabs" data-group="primary">
         <a class="item" data-tab="description">Description</a>
+        {{#ife data.category config.weapon.categories.RANGE}}
         <a class="item" data-tab="ammo">Ammo</a>
         <a class="item" data-tab="accessories">Accessories</a>
+        {{/ife}}
       </nav>
 
       <div class="tab" data-group="primary" data-tab="description">
         {{> "systems/shadowrun5e/templates/item/parts/item-description.html"}}
       </div>
+      {{#ife data.category config.weapon.categories.RANGE}}
       <div class="tab" data-group="primary" data-tab="ammo">
         {{> "systems/shadowrun5e/templates/item/parts/ammo.html"}}
       </div>
       <div class="tab" data-group="primary" data-tab="accessories">
       </div>
+      {{/ife}}
     </div>
   </div>
 </form>

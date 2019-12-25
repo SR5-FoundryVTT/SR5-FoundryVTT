@@ -12,8 +12,8 @@
   <div class="form-group">
     <label>Limit</label>
     <select name="attribute.limit">
-      {{#select attribute.limit}}
-      {{#each limits as |limit l|}}
+      {{#select limit}}
+      {{#each limits as |lim l|}}
         <option value="{{l}}">{{toHeaderCase l}}</option>
       {{/each}}
       {{/select}}

@@ -461,6 +461,11 @@ select.display {
       padding: 0 .25em;
       flex: 1 0 auto;
       min-width: 5rem;
+      &:hover {
+        .attribute-input-container.row {
+          visibility: visible;
+        }
+      }
       &.flex0 {
         min-width: 0;
         width: 0;
@@ -501,6 +506,11 @@ select.display {
       .attribute-input-container {
         align-text: center;
         position: relative;
+        &.row {
+          //visibility: hidden;
+          display: flex;
+          flex-flow: row;
+        }
         >.attribute-input {
           text-align: center;
           margin: 2px;
