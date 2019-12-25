@@ -3,6 +3,8 @@ import { Helpers } from '../helpers.js';
 
 export class SR5Item extends Item {
 
+  _previousFireMode = 1;
+
   get hasOpposedRoll() {
     return false;
     return !!(this.data.data.action && this.data.data.action.opposed.attributes.length);
@@ -21,6 +23,9 @@ export class SR5Item extends Item {
       const action = item.data.action;
       if (typeof action.limit === 'number') action.limit = {value: action.limit};
       action.limit.mod = 0;
+      action.damage.mod = 0;
+      if (typeof action.damage.ap === 'number') action.damage.ap = {value: action.damage.ap};
+      action.damage.ap.mod = 0;
       if (item.data.category === 'thrown') {
         action.skill = 'throwing_weapons';
       }
@@ -49,6 +54,8 @@ export class SR5Item extends Item {
             ammo.available.forEach(v => {
               if (v.equipped) {
                 ammo.equipped = v;
+                action.damage.mod += v.damage;
+                action.damage.ap.mod += v.ap;
               }
             });
           }
@@ -69,8 +76,11 @@ export class SR5Item extends Item {
 
     if (item.data.action) {
       const action = item.data.action;
-      // if (action.damage) action.damage.value = action.damage.base + action.damage.mod;
-      // if (action.damage.ap) action.damage.ap.value = action.damage.ap.base + action.damage.ap.mod;
+      if (action.damage) {
+        action.damage.value = action.damage.base + action.damage.mod;
+        if (action.damage.attribute && this.actor) action.damage.value += this.actor.data.data.attributes[action.damage.attribute].value;
+        if (action.damage.ap) action.damage.ap.value = action.damage.ap.base + action.damage.ap.mod;
+      }
       if (action.limit) action.limit.value = action.limit.base + action.limit.mod;
       console.log(action.limit);
     }
@@ -183,15 +193,14 @@ export class SR5Item extends Item {
     let damageType = data.action.damage.type.toUpperCase().charAt(0);
     let element = Helpers.label(data.action.damage.element);
     if (data.category === 'range') {
-      if (data.range.rc) props.push(`RC ${data.range.rc}`);
+      if (data.range.rc) props.push(`RC ${data.range.rc.value}`);
       const ammo = data.range.ammo;
       const curr = ammo.equipped;
-      dv += +curr.damage;
-      ap += +curr.ap;
-      if (data.range.range !== '') props.push(data.range.range);
+      if (data.range.range) props.push(data.range.range);
       if (curr.name) props.push(` ${ammo.value}/${ammo.max} ${curr.name}`);
       if (curr.blast.radius) props.push(`${curr.blast.radius}m`);
       if (curr.blast.dropoff) props.push(`${curr.blast.dropoff}/m`);
+      if (data.range.modes) props.push(data.range.modes);
     } else if (data.category === 'melee') {
       if (data.melee.reach !== '') props.push(`Reach ${data.melee.reach}`);
     } else if (data.category === 'thrown') {
@@ -309,7 +318,7 @@ export class SR5Item extends Item {
     if (this.data.type === 'weapon') {
       if (itemData.category === 'thrown') limit = actorData.limits.physical.value;
       if (itemData.category === 'range') {
-        let fireMode = true;
+        let fireMode = this._previousFireMode;
         let rc = parseInt(itemData.range.rc.value) + parseInt(actorData.recoil_compensation);
         let dialogData = {
           fireMode: fireMode,
@@ -345,7 +354,10 @@ export class SR5Item extends Item {
             close: (html) => {
               const fireMode = parseInt(html.find('[name="fireMode"]').val())
               title = this.data.name;
-              if (fireMode) title += ` - Defender - ${Helpers.mapRoundsToDefenseMod(fireMode)}`
+              if (fireMode) {
+                title += ` - Defender (${Helpers.mapRoundsToDefenseMod(fireMode)})`
+                this._previousFireMode = fireMode;
+              }
               if (fireMode > rc) count -= (fireMode - rc);
               DiceSR.d6({
                 event: ev,

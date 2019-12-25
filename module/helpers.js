@@ -1,11 +1,11 @@
 export class Helpers {
   static mapRoundsToDefenseMod(rounds) {
-    if (rounds === 1) return 0;
-    if (rounds === 3) return 2;
-    if (rounds === 6) return 5;
-    if (rounds === 10) return 9;
+    if (rounds === 1) return "No Mod";
+    if (rounds === 3) return "-2 Mod";
+    if (rounds === 6) return "-5 Mod";
+    if (rounds === 10) return "-9 Mod";
     if (rounds === 20) return 'Duck or Cover';
-    return 0;
+    return "unknown";
   }
   static label(str) {
     const frags = str.split('_');

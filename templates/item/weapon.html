@@ -8,16 +8,18 @@
       <div class="attributes smooth">
         <div class="attribute">
           <div class="attribute-name">Damage</div>
-          <div class="attribute-input-container row">
-            <input
-              class="display attribute-input"
-              type="text"
-              maxlength="2"
-              size="2"
-              name="data.action.damage.value"
-              value="{{data.action.damage.value}}"
-              data-dtype="Number"
-              placeholder="1"/>
+          <div class="track">
+            <div class="attribute-input-container">
+              <input
+                class="display attribute-input"
+                type="text"
+                maxlength="2"
+                size="2"
+                name="data.action.damage.base"
+                value="{{data.action.damage.base}}"
+                data-dtype="Number"
+                placeholder="1"/>
+            </div>
             {{#ife data.category config.weapon.categories.MELEE}}
             {{#if data.action.damage.attribute}}
             +
@@ -31,20 +33,28 @@
             {{/select}}
             </select>
             {{/ife}}
+            {{#ifne data.action.damage.base data.action.damage.value}}
+            <div class="track-max-value">({{data.action.damage.value}})</div>
+            {{/ifne}}
           </div>
         </div>
         <div class="attribute">
           <div class="attribute-name">AP</div>
-          <div class="attribute-input-container">
-            <input
-              class="display attribute-input"
-              type="text"
-              maxlength="2"
-              size="2"
-              name="data.action.damage.ap.value"
-              value="{{data.action.damage.ap.value}}"
-              data-dtype="Number"
-              placeholder="1"/>
+          <div class="track">
+            <div class="attribute-input-container">
+              <input
+                class="display attribute-input"
+                type="text"
+                maxlength="2"
+                size="2"
+                name="data.action.damage.ap.base"
+                value="{{data.action.damage.ap.base}}"
+                data-dtype="Number"
+                placeholder="1"/>
+            </div>
+            {{#ifne data.action.damage.ap.base data.action.damage.ap.value}}
+            <div class="track-max-value">({{data.action.damage.ap.value}})</div>
+            {{/ifne}}
           </div>
         </div>
         <div class="attribute">
