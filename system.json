@@ -8,7 +8,7 @@
   "esmodules": ["shadowrun5e.js"],
   "scripts": [],
   "styles": ["css/main.css"],
-  "minimumCoreVersion": "0.4.0",
+  "minimumCoreVersion": "0.4.3",
   "packs": [],
   "initiative": "@initiative.current.base.value + @initiative.current.dice.text - @wounds.value",
   "primaryTokenAttribute": "track.physical",
@@ -17,5 +17,6 @@
   "gridUnits": "m",
   "socket": true,
   "manifest": "https://raw.githubusercontent.com/smilligan93/SR5-FoundryVTT/master/system.json",
-  "url": "https://github.com/smilligan93/SR5-FoundryVTT"
+  "url": "https://github.com/smilligan93/SR5-FoundryVTT",
+  "download": "https://github.com/smilligan93/SR5-FoundryVTT/archive/master.zip"
 }
