@@ -1,102 +1,18 @@
 <form class="{{cssClass}}" autocomplete="off">
-  <div class="flexrow align-start">
-    {{> "systems/shadowrun5e/templates/item/parts/item-left.html" }}
-    <div class="flexcol">
-      {{> "systems/shadowrun5e/templates/item/parts/item-header.html" }}
-      <div class="attributes smooth">
-        <div class="attribute row">
-          <h4 class="attribute-name">Armor</h4>
-          <h3 class="attribute-input-container">
-            <input
-              class="display attribute-input"
-              type="text"
-              maxlength="2"
-              size="2"
-              name="data.armor.value"
-              value="{{data.armor.value}}"
-              data-dtype="Number"
-              placeholder="1"/>
-          </h3>
-        </div>
-        <div class="attribute">
-          <label class='checkbox'>
-            Accessory <input class='display' type='checkbox' name='data.armor.mod' {{checked data.armor.mod}}/>
-          </label>
-        </div>
+  <div class="flexcol">
+    {{> "systems/shadowrun5e/templates/item/parts/header.html" }}
+    <nav class="tabs" data-group="primary">
+      <a class="item" data-tab="description">Description</a>
+      <a class="item" data-tab="armor">Armor</a>
+    </nav>
+    <div class="tab" data-group="primary" data-tab="description">
+      <div class="flexrow align-start">
+        {{> "systems/shadowrun5e/templates/item/parts/technology.html" }}
+        {{> "systems/shadowrun5e/templates/item/parts/description.html"}}
       </div>
-      <div class="attributes">
-        <div class="attribute">
-          <h4 class="attribute-name">Acid</h4>
-          <h3 class="attribute-input-container">
-            <input
-              class="display attribute-input"
-              type="text"
-              maxlength="2"
-              size="2"
-              name="data.armor.acid"
-              value="{{data.armor.acid}}"
-              data-dtype="Number"
-              placeholder="0"/>
-          </h3>
-        </div>
-        <div class="attribute">
-          <h4 class="attribute-name">Cold</h4>
-          <h3 class="attribute-input-container">
-            <input
-              class="display attribute-input"
-              type="text"
-              maxlength="2"
-              size="2"
-              name="data.armor.cold"
-              value="{{data.armor.cold}}"
-              data-dtype="Number"
-              placeholder="0"/>
-          </h3>
-        </div>
-        <div class="attribute">
-          <h4 class="attribute-name">Fire</h4>
-          <h3 class="attribute-input-container">
-            <input
-              class="display attribute-input"
-              type="text"
-              maxlength="2"
-              size="2"
-              name="data.armor.fire"
-              value="{{data.armor.fire}}"
-              data-dtype="Number"
-              placeholder="0"/>
-          </h3>
-        </div>
-        <div class="attribute">
-          <h4 class="attribute-name">Electricity</h4>
-          <h3 class="attribute-input-container">
-            <input
-              class="display attribute-input"
-              type="text"
-              maxlength="2"
-              size="2"
-              name="data.armor.electricity"
-              value="{{data.armor.electricity}}"
-              data-dtype="Number"
-              placeholder="0"/>
-          </h3>
-        </div>
-        <div class="attribute">
-          <h4 class="attribute-name">Radiation</h4>
-          <h3 class="attribute-input-container">
-            <input
-              class="display attribute-input"
-              type="text"
-              maxlength="2"
-              size="2"
-              name="data.armor.radiation"
-              value="{{data.armor.radiation}}"
-              data-dtype="Number"
-              placeholder="0"/>
-          </h3>
-        </div>
-      </div>
-      {{> "systems/shadowrun5e/templates/item/parts/item-description.html"}}
+    </div>
+    <div class="tab" data-group="primary" data-tab="armor">
+      {{> "systems/shadowrun5e/templates/item/parts/armor.html"}}
     </div>
   </div>
 </form>

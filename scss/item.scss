@@ -1,0 +1,116 @@
+@import "config.scss";
+.sr5.item {
+  .item-name-input {
+    @include title;
+    font-size: 1.5em;
+  }
+  .item-header {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: stretch;
+    border: $groove;
+    .item-name {
+      flex: 1;
+      border-right: $groove;
+      @include nodesto;
+      font-size: 1.5em;
+      .display {
+        padding-top: 1em;
+        padding-bottom: 1em;
+      }
+    }
+    .item-type {
+      @include nodesto;
+      flex: 0;
+      padding: 0 .5em;
+      color: $dark;
+      display: flex;
+      flex-flow: column;
+      align-content: center;
+      justify-content: center;
+    }
+    .item-image {
+      flex: 0;
+      border-right: $groove;
+      margin-bottom: none;
+      padding-bottom: none;
+    }
+    .item-info {
+      flex: 1;
+      > :not(:last-child) {
+        border-bottom: $groove;
+      }
+    }
+  }
+  .technology {
+    @include nodesto;
+    > * {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: space-between;
+    }
+    min-width: 7em;
+    border-top: $groove;
+    border-right: $groove;
+    border-bottom: $groove;
+  }
+  .description {
+    padding: 2px;
+    height: 100%;
+    min-height: 16em;
+    border: $groove;
+    margin-left: -$groove-width;
+    overflow-y: auto;
+  }
+  .item-form {
+    padding: 0 .5em;
+    .header {
+      @include title;
+      font-size: 1.75em;
+      border-top: $groove;
+      border-bottom: $groove;
+    }
+    .form-line {
+      display: flex;
+      flex-flow: row;
+      justify-content: space-between;
+      align-content: center;
+      padding: .1em .25em;
+      > * {
+        flex: 1;
+      }
+      .label {
+        color: $dark;
+        font-size: 1.15em;
+        @include nodesto;
+      }
+      .inputs {
+        display: flex;
+        flex-flow: row;
+        justify-content: flex-end;
+        align-items: center;
+        font-size: .75em;
+        &.between {
+          justify-content: space-between;
+        }
+        &.around {
+          justify-content: space-around;
+        }
+        > * {
+          padding-left: .25em default;
+          padding-right: .25em default;
+        }
+      }
+      select {
+        background: rgba($black, 0.05);
+        border-radius: .3em;
+        border-color: $dark;
+      }
+      input {
+        background: rgba($black, 0.05);
+        border-radius: .3em;
+        border-color: $dark;
+      }
+    }
+  }
+}

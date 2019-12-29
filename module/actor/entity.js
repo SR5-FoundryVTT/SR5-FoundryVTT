@@ -36,7 +36,8 @@ export class SR5Actor extends Actor {
       'walk',
       'run',
       'defense',
-      'wound_tolerance'
+      'wound_tolerance',
+      'essence'
     ];
     modifiers.sort();
     modifiers.unshift('global');
@@ -50,6 +51,54 @@ export class SR5Actor extends Actor {
     Helpers.addLabels(data.skills);
     Helpers.addLabels(data.attributes);
     Helpers.addLabels(data.matrix);
+
+    let totalEssence = 6;
+    armor.value = 0;
+    armor.mod = 0;
+    const ELEMENTS = ['acid', 'cold', 'fire', 'electricity', 'radiation'];
+    ELEMENTS.forEach(element => {
+      armor[element] = 0;
+    });
+    const matrix = data.matrix;
+    matrix.firewall.value = matrix.firewall.mod;
+    matrix.data_processing.value = matrix.data_processing.mod;
+    matrix.attack.value = matrix.attack.mod;
+    matrix.sleaze.value = matrix.sleaze.mod;
+
+    for (let item of Object.values(items)) {
+      if (item.data.armor
+        && item.data.armor.value
+        && item.data.technology.equipped) {
+
+        if (item.data.armor.mod) armor.mod += item.data.armor.value; // if it's a mod, add to the mod field
+        else armor.value = item.data.armor.value; // if not a mod, set armor.value to the items value
+        ELEMENTS.forEach(element => {
+          armor[element] += item.data.armor[element];
+        });
+      }
+      if (item.data.essence && item.data.technology && item.data.technology.equipped) {
+        totalEssence -= item.data.essence;
+      }
+      if (item.type === 'device' && item.data.technology.equipped) {
+
+        matrix.device = item;
+        matrix.condition_monitor.max = item.data.condition_monitor.max;
+        matrix.rating = item.data.technology.rating;
+        matrix.is_cyberdeck = item.category === 'cyberdeck';
+        matrix.name = item.name;
+
+        if (item.data.category === 'cyberdeck') {
+          for (let att of Object.values(item.data.atts)) {
+            matrix[att.att].value += att.value;
+          }
+        } else {
+          matrix.firewall.value += matrix.rating;
+          matrix.data_processing.value += matrix.rating;
+        }
+      }
+    }
+
+    actorData.data.attributes.essence.value = totalEssence + mods.essence;
 
     const limits = data.limits;
     limits.physical.value = Math.ceil(((2 * attrs.strength.value)
@@ -97,41 +146,6 @@ export class SR5Actor extends Actor {
     init.current.dice.text = `${init.current.dice.value}d6`;
     init.current.base.value = init.current.base.base + mods.initiative;
 
-
-    armor.value = 0;
-    armor.mod = 0;
-    const ELEMENTS = ['acid', 'cold', 'fire', 'electricity', 'radiation'];
-    ELEMENTS.forEach(element => {
-      armor[element] = 0;
-    });
-    const matrix = data.matrix;
-    matrix.firewall.value = matrix.firewall.mod;
-    matrix.data_processing.value = matrix.data_processing.mod;
-    matrix.attack.value = matrix.attack.mod;
-    matrix.sleaze.value = matrix.sleaze.mod;
-    for (let item of Object.values(items)) {
-      if (item.type === 'armor' && item.data.technology.equipped) {
-        if (item.data.armor.mod) armor.mod += item.data.armor.value; // if it's a mod, add to the mod field
-        else armor.value = item.data.armor.value; // if not a mod, set armor.value to the items value
-        ELEMENTS.forEach(element => {
-          armor[element] += item.data.armor[element];
-        });
-      } else if (item.type === 'device' && item.data.technology.equipped) {
-        matrix.device = item;
-        matrix.condition_monitor.max = item.data.condition_monitor.max;
-        matrix.rating = item.data.technology.rating;
-        matrix.is_cyberdeck = item.category === 'cyberdeck';
-        matrix.name = item.name;
-        if (item.data.category === 'cyberdeck') {
-          for (let att of Object.values(item.data.atts)) {
-            matrix[att.att].value += att.value;
-          }
-        } else {
-          matrix.firewall.value += matrix.rating;
-          matrix.data_processing.value += matrix.rating;
-        }
-      }
-    }
     limits.firewall = {
       value: matrix.firewall.value
     };
@@ -144,7 +158,6 @@ export class SR5Actor extends Actor {
     limits.sleaze = {
       value: matrix.sleaze.value
     };
-
     armor.value += armor.mod + mods.armor;
 
     const soak = attrs.body.value + armor.value + mods.soak;
@@ -216,65 +229,119 @@ export class SR5Actor extends Actor {
     });
   }
 
-  rollDefense(id, options) {
-    const defense = this.data.data.rolls[id];
-    console.log(this);
-    return DiceSR.d6({
-      event: options.event,
-      actor: this,
-      count: defense,
-      title: 'Defense'
+  rollDefense(options) {
+    let dialogData = {
+      defense: this.data.data.rolls.defense,
+      fireMode: options.fireModeDefense,
+      cover: options.cover
+    };
+    let template = 'systems/shadowrun5e/templates/rolls/roll-defense.html';
+    let special = '';
+    return new Promise(resolve => {
+      renderTemplate(template, dialogData).then(dlg => {
+        new Dialog({
+          title: "Defense",
+          content: dlg,
+          buttons: {
+            normal: {
+              label: 'Normal'
+            },
+            full_defense: {
+              label: `Full Defense (+ ${this.data.data.attributes.willpower.value})`,
+              callback: () => special = 'full_defense'
+            }
+          },
+          default: 'normal',
+          close: html => {
+            let count = parseInt(html.find('[name=defense]').val());
+            let fireMode = parseInt(html.find('[name=fireMode]').val());
+            let cover = parseInt(html.find('[name=cover]').val());
+            if (special === 'full_defense') count += this.data.data.attributes.willpower.value;
+            if (special === 'dodge') count += this.data.data.skills.active.gymnastics.value;
+            if (special === 'block') count += this.data.data.skills.active.unarmed_combat.value;
+            if (fireMode) count += fireMode;
+            if (cover) count += cover;
+            return DiceSR.d6({
+              event: options.event,
+              actor: this,
+              count: count,
+              title: 'Defense'
+            });
+          }
+        }).render(true);
+      });
     });
   }
 
-  rollSoak(id, options) {
-    new Dialog({
-      title: 'Soak Test',
-      buttons: {
-        default: {
-          label: 'Base',
-          icon: '<i class="fas fa-shield-alt"></i>',
-          callback: () => id = 'default'
-        },
-        acid: {
-          label: 'Acid',
-          icon: '<i class="fas fa-vial"></i>',
-          callback: () => id = 'acid'
-        },
-        cold: {
-          label: 'Cold',
-          icon: '<i class="fas fa-snowflake"></i>',
-          callback: () => id = 'cold'
-        },
-        electricity: {
-          label: 'Elec',
-          icon: '<i class="fas fa-bolt"></i>',
-          callback: () => id = 'electricity'
-        },
-        fire: {
-          label: 'Fire',
-          icon: '<i class="fas fa-fire"></i>',
-          callback: () => id = 'fire'
-        },
-        radiation: {
-          label: 'Rad',
-          icon: '<i class="fas fa-radiation"></i>',
-          callback: () => id = 'radiation'
-        },
+  rollSoak(options) {
+    let dialogData = {
+      ap: options.ap,
+      soak: this.data.data.rolls.soak.default
+    };
+    let id = '';
+    let template = 'systems/shadowrun5e/templates/rolls/roll-soak.html';
+    return new Promise(resolve => {
+      renderTemplate(template, dialogData).then(dlg => {
+        new Dialog({
+          title: 'Soak Test',
+          content: dlg,
+          buttons: {
+            default: {
+              label: 'Base',
+              icon: '<i class="fas fa-shield-alt"></i>',
+              callback: () => id = 'default'
+            },
+            acid: {
+              label: 'Acid',
+              icon: '<i class="fas fa-vial"></i>',
+              callback: () => id = 'acid'
+            },
+            cold: {
+              label: 'Cold',
+              icon: '<i class="fas fa-snowflake"></i>',
+              callback: () => id = 'cold'
+            },
+            electricity: {
+              label: 'Elec',
+              icon: '<i class="fas fa-bolt"></i>',
+              callback: () => id = 'electricity'
+            },
+            fire: {
+              label: 'Fire',
+              icon: '<i class="fas fa-fire"></i>',
+              callback: () => id = 'fire'
+            },
+            radiation: {
+              label: 'Rad',
+              icon: '<i class="fas fa-radiation"></i>',
+              callback: () => id = 'radiation'
+            },
 
-      },
-      close: (html) => {
-        const soak = this.data.data.rolls.soak[id];
-        const label = Helpers.label(id);
-        return DiceSR.d6({
-          event: options.event,
-          actor: this,
-          count: soak,
-          title: `Soak - ${label}`,
-          wounds: false
-        });
-      }
-    }).render(true);
+          },
+          close: (html) => {
+            const soak = this.data.data.rolls.soak[id];
+            let count = soak;
+            const ap = parseInt(html.find('[name=ap]').val());
+            if (ap) {
+              const armorId = id === 'default' ? '' : id;
+              const armor = this.data.data.armor;
+              console.log(armor);
+              let armorVal = armor.value + (armor[armorId] || 0);
+              console.log(armorVal);
+              count += Math.max(ap, -armorVal); // don't take more AP than armor
+            }
+            const label = Helpers.label(id);
+            return DiceSR.d6({
+              event: options.event,
+              actor: this,
+              count: count,
+              title: `Soak - ${label}`,
+              wounds: false
+            });
+          }
+        }).render(true);
+      });
+    });
   }
 
   rollSingleAttribute(attId, options) {
@@ -373,6 +440,7 @@ export class SR5Actor extends Actor {
 
   rollSkill(skill, options) {
     let att = this.data.data.attributes[skill.attribute];
+    if (options.attribute) att = this.data.data.attributes[options.attribute];
     let spec = false;
     let limit = this.data.data.limits[att.limit];
 

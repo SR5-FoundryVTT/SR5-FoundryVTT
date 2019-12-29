@@ -417,8 +417,7 @@ export class SR5ActorSheet extends ActorSheet {
 
   async _onRollDefense(event) {
     event.preventDefault();
-    const defense = event.currentTarget.dataset.roll;
-    this.actor.rollDefense(defense, {event: event});
+    this.actor.rollDefense({event: event});
   }
 
   async _onRollMatrixAttribute(event) {
@@ -429,8 +428,7 @@ export class SR5ActorSheet extends ActorSheet {
 
   async _onRollSoak(event) {
     event.preventDefault();
-    const soak = event.currentTarget.dataset.soak;
-    this.actor.rollSoak(soak, {event: event});
+    this.actor.rollSoak({event: event});
   }
 
   async _onRollAttributesOnly(event) {

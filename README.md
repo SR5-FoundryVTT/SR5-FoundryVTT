@@ -2,28 +2,16 @@
 
 Shadowrun 5e System for FoundryVTT.
 
-Working:
-Weapons
-Spells
-Skills
-Attributes
-Initiative
-Armor
-Drain
-Soak
-Matrix
-Mods
-Mundane/Special selection
-More info for table stuff on click
+System is still work in progress but pretty stable now.
+Only Character sheet is available. All items have a sheet.
+Lots of things are autocalculated. Modifiers can be found in the character 'info' tab. Report an issue or message me on discord to add something I missed.
 
-Not Working:
-Wound modifiers
+It looks ugly... but it works
+
+Not Implemented:
 Complex Forms
 Vehicles
-
-Future:
-More options for powers and items
-Chummer import
-better rolls
+Chummer Import
+Targetted Rolls
 
 Work in progress.

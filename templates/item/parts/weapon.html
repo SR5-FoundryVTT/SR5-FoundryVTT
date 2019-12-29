@@ -1,0 +1,171 @@
+<div class="item-form">
+  <div class="header">
+    {{header}}
+  </div>
+  <div class="form-line">
+    <div class="label">
+      Type
+    </div>
+    <div class="inputs">
+      <select name="data.category">
+        {{#select data.category}}
+        <option value=""></option>
+        <option value="range">Range</option>
+        <option value="melee">Melee</option>
+        <option value="thrown">Thrown</option>
+        {{/select}}
+      </select>
+    </div>
+  </div>
+  {{#if data.category}}
+  {{#ife data.category "range"}}
+  <div class="form-line">
+    <div class="label">
+      Ammo Count
+    </div>
+    <div class="inputs">
+      <input
+        size='2'
+        maxlength='2'
+        type='text'
+        name='data.range.ammo.value'
+        value='{{data.range.ammo.value}}'
+        data-dtype='Number'
+        placeholder='0'/>
+      /
+      <input
+        size='2'
+        maxlength='2'
+        type='text'
+        name='data.range.ammo.max'
+        value="{{data.range.ammo.max}}"
+        data-dtype="Number"
+        placeholder='Max'/>
+    </div>
+  </div>
+  <div class="form-line">
+    <div class="label">
+      Modes
+    </div>
+    <div class="inputs">
+      <label class="checkbox">
+        SS<input type="checkbox" name="data.range.modes.single_shot" {{checked data.range.modes.single_shot}}>
+      </label>
+      <label class="checkbox">
+        SA<input type="checkbox" name="data.range.modes.semi-auto" {{checked data.range.modes.semi-auto}}>
+      </label>
+      <label class="checkbox">
+        BF<input type="checkbox" name="data.range.modes.burst-fire" {{checked data.range.modes.burst-fire}}>
+      </label>
+      <label class="checkbox">
+        FA<input type="checkbox" name="data.range.modes.full-auto" {{checked data.range.modes.full-auto}}>
+      </label>
+    </div>
+  </div>
+  <div class="form-line">
+    <div class="label">
+      Ranges
+    </div>
+    <div class="inputs">
+      <input
+         size='3'
+         maxlength='3'
+         type='text'
+         name='data.range.range.short'
+         value="{{data.range.range.short}}"
+         data-dtype="Number" />
+      /
+      <input
+         size='3'
+         maxlength='3'
+         type='text'
+         name='data.range.range.medium'
+         value="{{data.range.range.medium}}"
+         data-dtype="Number" />
+      /
+      <input
+         size='3'
+         maxlength='3'
+         type='text'
+         name='data.range.range.long'
+         value="{{data.range.range.long}}"
+         data-dtype="Number" />
+      /
+      <input
+         size='3'
+         maxlength='3'
+         type='text'
+         name='data.range.range.extreme'
+         value="{{data.range.range.extreme}}"
+         data-dtype="Number" />
+    </div>
+  </div>
+  <div class="form-line">
+    <div class="label">
+      Recoil Compensation
+    </div>
+    <div class="inputs">
+      <input
+        type="text"
+        maxlength="2"
+        size="2"
+        name='data.range.rc.base'
+        value='{{data.range.rc.base}}'
+        data-dtype="Number"
+        placeholder="1"/>
+    </div>
+  </div>
+  {{/ife}}
+  {{#ife data.category "melee"}}
+  <div class="form-line">
+    <div class="label">
+      Reach
+    </div>
+    <div class="inputs">
+      <input
+        type="text"
+        maxlength="2"
+        size="2"
+        name="data.melee.reach"
+        value="{{data.melee.reach}}"
+        data-dtype="Number"
+        placeholder="1"/>
+    </div>
+  </div>
+  {{/ife}}
+  {{#ife data.category "thrown"}}
+  <div class="form-line">
+    <div class="label">
+      Blast Radius
+    </div>
+    <div class="inputs">
+      <input
+        type="text"
+        maxlength="3"
+        size="4"
+        name="data.thrown.blast.radius"
+        value="{{data.thrown.blast.radius}}"
+        data-dtype="Number"
+        placeholder="1"/>
+      m
+    </div>
+  </div>
+  <div class="form-line">
+    <div class="label">
+      Blast Dropoff
+    </div>
+    <div class="inputs">
+      <input
+        size='3'
+        maxlength='4'
+        type='text'
+        name='data.thrown.blast.dropoff'
+        value='{{data.thrown.blast.dropoff}}'
+        data-dtype='Number'
+        placeholder='-1'/>
+      /m
+    </div>
+  </div>
+  {{/ife}}
+  {{/if}}
+</div>

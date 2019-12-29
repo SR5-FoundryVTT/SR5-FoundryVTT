@@ -51,10 +51,12 @@ export class SR5ItemSheet extends ItemSheet {
           console.error(e)
         }
       }
-      itemData.range.mods.forEach(mod => {
-        if (mod.rc === 0) delete mod.rc;
-        if (mod.acc === 0) delete mod.acc;
-      });
+      if (itemData.range.mods) {
+        itemData.range.mods.forEach(mod => {
+          if (mod.rc === 0) delete mod.rc;
+          if (mod.acc === 0) delete mod.acc;
+        });
+      }
     }
 
     if (itemData.action) {

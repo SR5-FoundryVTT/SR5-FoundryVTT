@@ -6,12 +6,11 @@ export class SR5Item extends Item {
   _previousFireMode = 1;
 
   get hasOpposedRoll() {
-    return false;
-    return !!(this.data.data.action && this.data.data.action.opposed.attributes.length);
+    return !!(this.data.data.action && this.data.data.action.opposed.type);
   }
 
   get hasRoll() {
-    return !!(this.data.data.action && this.data.data.action.attribute !== '');
+    return !!(this.data.data.action && this.data.data.action.type !== '');
   }
 
   prepareData() {
@@ -19,34 +18,30 @@ export class SR5Item extends Item {
     const labels = {};
     const item = this.data;
 
-    if (item.type === 'weapon') {
+    if (item.data.action) {
       const action = item.data.action;
-      if (typeof action.limit === 'number') action.limit = {value: action.limit};
       action.limit.mod = 0;
       action.damage.mod = 0;
-      if (typeof action.damage.ap === 'number') action.damage.ap = {value: action.damage.ap};
       action.damage.ap.mod = 0;
-      if (item.data.category === 'thrown') {
-        action.skill = 'throwing_weapons';
-      }
-      action.attribute = CONFIG.SR5.attributes.AGILITY;
-      if (item.data.range) {
+      // setup range weapon special shit
+      if (item.type !== 'spell' && item.data.range) {
         const range = item.data.range;
-        if (typeof range.rc !== 'object') range.rc = {value: 0, base: 0, mod: 0};
         range.rc.mod = 0;
-        if (!range.mods) range.mods = [];
-        if (typeof range.mods === 'object') {
-          range.mods = Object.values(range.mods);
-        }
-        range.mods.forEach(mod => {
-          console.log(mod);
-          if (mod.equipped) {
-            if (mod.rc) range.rc.mod += mod.rc;
-            if (mod.acc) action.limit.mod += mod.acc;
+        if (range.mods) {
+          // turn object into array
+          if (typeof range.mods === 'object') {
+            range.mods = Object.values(range.mods);
           }
-        });
+          range.mods.forEach(mod => {
+            if (mod.equipped) {
+              if (mod.rc) range.rc.mod += mod.rc;
+              if (mod.acc) action.limit.mod += mod.acc;
+            }
+          });
+        }
         if (range.ammo) {
           const ammo = range.ammo;
+          // turn object into array
           if (typeof ammo.available === 'object') {
             ammo.available = Object.values(ammo.available);
           }
@@ -60,9 +55,24 @@ export class SR5Item extends Item {
             });
           }
         }
-
-        range.rc.value = range.rc.base + range.rc.mod;
+        if (range.rc) range.rc.value = range.rc.base + range.rc.mod;
       }
+
+
+      // once all damage mods have been accounted for, sum base and mod to value
+      action.damage.value = action.damage.base + action.damage.mod;
+      if (action.damage.attribute && this.actor) action.damage.value += this.actor.data.data.attributes[action.damage.attribute].value;
+      action.damage.ap.value = action.damage.ap.base + action.damage.ap.mod;
+      action.limit.value = action.limit.base + action.limit.mod;
+    }
+
+
+    if (item.type === 'weapon') {
+      const action = item.data.action;
+      if (item.data.category === 'thrown') {
+        action.skill = 'throwing_weapons';
+      }
+      action.attribute = CONFIG.SR5.attributes.AGILITY;
     }
 
     if (item.type === 'spell') {
@@ -70,19 +80,8 @@ export class SR5Item extends Item {
       item.data.action.skill = 'spellcasting';
     }
 
-    if (item.type === 'device') {
+    if (item.data.condition_monitor) {
       item.data.condition_monitor.max = 8 + Math.ceil(item.data.technology.rating / 2);
-    }
-
-    if (item.data.action) {
-      const action = item.data.action;
-      if (action.damage) {
-        action.damage.value = action.damage.base + action.damage.mod;
-        if (action.damage.attribute && this.actor) action.damage.value += this.actor.data.data.attributes[action.damage.attribute].value;
-        if (action.damage.ap) action.damage.ap.value = action.damage.ap.base + action.damage.ap.mod;
-      }
-      if (action.limit) action.limit.value = action.limit.base + action.limit.mod;
-      console.log(action.limit);
     }
 
     this.labels = labels;
@@ -143,27 +142,49 @@ export class SR5Item extends Item {
   }
 
   _actionChatData(data, labels, props) {
-    props.push(Helpers.label(data.action.skill));
-    props.push(Helpers.label(data.action.attribute));
-    if (data.action.limit.attribute) props.push(Helpers.label(data.action.limit.attribute));
-    labels['roll'] = 'Roll';
+    if (data.action.limit.value) props.push(`Limit ${data.action.limit.value}`);
+    if (data.action.type) props.push(`${Helpers.label(data.action.type)} Action`);
+    if (data.action.skill) {
+      labels['roll'] = `${Helpers.label(data.action.skill)}+${Helpers.label(data.action.attribute)}`;
+    } else if (data.action.attribute2) {
+      labels['roll'] = `${Helpers.label(data.action.attribute)}+${Helpers.label(data.action.attribute2)}`;
+    }
+    if (data.action.damage.type) {
+      const damage = data.action.damage;
+      if (damage.value) props.push(`DV ${damage.value}${damage.type ? damage.type.toUpperCase().charAt(0) : ''}`);
+      if (damage.ap && damage.ap.value) props.push(`AP ${damage.ap.value}`);
+      if (damage.element) props.push(Helpers.label(damage.element));
+    }
+    if (data.action.opposed.type) {
+      const opposed = data.action.opposed;
+      if (opposed.type !== 'custom') labels['opposedRoll'] = `vs. ${Helpers.label(opposed.type)}`;
+      else if (opposed.skill) labels['opposedRoll'] = `vs. ${Helpers.label(opposed.skill)}+${Helpers.labels(opposed.attribute)}`;
+      else if (opposed.attribute2) labels['opposedRoll'] = `vs. ${Helpers.label(opposed.attribute)}+${Helpers.labels(opposed.attribute2)}`;
+      else if (opposed.attribute) labels['opposedRoll'] = `vs. ${Helpers.label(opposed.attribute)}`;
+      if (opposed.description) props.push(`Opposed Desc: ${opposed.desc}`);
+    }
   }
 
   _armorChatData(data, labels, props) {
-    props.push(`Armor ${data.armor.value}`);
-    if (data.armor.mod) props.push('Accessory');
-    if (data.armor.acid) props.push(`Acid ${data.armor.acid}`);
-    if (data.armor.cold) props.push(`Cold ${data.armor.cold}`);
-    if (data.armor.fire) props.push(`Fire ${data.armor.fire}`);
-    if (data.armor.electricity) props.push(`Electricity ${data.armor.electricity}`);
-    if (data.armor.radiation) props.push(`Radiation ${data.armor.radiation}`);
+    if (data.armor) {
+      if (data.armor.value) props.push(`Armor ${data.armor.value}`);
+      if (data.armor.mod) props.push('Accessory');
+      if (data.armor.acid) props.push(`Acid ${data.armor.acid}`);
+      if (data.armor.cold) props.push(`Cold ${data.armor.cold}`);
+      if (data.armor.fire) props.push(`Fire ${data.armor.fire}`);
+      if (data.armor.electricity) props.push(`Electricity ${data.armor.electricity}`);
+      if (data.armor.radiation) props.push(`Radiation ${data.armor.radiation}`);
+    }
   }
 
   _spellChatData(data, labels, props) {
+    this._actionChatData(data, labels, props);
+    props.push(Helpers.label(data.range),
+                Helpers.label(data.duration),
+                Helpers.label(data.type),
+                Helpers.label(data.category));
     if (data.category === 'combat') {
       props.push(Helpers.label(data.combat.type));
-      props.push(Helpers.label(data.action.damage.element));
-      props.push(Helpers.label(data.action.damage.type));
     } else if (data.category === 'health') {
 
     } else if (data.category === 'illusion') {
@@ -179,50 +200,45 @@ export class SR5Item extends Item {
       props.push(data.illusion.type);
       if (data.illusion.extended) props.push('Extended');
     }
-    props.unshift(Helpers.label(data.range),
-                  Helpers.label(data.duration),
-                  Helpers.label(data.type),
-                  Helpers.label(data.category));
     labels['roll'] = 'Cast';
   }
 
+  _cyberwareChatData(data, labels, props) {
+    _weaponChatData(data, labels, props);
+    _armorChatData(data, labels, props);
+    if (data.essence) props.push(`Ess ${data.essence}`);
+  }
+
   _weaponChatData(data, labels, props) {
-    let dv = +data.action.damage.value;
-    let acc = +data.action.limit.value;
-    let ap = +data.action.damage.ap.value;
-    let damageType = data.action.damage.type.toUpperCase().charAt(0);
-    let element = Helpers.label(data.action.damage.element);
+    this._actionChatData(data, labels, props);
+
     if (data.category === 'range') {
       if (data.range.rc) props.push(`RC ${data.range.rc.value}`);
       const ammo = data.range.ammo;
       const curr = ammo.equipped;
-      if (data.range.range) props.push(data.range.range);
       if (curr.name) props.push(` ${ammo.value}/${ammo.max} ${curr.name}`);
       if (curr.blast.radius) props.push(`${curr.blast.radius}m`);
       if (curr.blast.dropoff) props.push(`${curr.blast.dropoff}/m`);
-      if (data.range.modes) props.push(data.range.modes);
+      if (data.range.modes) props.push(Array.from(Object.entries(data.range.modes)).filter(([key, val]) => val).map(([key, val]) => Helpers.label(key)).join('/'));
+      if (data.range.range) props.push(Array.from(Object.values(data.range.range)).join('/'));
     } else if (data.category === 'melee') {
-      if (data.melee.reach !== '') props.push(`Reach ${data.melee.reach}`);
+      if (data.melee.reach) props.push(`Reach ${data.melee.reach}`);
     } else if (data.category === 'thrown') {
-      if (data.thrown.range !== '') props.push(data.thrown.range);
+      if (data.thrown.range) props.push(data.thrown.range);
       const blast = data.thrown.blast;
-      if (blast.value > 0) props.push(`Blast Radius ${blast.radius}`);
-      if (blast.dropoff !== 0) props.push(`Blast Dropoff ${blast.dropoff}`);
+      if (blast.value) props.push(`Radius ${blast.radius}m`);
+      if (blast.dropoff) props.push(`Dropoff ${blast.dropoff}/m`);
     }
-    if (element && element !== '') props.unshift(element);
-    if (data.action.damage.attribute) dv += this.actor.data.data.attributes[data.action.damage.attribute].value;
-    props.unshift(`DV ${dv}${damageType}`, `AP ${ap}`, `Acc ${acc}`);
-    labels['roll'] = 'Attack';
-    labels['opposedRoll'] = 'Defend';
   }
 
   _adept_powerChatData(data, labels, props) {
+    this._actionChatData(data, labels, props);
+    this._
     props.push(`PP ${data.pp}`);
     props.push(Helpers.label(data.type));
     if (data.type === 'active') {
       props.push(`${Helpers.label(data.action.type)} Action`);
     }
-    labels['roll'] = 'Roll';
   }
 
   addWeaponMod() {
@@ -300,6 +316,27 @@ export class SR5Item extends Item {
     this.update(data);
   }
 
+  rollOpposedTest(target, ev) {
+    const itemData = this.data.data;
+    let options = {event: ev};
+
+    if (this.data.type === 'weapon' && this.data.data.category === 'range' && itemData.range.previousFireMode) {
+      let mod = Helpers.mapRoundsToDefenseMod(itemData.range.previousFireMode);
+      options.fireModeDefense = mod;
+      options.cover = true;
+    }
+
+    const opposed = itemData.action.opposed;
+    if (opposed.type === 'defense') target.rollDefense(options);
+    if (opposed.type === 'soak') target.rollSoak(options);
+    if (opposed.type === 'armor') target.rollSoak(options);
+    else {
+      if (opposed.skill && opposed.attribute) target.rollSkill(opposed.skill, {...options, attribute: opposed.attribute});
+      if (opposed.attribute && opposed.attribute2) target.rollTwoAttributes([opposed.attribute, opposed.attribute2], options);
+      else if (opposed.attribute) target.rollSingleAttribute(opposed.attribute, options);
+    }
+  }
+
   rollTest(ev) {
     const itemData = this.data.data;
     const actorData = this.actor.data.data;
@@ -308,85 +345,79 @@ export class SR5Item extends Item {
     let attribute = actorData.attributes[itemData.action.attribute];
     let attribute2 = actorData.attributes[itemData.action.attribute2];
     let limit = parseInt(itemData.action.limit.value);
-    let limit_att = itemData.action.limit.attribute;
     let spec = itemData.action.spec ? 2 : 0;
     let mod = parseInt(itemData.action.mod || 0);
 
-    let count = skill.value + attribute.value + spec + mod;
-    let title = `${Helpers.label(skill.label)} + ${Helpers.label(attribute.label)}`;
+    // only check if attribute2 is set if skill is not set
+    let count = 0;
+    if (skill) count = skill.value + attribute.value;
+    else if (attribute2) count = attribute.value + attribute2.value;
+    else if (attribute) count = attribute.value;
+    count += spec + mod;
 
-    if (this.data.type === 'weapon') {
-      if (itemData.category === 'thrown') limit = actorData.limits.physical.value;
-      if (itemData.category === 'range') {
-        let fireMode = this._previousFireMode;
-        let rc = parseInt(itemData.range.rc.value) + parseInt(actorData.recoil_compensation);
-        let dialogData = {
-          fireMode: fireMode,
-          rc: rc,
-          ammo: itemData.range.ammo
+    let title = `${Helpers.label(skill.label)} + ${Helpers.label(attribute.label)}`;
+    title = this.data.data.name;
+
+    if ((this.data.type === 'weapon' || this.data.type === 'cyberware') && itemData.category === 'range') {
+      let fireMode = itemData.range.previousFireMode;
+      let rc = parseInt(itemData.range.rc.value) + parseInt(actorData.recoil_compensation);
+      let dialogData = {
+        fireMode: fireMode,
+        rc: rc,
+        ammo: itemData.range.ammo
+      };
+      return renderTemplate('systems/shadowrun5e/templates/rolls/range-weapon-roll.html', dialogData).then(dlg => {
+        const buttons = {};
+        let ranges = itemData.range.range;
+        let environmental = true;
+        buttons['short'] = {
+          label: `Short (${ranges.short})`
         };
-        return renderTemplate('systems/shadowrun5e/templates/rolls/range-weapon-roll.html', dialogData).then(dlg => {
-          const buttons = {};
-          let ranges = itemData.range.range.split('/');
-          let environmental = true;
-          if (ranges.length !== 4) {
-            ranges = ['','','',''];
-          }
-          buttons['short'] = {
-            label: `Short (${ranges[0]})`
-          };
-          buttons['medium'] = {
-            label: `Medium (${ranges[1]})`,
-            callback: () => environmental = 1
-          };
-          buttons['long'] = {
-            label: `Long (${ranges[2]})`,
-            callback: () => environmental = 3
-          };
-          buttons['extreme'] = {
-            label: `Extreme (${ranges[3]})`,
-            callback: () => environmental = 6
-          };
-          new Dialog({
-            title: title,
-            content: dlg,
-            buttons: buttons,
-            close: (html) => {
-              const fireMode = parseInt(html.find('[name="fireMode"]').val())
-              title = this.data.name;
-              if (fireMode) {
-                title += ` - Defender (${Helpers.mapRoundsToDefenseMod(fireMode)})`
-                this._previousFireMode = fireMode;
-              }
-              if (fireMode > rc) count -= (fireMode - rc);
-              DiceSR.d6({
-                event: ev,
-                count: count,
-                actor: this.actor,
-                limit: limit,
-                title: title,
-                dialogOptions: {
-                  environmental: environmental
-                },
-                after: () => {
-                  const dupData = duplicate(this.data);
-                  const ammo = dupData.data.range.ammo;
-                  ammo.value = Math.max(0, ammo.value - fireMode);
-                  this.update(dupData);
-                }
-              });
+        buttons['medium'] = {
+          label: `Medium (${ranges.medium})`,
+          callback: () => environmental = 1
+        };
+        buttons['long'] = {
+          label: `Long (${ranges.long})`,
+          callback: () => environmental = 3
+        };
+        buttons['extreme'] = {
+          label: `Extreme (${ranges.extreme})`,
+          callback: () => environmental = 6
+        };
+        new Dialog({
+          title: title,
+          content: dlg,
+          buttons: buttons,
+          close: (html) => {
+            const fireMode = parseInt(html.find('[name="fireMode"]').val())
+            title = this.data.name;
+            if (fireMode) {
+              title += ` - Defender (${Helpers.mapRoundsToDefenseDesc(fireMode)})`
             }
-          }).render(true);
-        });
-      } else {
-        return DiceSR.d6({
-          event: ev,
-          count: count,
-          actor: this.actor,
-          limit: limit,
-          title: title
-        });
-      }
+            if (fireMode > rc) count -= (fireMode - rc);
+            DiceSR.d6({
+              event: ev,
+              count: count,
+              actor: this.actor,
+              limit: limit,
+              title: title,
+              dialogOptions: {
+                environmental: environmental
+              },
+              after: () => {
+                const dupData = duplicate(this.data);
+                const range = dupData.data.range;
+                range.previousFireMode = fireMode;
+                const ammo = range.ammo;
+                ammo.value = Math.max(0, ammo.value - fireMode);
+                this.update(dupData);
+                console.log('after');
+              }
+            });
+          }
+        }).render(true);
+      });
     } else if (this.data.type === 'spell') {
       let dialogData = {
         drain: (itemData.drain >= 0 ? `+${itemData.drain}` : itemData.drain),
@@ -413,6 +444,7 @@ export class SR5Item extends Item {
             limit = force;
             DiceSR.d6({
               event: ev,
+              environmental: true,
               count: count,
               actor: this.actor,
               limit: limit,
@@ -425,36 +457,16 @@ export class SR5Item extends Item {
           }
         }).render(true);
       });
-    } else if (this.data.type === 'adept_power' || this.data.type === 'critter_power') {
-      title = this.data.name;
-      if (!limit || limit === 0) {
-        limit = actorData.limits[attribute.limit].value;
-      }
-      if (this.data.data.action.category === 'att+att') {
-        count = attribute.value + attribute2.value + spec + mod;
-        limit = undefined;
-      }
+    } else {
       return DiceSR.d6({
         event: ev,
         count: count,
-        actor: this.actor,
-        limit: limit,
-        title: title
-      });
-    } else if (this.data.type === 'action') {
-      title = this.data.name;
-      if (limit_att) {
-        limit = actorData.limits[limit_att].value;
-      }
-      return DiceSR.d6({
-        event: ev,
-        count: count,
+        environmental: true,
         actor: this.actor,
         limit: limit,
         title: title
       });
     }
-
   }
 
   static chatListeners(html) {
@@ -464,8 +476,11 @@ export class SR5Item extends Item {
             messageId = button.parents('.message').data('messageId'),
             senderId = game.messages.get(messageId).user._id,
             card = button.parents('.chat-card');
+      button.disabled = true;
+      const action = button.data('action');
 
-      if ( !game.user.isGM && (game.user._id !== senderId )) return;
+      let opposedRoll = action === 'opposed-roll';
+      if (!opposedRoll && !game.user.isGM && (game.user._id !== senderId )) return;
 
       let actor;
       const tokenKey = card.data('tokenId');
@@ -487,14 +502,29 @@ export class SR5Item extends Item {
       const itemId = Number(card.data('itemId'));
       const item = actor.getOwnedItem(itemId);
 
-      const action = button.data('action');
       if (action === 'roll') item.rollTest(ev);
+      if (opposedRoll) {
+        let targets = this._getChatCardTargets(card);
+        for (let t of targets) {
+          item.rollOpposedTest(t, ev);
+        }
+      }
 
+      button.disabled = false;
     });
     html.on('click', '.card-header', ev => {
       ev.preventDefault();
       $(ev.currentTarget).siblings('.card-content').toggle();
     });
     $(html).find('.card-content').hide();
+  }
+
+ static _getChatCardTargets(card) {
+    const character = game.user.character;
+    const controlled = canvas.tokens.controlled;
+    const targets = controlled.reduce((arr, t) => t.actor ? arr.concat([t.actor]) : arr, []);
+    if ( character && (controlled.length === 0) ) targets.push(character);
+    if ( !targets.length ) throw new Error(`You must designate a specific Token as the roll target`);
+    return targets;
   }
 }

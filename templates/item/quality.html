@@ -1,20 +1,22 @@
 <form class="{{cssClass}}" autocomplete="off">
-  <div class="flexrow align-start">
-    {{> "systems/shadowrun5e/templates/item/parts/item-left.html" }}
-    <div class="flexcol">
-      {{> "systems/shadowrun5e/templates/item/parts/item-header.html" }}
-      <div class="attributes smooth">
-        <div class="attribute">
-          <select name="data.type" class="display">
-            {{#select data.type}}
-            {{#each config.quality.types}}
-            <option value="{{this}}">{{toHeaderCase this}}</option>
-            {{/each}}
-            {{/select}}
-          </select>
+  <div class="flexcol">
+    {{> "systems/shadowrun5e/templates/item/parts/header.html" }}
+    <div class="flexrow align-start">
+      <div class="flexcol flex0">
+        <div class="technology">
+          <div class="flexrow nowrap">
+            <label>Type</label>
+            <select name="data.type" class="display">
+              {{#select data.type}}
+              {{#each config.quality.types}}
+              <option value="{{this}}">{{toHeaderCase this}}</option>
+              {{/each}}
+              {{/select}}
+            </select>
+          </div>
         </div>
       </div>
-      {{> "systems/shadowrun5e/templates/item/parts/item-description.html"}}
+      {{> "systems/shadowrun5e/templates/item/parts/description.html"}}
     </div>
   </div>
 </form>

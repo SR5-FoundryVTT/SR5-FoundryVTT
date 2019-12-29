@@ -1,40 +1,47 @@
 <form class="{{cssClass}}" autocomplete="off">
-  <div class="flexrow align-start">
-    {{> "systems/shadowrun5e/templates/item/parts/item-left.html" }}
-    <div class="flexcol">
-      {{> "systems/shadowrun5e/templates/item/parts/item-header.html" spec=true}}
-      <div class="attributes smooth">
-        <div class="attribute row">
-          <h4 class="attribute-name">Power Points</h4>
-          <h3 class="attribute-input-container">
-            <input
-              class="display attribute-input"
-              type="text"
-              maxlength="3"
-              size="3"
-              name="data.pp"
-              value="{{data.pp}}"
-              data-dtype="Number"
-              placeholder="1"/>
-          </h3>
+  <div class="flexcol">
+    {{> "systems/shadowrun5e/templates/item/parts/header.html"}}
+    <nav class="tabs" data-group="primary">
+      <a class="item" data-tab="description">Description</a>
+      <a class="item" data-tab="action">Action</a>
+    </nav>
+    <div class="tab" data-group="primary" data-tab="description">
+      <div class="flexrow align-start">
+        <div class="flexcol flex0">
+          <div class="technology">
+            <div class="flexrow nowrap">
+              <label>PowerPoints</label>
+              <input
+                class="display"
+                type='text'
+                size='2'
+                maxlength='2'
+                name='data.pp'
+                value='{{data.pp}}'
+                data-dtype='Number'
+                placeholder='1' />
+            </div>
+            <div class="flexrow nowrap">
+              <label>Level</label>
+              <input
+                class="display"
+                type='text'
+                size='2'
+                maxlength='2'
+                name='data.level'
+                value='{{data.level}}'
+                data-dtype='Number'
+                placeholder='1' />
+            </div>
+          </div>
         </div>
-        <div class="attribute row">
-          <h4 class="attribute-name">Level</h4>
-          <h3 class="attribute-input-container">
-            <input
-              class="display attribute-input"
-              type="text"
-              maxlength="3"
-              size="3"
-              name="data.level"
-              value="{{data.level}}"
-              data-dtype="Number"
-              placeholder="1"/>
-          </h3>
-        </div>
+        {{> "systems/shadowrun5e/templates/item/parts/description.html"}}
       </div>
-      {{> "systems/shadowrun5e/templates/item/parts/power-body.html"}}
-      {{> "systems/shadowrun5e/templates/item/parts/item-description.html"}}
+    </div>
+    <div class="tab" data-group="primary" data-tab="action">
+      {{> "systems/shadowrun5e/templates/item/parts/action.html" header="Test Details"}}
+      {{> "systems/shadowrun5e/templates/item/parts/damage.html" header="Damage"}}
+      {{> "systems/shadowrun5e/templates/item/parts/opposed.html" header="Opposed Test"}}
     </div>
   </div>
 </form>

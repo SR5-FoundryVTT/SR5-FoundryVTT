@@ -1,0 +1,39 @@
+@mixin rollable {
+  &:hover {
+    text-shadow: 0 0 .2em $rollcolor;
+    cursor: pointer;
+  }
+}
+
+@mixin nodesto {
+  font-family: $nodesto;
+}
+
+@mixin title {
+  font-size: 120%;
+  font-family: $nodesto;
+}
+
+@mixin textOutline {
+  color: $inner-color;
+  text-shadow: 
+    -1px -1px 0 $outline-color,
+    1px -1px 0 $outline-color,
+    -1px 1px 0 $outline-color,
+    1px 1px 0 $outline-color;
+}
+
+
+@mixin shortUnder {
+  position: relative;
+  &:after {
+    content: '';
+    display: block;
+    position: absolute;
+    width: 50%;
+    transform: translateX(50%);
+    border-bottom: $border-under;
+  }
+}
+
+

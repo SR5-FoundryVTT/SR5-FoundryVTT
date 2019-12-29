@@ -1,0 +1,25 @@
+<div class="item-header">
+  <div class="item-image">
+    <img src="{{item.img}}" title"{{item.name}}" data-edit="img" width="80" height="80"/>
+  </div>
+  <div class="item-info">
+    <div class="flexrow">
+      <div class="item-name">
+        <input type="text" class="display" name="name" value='{{item.name}}' placeholder="Item Name" />
+      </div>
+      <div class="item-type">
+        {{toHeaderCase item.type}}
+      </div>
+    </div>
+    <div class="flexrow">
+      <input
+        class="display"
+        type='text'
+        name='data.description.source'
+        value='{{data.description.source}}'
+        placeholder='Source' />
+    </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,5 +1,12 @@
 export class Helpers {
   static mapRoundsToDefenseMod(rounds) {
+    if (rounds === 1) return 0;
+    if (rounds === 3) return -2;
+    if (rounds === 6) return -5;
+    if (rounds === 10) return -9;
+    return 0;
+  }
+  static mapRoundsToDefenseDesc(rounds) {
     if (rounds === 1) return "No Mod";
     if (rounds === 3) return "-2 Mod";
     if (rounds === 6) return "-5 Mod";

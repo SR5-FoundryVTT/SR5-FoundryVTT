@@ -1,269 +1,30 @@
 <form class="{{cssClass}}" autocomplete="off">
-  <div class="flexrow align-start nowrap">
-    {{> "systems/shadowrun5e/templates/item/parts/item-left.html" }}
-    <div class="flexcol">
-      {{> "systems/shadowrun5e/templates/item/parts/item-header.html" spec=true categories=config.weapon.categories}}
-      {{#ife data.category config.weapon.categories.RANGE}}
+  <div class="flexcol">
+    {{> "systems/shadowrun5e/templates/item/parts/header.html"}}
+    <nav class="tabs" data-group="primary">
+      <a class="item" data-tab="description">Description</a>
+      <a class="item" data-tab="weapon">Weapon</a>
+      {{#ife data.category "range"}}
+      <a class="item" data-tab="ammo">Ammo/Mods</a>
       {{/ife}}
-      <div class="attributes smooth">
-        <div class="attribute">
-          <div class="attribute-name">Damage</div>
-          <div class="track">
-            <div class="attribute-input-container">
-              <input
-                class="display attribute-input"
-                type="text"
-                maxlength="2"
-                size="2"
-                name="data.action.damage.base"
-                value="{{data.action.damage.base}}"
-                data-dtype="Number"
-                placeholder="1"/>
-            </div>
-            {{#ife data.category config.weapon.categories.MELEE}}
-            {{#if data.action.damage.attribute}}
-            +
-            {{/if}}
-            <select name="data.action.damage.attribute" class='display'>
-            {{#select data.action.damage.attribute}}
-              <option value=""></option>
-              {{#each config.attributes as |label id|}}
-              <option value="{{label}}">{{toHeaderCase label}}</option>
-              {{/each}}
-            {{/select}}
-            </select>
-            {{/ife}}
-            {{#ifne data.action.damage.base data.action.damage.value}}
-            <div class="track-max-value">({{data.action.damage.value}})</div>
-            {{/ifne}}
-          </div>
-        </div>
-        <div class="attribute">
-          <div class="attribute-name">AP</div>
-          <div class="track">
-            <div class="attribute-input-container">
-              <input
-                class="display attribute-input"
-                type="text"
-                maxlength="2"
-                size="2"
-                name="data.action.damage.ap.base"
-                value="{{data.action.damage.ap.base}}"
-                data-dtype="Number"
-                placeholder="1"/>
-            </div>
-            {{#ifne data.action.damage.ap.base data.action.damage.ap.value}}
-            <div class="track-max-value">({{data.action.damage.ap.value}})</div>
-            {{/ifne}}
-          </div>
-        </div>
-        <div class="attribute">
-          <div class="attribute-name">Acc</div>
-          <div class="track">
-            <div class="attribute-input-container">
-              <input
-                class="display attribute-input"
-                type="text"
-                maxlength="2"
-                size="2"
-                name="data.action.limit.base"
-                value="{{data.action.limit.base}}"
-                data-dtype="Number"
-                placeholder="1"/>
-            </div>
-            {{#ifne data.action.limit.base data.action.limit.value}}
-            <div class="track-max-value">({{data.action.limit.value}})</div>
-            {{/ifne}}
-          </div>
-        </div>
-        {{#ife data.category config.weapon.categories.THROWN}}
-        <div class="attribute">
-          <div class="attribute-name">Blast</div>
-          <div class="attribute-input-container">
-            <input
-              class="display attribute-input"
-              type="text"
-              maxlength="2"
-              size="2"
-              name="data.thrown.blast.radius"
-              value="{{data.thrown.blast.radius}}"
-              data-dtype="Number"
-              placeholder="1"/>
-          </div>
-        </div>
-        <div class="attribute flex2">
-          <div class="attribute-name">Dropoff</div>
-          <div class="track">
-            <div class="attribute-input-container">
-              <input
-                class="display attribute-input"
-                size='3'
-                maxlength='3'
-                type='text'
-                name='data.thrown.blast.dropoff'
-                value='{{data.thrown.blast.dropoff}}'
-                data-dtype='Number'
-                placeholder='-1'/>
-            </div>
-            <div class="track-slash">
-            </div>
-            <div class="track-max-value">m</div>
-          </div>
-        </div>
-        {{/ife}}
-        {{#ife data.category config.weapon.categories.MELEE}}
-        <div class="attribute">
-          <div class="attribute-name">Reach</div>
-          <div class="attribute-input-container">
-            <input
-              class="display attribute-input"
-              type="text"
-              maxlength="2"
-              size="2"
-              name="data.melee.reach"
-              value="{{data.melee.reach}}"
-              data-dtype="Number"
-              placeholder="1"/>
-          </div>
-        </div>
-        {{/ife}}
-        {{#ife data.category config.weapon.categories.RANGE}}
-        <div class="attribute">
-          <div class="attribute-name">RC</div>
-          <div class="track">
-            <div class="attribute-input-container">
-              <input
-                class="display attribute-input"
-                type="text"
-                maxlength="2"
-                size="2"
-                name='data.range.rc.base'
-                value='{{data.range.rc.base}}'
-                data-dtype="Number"
-                placeholder="1"/>
-            </div>
-            {{#ifne data.range.rc.base data.range.rc.value}}
-            <div class="track-max-value">({{data.range.rc.value}})</div>
-            {{/ifne}}
-          </div>
-        </div>
-        <div class="attribute">
-          <div class="attribute-name roll ammo-reload">Ammo</div>
-          <div class="track">
-            <div class="attribute-input-container">
-              <input
-                class="display attribute-input"
-                size='2'
-                maxlength='2'
-                type='text'
-                name='data.range.ammo.value'
-                value='{{data.range.ammo.value}}'
-                data-dtype='Number'
-                placeholder='0'/>
-            </div>
-            <div class="track-slash">
-            </div>
-            <div class="attribute-input-container">
-              <input
-                class="display attribute-input"
-                size='2'
-                maxlength='2'
-                type='text'
-                name='data.range.ammo.max'
-                value="{{data.range.ammo.max}}"
-                data-dtype="Number"
-                placeholder='Max'/>
-            </div>
-          </div>
-        </div>
-        {{/ife}}
-      </div>
-      <div class="attributes smooth">
-        <div class="attribute">
-          <select name="data.action.damage.type" class="display">
-            {{#select data.action.damage.type}}
-            {{#each config.damageTypes}}
-            <option value="{{this}}">{{toHeaderCase this}}</option>
-            {{/each}}
-            {{/select}}
-          </select>
-        </div>
-        {{#ife data.category config.weapon.categories.RANGE}}
-        <div class="attribute">
-          <div class="attribute-input-container">
-            <input
-               class="display attribute-input"
-               size='15'
-               maxlength='15'
-               type='text'
-               name='data.range.modes'
-               value="{{data.range.modes}}"
-               placeholder="Modes" />
-          </div>
-        </div>
-        <div class="attribute">
-          <div class="attribute-input-container">
-            <input
-               class="display attribute-input"
-               size='15'
-               maxlength='15'
-               type='text'
-               name='data.range.range'
-               value="{{data.range.range}}"
-               placeholder="Ranges" />
-          </div>
-        </div>
-        {{/ife}}
-        {{#ifne data.category config.weapon.categories.THROWN}}
-        <div class="attribute">
-          <select name="data.action.skill" class="display">
-            {{#select data.action.skill}}
-            {{#ife data.category config.weapon.categories.RANGE}}
-            {{#each config.rangeWeapon.skills}}
-            <option value="{{this}}">{{toHeaderCase this}}</option>
-            {{/each}}
-            {{/ife}}
-            {{#ife data.category config.weapon.categories.MELEE}}
-            {{#each config.meleeWeapon.skills}}
-            <option value="{{this}}">{{toHeaderCase this}}</option>
-            {{/each}}
-            {{/ife}}
-            {{/select}}
-          </select>
-        </div>
-        {{/ifne}}
-        <div class="attribute">
-          <div class="attribute-input-container">
-            <input
-               class="display attribute-input"
-               size='4'
-               maxlength='3'
-               type='text'
-               name='data.action.mod'
-               value="{{data.action.mod}}"
-               placeholder="+Mod" />
-          </div>
-        </div>
-      </div>
-      <nav class="tabs" data-group="primary">
-        <a class="item" data-tab="description">Description</a>
-        {{#ife data.category config.weapon.categories.RANGE}}
-        <a class="item" data-tab="ammo">Ammo</a>
-        <a class="item" data-tab="mods">Mods</a>
-        {{/ife}}
-      </nav>
-
-      <div class="tab" data-group="primary" data-tab="description">
-        {{> "systems/shadowrun5e/templates/item/parts/item-description.html"}}
-      </div>
-      {{#ife data.category config.weapon.categories.RANGE}}
-      <div class="tab" data-group="primary" data-tab="ammo">
-        {{> "systems/shadowrun5e/templates/item/parts/ammo.html"}}
-      </div>
-      <div class="tab" data-group="primary" data-tab="mods">
-        {{> "systems/shadowrun5e/templates/item/parts/weapon-mods.html"}}
-      </div>
-      {{/ife}}
+    </nav>
+    <div class="tab" data-group="primary" data-tab="weapon">
+      {{> "systems/shadowrun5e/templates/item/parts/weapon.html" header="Weapon"}}
+      {{> "systems/shadowrun5e/templates/item/parts/action.html" header="Attack"}}
+      {{> "systems/shadowrun5e/templates/item/parts/damage.html" header="Damage"}}
+      {{> "systems/shadowrun5e/templates/item/parts/opposed.html" header="Opposed Test"}}
     </div>
+    <div class="tab" data-group="primary" data-tab="description">
+      <div class="flexrow align-start nowrap">
+        {{> "systems/shadowrun5e/templates/item/parts/technology.html" }}
+        {{> "systems/shadowrun5e/templates/item/parts/description.html"}}
+      </div>
+    </div>
+    {{#ife data.category "range"}}
+    <div class="tab" data-group="primary" data-tab="ammo">
+      {{> "systems/shadowrun5e/templates/item/parts/ammo.html"}}
+      {{> "systems/shadowrun5e/templates/item/parts/weapon-mods.html"}}
+    </div>
+    {{/ife}}
   </div>
 </form>

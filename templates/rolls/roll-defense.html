@@ -1,0 +1,35 @@
+<form>
+  <div class="form-group">
+    <label>Defense Pool</label>
+    <input
+       type="text"
+       value="{{defense}}"
+       name="defense"
+       disabled />
+  </div>
+  {{#if fireMode}}
+  <div class="form-group">
+    <label>Fire Mode</label>
+    <select name="fireMode">
+    {{#select fireMode}}
+      <option value="0">(-0) SingleShot/SemiAuto</option>
+      <option value="-2">(-2) ShortBurst/BurstFire</option>
+      <option value="-5">(-5) LongBurst/FullAuto(simple)</option>
+      <option value="-9">(-9) FullAuto(complex)</option>
+    {{/select}}
+    </select>
+  </div>
+  {{/if}}
+  {{#if cover}}
+  <div class="form-group">
+    <label>Cover</label>
+    <select name="cover">
+    {{#select cover}}
+      <option value="0">No Cover</option>
+      <option value="2">(+2) Partial Cover</option>
+      <option value="4">(+4) Good Cover</option>
+    {{/select}}
+    </select>
+  </div>
+  {{/if}}
+</form>

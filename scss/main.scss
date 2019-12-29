@@ -1,74 +1,10 @@
+@import "config.scss";
+@import "item.scss";
+
 @font-face {
   font-family: "Nodesto";
   src: url('../fonts/NodestoCapsCondensed.otf');
 }
-
-$nodesto: "Nodesto", "Signika", "Palatino Linotype", serif;
-
-$black: black;
-$green: green;
-$red: red;
-$grey: grey;
-$white: white;
-$darkblue: darkblue;
-$crimson: crimson;
-$darkred: darkred;
-$light: darken($white, 10%);
-$dark: darken($grey, 20%);
-
-$rollcolor: $grey;
-
-$color: $black;
-$inner-color: $black;
-$outline-color: rgba($grey, 0.5);
-
-$groove-width: 2px;
-$groove-color: $white;
-$groove: $groove-width groove $groove-color;
-$radius: .25em;
-
-$border-under: 1px groove $groove-color;
-
-$sheetbackground: url("../ui/parchment.jpg") repeat;
-
-@mixin rollable {
-  &:hover {
-    text-shadow: 0 0 .2em $rollcolor;
-    cursor: pointer;
-  }
-}
-
-@mixin nodesto {
-  font-family: $nodesto;
-}
-
-@mixin title {
-  font-size: 120%;
-  font-family: $nodesto;
-}
-
-@mixin textOutline {
-  color: $inner-color;
-  text-shadow: 
-    -1px -1px 0 $outline-color,
-    1px -1px 0 $outline-color,
-    -1px 1px 0 $outline-color,
-    1px 1px 0 $outline-color;
-}
-
-
-@mixin shortUnder {
-  position: relative;
-  &:after {
-    content: '';
-    display: block;
-    position: absolute;
-    width: 50%;
-    transform: translateX(50%);
-    border-bottom: $border-under;
-  }
-}
-
 .roll {
   @include rollable;
 }
@@ -616,30 +552,6 @@ select.display {
           padding-right: 0;
         }
       }
-    }
-  }
-  &.item {
-    .item-name-input {
-      @include title;
-      font-size: 1.5em;
-    }
-    .technology {
-      @include nodesto;
-      > * {
-        display: flex;
-        flex-flow: row nowrap;
-        justify-content: space-between;
-      }
-      border-right: $groove;
-      border-bottom: $groove;
-    }
-    .description {
-      padding: 2px;
-      height: 100%;
-      min-height: 16em;
-      border: $groove;
-      margin-left: -$groove-width;
-      overflow-y: auto;
     }
   }
   &.actor {

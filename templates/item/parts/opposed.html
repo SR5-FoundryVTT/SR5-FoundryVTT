@@ -1,0 +1,67 @@
+<div class="item-form">
+  <div class="header">
+    {{header}}
+  </div>
+  <div class="form-line">
+    <div class="label">
+      Type
+    </div>
+    <div class="inputs">
+      <select name="data.action.opposed.type">
+      {{#select data.action.opposed.type}}
+      <option value=""></option>
+      <option value="defense">Defense</option>
+      <option value="soak">Soak</option>
+      <option value="armor">Armor</option>
+      <option disabled>-----</option>
+      <option value="custom">Custom</option>
+      {{/select}}
+      </select>
+    </div>
+  </div>
+  {{#ife data.action.opposed.type "custom"}}
+  <div class="form-line">
+    <div class="label">
+      Skill
+    </div>
+    <div class="inputs">
+      <select name="data.action.opposed.skill">
+      {{#select data.action.opposed.skill}}
+        <option value=""></option>
+        {{#each config.skills.categories as |cat cid|}}
+        <option disabled>{{cat.label}}</option>
+        {{#each cat.skills as |skill sid|}}
+        <option value="{{skill}}">{{toHeaderCase skill}}</option>
+        {{/each}}
+        {{/each}}
+      {{/select}}
+      </select>
+    </div>
+  </div>
+  <div class="form-line">
+    <div class="label">
+      Attribute
+    </div>
+    <div class="inputs">
+      <select name="data.action.opposed.attribute">
+      {{#select data.action.opposed.attribute}}
+        <option value=""></option>
+        {{#each config.attributes as |label l|}}
+        <option value="{{label}}">{{toHeaderCase label}}</option>
+        {{/each}}
+      {{/select}}
+      </select>
+      {{#unless data.action.opposed.skill}}
+      <select name="data.action.opposed.attribute2">
+      {{#select data.action.opposed.attribute2}}
+        <option value=""></option>
+        {{#each config.attributes as |label l|}}
+        <option value="{{label}}">{{toHeaderCase label}}</option>
+        {{/each}}
+      {{/select}}
+      </select>
+      {{/unless}}
+    </div>
+  </div>
+  {{/ife}}
+</div>

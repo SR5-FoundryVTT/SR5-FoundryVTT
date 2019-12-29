@@ -1,0 +1,167 @@
+<div class="item-form">
+  <div class="header">
+    {{header}}
+  </div>
+  <div class="form-line">
+    <div class="label">
+      Category
+    </div>
+    <div class="inputs">
+      <select name="data.category">
+        {{#select data.category}}
+        <option value=""></option>
+        <option value="combat">Combat</option>
+        <option value="detection">Detection</option>
+        <option value="health">Health</option>
+        <option value="illusion">Illusion</option>
+        <option value="manipulation">Manipulation</option>
+        {{/select}}
+      </select>
+    </div>
+  </div>
+  {{#if data.category}}
+  <div class="form-line">
+    <div class="label">
+      Type
+    </div>
+    <div class="inputs">
+      <select name="data.type">
+        {{#select data.type}}
+        {{#each config.spell.types}}
+        <option value="{{this}}">{{toHeaderCase this}}</option>
+        {{/each}}
+        {{/select}}
+      </select>
+    </div>
+  </div>
+  <div class="form-line">
+    <div class="label">
+      Range
+    </div>
+    <div class="inputs">
+      <select name="data.range">
+        {{#select data.range}}
+        {{#each config.spell.ranges}}
+        <option value="{{this}}">{{toHeaderCase this}}</option>
+        {{/each}}
+        {{/select}}
+      </select>
+    </div>
+  </div>
+  <div class="form-line">
+    <div class="label">
+      Duration
+    </div>
+    <div class="inputs">
+      <select name="data.duration">
+        {{#select data.duration}}
+        {{#each config.spell.duration}}
+        <option value="{{this}}">{{toHeaderCase this}}</option>
+        {{/each}}
+        {{/select}}
+      </select>
+    </div>
+  </div>
+  <div class="form-line">
+    <div class="label">
+      Drain
+    </div>
+    <div class="inputs">
+      <input
+        type="text"
+        maxlength="2"
+        size="2"
+        name="data.drain"
+        value="{{data.drain}}"
+        data-dtype="Number"
+        placeholder="-2"
+        data-dtype="Number"/>
+    </div>
+  </div>
+  {{#ife data.category "combat"}}
+  <div class="form-line">
+    <div class="label">
+      Combat
+    </div>
+    <div class="inputs">
+      <select name="data.combat.type">
+      {{#select data.combat.type}}
+        <option value="direct">Direct</option>
+        <option value="indirect">Indirect</option>
+      {{/select}}
+      </select>
+    </div>
+  </div>
+  {{/ife}}
+  {{#ife data.category "detection"}}
+  <div class="form-line">
+    <div class="label">
+      Detection
+    </div>
+    <div class="inputs between">
+      <select name="data.detection.passive" data-dtype="Boolean">
+      {{#select data.detection.passive}}
+        <option value="false">Active</option>
+        <option value="true">Passive</option>
+      {{/select}}
+      </select>
+      <select name="data.detection.type">
+        {{#select data.detection.type}}
+        {{#each config.spell.detectionTypes}}
+        <option value="{{this}}">{{toHeaderCase this}}</option>
+        {{/each}}
+        {{/select}}
+      </select>
+      <label class='checkbox'>
+        <input class='display' type='checkbox' name='data.detection.extended' {{checked data.detection.extended}}/>Extended
+      </label>
+    </div>
+  </div>
+  {{/ife}}
+  {{#ife data.category "illusion"}}
+  <div class="form-line">
+    <div class="label">
+      Illusion
+    </div>
+    <div class="inputs between">
+      <select name="data.illusion.type">
+        {{#select data.illusion.type}}
+        {{#each config.spell.illusionTypes}}
+        <option value="{{this}}">{{toHeaderCase this}}</option>
+        {{/each}}
+        {{/select}}
+      </select>
+      <select name="data.illusion.sense">
+        {{#select data.illusion.sense}}
+        {{#each config.spell.illusionSenses}}
+        <option value="{{this}}">{{toHeaderCase this}}</option>
+        {{/each}}
+        {{/select}}
+      </select>
+    </div>
+  </div>
+  {{/ife}}
+  {{#ife data.category "manipulation"}}
+  <div class="form-line">
+    <div class="label">
+      Manipulation
+    </div>
+    <div class="inputs">
+      <label class='checkbox'>
+        Damaging <input class='display' type='checkbox' name='data.manipulation.damaging' {{checked data.manipulation.damaging}}/>
+      </label>
+      <label class='checkbox'>
+        Mental <input class='display' type='checkbox' name='data.manipulation.mental' {{checked data.manipulation.mental}}/>
+      </label>
+      <label class='checkbox'>
+        Environmental <input class='display' type='checkbox' name='data.manipulation.environmental' {{checked data.manipulation.environmental}}/>
+      </label>
+      <label class='checkbox'>
+        Physical <input class='display' type='checkbox' name='data.manipulation.physical' {{checked data.manipulation.physical}}/>
+      </label>
+    </div>
+  </div>
+  {{/ife}}
+  {{/if}}
+</div>
+

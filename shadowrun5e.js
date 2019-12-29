@@ -6,6 +6,7 @@ import { SR5Item } from './module/item/entity.js';
 import { SR5 } from './module/config.js';
 import { Helpers } from './module/helpers.js';
 import { preloadHandlebarsTemplates } from './module/templates.js';
+import { onCombatUpdate } from './module/combat.js';
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -13,17 +14,10 @@ import { preloadHandlebarsTemplates } from './module/templates.js';
 
 Hooks.once("init", async function() {
   console.log("hello world");
-  console.log(`Initializing Simple Worldbuilding System`);
 
   CONFIG.SR5 = SR5;
   CONFIG.Actor.entityClass = SR5Actor;
   CONFIG.Item.entityClass = SR5Item;
-
-  /**
-   * Set an initiative formula for the system
-   * @type {String}
-   */
-  CONFIG.initiative.formula = "@initiative.current.base.value + @initiative.current.dice.text";
 
   await preloadHandlebarsTemplates();
 
@@ -32,6 +26,12 @@ Hooks.once("init", async function() {
   Actors.registerSheet("SR5", SR5ActorSheet, { makeDefault: true });
   Items.unregisterSheet("core", ItemSheet);
   Items.registerSheet("SR5", SR5ItemSheet, { makeDefault: true});
+
+});
+
+Hooks.on('ready', () => {
+  console.log('ON READYYY');
+  game.socket.on("system.shadowrun5e", data => console.log(data));
 });
 
 ['renderSR5ActorSheet', 'renderSR5ItemSheet', 'renderDialog'].forEach(s => {
@@ -40,20 +40,10 @@ Hooks.once("init", async function() {
 
 });
 
+Hooks.on('updateCombat', args => onCombatUpdate(args));
+
 Hooks.on('renderChatMessage', (app, html, data) => SR5Item.chatListeners(html));
 
-Hooks.on('updateCombat', (args) => {
-  console.log('previous' + JSON.stringify(args.previous));
-  console.log('current' + JSON.stringify(args.current));
-  if (args.previous.round && args.previous.round < args.current.round) {
-    console.log('hello');
-    // subtact 10 from all initiative, we just went into the next initiative pass
-    const combatants = args.data.combatants;
-    combatants.forEach(c => c.initiative -= 10);
-    args.data.combatants = combatants.filter(c => c.initiative > 0);
-    args.turns = combatants;
-  }
-});
 
 Handlebars.registerHelper("toHeaderCase", function(str) {
   if (str) return Helpers.label(str);

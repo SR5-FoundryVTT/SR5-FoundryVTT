@@ -1,7 +1,4 @@
 <div class="flexcol flex0">
-  <div class="profile-img flex0">
-    <img src="{{item.img}}" title"{{item.name}}" data-edit="img" width="80" height="80"/>
-  </div>
   <div class="technology">
     <div class="flexrow nowrap">
       <label>Rating</label>
@@ -47,12 +44,24 @@
         placeholder='2R' />
     </div>
     <div class="flexrow nowrap">
-      <input
-        class="display"
-        type='text'
-        name='data.description.source'
-        value='{{data.description.source}}'
-        placeholder='Source' />
+      <label>ConMon</label>
+      <div class="flexrow">
+        <input
+          class='display'
+          type='text'
+          size='2'
+          maxlength='2'
+          name='data.condition_monitor.value'
+          value='{{data.condition_monitor.value}}'
+          placeholder='0' />
+        <input
+           class="display"
+           type="text"
+           size="3"
+           maxlength="3"
+           value="/{{data.condition_monitor.max}}"
+           disabled />
+      </div>
     </div>
     <div class="flexrow nowrap">
       Equipped<input class="checkbox" type="checkbox" name="data.technology.equipped" {{checked data.technology.equipped}} />

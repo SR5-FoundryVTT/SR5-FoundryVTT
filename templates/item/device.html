@@ -1,119 +1,18 @@
 <form class="{{cssClass}}" autocomplete="off">
-  <div class="flexrow align-start">
-    {{> "systems/shadowrun5e/templates/item/parts/item-left.html" }}
-    <div class="flexcol">
-      {{> "systems/shadowrun5e/templates/item/parts/item-header.html" categories=config.device.categories}}
-      {{#ife data.category config.device.categories.CYBERDECK}}
-      <div class="attributes smooth">
-        <div class="attribute">
-          <div class="attribute-name">
-            <select name="data.atts.att1.att" class="display">
-            {{#select data.atts.att1.att}}
-            {{#each config.matrix.attributes as |label l|}}
-            <option value="{{label}}">{{toHeaderCase label}}</option>
-            {{/each}}
-            {{/select}}
-            </select>
-          </div>
-          <h3 class="attribute-input-container">
-            <input
-              class="display attribute-input"
-              type="text"
-              maxlength="2"
-              size="2"
-              name="data.atts.att1.value"
-              value="{{data.atts.att1.value}}"
-              data-dtype="Number"
-              placeholder="1"/>
-          </h3>
-        </div>
-        <div class="attribute">
-          <div class="attribute-name">
-            <select name="data.atts.att2.att" class="display">
-            {{#select data.atts.att2.att}}
-            {{#each config.matrix.attributes as |label l|}}
-            <option value="{{label}}">{{toHeaderCase label}}</option>
-            {{/each}}
-            {{/select}}
-            </select>
-          </div>
-          <h3 class="attribute-input-container">
-            <input
-              class="display attribute-input"
-              type="text"
-              maxlength="2"
-              size="2"
-              name="data.atts.att2.value"
-              value="{{data.atts.att2.value}}"
-              data-dtype="Number"
-              placeholder="1"/>
-          </h3>
-        </div>
-        <div class="attribute">
-          <div class="attribute-name">
-            <select name="data.atts.att3.att" class="display">
-            {{#select data.atts.att3.att}}
-            {{#each config.matrix.attributes as |label l|}}
-            <option value="{{label}}">{{toHeaderCase label}}</option>
-            {{/each}}
-            {{/select}}
-            </select>
-          </div>
-          <h3 class="attribute-input-container">
-            <input
-              class="display attribute-input"
-              type="text"
-              maxlength="2"
-              size="2"
-              name="data.atts.att3.value"
-              value="{{data.atts.att3.value}}"
-              data-dtype="Number"
-              placeholder="1"/>
-          </h3>
-        </div>
-        <div class="attribute">
-          <div class="attribute-name">
-            <select name="data.atts.att4.att" class="display">
-            {{#select data.atts.att4.att}}
-            {{#each config.matrix.attributes as |label l|}}
-            <option value="{{label}}">{{toHeaderCase label}}</option>
-            {{/each}}
-            {{/select}}
-            </select>
-          </div>
-          <h3 class="attribute-input-container">
-            <input
-              class="display attribute-input"
-              type="text"
-              maxlength="2"
-              size="2"
-              name="data.atts.att4.value"
-              value="{{data.atts.att4.value}}"
-              data-dtype="Number"
-              placeholder="1"/>
-          </h3>
-        </div>
-        <div class="attribute">
-          <h4 class="attribute-name">Con. Mon.</h4>
-          <div class="track">
-            <div class="attribute-input-container">
-              <input
-                class="display track-input"
-                size='2'
-                maxlength='2'
-                type='text'
-                name='data.condition_monitor.value'
-                value="{{track.condition_monitor.value}}"
-                data-dtype="Number"/>
-            </div>
-            <h3 class="track-slash flex0">
-            </h3>
-            <h3 class="track-max-value">{{data.condition_monitor.max}}</h3>
-          </div>
-        </div>
+  <div class="flexcol">
+    {{> "systems/shadowrun5e/templates/item/parts/header.html"}}
+    <nav class="tabs" data-group="primary">
+      <a class="item" data-tab="description">Description</a>
+      <a class="item" data-tab="matrix">Matrix</a>
+    </nav>
+    <div class="tab" data-group="primary" data-tab="description">
+      <div class="flexrow align-start nowrap">
+        {{> "systems/shadowrun5e/templates/item/parts/technology.html" }}
+        {{> "systems/shadowrun5e/templates/item/parts/description.html"}}
       </div>
-      {{/ife}}
-      {{> "systems/shadowrun5e/templates/item/parts/item-description.html"}}
+    </div>
+    <div class="tab" data-group="primary" data-tab="matrix">
+      {{> "systems/shadowrun5e/templates/item/parts/matrix.html"}}
     </div>
   </div>
 </form>

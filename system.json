@@ -10,10 +10,12 @@
   "styles": ["css/main.css"],
   "minimumCoreVersion": "0.4.0",
   "packs": [],
-  "initiative": "5d6",
+  "initiative": "@initiative.current.base.value + @initiative.current.dice.text - @wounds.value",
   "primaryTokenAttribute": "track.physical",
   "secondaryTokenAttribute": "track.stun",
   "gridDistance": 1,
   "gridUnits": "m",
-  "manifest": "https://raw.githubusercontent.com/smilligan93/SR5-FoundryVTT/master/system.json"
+  "socket": true,
+  "manifest": "https://raw.githubusercontent.com/smilligan93/SR5-FoundryVTT/master/system.json",
+  "url": "https://github.com/smilligan93/SR5-FoundryVTT"
 }

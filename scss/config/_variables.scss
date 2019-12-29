@@ -1,0 +1,29 @@
+$nodesto: "Nodesto", "Signika", "Palatino Linotype", serif;
+
+$black: black;
+$green: green;
+$red: red;
+$grey: grey;
+$white: white;
+$darkblue: darkblue;
+$crimson: crimson;
+$darkred: darkred;
+$light: darken($white, 10%);
+$dark: darken($grey, 20%);
+
+$rollcolor: $grey;
+
+$color: $black;
+$inner-color: $black;
+$outline-color: rgba($grey, 0.5);
+
+$groove-width: 2px;
+$groove-color: $white;
+$groove: $groove-width groove $groove-color;
+$radius: .25em;
+
+$border-under: 1px groove $groove-color;
+
+$sheetbackground: url("../ui/parchment.jpg") repeat;
+
+

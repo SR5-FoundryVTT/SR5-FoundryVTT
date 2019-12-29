@@ -41,7 +41,7 @@ export class DiceSR {
     total += parseInt(mod) || 0;
     if (spec) total += 2;
 
-    if (Helpers.hasModifiers(event)) {
+    if (event && Helpers.hasModifiers(event)) {
       total -= wounds;
       if (event[SR5.kbmod.EDGE]) {
         roll(total, undefined, true);

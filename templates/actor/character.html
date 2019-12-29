@@ -140,6 +140,7 @@
                 name="data.attributes.essence.value"
                 value="{{data.attributes.essence.value}}"
                 data-dtype="Number"
+                disabled
                 placeholder="1"/>
             </h3>
           </div>
@@ -167,34 +168,18 @@
       {{/each}}
     </div>
     <div class="attributes">
-      <div class="attribute row">
-        <div title="Defense" class="attribute-name defense-roll roll" data-roll='defense'>Defense</div>
-      </div>
-      <div class="attribute row">
-        <div title="Soak" class="attribute-name soak-roll roll defense-icon" data-soak='default'>Soak</div>
-      </div>
-      <div class="attribute row">
-        <div class="attribute-name roll armor-roll">Armor</div>
-      </div>
-      {{#ifne data.special 'mundane'}}
-      <div class="attribute row">
-        <div class="attribute-name roll drain-roll">Drain</div>
-      </div>
-      {{/ifne}}
-      <div class="attribute row">
-        <div title="Roll" class="attribute-name basic-roll roll defense-icon fas fa-dice-six" data-roll='basic'></div>
-      </div>
-      <div class="attribute row">
+      <div class="attribute row space-around">
         <div class="attribute-only-roll roll attribute-name" data-roll='composure'>Composure</div>
-      </div>
-      <div class="attribute row">
         <div class="attribute-only-roll roll attribute-name" data-roll='judge_intentions'>J.Intentions</div>
-      </div>
-      <div class="attribute row">
         <div class="attribute-only-roll roll attribute-name" data-roll='lift_carry'>Lift&Carry</div>
-      </div>
-      <div class="attribute row">
         <div class="attribute-only-roll roll attribute-name" data-roll='memory'>Memory</div>
+        <div title="Roll" class="attribute-name basic-roll roll defense-icon fas fa-dice-six" data-roll='basic'></div>
+        <div title="Defense" class="attribute-name defense-roll roll">Defense</div>
+        <div title="Soak" class="attribute-name soak-roll roll defense-icon">Soak</div>
+        <div class="attribute-name roll armor-roll">Armor ({{data.armor.value}})</div>
+        {{#ifne data.special 'mundane'}}
+        <div class="attribute-name roll drain-roll">Drain</div>
+        {{/ifne}}
       </div>
     </div>
   </header>

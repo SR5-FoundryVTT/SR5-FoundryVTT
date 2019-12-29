@@ -1,6 +1,6 @@
 {
   "Actor": {
-    "types": ["character", "grunt"],
+    "types": ["character"],
     "templates": {
       "common": {
         "name": "",
@@ -768,51 +768,104 @@
           "overflow": 0
         }
       }
-    },
-    "grunt": {
-      "templates": ["common"],
-      "track": {
-        "physical": {
-          "value": 0,
-          "max": 0
-        }
-      }
     }
   },
   "Item": {
     "types": [
       "spell",
       "armor",
-      "weapon",
       "adept_power",
-      "critter_power",
       "quality",
       "device",
       "cyberware",
       "equipment",
-      "action"
+      "action",
+      "weapon"
     ],
     "templates": {
       "description": {
         "description": {
           "value": "",
           "chat": "",
-          "unidentified": "",
           "source": ""
+        }
+      },
+      "weapon": {
+        "category": "",
+        "range": {
+          "ranges": {
+            "short": 0,
+            "medium": 0,
+            "long": 0,
+            "extreme": 0
+          },
+          "rc": {
+            "value": 0
+          },
+          "modes": {
+            "single_shot": false,
+            "semi-auto": false,
+            "burst-fire": false,
+            "full-auto": false
+          },
+          "mods": [],
+          "ammo": {
+            "enabled": false,
+            "count": {
+              "value": 0,
+              "max": 0
+            },
+            "equipped": {
+              "name": "Regular",
+              "damage": 0,
+              "ap": 0,
+              "blast": {
+                "radius": 0,
+                "dropoff": 0
+              }
+            },
+            "available": [
+              {
+                "equipped": true,
+                "name": "Regular",
+                "damage": 0,
+                "ap": 0,
+                "blast": {
+                  "radius": 0,
+                  "dropoff": 0
+                },
+                "qty": 0
+              }
+            ]
+          }
+        },
+        "melee": {
+          "reach": 0
+        },
+        "thrown": {
+          "range": 0,
+          "blast": {
+            "radius": 0,
+            "dropoff": 0
+          }
         }
       },
       "technology": {
         "technology": {
-          "rating": 1,
+          "rating": 0,
           "availability": "0",
-          "quantity": 1,
+          "quantity": 0,
           "cost": 0,
           "equipped": false
+        },
+        "condition_monitor": {
+          "value": 0,
+          "max": 9
         }
       },
       "action": {
         "action": {
-          "type": "simple",
+          "type": "",
           "category": "",
           "attribute": "",
           "attribute2": "",
@@ -825,7 +878,7 @@
           },
           "extended": false,
           "damage": {
-            "type": "stun",
+            "type": "",
             "element": "",
             "value": 0,
             "ap": {
@@ -834,6 +887,7 @@
             "attribute": ""
           },
           "opposed": {
+            "type": "",
             "attribute": "",
             "attribute2": "",
             "skill": "",
@@ -858,25 +912,23 @@
       "templates": ["description", "armor", "technology"]
     },
     "spell": {
-      "templates": ["description", "technology", "action"],
+      "templates": ["description", "action"],
       "drain": 0,
-      "category": "combat",
-      "type": "physical",
-      "range": "LOS",
-      "area": false,
-      "duration": "instant",
-      "attribute": "logic",
+      "category": "",
+      "type": "",
+      "range": "",
+      "duration": "",
       "combat": {
-        "type": "indirect"
+        "type": ""
       },
       "detection": {
         "passive": false,
-        "type": "directional",
+        "type": "",
         "extended": false
       },
       "illusion": {
-        "type": "realistic",
-        "sense": "single"
+        "type": "",
+        "sense": ""
       },
       "manipulation": {
         "damaging": false,
@@ -886,52 +938,10 @@
       }
     },
     "weapon": {
-      "templates": ["description", "action", "technology"],
-      "category": "range",
-      "range": {
-        "range": "",
-        "rc": 0,
-        "modes": "",
-        "accessories": [],
-        "ammo": {
-          "max": 0,
-          "value": 0,
-          "equipped": {
-            "name": "Regular",
-            "damage": 0,
-            "ap": 0,
-            "blast": {
-              "radius": 0,
-              "dropoff": 0
-            }
-          },
-          "available": [
-            {
-              "equipped": true,
-              "name": "Regular",
-              "damage": 0,
-              "ap": 0,
-              "blast": {
-                "radius": 0,
-                "dropoff": 0
-              }
-            }
-          ]
-        }
-      },
-      "melee": {
-        "reach": 0
-      },
-      "thrown": {
-        "range": 0,
-        "blast": {
-          "radius": 0,
-          "dropoff": 0
-        }
-      }
+      "templates": ["description", "action", "technology", "weapon"]
     },
     "cyberware": {
-      "templates": ["description", "technology", "armor"],
+      "templates": ["description", "technology", "armor", "weapon", "action"],
       "essence": 0
     },
     "adept_power": {
@@ -939,19 +949,14 @@
       "pp": 0,
       "type": "",
       "drain": false,
-      "level": 1
-    },
-    "critter_power": {
-      "templates": ["description", "action", "armor"],
-      "type": ""
+      "level": 0
     },
     "quality": {
       "templates": ["description"],
       "type": "positive"
     },
     "action": {
-      "templates": ["description", "action"],
-      "type": "skill+att"
+      "templates": ["description", "action"]
     },
     "device": {
       "templates": ["description", "technology"],
@@ -973,10 +978,6 @@
           "value": 0,
           "att": "firewall"
         }
-      },
-      "condition_monitor": {
-        "value": 0,
-        "max": 9
       }
     },
     "equipment": {

@@ -7,13 +7,17 @@ export const preloadHandlebarsTemplates = async () => {
     "systems/shadowrun5e/templates/actor/parts/actor-matrix.html",
     "systems/shadowrun5e/templates/actor/parts/actor-actions.html",
     "systems/shadowrun5e/templates/actor/parts/actor-info.html",
-    "systems/shadowrun5e/templates/item/parts/item-description.html",
-    "systems/shadowrun5e/templates/item/parts/item-left.html",
-    "systems/shadowrun5e/templates/item/parts/spell-damage.html",
-    "systems/shadowrun5e/templates/item/parts/spell-body.html",
-    "systems/shadowrun5e/templates/item/parts/power-body.html",
-    "systems/shadowrun5e/templates/item/parts/item-header.html",
+    "systems/shadowrun5e/templates/item/parts/description.html",
+    "systems/shadowrun5e/templates/item/parts/technology.html",
+    "systems/shadowrun5e/templates/item/parts/header.html",
     "systems/shadowrun5e/templates/item/parts/ammo.html",
+    "systems/shadowrun5e/templates/item/parts/action.html",
+    "systems/shadowrun5e/templates/item/parts/damage.html",
+    "systems/shadowrun5e/templates/item/parts/opposed.html",
+    "systems/shadowrun5e/templates/item/parts/spell.html",
+    "systems/shadowrun5e/templates/item/parts/weapon.html",
+    "systems/shadowrun5e/templates/item/parts/armor.html",
+    "systems/shadowrun5e/templates/item/parts/matrix.html",
     "systems/shadowrun5e/templates/item/parts/weapon-mods.html"
   ];
 
