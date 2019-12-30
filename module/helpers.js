@@ -1,4 +1,20 @@
 export class Helpers {
+  static setupCustomCheckbox(html) {
+    const setContent = (el => {
+      console.log(el);
+      let checkbox = $(el).children('input[type=checkbox]');
+      let checkmark = $(el).children('.checkmark');
+      if ($(checkbox).prop('checked')) {
+        $(checkmark).addClass('fa-check-circle');
+        $(checkmark).removeClass('fa-circle');
+      } else {
+        $(checkmark).addClass('fa-circle');
+        $(checkmark).removeClass('fa-check-circle');
+      }
+    });
+    html.find('label.checkbox').each(function(index) { setContent(this) });
+    html.find('label.checkbox').click(event => setContent(event.currentTarget));
+  }
   static mapRoundsToDefenseMod(rounds) {
     if (rounds === 1) return 0;
     if (rounds === 3) return -2;

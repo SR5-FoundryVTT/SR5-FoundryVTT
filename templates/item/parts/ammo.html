@@ -50,16 +50,10 @@
     </div>
     <div class="item-right">
       <div class="item-text rtg">
-        <span
-          class="ammo-equip"
-          data-index='{{@index}}'>
-          {{#if this.equipped}}
-          <i class="far fa-check-circle"></i>
-          {{else}}
-          <i class="far fa-circle"></i>
-          {{/if}}
-        </span>
-        <input class='hidden' type='checkbox' name="data.range.ammo.available.{{@index}}.equipped" {{checked this.equipped}}>
+        <label class="checkbox">
+          <input type='checkbox' name="data.range.ammo.available.{{@index}}.equipped" {{checked this.equipped}}>
+          <span class="checkmark far"></span>
+        </label>
       </div>
       <div class="item-text rtg">
         <input

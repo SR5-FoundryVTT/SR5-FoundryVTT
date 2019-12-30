@@ -97,6 +97,8 @@ export class SR5ItemSheet extends ItemSheet {
     html.find('.mod-equip').click(this._onWeaponModEquip.bind(this));
     html.find('.mod-delete').click(this._onWeaponModRemove.bind(this));
 
+    Helpers.setupCustomCheckbox(html);
+
     // Activate tabs
     let tabs = html.find('.tabs');
     let initial = this._sheetTab;
@@ -132,6 +134,7 @@ export class SR5ItemSheet extends ItemSheet {
   }
 
   async _onAmmoEquip(event) {
+    this._onSubmit(event);
     event.preventDefault();
     this.item.equipAmmo(parseInt(event.currentTarget.dataset.index));
   }

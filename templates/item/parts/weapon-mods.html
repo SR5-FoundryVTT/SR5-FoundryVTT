@@ -41,16 +41,10 @@
     </div>
     <div class="item-right">
       <div class="item-text rtg">
-        <span
-          class="mod-equip"
-          data-index='{{id}}'>
-          {{#if mod.equipped}}
-          <i class="far fa-check-circle"></i>
-          {{else}}
-          <i class="far fa-circle"></i>
-          {{/if}}
-        </span>
-        <input class='hidden' type='checkbox' name="data.range.mods.{{id}}.equipped" {{checked mod.equipped}}>
+        <label class="checkbox">
+          <input type='checkbox' name="data.range.mods.{{id}}.equipped" {{checked mod.equipped}}>
+          <span class="checkmark far"></span>
+        </label>
       </div>
       <div class="item-text rtg">
         <input
