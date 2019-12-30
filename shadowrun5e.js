@@ -34,12 +34,6 @@ Hooks.on('ready', () => {
   game.socket.on("system.shadowrun5e", data => console.log(data));
 });
 
-['renderSR5ActorSheet', 'renderSR5ItemSheet', 'renderDialog'].forEach(s => {
-  Hooks.on(s, (app, html, data) => html.find('input[type="checkbox"]').click(event => app._onSubmit(event)));
-  Hooks.on(s, (app, html, data) => html.find('input[type="text"]').change(event => app._onSubmit(event)));
-
-});
-
 Hooks.on('updateCombat', args => onCombatUpdate(args));
 
 Hooks.on('renderChatMessage', (app, html, data) => SR5Item.chatListeners(html));
