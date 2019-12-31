@@ -300,15 +300,15 @@ export class SR5Actor extends Actor {
               count: count,
               title: 'Defense',
               after: (roll) => {
-                if (options.attack) {
+                if (options.incomingAttack) {
                   let defenderHits = roll.total;
-                  let attack = options.attack;
+                  let attack = options.incomingAttack;
                   let attackerHits = attack.hits || 0;
                   let netHits = attackerHits - defenderHits;
                   if (netHits >= 0) {
-                    let damage = options.attack.damage + netHits;
-                    let damageType = options.attack.damageType || '';
-                    let ap = options.attack.ap;
+                    let damage = options.incomingAttack.damage + netHits;
+                    let damageType = options.incomingAttack.damageType || '';
+                    let ap = options.incomingAttack.ap;
                     // ui.notifications.info(`Got Hit: DV${damage}${damageType ? damageType.charAt(0).toUpperCase() : ''} ${ap}AP`);
                     this.setFlag('shadowrun5e', 'incomingDamage', {
                       damage: damage,
