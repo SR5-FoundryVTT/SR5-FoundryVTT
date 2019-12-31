@@ -1,4 +1,14 @@
 <form>
+  {{#if damage}}
+  <div class="form-group">
+    <label>Incoming Damage</label>
+    <input
+       type="text"
+       value="{{damage}}"
+       name="soak"
+       disabled />
+  </div>
+  {{/if}}
   <div class="form-group">
     <label>Soak Pool</label>
     <input

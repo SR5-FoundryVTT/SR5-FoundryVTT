@@ -262,6 +262,7 @@ export class SR5Actor extends Actor {
   }
 
   rollDefense(options) {
+    this.unsetFlag('shadowrun5e', 'incomingAttack');
     let dialogData = {
       defense: this.data.data.rolls.defense,
       fireMode: options.fireModeDefense,
@@ -297,7 +298,26 @@ export class SR5Actor extends Actor {
               event: options.event,
               actor: this,
               count: count,
-              title: 'Defense'
+              title: 'Defense',
+              after: (roll) => {
+                if (options.attack) {
+                  let defenderHits = roll.total;
+                  let attack = options.attack;
+                  let attackerHits = attack.hits || 0;
+                  let netHits = attackerHits - defenderHits;
+                  if (netHits >= 0) {
+                    let damage = options.attack.damage + netHits;
+                    let damageType = options.attack.damageType || '';
+                    let ap = options.attack.ap;
+                    // ui.notifications.info(`Got Hit: DV${damage}${damageType ? damageType.charAt(0).toUpperCase() : ''} ${ap}AP`);
+                    this.setFlag('shadowrun5e', 'incomingDamage', {
+                      damage: damage,
+                      ap: ap
+                    });
+                    this.rollSoak({event, damage, ap});
+                  }
+                }
+              }
             });
           }
         }).render(true);
@@ -306,7 +326,9 @@ export class SR5Actor extends Actor {
   }
 
   rollSoak(options) {
+    this.unsetFlag('shadowrun5e', 'incomingDamage');
     let dialogData = {
+      damage: options.damage,
       ap: options.ap,
       soak: this.data.data.rolls.soak.default
     };
@@ -357,17 +379,18 @@ export class SR5Actor extends Actor {
             if (ap) {
               const armorId = id === 'default' ? '' : id;
               const armor = this.data.data.armor;
-              console.log(armor);
               let armorVal = armor.value + (armor[armorId] || 0);
-              console.log(armorVal);
               count += Math.max(ap, -armorVal); // don't take more AP than armor
             }
+
             const label = Helpers.label(id);
+            let title = `Soak - ${label}`;
+            if (options.damage) title += ` - Incoming Damage: ${options.damage}`;
             return DiceSR.d6({
               event: options.event,
               actor: this,
               count: count,
-              title: `Soak - ${label}`,
+              title: title,
               wounds: false
             });
           }

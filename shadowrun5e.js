@@ -26,16 +26,14 @@ Hooks.once("init", async function() {
   Actors.registerSheet("SR5", SR5ActorSheet, { makeDefault: true });
   Items.unregisterSheet("core", ItemSheet);
   Items.registerSheet("SR5", SR5ItemSheet, { makeDefault: true});
-
 });
 
 Hooks.on('ready', () => {
-  console.log('ON READYYY');
   game.socket.on("system.shadowrun5e", data => console.log(data));
+  game.socket.emit("system.shadowrun5e", {foo: 'bar'});
 });
 
 Hooks.on('updateCombat', args => onCombatUpdate(args));
-
 Hooks.on('renderChatMessage', (app, html, data) => SR5Item.chatListeners(html));
 
 

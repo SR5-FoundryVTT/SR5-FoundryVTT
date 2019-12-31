@@ -3,8 +3,6 @@ import { Helpers } from '../helpers.js';
 
 export class SR5Item extends Item {
 
-  _previousFireMode = 1;
-
   get hasOpposedRoll() {
     return !!(this.data.data.action && this.data.data.action.opposed.type);
   }
@@ -323,11 +321,13 @@ export class SR5Item extends Item {
     const itemData = this.data.data;
     let options = {event: ev};
 
-    if (this.data.type === 'weapon' && this.data.data.category === 'range' && itemData.range.previousFireMode) {
-      let mod = Helpers.mapRoundsToDefenseMod(itemData.range.previousFireMode);
-      options.fireModeDefense = mod;
+    if (this.getFlag('shadowrun5e', 'attack')) {
+      options.incomingAttack = this.getFlag('shadowrun5e', 'attack');
+      if (options.incomingAttack.fireMode) options.fireModeDefense = Helpers.mapRoundsToDefenseMod(options.incomingAttack.fireMode);
       options.cover = true;
     }
+
+    options.incomingAction = this.getFlag('shadowrun5e', 'action');
 
     const opposed = itemData.action.opposed;
     if (opposed.type === 'defense') target.rollDefense(options);
@@ -362,9 +362,11 @@ export class SR5Item extends Item {
     title = this.data.data.name;
 
     if ((this.data.type === 'weapon' || this.data.type === 'cyberware') && itemData.category === 'range') {
-      let fireMode = itemData.range.previousFireMode;
+      let attack = this.getFlag('shadowrun5e', 'attack') || {fireMode: 0};
+      let fireMode = attack.fireMode;
       let rc = parseInt(itemData.range.rc.value) + parseInt(actorData.recoil_compensation);
       let dialogData = {
+        dice_pool: count,
         fireMode: fireMode,
         rc: rc,
         ammo: itemData.range.ammo
@@ -408,14 +410,19 @@ export class SR5Item extends Item {
               dialogOptions: {
                 environmental: environmental
               },
-              after: () => {
+              after: (roll) => {
                 const dupData = duplicate(this.data);
-                const range = dupData.data.range;
-                range.previousFireMode = fireMode;
-                const ammo = range.ammo;
+                const ammo = dupData.data.range.ammo;
                 ammo.value = Math.max(0, ammo.value - fireMode);
                 this.update(dupData);
-                console.log('after');
+                this.setFlag('shadowrun5e', 'attack', {
+                  hits: roll.total,
+                  fireMode: fireMode,
+                  damageType: dupData.data.action.damage.type,
+                  element: dupData.data.action.damage.element,
+                  damage: dupData.data.action.damage.value,
+                  ap: dupData.data.action.damage.ap.value
+                });
               }
             });
           }
@@ -444,6 +451,7 @@ export class SR5Item extends Item {
           },
           close: (html) => {
             const force = parseInt(html.find('[name=force]').val());
+            console.log(force);
             limit = force;
             DiceSR.d6({
               event: ev,
@@ -452,7 +460,18 @@ export class SR5Item extends Item {
               actor: this.actor,
               limit: limit,
               title: `${this.data.name}`,
-              after: () => {
+              after: (roll) => {
+                if (this.data.data.category === 'combat') {
+                  let damage = force;
+                  let ap = -force;
+                  this.setFlag('shadowrun5e', 'attack', {
+                    hits: roll.total,
+                    damageType: this.data.data.action.damage.type,
+                    element: this.data.data.action.damage.element,
+                    damage: damage,
+                    ap: ap
+                  });
+                }
                 const drain = Math.max(itemData.drain + force + (reckless ? 3 : 0), 2);
                 this.actor.rollDrain({event: ev}, drain);
               }
@@ -467,7 +486,12 @@ export class SR5Item extends Item {
         environmental: true,
         actor: this.actor,
         limit: limit,
-        title: title
+        title: title,
+        after: (roll) => {
+          this.setFlag('shadowrun5e', 'action', {
+            hits: roll.total
+          });
+        });
       });
     }
   }
