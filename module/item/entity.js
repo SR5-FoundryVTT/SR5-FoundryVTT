@@ -358,8 +358,7 @@ export class SR5Item extends Item {
     else if (attribute) count = attribute.value;
     count += spec + mod;
 
-    let title = `${Helpers.label(skill.label)} + ${Helpers.label(attribute.label)}`;
-    title = this.data.data.name;
+    let title = this.data.data.name;
 
     if ((this.data.type === 'weapon' || this.data.type === 'cyberware') && itemData.category === 'range') {
       let attack = this.getFlag('shadowrun5e', 'attack') || {fireMode: 0};
@@ -396,7 +395,6 @@ export class SR5Item extends Item {
           buttons: buttons,
           close: (html) => {
             const fireMode = parseInt(html.find('[name="fireMode"]').val())
-            title = this.data.name;
             if (fireMode) {
               title += ` - Defender (${Helpers.mapRoundsToDefenseDesc(fireMode)})`
             }
@@ -459,7 +457,7 @@ export class SR5Item extends Item {
               count: count,
               actor: this.actor,
               limit: limit,
-              title: `${this.data.name}`,
+              title: title,
               after: (roll) => {
                 if (this.data.data.category === 'combat') {
                   let damage = force;
