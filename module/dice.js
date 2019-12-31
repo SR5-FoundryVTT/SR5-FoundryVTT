@@ -10,7 +10,7 @@ import { SR5 } from './config.js';
  */
 
 export class DiceSR {
-  static d6({event, count, spec, mod, actor, limit, title="Roll", prefix, suffix, after, dialogOptions, wounds=true}) {
+  static d6({event, count, spec, mod, actor, limit, title="Roll", prefix, suffix, after, extended, dialogOptions, wounds=true}) {
     const roll = (count, limit, explode) => {
       let formula = `${count}d6`;
       if (explode) {
@@ -54,6 +54,7 @@ export class DiceSR {
 
     let dialogData = {
       options: dialogOptions,
+      extended: extended,
       dice_pool: total,
       mod: "",
       limit: limit,
@@ -86,6 +87,7 @@ export class DiceSR {
               mod: parseInt(html.find('[name="mod"]').val()),
               limitMod: parseInt(html.find('[name="limit_mod"]').val()),
               wounds: parseInt(html.find('[name=wounds]').val()),
+              extended: html.find('[name=extended]').val(),
               options: {
                 environmental: parseInt(html.find('[name="options.environmental"]').val()),
               }
@@ -100,6 +102,11 @@ export class DiceSR {
             let r = roll(total, limit, edge);
             resolve(r);
             if (after) after();
+            if (dg.extended) {
+              count -= 1;
+              extended = dg.extended;
+              DiceSR.d6({event, count, spec, mod, actor, limit, title, prefix, suffix, after, extended, dialogOptions, wounds});
+            }
           }
         }).render(true);
       });
