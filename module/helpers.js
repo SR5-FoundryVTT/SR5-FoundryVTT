@@ -42,7 +42,7 @@ export class Helpers {
     return frags.join(' ');
   }
 
-  static orderKeys(obj, expected) {
+  static orderKeys(obj) {
     let keys = Object.keys(obj).sort(function keyOrder(k1, k2) {
             if (k1 < k2) return -1;
             else if (k1 > k2) return +1;

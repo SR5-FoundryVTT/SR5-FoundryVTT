@@ -284,6 +284,7 @@ select.display {
       @include shortUnder;
       margin: .25em;
       position: relative;
+      font-size: 1.15em;
     }
   }
   .tab {
@@ -412,6 +413,9 @@ select.display {
     &.no-border {
       border-top: none;
       border-bottom: none;
+    }
+    &.wrap {
+      flex-wrap: wrap;
     }
     & + :not(.attributes) {
       border-top: $groove;

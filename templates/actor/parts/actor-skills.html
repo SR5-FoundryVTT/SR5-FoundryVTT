@@ -1,12 +1,31 @@
+    <div class="attributes">
+      {{#each data.attributes as |attribute a|}}
+        {{#unless attribute.hidden}}
+          <div class="attribute">
+            <h4 class="attribute-name roll attribute-roll" data-attribute="{{a}}">{{toHeaderCase a}}</h4>
+            <h3 class="attribute-input-container">
+              <input
+                class="display attribute-input"
+                type="text"
+                maxlength="2"
+                size="2"
+                name="data.attributes.{{a}}.value"
+                value="{{attribute.value}}"
+                data-dtype="Number"
+                placeholder="1"/>
+            </h3>
+          </div>
+        {{/unless}}
+      {{/each}}
+    </div>
   <div class="inventory">
     <div class="flexrow nowrap">
       <div class="scroll-area">
-        {{#each data.skillCategories as |cat cid|}}
         <div>
           <div class="item item-section skill-header" data-category="{{cid}}">
             <div class="item-left">
               <div class="item-text item-name">
-                {{cid}}
+                Active Skills
               </div>
             </div>
             <div class="item-right">
@@ -18,7 +37,7 @@
               </div>
             </div>
           </div>
-          {{#each cat.skills as |skill sid|}}
+          {{#each data.skills.active as |skill sid|}}
           <div class="item {{skill.css}}">
             <div class="item-left">
               <div class="item-text item-name skill-roll roll" data-skill='{{sid}}'>
@@ -50,7 +69,6 @@
           </div>
           {{/each}}
         </div>
-        {{/each}}
       </div>
       <div class="scroll-area">
         <div>

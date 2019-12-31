@@ -81,33 +81,14 @@ export class SR5ActorSheet extends ActorSheet {
   }
 
   _prepareSkills(data) {
-    const categories = SR5.skills.categories;
-    const skillCategories = {};
-    for (let category of Object.values(categories)) {
-      if (category.label.toLowerCase() === 'magic' && data.data.special !== 'magic') continue;
-      if (category.label.toLowerCase() === 'resonance' && data.data.special !== 'resonance') continue;
-      skillCategories[category.label] = {
-        skills: {}
-      };
-      const skills = [];
-      for (let sid of category.skills) {
-        const skill = data.data.skills.active[sid];
-        skills.push(skill);
-        skill.css = skill.value > 0 ? '' : 'hidden';
-      }
-      skills.sort();
-      /*
-      skills.sort((a,b) => {
-        let diff = b.value - a.value;
-        if (diff === 0) {
-          diff = a.label.charCodeAt(0) - b.label.charCodeAt(0);
-        }
-        return diff;
-      });
-      */
-      skills.forEach(skill => skillCategories[category.label].skills[skill.label] = skill);
+    let remove = [];
+    for (let [key, skill] of Object.entries(data.data.skills.active)) {
+      skill.css = skill.value > 0 ? '' : 'hidden';
+      if (skill.attribute === 'magic' && data.data.special !== 'magic') remove.push(key);
+      if (skill.attribute === 'resonance' && data.data.special !== 'resonance') remove.push(key);
     }
-    data.data.skillCategories = skillCategories;
+    remove.forEach(key => delete data.data.skills.active[key]);
+    Helpers.orderKeys(data.data.skills.active);
   }
 
   _prepareItems(data) {

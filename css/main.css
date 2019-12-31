@@ -336,7 +336,8 @@ select.display {
   .sr5 .tabs > a {
     position: relative;
     margin: .25em;
-    position: relative; }
+    position: relative;
+    font-size: 1.15em; }
     .sr5 .tabs > a:after {
       content: '';
       display: block;
@@ -455,6 +456,8 @@ select.display {
   .sr5 .attributes.no-border {
     border-top: none;
     border-bottom: none; }
+  .sr5 .attributes.wrap {
+    flex-wrap: wrap; }
   .sr5 .attributes + :not(.attributes) {
     border-top: 2px groove white; }
   .sr5 .attributes:last-child {

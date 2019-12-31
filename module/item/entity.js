@@ -491,7 +491,7 @@ export class SR5Item extends Item {
           this.setFlag('shadowrun5e', 'action', {
             hits: roll.total
           });
-        });
+        }
       });
     }
   }

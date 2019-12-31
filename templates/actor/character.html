@@ -147,27 +147,7 @@
         </div>
       </div>
     </div>
-    <div class="flexrow attributes no-border">
-      {{#each data.attributes as |attribute a|}}
-        {{#unless attribute.hidden}}
-          <div class="attribute">
-            <h4 class="attribute-name roll attribute-roll" data-attribute="{{a}}">{{toHeaderCase a}}</h4>
-            <h3 class="attribute-input-container">
-              <input
-                class="display attribute-input"
-                type="text"
-                maxlength="2"
-                size="2"
-                name="data.attributes.{{a}}.value"
-                value="{{attribute.value}}"
-                data-dtype="Number"
-                placeholder="1"/>
-            </h3>
-          </div>
-        {{/unless}}
-      {{/each}}
-    </div>
-    <div class="attributes">
+    <div class="attributes no-border">
       <div class="attribute row space-around">
         <div class="attribute-only-roll roll attribute-name" data-roll='composure'>Composure</div>
         <div class="attribute-only-roll roll attribute-name" data-roll='judge_intentions'>J.Intentions</div>
