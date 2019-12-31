@@ -61,9 +61,12 @@ export class SR5Item extends Item {
 
       // once all damage mods have been accounted for, sum base and mod to value
       action.damage.value = action.damage.base + action.damage.mod;
-      if (action.damage.attribute && this.actor) action.damage.value += this.actor.data.data.attributes[action.damage.attribute].value;
       action.damage.ap.value = action.damage.ap.base + action.damage.ap.mod;
       action.limit.value = action.limit.base + action.limit.mod;
+      if (this.actor) {
+        if (action.damage.attribute) action.damage.value += this.actor.data.data.attributes[action.damage.attribute].value;
+        if (action.limit.attribute) action.limit.value += this.actor.data.data.limits[action.limit.attribute].value;
+      }
     }
 
 
@@ -344,7 +347,7 @@ export class SR5Item extends Item {
     let skill = actorData.skills.active[itemData.action.skill];
     let attribute = actorData.attributes[itemData.action.attribute];
     let attribute2 = actorData.attributes[itemData.action.attribute2];
-    let limit = parseInt(itemData.action.limit.value);
+    let limit = itemData.action.limit.value;
     let spec = itemData.action.spec ? 2 : 0;
     let mod = parseInt(itemData.action.mod || 0);
 

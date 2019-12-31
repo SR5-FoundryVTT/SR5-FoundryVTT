@@ -12,6 +12,7 @@ export class SR5Actor extends Actor {
     const data = actorData.data;
     const attrs = data.attributes;
     const armor = data.armor;
+    const limits = data.limits;
 
     attrs.magic.hidden = !(data.special === 'magic');
     attrs.resonance.hidden = !(data.special === 'resonance');
@@ -48,10 +49,6 @@ export class SR5Actor extends Actor {
 
     data.modifiers = mods;
 
-    Helpers.addLabels(data.skills);
-    Helpers.addLabels(data.attributes);
-    Helpers.addLabels(data.matrix);
-
     let totalEssence = 6;
     armor.value = 0;
     armor.mod = 0;
@@ -59,12 +56,15 @@ export class SR5Actor extends Actor {
     ELEMENTS.forEach(element => {
       armor[element] = 0;
     });
+
+    // DEFAULT MATRIX ATTS TO MOD VALUE
     const matrix = data.matrix;
     matrix.firewall.value = matrix.firewall.mod;
     matrix.data_processing.value = matrix.data_processing.mod;
     matrix.attack.value = matrix.attack.mod;
     matrix.sleaze.value = matrix.sleaze.mod;
 
+    // PARSE WEAPONS AND SET VALUES AS NEEDED
     for (let item of Object.values(items)) {
       if (item.data.armor
         && item.data.armor.value
@@ -76,9 +76,11 @@ export class SR5Actor extends Actor {
           armor[element] += item.data.armor[element];
         });
       }
+      // MODIFIES ESSENCE
       if (item.data.essence && item.data.technology && item.data.technology.equipped) {
         totalEssence -= item.data.essence;
       }
+      // MODIFIES MATRIX ATTRIBUTES
       if (item.type === 'device' && item.data.technology.equipped) {
 
         matrix.device = item;
@@ -98,9 +100,44 @@ export class SR5Actor extends Actor {
       }
     }
 
+    // ADD MATRIX ATTS TO LIMITS
+    limits.firewall = {
+      value: matrix.firewall.value
+    };
+    limits.data_processing = {
+      value: matrix.data_processing.value
+    };
+    limits.attack = {
+      value: matrix.attack.value
+    };
+    limits.sleaze = {
+      value: matrix.sleaze.value
+    };
+
+    attrs.firewall = {
+      value: matrix.firewall.value,
+      hidden: true
+    };
+    attrs.data_processing = {
+      value: matrix.data_processing.value,
+      hidden: true
+    };
+    attrs.attack = {
+      value: matrix.attack.value,
+      hidden: true
+    };
+    attrs.sleaze = {
+      value: matrix.sleaze.value,
+      hidden: true
+    };
+
+    // SET ARMOR
+    armor.value += armor.mod + mods.armor;
+
+    // SET ESSENCE
     actorData.data.attributes.essence.value = totalEssence + mods.essence;
 
-    const limits = data.limits;
+    // SETUP LIMITS
     limits.physical.value = Math.ceil(((2 * attrs.strength.value)
         + attrs.body.value
         + attrs.reaction.value) / 3)
@@ -114,12 +151,14 @@ export class SR5Actor extends Actor {
       + attrs.essence.value) / 3)
       + mods.social_limit;
 
+    // MOVEMENT
     const movement = data.movement;
     movement.walk.value = attrs.agility.value
       * (1 + mods.walk);
     movement.run.value = attrs.agility.value
       * (2 + mods.run);
 
+    // CONDITION_MONITORS
     const track = data.track;
     track.physical.max = 8 + Math.ceil(attrs.body.value / 2)
       + mods.physical_track;
@@ -127,8 +166,10 @@ export class SR5Actor extends Actor {
     track.stun.max = 8 + Math.ceil(attrs.willpower.value / 2)
       + mods.stun_track;
 
+    // CALCULATE RECOIL
     data.recoil_compensation = 1 + Math.ceil(attrs.strength.value / 3);
 
+    // INITIATIVE
     const init = data.initiative;
     init.meatspace.base.base = attrs.intuition.value + attrs.reaction.value;
     init.meatspace.dice.base = 1;
@@ -146,19 +187,6 @@ export class SR5Actor extends Actor {
     init.current.dice.text = `${init.current.dice.value}d6`;
     init.current.base.value = init.current.base.base + mods.initiative;
 
-    limits.firewall = {
-      value: matrix.firewall.value
-    };
-    limits.data_processing = {
-      value: matrix.data_processing.value
-    };
-    limits.attack = {
-      value: matrix.attack.value
-    };
-    limits.sleaze = {
-      value: matrix.sleaze.value
-    };
-    armor.value += armor.mod + mods.armor;
 
     const soak = attrs.body.value + armor.value + mods.soak;
     const drainAtt = attrs[data.magic.attribute];
@@ -204,6 +232,10 @@ export class SR5Actor extends Actor {
         value: stunWounds + physicalWounds
       }
     }
+
+    Helpers.addLabels(data.skills);
+    Helpers.addLabels(data.attributes);
+    Helpers.addLabels(data.matrix);
   }
 
   rollDrain(options, incoming = -1) {

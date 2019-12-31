@@ -58,6 +58,9 @@
         {{#each config.attributes as |label l|}}
         <option value="{{label}}">{{toHeaderCase label}}</option>
         {{/each}}
+        {{#each config.matrix.attributes as |label l|}}
+        <option value="{{label}}">{{toHeaderCase label}}</option>
+        {{/each}}
       {{/select}}
       </select>
       {{/unless}}
