@@ -780,7 +780,8 @@
       "cyberware",
       "equipment",
       "action",
-      "weapon"
+      "weapon",
+      "complex_form"
     ],
     "templates": {
       "description": {
@@ -843,7 +844,14 @@
           "reach": 0
         },
         "thrown": {
-          "range": 0,
+          "range": {
+            "ranges": {
+              "short": 0,
+              "medium": 0,
+              "long": 0,
+              "extreme": 0
+            }
+          },
           "blast": {
             "radius": 0,
             "dropoff": 0
@@ -852,14 +860,14 @@
       },
       "technology": {
         "technology": {
-          "rating": 0,
+          "rating": 1,
           "availability": "0",
-          "quantity": 0,
+          "quantity": 1,
           "cost": 0,
           "equipped": false
         },
         "condition_monitor": {
-          "value": 0,
+          "value": 9,
           "max": 9
         }
       },
@@ -936,6 +944,12 @@
         "environmental": false,
         "physical": false
       }
+    },
+    "complex_form": {
+      "templates": ["description", "action"],
+      "target": "",
+      "duration": "",
+      "fade": 0
     },
     "weapon": {
       "templates": ["description", "action", "technology", "weapon"]

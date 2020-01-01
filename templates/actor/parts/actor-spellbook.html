@@ -21,10 +21,10 @@
     {{#each powers as |item iid|}}
     <div class="item" data-item='{{item.id}}'>
       <div class="item-left">
-        <div class="item-img item-roll" data-item='{{item.id}}'>
+        <div class="item-img item-roll roll" data-item='{{item.id}}'>
           <img src="{{item.img}}" title="{{item.name}}" height='24px' width='24px'/>
         </div>
-        <div class="item-text item-name">
+        <div class="item-text item-name has-desc">
           {{item.name}}
         </div>
       </div>
@@ -36,6 +36,11 @@
           <i class="item-edit roll fas fa-edit" data-item='{{item.id}}'></i>
           <i class="item-delete roll fas fa-trash" data-item='{{item.id}}'></i>
         </div>
+      </div>
+    </div>
+    <div class="item hidden">
+      <div class="item-desc">
+        {{{item.data.description.value}}}
       </div>
     </div>
     {{/each}}
@@ -96,9 +101,9 @@
         </div>
       </div>
     </div>
-    <div class="item">
-      <div class="item-description hidden">
-        {{item.data.description.value}}
+    <div class="item hidden">
+      <div class="item-desc">
+        {{{item.data.description.value}}}
       </div>
     </div>
     {{/each}}

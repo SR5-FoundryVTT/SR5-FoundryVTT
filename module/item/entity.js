@@ -159,8 +159,8 @@ export class SR5Item extends Item {
     if (data.action.opposed.type) {
       const opposed = data.action.opposed;
       if (opposed.type !== 'custom') labels['opposedRoll'] = `vs. ${Helpers.label(opposed.type)}`;
-      else if (opposed.skill) labels['opposedRoll'] = `vs. ${Helpers.label(opposed.skill)}+${Helpers.labels(opposed.attribute)}`;
-      else if (opposed.attribute2) labels['opposedRoll'] = `vs. ${Helpers.label(opposed.attribute)}+${Helpers.labels(opposed.attribute2)}`;
+      else if (opposed.skill) labels['opposedRoll'] = `vs. ${Helpers.label(opposed.skill)}+${Helpers.label(opposed.attribute)}`;
+      else if (opposed.attribute2) labels['opposedRoll'] = `vs. ${Helpers.label(opposed.attribute)}+${Helpers.label(opposed.attribute2)}`;
       else if (opposed.attribute) labels['opposedRoll'] = `vs. ${Helpers.label(opposed.attribute)}`;
       if (opposed.description) props.push(`Opposed Desc: ${opposed.desc}`);
     }
@@ -178,12 +178,27 @@ export class SR5Item extends Item {
     }
   }
 
+  _complex_formChatData(data, labels, props) {
+    this._actionChatData(data, labels, props);
+    props.push(Helpers.label(data.target),
+                Helpers.label(data.duration))
+    let fade = data.fade;
+    if (fade > 0) props.push(`Fade L+${fade}`);
+    else if(fade < 0) props.push(`Fade L${fade}`);
+    else props.push('Fade L');
+  }
+
   _spellChatData(data, labels, props) {
     this._actionChatData(data, labels, props);
     props.push(Helpers.label(data.range),
                 Helpers.label(data.duration),
                 Helpers.label(data.type),
                 Helpers.label(data.category));
+    let drain = data.drain;
+    if (drain > 0) props.push(`Drain F+${drain}`);
+    else if(drain < 0) props.push(`Drain F${drain}`);
+    else props.push('Drain F');
+
     if (data.category === 'combat') {
       props.push(Helpers.label(data.combat.type));
     } else if (data.category === 'health') {
@@ -358,7 +373,7 @@ export class SR5Item extends Item {
     else if (attribute) count = attribute.value;
     count += spec + mod;
 
-    let title = this.data.data.name;
+    let title = this.data.name;
 
     if ((this.data.type === 'weapon' || this.data.type === 'cyberware') && itemData.category === 'range') {
       let attack = this.getFlag('shadowrun5e', 'attack') || {fireMode: 0};
@@ -432,13 +447,13 @@ export class SR5Item extends Item {
         force: 2 - itemData.drain
       };
       let reckless = false;
-      renderTemplate('systems/shadowrun5e/templates/rolls/spell-roll.html', dialogData).then(dlg => {
+      renderTemplate('systems/shadowrun5e/templates/rolls/roll-spell.html', dialogData).then(dlg => {
         new Dialog({
           title: `${Helpers.label(this.data.name)} Force`,
           content: dlg,
           buttons: {
             roll: {
-              label: 'Roll',
+              label: 'Continue',
               icon: '<i class="fas fa-dice-six"></i>'
             },
             spec: {
@@ -472,6 +487,41 @@ export class SR5Item extends Item {
                 }
                 const drain = Math.max(itemData.drain + force + (reckless ? 3 : 0), 2);
                 this.actor.rollDrain({event: ev}, drain);
+              }
+            });
+          }
+        }).render(true);
+      });
+    } else if (this.data.type === 'complex_form') {
+      let dialogData = {
+        fade: (itemData.fade >= 0 ? `+${itemData.fade}` : itemData.fade),
+        level: 2 - itemData.fade
+      };
+      let reckless = false;
+      renderTemplate('systems/shadowrun5e/templates/rolls/roll-complex-form.html', dialogData).then(dlg => {
+        new Dialog({
+          title: `${Helpers.label(this.data.name)} Level`,
+          content: dlg,
+          buttons: {
+            roll: {
+              label: 'Continue',
+              icon: '<i class="fas fa-dice-six"></i>'
+            }
+          },
+          close: (html) => {
+            const level = parseInt(html.find('[name=level]').val());
+            limit = level;
+            DiceSR.d6({
+              event: ev,
+              environmental: true,
+              count: count,
+              actor: this.actor,
+              limit: limit,
+              title: title,
+              after: (roll) => {
+                const fade = Math.max(itemData.fade + level, 2);
+                console.log(fade);
+                this.actor.rollFade({event: ev}, fade);
               }
             });
           }

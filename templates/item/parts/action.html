@@ -89,6 +89,7 @@
     </div>
   </div>
   {{#ifne item.type "spell"}}
+  {{#ifne item.type "complex_form"}}
   <div class="form-line">
     <div class="label">
       Limit
@@ -118,6 +119,7 @@
       </select>
     </div>
   </div>
+  {{/ifne}}
   {{/ifne}}
   {{/if}}
 </div>

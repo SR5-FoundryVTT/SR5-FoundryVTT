@@ -1,0 +1,58 @@
+<div class="item-form">
+  <div class="header">
+    {{header}}
+  </div>
+  <div class="form-line">
+    <div class="label">
+      Target
+    </div>
+    <div class="inputs">
+      <select name="data.target">
+        {{#select data.target}}
+        <option value=""></option>
+        <option value="persona">Persona</option>
+        <option value="device">Device</option>
+        <option value="file">File</option>
+        <option value="self">Self</option>
+        <option value="sprite">Sprite</option>
+        <option value="other">Other</option>
+        {{/select}}
+      </select>
+    </div>
+  </div>
+  {{#if data.target}}
+  <div class="form-line">
+    <div class="label">
+      Duration
+    </div>
+    <div class="inputs">
+      <select name="data.duration">
+        {{#select data.duration}}
+        <option value=""></option>
+        <option value="immediate">Immediate</option>
+        <option value="sustained">Sustained</option>
+        <option value="permanent">Permanent</option>
+        {{/select}}
+      </select>
+    </div>
+  </div>
+  <div class="form-line">
+    <div class="label">
+      Fade Value
+    </div>
+    <div class="inputs">
+      <input
+        type="text"
+        maxlength="2"
+        size="2"
+        name="data.fade"
+        value="{{data.fade}}"
+        data-dtype="Number"
+        placeholder="-2"
+        data-dtype="Number"/>
+    </div>
+  </div>
+  {{/if}}
+</div>
+
+

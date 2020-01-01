@@ -168,7 +168,7 @@ export class SR5ActorSheet extends ActorSheet {
       }
     };
 
-    let [items, spells, qualities, adept_powers, critter_powers, actions] = data.items.reduce((arr, item) => {
+    let [items, spells, qualities, adept_powers, critter_powers, actions, complex_forms] = data.items.reduce((arr, item) => {
       item.img = item.img || DEFAULT_TOKEN;
       item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
 
@@ -177,9 +177,10 @@ export class SR5ActorSheet extends ActorSheet {
       else if (item.type === 'adept_power') arr[3].push(item);
       else if (item.type === 'critter_power') arr[4].push(item);
       else if (item.type === 'action') arr[5].push(item);
+      else if (item.type === 'complex_form') arr[6].push(item);
       else if (Object.keys(inventory).includes(item.type)) arr[0].push(item);
       return arr;
-    }, [[], [], [], [], [], []]);
+    }, [[], [], [], [], [], [], []]);
 
     items.forEach(item => {
       inventory[item.type].items.push(item);
@@ -194,6 +195,7 @@ export class SR5ActorSheet extends ActorSheet {
       powers: adept_powers
     };
     data.actions = actions;
+    data.complex_forms = complex_forms;
   }
 
   /* -------------------------------------------- */
