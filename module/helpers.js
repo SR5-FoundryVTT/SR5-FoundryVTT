@@ -1,5 +1,5 @@
 export class Helpers {
-  static setupCustomCheckbox(html) {
+  static setupCustomCheckbox(app, html, data) {
     const setContent = (el => {
       console.log(el);
       let checkbox = $(el).children('input[type=checkbox]');
@@ -14,6 +14,7 @@ export class Helpers {
     });
     html.find('label.checkbox').each(function(index) { setContent(this) });
     html.find('label.checkbox').click(event => setContent(event.currentTarget));
+    html.find('.submit-checkbox').change((event) => app._onSubmit(event));
   }
   static mapRoundsToDefenseMod(rounds) {
     if (rounds === 1) return 0;

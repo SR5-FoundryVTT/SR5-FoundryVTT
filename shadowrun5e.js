@@ -28,7 +28,7 @@ Hooks.once("init", async function() {
   Items.registerSheet("SR5", SR5ItemSheet, { makeDefault: true});
 
   ['renderSR5ActorSheet', 'renderSR5ItemSheet'].forEach(s => {
-    Hooks.on(s, (app, html, data) => Helpers.setupCustomCheckbox(html));
+    Hooks.on(s, (app, html, data) => Helpers.setupCustomCheckbox(app, html, data));
   });
 });
 
