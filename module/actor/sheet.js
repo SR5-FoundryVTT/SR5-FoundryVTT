@@ -269,9 +269,6 @@ export class SR5ActorSheet extends ActorSheet {
       const item = this.actor.getOwnedItem(iid);
       item.sheet.render(true);
     });
-
-
-
     // Delete Inventory Item
     html.find('.item-delete').click(event => {
       event.preventDefault();
@@ -279,6 +276,15 @@ export class SR5ActorSheet extends ActorSheet {
       const el = $(event.currentTarget).parents(".item");
       this.actor.deleteOwnedItem(iid);
       el.slideUp(200, () => this.render(false));
+    });
+    // Drag inventory item
+    let handler = ev => this._onDragItemStart(ev);
+    html.find('.item').each((i, item) => {
+      if (item.dataset && item.dataset.item) {
+        item.dataset.itemId = item.dataset.item; // TODO fix all data-item to data-item-id to get rid of this
+        item.setAttribute('draggable', true);
+        item.addEventListener('dragstart', handler, false);
+      }
     });
   }
 
