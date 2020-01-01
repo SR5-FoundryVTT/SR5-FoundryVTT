@@ -380,7 +380,7 @@ select.display {
 
 .sr5 .window-content {
   font-size: 115%;
-  background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url("../ui/brushed_metal.jpg") repeat;
+  background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("../ui/brushed_metal.jpg") repeat;
   color: white; }
 
 .sr5 .editor {
@@ -394,19 +394,21 @@ select.display {
   border-bottom: 1px solid #4d4d4d; }
 
 .sr5 .tabs {
-  margin: .25em; }
+  margin: .25em;
+  margin-bottom: -5px;
+  border-bottom: 1px solid #4d4d4d; }
   .sr5 .tabs > a {
-    position: relative;
     margin: .25em;
+    padding: .25em;
+    margin-bottom: 0;
     position: relative;
-    font-size: 1.15em; }
-    .sr5 .tabs > a:after {
-      content: '';
-      display: block;
-      position: absolute;
-      width: 50%;
-      transform: translateX(50%);
-      border-bottom: 1px groove #4d4d4d; }
+    font-size: 1.15em;
+    border: 1px solid #4d4d4d;
+    border-top-left-radius: .25em;
+    border-top-right-radius: .25em;
+    border-bottom: none; }
+    .sr5 .tabs > a.active {
+      background-color: rgba(0, 0, 0, 0.1); }
 
 .sr5 .tab {
   border-radius: 0.25em;
@@ -436,7 +438,9 @@ select.display {
       border: 1px solid black;
       margin-right: 0;
       margin-left: 0;
-      background: rgba(128, 128, 128, 0.2); }
+      background: rgba(128, 128, 128, 0.2);
+      padding: .25em;
+      border-radius: .2em; }
     .sr5 .inventory .item .item-left {
       display: flex;
       flex-flow: row nowrap;

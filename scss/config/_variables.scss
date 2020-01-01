@@ -20,10 +20,13 @@ $outline-color: $black;
 $groove-width: 1px;
 $groove-color: $dark;
 $groove: $groove-width solid $groove-color;
+$light-border: $dark;
+
+
 $radius: .25em;
 
 $border-under: 1px groove $groove-color;
 
-$sheetbackground: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url("../ui/brushed_metal.jpg") repeat;
+$sheetbackground: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("../ui/brushed_metal.jpg") repeat;
 
 

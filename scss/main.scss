@@ -197,11 +197,21 @@ select.display {
   }
   .tabs {
     margin: .25em;
+    margin-bottom: -5px;
+    border-bottom: 1px solid $light-border;
     >a {
-      @include shortUnder;
       margin: .25em;
+      padding: .25em;
+      margin-bottom: 0;
       position: relative;
       font-size: 1.15em;
+      border: 1px solid $light-border;
+      border-top-left-radius: .25em;
+      border-top-right-radius: .25em;
+      border-bottom: none;
+      &.active {
+        background-color: rgba($black, .1);
+      }
     }
   }
   .tab {
@@ -233,6 +243,8 @@ select.display {
         margin-right: 0;
         margin-left: 0;
         background: rgba($grey, 0.2);
+        padding: .25em;
+        border-radius: .2em;
       }
       .item-left {
         display: flex;
