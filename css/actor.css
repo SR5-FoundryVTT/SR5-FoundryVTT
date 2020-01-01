@@ -60,7 +60,7 @@
         .sr5.actor .attributes .attribute > .attribute-name.icon {
           font-size: .75em; }
         .sr5.actor .attributes .attribute > .attribute-name.roll:hover {
-          text-shadow: 0 0 0.2em #4d4d4d;
+          text-shadow: 0 0 0.2em #6495ED;
           cursor: pointer; }
       .sr5.actor .attributes .attribute .attribute-input-container {
         align-text: center;

@@ -17,3 +17,6 @@ Chummer Import
 Targetted Rolls
 
 Work in progress.
+
+
+Icons provided by Font Awesome: https://fontawesome.com/license

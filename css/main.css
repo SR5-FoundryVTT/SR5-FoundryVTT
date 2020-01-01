@@ -164,7 +164,7 @@
         .sr5.actor .attributes .attribute > .attribute-name.icon {
           font-size: .75em; }
         .sr5.actor .attributes .attribute > .attribute-name.roll:hover {
-          text-shadow: 0 0 0.2em #4d4d4d;
+          text-shadow: 0 0 0.2em #6495ED;
           cursor: pointer; }
       .sr5.actor .attributes .attribute .attribute-input-container {
         align-text: center;
@@ -230,7 +230,7 @@
   src: url("../fonts/NodestoCapsCondensed.otf"); }
 
 .roll:hover {
-  text-shadow: 0 0 0.2em #4d4d4d;
+  text-shadow: 0 0 0.2em #6495ED;
   cursor: pointer; }
 
 .flexrow {
@@ -306,7 +306,7 @@ label.checkbox {
   -moz-user-select: none;
   -ms-user-select: none; }
   label.checkbox:hover input ~ .checkmark {
-    text-shadow: 0 0 0.2em #4d4d4d; }
+    text-shadow: 0 0 0.2em #6495ED; }
   label.checkbox.init-edge-label {
     margin-right: 1.75em;
     font-size: .75em;
@@ -432,7 +432,7 @@ select.display {
     margin-left: 1px;
     border-bottom: 1px solid grey; }
     .sr5 .inventory .item .has-desc:hover {
-      text-shadow: 0 0 0.2em #4d4d4d;
+      text-shadow: 0 0 0.2em #6495ED;
       cursor: pointer; }
     .sr5 .inventory .item.item-section {
       border: 1px solid black;
@@ -455,8 +455,11 @@ select.display {
       padding-right: .25em;
       flex: 0; }
       .sr5 .inventory .item .item-img:hover {
-        text-shadow: 0 0 0.2em #4d4d4d;
+        text-shadow: 0 0 0.2em #6495ED;
         cursor: pointer; }
+      .sr5 .inventory .item .item-img:hover > img {
+        content: url("../ui/dice-solid.svg");
+        filter: invert(1); }
       .sr5 .inventory .item .item-img > img {
         margin: 0;
         transform: translateY(10%); }
@@ -478,10 +481,10 @@ select.display {
       font-size: .75em;
       height: 100%; }
       .sr5 .inventory .item .item-icons .create-item:hover {
-        text-shadow: 0 0 0.2em #4d4d4d;
+        text-shadow: 0 0 0.2em #6495ED;
         cursor: pointer; }
       .sr5 .inventory .item .item-icons .create-matrix-action:hover {
-        text-shadow: 0 0 0.2em #4d4d4d;
+        text-shadow: 0 0 0.2em #6495ED;
         cursor: pointer; }
     .sr5 .inventory .item .item-text {
       min-width: 5em;
@@ -514,7 +517,7 @@ select.display {
     .sr5 .inventory .item .skill-item {
       min-width: 8em; }
     .sr5 .inventory .item.skill-header:hover {
-      text-shadow: 0 0 0.2em #4d4d4d;
+      text-shadow: 0 0 0.2em #6495ED;
       cursor: pointer; }
 
 .sr5.chat-card {

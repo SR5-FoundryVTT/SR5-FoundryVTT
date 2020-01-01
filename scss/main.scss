@@ -262,6 +262,12 @@ select.display {
         padding-right: .25em;
         flex: 0;
         @include rollable;
+        &:hover {
+          >img {
+            content:url('../ui/dice-solid.svg');
+            filter: invert(1);
+          }
+        }
         >img {
           margin: 0;
           transform: translateY(10%);
