@@ -185,6 +185,7 @@ export class SR5Actor extends Actor {
     }
     init.current.dice.value = init.current.dice.base + mods.initiative_dice;
     if (init.edge) init.current.dice.value = 5;
+    init.current.dice.value = Math.min(5, init.current.dice.value); // maximum of 5d6 for initiative
     init.current.dice.text = `${init.current.dice.value}d6`;
     init.current.base.value = init.current.base.base + mods.initiative;
 
