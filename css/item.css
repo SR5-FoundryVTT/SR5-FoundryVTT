@@ -46,6 +46,10 @@
       display: flex;
       flex-flow: row nowrap;
       justify-content: space-between; }
+    .sr5.item .technology .unit {
+      font-size: 10px;
+      top: 5px;
+      left: 2px; }
   .sr5.item .description {
     padding: 2px;
     height: 100%;
@@ -58,7 +62,7 @@
     .sr5.item .item-form .header {
       font-size: 120%;
       font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
-      color: #e6e6e6;
+      color: white;
       color: white;
       text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
       font-size: 1.75em;

@@ -23,7 +23,7 @@
     .sr5.actor .attributes .attribute {
       font-size: 120%;
       font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
-      color: #e6e6e6;
+      color: white;
       color: white;
       text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
       display: flex;
@@ -60,7 +60,7 @@
         .sr5.actor .attributes .attribute > .attribute-name.icon {
           font-size: .75em; }
         .sr5.actor .attributes .attribute > .attribute-name.roll:hover {
-          text-shadow: 0 0 0.2em #6495ED;
+          text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
           cursor: pointer; }
       .sr5.actor .attributes .attribute .attribute-input-container {
         align-text: center;
@@ -103,6 +103,15 @@
     .sr5.actor .skills-container > *:not(:last-child) {
       border-right: 1px solid #4d4d4d;
       padding-right: .25em; }
+  .sr5.actor .info-container {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-around; }
+    .sr5.actor .info-container > *:not(:first-child) {
+      padding-left: .25em;
+      border-left: 1px solid #4d4d4d; }
+    .sr5.actor .info-container > *:not(:last-child) {
+      margin-right: .25em; }
   .sr5.actor .limit {
     font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
     padding: 0 .1rem;
@@ -116,6 +125,8 @@
   .sr5.actor .scroll-area {
     overflow-y: scroll;
     max-height: 28em; }
+    .sr5.actor .scroll-area.info {
+      max-height: 32em; }
     .sr5.actor .scroll-area.left {
       direction: rtl; }
       .sr5.actor .scroll-area.left > * {

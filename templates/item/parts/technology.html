@@ -26,13 +26,18 @@
     </div>
     <div class="flexrow nowrap">
       <label>Cost</label>
-      <input
-        class="display"
-        type='text'
-        name='data.technology.cost'
-        value='{{data.technology.cost}}'
-        data-dtype='Number'
-        placeholder='100' />
+      <div class="input">
+        <input
+          class="display"
+          type='text'
+          name='data.technology.cost'
+          value='{{data.technology.cost}}'
+          data-dtype='Number'
+          placeholder='100' />
+        <span class="unit">
+          <i class="fas fa-yen-sign"></i>
+        </span>
+      </div>
     </div>
     <div class="flexrow nowrap">
       <label>Avail</label>

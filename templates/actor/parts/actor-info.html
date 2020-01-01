@@ -1,7 +1,134 @@
 <div class="inventory">
-  <div class="scroll-area">
-    <div class="flexrow align-start">
+  <div class="flexrow align-start info-container">
+    <div class="scroll-area left info">
       <div class="flexcol justify-start">
+        <div class="item">
+          <div class="item-left">
+            <div class="item-text item-name">
+              Metatype
+            </div>
+          </div>
+          <div class="item-right">
+            <div class="item-text">
+              <input
+                 class="display text"
+                 type="text"
+                 name="data.metatype"
+                 value="{{data.metatype}}" />
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-left">
+            <div class="item-text item-name">
+              Karma
+            </div>
+          </div>
+          <div class="item-right">
+            <div class="item-text">
+              <input
+                 class="display"
+                 type="text"
+                 size="10"
+                 name="data.karma.value"
+                 value="{{data.karma.value}}"
+                 data-dtype="Number" />
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-left">
+            <div class="item-text item-name">
+              Career Karma
+            </div>
+          </div>
+          <div class="item-right">
+            <div class="item-text">
+              <input
+                 class="display"
+                 type="text"
+                 size="10"
+                 name="data.karma.max"
+                 value="{{data.karma.max}}"
+                 data-dtype="Number" />
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-left">
+            <div class="item-text item-name">
+              Nuyen
+            </div>
+          </div>
+          <div class="item-right">
+            <div class="item-text input">
+              <input
+                 class="display"
+                 type="text"
+                 name="data.nuyen"
+                 size="10"
+                 value="{{data.nuyen}}"
+                 data-dtype="Number" />
+                <span class="unit">
+                  <i class="fas fa-yen-sign"></i>
+                </span>
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-left">
+            <div class="item-text item-name">
+              Notoriety
+            </div>
+          </div>
+          <div class="item-right">
+            <div class="item-text">
+              <input
+                 class="display"
+                 type="text"
+                 size="10"
+                 name="data.notoriety"
+                 value="{{data.notoriety}}"
+                 data-dtype="Number" />
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-left">
+            <div class="item-text item-name">
+              Public Awareness
+            </div>
+          </div>
+          <div class="item-right">
+            <div class="item-text">
+              <input
+                 class="display"
+                 type="text"
+                 size="10"
+                 name="data.public_awareness"
+                 value="{{data.public_awareness}}"
+                 data-dtype="Number" />
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-left">
+            <div class="item-text item-name">
+              Street Cred
+            </div>
+          </div>
+          <div class="item-right">
+            <div class="item-text">
+              <input
+                 class="display"
+                 type="text"
+                 size="10"
+                 name="data.street_cred"
+                 value="{{data.street_cred}}"
+                 data-dtype="Number" />
+            </div>
+          </div>
+        </div>
         <div class="item">
           <div class="item-left">
             <div class="item-text item-name">
@@ -42,19 +169,21 @@
         </div>
         {{/if}}
       </div>
-      <div class="flexcol justify-start">
-        <div class="item item-section">
-          <div class="item-left">
-            <div class="item-text item-name">
-              Modifier
-            </div>
-          </div>
-          <div class="item-right">
-            <div class="item-text rtg">
-              Value
-            </div>
+    </div>
+    <div class="flexcol justify-start">
+      <div class="item item-section">
+        <div class="item-left">
+          <div class="item-text item-name">
+            Modifier
           </div>
         </div>
+        <div class="item-right">
+          <div class="item-text rtg">
+            Value
+          </div>
+        </div>
+      </div>
+      <div class="scroll-area info">
         {{#each data.modifiers as |value id|}}
         {{#ifne id 'wound'}}
         <div class="item">

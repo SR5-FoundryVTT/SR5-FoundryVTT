@@ -46,6 +46,10 @@
       display: flex;
       flex-flow: row nowrap;
       justify-content: space-between; }
+    .sr5.item .technology .unit {
+      font-size: 10px;
+      top: 5px;
+      left: 2px; }
   .sr5.item .description {
     padding: 2px;
     height: 100%;
@@ -58,7 +62,7 @@
     .sr5.item .item-form .header {
       font-size: 120%;
       font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
-      color: #e6e6e6;
+      color: white;
       color: white;
       text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
       font-size: 1.75em;
@@ -127,7 +131,7 @@
     .sr5.actor .attributes .attribute {
       font-size: 120%;
       font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
-      color: #e6e6e6;
+      color: white;
       color: white;
       text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
       display: flex;
@@ -164,7 +168,7 @@
         .sr5.actor .attributes .attribute > .attribute-name.icon {
           font-size: .75em; }
         .sr5.actor .attributes .attribute > .attribute-name.roll:hover {
-          text-shadow: 0 0 0.2em #6495ED;
+          text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
           cursor: pointer; }
       .sr5.actor .attributes .attribute .attribute-input-container {
         align-text: center;
@@ -207,6 +211,15 @@
     .sr5.actor .skills-container > *:not(:last-child) {
       border-right: 1px solid #4d4d4d;
       padding-right: .25em; }
+  .sr5.actor .info-container {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-around; }
+    .sr5.actor .info-container > *:not(:first-child) {
+      padding-left: .25em;
+      border-left: 1px solid #4d4d4d; }
+    .sr5.actor .info-container > *:not(:last-child) {
+      margin-right: .25em; }
   .sr5.actor .limit {
     font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
     padding: 0 .1rem;
@@ -220,6 +233,8 @@
   .sr5.actor .scroll-area {
     overflow-y: scroll;
     max-height: 28em; }
+    .sr5.actor .scroll-area.info {
+      max-height: 32em; }
     .sr5.actor .scroll-area.left {
       direction: rtl; }
       .sr5.actor .scroll-area.left > * {
@@ -230,7 +245,7 @@
   src: url("../fonts/NodestoCapsCondensed.otf"); }
 
 .roll:hover {
-  text-shadow: 0 0 0.2em #6495ED;
+  text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
   cursor: pointer; }
 
 .flexrow {
@@ -289,6 +304,8 @@
 .input {
   position: relative; }
   .input .unit {
+    color: white;
+    text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
     position: absolute;
     display: block;
     left: 5px;
@@ -306,7 +323,7 @@ label.checkbox {
   -moz-user-select: none;
   -ms-user-select: none; }
   label.checkbox:hover input ~ .checkmark {
-    text-shadow: 0 0 0.2em #6495ED; }
+    text-shadow: 0 0 0.2em darkblue; }
   label.checkbox.init-edge-label {
     margin-right: 1.75em;
     font-size: .75em;
@@ -362,7 +379,7 @@ input[type="text"].display {
   input[type="text"].display.left {
     text-align: left; }
   input[type="text"].display:disabled {
-    color: #e6e6e6;
+    color: white;
     background: transparent;
     border-color: transparent;
     padding-left: 0;
@@ -407,8 +424,12 @@ select.display {
     border-top-left-radius: .25em;
     border-top-right-radius: .25em;
     border-bottom: none; }
+    .sr5 .tabs > a:hover {
+      text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
+      cursor: pointer; }
     .sr5 .tabs > a.active {
-      background-color: rgba(0, 0, 0, 0.1); }
+      text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
+      background-color: rgba(0, 0, 0, 0.4); }
 
 .sr5 .tab {
   border-radius: 0.25em;
@@ -432,7 +453,7 @@ select.display {
     margin-left: 1px;
     border-bottom: 1px solid grey; }
     .sr5 .inventory .item .has-desc:hover {
-      text-shadow: 0 0 0.2em #6495ED;
+      text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
       cursor: pointer; }
     .sr5 .inventory .item.item-section {
       border: 1px solid black;
@@ -455,7 +476,7 @@ select.display {
       padding-right: .25em;
       flex: 0; }
       .sr5 .inventory .item .item-img:hover {
-        text-shadow: 0 0 0.2em #6495ED;
+        text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
         cursor: pointer; }
       .sr5 .inventory .item .item-img:hover > img {
         content: url("../ui/dice-solid.svg");
@@ -481,10 +502,10 @@ select.display {
       font-size: .75em;
       height: 100%; }
       .sr5 .inventory .item .item-icons .create-item:hover {
-        text-shadow: 0 0 0.2em #6495ED;
+        text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
         cursor: pointer; }
       .sr5 .inventory .item .item-icons .create-matrix-action:hover {
-        text-shadow: 0 0 0.2em #6495ED;
+        text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
         cursor: pointer; }
     .sr5 .inventory .item .item-text {
       min-width: 5em;
@@ -517,7 +538,7 @@ select.display {
     .sr5 .inventory .item .skill-item {
       min-width: 8em; }
     .sr5 .inventory .item.skill-header:hover {
-      text-shadow: 0 0 0.2em #6495ED;
+      text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
       cursor: pointer; }
 
 .sr5.chat-card {

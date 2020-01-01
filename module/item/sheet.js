@@ -76,6 +76,17 @@ export class SR5ItemSheet extends ItemSheet {
       }
     }
 
+    if (itemData.technology) {
+      try {
+        const tech = itemData.technology;
+        if (tech.rating === 0) delete tech.rating;
+        if (tech.quantity === 0) delete tech.quantity;
+        if (tech.cost === 0) delete tech.cost;
+      } catch (e) {
+        console.log(e);
+      }
+    }
+
     data.config = CONFIG.SR5;
     return data;
   }

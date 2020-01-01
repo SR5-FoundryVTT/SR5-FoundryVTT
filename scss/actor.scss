@@ -132,6 +132,18 @@
       padding-right: .25em;
     }
   }
+  .info-container {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-around;
+    > *:not(:first-child) {
+      padding-left: .25em;
+      border-left: $groove;
+    }
+    > *:not(:last-child) {
+      margin-right: .25em;
+    }
+  }
   .limit {
     @include nodesto;
     padding: 0 .1rem;
@@ -146,6 +158,9 @@
   .scroll-area {
     overflow-y: scroll;
     max-height: 28em;
+    &.info {
+      max-height: 32em;
+    }
     &.left {
       direction: rtl;
       >* {

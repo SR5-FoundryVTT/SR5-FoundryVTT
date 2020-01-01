@@ -15,8 +15,8 @@
         "public_awareness": 0,
         "special": "mundane",
         "karma": {
-          "total": 0,
-          "remaining": 0
+          "value": 0,
+          "max": 0
         },
         "nuyen": 0,
         "rent": {
@@ -861,7 +861,7 @@
       "technology": {
         "technology": {
           "rating": 1,
-          "availability": "0",
+          "availability": "",
           "quantity": 1,
           "cost": 0,
           "equipped": false

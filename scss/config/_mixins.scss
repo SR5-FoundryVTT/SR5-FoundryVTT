@@ -1,8 +1,16 @@
 @mixin rollable {
   &:hover {
-    text-shadow: 0 0 .2em $rollcolor;
+    @include rolloutline;
     cursor: pointer;
   }
+}
+
+@mixin rolloutline {
+  text-shadow:
+    -1px -1px 0 $rollcolor,
+    1px -1px 0 $rollcolor,
+    -1px 1px 0 $rollcolor,
+    1px 1px 0 $rollcolor;
 }
 
 @mixin nodesto {
@@ -12,13 +20,13 @@
 @mixin title {
   font-size: 120%;
   font-family: $nodesto;
-  color: $light;
+  color: $color;
   @include textOutline;
 }
 
 @mixin textOutline {
-  color: $inner-color;
-  text-shadow: 
+  color: $color;
+  text-shadow:
     -1px -1px 0 $outline-color,
     1px -1px 0 $outline-color,
     -1px 1px 0 $outline-color,

@@ -67,6 +67,7 @@
 .input {
   position: relative;
   .unit {
+    @include textOutline;
     position: absolute;
     display: block;
     left: 5px;
@@ -155,7 +156,7 @@ input[type="text"].display {
     text-align: left;
   }
   &:disabled {
-    color: $light;
+    color: $color;
     background: transparent;
     border-color: transparent;
     padding-left: 0;
@@ -209,8 +210,10 @@ select.display {
       border-top-left-radius: .25em;
       border-top-right-radius: .25em;
       border-bottom: none;
+      @include rollable;
       &.active {
-        background-color: rgba($black, .1);
+        @include rolloutline;
+        background-color: rgba($black, .4);
       }
     }
   }
