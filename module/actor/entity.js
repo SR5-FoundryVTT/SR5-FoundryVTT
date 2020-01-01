@@ -38,7 +38,8 @@ export class SR5Actor extends Actor {
       'run',
       'defense',
       'wound_tolerance',
-      'essence'
+      'essence',
+      'fade'
     ];
     modifiers.sort();
     modifiers.unshift('global');
@@ -63,6 +64,10 @@ export class SR5Actor extends Actor {
     matrix.data_processing.value = matrix.data_processing.mod;
     matrix.attack.value = matrix.attack.mod;
     matrix.sleaze.value = matrix.sleaze.mod;
+    matrix.condition_monitor.max = 0;
+    matrix.rating = 0;
+    matrix.name = "";
+    matrix.device = "";
 
     // PARSE WEAPONS AND SET VALUES AS NEEDED
     for (let item of Object.values(items)) {
@@ -83,7 +88,7 @@ export class SR5Actor extends Actor {
       // MODIFIES MATRIX ATTRIBUTES
       if (item.type === 'device' && item.data.technology.equipped) {
 
-        matrix.device = item;
+        matrix.device = item.id;
         matrix.condition_monitor.max = item.data.condition_monitor.max;
         matrix.rating = item.data.technology.rating;
         matrix.is_cyberdeck = item.category === 'cyberdeck';
@@ -99,6 +104,24 @@ export class SR5Actor extends Actor {
         }
       }
     }
+
+    // TECHNOMANCER LIVING PERSONA
+    if (data.special === 'resonance') {
+      if (matrix.firewall.value === matrix.firewall.mod) {
+        // we should use living persona
+        matrix.firewall.value += attrs.willpower.value;
+        matrix.data_processing.value += attrs.logic.value;
+        matrix.rating = attrs.resonance.value;
+        matrix.attack.value += attrs.charisma.value;
+        matrix.sleaze.value += attrs.intuition.value;
+        matrix.name = "Living Persona";
+        matrix.device = "";
+        matrix.condition_monitor.max = 0;
+      }
+    }
+
+    // set matrix condition monitor to max if greater than
+    if (matrix.condition_monitor.value > matrix.condition_monitor.max) matrix.condition_monitor.value = matrix.condition_monitor.max;
 
     // ADD MATRIX ATTS TO LIMITS
     limits.firewall = {
@@ -197,6 +220,7 @@ export class SR5Actor extends Actor {
       ...data.rolls,
       defense: attrs.reaction.value + attrs.intuition.value + mods.defense,
       drain: attrs.willpower.value + (drainAtt ? drainAtt.value : 0) + (data.magic.drain ? data.magic.drain.mod : 0) + mods.drain,
+      fade: attrs.willpower.value + attrs.resonance.value + mods.fade,
       soak: {
         default: soak,
         cold: soak + armor.cold,
@@ -239,6 +263,19 @@ export class SR5Actor extends Actor {
     Helpers.addLabels(data.skills);
     Helpers.addLabels(data.attributes);
     Helpers.addLabels(data.matrix);
+  }
+
+  rollFade(options, incoming = -1) {
+    const resist = this.data.data.rolls.fade;
+    let title = "Fade";
+    if (incoming >= 0) title += ` (${incoming} incoming)`;
+    DiceSR.d6({
+      event: options.event,
+      count: resist,
+      actor: this,
+      title: title,
+      wounds: false
+    });
   }
 
   rollDrain(options, incoming = -1) {

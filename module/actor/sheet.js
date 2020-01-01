@@ -75,6 +75,8 @@ export class SR5ActorSheet extends ActorSheet {
     this._prepareSkills(data);
 
     data.config = CONFIG.SR5;
+    data.awakened = data.data.special === 'magic';
+    data.emerged = data.data.special === 'resonance';
 
     return data;
   }
@@ -83,8 +85,8 @@ export class SR5ActorSheet extends ActorSheet {
     let remove = [];
     for (let [key, skill] of Object.entries(data.data.skills.active)) {
       skill.css = skill.value > 0 ? '' : 'hidden';
-      if (skill.attribute === 'magic' && data.data.special !== 'magic') remove.push(key);
-      if (skill.attribute === 'resonance' && data.data.special !== 'resonance') remove.push(key);
+      if (key === 'magic' && data.data.special !== 'magic') remove.push(key);
+      if (key === 'resonance' && data.data.special !== 'resonance') remove.push(key);
     }
     remove.forEach(key => delete data.data.skills.active[key]);
     Helpers.orderKeys(data.data.skills.active);
@@ -247,6 +249,7 @@ export class SR5ActorSheet extends ActorSheet {
     html.find('.attribute-only-roll').click(this._onRollAttributesOnly.bind(this));
     html.find('.soak-roll').click(this._onRollSoak.bind(this));
     html.find('.drain-roll').click(this._onRollDrain.bind(this));
+    html.find('.fade-roll').click(this._onRollFade.bind(this));
     html.find('.item-roll').click(this._onRollItem.bind(this));
     html.find('.item-equip-toggle').click(this._onEquipItem.bind(this));
     html.find('.item-qty').change(this._onChangeQty.bind(this));
@@ -386,6 +389,11 @@ export class SR5ActorSheet extends ActorSheet {
     const item = this.actor.getOwnedItem(iid);
     if (item.type === 'action') item.rollTest(event);
     else item.roll(event);
+  }
+
+  async _onRollFade(event) {
+    event.preventDefault();
+    this.actor.rollFade({event: event});
   }
 
   async _onRollDrain(event) {

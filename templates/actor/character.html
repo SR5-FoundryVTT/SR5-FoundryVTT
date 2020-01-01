@@ -196,9 +196,12 @@
         <div title="Defense" class="attribute-name defense-roll roll">Defense</div>
         <div title="Soak" class="attribute-name soak-roll roll defense-icon">Soak</div>
         <div class="attribute-name roll armor-roll">Armor ({{data.armor.value}})</div>
-        {{#ifne data.special 'mundane'}}
+        {{#if awakened}}
         <div class="attribute-name roll drain-roll">Drain</div>
-        {{/ifne}}
+        {{/if}}
+        {{#if emerged}}
+        <div class="attribute-name roll fade-roll">Fade</div>
+        {{/if}}
       </div>
     </div>
   </header>
