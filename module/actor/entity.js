@@ -177,13 +177,14 @@ export class SR5Actor extends Actor {
     init.astral.dice.base = 2;
     init.matrix.base.base = attrs.intuition.value + data.matrix.data_processing.value;
     init.matrix.dice.base = data.matrix.hot_sim ? 4 : 3;
-    if (data.initiative.perception === 'matrix') init.current = init.matrix;
-    else if (data.initiative.perception === 'astral') init.current = init.astral;
+    if (init.perception === 'matrix') init.current = init.matrix;
+    else if (init.perception === 'astral') init.current = init.astral;
     else {
       init.current = init.meatspace;
-      data.initiative.perception = 'meatspace';
+      init.perception = 'meatspace';
     }
-    init.current.dice.value = init.current.dice.base + mods.initiative_dice;
+    // only apply dice mods if in meatspace (RAW)
+    init.current.dice.value = init.current.dice.base + (init.perception === 'meatspace' ? mods.initiative_dice : 0);
     if (init.edge) init.current.dice.value = 5;
     init.current.dice.value = Math.min(5, init.current.dice.value); // maximum of 5d6 for initiative
     init.current.dice.text = `${init.current.dice.value}d6`;
@@ -407,7 +408,8 @@ export class SR5Actor extends Actor {
       event: options.event,
       actor: this,
       count: attr.value,
-      title: Helpers.label(attrId)
+      title: Helpers.label(attrId),
+      matrix: Helpers.isMatrix(attr)
     });
   }
 
@@ -420,7 +422,8 @@ export class SR5Actor extends Actor {
       event: options.event,
       actor: this,
       count: attr1.value + attr2.value,
-      title: `${label1} + ${label2}`
+      title: `${label1} + ${label2}`,
+      matrix: Helpers.isMatrix([attr1, attr2])
     });
   }
 
@@ -433,7 +436,8 @@ export class SR5Actor extends Actor {
         actor: this,
         count: matrix_att.value + (options.event[SR5.kbmod.SPEC] ? 2 : 0),
         limit: limit ? limit.value : undefined,
-        title: `${Helpers.label(matrix_att)}`
+        title: `${Helpers.label(matrix_att)}`,
+        matrix: true
       });
     }
     const attributes = Helpers.filter(this.data.data.attributes, ([key, value]) => value.value > 0);
@@ -466,7 +470,8 @@ export class SR5Actor extends Actor {
             event: options.event,
             actor: this,
             count: count,
-            title: `${matrix_att.label} + ${att.label}`
+            title: `${matrix_att.label} + ${att.label}`,
+            matrix: true
           });
 
         }
@@ -507,7 +512,8 @@ export class SR5Actor extends Actor {
         actor: this,
         count: skill.value + att.value + (options.event[SR5.kbmod.SPEC] ? 2 : 0),
         limit: limit ? limit.value : undefined,
-        title: `${Helpers.label(skill.label)} Test`
+        title: `${Helpers.label(skill.label)} Test`,
+        matrix: Helpers.isMatrix(att)
       });
     }
     let dialogData = {
@@ -540,7 +546,8 @@ export class SR5Actor extends Actor {
             actor: this,
             count: count,
             limit: limit ? limit.value : undefined,
-            title: `${skill.label} Test`
+            title: `${skill.label} Test`,
+            matrix: Helpers.isMatrix(att)
           });
 
         }
@@ -604,6 +611,7 @@ export class SR5Actor extends Actor {
             actor: this,
             count: count,
             limit: limit,
+            matrix: Helpers.isMatrix([att, att2])
           });
         }
       }).render(true);

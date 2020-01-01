@@ -94,6 +94,10 @@
         flex-flow: row;
         justify-content: space-evenly;
         margin-bottom: .1em;
+        width: 100%;
+        &.between {
+          justify-content: space-between;
+        }
         .track-slash {
           width: 1.5em;
           transform: translateY(10%);

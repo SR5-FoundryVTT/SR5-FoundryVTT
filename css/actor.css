@@ -76,7 +76,10 @@
         display: flex;
         flex-flow: row;
         justify-content: space-evenly;
-        margin-bottom: .1em; }
+        margin-bottom: .1em;
+        width: 100%; }
+        .sr5.actor .attributes .attribute .track.between {
+          justify-content: space-between; }
         .sr5.actor .attributes .attribute .track .track-slash {
           width: 1.5em;
           transform: translateY(10%);

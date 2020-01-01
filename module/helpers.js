@@ -1,4 +1,17 @@
 export class Helpers {
+  static isMatrix(atts) {
+    if (!atts) return false;
+    const matrixAtts = ['firewall', 'data_processing', 'sleaze', 'attack'];
+    const matrixLabels = matrixAtts.map(s => this.label(s));
+    if (!Array.isArray(atts)) atts = [atts];
+    atts = atts.filter(att => att);
+    atts.forEach(att => {
+      if (typeof att === 'string' && matrixAtts.includes(att)) return true;
+      if (typeof att === 'object' && matrixLabels.includes(att.label)) return true;
+    });
+    return false;
+  }
+
   static setupCustomCheckbox(app, html, data) {
     const setContent = (el => {
       console.log(el);

@@ -1,7 +1,21 @@
 <div class="attributes smooth">
   <div class="attribute">
-    <h4 class="attribute-name roll matrix-roll" data-attribute='attack'>Attack</h4>
-    <h3 class="attribute-input-container">
+    <div class="track between">
+      <div class="attribute-name">
+        Hot Sim
+      </div>
+      <input type='checkbox' class="submit-checkbox" name="data.matrix.hot_sim" {{checked data.matrix.hot_sim}}>
+    </div>
+    <div class="track between">
+      <div class="attribute-name">
+        Running Silent
+      </div>
+      <input type='checkbox' class="submit-checkbox" name="data.matrix.running_silent" {{checked data.matrix.running_silent}}>
+    </div>
+  </div>
+  <div class="attribute">
+    <div class="attribute-name roll matrix-roll" data-attribute='attack'>Attack</div>
+    <div class="attribute-input-container">
       <input
         class="display attribute-input"
         type="text"
@@ -12,7 +26,7 @@
         data-dtype="Number"
         placeholder="1"
         disabled/>
-    </h3>
+    </div>
     <div class="attribute-input-container">
       <input
         class="display track-input"
@@ -26,8 +40,8 @@
     </div>
   </div>
   <div class="attribute">
-    <h4 class="attribute-name matrix-roll roll" data-attribute='sleaze'>Sleaze</h4>
-    <h3 class="attribute-input-container">
+    <div class="attribute-name matrix-roll roll" data-attribute='sleaze'>Sleaze</div>
+    <div class="attribute-input-container">
       <input
         class="display attribute-input"
         type="text"
@@ -38,7 +52,7 @@
         data-dtype="Number"
         placeholder="1"
         disabled/>
-    </h3>
+    </div>
     <div class="attribute-input-container">
       <input
         class="display track-input"
@@ -52,8 +66,8 @@
     </div>
   </div>
   <div class="attribute">
-    <h4 class="attribute-name roll matrix-roll" data-attribute='data_processing'>Data Proc.</h4>
-    <h3 class="attribute-input-container">
+    <div class="attribute-name roll matrix-roll" data-attribute='data_processing'>Data Proc.</div>
+    <div class="attribute-input-container">
       <input
         class="display attribute-input"
         type="text"
@@ -64,7 +78,7 @@
         data-dtype="Number"
         placeholder="1"
         disabled/>
-    </h3>
+    </div>
     <div class="attribute-input-container">
       <input
         class="display track-input"
@@ -78,8 +92,8 @@
     </div>
   </div>
   <div class="attribute">
-    <h4 class="attribute-name roll matrix-roll" data-attribute='firewall'>Firewall</h4>
-    <h3 class="attribute-input-container">
+    <div class="attribute-name roll matrix-roll" data-attribute='firewall'>Firewall</div>
+    <div class="attribute-input-container">
       <input
         class="display attribute-input"
         type="text"
@@ -90,7 +104,7 @@
         data-dtype="Number"
         placeholder="1"
         disabled/>
-    </h3>
+    </div>
     <div class="attribute-input-container">
       <input
         class="display track-input"
@@ -104,7 +118,7 @@
     </div>
   </div>
   <div class="attribute">
-    <h4 class="attribute-name">Con. Mon.</h4>
+    <div class="attribute-name">Con. Mon.</div>
     <div class="track">
       <div class="attribute-input-container">
         <input
@@ -116,8 +130,8 @@
           value="{{data.matrix.condition_monitor.value}}"
           data-dtype="Number"/>
       </div>
-      <h3 class="track-slash flex0">
-      </h3>
+      <div class="track-slash flex0">
+      </div>
       <div class="attribute-input-container">
         <input
           class="display track-input"

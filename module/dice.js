@@ -10,7 +10,7 @@ import { SR5 } from './config.js';
  */
 
 export class DiceSR {
-  static d6({event, count, mod, actor, limit, limitMod, title="Roll", prefix, suffix, after, extended, dialogOptions, wounds=true}) {
+  static d6({event, count, mod, actor, limit, limitMod, title="Roll", prefix, suffix, after, extended, matrix, dialogOptions, wounds=true}) {
     const roll = (count, limit, explode) => {
       let formula = `${count}d6`;
       if (explode) {
@@ -32,15 +32,25 @@ export class DiceSR {
 
       return roll;
     };
+    if (!mod) mod = 0;
 
-    if (wounds && actor) {
-      wounds = actor.data.data.wounds.value;
+    if (actor) {
+      if (wounds) wounds = actor.data.data.wounds.value;
+      if (matrix) {
+        const m = actor.data.data.matrix;
+        if (m.hot_sim) mod += 2;
+        if (m.running_silent) mod -= 2;
+      }
+      if (actor.data.data.modifiers.global) {
+        mod += actor.data.data.modifiers.global;
+      }
     }
 
     let total = parseInt(count) || 0;
 
     if (event && Helpers.hasModifiers(event)) {
       total -= wounds;
+      total += mods;
       let edge = event[SR5.kbmod.EDGE];
       let r = roll(total, edge ? undefined : limit, edge);
       if (after) after(r);
@@ -84,13 +94,14 @@ export class DiceSR {
             extended = html.find('[name=extended]').val(),
             dialogOptions = {
               ...dialogOptions,
-              environmental: parseInt(html.find('[name="options.environmental"]').val()),
+              environmental: parseInt(html.find('[name="options.environmental"]').val())
             };
 
             if (mod) total += mod;
             if (limitMod) limit += limitMod;
             if (wounds) total -= wounds;
             if (dialogOptions.environmental) total -= dialogOptions.environmental;
+            if (dialogOptions.matrix) total -= dialogOptions.matrix;
             let r = roll(total, edge ? undefined : limit, edge);
             resolve(r);
             if (after) after(r);
