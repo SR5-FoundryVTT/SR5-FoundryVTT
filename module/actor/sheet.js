@@ -261,6 +261,7 @@ export class SR5ActorSheet extends ActorSheet {
     html.find('.add-language').click(this._onAddLanguageSkill.bind(this));
     html.find('.language-skill').click(this._onRollLanguageSkill.bind(this));
     html.find('.remove-language').click(this._onRemoveLanguageSkill.bind(this));
+    html.find('.init-edge-checkbox').change((event) => this._onSubmit(event));
 
     // Update Inventory Item
     html.find('.item-edit').click(event => {

@@ -7,14 +7,14 @@
       <div class="flexcol flex4">
         <div class="flexrow">
           <div class="flex4">
-            <h3 class="name">
+            <div class="name">
               <input
                 class="display text left"
                 name="name"
                 type="text"
                 value="{{actor.name}}"
                 placeholder="Name"/>
-            </h3>
+            </div>
           </div>
           {{#each data.limits as |limit label|}}
           {{#ifin label ../config.limits }}
@@ -30,7 +30,7 @@
         <div class="attributes smooth">
           {{#each data.track as |track label|}}
           <div class="attribute">
-            <h4 class="attribute-name">{{toHeaderCase label}}</h4>
+            <div class="attribute-name">{{toHeaderCase label}}</div>
             <div class="track">
               <div class="attribute-input-container">
                 <input
@@ -59,7 +59,7 @@
           </div>
           {{/each}}
           <div class="attribute">
-            <h4 class="attribute-name roll attribute-roll" data-attribute='edge'>Edge</h4>
+            <div class="attribute-name attribute-roll roll" data-attribute="edge">Edge</div>
             <div class="track">
               <div class="attribute-input-container">
                 <input
@@ -86,7 +86,7 @@
             </div>
           </div>
           <div class="attribute">
-            <h4 class="attribute-name">Movement</h4>
+            <div class="attribute-name">Movement</div>
             <div class="track">
               <div class="attribute-input-container">
                 <input
@@ -112,8 +112,8 @@
                   data-dtype="Number"
                   disabled/>
               </div>
-              <h3 class="track-slash">
-              </h3>
+              <div class="track-slash">
+              </div>
               <div class="input attribute-input-container">
                 <input
                   class="display attribute-input"
@@ -130,8 +130,47 @@
             </div>
           </div>
           <div class="attribute">
-            <h4 class="attribute-name roll attribute-roll" data-attribute="essence">Essence</h4>
-            <h3 class="attribute-input-container">
+            <div class="track">
+              <div class="attribute-name">
+                <select name="data.initiative.perception" class="display">
+                  {{#select data.initiative.perception}}
+                  <option value="meatspace">Meatspace</option>
+                  <option value="matrix">Matrix</option>
+                  {{#ife data.special 'magic'}}
+                  <option value="astral">Astral</option>
+                  {{/ife}}
+                  {{/select}}
+                </select>
+              </div>
+              <label title="Use Edge in next Initiative Roll" class="checkbox init-edge-label">
+                <input type='checkbox' class="init-edge-checkbox" name="data.initiative.edge" {{checked data.initiative.edge}}>
+                <span class="checkmark far"></span>
+              </label>
+            </div>
+            <div class="track">
+              <div class="attribute-input-container">
+                <input
+                   class="display"
+                   size='4'
+                   type='text'
+                   value="{{data.initiative.current.base.value}}"
+                   disabled />
+              </div>
+              <div class="track-plus">
+              </div>
+              <div class="attribute-input-container">
+                <input
+                   class="display"
+                   size='4'
+                   type='text'
+                   value="{{data.initiative.current.dice.text}}"
+                   disabled />
+              </div>
+            </div>
+          </div>
+          <div class="attribute">
+            <div class="attribute-name roll attribute-roll" data-attribute="essence">Essence</div>
+            <div class="attribute-input-container">
               <input
                 class="display attribute-input"
                 type="text"
@@ -142,7 +181,7 @@
                 data-dtype="Number"
                 disabled
                 placeholder="1"/>
-            </h3>
+            </div>
           </div>
         </div>
       </div>

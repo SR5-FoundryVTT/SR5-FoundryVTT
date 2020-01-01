@@ -2,6 +2,11 @@
 .sr5.actor {
   min-height: 690px;
   min-width: 800px;
+  .name {
+    margin-bottom: 0;
+    font-size: 200%;
+    @include nodesto;
+  }
   .attributes {
     border-top: $groove;
     display: flex;
@@ -30,7 +35,7 @@
       justify-content: space-evenly;
       padding: 0 .25em;
       flex: 1 0 auto;
-      min-width: 5rem;
+      min-width: 4em;
       &:hover {
         .attribute-input-container.row {
           visibility: visible;
@@ -73,6 +78,7 @@
       .attribute-input-container {
         align-text: center;
         position: relative;
+        margin-bottom: 2px;
         &.row {
           //visibility: hidden;
           display: flex;
@@ -89,7 +95,7 @@
         justify-content: space-evenly;
         margin-bottom: .1em;
         .track-slash {
-          width: 2em;
+          width: 1.5em;
           transform: translateY(10%);
           flex: 0 0;
           &:after {
@@ -97,6 +103,7 @@
           }
         }
         .track-plus {
+          width: 1.5em;
           flex: 0 0;
           &:after {
             content: '+';
@@ -109,10 +116,21 @@
       }
     }
   }
+  .skills-container {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-around;
+    > *:not(:first-child) {
+      margin-left: .25em;
+    }
+    > *:not(:last-child) {
+      border-right: $groove;
+      padding-right: .25em;
+    }
+  }
   .limit {
     @include nodesto;
     padding: 0 .1rem;
-    border-right: $groove;
     margin-top: -2px;
     text-align: center;
     display: flex;
@@ -124,5 +142,11 @@
   .scroll-area {
     overflow-y: scroll;
     max-height: 28em;
+    &.left {
+      direction: rtl;
+      >* {
+        direction: ltr;
+      }
+    }
   }
 }

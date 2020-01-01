@@ -2,8 +2,8 @@
       {{#each data.attributes as |attribute a|}}
         {{#unless attribute.hidden}}
           <div class="attribute">
-            <h4 class="attribute-name roll attribute-roll" data-attribute="{{a}}">{{toHeaderCase a}}</h4>
-            <h3 class="attribute-input-container">
+            <div class="attribute-name roll attribute-roll" data-attribute="{{a}}">{{toHeaderCase a}}</div>
+            <div class="attribute-input-container">
               <input
                 class="display attribute-input"
                 type="text"
@@ -13,13 +13,13 @@
                 value="{{attribute.value}}"
                 data-dtype="Number"
                 placeholder="1"/>
-            </h3>
+            </div>
           </div>
         {{/unless}}
       {{/each}}
     </div>
   <div class="inventory">
-    <div class="flexrow nowrap">
+    <div class="flexrow nowrap skills-container">
       <div>
         <div class="item item-section skill-header" data-category="skills.active">
           <div class="item-left">
@@ -28,7 +28,7 @@
             </div>
           </div>
           <div class="item-right">
-            <div class="item-text skill-item">
+            <div class="item-text skill-item spec">
               Specializations
             </div>
             <div class="item-text rtg">
@@ -36,7 +36,7 @@
             </div>
           </div>
         </div>
-        <div class="scroll-area">
+        <div class="scroll-area left light-border-right">
           {{#each data.skills.active as |skill sid|}}
           <div class="item {{skill.css}}">
             <div class="item-left">
@@ -77,7 +77,7 @@
               </div>
             </div>
             <div class="item-right">
-              <div class="item-text skill-item">
+              <div class="item-text skill-item spec">
                 Specializations
               </div>
               <div class="item-text rtg">
@@ -139,7 +139,7 @@
               </div>
             </div>
             <div class="item-right">
-              <div class="item-text skill-item">
+              <div class="item-text skill-item spec">
                 Specializations
               </div>
               <div class="item-text rtg">

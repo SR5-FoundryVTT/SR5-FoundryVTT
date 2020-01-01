@@ -184,6 +184,7 @@ export class SR5Actor extends Actor {
       data.initiative.perception = 'meatspace';
     }
     init.current.dice.value = init.current.dice.base + mods.initiative_dice;
+    if (init.edge) init.current.dice.value = 5;
     init.current.dice.text = `${init.current.dice.value}d6`;
     init.current.base.value = init.current.base.base + mods.initiative;
 

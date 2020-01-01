@@ -105,6 +105,10 @@
 .sr5.actor {
   min-height: 690px;
   min-width: 800px; }
+  .sr5.actor .name {
+    margin-bottom: 0;
+    font-size: 200%;
+    font-family: "Nodesto", "Signika", "Palatino Linotype", serif; }
   .sr5.actor .attributes {
     border-top: 1px solid #4d4d4d;
     display: flex;
@@ -133,7 +137,7 @@
       justify-content: space-evenly;
       padding: 0 .25em;
       flex: 1 0 auto;
-      min-width: 5rem; }
+      min-width: 4em; }
       .sr5.actor .attributes .attribute:hover .attribute-input-container.row {
         visibility: visible; }
       .sr5.actor .attributes .attribute.flex0 {
@@ -164,7 +168,8 @@
           cursor: pointer; }
       .sr5.actor .attributes .attribute .attribute-input-container {
         align-text: center;
-        position: relative; }
+        position: relative;
+        margin-bottom: 2px; }
         .sr5.actor .attributes .attribute .attribute-input-container.row {
           display: flex;
           flex-flow: row; }
@@ -177,22 +182,31 @@
         justify-content: space-evenly;
         margin-bottom: .1em; }
         .sr5.actor .attributes .attribute .track .track-slash {
-          width: 2em;
+          width: 1.5em;
           transform: translateY(10%);
           flex: 0 0; }
           .sr5.actor .attributes .attribute .track .track-slash:after {
             content: '/'; }
         .sr5.actor .attributes .attribute .track .track-plus {
+          width: 1.5em;
           flex: 0 0; }
           .sr5.actor .attributes .attribute .track .track-plus:after {
             content: '+'; }
         .sr5.actor .attributes .attribute .track .track-max-value {
           margin-bottom: 0;
           margin-left: .25em; }
+  .sr5.actor .skills-container {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-around; }
+    .sr5.actor .skills-container > *:not(:first-child) {
+      margin-left: .25em; }
+    .sr5.actor .skills-container > *:not(:last-child) {
+      border-right: 1px solid #4d4d4d;
+      padding-right: .25em; }
   .sr5.actor .limit {
     font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
     padding: 0 .1rem;
-    border-right: 1px solid #4d4d4d;
     margin-top: -2px;
     text-align: center;
     display: flex;
@@ -203,6 +217,10 @@
   .sr5.actor .scroll-area {
     overflow-y: scroll;
     max-height: 28em; }
+    .sr5.actor .scroll-area.left {
+      direction: rtl; }
+      .sr5.actor .scroll-area.left > * {
+        direction: ltr; }
 
 @font-face {
   font-family: "Nodesto";
@@ -267,10 +285,6 @@
 
 .input {
   position: relative; }
-  .input.right > input[type="text"] {
-    text-align: right; }
-  .input.right .unit {
-    left: 50%; }
   .input .unit {
     position: absolute;
     display: block;
@@ -290,6 +304,11 @@ label.checkbox {
   -ms-user-select: none; }
   label.checkbox:hover input ~ .checkmark {
     text-shadow: 0 0 0.2em #4d4d4d; }
+  label.checkbox.init-edge-label {
+    margin-right: 1.75em;
+    font-size: .75em;
+    top: .95em;
+    left: -.5em; }
   label.checkbox input {
     position: absolute;
     opacity: 0;
@@ -342,7 +361,11 @@ input[type="text"].display {
   input[type="text"].display:disabled {
     color: #e6e6e6;
     background: transparent;
-    border-color: transparent; }
+    border-color: transparent;
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: 0;
+    margin-right: 0; }
 
 select.display {
   color: white;
@@ -366,12 +389,6 @@ select.display {
   padding: .25em;
   border-right: 1px solid #4d4d4d;
   border-bottom: 1px solid #4d4d4d; }
-
-.sr5 .name {
-  margin-bottom: 0;
-  border-right: 1px solid #4d4d4d;
-  font-size: 200%;
-  font-family: "Nodesto", "Signika", "Palatino Linotype", serif; }
 
 .sr5 .tabs {
   margin: .25em; }
@@ -439,7 +456,7 @@ select.display {
       .sr5 .inventory .item .item-img + .item-name {
         border-left: none !important; }
     .sr5 .inventory .item .item-input {
-      max-width: 10em; }
+      max-width: 9.5em; }
     .sr5 .inventory .item .item-desc {
       padding: .25em;
       font-size: .8em;
@@ -477,8 +494,14 @@ select.display {
         align-content: center; }
       .sr5 .inventory .item .item-text.item-name {
         text-align: left; }
+      .sr5 .inventory .item .item-text.spec {
+        width: 100%;
+        justify-content: center;
+        text-align: center; }
       .sr5 .inventory .item .item-text.rtg {
         min-width: 3em; }
+        .sr5 .inventory .item .item-text.rtg.active-skills-rating {
+          padding-right: 1em; }
       .sr5 .inventory .item .item-text.desc {
         min-width: 16em; }
     .sr5 .inventory .item .skill-item {
