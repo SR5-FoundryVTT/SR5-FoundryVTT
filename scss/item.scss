@@ -1,9 +1,7 @@
 @import "config.scss";
 .sr5.item {
-  .item-name-input {
-    @include title;
-    font-size: 1.5em;
-  }
+  min-height: 450px;
+  min-width: 650px;
   .item-header {
     display: flex;
     flex-flow: row nowrap;
@@ -11,9 +9,15 @@
     border: $groove;
     .item-name {
       flex: 1;
-      border-right: $groove;
       @include nodesto;
       font-size: 1.5em;
+      .display {
+        padding-top: 1em;
+        padding-bottom: 1em;
+      }
+    }
+    .source {
+      flex: 1;
       .display {
         padding-top: 1em;
         padding-bottom: 1em;
@@ -80,7 +84,7 @@
         flex: 1;
       }
       .label {
-        color: $dark;
+        color: $light;
         font-size: 1.15em;
         @include nodesto;
       }
@@ -102,11 +106,16 @@
         }
       }
       select {
+        color: $color;
         background: rgba($black, 0.05);
         border-radius: .3em;
         border-color: $dark;
+        >option {
+          background-color: $dark;
+        }
       }
       input {
+        color: $color;
         background: rgba($black, 0.05);
         border-radius: .3em;
         border-color: $dark;

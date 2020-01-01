@@ -39,11 +39,10 @@
       </div>
     </div>
     {{/each}}
-    {{#each spells as |section sid|}}
     <div class="item item-section">
       <div class="item-left">
         <div class="item-text item-name">
-          {{section.label}}
+          Spells
         </div>
       </div>
       <div class="item-right">
@@ -67,6 +66,7 @@
         </div>
       </div>
     </div>
+    {{#each spells as |section sid|}}
     {{#each section.items as |item iid|}}
     <div class="item" data-item='{{item.id}}'>
       <div class="item-left">

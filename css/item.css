@@ -1,97 +1,103 @@
-.sr5.item .item-name-input {
-  font-size: 120%;
-  font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
-  font-size: 1.5em; }
-
-.sr5.item .item-header {
-  display: flex;
-  flex-flow: row nowrap;
-  align-items: stretch;
-  border: 2px groove white; }
-  .sr5.item .item-header .item-name {
-    flex: 1;
-    border-right: 2px groove white;
-    font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
-    font-size: 1.5em; }
-    .sr5.item .item-header .item-name .display {
-      padding-top: 1em;
-      padding-bottom: 1em; }
-  .sr5.item .item-header .item-type {
-    font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
-    flex: 0;
-    padding: 0 .5em;
-    color: #4d4d4d;
-    display: flex;
-    flex-flow: column;
-    align-content: center;
-    justify-content: center; }
-  .sr5.item .item-header .item-image {
-    flex: 0;
-    border-right: 2px groove white;
-    margin-bottom: none;
-    padding-bottom: none; }
-  .sr5.item .item-header .item-info {
-    flex: 1; }
-    .sr5.item .item-header .item-info > :not(:last-child) {
-      border-bottom: 2px groove white; }
-
-.sr5.item .technology {
-  font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
-  min-width: 7em;
-  border-top: 2px groove white;
-  border-right: 2px groove white;
-  border-bottom: 2px groove white; }
-  .sr5.item .technology > * {
+.sr5.item {
+  min-height: 450px;
+  min-width: 650px; }
+  .sr5.item .item-header {
     display: flex;
     flex-flow: row nowrap;
-    justify-content: space-between; }
-
-.sr5.item .description {
-  padding: 2px;
-  height: 100%;
-  min-height: 16em;
-  border: 2px groove white;
-  margin-left: -2px;
-  overflow-y: auto; }
-
-.sr5.item .item-form {
-  padding: 0 .5em; }
-  .sr5.item .item-form .header {
-    font-size: 120%;
-    font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
-    font-size: 1.75em;
-    border-top: 2px groove white;
-    border-bottom: 2px groove white; }
-  .sr5.item .item-form .form-line {
-    display: flex;
-    flex-flow: row;
-    justify-content: space-between;
-    align-content: center;
-    padding: .1em .25em; }
-    .sr5.item .item-form .form-line > * {
+    align-items: stretch;
+    border: 1px solid #4d4d4d; }
+    .sr5.item .item-header .item-name {
+      flex: 1;
+      font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
+      font-size: 1.5em; }
+      .sr5.item .item-header .item-name .display {
+        padding-top: 1em;
+        padding-bottom: 1em; }
+    .sr5.item .item-header .source {
       flex: 1; }
-    .sr5.item .item-form .form-line .label {
+      .sr5.item .item-header .source .display {
+        padding-top: 1em;
+        padding-bottom: 1em; }
+    .sr5.item .item-header .item-type {
+      font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
+      flex: 0;
+      padding: 0 .5em;
       color: #4d4d4d;
-      font-size: 1.15em;
-      font-family: "Nodesto", "Signika", "Palatino Linotype", serif; }
-    .sr5.item .item-form .form-line .inputs {
+      display: flex;
+      flex-flow: column;
+      align-content: center;
+      justify-content: center; }
+    .sr5.item .item-header .item-image {
+      flex: 0;
+      border-right: 1px solid #4d4d4d;
+      margin-bottom: none;
+      padding-bottom: none; }
+    .sr5.item .item-header .item-info {
+      flex: 1; }
+      .sr5.item .item-header .item-info > :not(:last-child) {
+        border-bottom: 1px solid #4d4d4d; }
+  .sr5.item .technology {
+    font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
+    min-width: 7em;
+    border-top: 1px solid #4d4d4d;
+    border-right: 1px solid #4d4d4d;
+    border-bottom: 1px solid #4d4d4d; }
+    .sr5.item .technology > * {
+      display: flex;
+      flex-flow: row nowrap;
+      justify-content: space-between; }
+  .sr5.item .description {
+    padding: 2px;
+    height: 100%;
+    min-height: 16em;
+    border: 1px solid #4d4d4d;
+    margin-left: -1px;
+    overflow-y: auto; }
+  .sr5.item .item-form {
+    padding: 0 .5em; }
+    .sr5.item .item-form .header {
+      font-size: 120%;
+      font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
+      color: #e6e6e6;
+      color: white;
+      text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
+      font-size: 1.75em;
+      border-top: 1px solid #4d4d4d;
+      border-bottom: 1px solid #4d4d4d; }
+    .sr5.item .item-form .form-line {
       display: flex;
       flex-flow: row;
-      justify-content: flex-end;
-      align-items: center;
-      font-size: .75em; }
-      .sr5.item .item-form .form-line .inputs.between {
-        justify-content: space-between; }
-      .sr5.item .item-form .form-line .inputs.around {
-        justify-content: space-around; }
-      .sr5.item .item-form .form-line .inputs > * {
-        padding-left: .25em default;
-        padding-right: .25em default; }
-    .sr5.item .item-form .form-line select {
-      background: rgba(0, 0, 0, 0.05);
-      border-radius: .3em;
-      border-color: #4d4d4d; }
-    .sr5.item .item-form .form-line input {
-      background: rgba(0, 0, 0, 0.05);
-      border-radius: .3em;
-      border-color: #4d4d4d; }
+      justify-content: space-between;
+      align-content: center;
+      padding: .1em .25em; }
+      .sr5.item .item-form .form-line > * {
+        flex: 1; }
+      .sr5.item .item-form .form-line .label {
+        color: #e6e6e6;
+        font-size: 1.15em;
+        font-family: "Nodesto", "Signika", "Palatino Linotype", serif; }
+      .sr5.item .item-form .form-line .inputs {
+        display: flex;
+        flex-flow: row;
+        justify-content: flex-end;
+        align-items: center;
+        font-size: .75em; }
+        .sr5.item .item-form .form-line .inputs.between {
+          justify-content: space-between; }
+        .sr5.item .item-form .form-line .inputs.around {
+          justify-content: space-around; }
+        .sr5.item .item-form .form-line .inputs > * {
+          padding-left: .25em default;
+          padding-right: .25em default; }
+      .sr5.item .item-form .form-line select {
+        color: white;
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: .3em;
+        border-color: #4d4d4d; }
+        .sr5.item .item-form .form-line select > option {
+          background-color: #4d4d4d; }
+      .sr5.item .item-form .form-line input {
+        color: white;
+        background: rgba(0, 0, 0, 0.05);
+        border-radius: .3em;
+        border-color: #4d4d4d; }

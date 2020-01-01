@@ -15,8 +15,7 @@ export class SR5ActorSheet extends ActorSheet {
      * Keep track of the currently active sheet tab
      * @type {string}
      */
-    this._sheetTab = "equipment";
-    this._sheetSkillTab = 'active';
+    this._sheetTab = "skills";
     this._shownUntrainedSkills = [];
     this._shownDesc = [];
   }
@@ -31,8 +30,8 @@ export class SR5ActorSheet extends ActorSheet {
 	  return mergeObject(super.defaultOptions, {
   	  classes: ["sr5", "sheet", "actor"],
   	  template: "systems/shadowrun5e/templates/actor/character.html",
-      width: 600,
-      height: 670
+      width: 800,
+      height: 690
     });
   }
 
@@ -211,12 +210,6 @@ export class SR5ActorSheet extends ActorSheet {
       initial: initial,
       callback: clicked => this._sheetTab = clicked.data("tab")
     });
-    let skilltabs = html.find('.tabs').filter('nav[data-group=skills]');
-    let skillInitial = this._sheetSkillTab;
-    new Tabs(skilltabs, {
-      initial: skillInitial,
-      callback: clicked => this._sheetSkillTab = clicked.data('tab')
-    });
 
     html.find('.hidden').hide();
     this._shownUntrainedSkills.forEach(cat => {
@@ -227,7 +220,10 @@ export class SR5ActorSheet extends ActorSheet {
     html.find('.skill-header').click(event => {
       event.preventDefault();
       const category = event.currentTarget.dataset.category;
-      const field = $(event.currentTarget).siblings('.item.hidden');
+      let field = $(event.currentTarget).siblings('.item.hidden');
+      if (field.length === 0) {
+        field = $(event.currentTarget).siblings('.scroll-area').find('.item.hidden');
+      }
       field.toggle();
       if (field.is(':visible')) this._shownUntrainedSkills.push(category);
       else this._shownUntrainedSkills = this._shownUntrainedSkills.filter(val => val !== category);

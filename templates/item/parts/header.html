@@ -5,20 +5,20 @@
   <div class="item-info">
     <div class="flexrow">
       <div class="item-name">
-        <input type="text" class="display" name="name" value='{{item.name}}' placeholder="Item Name" />
+        <input type="text" class="display text" name="item.name" value='{{item.name}}' placeholder="Item Name" />
       </div>
       <div class="item-type">
         {{toHeaderCase item.type}}
       </div>
     </div>
     <div class="flexrow">
-      <input
-        class="display"
-        type='text'
-        name='data.description.source'
-        value='{{data.description.source}}'
-        placeholder='Source' />
-    </div>
+      <div class="source">
+        <input
+          class="display text"
+          type='text'
+          name='data.description.source'
+          value='{{data.description.source}}'
+          placeholder='Source' />
       </div>
     </div>
   </div>

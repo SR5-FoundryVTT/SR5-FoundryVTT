@@ -20,23 +20,23 @@
     </div>
   <div class="inventory">
     <div class="flexrow nowrap">
-      <div class="scroll-area">
-        <div>
-          <div class="item item-section skill-header" data-category="{{cid}}">
-            <div class="item-left">
-              <div class="item-text item-name">
-                Active Skills
-              </div>
-            </div>
-            <div class="item-right">
-              <div class="item-text skill-item">
-                Specializations
-              </div>
-              <div class="item-text rtg">
-                Rtg
-              </div>
+      <div>
+        <div class="item item-section skill-header" data-category="skills.active">
+          <div class="item-left">
+            <div class="item-text item-name">
+              Active Skills
             </div>
           </div>
+          <div class="item-right">
+            <div class="item-text skill-item">
+              Specializations
+            </div>
+            <div class="item-text rtg">
+              Rtg
+            </div>
+          </div>
+        </div>
+        <div class="scroll-area">
           {{#each data.skills.active as |skill sid|}}
           <div class="item {{skill.css}}">
             <div class="item-left">
@@ -47,7 +47,7 @@
             <div class="item-right">
               <div class="item-text skill-item">
                 <input
-                  class="display"
+                  class="display text right"
                   type="text"
                   value="{{skill.specs}}"
                   name="data.skills.active.{{sid}}.specs" />
@@ -93,10 +93,10 @@
           {{#each data.skills.language.value as |skill sid|}}
           <div class="item {{skill.css}}">
             <div class="item-left">
-              <div class="item-text skill-item item-name center">
-                <i class='roll language-skill fas fa-dice-six' data-skill='{{sid}}'></i>
+              <div class="item-text skill-item item-input center">
+                <i class='roll language-skill fas fa-dice-six item-img' data-skill='{{sid}}'></i>
                 <input
-                  class="display left"
+                  class="display left text"
                   type="text"
                   value="{{skill.name}}"
                   name="data.skills.language.value.{{sid}}.name" />
@@ -105,7 +105,7 @@
             <div class="item-right">
               <div class="item-text skill-item">
                 <input
-                  class="display"
+                  class="display text right"
                   type="text"
                   value="{{skill.specs}}"
                   name="data.skills.language.value.{{sid}}.specs" />
@@ -155,10 +155,10 @@
           {{#each cat.value as |skill sid|}}
           <div class="item {{skill.css}}">
             <div class="item-left">
-              <div class="item-text skill-item item-name center">
-                <i class='roll knowledge-skill fas fa-dice-six' data-skill='{{sid}}' data-category='{{cid}}'></i>
+              <div class="item-text skill-item item-input center">
+                <i class='roll knowledge-skill fas fa-dice-six item-img' data-skill='{{sid}}' data-category='{{cid}}'></i>
                 <input
-                  class="display left"
+                  class="display left text"
                   type="text"
                   value="{{skill.name}}"
                   name="data.skills.knowledge.{{cid}}.value.{{sid}}.name" />
@@ -167,7 +167,7 @@
             <div class="item-right">
               <div class="item-text skill-item">
                 <input
-                  class="display"
+                  class="display text"
                   type="text"
                   value="{{skill.specs}}"
                   name="data.skills.knowledge.{{cid}}.value.{{sid}}.specs" />

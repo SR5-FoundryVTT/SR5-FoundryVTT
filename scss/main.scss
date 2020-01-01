@@ -1,5 +1,6 @@
 @import "config.scss";
 @import "item.scss";
+@import "actor.scss";
 
 @font-face {
   font-family: "Nodesto";
@@ -7,15 +8,6 @@
 }
 .roll {
   @include rollable;
-}
-
-hr.divider {
-  margin: 0em;
-  border-width: .1em;
-}
-
-.border {
-  border: 1px solid black;
 }
 
 .flexrow {
@@ -26,9 +18,6 @@ hr.divider {
 }
 .nowrap {
   flex-wrap: nowrap;
-}
-.align-stretch {
-  align-items: stretch;
 }
 .align-start {
   align-items: flex-start;
@@ -74,14 +63,6 @@ hr.divider {
 .flex4 {
   flex: 4;
 }
-.flexchild1 {
-  > * {
-    flex: 1 0 auto;
-  }
-}
-.groove-right {
-  border-right: $groove;
-}
 
 .input {
   position: relative;
@@ -97,8 +78,8 @@ hr.divider {
   .unit {
     position: absolute;
     display: block;
-    left: 15%;
-    top: 10%;
+    left: 5px;
+    top: 2px;
     z-index: 9;
   }
 }
@@ -134,6 +115,7 @@ label.checkbox {
 
 button.display {
   background: transparent;
+  color: $color;
   border: none;
   text-align: center;
   &:hover {
@@ -147,6 +129,7 @@ input[type='checkbox'].hidden {
 
 input[type='checkbox'].display {
   background: transparent;
+  color: $color;
   border: none;
   text-align: center;
   font-size: 1em;
@@ -157,98 +140,38 @@ input[type='checkbox'].display {
 }
 
 input[type="text"].display {
-  background: transparent;
-  border: $groove-width solid transparent;
+  @include textOutline;
+  background: rgba($light, 0.1);
+  color: $color;
+  border-radius: .3em;
+  border-color: $black;
   text-align: center;
   min-height: 1em;
-  &:hover:not(:disabled) {
-    background: transparent;
-    border: $groove;
+  &.text {
+    background: rgba($dark, 0.1);
+    border-radius: 0;
+  }
+  &.right {
+    text-align: right;
   }
   &.left {
     text-align: left;
   }
-  &.mod-input {
-    font-size: .75em;
-    margin-top: -.5em;
-    margin-bottom: -.25em;
-    line-height: 10px;
-    padding: 0;
-  }
   &:disabled {
-    color: $black;
+    color: $light;
+    background: transparent;
+    border-color: transparent;
   }
 }
 
 select.display {
-  background: transparent;
-  border: none;
-  text-align: center;
-  margin: 0 $groove-width;
-  &:hover {
-    background: transparent;
-    border: $groove;
-    margin: 0
+  color: $color;
+  background: rgba($black, 0.05);
+  border-radius: .3em;
+  border-color: $dark;
+  >option {
+    background-color: $dark;
   }
-}
-
-.white {
-  color: $white;
-}
-
-.text-outline {
-  @include textOutline;
-}
-
-.level {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: nowrap;
-  justify-content: space-between;
-  >.level-left {
-    order: 0;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-  }
-  >.level-right {
-    order: 1;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: flex-end;
-  }
-  .level-item {
-
-  }
-}
-
-.text-center {
-  text-align: center;
-}
-
-.no-margin {
-  margin: 0;
-  margin-bottom: 0;
-}
-.size4 {
-  font-size: 1.5em;
-}
-.size5 {
-  font-size: 1.25em;
-}
-.size6 {
-  font-size: 1em;
-}
-.size7 {
-  font-size: .75em;
-}
-.groove-bottom {
-  border-bottom: $groove;
-}
-.groove-top {
-  border-top: $groove;
 }
 
 .sr5 {
@@ -259,11 +182,11 @@ select.display {
   }
 
   .editor {
-    height: 10em;
+    height: 15em;
     width: 100%;
+    color: $color;
     .tox-toolbar-overlord,
     .tox-toolbar__primary {
-      background: none;
     }
   }
 
@@ -297,23 +220,22 @@ select.display {
     width: 100%;
     font-size: 85%;
     position: relative;
-    .item:not(.item-section) + .item:not(.item-section) {
-      border-top: 1px solid rgba($black, 0.5);
-    }
     .item {
       display: flex;
       flex-flow: row nowrap;
       justify-content: space-between;
       align-items: center;
       align-content: center;
-      padding: 0 .25em;
+      padding: .1em .25em;
+      margin: .1em;
       margin-right: $groove-width;
       margin-left: $groove-width;
+      border-bottom: 1px solid $grey;
       .has-desc {
         @include rollable;
       }
       &.item-section {
-        border: $groove;
+        border: $groove-width solid $black;;
         margin-right: 0;
         margin-left: 0;
         background: rgba($grey, 0.2);
@@ -341,6 +263,9 @@ select.display {
         & + .item-name {
           border-left: none !important;
         }
+      }
+      .item-input {
+        max-width: 10em;
       }
       .item-desc {
         padding: .25em;
@@ -370,6 +295,7 @@ select.display {
         flex: 1 0 auto;
         text-align: center;
         height: 100%;
+        border: $light;
         &.six {
           min-width: 6em;
         }
@@ -380,14 +306,8 @@ select.display {
           align-items: center;
           align-content: center;
         }
-        &:not(:first-child) {
-          border-left: 1px solid rgba($grey, 0.5);
-        }
         &.item-name {
           text-align: left;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          max-width: 9em;
         }
         &.rtg {
           min-width: 3em;
@@ -402,122 +322,6 @@ select.display {
       &.skill-header {
         @include rollable;
       }
-    }
-  }
-  .attributes {
-    border-top: $groove;
-    display: flex;
-    flex-flow: row;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-    &.no-border {
-      border-top: none;
-      border-bottom: none;
-    }
-    &.wrap {
-      flex-wrap: wrap;
-    }
-    & + :not(.attributes) {
-      border-top: $groove;
-    }
-    &:last-child {
-      border-bottom: $groove;
-    }
-    .attribute {
-      @include title
-      display: flex;
-      text-align: center;
-      flex-flow: column nowrap;
-      align-items: center;
-      justify-content: space-around;
-      padding: 0 .25em;
-      flex: 1 0 auto;
-      min-width: 5rem;
-      &:hover {
-        .attribute-input-container.row {
-          visibility: visible;
-        }
-      }
-      &.flex0 {
-        min-width: 0;
-        width: 0;
-      }
-      &.row {
-        flex-flow: row nowrap;
-        justify-content: center;
-        align-items: center;
-        align-content: center;
-        >.attribute-name {
-          width: auto;
-        }
-        &.space-around {
-          justify-content: space-around;
-        }
-        .attribute-input {
-          transform: translateY(20%);
-        }
-      }
-      &:not(:last-child) {
-        border-right: $groove;
-      }
-      &:not(.row) > .attribute-name {
-        @include shortUnder;
-      }
-      >.attribute-name {
-        font-size: 115%;
-        width: 100%;
-        text-align: center;
-        margin-bottom: 0;
-        &.icon {
-          font-size: .75em;
-        }
-        &.roll {
-          @include rollable;
-        }
-      }
-      .attribute-input-container {
-        align-text: center;
-        position: relative;
-        &.row {
-          //visibility: hidden;
-          display: flex;
-          flex-flow: row;
-        }
-        >.attribute-input {
-          text-align: center;
-          margin: 2px;
-        }
-        .unit {
-          top: 0;
-          left: 0;
-        }
-      }
-      .track {
-        display: flex;
-        flex-flow: row;
-        flex-wrap: nowrap;
-        justify-content: center;
-        margin-bottom: 0;
-        .track-slash {
-          transform: translateY(10%);
-          flex: 0 0;
-          &:after {
-            content: '/';
-          }
-        }
-        .track-plus {
-          transform: translateY(10%);
-          flex: 0 0;
-          &:after {
-            content: '+';
-          }
-        }
-        .track-max-value {
-          margin-bottom: 0;
-          margin-left: .25em;
-        }
-      }
-
     }
   }
   &.chat-card {
@@ -585,60 +389,6 @@ select.display {
           padding-right: 0;
         }
       }
-    }
-  }
-  &.actor {
-    min-height: 45em;
-    min-width: 60em;
-    .sheet-header-row-2 {
-      > * {
-        text-align: center;
-      }
-
-      > *:not(:last-child) {
-        margin-right: 1em;
-      }
-      > *:not(:first-child) {
-        border-left: $groove;
-      }
-
-      .defense-icon {
-        margin-left: .25em;
-        margin-right: .25em;
-        &:hover {
-          color: $grey;
-          cursor: pointer;
-        }
-      }
-      .attribute-only-roll {
-        margin-left: .25em;
-        margin-right: .25em;
-        text-align: center;
-        margin-bottom: 0;
-        &:hover {
-          color: $grey;
-          cursor: pointer;
-        }
-      }
-    }
-    .skills {
-      width: 20em;
-    }
-    .limit {
-      @include nodesto;
-      padding: 0 .1rem;
-      border-right: $groove;
-      margin-top: -2px;
-      text-align: center;
-      display: flex;
-      flex-flow: column nowrap;
-      justify-content: center;
-      align-items: center;
-      align-content: center;
-    }
-    .scroll-area {
-      overflow-y: scroll;
-      max-height: 28em;
     }
   }
 }

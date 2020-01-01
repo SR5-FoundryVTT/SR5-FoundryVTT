@@ -14,6 +14,9 @@
           Attribute
         </div>
         <div class="item-text">
+          Attribute
+        </div>
+        <div class="item-text">
           Limit
         </div>
         <div class="item-text">
@@ -42,10 +45,19 @@
           {{toHeaderCase action.data.action.attribute}}
         </div>
         <div class="item-text">
-          {{toHeaderCase action.data.action.limit_att}}
+          {{#unless action.data.action.skill}}
+          {{toHeaderCase action.data.action.attribute2}}
+          {{/unless}}
         </div>
         <div class="item-text">
-          {{toHeaderCase action.data.action.mod}}
+          {{#if action.data.action.limit.attribute}}
+          {{toHeaderCase action.data.action.limit.attribute}} ({{action.data.action.limit.value}})
+          {{else}}
+          {{action.data.action.limit.value}}
+          {{/if}}
+        </div>
+        <div class="item-text">
+          {{action.data.action.mod}}
         </div>
         <div class="item-text item-icons">
           <i class="item-edit roll fas fa-edit" data-item='{{action.id}}'></i>

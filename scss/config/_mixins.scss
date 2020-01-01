@@ -12,6 +12,8 @@
 @mixin title {
   font-size: 120%;
   font-family: $nodesto;
+  color: $light;
+  @include textOutline;
 }
 
 @mixin textOutline {

@@ -1,0 +1,101 @@
+.sr5.actor {
+  min-height: 690px;
+  min-width: 800px; }
+  .sr5.actor .attributes {
+    border-top: 1px solid #4d4d4d;
+    display: flex;
+    flex-flow: row;
+    flex-wrap: nowrap;
+    justify-content: space-between; }
+    .sr5.actor .attributes.no-border {
+      border-top: none;
+      border-bottom: none; }
+    .sr5.actor .attributes.wrap {
+      flex-wrap: wrap; }
+    .sr5.actor .attributes + :not(.attributes) {
+      border-top: 1px solid #4d4d4d; }
+    .sr5.actor .attributes:last-child {
+      border-bottom: 1px solid #4d4d4d; }
+    .sr5.actor .attributes .attribute {
+      font-size: 120%;
+      font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
+      color: #e6e6e6;
+      color: white;
+      text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
+      display: flex;
+      text-align: center;
+      flex-flow: column nowrap;
+      align-items: center;
+      justify-content: space-evenly;
+      padding: 0 .25em;
+      flex: 1 0 auto;
+      min-width: 5rem; }
+      .sr5.actor .attributes .attribute:hover .attribute-input-container.row {
+        visibility: visible; }
+      .sr5.actor .attributes .attribute.flex0 {
+        min-width: 0;
+        width: 0; }
+      .sr5.actor .attributes .attribute.row {
+        flex-flow: row nowrap;
+        justify-content: center;
+        align-items: center;
+        align-content: center; }
+        .sr5.actor .attributes .attribute.row > .attribute-name {
+          width: auto; }
+        .sr5.actor .attributes .attribute.row.space-around {
+          justify-content: space-around; }
+        .sr5.actor .attributes .attribute.row .attribute-input {
+          transform: translateY(20%); }
+      .sr5.actor .attributes .attribute:not(:last-child) {
+        border-right: 1px solid #4d4d4d; }
+      .sr5.actor .attributes .attribute > .attribute-name {
+        font-size: 115%;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 0; }
+        .sr5.actor .attributes .attribute > .attribute-name.icon {
+          font-size: .75em; }
+        .sr5.actor .attributes .attribute > .attribute-name.roll:hover {
+          text-shadow: 0 0 0.2em #4d4d4d;
+          cursor: pointer; }
+      .sr5.actor .attributes .attribute .attribute-input-container {
+        align-text: center;
+        position: relative; }
+        .sr5.actor .attributes .attribute .attribute-input-container.row {
+          display: flex;
+          flex-flow: row; }
+        .sr5.actor .attributes .attribute .attribute-input-container > .attribute-input {
+          text-align: center;
+          margin: 2px; }
+      .sr5.actor .attributes .attribute .track {
+        display: flex;
+        flex-flow: row;
+        justify-content: space-evenly;
+        margin-bottom: .1em; }
+        .sr5.actor .attributes .attribute .track .track-slash {
+          width: 2em;
+          transform: translateY(10%);
+          flex: 0 0; }
+          .sr5.actor .attributes .attribute .track .track-slash:after {
+            content: '/'; }
+        .sr5.actor .attributes .attribute .track .track-plus {
+          flex: 0 0; }
+          .sr5.actor .attributes .attribute .track .track-plus:after {
+            content: '+'; }
+        .sr5.actor .attributes .attribute .track .track-max-value {
+          margin-bottom: 0;
+          margin-left: .25em; }
+  .sr5.actor .limit {
+    font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
+    padding: 0 .1rem;
+    border-right: 1px solid #4d4d4d;
+    margin-top: -2px;
+    text-align: center;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center; }
+  .sr5.actor .scroll-area {
+    overflow-y: scroll;
+    max-height: 28em; }

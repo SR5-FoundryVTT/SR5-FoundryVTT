@@ -17,8 +17,8 @@ export class SR5ItemSheet extends ItemSheet {
   static get defaultOptions() {
     return mergeObject(super.defaultOptions, {
           classes: ["sr5", "sheet", "item"],
-          width: 700,
-          height: 400,
+          width: 650,
+          height: 450,
       });
   }
 

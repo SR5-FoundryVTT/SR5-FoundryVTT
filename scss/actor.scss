@@ -1,0 +1,128 @@
+@import "config.scss";
+.sr5.actor {
+  min-height: 690px;
+  min-width: 800px;
+  .attributes {
+    border-top: $groove;
+    display: flex;
+    flex-flow: row;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    &.no-border {
+      border-top: none;
+      border-bottom: none;
+    }
+    &.wrap {
+      flex-wrap: wrap;
+    }
+    & + :not(.attributes) {
+      border-top: $groove;
+    }
+    &:last-child {
+      border-bottom: $groove;
+    }
+    .attribute {
+      @include title
+      display: flex;
+      text-align: center;
+      flex-flow: column nowrap;
+      align-items: center;
+      justify-content: space-evenly;
+      padding: 0 .25em;
+      flex: 1 0 auto;
+      min-width: 5rem;
+      &:hover {
+        .attribute-input-container.row {
+          visibility: visible;
+        }
+      }
+      &.flex0 {
+        min-width: 0;
+        width: 0;
+      }
+      &.row {
+        flex-flow: row nowrap;
+        justify-content: center;
+        align-items: center;
+        align-content: center;
+        >.attribute-name {
+          width: auto;
+        }
+        &.space-around {
+          justify-content: space-around;
+        }
+        .attribute-input {
+          transform: translateY(20%);
+        }
+      }
+      &:not(:last-child) {
+        border-right: $groove;
+      }
+      >.attribute-name {
+        font-size: 115%;
+        width: 100%;
+        text-align: center;
+        margin-bottom: 0;
+        &.icon {
+          font-size: .75em;
+        }
+        &.roll {
+          @include rollable;
+        }
+      }
+      .attribute-input-container {
+        align-text: center;
+        position: relative;
+        &.row {
+          //visibility: hidden;
+          display: flex;
+          flex-flow: row;
+        }
+        >.attribute-input {
+          text-align: center;
+          margin: 2px;
+        }
+      }
+      .track {
+        display: flex;
+        flex-flow: row;
+        justify-content: space-evenly;
+        margin-bottom: .1em;
+        .track-slash {
+          width: 2em;
+          transform: translateY(10%);
+          flex: 0 0;
+          &:after {
+            content: '/';
+          }
+        }
+        .track-plus {
+          flex: 0 0;
+          &:after {
+            content: '+';
+          }
+        }
+        .track-max-value {
+          margin-bottom: 0;
+          margin-left: .25em;
+        }
+      }
+    }
+  }
+  .limit {
+    @include nodesto;
+    padding: 0 .1rem;
+    border-right: $groove;
+    margin-top: -2px;
+    text-align: center;
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+  }
+  .scroll-area {
+    overflow-y: scroll;
+    max-height: 28em;
+  }
+}

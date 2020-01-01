@@ -9,7 +9,7 @@
           <div class="flex4">
             <h3 class="name">
               <input
-                class="display"
+                class="display text left"
                 name="name"
                 type="text"
                 value="{{actor.name}}"
@@ -42,8 +42,8 @@
                   value="{{track.value}}"
                   data-dtype="Number"/>
               </div>
-              <h3 class="track-slash flex0">
-              </h3>
+              <div class="track-slash">
+              </div>
               <div class="attribute-input-container">
                 <input
                   class="display attribute-input"
@@ -71,8 +71,8 @@
                   value="{{data.attributes.edge.value}}"
                   data-dtype="Number"/>
               </div>
-              <h3 class="track-slash">
-              </h3>
+              <div class="track-slash">
+              </div>
               <div class="attribute-input-container">
                 <input
                   class="display attribute-input"
@@ -99,8 +99,8 @@
                   data-dtype="Number"
                   disabled/>
               </div>
-              <h3 class="track-slash">
-              </h3>
+              <div class="track-slash">
+              </div>
               <div class="attribute-input-container">
                 <input
                   class="display attribute-input"
@@ -117,13 +117,13 @@
               <div class="input attribute-input-container">
                 <input
                   class="display attribute-input"
-                  size='1'
-                  maxlength='1'
+                  size='2'
+                  maxlength='2'
                   type='text'
                   name='data.movement.sprint'
                   value="{{data.movement.sprint}}"
                   data-dtype="Number"/>
-                <span class="size6 unit movement-unit">
+                <span class="unit">
                   +
                 </span>
               </div>
