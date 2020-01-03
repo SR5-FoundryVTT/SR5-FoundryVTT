@@ -79,6 +79,10 @@
         align-text: center;
         position: relative;
         margin-bottom: 2px;
+        .mod {
+          font-size: .75em;
+          margin-top: -2px;
+        }
         &.row {
           //visibility: hidden;
           display: flex;

@@ -66,6 +66,9 @@
         align-text: center;
         position: relative;
         margin-bottom: 2px; }
+        .sr5.actor .attributes .attribute .attribute-input-container .mod {
+          font-size: .75em;
+          margin-top: -2px; }
         .sr5.actor .attributes .attribute .attribute-input-container.row {
           display: flex;
           flex-flow: row; }

@@ -105,6 +105,14 @@ export class SR5Actor extends Actor {
       }
     }
 
+    // ATTRIBUTES
+    for (let [label, att] of Object.entries(attrs)) {
+      if (!att.hidden) {
+        if (!att.mod) att.mod = 0;
+        att.value = att.base + att.mod;
+      }
+    }
+
     // TECHNOMANCER LIVING PERSONA
     if (data.special === 'resonance') {
       if (matrix.firewall.value === matrix.firewall.mod) {
@@ -637,8 +645,9 @@ export class SR5Actor extends Actor {
           let title = label
 
           const att2Id = html.find('[name=attribute2]').val();
+          let att2 = null;
           if (att2Id !== 'none') {
-            const att2 = atts[att2Id];
+            att2 = atts[att2Id];
             const att2IdLabel = Helpers.label(att2Id);
             count += att2.value;
             title += ` + ${att2IdLabel}`

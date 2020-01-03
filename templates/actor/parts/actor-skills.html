@@ -3,16 +3,42 @@
         {{#unless attribute.hidden}}
           <div class="attribute">
             <div class="attribute-name roll attribute-roll" data-attribute="{{a}}">{{toHeaderCase a}}</div>
+            <div class="track">
+              {{#unless attribute.mod}}
+              <div class="attribute-input-container">
+                <input
+                  class="display attribute-input"
+                  type="text"
+                  maxlength="2"
+                  size="2"
+                  name="data.attributes.{{a}}.base"
+                  value="{{attribute.base}}"
+                  data-dtype="Number"
+                  placeholder="1"/>
+              </div>
+              {{else}}
+              <div class="attribute-input-container">
+                <input
+                  class="display attribute-input"
+                  type="text"
+                  maxlength="2"
+                  size="2"
+                  value="{{attribute.value}}"
+                  disabled
+                  placeholder="1"/>
+              </div>
+              {{/unless}}
+            </div>
             <div class="attribute-input-container">
               <input
-                class="display attribute-input"
+                class="display short attribute-input"
                 type="text"
-                maxlength="2"
-                size="2"
-                name="data.attributes.{{a}}.value"
-                value="{{attribute.value}}"
+                maxlength="5"
+                size="5"
+                name="data.attributes.{{a}}.mod"
+                value="{{attribute.mod}}"
                 data-dtype="Number"
-                placeholder="1"/>
+                placeholder="+Tmp"/>
             </div>
           </div>
         {{/unless}}

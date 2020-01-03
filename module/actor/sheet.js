@@ -57,6 +57,13 @@ export class SR5ActorSheet extends ActorSheet {
     if (track.physical.mod === 0) delete track.physical.mod;
     if (track.stun && track.stun.mod === 0) delete track.stun.mod;
 
+    const attrs = data.data.attributes;
+    for (let [label, att] of Object.entries(attrs)) {
+      if (!att.hidden) {
+        if (att.mod === 0) delete att.mod;
+      }
+    }
+
     const matrix = data.data.matrix;
     if (matrix.attack.mod === 0) delete matrix.attack.mod;
     if (matrix.sleaze.mod === 0) delete matrix.sleaze.mod;

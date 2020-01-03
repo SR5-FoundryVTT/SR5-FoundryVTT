@@ -145,6 +145,10 @@ input[type="text"].display {
   border-color: $black;
   text-align: center;
   min-height: 1em;
+  &.short {
+    font-size: .75em;
+    background: rgba($dark, 0.1);
+  }
   &.text {
     background: rgba($dark, 0.1);
     border-radius: 0;
