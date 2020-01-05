@@ -141,7 +141,7 @@
     flex-flow: row nowrap;
     justify-content: space-around;
     .editor {
-      height: 34em;
+      height: 32.5em;
     }
     > *:not(:first-child) {
       margin-left: .25em;
@@ -177,11 +177,17 @@
   .scroll-area {
     overflow-y: scroll;
     max-height: 33em;
+    &.equipment {
+      max-height: 32em;
+    }
     &.bio {
-      max-height: 34em;
+      max-height: 33em;
     }
     &.active-skills {
       max-height: 26em;
+    }
+    &.mods {
+      max-height: 32em;
     }
     &.info {
       max-height: 31em;

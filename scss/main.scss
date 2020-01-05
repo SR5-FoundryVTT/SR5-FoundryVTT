@@ -243,6 +243,9 @@ select.display {
       .has-desc {
         @include rollable;
       }
+      &.no-border {
+        border-bottom: none;
+      }
       &.item-section {
         border: $groove-width solid $black;;
         margin-right: 0;

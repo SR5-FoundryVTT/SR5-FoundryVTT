@@ -8,22 +8,6 @@
         <div class="item">
           <div class="item-left">
             <div class="item-text item-name">
-              Metatype
-            </div>
-          </div>
-          <div class="item-right">
-            <div class="item-text">
-              <input
-                 class="display text"
-                 type="text"
-                 name="data.metatype"
-                 value="{{data.metatype}}" />
-            </div>
-          </div>
-        </div>
-        <div class="item">
-          <div class="item-left">
-            <div class="item-text item-name">
               Karma
             </div>
           </div>
@@ -54,27 +38,6 @@
                  name="data.karma.max"
                  value="{{data.karma.max}}"
                  data-dtype="Number" />
-            </div>
-          </div>
-        </div>
-        <div class="item">
-          <div class="item-left">
-            <div class="item-text item-name">
-              Nuyen
-            </div>
-          </div>
-          <div class="item-right">
-            <div class="item-text input">
-              <input
-                 class="display"
-                 type="text"
-                 name="data.nuyen"
-                 size="10"
-                 value="{{data.nuyen}}"
-                 data-dtype="Number" />
-                <span class="unit">
-                  <i class="fas fa-yen-sign"></i>
-                </span>
             </div>
           </div>
         </div>
@@ -186,7 +149,7 @@
           </div>
         </div>
       </div>
-      <div class="scroll-area">
+      <div class="scroll-area mods">
         {{#each data.modifiers as |value id|}}
         {{#ifne id 'wound'}}
         <div class="item">
