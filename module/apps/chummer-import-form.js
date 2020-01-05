@@ -352,6 +352,7 @@ export class ChummerImportForm extends FormApplication {
             }
           });
         }
+        // armors
         if (c.armors && c.armors.armor) {
           let armors = getArray(c.armors.armor);
           armors.forEach(a => {
@@ -412,6 +413,67 @@ export class ChummerImportForm extends FormApplication {
             }
           });
         }
+        // cyberware
+		if (c.cyberwares && c.cyberwares.cyberware) {
+		  let cyberwares = getArray(c.cyberwares.cyberware);
+          cyberwares.forEach(cy => {
+            try {
+              const data = {};
+              data.description = {
+                rating: cy.rating,
+                value: cy.description
+              };
+              data.technology = {
+                equipped: true
+              };
+              data.essence = cy.ess;
+              data.grade = cy.grade;
+              const itemData = { name: cy.name, type: 'cyberware', data: data };
+              items.push(itemData);
+            } catch (e) {
+              console.error(e);
+            }
+		  });
+		}
+        // powers
+        if (c.powers && c.powers.power) {
+          let powers = getArray(c.powers.power);
+          powers.forEach(p => {
+            const data = {};
+            if (p.description) data.description = {
+              value: TextEditor.enrichHTML(p.description)
+            }
+            data.level = parseInt(p.rating);
+            p.pp = parseInt(p.totalpoints);
+
+            const itemData = { name: p.name, type: 'adept_power', data: data };
+            items.push(itemData);
+          });
+        }
+        // gear
+        if (c.gears && c.gears.gear) {
+          let gears = getArray(c.gears.gear);
+          let licenses = [];
+          gears.forEach(g => {
+            try {
+              const data = {};
+              let name = g.name;
+              if (g.extra) name += ` (${g.extra})`;
+              data.technology = {
+                rating: g.rating,
+                quantity: g.qty
+              };
+              data.description = {
+                value: g.description
+              };
+              const itemData = { name: name, type: 'equipment', data: data };
+              items.push(itemData);
+            } catch (e) {
+              console.error(e);
+            }
+          });
+        }
+        // spells
         if (c.spells && c.spells.spell) {
           let spells = getArray(c.spells.spell);
           spells.forEach(s => {
