@@ -14,6 +14,9 @@
         "notoriety": 0,
         "public_awareness": 0,
         "special": "mundane",
+        "description": {
+          "value": ""
+        },
         "karma": {
           "value": 0,
           "max": 0
@@ -772,16 +775,16 @@
   },
   "Item": {
     "types": [
-      "spell",
-      "armor",
-      "adept_power",
-      "quality",
-      "device",
-      "cyberware",
-      "equipment",
       "action",
-      "weapon",
-      "complex_form"
+      "adept_power",
+      "armor",
+      "complex_form",
+      "cyberware",
+      "device",
+      "equipment",
+      "quality",
+      "spell",
+      "weapon"
     ],
     "templates": {
       "description": {

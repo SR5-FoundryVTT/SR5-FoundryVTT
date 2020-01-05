@@ -214,6 +214,17 @@
     .sr5.actor .skills-container > *:not(:last-child) {
       border-right: 1px solid #4d4d4d;
       padding-right: .25em; }
+  .sr5.actor .bio-container {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-around; }
+    .sr5.actor .bio-container .editor {
+      height: 34em; }
+    .sr5.actor .bio-container > *:not(:first-child) {
+      margin-left: .25em; }
+    .sr5.actor .bio-container > *:not(:last-child) {
+      border-right: 1px solid #4d4d4d;
+      padding-right: .25em; }
   .sr5.actor .info-container {
     display: flex;
     flex-flow: row nowrap;
@@ -235,9 +246,15 @@
     align-content: center; }
   .sr5.actor .scroll-area {
     overflow-y: scroll;
-    max-height: 28em; }
+    max-height: 33em; }
+    .sr5.actor .scroll-area.bio {
+      max-height: 34em; }
+    .sr5.actor .scroll-area.active-skills {
+      max-height: 26em; }
     .sr5.actor .scroll-area.info {
-      max-height: 32em; }
+      max-height: 31em; }
+    .sr5.actor .scroll-area.knowledge-skills {
+      max-height: 27.5em; }
     .sr5.actor .scroll-area.left {
       direction: rtl; }
       .sr5.actor .scroll-area.left > * {

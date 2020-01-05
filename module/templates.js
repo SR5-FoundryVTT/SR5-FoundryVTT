@@ -7,6 +7,7 @@ export const preloadHandlebarsTemplates = async () => {
     "systems/shadowrun5e/templates/actor/parts/actor-matrix.html",
     "systems/shadowrun5e/templates/actor/parts/actor-actions.html",
     "systems/shadowrun5e/templates/actor/parts/actor-info.html",
+    "systems/shadowrun5e/templates/actor/parts/actor-bio.html",
     "systems/shadowrun5e/templates/item/parts/description.html",
     "systems/shadowrun5e/templates/item/parts/technology.html",
     "systems/shadowrun5e/templates/item/parts/header.html",
