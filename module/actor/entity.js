@@ -113,6 +113,37 @@ export class SR5Actor extends Actor {
       }
     }
 
+    const knowledgeSkills = data.skills.knowledge;
+    for (let [key, category] of Object.entries(knowledgeSkills)) {
+      if (typeof category.value === 'object') {
+        category.value = Object.values(category.value);
+      }
+    }
+    const language = data.skills.language;
+    if (language) {
+      if (!language.value) language.value = [];
+      if (typeof language.value === 'object') {
+        language.value = Object.values(language.value);
+      }
+      language.attribute = 'intution';
+    }
+    for (let [label, skill] of Object.entries(data.skills.active)) {
+      if (!skill.hidden) {
+        if (!skill.mod) skill.mod = 0;
+        skill.value = skill.base + skill.mod;
+      }
+    }
+    for (let skill of data.skills.language.value) {
+      if (!skill.mod) skill.mod = 0;
+      skill.value = skill.base + skill.mod;
+    }
+    for (let group of Object.values(data.skills.knowledge)) {
+      for (let skill of group.value) {
+        if (!skill.mod) skill.mod = 0;
+        skill.value = skill.base + skill.mod;
+      }
+    }
+
     // TECHNOMANCER LIVING PERSONA
     if (data.special === 'resonance') {
       if (matrix.firewall.value === matrix.firewall.mod) {
@@ -243,20 +274,6 @@ export class SR5Actor extends Actor {
       memory: attrs.willpower.value + attrs.logic.value + mods.memory
     }
 
-    const knowledgeSkills = data.skills.knowledge;
-    for (let [key, category] of Object.entries(knowledgeSkills)) {
-      if (typeof category.value === 'object') {
-        category.value = Object.values(category.value);
-      }
-    }
-    const language = data.skills.language;
-    if (language) {
-      if (!language.value) language.value = [];
-      if (typeof language.value === 'object') {
-        language.value = Object.values(language.value);
-      }
-      language.attribute = 'intution';
-    }
 
     {
       const count = 3 + mods.wound_tolerance;

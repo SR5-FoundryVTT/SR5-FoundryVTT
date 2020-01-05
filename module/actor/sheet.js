@@ -1,5 +1,6 @@
 import { SR5 } from '../config.js';
 import { Helpers } from '../helpers.js';
+import { ChummerImportForm } from '../apps/chummer-import-form.js';
 /**
  * Extend the basic ActorSheet with some very simple modifications
  */
@@ -273,6 +274,7 @@ export class SR5ActorSheet extends ActorSheet {
     html.find('.add-language').click(this._onAddLanguageSkill.bind(this));
     html.find('.language-skill').click(this._onRollLanguageSkill.bind(this));
     html.find('.remove-language').click(this._onRemoveLanguageSkill.bind(this));
+    html.find('.import-character').click(this._onShowImportCharacter.bind(this));
 
     // Update Inventory Item
     html.find('.item-edit').click(event => {
@@ -474,5 +476,14 @@ export class SR5ActorSheet extends ActorSheet {
   _updateObject(event, formData) {
     // Update the Actor
     return this.object.update(formData);
+  }
+
+  _onShowImportCharacter(event) {
+    event.preventDefault();
+    const options = {
+      name: 'chummer-import',
+      title: 'Chummer Import'
+    };
+    new ChummerImportForm(this.actor, options).render(true);
   }
 }

@@ -33,8 +33,8 @@ Hooks.once("init", async function() {
 });
 
 Hooks.on('ready', () => {
-  game.socket.on("system.shadowrun5e", data => console.log(data));
-  game.socket.emit("system.shadowrun5e", {foo: 'bar'});
+  // game.socket.on("system.shadowrun5e", data => console.log(data));
+  // game.socket.emit("system.shadowrun5e", {foo: 'bar'});
 });
 
 Hooks.on('updateCombat', args => onCombatUpdate(args));

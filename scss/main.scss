@@ -112,12 +112,13 @@ label.checkbox {
 }
 
 button.display {
-  background: transparent;
   color: $color;
-  border: none;
+  border-color: $black;
+  background: rgba($light, 0.1);
+  border-radius: .3em;
   text-align: center;
   &:hover {
-    background: transparent;
+    cursor: pointer;
   }
 }
 

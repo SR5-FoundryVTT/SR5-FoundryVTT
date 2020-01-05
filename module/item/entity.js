@@ -387,7 +387,7 @@ export class SR5Item extends Item {
       };
       return renderTemplate('systems/shadowrun5e/templates/rolls/range-weapon-roll.html', dialogData).then(dlg => {
         const buttons = {};
-        let ranges = itemData.range.range;
+        let ranges = itemData.range.ranges;
         let environmental = true;
         buttons['short'] = {
           label: `Short (${ranges.short})`

@@ -145,7 +145,7 @@
           "attribute": "logic",
           "projecting": false,
           "drain": {
-            "mod": 0
+            "value": 0
           }
         },
         "wounds": {
@@ -805,9 +805,9 @@
           },
           "modes": {
             "single_shot": false,
-            "semi-auto": false,
-            "burst-fire": false,
-            "full-auto": false
+            "semi_auto": false,
+            "burst_fire": false,
+            "full_auto": false
           },
           "mods": [],
           "ammo": {
