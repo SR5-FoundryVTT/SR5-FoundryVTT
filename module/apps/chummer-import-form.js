@@ -226,6 +226,25 @@ export class ChummerImportForm extends FormApplication {
             console.error(e);
           }
         }
+        // qualities
+        if (c.qualities && c.qualities.quality) {
+            let qualities = getArray(c.qualities.quality);
+            qualities.forEach(q => {
+              try {
+                const data = {};
+                data.type = q.qualitytype.toLowerCase();
+                if (q.description) data.description = {
+                  value: TextEditor.enrichHTML(q.description)
+                };
+
+                const itemData = { name: q.name, type: 'quality', data: data };
+                items.push(itemData);
+              } catch (e) {
+                console.error(e);
+              }
+            });
+        }
+        // weapons
         if (c.weapons != null && c.weapons.weapon != null) {
           let weapons = getArray(c.weapons.weapon);
           weapons.forEach(w => {
