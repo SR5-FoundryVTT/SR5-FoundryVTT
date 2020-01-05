@@ -20,11 +20,31 @@ Not Implemented but planned:
 * Vehicles/Drones
 * Sprites & Sprites
 * Hosts
-* Chummer Import
 * Targetted Rolls
 * Better Inititiative Tracking
 
 Work in progress.
+
+### v0.4.1 Changelog
+##### Breaking Changes
+Cyberware no long has Action, Armor, Weapon, etc. It is much simpler.
+- If cyberware provides another type of item, add it as a separate item.
+
+Template Changes
+- Attributes and Skills
+  - Now has support for Attribute and Skill temporary modifiers. Attributes are actually available on the sheet. Still working on a good method for skills
+
+##### Features
+Chummer Import, found in the Misc tab
+- Attributes, Skills, Weapons, Spells, Armor, Adept Powers, Qualities
+- More to come
+
+Qualities are now in the sheet, found in the Bio tab
+
+Spot for Notoriety, Public Awareness, Street Cred, and Karma found in the Misc tab.
+
+##### Fixes
+Lots of text boxes were allowed for more items.
 
 ### v0.4 Changelog
 ##### Features
