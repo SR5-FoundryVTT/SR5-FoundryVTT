@@ -56,7 +56,6 @@ export class SR5Item extends Item {
         if (range.rc) range.rc.value = range.rc.base + range.rc.mod;
       }
 
-
       // once all damage mods have been accounted for, sum base and mod to value
       action.damage.value = action.damage.base + action.damage.mod;
       action.damage.ap.value = action.damage.ap.base + action.damage.ap.mod;
@@ -65,20 +64,6 @@ export class SR5Item extends Item {
         if (action.damage.attribute) action.damage.value += this.actor.data.data.attributes[action.damage.attribute].value;
         if (action.limit.attribute) action.limit.value += this.actor.data.data.limits[action.limit.attribute].value;
       }
-    }
-
-
-    if (item.type === 'weapon') {
-      const action = item.data.action;
-      if (item.data.category === 'thrown') {
-        action.skill = 'throwing_weapons';
-      }
-      action.attribute = CONFIG.SR5.attributes.AGILITY;
-    }
-
-    if (item.type === 'spell') {
-      item.data.action.attribute = 'magic';
-      item.data.action.skill = 'spellcasting';
     }
 
     if (item.data.condition_monitor) {
@@ -375,7 +360,7 @@ export class SR5Item extends Item {
 
     let title = this.data.name;
 
-    if ((this.data.type === 'weapon' || this.data.type === 'cyberware') && itemData.category === 'range') {
+    if (this.data.type === 'weapon' && itemData.category === 'range') {
       let attack = this.getFlag('shadowrun5e', 'attack') || {fireMode: 0};
       let fireMode = attack.fireMode;
       let rc = parseInt(itemData.range.rc.value) + parseInt(actorData.recoil_compensation);

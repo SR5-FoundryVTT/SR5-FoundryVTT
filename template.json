@@ -958,8 +958,9 @@
       "templates": ["description", "action", "technology", "weapon"]
     },
     "cyberware": {
-      "templates": ["description", "technology", "armor", "weapon", "action"],
-      "essence": 0
+      "templates": ["description", "technology"],
+      "essence": 0,
+      "grade": ""
     },
     "adept_power": {
       "templates": ["description", "action", "armor"],
