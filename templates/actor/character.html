@@ -174,8 +174,7 @@
               <input
                 class="display attribute-input"
                 type="text"
-                maxlength="2"
-                size="2"
+                size="4"
                 name="data.attributes.essence.value"
                 value="{{data.attributes.essence.value}}"
                 data-dtype="Number"
@@ -209,12 +208,13 @@
     <nav class="tabs" data-group="primary">
       <a class="item" data-tab="actions">Actions</a>
       <a class="item" data-tab="skills">Skills</a>
-      <a class="item active" data-tab="equipment">Equipment</a>
+      <a class="item active" data-tab="equipment">Gear</a>
       {{#ife data.special 'magic'}}
       <a class="item" data-tab="magic">Magic</a>
       {{/ife}}
       <a class="item" data-tab="matrix">Matrix</a>
       <a class="item" data-tab="bio">Bio</a>
+      <a class="item" data-tab="lifestyle">Lifestyle</a>
       <a class="item" data-tab="config">Misc</a>
     </nav>
     <div class="tab" data-group="primary" data-tab="skills">
@@ -234,6 +234,9 @@
     </div>
     <div class="tab" data-group="primary" data-tab="bio">
       {{> "systems/shadowrun5e/templates/actor/parts/actor-bio.html" }}
+    </div>
+    <div class="tab" data-group="primary" data-tab="lifestyle">
+      <h3>Coming Soon (contacts & lifestyle support)</h3>
     </div>
     <div class="tab" data-group="primary" data-tab="config">
       {{> "systems/shadowrun5e/templates/actor/parts/actor-config.html" }}
