@@ -58,9 +58,8 @@ export class ChummerImportForm extends FormApplication {
         let split = val.split(',');
         if (split.length > 0) {
           let l = split[0].match(/(\d+)(\w+)/);
-          console.log(l);
-          if (l && l[0]) damage.damage = parseInt(l[0]);
-          if (l && l[1]) damage.type = l[1].toLowerCase().includes('p') ? 'physical' : 'stun';
+          if (l && l[1]) damage.damage = parseInt(l[1]);
+          if (l && l[2]) damage.type = l[2] === 'P' ? 'physical' : 'stun';
         }
         for (let i = 1; i < split.length; i++) {
           let l = split[i].match(/(-?\d+)(.*)/);
@@ -69,7 +68,6 @@ export class ChummerImportForm extends FormApplication {
             else damage.radius = parseInt(l[1]);
           }
         }
-        console.log(damage);
         return damage;
       };
 
@@ -332,6 +330,7 @@ export class ChummerImportForm extends FormApplication {
                 data.category = 'thrown';
               }
               {
+                // TODO handle raw damage if present
                 let d = parseDamage(w.damage_english);
                 damage.base = d.damage;
                 damage.type = d.type;
@@ -506,6 +505,11 @@ export class ChummerImportForm extends FormApplication {
                   if (s.category.toLowerCase() === "combat") {
                     data.combat = {};
                     if (desc.includes('direct')) {
+                      data.combat.type = 'indirect';
+                      action.opposed = {
+                        type: 'defense'
+                      };
+                    } else {
                       data.combat.type = 'direct';
                       if (data.type === 'mana') {
                         action.opposed = {
@@ -518,11 +522,6 @@ export class ChummerImportForm extends FormApplication {
                           attribute: 'body'
                         };
                       }
-                    } else {
-                      data.combat.type = 'indirect';
-                      action.opposed = {
-                        type: 'defense'
-                      };
                     }
                   }
                   if (s.category.toLowerCase() === 'detection') {
@@ -558,7 +557,6 @@ export class ChummerImportForm extends FormApplication {
                       if (token.includes('sense')) data.illusion.sense = token.toLowerCase();
                       else if (token) data.illusion.type = token.toLowerCase();
                     });
-                    
                     if (data.type === 'mana') {
                       action.opposed = {
                         type: 'custom',
