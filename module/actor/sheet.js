@@ -190,6 +190,17 @@ export class SR5ActorSheet extends ActorSheet {
       return arr;
     }, [[], [], [], [], [], [], []]);
 
+    const sortByName = (i1, i2) => {
+      if (i1.name > i2.name) return 1;
+      if (i1.name < i2.name) return -1;
+      return 0;
+    };
+    actions.sort(sortByName);
+    adept_powers.sort(sortByName);
+    complex_forms.sort(sortByName);
+    items.sort(sortByName);
+    spells.sort(sortByName);
+
     items.forEach(item => {
       inventory[item.type].items.push(item);
     });
