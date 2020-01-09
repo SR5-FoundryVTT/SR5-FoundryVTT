@@ -14,7 +14,6 @@ export class Helpers {
 
   static setupCustomCheckbox(app, html, data) {
     const setContent = (el => {
-      console.log(el);
       let checkbox = $(el).children('input[type=checkbox]');
       let checkmark = $(el).children('.checkmark');
       if ($(checkbox).prop('checked')) {

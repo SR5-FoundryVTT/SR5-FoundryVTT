@@ -204,13 +204,10 @@ export class SR5ActorSheet extends ActorSheet {
     items.forEach(item => {
       inventory[item.type].items.push(item);
     });
-    spells.forEach(spell => {
-      spellbook[spell.data.category].items.push(spell);
-    });
 
     data.inventory = Object.values(inventory);
     data.magic = {
-      spellbook: Object.values(spellbook),
+      spellbook: spells,
       powers: adept_powers
     };
     data.actions = actions;

@@ -71,8 +71,7 @@
         </div>
       </div>
     </div>
-    {{#each spells as |section sid|}}
-    {{#each section.items as |item iid|}}
+    {{#each spells as |item iid|}}
     <div class="item" data-item='{{item.id}}'>
       <div class="item-left">
         <div class="item-img item-roll" data-item='{{item.id}}'>
@@ -106,7 +105,6 @@
         {{{item.data.description.value}}}
       </div>
     </div>
-    {{/each}}
     {{/each}}
   </div>
 </div>
