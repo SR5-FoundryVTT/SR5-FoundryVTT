@@ -216,9 +216,9 @@ export class SR5Actor extends Actor {
     // MOVEMENT
     const movement = data.movement;
     movement.walk.value = attrs.agility.value
-      * (1 + mods.walk);
+      * (2 + mods.walk);
     movement.run.value = attrs.agility.value
-      * (2 + mods.run);
+      * (4 + mods.run);
 
     // CONDITION_MONITORS
     const track = data.track;
