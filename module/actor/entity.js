@@ -197,7 +197,7 @@ export class SR5Actor extends Actor {
     armor.value += armor.mod + mods.armor;
 
     // SET ESSENCE
-    actorData.data.attributes.essence.value = totalEssence + mods.essence;
+    actorData.data.attributes.essence.value = +(totalEssence + mods.essence).toFixed(3);
 
     // SETUP LIMITS
     limits.physical.value = Math.ceil(((2 * attrs.strength.value)
