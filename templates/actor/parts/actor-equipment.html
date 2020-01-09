@@ -59,6 +59,16 @@
         </div>
       </div>
       <div class="item-right">
+        {{#if item.data.range.ammo.max}}
+        <div class="item-text roll reload-ammo" data-item='{{item.id}}'>
+          Reload
+        </div>
+        <div class="item-text">
+          ({{item.data.range.ammo.value}}/{{item.data.range.ammo.max}})
+        </div>
+        <div class="item-text">
+        </div>
+        {{/if}}
         <div class="item-text">
           <span
             class="item-equip-toggle"

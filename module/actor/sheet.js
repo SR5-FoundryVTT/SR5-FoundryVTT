@@ -291,6 +291,7 @@ export class SR5ActorSheet extends ActorSheet {
     html.find('.language-skill').click(this._onRollLanguageSkill.bind(this));
     html.find('.remove-language').click(this._onRemoveLanguageSkill.bind(this));
     html.find('.import-character').click(this._onShowImportCharacter.bind(this));
+    html.find('.reload-ammo').click(this._onReloadAmmo.bind(this));
 
     // Update Inventory Item
     html.find('.item-edit').click(event => {
@@ -316,6 +317,13 @@ export class SR5ActorSheet extends ActorSheet {
         item.addEventListener('dragstart', handler, false);
       }
     });
+  }
+
+  async _onReloadAmmo(event) {
+    event.preventDefault();
+    const iid = event.currentTarget.dataset.item;
+    const item = this.actor.getOwnedItem(iid);
+    if (item) item.reloadAmmo();
   }
 
   _onItemCreate(event) {
