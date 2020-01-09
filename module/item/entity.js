@@ -71,6 +71,7 @@ export class SR5Item extends Item {
     }
 
     this.labels = labels;
+    item.properties = this.getChatData().properties;
     console.log(item);
   }
 
@@ -151,6 +152,15 @@ export class SR5Item extends Item {
     }
   }
 
+  _adept_powerChatData(data, labels, props) {
+    this._actionChatData(data, labels, props);
+    props.push(`PP ${data.pp}`);
+    props.push(Helpers.label(data.type));
+    if (data.type === 'active') {
+      props.push(`${Helpers.label(data.action.type)} Action`);
+    }
+  }
+
   _armorChatData(data, labels, props) {
     if (data.armor) {
       if (data.armor.value) props.push(`Armor ${data.armor.value}`);
@@ -171,6 +181,27 @@ export class SR5Item extends Item {
     if (fade > 0) props.push(`Fade L+${fade}`);
     else if(fade < 0) props.push(`Fade L${fade}`);
     else props.push('Fade L');
+  }
+
+  _cyberwareChatData(data, labels, props) {
+    if (data.essence) props.push(`Ess ${data.essence}`);
+  }
+
+  _deviceChatData(data, labels, props) {
+    if (data.technology && data.technology.rating) props.push(`Rating ${data.technology.rating}`);
+    if (data.category === 'cyberdeck') {
+      for (let attN of Object.values(data.atts)) {
+        props.push(`${Helpers.label(attN.att)} ${attN.value}`);
+      }
+    }
+  }
+
+  _equipmentChatData(data, labels, props) {
+    if (data.technology && data.technology.rating) props.push(`Rating ${data.technology.rating}`);
+  }
+
+  _qualityChatData(data, labels, props) {
+    props.push(Helpers.label(data.type));
   }
 
   _spellChatData(data, labels, props) {
@@ -204,12 +235,6 @@ export class SR5Item extends Item {
     labels['roll'] = 'Cast';
   }
 
-  _cyberwareChatData(data, labels, props) {
-    _weaponChatData(data, labels, props);
-    _armorChatData(data, labels, props);
-    if (data.essence) props.push(`Ess ${data.essence}`);
-  }
-
   _weaponChatData(data, labels, props) {
     this._actionChatData(data, labels, props);
 
@@ -217,11 +242,13 @@ export class SR5Item extends Item {
       if (data.range.rc) props.push(`RC ${data.range.rc.value}`);
       const ammo = data.range.ammo;
       const curr = ammo.equipped;
-      if (curr.name) props.push(` ${ammo.value}/${ammo.max} ${curr.name}`);
+      if (curr.name) props.push(`${curr.name}(${ammo.value}/${ammo.max})`);
       if (curr.blast.radius) props.push(`${curr.blast.radius}m`);
       if (curr.blast.dropoff) props.push(`${curr.blast.dropoff}/m`);
-      if (data.range.modes) props.push(Array.from(Object.entries(data.range.modes)).filter(([key, val]) => val).map(([key, val]) => Helpers.label(key)).join('/'));
-      if (data.range.range) props.push(Array.from(Object.values(data.range.range)).join('/'));
+      if (data.range.modes) props.push(Array.from(Object.entries(data.range.modes))
+          .filter(([key, val]) => val && !key.includes('-'))
+            .map(([key, val]) => Helpers.label(key)).join('/'));
+      if (data.range.ranges) props.push(Array.from(Object.values(data.range.ranges)).join('/'));
     } else if (data.category === 'melee') {
       if (data.melee.reach) props.push(`Reach ${data.melee.reach}`);
     } else if (data.category === 'thrown') {
@@ -229,16 +256,6 @@ export class SR5Item extends Item {
       const blast = data.thrown.blast;
       if (blast.value) props.push(`Radius ${blast.radius}m`);
       if (blast.dropoff) props.push(`Dropoff ${blast.dropoff}/m`);
-    }
-  }
-
-  _adept_powerChatData(data, labels, props) {
-    this._actionChatData(data, labels, props);
-    this._
-    props.push(`PP ${data.pp}`);
-    props.push(Helpers.label(data.type));
-    if (data.type === 'active') {
-      props.push(`${Helpers.label(data.action.type)} Action`);
     }
   }
 

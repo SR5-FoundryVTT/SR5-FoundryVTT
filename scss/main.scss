@@ -289,9 +289,18 @@ select.display {
       }
       .item-desc {
         padding: .25em;
-        font-size: .8em;
-        border-bottom: $groove;
+        font-size: 1em;
         width: 100%;
+        .props {
+          border-top: $groove;
+          padding-top: .25em;
+          > *{
+            padding: .25em .5em;
+          }
+          > :not(:last-child) {
+            border-right: $groove;
+          }
+        }
       }
       .item-icons {
         display: flex;

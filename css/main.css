@@ -520,9 +520,15 @@ select.display {
       max-width: 9.5em; }
     .sr5 .inventory .item .item-desc {
       padding: .25em;
-      font-size: .8em;
-      border-bottom: 1px solid #4d4d4d;
+      font-size: 1em;
       width: 100%; }
+      .sr5 .inventory .item .item-desc .props {
+        border-top: 1px solid #4d4d4d;
+        padding-top: .25em; }
+        .sr5 .inventory .item .item-desc .props > * {
+          padding: .25em .5em; }
+        .sr5 .inventory .item .item-desc .props > :not(:last-child) {
+          border-right: 1px solid #4d4d4d; }
     .sr5 .inventory .item .item-icons {
       display: flex;
       flex-flow: row nowrap;

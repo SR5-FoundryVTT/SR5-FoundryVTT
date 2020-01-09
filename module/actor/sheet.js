@@ -179,7 +179,6 @@ export class SR5ActorSheet extends ActorSheet {
     let [items, spells, qualities, adept_powers, critter_powers, actions, complex_forms] = data.items.reduce((arr, item) => {
       item.img = item.img || DEFAULT_TOKEN;
       item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
-
       if (item.type === 'spell') arr[1].push(item);
       else if (item.type === 'quality') arr[2].push(item);
       else if (item.type === 'adept_power') arr[3].push(item);
@@ -481,7 +480,41 @@ export class SR5ActorSheet extends ActorSheet {
     this.actor.rollAttribute(attr, {event: event});
   }
 
+  /**
+   * @private
+   */
+  _findActiveList () {
+    return this.element.find('.tab.active .scroll-area');
+  }
 
+  /**
+   * @private
+   */
+  async _render (force = false, options = {}) {
+    this._saveScrollPositions();
+    await super._render(force, options);
+    this._restoreScrollPositions();
+  }
+
+  /**
+   * @private
+   */
+  _restoreScrollPositions () {
+    const activeList = this._findActiveList();
+    if (activeList.length && this._scroll != null) {
+      activeList.prop('scrollTop', this._scroll);
+    }
+  }
+
+  /**
+   * @private
+   */
+  _saveScrollPositions () {
+    const activeList = this._findActiveList();
+    if (activeList.length) {
+      this._scroll = activeList.prop('scrollTop');
+    }
+  }
 
   /* -------------------------------------------- */
 
