@@ -7,6 +7,7 @@ import { SR5 } from './module/config.js';
 import { Helpers } from './module/helpers.js';
 import { preloadHandlebarsTemplates } from './module/templates.js';
 import { onCombatUpdate } from './module/combat.js';
+import { measureDistance } from './module/canvas.js';
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -30,6 +31,10 @@ Hooks.once("init", async function() {
   ['renderSR5ActorSheet', 'renderSR5ItemSheet'].forEach(s => {
     Hooks.on(s, (app, html, data) => Helpers.setupCustomCheckbox(app, html, data));
   });
+});
+
+Hooks.on('canvasInit', function() {
+  SquareGrid.prototype.measureDistance = measureDistance;
 });
 
 Hooks.on('ready', () => {
