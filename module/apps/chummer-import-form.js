@@ -97,44 +97,44 @@ export class ChummerImportForm extends FormApplication {
           && chummerfile.characters.character) {
         let c = chummerfile.characters.character;
         try {
-          if (c.playername != null) {
+          if (c.playername) {
             update.player_name = c.playername;
           }
-          if (c.alias != null) {
+          if (c.alias) {
             update.name = c.alias;
             updateData.name = c.alias;
           }
-          if (c.metatype != null) {
+          if (c.metatype) {
             update.metatype = c.metatype;
           }
-          if (c.sex != null) {
+          if (c.sex) {
             update.sex = c.sex;
           }
-          if (c.age != null) {
+          if (c.age) {
             update.age = c.age;
           }
-          if (c.height != null) {
+          if (c.height) {
             update.height = c.height;
           }
-          if (c.weight != null) {
+          if (c.weight) {
             update.weight = c.weight;
           }
-          if (c.calculatedstreetcred != null) {
+          if (c.calculatedstreetcred) {
             update.street_cred = c.calculatedstreetcred;
           }
-          if (c.calculatednotoriety != null) {
+          if (c.calculatednotoriety) {
             update.notoriety = c.calculatednotoriety;
           }
-          if (c.calculatedpublicawareness != null) {
+          if (c.calculatedpublicawareness) {
             update.public_awareness = c.calculatedpublicawareness;
           }
-          if (c.karma != null) {
+          if (c.karma) {
             update.karma.value = c.karma;
           }
-          if (c.totalkarma != null) {
+          if (c.totalkarma) {
             update.karma.max = c.totalkarma;
           }
-          if (c.technomancer != null && c.technomancer.toLowerCase() === "true") {
+          if (c.technomancer && c.technomancer.toLowerCase() === "true") {
             update.special = "resonance";
           }
           if ((c.magician && c.magician.toLowerCase() === "true")
@@ -152,10 +152,10 @@ export class ChummerImportForm extends FormApplication {
               if (att !== 'willpower') update.magic.attribute = att;
             });
           }
-          if (c.totaless != null) {
+          if (c.totaless) {
             update.attributes.essence.value = c.totaless;
           }
-          if (c.nuyen != null) {
+          if (c.nuyen) {
             update.nuyen = c.nuyen;
           }
         } catch (e) {
@@ -174,17 +174,17 @@ export class ChummerImportForm extends FormApplication {
         });
         // initiative stuff
         try {
-          if (c.initbonus != null) {
+          if (c.initbonus) {
             // not sure if this one is correct
             update.mods.initiative = c.initbonus;
           }
-          if (c.initdice != null) {
+          if (c.initdice) {
             update.mods.initiative_dice = c.initdice - 1;
           }
         } catch (e) {
             error += "Error with initiative: " + e + ". ";
         }
-        // skills... ugh
+        // skills...
         let skills = c.skills.skill;
         for (let i = 0; i < skills.length; i++) {
           try {

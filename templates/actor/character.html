@@ -2,7 +2,7 @@
   <header class="sheet-header flexcol">
     <div class="sheet-header-row-1 flexrow">
       <div class="profile-img flex0">
-        <img  src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="80" width="80"/>
+        <img class="profile" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="80" width="80"/>
       </div>
       <div class="flexcol flex4">
         <div class="flexrow">
@@ -221,7 +221,7 @@
       {{> "systems/shadowrun5e/templates/actor/parts/actor-skills.html"}}
     </div>
     <div class="tab" data-group="primary" data-tab="equipment">
-      {{> "systems/shadowrun5e/templates/actor/parts/actor-equipment.html" sections=inventory}}
+      {{> "systems/shadowrun5e/templates/actor/parts/actor-equipment.html" sections=inventory data=data}}
     </div>
     <div class="tab" data-group="primary" data-tab="magic">
       {{> "systems/shadowrun5e/templates/actor/parts/actor-spellbook.html" spells=magic.spellbook powers=magic.powers}}
