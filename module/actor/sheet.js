@@ -296,14 +296,14 @@ export class SR5ActorSheet extends ActorSheet {
     // Update Inventory Item
     html.find('.item-edit').click(event => {
       event.preventDefault();
-      const iid = parseInt(event.currentTarget.dataset.item);
+      const iid = event.currentTarget.closest('.item').dataset.itemId;
       const item = this.actor.getOwnedItem(iid);
       item.sheet.render(true);
     });
     // Delete Inventory Item
     html.find('.item-delete').click(event => {
       event.preventDefault();
-      const iid = parseInt(event.currentTarget.dataset.item);
+      const iid = event.currentTarget.closest('.item').dataset.itemId;
       const el = $(event.currentTarget).parents(".item");
       this.actor.deleteOwnedItem(iid);
       el.slideUp(200, () => this.render(false));
@@ -311,8 +311,7 @@ export class SR5ActorSheet extends ActorSheet {
     // Drag inventory item
     let handler = ev => this._onDragItemStart(ev);
     html.find('.item').each((i, item) => {
-      if (item.dataset && item.dataset.item) {
-        item.dataset.itemId = item.dataset.item; // TODO fix all data-item to data-item-id to get rid of this
+      if (item.dataset && item.dataset.itemId) {
         item.setAttribute('draggable', true);
         item.addEventListener('dragstart', handler, false);
       }
@@ -321,7 +320,7 @@ export class SR5ActorSheet extends ActorSheet {
 
   async _onReloadAmmo(event) {
     event.preventDefault();
-    const iid = event.currentTarget.dataset.item;
+    const iid = event.currentTarget.closest('.item').dataset.itemId;
     const item = this.actor.getOwnedItem(iid);
     if (item) item.reloadAmmo();
   }
@@ -374,42 +373,39 @@ export class SR5ActorSheet extends ActorSheet {
   }
 
   async _onChangeRtg(event) {
-    const iid = parseInt(event.currentTarget.dataset.item);
+    const iid = event.currentTarget.closest('.item').dataset.itemId;
     const item = this.actor.getOwnedItem(iid);
     const rtg = parseInt(event.currentTarget.value);
     if (item && rtg) {
-      item.data.data.technology.rating = rtg;
+      item.update({"data.technology.rating": rtg});
     }
-    this.actor.updateOwnedItem(item.data);
   }
 
   async _onChangeQty(event) {
-    const iid = parseInt(event.currentTarget.dataset.item);
+    const iid = event.currentTarget.closest('.item').dataset.itemId;
     const item = this.actor.getOwnedItem(iid);
     const qty = parseInt(event.currentTarget.value);
     if (item && qty) {
       item.data.data.technology.quantity = qty;
+      item.update({"data.technology.quantity": qty});
     }
-    this.actor.updateOwnedItem(item.data);
   }
 
   async _onEquipItem(event) {
     event.preventDefault();
-    const iid = parseInt(event.currentTarget.dataset.item);
+    const iid = event.currentTarget.closest('.item').dataset.itemId;
     const item = this.actor.getOwnedItem(iid);
     if (item) {
       const itemData = item.data.data;
       // if we will be equipping and it is a device
       if (!itemData.technology.equipped && item.type === 'device') {
         for (let ite of this.actor.items) {
-          if (ite.type === 'device' && ite.data.data.technology.equipped) {
-            ite.data.data.technology.equipped = false;
-            this.actor.updateOwnedItem(ite.data);
+          if (ite.type === 'device') {
+            ite.update({"data.technology.equipped": false});
           };
         }
       }
-      if (itemData.technology) itemData.technology.equipped = !itemData.technology.equipped;
-      this.actor.updateOwnedItem(item.data);
+      item.update({"data.technology.equipped": !itemData.technology.equipped});
     }
   }
 
@@ -420,7 +416,7 @@ export class SR5ActorSheet extends ActorSheet {
 
   async _onRollItem(event) {
     event.preventDefault();
-    const iid = parseInt(event.currentTarget.dataset.item);
+    const iid = event.currentTarget.closest('.item').dataset.itemId;
     const item = this.actor.getOwnedItem(iid);
     if (item.type === 'action') item.rollTest(event);
     else item.roll(event);

@@ -19,9 +19,9 @@
       </div>
     </div>
     {{#each powers as |item iid|}}
-    <div class="item" data-item='{{item.id}}'>
+    <div class="item" data-item-id='{{item._id}}'>
       <div class="item-left">
-        <div class="item-img item-roll roll" data-item='{{item.id}}'>
+        <div class="item-img item-roll roll" >
           <img src="{{item.img}}" title="{{item.name}}" height='24px' width='24px'/>
         </div>
         <div class="item-text item-name has-desc">
@@ -33,8 +33,8 @@
           {{toHeaderCase item.data.type}}
         </div>
         <div class="item-text item-icons">
-          <i class="item-edit roll fas fa-edit" data-item='{{item.id}}'></i>
-          <i class="item-delete roll fas fa-trash" data-item='{{item.id}}'></i>
+          <i class="item-edit roll fas fa-edit" ></i>
+          <i class="item-delete roll fas fa-trash" ></i>
         </div>
       </div>
     </div>
@@ -77,9 +77,9 @@
       </div>
     </div>
     {{#each spells as |item iid|}}
-    <div class="item" data-item='{{item.id}}'>
+    <div class="item" data-item-id='{{item._id}}'>
       <div class="item-left">
-        <div class="item-img item-roll" data-item='{{item.id}}'>
+        <div class="item-img item-roll" >
           <img src="{{item.img}}" title="{{item.name}}" height='24px' width='24px'/>
         </div>
         <div class="item-text item-name has-desc">
@@ -100,8 +100,8 @@
           {{item.data.drain}}
         </div>
         <div class="item-text item-icons">
-          <i class="item-edit roll fas fa-edit" data-item='{{item.id}}'></i>
-          <i class="item-delete roll fas fa-trash" data-item='{{item.id}}'></i>
+          <i class="item-edit roll fas fa-edit" ></i>
+          <i class="item-delete roll fas fa-trash" ></i>
         </div>
       </div>
     </div>

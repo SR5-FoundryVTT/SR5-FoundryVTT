@@ -6,6 +6,7 @@ import { SR5Item } from './module/item/entity.js';
 import { SR5 } from './module/config.js';
 import { Helpers } from './module/helpers.js';
 import { preloadHandlebarsTemplates } from './module/templates.js';
+import { DiceSR } from './module/dice.js';
 import { onCombatUpdate } from './module/combat.js';
 import { measureDistance } from './module/canvas.js';
 
@@ -15,6 +16,14 @@ import { measureDistance } from './module/canvas.js';
 
 Hooks.once("init", async function() {
   console.log("hello world");
+
+  // Create a D&D5E namespace within the game global
+  game.shadowrun5e = {
+    SR5Actor,
+    DiceSR,
+    SR5Item,
+    rollItemMacro,
+  };
 
   CONFIG.SR5 = SR5;
   CONFIG.Actor.entityClass = SR5Actor;
@@ -42,8 +51,59 @@ Hooks.on('ready', () => {
   // game.socket.emit("system.shadowrun5e", {foo: 'bar'});
 });
 
-Hooks.on('updateCombat', args => onCombatUpdate(args));
+Hooks.on('updateCombatant', (args, changes) => console.log(args));
+
+Hooks.on('preUpdateCombat', onCombatUpdate);
 Hooks.on('renderChatMessage', (app, html, data) => SR5Item.chatListeners(html));
+
+/* -------------------------------------------- */
+/*  Hotbar Macros                               */
+/* -------------------------------------------- */
+
+Hooks.on("hotbarDrop", (bar, data, slot) => {
+  if ( data.type !== "Item" ) return;
+  createItemMacro(data.data, slot);
+  return false;
+});
+
+/**
+ * Create a Macro from an Item drop.
+ * Get an existing item macro if one exists, otherwise create a new one.
+ * @param {Object} item     The item data
+ * @param {number} slot     The hotbar slot to use
+ * @returns {Promise}
+ */
+async function createItemMacro(item, slot) {
+  const command = `game.shadowrun5e.rollItemMacro("${item.name}");`;
+  let macro = game.macros.entities.find(m => (m.name === item.name) && (m.command === command));
+  if ( !macro ) {
+    macro = await Macro.create({
+      name: item.name,
+      type: "script",
+      img: item.img,
+      command: command,
+      flags: {"shadowrun5e.itemMacro": true}
+    }, {displaySheet: false});
+  }
+  game.user.assignHotbarMacro(macro, slot);
+}
+
+/**
+ * Create a Macro from an Item drop.
+ * Get an existing item macro if one exists, otherwise create a new one.
+ * @param {string} itemName
+ * @return {Promise}
+ */
+function rollItemMacro(itemName) {
+  const speaker = ChatMessage.getSpeaker();
+  let actor;
+  if ( speaker.token ) actor = game.actors.tokens[speaker.token];
+  if ( !actor ) actor = game.actors.get(speaker.actor);
+  const item = actor ? actor.items.find(i => i.name === itemName) : null;
+  if ( !item ) return ui.notifications.warn(`Your controlled Actor does not have an item named ${itemName}`);
+
+  return item.roll();
+}
 
 
 Handlebars.registerHelper("toHeaderCase", function(str) {

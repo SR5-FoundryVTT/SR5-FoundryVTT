@@ -49,9 +49,9 @@
       </div>
     </div>
     {{#each section.items as |item i|}}
-    <div class="item" data-item='{{item.id}}'>
+    <div class="item" data-item-id='{{item._id}}'>
       <div class="item-left">
-        <div class="item-img item-roll" data-item='{{item.id}}'>
+        <div class="item-img item-roll">
           <img src="{{item.img}}" title="{{item.name}}" height='24px' width='24px'/>
         </div>
         <div class="item-text item-name has-desc">
@@ -60,7 +60,7 @@
       </div>
       <div class="item-right">
         {{#if item.data.range.ammo.max}}
-        <div class="item-text roll reload-ammo" data-item='{{item.id}}'>
+        <div class="item-text roll reload-ammo">
           Reload
         </div>
         <div class="item-text">
@@ -70,9 +70,7 @@
         </div>
         {{/if}}
         <div class="item-text">
-          <span
-            class="item-equip-toggle"
-            data-item='{{item.id}}'>
+          <span class="item-equip-toggle" >
             {{#if item.data.technology.equipped}}
             <i class="far fa-check-circle"></i>
             {{else}}
@@ -87,8 +85,7 @@
             maxlength="3"
             size="3"
             value="{{item.data.technology.rating}}"
-            data-dtype='Number'
-            data-item='{{item.id}}'/>
+            data-dtype='Number' />
         </div>
         <div class="item-text rtg">
           <input
@@ -97,12 +94,11 @@
             maxlength="3"
             size="3"
             value="{{item.data.technology.quantity}}"
-            data-dtype='Number'
-            data-item='{{item.id}}'/>
+            data-dtype='Number' />
         </div>
         <div class="item-text item-icons">
-          <i class="item-edit roll fas fa-edit" data-item='{{item.id}}'></i>
-          <i class="item-delete roll fas fa-trash" data-item='{{item.id}}'></i>
+          <i class="item-edit roll fas fa-edit"></i>
+          <i class="item-delete roll fas fa-trash"></i>
         </div>
       </div>
     </div>

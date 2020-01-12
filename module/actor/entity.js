@@ -335,6 +335,7 @@ export class SR5Actor extends Actor {
     };
     let template = 'systems/shadowrun5e/templates/rolls/roll-defense.html';
     let special = '';
+    let cancel = true;
     return new Promise(resolve => {
       renderTemplate(template, dialogData).then(dlg => {
         new Dialog({
@@ -342,15 +343,17 @@ export class SR5Actor extends Actor {
           content: dlg,
           buttons: {
             normal: {
-              label: 'Normal'
+              label: 'Normal',
+              callback: () => cancel = false
             },
             full_defense: {
               label: `Full Defense (+ ${this.data.data.attributes.willpower.value})`,
-              callback: () => special = 'full_defense'
+              callback: () => { special = 'full_defense';cancel = false; }
             }
           },
           default: 'normal',
           close: html => {
+            if (cancel) return;
             let count = parseInt(html.find('[name=defense]').val());
             let fireMode = parseInt(html.find('[name=fireMode]').val());
             let cover = parseInt(html.find('[name=cover]').val());
@@ -398,6 +401,7 @@ export class SR5Actor extends Actor {
       soak: this.data.data.rolls.soak.default
     };
     let id = '';
+    let cancel = true;
     let template = 'systems/shadowrun5e/templates/rolls/roll-soak.html';
     return new Promise(resolve => {
       renderTemplate(template, dialogData).then(dlg => {
@@ -405,39 +409,39 @@ export class SR5Actor extends Actor {
           title: 'Soak Test',
           content: dlg,
           buttons: {
-            default: {
+            base: {
               label: 'Base',
               icon: '<i class="fas fa-shield-alt"></i>',
-              callback: () => id = 'default'
+              callback: () => { id = 'default'; cancel = false; }
             },
             acid: {
               label: 'Acid',
               icon: '<i class="fas fa-vial"></i>',
-              callback: () => id = 'acid'
+              callback: () => { id = 'acid'; cancel = false; }
             },
             cold: {
               label: 'Cold',
               icon: '<i class="fas fa-snowflake"></i>',
-              callback: () => id = 'cold'
+              callback: () => { id = 'cold'; cancel = false; }
             },
             electricity: {
               label: 'Elec',
               icon: '<i class="fas fa-bolt"></i>',
-              callback: () => id = 'electricity'
+              callback: () => { id = 'electricity'; cancel = false; }
             },
             fire: {
               label: 'Fire',
               icon: '<i class="fas fa-fire"></i>',
-              callback: () => id = 'fire'
+              callback: () => { id = 'fire'; cancel = false; }
             },
             radiation: {
               label: 'Rad',
               icon: '<i class="fas fa-radiation"></i>',
-              callback: () => id = 'radiation'
-            },
-
+              callback: () => { id = 'radiation'; cancel = false; }
+            }
           },
           close: (html) => {
+            if (cancel) return;
             const soak = this.data.data.rolls.soak[id];
             let count = soak;
             const ap = parseInt(html.find('[name=ap]').val());
@@ -510,20 +514,23 @@ export class SR5Actor extends Actor {
       attributes: attributes
     };
     let spec = false;
+    let cancel = false;
     renderTemplate('systems/shadowrun5e/templates/rolls/matrix-roll.html', dialogData).then(dlg => {
       new Dialog({
         title: `${Helpers.label(matrix_att.label)} Test`,
         content: dlg,
         buttons: {
           roll: {
-            label: 'Normal'
+            label: 'Normal',
+            callback: () => cancel = false
           },
           spec: {
             label: 'Spec',
-            callback: () => spec = true
+            callback: () => { spec = true; cancel = false; }
           }
         },
         close: (html) => {
+          if (cancel) return;
           const newAtt = html.find('[name=attribute]').val();
           let att = "";
           if (newAtt) att = this.data.data.attributes[newAtt];
@@ -646,17 +653,20 @@ export class SR5Actor extends Actor {
       attributes: atts
     };
     let defaulting = false;
+    let cancel = true;
     renderTemplate('systems/shadowrun5e/templates/rolls/single-attribute.html', dialogData).then(dlg => {
       new Dialog({
         title: `${label} Attribute Test`,
         content: dlg,
         buttons: {
           roll: {
-            label: 'Continue'
+            label: 'Continue',
+            callback: () => cancel = false
           }
         },
         default: 'roll',
         close: html => {
+          if (cancel) return;
           let count = att.value;
           let limit = undefined;
           let title = label

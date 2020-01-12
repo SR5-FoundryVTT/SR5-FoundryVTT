@@ -118,7 +118,7 @@ export class SR5Item extends Item {
     const data = duplicate(this.data.data);
     const labels = this.labels;
 
-    data.description.value = enrichHTML(data.description.value, htmlOptions);
+    data.description.value = TextEditor.enrichHTML(data.description.value, htmlOptions);
 
     const props = [];
     this[`_${this.data.type}ChatData`](data, labels, props);
@@ -391,26 +391,30 @@ export class SR5Item extends Item {
         const buttons = {};
         let ranges = itemData.range.ranges;
         let environmental = true;
+        let cancel = true;
         buttons['short'] = {
-          label: `Short (${ranges.short})`
+          label: `Short (${ranges.short})`,
+          callback: () => cancel = false
         };
         buttons['medium'] = {
           label: `Medium (${ranges.medium})`,
-          callback: () => environmental = 1
+          callback: () => { environmental = 1; cancel = false; }
         };
         buttons['long'] = {
           label: `Long (${ranges.long})`,
-          callback: () => environmental = 3
+          callback: () => { environmental = 3; cancel = false; }
         };
         buttons['extreme'] = {
           label: `Extreme (${ranges.extreme})`,
-          callback: () => environmental = 6
+          callback: () => { environmental = 6; cancel = false; }
         };
         new Dialog({
           title: title,
           content: dlg,
           buttons: buttons,
           close: (html) => {
+            if (cancel) return;
+
             const fireMode = parseInt(html.find('[name="fireMode"]').val())
             if (fireMode) {
               title += ` - Defender (${Helpers.mapRoundsToDefenseDesc(fireMode)})`
@@ -449,6 +453,7 @@ export class SR5Item extends Item {
         force: 2 - itemData.drain
       };
       let reckless = false;
+      let cancel = false;
       renderTemplate('systems/shadowrun5e/templates/rolls/roll-spell.html', dialogData).then(dlg => {
         new Dialog({
           title: `${Helpers.label(this.data.name)} Force`,
@@ -456,15 +461,17 @@ export class SR5Item extends Item {
           buttons: {
             roll: {
               label: 'Continue',
-              icon: '<i class="fas fa-dice-six"></i>'
+              icon: '<i class="fas fa-dice-six"></i>',
+              callback: () => cancel = false
             },
             spec: {
               label: 'Reckless',
               icon: '<i class="fas fa-plus"></i>',
-              callback: () => reckless = true
+              callback: () => { reckless = true; cancel = false; }
             }
           },
           close: (html) => {
+            if (cancel) return;
             const force = parseInt(html.find('[name=force]').val());
             console.log(force);
             limit = force;
@@ -499,7 +506,7 @@ export class SR5Item extends Item {
         fade: (itemData.fade >= 0 ? `+${itemData.fade}` : itemData.fade),
         level: 2 - itemData.fade
       };
-      let reckless = false;
+      let cancel = true;
       renderTemplate('systems/shadowrun5e/templates/rolls/roll-complex-form.html', dialogData).then(dlg => {
         new Dialog({
           title: `${Helpers.label(this.data.name)} Level`,
@@ -507,10 +514,12 @@ export class SR5Item extends Item {
           buttons: {
             roll: {
               label: 'Continue',
-              icon: '<i class="fas fa-dice-six"></i>'
+              icon: '<i class="fas fa-dice-six"></i>',
+              callback: () => cancel = false
             }
           },
           close: (html) => {
+            if (cancel) return;
             const level = parseInt(html.find('[name=level]').val());
             limit = level;
             DiceSR.d6({
@@ -576,7 +585,7 @@ export class SR5Item extends Item {
       } else actor = game.actors.get(card.data('actorId'));
 
       if (!actor) return;
-      const itemId = Number(card.data('itemId'));
+      const itemId = card.data('itemId');
       const item = actor.getOwnedItem(itemId);
 
       if (action === 'roll') item.rollTest(ev);

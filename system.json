@@ -8,7 +8,7 @@
   "esmodules": ["shadowrun5e.js"],
   "scripts": [],
   "styles": ["css/main.css"],
-  "minimumCoreVersion": "0.4.3",
+  "minimumCoreVersion": "0.4.4",
   "packs": [],
   "initiative": "@initiative.current.base.value + @initiative.current.dice.text - @wounds.value",
   "primaryTokenAttribute": "track.physical",
