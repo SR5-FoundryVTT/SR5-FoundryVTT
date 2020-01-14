@@ -7,7 +7,7 @@ import { SR5 } from './module/config.js';
 import { Helpers } from './module/helpers.js';
 import { preloadHandlebarsTemplates } from './module/templates.js';
 import { DiceSR } from './module/dice.js';
-import { onCombatUpdate } from './module/combat.js';
+import { preCombatUpdate, combatUpdate } from './module/combat.js';
 import { measureDistance } from './module/canvas.js';
 
 /* -------------------------------------------- */
@@ -40,6 +40,8 @@ Hooks.once("init", async function() {
   ['renderSR5ActorSheet', 'renderSR5ItemSheet'].forEach(s => {
     Hooks.on(s, (app, html, data) => Helpers.setupCustomCheckbox(app, html, data));
   });
+
+  // CONFIG.debug.hooks = true;
 });
 
 Hooks.on('canvasInit', function() {
@@ -51,9 +53,8 @@ Hooks.on('ready', () => {
   // game.socket.emit("system.shadowrun5e", {foo: 'bar'});
 });
 
-Hooks.on('updateCombatant', (args, changes) => console.log(args));
-
-Hooks.on('preUpdateCombat', onCombatUpdate);
+Hooks.on('preUpdateCombat', preCombatUpdate);
+Hooks.on('updateCombat', combatUpdate);
 Hooks.on('renderChatMessage', (app, html, data) => SR5Item.chatListeners(html));
 
 /* -------------------------------------------- */
