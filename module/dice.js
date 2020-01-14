@@ -68,6 +68,7 @@ export class DiceSR {
     };
     let template = 'systems/shadowrun5e/templates/rolls/roll-dialog.html';
     let edge = false;
+    let cancel = true;
     return new Promise(resolve => {
       renderTemplate(template, dialogData).then(dlg => {
         new Dialog({
@@ -76,22 +77,24 @@ export class DiceSR {
           buttons: {
             roll: {
               label: 'Roll',
-              icon: '<i class="fas fa-dice-six"></i>'
+              icon: '<i class="fas fa-dice-six"></i>',
+              callback: () => cancel = false
             },
             edge: {
               label: 'Edge',
               icon: '<i class="fas fa-bomb"></i>',
-              callback: () => edge = true
+              callback: () => { edge = true; cancel = false; }
             }
           },
           default: 'roll',
           close: html => {
-            total = parseInt(html.find('[name="dice_pool"]').val()),
-            limit = parseInt(html.find('[name="limit"]').val()),
-            mod = parseInt(html.find('[name="mod"]').val()),
-            limitMod = parseInt(html.find('[name="limit_mod"]').val()),
-            wounds = parseInt(html.find('[name=wounds]').val()),
-            extended = html.find('[name=extended]').val(),
+            if (cancel) return;
+            total = parseInt(html.find('[name="dice_pool"]').val());
+            limit = parseInt(html.find('[name="limit"]').val());
+            mod = parseInt(eval(html.find('[name="mod"]').val()));
+            limitMod = parseInt(html.find('[name="limit_mod"]').val());
+            wounds = parseInt(html.find('[name=wounds]').val());
+            extended = html.find('[name=extended]').val();
             dialogOptions = {
               ...dialogOptions,
               environmental: parseInt(html.find('[name="options.environmental"]').val())

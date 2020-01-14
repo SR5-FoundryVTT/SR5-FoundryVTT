@@ -2,7 +2,7 @@
   <div class='form-group'>
     <label>Dice Pool</label>
     <input style='flex: 1' type='text' name='dice_pool' size='3' maxlength='3' value='{{dice_pool}}' {{#unless options.prompt}}disabled{{/unless}} data-dtype="Number"/>
-    {{#unless options.prompt}}<input style='flex: 1' type='text' name='mod' size='3' maxlength='3' value='{{mod}}' placeholder='+Modifiers' data-dtype="Number"/>{{/unless}}
+    {{#unless options.prompt}}<input style='flex: 1' type='text' name='mod' value='{{mod}}' placeholder='+Modifiers' data-dtype="Number"/>{{/unless}}
   </div>
   {{#if limit}}
   <div class='form-group'>
