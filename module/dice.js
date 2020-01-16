@@ -11,7 +11,7 @@ import { SR5 } from './config.js';
 
 export class DiceSR {
   static d6({event, count, mod, actor, limit, limitMod, title="Roll", prefix, suffix, after, extended, matrix, dialogOptions, wounds=true}) {
-    const roll = (count, limit, explode) => {
+    const roll = async (count, limit, explode) => {
       let formula = `${count}d6`;
       if (explode) {
         formula += 'x6';
@@ -25,16 +25,44 @@ export class DiceSR {
       if (prefix) formula = prefix + formula;
 
       let roll = new Roll(formula);
+      let rollMode = game.settings.get("core", "rollMode");
+
+      roll.roll();
+
+      const hits = roll.total;
+      const fails = roll.dice[0].rolls.reduce((fails, r) => (r.roll === 1) ? fails + 1 : fails, 0);
+
+      const template = 'systems/shadowrun5e/templates/rolls/roll-card.html';
+      const templateData = {
+        actor: actor,
+        hits: roll.total,
+        fails: fails,
+        roll: roll,
+        count: count,
+        limit: limit,
+        edge: edge
+      };
+      const html = await renderTemplate(template, templateData);
+      const chatData = {
+        user: game.user._id,
+        speaker: ChatMessage.getSpeaker({actor: actor}),
+        type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+        content: html
+      };
+
+      // ChatMessage.create(chatData, {displaySheet: false});
 
       roll.toMessage({
-        flavor: title
+        speaker: ChatMessage.getSpeaker({actor: actor}),
+        flavor: title,
+        rollMode: rollMode
       });
 
       return roll;
     };
     if (!mod) mod = 0;
 
-    if (actor) {
+    if (actor && !(title.includes('Soak') || title.includes('Drain') || title.includes('Fade'))) {
       if (wounds) wounds = actor.data.data.wounds.value;
       if (matrix) {
         const m = actor.data.data.matrix;
@@ -52,6 +80,10 @@ export class DiceSR {
       total -= wounds;
       total += mods;
       let edge = event[SR5.kbmod.EDGE];
+      if (edge && actor) {
+        total += actor.data.data.attributes.edge.max;
+        actor.update({"data.attributes.edge.value": actor.data.data.attributes.edge.value - 1});
+      }
       let r = roll(total, edge ? undefined : limit, edge);
       if (after) after(r);
       return;
@@ -105,6 +137,10 @@ export class DiceSR {
             if (wounds) total -= wounds;
             if (dialogOptions.environmental) total -= dialogOptions.environmental;
             if (dialogOptions.matrix) total -= dialogOptions.matrix;
+            if (edge && actor) {
+              total += actor.data.data.attributes.edge.max;
+              actor.update({"data.attributes.edge.value": actor.data.data.attributes.edge.value - 1});
+            }
             let r = roll(total, edge ? undefined : limit, edge);
             resolve(r);
             if (after) after(r);

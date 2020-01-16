@@ -55,7 +55,9 @@ Hooks.on('ready', () => {
 
 Hooks.on('preUpdateCombat', preCombatUpdate);
 Hooks.on('updateCombat', combatUpdate);
-Hooks.on('renderChatMessage', (app, html, data) => SR5Item.chatListeners(html));
+Hooks.on('renderChatMessage', (app, html, data) => {
+  if (!app.isRoll) SR5Item.chatListeners(html)
+});
 
 /* -------------------------------------------- */
 /*  Hotbar Macros                               */
