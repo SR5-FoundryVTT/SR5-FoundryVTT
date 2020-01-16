@@ -27,6 +27,7 @@ export class DiceSR {
       let roll = new Roll(formula);
 
       roll.toMessage({
+        speaker: ChatMessage.getSpeaker({actor: actor}),
         flavor: title
       });
 
@@ -34,7 +35,7 @@ export class DiceSR {
     };
     if (!mod) mod = 0;
 
-    if (actor) {
+    if (actor && !(title.includes('Soak') || title.includes('Drain') || title.includes('Fade'))) {
       if (wounds) wounds = actor.data.data.wounds.value;
       if (matrix) {
         const m = actor.data.data.matrix;
