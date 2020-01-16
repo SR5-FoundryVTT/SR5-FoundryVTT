@@ -72,7 +72,6 @@ export class SR5Item extends Item {
 
     this.labels = labels;
     item.properties = this.getChatData().properties;
-    console.log(item);
   }
 
   async roll(event) {
