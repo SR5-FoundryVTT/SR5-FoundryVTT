@@ -52,6 +52,10 @@ export class DiceSR {
       total -= wounds;
       total += mods;
       let edge = event[SR5.kbmod.EDGE];
+      if (edge && actor) {
+        total += actor.data.data.attributes.edge.max;
+        actor.update({"data.attributes.edge.value": actor.data.data.attributes.edge.value - 1});
+      }
       let r = roll(total, edge ? undefined : limit, edge);
       if (after) after(r);
       return;
@@ -105,6 +109,10 @@ export class DiceSR {
             if (wounds) total -= wounds;
             if (dialogOptions.environmental) total -= dialogOptions.environmental;
             if (dialogOptions.matrix) total -= dialogOptions.matrix;
+            if (edge && actor) {
+              total += actor.data.data.attributes.edge.max;
+              actor.update({"data.attributes.edge.value": actor.data.data.attributes.edge.value - 1});
+            }
             let r = roll(total, edge ? undefined : limit, edge);
             resolve(r);
             if (after) after(r);
