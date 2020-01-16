@@ -348,8 +348,8 @@ export class SR5Item extends Item {
 
     const opposed = itemData.action.opposed;
     if (opposed.type === 'defense') target.rollDefense(options);
-    if (opposed.type === 'soak') target.rollSoak(options);
-    if (opposed.type === 'armor') target.rollSoak(options);
+    else if (opposed.type === 'soak') target.rollSoak(options);
+    else if (opposed.type === 'armor') target.rollSoak(options);
     else {
       if (opposed.skill && opposed.attribute) target.rollSkill(opposed.skill, {...options, attribute: opposed.attribute});
       if (opposed.attribute && opposed.attribute2) target.rollTwoAttributes([opposed.attribute, opposed.attribute2], options);
@@ -429,12 +429,12 @@ export class SR5Item extends Item {
               dialogOptions: {
                 environmental: environmental
               },
-              after: (roll) => {
+              after: async (roll) => {
                 const dupData = duplicate(this.data);
                 const ammo = dupData.data.range.ammo;
-                ammo.value = Math.max(0, ammo.value - fireMode);
-                this.update(dupData);
-                this.setFlag('shadowrun5e', 'attack', {
+                let ammoValue = Math.max(0, ammo.value - fireMode);
+                await this.update({"data.range.ammo.value": ammoValue});
+                await this.setFlag('shadowrun5e', 'attack', {
                   hits: roll.total,
                   fireMode: fireMode,
                   damageType: dupData.data.action.damage.type,
@@ -531,7 +531,6 @@ export class SR5Item extends Item {
               title: title,
               after: (roll) => {
                 const fade = Math.max(itemData.fade + level, 2);
-                console.log(fade);
                 this.actor.rollFade({event: ev}, fade);
               }
             });

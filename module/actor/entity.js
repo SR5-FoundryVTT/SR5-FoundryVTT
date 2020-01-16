@@ -327,7 +327,6 @@ export class SR5Actor extends Actor {
   }
 
   rollDefense(options) {
-    this.unsetFlag('shadowrun5e', 'incomingAttack');
     let dialogData = {
       defense: this.data.data.rolls.defense,
       fireMode: options.fireModeDefense,
@@ -368,6 +367,7 @@ export class SR5Actor extends Actor {
               count: count,
               title: 'Defense',
               after: (roll) => {
+                this.unsetFlag('shadowrun5e', 'incomingAttack');
                 if (options.incomingAttack) {
                   let defenderHits = roll.total;
                   let attack = options.incomingAttack;
@@ -394,7 +394,6 @@ export class SR5Actor extends Actor {
   }
 
   rollSoak(options) {
-    this.unsetFlag('shadowrun5e', 'incomingDamage');
     let dialogData = {
       damage: options.damage,
       ap: options.ap,
@@ -441,6 +440,7 @@ export class SR5Actor extends Actor {
             }
           },
           close: (html) => {
+            this.unsetFlag('shadowrun5e', 'incomingDamage');
             if (cancel) return;
             const soak = this.data.data.rolls.soak[id];
             let count = soak;
