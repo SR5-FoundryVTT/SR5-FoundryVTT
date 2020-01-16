@@ -27,6 +27,7 @@ export class DiceSR {
       let roll = new Roll(formula);
       let rollMode = game.settings.get("core", "rollMode");
 
+      /*
       roll.roll();
 
       const hits = roll.total;
@@ -49,6 +50,7 @@ export class DiceSR {
         type: CONST.CHAT_MESSAGE_TYPES.ROLL,
         content: html
       };
+      */
 
       // ChatMessage.create(chatData, {displaySheet: false});
 
@@ -142,12 +144,13 @@ export class DiceSR {
               actor.update({"data.attributes.edge.value": actor.data.data.attributes.edge.value - 1});
             }
             let r = roll(total, edge ? undefined : limit, edge);
-            resolve(r);
-            if (after) after(r);
-            if (extended) {
-              count -= 1;
-              DiceSR.d6({event, count, mod, actor, limit, limitMod, title, prefix, suffix, after, extended, dialogOptions, wounds, after});
-            }
+            r.then(r => {;
+              if (after) after(r);
+              if (extended) {
+                count -= 1;
+                DiceSR.d6({event, count, mod, actor, limit, limitMod, title, prefix, suffix, after, extended, dialogOptions, wounds, after});
+              }
+            });
           }
         }).render(true);
       });

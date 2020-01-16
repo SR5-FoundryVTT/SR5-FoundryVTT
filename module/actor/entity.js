@@ -366,7 +366,7 @@ export class SR5Actor extends Actor {
               actor: this,
               count: count,
               title: 'Defense',
-              after: (roll) => {
+              after: async (roll) => {
                 this.unsetFlag('shadowrun5e', 'incomingAttack');
                 if (options.incomingAttack) {
                   let defenderHits = roll.total;
@@ -439,7 +439,7 @@ export class SR5Actor extends Actor {
               callback: () => { id = 'radiation'; cancel = false; }
             }
           },
-          close: (html) => {
+          close: async (html) => {
             this.unsetFlag('shadowrun5e', 'incomingDamage');
             if (cancel) return;
             const soak = this.data.data.rolls.soak[id];

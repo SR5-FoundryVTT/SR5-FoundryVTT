@@ -433,7 +433,7 @@ export class SR5Item extends Item {
                 const ammo = dupData.data.range.ammo;
                 let ammoValue = Math.max(0, ammo.value - fireMode);
                 await this.update({"data.range.ammo.value": ammoValue});
-                await this.setFlag('shadowrun5e', 'attack', {
+                this.setFlag('shadowrun5e', 'attack', {
                   hits: roll.total,
                   fireMode: fireMode,
                   damageType: dupData.data.action.damage.type,
@@ -481,7 +481,7 @@ export class SR5Item extends Item {
               actor: this.actor,
               limit: limit,
               title: title,
-              after: (roll) => {
+              after: async (roll) => {
                 if (this.data.data.category === 'combat') {
                   let damage = force;
                   let ap = -force;
@@ -544,7 +544,7 @@ export class SR5Item extends Item {
         actor: this.actor,
         limit: limit,
         title: title,
-        after: (roll) => {
+        after: async (roll) => {
           this.setFlag('shadowrun5e', 'action', {
             hits: roll.total
           });
