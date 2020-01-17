@@ -2,7 +2,7 @@
   "name": "shadowrun5e",
   "title": "Shadowrun 5th Edition",
   "description": "Shadowrun 5th Edition game",
-  "version": "0.4.8",
+  "version": "0.4.9",
   "templateVersion": "1.1",
   "author": "n3rf_herder",
   "esmodules": ["shadowrun5e.js"],

@@ -1,186 +1,184 @@
 <form class="{{cssClass}}" autocomplete="off">
-  <header class="sheet-header flexcol">
-    <div class="sheet-header-row-1 flexrow">
-      <div class="profile-img flex0">
-        <img class="profile" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="80" width="80"/>
-      </div>
-      <div class="flexcol flex4">
-        <div class="flexrow">
-          <div class="flex4">
-            <div class="name">
-              <input
-                class="display text left"
-                name="name"
-                type="text"
-                value="{{actor.name}}"
-                placeholder="Name"/>
-            </div>
+  <header class="sheet-header">
+    <div class="profile-img flex0">
+      <img class="profile" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="80" width="80"/>
+    </div>
+    <div class="flexcol flex4">
+      <div class="flexrow">
+        <div class="flex4">
+          <div class="name">
+            <input
+              class="display text left"
+              name="name"
+              type="text"
+              value="{{actor.name}}"
+              placeholder="Name"/>
           </div>
-          {{#each data.limits as |limit label|}}
-          {{#ifin label ../config.limits }}
-          <div class="limit">
-            <div class="limit-row">
-              <span class="limit-title">{{toHeaderCase label}}</span>
-              <span class="limit-value" value={{limit.value}}>{{limit.value}}</span>
-            </div>
-          </div>
-          {{/ifin}}
-          {{/each}}
         </div>
-        <div class="attributes smooth">
-          {{#each data.track as |track label|}}
-          <div class="attribute">
-            <div class="attribute-name">{{toHeaderCase label}}</div>
-            <div class="track">
-              <div class="attribute-input-container">
-                <input
-                  class="display attribute-input"
-                  size='2'
-                  maxlength='2'
-                  type='text'
-                  name='data.track.{{label}}.value'
-                  value="{{track.value}}"
-                  data-dtype="Number"/>
-              </div>
-              <div class="track-slash">
-              </div>
-              <div class="attribute-input-container">
-                <input
-                  class="display attribute-input"
-                  size='2'
-                  maxlength='2'
-                  type='text'
-                  name='data.track.{{label}}.max'
-                  value="{{track.max}}"
-                  disabled
-                  data-dtype="Number"/>
-              </div>
-            </div>
+        {{#each data.limits as |limit label|}}
+        {{#ifin label ../config.limits }}
+        <div class="limit">
+          <div class="limit-row">
+            <span class="limit-title">{{toHeaderCase label}}</span>
+            <span class="limit-value" value={{limit.value}}>{{limit.value}}</span>
           </div>
-          {{/each}}
-          <div class="attribute">
-            <div class="attribute-name attribute-roll roll" data-attribute="edge">Edge</div>
-            <div class="track">
-              <div class="attribute-input-container">
-                <input
-                  class="display attribute-input"
-                  size='2'
-                  maxlength='2'
-                  type='text'
-                  name='data.attributes.edge.value'
-                  value="{{data.attributes.edge.value}}"
-                  data-dtype="Number"/>
-              </div>
-              <div class="track-slash">
-              </div>
-              <div class="attribute-input-container">
-                <input
-                  class="display attribute-input"
-                  size='2'
-                  maxlength='2'
-                  type='text'
-                  name='data.attributes.edge.max'
-                  value="{{data.attributes.edge.max}}"
-                  data-dtype="Number"/>
-              </div>
-            </div>
-          </div>
-          <div class="attribute">
-            <div class="attribute-name">Movement</div>
-            <div class="track">
-              <div class="attribute-input-container">
-                <input
-                  class="display attribute-input"
-                  size='2'
-                  maxlength='2'
-                  type='text'
-                  name='data.movement.walk.value'
-                  value="{{data.movement.walk.value}}"
-                  data-dtype="Number"
-                  disabled/>
-              </div>
-              <div class="track-slash">
-              </div>
-              <div class="attribute-input-container">
-                <input
-                  class="display attribute-input"
-                  size='2'
-                  maxlength='2'
-                  type='text'
-                  name='data.movement.run.value'
-                  value="{{data.movement.run.value}}"
-                  data-dtype="Number"
-                  disabled/>
-              </div>
-              <div class="track-slash">
-              </div>
-              <div class="input attribute-input-container">
-                <input
-                  class="display attribute-input"
-                  size='2'
-                  maxlength='2'
-                  type='text'
-                  name='data.movement.sprint'
-                  value="{{data.movement.sprint}}"
-                  data-dtype="Number"/>
-                <span class="unit">
-                  +
-                </span>
-              </div>
-            </div>
-          </div>
-          <div class="attribute">
-            <div class="track">
-              <div class="attribute-name">
-                <select name="data.initiative.perception" class="display">
-                  {{#select data.initiative.perception}}
-                  <option value="meatspace">Meatspace</option>
-                  <option value="matrix">Matrix</option>
-                  {{#ife data.special 'magic'}}
-                  <option value="astral">Astral</option>
-                  {{/ife}}
-                  {{/select}}
-                </select>
-              </div>
-              <label title="Use Edge in next Initiative Roll" class="checkbox init-edge-label">
-                <input type='checkbox' class="submit-checkbox" name="data.initiative.edge" {{checked data.initiative.edge}}>
-                <span class="checkmark far"></span>
-              </label>
-            </div>
-            <div class="track">
-              <div class="attribute-input-container">
-                <input
-                   class="display"
-                   size='4'
-                   type='text'
-                   value="{{data.initiative.current.base.value}}"
-                   disabled />
-              </div>
-              <div class="track-plus">
-              </div>
-              <div class="attribute-input-container">
-                <input
-                   class="display"
-                   size='4'
-                   type='text'
-                   value="{{data.initiative.current.dice.text}}"
-                   disabled />
-              </div>
-            </div>
-          </div>
-          <div class="attribute">
-            <div class="attribute-name roll attribute-roll" data-attribute="essence">Essence</div>
+        </div>
+        {{/ifin}}
+        {{/each}}
+      </div>
+      <div class="attributes smooth">
+        {{#each data.track as |track label|}}
+        <div class="attribute">
+          <div class="attribute-name">{{toHeaderCase label}}</div>
+          <div class="track">
             <div class="attribute-input-container">
               <input
                 class="display attribute-input"
-                type="text"
-                size="4"
-                name="data.attributes.essence.value"
-                value="{{data.attributes.essence.value}}"
-                data-dtype="Number"
-                disabled
-                placeholder="1"/>
+                size='2'
+                maxlength='2'
+                type='text'
+                name='data.track.{{label}}.value'
+                value="{{track.value}}"
+                data-dtype="Number"/>
             </div>
+            <div class="track-slash">
+            </div>
+            <div class="attribute-input-container">
+              <input
+                class="display attribute-input"
+                size='2'
+                maxlength='2'
+                type='text'
+                name='data.track.{{label}}.max'
+                value="{{track.max}}"
+                disabled
+                data-dtype="Number"/>
+            </div>
+          </div>
+        </div>
+        {{/each}}
+        <div class="attribute">
+          <div class="attribute-name attribute-roll roll" data-attribute="edge">Edge</div>
+          <div class="track">
+            <div class="attribute-input-container">
+              <input
+                class="display attribute-input"
+                size='2'
+                maxlength='2'
+                type='text'
+                name='data.attributes.edge.value'
+                value="{{data.attributes.edge.value}}"
+                data-dtype="Number"/>
+            </div>
+            <div class="track-slash">
+            </div>
+            <div class="attribute-input-container">
+              <input
+                class="display attribute-input"
+                size='2'
+                maxlength='2'
+                type='text'
+                name='data.attributes.edge.max'
+                value="{{data.attributes.edge.max}}"
+                data-dtype="Number"/>
+            </div>
+          </div>
+        </div>
+        <div class="attribute">
+          <div class="attribute-name">Movement</div>
+          <div class="track">
+            <div class="attribute-input-container">
+              <input
+                class="display attribute-input"
+                size='2'
+                maxlength='2'
+                type='text'
+                name='data.movement.walk.value'
+                value="{{data.movement.walk.value}}"
+                data-dtype="Number"
+                disabled/>
+            </div>
+            <div class="track-slash">
+            </div>
+            <div class="attribute-input-container">
+              <input
+                class="display attribute-input"
+                size='2'
+                maxlength='2'
+                type='text'
+                name='data.movement.run.value'
+                value="{{data.movement.run.value}}"
+                data-dtype="Number"
+                disabled/>
+            </div>
+            <div class="track-slash">
+            </div>
+            <div class="input attribute-input-container">
+              <input
+                class="display attribute-input"
+                size='2'
+                maxlength='2'
+                type='text'
+                name='data.movement.sprint'
+                value="{{data.movement.sprint}}"
+                data-dtype="Number"/>
+              <span class="unit">
+                +
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="attribute">
+          <div class="track">
+            <div class="attribute-name">
+              <select name="data.initiative.perception" class="display">
+                {{#select data.initiative.perception}}
+                <option value="meatspace">Meatspace</option>
+                <option value="matrix">Matrix</option>
+                {{#ife data.special 'magic'}}
+                <option value="astral">Astral</option>
+                {{/ife}}
+                {{/select}}
+              </select>
+            </div>
+            <label title="Use Edge in next Initiative Roll" class="checkbox init-edge-label">
+              <input type='checkbox' class="submit-checkbox" name="data.initiative.edge" {{checked data.initiative.edge}}>
+              <span class="checkmark far"></span>
+            </label>
+          </div>
+          <div class="track">
+            <div class="attribute-input-container">
+              <input
+                 class="display"
+                 size='4'
+                 type='text'
+                 value="{{data.initiative.current.base.value}}"
+                 disabled />
+            </div>
+            <div class="track-plus">
+            </div>
+            <div class="attribute-input-container">
+              <input
+                 class="display"
+                 size='4'
+                 type='text'
+                 value="{{data.initiative.current.dice.text}}"
+                 disabled />
+            </div>
+          </div>
+        </div>
+        <div class="attribute">
+          <div class="attribute-name roll attribute-roll" data-attribute="essence">Essence</div>
+          <div class="attribute-input-container">
+            <input
+              class="display attribute-input"
+              type="text"
+              size="4"
+              name="data.attributes.essence.value"
+              value="{{data.attributes.essence.value}}"
+              data-dtype="Number"
+              disabled
+              placeholder="1"/>
           </div>
         </div>
       </div>
@@ -204,7 +202,7 @@
       </div>
     </div>
   </header>
-  <section class="flexcol">
+  <section class="sheet-body">
     <nav class="tabs" data-group="primary">
       <a class="item" data-tab="actions">Actions</a>
       <a class="item" data-tab="skills">Skills</a>
