@@ -213,8 +213,6 @@ export class SR5ActorSheet extends ActorSheet {
     data.complex_forms = complex_forms;
 
     qualities.sort((a, b) => {
-      console.log(a);
-      console.log(b);
       if (a.data.type === 'positive' && b.data.type === 'negative') return -1;
       if (a.data.type === 'negative' && b.data.type === 'positive') return 1;
       return a.name < b.name ? -1 : 1;
