@@ -14,8 +14,8 @@ import { measureDistance } from './module/canvas.js';
 /*  Foundry VTT Initialization                  */
 /* -------------------------------------------- */
 
-Hooks.once("init", async function() {
-  console.log("hello world");
+Hooks.once("init", function() {
+  console.log("Loading Shadowrun 5e System");
 
   // Create a D&D5E namespace within the game global
   game.shadowrun5e = {
@@ -29,17 +29,17 @@ Hooks.once("init", async function() {
   CONFIG.Actor.entityClass = SR5Actor;
   CONFIG.Item.entityClass = SR5Item;
 
-  await preloadHandlebarsTemplates();
-
   // Register sheet application classes
   Actors.unregisterSheet("core", ActorSheet);
-  Actors.registerSheet("SR5", SR5ActorSheet, { makeDefault: true });
+  Actors.registerSheet("shadowrun5e", SR5ActorSheet, { makeDefault: true });
   Items.unregisterSheet("core", ItemSheet);
-  Items.registerSheet("SR5", SR5ItemSheet, { makeDefault: true});
+  Items.registerSheet("shadowrun5e", SR5ItemSheet, { makeDefault: true});
 
   ['renderSR5ActorSheet', 'renderSR5ItemSheet'].forEach(s => {
     Hooks.on(s, (app, html, data) => Helpers.setupCustomCheckbox(app, html, data));
   });
+
+  preloadHandlebarsTemplates();
 
   // CONFIG.debug.hooks = true;
 });
