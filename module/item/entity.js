@@ -251,7 +251,11 @@ export class SR5Item extends Item {
     } else if (data.category === 'melee') {
       if (data.melee.reach) props.push(`Reach ${data.melee.reach}`);
     } else if (data.category === 'thrown') {
-      if (data.thrown.range) props.push(data.thrown.range);
+      if (data.thrown.ranges) {
+        const mult = data.thrown.ranges.attribute && this.actor ? this.actor.data.data.attributes[data.thrown.ranges.attribute].value : 1;
+        const ranges = [data.thrown.ranges.short, data.thrown.ranges.medium, data.thrown.ranges.long, data.thrown.ranges.extreme];
+        props.push(ranges.map(v => v * mult).join('/'));
+      };
       const blast = data.thrown.blast;
       if (blast.value) props.push(`Radius ${blast.radius}m`);
       if (blast.dropoff) props.push(`Dropoff ${blast.dropoff}/m`);
