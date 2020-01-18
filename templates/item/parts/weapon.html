@@ -62,6 +62,8 @@
       </label>
     </div>
   </div>
+  {{/ife}}
+  {{#ifne data.category "melee"}}
   <div class="form-line">
     <div class="label">
       Ranges
@@ -98,8 +100,21 @@
          name='data.range.ranges.extreme'
          value="{{data.range.ranges.extreme}}"
          data-dtype="Number" />
+      <i class="fas fa-times"></i>
+      {{#ife data.category "thrown"}}
+      <select name="data.thrown.ranges.attribute">
+      {{#select data.thrown.ranges.attribute}}
+        <option value=""></option>
+        {{#each config.attributes as |label id|}}
+        <option value="{{label}}">{{toHeaderCase label}}</option>
+        {{/each}}
+      {{/select}}
+      </select>
+      {{/ife}}
     </div>
   </div>
+  {{/ifne}}
+  {{#ife data.category "range"}}
   <div class="form-line">
     <div class="label">
       Recoil Compensation
