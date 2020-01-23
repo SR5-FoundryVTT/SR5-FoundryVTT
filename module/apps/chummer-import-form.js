@@ -17,6 +17,7 @@ export class ChummerImportForm extends FormApplication {
   }
 
   activateListeners(html) {
+    // html.find('.chummer-text').on('paste', async event => {
     html.find('.submit-chummer-import').click(async event => {
       event.preventDefault();
       let chummerfile = JSON.parse($('.chummer-text').val());
@@ -206,7 +207,7 @@ export class ChummerImportForm extends FormApplication {
                 }
                 group = "knowledge";
               } else {
-                let name = s.name.toLowerCase().trim().replace(/\s/g, '_');
+                let name = s.name.toLowerCase().trim().replace(/\s/g, '_').replace(/-/g, '_');
                 if (name.includes('exotic') && name.includes('_weapon')) name = name.replace('_weapon', '');
                 skill = update.skills.active[name];
               }
@@ -263,7 +264,8 @@ export class ChummerImportForm extends FormApplication {
                 base: parseInt(getValues(w.ap)[0])
               };
               action.type = 'varies';
-              action.skill = w.skill.toLowerCase().replace(/\s/g, "_");
+              if (w.skill) action.skill = w.skill.toLowerCase().replace(/\s/g, "_");
+              else if (w.category && w.category.toLowerCase().includes('exotic')) action.skill = w.category.toLowerCase().replace(' weapons', '').replace(/\s/g, '_');
               if (action.skill.includes('exotic')) action.skill = action.skill.replace('_weapon', '');
               action.attribute = 'agility';
               action.limit = {
@@ -603,8 +605,6 @@ export class ChummerImportForm extends FormApplication {
           });
         }
       };
-
-      console.log(update);
       await this.object.update(updateData);
       for (let i = 0; i < items.length; i++) {
         let item = items[i];

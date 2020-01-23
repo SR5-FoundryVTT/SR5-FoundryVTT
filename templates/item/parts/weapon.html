@@ -26,7 +26,6 @@
     <div class="inputs">
       <input
         size='2'
-        maxlength='2'
         type='text'
         name='data.range.ammo.value'
         value='{{data.range.ammo.value}}'
@@ -35,7 +34,6 @@
       /
       <input
         size='2'
-        maxlength='2'
         type='text'
         name='data.range.ammo.max'
         value="{{data.range.ammo.max}}"
@@ -62,6 +60,8 @@
       </label>
     </div>
   </div>
+  {{/ife}}
+  {{#ife data.category "range"}}
   <div class="form-line">
     <div class="label">
       Ranges
@@ -69,7 +69,6 @@
     <div class="inputs">
       <input
          size='3'
-         maxlength='3'
          type='text'
          name='data.range.ranges.short'
          value="{{data.range.ranges.short}}"
@@ -77,7 +76,6 @@
       /
       <input
          size='3'
-         maxlength='3'
          type='text'
          name='data.range.ranges.medium'
          value="{{data.range.ranges.medium}}"
@@ -85,7 +83,6 @@
       /
       <input
          size='3'
-         maxlength='3'
          type='text'
          name='data.range.ranges.long'
          value="{{data.range.ranges.long}}"
@@ -93,11 +90,11 @@
       /
       <input
          size='3'
-         maxlength='3'
          type='text'
          name='data.range.ranges.extreme'
          value="{{data.range.ranges.extreme}}"
          data-dtype="Number" />
+      <i class="fas fa-times"></i>
     </div>
   </div>
   <div class="form-line">
@@ -107,13 +104,57 @@
     <div class="inputs">
       <input
         type="text"
-        maxlength="2"
         size="2"
         name='data.range.rc.base'
         value='{{data.range.rc.base}}'
         data-dtype="Number"
         placeholder="1"/>
     </div>
+  </div>
+  {{/ife}}
+  {{#ife data.category "thrown"}}
+  <div class="form-line">
+    <div class="label">
+      Ranges
+    </div>
+    <div class="inputs">
+      <input
+         size='3'
+         type='text'
+         name='data.thrown.ranges.short'
+         value="{{data.thrown.ranges.short}}"
+         data-dtype="Number" />
+      /
+      <input
+         size='3'
+         type='text'
+         name='data.thrown.ranges.medium'
+         value="{{data.thrown.ranges.medium}}"
+         data-dtype="Number" />
+      /
+      <input
+         size='3'
+         type='text'
+         name='data.thrown.ranges.long'
+         value="{{data.thrown.ranges.long}}"
+         data-dtype="Number" />
+      /
+      <input
+         size='3'
+         type='text'
+         name='data.thrown.ranges.extreme'
+         value="{{data.thrown.ranges.extreme}}"
+         data-dtype="Number" />
+      <i class="fas fa-times"></i>
+    </div>
+    <select name="data.thrown.ranges.attribute">
+    {{#select data.thrown.ranges.attribute}}
+      <option value=""></option>
+      {{#each config.attributes as |label id|}}
+      <option value="{{label}}">{{toHeaderCase label}}</option>
+      {{/each}}
+    {{/select}}
+    </select>
   </div>
   {{/ife}}
   {{#ife data.category "melee"}}
@@ -124,7 +165,6 @@
     <div class="inputs">
       <input
         type="text"
-        maxlength="2"
         size="2"
         name="data.melee.reach"
         value="{{data.melee.reach}}"
@@ -141,7 +181,6 @@
     <div class="inputs">
       <input
         type="text"
-        maxlength="3"
         size="4"
         name="data.thrown.blast.radius"
         value="{{data.thrown.blast.radius}}"
@@ -157,7 +196,6 @@
     <div class="inputs">
       <input
         size='3'
-        maxlength='4'
         type='text'
         name='data.thrown.blast.dropoff'
         value='{{data.thrown.blast.dropoff}}'

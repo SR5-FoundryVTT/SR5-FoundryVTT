@@ -847,13 +847,12 @@
           "reach": 0
         },
         "thrown": {
-          "range": {
-            "ranges": {
-              "short": 0,
-              "medium": 0,
-              "long": 0,
-              "extreme": 0
-            }
+          "ranges": {
+            "short": 0,
+            "medium": 0,
+            "long": 0,
+            "extreme": 0,
+            "attribute": ""
           },
           "blast": {
             "radius": 0,
