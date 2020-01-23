@@ -416,8 +416,7 @@ export class SR5ActorSheet extends ActorSheet {
     event.preventDefault();
     const iid = event.currentTarget.closest('.item').dataset.itemId;
     const item = this.actor.getOwnedItem(iid);
-    if (item.type === 'action') item.rollTest(event);
-    else item.roll(event);
+    item.roll(event);
   }
 
   async _onRollFade(event) {

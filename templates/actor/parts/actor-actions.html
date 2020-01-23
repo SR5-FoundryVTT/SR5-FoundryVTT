@@ -33,7 +33,10 @@
     {{#each actions as |action id|}}
     <div class="item" data-item-id='{{action._id}}'>
       <div class="item-left">
-        <div class="item-text item-name item-roll roll" >
+        <div class="item-img item-roll">
+          <img src="{{action.img}}" title="{{action.name}}" height='24px' width='24px'/>
+        </div>
+        <div class="item-text item-name has-desc" >
           {{action.name}}
         </div>
       </div>
@@ -62,6 +65,16 @@
         <div class="item-text item-icons">
           <i class="item-edit roll fas fa-edit" ></i>
           <i class="item-delete roll fas fa-trash" ></i>
+        </div>
+      </div>
+    </div>
+    <div class="item hidden">
+      <div class="item-desc">
+        {{{item.data.description.value}}}
+        <div class="props">
+          {{#each item.properties}}
+          <span>{{this}}</span>
+          {{/each}}
         </div>
       </div>
     </div>
