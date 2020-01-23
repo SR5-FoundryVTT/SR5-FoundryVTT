@@ -258,7 +258,7 @@ export class SR5Actor extends Actor {
     data.rolls = {
       ...data.rolls,
       defense: attrs.reaction.value + attrs.intuition.value + mods.defense,
-      drain: attrs.willpower.value + (drainAtt ? drainAtt.value : 0) + (data.magic.drain ? data.magic.drain.mod : 0) + mods.drain,
+      drain: attrs.willpower.value + (drainAtt ? drainAtt.value : 0) + mods.drain,
       fade: attrs.willpower.value + attrs.resonance.value + mods.fade,
       soak: {
         default: soak,
