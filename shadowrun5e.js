@@ -7,7 +7,7 @@ import { SR5 } from './module/config.js';
 import { Helpers } from './module/helpers.js';
 import { preloadHandlebarsTemplates } from './module/templates.js';
 import { DiceSR } from './module/dice.js';
-import { preCombatUpdate, combatUpdate } from './module/combat.js';
+import { preCombatUpdate, shadowrunCombatUpdate } from './module/combat.js';
 import { measureDistance } from './module/canvas.js';
 
 /* -------------------------------------------- */
@@ -49,12 +49,18 @@ Hooks.on('canvasInit', function() {
 });
 
 Hooks.on('ready', () => {
-  // game.socket.on("system.shadowrun5e", data => console.log(data));
-  // game.socket.emit("system.shadowrun5e", {foo: 'bar'});
+  game.socket.on("system.shadowrun5e", data => {
+    if (game.user.isGM && data.gmCombatUpdate) {
+      shadowrunCombatUpdate(
+        data.gmCombatUpdate.changes,
+        data.gmCombatUpdate.options
+      );
+    }
+    console.log(data)
+  });
 });
 
 Hooks.on('preUpdateCombat', preCombatUpdate);
-Hooks.on('updateCombat', combatUpdate);
 Hooks.on('renderChatMessage', (app, html, data) => {
   if (!app.isRoll) SR5Item.chatListeners(html)
 });
