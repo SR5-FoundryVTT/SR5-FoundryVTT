@@ -1,0 +1,19 @@
+<form class="{{cssClass}}" autocomplete="off">
+  <div class="flexcol">
+    {{> "systems/shadowrun5e/templates/item/parts/header.html" }}
+    <nav class="tabs" data-group="primary">
+      <a class="item" data-tab="description">{{localize "SR5.Description"}}</a>
+      <a class="item" data-tab="sin">{{localize "SR5.Licenses"}}</a>
+    </nav>
+    <div class="tab" data-group="primary" data-tab="description">
+      <div class="flexrow align-start nowrap">
+        {{> "systems/shadowrun5e/templates/item/parts/technology.html" }}
+        {{> "systems/shadowrun5e/templates/item/parts/description.html"}}
+      </div>
+    </div>
+    <div class="tab" data-group="primary" data-tab="sin">
+      {{> "systems/shadowrun5e/templates/item/parts/sin.html"}}
+    </div>
+  </div>
+</form>
+

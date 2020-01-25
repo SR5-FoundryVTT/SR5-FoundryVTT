@@ -153,6 +153,10 @@ export class SR5Item extends Item {
     }
   }
 
+  _sinChatData(data, labels, props) {
+
+  }
+
   _adept_powerChatData(data, labels, props) {
     this._actionChatData(data, labels, props);
     props.push(`PP ${data.pp}`);
@@ -318,6 +322,27 @@ export class SR5Item extends Item {
     const data = duplicate(this.data);
     const ammo = data.data.range.ammo;
     ammo.available.splice(index, 1);
+    this.update(data);
+  }
+
+  addNewLicense() {
+    const data = duplicate(this.data);
+    let licenses = data.data.licenses;
+    if (typeof licenses === 'object') {
+      data.data.licenses = Object.values(licenses);
+    }
+    data.data.licenses.push({
+      name: '',
+      rtg: '',
+      description: ''
+    });
+    this.update(data);
+  }
+
+  removeLicense(index) {
+    const data = duplicate(this.data);
+    const licenses = data.data.licenses;
+    licenses.splice(index, 1);
     this.update(data);
   }
 
