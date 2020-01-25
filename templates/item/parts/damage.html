@@ -11,7 +11,7 @@
         <option value=""></option>
         {{#select data.action.damage.type}}
         {{#each config.damageTypes as |name type|}}
-        <option value="{{type}}">{{name}}</option>
+        <option value="{{type}}">{{localize name}}</option>
         {{/each}}
         {{/select}}
       </select>
@@ -37,7 +37,7 @@
       {{#select data.action.damage.attribute}}
         <option value=""></option>
         {{#each config.attributes as |name type|}}
-        <option value="{{type}}">{{name}}</option>
+        <option value="{{type}}">{{localize name}}</option>
         {{/each}}
       {{/select}}
       </select>
@@ -53,7 +53,7 @@
         {{#select data.action.damage.element}}
         <option value=""></option>
         {{#each config.elementTypes as |name type|}}
-        <option value="{{type}}">{{name}}</option>
+        <option value="{{type}}">{{localize name}}</option>
         {{/each}}
         {{/select}}
       </select>

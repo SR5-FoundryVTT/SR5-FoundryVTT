@@ -31,8 +31,8 @@ SR5.limits = {
 
 SR5.specialTypes = {
   "mundane": "SR5.Mundane",
-  "awakend": "SR5.Awakened",
-  "emerged": "SR5.Emerged"
+  "magic": "SR5.Awakened",
+  "resonance": "SR5.Emerged"
 };
 
 SR5.damageTypes = {
@@ -202,7 +202,7 @@ SR5.activeSkills = {
   "pilot_walker": "SR5.SkillPilotWalker",
   "pilot_ground_craft": "SR5.SkillPilotGroundCraft",
   "pilot_water_craft": "SR5.SkillPilotWaterCraft",
-  "pilot_exotic_vehicle":"SR5.SkillPilotExoticVehicle"
+  "pilot_exotic_vehicle": "SR5.SkillPilotExoticVehicle"
 };
 
 SR5.actionTypes = {
