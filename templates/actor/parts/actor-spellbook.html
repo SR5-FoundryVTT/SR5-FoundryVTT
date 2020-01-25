@@ -3,17 +3,17 @@
     <div class="item item-section">
       <div class="item-left">
         <div class="item-text item-name">
-          Powers
+          {{localize "SR5.Powers"}}
         </div>
       </div>
       <div class="item-right">
         <div class="item-text">
-          Type
+          {{localize "SR5.PowerType"}}
         </div>
         <div class="item-text item-icons">
           <a class="item-create" title="Create Item" data-type="adept_power">
             <i class="fas fa-plus"></i>
-            Add
+            {{localize "SR5.Add"}}
           </a>
         </div>
       </div>
@@ -30,7 +30,7 @@
       </div>
       <div class="item-right">
         <div class="item-text">
-          {{toHeaderCase item.data.type}}
+          {{localize item.data.type}}
         </div>
         <div class="item-text item-icons">
           <i class="item-edit roll fas fa-edit" ></i>
@@ -52,26 +52,26 @@
     <div class="item item-section">
       <div class="item-left">
         <div class="item-text item-name">
-          Spells
+          {{localize "SR5.Spells"}}
         </div>
       </div>
       <div class="item-right">
         <div class="item-text">
-          Type
+          {{localize "SR5.SpellType"}}
         </div>
         <div class="item-text">
-          Range
+          {{localize "SR5.SpellRange"}}
         </div>
         <div class="item-text">
-          Duration
+          {{localize "SR5.Duration"}}
         </div>
         <div class="item-text">
-          Drain
+          {{localize "SR5.Drain"}}
         </div>
         <div class="item-text item-icons">
           <a class="item-create" title="Create Item" data-type="spell">
             <i class="fas fa-plus"></i>
-            Add
+            {{localize "SR5.Add"}}
           </a>
         </div>
       </div>
@@ -88,13 +88,13 @@
       </div>
       <div class="item-right">
         <div class="item-text">
-          {{toHeaderCase item.data.type}}
+          {{localizeOb item.data.type ../config.spellTypes}}
         </div>
         <div class="item-text">
-          {{toHeaderCase item.data.range}}
+          {{localizeOb item.data.range ../config.spellRanges}}
         </div>
         <div class="item-text">
-          {{toHeaderCase item.data.duration}}
+          {{localizeOb item.data.duration ../config.durations}}
         </div>
         <div class="item-text">
           {{item.data.drain}}

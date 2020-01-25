@@ -3,12 +3,12 @@
     <div class="scroll-area left">
       <div class="flexcol justify-start">
         <div class="item">
-          <button type="button" class="display import-character">Import Character</button>
+          <button type="button" class="display import-character">{{localize "SR5.ImportCharacter"}}</button>
         </div>
         <div class="item">
           <div class="item-left">
             <div class="item-text item-name">
-              Karma
+              {{localize "SR5.Karma"}}
             </div>
           </div>
           <div class="item-right">
@@ -26,7 +26,7 @@
         <div class="item">
           <div class="item-left">
             <div class="item-text item-name">
-              Career Karma
+              {{localize "SR5.CareerKarma"}}
             </div>
           </div>
           <div class="item-right">
@@ -44,7 +44,7 @@
         <div class="item">
           <div class="item-left">
             <div class="item-text item-name">
-              Notoriety
+              {{localize "SR5.Notoriety"}}
             </div>
           </div>
           <div class="item-right">
@@ -62,7 +62,7 @@
         <div class="item">
           <div class="item-left">
             <div class="item-text item-name">
-              Public Awareness
+              {{localize "SR5.PublicAwareness"}}
             </div>
           </div>
           <div class="item-right">
@@ -80,7 +80,7 @@
         <div class="item">
           <div class="item-left">
             <div class="item-text item-name">
-              Street Cred
+              {{localize "SR5.StreetCred"}}
             </div>
           </div>
           <div class="item-right">
@@ -98,16 +98,16 @@
         <div class="item">
           <div class="item-left">
             <div class="item-text item-name">
-              Awakened/Emerged
+              {{localize "SR5.AwakenedEmerged"}}
             </div>
           </div>
           <div class="item-right">
             <div class="item-text">
               <select class='display' name='data.special'>
                 {{#select data.special}}
-                <option value="mundane">Mundane</option>
-                <option value="magic">Awakened</option>
-                <option value="resonance">Emerged</option>
+                {{#each config.specialTypes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}}
                 {{/select}}
               </select>
             </div>
@@ -117,17 +117,16 @@
         <div class="item">
           <div class="item-left">
             <div class="item-text item-name">
-              Drain Resist
+              {{localize "SR5.DrainResist"}}
             </div>
           </div>
           <div class="item-right">
             <div class="item-text">
               <select name="data.magic.attribute" class="display">
                 {{#select data.magic.attribute}}
-                {{#each config.spell.attributes}}
-                <option value="{{this}}">{{toHeaderCase this}}</option>
+                {{#each config.attributes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
                 {{/each}}
-                <option value="body">Body</option>
                 {{/select}}
               </select>
             </div>
@@ -140,12 +139,12 @@
       <div class="item item-section">
         <div class="item-left">
           <div class="item-text item-name">
-            Modifier
+            {{localize "SR5.Modifier"}}
           </div>
         </div>
         <div class="item-right">
           <div class="item-text rtg">
-            Value
+            {{localize "SR5.Value"}}
           </div>
         </div>
       </div>

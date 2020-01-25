@@ -5,10 +5,10 @@
   <div class="item-info">
     <div class="flexrow">
       <div class="item-name">
-        <input type="text" class="display text" name="name" value='{{item.name}}' placeholder="Item Name" />
+        <input type="text" class="display text" name="name" value='{{item.name}}' placeholder='{{localize "SR5.ItemName"}}' />
       </div>
       <div class="item-type">
-        {{toHeaderCase item.type}}
+        {{localize item.type}}
       </div>
     </div>
     <div class="flexrow">
@@ -18,7 +18,7 @@
           type='text'
           name='data.description.source'
           value='{{data.description.source}}'
-          placeholder='Source' />
+          placeholder='{{localize "SR5.Source"}}' />
       </div>
     </div>
   </div>

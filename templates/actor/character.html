@@ -1,7 +1,7 @@
 <form class="{{cssClass}}" autocomplete="off">
   <header class="sheet-header">
     <div class="profile-img flex0">
-      <img class="profile" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="80" width="80"/>
+      <img class="profile" src="{{actor.img}}" data-edit="img" title="{{actor.name}}" height="120" width="80"/>
     </div>
     <div class="flexcol flex4">
       <div class="flexrow">
@@ -15,21 +15,21 @@
               placeholder="Name"/>
           </div>
         </div>
-        {{#each data.limits as |limit label|}}
-        {{#ifin label ../config.limits }}
+        {{#each data.limits as |limit id|}}
+        {{#unless limit.hidden}}
         <div class="limit">
           <div class="limit-row">
-            <span class="limit-title">{{toHeaderCase label}}</span>
+            <span class="limit-title">{{localize limit.label}}</span>
             <span class="limit-value" value={{limit.value}}>{{limit.value}}</span>
           </div>
         </div>
-        {{/ifin}}
+        {{/unless}}
         {{/each}}
       </div>
       <div class="attributes smooth">
-        {{#each data.track as |track label|}}
+        {{#each data.track as |track id|}}
         <div class="attribute">
-          <div class="attribute-name">{{toHeaderCase label}}</div>
+          <div class="attribute-name">{{localize track.label}}</div>
           <div class="track">
             <div class="attribute-input-container">
               <input
@@ -37,7 +37,7 @@
                 size='2'
                 maxlength='2'
                 type='text'
-                name='data.track.{{label}}.value'
+                name='data.track.{{id}}.value'
                 value="{{track.value}}"
                 data-dtype="Number"/>
             </div>
@@ -49,7 +49,7 @@
                 size='2'
                 maxlength='2'
                 type='text'
-                name='data.track.{{label}}.max'
+                name='data.track.{{id}}.max'
                 value="{{track.max}}"
                 disabled
                 data-dtype="Number"/>
@@ -58,7 +58,7 @@
         </div>
         {{/each}}
         <div class="attribute">
-          <div class="attribute-name attribute-roll roll" data-attribute="edge">Edge</div>
+          <div class="attribute-name attribute-roll roll" data-attribute="edge">{{localize "SR5.AttrEdge"}}</div>
           <div class="track">
             <div class="attribute-input-container">
               <input
@@ -85,7 +85,7 @@
           </div>
         </div>
         <div class="attribute">
-          <div class="attribute-name">Movement</div>
+          <div class="attribute-name">{{localize "SR5.Movement"}}</div>
           <div class="track">
             <div class="attribute-input-container">
               <input
@@ -133,10 +133,10 @@
             <div class="attribute-name">
               <select name="data.initiative.perception" class="display">
                 {{#select data.initiative.perception}}
-                <option value="meatspace">Meatspace</option>
-                <option value="matrix">Matrix</option>
+                <option value="meatspace">{{localize "SR5.InitCatMeatspace"}}</option>
+                <option value="matrix">{{localize "SR5.InitCatMatrix"}}</option>
                 {{#ife data.special 'magic'}}
-                <option value="astral">Astral</option>
+                <option value="astral">{{localize "SR5.InitCatAstral"}}</option>
                 {{/ife}}
                 {{/select}}
               </select>
@@ -168,7 +168,7 @@
           </div>
         </div>
         <div class="attribute">
-          <div class="attribute-name roll attribute-roll" data-attribute="essence">Essence</div>
+          <div class="attribute-name roll attribute-roll" data-attribute="essence">{{localize "SR5.AttrEssence"}}</div>
           <div class="attribute-input-container">
             <input
               class="display attribute-input"
@@ -185,35 +185,35 @@
     </div>
     <div class="attributes no-border">
       <div class="attribute row space-around">
-        <div class="attribute-only-roll roll attribute-name" data-roll='composure'>Composure</div>
-        <div class="attribute-only-roll roll attribute-name" data-roll='judge_intentions'>J.Intentions</div>
-        <div class="attribute-only-roll roll attribute-name" data-roll='lift_carry'>Lift&Carry</div>
-        <div class="attribute-only-roll roll attribute-name" data-roll='memory'>Memory</div>
+        <div class="attribute-only-roll roll attribute-name" data-roll='composure'>{{localize "SR5.RollComposure"}}</div>
+        <div class="attribute-only-roll roll attribute-name" data-roll='judge_intentions'>{{localize "SR5.RollJudgeIntentions"}}</div>
+        <div class="attribute-only-roll roll attribute-name" data-roll='lift_carry'>{{localize "SR5.RollLiftCarry"}}</div>
+        <div class="attribute-only-roll roll attribute-name" data-roll='memory'>{{localize "SR5.RollMemory"}}</div>
         <div title="Roll" class="attribute-name basic-roll roll defense-icon fas fa-dice-six" data-roll='basic'></div>
-        <div title="Defense" class="attribute-name defense-roll roll">Defense</div>
-        <div title="Soak" class="attribute-name soak-roll roll defense-icon">Soak</div>
-        <div class="attribute-name roll armor-roll">Armor ({{data.armor.value}})</div>
+        <div title="Defense" class="attribute-name defense-roll roll">{{localize "SR5.RollDefense"}}</div>
+        <div title="Soak" class="attribute-name soak-roll roll defense-icon">{{localize "SR5.RollSoak"}}</div>
+        <div class="attribute-name roll armor-roll">{{localize "SR5.RollArmor"}} ({{data.armor.value}})</div>
         {{#if awakened}}
-        <div class="attribute-name roll drain-roll">Drain</div>
+        <div class="attribute-name roll drain-roll">{{localize "SR5.RollDrain"}}</div>
         {{/if}}
         {{#if emerged}}
-        <div class="attribute-name roll fade-roll">Fade</div>
+        <div class="attribute-name roll fade-roll">{{localize "SR5.RollFade"}}</div>
         {{/if}}
       </div>
     </div>
   </header>
   <section class="sheet-body">
     <nav class="tabs" data-group="primary">
-      <a class="item" data-tab="actions">Actions</a>
-      <a class="item" data-tab="skills">Skills</a>
-      <a class="item active" data-tab="equipment">Gear</a>
+      <a class="item" data-tab="actions">{{localize "SR5.Actions"}}</a>
+      <a class="item" data-tab="skills">{{localize "SR5.Skills"}}</a>
+      <a class="item active" data-tab="equipment">{{localize "SR5.Gear"}}</a>
       {{#ife data.special 'magic'}}
-      <a class="item" data-tab="magic">Magic</a>
+      <a class="item" data-tab="magic">{{localize "SR5.Magic"}}</a>
       {{/ife}}
-      <a class="item" data-tab="matrix">Matrix</a>
-      <a class="item" data-tab="bio">Bio</a>
-      <a class="item" data-tab="lifestyle">Lifestyle</a>
-      <a class="item" data-tab="config">Misc</a>
+      <a class="item" data-tab="matrix">{{localize "SR5.Matrix"}}</a>
+      <a class="item" data-tab="bio">{{localize "SR5.Biography"}}</a>
+      <a class="item" data-tab="lifestyle">{{localize "SR5.Lifestyle"}}</a>
+      <a class="item" data-tab="config">{{localize "SR5.Miscellaneous"}}</a>
     </nav>
     <div class="tab" data-group="primary" data-tab="skills">
       {{> "systems/shadowrun5e/templates/actor/parts/actor-skills.html"}}
@@ -228,7 +228,7 @@
       {{> "systems/shadowrun5e/templates/actor/parts/actor-matrix.html" }}
     </div>
     <div class="tab" data-group="primary" data-tab="actions">
-      {{> "systems/shadowrun5e/templates/actor/parts/actor-actions.html" actions=actions }}
+      {{> "systems/shadowrun5e/templates/actor/parts/actor-actions.html"}}
     </div>
     <div class="tab" data-group="primary" data-tab="bio">
       {{> "systems/shadowrun5e/templates/actor/parts/actor-bio.html" }}

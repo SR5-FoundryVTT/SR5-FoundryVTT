@@ -3,7 +3,7 @@
     <div class="item flex0 no-border">
       <div class="item-left">
         <div class="item-text item-name">
-          Nuyen
+          {{localize "SR5.Nuyen"}}
         </div>
       </div>
       <div class="item-right">
@@ -32,18 +32,18 @@
       </div>
       <div class="item-right">
         <div class="item-text">
-          Equipped
+          {{localize "SR5.Equipped"}}
         </div>
         <div class="item-text rtg">
-          Rtg
+          {{localize "SR5.Rtg"}}
         </div>
         <div class="item-text rtg">
-          Qty
+          {{localize "SR5.Qty"}}
         </div>
         <div class="item-text item-icons">
           <a class="item-create" title="Create Item" {{#each section.dataset as |v k|}}data-{{k}}="{{v}}"{{/each}}>
             <i class="fas fa-plus"></i>
-            Add
+            {{localize "SR5.Add"}}
           </a>
         </div>
       </div>
@@ -61,7 +61,7 @@
       <div class="item-right">
         {{#if item.data.range.ammo.max}}
         <div class="item-text roll reload-ammo">
-          Reload
+          {{localize "SR5.WeaponReload"}}
         </div>
         <div class="item-text">
           ({{item.data.range.ammo.value}}/{{item.data.range.ammo.max}})

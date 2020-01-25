@@ -114,6 +114,10 @@ function rollItemMacro(itemName) {
   return item.roll();
 }
 
+Handlebars.registerHelper("localizeOb", function(strId, obj, options) {
+  if (obj) strId = obj[strId];
+  return game.i18n.localize(strId);
+});
 
 Handlebars.registerHelper("toHeaderCase", function(str) {
   if (str) return Helpers.label(str);

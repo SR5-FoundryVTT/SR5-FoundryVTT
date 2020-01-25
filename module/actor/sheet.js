@@ -86,6 +86,8 @@ export class SR5ActorSheet extends ActorSheet {
     data.awakened = data.data.special === 'magic';
     data.emerged = data.data.special === 'resonance';
 
+    console.log(data.data.track);
+
     return data;
   }
 
@@ -103,35 +105,35 @@ export class SR5ActorSheet extends ActorSheet {
   _prepareItems(data) {
     const inventory = {
       weapon: {
-        label: "Weapon",
+        label: game.i18n.localize("weapon"),
         items: [],
         dataset: {
           type: 'weapon'
         }
       },
       armor: {
-        label: "Armor",
+        label: game.i18n.localize("armor"),
         items: [],
         dataset: {
           type: 'armor'
         }
       },
       device: {
-        label: "Device",
+        label: game.i18n.localize("device"),
         items: [],
         dataset: {
           type: 'device'
         }
       },
       equipment: {
-        label: "Equipment",
+        label: game.i18n.localize("equipment"),
         items: [],
         dataset: {
           type: 'equipment'
         }
       },
       cyberware: {
-        label: "Cyberware",
+        label: game.i18n.localize("cyberware"),
         items: [],
         dataset: {
           type: 'cyberware'

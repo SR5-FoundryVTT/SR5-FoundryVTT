@@ -9,6 +9,13 @@
   "scripts": [],
   "styles": ["css/main.css", "css/actor.css", "css/config.css", "css/item.css"],
   "minimumCoreVersion": "0.4.4",
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
   "packs": [],
   "initiative": "@initiative.current.base.value + @initiative.current.dice.text - @wounds.value",
   "primaryTokenAttribute": "track.physical",

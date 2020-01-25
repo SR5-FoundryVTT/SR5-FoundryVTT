@@ -4,17 +4,17 @@
   </div>
   <div class="form-line">
     <div class="label">
-      Type
+      {{localize "SR5.OpposedType"}}
     </div>
     <div class="inputs">
       <select name="data.action.opposed.type">
       {{#select data.action.opposed.type}}
       <option value=""></option>
-      <option value="defense">Defense</option>
-      <option value="soak">Soak</option>
-      <option value="armor">Armor</option>
+      <option value="defense">{{localize "SR5.RollDefense"}}</option>
+      <option value="soak">{{localize "SR5.RollSoak"}}</option>
+      <option value="armor">{{localize "SR5.RollArmor"}}</option>
       <option disabled>-----</option>
-      <option value="custom">Custom</option>
+      <option value="custom">{{localize "SR5.RollCustom"}}</option>
       {{/select}}
       </select>
     </div>
@@ -22,17 +22,14 @@
   {{#ife data.action.opposed.type "custom"}}
   <div class="form-line">
     <div class="label">
-      Skill
+      {{localize "SR5.Skill"}}
     </div>
     <div class="inputs">
       <select name="data.action.opposed.skill">
       {{#select data.action.opposed.skill}}
         <option value=""></option>
-        {{#each config.skills.categories as |cat cid|}}
-        <option disabled>{{cat.label}}</option>
-        {{#each cat.skills as |skill sid|}}
-        <option value="{{skill}}">{{toHeaderCase skill}}</option>
-        {{/each}}
+        {{#each config.activeSkills as |name type|}}
+        <option value="{{type}}">{{localize name}}</option>
         {{/each}}
       {{/select}}
       </select>
@@ -40,14 +37,14 @@
   </div>
   <div class="form-line">
     <div class="label">
-      Attribute
+      {{localize "SR5.Attribute"}}
     </div>
     <div class="inputs">
       <select name="data.action.opposed.attribute">
       {{#select data.action.opposed.attribute}}
         <option value=""></option>
-        {{#each config.attributes as |label l|}}
-        <option value="{{label}}">{{toHeaderCase label}}</option>
+        {{#each config.attributes as |name type|}}
+        <option value="{{type}}">{{localize name}}</option>
         {{/each}}
       {{/select}}
       </select>
@@ -55,11 +52,11 @@
       <select name="data.action.opposed.attribute2">
       {{#select data.action.opposed.attribute2}}
         <option value=""></option>
-        {{#each config.attributes as |label l|}}
-        <option value="{{label}}">{{toHeaderCase label}}</option>
+        {{#each config.attributes as |name type|}}
+        <option value="{{type}}">{{localize name}}</option>
         {{/each}}
-        {{#each config.matrix.attributes as |label l|}}
-        <option value="{{label}}">{{toHeaderCase label}}</option>
+        {{#each config.matrixAttributes as |name type|}}
+        <option value="{{type}}">{{localize name}}</option>
         {{/each}}
       {{/select}}
       </select>

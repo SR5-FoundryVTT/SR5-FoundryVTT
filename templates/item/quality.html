@@ -5,11 +5,11 @@
       <div class="flexcol flex0">
         <div class="technology">
           <div class="flexrow nowrap">
-            <label>Type</label>
+            <label>{{localize "SR5.QualityType"}}</label>
             <select name="data.type" class="display">
               {{#select data.type}}
-              {{#each config.quality.types}}
-              <option value="{{this}}">{{toHeaderCase this}}</option>
+              {{#each config.qualityTypes as |name type|}}
+              <option value="{{type}}">{{localize name}}</option>
               {{/each}}
               {{/select}}
             </select>
