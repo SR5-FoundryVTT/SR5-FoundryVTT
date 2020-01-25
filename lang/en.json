@@ -107,6 +107,11 @@
   "SR5.WeaponReach": "Reach",
   "SR5.Radius": "Radius",
   "SR5.Dropoff": "Dropoff",
+  "SR5.WeaponMod": "Mod",
+  "SR5.DP": "DP",
+  "SR5.Accuracy": "Acc",
+  "SR5.RecoilCompensation": "RC",
+  "SR5.Equip": "Equip",
 
   "SR5.Spell": "Spell",
   "SR5.SpellCategory": "Category",

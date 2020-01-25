@@ -10,6 +10,9 @@
         {{localize "SR5.Equip"}}
       </div>
       <div class="item-text rtg">
+        {{localize "SR5.DP"}}
+      </div>
+      <div class="item-text rtg">
         {{localize "SR5.Accuracy"}}
       </div>
       <div class="item-text rtg">
@@ -48,7 +51,16 @@
         <input
           class='display'
           size='3'
-          maxlength='3'
+          type='text'
+          name='data.range.mods.{{id}}.dp'
+          value='{{mod.dp}}'
+          data-dtype="Number"
+          placeholder='0' />
+      </div>
+      <div class="item-text rtg">
+        <input
+          class='display'
+          size='3'
           type='text'
           name='data.range.mods.{{id}}.acc'
           value='{{mod.acc}}'
@@ -59,7 +71,6 @@
         <input
           class='display'
           size='3'
-          maxlength='3'
           type='text'
           name='data.range.mods.{{id}}.rc'
           value='{{mod.rc}}'

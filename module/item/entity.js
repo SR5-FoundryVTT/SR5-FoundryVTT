@@ -18,6 +18,7 @@ export class SR5Item extends Item {
 
     if (item.data.action) {
       const action = item.data.action;
+      action.alt_mod = 0;
       action.limit.mod = 0;
       action.damage.mod = 0;
       action.damage.ap.mod = 0;
@@ -34,6 +35,7 @@ export class SR5Item extends Item {
             if (mod.equipped) {
               if (mod.rc) range.rc.mod += mod.rc;
               if (mod.acc) action.limit.mod += mod.acc;
+              if (mod.dp) action.alt_mod += mod.dp;
             }
           });
         }
@@ -271,6 +273,7 @@ export class SR5Item extends Item {
     range.mods.push({
       equipped: false,
       name: '',
+      dp: 0,
       acc: 0,
       rc: 0,
       desc: ''
@@ -369,7 +372,7 @@ export class SR5Item extends Item {
     let attribute2 = actorData.attributes[itemData.action.attribute2];
     let limit = itemData.action.limit.value;
     let spec = itemData.action.spec ? 2 : 0;
-    let mod = parseInt(itemData.action.mod || 0);
+    let mod = parseInt(itemData.action.mod || 0) + parseInt(itemData.action.alt_mod || 0);
 
     // only check if attribute2 is set if skill is not set
     let count = 0;
