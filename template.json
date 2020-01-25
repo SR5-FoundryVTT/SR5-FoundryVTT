@@ -866,7 +866,8 @@
           "availability": "",
           "quantity": 1,
           "cost": 0,
-          "equipped": false
+          "equipped": false,
+          "concealability": 0
         },
         "condition_monitor": {
           "value": 9,
