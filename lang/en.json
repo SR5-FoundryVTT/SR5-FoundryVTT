@@ -62,6 +62,7 @@
   "SR5.SpellType": "Type",
   "SR5.SpellRange": "Range",
   "SR5.Drain": "Drain",
+  "SR5.DrainResist": "Drain Resist",
 
   "SR5.Metatype": "Metatype",
   "SR5.Quality": "Quality",
