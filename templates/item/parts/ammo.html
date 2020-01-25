@@ -15,16 +15,16 @@
       <div class="item-text six">
         {{localize "SR5.Damage"}}
       </div>
-      <div class="item-text">
+      <div class="item-text six">
         {{localize "SR5.Element"}}
       </div>
       <div class="item-text rtg">
         {{localize "SR5.AP"}}
       </div>
-      <div class="item-text">
+      <div class="item-text rtg">
         {{localize "SR5.Radius"}}
       </div>
-      <div class="item-text">
+      <div class="item-text rtg">
         {{localize "SR5.Dropoff"}}
       </div>
       <div class="item-text item-icons rtg">
@@ -82,12 +82,12 @@
           {{/select}}
         </select>
       </div>
-      <div class="item-text">
+      <div class="item-text six">
         <select class='display' name='data.range.ammo.available.{{@index}}.element'>
           {{#select this.element}}
           <option value=""></option>
-          {{#each config.elementTypes as |name type|}}
-          <option value="type">{{localize name}}</option>
+          {{#each ../config.elementTypes as |name type|}}
+          <option value="{{type}}">{{localize name}}</option>
           {{/each}}
           {{/select}}
         </select>
@@ -103,7 +103,7 @@
           data-dtype="Number"
           placeholder='0' />
       </div>
-      <div class="item-text center">
+      <div class="item-text center rtg">
         <input
           class="display"
           type="text"
@@ -115,7 +115,7 @@
           placeholder="0"/>
         <div class="track-max-value">m</div>
       </div>
-      <div class="item-text center">
+      <div class="item-text center rtg">
         <input
           class="display"
           size='2'
