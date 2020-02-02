@@ -86,6 +86,7 @@
   "SR5.Licenses": "Licenses",
   "SR5.Information": "Info",
 
+  "SR5.Contacts": "Contacts",
   "SR5.ContactType": "Type",
   "SR5.Connection": "Connection",
   "SR5.Loyalty": "Loyalty",
@@ -102,6 +103,7 @@
   "SR5.LifestyleHigh": "High",
   "SR5.LifestyleLuxory": "Luxory",
   "SR5.LifestyleOther": "Other",
+  "SR5.Lifestyles": "Lifestyles",
 
   "SR5.Description": "Description",
   "SR5.Source": "Source",

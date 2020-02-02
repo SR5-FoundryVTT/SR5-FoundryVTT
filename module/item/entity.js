@@ -16,6 +16,12 @@ export class SR5Item extends Item {
     const labels = {};
     const item = this.data;
 
+    if (item.type === 'sin') {
+      if (typeof item.data.licenses === 'object') {
+        item.data.licenses = Object.values(item.data.licenses);
+      }
+    }
+
     if (item.data.action) {
       const action = item.data.action;
       action.alt_mod = 0;
@@ -154,7 +160,26 @@ export class SR5Item extends Item {
   }
 
   _sinChatData(data, labels, props) {
+    props.push(`Rating ${data.technology.rating}`);
+    console.log(data);
+    data.licenses.forEach(license => {
+      props.push(`${license.name} R${license.rtg}`);
+    });
+  }
 
+  _contactChatData(data, labels, props) {
+    props.push(data.type);
+    props.push(`Connection ${data.connection}`);
+    props.push(`Loyalty ${data.loyalty}`);
+  }
+
+  _lifestyleChatData(data, labels, props) {
+    props.push(Helpers.label(data.type));
+    if (data.cost) props.push(`¥${data.cost}`);
+    if (data.comforts) props.push(`Comforts ${data.comforts}`);
+    if (data.security) props.push(`Security ${data.security}`);
+    if (data.neighborhood) props.push(`Neighborhood ${data.neighborhood}`);
+    if (data.guests) props.push(`Guests ${data.guests}`);
   }
 
   _adept_powerChatData(data, labels, props) {

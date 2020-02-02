@@ -7,8 +7,8 @@
       {{localize "SR5.LifestyleType"}}
     </div>
     <div class="inputs">
-      <select name="data.category">
-        {{#select data.category}}
+      <select name="data.type">
+        {{#select data.type}}
         <option value=""></option>
         {{#each config.lifestyleTypes as |name type|}}
         <option value="{{type}}">{{localize name}}</option>

@@ -996,7 +996,7 @@
       "security": 0,
       "neighborhood": 0,
       "guests": 0,
-      "permanent": true,
+      "permanent": false,
       "cost": 0,
       "mods": []
     },
