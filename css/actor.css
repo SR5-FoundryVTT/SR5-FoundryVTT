@@ -1,10 +1,17 @@
 .sr5.actor {
   min-height: 690px;
   min-width: 800px; }
+  .sr5.actor .wholesheet {
+    height: 100%;
+    display: flex;
+    flex-flow: column nowrap; }
   .sr5.actor .name {
     margin-bottom: 0;
     font-size: 200%;
     font-family: "Nodesto", "Signika", "Palatino Linotype", serif; }
+  .sr5.actor .sheetbody {
+    overflow: hidden;
+    flex: 1; }
   .sr5.actor .attributes {
     border-top: 1px solid #4d4d4d;
     display: flex;
@@ -97,38 +104,9 @@
         .sr5.actor .attributes .attribute .track .track-max-value {
           margin-bottom: 0;
           margin-left: .25em; }
-  .sr5.actor .skills-container {
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-around; }
-    .sr5.actor .skills-container > *:not(:first-child) {
-      margin-left: .25em; }
-    .sr5.actor .skills-container > *:not(:last-child) {
-      border-right: 1px solid #4d4d4d;
-      padding-right: .25em; }
-  .sr5.actor .bio-container {
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-around; }
-    .sr5.actor .bio-container .editor {
-      height: 32.5em; }
-    .sr5.actor .bio-container > *:not(:first-child) {
-      margin-left: .25em; }
-    .sr5.actor .bio-container > *:not(:last-child) {
-      border-right: 1px solid #4d4d4d;
-      padding-right: .25em; }
-  .sr5.actor .info-container {
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-around; }
-    .sr5.actor .info-container > *:not(:first-child) {
-      padding-left: .25em;
-      border-left: 1px solid #4d4d4d; }
-    .sr5.actor .info-container > *:not(:last-child) {
-      margin-right: .25em; }
   .sr5.actor .limit {
     font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
-    padding: 0 .1rem;
+    padding: 0 .1em;
     margin-top: -2px;
     text-align: center;
     display: flex;
@@ -136,22 +114,3 @@
     justify-content: center;
     align-items: center;
     align-content: center; }
-  .sr5.actor .scroll-area {
-    overflow-y: scroll;
-    max-height: 33em; }
-    .sr5.actor .scroll-area.equipment {
-      max-height: 32em; }
-    .sr5.actor .scroll-area.bio {
-      max-height: 33em; }
-    .sr5.actor .scroll-area.active-skills {
-      max-height: 26em; }
-    .sr5.actor .scroll-area.mods {
-      max-height: 32em; }
-    .sr5.actor .scroll-area.info {
-      max-height: 31em; }
-    .sr5.actor .scroll-area.knowledge-skills {
-      max-height: 27.5em; }
-    .sr5.actor .scroll-area.left {
-      direction: rtl; }
-      .sr5.actor .scroll-area.left > * {
-        direction: ltr; }

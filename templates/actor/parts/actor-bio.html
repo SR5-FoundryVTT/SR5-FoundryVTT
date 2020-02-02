@@ -1,6 +1,6 @@
 <div class="inventory">
-  <div class="flexrow align-start bio-container">
-    <div class="flexcol justify-start">
+  <div class="split-container">
+    <div>
       <div class="item">
         <div class="item-left">
           <div class="item-text item-name">
@@ -19,55 +19,53 @@
       </div>
       {{editor content=data.description.value target="data.description.value" button=true editable=true}}
     </div>
-    <div class="scroll-area">
-      <div class="flexcol justify-start">
-        <div class="item item-section">
-          <div class="item-left">
-            <div class="item-text item-name">
-              {{localize "SR5.Quality"}}
-            </div>
-          </div>
-          <div class="item-right">
-            <div class="item-text item-icons">
-              <a class="item-create" title="Create Quality" data-type="quality">
-                <i class="fas fa-plus"></i>
-                {{localize "SR5.Add"}}
-              </a>
-            </div>
+    <div>
+      <div class="item item-section">
+        <div class="item-left">
+          <div class="item-text item-name">
+            {{localize "SR5.Quality"}}
           </div>
         </div>
-        {{#each qualities as |item i|}}
-        <div class="item" data-item-id='{{item._id}}'>
-          <div class="item-left">
-            <div class="item-img item-roll">
-              <img src="{{item.img}}" title="{{item.name}}" height='24px' width='24px'/>
-            </div>
-            <div class="item-text item-name has-desc">
-              {{item.name}}
-            </div>
-          </div>
-          <div class="item-right">
-            <div class="item-text">
-              {{localizeOb item.data.type ../config.qualityTypes}}
-            </div>
-            <div class="item-text item-icons">
-              <i class="item-edit roll fas fa-edit" ></i>
-              <i class="item-delete roll fas fa-trash" ></i>
-            </div>
+        <div class="item-right">
+          <div class="item-text item-icons">
+            <a class="item-create" title="Create Quality" data-type="quality">
+              <i class="fas fa-plus"></i>
+              {{localize "SR5.Add"}}
+            </a>
           </div>
         </div>
-        <div class="item hidden">
-          <div class="item-desc">
-            {{{item.data.description.value}}}
-            <div class="props">
-              {{#each item.properties}}
-              <span>{{this}}</span>
-              {{/each}}
-            </div>
-          </div>
-        </div>
-        {{/each}}
       </div>
+      {{#each qualities as |item i|}}
+      <div class="item" data-item-id='{{item._id}}'>
+        <div class="item-left">
+          <div class="item-img item-roll">
+            <img src="{{item.img}}" title="{{item.name}}" height='24px' width='24px'/>
+          </div>
+          <div class="item-text item-name has-desc">
+            {{item.name}}
+          </div>
+        </div>
+        <div class="item-right">
+          <div class="item-text">
+            {{localizeOb item.data.type ../config.qualityTypes}}
+          </div>
+          <div class="item-text item-icons">
+            <i class="item-edit roll fas fa-edit" ></i>
+            <i class="item-delete roll fas fa-trash" ></i>
+          </div>
+        </div>
+      </div>
+      <div class="item hidden">
+        <div class="item-desc">
+          {{{item.data.description.value}}}
+          <div class="props">
+            {{#each item.properties}}
+            <span>{{this}}</span>
+            {{/each}}
+          </div>
+        </div>
+      </div>
+      {{/each}}
     </div>
   </div>
 </div>

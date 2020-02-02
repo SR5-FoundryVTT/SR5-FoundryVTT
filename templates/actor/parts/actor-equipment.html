@@ -1,28 +1,5 @@
 <div class="inventory">
-  <div class="flexrow justify-start">
-    <div class="item flex0 no-border">
-      <div class="item-left">
-        <div class="item-text item-name">
-          {{localize "SR5.Nuyen"}}
-        </div>
-      </div>
-      <div class="item-right">
-        <div class="item-text input">
-          <input
-             class="display"
-             type="text"
-             name="data.nuyen"
-             size="10"
-             value="{{data.nuyen}}"
-             data-dtype="Number" />
-            <span class="unit">
-              <i class="fas fa-yen-sign"></i>
-            </span>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="scroll-area equipment">
+  <div class="scroll-area">
     {{#each sections as |section sid|}}
     <div class="item item-section">
       <div class="item-left">

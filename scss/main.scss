@@ -186,6 +186,7 @@ select.display {
     font-size: 115%;
     background: $sheetbackground;
     color: $color;
+    overflow: hidden;
   }
   .editor {
     height: 15em;
@@ -199,6 +200,7 @@ select.display {
     border-bottom: $groove;
   }
   .tabs {
+    flex: 0;
     margin: .25em;
     margin-bottom: -5px;
     border-bottom: 1px solid $light-border;
@@ -222,13 +224,45 @@ select.display {
   .tab {
     border-radius: $radius;
     margin-top: .25em;
+    height: 100%;
+    .tabbody {
+      height: 100%;
+      display: flex;
+      flex-flow: column nowrap;
+      &.active {
+        display: flex;
+      }
+
+      > * {
+        flex: 0;
+      }
+      > .inventory {
+        flex: 1;
+      }
+    }
+  }
+  .split-container {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: stretch;
+    align-content: stretch;
+    > * {
+      width: 100%;
+    }
+    > *:not(:first-child) {
+      margin-left: .25em;
+    }
+    > *:not(:last-child) {
+      border-right: $groove;
+      padding-right: .25em;
+    }
   }
   .inventory {
-    display: flex;
-    flex-flow: column nowrap;
+    overflow-y: auto;
+    height: 100%;
     width: 100%;
     font-size: 85%;
-    position: relative;
     .item {
       display: flex;
       flex-flow: row nowrap;
@@ -285,7 +319,7 @@ select.display {
         }
       }
       .item-input {
-        max-width: 9.5em;
+        width: 9.5em;
       }
       .item-desc {
         padding: .25em;
@@ -341,6 +375,10 @@ select.display {
           &.active-skills-rating {
             padding-right: 1em;
           }
+        }
+        &.input {
+          text-align: right;
+          width: 9.5em;
         }
         &.desc {
           width: 16em;

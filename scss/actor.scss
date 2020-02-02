@@ -2,10 +2,19 @@
 .sr5.actor {
   min-height: 690px;
   min-width: 800px;
+  .wholesheet {
+    height: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+  }
   .name {
     margin-bottom: 0;
     font-size: 200%;
     @include nodesto;
+  }
+  .sheetbody {
+    overflow: hidden;
+    flex: 1;
   }
   .attributes {
     border-top: $groove;
@@ -124,48 +133,9 @@
       }
     }
   }
-  .skills-container {
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-around;
-    > *:not(:first-child) {
-      margin-left: .25em;
-    }
-    > *:not(:last-child) {
-      border-right: $groove;
-      padding-right: .25em;
-    }
-  }
-  .bio-container {
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-around;
-    .editor {
-      height: 32.5em;
-    }
-    > *:not(:first-child) {
-      margin-left: .25em;
-    }
-    > *:not(:last-child) {
-      border-right: $groove;
-      padding-right: .25em;
-    }
-  }
-  .info-container {
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: space-around;
-    > *:not(:first-child) {
-      padding-left: .25em;
-      border-left: $groove;
-    }
-    > *:not(:last-child) {
-      margin-right: .25em;
-    }
-  }
   .limit {
     @include nodesto;
-    padding: 0 .1rem;
+    padding: 0 .1em;
     margin-top: -2px;
     text-align: center;
     display: flex;
@@ -173,33 +143,5 @@
     justify-content: center;
     align-items: center;
     align-content: center;
-  }
-  .scroll-area {
-    overflow-y: scroll;
-    max-height: 33em;
-    &.equipment {
-      max-height: 32em;
-    }
-    &.bio {
-      max-height: 33em;
-    }
-    &.active-skills {
-      max-height: 26em;
-    }
-    &.mods {
-      max-height: 32em;
-    }
-    &.info {
-      max-height: 31em;
-    }
-    &.knowledge-skills {
-      max-height: 27.5em;
-    }
-    &.left {
-      direction: rtl;
-      >* {
-        direction: ltr;
-      }
-    }
   }
 }
