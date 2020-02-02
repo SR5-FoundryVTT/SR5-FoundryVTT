@@ -7,19 +7,19 @@
         </div>
       </div>
       <div class="item-right">
-        <div class="item-text">
+        <div class="item-text six">
           {{localize "SR5.Skill"}}
         </div>
-        <div class="item-text">
+        <div class="item-text six">
           {{localize "SR5.Attribute"}}
         </div>
-        <div class="item-text">
+        <div class="item-text six">
           {{localize "SR5.Attribute"}}
         </div>
-        <div class="item-text">
+        <div class="item-text six">
           {{localize "SR5.Limit"}}
         </div>
-        <div class="item-text">
+        <div class="item-text six">
           {{localize "SR5.Modifier"}}
         </div>
         <div class="item-text item-icons">
@@ -41,25 +41,25 @@
         </div>
       </div>
       <div class="item-right">
-        <div class="item-text">
+        <div class="item-text six">
           {{localizeOb action.data.action.skill ../config.activeSkills}}
         </div>
-        <div class="item-text">
+        <div class="item-text six">
           {{localizeOb action.data.action.attribute ../config.attributes}}
         </div>
-        <div class="item-text">
+        <div class="item-text six">
           {{#unless action.data.action.skill}}
           {{localizeOb action.data.action.attribute2 ../config.attributes}}
           {{/unless}}
         </div>
-        <div class="item-text">
+        <div class="item-text six">
           {{#if action.data.action.limit.attribute}}
           {{localizeOb action.data.action.limit.attribute ../config.attributes}} ({{action.data.action.limit.value}})
           {{else}}
           {{action.data.action.limit.value}}
           {{/if}}
         </div>
-        <div class="item-text">
+        <div class="item-text six">
           {{action.data.action.mod}}
         </div>
         <div class="item-text item-icons">

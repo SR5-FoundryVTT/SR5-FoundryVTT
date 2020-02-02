@@ -9,6 +9,9 @@
   "quality": "Quality",
   "spell": "Spell",
   "weapon": "Weapon",
+  "sin": "SIN",
+  "lifestyle": "Lifestyle",
+  "contact": "Contact",
 
   "SR5.ActiveSkills": "Active Skills",
   "SR5.Specializations": "Specializations",
@@ -35,6 +38,7 @@
   "SR5.Lifestyle": "Lifestyle",
   "SR5.Miscellaneous": "Misc",
   "SR5.Magic": "Magic",
+  "SR5.Social": "Social",
 
   "SR5.RollComposure": "Composure",
   "SR5.RollJudgeIntentions": "J.Intentions",

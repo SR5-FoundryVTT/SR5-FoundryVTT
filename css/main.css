@@ -544,15 +544,13 @@ select.display {
         text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
         cursor: pointer; }
     .sr5 .inventory .item .item-text {
-      min-width: 5em;
+      width: 5em;
       margin: 0 .1rem;
       margin-bottom: 0;
       flex: 1 0 auto;
       text-align: center;
       height: 100%;
       border: #e6e6e6; }
-      .sr5 .inventory .item .item-text.six {
-        min-width: 6em; }
       .sr5 .inventory .item .item-text.center {
         display: flex;
         flex-flow: row;
@@ -560,19 +558,16 @@ select.display {
         align-items: center;
         align-content: center; }
       .sr5 .inventory .item .item-text.item-name {
-        text-align: left; }
-      .sr5 .inventory .item .item-text.spec {
-        width: 100%;
-        justify-content: center;
-        text-align: center; }
+        text-align: left;
+        width: auto; }
       .sr5 .inventory .item .item-text.rtg {
-        min-width: 3em; }
+        width: 3em; }
         .sr5 .inventory .item .item-text.rtg.active-skills-rating {
           padding-right: 1em; }
       .sr5 .inventory .item .item-text.desc {
-        min-width: 16em; }
+        width: 16em; }
     .sr5 .inventory .item .skill-item {
-      min-width: 8em; }
+      width: 8em; }
     .sr5 .inventory .item.skill-header:hover {
       text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
       cursor: pointer; }

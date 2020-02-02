@@ -318,16 +318,13 @@ select.display {
         }
       }
       .item-text {
-        min-width: 5em;
+        width: 5em;
         margin: 0 .1rem;
         margin-bottom: 0;
         flex: 1 0 auto;
         text-align: center;
         height: 100%;
         border: $light;
-        &.six {
-          min-width: 6em;
-        }
         &.center {
           display: flex;
           flex-flow: row;
@@ -337,24 +334,20 @@ select.display {
         }
         &.item-name {
           text-align: left;
-        }
-        &.spec {
-          width: 100%;
-          justify-content: center;
-          text-align: center;
+          width: auto;
         }
         &.rtg {
-          min-width: 3em;
+          width: 3em;
           &.active-skills-rating {
             padding-right: 1em;
           }
         }
         &.desc {
-          min-width: 16em;
+          width: 16em;
         }
       }
       .skill-item {
-        min-width: 8em;
+        width: 8em;
       }
       &.skill-header {
         @include rollable;
