@@ -21,7 +21,9 @@ export const preloadHandlebarsTemplates = async () => {
     "systems/shadowrun5e/templates/item/parts/armor.html",
     "systems/shadowrun5e/templates/item/parts/matrix.html",
     "systems/shadowrun5e/templates/item/parts/weapon-mods.html",
-    "systems/shadowrun5e/templates/item/parts/sin.html"
+    "systems/shadowrun5e/templates/item/parts/sin.html",
+    "systems/shadowrun5e/templates/item/parts/contact.html",
+    "systems/shadowrun5e/templates/item/parts/lifestyle.html"
   ];
 
   return loadTemplates(templatePaths);

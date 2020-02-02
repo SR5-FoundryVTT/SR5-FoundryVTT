@@ -226,6 +226,16 @@ SR5.initiativeCategories = {
   "matrix": "SR5.InitCatMatrix"
 };
 
+SR5.lifestyleTypes = {
+  "street": "SR5.LifestyleStreet",
+  "squatter": "SR5.LifestyleSquatter",
+  "low": "SR5.LifestyleLow",
+  "middle": "SR5.LifestyleMiddle",
+  "high": "SR5.LifestyleHigh",
+  "luxory": "SR5.LifestyleLuxory",
+  "other": "SR5.LifestyleOther"
+};
+
 SR5.kbmod = {
   STANDARD: 'shiftKey',
   EDGE: 'altKey',

@@ -84,6 +84,24 @@
 
   "SR5.License": "License",
   "SR5.Licenses": "Licenses",
+  "SR5.Information": "Info",
+
+  "SR5.ContactType": "Type",
+  "SR5.Connection": "Connection",
+  "SR5.Loyalty": "Loyalty",
+
+  "SR5.LifestyleType": "Type",
+  "SR5.LifestyleComforts": "Comforts",
+  "SR5.LifestyleSecurity": "Security",
+  "SR5.LifestyleNeighborhood": "Neighborhood",
+  "SR5.LifestyleGuests": "Guests",
+  "SR5.LifestyleStreet": "Street",
+  "SR5.LifestyleSquatter": "Squatter",
+  "SR5.LifestyleLow": "Low",
+  "SR5.LifestyleMiddle": "Middle",
+  "SR5.LifestyleHigh": "High",
+  "SR5.LifestyleLuxory": "Luxory",
+  "SR5.LifestyleOther": "Other",
 
   "SR5.Description": "Description",
   "SR5.Source": "Source",
