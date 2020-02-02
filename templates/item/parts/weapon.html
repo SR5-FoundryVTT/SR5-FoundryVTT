@@ -4,15 +4,15 @@
   </div>
   <div class="form-line">
     <div class="label">
-      {{localize "SR5.WeaponType"}}
+      Type
     </div>
     <div class="inputs">
       <select name="data.category">
         {{#select data.category}}
         <option value=""></option>
-        {{#each config.weaponCategories as |name type|}}
-        <option value="{{type}}">{{localize name}}</option>
-        {{/each}}
+        <option value="range">Range</option>
+        <option value="melee">Melee</option>
+        <option value="thrown">Thrown</option>
         {{/select}}
       </select>
     </div>
@@ -21,7 +21,7 @@
   {{#ife data.category "range"}}
   <div class="form-line">
     <div class="label">
-      {{localize "SR5.WeaponAmmoCount"}}
+      Ammo Count
     </div>
     <div class="inputs">
       <input
@@ -38,25 +38,25 @@
         name='data.range.ammo.max'
         value="{{data.range.ammo.max}}"
         data-dtype="Number"
-        placeholder='{{localize SR5.Max}}'/>
+        placeholder='Max'/>
     </div>
   </div>
   <div class="form-line">
     <div class="label">
-      {{localize "SR5.WeaponModes"}}
+      Modes
     </div>
     <div class="inputs">
       <label>
-        {{localize "SR5.WeaponModeSingleShot"}}<input type="checkbox" name="data.range.modes.single_shot" {{checked data.range.modes.single_shot}}>
+        SS<input type="checkbox" name="data.range.modes.single_shot" {{checked data.range.modes.single_shot}}>
       </label>
       <label>
-        {{localize "SR5.WeaponModeSemiAuto"}}<input type="checkbox" name="data.range.modes.semi_auto" {{checked data.range.modes.semi_auto}}>
+        SA<input type="checkbox" name="data.range.modes.semi_auto" {{checked data.range.modes.semi_auto}}>
       </label>
       <label>
-        {{localize "SR5.WeaponModeBurstFire"}}<input type="checkbox" name="data.range.modes.burst_fire" {{checked data.range.modes.burst_fire}}>
+        BF<input type="checkbox" name="data.range.modes.burst_fire" {{checked data.range.modes.burst_fire}}>
       </label>
       <label>
-        {{localize "SR5.WeaponModeFullAuto"}}<input type="checkbox" name="data.range.modes.full_auto" {{checked data.range.modes.full_auto}}>
+        FA<input type="checkbox" name="data.range.modes.full_auto" {{checked data.range.modes.full_auto}}>
       </label>
     </div>
   </div>
@@ -64,7 +64,7 @@
   {{#ife data.category "range"}}
   <div class="form-line">
     <div class="label">
-      {{localize "SR5.WeaponRanges"}}
+      Ranges
     </div>
     <div class="inputs">
       <input
@@ -99,7 +99,7 @@
   </div>
   <div class="form-line">
     <div class="label">
-      {{localize "SR5.RecoilCompensation"}}
+      Recoil Compensation
     </div>
     <div class="inputs">
       <input
@@ -115,7 +115,7 @@
   {{#ife data.category "thrown"}}
   <div class="form-line">
     <div class="label">
-      {{localize "SR5.WeaponRanges"}}
+      Ranges
     </div>
     <div class="inputs">
       <input
@@ -150,8 +150,8 @@
     <select name="data.thrown.ranges.attribute">
     {{#select data.thrown.ranges.attribute}}
       <option value=""></option>
-      {{#each config.attributes as |name type|}}
-      <option value="{{type}}">{{localize name}}</option>
+      {{#each config.attributes as |label id|}}
+      <option value="{{label}}">{{toHeaderCase label}}</option>
       {{/each}}
     {{/select}}
     </select>
@@ -160,7 +160,7 @@
   {{#ife data.category "melee"}}
   <div class="form-line">
     <div class="label">
-      {{localize "SR5.WeaponReach"}}
+      Reach
     </div>
     <div class="inputs">
       <input
@@ -176,7 +176,7 @@
   {{#ife data.category "thrown"}}
   <div class="form-line">
     <div class="label">
-      {{localize "SR5.Radius"}}
+      Blast Radius
     </div>
     <div class="inputs">
       <input
@@ -191,7 +191,7 @@
   </div>
   <div class="form-line">
     <div class="label">
-      {{localize "SR5.Dropoff"}}
+      Blast Dropoff
     </div>
     <div class="inputs">
       <input

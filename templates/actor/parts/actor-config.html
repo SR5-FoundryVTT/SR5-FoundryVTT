@@ -1,168 +1,151 @@
 <div class="inventory">
-  <div class="split-container">
-    <div>
-      <div class="item">
-        <button type="button" class="display import-character">{{localize "SR5.ImportCharacter"}}</button>
+  <div class="flexrow align-start info-container">
+    <div class="scroll-area left">
+      <div class="flexcol justify-start">
+        <div class="item">
+          <button type="button" class="display import-character">Import Character</button>
+        </div>
+        <div class="item">
+          <div class="item-left">
+            <div class="item-text item-name">
+              Karma
+            </div>
+          </div>
+          <div class="item-right">
+            <div class="item-text">
+              <input
+                 class="display"
+                 type="text"
+                 size="10"
+                 name="data.karma.value"
+                 value="{{data.karma.value}}"
+                 data-dtype="Number" />
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-left">
+            <div class="item-text item-name">
+              Career Karma
+            </div>
+          </div>
+          <div class="item-right">
+            <div class="item-text">
+              <input
+                 class="display"
+                 type="text"
+                 size="10"
+                 name="data.karma.max"
+                 value="{{data.karma.max}}"
+                 data-dtype="Number" />
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-left">
+            <div class="item-text item-name">
+              Notoriety
+            </div>
+          </div>
+          <div class="item-right">
+            <div class="item-text">
+              <input
+                 class="display"
+                 type="text"
+                 size="10"
+                 name="data.notoriety"
+                 value="{{data.notoriety}}"
+                 data-dtype="Number" />
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-left">
+            <div class="item-text item-name">
+              Public Awareness
+            </div>
+          </div>
+          <div class="item-right">
+            <div class="item-text">
+              <input
+                 class="display"
+                 type="text"
+                 size="10"
+                 name="data.public_awareness"
+                 value="{{data.public_awareness}}"
+                 data-dtype="Number" />
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-left">
+            <div class="item-text item-name">
+              Street Cred
+            </div>
+          </div>
+          <div class="item-right">
+            <div class="item-text">
+              <input
+                 class="display"
+                 type="text"
+                 size="10"
+                 name="data.street_cred"
+                 value="{{data.street_cred}}"
+                 data-dtype="Number" />
+            </div>
+          </div>
+        </div>
+        <div class="item">
+          <div class="item-left">
+            <div class="item-text item-name">
+              Awakened/Emerged
+            </div>
+          </div>
+          <div class="item-right">
+            <div class="item-text">
+              <select class='display' name='data.special'>
+                {{#select data.special}}
+                <option value="mundane">Mundane</option>
+                <option value="magic">Awakened</option>
+                <option value="resonance">Emerged</option>
+                {{/select}}
+              </select>
+            </div>
+          </div>
+        </div>
+        {{#if awakened}}
+        <div class="item">
+          <div class="item-left">
+            <div class="item-text item-name">
+              Drain Resist
+            </div>
+          </div>
+          <div class="item-right">
+            <div class="item-text">
+              <select name="data.magic.attribute" class="display">
+                {{#select data.magic.attribute}}
+                {{#each config.spell.attributes}}
+                <option value="{{this}}">{{toHeaderCase this}}</option>
+                {{/each}}
+                <option value="body">Body</option>
+                {{/select}}
+              </select>
+            </div>
+          </div>
+        </div>
+        {{/if}}
       </div>
-      <div class="item">
-        <div class="item-left">
-          <div class="item-text item-name">
-            {{localize "SR5.Nuyen"}}
-          </div>
-        </div>
-        <div class="item-right">
-          <div class="item-text input">
-            <input
-               class="display"
-               type="text"
-               name="data.nuyen"
-               value="{{data.nuyen}}"
-               data-dtype="Number" />
-              <span class="unit">
-                <i class="fas fa-yen-sign"></i>
-              </span>
-          </div>
-        </div>
-      </div>
-      <div class="item">
-        <div class="item-left">
-          <div class="item-text item-name">
-            {{localize "SR5.Karma"}}
-          </div>
-        </div>
-        <div class="item-right">
-          <div class="item-text">
-            <input
-               class="display"
-               type="text"
-               size="10"
-               name="data.karma.value"
-               value="{{data.karma.value}}"
-               data-dtype="Number" />
-          </div>
-        </div>
-      </div>
-      <div class="item">
-        <div class="item-left">
-          <div class="item-text item-name">
-            {{localize "SR5.CareerKarma"}}
-          </div>
-        </div>
-        <div class="item-right">
-          <div class="item-text">
-            <input
-               class="display"
-               type="text"
-               size="10"
-               name="data.karma.max"
-               value="{{data.karma.max}}"
-               data-dtype="Number" />
-          </div>
-        </div>
-      </div>
-      <div class="item">
-        <div class="item-left">
-          <div class="item-text item-name">
-            {{localize "SR5.Notoriety"}}
-          </div>
-        </div>
-        <div class="item-right">
-          <div class="item-text">
-            <input
-               class="display"
-               type="text"
-               size="10"
-               name="data.notoriety"
-               value="{{data.notoriety}}"
-               data-dtype="Number" />
-          </div>
-        </div>
-      </div>
-      <div class="item">
-        <div class="item-left">
-          <div class="item-text item-name">
-            {{localize "SR5.PublicAwareness"}}
-          </div>
-        </div>
-        <div class="item-right">
-          <div class="item-text">
-            <input
-               class="display"
-               type="text"
-               size="10"
-               name="data.public_awareness"
-               value="{{data.public_awareness}}"
-               data-dtype="Number" />
-          </div>
-        </div>
-      </div>
-      <div class="item">
-        <div class="item-left">
-          <div class="item-text item-name">
-            {{localize "SR5.StreetCred"}}
-          </div>
-        </div>
-        <div class="item-right">
-          <div class="item-text">
-            <input
-               class="display"
-               type="text"
-               size="10"
-               name="data.street_cred"
-               value="{{data.street_cred}}"
-               data-dtype="Number" />
-          </div>
-        </div>
-      </div>
-      <div class="item">
-        <div class="item-left">
-          <div class="item-text item-name">
-            {{localize "SR5.AwakenedEmerged"}}
-          </div>
-        </div>
-        <div class="item-right">
-          <div class="item-text input">
-            <select class='display' name='data.special'>
-              {{#select data.special}}
-              {{#each config.specialTypes as |name type|}}
-              <option value="{{type}}">{{localize name}}</option>
-              {{/each}}
-              {{/select}}
-            </select>
-          </div>
-        </div>
-      </div>
-      {{#if awakened}}
-      <div class="item">
-        <div class="item-left">
-          <div class="item-text item-name">
-            {{localize "SR5.DrainResist"}}
-          </div>
-        </div>
-        <div class="item-right">
-          <div class="item-text input">
-            <select name="data.magic.attribute" class="display">
-              {{#select data.magic.attribute}}
-              {{#each config.attributes as |name type|}}
-              <option value="{{type}}">{{localize name}}</option>
-              {{/each}}
-              {{/select}}
-            </select>
-          </div>
-        </div>
-      </div>
-      {{/if}}
     </div>
-    <div class='flexcol'>
+    <div class="flexcol justify-start">
       <div class="item item-section">
         <div class="item-left">
           <div class="item-text item-name">
-            {{localize "SR5.Modifier"}}
+            Modifier
           </div>
         </div>
         <div class="item-right">
           <div class="item-text rtg">
-            {{localize "SR5.Value"}}
+            Value
           </div>
         </div>
       </div>

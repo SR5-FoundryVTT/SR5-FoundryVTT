@@ -2,19 +2,19 @@
   <div class="attribute">
     <div class="track between">
       <div class="attribute-name">
-        {{localize "SR5.HotSim"}}
+        Hot Sim
       </div>
       <input type='checkbox' class="submit-checkbox" name="data.matrix.hot_sim" {{checked data.matrix.hot_sim}}>
     </div>
     <div class="track between">
       <div class="attribute-name">
-        {{localize "SR5.RunningSilent"}}
+        Running Silent
       </div>
       <input type='checkbox' class="submit-checkbox" name="data.matrix.running_silent" {{checked data.matrix.running_silent}}>
     </div>
   </div>
   <div class="attribute">
-    <div class="attribute-name roll matrix-roll" data-attribute='attack'>{{localize "SR5.MatrixAttrAttack"}}</div>
+    <div class="attribute-name roll matrix-roll" data-attribute='attack'>Attack</div>
     <div class="attribute-input-container">
       <input
         class="display attribute-input"
@@ -40,7 +40,7 @@
     </div>
   </div>
   <div class="attribute">
-    <div class="attribute-name matrix-roll roll" data-attribute='sleaze'>{{localize "SR5.MatrixAttrSleaze"}}</div>
+    <div class="attribute-name matrix-roll roll" data-attribute='sleaze'>Sleaze</div>
     <div class="attribute-input-container">
       <input
         class="display attribute-input"
@@ -66,7 +66,7 @@
     </div>
   </div>
   <div class="attribute">
-    <div class="attribute-name roll matrix-roll" data-attribute='data_processing'>{{localize "SR5.MatrixAttrDataProc"}}</div>
+    <div class="attribute-name roll matrix-roll" data-attribute='data_processing'>Data Proc.</div>
     <div class="attribute-input-container">
       <input
         class="display attribute-input"
@@ -92,7 +92,7 @@
     </div>
   </div>
   <div class="attribute">
-    <div class="attribute-name roll matrix-roll" data-attribute='firewall'>{{localize "SR5.MatrixAttrFirewall"}}</div>
+    <div class="attribute-name roll matrix-roll" data-attribute='firewall'>Firewall</div>
     <div class="attribute-input-container">
       <input
         class="display attribute-input"
@@ -118,7 +118,7 @@
     </div>
   </div>
   <div class="attribute">
-    <div class="attribute-name">{{localize "SR5.ConditionMonitor"}}</div>
+    <div class="attribute-name">Con. Mon.</div>
     <div class="track">
       <div class="attribute-input-container">
         <input
@@ -152,23 +152,23 @@
     <div class="item item-section">
       <div class="item-left">
         <div class="item-text item-name">
-          {{localize "SR5.ComplexForms"}}
+          Complex Forms
         </div>
       </div>
       <div class="item-right">
         <div class="item-text">
-          {{localize "SR5.Target"}}
+          Target
         </div>
         <div class="item-text">
-          {{localize "SR5.Duration"}}
+          Duration
         </div>
         <div class="item-text">
-          {{localize "SR5.Fade"}}
+          Fade
         </div>
         <div class="item-text item-icons">
           <a class="item-create" title="Create Item" data-type="adept_power">
             <i class="fas fa-plus"></i>
-            {{localize "SR5.Add"}}
+            Add
           </a>
         </div>
       </div>
@@ -185,10 +185,10 @@
       </div>
       <div class="item-right">
         <div class="item-text">
-          {{localizeOb item.data.target ../config.matrixTargets}}
+          {{toHeaderCase item.data.target}}
         </div>
         <div class="item-text">
-          {{localizeOb item.data.duration ../config.durations}}
+          {{toHeaderCase item.data.duration}}
         </div>
         <div class="item-text">
           {{item.data.fade}}

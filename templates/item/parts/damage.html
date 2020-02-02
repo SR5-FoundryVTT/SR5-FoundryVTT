@@ -4,15 +4,15 @@
   </div>
   <div class="form-line">
     <div class="label">
-      {{localize "SR5.DamageType"}}
+      Type
     </div>
     <div class="inputs">
       <select name="data.action.damage.type">
         <option value=""></option>
         {{#select data.action.damage.type}}
-        {{#each config.damageTypes as |name type|}}
-        <option value="{{type}}">{{localize name}}</option>
-        {{/each}}
+        <option value="stun">Stun</option>
+        <option value="physical">Physical</option>
+        <option value="matrix">Matrix</option>
         {{/select}}
       </select>
     </div>
@@ -21,7 +21,7 @@
   {{#ifne item.type "spell"}}
   <div class="form-line">
     <div class="label">
-      {{localize "SR5.DamageValue"}}
+      Damage Value
     </div>
     <div class="inputs around">
       <input
@@ -36,8 +36,8 @@
       <select name="data.action.damage.attribute">
       {{#select data.action.damage.attribute}}
         <option value=""></option>
-        {{#each config.attributes as |name type|}}
-        <option value="{{type}}">{{localize name}}</option>
+        {{#each config.attributes as |label id|}}
+        <option value="{{label}}">{{toHeaderCase label}}</option>
         {{/each}}
       {{/select}}
       </select>
@@ -46,14 +46,14 @@
   {{/ifne}}
   <div class="form-line">
     <div class="label">
-      {{localize "SR5.Element"}}
+      Element
     </div>
     <div class="inputs">
       <select name="data.action.damage.element">
         {{#select data.action.damage.element}}
-        <option value=""></option>
-        {{#each config.elementTypes as |name type|}}
-        <option value="{{type}}">{{localize name}}</option>
+        <option value="">None</option>
+        {{#each config.elementTypes}}
+        <option value="{{this}}">{{toHeaderCase this}}</option>
         {{/each}}
         {{/select}}
       </select>
@@ -62,7 +62,7 @@
   {{#ifne item.type "spell"}}
   <div class="form-line">
     <div class="label">
-      {{localize "SR5.AP"}}
+      AP
     </div>
     <div class="inputs">
       <input

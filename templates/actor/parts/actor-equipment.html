@@ -1,5 +1,28 @@
 <div class="inventory">
-  <div class="scroll-area">
+  <div class="flexrow justify-start">
+    <div class="item flex0 no-border">
+      <div class="item-left">
+        <div class="item-text item-name">
+          Nuyen
+        </div>
+      </div>
+      <div class="item-right">
+        <div class="item-text input">
+          <input
+             class="display"
+             type="text"
+             name="data.nuyen"
+             size="10"
+             value="{{data.nuyen}}"
+             data-dtype="Number" />
+            <span class="unit">
+              <i class="fas fa-yen-sign"></i>
+            </span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="scroll-area equipment">
     {{#each sections as |section sid|}}
     <div class="item item-section">
       <div class="item-left">
@@ -9,18 +32,18 @@
       </div>
       <div class="item-right">
         <div class="item-text">
-          {{localize "SR5.Equipped"}}
+          Equipped
         </div>
         <div class="item-text rtg">
-          {{localize "SR5.Rtg"}}
+          Rtg
         </div>
         <div class="item-text rtg">
-          {{localize "SR5.Qty"}}
+          Qty
         </div>
         <div class="item-text item-icons">
           <a class="item-create" title="Create Item" {{#each section.dataset as |v k|}}data-{{k}}="{{v}}"{{/each}}>
             <i class="fas fa-plus"></i>
-            {{localize "SR5.Add"}}
+            Add
           </a>
         </div>
       </div>
@@ -38,7 +61,7 @@
       <div class="item-right">
         {{#if item.data.range.ammo.max}}
         <div class="item-text roll reload-ammo">
-          {{localize "SR5.WeaponReload"}}
+          Reload
         </div>
         <div class="item-text">
           ({{item.data.range.ammo.value}}/{{item.data.range.ammo.max}})

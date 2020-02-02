@@ -164,20 +164,16 @@ export class SR5Actor extends Actor {
 
     // ADD MATRIX ATTS TO LIMITS
     limits.firewall = {
-      value: matrix.firewall.value,
-      hidden: true
+      value: matrix.firewall.value
     };
     limits.data_processing = {
-      value: matrix.data_processing.value,
-      hidden: true
+      value: matrix.data_processing.value
     };
     limits.attack = {
-      value: matrix.attack.value,
-      hidden: true
+      value: matrix.attack.value
     };
     limits.sleaze = {
-      value: matrix.sleaze.value,
-      hidden: true
+      value: matrix.sleaze.value
     };
 
     attrs.firewall = {
@@ -289,24 +285,9 @@ export class SR5Actor extends Actor {
       }
     }
 
-    // limit labels
-    for (let [l, limit] of Object.entries(data.limits)) {
-      limit.label = CONFIG.SR5.limits[l];
-    }
-    // skill labels
-    for (let [s, skill] of Object.entries(data.skills.active)) {
-      skill.label = CONFIG.SR5.activeSkills[s];
-    }
-    // attribute labels
-    for (let [a, att] of Object.entries(data.attributes)) {
-      att.label = CONFIG.SR5.attributes[a];
-    }
-    // tracks
-    for (let [t, track] of Object.entries(data.track)) {
-      track.label = CONFIG.SR5.damageTypes[t];
-    }
-
-    console.log(data);
+    Helpers.addLabels(data.skills);
+    Helpers.addLabels(data.attributes);
+    Helpers.addLabels(data.matrix);
   }
 
   rollFade(options, incoming = -1) {

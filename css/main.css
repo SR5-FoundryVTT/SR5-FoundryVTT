@@ -109,17 +109,10 @@
 .sr5.actor {
   min-height: 690px;
   min-width: 800px; }
-  .sr5.actor .wholesheet {
-    height: 100%;
-    display: flex;
-    flex-flow: column nowrap; }
   .sr5.actor .name {
     margin-bottom: 0;
     font-size: 200%;
     font-family: "Nodesto", "Signika", "Palatino Linotype", serif; }
-  .sr5.actor .sheetbody {
-    overflow: hidden;
-    flex: 1; }
   .sr5.actor .attributes {
     border-top: 1px solid #4d4d4d;
     display: flex;
@@ -212,14 +205,38 @@
         .sr5.actor .attributes .attribute .track .track-max-value {
           margin-bottom: 0;
           margin-left: .25em; }
-  .sr5.actor .scroll-area {
-    height: 100%;
-    margin-bottom: .5em;
-    flex: 1;
-    overflow-y: auto; }
+  .sr5.actor .skills-container {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-around; }
+    .sr5.actor .skills-container > *:not(:first-child) {
+      margin-left: .25em; }
+    .sr5.actor .skills-container > *:not(:last-child) {
+      border-right: 1px solid #4d4d4d;
+      padding-right: .25em; }
+  .sr5.actor .bio-container {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-around; }
+    .sr5.actor .bio-container .editor {
+      height: 32.5em; }
+    .sr5.actor .bio-container > *:not(:first-child) {
+      margin-left: .25em; }
+    .sr5.actor .bio-container > *:not(:last-child) {
+      border-right: 1px solid #4d4d4d;
+      padding-right: .25em; }
+  .sr5.actor .info-container {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-around; }
+    .sr5.actor .info-container > *:not(:first-child) {
+      padding-left: .25em;
+      border-left: 1px solid #4d4d4d; }
+    .sr5.actor .info-container > *:not(:last-child) {
+      margin-right: .25em; }
   .sr5.actor .limit {
     font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
-    padding: 0 .1em;
+    padding: 0 .1rem;
     margin-top: -2px;
     text-align: center;
     display: flex;
@@ -227,6 +244,25 @@
     justify-content: center;
     align-items: center;
     align-content: center; }
+  .sr5.actor .scroll-area {
+    overflow-y: scroll;
+    max-height: 33em; }
+    .sr5.actor .scroll-area.equipment {
+      max-height: 32em; }
+    .sr5.actor .scroll-area.bio {
+      max-height: 33em; }
+    .sr5.actor .scroll-area.active-skills {
+      max-height: 26em; }
+    .sr5.actor .scroll-area.mods {
+      max-height: 32em; }
+    .sr5.actor .scroll-area.info {
+      max-height: 31em; }
+    .sr5.actor .scroll-area.knowledge-skills {
+      max-height: 27.5em; }
+    .sr5.actor .scroll-area.left {
+      direction: rtl; }
+      .sr5.actor .scroll-area.left > * {
+        direction: ltr; }
 
 @font-face {
   font-family: "Nodesto";
@@ -267,8 +303,6 @@
   display: flex;
   flex-direction: col;
   flex-wrap: nowrap; }
-  .flexcol > * {
-    flex: 0; }
 
 .align-items-center {
   align-items: 'center'; }
@@ -392,8 +426,7 @@ select.display {
 .sr5 .window-content {
   font-size: 115%;
   background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("../ui/brushed_metal.jpg") repeat;
-  color: white;
-  overflow: hidden; }
+  color: white; }
 
 .sr5 .editor {
   height: 15em;
@@ -406,7 +439,6 @@ select.display {
   border-bottom: 1px solid #4d4d4d; }
 
 .sr5 .tabs {
-  flex: 0;
   margin: .25em;
   margin-bottom: -5px;
   border-bottom: 1px solid #4d4d4d; }
@@ -429,42 +461,14 @@ select.display {
 
 .sr5 .tab {
   border-radius: 0.25em;
-  margin-top: .25em;
-  height: 100%; }
-  .sr5 .tab .tabbody {
-    height: 100%;
-    display: flex;
-    flex-flow: column nowrap; }
-    .sr5 .tab .tabbody.active {
-      display: flex; }
-    .sr5 .tab .tabbody > * {
-      flex: 0; }
-    .sr5 .tab .tabbody > .inventory {
-      flex: 1; }
-
-.sr5 .split-container {
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: center;
-  align-items: stretch;
-  align-content: stretch;
-  height: 100%; }
-  .sr5 .split-container > * {
-    flex: 1;
-    width: 100%; }
-  .sr5 .split-container > *:not(:first-child) {
-    margin-left: .25em; }
-  .sr5 .split-container > *:not(:last-child) {
-    border-right: 1px solid #4d4d4d;
-    padding-right: .25em; }
+  margin-top: .25em; }
 
 .sr5 .inventory {
-  overflow-y: hidden;
-  height: 100%;
+  display: flex;
+  flex-flow: column nowrap;
   width: 100%;
   font-size: 85%;
-  display: flex;
-  flex-flow: column nowrap; }
+  position: relative; }
   .sr5 .inventory .item {
     display: flex;
     flex-flow: row nowrap;
@@ -513,7 +517,7 @@ select.display {
       .sr5 .inventory .item .item-img + .item-name {
         border-left: none !important; }
     .sr5 .inventory .item .item-input {
-      width: 9.5em; }
+      max-width: 9.5em; }
     .sr5 .inventory .item .item-desc {
       padding: .25em;
       font-size: 1em;
@@ -540,13 +544,15 @@ select.display {
         text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
         cursor: pointer; }
     .sr5 .inventory .item .item-text {
-      width: 5em;
+      min-width: 5em;
       margin: 0 .1rem;
       margin-bottom: 0;
       flex: 1 0 auto;
       text-align: center;
       height: 100%;
       border: #e6e6e6; }
+      .sr5 .inventory .item .item-text.six {
+        min-width: 6em; }
       .sr5 .inventory .item .item-text.center {
         display: flex;
         flex-flow: row;
@@ -554,19 +560,19 @@ select.display {
         align-items: center;
         align-content: center; }
       .sr5 .inventory .item .item-text.item-name {
-        text-align: left;
-        width: auto; }
+        text-align: left; }
+      .sr5 .inventory .item .item-text.spec {
+        width: 100%;
+        justify-content: center;
+        text-align: center; }
       .sr5 .inventory .item .item-text.rtg {
-        width: 3em; }
+        min-width: 3em; }
         .sr5 .inventory .item .item-text.rtg.active-skills-rating {
           padding-right: 1em; }
-      .sr5 .inventory .item .item-text.input {
-        text-align: right;
-        width: 9.5em; }
       .sr5 .inventory .item .item-text.desc {
-        width: 16em; }
+        min-width: 16em; }
     .sr5 .inventory .item .skill-item {
-      width: 8em; }
+      min-width: 8em; }
     .sr5 .inventory .item.skill-header:hover {
       text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
       cursor: pointer; }

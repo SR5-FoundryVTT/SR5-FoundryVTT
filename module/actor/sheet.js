@@ -103,35 +103,35 @@ export class SR5ActorSheet extends ActorSheet {
   _prepareItems(data) {
     const inventory = {
       weapon: {
-        label: game.i18n.localize("weapon"),
+        label: "Weapon",
         items: [],
         dataset: {
           type: 'weapon'
         }
       },
       armor: {
-        label: game.i18n.localize("armor"),
+        label: "Armor",
         items: [],
         dataset: {
           type: 'armor'
         }
       },
       device: {
-        label: game.i18n.localize("device"),
+        label: "Device",
         items: [],
         dataset: {
           type: 'device'
         }
       },
       equipment: {
-        label: game.i18n.localize("equipment"),
+        label: "Equipment",
         items: [],
         dataset: {
           type: 'equipment'
         }
       },
       cyberware: {
-        label: game.i18n.localize("cyberware"),
+        label: "Cyberware",
         items: [],
         dataset: {
           type: 'cyberware'
@@ -176,7 +176,7 @@ export class SR5ActorSheet extends ActorSheet {
       }
     };
 
-    let [items, spells, qualities, adept_powers, critter_powers, actions, complex_forms, lifestyles, contacts, sins] = data.items.reduce((arr, item) => {
+    let [items, spells, qualities, adept_powers, critter_powers, actions, complex_forms] = data.items.reduce((arr, item) => {
       item.img = item.img || DEFAULT_TOKEN;
       item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
       if (item.type === 'spell') arr[1].push(item);
@@ -185,12 +185,9 @@ export class SR5ActorSheet extends ActorSheet {
       else if (item.type === 'critter_power') arr[4].push(item);
       else if (item.type === 'action') arr[5].push(item);
       else if (item.type === 'complex_form') arr[6].push(item);
-      else if (item.type === 'lifestyle') arr[7].push(item);
-      else if (item.type === 'contact') arr[8].push(item);
-      else if (item.type === 'sin') arr[9].push(item);
       else if (Object.keys(inventory).includes(item.type)) arr[0].push(item);
       return arr;
-    }, [[], [], [], [], [], [], [], [], [], []]);
+    }, [[], [], [], [], [], [], []]);
 
     const sortByName = (i1, i2) => {
       if (i1.name > i2.name) return 1;
@@ -202,10 +199,6 @@ export class SR5ActorSheet extends ActorSheet {
     complex_forms.sort(sortByName);
     items.sort(sortByName);
     spells.sort(sortByName);
-    complex_forms.sort(sortByName);
-    contacts.sort(sortByName);
-    lifestyles.sort(sortByName);
-    sins.sort(sortByName)
 
     items.forEach(item => {
       inventory[item.type].items.push(item);
@@ -218,9 +211,6 @@ export class SR5ActorSheet extends ActorSheet {
     };
     data.actions = actions;
     data.complex_forms = complex_forms;
-    data.lifestyles = lifestyles;
-    data.contacts = contacts;
-    data.sins = sins;
 
     qualities.sort((a, b) => {
       if (a.data.type === 'positive' && b.data.type === 'negative') return -1;

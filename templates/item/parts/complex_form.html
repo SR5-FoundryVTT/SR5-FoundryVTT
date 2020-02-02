@@ -4,15 +4,18 @@
   </div>
   <div class="form-line">
     <div class="label">
-      {{localize "SR5.MatrixTarget"}}
+      Target
     </div>
     <div class="inputs">
       <select name="data.target">
         {{#select data.target}}
         <option value=""></option>
-        {{#each config.matrixTargets as |name type|}}
-        <option value="{{type}}">{{localize name}}</option>
-        {{/each}}
+        <option value="persona">Persona</option>
+        <option value="device">Device</option>
+        <option value="file">File</option>
+        <option value="self">Self</option>
+        <option value="sprite">Sprite</option>
+        <option value="other">Other</option>
         {{/select}}
       </select>
     </div>
@@ -20,22 +23,22 @@
   {{#if data.target}}
   <div class="form-line">
     <div class="label">
-      {{localize "SR5.Duration"}}
+      Duration
     </div>
     <div class="inputs">
       <select name="data.duration">
         {{#select data.duration}}
         <option value=""></option>
-        {{#each config.durations as |name type|}}
-        <option value="{{type}}">{{localize name}}</option>
-        {{/each}}
+        <option value="immediate">Immediate</option>
+        <option value="sustained">Sustained</option>
+        <option value="permanent">Permanent</option>
         {{/select}}
       </select>
     </div>
   </div>
   <div class="form-line">
     <div class="label">
-      {{localize "SR5.FadeValue"}}
+      Fade Value
     </div>
     <div class="inputs">
       <input
