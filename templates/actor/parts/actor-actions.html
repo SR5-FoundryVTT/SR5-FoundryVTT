@@ -1,83 +1,85 @@
 <div class="inventory">
-  <div class="item item-section">
-    <div class="item-left">
-      <div class="item-text item-name">
-        {{localize "SR5.Action"}}
+  <div class="scroll-area">
+    <div class="item item-section">
+      <div class="item-left">
+        <div class="item-text item-name">
+          {{localize "SR5.Action"}}
+        </div>
+      </div>
+      <div class="item-right">
+        <div class="item-text six">
+          {{localize "SR5.Skill"}}
+        </div>
+        <div class="item-text six">
+          {{localize "SR5.Attribute"}}
+        </div>
+        <div class="item-text six">
+          {{localize "SR5.Attribute"}}
+        </div>
+        <div class="item-text six">
+          {{localize "SR5.Limit"}}
+        </div>
+        <div class="item-text six">
+          {{localize "SR5.Modifier"}}
+        </div>
+        <div class="item-text item-icons">
+          <a class="item-create" title="Create Item" data-type="action">
+            <i class="fas fa-plus"></i>
+            {{localize "SR5.Add"}}
+          </a>
+        </div>
       </div>
     </div>
-    <div class="item-right">
-      <div class="item-text six">
-        {{localize "SR5.Skill"}}
+    {{#each actions as |action id|}}
+    <div class="item" data-item-id='{{action._id}}'>
+      <div class="item-left">
+        <div class="item-img item-roll">
+          <img src="{{action.img}}" title="{{action.name}}" height='24px' width='24px'/>
+        </div>
+        <div class="item-text item-name has-desc" >
+          {{action.name}}
+        </div>
       </div>
-      <div class="item-text six">
-        {{localize "SR5.Attribute"}}
-      </div>
-      <div class="item-text six">
-        {{localize "SR5.Attribute"}}
-      </div>
-      <div class="item-text six">
-        {{localize "SR5.Limit"}}
-      </div>
-      <div class="item-text six">
-        {{localize "SR5.Modifier"}}
-      </div>
-      <div class="item-text item-icons">
-        <a class="item-create" title="Create Item" data-type="action">
-          <i class="fas fa-plus"></i>
-          {{localize "SR5.Add"}}
-        </a>
+      <div class="item-right">
+        <div class="item-text six">
+          {{localizeOb action.data.action.skill ../config.activeSkills}}
+        </div>
+        <div class="item-text six">
+          {{localizeOb action.data.action.attribute ../config.attributes}}
+        </div>
+        <div class="item-text six">
+          {{#unless action.data.action.skill}}
+          {{localizeOb action.data.action.attribute2 ../config.attributes}}
+          {{/unless}}
+        </div>
+        <div class="item-text six">
+          {{#if action.data.action.limit.attribute}}
+          {{localizeOb action.data.action.limit.attribute ../config.attributes}} ({{action.data.action.limit.value}})
+          {{else}}
+          {{action.data.action.limit.value}}
+          {{/if}}
+        </div>
+        <div class="item-text six">
+          {{action.data.action.mod}}
+        </div>
+        <div class="item-text item-icons">
+          <i class="item-edit roll fas fa-edit" ></i>
+          <i class="item-delete roll fas fa-trash" ></i>
+        </div>
       </div>
     </div>
+    <div class="item hidden">
+      <div class="item-desc">
+        {{{item.data.description.value}}}
+        <div class="props">
+          {{#each item.properties}}
+          <span>{{this}}</span>
+          {{/each}}
+        </div>
+      </div>
+    </div>
+    {{/each}}
   </div>
-  {{#each actions as |action id|}}
-  <div class="item" data-item-id='{{action._id}}'>
-    <div class="item-left">
-      <div class="item-img item-roll">
-        <img src="{{action.img}}" title="{{action.name}}" height='24px' width='24px'/>
-      </div>
-      <div class="item-text item-name has-desc" >
-        {{action.name}}
-      </div>
-    </div>
-    <div class="item-right">
-      <div class="item-text six">
-        {{localizeOb action.data.action.skill ../config.activeSkills}}
-      </div>
-      <div class="item-text six">
-        {{localizeOb action.data.action.attribute ../config.attributes}}
-      </div>
-      <div class="item-text six">
-        {{#unless action.data.action.skill}}
-        {{localizeOb action.data.action.attribute2 ../config.attributes}}
-        {{/unless}}
-      </div>
-      <div class="item-text six">
-        {{#if action.data.action.limit.attribute}}
-        {{localizeOb action.data.action.limit.attribute ../config.attributes}} ({{action.data.action.limit.value}})
-        {{else}}
-        {{action.data.action.limit.value}}
-        {{/if}}
-      </div>
-      <div class="item-text six">
-        {{action.data.action.mod}}
-      </div>
-      <div class="item-text item-icons">
-        <i class="item-edit roll fas fa-edit" ></i>
-        <i class="item-delete roll fas fa-trash" ></i>
-      </div>
-    </div>
-  </div>
-  <div class="item hidden">
-    <div class="item-desc">
-      {{{item.data.description.value}}}
-      <div class="props">
-        {{#each item.properties}}
-        <span>{{this}}</span>
-        {{/each}}
-      </div>
-    </div>
-  </div>
-  {{/each}}
 </div>
 
 

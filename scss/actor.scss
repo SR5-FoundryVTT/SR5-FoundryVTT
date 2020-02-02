@@ -133,6 +133,12 @@
       }
     }
   }
+  .scroll-area {
+    height: 100%;
+    margin-bottom: .5em;
+    flex: 1;
+    overflow-y: auto;
+  }
   .limit {
     @include nodesto;
     padding: 0 .1em;
