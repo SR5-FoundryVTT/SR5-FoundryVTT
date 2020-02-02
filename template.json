@@ -779,10 +779,13 @@
       "adept_power",
       "armor",
       "complex_form",
+      "contact",
       "cyberware",
       "device",
       "equipment",
+      "lifestyle",
       "quality",
+      "sin",
       "spell",
       "weapon"
     ],
@@ -866,7 +869,8 @@
           "availability": "",
           "quantity": 1,
           "cost": 0,
-          "equipped": false
+          "equipped": false,
+          "concealability": 0
         },
         "condition_monitor": {
           "value": 9,
@@ -974,6 +978,27 @@
     },
     "action": {
       "templates": ["description", "action"]
+    },
+    "contact": {
+      "templates": ["description"],
+      "type": "",
+      "connection": 0,
+      "loyalty": 0
+    },
+    "sin": {
+      "templates": ["description", "technology"],
+      "licenses": []
+    },
+    "lifestyle": {
+      "templates": ["description"],
+      "type": "",
+      "comforts": 0,
+      "security": 0,
+      "neighborhood": 0,
+      "guests": 0,
+      "permanent": false,
+      "cost": 0,
+      "mods": []
     },
     "device": {
       "templates": ["description", "technology"],

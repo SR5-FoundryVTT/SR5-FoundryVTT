@@ -108,6 +108,8 @@ export class SR5ItemSheet extends ItemSheet {
     html.find('.mod-equip').click(this._onWeaponModEquip.bind(this));
     html.find('.mod-delete').click(this._onWeaponModRemove.bind(this));
 
+    html.find('.add-new-license').click(this._onAddLicense.bind(this));
+
     // Activate tabs
     let tabs = html.find('.tabs');
     let initial = this._sheetTab;
@@ -116,6 +118,11 @@ export class SR5ItemSheet extends ItemSheet {
       callback: clicked => this._sheetTab = clicked.data('tab')
     });
   }
+
+  async _onAddLicense(event) {
+    event.preventDefault();
+    this.item.addNewLicense();
+  };
 
   async _onWeaponModRemove(event) {
     event.preventDefault();

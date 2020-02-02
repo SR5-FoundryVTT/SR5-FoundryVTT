@@ -3,29 +3,29 @@
     <div class="item item-section">
       <div class="item-left">
         <div class="item-text item-name">
-          Action
+          {{localize "SR5.Action"}}
         </div>
       </div>
       <div class="item-right">
-        <div class="item-text">
-          Skill
+        <div class="item-text six">
+          {{localize "SR5.Skill"}}
         </div>
-        <div class="item-text">
-          Attribute
+        <div class="item-text six">
+          {{localize "SR5.Attribute"}}
         </div>
-        <div class="item-text">
-          Attribute
+        <div class="item-text six">
+          {{localize "SR5.Attribute"}}
         </div>
-        <div class="item-text">
-          Limit
+        <div class="item-text six">
+          {{localize "SR5.Limit"}}
         </div>
-        <div class="item-text">
-          Mod
+        <div class="item-text six">
+          {{localize "SR5.Modifier"}}
         </div>
         <div class="item-text item-icons">
           <a class="item-create" title="Create Item" data-type="action">
             <i class="fas fa-plus"></i>
-            Add
+            {{localize "SR5.Add"}}
           </a>
         </div>
       </div>
@@ -41,25 +41,25 @@
         </div>
       </div>
       <div class="item-right">
-        <div class="item-text">
-          {{toHeaderCase action.data.action.skill}}
+        <div class="item-text six">
+          {{localizeOb action.data.action.skill ../config.activeSkills}}
         </div>
-        <div class="item-text">
-          {{toHeaderCase action.data.action.attribute}}
+        <div class="item-text six">
+          {{localizeOb action.data.action.attribute ../config.attributes}}
         </div>
-        <div class="item-text">
+        <div class="item-text six">
           {{#unless action.data.action.skill}}
-          {{toHeaderCase action.data.action.attribute2}}
+          {{localizeOb action.data.action.attribute2 ../config.attributes}}
           {{/unless}}
         </div>
-        <div class="item-text">
+        <div class="item-text six">
           {{#if action.data.action.limit.attribute}}
-          {{toHeaderCase action.data.action.limit.attribute}} ({{action.data.action.limit.value}})
+          {{localizeOb action.data.action.limit.attribute ../config.attributes}} ({{action.data.action.limit.value}})
           {{else}}
           {{action.data.action.limit.value}}
           {{/if}}
         </div>
-        <div class="item-text">
+        <div class="item-text six">
           {{action.data.action.mod}}
         </div>
         <div class="item-text item-icons">

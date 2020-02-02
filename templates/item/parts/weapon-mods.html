@@ -2,21 +2,24 @@
   <div class="item item-section">
     <div class="item-left">
       <div class="item-text item-name">
-        Mod Name
+        {{localize "SR5.WeaponMod"}}
       </div>
     </div>
     <div class="item-right">
       <div class="item-text rtg">
-        Equip
+        {{localize "SR5.Equip"}}
       </div>
       <div class="item-text rtg">
-        Acc
+        {{localize "SR5.DP"}}
       </div>
       <div class="item-text rtg">
-        RC
+        {{localize "SR5.Accuracy"}}
+      </div>
+      <div class="item-text rtg">
+        {{localize "SR5.RecoilCompensation"}}
       </div>
       <div class="item-text desc">
-        Description
+        {{localize "SR5.Description"}}
       </div>
       <div class="item-text item-icons rtg">
         <a class="add-new-mod" title="Add New Accessory">
@@ -48,7 +51,16 @@
         <input
           class='display'
           size='3'
-          maxlength='3'
+          type='text'
+          name='data.range.mods.{{id}}.dp'
+          value='{{mod.dp}}'
+          data-dtype="Number"
+          placeholder='0' />
+      </div>
+      <div class="item-text rtg">
+        <input
+          class='display'
+          size='3'
           type='text'
           name='data.range.mods.{{id}}.acc'
           value='{{mod.acc}}'
@@ -59,7 +71,6 @@
         <input
           class='display'
           size='3'
-          maxlength='3'
           type='text'
           name='data.range.mods.{{id}}.rc'
           value='{{mod.rc}}'
@@ -72,7 +83,7 @@
           type='text'
           name='data.range.mods.{{id}}.description'
           value='{{mod.description}}'
-          placeholder='Description' />
+           placeholder='{{localize "SR5.Description"}}' />
       </div>
       <div class="item-text item-icons rtg">
         <a class="mod-delete" title="Delete Accessory" data-index='{{id}}'>

@@ -4,22 +4,20 @@
   </div>
   <div class="form-line">
     <div class="label">
-      Type
+      {{localize "SR5.ActionType"}}
     </div>
     <div class="inputs">
       {{#if data.action.type}}
       <label>
-        Extended<input title="Specialization" type='checkbox' name="data.action.extended" {{checked data.action.extended}}/>
+        {{localize "SR5.Extended"}}<input title="Specialization" type='checkbox' name="data.action.extended" {{checked data.action.extended}}/>
       </label>
       {{/if}}
       <select name="data.action.type">
         {{#select data.action.type}}
         <option value=""></option>
-        <option value="none">None</option>
-        <option value="free">Free</option>
-        <option value="simple">Simple</option>
-        <option value="complex">Complex</option>
-        <option value="varies">Varies</option>
+        {{#each config.actionTypes as |name type|}}
+        <option value="{{type}}">{{localize name}}</option>
+        {{/each}}
         {{/select}}
       </select>
     </div>
@@ -27,22 +25,19 @@
   {{#if data.action.type}}
   <div class="form-line">
     <div class="label">
-      Skill
+      {{localize "SR5.Skill"}}
     </div>
     <div class="inputs">
       {{#if data.action.skill}}
       <label>
-        Spec<input title="Specialization" type='checkbox' name="data.action.spec" {{checked data.action.spec}}/>
+        {{localize "SR5.Specialization"}}<input title="Specialization" type='checkbox' name="data.action.spec" {{checked data.action.spec}}/>
       </label>
       {{/if}}
       <select name="data.action.skill">
       {{#select data.action.skill}}
         <option value=""></option>
-        {{#each config.skills.categories as |cat cid|}}
-        <option disabled>{{cat.label}}</option>
-        {{#each cat.skills as |skill sid|}}
-        <option value="{{skill}}">{{toHeaderCase skill}}</option>
-        {{/each}}
+        {{#each config.activeSkills as |name type|}}
+        <option value="{{type}}">{{localize name}}</option>
         {{/each}}
       {{/select}}
       </select>
@@ -50,14 +45,14 @@
   </div>
   <div class="form-line">
     <div class="label">
-      Attribute
+      {{localize "SR5.Attribute"}}
     </div>
     <div class="inputs">
       <select name="data.action.attribute">
       {{#select data.action.attribute}}
         <option value=""></option>
-        {{#each config.attributes as |label l|}}
-        <option value="{{label}}">{{toHeaderCase label}}</option>
+        {{#each config.attributes as |name type|}}
+        <option value="{{type}}">{{localize name}}</option>
         {{/each}}
       {{/select}}
       </select>
@@ -65,8 +60,8 @@
       <select name="data.action.attribute2">
       {{#select data.action.attribute2}}
         <option value=""></option>
-        {{#each config.attributes as |label l|}}
-        <option value="{{label}}">{{toHeaderCase label}}</option>
+        {{#each config.attributes as |name type|}}
+        <option value="{{type}}">{{localize name}}</option>
         {{/each}}
       {{/select}}
       </select>
@@ -75,7 +70,7 @@
   </div>
   <div class="form-line">
     <div class="label">
-      Dice Pool Mod
+      {{localize "SR5.DicePoolModifier"}}
     </div>
     <div class="inputs">
       <input
@@ -92,7 +87,7 @@
   {{#ifne item.type "complex_form"}}
   <div class="form-line">
     <div class="label">
-      Limit
+      {{localize "SR5.Limit"}}
     </div>
     <div class="inputs">
       <input
@@ -109,11 +104,11 @@
       <select name="data.action.limit.attribute">
       {{#select data.action.limit.attribute}}
         <option value=""></option>
-        {{#each config.limits as |lim id|}}
-        <option value="{{lim}}">{{toHeaderCase lim}}</option>
+        {{#each config.limits as |name type|}}
+        <option value="{{type}}">{{localize name}}</option>
         {{/each}}
-        {{#each config.matrix.attributes as |lim id|}}
-        <option value="{{lim}}">{{toHeaderCase lim}}</option>
+        {{#each config.matrixAttributes as |name type|}}
+        <option value="{{type}}">{{localize name}}</option>
         {{/each}}
       {{/select}}
       </select>

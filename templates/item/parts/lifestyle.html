@@ -1,0 +1,91 @@
+<div class="item-form">
+  <div class="header">
+    {{header}}
+  </div>
+  <div class="form-line">
+    <div class="label">
+      {{localize "SR5.LifestyleType"}}
+    </div>
+    <div class="inputs">
+      <select name="data.type">
+        {{#select data.type}}
+        <option value=""></option>
+        {{#each config.lifestyleTypes as |name type|}}
+        <option value="{{type}}">{{localize name}}</option>
+        {{/each}}
+        {{/select}}
+      </select>
+    </div>
+  </div>
+  <div class="form-line">
+    <div class="label">
+      {{localize "SR5.Cost"}}
+    </div>
+    <div class="inputs">
+      <input
+        size='2'
+        type='text'
+        name='data.cost'
+        value='{{data.cost}}'
+        data-dtype='Number'
+        placeholder='0'/>
+    </div>
+  </div>
+  <div class="form-line">
+    <div class="label">
+      {{localize "SR5.LifestyleComforts"}}
+    </div>
+    <div class="inputs">
+      <input
+        size='2'
+        type='text'
+        name='data.comforts'
+        value='{{data.comforts}}'
+        data-dtype='Number'
+        placeholder='0'/>
+    </div>
+  </div>
+  <div class="form-line">
+    <div class="label">
+      {{localize "SR5.LifestyleSecurity"}}
+    </div>
+    <div class="inputs">
+      <input
+        size='2'
+        type='text'
+        name='data.security'
+        value='{{data.security}}'
+        data-dtype='Number'
+        placeholder='0'/>
+    </div>
+  </div>
+  <div class="form-line">
+    <div class="label">
+      {{localize "SR5.LifestyleNeighborhood"}}
+    </div>
+    <div class="inputs">
+      <input
+        size='2'
+        type='text'
+        name='data.neighborhood'
+        value='{{data.neighborhood}}'
+        data-dtype='Number'
+        placeholder='0'/>
+    </div>
+  </div>
+  <div class="form-line">
+    <div class="label">
+      {{localize "SR5.LifestyleGuests"}}
+    </div>
+    <div class="inputs">
+      <input
+        size='2'
+        type='text'
+        name='data.guests'
+        value='{{data.guests}}'
+        data-dtype='Number'
+        placeholder='0'/>
+    </div>
+  </div>
+</div>
+

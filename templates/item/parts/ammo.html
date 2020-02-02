@@ -2,30 +2,30 @@
   <div class="item item-section">
     <div class="item-left">
       <div class="item-text item-name">
-        Ammo Name
+        {{localize "SR5.Ammo"}}
       </div>
     </div>
     <div class="item-right">
       <div class="item-text rtg">
-        Equip
+        {{localize "SR5.Equip"}}
       </div>
       <div class="item-text rtg">
-        Qty
+        {{localize "SR5.Qty"}}
       </div>
       <div class="item-text six">
-        Damage
+        {{localize "SR5.Damage"}}
       </div>
-      <div class="item-text">
-        Element
+      <div class="item-text six">
+        {{localize "SR5.Element"}}
       </div>
       <div class="item-text rtg">
-        AP
+        {{localize "SR5.AP"}}
       </div>
-      <div class="item-text">
-        Radius
+      <div class="item-text rtg">
+        {{localize "SR5.Radius"}}
       </div>
-      <div class="item-text">
-        Dropoff
+      <div class="item-text rtg">
+        {{localize "SR5.Dropoff"}}
       </div>
       <div class="item-text item-icons rtg">
         <a class="add-new-ammo" title="Add New Ammo">
@@ -82,15 +82,13 @@
           {{/select}}
         </select>
       </div>
-      <div class="item-text">
+      <div class="item-text six">
         <select class='display' name='data.range.ammo.available.{{@index}}.element'>
           {{#select this.element}}
           <option value=""></option>
-          <option value="acid">Acid</option>
-          <option value="fire">Fire</option>
-          <option value="cold">Cold</option>
-          <option value="electricity">Elec</option>
-          <option value="radiation">Rad</option>
+          {{#each ../config.elementTypes as |name type|}}
+          <option value="{{type}}">{{localize name}}</option>
+          {{/each}}
           {{/select}}
         </select>
       </div>
@@ -105,7 +103,7 @@
           data-dtype="Number"
           placeholder='0' />
       </div>
-      <div class="item-text center">
+      <div class="item-text center rtg">
         <input
           class="display"
           type="text"
@@ -117,7 +115,7 @@
           placeholder="0"/>
         <div class="track-max-value">m</div>
       </div>
-      <div class="item-text center">
+      <div class="item-text center rtg">
         <input
           class="display"
           size='2'

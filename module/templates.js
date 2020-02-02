@@ -8,6 +8,7 @@ export const preloadHandlebarsTemplates = async () => {
     "systems/shadowrun5e/templates/actor/parts/actor-actions.html",
     "systems/shadowrun5e/templates/actor/parts/actor-config.html",
     "systems/shadowrun5e/templates/actor/parts/actor-bio.html",
+    "systems/shadowrun5e/templates/actor/parts/actor-social.html",
     "systems/shadowrun5e/templates/item/parts/description.html",
     "systems/shadowrun5e/templates/item/parts/technology.html",
     "systems/shadowrun5e/templates/item/parts/header.html",
@@ -20,7 +21,10 @@ export const preloadHandlebarsTemplates = async () => {
     "systems/shadowrun5e/templates/item/parts/weapon.html",
     "systems/shadowrun5e/templates/item/parts/armor.html",
     "systems/shadowrun5e/templates/item/parts/matrix.html",
-    "systems/shadowrun5e/templates/item/parts/weapon-mods.html"
+    "systems/shadowrun5e/templates/item/parts/weapon-mods.html",
+    "systems/shadowrun5e/templates/item/parts/sin.html",
+    "systems/shadowrun5e/templates/item/parts/contact.html",
+    "systems/shadowrun5e/templates/item/parts/lifestyle.html"
   ];
 
   return loadTemplates(templatePaths);

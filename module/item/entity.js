@@ -16,8 +16,15 @@ export class SR5Item extends Item {
     const labels = {};
     const item = this.data;
 
+    if (item.type === 'sin') {
+      if (typeof item.data.licenses === 'object') {
+        item.data.licenses = Object.values(item.data.licenses);
+      }
+    }
+
     if (item.data.action) {
       const action = item.data.action;
+      action.alt_mod = 0;
       action.limit.mod = 0;
       action.damage.mod = 0;
       action.damage.ap.mod = 0;
@@ -34,6 +41,7 @@ export class SR5Item extends Item {
             if (mod.equipped) {
               if (mod.rc) range.rc.mod += mod.rc;
               if (mod.acc) action.limit.mod += mod.acc;
+              if (mod.dp) action.alt_mod += mod.dp;
             }
           });
         }
@@ -149,6 +157,29 @@ export class SR5Item extends Item {
       else if (opposed.attribute) labels['opposedRoll'] = `vs. ${Helpers.label(opposed.attribute)}`;
       if (opposed.description) props.push(`Opposed Desc: ${opposed.desc}`);
     }
+  }
+
+  _sinChatData(data, labels, props) {
+    props.push(`Rating ${data.technology.rating}`);
+    console.log(data);
+    data.licenses.forEach(license => {
+      props.push(`${license.name} R${license.rtg}`);
+    });
+  }
+
+  _contactChatData(data, labels, props) {
+    props.push(data.type);
+    props.push(`Connection ${data.connection}`);
+    props.push(`Loyalty ${data.loyalty}`);
+  }
+
+  _lifestyleChatData(data, labels, props) {
+    props.push(Helpers.label(data.type));
+    if (data.cost) props.push(`¥${data.cost}`);
+    if (data.comforts) props.push(`Comforts ${data.comforts}`);
+    if (data.security) props.push(`Security ${data.security}`);
+    if (data.neighborhood) props.push(`Neighborhood ${data.neighborhood}`);
+    if (data.guests) props.push(`Guests ${data.guests}`);
   }
 
   _adept_powerChatData(data, labels, props) {
@@ -271,6 +302,7 @@ export class SR5Item extends Item {
     range.mods.push({
       equipped: false,
       name: '',
+      dp: 0,
       acc: 0,
       rc: 0,
       desc: ''
@@ -315,6 +347,27 @@ export class SR5Item extends Item {
     const data = duplicate(this.data);
     const ammo = data.data.range.ammo;
     ammo.available.splice(index, 1);
+    this.update(data);
+  }
+
+  addNewLicense() {
+    const data = duplicate(this.data);
+    let licenses = data.data.licenses;
+    if (typeof licenses === 'object') {
+      data.data.licenses = Object.values(licenses);
+    }
+    data.data.licenses.push({
+      name: '',
+      rtg: '',
+      description: ''
+    });
+    this.update(data);
+  }
+
+  removeLicense(index) {
+    const data = duplicate(this.data);
+    const licenses = data.data.licenses;
+    licenses.splice(index, 1);
     this.update(data);
   }
 
@@ -369,7 +422,7 @@ export class SR5Item extends Item {
     let attribute2 = actorData.attributes[itemData.action.attribute2];
     let limit = itemData.action.limit.value;
     let spec = itemData.action.spec ? 2 : 0;
-    let mod = parseInt(itemData.action.mod || 0);
+    let mod = parseInt(itemData.action.mod || 0) + parseInt(itemData.action.alt_mod || 0);
 
     // only check if attribute2 is set if skill is not set
     let count = 0;

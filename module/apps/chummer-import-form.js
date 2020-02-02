@@ -17,10 +17,17 @@ export class ChummerImportForm extends FormApplication {
   }
 
   activateListeners(html) {
-    // html.find('.chummer-text').on('paste', async event => {
     html.find('.submit-chummer-import').click(async event => {
       event.preventDefault();
       let chummerfile = JSON.parse($('.chummer-text').val());
+      const weapons = $('.weapons').is(':checked');
+      const armor = $('.armor').is(':checked');
+      const cyberware = $('.cyberware').is(':checked');
+      const equipment = $('.gear').is(':checked');
+      const qualities = $('.qualities').is(':checked');
+      const powers = $('.powers').is(':checked');
+      const spells = $('.spells').is(':checked');
+
       console.log(chummerfile);
 
       const parseAtt = (att) => {
@@ -157,7 +164,7 @@ export class ChummerImportForm extends FormApplication {
             update.attributes.essence.value = c.totaless;
           }
           if (c.nuyen) {
-            update.nuyen = c.nuyen;
+            update.nuyen = parseInt(c.nuyen.replace(',',''));
           }
         } catch (e) {
             error += "Error with character info: " + e + ". ";
@@ -226,7 +233,7 @@ export class ChummerImportForm extends FormApplication {
           }
         }
         // qualities
-        if (c.qualities && c.qualities.quality) {
+        if (qualities && c.qualities && c.qualities.quality) {
             let qualities = getArray(c.qualities.quality);
             qualities.forEach(q => {
               try {
@@ -244,7 +251,7 @@ export class ChummerImportForm extends FormApplication {
             });
         }
         // weapons
-        if (c.weapons != null && c.weapons.weapon != null) {
+        if (weapons && c.weapons != null && c.weapons.weapon != null) {
           let weapons = getArray(c.weapons.weapon);
           weapons.forEach(w => {
             try {
@@ -354,7 +361,7 @@ export class ChummerImportForm extends FormApplication {
           });
         }
         // armors
-        if (c.armors && c.armors.armor) {
+        if (armor && c.armors && c.armors.armor) {
           let armors = getArray(c.armors.armor);
           armors.forEach(a => {
             try {
@@ -415,7 +422,7 @@ export class ChummerImportForm extends FormApplication {
           });
         }
         // cyberware
-		if (c.cyberwares && c.cyberwares.cyberware) {
+		if (cyberware && c.cyberwares && c.cyberwares.cyberware) {
 		  let cyberwares = getArray(c.cyberwares.cyberware);
           cyberwares.forEach(cy => {
             try {
@@ -437,7 +444,7 @@ export class ChummerImportForm extends FormApplication {
 		  });
 		}
         // powers
-        if (c.powers && c.powers.power) {
+        if (powers && c.powers && c.powers.power) {
           let powers = getArray(c.powers.power);
           powers.forEach(p => {
             const data = {};
@@ -452,7 +459,7 @@ export class ChummerImportForm extends FormApplication {
           });
         }
         // gear
-        if (c.gears && c.gears.gear) {
+        if (equipment && c.gears && c.gears.gear) {
           let gears = getArray(c.gears.gear);
           let licenses = [];
           gears.forEach(g => {
@@ -475,7 +482,7 @@ export class ChummerImportForm extends FormApplication {
           });
         }
         // spells
-        if (c.spells && c.spells.spell) {
+        if (spells && c.spells && c.spells.spell) {
           let spells = getArray(c.spells.spell);
           spells.forEach(s => {
             try {
@@ -606,10 +613,9 @@ export class ChummerImportForm extends FormApplication {
         }
       };
       await this.object.update(updateData);
-      for (let i = 0; i < items.length; i++) {
-        let item = items[i];
-        await this.object.createOwnedItem(item);
-      }
+      await this.object.createManyEmbeddedEntities("OwnedItem", items);
+      ui.notifications.info('Complete! Check everything. Notably: Ranged weapon mods and ammo; Strength based weapon damage; Specializations on all spells, powers, and weapons;');
+      this.close();
     });
   }
 };

@@ -41,6 +41,10 @@
   display: flex;
   flex-direction: col;
   flex-wrap: nowrap;
+
+  > * {
+    flex: 0;
+  }
 }
 .align-items-center {
   align-items: 'center';
@@ -186,6 +190,7 @@ select.display {
     font-size: 115%;
     background: $sheetbackground;
     color: $color;
+    overflow: hidden;
   }
   .editor {
     height: 15em;
@@ -199,6 +204,7 @@ select.display {
     border-bottom: $groove;
   }
   .tabs {
+    flex: 0;
     margin: .25em;
     margin-bottom: -5px;
     border-bottom: 1px solid $light-border;
@@ -222,13 +228,49 @@ select.display {
   .tab {
     border-radius: $radius;
     margin-top: .25em;
+    height: 100%;
+    .tabbody {
+      height: 100%;
+      display: flex;
+      flex-flow: column nowrap;
+      &.active {
+        display: flex;
+      }
+
+      > * {
+        flex: 0;
+      }
+      > .inventory {
+        flex: 1;
+      }
+    }
+  }
+  .split-container {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-items: stretch;
+    align-content: stretch;
+    height: 100%;
+    > * {
+      flex: 1;
+      width: 100%;
+    }
+    > *:not(:first-child) {
+      margin-left: .25em;
+    }
+    > *:not(:last-child) {
+      border-right: $groove;
+      padding-right: .25em;
+    }
   }
   .inventory {
-    display: flex;
-    flex-flow: column nowrap;
+    overflow-y: hidden;
+    height: 100%;
     width: 100%;
     font-size: 85%;
-    position: relative;
+    display: flex;
+    flex-flow: column nowrap;
     .item {
       display: flex;
       flex-flow: row nowrap;
@@ -285,7 +327,7 @@ select.display {
         }
       }
       .item-input {
-        max-width: 9.5em;
+        width: 9.5em;
       }
       .item-desc {
         padding: .25em;
@@ -318,16 +360,13 @@ select.display {
         }
       }
       .item-text {
-        min-width: 5em;
+        width: 5em;
         margin: 0 .1rem;
         margin-bottom: 0;
         flex: 1 0 auto;
         text-align: center;
         height: 100%;
         border: $light;
-        &.six {
-          min-width: 6em;
-        }
         &.center {
           display: flex;
           flex-flow: row;
@@ -337,24 +376,24 @@ select.display {
         }
         &.item-name {
           text-align: left;
-        }
-        &.spec {
-          width: 100%;
-          justify-content: center;
-          text-align: center;
+          width: auto;
         }
         &.rtg {
-          min-width: 3em;
+          width: 3em;
           &.active-skills-rating {
             padding-right: 1em;
           }
         }
+        &.input {
+          text-align: right;
+          width: 9.5em;
+        }
         &.desc {
-          min-width: 16em;
+          width: 16em;
         }
       }
       .skill-item {
-        min-width: 8em;
+        width: 8em;
       }
       &.skill-header {
         @include rollable;

@@ -4,13 +4,13 @@
   </div>
   <div class="form-line">
     <div class="label">
-      Category
+      {{localize "SR5.DeviceType"}}
     </div>
     <div class="inputs">
       <select name="data.category">
       {{#select data.category}}
-        {{#each config.device.categories}}
-        <option value="{{this}}">{{toHeaderCase this}}</option>
+        {{#each config.deviceCategories as |name type|}}
+        <option value="{{type}}">{{localize name}}</option>
         {{/each}}
       {{/select}}
       </select>
@@ -21,8 +21,8 @@
     <div class="label">
       <select name="data.atts.att1.att">
       {{#select data.atts.att1.att}}
-        {{#each config.matrix.attributes as |label l|}}
-        <option value="{{label}}">{{toHeaderCase label}}</option>
+        {{#each config.matrixAttributes as |name type|}}
+        <option value="{{type}}">{{localize name}}</option>
         {{/each}}
       {{/select}}
       </select>
@@ -42,8 +42,8 @@
     <div class="label">
       <select name="data.atts.att2.att">
       {{#select data.atts.att2.att}}
-        {{#each config.matrix.attributes as |label l|}}
-        <option value="{{label}}">{{toHeaderCase label}}</option>
+        {{#each config.matrixAttributes as |name type|}}
+        <option value="{{type}}">{{localize name}}</option>
         {{/each}}
       {{/select}}
       </select>
@@ -63,8 +63,8 @@
     <div class="label">
       <select name="data.atts.att3.att">
       {{#select data.atts.att3.att}}
-        {{#each config.matrix.attributes as |label l|}}
-        <option value="{{label}}">{{toHeaderCase label}}</option>
+        {{#each config.matrixAttributes as |name type|}}
+        <option value="{{type}}">{{localize name}}</option>
         {{/each}}
       {{/select}}
       </select>
@@ -84,8 +84,8 @@
     <div class="label">
       <select name="data.atts.att4.att">
       {{#select data.atts.att4.att}}
-        {{#each config.matrix.attributes as |label l|}}
-        <option value="{{label}}">{{toHeaderCase label}}</option>
+        {{#each config.matrixAttributes as |name type|}}
+        <option value="{{type}}">{{localize name}}</option>
         {{/each}}
       {{/select}}
       </select>
