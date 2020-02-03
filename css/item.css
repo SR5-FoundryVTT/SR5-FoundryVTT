@@ -1,6 +1,13 @@
 .sr5.item {
   min-height: 450px;
   min-width: 650px; }
+  .sr5.item .wholesheet {
+    height: 100%;
+    display: flex;
+    flex-flow: column nowrap; }
+  .sr5.item .sheetbody {
+    overflow: hidden;
+    flex: 1; }
   .sr5.item .item-header {
     display: flex;
     flex-flow: row nowrap;

@@ -104,11 +104,6 @@
         .sr5.actor .attributes .attribute .track .track-max-value {
           margin-bottom: 0;
           margin-left: .25em; }
-  .sr5.actor .scroll-area {
-    height: 100%;
-    margin-bottom: .5em;
-    flex: 1;
-    overflow-y: auto; }
   .sr5.actor .limit {
     font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
     padding: 0 .1em;

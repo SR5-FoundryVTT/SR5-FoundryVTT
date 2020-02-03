@@ -197,6 +197,12 @@ select.display {
     width: 100%;
     color: $color;
   }
+  .scroll-area {
+    height: 100%;
+    margin-bottom: .5em;
+    flex: 1;
+    overflow-y: auto;
+  }
 
   .profile-img {
     padding: .25em;
@@ -233,9 +239,6 @@ select.display {
       height: 100%;
       display: flex;
       flex-flow: column nowrap;
-      &.active {
-        display: flex;
-      }
 
       > * {
         flex: 0;
@@ -377,6 +380,15 @@ select.display {
         &.item-name {
           text-align: left;
           width: auto;
+        }
+        &.element {
+          width: 7em;
+        }
+        &.radius {
+          width: 4em;
+        }
+        &.dropoff {
+          width: 4em;
         }
         &.rtg {
           width: 3em;

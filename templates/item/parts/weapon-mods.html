@@ -1,96 +1,98 @@
 <div class="inventory">
-  <div class="item item-section">
-    <div class="item-left">
-      <div class="item-text item-name">
-        {{localize "SR5.WeaponMod"}}
+  <div class="scroll-area">
+    <div class="item item-section">
+      <div class="item-left">
+        <div class="item-text item-name">
+          {{localize "SR5.WeaponMod"}}
+        </div>
+      </div>
+      <div class="item-right">
+        <div class="item-text rtg">
+          {{localize "SR5.Equip"}}
+        </div>
+        <div class="item-text rtg">
+          {{localize "SR5.DP"}}
+        </div>
+        <div class="item-text rtg">
+          {{localize "SR5.Accuracy"}}
+        </div>
+        <div class="item-text rtg">
+          {{localize "SR5.RecoilCompensation"}}
+        </div>
+        <div class="item-text desc">
+          {{localize "SR5.Description"}}
+        </div>
+        <div class="item-text item-icons rtg">
+          <a class="add-new-mod" title="Add New Accessory">
+            <i class="fas fa-plus"></i>
+          </a>
+        </div>
       </div>
     </div>
-    <div class="item-right">
-      <div class="item-text rtg">
-        {{localize "SR5.Equip"}}
+    {{#each data.range.mods as |mod id|}}
+    <div class="item">
+      <div class="item-left">
+        <div class="item-text item-name">
+          <input
+            class='display left'
+            type='text'
+            name='data.range.mods.{{id}}.name'
+            value='{{mod.name}}'
+            placeholder='' />
+        </div>
       </div>
-      <div class="item-text rtg">
-        {{localize "SR5.DP"}}
-      </div>
-      <div class="item-text rtg">
-        {{localize "SR5.Accuracy"}}
-      </div>
-      <div class="item-text rtg">
-        {{localize "SR5.RecoilCompensation"}}
-      </div>
-      <div class="item-text desc">
-        {{localize "SR5.Description"}}
-      </div>
-      <div class="item-text item-icons rtg">
-        <a class="add-new-mod" title="Add New Accessory">
-          <i class="fas fa-plus"></i>
-        </a>
+      <div class="item-right">
+        <div class="item-text rtg">
+          <label class="checkbox">
+            <input type='checkbox' name="data.range.mods.{{id}}.equipped" {{checked mod.equipped}}>
+            <span class="checkmark far"></span>
+          </label>
+        </div>
+        <div class="item-text rtg">
+          <input
+            class='display'
+            size='3'
+            type='text'
+            name='data.range.mods.{{id}}.dp'
+            value='{{mod.dp}}'
+            data-dtype="Number"
+            placeholder='0' />
+        </div>
+        <div class="item-text rtg">
+          <input
+            class='display'
+            size='3'
+            type='text'
+            name='data.range.mods.{{id}}.acc'
+            value='{{mod.acc}}'
+            data-dtype="Number"
+            placeholder='0' />
+        </div>
+        <div class="item-text rtg">
+          <input
+            class='display'
+            size='3'
+            type='text'
+            name='data.range.mods.{{id}}.rc'
+            value='{{mod.rc}}'
+            data-dtype="Number"
+            placeholder='0' />
+        </div>
+        <div class="item-text desc">
+          <input
+            class='display'
+            type='text'
+            name='data.range.mods.{{id}}.description'
+            value='{{mod.description}}'
+             placeholder='{{localize "SR5.Description"}}' />
+        </div>
+        <div class="item-text item-icons rtg">
+          <a class="mod-delete" title="Delete Accessory" data-index='{{id}}'>
+            <i class="fas fa-trash"></i>
+          </a>
+        </div>
       </div>
     </div>
+    {{/each}}
   </div>
-{{#each data.range.mods as |mod id|}}
-  <div class="item">
-    <div class="item-left">
-      <div class="item-text item-name">
-        <input
-          class='display left'
-          type='text'
-          name='data.range.mods.{{id}}.name'
-          value='{{mod.name}}'
-          placeholder='' />
-      </div>
-    </div>
-    <div class="item-right">
-      <div class="item-text rtg">
-        <label class="checkbox">
-          <input type='checkbox' name="data.range.mods.{{id}}.equipped" {{checked mod.equipped}}>
-          <span class="checkmark far"></span>
-        </label>
-      </div>
-      <div class="item-text rtg">
-        <input
-          class='display'
-          size='3'
-          type='text'
-          name='data.range.mods.{{id}}.dp'
-          value='{{mod.dp}}'
-          data-dtype="Number"
-          placeholder='0' />
-      </div>
-      <div class="item-text rtg">
-        <input
-          class='display'
-          size='3'
-          type='text'
-          name='data.range.mods.{{id}}.acc'
-          value='{{mod.acc}}'
-          data-dtype="Number"
-          placeholder='0' />
-      </div>
-      <div class="item-text rtg">
-        <input
-          class='display'
-          size='3'
-          type='text'
-          name='data.range.mods.{{id}}.rc'
-          value='{{mod.rc}}'
-          data-dtype="Number"
-          placeholder='0' />
-      </div>
-      <div class="item-text desc">
-        <input
-          class='display'
-          type='text'
-          name='data.range.mods.{{id}}.description'
-          value='{{mod.description}}'
-           placeholder='{{localize "SR5.Description"}}' />
-      </div>
-      <div class="item-text item-icons rtg">
-        <a class="mod-delete" title="Delete Accessory" data-index='{{id}}'>
-          <i class="fas fa-trash"></i>
-        </a>
-      </div>
-    </div>
-  </div>
-{{/each}}
 </div>

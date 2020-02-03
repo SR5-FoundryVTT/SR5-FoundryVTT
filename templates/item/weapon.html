@@ -1,30 +1,38 @@
-<form class="{{cssClass}}" autocomplete="off">
-  <div class="flexcol">
-    {{> "systems/shadowrun5e/templates/item/parts/header.html"}}
-    <nav class="tabs" data-group="primary">
-      <a class="item" data-tab="description">{{localize "SR5.Description"}}</a>
-      <a class="item" data-tab="weapon">{{localize "SR5.Weapon"}}</a>
-      {{#ife data.category "range"}}
-      <a class="item" data-tab="ammo">{{localize "SR5.Ammo"}}/{{localize "SR5.WeaponMods"}}</a>
-      {{/ife}}
-    </nav>
-    <div class="tab" data-group="primary" data-tab="weapon">
-      {{> "systems/shadowrun5e/templates/item/parts/weapon.html" header="Weapon"}}
-      {{> "systems/shadowrun5e/templates/item/parts/action.html" header="Attack"}}
-      {{> "systems/shadowrun5e/templates/item/parts/damage.html" header="Damage"}}
-      {{> "systems/shadowrun5e/templates/item/parts/opposed.html" header="Opposed Test"}}
-    </div>
+<form class="{{cssClass}} wholesheet" autocomplete="off">
+  {{> "systems/shadowrun5e/templates/item/parts/header.html"}}
+  <nav class="tabs" data-group="primary">
+    <a class="item" data-tab="description">{{localize "SR5.Description"}}</a>
+    <a class="item" data-tab="weapon">{{localize "SR5.Weapon"}}</a>
+    {{#ife data.category "range"}}
+    <a class="item" data-tab="ammo">{{localize "SR5.Ammo"}}/{{localize "SR5.WeaponMods"}}</a>
+    {{/ife}}
+  </nav>
+  <section class='sheetbody'>
     <div class="tab" data-group="primary" data-tab="description">
       <div class="flexrow align-start nowrap">
         {{> "systems/shadowrun5e/templates/item/parts/technology.html" }}
         {{> "systems/shadowrun5e/templates/item/parts/description.html"}}
       </div>
     </div>
+    <div class="tab" data-group="primary" data-tab="weapon">
+      <div class="tabbody">
+        <div class="inventory">
+          <div class="scroll-area">
+            {{> "systems/shadowrun5e/templates/item/parts/weapon.html" header="Weapon"}}
+            {{> "systems/shadowrun5e/templates/item/parts/action.html" header="Attack"}}
+            {{> "systems/shadowrun5e/templates/item/parts/damage.html" header="Damage"}}
+            {{> "systems/shadowrun5e/templates/item/parts/opposed.html" header="Opposed Test"}}
+          </div>
+        </div>
+      </div>
+    </div>
     {{#ife data.category "range"}}
     <div class="tab" data-group="primary" data-tab="ammo">
-      {{> "systems/shadowrun5e/templates/item/parts/ammo.html"}}
-      {{> "systems/shadowrun5e/templates/item/parts/weapon-mods.html"}}
+      <div class="tabbody">
+        {{> "systems/shadowrun5e/templates/item/parts/ammo.html"}}
+        {{> "systems/shadowrun5e/templates/item/parts/weapon-mods.html"}}
+      </div>
     </div>
     {{/ife}}
-  </div>
+  </section>
 </form>

@@ -1,25 +1,23 @@
-<form class="{{cssClass}}" autocomplete="off">
-  <div class="flexcol">
-    {{> "systems/shadowrun5e/templates/item/parts/header.html"}}
-    <div class="flexrow align-start">
-      <div class="flexcol flex0">
-        <div class="technology">
-          <div class="flexrow nowrap">
-            <label>{{localize "SR5.EssenceCost"}}</label>
-            <input
-              class="display attribute-input"
-              type="text"
-              size="4"
-              name="data.essence"
-              value="{{data.essence}}"
-              data-dtype="Number"
-              placeholder="0"/>
-          </div>
+<form class="{{cssClass}} wholesheet" autocomplete="off">
+  {{> "systems/shadowrun5e/templates/item/parts/header.html"}}
+  <div class="flexrow align-start">
+    <div class="flexcol flex0">
+      <div class="technology">
+        <div class="flexrow nowrap">
+          <label>{{localize "SR5.EssenceCost"}}</label>
+          <input
+            class="display attribute-input"
+            type="text"
+            size="4"
+            name="data.essence"
+            value="{{data.essence}}"
+            data-dtype="Number"
+            placeholder="0"/>
         </div>
-        {{> "systems/shadowrun5e/templates/item/parts/technology.html" }}
       </div>
-      {{> "systems/shadowrun5e/templates/item/parts/description.html"}}
+      {{> "systems/shadowrun5e/templates/item/parts/technology.html" }}
     </div>
+    {{> "systems/shadowrun5e/templates/item/parts/description.html"}}
   </div>
 </form>
 

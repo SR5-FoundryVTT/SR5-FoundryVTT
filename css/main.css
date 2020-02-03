@@ -1,6 +1,13 @@
 .sr5.item {
   min-height: 450px;
   min-width: 650px; }
+  .sr5.item .wholesheet {
+    height: 100%;
+    display: flex;
+    flex-flow: column nowrap; }
+  .sr5.item .sheetbody {
+    overflow: hidden;
+    flex: 1; }
   .sr5.item .item-header {
     display: flex;
     flex-flow: row nowrap;
@@ -212,11 +219,6 @@
         .sr5.actor .attributes .attribute .track .track-max-value {
           margin-bottom: 0;
           margin-left: .25em; }
-  .sr5.actor .scroll-area {
-    height: 100%;
-    margin-bottom: .5em;
-    flex: 1;
-    overflow-y: auto; }
   .sr5.actor .limit {
     font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
     padding: 0 .1em;
@@ -400,6 +402,12 @@ select.display {
   width: 100%;
   color: white; }
 
+.sr5 .scroll-area {
+  height: 100%;
+  margin-bottom: .5em;
+  flex: 1;
+  overflow-y: auto; }
+
 .sr5 .profile-img {
   padding: .25em;
   border-right: 1px solid #4d4d4d;
@@ -435,8 +443,6 @@ select.display {
     height: 100%;
     display: flex;
     flex-flow: column nowrap; }
-    .sr5 .tab .tabbody.active {
-      display: flex; }
     .sr5 .tab .tabbody > * {
       flex: 0; }
     .sr5 .tab .tabbody > .inventory {
@@ -556,6 +562,12 @@ select.display {
       .sr5 .inventory .item .item-text.item-name {
         text-align: left;
         width: auto; }
+      .sr5 .inventory .item .item-text.element {
+        width: 7em; }
+      .sr5 .inventory .item .item-text.radius {
+        width: 4em; }
+      .sr5 .inventory .item .item-text.dropoff {
+        width: 4em; }
       .sr5 .inventory .item .item-text.rtg {
         width: 3em; }
         .sr5 .inventory .item .item-text.rtg.active-skills-rating {
