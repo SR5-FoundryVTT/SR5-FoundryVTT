@@ -514,6 +514,7 @@ export class SR5Actor extends Actor {
 
   rollMatrixAttribute(attr, options) {
     let matrix_att = this.data.data.matrix[attr];
+    let title = game.i18n.localize(CONFIG.SR5.matrixAttributes[attr]);
 
     if (Helpers.hasModifiers(options.event)) {
       return DiceSR.d6({
@@ -521,7 +522,7 @@ export class SR5Actor extends Actor {
         actor: this,
         count: matrix_att.value + (options.event[SR5.kbmod.SPEC] ? 2 : 0),
         limit: limit ? limit.value : undefined,
-        title: `${Helpers.label(matrix_att)}`,
+        title: title,
         matrix: true
       });
     }
@@ -533,10 +534,10 @@ export class SR5Actor extends Actor {
       attributes: attributes
     };
     let spec = false;
-    let cancel = false;
+    let cancel = true;
     renderTemplate('systems/shadowrun5e/templates/rolls/matrix-roll.html', dialogData).then(dlg => {
       new Dialog({
-        title: `${Helpers.label(matrix_att.label)} Test`,
+        title: `${title} Test`,
         content: dlg,
         buttons: {
           roll: {
@@ -552,13 +553,16 @@ export class SR5Actor extends Actor {
           if (cancel) return;
           const newAtt = html.find('[name=attribute]').val();
           let att = "";
-          if (newAtt) att = this.data.data.attributes[newAtt];
+          if (newAtt) {
+            att = this.data.data.attributes[newAtt];
+            title += ` + ${game.i18n.localize(CONFIG.SR5.attributes[newAtt])}`;
+          }
           let count = matrix_att.value + (att.value || 0) + (spec ? 2 : 0);
           return DiceSR.d6({
             event: options.event,
             actor: this,
             count: count,
-            title: `${matrix_att.label} + ${att.label}`,
+            title: title,
             matrix: true
           });
 
@@ -578,18 +582,20 @@ export class SR5Actor extends Actor {
   }
 
   rollAttributesTest(rollId, options) {
-    const label = Helpers.label(rollId);
+    const title = game.i18n.localize(CONFIG.SR5.attributeRolls[rollId]);
     const roll = this.data.data.rolls[rollId];
     return DiceSR.d6({
       event: options.event,
       actor: this,
       count: roll,
-      title: label
+      title: `${title} Test`
     });
   }
 
   rollSkill(skill, options) {
     let att = this.data.data.attributes[skill.attribute];
+    let title = skill.label;
+
     if (options.attribute) att = this.data.data.attributes[options.attribute];
     let spec = false;
     let limit = this.data.data.limits[att.limit];
@@ -600,7 +606,7 @@ export class SR5Actor extends Actor {
         actor: this,
         count: skill.value + att.value + (options.event[SR5.kbmod.SPEC] ? 2 : 0),
         limit: limit ? limit.value : undefined,
-        title: `${Helpers.label(skill.label)} Test`,
+        title: `${title} Test`,
         matrix: Helpers.isMatrix(att)
       });
     }
@@ -610,23 +616,27 @@ export class SR5Actor extends Actor {
       limit: att.limit,
       limits: this.data.data.limits
     };
+    let cancel = true;
     renderTemplate('systems/shadowrun5e/templates/rolls/skill-roll.html', dialogData).then(dlg => {
       new Dialog({
-        title: `${Helpers.label(skill.label)} Test`,
+        title: `${title} Test`,
         content: dlg,
         buttons: {
           roll: {
-            label: 'Normal'
+            label: 'Normal',
+            callback: () => cancel = false
           },
           spec: {
             label: 'Spec',
-            callback: () => spec = true
+            callback: () => { spec = true; cancel = false; }
           }
         },
         close: (html) => {
+          if (cancel) return;
           const newAtt = html.find('[name="attribute"]').val();
           const newLimit = html.find('[name="attribute.limit"]').val();
           att = this.data.data.attributes[newAtt];
+          title += ` + ${game.i18n.localize(CONFIG.SR5.attributes[newAtt])}`;
           limit = this.data.data.limits[newLimit];
           let count = (skill.value > 0 ? skill.value : -1) + att.value + (spec ? 2 : 0);
           return DiceSR.d6({
@@ -634,7 +644,7 @@ export class SR5Actor extends Actor {
             actor: this,
             count: count,
             limit: limit ? limit.value : undefined,
-            title: `${skill.label} Test`,
+            title: `${title} Test`,
             matrix: Helpers.isMatrix(att)
           });
 
@@ -660,11 +670,12 @@ export class SR5Actor extends Actor {
 
   rollActiveSkill(skillId, options) {
     const skill = this.data.data.skills.active[skillId];
+    skill.label = game.i18n.localize(CONFIG.SR5.activeSkills[skillId]);
     this.rollSkill(skill, options);
   }
 
   rollAttribute(attId, options) {
-    let label = Helpers.label(attId);
+    let title = game.i18n.localize(CONFIG.SR5.attributes[attId]);
     const att = this.data.data.attributes[attId];
     const atts = this.data.data.attributes;
     let dialogData = {
@@ -675,7 +686,7 @@ export class SR5Actor extends Actor {
     let cancel = true;
     renderTemplate('systems/shadowrun5e/templates/rolls/single-attribute.html', dialogData).then(dlg => {
       new Dialog({
-        title: `${label} Attribute Test`,
+        title: `${title} Attribute Test`,
         content: dlg,
         buttons: {
           roll: {
@@ -688,18 +699,18 @@ export class SR5Actor extends Actor {
           if (cancel) return;
           let count = att.value;
           let limit = undefined;
-          let title = label
 
           const att2Id = html.find('[name=attribute2]').val();
           let att2 = null;
           if (att2Id !== 'none') {
             att2 = atts[att2Id];
-            const att2IdLabel = Helpers.label(att2Id);
+            const att2IdLabel = game.i18n.localize(CONFIG.SR5.attributes[att2Id]);
             count += att2.value;
             title += ` + ${att2IdLabel}`
           }
           return DiceSR.d6({
             event: options.event,
+            title: `${title} Test`,
             actor: this,
             count: count,
             limit: limit,

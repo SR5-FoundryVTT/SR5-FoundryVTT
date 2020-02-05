@@ -516,7 +516,7 @@ export class SR5Item extends Item {
           content: dlg,
           buttons: {
             roll: {
-              label: 'Continue',
+              label: 'Normal',
               icon: '<i class="fas fa-dice-six"></i>',
               callback: () => cancel = false
             },

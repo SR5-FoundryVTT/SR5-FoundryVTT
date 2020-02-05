@@ -89,6 +89,13 @@ SR5.illusionSpellSenses = {
   "multi-sense": "SR5.SpellIllusionMultiSense"
 };
 
+SR5.attributeRolls = {
+  'composure': 'SR5.RollComposure',
+  'lift_carry': 'SR5.RollLiftCarry',
+  'judge_intentions': 'SR5.RollJudgeIntentions',
+  'memory': 'SR5.RollMemory'
+}
+
 SR5.matrixTargets = {
   "persona": "SR5.TargetPersona",
   "device": "SR5.TargetDevice",

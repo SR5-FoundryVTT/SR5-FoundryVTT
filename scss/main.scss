@@ -437,6 +437,9 @@ select.display {
     .card-content {
       padding: .5em 0;
       border-bottom: $groove;
+      p {
+        font-size: .8em;
+      }
       h3 {
         font-size: 1em;
         margin: 0;
