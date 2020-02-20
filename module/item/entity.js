@@ -509,7 +509,7 @@ export class SR5Item extends Item {
         force: 2 - itemData.drain
       };
       let reckless = false;
-      let cancel = false;
+      let cancel = true;
       renderTemplate('systems/shadowrun5e/templates/rolls/roll-spell.html', dialogData).then(dlg => {
         new Dialog({
           title: `${Helpers.label(this.data.name)} Force`,
@@ -517,12 +517,10 @@ export class SR5Item extends Item {
           buttons: {
             roll: {
               label: 'Normal',
-              icon: '<i class="fas fa-dice-six"></i>',
               callback: () => cancel = false
             },
             spec: {
               label: 'Reckless',
-              icon: '<i class="fas fa-plus"></i>',
               callback: () => { reckless = true; cancel = false; }
             }
           },
