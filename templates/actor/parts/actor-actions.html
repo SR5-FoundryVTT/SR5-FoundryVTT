@@ -30,37 +30,37 @@
         </div>
       </div>
     </div>
-    {{#each actions as |action id|}}
-    <div class="item" data-item-id='{{action._id}}'>
+    {{#each actions as |item id|}}
+    <div class="item" data-item-id='{{item._id}}'>
       <div class="item-left">
         <div class="item-img item-roll">
-          <img src="{{action.img}}" title="{{action.name}}" height='24px' width='24px'/>
+          <img src="{{item.img}}" title="{{item.name}}" height='24px' width='24px'/>
         </div>
         <div class="item-text item-name has-desc" >
-          {{action.name}}
+          {{item.name}}
         </div>
       </div>
       <div class="item-right">
         <div class="item-text six">
-          {{localizeOb action.data.action.skill ../config.activeSkills}}
+          {{localizeOb item.data.action.skill ../config.activeSkills}}
         </div>
         <div class="item-text six">
-          {{localizeOb action.data.action.attribute ../config.attributes}}
+          {{localizeOb item.data.action.attribute ../config.attributes}}
         </div>
         <div class="item-text six">
-          {{#unless action.data.action.skill}}
-          {{localizeOb action.data.action.attribute2 ../config.attributes}}
+          {{#unless item.data.action.skill}}
+          {{localizeOb item.data.action.attribute2 ../config.attributes}}
           {{/unless}}
         </div>
         <div class="item-text six">
-          {{#if action.data.action.limit.attribute}}
-          {{localizeOb action.data.action.limit.attribute ../config.attributes}} ({{action.data.action.limit.value}})
+          {{#if item.data.action.limit.attribute}}
+          {{localizeOb item.data.action.limit.attribute ../config.attributes}} ({{item.data.action.limit.value}})
           {{else}}
-          {{action.data.action.limit.value}}
+          {{item.data.action.limit.value}}
           {{/if}}
         </div>
         <div class="item-text six">
-          {{action.data.action.mod}}
+          {{item.data.action.mod}}
         </div>
         <div class="item-text item-icons">
           <i class="item-edit roll fas fa-edit" ></i>
