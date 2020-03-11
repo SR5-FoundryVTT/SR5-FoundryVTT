@@ -720,4 +720,54 @@ export class SR5Actor extends Actor {
       }).render(true);
     });
   }
+
+  static async pushTheLimit(roll) {
+    let title = roll.find('.flavor-text').text();
+    let msg = game.messages.get(roll.data().messageId)
+
+    if (msg && msg.data && msg.data.speaker && msg.data.speaker.actor) {
+
+      let actor = game.actors.get(msg.data.speaker.actor);
+
+      return DiceSR.d6({
+        event: {shiftKey: true, altKey: true},
+        title: `${title} - Push the Limit`,
+        actor: actor,
+        count: 0,
+        wounds: false,
+      });
+    }
+  };
+
+  static async secondChance(roll) {
+    let formula = roll.find('.dice-formula').text();
+    let hits = parseInt(roll.find('.dice-total').text());
+    let title = roll.find('.flavor-text').text();
+    let re = /(\d+)d6/;
+    let matches = formula.match(re);
+    if (matches[1]) {
+
+      let match = matches[1];
+      let pool = parseInt(match.replace('d6',''));
+      if (pool != NaN && hits != NaN) {
+
+        let msg = game.messages.get(roll.data().messageId)
+        if (msg && msg.data && msg.data.speaker && msg.data.speaker.actor) {
+          let actor = game.actors.get(msg.data.speaker.actor);
+          let count = pool - hits;
+
+          return DiceSR.d6({
+            event: {shiftKey: true},
+            title: `${title} - Second Chance`,
+            count: count,
+            wounds: false,
+            actor: actor,
+            after: (r) => {
+              actor.update({"data.attributes.edge.value": actor.data.data.attributes.edge.value - 1});
+            }
+          });
+        }
+      }
+    }
+  };
 }

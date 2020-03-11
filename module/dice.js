@@ -78,9 +78,9 @@ export class DiceSR {
 
     let total = parseInt(count) || 0;
 
-    if (event && Helpers.hasModifiers(event)) {
-      total -= wounds;
-      total += mods;
+    if ((event && Helpers.hasModifiers(event))) {
+      if (wounds) total -= wounds;
+      if (mod) total += mod;
       let edge = event[SR5.kbmod.EDGE];
       if (edge && actor) {
         total += actor.data.data.attributes.edge.max;

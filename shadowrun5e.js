@@ -9,6 +9,7 @@ import { preloadHandlebarsTemplates } from './module/templates.js';
 import { DiceSR } from './module/dice.js';
 import { preCombatUpdate, shadowrunCombatUpdate } from './module/combat.js';
 import { measureDistance } from './module/canvas.js';
+import * as chat from './module/chat.js';
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -64,6 +65,7 @@ Hooks.on('preUpdateCombat', preCombatUpdate);
 Hooks.on('renderChatMessage', (app, html, data) => {
   if (!app.isRoll) SR5Item.chatListeners(html)
 });
+Hooks.on("getChatLogEntryContext", chat.addChatMessageContextOptions);
 
 /* -------------------------------------------- */
 /*  Hotbar Macros                               */
