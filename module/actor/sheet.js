@@ -311,7 +311,9 @@ export class SR5ActorSheet extends ActorSheet {
 
       // get current matrix attribute on the device
       let oldVal = item.data.data.atts[deviceAtt].att;
-      let data = {};
+      let data = {
+        _id: iid
+      };
 
       // go through atts on device, setup matrix attributes on it
       for (let i = 1; i <= 4; i++) {
@@ -323,7 +325,10 @@ export class SR5ActorSheet extends ActorSheet {
           data[key] = oldVal;
         }
       }
-      item.update(data);
+      // update twice so that it triggers the correct values for the sheet
+      this.actor.updateEmbeddedEntity('OwnedItem', data).then(() => {
+        item.update({});
+      });
     });
 
     // Update Inventory Item
