@@ -4,6 +4,17 @@ import { SR5 } from '../config.js';
 
 export class SR5Actor extends Actor {
 
+  update(data, options) {
+    super.update(data, options);
+    // trigger update for all owned items
+    // needed for rolls to properly update when items or attributes update
+    for (let i of this.data.items) {
+      let id = i._id;
+      let item = this.getOwnedItem(id);
+      item.update({});
+    }
+  }
+
   prepareData() {
     super.prepareData();
 
