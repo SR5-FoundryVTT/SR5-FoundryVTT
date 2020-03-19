@@ -88,15 +88,17 @@ export class SR5Actor extends Actor {
       // MODIFIES MATRIX ATTRIBUTES
       if (item.type === 'device' && item.data.technology.equipped) {
 
-        matrix.device = item.id;
+        matrix.device = item._id;
         matrix.condition_monitor.max = item.data.condition_monitor.max;
         matrix.rating = item.data.technology.rating;
-        matrix.is_cyberdeck = item.category === 'cyberdeck';
+        matrix.is_cyberdeck = item.data.category === 'cyberdeck';
         matrix.name = item.name;
+        matrix.item = item.data;
 
         if (item.data.category === 'cyberdeck') {
-          for (let att of Object.values(item.data.atts)) {
+          for (let [key, att] of Object.entries(item.data.atts)) {
             matrix[att.att].value += att.value;
+            matrix[att.att].device_att = key;
           }
         } else {
           matrix.firewall.value += matrix.rating;

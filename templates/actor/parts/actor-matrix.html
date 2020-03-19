@@ -15,17 +15,27 @@
   </div>
   <div class="attribute">
     <div class="attribute-name roll matrix-roll" data-attribute='attack'>{{localize "SR5.MatrixAttrAttack"}}</div>
-    <div class="attribute-input-container">
+    <div class="attribute-input-container row">
+      <select class='display matrix-att-selector' name='matrix-attack' data-att='attack'>
+        {{#select data.matrix.attack.device_att}}
+        <option value="att1">{{data.matrix.item.atts.att1.value}}</option>
+        <option value="att2">{{data.matrix.item.atts.att2.value}}</option>
+        <option value="att3">{{data.matrix.item.atts.att3.value}}</option>
+        <option value="att4">{{data.matrix.item.atts.att4.value}}</option>
+        {{/select}}
+      </select>
+      {{#if data.matrix.attack.mod}}
       <input
         class="display attribute-input"
         type="text"
         maxlength="2"
         size="2"
         name="data.matrix.attack.value"
-        value="{{data.matrix.attack.value}}"
+        value="({{data.matrix.attack.value}})"
         data-dtype="Number"
         placeholder="1"
         disabled/>
+      {{/if}}
     </div>
     <div class="attribute-input-container">
       <input
@@ -41,17 +51,27 @@
   </div>
   <div class="attribute">
     <div class="attribute-name matrix-roll roll" data-attribute='sleaze'>{{localize "SR5.MatrixAttrSleaze"}}</div>
-    <div class="attribute-input-container">
+    <div class="attribute-input-container row">
+      <select class='display matrix-att-selector' name='matrix-sleaze' data-att='sleaze'>
+        {{#select data.matrix.sleaze.device_att}}
+        <option value="att1">{{data.matrix.item.atts.att1.value}}</option>
+        <option value="att2">{{data.matrix.item.atts.att2.value}}</option>
+        <option value="att3">{{data.matrix.item.atts.att3.value}}</option>
+        <option value="att4">{{data.matrix.item.atts.att4.value}}</option>
+        {{/select}}
+      </select>
+      {{#if data.matrix.sleaze.mod}}
       <input
         class="display attribute-input"
         type="text"
         maxlength="2"
         size="2"
         name="data.matrix.sleaze.value"
-        value="{{data.matrix.sleaze.value}}"
+        value="({{data.matrix.sleaze.value}})"
         data-dtype="Number"
         placeholder="1"
         disabled/>
+      {{/if}}
     </div>
     <div class="attribute-input-container">
       <input
@@ -67,17 +87,27 @@
   </div>
   <div class="attribute">
     <div class="attribute-name roll matrix-roll" data-attribute='data_processing'>{{localize "SR5.MatrixAttrDataProc"}}</div>
-    <div class="attribute-input-container">
+    <div class="attribute-input-container row">
+      <select class='display matrix-att-selector' name='matrix-data_processing' data-att='data_processing'>
+        {{#select data.matrix.data_processing.device_att}}
+        <option value="att1">{{data.matrix.item.atts.att1.value}}</option>
+        <option value="att2">{{data.matrix.item.atts.att2.value}}</option>
+        <option value="att3">{{data.matrix.item.atts.att3.value}}</option>
+        <option value="att4">{{data.matrix.item.atts.att4.value}}</option>
+        {{/select}}
+      </select>
+      {{#if data.matrix.data_processing.mod}}
       <input
         class="display attribute-input"
         type="text"
         maxlength="2"
         size="2"
         name="data.matrix.data_processing.value"
-        value="{{data.matrix.data_processing.value}}"
+        value="({{data.matrix.data_processing.value}})"
         data-dtype="Number"
         placeholder="1"
         disabled/>
+      {{/if}}
     </div>
     <div class="attribute-input-container">
       <input
@@ -93,17 +123,27 @@
   </div>
   <div class="attribute">
     <div class="attribute-name roll matrix-roll" data-attribute='firewall'>{{localize "SR5.MatrixAttrFirewall"}}</div>
-    <div class="attribute-input-container">
+    <div class="attribute-input-container row">
+      <select class='display matrix-att-selector' name='matrix-firewall' data-att='firewall'>
+        {{#select data.matrix.firewall.device_att}}
+        <option value="att1">{{data.matrix.item.atts.att1.value}}</option>
+        <option value="att2">{{data.matrix.item.atts.att2.value}}</option>
+        <option value="att3">{{data.matrix.item.atts.att3.value}}</option>
+        <option value="att4">{{data.matrix.item.atts.att4.value}}</option>
+        {{/select}}
+      </select>
+      {{#if data.matrix.firewall.mod}}
       <input
         class="display attribute-input"
         type="text"
         maxlength="2"
         size="2"
         name="data.matrix.firewall.value"
-        value="{{data.matrix.firewall.value}}"
+        value="({{data.matrix.firewall.value}})"
         data-dtype="Number"
         placeholder="1"
         disabled/>
+      {{/if}}
     </div>
     <div class="attribute-input-container">
       <input

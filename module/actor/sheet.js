@@ -300,6 +300,31 @@ export class SR5ActorSheet extends ActorSheet {
     html.find('.remove-language').click(this._onRemoveLanguageSkill.bind(this));
     html.find('.import-character').click(this._onShowImportCharacter.bind(this));
     html.find('.reload-ammo').click(this._onReloadAmmo.bind(this));
+    html.find('.matrix-att-selector').change(event => {
+      let iid = this.data.matrix.device;
+      let item = this.actor.getOwnedItem(iid);
+      if (!item) console.error('could not find item');
+      // grab matrix attribute (sleaze, attack, etc.)
+      let att = event.currentTarget.dataset.att;
+      // grab device attribute (att1, att2, ...)
+      let deviceAtt = event.currentTarget.value;
+
+      // get current matrix attribute on the device
+      let oldVal = item.data.data.atts[deviceAtt].att;
+      let data = {};
+
+      // go through atts on device, setup matrix attributes on it
+      for (let i = 1; i <= 4; i++) {
+        let tmp = `att${i}`;
+        let key = `data.atts.att${i}.att`
+        if (tmp === deviceAtt) {
+          data[key] = att;
+        } else if (item.data.data.atts[`att${i}`].att === att) {
+          data[key] = oldVal;
+        }
+      }
+      item.update(data);
+    });
 
     // Update Inventory Item
     html.find('.item-edit').click(event => {
