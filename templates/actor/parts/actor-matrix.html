@@ -13,6 +13,7 @@
       <input type='checkbox' class="submit-checkbox" name="data.matrix.running_silent" {{checked data.matrix.running_silent}}>
     </div>
   </div>
+  {{#if data.matrix.is_cyberdeck}}
   <div class="attribute">
     <div class="attribute-name roll matrix-roll" data-attribute='attack'>{{localize "SR5.MatrixAttrAttack"}}</div>
     <div class="attribute-input-container row">
@@ -157,6 +158,112 @@
         placeholder='+Mod'/>
     </div>
   </div>
+  {{else}}
+  <div class="attribute">
+    <div class="attribute-name roll matrix-roll" data-attribute='attack'>{{localize "SR5.MatrixAttrAttack"}}</div>
+    <div class="attribute-input-container">
+      <input
+        class="display attribute-input"
+        type="text"
+        maxlength="2"
+        size="2"
+        name="data.matrix.attack.value"
+        value="{{data.matrix.attack.value}}"
+        data-dtype="Number"
+        placeholder="1"
+        disabled/>
+    </div>
+    <div class="attribute-input-container">
+      <input
+        class="display track-input"
+        size='4'
+        maxlength='4'
+        type='text'
+        name='data.matrix.attack.mod'
+        value="{{data.matrix.attack.mod}}"
+        data-dtype="Number"
+        placeholder='+Mod'/>
+    </div>
+  </div>
+  <div class="attribute">
+    <div class="attribute-name matrix-roll roll" data-attribute='sleaze'>{{localize "SR5.MatrixAttrSleaze"}}</div>
+    <div class="attribute-input-container">
+      <input
+        class="display attribute-input"
+        type="text"
+        maxlength="2"
+        size="2"
+        name="data.matrix.sleaze.value"
+        value="{{data.matrix.sleaze.value}}"
+        data-dtype="Number"
+        placeholder="1"
+        disabled/>
+    </div>
+    <div class="attribute-input-container">
+      <input
+        class="display track-input"
+        size='4'
+        maxlength='4'
+        type='text'
+        name='data.matrix.sleaze.mod'
+        value="{{data.matrix.sleaze.mod}}"
+        data-dtype="Number"
+        placeholder='+Mod'/>
+    </div>
+  </div>
+  <div class="attribute">
+    <div class="attribute-name roll matrix-roll" data-attribute='data_processing'>{{localize "SR5.MatrixAttrDataProc"}}</div>
+    <div class="attribute-input-container">
+      <input
+        class="display attribute-input"
+        type="text"
+        maxlength="2"
+        size="2"
+        name="data.matrix.data_processing.value"
+        value="{{data.matrix.data_processing.value}}"
+        data-dtype="Number"
+        placeholder="1"
+        disabled/>
+    </div>
+    <div class="attribute-input-container">
+      <input
+        class="display track-input"
+        size='4'
+        maxlength='4'
+        type='text'
+        name='data.matrix.data_processing.mod'
+        value="{{data.matrix.data_processing.mod}}"
+        data-dtype="Number"
+        placeholder='+Mod'/>
+    </div>
+  </div>
+  <div class="attribute">
+    <div class="attribute-name roll matrix-roll" data-attribute='firewall'>{{localize "SR5.MatrixAttrFirewall"}}</div>
+    <div class="attribute-input-container">
+      <input
+        class="display attribute-input"
+        type="text"
+        maxlength="2"
+        size="2"
+        name="data.matrix.firewall.value"
+        value="{{data.matrix.firewall.value}}"
+        data-dtype="Number"
+        placeholder="1"
+        disabled/>
+    </div>
+    <div class="attribute-input-container">
+      <input
+        class="display track-input"
+        size='4'
+        maxlength='4'
+        type='text'
+        name='data.matrix.firewall.mod'
+        value="{{data.matrix.firewall.mod}}"
+        data-dtype="Number"
+        placeholder='+Mod'/>
+    </div>
+  </div>
+  {{/if}}
   <div class="attribute">
     <div class="attribute-name">{{localize "SR5.ConditionMonitor"}}</div>
     <div class="track">

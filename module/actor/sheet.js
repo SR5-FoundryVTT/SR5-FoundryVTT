@@ -439,11 +439,11 @@ export class SR5ActorSheet extends ActorSheet {
       if (!itemData.technology.equipped && item.type === 'device') {
         for (let ite of this.actor.items) {
           if (ite.type === 'device') {
-            ite.update({"data.technology.equipped": false});
+            await ite.update({"data.technology.equipped": false});
           };
         }
       }
-      item.update({"data.technology.equipped": !itemData.technology.equipped});
+      await item.update({"data.technology.equipped": !itemData.technology.equipped});
     }
   }
 
