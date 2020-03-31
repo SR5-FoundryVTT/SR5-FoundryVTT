@@ -11,7 +11,9 @@ export class SR5Actor extends Actor {
     for (let i of this.data.items) {
       let id = i._id;
       let item = this.getOwnedItem(id);
-      item.update({});
+      if (item.data.data.action) {
+        item.update({});
+      }
     }
   }
 
@@ -294,8 +296,8 @@ export class SR5Actor extends Actor {
 
     {
       const count = 3 + mods.wound_tolerance;
-      const stunWounds = Math.floor((data.track.stun.max - data.track.stun.value) / count);
-      const physicalWounds = Math.floor((data.track.physical.max - data.track.physical.value) / count);
+      const stunWounds = Math.floor(data.track.stun.value / count);
+      const physicalWounds = Math.floor(data.track.physical.value / count);
 
       data.wounds = {
         value: stunWounds + physicalWounds
