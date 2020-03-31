@@ -26,6 +26,14 @@
           </div>
           {{/unless}}
           {{/each}}
+          {{#if data.wounds.value}}
+          <div class="limit">
+            <div class="limit-row">
+              <span class="limit-title">({{localize "SR5.Wounds"}}</span>
+              <span class="limit-value">-{{data.wounds.value}})</span>
+            </div>
+          </div>
+          {{/if}}
         </div>
         <div class="attributes smooth">
           {{#each data.track as |track id|}}

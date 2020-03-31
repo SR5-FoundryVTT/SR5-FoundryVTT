@@ -299,6 +299,9 @@ export class SR5Actor extends Actor {
       const stunWounds = Math.floor(data.track.stun.value / count);
       const physicalWounds = Math.floor(data.track.physical.value / count);
 
+      data.track.stun.wounds = stunWounds;
+      data.track.physical.wounds = physicalWounds;
+
       data.wounds = {
         value: stunWounds + physicalWounds
       }
