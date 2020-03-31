@@ -277,6 +277,7 @@ export class SR5ActorSheet extends ActorSheet {
       }
     });
 
+    html.find('.track-roll').click(this._onRollTrack.bind(this));
     html.find('.attribute-roll').click(this._onRollAttribute.bind(this));
     html.find('.skill-roll').click(this._onRollActiveSkill.bind(this));
     html.find('.defense-roll').click(this._onRollDefense.bind(this));
@@ -445,6 +446,12 @@ export class SR5ActorSheet extends ActorSheet {
       }
       await item.update({"data.technology.equipped": !itemData.technology.equipped});
     }
+  }
+
+  async _onRollTrack(event) {
+    event.preventDefault();
+    let track = event.currentTarget.closest('.attribute').dataset.track;
+    this.actor.rollNaturalRecovery(track, event);
   }
 
   async _onRollPrompt(event) {

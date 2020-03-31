@@ -115,7 +115,7 @@ export class DiceSR {
               callback: () => cancel = false
             },
             edge: {
-              label: 'Edge',
+              label: 'Push the Limit',
               icon: '<i class="fas fa-bomb"></i>',
               callback: () => { edge = true; cancel = false; }
             }
@@ -144,11 +144,13 @@ export class DiceSR {
               actor.update({"data.attributes.edge.value": actor.data.data.attributes.edge.value - 1});
             }
             let r = roll(total, edge ? undefined : limit, edge);
-            r.then(r => {;
-              if (after) after(r);
+            r.then(async r => {;
+              if (after) await after(r);
               if (extended) {
                 count -= 1;
-                DiceSR.d6({event, count, mod, actor, limit, limitMod, title, prefix, suffix, after, extended, dialogOptions, wounds, after});
+                // add a bit of a delay to roll again
+                // helps with any updates that happened inside after and to not spam the user
+                setTimeout(() => DiceSR.d6({event, count, mod, actor, limit, limitMod, title, prefix, suffix, extended, dialogOptions, wounds, after}), 400);
               }
             });
           }

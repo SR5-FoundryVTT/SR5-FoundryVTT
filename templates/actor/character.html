@@ -37,8 +37,8 @@
         </div>
         <div class="attributes smooth">
           {{#each data.track as |track id|}}
-          <div class="attribute">
-            <div class="attribute-name">{{localize track.label}}</div>
+          <div class="attribute" data-track="{{id}}">
+            <div class="attribute-name track-roll roll">{{localize track.label}}</div>
             <div class="track">
               <div class="attribute-input-container">
                 <input

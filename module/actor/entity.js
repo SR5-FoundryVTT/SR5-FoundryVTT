@@ -512,7 +512,7 @@ export class SR5Actor extends Actor {
       actor: this,
       count: attr.value,
       title: Helpers.label(attrId),
-      matrix: Helpers.isMatrix(attr)
+      matrix: Helpers.isMatrix(attr),
     });
   }
 
@@ -526,7 +526,41 @@ export class SR5Actor extends Actor {
       actor: this,
       count: attr1.value + attr2.value,
       title: `${label1} + ${label2}`,
-      matrix: Helpers.isMatrix([attr1, attr2])
+      matrix: Helpers.isMatrix([attr1, attr2]),
+    });
+  }
+
+  rollNaturalRecovery(track, options) {
+    let id1 = 'body';
+    let id2 = 'willpower';
+    let title = 'Natural Recover';
+    if (track === 'physical') {
+      id2 = 'body';
+      title += ' - Physical - 1 Day';
+    } else {
+      title += ' - Stun - 1 Hour';
+    }
+    let att1 = this.data.data.attributes[id1];
+    let att2 = this.data.data.attributes[id2];
+
+    return DiceSR.d6({
+      event: options.event,
+      actor: this,
+      title: title,
+      count: att1.value + att2.value,
+      extended: true,
+      after: async (roll) => {
+        let hits = roll.total;
+        let current = this.data.data.track[track].value;
+
+        current = Math.max(current - hits, 0);
+
+        let key = `data.track.${track}.value`;
+
+        let u = {};
+        u[key] = current;
+        await this.update(u);
+      }
     });
   }
 
