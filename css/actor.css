@@ -1,116 +1,150 @@
 .sr5.actor {
   min-height: 690px;
-  min-width: 800px; }
-  .sr5.actor .wholesheet {
-    height: 100%;
-    display: flex;
-    flex-flow: column nowrap; }
-  .sr5.actor .name {
-    margin-bottom: 0;
-    font-size: 200%;
-    font-family: "Nodesto", "Signika", "Palatino Linotype", serif; }
-  .sr5.actor .sheetbody {
-    overflow: hidden;
-    flex: 1; }
-  .sr5.actor .attributes {
-    border-top: 1px solid #4d4d4d;
-    display: flex;
-    flex-flow: row;
-    flex-wrap: nowrap;
-    justify-content: space-between; }
-    .sr5.actor .attributes.no-border {
-      border-top: none;
-      border-bottom: none; }
-    .sr5.actor .attributes.wrap {
-      flex-wrap: wrap; }
-    .sr5.actor .attributes + :not(.attributes) {
-      border-top: 1px solid #4d4d4d; }
-    .sr5.actor .attributes:last-child {
-      border-bottom: 1px solid #4d4d4d; }
-    .sr5.actor .attributes .attribute {
-      font-size: 120%;
-      font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
-      color: white;
-      color: white;
-      text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
-      display: flex;
-      text-align: center;
-      flex-flow: column nowrap;
-      align-items: center;
-      justify-content: space-evenly;
-      padding: 0 .25em;
-      flex: 1 0 auto;
-      min-width: 4em; }
-      .sr5.actor .attributes .attribute:hover .attribute-input-container.row {
-        visibility: visible; }
-      .sr5.actor .attributes .attribute.flex0 {
-        min-width: 0;
-        width: 0; }
-      .sr5.actor .attributes .attribute.row {
-        flex-flow: row nowrap;
-        justify-content: center;
-        align-items: center;
-        align-content: center; }
-        .sr5.actor .attributes .attribute.row > .attribute-name {
-          width: auto; }
-        .sr5.actor .attributes .attribute.row.space-around {
-          justify-content: space-around; }
-        .sr5.actor .attributes .attribute.row .attribute-input {
-          transform: translateY(20%); }
-      .sr5.actor .attributes .attribute:not(:last-child) {
-        border-right: 1px solid #4d4d4d; }
-      .sr5.actor .attributes .attribute > .attribute-name {
-        font-size: 115%;
-        width: 100%;
-        text-align: center;
-        margin-bottom: 0; }
-        .sr5.actor .attributes .attribute > .attribute-name.icon {
-          font-size: .75em; }
-        .sr5.actor .attributes .attribute > .attribute-name.roll:hover {
-          text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
-          cursor: pointer; }
-      .sr5.actor .attributes .attribute .attribute-input-container {
-        align-text: center;
-        position: relative;
-        margin-bottom: 2px; }
-        .sr5.actor .attributes .attribute .attribute-input-container .mod {
-          font-size: .75em;
-          margin-top: -2px; }
-        .sr5.actor .attributes .attribute .attribute-input-container.row {
-          display: flex;
-          flex-flow: row; }
-        .sr5.actor .attributes .attribute .attribute-input-container > .attribute-input {
-          text-align: center;
-          margin: 2px; }
-      .sr5.actor .attributes .attribute .track {
-        display: flex;
-        flex-flow: row;
-        justify-content: space-evenly;
-        margin-bottom: .1em;
-        width: 100%; }
-        .sr5.actor .attributes .attribute .track.between {
-          justify-content: space-between; }
-        .sr5.actor .attributes .attribute .track .track-slash {
-          width: 1.5em;
-          transform: translateY(10%);
-          flex: 0 0; }
-          .sr5.actor .attributes .attribute .track .track-slash:after {
-            content: '/'; }
-        .sr5.actor .attributes .attribute .track .track-plus {
-          width: 1.5em;
-          flex: 0 0; }
-          .sr5.actor .attributes .attribute .track .track-plus:after {
-            content: '+'; }
-        .sr5.actor .attributes .attribute .track .track-max-value {
-          margin-bottom: 0;
-          margin-left: .25em; }
-  .sr5.actor .limit {
-    font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
-    padding: 0 .1em;
-    margin-top: -2px;
-    text-align: center;
-    display: flex;
-    flex-flow: column nowrap;
-    justify-content: center;
-    align-items: center;
-    align-content: center; }
+  min-width: 800px;
+}
+.sr5.actor .wholesheet {
+  height: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+}
+.sr5.actor .name {
+  margin-bottom: 0;
+  font-size: 200%;
+  font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
+}
+.sr5.actor .sheetbody {
+  overflow: hidden;
+  flex: 1;
+}
+.sr5.actor .attributes {
+  border-top: 1px solid #4d4d4d;
+  display: flex;
+  flex-flow: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+}
+.sr5.actor .attributes.no-border {
+  border-top: none;
+  border-bottom: none;
+}
+.sr5.actor .attributes.wrap {
+  flex-wrap: wrap;
+}
+.sr5.actor .attributes + :not(.attributes) {
+  border-top: 1px solid #4d4d4d;
+}
+.sr5.actor .attributes:last-child {
+  border-bottom: 1px solid #4d4d4d;
+}
+.sr5.actor .attributes .attribute {
+  font-size: 120%;
+  font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
+  color: white;
+  color: white;
+  text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;
+  display: flex;
+  text-align: center;
+  flex-flow: column nowrap;
+  align-items: center;
+  justify-content: space-evenly;
+  padding: 0 0.25em;
+  flex: 1 0 auto;
+  min-width: 4em;
+}
+.sr5.actor .attributes .attribute:hover .attribute-input-container.row {
+  visibility: visible;
+}
+.sr5.actor .attributes .attribute.flex0 {
+  min-width: 0;
+  width: 0;
+}
+.sr5.actor .attributes .attribute.row {
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+}
+.sr5.actor .attributes .attribute.row > .attribute-name {
+  width: auto;
+}
+.sr5.actor .attributes .attribute.row.space-around {
+  justify-content: space-around;
+}
+.sr5.actor .attributes .attribute.row .attribute-input {
+  transform: translateY(20%);
+}
+.sr5.actor .attributes .attribute:not(:last-child) {
+  border-right: 1px solid #4d4d4d;
+}
+.sr5.actor .attributes .attribute > .attribute-name {
+  font-size: 115%;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 0;
+}
+.sr5.actor .attributes .attribute > .attribute-name.icon {
+  font-size: 0.75em;
+}
+.sr5.actor .attributes .attribute > .attribute-name.roll:hover {
+  text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
+  cursor: pointer;
+}
+.sr5.actor .attributes .attribute .attribute-input-container {
+  align-text: center;
+  position: relative;
+  margin-bottom: 2px;
+}
+.sr5.actor .attributes .attribute .attribute-input-container .mod {
+  font-size: 0.75em;
+  margin-top: -2px;
+}
+.sr5.actor .attributes .attribute .attribute-input-container.row {
+  display: flex;
+  flex-flow: row;
+}
+.sr5.actor .attributes .attribute .attribute-input-container > .attribute-input {
+  text-align: center;
+  margin: 2px;
+}
+.sr5.actor .attributes .attribute .track {
+  display: flex;
+  flex-flow: row;
+  justify-content: space-evenly;
+  margin-bottom: 0.1em;
+  width: 100%;
+}
+.sr5.actor .attributes .attribute .track.between {
+  justify-content: space-between;
+}
+.sr5.actor .attributes .attribute .track .track-slash {
+  width: 1.5em;
+  transform: translateY(10%);
+  flex: 0 0;
+}
+.sr5.actor .attributes .attribute .track .track-slash:after {
+  content: "/";
+}
+.sr5.actor .attributes .attribute .track .track-plus {
+  width: 1.5em;
+  flex: 0 0;
+}
+.sr5.actor .attributes .attribute .track .track-plus:after {
+  content: "+";
+}
+.sr5.actor .attributes .attribute .track .track-max-value {
+  margin-bottom: 0;
+  margin-left: 0.25em;
+}
+.sr5.actor .limit {
+  font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
+  padding: 0 0.1em;
+  margin-top: -2px;
+  text-align: center;
+  display: flex;
+  flex-flow: column nowrap;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+}
+
+/*# sourceMappingURL=actor.css.map */

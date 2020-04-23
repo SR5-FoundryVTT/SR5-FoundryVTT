@@ -206,6 +206,7 @@ select.display {
 
   .profile-img {
     padding: .25em;
+    max-width: 100px;
     border-right: $groove;
     border-bottom: $groove;
   }
@@ -313,7 +314,7 @@ select.display {
       }
       .item-img {
         padding-right: .25em;
-        flex: 0;
+        max-width: 50px;
         @include rollable;
         &:hover {
           >img {

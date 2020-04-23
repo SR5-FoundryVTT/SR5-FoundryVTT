@@ -36,7 +36,7 @@
       border-bottom: $groove;
     }
     .attribute {
-      @include title
+      @include title;
       display: flex;
       text-align: center;
       flex-flow: column nowrap;

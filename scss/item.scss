@@ -43,7 +43,7 @@
       justify-content: center;
     }
     .item-image {
-      flex: 0;
+      max-width: 100px;
       border-right: $groove;
       margin-bottom: none;
       padding-bottom: none;
