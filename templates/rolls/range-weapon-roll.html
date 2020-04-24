@@ -9,11 +9,9 @@
     <label>Fire Mode{{#if rc}} (Total RC {{rc}}){{/if}}</label>
     <select name="fireMode">
     {{#select fireMode}}
-      <option value="1">SS/SA- 1 Round</option>
-      <option value="3">SB/BF - 3 Rounds</option>
-      <option value="6">LB/FA(s) - 6 Rounds</option>
-      <option value="10">FA(c) - 10 Rounds</option>
-      <option value="20">Supp - 20 Rounds</option>
+      {{#each fireModes as |description count|}}
+        <option value="{{count}}">{{description}} - {{count}} Round{{#ifgt count 1}}s{{/ifgt}}</option>
+      {{/each}}
     {{/select}}
     </select>
   </div>

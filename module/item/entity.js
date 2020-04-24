@@ -434,11 +434,33 @@ export class SR5Item extends Item {
     let title = this.data.name;
 
     if (this.data.type === 'weapon' && itemData.category === 'range') {
+      const fireModes = {};
+      {
+        const modes = itemData.range.modes;
+        if (modes.single_shot) {
+          fireModes["1"] = "SS";
+        }
+        if (modes.semi_auto) {
+          fireModes["1"] = "SA";
+          fireModes["3"] = "SB";
+        }
+        if (modes.burst_fire) {
+          fireModes["3"] = `${modes.semi_auto ? 'SB/' : ''}BF`;
+          fireModes["6"] = "LB";
+        }
+        if (modes.full_auto) {
+          fireModes["6"] = `${modes.burst_fire ? 'LB/' : ''}FA(s)`;
+          fireModes["10"] = "FA(c)";
+          fireModes["20"] = "Supp";
+        }
+      }
+
       let attack = this.getFlag('shadowrun5e', 'attack') || {fireMode: 0};
       let fireMode = attack.fireMode;
       let rc = parseInt(itemData.range.rc.value) + parseInt(actorData.recoil_compensation);
       let dialogData = {
         dice_pool: count,
+        fireModes: fireModes,
         fireMode: fireMode,
         rc: rc,
         ammo: itemData.range.ammo
