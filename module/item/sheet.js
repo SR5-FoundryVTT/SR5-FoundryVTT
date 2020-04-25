@@ -19,6 +19,7 @@ export class SR5ItemSheet extends ItemSheet {
           classes: ["sr5", "sheet", "item"],
           width: 650,
           height: 450,
+          tabs: [{navSelector: '.tabs', contentSelector: '.sheetbody'}]
       });
   }
 
@@ -111,12 +112,12 @@ export class SR5ItemSheet extends ItemSheet {
     html.find('.add-new-license').click(this._onAddLicense.bind(this));
 
     // Activate tabs
-    let tabs = html.find('.tabs');
-    let initial = this._sheetTab;
-    new Tabs(tabs, {
-      initial: initial,
-      callback: clicked => this._sheetTab = clicked.data('tab')
-    });
+    // let tabs = html.find('.tabs');
+    // let initial = this._sheetTab;
+    // new Tabs(tabs, {
+    //   initial: initial,
+    //   callback: clicked => this._sheetTab = clicked.data('tab')
+    // });
   }
 
   async _onAddLicense(event) {
