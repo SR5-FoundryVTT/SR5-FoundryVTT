@@ -322,5 +322,9 @@
   "SR5.ActionTypeVaries": "Varies",
   "SR5.InitCatMeatspace": "Meatspace",
   "SR5.InitCatAstral": "Astral",
-  "SR5.InitCatMatrix": "Matrix"
+  "SR5.InitCatMatrix": "Matrix",
+
+  "SETTINGS.DiagonalMovementName": "Diagonal Movement",
+  "SETTINGS.IgnoreDiagonal": "Ignore Diagonal Movement (1-1-1)",
+  "SETTINGS.EstimateDiagonal": "Estimate Diagonal Movement (1-2-1)"
 }

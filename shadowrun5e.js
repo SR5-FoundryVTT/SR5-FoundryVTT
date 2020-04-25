@@ -5,6 +5,7 @@ import { SR5Actor } from './module/actor/entity.js';
 import { SR5Item } from './module/item/entity.js';
 import { SR5 } from './module/config.js';
 import { Helpers } from './module/helpers.js';
+import { registerSystemSettings} from "./module/settings.js";
 import { preloadHandlebarsTemplates } from './module/templates.js';
 import { DiceSR } from './module/dice.js';
 import { preCombatUpdate, shadowrunCombatUpdate } from './module/combat.js';
@@ -29,6 +30,8 @@ Hooks.once("init", function() {
   CONFIG.SR5 = SR5;
   CONFIG.Actor.entityClass = SR5Actor;
   CONFIG.Item.entityClass = SR5Item;
+
+  registerSystemSettings();
 
   // Register sheet application classes
   Actors.unregisterSheet("core", ActorSheet);

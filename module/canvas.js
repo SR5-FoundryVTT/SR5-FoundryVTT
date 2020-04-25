@@ -18,7 +18,13 @@ export const measureDistance = function(p0, p1, {gridSpaces=true}={}) {
   let nDiagonal = Math.min(nx, ny),
       nStraight = Math.abs(ny - nx);
 
-  let nd10 = Math.floor(nDiagonal / 2);
-  let spaces = (nd10 * 2) + (nDiagonal - nd10) + nStraight;
-  return spaces * canvas.dimensions.distance;
+  const diagonalRule = game.settings.get("shadowrun5e", "diagonalMovement")
+
+  if ( diagonalRule === "1-2-1") {
+    let nd10 = Math.floor(nDiagonal / 2);
+    let spaces = (nd10 * 2) + (nDiagonal - nd10) + nStraight;
+    return spaces * canvas.dimensions.distance;
+  } else {
+    return (nStraight + nDiagonal) * canvas.scene.data.gridDistance;
+  }
 };
