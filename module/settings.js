@@ -30,6 +30,14 @@ export const registerSystemSettings = () => {
     });
 
     /**
-     *
+     * Default limit behavior
      */
+    game.settings.register("shadowrun5e", "applyLimits", {
+        name: "SETTINGS.ApplyLimitsName",
+        description: "SETTINGS.ApplyLimitsDescription",
+        scope: "world",
+        config: true,
+        type: Boolean,
+        default: true,
+    });
 }

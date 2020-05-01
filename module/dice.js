@@ -1,14 +1,6 @@
 import { Helpers } from './helpers.js';
 import { SR5 } from './config.js';
 
-/**
- * @param {Event} event         The triggering event which initiated the roll
- * @param {Number} count        The number of d6's to roll
- * @param {Actor} actor         The actor making the d6 roll
- * @param {Number} limit        The limit for the roll -- leave undefined for no limit
- *
- */
-
 export class DiceSR {
   static d6({event, count, mod, actor, limit, limitMod, title="Roll", prefix, suffix, after, extended, matrix, dialogOptions, wounds=true}) {
     const roll = async (count, limit, explode) => {
@@ -78,6 +70,10 @@ export class DiceSR {
 
     let total = parseInt(count) || 0;
 
+    if (!game.settings.get("shadowrun5e", "applyLimits")) {
+      limit = undefined;
+    }
+
     if ((event && Helpers.hasModifiers(event))) {
       if (wounds) total -= wounds;
       if (mod) total += mod;
@@ -144,7 +140,7 @@ export class DiceSR {
               actor.update({"data.attributes.edge.value": actor.data.data.attributes.edge.value - 1});
             }
             let r = roll(total, edge ? undefined : limit, edge);
-            r.then(async r => {;
+            r.then(async r => {
               if (after) await after(r);
               if (extended) {
                 count -= 1;
