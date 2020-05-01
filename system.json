@@ -7,7 +7,7 @@
   "author": "n3rf_herder",
   "esmodules": ["shadowrun5e.js"],
   "scripts": [],
-  "styles": ["css/main.css", "css/actor.css", "css/config.css", "css/item.css"],
+  "styles": ["css/main.css", "css/actor.css", "css/config.css", "css/item.css", "css/chat.css"],
   "minimumCoreVersion": "0.5.2",
   "compatibleCoreVersion": "0.5.5",
   "languages": [
