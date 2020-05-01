@@ -6,6 +6,7 @@
     height: 100%;
     display: flex;
     flex-flow: column nowrap;
+    overflow: hidden;
   }
   .name {
     margin-bottom: 0;

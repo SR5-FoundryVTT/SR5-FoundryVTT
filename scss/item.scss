@@ -6,6 +6,7 @@
     height: 100%;
     display: flex;
     flex-flow: column nowrap;
+    overflow: hidden;
   }
   .sheetbody {
     overflow: hidden;
@@ -45,8 +46,8 @@
     .item-image {
       max-width: 100px;
       border-right: $groove;
-      margin-bottom: none;
-      padding-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
     }
     .item-info {
       flex: 1;

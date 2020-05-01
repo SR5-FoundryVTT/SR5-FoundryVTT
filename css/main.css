@@ -6,6 +6,7 @@
   height: 100%;
   display: flex;
   flex-flow: column nowrap;
+  overflow: hidden;
 }
 .sr5.item .sheetbody {
   overflow: hidden;
@@ -46,8 +47,8 @@
 .sr5.item .item-header .item-image {
   max-width: 100px;
   border-right: 1px solid #4d4d4d;
-  margin-bottom: none;
-  padding-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 .sr5.item .item-header .item-info {
   flex: 1;
@@ -149,6 +150,7 @@
   height: 100%;
   display: flex;
   flex-flow: column nowrap;
+  overflow: hidden;
 }
 .sr5.actor .name {
   margin-bottom: 0;
