@@ -139,6 +139,7 @@ export const migrateItemData = function(item) {
     const updateData = {};
 
     _migrateItemsAddActions(item, updateData);
+    _migrateItemsAddCapacity(item, updateData);
 
     // Return the migrated update data
     return updateData;
@@ -176,6 +177,14 @@ const _migrateActorOverflow = function(actor, updateData) {
     if (getProperty(actor.data, 'track.physical.overflow') === 0) {
         updateData['data.track.physical.overflow.value'] = 0;
         updateData['data.track.physical.overflow.max'] = 0;
+    }
+}
+
+const _migrateItemsAddCapacity = function(item, updateData) {
+    if (['cyberware'].includes(item.type)) {
+        if (item.data.capacity === undefined) {
+            updateData.data.capacity = 0;
+        }
     }
 }
 

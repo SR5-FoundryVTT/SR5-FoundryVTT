@@ -1,5 +1,11 @@
 @import "config.scss";
 
+.sr5.item-card {
+  .card-content {
+    font-size: 16px;
+  }
+}
+
 .dice-roll .dice-total {
   &.limit-hit {
     color: $roll-limit-hit;

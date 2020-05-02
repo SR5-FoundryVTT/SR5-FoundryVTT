@@ -325,6 +325,15 @@
   "SR5.InitCatAstral": "Astral",
   "SR5.InitCatMatrix": "Matrix",
 
+  "SR5.CyberwareGrade": "Grade",
+  "SR5.CyberwareGradeStandard": "Standard",
+  "SR5.CyberwareGradeAlpha": "Alphaware",
+  "SR5.CyberwareGradeBeta": "Betaware",
+  "SR5.CyberwareGradeDelta": "Deltaware",
+  "SR5.CyberwareGradeUsed": "Used",
+
+  "SR5.Capacity": "Capacity",
+
   "SETTINGS.DiagonalMovementName": "Diagonal Movement",
   "SETTINGS.DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
   "SETTINGS.IgnoreDiagonal": "Ignore Diagonal Movement (1-1-1)",

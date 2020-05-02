@@ -1,6 +1,18 @@
 <div class="flexcol flex0">
   <div class="technology">
-    {{#if data.essence}}
+    {{#hasprop data 'grade'}}
+    <div class="flexrow nowrap">
+      <label>{{localize "SR5.CyberwareGrade"}}</label>
+      <select name="data.grade" class="display">
+        {{#select data.grade}}
+        {{#each config.cyberwareGrades as |name type|}}
+        <option value="{{type}}">{{localize name}}</option>
+        {{/each}}
+        {{/select}}
+      </select>
+    </div>
+    {{/hasprop}}
+    {{#hasprop data 'essence'}}
     <div class="flexrow nowrap">
       <label>{{localize "SR5.EssenceCost"}}</label>
       <input
@@ -12,7 +24,20 @@
         data-dtype="Number"
         placeholder="0"/>
     </div>
-    {{/if}}
+    {{/hasprop}}
+    {{#hasprop data 'capacity'}}
+    <div class="flexrow nowrap">
+      <label>{{localize "SR5.Capacity"}}</label>
+      <input
+        class="display attribute-input"
+        type="text"
+        size="4"
+        name="data.capacity"
+        value="{{data.capacity}}"
+        data-dtype="Number"
+        placeholder="0"/>
+    </div>
+    {{/hasprop}}
     <div class="flexrow nowrap">
       <label>{{localize "SR5.Rating"}}</label>
       <input

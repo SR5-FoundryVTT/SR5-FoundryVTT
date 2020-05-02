@@ -127,6 +127,14 @@ SR5.deviceCategories = {
   "cyberdeck": "SR5.DeviceCatCyberdeck"
 };
 
+SR5.cyberwareGrades = {
+  "standard": "SR5.CyberwareGradeStandard",
+  "alpha": "SR5.CyberwareGradeAlpha",
+  "beta": "SR5.CyberwareGradeBeta",
+  "delta": "SR5.CyberwareGradeDelta",
+  "used": "SR5.CyberwareGradeUsed",
+};
+
 SR5.knowledgeSkillCategories = {
   "street": "SR5.KnowledgeSkillStreet",
   "academic": "SR5.KnowledgeSkillAcademic",

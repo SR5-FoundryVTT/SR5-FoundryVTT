@@ -89,6 +89,9 @@ export class SR5ItemSheet extends ItemSheet {
     }
 
     data.config = CONFIG.SR5;
+
+    console.log(data);
+
     return data;
   }
 

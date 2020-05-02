@@ -876,7 +876,7 @@
           "concealability": 0
         },
         "condition_monitor": {
-          "value": 9,
+          "value": 0,
           "max": 9
         }
       },
@@ -964,9 +964,10 @@
       "templates": ["description", "action", "technology", "weapon"]
     },
     "cyberware": {
-      "templates": ["description", "technology", "action"],
+      "templates": ["description", "technology", "action", "armor"],
       "essence": 0,
-      "grade": ""
+      "grade": "standard",
+      "capacity": 0
     },
     "adept_power": {
       "templates": ["description", "action", "armor"],

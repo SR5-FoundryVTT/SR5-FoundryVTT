@@ -132,30 +132,33 @@ export class SR5Item extends Item {
 
     data.properties = props.filter(p => !!p);
 
+
     return data;
   }
 
   _actionChatData(data, labels, props) {
-    if (data.action.limit.value) props.push(`Limit ${data.action.limit.value}`);
-    if (data.action.type) props.push(`${Helpers.label(data.action.type)} Action`);
-    if (data.action.skill) {
-      labels['roll'] = `${Helpers.label(data.action.skill)}+${Helpers.label(data.action.attribute)}`;
-    } else if (data.action.attribute2) {
-      labels['roll'] = `${Helpers.label(data.action.attribute)}+${Helpers.label(data.action.attribute2)}`;
-    }
-    if (data.action.damage.type) {
-      const damage = data.action.damage;
-      if (damage.value) props.push(`DV ${damage.value}${damage.type ? damage.type.toUpperCase().charAt(0) : ''}`);
-      if (damage.ap && damage.ap.value) props.push(`AP ${damage.ap.value}`);
-      if (damage.element) props.push(Helpers.label(damage.element));
-    }
-    if (data.action.opposed.type) {
-      const opposed = data.action.opposed;
-      if (opposed.type !== 'custom') labels['opposedRoll'] = `vs. ${Helpers.label(opposed.type)}`;
-      else if (opposed.skill) labels['opposedRoll'] = `vs. ${Helpers.label(opposed.skill)}+${Helpers.label(opposed.attribute)}`;
-      else if (opposed.attribute2) labels['opposedRoll'] = `vs. ${Helpers.label(opposed.attribute)}+${Helpers.label(opposed.attribute2)}`;
-      else if (opposed.attribute) labels['opposedRoll'] = `vs. ${Helpers.label(opposed.attribute)}`;
-      if (opposed.description) props.push(`Opposed Desc: ${opposed.desc}`);
+    if (data.action) {
+      if (data.action.limit.value) props.push(`Limit ${data.action.limit.value}`);
+      if (data.action.type) props.push(`${Helpers.label(data.action.type)} Action`);
+      if (data.action.skill) {
+        labels['roll'] = `${Helpers.label(data.action.skill)}+${Helpers.label(data.action.attribute)}`;
+      } else if (data.action.attribute2) {
+        labels['roll'] = `${Helpers.label(data.action.attribute)}+${Helpers.label(data.action.attribute2)}`;
+      }
+      if (data.action.damage.type) {
+        const damage = data.action.damage;
+        if (damage.value) props.push(`DV ${damage.value}${damage.type ? damage.type.toUpperCase().charAt(0) : ''}`);
+        if (damage.ap && damage.ap.value) props.push(`AP ${damage.ap.value}`);
+        if (damage.element) props.push(Helpers.label(damage.element));
+      }
+      if (data.action.opposed.type) {
+        const opposed = data.action.opposed;
+        if (opposed.type !== 'custom') labels['opposedRoll'] = `vs. ${Helpers.label(opposed.type)}`;
+        else if (opposed.skill) labels['opposedRoll'] = `vs. ${Helpers.label(opposed.skill)}+${Helpers.label(opposed.attribute)}`;
+        else if (opposed.attribute2) labels['opposedRoll'] = `vs. ${Helpers.label(opposed.attribute)}+${Helpers.label(opposed.attribute2)}`;
+        else if (opposed.attribute) labels['opposedRoll'] = `vs. ${Helpers.label(opposed.attribute)}`;
+        if (opposed.description) props.push(`Opposed Desc: ${opposed.desc}`);
+      }
     }
   }
 
@@ -193,8 +196,7 @@ export class SR5Item extends Item {
 
   _armorChatData(data, labels, props) {
     if (data.armor) {
-      if (data.armor.value) props.push(`Armor ${data.armor.value}`);
-      if (data.armor.mod) props.push('Accessory');
+      if (data.armor.value) props.push(`Armor ${data.armor.mod ? '+' : ''}${data.armor.value}`);
       if (data.armor.acid) props.push(`Acid ${data.armor.acid}`);
       if (data.armor.cold) props.push(`Cold ${data.armor.cold}`);
       if (data.armor.fire) props.push(`Fire ${data.armor.fire}`);
@@ -214,6 +216,8 @@ export class SR5Item extends Item {
   }
 
   _cyberwareChatData(data, labels, props) {
+    this._actionChatData(data, labels, props);
+    this._armorChatData(data, labels, props);
     if (data.essence) props.push(`Ess ${data.essence}`);
   }
 
@@ -231,6 +235,7 @@ export class SR5Item extends Item {
   }
 
   _qualityChatData(data, labels, props) {
+    this._actionChatData(data, labels, props);
     props.push(Helpers.label(data.type));
   }
 

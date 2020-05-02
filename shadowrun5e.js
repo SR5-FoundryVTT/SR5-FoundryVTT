@@ -152,6 +152,11 @@ Handlebars.registerHelper("concat", function(strs, c = ",") {
   }
   return strs;
 });
+Handlebars.registerHelper("hasprop", function(obj, prop, options) {
+  if(obj.hasOwnProperty(prop)) {
+    return options.fn(this);
+  } else return options.inverse(this);
+});
 Handlebars.registerHelper("ifin", function(val, arr, options) {
   if (arr.includes(val)) return options.fn(this);
   else return options.inverse(this);
