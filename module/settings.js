@@ -17,7 +17,7 @@ export const registerSystemSettings = () => {
      */
     game.settings.register("shadowrun5e", "diagonalMovement", {
         name: "SETTINGS.DiagonalMovementName",
-        description: "SETTINGS.DiagonalMovementDescription",
+        hint: "SETTINGS.DiagonalMovementDescription",
         scope: "world",
         config: true,
         type: String,
@@ -34,7 +34,7 @@ export const registerSystemSettings = () => {
      */
     game.settings.register("shadowrun5e", "applyLimits", {
         name: "SETTINGS.ApplyLimitsName",
-        description: "SETTINGS.ApplyLimitsDescription",
+        hint: "SETTINGS.ApplyLimitsDescription",
         scope: "world",
         config: true,
         type: Boolean,
