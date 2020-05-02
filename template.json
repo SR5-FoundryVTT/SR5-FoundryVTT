@@ -768,7 +768,10 @@
         "physical": {
           "value": 0,
           "max": 0,
-          "overflow": 0
+          "overflow": {
+            "value": 0,
+            "max": 0
+          }
         }
       }
     }

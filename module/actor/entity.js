@@ -11,7 +11,7 @@ export class SR5Actor extends Actor {
     for (let i of this.data.items) {
       let id = i._id;
       let item = this.getOwnedItem(id);
-      if (item.data.data.action) {
+      if (item && item.data.data.action) {
         item.update({});
       }
     }
@@ -243,7 +243,7 @@ export class SR5Actor extends Actor {
     const track = data.track;
     track.physical.max = 8 + Math.ceil(attrs.body.value / 2)
       + mods.physical_track;
-    track.physical.overflow = attrs.body;
+    track.physical.overflow.max = attrs.body.value;
     track.stun.max = 8 + Math.ceil(attrs.willpower.value / 2)
       + mods.stun_track;
 

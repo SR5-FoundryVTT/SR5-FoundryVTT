@@ -30,6 +30,7 @@
   "SR5.Wounds": "Wounds",
 
   "SR5.Movement": "Movement",
+  "SR5.Overflow": "Overflow",
   "SR5.Nuyen": "Nuyen",
   "SR5.Equipped": "Equipped",
 
@@ -325,6 +326,10 @@
   "SR5.InitCatMatrix": "Matrix",
 
   "SETTINGS.DiagonalMovementName": "Diagonal Movement",
+  "SETTINGS.DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
   "SETTINGS.IgnoreDiagonal": "Ignore Diagonal Movement (1-1-1)",
-  "SETTINGS.EstimateDiagonal": "Estimate Diagonal Movement (1-2-1)"
+  "SETTINGS.EstimateDiagonal": "Estimate Diagonal Movement (1-2-1)",
+
+  "SETTINGS.ApplyLimitsName": "Apply Limits to Rolls",
+  "SETTINGS.ApplyLimitsDescription": "Should limits be applied to roll"
 }

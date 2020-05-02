@@ -11,6 +11,7 @@ import { DiceSR } from './module/dice.js';
 import { preCombatUpdate, shadowrunCombatUpdate } from './module/combat.js';
 import { measureDistance } from './module/canvas.js';
 import * as chat from './module/chat.js';
+import * as migrations from './module/migration.js';
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -52,7 +53,7 @@ Hooks.on('canvasInit', function() {
   SquareGrid.prototype.measureDistance = measureDistance;
 });
 
-Hooks.on('ready', () => {
+Hooks.on('ready', function() {
   game.socket.on("system.shadowrun5e", data => {
     if (game.user.isGM && data.gmCombatUpdate) {
       shadowrunCombatUpdate(
@@ -62,6 +63,21 @@ Hooks.on('ready', () => {
     }
     console.log(data)
   });
+
+  // Determine whether a system migration is required and feasible
+  const currentVersion = game.settings.get("shadowrun5e", "systemMigrationVersion");
+  const NEEDS_MIGRATION_VERSION = 0.55;
+  const COMPATIBLE_MIGRATION_VERSION = 0;
+  let needMigration = (currentVersion < NEEDS_MIGRATION_VERSION) || (currentVersion === null);
+
+  // Perform the migration
+  if ( needMigration && game.user.isGM ) {
+    if ( currentVersion && (currentVersion < COMPATIBLE_MIGRATION_VERSION) ) {
+      ui.notifications.error(`Your Shadowrun5e system data is from too old a Foundry version and cannot be reliably migrated to the latest version. The process will be attempted, but errors may occur.`, {permanent: true});
+    }
+    migrations.migrateWorld();
+  }
+
 });
 
 Hooks.on('preUpdateCombat', preCombatUpdate);

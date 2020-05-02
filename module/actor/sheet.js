@@ -30,7 +30,7 @@ export class SR5ActorSheet extends ActorSheet {
 	  return mergeObject(super.defaultOptions, {
         classes: ["sr5", "sheet", "actor"],
         template: "systems/shadowrun5e/templates/actor/character.html",
-        width: 800,
+        width: 880,
         height: 690,
         tabs: [{navSelector: '.tabs', contentSelector: '.sheetbody', initial: 'skills'}]
     });
