@@ -964,7 +964,7 @@
       "templates": ["description", "action", "technology", "weapon"]
     },
     "cyberware": {
-      "templates": ["description", "technology"],
+      "templates": ["description", "technology", "action"],
       "essence": 0,
       "grade": ""
     },
@@ -976,7 +976,7 @@
       "level": 0
     },
     "quality": {
-      "templates": ["description"],
+      "templates": ["description", "action"],
       "type": "positive"
     },
     "action": {

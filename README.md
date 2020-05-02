@@ -50,7 +50,7 @@ Originally I planned on making a Grunt sheet, but quickly found myself just expa
 - Equipping items have certain effects.
   - Armor - Calculates Armor value
   - Device - Calculates Matrix attributes in the matrix tab
-  - Cyberware - Caluclates Essence attribute
+  - Cyberware - Calculates Essence attribute and have actions
 ### Magic Tab
 - Only shows if actor is set as Awakened
 - Powers and Spells are displayed here.
@@ -63,7 +63,7 @@ Originally I planned on making a Grunt sheet, but quickly found myself just expa
 - Metatype can be input here (no impact on the sheet)
 - Description is underneath
 #### Qualities
-- Just for descriptions and type
+- Has actions on the items
 - Rolls similar to Gear
 ### Social Tab
 - SIN, Lifestyles, and Contacts

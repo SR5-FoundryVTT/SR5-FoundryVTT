@@ -138,6 +138,8 @@ export const migrateActorData = function(actor) {
 export const migrateItemData = function(item) {
     const updateData = {};
 
+    _migrateItemsAddActions(item, updateData);
+
     // Return the migrated update data
     return updateData;
 };
@@ -174,5 +176,45 @@ const _migrateActorOverflow = function(actor, updateData) {
     if (getProperty(actor.data, 'track.physical.overflow') === 0) {
         updateData['data.track.physical.overflow.value'] = 0;
         updateData['data.track.physical.overflow.max'] = 0;
+    }
+}
+
+const _migrateItemsAddActions = function(item, updateData) {
+    if (['quality', 'cyberware'].includes(item.type)) {
+        if (item.data.action === undefined) {
+            const action = {
+                "type": "",
+                "category": "",
+                "attribute": "",
+                "attribute2": "",
+                "skill": "",
+                "spec": false,
+                "mod": 0,
+                "limit": {
+                    "value": 0,
+                    "attribute": ""
+                },
+                "extended": false,
+                "damage": {
+                    "type": "",
+                    "element": "",
+                    "value": 0,
+                    "ap": {
+                        "value": 0
+                    },
+                    "attribute": ""
+                },
+                "opposed": {
+                    "type": "",
+                    "attribute": "",
+                    "attribute2": "",
+                    "skill": "",
+                    "mod": 0,
+                    "description": ""
+                }
+            }
+            if (!updateData.data) updateData.data = {};
+            updateData.data.action = action;
+        }
     }
 }

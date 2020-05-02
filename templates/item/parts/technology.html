@@ -1,5 +1,18 @@
 <div class="flexcol flex0">
   <div class="technology">
+    {{#if data.essence}}
+    <div class="flexrow nowrap">
+      <label>{{localize "SR5.EssenceCost"}}</label>
+      <input
+        class="display attribute-input"
+        type="text"
+        size="4"
+        name="data.essence"
+        value="{{data.essence}}"
+        data-dtype="Number"
+        placeholder="0"/>
+    </div>
+    {{/if}}
     <div class="flexrow nowrap">
       <label>{{localize "SR5.Rating"}}</label>
       <input
