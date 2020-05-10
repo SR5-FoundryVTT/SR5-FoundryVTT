@@ -1,0 +1,57 @@
+<form class="{{cssClass}} wholesheet" autocomplete="off">
+    <div class="inventory">
+        <div class="item item-section">
+            <div class="item-left">
+                <div class="item-text item-name">
+                    {{localize "SR5.BaseValue"}}
+                </div>
+            </div>
+            <div class="item-right">
+                <div class="item-text rtg">
+                    <input
+                            class="display"
+                            type="text"
+                            value="{{data.base}}"
+                            name="data.base"
+                            placeholder="0"
+                            data-dtype="Number"/>
+                </div>
+            </div>
+        </div>
+        <div class="item item-section">
+            <div class="item-left">
+                <div class="item-text item-name">
+                    {{localize "SR5.Specializations"}}
+                </div>
+            </div>
+            <div class="item-right">
+                <div class="item-text item-icons rtg">
+                    <a class="add-spec">
+                        <i class="fas fa-plus"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-area">
+            {{#each data.specs as |spec id|}}
+            <div class="item">
+                <div class="item-left flex1">
+                    <input
+                            class='display'
+                            type='text'
+                            name='data.specs.{{id}}'
+                            value='{{spec}}'
+                            placeholder='{{localize "SR5.Specialization"}}' />
+                </div>
+                <div class="item-right">
+                    <div class="item-text item-icons rtg">
+                        <a class="remove-spec" title="Remove Specialization" data-spec="{{id}}">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+</form>

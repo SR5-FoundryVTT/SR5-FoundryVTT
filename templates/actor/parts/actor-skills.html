@@ -54,11 +54,13 @@
           </div>
         </div>
         <div class="item-right">
-          <div class="item-text skill-item">
+          <div class="item-text skill-spec-item">
             {{localize "SR5.Specializations"}}
           </div>
           <div class="item-text rtg">
             {{localize "SR5.Rtg"}}
+          </div>
+          <div class="item-text rtg">
           </div>
         </div>
       </div>
@@ -71,21 +73,24 @@
             </div>
           </div>
           <div class="item-right">
-            <div class="item-text skill-item">
+            <div class="item-text skill-spec-item">
               <input
                 class="display text"
                 type="text"
+                disabled
                 value="{{skill.specs}}"
-                name="data.skills.active.{{sid}}.specs" />
+                />
             </div>
             <div class="item-text rtg">
               <input
                 class="display"
                 type="text"
                 value="{{skill.value}}"
-                name="data.skills.active.{{sid}}.base"
-                placeholder="0"
+                disabled
                 data-dtype="Number"/>
+            </div>
+            <div class="item-text item-icons rtg">
+              <i class="skill-edit roll fas fa-edit" data-skill="{{sid}}"></i>
             </div>
           </div>
         </div>

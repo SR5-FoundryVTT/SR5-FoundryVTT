@@ -142,6 +142,17 @@
   border-color: #4d4d4d;
 }
 
+.sr5.skill-edit-window {
+  min-height: 200px;
+  min-width: 200px;
+}
+.sr5.skill-edit-window .wholesheet {
+  height: 100%;
+  display: flex;
+  flex-flow: column nowrap;
+  overflow: hidden;
+}
+
 .sr5.actor {
   min-height: 690px;
   min-width: 800px;
@@ -235,7 +246,7 @@
   cursor: pointer;
 }
 .sr5.actor .attributes .attribute .attribute-input-container {
-  align-text: center;
+  text-align: center;
   position: relative;
   margin-bottom: 2px;
 }
@@ -338,7 +349,7 @@
 
 .flexcol {
   display: flex;
-  flex-direction: col;
+  flex-direction: column;
   flex-wrap: nowrap;
 }
 .flexcol > * {
@@ -346,11 +357,11 @@
 }
 
 .align-items-center {
-  align-items: "center";
+  align-items: center;
 }
 
 .align-content-center {
-  align-content: "center";
+  align-content: center;
 }
 
 .flex0 {
@@ -678,7 +689,6 @@ select.display > option {
 .sr5 .inventory .item .item-text {
   width: 5em;
   margin: 0 0.1rem;
-  margin-bottom: 0;
   flex: 1 0 auto;
   text-align: center;
   height: 100%;
@@ -719,6 +729,9 @@ select.display > option {
 }
 .sr5 .inventory .item .skill-item {
   width: 8em;
+}
+.sr5 .inventory .item .skill-spec-item {
+  width: 15em;
 }
 .sr5 .inventory .item.skill-header:hover {
   text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;

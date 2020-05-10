@@ -39,7 +39,7 @@
 }
 .flexcol {
   display: flex;
-  flex-direction: col;
+  flex-direction: column;
   flex-wrap: nowrap;
 
   > * {
@@ -47,10 +47,10 @@
   }
 }
 .align-items-center {
-  align-items: 'center';
+  align-items: center;
 }
 .align-content-center {
-  align-content: 'center';
+  align-content: center;
 }
 .flex0 {
   flex: 0;
@@ -366,7 +366,6 @@ select.display {
       .item-text {
         width: 5em;
         margin: 0 .1rem;
-        margin-bottom: 0;
         flex: 1 0 auto;
         text-align: center;
         height: 100%;
@@ -407,6 +406,9 @@ select.display {
       }
       .skill-item {
         width: 8em;
+      }
+      .skill-spec-item {
+        width: 15em;
       }
       &.skill-header {
         @include rollable;

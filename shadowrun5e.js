@@ -20,7 +20,7 @@ import * as migrations from './module/migration.js';
 Hooks.once("init", function() {
   console.log("Loading Shadowrun 5e System");
 
-  // Create a D&D5E namespace within the game global
+  // Create a shadowrun5e namespace within the game global
   game.shadowrun5e = {
     SR5Actor,
     DiceSR,
@@ -66,15 +66,12 @@ Hooks.on('ready', function() {
 
   // Determine whether a system migration is required and feasible
   const currentVersion = game.settings.get("shadowrun5e", "systemMigrationVersion");
-  const NEEDS_MIGRATION_VERSION = 0.55;
-  const COMPATIBLE_MIGRATION_VERSION = 0;
-  let needMigration = (currentVersion < NEEDS_MIGRATION_VERSION) || (currentVersion === null);
+  // the latest version that requires migration
+  const NEEDS_MIGRATION_VERSION = "0.5.7";
+  let needMigration = (currentVersion === null) || (compareVersion(currentVersion, NEEDS_MIGRATION_VERSION) < 0);
 
   // Perform the migration
   if ( needMigration && game.user.isGM ) {
-    if ( currentVersion && (currentVersion < COMPATIBLE_MIGRATION_VERSION) ) {
-      ui.notifications.error(`Your Shadowrun5e system data is from too old a Foundry version and cannot be reliably migrated to the latest version. The process will be attempted, but errors may occur.`, {permanent: true});
-    }
     migrations.migrateWorld();
   }
 
@@ -96,6 +93,22 @@ Hooks.on("hotbarDrop", (bar, data, slot) => {
   createItemMacro(data.data, slot);
   return false;
 });
+
+// found at: https://helloacm.com/the-javascript-function-to-compare-version-number-strings/
+function compareVersion(v1, v2) {
+  if (typeof v1 !== 'string') return false;
+  if (typeof v2 !== 'string') return false;
+  v1 = v1.split('.');
+  v2 = v2.split('.');
+  const k = Math.min(v1.length, v2.length);
+  for (let i = 0; i < k; ++ i) {
+    v1[i] = parseInt(v1[i], 10);
+    v2[i] = parseInt(v2[i], 10);
+    if (v1[i] > v2[i]) return 1;
+    if (v1[i] < v2[i]) return -1;
+  }
+  return v1.length === v2.length ? 0: (v1.length < v2.length ? -1 : 1);
+}
 
 /**
  * Create a Macro from an Item drop.

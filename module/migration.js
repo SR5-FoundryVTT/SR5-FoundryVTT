@@ -55,6 +55,7 @@ export const migrateWorld = async function() {
     // Set the migration as complete
     game.settings.set("shadowrun5e", "systemMigrationVersion", game.system.data.version);
     ui.notifications.info(`Shadowrun5e System Migration to version ${game.system.data.version} completed!`, {permanent: true});
+    console.log(`Shadowrun5e System Migration to version ${game.system.data.version} completed!`);
 };
 
 /* -------------------------------------------- */
@@ -106,8 +107,9 @@ export const migrateCompendium = async function(pack) {
 export const migrateActorData = function(actor) {
     const updateData = {};
 
-    // Remove deprecated fields
     _migrateActorOverflow(actor, updateData);
+
+    _migrateActorSkills(actor, updateData);
 
     console.log(updateData);
 
@@ -178,6 +180,20 @@ const _migrateActorOverflow = function(actor, updateData) {
         updateData['data.track.physical.overflow.value'] = 0;
         updateData['data.track.physical.overflow.max'] = 0;
     }
+}
+
+const _migrateActorSkills = function(actor, updateData) {
+    const splitRegex = /[,\/|.]+/;
+
+    const skills = actor.data.skills.active;
+    updateData['data.skills.active'] = Object.entries(skills).reduce((running, [key, val]) => {
+        if (!Array.isArray(val.specs)) {
+            running[key] = {
+                specs: val.specs.split(splitRegex).filter(s => s !== '')
+            }
+        }
+        return running;
+    }, {});
 }
 
 const _migrateItemsAddCapacity = function(item, updateData) {

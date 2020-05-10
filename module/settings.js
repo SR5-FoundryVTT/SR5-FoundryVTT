@@ -8,8 +8,8 @@ export const registerSystemSettings = () => {
         name: "System Migration Version",
         scope: "world",
         config: false,
-        type: Number,
-        default: 0 // TODO change this to most recent version?
+        type: String,
+        default: "",
     });
 
     /**

@@ -1,6 +1,7 @@
-import { SR5 } from '../config.js';
 import { Helpers } from '../helpers.js';
 import { ChummerImportForm } from '../apps/chummer-import-form.js';
+import {SkillEditForm} from '../apps/skill-edit.js';
+
 /**
  * Extend the basic ActorSheet with some very simple modifications
  */
@@ -301,6 +302,7 @@ export class SR5ActorSheet extends ActorSheet {
     html.find('.remove-language').click(this._onRemoveLanguageSkill.bind(this));
     html.find('.import-character').click(this._onShowImportCharacter.bind(this));
     html.find('.reload-ammo').click(this._onReloadAmmo.bind(this));
+    html.find('.skill-edit').click(this._onShowEditSkill.bind(this));
     html.find('.matrix-att-selector').change(event => {
       let iid = this.data.matrix.device;
       let item = this.actor.getOwnedItem(iid);
@@ -441,7 +443,7 @@ export class SR5ActorSheet extends ActorSheet {
         for (let ite of this.actor.items) {
           if (ite.type === 'device') {
             await ite.update({"data.technology.equipped": false});
-          };
+          }
         }
       }
       await item.update({"data.technology.equipped": !itemData.technology.equipped});
@@ -574,6 +576,12 @@ export class SR5ActorSheet extends ActorSheet {
   _updateObject(event, formData) {
     // Update the Actor
     return this.object.update(formData);
+  }
+
+  _onShowEditSkill(event) {
+    event.preventDefault();
+    const skill = event.currentTarget.dataset.skill;
+    new SkillEditForm(this.actor, skill, {event: event}).render(true);
   }
 
   _onShowImportCharacter(event) {

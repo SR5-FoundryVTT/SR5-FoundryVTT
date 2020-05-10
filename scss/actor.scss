@@ -1,4 +1,14 @@
 @import "config.scss";
+.sr5.skill-edit-window {
+  min-height: 200px;
+  min-width: 200px;
+  .wholesheet {
+    height: 100%;
+    display: flex;
+    flex-flow: column nowrap;
+    overflow: hidden;
+  }
+}
 .sr5.actor {
   min-height: 690px;
   min-width: 800px;
@@ -86,7 +96,7 @@
         }
       }
       .attribute-input-container {
-        align-text: center;
+        text-align: center;
         position: relative;
         margin-bottom: 2px;
         .mod {
