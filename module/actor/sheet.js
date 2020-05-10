@@ -17,7 +17,7 @@ export class SR5ActorSheet extends ActorSheet {
      * Keep track of the currently active sheet tab
      * @type {string}
      */
-    this._shownUntrainedSkills = [];
+    this._shownUntrainedSkills = true;
     this._shownDesc = [];
   }
 
@@ -90,15 +90,23 @@ export class SR5ActorSheet extends ActorSheet {
     return data;
   }
 
+  _isSkillMagic(id, skill) {
+    return skill.attribute === 'magic'
+            || id === 'astral_combat'
+            || id === 'assensing';
+  }
+
   _prepareSkills(data) {
-    let remove = [];
+    const activeSkills = {};
     for (let [key, skill] of Object.entries(data.data.skills.active)) {
-      skill.css = skill.value > 0 ? '' : 'hidden';
-      if (key === 'magic' && data.data.special !== 'magic') remove.push(key);
-      if (key === 'resonance' && data.data.special !== 'resonance') remove.push(key);
+      if ((skill.value > 0 || this._shownUntrainedSkills)
+          && !(this._isSkillMagic(key, skill) && data.data.special !== 'magic')
+          && !(skill.attribute === 'resonance' && data.data.special !== 'resonance')) {
+        activeSkills[key] = skill;
+      }
     }
-    remove.forEach(key => delete data.data.skills.active[key]);
-    Helpers.orderKeys(data.data.skills.active);
+    Helpers.orderKeys(activeSkills);
+    data.data.skills.active = activeSkills;
   }
 
   _prepareItems(data) {
@@ -249,21 +257,11 @@ export class SR5ActorSheet extends ActorSheet {
     // });
 
     html.find('.hidden').hide();
-    this._shownUntrainedSkills.forEach(cat => {
-      const field = $(`[data-category='${cat}']`);
-      field.siblings('.item.hidden').show();
-    });
 
     html.find('.skill-header').click(event => {
       event.preventDefault();
-      const category = event.currentTarget.dataset.category;
-      let field = $(event.currentTarget).siblings('.item.hidden');
-      if (field.length === 0) {
-        field = $(event.currentTarget).siblings('.scroll-area').find('.item.hidden');
-      }
-      field.toggle();
-      if (field.is(':visible')) this._shownUntrainedSkills.push(category);
-      else this._shownUntrainedSkills = this._shownUntrainedSkills.filter(val => val !== category);
+      this._shownUntrainedSkills = !this._shownUntrainedSkills;
+      this._render();
     });
 
     html.find('.has-desc').click(event => {
