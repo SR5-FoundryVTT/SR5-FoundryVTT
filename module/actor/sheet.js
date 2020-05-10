@@ -1,6 +1,8 @@
 import {Helpers} from '../helpers.js';
 import {ChummerImportForm} from '../apps/chummer-import-form.js';
 import {SkillEditForm} from '../apps/skill-edit.js';
+import {KnowledgeSkillEditForm} from "../apps/knowledge-skill-edit.js";
+import {LanguageSkillEditForm} from "../apps/language-skill-edit.js";
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -310,6 +312,8 @@ export class SR5ActorSheet extends ActorSheet {
     html.find('.import-character').click(this._onShowImportCharacter.bind(this));
     html.find('.reload-ammo').click(this._onReloadAmmo.bind(this));
     html.find('.skill-edit').click(this._onShowEditSkill.bind(this));
+    html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
+    html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
     html.find('.matrix-att-selector').change(event => {
       let iid = this.data.matrix.device;
       let item = this.actor.getOwnedItem(iid);
@@ -393,36 +397,30 @@ export class SR5ActorSheet extends ActorSheet {
 
   async _onAddLanguageSkill(event) {
     event.preventDefault();
-    const data = duplicate(this.actor.data);
-    data.data.skills.language.value.push({name: '', specs: '', rating: 0});
-    this.actor.update(data);
+    this.actor.addLanguageSkill({name: ''});
+    //data.data.skills.language.value.push({name: '', specs: '', rating: 0});
   }
 
   async _onRemoveLanguageSkill(event) {
     event.preventDefault();
     const skillId = event.currentTarget.dataset.skill;
-    const data = duplicate(this.actor.data);
-    data.data.skills.language.value.splice(skillId, 1);
-    this.actor.update(data);
+    this.actor.removeLanguageSkill(skillId);
+    //data.data.skills.language.value.splice(skillId, 1);
   }
 
   async _onAddKnowledgeSkill(event) {
     event.preventDefault();
     const category = event.currentTarget.dataset.category;
-    const data = duplicate(this.actor.data);
-    const cat = data.data.skills.knowledge[category];
-    if (cat) cat.value.push({name: '', specs: '', rating: 0});
-    this.actor.update(data);
+    this.actor.addKnowledgeSkill(category);
+    // if (cat) cat.value.push({name: '', specs: '', rating: 0});
   }
 
   async _onRemoveKnowledgeSkill(event) {
     event.preventDefault();
     const skillId = event.currentTarget.dataset.skill;
     const category = event.currentTarget.dataset.category;
-    const data = duplicate(this.actor.data);
-    const cat = data.data.skills.knowledge[category];
-    if (cat) cat.value.splice(skillId, 1);
-    this.actor.update(data);
+    this.actor.removeKnowledgeSkill(skillId, category);
+    // if (cat) cat.value.splice(skillId, 1);
   }
 
   async _onChangeRtg(event) {
@@ -585,6 +583,19 @@ export class SR5ActorSheet extends ActorSheet {
     if (activeList.length) {
       this._scroll = activeList.prop('scrollTop');
     }
+  }
+
+  _onShowEditKnowledgeSkill(event) {
+    event.preventDefault();
+    const skill = event.currentTarget.dataset.skill;
+    const category = event.currentTarget.dataset.category;
+    new KnowledgeSkillEditForm(this.actor, skill, category, {event: event}).render(true);
+  }
+
+  _onShowEditLanguageSkill(event) {
+    event.preventDefault();
+    const skill = event.currentTarget.dataset.skill;
+    new LanguageSkillEditForm(this.actor, skill, {event: event}).render(true);
   }
 
   _onShowEditSkill(event) {

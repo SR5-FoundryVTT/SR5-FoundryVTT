@@ -1,9 +1,44 @@
 <form class="{{cssClass}} wholesheet" autocomplete="off">
     <div class="inventory">
+        {{#if editable_name}}
         <div class="item item-section">
             <div class="item-left">
                 <div class="item-text item-name">
-                    {{localize "SR5.BaseValue"}}
+                    {{localize "Name"}}
+                </div>
+            </div>
+            <div class="item-right">
+                <div class="item-text item-name">
+                    <input
+                        class="display"
+                        type="text"
+                        value="{{data.name}}"
+                        name="data.name" />
+                </div>
+            </div>
+        </div>
+        {{/if}}
+        <div class="item item-section">
+            <div class="item-left">
+                <div class="item-text item-name">
+                    {{localize "Total"}} {{localize "Value"}}
+                </div>
+            </div>
+            <div class="item-right">
+                <div class="item-text rtg">
+                    <input
+                            class="display"
+                            type="text"
+                            value="{{data.value}}"
+                            disabled
+                            data-dtype="Number"/>
+                </div>
+            </div>
+        </div>
+        <div class="item">
+            <div class="item-left">
+                <div class="item-text item-name">
+                    {{localize "Base"}} {{localize "Value"}}
                 </div>
             </div>
             <div class="item-right">
@@ -14,6 +49,24 @@
                             value="{{data.base}}"
                             name="data.base"
                             placeholder="0"
+                            data-dtype="Number"/>
+                </div>
+            </div>
+        </div>
+        <div class="item">
+            <div class="item-left">
+                <div class="item-text item-name">
+                    {{localize "Item"}} {{localize "Value"}}
+                </div>
+            </div>
+            <div class="item-right">
+                <div class="item-text rtg">
+                    <input
+                            class="display"
+                            type="text"
+                            value="{{data.item}}"
+                            disabled
+                            placeholder="-"
                             data-dtype="Number"/>
                 </div>
             </div>

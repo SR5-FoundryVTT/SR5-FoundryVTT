@@ -128,35 +128,42 @@ export class SR5Actor extends Actor {
       }
     }
 
-    const knowledgeSkills = data.skills.knowledge;
-    for (let [key, category] of Object.entries(knowledgeSkills)) {
-      if (typeof category.value === 'object') {
-        category.value = Object.values(category.value);
-      }
-    }
     const language = data.skills.language;
     if (language) {
-      if (!language.value) language.value = [];
-      if (typeof language.value === 'object') {
-        language.value = Object.values(language.value);
-      }
+      if (!language.value) language.value = {};
       language.attribute = 'intution';
     }
+
+
+
     for (let [label, skill] of Object.entries(data.skills.active)) {
       if (!skill.hidden) {
         if (!skill.mod) skill.mod = 0;
         skill.value = skill.base + skill.mod;
       }
     }
-    for (let skill of data.skills.language.value) {
+
+    {
+      const entries = Object.entries(data.skills.language.value);
+      // remove entries which are deleted TODO figure out how to delete these from the data
+      entries.forEach(([key, val]) => val._delete && delete data.skills.language.value[key]);
+    }
+
+    for (let skill of Object.values(data.skills.language.value)) {
       if (!skill.mod) skill.mod = 0;
       skill.value = skill.base + skill.mod;
     }
-    for (let group of Object.values(data.skills.knowledge)) {
-      for (let skill of group.value) {
+
+    for (let [category, group] of Object.entries(data.skills.knowledge)) {
+      const entries = Object.entries(group.value);
+      // remove entries which are deleted TODO figure out how to delete these from the data
+      group.value = entries.filter(([key, val]) => !val._delete).reduce((acc, [id, skill]) => {
         if (!skill.mod) skill.mod = 0;
         skill.value = skill.base + skill.mod;
-      }
+        acc[id] = skill;
+        return acc;
+      }, {});
+      console.log(group)
     }
 
     // TECHNOMANCER LIVING PERSONA
@@ -264,8 +271,7 @@ export class SR5Actor extends Actor {
       init.current = init.meatspace;
       init.perception = 'meatspace';
     }
-    // only apply dice mods if in meatspace (RAW)
-    init.current.dice.value = init.current.dice.base + (init.perception === 'meatspace' ? mods.initiative_dice : 0);
+    init.current.dice.value = init.current.dice.base + mods.initiative_dice;
     if (init.edge) init.current.dice.value = 5;
     init.current.dice.value = Math.min(5, init.current.dice.value); // maximum of 5d6 for initiative
     init.current.dice.text = `${init.current.dice.value}d6`;
@@ -325,6 +331,67 @@ export class SR5Actor extends Actor {
     }
 
     console.log(data);
+  }
+
+  addKnowledgeSkill(category, skill) {
+    const defaultSkill = {
+      name: '',
+      specs: [],
+      base: 0,
+      value: 0,
+      mod: 0
+    };
+    skill = {
+      ...defaultSkill,
+      ...skill
+    };
+
+    const id = randomID(16);
+    const value = {};
+    value[id] = skill;
+    const fieldName = `data.skills.knowledge.${category}.value`;
+    const updateData = {};
+    updateData[fieldName] = value;
+    this.update(updateData);
+  }
+
+  removeLanguageSkill(skillId) {
+    const value = {};
+    value[skillId] = {_delete: true};
+    this.update({'data.skills.language.value': value});
+  }
+
+  addLanguageSkill(skill) {
+    const defaultSkill = {
+      name: '',
+      specs: [],
+      base: 0,
+      value: 0,
+      mod: 0
+    };
+    skill = {
+      ...defaultSkill,
+      ...skill
+    };
+
+    const id = randomID(16);
+    const value = {};
+    value[id] = skill;
+    const fieldName = `data.skills.language.value`;
+    const updateData = {};
+    updateData[fieldName] = value;
+    this.update(updateData);
+  }
+
+  removeKnowledgeSkill(skillId, category) {
+    const value = {};
+    const updateData = {};
+
+    const dataString = `data.skills.knowledge.${category}.value`;
+    value[skillId] = {_delete: true};
+    updateData[dataString] = value;
+
+    this.update(updateData);
   }
 
   rollFade(options, incoming = -1) {

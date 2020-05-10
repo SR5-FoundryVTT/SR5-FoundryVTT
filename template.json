@@ -748,12 +748,12 @@
             },
             "interests": {
               "attribute": "intuition",
-              "value": []
+              "value": {}
             }
           },
           "language": {
             "attribute": "intuition",
-            "value": []
+            "value": {}
           }
         }
       }

@@ -27,9 +27,7 @@ export class SkillEditForm extends BaseEntitySheet {
         return `Edit Skill - ${game.i18n.localize(this.getData().data.label)}`;
     }
 
-    /** @override */
-    _updateObject(event, formData) {
-        const updateData = {};
+    _onUpdateObject(event, formData, updateData) {
         const base = formData['data.base'];
         const regex = /data\.specs\.(\d+)/;
         const specs = Object.entries(formData).reduce((running, [key, val]) => {
@@ -39,10 +37,19 @@ export class SkillEditForm extends BaseEntitySheet {
             }
             return running;
         }, []);
+
+        const currentData = updateData[this._updateString()] || {};
         updateData[this._updateString()] = {
+            ...currentData,
             base,
             specs,
         };
+    }
+
+    /** @override */
+    async _updateObject(event, formData) {
+        const updateData = {};
+        this._onUpdateObject(event, formData, updateData);
         this.entity.update(updateData);
     }
 
@@ -75,27 +82,11 @@ export class SkillEditForm extends BaseEntitySheet {
     }
 
     getData() {
-        const actorData = super.getData().entity;
-        const activeSkill = actorData.data.skills.active[this.skillId];
-        let label = '';
-        let item = 0;
-        let base = 0;
-        let specs = [];
-        if (activeSkill) {
-            specs = activeSkill.specs;
-            base = activeSkill.base;
-            item = activeSkill.item;
-            label = activeSkill.label;
-        }
-        const data = {
-            label,
-            base,
-            specs,
-            item,
-            skill: activeSkill
-        }
+        const actor = super.getData().entity;
+        const skill = getProperty(actor, this._updateString());
+        console.log(skill)
         return {
-            data
+            data: skill
         }
     }
 }

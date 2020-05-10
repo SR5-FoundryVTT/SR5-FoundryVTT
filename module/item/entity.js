@@ -502,7 +502,8 @@ export class SR5Item extends Item {
             if (fireMode) {
               title += ` - Defender (${Helpers.mapRoundsToDefenseDesc(fireMode)})`
             }
-            if (fireMode > rc) count -= (fireMode - rc);
+            // suppressing fire doesn't cause recoil
+            if (fireMode > rc && fireMode !== 20) count -= (fireMode - rc);
             DiceSR.d6({
               event: ev,
               count: count,
