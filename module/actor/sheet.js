@@ -1,5 +1,5 @@
-import { Helpers } from '../helpers.js';
-import { ChummerImportForm } from '../apps/chummer-import-form.js';
+import {Helpers} from '../helpers.js';
+import {ChummerImportForm} from '../apps/chummer-import-form.js';
 import {SkillEditForm} from '../apps/skill-edit.js';
 
 /**
@@ -19,6 +19,9 @@ export class SR5ActorSheet extends ActorSheet {
      */
     this._shownUntrainedSkills = true;
     this._shownDesc = [];
+    this._filters = {
+      skills: ''
+    };
   }
 
   /* -------------------------------------------- */
@@ -87,6 +90,8 @@ export class SR5ActorSheet extends ActorSheet {
     data.awakened = data.data.special === 'magic';
     data.emerged = data.data.special === 'resonance';
 
+    data.filters = this._filters;
+
     return data;
   }
 
@@ -96,10 +101,21 @@ export class SR5ActorSheet extends ActorSheet {
             || id === 'assensing';
   }
 
+  _doesSkillContainText(key, skill, text) {
+    let searchString = `${key} ${game.i18n.localize(skill.label)} ${skill.specs.join(' ')}`;
+    return searchString.toLowerCase().search(text.toLowerCase()) > -1;
+  }
+
   _prepareSkills(data) {
     const activeSkills = {};
     for (let [key, skill] of Object.entries(data.data.skills.active)) {
-      if ((skill.value > 0 || this._shownUntrainedSkills)
+      // if filter isn't empty, we are doing custom filtering
+      if (this._filters.skills !== '') {
+        if (this._doesSkillContainText(key, skill, this._filters.skills)) {
+          activeSkills[key] = skill;
+        }
+        // general check if we aren't filtering
+      } else if ((skill.value > 0 || this._shownUntrainedSkills)
           && !(this._isSkillMagic(key, skill) && data.data.special !== 'magic')
           && !(skill.attribute === 'resonance' && data.data.special !== 'resonance')) {
         activeSkills[key] = skill;
@@ -248,20 +264,12 @@ export class SR5ActorSheet extends ActorSheet {
   activateListeners(html) {
     super.activateListeners(html);
 
-    // Activate tabs
-    // let tabs = html.find('.tabs').filter('nav[data-group=primary]');
-    // let initial = this._sheetTab;
-    // new Tabs(tabs, {
-    //   initial: initial,
-    //   callback: clicked => this._sheetTab = clicked.data("tab")
-    // });
-
     html.find('.hidden').hide();
 
     html.find('.skill-header').click(event => {
       event.preventDefault();
       this._shownUntrainedSkills = !this._shownUntrainedSkills;
-      this._render();
+      this._render(true);
     });
 
     html.find('.has-desc').click(event => {
@@ -276,6 +284,7 @@ export class SR5ActorSheet extends ActorSheet {
       }
     });
 
+    html.find('#filter-skills').on('input', this._onFilterSkills.bind(this));
     html.find('.track-roll').click(this._onRollTrack.bind(this));
     html.find('.attribute-roll').click(this._onRollAttribute.bind(this));
     html.find('.skill-roll').click(this._onRollActiveSkill.bind(this));
@@ -355,6 +364,11 @@ export class SR5ActorSheet extends ActorSheet {
         item.addEventListener('dragstart', handler, false);
       }
     });
+  }
+
+  async _onFilterSkills(event) {
+    this._filters.skills = event.currentTarget.value;
+    this._render();
   }
 
   async _onReloadAmmo(event) {
@@ -538,10 +552,19 @@ export class SR5ActorSheet extends ActorSheet {
   /**
    * @private
    */
-  async _render (force = false, options = {}) {
+  async _render (...args) {
+    let focus = this.element.find(':focus');
+    focus = focus.length ? focus[0] : null;
+
     this._saveScrollPositions();
-    await super._render(force, options);
+    await super._render(...args);
     this._restoreScrollPositions();
+
+    if (focus && focus.name) {
+      this.form[focus.name].focus();
+      // set the selection range on the focus formed from before (keeps track of cursor in input)
+      this.form[focus.name].setSelectionRange(focus.selectionStart, focus.selectionEnd);
+    }
   }
 
   /**
@@ -562,18 +585,6 @@ export class SR5ActorSheet extends ActorSheet {
     if (activeList.length) {
       this._scroll = activeList.prop('scrollTop');
     }
-  }
-
-  /* -------------------------------------------- */
-
-  /**
-   * Implement the _updateObject method as required by the parent class spec
-   * This defines how to update the subject of the form when the form is submitted
-   * @private
-   */
-  _updateObject(event, formData) {
-    // Update the Actor
-    return this.object.update(formData);
   }
 
   _onShowEditSkill(event) {

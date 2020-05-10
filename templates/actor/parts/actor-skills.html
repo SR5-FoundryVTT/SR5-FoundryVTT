@@ -64,6 +64,18 @@
           </div>
         </div>
       </div>
+      <div class="item">
+        <div class="item-text skill-spec-item">
+          <input
+                  id="filter-skills"
+                  class="display text left"
+                  type="text"
+                  value="{{filters.skills}}"
+                  name="filters.skills"
+                  placeholder="Filter..."
+          />
+        </div>
+      </div>
       <div class="scroll-area left light-border-right">
         {{#each data.skills.active as |skill sid|}}
         <div class="item {{skill.css}}">
