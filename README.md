@@ -91,7 +91,8 @@ All Items have similar setup to them. The sheet doesn't force the attribute for 
 ### Opposed Test
 - What kind of test the opposition has to make, leave blank if none
 ## Chummer Import
-Chummer Import should be considered Experimental
+Chummer Import should be considered Experimental.
+The importer itself is found in the 'Misc' tab on the character sheet.
 ### A few rules to follow
 **The Import Is Not Perfect**
 - Cleanup is needed, mostly on weapons.
