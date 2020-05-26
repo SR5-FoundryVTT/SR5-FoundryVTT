@@ -191,17 +191,31 @@ export class ChummerImportForm extends FormApplication {
             if (s.rating > 0 && s.islanguage) {
               let group = "active";
               let skill = null;
+              const id = randomID(16);
               if (s.islanguage && s.islanguage.toLowerCase() === "true") {
                 skill = {};
-                update.skills.language.value[skill.id] = skill;
+                update.skills.language.value[id] = skill;
                 group = "language";
               } else if (s.knowledge && s.knowledge.toLowerCase() === "true") {
+                const category = s.skillcategory_english;
+                console.log(category);
                 skill = {};
-                if (s.attribute.toLowerCase() === "int") {
-                  update.skills.knowledge.street.value[skill.id] = skill;
-                }
-                if (s.attribute.toLowerCase() === "log") {
-                  update.skills.knowledge.professional.value[skill.id] = skill;
+                let skillCategory = undefined;
+                if (category) {
+                  console.log('found category', category);
+                  const cat = category.toLowerCase();
+                  if (cat === 'street') skillCategory = update.skills.knowledge.street.value;
+                  if (cat === 'academic') skillCategory = update.skills.knowledge.academic.value;
+                  if (cat === 'professional') skillCategory = update.skills.knowledge.professional.value;
+                  if (cat === 'interests') skillCategory = update.skills.knowledge.interests.value;
+                  if (skillCategory) skillCategory[id] = skill;
+                } else {
+                  if (s.attribute.toLowerCase() === "int") {
+                    update.skills.knowledge.street.value[id] = skill;
+                  }
+                  if (s.attribute.toLowerCase() === "log") {
+                    update.skills.knowledge.professional.value[id] = skill;
+                  }
                 }
                 group = "knowledge";
               } else {
@@ -214,8 +228,7 @@ export class ChummerImportForm extends FormApplication {
                 if (group !== 'active') skill.name = s.name;
                 skill.base = parseInt(s.rating);
                 if (s.skillspecializations) {
-                  let spec = getArray(s.skillspecializations.skillspecialization.name);
-                  skill.specs = spec.join('/');
+                  skill.specs = getArray(s.skillspecializations.skillspecialization.name);
                 }
               }
             }
