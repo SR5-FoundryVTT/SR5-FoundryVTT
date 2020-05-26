@@ -42,8 +42,8 @@ export const shadowrunCombatUpdate = async (changes, options) => {
       });
     }
   }
-  await combat.deleteManyEmbeddedEntities('Combatant', removedCombatants.map(c => c._id), {});
-  await combat.updateManyEmbeddedEntities('Combatant', combatants, {});
+  await combat.deleteEmbeddedEntity('Combatant', removedCombatants.map(c => c._id), {});
+  await combat.updateEmbeddedEntity('Combatant', combatants, {});
   if (combatants.length === 0) {
     const messages = [];
     const messageOptions = options.messageOptions || {};
@@ -73,8 +73,8 @@ export const shadowrunCombatUpdate = async (changes, options) => {
       else chatData.sound = null;
       messages.push(chatData);
     }
-    await combat.createManyEmbeddedEntities('Combatant', removedCombatants, {});
-    await ChatMessage.createMany(messages);
+    await combat.createEmbeddedEntity('Combatant', removedCombatants, {});
+    await ChatMessage.create(messages);
     await combat.unsetFlag('shadowrun5e', 'removedCombatants');
     await combat.resetAll();
     await combat.rollAll();

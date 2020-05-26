@@ -84,15 +84,6 @@ export class ChummerImportForm extends FormApplication {
         return l || ['0'];
       }
 
-	  const getValInParen = (value) => {
-		// regex to capture value inside () or single number
-		let l = value.match(/([0-9]+)(?:([0-9]+))*/g);
-		if (l != null) {
-		  return (l.length > 1 ? l[1] : l[0])
-		} else {
-		  return value;
-		}
-	  };
 	  const getArray = (value) => {
         return Array.isArray(value) ? value : [value];
       }
@@ -202,15 +193,15 @@ export class ChummerImportForm extends FormApplication {
               let skill = null;
               if (s.islanguage && s.islanguage.toLowerCase() === "true") {
                 skill = {};
-                update.skills.language.value.push(skill);
+                update.skills.language.value[skill.id] = skill;
                 group = "language";
               } else if (s.knowledge && s.knowledge.toLowerCase() === "true") {
                 skill = {};
                 if (s.attribute.toLowerCase() === "int") {
-                  update.skills.knowledge.street.value.push(skill);
+                  update.skills.knowledge.street.value[skill.id] = skill;
                 }
                 if (s.attribute.toLowerCase() === "log") {
-                  update.skills.knowledge.professional.value.push(skill);
+                  update.skills.knowledge.professional.value[skill.id] = skill;
                 }
                 group = "knowledge";
               } else {
@@ -394,7 +385,7 @@ export class ChummerImportForm extends FormApplication {
                   } else if (mod.name.toLowerCase().includes("radiation shielding")) {
                     armor.radiation += parseInt(mod.rating);
                   }
-                  if (mod.rating != "") {
+                  if (mod.rating !== "") {
                     modDesc.push(mod.name + " R" + mod.rating);
                   } else {
                     modDesc.push(mod.name);
@@ -613,7 +604,7 @@ export class ChummerImportForm extends FormApplication {
         }
       };
       await this.object.update(updateData);
-      await this.object.createManyEmbeddedEntities("OwnedItem", items);
+      await this.object.createEmbeddedEntity("OwnedItem", items);
       ui.notifications.info('Complete! Check everything. Notably: Ranged weapon mods and ammo; Strength based weapon damage; Specializations on all spells, powers, and weapons;');
       this.close();
     });
