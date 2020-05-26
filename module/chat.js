@@ -2,7 +2,7 @@ import { SR5Actor } from './actor/entity.js';
 
 export const highlightSuccessFailure = function(message, html, data) {
     if (!message) return;
-    if (!message.isRollVisible || !message.roll.parts.length ) return;
+    if (!message.isContentVisible || !message.roll.parts.length ) return;
     const roll = message.roll;
     if (!roll.parts.length) return;
     if (!roll.parts[0].rolls) return;
