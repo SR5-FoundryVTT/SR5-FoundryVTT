@@ -431,6 +431,19 @@ label.checkbox .checkmark {
   left: 0.8em;
 }
 
+button.plus1_button {
+  padding: 2px;
+  color: black;
+  line-height: 0;
+  flex: 0;
+  background: rgba(230, 230, 230, 0.1);
+  border-radius: 0.3em;
+  text-align: center;
+}
+button.plus1_button:hover {
+  cursor: pointer;
+}
+
 button.display {
   color: white;
   border-color: black;

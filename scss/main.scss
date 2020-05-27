@@ -115,6 +115,19 @@ label.checkbox {
   }
 }
 
+button.plus1_button {
+  padding: 2px;
+  color: $black;
+  line-height: 0;
+  flex: 0;
+  background: rgba($light, 0.1);
+  border-radius: .3em;
+  text-align: center;
+  &:hover {
+    cursor: pointer;
+  }
+}
+
 button.display {
   color: $color;
   border-color: $black;

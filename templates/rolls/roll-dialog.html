@@ -1,14 +1,22 @@
-<form>
-  <div class='form-group'>
-    <label>Dice Pool</label>
-    <input style='flex: 1' type='text' name='dice_pool' size='3' maxlength='3' value='{{dice_pool}}' {{#unless options.prompt}}disabled{{/unless}} data-dtype="Number"/>
-    {{#unless options.prompt}}<input style='flex: 1' type='text' name='mod' value='{{mod}}' placeholder='+Modifiers' data-dtype="Number"/>{{/unless}}
+<form class="sr5">
+  <div>
+    {{#if base}}<span>{{localize "SR5.Base"}}</span> (<span style="font-weight: bold">{{base}}</span>){{/if}}
+    {{#each mods as |mod id|}}
+    <span>{{localize id}}</span> (<span style="font-weight: bold">{{mod}}</span>)
+    {{/each}}
+  </div>
+  <div class="form-group">
+    <label style="font-weight: bold">{{localize "SR5.DicePool"}}</label>
+    <input style='flex: 1' type='text' name='dice_pool' size='3' maxlength='3' value='{{dice_pool}}' data-dtype="Number" {{#unless options.prompt}} disabled {{/unless}} />
+  </div>
+  <div class="form-group">
+    <label>{{localize "SR5.SituationalModifier"}}</label>
+    <input style='flex: 1' type='text' name='dp_mod' size='3' maxlength='3' value='{{dp_mod}}' data-dtype="Number" placeholder="+/- mod"/>
   </div>
   {{#if limit}}
   <div class='form-group'>
     <label>Limit</label>
-    <input style='flex: 1' type='text' name='limit' size='3' maxlength='3' value='{{limit}}' {{#unless options.prompt}}disabled{{/unless}} data-dtype="Number"/>
-    {{#unless options.prompt}}<input style='flex: 1' type='text' name='limit_mod' size='3' maxlength='3' value='{{limit_mod}}' placeholder='+LimitMod' data-dtype="Number"/>{{/unless}}
+    <input style='flex: 1' type='text' name='limit' size='3' maxlength='3' value='{{limit}}' data-dtype="Number"/>
   </div>
   {{/if}}
   {{#if wounds}}

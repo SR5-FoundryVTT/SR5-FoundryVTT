@@ -185,15 +185,22 @@ const _migrateActorOverflow = function(actor, updateData) {
 const _migrateActorSkills = function(actor, updateData) {
     const splitRegex = /[,\/|.]+/;
 
-    const skills = actor.data.skills.active;
-    updateData['data.skills.active'] = Object.entries(skills).reduce((running, [key, val]) => {
+    const reducer = (running, [key, val]) => {
         if (!Array.isArray(val.specs)) {
             running[key] = {
                 specs: val.specs.split(splitRegex).filter(s => s !== '')
             }
         }
         return running;
-    }, {});
+    };
+
+    // TODO verify this works
+    updateData['data.skills.active'] = Object.entries(actor.data.skills.active).reduce(reducer, {});
+    updateData['data.skills.knowledge.street.value'] = Object.entries(actor.data.skills.knowledge.street.value).reduce(reducer, {});
+    updateData['data.skills.knowledge.professional.value'] = Object.entries(actor.data.skills.knowledge.professional.value).reduce(reducer, {});
+    updateData['data.skills.knowledge.academic.value'] = Object.entries(actor.data.skills.knowledge.academic.value).reduce(reducer, {});
+    updateData['data.skills.knowledge.interests.value'] = Object.entries(actor.data.skills.knowledge.interests.value).reduce(reducer, {});
+    updateData['data.skills.language.value'] = Object.entries(actor.data.skills.language.value).reduce(reducer, {});
 }
 
 const _migrateItemsAddCapacity = function(item, updateData) {

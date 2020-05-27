@@ -291,7 +291,7 @@ export class SR5Item extends Item {
         const mult = data.thrown.ranges.attribute && this.actor ? this.actor.data.data.attributes[data.thrown.ranges.attribute].value : 1;
         const ranges = [data.thrown.ranges.short, data.thrown.ranges.medium, data.thrown.ranges.long, data.thrown.ranges.extreme];
         props.push(ranges.map(v => v * mult).join('/'));
-      };
+      }
       const blast = data.thrown.blast;
       if (blast.value) props.push(`Radius ${blast.radius}m`);
       if (blast.dropoff) props.push(`Dropoff ${blast.dropoff}/m`);
@@ -426,15 +426,17 @@ export class SR5Item extends Item {
     let attribute = actorData.attributes[itemData.action.attribute];
     let attribute2 = actorData.attributes[itemData.action.attribute2];
     let limit = itemData.action.limit.value;
-    let spec = itemData.action.spec ? 2 : 0;
     let mod = parseInt(itemData.action.mod || 0) + parseInt(itemData.action.alt_mod || 0);
 
     // only check if attribute2 is set if skill is not set
-    let count = 0;
-    if (skill) count = skill.value + attribute.value;
-    else if (attribute2) count = attribute.value + attribute2.value;
-    else if (attribute) count = attribute.value;
-    count += spec + mod;
+    let mods = {};
+    if (attribute) mods[attribute.label] = attribute.value;
+    if (skill) mods[skill.label] = skill.value;
+    else if (attribute2) mods[attribute2.label] = attribute2.value;
+
+    // TODO change item to allow selecting specialization type
+    if (itemData.action.spec) mods['SR5.Specialization'] = 2;
+    if (mod) mods['SR5.ItemMod'] = mod;
 
     let title = this.data.name;
 
@@ -456,7 +458,7 @@ export class SR5Item extends Item {
         if (modes.full_auto) {
           fireModes["6"] = `${modes.burst_fire ? 'LB/' : ''}FA(s)`;
           fireModes["10"] = "FA(c)";
-          fireModes["20"] = "Supp";
+          fireModes["20"] = game.i18n.localize("SR5.Suppressing");
         }
       }
 
@@ -464,7 +466,6 @@ export class SR5Item extends Item {
       let fireMode = attack.fireMode;
       let rc = parseInt(itemData.range.rc.value) + parseInt(actorData.recoil_compensation);
       let dialogData = {
-        dice_pool: count,
         fireModes: fireModes,
         fireMode: fireMode,
         rc: rc,
@@ -503,30 +504,32 @@ export class SR5Item extends Item {
               title += ` - Defender (${Helpers.mapRoundsToDefenseDesc(fireMode)})`
             }
             // suppressing fire doesn't cause recoil
-            if (fireMode > rc && fireMode !== 20) count -= (fireMode - rc);
-            DiceSR.d6({
+            if (fireMode > rc && fireMode !== 20) {
+              mods['SR5.BulletCount'] = -fireMode;
+              mods['SR5.RecoilCompensation'] = rc;
+            }
+            DiceSR.rollTest({
               event: ev,
-              count: count,
+              mods,
               actor: this.actor,
               limit: limit,
               title: title,
               dialogOptions: {
                 environmental: environmental
               },
-              after: async (roll) => {
-                const dupData = duplicate(this.data);
-                const ammo = dupData.data.range.ammo;
-                let ammoValue = Math.max(0, ammo.value - fireMode);
-                await this.update({"data.range.ammo.value": ammoValue});
-                this.setFlag('shadowrun5e', 'attack', {
-                  hits: roll.total,
-                  fireMode: fireMode,
-                  damageType: dupData.data.action.damage.type,
-                  element: dupData.data.action.damage.element,
-                  damage: dupData.data.action.damage.value,
-                  ap: dupData.data.action.damage.ap.value
-                });
-              }
+            }).then(async (roll) => {
+              const dupData = duplicate(this.data);
+              const ammo = dupData.data.range.ammo;
+              let ammoValue = Math.max(0, ammo.value - fireMode);
+              await this.update({"data.range.ammo.value": ammoValue});
+              this.setFlag('shadowrun5e', 'attack', {
+                hits: roll.total,
+                fireMode: fireMode,
+                damageType: dupData.data.action.damage.type,
+                element: dupData.data.action.damage.element,
+                damage: dupData.data.action.damage.value,
+                ap: dupData.data.action.damage.ap.value
+              });
             });
           }
         }).render(true);
@@ -557,28 +560,27 @@ export class SR5Item extends Item {
             const force = parseInt(html.find('[name=force]').val());
             console.log(force);
             limit = force;
-            DiceSR.d6({
+            DiceSR.rollTest({
               event: ev,
               environmental: true,
-              count: count,
+              mods,
               actor: this.actor,
               limit: limit,
               title: title,
-              after: async (roll) => {
-                if (this.data.data.category === 'combat') {
-                  let damage = force;
-                  let ap = -force;
-                  this.setFlag('shadowrun5e', 'attack', {
-                    hits: roll.total,
-                    damageType: this.data.data.action.damage.type,
-                    element: this.data.data.action.damage.element,
-                    damage: damage,
-                    ap: ap
-                  });
-                }
-                const drain = Math.max(itemData.drain + force + (reckless ? 3 : 0), 2);
-                this.actor.rollDrain({event: ev}, drain);
+            }).then(async (roll) => {
+              if (this.data.data.category === 'combat') {
+                let damage = force;
+                let ap = -force;
+                this.setFlag('shadowrun5e', 'attack', {
+                  hits: roll.total,
+                  damageType: this.data.data.action.damage.type,
+                  element: this.data.data.action.damage.element,
+                  damage: damage,
+                  ap: ap
+                });
               }
+              const drain = Math.max(itemData.drain + force + (reckless ? 3 : 0), 2);
+              this.actor.rollDrain({event: ev}, drain);
             });
           }
         }).render(true);
@@ -604,34 +606,32 @@ export class SR5Item extends Item {
             if (cancel) return;
             const level = parseInt(html.find('[name=level]').val());
             limit = level;
-            DiceSR.d6({
+            DiceSR.rollTest({
               event: ev,
               environmental: true,
-              count: count,
+              mods,
               actor: this.actor,
               limit: limit,
               title: title,
-              after: (roll) => {
-                const fade = Math.max(itemData.fade + level, 2);
-                this.actor.rollFade({event: ev}, fade);
-              }
+            }).then(() => {
+              const fade = Math.max(itemData.fade + level, 2);
+              this.actor.rollFade({event: ev}, fade);
             });
           }
         }).render(true);
       });
     } else {
-      return DiceSR.d6({
+      return DiceSR.rollTest({
         event: ev,
-        count: count,
+        mods,
         environmental: true,
         actor: this.actor,
         limit: limit,
         title: title,
-        after: async (roll) => {
-          this.setFlag('shadowrun5e', 'action', {
-            hits: roll.total
-          });
-        }
+      }).then(async (roll) => {
+        this.setFlag('shadowrun5e', 'action', {
+          hits: roll.total
+        });
       });
     }
   }
@@ -686,7 +686,7 @@ export class SR5Item extends Item {
     $(html).find('.card-content').hide();
   }
 
- static _getChatCardTargets(card) {
+ static _getChatCardTargets() {
     const character = game.user.character;
     const controlled = canvas.tokens.controlled;
     const targets = controlled.reduce((arr, t) => t.actor ? arr.concat([t.actor]) : arr, []);
