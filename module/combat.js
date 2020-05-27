@@ -65,7 +65,7 @@ export const shadowrunCombatUpdate = async (changes, options) => {
           token: c.token._id,
           alias: c.token.name
         },
-        flavor: `${c.token.name} rolls for Initative!`
+        flavor: `${c.token.name} rolls for Initiative!`
       }, messageOptions);
       const chatData = roll.toMessage(messageData, {rollMode, create: false});
       // only make the sound once
@@ -81,5 +81,6 @@ export const shadowrunCombatUpdate = async (changes, options) => {
     await combat.update({turn: 0});
   } else if (removedCombatants.length) {
     await combat.setFlag('shadowrun5e', 'removedCombatants', removedCombatants);
+    await combat.update({turn: 0});
   }
 };
