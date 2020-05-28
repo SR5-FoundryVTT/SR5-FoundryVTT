@@ -199,6 +199,17 @@ select.display {
 }
 
 .sr5 {
+  &.roll-dialog {
+    .mods-list {
+      display: flex;
+      flex-flow: row wrap;
+      justify-content: center;
+      align-items: center;
+      > * {
+        margin: 0 .5em;
+      }
+    }
+  }
   .window-content {
     font-size: 115%;
     background: $sheetbackground;

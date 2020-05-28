@@ -1,8 +1,14 @@
-<form class="sr5">
-  <div>
-    {{#if base}}<span>{{localize "SR5.Base"}}</span> (<span style="font-weight: bold">{{base}}</span>){{/if}}
+<form class="sr5 roll-dialog">
+  <div class="mods-list">
+    {{#if base}}
+    <div class="flex0" style="white-space: nowrap">
+      <span>{{localize "SR5.Base"}}</span> (<span style="font-weight: bold">{{base}}</span>)
+    </div>
+    {{/if}}
     {{#each mods as |mod id|}}
-    <span>{{localize id}}</span> (<span style="font-weight: bold">{{mod}}</span>)
+    <div class="flex0" style="white-space: nowrap">
+      <span>{{localize id}}</span> (<span style="font-weight: bold">{{mod}}</span>)
+    </div>
     {{/each}}
   </div>
   <div class="form-group">

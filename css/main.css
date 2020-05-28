@@ -515,6 +515,15 @@ select.display > option {
   background-color: #4d4d4d;
 }
 
+.sr5.roll-dialog .mods-list {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  align-items: center;
+}
+.sr5.roll-dialog .mods-list > * {
+  margin: 0 0.5em;
+}
 .sr5 .window-content {
   font-size: 115%;
   background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("../ui/brushed_metal.jpg") repeat;
