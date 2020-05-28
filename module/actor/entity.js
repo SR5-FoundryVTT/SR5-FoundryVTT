@@ -1,6 +1,6 @@
-import { DiceSR } from '../dice.js';
-import { Helpers } from '../helpers.js';
-import { SR5 } from '../config.js';
+import {DiceSR} from '../dice.js';
+import {Helpers} from '../helpers.js';
+import {SR5} from '../config.js';
 
 export class SR5Actor extends Actor {
 
@@ -395,12 +395,19 @@ export class SR5Actor extends Actor {
   }
 
   rollFade(options, incoming = -1) {
-    const resist = this.data.data.rolls.fade;
+    const wil = this.data.data.attributes.willpower;
+    const res = this.data.data.attributes.resonance;
+
+    const mods = {};
+    mods[wil.label] = wil.value;
+    mods[res.label] = res.value;
+    if (data.modifiers.fade) mods['SR5.Bonus'] = data.modifiers.fade;
+
     let title = "Fade";
     if (incoming >= 0) title += ` (${incoming} incoming)`;
     DiceSR.rollTest({
       event: options.event,
-      base: resist,
+      mods,
       actor: this,
       title: title,
       wounds: false
@@ -408,12 +415,19 @@ export class SR5Actor extends Actor {
   }
 
   rollDrain(options, incoming = -1) {
-    const resist = this.data.data.rolls.drain;
+    const wil = this.data.data.attributes.willpower;
+    const drainAtt = this.data.data.attributes[this.data.data.magic.attribute];
+
+    const mods = {};
+    mods[wil.label] = wil.value;
+    mods[drainAtt.label] = drainAtt.value;
+    if (this.data.data.modifiers.drain) mods['SR5.Bonus'] = this.data.data.modifiers.drain;
+
     let title = 'Drain';
     if (incoming >= 0) title += ` (${incoming} incoming)`;
     DiceSR.rollTest({
       event: options.event,
-      base: resist,
+      mods,
       actor: this,
       title: title,
       wounds: false
@@ -422,10 +436,12 @@ export class SR5Actor extends Actor {
 
   rollArmor(options) {
     const armor = this.data.data.armor.value;
+    const mods = {};
+    mods["SR5.Armor"] = armor;
     return DiceSR.rollTest({
       event: options.event,
       actor: this,
-      base: armor,
+      mods,
       title: 'Armor',
       wounds: false
     });
@@ -458,16 +474,23 @@ export class SR5Actor extends Actor {
           default: 'normal',
           close: html => {
             if (cancel) return;
-            let count = parseInt(html.find('[name=defense]').val());
+            const rea = this.data.data.attributes.reaction;
+            const int = this.data.data.attributes.intuition;
+
+            const mods = {};
+            mods[rea.label] = rea.value;
+            mods[int.label] = int.value;
+            if (this.data.data.modifiers.defense) mods['SR5.Bonus'] = this.data.data.modifiers.defense;
+
             let fireMode = parseInt(html.find('[name=fireMode]').val());
             let cover = parseInt(html.find('[name=cover]').val());
-            const mods = {};
-            mods['SR5.Defense'] = count;
+
             if (special === 'full_defense') mods['SR5.FullDefense'] = this.data.data.attributes.willpower.value;
             if (special === 'dodge') mods['SR5.Dodge'] = this.data.data.skills.active.gymnastics.value;
             if (special === 'block') mods['SR5.Block'] = this.data.data.skills.active.unarmed_combat.value;
             if (fireMode) mods['SR5.FireMode'] = fireMode;
             if (cover) mods['SR5.Cover'] = cover;
+
             return DiceSR.rollTest({
               event: options.event,
               actor: this,
@@ -547,17 +570,26 @@ export class SR5Actor extends Actor {
           close: async (html) => {
             this.unsetFlag('shadowrun5e', 'incomingDamage');
             if (cancel) return;
-            const soak = this.data.data.rolls.soak[id];
+
+            const body = this.data.data.attributes.body;
+            const armor = this.data.data.armor;
+
             const mods = {};
-            mods['SR5.Soak'] = soak;
+
+            mods[body.label] = body.value;
+            mods['SR5.Armor'] = armor.value;
+            if (this.data.data.modifiers.soak) mods['SR5.Bonus'] = this.data.data.modifiers.soak;
+
+            const armorId = id === 'default' ? '' : id;
+            const bonusArmor = armor[armorId] || 0;
+            if (bonusArmor) mods[Helpers.label(armorId)] = bonusArmor;
+
             const ap = parseInt(html.find('[name=ap]').val());
             if (ap) {
-              const armorId = id === 'default' ? '' : id;
-              const armor = this.data.data.armor;
-              let armorVal = armor.value + (armor[armorId] || 0);
-              const effectiveAp = Math.max(ap, -armorVal);
-              mods['AP'] = effectiveAp;
-              // count += Math.max(ap, -armorVal); // don't take more AP than armor
+              let armorVal = armor.value + bonusArmor;
+
+              // don't take more AP than armor
+              mods['SR5.AP'] = Math.max(ap, -armorVal);
             }
 
             const label = Helpers.label(id);
@@ -567,7 +599,6 @@ export class SR5Actor extends Actor {
               event: options.event,
               actor: this,
               mods: mods,
-              // base: count,
               title: title,
               wounds: false
             });
@@ -585,7 +616,6 @@ export class SR5Actor extends Actor {
       event: options.event,
       actor: this,
       mods,
-      // base: attr.value,
       title: Helpers.label(attrId),
       matrix: Helpers.isMatrix(attr),
     });
@@ -603,7 +633,6 @@ export class SR5Actor extends Actor {
       event: options.event,
       actor: this,
       mods,
-      // base: attr1.value + attr2.value,
       title: `${label1} + ${label2}`,
       matrix: Helpers.isMatrix([attr1, attr2]),
     });
@@ -631,7 +660,8 @@ export class SR5Actor extends Actor {
       mods,
       title: title,
       extended: true,
-    }).then(async (roll) => {
+      after: async (roll) => {
+        console.log(roll)
         let hits = roll.total;
         let current = this.data.data.track[track].value;
 
@@ -642,6 +672,7 @@ export class SR5Actor extends Actor {
         let u = {};
         u[key] = current;
         await this.update(u);
+      }
     });
   }
 
@@ -715,12 +746,34 @@ export class SR5Actor extends Actor {
 
   rollAttributesTest(rollId, options) {
     const title = game.i18n.localize(CONFIG.SR5.attributeRolls[rollId]);
-    const roll = this.data.data.rolls[rollId];
+    const atts = this.data.data.attributes;
+    const modifiers = this.data.data.modifiers;
+    const mods = {};
+    if (rollId === 'composure') {
+      mods[atts.charisma.label] = atts.charisma.value;
+      mods[atts.willpower.label] = atts.willpower.value;
+      if (modifiers.composure) mods['SR5.Bonus'] = modifiers.composure;
+    } else if (rollId === 'judge_intentions') {
+      mods[atts.charisma.label] = atts.charisma.value;
+      mods[atts.intuition.label] = atts.intuition.value;
+      if (modifiers.judge_intentions) mods['SR5.Bonus'] = modifiers.judge_intentions;
+    } else if (rollId === 'lift_carry') {
+      mods[atts.strength.label] = atts.strength.value;
+      mods[atts.body.label] = atts.body.value;
+      if (modifiers.lift_carry) mods['SR5.Bonus'] = modifiers.lift_carry;
+    } else if (rollId === 'memory') {
+      mods[atts.willpower.label] = atts.willpower.value;
+      mods[atts.logic.label] = atts.logic.value;
+      if (modifiers.memory) mods['SR5.Bonus'] = modifiers.memory;
+    }
+
+    // const roll = this.data.data.rolls[rollId];
     // TODO update roll to use mods
     return DiceSR.rollTest({
       event: options.event,
       actor: this,
-      base: roll,
+      mods,
+      // base: roll,
       title: `${title} Test`
     });
   }
@@ -742,7 +795,6 @@ export class SR5Actor extends Actor {
         actor: this,
         specialization: options.event[SR5.kbmod.SPEC] ? 'Specialization' : undefined,
         mods,
-        // base: skill.value + att.value,
         limit: limit ? limit.value : undefined,
         title: `${title} Test`,
         matrix: Helpers.isMatrix(att)
@@ -857,7 +909,6 @@ export class SR5Actor extends Actor {
             att2 = atts[att2Id];
             mods[att2.label] = att2.value;
             const att2IdLabel = game.i18n.localize(CONFIG.SR5.attributes[att2Id]);
-            count += att2.value;
             title += ` + ${att2IdLabel}`
           } else if (att2Id === 'default') {
             mods['SR5.Defaulting'] = -1;
@@ -867,7 +918,6 @@ export class SR5Actor extends Actor {
             title: `${title} Test`,
             actor: this,
             mods,
-            // base: count,
             limit: limit,
             matrix: Helpers.isMatrix([att, att2])
           });
@@ -908,7 +958,6 @@ export class SR5Actor extends Actor {
         let msg = game.messages.get(roll.data().messageId)
         if (msg && msg.data && msg.data.speaker && msg.data.speaker.actor) {
           let actor = game.actors.get(msg.data.speaker.actor);
-          let count = pool - hits;
 
           const mods = {};
           mods['SR5.OriginalDicePool'] = pool;
@@ -918,7 +967,6 @@ export class SR5Actor extends Actor {
             event: {shiftKey: true},
             title: `${title} - Second Chance`,
             mods,
-            // base: count,
             wounds: false,
             actor: actor
           }).then((r) => {

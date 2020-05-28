@@ -25,7 +25,7 @@ export class DiceSR {
     return roll;
   };
 
-  static rollTest({event, actor, mods = {}, specialization, limit, matrix, extended, prefix, suffix, dialogOptions, base = 0, title = "Roll", wounds = true }) {
+  static rollTest({event, actor, mods = {}, specialization, limit, matrix, extended, prefix, suffix, dialogOptions, after, base = 0, title = "Roll", wounds = true }) {
     // if we aren't for soaking some damage
     if (actor && !(title.includes('Soak') || title.includes('Drain') || title.includes('Fade'))) {
       if (wounds) wounds = actor.data.data.wounds.value;
@@ -46,7 +46,7 @@ export class DiceSR {
       limit = undefined;
     }
 
-    if (wounds) mods['SR5.Wounds'] = -wounds;
+    // if (wounds) mods['SR5.Wounds'] = -wounds;
 
     let dice_pool = base;
 
@@ -57,8 +57,9 @@ export class DiceSR {
       actor?.update({"data.attributes.edge.value": actor.data.data.attributes.edge.value - 1});
     }
 
+    const initialModPool = Object.values(mods).reduce((acc, curr) => acc += curr, 0);
     // add mods to dice pool
-    dice_pool += Object.values(mods).reduce((acc, curr) => acc += curr, 0);
+    dice_pool += initialModPool;
 
     if (event && event[SR5.kbmod.STANDARD]) {
       const edge = mods['SR5.Edge'] || undefined;
@@ -99,6 +100,9 @@ export class DiceSR {
           close: html => {
             if (cancel) return;
             let limitVal = parseInt(html.find('[name="limit"]').val())
+            let total = parseInt(html.find('[name="dice_pool"]').val()) - initialModPool;
+            let dpMod = eval(html.find('[name="dp_mod"]').val());
+            if (dpMod) total += dpMod;
             wounds = parseInt(html.find('[name=wounds]').val());
             extended = html.find('[name=extended]').val();
             dialogOptions = {
@@ -106,7 +110,6 @@ export class DiceSR {
               environmental: parseInt(html.find('[name="options.environmental"]').val())
             };
 
-            let total = base;
             const modTotal = Object.values(mods).reduce((acc, curr) => acc += curr, 0);
             if (modTotal) total += modTotal;
             if (wounds) total -= wounds;
@@ -120,9 +123,10 @@ export class DiceSR {
               const currentExtended = mods['SR5.Extended'] || 0;
               mods['SR5.Extended'] = currentExtended - 1;
               // add a bit of a delay to roll again
-              setTimeout(() => DiceSR.rollTest({event, base, mods, actor, limit, title, prefix, suffix, extended, dialogOptions, wounds}), 400);
+              setTimeout(() => DiceSR.rollTest({event, base, mods, actor, limit, title, prefix, suffix, extended, dialogOptions, wounds, after}), 400);
             }
             resolve(r);
+            if (after) r.then(roll => after(roll));
           }
         }).render(true);
       });
