@@ -123,8 +123,8 @@
   justify-content: space-around;
 }
 .sr5.item .item-form .form-line .inputs > * {
-  padding-left: 0.25em default;
-  padding-right: 0.25em default;
+  padding-left: 0.25em;
+  padding-right: 0.25em;
 }
 .sr5.item .item-form .form-line select {
   color: white;

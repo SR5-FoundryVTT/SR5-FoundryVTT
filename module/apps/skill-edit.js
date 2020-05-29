@@ -1,5 +1,4 @@
 export class SkillEditForm extends BaseEntitySheet {
-
     constructor(actor, skillId, options) {
         super(actor, options);
         this.skillId = skillId;
@@ -72,21 +71,21 @@ export class SkillEditForm extends BaseEntitySheet {
     _removeSpec(event) {
         event.preventDefault();
         const updateData = {};
-        const specs = this.getData().data.specs;
+        const { specs } = this.getData().data;
         const index = event.currentTarget.dataset.spec;
         if (index >= 0) {
             specs.splice(index, 1);
             updateData[`${this._updateString()}.specs`] = specs;
-            this.entity.update(updateData)
+            this.entity.update(updateData);
         }
     }
 
     getData() {
         const actor = super.getData().entity;
         const skill = getProperty(actor, this._updateString());
-        console.log(skill)
+        console.log(skill);
         return {
-            data: skill
-        }
+            data: skill,
+        };
     }
 }

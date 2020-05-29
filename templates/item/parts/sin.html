@@ -1,62 +1,64 @@
 <div class="inventory">
-  <div class="item item-section">
-    <div class="item-left">
-      <div class="item-text item-name">
-        {{localize "SR5.License"}}
-      </div>
+    <div class="item item-section">
+        <div class="item-left">
+            <div class="item-text item-name">
+                {{localize "SR5.License"}}
+            </div>
+        </div>
+        <div class="item-right">
+            <div class="item-text rtg">
+                {{localize "SR5.Rtg"}}
+            </div>
+            <div class="item-text desc">
+                {{localize "SR5.Description"}}
+            </div>
+            <div class="item-text item-icons rtg">
+                <a class="add-new-license" title="Add New License">
+                    <i class="fas fa-plus"></i>
+                </a>
+            </div>
+        </div>
     </div>
-    <div class="item-right">
-      <div class="item-text rtg">
-        {{localize "SR5.Rtg"}}
-      </div>
-      <div class="item-text desc">
-        {{localize "SR5.Description"}}
-      </div>
-      <div class="item-text item-icons rtg">
-        <a class="add-new-license" title="Add New License">
-          <i class="fas fa-plus"></i>
-        </a>
-      </div>
+    {{#each data.licenses as |license id|}}
+    <div class="item">
+        <div class="item-left">
+            <div class="item-text item-name">
+                <input
+                    class="display left"
+                    type="text"
+                    name="data.licenses.{{id}}.name"
+                    value="{{license.name}}"
+                    placeholder=""
+                />
+            </div>
+        </div>
+        <div class="item-right">
+            <div class="item-text rtg">
+                <input
+                    class="display"
+                    size="3"
+                    type="text"
+                    name="data.licenses.{{id}}.rtg"
+                    value="{{license.rtg}}"
+                    data-dtype="Number"
+                    placeholder="0"
+                />
+            </div>
+            <div class="item-text desc">
+                <input
+                    class="display"
+                    type="text"
+                    name="data.license.{{id}}.description"
+                    value="{{license.description}}"
+                    placeholder='{{localize "SR5.Description"}}'
+                />
+            </div>
+            <div class="item-text item-icons rtg">
+                <a class="license-delete" title="Delete License" data-index="{{id}}">
+                    <i class="fas fa-trash"></i>
+                </a>
+            </div>
+        </div>
     </div>
-  </div>
-{{#each data.licenses as |license id|}}
-  <div class="item">
-    <div class="item-left">
-      <div class="item-text item-name">
-        <input
-          class='display left'
-          type='text'
-          name='data.licenses.{{id}}.name'
-          value='{{license.name}}'
-          placeholder='' />
-      </div>
-    </div>
-    <div class="item-right">
-      <div class="item-text rtg">
-        <input
-          class='display'
-          size='3'
-          type='text'
-          name='data.licenses.{{id}}.rtg'
-          value='{{license.rtg}}'
-          data-dtype="Number"
-          placeholder='0' />
-      </div>
-      <div class="item-text desc">
-        <input
-          class='display'
-          type='text'
-          name='data.license.{{id}}.description'
-          value='{{license.description}}'
-           placeholder='{{localize "SR5.Description"}}' />
-      </div>
-      <div class="item-text item-icons rtg">
-        <a class="license-delete" title="Delete License" data-index='{{id}}'>
-          <i class="fas fa-trash"></i>
-        </a>
-      </div>
-    </div>
-  </div>
-{{/each}}
+    {{/each}}
 </div>
-

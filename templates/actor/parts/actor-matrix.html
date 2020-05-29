@@ -1,357 +1,406 @@
 <div class="attributes smooth">
-  <div class="attribute">
-    <div class="track between">
-      <div class="attribute-name">
-        {{localize "SR5.HotSim"}}
-      </div>
-      <input type='checkbox' class="submit-checkbox" name="data.matrix.hot_sim" {{checked data.matrix.hot_sim}}>
+    <div class="attribute">
+        <div class="track between">
+            <div class="attribute-name">
+                {{localize "SR5.HotSim"}}
+            </div>
+            <input
+                type="checkbox"
+                class="submit-checkbox"
+                name="data.matrix.hot_sim"
+                {{checked
+                data.matrix.hot_sim}}
+            />
+        </div>
+        <div class="track between">
+            <div class="attribute-name">
+                {{localize "SR5.RunningSilent"}}
+            </div>
+            <input
+                type="checkbox"
+                class="submit-checkbox"
+                name="data.matrix.running_silent"
+                {{checked
+                data.matrix.running_silent}}
+            />
+        </div>
     </div>
-    <div class="track between">
-      <div class="attribute-name">
-        {{localize "SR5.RunningSilent"}}
-      </div>
-      <input type='checkbox' class="submit-checkbox" name="data.matrix.running_silent" {{checked data.matrix.running_silent}}>
+    {{#if data.matrix.is_cyberdeck}}
+    <div class="attribute">
+        <div class="attribute-name roll matrix-roll" data-attribute="attack">
+            {{localize "SR5.MatrixAttrAttack"}}
+        </div>
+        <div class="attribute-input-container row">
+            <select class="display matrix-att-selector" name="matrix-attack" data-att="attack">
+                {{#select data.matrix.attack.device_att}}
+                <option value="att1">{{data.matrix.item.atts.att1.value}}</option>
+                <option value="att2">{{data.matrix.item.atts.att2.value}}</option>
+                <option value="att3">{{data.matrix.item.atts.att3.value}}</option>
+                <option value="att4">{{data.matrix.item.atts.att4.value}}</option>
+                {{/select}}
+            </select>
+            {{#if data.matrix.attack.mod}}
+            <input
+                class="display attribute-input"
+                type="text"
+                maxlength="2"
+                size="2"
+                name="data.matrix.attack.value"
+                value="({{data.matrix.attack.value}})"
+                data-dtype="Number"
+                placeholder="1"
+                disabled
+            />
+            {{/if}}
+        </div>
+        <div class="attribute-input-container">
+            <input
+                class="display track-input"
+                size="4"
+                maxlength="4"
+                type="text"
+                name="data.matrix.attack.mod"
+                value="{{data.matrix.attack.mod}}"
+                data-dtype="Number"
+                placeholder="+Mod"
+            />
+        </div>
     </div>
-  </div>
-  {{#if data.matrix.is_cyberdeck}}
-  <div class="attribute">
-    <div class="attribute-name roll matrix-roll" data-attribute='attack'>{{localize "SR5.MatrixAttrAttack"}}</div>
-    <div class="attribute-input-container row">
-      <select class='display matrix-att-selector' name='matrix-attack' data-att='attack'>
-        {{#select data.matrix.attack.device_att}}
-        <option value="att1">{{data.matrix.item.atts.att1.value}}</option>
-        <option value="att2">{{data.matrix.item.atts.att2.value}}</option>
-        <option value="att3">{{data.matrix.item.atts.att3.value}}</option>
-        <option value="att4">{{data.matrix.item.atts.att4.value}}</option>
-        {{/select}}
-      </select>
-      {{#if data.matrix.attack.mod}}
-      <input
-        class="display attribute-input"
-        type="text"
-        maxlength="2"
-        size="2"
-        name="data.matrix.attack.value"
-        value="({{data.matrix.attack.value}})"
-        data-dtype="Number"
-        placeholder="1"
-        disabled/>
-      {{/if}}
+    <div class="attribute">
+        <div class="attribute-name matrix-roll roll" data-attribute="sleaze">
+            {{localize "SR5.MatrixAttrSleaze"}}
+        </div>
+        <div class="attribute-input-container row">
+            <select class="display matrix-att-selector" name="matrix-sleaze" data-att="sleaze">
+                {{#select data.matrix.sleaze.device_att}}
+                <option value="att1">{{data.matrix.item.atts.att1.value}}</option>
+                <option value="att2">{{data.matrix.item.atts.att2.value}}</option>
+                <option value="att3">{{data.matrix.item.atts.att3.value}}</option>
+                <option value="att4">{{data.matrix.item.atts.att4.value}}</option>
+                {{/select}}
+            </select>
+            {{#if data.matrix.sleaze.mod}}
+            <input
+                class="display attribute-input"
+                type="text"
+                maxlength="2"
+                size="2"
+                name="data.matrix.sleaze.value"
+                value="({{data.matrix.sleaze.value}})"
+                data-dtype="Number"
+                placeholder="1"
+                disabled
+            />
+            {{/if}}
+        </div>
+        <div class="attribute-input-container">
+            <input
+                class="display track-input"
+                size="4"
+                maxlength="4"
+                type="text"
+                name="data.matrix.sleaze.mod"
+                value="{{data.matrix.sleaze.mod}}"
+                data-dtype="Number"
+                placeholder="+Mod"
+            />
+        </div>
     </div>
-    <div class="attribute-input-container">
-      <input
-        class="display track-input"
-        size='4'
-        maxlength='4'
-        type='text'
-        name='data.matrix.attack.mod'
-        value="{{data.matrix.attack.mod}}"
-        data-dtype="Number"
-        placeholder='+Mod'/>
+    <div class="attribute">
+        <div class="attribute-name roll matrix-roll" data-attribute="data_processing">
+            {{localize "SR5.MatrixAttrDataProc"}}
+        </div>
+        <div class="attribute-input-container row">
+            <select
+                class="display matrix-att-selector"
+                name="matrix-data_processing"
+                data-att="data_processing"
+            >
+                {{#select data.matrix.data_processing.device_att}}
+                <option value="att1">{{data.matrix.item.atts.att1.value}}</option>
+                <option value="att2">{{data.matrix.item.atts.att2.value}}</option>
+                <option value="att3">{{data.matrix.item.atts.att3.value}}</option>
+                <option value="att4">{{data.matrix.item.atts.att4.value}}</option>
+                {{/select}}
+            </select>
+            {{#if data.matrix.data_processing.mod}}
+            <input
+                class="display attribute-input"
+                type="text"
+                maxlength="2"
+                size="2"
+                name="data.matrix.data_processing.value"
+                value="({{data.matrix.data_processing.value}})"
+                data-dtype="Number"
+                placeholder="1"
+                disabled
+            />
+            {{/if}}
+        </div>
+        <div class="attribute-input-container">
+            <input
+                class="display track-input"
+                size="4"
+                maxlength="4"
+                type="text"
+                name="data.matrix.data_processing.mod"
+                value="{{data.matrix.data_processing.mod}}"
+                data-dtype="Number"
+                placeholder="+Mod"
+            />
+        </div>
     </div>
-  </div>
-  <div class="attribute">
-    <div class="attribute-name matrix-roll roll" data-attribute='sleaze'>{{localize "SR5.MatrixAttrSleaze"}}</div>
-    <div class="attribute-input-container row">
-      <select class='display matrix-att-selector' name='matrix-sleaze' data-att='sleaze'>
-        {{#select data.matrix.sleaze.device_att}}
-        <option value="att1">{{data.matrix.item.atts.att1.value}}</option>
-        <option value="att2">{{data.matrix.item.atts.att2.value}}</option>
-        <option value="att3">{{data.matrix.item.atts.att3.value}}</option>
-        <option value="att4">{{data.matrix.item.atts.att4.value}}</option>
-        {{/select}}
-      </select>
-      {{#if data.matrix.sleaze.mod}}
-      <input
-        class="display attribute-input"
-        type="text"
-        maxlength="2"
-        size="2"
-        name="data.matrix.sleaze.value"
-        value="({{data.matrix.sleaze.value}})"
-        data-dtype="Number"
-        placeholder="1"
-        disabled/>
-      {{/if}}
+    <div class="attribute">
+        <div class="attribute-name roll matrix-roll" data-attribute="firewall">
+            {{localize "SR5.MatrixAttrFirewall"}}
+        </div>
+        <div class="attribute-input-container row">
+            <select class="display matrix-att-selector" name="matrix-firewall" data-att="firewall">
+                {{#select data.matrix.firewall.device_att}}
+                <option value="att1">{{data.matrix.item.atts.att1.value}}</option>
+                <option value="att2">{{data.matrix.item.atts.att2.value}}</option>
+                <option value="att3">{{data.matrix.item.atts.att3.value}}</option>
+                <option value="att4">{{data.matrix.item.atts.att4.value}}</option>
+                {{/select}}
+            </select>
+            {{#if data.matrix.firewall.mod}}
+            <input
+                class="display attribute-input"
+                type="text"
+                maxlength="2"
+                size="2"
+                name="data.matrix.firewall.value"
+                value="({{data.matrix.firewall.value}})"
+                data-dtype="Number"
+                placeholder="1"
+                disabled
+            />
+            {{/if}}
+        </div>
+        <div class="attribute-input-container">
+            <input
+                class="display track-input"
+                size="4"
+                maxlength="4"
+                type="text"
+                name="data.matrix.firewall.mod"
+                value="{{data.matrix.firewall.mod}}"
+                data-dtype="Number"
+                placeholder="+Mod"
+            />
+        </div>
     </div>
-    <div class="attribute-input-container">
-      <input
-        class="display track-input"
-        size='4'
-        maxlength='4'
-        type='text'
-        name='data.matrix.sleaze.mod'
-        value="{{data.matrix.sleaze.mod}}"
-        data-dtype="Number"
-        placeholder='+Mod'/>
+    {{else}}
+    <div class="attribute">
+        <div class="attribute-name roll matrix-roll" data-attribute="attack">
+            {{localize "SR5.MatrixAttrAttack"}}
+        </div>
+        <div class="attribute-input-container">
+            <input
+                class="display attribute-input"
+                type="text"
+                maxlength="2"
+                size="2"
+                name="data.matrix.attack.value"
+                value="{{data.matrix.attack.value}}"
+                data-dtype="Number"
+                placeholder="1"
+                disabled
+            />
+        </div>
+        <div class="attribute-input-container">
+            <input
+                class="display track-input"
+                size="4"
+                maxlength="4"
+                type="text"
+                name="data.matrix.attack.mod"
+                value="{{data.matrix.attack.mod}}"
+                data-dtype="Number"
+                placeholder="+Mod"
+            />
+        </div>
     </div>
-  </div>
-  <div class="attribute">
-    <div class="attribute-name roll matrix-roll" data-attribute='data_processing'>{{localize "SR5.MatrixAttrDataProc"}}</div>
-    <div class="attribute-input-container row">
-      <select class='display matrix-att-selector' name='matrix-data_processing' data-att='data_processing'>
-        {{#select data.matrix.data_processing.device_att}}
-        <option value="att1">{{data.matrix.item.atts.att1.value}}</option>
-        <option value="att2">{{data.matrix.item.atts.att2.value}}</option>
-        <option value="att3">{{data.matrix.item.atts.att3.value}}</option>
-        <option value="att4">{{data.matrix.item.atts.att4.value}}</option>
-        {{/select}}
-      </select>
-      {{#if data.matrix.data_processing.mod}}
-      <input
-        class="display attribute-input"
-        type="text"
-        maxlength="2"
-        size="2"
-        name="data.matrix.data_processing.value"
-        value="({{data.matrix.data_processing.value}})"
-        data-dtype="Number"
-        placeholder="1"
-        disabled/>
-      {{/if}}
+    <div class="attribute">
+        <div class="attribute-name matrix-roll roll" data-attribute="sleaze">
+            {{localize "SR5.MatrixAttrSleaze"}}
+        </div>
+        <div class="attribute-input-container">
+            <input
+                class="display attribute-input"
+                type="text"
+                maxlength="2"
+                size="2"
+                name="data.matrix.sleaze.value"
+                value="{{data.matrix.sleaze.value}}"
+                data-dtype="Number"
+                placeholder="1"
+                disabled
+            />
+        </div>
+        <div class="attribute-input-container">
+            <input
+                class="display track-input"
+                size="4"
+                maxlength="4"
+                type="text"
+                name="data.matrix.sleaze.mod"
+                value="{{data.matrix.sleaze.mod}}"
+                data-dtype="Number"
+                placeholder="+Mod"
+            />
+        </div>
     </div>
-    <div class="attribute-input-container">
-      <input
-        class="display track-input"
-        size='4'
-        maxlength='4'
-        type='text'
-        name='data.matrix.data_processing.mod'
-        value="{{data.matrix.data_processing.mod}}"
-        data-dtype="Number"
-        placeholder='+Mod'/>
+    <div class="attribute">
+        <div class="attribute-name roll matrix-roll" data-attribute="data_processing">
+            {{localize "SR5.MatrixAttrDataProc"}}
+        </div>
+        <div class="attribute-input-container">
+            <input
+                class="display attribute-input"
+                type="text"
+                maxlength="2"
+                size="2"
+                name="data.matrix.data_processing.value"
+                value="{{data.matrix.data_processing.value}}"
+                data-dtype="Number"
+                placeholder="1"
+                disabled
+            />
+        </div>
+        <div class="attribute-input-container">
+            <input
+                class="display track-input"
+                size="4"
+                maxlength="4"
+                type="text"
+                name="data.matrix.data_processing.mod"
+                value="{{data.matrix.data_processing.mod}}"
+                data-dtype="Number"
+                placeholder="+Mod"
+            />
+        </div>
     </div>
-  </div>
-  <div class="attribute">
-    <div class="attribute-name roll matrix-roll" data-attribute='firewall'>{{localize "SR5.MatrixAttrFirewall"}}</div>
-    <div class="attribute-input-container row">
-      <select class='display matrix-att-selector' name='matrix-firewall' data-att='firewall'>
-        {{#select data.matrix.firewall.device_att}}
-        <option value="att1">{{data.matrix.item.atts.att1.value}}</option>
-        <option value="att2">{{data.matrix.item.atts.att2.value}}</option>
-        <option value="att3">{{data.matrix.item.atts.att3.value}}</option>
-        <option value="att4">{{data.matrix.item.atts.att4.value}}</option>
-        {{/select}}
-      </select>
-      {{#if data.matrix.firewall.mod}}
-      <input
-        class="display attribute-input"
-        type="text"
-        maxlength="2"
-        size="2"
-        name="data.matrix.firewall.value"
-        value="({{data.matrix.firewall.value}})"
-        data-dtype="Number"
-        placeholder="1"
-        disabled/>
-      {{/if}}
+    <div class="attribute">
+        <div class="attribute-name roll matrix-roll" data-attribute="firewall">
+            {{localize "SR5.MatrixAttrFirewall"}}
+        </div>
+        <div class="attribute-input-container">
+            <input
+                class="display attribute-input"
+                type="text"
+                maxlength="2"
+                size="2"
+                name="data.matrix.firewall.value"
+                value="{{data.matrix.firewall.value}}"
+                data-dtype="Number"
+                placeholder="1"
+                disabled
+            />
+        </div>
+        <div class="attribute-input-container">
+            <input
+                class="display track-input"
+                size="4"
+                maxlength="4"
+                type="text"
+                name="data.matrix.firewall.mod"
+                value="{{data.matrix.firewall.mod}}"
+                data-dtype="Number"
+                placeholder="+Mod"
+            />
+        </div>
     </div>
-    <div class="attribute-input-container">
-      <input
-        class="display track-input"
-        size='4'
-        maxlength='4'
-        type='text'
-        name='data.matrix.firewall.mod'
-        value="{{data.matrix.firewall.mod}}"
-        data-dtype="Number"
-        placeholder='+Mod'/>
+    {{/if}}
+    <div class="attribute">
+        <div class="attribute-name">{{localize "SR5.ConditionMonitor"}}</div>
+        <div class="track">
+            <div class="attribute-input-container">
+                <input
+                    class="display track-input"
+                    size="2"
+                    maxlength="2"
+                    type="text"
+                    name="data.matrix.condition_monitor.value"
+                    value="{{data.matrix.condition_monitor.value}}"
+                    data-dtype="Number"
+                />
+            </div>
+            <div class="track-slash flex0"></div>
+            <div class="attribute-input-container">
+                <input
+                    class="display track-input"
+                    size="2"
+                    maxlength="2"
+                    type="text"
+                    name="data.matrix.condition_monitor.max"
+                    value="{{data.matrix.condition_monitor.max}}"
+                    data-dtype="Number"
+                    disabled
+                />
+            </div>
+        </div>
     </div>
-  </div>
-  {{else}}
-  <div class="attribute">
-    <div class="attribute-name roll matrix-roll" data-attribute='attack'>{{localize "SR5.MatrixAttrAttack"}}</div>
-    <div class="attribute-input-container">
-      <input
-        class="display attribute-input"
-        type="text"
-        maxlength="2"
-        size="2"
-        name="data.matrix.attack.value"
-        value="{{data.matrix.attack.value}}"
-        data-dtype="Number"
-        placeholder="1"
-        disabled/>
-    </div>
-    <div class="attribute-input-container">
-      <input
-        class="display track-input"
-        size='4'
-        maxlength='4'
-        type='text'
-        name='data.matrix.attack.mod'
-        value="{{data.matrix.attack.mod}}"
-        data-dtype="Number"
-        placeholder='+Mod'/>
-    </div>
-  </div>
-  <div class="attribute">
-    <div class="attribute-name matrix-roll roll" data-attribute='sleaze'>{{localize "SR5.MatrixAttrSleaze"}}</div>
-    <div class="attribute-input-container">
-      <input
-        class="display attribute-input"
-        type="text"
-        maxlength="2"
-        size="2"
-        name="data.matrix.sleaze.value"
-        value="{{data.matrix.sleaze.value}}"
-        data-dtype="Number"
-        placeholder="1"
-        disabled/>
-    </div>
-    <div class="attribute-input-container">
-      <input
-        class="display track-input"
-        size='4'
-        maxlength='4'
-        type='text'
-        name='data.matrix.sleaze.mod'
-        value="{{data.matrix.sleaze.mod}}"
-        data-dtype="Number"
-        placeholder='+Mod'/>
-    </div>
-  </div>
-  <div class="attribute">
-    <div class="attribute-name roll matrix-roll" data-attribute='data_processing'>{{localize "SR5.MatrixAttrDataProc"}}</div>
-    <div class="attribute-input-container">
-      <input
-        class="display attribute-input"
-        type="text"
-        maxlength="2"
-        size="2"
-        name="data.matrix.data_processing.value"
-        value="{{data.matrix.data_processing.value}}"
-        data-dtype="Number"
-        placeholder="1"
-        disabled/>
-    </div>
-    <div class="attribute-input-container">
-      <input
-        class="display track-input"
-        size='4'
-        maxlength='4'
-        type='text'
-        name='data.matrix.data_processing.mod'
-        value="{{data.matrix.data_processing.mod}}"
-        data-dtype="Number"
-        placeholder='+Mod'/>
-    </div>
-  </div>
-  <div class="attribute">
-    <div class="attribute-name roll matrix-roll" data-attribute='firewall'>{{localize "SR5.MatrixAttrFirewall"}}</div>
-    <div class="attribute-input-container">
-      <input
-        class="display attribute-input"
-        type="text"
-        maxlength="2"
-        size="2"
-        name="data.matrix.firewall.value"
-        value="{{data.matrix.firewall.value}}"
-        data-dtype="Number"
-        placeholder="1"
-        disabled/>
-    </div>
-    <div class="attribute-input-container">
-      <input
-        class="display track-input"
-        size='4'
-        maxlength='4'
-        type='text'
-        name='data.matrix.firewall.mod'
-        value="{{data.matrix.firewall.mod}}"
-        data-dtype="Number"
-        placeholder='+Mod'/>
-    </div>
-  </div>
-  {{/if}}
-  <div class="attribute">
-    <div class="attribute-name">{{localize "SR5.ConditionMonitor"}}</div>
-    <div class="track">
-      <div class="attribute-input-container">
-        <input
-          class="display track-input"
-          size='2'
-          maxlength='2'
-          type='text'
-          name='data.matrix.condition_monitor.value'
-          value="{{data.matrix.condition_monitor.value}}"
-          data-dtype="Number"/>
-      </div>
-      <div class="track-slash flex0">
-      </div>
-      <div class="attribute-input-container">
-        <input
-          class="display track-input"
-          size='2'
-          maxlength='2'
-          type='text'
-          name='data.matrix.condition_monitor.max'
-          value="{{data.matrix.condition_monitor.max}}"
-          data-dtype="Number"
-          disabled/>
-      </div>
-    </div>
-  </div>
 </div>
 {{#if emerged}}
 <div class="inventory">
-  <div class="scroll-area">
-    <div class="item item-section">
-      <div class="item-left">
-        <div class="item-text item-name">
-          {{localize "SR5.ComplexForms"}}
+    <div class="scroll-area">
+        <div class="item item-section">
+            <div class="item-left">
+                <div class="item-text item-name">
+                    {{localize "SR5.ComplexForms"}}
+                </div>
+            </div>
+            <div class="item-right">
+                <div class="item-text">
+                    {{localize "SR5.Target"}}
+                </div>
+                <div class="item-text">
+                    {{localize "SR5.Duration"}}
+                </div>
+                <div class="item-text">
+                    {{localize "SR5.Fade"}}
+                </div>
+                <div class="item-text item-icons">
+                    <a class="item-create" title="Create Item" data-type="adept_power">
+                        <i class="fas fa-plus"></i>
+                        {{localize "SR5.Add"}}
+                    </a>
+                </div>
+            </div>
         </div>
-      </div>
-      <div class="item-right">
-        <div class="item-text">
-          {{localize "SR5.Target"}}
+        {{#each complex_forms as |item iid|}}
+        <div class="item" data-item-id="{{item._id}}">
+            <div class="item-left">
+                <div class="item-img item-roll roll">
+                    <img src="{{item.img}}" title="{{item.name}}" height="24px" width="24px" />
+                </div>
+                <div class="item-text item-name has-desc">
+                    {{item.name}}
+                </div>
+            </div>
+            <div class="item-right">
+                <div class="item-text">
+                    {{localizeOb item.data.target ../config.matrixTargets}}
+                </div>
+                <div class="item-text">
+                    {{localizeOb item.data.duration ../config.durations}}
+                </div>
+                <div class="item-text">
+                    {{item.data.fade}}
+                </div>
+                <div class="item-text item-icons">
+                    <i class="item-edit roll fas fa-edit"></i>
+                    <i class="item-delete roll fas fa-trash"></i>
+                </div>
+            </div>
         </div>
-        <div class="item-text">
-          {{localize "SR5.Duration"}}
+        <div class="item hidden">
+            <div class="item-desc">
+                {{{item.data.description.value}}}
+            </div>
         </div>
-        <div class="item-text">
-          {{localize "SR5.Fade"}}
-        </div>
-        <div class="item-text item-icons">
-          <a class="item-create" title="Create Item" data-type="adept_power">
-            <i class="fas fa-plus"></i>
-            {{localize "SR5.Add"}}
-          </a>
-        </div>
-      </div>
+        {{/each}}
     </div>
-    {{#each complex_forms as |item iid|}}
-    <div class="item" data-item-id='{{item._id}}'>
-      <div class="item-left">
-        <div class="item-img item-roll roll" >
-          <img src="{{item.img}}" title="{{item.name}}" height='24px' width='24px'/>
-        </div>
-        <div class="item-text item-name has-desc">
-          {{item.name}}
-        </div>
-      </div>
-      <div class="item-right">
-        <div class="item-text">
-          {{localizeOb item.data.target ../config.matrixTargets}}
-        </div>
-        <div class="item-text">
-          {{localizeOb item.data.duration ../config.durations}}
-        </div>
-        <div class="item-text">
-          {{item.data.fade}}
-        </div>
-        <div class="item-text item-icons">
-          <i class="item-edit roll fas fa-edit" ></i>
-          <i class="item-delete roll fas fa-trash" ></i>
-        </div>
-      </div>
-    </div>
-    <div class="item hidden">
-      <div class="item-desc">
-        {{{item.data.description.value}}}
-      </div>
-    </div>
-    {{/each}}
-  </div>
 </div>
 {{/if}}

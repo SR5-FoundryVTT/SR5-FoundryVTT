@@ -1,4 +1,4 @@
-import {LanguageSkillEditForm} from "./language-skill-edit.js";
+import { LanguageSkillEditForm } from './language-skill-edit.js';
 
 export class KnowledgeSkillEditForm extends LanguageSkillEditForm {
     _updateString() {

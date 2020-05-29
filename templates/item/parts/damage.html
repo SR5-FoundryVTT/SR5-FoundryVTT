@@ -1,81 +1,76 @@
 <div class="item-form">
-  <div class="header">
-    {{header}}
-  </div>
-  <div class="form-line">
-    <div class="label">
-      {{localize "SR5.DamageType"}}
+    <div class="header">
+        {{header}}
     </div>
-    <div class="inputs">
-      <select name="data.action.damage.type">
-        <option value=""></option>
-        {{#select data.action.damage.type}}
-        {{#each config.damageTypes as |name type|}}
-        <option value="{{type}}">{{localize name}}</option>
-        {{/each}}
-        {{/select}}
-      </select>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.DamageType"}}
+        </div>
+        <div class="inputs">
+            <select name="data.action.damage.type">
+                <option value=""></option>
+                {{#select data.action.damage.type}} {{#each config.damageTypes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
     </div>
-  </div>
-  {{#if data.action.damage.type}}
-  {{#ifne item.type "spell"}}
-  <div class="form-line">
-    <div class="label">
-      {{localize "SR5.DamageValue"}}
+    {{#if data.action.damage.type}} {{#ifne item.type "spell"}}
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.DamageValue"}}
+        </div>
+        <div class="inputs around">
+            <input
+                size="4"
+                maxlength="3"
+                type="text"
+                name="data.action.damage.base"
+                value="{{data.action.damage.base}}"
+                data-dtype="Number"
+                placeholder="DV"
+            />
+            +
+            <select name="data.action.damage.attribute">
+                {{#select data.action.damage.attribute}}
+                <option value=""></option>
+                {{#each config.attributes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
     </div>
-    <div class="inputs around">
-      <input
-         size='4'
-         maxlength='3'
-         type='text'
-         name='data.action.damage.base'
-         value="{{data.action.damage.base}}"
-         data-dtype="Number"
-         placeholder="DV" />
-      +
-      <select name="data.action.damage.attribute">
-      {{#select data.action.damage.attribute}}
-        <option value=""></option>
-        {{#each config.attributes as |name type|}}
-        <option value="{{type}}">{{localize name}}</option>
-        {{/each}}
-      {{/select}}
-      </select>
+    {{/ifne}}
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.Element"}}
+        </div>
+        <div class="inputs">
+            <select name="data.action.damage.element">
+                {{#select data.action.damage.element}}
+                <option value=""></option>
+                {{#each config.elementTypes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
     </div>
-  </div>
-  {{/ifne}}
-  <div class="form-line">
-    <div class="label">
-      {{localize "SR5.Element"}}
+    {{#ifne item.type "spell"}}
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.AP"}}
+        </div>
+        <div class="inputs">
+            <input
+                type="text"
+                maxlength="2"
+                size="2"
+                name="data.action.damage.ap.base"
+                value="{{data.action.damage.ap.base}}"
+                data-dtype="Number"
+                placeholder="AP"
+            />
+        </div>
     </div>
-    <div class="inputs">
-      <select name="data.action.damage.element">
-        {{#select data.action.damage.element}}
-        <option value=""></option>
-        {{#each config.elementTypes as |name type|}}
-        <option value="{{type}}">{{localize name}}</option>
-        {{/each}}
-        {{/select}}
-      </select>
-    </div>
-  </div>
-  {{#ifne item.type "spell"}}
-  <div class="form-line">
-    <div class="label">
-      {{localize "SR5.AP"}}
-    </div>
-    <div class="inputs">
-      <input
-        type="text"
-        maxlength="2"
-        size="2"
-        name="data.action.damage.ap.base"
-        value="{{data.action.damage.ap.base}}"
-        data-dtype="Number"
-        placeholder="AP"/>
-    </div>
-  </div>
-  {{/ifne}}
-  {{/if}}
+    {{/ifne}} {{/if}}
 </div>
-

@@ -1,52 +1,53 @@
 import { SR5Actor } from './actor/entity.js';
 
-export const highlightSuccessFailure = function(message, html, data) {
+export const highlightSuccessFailure = function (message, html, data) {
     if (!message) return;
-    if (!message.isContentVisible || !message.roll.parts.length ) return;
-    const roll = message.roll;
+    if (!message.isContentVisible || !message.roll.parts.length) return;
+    const { roll } = message;
     if (!roll.parts.length) return;
     if (!roll.parts[0].rolls) return;
 
     const khreg = /kh\d+/;
     const match = roll.formula.match(khreg);
 
-    const limit = match ? +(match[0].replace('kh', '')) : 0;
+    const limit = match ? +match[0].replace('kh', '') : 0;
 
     const hits = roll.total;
-    const fails = roll.parts[0].rolls.reduce((fails, r) => (r.roll === 1) ? fails + 1 : fails, 0);
+    const fails = roll.parts[0].rolls.reduce((fails, r) => (r.roll === 1 ? fails + 1 : fails), 0);
     const count = roll.parts[0].rolls.length;
-    const glitch = fails > (count / 2.0);
-
+    const glitch = fails > count / 2.0;
 
     if (limit && hits >= limit) {
         html.find('.dice-total').addClass('limit-hit');
     } else if (glitch) {
         html.find('.dice-total').addClass('glitch');
     }
-}
+};
 
-export const addChatMessageContextOptions = function(html, options) {
-  const canRoll = li => {
-    const msg = game.messages.get(li.data().messageId);
+export const addChatMessageContextOptions = function (html, options) {
+    const canRoll = (li) => {
+        const msg = game.messages.get(li.data().messageId);
 
-    return !!(li.find(".dice-roll").length
-        && msg
-        && (msg.user.id === game.user.id || game.user.isGM));
-  }
+        return !!(
+            li.find('.dice-roll').length &&
+            msg &&
+            (msg.user.id === game.user.id || game.user.isGM)
+        );
+    };
 
-  options.push(
-    {
-      name: 'Push the Limit',
-      callback: li => SR5Actor.pushTheLimit(li),
-      condition: canRoll,
-      icon: '<i class="fas fa-meteor"></i>'
-    },
-    {
-      name: 'Second Chance',
-      callback: li => SR5Actor.secondChance(li),
-      condition: canRoll,
-      icon: '<i class="fas fa-dice-d6"></i>'
-    }
-  );
-  return options;
-}
+    options.push(
+        {
+            name: 'Push the Limit',
+            callback: (li) => SR5Actor.pushTheLimit(li),
+            condition: canRoll,
+            icon: '<i class="fas fa-meteor"></i>',
+        },
+        {
+            name: 'Second Chance',
+            callback: (li) => SR5Actor.secondChance(li),
+            condition: canRoll,
+            icon: '<i class="fas fa-dice-d6"></i>',
+        }
+    );
+    return options;
+};

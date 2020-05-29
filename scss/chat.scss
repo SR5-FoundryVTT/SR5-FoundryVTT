@@ -1,26 +1,26 @@
-@import "config.scss";
+@import 'config.scss';
 
 .sr5.item-card {
-  .card-content {
-    font-size: 16px;
-  }
+    .card-content {
+        font-size: 16px;
+    }
 }
 
 .dice-roll .dice-total {
-  &.limit-hit {
-    color: $roll-limit-hit;
-  }
-  &.glitch {
-    color: $darkred;
-  }
-  &.failure {
-    color: inherit;
-    background: $roll-failure-background;
-    border: 1px solid $roll-failure-border;
-  }
-  &.success {
-    color: inherit;
-    background: #c7d0c0;
-    border: 1px solid #006c00;
-  }
+    &.limit-hit {
+        color: $roll-limit-hit;
+    }
+    &.glitch {
+        color: $darkred;
+    }
+    &.failure {
+        color: inherit;
+        background: $roll-failure-background;
+        border: 1px solid $roll-failure-border;
+    }
+    &.success {
+        color: inherit;
+        background: #c7d0c0;
+        border: 1px solid #006c00;
+    }
 }

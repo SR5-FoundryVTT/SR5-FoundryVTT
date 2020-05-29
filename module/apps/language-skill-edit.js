@@ -1,4 +1,4 @@
-import {SkillEditForm} from "./skill-edit.js";
+import { SkillEditForm } from './skill-edit.js';
 
 export class LanguageSkillEditForm extends SkillEditForm {
     _updateString() {
@@ -11,7 +11,7 @@ export class LanguageSkillEditForm extends SkillEditForm {
 
     getData() {
         return mergeObject(super.getData(), {
-            editable_name: true
+            editable_name: true,
         });
     }
 
@@ -22,7 +22,7 @@ export class LanguageSkillEditForm extends SkillEditForm {
         const currentData = updateData[this._updateString()] || {};
         updateData[this._updateString()] = {
             ...currentData,
-            name
+            name,
         };
     }
 }

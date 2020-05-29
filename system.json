@@ -6,7 +6,6 @@
   "templateVersion": "1.2",
   "author": "Shawn Milligan [n3rf_herder#9026]",
   "esmodules": ["shadowrun5e.js"],
-  "scripts": [],
   "styles": ["css/main.css", "css/actor.css", "css/config.css", "css/item.css", "css/chat.css"],
   "minimumCoreVersion": "0.6.0",
   "compatibleCoreVersion": "0.6.0",

@@ -1,18 +1,18 @@
 <form>
-  {{#if ammo}}
-  <div class="form-group">
-    <label>Rounds Remaining</label>
-    <label>{{ammo.value}}/{{ammo.max}}</label>
-  </div>
-  {{/if}}
-  <div class="form-group">
-    <label>Fire Mode{{#if rc}} (Total RC {{rc}}){{/if}}</label>
-    <select name="fireMode">
-    {{#select fireMode}}
-      {{#each fireModes as |description count|}}
-        <option value="{{count}}">{{description}} - {{count}} Round{{#ifgt count 1}}s{{/ifgt}}</option>
-      {{/each}}
-    {{/select}}
-    </select>
-  </div>
+    {{#if ammo}}
+    <div class="form-group">
+        <label>Rounds Remaining</label>
+        <label>{{ammo.value}}/{{ammo.max}}</label>
+    </div>
+    {{/if}}
+    <div class="form-group">
+        <label>Fire Mode{{#if rc}} (Total RC {{rc}}){{/if}}</label>
+        <select name="fireMode">
+            {{#select fireMode}} {{#each fireModes as |description count|}}
+            <option value="{{count}}"
+                >{{description}} - {{count}} Round{{#ifgt count 1}}s{{/ifgt}}</option
+            >
+            {{/each}} {{/select}}
+        </select>
+    </div>
 </form>

@@ -1,8 +1,8 @@
-$nodesto: "Nodesto", "Signika", "Palatino Linotype", serif;
+$nodesto: 'Nodesto', 'Signika', 'Palatino Linotype', serif;
 
 $black: black;
 $blue: blue;
-$cornflower: #6495ED;
+$cornflower: #6495ed;
 $green: green;
 $red: red;
 $grey: grey;
@@ -28,11 +28,9 @@ $groove-color: $dark;
 $groove: $groove-width solid $groove-color;
 $light-border: $dark;
 
-
-$radius: .25em;
+$radius: 0.25em;
 
 $border-under: 1px groove $groove-color;
 
-$sheetbackground: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("../ui/brushed_metal.jpg") repeat;
-
-
+$sheetbackground: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)),
+    url('../ui/brushed_metal.jpg') repeat;

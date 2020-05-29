@@ -1,125 +1,135 @@
 <div class="flexcol flex0">
-  <div class="technology">
-    {{#hasprop data 'grade'}}
-    <div class="flexrow nowrap">
-      <label>{{localize "SR5.CyberwareGrade"}}</label>
-      <select name="data.grade" class="display">
-        {{#select data.grade}}
-        {{#each config.cyberwareGrades as |name type|}}
-        <option value="{{type}}">{{localize name}}</option>
-        {{/each}}
-        {{/select}}
-      </select>
+    <div class="technology">
+        {{#hasprop data 'grade'}}
+        <div class="flexrow nowrap">
+            <label>{{localize "SR5.CyberwareGrade"}}</label>
+            <select name="data.grade" class="display">
+                {{#select data.grade}} {{#each config.cyberwareGrades as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
+        {{/hasprop}} {{#hasprop data 'essence'}}
+        <div class="flexrow nowrap">
+            <label>{{localize "SR5.EssenceCost"}}</label>
+            <input
+                class="display attribute-input"
+                type="text"
+                size="4"
+                name="data.essence"
+                value="{{data.essence}}"
+                data-dtype="Number"
+                placeholder="0"
+            />
+        </div>
+        {{/hasprop}} {{#hasprop data 'capacity'}}
+        <div class="flexrow nowrap">
+            <label>{{localize "SR5.Capacity"}}</label>
+            <input
+                class="display attribute-input"
+                type="text"
+                size="4"
+                name="data.capacity"
+                value="{{data.capacity}}"
+                data-dtype="Number"
+                placeholder="0"
+            />
+        </div>
+        {{/hasprop}}
+        <div class="flexrow nowrap">
+            <label>{{localize "SR5.Rating"}}</label>
+            <input
+                class="display"
+                type="text"
+                size="2"
+                maxlength="2"
+                name="data.technology.rating"
+                value="{{data.technology.rating}}"
+                data-dtype="Number"
+                placeholder="2"
+            />
+        </div>
+        <div class="flexrow nowrap">
+            <label>{{localize "SR5.Qty"}}</label>
+            <input
+                class="display"
+                type="text"
+                size="3"
+                maxlength="3"
+                name="data.technology.quantity"
+                value="{{data.technology.quantity}}"
+                data-dtype="Number"
+                placeholder="1"
+            />
+        </div>
+        <div class="flexrow nowrap">
+            <label>{{localize "SR5.Concealability"}}</label>
+            <input
+                class="display"
+                type="text"
+                size="3"
+                name="data.technology.concealability"
+                value="{{data.technology.concealability}}"
+                data-dtype="Number"
+                placeholder="0"
+            />
+        </div>
+        <div class="flexrow nowrap">
+            <label>{{localize "SR5.Cost"}}</label>
+            <div class="input">
+                <input
+                    class="display"
+                    type="text"
+                    name="data.technology.cost"
+                    value="{{data.technology.cost}}"
+                    data-dtype="Number"
+                    placeholder="100"
+                />
+                <span class="unit">
+                    <i class="fas fa-yen-sign"></i>
+                </span>
+            </div>
+        </div>
+        <div class="flexrow nowrap">
+            <label>{{localize "SR5.Availability"}}</label>
+            <input
+                class="display"
+                type="text"
+                name="data.technology.availability"
+                value="{{data.technology.availability}}"
+                placeholder="2R"
+            />
+        </div>
+        <div class="flexrow nowrap">
+            <label>{{localize "SR5.ConditionMonitor"}}</label>
+            <div class="flexrow">
+                <input
+                    class="display"
+                    type="text"
+                    size="2"
+                    maxlength="2"
+                    name="data.condition_monitor.value"
+                    value="{{data.condition_monitor.value}}"
+                    placeholder="0"
+                />
+                <input
+                    class="display"
+                    type="text"
+                    size="3"
+                    maxlength="3"
+                    value="/{{data.condition_monitor.max}}"
+                    disabled
+                />
+            </div>
+        </div>
+        <div class="flexrow nowrap">
+            {{localize "SR5.Equipped"}}<input
+                class="checkbox"
+                type="checkbox"
+                name="data.technology.equipped"
+                {{checked
+                data.technology.equipped}}
+            />
+        </div>
     </div>
-    {{/hasprop}}
-    {{#hasprop data 'essence'}}
-    <div class="flexrow nowrap">
-      <label>{{localize "SR5.EssenceCost"}}</label>
-      <input
-        class="display attribute-input"
-        type="text"
-        size="4"
-        name="data.essence"
-        value="{{data.essence}}"
-        data-dtype="Number"
-        placeholder="0"/>
-    </div>
-    {{/hasprop}}
-    {{#hasprop data 'capacity'}}
-    <div class="flexrow nowrap">
-      <label>{{localize "SR5.Capacity"}}</label>
-      <input
-        class="display attribute-input"
-        type="text"
-        size="4"
-        name="data.capacity"
-        value="{{data.capacity}}"
-        data-dtype="Number"
-        placeholder="0"/>
-    </div>
-    {{/hasprop}}
-    <div class="flexrow nowrap">
-      <label>{{localize "SR5.Rating"}}</label>
-      <input
-        class="display"
-        type='text'
-        size='2'
-        maxlength='2'
-        name='data.technology.rating'
-        value='{{data.technology.rating}}'
-        data-dtype='Number'
-        placeholder='2' />
-    </div>
-    <div class="flexrow nowrap">
-      <label>{{localize "SR5.Qty"}}</label>
-      <input
-        class="display"
-        type='text'
-        size='3'
-        maxlength='3'
-        name='data.technology.quantity'
-        value='{{data.technology.quantity}}'
-        data-dtype='Number'
-        placeholder='1' />
-    </div>
-    <div class="flexrow nowrap">
-      <label>{{localize "SR5.Concealability"}}</label>
-      <input
-        class="display"
-        type='text'
-        size='3'
-        name='data.technology.concealability'
-        value='{{data.technology.concealability}}'
-        data-dtype='Number'
-        placeholder='0' />
-    </div>
-    <div class="flexrow nowrap">
-      <label>{{localize "SR5.Cost"}}</label>
-      <div class="input">
-        <input
-          class="display"
-          type='text'
-          name='data.technology.cost'
-          value='{{data.technology.cost}}'
-          data-dtype='Number'
-          placeholder='100' />
-        <span class="unit">
-          <i class="fas fa-yen-sign"></i>
-        </span>
-      </div>
-    </div>
-    <div class="flexrow nowrap">
-      <label>{{localize "SR5.Availability"}}</label>
-      <input
-        class="display"
-        type='text'
-        name='data.technology.availability'
-        value='{{data.technology.availability}}'
-        placeholder='2R' />
-    </div>
-    <div class="flexrow nowrap">
-      <label>{{localize "SR5.ConditionMonitor"}}</label>
-      <div class="flexrow">
-        <input
-          class='display'
-          type='text'
-          size='2'
-          maxlength='2'
-          name='data.condition_monitor.value'
-          value='{{data.condition_monitor.value}}'
-          placeholder='0' />
-        <input
-           class="display"
-           type="text"
-           size="3"
-           maxlength="3"
-           value="/{{data.condition_monitor.max}}"
-           disabled />
-      </div>
-    </div>
-    <div class="flexrow nowrap">
-      {{localize "SR5.Equipped"}}<input class="checkbox" type="checkbox" name="data.technology.equipped" {{checked data.technology.equipped}} />
-    </div>
-  </div>
 </div>
-

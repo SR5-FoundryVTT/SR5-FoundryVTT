@@ -1,120 +1,124 @@
 <div class="item-form">
-  <div class="header">
-    {{header}}
-  </div>
-  <div class="form-line">
-    <div class="label">
-      {{localize "SR5.ActionType"}}
+    <div class="header">
+        {{header}}
     </div>
-    <div class="inputs">
-      {{#if data.action.type}}
-      <label>
-        {{localize "SR5.Extended"}}<input title="Specialization" type='checkbox' name="data.action.extended" {{checked data.action.extended}}/>
-      </label>
-      {{/if}}
-      <select name="data.action.type">
-        {{#select data.action.type}}
-        <option value=""></option>
-        {{#each config.actionTypes as |name type|}}
-        <option value="{{type}}">{{localize name}}</option>
-        {{/each}}
-        {{/select}}
-      </select>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.ActionType"}}
+        </div>
+        <div class="inputs">
+            {{#if data.action.type}}
+            <label>
+                {{localize "SR5.Extended"}}<input
+                    title="Specialization"
+                    type="checkbox"
+                    name="data.action.extended"
+                    {{checked data.action.extended}}
+                />
+            </label>
+            {{/if}}
+            <select name="data.action.type">
+                {{#select data.action.type}}
+                <option value=""></option>
+                {{#each config.actionTypes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
     </div>
-  </div>
-  {{#if data.action.type}}
-  <div class="form-line">
-    <div class="label">
-      {{localize "SR5.Skill"}}
+    {{#if data.action.type}}
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.Skill"}}
+        </div>
+        <div class="inputs">
+            {{#if data.action.skill}}
+            <label>
+                {{localize "SR5.Specialization"}}
+                <input
+                    title="Specialization"
+                    type="checkbox"
+                    name="data.action.spec"
+                    {{checked data.action.spec}}
+                />
+            </label>
+            {{/if}}
+            <select name="data.action.skill">
+                {{#select data.action.skill}}
+                <option value=""></option>
+                {{#each config.activeSkills as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
     </div>
-    <div class="inputs">
-      {{#if data.action.skill}}
-      <label>
-        {{localize "SR5.Specialization"}}<input title="Specialization" type='checkbox' name="data.action.spec" {{checked data.action.spec}}/>
-      </label>
-      {{/if}}
-      <select name="data.action.skill">
-      {{#select data.action.skill}}
-        <option value=""></option>
-        {{#each config.activeSkills as |name type|}}
-        <option value="{{type}}">{{localize name}}</option>
-        {{/each}}
-      {{/select}}
-      </select>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.Attribute"}}
+        </div>
+        <div class="inputs">
+            <select name="data.action.attribute">
+                {{#select data.action.attribute}}
+                <option value=""></option>
+                {{#each config.attributes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+            {{#unless data.action.skill}}
+            <select name="data.action.attribute2">
+                {{#select data.action.attribute2}}
+                <option value=""></option>
+                {{#each config.attributes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+            {{/unless}}
+        </div>
     </div>
-  </div>
-  <div class="form-line">
-    <div class="label">
-      {{localize "SR5.Attribute"}}
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.DicePoolModifier"}}
+        </div>
+        <div class="inputs">
+            <input
+                size="4"
+                maxlength="3"
+                type="text"
+                name="data.action.mod"
+                value="{{data.action.mod}}"
+                data-dtype="Number"
+                placeholder="+Mod"
+            />
+        </div>
     </div>
-    <div class="inputs">
-      <select name="data.action.attribute">
-      {{#select data.action.attribute}}
-        <option value=""></option>
-        {{#each config.attributes as |name type|}}
-        <option value="{{type}}">{{localize name}}</option>
-        {{/each}}
-      {{/select}}
-      </select>
-      {{#unless data.action.skill}}
-      <select name="data.action.attribute2">
-      {{#select data.action.attribute2}}
-        <option value=""></option>
-        {{#each config.attributes as |name type|}}
-        <option value="{{type}}">{{localize name}}</option>
-        {{/each}}
-      {{/select}}
-      </select>
-      {{/unless}}
+    {{#ifne item.type "spell"}} {{#ifne item.type "complex_form"}}
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.Limit"}}
+        </div>
+        <div class="inputs">
+            <input
+                size="4"
+                maxlength="3"
+                type="text"
+                name="data.action.limit.base"
+                value="{{data.action.limit.base}}"
+                data-dtype="Number"
+                placeholder=""
+            />
+            <div>
+                +
+            </div>
+            <select name="data.action.limit.attribute">
+                {{#select data.action.limit.attribute}}
+                <option value=""></option>
+                {{#each config.limits as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{#each config.matrixAttributes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
     </div>
-  </div>
-  <div class="form-line">
-    <div class="label">
-      {{localize "SR5.DicePoolModifier"}}
-    </div>
-    <div class="inputs">
-      <input
-         size='4'
-         maxlength='3'
-         type='text'
-         name='data.action.mod'
-         value="{{data.action.mod}}"
-         data-dtype="Number"
-         placeholder="+Mod" />
-    </div>
-  </div>
-  {{#ifne item.type "spell"}}
-  {{#ifne item.type "complex_form"}}
-  <div class="form-line">
-    <div class="label">
-      {{localize "SR5.Limit"}}
-    </div>
-    <div class="inputs">
-      <input
-         size='4'
-         maxlength='3'
-         type='text'
-         name='data.action.limit.base'
-         value="{{data.action.limit.base}}"
-         data-dtype="Number"
-         placeholder="" />
-      <div>
-        +
-      </div>
-      <select name="data.action.limit.attribute">
-      {{#select data.action.limit.attribute}}
-        <option value=""></option>
-        {{#each config.limits as |name type|}}
-        <option value="{{type}}">{{localize name}}</option>
-        {{/each}}
-        {{#each config.matrixAttributes as |name type|}}
-        <option value="{{type}}">{{localize name}}</option>
-        {{/each}}
-      {{/select}}
-      </select>
-    </div>
-  </div>
-  {{/ifne}}
-  {{/ifne}}
-  {{/if}}
+    {{/ifne}} {{/ifne}} {{/if}}
 </div>

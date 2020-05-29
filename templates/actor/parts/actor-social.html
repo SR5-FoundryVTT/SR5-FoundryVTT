@@ -1,144 +1,143 @@
 <div class="inventory">
-  <div class="split-container">
-    <div class='scroll-area'>
-      <div class="item item-section">
-        <div class="item-left">
-          <div class="item-text item-name">
-            SIN
-          </div>
-        </div>
-        <div class="item-right">
-          <div class="item-text item-icons">
-            <a class="item-create" title="Create SIN" data-type="sin">
-              <i class="fas fa-plus"></i>
-              {{localize "SR5.Add"}}
-            </a>
-          </div>
-        </div>
-      </div>
-      {{#each sins as |item i|}}
-      <div class="item" data-item-id='{{item._id}}'>
-        <div class="item-left">
-          <div class="item-img item-roll">
-            <img src="{{item.img}}" title="{{item.name}}" height='24px' width='24px'/>
-          </div>
-          <div class="item-text item-name has-desc">
-            {{item.name}}
-          </div>
-        </div>
-        <div class="item-right">
-          <div class="item-text">
-            R {{item.data.technology.rating}}
-          </div>
-          <div class="item-text item-icons">
-            <i class="item-edit roll fas fa-edit" ></i>
-            <i class="item-delete roll fas fa-trash" ></i>
-          </div>
-        </div>
-      </div>
-      <div class="item hidden">
-        <div class="item-desc">
-          {{{item.data.description.value}}}
-          <div class="props">
-            {{#each item.properties}}
-            <span>{{this}}</span>
+    <div class="split-container">
+        <div class="scroll-area">
+            <div class="item item-section">
+                <div class="item-left">
+                    <div class="item-text item-name">
+                        SIN
+                    </div>
+                </div>
+                <div class="item-right">
+                    <div class="item-text item-icons">
+                        <a class="item-create" title="Create SIN" data-type="sin">
+                            <i class="fas fa-plus"></i>
+                            {{localize "SR5.Add"}}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {{#each sins as |item i|}}
+            <div class="item" data-item-id="{{item._id}}">
+                <div class="item-left">
+                    <div class="item-img item-roll">
+                        <img src="{{item.img}}" title="{{item.name}}" height="24px" width="24px" />
+                    </div>
+                    <div class="item-text item-name has-desc">
+                        {{item.name}}
+                    </div>
+                </div>
+                <div class="item-right">
+                    <div class="item-text">
+                        R {{item.data.technology.rating}}
+                    </div>
+                    <div class="item-text item-icons">
+                        <i class="item-edit roll fas fa-edit"></i>
+                        <i class="item-delete roll fas fa-trash"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="item hidden">
+                <div class="item-desc">
+                    {{{item.data.description.value}}}
+                    <div class="props">
+                        {{#each item.properties}}
+                        <span>{{this}}</span>
+                        {{/each}}
+                    </div>
+                </div>
+            </div>
             {{/each}}
-          </div>
-        </div>
-      </div>
-      {{/each}}
-      <div class="item item-section">
-        <div class="item-left">
-          <div class="item-text item-name">
-            {{localize "SR5.Lifestyles"}}
-          </div>
-        </div>
-        <div class="item-right">
-          <div class="item-text item-icons">
-            <a class="item-create" title="Create Lifestyle" data-type="lifestyle">
-              <i class="fas fa-plus"></i>
-              {{localize "SR5.Add"}}
-            </a>
-          </div>
-        </div>
-      </div>
-      {{#each lifestyles as |item i|}}
-      <div class="item" data-item-id='{{item._id}}'>
-        <div class="item-left">
-          <div class="item-img item-roll">
-            <img src="{{item.img}}" title="{{item.name}}" height='24px' width='24px'/>
-          </div>
-          <div class="item-text item-name has-desc">
-            {{item.name}}
-          </div>
-        </div>
-        <div class="item-right">
-          <div class="item-text">
-            {{localizeOb item.data.type ../config.lifestyleTypes}}
-          </div>
-          <div class="item-text item-icons">
-            <i class="item-edit roll fas fa-edit" ></i>
-            <i class="item-delete roll fas fa-trash" ></i>
-          </div>
-        </div>
-      </div>
-      <div class="item hidden">
-        <div class="item-desc">
-          {{{item.data.description.value}}}
-          <div class="props">
-            {{#each item.properties}}
-            <span>{{this}}</span>
+            <div class="item item-section">
+                <div class="item-left">
+                    <div class="item-text item-name">
+                        {{localize "SR5.Lifestyles"}}
+                    </div>
+                </div>
+                <div class="item-right">
+                    <div class="item-text item-icons">
+                        <a class="item-create" title="Create Lifestyle" data-type="lifestyle">
+                            <i class="fas fa-plus"></i>
+                            {{localize "SR5.Add"}}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {{#each lifestyles as |item i|}}
+            <div class="item" data-item-id="{{item._id}}">
+                <div class="item-left">
+                    <div class="item-img item-roll">
+                        <img src="{{item.img}}" title="{{item.name}}" height="24px" width="24px" />
+                    </div>
+                    <div class="item-text item-name has-desc">
+                        {{item.name}}
+                    </div>
+                </div>
+                <div class="item-right">
+                    <div class="item-text">
+                        {{localizeOb item.data.type ../config.lifestyleTypes}}
+                    </div>
+                    <div class="item-text item-icons">
+                        <i class="item-edit roll fas fa-edit"></i>
+                        <i class="item-delete roll fas fa-trash"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="item hidden">
+                <div class="item-desc">
+                    {{{item.data.description.value}}}
+                    <div class="props">
+                        {{#each item.properties}}
+                        <span>{{this}}</span>
+                        {{/each}}
+                    </div>
+                </div>
+            </div>
             {{/each}}
-          </div>
         </div>
-      </div>
-      {{/each}}
+        <div class="scroll-area">
+            <div class="item item-section">
+                <div class="item-left">
+                    <div class="item-text item-name">
+                        {{localize "SR5.Contacts"}}
+                    </div>
+                </div>
+                <div class="item-right">
+                    <div class="item-text item-icons">
+                        <a class="item-create" title="Create Contact" data-type="contact">
+                            <i class="fas fa-plus"></i>
+                            {{localize "SR5.Add"}}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {{#each contacts as |item i|}}
+            <div class="item" data-item-id="{{item._id}}">
+                <div class="item-left">
+                    <div class="item-img item-roll">
+                        <img src="{{item.img}}" title="{{item.name}}" height="24px" width="24px" />
+                    </div>
+                    <div class="item-text item-name has-desc">
+                        {{item.name}}
+                    </div>
+                </div>
+                <div class="item-right">
+                    <div class="item-text item-icons">
+                        <i class="item-edit roll fas fa-edit"></i>
+                        <i class="item-delete roll fas fa-trash"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="item hidden">
+                <div class="item-desc">
+                    {{{item.data.description.value}}}
+                    <div class="props">
+                        {{#each item.properties}}
+                        <span>{{this}}</span>
+                        {{/each}}
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+        </div>
     </div>
-    <div class='scroll-area'>
-      <div class="item item-section">
-        <div class="item-left">
-          <div class="item-text item-name">
-            {{localize "SR5.Contacts"}}
-          </div>
-        </div>
-        <div class="item-right">
-          <div class="item-text item-icons">
-            <a class="item-create" title="Create Contact" data-type="contact">
-              <i class="fas fa-plus"></i>
-              {{localize "SR5.Add"}}
-            </a>
-          </div>
-        </div>
-      </div>
-      {{#each contacts as |item i|}}
-      <div class="item" data-item-id='{{item._id}}'>
-        <div class="item-left">
-          <div class="item-img item-roll">
-            <img src="{{item.img}}" title="{{item.name}}" height='24px' width='24px'/>
-          </div>
-          <div class="item-text item-name has-desc">
-            {{item.name}}
-          </div>
-        </div>
-        <div class="item-right">
-          <div class="item-text item-icons">
-            <i class="item-edit roll fas fa-edit" ></i>
-            <i class="item-delete roll fas fa-trash" ></i>
-          </div>
-        </div>
-      </div>
-      <div class="item hidden">
-        <div class="item-desc">
-          {{{item.data.description.value}}}
-          <div class="props">
-            {{#each item.properties}}
-            <span>{{this}}</span>
-            {{/each}}
-          </div>
-        </div>
-      </div>
-      {{/each}}
-    </div>
-  </div>
 </div>
-

@@ -1,208 +1,234 @@
 <div class="item-form">
-  <div class="header">
-    {{header}}
-  </div>
-  <div class="form-line">
-    <div class="label">
-      {{localize "SR5.WeaponType"}}
+    <div class="header">
+        {{header}}
     </div>
-    <div class="inputs">
-      <select name="data.category">
-        {{#select data.category}}
-        <option value=""></option>
-        {{#each config.weaponCategories as |name type|}}
-        <option value="{{type}}">{{localize name}}</option>
-        {{/each}}
-        {{/select}}
-      </select>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.WeaponType"}}
+        </div>
+        <div class="inputs">
+            <select name="data.category">
+                {{#select data.category}}
+                <option value=""></option>
+                {{#each config.weaponCategories as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
     </div>
-  </div>
-  {{#if data.category}}
-  {{#ife data.category "range"}}
-  <div class="form-line">
-    <div class="label">
-      {{localize "SR5.WeaponAmmoCount"}}
+    {{#if data.category}} {{#ife data.category "range"}}
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.WeaponAmmoCount"}}
+        </div>
+        <div class="inputs">
+            <input
+                size="2"
+                type="text"
+                name="data.range.ammo.value"
+                value="{{data.range.ammo.value}}"
+                data-dtype="Number"
+                placeholder="0"
+            />
+            /
+            <input
+                size="2"
+                type="text"
+                name="data.range.ammo.max"
+                value="{{data.range.ammo.max}}"
+                data-dtype="Number"
+                placeholder="{{localize SR5.Max}}"
+            />
+        </div>
     </div>
-    <div class="inputs">
-      <input
-        size='2'
-        type='text'
-        name='data.range.ammo.value'
-        value='{{data.range.ammo.value}}'
-        data-dtype='Number'
-        placeholder='0'/>
-      /
-      <input
-        size='2'
-        type='text'
-        name='data.range.ammo.max'
-        value="{{data.range.ammo.max}}"
-        data-dtype="Number"
-        placeholder='{{localize SR5.Max}}'/>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.WeaponModes"}}
+        </div>
+        <div class="inputs">
+            <label>
+                {{localize "SR5.WeaponModeSingleShot"}}<input
+                    type="checkbox"
+                    name="data.range.modes.single_shot"
+                    {{checked
+                    data.range.modes.single_shot}}
+                />
+            </label>
+            <label>
+                {{localize "SR5.WeaponModeSemiAuto"}}<input
+                    type="checkbox"
+                    name="data.range.modes.semi_auto"
+                    {{checked
+                    data.range.modes.semi_auto}}
+                />
+            </label>
+            <label>
+                {{localize "SR5.WeaponModeBurstFire"}}<input
+                    type="checkbox"
+                    name="data.range.modes.burst_fire"
+                    {{checked
+                    data.range.modes.burst_fire}}
+                />
+            </label>
+            <label>
+                {{localize "SR5.WeaponModeFullAuto"}}<input
+                    type="checkbox"
+                    name="data.range.modes.full_auto"
+                    {{checked
+                    data.range.modes.full_auto}}
+                />
+            </label>
+        </div>
     </div>
-  </div>
-  <div class="form-line">
-    <div class="label">
-      {{localize "SR5.WeaponModes"}}
+    {{/ife}} {{#ife data.category "range"}}
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.WeaponRanges"}}
+        </div>
+        <div class="inputs">
+            <input
+                size="3"
+                type="text"
+                name="data.range.ranges.short"
+                value="{{data.range.ranges.short}}"
+                data-dtype="Number"
+            />
+            /
+            <input
+                size="3"
+                type="text"
+                name="data.range.ranges.medium"
+                value="{{data.range.ranges.medium}}"
+                data-dtype="Number"
+            />
+            /
+            <input
+                size="3"
+                type="text"
+                name="data.range.ranges.long"
+                value="{{data.range.ranges.long}}"
+                data-dtype="Number"
+            />
+            /
+            <input
+                size="3"
+                type="text"
+                name="data.range.ranges.extreme"
+                value="{{data.range.ranges.extreme}}"
+                data-dtype="Number"
+            />
+        </div>
     </div>
-    <div class="inputs">
-      <label>
-        {{localize "SR5.WeaponModeSingleShot"}}<input type="checkbox" name="data.range.modes.single_shot" {{checked data.range.modes.single_shot}}>
-      </label>
-      <label>
-        {{localize "SR5.WeaponModeSemiAuto"}}<input type="checkbox" name="data.range.modes.semi_auto" {{checked data.range.modes.semi_auto}}>
-      </label>
-      <label>
-        {{localize "SR5.WeaponModeBurstFire"}}<input type="checkbox" name="data.range.modes.burst_fire" {{checked data.range.modes.burst_fire}}>
-      </label>
-      <label>
-        {{localize "SR5.WeaponModeFullAuto"}}<input type="checkbox" name="data.range.modes.full_auto" {{checked data.range.modes.full_auto}}>
-      </label>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.RecoilCompensation"}}
+        </div>
+        <div class="inputs">
+            <input
+                type="text"
+                size="2"
+                name="data.range.rc.base"
+                value="{{data.range.rc.base}}"
+                data-dtype="Number"
+                placeholder="1"
+            />
+        </div>
     </div>
-  </div>
-  {{/ife}}
-  {{#ife data.category "range"}}
-  <div class="form-line">
-    <div class="label">
-      {{localize "SR5.WeaponRanges"}}
+    {{/ife}} {{#ife data.category "thrown"}}
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.WeaponRanges"}}
+        </div>
+        <div class="inputs">
+            <input
+                size="3"
+                type="text"
+                name="data.thrown.ranges.short"
+                value="{{data.thrown.ranges.short}}"
+                data-dtype="Number"
+            />
+            /
+            <input
+                size="3"
+                type="text"
+                name="data.thrown.ranges.medium"
+                value="{{data.thrown.ranges.medium}}"
+                data-dtype="Number"
+            />
+            /
+            <input
+                size="3"
+                type="text"
+                name="data.thrown.ranges.long"
+                value="{{data.thrown.ranges.long}}"
+                data-dtype="Number"
+            />
+            /
+            <input
+                size="3"
+                type="text"
+                name="data.thrown.ranges.extreme"
+                value="{{data.thrown.ranges.extreme}}"
+                data-dtype="Number"
+            />
+            <i class="fas fa-times"></i>
+            <select name="data.thrown.ranges.attribute">
+                {{#select data.thrown.ranges.attribute}}
+                <option value=""></option>
+                {{#each config.attributes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
     </div>
-    <div class="inputs">
-      <input
-         size='3'
-         type='text'
-         name='data.range.ranges.short'
-         value="{{data.range.ranges.short}}"
-         data-dtype="Number" />
-      /
-      <input
-         size='3'
-         type='text'
-         name='data.range.ranges.medium'
-         value="{{data.range.ranges.medium}}"
-         data-dtype="Number" />
-      /
-      <input
-         size='3'
-         type='text'
-         name='data.range.ranges.long'
-         value="{{data.range.ranges.long}}"
-         data-dtype="Number" />
-      /
-      <input
-         size='3'
-         type='text'
-         name='data.range.ranges.extreme'
-         value="{{data.range.ranges.extreme}}"
-         data-dtype="Number" />
+    {{/ife}} {{#ife data.category "melee"}}
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.WeaponReach"}}
+        </div>
+        <div class="inputs">
+            <input
+                type="text"
+                size="2"
+                name="data.melee.reach"
+                value="{{data.melee.reach}}"
+                data-dtype="Number"
+                placeholder="1"
+            />
+        </div>
     </div>
-  </div>
-  <div class="form-line">
-    <div class="label">
-      {{localize "SR5.RecoilCompensation"}}
+    {{/ife}} {{#ife data.category "thrown"}}
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.Radius"}}
+        </div>
+        <div class="inputs">
+            <input
+                type="text"
+                size="4"
+                name="data.thrown.blast.radius"
+                value="{{data.thrown.blast.radius}}"
+                data-dtype="Number"
+                placeholder="1"
+            />
+            m
+        </div>
     </div>
-    <div class="inputs">
-      <input
-        type="text"
-        size="2"
-        name='data.range.rc.base'
-        value='{{data.range.rc.base}}'
-        data-dtype="Number"
-        placeholder="1"/>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.Dropoff"}}
+        </div>
+        <div class="inputs">
+            <input
+                size="3"
+                type="text"
+                name="data.thrown.blast.dropoff"
+                value="{{data.thrown.blast.dropoff}}"
+                data-dtype="Number"
+                placeholder="-1"
+            />
+            /m
+        </div>
     </div>
-  </div>
-  {{/ife}}
-  {{#ife data.category "thrown"}}
-  <div class="form-line">
-    <div class="label">
-      {{localize "SR5.WeaponRanges"}}
-    </div>
-    <div class="inputs">
-      <input
-         size='3'
-         type='text'
-         name='data.thrown.ranges.short'
-         value="{{data.thrown.ranges.short}}"
-         data-dtype="Number" />
-      /
-      <input
-         size='3'
-         type='text'
-         name='data.thrown.ranges.medium'
-         value="{{data.thrown.ranges.medium}}"
-         data-dtype="Number" />
-      /
-      <input
-         size='3'
-         type='text'
-         name='data.thrown.ranges.long'
-         value="{{data.thrown.ranges.long}}"
-         data-dtype="Number" />
-      /
-      <input
-         size='3'
-         type='text'
-         name='data.thrown.ranges.extreme'
-         value="{{data.thrown.ranges.extreme}}"
-         data-dtype="Number" />
-      <i class="fas fa-times"></i>
-      <select name="data.thrown.ranges.attribute">
-      {{#select data.thrown.ranges.attribute}}
-        <option value=""></option>
-        {{#each config.attributes as |name type|}}
-        <option value="{{type}}">{{localize name}}</option>
-        {{/each}}
-      {{/select}}
-      </select>
-    </div>
-  </div>
-  {{/ife}}
-  {{#ife data.category "melee"}}
-  <div class="form-line">
-    <div class="label">
-      {{localize "SR5.WeaponReach"}}
-    </div>
-    <div class="inputs">
-      <input
-        type="text"
-        size="2"
-        name="data.melee.reach"
-        value="{{data.melee.reach}}"
-        data-dtype="Number"
-        placeholder="1"/>
-    </div>
-  </div>
-  {{/ife}}
-  {{#ife data.category "thrown"}}
-  <div class="form-line">
-    <div class="label">
-      {{localize "SR5.Radius"}}
-    </div>
-    <div class="inputs">
-      <input
-        type="text"
-        size="4"
-        name="data.thrown.blast.radius"
-        value="{{data.thrown.blast.radius}}"
-        data-dtype="Number"
-        placeholder="1"/>
-      m
-    </div>
-  </div>
-  <div class="form-line">
-    <div class="label">
-      {{localize "SR5.Dropoff"}}
-    </div>
-    <div class="inputs">
-      <input
-        size='3'
-        type='text'
-        name='data.thrown.blast.dropoff'
-        value='{{data.thrown.blast.dropoff}}'
-        data-dtype='Number'
-        placeholder='-1'/>
-      /m
-    </div>
-  </div>
-  {{/ife}}
-  {{/if}}
+    {{/ife}} {{/if}}
 </div>
