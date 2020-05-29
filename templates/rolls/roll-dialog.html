@@ -1,13 +1,13 @@
 <form class="sr5 roll-dialog">
-  <div class="mods-list">
+  <div class="parts-list">
     {{#if base}}
     <div class="flex0" style="white-space: nowrap">
       <span>{{localize "SR5.Base"}}</span> (<span style="font-weight: bold">{{base}}</span>)
     </div>
     {{/if}}
-    {{#each mods as |mod id|}}
+    {{#each parts as |part id|}}
     <div class="flex0" style="white-space: nowrap">
-      <span>{{localize id}}</span> (<span style="font-weight: bold">{{mod}}</span>)
+      <span>{{localize id}}</span> (<span style="font-weight: bold">{{part}}</span>)
     </div>
     {{/each}}
   </div>

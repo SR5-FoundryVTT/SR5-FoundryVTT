@@ -1,6 +1,7 @@
 export class Helpers {
   static isMatrix(atts) {
     if (!atts) return false;
+    if (typeof atts === 'boolean' && atts) return true;
     const matrixAtts = ['firewall', 'data_processing', 'sleaze', 'attack'];
     const matrixLabels = matrixAtts.map(s => this.label(s));
     if (!Array.isArray(atts)) atts = [atts];
@@ -12,7 +13,7 @@ export class Helpers {
     return false;
   }
 
-  static setupCustomCheckbox(app, html, data) {
+  static setupCustomCheckbox(app, html) {
     const setContent = (el => {
       let checkbox = $(el).children('input[type=checkbox]');
       let checkmark = $(el).children('.checkmark');
@@ -24,7 +25,7 @@ export class Helpers {
         $(checkmark).removeClass('fa-check-circle');
       }
     });
-    html.find('label.checkbox').each(function(index) { setContent(this) });
+    html.find('label.checkbox').each(function() { setContent(this) });
     html.find('label.checkbox').click(event => setContent(event.currentTarget));
     html.find('.submit-checkbox').change((event) => app._onSubmit(event));
   }
@@ -98,14 +99,14 @@ export class Helpers {
     return retObj;
   }
 
-  static addLabels(obj, label, recurs = false) {
+  static addLabels(obj, label) {
     if (typeof obj === 'object' && obj !== null) {
       if (!obj.hasOwnProperty('label') && obj.hasOwnProperty('value') && label !== '') {
         obj.label = label;
       }
       Object.entries(obj)
-        .filter(([key, value]) => typeof value === 'object')
+        .filter(([, value]) => typeof value === 'object')
         .forEach(([key, value]) => Helpers.addLabels(value, key));
     }
   }
-};
+}

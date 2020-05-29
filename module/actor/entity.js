@@ -6,15 +6,15 @@ export class SR5Actor extends Actor {
 
   update(data, options) {
     super.update(data, options);
-    // trigger update for all owned items
+    // trigger update for all items with action
     // needed for rolls to properly update when items or attributes update
-    for (let i of this.data.items) {
-      let id = i._id;
-      let item = this.getOwnedItem(id);
-      if (item && item.data.data.action) {
-        item.update({});
+    const itemUpdates = [];
+    for (let item of this.data.items) {
+      if (item && item.data.action) {
+        itemUpdates.push(item);
       }
     }
+    this.updateEmbeddedEntity("OwnedItem", itemUpdates);
   }
 
   prepareData() {
@@ -121,7 +121,7 @@ export class SR5Actor extends Actor {
     }
 
     // ATTRIBUTES
-    for (let [label, att] of Object.entries(attrs)) {
+    for (let [, att] of Object.entries(attrs)) {
       if (!att.hidden) {
         if (!att.mod) att.mod = 0;
         att.value = att.base + att.mod;
@@ -136,7 +136,7 @@ export class SR5Actor extends Actor {
 
 
 
-    for (let [label, skill] of Object.entries(data.skills.active)) {
+    for (let [, skill] of Object.entries(data.skills.active)) {
       if (!skill.hidden) {
         if (!skill.mod) skill.mod = 0;
         skill.value = skill.base + skill.mod;
@@ -154,20 +154,20 @@ export class SR5Actor extends Actor {
       skill.value = skill.base + skill.mod;
     }
 
-    for (let [category, group] of Object.entries(data.skills.knowledge)) {
+    for (let [, group] of Object.entries(data.skills.knowledge)) {
       const entries = Object.entries(group.value);
       // remove entries which are deleted TODO figure out how to delete these from the data
-      group.value = entries.filter(([key, val]) => !val._delete).reduce((acc, [id, skill]) => {
+      group.value = entries.filter(([, val]) => !val._delete).reduce((acc, [id, skill]) => {
         if (!skill.mod) skill.mod = 0;
         skill.value = skill.base + skill.mod;
         acc[id] = skill;
         return acc;
       }, {});
-      console.log(group)
     }
 
     // TECHNOMANCER LIVING PERSONA
     if (data.special === 'resonance') {
+      // if value is equal to mod, we don't have an item equipped TODO this is horrible
       if (matrix.firewall.value === matrix.firewall.mod) {
         // we should use living persona
         matrix.firewall.value += attrs.willpower.value;
@@ -398,16 +398,16 @@ export class SR5Actor extends Actor {
     const wil = this.data.data.attributes.willpower;
     const res = this.data.data.attributes.resonance;
 
-    const mods = {};
-    mods[wil.label] = wil.value;
-    mods[res.label] = res.value;
-    if (data.modifiers.fade) mods['SR5.Bonus'] = data.modifiers.fade;
+    const parts = {};
+    parts[wil.label] = wil.value;
+    parts[res.label] = res.value;
+    if (data.modifiers.fade) parts['SR5.Bonus'] = data.modifiers.fade;
 
     let title = "Fade";
     if (incoming >= 0) title += ` (${incoming} incoming)`;
     DiceSR.rollTest({
       event: options.event,
-      mods,
+      parts,
       actor: this,
       title: title,
       wounds: false
@@ -418,16 +418,16 @@ export class SR5Actor extends Actor {
     const wil = this.data.data.attributes.willpower;
     const drainAtt = this.data.data.attributes[this.data.data.magic.attribute];
 
-    const mods = {};
-    mods[wil.label] = wil.value;
-    mods[drainAtt.label] = drainAtt.value;
-    if (this.data.data.modifiers.drain) mods['SR5.Bonus'] = this.data.data.modifiers.drain;
+    const parts = {};
+    parts[wil.label] = wil.value;
+    parts[drainAtt.label] = drainAtt.value;
+    if (this.data.data.modifiers.drain) parts['SR5.Bonus'] = this.data.data.modifiers.drain;
 
     let title = 'Drain';
     if (incoming >= 0) title += ` (${incoming} incoming)`;
     DiceSR.rollTest({
       event: options.event,
-      mods,
+      parts,
       actor: this,
       title: title,
       wounds: false
@@ -436,12 +436,12 @@ export class SR5Actor extends Actor {
 
   rollArmor(options) {
     const armor = this.data.data.armor.value;
-    const mods = {};
-    mods["SR5.Armor"] = armor;
+    const parts = {};
+    parts["SR5.Armor"] = armor;
     return DiceSR.rollTest({
       event: options.event,
       actor: this,
-      mods,
+      parts,
       title: 'Armor',
       wounds: false
     });
@@ -463,38 +463,38 @@ export class SR5Actor extends Actor {
           content: dlg,
           buttons: {
             normal: {
-              label: 'Normal',
+              label: game.i18n.localize("Normal"),
               callback: () => cancel = false
             },
             full_defense: {
-              label: `Full Defense (+ ${this.data.data.attributes.willpower.value})`,
+              label: `${game.i18n.localize("SR5.FullDefense")} (+${this.data.data.attributes.willpower.value})`,
               callback: () => { special = 'full_defense';cancel = false; }
             }
           },
           default: 'normal',
-          close: html => {
+          close: async (html) => {
             if (cancel) return;
             const rea = this.data.data.attributes.reaction;
             const int = this.data.data.attributes.intuition;
 
-            const mods = {};
-            mods[rea.label] = rea.value;
-            mods[int.label] = int.value;
-            if (this.data.data.modifiers.defense) mods['SR5.Bonus'] = this.data.data.modifiers.defense;
+            const parts = {};
+            parts[rea.label] = rea.value;
+            parts[int.label] = int.value;
+            if (this.data.data.modifiers.defense) parts['SR5.Bonus'] = this.data.data.modifiers.defense;
 
             let fireMode = parseInt(html.find('[name=fireMode]').val());
             let cover = parseInt(html.find('[name=cover]').val());
 
-            if (special === 'full_defense') mods['SR5.FullDefense'] = this.data.data.attributes.willpower.value;
-            if (special === 'dodge') mods['SR5.Dodge'] = this.data.data.skills.active.gymnastics.value;
-            if (special === 'block') mods['SR5.Block'] = this.data.data.skills.active.unarmed_combat.value;
-            if (fireMode) mods['SR5.FireMode'] = fireMode;
-            if (cover) mods['SR5.Cover'] = cover;
+            if (special === 'full_defense') parts['SR5.FullDefense'] = this.data.data.attributes.willpower.value;
+            if (special === 'dodge') parts['SR5.Dodge'] = this.data.data.skills.active.gymnastics.value;
+            if (special === 'block') parts['SR5.Block'] = this.data.data.skills.active.unarmed_combat.value;
+            if (fireMode) parts['SR5.FireMode'] = fireMode;
+            if (cover) parts['SR5.Cover'] = cover;
 
-            return DiceSR.rollTest({
+            resolve(DiceSR.rollTest({
               event: options.event,
               actor: this,
-              mods: mods,
+              parts,
               title: 'Defense'}).then(async (roll) => {
                 this.unsetFlag('shadowrun5e', 'incomingAttack');
                 if (options.incomingAttack) {
@@ -508,13 +508,14 @@ export class SR5Actor extends Actor {
                     let ap = options.incomingAttack.ap;
                     // ui.notifications.info(`Got Hit: DV${damage}${damageType ? damageType.charAt(0).toUpperCase() : ''} ${ap}AP`);
                     this.setFlag('shadowrun5e', 'incomingDamage', {
-                      damage: damage,
-                      ap: ap
+                      damage,
+                      damageType,
+                      ap,
                     });
-                    this.rollSoak({event, damage, ap});
+                    this.rollSoak({event: options.event, damage, ap});
                   }
                 }
-            });
+            }));
           }
         }).render(true);
       });
@@ -574,34 +575,34 @@ export class SR5Actor extends Actor {
             const body = this.data.data.attributes.body;
             const armor = this.data.data.armor;
 
-            const mods = {};
+            const parts = {};
 
-            mods[body.label] = body.value;
-            mods['SR5.Armor'] = armor.value;
-            if (this.data.data.modifiers.soak) mods['SR5.Bonus'] = this.data.data.modifiers.soak;
+            parts[body.label] = body.value;
+            parts['SR5.Armor'] = armor.value;
+            if (this.data.data.modifiers.soak) parts['SR5.Bonus'] = this.data.data.modifiers.soak;
 
             const armorId = id === 'default' ? '' : id;
             const bonusArmor = armor[armorId] || 0;
-            if (bonusArmor) mods[Helpers.label(armorId)] = bonusArmor;
+            if (bonusArmor) parts[Helpers.label(armorId)] = bonusArmor;
 
             const ap = parseInt(html.find('[name=ap]').val());
             if (ap) {
               let armorVal = armor.value + bonusArmor;
 
               // don't take more AP than armor
-              mods['SR5.AP'] = Math.max(ap, -armorVal);
+              parts['SR5.AP'] = Math.max(ap, -armorVal);
             }
 
             const label = Helpers.label(id);
             let title = `Soak - ${label}`;
             if (options.damage) title += ` - Incoming Damage: ${options.damage}`;
-            return DiceSR.rollTest({
+            resolve(DiceSR.rollTest({
               event: options.event,
               actor: this,
-              mods: mods,
+              parts,
               title: title,
               wounds: false
-            });
+            }));
           }
         }).render(true);
       });
@@ -610,12 +611,12 @@ export class SR5Actor extends Actor {
 
   rollSingleAttribute(attId, options) {
     const attr = this.data.data.attributes[attId];
-    const mods = {};
-    mods[attr.label] = attr.value;
+    const parts = {};
+    parts[attr.label] = attr.value;
     return DiceSR.rollTest({
       event: options.event,
       actor: this,
-      mods,
+      parts,
       title: Helpers.label(attrId),
       matrix: Helpers.isMatrix(attr),
     });
@@ -626,13 +627,13 @@ export class SR5Actor extends Actor {
     const attr2 = this.data.data.attributes[id2];
     const label1 = Helpers.label(id1);
     const label2 = Helpers.label(id2);
-    const mods = {}
-    mods[attr1.label] = attr1.value;
-    mods[attr2.label] = attr2.value;
+    const parts = {}
+    parts[attr1.label] = attr1.value;
+    parts[attr2.label] = attr2.value;
     return DiceSR.rollTest({
       event: options.event,
       actor: this,
-      mods,
+      parts,
       title: `${label1} + ${label2}`,
       matrix: Helpers.isMatrix([attr1, attr2]),
     });
@@ -650,18 +651,17 @@ export class SR5Actor extends Actor {
     }
     let att1 = this.data.data.attributes[id1];
     let att2 = this.data.data.attributes[id2];
-    const mods = {};
-    mods[att1.label] = att1.value;
-    mods[att2.label] = att2.value;
+    const parts = {};
+    parts[att1.label] = att1.value;
+    parts[att2.label] = att2.value;
 
     return DiceSR.rollTest({
       event: options.event,
       actor: this,
-      mods,
+      parts,
       title: title,
       extended: true,
       after: async (roll) => {
-        console.log(roll)
         let hits = roll.total;
         let current = this.data.data.track[track].value;
 
@@ -676,23 +676,23 @@ export class SR5Actor extends Actor {
     });
   }
 
-  rollMatrixAttribute(attr, options) {
+  async rollMatrixAttribute(attr, options) {
     let matrix_att = this.data.data.matrix[attr];
     let title = game.i18n.localize(CONFIG.SR5.matrixAttributes[attr]);
-    const mods = {};
-    mods[CONFIG.SR5.matrixAttributes[attr]] = matrix_att.value;
+    const parts = {};
+    parts[CONFIG.SR5.matrixAttributes[attr]] = matrix_att.value;
+    if (options.event[SR5.kbmod.SPEC]) parts['SR5.Specialization'] = 2;
     if (Helpers.hasModifiers(options.event)) {
       return DiceSR.rollTest({
         event: options.event,
         actor: this,
-        mods,
-        specialization: options.event[SR5.kbmod.SPEC] ? 'Specialization' : undefined,
+        parts,
         limit: limit ? limit.value : undefined,
         title: title,
         matrix: true
       });
     }
-    const attributes = Helpers.filter(this.data.data.attributes, ([key, value]) => value.value > 0);
+    const attributes = Helpers.filter(this.data.data.attributes, ([, value]) => value.value > 0);
     const attribute = 'willpower';
 
     let dialogData = {
@@ -712,7 +712,7 @@ export class SR5Actor extends Actor {
         title: `${title} Test`,
         content: dlg,
         buttons: buttons,
-        close: (html) => {
+        close: async (html) => {
           if (cancel) return;
           const newAtt = html.find('[name=attribute]').val();
           let att = {};
@@ -720,13 +720,14 @@ export class SR5Actor extends Actor {
             att = this.data.data.attributes[newAtt];
             title += ` + ${game.i18n.localize(CONFIG.SR5.attributes[newAtt])}`;
           }
-          if (att.value) mods[att.label] = att.value;
+          if (att.value) parts[att.label] = att.value;
+          this._addMatrixParts(parts, true);
+          this._addGlobalParts(parts);
           return DiceSR.rollTest({
             event: options.event,
             actor: this,
-            mods,
+            parts,
             title: title,
-            matrix: true
           });
 
         }
@@ -748,61 +749,60 @@ export class SR5Actor extends Actor {
     const title = game.i18n.localize(CONFIG.SR5.attributeRolls[rollId]);
     const atts = this.data.data.attributes;
     const modifiers = this.data.data.modifiers;
-    const mods = {};
+    const parts = {};
     if (rollId === 'composure') {
-      mods[atts.charisma.label] = atts.charisma.value;
-      mods[atts.willpower.label] = atts.willpower.value;
-      if (modifiers.composure) mods['SR5.Bonus'] = modifiers.composure;
+      parts[atts.charisma.label] = atts.charisma.value;
+      parts[atts.willpower.label] = atts.willpower.value;
+      if (modifiers.composure) parts['SR5.Bonus'] = modifiers.composure;
     } else if (rollId === 'judge_intentions') {
-      mods[atts.charisma.label] = atts.charisma.value;
-      mods[atts.intuition.label] = atts.intuition.value;
-      if (modifiers.judge_intentions) mods['SR5.Bonus'] = modifiers.judge_intentions;
+      parts[atts.charisma.label] = atts.charisma.value;
+      parts[atts.intuition.label] = atts.intuition.value;
+      if (modifiers.judge_intentions) parts['SR5.Bonus'] = modifiers.judge_intentions;
     } else if (rollId === 'lift_carry') {
-      mods[atts.strength.label] = atts.strength.value;
-      mods[atts.body.label] = atts.body.value;
-      if (modifiers.lift_carry) mods['SR5.Bonus'] = modifiers.lift_carry;
+      parts[atts.strength.label] = atts.strength.value;
+      parts[atts.body.label] = atts.body.value;
+      if (modifiers.lift_carry) parts['SR5.Bonus'] = modifiers.lift_carry;
     } else if (rollId === 'memory') {
-      mods[atts.willpower.label] = atts.willpower.value;
-      mods[atts.logic.label] = atts.logic.value;
-      if (modifiers.memory) mods['SR5.Bonus'] = modifiers.memory;
+      parts[atts.willpower.label] = atts.willpower.value;
+      parts[atts.logic.label] = atts.logic.value;
+      if (modifiers.memory) parts['SR5.Bonus'] = modifiers.memory;
     }
 
-    // const roll = this.data.data.rolls[rollId];
-    // TODO update roll to use mods
     return DiceSR.rollTest({
       event: options.event,
       actor: this,
-      mods,
+      parts,
       // base: roll,
       title: `${title} Test`
     });
   }
 
   rollSkill(skill, options) {
-    console.log(skill);
     let att = this.data.data.attributes[skill.attribute];
     let title = skill.label;
 
     if (options.attribute) att = this.data.data.attributes[options.attribute];
     let limit = this.data.data.limits[att.limit];
-    const mods = {};
-    mods[skill.label] = skill.value;
+    const parts = {};
+    parts[skill.label] = skill.value;
 
     if (Helpers.hasModifiers(options.event)) {
-      mods[att.label] = att.value;
+      parts[att.label] = att.value;
+      if (options.event[SR5.kbmod.SPEC]) parts['SR5.Specialization'] = 2;
+
+      this._addMatrixParts(parts, att);
+      this._addGlobalParts(parts);
       return DiceSR.rollTest({
         event: options.event,
         actor: this,
-        specialization: options.event[SR5.kbmod.SPEC] ? 'Specialization' : undefined,
-        mods,
+        parts,
         limit: limit ? limit.value : undefined,
         title: `${title} Test`,
-        matrix: Helpers.isMatrix(att)
       });
     }
     let dialogData = {
       attribute: skill.attribute,
-      attributes: Helpers.filter(this.data.data.attributes, ([key, value]) => value.value > 0),
+      attributes: Helpers.filter(this.data.data.attributes, ([, value]) => value.value > 0),
       limit: att.limit,
       limits: this.data.data.limits
     };
@@ -829,24 +829,25 @@ export class SR5Actor extends Actor {
         title: `${title} Test`,
         content: dlg,
         buttons,
-        close: (html) => {
+        close: async (html) => {
           if (cancel) return;
           const newAtt = html.find('[name="attribute"]').val();
           const newLimit = html.find('[name="attribute.limit"]').val();
           att = this.data.data.attributes[newAtt];
           title += ` + ${game.i18n.localize(CONFIG.SR5.attributes[newAtt])}`;
           limit = this.data.data.limits[newLimit];
-          mods[att.label] = att.value;
-          if (skill.value === 0) mods['SR5.Defaulting'] = -1;
+          parts[att.label] = att.value;
+          if (skill.value === 0) parts['SR5.Defaulting'] = -1;
+          if (spec) parts['SR5.Specialization'] = 2;
           // let count = (skill.value > 0 ? skill.value : -1) + att.value;
+          this._addMatrixParts(parts, att);
+          this._addGlobalParts(parts);
           return DiceSR.rollTest({
             event: options.event,
             actor: this,
-            mods,
+            parts,
             limit: limit ? limit.value : undefined,
-            specialization: spec,
             title: `${title} Test`,
-            matrix: Helpers.isMatrix(att)
           });
 
         }
@@ -879,13 +880,12 @@ export class SR5Actor extends Actor {
     let title = game.i18n.localize(CONFIG.SR5.attributes[attId]);
     const att = this.data.data.attributes[attId];
     const atts = this.data.data.attributes;
-    const mods = {};
-    mods[att.label] = att.value;
+    const parts = {};
+    parts[att.label] = att.value;
     let dialogData = {
       attrribute: att,
       attributes: atts
     };
-    let defaulting = false;
     let cancel = true;
     renderTemplate('systems/shadowrun5e/templates/rolls/single-attribute.html', dialogData).then(dlg => {
       new Dialog({
@@ -898,32 +898,45 @@ export class SR5Actor extends Actor {
           }
         },
         default: 'roll',
-        close: html => {
+        close: async (html) => {
           if (cancel) return;
-          let count = att.value;
           let limit = undefined;
 
           const att2Id = html.find('[name=attribute2]').val();
           let att2 = null;
           if (att2Id !== 'none') {
             att2 = atts[att2Id];
-            mods[att2.label] = att2.value;
+            parts[att2.label] = att2.value;
             const att2IdLabel = game.i18n.localize(CONFIG.SR5.attributes[att2Id]);
             title += ` + ${att2IdLabel}`
           } else if (att2Id === 'default') {
-            mods['SR5.Defaulting'] = -1;
+            parts['SR5.Defaulting'] = -1;
           }
+          this._addMatrixParts(parts, [att, att2]);
+          this._addGlobalParts(parts);
           return DiceSR.rollTest({
             event: options.event,
             title: `${title} Test`,
             actor: this,
-            mods,
+            parts,
             limit: limit,
-            matrix: Helpers.isMatrix([att, att2])
           });
         }
       }).render(true);
     });
+  }
+
+  _addMatrixParts(parts, atts) {
+    if (Helpers.isMatrix(atts)) {
+      const m = this.data.data.matrix;
+      if (m.hot_sim) parts['SR5.HotSim'] = 2;
+      if (m.running_silent) parts['SR5.RunningSilent'] = -2;
+    }
+  }
+  _addGlobalParts(parts) {
+    if (this.data.data.modifiers.global) {
+      parts['SR5.Global'] = this.data.data.modifiers.global;
+    }
   }
 
   static async pushTheLimit(roll) {
@@ -959,17 +972,17 @@ export class SR5Actor extends Actor {
         if (msg && msg.data && msg.data.speaker && msg.data.speaker.actor) {
           let actor = game.actors.get(msg.data.speaker.actor);
 
-          const mods = {};
-          mods['SR5.OriginalDicePool'] = pool;
-          mods['SR5.Successes'] = -hits;
+          const parts = {};
+          parts['SR5.OriginalDicePool'] = pool;
+          parts['SR5.Successes'] = -hits;
 
           return DiceSR.rollTest({
             event: {shiftKey: true},
             title: `${title} - Second Chance`,
-            mods,
+            parts,
             wounds: false,
             actor: actor
-          }).then((r) => {
+          }).then(() => {
             actor.update({"data.attributes.edge.value": actor.data.data.attributes.edge.value - 1});
           });
         }

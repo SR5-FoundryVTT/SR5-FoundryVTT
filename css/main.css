@@ -515,13 +515,13 @@ select.display > option {
   background-color: #4d4d4d;
 }
 
-.sr5.roll-dialog .mods-list {
+.sr5.roll-dialog .parts-list {
   display: flex;
   flex-flow: row wrap;
   justify-content: center;
   align-items: center;
 }
-.sr5.roll-dialog .mods-list > * {
+.sr5.roll-dialog .parts-list > * {
   margin: 0 0.5em;
 }
 .sr5 .window-content {

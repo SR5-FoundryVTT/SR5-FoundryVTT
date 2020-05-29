@@ -86,7 +86,6 @@ export class SR5Item extends Item {
     if (Helpers.hasModifiers(event)) {
       return this.rollTest(event);
     }
-    const data = this.data.data;
     const token = this.actor.token;
     const templateData = {
       actor: this.actor,
@@ -164,7 +163,6 @@ export class SR5Item extends Item {
 
   _sinChatData(data, labels, props) {
     props.push(`Rating ${data.technology.rating}`);
-    console.log(data);
     data.licenses.forEach(license => {
       props.push(`${license.name} R${license.rtg}`);
     });
@@ -282,7 +280,7 @@ export class SR5Item extends Item {
       if (curr.blast.dropoff) props.push(`${curr.blast.dropoff}/m`);
       if (data.range.modes) props.push(Array.from(Object.entries(data.range.modes))
           .filter(([key, val]) => val && !key.includes('-'))
-            .map(([key, val]) => Helpers.label(key)).join('/'));
+            .map(([key]) => Helpers.label(key)).join('/'));
       if (data.range.ranges) props.push(Array.from(Object.values(data.range.ranges)).join('/'));
     } else if (data.category === 'melee') {
       if (data.melee.reach) props.push(`Reach ${data.melee.reach}`);
@@ -429,14 +427,14 @@ export class SR5Item extends Item {
     let mod = parseInt(itemData.action.mod || 0) + parseInt(itemData.action.alt_mod || 0);
 
     // only check if attribute2 is set if skill is not set
-    let mods = {};
-    if (attribute) mods[attribute.label] = attribute.value;
-    if (skill) mods[skill.label] = skill.value;
-    else if (attribute2) mods[attribute2.label] = attribute2.value;
+    let parts = {};
+    if (attribute) parts[attribute.label] = attribute.value;
+    if (skill) parts[skill.label] = skill.value;
+    else if (attribute2) parts[attribute2.label] = attribute2.value;
 
     // TODO change item to allow selecting specialization type
-    if (itemData.action.spec) mods['SR5.Specialization'] = 2;
-    if (mod) mods['SR5.ItemMod'] = mod;
+    if (itemData.action.spec) parts['SR5.Specialization'] = 2;
+    if (mod) parts['SR5.ItemMod'] = mod;
 
     let title = this.data.name;
 
@@ -505,12 +503,11 @@ export class SR5Item extends Item {
             }
             // suppressing fire doesn't cause recoil
             if (fireMode > rc && fireMode !== 20) {
-              mods['SR5.BulletCount'] = -fireMode;
-              mods['SR5.RecoilCompensation'] = rc;
+              parts['SR5.Recoil'] = rc - fireMode;
             }
             DiceSR.rollTest({
               event: ev,
-              mods,
+              parts,
               actor: this.actor,
               limit: limit,
               title: title,
@@ -558,12 +555,11 @@ export class SR5Item extends Item {
           close: (html) => {
             if (cancel) return;
             const force = parseInt(html.find('[name=force]').val());
-            console.log(force);
             limit = force;
             DiceSR.rollTest({
               event: ev,
               environmental: true,
-              mods,
+              parts,
               actor: this.actor,
               limit: limit,
               title: title,
@@ -609,7 +605,7 @@ export class SR5Item extends Item {
             DiceSR.rollTest({
               event: ev,
               environmental: true,
-              mods,
+              parts,
               actor: this.actor,
               limit: limit,
               title: title,
@@ -623,7 +619,7 @@ export class SR5Item extends Item {
     } else {
       return DiceSR.rollTest({
         event: ev,
-        mods,
+        parts,
         environmental: true,
         actor: this.actor,
         limit: limit,

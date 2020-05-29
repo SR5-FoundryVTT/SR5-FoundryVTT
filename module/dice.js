@@ -1,7 +1,7 @@
 import { SR5 } from './config.js';
 
 export class DiceSR {
-  static async basicRoll({count, limit, explode, prefix, suffix, title, actor}) {
+  static async basicRoll({count, limit, explode, title, actor}) {
     let formula = `${count}d6`;
     if (explode) {
       formula += 'x6';
@@ -11,8 +11,6 @@ export class DiceSR {
     }
 
     formula += 'cs>=5'
-    if (suffix) formula += suffix;
-    if (prefix) formula = prefix + formula;
 
     let roll = new Roll(formula);
     let rollMode = game.settings.get("core", "rollMode");
@@ -25,55 +23,58 @@ export class DiceSR {
     return roll;
   };
 
-  static rollTest({event, actor, mods = {}, specialization, limit, matrix, extended, prefix, suffix, dialogOptions, after, base = 0, title = "Roll", wounds = true }) {
+  /**
+   *
+   * @param event {MouseEvent} - mouse event that caused this
+   * @param actor {Sr5Actor} - actor this roll is associated with
+   * @param parts {Object} - object where keys should be the 'name' that can be translated/is translated and value should be the numerical values to add to dice pool
+   * @param limit {Number} - Limit to apply to the roll, leave empty for no limit
+   * @param extended {Boolean} - if this is an extended test (automatically sets the dropdown in the dialog)
+   * @param dialogOptions {Object} - Options to provide to the dialog window
+   * @param dialogOptions.environmental {Number} - value of Environmental Modifiers
+   * @param dialogOptions.prompt {Boolean} - if this is prompting the user to enter the dice pool of the roll (enables the Dice Pool box)
+   * @param after {Function} - Function to run after each roll. Needed to capture rolls of extended tests, otherwise Promise will work
+   * @param base {Number} - base value to use for the dice pool, default to 0 (parts are preferred method)
+   * @param title {String} - title to display for the roll
+   * @param wounds {Boolean} - if wounds should be applied, defaults to true
+   * @returns {Promise<Roll>|Promise<*>}
+   */
+  static rollTest({event, actor, parts = {}, limit, extended, dialogOptions, after, base = 0, title = "Roll", wounds = true }) {
+
     // if we aren't for soaking some damage
     if (actor && !(title.includes('Soak') || title.includes('Drain') || title.includes('Fade'))) {
       if (wounds) wounds = actor.data.data.wounds.value;
-      if (matrix) {
-        const m = actor.data.data.matrix;
-        if (m.hot_sim) mods['SR5.HotSim'] = 2;
-        if (m.running_silent) mods['SR5.RunningSilent'] = -2;
-      }
-      if (actor.data.data.modifiers.global) {
-        mods['SR5.Global'] = actor.data.data.modifiers.global;
-      }
-    }
-    if (specialization) {
-      mods[specialization] = 2
     }
 
     if (!game.settings.get("shadowrun5e", "applyLimits")) {
       limit = undefined;
     }
 
-    // if (wounds) mods['SR5.Wounds'] = -wounds;
-
     let dice_pool = base;
 
     const edgeAttMax = actor ? actor.data.data.attributes.edge.max : 0;
 
     if (event && event[SR5.kbmod.EDGE]) {
-      mods['SR5.Edge'] = +edgeAttMax;
+      parts['SR5.Edge'] = +edgeAttMax;
       actor?.update({"data.attributes.edge.value": actor.data.data.attributes.edge.value - 1});
     }
 
-    const initialModPool = Object.values(mods).reduce((acc, curr) => acc += curr, 0);
     // add mods to dice pool
-    dice_pool += initialModPool;
+    dice_pool += Object.values(parts).reduce((prev, cur) => prev + cur, 0);
 
     if (event && event[SR5.kbmod.STANDARD]) {
-      const edge = mods['SR5.Edge'] || undefined;
-      return this.basicRoll({count: dice_pool, explode: edge, limit: edge ? undefined : limit, prefix, suffix, title, actor});
+      const edge = parts['SR5.Edge'] || undefined;
+      return this.basicRoll({count: dice_pool, explode: edge, limit: edge ? undefined : limit, title, actor});
     }
 
     let dialogData = {
       options: dialogOptions,
-      extended: extended,
-      dice_pool: dice_pool,
-      base: base,
-      mods: mods,
-      limit: limit,
-      wounds: wounds
+      extended,
+      dice_pool,
+      base,
+      parts,
+      limit,
+      wounds,
     };
     let template = 'systems/shadowrun5e/templates/rolls/roll-dialog.html';
     let edge = false;
@@ -99,31 +100,35 @@ export class DiceSR {
 
           close: html => {
             if (cancel) return;
-            let limitVal = parseInt(html.find('[name="limit"]').val())
-            let total = parseInt(html.find('[name="dice_pool"]').val()) - initialModPool;
-            let dpMod = eval(html.find('[name="dp_mod"]').val());
-            if (dpMod) total += dpMod;
-            wounds = parseInt(html.find('[name=wounds]').val());
+            // get the actual dice_pool from the difference of initial parts and value in the dialog
+            let dicePool = parseInt(html.find('[name="dice_pool"]').val());
+
+            // apply dicepool mod from roll
+            const dpMod = eval(html.find('[name="dp_mod"]').val());
+            if (dpMod) dicePool += dpMod;
+
+            const woundValue = parseInt(html.find('[name=wounds]').val());
+            if (woundValue) dicePool -= woundValue;
+
+            const limitVal = parseInt(html.find('[name="limit"]').val())
+
             extended = html.find('[name=extended]').val();
             dialogOptions = {
               ...dialogOptions,
               environmental: parseInt(html.find('[name="options.environmental"]').val())
             };
 
-            const modTotal = Object.values(mods).reduce((acc, curr) => acc += curr, 0);
-            if (modTotal) total += modTotal;
-            if (wounds) total -= wounds;
-            if (dialogOptions.environmental) total -= dialogOptions.environmental;
+            if (dialogOptions.environmental) dicePool -= dialogOptions.environmental;
             if (edge && actor) {
-              total += actor.data.data.attributes.edge.max;
+              dicePool += actor.data.data.attributes.edge.max;
               actor.update({"data.attributes.edge.value": actor.data.data.attributes.edge.value - 1});
             }
-            const r = this.basicRoll({count: total, explode: edge, limit: edge ? undefined : limitVal, prefix, suffix, title, actor});
+            const r = this.basicRoll({count: dicePool, explode: edge, limit: edge ? undefined : limitVal, title, actor});
             if (extended) {
-              const currentExtended = mods['SR5.Extended'] || 0;
-              mods['SR5.Extended'] = currentExtended - 1;
+              const currentExtended = parts['SR5.Extended'] || 0;
+              parts['SR5.Extended'] = currentExtended - 1;
               // add a bit of a delay to roll again
-              setTimeout(() => DiceSR.rollTest({event, base, mods, actor, limit, title, prefix, suffix, extended, dialogOptions, wounds, after}), 400);
+              setTimeout(() => DiceSR.rollTest({event, base, parts, actor, limit, title, extended, dialogOptions, wounds, after}), 400);
             }
             resolve(r);
             if (after) r.then(roll => after(roll));
