@@ -67,7 +67,7 @@ Hooks.on('ready', function() {
   // Determine whether a system migration is required and feasible
   const currentVersion = game.settings.get("shadowrun5e", "systemMigrationVersion");
   // the latest version that requires migration
-  const NEEDS_MIGRATION_VERSION = "0.5.7";
+  const NEEDS_MIGRATION_VERSION = "0.5.10";
   let needMigration = (currentVersion === null) || (compareVersion(currentVersion, NEEDS_MIGRATION_VERSION) < 0);
 
   // Perform the migration
@@ -149,7 +149,7 @@ function rollItemMacro(itemName) {
   return item.roll();
 }
 
-Handlebars.registerHelper("localizeOb", function(strId, obj, options) {
+Handlebars.registerHelper("localizeOb", function(strId, obj) {
   if (obj) strId = obj[strId];
   return game.i18n.localize(strId);
 });
