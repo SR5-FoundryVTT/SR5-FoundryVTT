@@ -146,7 +146,7 @@ export class SR5Item extends Item {
 
     _ammoChatData(data, labels, props) {}
 
-    _modificationsChatData(data, labels, props) {}
+    _modificationChatData(data, labels, props) {}
 
     _actionChatData(data, labels, props) {
         if (data.action) {
@@ -373,35 +373,10 @@ export class SR5Item extends Item {
         )[0];
     }
 
-    addWeaponMod() {
-        const data = duplicate(this.data);
-        const { range } = data.data;
-        if (typeof range.mods === 'object') {
-            range.mods = Object.values(range.mods);
-        }
-        range.mods.push({
-            equipped: false,
-            name: '',
-            dp: 0,
-            acc: 0,
-            rc: 0,
-            desc: '',
-        });
-        this.update(data);
-    }
-
-    equipWeaponMod(index) {
-        const data = duplicate(this.data);
-        const { mods } = data.data.range;
-        mods[index].equipped = !mods[index].equipped;
-        this.update(data);
-    }
-
-    removeWeaponMod(index) {
-        const data = duplicate(this.data);
-        const { mods } = data.data.range;
-        mods.splice(index, 1);
-        this.update(data);
+    equipWeaponMod(iid) {
+        const mod = this.items.find((item) => item._id === iid);
+        mod.data.data.technology.equipped = !mod.data.data.technology.equipped;
+        this.updateOwnedItem(mod);
     }
 
     async useAmmo(fireMode) {
@@ -817,7 +792,7 @@ export class SR5Item extends Item {
 
             itemData.forEach((item) => {
                 item._id = randomID(16);
-                if (item.type === 'ammo') {
+                if (item.type === 'ammo' || item.type === 'modification') {
                     currentItems.push(item);
                 }
             });

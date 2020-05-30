@@ -19,9 +19,6 @@
                 <div class="item-text rtg">
                     {{localize "SR5.RecoilCompensation"}}
                 </div>
-                <div class="item-text desc">
-                    {{localize "SR5.Description"}}
-                </div>
                 <div class="item-text item-icons rtg">
                     <a class="add-new-mod" title="Add New Accessory">
                         <i class="fas fa-plus"></i>
@@ -29,16 +26,15 @@
                 </div>
             </div>
         </div>
-        {{#each data.range.mods as |mod id|}}
-        <div class="item">
+        {{#each weaponMods as |mod id|}}
+        <div class="item" data-item-id="{{mod._id}}">
             <div class="item-left">
                 <div class="item-text item-name">
                     <input
                         class="display left"
                         type="text"
-                        name="data.range.mods.{{id}}.name"
                         value="{{mod.name}}"
-                        placeholder=""
+                        disabled
                     />
                 </div>
             </div>
@@ -47,9 +43,8 @@
                     <label class="checkbox">
                         <input
                             type="checkbox"
-                            name="data.range.mods.{{id}}.equipped"
                             {{checked
-                            mod.equipped}}
+                            mod.data.data.technology.equipped}}
                         />
                         <span class="checkmark far"></span>
                     </label>
@@ -59,8 +54,8 @@
                         class="display"
                         size="3"
                         type="text"
-                        name="data.range.mods.{{id}}.dp"
-                        value="{{mod.dp}}"
+                        disabled
+                        value="{{mod.data.data.dp}}"
                         data-dtype="Number"
                         placeholder="0"
                     />
@@ -70,8 +65,8 @@
                         class="display"
                         size="3"
                         type="text"
-                        name="data.range.mods.{{id}}.acc"
-                        value="{{mod.acc}}"
+                        disabled
+                        value="{{mod.data.data.acc}}"
                         data-dtype="Number"
                         placeholder="0"
                     />
@@ -81,23 +76,17 @@
                         class="display"
                         size="3"
                         type="text"
-                        name="data.range.mods.{{id}}.rc"
-                        value="{{mod.rc}}"
+                        disabled
+                        value="{{mod.data.data.rc}}"
                         data-dtype="Number"
                         placeholder="0"
-                    />
-                </div>
-                <div class="item-text desc">
-                    <input
-                        class="display"
-                        type="text"
-                        name="data.range.mods.{{id}}.description"
-                        value="{{mod.description}}"
-                        placeholder='{{localize "SR5.Description"}}'
                     />
                 </div>
                 <div class="item-text item-icons rtg">
-                    <a class="mod-delete" title="Delete Accessory" data-index="{{id}}">
+                    <a class="edit-item" title="Edit Mod">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a class="mod-delete" title="Delete Accessory">
                         <i class="fas fa-trash"></i>
                     </a>
                 </div>

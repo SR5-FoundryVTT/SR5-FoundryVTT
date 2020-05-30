@@ -4,6 +4,7 @@
         <a class="item" data-tab="description">{{localize "SR5.Description"}}</a>
         <a class="item" data-tab="weapon">{{localize "SR5.Weapon"}}</a>
         <a class="item" data-tab="ammo">{{localize "SR5.Ammo"}}</a>
+        <a class="item" data-tab="mods">{{localize "SR5.WeaponMods"}}</a>
     </nav>
     <section class="sheetbody">
         <div class="tab" data-group="primary" data-tab="description">
@@ -25,12 +26,15 @@
                 </div>
             </div>
         </div>
-        {{#ife data.category "range"}}
         <div class="tab" data-group="primary" data-tab="ammo">
             <div class="tabbody">
                 {{> "systems/shadowrun5e/templates/item/parts/weapon-ammo-list.html"}}
             </div>
         </div>
-        {{/ife}}
+        <div class="tab" data-group="primary" data-tab="mods">
+            <div class="tabbody">
+                {{> "systems/shadowrun5e/templates/item/parts/weapon-mods-list.html"}}
+            </div>
+        </div>
     </section>
 </form>

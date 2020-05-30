@@ -241,6 +241,18 @@ SR5.initiativeCategories = {
     matrix: 'SR5.InitCatMatrix',
 };
 
+SR5.modificationTypes = {
+    weapon: 'SR5.Weapon',
+    armor: 'SR5.Armor',
+};
+
+SR5.mountPoints = {
+    barrel: 'SR5.Barrel',
+    stock: 'SR5.Stock',
+    top: 'SR5.Top',
+    side: 'SR5.Side',
+};
+
 SR5.lifestyleTypes = {
     street: 'SR5.LifestyleStreet',
     squatter: 'SR5.LifestyleSquatter',
