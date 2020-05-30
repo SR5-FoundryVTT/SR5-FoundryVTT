@@ -780,6 +780,7 @@
     "types": [
       "action",
       "adept_power",
+      "ammo",
       "armor",
       "complex_form",
       "contact",
@@ -787,6 +788,7 @@
       "device",
       "equipment",
       "lifestyle",
+      "modifications",
       "quality",
       "sin",
       "spell",
@@ -803,6 +805,7 @@
       "weapon": {
         "category": "",
         "range": {
+          "category": "",
           "ranges": {
             "short": 0,
             "medium": 0,
@@ -818,36 +821,14 @@
             "burst_fire": false,
             "full_auto": false
           },
-          "mods": [],
-          "ammo": {
-            "enabled": false,
-            "count": {
-              "value": 0,
-              "max": 0
-            },
-            "equipped": {
-              "name": "Regular",
-              "damage": 0,
-              "ap": 0,
-              "blast": {
-                "radius": 0,
-                "dropoff": 0
-              }
-            },
-            "available": [
-              {
-                "equipped": true,
-                "name": "Regular",
-                "damage": 0,
-                "ap": 0,
-                "blast": {
-                  "radius": 0,
-                  "dropoff": 0
-                },
-                "qty": 0
-              }
-            ]
-          }
+          "mount_points": {
+            "top": {},
+            "side": {},
+            "barrel": {},
+            "stock": {},
+            "internal": {}
+          },
+          "ammo": []
         },
         "melee": {
           "reach": 0
@@ -889,6 +870,7 @@
           "skill": "",
           "spec": false,
           "mod": 0,
+          "mod_description": "",
           "limit": {
             "value": 0,
             "attribute": ""
@@ -927,6 +909,27 @@
     },
     "armor": {
       "templates": ["description", "armor", "technology"]
+    },
+    "ammo": {
+      "templates": ["description", "technology"],
+      "type": "",
+      "element": "",
+      "ap": 0,
+      "damage": 0,
+      "blast": {
+        "radius": 0,
+        "dropoff": 0
+      }
+    },
+    "modifications": {
+      "templates": ["description", "technology"],
+      "type": "",
+      "weapon": {
+        "mount_point": "",
+        "dice_pool": 0,
+        "accuracy": 0,
+        "rc": 0
+      }
     },
     "spell": {
       "templates": ["description", "action"],

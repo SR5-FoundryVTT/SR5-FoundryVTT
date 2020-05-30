@@ -138,6 +138,10 @@ export class SR5Item extends Item {
         return data;
     }
 
+    _ammoChatData(data, labels, props) {}
+
+    _modificationsChatData(data, labels, props) {}
+
     _actionChatData(data, labels, props) {
         if (data.action) {
             if (data.action.limit.value) props.push(`Limit ${data.action.limit.value}`);
