@@ -15,9 +15,6 @@ export class SR5Item extends Item {
         const labels = {};
         const item = this.data;
 
-        // fix for items held within items
-        if (!this.data._id) this.data._id = this.data.id;
-
         if (item.type === 'sin') {
             if (typeof item.data.licenses === 'object') {
                 item.data.licenses = Object.values(item.data.licenses);
@@ -445,8 +442,8 @@ export class SR5Item extends Item {
             ?.filter((item) => item.type === 'ammo')
             .map((item) => {
                 const i = this.getOwnedItem(item._id);
-                i.data.technology.equipped = iid === item._id;
-                return i;
+                i.data.data.technology.equipped = iid === item._id;
+                return i.data;
             });
         this.updateOwnedItem(ammo);
     }
@@ -472,23 +469,9 @@ export class SR5Item extends Item {
         this.update(data);
     }
 
-    addNewAmmo() {
-        const data = duplicate(this.data);
-        const { ammo } = data.data.range;
-        if (typeof ammo.available === 'object') {
-            ammo.available = Object.values(ammo.available);
-        }
-        ammo.available.push({
-            equipped: false,
-            name: '',
-            damage: 0,
-            ap: 0,
-            blast: {
-                radius: 0,
-                dropoff: 0,
-            },
-        });
-        this.update(data);
+    editItem(iid) {
+        const item = this.getOwnedItem(iid);
+        item.sheet.render(true);
     }
 
     rollOpposedTest(target, ev) {
@@ -833,8 +816,9 @@ export class SR5Item extends Item {
             const currentItems = duplicate(this.getFlag('shadowrun5e', 'embeddedItems') || []);
 
             itemData.forEach((item) => {
+                item._id = randomID(16);
                 if (item.type === 'ammo') {
-                    currentItems.push(item.data);
+                    currentItems.push(item);
                 }
             });
 
@@ -871,7 +855,7 @@ export class SR5Item extends Item {
     }
 
     getOwnedItem(itemId) {
-        const items = this.getFlag('shadowrun5e', 'embeddedItems');
+        const items = this.items;
         if (!items) return;
         return items.find((i) => i._id === itemId);
     }
@@ -897,6 +881,10 @@ export class SR5Item extends Item {
         await this.prepareData();
         await this.render(false);
         return true;
+    }
+
+    async updateEmbeddedEntity(embeddedName, updateData, options = {}) {
+        return this.updateOwnedItem(updateData, options);
     }
 
     /**

@@ -28,7 +28,11 @@
                 <div class="item-text dropoff">
                     {{localize "SR5.Dropoff"}}
                 </div>
-                <div class="item-text item-icons rtg"></div>
+                <div class="item-text item-icons rtg">
+                    <a class="add-new-ammo" title="Add Ammo">
+                        <i class="fas fa-plus"></i>
+                    </a>
+                </div>
             </div>
         </div>
         {{#each ammunition}}
@@ -114,6 +118,9 @@
                     <div class="track-max-value">/m</div>
                 </div>
                 <div class="item-text item-icons rtg">
+                    <a class="edit-item" title="Edit ammo" data-item-id="{{this._id}}">
+                        <i class="fas fa-edit"></i>
+                    </a>
                     <a class="ammo-delete" title="Delete ammo" data-id="{{this._id}}">
                         <i class="fas fa-trash"></i>
                     </a>

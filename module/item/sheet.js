@@ -1,3 +1,5 @@
+import { Helpers } from '../helpers.js';
+
 /**
  * Extend the basic ItemSheet with some very simple modifications
  */
@@ -85,6 +87,8 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.ammo-delete').click(this._onAmmoRemove.bind(this));
         html.find('.ammo-reload').click(this._onAmmoReload.bind(this));
 
+        html.find('.edit-item').click(this._onEditItem.bind(this));
+
         html.find('.add-new-mod').click(this._onAddWeaponMod.bind(this));
         html.find('.mod-equip').click(this._onWeaponModEquip.bind(this));
         html.find('.mod-delete').click(this._onWeaponModRemove.bind(this));
@@ -130,16 +134,21 @@ export class SR5ItemSheet extends ItemSheet {
             // Case 3 - From a World Entity
             item = game.items.get(data.id);
         }
-        if (item) console.log(item);
 
         if (item.type === 'ammo' && this.item.type === 'weapon') {
-            this.item.createOwnedItem(item);
+            this.item.createOwnedItem(item.data);
         }
     }
 
     _getItemFromCollection(collection, itemId) {
         const pack = game.packs.find((p) => (p.collection = collection));
         return pack.getEntity(itemId);
+    }
+
+    async _onEditItem(event) {
+        event.preventDefault();
+        const iid = event.currentTarget.dataset.itemId;
+        this.item.editItem(iid);
     }
 
     async _onAddLicense(event) {
@@ -178,9 +187,16 @@ export class SR5ItemSheet extends ItemSheet {
         this.item.equipAmmo(iid);
     }
 
-    async _onAddNewAmmo(event) {
+    _onAddNewAmmo(event) {
         event.preventDefault();
-        this.item.addNewAmmo();
+        const type = 'ammo';
+        const itemData = {
+            name: `New ${Helpers.label(type)}`,
+            type: type,
+            data: duplicate(game.system.model.Item.ammo),
+        };
+        const item = Item.createOwned(itemData, this.item);
+        return this.item.createOwnedItem(item.data);
     }
 
     /**
