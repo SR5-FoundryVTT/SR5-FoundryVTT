@@ -28,36 +28,21 @@
                 <div class="item-text dropoff">
                     {{localize "SR5.Dropoff"}}
                 </div>
-                <div class="item-text item-icons rtg">
-                    <a class="add-new-ammo" title="Add New Ammo">
-                        <i class="fas fa-plus"></i>
-                    </a>
-                </div>
+                <div class="item-text item-icons rtg"></div>
             </div>
         </div>
-        {{#each data.range.ammo.available}}
-        <div class="item">
+        {{#each data.ammunition}}
+        <div class="item" data-item-id="{{this._id}}">
             <div class="item-left">
                 <div class="item-text item-name">
-                    <input
-                        class="display left"
-                        type="text"
-                        name="data.range.ammo.available.{{@index}}.name"
-                        value="{{this.name}}"
-                        placeholder=""
-                    />
+                    <input class="display left" type="text" value="{{this.name}}" placeholder="" disabled/>
                 </div>
             </div>
             <div class="item-right">
                 <div class="item-text rtg">
                     <label class="checkbox">
-                        <input
-                            type="checkbox"
-                            name="data.range.ammo.available.{{@index}}.equipped"
-                            {{checked
-                            this.equipped}}
-                        />
-                        <span class="checkmark far"></span>
+                        <input type="checkbox" {{checked this.data.technology.equipped}} />
+                        <span class="checkmark far ammo-equip"></span>
                     </label>
                 </div>
                 <div class="item-text rtg">
@@ -66,8 +51,8 @@
                         size="3"
                         maxlength="3"
                         type="text"
-                        name="data.range.ammo.available.{{@index}}.qty"
-                        value="{{this.qty}}"
+                        disabled
+                        value="{{this.data.technology.quantity}}"
                         data-dtype="Number"
                         placeholder="0"
                     />
@@ -75,30 +60,20 @@
                 <div class="item-text center six">
                     <input
                         class="display"
-                        size="2"
-                        maxlength="2"
                         type="text"
-                        name="data.range.ammo.available.{{@index}}.damage"
-                        value="{{this.damage}}"
-                        data-dtype="Number"
-                        placeholder="0"
+                        disabled
+                        value="{{this.data.damage}}{{damageAbbreviation this.data.damageType}}"
+                        data-dtype="Text"
                     />
-                    <select class="display" name="data.range.ammo.available.{{@index}}.damageType">
-                        {{#select this.damageType}}
-                        <option value=""></option>
-                        <option value="physical">P</option>
-                        <option value="stun">S</option>
-                        {{/select}}
-                    </select>
                 </div>
                 <div class="item-text element">
-                    <select class="display" name="data.range.ammo.available.{{@index}}.element">
-                        {{#select this.element}}
-                        <option value=""></option>
-                        {{#each ../config.elementTypes as |name type|}}
-                        <option value="{{type}}">{{localize name}}</option>
-                        {{/each}} {{/select}}
-                    </select>
+                    <input
+                        class="display"
+                        type="text"
+                        disabled
+                        value="{{localizeOb this.data.element ../config.elementTypes}}"
+                        data-dtype="Text"
+                    />
                 </div>
                 <div class="item-text rtg">
                     <input
@@ -106,8 +81,8 @@
                         size="3"
                         maxlength="3"
                         type="text"
-                        name="data.range.ammo.available.{{@index}}.ap"
-                        value="{{this.ap}}"
+                        disabled
+                        value="{{this.data.ap}}"
                         data-dtype="Number"
                         placeholder="0"
                     />
@@ -118,8 +93,8 @@
                         type="text"
                         maxlength="2"
                         size="2"
-                        name="data.range.ammo.available.{{@index}}.blast.radius"
-                        value="{{this.blast.radius}}"
+                        disabled
+                        value="{{this.data.blast.radius}}"
                         data-dtype="Number"
                         placeholder="0"
                     />
@@ -131,15 +106,15 @@
                         size="2"
                         maxlength="2"
                         type="text"
-                        name="data.range.ammo.available.{{@index}}.blast.dropoff"
-                        value="{{this.blast.dropoff}}"
+                        disabled
+                        value="{{this.data.blast.dropoff}}"
                         data-dtype="Number"
                         placeholder="0"
                     />
                     <div class="track-max-value">/m</div>
                 </div>
                 <div class="item-text item-icons rtg">
-                    <a class="ammo-delete" title="Delete ammo" data-index="{{@index}}">
+                    <a class="ammo-delete" title="Delete ammo" data-id="{{this._id}}">
                         <i class="fas fa-trash"></i>
                     </a>
                 </div>

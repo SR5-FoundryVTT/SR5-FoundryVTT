@@ -820,15 +820,7 @@
             "semi_auto": false,
             "burst_fire": false,
             "full_auto": false
-          },
-          "mount_points": {
-            "top": {},
-            "side": {},
-            "barrel": {},
-            "stock": {},
-            "internal": {}
-          },
-          "ammo": []
+          }
         },
         "melee": {
           "reach": 0
@@ -912,10 +904,10 @@
     },
     "ammo": {
       "templates": ["description", "technology"],
-      "type": "",
       "element": "",
       "ap": 0,
       "damage": 0,
+      "damageType": "",
       "blast": {
         "radius": 0,
         "dropoff": 0

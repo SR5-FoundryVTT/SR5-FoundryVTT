@@ -1,13 +1,9 @@
-import { SR5 } from '../config.js';
-import { Helpers } from '../helpers.js';
 /**
  * Extend the basic ItemSheet with some very simple modifications
  */
 export class SR5ItemSheet extends ItemSheet {
     constructor(...args) {
         super(...args);
-
-        this._sheetTab = null;
     }
 
     /**
@@ -103,6 +99,10 @@ export class SR5ItemSheet extends ItemSheet {
      */
     activateListeners(html) {
         super.activateListeners(html);
+        if (this.item.type === 'weapon') {
+            this.form.ondragover = (event) => this._onDragOver(event);
+            this.form.ondrop = (event) => this._onDrop(event);
+        }
         html.find('.add-new-ammo').click(this._onAddNewAmmo.bind(this));
         html.find('.ammo-equip').click(this._onAmmoEquip.bind(this));
         html.find('.ammo-delete').click(this._onAmmoRemove.bind(this));
@@ -113,14 +113,56 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.mod-delete').click(this._onWeaponModRemove.bind(this));
 
         html.find('.add-new-license').click(this._onAddLicense.bind(this));
+    }
 
-        // Activate tabs
-        // let tabs = html.find('.tabs');
-        // let initial = this._sheetTab;
-        // new Tabs(tabs, {
-        //   initial: initial,
-        //   callback: clicked => this._sheetTab = clicked.data('tab')
-        // });
+    _onDragOver(event) {
+        event.preventDefault();
+        return false;
+    }
+
+    async _onDrop(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        let data;
+        try {
+            data = JSON.parse(event.dataTransfer.getData('text/plain'));
+            if (data.type !== 'Item') {
+                console.log('Shadowrun5e | Can only drop Items');
+            }
+        } catch (err) {
+            console.log('Shadowrun5e | drop error');
+        }
+        let item;
+        // Case 1 - Data explicitly provided
+        if (data.data) {
+            // TODO test
+            if (
+                this.item.isOwned &&
+                data.actorId === this.item.actor._id &&
+                data.data._id === this.item.data._id
+            ) {
+                console.log('Shadowrun5e | Cant drop item on itself');
+                ui.notifications.error('Are you trying to break the game??');
+            }
+            item = data;
+        } else if (data.pack) {
+            // Case 2 - From a Compendium Pack
+            // TODO test
+            item = this._getItemFromCollection(data.pack, data.id);
+        } else {
+            // Case 3 - From a World Entity
+            item = game.items.get(data.id);
+        }
+        if (item) console.log(item);
+
+        if (item.type === 'ammo' && this.item.type === 'weapon') {
+            this.item.createOwnedItem(item);
+        }
+    }
+
+    _getItemFromCollection(collection, itemId) {
+        const pack = game.packs.find((p) => (p.collection = collection));
+        return pack.getEntity(itemId);
     }
 
     async _onAddLicense(event) {
@@ -150,13 +192,20 @@ export class SR5ItemSheet extends ItemSheet {
 
     async _onAmmoRemove(event) {
         event.preventDefault();
-        this.item.removeAmmo(parseInt(event.currentTarget.dataset.index));
+        this.item.deleteOwnedItem(event.currentTarget.dataset.id);
     }
 
     async _onAmmoEquip(event) {
-        this._onSubmit(event);
         event.preventDefault();
-        this.item.equipAmmo(parseInt(event.currentTarget.dataset.index));
+        const iid = event.currentTarget.closest('.item').dataset.itemId;
+
+        // only allow ammo that was just clicked to be equipped
+        const ammo = this.item.items?.filter(item => item.type === 'ammo').map(item => {
+            const i = this.item.getOwnedItem(item._id);
+            i.data.technology.equipped = iid === item._id;
+            return i;
+        });
+        this.item.updateOwnedItem(ammo);
     }
 
     async _onAddNewAmmo(event) {

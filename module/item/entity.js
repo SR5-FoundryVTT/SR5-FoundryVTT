@@ -2,6 +2,8 @@ import { DiceSR } from '../dice.js';
 import { Helpers } from '../helpers.js';
 
 export class SR5Item extends Item {
+    static AmmoFlag = 'weapon.ammo';
+
     get hasOpposedRoll() {
         return !!(this.data.data.action && this.data.data.action.opposed.type);
     }
@@ -14,6 +16,9 @@ export class SR5Item extends Item {
         super.prepareData();
         const labels = {};
         const item = this.data;
+
+        // fix for items held within items
+        if (!this.data._id) this.data._id = this.data.id;
 
         if (item.type === 'sin') {
             if (typeof item.data.licenses === 'object') {
@@ -83,6 +88,8 @@ export class SR5Item extends Item {
 
         this.labels = labels;
         item.properties = this.getChatData().properties;
+
+        item.data.ammunition = (this.items || []).filter((item) => item.type === 'ammo');
     }
 
     async roll(event) {
@@ -127,6 +134,7 @@ export class SR5Item extends Item {
     getChatData(htmlOptions) {
         const data = duplicate(this.data.data);
         const { labels } = this;
+        if (!data.description) data.description = {};
 
         data.description.value = TextEditor.enrichHTML(data.description.value, htmlOptions);
 
@@ -766,5 +774,97 @@ export class SR5Item extends Item {
         if (!targets.length)
             throw new Error(`You must designate a specific Token as the roll target`);
         return targets;
+    }
+
+    /**
+     * Create an item in this item
+     * @param itemData
+     * @param options
+     */
+    async createOwnedItem(itemData, options = {}) {
+        // weapons accept items
+        if (this.type === 'weapon') {
+            if (itemData.type === 'ammo') {
+                const currentItems = duplicate(this.getFlag('shadowrun5e', 'embeddedItems') || []);
+                currentItems.push(itemData.data);
+                await this.setFlag('shadowrun5e', 'embeddedItems', currentItems);
+            }
+        }
+        await this.prepareEmbeddedEntities();
+        await this.prepareData();
+        await this.render(false);
+        return true;
+    }
+
+    /**
+     * Prepare ammo and weapon mods as available lists
+     */
+    prepareEmbeddedEntities() {
+        super.prepareEmbeddedEntities();
+        const items = this.getFlag('shadowrun5e', 'embeddedItems');
+        if (items) {
+            const existing = (this.items || []).reduce((object, i) => {
+                object[i.id] = i;
+                return object;
+            }, {});
+            this.items = items.map((i) => {
+                if (i._id in existing) {
+                    const a = existing[i._id];
+                    a.data = i;
+                    a.prepareData();
+                    return a;
+                } else {
+                    return Item.createOwned(i, this);
+                }
+            });
+        }
+    }
+
+    getOwnedItem(itemId) {
+        const items = this.getFlag('shadowrun5e', 'embeddedItems');
+        if (!items) return;
+        return items.find(i => i._id === itemId);
+    }
+
+    async updateOwnedItem(changes) {
+        const items = duplicate(this.getFlag('shadowrun5e', 'embeddedItems'));
+        if (!items) return;
+        changes =  Array.isArray(changes) ? changes : [changes];
+        changes.forEach(itemChanges => {
+            const index = items.findIndex((i) => i._id === itemChanges._id);
+            if (index === -1) return;
+            const item = items[index];
+            if (item) {
+                itemChanges = expandObject(itemChanges);
+                mergeObject(item, itemChanges);
+                items[index] = item;
+                // this.items[index].data = items[index];
+            }
+        })
+
+        await this.setFlag('shadowrun5e', 'embeddedItems', items);
+        await this.prepareEmbeddedEntities();
+        await this.prepareData();
+        await this.render(false);
+        return true;
+    }
+
+    /**
+     * Remove an owned item
+     * @param deleted
+     * @returns {Promise<boolean>}
+     */
+    async deleteOwnedItem(deleted) {
+        const items = duplicate(this.getFlag('shadowrun5e', 'embeddedItems'));
+        if (!items) return;
+
+        const idx = items.findIndex((i) => i._id === deleted || Number(i._id) === deleted);
+        if (idx === -1) throw new Error(`Shadowrun5e | Couldn't find owned item ${deleted}`);
+        items.splice(idx, 1);
+        await this.setFlag('shadowrun5e', 'embeddedItems', items);
+        await this.prepareEmbeddedEntities();
+        await this.prepareData();
+        await this.render(false);
+        return true;
     }
 }

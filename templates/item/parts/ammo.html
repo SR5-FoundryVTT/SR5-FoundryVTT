@@ -7,9 +7,9 @@
             {{localize "SR5.DamageType"}}
         </div>
         <div class="inputs">
-            <select name="data.type">
+            <select name="data.damageType">
                 <option value=""></option>
-                {{#select data.type}} {{#each config.damageTypes as |name type|}}
+                {{#select data.damageType}} {{#each config.damageTypes as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
             </select>
@@ -22,13 +22,13 @@
         </div>
         <div class="inputs around">
             <input
-                    size="4"
-                    maxlength="3"
-                    type="text"
-                    name="data.damage"
-                    value="{{data.damage}}"
-                    data-dtype="Number"
-                    placeholder="DV Modifier"
+                size="4"
+                maxlength="3"
+                type="text"
+                name="data.damage"
+                value="{{data.damage}}"
+                data-dtype="Number"
+                placeholder="DV Modifier"
             />
         </div>
     </div>
@@ -38,7 +38,7 @@
         </div>
         <div class="inputs">
             <select name="data.element">
-                {{#select data.action.damage.element}}
+                {{#select data.element}}
                 <option value=""></option>
                 {{#each config.elementTypes as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
@@ -52,13 +52,13 @@
         </div>
         <div class="inputs">
             <input
-                    type="text"
-                    maxlength="2"
-                    size="2"
-                    name="data.ap"
-                    value="{{data.ap}}"
-                    data-dtype="Number"
-                    placeholder="AP"
+                type="text"
+                maxlength="2"
+                size="2"
+                name="data.ap"
+                value="{{data.ap}}"
+                data-dtype="Number"
+                placeholder="AP"
             />
         </div>
     </div>
@@ -68,13 +68,13 @@
         </div>
         <div class="inputs">
             <input
-                    type="text"
-                    maxlength="2"
-                    size="2"
-                    name="data.blast.radius"
-                    value="{{data.blast.radius}}"
-                    data-dtype="Number"
-                    placeholder="Radius"
+                type="text"
+                maxlength="2"
+                size="2"
+                name="data.blast.radius"
+                value="{{data.blast.radius}}"
+                data-dtype="Number"
+                placeholder="Radius"
             />
         </div>
     </div>
@@ -85,16 +85,15 @@
         </div>
         <div class="inputs">
             <input
-                    type="text"
-                    maxlength="2"
-                    size="2"
-                    name="data.blast.dropoff"
-                    value="{{data.blast.dropoff}}"
-                    data-dtype="Number"
-                    placeholder="Drop Off"
+                type="text"
+                maxlength="2"
+                size="2"
+                name="data.blast.dropoff"
+                value="{{data.blast.dropoff}}"
+                data-dtype="Number"
+                placeholder="Drop Off"
             />
         </div>
     </div>
-    {{/if}}
-    {{/if}}
+    {{/if}} {{/if}}
 </div>

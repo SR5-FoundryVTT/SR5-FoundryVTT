@@ -195,3 +195,9 @@ Handlebars.registerHelper('ife', function (v1, v2, options) {
 Handlebars.registerHelper('sum', function (v1, v2) {
     return v1 + v2;
 });
+Handlebars.registerHelper('damageAbbreviation', function(damage) {
+    if (damage === 'physical') return 'P';
+    if (damage === 'stun') return 'S';
+    if (damage === 'matrix') return 'M';
+    return '';
+})
