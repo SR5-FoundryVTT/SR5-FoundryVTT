@@ -875,19 +875,24 @@
           "mod_description": "",
           "limit": {
             "value": 0,
+            "base": 0,
             "attribute": ""
           },
           "extended": false,
           "damage": {
             "type": {
-              "value": ""
+              "value": "",
+              "base": ""
             },
             "element": {
-              "value": ""
+              "value": "",
+              "base": ""
             },
             "value": 0,
+            "base": 0,
             "ap": {
-              "value": 0
+              "value": 0,
+              "base": 0
             },
             "attribute": ""
           },

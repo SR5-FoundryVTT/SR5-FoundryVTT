@@ -89,6 +89,8 @@ export class SR5Item extends Item {
 
         this.labels = labels;
         item.properties = this.getChatData().properties;
+
+        console.log(item);
     }
 
     async roll(event) {
@@ -417,10 +419,8 @@ export class SR5Item extends Item {
         const newAmmunition = duplicate(this.items)
             ?.filter((i) => i.type === 'ammo')
             .reduce((acc, item) => {
-                console.log(data);
                 const { technology } = item.data;
                 const { ammo } = data.data;
-                console.log(item);
                 if (technology.equipped) {
                     const qty = technology.quantity;
                     technology.quantity = Math.max(
@@ -435,7 +435,7 @@ export class SR5Item extends Item {
                 }
                 return acc;
             }, []);
-        await this.updateOwnedItem(newAmmunition);
+        if (newAmmunition) await this.updateOwnedItem(newAmmunition);
         await this.update(data);
     }
 
@@ -827,13 +827,18 @@ export class SR5Item extends Item {
      * @param options
      */
     async createOwnedItem(itemData, options = {}) {
+        if (!Array.isArray(itemData)) itemData = [itemData];
         // weapons accept items
         if (this.type === 'weapon') {
-            if (itemData.type === 'ammo') {
-                const currentItems = duplicate(this.getFlag('shadowrun5e', 'embeddedItems') || []);
-                currentItems.push(itemData.data);
-                await this.setFlag('shadowrun5e', 'embeddedItems', currentItems);
-            }
+            const currentItems = duplicate(this.getFlag('shadowrun5e', 'embeddedItems') || []);
+
+            itemData.forEach((item) => {
+                if (item.type === 'ammo') {
+                    currentItems.push(item.data);
+                }
+            });
+
+            await this.setFlag('shadowrun5e', 'embeddedItems', currentItems);
         }
         await this.prepareEmbeddedEntities();
         await this.prepareData();
@@ -842,7 +847,7 @@ export class SR5Item extends Item {
     }
 
     /**
-     * Prepare ammo and weapon mods as available lists
+     * Prepare embeddedItems
      */
     prepareEmbeddedEntities() {
         super.prepareEmbeddedEntities();

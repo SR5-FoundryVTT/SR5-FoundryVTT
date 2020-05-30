@@ -154,6 +154,8 @@ export const migrateItemData = function (item) {
 
     _migrateItemsAddActions(item, updateData);
     _migrateItemsAddCapacity(item, updateData);
+    _migrateItemsAmmo(item, updateData);
+    _migrateDamageTypeAndElement(item, updateData);
 
     // Return the migrated update data
     return updateData;
@@ -223,6 +225,47 @@ const _migrateActorSkills = function (actor, updateData) {
     updateData['data.skills.language.value'] = Object.entries(
         actor.data.skills.language.value
     ).reduce(reducer, {});
+};
+
+const cleanItemData = function (itemData) {
+    const model = game.system.model.Item[itemData.type];
+    itemData.data = filterObject(itemData.data, model);
+};
+
+const _migrateDamageTypeAndElement = function (item, updateData) {
+    console.log('Migrating Damage and Elements');
+    if (item.data.action) {
+        const action = item.data.action;
+        if (typeof action.damage.type === 'string') {
+            updateData['data.action.damage.type.base'] = item.data.action.damage.type;
+        }
+        if (typeof action.damage.element === 'string') {
+            updateData['data.action.damage.element.base'] = item.data.action.damage.element;
+        }
+    }
+};
+
+const _migrateItemsAmmo = function (item, updateData) {
+    console.log('Migrating Ammo');
+    if (item.type === 'weapon') {
+        let currentAmmo = { value: 0, max: 0 };
+        if (item.data.category === 'range' && item.data.range && item.data.range.ammo) {
+            // copy over ammo count
+            const oldAmmo = item.data.range.ammo;
+            currentAmmo.value = oldAmmo.value;
+            currentAmmo.max = oldAmmo.max;
+        }
+        updateData['data.ammo'] = {
+            spare_clips: {
+                value: 0,
+                max: 0,
+            },
+            current: {
+                value: currentAmmo.value,
+                max: currentAmmo.max,
+            },
+        };
+    }
 };
 
 const _migrateItemsAddCapacity = function (item, updateData) {

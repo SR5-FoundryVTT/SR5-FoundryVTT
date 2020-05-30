@@ -65,8 +65,6 @@ export class SR5ItemSheet extends ItemSheet {
         data.config = CONFIG.SR5;
         data.ammunition = (this.item.items || []).filter((item) => item.type === 'ammo');
 
-        console.log(data);
-
         return data;
     }
 
