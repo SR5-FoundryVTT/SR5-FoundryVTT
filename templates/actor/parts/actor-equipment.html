@@ -36,16 +36,18 @@
         </div>
       </div>
       <div class="item-right">
-        {{#if item.data.range.ammo.max}}
+
+        {{#if item.data.ammo.current.max}}
         <div class="item-text roll reload-ammo">
           {{localize "SR5.WeaponReload"}}
         </div>
         <div class="item-text">
-          ({{item.data.range.ammo.value}}/{{item.data.range.ammo.max}})
+          ({{item.data.ammo.current.value}}/{{item.data.ammo.current.max}})
         </div>
         <div class="item-text">
         </div>
         {{/if}}
+
         <div class="item-text">
           <span class="item-equip-toggle" >
             {{#if item.data.technology.equipped}}

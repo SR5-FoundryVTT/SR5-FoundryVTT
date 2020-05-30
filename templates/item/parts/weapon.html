@@ -16,28 +16,52 @@
             </select>
         </div>
     </div>
-    {{#if data.category}} {{#ife data.category "range"}}
     <div class="form-line">
         <div class="label">
             {{localize "SR5.WeaponAmmoCount"}}
         </div>
         <div class="inputs">
             <input
-                size="2"
-                type="text"
-                name="data.range.ammo.value"
-                value="{{data.range.ammo.value}}"
-                data-dtype="Number"
-                placeholder="0"
+                    size="2"
+                    type="text"
+                    name="data.ammo.current.value"
+                    value="{{data.ammo.current.value}}"
+                    data-dtype="Number"
+                    placeholder="0"
             />
             /
             <input
-                size="2"
-                type="text"
-                name="data.range.ammo.max"
-                value="{{data.range.ammo.max}}"
-                data-dtype="Number"
-                placeholder="{{localize SR5.Max}}"
+                    size="2"
+                    type="text"
+                    name="data.ammo.current.max"
+                    value="{{data.ammo.current.max}}"
+                    data-dtype="Number"
+                    placeholder="{{localize SR5.Max}}"
+            />
+        </div>
+    </div>
+    {{#if data.category}} {{#ife data.category "range"}}
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.SpareClips"}}
+        </div>
+        <div class="inputs">
+            <input
+                    size="2"
+                    type="text"
+                    name="data.ammo.spare_clips.value"
+                    value="{{data.ammo.spare_clips.value}}"
+                    data-dtype="Number"
+                    placeholder="0"
+            />
+            /
+            <input
+                    size="2"
+                    type="text"
+                    name="data.ammo.spare_clips.max"
+                    value="{{data.ammo.spare_clips.max}}"
+                    data-dtype="Number"
+                    placeholder="{{localize SR5.Max}}"
             />
         </div>
     </div>

@@ -34,28 +34,6 @@ export class SR5ItemSheet extends ItemSheet {
         const data = super.getData();
         const itemData = data.data;
 
-        if (itemData.range) {
-            if (itemData.range.ammo) {
-                try {
-                    const { ammo } = itemData.range;
-                    ammo.available.forEach((a) => {
-                        if (a.damage === 0) delete a.damage;
-                        if (a.ap === 0) delete a.ap;
-                        if (a.blast.radius === 0) delete a.blast.radius;
-                        if (a.blast.dropoff === 0) delete a.blast.dropoff;
-                    });
-                } catch (e) {
-                    console.error(e);
-                }
-            }
-            if (itemData.range.mods) {
-                itemData.range.mods.forEach((mod) => {
-                    if (mod.rc === 0) delete mod.rc;
-                    if (mod.acc === 0) delete mod.acc;
-                });
-            }
-        }
-
         if (itemData.action) {
             try {
                 const { action } = itemData;
@@ -85,6 +63,7 @@ export class SR5ItemSheet extends ItemSheet {
         }
 
         data.config = CONFIG.SR5;
+        data.ammunition = (this.item.items || []).filter((item) => item.type === 'ammo');
 
         console.log(data);
 
@@ -198,14 +177,7 @@ export class SR5ItemSheet extends ItemSheet {
     async _onAmmoEquip(event) {
         event.preventDefault();
         const iid = event.currentTarget.closest('.item').dataset.itemId;
-
-        // only allow ammo that was just clicked to be equipped
-        const ammo = this.item.items?.filter(item => item.type === 'ammo').map(item => {
-            const i = this.item.getOwnedItem(item._id);
-            i.data.technology.equipped = iid === item._id;
-            return i;
-        });
-        this.item.updateOwnedItem(ammo);
+        this.item.equipAmmo(iid);
     }
 
     async _onAddNewAmmo(event) {

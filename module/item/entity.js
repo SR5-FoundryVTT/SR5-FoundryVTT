@@ -2,8 +2,6 @@ import { DiceSR } from '../dice.js';
 import { Helpers } from '../helpers.js';
 
 export class SR5Item extends Item {
-    static AmmoFlag = 'weapon.ammo';
-
     get hasOpposedRoll() {
         return !!(this.data.data.action && this.data.data.action.opposed.type);
     }
@@ -29,49 +27,52 @@ export class SR5Item extends Item {
         if (item.data.action) {
             const { action } = item.data;
             action.alt_mod = 0;
-            action.limit.mod = 0;
-            action.damage.mod = 0;
-            action.damage.ap.mod = 0;
+            action.limit.mod = {};
+            action.damage.mod = {};
+            action.damage.ap.mod = {};
             // setup range weapon special shit
             if (item.type !== 'spell' && item.data.range) {
                 const { range } = item.data;
-                range.rc.mod = 0;
-                if (range.mods) {
-                    // turn object into array
-                    if (typeof range.mods === 'object') {
-                        range.mods = Object.values(range.mods);
+                // range.rc.mod = 0;
+                // if (range.mods) {
+                //     // turn object into array
+                //     if (typeof range.mods === 'object') {
+                //         range.mods = Object.values(range.mods);
+                //     }
+                //     range.mods.forEach((mod) => {
+                //         if (mod.equipped) {
+                //             if (mod.rc) range.rc.mod += mod.rc;
+                //             if (mod.acc) action.limit.mod += mod.acc;
+                //             if (mod.dp) action.alt_mod += mod.dp;
+                //         }
+                //     });
+                // }
+                const equippedAmmo = this.getEquippedAmmo();
+                if (equippedAmmo) {
+                    action.damage.mod[`SR5.Ammo ${equippedAmmo.name}`] =
+                        equippedAmmo.data.data.damage;
+                    action.damage.ap.mod[`SR5.Ammo ${equippedAmmo.name}`] +=
+                        equippedAmmo.data.data.ap;
+                    if (equippedAmmo.data.data.element) {
+                        action.damage.element.value = equippedAmmo.data.data.element;
+                    } else {
+                        action.damage.element.value = action.damage.element.base;
                     }
-                    range.mods.forEach((mod) => {
-                        if (mod.equipped) {
-                            if (mod.rc) range.rc.mod += mod.rc;
-                            if (mod.acc) action.limit.mod += mod.acc;
-                            if (mod.dp) action.alt_mod += mod.dp;
-                        }
-                    });
+
+                    if (equippedAmmo.data.data.damageType) {
+                        action.damage.type.value = equippedAmmo.data.data.damageType;
+                    } else {
+                        action.damage.type.value = action.damage.type.base;
+                    }
+                    if (range.rc) range.rc.value = range.rc.base + range.rc.mod;
                 }
-                if (range.ammo) {
-                    const { ammo } = range;
-                    // turn object into array
-                    if (typeof ammo.available === 'object') {
-                        ammo.available = Object.values(ammo.available);
-                    }
-                    if (ammo.available) {
-                        ammo.available.forEach((v) => {
-                            if (v.equipped) {
-                                ammo.equipped = v;
-                                action.damage.mod += v.damage;
-                                action.damage.ap.mod += v.ap;
-                            }
-                        });
-                    }
-                }
-                if (range.rc) range.rc.value = range.rc.base + range.rc.mod;
             }
 
             // once all damage mods have been accounted for, sum base and mod to value
-            action.damage.value = action.damage.base + action.damage.mod;
-            action.damage.ap.value = action.damage.ap.base + action.damage.ap.mod;
-            action.limit.value = action.limit.base + action.limit.mod;
+            action.damage.value = action.damage.base + Helpers.totalMods(action.damage.mod);
+            action.damage.ap.value =
+                action.damage.ap.base + Helpers.totalMods(action.damage.ap.mod);
+            action.limit.value = action.limit.base + Helpers.totalMods(action.limit.mod);
             if (this.actor) {
                 if (action.damage.attribute)
                     action.damage.value += this.actor.data.data.attributes[
@@ -88,8 +89,6 @@ export class SR5Item extends Item {
 
         this.labels = labels;
         item.properties = this.getChatData().properties;
-
-        item.data.ammunition = (this.items || []).filter((item) => item.type === 'ammo');
     }
 
     async roll(event) {
@@ -163,16 +162,16 @@ export class SR5Item extends Item {
                     data.action.attribute2
                 )}`;
             }
-            if (data.action.damage.type) {
+            if (data.action.damage.type.value) {
                 const { damage } = data.action;
                 if (damage.value)
                     props.push(
                         `DV ${damage.value}${
-                            damage.type ? damage.type.toUpperCase().charAt(0) : ''
+                            damage.type.value ? damage.type.value.toUpperCase().charAt(0) : ''
                         }`
                     );
                 if (damage.ap && damage.ap.value) props.push(`AP ${damage.ap.value}`);
-                if (damage.element) props.push(Helpers.label(damage.element));
+                if (damage.element.value) props.push(Helpers.label(damage.element.value));
             }
             if (data.action.opposed.type) {
                 const { opposed } = data.action;
@@ -306,13 +305,35 @@ export class SR5Item extends Item {
     _weaponChatData(data, labels, props) {
         this._actionChatData(data, labels, props);
 
+        const equippedAmmo = this.getEquippedAmmo();
+        if (equippedAmmo && data.ammo && data.ammo.current?.max) {
+            if (equippedAmmo) {
+                const { current, spare_clips } = data.ammo;
+                if (equippedAmmo.name)
+                    props.push(`${equippedAmmo.name} (${current.value}/${current.max})`);
+                if (equippedAmmo.data.data.blast.radius)
+                    props.push(
+                        `${game.i18n.localize('SR5.BlastRadius')} ${
+                            equippedAmmo.data.data.blast.radius
+                        }m`
+                    );
+                if (equippedAmmo.data.data.blast.dropoff)
+                    props.push(
+                        `${game.i18n.localize('SR5.DropOff')} ${
+                            equippedAmmo.data.data.blast.dropoff
+                        }/m`
+                    );
+                if (spare_clips && spare_clips.max)
+                    props.push(
+                        `${game.i18n.localize('SR5.SpareClips')} (${spare_clips.value}/${
+                            spare_clips.max
+                        })`
+                    );
+            }
+        }
+
         if (data.category === 'range') {
             if (data.range.rc) props.push(`RC ${data.range.rc.value}`);
-            const { ammo } = data.range;
-            const curr = ammo.equipped;
-            if (curr.name) props.push(`${curr.name}(${ammo.value}/${ammo.max})`);
-            if (curr.blast.radius) props.push(`${curr.blast.radius}m`);
-            if (curr.blast.dropoff) props.push(`${curr.blast.dropoff}/m`);
             if (data.range.modes)
                 props.push(
                     Array.from(Object.entries(data.range.modes))
@@ -323,7 +344,8 @@ export class SR5Item extends Item {
             if (data.range.ranges)
                 props.push(Array.from(Object.values(data.range.ranges)).join('/'));
         } else if (data.category === 'melee') {
-            if (data.melee.reach) props.push(`Reach ${data.melee.reach}`);
+            if (data.melee.reach)
+                props.push(`${game.i18n.localize('SR5.Reach')} ${data.melee.reach}`);
         } else if (data.category === 'thrown') {
             if (data.thrown.ranges) {
                 const mult =
@@ -339,9 +361,17 @@ export class SR5Item extends Item {
                 props.push(ranges.map((v) => v * mult).join('/'));
             }
             const { blast } = data.thrown;
-            if (blast.value) props.push(`Radius ${blast.radius}m`);
-            if (blast.dropoff) props.push(`Dropoff ${blast.dropoff}/m`);
+            if (blast.value)
+                props.push(`${game.i18n.localize('SR5.BlastRadius')} ${blast.radius}m`);
+            if (blast.dropoff)
+                props.push(`${game.i18n.localize('SR5.DropOff')} ${blast.dropoff}/m`);
         }
+    }
+
+    getEquippedAmmo() {
+        return (this.items || []).filter(
+            (item) => item.type === 'ammo' && item.data.data?.technology?.equipped
+        )[0];
     }
 
     addWeaponMod() {
@@ -375,30 +405,50 @@ export class SR5Item extends Item {
         this.update(data);
     }
 
-    reloadAmmo() {
-        const data = duplicate(this.data);
-        const { ammo } = data.data.range;
-        ammo.available.forEach((v) => {
-            if (v.equipped) v.qty = Math.max(0, v.qty - (ammo.max - ammo.value));
-        });
-        ammo.value = ammo.max;
-        this.update(data);
+    async useAmmo(fireMode) {
+        const dupData = duplicate(this.data);
+        const { ammo } = dupData.data;
+        ammo.current.value = Math.max(0, ammo.current.value - fireMode);
+        return this.update(dupData);
     }
 
-    equipAmmo(index) {
+    async reloadAmmo() {
         const data = duplicate(this.data);
-        const { ammo } = data.data.range;
-        ammo.available.forEach((v, i) => {
-            v.equipped = i === index;
-        });
-        this.update(data);
+        const newAmmunition = duplicate(this.items)
+            ?.filter((i) => i.type === 'ammo')
+            .reduce((acc, item) => {
+                console.log(data);
+                const { technology } = item.data;
+                const { ammo } = data.data;
+                console.log(item);
+                if (technology.equipped) {
+                    const qty = technology.quantity;
+                    technology.quantity = Math.max(
+                        0,
+                        qty - (ammo.current.max - ammo.current.value)
+                    );
+                    if (ammo.spare_clips) {
+                        ammo.spare_clips.value = Math.max(0, ammo.spare_clips.value - 1);
+                        ammo.current.value = ammo.current.max;
+                    }
+                    acc.push(item);
+                }
+                return acc;
+            }, []);
+        await this.updateOwnedItem(newAmmunition);
+        await this.update(data);
     }
 
-    removeAmmo(index) {
-        const data = duplicate(this.data);
-        const { ammo } = data.data.range;
-        ammo.available.splice(index, 1);
-        this.update(data);
+    equipAmmo(iid) {
+        // only allow ammo that was just clicked to be equipped
+        const ammo = this.items
+            ?.filter((item) => item.type === 'ammo')
+            .map((item) => {
+                const i = this.getOwnedItem(item._id);
+                i.data.technology.equipped = iid === item._id;
+                return i;
+            });
+        this.updateOwnedItem(ammo);
     }
 
     addNewLicense() {
@@ -585,19 +635,14 @@ export class SR5Item extends Item {
                                 environmental,
                             },
                         }).then(async (roll) => {
-                            const dupData = duplicate(this.data);
-                            const { ammo } = dupData.data.range;
-                            const ammoValue = Math.max(0, ammo.value - fireMode);
-                            await this.update({
-                                'data.range.ammo.value': ammoValue,
-                            });
-                            this.setFlag('shadowrun5e', 'attack', {
+                            await this.useAmmo(fireMode);
+                            await this.setFlag('shadowrun5e', 'attack', {
                                 hits: roll.total,
                                 fireMode,
-                                damageType: dupData.data.action.damage.type,
-                                element: dupData.data.action.damage.element,
-                                damage: dupData.data.action.damage.value,
-                                ap: dupData.data.action.damage.ap.value,
+                                damageType: this.data.data.action.damage.type.value,
+                                element: this.data.data.action.damage.element.value,
+                                damage: this.data.data.action.damage.value,
+                                ap: this.data.data.action.damage.ap.value,
                             });
                         });
                     },
@@ -823,14 +868,14 @@ export class SR5Item extends Item {
     getOwnedItem(itemId) {
         const items = this.getFlag('shadowrun5e', 'embeddedItems');
         if (!items) return;
-        return items.find(i => i._id === itemId);
+        return items.find((i) => i._id === itemId);
     }
 
     async updateOwnedItem(changes) {
         const items = duplicate(this.getFlag('shadowrun5e', 'embeddedItems'));
         if (!items) return;
-        changes =  Array.isArray(changes) ? changes : [changes];
-        changes.forEach(itemChanges => {
+        changes = Array.isArray(changes) ? changes : [changes];
+        changes.forEach((itemChanges) => {
             const index = items.findIndex((i) => i._id === itemChanges._id);
             if (index === -1) return;
             const item = items[index];
@@ -840,7 +885,7 @@ export class SR5Item extends Item {
                 items[index] = item;
                 // this.items[index].data = items[index];
             }
-        })
+        });
 
         await this.setFlag('shadowrun5e', 'embeddedItems', items);
         await this.prepareEmbeddedEntities();

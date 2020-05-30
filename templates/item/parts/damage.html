@@ -7,15 +7,15 @@
             {{localize "SR5.DamageType"}}
         </div>
         <div class="inputs">
-            <select name="data.action.damage.type">
+            <select name="data.action.damage.type.base">
                 <option value=""></option>
-                {{#select data.action.damage.type}} {{#each config.damageTypes as |name type|}}
+                {{#select data.action.damage.type.base}} {{#each config.damageTypes as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
             </select>
         </div>
     </div>
-    {{#if data.action.damage.type}} {{#ifne item.type "spell"}}
+    {{#if data.action.damage.type.base}} {{#ifne item.type "spell"}}
     <div class="form-line">
         <div class="label">
             {{localize "SR5.DamageValue"}}
@@ -46,8 +46,8 @@
             {{localize "SR5.Element"}}
         </div>
         <div class="inputs">
-            <select name="data.action.damage.element">
-                {{#select data.action.damage.element}}
+            <select name="data.action.damage.element.base">
+                {{#select data.action.damage.element.base}}
                 <option value=""></option>
                 {{#each config.elementTypes as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>

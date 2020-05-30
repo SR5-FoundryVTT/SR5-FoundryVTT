@@ -804,6 +804,16 @@
       },
       "weapon": {
         "category": "",
+        "ammo": {
+          "spare_clips": {
+            "value": 0,
+            "max": 0
+          },
+          "current": {
+            "value": 0,
+            "max": 0
+          }
+        },
         "range": {
           "category": "",
           "ranges": {
@@ -860,7 +870,7 @@
           "attribute": "",
           "attribute2": "",
           "skill": "",
-          "spec": false,
+          "spec": "",
           "mod": 0,
           "mod_description": "",
           "limit": {
@@ -869,8 +879,12 @@
           },
           "extended": false,
           "damage": {
-            "type": "",
-            "element": "",
+            "type": {
+              "value": ""
+            },
+            "element": {
+              "value": ""
+            },
             "value": 0,
             "ap": {
               "value": 0

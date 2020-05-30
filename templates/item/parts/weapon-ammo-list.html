@@ -31,7 +31,7 @@
                 <div class="item-text item-icons rtg"></div>
             </div>
         </div>
-        {{#each data.ammunition}}
+        {{#each ammunition}}
         <div class="item" data-item-id="{{this._id}}">
             <div class="item-left">
                 <div class="item-text item-name">
@@ -41,7 +41,7 @@
             <div class="item-right">
                 <div class="item-text rtg">
                     <label class="checkbox">
-                        <input type="checkbox" {{checked this.data.technology.equipped}} />
+                        <input type="checkbox" {{checked this.data.data.technology.equipped}} />
                         <span class="checkmark far ammo-equip"></span>
                     </label>
                 </div>
@@ -52,7 +52,7 @@
                         maxlength="3"
                         type="text"
                         disabled
-                        value="{{this.data.technology.quantity}}"
+                        value="{{this.data.data.technology.quantity}}"
                         data-dtype="Number"
                         placeholder="0"
                     />
@@ -62,7 +62,7 @@
                         class="display"
                         type="text"
                         disabled
-                        value="{{this.data.damage}}{{damageAbbreviation this.data.damageType}}"
+                        value="{{this.data.data.damage}}{{damageAbbreviation this.data.data.damageType}}"
                         data-dtype="Text"
                     />
                 </div>
@@ -71,7 +71,7 @@
                         class="display"
                         type="text"
                         disabled
-                        value="{{localizeOb this.data.element ../config.elementTypes}}"
+                        value="{{localizeOb this.data.data.element ../config.elementTypes}}"
                         data-dtype="Text"
                     />
                 </div>
@@ -82,7 +82,7 @@
                         maxlength="3"
                         type="text"
                         disabled
-                        value="{{this.data.ap}}"
+                        value="{{this.data.data.ap}}"
                         data-dtype="Number"
                         placeholder="0"
                     />
@@ -94,7 +94,7 @@
                         maxlength="2"
                         size="2"
                         disabled
-                        value="{{this.data.blast.radius}}"
+                        value="{{this.data.data.blast.radius}}"
                         data-dtype="Number"
                         placeholder="0"
                     />
@@ -107,7 +107,7 @@
                         maxlength="2"
                         type="text"
                         disabled
-                        value="{{this.data.blast.dropoff}}"
+                        value="{{this.data.data.blast.dropoff}}"
                         data-dtype="Number"
                         placeholder="0"
                     />

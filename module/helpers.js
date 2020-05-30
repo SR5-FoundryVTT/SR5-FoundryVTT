@@ -1,4 +1,11 @@
 export class Helpers {
+    static totalMods(mods) {
+        const reducer = (acc, cur) => acc + cur;
+        if (!mods) return 0;
+        if (Array.isArray(mods)) return mods.reduce(reducer, 0);
+        // assume object of key/values
+        return Object.values(mods).reduce(reducer, 0);
+    }
     static isMatrix(atts) {
         if (!atts) return false;
         if (typeof atts === 'boolean' && atts) return true;
