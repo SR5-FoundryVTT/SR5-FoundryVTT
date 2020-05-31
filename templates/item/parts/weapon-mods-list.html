@@ -7,22 +7,20 @@
                 </div>
             </div>
             <div class="item-right">
-                <div class="item-text rtg">
-                    {{localize "SR5.Equip"}}
-                </div>
-                <div class="item-text rtg">
+                <div class="item-text">
                     {{localize "SR5.DP"}}
                 </div>
-                <div class="item-text rtg">
+                <div class="item-text">
                     {{localize "SR5.Accuracy"}}
                 </div>
-                <div class="item-text rtg">
+                <div class="item-text">
                     {{localize "SR5.RecoilCompensation"}}
                 </div>
-                <div class="item-text item-icons rtg">
-                    <a class="add-new-mod" title="Add New Accessory">
-                        <i class="fas fa-plus"></i>
-                    </a>
+                <div class="item-text">
+                    {{localize "SR5.Conceal"}}
+                </div>
+                <div class="item-text item-icons">
+                    <i class="fas fa-plus roll add-new-mod" title="Add new mod"></i>
                 </div>
             </div>
         </div>
@@ -42,13 +40,7 @@
                         disabled
                     />
                 </div>
-                <div class="item-text rtg">
-                    <label class="checkbox">
-                        <input type="checkbox" {{checked mod.data.data.technology.equipped}} />
-                        <span class="checkmark far mod-equip"></span>
-                    </label>
-                </div>
-                <div class="item-text rtg">
+                <div class="item-text">
                     <input
                         class="display"
                         size="3"
@@ -59,7 +51,7 @@
                         placeholder="0"
                     />
                 </div>
-                <div class="item-text rtg">
+                <div class="item-text">
                     <input
                         class="display"
                         size="3"
@@ -70,7 +62,7 @@
                         placeholder="0"
                     />
                 </div>
-                <div class="item-text rtg">
+                <div class="item-text">
                     <input
                         class="display"
                         size="3"
@@ -81,13 +73,30 @@
                         placeholder="0"
                     />
                 </div>
-                <div class="item-text item-icons rtg">
-                    <a class="edit-item" title="Edit Mod">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <a class="mod-delete" title="Delete Accessory">
-                        <i class="fas fa-trash"></i>
-                    </a>
+                <div class="item-text">
+                    <input
+                            class="display"
+                            size="3"
+                            type="text"
+                            disabled
+                            value="{{mod.data.data.technology.conceal.value}}"
+                            data-dtype="Number"
+                            placeholder="0"
+                    />
+                </div>
+                <div class="item-text item-icons">
+                    <i
+                        title="{{localize 'SR5.ToggleEquip'}}"
+                        class="mod-equip roll
+                             {{#if mod.data.data.technology.equipped}}
+                              fas fa-check-circle
+                             {{else}}
+                              far fa-circle
+                             {{/if}}"
+                    >
+                    </i>
+                    <i class="roll fas fa-edit edit-item" title="Edit Mod"></i>
+                    <i class="roll fas fa-trash mod-delete" title="Delete Mod"></i>
                 </div>
             </div>
         </div>
