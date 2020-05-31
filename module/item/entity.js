@@ -44,22 +44,30 @@ export class SR5Item extends Item {
                 // handle overrides from ammo
                 const equippedAmmo = this.getEquippedAmmo();
                 if (equippedAmmo) {
+                    // add mods to damage from ammo
                     action.damage.mod[`SR5.Ammo ${equippedAmmo.name}`] =
                         equippedAmmo.data.data.damage;
+                    // add mods to ap from ammo
                     action.damage.ap.mod[`SR5.Ammo ${equippedAmmo.name}`] =
                         equippedAmmo.data.data.ap;
 
+                    // override element
                     if (equippedAmmo.data.data.element) {
                         action.damage.element.value = equippedAmmo.data.data.element;
                     } else {
                         action.damage.element.value = action.damage.element.base;
                     }
 
+                    // override damage type
                     if (equippedAmmo.data.data.damageType) {
                         action.damage.type.value = equippedAmmo.data.data.damageType;
                     } else {
                         action.damage.type.value = action.damage.type.base;
                     }
+                } else {
+                    // set value if we don't have item overrides
+                    action.damage.element.value = action.damage.element.base;
+                    action.damage.type.value = action.damage.type.base;
                 }
                 if (range.rc) range.rc.value = range.rc.base + Helpers.totalMods(range.rc.mod);
             }
