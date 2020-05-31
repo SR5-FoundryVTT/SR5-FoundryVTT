@@ -402,32 +402,37 @@ export class SR5Item extends Item {
     async useAmmo(fireMode) {
         const dupData = duplicate(this.data);
         const { ammo } = dupData.data;
-        ammo.current.value = Math.max(0, ammo.current.value - fireMode);
-        return this.update(dupData);
+        if (ammo) {
+            ammo.current.value = Math.max(0, ammo.current.value - fireMode);
+            return this.update(dupData);
+        }
     }
 
     async reloadAmmo() {
         const data = duplicate(this.data);
-        const newAmmunition = duplicate(this.items)
-            ?.filter((i) => i.type === 'ammo')
+        const { ammo } = data.data;
+        if (ammo.spare_clips) {
+            ammo.spare_clips.value = Math.max(0, ammo.spare_clips.value - 1);
+            ammo.current.value = ammo.current.max;
+        }
+
+        const newAmmunition = (this.items || [])
+            .filter((i) => i.type === 'ammo')
             .reduce((acc, item) => {
+                console.log(item);
                 const { technology } = item.data;
-                const { ammo } = data.data;
                 if (technology.equipped) {
                     const qty = technology.quantity;
                     technology.quantity = Math.max(
                         0,
                         qty - (ammo.current.max - ammo.current.value)
                     );
-                    if (ammo.spare_clips) {
-                        ammo.spare_clips.value = Math.max(0, ammo.spare_clips.value - 1);
-                        ammo.current.value = ammo.current.max;
-                    }
                     acc.push(item);
                 }
                 return acc;
             }, []);
-        if (newAmmunition) await this.updateOwnedItem(newAmmunition);
+        if (newAmmunition.length) await this.updateOwnedItem(newAmmunition);
+
         await this.update(data);
     }
 
@@ -728,6 +733,7 @@ export class SR5Item extends Item {
                 limit,
                 title,
             }).then(async (roll) => {
+                await this.useAmmo(1);
                 this.setFlag('shadowrun5e', 'action', {
                     hits: roll.total,
                 });
@@ -855,6 +861,7 @@ export class SR5Item extends Item {
         const items = duplicate(this.getFlag('shadowrun5e', 'embeddedItems'));
         if (!items) return;
         changes = Array.isArray(changes) ? changes : [changes];
+        if (!changes || changes.length === 0) return;
         changes.forEach((itemChanges) => {
             const index = items.findIndex((i) => i._id === itemChanges._id);
             if (index === -1) return;
