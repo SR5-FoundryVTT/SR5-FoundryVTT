@@ -27,29 +27,28 @@ export class SR5Item extends Item {
             action.limit.mod = {};
             action.damage.mod = {};
             action.damage.ap.mod = {};
+            action.dice_pool_mod = {};
             // setup range weapon special shit
             if (item.type !== 'spell' && item.data.range) {
                 const { range } = item.data;
-                // range.rc.mod = 0;
-                // if (range.mods) {
-                //     // turn object into array
-                //     if (typeof range.mods === 'object') {
-                //         range.mods = Object.values(range.mods);
-                //     }
-                //     range.mods.forEach((mod) => {
-                //         if (mod.equipped) {
-                //             if (mod.rc) range.rc.mod += mod.rc;
-                //             if (mod.acc) action.limit.mod += mod.acc;
-                //             if (mod.dp) action.alt_mod += mod.dp;
-                //         }
-                //     });
-                // }
+                range.rc.mod = {};
+                const equippedMods = this.getEquippedMods();
+
+                // handle overrides from mods
+                equippedMods.forEach((mod) => {
+                    if (mod.data.data.rc) range.rc.mod[mod.name] = mod.data.data.rc;
+                    if (mod.data.data.accuracy) action.limit.mod[mod.name] = mod.data.data.accuracy;
+                    if (mod.data.data.dice_pool)
+                        action.dice_pool_mod[mod.name] = mod.data.data.dice_pool;
+                });
+                // handle overrides from ammo
                 const equippedAmmo = this.getEquippedAmmo();
                 if (equippedAmmo) {
                     action.damage.mod[`SR5.Ammo ${equippedAmmo.name}`] =
                         equippedAmmo.data.data.damage;
-                    action.damage.ap.mod[`SR5.Ammo ${equippedAmmo.name}`] +=
+                    action.damage.ap.mod[`SR5.Ammo ${equippedAmmo.name}`] =
                         equippedAmmo.data.data.ap;
+
                     if (equippedAmmo.data.data.element) {
                         action.damage.element.value = equippedAmmo.data.data.element;
                     } else {
@@ -61,15 +60,17 @@ export class SR5Item extends Item {
                     } else {
                         action.damage.type.value = action.damage.type.base;
                     }
-                    if (range.rc) range.rc.value = range.rc.base + range.rc.mod;
                 }
+                if (range.rc) range.rc.value = range.rc.base + Helpers.totalMods(range.rc.mod);
             }
 
             // once all damage mods have been accounted for, sum base and mod to value
             action.damage.value = action.damage.base + Helpers.totalMods(action.damage.mod);
             action.damage.ap.value =
                 action.damage.ap.base + Helpers.totalMods(action.damage.ap.mod);
+
             action.limit.value = action.limit.base + Helpers.totalMods(action.limit.mod);
+
             if (this.actor) {
                 if (action.damage.attribute)
                     action.damage.value += this.actor.data.data.attributes[
@@ -88,6 +89,8 @@ export class SR5Item extends Item {
         item.properties = this.getChatData().properties;
 
         console.log(item);
+
+        if (this.actor) this.actor.render(true);
     }
 
     async roll(event) {
@@ -373,10 +376,20 @@ export class SR5Item extends Item {
         )[0];
     }
 
-    equipWeaponMod(iid) {
-        const mod = this.items.find((item) => item._id === iid);
-        mod.data.data.technology.equipped = !mod.data.data.technology.equipped;
-        this.updateOwnedItem(mod);
+    getEquippedMods() {
+        return (this.items || []).filter(
+            (item) =>
+                item.type === 'modification' &&
+                item.data.data.type === 'weapon' &&
+                item.data.data?.technology?.equipped
+        );
+    }
+
+    async equipWeaponMod(iid) {
+        const mod = this.getOwnedItem(iid);
+        const dupData = duplicate(mod.data);
+        dupData.data.technology.equipped = !dupData.data.technology.equipped;
+        await this.updateOwnedItem(dupData);
     }
 
     async useAmmo(fireMode) {
@@ -411,7 +424,7 @@ export class SR5Item extends Item {
         await this.update(data);
     }
 
-    equipAmmo(iid) {
+    async equipAmmo(iid) {
         // only allow ammo that was just clicked to be equipped
         const ammo = this.items
             ?.filter((item) => item.type === 'ammo')
@@ -420,7 +433,7 @@ export class SR5Item extends Item {
                 i.data.data.technology.equipped = iid === item._id;
                 return i.data;
             });
-        this.updateOwnedItem(ammo);
+        await this.updateOwnedItem(ammo);
     }
 
     addNewLicense() {
@@ -488,10 +501,11 @@ export class SR5Item extends Item {
         const attribute = actorData.attributes[itemData.action.attribute];
         const attribute2 = actorData.attributes[itemData.action.attribute2];
         let limit = itemData.action.limit.value;
+        // TODO remove these (by making them not used, not just delete)
         const mod = parseInt(itemData.action.mod || 0) + parseInt(itemData.action.alt_mod || 0);
 
         // only check if attribute2 is set if skill is not set
-        const parts = {};
+        const parts = duplicate(itemData.action.dice_pool_mod);
         if (attribute) parts[attribute.label] = attribute.value;
         if (skill) parts[skill.label] = skill.value;
         else if (attribute2) parts[attribute2.label] = attribute2.value;

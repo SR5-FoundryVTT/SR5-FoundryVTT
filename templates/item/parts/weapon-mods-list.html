@@ -30,23 +30,22 @@
         <div class="item" data-item-id="{{mod._id}}">
             <div class="item-left">
                 <div class="item-text item-name">
-                    <input
-                        class="display left"
-                        type="text"
-                        value="{{mod.name}}"
-                        disabled
-                    />
+                    <input class="display left" type="text" value="{{mod.name}}" disabled />
                 </div>
             </div>
             <div class="item-right">
+                <div class="">
+                    <input
+                        class="display left"
+                        type="text"
+                        value="{{localizeOb mod.data.data.mount_point ../config.mountPoints}}"
+                        disabled
+                    />
+                </div>
                 <div class="item-text rtg">
                     <label class="checkbox">
-                        <input
-                            type="checkbox"
-                            {{checked
-                            mod.data.data.technology.equipped}}
-                        />
-                        <span class="checkmark far"></span>
+                        <input type="checkbox" {{checked mod.data.data.technology.equipped}} />
+                        <span class="checkmark far mod-equip"></span>
                     </label>
                 </div>
                 <div class="item-text rtg">
@@ -55,7 +54,7 @@
                         size="3"
                         type="text"
                         disabled
-                        value="{{mod.data.data.dp}}"
+                        value="{{mod.data.data.dice_pool}}"
                         data-dtype="Number"
                         placeholder="0"
                     />
@@ -66,7 +65,7 @@
                         size="3"
                         type="text"
                         disabled
-                        value="{{mod.data.data.acc}}"
+                        value="{{mod.data.data.accuracy}}"
                         data-dtype="Number"
                         placeholder="0"
                     />

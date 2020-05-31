@@ -251,6 +251,7 @@ SR5.mountPoints = {
     stock: 'SR5.Stock',
     top: 'SR5.Top',
     side: 'SR5.Side',
+    internal: 'SR5.Internal',
 };
 
 SR5.lifestyleTypes = {

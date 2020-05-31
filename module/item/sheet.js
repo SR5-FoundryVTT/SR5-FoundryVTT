@@ -67,14 +67,11 @@ export class SR5ItemSheet extends ItemSheet {
         data.config = CONFIG.SR5;
         const items = this.item.items || [];
         const [ammunition, weaponMods, armorMods] = items.reduce((parts, item) => {
-            console.log(item);
             if (item.type === 'ammo') parts[0].push(item);
             if (item.type === 'modification' && item.data.data.type === 'weapon') parts[1].push(item);
             if (item.type === 'modification' && item.data.data.type === 'armor') parts[2].push(item);
             return parts;
         }, [[], [], []])
-        console.log(ammunition);
-        console.log(weaponMods);
         data.ammunition = ammunition;
         data.weaponMods = weaponMods;
         data.armorMods = armorMods;
