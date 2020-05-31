@@ -2,7 +2,10 @@ import { SR5 } from './config.js';
 
 export class DiceSR {
     static async basicRoll({ count, limit, explode, title, actor }) {
-        if (count <= 0) ui.notifications.error(game.i18n.localize('SR5.RollOneDie'));
+        if (count <= 0) {
+            ui.notifications.error(game.i18n.localize('SR5.RollOneDie'));
+            return;
+        }
         let formula = `${count}d6`;
         if (explode) {
             formula += 'x6';
@@ -160,7 +163,7 @@ export class DiceSR {
                             title,
                             actor,
                         });
-                        if (extended) {
+                        if (extended && r) {
                             const currentExtended = parts['SR5.Extended'] || 0;
                             parts['SR5.Extended'] = currentExtended - 1;
                             // add a bit of a delay to roll again
@@ -182,7 +185,7 @@ export class DiceSR {
                             );
                         }
                         resolve(r);
-                        if (after) r.then((roll) => after(roll));
+                        if (after && r) r.then((roll) => after(roll));
                     },
                 }).render(true);
             });
