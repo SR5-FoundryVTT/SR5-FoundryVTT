@@ -90,7 +90,8 @@ export class SR5Item extends Item {
 
         console.log(item);
 
-        if (this.actor) this.actor.render(true);
+        // update actor sheet if it's rendered
+        if (this.actor) this.actor.render();
     }
 
     async roll(event) {
@@ -455,11 +456,6 @@ export class SR5Item extends Item {
         const { licenses } = data.data;
         licenses.splice(index, 1);
         this.update(data);
-    }
-
-    editItem(iid) {
-        const item = this.getOwnedItem(iid);
-        item.sheet.render(true);
     }
 
     rollOpposedTest(target, ev) {

@@ -12,6 +12,8 @@
   "sin": "SIN",
   "lifestyle": "Lifestyle",
   "contact": "Contact",
+  "modification": "Modification",
+  "ammo": "Ammo",
 
   "SR5.ActiveSkills": "Active Skills",
   "SR5.Specializations": "Specializations",
@@ -140,7 +142,7 @@
   "SR5.Dropoff": "Dropoff",
   "SR5.WeaponMod": "Mod",
   "SR5.DP": "DP",
-  "SR5.Accuracy": "Acc",
+  "SR5.Accuracy": "Accuracy",
   "SR5.RecoilCompensation": "RC",
   "SR5.Equip": "Equip",
   "SR5.Damage": "Damage",
@@ -179,7 +181,7 @@
   "SR5.AttrStrength": "Strength",
   "SR5.AttrWillpower": "Willpower",
   "SR5.AttrLogic": "Logic",
-  "SR5.AttrIntution": "Intuition",
+  "SR5.AttrIntuition": "Intuition",
   "SR5.AttrCharisma": "Charisma",
   "SR5.AttrMagic": "Magic",
   "SR5.AttrResonance": "Resonance",
@@ -346,6 +348,16 @@
   "SR5.Cover": "Cover",
   "SR5.FullDefense": "Full Defense",
   "SR5.Global": "Global",
+
+  "SR5.Internal": "Internal",
+  "SR5.Barrel": "Barrel",
+  "SR5.Stock": "Stock",
+  "SR5.Top": "Top",
+  "SR5.Side": "Side",
+
+  "SR5.MountPoint": "Mount Point",
+  "SR5.BlastRadius": "Blast Radius",
+  "SR5.Modification": "Modification",
 
   "SETTINGS.DiagonalMovementName": "Diagonal Movement",
   "SETTINGS.DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",

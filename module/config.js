@@ -7,7 +7,7 @@ SR5.attributes = {
     strength: 'SR5.AttrStrength',
     willpower: 'SR5.AttrWillpower',
     logic: 'SR5.AttrLogic',
-    intuition: 'SR5.AttrIntution',
+    intuition: 'SR5.AttrIntuition',
     charisma: 'SR5.AttrCharisma',
     magic: 'SR5.AttrMagic',
     resonance: 'SR5.AttrResonance',

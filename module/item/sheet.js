@@ -66,12 +66,17 @@ export class SR5ItemSheet extends ItemSheet {
 
         data.config = CONFIG.SR5;
         const items = this.item.items || [];
-        const [ammunition, weaponMods, armorMods] = items.reduce((parts, item) => {
-            if (item.type === 'ammo') parts[0].push(item);
-            if (item.type === 'modification' && item.data.data.type === 'weapon') parts[1].push(item);
-            if (item.type === 'modification' && item.data.data.type === 'armor') parts[2].push(item);
-            return parts;
-        }, [[], [], []])
+        const [ammunition, weaponMods, armorMods] = items.reduce(
+            (parts, item) => {
+                if (item.type === 'ammo') parts[0].push(item);
+                if (item.type === 'modification' && item.data.data.type === 'weapon')
+                    parts[1].push(item);
+                if (item.type === 'modification' && item.data.data.type === 'armor')
+                    parts[2].push(item);
+                return parts;
+            },
+            [[], [], []]
+        );
         data.ammunition = ammunition;
         data.weaponMods = weaponMods;
         data.armorMods = armorMods;
@@ -149,14 +154,18 @@ export class SR5ItemSheet extends ItemSheet {
     }
 
     _getItemFromCollection(collection, itemId) {
-        const pack = game.packs.find((p) => (p.collection === collection));
+        const pack = game.packs.find((p) => p.collection === collection);
         return pack.getEntity(itemId);
     }
 
-    async _onEditItem(event) {
+    _eventId(event) {
         event.preventDefault();
-        const iid = event.currentTarget.closest('.item').dataset.itemId;
-        this.item.editItem(iid);
+        return event.currentTarget.closest('.item').dataset.itemId;
+    }
+
+    async _onEditItem(event) {
+        const item = this.item.getOwnedItem(this._eventId(event));
+        item.sheet.render(true);
     }
 
     async _onAddLicense(event) {
@@ -165,15 +174,11 @@ export class SR5ItemSheet extends ItemSheet {
     }
 
     async _onWeaponModRemove(event) {
-        event.preventDefault();
-        const iid = event.currentTarget.closest('.item').dataset.itemId;
-        this.item.deleteOwnedItem(iid);
+        this.item.deleteOwnedItem(this._eventId(event));
     }
 
     async _onWeaponModEquip(event) {
-        event.preventDefault();
-        const iid = event.currentTarget.closest('.item').dataset.itemId;
-        this.item.equipWeaponMod(iid);
+        this.item.equipWeaponMod(this._eventId(event));
     }
 
     async _onAddWeaponMod(event) {
@@ -195,15 +200,11 @@ export class SR5ItemSheet extends ItemSheet {
     }
 
     async _onAmmoRemove(event) {
-        event.preventDefault();
-        const iid = event.currentTarget.closest('.item').dataset.itemId;
-        this.item.deleteOwnedItem(iid);
+        this.item.deleteOwnedItem(this._eventId(event));
     }
 
     async _onAmmoEquip(event) {
-        event.preventDefault();
-        const iid = event.currentTarget.closest('.item').dataset.itemId;
-        this.item.equipAmmo(iid);
+        this.item.equipAmmo(this._eventId(event));
     }
 
     _onAddNewAmmo(event) {
