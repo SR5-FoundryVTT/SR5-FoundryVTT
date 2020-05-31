@@ -25,56 +25,59 @@ export class SR5Item extends Item {
                 item.data.licenses = Object.values(item.data.licenses);
             }
         }
+        const equippedMods = this.getEquippedMods();
+        const equippedAmmo = this.getEquippedAmmo();
 
-        if (item.data.action) {
-            const { action } = item.data;
+        const { technology, range, action } = item.data;
+
+        if (technology?.conceal) {
+            technology.conceal.mod = {};
+            equippedMods.forEach((mod) => {
+                if (technology?.conceal && mod.data.data.technology.conceal.value) {
+                    technology.conceal.mod[mod.name] = mod.data.data.technology.conceal.value;
+                }
+            });
+
+            technology.conceal.value =
+                technology.conceal.base + Helpers.totalMods(technology.conceal.mod);
+        }
+
+        if (action) {
             action.alt_mod = 0;
             action.limit.mod = {};
             action.damage.mod = {};
             action.damage.ap.mod = {};
             action.dice_pool_mod = {};
-            // setup range weapon special shit
-            if (item.type !== 'spell' && item.data.range) {
-                const { range } = item.data;
-                range.rc.mod = {};
-                const equippedMods = this.getEquippedMods();
+            // handle overrides from mods
+            equippedMods.forEach((mod) => {
+                if (mod.data.data.accuracy) action.limit.mod[mod.name] = mod.data.data.accuracy;
+                if (mod.data.data.dice_pool)
+                    action.dice_pool_mod[mod.name] = mod.data.data.dice_pool;
+            });
 
-                // handle overrides from mods
-                equippedMods.forEach((mod) => {
-                    if (mod.data.data.rc) range.rc.mod[mod.name] = mod.data.data.rc;
-                    if (mod.data.data.accuracy) action.limit.mod[mod.name] = mod.data.data.accuracy;
-                    if (mod.data.data.dice_pool)
-                        action.dice_pool_mod[mod.name] = mod.data.data.dice_pool;
-                });
-                // handle overrides from ammo
-                const equippedAmmo = this.getEquippedAmmo();
-                if (equippedAmmo) {
-                    // add mods to damage from ammo
-                    action.damage.mod[`SR5.Ammo ${equippedAmmo.name}`] =
-                        equippedAmmo.data.data.damage;
-                    // add mods to ap from ammo
-                    action.damage.ap.mod[`SR5.Ammo ${equippedAmmo.name}`] =
-                        equippedAmmo.data.data.ap;
+            if (equippedAmmo) {
+                // add mods to damage from ammo
+                action.damage.mod[`SR5.Ammo ${equippedAmmo.name}`] = equippedAmmo.data.data.damage;
+                // add mods to ap from ammo
+                action.damage.ap.mod[`SR5.Ammo ${equippedAmmo.name}`] = equippedAmmo.data.data.ap;
 
-                    // override element
-                    if (equippedAmmo.data.data.element) {
-                        action.damage.element.value = equippedAmmo.data.data.element;
-                    } else {
-                        action.damage.element.value = action.damage.element.base;
-                    }
-
-                    // override damage type
-                    if (equippedAmmo.data.data.damageType) {
-                        action.damage.type.value = equippedAmmo.data.data.damageType;
-                    } else {
-                        action.damage.type.value = action.damage.type.base;
-                    }
+                // override element
+                if (equippedAmmo.data.data.element) {
+                    action.damage.element.value = equippedAmmo.data.data.element;
                 } else {
-                    // set value if we don't have item overrides
                     action.damage.element.value = action.damage.element.base;
+                }
+
+                // override damage type
+                if (equippedAmmo.data.data.damageType) {
+                    action.damage.type.value = equippedAmmo.data.data.damageType;
+                } else {
                     action.damage.type.value = action.damage.type.base;
                 }
-                if (range.rc) range.rc.value = range.rc.base + Helpers.totalMods(range.rc.mod);
+            } else {
+                // set value if we don't have item overrides
+                action.damage.element.value = action.damage.element.base;
+                action.damage.type.value = action.damage.type.base;
             }
 
             // once all damage mods have been accounted for, sum base and mod to value
@@ -85,12 +88,25 @@ export class SR5Item extends Item {
             action.limit.value = action.limit.base + Helpers.totalMods(action.limit.mod);
 
             if (this.actor) {
-                if (action.damage.attribute)
+                if (action.damage.attribute) {
                     action.damage.value += this.actor.data.data.attributes[
                         action.damage.attribute
                     ].value;
-                if (action.limit.attribute)
+                }
+                if (action.limit.attribute) {
                     action.limit.value += this.actor.data.data.limits[action.limit.attribute].value;
+                }
+            }
+        }
+
+        if (range) {
+            if (range.rc) {
+                range.rc.mod = {};
+                equippedMods.forEach((mod) => {
+                    if (mod.data.data.rc) range.rc.mod[mod.name] = mod.data.data.rc;
+                    // handle overrides from ammo
+                });
+                if (range.rc) range.rc.value = range.rc.base + Helpers.totalMods(range.rc.mod);
             }
         }
 
@@ -341,6 +357,12 @@ export class SR5Item extends Item {
                         })`
                     );
             }
+        }
+
+        if (data.technology?.conceal?.value) {
+            props.push(
+                `${game.i18n.localize('SR5.Conceal')} ${data.technology.conceal.value}`
+            );
         }
 
         if (data.category === 'range') {
