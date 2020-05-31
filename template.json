@@ -856,7 +856,10 @@
           "quantity": 1,
           "cost": 0,
           "equipped": false,
-          "concealability": 0
+          "conceal": {
+            "base": 0,
+            "value": 0
+          }
         },
         "condition_monitor": {
           "value": 0,

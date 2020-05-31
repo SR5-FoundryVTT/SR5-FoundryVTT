@@ -143,15 +143,14 @@ export const migrateActorData = function (actor) {
     _migrateActorSkills(actor, updateData);
 
     let hasItemUpdates = false;
-    const items = actor.items.map(i => {
-
+    const items = actor.items.map((i) => {
         // Migrate the Owned Item
         let itemUpdate = migrateItemData(i);
 
         // Update the Owned Item
-        if ( !isObjectEmpty(itemUpdate) ) {
+        if (!isObjectEmpty(itemUpdate)) {
             hasItemUpdates = true;
-            return mergeObject(i, itemUpdate, {enforceTypes: false, inplace: false});
+            return mergeObject(i, itemUpdate, { enforceTypes: false, inplace: false });
         } else return i;
     });
     if (hasItemUpdates) updateData.items = items;
@@ -177,6 +176,7 @@ export const migrateItemData = function (item) {
     _migrateDamageTypeAndElement(item, updateData);
     _migrateItemsAddActions(item, updateData);
     _migrateItemsAddCapacity(item, updateData);
+    _migrateItemsConceal(item, updateData);
 
     if (!isObjectEmpty(updateData)) {
         updateData._id = item._id;
@@ -290,6 +290,14 @@ const _migrateItemsAmmo = function (item, updateData) {
                 value: currentAmmo.value,
                 max: currentAmmo.max,
             },
+        };
+    }
+};
+
+const _migrateItemsConceal = (item, updateData) => {
+    if (item.data.technology?.concealability !== undefined) {
+        updateData['data.technology.conceal'] = {
+            base: item.data.technology.concealability,
         };
     }
 };
