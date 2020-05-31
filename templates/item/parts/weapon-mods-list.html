@@ -21,7 +21,10 @@
                     {{localize "SR5.Conceal"}}
                 </div>
                 <div class="item-text item-icons">
-                    <i class="fas fa-plus roll add-new-mod" title="Add new mod"></i>
+                    <a class="add-new-mod roll" title="Add Ammo" >
+                        <i class="fas fa-plus"></i>
+                        {{localize "SR5.Add"}}
+                    </a>
                 </div>
             </div>
         </div>
@@ -32,7 +35,7 @@
                     <i
                         title="{{localize 'SR5.ToggleEquip'}}"
                         class="mod-equip roll
-                             {{#if mod.data.data.technology.equipped}}
+                             {{#if mod.data.technology.equipped}}
                               fas fa-check-circle
                              {{else}}
                               far fa-circle
@@ -40,8 +43,8 @@
                     >
                     </i>
                 </div>
-                <div class="item-text item-name">
-                    <input class="display left" type="text" value="{{mod.name}}" disabled />
+                <div class="item-text item-name has-desc roll">
+                    {{mod.name}}
                 </div>
             </div>
             <div class="item-right">
@@ -49,7 +52,7 @@
                     <input
                         class="display left"
                         type="text"
-                        value="{{localizeOb mod.data.data.mount_point ../config.mountPoints}}"
+                        value="{{localizeOb mod.data.mount_point ../config.mountPoints}}"
                         disabled
                     />
                 </div>
@@ -59,7 +62,7 @@
                         size="3"
                         type="text"
                         disabled
-                        value="{{mod.data.data.dice_pool}}"
+                        value="{{mod.data.dice_pool}}"
                         data-dtype="Number"
                         placeholder="0"
                     />
@@ -70,7 +73,7 @@
                         size="3"
                         type="text"
                         disabled
-                        value="{{mod.data.data.accuracy}}"
+                        value="{{mod.data.accuracy}}"
                         data-dtype="Number"
                         placeholder="0"
                     />
@@ -81,7 +84,7 @@
                         size="3"
                         type="text"
                         disabled
-                        value="{{mod.data.data.rc}}"
+                        value="{{mod.data.rc}}"
                         data-dtype="Number"
                         placeholder="0"
                     />
@@ -92,7 +95,7 @@
                         size="3"
                         type="text"
                         disabled
-                        value="{{mod.data.data.technology.conceal.value}}"
+                        value="{{mod.data.technology.conceal.value}}"
                         data-dtype="Number"
                         placeholder="0"
                     />
@@ -100,6 +103,16 @@
                 <div class="item-text item-icons">
                     <i class="roll fas fa-edit edit-item" title="Edit Mod"></i>
                     <i class="roll fas fa-trash mod-delete" title="Delete Mod"></i>
+                </div>
+            </div>
+        </div>
+        <div class="item hidden">
+            <div class="item-desc">
+                {{{mod.data.description.value}}}
+                <div class="props">
+                    {{#each item.properties}}
+                    <span>{{this}}</span>
+                    {{/each}}
                 </div>
             </div>
         </div>

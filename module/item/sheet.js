@@ -6,6 +6,7 @@ import { Helpers } from '../helpers.js';
 export class SR5ItemSheet extends ItemSheet {
     constructor(...args) {
         super(...args);
+        this._shownDesc = [];
     }
 
     /**
@@ -68,11 +69,11 @@ export class SR5ItemSheet extends ItemSheet {
         const items = this.item.items || [];
         const [ammunition, weaponMods, armorMods] = items.reduce(
             (parts, item) => {
-                if (item.type === 'ammo') parts[0].push(item);
+                if (item.type === 'ammo') parts[0].push(item.data);
                 if (item.type === 'modification' && item.data.data.type === 'weapon')
-                    parts[1].push(item);
+                    parts[1].push(item.data);
                 if (item.type === 'modification' && item.data.data.type === 'armor')
-                    parts[2].push(item);
+                    parts[2].push(item.data);
                 return parts;
             },
             [[], [], []]
@@ -108,6 +109,20 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.mod-delete').click(this._onWeaponModRemove.bind(this));
 
         html.find('.add-new-license').click(this._onAddLicense.bind(this));
+
+        html.find('.has-desc').click((event) => {
+            event.preventDefault();
+            const item = $(event.currentTarget).parents('.item');
+            const iid = $(item).data().item;
+            const field = item.next();
+            field.toggle();
+            if (iid) {
+                if (field.is(':visible')) this._shownDesc.push(iid);
+                else this._shownDesc = this._shownDesc.filter((val) => val !== iid);
+            }
+        });
+
+        html.find('.hidden').hide();
     }
 
     _onDragOver(event) {
