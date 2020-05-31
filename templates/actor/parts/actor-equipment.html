@@ -8,9 +8,6 @@
         </div>
       </div>
       <div class="item-right">
-        <div class="item-text">
-          {{localize "SR5.Equipped"}}
-        </div>
         <div class="item-text rtg">
           {{localize "SR5.Rtg"}}
         </div>
@@ -36,7 +33,6 @@
         </div>
       </div>
       <div class="item-right">
-
         {{#if item.data.ammo.current.max}}
         <div class="item-text roll reload-ammo">
           {{localize "SR5.WeaponReload"}}
@@ -48,15 +44,6 @@
         </div>
         {{/if}}
 
-        <div class="item-text">
-          <span class="item-equip-toggle" >
-            {{#if item.data.technology.equipped}}
-            <i class="far fa-check-circle"></i>
-            {{else}}
-            <i class="far fa-circle"></i>
-            {{/if}}
-          </span>
-        </div>
         <div class="item-text rtg">
           <input
             class='display item-rtg'
@@ -76,6 +63,15 @@
             data-dtype='Number' />
         </div>
         <div class="item-text item-icons">
+          <i title="{{localize 'SR5.ToggleEquip'}}"
+             class="item-equip-toggle roll
+             {{#if item.data.technology.equipped}}
+              fas fa-check-circle
+             {{else}}
+              far fa-circle
+             {{/if}}"
+          >
+          </i>
           <i class="item-edit roll fas fa-edit"></i>
           <i class="item-delete roll fas fa-trash"></i>
         </div>

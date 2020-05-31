@@ -2,6 +2,11 @@ import { DiceSR } from '../dice.js';
 import { Helpers } from '../helpers.js';
 
 export class SR5Item extends Item {
+    async update(data, options) {
+        await super.update(data, options);
+        if (this.actor) this.actor.render();
+        return this;
+    }
     get hasOpposedRoll() {
         return !!(this.data.data.action && this.data.data.action.opposed.type);
     }
@@ -95,9 +100,6 @@ export class SR5Item extends Item {
 
         this.labels = labels;
         item.properties = this.getChatData().properties;
-
-        // update actor sheet if it's rendered
-        if (this.actor) this.actor.render();
     }
 
     async roll(event) {

@@ -8,10 +8,6 @@ import { LanguageSkillEditForm } from '../apps/language-skill-edit.js';
  * Extend the basic ActorSheet with some very simple modifications
  */
 export class SR5ActorSheet extends ActorSheet {
-    get data() {
-        return this.actor.data.data;
-    }
-
     constructor(...args) {
         super(...args);
 
@@ -333,8 +329,8 @@ export class SR5ActorSheet extends ActorSheet {
         html.find('.skill-edit').click(this._onShowEditSkill.bind(this));
         html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
         html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
-        html.find('.matrix-att-selector').change((event) => {
-            let iid = this.data.matrix.device;
+        html.find('.matrix-att-selector').change(async (event) => {
+            let iid = this.actor.data.data.matrix.device;
             let item = this.actor.getOwnedItem(iid);
             if (!item) console.error('could not find item');
             // grab matrix attribute (sleaze, attack, etc.)
@@ -358,10 +354,7 @@ export class SR5ActorSheet extends ActorSheet {
                     data[key] = oldVal;
                 }
             }
-            // update twice so that it triggers the correct values for the sheet
-            this.actor.updateEmbeddedEntity('OwnedItem', data).then(() => {
-                item.update({});
-            });
+            await this.actor.updateOwnedItem(data);
         });
 
         // Update Inventory Item
@@ -391,14 +384,14 @@ export class SR5ActorSheet extends ActorSheet {
 
     async _onFilterSkills(event) {
         this._filters.skills = event.currentTarget.value;
-        this._render();
+        this.render();
     }
 
     async _onReloadAmmo(event) {
         event.preventDefault();
         const iid = event.currentTarget.closest('.item').dataset.itemId;
         const item = this.actor.getOwnedItem(iid);
-        if (item) item.reloadAmmo();
+        if (item) return item.reloadAmmo();
     }
 
     _onItemCreate(event) {
@@ -417,21 +410,18 @@ export class SR5ActorSheet extends ActorSheet {
     async _onAddLanguageSkill(event) {
         event.preventDefault();
         this.actor.addLanguageSkill({ name: '' });
-        //data.data.skills.language.value.push({name: '', specs: '', rating: 0});
     }
 
     async _onRemoveLanguageSkill(event) {
         event.preventDefault();
         const skillId = event.currentTarget.dataset.skill;
         this.actor.removeLanguageSkill(skillId);
-        //data.data.skills.language.value.splice(skillId, 1);
     }
 
     async _onAddKnowledgeSkill(event) {
         event.preventDefault();
         const category = event.currentTarget.dataset.category;
         this.actor.addKnowledgeSkill(category);
-        // if (cat) cat.value.push({name: '', specs: '', rating: 0});
     }
 
     async _onRemoveKnowledgeSkill(event) {
@@ -439,7 +429,6 @@ export class SR5ActorSheet extends ActorSheet {
         const skillId = event.currentTarget.dataset.skill;
         const category = event.currentTarget.dataset.category;
         this.actor.removeKnowledgeSkill(skillId, category);
-        // if (cat) cat.value.splice(skillId, 1);
     }
 
     async _onChangeRtg(event) {
@@ -467,17 +456,24 @@ export class SR5ActorSheet extends ActorSheet {
         const item = this.actor.getOwnedItem(iid);
         if (item) {
             const itemData = item.data.data;
-            // if we will be equipping and it is a device
-            if (!itemData.technology.equipped && item.type === 'device') {
-                for (let ite of this.actor.items) {
-                    if (ite.type === 'device') {
-                        await ite.update({ 'data.technology.equipped': false });
-                    }
+            const newItems = [];
+            if (item.type === 'device') {
+                // turn off all other devices than the one that is being equipped
+                // if clicking the equipped, toggle it
+                for (let ite of this.actor.items.filter(i => i.type === 'device')) {
+                    newItems.push({
+                        _id: ite._id,
+                        'data.technology.equipped': ite._id === iid ? !itemData.technology.equipped : false,
+                    });
                 }
+            } else {
+                newItems.push({
+                    _id: iid,
+                    'data.technology.equipped': !itemData.technology.equipped,
+                });
             }
-            await item.update({
-                'data.technology.equipped': !itemData.technology.equipped,
-            });
+            await this.actor.updateEmbeddedEntity('OwnedItem', newItems);
+            this.actor.render();
         }
     }
 

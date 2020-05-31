@@ -3,8 +3,8 @@ import { Helpers } from '../helpers.js';
 import { SR5 } from '../config.js';
 
 export class SR5Actor extends Actor {
-    update(data, options) {
-        super.update(data, options);
+    async update(data, options) {
+        await super.update(data, options);
         // trigger update for all items with action
         // needed for rolls to properly update when items or attributes update
         const itemUpdates = [];
@@ -13,7 +13,8 @@ export class SR5Actor extends Actor {
                 itemUpdates.push(item);
             }
         }
-        this.updateEmbeddedEntity('OwnedItem', itemUpdates);
+        await this.updateEmbeddedEntity('OwnedItem', itemUpdates);
+        return this;
     }
 
     prepareData() {
