@@ -160,10 +160,11 @@
 
   "SR5.PowerPoints": "PP",
   "SR5.PowerLevel": "Level",
+  "SR5.ToggleEquip": "Toggle Equipped",
 
   "SR5.Armor": "Armor",
   "SR5.ArmorValue": "Armor Value",
-  "SR5.Accessory": "Accesssory",
+  "SR5.Accessory": "Accessory",
 
   "SR5.DeviceType": "Type",
 
