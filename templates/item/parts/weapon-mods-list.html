@@ -2,6 +2,7 @@
     <div class="scroll-area">
         <div class="item item-section">
             <div class="item-left">
+                <div class="item-text rtg"></div>
                 <div class="item-text item-name">
                     {{localize "SR5.WeaponMod"}}
                 </div>
@@ -27,6 +28,18 @@
         {{#each weaponMods as |mod id|}}
         <div class="item" data-item-id="{{mod._id}}">
             <div class="item-left">
+                <div class="item-text rtg">
+                    <i
+                        title="{{localize 'SR5.ToggleEquip'}}"
+                        class="mod-equip roll
+                             {{#if mod.data.data.technology.equipped}}
+                              fas fa-check-circle
+                             {{else}}
+                              far fa-circle
+                             {{/if}}"
+                    >
+                    </i>
+                </div>
                 <div class="item-text item-name">
                     <input class="display left" type="text" value="{{mod.name}}" disabled />
                 </div>
@@ -75,26 +88,16 @@
                 </div>
                 <div class="item-text">
                     <input
-                            class="display"
-                            size="3"
-                            type="text"
-                            disabled
-                            value="{{mod.data.data.technology.conceal.value}}"
-                            data-dtype="Number"
-                            placeholder="0"
+                        class="display"
+                        size="3"
+                        type="text"
+                        disabled
+                        value="{{mod.data.data.technology.conceal.value}}"
+                        data-dtype="Number"
+                        placeholder="0"
                     />
                 </div>
                 <div class="item-text item-icons">
-                    <i
-                        title="{{localize 'SR5.ToggleEquip'}}"
-                        class="mod-equip roll
-                             {{#if mod.data.data.technology.equipped}}
-                              fas fa-check-circle
-                             {{else}}
-                              far fa-circle
-                             {{/if}}"
-                    >
-                    </i>
                     <i class="roll fas fa-edit edit-item" title="Edit Mod"></i>
                     <i class="roll fas fa-trash mod-delete" title="Delete Mod"></i>
                 </div>

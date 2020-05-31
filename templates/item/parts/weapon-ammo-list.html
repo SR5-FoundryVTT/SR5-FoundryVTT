@@ -2,14 +2,12 @@
     <div class="scroll-area">
         <div class="item item-section">
             <div class="item-left">
+                <div class="item-text item-rtg"></div>
                 <div class="item-text item-name">
                     {{localize "SR5.Ammo"}}
                 </div>
             </div>
             <div class="item-right">
-                <div class="item-text rtg">
-                    {{localize "SR5.Equip"}}
-                </div>
                 <div class="item-text rtg">
                     {{localize "SR5.Qty"}}
                 </div>
@@ -28,7 +26,7 @@
                 <div class="item-text dropoff">
                     {{localize "SR5.Dropoff"}}
                 </div>
-                <div class="item-text item-icons rtg">
+                <div class="item-text item-icons">
                     <a class="add-new-ammo" title="Add Ammo">
                         <i class="fas fa-plus"></i>
                     </a>
@@ -38,17 +36,29 @@
         {{#each ammunition}}
         <div class="item" data-item-id="{{this._id}}">
             <div class="item-left">
+                <div class="item-text rtg">
+                    <i
+                        title="{{localize 'SR5.ToggleEquip'}}"
+                        class="ammo-equip roll
+                             {{#if this.data.data.technology.equipped}}
+                              fas fa-check-circle
+                             {{else}}
+                              far fa-circle
+                             {{/if}}"
+                    >
+                    </i>
+                </div>
                 <div class="item-text item-name">
-                    <input class="display left" type="text" value="{{this.name}}" placeholder="" disabled/>
+                    <input
+                        class="display left"
+                        type="text"
+                        value="{{this.name}}"
+                        placeholder=""
+                        disabled
+                    />
                 </div>
             </div>
             <div class="item-right">
-                <div class="item-text rtg">
-                    <label class="checkbox">
-                        <input type="checkbox" {{checked this.data.data.technology.equipped}} />
-                        <span class="checkmark far ammo-equip"></span>
-                    </label>
-                </div>
                 <div class="item-text rtg">
                     <input
                         class="display"
@@ -117,13 +127,9 @@
                     />
                     <div class="track-max-value">/m</div>
                 </div>
-                <div class="item-text item-icons rtg">
-                    <a class="edit-item" title="Edit ammo">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <a class="ammo-delete" title="Delete ammo">
-                        <i class="fas fa-trash"></i>
-                    </a>
+                <div class="item-text item-icons">
+                    <i class="edit-item fas fa-edit" title="Edit Ammo"></i>
+                    <i class="ammo-delete fas fa-trash" title="Delete Ammo"></i>
                 </div>
             </div>
         </div>
