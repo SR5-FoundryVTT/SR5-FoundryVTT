@@ -64,7 +64,7 @@ Hooks.on('ready', function () {
     // Determine whether a system migration is required and feasible
     const currentVersion = game.settings.get('shadowrun5e', 'systemMigrationVersion');
     // the latest version that requires migration
-    const NEEDS_MIGRATION_VERSION = '0.5.10';
+    const NEEDS_MIGRATION_VERSION = '0.5.11';
     let needMigration =
         currentVersion === null || compareVersion(currentVersion, NEEDS_MIGRATION_VERSION) < 0;
 
@@ -195,9 +195,9 @@ Handlebars.registerHelper('ife', function (v1, v2, options) {
 Handlebars.registerHelper('sum', function (v1, v2) {
     return v1 + v2;
 });
-Handlebars.registerHelper('damageAbbreviation', function(damage) {
+Handlebars.registerHelper('damageAbbreviation', function (damage) {
     if (damage === 'physical') return 'P';
     if (damage === 'stun') return 'S';
     if (damage === 'matrix') return 'M';
     return '';
-})
+});

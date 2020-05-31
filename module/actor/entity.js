@@ -318,8 +318,6 @@ export class SR5Actor extends Actor {
         for (let [t, track] of Object.entries(data.track)) {
             track.label = CONFIG.SR5.damageTypes[t];
         }
-
-        console.log(data);
     }
 
     addKnowledgeSkill(category, skill) {

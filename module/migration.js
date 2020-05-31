@@ -8,26 +8,33 @@ export const migrateWorld = async function () {
         { permanent: true }
     );
 
-    // Migrate World Actors
-    for (const a of game.actors.entities) {
+    // Migrate World Items
+    for (const i of game.items.entities) {
         try {
-            const updateData = migrateActorData(a.data);
+            const updateData = migrateItemData(i.data);
             if (!isObjectEmpty(updateData)) {
-                console.log(`Migrating Actor entity ${a.name}`);
-                await a.update(updateData, { enforceTypes: false });
+                expandObject(updateData);
+                console.log(`Migrating Item entity ${i.name}`);
+                await i.update(updateData, { enforceTypes: false });
             }
         } catch (err) {
             console.error(err);
         }
     }
 
-    // Migrate World Items
-    for (const i of game.items.entities) {
+    // Migrate World Actors
+    for (const a of game.actors.entities) {
         try {
-            const updateData = migrateItemData(i.data);
+            const updateData = migrateActorData(duplicate(a.data));
+
             if (!isObjectEmpty(updateData)) {
-                console.log(`Migrating Item entity ${i.name}`);
-                await i.update(updateData, { enforceTypes: false });
+                expandObject(updateData);
+                delete updateData.items;
+                console.log(`Migrating Actor entity ${a.name}`);
+                await a.update(updateData, { enforceTypes: false });
+                const items = getMigratedActorItems(a.data);
+                console.log(items);
+                await a.updateOwnedItem(items);
             }
         } catch (err) {
             console.error(err);
@@ -37,10 +44,12 @@ export const migrateWorld = async function () {
     // Migrate Actor Override Tokens
     for (const s of game.scenes.entities) {
         try {
-            const updateData = migrateSceneData(s.data);
+            const updateData = migrateSceneData(duplicate(s.data));
             if (!isObjectEmpty(updateData)) {
+                expandObject(updateData);
                 console.log(`Migrating Scene entity ${s.name}`);
                 await s.update(updateData, { enforceTypes: false });
+                console.log(updateData);
             }
         } catch (err) {
             console.error(err);
@@ -66,6 +75,19 @@ export const migrateWorld = async function () {
     console.log(`Shadowrun5e System Migration to version ${game.system.data.version} completed!`);
 };
 
+const getMigratedActorItems = (actor) => {
+    // Migrate Owned Items
+    if (!actor.items) return updateData;
+    return actor.items.reduce((acc, i) => {
+        // Migrate the Owned Item
+        const mi = migrateItemData(i);
+        if (!isObjectEmpty(mi)) {
+            acc.push(mi);
+        }
+        return acc;
+    }, []);
+};
+
 /* -------------------------------------------- */
 
 /**
@@ -88,7 +110,7 @@ export const migrateCompendium = async function (pack) {
             if (entity === 'Item') updateData = migrateItemData(ent.data);
             else if (entity === 'Actor') updateData = migrateActorData(ent.data);
             else if (entity === 'Scene') updateData = migrateSceneData(ent.data);
-            if (!isObjectEmpty(updateData)) {
+            if (!isObjectEmpty(updateData) && updateData !== null) {
                 expandObject(updateData);
                 updateData._id = ent._id;
                 await pack.updateEntity(updateData);
@@ -120,26 +142,25 @@ export const migrateActorData = function (actor) {
 
     _migrateActorSkills(actor, updateData);
 
-    console.log(updateData);
-
-    // Migrate Owned Items
-    if (!actor.items) return updateData;
     let hasItemUpdates = false;
-    const items = actor.items.map((i) => {
+    const items = actor.items.map(i => {
+
         // Migrate the Owned Item
-        const itemUpdate = migrateItemData(i);
+        let itemUpdate = migrateItemData(i);
 
         // Update the Owned Item
-        if (!isObjectEmpty(itemUpdate)) {
+        if ( !isObjectEmpty(itemUpdate) ) {
             hasItemUpdates = true;
-            return mergeObject(i, itemUpdate, {
-                enforceTypes: false,
-                inplace: false,
-            });
-        }
-        return i;
+            return mergeObject(i, itemUpdate, {enforceTypes: false, inplace: false});
+        } else return i;
     });
     if (hasItemUpdates) updateData.items = items;
+
+    if (!isObjectEmpty(updateData)) {
+        updateData._id = actor._id;
+        updateData.id = actor._id;
+    }
+
     return updateData;
 };
 
@@ -152,10 +173,15 @@ export const migrateActorData = function (actor) {
 export const migrateItemData = function (item) {
     const updateData = {};
 
-    _migrateItemsAddActions(item, updateData);
-    _migrateItemsAddCapacity(item, updateData);
     _migrateItemsAmmo(item, updateData);
     _migrateDamageTypeAndElement(item, updateData);
+    _migrateItemsAddActions(item, updateData);
+    _migrateItemsAddCapacity(item, updateData);
+
+    if (!isObjectEmpty(updateData)) {
+        updateData._id = item._id;
+        updateData.id = item._id;
+    }
 
     // Return the migrated update data
     return updateData;
@@ -200,7 +226,7 @@ const _migrateActorSkills = function (actor, updateData) {
     const splitRegex = /[,\/|.]+/;
 
     const reducer = (running, [key, val]) => {
-        if (!Array.isArray(val.specs)) {
+        if (!Array.isArray(val.specs) && val.specs) {
             running[key] = {
                 specs: val.specs.split(splitRegex).filter((s) => s !== ''),
             };

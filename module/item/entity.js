@@ -88,8 +88,6 @@ export class SR5Item extends Item {
         this.labels = labels;
         item.properties = this.getChatData().properties;
 
-        console.log(item);
-
         // update actor sheet if it's rendered
         if (this.actor) this.actor.render();
     }
