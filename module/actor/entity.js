@@ -382,7 +382,7 @@ export class SR5Actor extends Actor {
         this.update(updateData);
     }
 
-    rollFade(options, incoming = -1) {
+    rollFade(options = {}, incoming = -1) {
         const wil = this.data.data.attributes.willpower;
         const res = this.data.data.attributes.resonance;
 
@@ -402,7 +402,7 @@ export class SR5Actor extends Actor {
         });
     }
 
-    rollDrain(options, incoming = -1) {
+    rollDrain(options = {}, incoming = -1) {
         const wil = this.data.data.attributes.willpower;
         const drainAtt = this.data.data.attributes[this.data.data.magic.attribute];
 
@@ -422,7 +422,7 @@ export class SR5Actor extends Actor {
         });
     }
 
-    rollArmor(options) {
+    rollArmor(options = {}) {
         const armor = this.data.data.armor.value;
         const parts = {};
         parts['SR5.Armor'] = armor;
@@ -435,7 +435,7 @@ export class SR5Actor extends Actor {
         });
     }
 
-    rollDefense(options) {
+    rollDefense(options = {}) {
         let dialogData = {
             defense: this.data.data.rolls.defense,
             fireMode: options.fireModeDefense,
@@ -526,7 +526,7 @@ export class SR5Actor extends Actor {
         });
     }
 
-    rollSoak(options) {
+    rollSoak(options = {}) {
         let dialogData = {
             damage: options.damage,
             ap: options.ap,
@@ -634,7 +634,7 @@ export class SR5Actor extends Actor {
         });
     }
 
-    rollSingleAttribute(attId, options) {
+    rollSingleAttribute(attId, options = {}) {
         const attr = this.data.data.attributes[attId];
         const parts = {};
         parts[attr.label] = attr.value;
@@ -647,7 +647,7 @@ export class SR5Actor extends Actor {
         });
     }
 
-    rollTwoAttributes([id1, id2], options) {
+    rollTwoAttributes([id1, id2], options = {}) {
         const attr1 = this.data.data.attributes[id1];
         const attr2 = this.data.data.attributes[id2];
         const label1 = Helpers.label(id1);
@@ -664,7 +664,7 @@ export class SR5Actor extends Actor {
         });
     }
 
-    rollNaturalRecovery(track, options) {
+    rollNaturalRecovery(track, options = {}) {
         let id1 = 'body';
         let id2 = 'willpower';
         let title = 'Natural Recover';
@@ -701,7 +701,7 @@ export class SR5Actor extends Actor {
         });
     }
 
-    async rollMatrixAttribute(attr, options) {
+    async rollMatrixAttribute(attr, options = {}) {
         let matrix_att = this.data.data.matrix[attr];
         let title = game.i18n.localize(CONFIG.SR5.matrixAttributes[attr]);
         const parts = {};
@@ -764,7 +764,7 @@ export class SR5Actor extends Actor {
         );
     }
 
-    promptRoll(options) {
+    promptRoll(options = {}) {
         return DiceSR.rollTest({
             event: options.event,
             actor: this,
@@ -806,7 +806,7 @@ export class SR5Actor extends Actor {
         });
     }
 
-    rollSkill(skill, options) {
+    rollSkill(skill, options = {}) {
         let att = this.data.data.attributes[skill.attribute];
         let title = skill.label;
 
@@ -889,7 +889,7 @@ export class SR5Actor extends Actor {
         );
     }
 
-    rollKnowledgeSkill(catId, skillId, options) {
+    rollKnowledgeSkill(catId, skillId, options = {}) {
         const category = this.data.data.skills.knowledge[catId];
         const skill = duplicate(category.value[skillId]);
         skill.attribute = category.attribute;
@@ -897,20 +897,20 @@ export class SR5Actor extends Actor {
         this.rollSkill(skill, options);
     }
 
-    rollLanguageSkill(skillId, options) {
+    rollLanguageSkill(skillId, options = {}) {
         const skill = duplicate(this.data.data.skills.language.value[skillId]);
         skill.attribute = 'intuition';
         skill.label = skill.name;
         this.rollSkill(skill, options);
     }
 
-    rollActiveSkill(skillId, options) {
+    rollActiveSkill(skillId, options = {}) {
         const skill = this.data.data.skills.active[skillId];
         skill.label = game.i18n.localize(CONFIG.SR5.activeSkills[skillId]);
         this.rollSkill(skill, options);
     }
 
-    rollAttribute(attId, options) {
+    rollAttribute(attId, options = {}) {
         let title = game.i18n.localize(CONFIG.SR5.attributes[attId]);
         const att = this.data.data.attributes[attId];
         const atts = this.data.data.attributes;

@@ -64,7 +64,7 @@ Hooks.on('ready', function () {
     // Determine whether a system migration is required and feasible
     const currentVersion = game.settings.get('shadowrun5e', 'systemMigrationVersion');
     // the latest version that requires migration
-    const NEEDS_MIGRATION_VERSION = '0.5.11';
+    const NEEDS_MIGRATION_VERSION = '0.5.12';
     let needMigration =
         currentVersion === null || compareVersion(currentVersion, NEEDS_MIGRATION_VERSION) < 0;
 

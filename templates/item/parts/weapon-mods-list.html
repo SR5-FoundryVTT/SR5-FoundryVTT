@@ -2,26 +2,28 @@
     <div class="scroll-area">
         <div class="item item-section">
             <div class="item-left">
+                <div class="item-text rtg"></div>
                 <div class="item-text item-name">
                     {{localize "SR5.WeaponMod"}}
                 </div>
             </div>
             <div class="item-right">
-                <div class="item-text rtg">
-                    {{localize "SR5.Equip"}}
-                </div>
-                <div class="item-text rtg">
+                <div class="item-text">
                     {{localize "SR5.DP"}}
                 </div>
-                <div class="item-text rtg">
+                <div class="item-text">
                     {{localize "SR5.Accuracy"}}
                 </div>
-                <div class="item-text rtg">
+                <div class="item-text">
                     {{localize "SR5.RecoilCompensation"}}
                 </div>
-                <div class="item-text item-icons rtg">
-                    <a class="add-new-mod" title="Add New Accessory">
+                <div class="item-text">
+                    {{localize "SR5.Conceal"}}
+                </div>
+                <div class="item-text item-icons">
+                    <a class="add-new-mod roll" title="Add Ammo" >
                         <i class="fas fa-plus"></i>
+                        {{localize "SR5.Add"}}
                     </a>
                 </div>
             </div>
@@ -29,8 +31,20 @@
         {{#each weaponMods as |mod id|}}
         <div class="item" data-item-id="{{mod._id}}">
             <div class="item-left">
-                <div class="item-text item-name">
-                    <input class="display left" type="text" value="{{mod.name}}" disabled />
+                <div class="item-text rtg">
+                    <i
+                        title="{{localize 'SR5.ToggleEquip'}}"
+                        class="mod-equip roll
+                             {{#if mod.data.technology.equipped}}
+                              fas fa-check-circle
+                             {{else}}
+                              far fa-circle
+                             {{/if}}"
+                    >
+                    </i>
+                </div>
+                <div class="item-text item-name has-desc roll">
+                    {{mod.name}}
                 </div>
             </div>
             <div class="item-right">
@@ -38,56 +52,67 @@
                     <input
                         class="display left"
                         type="text"
-                        value="{{localizeOb mod.data.data.mount_point ../config.mountPoints}}"
+                        value="{{localizeOb mod.data.mount_point ../config.mountPoints}}"
                         disabled
                     />
                 </div>
-                <div class="item-text rtg">
-                    <label class="checkbox">
-                        <input type="checkbox" {{checked mod.data.data.technology.equipped}} />
-                        <span class="checkmark far mod-equip"></span>
-                    </label>
-                </div>
-                <div class="item-text rtg">
+                <div class="item-text">
                     <input
                         class="display"
                         size="3"
                         type="text"
                         disabled
-                        value="{{mod.data.data.dice_pool}}"
+                        value="{{mod.data.dice_pool}}"
                         data-dtype="Number"
                         placeholder="0"
                     />
                 </div>
-                <div class="item-text rtg">
+                <div class="item-text">
                     <input
                         class="display"
                         size="3"
                         type="text"
                         disabled
-                        value="{{mod.data.data.accuracy}}"
+                        value="{{mod.data.accuracy}}"
                         data-dtype="Number"
                         placeholder="0"
                     />
                 </div>
-                <div class="item-text rtg">
+                <div class="item-text">
                     <input
                         class="display"
                         size="3"
                         type="text"
                         disabled
-                        value="{{mod.data.data.rc}}"
+                        value="{{mod.data.rc}}"
                         data-dtype="Number"
                         placeholder="0"
                     />
                 </div>
-                <div class="item-text item-icons rtg">
-                    <a class="edit-item" title="Edit Mod">
-                        <i class="fas fa-edit"></i>
-                    </a>
-                    <a class="mod-delete" title="Delete Accessory">
-                        <i class="fas fa-trash"></i>
-                    </a>
+                <div class="item-text">
+                    <input
+                        class="display"
+                        size="3"
+                        type="text"
+                        disabled
+                        value="{{mod.data.technology.conceal.value}}"
+                        data-dtype="Number"
+                        placeholder="0"
+                    />
+                </div>
+                <div class="item-text item-icons">
+                    <i class="roll fas fa-edit edit-item" title="Edit Mod"></i>
+                    <i class="roll fas fa-trash mod-delete" title="Delete Mod"></i>
+                </div>
+            </div>
+        </div>
+        <div class="item hidden">
+            <div class="item-desc">
+                {{{mod.data.description.value}}}
+                <div class="props">
+                    {{#each item.properties}}
+                    <span>{{this}}</span>
+                    {{/each}}
                 </div>
             </div>
         </div>
