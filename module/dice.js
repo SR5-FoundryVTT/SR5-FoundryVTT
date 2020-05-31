@@ -2,6 +2,7 @@ import { SR5 } from './config.js';
 
 export class DiceSR {
     static async basicRoll({ count, limit, explode, title, actor }) {
+        if (count <= 0) ui.notifications.error(game.i18n.localize('SR5.RollOneDie'));
         let formula = `${count}d6`;
         if (explode) {
             formula += 'x6';

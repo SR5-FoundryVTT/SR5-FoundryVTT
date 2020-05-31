@@ -360,6 +360,8 @@
   "SR5.BlastRadius": "Blast Radius",
   "SR5.Modification": "Modification",
 
+  "SR5.RollOneDie": "You can't roll less than 1 die, chummer",
+
   "SETTINGS.DiagonalMovementName": "Diagonal Movement",
   "SETTINGS.DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
   "SETTINGS.IgnoreDiagonal": "Ignore Diagonal Movement (1-1-1)",
