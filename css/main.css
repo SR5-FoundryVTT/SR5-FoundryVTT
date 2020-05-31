@@ -708,6 +708,9 @@ select.display > option {
   height: 100%;
   border: #e6e6e6;
 }
+.sr5 .inventory .item .item-text.faded {
+  color: #4d4d4d;
+}
 .sr5 .inventory .item .item-text.center {
   display: flex;
   flex-flow: row;

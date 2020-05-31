@@ -388,6 +388,9 @@ select.display {
                 text-align: center;
                 height: 100%;
                 border: $light;
+                &.faded {
+                    color: $dark;
+                }
                 &.center {
                     display: flex;
                     flex-flow: row;

@@ -34,14 +34,22 @@
       </div>
       <div class="item-right">
         {{#if item.data.ammo.current.max}}
-        <div class="item-text roll reload-ammo">
-          {{localize "SR5.WeaponReload"}}
-        </div>
-        <div class="item-text">
-          ({{item.data.ammo.current.value}}/{{item.data.ammo.current.max}})
-        </div>
-        <div class="item-text">
-        </div>
+          {{#ifne item.data.ammo.current.max item.data.ammo.current.value}}
+          <div class="item-text roll reload-ammo">
+            <span style="white-space: nowrap">
+              {{localize "SR5.WeaponReload"}} ({{item.data.ammo.current.value}}/{{item.data.ammo.current.max}})
+            </span>
+          </div>
+          <div class="item-text">
+          </div>
+          {{/ifne}}
+          {{#ife item.data.ammo.current.max item.data.ammo.current.value}}
+          <div class="item-text faded" title="{{localize 'SR5.WeaponAmmoCount'}}: {{item.data.ammo.current.max}}">
+            {{localize "SR5.AmmoFull"}}
+          </div>
+          <div class="item-text">
+          </div>
+          {{/ife}}
         {{/if}}
 
         <div class="item-text rtg">
