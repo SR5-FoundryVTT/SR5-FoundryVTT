@@ -411,29 +411,26 @@ export class SR5Item extends Item {
     async reloadAmmo() {
         const data = duplicate(this.data);
         const { ammo } = data.data;
+        const diff = ammo.current.max - ammo.current.value;
+        ammo.current.value = ammo.current.max;
+
         if (ammo.spare_clips) {
             ammo.spare_clips.value = Math.max(0, ammo.spare_clips.value - 1);
-            ammo.current.value = ammo.current.max;
         }
+        await this.update(data);
 
         const newAmmunition = (this.items || [])
-            .filter((i) => i.type === 'ammo')
+            .filter((i) => i.data.type === 'ammo')
             .reduce((acc, item) => {
-                console.log(item);
-                const { technology } = item.data;
+                const { technology } = item.data.data;
                 if (technology.equipped) {
                     const qty = technology.quantity;
-                    technology.quantity = Math.max(
-                        0,
-                        qty - (ammo.current.max - ammo.current.value)
-                    );
-                    acc.push(item);
+                    technology.quantity = Math.max(0, qty - diff);
+                    acc.push(item.data);
                 }
                 return acc;
             }, []);
         if (newAmmunition.length) await this.updateOwnedItem(newAmmunition);
-
-        await this.update(data);
     }
 
     async equipAmmo(iid) {
