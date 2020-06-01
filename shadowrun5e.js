@@ -100,12 +100,14 @@ Hooks.on('renderSceneControls', (controls, html) => {
 });
 
 Hooks.on('getSceneControlButtons', (controls) => {
-    const tokenControls = controls.find(c => c.name === 'token');
-    tokenControls.tools.push({
-        name: 'overwatch-score-tracker',
-        title: 'CONTROLS.SR5.OverwatchScoreTracker',
-        icon: 'fas fa-network-wired',
-    });
+    if (game.user.isGM) {
+        const tokenControls = controls.find(c => c.name === 'token');
+        tokenControls.tools.push({
+            name: 'overwatch-score-tracker',
+            title: 'CONTROLS.SR5.OverwatchScoreTracker',
+            icon: 'fas fa-network-wired',
+        });
+    }
 });
 
 // found at: https://helloacm.com/the-javascript-function-to-compare-version-number-strings/
