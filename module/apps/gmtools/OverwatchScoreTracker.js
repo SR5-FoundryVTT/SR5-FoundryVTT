@@ -80,9 +80,9 @@ export class OverwatchScoreTracker extends Application {
             roll.roll();
 
             // use GM Roll Mode so players don't see
-            const rollMode = CONFIG.Dice.rollModes.gmroll;
+            // const rollMode = CONFIG.Dice.rollModes.gmroll;
+            // roll.toMessage({ rollMode });
 
-            roll.toMessage({ rollMode });
             if (roll.total) {
                 const os = actor.getOverwatchScore();
                 actor.setOverwatchScore(os + roll.total).then(() => this.render());
