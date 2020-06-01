@@ -2,6 +2,7 @@
  * A GM-Tool to keep track of all players overwatch scores
  */
 export class OverwatchScoreTracker extends Application {
+    static MatrixOverwatchDiceCount = '2d6';
     static get defaultOptions() {
         const options = super.defaultOptions;
         options.id = 'overwatch-score-tracker';
@@ -16,6 +17,7 @@ export class OverwatchScoreTracker extends Application {
     }
 
     getData() {
+        // get list of actors that belong to users
         const actors = game.users.reduce((acc, user) => {
             if (!user.isGM && user.character) {
                 acc.push(user.character.data);
@@ -38,6 +40,7 @@ export class OverwatchScoreTracker extends Application {
         );
     }
 
+    // returns the actor that this event is acting on
     _getActorFromEvent(event) {
         const id = event.currentTarget.closest('.item').dataset.actorId;
         if (id) return game.actors.find((a) => a._id === id);
@@ -72,10 +75,14 @@ export class OverwatchScoreTracker extends Application {
         event.preventDefault();
         const actor = this._getActorFromEvent(event);
         if (actor) {
-            const roll = new Roll('2d6');
-            roll.toMessage({
-                rollMode: 'gmroll',
-            });
+            //  use static value so it can be modified in modules
+            const roll = new Roll(OverwatchScoreTracker.MatrixOverwatchDiceCount);
+            roll.roll();
+
+            // use GM Roll Mode so players don't see
+            const rollMode = CONFIG.Dice.rollModes.gmroll;
+
+            roll.toMessage({ rollMode });
             if (roll.total) {
                 const os = actor.getOverwatchScore();
                 actor.setOverwatchScore(os + roll.total).then(() => this.render());
