@@ -12,6 +12,7 @@ import { preCombatUpdate, shadowrunCombatUpdate } from './module/combat.js';
 import { measureDistance } from './module/canvas.js';
 import * as chat from './module/chat.js';
 import * as migrations from './module/migration.js';
+import { OverwatchScoreTracker } from './module/apps/gmtools/OverwatchScoreTracker.js';
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -89,6 +90,22 @@ Hooks.on('hotbarDrop', (bar, data, slot) => {
     if (data.type !== 'Item') return;
     createItemMacro(data.data, slot);
     return false;
+});
+
+Hooks.on('renderSceneControls', (controls, html) => {
+    html.find('[data-tool="overwatch-score-tracker"]').on('click', (event) => {
+        event.preventDefault();
+        new OverwatchScoreTracker().render(true);
+    });
+});
+
+Hooks.on('getSceneControlButtons', (controls) => {
+    const tokenControls = controls.find(c => c.name === 'token');
+    tokenControls.tools.push({
+        name: 'overwatch-score-tracker',
+        title: 'CONTROLS.SR5.OverwatchScoreTracker',
+        icon: 'fas fa-network-wired',
+    });
 });
 
 // found at: https://helloacm.com/the-javascript-function-to-compare-version-number-strings/

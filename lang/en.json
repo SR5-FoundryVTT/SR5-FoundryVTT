@@ -365,6 +365,10 @@
 
   "SR5.RollOneDie": "You can't roll less than 1 die, chummer",
 
+  "SR5.OverwatchScoreTrackerTitle": "Mr. Johnson's Baby Monitor",
+  "SR5.PlusFifteenMinutes": "+15min",
+  "SR5.Character": "Character",
+
   "SETTINGS.DiagonalMovementName": "Diagonal Movement",
   "SETTINGS.DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
   "SETTINGS.IgnoreDiagonal": "Ignore Diagonal Movement (1-1-1)",
