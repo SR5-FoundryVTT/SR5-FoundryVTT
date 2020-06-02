@@ -17,6 +17,18 @@ export class SR5Actor extends Actor {
         return this;
     }
 
+    getOverwatchScore() {
+        const os = this.getFlag('shadowrun5e', 'overwatchScore');
+        return os !== undefined ? os : 0;
+    }
+
+    async setOverwatchScore(value) {
+        const num = parseInt(value);
+        if (!isNaN(num)) {
+            return this.setFlag('shadowrun5e', 'overwatchScore', num);
+        }
+    }
+
     prepareData() {
         super.prepareData();
 

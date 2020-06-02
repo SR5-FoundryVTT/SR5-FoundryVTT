@@ -137,6 +137,9 @@ button.display {
     &:hover {
         cursor: pointer;
     }
+    &.short {
+        line-height: 1.3em;
+    }
 }
 
 input[type='checkbox'].hidden {
@@ -339,11 +342,13 @@ select.display {
             .item-img {
                 padding-right: 0.25em;
                 max-width: 50px;
-                @include rollable;
-                &:hover {
-                    > img {
-                        content: url('../ui/dice-solid.svg');
-                        filter: invert(1);
+                &.item-roll {
+                    @include rollable;
+                    &:hover {
+                        > img {
+                            content: url('../ui/dice-solid.svg');
+                            filter: invert(1);
+                        }
                     }
                 }
                 > img {
