@@ -1,18 +1,18 @@
 // Import Modules
-import { SR5ItemSheet } from './module/item/sheet.js';
-import { SR5ActorSheet } from './module/actor/sheet.js';
-import { SR5Actor } from './module/actor/entity.js';
-import { SR5Item } from './module/item/entity.js';
-import { SR5 } from './module/config.js';
-import { Helpers } from './module/helpers.js';
-import { registerSystemSettings } from './module/settings.js';
-import { preloadHandlebarsTemplates } from './module/templates.js';
-import { DiceSR } from './module/dice.js';
-import { preCombatUpdate, shadowrunCombatUpdate } from './module/combat.js';
-import { measureDistance } from './module/canvas.js';
-import * as chat from './module/chat.js';
-import * as migrations from './module/migration.js';
-import { OverwatchScoreTracker } from './module/apps/gmtools/OverwatchScoreTracker.js';
+import { SR5ItemSheet } from './item/sheet.js';
+import { SR5ActorSheet } from './actor/sheet.js';
+import { SR5Actor } from './actor/entity.js';
+import { SR5Item } from './item/entity.js';
+import { SR5 } from './config.js';
+import { Helpers } from './helpers.js';
+import { registerSystemSettings } from './settings.js';
+import { preloadHandlebarsTemplates } from './templates.js';
+import { DiceSR } from './dice.js';
+import { preCombatUpdate, shadowrunCombatUpdate } from './combat.js';
+import { measureDistance } from './canvas.js';
+import * as chat from './chat.js';
+import * as migrations from './migration.js';
+import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker.js';
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -101,7 +101,7 @@ Hooks.on('renderSceneControls', (controls, html) => {
 
 Hooks.on('getSceneControlButtons', (controls) => {
     if (game.user.isGM) {
-        const tokenControls = controls.find(c => c.name === 'token');
+        const tokenControls = controls.find((c) => c.name === 'token');
         tokenControls.tools.push({
             name: 'overwatch-score-tracker',
             title: 'CONTROLS.SR5.OverwatchScoreTracker',
@@ -164,7 +164,7 @@ function rollItemMacro(itemName) {
     if (!actor) actor = game.actors.get(speaker.actor);
     const item = actor ? actor.items.find((i) => i.name === itemName) : null;
     if (!item)
-        return ui.notifications.warn(
+        return ui.notification.warn(
             `Your controlled Actor does not have an item named ${itemName}`
         );
 
