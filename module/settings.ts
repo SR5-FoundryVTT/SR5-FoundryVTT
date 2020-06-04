@@ -1,4 +1,5 @@
 // game settings for shadowrun 5e
+
 export const registerSystemSettings = () => {
     /**
      * Track system version upon which a migration was last applied
@@ -10,6 +11,7 @@ export const registerSystemSettings = () => {
         type: String,
         default: '',
     });
+
     /**
      * Register diagonal movement rule setting
      */
@@ -26,6 +28,7 @@ export const registerSystemSettings = () => {
         },
         onChange: (rule) => (canvas.grid.diagonalRule = rule),
     });
+
     /**
      * Default limit behavior
      */

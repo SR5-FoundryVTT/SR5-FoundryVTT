@@ -1,40 +1,60 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import { SR5 } from './config.js';
 import { Helpers } from './helpers';
+
+interface basicRollProps {
+    count: number;
+    limit?: number;
+    explode?: boolean;
+    title?: string;
+    actor?: Actor;
+}
+
+interface RollDialogOptions {
+    environmental?: number | boolean;
+    prompt?: boolean;
+}
+
+interface rollTestProps {
+    event?: MouseEvent;
+    actor?: Actor;
+    parts?: Shadowrun.ModList<number>;
+    limit?: number;
+    extended?: boolean;
+    dialogOptions?: RollDialogOptions;
+    after?: (roll: Roll | undefined) => void;
+    base?: number;
+    title?: string;
+    wounds?: boolean;
+}
+
 export class DiceSR {
-    static basicRoll({ count, limit, explode, title, actor }) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (count <= 0) {
-                // @ts-ignore
-                ui.notifications.error(game.i18n.localize('SR5.RollOneDie'));
-                return;
-            }
-            let formula = `${count}d6`;
-            if (explode) {
-                formula += 'x6';
-            }
-            if (limit) {
-                formula += `kh${limit}`;
-            }
-            formula += 'cs>=5';
-            let roll = new Roll(formula);
-            let rollMode = game.settings.get('core', 'rollMode');
-            roll.toMessage({
-                speaker: ChatMessage.getSpeaker({ actor: actor }),
-                flavor: title,
-                rollMode: rollMode,
-            });
-            return roll;
+    static async basicRoll({ count, limit, explode, title, actor }: basicRollProps) {
+        if (count <= 0) {
+            // @ts-ignore
+            ui.notifications.error(game.i18n.localize('SR5.RollOneDie'));
+            return;
+        }
+        let formula = `${count}d6`;
+        if (explode) {
+            formula += 'x6';
+        }
+        if (limit) {
+            formula += `kh${limit}`;
+        }
+
+        formula += 'cs>=5';
+
+        let roll = new Roll(formula);
+        let rollMode = game.settings.get('core', 'rollMode');
+        roll.toMessage({
+            speaker: ChatMessage.getSpeaker({ actor: actor }),
+            flavor: title,
+            rollMode: rollMode,
         });
+
+        return roll;
     }
+
     /**
      *
      * @param event {MouseEvent} - mouse event that caused this
@@ -51,26 +71,44 @@ export class DiceSR {
      * @param wounds {Boolean} - if wounds should be applied, defaults to true
      * @returns {Promise<Roll>|Promise<*>}
      */
-    static rollTest({ event, actor, parts = {}, limit, extended, dialogOptions, after, base = 0, title = 'Roll', wounds = true, }) {
+    static rollTest({
+        event,
+        actor,
+        parts = {},
+        limit,
+        extended,
+        dialogOptions,
+        after,
+        base = 0,
+        title = 'Roll',
+        wounds = true,
+    }: rollTestProps) {
         // if we aren't for soaking some damage
-        if (actor &&
-            !(title.includes('Soak') || title.includes('Drain') || title.includes('Fade'))) {
-            if (wounds)
-                wounds = actor.data.data.wounds.value;
+        if (
+            actor &&
+            !(title.includes('Soak') || title.includes('Drain') || title.includes('Fade'))
+        ) {
+            if (wounds) wounds = actor.data.data.wounds.value;
         }
+
         if (!game.settings.get('shadowrun5e', 'applyLimits')) {
             limit = undefined;
         }
+
         let dice_pool = base;
+
         const edgeAttMax = actor ? actor.data.data.attributes.edge.max : 0;
+
         if (event && event[SR5['kbmod'].EDGE]) {
             parts['SR5.Edge'] = +edgeAttMax;
-            actor === null || actor === void 0 ? void 0 : actor.update({
+            actor?.update({
                 'data.attributes.edge.value': actor.data.data.attributes.edge.value - 1,
             });
         }
+
         // add mods to dice pool
         dice_pool += Object.values(parts).reduce((prev, cur) => prev + cur, 0);
+
         if (event && event[SR5['kbmod'].STANDARD]) {
             const edge = parts['SR5.Edge'] !== undefined || undefined;
             return this.basicRoll({
@@ -81,6 +119,7 @@ export class DiceSR {
                 actor,
             });
         }
+
         let dialogData = {
             options: dialogOptions,
             extended,
@@ -114,20 +153,26 @@ export class DiceSR {
                         },
                     },
                     default: 'roll',
+
                     close: (html) => {
-                        if (cancel)
-                            return;
+                        if (cancel) return;
                         // get the actual dice_pool from the difference of initial parts and value in the dialog
+
                         let dicePool = Helpers.parseInput($(html).find('[name="dice_pool"]').val());
+
                         +Helpers.parseInput($(html).find('[name="dp_mod"]').val());
                         +Helpers.parseInput($(html).find('[name="wounds"]').val());
                         -Helpers.parseInput($(html).find('[name="options.environmental"]').val());
+
                         const limit = Helpers.parseInput($(html).find('[name="limit"]').val());
-                        const extended = Helpers.parseInput($(html).find('[name="extended"]').val()) !== 0;
+                        const extended =
+                            Helpers.parseInput($(html).find('[name="extended"]').val()) !== 0;
+
                         if (edge && actor) {
                             dicePool += actor.data.data.attributes.edge.max;
                             actor.update({
-                                'data.attributes.edge.value': actor.data.data.attributes.edge.value - 1,
+                                'data.attributes.edge.value':
+                                    actor.data.data.attributes.edge.value - 1,
                             });
                         }
                         const r = this.basicRoll({
@@ -141,22 +186,25 @@ export class DiceSR {
                             const currentExtended = parts['SR5.Extended'] || 0;
                             parts['SR5.Extended'] = currentExtended - 1;
                             // add a bit of a delay to roll again
-                            setTimeout(() => DiceSR.rollTest({
-                                event,
-                                base,
-                                parts,
-                                actor,
-                                limit,
-                                title,
-                                extended,
-                                dialogOptions,
-                                wounds,
-                                after,
-                            }), 400);
+                            setTimeout(
+                                () =>
+                                    DiceSR.rollTest({
+                                        event,
+                                        base,
+                                        parts,
+                                        actor,
+                                        limit,
+                                        title,
+                                        extended,
+                                        dialogOptions,
+                                        wounds,
+                                        after,
+                                    }),
+                                400
+                            );
                         }
                         resolve(r);
-                        if (after && r)
-                            r.then((roll) => after(roll));
+                        if (after && r) r.then((roll) => after(roll));
                     },
                 }).render(true);
             });

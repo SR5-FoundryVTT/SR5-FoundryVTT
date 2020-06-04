@@ -1,4 +1,5 @@
 export const SR5 = {};
+
 SR5['attributes'] = {
     body: 'SR5.AttrBody',
     agility: 'SR5.AttrAgility',
@@ -17,6 +18,7 @@ SR5['attributes'] = {
     data_processing: 'SR5.MatrixAttrDataProc',
     firewall: 'SR5.MatrixAttrFirewall',
 };
+
 SR5['limits'] = {
     physical: 'SR5.LimitPhysical',
     social: 'SR5.LimitSocial',
@@ -26,16 +28,19 @@ SR5['limits'] = {
     data_processing: 'SR5.MatrixAttrDataProc',
     firewall: 'SR5.MatrixAttrFirewall',
 };
+
 SR5['specialTypes'] = {
     mundane: 'SR5.Mundane',
     magic: 'SR5.Awakened',
     resonance: 'SR5.Emerged',
 };
+
 SR5['damageTypes'] = {
     physical: 'SR5.DmgTypePhysical',
     stun: 'SR5.DmgTypeStun',
     matrix: 'SR5.DmgTypeMatrix',
 };
+
 SR5['elementTypes'] = {
     fire: 'SR5.ElementFire',
     cold: 'SR5.ElementCold',
@@ -43,6 +48,7 @@ SR5['elementTypes'] = {
     electricity: 'SR5.ElementElectricity',
     radiation: 'SR5.ElementRadiation',
 };
+
 SR5['spellCategories'] = {
     combat: 'SR5.SpellCatCombat',
     detection: 'SR5.SpellCatDetection',
@@ -50,38 +56,46 @@ SR5['spellCategories'] = {
     illusion: 'SR5.SpellCatIllusion',
     manipulation: 'SR5.SpellCatManipulation',
 };
+
 SR5['spellTypes'] = {
     physical: 'SR5.SpellTypePhysical',
     mana: 'SR5.SpellTypeMana',
 };
+
 SR5['spellRanges'] = {
     touch: 'SR5.SpellRangeTouch',
     los: 'SR5.SpellRangeLos',
     los_a: 'SR5.SpellRangeLosA',
 };
+
 SR5['combatSpellTypes'] = {
     direct: 'SR5.SpellCombatDirect',
     indirect: 'SR5.SpellCombatIndirect',
 };
+
 SR5['detectionSpellTypes'] = {
     directional: 'SR5.SpellDetectionDirectional',
     psychic: 'SR5.SpellDetectionPsychic',
     area: 'SR5.SpellDetectionArea',
 };
+
 SR5['illusionSpellTypes'] = {
     obvious: 'SR5.SpellIllusionObvious',
     realistic: 'SR5.SpellIllusionRealistic',
 };
+
 SR5['illusionSpellSenses'] = {
     'single-sense': 'SR5.SpellIllusionSingleSense',
     'multi-sense': 'SR5.SpellIllusionMultiSense',
 };
+
 SR5['attributeRolls'] = {
     composure: 'SR5.RollComposure',
     lift_carry: 'SR5.RollLiftCarry',
     judge_intentions: 'SR5.RollJudgeIntentions',
     memory: 'SR5.RollMemory',
 };
+
 SR5['matrixTargets'] = {
     persona: 'SR5.TargetPersona',
     device: 'SR5.TargetDevice',
@@ -90,24 +104,29 @@ SR5['matrixTargets'] = {
     sprite: 'SR5.TargetSprite',
     other: 'SR5.TargetOther',
 };
+
 SR5['durations'] = {
     instant: 'SR5.DurationInstant',
     sustained: 'SR5.DurationSustained',
     permanent: 'SR5.DurationPermanent',
 };
+
 SR5['weaponCategories'] = {
     range: 'SR5.WeaponCatRange',
     melee: 'SR5.WeaponCatMelee',
     thrown: 'SR5.WeaponCatThrown',
 };
+
 SR5['qualityTypes'] = {
     positive: 'SR5.QualityTypePositive',
     negative: 'SR5.QualityTypeNegative',
 };
+
 SR5['deviceCategories'] = {
     commlink: 'SR5.DeviceCatCommlink',
     cyberdeck: 'SR5.DeviceCatCyberdeck',
 };
+
 SR5['cyberwareGrades'] = {
     standard: 'SR5.CyberwareGradeStandard',
     alpha: 'SR5.CyberwareGradeAlpha',
@@ -115,12 +134,14 @@ SR5['cyberwareGrades'] = {
     delta: 'SR5.CyberwareGradeDelta',
     used: 'SR5.CyberwareGradeUsed',
 };
+
 SR5['knowledgeSkillCategories'] = {
     street: 'SR5.KnowledgeSkillStreet',
     academic: 'SR5.KnowledgeSkillAcademic',
     professional: 'SR5.KnowledgeSkillProfessional',
     interests: 'SR5.KnowledgeSkillInterests',
 };
+
 SR5['activeSkills'] = {
     archery: 'SR5.SkillArchery',
     automatics: 'SR5.SkillAutomatics',
@@ -198,6 +219,7 @@ SR5['activeSkills'] = {
     pilot_water_craft: 'SR5.SkillPilotWaterCraft',
     pilot_exotic_vehicle: 'SR5.SkillPilotExoticVehicle',
 };
+
 SR5['actionTypes'] = {
     none: 'SR5.ActionTypeNone',
     free: 'SR5.ActionTypeFree',
@@ -205,21 +227,25 @@ SR5['actionTypes'] = {
     complex: 'SR5.ActionTypeComplex',
     varies: 'SR5.ActionTypeVaries',
 };
+
 SR5['matrixAttributes'] = {
     attack: 'SR5.MatrixAttrAttack',
     sleaze: 'SR5.MatrixAttrSleaze',
     data_processing: 'SR5.MatrixAttrDataProc',
     firewall: 'SR5.MatrixAttrFirewall',
 };
+
 SR5['initiativeCategories'] = {
     meatspace: 'SR5.InitCatMeatspace',
     astral: 'SR5.InitCatAstral',
     matrix: 'SR5.InitCatMatrix',
 };
+
 SR5['modificationTypes'] = {
     weapon: 'SR5.Weapon',
     armor: 'SR5.Armor',
 };
+
 SR5['mountPoints'] = {
     barrel: 'SR5.Barrel',
     stock: 'SR5.Stock',
@@ -227,6 +253,7 @@ SR5['mountPoints'] = {
     side: 'SR5.Side',
     internal: 'SR5.Internal',
 };
+
 SR5['lifestyleTypes'] = {
     street: 'SR5.LifestyleStreet',
     squatter: 'SR5.LifestyleSquatter',
@@ -236,6 +263,7 @@ SR5['lifestyleTypes'] = {
     luxory: 'SR5.LifestyleLuxory',
     other: 'SR5.LifestyleOther',
 };
+
 SR5['kbmod'] = {
     STANDARD: 'shiftKey',
     EDGE: 'altKey',

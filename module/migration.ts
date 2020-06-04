@@ -1,85 +1,85 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 /**
  * Perform a system migration for the entire World, applying migrations for Actors, Items, and Compendium packs
  * @return {Promise}      A Promise which resolves once the migration is completed
  */
-export const migrateWorld = function () {
-    return __awaiter(this, void 0, void 0, function* () {
-        // @ts-ignore
-        ui.notifications.info(`Applying Shadowrun 5e System Migration for version ${game.system.data.version}. Please be patient and do not close your game or shut down your server.`, { permanent: true });
-        // Migrate World Items
-        for (const i of game.items.entities) {
-            try {
-                const updateData = migrateItemData(i.data);
-                if (!isObjectEmpty(updateData)) {
-                    expandObject(updateData);
-                    console.log(`Migrating Item entity ${i.name}`);
-                    yield i.update(updateData, { enforceTypes: false });
-                }
+export const migrateWorld = async function () {
+    // @ts-ignore
+    ui.notifications.info(
+        `Applying Shadowrun 5e System Migration for version ${game.system.data.version}. Please be patient and do not close your game or shut down your server.`,
+        { permanent: true }
+    );
+
+    // Migrate World Items
+    for (const i of game.items.entities) {
+        try {
+            const updateData = migrateItemData(i.data);
+            if (!isObjectEmpty(updateData)) {
+                expandObject(updateData);
+                console.log(`Migrating Item entity ${i.name}`);
+                await i.update(updateData, { enforceTypes: false });
             }
-            catch (err) {
-                console.error(err);
-            }
+        } catch (err) {
+            console.error(err);
         }
-        // Migrate World Actors
-        for (const a of game.actors.entities) {
-            try {
-                const updateData = migrateActorData(duplicate(a.data));
-                if (!isObjectEmpty(updateData)) {
-                    expandObject(updateData);
-                    delete updateData['items'];
-                    console.log(`Migrating Actor entity ${a.name}`);
-                    yield a.update(updateData, { enforceTypes: false });
-                    const items = getMigratedActorItems(a.data);
-                    console.log(items);
-                    yield a.updateOwnedItem(items);
-                }
+    }
+
+    // Migrate World Actors
+    for (const a of game.actors.entities) {
+        try {
+            const updateData = migrateActorData(duplicate(a.data));
+
+            if (!isObjectEmpty(updateData)) {
+                expandObject(updateData);
+                delete updateData['items'];
+                console.log(`Migrating Actor entity ${a.name}`);
+                await a.update(updateData, { enforceTypes: false });
+                const items = getMigratedActorItems(a.data);
+                console.log(items);
+                await a.updateOwnedItem(items);
             }
-            catch (err) {
-                console.error(err);
-            }
+        } catch (err) {
+            console.error(err);
         }
-        // Migrate Actor Override Tokens
-        for (const s of game.scenes.entities) {
-            try {
-                const updateData = migrateSceneData(duplicate(s.data));
-                if (!isObjectEmpty(updateData)) {
-                    expandObject(updateData);
-                    console.log(`Migrating Scene entity ${s.name}`);
-                    yield s.update(updateData, { enforceTypes: false });
-                    console.log(updateData);
-                }
+    }
+
+    // Migrate Actor Override Tokens
+    for (const s of game.scenes.entities) {
+        try {
+            const updateData = migrateSceneData(duplicate(s.data));
+            if (!isObjectEmpty(updateData)) {
+                expandObject(updateData);
+                console.log(`Migrating Scene entity ${s.name}`);
+                await s.update(updateData, { enforceTypes: false });
+                console.log(updateData);
             }
-            catch (err) {
-                console.error(err);
-            }
+        } catch (err) {
+            console.error(err);
         }
-        // Migrate World Compendium Packs
-        const packs = game.packs.filter((p) => {
-            return (p.metadata.package === 'world' && ['Actor', 'Item', 'Scene'].includes(p.metadata.entity));
-        });
-        for (const p of packs) {
-            yield migrateCompendium(p);
-        }
-        // Set the migration as complete
-        game.settings.set('shadowrun5e', 'systemMigrationVersion', game.system.data.version);
-        // @ts-ignore
-        ui.notifications.info(`Shadowrun5e System Migration to version ${game.system.data.version} completed!`, { permanent: true });
-        console.log(`Shadowrun5e System Migration to version ${game.system.data.version} completed!`);
+    }
+
+    // Migrate World Compendium Packs
+    const packs = game.packs.filter((p) => {
+        return (
+            p.metadata.package === 'world' && ['Actor', 'Item', 'Scene'].includes(p.metadata.entity)
+        );
     });
+    for (const p of packs) {
+        await migrateCompendium(p);
+    }
+
+    // Set the migration as complete
+    game.settings.set('shadowrun5e', 'systemMigrationVersion', game.system.data.version);
+    // @ts-ignore
+    ui.notifications.info(
+        `Shadowrun5e System Migration to version ${game.system.data.version} completed!`,
+        { permanent: true }
+    );
+    console.log(`Shadowrun5e System Migration to version ${game.system.data.version} completed!`);
 };
+
 const getMigratedActorItems = (actor) => {
     // Migrate Owned Items
-    if (!actor.items)
-        return [];
+    if (!actor.items) return [];
     return actor.items.reduce((acc, i) => {
         // Migrate the Owned Item
         const mi = migrateItemData(i);
@@ -89,47 +89,48 @@ const getMigratedActorItems = (actor) => {
         return acc;
     }, []);
 };
+
 /* -------------------------------------------- */
+
 /**
  * Apply migration rules to all Entities within a single Compendium pack
  * @param pack
  * @return {Promise}
  */
-export const migrateCompendium = function (pack) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const { entity } = pack.metadata;
-        if (!['Actor', 'Item', 'Scene'].includes(entity))
-            return;
-        // Begin by requesting server-side data model migration and get the migrated content
-        yield pack.migrate();
-        const content = yield pack.getContent();
-        // Iterate over compendium entries - applying fine-tuned migration functions
-        for (const ent of content) {
-            try {
-                let updateData;
-                if (entity === 'Item')
-                    updateData = migrateItemData(ent.data);
-                else if (entity === 'Actor')
-                    updateData = migrateActorData(ent.data);
-                else if (entity === 'Scene')
-                    updateData = migrateSceneData(ent.data);
-                if (!isObjectEmpty(updateData) && updateData !== null) {
-                    expandObject(updateData);
-                    updateData._id = ent._id;
-                    yield pack.updateEntity(updateData);
-                    console.log(`Migrated ${entity} entity ${ent.name} in Compendium ${pack.collection}`);
-                }
+export const migrateCompendium = async function (pack) {
+    const { entity } = pack.metadata;
+    if (!['Actor', 'Item', 'Scene'].includes(entity)) return;
+
+    // Begin by requesting server-side data model migration and get the migrated content
+    await pack.migrate();
+    const content = await pack.getContent();
+
+    // Iterate over compendium entries - applying fine-tuned migration functions
+    for (const ent of content) {
+        try {
+            let updateData;
+            if (entity === 'Item') updateData = migrateItemData(ent.data);
+            else if (entity === 'Actor') updateData = migrateActorData(ent.data);
+            else if (entity === 'Scene') updateData = migrateSceneData(ent.data);
+            if (!isObjectEmpty(updateData) && updateData !== null) {
+                expandObject(updateData);
+                updateData._id = ent._id;
+                await pack.updateEntity(updateData);
+                console.log(
+                    `Migrated ${entity} entity ${ent.name} in Compendium ${pack.collection}`
+                );
             }
-            catch (err) {
-                console.error(err);
-            }
+        } catch (err) {
+            console.error(err);
         }
-        console.log(`Migrated all ${entity} entities from Compendium ${pack.collection}`);
-    });
+    }
+    console.log(`Migrated all ${entity} entities from Compendium ${pack.collection}`);
 };
+
 /* -------------------------------------------- */
 /*  Entity Type Migration Helpers               */
 /* -------------------------------------------- */
+
 /**
  * Migrate a single Actor entity to incorporate latest data model changes
  * Return an Object of updateData to be applied
@@ -138,48 +139,57 @@ export const migrateCompendium = function (pack) {
  */
 export const migrateActorData = function (actor) {
     const updateData = {};
+
     _migrateActorOverflow(actor, updateData);
+
     _migrateActorSkills(actor, updateData);
+
     let hasItemUpdates = false;
     const items = actor.items.map((i) => {
         // Migrate the Owned Item
         let itemUpdate = migrateItemData(i);
+
         // Update the Owned Item
         if (!isObjectEmpty(itemUpdate)) {
             hasItemUpdates = true;
             return mergeObject(i, itemUpdate, { enforceTypes: false, inplace: false });
-        }
-        else
-            return i;
+        } else return i;
     });
-    if (hasItemUpdates)
-        updateData['items'] = items;
+    if (hasItemUpdates) updateData['items'] = items;
+
     if (!isObjectEmpty(updateData)) {
         updateData['_id'] = actor._id;
         updateData['id'] = actor._id;
     }
+
     return updateData;
 };
+
 /* -------------------------------------------- */
+
 /**
  * Migrate a single Item entity to incorporate latest data model changes
  * @param item
  */
 export const migrateItemData = function (item) {
     const updateData = {};
+
     _migrateItemsAmmo(item, updateData);
     _migrateDamageTypeAndElement(item, updateData);
     _migrateItemsAddActions(item, updateData);
     _migrateItemsAddCapacity(item, updateData);
     _migrateItemsConceal(item, updateData);
+
     if (!isObjectEmpty(updateData)) {
         updateData['_id'] = item._id;
         updateData['id'] = item._id;
     }
+
     // Return the migrated update data
     return updateData;
 };
 /* -------------------------------------------- */
+
 /**
  * Migrate a single Scene entity to incorporate changes to the data model of it's actor data overrides
  * Return an Object of updateData to be applied
@@ -198,8 +208,7 @@ export const migrateSceneData = function (scene) {
             if (!token.actor) {
                 t.actorId = null;
                 t.actorData = {};
-            }
-            else if (!t.actorLink) {
+            } else if (!t.actorLink) {
                 const updateData = migrateActorData(token.data.actorData);
                 t.actorData = mergeObject(token.data.actorData, updateData);
             }
@@ -207,14 +216,17 @@ export const migrateSceneData = function (scene) {
         }),
     };
 };
+
 const _migrateActorOverflow = function (actor, updateData) {
     if (getProperty(actor.data, 'track.physical.overflow') === 0) {
         updateData['data.track.physical.overflow.value'] = 0;
         updateData['data.track.physical.overflow.max'] = 0;
     }
 };
+
 const _migrateActorSkills = function (actor, updateData) {
     const splitRegex = /[,\/|.]+/;
+
     const reducer = (running, [key, val]) => {
         if (!Array.isArray(val.specs) && val.specs) {
             running[key] = {
@@ -223,18 +235,31 @@ const _migrateActorSkills = function (actor, updateData) {
         }
         return running;
     };
+
     // TODO verify this works
     updateData['data.skills.active'] = Object.entries(actor.data.skills.active).reduce(reducer, {});
-    updateData['data.skills.knowledge.street.value'] = Object.entries(actor.data.skills.knowledge.street.value).reduce(reducer, {});
-    updateData['data.skills.knowledge.professional.value'] = Object.entries(actor.data.skills.knowledge.professional.value).reduce(reducer, {});
-    updateData['data.skills.knowledge.academic.value'] = Object.entries(actor.data.skills.knowledge.academic.value).reduce(reducer, {});
-    updateData['data.skills.knowledge.interests.value'] = Object.entries(actor.data.skills.knowledge.interests.value).reduce(reducer, {});
-    updateData['data.skills.language.value'] = Object.entries(actor.data.skills.language.value).reduce(reducer, {});
+    updateData['data.skills.knowledge.street.value'] = Object.entries(
+        actor.data.skills.knowledge.street.value
+    ).reduce(reducer, {});
+    updateData['data.skills.knowledge.professional.value'] = Object.entries(
+        actor.data.skills.knowledge.professional.value
+    ).reduce(reducer, {});
+    updateData['data.skills.knowledge.academic.value'] = Object.entries(
+        actor.data.skills.knowledge.academic.value
+    ).reduce(reducer, {});
+    updateData['data.skills.knowledge.interests.value'] = Object.entries(
+        actor.data.skills.knowledge.interests.value
+    ).reduce(reducer, {});
+    updateData['data.skills.language.value'] = Object.entries(
+        actor.data.skills.language.value
+    ).reduce(reducer, {});
 };
+
 const cleanItemData = function (itemData) {
     const model = game.system.model.Item[itemData.type];
     itemData.data = filterObject(itemData.data, model);
 };
+
 const _migrateDamageTypeAndElement = function (item, updateData) {
     console.log('Migrating Damage and Elements');
     if (item.data.action) {
@@ -247,6 +272,7 @@ const _migrateDamageTypeAndElement = function (item, updateData) {
         }
     }
 };
+
 const _migrateItemsAmmo = function (item, updateData) {
     console.log('Migrating Ammo');
     if (item.type === 'weapon') {
@@ -269,14 +295,15 @@ const _migrateItemsAmmo = function (item, updateData) {
         };
     }
 };
+
 const _migrateItemsConceal = (item, updateData) => {
-    var _a;
-    if (((_a = item.data.technology) === null || _a === void 0 ? void 0 : _a.concealability) !== undefined) {
+    if (item.data.technology?.concealability !== undefined) {
         updateData['data.technology.conceal'] = {
             base: item.data.technology.concealability,
         };
     }
 };
+
 const _migrateItemsAddCapacity = function (item, updateData) {
     if (['cyberware'].includes(item.type)) {
         if (item.data.capacity === undefined) {
@@ -284,6 +311,7 @@ const _migrateItemsAddCapacity = function (item, updateData) {
         }
     }
 };
+
 const _migrateItemsAddActions = function (item, updateData) {
     if (['quality', 'cyberware'].includes(item.type)) {
         if (item.data.action === undefined) {
@@ -318,8 +346,7 @@ const _migrateItemsAddActions = function (item, updateData) {
                     description: '',
                 },
             };
-            if (!updateData.data)
-                updateData.data = {};
+            if (!updateData.data) updateData.data = {};
             updateData.data.action = action;
         }
     }

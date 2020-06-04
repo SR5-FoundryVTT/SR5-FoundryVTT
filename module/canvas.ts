@@ -8,20 +8,24 @@
  * @return {number}             The distance between p1 and p0
  */
 export const measureDistance = function (p0, p1, { gridSpaces = true } = {}) {
-    if (!gridSpaces) { // BaseGrid exists... fix in foundry types
-        // @ts-ignore
-        return BaseGrid.prototype.measureDistance.bind(this)(p0, p1, {
-            gridSpaces,
-        });
-    }
+    if (!gridSpaces)
+        {  // BaseGrid exists... fix in foundry types
+            // @ts-ignore
+            return BaseGrid.prototype.measureDistance.bind(this)(p0, p1, {
+                        gridSpaces,
+                    });
+        }
     const gs = canvas.dimensions.size;
     const ray = new Ray(p0, p1);
     const nx = Math.abs(Math.ceil(ray.dx / gs));
     const ny = Math.abs(Math.ceil(ray.dy / gs));
+
     // Get the number of straight and diagonal moves
     const nDiagonal = Math.min(nx, ny);
     const nStraight = Math.abs(ny - nx);
+
     const diagonalRule = game.settings.get('shadowrun5e', 'diagonalMovement');
+
     if (diagonalRule === '1-2-1') {
         const nd10 = Math.floor(nDiagonal / 2);
         const spaces = nd10 * 2 + (nDiagonal - nd10) + nStraight;

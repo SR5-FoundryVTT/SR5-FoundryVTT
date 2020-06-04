@@ -1,5 +1,13 @@
-import { Helpers } from '../helpers.js';
-
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+import { Helpers } from '../helpers';
 /**
  * Extend the basic ItemSheet with some very simple modifications
  */
@@ -8,7 +16,9 @@ export class SR5ItemSheet extends ItemSheet {
         super(...args);
         this._shownDesc = [];
     }
-
+    getEmbeddedItems() {
+        return this.item.items || [];
+    }
     /**
      * Extend and override the default options used by the Simple Item Sheet
      * @returns {Object}
@@ -21,14 +31,11 @@ export class SR5ItemSheet extends ItemSheet {
             tabs: [{ navSelector: '.tabs', contentSelector: '.sheetbody' }],
         });
     }
-
     get template() {
         const path = 'systems/shadowrun5e/templates/item/';
         return `${path}${this.item.data.type}.html`;
     }
-
     /* -------------------------------------------- */
-
     /**
      * Prepare data for rendering the Item sheet
      * The prepared data object contains both the actor data as well as additional sheet options
@@ -36,57 +43,59 @@ export class SR5ItemSheet extends ItemSheet {
     getData() {
         const data = super.getData();
         const itemData = data.data;
-
         if (itemData.action) {
             try {
                 const { action } = itemData;
-                if (action.mod === 0) delete action.mod;
-                if (action.limit === 0) delete action.limit;
+                if (action.mod === 0)
+                    delete action.mod;
+                if (action.limit === 0)
+                    delete action.limit;
                 if (action.damage) {
-                    if (action.damage.mod === 0) delete action.damage.mod;
-                    if (action.damage.ap.mod === 0) delete action.damage.ap.mod;
+                    if (action.damage.mod === 0)
+                        delete action.damage.mod;
+                    if (action.damage.ap.mod === 0)
+                        delete action.damage.ap.mod;
                 }
                 if (action.limit) {
-                    if (action.limit.mod === 0) delete action.limit.mod;
+                    if (action.limit.mod === 0)
+                        delete action.limit.mod;
                 }
-            } catch (e) {
+            }
+            catch (e) {
                 console.error(e);
             }
         }
-
         if (itemData.technology) {
             try {
                 const tech = itemData.technology;
-                if (tech.rating === 0) delete tech.rating;
-                if (tech.quantity === 0) delete tech.quantity;
-                if (tech.cost === 0) delete tech.cost;
-            } catch (e) {
+                if (tech.rating === 0)
+                    delete tech.rating;
+                if (tech.quantity === 0)
+                    delete tech.quantity;
+                if (tech.cost === 0)
+                    delete tech.cost;
+            }
+            catch (e) {
                 console.log(e);
             }
         }
-
-        data.config = CONFIG.SR5;
-        const items = this.item.items || [];
-        const [ammunition, weaponMods, armorMods] = items.reduce(
-            (parts, item) => {
-                if (item.type === 'ammo') parts[0].push(item.data);
-                if (item.type === 'modification' && item.data.data.type === 'weapon')
-                    parts[1].push(item.data);
-                if (item.type === 'modification' && item.data.data.type === 'armor')
-                    parts[2].push(item.data);
-                return parts;
-            },
-            [[], [], []]
-        );
-        data.ammunition = ammunition;
-        data.weaponMods = weaponMods;
-        data.armorMods = armorMods;
-
+        data['config'] = CONFIG.SR5;
+        const items = this.getEmbeddedItems();
+        const [ammunition, weaponMods, armorMods] = items.reduce((parts, item) => {
+            if (item.type === 'ammo')
+                parts[0].push(item.data);
+            if (item.type === 'modification' && item.data.data.type === 'weapon')
+                parts[1].push(item.data);
+            if (item.type === 'modification' && item.data.data.type === 'armor')
+                parts[2].push(item.data);
+            return parts;
+        }, [[], [], []]);
+        data['ammunition'] = ammunition;
+        data['weaponMods'] = weaponMods;
+        data['armorMods'] = armorMods;
         return data;
     }
-
     /* -------------------------------------------- */
-
     /**
      * Activate event listeners using the prepared sheet HTML
      * @param html {HTML}   The prepared HTML object ready to be rendered into the DOM
@@ -101,15 +110,11 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.ammo-equip').click(this._onAmmoEquip.bind(this));
         html.find('.ammo-delete').click(this._onAmmoRemove.bind(this));
         html.find('.ammo-reload').click(this._onAmmoReload.bind(this));
-
         html.find('.edit-item').click(this._onEditItem.bind(this));
-
         html.find('.add-new-mod').click(this._onAddWeaponMod.bind(this));
         html.find('.mod-equip').click(this._onWeaponModEquip.bind(this));
         html.find('.mod-delete').click(this._onWeaponModRemove.bind(this));
-
         html.find('.add-new-license').click(this._onAddLicense.bind(this));
-
         html.find('.has-desc').click((event) => {
             event.preventDefault();
             const item = $(event.currentTarget).parents('.item');
@@ -117,111 +122,122 @@ export class SR5ItemSheet extends ItemSheet {
             const field = item.next();
             field.toggle();
             if (iid) {
-                if (field.is(':visible')) this._shownDesc.push(iid);
-                else this._shownDesc = this._shownDesc.filter((val) => val !== iid);
+                if (field.is(':visible'))
+                    this._shownDesc.push(iid);
+                else
+                    this._shownDesc = this._shownDesc.filter((val) => val !== iid);
             }
         });
-
         html.find('.hidden').hide();
     }
-
     _onDragOver(event) {
         event.preventDefault();
         return false;
     }
-
-    async _onDrop(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        let data;
-        try {
-            data = JSON.parse(event.dataTransfer.getData('text/plain'));
-            if (data.type !== 'Item') {
-                console.log('Shadowrun5e | Can only drop Items');
+    _onDrop(event) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            event.stopPropagation();
+            let data;
+            try {
+                data = JSON.parse(event.dataTransfer.getData('text/plain'));
+                if (data.type !== 'Item') {
+                    console.log('Shadowrun5e | Can only drop Items');
+                }
             }
-        } catch (err) {
-            console.log('Shadowrun5e | drop error');
-        }
-        let item;
-        // Case 1 - Data explicitly provided
-        if (data.data) {
-            // TODO test
-            if (
-                this.item.isOwned &&
-                data.actorId === this.item.actor._id &&
-                data.data._id === this.item.data._id
-            ) {
-                console.log('Shadowrun5e | Cant drop item on itself');
-                ui.notifications.error('Are you trying to break the game??');
+            catch (err) {
+                console.log('Shadowrun5e | drop error');
             }
-            item = data;
-        } else if (data.pack) {
-            console.log(data);
-            // Case 2 - From a Compendium Pack
-            // TODO test
-            item = await this._getItemFromCollection(data.pack, data.id);
-        } else {
-            // Case 3 - From a World Entity
-            item = game.items.get(data.id);
-        }
-
-        this.item.createOwnedItem(item.data);
+            let item;
+            // Case 1 - Data explicitly provided
+            if (data.data) {
+                // TODO test
+                if (this.item.isOwned &&
+                    data.actorId === ((_a = this.item.actor) === null || _a === void 0 ? void 0 : _a._id) &&
+                    data.data._id === this.item._id) {
+                    console.log('Shadowrun5e | Cant drop item on itself');
+                    // @ts-ignore
+                    ui.notifications.error('Are you trying to break the game??');
+                }
+                item = data;
+            }
+            else if (data.pack) {
+                console.log(data);
+                // Case 2 - From a Compendium Pack
+                // TODO test
+                item = yield this._getItemFromCollection(data.pack, data.id);
+            }
+            else {
+                // Case 3 - From a World Entity
+                item = game.items.get(data.id);
+            }
+            this.item.createOwnedItem(item.data);
+        });
     }
-
     _getItemFromCollection(collection, itemId) {
         const pack = game.packs.find((p) => p.collection === collection);
         return pack.getEntity(itemId);
     }
-
     _eventId(event) {
         event.preventDefault();
         return event.currentTarget.closest('.item').dataset.itemId;
     }
-
-    async _onEditItem(event) {
-        const item = this.item.getOwnedItem(this._eventId(event));
-        item.sheet.render(true);
+    _onEditItem(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const item = this.item.getOwnedItem(this._eventId(event));
+            if (item) {
+                item.sheet.render(true);
+            }
+        });
     }
-
-    async _onAddLicense(event) {
-        event.preventDefault();
-        this.item.addNewLicense();
+    _onAddLicense(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            this.item.addNewLicense();
+        });
     }
-
-    async _onWeaponModRemove(event) {
-        this.item.deleteOwnedItem(this._eventId(event));
+    _onWeaponModRemove(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.item.deleteOwnedItem(this._eventId(event));
+        });
     }
-
-    async _onWeaponModEquip(event) {
-        this.item.equipWeaponMod(this._eventId(event));
+    _onWeaponModEquip(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.item.equipWeaponMod(this._eventId(event));
+        });
     }
-
-    async _onAddWeaponMod(event) {
-        event.preventDefault();
-        const type = 'modification';
-        const itemData = {
-            name: `New ${Helpers.label(type)}`,
-            type: type,
-            data: duplicate(game.system.model.Item.modification),
-        };
-        itemData.data.type = 'weapon';
-        const item = Item.createOwned(itemData, this.item);
-        this.item.createOwnedItem(item.data);
+    _onAddWeaponMod(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const type = 'modification';
+            const itemData = {
+                name: `New ${Helpers.label(type)}`,
+                type: type,
+                data: duplicate(game.system.model.Item.modification),
+            };
+            itemData.data.type = 'weapon';
+            // @ts-ignore
+            const item = Item.createOwned(itemData, this.item);
+            this.item.createOwnedItem(item.data);
+        });
     }
-
-    async _onAmmoReload(event) {
-        event.preventDefault();
-        this.item.reloadAmmo();
+    _onAmmoReload(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            this.item.reloadAmmo();
+        });
     }
-
-    async _onAmmoRemove(event) {
-        this.item.deleteOwnedItem(this._eventId(event));
+    _onAmmoRemove(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.item.deleteOwnedItem(this._eventId(event));
+        });
     }
-
-    async _onAmmoEquip(event) {
-        this.item.equipAmmo(this._eventId(event));
+    _onAmmoEquip(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.item.equipAmmo(this._eventId(event));
+        });
     }
-
     _onAddNewAmmo(event) {
         event.preventDefault();
         const type = 'ammo';
@@ -230,26 +246,29 @@ export class SR5ItemSheet extends ItemSheet {
             type: type,
             data: duplicate(game.system.model.Item.ammo),
         };
+        // @ts-ignore
         const item = Item.createOwned(itemData, this.item);
         this.item.createOwnedItem(item.data);
     }
-
     /**
      * @private
      */
     _findActiveList() {
-        return this.element.find('.tab.active .scroll-area');
+        return $(this.element).find('.tab.active .scroll-area');
     }
-
     /**
      * @private
      */
-    async _render(force = false, options = {}) {
-        this._saveScrollPositions();
-        await super._render(force, options);
-        this._restoreScrollPositions();
+    _render(force = false, options = {}) {
+        const _super = Object.create(null, {
+            _render: { get: () => super._render }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            this._saveScrollPositions();
+            yield _super._render.call(this, force, options);
+            this._restoreScrollPositions();
+        });
     }
-
     /**
      * @private
      */
@@ -259,7 +278,6 @@ export class SR5ItemSheet extends ItemSheet {
             activeList.prop('scrollTop', this._scroll);
         }
     }
-
     /**
      * @private
      */
