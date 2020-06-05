@@ -1,4 +1,4 @@
-import { LanguageSkillEditForm } from './language-skill-edit.js';
+import { LanguageSkillEditForm } from './language-skill-edit';
 import KnowledgeSkillCategory = Shadowrun.KnowledgeSkillCategory;
 
 export class KnowledgeSkillEditForm extends LanguageSkillEditForm {

@@ -1,8 +1,8 @@
 // Import Modules
-import { SR5ItemSheet } from './item/sheet';
-import { SR5ActorSheet } from './actor/sheet';
-import { SR5Actor } from './actor/entity';
-import { SR5Item } from './item/entity';
+import { SR5ItemSheet } from './item/SR5ItemSheet';
+import { SR5ActorSheet } from './actor/SR5ActorSheet';
+import { SR5Actor } from './actor/SR5Actor';
+import { SR5Item } from './item/SR5Item';
 import { SR5 } from './config';
 import { Helpers } from './helpers';
 import { registerSystemSettings } from './settings';
@@ -42,7 +42,7 @@ Hooks.once('init', function () {
     Items.registerSheet('shadowrun5e', SR5ItemSheet, { makeDefault: true });
 
     ['renderSR5ActorSheet', 'renderSR5ItemSheet'].forEach((s) => {
-        Hooks.on(s, (app, html, data) => Helpers.setupCustomCheckbox(app, html));
+        Hooks.on(s, (app, html) => Helpers.setupCustomCheckbox(app, html));
     });
 
     preloadHandlebarsTemplates();
@@ -82,7 +82,7 @@ Hooks.on('ready', function () {
 });
 
 Hooks.on('preUpdateCombat', preCombatUpdate);
-Hooks.on('renderChatMessage', (app, html, data) => {
+Hooks.on('renderChatMessage', (app, html) => {
     if (!app.isRoll) SR5Item.chatListeners(html);
     if (app.isRoll) chat.highlightSuccessFailure(app, html);
 });
@@ -170,12 +170,12 @@ function rollItemMacro(itemName) {
     if (speaker.token) actor = game.actors.tokens[speaker.token];
     if (!actor) actor = game.actors.get(speaker.actor);
     const item = actor ? actor.items.find((i) => i.name === itemName) : null;
-    if (!item)
-        { // @ts-ignore
-            return ui.notifications.warn(
-                        `Your controlled Actor does not have an item named ${itemName}`
-                    );
-        }
+    if (!item) {
+        // @ts-ignore
+        return ui.notifications.warn(
+            `Your controlled Actor does not have an item named ${itemName}`
+        );
+    }
 
     return item.roll();
 }

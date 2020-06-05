@@ -1,5 +1,5 @@
 import { Helpers } from '../helpers';
-import { SR5Item } from './entity';
+import { SR5Item } from './SR5Item';
 
 /**
  * Extend the basic ItemSheet with some very simple modifications

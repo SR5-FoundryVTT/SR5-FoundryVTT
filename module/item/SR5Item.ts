@@ -1,7 +1,7 @@
-import { DiceSR } from '../dice.js';
-import { Helpers } from '../helpers.js';
+import { DiceSR } from '../dice';
+import { Helpers } from '../helpers';
 import DeviceData = Shadowrun.DeviceData;
-import { SR5Actor } from '../actor/entity';
+import { SR5Actor } from '../actor/SR5Actor';
 
 export class SR5Item extends Item {
     labels: {};

@@ -1,12 +1,12 @@
-import { Helpers } from '../helpers.js';
-import { ChummerImportForm } from '../apps/chummer-import-form.js';
-import { SkillEditForm } from '../apps/skill-edit.js';
-import { KnowledgeSkillEditForm } from '../apps/knowledge-skill-edit.js';
-import { LanguageSkillEditForm } from '../apps/language-skill-edit.js';
+import { Helpers } from '../helpers';
+import { ChummerImportForm } from '../apps/chummer-import-form';
+import { SkillEditForm } from '../apps/skill-edit';
+import { KnowledgeSkillEditForm } from '../apps/knowledge-skill-edit';
+import { LanguageSkillEditForm } from '../apps/language-skill-edit';
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import Skills = Shadowrun.Skills;
-import { SR5Actor } from './entity';
+import { SR5Actor } from './SR5Actor';
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 
 /**

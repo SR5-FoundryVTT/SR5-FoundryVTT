@@ -1,4 +1,3 @@
-import { SR5 } from './config.js';
 import { Helpers } from './helpers';
 import RollEvent = Shadowrun.RollEvent;
 
@@ -59,7 +58,7 @@ export class DiceSR {
     /**
      *
      * @param event {MouseEvent} - mouse event that caused this
-     * @param actor {Sr5Actor} - actor this roll is associated with
+     * @param actor {SR5Actor} - actor this roll is associated with
      * @param parts {Object} - object where keys should be the 'name' that can be translated/is translated and value should be the numerical values to add to dice pool
      * @param limit {Number} - Limit to apply to the roll, leave empty for no limit
      * @param extended {Boolean} - if this is an extended test (automatically sets the dropdown in the dialog)
@@ -100,7 +99,7 @@ export class DiceSR {
 
         const edgeAttMax = actor ? actor.data.data.attributes.edge.max : 0;
 
-        if (event && event[SR5['kbmod'].EDGE]) {
+        if (event && event[CONFIG.SR5.kbmod.EDGE]) {
             parts['SR5.Edge'] = +edgeAttMax;
             actor?.update({
                 'data.attributes.edge.value': actor.data.data.attributes.edge.value - 1,
@@ -110,7 +109,7 @@ export class DiceSR {
         // add mods to dice pool
         dice_pool += Object.values(parts).reduce((prev, cur) => prev + cur, 0);
 
-        if (event && event[SR5['kbmod'].STANDARD]) {
+        if (event && event[CONFIG.SR5.kbmod.STANDARD]) {
             const edge = parts['SR5.Edge'] !== undefined || undefined;
             return this.basicRoll({
                 count: dice_pool,
@@ -159,15 +158,22 @@ export class DiceSR {
                         if (cancel) return;
                         // get the actual dice_pool from the difference of initial parts and value in the dialog
 
-                        let dicePool = Helpers.parseInputToNumber($(html).find('[name="dice_pool"]').val());
+                        let dicePool = Helpers.parseInputToNumber(
+                            $(html).find('[name="dice_pool"]').val()
+                        );
 
                         +Helpers.parseInputToNumber($(html).find('[name="dp_mod"]').val());
                         +Helpers.parseInputToNumber($(html).find('[name="wounds"]').val());
-                        -Helpers.parseInputToNumber($(html).find('[name="options.environmental"]').val());
+                        -Helpers.parseInputToNumber(
+                            $(html).find('[name="options.environmental"]').val()
+                        );
 
-                        const limit = Helpers.parseInputToNumber($(html).find('[name="limit"]').val());
+                        const limit = Helpers.parseInputToNumber(
+                            $(html).find('[name="limit"]').val()
+                        );
                         const extended =
-                            Helpers.parseInputToNumber($(html).find('[name="extended"]').val()) !== 0;
+                            Helpers.parseInputToNumber($(html).find('[name="extended"]').val()) !==
+                            0;
 
                         if (edge && actor) {
                             dicePool += actor.data.data.attributes.edge.max;

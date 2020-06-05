@@ -1,6 +1,6 @@
-import { DiceSR } from '../dice.js';
-import { Helpers } from '../helpers.js';
-import { SR5Item } from '../item/entity';
+import { DiceSR } from '../dice';
+import { Helpers } from '../helpers';
+import { SR5Item } from '../item/SR5Item';
 import ItemData = Shadowrun.ItemData;
 import Attributes = Shadowrun.Attributes;
 import Skills = Shadowrun.Skills;

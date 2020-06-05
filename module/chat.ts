@@ -1,4 +1,4 @@
-import { SR5Actor } from './actor/entity.js';
+import { SR5Actor } from './actor/SR5Actor';
 
 export const highlightSuccessFailure = (message, html) => {
     if (!message) return;

@@ -1,4 +1,4 @@
-import { SkillEditForm } from './skill-edit.js';
+import { SkillEditForm } from './skill-edit';
 
 export class LanguageSkillEditForm extends SkillEditForm {
     skillId: string;
