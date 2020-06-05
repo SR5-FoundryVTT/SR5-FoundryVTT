@@ -1,18 +1,15 @@
 import { DiceSR } from '../dice.js';
 import { Helpers } from '../helpers.js';
-import { SR5 } from '../config.js';
 import { SR5Item } from '../item/entity';
 import ItemData = Shadowrun.ItemData;
 import Attributes = Shadowrun.Attributes;
 import Skills = Shadowrun.Skills;
 import KnowledgeSkillList = Shadowrun.KnowledgeSkillList;
 import KnowledgeSkills = Shadowrun.KnowledgeSkills;
-import LimitData = Shadowrun.LimitData;
 import Limits = Shadowrun.Limits;
 import Tracks = Shadowrun.Tracks;
 import ActorRollOptions = Shadowrun.ActorRollOptions;
 import DefenseRollOptions = Shadowrun.DefenseRollOptions;
-import IncomingAttack = Shadowrun.IncomingAttack;
 import SoakRollOptions = Shadowrun.SoakRollOptions;
 import AttributeField = Shadowrun.AttributeField;
 import SkillRollOptions = Shadowrun.SkillRollOptions;
@@ -64,8 +61,8 @@ export class SR5Actor extends Actor {
         attributes.resonance.hidden = !(data.special === 'resonance');
 
         if (!data.modifiers) data.modifiers = {};
-        const mods = {};
-        let modifiers = [
+        const modifiers = {};
+        let miscTabModifiers = [
             'soak',
             'drain',
             'armor',
@@ -87,14 +84,14 @@ export class SR5Actor extends Actor {
             'essence',
             'fade',
         ];
-        modifiers.sort();
-        modifiers.unshift('global');
+        miscTabModifiers.sort();
+        miscTabModifiers.unshift('global');
 
-        for (let item of modifiers) {
-            mods[item] = data.modifiers[item] || 0;
+        for (let item of miscTabModifiers) {
+            modifiers[item] = data.modifiers[item] || 0;
         }
 
-        data.modifiers = mods;
+        data.modifiers = modifiers;
 
         let totalEssence = 6;
         armor.value = 0;
@@ -274,32 +271,43 @@ export class SR5Actor extends Actor {
         };
 
         // SET ARMOR
-        armor.value += armor.mod + mods['armor'];
+        armor.value += armor.mod + modifiers['armor'];
 
         // SET ESSENCE
-        actorData.data.attributes.essence.value = +(totalEssence + mods['essence']).toFixed(3);
+        actorData.data.attributes.essence.value = +(totalEssence + modifiers['essence']).toFixed(3);
 
         // SETUP LIMITS
         limits.physical.value =
-            Math.ceil((2 * attributes.strength.value + attributes.body.value + attributes.reaction.value) / 3) +
-            mods['physical_limit'];
+            Math.ceil(
+                (2 * attributes.strength.value +
+                    attributes.body.value +
+                    attributes.reaction.value) /
+                    3
+            ) + modifiers['physical_limit'];
         limits.mental.value =
-            Math.ceil((2 * attributes.logic.value + attributes.intuition.value + attributes.willpower.value) / 3) +
-            mods['mental_limit'];
+            Math.ceil(
+                (2 * attributes.logic.value +
+                    attributes.intuition.value +
+                    attributes.willpower.value) /
+                    3
+            ) + modifiers['mental_limit'];
         limits.social.value =
             Math.ceil(
-                (2 * attributes.charisma.value + attributes.willpower.value + attributes.essence.value) / 3
-            ) + mods['social_limit'];
+                (2 * attributes.charisma.value +
+                    attributes.willpower.value +
+                    attributes.essence.value) /
+                    3
+            ) + modifiers['social_limit'];
 
         // MOVEMENT
         const movement = data.movement;
-        movement.walk.value = attributes.agility.value * (2 + mods['walk']);
-        movement.run.value = attributes.agility.value * (4 + mods['run']);
+        movement.walk.value = attributes.agility.value * (2 + modifiers['walk']);
+        movement.run.value = attributes.agility.value * (4 + modifiers['run']);
 
         // CONDITION_MONITORS
-        track.physical.max = 8 + Math.ceil(attributes.body.value / 2) + mods['physical_track'];
+        track.physical.max = 8 + Math.ceil(attributes.body.value / 2) + modifiers['physical_track'];
         track.physical.overflow.max = attributes.body.value;
-        track.stun.max = 8 + Math.ceil(attributes.willpower.value / 2) + mods['stun_track'];
+        track.stun.max = 8 + Math.ceil(attributes.willpower.value / 2) + modifiers['stun_track'];
 
         // CALCULATE RECOIL
         data.recoil_compensation = 1 + Math.ceil(attributes.strength.value / 3);
@@ -318,19 +326,20 @@ export class SR5Actor extends Actor {
             init.current = init.meatspace;
             init.perception = 'meatspace';
         }
-        init.current.dice.value = init.current.dice.base + mods['initiative_dice'];
+        init.current.dice.value = init.current.dice.base + modifiers['initiative_dice'];
         if (init.edge) init.current.dice.value = 5;
         init.current.dice.value = Math.min(5, init.current.dice.value); // maximum of 5d6 for initiative
         init.current.dice.text = `${init.current.dice.value}d6`;
-        init.current.base.value = init.current.base.base + mods['initiative'];
+        init.current.base.value = init.current.base.base + modifiers['initiative'];
 
-        const soak = attributes.body.value + armor.value + mods['soak'];
+        const soak = attributes.body.value + armor.value + modifiers['soak'];
         const drainAtt = attributes[data.magic.attribute];
         data.rolls = {
             ...data.rolls,
-            defense: attributes.reaction.value + attributes.intuition.value + mods['defense'],
-            drain: attributes.willpower.value + (drainAtt ? drainAtt.value : 0) + mods['drain'],
-            fade: attributes.willpower.value + attributes.resonance.value + mods['fade'],
+            defense: attributes.reaction.value + attributes.intuition.value + modifiers['defense'],
+            drain:
+                attributes.willpower.value + (drainAtt ? drainAtt.value : 0) + modifiers['drain'],
+            fade: attributes.willpower.value + attributes.resonance.value + modifiers['fade'],
             soak: {
                 default: soak,
                 cold: soak + armor.cold,
@@ -339,15 +348,18 @@ export class SR5Actor extends Actor {
                 electricity: soak + armor.electricity,
                 radiation: soak + armor.radiation,
             },
-            composure: attributes.charisma.value + attributes.willpower.value + mods['composure'],
+            composure:
+                attributes.charisma.value + attributes.willpower.value + modifiers['composure'],
             judge_intentions:
-                attributes.charisma.value + attributes.intuition.value + mods['judge_intentions'],
-            lift_carry: attributes.strength.value + attributes.body.value + mods['lift_carry'],
-            memory: attributes.willpower.value + attributes.logic.value + mods['memory'],
+                attributes.charisma.value +
+                attributes.intuition.value +
+                modifiers['judge_intentions'],
+            lift_carry: attributes.strength.value + attributes.body.value + modifiers['lift_carry'],
+            memory: attributes.willpower.value + attributes.logic.value + modifiers['memory'],
         };
 
         {
-            const count = 3 + mods['wound_tolerance'];
+            const count = 3 + modifiers['wound_tolerance'];
             const stunWounds = Math.floor(data.track.stun.value / count);
             const physicalWounds = Math.floor(data.track.physical.value / count);
 
@@ -378,7 +390,7 @@ export class SR5Actor extends Actor {
     }
 
     getOwnedItem(itemId: string): SR5Item | null {
-        return super.getOwnedItem(itemId) as unknown as SR5Item;
+        return (super.getOwnedItem(itemId) as unknown) as SR5Item;
     }
 
     addKnowledgeSkill(category, skill?) {

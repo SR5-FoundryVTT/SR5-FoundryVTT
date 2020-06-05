@@ -1,6 +1,9 @@
 import { LanguageSkillEditForm } from './language-skill-edit.js';
+import KnowledgeSkillCategory = Shadowrun.KnowledgeSkillCategory;
 
 export class KnowledgeSkillEditForm extends LanguageSkillEditForm {
+    category: KnowledgeSkillCategory;
+    skillId: string;
     _updateString() {
         return `data.skills.knowledge.${this.category}.value.${this.skillId}`;
     }

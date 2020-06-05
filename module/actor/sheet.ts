@@ -64,18 +64,6 @@ export class SR5ActorSheet extends ActorSheet {
     getData() {
         const data: SR5ActorSheetData = super.getData() as unknown as SR5ActorSheetData;
 
-        // do some calculations
-        const { limits } : { limits: Limits } = data.data;
-        if (limits.physical.mod['Misc'] === 0) delete limits.physical.mod;
-        if (limits.social.mod['Misc'] === 0) delete limits.social.mod;
-        if (limits.mental.mod['Misc'] === 0) delete limits.mental.mod;
-        const movement = data.data.movement;
-        if (movement.walk.mult === 1 || movement.walk.mult === 0) delete movement.walk.mult;
-        if (movement.run.mult === 2 || movement.run.mult === 0) delete movement.run.mult;
-        const track = data.data.track;
-        if (track.physical.mod['Misc'] === 0) delete track.physical.mod['Misc'];
-        if (track.stun && track.stun.mod['Misc'] === 0) delete track.stun.mod['Misc'];
-
         const attrs = data.data.attributes;
         for (let [label, att] of Object.entries(attrs)) {
             if (!att.hidden) {

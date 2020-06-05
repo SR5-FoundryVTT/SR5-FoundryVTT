@@ -43,11 +43,15 @@ declare namespace Shadowrun {
         [name: string]: SkillField & RemovableField;
     };
 
-    export type SkillField = BaseValuePair<number> & HideableField & ModifiableValue & LabelField & HasAttribute;
+    export type SkillField = BaseValuePair<number> & HideableField & ModifiableValue & LabelField & HasAttribute & {
+        specs: string[];
+    };
 
     export type HasAttribute = {
         attribute: ActorAttribute;
     }
+
+    export type KnowledgeSkillCategory = keyof KnowledgeSkills;
 
     export type KnowledgeSkills = {
         street: KnowledgeSkillList;
@@ -109,5 +113,10 @@ declare namespace Shadowrun {
 
     export type Modifiers = {
         [name: string]: number;
+    }
+
+    export type SkillEditFormData = BaseEntitySheetData & {
+        data?: SkillField;
+        editable_name?: boolean;
     }
 }
