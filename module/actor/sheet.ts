@@ -3,7 +3,6 @@ import { ChummerImportForm } from '../apps/chummer-import-form.js';
 import { SkillEditForm } from '../apps/skill-edit.js';
 import { KnowledgeSkillEditForm } from '../apps/knowledge-skill-edit.js';
 import { LanguageSkillEditForm } from '../apps/language-skill-edit.js';
-import Limits = Shadowrun.Limits;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import Skills = Shadowrun.Skills;
@@ -62,7 +61,7 @@ export class SR5ActorSheet extends ActorSheet {
      * The prepared data object contains both the actor data as well as additional sheet options
      */
     getData() {
-        const data: SR5ActorSheetData = super.getData() as unknown as SR5ActorSheetData;
+        const data: SR5ActorSheetData = (super.getData() as unknown) as SR5ActorSheetData;
 
         const attrs = data.data.attributes;
         for (let [label, att] of Object.entries(attrs)) {
@@ -74,7 +73,8 @@ export class SR5ActorSheet extends ActorSheet {
         const { matrix } = data.data;
         if (matrix.attack.mod['Temporary'] === 0) delete matrix.attack.mod['Temporary'];
         if (matrix.sleaze.mod['Temporary'] === 0) delete matrix.sleaze.mod['Temporary'];
-        if (matrix.data_processing.mod['Temporary'] === 0) delete matrix.data_processing.mod['Temporary'];
+        if (matrix.data_processing.mod['Temporary'] === 0)
+            delete matrix.data_processing.mod['Temporary'];
         if (matrix.firewall.mod['Temporary'] === 0) delete matrix.firewall.mod['Temporary'];
 
         const { magic } = data.data;
@@ -464,10 +464,11 @@ export class SR5ActorSheet extends ActorSheet {
             if (item.type === 'device') {
                 // turn off all other devices than the one that is being equipped
                 // if clicking the equipped, toggle it
-                for (let ite of this.actor.items.filter(i => i.type === 'device')) {
+                for (let ite of this.actor.items.filter((i) => i.type === 'device')) {
                     newItems.push({
                         _id: ite._id,
-                        'data.technology.equipped': ite._id === iid ? !itemData.technology.equipped : false,
+                        'data.technology.equipped':
+                            ite._id === iid ? !itemData.technology.equipped : false,
                     });
                 }
             } else {

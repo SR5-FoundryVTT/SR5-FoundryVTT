@@ -106,8 +106,9 @@ var SR5Actor = /*#__PURE__*/function (_Actor) {
               case 2:
                 // trigger update for all items with action
                 // needed for rolls to properly update when items or attributes update
-                itemUpdates = [];
-                _iterator = _createForOfIteratorHelper(this.data.data.items);
+                itemUpdates = []; // @ts-ignore
+
+                _iterator = _createForOfIteratorHelper(this.data.items);
 
                 try {
                   for (_iterator.s(); !(_step = _iterator.n()).done;) {
@@ -175,30 +176,31 @@ var SR5Actor = /*#__PURE__*/function (_Actor) {
       var _a, _b, _c;
 
       (0, _get2["default"])((0, _getPrototypeOf2["default"])(SR5Actor.prototype), "prepareData", this).call(this);
-      var actorData = this.data;
-      var items = actorData.data.items;
+      var actorData = this.data; // @ts-ignore
+
+      var items = actorData.items;
       var data = actorData.data;
-      var attrs = data.attributes;
+      var attributes = data.attributes;
       var armor = data.armor;
       var limits = data.limits;
       var language = data.skills.language;
       var active = data.skills.active;
-      var knowledgeSkills = data.knowledgeSkills;
+      var knowledge = data.skills.knowledge;
       var track = data.track;
-      attrs.magic.hidden = !(data.special === 'magic');
-      attrs.resonance.hidden = !(data.special === 'resonance');
+      attributes.magic.hidden = !(data.special === 'magic');
+      attributes.resonance.hidden = !(data.special === 'resonance');
       if (!data.modifiers) data.modifiers = {};
-      var mods = {};
-      var modifiers = ['soak', 'drain', 'armor', 'physical_limit', 'social_limit', 'mental_limit', 'stun_track', 'physical_track', 'initiative', 'initiative_dice', 'composure', 'lift_carry', 'judge_intentions', 'memory', 'walk', 'run', 'defense', 'wound_tolerance', 'essence', 'fade'];
-      modifiers.sort();
-      modifiers.unshift('global');
+      var modifiers = {};
+      var miscTabModifiers = ['soak', 'drain', 'armor', 'physical_limit', 'social_limit', 'mental_limit', 'stun_track', 'physical_track', 'initiative', 'initiative_dice', 'composure', 'lift_carry', 'judge_intentions', 'memory', 'walk', 'run', 'defense', 'wound_tolerance', 'essence', 'fade'];
+      miscTabModifiers.sort();
+      miscTabModifiers.unshift('global');
 
-      for (var _i = 0, _modifiers = modifiers; _i < _modifiers.length; _i++) {
-        var item = _modifiers[_i];
-        mods[item] = data.modifiers[item] || 0;
+      for (var _i = 0, _miscTabModifiers = miscTabModifiers; _i < _miscTabModifiers.length; _i++) {
+        var item = _miscTabModifiers[_i];
+        modifiers[item] = data.modifiers[item] || 0;
       }
 
-      data.modifiers = mods;
+      data.modifiers = modifiers;
       var totalEssence = 6;
       armor.value = 0;
       armor.mod = 0;
@@ -268,7 +270,7 @@ var SR5Actor = /*#__PURE__*/function (_Actor) {
       } // ATTRIBUTES
 
 
-      for (var _i6 = 0, _Object$entries2 = Object.entries(attrs); _i6 < _Object$entries2.length; _i6++) {
+      for (var _i6 = 0, _Object$entries2 = Object.entries(attributes); _i6 < _Object$entries2.length; _i6++) {
         var _Object$entries2$_i = (0, _slicedToArray2["default"])(_Object$entries2[_i6], 2),
             _att = _Object$entries2$_i[1];
 
@@ -310,7 +312,7 @@ var SR5Actor = /*#__PURE__*/function (_Actor) {
         _skill.value = _skill.base + _helpers.Helpers.totalMods(_skill.mod);
       }
 
-      for (var _i9 = 0, _Object$entries3 = Object.entries(knowledgeSkills); _i9 < _Object$entries3.length; _i9++) {
+      for (var _i9 = 0, _Object$entries3 = Object.entries(knowledge); _i9 < _Object$entries3.length; _i9++) {
         var _Object$entries3$_i = (0, _slicedToArray2["default"])(_Object$entries3[_i9], 2),
             group = _Object$entries3$_i[1];
 
@@ -339,11 +341,11 @@ var SR5Actor = /*#__PURE__*/function (_Actor) {
         // if value is equal to mod, we don't have an item equipped TODO this is horrible
         if (matrix.firewall.value === matrix.firewall.mod) {
           // we should use living persona
-          matrix.firewall.value += attrs.willpower.value;
-          matrix.data_processing.value += attrs.logic.value;
-          matrix.rating = attrs.resonance.value;
-          matrix.attack.value += attrs.charisma.value;
-          matrix.sleaze.value += attrs.intuition.value;
+          matrix.firewall.value += attributes.willpower.value;
+          matrix.data_processing.value += attributes.logic.value;
+          matrix.rating = attributes.resonance.value;
+          matrix.attack.value += attributes.charisma.value;
+          matrix.sleaze.value += attributes.intuition.value;
           matrix.name = 'Living Persona';
           matrix.device = '';
           matrix.condition_monitor.max = 0;
@@ -377,72 +379,72 @@ var SR5Actor = /*#__PURE__*/function (_Actor) {
         mod: matrix.sleaze.mod,
         hidden: true
       };
-      attrs.firewall = {
+      attributes.firewall = {
         value: matrix.firewall.value,
         base: matrix.firewall.base,
         mod: matrix.firewall.mod,
         hidden: true
       };
-      attrs.data_processing = {
+      attributes.data_processing = {
         value: matrix.data_processing.value,
         base: matrix.data_processing.base,
         mod: matrix.data_processing.mod,
         hidden: true
       };
-      attrs.attack = {
+      attributes.attack = {
         value: matrix.attack.value,
         base: matrix.attack.base,
         mod: matrix.attack.mod,
         hidden: true
       };
-      attrs.sleaze = {
+      attributes.sleaze = {
         value: matrix.sleaze.value,
         base: matrix.sleaze.base,
         mod: matrix.sleaze.mod,
         hidden: true
       }; // SET ARMOR
 
-      armor.value += armor.mod + mods['armor']; // SET ESSENCE
+      armor.value += armor.mod + modifiers['armor']; // SET ESSENCE
 
-      actorData.data.attributes.essence.value = +(totalEssence + mods['essence']).toFixed(3); // SETUP LIMITS
+      actorData.data.attributes.essence.value = +(totalEssence + modifiers['essence']).toFixed(3); // SETUP LIMITS
 
-      limits.physical.value = Math.ceil((2 * attrs.strength.value + attrs.body.value + attrs.reaction.value) / 3) + mods['physical_limit'];
-      limits.mental.value = Math.ceil((2 * attrs.logic.value + attrs.intuition.value + attrs.willpower.value) / 3) + mods['mental_limit'];
-      limits.social.value = Math.ceil((2 * attrs.charisma.value + attrs.willpower.value + attrs.essence.value) / 3) + mods['social_limit']; // MOVEMENT
+      limits.physical.value = Math.ceil((2 * attributes.strength.value + attributes.body.value + attributes.reaction.value) / 3) + modifiers['physical_limit'];
+      limits.mental.value = Math.ceil((2 * attributes.logic.value + attributes.intuition.value + attributes.willpower.value) / 3) + modifiers['mental_limit'];
+      limits.social.value = Math.ceil((2 * attributes.charisma.value + attributes.willpower.value + attributes.essence.value) / 3) + modifiers['social_limit']; // MOVEMENT
 
       var movement = data.movement;
-      movement.walk.value = attrs.agility.value * (2 + mods['walk']);
-      movement.run.value = attrs.agility.value * (4 + mods['run']); // CONDITION_MONITORS
+      movement.walk.value = attributes.agility.value * (2 + modifiers['walk']);
+      movement.run.value = attributes.agility.value * (4 + modifiers['run']); // CONDITION_MONITORS
 
-      track.physical.max = 8 + Math.ceil(attrs.body.value / 2) + mods['physical_track'];
-      track.physical.overflow.max = attrs.body.value;
-      track.stun.max = 8 + Math.ceil(attrs.willpower.value / 2) + mods['stun_track']; // CALCULATE RECOIL
+      track.physical.max = 8 + Math.ceil(attributes.body.value / 2) + modifiers['physical_track'];
+      track.physical.overflow.max = attributes.body.value;
+      track.stun.max = 8 + Math.ceil(attributes.willpower.value / 2) + modifiers['stun_track']; // CALCULATE RECOIL
 
-      data.recoil_compensation = 1 + Math.ceil(attrs.strength.value / 3); // INITIATIVE
+      data.recoil_compensation = 1 + Math.ceil(attributes.strength.value / 3); // INITIATIVE
 
       var init = data.initiative;
-      init.meatspace.base.base = attrs.intuition.value + attrs.reaction.value;
+      init.meatspace.base.base = attributes.intuition.value + attributes.reaction.value;
       init.meatspace.dice.base = 1;
-      init.astral.base.base = attrs.intuition.value * 2;
+      init.astral.base.base = attributes.intuition.value * 2;
       init.astral.dice.base = 2;
-      init.matrix.base.base = attrs.intuition.value + data.matrix.data_processing.value;
+      init.matrix.base.base = attributes.intuition.value + data.matrix.data_processing.value;
       init.matrix.dice.base = data.matrix.hot_sim ? 4 : 3;
       if (init.perception === 'matrix') init.current = init.matrix;else if (init.perception === 'astral') init.current = init.astral;else {
         init.current = init.meatspace;
         init.perception = 'meatspace';
       }
-      init.current.dice.value = init.current.dice.base + mods['initiative_dice'];
+      init.current.dice.value = init.current.dice.base + modifiers['initiative_dice'];
       if (init.edge) init.current.dice.value = 5;
       init.current.dice.value = Math.min(5, init.current.dice.value); // maximum of 5d6 for initiative
 
       init.current.dice.text = "".concat(init.current.dice.value, "d6");
-      init.current.base.value = init.current.base.base + mods['initiative'];
-      var soak = attrs.body.value + armor.value + mods['soak'];
-      var drainAtt = attrs[data.magic.attribute];
+      init.current.base.value = init.current.base.base + modifiers['initiative'];
+      var soak = attributes.body.value + armor.value + modifiers['soak'];
+      var drainAtt = attributes[data.magic.attribute];
       data.rolls = Object.assign(Object.assign({}, data.rolls), {
-        defense: attrs.reaction.value + attrs.intuition.value + mods['defense'],
-        drain: attrs.willpower.value + (drainAtt ? drainAtt.value : 0) + mods['drain'],
-        fade: attrs.willpower.value + attrs.resonance.value + mods['fade'],
+        defense: attributes.reaction.value + attributes.intuition.value + modifiers['defense'],
+        drain: attributes.willpower.value + (drainAtt ? drainAtt.value : 0) + modifiers['drain'],
+        fade: attributes.willpower.value + attributes.resonance.value + modifiers['fade'],
         soak: {
           "default": soak,
           cold: soak + armor.cold,
@@ -451,13 +453,13 @@ var SR5Actor = /*#__PURE__*/function (_Actor) {
           electricity: soak + armor.electricity,
           radiation: soak + armor.radiation
         },
-        composure: attrs.charisma.value + attrs.willpower.value + mods['composure'],
-        judge_intentions: attrs.charisma.value + attrs.intuition.value + mods['judge_intentions'],
-        lift_carry: attrs.strength.value + attrs.body.value + mods['lift_carry'],
-        memory: attrs.willpower.value + attrs.logic.value + mods['memory']
+        composure: attributes.charisma.value + attributes.willpower.value + modifiers['composure'],
+        judge_intentions: attributes.charisma.value + attributes.intuition.value + modifiers['judge_intentions'],
+        lift_carry: attributes.strength.value + attributes.body.value + modifiers['lift_carry'],
+        memory: attributes.willpower.value + attributes.logic.value + modifiers['memory']
       });
       {
-        var count = 3 + mods['wound_tolerance'];
+        var count = 3 + modifiers['wound_tolerance'];
         var stunWounds = Math.floor(data.track.stun.value / count);
         var physicalWounds = Math.floor(data.track.physical.value / count);
         data.track.stun.wounds = stunWounds;
@@ -485,7 +487,7 @@ var SR5Actor = /*#__PURE__*/function (_Actor) {
       } // attribute labels
 
 
-      for (var _i12 = 0, _Object$entries6 = Object.entries(attrs); _i12 < _Object$entries6.length; _i12++) {
+      for (var _i12 = 0, _Object$entries6 = Object.entries(attributes); _i12 < _Object$entries6.length; _i12++) {
         var _Object$entries6$_i = (0, _slicedToArray2["default"])(_Object$entries6[_i12], 2),
             a = _Object$entries6$_i[0],
             _att2 = _Object$entries6$_i[1];
@@ -501,6 +503,11 @@ var SR5Actor = /*#__PURE__*/function (_Actor) {
 
         tr.label = CONFIG.SR5.damageTypes[t];
       }
+    }
+  }, {
+    key: "getOwnedItem",
+    value: function getOwnedItem(itemId) {
+      return (0, _get2["default"])((0, _getPrototypeOf2["default"])(SR5Actor.prototype), "getOwnedItem", this).call(this, itemId);
     }
   }, {
     key: "addKnowledgeSkill",
@@ -1227,14 +1234,14 @@ var SR5Actor = /*#__PURE__*/function (_Actor) {
                       return _context9.abrupt("return");
 
                     case 2:
-                      newAtt = _helpers.Helpers.parseInputToNumber($(html).find('[name="attribute"]').val());
+                      newAtt = _helpers.Helpers.parseInputToString($(html).find('[name="attribute"]').val());
                       newLimit = _helpers.Helpers.parseInputToNumber($(html).find('[name="attribute.limit"]').val());
                       att = this.data.data.attributes[newAtt];
                       title += " + ".concat(game.i18n.localize(CONFIG.SR5.attributes[newAtt]));
                       limit = this.data.data.limits[newLimit];
                       parts[att.label] = att.value;
                       if (skill.value === 0) parts['SR5.Defaulting'] = -1;
-                      if (spec) parts['SR5.Specialization'] = 2; // let count = (skill.value > 0 ? skill.value : -1) + att.value;
+                      if (spec) parts['SR5.Specialization'] = 2;
 
                       this._addMatrixParts(parts, att);
 
@@ -1294,7 +1301,7 @@ var SR5Actor = /*#__PURE__*/function (_Actor) {
       var parts = {};
       parts[att.label] = att.value;
       var dialogData = {
-        attrribute: att,
+        attribute: att,
         attributes: atts
       };
       var cancel = true;
@@ -1394,13 +1401,13 @@ var SR5Actor = /*#__PURE__*/function (_Actor) {
               case 0:
                 title = roll.find('.flavor-text').text();
                 msg = game.messages.get(roll.data().messageId);
+                actor = msg.user.character;
 
-                if (!(msg && msg.data && msg.data.speaker && msg.data.speaker.actor)) {
+                if (!actor) {
                   _context11.next = 5;
                   break;
                 }
 
-                actor = game.actors.get(msg.data.speaker.actor);
                 return _context11.abrupt("return", _dice.DiceSR.rollTest({
                   event: {
                     shiftKey: true,
@@ -1448,13 +1455,13 @@ var SR5Actor = /*#__PURE__*/function (_Actor) {
                 }
 
                 msg = game.messages.get(roll.data().messageId);
+                actor = msg.user.character;
 
-                if (!(msg && msg.data && msg.data.speaker && msg.data.speaker.actor)) {
+                if (!actor) {
                   _context12.next = 16;
                   break;
                 }
 
-                actor = game.actors.get(msg.data.speaker.actor);
                 parts = {};
                 parts['SR5.OriginalDicePool'] = pool;
                 parts['SR5.Successes'] = -hits;
@@ -1551,8 +1558,8 @@ class SR5Actor extends Actor {
         attributes.resonance.hidden = !(data.special === 'resonance');
         if (!data.modifiers)
             data.modifiers = {};
-        const mods = {};
-        let modifiers = [
+        const modifiers = {};
+        let miscTabModifiers = [
             'soak',
             'drain',
             'armor',
@@ -1574,12 +1581,12 @@ class SR5Actor extends Actor {
             'essence',
             'fade',
         ];
-        modifiers.sort();
-        modifiers.unshift('global');
-        for (let item of modifiers) {
-            mods[item] = data.modifiers[item] || 0;
+        miscTabModifiers.sort();
+        miscTabModifiers.unshift('global');
+        for (let item of miscTabModifiers) {
+            modifiers[item] = data.modifiers[item] || 0;
         }
-        data.modifiers = mods;
+        data.modifiers = modifiers;
         let totalEssence = 6;
         armor.value = 0;
         armor.mod = 0;
@@ -1748,26 +1755,33 @@ class SR5Actor extends Actor {
             hidden: true,
         };
         // SET ARMOR
-        armor.value += armor.mod + mods['armor'];
+        armor.value += armor.mod + modifiers['armor'];
         // SET ESSENCE
-        actorData.data.attributes.essence.value = +(totalEssence + mods['essence']).toFixed(3);
+        actorData.data.attributes.essence.value = +(totalEssence + modifiers['essence']).toFixed(3);
         // SETUP LIMITS
         limits.physical.value =
-            Math.ceil((2 * attributes.strength.value + attributes.body.value + attributes.reaction.value) / 3) +
-                mods['physical_limit'];
+            Math.ceil((2 * attributes.strength.value +
+                attributes.body.value +
+                attributes.reaction.value) /
+                3) + modifiers['physical_limit'];
         limits.mental.value =
-            Math.ceil((2 * attributes.logic.value + attributes.intuition.value + attributes.willpower.value) / 3) +
-                mods['mental_limit'];
+            Math.ceil((2 * attributes.logic.value +
+                attributes.intuition.value +
+                attributes.willpower.value) /
+                3) + modifiers['mental_limit'];
         limits.social.value =
-            Math.ceil((2 * attributes.charisma.value + attributes.willpower.value + attributes.essence.value) / 3) + mods['social_limit'];
+            Math.ceil((2 * attributes.charisma.value +
+                attributes.willpower.value +
+                attributes.essence.value) /
+                3) + modifiers['social_limit'];
         // MOVEMENT
         const movement = data.movement;
-        movement.walk.value = attributes.agility.value * (2 + mods['walk']);
-        movement.run.value = attributes.agility.value * (4 + mods['run']);
+        movement.walk.value = attributes.agility.value * (2 + modifiers['walk']);
+        movement.run.value = attributes.agility.value * (4 + modifiers['run']);
         // CONDITION_MONITORS
-        track.physical.max = 8 + Math.ceil(attributes.body.value / 2) + mods['physical_track'];
+        track.physical.max = 8 + Math.ceil(attributes.body.value / 2) + modifiers['physical_track'];
         track.physical.overflow.max = attributes.body.value;
-        track.stun.max = 8 + Math.ceil(attributes.willpower.value / 2) + mods['stun_track'];
+        track.stun.max = 8 + Math.ceil(attributes.willpower.value / 2) + modifiers['stun_track'];
         // CALCULATE RECOIL
         data.recoil_compensation = 1 + Math.ceil(attributes.strength.value / 3);
         // INITIATIVE
@@ -1786,24 +1800,26 @@ class SR5Actor extends Actor {
             init.current = init.meatspace;
             init.perception = 'meatspace';
         }
-        init.current.dice.value = init.current.dice.base + mods['initiative_dice'];
+        init.current.dice.value = init.current.dice.base + modifiers['initiative_dice'];
         if (init.edge)
             init.current.dice.value = 5;
         init.current.dice.value = Math.min(5, init.current.dice.value); // maximum of 5d6 for initiative
         init.current.dice.text = `${init.current.dice.value}d6`;
-        init.current.base.value = init.current.base.base + mods['initiative'];
-        const soak = attributes.body.value + armor.value + mods['soak'];
+        init.current.base.value = init.current.base.base + modifiers['initiative'];
+        const soak = attributes.body.value + armor.value + modifiers['soak'];
         const drainAtt = attributes[data.magic.attribute];
-        data.rolls = Object.assign(Object.assign({}, data.rolls), { defense: attributes.reaction.value + attributes.intuition.value + mods['defense'], drain: attributes.willpower.value + (drainAtt ? drainAtt.value : 0) + mods['drain'], fade: attributes.willpower.value + attributes.resonance.value + mods['fade'], soak: {
+        data.rolls = Object.assign(Object.assign({}, data.rolls), { defense: attributes.reaction.value + attributes.intuition.value + modifiers['defense'], drain: attributes.willpower.value + (drainAtt ? drainAtt.value : 0) + modifiers['drain'], fade: attributes.willpower.value + attributes.resonance.value + modifiers['fade'], soak: {
                 default: soak,
                 cold: soak + armor.cold,
                 fire: soak + armor.fire,
                 acid: soak + armor.acid,
                 electricity: soak + armor.electricity,
                 radiation: soak + armor.radiation,
-            }, composure: attributes.charisma.value + attributes.willpower.value + mods['composure'], judge_intentions: attributes.charisma.value + attributes.intuition.value + mods['judge_intentions'], lift_carry: attributes.strength.value + attributes.body.value + mods['lift_carry'], memory: attributes.willpower.value + attributes.logic.value + mods['memory'] });
+            }, composure: attributes.charisma.value + attributes.willpower.value + modifiers['composure'], judge_intentions: attributes.charisma.value +
+                attributes.intuition.value +
+                modifiers['judge_intentions'], lift_carry: attributes.strength.value + attributes.body.value + modifiers['lift_carry'], memory: attributes.willpower.value + attributes.logic.value + modifiers['memory'] });
         {
-            const count = 3 + mods['wound_tolerance'];
+            const count = 3 + modifiers['wound_tolerance'];
             const stunWounds = Math.floor(data.track.stun.value / count);
             const physicalWounds = Math.floor(data.track.physical.value / count);
             data.track.stun.wounds = stunWounds;
@@ -2503,1325 +2519,652 @@ exports.SR5Actor = SR5Actor;
 
 },{"../dice.js":14,"../helpers.js":16}],3:[function(require,module,exports){
 "use strict";
-
-var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ActorSheet = void 0;
-
-var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
-
-var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
-
-var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/slicedToArray"));
-
-var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
-
-var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
-
-var _get3 = _interopRequireDefault(require("@babel/runtime/helpers/get"));
-
-var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
-
-var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
-
-var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
-
-var _helpers = require("../helpers.js");
-
-var _chummerImportForm = require("../apps/chummer-import-form.js");
-
-var _skillEdit = require("../apps/skill-edit.js");
-
-var _knowledgeSkillEdit = require("../apps/knowledge-skill-edit.js");
-
-var _languageSkillEdit = require("../apps/language-skill-edit.js");
-
-function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
-
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
-
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
-
+const helpers_js_1 = require("../helpers.js");
+const chummer_import_form_js_1 = require("../apps/chummer-import-form.js");
+const skill_edit_js_1 = require("../apps/skill-edit.js");
+const knowledge_skill_edit_js_1 = require("../apps/knowledge-skill-edit.js");
+const language_skill_edit_js_1 = require("../apps/language-skill-edit.js");
 /**
  * Extend the basic ActorSheet with some very simple modifications
  */
-var SR5ActorSheet = /*#__PURE__*/function (_ActorSheet) {
-  (0, _inherits2["default"])(SR5ActorSheet, _ActorSheet);
-
-  var _super = _createSuper(SR5ActorSheet);
-
-  function SR5ActorSheet() {
-    var _this;
-
-    (0, _classCallCheck2["default"])(this, SR5ActorSheet);
-
-    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
+class SR5ActorSheet extends ActorSheet {
+    constructor(...args) {
+        super(...args);
+        /**
+         * Keep track of the currently active sheet tab
+         * @type {string}
+         */
+        this._shownUntrainedSkills = true;
+        this._shownDesc = [];
+        this._filters = {
+            skills: '',
+        };
     }
-
-    _this = _super.call.apply(_super, [this].concat(args));
-    /**
-     * Keep track of the currently active sheet tab
-     * @type {string}
-     */
-
-    _this._shownUntrainedSkills = true;
-    _this._shownDesc = [];
-    _this._filters = {
-      skills: ''
-    };
-    return _this;
-  }
-  /* -------------------------------------------- */
-
-  /**
-   * Extend and override the default options used by the 5e Actor Sheet
-   * @returns {Object}
-   */
-
-
-  (0, _createClass2["default"])(SR5ActorSheet, [{
-    key: "getData",
-
     /* -------------------------------------------- */
-
+    /**
+     * Extend and override the default options used by the 5e Actor Sheet
+     * @returns {Object}
+     */
+    static get defaultOptions() {
+        return mergeObject(super.defaultOptions, {
+            classes: ['sr5', 'sheet', 'actor'],
+            template: 'systems/shadowrun5e/templates/actor/character.html',
+            width: 880,
+            height: 690,
+            tabs: [
+                {
+                    navSelector: '.tabs',
+                    contentSelector: '.sheetbody',
+                    initial: 'skills',
+                },
+            ],
+        });
+    }
+    /* -------------------------------------------- */
     /**
      * Prepare data for rendering the Actor sheet
      * The prepared data object contains both the actor data as well as additional sheet options
      */
-    value: function getData() {
-      var data = (0, _get3["default"])((0, _getPrototypeOf2["default"])(SR5ActorSheet.prototype), "getData", this).call(this); // do some calculations
-
-      var limits = data.data.limits;
-      if (limits.physical.mod === 0) delete limits.physical.mod;
-      if (limits.social.mod === 0) delete limits.social.mod;
-      if (limits.mental.mod === 0) delete limits.mental.mod;
-      var movement = data.data.movement;
-      if (movement.walk.mult === 1 || movement.walk.mult === 0) delete movement.walk.mult;
-      if (movement.run.mult === 2 || movement.run.mult === 0) delete movement.run.mult;
-      var track = data.data.track;
-      if (track.physical.mod === 0) delete track.physical.mod;
-      if (track.stun && track.stun.mod === 0) delete track.stun.mod;
-      var attrs = data.data.attributes;
-
-      for (var _i = 0, _Object$entries = Object.entries(attrs); _i < _Object$entries.length; _i++) {
-        var _Object$entries$_i = (0, _slicedToArray2["default"])(_Object$entries[_i], 2),
-            label = _Object$entries$_i[0],
-            att = _Object$entries$_i[1];
-
-        if (!att.hidden) {
-          if (att.mod === 0) delete att.mod;
+    getData() {
+        const data = super.getData();
+        const attrs = data.data.attributes;
+        for (let [label, att] of Object.entries(attrs)) {
+            if (!att.hidden) {
+                if (att.mod['Temporary'] === 0)
+                    delete att.mod;
+            }
         }
-      }
-
-      var matrix = data.data.matrix;
-      if (matrix.attack.mod === 0) delete matrix.attack.mod;
-      if (matrix.sleaze.mod === 0) delete matrix.sleaze.mod;
-      if (matrix.data_processing.mod === 0) delete matrix.data_processing.mod;
-      if (matrix.firewall.mod === 0) delete matrix.firewall.mod;
-      var magic = data.data.magic;
-      if (magic.drain && magic.drain.mod === 0) delete magic.drain.mod;
-      var mods = data.data.modifiers;
-
-      for (var _i2 = 0, _Object$entries2 = Object.entries(mods); _i2 < _Object$entries2.length; _i2++) {
-        var _Object$entries2$_i = (0, _slicedToArray2["default"])(_Object$entries2[_i2], 2),
-            key = _Object$entries2$_i[0],
-            value = _Object$entries2$_i[1];
-
-        if (value === 0) mods[key] = '';
-      }
-
-      this._prepareItems(data);
-
-      this._prepareSkills(data);
-
-      data.config = CONFIG.SR5;
-      data.awakened = data.data.special === 'magic';
-      data.emerged = data.data.special === 'resonance';
-      data.filters = this._filters;
-      return data;
-    }
-  }, {
-    key: "_isSkillMagic",
-    value: function _isSkillMagic(id, skill) {
-      return skill.attribute === 'magic' || id === 'astral_combat' || id === 'assensing';
-    }
-  }, {
-    key: "_doesSkillContainText",
-    value: function _doesSkillContainText(key, skill, text) {
-      var _skill$specs;
-
-      var searchString = "".concat(key, " ").concat(game.i18n.localize(skill.label), " ").concat(skill === null || skill === void 0 ? void 0 : (_skill$specs = skill.specs) === null || _skill$specs === void 0 ? void 0 : _skill$specs.join(' '));
-      return searchString.toLowerCase().search(text.toLowerCase()) > -1;
-    }
-  }, {
-    key: "_prepareSkills",
-    value: function _prepareSkills(data) {
-      var activeSkills = {};
-
-      for (var _i3 = 0, _Object$entries3 = Object.entries(data.data.skills.active); _i3 < _Object$entries3.length; _i3++) {
-        var _Object$entries3$_i = (0, _slicedToArray2["default"])(_Object$entries3[_i3], 2),
-            key = _Object$entries3$_i[0],
-            skill = _Object$entries3$_i[1];
-
-        // if filter isn't empty, we are doing custom filtering
-        if (this._filters.skills !== '') {
-          if (this._doesSkillContainText(key, skill, this._filters.skills)) {
-            activeSkills[key] = skill;
-          } // general check if we aren't filtering
-
-        } else if ((skill.value > 0 || this._shownUntrainedSkills) && !(this._isSkillMagic(key, skill) && data.data.special !== 'magic') && !(skill.attribute === 'resonance' && data.data.special !== 'resonance')) {
-          activeSkills[key] = skill;
+        const { matrix } = data.data;
+        if (matrix.attack.mod['Temporary'] === 0)
+            delete matrix.attack.mod['Temporary'];
+        if (matrix.sleaze.mod['Temporary'] === 0)
+            delete matrix.sleaze.mod['Temporary'];
+        if (matrix.data_processing.mod['Temporary'] === 0)
+            delete matrix.data_processing.mod['Temporary'];
+        if (matrix.firewall.mod['Temporary'] === 0)
+            delete matrix.firewall.mod['Temporary'];
+        const { magic } = data.data;
+        if (magic.drain && magic.drain.mod['Temporary'] === 0)
+            delete magic.drain.mod['Temporary'];
+        const { modifiers: mods } = data.data;
+        for (let [key, value] of Object.entries(mods)) {
+            if (value === 0)
+                delete mods[key];
         }
-      }
-
-      _helpers.Helpers.orderKeys(activeSkills);
-
-      data.data.skills.active = activeSkills;
+        this._prepareItems(data);
+        this._prepareSkills(data);
+        data['config'] = CONFIG.SR5;
+        data['awakened'] = data.data.special === 'magic';
+        data['emerged'] = data.data.special === 'resonance';
+        data.filters = this._filters;
+        return data;
     }
-  }, {
-    key: "_prepareItems",
-    value: function _prepareItems(data) {
-      var inventory = {
-        weapon: {
-          label: game.i18n.localize('weapon'),
-          items: [],
-          dataset: {
-            type: 'weapon'
-          }
-        },
-        armor: {
-          label: game.i18n.localize('armor'),
-          items: [],
-          dataset: {
-            type: 'armor'
-          }
-        },
-        device: {
-          label: game.i18n.localize('device'),
-          items: [],
-          dataset: {
-            type: 'device'
-          }
-        },
-        equipment: {
-          label: game.i18n.localize('equipment'),
-          items: [],
-          dataset: {
-            type: 'equipment'
-          }
-        },
-        cyberware: {
-          label: game.i18n.localize('cyberware'),
-          items: [],
-          dataset: {
-            type: 'cyberware'
-          }
+    _isSkillMagic(id, skill) {
+        return skill.attribute === 'magic' || id === 'astral_combat' || id === 'assensing';
+    }
+    _doesSkillContainText(key, skill, text) {
+        var _a;
+        let searchString = `${key} ${game.i18n.localize(skill.label)} ${(_a = skill === null || skill === void 0 ? void 0 : skill.specs) === null || _a === void 0 ? void 0 : _a.join(' ')}`;
+        return searchString.toLowerCase().search(text.toLowerCase()) > -1;
+    }
+    _prepareSkills(data) {
+        const activeSkills = {};
+        const oldSkills = data.data.skills.active;
+        for (let [key, skill] of Object.entries(oldSkills)) {
+            // if filter isn't empty, we are doing custom filtering
+            if (this._filters.skills !== '') {
+                if (this._doesSkillContainText(key, skill, this._filters.skills)) {
+                    activeSkills[key] = skill;
+                }
+                // general check if we aren't filtering
+            }
+            else if ((skill.value > 0 || this._shownUntrainedSkills) &&
+                !(this._isSkillMagic(key, skill) && data.data.special !== 'magic') &&
+                !(skill.attribute === 'resonance' && data.data.special !== 'resonance')) {
+                activeSkills[key] = skill;
+            }
         }
-      };
-      var spellbook = {
-        combat: {
-          label: 'Combat',
-          items: [],
-          dataset: {
-            type: 'combat'
-          }
-        },
-        detection: {
-          label: 'Detection',
-          items: [],
-          dataset: {
-            type: 'detection'
-          }
-        },
-        health: {
-          label: 'Health',
-          items: [],
-          dataset: {
-            type: 'health'
-          }
-        },
-        illusion: {
-          label: 'Illusion',
-          items: [],
-          dataset: {
-            type: 'illusion'
-          }
-        },
-        manipulation: {
-          label: 'Manipulation',
-          items: [],
-          dataset: {
-            type: 'manipulation'
-          }
-        }
-      };
-
-      var _data$items$reduce = data.items.reduce(function (arr, item) {
-        item.img = item.img || DEFAULT_TOKEN;
-        item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
-        if (item.type === 'spell') arr[1].push(item);else if (item.type === 'quality') arr[2].push(item);else if (item.type === 'adept_power') arr[3].push(item);else if (item.type === 'critter_power') arr[4].push(item);else if (item.type === 'action') arr[5].push(item);else if (item.type === 'complex_form') arr[6].push(item);else if (item.type === 'lifestyle') arr[7].push(item);else if (item.type === 'contact') arr[8].push(item);else if (item.type === 'sin') arr[9].push(item);else if (Object.keys(inventory).includes(item.type)) arr[0].push(item);
-        return arr;
-      }, [[], [], [], [], [], [], [], [], [], []]),
-          _data$items$reduce2 = (0, _slicedToArray2["default"])(_data$items$reduce, 10),
-          items = _data$items$reduce2[0],
-          spells = _data$items$reduce2[1],
-          qualities = _data$items$reduce2[2],
-          adept_powers = _data$items$reduce2[3],
-          critter_powers = _data$items$reduce2[4],
-          actions = _data$items$reduce2[5],
-          complex_forms = _data$items$reduce2[6],
-          lifestyles = _data$items$reduce2[7],
-          contacts = _data$items$reduce2[8],
-          sins = _data$items$reduce2[9];
-
-      var sortByName = function sortByName(i1, i2) {
-        if (i1.name > i2.name) return 1;
-        if (i1.name < i2.name) return -1;
-        return 0;
-      };
-
-      actions.sort(sortByName);
-      adept_powers.sort(sortByName);
-      complex_forms.sort(sortByName);
-      items.sort(sortByName);
-      spells.sort(sortByName);
-      complex_forms.sort(sortByName);
-      contacts.sort(sortByName);
-      lifestyles.sort(sortByName);
-      sins.sort(sortByName);
-      items.forEach(function (item) {
-        inventory[item.type].items.push(item);
-      });
-      data.inventory = Object.values(inventory);
-      data.magic = {
-        spellbook: spells,
-        powers: adept_powers
-      };
-      data.actions = actions;
-      data.complex_forms = complex_forms;
-      data.lifestyles = lifestyles;
-      data.contacts = contacts;
-      data.sins = sins;
-      qualities.sort(function (a, b) {
-        if (a.data.type === 'positive' && b.data.type === 'negative') return -1;
-        if (a.data.type === 'negative' && b.data.type === 'positive') return 1;
-        return a.name < b.name ? -1 : 1;
-      });
-      data.qualities = qualities;
+        helpers_js_1.Helpers.orderKeys(activeSkills);
+        data.data.skills.active = activeSkills;
+    }
+    _prepareItems(data) {
+        const inventory = {
+            weapon: {
+                label: game.i18n.localize('weapon'),
+                items: [],
+                dataset: {
+                    type: 'weapon',
+                },
+            },
+            armor: {
+                label: game.i18n.localize('armor'),
+                items: [],
+                dataset: {
+                    type: 'armor',
+                },
+            },
+            device: {
+                label: game.i18n.localize('device'),
+                items: [],
+                dataset: {
+                    type: 'device',
+                },
+            },
+            equipment: {
+                label: game.i18n.localize('equipment'),
+                items: [],
+                dataset: {
+                    type: 'equipment',
+                },
+            },
+            cyberware: {
+                label: game.i18n.localize('cyberware'),
+                items: [],
+                dataset: {
+                    type: 'cyberware',
+                },
+            },
+        };
+        const spellbook = {
+            combat: {
+                label: 'Combat',
+                items: [],
+                dataset: {
+                    type: 'combat',
+                },
+            },
+            detection: {
+                label: 'Detection',
+                items: [],
+                dataset: {
+                    type: 'detection',
+                },
+            },
+            health: {
+                label: 'Health',
+                items: [],
+                dataset: {
+                    type: 'health',
+                },
+            },
+            illusion: {
+                label: 'Illusion',
+                items: [],
+                dataset: {
+                    type: 'illusion',
+                },
+            },
+            manipulation: {
+                label: 'Manipulation',
+                items: [],
+                dataset: {
+                    type: 'manipulation',
+                },
+            },
+        };
+        let [items, spells, qualities, adept_powers, critter_powers, actions, complex_forms, lifestyles, contacts, sins,] = data.items.reduce((arr, item) => {
+            item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
+            if (item.type === 'spell')
+                arr[1].push(item);
+            else if (item.type === 'quality')
+                arr[2].push(item);
+            else if (item.type === 'adept_power')
+                arr[3].push(item);
+            else if (item.type === 'critter_power')
+                arr[4].push(item);
+            else if (item.type === 'action')
+                arr[5].push(item);
+            else if (item.type === 'complex_form')
+                arr[6].push(item);
+            else if (item.type === 'lifestyle')
+                arr[7].push(item);
+            else if (item.type === 'contact')
+                arr[8].push(item);
+            else if (item.type === 'sin')
+                arr[9].push(item);
+            else if (Object.keys(inventory).includes(item.type))
+                arr[0].push(item);
+            return arr;
+        }, [[], [], [], [], [], [], [], [], [], []]);
+        const sortByName = (i1, i2) => {
+            if (i1.name > i2.name)
+                return 1;
+            if (i1.name < i2.name)
+                return -1;
+            return 0;
+        };
+        actions.sort(sortByName);
+        adept_powers.sort(sortByName);
+        complex_forms.sort(sortByName);
+        items.sort(sortByName);
+        spells.sort(sortByName);
+        complex_forms.sort(sortByName);
+        contacts.sort(sortByName);
+        lifestyles.sort(sortByName);
+        sins.sort(sortByName);
+        items.forEach((item) => {
+            inventory[item.type].items.push(item);
+        });
+        data.inventory = Object.values(inventory);
+        data.magic = {
+            spellbook: spells,
+            powers: adept_powers,
+        };
+        data.actions = actions;
+        data.complex_forms = complex_forms;
+        data.lifestyles = lifestyles;
+        data.contacts = contacts;
+        data.sins = sins;
+        qualities.sort((a, b) => {
+            if (a.data.type === 'positive' && b.data.type === 'negative')
+                return -1;
+            if (a.data.type === 'negative' && b.data.type === 'positive')
+                return 1;
+            return a.name < b.name ? -1 : 1;
+        });
+        data.qualities = qualities;
     }
     /* -------------------------------------------- */
-
     /**
      * Activate event listeners using the prepared sheet HTML
      * @param html {HTML}   The prepared HTML object ready to be rendered into the DOM
      */
-
-  }, {
-    key: "activateListeners",
-    value: function activateListeners(html) {
-      var _this2 = this;
-
-      (0, _get3["default"])((0, _getPrototypeOf2["default"])(SR5ActorSheet.prototype), "activateListeners", this).call(this, html);
-      html.find('.hidden').hide();
-      html.find('.skill-header').click(function (event) {
-        event.preventDefault();
-        _this2._shownUntrainedSkills = !_this2._shownUntrainedSkills;
-
-        _this2._render(true);
-      });
-      html.find('.has-desc').click(function (event) {
-        event.preventDefault();
-        var item = $(event.currentTarget).parents('.item');
-        var iid = $(item).data().item;
-        var field = item.next();
-        field.toggle();
-
-        if (iid) {
-          if (field.is(':visible')) _this2._shownDesc.push(iid);else _this2._shownDesc = _this2._shownDesc.filter(function (val) {
-            return val !== iid;
-          });
-        }
-      });
-      html.find('#filter-skills').on('input', this._onFilterSkills.bind(this));
-      html.find('.track-roll').click(this._onRollTrack.bind(this));
-      html.find('.attribute-roll').click(this._onRollAttribute.bind(this));
-      html.find('.skill-roll').click(this._onRollActiveSkill.bind(this));
-      html.find('.defense-roll').click(this._onRollDefense.bind(this));
-      html.find('.attribute-only-roll').click(this._onRollAttributesOnly.bind(this));
-      html.find('.soak-roll').click(this._onRollSoak.bind(this));
-      html.find('.drain-roll').click(this._onRollDrain.bind(this));
-      html.find('.fade-roll').click(this._onRollFade.bind(this));
-      html.find('.item-roll').click(this._onRollItem.bind(this));
-      html.find('.item-equip-toggle').click(this._onEquipItem.bind(this));
-      html.find('.item-qty').change(this._onChangeQty.bind(this));
-      html.find('.item-rtg').change(this._onChangeRtg.bind(this));
-      html.find('.item-create').click(this._onItemCreate.bind(this));
-      html.find('.matrix-roll').click(this._onRollMatrixAttribute.bind(this));
-      html.find('.basic-roll').click(this._onRollPrompt.bind(this));
-      html.find('.armor-roll').click(this._onRollArmor.bind(this));
-      html.find('.add-knowledge').click(this._onAddKnowledgeSkill.bind(this));
-      html.find('.knowledge-skill').click(this._onRollKnowledgeSkill.bind(this));
-      html.find('.remove-knowledge').click(this._onRemoveKnowledgeSkill.bind(this));
-      html.find('.add-language').click(this._onAddLanguageSkill.bind(this));
-      html.find('.language-skill').click(this._onRollLanguageSkill.bind(this));
-      html.find('.remove-language').click(this._onRemoveLanguageSkill.bind(this));
-      html.find('.import-character').click(this._onShowImportCharacter.bind(this));
-      html.find('.reload-ammo').click(this._onReloadAmmo.bind(this));
-      html.find('.skill-edit').click(this._onShowEditSkill.bind(this));
-      html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
-      html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
-      html.find('.matrix-att-selector').change( /*#__PURE__*/function () {
-        var _ref = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(event) {
-          var iid, item, att, deviceAtt, oldVal, data, i, tmp, key;
-          return _regenerator["default"].wrap(function _callee$(_context) {
-            while (1) {
-              switch (_context.prev = _context.next) {
-                case 0:
-                  iid = _this2.actor.data.data.matrix.device;
-                  item = _this2.actor.getOwnedItem(iid);
-                  if (!item) console.error('could not find item'); // grab matrix attribute (sleaze, attack, etc.)
-
-                  att = event.currentTarget.dataset.att; // grab device attribute (att1, att2, ...)
-
-                  deviceAtt = event.currentTarget.value; // get current matrix attribute on the device
-
-                  oldVal = item.data.data.atts[deviceAtt].att;
-                  data = {
-                    _id: iid
-                  }; // go through atts on device, setup matrix attributes on it
-
-                  for (i = 1; i <= 4; i++) {
-                    tmp = "att".concat(i);
-                    key = "data.atts.att".concat(i, ".att");
-
-                    if (tmp === deviceAtt) {
-                      data[key] = att;
-                    } else if (item.data.data.atts["att".concat(i)].att === att) {
-                      data[key] = oldVal;
-                    }
-                  }
-
-                  _context.next = 10;
-                  return _this2.actor.updateOwnedItem(data);
-
-                case 10:
-                case "end":
-                  return _context.stop();
-              }
-            }
-          }, _callee);
-        }));
-
-        return function (_x) {
-          return _ref.apply(this, arguments);
-        };
-      }()); // Update Inventory Item
-
-      html.find('.item-edit').click(function (event) {
-        event.preventDefault();
-        var iid = event.currentTarget.closest('.item').dataset.itemId;
-
-        var item = _this2.actor.getOwnedItem(iid);
-
-        item.sheet.render(true);
-      }); // Delete Inventory Item
-
-      html.find('.item-delete').click(function (event) {
-        event.preventDefault();
-        var iid = event.currentTarget.closest('.item').dataset.itemId;
-        var el = $(event.currentTarget).parents('.item');
-
-        _this2.actor.deleteOwnedItem(iid);
-
-        el.slideUp(200, function () {
-          return _this2.render(false);
+    activateListeners(html) {
+        super.activateListeners(html);
+        html.find('.hidden').hide();
+        html.find('.skill-header').click((event) => {
+            event.preventDefault();
+            this._shownUntrainedSkills = !this._shownUntrainedSkills;
+            this._render(true);
         });
-      }); // Drag inventory item
-
-      var handler = function handler(ev) {
-        return _this2._onDragItemStart(ev);
-      };
-
-      html.find('.item').each(function (i, item) {
-        if (item.dataset && item.dataset.itemId) {
-          item.setAttribute('draggable', true);
-          item.addEventListener('dragstart', handler, false);
-        }
-      });
+        html.find('.has-desc').click((event) => {
+            event.preventDefault();
+            const item = $(event.currentTarget).parents('.item');
+            const iid = $(item).data().item;
+            const field = item.next();
+            field.toggle();
+            if (iid) {
+                if (field.is(':visible'))
+                    this._shownDesc.push(iid);
+                else
+                    this._shownDesc = this._shownDesc.filter((val) => val !== iid);
+            }
+        });
+        html.find('#filter-skills').on('input', this._onFilterSkills.bind(this));
+        html.find('.track-roll').click(this._onRollTrack.bind(this));
+        html.find('.attribute-roll').click(this._onRollAttribute.bind(this));
+        html.find('.skill-roll').click(this._onRollActiveSkill.bind(this));
+        html.find('.defense-roll').click(this._onRollDefense.bind(this));
+        html.find('.attribute-only-roll').click(this._onRollAttributesOnly.bind(this));
+        html.find('.soak-roll').click(this._onRollSoak.bind(this));
+        html.find('.drain-roll').click(this._onRollDrain.bind(this));
+        html.find('.fade-roll').click(this._onRollFade.bind(this));
+        html.find('.item-roll').click(this._onRollItem.bind(this));
+        html.find('.item-equip-toggle').click(this._onEquipItem.bind(this));
+        html.find('.item-qty').change(this._onChangeQty.bind(this));
+        html.find('.item-rtg').change(this._onChangeRtg.bind(this));
+        html.find('.item-create').click(this._onItemCreate.bind(this));
+        html.find('.matrix-roll').click(this._onRollMatrixAttribute.bind(this));
+        html.find('.basic-roll').click(this._onRollPrompt.bind(this));
+        html.find('.armor-roll').click(this._onRollArmor.bind(this));
+        html.find('.add-knowledge').click(this._onAddKnowledgeSkill.bind(this));
+        html.find('.knowledge-skill').click(this._onRollKnowledgeSkill.bind(this));
+        html.find('.remove-knowledge').click(this._onRemoveKnowledgeSkill.bind(this));
+        html.find('.add-language').click(this._onAddLanguageSkill.bind(this));
+        html.find('.language-skill').click(this._onRollLanguageSkill.bind(this));
+        html.find('.remove-language').click(this._onRemoveLanguageSkill.bind(this));
+        html.find('.import-character').click(this._onShowImportCharacter.bind(this));
+        html.find('.reload-ammo').click(this._onReloadAmmo.bind(this));
+        html.find('.skill-edit').click(this._onShowEditSkill.bind(this));
+        html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
+        html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
+        html.find('.matrix-att-selector').change(this._onMatrixAttributeSelected.bind(this));
+        // Update Inventory Item
+        html.find('.item-edit').click((event) => {
+            event.preventDefault();
+            const iid = event.currentTarget.closest('.item').dataset.itemId;
+            const item = this.actor.getOwnedItem(iid);
+            if (item)
+                item.sheet.render(true);
+        });
+        // Delete Inventory Item
+        html.find('.item-delete').click((event) => {
+            event.preventDefault();
+            const iid = event.currentTarget.closest('.item').dataset.itemId;
+            const el = $(event.currentTarget).parents('.item');
+            this.actor.deleteOwnedItem(iid);
+            el.slideUp(200, () => this.render(false));
+        });
+        // Drag inventory item
+        let handler = (ev) => this._onDragItemStart(ev);
+        html.find('.item').each((i, item) => {
+            if (item.dataset && item.dataset.itemId) {
+                item.setAttribute('draggable', true);
+                item.addEventListener('dragstart', handler, false);
+            }
+        });
     }
-  }, {
-    key: "_onFilterSkills",
-    value: function () {
-      var _onFilterSkills2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee2(event) {
-        return _regenerator["default"].wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                this._filters.skills = event.currentTarget.value;
-                this.render();
-
-              case 2:
-              case "end":
-                return _context2.stop();
-            }
-          }
-        }, _callee2, this);
-      }));
-
-      function _onFilterSkills(_x2) {
-        return _onFilterSkills2.apply(this, arguments);
-      }
-
-      return _onFilterSkills;
-    }()
-  }, {
-    key: "_onReloadAmmo",
-    value: function () {
-      var _onReloadAmmo2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee3(event) {
-        var iid, item;
-        return _regenerator["default"].wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-                event.preventDefault();
-                iid = event.currentTarget.closest('.item').dataset.itemId;
-                item = this.actor.getOwnedItem(iid);
-
-                if (!item) {
-                  _context3.next = 5;
-                  break;
-                }
-
-                return _context3.abrupt("return", item.reloadAmmo());
-
-              case 5:
-              case "end":
-                return _context3.stop();
-            }
-          }
-        }, _callee3, this);
-      }));
-
-      function _onReloadAmmo(_x3) {
-        return _onReloadAmmo2.apply(this, arguments);
-      }
-
-      return _onReloadAmmo;
-    }()
-  }, {
-    key: "_onItemCreate",
-    value: function _onItemCreate(event) {
-      event.preventDefault();
-      var header = event.currentTarget;
-      var type = header.dataset.type;
-      var itemData = {
-        name: "New ".concat(_helpers.Helpers.label(type)),
-        type: type,
-        data: duplicate(header.dataset)
-      };
-      delete itemData.data['type'];
-      return this.actor.createOwnedItem(itemData);
+    _onFilterSkills(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this._filters.skills = event.currentTarget.value;
+            this.render();
+        });
     }
-  }, {
-    key: "_onAddLanguageSkill",
-    value: function () {
-      var _onAddLanguageSkill2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee4(event) {
-        return _regenerator["default"].wrap(function _callee4$(_context4) {
-          while (1) {
-            switch (_context4.prev = _context4.next) {
-              case 0:
-                event.preventDefault();
-                this.actor.addLanguageSkill({
-                  name: ''
-                });
-
-              case 2:
-              case "end":
-                return _context4.stop();
+    _onReloadAmmo(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const iid = event.currentTarget.closest('.item').dataset.itemId;
+            const item = this.actor.getOwnedItem(iid);
+            if (item)
+                return item.reloadAmmo();
+        });
+    }
+    _onMatrixAttributeSelected(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let iid = this.actor.data.data.matrix.device;
+            let item = this.actor.getOwnedItem(iid);
+            if (!item) {
+                console.error('could not find item');
+                return;
             }
-          }
-        }, _callee4, this);
-      }));
-
-      function _onAddLanguageSkill(_x4) {
-        return _onAddLanguageSkill2.apply(this, arguments);
-      }
-
-      return _onAddLanguageSkill;
-    }()
-  }, {
-    key: "_onRemoveLanguageSkill",
-    value: function () {
-      var _onRemoveLanguageSkill2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee5(event) {
-        var skillId;
-        return _regenerator["default"].wrap(function _callee5$(_context5) {
-          while (1) {
-            switch (_context5.prev = _context5.next) {
-              case 0:
-                event.preventDefault();
-                skillId = event.currentTarget.dataset.skill;
-                this.actor.removeLanguageSkill(skillId);
-
-              case 3:
-              case "end":
-                return _context5.stop();
-            }
-          }
-        }, _callee5, this);
-      }));
-
-      function _onRemoveLanguageSkill(_x5) {
-        return _onRemoveLanguageSkill2.apply(this, arguments);
-      }
-
-      return _onRemoveLanguageSkill;
-    }()
-  }, {
-    key: "_onAddKnowledgeSkill",
-    value: function () {
-      var _onAddKnowledgeSkill2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee6(event) {
-        var category;
-        return _regenerator["default"].wrap(function _callee6$(_context6) {
-          while (1) {
-            switch (_context6.prev = _context6.next) {
-              case 0:
-                event.preventDefault();
-                category = event.currentTarget.dataset.category;
-                this.actor.addKnowledgeSkill(category);
-
-              case 3:
-              case "end":
-                return _context6.stop();
-            }
-          }
-        }, _callee6, this);
-      }));
-
-      function _onAddKnowledgeSkill(_x6) {
-        return _onAddKnowledgeSkill2.apply(this, arguments);
-      }
-
-      return _onAddKnowledgeSkill;
-    }()
-  }, {
-    key: "_onRemoveKnowledgeSkill",
-    value: function () {
-      var _onRemoveKnowledgeSkill2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee7(event) {
-        var skillId, category;
-        return _regenerator["default"].wrap(function _callee7$(_context7) {
-          while (1) {
-            switch (_context7.prev = _context7.next) {
-              case 0:
-                event.preventDefault();
-                skillId = event.currentTarget.dataset.skill;
-                category = event.currentTarget.dataset.category;
-                this.actor.removeKnowledgeSkill(skillId, category);
-
-              case 4:
-              case "end":
-                return _context7.stop();
-            }
-          }
-        }, _callee7, this);
-      }));
-
-      function _onRemoveKnowledgeSkill(_x7) {
-        return _onRemoveKnowledgeSkill2.apply(this, arguments);
-      }
-
-      return _onRemoveKnowledgeSkill;
-    }()
-  }, {
-    key: "_onChangeRtg",
-    value: function () {
-      var _onChangeRtg2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee8(event) {
-        var iid, item, rtg;
-        return _regenerator["default"].wrap(function _callee8$(_context8) {
-          while (1) {
-            switch (_context8.prev = _context8.next) {
-              case 0:
-                iid = event.currentTarget.closest('.item').dataset.itemId;
-                item = this.actor.getOwnedItem(iid);
-                rtg = parseInt(event.currentTarget.value);
-
-                if (item && rtg) {
-                  item.update({
-                    'data.technology.rating': rtg
-                  });
+            // grab matrix attribute (sleaze, attack, etc.)
+            let att = event.currentTarget.dataset.att;
+            // grab device attribute (att1, att2, ...)
+            let deviceAtt = event.currentTarget.value;
+            // get current matrix attribute on the device
+            let oldVal = item.data.data.atts[deviceAtt].att;
+            let data = {
+                _id: iid,
+            };
+            // go through atts on device, setup matrix attributes on it
+            for (let i = 1; i <= 4; i++) {
+                let tmp = `att${i}`;
+                let key = `data.atts.att${i}.att`;
+                if (tmp === deviceAtt) {
+                    data[key] = att;
                 }
-
-              case 4:
-              case "end":
-                return _context8.stop();
-            }
-          }
-        }, _callee8, this);
-      }));
-
-      function _onChangeRtg(_x8) {
-        return _onChangeRtg2.apply(this, arguments);
-      }
-
-      return _onChangeRtg;
-    }()
-  }, {
-    key: "_onChangeQty",
-    value: function () {
-      var _onChangeQty2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee9(event) {
-        var iid, item, qty;
-        return _regenerator["default"].wrap(function _callee9$(_context9) {
-          while (1) {
-            switch (_context9.prev = _context9.next) {
-              case 0:
-                iid = event.currentTarget.closest('.item').dataset.itemId;
-                item = this.actor.getOwnedItem(iid);
-                qty = parseInt(event.currentTarget.value);
-
-                if (item && qty) {
-                  item.data.data.technology.quantity = qty;
-                  item.update({
-                    'data.technology.quantity': qty
-                  });
+                else if (item.data.data.atts[`att${i}`].att === att) {
+                    data[key] = oldVal;
                 }
-
-              case 4:
-              case "end":
-                return _context9.stop();
             }
-          }
-        }, _callee9, this);
-      }));
-
-      function _onChangeQty(_x9) {
-        return _onChangeQty2.apply(this, arguments);
-      }
-
-      return _onChangeQty;
-    }()
-  }, {
-    key: "_onEquipItem",
-    value: function () {
-      var _onEquipItem2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee10(event) {
-        var iid, item, itemData, newItems, _iterator, _step, ite;
-
-        return _regenerator["default"].wrap(function _callee10$(_context10) {
-          while (1) {
-            switch (_context10.prev = _context10.next) {
-              case 0:
-                event.preventDefault();
-                iid = event.currentTarget.closest('.item').dataset.itemId;
-                item = this.actor.getOwnedItem(iid);
-
-                if (!item) {
-                  _context10.next = 10;
-                  break;
-                }
-
-                itemData = item.data.data;
-                newItems = [];
-
+            yield this.actor.updateOwnedItem(data);
+        });
+    }
+    _onItemCreate(event) {
+        event.preventDefault();
+        const header = event.currentTarget;
+        const type = header.dataset.type;
+        const itemData = {
+            name: `New ${helpers_js_1.Helpers.label(type)}`,
+            type: type,
+            data: duplicate(header.dataset),
+        };
+        delete itemData.data['type'];
+        return this.actor.createOwnedItem(itemData);
+    }
+    _onAddLanguageSkill(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            this.actor.addLanguageSkill({ name: '' });
+        });
+    }
+    _onRemoveLanguageSkill(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const skillId = event.currentTarget.dataset.skill;
+            this.actor.removeLanguageSkill(skillId);
+        });
+    }
+    _onAddKnowledgeSkill(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const category = event.currentTarget.dataset.category;
+            this.actor.addKnowledgeSkill(category);
+        });
+    }
+    _onRemoveKnowledgeSkill(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const skillId = event.currentTarget.dataset.skill;
+            const category = event.currentTarget.dataset.category;
+            this.actor.removeKnowledgeSkill(skillId, category);
+        });
+    }
+    _onChangeRtg(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const iid = event.currentTarget.closest('.item').dataset.itemId;
+            const item = this.actor.getOwnedItem(iid);
+            const rtg = parseInt(event.currentTarget.value);
+            if (item && rtg) {
+                item.update({ 'data.technology.rating': rtg });
+            }
+        });
+    }
+    _onChangeQty(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const iid = event.currentTarget.closest('.item').dataset.itemId;
+            const item = this.actor.getOwnedItem(iid);
+            const qty = parseInt(event.currentTarget.value);
+            if (item && qty) {
+                item.data.data.technology.quantity = qty;
+                item.update({ 'data.technology.quantity': qty });
+            }
+        });
+    }
+    _onEquipItem(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const iid = event.currentTarget.closest('.item').dataset.itemId;
+            const item = this.actor.getOwnedItem(iid);
+            if (item) {
+                const itemData = item.data.data;
+                const newItems = [];
                 if (item.type === 'device') {
-                  // turn off all other devices than the one that is being equipped
-                  // if clicking the equipped, toggle it
-                  _iterator = _createForOfIteratorHelper(this.actor.items.filter(function (i) {
-                    return i.type === 'device';
-                  }));
-
-                  try {
-                    for (_iterator.s(); !(_step = _iterator.n()).done;) {
-                      ite = _step.value;
-                      newItems.push({
-                        _id: ite._id,
-                        'data.technology.equipped': ite._id === iid ? !itemData.technology.equipped : false
-                      });
+                    // turn off all other devices than the one that is being equipped
+                    // if clicking the equipped, toggle it
+                    for (let ite of this.actor.items.filter((i) => i.type === 'device')) {
+                        newItems.push({
+                            _id: ite._id,
+                            'data.technology.equipped': ite._id === iid ? !itemData.technology.equipped : false,
+                        });
                     }
-                  } catch (err) {
-                    _iterator.e(err);
-                  } finally {
-                    _iterator.f();
-                  }
-                } else {
-                  newItems.push({
-                    _id: iid,
-                    'data.technology.equipped': !itemData.technology.equipped
-                  });
                 }
-
-                _context10.next = 9;
-                return this.actor.updateEmbeddedEntity('OwnedItem', newItems);
-
-              case 9:
+                else {
+                    newItems.push({
+                        _id: iid,
+                        'data.technology.equipped': !itemData.technology.equipped,
+                    });
+                }
+                yield this.actor.updateEmbeddedEntity('OwnedItem', newItems);
                 this.actor.render();
-
-              case 10:
-              case "end":
-                return _context10.stop();
             }
-          }
-        }, _callee10, this);
-      }));
-
-      function _onEquipItem(_x10) {
-        return _onEquipItem2.apply(this, arguments);
-      }
-
-      return _onEquipItem;
-    }()
-  }, {
-    key: "_onRollTrack",
-    value: function () {
-      var _onRollTrack2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee11(event) {
-        var track;
-        return _regenerator["default"].wrap(function _callee11$(_context11) {
-          while (1) {
-            switch (_context11.prev = _context11.next) {
-              case 0:
-                event.preventDefault();
-                track = event.currentTarget.closest('.attribute').dataset.track;
-                this.actor.rollNaturalRecovery(track, event);
-
-              case 3:
-              case "end":
-                return _context11.stop();
-            }
-          }
-        }, _callee11, this);
-      }));
-
-      function _onRollTrack(_x11) {
-        return _onRollTrack2.apply(this, arguments);
-      }
-
-      return _onRollTrack;
-    }()
-  }, {
-    key: "_onRollPrompt",
-    value: function () {
-      var _onRollPrompt2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee12(event) {
-        return _regenerator["default"].wrap(function _callee12$(_context12) {
-          while (1) {
-            switch (_context12.prev = _context12.next) {
-              case 0:
-                event.preventDefault();
-                this.actor.promptRoll({
-                  event: event
-                });
-
-              case 2:
-              case "end":
-                return _context12.stop();
-            }
-          }
-        }, _callee12, this);
-      }));
-
-      function _onRollPrompt(_x12) {
-        return _onRollPrompt2.apply(this, arguments);
-      }
-
-      return _onRollPrompt;
-    }()
-  }, {
-    key: "_onRollItem",
-    value: function () {
-      var _onRollItem2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee13(event) {
-        var iid, item;
-        return _regenerator["default"].wrap(function _callee13$(_context13) {
-          while (1) {
-            switch (_context13.prev = _context13.next) {
-              case 0:
-                event.preventDefault();
-                iid = event.currentTarget.closest('.item').dataset.itemId;
-                item = this.actor.getOwnedItem(iid);
-                item.roll(event);
-
-              case 4:
-              case "end":
-                return _context13.stop();
-            }
-          }
-        }, _callee13, this);
-      }));
-
-      function _onRollItem(_x13) {
-        return _onRollItem2.apply(this, arguments);
-      }
-
-      return _onRollItem;
-    }()
-  }, {
-    key: "_onRollFade",
-    value: function () {
-      var _onRollFade2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee14(event) {
-        return _regenerator["default"].wrap(function _callee14$(_context14) {
-          while (1) {
-            switch (_context14.prev = _context14.next) {
-              case 0:
-                event.preventDefault();
-                this.actor.rollFade({
-                  event: event
-                });
-
-              case 2:
-              case "end":
-                return _context14.stop();
-            }
-          }
-        }, _callee14, this);
-      }));
-
-      function _onRollFade(_x14) {
-        return _onRollFade2.apply(this, arguments);
-      }
-
-      return _onRollFade;
-    }()
-  }, {
-    key: "_onRollDrain",
-    value: function () {
-      var _onRollDrain2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee15(event) {
-        return _regenerator["default"].wrap(function _callee15$(_context15) {
-          while (1) {
-            switch (_context15.prev = _context15.next) {
-              case 0:
-                event.preventDefault();
-                this.actor.rollDrain({
-                  event: event
-                });
-
-              case 2:
-              case "end":
-                return _context15.stop();
-            }
-          }
-        }, _callee15, this);
-      }));
-
-      function _onRollDrain(_x15) {
-        return _onRollDrain2.apply(this, arguments);
-      }
-
-      return _onRollDrain;
-    }()
-  }, {
-    key: "_onRollArmor",
-    value: function () {
-      var _onRollArmor2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee16(event) {
-        return _regenerator["default"].wrap(function _callee16$(_context16) {
-          while (1) {
-            switch (_context16.prev = _context16.next) {
-              case 0:
-                event.preventDefault();
-                this.actor.rollArmor({
-                  event: event
-                });
-
-              case 2:
-              case "end":
-                return _context16.stop();
-            }
-          }
-        }, _callee16, this);
-      }));
-
-      function _onRollArmor(_x16) {
-        return _onRollArmor2.apply(this, arguments);
-      }
-
-      return _onRollArmor;
-    }()
-  }, {
-    key: "_onRollDefense",
-    value: function () {
-      var _onRollDefense2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee17(event) {
-        return _regenerator["default"].wrap(function _callee17$(_context17) {
-          while (1) {
-            switch (_context17.prev = _context17.next) {
-              case 0:
-                event.preventDefault();
-                this.actor.rollDefense({
-                  event: event
-                });
-
-              case 2:
-              case "end":
-                return _context17.stop();
-            }
-          }
-        }, _callee17, this);
-      }));
-
-      function _onRollDefense(_x17) {
-        return _onRollDefense2.apply(this, arguments);
-      }
-
-      return _onRollDefense;
-    }()
-  }, {
-    key: "_onRollMatrixAttribute",
-    value: function () {
-      var _onRollMatrixAttribute2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee18(event) {
-        var attr;
-        return _regenerator["default"].wrap(function _callee18$(_context18) {
-          while (1) {
-            switch (_context18.prev = _context18.next) {
-              case 0:
-                event.preventDefault();
-                attr = event.currentTarget.dataset.attribute;
-                this.actor.rollMatrixAttribute(attr, {
-                  event: event
-                });
-
-              case 3:
-              case "end":
-                return _context18.stop();
-            }
-          }
-        }, _callee18, this);
-      }));
-
-      function _onRollMatrixAttribute(_x18) {
-        return _onRollMatrixAttribute2.apply(this, arguments);
-      }
-
-      return _onRollMatrixAttribute;
-    }()
-  }, {
-    key: "_onRollSoak",
-    value: function () {
-      var _onRollSoak2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee19(event) {
-        return _regenerator["default"].wrap(function _callee19$(_context19) {
-          while (1) {
-            switch (_context19.prev = _context19.next) {
-              case 0:
-                event.preventDefault();
-                this.actor.rollSoak({
-                  event: event
-                });
-
-              case 2:
-              case "end":
-                return _context19.stop();
-            }
-          }
-        }, _callee19, this);
-      }));
-
-      function _onRollSoak(_x19) {
-        return _onRollSoak2.apply(this, arguments);
-      }
-
-      return _onRollSoak;
-    }()
-  }, {
-    key: "_onRollAttributesOnly",
-    value: function () {
-      var _onRollAttributesOnly2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee20(event) {
-        var roll;
-        return _regenerator["default"].wrap(function _callee20$(_context20) {
-          while (1) {
-            switch (_context20.prev = _context20.next) {
-              case 0:
-                event.preventDefault();
-                roll = event.currentTarget.dataset.roll;
-                this.actor.rollAttributesTest(roll, {
-                  event: event
-                });
-
-              case 3:
-              case "end":
-                return _context20.stop();
-            }
-          }
-        }, _callee20, this);
-      }));
-
-      function _onRollAttributesOnly(_x20) {
-        return _onRollAttributesOnly2.apply(this, arguments);
-      }
-
-      return _onRollAttributesOnly;
-    }()
-  }, {
-    key: "_onRollKnowledgeSkill",
-    value: function () {
-      var _onRollKnowledgeSkill2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee21(event) {
-        var skill, category;
-        return _regenerator["default"].wrap(function _callee21$(_context21) {
-          while (1) {
-            switch (_context21.prev = _context21.next) {
-              case 0:
-                event.preventDefault();
-                skill = event.currentTarget.dataset.skill;
-                category = event.currentTarget.dataset.category;
-                this.actor.rollKnowledgeSkill(category, skill, {
-                  event: event
-                });
-
-              case 4:
-              case "end":
-                return _context21.stop();
-            }
-          }
-        }, _callee21, this);
-      }));
-
-      function _onRollKnowledgeSkill(_x21) {
-        return _onRollKnowledgeSkill2.apply(this, arguments);
-      }
-
-      return _onRollKnowledgeSkill;
-    }()
-  }, {
-    key: "_onRollLanguageSkill",
-    value: function () {
-      var _onRollLanguageSkill2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee22(event) {
-        var skill;
-        return _regenerator["default"].wrap(function _callee22$(_context22) {
-          while (1) {
-            switch (_context22.prev = _context22.next) {
-              case 0:
-                event.preventDefault();
-                skill = event.currentTarget.dataset.skill;
-                this.actor.rollLanguageSkill(skill, {
-                  event: event
-                });
-
-              case 3:
-              case "end":
-                return _context22.stop();
-            }
-          }
-        }, _callee22, this);
-      }));
-
-      function _onRollLanguageSkill(_x22) {
-        return _onRollLanguageSkill2.apply(this, arguments);
-      }
-
-      return _onRollLanguageSkill;
-    }()
-  }, {
-    key: "_onRollActiveSkill",
-    value: function () {
-      var _onRollActiveSkill2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee23(event) {
-        var skill;
-        return _regenerator["default"].wrap(function _callee23$(_context23) {
-          while (1) {
-            switch (_context23.prev = _context23.next) {
-              case 0:
-                event.preventDefault();
-                skill = event.currentTarget.dataset.skill;
-                this.actor.rollActiveSkill(skill, {
-                  event: event
-                });
-
-              case 3:
-              case "end":
-                return _context23.stop();
-            }
-          }
-        }, _callee23, this);
-      }));
-
-      function _onRollActiveSkill(_x23) {
-        return _onRollActiveSkill2.apply(this, arguments);
-      }
-
-      return _onRollActiveSkill;
-    }()
-  }, {
-    key: "_onRollAttribute",
-    value: function () {
-      var _onRollAttribute2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee24(event) {
-        var attr;
-        return _regenerator["default"].wrap(function _callee24$(_context24) {
-          while (1) {
-            switch (_context24.prev = _context24.next) {
-              case 0:
-                event.preventDefault();
-                attr = event.currentTarget.dataset.attribute;
-                this.actor.rollAttribute(attr, {
-                  event: event
-                });
-
-              case 3:
-              case "end":
-                return _context24.stop();
-            }
-          }
-        }, _callee24, this);
-      }));
-
-      function _onRollAttribute(_x24) {
-        return _onRollAttribute2.apply(this, arguments);
-      }
-
-      return _onRollAttribute;
-    }()
-    /**
-     * @private
-     */
-
-  }, {
-    key: "_findActiveList",
-    value: function _findActiveList() {
-      return this.element.find('.tab.active .scroll-area');
+        });
+    }
+    _onRollTrack(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            let track = event.currentTarget.closest('.attribute').dataset.track;
+            this.actor.rollNaturalRecovery(track, event);
+        });
+    }
+    _onRollPrompt(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            this.actor.promptRoll({ event: event });
+        });
+    }
+    _onRollItem(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const iid = event.currentTarget.closest('.item').dataset.itemId;
+            const item = this.actor.getOwnedItem(iid);
+            if (item)
+                return item.roll(event);
+        });
+    }
+    _onRollFade(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            this.actor.rollFade({ event: event });
+        });
+    }
+    _onRollDrain(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            this.actor.rollDrain({ event: event });
+        });
+    }
+    _onRollArmor(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            return this.actor.rollArmor({ event: event });
+        });
+    }
+    _onRollDefense(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            return this.actor.rollDefense({ event: event });
+        });
+    }
+    _onRollMatrixAttribute(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const attr = event.currentTarget.dataset.attribute;
+            return this.actor.rollMatrixAttribute(attr, { event: event });
+        });
+    }
+    _onRollSoak(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            return this.actor.rollSoak({ event: event });
+        });
+    }
+    _onRollAttributesOnly(event) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const roll = (_a = event.currentTarget) === null || _a === void 0 ? void 0 : _a.data.roll;
+            return this.actor.rollAttributesTest(roll, { event: event });
+        });
+    }
+    _onRollKnowledgeSkill(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const skill = event.currentTarget.dataset.skill;
+            const category = event.currentTarget.dataset.category;
+            this.actor.rollKnowledgeSkill(category, skill, { event: event });
+        });
+    }
+    _onRollLanguageSkill(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const skill = event.currentTarget.dataset.skill;
+            this.actor.rollLanguageSkill(skill, { event: event });
+        });
+    }
+    _onRollActiveSkill(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const skill = event.currentTarget.dataset.skill;
+            this.actor.rollActiveSkill(skill, { event: event });
+        });
+    }
+    _onRollAttribute(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const attr = event.currentTarget.dataset.attribute;
+            this.actor.rollAttribute(attr, { event: event });
+        });
     }
     /**
      * @private
      */
-
-  }, {
-    key: "_render",
-    value: function () {
-      var _render2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee25() {
-        var _get2;
-
-        var focus,
-            _len2,
-            args,
-            _key2,
-            element,
-            _args25 = arguments;
-
-        return _regenerator["default"].wrap(function _callee25$(_context25) {
-          while (1) {
-            switch (_context25.prev = _context25.next) {
-              case 0:
-                focus = this.element.find(':focus');
-                focus = focus.length ? focus[0] : null;
-
-                this._saveScrollPositions();
-
-                for (_len2 = _args25.length, args = new Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-                  args[_key2] = _args25[_key2];
+    _findActiveList() {
+        return $(this.element).find('.tab.active .scroll-area');
+    }
+    /**
+     * @private
+     */
+    _render(...args) {
+        const _super = Object.create(null, {
+            _render: { get: () => super._render }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            const focusList = $(this.element).find(':focus');
+            const focus = focusList.length ? focusList[0] : null;
+            this._saveScrollPositions();
+            yield _super._render.call(this, ...args);
+            this._restoreScrollPositions();
+            if (focus && focus.name) {
+                const element = this.form[focus.name];
+                if (element) {
+                    element.focus();
+                    // set the selection range on the focus formed from before (keeps track of cursor in input)
+                    element.setSelectionRange &&
+                        element.setSelectionRange(focus.selectionStart, focus.selectionEnd);
                 }
-
-                _context25.next = 6;
-                return (_get2 = (0, _get3["default"])((0, _getPrototypeOf2["default"])(SR5ActorSheet.prototype), "_render", this)).call.apply(_get2, [this].concat(args));
-
-              case 6:
-                this._restoreScrollPositions();
-
-                if (focus && focus.name) {
-                  element = this.form[focus.name];
-
-                  if (element) {
-                    element.focus(); // set the selection range on the focus formed from before (keeps track of cursor in input)
-
-                    element.setSelectionRange && element.setSelectionRange(focus.selectionStart, focus.selectionEnd);
-                  }
-                }
-
-              case 8:
-              case "end":
-                return _context25.stop();
             }
-          }
-        }, _callee25, this);
-      }));
-
-      function _render() {
-        return _render2.apply(this, arguments);
-      }
-
-      return _render;
-    }()
-    /**
-     * @private
-     */
-
-  }, {
-    key: "_restoreScrollPositions",
-    value: function _restoreScrollPositions() {
-      var activeList = this._findActiveList();
-
-      if (activeList.length && this._scroll != null) {
-        activeList.prop('scrollTop', this._scroll);
-      }
+        });
     }
     /**
      * @private
      */
-
-  }, {
-    key: "_saveScrollPositions",
-    value: function _saveScrollPositions() {
-      var activeList = this._findActiveList();
-
-      if (activeList.length) {
-        this._scroll = activeList.prop('scrollTop');
-      }
+    _restoreScrollPositions() {
+        const activeList = this._findActiveList();
+        if (activeList.length && this._scroll != null) {
+            activeList.prop('scrollTop', this._scroll);
+        }
     }
-  }, {
-    key: "_onShowEditKnowledgeSkill",
-    value: function _onShowEditKnowledgeSkill(event) {
-      event.preventDefault();
-      var skill = event.currentTarget.dataset.skill;
-      var category = event.currentTarget.dataset.category;
-      new _knowledgeSkillEdit.KnowledgeSkillEditForm(this.actor, skill, category, {
-        event: event
-      }).render(true);
+    /**
+     * @private
+     */
+    _saveScrollPositions() {
+        const activeList = this._findActiveList();
+        if (activeList.length) {
+            this._scroll = activeList.prop('scrollTop');
+        }
     }
-  }, {
-    key: "_onShowEditLanguageSkill",
-    value: function _onShowEditLanguageSkill(event) {
-      event.preventDefault();
-      var skill = event.currentTarget.dataset.skill;
-      new _languageSkillEdit.LanguageSkillEditForm(this.actor, skill, {
-        event: event
-      }).render(true);
+    _onShowEditKnowledgeSkill(event) {
+        event.preventDefault();
+        const skill = event.currentTarget.dataset.skill;
+        const category = event.currentTarget.dataset.category;
+        new knowledge_skill_edit_js_1.KnowledgeSkillEditForm(this.actor, skill, category, {
+            event: event,
+        }).render(true);
     }
-  }, {
-    key: "_onShowEditSkill",
-    value: function _onShowEditSkill(event) {
-      event.preventDefault();
-      var skill = event.currentTarget.dataset.skill;
-      new _skillEdit.SkillEditForm(this.actor, skill, {
-        event: event
-      }).render(true);
+    _onShowEditLanguageSkill(event) {
+        event.preventDefault();
+        const skill = event.currentTarget.dataset.skill;
+        new language_skill_edit_js_1.LanguageSkillEditForm(this.actor, skill, { event: event }).render(true);
     }
-  }, {
-    key: "_onShowImportCharacter",
-    value: function _onShowImportCharacter(event) {
-      event.preventDefault();
-      var options = {
-        name: 'chummer-import',
-        title: 'Chummer Import'
-      };
-      new _chummerImportForm.ChummerImportForm(this.actor, options).render(true);
+    _onShowEditSkill(event) {
+        event.preventDefault();
+        const skill = event.currentTarget.dataset.skill;
+        new skill_edit_js_1.SkillEditForm(this.actor, skill, { event: event }).render(true);
     }
-  }], [{
-    key: "defaultOptions",
-    get: function get() {
-      return mergeObject((0, _get3["default"])((0, _getPrototypeOf2["default"])(SR5ActorSheet), "defaultOptions", this), {
-        classes: ['sr5', 'sheet', 'actor'],
-        template: 'systems/shadowrun5e/templates/actor/character.html',
-        width: 880,
-        height: 690,
-        tabs: [{
-          navSelector: '.tabs',
-          contentSelector: '.sheetbody',
-          initial: 'skills'
-        }]
-      });
+    _onShowImportCharacter(event) {
+        event.preventDefault();
+        const options = {
+            name: 'chummer-import',
+            title: 'Chummer Import',
+        };
+        new chummer_import_form_js_1.ChummerImportForm(this.actor, options).render(true);
     }
-  }]);
-  return SR5ActorSheet;
-}(ActorSheet);
-
+}
 exports.SR5ActorSheet = SR5ActorSheet;
 
-},{"../apps/chummer-import-form.js":4,"../apps/knowledge-skill-edit.js":6,"../apps/language-skill-edit.js":7,"../apps/skill-edit.js":8,"../helpers.js":16,"@babel/runtime/helpers/asyncToGenerator":28,"@babel/runtime/helpers/classCallCheck":29,"@babel/runtime/helpers/createClass":30,"@babel/runtime/helpers/get":32,"@babel/runtime/helpers/getPrototypeOf":33,"@babel/runtime/helpers/inherits":34,"@babel/runtime/helpers/interopRequireDefault":35,"@babel/runtime/helpers/possibleConstructorReturn":40,"@babel/runtime/helpers/slicedToArray":42,"@babel/runtime/regenerator":47}],4:[function(require,module,exports){
+},{"../apps/chummer-import-form.js":4,"../apps/knowledge-skill-edit.js":6,"../apps/language-skill-edit.js":7,"../apps/skill-edit.js":8,"../helpers.js":16}],4:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -4809,13 +4152,6 @@ var KnowledgeSkillEditForm = /*#__PURE__*/function (_LanguageSkillEditFor) {
 
   var _super = _createSuper(KnowledgeSkillEditForm);
 
-  (0, _createClass2["default"])(KnowledgeSkillEditForm, [{
-    key: "_updateString",
-    value: function _updateString() {
-      return "data.skills.knowledge.".concat(this.category, ".value.").concat(this.skillId);
-    }
-  }]);
-
   function KnowledgeSkillEditForm(actor, skillId, category, options) {
     var _this;
 
@@ -4825,6 +4161,12 @@ var KnowledgeSkillEditForm = /*#__PURE__*/function (_LanguageSkillEditFor) {
     return _this;
   }
 
+  (0, _createClass2["default"])(KnowledgeSkillEditForm, [{
+    key: "_updateString",
+    value: function _updateString() {
+      return "data.skills.knowledge.".concat(this.category, ".value.").concat(this.skillId);
+    }
+  }]);
   return KnowledgeSkillEditForm;
 }(_languageSkillEdit.LanguageSkillEditForm);
 
@@ -4840,8 +4182,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.LanguageSkillEditForm = void 0;
 
-var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
-
 var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
 
 var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
@@ -4855,10 +4195,6 @@ var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime
 var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
 
 var _skillEdit = require("./skill-edit.js");
-
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { (0, _defineProperty2["default"])(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 
@@ -4894,14 +4230,9 @@ var LanguageSkillEditForm = /*#__PURE__*/function (_SkillEditForm) {
       (0, _get2["default"])((0, _getPrototypeOf2["default"])(LanguageSkillEditForm.prototype), "_onUpdateObject", this).call(this, event, formData, updateData);
       var name = formData['data.name'];
       var currentData = updateData[this._updateString()] || {};
-      updateData[this._updateString()] = _objectSpread(_objectSpread({}, currentData), {}, {
+      updateData[this._updateString()] = Object.assign(Object.assign({}, currentData), {
         name: name
       });
-    }
-  }, {
-    key: "title",
-    get: function get() {
-      return "Edit Skill - ".concat(game.i18n.localize(this.getData().data.name));
     }
   }]);
   return LanguageSkillEditForm;
@@ -4909,7 +4240,7 @@ var LanguageSkillEditForm = /*#__PURE__*/function (_SkillEditForm) {
 
 exports.LanguageSkillEditForm = LanguageSkillEditForm;
 
-},{"./skill-edit.js":8,"@babel/runtime/helpers/classCallCheck":29,"@babel/runtime/helpers/createClass":30,"@babel/runtime/helpers/defineProperty":31,"@babel/runtime/helpers/get":32,"@babel/runtime/helpers/getPrototypeOf":33,"@babel/runtime/helpers/inherits":34,"@babel/runtime/helpers/interopRequireDefault":35,"@babel/runtime/helpers/possibleConstructorReturn":40}],8:[function(require,module,exports){
+},{"./skill-edit.js":8,"@babel/runtime/helpers/classCallCheck":29,"@babel/runtime/helpers/createClass":30,"@babel/runtime/helpers/get":32,"@babel/runtime/helpers/getPrototypeOf":33,"@babel/runtime/helpers/inherits":34,"@babel/runtime/helpers/interopRequireDefault":35,"@babel/runtime/helpers/possibleConstructorReturn":40}],8:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -4922,10 +4253,6 @@ exports.SkillEditForm = void 0;
 var _toConsumableArray2 = _interopRequireDefault(require("@babel/runtime/helpers/toConsumableArray"));
 
 var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
-
-var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
-
-var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
 
 var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/slicedToArray"));
 
@@ -4941,13 +4268,41 @@ var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime
 
 var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
 
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { (0, _defineProperty2["default"])(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 
 function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+var __awaiter = void 0 && (void 0).__awaiter || function (thisArg, _arguments, P, generator) {
+  function adopt(value) {
+    return value instanceof P ? value : new P(function (resolve) {
+      resolve(value);
+    });
+  }
+
+  return new (P || (P = Promise))(function (resolve, reject) {
+    function fulfilled(value) {
+      try {
+        step(generator.next(value));
+      } catch (e) {
+        reject(e);
+      }
+    }
+
+    function rejected(value) {
+      try {
+        step(generator["throw"](value));
+      } catch (e) {
+        reject(e);
+      }
+    }
+
+    function step(result) {
+      result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+    }
+
+    step((generator = generator.apply(thisArg, _arguments || [])).next());
+  });
+};
 
 var SkillEditForm = /*#__PURE__*/function (_BaseEntitySheet) {
   (0, _inherits2["default"])(SkillEditForm, _BaseEntitySheet);
@@ -4987,7 +4342,7 @@ var SkillEditForm = /*#__PURE__*/function (_BaseEntitySheet) {
         return running;
       }, []);
       var currentData = updateData[this._updateString()] || {};
-      updateData[this._updateString()] = _objectSpread(_objectSpread({}, currentData), {}, {
+      updateData[this._updateString()] = Object.assign(Object.assign({}, currentData), {
         base: base,
         specs: specs
       });
@@ -4996,8 +4351,8 @@ var SkillEditForm = /*#__PURE__*/function (_BaseEntitySheet) {
 
   }, {
     key: "_updateObject",
-    value: function () {
-      var _updateObject2 = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(event, formData) {
+    value: function _updateObject(event, formData) {
+      return __awaiter(this, void 0, void 0, /*#__PURE__*/_regenerator["default"].mark(function _callee() {
         var updateData;
         return _regenerator["default"].wrap(function _callee$(_context) {
           while (1) {
@@ -5016,13 +4371,7 @@ var SkillEditForm = /*#__PURE__*/function (_BaseEntitySheet) {
           }
         }, _callee, this);
       }));
-
-      function _updateObject(_x, _x2) {
-        return _updateObject2.apply(this, arguments);
-      }
-
-      return _updateObject;
-    }()
+    }
   }, {
     key: "activateListeners",
     value: function activateListeners(html) {
@@ -5034,10 +4383,15 @@ var SkillEditForm = /*#__PURE__*/function (_BaseEntitySheet) {
     key: "_addNewSpec",
     value: function _addNewSpec(event) {
       event.preventDefault();
-      var updateData = {}; // add a blank line to specs
+      var updateData = {};
+      var data = this.getData().data;
 
-      var specializations = this.getData().data.specs;
-      updateData["".concat(this._updateString(), ".specs")] = [].concat((0, _toConsumableArray2["default"])(specializations), ['']);
+      if (data === null || data === void 0 ? void 0 : data.specs) {
+        // add a blank line to specs
+        var specs = data.specs;
+        updateData["".concat(this._updateString(), ".specs")] = [].concat((0, _toConsumableArray2["default"])(specs), ['']);
+      }
+
       this.entity.update(updateData);
     }
   }, {
@@ -5045,29 +4399,32 @@ var SkillEditForm = /*#__PURE__*/function (_BaseEntitySheet) {
     value: function _removeSpec(event) {
       event.preventDefault();
       var updateData = {};
-      var specs = this.getData().data.specs;
-      var index = event.currentTarget.dataset.spec;
+      var data = this.getData().data;
 
-      if (index >= 0) {
-        specs.splice(index, 1);
-        updateData["".concat(this._updateString(), ".specs")] = specs;
-        this.entity.update(updateData);
+      if (data === null || data === void 0 ? void 0 : data.specs) {
+        var specs = data.specs;
+        var index = event.currentTarget.dataset.spec;
+
+        if (index >= 0) {
+          specs.splice(index, 1);
+          updateData["".concat(this._updateString(), ".specs")] = specs;
+          this.entity.update(updateData);
+        }
       }
     }
   }, {
     key: "getData",
     value: function getData() {
+      var data = (0, _get2["default"])((0, _getPrototypeOf2["default"])(SkillEditForm.prototype), "getData", this).call(this);
       var actor = (0, _get2["default"])((0, _getPrototypeOf2["default"])(SkillEditForm.prototype), "getData", this).call(this).entity;
-      var skill = getProperty(actor, this._updateString());
-      console.log(skill);
-      return {
-        data: skill
-      };
+      data['data'] = actor ? getProperty(actor, this._updateString()) : {};
+      return data;
     }
   }, {
     key: "title",
     get: function get() {
-      return "Edit Skill - ".concat(game.i18n.localize(this.getData().data.label));
+      var data = this.getData().data;
+      return "Edit Skill - ".concat((data === null || data === void 0 ? void 0 : data.label) ? game.i18n.localize(data.label) : '');
     }
   }], [{
     key: "defaultOptions",
@@ -5090,7 +4447,7 @@ var SkillEditForm = /*#__PURE__*/function (_BaseEntitySheet) {
 
 exports.SkillEditForm = SkillEditForm;
 
-},{"@babel/runtime/helpers/asyncToGenerator":28,"@babel/runtime/helpers/classCallCheck":29,"@babel/runtime/helpers/createClass":30,"@babel/runtime/helpers/defineProperty":31,"@babel/runtime/helpers/get":32,"@babel/runtime/helpers/getPrototypeOf":33,"@babel/runtime/helpers/inherits":34,"@babel/runtime/helpers/interopRequireDefault":35,"@babel/runtime/helpers/possibleConstructorReturn":40,"@babel/runtime/helpers/slicedToArray":42,"@babel/runtime/helpers/toConsumableArray":44,"@babel/runtime/regenerator":47}],9:[function(require,module,exports){
+},{"@babel/runtime/helpers/classCallCheck":29,"@babel/runtime/helpers/createClass":30,"@babel/runtime/helpers/get":32,"@babel/runtime/helpers/getPrototypeOf":33,"@babel/runtime/helpers/inherits":34,"@babel/runtime/helpers/interopRequireDefault":35,"@babel/runtime/helpers/possibleConstructorReturn":40,"@babel/runtime/helpers/slicedToArray":42,"@babel/runtime/helpers/toConsumableArray":44,"@babel/runtime/regenerator":47}],9:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.measureDistance = void 0;

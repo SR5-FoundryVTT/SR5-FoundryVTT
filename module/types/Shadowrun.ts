@@ -22,9 +22,9 @@ declare namespace Shadowrun {
 
     export type NumberOrEmpty = number | '';
 
-    export type Skill = string;
+    export type SkillName = string;
 
-    export type HideableField = {
+    export type CanHideFiled = {
         hidden: boolean;
     };
 
@@ -64,9 +64,9 @@ declare namespace Shadowrun {
 
     export type RemovableField = {
         _delete?: boolean;
-    }
+    };
 
     export type LabelField = {
         label?: string;
-    }
+    };
 }

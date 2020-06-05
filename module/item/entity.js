@@ -717,7 +717,7 @@ export class SR5Item extends Item {
                         DiceSR.rollTest({
                             event: ev,
                             dialogOptions: {
-                                environmental: false
+                                environmental: false,
                             },
                             parts,
                             actor: this.actor,
@@ -736,7 +736,7 @@ export class SR5Item extends Item {
                 event: ev,
                 parts,
                 dialogOptions: {
-                    environmental: true
+                    environmental: true,
                 },
                 actor: this.actor,
                 limit,
