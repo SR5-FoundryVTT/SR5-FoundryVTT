@@ -7,6 +7,7 @@ import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import Skills = Shadowrun.Skills;
 import { SR5Actor } from './entity';
+import MatrixAttribute = Shadowrun.MatrixAttribute;
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -63,19 +64,14 @@ export class SR5ActorSheet extends ActorSheet {
     getData() {
         const data: SR5ActorSheetData = (super.getData() as unknown) as SR5ActorSheetData;
 
+        this._prepareMatrixAttributes(data);
+
         const attrs = data.data.attributes;
-        for (let [label, att] of Object.entries(attrs)) {
+        for (let [, att] of Object.entries(attrs)) {
             if (!att.hidden) {
                 if (att.mod['Temporary'] === 0) delete att.mod;
             }
         }
-
-        const { matrix } = data.data;
-        if (matrix.attack.mod['Temporary'] === 0) delete matrix.attack.mod['Temporary'];
-        if (matrix.sleaze.mod['Temporary'] === 0) delete matrix.sleaze.mod['Temporary'];
-        if (matrix.data_processing.mod['Temporary'] === 0)
-            delete matrix.data_processing.mod['Temporary'];
-        if (matrix.firewall.mod['Temporary'] === 0) delete matrix.firewall.mod['Temporary'];
 
         const { magic } = data.data;
         if (magic.drain && magic.drain.mod['Temporary'] === 0) delete magic.drain.mod['Temporary'];
@@ -104,6 +100,21 @@ export class SR5ActorSheet extends ActorSheet {
     _doesSkillContainText(key, skill, text) {
         let searchString = `${key} ${game.i18n.localize(skill.label)} ${skill?.specs?.join(' ')}`;
         return searchString.toLowerCase().search(text.toLowerCase()) > -1;
+    }
+
+    _prepareMatrixAttributes(data) {
+        const { matrix } = data.data;
+        const cleanupAttribute = (attribute: MatrixAttribute) => {
+            const att = matrix[attribute];
+            if (att) {
+                if (!att.mod) att.mod = {};
+                if (att.mod['Temporary'] === 0) delete att.mod['Temporary'];
+            }
+        };
+
+        ['firewall', 'data_processing', 'sleaze', 'attack'].forEach((att: MatrixAttribute) =>
+            cleanupAttribute(att)
+        );
     }
 
     _prepareSkills(data) {
@@ -166,50 +177,12 @@ export class SR5ActorSheet extends ActorSheet {
                 },
             },
         };
-        const spellbook = {
-            combat: {
-                label: 'Combat',
-                items: [],
-                dataset: {
-                    type: 'combat',
-                },
-            },
-            detection: {
-                label: 'Detection',
-                items: [],
-                dataset: {
-                    type: 'detection',
-                },
-            },
-            health: {
-                label: 'Health',
-                items: [],
-                dataset: {
-                    type: 'health',
-                },
-            },
-            illusion: {
-                label: 'Illusion',
-                items: [],
-                dataset: {
-                    type: 'illusion',
-                },
-            },
-            manipulation: {
-                label: 'Manipulation',
-                items: [],
-                dataset: {
-                    type: 'manipulation',
-                },
-            },
-        };
 
         let [
             items,
             spells,
             qualities,
             adept_powers,
-            critter_powers,
             actions,
             complex_forms,
             lifestyles,
@@ -221,16 +194,15 @@ export class SR5ActorSheet extends ActorSheet {
                 if (item.type === 'spell') arr[1].push(item);
                 else if (item.type === 'quality') arr[2].push(item);
                 else if (item.type === 'adept_power') arr[3].push(item);
-                else if (item.type === 'critter_power') arr[4].push(item);
-                else if (item.type === 'action') arr[5].push(item);
-                else if (item.type === 'complex_form') arr[6].push(item);
-                else if (item.type === 'lifestyle') arr[7].push(item);
-                else if (item.type === 'contact') arr[8].push(item);
-                else if (item.type === 'sin') arr[9].push(item);
+                else if (item.type === 'action') arr[4].push(item);
+                else if (item.type === 'complex_form') arr[5].push(item);
+                else if (item.type === 'lifestyle') arr[6].push(item);
+                else if (item.type === 'contact') arr[7].push(item);
+                else if (item.type === 'sin') arr[8].push(item);
                 else if (Object.keys(inventory).includes(item.type)) arr[0].push(item);
                 return arr;
             },
-            [[], [], [], [], [], [], [], [], [], []]
+            [[], [], [], [], [], [], [], [], []]
         );
 
         const sortByName = (i1, i2) => {
@@ -315,6 +287,7 @@ export class SR5ActorSheet extends ActorSheet {
         html.find('.item-rtg').change(this._onChangeRtg.bind(this));
         html.find('.item-create').click(this._onItemCreate.bind(this));
         html.find('.matrix-roll').click(this._onRollMatrixAttribute.bind(this));
+        html.find('.matrix-att-selector').change(this._onMatrixAttributeSelected.bind(this));
         html.find('.basic-roll').click(this._onRollPrompt.bind(this));
         html.find('.armor-roll').click(this._onRollArmor.bind(this));
         html.find('.add-knowledge').click(this._onAddKnowledgeSkill.bind(this));
@@ -328,7 +301,6 @@ export class SR5ActorSheet extends ActorSheet {
         html.find('.skill-edit').click(this._onShowEditSkill.bind(this));
         html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
         html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
-        html.find('.matrix-att-selector').change(this._onMatrixAttributeSelected.bind(this));
 
         // Update Inventory Item
         html.find('.item-edit').click((event) => {

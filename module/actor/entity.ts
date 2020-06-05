@@ -13,6 +13,7 @@ import DefenseRollOptions = Shadowrun.DefenseRollOptions;
 import SoakRollOptions = Shadowrun.SoakRollOptions;
 import AttributeField = Shadowrun.AttributeField;
 import SkillRollOptions = Shadowrun.SkillRollOptions;
+import Matrix = Shadowrun.Matrix;
 
 export class SR5Actor extends Actor {
     async update(data, options?) {
@@ -101,11 +102,11 @@ export class SR5Actor extends Actor {
         }
 
         // DEFAULT MATRIX ATTS TO MOD VALUE
-        const matrix = data.matrix;
-        matrix.firewall.value = matrix.firewall.mod;
-        matrix.data_processing.value = matrix.data_processing.mod;
-        matrix.attack.value = matrix.attack.mod;
-        matrix.sleaze.value = matrix.sleaze.mod;
+        const matrix: Matrix = data.matrix;
+        matrix.firewall.value = Helpers.totalMods(matrix.firewall.mod);
+        matrix.data_processing.value = Helpers.totalMods(matrix.data_processing.mod);
+        matrix.attack.value = Helpers.totalMods(matrix.attack.mod);
+        matrix.sleaze.value = Helpers.totalMods(matrix.sleaze.mod);
         matrix.condition_monitor.max = 0;
         matrix.rating = 0;
         matrix.name = '';
@@ -114,7 +115,6 @@ export class SR5Actor extends Actor {
         // PARSE WEAPONS AND SET VALUES AS NEEDED
         for (let item of Object.values(items)) {
             const itemData: ItemData = (item.data as unknown) as ItemData;
-            const type = item.type;
 
             const equipped = itemData.technology?.equipped;
             if (equipped) {
@@ -146,8 +146,8 @@ export class SR5Actor extends Actor {
                         matrix[att.att].device_att = key;
                     }
                 } else {
-                    matrix.firewall.value += matrix.rating;
-                    matrix.data_processing.value += matrix.rating;
+                    matrix.firewall.value += matrix.rating || 0;
+                    matrix.data_processing.value += matrix.rating || 0;
                 }
             }
         }
@@ -201,8 +201,8 @@ export class SR5Actor extends Actor {
 
         // TECHNOMANCER LIVING PERSONA
         if (data.special === 'resonance') {
-            // if value is equal to mod, we don't have an item equipped TODO this is horrible
-            if (matrix.firewall.value === matrix.firewall.mod) {
+            // if we don't have a device, use living persona
+            if (matrix.device === undefined) {
                 // we should use living persona
                 matrix.firewall.value += attributes.willpower.value;
                 matrix.data_processing.value += attributes.logic.value;
@@ -883,7 +883,6 @@ export class SR5Actor extends Actor {
             event: options?.event,
             actor: this,
             parts,
-            // base: roll,
             title: `${title} Test`,
         });
     }
@@ -979,20 +978,20 @@ export class SR5Actor extends Actor {
         const skill = duplicate(category.value[skillId]);
         skill.attribute = category.attribute;
         skill.label = skill.name;
-        this.rollSkill(skill, options);
+        return this.rollSkill(skill, options);
     }
 
     rollLanguageSkill(skillId, options?: SkillRollOptions) {
         const skill = duplicate(this.data.data.skills.language.value[skillId]);
         skill.attribute = 'intuition';
         skill.label = skill.name;
-        this.rollSkill(skill, options);
+        return this.rollSkill(skill, options);
     }
 
     rollActiveSkill(skillId, options?: SkillRollOptions) {
         const skill = this.data.data.skills.active[skillId];
         skill.label = game.i18n.localize(CONFIG.SR5.activeSkills[skillId]);
-        this.rollSkill(skill, options);
+        return this.rollSkill(skill, options);
     }
 
     rollAttribute(attId, options?: ActorRollOptions) {

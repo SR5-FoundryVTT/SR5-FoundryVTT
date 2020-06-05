@@ -2,30 +2,7 @@
   "Actor": {
     "types": ["character"],
     "templates": {
-      "common": {
-        "name": "",
-        "metatype": "",
-        "ethnicity": "",
-        "age": "",
-        "sex": "",
-        "height": "",
-        "weight": "",
-        "street_cred": 0,
-        "notoriety": 0,
-        "public_awareness": 0,
-        "special": "mundane",
-        "description": {
-          "value": ""
-        },
-        "karma": {
-          "value": 0,
-          "max": 0
-        },
-        "nuyen": 0,
-        "rent": {
-          "cost": 0,
-          "locations": []
-        },
+      "matrix": {
         "matrix": {
           "condition_monitor": {
             "value": 0,
@@ -39,169 +16,123 @@
           "hot_sim": false,
           "firewall": {
             "value": 0,
-            "mod": 0
+            "mod": {},
+            "base": 0
           },
           "data_processing": {
             "value": 0,
-            "mod": 0
+            "mod": {},
+            "base": 0
           },
           "attack": {
             "value": 0,
-            "mod": 0
+            "mod": {},
+            "base": 0
           },
           "sleaze": {
             "value": 0,
-            "mod": 0
+            "mod": {},
+            "base": 0
           }
-        },
+        }
+      },
+      "limits": {
+        "limits": {
+          "physical": {
+            "value": 1,
+            "mod": {},
+            "min": 1
+          },
+          "social": {
+            "value": 1,
+            "mod": {},
+            "min": 1
+          },
+          "mental": {
+            "value": 1,
+            "mod": {},
+            "min": 1
+          }
+        }
+      },
+      "attributes": {
         "attributes": {
           "body": {
             "value": 1,
             "min": 1,
+            "mod": {},
             "limit": "physical"
           },
           "agility": {
             "value": 1,
             "min": 1,
+            "mod": {},
             "limit": "physical"
           },
           "reaction": {
             "value": 1,
             "min": 1,
+            "mod": {},
             "limit": "physical"
           },
           "strength": {
             "value": 1,
             "min": 1,
+            "mod": {},
             "limit": "physical"
           },
           "willpower": {
             "value": 1,
             "min": 1,
+            "mod": {},
             "limit": "mental"
           },
           "logic": {
             "value": 1,
             "min": 1,
+            "mod": {},
             "limit": "mental"
           },
           "intuition": {
             "value": 1,
             "min": 1,
+            "mod": {},
             "limit": "mental"
           },
           "charisma": {
             "value": 1,
             "min": 1,
+            "mod": {},
             "limit": "social"
           },
           "magic": {
             "value": 0,
             "min": 0,
+            "mod": {},
             "limit": "mental"
           },
           "resonance": {
             "value": 0,
             "min": 0,
+            "mod": {},
             "limit": "mental"
           },
           "edge": {
             "value": 1,
             "min": 0,
             "max": 1,
+            "mod": {},
             "hidden": true
           },
           "essence": {
             "value": 6,
             "min": 0,
+            "mod": {},
             "hidden": true
           }
-        },
-        "limits": {
-          "physical": {
-            "value": 1,
-            "mod": 0,
-            "min": 1
-          },
-          "social": {
-            "value": 1,
-            "mod": 0,
-            "min": 1
-          },
-          "mental": {
-            "value": 1,
-            "mod": 0,
-            "min": 1
-          }
-        },
-        "movement": {
-          "walk": {
-            "value": 1
-          },
-          "run": {
-            "value": 2
-          },
-          "sprint": 2,
-          "swimming": 2
-        },
-        "magic": {
-          "attribute": "logic",
-          "projecting": false,
-          "drain": {
-            "value": 0
-          }
-        },
-        "wounds": {
-          "value": 0
-        },
-        "armor": {
-          "value": 0,
-          "mod": 0,
-          "acid": 0,
-          "cold": 0,
-          "fire": 0,
-          "electricity": 0,
-          "radiation": 0
-        },
-        "initiative": {
-          "perception": "meatspace",
-          "meatspace": {
-            "dice": {
-              "base": 1,
-              "mod": 0,
-              "value": 1
-            },
-            "base": {
-              "base": 1,
-              "mod": 0,
-              "value": 1
-            }
-          },
-          "matrix": {
-            "dice": {
-              "base": 1,
-              "mod": 0,
-              "value": 1
-            },
-            "base": {
-              "base": 1,
-              "mod": 0,
-              "value": 1
-            }
-          },
-          "astral": {
-            "dice": {
-              "base": 1,
-              "mod": 0,
-              "value": 1
-            },
-            "base": {
-              "base": 1,
-              "mod": 0,
-              "value": 1
-            }
-          }
-        },
+        }
+      },
+      "skills": {
         "skills": {
           "active": {
             "archery": {
@@ -209,6 +140,7 @@
               "attribute": "agility",
               "canDefault": true,
               "group": "",
+              "mod": {},
               "specs": []
             },
             "automatics": {
@@ -216,6 +148,7 @@
               "attribute": "agility",
               "canDefault": true,
               "group": "Firearms",
+              "mod": {},
               "specs": []
             },
             "blades": {
@@ -223,6 +156,7 @@
               "attribute": "agility",
               "canDefault": true,
               "group": "Close Combat",
+              "mod": {},
               "specs": []
             },
             "clubs": {
@@ -230,6 +164,7 @@
               "attribute": "agility",
               "canDefault": true,
               "group": "Close Combat",
+              "mod": {},
               "specs": []
             },
             "exotic_melee": {
@@ -238,6 +173,7 @@
               "weapons": [],
               "attribute": "agility",
               "canDefault": false,
+              "mod": {},
               "group": ""
             },
             "exotic_range": {
@@ -247,6 +183,7 @@
               "attribute": "agility",
               "canDefault": false,
               "group": "",
+              "mod": {},
               "specs": []
             },
             "heavy_weapons": {
@@ -254,6 +191,7 @@
               "attribute": "agility",
               "canDefault": true,
               "group": "",
+              "mod": {},
               "specs": []
             },
             "longarms": {
@@ -261,6 +199,7 @@
               "attribute": "agility",
               "canDefault": true,
               "group": "Firearms",
+              "mod": {},
               "specs": []
             },
             "pistols": {
@@ -268,6 +207,7 @@
               "attribute": "agility",
               "canDefault": true,
               "group": "Firearms",
+              "mod": {},
               "specs": []
             },
             "throwing_weapons": {
@@ -275,6 +215,7 @@
               "attribute": "agility",
               "canDefault": true,
               "group": "",
+              "mod": {},
               "specs": []
             },
             "unarmed_combat": {
@@ -282,6 +223,7 @@
               "attribute": "agility",
               "canDefault": true,
               "group": "Close Combat",
+              "mod": {},
               "specs": []
             },
             "disguise": {
@@ -289,6 +231,7 @@
               "attribute": "intuition",
               "canDefault": true,
               "group": "Stealth",
+              "mod": {},
               "specs": []
             },
             "diving": {
@@ -296,6 +239,7 @@
               "attribute": "body",
               "canDefault": true,
               "group": "",
+              "mod": {},
               "specs": []
             },
             "escape_artist": {
@@ -303,6 +247,7 @@
               "attribute": "agility",
               "canDefault": true,
               "group": "",
+              "mod": {},
               "specs": []
             },
             "free_fall": {
@@ -310,6 +255,7 @@
               "attribute": "body",
               "canDefault": true,
               "group": "",
+              "mod": {},
               "specs": []
             },
             "gymnastics": {
@@ -317,6 +263,7 @@
               "attribute": "agility",
               "canDefault": true,
               "group": "Athletics",
+              "mod": {},
               "specs": []
             },
             "palming": {
@@ -324,6 +271,7 @@
               "attribute": "agility",
               "canDefault": false,
               "group": "Stealth",
+              "mod": {},
               "specs": []
             },
             "perception": {
@@ -331,6 +279,7 @@
               "attribute": "intuition",
               "canDefault": true,
               "group": "Stealth",
+              "mod": {},
               "specs": []
             },
             "running": {
@@ -338,6 +287,7 @@
               "attribute": "strength",
               "canDefault": true,
               "group": "Athletics",
+              "mod": {},
               "specs": []
             },
             "sneaking": {
@@ -345,6 +295,7 @@
               "attribute": "agility",
               "canDefault": true,
               "group": "Stealth",
+              "mod": {},
               "specs": []
             },
             "survival": {
@@ -352,6 +303,7 @@
               "attribute": "willpower",
               "canDefault": true,
               "group": "Outdoors",
+              "mod": {},
               "specs": []
             },
             "swimming": {
@@ -359,6 +311,7 @@
               "attribute": "strength",
               "canDefault": true,
               "group": "Athletics",
+              "mod": {},
               "specs": []
             },
             "tracking": {
@@ -366,6 +319,7 @@
               "attribute": "intuition",
               "canDefault": true,
               "group": "Outdoors",
+              "mod": {},
               "specs": []
             },
             "con": {
@@ -373,6 +327,7 @@
               "attribute": "charisma",
               "canDefault": true,
               "group": "Acting",
+              "mod": {},
               "specs": []
             },
             "etiquette": {
@@ -380,6 +335,7 @@
               "attribute": "charisma",
               "canDefault": true,
               "group": "Influence",
+              "mod": {},
               "specs": []
             },
             "impersonation": {
@@ -387,6 +343,7 @@
               "attribute": "charisma",
               "canDefault": true,
               "group": "Acting",
+              "mod": {},
               "specs": []
             },
             "instruction": {
@@ -394,6 +351,7 @@
               "attribute": "charisma",
               "canDefault": true,
               "group": "",
+              "mod": {},
               "specs": []
             },
             "intimidation": {
@@ -401,6 +359,7 @@
               "attribute": "charisma",
               "canDefault": true,
               "group": "",
+              "mod": {},
               "specs": []
             },
             "leadership": {
@@ -408,6 +367,7 @@
               "attribute": "charisma",
               "canDefault": true,
               "group": "Influence",
+              "mod": {},
               "specs": []
             },
             "negotiation": {
@@ -415,6 +375,7 @@
               "attribute": "charisma",
               "canDefault": true,
               "group": "Influence",
+              "mod": {},
               "specs": []
             },
             "performance": {
@@ -422,6 +383,7 @@
               "attribute": "charisma",
               "canDefault": true,
               "group": "Acting",
+              "mod": {},
               "specs": []
             },
             "alchemy": {
@@ -429,6 +391,7 @@
               "attribute": "magic",
               "canDefault": false,
               "group": "Enchanting",
+              "mod": {},
               "specs": []
             },
             "arcana": {
@@ -436,6 +399,7 @@
               "attribute": "logic",
               "canDefault": false,
               "group": "",
+              "mod": {},
               "specs": []
             },
             "artificing": {
@@ -443,6 +407,7 @@
               "attribute": "magic",
               "canDefault": false,
               "group": "Enchanting",
+              "mod": {},
               "specs": []
             },
             "assensing": {
@@ -450,6 +415,7 @@
               "attribute": "intuition",
               "canDefault": false,
               "group": "",
+              "mod": {},
               "specs": []
             },
             "astral_combat": {
@@ -457,6 +423,7 @@
               "attribute": "willpower",
               "canDefault": false,
               "group": "",
+              "mod": {},
               "specs": []
             },
             "banishing": {
@@ -464,6 +431,7 @@
               "attribute": "magic",
               "canDefault": false,
               "group": "Conjuring",
+              "mod": {},
               "specs": []
             },
             "binding": {
@@ -471,6 +439,7 @@
               "attribute": "magic",
               "canDefault": false,
               "group": "Conjuring",
+              "mod": {},
               "specs": []
             },
             "counterspelling": {
@@ -478,6 +447,7 @@
               "attribute": "magic",
               "canDefault": false,
               "group": "Conjuring",
+              "mod": {},
               "specs": []
             },
             "disenchanting": {
@@ -485,6 +455,7 @@
               "attribute": "magic",
               "canDefault": false,
               "group": "Enchanting",
+              "mod": {},
               "specs": []
             },
             "ritual_spellcasting": {
@@ -492,6 +463,7 @@
               "attribute": "magic",
               "canDefault": false,
               "group": "Sorcery",
+              "mod": {},
               "specs": []
             },
             "spellcasting": {
@@ -499,6 +471,7 @@
               "attribute": "magic",
               "canDefault": false,
               "group": "Sorcery",
+              "mod": {},
               "specs": []
             },
             "summoning": {
@@ -506,6 +479,7 @@
               "attribute": "magic",
               "canDefault": false,
               "group": "Conjuring",
+              "mod": {},
               "specs": []
             },
             "compiling": {
@@ -513,6 +487,7 @@
               "attribute": "resonance",
               "canDefault": false,
               "group": "Tasking",
+              "mod": {},
               "specs": []
             },
             "decompiling": {
@@ -520,6 +495,7 @@
               "attribute": "resonance",
               "canDefault": false,
               "group": "Tasking",
+              "mod": {},
               "specs": []
             },
             "registering": {
@@ -527,6 +503,7 @@
               "attribute": "resonance",
               "canDefault": false,
               "group": "Tasking",
+              "mod": {},
               "specs": []
             },
             "aeronautics_mechanic": {
@@ -534,6 +511,7 @@
               "attribute": "logic",
               "canDefault": false,
               "group": "Engineering",
+              "mod": {},
               "specs": []
             },
             "automotive_mechanic": {
@@ -541,6 +519,7 @@
               "attribute": "logic",
               "canDefault": false,
               "group": "Engineering",
+              "mod": {},
               "specs": []
             },
             "industrial_mechanic": {
@@ -548,6 +527,7 @@
               "attribute": "logic",
               "canDefault": false,
               "group": "Engineering",
+              "mod": {},
               "specs": []
             },
             "nautical_mechanic": {
@@ -555,6 +535,7 @@
               "attribute": "logic",
               "canDefault": false,
               "group": "Engineering",
+              "mod": {},
               "specs": []
             },
             "animal_handling": {
@@ -562,6 +543,7 @@
               "attribute": "charisma",
               "canDefault": true,
               "group": "",
+              "mod": {},
               "specs": []
             },
             "armorer": {
@@ -569,6 +551,7 @@
               "attribute": "logic",
               "canDefault": true,
               "group": "",
+              "mod": {},
               "specs": []
             },
             "artisan": {
@@ -576,6 +559,7 @@
               "attribute": "intuition",
               "canDefault": false,
               "group": "",
+              "mod": {},
               "specs": []
             },
             "biotechnology": {
@@ -583,6 +567,7 @@
               "attribute": "logic",
               "canDefault": false,
               "group": "",
+              "mod": {},
               "specs": []
             },
             "chemistry": {
@@ -590,6 +575,7 @@
               "attribute": "logic",
               "canDefault": false,
               "group": "",
+              "mod": {},
               "specs": []
             },
             "computer": {
@@ -597,6 +583,7 @@
               "attribute": "logic",
               "canDefault": true,
               "group": "Electronics",
+              "mod": {},
               "specs": []
             },
             "cybercombat": {
@@ -604,6 +591,7 @@
               "attribute": "logic",
               "canDefault": true,
               "group": "Cracking",
+              "mod": {},
               "specs": []
             },
             "cybertechnology": {
@@ -611,6 +599,7 @@
               "attribute": "logic",
               "canDefault": false,
               "group": "Biotech",
+              "mod": {},
               "specs": []
             },
             "demolitions": {
@@ -618,6 +607,7 @@
               "attribute": "logic",
               "canDefault": true,
               "group": "",
+              "mod": {},
               "specs": []
             },
             "electronic_warfare": {
@@ -625,6 +615,7 @@
               "attribute": "logic",
               "canDefault": false,
               "group": "Cracking",
+              "mod": {},
               "specs": []
             },
             "first_aid": {
@@ -632,6 +623,7 @@
               "attribute": "logic",
               "canDefault": true,
               "group": "Biotech",
+              "mod": {},
               "specs": []
             },
             "forgery": {
@@ -639,6 +631,7 @@
               "attribute": "logic",
               "canDefault": true,
               "group": "",
+              "mod": {},
               "specs": []
             },
             "hacking": {
@@ -646,6 +639,7 @@
               "attribute": "logic",
               "canDefault": true,
               "group": "Cracking",
+              "mod": {},
               "specs": []
             },
             "hardware": {
@@ -653,6 +647,7 @@
               "attribute": "logic",
               "canDefault": false,
               "group": "Electronics",
+              "mod": {},
               "specs": []
             },
             "locksmith": {
@@ -660,6 +655,7 @@
               "attribute": "agility",
               "canDefault": false,
               "group": "",
+              "mod": {},
               "specs": []
             },
             "medicine": {
@@ -667,6 +663,7 @@
               "attribute": "logic",
               "canDefault": false,
               "group": "Biotech",
+              "mod": {},
               "specs": []
             },
             "navigation": {
@@ -674,6 +671,7 @@
               "attribute": "intuition",
               "canDefault": true,
               "group": "Outdoors",
+              "mod": {},
               "specs": []
             },
             "software": {
@@ -681,6 +679,7 @@
               "attribute": "logic",
               "canDefault": false,
               "group": "Electronics",
+              "mod": {},
               "specs": []
             },
             "gunnery": {
@@ -688,6 +687,7 @@
               "attribute": "agility",
               "canDefault": true,
               "group": "",
+              "mod": {},
               "specs": []
             },
             "pilot_aerospace": {
@@ -695,6 +695,7 @@
               "attribute": "reaction",
               "canDefault": false,
               "group": "",
+              "mod": {},
               "specs": []
             },
             "pilot_aircraft": {
@@ -702,6 +703,7 @@
               "attribute": "reaction",
               "canDefault": false,
               "group": "",
+              "mod": {},
               "specs": []
             },
             "pilot_walker": {
@@ -709,6 +711,7 @@
               "attribute": "reaction",
               "canDefault": false,
               "group": "",
+              "mod": {},
               "specs": []
             },
             "pilot_ground_craft": {
@@ -716,6 +719,7 @@
               "attribute": "reaction",
               "canDefault": false,
               "group": "",
+              "mod": {},
               "specs": []
             },
             "pilot_water_craft": {
@@ -723,6 +727,7 @@
               "attribute": "reaction",
               "canDefault": false,
               "group": "",
+              "mod": {},
               "specs": []
             },
             "pilot_exotic_vehicle": {
@@ -730,6 +735,7 @@
               "attribute": "reaction",
               "canDefault": false,
               "group": "",
+              "mod": {},
               "specs": []
             }
           },
@@ -756,10 +762,105 @@
             "value": {}
           }
         }
+      },
+      "common": {
+        "name": "",
+        "metatype": "",
+        "ethnicity": "",
+        "age": "",
+        "sex": "",
+        "height": "",
+        "weight": "",
+        "street_cred": 0,
+        "notoriety": 0,
+        "public_awareness": 0,
+        "special": "mundane",
+        "description": {
+          "value": ""
+        },
+        "karma": {
+          "value": 0,
+          "max": 0
+        },
+        "nuyen": 0,
+        "rent": {
+          "cost": 0,
+          "locations": []
+        },
+        "movement": {
+          "walk": {
+            "value": 1
+          },
+          "run": {
+            "value": 2
+          },
+          "sprint": 2,
+          "swimming": 2
+        },
+        "magic": {
+          "attribute": "logic",
+          "projecting": false,
+          "drain": {
+            "value": 0,
+            "base": 0,
+            "mod": {}
+          }
+        },
+        "wounds": {
+          "value": 0
+        },
+        "armor": {
+          "value": 0,
+          "mod": 0,
+          "acid": 0,
+          "cold": 0,
+          "fire": 0,
+          "electricity": 0,
+          "radiation": 0
+        },
+        "initiative": {
+          "perception": "meatspace",
+          "meatspace": {
+            "dice": {
+              "base": 1,
+              "mod": {},
+              "value": 1
+            },
+            "base": {
+              "base": 1,
+              "mod": {},
+              "value": 1
+            }
+          },
+          "matrix": {
+            "dice": {
+              "base": 1,
+              "mod": {},
+              "value": 1
+            },
+            "base": {
+              "base": 1,
+              "mod": {},
+              "value": 1
+            }
+          },
+          "astral": {
+            "dice": {
+              "base": 1,
+              "mod": {},
+              "value": 1
+            },
+            "base": {
+              "base": 1,
+              "mod": {},
+              "value": 1
+            }
+          }
+        }
       }
     },
     "character": {
-      "templates": ["common"],
+      "templates": ["common", "skills", "attributes", "matrix", "limits"],
       "track": {
         "stun": {
           "value": 0,

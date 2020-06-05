@@ -4,9 +4,21 @@ declare namespace Shadowrun {
         dice: BaseValuePair<number> & ModifiableValue;
         base: BaseValuePair<number> & ModifiableValue;
 
-        attack: AttributeField;
-        sleaze: AttributeField;
-        data_processing: AttributeField;
-        firewall: AttributeField;
+        attack: MatrixAttributeField;
+        sleaze: MatrixAttributeField;
+        data_processing: MatrixAttributeField;
+        firewall: MatrixAttributeField;
+
+        condition_monitor: ConditionData;
+        rating: NumberOrEmpty;
+        name: string;
+        device: string;
+        is_cyberdeck: boolean;
+        // TODO fix this
+        item: any;
     };
+
+    export type MatrixAttributeField = AttributeField & {
+        device_att: string;
+    }
 }

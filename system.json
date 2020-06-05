@@ -6,7 +6,7 @@
   "templateVersion": "1.3",
   "author": "Shawn Milligan [n3rf_herder#9026]",
   "esmodules": ["build/bundle.js"],
-  "styles": ["css/main.css", "css/actor.css", "css/config.css", "css/item.css", "css/chat.css"],
+  "styles": ["css/main.css"],
   "minimumCoreVersion": "0.6.0",
   "compatibleCoreVersion": "0.6.0",
   "languages": [
