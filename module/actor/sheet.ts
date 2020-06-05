@@ -3,11 +3,22 @@ import { ChummerImportForm } from '../apps/chummer-import-form.js';
 import { SkillEditForm } from '../apps/skill-edit.js';
 import { KnowledgeSkillEditForm } from '../apps/knowledge-skill-edit.js';
 import { LanguageSkillEditForm } from '../apps/language-skill-edit.js';
+import Limits = Shadowrun.Limits;
+import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
+import SR5SheetFilters = Shadowrun.SR5SheetFilters;
+import Skills = Shadowrun.Skills;
+import { SR5Actor } from './entity';
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
  */
 export class SR5ActorSheet extends ActorSheet {
+    _shownUntrainedSkills: boolean;
+    _shownDesc: string[];
+    _filters: SR5SheetFilters;
+    actor: SR5Actor;
+    _scroll: string;
+
     constructor(...args) {
         super(...args);
 
@@ -51,47 +62,47 @@ export class SR5ActorSheet extends ActorSheet {
      * The prepared data object contains both the actor data as well as additional sheet options
      */
     getData() {
-        const data = super.getData();
+        const data: SR5ActorSheetData = super.getData() as unknown as SR5ActorSheetData;
 
         // do some calculations
-        const limits = data.data.limits;
-        if (limits.physical.mod === 0) delete limits.physical.mod;
-        if (limits.social.mod === 0) delete limits.social.mod;
-        if (limits.mental.mod === 0) delete limits.mental.mod;
+        const { limits } : { limits: Limits } = data.data;
+        if (limits.physical.mod['Misc'] === 0) delete limits.physical.mod;
+        if (limits.social.mod['Misc'] === 0) delete limits.social.mod;
+        if (limits.mental.mod['Misc'] === 0) delete limits.mental.mod;
         const movement = data.data.movement;
         if (movement.walk.mult === 1 || movement.walk.mult === 0) delete movement.walk.mult;
         if (movement.run.mult === 2 || movement.run.mult === 0) delete movement.run.mult;
         const track = data.data.track;
-        if (track.physical.mod === 0) delete track.physical.mod;
-        if (track.stun && track.stun.mod === 0) delete track.stun.mod;
+        if (track.physical.mod['Misc'] === 0) delete track.physical.mod['Misc'];
+        if (track.stun && track.stun.mod['Misc'] === 0) delete track.stun.mod['Misc'];
 
         const attrs = data.data.attributes;
         for (let [label, att] of Object.entries(attrs)) {
             if (!att.hidden) {
-                if (att.mod === 0) delete att.mod;
+                if (att.mod['Temporary'] === 0) delete att.mod;
             }
         }
 
-        const matrix = data.data.matrix;
-        if (matrix.attack.mod === 0) delete matrix.attack.mod;
-        if (matrix.sleaze.mod === 0) delete matrix.sleaze.mod;
-        if (matrix.data_processing.mod === 0) delete matrix.data_processing.mod;
-        if (matrix.firewall.mod === 0) delete matrix.firewall.mod;
+        const { matrix } = data.data;
+        if (matrix.attack.mod['Temporary'] === 0) delete matrix.attack.mod['Temporary'];
+        if (matrix.sleaze.mod['Temporary'] === 0) delete matrix.sleaze.mod['Temporary'];
+        if (matrix.data_processing.mod['Temporary'] === 0) delete matrix.data_processing.mod['Temporary'];
+        if (matrix.firewall.mod['Temporary'] === 0) delete matrix.firewall.mod['Temporary'];
 
-        const magic = data.data.magic;
-        if (magic.drain && magic.drain.mod === 0) delete magic.drain.mod;
+        const { magic } = data.data;
+        if (magic.drain && magic.drain.mod['Temporary'] === 0) delete magic.drain.mod['Temporary'];
 
-        const mods = data.data.modifiers;
+        const { modifiers: mods } = data.data;
         for (let [key, value] of Object.entries(mods)) {
-            if (value === 0) mods[key] = '';
+            if (value === 0) delete mods[key];
         }
 
         this._prepareItems(data);
         this._prepareSkills(data);
 
-        data.config = CONFIG.SR5;
-        data.awakened = data.data.special === 'magic';
-        data.emerged = data.data.special === 'resonance';
+        data['config'] = CONFIG.SR5;
+        data['awakened'] = data.data.special === 'magic';
+        data['emerged'] = data.data.special === 'resonance';
 
         data.filters = this._filters;
 
@@ -109,7 +120,8 @@ export class SR5ActorSheet extends ActorSheet {
 
     _prepareSkills(data) {
         const activeSkills = {};
-        for (let [key, skill] of Object.entries(data.data.skills.active)) {
+        const oldSkills: Skills = data.data.skills.active;
+        for (let [key, skill] of Object.entries(oldSkills)) {
             // if filter isn't empty, we are doing custom filtering
             if (this._filters.skills !== '') {
                 if (this._doesSkillContainText(key, skill, this._filters.skills)) {
@@ -217,7 +229,6 @@ export class SR5ActorSheet extends ActorSheet {
             sins,
         ] = data.items.reduce(
             (arr, item) => {
-                item.img = item.img || DEFAULT_TOKEN;
                 item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
                 if (item.type === 'spell') arr[1].push(item);
                 else if (item.type === 'quality') arr[2].push(item);
@@ -329,40 +340,14 @@ export class SR5ActorSheet extends ActorSheet {
         html.find('.skill-edit').click(this._onShowEditSkill.bind(this));
         html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
         html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
-        html.find('.matrix-att-selector').change(async (event) => {
-            let iid = this.actor.data.data.matrix.device;
-            let item = this.actor.getOwnedItem(iid);
-            if (!item) console.error('could not find item');
-            // grab matrix attribute (sleaze, attack, etc.)
-            let att = event.currentTarget.dataset.att;
-            // grab device attribute (att1, att2, ...)
-            let deviceAtt = event.currentTarget.value;
-
-            // get current matrix attribute on the device
-            let oldVal = item.data.data.atts[deviceAtt].att;
-            let data = {
-                _id: iid,
-            };
-
-            // go through atts on device, setup matrix attributes on it
-            for (let i = 1; i <= 4; i++) {
-                let tmp = `att${i}`;
-                let key = `data.atts.att${i}.att`;
-                if (tmp === deviceAtt) {
-                    data[key] = att;
-                } else if (item.data.data.atts[`att${i}`].att === att) {
-                    data[key] = oldVal;
-                }
-            }
-            await this.actor.updateOwnedItem(data);
-        });
+        html.find('.matrix-att-selector').change(this._onMatrixAttributeSelected.bind(this));
 
         // Update Inventory Item
         html.find('.item-edit').click((event) => {
             event.preventDefault();
             const iid = event.currentTarget.closest('.item').dataset.itemId;
             const item = this.actor.getOwnedItem(iid);
-            item.sheet.render(true);
+            if (item) item.sheet.render(true);
         });
         // Delete Inventory Item
         html.find('.item-delete').click((event) => {
@@ -392,6 +377,37 @@ export class SR5ActorSheet extends ActorSheet {
         const iid = event.currentTarget.closest('.item').dataset.itemId;
         const item = this.actor.getOwnedItem(iid);
         if (item) return item.reloadAmmo();
+    }
+
+    async _onMatrixAttributeSelected(event) {
+        let iid = this.actor.data.data.matrix.device;
+        let item = this.actor.getOwnedItem(iid);
+        if (!item) {
+            console.error('could not find item');
+            return;
+        }
+        // grab matrix attribute (sleaze, attack, etc.)
+        let att = event.currentTarget.dataset.att;
+        // grab device attribute (att1, att2, ...)
+        let deviceAtt = event.currentTarget.value;
+
+        // get current matrix attribute on the device
+        let oldVal = item.data.data.atts[deviceAtt].att;
+        let data = {
+            _id: iid,
+        };
+
+        // go through atts on device, setup matrix attributes on it
+        for (let i = 1; i <= 4; i++) {
+            let tmp = `att${i}`;
+            let key = `data.atts.att${i}.att`;
+            if (tmp === deviceAtt) {
+                data[key] = att;
+            } else if (item.data.data.atts[`att${i}`].att === att) {
+                data[key] = oldVal;
+            }
+        }
+        await this.actor.updateOwnedItem(data);
     }
 
     _onItemCreate(event) {
@@ -456,7 +472,7 @@ export class SR5ActorSheet extends ActorSheet {
         const item = this.actor.getOwnedItem(iid);
         if (item) {
             const itemData = item.data.data;
-            const newItems = [];
+            const newItems = [] as any[];
             if (item.type === 'device') {
                 // turn off all other devices than the one that is being equipped
                 // if clicking the equipped, toggle it
@@ -492,7 +508,7 @@ export class SR5ActorSheet extends ActorSheet {
         event.preventDefault();
         const iid = event.currentTarget.closest('.item').dataset.itemId;
         const item = this.actor.getOwnedItem(iid);
-        item.roll(event);
+        if (item) return item.roll(event);
     }
 
     async _onRollFade(event) {
@@ -507,29 +523,29 @@ export class SR5ActorSheet extends ActorSheet {
 
     async _onRollArmor(event) {
         event.preventDefault();
-        this.actor.rollArmor({ event: event });
+        return this.actor.rollArmor({ event: event });
     }
 
     async _onRollDefense(event) {
         event.preventDefault();
-        this.actor.rollDefense({ event: event });
+        return this.actor.rollDefense({ event: event });
     }
 
     async _onRollMatrixAttribute(event) {
         event.preventDefault();
         const attr = event.currentTarget.dataset.attribute;
-        this.actor.rollMatrixAttribute(attr, { event: event });
+        return this.actor.rollMatrixAttribute(attr, { event: event });
     }
 
-    async _onRollSoak(event) {
+    async _onRollSoak(event: MouseEvent) {
         event.preventDefault();
-        this.actor.rollSoak({ event: event });
+        return this.actor.rollSoak({ event: event });
     }
 
     async _onRollAttributesOnly(event) {
         event.preventDefault();
-        const roll = event.currentTarget.dataset.roll;
-        this.actor.rollAttributesTest(roll, { event: event });
+        const roll = event.currentTarget?.data.roll;
+        return this.actor.rollAttributesTest(roll, { event: event });
     }
 
     async _onRollKnowledgeSkill(event) {
@@ -561,15 +577,15 @@ export class SR5ActorSheet extends ActorSheet {
      * @private
      */
     _findActiveList() {
-        return this.element.find('.tab.active .scroll-area');
+        return $(this.element).find('.tab.active .scroll-area');
     }
 
     /**
      * @private
      */
     async _render(...args) {
-        let focus = this.element.find(':focus');
-        focus = focus.length ? focus[0] : null;
+        const focusList = $(this.element).find(':focus');
+        const focus: any = focusList.length ? focusList[0] : null;
 
         this._saveScrollPositions();
         await super._render(...args);

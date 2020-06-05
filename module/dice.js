@@ -118,12 +118,12 @@ export class DiceSR {
                         if (cancel)
                             return;
                         // get the actual dice_pool from the difference of initial parts and value in the dialog
-                        let dicePool = Helpers.parseInput($(html).find('[name="dice_pool"]').val());
-                        +Helpers.parseInput($(html).find('[name="dp_mod"]').val());
-                        +Helpers.parseInput($(html).find('[name="wounds"]').val());
-                        -Helpers.parseInput($(html).find('[name="options.environmental"]').val());
-                        const limit = Helpers.parseInput($(html).find('[name="limit"]').val());
-                        const extended = Helpers.parseInput($(html).find('[name="extended"]').val()) !== 0;
+                        let dicePool = Helpers.parseInputToNumber($(html).find('[name="dice_pool"]').val());
+                        +Helpers.parseInputToNumber($(html).find('[name="dp_mod"]').val());
+                        +Helpers.parseInputToNumber($(html).find('[name="wounds"]').val());
+                        -Helpers.parseInputToNumber($(html).find('[name="options.environmental"]').val());
+                        const limit = Helpers.parseInputToNumber($(html).find('[name="limit"]').val());
+                        const extended = Helpers.parseInputToNumber($(html).find('[name="extended"]').val()) !== 0;
                         if (edge && actor) {
                             dicePool += actor.data.data.attributes.edge.max;
                             actor.update({

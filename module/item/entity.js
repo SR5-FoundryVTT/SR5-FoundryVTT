@@ -599,7 +599,7 @@ export class SR5Item extends Item {
                     close: (html) => {
                         if (cancel)
                             return;
-                        const fireMode = Helpers.parseInput($(html).find('[name="fireMode"]').val());
+                        const fireMode = Helpers.parseInputToNumber($(html).find('[name="fireMode"]').val());
                         if (fireMode) {
                             title += ` - Defender (${Helpers.mapRoundsToDefenseDesc(fireMode)})`;
                         }
@@ -661,7 +661,7 @@ export class SR5Item extends Item {
                     close: (html) => {
                         if (cancel)
                             return;
-                        const force = Helpers.parseInput($(html).find('[name=force]').val());
+                        const force = Helpers.parseInputToNumber($(html).find('[name=force]').val());
                         limit = force;
                         DiceSR.rollTest({
                             event: ev,
@@ -712,7 +712,7 @@ export class SR5Item extends Item {
                     close: (html) => {
                         if (cancel)
                             return;
-                        const level = Helpers.parseInput($(html).find('[name=level]').val());
+                        const level = Helpers.parseInputToNumber($(html).find('[name=level]').val());
                         limit = level;
                         DiceSR.rollTest({
                             event: ev,

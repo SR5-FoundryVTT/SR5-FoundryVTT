@@ -7,7 +7,7 @@ declare namespace Shadowrun {
 
     export type DeviceCategory = 'commlink' | 'cyberdeck';
 
-    export type DeviceData = {
+    export type DeviceData = TechnologyData & {
         category: DeviceCategory;
         atts: {
             att1: DeviceAttribute;

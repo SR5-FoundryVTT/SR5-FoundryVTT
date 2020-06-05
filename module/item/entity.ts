@@ -638,7 +638,7 @@ export class SR5Item extends Item {
                     close: (html) => {
                         if (cancel) return;
 
-                        const fireMode = Helpers.parseInput(
+                        const fireMode = Helpers.parseInputToNumber(
                             $(html).find('[name="fireMode"]').val()
                         );
                         if (fireMode) {
@@ -702,7 +702,9 @@ export class SR5Item extends Item {
                         },
                         close: (html) => {
                             if (cancel) return;
-                            const force = Helpers.parseInput($(html).find('[name=force]').val());
+                            const force = Helpers.parseInputToNumber(
+                                $(html).find('[name=force]').val()
+                            );
                             limit = force;
                             DiceSR.rollTest({
                                 event: ev,
@@ -757,12 +759,14 @@ export class SR5Item extends Item {
                     },
                     close: (html) => {
                         if (cancel) return;
-                        const level = Helpers.parseInput($(html).find('[name=level]').val());
+                        const level = Helpers.parseInputToNumber(
+                            $(html).find('[name=level]').val()
+                        );
                         limit = level;
                         DiceSR.rollTest({
                             event: ev,
                             dialogOptions: {
-                                environmental: false
+                                environmental: false,
                             },
                             parts,
                             actor: this.actor,
@@ -780,7 +784,7 @@ export class SR5Item extends Item {
                 event: ev,
                 parts,
                 dialogOptions: {
-                    environmental: true
+                    environmental: true,
                 },
                 actor: this.actor,
                 limit,
@@ -937,7 +941,11 @@ export class SR5Item extends Item {
         return true;
     }
 
-    async updateEmbeddedEntity(embeddedName: string, updateData: object | object[], options?: object) {
+    async updateEmbeddedEntity(
+        embeddedName: string,
+        updateData: object | object[],
+        options?: object
+    ) {
         this.updateOwnedItem(updateData);
         return this;
     }

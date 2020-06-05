@@ -21,12 +21,24 @@ export class Helpers {
         atts.forEach((att) => {
             if (typeof att === 'string' && matrixAtts.includes(att))
                 return true;
-            if (typeof att === 'object' && matrixLabels.includes(att.label))
+            else if (matrixLabels.includes(att.label))
                 return true;
         });
         return false;
     }
-    static parseInput(val) {
+    static parseInputToString(val) {
+        if (val === undefined)
+            return '';
+        if (typeof val === 'number')
+            return val.toString();
+        if (typeof val === 'string')
+            return val;
+        if (Array.isArray(val)) {
+            return val.join(',');
+        }
+        return '';
+    }
+    static parseInputToNumber(val) {
         if (typeof val === 'number')
             return val;
         if (typeof val === 'string') {

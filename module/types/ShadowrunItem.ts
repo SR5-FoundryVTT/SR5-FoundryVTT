@@ -19,20 +19,18 @@ declare namespace Shadowrun {
             condition_monitor?: ConditionData;
         };
 
-    export type TechnologyData = {
-        technology: TechnologyMetaData;
-    };
-
     /**
      * Technology data for an item.
      */
-    export type TechnologyMetaData = {
-        rating: NumberOrEmpty;
-        availability: string;
-        quantity: NumberOrEmpty;
-        cost: NumberOrEmpty;
-        equipped: boolean;
-        conceal: ModifiableValue;
+    export type TechnologyData = {
+        technology: {
+            rating: NumberOrEmpty;
+            availability: string;
+            quantity: NumberOrEmpty;
+            cost: NumberOrEmpty;
+            equipped: boolean;
+            conceal: ModifiableValue;
+        };
     };
 
     /**
