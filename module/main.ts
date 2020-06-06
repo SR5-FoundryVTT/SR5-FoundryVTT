@@ -57,27 +57,26 @@ Hooks.on('canvasInit', function () {
 });
 
 Hooks.on('ready', function () {
-    console.log(game.socket);
-
     // this is correct, will need to be fixed in foundry types
     // @ts-ignore
     game.socket.on('system.shadowrun5e', (data) => {
         if (game.user.isGM && data.gmCombatUpdate) {
             shadowrunCombatUpdate(data.gmCombatUpdate.changes, data.gmCombatUpdate.options);
         }
-        console.log(data);
     });
 
-    // Determine whether a system migration is required and feasible
-    const currentVersion = game.settings.get('shadowrun5e', 'systemMigrationVersion');
-    // the latest version that requires migration
-    const NEEDS_MIGRATION_VERSION = '0.5.12';
-    let needMigration =
-        currentVersion === null || compareVersion(currentVersion, NEEDS_MIGRATION_VERSION) < 0;
+    if (game.user.isGM) {
+        // Determine whether a system migration is required and feasible
+        const currentVersion = game.settings.get('shadowrun5e', 'systemMigrationVersion');
+        // the latest version that requires migration
+        const NEEDS_MIGRATION_VERSION = '0.5.12';
+        let needMigration =
+            currentVersion === null || compareVersion(currentVersion, NEEDS_MIGRATION_VERSION) < 0;
 
-    // Perform the migration
-    if (needMigration && game.user.isGM) {
-        migrations.migrateWorld();
+        // Perform the migration
+        if (needMigration && game.user.isGM) {
+            migrations.migrateWorld();
+        }
     }
 });
 
