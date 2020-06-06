@@ -190,8 +190,9 @@ export class SR5Item extends Item {
 
     _actionChatData(data, labels, props) {
         if (data.action) {
-            if (data.action.limit.value) props.push(`Limit ${data.action.limit.value}`);
-            if (data.action.type) props.push(`${Helpers.label(data.action.type)} Action`);
+            if (data.action.type && data.action.type !== 'varies' && data.action.type !== 'none') {
+                props.push(`${Helpers.label(data.action.type)} Action`);
+            }
             if (data.action.skill) {
                 labels.roll = `${Helpers.label(data.action.skill)}+${Helpers.label(
                     data.action.attribute
@@ -212,6 +213,7 @@ export class SR5Item extends Item {
                 if (damage.ap && damage.ap.value) props.push(`AP ${damage.ap.value}`);
                 if (damage.element.value) props.push(Helpers.label(damage.element.value));
             }
+            if (data.action.limit.value) props.push(`Limit ${data.action.limit.value}`);
             if (data.action.opposed.type) {
                 const { opposed } = data.action;
                 if (opposed.type !== 'custom')
@@ -333,8 +335,6 @@ export class SR5Item extends Item {
         }
         // add range
         props.push(Helpers.label(data.range));
-
-        delete data.action.type;
 
         // add action data
         this._actionChatData(data, labels, props);
