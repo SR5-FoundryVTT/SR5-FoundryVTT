@@ -893,6 +893,7 @@ export class SR5Actor extends Actor {
 
         if (options?.attribute) att = this.data.data.attributes[options.attribute];
         let limit = this.data.data.limits[att.limit];
+        console.log(limit);
         const parts = {};
         parts[skill.label] = skill.value;
 
@@ -949,7 +950,7 @@ export class SR5Actor extends Actor {
                         const newAtt = Helpers.parseInputToString(
                             $(html).find('[name="attribute"]').val()
                         );
-                        const newLimit = Helpers.parseInputToNumber(
+                        const newLimit = Helpers.parseInputToString(
                             $(html).find('[name="attribute.limit"]').val()
                         );
                         att = this.data.data.attributes[newAtt];
