@@ -39,3 +39,27 @@ jobs:
         env:
           # This is necessary in order to push a commit to the repo
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Leave this line unchanged
+  create_release:
+     name: "Pre Release"
+     runs-on: "ubuntu-latest"
+     
+     steps:
+     - name: Automatic Releases
+       uses: marvinpinto/action-automatic-releases@latest
+       with:
+         # GitHub secret token
+         repo_token: "${{ secrets.GITHUB_TOKEN }}"
+         # Git tag (for automatic releases)
+         automatic_release_tag: "latest"
+         # Release title (for automatic releases)
+         title: "Development Build"
+         # Assets to upload to the release
+         files: |
+           system.json
+           template.json
+           build/bundle.js
+           css/main.css
+           ui/**
+           lang/**
+           templates/**
+           
