@@ -26,7 +26,7 @@ declare namespace Shadowrun {
     };
 
     export type Modifiers = {
-        [name: string]: number;
+        [name: string]: NumberOrEmpty;
     };
 
     export type SkillEditFormData = BaseEntitySheetData & {

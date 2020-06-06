@@ -445,10 +445,10 @@ export class SR5Item extends Item {
             }
         } else if (data.category === 'thrown') {
             const { blast } = data.thrown;
-            if (blast?.value)
+            if (blast?.radius)
                 props.push(`${game.i18n.localize('SR5.BlastRadius')} ${blast.radius}m`);
             if (blast?.dropoff)
-                props.push(`${game.i18n.localize('SR5.DropOff')} ${blast.dropoff}/m`);
+                props.push(`${game.i18n.localize('SR5.Dropoff')} ${blast.dropoff}/m`);
 
             if (data.thrown.ranges) {
                 const mult =

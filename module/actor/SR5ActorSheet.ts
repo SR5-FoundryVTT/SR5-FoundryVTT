@@ -78,7 +78,7 @@ export class SR5ActorSheet extends ActorSheet {
 
         const { modifiers: mods } = data.data;
         for (let [key, value] of Object.entries(mods)) {
-            if (value === 0) delete mods[key];
+            if (value === 0) mods[key] = "";
         }
 
         this._prepareItems(data);
@@ -505,7 +505,7 @@ export class SR5ActorSheet extends ActorSheet {
 
     async _onRollAttributesOnly(event) {
         event.preventDefault();
-        const roll = event.currentTarget?.data.roll;
+        const roll = event.currentTarget.dataset.roll;
         return this.actor.rollAttributesTest(roll, { event: event });
     }
 
@@ -513,25 +513,25 @@ export class SR5ActorSheet extends ActorSheet {
         event.preventDefault();
         const skill = event.currentTarget.dataset.skill;
         const category = event.currentTarget.dataset.category;
-        this.actor.rollKnowledgeSkill(category, skill, { event: event });
+        return this.actor.rollKnowledgeSkill(category, skill, { event: event });
     }
 
     async _onRollLanguageSkill(event) {
         event.preventDefault();
         const skill = event.currentTarget.dataset.skill;
-        this.actor.rollLanguageSkill(skill, { event: event });
+        return this.actor.rollLanguageSkill(skill, { event: event });
     }
 
     async _onRollActiveSkill(event) {
         event.preventDefault();
         const skill = event.currentTarget.dataset.skill;
-        this.actor.rollActiveSkill(skill, { event: event });
+        return this.actor.rollActiveSkill(skill, { event: event });
     }
 
     async _onRollAttribute(event) {
         event.preventDefault();
         const attr = event.currentTarget.dataset.attribute;
-        this.actor.rollAttribute(attr, { event: event });
+        return this.actor.rollAttribute(attr, { event: event });
     }
 
     /**

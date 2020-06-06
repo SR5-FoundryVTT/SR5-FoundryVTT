@@ -334,6 +334,7 @@ export class SR5Actor extends Actor {
 
         const soak = attributes.body.value + armor.value + modifiers['soak'];
         const drainAtt = attributes[data.magic.attribute];
+        if (data.magic.drain && !data.magic.drain.mod) data.magic.drain.mod = {};
         data.rolls = {
             ...data.rolls,
             defense: attributes.reaction.value + attributes.intuition.value + modifiers['defense'],
