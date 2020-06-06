@@ -9,9 +9,12 @@
  */
 export const measureDistance = function (p0, p1, { gridSpaces = true } = {}) {
     if (!gridSpaces)
-        return BaseGrid.prototype.measureDistance.bind(this)(p0, p1, {
-            gridSpaces,
-        });
+        {  // BaseGrid exists... fix in foundry types
+            // @ts-ignore
+            return BaseGrid.prototype.measureDistance.bind(this)(p0, p1, {
+                        gridSpaces,
+                    });
+        }
     const gs = canvas.dimensions.size;
     const ray = new Ray(p0, p1);
     const nx = Math.abs(Math.ceil(ray.dx / gs));

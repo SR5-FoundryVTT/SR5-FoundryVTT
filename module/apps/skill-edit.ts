@@ -1,4 +1,8 @@
+import SkillEditFormData = Shadowrun.SkillEditFormData;
+
 export class SkillEditForm extends BaseEntitySheet {
+    skillId: string;
+
     constructor(actor, skillId, options) {
         super(actor, options);
         this.skillId = skillId;
@@ -23,19 +27,20 @@ export class SkillEditForm extends BaseEntitySheet {
     }
 
     get title() {
-        return `Edit Skill - ${game.i18n.localize(this.getData().data.label)}`;
+        const data = this.getData().data;
+        return `Edit Skill - ${data?.label ? game.i18n.localize(data.label) : ''}`;
     }
 
     _onUpdateObject(event, formData, updateData) {
         const base = formData['data.base'];
         const regex = /data\.specs\.(\d+)/;
-        const specs = Object.entries(formData).reduce((running, [key, val]) => {
+        const specs = Object.entries(formData).reduce((running, [key, val]: [string, any]) => {
             const found = key.match(regex);
             if (found && found[0]) {
                 running.push(val);
             }
             return running;
-        }, []);
+        }, [] as any[]);
 
         const currentData = updateData[this._updateString()] || {};
         updateData[this._updateString()] = {
@@ -61,31 +66,34 @@ export class SkillEditForm extends BaseEntitySheet {
     _addNewSpec(event) {
         event.preventDefault();
         const updateData = {};
-        // add a blank line to specs
-        const specializations = this.getData().data.specs;
-        updateData[`${this._updateString()}.specs`] = [...specializations, ''];
-
+        const data = this.getData().data;
+        if (data?.specs) {
+            // add a blank line to specs
+            const { specs } = data;
+            updateData[`${this._updateString()}.specs`] = [...specs, ''];
+        }
         this.entity.update(updateData);
     }
 
     _removeSpec(event) {
         event.preventDefault();
         const updateData = {};
-        const { specs } = this.getData().data;
-        const index = event.currentTarget.dataset.spec;
-        if (index >= 0) {
-            specs.splice(index, 1);
-            updateData[`${this._updateString()}.specs`] = specs;
-            this.entity.update(updateData);
+        const data = this.getData().data;
+        if (data?.specs) {
+            const { specs } = data;
+            const index = event.currentTarget.dataset.spec;
+            if (index >= 0) {
+                specs.splice(index, 1);
+                updateData[`${this._updateString()}.specs`] = specs;
+                this.entity.update(updateData);
+            }
         }
     }
 
-    getData() {
+    getData(): SkillEditFormData {
+        const data = super.getData();
         const actor = super.getData().entity;
-        const skill = getProperty(actor, this._updateString());
-        console.log(skill);
-        return {
-            data: skill,
-        };
+        data['data'] = actor ? getProperty(actor, this._updateString()) : {};
+        return data;
     }
 }

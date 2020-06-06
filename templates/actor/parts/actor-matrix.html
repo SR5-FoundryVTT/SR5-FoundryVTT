@@ -39,7 +39,7 @@
                 <option value="att4">{{data.matrix.item.atts.att4.value}}</option>
                 {{/select}}
             </select>
-            {{#if data.matrix.attack.mod}}
+            {{#if data.matrix.attack.mod.Temporary}}
             <input
                 class="display attribute-input"
                 type="text"
@@ -59,8 +59,8 @@
                 size="4"
                 maxlength="4"
                 type="text"
-                name="data.matrix.attack.mod"
-                value="{{data.matrix.attack.mod}}"
+                name="data.matrix.attack.mod.Temporary"
+                value="{{data.matrix.attack.mod.Temporary}}"
                 data-dtype="Number"
                 placeholder="+Mod"
             />
@@ -79,7 +79,7 @@
                 <option value="att4">{{data.matrix.item.atts.att4.value}}</option>
                 {{/select}}
             </select>
-            {{#if data.matrix.sleaze.mod}}
+            {{#if data.matrix.sleaze.mod.Temporary}}
             <input
                 class="display attribute-input"
                 type="text"
@@ -99,8 +99,8 @@
                 size="4"
                 maxlength="4"
                 type="text"
-                name="data.matrix.sleaze.mod"
-                value="{{data.matrix.sleaze.mod}}"
+                name="data.matrix.sleaze.mod.Temporary"
+                value="{{data.matrix.sleaze.mod.Temporary}}"
                 data-dtype="Number"
                 placeholder="+Mod"
             />
@@ -123,7 +123,7 @@
                 <option value="att4">{{data.matrix.item.atts.att4.value}}</option>
                 {{/select}}
             </select>
-            {{#if data.matrix.data_processing.mod}}
+            {{#if data.matrix.data_processing.mod.Temporary}}
             <input
                 class="display attribute-input"
                 type="text"
@@ -143,8 +143,8 @@
                 size="4"
                 maxlength="4"
                 type="text"
-                name="data.matrix.data_processing.mod"
-                value="{{data.matrix.data_processing.mod}}"
+                name="data.matrix.data_processing.mod.Temporary"
+                value="{{data.matrix.data_processing.mod.Temporary}}"
                 data-dtype="Number"
                 placeholder="+Mod"
             />
@@ -163,7 +163,7 @@
                 <option value="att4">{{data.matrix.item.atts.att4.value}}</option>
                 {{/select}}
             </select>
-            {{#if data.matrix.firewall.mod}}
+            {{#if data.matrix.firewall.mod.Temporary}}
             <input
                 class="display attribute-input"
                 type="text"
@@ -183,8 +183,8 @@
                 size="4"
                 maxlength="4"
                 type="text"
-                name="data.matrix.firewall.mod"
-                value="{{data.matrix.firewall.mod}}"
+                name="data.matrix.firewall.mod.Temporary"
+                value="{{data.matrix.firewall.mod.Temporary}}"
                 data-dtype="Number"
                 placeholder="+Mod"
             />
@@ -214,8 +214,8 @@
                 size="4"
                 maxlength="4"
                 type="text"
-                name="data.matrix.attack.mod"
-                value="{{data.matrix.attack.mod}}"
+                name="data.matrix.attack.mod.Temporary"
+                value="{{data.matrix.attack.mod.Temporary}}"
                 data-dtype="Number"
                 placeholder="+Mod"
             />
@@ -244,8 +244,8 @@
                 size="4"
                 maxlength="4"
                 type="text"
-                name="data.matrix.sleaze.mod"
-                value="{{data.matrix.sleaze.mod}}"
+                name="data.matrix.sleaze.mod.Temporary"
+                value="{{data.matrix.sleaze.mod.Temporary}}"
                 data-dtype="Number"
                 placeholder="+Mod"
             />
@@ -274,8 +274,8 @@
                 size="4"
                 maxlength="4"
                 type="text"
-                name="data.matrix.data_processing.mod"
-                value="{{data.matrix.data_processing.mod}}"
+                name="data.matrix.data_processing.mod.Temporary"
+                value="{{data.matrix.data_processing.mod.Temporary}}"
                 data-dtype="Number"
                 placeholder="+Mod"
             />
@@ -304,8 +304,8 @@
                 size="4"
                 maxlength="4"
                 type="text"
-                name="data.matrix.firewall.mod"
-                value="{{data.matrix.firewall.mod}}"
+                name="data.matrix.firewall.mod.Temporary"
+                value="{{data.matrix.firewall.mod.Temporary}}"
                 data-dtype="Number"
                 placeholder="+Mod"
             />
@@ -396,6 +396,11 @@
             </div>
         </div>
         <div class="item hidden">
+            <div class="props">
+                {{#each item.properties}}
+                <span>{{this}}</span>
+                {{/each}}
+            </div>
             <div class="item-desc">
                 {{{item.data.description.value}}}
             </div>

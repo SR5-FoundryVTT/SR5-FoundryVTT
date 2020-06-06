@@ -16,6 +16,7 @@ export const preCombatUpdate = async function (combat, changes, options) {
         if (game.user.isGM) {
             await shadowrunCombatUpdate(changes, options);
         } else {
+            // @ts-ignore
             game.socket.emit('system.shadowrun5e', {
                 gmCombatUpdate: {
                     changes,
@@ -36,10 +37,8 @@ export const shadowrunCombatUpdate = async (changes, options) => {
         init -= 10;
         if (init <= 0) removedCombatants.push({ ...c });
         else {
-            combatants.push({
-                _id: c._id,
-                initiative: init,
-            });
+            // @ts-ignore
+            combatants.push({ _id: c._id, initiative: init });
         }
     }
     await combat.deleteEmbeddedEntity(
@@ -56,7 +55,8 @@ export const shadowrunCombatUpdate = async (changes, options) => {
 
         for (const c of removedCombatants) {
             const actorData = c.actor ? c.actor.data : {};
-            const formula = combat.formula || combat._getInitiativeFormula(c);
+            // @ts-ignore
+            const formula = combat._getInitiativeFormula(c);
 
             const roll = new Roll(formula, actorData).roll();
             c.initiative = roll.total;
@@ -75,18 +75,21 @@ export const shadowrunCombatUpdate = async (changes, options) => {
                 },
                 messageOptions
             );
-            const chatData = roll.toMessage(messageData, {
+            roll.toMessage(messageData, {
                 rollMode,
                 create: false,
+            }).then((chatData) => {
+                // only make the sound once
+                if (sound) sound = false;
+                else chatData.sound = null;
+                // @ts-ignore
+                messages.push(chatData);
             });
-            // only make the sound once
-            if (sound) sound = false;
-            else chatData.sound = null;
-            messages.push(chatData);
         }
         await combat.createEmbeddedEntity('Combatant', removedCombatants, {});
         await ChatMessage.create(messages);
         await combat.unsetFlag('shadowrun5e', 'removedCombatants');
+        // @ts-ignore
         await combat.resetAll();
         await combat.rollAll();
         await combat.update({ turn: 0 });

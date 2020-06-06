@@ -1,18 +1,18 @@
 // Import Modules
-import { SR5ItemSheet } from './module/item/sheet.js';
-import { SR5ActorSheet } from './module/actor/sheet.js';
-import { SR5Actor } from './module/actor/entity.js';
-import { SR5Item } from './module/item/entity.js';
-import { SR5 } from './module/config.js';
-import { Helpers } from './module/helpers.js';
-import { registerSystemSettings } from './module/settings.js';
-import { preloadHandlebarsTemplates } from './module/templates.js';
-import { DiceSR } from './module/dice.js';
-import { preCombatUpdate, shadowrunCombatUpdate } from './module/combat.js';
-import { measureDistance } from './module/canvas.js';
-import * as chat from './module/chat.js';
-import * as migrations from './module/migration.js';
-import { OverwatchScoreTracker } from './module/apps/gmtools/OverwatchScoreTracker.js';
+import { SR5ItemSheet } from './item/SR5ItemSheet';
+import { SR5ActorSheet } from './actor/SR5ActorSheet';
+import { SR5Actor } from './actor/SR5Actor';
+import { SR5Item } from './item/SR5Item';
+import { SR5 } from './config';
+import { Helpers } from './helpers';
+import { registerSystemSettings } from './settings';
+import { preloadHandlebarsTemplates } from './templates';
+import { DiceSR } from './dice';
+import { preCombatUpdate, shadowrunCombatUpdate } from './combat';
+import { measureDistance } from './canvas';
+import * as chat from './chat';
+import * as migrations from './migration';
+import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -22,7 +22,7 @@ Hooks.once('init', function () {
     console.log('Loading Shadowrun 5e System');
 
     // Create a shadowrun5e namespace within the game global
-    game.shadowrun5e = {
+    game['shadowrun5e'] = {
         SR5Actor,
         DiceSR,
         SR5Item,
@@ -42,7 +42,7 @@ Hooks.once('init', function () {
     Items.registerSheet('shadowrun5e', SR5ItemSheet, { makeDefault: true });
 
     ['renderSR5ActorSheet', 'renderSR5ItemSheet'].forEach((s) => {
-        Hooks.on(s, (app, html, data) => Helpers.setupCustomCheckbox(app, html, data));
+        Hooks.on(s, (app, html) => Helpers.setupCustomCheckbox(app, html));
     });
 
     preloadHandlebarsTemplates();
@@ -51,34 +51,39 @@ Hooks.once('init', function () {
 });
 
 Hooks.on('canvasInit', function () {
+    // this does actually exist. Fix in types?
+    // @ts-ignore
     SquareGrid.prototype.measureDistance = measureDistance;
 });
 
 Hooks.on('ready', function () {
+    // this is correct, will need to be fixed in foundry types
+    // @ts-ignore
     game.socket.on('system.shadowrun5e', (data) => {
         if (game.user.isGM && data.gmCombatUpdate) {
             shadowrunCombatUpdate(data.gmCombatUpdate.changes, data.gmCombatUpdate.options);
         }
-        console.log(data);
     });
 
-    // Determine whether a system migration is required and feasible
-    const currentVersion = game.settings.get('shadowrun5e', 'systemMigrationVersion');
-    // the latest version that requires migration
-    const NEEDS_MIGRATION_VERSION = '0.5.12';
-    let needMigration =
-        currentVersion === null || compareVersion(currentVersion, NEEDS_MIGRATION_VERSION) < 0;
+    if (game.user.isGM) {
+        // Determine whether a system migration is required and feasible
+        const currentVersion = game.settings.get('shadowrun5e', 'systemMigrationVersion');
+        // the latest version that requires migration
+        const NEEDS_MIGRATION_VERSION = '0.5.12';
+        let needMigration =
+            currentVersion === null || compareVersion(currentVersion, NEEDS_MIGRATION_VERSION) < 0;
 
-    // Perform the migration
-    if (needMigration && game.user.isGM) {
-        migrations.migrateWorld();
+        // Perform the migration
+        if (needMigration && game.user.isGM) {
+            migrations.migrateWorld();
+        }
     }
 });
 
 Hooks.on('preUpdateCombat', preCombatUpdate);
-Hooks.on('renderChatMessage', (app, html, data) => {
+Hooks.on('renderChatMessage', (app, html) => {
     if (!app.isRoll) SR5Item.chatListeners(html);
-    if (app.isRoll) chat.highlightSuccessFailure(app, html, data);
+    if (app.isRoll) chat.highlightSuccessFailure(app, html);
 });
 Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);
 
@@ -88,6 +93,7 @@ Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);
 
 Hooks.on('hotbarDrop', (bar, data, slot) => {
     if (data.type !== 'Item') return;
+
     createItemMacro(data.data, slot);
     return false;
 });
@@ -101,7 +107,7 @@ Hooks.on('renderSceneControls', (controls, html) => {
 
 Hooks.on('getSceneControlButtons', (controls) => {
     if (game.user.isGM) {
-        const tokenControls = controls.find(c => c.name === 'token');
+        const tokenControls = controls.find((c) => c.name === 'token');
         tokenControls.tools.push({
             name: 'overwatch-score-tracker',
             title: 'CONTROLS.SR5.OverwatchScoreTracker',
@@ -135,9 +141,9 @@ function compareVersion(v1, v2) {
  */
 async function createItemMacro(item, slot) {
     const command = `game.shadowrun5e.rollItemMacro("${item.name}");`;
-    let macro = game.macros.entities.find((m) => m.name === item.name && m.command === command);
+    let macro = game.macros.entities.find((m) => m.name === item.name);
     if (!macro) {
-        macro = await Macro.create(
+        macro = (await Macro.create(
             {
                 name: item.name,
                 type: 'script',
@@ -146,9 +152,9 @@ async function createItemMacro(item, slot) {
                 flags: { 'shadowrun5e.itemMacro': true },
             },
             { displaySheet: false }
-        );
+        )) as Macro;
     }
-    game.user.assignHotbarMacro(macro, slot);
+    if (macro) game.user.assignHotbarMacro(macro, slot);
 }
 
 /**
@@ -163,10 +169,12 @@ function rollItemMacro(itemName) {
     if (speaker.token) actor = game.actors.tokens[speaker.token];
     if (!actor) actor = game.actors.get(speaker.actor);
     const item = actor ? actor.items.find((i) => i.name === itemName) : null;
-    if (!item)
+    if (!item) {
+        // @ts-ignore
         return ui.notifications.warn(
             `Your controlled Actor does not have an item named ${itemName}`
         );
+    }
 
     return item.roll();
 }

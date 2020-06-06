@@ -1,0 +1,17 @@
+{
+    "devDependencies": {
+        "@babel/core": "^7.0.0",
+        "@babel/plugin-proposal-class-properties": "^7.0.0",
+        "@babel/plugin-transform-runtime": "^7.10.1",
+        "@babel/preset-env": "^7.0.0",
+        "@babel/preset-typescript": "^7.10.1",
+        "babel-core": "7.0.0-bridge.0",
+        "babelify": "^10.0.0",
+        "browserify": "^16.5.1",
+        "foundry-pc-types": "gitlab:foundry-projects/foundry-pc/foundry-pc-types",
+        "tsify": "^4.0.1",
+        "typescript": "^3.9.3",
+        "watchify": "^3.11.1",
+        "xml2js": "^0.4.23"
+    }
+}

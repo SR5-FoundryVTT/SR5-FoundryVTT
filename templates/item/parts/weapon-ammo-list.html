@@ -130,11 +130,13 @@
         </div>
         <div class="item hidden">
             <div class="item-desc">
-                {{{ammo.data.description.value}}}
                 <div class="props">
                     {{#each item.properties}}
                     <span>{{this}}</span>
                     {{/each}}
+                </div>
+                <div class="description">
+                    {{{ammo.data.description.value}}}
                 </div>
             </div>
         </div>

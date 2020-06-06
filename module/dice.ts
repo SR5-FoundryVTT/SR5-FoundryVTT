@@ -1,8 +1,36 @@
-import { SR5 } from './config.js';
+import { Helpers } from './helpers';
+import RollEvent = Shadowrun.RollEvent;
+
+interface basicRollProps {
+    count: number;
+    limit?: number;
+    explode?: boolean;
+    title?: string;
+    actor?: Actor;
+}
+
+interface RollDialogOptions {
+    environmental?: number | boolean;
+    prompt?: boolean;
+}
+
+interface rollTestProps {
+    event?: RollEvent;
+    actor?: Actor;
+    parts?: Shadowrun.ModList<number>;
+    limit?: number;
+    extended?: boolean;
+    dialogOptions?: RollDialogOptions;
+    after?: (roll: Roll | undefined) => void;
+    base?: number;
+    title?: string;
+    wounds?: boolean;
+}
 
 export class DiceSR {
-    static async basicRoll({ count, limit, explode, title, actor }) {
+    static async basicRoll({ count, limit, explode, title, actor }: basicRollProps) {
         if (count <= 0) {
+            // @ts-ignore
             ui.notifications.error(game.i18n.localize('SR5.RollOneDie'));
             return;
         }
@@ -30,7 +58,7 @@ export class DiceSR {
     /**
      *
      * @param event {MouseEvent} - mouse event that caused this
-     * @param actor {Sr5Actor} - actor this roll is associated with
+     * @param actor {SR5Actor} - actor this roll is associated with
      * @param parts {Object} - object where keys should be the 'name' that can be translated/is translated and value should be the numerical values to add to dice pool
      * @param limit {Number} - Limit to apply to the roll, leave empty for no limit
      * @param extended {Boolean} - if this is an extended test (automatically sets the dropdown in the dialog)
@@ -54,7 +82,7 @@ export class DiceSR {
         base = 0,
         title = 'Roll',
         wounds = true,
-    }) {
+    }: rollTestProps) {
         // if we aren't for soaking some damage
         if (
             actor &&
@@ -71,7 +99,7 @@ export class DiceSR {
 
         const edgeAttMax = actor ? actor.data.data.attributes.edge.max : 0;
 
-        if (event && event[SR5.kbmod.EDGE]) {
+        if (event && event[CONFIG.SR5.kbmod.EDGE]) {
             parts['SR5.Edge'] = +edgeAttMax;
             actor?.update({
                 'data.attributes.edge.value': actor.data.data.attributes.edge.value - 1,
@@ -81,8 +109,8 @@ export class DiceSR {
         // add mods to dice pool
         dice_pool += Object.values(parts).reduce((prev, cur) => prev + cur, 0);
 
-        if (event && event[SR5.kbmod.STANDARD]) {
-            const edge = parts['SR5.Edge'] || undefined;
+        if (event && event[CONFIG.SR5.kbmod.STANDARD]) {
+            const edge = parts['SR5.Edge'] !== undefined || undefined;
             return this.basicRoll({
                 count: dice_pool,
                 explode: edge,
@@ -129,26 +157,24 @@ export class DiceSR {
                     close: (html) => {
                         if (cancel) return;
                         // get the actual dice_pool from the difference of initial parts and value in the dialog
-                        let dicePool = parseInt(html.find('[name="dice_pool"]').val());
 
-                        // apply dicepool mod from roll
-                        const dpMod = eval(html.find('[name="dp_mod"]').val());
-                        if (dpMod) dicePool += dpMod;
+                        let dicePool = Helpers.parseInputToNumber(
+                            $(html).find('[name="dice_pool"]').val()
+                        );
 
-                        const woundValue = parseInt(html.find('[name=wounds]').val());
-                        if (woundValue) dicePool -= woundValue;
+                        +Helpers.parseInputToNumber($(html).find('[name="dp_mod"]').val());
+                        +Helpers.parseInputToNumber($(html).find('[name="wounds"]').val());
+                        -Helpers.parseInputToNumber(
+                            $(html).find('[name="options.environmental"]').val()
+                        );
 
-                        const limitVal = parseInt(html.find('[name="limit"]').val());
+                        const limit = Helpers.parseInputToNumber(
+                            $(html).find('[name="limit"]').val()
+                        );
+                        const extended =
+                            Helpers.parseInputToNumber($(html).find('[name="extended"]').val()) !==
+                            0;
 
-                        extended = html.find('[name=extended]').val();
-                        dialogOptions = {
-                            ...dialogOptions,
-                            environmental: parseInt(
-                                html.find('[name="options.environmental"]').val()
-                            ),
-                        };
-
-                        if (dialogOptions.environmental) dicePool -= dialogOptions.environmental;
                         if (edge && actor) {
                             dicePool += actor.data.data.attributes.edge.max;
                             actor.update({
@@ -159,7 +185,7 @@ export class DiceSR {
                         const r = this.basicRoll({
                             count: dicePool,
                             explode: edge,
-                            limit: edge ? undefined : limitVal,
+                            limit: edge ? undefined : limit,
                             title,
                             actor,
                         });

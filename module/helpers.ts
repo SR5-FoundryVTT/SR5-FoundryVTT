@@ -1,3 +1,5 @@
+import AttributeField = Shadowrun.AttributeField;
+
 export class Helpers {
     static totalMods(mods) {
         const reducer = (acc, cur) => acc + cur;
@@ -6,7 +8,8 @@ export class Helpers {
         // assume object of key/values
         return Object.values(mods).reduce(reducer, 0);
     }
-    static isMatrix(atts) {
+
+    static isMatrix(atts?: boolean | AttributeField[] | AttributeField) {
         if (!atts) return false;
         if (typeof atts === 'boolean' && atts) return true;
         const matrixAtts = ['firewall', 'data_processing', 'sleaze', 'attack'];
@@ -15,9 +18,35 @@ export class Helpers {
         atts = atts.filter((att) => att);
         atts.forEach((att) => {
             if (typeof att === 'string' && matrixAtts.includes(att)) return true;
-            if (typeof att === 'object' && matrixLabels.includes(att.label)) return true;
+            else if (matrixLabels.includes(att.label)) return true;
         });
         return false;
+    }
+
+    static parseInputToString(val: number | string | string[] | undefined): string {
+        if (val === undefined) return '';
+        if (typeof val === 'number') return val.toString();
+        if (typeof val === 'string') return val;
+        if (Array.isArray(val)) {
+            return val.join(',');
+        }
+        return '';
+    }
+
+    static parseInputToNumber(val: number | string | string[] | undefined): number {
+        if (typeof val === 'number') return val;
+        if (typeof val === 'string') {
+            const ret = +val;
+            if (!isNaN(ret)) return ret;
+            return 0;
+        }
+        if (Array.isArray(val)) {
+            const str = val.join('');
+            const ret = +str;
+            if (!isNaN(ret)) return ret;
+            return 0;
+        }
+        return 0;
     }
 
     static setupCustomCheckbox(app, html) {

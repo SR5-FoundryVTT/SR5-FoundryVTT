@@ -1,12 +1,20 @@
-import { Helpers } from '../helpers.js';
+import { Helpers } from '../helpers';
+import { SR5Item } from './SR5Item';
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
  */
 export class SR5ItemSheet extends ItemSheet {
+    item: SR5Item;
+    private _shownDesc: any[];
+    private _scroll: string;
     constructor(...args) {
         super(...args);
         this._shownDesc = [];
+    }
+
+    getEmbeddedItems() {
+        return this.item.items || [];
     }
 
     /**
@@ -65,10 +73,10 @@ export class SR5ItemSheet extends ItemSheet {
             }
         }
 
-        data.config = CONFIG.SR5;
-        const items = this.item.items || [];
+        data['config'] = CONFIG.SR5;
+        const items = this.getEmbeddedItems();
         const [ammunition, weaponMods, armorMods] = items.reduce(
-            (parts, item) => {
+            (parts: [BaseEntityData[], BaseEntityData[], BaseEntityData[]], item: SR5Item) => {
                 if (item.type === 'ammo') parts[0].push(item.data);
                 if (item.type === 'modification' && item.data.data.type === 'weapon')
                     parts[1].push(item.data);
@@ -78,9 +86,9 @@ export class SR5ItemSheet extends ItemSheet {
             },
             [[], [], []]
         );
-        data.ammunition = ammunition;
-        data.weaponMods = weaponMods;
-        data.armorMods = armorMods;
+        data['ammunition'] = ammunition;
+        data['weaponMods'] = weaponMods;
+        data['armorMods'] = armorMods;
 
         return data;
     }
@@ -148,10 +156,11 @@ export class SR5ItemSheet extends ItemSheet {
             // TODO test
             if (
                 this.item.isOwned &&
-                data.actorId === this.item.actor._id &&
-                data.data._id === this.item.data._id
+                data.actorId === this.item.actor?._id &&
+                data.data._id === this.item._id
             ) {
                 console.log('Shadowrun5e | Cant drop item on itself');
+                // @ts-ignore
                 ui.notifications.error('Are you trying to break the game??');
             }
             item = data;
@@ -180,7 +189,9 @@ export class SR5ItemSheet extends ItemSheet {
 
     async _onEditItem(event) {
         const item = this.item.getOwnedItem(this._eventId(event));
-        item.sheet.render(true);
+        if (item) {
+            item.sheet.render(true);
+        }
     }
 
     async _onAddLicense(event) {
@@ -205,6 +216,7 @@ export class SR5ItemSheet extends ItemSheet {
             data: duplicate(game.system.model.Item.modification),
         };
         itemData.data.type = 'weapon';
+        // @ts-ignore
         const item = Item.createOwned(itemData, this.item);
         this.item.createOwnedItem(item.data);
     }
@@ -230,6 +242,7 @@ export class SR5ItemSheet extends ItemSheet {
             type: type,
             data: duplicate(game.system.model.Item.ammo),
         };
+        // @ts-ignore
         const item = Item.createOwned(itemData, this.item);
         this.item.createOwnedItem(item.data);
     }
@@ -238,7 +251,7 @@ export class SR5ItemSheet extends ItemSheet {
      * @private
      */
     _findActiveList() {
-        return this.element.find('.tab.active .scroll-area');
+        return $(this.element).find('.tab.active .scroll-area');
     }
 
     /**
