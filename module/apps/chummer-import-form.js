@@ -88,7 +88,8 @@ export class ChummerImportForm extends FormApplication {
             };
 
             const getValues = (val) => {
-                const l = val.match(/([0-9]+)(?:([0-9]+))*/g);
+                const regex = /(-?[0-9]+)(?:([0-9]+))*/g;
+                const l = val.match(regex);
                 return l || ['0'];
             };
 
