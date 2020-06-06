@@ -1,12 +1,9 @@
-import { SkillEditForm } from './skill-edit.js';
+import { SkillEditForm } from './skill-edit';
 
 export class LanguageSkillEditForm extends SkillEditForm {
+    skillId: string;
     _updateString() {
         return `data.skills.language.value.${this.skillId}`;
-    }
-
-    get title() {
-        return `Edit Skill - ${game.i18n.localize(this.getData().data.name)}`;
     }
 
     getData() {

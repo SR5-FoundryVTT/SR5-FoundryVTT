@@ -3,6 +3,7 @@
  * @return {Promise}      A Promise which resolves once the migration is completed
  */
 export const migrateWorld = async function () {
+    // @ts-ignore
     ui.notifications.info(
         `Applying Shadowrun 5e System Migration for version ${game.system.data.version}. Please be patient and do not close your game or shut down your server.`,
         { permanent: true }
@@ -29,7 +30,7 @@ export const migrateWorld = async function () {
 
             if (!isObjectEmpty(updateData)) {
                 expandObject(updateData);
-                delete updateData.items;
+                delete updateData['items'];
                 console.log(`Migrating Actor entity ${a.name}`);
                 await a.update(updateData, { enforceTypes: false });
                 const items = getMigratedActorItems(a.data);
@@ -68,6 +69,7 @@ export const migrateWorld = async function () {
 
     // Set the migration as complete
     game.settings.set('shadowrun5e', 'systemMigrationVersion', game.system.data.version);
+    // @ts-ignore
     ui.notifications.info(
         `Shadowrun5e System Migration to version ${game.system.data.version} completed!`,
         { permanent: true }
@@ -77,7 +79,7 @@ export const migrateWorld = async function () {
 
 const getMigratedActorItems = (actor) => {
     // Migrate Owned Items
-    if (!actor.items) return updateData;
+    if (!actor.items) return [];
     return actor.items.reduce((acc, i) => {
         // Migrate the Owned Item
         const mi = migrateItemData(i);
@@ -106,7 +108,7 @@ export const migrateCompendium = async function (pack) {
     // Iterate over compendium entries - applying fine-tuned migration functions
     for (const ent of content) {
         try {
-            let updateData = null;
+            let updateData;
             if (entity === 'Item') updateData = migrateItemData(ent.data);
             else if (entity === 'Actor') updateData = migrateActorData(ent.data);
             else if (entity === 'Scene') updateData = migrateSceneData(ent.data);
@@ -153,11 +155,11 @@ export const migrateActorData = function (actor) {
             return mergeObject(i, itemUpdate, { enforceTypes: false, inplace: false });
         } else return i;
     });
-    if (hasItemUpdates) updateData.items = items;
+    if (hasItemUpdates) updateData['items'] = items;
 
     if (!isObjectEmpty(updateData)) {
-        updateData._id = actor._id;
-        updateData.id = actor._id;
+        updateData['_id'] = actor._id;
+        updateData['id'] = actor._id;
     }
 
     return updateData;
@@ -179,8 +181,8 @@ export const migrateItemData = function (item) {
     _migrateItemsConceal(item, updateData);
 
     if (!isObjectEmpty(updateData)) {
-        updateData._id = item._id;
-        updateData.id = item._id;
+        updateData['_id'] = item._id;
+        updateData['id'] = item._id;
     }
 
     // Return the migrated update data

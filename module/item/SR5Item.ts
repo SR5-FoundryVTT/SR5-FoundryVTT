@@ -1,11 +1,21 @@
-import { DiceSR } from '../dice.js';
-import { Helpers } from '../helpers.js';
+import { DiceSR } from '../dice';
+import { Helpers } from '../helpers';
+import DeviceData = Shadowrun.DeviceData;
+import { SR5Actor } from '../actor/SR5Actor';
 
 export class SR5Item extends Item {
-    async update(data, options) {
-        await super.update(data, options);
-        if (this.actor) this.actor.render();
-        return this;
+    labels: {} = {};
+    items: SR5Item[];
+    actor: SR5Actor;
+
+    async update(data, options?) {
+        const ret = super.update(data, options);
+        ret.then(() => {
+            if (this.actor) {
+                this.actor.render();
+            }
+        });
+        return ret;
     }
     get hasOpposedRoll() {
         return !!(this.data.data.action && this.data.data.action.opposed.type);
@@ -114,14 +124,20 @@ export class SR5Item extends Item {
             item.data.condition_monitor.max = 8 + Math.ceil(item.data.technology.rating / 2);
         }
 
+        if (item.type === 'adept_power') {
+            item.data.type = item.data.action?.type ? 'active' : 'passive';
+        }
+
         this.labels = labels;
-        item.properties = this.getChatData().properties;
+        item['properties'] = this.getChatData().properties;
     }
 
     async roll(event) {
         if (Helpers.hasModifiers(event)) {
             return this.rollTest(event);
         }
+        // we won't work if we don't have an actor
+        if (!this.actor) return;
         const { token } = this.actor;
         const templateData = {
             actor: this.actor,
@@ -151,13 +167,13 @@ export class SR5Item extends Item {
 
         const rollMode = game.settings.get('core', 'rollMode');
         if (['gmroll', 'blindroll'].includes(rollMode))
-            chatData.whisper = ChatMessage.getWhisperIDs('GM');
-        if (rollMode === 'blindroll') chatData.blind = true;
+            chatData['whisper'] = ChatMessage.getWhisperIDs('GM');
+        if (rollMode === 'blindroll') chatData['blind'] = true;
 
         return ChatMessage.create(chatData, { displaySheet: false });
     }
 
-    getChatData(htmlOptions) {
+    getChatData(htmlOptions?) {
         const data = duplicate(this.data.data);
         const { labels } = this;
         if (!data.description) data.description = {};
@@ -165,7 +181,7 @@ export class SR5Item extends Item {
         data.description.value = TextEditor.enrichHTML(data.description.value, htmlOptions);
 
         const props = [];
-        this[`_${this.data.type}ChatData`](data, labels, props);
+        this[`_${this.data.type}ChatData`](duplicate(data), labels, props);
 
         data.properties = props.filter((p) => !!p);
 
@@ -178,28 +194,27 @@ export class SR5Item extends Item {
 
     _actionChatData(data, labels, props) {
         if (data.action) {
-            if (data.action.limit.value) props.push(`Limit ${data.action.limit.value}`);
-            if (data.action.type) props.push(`${Helpers.label(data.action.type)} Action`);
+            const labelStringList: string[] = [];
             if (data.action.skill) {
-                labels.roll = `${Helpers.label(data.action.skill)}+${Helpers.label(
-                    data.action.attribute
-                )}`;
+                labelStringList.push(Helpers.label(data.action.skill));
+                labelStringList.push(Helpers.label(data.action.attribute));
             } else if (data.action.attribute2) {
-                labels.roll = `${Helpers.label(data.action.attribute)}+${Helpers.label(
-                    data.action.attribute2
-                )}`;
+                labelStringList.push(Helpers.label(data.action.attribute));
+                labelStringList.push(Helpers.label(data.action.attribute2));
+            } else if (data.action.attribute) {
+                labelStringList.push(Helpers.label(data.action.attribute));
             }
-            if (data.action.damage.type.value) {
-                const { damage } = data.action;
-                if (damage.value)
-                    props.push(
-                        `DV ${damage.value}${
-                            damage.type.value ? damage.type.value.toUpperCase().charAt(0) : ''
-                        }`
-                    );
-                if (damage.ap && damage.ap.value) props.push(`AP ${damage.ap.value}`);
-                if (damage.element.value) props.push(Helpers.label(damage.element.value));
+            if (data.action.mod) {
+                labelStringList.push(`${game.i18n.localize('SR5.ItemMod')} (${data.action.mod})`)
+                // TODO when all mods are modlists
+                // Object.entries(data.action.mod).forEach(([key, value]) =>
+                //     labelStringList.push(`${game.i18n.localize(key)} (${value})`)
+                // );
             }
+            if (labelStringList.length) {
+                labels.roll = labelStringList.join(' + ');
+            }
+
             if (data.action.opposed.type) {
                 const { opposed } = data.action;
                 if (opposed.type !== 'custom')
@@ -214,7 +229,43 @@ export class SR5Item extends Item {
                     )}`;
                 else if (opposed.attribute)
                     labels.opposedRoll = `vs. ${Helpers.label(opposed.attribute)}`;
-                if (opposed.description) props.push(`Opposed Desc: ${opposed.desc}`);
+            }
+
+            // setup action props
+            // go in order of "Limit/Accuracy" "Damage" "AP"
+            // don't add action type if set to 'varies' or 'none' as that's pretty much useless info
+            if (
+                data.action.type !== '' &&
+                data.action.type !== 'varies' &&
+                data.action.type !== 'none'
+            ) {
+                props.push(`${Helpers.label(data.action.type)} Action`);
+            }
+            if (data.action.limit.value) props.push(`Limit ${data.action.limit.value}`);
+            if (data.action.damage.type.value) {
+                const { damage } = data.action;
+                let damageString = '';
+                let elementString = '';
+                if (damage.value) {
+                    damageString = `DV ${damage.value}${
+                        damage.type.value ? damage.type.value.toUpperCase().charAt(0) : ''
+                    }`;
+                }
+                if (damage.element.value) {
+                    // if we have a damage value and are electric, follow the convention of (e) after
+                    if (damage.value) {
+                        if (damage.element.value === 'electricity') {
+                            damageString += ' (e)';
+                        } else {
+                            elementString = Helpers.label(damage.element.value);
+                        }
+                    } else {
+                        elementString = Helpers.label(damage.element.value);
+                    }
+                }
+                if (damageString) props.push(damageString);
+                if (elementString) props.push(elementString);
+                if (damage.ap && damage.ap.value) props.push(`AP ${damage.ap.value}`);
             }
         }
     }
@@ -245,9 +296,6 @@ export class SR5Item extends Item {
         this._actionChatData(data, labels, props);
         props.push(`PP ${data.pp}`);
         props.push(Helpers.label(data.type));
-        if (data.type === 'active') {
-            props.push(`${Helpers.label(data.action.type)} Action`);
-        }
     }
 
     _armorChatData(data, labels, props) {
@@ -277,7 +325,7 @@ export class SR5Item extends Item {
         if (data.essence) props.push(`Ess ${data.essence}`);
     }
 
-    _deviceChatData(data, labels, props) {
+    _deviceChatData(data: DeviceData, labels, props) {
         if (data.technology && data.technology.rating)
             props.push(`Rating ${data.technology.rating}`);
         if (data.category === 'cyberdeck') {
@@ -297,19 +345,12 @@ export class SR5Item extends Item {
         props.push(Helpers.label(data.type));
     }
 
+    // add properties for spell data, follow order in book
     _spellChatData(data, labels, props) {
-        this._actionChatData(data, labels, props);
-        props.push(
-            Helpers.label(data.range),
-            Helpers.label(data.duration),
-            Helpers.label(data.type),
-            Helpers.label(data.category)
-        );
-        const { drain } = data;
-        if (drain > 0) props.push(`Drain F+${drain}`);
-        else if (drain < 0) props.push(`Drain F${drain}`);
-        else props.push('Drain F');
+        // first category and type
+        props.push(Helpers.label(data.category), Helpers.label(data.type));
 
+        // add subtype tags
         if (data.category === 'combat') {
             props.push(Helpers.label(data.combat.type));
         } else if (data.category === 'health') {
@@ -322,15 +363,36 @@ export class SR5Item extends Item {
             if (data.manipulation.environmental) props.push('Environmental');
             if (data.manipulation.physical) props.push('Physical');
         } else if (data.category === 'detection') {
-            props.push(data.illusion.passive ? 'Passive' : 'Active');
             props.push(data.illusion.type);
+            props.push(data.illusion.passive ? 'Passive' : 'Active');
             if (data.illusion.extended) props.push('Extended');
         }
+        // add range
+        props.push(Helpers.label(data.range));
+
+        // add action data
+        this._actionChatData(data, labels, props);
+
+        // add duration data
+        props.push(Helpers.label(data.duration));
+
+        // add drain data
+        const { drain } = data;
+        if (drain > 0) props.push(`Drain F+${drain}`);
+        else if (drain < 0) props.push(`Drain F${drain}`);
+        else props.push('Drain F');
+
         labels.roll = 'Cast';
     }
 
     _weaponChatData(data, labels, props) {
         this._actionChatData(data, labels, props);
+        for (let i = 0; i < props.length; i++) {
+            const prop = props[i];
+            if (prop.includes('Limit')) {
+                props[i] = prop.replace('Limit', 'Accuracy');
+            }
+        }
 
         const equippedAmmo = this.getEquippedAmmo();
         if (equippedAmmo && data.ammo && data.ammo.current?.max) {
@@ -360,26 +422,50 @@ export class SR5Item extends Item {
         }
 
         if (data.technology?.conceal?.value) {
-            props.push(
-                `${game.i18n.localize('SR5.Conceal')} ${data.technology.conceal.value}`
-            );
+            props.push(`${game.i18n.localize('SR5.Conceal')} ${data.technology.conceal.value}`);
         }
 
         if (data.category === 'range') {
-            if (data.range.rc) props.push(`RC ${data.range.rc.value}`);
-            if (data.range.modes)
-                props.push(
-                    Array.from(Object.entries(data.range.modes))
-                        .filter(([key, val]) => val && !key.includes('-'))
-                        .map(([key]) => Helpers.label(key))
-                        .join('/')
-                );
+            if (data.range.rc) {
+                let rcString = `${game.i18n.localize('SR5.RecoilCompensation')} ${
+                    data.range.rc.value
+                }`;
+                if (this.actor) {
+                    rcString += ` (${game.i18n.localize('SR5.Total')} ${
+                        this.actor.data.data.recoil_compensation + data.range.rc.value
+                    })`;
+                }
+                props.push(rcString);
+            }
+            if (data.range.modes) {
+                const newModes: string[] = [];
+                const { modes } = data.range;
+                if (modes.single_shot) newModes.push('SR5.WeaponModeSingleShotShort');
+                if (modes.semi_auto) newModes.push('SR5.WeaponModeSemiAutoShort');
+                if (modes.burst_fire) newModes.push('SR5.WeaponModeBurstFireShort');
+                if (modes.full_auto) newModes.push('SR5.WeaponModeFullAutoShort');
+                props.push(newModes.map((m) => game.i18n.localize(m)).join('/'));
+            }
             if (data.range.ranges)
                 props.push(Array.from(Object.values(data.range.ranges)).join('/'));
         } else if (data.category === 'melee') {
-            if (data.melee.reach)
-                props.push(`${game.i18n.localize('SR5.Reach')} ${data.melee.reach}`);
+            if (data.melee.reach) {
+                const reachString = `${game.i18n.localize('SR5.Reach')} ${data.melee.reach}`;
+                // find accuracy in props and insert ourselves after it
+                const accIndex = props.findIndex((p) => p.includes('Accuracy'));
+                if (accIndex > -1) {
+                    props.splice(accIndex + 1, 0, reachString);
+                } else {
+                    props.push(reachString);
+                }
+            }
         } else if (data.category === 'thrown') {
+            const { blast } = data.thrown;
+            if (blast?.radius)
+                props.push(`${game.i18n.localize('SR5.BlastRadius')} ${blast.radius}m`);
+            if (blast?.dropoff)
+                props.push(`${game.i18n.localize('SR5.Dropoff')} ${blast.dropoff}/m`);
+
             if (data.thrown.ranges) {
                 const mult =
                     data.thrown.ranges.attribute && this.actor
@@ -393,11 +479,6 @@ export class SR5Item extends Item {
                 ];
                 props.push(ranges.map((v) => v * mult).join('/'));
             }
-            const { blast } = data.thrown;
-            if (blast.value)
-                props.push(`${game.i18n.localize('SR5.BlastRadius')} ${blast.radius}m`);
-            if (blast.dropoff)
-                props.push(`${game.i18n.localize('SR5.DropOff')} ${blast.dropoff}/m`);
         }
     }
 
@@ -418,9 +499,11 @@ export class SR5Item extends Item {
 
     async equipWeaponMod(iid) {
         const mod = this.getOwnedItem(iid);
-        const dupData = duplicate(mod.data);
-        dupData.data.technology.equipped = !dupData.data.technology.equipped;
-        await this.updateOwnedItem(dupData);
+        if (mod) {
+            const dupData = duplicate(mod.data);
+            dupData.data.technology.equipped = !dupData.data.technology.equipped;
+            await this.updateOwnedItem(dupData);
+        }
     }
 
     async useAmmo(fireMode) {
@@ -445,7 +528,7 @@ export class SR5Item extends Item {
 
         const newAmmunition = (this.items || [])
             .filter((i) => i.data.type === 'ammo')
-            .reduce((acc, item) => {
+            .reduce((acc: BaseEntityData[], item) => {
                 const { technology } = item.data.data;
                 if (technology.equipped) {
                     const qty = technology.quantity;
@@ -463,8 +546,10 @@ export class SR5Item extends Item {
             ?.filter((item) => item.type === 'ammo')
             .map((item) => {
                 const i = this.getOwnedItem(item._id);
-                i.data.data.technology.equipped = iid === item._id;
-                return i.data;
+                if (i) {
+                    i.data.data.technology.equipped = iid === item._id;
+                    return i.data;
+                }
             });
         await this.updateOwnedItem(ammo);
     }
@@ -492,7 +577,13 @@ export class SR5Item extends Item {
 
     rollOpposedTest(target, ev) {
         const itemData = this.data.data;
-        const options = { event: ev };
+        const options = {
+            event: ev,
+            incomingAttack: { fireMode: 0 },
+            fireModeDefense: 0,
+            cover: false,
+            incomingAction: {},
+        };
 
         if (this.getFlag('shadowrun5e', 'attack')) {
             options.incomingAttack = this.getFlag('shadowrun5e', 'attack');
@@ -523,6 +614,7 @@ export class SR5Item extends Item {
 
     rollTest(ev) {
         const itemData = this.data.data;
+        if (!this.actor) return console.error('COULD NOT FIND ACTOR');
         const actorData = this.actor.data.data;
 
         const skill = actorData.skills.active[itemData.action.skill];
@@ -583,27 +675,27 @@ export class SR5Item extends Item {
             ).then((dlg) => {
                 const buttons = {};
                 const { ranges } = itemData.range;
-                let environmental = true;
+                let environmental: boolean | number = true;
                 let cancel = true;
-                buttons.short = {
+                buttons['short'] = {
                     label: `Short (${ranges.short})`,
                     callback: () => (cancel = false),
                 };
-                buttons.medium = {
+                buttons['medium'] = {
                     label: `Medium (${ranges.medium})`,
                     callback: () => {
                         environmental = 1;
                         cancel = false;
                     },
                 };
-                buttons.long = {
+                buttons['long'] = {
                     label: `Long (${ranges.long})`,
                     callback: () => {
                         environmental = 3;
                         cancel = false;
                     },
                 };
-                buttons.extreme = {
+                buttons['extreme'] = {
                     label: `Extreme (${ranges.extreme})`,
                     callback: () => {
                         environmental = 6;
@@ -617,7 +709,9 @@ export class SR5Item extends Item {
                     close: (html) => {
                         if (cancel) return;
 
-                        const fireMode = parseInt(html.find('[name="fireMode"]').val());
+                        const fireMode = Helpers.parseInputToNumber(
+                            $(html).find('[name="fireMode"]').val()
+                        );
                         if (fireMode) {
                             title += ` - Defender (${Helpers.mapRoundsToDefenseDesc(fireMode)})`;
                         }
@@ -628,22 +722,25 @@ export class SR5Item extends Item {
                         DiceSR.rollTest({
                             event: ev,
                             parts,
-                            actor: this.actor,
+                            actor: this.actor || undefined,
                             limit,
                             title,
                             dialogOptions: {
                                 environmental,
                             },
-                        }).then(async (roll) => {
-                            await this.useAmmo(fireMode);
-                            await this.setFlag('shadowrun5e', 'attack', {
-                                hits: roll.total,
-                                fireMode,
-                                damageType: this.data.data.action.damage.type.value,
-                                element: this.data.data.action.damage.element.value,
-                                damage: this.data.data.action.damage.value,
-                                ap: this.data.data.action.damage.ap.value,
-                            });
+                        }).then((roll: Roll | undefined) => {
+                            if (roll) {
+                                this.useAmmo(fireMode).then(() => {
+                                    this.setFlag('shadowrun5e', 'attack', {
+                                        hits: roll.total,
+                                        fireMode,
+                                        damageType: this.data.data.action.damage.type.value,
+                                        element: this.data.data.action.damage.element.value,
+                                        damage: this.data.data.action.damage.value,
+                                        ap: this.data.data.action.damage.ap.value,
+                                    });
+                                });
+                            }
                         });
                     },
                 }).render(true);
@@ -676,17 +773,21 @@ export class SR5Item extends Item {
                         },
                         close: (html) => {
                             if (cancel) return;
-                            const force = parseInt(html.find('[name=force]').val());
+                            const force = Helpers.parseInputToNumber(
+                                $(html).find('[name=force]').val()
+                            );
                             limit = force;
                             DiceSR.rollTest({
                                 event: ev,
-                                environmental: true,
+                                dialogOptions: {
+                                    environmental: true,
+                                },
                                 parts,
-                                actor: this.actor,
+                                actor: this.actor || undefined,
                                 limit,
                                 title,
-                            }).then(async (roll) => {
-                                if (this.data.data.category === 'combat') {
+                            }).then(async (roll: Roll | undefined) => {
+                                if (this.data.data.category === 'combat' && roll) {
                                     const damage = force;
                                     const ap = -force;
                                     this.setFlag('shadowrun5e', 'attack', {
@@ -701,7 +802,7 @@ export class SR5Item extends Item {
                                     itemData.drain + force + (reckless ? 3 : 0),
                                     2
                                 );
-                                this.actor.rollDrain({ event: ev }, drain);
+                                this.actor?.rollDrain({ event: ev }, drain);
                             });
                         },
                     }).render(true);
@@ -729,11 +830,15 @@ export class SR5Item extends Item {
                     },
                     close: (html) => {
                         if (cancel) return;
-                        const level = parseInt(html.find('[name=level]').val());
+                        const level = Helpers.parseInputToNumber(
+                            $(html).find('[name=level]').val()
+                        );
                         limit = level;
                         DiceSR.rollTest({
                             event: ev,
-                            environmental: true,
+                            dialogOptions: {
+                                environmental: false,
+                            },
                             parts,
                             actor: this.actor,
                             limit,
@@ -749,15 +854,20 @@ export class SR5Item extends Item {
             return DiceSR.rollTest({
                 event: ev,
                 parts,
-                environmental: true,
+                dialogOptions: {
+                    environmental: true,
+                },
                 actor: this.actor,
                 limit,
                 title,
-            }).then(async (roll) => {
-                await this.useAmmo(1);
-                this.setFlag('shadowrun5e', 'action', {
-                    hits: roll.total,
-                });
+            }).then((roll: Roll | undefined) => {
+                if (roll) {
+                    this.useAmmo(1).then(() => {
+                        this.setFlag('shadowrun5e', 'action', {
+                            hits: roll.total,
+                        });
+                    });
+                }
             });
         }
     }
@@ -769,7 +879,6 @@ export class SR5Item extends Item {
             const messageId = button.parents('.message').data('messageId');
             const senderId = game.messages.get(messageId).user._id;
             const card = button.parents('.chat-card');
-            button.disabled = true;
             const action = button.data('action');
 
             const opposedRoll = action === 'opposed-roll';
@@ -782,8 +891,9 @@ export class SR5Item extends Item {
                 let token;
                 if (sceneId === canvas.scene._id) token = canvas.tokens.get(tokenId);
                 else {
-                    const scene = game.scenes.get(sceneId);
+                    const scene: Scene = game.scenes.get(sceneId);
                     if (!scene) return;
+                    // @ts-ignore
                     const tokenData = scene.data.tokens.find((t) => t.id === Number(tokenId));
                     if (tokenData) token = new Token(tokenData);
                 }
@@ -797,13 +907,11 @@ export class SR5Item extends Item {
 
             if (action === 'roll') item.rollTest(ev);
             if (opposedRoll) {
-                const targets = this._getChatCardTargets(card);
+                const targets = this._getChatCardTargets();
                 for (const t of targets) {
                     item.rollOpposedTest(t, ev);
                 }
             }
-
-            button.disabled = false;
         });
         html.on('click', '.card-header', (ev) => {
             ev.preventDefault();
@@ -866,6 +974,8 @@ export class SR5Item extends Item {
                     a.prepareData();
                     return a;
                 } else {
+                    // dirty things done here
+                    // @ts-ignore
                     return Item.createOwned(i, this);
                 }
             });
@@ -902,8 +1012,13 @@ export class SR5Item extends Item {
         return true;
     }
 
-    async updateEmbeddedEntity(embeddedName, updateData, options = {}) {
-        return this.updateOwnedItem(updateData, options);
+    async updateEmbeddedEntity(
+        embeddedName: string,
+        updateData: object | object[],
+        options?: object
+    ) {
+        this.updateOwnedItem(updateData);
+        return this;
     }
 
     /**

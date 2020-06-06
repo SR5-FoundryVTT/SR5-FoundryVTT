@@ -1,6 +1,6 @@
-import { SR5Actor } from './actor/entity.js';
+import { SR5Actor } from './actor/SR5Actor';
 
-export const highlightSuccessFailure = function (message, html, data) {
+export const highlightSuccessFailure = (message, html) => {
     if (!message) return;
     if (!message.isContentVisible || !message.roll.parts.length) return;
     const { roll } = message;

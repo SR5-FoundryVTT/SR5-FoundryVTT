@@ -1,6 +1,6 @@
 export const SR5 = {};
 
-SR5.attributes = {
+SR5['attributes'] = {
     body: 'SR5.AttrBody',
     agility: 'SR5.AttrAgility',
     reaction: 'SR5.AttrReaction',
@@ -19,7 +19,7 @@ SR5.attributes = {
     firewall: 'SR5.MatrixAttrFirewall',
 };
 
-SR5.limits = {
+SR5['limits'] = {
     physical: 'SR5.LimitPhysical',
     social: 'SR5.LimitSocial',
     mental: 'SR5.LimitMental',
@@ -29,19 +29,19 @@ SR5.limits = {
     firewall: 'SR5.MatrixAttrFirewall',
 };
 
-SR5.specialTypes = {
+SR5['specialTypes'] = {
     mundane: 'SR5.Mundane',
     magic: 'SR5.Awakened',
     resonance: 'SR5.Emerged',
 };
 
-SR5.damageTypes = {
+SR5['damageTypes'] = {
     physical: 'SR5.DmgTypePhysical',
     stun: 'SR5.DmgTypeStun',
     matrix: 'SR5.DmgTypeMatrix',
 };
 
-SR5.elementTypes = {
+SR5['elementTypes'] = {
     fire: 'SR5.ElementFire',
     cold: 'SR5.ElementCold',
     acid: 'SR5.ElementAcid',
@@ -49,7 +49,7 @@ SR5.elementTypes = {
     radiation: 'SR5.ElementRadiation',
 };
 
-SR5.spellCategories = {
+SR5['spellCategories'] = {
     combat: 'SR5.SpellCatCombat',
     detection: 'SR5.SpellCatDetection',
     health: 'SR5.SpellCatHealth',
@@ -57,46 +57,46 @@ SR5.spellCategories = {
     manipulation: 'SR5.SpellCatManipulation',
 };
 
-SR5.spellTypes = {
+SR5['spellTypes'] = {
     physical: 'SR5.SpellTypePhysical',
     mana: 'SR5.SpellTypeMana',
 };
 
-SR5.spellRanges = {
+SR5['spellRanges'] = {
     touch: 'SR5.SpellRangeTouch',
     los: 'SR5.SpellRangeLos',
     los_a: 'SR5.SpellRangeLosA',
 };
 
-SR5.combatSpellTypes = {
+SR5['combatSpellTypes'] = {
     direct: 'SR5.SpellCombatDirect',
     indirect: 'SR5.SpellCombatIndirect',
 };
 
-SR5.detectionSpellTypes = {
+SR5['detectionSpellTypes'] = {
     directional: 'SR5.SpellDetectionDirectional',
     psychic: 'SR5.SpellDetectionPsychic',
     area: 'SR5.SpellDetectionArea',
 };
 
-SR5.illusionSpellTypes = {
+SR5['illusionSpellTypes'] = {
     obvious: 'SR5.SpellIllusionObvious',
     realistic: 'SR5.SpellIllusionRealistic',
 };
 
-SR5.illusionSpellSenses = {
+SR5['illusionSpellSenses'] = {
     'single-sense': 'SR5.SpellIllusionSingleSense',
     'multi-sense': 'SR5.SpellIllusionMultiSense',
 };
 
-SR5.attributeRolls = {
+SR5['attributeRolls'] = {
     composure: 'SR5.RollComposure',
     lift_carry: 'SR5.RollLiftCarry',
     judge_intentions: 'SR5.RollJudgeIntentions',
     memory: 'SR5.RollMemory',
 };
 
-SR5.matrixTargets = {
+SR5['matrixTargets'] = {
     persona: 'SR5.TargetPersona',
     device: 'SR5.TargetDevice',
     file: 'SR5.TargetFile',
@@ -105,29 +105,29 @@ SR5.matrixTargets = {
     other: 'SR5.TargetOther',
 };
 
-SR5.durations = {
+SR5['durations'] = {
     instant: 'SR5.DurationInstant',
     sustained: 'SR5.DurationSustained',
     permanent: 'SR5.DurationPermanent',
 };
 
-SR5.weaponCategories = {
+SR5['weaponCategories'] = {
     range: 'SR5.WeaponCatRange',
     melee: 'SR5.WeaponCatMelee',
     thrown: 'SR5.WeaponCatThrown',
 };
 
-SR5.qualityTypes = {
+SR5['qualityTypes'] = {
     positive: 'SR5.QualityTypePositive',
     negative: 'SR5.QualityTypeNegative',
 };
 
-SR5.deviceCategories = {
+SR5['deviceCategories'] = {
     commlink: 'SR5.DeviceCatCommlink',
     cyberdeck: 'SR5.DeviceCatCyberdeck',
 };
 
-SR5.cyberwareGrades = {
+SR5['cyberwareGrades'] = {
     standard: 'SR5.CyberwareGradeStandard',
     alpha: 'SR5.CyberwareGradeAlpha',
     beta: 'SR5.CyberwareGradeBeta',
@@ -135,14 +135,14 @@ SR5.cyberwareGrades = {
     used: 'SR5.CyberwareGradeUsed',
 };
 
-SR5.knowledgeSkillCategories = {
+SR5['knowledgeSkillCategories'] = {
     street: 'SR5.KnowledgeSkillStreet',
     academic: 'SR5.KnowledgeSkillAcademic',
     professional: 'SR5.KnowledgeSkillProfessional',
     interests: 'SR5.KnowledgeSkillInterests',
 };
 
-SR5.activeSkills = {
+SR5['activeSkills'] = {
     archery: 'SR5.SkillArchery',
     automatics: 'SR5.SkillAutomatics',
     blades: 'SR5.SkillBlades',
@@ -220,7 +220,7 @@ SR5.activeSkills = {
     pilot_exotic_vehicle: 'SR5.SkillPilotExoticVehicle',
 };
 
-SR5.actionTypes = {
+SR5['actionTypes'] = {
     none: 'SR5.ActionTypeNone',
     free: 'SR5.ActionTypeFree',
     simple: 'SR5.ActionTypeSimple',
@@ -228,25 +228,25 @@ SR5.actionTypes = {
     varies: 'SR5.ActionTypeVaries',
 };
 
-SR5.matrixAttributes = {
+SR5['matrixAttributes'] = {
     attack: 'SR5.MatrixAttrAttack',
     sleaze: 'SR5.MatrixAttrSleaze',
     data_processing: 'SR5.MatrixAttrDataProc',
     firewall: 'SR5.MatrixAttrFirewall',
 };
 
-SR5.initiativeCategories = {
+SR5['initiativeCategories'] = {
     meatspace: 'SR5.InitCatMeatspace',
     astral: 'SR5.InitCatAstral',
     matrix: 'SR5.InitCatMatrix',
 };
 
-SR5.modificationTypes = {
+SR5['modificationTypes'] = {
     weapon: 'SR5.Weapon',
     armor: 'SR5.Armor',
 };
 
-SR5.mountPoints = {
+SR5['mountPoints'] = {
     barrel: 'SR5.Barrel',
     stock: 'SR5.Stock',
     top: 'SR5.Top',
@@ -254,7 +254,7 @@ SR5.mountPoints = {
     internal: 'SR5.Internal',
 };
 
-SR5.lifestyleTypes = {
+SR5['lifestyleTypes'] = {
     street: 'SR5.LifestyleStreet',
     squatter: 'SR5.LifestyleSquatter',
     low: 'SR5.LifestyleLow',
@@ -264,7 +264,7 @@ SR5.lifestyleTypes = {
     other: 'SR5.LifestyleOther',
 };
 
-SR5.kbmod = {
+SR5['kbmod'] = {
     STANDARD: 'shiftKey',
     EDGE: 'altKey',
     SPEC: 'ctrlKey',
