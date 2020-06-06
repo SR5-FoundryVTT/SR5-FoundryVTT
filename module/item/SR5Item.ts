@@ -124,6 +124,10 @@ export class SR5Item extends Item {
             item.data.condition_monitor.max = 8 + Math.ceil(item.data.technology.rating / 2);
         }
 
+        if (item.type === 'adept_power') {
+            item.data.type = item.data.action?.type ? 'active' : 'passive';
+        }
+
         this.labels = labels;
         item['properties'] = this.getChatData().properties;
     }
@@ -219,7 +223,7 @@ export class SR5Item extends Item {
             // setup action props
             // go in order of "Limit/Accuracy" "Damage" "AP"
             // don't add action type if set to 'varies' or 'none' as that's pretty much useless info
-            if (data.action.type && data.action.type !== 'varies' && data.action.type !== 'none') {
+            if (data.action.type !== '' && data.action.type !== 'varies' && data.action.type !== 'none') {
                 props.push(`${Helpers.label(data.action.type)} Action`);
             }
             if (data.action.limit.value) props.push(`Limit ${data.action.limit.value}`);
@@ -277,9 +281,6 @@ export class SR5Item extends Item {
         this._actionChatData(data, labels, props);
         props.push(`PP ${data.pp}`);
         props.push(Helpers.label(data.type));
-        if (data.type === 'active') {
-            props.push(`${Helpers.label(data.action.type)} Action`);
-        }
     }
 
     _armorChatData(data, labels, props) {
