@@ -367,14 +367,21 @@ select.display {
                 font-size: 1em;
                 width: 100%;
                 .props {
-                    border-top: $groove;
-                    padding-top: 0.25em;
+                    padding: 0.25em 0;
                     > * {
-                        padding: 0.25em 0.5em;
-                    }
-                    > :not(:last-child) {
                         border-right: $groove;
+                        border-bottom: $groove;
+                        padding: 0.25em 0.5em;
+                        box-shadow: .15em .15em $black;
                     }
+                }
+                .description {
+                    //border-right: $light 2px solid;
+                    // border-top: $light 2px solid;
+                    margin: 0.5em .25em;
+                    padding: 0.5em;
+                    // margin-right: 0.5em;
+                    //padding-right: 0.5em;
                 }
             }
             .item-icons {

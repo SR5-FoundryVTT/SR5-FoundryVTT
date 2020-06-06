@@ -177,7 +177,7 @@ export class SR5Item extends Item {
         data.description.value = TextEditor.enrichHTML(data.description.value, htmlOptions);
 
         const props = [];
-        this[`_${this.data.type}ChatData`](data, labels, props);
+        this[`_${this.data.type}ChatData`](duplicate(data), labels, props);
 
         data.properties = props.filter((p) => !!p);
 
@@ -309,19 +309,12 @@ export class SR5Item extends Item {
         props.push(Helpers.label(data.type));
     }
 
+    // add properties for spell data, follow order in book
     _spellChatData(data, labels, props) {
-        this._actionChatData(data, labels, props);
-        props.push(
-            Helpers.label(data.range),
-            Helpers.label(data.duration),
-            Helpers.label(data.type),
-            Helpers.label(data.category)
-        );
-        const { drain } = data;
-        if (drain > 0) props.push(`Drain F+${drain}`);
-        else if (drain < 0) props.push(`Drain F${drain}`);
-        else props.push('Drain F');
+        // first category and type
+        props.push(Helpers.label(data.category), Helpers.label(data.type));
 
+        // add subtype tags
         if (data.category === 'combat') {
             props.push(Helpers.label(data.combat.type));
         } else if (data.category === 'health') {
@@ -334,10 +327,27 @@ export class SR5Item extends Item {
             if (data.manipulation.environmental) props.push('Environmental');
             if (data.manipulation.physical) props.push('Physical');
         } else if (data.category === 'detection') {
-            props.push(data.illusion.passive ? 'Passive' : 'Active');
             props.push(data.illusion.type);
+            props.push(data.illusion.passive ? 'Passive' : 'Active');
             if (data.illusion.extended) props.push('Extended');
         }
+        // add range
+        props.push(Helpers.label(data.range));
+
+        delete data.action.type;
+
+        // add action data
+        this._actionChatData(data, labels, props);
+
+        // add duration data
+        props.push(Helpers.label(data.duration));
+
+        // add drain data
+        const { drain } = data;
+        if (drain > 0) props.push(`Drain F+${drain}`);
+        else if (drain < 0) props.push(`Drain F${drain}`);
+        else props.push('Drain F');
+
         labels.roll = 'Cast';
     }
 

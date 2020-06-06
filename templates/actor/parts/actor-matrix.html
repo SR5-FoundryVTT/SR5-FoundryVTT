@@ -396,6 +396,11 @@
             </div>
         </div>
         <div class="item hidden">
+            <div class="props">
+                {{#each item.properties}}
+                <span>{{this}}</span>
+                {{/each}}
+            </div>
             <div class="item-desc">
                 {{{item.data.description.value}}}
             </div>
