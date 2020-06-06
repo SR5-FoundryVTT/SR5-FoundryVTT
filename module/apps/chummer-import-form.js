@@ -328,8 +328,9 @@ export class ChummerImportForm extends FormApplication {
                                 melee.reach = parseInt(w.reach);
                             } else if (w.type.toLowerCase() === 'ranged') {
                                 data.category = 'range';
-                                if (w.skill.toLowerCase().includes('throw'))
+                                if (w.skill.toLowerCase().includes('throw')) {
                                     data.category = 'thrown'; // TODO clean this up
+                                }
                                 const range = {};
                                 data.range = range;
                                 range.rc = {
@@ -369,17 +370,18 @@ export class ChummerImportForm extends FormApplication {
                                         extreme: parseInt(w.ranges.extreme.split('-')[1]),
                                     };
                                 }
-                                if (w.accessories && w.accessories.accessory) {
-                                    range.mods = [];
-                                    const accessories = getArray(w.accessories.accessory);
-                                    accessories.forEach((a) => {
-                                        if (a) {
-                                            range.mods.push({
-                                                name: a.name,
-                                            });
-                                        }
-                                    });
-                                }
+                                // TODO figure out how to add mods to weapons
+                                // if (w.accessories && w.accessories.accessory) {
+                                //     range.mods = [];
+                                //     const accessories = getArray(w.accessories.accessory);
+                                //     accessories.forEach((a) => {
+                                //         if (a) {
+                                //             range.mods.push({
+                                //                 name: a.name,
+                                //             });
+                                //         }
+                                //     });
+                                // }
                             } else if (w.type.toLowerCase() === 'thrown') {
                                 data.category = 'thrown';
                             }
@@ -387,7 +389,8 @@ export class ChummerImportForm extends FormApplication {
                                 // TODO handle raw damage if present
                                 const d = parseDamage(w.damage_english);
                                 damage.base = d.damage;
-                                damage.type = d.type;
+                                damage.type = {};
+                                damage.type.base = d.type;
                                 if (d.dropoff || d.radius) {
                                     const thrown = {};
                                     data.thrown = thrown;

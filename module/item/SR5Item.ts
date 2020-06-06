@@ -4,7 +4,7 @@ import DeviceData = Shadowrun.DeviceData;
 import { SR5Actor } from '../actor/SR5Actor';
 
 export class SR5Item extends Item {
-    labels: {};
+    labels: {} = {};
     items: SR5Item[];
     actor: SR5Actor;
 
