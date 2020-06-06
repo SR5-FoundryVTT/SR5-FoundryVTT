@@ -2,5 +2,4 @@
 .idea
 node_modules
 module/**/*.js
-build/bundle.js
 css/*.map
