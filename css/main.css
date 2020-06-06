@@ -691,7 +691,7 @@ select.display > option {
   border-right: 1px solid #4d4d4d;
   border-bottom: 1px solid #4d4d4d;
   padding: 0.25em 0.5em;
-  box-shadow: 0.15em 0.15em black;
+  box-shadow: 0.2em 0.2em 0.3em black;
 }
 .sr5 .inventory .item .item-desc .description {
   margin: 0.5em 0.25em;
