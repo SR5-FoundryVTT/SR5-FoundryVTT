@@ -194,14 +194,25 @@ export class SR5Item extends Item {
 
     _actionChatData(data, labels, props) {
         if (data.action) {
+            const labelStringList: string[] = [];
             if (data.action.skill) {
-                labels.roll = `${Helpers.label(data.action.skill)}+${Helpers.label(
-                    data.action.attribute
-                )}`;
+                labelStringList.push(Helpers.label(data.action.skill));
+                labelStringList.push(Helpers.label(data.action.attribute));
             } else if (data.action.attribute2) {
-                labels.roll = `${Helpers.label(data.action.attribute)}+${Helpers.label(
-                    data.action.attribute2
-                )}`;
+                labelStringList.push(Helpers.label(data.action.attribute));
+                labelStringList.push(Helpers.label(data.action.attribute2));
+            } else if (data.action.attribute) {
+                labelStringList.push(Helpers.label(data.action.attribute));
+            }
+            if (data.action.mod) {
+                labelStringList.push(`${game.i18n.localize('SR5.ItemMod')} (${data.action.mod})`)
+                // TODO when all mods are modlists
+                // Object.entries(data.action.mod).forEach(([key, value]) =>
+                //     labelStringList.push(`${game.i18n.localize(key)} (${value})`)
+                // );
+            }
+            if (labelStringList.length) {
+                labels.roll = labelStringList.join(' + ');
             }
 
             if (data.action.opposed.type) {
@@ -223,7 +234,11 @@ export class SR5Item extends Item {
             // setup action props
             // go in order of "Limit/Accuracy" "Damage" "AP"
             // don't add action type if set to 'varies' or 'none' as that's pretty much useless info
-            if (data.action.type !== '' && data.action.type !== 'varies' && data.action.type !== 'none') {
+            if (
+                data.action.type !== '' &&
+                data.action.type !== 'varies' &&
+                data.action.type !== 'none'
+            ) {
                 props.push(`${Helpers.label(data.action.type)} Action`);
             }
             if (data.action.limit.value) props.push(`Limit ${data.action.limit.value}`);
