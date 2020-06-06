@@ -223,7 +223,7 @@ export class ChummerImportForm extends FormApplication {
                                         skillCategory = update.skills.knowledge.academic.value;
                                     if (cat === 'professional')
                                         skillCategory = update.skills.knowledge.professional.value;
-                                    if (cat === 'interests')
+                                    if (cat === 'interest')
                                         skillCategory = update.skills.knowledge.interests.value;
                                     if (skillCategory) skillCategory[id] = skill;
                                 } else {
@@ -528,7 +528,6 @@ export class ChummerImportForm extends FormApplication {
                 // gear
                 if (equipment && c.gears && c.gears.gear) {
                     const gears = getArray(c.gears.gear);
-                    const licenses = [];
                     gears.forEach((g) => {
                         try {
                             const data = {};
