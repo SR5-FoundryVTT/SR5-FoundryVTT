@@ -190,9 +190,6 @@ export class SR5Item extends Item {
 
     _actionChatData(data, labels, props) {
         if (data.action) {
-            if (data.action.type && data.action.type !== 'varies' && data.action.type !== 'none') {
-                props.push(`${Helpers.label(data.action.type)} Action`);
-            }
             if (data.action.skill) {
                 labels.roll = `${Helpers.label(data.action.skill)}+${Helpers.label(
                     data.action.attribute
@@ -202,18 +199,7 @@ export class SR5Item extends Item {
                     data.action.attribute2
                 )}`;
             }
-            if (data.action.damage.type.value) {
-                const { damage } = data.action;
-                if (damage.value)
-                    props.push(
-                        `DV ${damage.value}${
-                            damage.type.value ? damage.type.value.toUpperCase().charAt(0) : ''
-                        }`
-                    );
-                if (damage.ap && damage.ap.value) props.push(`AP ${damage.ap.value}`);
-                if (damage.element.value) props.push(Helpers.label(damage.element.value));
-            }
-            if (data.action.limit.value) props.push(`Limit ${data.action.limit.value}`);
+
             if (data.action.opposed.type) {
                 const { opposed } = data.action;
                 if (opposed.type !== 'custom')
@@ -228,7 +214,39 @@ export class SR5Item extends Item {
                     )}`;
                 else if (opposed.attribute)
                     labels.opposedRoll = `vs. ${Helpers.label(opposed.attribute)}`;
-                if (opposed.description) props.push(`Opposed Desc: ${opposed.desc}`);
+            }
+
+            // setup action props
+            // go in order of "Limit/Accuracy" "Damage" "AP"
+            // don't add action type if set to 'varies' or 'none' as that's pretty much useless info
+            if (data.action.type && data.action.type !== 'varies' && data.action.type !== 'none') {
+                props.push(`${Helpers.label(data.action.type)} Action`);
+            }
+            if (data.action.limit.value) props.push(`Limit ${data.action.limit.value}`);
+            if (data.action.damage.type.value) {
+                const { damage } = data.action;
+                let damageString = '';
+                let elementString = '';
+                if (damage.value) {
+                    damageString = `DV ${damage.value}${
+                        damage.type.value ? damage.type.value.toUpperCase().charAt(0) : ''
+                    }`;
+                }
+                if (damage.element.value) {
+                    // if we have a damage value and are electric, follow the convention of (e) after
+                    if (damage.value) {
+                        if (damage.element.value === 'electricity') {
+                            damageString += ' (e)';
+                        } else {
+                            elementString = Helpers.label(damage.element.value);
+                        }
+                    } else {
+                        elementString = Helpers.label(damage.element.value);
+                    }
+                }
+                if (damageString) props.push(damageString);
+                if (elementString) props.push(elementString);
+                if (damage.ap && damage.ap.value) props.push(`AP ${damage.ap.value}`);
             }
         }
     }
@@ -353,6 +371,12 @@ export class SR5Item extends Item {
 
     _weaponChatData(data, labels, props) {
         this._actionChatData(data, labels, props);
+        for (let i = 0; i < props.length; i++) {
+            const prop = props[i];
+            if (prop.includes('Limit')) {
+                props[i] = prop.replace('Limit', 'Accuracy');
+            }
+        }
 
         const equippedAmmo = this.getEquippedAmmo();
         if (equippedAmmo && data.ammo && data.ammo.current?.max) {
@@ -386,20 +410,46 @@ export class SR5Item extends Item {
         }
 
         if (data.category === 'range') {
-            if (data.range.rc) props.push(`RC ${data.range.rc.value}`);
-            if (data.range.modes)
-                props.push(
-                    Array.from(Object.entries(data.range.modes))
-                        .filter(([key, val]) => val && !key.includes('-'))
-                        .map(([key]) => Helpers.label(key))
-                        .join('/')
-                );
+            if (data.range.rc) {
+                let rcString = `${game.i18n.localize('SR5.RecoilCompensation')} ${
+                    data.range.rc.value
+                }`;
+                if (this.actor) {
+                    rcString += ` (${game.i18n.localize('SR5.Total')} ${
+                        this.actor.data.data.recoil_compensation + data.range.rc.value
+                    })`;
+                }
+                props.push(rcString);
+            }
+            if (data.range.modes) {
+                const newModes: string[] = [];
+                const { modes } = data.range;
+                if (modes.single_shot) newModes.push('SR5.WeaponModeSingleShotShort');
+                if (modes.semi_auto) newModes.push('SR5.WeaponModeSemiAutoShort');
+                if (modes.burst_fire) newModes.push('SR5.WeaponModeBurstFireShort');
+                if (modes.full_auto) newModes.push('SR5.WeaponModeFullAutoShort');
+                props.push(newModes.map((m) => game.i18n.localize(m)).join('/'));
+            }
             if (data.range.ranges)
                 props.push(Array.from(Object.values(data.range.ranges)).join('/'));
         } else if (data.category === 'melee') {
-            if (data.melee.reach)
-                props.push(`${game.i18n.localize('SR5.Reach')} ${data.melee.reach}`);
+            if (data.melee.reach) {
+                const reachString = `${game.i18n.localize('SR5.Reach')} ${data.melee.reach}`;
+                // find accuracy in props and insert ourselves after it
+                const accIndex = props.findIndex((p) => p.includes('Accuracy'));
+                if (accIndex > -1) {
+                    props.splice(accIndex + 1, 0, reachString);
+                } else {
+                    props.push(reachString);
+                }
+            }
         } else if (data.category === 'thrown') {
+            const { blast } = data.thrown;
+            if (blast?.value)
+                props.push(`${game.i18n.localize('SR5.BlastRadius')} ${blast.radius}m`);
+            if (blast?.dropoff)
+                props.push(`${game.i18n.localize('SR5.DropOff')} ${blast.dropoff}/m`);
+
             if (data.thrown.ranges) {
                 const mult =
                     data.thrown.ranges.attribute && this.actor
@@ -413,11 +463,6 @@ export class SR5Item extends Item {
                 ];
                 props.push(ranges.map((v) => v * mult).join('/'));
             }
-            const { blast } = data.thrown;
-            if (blast.value)
-                props.push(`${game.i18n.localize('SR5.BlastRadius')} ${blast.radius}m`);
-            if (blast.dropoff)
-                props.push(`${game.i18n.localize('SR5.DropOff')} ${blast.dropoff}/m`);
         }
     }
 

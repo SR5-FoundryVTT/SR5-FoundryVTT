@@ -373,6 +373,12 @@
   "SR5.AddFifteenMinutesToOverwatch": "Roll 2d6 for 15 minutes in the matrix",
   "SR5.ResetOverwatchScore": "Reset Overwatch Score",
 
+  "SR5.WeaponModeSingleShotShort": "SS",
+  "SR5.WeaponModeSemiAutoShort": "SA",
+  "SR5.WeaponModeBurstFireShort": "BF",
+  "SR5.WeaponModeFullAutoShort": "FA",
+
+  "SR5.Total": "Total",
 
   "SETTINGS.DiagonalMovementName": "Diagonal Movement",
   "SETTINGS.DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
