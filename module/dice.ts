@@ -158,15 +158,13 @@ export class DiceSR {
                         if (cancel) return;
                         // get the actual dice_pool from the difference of initial parts and value in the dialog
 
-                        let dicePool = Helpers.parseInputToNumber(
-                            $(html).find('[name="dice_pool"]').val()
-                        );
-
-                        +Helpers.parseInputToNumber($(html).find('[name="dp_mod"]').val());
-                        +Helpers.parseInputToNumber($(html).find('[name="wounds"]').val());
-                        -Helpers.parseInputToNumber(
-                            $(html).find('[name="options.environmental"]').val()
-                        );
+                        let dicePool =
+                            Helpers.parseInputToNumber($(html).find('[name="dice_pool"]').val()) +
+                            Helpers.parseInputToNumber($(html).find('[name="dp_mod"]').val()) -
+                            Helpers.parseInputToNumber($(html).find('[name="wounds"]').val()) -
+                            Helpers.parseInputToNumber(
+                                $(html).find('[name="options.environmental"]').val()
+                            );
 
                         const limit = Helpers.parseInputToNumber(
                             $(html).find('[name="limit"]').val()
