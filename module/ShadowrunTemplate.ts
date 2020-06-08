@@ -17,15 +17,12 @@ class ShadowrunTemplate extends MeasuredTemplate {
     x: number;
     y: number;
 
-    static fromSpell(item: SR5Item, force: number): ShadowrunTemplate {
+    static fromItem(item): ShadowrunTemplate | undefined {
         const templateShape = 'circle';
-        // TODO account for extended spell
-        const distance = force;
 
         const templateData = {
             t: templateShape,
             user: game.user._id,
-            distance,
             direction: 0,
             x: 0,
             y: 0,
@@ -33,36 +30,33 @@ class ShadowrunTemplate extends MeasuredTemplate {
             fillColor: game.user.color,
         };
 
-        // @ts-ignore
-        return new this(templateData);
-    }
-
-    static fromGrenade(item: SR5Item): ShadowrunTemplate {
-        const templateShape = 'circle';
-        // TODO use item radius
-        const distance = 10;
-
-        const templateData = {
-            t: templateShape,
-            user: game.user._id,
-            distance,
-            direction: 0,
-            x: 0,
-            y: 0,
-            // @ts-ignore
-            fillColor: game.user.color,
-        };
+        // can only handle spells and grenade right now
+        if (item.isSpell()) {
+            const force = item.getLastSpellForce();
+            // distance on spells is equal to force (I'm probably wrong for certain spells)
+            let distance = force;
+            // extended spells multiply by 10
+            if (item.data.data.extended) distance *= 10;
+            templateData['distance'] = distance;
+        } else if (item.isGrenade()) {
+            // use blast radius
+            const distance = item.data.data.thrown.blast.radius;
+            const dropoff = item.data.data.thrown.blast.dropoff;
+            templateData['distance'] = distance;
+        }
 
         // @ts-ignore
         return new this(templateData);
     }
 
-    drawPreview(event: Event) {
+    drawPreview(event?: Event) {
         const initialLayer = canvas.activeLayer;
         // @ts-ignore
         this.draw();
         // @ts-ignore
         this.layer.activate();
+        // @ts-ignore
+        this.layer.preview.addChild(this);
         this.activatePreviewListeners(initialLayer);
     }
 

@@ -5,6 +5,7 @@ import { SR5Actor } from '../actor/SR5Actor';
 import ModList = Shadowrun.ModList;
 import { ShadowrunRollDialog } from '../apps/dialogs/ShadowrunRollDialog';
 import AttackData = Shadowrun.AttackData;
+import ShadowrunTemplate from '../ShadowrunTemplate';
 
 export class SR5Item extends Item {
     labels: {} = {};
@@ -17,6 +18,24 @@ export class SR5Item extends Item {
     }
     setLastFireMode(fireMode: number) {
         return this.setFlag('shadowrun5e', 'lastFireMode', fireMode);
+    }
+    getLastSpellForce(): number {
+        return this.getFlag('shadowrun5e', 'lastSpellForce') || 0;
+    }
+    setLastSpellForce(force: number) {
+        return this.setFlag('shadowrun5e', 'lastSpellForce', force);
+    }
+    getLastComplexFormLevel(): number {
+        return this.getFlag('shadowrun5e', 'lastComplexFormLevel') || 0;
+    }
+    setLastComplexFormLevel(level: number) {
+        return this.setFlag('shadowrun5e', 'lastComplexFormLevel', level);
+    }
+    getLastFireRange(): number {
+        return this.getFlag('shadowrun5e', 'lastFireRange') || 0;
+    }
+    setLastFireRange(environmentalMod: number) {
+        return this.setFlag('shadowrun5e', 'lastFireRange', environmentalMod);
     }
 
     getLastAttack(): AttackData | undefined {
@@ -44,6 +63,9 @@ export class SR5Item extends Item {
 
     get hasRoll() {
         return !!(this.data.data.action && this.data.data.action.type !== '');
+    }
+    get hasTemplate() {
+        return (this.data.type === 'spell' && this.data.data.range === 'los_a') || this.isGrenade();
     }
 
     prepareData() {
@@ -168,6 +190,7 @@ export class SR5Item extends Item {
             data: this.getChatData(),
             hasRoll: this.hasRoll,
             hasOpposedRoll: this.hasOpposedRoll,
+            hasTemplate: this.hasTemplate,
             labels: this.labels,
         };
 
@@ -657,36 +680,31 @@ export class SR5Item extends Item {
         }
     }
 
-    async rollTest(ev) {
-        let title = this.data.name;
-
-        // see if we have a custom dialog for this
-        const dialog = await ShadowrunRollDialog.fromItemRoll(this, ev);
-
+    async rollTest(event) {
+        const dialog = await ShadowrunRollDialog.fromItemRoll(this, event);
         if (dialog) return dialog.render(true);
-        else {
-            const parts = this.getRollPartsList();
-            const limit = this.getActionLimit();
 
-            return DiceSR.rollTest({
-                event: ev,
-                parts,
-                dialogOptions: {
-                    environmental: true,
-                },
-                actor: this.actor,
-                limit,
-                title,
-            }).then((roll: Roll | undefined) => {
-                if (roll && this.data.type === 'weapon') {
-                    this.useAmmo(1).then(() => {
-                        this.setFlag('shadowrun5e', 'action', {
-                            hits: roll.total,
-                        });
+        let title = this.data.name;
+        const parts = this.getRollPartsList();
+        const limit = this.getActionLimit();
+        return DiceSR.rollTest({
+            event,
+            parts,
+            dialogOptions: {
+                environmental: true,
+            },
+            actor: this.actor,
+            limit,
+            title,
+        }).then((roll: Roll | undefined) => {
+            if (roll && this.data.type === 'weapon') {
+                this.useAmmo(1).then(() => {
+                    this.setFlag('shadowrun5e', 'action', {
+                        hits: roll.total,
                     });
-                }
-            });
-        }
+                });
+            }
+        });
     }
 
     static chatListeners(html) {
@@ -727,6 +745,13 @@ export class SR5Item extends Item {
                 const targets = this._getChatCardTargets();
                 for (const t of targets) {
                     item.rollOpposedTest(t, ev);
+                }
+            }
+            if (action === 'place-template') {
+                const template = ShadowrunTemplate.fromItem(item);
+                console.log(template);
+                if (template) {
+                    template.drawPreview();
                 }
             }
         });
@@ -834,7 +859,7 @@ export class SR5Item extends Item {
         updateData: object | object[],
         options?: object
     ) {
-        this.updateOwnedItem(updateData);
+        await this.updateOwnedItem(updateData);
         return this;
     }
 
@@ -855,6 +880,11 @@ export class SR5Item extends Item {
         await this.prepareData();
         await this.render(false);
         return true;
+    }
+
+    isGrenade(): boolean {
+        console.log(this.data.data.thrown);
+        return this.data.type === 'weapon' && this.data.data.thrown?.blast?.radius;
     }
 
     isCombatSpell(): boolean {
@@ -927,4 +957,9 @@ export class SR5Item extends Item {
         return this.data.data.fade || 0;
     }
 
+    getRecoilCompensation(includeActor: boolean = true): number {
+        let base = parseInt(this.data.data.range.rc.value);
+        if (includeActor) base += parseInt(this.actor.data.data.recoil_compensation);
+        return base;
+    }
 }

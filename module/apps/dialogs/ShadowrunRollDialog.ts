@@ -68,6 +68,7 @@ export class ShadowrunRollDialog extends Dialog {
         dialogData.close = async (html) => {
             if (cancel) return;
             const level = Helpers.parseInputToNumber($(html).find('[name=level]').val());
+            await item.setLastComplexFormLevel(level);
             DiceSR.rollTest({
                 event: dialogData['event'],
                 dialogOptions: {
@@ -113,6 +114,7 @@ export class ShadowrunRollDialog extends Dialog {
         dialogData.default = 'normal';
         dialogData.close = async (html) => {
             const force = Helpers.parseInputToNumber($(html).find('[name=force]').val());
+            await item.setLastSpellForce(force);
             DiceSR.rollTest({
                 event: dialogData['event'],
                 dialogOptions: {
@@ -141,10 +143,9 @@ export class ShadowrunRollDialog extends Dialog {
         let title = dialogData.title || item.name;
 
         const itemData = item.data.data;
-        const actorData = item.actor.data.data;
         const fireModes = {};
 
-        const { modes, ranges } = itemData.range;
+        const { modes, ranges, ammo } = itemData.range;
         if (modes.single_shot) {
             fireModes['1'] = 'SS';
         }
@@ -163,11 +164,11 @@ export class ShadowrunRollDialog extends Dialog {
         }
 
         const fireMode = item.getLastFireMode();
-        const rc = parseInt(itemData.range.rc.value) + parseInt(actorData.recoil_compensation);
+        const rc = item.getRecoilCompensation(true);
         templateData['fireModes'] = fireModes;
         templateData['fireMode'] = fireMode;
         templateData['rc'] = rc;
-        templateData['ammo'] = itemData.range.ammo;
+        templateData['ammo'] = ammo;
         templateData['title'] = title;
 
         let environmental: boolean | number = true;
@@ -203,6 +204,7 @@ export class ShadowrunRollDialog extends Dialog {
         dialogData.close = async (html) => {
             if (cancel) return;
             const fireMode = Helpers.parseInputToNumber($(html).find('[name="fireMode"]').val());
+            await item.setLastFireMode(fireMode);
             if (fireMode) {
                 if (fireMode) {
                     title += ` - Defender (${Helpers.mapRoundsToDefenseDesc(fireMode)})`;
