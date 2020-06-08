@@ -4318,7 +4318,7 @@ class SR5Item extends Item {
                 if (equippedAmmo.data.data.blast.radius)
                     props.push(`${game.i18n.localize('SR5.BlastRadius')} ${equippedAmmo.data.data.blast.radius}m`);
                 if (equippedAmmo.data.data.blast.dropoff)
-                    props.push(`${game.i18n.localize('SR5.DropOff')} ${equippedAmmo.data.data.blast.dropoff}/m`);
+                    props.push(`${game.i18n.localize('SR5.Dropoff')} ${equippedAmmo.data.data.blast.dropoff}/m`);
                 if (spare_clips && spare_clips.max)
                     props.push(`${game.i18n.localize('SR5.SpareClips')} (${spare_clips.value}/${spare_clips.max})`);
             }
@@ -4808,10 +4808,9 @@ class SR5Item extends Item {
         return base;
     }
     hasExplosiveAmmo() {
-        var _a;
+        var _a, _b, _c;
         const ammo = this.getEquippedAmmo();
-        console.log(ammo);
-        return ((_a = ammo.data.data.blast) === null || _a === void 0 ? void 0 : _a.radius) > 0;
+        return ((_c = (_b = (_a = ammo === null || ammo === void 0 ? void 0 : ammo.data) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.blast) === null || _c === void 0 ? void 0 : _c.radius) > 0;
     }
 }
 exports.SR5Item = SR5Item;

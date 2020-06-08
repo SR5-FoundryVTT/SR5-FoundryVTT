@@ -456,7 +456,7 @@ export class SR5Item extends Item {
                     );
                 if (equippedAmmo.data.data.blast.dropoff)
                     props.push(
-                        `${game.i18n.localize('SR5.DropOff')} ${
+                        `${game.i18n.localize('SR5.Dropoff')} ${
                             equippedAmmo.data.data.blast.dropoff
                         }/m`
                     );
@@ -969,7 +969,6 @@ export class SR5Item extends Item {
 
     hasExplosiveAmmo(): boolean {
         const ammo = this.getEquippedAmmo();
-        console.log(ammo);
-        return ammo.data.data.blast?.radius > 0;
+        return ammo?.data?.data?.blast?.radius > 0;
     }
 }
