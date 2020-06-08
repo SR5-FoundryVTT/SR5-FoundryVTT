@@ -169,6 +169,7 @@ export class SR5Actor extends Actor {
         for (const skill of Object.values(active)) {
             if (!skill.hidden) {
                 if (!skill.mod) skill.mod = {};
+                if (!skill.base) skill.base = 0;
                 skill.value = skill.base + Helpers.totalMods(skill.mod);
             }
         }
@@ -184,6 +185,7 @@ export class SR5Actor extends Actor {
 
         for (let skill of Object.values(language.value)) {
             if (!skill.mod) skill.mod = {};
+            if (!skill.base) skill.base = 0;
             skill.value = skill.base + Helpers.totalMods(skill.mod);
         }
 
@@ -194,6 +196,7 @@ export class SR5Actor extends Actor {
                 .filter(([, val]) => !val._delete)
                 .reduce((acc, [id, skill]) => {
                     if (!skill.mod) skill.mod = {};
+                    if (!skill.base) skill.base = 0;
                     skill.value = skill.base + Helpers.totalMods(skill.mod);
                     acc[id] = skill;
                     return acc;
