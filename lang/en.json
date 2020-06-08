@@ -381,6 +381,12 @@
   "SR5.WeaponModeFullAutoShort": "FA",
 
   "SR5.Total": "Total",
+  "SR5.PlaceTemplate": "Place Template",
+  "SR5.Defaulting": "Defaulting",
+  "SR5.NotExtended": "Not Extended",
+
+  "SR5.NormalSpellButton": "Normal",
+  "SR5.RecklessSpellButton": "Reckless",
 
   "SETTINGS.DiagonalMovementName": "Diagonal Movement",
   "SETTINGS.DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",

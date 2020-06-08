@@ -154,30 +154,32 @@ export class DiceSR {
                     },
                     default: 'roll',
 
-                    close: (html) => {
+                    close: async (html) => {
                         if (cancel) return;
                         // get the actual dice_pool from the difference of initial parts and value in the dialog
 
-                        let dicePool = Helpers.parseInputToNumber(
-                            $(html).find('[name="dice_pool"]').val()
-                        );
-
-                        +Helpers.parseInputToNumber($(html).find('[name="dp_mod"]').val());
-                        +Helpers.parseInputToNumber($(html).find('[name="wounds"]').val());
-                        -Helpers.parseInputToNumber(
-                            $(html).find('[name="options.environmental"]').val()
-                        );
+                        let dicePool =
+                            Helpers.parseInputToNumber($(html).find('[name="dice_pool"]').val()) +
+                            Helpers.parseInputToNumber($(html).find('[name="dp_mod"]').val()) -
+                            Helpers.parseInputToNumber($(html).find('[name="wounds"]').val()) -
+                            Helpers.parseInputToNumber(
+                                $(html).find('[name="options.environmental"]').val()
+                            );
 
                         const limit = Helpers.parseInputToNumber(
                             $(html).find('[name="limit"]').val()
                         );
-                        const extended =
-                            Helpers.parseInputToNumber($(html).find('[name="extended"]').val()) !==
-                            0;
+                        const extendedString = Helpers.parseInputToString(
+                            $(html).find('[name="extended"]').val()
+                        );
+
+                        console.log(extendedString);
+
+                        const extended = extendedString === 'true';
 
                         if (edge && actor) {
                             dicePool += actor.data.data.attributes.edge.max;
-                            actor.update({
+                            await actor.update({
                                 'data.attributes.edge.value':
                                     actor.data.data.attributes.edge.value - 1,
                             });

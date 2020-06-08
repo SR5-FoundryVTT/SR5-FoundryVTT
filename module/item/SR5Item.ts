@@ -2,11 +2,53 @@ import { DiceSR } from '../dice';
 import { Helpers } from '../helpers';
 import DeviceData = Shadowrun.DeviceData;
 import { SR5Actor } from '../actor/SR5Actor';
+import ModList = Shadowrun.ModList;
+import { ShadowrunRollDialog } from '../apps/dialogs/ShadowrunRollDialog';
+import AttackData = Shadowrun.AttackData;
+import ShadowrunTemplate from '../ShadowrunTemplate';
+import AttributeField = Shadowrun.AttributeField;
+import SkillField = Shadowrun.SkillField;
 
 export class SR5Item extends Item {
     labels: {} = {};
     items: SR5Item[];
     actor: SR5Actor;
+
+    // Flag Functions
+    getLastFireMode(): number {
+        return this.getFlag('shadowrun5e', 'lastFireMode') || 0;
+    }
+    setLastFireMode(fireMode: number) {
+        return this.setFlag('shadowrun5e', 'lastFireMode', fireMode);
+    }
+    getLastSpellForce(): number {
+        return this.getFlag('shadowrun5e', 'lastSpellForce') || 0;
+    }
+    setLastSpellForce(force: number) {
+        return this.setFlag('shadowrun5e', 'lastSpellForce', force);
+    }
+    getLastComplexFormLevel(): number {
+        return this.getFlag('shadowrun5e', 'lastComplexFormLevel') || 0;
+    }
+    setLastComplexFormLevel(level: number) {
+        return this.setFlag('shadowrun5e', 'lastComplexFormLevel', level);
+    }
+    getLastFireRange(): number {
+        return this.getFlag('shadowrun5e', 'lastFireRange') || 0;
+    }
+    setLastFireRange(environmentalMod: number) {
+        return this.setFlag('shadowrun5e', 'lastFireRange', environmentalMod);
+    }
+
+    getLastAttack(): AttackData | undefined {
+        return this.getFlag('shadowrun5e', 'lastAttack');
+    }
+    setLastAttack(attack: AttackData) {
+        return this.setFlag('shadowrun5e', 'lastAttack', attack);
+    }
+    clearLastAttack() {
+        return this.unsetFlag('shadowrun5e', 'lastAttack');
+    }
 
     async update(data, options?) {
         const ret = super.update(data, options);
@@ -23,6 +65,13 @@ export class SR5Item extends Item {
 
     get hasRoll() {
         return !!(this.data.data.action && this.data.data.action.type !== '');
+    }
+    get hasTemplate() {
+        return (
+            (this.data.type === 'spell' && this.data.data.range === 'los_a') ||
+            this.isGrenade() ||
+            this.hasExplosiveAmmo()
+        );
     }
 
     prepareData() {
@@ -147,6 +196,7 @@ export class SR5Item extends Item {
             data: this.getChatData(),
             hasRoll: this.hasRoll,
             hasOpposedRoll: this.hasOpposedRoll,
+            hasTemplate: this.hasTemplate,
             labels: this.labels,
         };
 
@@ -205,7 +255,7 @@ export class SR5Item extends Item {
                 labelStringList.push(Helpers.label(data.action.attribute));
             }
             if (data.action.mod) {
-                labelStringList.push(`${game.i18n.localize('SR5.ItemMod')} (${data.action.mod})`)
+                labelStringList.push(`${game.i18n.localize('SR5.ItemMod')} (${data.action.mod})`);
                 // TODO when all mods are modlists
                 // Object.entries(data.action.mod).forEach(([key, value]) =>
                 //     labelStringList.push(`${game.i18n.localize(key)} (${value})`)
@@ -408,7 +458,7 @@ export class SR5Item extends Item {
                     );
                 if (equippedAmmo.data.data.blast.dropoff)
                     props.push(
-                        `${game.i18n.localize('SR5.DropOff')} ${
+                        `${game.i18n.localize('SR5.Dropoff')} ${
                             equippedAmmo.data.data.blast.dropoff
                         }/m`
                     );
@@ -568,6 +618,40 @@ export class SR5Item extends Item {
         this.update(data);
     }
 
+    getRollPartsList(): ModList<number> {
+        // we only have a roll if we have an action or an actor
+        if (!this.data.data.action || !this.actor) return {};
+
+        const parts = duplicate(this.getModifierList());
+
+        const skill = this.actor.findActiveSkill(this.getActionSkill());
+        const attribute = this.actor.findAttribute(this.getActionAttribute());
+        const attribute2 = this.actor.findAttribute(this.getActionAttribute2());
+
+        if (attribute && attribute.label) parts[attribute.label] = attribute.value;
+
+        // if we have a valid skill, don't look for a second attribute
+        if (skill && skill.label) parts[skill.label] = skill.value;
+        else if (attribute2 && attribute2.label) parts[attribute2.label] = attribute2.value;
+
+        const spec = this.getActionSpecialization();
+        if (spec) parts[spec] = 2;
+
+        // TODO remove these (by making them not used, not just delete)
+        const mod = parseInt(this.data.data.action.mod || 0);
+        if (mod) parts['SR5.ItemMod'] = mod;
+
+        const atts: (AttributeField | SkillField)[] | boolean = [];
+        if (attribute !== undefined) atts.push(attribute);
+        if (attribute2 !== undefined) atts.push(attribute2);
+        if (skill !== undefined) atts.push(skill);
+        // add global parts from actor
+        this.actor._addGlobalParts(parts);
+        this.actor._addMatrixParts(parts, atts)
+
+        return parts;
+    }
+
     removeLicense(index) {
         const data = duplicate(this.data);
         const { licenses } = data.data;
@@ -579,19 +663,17 @@ export class SR5Item extends Item {
         const itemData = this.data.data;
         const options = {
             event: ev,
-            incomingAttack: { fireMode: 0 },
+            incomingAttack: {},
             fireModeDefense: 0,
             cover: false,
             incomingAction: {},
         };
 
-        if (this.getFlag('shadowrun5e', 'attack')) {
-            options.incomingAttack = this.getFlag('shadowrun5e', 'attack');
-            if (options.incomingAttack.fireMode)
-                options.fireModeDefense = Helpers.mapRoundsToDefenseMod(
-                    options.incomingAttack.fireMode
-                );
+        const lastAttack = this.getLastAttack();
+        if (lastAttack) {
+            options.incomingAttack = lastAttack;
             options.cover = true;
+            options.fireModeDefense = Helpers.mapRoundsToDefenseMod(this.getLastFireMode());
         }
 
         options.incomingAction = this.getFlag('shadowrun5e', 'action');
@@ -612,264 +694,31 @@ export class SR5Item extends Item {
         }
     }
 
-    rollTest(ev) {
-        const itemData = this.data.data;
-        if (!this.actor) return console.error('COULD NOT FIND ACTOR');
-        const actorData = this.actor.data.data;
-
-        const skill = actorData.skills.active[itemData.action.skill];
-        const attribute = actorData.attributes[itemData.action.attribute];
-        const attribute2 = actorData.attributes[itemData.action.attribute2];
-        let limit = itemData.action.limit.value;
-        // TODO remove these (by making them not used, not just delete)
-        const mod = parseInt(itemData.action.mod || 0) + parseInt(itemData.action.alt_mod || 0);
-
-        // only check if attribute2 is set if skill is not set
-        const parts = duplicate(itemData.action.dice_pool_mod);
-        if (attribute) parts[attribute.label] = attribute.value;
-        if (skill) parts[skill.label] = skill.value;
-        else if (attribute2) parts[attribute2.label] = attribute2.value;
-
-        // TODO change item to allow selecting specialization type
-        if (itemData.action.spec) parts['SR5.Specialization'] = 2;
-        if (mod) parts['SR5.ItemMod'] = mod;
+    async rollTest(event) {
+        const dialog = await ShadowrunRollDialog.fromItemRoll(this, event);
+        if (dialog) return dialog.render(true);
 
         let title = this.data.name;
-
-        if (this.data.type === 'weapon' && itemData.category === 'range') {
-            const fireModes = {};
-            {
-                const { modes } = itemData.range;
-                if (modes.single_shot) {
-                    fireModes['1'] = 'SS';
-                }
-                if (modes.semi_auto) {
-                    fireModes['1'] = 'SA';
-                    fireModes['3'] = 'SB';
-                }
-                if (modes.burst_fire) {
-                    fireModes['3'] = `${modes.semi_auto ? 'SB/' : ''}BF`;
-                    fireModes['6'] = 'LB';
-                }
-                if (modes.full_auto) {
-                    fireModes['6'] = `${modes.burst_fire ? 'LB/' : ''}FA(s)`;
-                    fireModes['10'] = 'FA(c)';
-                    fireModes['20'] = game.i18n.localize('SR5.Suppressing');
-                }
-            }
-
-            const attack = this.getFlag('shadowrun5e', 'attack') || {
-                fireMode: 0,
-            };
-            const { fireMode } = attack;
-            const rc = parseInt(itemData.range.rc.value) + parseInt(actorData.recoil_compensation);
-            const dialogData = {
-                fireModes,
-                fireMode,
-                rc,
-                ammo: itemData.range.ammo,
-            };
-            return renderTemplate(
-                'systems/shadowrun5e/templates/rolls/range-weapon-roll.html',
-                dialogData
-            ).then((dlg) => {
-                const buttons = {};
-                const { ranges } = itemData.range;
-                let environmental: boolean | number = true;
-                let cancel = true;
-                buttons['short'] = {
-                    label: `Short (${ranges.short})`,
-                    callback: () => (cancel = false),
-                };
-                buttons['medium'] = {
-                    label: `Medium (${ranges.medium})`,
-                    callback: () => {
-                        environmental = 1;
-                        cancel = false;
-                    },
-                };
-                buttons['long'] = {
-                    label: `Long (${ranges.long})`,
-                    callback: () => {
-                        environmental = 3;
-                        cancel = false;
-                    },
-                };
-                buttons['extreme'] = {
-                    label: `Extreme (${ranges.extreme})`,
-                    callback: () => {
-                        environmental = 6;
-                        cancel = false;
-                    },
-                };
-                new Dialog({
-                    title,
-                    content: dlg,
-                    buttons,
-                    close: (html) => {
-                        if (cancel) return;
-
-                        const fireMode = Helpers.parseInputToNumber(
-                            $(html).find('[name="fireMode"]').val()
-                        );
-                        if (fireMode) {
-                            title += ` - Defender (${Helpers.mapRoundsToDefenseDesc(fireMode)})`;
-                        }
-                        // suppressing fire doesn't cause recoil
-                        if (fireMode > rc && fireMode !== 20) {
-                            parts['SR5.Recoil'] = rc - fireMode;
-                        }
-                        DiceSR.rollTest({
-                            event: ev,
-                            parts,
-                            actor: this.actor || undefined,
-                            limit,
-                            title,
-                            dialogOptions: {
-                                environmental,
-                            },
-                        }).then((roll: Roll | undefined) => {
-                            if (roll) {
-                                this.useAmmo(fireMode).then(() => {
-                                    this.setFlag('shadowrun5e', 'attack', {
-                                        hits: roll.total,
-                                        fireMode,
-                                        damageType: this.data.data.action.damage.type.value,
-                                        element: this.data.data.action.damage.element.value,
-                                        damage: this.data.data.action.damage.value,
-                                        ap: this.data.data.action.damage.ap.value,
-                                    });
-                                });
-                            }
-                        });
-                    },
-                }).render(true);
-            });
-        }
-        if (this.data.type === 'spell') {
-            const dialogData = {
-                drain: itemData.drain >= 0 ? `+${itemData.drain}` : itemData.drain,
-                force: 2 - itemData.drain,
-            };
-            let reckless = false;
-            let cancel = true;
-            renderTemplate('systems/shadowrun5e/templates/rolls/roll-spell.html', dialogData).then(
-                (dlg) => {
-                    new Dialog({
-                        title: `${Helpers.label(this.data.name)} Force`,
-                        content: dlg,
-                        buttons: {
-                            roll: {
-                                label: 'Normal',
-                                callback: () => (cancel = false),
-                            },
-                            spec: {
-                                label: 'Reckless',
-                                callback: () => {
-                                    reckless = true;
-                                    cancel = false;
-                                },
-                            },
-                        },
-                        close: (html) => {
-                            if (cancel) return;
-                            const force = Helpers.parseInputToNumber(
-                                $(html).find('[name=force]').val()
-                            );
-                            limit = force;
-                            DiceSR.rollTest({
-                                event: ev,
-                                dialogOptions: {
-                                    environmental: true,
-                                },
-                                parts,
-                                actor: this.actor || undefined,
-                                limit,
-                                title,
-                            }).then(async (roll: Roll | undefined) => {
-                                if (this.data.data.category === 'combat' && roll) {
-                                    const damage = force;
-                                    const ap = -force;
-                                    this.setFlag('shadowrun5e', 'attack', {
-                                        hits: roll.total,
-                                        damageType: this.data.data.action.damage.type,
-                                        element: this.data.data.action.damage.element,
-                                        damage,
-                                        ap,
-                                    });
-                                }
-                                const drain = Math.max(
-                                    itemData.drain + force + (reckless ? 3 : 0),
-                                    2
-                                );
-                                this.actor?.rollDrain({ event: ev }, drain);
-                            });
-                        },
-                    }).render(true);
-                }
-            );
-        } else if (this.data.type === 'complex_form') {
-            const dialogData = {
-                fade: itemData.fade >= 0 ? `+${itemData.fade}` : itemData.fade,
-                level: 2 - itemData.fade,
-            };
-            let cancel = true;
-            renderTemplate(
-                'systems/shadowrun5e/templates/rolls/roll-complex-form.html',
-                dialogData
-            ).then((dlg) => {
-                new Dialog({
-                    title: `${Helpers.label(this.data.name)} Level`,
-                    content: dlg,
-                    buttons: {
-                        roll: {
-                            label: 'Continue',
-                            icon: '<i class="fas fa-dice-six"></i>',
-                            callback: () => (cancel = false),
-                        },
-                    },
-                    close: (html) => {
-                        if (cancel) return;
-                        const level = Helpers.parseInputToNumber(
-                            $(html).find('[name=level]').val()
-                        );
-                        limit = level;
-                        DiceSR.rollTest({
-                            event: ev,
-                            dialogOptions: {
-                                environmental: false,
-                            },
-                            parts,
-                            actor: this.actor,
-                            limit,
-                            title,
-                        }).then(() => {
-                            const fade = Math.max(itemData.fade + level, 2);
-                            this.actor.rollFade({ event: ev }, fade);
-                        });
-                    },
-                }).render(true);
-            });
-        } else {
-            return DiceSR.rollTest({
-                event: ev,
-                parts,
-                dialogOptions: {
-                    environmental: true,
-                },
-                actor: this.actor,
-                limit,
-                title,
-            }).then((roll: Roll | undefined) => {
-                if (roll) {
-                    this.useAmmo(1).then(() => {
-                        this.setFlag('shadowrun5e', 'action', {
-                            hits: roll.total,
-                        });
+        const parts = this.getRollPartsList();
+        const limit = this.getActionLimit();
+        return DiceSR.rollTest({
+            event,
+            parts,
+            dialogOptions: {
+                environmental: true,
+            },
+            actor: this.actor,
+            limit,
+            title,
+        }).then((roll: Roll | undefined) => {
+            if (roll && this.data.type === 'weapon') {
+                this.useAmmo(1).then(() => {
+                    this.setFlag('shadowrun5e', 'action', {
+                        hits: roll.total,
                     });
-                }
-            });
-        }
+                });
+            }
+        });
     }
 
     static chatListeners(html) {
@@ -910,6 +759,13 @@ export class SR5Item extends Item {
                 const targets = this._getChatCardTargets();
                 for (const t of targets) {
                     item.rollOpposedTest(t, ev);
+                }
+            }
+            if (action === 'place-template') {
+                const template = ShadowrunTemplate.fromItem(item);
+                console.log(template);
+                if (template) {
+                    template.drawPreview();
                 }
             }
         });
@@ -1017,7 +873,7 @@ export class SR5Item extends Item {
         updateData: object | object[],
         options?: object
     ) {
-        this.updateOwnedItem(updateData);
+        await this.updateOwnedItem(updateData);
         return this;
     }
 
@@ -1038,5 +894,91 @@ export class SR5Item extends Item {
         await this.prepareData();
         await this.render(false);
         return true;
+    }
+
+    isGrenade(): boolean {
+        console.log(this.data.data.thrown);
+        return this.data.type === 'weapon' && this.data.data.thrown?.blast?.radius;
+    }
+
+    isCombatSpell(): boolean {
+        return this.isSpell() && this.data.data.category === 'combat';
+    }
+
+    isRangedWeapon(): boolean {
+        return this.data.type === 'weapon' && this.data.data.category === 'range';
+    }
+
+    isSpell(): boolean {
+        return this.data.type === 'spell';
+    }
+
+    isComplexForm(): boolean {
+        return this.data.type === 'complex_form';
+    }
+
+    getAttackData(hits: number, force?: number): AttackData | undefined {
+        if (!this.data.data.action?.damage) return undefined;
+        const damage = this.data.data.action.damage;
+        let ap = damage.ap.value;
+        let itemValue = damage.value;
+
+        if (this.isCombatSpell() && force) {
+            itemValue = force;
+            ap = -force;
+        }
+
+        return {
+            hits,
+            damage: {
+                ...damage,
+                value: itemValue,
+                ap,
+            },
+        };
+    }
+
+    getActionSkill(): string | undefined {
+        return this.data.data.action?.skill;
+    }
+
+    getActionAttribute(): string | undefined {
+        return this.data.data.action?.attribute;
+    }
+
+    getActionAttribute2(): string | undefined {
+        return this.data.data.action?.attribute2;
+    }
+
+    getActionLimit(): number | undefined {
+        return this.data.data.action?.limit?.value;
+    }
+
+    getModifierList(): ModList<number> {
+        return this.data.data.action?.dice_pool_mod || [];
+    }
+
+    getActionSpecialization(): string | undefined {
+        if (this.data.data.action?.spec) return 'SR5.Specialization';
+        return undefined;
+    }
+
+    getDrain(): number {
+        return this.data.data.drain || 0;
+    }
+
+    getFade(): number {
+        return this.data.data.fade || 0;
+    }
+
+    getRecoilCompensation(includeActor: boolean = true): number {
+        let base = parseInt(this.data.data.range.rc.value);
+        if (includeActor) base += parseInt(this.actor.data.data.recoil_compensation);
+        return base;
+    }
+
+    hasExplosiveAmmo(): boolean {
+        const ammo = this.getEquippedAmmo();
+        return ammo?.data?.data?.blast?.radius > 0;
     }
 }

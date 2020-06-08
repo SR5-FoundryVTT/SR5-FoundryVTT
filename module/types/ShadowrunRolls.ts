@@ -8,17 +8,20 @@ declare namespace Shadowrun {
     type DefenseRollOptions = ActorRollOptions & {
         fireModeDefense?: number;
         cover?: number;
-        incomingAttack?: IncomingAttack;
+        incomingAttack?: AttackData;
     };
 
-    type IncomingAttack = {
-        hits?: number;
-        damage: number;
-        damageType: DamageType;
-        ap: number;
+    type AttackData = {
+        hits: number;
+        damage: DamageData;
     };
 
-    type SoakRollOptions = ActorRollOptions & Partial<IncomingAttack>;
+    type SoakRollOptions = ActorRollOptions & {
+        damage?: DamageData;
+        attackerHits?: number;
+        defenderHits?: number;
+        netHits?: number;
+    };
 
     type SkillRollOptions = ActorRollOptions & {
         attribute?: ActorAttribute;

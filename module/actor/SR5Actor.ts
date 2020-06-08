@@ -14,6 +14,7 @@ import SoakRollOptions = Shadowrun.SoakRollOptions;
 import AttributeField = Shadowrun.AttributeField;
 import SkillRollOptions = Shadowrun.SkillRollOptions;
 import Matrix = Shadowrun.Matrix;
+import SkillField = Shadowrun.SkillField;
 
 export class SR5Actor extends Actor {
     async update(data, options?) {
@@ -168,6 +169,7 @@ export class SR5Actor extends Actor {
         for (const skill of Object.values(active)) {
             if (!skill.hidden) {
                 if (!skill.mod) skill.mod = {};
+                if (!skill.base) skill.base = 0;
                 skill.value = skill.base + Helpers.totalMods(skill.mod);
             }
         }
@@ -183,6 +185,7 @@ export class SR5Actor extends Actor {
 
         for (let skill of Object.values(language.value)) {
             if (!skill.mod) skill.mod = {};
+            if (!skill.base) skill.base = 0;
             skill.value = skill.base + Helpers.totalMods(skill.mod);
         }
 
@@ -193,6 +196,7 @@ export class SR5Actor extends Actor {
                 .filter(([, val]) => !val._delete)
                 .reduce((acc, [id, skill]) => {
                     if (!skill.mod) skill.mod = {};
+                    if (!skill.base) skill.base = 0;
                     skill.value = skill.base + Helpers.totalMods(skill.mod);
                     acc[id] = skill;
                     return acc;
@@ -390,6 +394,16 @@ export class SR5Actor extends Actor {
         }
     }
 
+    findActiveSkill(skillName?: string): SkillField | undefined {
+        if (skillName === undefined) return undefined;
+        return this.data.data.skills.active[skillName];
+    }
+
+    findAttribute(attributeName?: string): AttributeField | undefined {
+        if (attributeName === undefined) return undefined;
+        return this.data.data.attributes[attributeName];
+    }
+
     getOwnedItem(itemId: string): SR5Item | null {
         return (super.getOwnedItem(itemId) as unknown) as SR5Item;
     }
@@ -571,28 +585,21 @@ export class SR5Actor extends Actor {
                                 parts,
                                 title: 'Defense',
                             }).then(async (roll: Roll | undefined) => {
-                                this.unsetFlag('shadowrun5e', 'incomingAttack');
                                 if (options.incomingAttack && roll) {
                                     let defenderHits = roll.total;
                                     let attack = options.incomingAttack;
                                     let attackerHits = attack.hits || 0;
                                     let netHits = attackerHits - defenderHits;
+
                                     if (netHits >= 0) {
-                                        let damage = options.incomingAttack.damage + netHits;
-                                        let damageType = options.incomingAttack.damageType;
-                                        let ap = options.incomingAttack.ap;
-                                        // ui.notifications.info(`Got Hit: DV${damage}${damageType ? damageType.charAt(0).toUpperCase() : ''} ${ap}AP`);
-                                        this.setFlag('shadowrun5e', 'incomingDamage', {
-                                            damage,
-                                            damageType,
-                                            ap,
-                                        });
-                                        this.rollSoak({
+                                        const soakRollOptions = {
                                             event: options.event,
-                                            damage,
-                                            damageType,
-                                            ap,
-                                        });
+                                            attackerHits,
+                                            defenderHits,
+                                            netHits,
+                                            damage: options.incomingAttack.damage,
+                                        };
+                                        await this.rollSoak(soakRollOptions);
                                     }
                                 }
                             })
@@ -604,9 +611,10 @@ export class SR5Actor extends Actor {
     }
 
     rollSoak(options?: SoakRollOptions) {
+        const totalDamage = (options?.damage?.value || 0) + (options?.netHits || 0);
         let dialogData = {
-            damage: options?.damage,
-            ap: options?.ap,
+            damage: totalDamage,
+            ap: options?.damage?.ap,
             soak: this.data.data.rolls.soak.default,
         };
         let id = '';
@@ -668,7 +676,6 @@ export class SR5Actor extends Actor {
                         },
                     },
                     close: async (html) => {
-                        this.unsetFlag('shadowrun5e', 'incomingDamage');
                         if (cancel) return;
 
                         const body = this.data.data.attributes.body;
@@ -695,7 +702,7 @@ export class SR5Actor extends Actor {
 
                         const label = Helpers.label(id);
                         let title = `Soak - ${label}`;
-                        if (options?.damage) title += ` - Incoming Damage: ${options.damage}`;
+                        if (totalDamage) title += ` - Incoming Damage: ${totalDamage}`;
                         resolve(
                             DiceSR.rollTest({
                                 event: options?.event,
@@ -715,7 +722,7 @@ export class SR5Actor extends Actor {
         const attr = this.data.data.attributes[attId];
         const parts = {};
         parts[attr.label] = attr.value;
-        this._addMatrixParts(parts, [attr]);
+        this._addMatrixParts(parts, attr);
         this._addGlobalParts(parts);
         return DiceSR.rollTest({
             event: options?.event,
@@ -894,7 +901,6 @@ export class SR5Actor extends Actor {
 
         if (options?.attribute) att = this.data.data.attributes[options.attribute];
         let limit = this.data.data.limits[att.limit];
-        console.log(limit);
         const parts = {};
         parts[skill.label] = skill.value;
 
@@ -902,7 +908,7 @@ export class SR5Actor extends Actor {
             parts[att.label] = att.value;
             if (options.event[CONFIG.SR5.kbmod.SPEC]) parts['SR5.Specialization'] = 2;
 
-            this._addMatrixParts(parts, att);
+            this._addMatrixParts(parts, [att, skill]);
             this._addGlobalParts(parts);
             return DiceSR.rollTest({
                 event: options.event,
@@ -960,7 +966,7 @@ export class SR5Actor extends Actor {
                         parts[att.label] = att.value;
                         if (skill.value === 0) parts['SR5.Defaulting'] = -1;
                         if (spec) parts['SR5.Specialization'] = 2;
-                        this._addMatrixParts(parts, att);
+                        this._addMatrixParts(parts, [att, skill]);
                         this._addGlobalParts(parts);
                         return DiceSR.rollTest({
                             event: options?.event,
