@@ -10,7 +10,6 @@ export class Helpers {
         return Object.values(mods).reduce(reducer, 0);
     }
 
-    // TODO this needs to be fixed because it doesn't work
     static isMatrix(
         atts?: boolean | (AttributeField | SkillField)[] | AttributeField | SkillField
     ) {
