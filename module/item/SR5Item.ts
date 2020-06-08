@@ -6,6 +6,8 @@ import ModList = Shadowrun.ModList;
 import { ShadowrunRollDialog } from '../apps/dialogs/ShadowrunRollDialog';
 import AttackData = Shadowrun.AttackData;
 import ShadowrunTemplate from '../ShadowrunTemplate';
+import AttributeField = Shadowrun.AttributeField;
+import SkillField = Shadowrun.SkillField;
 
 export class SR5Item extends Item {
     labels: {} = {};
@@ -638,6 +640,14 @@ export class SR5Item extends Item {
         // TODO remove these (by making them not used, not just delete)
         const mod = parseInt(this.data.data.action.mod || 0);
         if (mod) parts['SR5.ItemMod'] = mod;
+
+        const atts: (AttributeField | SkillField)[] | boolean = [];
+        if (attribute !== undefined) atts.push(attribute);
+        if (attribute2 !== undefined) atts.push(attribute2);
+        if (skill !== undefined) atts.push(skill);
+        // add global parts from actor
+        this.actor._addGlobalParts(parts);
+        this.actor._addMatrixParts(parts, atts)
 
         return parts;
     }

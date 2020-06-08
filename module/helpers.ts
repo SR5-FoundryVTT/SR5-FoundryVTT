@@ -1,4 +1,5 @@
 import AttributeField = Shadowrun.AttributeField;
+import SkillField = Shadowrun.SkillField;
 
 export class Helpers {
     static totalMods(mods) {
@@ -9,10 +10,23 @@ export class Helpers {
         return Object.values(mods).reduce(reducer, 0);
     }
 
-    static isMatrix(atts?: boolean | AttributeField[] | AttributeField) {
+    // TODO this needs to be fixed because it doesn't work
+    static isMatrix(
+        atts?: boolean | (AttributeField | SkillField)[] | AttributeField | SkillField
+    ) {
         if (!atts) return false;
         if (typeof atts === 'boolean' && atts) return true;
-        const matrixAtts = ['firewall', 'data_processing', 'sleaze', 'attack'];
+        const matrixAtts = [
+            'firewall',
+            'data_processing',
+            'sleaze',
+            'attack',
+            'computer',
+            'hacking',
+            'cybercombat',
+            'electronic_warfare',
+            'software',
+        ];
         const matrixLabels = matrixAtts.map((s) => this.label(s));
         if (!Array.isArray(atts)) atts = [atts];
         atts = atts.filter((att) => att);

@@ -752,7 +752,7 @@ class SR5Actor extends Actor {
         const attr = this.data.data.attributes[attId];
         const parts = {};
         parts[attr.label] = attr.value;
-        this._addMatrixParts(parts, [attr]);
+        this._addMatrixParts(parts, attr);
         this._addGlobalParts(parts);
         return dice_1.DiceSR.rollTest({
             event: options === null || options === void 0 ? void 0 : options.event,
@@ -925,14 +925,13 @@ class SR5Actor extends Actor {
         if (options === null || options === void 0 ? void 0 : options.attribute)
             att = this.data.data.attributes[options.attribute];
         let limit = this.data.data.limits[att.limit];
-        console.log(limit);
         const parts = {};
         parts[skill.label] = skill.value;
         if ((options === null || options === void 0 ? void 0 : options.event) && helpers_1.Helpers.hasModifiers(options === null || options === void 0 ? void 0 : options.event)) {
             parts[att.label] = att.value;
             if (options.event[CONFIG.SR5.kbmod.SPEC])
                 parts['SR5.Specialization'] = 2;
-            this._addMatrixParts(parts, att);
+            this._addMatrixParts(parts, [att, skill]);
             this._addGlobalParts(parts);
             return dice_1.DiceSR.rollTest({
                 event: options.event,
@@ -984,7 +983,7 @@ class SR5Actor extends Actor {
                         parts['SR5.Defaulting'] = -1;
                     if (spec)
                         parts['SR5.Specialization'] = 2;
-                    this._addMatrixParts(parts, att);
+                    this._addMatrixParts(parts, [att, skill]);
                     this._addGlobalParts(parts);
                     return dice_1.DiceSR.rollTest({
                         event: options === null || options === void 0 ? void 0 : options.event,
@@ -2704,6 +2703,8 @@ class ShadowrunRollDialog extends Dialog {
             fireModes['10'] = 'FA(c)';
             fireModes['20'] = game.i18n.localize('SR5.Suppressing');
         }
+        const targets = game.user.targets;
+        console.log(targets);
         const fireMode = item.getLastFireMode();
         const rc = item.getRecoilCompensation(true);
         templateData['fireModes'] = fireModes;
@@ -3709,12 +3710,23 @@ class Helpers {
         // assume object of key/values
         return Object.values(mods).reduce(reducer, 0);
     }
+    // TODO this needs to be fixed because it doesn't work
     static isMatrix(atts) {
         if (!atts)
             return false;
         if (typeof atts === 'boolean' && atts)
             return true;
-        const matrixAtts = ['firewall', 'data_processing', 'sleaze', 'attack'];
+        const matrixAtts = [
+            'firewall',
+            'data_processing',
+            'sleaze',
+            'attack',
+            'computer',
+            'hacking',
+            'cybercombat',
+            'electronic_warfare',
+            'software',
+        ];
         const matrixLabels = matrixAtts.map((s) => this.label(s));
         if (!Array.isArray(atts))
             atts = [atts];
@@ -4487,6 +4499,16 @@ class SR5Item extends Item {
         const mod = parseInt(this.data.data.action.mod || 0);
         if (mod)
             parts['SR5.ItemMod'] = mod;
+        const atts = [];
+        if (attribute !== undefined)
+            atts.push(attribute);
+        if (attribute2 !== undefined)
+            atts.push(attribute2);
+        if (skill !== undefined)
+            atts.push(skill);
+        // add global parts from actor
+        this.actor._addGlobalParts(parts);
+        this.actor._addMatrixParts(parts, atts);
         return parts;
     }
     removeLicense(index) {

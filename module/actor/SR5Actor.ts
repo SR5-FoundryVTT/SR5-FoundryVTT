@@ -608,7 +608,7 @@ export class SR5Actor extends Actor {
     }
 
     rollSoak(options?: SoakRollOptions) {
-        const totalDamage = (options?.damage?.value || 0) + (options?.netHits || 0)
+        const totalDamage = (options?.damage?.value || 0) + (options?.netHits || 0);
         let dialogData = {
             damage: totalDamage,
             ap: options?.damage?.ap,
@@ -719,7 +719,7 @@ export class SR5Actor extends Actor {
         const attr = this.data.data.attributes[attId];
         const parts = {};
         parts[attr.label] = attr.value;
-        this._addMatrixParts(parts, [attr]);
+        this._addMatrixParts(parts, attr);
         this._addGlobalParts(parts);
         return DiceSR.rollTest({
             event: options?.event,
@@ -898,7 +898,6 @@ export class SR5Actor extends Actor {
 
         if (options?.attribute) att = this.data.data.attributes[options.attribute];
         let limit = this.data.data.limits[att.limit];
-        console.log(limit);
         const parts = {};
         parts[skill.label] = skill.value;
 
@@ -906,7 +905,7 @@ export class SR5Actor extends Actor {
             parts[att.label] = att.value;
             if (options.event[CONFIG.SR5.kbmod.SPEC]) parts['SR5.Specialization'] = 2;
 
-            this._addMatrixParts(parts, att);
+            this._addMatrixParts(parts, [att, skill]);
             this._addGlobalParts(parts);
             return DiceSR.rollTest({
                 event: options.event,
@@ -964,7 +963,7 @@ export class SR5Actor extends Actor {
                         parts[att.label] = att.value;
                         if (skill.value === 0) parts['SR5.Defaulting'] = -1;
                         if (spec) parts['SR5.Specialization'] = 2;
-                        this._addMatrixParts(parts, att);
+                        this._addMatrixParts(parts, [att, skill]);
                         this._addGlobalParts(parts);
                         return DiceSR.rollTest({
                             event: options?.event,

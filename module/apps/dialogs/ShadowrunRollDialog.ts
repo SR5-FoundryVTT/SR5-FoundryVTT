@@ -163,6 +163,9 @@ export class ShadowrunRollDialog extends Dialog {
             fireModes['20'] = game.i18n.localize('SR5.Suppressing');
         }
 
+        const targets = game.user.targets;
+        console.log(targets);
+
         const fireMode = item.getLastFireMode();
         const rc = item.getRecoilCompensation(true);
         templateData['fireModes'] = fireModes;
