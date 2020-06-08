@@ -43,6 +43,11 @@ class ShadowrunTemplate extends MeasuredTemplate {
             const distance = item.data.data.thrown.blast.radius;
             const dropoff = item.data.data.thrown.blast.dropoff;
             templateData['distance'] = distance;
+        } else if (item.hasExplosiveAmmo()) {
+            const ammo = item.getEquippedAmmo();
+            const distance = ammo.data.data.blast.radius;
+            const dropoff = ammo.data.data.blast.dropoff;
+            templateData['distance'] = distance;
         }
 
         // @ts-ignore

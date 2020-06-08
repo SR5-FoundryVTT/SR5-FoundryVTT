@@ -65,7 +65,11 @@ export class SR5Item extends Item {
         return !!(this.data.data.action && this.data.data.action.type !== '');
     }
     get hasTemplate() {
-        return (this.data.type === 'spell' && this.data.data.range === 'los_a') || this.isGrenade();
+        return (
+            (this.data.type === 'spell' && this.data.data.range === 'los_a') ||
+            this.isGrenade() ||
+            this.hasExplosiveAmmo()
+        );
     }
 
     prepareData() {
@@ -961,5 +965,11 @@ export class SR5Item extends Item {
         let base = parseInt(this.data.data.range.rc.value);
         if (includeActor) base += parseInt(this.actor.data.data.recoil_compensation);
         return base;
+    }
+
+    hasExplosiveAmmo(): boolean {
+        const ammo = this.getEquippedAmmo();
+        console.log(ammo);
+        return ammo.data.data.blast?.radius > 0;
     }
 }

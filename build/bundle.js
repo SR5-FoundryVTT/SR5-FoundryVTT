@@ -3,47 +3,38 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 class ShadowrunTemplate extends MeasuredTemplate {
     static fromItem(item) {
-        if (item.isSpell())
-            return this.fromSpell(item);
-        if (item.isGrenade())
-            return this.fromGrenade(item);
-    }
-    static fromSpell(item) {
-        const force = item.getLastSpellForce();
         const templateShape = 'circle';
-        // distance on spells is equal to force (I'm probably wrong for certain spells)
-        let distance = force;
-        // extended spells multiply by 10
-        if (item.data.data.extended)
-            distance *= 10;
         const templateData = {
             t: templateShape,
             user: game.user._id,
-            distance,
             direction: 0,
             x: 0,
             y: 0,
             // @ts-ignore
             fillColor: game.user.color,
         };
-        // @ts-ignore
-        return new this(templateData);
-    }
-    static fromGrenade(item) {
-        const templateShape = 'circle';
-        // use blast radius
-        const distance = item.data.data.thrown.blast.radius;
-        const dropoff = item.data.data.thrown.blast.dropoff;
-        const templateData = {
-            t: templateShape,
-            user: game.user._id,
-            distance,
-            direction: 0,
-            x: 0,
-            y: 0,
-            // @ts-ignore
-            fillColor: game.user.color,
-        };
+        // can only handle spells and grenade right now
+        if (item.isSpell()) {
+            const force = item.getLastSpellForce();
+            // distance on spells is equal to force (I'm probably wrong for certain spells)
+            let distance = force;
+            // extended spells multiply by 10
+            if (item.data.data.extended)
+                distance *= 10;
+            templateData['distance'] = distance;
+        }
+        else if (item.isGrenade()) {
+            // use blast radius
+            const distance = item.data.data.thrown.blast.radius;
+            const dropoff = item.data.data.thrown.blast.dropoff;
+            templateData['distance'] = distance;
+        }
+        else if (item.hasExplosiveAmmo()) {
+            const ammo = item.getEquippedAmmo();
+            const distance = ammo.data.data.blast.radius;
+            const dropoff = ammo.data.data.blast.dropoff;
+            templateData['distance'] = distance;
+        }
         // @ts-ignore
         return new this(templateData);
     }
@@ -3955,7 +3946,9 @@ class SR5Item extends Item {
         return !!(this.data.data.action && this.data.data.action.type !== '');
     }
     get hasTemplate() {
-        return (this.data.type === 'spell' && this.data.data.range === 'los_a') || this.isGrenade();
+        return ((this.data.type === 'spell' && this.data.data.range === 'los_a') ||
+            this.isGrenade() ||
+            this.hasExplosiveAmmo());
     }
     prepareData() {
         var _a;
@@ -4813,6 +4806,12 @@ class SR5Item extends Item {
         if (includeActor)
             base += parseInt(this.actor.data.data.recoil_compensation);
         return base;
+    }
+    hasExplosiveAmmo() {
+        var _a;
+        const ammo = this.getEquippedAmmo();
+        console.log(ammo);
+        return ((_a = ammo.data.data.blast) === null || _a === void 0 ? void 0 : _a.radius) > 0;
     }
 }
 exports.SR5Item = SR5Item;
