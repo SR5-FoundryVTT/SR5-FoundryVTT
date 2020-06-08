@@ -3650,7 +3650,7 @@ class DiceSR {
                         },
                     },
                     default: 'roll',
-                    close: (html) => {
+                    close: (html) => __awaiter(this, void 0, void 0, function* () {
                         if (cancel)
                             return;
                         // get the actual dice_pool from the difference of initial parts and value in the dialog
@@ -3659,11 +3659,12 @@ class DiceSR {
                             helpers_1.Helpers.parseInputToNumber($(html).find('[name="wounds"]').val()) -
                             helpers_1.Helpers.parseInputToNumber($(html).find('[name="options.environmental"]').val());
                         const limit = helpers_1.Helpers.parseInputToNumber($(html).find('[name="limit"]').val());
-                        const extended = helpers_1.Helpers.parseInputToNumber($(html).find('[name="extended"]').val()) !==
-                            0;
+                        const extendedString = helpers_1.Helpers.parseInputToString($(html).find('[name="extended"]').val());
+                        console.log(extendedString);
+                        const extended = extendedString === 'true';
                         if (edge && actor) {
                             dicePool += actor.data.data.attributes.edge.max;
-                            actor.update({
+                            yield actor.update({
                                 'data.attributes.edge.value': actor.data.data.attributes.edge.value - 1,
                             });
                         }
@@ -3694,7 +3695,7 @@ class DiceSR {
                         resolve(r);
                         if (after && r)
                             r.then((roll) => after(roll));
-                    },
+                    }),
                 }).render(true);
             });
         });
@@ -3716,7 +3717,6 @@ class Helpers {
         // assume object of key/values
         return Object.values(mods).reduce(reducer, 0);
     }
-    // TODO this needs to be fixed because it doesn't work
     static isMatrix(atts) {
         if (!atts)
             return false;
