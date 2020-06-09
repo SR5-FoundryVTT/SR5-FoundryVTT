@@ -244,6 +244,7 @@
 .sr5.actor .attributes .attribute > .attribute-name.roll:hover {
   text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
   cursor: pointer;
+  color: #6495ed;
 }
 .sr5.actor .attributes .attribute .attribute-input-container {
   text-align: center;
@@ -391,7 +392,9 @@
   filter: sepia(0.5) hue-rotate(60deg);
 }
 .sr5.roll-card .opposed-test-content .opposed-test {
-  margin: auto;
+  margin-top: 0.5em;
+  margin-left: auto;
+  margin-right: auto;
   text-align: center;
   font-size: 16px;
   font-style: italic;
@@ -406,6 +409,7 @@
 .roll:hover {
   text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
   cursor: pointer;
+  color: #6495ed;
 }
 
 .flexrow {
@@ -666,6 +670,7 @@ select.display > option {
 .sr5 .tabs > a:hover {
   text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
   cursor: pointer;
+  color: #6495ed;
 }
 .sr5 .tabs > a.active {
   text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
@@ -729,6 +734,7 @@ select.display > option {
 .sr5 .inventory .item .has-desc:hover {
   text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
   cursor: pointer;
+  color: #6495ed;
 }
 .sr5 .inventory .item.no-border {
   border-bottom: none;
@@ -760,6 +766,7 @@ select.display > option {
 .sr5 .inventory .item .item-img.item-roll:hover {
   text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
   cursor: pointer;
+  color: #6495ed;
 }
 .sr5 .inventory .item .item-img.item-roll:hover > img {
   content: url("../ui/dice-solid.svg");
@@ -855,6 +862,7 @@ select.display > option {
 .sr5 .inventory .item.skill-header:hover {
   text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
   cursor: pointer;
+  color: #6495ed;
 }
 .sr5.chat-card {
   font-style: normal;

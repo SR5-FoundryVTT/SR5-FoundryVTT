@@ -2,6 +2,7 @@
     &:hover {
         @include rolloutline;
         cursor: pointer;
+        color: $cornflower;
     }
 }
 
