@@ -303,6 +303,102 @@
   align-content: center;
 }
 
+.sr5.roll-card {
+  margin: 0.15em;
+}
+.sr5.roll-card .card-title {
+  font-size: 14px;
+  border-bottom: 1px solid #4d4d4d;
+  justify-content: left;
+  align-content: center;
+  align-items: flex-end;
+}
+.sr5.roll-card .card-title > * {
+  margin-left: 0.15em;
+  margin-right: 0.15em;
+}
+.sr5.roll-card .card-title .speaker-name {
+  flex: 2;
+}
+.sr5.roll-card .card-content {
+  font-size: 14px;
+  padding: 0 0.25em;
+  font-style: italic;
+}
+.sr5.roll-card .card-content .key {
+  margin-right: 0.35em;
+}
+.sr5.roll-card .card-content .value {
+  font-weight: bold;
+}
+.sr5.roll-card .card-content .test-line {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+}
+.sr5.roll-card .card-content .test-line .test-name {
+  text-decoration: underline;
+}
+.sr5.roll-card .card-content .test-line .place-template {
+  padding: 2px 5px;
+  line-height: 1em;
+  color: black;
+  font-size: 18px;
+  margin-right: 1em;
+  flex: 0;
+}
+.sr5.roll-card .card-content .limit-line {
+  display: flex;
+  flex-flow: nowrap row;
+  justify-content: flex-start;
+}
+.sr5.roll-card .card-content .damage-line {
+  display: flex;
+  flex-flow: nowrap row;
+  justify-content: flex-start;
+}
+.sr5.roll-card .card-content .damage-line > :not(:first-child) {
+  margin-left: 0.5em;
+}
+.sr5.roll-card .card-content .damage-line > :not(:last-child) {
+  margin-right: 0.5em;
+}
+.sr5.roll-card .card-content .damage-line .icon {
+  font-style: italic;
+}
+.sr5.roll-card .dice-roll-content {
+  padding: 0.5em 0.5em;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+  border-bottom: 1px solid #4d4d4d;
+}
+.sr5.roll-card .dice-roll-content .dice-roll {
+  background-image: url(/icons/svg/d6-grey.svg);
+  background-size: 24px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  width: 24px;
+  line-height: 24px;
+}
+.sr5.roll-card .dice-roll-content .dice-roll.red {
+  color: #aa0200;
+  filter: sepia(0.5) hue-rotate(-60deg);
+}
+.sr5.roll-card .dice-roll-content .dice-roll.green {
+  color: #18520b;
+  filter: sepia(0.5) hue-rotate(60deg);
+}
+.sr5.roll-card .opposed-test-content .opposed-test {
+  margin: auto;
+  text-align: center;
+  font-size: 16px;
+  font-style: italic;
+  font-weight: bold;
+  text-decoration: underline;
+}
+
 @font-face {
   font-family: "Nodesto";
   src: url("../fonts/NodestoCapsCondensed.otf");

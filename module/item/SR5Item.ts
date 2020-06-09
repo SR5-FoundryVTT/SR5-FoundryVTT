@@ -773,7 +773,7 @@ export class SR5Item extends Item {
             ev.preventDefault();
             $(ev.currentTarget).siblings('.card-content').toggle();
         });
-        $(html).find('.card-content').hide();
+        // $(html).find('.card-content').hide();
     }
 
     static _getChatCardTargets() {

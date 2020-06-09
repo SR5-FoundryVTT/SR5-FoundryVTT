@@ -78,7 +78,7 @@ export class SR5ActorSheet extends ActorSheet {
 
         const { modifiers: mods } = data.data;
         for (let [key, value] of Object.entries(mods)) {
-            if (value === 0) mods[key] = "";
+            if (value === 0) mods[key] = '';
         }
 
         this._prepareItems(data);
@@ -191,6 +191,7 @@ export class SR5ActorSheet extends ActorSheet {
         ] = data.items.reduce(
             (arr, item) => {
                 item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
+                console.log(item);
                 if (item.type === 'spell') arr[1].push(item);
                 else if (item.type === 'quality') arr[2].push(item);
                 else if (item.type === 'adept_power') arr[3].push(item);
@@ -215,7 +216,6 @@ export class SR5ActorSheet extends ActorSheet {
         complex_forms.sort(sortByName);
         items.sort(sortByName);
         spells.sort(sortByName);
-        complex_forms.sort(sortByName);
         contacts.sort(sortByName);
         lifestyles.sort(sortByName);
         sins.sort(sortByName);

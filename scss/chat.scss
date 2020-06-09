@@ -1,26 +1,100 @@
 @import 'config.scss';
 
-.sr5.item-card {
-    .card-content {
-        font-size: 16px;
-    }
-}
+.sr5.roll-card {
+    margin: 0.15em;
+    .card-title {
+        font-size: 14px;
+        border-bottom: $groove;
+        justify-content: left;
+        align-content: center;
+        align-items: flex-end;
+        > * {
+            margin-left: 0.15em;
+            margin-right: 0.15em;
+        }
 
-.dice-roll .dice-total {
-    &.limit-hit {
-        color: $roll-limit-hit;
+        .speaker-name {
+            flex: 2;
+        }
     }
-    &.glitch {
-        color: $darkred;
+    .card-content {
+        font-size: 14px;
+        padding: 0 0.25em;
+        font-style: italic;
+        .key {
+            margin-right: 0.35em;
+        }
+        .value {
+            font-weight: bold;
+        }
+        .test-line {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-between;
+            .test-name {
+                text-decoration: underline;
+            }
+            .place-template {
+                padding: 2px 5px;
+                line-height: 1em;
+                color: $black;
+                font-size: 18px;
+                margin-right: 1em;
+                flex: 0;
+            }
+        }
+        .limit-line {
+            display: flex;
+            flex-flow: nowrap row;
+            justify-content: flex-start;
+        }
+        .damage-line {
+            display: flex;
+            flex-flow: nowrap row;
+            justify-content: flex-start;
+            > :not(:first-child) {
+                margin-left: .5em;
+            }
+            > :not(:last-child) {
+                margin-right: .5em;
+            }
+            .icon {
+                font-style: italic;
+            }
+        }
     }
-    &.failure {
-        color: inherit;
-        background: $roll-failure-background;
-        border: 1px solid $roll-failure-border;
+    .dice-roll-content {
+        padding: 0.5em 0.5em;
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: center;
+        border-bottom: $groove;
+        .dice-roll {
+            background-image: url(/icons/svg/d6-grey.svg);
+            background-size: 24px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            width: 24px;
+            line-height: 24px;
+            &.red {
+                color: #aa0200;
+                filter: sepia(0.5) hue-rotate(-60deg);
+            }
+            &.green {
+                color: #18520b;
+                filter: sepia(0.5) hue-rotate(60deg);
+            }
+        }
     }
-    &.success {
-        color: inherit;
-        background: #c7d0c0;
-        border: 1px solid #006c00;
+    .opposed-test-content {
+        .opposed-test {
+            margin: auto;
+            text-align: center;
+            font-size: 16px;
+            font-style: italic;
+            font-weight: bold;
+            text-decoration: underline;
+        }
     }
 }

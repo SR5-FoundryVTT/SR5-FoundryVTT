@@ -13,6 +13,7 @@ import { measureDistance } from './canvas';
 import * as chat from './chat';
 import * as migrations from './migration';
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
+import { registerHandlebarHelpers } from './ShadowrunHandlebarHelpers';
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -179,52 +180,4 @@ function rollItemMacro(itemName) {
     return item.roll();
 }
 
-Handlebars.registerHelper('localizeOb', function (strId, obj) {
-    if (obj) strId = obj[strId];
-    return game.i18n.localize(strId);
-});
-
-Handlebars.registerHelper('toHeaderCase', function (str) {
-    if (str) return Helpers.label(str);
-    return '';
-});
-
-Handlebars.registerHelper('concat', function (strs, c = ',') {
-    if (Array.isArray(strs)) {
-        return strs.join(c);
-    }
-    return strs;
-});
-Handlebars.registerHelper('hasprop', function (obj, prop, options) {
-    if (obj.hasOwnProperty(prop)) {
-        return options.fn(this);
-    } else return options.inverse(this);
-});
-Handlebars.registerHelper('ifin', function (val, arr, options) {
-    if (arr.includes(val)) return options.fn(this);
-    else return options.inverse(this);
-});
-// if greater than
-Handlebars.registerHelper('ifgt', function (v1, v2, options) {
-    if (v1 > v2) return options.fn(this);
-    else return options.inverse(this);
-});
-// if not equal
-Handlebars.registerHelper('ifne', function (v1, v2, options) {
-    if (v1 !== v2) return options.fn(this);
-    else return options.inverse(this);
-});
-// if equal
-Handlebars.registerHelper('ife', function (v1, v2, options) {
-    if (v1 === v2) return options.fn(this);
-    else return options.inverse(this);
-});
-Handlebars.registerHelper('sum', function (v1, v2) {
-    return v1 + v2;
-});
-Handlebars.registerHelper('damageAbbreviation', function (damage) {
-    if (damage === 'physical') return 'P';
-    if (damage === 'stun') return 'S';
-    if (damage === 'matrix') return 'M';
-    return '';
-});
+registerHandlebarHelpers();

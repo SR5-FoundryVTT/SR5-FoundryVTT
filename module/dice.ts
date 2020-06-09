@@ -1,5 +1,6 @@
 import { Helpers } from './helpers';
 import RollEvent = Shadowrun.RollEvent;
+import { SR5Actor } from './actor/SR5Actor';
 
 interface basicRollProps {
     count: number;
@@ -7,6 +8,7 @@ interface basicRollProps {
     explode?: boolean;
     title?: string;
     actor?: Actor;
+    item?: Item;
 }
 
 interface RollDialogOptions {
@@ -17,6 +19,7 @@ interface RollDialogOptions {
 interface rollTestProps {
     event?: RollEvent;
     actor?: Actor;
+    item?: Item;
     parts?: Shadowrun.ModList<number>;
     limit?: number;
     extended?: boolean;
@@ -28,7 +31,7 @@ interface rollTestProps {
 }
 
 export class DiceSR {
-    static async basicRoll({ count, limit, explode, title, actor }: basicRollProps) {
+    static async basicRoll({ count, limit, explode, title, actor, item }: basicRollProps) {
         if (count <= 0) {
             // @ts-ignore
             ui.notifications.error(game.i18n.localize('SR5.RollOneDie'));
@@ -43,14 +46,68 @@ export class DiceSR {
         }
 
         formula += 'cs>=5';
-
         let roll = new Roll(formula);
         let rollMode = game.settings.get('core', 'rollMode');
-        roll.toMessage({
-            speaker: ChatMessage.getSpeaker({ actor: actor }),
-            flavor: title,
-            rollMode: rollMode,
-        });
+        roll.roll();
+
+        if (game.settings.get('shadowrun5e', 'displayDefaultRollCard')) {
+            await roll.toMessage({
+                speaker: ChatMessage.getSpeaker({ actor: actor }),
+                flavor: title,
+                rollMode: rollMode,
+            });
+        }
+
+        // start of custom message
+
+        console.log(roll);
+        console.log(title);
+        const dice = roll.parts[0].rolls;
+
+        const damage = {
+            value: '7P',
+            ap: -5,
+            element: 'electricity',
+        };
+        const opposedTest = 'Defense (-5)';
+
+        const token = actor?.token;
+        const templateData = {
+            actor: actor,
+            tokenId: token ? `${token.scene._id}.${token.id}` : null,
+            item: item,
+            dice,
+            limit,
+            testName: title,
+            hits: roll.total,
+            dicePool: count,
+            opposedTest,
+            damage,
+        };
+
+        if (item) {
+            // TODO set accuracy, level, force, damage
+        }
+
+        const template = `systems/shadowrun5e/templates/rolls/roll-card.html`;
+        const html = await renderTemplate(template, templateData);
+
+        const chatData = {
+            user: game.user._id,
+            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+            content: html,
+            speaker: {
+                actor: actor?._id,
+                token: actor?.token,
+                alias: actor?.name,
+            },
+        };
+
+        if (['gmroll', 'blindroll'].includes(rollMode))
+            chatData['whisper'] = ChatMessage.getWhisperIDs('GM');
+        if (rollMode === 'blindroll') chatData['blind'] = true;
+
+        await ChatMessage.create(chatData, { displaySheet: false });
 
         return roll;
     }
@@ -172,9 +229,6 @@ export class DiceSR {
                         const extendedString = Helpers.parseInputToString(
                             $(html).find('[name="extended"]').val()
                         );
-
-                        console.log(extendedString);
-
                         const extended = extendedString === 'true';
 
                         if (edge && actor) {
