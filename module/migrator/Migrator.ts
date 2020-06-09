@@ -6,14 +6,14 @@ export class Migrator {
     // It is capable of supporting *multiple* migrations for a single version,
     //  but this should be done with care, as both will run.
     private static readonly s_Versions = [
-        { versionNumber: 0, migration: Version1 }
+        { versionNumber: VersionMigration.NO_VERSION, migration: Version1 }
     ];
 
     //TODO: Call on Init()
     public static async BeginMigration() {
         let currentVersion = game.settings.get(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION);
         if (currentVersion === undefined || currentVersion === null) {
-            currentVersion = 0;
+            currentVersion = VersionMigration.NO_VERSION;
         }
         // Ensure int for safety.
         currentVersion = parseInt(currentVersion);

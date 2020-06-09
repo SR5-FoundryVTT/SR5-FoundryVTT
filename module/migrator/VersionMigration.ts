@@ -8,7 +8,7 @@ import { SR5Actor } from '../actor/SR5Actor';
 export abstract class VersionMigration {
     static readonly MODULE_NAME = "shadowrun5e";
     static readonly KEY_DATA_VERSION = "systemDataVersion";
-    static readonly NO_VERSION = 'undefined';
+    static readonly NO_VERSION = 0;
 
     private m_Abort: boolean = false;
     private m_AbortReason: string;
