@@ -69,9 +69,6 @@ export class ShadowrunRollDialog extends Dialog {
             if (cancel) return;
             const level = Helpers.parseInputToNumber($(html).find('[name=level]').val());
             await item.setLastComplexFormLevel(level);
-            const limitPart = {
-                'SR5.Level': level
-            };
             ShadowrunRoller.advancedRoll({
                 event: dialogData['event'],
                 dialogOptions: {
@@ -79,7 +76,11 @@ export class ShadowrunRollDialog extends Dialog {
                 },
                 parts,
                 actor: item.actor,
-                limitPart,
+                limit: {
+                    value: level,
+                    base: level,
+                    label: 'SR5.Level',
+                },
                 title,
             }).then(() => {
                 const totalFade = Math.max(item.getFade() + level, 2);
@@ -118,9 +119,6 @@ export class ShadowrunRollDialog extends Dialog {
         dialogData.close = async (html) => {
             const force = Helpers.parseInputToNumber($(html).find('[name=force]').val());
             await item.setLastSpellForce(force);
-            const limitPart = {
-                'SR5.Force': force
-            }
             ShadowrunRoller.advancedRoll({
                 event: dialogData['event'],
                 dialogOptions: {
@@ -129,7 +127,11 @@ export class ShadowrunRollDialog extends Dialog {
                 damage: item.getAttackData(0, force)?.damage,
                 parts,
                 actor: item.actor,
-                limitPart,
+                limit: {
+                    value: force,
+                    base: force,
+                    label: 'SR5.Force',
+                },
                 title: `${title} ${force}`,
             }).then(async (roll: Roll | undefined) => {
                 if (item.data.data.category === 'combat' && roll) {
@@ -222,12 +224,11 @@ export class ShadowrunRollDialog extends Dialog {
                 if (fireMode > rc && fireMode !== 20) {
                     parts['SR5.Recoil'] = rc - fireMode;
                 }
-                const limitPart = item.getLimitPart();
                 ShadowrunRoller.advancedRoll({
                     event: dialogData['event'],
                     parts,
                     actor: item.actor,
-                    limitPart,
+                    limit: item.getLimit(),
                     title,
                     damage: item.getAttackData(0)?.damage,
                     dialogOptions: {

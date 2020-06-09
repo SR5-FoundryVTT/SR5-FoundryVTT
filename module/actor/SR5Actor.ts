@@ -911,8 +911,6 @@ export class SR5Actor extends Actor {
 
         if (options?.attribute) att = this.data.data.attributes[options.attribute];
         let limit = this.data.data.limits[att.limit];
-        const limitPart = {};
-        if (limit?.value) limitPart['SR5.Limit'] = limit.value;
         const parts = {};
         parts[skill.label] = skill.value;
 
@@ -926,7 +924,7 @@ export class SR5Actor extends Actor {
                 event: options.event,
                 actor: this,
                 parts,
-                limitPart,
+                limit,
                 title: `${title} Test`,
             });
         }
@@ -980,12 +978,11 @@ export class SR5Actor extends Actor {
                         if (spec) parts['SR5.Specialization'] = 2;
                         this._addMatrixParts(parts, [att, skill]);
                         this._addGlobalParts(parts);
-                        if (limit?.value) limitPart['SR5.Limit'] = limit.value;
                         return ShadowrunRoller.advancedRoll({
                             event: options?.event,
                             actor: this,
                             parts,
-                            limitPart,
+                            limit,
                             title: `${title} Test`,
                         });
                     },

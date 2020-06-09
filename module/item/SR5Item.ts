@@ -8,6 +8,8 @@ import ShadowrunTemplate from '../ShadowrunTemplate';
 import AttributeField = Shadowrun.AttributeField;
 import SkillField = Shadowrun.SkillField;
 import { ShadowrunRoller } from '../rolls/ShadowrunRoll';
+import LabelField = Shadowrun.LabelField;
+import BaseValuePair = Shadowrun.BaseValuePair;
 
 export class SR5Item extends Item {
     labels: {} = {};
@@ -698,7 +700,7 @@ export class SR5Item extends Item {
 
         let title = this.data.name;
         const parts = this.getRollPartsList();
-        const limitPart = this.getLimitPart();
+        const limit = this.getLimit();
         return ShadowrunRoller.advancedRoll({
             event,
             parts,
@@ -706,7 +708,7 @@ export class SR5Item extends Item {
                 environmental: true,
             },
             actor: this.actor,
-            limitPart,
+            limit,
             title,
         }).then((roll: Roll | undefined) => {
             if (roll && this.data.type === 'weapon') {
@@ -948,26 +950,18 @@ export class SR5Item extends Item {
         return this.data.data.action?.attribute2;
     }
 
-    getLimitPart(): ModList<number> {
-        const parts = {};
-        const limit = this.data.data.action?.limit?.value;
-        console.log('');
-        console.log('');
-        console.log('');
-        console.log(this.data.type);
-        console.log(limit);
-        console.log('');
-        console.log('');
-        console.log('');
-        if (limit) {
-            if (this.data.type === 'weapon') {
-                parts['SR5.Accuracy'] = limit;
-            } else {
-                parts['SR5.Limit'] = limit;
-            }
+    getLimit(): BaseValuePair<number> & LabelField {
+        const limit = this.data.data.action?.limit;
+        if (this.data.type === 'weapon') {
+            limit.label = 'SR5.Accuracy';
+        } else if (limit?.attribute) {
+            limit.label = CONFIG.SR5.attributes[limit.attribute];
+        } else {
+            limit.label = 'SR5.Limit';
         }
-        return parts;
+        return limit;
     }
+
     getActionLimit(): number | undefined {
         return this.data.data.action?.limit?.value;
     }

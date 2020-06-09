@@ -3,10 +3,12 @@ import { Helpers } from '../helpers';
 import DamageData = Shadowrun.DamageData;
 import { SR5Actor } from '../actor/SR5Actor';
 import RollEvent = Shadowrun.RollEvent;
+import BaseValuePair = Shadowrun.BaseValuePair;
+import LabelField = Shadowrun.LabelField;
 
 interface BasicRollProps {
     parts: ModList<number>;
-    limitPart?: ModList<number>;
+    limit?: BaseValuePair<number> & LabelField;
     explodeSixes?: boolean;
     title?: string;
     actor?: SR5Actor;
@@ -28,9 +30,8 @@ interface AdvancedRollProps extends BasicRollProps {
 }
 
 export class ShadowrunRoller {
-    static shadowrunFormula({ parts, limitPart, explode }): string {
+    static shadowrunFormula({ parts, limit, explode }): string {
         const count = Helpers.totalMods(parts);
-        const limit = Helpers.totalMods(limitPart);
         if (count <= 0) {
             // @ts-ignore
             ui.notifications.error(game.i18n.localize('SR5.RollOneDie'));
@@ -40,8 +41,8 @@ export class ShadowrunRoller {
         if (explode) {
             formula += 'x6';
         }
-        if (limit) {
-            formula += `kh${limit}`;
+        if (limit.value) {
+            formula += `kh${limit.value}`;
         }
         formula += 'cs>=5';
         return formula;
@@ -49,14 +50,14 @@ export class ShadowrunRoller {
 
     static async basicRoll({
         parts,
-        limitPart,
+        limit,
         explodeSixes,
         title,
         damage,
         actor,
         opposedTest,
     }: BasicRollProps): Promise<Roll | undefined> {
-        const formula = this.shadowrunFormula({ parts, limitPart, explode: explodeSixes });
+        const formula = this.shadowrunFormula({ parts, limit, explode: explodeSixes });
         if (!formula) return;
         let roll = new Roll(formula);
         let rollMode = game.settings.get('core', 'rollMode');
@@ -77,8 +78,9 @@ export class ShadowrunRoller {
             actor: actor,
             tokenId: token ? `${token.scene._id}.${token.id}` : null,
             dice,
-            limitPart,
+            limit,
             testName: title,
+            dicePool: Helpers.totalMods(parts),
             parts,
             opposedTest,
             damage,
@@ -111,11 +113,11 @@ export class ShadowrunRoller {
     static advancedRoll(props: AdvancedRollProps) {
         // destructure what we need to use from props
         // any value pulled out needs to be updated back in props if changed
-        const { title, actor, parts, limitPart, extended, wounds, after, dialogOptions } = props;
+        const { title, actor, parts, limit, extended, wounds = true, after, dialogOptions } = props;
 
         // remove limits if game settings is set
         if (!game.settings.get('shadowrun5e', 'applyLimits')) {
-            delete props.limitPart;
+            delete props.limit;
         }
 
         // TODO create "fast roll" option
@@ -125,8 +127,9 @@ export class ShadowrunRoller {
             extended,
             dice_poll: Helpers.totalMods(parts),
             parts,
-            limit: Helpers.totalMods(limitPart),
+            limit: limit?.value,
             wounds,
+            woundValue: actor?.getWounds(),
         };
         let template = 'systems/shadowrun5e/templates/rolls/roll-dialog.html';
         let edge = false;
@@ -168,11 +171,11 @@ export class ShadowrunRoller {
                         const situationMod = Helpers.parseInputToNumber(
                             $(html).find('[name="dp_mod"]').val()
                         );
-                        const environmentMod = Helpers.parseInputToNumber(
+                        const environmentMod = -Helpers.parseInputToNumber(
                             $(html).find('[name="options.environmental"]').val()
                         );
 
-                        if (woundValue) {
+                        if (wounds && woundValue !== 0) {
                             parts['SR5.Wounds'] = woundValue;
                             props.wounds = true;
                         }

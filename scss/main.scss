@@ -204,15 +204,28 @@ select.display {
 }
 
 .sr5 {
-    &.roll-dialog {
-        .parts-list {
-            display: flex;
-            flex-flow: row wrap;
-            justify-content: center;
-            align-items: center;
-            > * {
-                margin: 0 0.5em;
+    .parts-list {
+        font-size: 12px;
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: center;
+        align-items: center;
+        &.vertical {
+            flex-flow: column nowrap;
+            justify-content: flex-end;
+            align-items: flex-end;
+        }
+        .part {
+            white-space: nowrap;
+            .value {
+                font-weight: bold;
             }
+            &.underline {
+                text-decoration: underline;
+            }
+        }
+        > * {
+            margin: 0 0.5em;
         }
     }
     .window-content {

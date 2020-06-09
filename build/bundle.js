@@ -1046,9 +1046,6 @@ class SR5Actor extends Actor {
         if (options === null || options === void 0 ? void 0 : options.attribute)
             att = this.data.data.attributes[options.attribute];
         let limit = this.data.data.limits[att.limit];
-        const limitPart = {};
-        if (limit === null || limit === void 0 ? void 0 : limit.value)
-            limitPart['SR5.Limit'] = limit.value;
         const parts = {};
         parts[skill.label] = skill.value;
         if ((options === null || options === void 0 ? void 0 : options.event) && helpers_1.Helpers.hasModifiers(options === null || options === void 0 ? void 0 : options.event)) {
@@ -1061,7 +1058,7 @@ class SR5Actor extends Actor {
                 event: options.event,
                 actor: this,
                 parts,
-                limitPart,
+                limit,
                 title: `${title} Test`,
             });
         }
@@ -1109,13 +1106,11 @@ class SR5Actor extends Actor {
                         parts['SR5.Specialization'] = 2;
                     this._addMatrixParts(parts, [att, skill]);
                     this._addGlobalParts(parts);
-                    if (limit === null || limit === void 0 ? void 0 : limit.value)
-                        limitPart['SR5.Limit'] = limit.value;
                     return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
                         event: options === null || options === void 0 ? void 0 : options.event,
                         actor: this,
                         parts,
-                        limitPart,
+                        limit,
                         title: `${title} Test`,
                     });
                 }),
@@ -2741,9 +2736,6 @@ class ShadowrunRollDialog extends Dialog {
                 return;
             const level = helpers_1.Helpers.parseInputToNumber($(html).find('[name=level]').val());
             yield item.setLastComplexFormLevel(level);
-            const limitPart = {
-                'SR5.Level': level
-            };
             ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
                 event: dialogData['event'],
                 dialogOptions: {
@@ -2751,7 +2743,11 @@ class ShadowrunRollDialog extends Dialog {
                 },
                 parts,
                 actor: item.actor,
-                limitPart,
+                limit: {
+                    value: level,
+                    base: level,
+                    label: 'SR5.Level'
+                },
                 title,
             }).then(() => {
                 const totalFade = Math.max(item.getFade() + level, 2);
@@ -2787,9 +2783,6 @@ class ShadowrunRollDialog extends Dialog {
             var _a;
             const force = helpers_1.Helpers.parseInputToNumber($(html).find('[name=force]').val());
             yield item.setLastSpellForce(force);
-            const limitPart = {
-                'SR5.Force': force
-            };
             ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
                 event: dialogData['event'],
                 dialogOptions: {
@@ -2798,7 +2791,11 @@ class ShadowrunRollDialog extends Dialog {
                 damage: (_a = item.getAttackData(0, force)) === null || _a === void 0 ? void 0 : _a.damage,
                 parts,
                 actor: item.actor,
-                limitPart,
+                limit: {
+                    value: force,
+                    base: force,
+                    label: 'SR5.Force'
+                },
                 title: `${title} ${force}`,
             }).then((roll) => __awaiter(this, void 0, void 0, function* () {
                 var _b;
@@ -2887,12 +2884,11 @@ class ShadowrunRollDialog extends Dialog {
                 if (fireMode > rc && fireMode !== 20) {
                     parts['SR5.Recoil'] = rc - fireMode;
                 }
-                const limitPart = item.getLimitPart();
                 ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
                     event: dialogData['event'],
                     parts,
                     actor: item.actor,
-                    limitPart,
+                    limit: item.getLimit(),
                     title,
                     damage: (_a = item.getAttackData(0)) === null || _a === void 0 ? void 0 : _a.damage,
                     dialogOptions: {
@@ -4517,7 +4513,7 @@ class SR5Item extends Item {
                 return dialog.render(true);
             let title = this.data.name;
             const parts = this.getRollPartsList();
-            const limitPart = this.getLimitPart();
+            const limit = this.getLimit();
             return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
                 event,
                 parts,
@@ -4525,7 +4521,7 @@ class SR5Item extends Item {
                     environmental: true,
                 },
                 actor: this.actor,
-                limitPart,
+                limit,
                 title,
             }).then((roll) => {
                 if (roll && this.data.type === 'weapon') {
@@ -4764,27 +4760,19 @@ class SR5Item extends Item {
         var _a;
         return (_a = this.data.data.action) === null || _a === void 0 ? void 0 : _a.attribute2;
     }
-    getLimitPart() {
-        var _a, _b;
-        const parts = {};
-        const limit = (_b = (_a = this.data.data.action) === null || _a === void 0 ? void 0 : _a.limit) === null || _b === void 0 ? void 0 : _b.value;
-        console.log('');
-        console.log('');
-        console.log('');
-        console.log(this.data.type);
-        console.log(limit);
-        console.log('');
-        console.log('');
-        console.log('');
-        if (limit) {
-            if (this.data.type === 'weapon') {
-                parts['SR5.Accuracy'] = limit;
-            }
-            else {
-                parts['SR5.Limit'] = limit;
-            }
+    getLimit() {
+        var _a;
+        const limit = (_a = this.data.data.action) === null || _a === void 0 ? void 0 : _a.limit;
+        if (this.data.type === 'weapon') {
+            limit.label = 'SR5.Accuracy';
         }
-        return parts;
+        else if (limit === null || limit === void 0 ? void 0 : limit.attribute) {
+            limit.label = CONFIG.SR5.attributes[limit.attribute];
+        }
+        else {
+            limit.label = 'SR5.Limit';
+        }
+        return limit;
     }
     getActionLimit() {
         var _a, _b;
@@ -5641,9 +5629,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ShadowrunRoller = void 0;
 const helpers_1 = require("../helpers");
 class ShadowrunRoller {
-    static shadowrunFormula({ parts, limitPart, explode }) {
+    static shadowrunFormula({ parts, limit, explode }) {
         const count = helpers_1.Helpers.totalMods(parts);
-        const limit = helpers_1.Helpers.totalMods(limitPart);
         if (count <= 0) {
             // @ts-ignore
             ui.notifications.error(game.i18n.localize('SR5.RollOneDie'));
@@ -5653,15 +5640,15 @@ class ShadowrunRoller {
         if (explode) {
             formula += 'x6';
         }
-        if (limit) {
-            formula += `kh${limit}`;
+        if (limit.value) {
+            formula += `kh${limit.value}`;
         }
         formula += 'cs>=5';
         return formula;
     }
-    static basicRoll({ parts, limitPart, explodeSixes, title, damage, actor, opposedTest, }) {
+    static basicRoll({ parts, limit, explodeSixes, title, damage, actor, opposedTest, }) {
         return __awaiter(this, void 0, void 0, function* () {
-            const formula = this.shadowrunFormula({ parts, limitPart, explode: explodeSixes });
+            const formula = this.shadowrunFormula({ parts, limit, explode: explodeSixes });
             if (!formula)
                 return;
             let roll = new Roll(formula);
@@ -5681,8 +5668,9 @@ class ShadowrunRoller {
                 actor: actor,
                 tokenId: token ? `${token.scene._id}.${token.id}` : null,
                 dice,
-                limitPart,
+                limit,
                 testName: title,
+                dicePool: helpers_1.Helpers.totalMods(parts),
                 parts,
                 opposedTest,
                 damage,
@@ -5711,10 +5699,10 @@ class ShadowrunRoller {
     static advancedRoll(props) {
         // destructure what we need to use from props
         // any value pulled out needs to be updated back in props if changed
-        const { title, actor, parts, limitPart, extended, wounds, after, dialogOptions } = props;
+        const { title, actor, parts, limit, extended, wounds = true, after, dialogOptions } = props;
         // remove limits if game settings is set
         if (!game.settings.get('shadowrun5e', 'applyLimits')) {
-            delete props.limitPart;
+            delete props.limit;
         }
         // TODO create "fast roll" option
         let dialogData = {
@@ -5722,8 +5710,9 @@ class ShadowrunRoller {
             extended,
             dice_poll: helpers_1.Helpers.totalMods(parts),
             parts,
-            limit: helpers_1.Helpers.totalMods(limitPart),
+            limit: limit === null || limit === void 0 ? void 0 : limit.value,
             wounds,
+            woundValue: actor === null || actor === void 0 ? void 0 : actor.getWounds(),
         };
         let template = 'systems/shadowrun5e/templates/rolls/roll-dialog.html';
         let edge = false;
@@ -5758,8 +5747,8 @@ class ShadowrunRoller {
                         // get the actual dice_pool from the difference of initial parts and value in the dialog
                         const woundValue = -helpers_1.Helpers.parseInputToNumber($(html).find('[name="wounds"]').val());
                         const situationMod = helpers_1.Helpers.parseInputToNumber($(html).find('[name="dp_mod"]').val());
-                        const environmentMod = helpers_1.Helpers.parseInputToNumber($(html).find('[name="options.environmental"]').val());
-                        if (woundValue) {
+                        const environmentMod = -helpers_1.Helpers.parseInputToNumber($(html).find('[name="options.environmental"]').val());
+                        if (wounds && woundValue !== 0) {
                             parts['SR5.Wounds'] = woundValue;
                             props.wounds = true;
                         }

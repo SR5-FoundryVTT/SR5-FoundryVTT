@@ -18,47 +18,62 @@
             {{actor.name}}
         </div>
     </div>
-    <div class="card-content">
-        <div class="test-line">
-            <span class="test-name">
-                {{testName}}
-            </span>
-            {{#if template}}
-            <div class="roll" title="{{localize 'SR5.PlaceTemplate'}}">
-                <i class="fas fa-bullseye place-template" data-template="{{template}}"></i>
-            </div>
-            {{/if}}
-        </div>
-        <div class="limit-line">
-            <span class="key">{{localize "SR5.Hits"}}: </span
-            ><span class="value">{{hits}}</span> {{#if dicePool}} <span>/{{dicePool}}</span> {{/if}}
-        </div>
-        {{#if limitPart}}
-        <div class="limit-line">
-            {{#each limitPart as |value key|}}
-            <span class="key">{{localize key}}: </span>
-            <span class="value">{{value}}</span>
-            {{/each}}
-        </div>
-        {{/if}} {{#if damage}}
-        <div class="damage-line">
-            {{#if damage.value}}
-            <div>
-                <span class="key">{{localize "SR5.DV"}}: </span>
-                <span class="value">{{damage.value}}</span>
-            </div>
-            {{/if}} {{#if damage.ap}}
-            <div>
-                <span class="key">{{localize "SR5.AP"}}: </span>
-                <span class="value">{{damage.ap}}</span>
-            </div>
-            {{/if}} {{#if damage.element.value}}
-            <div>
-                <i class="{{elementIcon damage.element.value}} icon" title="{{localize damage.element.value}}"></i>
-            </div>
-            {{/if}}
+    <div class="test-line">
+        <span class="test-name">
+            {{testName}}
+        </span>
+        {{#if template}}
+        <div class="roll" title="{{localize 'SR5.PlaceTemplate'}}">
+            <i class="fas fa-bullseye place-template" data-template="{{template}}"></i>
         </div>
         {{/if}}
+    </div>
+    <div class="card-content">
+        <div class="left-side">
+            <div class="limit-line">
+                <span class="key">{{localize "SR5.Hits"}}: </span
+                ><span class="value">{{hits}}</span>
+            </div>
+            {{#if limit}}
+            <div class="limit-line" title="{{localize 'SR5.Limit'}}">
+                <span class="key">{{localize limit.label}}: </span>
+                <span class="value">{{limit.value}}</span>
+            </div>
+            {{/if}} {{#if damage}}
+            <div class="damage-line">
+                {{#if damage.value}}
+                <div>
+                    <span class="key">{{localize "SR5.DV"}}: </span>
+                    <span class="value">{{damage.value}}</span>
+                </div>
+                {{/if}} {{#if damage.ap}}
+                <div>
+                    <span class="key">{{localize "SR5.AP"}}: </span>
+                    <span class="value">{{damage.ap}}</span>
+                </div>
+                {{/if}} {{#if damage.element.value}}
+                <div>
+                    <i
+                        class="{{elementIcon damage.element.value}} icon"
+                        title="{{localize damage.element.value}}"
+                    ></i>
+                </div>
+                {{/if}}
+            </div>
+            {{/if}}
+        </div>
+        <div class="right-side">
+            <div class="parts-list vertical">
+                {{#each parts as |part id|}}
+                <div class="part">
+                    <span>{{localize id}}</span> (<span class="value">{{part}}</span>)
+                </div>
+                {{/each}}
+                <div class="part underline">
+                    <span>{{localize 'SR5.DicePool'}}</span> (<span class="value">{{dicePool}}</span>)
+                </div>
+            </div>
+        </div>
     </div>
     <div class="dice-roll-content">
         {{#each dice}}
