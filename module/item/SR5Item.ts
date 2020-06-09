@@ -1,4 +1,3 @@
-import { DiceSR } from '../dice';
 import { Helpers } from '../helpers';
 import DeviceData = Shadowrun.DeviceData;
 import { SR5Actor } from '../actor/SR5Actor';
@@ -8,6 +7,7 @@ import AttackData = Shadowrun.AttackData;
 import ShadowrunTemplate from '../ShadowrunTemplate';
 import AttributeField = Shadowrun.AttributeField;
 import SkillField = Shadowrun.SkillField;
+import { ShadowrunRoller } from '../rolls/ShadowrunRoll';
 
 export class SR5Item extends Item {
     labels: {} = {};
@@ -647,7 +647,7 @@ export class SR5Item extends Item {
         if (skill !== undefined) atts.push(skill);
         // add global parts from actor
         this.actor._addGlobalParts(parts);
-        this.actor._addMatrixParts(parts, atts)
+        this.actor._addMatrixParts(parts, atts);
 
         return parts;
     }
@@ -659,24 +659,22 @@ export class SR5Item extends Item {
         this.update(data);
     }
 
-    rollOpposedTest(target, ev) {
+    rollOpposedTest(target: SR5Actor, ev) {
         const itemData = this.data.data;
         const options = {
             event: ev,
-            incomingAttack: {},
             fireModeDefense: 0,
             cover: false,
-            incomingAction: {},
         };
 
         const lastAttack = this.getLastAttack();
         if (lastAttack) {
-            options.incomingAttack = lastAttack;
+            options['incomingAttack'] = lastAttack;
             options.cover = true;
             options.fireModeDefense = Helpers.mapRoundsToDefenseMod(this.getLastFireMode());
         }
 
-        options.incomingAction = this.getFlag('shadowrun5e', 'action');
+        options['incomingAction'] = this.getFlag('shadowrun5e', 'action');
 
         const { opposed } = itemData.action;
         if (opposed.type === 'defense') target.rollDefense(options);
@@ -700,15 +698,15 @@ export class SR5Item extends Item {
 
         let title = this.data.name;
         const parts = this.getRollPartsList();
-        const limit = this.getActionLimit();
-        return DiceSR.rollTest({
+        const limitPart = this.getLimitPart();
+        return ShadowrunRoller.advancedRoll({
             event,
             parts,
             dialogOptions: {
                 environmental: true,
             },
             actor: this.actor,
-            limit,
+            limitPart,
             title,
         }).then((roll: Roll | undefined) => {
             if (roll && this.data.type === 'weapon') {
@@ -950,6 +948,26 @@ export class SR5Item extends Item {
         return this.data.data.action?.attribute2;
     }
 
+    getLimitPart(): ModList<number> {
+        const parts = {};
+        const limit = this.data.data.action?.limit?.value;
+        console.log('');
+        console.log('');
+        console.log('');
+        console.log(this.data.type);
+        console.log(limit);
+        console.log('');
+        console.log('');
+        console.log('');
+        if (limit) {
+            if (this.data.type === 'weapon') {
+                parts['SR5.Accuracy'] = limit;
+            } else {
+                parts['SR5.Limit'] = limit;
+            }
+        }
+        return parts;
+    }
     getActionLimit(): number | undefined {
         return this.data.data.action?.limit?.value;
     }

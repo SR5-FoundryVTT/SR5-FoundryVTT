@@ -7,7 +7,7 @@ declare namespace Shadowrun {
     };
     type DefenseRollOptions = ActorRollOptions & {
         fireModeDefense?: number;
-        cover?: number;
+        cover?: number | boolean;
         incomingAttack?: AttackData;
     };
 

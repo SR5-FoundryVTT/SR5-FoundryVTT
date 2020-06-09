@@ -105,7 +105,7 @@ exports.registerHandlebarHelpers = () => {
     });
 };
 
-},{"./helpers":16}],2:[function(require,module,exports){
+},{"./helpers":15}],2:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class ShadowrunTemplate extends MeasuredTemplate {
@@ -224,7 +224,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5Actor = void 0;
-const dice_1 = require("../dice");
+const ShadowrunRoll_1 = require("../rolls/ShadowrunRoll");
 const helpers_1 = require("../helpers");
 class SR5Actor extends Actor {
     update(data, options) {
@@ -580,6 +580,13 @@ class SR5Actor extends Actor {
             return undefined;
         return this.data.data.attributes[attributeName];
     }
+    getWounds() {
+        var _a;
+        return ((_a = this.data.data.wounds) === null || _a === void 0 ? void 0 : _a.value) || 0;
+    }
+    getEdge() {
+        return this.data.data.attributes.edge;
+    }
     getOwnedItem(itemId) {
         return super.getOwnedItem(itemId);
     }
@@ -642,7 +649,7 @@ class SR5Actor extends Actor {
         let title = 'Fade';
         if (incoming >= 0)
             title += ` (${incoming} incoming)`;
-        dice_1.DiceSR.rollTest({
+        return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
             event: options.event,
             parts,
             actor: this,
@@ -661,7 +668,7 @@ class SR5Actor extends Actor {
         let title = 'Drain';
         if (incoming >= 0)
             title += ` (${incoming} incoming)`;
-        dice_1.DiceSR.rollTest({
+        return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
             event: options.event,
             parts,
             actor: this,
@@ -673,7 +680,7 @@ class SR5Actor extends Actor {
         const armor = this.data.data.armor.value;
         const parts = {};
         parts['SR5.Armor'] = armor;
-        return dice_1.DiceSR.rollTest({
+        return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
             event: options.event,
             actor: this,
             parts,
@@ -697,7 +704,7 @@ class SR5Actor extends Actor {
                     content: dlg,
                     buttons: {
                         normal: {
-                            label: game.i18n.localize('Normal'),
+                            label: game.i18n.localize('SR5.Normal'),
                             callback: () => (cancel = false),
                         },
                         full_defense: {
@@ -731,7 +738,7 @@ class SR5Actor extends Actor {
                             parts['SR5.FireMode'] = fireMode;
                         if (cover)
                             parts['SR5.Cover'] = cover;
-                        resolve(dice_1.DiceSR.rollTest({
+                        resolve(ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
                             event: options.event,
                             actor: this,
                             parts,
@@ -849,7 +856,7 @@ class SR5Actor extends Actor {
                         let title = `Soak - ${label}`;
                         if (totalDamage)
                             title += ` - Incoming Damage: ${totalDamage}`;
-                        resolve(dice_1.DiceSR.rollTest({
+                        resolve(ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
                             event: options === null || options === void 0 ? void 0 : options.event,
                             actor: this,
                             parts,
@@ -867,7 +874,7 @@ class SR5Actor extends Actor {
         parts[attr.label] = attr.value;
         this._addMatrixParts(parts, attr);
         this._addGlobalParts(parts);
-        return dice_1.DiceSR.rollTest({
+        return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
             event: options === null || options === void 0 ? void 0 : options.event,
             actor: this,
             parts,
@@ -884,7 +891,7 @@ class SR5Actor extends Actor {
         parts[attr2.label] = attr2.value;
         this._addMatrixParts(parts, [attr1, attr2]);
         this._addGlobalParts(parts);
-        return dice_1.DiceSR.rollTest({
+        return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
             event: options === null || options === void 0 ? void 0 : options.event,
             actor: this,
             parts,
@@ -907,7 +914,7 @@ class SR5Actor extends Actor {
         const parts = {};
         parts[att1.label] = att1.value;
         parts[att2.label] = att2.value;
-        return dice_1.DiceSR.rollTest({
+        return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
             event: options === null || options === void 0 ? void 0 : options.event,
             actor: this,
             parts,
@@ -935,7 +942,7 @@ class SR5Actor extends Actor {
             if (options && options.event && options.event[CONFIG.SR5.kbmod.SPEC])
                 parts['SR5.Specialization'] = 2;
             if (helpers_1.Helpers.hasModifiers(options === null || options === void 0 ? void 0 : options.event)) {
-                return dice_1.DiceSR.rollTest({
+                return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
                     event: options === null || options === void 0 ? void 0 : options.event,
                     actor: this,
                     parts,
@@ -974,7 +981,7 @@ class SR5Actor extends Actor {
                                 parts[att.label] = att.value;
                             this._addMatrixParts(parts, true);
                             this._addGlobalParts(parts);
-                            return dice_1.DiceSR.rollTest({
+                            return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
                                 event: options === null || options === void 0 ? void 0 : options.event,
                                 actor: this,
                                 parts,
@@ -987,8 +994,9 @@ class SR5Actor extends Actor {
         });
     }
     promptRoll(options) {
-        return dice_1.DiceSR.rollTest({
+        return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
             event: options === null || options === void 0 ? void 0 : options.event,
+            parts: {},
             actor: this,
             dialogOptions: {
                 prompt: true,
@@ -1024,7 +1032,7 @@ class SR5Actor extends Actor {
             if (modifiers.memory)
                 parts['SR5.Bonus'] = modifiers.memory;
         }
-        return dice_1.DiceSR.rollTest({
+        return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
             event: options === null || options === void 0 ? void 0 : options.event,
             actor: this,
             parts,
@@ -1038,6 +1046,9 @@ class SR5Actor extends Actor {
         if (options === null || options === void 0 ? void 0 : options.attribute)
             att = this.data.data.attributes[options.attribute];
         let limit = this.data.data.limits[att.limit];
+        const limitPart = {};
+        if (limit === null || limit === void 0 ? void 0 : limit.value)
+            limitPart['SR5.Limit'] = limit.value;
         const parts = {};
         parts[skill.label] = skill.value;
         if ((options === null || options === void 0 ? void 0 : options.event) && helpers_1.Helpers.hasModifiers(options === null || options === void 0 ? void 0 : options.event)) {
@@ -1046,11 +1057,11 @@ class SR5Actor extends Actor {
                 parts['SR5.Specialization'] = 2;
             this._addMatrixParts(parts, [att, skill]);
             this._addGlobalParts(parts);
-            return dice_1.DiceSR.rollTest({
+            return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
                 event: options.event,
                 actor: this,
                 parts,
-                limit: limit ? limit.value : undefined,
+                limitPart,
                 title: `${title} Test`,
             });
         }
@@ -1098,11 +1109,13 @@ class SR5Actor extends Actor {
                         parts['SR5.Specialization'] = 2;
                     this._addMatrixParts(parts, [att, skill]);
                     this._addGlobalParts(parts);
-                    return dice_1.DiceSR.rollTest({
+                    if (limit === null || limit === void 0 ? void 0 : limit.value)
+                        limitPart['SR5.Limit'] = limit.value;
+                    return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
                         event: options === null || options === void 0 ? void 0 : options.event,
                         actor: this,
                         parts,
-                        limit: limit ? limit.value : undefined,
+                        limitPart,
                         title: `${title} Test`,
                     });
                 }),
@@ -1152,7 +1165,6 @@ class SR5Actor extends Actor {
                 close: (html) => __awaiter(this, void 0, void 0, function* () {
                     if (cancel)
                         return;
-                    let limit = undefined;
                     const att2Id = helpers_1.Helpers.parseInputToString($(html).find('[name=attribute2]').val());
                     let att2 = undefined;
                     if (att2Id !== 'none') {
@@ -1168,12 +1180,11 @@ class SR5Actor extends Actor {
                     }
                     this._addMatrixParts(parts, [att, att2]);
                     this._addGlobalParts(parts);
-                    return dice_1.DiceSR.rollTest({
+                    return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
                         event: options === null || options === void 0 ? void 0 : options.event,
                         title: `${title} Test`,
                         actor: this,
                         parts,
-                        limit: limit,
                     });
                 }),
             }).render(true);
@@ -1199,9 +1210,10 @@ class SR5Actor extends Actor {
             let msg = game.messages.get(roll.data().messageId);
             const actor = msg.user.character;
             if (actor) {
-                return dice_1.DiceSR.rollTest({
+                return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
                     event: { shiftKey: true, altKey: true },
                     title: `${title} - Push the Limit`,
+                    parts: {},
                     actor: actor,
                     wounds: false,
                 });
@@ -1225,7 +1237,7 @@ class SR5Actor extends Actor {
                         const parts = {};
                         parts['SR5.OriginalDicePool'] = pool;
                         parts['SR5.Successes'] = -hits;
-                        return dice_1.DiceSR.rollTest({
+                        return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
                             event: { shiftKey: true },
                             title: `${title} - Second Chance`,
                             parts,
@@ -1244,7 +1256,7 @@ class SR5Actor extends Actor {
 }
 exports.SR5Actor = SR5Actor;
 
-},{"../dice":15,"../helpers":16}],4:[function(require,module,exports){
+},{"../helpers":15,"../rolls/ShadowrunRoll":20}],4:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -1856,7 +1868,7 @@ class SR5ActorSheet extends ActorSheet {
 }
 exports.SR5ActorSheet = SR5ActorSheet;
 
-},{"../apps/chummer-import-form":5,"../apps/knowledge-skill-edit":8,"../apps/language-skill-edit":9,"../apps/skill-edit":10,"../helpers":16}],5:[function(require,module,exports){
+},{"../apps/chummer-import-form":5,"../apps/knowledge-skill-edit":8,"../apps/language-skill-edit":9,"../apps/skill-edit":10,"../helpers":15}],5:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -2668,7 +2680,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ShadowrunRollDialog = void 0;
 const helpers_1 = require("../../helpers");
-const dice_1 = require("../../dice");
+const ShadowrunRoll_1 = require("../../rolls/ShadowrunRoll");
 class ShadowrunRollDialog extends Dialog {
     static fromItemRoll(item, event) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -2729,14 +2741,17 @@ class ShadowrunRollDialog extends Dialog {
                 return;
             const level = helpers_1.Helpers.parseInputToNumber($(html).find('[name=level]').val());
             yield item.setLastComplexFormLevel(level);
-            dice_1.DiceSR.rollTest({
+            const limitPart = {
+                'SR5.Level': level
+            };
+            ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
                 event: dialogData['event'],
                 dialogOptions: {
                     environmental: false,
                 },
                 parts,
                 actor: item.actor,
-                limit: level,
+                limitPart,
                 title,
             }).then(() => {
                 const totalFade = Math.max(item.getFade() + level, 2);
@@ -2769,19 +2784,24 @@ class ShadowrunRollDialog extends Dialog {
         };
         dialogData.default = 'normal';
         dialogData.close = (html) => __awaiter(this, void 0, void 0, function* () {
+            var _a;
             const force = helpers_1.Helpers.parseInputToNumber($(html).find('[name=force]').val());
             yield item.setLastSpellForce(force);
-            dice_1.DiceSR.rollTest({
+            const limitPart = {
+                'SR5.Force': force
+            };
+            ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
                 event: dialogData['event'],
                 dialogOptions: {
                     environmental: true,
                 },
+                damage: (_a = item.getAttackData(0, force)) === null || _a === void 0 ? void 0 : _a.damage,
                 parts,
                 actor: item.actor,
-                limit: force,
+                limitPart,
                 title: `${title} ${force}`,
             }).then((roll) => __awaiter(this, void 0, void 0, function* () {
-                var _a;
+                var _b;
                 if (item.data.data.category === 'combat' && roll) {
                     const attackData = item.getAttackData(roll.total, force);
                     if (attackData) {
@@ -2789,12 +2809,11 @@ class ShadowrunRollDialog extends Dialog {
                     }
                 }
                 const drain = Math.max(item.getDrain() + force + (reckless ? 3 : 0), 2);
-                (_a = item.actor) === null || _a === void 0 ? void 0 : _a.rollDrain({ event: dialogData['event'] }, drain);
+                (_b = item.actor) === null || _b === void 0 ? void 0 : _b.rollDrain({ event: dialogData['event'] }, drain);
             }));
         });
     }
     static addRangedWeaponData(templateData, dialogData, item) {
-        let limit = item.getActionLimit();
         const parts = item.getRollPartsList();
         let title = dialogData.title || item.name;
         const itemData = item.data.data;
@@ -2855,6 +2874,7 @@ class ShadowrunRollDialog extends Dialog {
         };
         dialogData.buttons = buttons;
         dialogData.close = (html) => __awaiter(this, void 0, void 0, function* () {
+            var _a;
             if (cancel)
                 return;
             const fireMode = helpers_1.Helpers.parseInputToNumber($(html).find('[name="fireMode"]').val());
@@ -2867,12 +2887,14 @@ class ShadowrunRollDialog extends Dialog {
                 if (fireMode > rc && fireMode !== 20) {
                     parts['SR5.Recoil'] = rc - fireMode;
                 }
-                dice_1.DiceSR.rollTest({
+                const limitPart = item.getLimitPart();
+                ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
                     event: dialogData['event'],
                     parts,
                     actor: item.actor,
-                    limit,
+                    limitPart,
                     title,
+                    damage: (_a = item.getAttackData(0)) === null || _a === void 0 ? void 0 : _a.damage,
                     dialogOptions: {
                         environmental,
                     },
@@ -2893,7 +2915,7 @@ class ShadowrunRollDialog extends Dialog {
 }
 exports.ShadowrunRollDialog = ShadowrunRollDialog;
 
-},{"../../dice":15,"../../helpers":16}],7:[function(require,module,exports){
+},{"../../helpers":15,"../../rolls/ShadowrunRoll":20}],7:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -3640,223 +3662,6 @@ exports.SR5['kbmod'] = {
 
 },{}],15:[function(require,module,exports){
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.DiceSR = void 0;
-const helpers_1 = require("./helpers");
-class DiceSR {
-    static basicRoll({ count, limit, explode, title, actor, item }) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (count <= 0) {
-                // @ts-ignore
-                ui.notifications.error(game.i18n.localize('SR5.RollOneDie'));
-                return;
-            }
-            let formula = `${count}d6`;
-            if (explode) {
-                formula += 'x6';
-            }
-            if (limit) {
-                formula += `kh${limit}`;
-            }
-            formula += 'cs>=5';
-            let roll = new Roll(formula);
-            let rollMode = game.settings.get('core', 'rollMode');
-            roll.roll();
-            if (game.settings.get('shadowrun5e', 'displayDefaultRollCard')) {
-                yield roll.toMessage({
-                    speaker: ChatMessage.getSpeaker({ actor: actor }),
-                    flavor: title,
-                    rollMode: rollMode,
-                });
-            }
-            // start of custom message
-            console.log(roll);
-            console.log(title);
-            const dice = roll.parts[0].rolls;
-            const damage = {
-                value: '7P',
-                ap: -5,
-                element: 'electricity'
-            };
-            const opposedTest = "Defense (-5)";
-            const token = actor === null || actor === void 0 ? void 0 : actor.token;
-            const templateData = {
-                actor: actor,
-                tokenId: token ? `${token.scene._id}.${token.id}` : null,
-                item: item,
-                dice,
-                limit,
-                testName: title,
-                hits: roll.total,
-                dicePool: count,
-                opposedTest,
-                damage,
-            };
-            if (item) {
-                // TODO set accuracy, level, force, damage
-            }
-            const template = `systems/shadowrun5e/templates/rolls/roll-card.html`;
-            const html = yield renderTemplate(template, templateData);
-            const chatData = {
-                user: game.user._id,
-                type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-                content: html,
-                speaker: {
-                    actor: actor === null || actor === void 0 ? void 0 : actor._id,
-                    token: actor === null || actor === void 0 ? void 0 : actor.token,
-                    alias: actor === null || actor === void 0 ? void 0 : actor.name,
-                },
-            };
-            if (['gmroll', 'blindroll'].includes(rollMode))
-                chatData['whisper'] = ChatMessage.getWhisperIDs('GM');
-            if (rollMode === 'blindroll')
-                chatData['blind'] = true;
-            yield ChatMessage.create(chatData, { displaySheet: false });
-            return roll;
-        });
-    }
-    /**
-     *
-     * @param event {MouseEvent} - mouse event that caused this
-     * @param actor {SR5Actor} - actor this roll is associated with
-     * @param parts {Object} - object where keys should be the 'name' that can be translated/is translated and value should be the numerical values to add to dice pool
-     * @param limit {Number} - Limit to apply to the roll, leave empty for no limit
-     * @param extended {Boolean} - if this is an extended test (automatically sets the dropdown in the dialog)
-     * @param dialogOptions {Object} - Options to provide to the dialog window
-     * @param dialogOptions.environmental {Number} - value of Environmental Modifiers
-     * @param dialogOptions.prompt {Boolean} - if this is prompting the user to enter the dice pool of the roll (enables the Dice Pool box)
-     * @param after {Function} - Function to run after each roll. Needed to capture rolls of extended tests, otherwise Promise will work
-     * @param base {Number} - base value to use for the dice pool, default to 0 (parts are preferred method)
-     * @param title {String} - title to display for the roll
-     * @param wounds {Boolean} - if wounds should be applied, defaults to true
-     * @returns {Promise<Roll>|Promise<*>}
-     */
-    static rollTest({ event, actor, parts = {}, limit, extended, dialogOptions, after, base = 0, title = 'Roll', wounds = true, }) {
-        // if we aren't for soaking some damage
-        if (actor &&
-            !(title.includes('Soak') || title.includes('Drain') || title.includes('Fade'))) {
-            if (wounds)
-                wounds = actor.data.data.wounds.value;
-        }
-        if (!game.settings.get('shadowrun5e', 'applyLimits')) {
-            limit = undefined;
-        }
-        let dice_pool = base;
-        const edgeAttMax = actor ? actor.data.data.attributes.edge.max : 0;
-        if (event && event[CONFIG.SR5.kbmod.EDGE]) {
-            parts['SR5.Edge'] = +edgeAttMax;
-            actor === null || actor === void 0 ? void 0 : actor.update({
-                'data.attributes.edge.value': actor.data.data.attributes.edge.value - 1,
-            });
-        }
-        // add mods to dice pool
-        dice_pool += Object.values(parts).reduce((prev, cur) => prev + cur, 0);
-        if (event && event[CONFIG.SR5.kbmod.STANDARD]) {
-            const edge = parts['SR5.Edge'] !== undefined || undefined;
-            return this.basicRoll({
-                count: dice_pool,
-                explode: edge,
-                limit: edge ? undefined : limit,
-                title,
-                actor,
-            });
-        }
-        let dialogData = {
-            options: dialogOptions,
-            extended,
-            dice_pool,
-            base,
-            parts,
-            limit,
-            wounds,
-        };
-        let template = 'systems/shadowrun5e/templates/rolls/roll-dialog.html';
-        let edge = false;
-        let cancel = true;
-        return new Promise((resolve) => {
-            renderTemplate(template, dialogData).then((dlg) => {
-                new Dialog({
-                    title: title,
-                    content: dlg,
-                    buttons: {
-                        roll: {
-                            label: 'Roll',
-                            icon: '<i class="fas fa-dice-six"></i>',
-                            callback: () => (cancel = false),
-                        },
-                        edge: {
-                            label: `Push the Limit (+${edgeAttMax})`,
-                            icon: '<i class="fas fa-bomb"></i>',
-                            callback: () => {
-                                edge = true;
-                                cancel = false;
-                            },
-                        },
-                    },
-                    default: 'roll',
-                    close: (html) => __awaiter(this, void 0, void 0, function* () {
-                        if (cancel)
-                            return;
-                        // get the actual dice_pool from the difference of initial parts and value in the dialog
-                        let dicePool = helpers_1.Helpers.parseInputToNumber($(html).find('[name="dice_pool"]').val()) +
-                            helpers_1.Helpers.parseInputToNumber($(html).find('[name="dp_mod"]').val()) -
-                            helpers_1.Helpers.parseInputToNumber($(html).find('[name="wounds"]').val()) -
-                            helpers_1.Helpers.parseInputToNumber($(html).find('[name="options.environmental"]').val());
-                        const limit = helpers_1.Helpers.parseInputToNumber($(html).find('[name="limit"]').val());
-                        const extendedString = helpers_1.Helpers.parseInputToString($(html).find('[name="extended"]').val());
-                        const extended = extendedString === 'true';
-                        if (edge && actor) {
-                            dicePool += actor.data.data.attributes.edge.max;
-                            yield actor.update({
-                                'data.attributes.edge.value': actor.data.data.attributes.edge.value - 1,
-                            });
-                        }
-                        const r = this.basicRoll({
-                            count: dicePool,
-                            explode: edge,
-                            limit: edge ? undefined : limit,
-                            title,
-                            actor,
-                        });
-                        if (extended && r) {
-                            const currentExtended = parts['SR5.Extended'] || 0;
-                            parts['SR5.Extended'] = currentExtended - 1;
-                            // add a bit of a delay to roll again
-                            setTimeout(() => DiceSR.rollTest({
-                                event,
-                                base,
-                                parts,
-                                actor,
-                                limit,
-                                title,
-                                extended,
-                                dialogOptions,
-                                wounds,
-                                after,
-                            }), 400);
-                        }
-                        resolve(r);
-                        if (after && r)
-                            r.then((roll) => after(roll));
-                    }),
-                }).render(true);
-            });
-        });
-    }
-}
-exports.DiceSR = DiceSR;
-
-},{"./helpers":16}],16:[function(require,module,exports){
-"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Helpers = void 0;
 class Helpers {
@@ -4039,7 +3844,7 @@ class Helpers {
 }
 exports.Helpers = Helpers;
 
-},{}],17:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -4052,10 +3857,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5Item = void 0;
-const dice_1 = require("../dice");
 const helpers_1 = require("../helpers");
 const ShadowrunRollDialog_1 = require("../apps/dialogs/ShadowrunRollDialog");
 const ShadowrunTemplate_1 = require("../ShadowrunTemplate");
+const ShadowrunRoll_1 = require("../rolls/ShadowrunRoll");
 class SR5Item extends Item {
     constructor() {
         super(...arguments);
@@ -4679,18 +4484,16 @@ class SR5Item extends Item {
         const itemData = this.data.data;
         const options = {
             event: ev,
-            incomingAttack: {},
             fireModeDefense: 0,
             cover: false,
-            incomingAction: {},
         };
         const lastAttack = this.getLastAttack();
         if (lastAttack) {
-            options.incomingAttack = lastAttack;
+            options['incomingAttack'] = lastAttack;
             options.cover = true;
             options.fireModeDefense = helpers_1.Helpers.mapRoundsToDefenseMod(this.getLastFireMode());
         }
-        options.incomingAction = this.getFlag('shadowrun5e', 'action');
+        options['incomingAction'] = this.getFlag('shadowrun5e', 'action');
         const { opposed } = itemData.action;
         if (opposed.type === 'defense')
             target.rollDefense(options);
@@ -4714,15 +4517,15 @@ class SR5Item extends Item {
                 return dialog.render(true);
             let title = this.data.name;
             const parts = this.getRollPartsList();
-            const limit = this.getActionLimit();
-            return dice_1.DiceSR.rollTest({
+            const limitPart = this.getLimitPart();
+            return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
                 event,
                 parts,
                 dialogOptions: {
                     environmental: true,
                 },
                 actor: this.actor,
-                limit,
+                limitPart,
                 title,
             }).then((roll) => {
                 if (roll && this.data.type === 'weapon') {
@@ -4961,6 +4764,28 @@ class SR5Item extends Item {
         var _a;
         return (_a = this.data.data.action) === null || _a === void 0 ? void 0 : _a.attribute2;
     }
+    getLimitPart() {
+        var _a, _b;
+        const parts = {};
+        const limit = (_b = (_a = this.data.data.action) === null || _a === void 0 ? void 0 : _a.limit) === null || _b === void 0 ? void 0 : _b.value;
+        console.log('');
+        console.log('');
+        console.log('');
+        console.log(this.data.type);
+        console.log(limit);
+        console.log('');
+        console.log('');
+        console.log('');
+        if (limit) {
+            if (this.data.type === 'weapon') {
+                parts['SR5.Accuracy'] = limit;
+            }
+            else {
+                parts['SR5.Limit'] = limit;
+            }
+        }
+        return parts;
+    }
     getActionLimit() {
         var _a, _b;
         return (_b = (_a = this.data.data.action) === null || _a === void 0 ? void 0 : _a.limit) === null || _b === void 0 ? void 0 : _b.value;
@@ -4995,7 +4820,7 @@ class SR5Item extends Item {
 }
 exports.SR5Item = SR5Item;
 
-},{"../ShadowrunTemplate":2,"../apps/dialogs/ShadowrunRollDialog":6,"../dice":15,"../helpers":16}],18:[function(require,module,exports){
+},{"../ShadowrunTemplate":2,"../apps/dialogs/ShadowrunRollDialog":6,"../helpers":15,"../rolls/ShadowrunRoll":20}],17:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -5292,7 +5117,7 @@ class SR5ItemSheet extends ItemSheet {
 }
 exports.SR5ItemSheet = SR5ItemSheet;
 
-},{"../helpers":16}],19:[function(require,module,exports){
+},{"../helpers":15}],18:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -5313,13 +5138,13 @@ const config_1 = require("./config");
 const helpers_1 = require("./helpers");
 const settings_1 = require("./settings");
 const templates_1 = require("./templates");
-const dice_1 = require("./dice");
 const combat_1 = require("./combat");
 const canvas_1 = require("./canvas");
 const chat = require("./chat");
 const migrations = require("./migration");
 const OverwatchScoreTracker_1 = require("./apps/gmtools/OverwatchScoreTracker");
 const ShadowrunHandlebarHelpers_1 = require("./ShadowrunHandlebarHelpers");
+const ShadowrunRoll_1 = require("./rolls/ShadowrunRoll");
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
 /* -------------------------------------------- */
@@ -5328,7 +5153,7 @@ Hooks.once('init', function () {
     // Create a shadowrun5e namespace within the game global
     game['shadowrun5e'] = {
         SR5Actor: SR5Actor_1.SR5Actor,
-        DiceSR: dice_1.DiceSR,
+        ShadowrunRoller: ShadowrunRoll_1.ShadowrunRoller,
         SR5Item: SR5Item_1.SR5Item,
         rollItemMacro,
     };
@@ -5470,7 +5295,7 @@ function rollItemMacro(itemName) {
 }
 ShadowrunHandlebarHelpers_1.registerHandlebarHelpers();
 
-},{"./ShadowrunHandlebarHelpers":1,"./actor/SR5Actor":3,"./actor/SR5ActorSheet":4,"./apps/gmtools/OverwatchScoreTracker":7,"./canvas":11,"./chat":12,"./combat":13,"./config":14,"./dice":15,"./helpers":16,"./item/SR5Item":17,"./item/SR5ItemSheet":18,"./migration":20,"./settings":21,"./templates":22}],20:[function(require,module,exports){
+},{"./ShadowrunHandlebarHelpers":1,"./actor/SR5Actor":3,"./actor/SR5ActorSheet":4,"./apps/gmtools/OverwatchScoreTracker":7,"./canvas":11,"./chat":12,"./combat":13,"./config":14,"./helpers":15,"./item/SR5Item":16,"./item/SR5ItemSheet":17,"./migration":19,"./rolls/ShadowrunRoll":20,"./settings":21,"./templates":22}],19:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -5801,7 +5626,179 @@ const _migrateItemsAddActions = function (item, updateData) {
     }
 };
 
-},{}],21:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ShadowrunRoller = void 0;
+const helpers_1 = require("../helpers");
+class ShadowrunRoller {
+    static shadowrunFormula({ parts, limitPart, explode }) {
+        const count = helpers_1.Helpers.totalMods(parts);
+        const limit = helpers_1.Helpers.totalMods(limitPart);
+        if (count <= 0) {
+            // @ts-ignore
+            ui.notifications.error(game.i18n.localize('SR5.RollOneDie'));
+            return '0d6cs>=5';
+        }
+        let formula = `${count}d6`;
+        if (explode) {
+            formula += 'x6';
+        }
+        if (limit) {
+            formula += `kh${limit}`;
+        }
+        formula += 'cs>=5';
+        return formula;
+    }
+    static basicRoll({ parts, limitPart, explodeSixes, title, damage, actor, opposedTest, }) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const formula = this.shadowrunFormula({ parts, limitPart, explode: explodeSixes });
+            if (!formula)
+                return;
+            let roll = new Roll(formula);
+            let rollMode = game.settings.get('core', 'rollMode');
+            roll.roll();
+            if (game.settings.get('shadowrun5e', 'displayDefaultRollCard')) {
+                yield roll.toMessage({
+                    speaker: ChatMessage.getSpeaker({ actor: actor }),
+                    flavor: title,
+                    rollMode: rollMode,
+                });
+            }
+            // start of custom message
+            const dice = roll.parts[0].rolls;
+            const token = actor === null || actor === void 0 ? void 0 : actor.token;
+            const templateData = {
+                actor: actor,
+                tokenId: token ? `${token.scene._id}.${token.id}` : null,
+                dice,
+                limitPart,
+                testName: title,
+                parts,
+                opposedTest,
+                damage,
+                hits: roll.total,
+            };
+            const template = `systems/shadowrun5e/templates/rolls/roll-card.html`;
+            const html = yield renderTemplate(template, templateData);
+            const chatData = {
+                user: game.user._id,
+                type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+                content: html,
+                speaker: {
+                    actor: actor === null || actor === void 0 ? void 0 : actor._id,
+                    token: actor === null || actor === void 0 ? void 0 : actor.token,
+                    alias: actor === null || actor === void 0 ? void 0 : actor.name,
+                },
+            };
+            if (['gmroll', 'blindroll'].includes(rollMode))
+                chatData['whisper'] = ChatMessage.getWhisperIDs('GM');
+            if (rollMode === 'blindroll')
+                chatData['blind'] = true;
+            yield ChatMessage.create(chatData, { displaySheet: false });
+            return roll;
+        });
+    }
+    static advancedRoll(props) {
+        // destructure what we need to use from props
+        // any value pulled out needs to be updated back in props if changed
+        const { title, actor, parts, limitPart, extended, wounds, after, dialogOptions } = props;
+        // remove limits if game settings is set
+        if (!game.settings.get('shadowrun5e', 'applyLimits')) {
+            delete props.limitPart;
+        }
+        // TODO create "fast roll" option
+        let dialogData = {
+            options: dialogOptions,
+            extended,
+            dice_poll: helpers_1.Helpers.totalMods(parts),
+            parts,
+            limit: helpers_1.Helpers.totalMods(limitPart),
+            wounds,
+        };
+        let template = 'systems/shadowrun5e/templates/rolls/roll-dialog.html';
+        let edge = false;
+        let cancel = false;
+        const buttons = {
+            roll: {
+                label: 'Roll',
+                icon: '<i class="fas fa-dice-six"></i>',
+                callback: () => (cancel = false),
+            },
+        };
+        if (actor) {
+            buttons['edge'] = {
+                label: `Push the Limit (+${actor.getEdge().max})`,
+                icon: '<i class="fas fa-bomb"></i>',
+                callback: () => {
+                    edge = true;
+                    cancel = false;
+                },
+            };
+        }
+        return new Promise((resolve) => {
+            renderTemplate(template, dialogData).then((dlg) => {
+                new Dialog({
+                    title: title,
+                    content: dlg,
+                    buttons,
+                    default: 'roll',
+                    close: (html) => __awaiter(this, void 0, void 0, function* () {
+                        if (cancel)
+                            return;
+                        // get the actual dice_pool from the difference of initial parts and value in the dialog
+                        const woundValue = -helpers_1.Helpers.parseInputToNumber($(html).find('[name="wounds"]').val());
+                        const situationMod = helpers_1.Helpers.parseInputToNumber($(html).find('[name="dp_mod"]').val());
+                        const environmentMod = helpers_1.Helpers.parseInputToNumber($(html).find('[name="options.environmental"]').val());
+                        if (woundValue) {
+                            parts['SR5.Wounds'] = woundValue;
+                            props.wounds = true;
+                        }
+                        if (situationMod)
+                            parts['SR5.SituationalModifier'] = situationMod;
+                        if (environmentMod) {
+                            parts['SR5.EnvironmentModifier'] = environmentMod;
+                            if (!props.dialogOptions)
+                                props.dialogOptions = {};
+                            props.dialogOptions.environmental = true;
+                        }
+                        const extendedString = helpers_1.Helpers.parseInputToString($(html).find('[name="extended"]').val());
+                        const extended = extendedString === 'true';
+                        if (edge && actor) {
+                            parts['SR5.PushTheLimit'] = actor.getEdge().max;
+                            yield actor.update({
+                                'data.attributes.edge.value': actor.data.data.attributes.edge.value - 1,
+                            });
+                        }
+                        props.parts = parts;
+                        const r = this.basicRoll(Object.assign({}, props));
+                        if (extended && r) {
+                            const currentExtended = parts['SR5.Extended'] || 0;
+                            parts['SR5.Extended'] = currentExtended - 1;
+                            // add a bit of a delay to roll again
+                            setTimeout(() => this.advancedRoll(props), 400);
+                        }
+                        resolve(r);
+                        if (after && r)
+                            r.then((roll) => after(roll));
+                    }),
+                }).render(true);
+            });
+        });
+    }
+}
+exports.ShadowrunRoller = ShadowrunRoller;
+
+},{"../helpers":15}],21:[function(require,module,exports){
 "use strict";
 // game settings for shadowrun 5e
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -6840,4 +6837,4 @@ try {
   Function("r", "regeneratorRuntime = r")(runtime);
 }
 
-},{}]},{},[19]);
+},{}]},{},[18]);

@@ -86,7 +86,7 @@ export class DiceSR {
         };
 
         if (item) {
-            // TODO set accuracy, level, force, damage
+            // todo set accuracy, level, force, damage
         }
 
         const template = `systems/shadowrun5e/templates/rolls/roll-card.html`;

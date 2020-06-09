@@ -1,6 +1,6 @@
 import { SR5Item } from '../../item/SR5Item';
 import { Helpers } from '../../helpers';
-import { DiceSR } from '../../dice';
+import { ShadowrunRoller } from '../../rolls/ShadowrunRoll';
 
 export class ShadowrunRollDialog extends Dialog {
     static async fromItemRoll(
@@ -69,14 +69,17 @@ export class ShadowrunRollDialog extends Dialog {
             if (cancel) return;
             const level = Helpers.parseInputToNumber($(html).find('[name=level]').val());
             await item.setLastComplexFormLevel(level);
-            DiceSR.rollTest({
+            const limitPart = {
+                'SR5.Level': level
+            };
+            ShadowrunRoller.advancedRoll({
                 event: dialogData['event'],
                 dialogOptions: {
                     environmental: false,
                 },
                 parts,
                 actor: item.actor,
-                limit: level,
+                limitPart,
                 title,
             }).then(() => {
                 const totalFade = Math.max(item.getFade() + level, 2);
@@ -115,14 +118,18 @@ export class ShadowrunRollDialog extends Dialog {
         dialogData.close = async (html) => {
             const force = Helpers.parseInputToNumber($(html).find('[name=force]').val());
             await item.setLastSpellForce(force);
-            DiceSR.rollTest({
+            const limitPart = {
+                'SR5.Force': force
+            }
+            ShadowrunRoller.advancedRoll({
                 event: dialogData['event'],
                 dialogOptions: {
                     environmental: true,
                 },
+                damage: item.getAttackData(0, force)?.damage,
                 parts,
                 actor: item.actor,
-                limit: force,
+                limitPart,
                 title: `${title} ${force}`,
             }).then(async (roll: Roll | undefined) => {
                 if (item.data.data.category === 'combat' && roll) {
@@ -138,7 +145,6 @@ export class ShadowrunRollDialog extends Dialog {
     }
 
     static addRangedWeaponData(templateData: object, dialogData: DialogData, item: SR5Item): void {
-        let limit = item.getActionLimit();
         const parts = item.getRollPartsList();
         let title = dialogData.title || item.name;
 
@@ -216,12 +222,14 @@ export class ShadowrunRollDialog extends Dialog {
                 if (fireMode > rc && fireMode !== 20) {
                     parts['SR5.Recoil'] = rc - fireMode;
                 }
-                DiceSR.rollTest({
+                const limitPart = item.getLimitPart();
+                ShadowrunRoller.advancedRoll({
                     event: dialogData['event'],
                     parts,
                     actor: item.actor,
-                    limit,
+                    limitPart,
                     title,
+                    damage: item.getAttackData(0)?.damage,
                     dialogOptions: {
                         environmental,
                     },

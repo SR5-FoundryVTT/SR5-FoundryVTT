@@ -1,4 +1,4 @@
-import { DiceSR } from '../dice';
+import { ShadowrunRoller } from '../rolls/ShadowrunRoll';
 import { Helpers } from '../helpers';
 import { SR5Item } from '../item/SR5Item';
 import ItemData = Shadowrun.ItemData;
@@ -15,6 +15,7 @@ import AttributeField = Shadowrun.AttributeField;
 import SkillRollOptions = Shadowrun.SkillRollOptions;
 import Matrix = Shadowrun.Matrix;
 import SkillField = Shadowrun.SkillField;
+import ValueMaxPair = Shadowrun.ValueMaxPair;
 
 export class SR5Actor extends Actor {
     async update(data, options?) {
@@ -404,6 +405,14 @@ export class SR5Actor extends Actor {
         return this.data.data.attributes[attributeName];
     }
 
+    getWounds(): number {
+        return this.data.data.wounds?.value || 0;
+    }
+
+    getEdge(): AttributeField & ValueMaxPair<number> {
+        return this.data.data.attributes.edge;
+    }
+
     getOwnedItem(itemId: string): SR5Item | null {
         return (super.getOwnedItem(itemId) as unknown) as SR5Item;
     }
@@ -481,7 +490,7 @@ export class SR5Actor extends Actor {
 
         let title = 'Fade';
         if (incoming >= 0) title += ` (${incoming} incoming)`;
-        DiceSR.rollTest({
+        return ShadowrunRoller.advancedRoll({
             event: options.event,
             parts,
             actor: this,
@@ -501,7 +510,7 @@ export class SR5Actor extends Actor {
 
         let title = 'Drain';
         if (incoming >= 0) title += ` (${incoming} incoming)`;
-        DiceSR.rollTest({
+        return ShadowrunRoller.advancedRoll({
             event: options.event,
             parts,
             actor: this,
@@ -514,7 +523,7 @@ export class SR5Actor extends Actor {
         const armor = this.data.data.armor.value;
         const parts = {};
         parts['SR5.Armor'] = armor;
-        return DiceSR.rollTest({
+        return ShadowrunRoller.advancedRoll({
             event: options.event,
             actor: this,
             parts,
@@ -539,7 +548,7 @@ export class SR5Actor extends Actor {
                     content: dlg,
                     buttons: {
                         normal: {
-                            label: game.i18n.localize('Normal'),
+                            label: game.i18n.localize('SR5.Normal'),
                             callback: () => (cancel = false),
                         },
                         full_defense: {
@@ -579,7 +588,7 @@ export class SR5Actor extends Actor {
                         if (cover) parts['SR5.Cover'] = cover;
 
                         resolve(
-                            DiceSR.rollTest({
+                            ShadowrunRoller.advancedRoll({
                                 event: options.event,
                                 actor: this,
                                 parts,
@@ -704,7 +713,7 @@ export class SR5Actor extends Actor {
                         let title = `Soak - ${label}`;
                         if (totalDamage) title += ` - Incoming Damage: ${totalDamage}`;
                         resolve(
-                            DiceSR.rollTest({
+                            ShadowrunRoller.advancedRoll({
                                 event: options?.event,
                                 actor: this,
                                 parts,
@@ -724,7 +733,7 @@ export class SR5Actor extends Actor {
         parts[attr.label] = attr.value;
         this._addMatrixParts(parts, attr);
         this._addGlobalParts(parts);
-        return DiceSR.rollTest({
+        return ShadowrunRoller.advancedRoll({
             event: options?.event,
             actor: this,
             parts,
@@ -742,7 +751,7 @@ export class SR5Actor extends Actor {
         parts[attr2.label] = attr2.value;
         this._addMatrixParts(parts, [attr1, attr2]);
         this._addGlobalParts(parts);
-        return DiceSR.rollTest({
+        return ShadowrunRoller.advancedRoll({
             event: options?.event,
             actor: this,
             parts,
@@ -766,7 +775,7 @@ export class SR5Actor extends Actor {
         parts[att1.label] = att1.value;
         parts[att2.label] = att2.value;
 
-        return DiceSR.rollTest({
+        return ShadowrunRoller.advancedRoll({
             event: options?.event,
             actor: this,
             parts,
@@ -796,7 +805,7 @@ export class SR5Actor extends Actor {
         if (options && options.event && options.event[CONFIG.SR5.kbmod.SPEC])
             parts['SR5.Specialization'] = 2;
         if (Helpers.hasModifiers(options?.event)) {
-            return DiceSR.rollTest({
+            return ShadowrunRoller.advancedRoll({
                 event: options?.event,
                 actor: this,
                 parts,
@@ -841,7 +850,7 @@ export class SR5Actor extends Actor {
                             if (att.value && att.label) parts[att.label] = att.value;
                             this._addMatrixParts(parts, true);
                             this._addGlobalParts(parts);
-                            return DiceSR.rollTest({
+                            return ShadowrunRoller.advancedRoll({
                                 event: options?.event,
                                 actor: this,
                                 parts,
@@ -855,8 +864,9 @@ export class SR5Actor extends Actor {
     }
 
     promptRoll(options?: ActorRollOptions) {
-        return DiceSR.rollTest({
+        return ShadowrunRoller.advancedRoll({
             event: options?.event,
+            parts: {},
             actor: this,
             dialogOptions: {
                 prompt: true,
@@ -887,7 +897,7 @@ export class SR5Actor extends Actor {
             if (modifiers.memory) parts['SR5.Bonus'] = modifiers.memory;
         }
 
-        return DiceSR.rollTest({
+        return ShadowrunRoller.advancedRoll({
             event: options?.event,
             actor: this,
             parts,
@@ -901,6 +911,8 @@ export class SR5Actor extends Actor {
 
         if (options?.attribute) att = this.data.data.attributes[options.attribute];
         let limit = this.data.data.limits[att.limit];
+        const limitPart = {};
+        if (limit?.value) limitPart['SR5.Limit'] = limit.value;
         const parts = {};
         parts[skill.label] = skill.value;
 
@@ -910,11 +922,11 @@ export class SR5Actor extends Actor {
 
             this._addMatrixParts(parts, [att, skill]);
             this._addGlobalParts(parts);
-            return DiceSR.rollTest({
+            return ShadowrunRoller.advancedRoll({
                 event: options.event,
                 actor: this,
                 parts,
-                limit: limit ? limit.value : undefined,
+                limitPart,
                 title: `${title} Test`,
             });
         }
@@ -968,11 +980,12 @@ export class SR5Actor extends Actor {
                         if (spec) parts['SR5.Specialization'] = 2;
                         this._addMatrixParts(parts, [att, skill]);
                         this._addGlobalParts(parts);
-                        return DiceSR.rollTest({
+                        if (limit?.value) limitPart['SR5.Limit'] = limit.value;
+                        return ShadowrunRoller.advancedRoll({
                             event: options?.event,
                             actor: this,
                             parts,
-                            limit: limit ? limit.value : undefined,
+                            limitPart,
                             title: `${title} Test`,
                         });
                     },
@@ -1029,7 +1042,6 @@ export class SR5Actor extends Actor {
                 default: 'roll',
                 close: async (html) => {
                     if (cancel) return;
-                    let limit = undefined;
 
                     const att2Id: string = Helpers.parseInputToString(
                         $(html).find('[name=attribute2]').val()
@@ -1048,12 +1060,11 @@ export class SR5Actor extends Actor {
                     }
                     this._addMatrixParts(parts, [att, att2]);
                     this._addGlobalParts(parts);
-                    return DiceSR.rollTest({
+                    return ShadowrunRoller.advancedRoll({
                         event: options?.event,
                         title: `${title} Test`,
                         actor: this,
                         parts,
-                        limit: limit,
                     });
                 },
             }).render(true);
@@ -1077,11 +1088,12 @@ export class SR5Actor extends Actor {
         let title = roll.find('.flavor-text').text();
         let msg: ChatMessage = game.messages.get(roll.data().messageId);
 
-        const actor = msg.user.character;
+        const actor = (msg.user.character as unknown) as SR5Actor;
         if (actor) {
-            return DiceSR.rollTest({
+            return ShadowrunRoller.advancedRoll({
                 event: { shiftKey: true, altKey: true },
                 title: `${title} - Push the Limit`,
+                parts: {},
                 actor: actor,
                 wounds: false,
             });
@@ -1099,14 +1111,14 @@ export class SR5Actor extends Actor {
             let pool = parseInt(match.replace('d6', ''));
             if (!isNaN(pool) && !isNaN(hits)) {
                 let msg: ChatMessage = game.messages.get(roll.data().messageId);
-                const actor = msg.user.character;
+                const actor = (msg.user.character as unknown) as SR5Actor;
 
                 if (actor) {
                     const parts = {};
                     parts['SR5.OriginalDicePool'] = pool;
                     parts['SR5.Successes'] = -hits;
 
-                    return DiceSR.rollTest({
+                    return ShadowrunRoller.advancedRoll({
                         event: { shiftKey: true },
                         title: `${title} - Second Chance`,
                         parts,

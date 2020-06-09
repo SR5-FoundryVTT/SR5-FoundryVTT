@@ -7,13 +7,13 @@ import { SR5 } from './config';
 import { Helpers } from './helpers';
 import { registerSystemSettings } from './settings';
 import { preloadHandlebarsTemplates } from './templates';
-import { DiceSR } from './dice';
 import { preCombatUpdate, shadowrunCombatUpdate } from './combat';
 import { measureDistance } from './canvas';
 import * as chat from './chat';
 import * as migrations from './migration';
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
 import { registerHandlebarHelpers } from './ShadowrunHandlebarHelpers';
+import { ShadowrunRoller } from './rolls/ShadowrunRoll';
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -25,7 +25,7 @@ Hooks.once('init', function () {
     // Create a shadowrun5e namespace within the game global
     game['shadowrun5e'] = {
         SR5Actor,
-        DiceSR,
+        ShadowrunRoller,
         SR5Item,
         rollItemMacro,
     };
