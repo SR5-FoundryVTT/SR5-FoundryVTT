@@ -125,7 +125,7 @@ export class ShadowrunRollDialog extends Dialog {
                 dialogOptions: {
                     environmental: true,
                 },
-                damage: item.getAttackData(0, force)?.damage,
+                attack: item.getAttackData(0),
                 parts,
                 actor: item.actor,
                 opposedTest: {
@@ -140,7 +140,7 @@ export class ShadowrunRollDialog extends Dialog {
                 title: `${title} ${force}`,
             }).then(async (roll: Roll | undefined) => {
                 if (item.data.data.category === 'combat' && roll) {
-                    const attackData = item.getAttackData(roll.total, force);
+                    const attackData = item.getAttackData(roll.total);
                     if (attackData) {
                         await item.setLastAttack(attackData);
                     }
@@ -231,15 +231,16 @@ export class ShadowrunRollDialog extends Dialog {
                 if (defenseModifier === 'SR5.DuckOrCover') {
                     defenseLabel = game.i18n.localize(defenseModifier);
                 } else if (defenseModifier !== '') {
-                    defenseLabel += ` (${defenseModifier})`
+                    defenseLabel += ` (${defenseModifier})`;
                 }
                 ShadowrunRoller.advancedRoll({
                     event: dialogData['event'],
                     parts,
+                    fireMode: fireModes[fireMode],
                     actor: item.actor,
                     limit: item.getLimit(),
                     title,
-                    damage: item.getAttackData(0)?.damage,
+                    attack: item.getAttackData(0),
                     opposedTest: {
                         roll: (actor: SR5Actor, event) => item.rollOpposedTest(actor, event),
                         label: defenseLabel,

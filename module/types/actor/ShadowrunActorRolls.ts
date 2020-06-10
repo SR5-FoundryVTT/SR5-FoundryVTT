@@ -12,7 +12,10 @@ declare namespace Shadowrun {
     };
 
     type AttackData = {
-        hits: number;
+        hits?: number;
+        fireMode?: string;
+        reach?: number;
+        force?: number;
         damage: DamageData;
     };
 

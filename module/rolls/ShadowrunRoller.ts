@@ -1,10 +1,11 @@
 import ModList = Shadowrun.ModList;
 import { Helpers } from '../helpers';
-import DamageData = Shadowrun.DamageData;
 import { SR5Actor } from '../actor/SR5Actor';
 import RollEvent = Shadowrun.RollEvent;
 import BaseValuePair = Shadowrun.BaseValuePair;
 import LabelField = Shadowrun.LabelField;
+import BlastData = Shadowrun.BlastData;
+import AttackData = Shadowrun.AttackData;
 
 interface BasicRollProps {
     parts: ModList<number>;
@@ -12,7 +13,10 @@ interface BasicRollProps {
     explodeSixes?: boolean;
     title?: string;
     actor?: SR5Actor;
-    damage?: DamageData;
+    attack?: AttackData;
+    fireMode?: string;
+    reach?: number;
+    blast?: BlastData;
     opposedTest?: {
         label: string;
         roll: (target: Actor, event) => void;
@@ -56,9 +60,8 @@ export class ShadowrunRoller {
         limit,
         explodeSixes,
         title,
-        damage,
         actor,
-        opposedTest,
+        ...props
     }: BasicRollProps): Promise<Roll | undefined> {
         const formula = this.shadowrunFormula({ parts, limit, explode: explodeSixes });
         if (!formula) return;
@@ -89,9 +92,8 @@ export class ShadowrunRoller {
             testName: title,
             dicePool: Helpers.totalMods(parts),
             parts,
-            opposedTest,
-            damage,
             hits: roll.total,
+            ...props,
         };
 
         const template = `systems/shadowrun5e/templates/rolls/roll-card.html`;

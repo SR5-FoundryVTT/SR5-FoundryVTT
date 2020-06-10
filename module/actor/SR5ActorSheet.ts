@@ -191,7 +191,6 @@ export class SR5ActorSheet extends ActorSheet {
         ] = data.items.reduce(
             (arr, item) => {
                 item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
-                console.log(item);
                 if (item.type === 'spell') arr[1].push(item);
                 else if (item.type === 'quality') arr[2].push(item);
                 else if (item.type === 'adept_power') arr[3].push(item);

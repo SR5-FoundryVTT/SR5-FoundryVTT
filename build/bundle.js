@@ -1417,7 +1417,6 @@ class SR5ActorSheet extends ActorSheet {
         };
         let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins,] = data.items.reduce((arr, item) => {
             item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
-            console.log(item);
             if (item.type === 'spell')
                 arr[1].push(item);
             else if (item.type === 'quality')
@@ -2780,7 +2779,6 @@ class ShadowrunRollDialog extends Dialog {
         };
         dialogData.default = 'normal';
         dialogData.close = (html) => __awaiter(this, void 0, void 0, function* () {
-            var _a;
             const force = helpers_1.Helpers.parseInputToNumber($(html).find('[name=force]').val());
             yield item.setLastSpellForce(force);
             ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
@@ -2788,7 +2786,7 @@ class ShadowrunRollDialog extends Dialog {
                 dialogOptions: {
                     environmental: true,
                 },
-                damage: (_a = item.getAttackData(0, force)) === null || _a === void 0 ? void 0 : _a.damage,
+                attack: item.getAttackData(0),
                 parts,
                 actor: item.actor,
                 opposedTest: {
@@ -2802,15 +2800,15 @@ class ShadowrunRollDialog extends Dialog {
                 },
                 title: `${title} ${force}`,
             }).then((roll) => __awaiter(this, void 0, void 0, function* () {
-                var _b;
+                var _a;
                 if (item.data.data.category === 'combat' && roll) {
-                    const attackData = item.getAttackData(roll.total, force);
+                    const attackData = item.getAttackData(roll.total);
                     if (attackData) {
                         yield item.setLastAttack(attackData);
                     }
                 }
                 const drain = Math.max(item.getDrain() + force + (reckless ? 3 : 0), 2);
-                (_b = item.actor) === null || _b === void 0 ? void 0 : _b.rollDrain({ event: dialogData['event'] }, drain);
+                (_a = item.actor) === null || _a === void 0 ? void 0 : _a.rollDrain({ event: dialogData['event'] }, drain);
             }));
         });
     }
@@ -2875,7 +2873,6 @@ class ShadowrunRollDialog extends Dialog {
         };
         dialogData.buttons = buttons;
         dialogData.close = (html) => __awaiter(this, void 0, void 0, function* () {
-            var _a;
             if (cancel)
                 return;
             const fireMode = helpers_1.Helpers.parseInputToNumber($(html).find('[name="fireMode"]').val());
@@ -2896,10 +2893,11 @@ class ShadowrunRollDialog extends Dialog {
                 ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
                     event: dialogData['event'],
                     parts,
+                    fireMode: fireModes[fireMode],
                     actor: item.actor,
                     limit: item.getLimit(),
                     title,
-                    damage: (_a = item.getAttackData(0)) === null || _a === void 0 ? void 0 : _a.damage,
+                    attack: item.getAttackData(0),
                     opposedTest: {
                         roll: (actor, event) => item.rollOpposedTest(actor, event),
                         label: defenseLabel,
@@ -4539,7 +4537,6 @@ class SR5Item extends Item {
         }
     }
     rollTest(event) {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const dialog = yield ShadowrunRollDialog_1.ShadowrunRollDialog.fromItemRoll(this, event);
             if (dialog)
@@ -4562,7 +4559,7 @@ class SR5Item extends Item {
                 },
                 opposedTest,
                 actor: this.actor,
-                damage: (_a = this.getAttackData(0)) === null || _a === void 0 ? void 0 : _a.damage,
+                attack: this.getAttackData(0),
                 limit,
                 title,
             }).then((roll) => {
@@ -4774,21 +4771,31 @@ class SR5Item extends Item {
     isComplexForm() {
         return this.data.type === 'complex_form';
     }
-    getAttackData(hits, force) {
+    isMeleeWeapon() {
+        return this.data.type === 'weapon' && this.data.data.category === 'melee';
+    }
+    getAttackData(hits) {
         var _a;
         if (!((_a = this.data.data.action) === null || _a === void 0 ? void 0 : _a.damage))
             return undefined;
         const damage = this.data.data.action.damage;
-        let ap = damage.ap.value;
-        let itemValue = damage.value;
-        if (this.isCombatSpell() && force) {
-            itemValue = force;
-            ap = -force;
-        }
-        return {
+        const data = {
             hits,
-            damage: Object.assign(Object.assign({}, damage), { value: itemValue, ap }),
+            damage: damage
         };
+        if (this.isCombatSpell()) {
+            const force = this.getLastSpellForce();
+            data.force = force;
+            data.damage.value = force;
+            data.damage.ap.value = -force;
+        }
+        if (this.isMeleeWeapon()) {
+            data.reach = this.getReach();
+        }
+        if (this.isRangedWeapon()) {
+            // data.fireMode = this.getLastFireMode();
+        }
+        return data;
     }
     getActionSkill() {
         var _a;
@@ -4841,6 +4848,13 @@ class SR5Item extends Item {
         if (includeActor)
             base += parseInt(this.actor.data.data.recoil_compensation);
         return base;
+    }
+    getReach() {
+        var _a;
+        if (this.isMeleeWeapon()) {
+            return (_a = this.data.data.melee) === null || _a === void 0 ? void 0 : _a.reach;
+        }
+        return 0;
     }
     hasExplosiveAmmo() {
         var _a, _b, _c;
@@ -5667,6 +5681,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ShadowrunRoller = void 0;
 const helpers_1 = require("../helpers");
@@ -5688,7 +5713,8 @@ class ShadowrunRoller {
         formula += 'cs>=5';
         return formula;
     }
-    static basicRoll({ parts, limit, explodeSixes, title, damage, actor, opposedTest, }) {
+    static basicRoll(_a) {
+        var { parts, limit, explodeSixes, title, actor } = _a, props = __rest(_a, ["parts", "limit", "explodeSixes", "title", "actor"]);
         return __awaiter(this, void 0, void 0, function* () {
             const formula = this.shadowrunFormula({ parts, limit, explode: explodeSixes });
             if (!formula)
@@ -5706,22 +5732,11 @@ class ShadowrunRoller {
             // start of custom message
             const dice = roll.parts[0].rolls;
             const token = actor === null || actor === void 0 ? void 0 : actor.token;
-            const templateData = {
-                actor: actor,
-                header: {
+            const templateData = Object.assign({ actor: actor, header: {
                     name: actor === null || actor === void 0 ? void 0 : actor.name,
                     img: actor === null || actor === void 0 ? void 0 : actor.img,
-                },
-                tokenId: token ? `${token.scene._id}.${token.id}` : null,
-                dice,
-                limit,
-                testName: title,
-                dicePool: helpers_1.Helpers.totalMods(parts),
-                parts,
-                opposedTest,
-                damage,
-                hits: roll.total,
-            };
+                }, tokenId: token ? `${token.scene._id}.${token.id}` : null, dice,
+                limit, testName: title, dicePool: helpers_1.Helpers.totalMods(parts), parts, hits: roll.total }, props);
             const template = `systems/shadowrun5e/templates/rolls/roll-card.html`;
             const html = yield renderTemplate(template, templateData);
             const chatData = {

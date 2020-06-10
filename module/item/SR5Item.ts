@@ -248,11 +248,8 @@ export class SR5Item extends Item {
             } else if (opposed.skill) {
                 return `${Helpers.label(opposed.skill)}+${Helpers.label(opposed.attribute)}`;
             } else if (opposed.attribute2) {
-                return `${Helpers.label(opposed.attribute)}+${Helpers.label(
-                    opposed.attribute2
-                )}`;
-            }
-            else if (opposed.attribute) {
+                return `${Helpers.label(opposed.attribute)}+${Helpers.label(opposed.attribute2)}`;
+            } else if (opposed.attribute) {
                 return `${Helpers.label(opposed.attribute)}`;
             }
         }
@@ -720,7 +717,7 @@ export class SR5Item extends Item {
         if (this.hasOpposedRoll) {
             opposedTest = {
                 roll: (actor: SR5Actor, event) => this.rollOpposedTest(actor, event),
-                    label: this.getOpposedRoll(),
+                label: this.getOpposedRoll(),
             };
         }
 
@@ -735,7 +732,7 @@ export class SR5Item extends Item {
             },
             opposedTest,
             actor: this.actor,
-            damage: this.getAttackData(0)?.damage,
+            attack: this.getAttackData(0),
             limit,
             title,
         }).then((roll: Roll | undefined) => {
@@ -945,25 +942,34 @@ export class SR5Item extends Item {
         return this.data.type === 'complex_form';
     }
 
-    getAttackData(hits: number, force?: number): AttackData | undefined {
+    isMeleeWeapon(): boolean {
+        return this.data.type === 'weapon' && this.data.data.category === 'melee';
+    }
+
+    getAttackData(hits: number): AttackData | undefined {
         if (!this.data.data.action?.damage) return undefined;
         const damage = this.data.data.action.damage;
-        let ap = damage.ap.value;
-        let itemValue = damage.value;
+        const data: AttackData = {
+            hits,
+            damage: damage
+        };
 
-        if (this.isCombatSpell() && force) {
-            itemValue = force;
-            ap = -force;
+        if (this.isCombatSpell()) {
+            const force = this.getLastSpellForce();
+            data.force = force;
+            data.damage.value = force;
+            data.damage.ap.value = -force;
         }
 
-        return {
-            hits,
-            damage: {
-                ...damage,
-                value: itemValue,
-                ap,
-            },
-        };
+        if (this.isMeleeWeapon()) {
+            data.reach = this.getReach();
+        }
+
+        if (this.isRangedWeapon()) {
+            // data.fireMode = this.getLastFireMode();
+        }
+
+        return data;
     }
 
     getActionSkill(): string | undefined {
@@ -1015,6 +1021,13 @@ export class SR5Item extends Item {
         let base = parseInt(this.data.data.range.rc.value);
         if (includeActor) base += parseInt(this.actor.data.data.recoil_compensation);
         return base;
+    }
+
+    getReach(): number {
+        if (this.isMeleeWeapon()) {
+            return this.data.data.melee?.reach;
+        }
+        return 0;
     }
 
     hasExplosiveAmmo(): boolean {

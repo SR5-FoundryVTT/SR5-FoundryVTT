@@ -39,26 +39,37 @@
                 <span class="key">{{localize limit.label}}: </span>
                 <span class="value">{{limit.value}}</span>
             </div>
-            {{/if}} {{#if damage}}
+            {{/if}} {{#if attack.damage}}
             <div class="damage-line">
-                {{#if damage.value}}
+                {{#if attack.damage.value}}
                 <div>
                     <span class="key">{{localize "SR5.DV"}}: </span>
-                    <span class="value">{{damage.value}}</span>
+                    <span class="value">{{attack.damage.value}}</span>
                 </div>
-                {{/if}} {{#if damage.ap}}
+                {{/if}} {{#if attack.damage.ap.value}}
                 <div>
                     <span class="key">{{localize "SR5.AP"}}: </span>
-                    <span class="value">{{damage.ap}}</span>
+                    <span class="value">{{attack.damage.ap.value}}</span>
                 </div>
-                {{/if}} {{#if damage.element.value}}
+                {{/if}} {{#if attack.damage.element.value}}
                 <div>
                     <i
-                        class="{{elementIcon damage.element.value}} icon"
-                        title="{{localize damage.element.value}}"
+                        class="{{elementIcon attack.damage.element.value}} icon"
+                        title="{{localize attack.damage.element.value}}"
                     ></i>
                 </div>
                 {{/if}}
+            </div>
+            {{/if}}
+            {{#if attack.fireMode}}
+            <div class="limit-line">
+                <span class="key">{{attack.fireMode}}</span>
+            </div>
+            {{/if}}
+            {{#if attack.reach}}
+            <div class="limit-line">
+                <span class="key">{{localize "SR5.Reach"}}</span>
+                <span class="value">{{attack.reach}}</span>
             </div>
             {{/if}}
         </div>
