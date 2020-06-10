@@ -5708,6 +5708,10 @@ class ShadowrunRoller {
             const token = actor === null || actor === void 0 ? void 0 : actor.token;
             const templateData = {
                 actor: actor,
+                header: {
+                    name: actor === null || actor === void 0 ? void 0 : actor.name,
+                    img: actor === null || actor === void 0 ? void 0 : actor.img,
+                },
                 tokenId: token ? `${token.scene._id}.${token.id}` : null,
                 dice,
                 limit,
@@ -5722,8 +5726,10 @@ class ShadowrunRoller {
             const html = yield renderTemplate(template, templateData);
             const chatData = {
                 user: game.user._id,
-                type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+                type: CONST.CHAT_MESSAGE_TYPES.ROLL,
                 content: html,
+                roll,
+                sound: CONFIG.sounds.dice,
                 speaker: {
                     actor: actor === null || actor === void 0 ? void 0 : actor._id,
                     token: actor === null || actor === void 0 ? void 0 : actor.token,

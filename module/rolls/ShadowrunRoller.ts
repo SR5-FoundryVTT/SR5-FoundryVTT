@@ -79,6 +79,10 @@ export class ShadowrunRoller {
         const token = actor?.token;
         const templateData = {
             actor: actor,
+            header: {
+                name: actor?.name,
+                img: actor?.img,
+            },
             tokenId: token ? `${token.scene._id}.${token.id}` : null,
             dice,
             limit,
@@ -95,8 +99,10 @@ export class ShadowrunRoller {
 
         const chatData = {
             user: game.user._id,
-            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
+            type: CONST.CHAT_MESSAGE_TYPES.ROLL,
             content: html,
+            roll,
+            sound: CONFIG.sounds.dice,
             speaker: {
                 actor: actor?._id,
                 token: actor?.token,

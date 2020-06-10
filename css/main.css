@@ -325,13 +325,12 @@
 }
 .sr5.roll-card .test-line {
   margin-top: 0.25em;
-  font-style: italic;
   display: flex;
   flex-flow: row nowrap;
   justify-content: space-between;
 }
 .sr5.roll-card .test-line .test-name {
-  text-decoration: underline;
+  font-style: italic;
 }
 .sr5.roll-card .test-line .place-template {
   padding: 2px 5px;
@@ -344,7 +343,6 @@
 .sr5.roll-card .card-content {
   font-size: 14px;
   padding: 0 0.25em;
-  font-style: italic;
   display: flex;
   flex-flow: row nowrap;
   justify-content: space-between;
@@ -408,6 +406,10 @@
   filter: sepia(0.5) hue-rotate(60deg);
 }
 .sr5.roll-card .opposed-test-content .opposed-test {
+  box-shadow: 0 0 0.25em 0.15em #4d4d4d;
+  cursor: pointer;
+  border: 1px solid #4d4d4d;
+  background: grey;
   margin-top: 0.5em;
   margin-left: auto;
   margin-right: auto;
@@ -415,7 +417,9 @@
   font-size: 16px;
   font-style: italic;
   font-weight: bold;
-  text-decoration: underline;
+}
+.sr5.roll-card .opposed-test-content .opposed-test:hover {
+  box-shadow: 0 0 0.25em 0.15em black;
 }
 
 @font-face {

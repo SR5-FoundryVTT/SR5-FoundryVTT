@@ -7,7 +7,7 @@
     <div class="card-title flexrow">
         <div class="speaker-img">
             <img
-                src="{{actor.img}}"
+                src="{{header.img}}"
                 data-edit="img"
                 title="{{actor.name}}"
                 height="30px"
@@ -15,7 +15,7 @@
             />
         </div>
         <div class="speaker-name">
-            {{actor.name}}
+            {{header.name}}
         </div>
     </div>
     <div class="test-line">
@@ -66,11 +66,11 @@
             <div class="parts-list vertical">
                 {{#each parts as |part id|}}
                 <div class="part">
-                    <span>{{localize id}}</span> (<span class="value">{{part}}</span>)
+                    <span>{{localize id}}</span>: <span class="value">{{part}}</span>
                 </div>
                 {{/each}}
-                <div class="part underline">
-                    <span>{{localize 'SR5.DicePool'}}</span> (<span class="value">{{dicePool}}</span>)
+                <div class="part">
+                    <span class="value">{{localize 'SR5.DicePool'}}</span>: <span class="value">{{dicePool}}</span>
                 </div>
             </div>
         </div>
@@ -84,7 +84,7 @@
     </div>
     {{#if opposedTest}}
     <div class="opposed-test-content">
-        <div class="roll opposed-test">
+        <div class="opposed-test">
             {{opposedTest.label}}
         </div>
     </div>

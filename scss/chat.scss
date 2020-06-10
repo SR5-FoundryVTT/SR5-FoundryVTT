@@ -21,12 +21,11 @@
     }
     .test-line {
         margin-top: .25em;
-        font-style: italic;
         display: flex;
         flex-flow: row nowrap;
         justify-content: space-between;
         .test-name {
-            text-decoration: underline;
+            font-style: italic;
         }
         .place-template {
             padding: 2px 5px;
@@ -40,7 +39,6 @@
     .card-content {
         font-size: 14px;
         padding: 0 0.25em;
-        font-style: italic;
         display: flex;
         flex-flow: row nowrap;
         justify-content: space-between;
@@ -105,6 +103,13 @@
     }
     .opposed-test-content {
         .opposed-test {
+            box-shadow: 0 0 .25em .15em $dark;
+            &:hover {
+                box-shadow: 0 0 .25em .15em $black;
+            }
+            cursor: pointer;
+            border: $groove;
+            background: $grey;
             margin-top: 0.5em;
             margin-left: auto;
             margin-right: auto;
@@ -112,7 +117,6 @@
             font-size: 16px;
             font-style: italic;
             font-weight: bold;
-            text-decoration: underline;
         }
     }
 }
