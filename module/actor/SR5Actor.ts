@@ -1,4 +1,4 @@
-import { ShadowrunRoller } from '../rolls/ShadowrunRoll';
+import { ShadowrunRoller } from '../rolls/ShadowrunRoller';
 import { Helpers } from '../helpers';
 import { SR5Item } from '../item/SR5Item';
 import ItemData = Shadowrun.ItemData;

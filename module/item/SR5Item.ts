@@ -7,7 +7,7 @@ import AttackData = Shadowrun.AttackData;
 import ShadowrunTemplate from '../ShadowrunTemplate';
 import AttributeField = Shadowrun.AttributeField;
 import SkillField = Shadowrun.SkillField;
-import { ShadowrunRoller } from '../rolls/ShadowrunRoll';
+import { ShadowrunRoller } from '../rolls/ShadowrunRoller';
 import LabelField = Shadowrun.LabelField;
 import BaseValuePair = Shadowrun.BaseValuePair;
 
@@ -238,6 +238,25 @@ export class SR5Item extends Item {
         data.properties = props.filter((p) => !!p);
 
         return data;
+    }
+
+    getOpposedRoll() {
+        if (this.data.data.action?.opposed?.type) {
+            const { opposed } = this.data.data.action;
+            if (opposed.type !== 'custom') {
+                return `${Helpers.label(opposed.type)}`;
+            } else if (opposed.skill) {
+                return `${Helpers.label(opposed.skill)}+${Helpers.label(opposed.attribute)}`;
+            } else if (opposed.attribute2) {
+                return `${Helpers.label(opposed.attribute)}+${Helpers.label(
+                    opposed.attribute2
+                )}`;
+            }
+            else if (opposed.attribute) {
+                return `${Helpers.label(opposed.attribute)}`;
+            }
+        }
+        return '';
     }
 
     _ammoChatData(data, labels, props) {}
@@ -697,6 +716,13 @@ export class SR5Item extends Item {
     async rollTest(event) {
         const dialog = await ShadowrunRollDialog.fromItemRoll(this, event);
         if (dialog) return dialog.render(true);
+        let opposedTest;
+        if (this.hasOpposedRoll) {
+            opposedTest = {
+                roll: (actor: SR5Actor, event) => this.rollOpposedTest(actor, event),
+                    label: this.getOpposedRoll(),
+            };
+        }
 
         let title = this.data.name;
         const parts = this.getRollPartsList();
@@ -707,7 +733,9 @@ export class SR5Item extends Item {
             dialogOptions: {
                 environmental: true,
             },
+            opposedTest,
             actor: this.actor,
+            damage: this.getAttackData(0)?.damage,
             limit,
             title,
         }).then((roll: Roll | undefined) => {

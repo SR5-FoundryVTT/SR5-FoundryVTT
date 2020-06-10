@@ -13,7 +13,7 @@ import * as chat from './chat';
 import * as migrations from './migration';
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
 import { registerHandlebarHelpers } from './ShadowrunHandlebarHelpers';
-import { ShadowrunRoller } from './rolls/ShadowrunRoll';
+import { ShadowrunRoller } from './rolls/ShadowrunRoller';
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */

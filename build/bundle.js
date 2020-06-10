@@ -224,7 +224,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5Actor = void 0;
-const ShadowrunRoll_1 = require("../rolls/ShadowrunRoll");
+const ShadowrunRoller_1 = require("../rolls/ShadowrunRoller");
 const helpers_1 = require("../helpers");
 class SR5Actor extends Actor {
     update(data, options) {
@@ -649,7 +649,7 @@ class SR5Actor extends Actor {
         let title = 'Fade';
         if (incoming >= 0)
             title += ` (${incoming} incoming)`;
-        return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
+        return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
             event: options.event,
             parts,
             actor: this,
@@ -668,7 +668,7 @@ class SR5Actor extends Actor {
         let title = 'Drain';
         if (incoming >= 0)
             title += ` (${incoming} incoming)`;
-        return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
+        return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
             event: options.event,
             parts,
             actor: this,
@@ -680,7 +680,7 @@ class SR5Actor extends Actor {
         const armor = this.data.data.armor.value;
         const parts = {};
         parts['SR5.Armor'] = armor;
-        return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
+        return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
             event: options.event,
             actor: this,
             parts,
@@ -738,7 +738,7 @@ class SR5Actor extends Actor {
                             parts['SR5.FireMode'] = fireMode;
                         if (cover)
                             parts['SR5.Cover'] = cover;
-                        resolve(ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
+                        resolve(ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
                             event: options.event,
                             actor: this,
                             parts,
@@ -856,7 +856,7 @@ class SR5Actor extends Actor {
                         let title = `Soak - ${label}`;
                         if (totalDamage)
                             title += ` - Incoming Damage: ${totalDamage}`;
-                        resolve(ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
+                        resolve(ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
                             event: options === null || options === void 0 ? void 0 : options.event,
                             actor: this,
                             parts,
@@ -874,7 +874,7 @@ class SR5Actor extends Actor {
         parts[attr.label] = attr.value;
         this._addMatrixParts(parts, attr);
         this._addGlobalParts(parts);
-        return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
+        return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
             event: options === null || options === void 0 ? void 0 : options.event,
             actor: this,
             parts,
@@ -891,7 +891,7 @@ class SR5Actor extends Actor {
         parts[attr2.label] = attr2.value;
         this._addMatrixParts(parts, [attr1, attr2]);
         this._addGlobalParts(parts);
-        return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
+        return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
             event: options === null || options === void 0 ? void 0 : options.event,
             actor: this,
             parts,
@@ -914,7 +914,7 @@ class SR5Actor extends Actor {
         const parts = {};
         parts[att1.label] = att1.value;
         parts[att2.label] = att2.value;
-        return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
+        return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
             event: options === null || options === void 0 ? void 0 : options.event,
             actor: this,
             parts,
@@ -942,7 +942,7 @@ class SR5Actor extends Actor {
             if (options && options.event && options.event[CONFIG.SR5.kbmod.SPEC])
                 parts['SR5.Specialization'] = 2;
             if (helpers_1.Helpers.hasModifiers(options === null || options === void 0 ? void 0 : options.event)) {
-                return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
+                return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
                     event: options === null || options === void 0 ? void 0 : options.event,
                     actor: this,
                     parts,
@@ -981,7 +981,7 @@ class SR5Actor extends Actor {
                                 parts[att.label] = att.value;
                             this._addMatrixParts(parts, true);
                             this._addGlobalParts(parts);
-                            return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
+                            return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
                                 event: options === null || options === void 0 ? void 0 : options.event,
                                 actor: this,
                                 parts,
@@ -994,7 +994,7 @@ class SR5Actor extends Actor {
         });
     }
     promptRoll(options) {
-        return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
+        return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
             event: options === null || options === void 0 ? void 0 : options.event,
             parts: {},
             actor: this,
@@ -1032,7 +1032,7 @@ class SR5Actor extends Actor {
             if (modifiers.memory)
                 parts['SR5.Bonus'] = modifiers.memory;
         }
-        return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
+        return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
             event: options === null || options === void 0 ? void 0 : options.event,
             actor: this,
             parts,
@@ -1054,7 +1054,7 @@ class SR5Actor extends Actor {
                 parts['SR5.Specialization'] = 2;
             this._addMatrixParts(parts, [att, skill]);
             this._addGlobalParts(parts);
-            return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
+            return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
                 event: options.event,
                 actor: this,
                 parts,
@@ -1106,7 +1106,7 @@ class SR5Actor extends Actor {
                         parts['SR5.Specialization'] = 2;
                     this._addMatrixParts(parts, [att, skill]);
                     this._addGlobalParts(parts);
-                    return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
+                    return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
                         event: options === null || options === void 0 ? void 0 : options.event,
                         actor: this,
                         parts,
@@ -1175,7 +1175,7 @@ class SR5Actor extends Actor {
                     }
                     this._addMatrixParts(parts, [att, att2]);
                     this._addGlobalParts(parts);
-                    return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
+                    return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
                         event: options === null || options === void 0 ? void 0 : options.event,
                         title: `${title} Test`,
                         actor: this,
@@ -1205,7 +1205,7 @@ class SR5Actor extends Actor {
             let msg = game.messages.get(roll.data().messageId);
             const actor = msg.user.character;
             if (actor) {
-                return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
+                return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
                     event: { shiftKey: true, altKey: true },
                     title: `${title} - Push the Limit`,
                     parts: {},
@@ -1232,7 +1232,7 @@ class SR5Actor extends Actor {
                         const parts = {};
                         parts['SR5.OriginalDicePool'] = pool;
                         parts['SR5.Successes'] = -hits;
-                        return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
+                        return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
                             event: { shiftKey: true },
                             title: `${title} - Second Chance`,
                             parts,
@@ -1251,7 +1251,7 @@ class SR5Actor extends Actor {
 }
 exports.SR5Actor = SR5Actor;
 
-},{"../helpers":15,"../rolls/ShadowrunRoll":20}],4:[function(require,module,exports){
+},{"../helpers":15,"../rolls/ShadowrunRoller":20}],4:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -2675,7 +2675,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ShadowrunRollDialog = void 0;
 const helpers_1 = require("../../helpers");
-const ShadowrunRoll_1 = require("../../rolls/ShadowrunRoll");
+const ShadowrunRoller_1 = require("../../rolls/ShadowrunRoller");
 class ShadowrunRollDialog extends Dialog {
     static fromItemRoll(item, event) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -2736,7 +2736,7 @@ class ShadowrunRollDialog extends Dialog {
                 return;
             const level = helpers_1.Helpers.parseInputToNumber($(html).find('[name=level]').val());
             yield item.setLastComplexFormLevel(level);
-            ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
+            ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
                 event: dialogData['event'],
                 dialogOptions: {
                     environmental: false,
@@ -2746,7 +2746,7 @@ class ShadowrunRollDialog extends Dialog {
                 limit: {
                     value: level,
                     base: level,
-                    label: 'SR5.Level'
+                    label: 'SR5.Level',
                 },
                 title,
             }).then(() => {
@@ -2783,7 +2783,7 @@ class ShadowrunRollDialog extends Dialog {
             var _a;
             const force = helpers_1.Helpers.parseInputToNumber($(html).find('[name=force]').val());
             yield item.setLastSpellForce(force);
-            ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
+            ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
                 event: dialogData['event'],
                 dialogOptions: {
                     environmental: true,
@@ -2791,10 +2791,14 @@ class ShadowrunRollDialog extends Dialog {
                 damage: (_a = item.getAttackData(0, force)) === null || _a === void 0 ? void 0 : _a.damage,
                 parts,
                 actor: item.actor,
+                opposedTest: {
+                    label: item.getOpposedRoll(),
+                    roll: (actor, event) => item.rollOpposedTest(actor, event),
+                },
                 limit: {
                     value: force,
                     base: force,
-                    label: 'SR5.Force'
+                    label: 'SR5.Force',
                 },
                 title: `${title} ${force}`,
             }).then((roll) => __awaiter(this, void 0, void 0, function* () {
@@ -2877,20 +2881,29 @@ class ShadowrunRollDialog extends Dialog {
             const fireMode = helpers_1.Helpers.parseInputToNumber($(html).find('[name="fireMode"]').val());
             yield item.setLastFireMode(fireMode);
             if (fireMode) {
-                if (fireMode) {
-                    title += ` - Defender (${helpers_1.Helpers.mapRoundsToDefenseDesc(fireMode)})`;
-                }
+                const defenseModifier = helpers_1.Helpers.mapRoundsToDefenseDesc(fireMode);
                 // suppressing fire doesn't cause recoil
                 if (fireMode > rc && fireMode !== 20) {
                     parts['SR5.Recoil'] = rc - fireMode;
                 }
-                ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
+                let defenseLabel = item.getOpposedRoll();
+                if (defenseModifier === 'SR5.DuckOrCover') {
+                    defenseLabel = game.i18n.localize(defenseModifier);
+                }
+                else if (defenseModifier !== '') {
+                    defenseLabel += ` (${defenseModifier})`;
+                }
+                ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
                     event: dialogData['event'],
                     parts,
                     actor: item.actor,
                     limit: item.getLimit(),
                     title,
                     damage: (_a = item.getAttackData(0)) === null || _a === void 0 ? void 0 : _a.damage,
+                    opposedTest: {
+                        roll: (actor, event) => item.rollOpposedTest(actor, event),
+                        label: defenseLabel,
+                    },
                     dialogOptions: {
                         environmental,
                     },
@@ -2911,7 +2924,7 @@ class ShadowrunRollDialog extends Dialog {
 }
 exports.ShadowrunRollDialog = ShadowrunRollDialog;
 
-},{"../../helpers":15,"../../rolls/ShadowrunRoll":20}],7:[function(require,module,exports){
+},{"../../helpers":15,"../../rolls/ShadowrunRoller":20}],7:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -3760,16 +3773,16 @@ class Helpers {
     }
     static mapRoundsToDefenseDesc(rounds) {
         if (rounds === 1)
-            return 'No Mod';
+            return '';
         if (rounds === 3)
-            return '-2 Mod';
+            return '-2';
         if (rounds === 6)
-            return '-5 Mod';
+            return '-5';
         if (rounds === 10)
-            return '-9 Mod';
+            return '-9';
         if (rounds === 20)
-            return 'Duck or Cover';
-        return 'unknown';
+            return 'SR5.DuckOrCover';
+        return '';
     }
     static label(str) {
         const frags = str.split('_');
@@ -3856,7 +3869,7 @@ exports.SR5Item = void 0;
 const helpers_1 = require("../helpers");
 const ShadowrunRollDialog_1 = require("../apps/dialogs/ShadowrunRollDialog");
 const ShadowrunTemplate_1 = require("../ShadowrunTemplate");
-const ShadowrunRoll_1 = require("../rolls/ShadowrunRoll");
+const ShadowrunRoller_1 = require("../rolls/ShadowrunRoller");
 class SR5Item extends Item {
     constructor() {
         super(...arguments);
@@ -4068,6 +4081,25 @@ class SR5Item extends Item {
         this[`_${this.data.type}ChatData`](duplicate(data), labels, props);
         data.properties = props.filter((p) => !!p);
         return data;
+    }
+    getOpposedRoll() {
+        var _a, _b;
+        if ((_b = (_a = this.data.data.action) === null || _a === void 0 ? void 0 : _a.opposed) === null || _b === void 0 ? void 0 : _b.type) {
+            const { opposed } = this.data.data.action;
+            if (opposed.type !== 'custom') {
+                return `${helpers_1.Helpers.label(opposed.type)}`;
+            }
+            else if (opposed.skill) {
+                return `${helpers_1.Helpers.label(opposed.skill)}+${helpers_1.Helpers.label(opposed.attribute)}`;
+            }
+            else if (opposed.attribute2) {
+                return `${helpers_1.Helpers.label(opposed.attribute)}+${helpers_1.Helpers.label(opposed.attribute2)}`;
+            }
+            else if (opposed.attribute) {
+                return `${helpers_1.Helpers.label(opposed.attribute)}`;
+            }
+        }
+        return '';
     }
     _ammoChatData(data, labels, props) { }
     _modificationChatData(data, labels, props) { }
@@ -4507,20 +4539,30 @@ class SR5Item extends Item {
         }
     }
     rollTest(event) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const dialog = yield ShadowrunRollDialog_1.ShadowrunRollDialog.fromItemRoll(this, event);
             if (dialog)
                 return dialog.render(true);
+            let opposedTest;
+            if (this.hasOpposedRoll) {
+                opposedTest = {
+                    roll: (actor, event) => this.rollOpposedTest(actor, event),
+                    label: this.getOpposedRoll(),
+                };
+            }
             let title = this.data.name;
             const parts = this.getRollPartsList();
             const limit = this.getLimit();
-            return ShadowrunRoll_1.ShadowrunRoller.advancedRoll({
+            return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
                 event,
                 parts,
                 dialogOptions: {
                     environmental: true,
                 },
+                opposedTest,
                 actor: this.actor,
+                damage: (_a = this.getAttackData(0)) === null || _a === void 0 ? void 0 : _a.damage,
                 limit,
                 title,
             }).then((roll) => {
@@ -4808,7 +4850,7 @@ class SR5Item extends Item {
 }
 exports.SR5Item = SR5Item;
 
-},{"../ShadowrunTemplate":2,"../apps/dialogs/ShadowrunRollDialog":6,"../helpers":15,"../rolls/ShadowrunRoll":20}],17:[function(require,module,exports){
+},{"../ShadowrunTemplate":2,"../apps/dialogs/ShadowrunRollDialog":6,"../helpers":15,"../rolls/ShadowrunRoller":20}],17:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -5132,7 +5174,7 @@ const chat = require("./chat");
 const migrations = require("./migration");
 const OverwatchScoreTracker_1 = require("./apps/gmtools/OverwatchScoreTracker");
 const ShadowrunHandlebarHelpers_1 = require("./ShadowrunHandlebarHelpers");
-const ShadowrunRoll_1 = require("./rolls/ShadowrunRoll");
+const ShadowrunRoller_1 = require("./rolls/ShadowrunRoller");
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
 /* -------------------------------------------- */
@@ -5141,7 +5183,7 @@ Hooks.once('init', function () {
     // Create a shadowrun5e namespace within the game global
     game['shadowrun5e'] = {
         SR5Actor: SR5Actor_1.SR5Actor,
-        ShadowrunRoller: ShadowrunRoll_1.ShadowrunRoller,
+        ShadowrunRoller: ShadowrunRoller_1.ShadowrunRoller,
         SR5Item: SR5Item_1.SR5Item,
         rollItemMacro,
     };
@@ -5283,7 +5325,7 @@ function rollItemMacro(itemName) {
 }
 ShadowrunHandlebarHelpers_1.registerHandlebarHelpers();
 
-},{"./ShadowrunHandlebarHelpers":1,"./actor/SR5Actor":3,"./actor/SR5ActorSheet":4,"./apps/gmtools/OverwatchScoreTracker":7,"./canvas":11,"./chat":12,"./combat":13,"./config":14,"./helpers":15,"./item/SR5Item":16,"./item/SR5ItemSheet":17,"./migration":19,"./rolls/ShadowrunRoll":20,"./settings":21,"./templates":22}],19:[function(require,module,exports){
+},{"./ShadowrunHandlebarHelpers":1,"./actor/SR5Actor":3,"./actor/SR5ActorSheet":4,"./apps/gmtools/OverwatchScoreTracker":7,"./canvas":11,"./chat":12,"./combat":13,"./config":14,"./helpers":15,"./item/SR5Item":16,"./item/SR5ItemSheet":17,"./migration":19,"./rolls/ShadowrunRoller":20,"./settings":21,"./templates":22}],19:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }

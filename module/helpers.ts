@@ -90,12 +90,12 @@ export class Helpers {
     }
 
     static mapRoundsToDefenseDesc(rounds) {
-        if (rounds === 1) return 'No Mod';
-        if (rounds === 3) return '-2 Mod';
-        if (rounds === 6) return '-5 Mod';
-        if (rounds === 10) return '-9 Mod';
-        if (rounds === 20) return 'Duck or Cover';
-        return 'unknown';
+        if (rounds === 1) return '';
+        if (rounds === 3) return '-2';
+        if (rounds === 6) return '-5';
+        if (rounds === 10) return '-9';
+        if (rounds === 20) return 'SR5.DuckOrCover';
+        return '';
     }
 
     static label(str) {

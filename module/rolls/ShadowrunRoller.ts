@@ -13,7 +13,10 @@ interface BasicRollProps {
     title?: string;
     actor?: SR5Actor;
     damage?: DamageData;
-    opposedTest?: (target: Actor | Token | User, event) => void;
+    opposedTest?: {
+        label: string;
+        roll: (target: Actor, event) => void;
+    };
 }
 
 interface RollDialogOptions {

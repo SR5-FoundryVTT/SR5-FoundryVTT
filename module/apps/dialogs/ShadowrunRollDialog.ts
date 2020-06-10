@@ -1,6 +1,7 @@
 import { SR5Item } from '../../item/SR5Item';
 import { Helpers } from '../../helpers';
-import { ShadowrunRoller } from '../../rolls/ShadowrunRoll';
+import { ShadowrunRoller } from '../../rolls/ShadowrunRoller';
+import { SR5Actor } from '../../actor/SR5Actor';
 
 export class ShadowrunRollDialog extends Dialog {
     static async fromItemRoll(
@@ -127,6 +128,10 @@ export class ShadowrunRollDialog extends Dialog {
                 damage: item.getAttackData(0, force)?.damage,
                 parts,
                 actor: item.actor,
+                opposedTest: {
+                    label: item.getOpposedRoll(),
+                    roll: (actor: SR5Actor, event) => item.rollOpposedTest(actor, event),
+                },
                 limit: {
                     value: force,
                     base: force,
@@ -217,12 +222,16 @@ export class ShadowrunRollDialog extends Dialog {
             const fireMode = Helpers.parseInputToNumber($(html).find('[name="fireMode"]').val());
             await item.setLastFireMode(fireMode);
             if (fireMode) {
-                if (fireMode) {
-                    title += ` - Defender (${Helpers.mapRoundsToDefenseDesc(fireMode)})`;
-                }
+                const defenseModifier = Helpers.mapRoundsToDefenseDesc(fireMode);
                 // suppressing fire doesn't cause recoil
                 if (fireMode > rc && fireMode !== 20) {
                     parts['SR5.Recoil'] = rc - fireMode;
+                }
+                let defenseLabel = item.getOpposedRoll();
+                if (defenseModifier === 'SR5.DuckOrCover') {
+                    defenseLabel = game.i18n.localize(defenseModifier);
+                } else if (defenseModifier !== '') {
+                    defenseLabel += ` (${defenseModifier})`
                 }
                 ShadowrunRoller.advancedRoll({
                     event: dialogData['event'],
@@ -231,6 +240,10 @@ export class ShadowrunRollDialog extends Dialog {
                     limit: item.getLimit(),
                     title,
                     damage: item.getAttackData(0)?.damage,
+                    opposedTest: {
+                        roll: (actor: SR5Actor, event) => item.rollOpposedTest(actor, event),
+                        label: defenseLabel,
+                    },
                     dialogOptions: {
                         environmental,
                     },
