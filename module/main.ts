@@ -6,13 +6,12 @@ import { SR5Item } from './item/SR5Item';
 import { SR5 } from './config';
 import { Helpers } from './helpers';
 import { registerSystemSettings } from './settings';
-import { preloadHandlebarsTemplates } from './templates';
 import { preCombatUpdate, shadowrunCombatUpdate } from './combat';
 import { measureDistance } from './canvas';
 import * as chat from './chat';
 import * as migrations from './migration';
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
-import { registerHandlebarHelpers } from './ShadowrunHandlebarHelpers';
+import { registerHandlebarHelpers, preloadHandlebarsTemplates } from './handlebars';
 import { ShadowrunRoller } from './rolls/ShadowrunRoller';
 
 /* -------------------------------------------- */

@@ -11,13 +11,13 @@ export type ShadowrunTemplateData = {
 };
 
 export default // @ts-ignore
-class ShadowrunTemplate extends MeasuredTemplate {
+class Template extends MeasuredTemplate {
     data: ShadowrunTemplateData;
     layer: PlaceablesLayer;
     x: number;
     y: number;
 
-    static fromItem(item): ShadowrunTemplate | undefined {
+    static fromItem(item: SR5Item): Template | undefined {
         const templateShape = 'circle';
 
         const templateData = {
@@ -32,9 +32,8 @@ class ShadowrunTemplate extends MeasuredTemplate {
 
         // can only handle spells and grenade right now
         if (item.isSpell()) {
-            const force = item.getLastSpellForce();
-            // distance on spells is equal to force (I'm probably wrong for certain spells)
-            let distance = force;
+            // distance on spells is equal to force
+            let distance = item.getLastSpellForce();
             // extended spells multiply by 10
             if (item.data.data.extended) distance *= 10;
             templateData['distance'] = distance;

@@ -4,7 +4,7 @@ import { SR5Actor } from '../actor/SR5Actor';
 import ModList = Shadowrun.ModList;
 import { ShadowrunRollDialog } from '../apps/dialogs/ShadowrunRollDialog';
 import AttackData = Shadowrun.AttackData;
-import ShadowrunTemplate from '../ShadowrunTemplate';
+import Template from '../template';
 import AttributeField = Shadowrun.AttributeField;
 import SkillField = Shadowrun.SkillField;
 import { ShadowrunRoller } from '../rolls/ShadowrunRoller';
@@ -787,7 +787,7 @@ export class SR5Item extends Item {
                 }
             }
             if (action === 'place-template') {
-                const template = ShadowrunTemplate.fromItem(item);
+                const template = Template.fromItem(item);
                 console.log(template);
                 if (template) {
                     template.drawPreview();
@@ -951,7 +951,7 @@ export class SR5Item extends Item {
         const damage = this.data.data.action.damage;
         const data: AttackData = {
             hits,
-            damage: damage
+            damage: damage,
         };
 
         if (this.isCombatSpell()) {
