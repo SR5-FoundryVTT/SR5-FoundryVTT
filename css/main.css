@@ -318,10 +318,15 @@
   margin-left: 0.15em;
   margin-right: 0.15em;
 }
-.sr5.roll-card .card-title .speaker-name {
+.sr5.roll-card .card-title .header-name {
   flex: 2;
   font-size: 1.75em;
   font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
+}
+.sr5.roll-card .card-title .header-name:hover {
+  text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
+  cursor: pointer;
+  color: #6495ed;
 }
 .sr5.roll-card .test-line {
   margin-top: 0.25em;
@@ -339,6 +344,11 @@
   font-size: 18px;
   margin-right: 1em;
   flex: 0;
+}
+.sr5.roll-card .card-description {
+  padding: 0.25em;
+  font-size: 14px;
+  border-bottom: 1px solid #4d4d4d;
 }
 .sr5.roll-card .card-content {
   font-size: 14px;

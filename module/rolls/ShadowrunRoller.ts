@@ -159,6 +159,11 @@ export class ShadowrunRoller {
                 token: actor?.token,
                 alias: actor?.name,
             },
+            flags: {
+                'shadowrun5e': {
+                    'customRoll': true
+                }
+            }
         };
 
         if (['gmroll', 'blindroll'].includes(rollMode))

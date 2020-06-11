@@ -3010,7 +3010,7 @@ exports.measureDistance = function (p0, p1, { gridSpaces = true } = {}) {
 },{}],10:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addChatMessageContextOptions = exports.highlightSuccessFailure = void 0;
+exports.addRollListeners = exports.addChatMessageContextOptions = exports.highlightSuccessFailure = void 0;
 const SR5Actor_1 = require("./actor/SR5Actor");
 exports.highlightSuccessFailure = (message, html) => {
     if (!message)
@@ -3055,6 +3055,16 @@ exports.addChatMessageContextOptions = function (html, options) {
         icon: '<i class="fas fa-dice-d6"></i>',
     });
     return options;
+};
+exports.addRollListeners = (app, html) => {
+    console.log(app);
+    if (!app.getFlag('shadowrun5e', 'customRoll'))
+        return;
+    html.on('click', '.card-title', (ev) => {
+        ev.preventDefault();
+        $(ev.currentTarget).siblings('.card-description').toggle();
+    });
+    $(html).find('.card-description').hide();
 };
 
 },{"./actor/SR5Actor":1}],11:[function(require,module,exports){
@@ -4507,9 +4517,9 @@ class SR5Item extends Item {
         });
         html.on('click', '.card-header', (ev) => {
             ev.preventDefault();
-            $(ev.currentTarget).siblings('.card-content').toggle();
+            $(ev.currentTarget).siblings('.card-description').toggle();
         });
-        // $(html).find('.card-content').hide();
+        $(html).find('.card-description').hide();
     }
     static _getChatCardTargets() {
         const { character } = game.user;
@@ -5202,7 +5212,7 @@ Hooks.on('renderChatMessage', (app, html) => {
     if (!app.isRoll)
         SR5Item_1.SR5Item.chatListeners(html);
     if (app.isRoll)
-        chat.highlightSuccessFailure(app, html);
+        chat.addRollListeners(app, html);
 });
 Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);
 /* -------------------------------------------- */
@@ -5746,6 +5756,11 @@ class ShadowrunRoller {
                     token: actor === null || actor === void 0 ? void 0 : actor.token,
                     alias: actor === null || actor === void 0 ? void 0 : actor.name,
                 },
+                flags: {
+                    'shadowrun5e': {
+                        'customRoll': true
+                    }
+                }
             };
             if (['gmroll', 'blindroll'].includes(rollMode))
                 chatData['whisper'] = ChatMessage.getWhisperIDs('GM');

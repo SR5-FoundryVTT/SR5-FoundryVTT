@@ -783,9 +783,9 @@ export class SR5Item extends Item {
         });
         html.on('click', '.card-header', (ev) => {
             ev.preventDefault();
-            $(ev.currentTarget).siblings('.card-content').toggle();
+            $(ev.currentTarget).siblings('.card-description').toggle();
         });
-        // $(html).find('.card-content').hide();
+        $(html).find('.card-description').hide();
     }
 
     static _getChatCardTargets() {

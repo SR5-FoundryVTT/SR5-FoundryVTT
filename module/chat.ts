@@ -51,3 +51,13 @@ export const addChatMessageContextOptions = function (html, options) {
     );
     return options;
 };
+
+export const addRollListeners = (app, html) => {
+    console.log(app);
+    if (!app.getFlag('shadowrun5e', 'customRoll')) return;
+    html.on('click', '.card-title', (ev) => {
+        ev.preventDefault();
+        $(ev.currentTarget).siblings('.card-description').toggle();
+    });
+    $(html).find('.card-description').hide();
+}

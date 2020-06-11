@@ -5,18 +5,28 @@
     data-token-id="{{tokenId}}"
 >
     <div class="card-title flexrow">
-        <div class="speaker-img">
+        <div class="header-img">
             <img
                 src="{{header.img}}"
                 data-edit="img"
                 title="{{header.name}}"
-                height="30px"
-                width="30px"
+                height="45px"
+                width="45px"
             />
         </div>
-        <div class="speaker-name">
+        <div class="header-name">
             {{header.name}}
         </div>
+    </div>
+    <div class="card-description">
+        <div class="card-description-content">
+            {{{description.description.value}}}
+        </div>
+        <footer class='card-footer'>
+            {{#each description.properties}}
+            <span style="white-space: nowrap">{{this}}</span>
+            {{/each}}
+        </footer>
     </div>
     <div class="test-line">
         <span class="test-name">
