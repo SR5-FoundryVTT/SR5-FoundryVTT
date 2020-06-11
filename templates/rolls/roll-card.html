@@ -9,7 +9,7 @@
             <img
                 src="{{header.img}}"
                 data-edit="img"
-                title="{{actor.name}}"
+                title="{{header.name}}"
                 height="30px"
                 width="30px"
             />
@@ -35,8 +35,8 @@
                 ><span class="value">{{hits}}</span>
             </div>
             {{#if limit.value}}
-            <div class="limit-line" title="{{localize 'SR5.Limit'}}">
-                <span class="key">{{localize limit.label}}: </span>
+            <div class="limit-line" title="{{localize limit.label}}">
+                <span class="key">{{localize "SR5.Limit"}}: </span>
                 <span class="value">{{limit.value}}</span>
             </div>
             {{/if}} {{#if attack.damage}}
@@ -44,7 +44,7 @@
                 {{#if attack.damage.value}}
                 <div>
                     <span class="key">{{localize "SR5.DV"}}: </span>
-                    <span class="value">{{attack.damage.value}}</span>
+                    <span class="value">{{attack.damage.value}}{{damageAbbreviation attack.damage.type.value}}</span>
                 </div>
                 {{/if}} {{#if attack.damage.ap.value}}
                 <div>

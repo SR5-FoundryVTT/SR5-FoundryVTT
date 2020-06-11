@@ -4673,9 +4673,11 @@ class SR5Item extends Item {
         }
         if (this.isMeleeWeapon()) {
             data.reach = this.getReach();
+            data.accuracy = this.getActionLimit();
         }
         if (this.isRangedWeapon()) {
             data.fireMode = this.getLastFireMode();
+            data.accuracy = this.getActionLimit();
         }
         const blastData = this.getBlastData();
         if (blastData)
@@ -4695,6 +4697,18 @@ class SR5Item extends Item {
         return (_a = this.data.data.action) === null || _a === void 0 ? void 0 : _a.attribute2;
     }
     getRollName() {
+        if (this.isRangedWeapon()) {
+            return 'SR5.RangedWeaponAttack';
+        }
+        if (this.isMeleeWeapon()) {
+            return 'SR5.MeleeWeaponAttack';
+        }
+        if (this.isCombatSpell()) {
+            return 'SR5.SpellAttack';
+        }
+        if (this.isSpell()) {
+            return 'SR5.SpellCast';
+        }
         return this.name;
     }
     getLimit() {
@@ -5652,21 +5666,24 @@ class ShadowrunRoller {
             actor: item.actor,
             limit,
             title,
+            name: item.name,
+            img: item.img,
         };
+        rollData['attack'] = item.getAttackData(0);
+        rollData['blast'] = item.getBlastData();
         if (item.hasOpposedRoll) {
             rollData['opposedTest'] = {
                 roll: (actor, event) => item.rollOpposedTest(actor, event),
                 label: item.getOpposedTestName(),
             };
         }
-        rollData['attack'] = item.getAttackData(0);
-        rollData['blast'] = item.getBlastData();
         if (item.isMeleeWeapon()) {
             rollData['reach'] = item.getReach();
         }
         if (item.isRangedWeapon()) {
             rollData['fireMode'] = (_a = item.getLastFireMode()) === null || _a === void 0 ? void 0 : _a.label;
         }
+        rollData.description = item.getChatData();
         const r = ShadowrunRoller.advancedRoll(rollData);
         r.then((roll) => __awaiter(this, void 0, void 0, function* () {
             if (roll && item.data.type === 'weapon') {
@@ -5693,7 +5710,7 @@ class ShadowrunRoller {
         return formula;
     }
     static basicRoll(_a) {
-        var { parts, limit, explodeSixes, title, actor } = _a, props = __rest(_a, ["parts", "limit", "explodeSixes", "title", "actor"]);
+        var { parts, limit, explodeSixes, title, actor, img = actor === null || actor === void 0 ? void 0 : actor.img, name = actor === null || actor === void 0 ? void 0 : actor.name } = _a, props = __rest(_a, ["parts", "limit", "explodeSixes", "title", "actor", "img", "name"]);
         return __awaiter(this, void 0, void 0, function* () {
             const formula = this.shadowrunFormula({ parts, limit, explode: explodeSixes });
             if (!formula)
@@ -5712,8 +5729,8 @@ class ShadowrunRoller {
             const dice = roll.parts[0].rolls;
             const token = actor === null || actor === void 0 ? void 0 : actor.token;
             const templateData = Object.assign({ actor: actor, header: {
-                    name: actor === null || actor === void 0 ? void 0 : actor.name,
-                    img: actor === null || actor === void 0 ? void 0 : actor.img,
+                    name,
+                    img,
                 }, tokenId: token ? `${token.scene._id}.${token.id}` : null, dice,
                 limit, testName: title, dicePool: helpers_1.Helpers.totalMods(parts), parts, hits: roll.total }, props);
             const template = `systems/shadowrun5e/templates/rolls/roll-card.html`;

@@ -8,6 +8,8 @@ import { SR5Item } from '../item/SR5Item';
 import AttackData = Shadowrun.AttackData;
 
 interface BasicRollProps {
+    name?: string;
+    img?: string;
     parts: ModList<number>;
     limit?: BaseValuePair<number> & LabelField;
     explodeSixes?: boolean;
@@ -18,6 +20,7 @@ interface BasicRollProps {
         label: string;
         roll: (target: Actor, event) => void;
     };
+    description?: object;
 }
 
 interface RollDialogOptions {
@@ -44,7 +47,7 @@ export class ShadowrunRoller {
         let limit = item.getLimit();
         let title = item.getRollName();
 
-        const rollData = {
+        const rollData: AdvancedRollProps = {
             event: event,
             dialogOptions: {
                 environmental: true,
@@ -53,21 +56,25 @@ export class ShadowrunRoller {
             actor: item.actor,
             limit,
             title,
+            name: item.name,
+            img: item.img,
         };
+        rollData['attack'] = item.getAttackData(0);
+        rollData['blast'] = item.getBlastData();
+
         if (item.hasOpposedRoll) {
             rollData['opposedTest'] = {
                 roll: (actor: SR5Actor, event) => item.rollOpposedTest(actor, event),
                 label: item.getOpposedTestName(),
             };
         }
-        rollData['attack'] = item.getAttackData(0);
-        rollData['blast'] = item.getBlastData();
         if (item.isMeleeWeapon()) {
             rollData['reach'] = item.getReach();
         }
         if (item.isRangedWeapon()) {
             rollData['fireMode'] = item.getLastFireMode()?.label;
         }
+        rollData.description = item.getChatData();
 
         const r = ShadowrunRoller.advancedRoll(rollData);
         r.then(async (roll: Roll | undefined) => {
@@ -101,6 +108,8 @@ export class ShadowrunRoller {
         explodeSixes,
         title,
         actor,
+        img = actor?.img,
+        name = actor?.name,
         ...props
     }: BasicRollProps): Promise<Roll | undefined> {
         const formula = this.shadowrunFormula({ parts, limit, explode: explodeSixes });
@@ -123,8 +132,8 @@ export class ShadowrunRoller {
         const templateData = {
             actor: actor,
             header: {
-                name: actor?.name,
-                img: actor?.img,
+                name,
+                img,
             },
             tokenId: token ? `${token.scene._id}.${token.id}` : null,
             dice,

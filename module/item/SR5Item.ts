@@ -954,10 +954,12 @@ export class SR5Item extends Item {
 
         if (this.isMeleeWeapon()) {
             data.reach = this.getReach();
+            data.accuracy = this.getActionLimit();
         }
 
         if (this.isRangedWeapon()) {
             data.fireMode = this.getLastFireMode();
+            data.accuracy = this.getActionLimit();
         }
 
         const blastData = this.getBlastData();
@@ -979,6 +981,18 @@ export class SR5Item extends Item {
     }
 
     getRollName(): string {
+        if (this.isRangedWeapon()) {
+            return 'SR5.RangedWeaponAttack';
+        }
+        if (this.isMeleeWeapon()) {
+            return 'SR5.MeleeWeaponAttack'
+        }
+        if (this.isCombatSpell()) {
+            return 'SR5.SpellAttack';
+        }
+        if (this.isSpell()) {
+            return 'SR5.SpellCast';
+        }
         return this.name;
     }
 

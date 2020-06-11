@@ -17,6 +17,7 @@ declare namespace Shadowrun {
         reach?: number;
         force?: number;
         level?: number;
+        accuracy?: number;
         damage: DamageData;
         blast?: BlastData;
     };
