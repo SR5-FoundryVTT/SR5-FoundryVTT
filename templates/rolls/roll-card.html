@@ -34,7 +34,7 @@
                 <span class="key">{{localize "SR5.Hits"}}: </span
                 ><span class="value">{{hits}}</span>
             </div>
-            {{#if limit}}
+            {{#if limit.value}}
             <div class="limit-line" title="{{localize 'SR5.Limit'}}">
                 <span class="key">{{localize limit.label}}: </span>
                 <span class="value">{{limit.value}}</span>
@@ -60,16 +60,26 @@
                 </div>
                 {{/if}}
             </div>
-            {{/if}}
-            {{#if attack.fireMode}}
+            {{/if}} {{#if attack.fireMode.value}}
             <div class="limit-line">
-                <span class="key">{{attack.fireMode}}</span>
+                <span class="key">{{attack.fireMode.label}}</span>
             </div>
-            {{/if}}
-            {{#if attack.reach}}
+            {{/if}} {{#if attack.reach}}
             <div class="limit-line">
                 <span class="key">{{localize "SR5.Reach"}}</span>
                 <span class="value">{{attack.reach}}</span>
+            </div>
+            {{/if}} {{#if attack.blast.radius}}
+            <div class="limit-line">
+                <div>
+                    <span class="key">{{localize "SR5.Radius"}}: </span>
+                    <span class="value">{{attack.blast.radius}}m</span>
+                </div>
+            </div>
+            {{/if}} {{#if attack.blast.dropoff}}
+            <div class="limit-line">
+                <span class="key">{{localize "SR5.Dropoff"}}: </span>
+                <span class="value">{{attack.blast.dropoff}}/m</span>
             </div>
             {{/if}}
         </div>
@@ -81,7 +91,8 @@
                 </div>
                 {{/each}}
                 <div class="part">
-                    <span class="value">{{localize 'SR5.DicePool'}}</span>: <span class="value">{{dicePool}}</span>
+                    <span class="value">{{localize 'SR5.DicePool'}}</span>:
+                    <span class="value">{{dicePool}}</span>
                 </div>
             </div>
         </div>

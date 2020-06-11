@@ -29,25 +29,9 @@ class Template extends MeasuredTemplate {
             // @ts-ignore
             fillColor: game.user.color,
         };
-
-        // can only handle spells and grenade right now
-        if (item.isSpell()) {
-            // distance on spells is equal to force
-            let distance = item.getLastSpellForce();
-            // extended spells multiply by 10
-            if (item.data.data.extended) distance *= 10;
-            templateData['distance'] = distance;
-        } else if (item.isGrenade()) {
-            // use blast radius
-            const distance = item.data.data.thrown.blast.radius;
-            const dropoff = item.data.data.thrown.blast.dropoff;
-            templateData['distance'] = distance;
-        } else if (item.hasExplosiveAmmo()) {
-            const ammo = item.getEquippedAmmo();
-            const distance = ammo.data.data.blast.radius;
-            const dropoff = ammo.data.data.blast.dropoff;
-            templateData['distance'] = distance;
-        }
+        const blast = item.getBlastData();
+        templateData['distance'] = blast?.radius;
+        templateData['dropoff'] = blast?.dropoff;
 
         // @ts-ignore
         return new this(templateData);

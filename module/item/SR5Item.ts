@@ -1,15 +1,18 @@
 import { Helpers } from '../helpers';
-import DeviceData = Shadowrun.DeviceData;
 import { SR5Actor } from '../actor/SR5Actor';
-import ModList = Shadowrun.ModList;
 import { ShadowrunRollDialog } from '../apps/dialogs/ShadowrunRollDialog';
-import AttackData = Shadowrun.AttackData;
 import Template from '../template';
+import DeviceData = Shadowrun.DeviceData;
+import ModList = Shadowrun.ModList;
+import AttackData = Shadowrun.AttackData;
 import AttributeField = Shadowrun.AttributeField;
 import SkillField = Shadowrun.SkillField;
-import { ShadowrunRoller } from '../rolls/ShadowrunRoller';
-import LabelField = Shadowrun.LabelField;
-import BaseValuePair = Shadowrun.BaseValuePair;
+import LimitField = Shadowrun.LimitField;
+import FireModeData = Shadowrun.FireModeData;
+import SpellForceData = Shadowrun.SpellForceData;
+import ComplexFormLevelData = Shadowrun.ComplexFormLevelData;
+import FireRangeData = Shadowrun.FireRangeData;
+import BlastData = Shadowrun.BlastData;
 
 export class SR5Item extends Item {
     labels: {} = {};
@@ -17,28 +20,28 @@ export class SR5Item extends Item {
     actor: SR5Actor;
 
     // Flag Functions
-    getLastFireMode(): number {
-        return this.getFlag('shadowrun5e', 'lastFireMode') || 0;
+    getLastFireMode(): FireModeData | undefined {
+        return this.getFlag('shadowrun5e', 'lastFireMode');
     }
-    setLastFireMode(fireMode: number) {
+    setLastFireMode(fireMode: FireModeData) {
         return this.setFlag('shadowrun5e', 'lastFireMode', fireMode);
     }
-    getLastSpellForce(): number {
-        return this.getFlag('shadowrun5e', 'lastSpellForce') || 0;
+    getLastSpellForce(): SpellForceData {
+        return this.getFlag('shadowrun5e', 'lastSpellForce');
     }
-    setLastSpellForce(force: number) {
+    setLastSpellForce(force: SpellForceData) {
         return this.setFlag('shadowrun5e', 'lastSpellForce', force);
     }
-    getLastComplexFormLevel(): number {
-        return this.getFlag('shadowrun5e', 'lastComplexFormLevel') || 0;
+    getLastComplexFormLevel(): ComplexFormLevelData {
+        return this.getFlag('shadowrun5e', 'lastComplexFormLevel');
     }
-    setLastComplexFormLevel(level: number) {
+    setLastComplexFormLevel(level: ComplexFormLevelData) {
         return this.setFlag('shadowrun5e', 'lastComplexFormLevel', level);
     }
-    getLastFireRange(): number {
+    getLastFireRange(): FireRangeData {
         return this.getFlag('shadowrun5e', 'lastFireRange') || 0;
     }
-    setLastFireRange(environmentalMod: number) {
+    setLastFireRange(environmentalMod: FireRangeData) {
         return this.setFlag('shadowrun5e', 'lastFireRange', environmentalMod);
     }
 
@@ -240,20 +243,23 @@ export class SR5Item extends Item {
         return data;
     }
 
-    getOpposedRoll() {
+    getOpposedTestName(): string {
+        let name = '';
         if (this.data.data.action?.opposed?.type) {
             const { opposed } = this.data.data.action;
             if (opposed.type !== 'custom') {
-                return `${Helpers.label(opposed.type)}`;
+                name = `${Helpers.label(opposed.type)}`;
             } else if (opposed.skill) {
-                return `${Helpers.label(opposed.skill)}+${Helpers.label(opposed.attribute)}`;
+                name = `${Helpers.label(opposed.skill)}+${Helpers.label(opposed.attribute)}`;
             } else if (opposed.attribute2) {
-                return `${Helpers.label(opposed.attribute)}+${Helpers.label(opposed.attribute2)}`;
+                name = `${Helpers.label(opposed.attribute)}+${Helpers.label(opposed.attribute2)}`;
             } else if (opposed.attribute) {
-                return `${Helpers.label(opposed.attribute)}`;
+                name = `${Helpers.label(opposed.attribute)}`;
             }
         }
-        return '';
+        const mod = this.getOpposedTestModifier();
+        if (mod) name += ` ${mod}`;
+        return name;
     }
 
     _ammoChatData(data, labels, props) {}
@@ -666,8 +672,20 @@ export class SR5Item extends Item {
         // add global parts from actor
         this.actor._addGlobalParts(parts);
         this.actor._addMatrixParts(parts, atts);
+        this._addWeaponParts(parts);
 
         return parts;
+    }
+
+    calculateRecoil() {
+        return Math.min(this.getRecoilCompensation(true) - (this.getLastFireMode()?.value || 0), 0);
+    }
+
+    _addWeaponParts(parts: ModList<number>) {
+        if (this.isRangedWeapon()) {
+            const recoil = this.calculateRecoil();
+            if (recoil) parts['SR5.Recoil'] = recoil;
+        }
     }
 
     removeLicense(index) {
@@ -713,37 +731,6 @@ export class SR5Item extends Item {
     async rollTest(event) {
         const dialog = await ShadowrunRollDialog.fromItemRoll(this, event);
         if (dialog) return dialog.render(true);
-        let opposedTest;
-        if (this.hasOpposedRoll) {
-            opposedTest = {
-                roll: (actor: SR5Actor, event) => this.rollOpposedTest(actor, event),
-                label: this.getOpposedRoll(),
-            };
-        }
-
-        let title = this.data.name;
-        const parts = this.getRollPartsList();
-        const limit = this.getLimit();
-        return ShadowrunRoller.advancedRoll({
-            event,
-            parts,
-            dialogOptions: {
-                environmental: true,
-            },
-            opposedTest,
-            actor: this.actor,
-            attack: this.getAttackData(0),
-            limit,
-            title,
-        }).then((roll: Roll | undefined) => {
-            if (roll && this.data.type === 'weapon') {
-                this.useAmmo(1).then(() => {
-                    this.setFlag('shadowrun5e', 'action', {
-                        hits: roll.total,
-                    });
-                });
-            }
-        });
     }
 
     static chatListeners(html) {
@@ -955,10 +942,14 @@ export class SR5Item extends Item {
         };
 
         if (this.isCombatSpell()) {
-            const force = this.getLastSpellForce();
+            const force = this.getLastSpellForce().value;
             data.force = force;
             data.damage.value = force;
             data.damage.ap.value = -force;
+        }
+
+        if (this.isComplexForm()) {
+            data.level = this.getLastComplexFormLevel().value;
         }
 
         if (this.isMeleeWeapon()) {
@@ -966,8 +957,11 @@ export class SR5Item extends Item {
         }
 
         if (this.isRangedWeapon()) {
-            // data.fireMode = this.getLastFireMode();
+            data.fireMode = this.getLastFireMode();
         }
+
+        const blastData = this.getBlastData();
+        if (blastData) data.blast = blastData;
 
         return data;
     }
@@ -984,12 +978,22 @@ export class SR5Item extends Item {
         return this.data.data.action?.attribute2;
     }
 
-    getLimit(): BaseValuePair<number> & LabelField {
+    getRollName(): string {
+        return this.name;
+    }
+
+    getLimit(): LimitField {
         const limit = this.data.data.action?.limit;
         if (this.data.type === 'weapon') {
             limit.label = 'SR5.Accuracy';
         } else if (limit?.attribute) {
             limit.label = CONFIG.SR5.attributes[limit.attribute];
+        } else if (this.isSpell()) {
+            limit.value = this.getLastSpellForce().value;
+            limit.label = 'SR5.Force';
+        } else if (this.isComplexForm()) {
+            limit.value = this.getLastComplexFormLevel().value;
+            limit.label = 'SR5.Level';
         } else {
             limit.label = 'SR5.Limit';
         }
@@ -1033,5 +1037,50 @@ export class SR5Item extends Item {
     hasExplosiveAmmo(): boolean {
         const ammo = this.getEquippedAmmo();
         return ammo?.data?.data?.blast?.radius > 0;
+    }
+
+    getOpposedTestModifier(): string {
+        if (this.isRangedWeapon()) {
+            const fireModeData = this.getLastFireMode();
+            console.log(fireModeData);
+            if (fireModeData?.defense) {
+                if (fireModeData.defense === 'SR5.DuckOrCover') {
+                    return game.i18n.localize('SR5.DuckOrCover');
+                } else {
+                    return ` (${fireModeData.defense})`;
+                }
+            }
+        }
+        return '';
+    }
+
+    getBlastData(): BlastData | undefined {
+        // can only handle spells and grenade right now
+        if (this.isSpell()) {
+            // distance on spells is equal to force
+            let distance = this.getLastSpellForce().value;
+            // extended spells multiply by 10
+            if (this.data.data.extended) distance *= 10;
+            return {
+                radius: distance,
+                dropoff: 0,
+            };
+        } else if (this.isGrenade()) {
+            // use blast radius
+            const distance = this.data.data.thrown.blast.radius;
+            const dropoff = this.data.data.thrown.blast.dropoff;
+            return {
+                radius: distance,
+                dropoff: dropoff,
+            };
+        } else if (this.hasExplosiveAmmo()) {
+            const ammo = this.getEquippedAmmo();
+            const distance = ammo.data.data.blast.radius;
+            const dropoff = ammo.data.data.blast.dropoff;
+            return {
+                radius: distance,
+                dropoff,
+            };
+        }
     }
 }

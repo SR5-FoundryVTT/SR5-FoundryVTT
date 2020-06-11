@@ -4,7 +4,7 @@ import { SR5Actor } from '../actor/SR5Actor';
 import RollEvent = Shadowrun.RollEvent;
 import BaseValuePair = Shadowrun.BaseValuePair;
 import LabelField = Shadowrun.LabelField;
-import BlastData = Shadowrun.BlastData;
+import { SR5Item } from '../item/SR5Item';
 import AttackData = Shadowrun.AttackData;
 
 interface BasicRollProps {
@@ -14,9 +14,6 @@ interface BasicRollProps {
     title?: string;
     actor?: SR5Actor;
     attack?: AttackData;
-    fireMode?: string;
-    reach?: number;
-    blast?: BlastData;
     opposedTest?: {
         label: string;
         roll: (target: Actor, event) => void;
@@ -36,7 +33,50 @@ interface AdvancedRollProps extends BasicRollProps {
     dialogOptions?: RollDialogOptions;
 }
 
+interface ItemRollProps {
+    event: RollEvent;
+    item: SR5Item;
+}
+
 export class ShadowrunRoller {
+    static itemRoll({ event, item }: ItemRollProps): Promise<Roll | undefined> {
+        const parts = item.getRollPartsList();
+        let limit = item.getLimit();
+        let title = item.getRollName();
+
+        const rollData = {
+            event: event,
+            dialogOptions: {
+                environmental: true,
+            },
+            parts,
+            actor: item.actor,
+            limit,
+            title,
+        };
+        if (item.hasOpposedRoll) {
+            rollData['opposedTest'] = {
+                roll: (actor: SR5Actor, event) => item.rollOpposedTest(actor, event),
+                label: item.getOpposedTestName(),
+            };
+        }
+        rollData['attack'] = item.getAttackData(0);
+        rollData['blast'] = item.getBlastData();
+        if (item.isMeleeWeapon()) {
+            rollData['reach'] = item.getReach();
+        }
+        if (item.isRangedWeapon()) {
+            rollData['fireMode'] = item.getLastFireMode()?.label;
+        }
+
+        const r = ShadowrunRoller.advancedRoll(rollData);
+        r.then(async (roll: Roll | undefined) => {
+            if (roll && item.data.type === 'weapon') {
+                await item.useAmmo(1);
+            }
+        });
+        return r;
+    }
     static shadowrunFormula({ parts, limit, explode }): string {
         const count = Helpers.totalMods(parts);
         if (count <= 0) {
@@ -48,7 +88,7 @@ export class ShadowrunRoller {
         if (explode) {
             formula += 'x6';
         }
-        if (limit.value) {
+        if (limit?.value) {
             formula += `kh${limit.value}`;
         }
         formula += 'cs>=5';
@@ -121,7 +161,7 @@ export class ShadowrunRoller {
         return roll;
     }
 
-    static advancedRoll(props: AdvancedRollProps) {
+    static advancedRoll(props: AdvancedRollProps): Promise<Roll | undefined> {
         // destructure what we need to use from props
         // any value pulled out needs to be updated back in props if changed
         const { title, actor, parts, limit, extended, wounds = true, after, dialogOptions } = props;

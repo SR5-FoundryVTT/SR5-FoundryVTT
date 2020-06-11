@@ -13,10 +13,12 @@ declare namespace Shadowrun {
 
     type AttackData = {
         hits?: number;
-        fireMode?: string;
+        fireMode?: FireModeData;
         reach?: number;
         force?: number;
+        level?: number;
         damage: DamageData;
+        blast?: BlastData;
     };
 
     type SoakRollOptions = ActorRollOptions & {
