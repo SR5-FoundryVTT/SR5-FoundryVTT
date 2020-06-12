@@ -25,6 +25,7 @@ interface BasicRollProps {
         roll: (target: Actor, event) => void;
     };
     description?: object;
+    previewTemplate?: boolean;
 }
 
 interface RollDialogOptions {
@@ -63,6 +64,7 @@ export class ShadowrunRoller {
             title,
             name: item.name,
             img: item.img,
+            previewTemplate: item.hasTemplate,
         };
         rollData['attack'] = item.getAttackData(0);
         rollData['blast'] = item.getBlastData();

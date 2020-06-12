@@ -283,6 +283,10 @@ export class SR5Item extends Item {
         }
     }
 
+    get hasAmmo() {
+        return this.data.data.ammo !== undefined;
+    }
+
     async useAmmo(fireMode) {
         const dupData = duplicate(this.data);
         const { ammo } = dupData.data;
@@ -407,11 +411,6 @@ export class SR5Item extends Item {
         };
 
         const lastAttack = this.getLastAttack();
-        console.log('opp');
-        console.log('');
-        console.log(lastAttack);
-        console.log('');
-        console.log('');
         if (lastAttack) {
             options['incomingAttack'] = lastAttack;
             options.cover = true;

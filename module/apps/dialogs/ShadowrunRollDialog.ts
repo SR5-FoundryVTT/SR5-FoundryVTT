@@ -39,10 +39,12 @@ export class ShadowrunRollDialog extends Dialog {
         ShadowrunRoller.itemRoll({ event: dialogData['event'], item }).then(
             async (roll: Roll | undefined) => {
                 if (roll && item.data.type === 'weapon') {
-                    await item.useAmmo(1);
                     const attackData = item.getAttackData(roll.total);
                     if (attackData) {
                         await item.setLastAttack(attackData);
+                    }
+                    if (item.hasAmmo) {
+                        await item.useAmmo(1);
                     }
                 }
             }

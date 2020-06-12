@@ -2496,10 +2496,12 @@ class ShadowrunRollDialog extends Dialog {
             }
             ShadowrunRoller_1.ShadowrunRoller.itemRoll({ event: dialogData['event'], item }).then((roll) => __awaiter(this, void 0, void 0, function* () {
                 if (roll && item.data.type === 'weapon') {
-                    yield item.useAmmo(1);
                     const attackData = item.getAttackData(roll.total);
                     if (attackData) {
                         yield item.setLastAttack(attackData);
+                    }
+                    if (item.hasAmmo) {
+                        yield item.useAmmo(1);
                     }
                 }
             }));
@@ -3017,33 +3019,10 @@ exports.measureDistance = function (p0, p1, { gridSpaces = true } = {}) {
 },{}],10:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.addRollListeners = exports.addChatMessageContextOptions = exports.highlightSuccessFailure = void 0;
+exports.addRollListeners = exports.addChatMessageContextOptions = void 0;
 const SR5Actor_1 = require("./actor/SR5Actor");
 const SR5Item_1 = require("./item/SR5Item");
-exports.highlightSuccessFailure = (message, html) => {
-    if (!message)
-        return;
-    if (!message.isContentVisible || !message.roll.parts.length)
-        return;
-    const { roll } = message;
-    if (!roll.parts.length)
-        return;
-    if (!roll.parts[0].rolls)
-        return;
-    const khreg = /kh\d+/;
-    const match = roll.formula.match(khreg);
-    const limit = match ? +match[0].replace('kh', '') : 0;
-    const hits = roll.total;
-    const fails = roll.parts[0].rolls.reduce((fails, r) => (r.roll === 1 ? fails + 1 : fails), 0);
-    const count = roll.parts[0].rolls.length;
-    const glitch = fails > count / 2.0;
-    if (limit && hits >= limit) {
-        html.find('.dice-total').addClass('limit-hit');
-    }
-    else if (glitch) {
-        html.find('.dice-total').addClass('glitch');
-    }
-};
+const template_1 = require("./template");
 exports.addChatMessageContextOptions = function (html, options) {
     const canRoll = (li) => {
         const msg = game.messages.get(li.data().messageId);
@@ -3065,7 +3044,6 @@ exports.addChatMessageContextOptions = function (html, options) {
     return options;
 };
 exports.addRollListeners = (app, html) => {
-    console.log(app);
     if (!app.getFlag('shadowrun5e', 'customRoll'))
         return;
     html.on('click', '.opposed-test', (event) => {
@@ -3078,6 +3056,15 @@ exports.addRollListeners = (app, html) => {
             }
         }
     });
+    html.on('click', '.place-template', (event) => {
+        event.preventDefault();
+        const item = SR5Item_1.SR5Item.getItemFromMessage(app, html);
+        if (item) {
+            const template = template_1.default.fromItem(item);
+            template === null || template === void 0 ? void 0 : template.drawPreview(event);
+        }
+        console.log(event);
+    });
     html.on('click', '.card-title', (event) => {
         event.preventDefault();
         $(event.currentTarget).siblings('.card-description').toggle();
@@ -3085,7 +3072,7 @@ exports.addRollListeners = (app, html) => {
     $(html).find('.card-description').hide();
 };
 
-},{"./actor/SR5Actor":1,"./item/SR5Item":16}],11:[function(require,module,exports){
+},{"./actor/SR5Actor":1,"./item/SR5Item":16,"./template":22}],11:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -4342,6 +4329,9 @@ class SR5Item extends Item {
             }
         });
     }
+    get hasAmmo() {
+        return this.data.data.ammo !== undefined;
+    }
     useAmmo(fireMode) {
         return __awaiter(this, void 0, void 0, function* () {
             const dupData = duplicate(this.data);
@@ -4465,11 +4455,6 @@ class SR5Item extends Item {
             cover: false,
         };
         const lastAttack = this.getLastAttack();
-        console.log('opp');
-        console.log('');
-        console.log(lastAttack);
-        console.log('');
-        console.log('');
         if (lastAttack) {
             options['incomingAttack'] = lastAttack;
             options.cover = true;
@@ -5756,6 +5741,7 @@ class ShadowrunRoller {
             title,
             name: item.name,
             img: item.img,
+            previewTemplate: item.hasTemplate,
         };
         rollData['attack'] = item.getAttackData(0);
         rollData['blast'] = item.getBlastData();

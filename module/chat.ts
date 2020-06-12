@@ -1,29 +1,6 @@
 import { SR5Actor } from './actor/SR5Actor';
 import { SR5Item } from './item/SR5Item';
-
-export const highlightSuccessFailure = (message, html) => {
-    if (!message) return;
-    if (!message.isContentVisible || !message.roll.parts.length) return;
-    const { roll } = message;
-    if (!roll.parts.length) return;
-    if (!roll.parts[0].rolls) return;
-
-    const khreg = /kh\d+/;
-    const match = roll.formula.match(khreg);
-
-    const limit = match ? +match[0].replace('kh', '') : 0;
-
-    const hits = roll.total;
-    const fails = roll.parts[0].rolls.reduce((fails, r) => (r.roll === 1 ? fails + 1 : fails), 0);
-    const count = roll.parts[0].rolls.length;
-    const glitch = fails > count / 2.0;
-
-    if (limit && hits >= limit) {
-        html.find('.dice-total').addClass('limit-hit');
-    } else if (glitch) {
-        html.find('.dice-total').addClass('glitch');
-    }
-};
+import Template from './template';
 
 export const addChatMessageContextOptions = function (html, options) {
     const canRoll = (li) => {
@@ -54,7 +31,6 @@ export const addChatMessageContextOptions = function (html, options) {
 };
 
 export const addRollListeners = (app, html) => {
-    console.log(app);
     if (!app.getFlag('shadowrun5e', 'customRoll')) return;
     html.on('click', '.opposed-test', (event) => {
         event.preventDefault();
@@ -66,6 +42,15 @@ export const addRollListeners = (app, html) => {
             }
         }
     });
+    html.on('click', '.place-template', (event) => {
+        event.preventDefault();
+        const item = SR5Item.getItemFromMessage(app, html);
+        if (item) {
+            const template = Template.fromItem(item);
+            template?.drawPreview(event);
+        }
+        console.log(event);
+    })
     html.on('click', '.card-title', (event) => {
         event.preventDefault();
         $(event.currentTarget).siblings('.card-description').toggle();
