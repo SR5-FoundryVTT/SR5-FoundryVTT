@@ -4,19 +4,9 @@
     data-item-id="{{item._id}}"
     data-token-id="{{tokenId}}"
 >
-    <div class="card-title flexrow">
-        <div class="header-img">
-            <img
-                src="{{header.img}}"
-                data-edit="img"
-                title="{{header.name}}"
-                height="35px"
-                width="35px"
-            />
-        </div>
-        <div class="header-name">
-            {{header.name}}
-        </div>
+    <div class="card-title card-header flexrow">
+        <img src='{{header.img}}' title='{{header.name}}' width='36' height='36'>
+        <h3 class="header-name">{{header.name}}</h3>
     </div>
     {{#if description}}
     <div class="card-description">
@@ -138,8 +128,8 @@
         {{/each}}
     </div>
     {{#if opposedTest}}
-    <div class="opposed-test-content">
-        <div class="opposed-test">
+    <div class="card-buttons">
+        <div class="button opposed-test">
             {{opposedTest.label}}
         </div>
     </div>

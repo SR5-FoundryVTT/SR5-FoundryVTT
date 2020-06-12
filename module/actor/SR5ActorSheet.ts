@@ -471,7 +471,7 @@ export class SR5ActorSheet extends ActorSheet {
         const item = this.actor.getOwnedItem(iid);
         if (item) {
             // if shiftKey, post just a card, otherwise roll
-            if (event.shiftKey) return item.postCard(event);
+            if (event.shiftKey || !item.hasRoll) return item.postCard();
             return item.rollTest(event);
         }
     }

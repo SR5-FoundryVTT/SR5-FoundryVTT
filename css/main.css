@@ -304,6 +304,68 @@
   align-content: center;
 }
 
+.sr5.chat-card {
+  font-style: normal;
+  font-size: 1rem;
+}
+.sr5.chat-card .card-header {
+  padding: 0.25em 0;
+  border-top: 1px solid #4d4d4d;
+  border-bottom: 1px solid #4d4d4d;
+}
+.sr5.chat-card .card-header img {
+  flex: 0 0 36px;
+  margin-right: 0.5em;
+}
+.sr5.chat-card .card-header h3 {
+  font-size: 1.75em;
+  align-self: center;
+  flex: 1;
+  margin: 0;
+  font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
+}
+.sr5.chat-card .card-content {
+  padding: 0.5em 0;
+  border-bottom: 1px solid #4d4d4d;
+}
+.sr5.chat-card .card-content p {
+  font-size: 0.8em;
+}
+.sr5.chat-card .card-content h3 {
+  font-size: 1em;
+  margin: 0;
+  font-weight: bold;
+}
+.sr5.chat-card .card-buttons .button {
+  box-shadow: 0 0 0.25em 0.15em #4d4d4d;
+  cursor: pointer;
+  border: 1px solid #4d4d4d;
+  background: grey;
+  margin-top: 0.5em;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  font-size: 16px;
+  font-style: italic;
+  font-weight: bold;
+}
+.sr5.chat-card .card-buttons .button:hover {
+  box-shadow: 0 0 0.25em 0.15em black;
+}
+.sr5.chat-card .card-footer {
+  padding: 0.25em 0 0;
+  border-top: 1px solid #4d4d4d;
+}
+.sr5.chat-card .card-footer span {
+  border-right: 1px solid #4d4d4d;
+  padding: 0;
+  padding-right: 0.3em;
+  font-size: 0.75em;
+}
+.sr5.chat-card .card-footer span:last-child {
+  border-right: none;
+  padding-right: 0;
+}
 .sr5.roll-card {
   margin: 0.15em;
 }
@@ -317,11 +379,6 @@
 .sr5.roll-card .card-title > * {
   margin-left: 0.15em;
   margin-right: 0.15em;
-}
-.sr5.roll-card .card-title .header-name {
-  flex: 2;
-  font-size: 1.75em;
-  font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
 }
 .sr5.roll-card .card-title .header-name:hover {
   text-shadow: -1px -1px 0 #6495ed, 1px -1px 0 #6495ed, -1px 1px 0 #6495ed, 1px 1px 0 #6495ed;
@@ -412,22 +469,6 @@
 .sr5.roll-card .dice-roll-content .dice-roll.green {
   color: #18520b;
   filter: sepia(0.5) hue-rotate(60deg);
-}
-.sr5.roll-card .opposed-test-content .opposed-test {
-  box-shadow: 0 0 0.25em 0.15em #4d4d4d;
-  cursor: pointer;
-  border: 1px solid #4d4d4d;
-  background: grey;
-  margin-top: 0.5em;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center;
-  font-size: 16px;
-  font-style: italic;
-  font-weight: bold;
-}
-.sr5.roll-card .opposed-test-content .opposed-test:hover {
-  box-shadow: 0 0 0.25em 0.15em black;
 }
 
 @font-face {
@@ -906,68 +947,6 @@ select.display > option {
   text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
   cursor: pointer;
   color: #6495ed;
-}
-.sr5.chat-card {
-  font-style: normal;
-  font-size: 1rem;
-}
-.sr5.chat-card .card-header {
-  padding: 0.25em 0;
-  border-top: 1px solid #4d4d4d;
-  border-bottom: 1px solid #4d4d4d;
-}
-.sr5.chat-card .card-header img {
-  flex: 0 0 36px;
-  margin-right: 0.5em;
-}
-.sr5.chat-card .card-header h3 {
-  font-size: 1.75em;
-  align-self: center;
-  flex: 1;
-  margin: 0;
-  font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
-}
-.sr5.chat-card .card-content {
-  padding: 0.5em 0;
-  border-bottom: 1px solid #4d4d4d;
-}
-.sr5.chat-card .card-content p {
-  font-size: 0.8em;
-}
-.sr5.chat-card .card-content h3 {
-  font-size: 1em;
-  margin: 0;
-  font-weight: bold;
-}
-.sr5.chat-card .card-buttons {
-  margin: 0.5em 0;
-}
-.sr5.chat-card .card-buttons span {
-  display: block;
-  line-height: 2em;
-  text-align: center;
-}
-.sr5.chat-card .card-buttons button {
-  font-size: 1em;
-  height: 1.5em;
-  line-height: 1.25em;
-  margin: 0.25em 0;
-  color: #e6e6e6;
-  background: #4d4d4d;
-}
-.sr5.chat-card .card-footer {
-  padding: 0.25em 0 0;
-  border-top: 1px solid #4d4d4d;
-}
-.sr5.chat-card .card-footer span {
-  border-right: 1px solid #4d4d4d;
-  padding: 0;
-  padding-right: 0.3em;
-  font-size: 0.75em;
-}
-.sr5.chat-card .card-footer span:last-child {
-  border-right: none;
-  padding-right: 0;
 }
 
 /*# sourceMappingURL=main.css.map */

@@ -1,131 +1,183 @@
 @import 'config.scss';
 
-.sr5.roll-card {
-    margin: 0.15em;
-    .card-title {
-        font-size: 14px;
-        border-bottom: $groove;
-        justify-content: left;
-        align-content: center;
-        align-items: flex-end;
-        > * {
-            margin-left: 0.15em;
-            margin-right: 0.15em;
-        }
+.sr5 {
+    &.chat-card {
+        font-style: normal;
+        font-size: 1rem;
 
-        .header-name {
-            &:hover {
-                text-shadow: -1px -1px 0 $cornflower, 1px -1px 0 $cornflower, -1px 1px 0 $cornflower,
-                    1px 1px 0 $cornflower;
-            }
-            flex: 2;
-            font-size: 1.75em;
-            @include nodesto;
-        }
-    }
-    .test-line {
-        margin-top: 0.25em;
-        display: flex;
-        flex-flow: row nowrap;
-        justify-content: space-between;
-        .test-name {
-            font-style: italic;
-        }
-        .place-template {
-            padding: 2px 5px;
-            line-height: 1em;
-            color: $black;
-            font-size: 18px;
-            margin-right: 1em;
-            flex: 0;
-        }
-    }
-    .card-description {
-        padding: 0.25em;
-        font-size: 14px;
-        border-bottom: $groove;
-    }
-    .card-content {
-        font-size: 14px;
-        padding: 0 0.25em;
-        display: flex;
-        flex-flow: row nowrap;
-        justify-content: space-between;
-        .left-side {
-            display: flex;
-            flex-shrink: 0;
-            flex-flow: column;
-        }
-        .right-side {
-            display: flex;
-            flex-flow: column;
-        }
-        .key {
-            margin-right: 0.35em;
-        }
-        .value {
-            font-weight: bold;
-        }
-        .limit-line {
-            display: flex;
-            flex-flow: nowrap row;
-            justify-content: flex-start;
-        }
-        .damage-line {
-            display: flex;
-            flex-flow: nowrap row;
-            justify-content: flex-start;
-            > :not(:first-child) {
-                margin-left: 0.5em;
-            }
-            > :not(:last-child) {
+        .card-header {
+            padding: 0.25em 0;
+            border-top: $groove;
+            border-bottom: $groove;
+
+            img {
+                flex: 0 0 36px;
                 margin-right: 0.5em;
             }
-            .icon {
+
+            h3 {
+                font-size: 1.75em;
+                align-self: center;
+                flex: 1;
+                margin: 0;
+                @include nodesto;
+            }
+        }
+        .card-content {
+            padding: 0.5em 0;
+            border-bottom: $groove;
+            p {
+                font-size: 0.8em;
+            }
+            h3 {
+                font-size: 1em;
+                margin: 0;
+                font-weight: bold;
+            }
+        }
+
+        .card-buttons {
+            .button {
+                box-shadow: 0 0 0.25em 0.15em $dark;
+                &:hover {
+                    box-shadow: 0 0 0.25em 0.15em $black;
+                }
+                cursor: pointer;
+                border: $groove;
+                background: $grey;
+                margin-top: 0.5em;
+                margin-left: auto;
+                margin-right: auto;
+                text-align: center;
+                font-size: 16px;
+                font-style: italic;
+                font-weight: bold;
+            }
+        }
+
+        .card-footer {
+            padding: 0.25em 0 0;
+            border-top: $groove;
+
+            span {
+                border-right: $groove;
+                padding: 0;
+                padding-right: 0.3em;
+                font-size: 0.75em;
+
+                &:last-child {
+                    border-right: none;
+                    padding-right: 0;
+                }
+            }
+        }
+    }
+    &.roll-card {
+        margin: 0.15em;
+        .card-title {
+            font-size: 14px;
+            border-bottom: $groove;
+            justify-content: left;
+            align-content: center;
+            align-items: flex-end;
+            > * {
+                margin-left: 0.15em;
+                margin-right: 0.15em;
+            }
+
+            .header-name {
+                &:hover {
+                    text-shadow: -1px -1px 0 $cornflower, 1px -1px 0 $cornflower, -1px 1px 0 $cornflower,
+                    1px 1px 0 $cornflower;
+                }
+            }
+        }
+        .test-line {
+            margin-top: 0.25em;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-between;
+            .test-name {
                 font-style: italic;
             }
-        }
-    }
-    .dice-roll-content {
-        padding: 0.5em 0.5em;
-        display: flex;
-        flex-flow: row wrap;
-        justify-content: center;
-        border-bottom: $groove;
-        .dice-roll {
-            background-image: url(/icons/svg/d6-grey.svg);
-            background-size: 24px 24px;
-            font-size: 16px;
-            font-weight: bold;
-            text-align: center;
-            width: 24px;
-            line-height: 24px;
-            &.red {
-                color: #aa0200;
-                filter: sepia(0.5) hue-rotate(-60deg);
-            }
-            &.green {
-                color: #18520b;
-                filter: sepia(0.5) hue-rotate(60deg);
+            .place-template {
+                padding: 2px 5px;
+                line-height: 1em;
+                color: $black;
+                font-size: 18px;
+                margin-right: 1em;
+                flex: 0;
             }
         }
-    }
-    .opposed-test-content {
-        .opposed-test {
-            box-shadow: 0 0 0.25em 0.15em $dark;
-            &:hover {
-                box-shadow: 0 0 0.25em 0.15em $black;
+        .card-description {
+            padding: 0.25em;
+            font-size: 14px;
+            border-bottom: $groove;
+        }
+        .card-content {
+            font-size: 14px;
+            padding: 0 0.25em;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-between;
+            .left-side {
+                display: flex;
+                flex-shrink: 0;
+                flex-flow: column;
             }
-            cursor: pointer;
-            border: $groove;
-            background: $grey;
-            margin-top: 0.5em;
-            margin-left: auto;
-            margin-right: auto;
-            text-align: center;
-            font-size: 16px;
-            font-style: italic;
-            font-weight: bold;
+            .right-side {
+                display: flex;
+                flex-flow: column;
+            }
+            .key {
+                margin-right: 0.35em;
+            }
+            .value {
+                font-weight: bold;
+            }
+            .limit-line {
+                display: flex;
+                flex-flow: nowrap row;
+                justify-content: flex-start;
+            }
+            .damage-line {
+                display: flex;
+                flex-flow: nowrap row;
+                justify-content: flex-start;
+                > :not(:first-child) {
+                    margin-left: 0.5em;
+                }
+                > :not(:last-child) {
+                    margin-right: 0.5em;
+                }
+                .icon {
+                    font-style: italic;
+                }
+            }
+        }
+        .dice-roll-content {
+            padding: 0.5em 0.5em;
+            display: flex;
+            flex-flow: row wrap;
+            justify-content: center;
+            border-bottom: $groove;
+            .dice-roll {
+                background-image: url(/icons/svg/d6-grey.svg);
+                background-size: 24px 24px;
+                font-size: 16px;
+                font-weight: bold;
+                text-align: center;
+                width: 24px;
+                line-height: 24px;
+                &.red {
+                    color: #aa0200;
+                    filter: sepia(0.5) hue-rotate(-60deg);
+                }
+                &.green {
+                    color: #18520b;
+                    filter: sepia(0.5) hue-rotate(60deg);
+                }
+            }
         }
     }
 }
