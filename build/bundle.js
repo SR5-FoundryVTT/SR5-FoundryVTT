@@ -357,6 +357,9 @@ class SR5Actor extends Actor {
             tr.label = CONFIG.SR5.damageTypes[t];
         }
     }
+    getModifier(modifierName) {
+        return this.data.data.modifiers[modifierName];
+    }
     findActiveSkill(skillName) {
         if (skillName === undefined)
             return undefined;
@@ -475,10 +478,10 @@ class SR5Actor extends Actor {
             wounds: false,
         });
     }
-    rollDefense(options = {}) {
+    rollDefense(options = {}, parts = {}) {
+        this._addDefenseParts(parts);
         let dialogData = {
-            defense: this.data.data.rolls.defense,
-            fireMode: options.fireModeDefense,
+            parts,
             cover: options.cover,
         };
         let template = 'systems/shadowrun5e/templates/rolls/roll-defense.html';
@@ -508,14 +511,6 @@ class SR5Actor extends Actor {
                     close: (html) => __awaiter(this, void 0, void 0, function* () {
                         if (cancel)
                             return;
-                        const rea = this.data.data.attributes.reaction;
-                        const int = this.data.data.attributes.intuition;
-                        const parts = {};
-                        parts[rea.label] = rea.value;
-                        parts[int.label] = int.value;
-                        if (this.data.data.modifiers.defense)
-                            parts['SR5.Bonus'] = this.data.data.modifiers.defense;
-                        let fireMode = helpers_1.Helpers.parseInputToNumber($(html).find('[name=fireMode]').val());
                         let cover = helpers_1.Helpers.parseInputToNumber($(html).find('[name=cover]').val());
                         if (special === 'full_defense')
                             parts['SR5.FullDefense'] = this.data.data.attributes.willpower.value;
@@ -523,15 +518,13 @@ class SR5Actor extends Actor {
                             parts['SR5.Dodge'] = this.data.data.skills.active.gymnastics.value;
                         if (special === 'block')
                             parts['SR5.Block'] = this.data.data.skills.active.unarmed_combat.value;
-                        if (fireMode)
-                            parts['SR5.FireMode'] = fireMode;
                         if (cover)
                             parts['SR5.Cover'] = cover;
                         resolve(ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
                             event: event,
                             actor: this,
                             parts,
-                            title: 'Defense',
+                            title: 'SR5.DefenseTest',
                             incomingAttack,
                         }).then((roll) => __awaiter(this, void 0, void 0, function* () {
                             if (incomingAttack && roll) {
@@ -566,7 +559,7 @@ class SR5Actor extends Actor {
         return new Promise((resolve) => {
             renderTemplate(template, dialogData).then((dlg) => {
                 new Dialog({
-                    title: 'Soak Test',
+                    title: 'SR5.DamageResistanceTest',
                     content: dlg,
                     buttons: {
                         base: {
@@ -982,6 +975,20 @@ class SR5Actor extends Actor {
     _addGlobalParts(parts) {
         if (this.data.data.modifiers.global) {
             parts['SR5.Global'] = this.data.data.modifiers.global;
+        }
+    }
+    _addDefenseParts(parts) {
+        const reaction = this.findAttribute('reaction');
+        const intuition = this.findAttribute('intuition');
+        const mod = this.getModifier('defense');
+        if (reaction) {
+            parts[reaction.label || 'SR5.Reaction'] = reaction.value;
+        }
+        if (intuition) {
+            parts[intuition.label || 'SR5.Intuition'] = intuition.value;
+        }
+        if (mod) {
+            parts['SR5.Bonus'] = mod;
         }
     }
     static pushTheLimit(roll) {
@@ -3048,7 +3055,7 @@ exports.addRollListeners = (app, html) => {
         return;
     html.on('click', '.opposed-test', (event) => {
         event.preventDefault();
-        const item = SR5Item_1.SR5Item.getItemFromMessage(app, html);
+        const item = SR5Item_1.SR5Item.getItemFromMessage(html);
         if (item) {
             const targets = SR5Item_1.SR5Item._getChatCardTargets();
             for (const t of targets) {
@@ -3058,7 +3065,7 @@ exports.addRollListeners = (app, html) => {
     });
     html.on('click', '.place-template', (event) => {
         event.preventDefault();
-        const item = SR5Item_1.SR5Item.getItemFromMessage(app, html);
+        const item = SR5Item_1.SR5Item.getItemFromMessage(html);
         if (item) {
             const template = template_1.default.fromItem(item);
             template === null || template === void 0 ? void 0 : template.drawPreview(event);
@@ -3471,6 +3478,7 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/templates/item/parts/lifestyle.html',
         'systems/shadowrun5e/templates/item/parts/ammo.html',
         'systems/shadowrun5e/templates/item/parts/modification.html',
+        'systems/shadowrun5e/templates/rolls/parts/parts-list.html',
     ];
     return loadTemplates(templatePaths);
 });
@@ -4448,39 +4456,42 @@ class SR5Item extends Item {
     }
     rollOpposedTest(target, ev) {
         var _a;
-        const itemData = this.data.data;
-        const options = {
-            event: ev,
-            fireModeDefense: 0,
-            cover: false,
-        };
-        const lastAttack = this.getLastAttack();
-        if (lastAttack) {
-            options['incomingAttack'] = lastAttack;
-            options.cover = true;
-            if ((_a = lastAttack.fireMode) === null || _a === void 0 ? void 0 : _a.defense) {
-                options.fireModeDefense = +lastAttack.fireMode.defense;
+        return __awaiter(this, void 0, void 0, function* () {
+            const itemData = this.data.data;
+            const options = {
+                event: ev,
+                fireModeDefense: 0,
+                cover: false,
+            };
+            const lastAttack = this.getLastAttack();
+            if (lastAttack) {
+                options['incomingAttack'] = lastAttack;
+                options.cover = true;
+                if ((_a = lastAttack.fireMode) === null || _a === void 0 ? void 0 : _a.defense) {
+                    options.fireModeDefense = +lastAttack.fireMode.defense;
+                }
             }
-        }
-        options['incomingAction'] = this.getFlag('shadowrun5e', 'action');
-        const { opposed } = itemData.action;
-        if (opposed.type === 'defense')
-            return target.rollDefense(options);
-        else if (opposed.type === 'soak')
-            return target.rollSoak(options);
-        else if (opposed.type === 'armor')
-            return target.rollSoak(options);
-        else {
-            if (opposed.skill && opposed.attribute) {
-                target.rollSkill(opposed.skill, Object.assign(Object.assign({}, options), { attribute: opposed.attribute }));
+            const parts = this.getOpposedTestMod();
+            options['incomingAction'] = this.getFlag('shadowrun5e', 'action');
+            const { opposed } = itemData.action;
+            if (opposed.type === 'defense')
+                return target.rollDefense(options, parts);
+            else if (opposed.type === 'soak')
+                return target.rollSoak(options);
+            else if (opposed.type === 'armor')
+                return target.rollSoak(options);
+            else {
+                if (opposed.skill && opposed.attribute) {
+                    return target.rollSkill(opposed.skill, Object.assign(Object.assign({}, options), { attribute: opposed.attribute }));
+                }
+                else if (opposed.attribute && opposed.attribute2) {
+                    return target.rollTwoAttributes([opposed.attribute, opposed.attribute2], options);
+                }
+                else if (opposed.attribute) {
+                    return target.rollSingleAttribute(opposed.attribute, options);
+                }
             }
-            else if (opposed.attribute && opposed.attribute2) {
-                return target.rollTwoAttributes([opposed.attribute, opposed.attribute2], options);
-            }
-            else if (opposed.attribute) {
-                return target.rollSingleAttribute(opposed.attribute, options);
-            }
-        }
+        });
     }
     rollTest(event) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -4489,7 +4500,7 @@ class SR5Item extends Item {
                 return dialog.render(true);
         });
     }
-    static getItemFromMessage(app, html) {
+    static getItemFromMessage(html) {
         const card = html.find('.chat-card');
         let actor;
         const tokenKey = card.data('tokenId');
@@ -4524,37 +4535,13 @@ class SR5Item extends Item {
             const button = $(ev.currentTarget);
             const messageId = button.parents('.message').data('messageId');
             const senderId = game.messages.get(messageId).user._id;
-            const card = button.parents('.chat-card');
             const action = button.data('action');
             const opposedRoll = action === 'opposed-roll';
             if (!opposedRoll && !game.user.isGM && game.user._id !== senderId)
                 return;
-            let actor;
-            const tokenKey = card.data('tokenId');
-            if (tokenKey) {
-                const [sceneId, tokenId] = tokenKey.split('.');
-                let token;
-                if (sceneId === canvas.scene._id)
-                    token = canvas.tokens.get(tokenId);
-                else {
-                    const scene = game.scenes.get(sceneId);
-                    if (!scene)
-                        return;
-                    // @ts-ignore
-                    const tokenData = scene.data.tokens.find((t) => t.id === Number(tokenId));
-                    if (tokenData)
-                        token = new Token(tokenData);
-                }
-                if (!token)
-                    return;
-                actor = Actor.fromToken(token);
-            }
-            else
-                actor = game.actors.get(card.data('actorId'));
-            if (!actor)
+            const item = this.getItemFromMessage(html);
+            if (!item)
                 return;
-            const itemId = card.data('itemId');
-            const item = actor.getOwnedItem(itemId);
             if (action === 'roll')
                 item.rollTest(ev);
             if (opposedRoll) {
@@ -4843,16 +4830,35 @@ class SR5Item extends Item {
         const ammo = this.getEquippedAmmo();
         return ((_c = (_b = (_a = ammo === null || ammo === void 0 ? void 0 : ammo.data) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.blast) === null || _c === void 0 ? void 0 : _c.radius) > 0;
     }
-    getOpposedTestModifier() {
+    getOpposedTestMod() {
+        const parts = {};
+        if (this.isGrenade() || (this.isCombatSpell() && this.hasTemplate)) {
+            parts['SR5.Aoe'] = -2;
+        }
         if (this.isRangedWeapon()) {
             const fireModeData = this.getLastFireMode();
-            console.log(fireModeData);
             if (fireModeData === null || fireModeData === void 0 ? void 0 : fireModeData.defense) {
-                if (fireModeData.defense === 'SR5.DuckOrCover') {
-                    return game.i18n.localize('SR5.DuckOrCover');
+                if (fireModeData.defense !== 'SR5.DuckOrCover') {
+                    const fireMode = +fireModeData.defense;
+                    if (fireMode)
+                        parts['SR5.FireMode'] = fireMode;
                 }
-                else {
-                    return ` (${fireModeData.defense})`;
+            }
+        }
+        return parts;
+    }
+    getOpposedTestModifier() {
+        const testMod = this.getOpposedTestMod();
+        const total = helpers_1.Helpers.totalMods(testMod);
+        if (total)
+            return `(${total})`;
+        else {
+            if (this.isRangedWeapon()) {
+                const fireModeData = this.getLastFireMode();
+                if (fireModeData === null || fireModeData === void 0 ? void 0 : fireModeData.defense) {
+                    if (fireModeData.defense === 'SR5.DuckOrCover') {
+                        return game.i18n.localize('SR5.DuckOrCover');
+                    }
                 }
             }
         }

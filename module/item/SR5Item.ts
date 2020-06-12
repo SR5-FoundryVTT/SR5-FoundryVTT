@@ -402,7 +402,7 @@ export class SR5Item extends Item {
         this.update(data);
     }
 
-    rollOpposedTest(target: SR5Actor, ev) {
+    async rollOpposedTest(target: SR5Actor, ev) {
         const itemData = this.data.data;
         const options = {
             event: ev,
@@ -419,15 +419,17 @@ export class SR5Item extends Item {
             }
         }
 
+        const parts = this.getOpposedTestMod();
+
         options['incomingAction'] = this.getFlag('shadowrun5e', 'action');
 
         const { opposed } = itemData.action;
-        if (opposed.type === 'defense') return target.rollDefense(options);
+        if (opposed.type === 'defense') return target.rollDefense(options, parts);
         else if (opposed.type === 'soak') return target.rollSoak(options);
         else if (opposed.type === 'armor') return target.rollSoak(options);
         else {
             if (opposed.skill && opposed.attribute) {
-                target.rollSkill(opposed.skill, {
+                return target.rollSkill(opposed.skill, {
                     ...options,
                     attribute: opposed.attribute,
                 });
@@ -444,7 +446,7 @@ export class SR5Item extends Item {
         if (dialog) return dialog.render(true);
     }
 
-    static getItemFromMessage(app, html): SR5Item | undefined {
+    static getItemFromMessage(html): SR5Item | undefined {
         const card = html.find('.chat-card');
         let actor;
         const tokenKey = card.data('tokenId');
@@ -474,32 +476,13 @@ export class SR5Item extends Item {
             const button = $(ev.currentTarget);
             const messageId = button.parents('.message').data('messageId');
             const senderId = game.messages.get(messageId).user._id;
-            const card = button.parents('.chat-card');
             const action = button.data('action');
 
             const opposedRoll = action === 'opposed-roll';
             if (!opposedRoll && !game.user.isGM && game.user._id !== senderId) return;
 
-            let actor;
-            const tokenKey = card.data('tokenId');
-            if (tokenKey) {
-                const [sceneId, tokenId] = tokenKey.split('.');
-                let token;
-                if (sceneId === canvas.scene._id) token = canvas.tokens.get(tokenId);
-                else {
-                    const scene: Scene = game.scenes.get(sceneId);
-                    if (!scene) return;
-                    // @ts-ignore
-                    const tokenData = scene.data.tokens.find((t) => t.id === Number(tokenId));
-                    if (tokenData) token = new Token(tokenData);
-                }
-                if (!token) return;
-                actor = Actor.fromToken(token);
-            } else actor = game.actors.get(card.data('actorId'));
-
-            if (!actor) return;
-            const itemId = card.data('itemId');
-            const item = actor.getOwnedItem(itemId);
+            const item = this.getItemFromMessage(html);
+            if (!item) return;
 
             if (action === 'roll') item.rollTest(ev);
             if (opposedRoll) {
@@ -795,15 +778,34 @@ export class SR5Item extends Item {
         return ammo?.data?.data?.blast?.radius > 0;
     }
 
-    getOpposedTestModifier(): string {
+    getOpposedTestMod(): ModList<number> {
+        const parts = {};
+        if (this.isGrenade() || (this.isCombatSpell() && this.hasTemplate)) {
+            parts['SR5.Aoe'] = -2;
+        }
         if (this.isRangedWeapon()) {
             const fireModeData = this.getLastFireMode();
-            console.log(fireModeData);
             if (fireModeData?.defense) {
-                if (fireModeData.defense === 'SR5.DuckOrCover') {
-                    return game.i18n.localize('SR5.DuckOrCover');
-                } else {
-                    return ` (${fireModeData.defense})`;
+                if (fireModeData.defense !== 'SR5.DuckOrCover') {
+                    const fireMode = +fireModeData.defense;
+                    if (fireMode) parts['SR5.FireMode'] = fireMode;
+                }
+            }
+        }
+        return parts;
+    }
+
+    getOpposedTestModifier(): string {
+        const testMod = this.getOpposedTestMod();
+        const total = Helpers.totalMods(testMod);
+        if (total) return `(${total})`;
+        else {
+            if (this.isRangedWeapon()) {
+                const fireModeData = this.getLastFireMode();
+                if (fireModeData?.defense) {
+                    if (fireModeData.defense === 'SR5.DuckOrCover') {
+                        return game.i18n.localize('SR5.DuckOrCover');
+                    }
                 }
             }
         }

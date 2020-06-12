@@ -1,15 +1,5 @@
 <form class="sr5 roll-dialog">
-    <div class="parts-list">
-        {{#if base}}
-        <div class="flex0" style="white-space: nowrap;">
-            <span>{{localize "SR5.Base"}}</span> (<span style="font-weight: bold;">{{base}}</span>)
-        </div>
-        {{/if}} {{#each parts as |part id|}}
-        <div class="part">
-            <span>{{localize id}}</span> (<span class="value">{{part}}</span>)
-        </div>
-        {{/each}}
-    </div>
+    {{> "systems/shadowrun5e/templates/rolls/parts/parts-list.html" }}
     <div class="form-group">
         <label style="font-weight: bold;">{{localize "SR5.DicePool"}}</label>
         <input style='flex: 1' type='text' name='dice_pool' size='3' maxlength='3'

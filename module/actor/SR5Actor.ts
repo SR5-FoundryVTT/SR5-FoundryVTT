@@ -16,6 +16,7 @@ import SkillRollOptions = Shadowrun.SkillRollOptions;
 import Matrix = Shadowrun.Matrix;
 import SkillField = Shadowrun.SkillField;
 import ValueMaxPair = Shadowrun.ValueMaxPair;
+import ModList = Shadowrun.ModList;
 
 export class SR5Actor extends Actor {
     async update(data, options?) {
@@ -395,6 +396,10 @@ export class SR5Actor extends Actor {
         }
     }
 
+    getModifier(modifierName: string): number | undefined {
+        return this.data.data.modifiers[modifierName];
+    }
+
     findActiveSkill(skillName?: string): SkillField | undefined {
         if (skillName === undefined) return undefined;
         return this.data.data.skills.active[skillName];
@@ -532,10 +537,10 @@ export class SR5Actor extends Actor {
         });
     }
 
-    rollDefense(options: DefenseRollOptions = {}) {
+    rollDefense(options: DefenseRollOptions = {}, parts: ModList<number> = {}) {
+        this._addDefenseParts(parts);
         let dialogData = {
-            defense: this.data.data.rolls.defense,
-            fireMode: options.fireModeDefense,
+            parts,
             cover: options.cover,
         };
         let template = 'systems/shadowrun5e/templates/rolls/roll-defense.html';
@@ -566,27 +571,13 @@ export class SR5Actor extends Actor {
                     default: 'normal',
                     close: async (html) => {
                         if (cancel) return;
-                        const rea = this.data.data.attributes.reaction;
-                        const int = this.data.data.attributes.intuition;
-
-                        const parts = {};
-                        parts[rea.label] = rea.value;
-                        parts[int.label] = int.value;
-                        if (this.data.data.modifiers.defense)
-                            parts['SR5.Bonus'] = this.data.data.modifiers.defense;
-
-                        let fireMode = Helpers.parseInputToNumber(
-                            $(html).find('[name=fireMode]').val()
-                        );
                         let cover = Helpers.parseInputToNumber($(html).find('[name=cover]').val());
-
                         if (special === 'full_defense')
                             parts['SR5.FullDefense'] = this.data.data.attributes.willpower.value;
                         if (special === 'dodge')
                             parts['SR5.Dodge'] = this.data.data.skills.active.gymnastics.value;
                         if (special === 'block')
                             parts['SR5.Block'] = this.data.data.skills.active.unarmed_combat.value;
-                        if (fireMode) parts['SR5.FireMode'] = fireMode;
                         if (cover) parts['SR5.Cover'] = cover;
 
                         resolve(
@@ -594,7 +585,7 @@ export class SR5Actor extends Actor {
                                 event: event,
                                 actor: this,
                                 parts,
-                                title: 'Defense',
+                                title: 'SR5.DefenseTest',
                                 incomingAttack,
                             }).then(async (roll: Roll | undefined) => {
                                 if (incomingAttack && roll) {
@@ -633,7 +624,7 @@ export class SR5Actor extends Actor {
         return new Promise((resolve) => {
             renderTemplate(template, dialogData).then((dlg) => {
                 new Dialog({
-                    title: 'Soak Test',
+                    title: 'SR5.DamageResistanceTest',
                     content: dlg,
                     buttons: {
                         base: {
@@ -1079,6 +1070,22 @@ export class SR5Actor extends Actor {
     _addGlobalParts(parts) {
         if (this.data.data.modifiers.global) {
             parts['SR5.Global'] = this.data.data.modifiers.global;
+        }
+    }
+
+    _addDefenseParts(parts) {
+        const reaction = this.findAttribute('reaction');
+        const intuition = this.findAttribute('intuition');
+        const mod = this.getModifier('defense');
+
+        if (reaction) {
+            parts[reaction.label || 'SR5.Reaction'] = reaction.value;
+        }
+        if (intuition) {
+            parts[intuition.label || 'SR5.Intuition'] = intuition.value;
+        }
+        if (mod) {
+            parts['SR5.Bonus'] = mod;
         }
     }
 

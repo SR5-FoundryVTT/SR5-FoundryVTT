@@ -34,7 +34,7 @@ export const addRollListeners = (app, html) => {
     if (!app.getFlag('shadowrun5e', 'customRoll')) return;
     html.on('click', '.opposed-test', (event) => {
         event.preventDefault();
-        const item = SR5Item.getItemFromMessage(app, html);
+        const item = SR5Item.getItemFromMessage(html);
         if (item) {
             const targets = SR5Item._getChatCardTargets();
             for (const t of targets) {
@@ -44,7 +44,7 @@ export const addRollListeners = (app, html) => {
     });
     html.on('click', '.place-template', (event) => {
         event.preventDefault();
-        const item = SR5Item.getItemFromMessage(app, html);
+        const item = SR5Item.getItemFromMessage(html);
         if (item) {
             const template = Template.fromItem(item);
             template?.drawPreview(event);
