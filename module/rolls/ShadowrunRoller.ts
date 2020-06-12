@@ -117,22 +117,24 @@ export class ShadowrunRoller {
         name = actor?.name,
         ...props
     }: BasicRollProps): Promise<Roll | undefined> {
-        const formula = this.shadowrunFormula({ parts, limit, explode: explodeSixes });
-        if (!formula) return;
-        let roll = new Roll(formula);
-        let rollMode = game.settings.get('core', 'rollMode');
-        roll.roll();
+        let roll;
+        const rollMode = game.settings.get('core', 'rollMode');
+        if (Object.keys(parts).length > 0) {
+            const formula = this.shadowrunFormula({ parts, limit, explode: explodeSixes });
+            if (!formula) return;
+            roll = new Roll(formula);
+            roll.roll();
 
-        if (game.settings.get('shadowrun5e', 'displayDefaultRollCard')) {
-            await roll.toMessage({
-                speaker: ChatMessage.getSpeaker({ actor: actor }),
-                flavor: title,
-                rollMode: rollMode,
-            });
+            if (game.settings.get('shadowrun5e', 'displayDefaultRollCard')) {
+                await roll.toMessage({
+                    speaker: ChatMessage.getSpeaker({ actor: actor }),
+                    flavor: title,
+                    rollMode: rollMode,
+                });
+            }
         }
-
         // start of custom message
-        const dice = roll.parts[0].rolls;
+        const dice = roll?.parts[0].rolls;
         const token = actor?.token;
         const templateData = {
             actor: actor,
@@ -146,7 +148,7 @@ export class ShadowrunRoller {
             testName: title,
             dicePool: Helpers.totalMods(parts),
             parts,
-            hits: roll.total,
+            hits: roll?.total,
             ...props,
         };
 
@@ -165,10 +167,10 @@ export class ShadowrunRoller {
                 alias: actor?.name,
             },
             flags: {
-                'shadowrun5e': {
-                    'customRoll': true
-                }
-            }
+                shadowrun5e: {
+                    customRoll: true,
+                },
+            },
         };
 
         if (['gmroll', 'blindroll'].includes(rollMode))

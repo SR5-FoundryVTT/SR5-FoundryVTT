@@ -281,6 +281,7 @@ export class SR5ActorSheet extends ActorSheet {
         html.find('.drain-roll').click(this._onRollDrain.bind(this));
         html.find('.fade-roll').click(this._onRollFade.bind(this));
         html.find('.item-roll').click(this._onRollItem.bind(this));
+        // $(html).find('.item-roll').on('contextmenu', () => console.log('TEST'));
         html.find('.item-equip-toggle').click(this._onEquipItem.bind(this));
         html.find('.item-qty').change(this._onChangeQty.bind(this));
         html.find('.item-rtg').change(this._onChangeRtg.bind(this));
@@ -468,7 +469,11 @@ export class SR5ActorSheet extends ActorSheet {
         event.preventDefault();
         const iid = event.currentTarget.closest('.item').dataset.itemId;
         const item = this.actor.getOwnedItem(iid);
-        if (item) return item.roll(event);
+        if (item) {
+            // if shiftKey, post just a card, otherwise roll
+            if (event.shiftKey) return item.postCard(event);
+            return item.rollTest(event);
+        }
     }
 
     async _onRollFade(event) {

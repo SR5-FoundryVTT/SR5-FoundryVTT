@@ -541,6 +541,8 @@ export class SR5Actor extends Actor {
         let template = 'systems/shadowrun5e/templates/rolls/roll-defense.html';
         let special = '';
         let cancel = true;
+        const incomingAttack = options.incomingAttack;
+        const event = options.event;
         return new Promise((resolve) => {
             renderTemplate(template, dialogData).then((dlg) => {
                 new Dialog({
@@ -589,26 +591,25 @@ export class SR5Actor extends Actor {
 
                         resolve(
                             ShadowrunRoller.advancedRoll({
-                                event: options.event,
+                                event: event,
                                 actor: this,
                                 parts,
                                 title: 'Defense',
-                                incomingAttack: options.incomingAttack,
+                                incomingAttack,
                             }).then(async (roll: Roll | undefined) => {
-                                if (options.incomingAttack && roll) {
+                                if (incomingAttack && roll) {
                                     let defenderHits = roll.total;
-                                    let attack = options.incomingAttack;
-                                    let attackerHits = attack.hits || 0;
+                                    let attackerHits = incomingAttack.hits || 0;
                                     let netHits = attackerHits - defenderHits;
 
                                     if (netHits >= 0) {
-                                        const damage = options.incomingAttack.damage;
+                                        const damage = incomingAttack.damage;
                                         damage.mod['SR5.NetHits'] = netHits;
                                         damage.value = damage.base + Helpers.totalMods(damage.mod);
 
                                         const soakRollOptions = {
-                                            event: options.event,
-                                            damage: options.incomingAttack.damage,
+                                            event: event,
+                                            damage: incomingAttack.damage,
                                         };
                                         await this.rollSoak(soakRollOptions);
                                     }

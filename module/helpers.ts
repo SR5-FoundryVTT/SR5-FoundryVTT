@@ -3,7 +3,7 @@ import SkillField = Shadowrun.SkillField;
 
 export class Helpers {
     static totalMods(mods) {
-        const reducer = (acc, cur) => acc + cur;
+        const reducer = (acc, cur) => +acc + +cur;
         if (!mods) return 0;
         if (Array.isArray(mods)) return mods.reduce(reducer, 0);
         // assume object of key/values
