@@ -4,10 +4,7 @@
  */
 export const migrateWorld = async function () {
     // @ts-ignore
-    ui.notifications.info(
-        `Applying Shadowrun 5e System Migration for version ${game.system.data.version}. Please be patient and do not close your game or shut down your server.`,
-        { permanent: true }
-    );
+    ui.notifications.info(`Applying Shadowrun 5e System Migration for version ${game.system.data.version}. Please be patient and do not close your game or shut down your server.`, { permanent: true });
 
     // Migrate World Items
     for (const i of game.items.entities) {
@@ -70,10 +67,7 @@ export const migrateWorld = async function () {
     // Set the migration as complete
     game.settings.set('shadowrun5e', 'systemMigrationVersion', game.system.data.version);
     // @ts-ignore
-    ui.notifications.info(
-        `Shadowrun5e System Migration to version ${game.system.data.version} completed!`,
-        { permanent: true }
-    );
+    ui.notifications.info(`Shadowrun5e System Migration to version ${game.system.data.version} completed!`, { permanent: true });
     console.log(`Shadowrun5e System Migration to version ${game.system.data.version} completed!`);
 };
 
