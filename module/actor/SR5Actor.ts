@@ -207,7 +207,7 @@ export class SR5Actor extends Actor {
         // TECHNOMANCER LIVING PERSONA
         if (data.special === 'resonance') {
             // if we don't have a device, use living persona
-            if (matrix.device === undefined) {
+            if (matrix.device === '') {
                 // we should use living persona
                 matrix.firewall.value += attributes.willpower.value;
                 matrix.data_processing.value += attributes.logic.value;
