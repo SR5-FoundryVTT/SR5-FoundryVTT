@@ -1,4 +1,5 @@
 import { SR5Actor } from './actor/SR5Actor';
+import { SR5Item } from './item/SR5Item';
 
 export const highlightSuccessFailure = (message, html) => {
     if (!message) return;
@@ -55,9 +56,19 @@ export const addChatMessageContextOptions = function (html, options) {
 export const addRollListeners = (app, html) => {
     console.log(app);
     if (!app.getFlag('shadowrun5e', 'customRoll')) return;
-    html.on('click', '.card-title', (ev) => {
-        ev.preventDefault();
-        $(ev.currentTarget).siblings('.card-description').toggle();
+    html.on('click', '.opposed-test', (event) => {
+        event.preventDefault();
+        const item = SR5Item.getItemFromMessage(app, html);
+        if (item) {
+            const targets = SR5Item._getChatCardTargets();
+            for (const t of targets) {
+                item.rollOpposedTest(t, event);
+            }
+        }
+    });
+    html.on('click', '.card-title', (event) => {
+        event.preventDefault();
+        $(event.currentTarget).siblings('.card-description').toggle();
     });
     $(html).find('.card-description').hide();
-}
+};

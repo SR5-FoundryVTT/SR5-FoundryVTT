@@ -707,30 +707,58 @@ export class SR5Item extends Item {
         if (lastAttack) {
             options['incomingAttack'] = lastAttack;
             options.cover = true;
-            options.fireModeDefense = Helpers.mapRoundsToDefenseMod(this.getLastFireMode());
+            if (lastAttack.fireMode?.defense) {
+                options.fireModeDefense = +lastAttack.fireMode.defense;
+            }
         }
 
         options['incomingAction'] = this.getFlag('shadowrun5e', 'action');
 
         const { opposed } = itemData.action;
-        if (opposed.type === 'defense') target.rollDefense(options);
-        else if (opposed.type === 'soak') target.rollSoak(options);
-        else if (opposed.type === 'armor') target.rollSoak(options);
+        if (opposed.type === 'defense') return target.rollDefense(options);
+        else if (opposed.type === 'soak') return target.rollSoak(options);
+        else if (opposed.type === 'armor') return target.rollSoak(options);
         else {
-            if (opposed.skill && opposed.attribute)
+            if (opposed.skill && opposed.attribute) {
                 target.rollSkill(opposed.skill, {
                     ...options,
                     attribute: opposed.attribute,
                 });
-            if (opposed.attribute && opposed.attribute2)
-                target.rollTwoAttributes([opposed.attribute, opposed.attribute2], options);
-            else if (opposed.attribute) target.rollSingleAttribute(opposed.attribute, options);
+            } else if (opposed.attribute && opposed.attribute2) {
+                return target.rollTwoAttributes([opposed.attribute, opposed.attribute2], options);
+            } else if (opposed.attribute) {
+                return target.rollSingleAttribute(opposed.attribute, options);
+            }
         }
     }
 
     async rollTest(event) {
         const dialog = await ShadowrunRollDialog.fromItemRoll(this, event);
         if (dialog) return dialog.render(true);
+    }
+
+    static getItemFromMessage(app, html): SR5Item | undefined {
+        const card = html.find('.chat-card');
+        let actor;
+        const tokenKey = card.data('tokenId');
+        if (tokenKey) {
+            const [sceneId, tokenId] = tokenKey.split('.');
+            let token;
+            if (sceneId === canvas.scene._id) token = canvas.tokens.get(tokenId);
+            else {
+                const scene: Scene = game.scenes.get(sceneId);
+                if (!scene) return;
+                // @ts-ignore
+                const tokenData = scene.data.tokens.find((t) => t.id === Number(tokenId));
+                if (tokenData) token = new Token(tokenData);
+            }
+            if (!token) return;
+            actor = Actor.fromToken(token);
+        } else actor = game.actors.get(card.data('actorId'));
+
+        if (!actor) return;
+        const itemId = card.data('itemId');
+        return actor.getOwnedItem(itemId);
     }
 
     static chatListeners(html) {
@@ -944,8 +972,10 @@ export class SR5Item extends Item {
         if (this.isCombatSpell()) {
             const force = this.getLastSpellForce().value;
             data.force = force;
-            data.damage.value = force;
-            data.damage.ap.value = -force;
+            data.damage.base = force;
+            data.damage.value = force + Helpers.totalMods(data.damage.mod);
+            data.damage.ap.value = -force + Helpers.totalMods(data.damage.mod);
+            data.damage.ap.base = -force;
         }
 
         if (this.isComplexForm()) {
@@ -985,7 +1015,7 @@ export class SR5Item extends Item {
             return 'SR5.RangedWeaponAttack';
         }
         if (this.isMeleeWeapon()) {
-            return 'SR5.MeleeWeaponAttack'
+            return 'SR5.MeleeWeaponAttack';
         }
         if (this.isCombatSpell()) {
             return 'SR5.SpellAttack';

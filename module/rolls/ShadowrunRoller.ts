@@ -6,6 +6,7 @@ import BaseValuePair = Shadowrun.BaseValuePair;
 import LabelField = Shadowrun.LabelField;
 import { SR5Item } from '../item/SR5Item';
 import AttackData = Shadowrun.AttackData;
+import DamageData = Shadowrun.DamageData;
 
 interface BasicRollProps {
     name?: string;
@@ -15,7 +16,10 @@ interface BasicRollProps {
     explodeSixes?: boolean;
     title?: string;
     actor?: SR5Actor;
+    item?: SR5Item;
     attack?: AttackData;
+    incomingAttack?: AttackData;
+    soak?: DamageData;
     opposedTest?: {
         label: string;
         roll: (target: Actor, event) => void;
@@ -54,6 +58,7 @@ export class ShadowrunRoller {
             },
             parts,
             actor: item.actor,
+            item,
             limit,
             title,
             name: item.name,

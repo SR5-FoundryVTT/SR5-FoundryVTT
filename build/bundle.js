@@ -530,6 +530,7 @@ class SR5Actor extends Actor {
                             actor: this,
                             parts,
                             title: 'Defense',
+                            incomingAttack: options.incomingAttack,
                         }).then((roll) => __awaiter(this, void 0, void 0, function* () {
                             if (options.incomingAttack && roll) {
                                 let defenderHits = roll.total;
@@ -537,11 +538,11 @@ class SR5Actor extends Actor {
                                 let attackerHits = attack.hits || 0;
                                 let netHits = attackerHits - defenderHits;
                                 if (netHits >= 0) {
+                                    const damage = options.incomingAttack.damage;
+                                    damage.mod['SR5.NetHits'] = netHits;
+                                    damage.value = damage.base + helpers_1.Helpers.totalMods(damage.mod);
                                     const soakRollOptions = {
                                         event: options.event,
-                                        attackerHits,
-                                        defenderHits,
-                                        netHits,
                                         damage: options.incomingAttack.damage,
                                     };
                                     yield this.rollSoak(soakRollOptions);
@@ -554,11 +555,8 @@ class SR5Actor extends Actor {
         });
     }
     rollSoak(options) {
-        var _a, _b;
-        const totalDamage = (((_a = options === null || options === void 0 ? void 0 : options.damage) === null || _a === void 0 ? void 0 : _a.value) || 0) + ((options === null || options === void 0 ? void 0 : options.netHits) || 0);
         let dialogData = {
-            damage: totalDamage,
-            ap: (_b = options === null || options === void 0 ? void 0 : options.damage) === null || _b === void 0 ? void 0 : _b.ap,
+            damage: options === null || options === void 0 ? void 0 : options.damage,
             soak: this.data.data.rolls.soak.default,
         };
         let id = '';
@@ -641,11 +639,10 @@ class SR5Actor extends Actor {
                         }
                         const label = helpers_1.Helpers.label(id);
                         let title = `Soak - ${label}`;
-                        if (totalDamage)
-                            title += ` - Incoming Damage: ${totalDamage}`;
                         resolve(ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
                             event: options === null || options === void 0 ? void 0 : options.event,
                             actor: this,
+                            soak: options === null || options === void 0 ? void 0 : options.damage,
                             parts,
                             title: title,
                             wounds: false,
@@ -2494,6 +2491,10 @@ class ShadowrunRollDialog extends Dialog {
             ShadowrunRoller_1.ShadowrunRoller.itemRoll({ event: dialogData['event'], item }).then((roll) => __awaiter(this, void 0, void 0, function* () {
                 if (roll && item.data.type === 'weapon') {
                     yield item.useAmmo(1);
+                    const attackData = item.getAttackData(roll.total);
+                    if (attackData) {
+                        yield item.setLastAttack(attackData);
+                    }
                 }
             }));
             return undefined;
@@ -3012,6 +3013,7 @@ exports.measureDistance = function (p0, p1, { gridSpaces = true } = {}) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.addRollListeners = exports.addChatMessageContextOptions = exports.highlightSuccessFailure = void 0;
 const SR5Actor_1 = require("./actor/SR5Actor");
+const SR5Item_1 = require("./item/SR5Item");
 exports.highlightSuccessFailure = (message, html) => {
     if (!message)
         return;
@@ -3060,14 +3062,24 @@ exports.addRollListeners = (app, html) => {
     console.log(app);
     if (!app.getFlag('shadowrun5e', 'customRoll'))
         return;
-    html.on('click', '.card-title', (ev) => {
-        ev.preventDefault();
-        $(ev.currentTarget).siblings('.card-description').toggle();
+    html.on('click', '.opposed-test', (event) => {
+        event.preventDefault();
+        const item = SR5Item_1.SR5Item.getItemFromMessage(app, html);
+        if (item) {
+            const targets = SR5Item_1.SR5Item._getChatCardTargets();
+            for (const t of targets) {
+                item.rollOpposedTest(t, event);
+            }
+        }
+    });
+    html.on('click', '.card-title', (event) => {
+        event.preventDefault();
+        $(event.currentTarget).siblings('.card-description').toggle();
     });
     $(html).find('.card-description').hide();
 };
 
-},{"./actor/SR5Actor":1}],11:[function(require,module,exports){
+},{"./actor/SR5Actor":1,"./item/SR5Item":15}],11:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -4426,6 +4438,7 @@ class SR5Item extends Item {
         this.update(data);
     }
     rollOpposedTest(target, ev) {
+        var _a;
         const itemData = this.data.data;
         const options = {
             event: ev,
@@ -4436,23 +4449,28 @@ class SR5Item extends Item {
         if (lastAttack) {
             options['incomingAttack'] = lastAttack;
             options.cover = true;
-            options.fireModeDefense = helpers_1.Helpers.mapRoundsToDefenseMod(this.getLastFireMode());
+            if ((_a = lastAttack.fireMode) === null || _a === void 0 ? void 0 : _a.defense) {
+                options.fireModeDefense = +lastAttack.fireMode.defense;
+            }
         }
         options['incomingAction'] = this.getFlag('shadowrun5e', 'action');
         const { opposed } = itemData.action;
         if (opposed.type === 'defense')
-            target.rollDefense(options);
+            return target.rollDefense(options);
         else if (opposed.type === 'soak')
-            target.rollSoak(options);
+            return target.rollSoak(options);
         else if (opposed.type === 'armor')
-            target.rollSoak(options);
+            return target.rollSoak(options);
         else {
-            if (opposed.skill && opposed.attribute)
+            if (opposed.skill && opposed.attribute) {
                 target.rollSkill(opposed.skill, Object.assign(Object.assign({}, options), { attribute: opposed.attribute }));
-            if (opposed.attribute && opposed.attribute2)
-                target.rollTwoAttributes([opposed.attribute, opposed.attribute2], options);
-            else if (opposed.attribute)
-                target.rollSingleAttribute(opposed.attribute, options);
+            }
+            else if (opposed.attribute && opposed.attribute2) {
+                return target.rollTwoAttributes([opposed.attribute, opposed.attribute2], options);
+            }
+            else if (opposed.attribute) {
+                return target.rollSingleAttribute(opposed.attribute, options);
+            }
         }
     }
     rollTest(event) {
@@ -4461,6 +4479,35 @@ class SR5Item extends Item {
             if (dialog)
                 return dialog.render(true);
         });
+    }
+    static getItemFromMessage(app, html) {
+        const card = html.find('.chat-card');
+        let actor;
+        const tokenKey = card.data('tokenId');
+        if (tokenKey) {
+            const [sceneId, tokenId] = tokenKey.split('.');
+            let token;
+            if (sceneId === canvas.scene._id)
+                token = canvas.tokens.get(tokenId);
+            else {
+                const scene = game.scenes.get(sceneId);
+                if (!scene)
+                    return;
+                // @ts-ignore
+                const tokenData = scene.data.tokens.find((t) => t.id === Number(tokenId));
+                if (tokenData)
+                    token = new Token(tokenData);
+            }
+            if (!token)
+                return;
+            actor = Actor.fromToken(token);
+        }
+        else
+            actor = game.actors.get(card.data('actorId'));
+        if (!actor)
+            return;
+        const itemId = card.data('itemId');
+        return actor.getOwnedItem(itemId);
     }
     static chatListeners(html) {
         html.on('click', '.card-buttons button', (ev) => {
@@ -4675,8 +4722,10 @@ class SR5Item extends Item {
         if (this.isCombatSpell()) {
             const force = this.getLastSpellForce().value;
             data.force = force;
-            data.damage.value = force;
-            data.damage.ap.value = -force;
+            data.damage.base = force;
+            data.damage.value = force + helpers_1.Helpers.totalMods(data.damage.mod);
+            data.damage.ap.value = -force + helpers_1.Helpers.totalMods(data.damage.mod);
+            data.damage.ap.base = -force;
         }
         if (this.isComplexForm()) {
             data.level = this.getLastComplexFormLevel().value;
@@ -5674,6 +5723,7 @@ class ShadowrunRoller {
             },
             parts,
             actor: item.actor,
+            item,
             limit,
             title,
             name: item.name,

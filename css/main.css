@@ -324,9 +324,7 @@
   font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
 }
 .sr5.roll-card .card-title .header-name:hover {
-  text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
-  cursor: pointer;
-  color: #6495ed;
+  text-shadow: -1px -1px 0 #6495ed, 1px -1px 0 #6495ed, -1px 1px 0 #6495ed, 1px 1px 0 #6495ed;
 }
 .sr5.roll-card .test-line {
   margin-top: 0.25em;

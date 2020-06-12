@@ -593,6 +593,7 @@ export class SR5Actor extends Actor {
                                 actor: this,
                                 parts,
                                 title: 'Defense',
+                                incomingAttack: options.incomingAttack,
                             }).then(async (roll: Roll | undefined) => {
                                 if (options.incomingAttack && roll) {
                                     let defenderHits = roll.total;
@@ -601,11 +602,12 @@ export class SR5Actor extends Actor {
                                     let netHits = attackerHits - defenderHits;
 
                                     if (netHits >= 0) {
+                                        const damage = options.incomingAttack.damage;
+                                        damage.mod['SR5.NetHits'] = netHits;
+                                        damage.value = damage.base + Helpers.totalMods(damage.mod);
+
                                         const soakRollOptions = {
                                             event: options.event,
-                                            attackerHits,
-                                            defenderHits,
-                                            netHits,
                                             damage: options.incomingAttack.damage,
                                         };
                                         await this.rollSoak(soakRollOptions);
@@ -620,10 +622,8 @@ export class SR5Actor extends Actor {
     }
 
     rollSoak(options?: SoakRollOptions) {
-        const totalDamage = (options?.damage?.value || 0) + (options?.netHits || 0);
         let dialogData = {
-            damage: totalDamage,
-            ap: options?.damage?.ap,
+            damage: options?.damage,
             soak: this.data.data.rolls.soak.default,
         };
         let id = '';
@@ -711,11 +711,11 @@ export class SR5Actor extends Actor {
 
                         const label = Helpers.label(id);
                         let title = `Soak - ${label}`;
-                        if (totalDamage) title += ` - Incoming Damage: ${totalDamage}`;
                         resolve(
                             ShadowrunRoller.advancedRoll({
                                 event: options?.event,
                                 actor: this,
+                                soak: options?.damage,
                                 parts,
                                 title: title,
                                 wounds: false,
