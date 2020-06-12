@@ -17,6 +17,9 @@ import Matrix = Shadowrun.Matrix;
 import SkillField = Shadowrun.SkillField;
 import ValueMaxPair = Shadowrun.ValueMaxPair;
 import ModList = Shadowrun.ModList;
+import BaseValuePair = Shadowrun.BaseValuePair;
+import ModifiableValue = Shadowrun.ModifiableValue;
+import LabelField = Shadowrun.LabelField;
 
 export class SR5Actor extends Actor {
     async update(data, options?) {
@@ -99,7 +102,7 @@ export class SR5Actor extends Actor {
 
         let totalEssence = 6;
         armor.value = 0;
-        armor.mod = 0;
+        armor.mod = {};
         for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
             armor[element] = 0;
         }
@@ -122,9 +125,14 @@ export class SR5Actor extends Actor {
             const equipped = itemData.technology?.equipped;
             if (equipped) {
                 if (itemData.armor && itemData.armor.value) {
-                    if (itemData.armor.mod) armor.mod += itemData.armor.value;
                     // if it's a mod, add to the mod field
-                    else armor.value = itemData.armor.value; // if not a mod, set armor.value to the items value
+                    if (itemData.armor.mod) {
+                        armor.mod[item.name] = itemData.armor.value;
+                    } // if not a mod, set armor.value to the items value
+                    else {
+                        armor.base = itemData.armor.value;
+                        armor.label = item.name;
+                    }
                     for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
                         armor[element] = itemData.armor[element];
                     }
@@ -154,6 +162,9 @@ export class SR5Actor extends Actor {
                 }
             }
         }
+
+        // SET ARMOR
+        armor.value = armor.base + Helpers.totalMods(armor.mod) + modifiers['armor'];
 
         // ATTRIBUTES
         for (let [, att] of Object.entries(attributes)) {
@@ -275,9 +286,6 @@ export class SR5Actor extends Actor {
             mod: matrix.sleaze.mod,
             hidden: true,
         };
-
-        // SET ARMOR
-        armor.value += armor.mod + modifiers['armor'];
 
         // SET ESSENCE
         actorData.data.attributes.essence.value = +(totalEssence + modifiers['essence']).toFixed(3);
@@ -418,6 +426,10 @@ export class SR5Actor extends Actor {
         return this.data.data.attributes.edge;
     }
 
+    getArmor(): BaseValuePair<number> & ModifiableValue & LabelField {
+        return this.data.data.armor;
+    }
+
     getOwnedItem(itemId: string): SR5Item | null {
         return (super.getOwnedItem(itemId) as unknown) as SR5Item;
     }
@@ -524,10 +536,8 @@ export class SR5Actor extends Actor {
         });
     }
 
-    rollArmor(options: ActorRollOptions = {}) {
-        const armor = this.data.data.armor.value;
-        const parts = {};
-        parts['SR5.Armor'] = armor;
+    rollArmor(options: ActorRollOptions = {}, parts: ModList<number> = {}) {
+        this._addArmorParts(parts);
         return ShadowrunRoller.advancedRoll({
             event: options.event,
             actor: this,
@@ -585,7 +595,7 @@ export class SR5Actor extends Actor {
                                 event: event,
                                 actor: this,
                                 parts,
-                                title: 'SR5.DefenseTest',
+                                title: game.i18n.localize('SR5.DefenseTest'),
                                 incomingAttack,
                             }).then(async (roll: Roll | undefined) => {
                                 if (incomingAttack && roll) {
@@ -613,10 +623,11 @@ export class SR5Actor extends Actor {
         });
     }
 
-    rollSoak(options?: SoakRollOptions) {
+    rollSoak(options?: SoakRollOptions, parts: ModList<number> = {}) {
+        this._addSoakParts(parts);
         let dialogData = {
             damage: options?.damage,
-            soak: this.data.data.rolls.soak.default,
+            parts,
         };
         let id = '';
         let cancel = true;
@@ -679,16 +690,7 @@ export class SR5Actor extends Actor {
                     close: async (html) => {
                         if (cancel) return;
 
-                        const body = this.data.data.attributes.body;
-                        const armor = this.data.data.armor;
-
-                        const parts = {};
-
-                        parts[body.label] = body.value;
-                        parts['SR5.Armor'] = armor.value;
-                        if (this.data.data.modifiers.soak)
-                            parts['SR5.Bonus'] = this.data.data.modifiers.soak;
-
+                        const armor = this.getArmor();
                         const armorId = id === 'default' ? '' : id;
                         const bonusArmor = armor[armorId] || 0;
                         if (bonusArmor) parts[Helpers.label(armorId)] = bonusArmor;
@@ -701,8 +703,7 @@ export class SR5Actor extends Actor {
                             parts['SR5.AP'] = Math.max(ap, -armorVal);
                         }
 
-                        const label = Helpers.label(id);
-                        let title = `Soak - ${label}`;
+                        let title = game.i18n.localize('SR5.SoakTest');
                         resolve(
                             ShadowrunRoller.advancedRoll({
                                 event: options?.event,
@@ -1087,6 +1088,26 @@ export class SR5Actor extends Actor {
         if (mod) {
             parts['SR5.Bonus'] = mod;
         }
+    }
+
+    _addArmorParts(parts: ModList<number>) {
+        const armor = this.getArmor();
+        if (armor) {
+            parts[armor.label || 'SR5.Armor'] = armor.base;
+            for (let [key, val] of Object.entries(armor.mod)) {
+                parts[key] = val;
+            }
+        }
+
+    }
+
+
+    _addSoakParts(parts: ModList<number>) {
+        const body = this.findAttribute('body');
+        if (body) {
+            parts[body.label || 'SR5.Body'] = body.value;
+        }
+        this._addArmorParts(parts);
     }
 
     static async pushTheLimit(roll) {

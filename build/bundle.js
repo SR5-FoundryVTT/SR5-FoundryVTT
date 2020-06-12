@@ -94,7 +94,7 @@ class SR5Actor extends Actor {
         data.modifiers = modifiers;
         let totalEssence = 6;
         armor.value = 0;
-        armor.mod = 0;
+        armor.mod = {};
         for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
             armor[element] = 0;
         }
@@ -114,11 +114,14 @@ class SR5Actor extends Actor {
             const equipped = (_a = itemData.technology) === null || _a === void 0 ? void 0 : _a.equipped;
             if (equipped) {
                 if (itemData.armor && itemData.armor.value) {
-                    if (itemData.armor.mod)
-                        armor.mod += itemData.armor.value;
                     // if it's a mod, add to the mod field
-                    else
-                        armor.value = itemData.armor.value; // if not a mod, set armor.value to the items value
+                    if (itemData.armor.mod) {
+                        armor.mod[item.name] = itemData.armor.value;
+                    } // if not a mod, set armor.value to the items value
+                    else {
+                        armor.base = itemData.armor.value;
+                        armor.label = item.name;
+                    }
                     for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
                         armor[element] = itemData.armor[element];
                     }
@@ -148,6 +151,8 @@ class SR5Actor extends Actor {
                 }
             }
         }
+        // SET ARMOR
+        armor.value = armor.base + helpers_1.Helpers.totalMods(armor.mod) + modifiers['armor'];
         // ATTRIBUTES
         for (let [, att] of Object.entries(attributes)) {
             if (!att.hidden) {
@@ -264,8 +269,6 @@ class SR5Actor extends Actor {
             mod: matrix.sleaze.mod,
             hidden: true,
         };
-        // SET ARMOR
-        armor.value += armor.mod + modifiers['armor'];
         // SET ESSENCE
         actorData.data.attributes.essence.value = +(totalEssence + modifiers['essence']).toFixed(3);
         // SETUP LIMITS
@@ -377,6 +380,9 @@ class SR5Actor extends Actor {
     getEdge() {
         return this.data.data.attributes.edge;
     }
+    getArmor() {
+        return this.data.data.armor;
+    }
     getOwnedItem(itemId) {
         return super.getOwnedItem(itemId);
     }
@@ -466,10 +472,8 @@ class SR5Actor extends Actor {
             wounds: false,
         });
     }
-    rollArmor(options = {}) {
-        const armor = this.data.data.armor.value;
-        const parts = {};
-        parts['SR5.Armor'] = armor;
+    rollArmor(options = {}, parts = {}) {
+        this._addArmorParts(parts);
         return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
             event: options.event,
             actor: this,
@@ -524,7 +528,7 @@ class SR5Actor extends Actor {
                             event: event,
                             actor: this,
                             parts,
-                            title: 'SR5.DefenseTest',
+                            title: game.i18n.localize('SR5.DefenseTest'),
                             incomingAttack,
                         }).then((roll) => __awaiter(this, void 0, void 0, function* () {
                             if (incomingAttack && roll) {
@@ -548,10 +552,11 @@ class SR5Actor extends Actor {
             });
         });
     }
-    rollSoak(options) {
+    rollSoak(options, parts = {}) {
+        this._addSoakParts(parts);
         let dialogData = {
             damage: options === null || options === void 0 ? void 0 : options.damage,
-            soak: this.data.data.rolls.soak.default,
+            parts,
         };
         let id = '';
         let cancel = true;
@@ -614,13 +619,7 @@ class SR5Actor extends Actor {
                     close: (html) => __awaiter(this, void 0, void 0, function* () {
                         if (cancel)
                             return;
-                        const body = this.data.data.attributes.body;
-                        const armor = this.data.data.armor;
-                        const parts = {};
-                        parts[body.label] = body.value;
-                        parts['SR5.Armor'] = armor.value;
-                        if (this.data.data.modifiers.soak)
-                            parts['SR5.Bonus'] = this.data.data.modifiers.soak;
+                        const armor = this.getArmor();
                         const armorId = id === 'default' ? '' : id;
                         const bonusArmor = armor[armorId] || 0;
                         if (bonusArmor)
@@ -631,8 +630,7 @@ class SR5Actor extends Actor {
                             // don't take more AP than armor
                             parts['SR5.AP'] = Math.max(ap, -armorVal);
                         }
-                        const label = helpers_1.Helpers.label(id);
-                        let title = `Soak - ${label}`;
+                        let title = game.i18n.localize('SR5.SoakTest');
                         resolve(ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
                             event: options === null || options === void 0 ? void 0 : options.event,
                             actor: this,
@@ -990,6 +988,22 @@ class SR5Actor extends Actor {
         if (mod) {
             parts['SR5.Bonus'] = mod;
         }
+    }
+    _addArmorParts(parts) {
+        const armor = this.getArmor();
+        if (armor) {
+            parts[armor.label || 'SR5.Armor'] = armor.base;
+            for (let [key, val] of Object.entries(armor.mod)) {
+                parts[key] = val;
+            }
+        }
+    }
+    _addSoakParts(parts) {
+        const body = this.findAttribute('body');
+        if (body) {
+            parts[body.label || 'SR5.Body'] = body.value;
+        }
+        this._addArmorParts(parts);
     }
     static pushTheLimit(roll) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -4479,7 +4493,7 @@ class SR5Item extends Item {
             else if (opposed.type === 'soak')
                 return target.rollSoak(options);
             else if (opposed.type === 'armor')
-                return target.rollSoak(options);
+                return target.rollArmor(options);
             else {
                 if (opposed.skill && opposed.attribute) {
                     return target.rollSkill(opposed.skill, Object.assign(Object.assign({}, options), { attribute: opposed.attribute }));

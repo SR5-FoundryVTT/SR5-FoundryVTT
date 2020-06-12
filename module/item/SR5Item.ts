@@ -426,7 +426,7 @@ export class SR5Item extends Item {
         const { opposed } = itemData.action;
         if (opposed.type === 'defense') return target.rollDefense(options, parts);
         else if (opposed.type === 'soak') return target.rollSoak(options);
-        else if (opposed.type === 'armor') return target.rollSoak(options);
+        else if (opposed.type === 'armor') return target.rollArmor(options);
         else {
             if (opposed.skill && opposed.attribute) {
                 return target.rollSkill(opposed.skill, {
