@@ -63,19 +63,15 @@ export class SR5Item extends Item {
         });
         return ret;
     }
-    get hasOpposedRoll() {
+    get hasOpposedRoll(): boolean {
         return !!(this.data.data.action && this.data.data.action.opposed.type);
     }
 
-    get hasRoll() {
+    get hasRoll(): boolean {
         return !!(this.data.data.action && this.data.data.action.type !== '');
     }
-    get hasTemplate() {
-        return (
-            (this.data.type === 'spell' && this.data.data.range === 'los_a') ||
-            this.isGrenade() ||
-            this.hasExplosiveAmmo()
-        );
+    get hasTemplate(): boolean {
+        return this.isAreaOfEffect();
     }
 
     prepareData() {
@@ -626,8 +622,15 @@ export class SR5Item extends Item {
         return true;
     }
 
+    isAreaOfEffect(): boolean {
+        return (
+            this.isGrenade() ||
+            (this.isSpell() && this.data.data.range === 'los_a') ||
+            this.hasExplosiveAmmo()
+        );
+    }
+
     isGrenade(): boolean {
-        console.log(this.data.data.thrown);
         return this.data.type === 'weapon' && this.data.data.thrown?.blast?.radius;
     }
 
@@ -778,17 +781,23 @@ export class SR5Item extends Item {
         return ammo?.data?.data?.blast?.radius > 0;
     }
 
+    hasDefenseTest(): boolean {
+        return this.data.data.action?.opposed?.type === 'defense';
+    }
+
     getOpposedTestMod(): ModList<number> {
         const parts = {};
-        if (this.isGrenade() || (this.isCombatSpell() && this.hasTemplate)) {
-            parts['SR5.Aoe'] = -2;
-        }
-        if (this.isRangedWeapon()) {
-            const fireModeData = this.getLastFireMode();
-            if (fireModeData?.defense) {
-                if (fireModeData.defense !== 'SR5.DuckOrCover') {
-                    const fireMode = +fireModeData.defense;
-                    if (fireMode) parts['SR5.FireMode'] = fireMode;
+        if (this.hasDefenseTest()) {
+            if (this.isAreaOfEffect()) {
+                parts['SR5.Aoe'] = -2;
+            }
+            if (this.isRangedWeapon()) {
+                const fireModeData = this.getLastFireMode();
+                if (fireModeData?.defense) {
+                    if (fireModeData.defense !== 'SR5.DuckOrCover') {
+                        const fireMode = +fireModeData.defense;
+                        if (fireMode) parts['SR5.FireMode'] = fireMode;
+                    }
                 }
             }
         }
