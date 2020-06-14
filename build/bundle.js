@@ -2578,9 +2578,10 @@ class ShadowrunItemDialog extends Dialog {
         };
         dialogData.close = (html) => __awaiter(this, void 0, void 0, function* () {
             if (cancel)
-                return;
+                return false;
             const level = helpers_1.Helpers.parseInputToNumber($(html).find('[name=level]').val());
             yield item.setLastComplexFormLevel({ value: level });
+            return true;
         });
     }
     static addSpellData(templateData, dialogData, item) {
@@ -2610,9 +2611,10 @@ class ShadowrunItemDialog extends Dialog {
         dialogData.default = 'normal';
         dialogData.close = (html) => __awaiter(this, void 0, void 0, function* () {
             if (cancel)
-                return;
+                return false;
             const force = helpers_1.Helpers.parseInputToNumber($(html).find('[name=force]').val());
             yield item.setLastSpellForce({ value: force, reckless });
+            return true;
         });
     }
     static addRangedWeaponData(templateData, dialogData, item) {
@@ -2677,7 +2679,7 @@ class ShadowrunItemDialog extends Dialog {
         dialogData.buttons = buttons;
         dialogData.close = (html) => __awaiter(this, void 0, void 0, function* () {
             if (cancel)
-                return;
+                return false;
             const fireMode = helpers_1.Helpers.parseInputToNumber($(html).find('[name="fireMode"]').val());
             if (fireMode) {
                 const fireModeString = fireModes[fireMode];
@@ -2689,6 +2691,7 @@ class ShadowrunItemDialog extends Dialog {
                 };
                 yield item.setLastFireMode(fireModeData);
             }
+            return true;
         });
     }
 }
@@ -4343,8 +4346,12 @@ class SR5Item extends Item {
                 const oldClose = dialogData.close;
                 // call post() after dialog closes
                 dialogData.close = (html) => __awaiter(this, void 0, void 0, function* () {
-                    if (oldClose)
-                        yield oldClose(html);
+                    if (oldClose) {
+                        // the oldClose we put on the dialog will return a boolean
+                        const ret = yield oldClose(html);
+                        if (!ret)
+                            return;
+                    }
                     post();
                 });
                 return new Dialog(dialogData).render(true);

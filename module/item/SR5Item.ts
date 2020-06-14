@@ -233,7 +233,11 @@ export class SR5Item extends Item {
             const oldClose = dialogData.close;
             // call post() after dialog closes
             dialogData.close = async (html) => {
-                if (oldClose) await oldClose(html);
+                if (oldClose) {
+                    // the oldClose we put on the dialog will return a boolean
+                    const ret = await oldClose(html) as unknown as boolean;
+                    if (!ret) return;
+                }
                 post();
             };
             return new Dialog(dialogData).render(true);

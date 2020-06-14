@@ -61,9 +61,10 @@ export class ShadowrunItemDialog extends Dialog {
             },
         };
         dialogData.close = async (html) => {
-            if (cancel) return;
+            if (cancel) return false;
             const level = Helpers.parseInputToNumber($(html).find('[name=level]').val());
             await item.setLastComplexFormLevel({ value: level });
+            return true;
         };
     }
 
@@ -95,9 +96,10 @@ export class ShadowrunItemDialog extends Dialog {
         };
         dialogData.default = 'normal';
         dialogData.close = async (html) => {
-            if (cancel) return;
+            if (cancel) return false;
             const force = Helpers.parseInputToNumber($(html).find('[name=force]').val());
             await item.setLastSpellForce({ value: force, reckless });
+            return true;
         };
     }
 
@@ -168,7 +170,7 @@ export class ShadowrunItemDialog extends Dialog {
         dialogData.buttons = buttons;
 
         dialogData.close = async (html) => {
-            if (cancel) return;
+            if (cancel) return false;
             const fireMode = Helpers.parseInputToNumber($(html).find('[name="fireMode"]').val());
 
             if (fireMode) {
@@ -181,6 +183,7 @@ export class ShadowrunItemDialog extends Dialog {
                 };
                 await item.setLastFireMode(fireModeData);
             }
+            return true;
         };
     }
 }
