@@ -1,12 +1,12 @@
 import ModList = Shadowrun.ModList;
-import { Helpers } from '../helpers';
-import { SR5Actor } from '../actor/SR5Actor';
 import RollEvent = Shadowrun.RollEvent;
 import BaseValuePair = Shadowrun.BaseValuePair;
 import LabelField = Shadowrun.LabelField;
-import { SR5Item } from '../item/SR5Item';
 import AttackData = Shadowrun.AttackData;
 import DamageData = Shadowrun.DamageData;
+import { Helpers } from '../helpers';
+import { SR5Actor } from '../actor/SR5Actor';
+import { SR5Item } from '../item/SR5Item';
 import { createChatData, TemplateData } from '../chat';
 
 export interface BasicRollProps {
@@ -95,13 +95,7 @@ export class ShadowrunRoller {
         }
         rollData.description = item.getChatData();
 
-        const r = ShadowrunRoller.advancedRoll(rollData);
-        r.then(async (roll: ShadowrunRoll | undefined) => {
-            if (roll && item.data.type === 'weapon') {
-                await item.useAmmo(1);
-            }
-        });
-        return r;
+        return ShadowrunRoller.advancedRoll(rollData);
     }
 
     static shadowrunFormula({ parts, limit, explode }): string {

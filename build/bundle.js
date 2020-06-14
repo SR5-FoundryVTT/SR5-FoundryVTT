@@ -4557,12 +4557,14 @@ class SR5Item extends Item {
     rollTest(event, options) {
         return __awaiter(this, void 0, void 0, function* () {
             const promise = ShadowrunRoller_1.ShadowrunRoller.itemRoll({ event, item: this }, options);
+            // handle promise when it resolves for our own stuff
             promise.then((roll) => __awaiter(this, void 0, void 0, function* () {
                 var _a, _b;
+                // complex form handles fade
                 if (this.isComplexForm()) {
                     const totalFade = Math.max(this.getFade() + this.getLastComplexFormLevel().value, 2);
                     yield this.actor.rollFade({ event }, totalFade);
-                }
+                } // spells handle drain, force, and attack data
                 else if (this.isSpell()) {
                     if (this.isCombatSpell() && roll) {
                         const attackData = this.getAttackData(roll.total);
@@ -4573,23 +4575,15 @@ class SR5Item extends Item {
                     const forceData = this.getLastSpellForce();
                     const drain = Math.max(this.getDrain() + forceData.value + (forceData.reckless ? 3 : 0), 2);
                     yield ((_a = this.actor) === null || _a === void 0 ? void 0 : _a.rollDrain({ event }, drain));
-                }
-                else if (this.isRangedWeapon()) {
-                    const fireMode = (_b = this.getLastFireMode()) === null || _b === void 0 ? void 0 : _b.value;
-                    this.useAmmo(fireMode).then(() => __awaiter(this, void 0, void 0, function* () {
-                        const attackData = this.getAttackData((roll === null || roll === void 0 ? void 0 : roll.total) || 0);
-                        if (attackData) {
-                            yield this.setLastAttack(attackData);
-                        }
-                    }));
-                }
-                else if (roll && this.data.type === 'weapon') {
-                    const attackData = this.getAttackData(roll.total);
+                } // weapons handle ammo and attack data
+                else if (this.data.type === 'weapon') {
+                    const attackData = this.getAttackData((roll === null || roll === void 0 ? void 0 : roll.total) || 0);
                     if (attackData) {
                         yield this.setLastAttack(attackData);
                     }
                     if (this.hasAmmo) {
-                        yield this.useAmmo(1);
+                        const fireMode = ((_b = this.getLastFireMode()) === null || _b === void 0 ? void 0 : _b.value) || 1;
+                        yield this.useAmmo(fireMode);
                     }
                 }
             }));
@@ -5829,13 +5823,7 @@ class ShadowrunRoller {
             rollData['fireMode'] = (_a = item.getLastFireMode()) === null || _a === void 0 ? void 0 : _a.label;
         }
         rollData.description = item.getChatData();
-        const r = ShadowrunRoller.advancedRoll(rollData);
-        r.then((roll) => __awaiter(this, void 0, void 0, function* () {
-            if (roll && item.data.type === 'weapon') {
-                yield item.useAmmo(1);
-            }
-        }));
-        return r;
+        return ShadowrunRoller.advancedRoll(rollData);
     }
     static shadowrunFormula({ parts, limit, explode }) {
         const count = helpers_1.Helpers.totalMods(parts);

@@ -480,14 +480,18 @@ export class SR5Item extends Item {
         options?: Partial<AdvancedRollProps>
     ): Promise<ShadowrunRoll | undefined> {
         const promise = ShadowrunRoller.itemRoll({ event, item: this }, options);
+
+        // handle promise when it resolves for our own stuff
         promise.then(async (roll) => {
+            // complex form handles fade
             if (this.isComplexForm()) {
                 const totalFade = Math.max(
                     this.getFade() + this.getLastComplexFormLevel().value,
                     2
                 );
                 await this.actor.rollFade({ event }, totalFade);
-            } else if (this.isSpell()) {
+            } // spells handle drain, force, and attack data
+            else if (this.isSpell()) {
                 if (this.isCombatSpell() && roll) {
                     const attackData = this.getAttackData(roll.total);
                     if (attackData) {
@@ -500,21 +504,15 @@ export class SR5Item extends Item {
                     2
                 );
                 await this.actor?.rollDrain({ event }, drain);
-            } else if (this.isRangedWeapon()) {
-                const fireMode = this.getLastFireMode()?.value;
-                this.useAmmo(fireMode).then(async () => {
-                    const attackData = this.getAttackData(roll?.total || 0);
-                    if (attackData) {
-                        await this.setLastAttack(attackData);
-                    }
-                });
-            } else if (roll && this.data.type === 'weapon') {
-                const attackData = this.getAttackData(roll.total);
+            } // weapons handle ammo and attack data
+            else if (this.data.type === 'weapon') {
+                const attackData = this.getAttackData(roll?.total || 0);
                 if (attackData) {
                     await this.setLastAttack(attackData);
                 }
                 if (this.hasAmmo) {
-                    await this.useAmmo(1);
+                    const fireMode = this.getLastFireMode()?.value || 1;
+                    await this.useAmmo(fireMode);
                 }
             }
         });
