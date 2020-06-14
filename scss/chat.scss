@@ -129,11 +129,12 @@
             justify-content: space-between;
             .left-side {
                 display: flex;
-                flex-shrink: 0;
+                flex: 1;
                 flex-flow: column;
             }
             .right-side {
                 display: flex;
+                flex: 1;
                 flex-flow: column;
                 font-size: 12px;
                 text-align: right;
@@ -144,7 +145,6 @@
             }
             .key {
                 margin-right: 0.35em;
-                white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 max-width: 10em;
@@ -154,21 +154,27 @@
             }
             .value {
                 font-weight: bold;
+                align-self: flex-end;
             }
             .limit-line {
                 display: flex;
                 flex-flow: nowrap row;
                 justify-content: flex-start;
             }
+            .category-line {
+                font-style: italic;
+            }
             .damage-line {
                 display: flex;
                 flex-flow: nowrap row;
                 justify-content: flex-start;
+                align-items: flex-end;
+                text-align: left;
                 > :not(:first-child) {
-                    margin-left: 0.5em;
+                    margin-left: 0.1em;
                 }
                 > :not(:last-child) {
-                    margin-right: 0.5em;
+                    margin-right: 0.1em;
                 }
                 .icon {
                     font-style: italic;

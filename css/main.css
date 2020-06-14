@@ -423,11 +423,12 @@
 }
 .sr5.roll-card .card-content .left-side {
   display: flex;
-  flex-shrink: 0;
+  flex: 1;
   flex-flow: column;
 }
 .sr5.roll-card .card-content .right-side {
   display: flex;
+  flex: 1;
   flex-flow: column;
   font-size: 12px;
   text-align: right;
@@ -438,7 +439,6 @@
 }
 .sr5.roll-card .card-content .key {
   margin-right: 0.35em;
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 10em;
@@ -448,22 +448,28 @@
 }
 .sr5.roll-card .card-content .value {
   font-weight: bold;
+  align-self: flex-end;
 }
 .sr5.roll-card .card-content .limit-line {
   display: flex;
   flex-flow: nowrap row;
   justify-content: flex-start;
 }
+.sr5.roll-card .card-content .category-line {
+  font-style: italic;
+}
 .sr5.roll-card .card-content .damage-line {
   display: flex;
   flex-flow: nowrap row;
   justify-content: flex-start;
+  align-items: flex-end;
+  text-align: left;
 }
 .sr5.roll-card .card-content .damage-line > :not(:first-child) {
-  margin-left: 0.5em;
+  margin-left: 0.1em;
 }
 .sr5.roll-card .card-content .damage-line > :not(:last-child) {
-  margin-right: 0.5em;
+  margin-right: 0.1em;
 }
 .sr5.roll-card .card-content .damage-line .icon {
   font-style: italic;

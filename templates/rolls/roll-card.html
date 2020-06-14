@@ -66,27 +66,6 @@
                 </div>
                 {{/if}}
             </div>
-            {{/if}} {{#if soak}}
-            <div class="damage-line">
-                {{#if soak.value}}
-                <div>
-                    <span class="key">{{localize "SR5.Incoming"}} {{localize "SR5.Damage"}}: </span>
-                    <span class="value">{{soak.value}}{{damageAbbreviation soak.type.value}}</span>
-                </div>
-                {{/if}} {{#if soak.element.value}}
-                <div>
-                    <i
-                        class="{{elementIcon soak.element.value}} icon"
-                        title="{{localize soak.element.value}}"
-                    ></i>
-                </div>
-                {{/if}}
-            </div>
-            {{/if}} {{#if (isDefined incomingAttack.hits)}}
-            <div class="limit-line">
-                <span class="key">{{localize "SR5.AttackerHits"}}</span>
-                <span class="value">{{incomingAttack.hits}}</span>
-            </div>
             {{/if}} {{#if attack.force}}
             <div class="limit-line">
                 <span class="key">{{localize "SR5.Force"}}</span>
@@ -118,10 +97,37 @@
                 <span class="key">{{localize "SR5.Dropoff"}}: </span>
                 <span class="value">{{attack.blast.dropoff}}/m</span>
             </div>
+            {{/if}} {{#if soak}}
+            <div class="category-line">
+                {{localize "SR5.Incoming"}}
+            </div>
+            <div class="damage-line">
+                {{#if soak.value}}
+                <div>
+                    <span class="key">{{localize "SR5.Damage"}}: </span>
+                    <span class="value">{{soak.value}}{{damageAbbreviation soak.type.value}}</span>
+                </div>
+                {{/if}} {{#if soak.element.value}}
+                <div>
+                    <i
+                            class="{{elementIcon soak.element.value}} icon"
+                            title="{{localize soak.element.value}}"
+                    ></i>
+                </div>
+                {{/if}}
+            </div>
+            {{/if}} {{#if (isDefined incomingAttack.hits)}}
+            <div class="limit-line">
+                <span class="key">{{localize "SR5.AttackerHits"}}</span>
+                <span class="value">{{incomingAttack.hits}}</span>
+            </div>
             {{/if}} {{#if incomingDrain}}
+            <div class="category-line">
+                {{localize "SR5.Incoming"}}
+            </div>
             <div class="limit-line">
                 <span class="key"
-                    >{{localize "SR5.Incoming"}} {{localize incomingDrain.label}}:
+                    >{{localize incomingDrain.label}}:
                 </span>
                 <span class="value">{{incomingDrain.value}}</span>
             </div>
