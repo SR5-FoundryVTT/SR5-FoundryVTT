@@ -4587,7 +4587,7 @@ class SR5Item extends Item {
      */
     rollTest(event, options) {
         return __awaiter(this, void 0, void 0, function* () {
-            const promise = ShadowrunRoller_1.ShadowrunRoller.itemRoll({ event, item: this }, options);
+            const promise = ShadowrunRoller_1.ShadowrunRoller.itemRoll(event, this, options);
             // handle promise when it resolves for our own stuff
             promise.then((roll) => __awaiter(this, void 0, void 0, function* () {
                 var _a, _b;
@@ -5823,7 +5823,7 @@ class ShadowrunRoll extends Roll {
 }
 exports.ShadowrunRoll = ShadowrunRoll;
 class ShadowrunRoller {
-    static itemRoll({ event, item }, options) {
+    static itemRoll(event, item, options) {
         var _a;
         const parts = item.getRollPartsList();
         let limit = item.getLimit();
@@ -5971,6 +5971,7 @@ class ShadowrunRoller {
                         const extendedString = helpers_1.Helpers.parseInputToString($(html).find('[name="extended"]').val());
                         const extended = extendedString === 'true';
                         if (edge && actor) {
+                            props.explodeSixes = true;
                             parts['SR5.PushTheLimit'] = actor.getEdge().max;
                             yield actor.update({
                                 'data.attributes.edge.value': actor.data.data.attributes.edge.value - 1,

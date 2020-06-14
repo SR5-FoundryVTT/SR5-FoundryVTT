@@ -46,17 +46,16 @@ export interface AdvancedRollProps extends BasicRollProps {
     dialogOptions?: RollDialogOptions;
 }
 
-export interface ItemRollProps {
-    event: RollEvent;
-    item: SR5Item;
-}
-
 export class ShadowrunRoll extends Roll {
     templateData: TemplateData | undefined;
 }
 
 export class ShadowrunRoller {
-    static itemRoll({ event, item }: ItemRollProps, options?: Partial<AdvancedRollProps>): Promise<ShadowrunRoll | undefined> {
+    static itemRoll(
+        event,
+        item,
+        options?: Partial<AdvancedRollProps>
+    ): Promise<ShadowrunRoll | undefined> {
         const parts = item.getRollPartsList();
         let limit = item.getLimit();
         let title = item.getRollName();
@@ -254,6 +253,7 @@ export class ShadowrunRoller {
                         const extended = extendedString === 'true';
 
                         if (edge && actor) {
+                            props.explodeSixes = true;
                             parts['SR5.PushTheLimit'] = actor.getEdge().max;
                             await actor.update({
                                 'data.attributes.edge.value':

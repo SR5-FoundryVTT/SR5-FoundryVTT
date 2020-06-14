@@ -479,7 +479,7 @@ export class SR5Item extends Item {
         event,
         options?: Partial<AdvancedRollProps>
     ): Promise<ShadowrunRoll | undefined> {
-        const promise = ShadowrunRoller.itemRoll({ event, item: this }, options);
+        const promise = ShadowrunRoller.itemRoll(event, this, options);
 
         // handle promise when it resolves for our own stuff
         promise.then(async (roll) => {
