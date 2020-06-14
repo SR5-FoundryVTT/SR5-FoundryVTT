@@ -404,6 +404,7 @@
   "SR5.Force": "Force",
   "SR5.Roll": "Roll",
   "SR5.Aoe": "AoE",
+  "SR5.Level": "Level",
 
   "SETTINGS.DiagonalMovementName": "Diagonal Movement",
   "SETTINGS.DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
