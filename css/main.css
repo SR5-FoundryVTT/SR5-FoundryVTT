@@ -336,6 +336,9 @@
   margin: 0;
   font-weight: bold;
 }
+.sr5.chat-card .card-buttons {
+  border-top: 1px solid #4d4d4d;
+}
 .sr5.chat-card .card-buttons .button {
   box-shadow: 0 0 0.25em 0.15em #4d4d4d;
   cursor: pointer;
@@ -451,7 +454,6 @@
   display: flex;
   flex-flow: row wrap;
   justify-content: center;
-  border-bottom: 1px solid #4d4d4d;
 }
 .sr5.roll-card .dice-roll-content .dice-roll {
   background-image: url(/icons/svg/d6-grey.svg);

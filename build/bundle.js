@@ -442,15 +442,18 @@ class SR5Actor extends Actor {
         parts[res.label] = res.value;
         if (data.modifiers.fade)
             parts['SR5.Bonus'] = data.modifiers.fade;
-        let title = 'Fade';
-        if (incoming >= 0)
-            title += ` (${incoming} incoming)`;
+        let title = `${game.i18n.localize('SR5.Resist')} ${game.i18n.localize('SR5.Fade')}`;
+        const incomingDrain = {
+            label: 'SR5.Fade',
+            value: incoming,
+        };
         return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
             event: options.event,
             parts,
             actor: this,
             title: title,
             wounds: false,
+            incomingDrain,
         });
     }
     rollDrain(options = {}, incoming = -1) {
@@ -461,15 +464,18 @@ class SR5Actor extends Actor {
         parts[drainAtt.label] = drainAtt.value;
         if (this.data.data.modifiers.drain)
             parts['SR5.Bonus'] = this.data.data.modifiers.drain;
-        let title = 'Drain';
-        if (incoming >= 0)
-            title += ` (${incoming} incoming)`;
+        let title = `${game.i18n.localize('SR5.Resist')} ${game.i18n.localize('SR5.Drain')}`;
+        const incomingDrain = {
+            label: 'SR5.Drain',
+            value: incoming
+        };
         return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
             event: options.event,
             parts,
             actor: this,
             title: title,
             wounds: false,
+            incomingDrain,
         });
     }
     rollArmor(options = {}, parts = {}) {
@@ -3039,6 +3045,15 @@ exports.measureDistance = function (p0, p1, { gridSpaces = true } = {}) {
 
 },{}],10:[function(require,module,exports){
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.addRollListeners = exports.addChatMessageContextOptions = void 0;
 const SR5Actor_1 = require("./actor/SR5Actor");
@@ -3067,16 +3082,14 @@ exports.addChatMessageContextOptions = function (html, options) {
 exports.addRollListeners = (app, html) => {
     if (!app.getFlag('shadowrun5e', 'customRoll'))
         return;
-    html.on('click', '.opposed-test', (event) => {
+    html.on('click', '.test', (event) => __awaiter(void 0, void 0, void 0, function* () {
         event.preventDefault();
+        const type = event.currentTarget.dataset.action;
         const item = SR5Item_1.SR5Item.getItemFromMessage(html);
         if (item) {
-            const targets = SR5Item_1.SR5Item._getChatCardTargets();
-            for (const t of targets) {
-                item.rollOpposedTest(t, event);
-            }
+            yield item.rollExtraTest(type, event);
         }
-    });
+    }));
     html.on('click', '.place-template', (event) => {
         event.preventDefault();
         const item = SR5Item_1.SR5Item.getItemFromMessage(html);
@@ -4157,9 +4170,7 @@ class SR5Item extends Item {
         return !!(this.data.data.action && this.data.data.action.type !== '');
     }
     get hasTemplate() {
-        return ((this.data.type === 'spell' && this.data.data.range === 'los_a') ||
-            this.isGrenade() ||
-            this.hasExplosiveAmmo());
+        return this.isAreaOfEffect();
     }
     prepareData() {
         var _a;
@@ -4478,22 +4489,26 @@ class SR5Item extends Item {
                 cover: false,
             };
             const lastAttack = this.getLastAttack();
-            if (lastAttack) {
-                options['incomingAttack'] = lastAttack;
-                options.cover = true;
-                if ((_a = lastAttack.fireMode) === null || _a === void 0 ? void 0 : _a.defense) {
-                    options.fireModeDefense = +lastAttack.fireMode.defense;
-                }
-            }
             const parts = this.getOpposedTestMod();
-            options['incomingAction'] = this.getFlag('shadowrun5e', 'action');
             const { opposed } = itemData.action;
-            if (opposed.type === 'defense')
+            if (opposed.type === 'defense') {
+                if (lastAttack) {
+                    options['incomingAttack'] = lastAttack;
+                    options.cover = true;
+                    if ((_a = lastAttack.fireMode) === null || _a === void 0 ? void 0 : _a.defense) {
+                        options.fireModeDefense = +lastAttack.fireMode.defense;
+                    }
+                }
                 return target.rollDefense(options, parts);
-            else if (opposed.type === 'soak')
-                return target.rollSoak(options);
-            else if (opposed.type === 'armor')
+            }
+            else if (opposed.type === 'soak') {
+                options['damage'] = lastAttack === null || lastAttack === void 0 ? void 0 : lastAttack.damage;
+                options['attackerHits'] = lastAttack === null || lastAttack === void 0 ? void 0 : lastAttack.hits;
+                return target.rollSoak(options, parts);
+            }
+            else if (opposed.type === 'armor') {
                 return target.rollArmor(options);
+            }
             else {
                 if (opposed.skill && opposed.attribute) {
                     return target.rollSkill(opposed.skill, Object.assign(Object.assign({}, options), { attribute: opposed.attribute }));
@@ -4503,6 +4518,16 @@ class SR5Item extends Item {
                 }
                 else if (opposed.attribute) {
                     return target.rollSingleAttribute(opposed.attribute, options);
+                }
+            }
+        });
+    }
+    rollExtraTest(type, event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const targets = SR5Item.getTargets();
+            if (type === 'opposed') {
+                for (const t of targets) {
+                    yield this.rollOpposedTest(t, event);
                 }
             }
         });
@@ -4559,7 +4584,7 @@ class SR5Item extends Item {
             if (action === 'roll')
                 item.rollTest(ev);
             if (opposedRoll) {
-                const targets = this._getChatCardTargets();
+                const targets = this.getTargets();
                 for (const t of targets) {
                     item.rollOpposedTest(t, ev);
                 }
@@ -4578,7 +4603,7 @@ class SR5Item extends Item {
         });
         $(html).find('.card-description').hide();
     }
-    static _getChatCardTargets() {
+    static getTargets() {
         const { character } = game.user;
         const { controlled } = canvas.tokens;
         const targets = controlled.reduce((arr, t) => (t.actor ? arr.concat([t.actor]) : arr), []);
@@ -4700,9 +4725,13 @@ class SR5Item extends Item {
             return true;
         });
     }
+    isAreaOfEffect() {
+        return (this.isGrenade() ||
+            (this.isSpell() && this.data.data.range === 'los_a') ||
+            this.hasExplosiveAmmo());
+    }
     isGrenade() {
         var _a, _b;
-        console.log(this.data.data.thrown);
         return this.data.type === 'weapon' && ((_b = (_a = this.data.data.thrown) === null || _a === void 0 ? void 0 : _a.blast) === null || _b === void 0 ? void 0 : _b.radius);
     }
     isCombatSpell() {
@@ -4844,18 +4873,24 @@ class SR5Item extends Item {
         const ammo = this.getEquippedAmmo();
         return ((_c = (_b = (_a = ammo === null || ammo === void 0 ? void 0 : ammo.data) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.blast) === null || _c === void 0 ? void 0 : _c.radius) > 0;
     }
+    hasDefenseTest() {
+        var _a, _b;
+        return ((_b = (_a = this.data.data.action) === null || _a === void 0 ? void 0 : _a.opposed) === null || _b === void 0 ? void 0 : _b.type) === 'defense';
+    }
     getOpposedTestMod() {
         const parts = {};
-        if (this.isGrenade() || (this.isCombatSpell() && this.hasTemplate)) {
-            parts['SR5.Aoe'] = -2;
-        }
-        if (this.isRangedWeapon()) {
-            const fireModeData = this.getLastFireMode();
-            if (fireModeData === null || fireModeData === void 0 ? void 0 : fireModeData.defense) {
-                if (fireModeData.defense !== 'SR5.DuckOrCover') {
-                    const fireMode = +fireModeData.defense;
-                    if (fireMode)
-                        parts['SR5.FireMode'] = fireMode;
+        if (this.hasDefenseTest()) {
+            if (this.isAreaOfEffect()) {
+                parts['SR5.Aoe'] = -2;
+            }
+            if (this.isRangedWeapon()) {
+                const fireModeData = this.getLastFireMode();
+                if (fireModeData === null || fireModeData === void 0 ? void 0 : fireModeData.defense) {
+                    if (fireModeData.defense !== 'SR5.DuckOrCover') {
+                        const fireMode = +fireModeData.defense;
+                        if (fireMode)
+                            parts['SR5.FireMode'] = fireMode;
+                    }
                 }
             }
         }
@@ -5766,10 +5801,12 @@ class ShadowrunRoller {
         rollData['attack'] = item.getAttackData(0);
         rollData['blast'] = item.getBlastData();
         if (item.hasOpposedRoll) {
-            rollData['opposedTest'] = {
-                roll: (actor, event) => item.rollOpposedTest(actor, event),
-                label: item.getOpposedTestName(),
-            };
+            rollData['tests'] = [
+                {
+                    label: item.getOpposedTestName(),
+                    type: 'opposed',
+                },
+            ];
         }
         if (item.isMeleeWeapon()) {
             rollData['reach'] = item.getReach();

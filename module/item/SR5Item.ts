@@ -407,22 +407,27 @@ export class SR5Item extends Item {
         };
 
         const lastAttack = this.getLastAttack();
-        if (lastAttack) {
-            options['incomingAttack'] = lastAttack;
-            options.cover = true;
-            if (lastAttack.fireMode?.defense) {
-                options.fireModeDefense = +lastAttack.fireMode.defense;
-            }
-        }
-
         const parts = this.getOpposedTestMod();
-
-        options['incomingAction'] = this.getFlag('shadowrun5e', 'action');
-
         const { opposed } = itemData.action;
-        if (opposed.type === 'defense') return target.rollDefense(options, parts);
-        else if (opposed.type === 'soak') return target.rollSoak(options);
-        else if (opposed.type === 'armor') return target.rollArmor(options);
+
+        if (opposed.type === 'defense') {
+            if (lastAttack) {
+                options['incomingAttack'] = lastAttack;
+                options.cover = true;
+                if (lastAttack.fireMode?.defense) {
+                    options.fireModeDefense = +lastAttack.fireMode.defense;
+                }
+            }
+            return target.rollDefense(options, parts);
+        }
+        else if (opposed.type === 'soak') {
+            options['damage'] = lastAttack?.damage;
+            options['attackerHits'] = lastAttack?.hits;
+            return target.rollSoak(options, parts);
+        }
+        else if (opposed.type === 'armor') {
+            return target.rollArmor(options);
+        }
         else {
             if (opposed.skill && opposed.attribute) {
                 return target.rollSkill(opposed.skill, {
@@ -433,6 +438,15 @@ export class SR5Item extends Item {
                 return target.rollTwoAttributes([opposed.attribute, opposed.attribute2], options);
             } else if (opposed.attribute) {
                 return target.rollSingleAttribute(opposed.attribute, options);
+            }
+        }
+    }
+
+    async rollExtraTest(type: string, event) {
+        const targets = SR5Item.getTargets();
+        if (type === 'opposed') {
+            for (const t of targets) {
+                await this.rollOpposedTest(t, event);
             }
         }
     }
@@ -482,7 +496,7 @@ export class SR5Item extends Item {
 
             if (action === 'roll') item.rollTest(ev);
             if (opposedRoll) {
-                const targets = this._getChatCardTargets();
+                const targets = this.getTargets();
                 for (const t of targets) {
                     item.rollOpposedTest(t, ev);
                 }
@@ -502,7 +516,7 @@ export class SR5Item extends Item {
         $(html).find('.card-description').hide();
     }
 
-    static _getChatCardTargets() {
+    static getTargets() {
         const { character } = game.user;
         const { controlled } = canvas.tokens;
         const targets = controlled.reduce((arr, t) => (t.actor ? arr.concat([t.actor]) : arr), []);

@@ -32,14 +32,12 @@ export const addChatMessageContextOptions = function (html, options) {
 
 export const addRollListeners = (app, html) => {
     if (!app.getFlag('shadowrun5e', 'customRoll')) return;
-    html.on('click', '.opposed-test', (event) => {
+    html.on('click', '.test', async (event) => {
         event.preventDefault();
+        const type = event.currentTarget.dataset.action;
         const item = SR5Item.getItemFromMessage(html);
         if (item) {
-            const targets = SR5Item._getChatCardTargets();
-            for (const t of targets) {
-                item.rollOpposedTest(t, event);
-            }
+            await item.rollExtraTest(type, event);
         }
     });
     html.on('click', '.place-template', (event) => {

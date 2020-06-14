@@ -505,14 +505,18 @@ export class SR5Actor extends Actor {
         parts[res.label] = res.value;
         if (data.modifiers.fade) parts['SR5.Bonus'] = data.modifiers.fade;
 
-        let title = 'Fade';
-        if (incoming >= 0) title += ` (${incoming} incoming)`;
+        let title = `${game.i18n.localize('SR5.Resist')} ${game.i18n.localize('SR5.Fade')}`;
+        const incomingDrain = {
+            label: 'SR5.Fade',
+            value: incoming,
+        };
         return ShadowrunRoller.advancedRoll({
             event: options.event,
             parts,
             actor: this,
             title: title,
             wounds: false,
+            incomingDrain,
         });
     }
 
@@ -525,14 +529,18 @@ export class SR5Actor extends Actor {
         parts[drainAtt.label] = drainAtt.value;
         if (this.data.data.modifiers.drain) parts['SR5.Bonus'] = this.data.data.modifiers.drain;
 
-        let title = 'Drain';
-        if (incoming >= 0) title += ` (${incoming} incoming)`;
+        let title = `${game.i18n.localize('SR5.Resist')} ${game.i18n.localize('SR5.Drain')}`;
+        const incomingDrain = {
+            label: 'SR5.Drain',
+            value: incoming,
+        };
         return ShadowrunRoller.advancedRoll({
             event: options.event,
             parts,
             actor: this,
             title: title,
             wounds: false,
+            incomingDrain,
         });
     }
 
@@ -542,7 +550,7 @@ export class SR5Actor extends Actor {
             event: options.event,
             actor: this,
             parts,
-            title: 'Armor',
+            title: game.i18n.localize('SR5.Armor'),
             wounds: false,
         });
     }
@@ -561,7 +569,7 @@ export class SR5Actor extends Actor {
         return new Promise((resolve) => {
             renderTemplate(template, dialogData).then((dlg) => {
                 new Dialog({
-                    title: 'Defense',
+                    title: game.i18n.localize('SR5.Defense'),
                     content: dlg,
                     buttons: {
                         normal: {
@@ -1098,9 +1106,7 @@ export class SR5Actor extends Actor {
                 parts[key] = val;
             }
         }
-
     }
-
 
     _addSoakParts(parts: ModList<number>) {
         const body = this.findAttribute('body');

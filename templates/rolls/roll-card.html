@@ -83,14 +83,24 @@
                 <span class="key">{{localize "SR5.AttackerHits"}}</span>
                 <span class="value">{{incomingAttack.hits}}</span>
             </div>
-            {{/if}} {{#if attack.fireMode.value}}
+            {{/if}} {{#if attack.force}}
             <div class="limit-line">
-                <span class="key">{{attack.fireMode.label}}</span>
+                <span class="key">{{localize "SR5.Force"}}</span>
+                <span class="value">{{attack.force}}</span>
+            </div>
+            {{/if}} {{#if attack.level}}
+            <div class="limit-line">
+                <span class="key">{{localize "SR5.Level"}}</span>
+                <span class="value">{{attack.level}}</span>
             </div>
             {{/if}} {{#if attack.reach}}
             <div class="limit-line">
                 <span class="key">{{localize "SR5.Reach"}}</span>
                 <span class="value">{{attack.reach}}</span>
+            </div>
+            {{/if}} {{#if attack.fireMode.value}}
+            <div class="limit-line">
+                <span class="key">{{attack.fireMode.label}}</span>
             </div>
             {{/if}} {{#if attack.blast.radius}}
             <div class="limit-line">
@@ -103,6 +113,12 @@
             <div class="limit-line">
                 <span class="key">{{localize "SR5.Dropoff"}}: </span>
                 <span class="value">{{attack.blast.dropoff}}/m</span>
+            </div>
+            {{/if}}
+            {{#if incomingDrain}}
+            <div class="limit-line">
+                <span class="key">{{localize "SR5.Incoming"}} {{localize incomingDrain.label}}: </span>
+                <span class="value">{{incomingDrain.value}}</span>
             </div>
             {{/if}}
         </div>
@@ -127,11 +143,13 @@
         </div>
         {{/each}}
     </div>
-    {{#if opposedTest}}
+    {{#if tests}}
     <div class="card-buttons">
-        <div class="button opposed-test">
-            {{opposedTest.label}}
+        {{#each tests as |test index|}}
+        <div class="button test" data-action="{{test.type}}">
+            {{test.label}}
         </div>
+        {{/each}}
     </div>
     {{/if}}
 </div>

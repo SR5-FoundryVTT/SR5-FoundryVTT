@@ -37,6 +37,7 @@
         }
 
         .card-buttons {
+            border-top: $groove;
             .button {
                 box-shadow: 0 0 0.25em 0.15em $dark;
                 &:hover {
@@ -160,7 +161,6 @@
             display: flex;
             flex-flow: row wrap;
             justify-content: center;
-            border-bottom: $groove;
             .dice-roll {
                 background-image: url(/icons/svg/d6-grey.svg);
                 background-size: 24px 24px;

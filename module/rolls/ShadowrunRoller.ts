@@ -19,11 +19,14 @@ interface BasicRollProps {
     item?: SR5Item;
     attack?: AttackData;
     incomingAttack?: AttackData;
-    soak?: DamageData;
-    opposedTest?: {
-        label: string;
-        roll: (target: Actor, event) => void;
+    incomingDrain?: LabelField & {
+        value: number;
     };
+    soak?: DamageData;
+    tests?: {
+        label: string,
+        type: string
+    }[];
     description?: object;
     previewTemplate?: boolean;
 }
@@ -70,10 +73,12 @@ export class ShadowrunRoller {
         rollData['blast'] = item.getBlastData();
 
         if (item.hasOpposedRoll) {
-            rollData['opposedTest'] = {
-                roll: (actor: SR5Actor, event) => item.rollOpposedTest(actor, event),
-                label: item.getOpposedTestName(),
-            };
+            rollData['tests'] = [
+                {
+                    label: item.getOpposedTestName(),
+                    type: 'opposed',
+                },
+            ];
         }
         if (item.isMeleeWeapon()) {
             rollData['reach'] = item.getReach();
