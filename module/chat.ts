@@ -70,11 +70,7 @@ export const addChatMessageContextOptions = function (html, options) {
     const canRoll = (li) => {
         const msg = game.messages.get(li.data().messageId);
 
-        return !!(
-            li.find('.dice-roll').length &&
-            msg &&
-            (msg.user.id === game.user.id || game.user.isGM)
-        );
+        msg.getFlag('shadowrun5e', 'customRoll');
     };
 
     options.push(

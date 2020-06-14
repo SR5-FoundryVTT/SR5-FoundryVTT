@@ -1116,49 +1116,79 @@ export class SR5Actor extends Actor {
         this._addArmorParts(parts);
     }
 
-    static async pushTheLimit(roll) {
-        let title = roll.find('.flavor-text').text();
-        let msg: ChatMessage = game.messages.get(roll.data().messageId);
+    static async pushTheLimit(li) {
+        let msg: ChatMessage = game.messages.get(li.data().messageId);
 
-        const actor = (msg.user.character as unknown) as SR5Actor;
-        if (actor) {
-            return ShadowrunRoller.advancedRoll({
-                event: { shiftKey: true, altKey: true },
-                title: `${title} - Push the Limit`,
-                parts: {},
-                actor: actor,
-                wounds: false,
-            });
+        if (msg.getFlag('shadowrun5e', 'customRoll')) {
+            let actor = (msg.user.character as unknown) as SR5Actor;
+            if (!actor) {
+                // get controlled tokens
+                const tokens = canvas.tokens.controlled;
+                console.log(tokens);
+                if (tokens.length > 0) {
+                    for (let token of tokens) {
+                        if (token.actor.owner) {
+                            actor = token.actor;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (actor) {
+                const parts = {};
+                parts['SR5.PushTheLimit'] = actor.getEdge().max;
+                ShadowrunRoller.basicRoll({
+                    title: ` - ${game.i18n.localize('SR5.PushTheLimit')}`,
+                    parts: parts,
+                    actor: actor,
+                }).then(() => {
+                    actor.update({
+                        'data.attributes.edge.value': actor.getEdge().value - 1,
+                    });
+                });
+            }
         }
     }
 
-    static async secondChance(roll) {
-        let formula = roll.find('.dice-formula').text();
-        let hits = parseInt(roll.find('.dice-total').text());
-        let title = roll.find('.flavor-text').text();
+    static async secondChance(li) {
+        let msg: ChatMessage = game.messages.get(li.data().messageId);
+        // @ts-ignore
+        let roll: Roll = JSON.parse(msg.data?.roll);
+        let formula = roll.formula;
+        let hits = roll.total;
         let re = /(\d+)d6/;
+        console.log(formula);
         let matches = formula.match(re);
-        if (matches[1]) {
+        if (matches && matches[1]) {
             let match = matches[1];
             let pool = parseInt(match.replace('d6', ''));
             if (!isNaN(pool) && !isNaN(hits)) {
-                let msg: ChatMessage = game.messages.get(roll.data().messageId);
-                const actor = (msg.user.character as unknown) as SR5Actor;
-
+                let actor = (msg.user.character as unknown) as SR5Actor;
+                if (!actor) {
+                    // get controlled tokens
+                    const tokens = canvas.tokens.controlled;
+                    console.log(tokens);
+                    if (tokens.length > 0) {
+                        for (let token of tokens) {
+                            if (token.actor.owner) {
+                                actor = token.actor;
+                                break;
+                            }
+                        }
+                    }
+                }
                 if (actor) {
                     const parts = {};
                     parts['SR5.OriginalDicePool'] = pool;
                     parts['SR5.Successes'] = -hits;
 
-                    return ShadowrunRoller.advancedRoll({
-                        event: { shiftKey: true },
-                        title: `${title} - Second Chance`,
+                    return ShadowrunRoller.basicRoll({
+                        title: ` - Second Chance`,
                         parts,
-                        wounds: false,
                         actor: actor,
                     }).then(() => {
                         actor.update({
-                            'data.attributes.edge.value': actor.data.data.attributes.edge.value - 1,
+                            'data.attributes.edge.value': actor.getEdge().value - 1,
                         });
                     });
                 }

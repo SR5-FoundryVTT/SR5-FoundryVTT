@@ -467,7 +467,7 @@ class SR5Actor extends Actor {
         let title = `${game.i18n.localize('SR5.Resist')} ${game.i18n.localize('SR5.Drain')}`;
         const incomingDrain = {
             label: 'SR5.Drain',
-            value: incoming
+            value: incoming,
         };
         return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
             event: options.event,
@@ -1011,48 +1011,80 @@ class SR5Actor extends Actor {
         }
         this._addArmorParts(parts);
     }
-    static pushTheLimit(roll) {
+    static pushTheLimit(li) {
         return __awaiter(this, void 0, void 0, function* () {
-            let title = roll.find('.flavor-text').text();
-            let msg = game.messages.get(roll.data().messageId);
-            const actor = msg.user.character;
-            if (actor) {
-                return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
-                    event: { shiftKey: true, altKey: true },
-                    title: `${title} - Push the Limit`,
-                    parts: {},
-                    actor: actor,
-                    wounds: false,
-                });
+            let msg = game.messages.get(li.data().messageId);
+            if (msg.getFlag('shadowrun5e', 'customRoll')) {
+                let actor = msg.user.character;
+                if (!actor) {
+                    // get controlled tokens
+                    const tokens = canvas.tokens.controlled;
+                    console.log(tokens);
+                    if (tokens.length > 0) {
+                        for (let token of tokens) {
+                            if (token.actor.owner) {
+                                actor = token.actor;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (actor) {
+                    const parts = {};
+                    parts['SR5.PushTheLimit'] = actor.getEdge().max;
+                    ShadowrunRoller_1.ShadowrunRoller.basicRoll({
+                        title: ` - ${game.i18n.localize('SR5.PushTheLimit')}`,
+                        parts: parts,
+                        actor: actor,
+                    }).then(() => {
+                        actor.update({
+                            'data.attributes.edge.value': actor.getEdge().value - 1,
+                        });
+                    });
+                }
             }
         });
     }
-    static secondChance(roll) {
+    static secondChance(li) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            let formula = roll.find('.dice-formula').text();
-            let hits = parseInt(roll.find('.dice-total').text());
-            let title = roll.find('.flavor-text').text();
+            let msg = game.messages.get(li.data().messageId);
+            // @ts-ignore
+            let roll = JSON.parse((_a = msg.data) === null || _a === void 0 ? void 0 : _a.roll);
+            let formula = roll.formula;
+            let hits = roll.total;
             let re = /(\d+)d6/;
+            console.log(formula);
             let matches = formula.match(re);
-            if (matches[1]) {
+            if (matches && matches[1]) {
                 let match = matches[1];
                 let pool = parseInt(match.replace('d6', ''));
                 if (!isNaN(pool) && !isNaN(hits)) {
-                    let msg = game.messages.get(roll.data().messageId);
-                    const actor = msg.user.character;
+                    let actor = msg.user.character;
+                    if (!actor) {
+                        // get controlled tokens
+                        const tokens = canvas.tokens.controlled;
+                        console.log(tokens);
+                        if (tokens.length > 0) {
+                            for (let token of tokens) {
+                                if (token.actor.owner) {
+                                    actor = token.actor;
+                                    break;
+                                }
+                            }
+                        }
+                    }
                     if (actor) {
                         const parts = {};
                         parts['SR5.OriginalDicePool'] = pool;
                         parts['SR5.Successes'] = -hits;
-                        return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
-                            event: { shiftKey: true },
-                            title: `${title} - Second Chance`,
+                        return ShadowrunRoller_1.ShadowrunRoller.basicRoll({
+                            title: ` - Second Chance`,
                             parts,
-                            wounds: false,
                             actor: actor,
                         }).then(() => {
                             actor.update({
-                                'data.attributes.edge.value': actor.data.data.attributes.edge.value - 1,
+                                'data.attributes.edge.value': actor.getEdge().value - 1,
                             });
                         });
                     }
@@ -3049,9 +3081,7 @@ exports.createChatData = (templateData, roll) => __awaiter(void 0, void 0, void 
 exports.addChatMessageContextOptions = function (html, options) {
     const canRoll = (li) => {
         const msg = game.messages.get(li.data().messageId);
-        return !!(li.find('.dice-roll').length &&
-            msg &&
-            (msg.user.id === game.user.id || game.user.isGM));
+        msg.getFlag('shadowrun5e', 'customRoll');
     };
     options.push({
         name: 'Push the Limit',
