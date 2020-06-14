@@ -899,12 +899,16 @@ select.display > option {
   width: 100%;
 }
 .sr5 .inventory .item .item-desc .props {
+  display: flex;
+  flex-flow: wrap row;
   padding: 0.25em 0;
 }
 .sr5 .inventory .item .item-desc .props > * {
+  flex-shrink: 0;
   border-right: 1px solid #4d4d4d;
   border-bottom: 1px solid #4d4d4d;
   padding: 0.25em 0.5em;
+  margin: 0.1em 0.25em;
   box-shadow: 0.2em 0.2em 0.3em black;
 }
 .sr5 .inventory .item .item-desc .description {

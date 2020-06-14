@@ -382,11 +382,15 @@ select.display {
                 font-size: 1em;
                 width: 100%;
                 .props {
+                    display: flex;
+                    flex-flow: wrap row;
                     padding: 0.25em 0;
                     > * {
+                        flex-shrink: 0;
                         border-right: $groove;
                         border-bottom: $groove;
                         padding: 0.25em 0.5em;
+                        margin: .1em .25em;
                         box-shadow: .2em .2em .3em $black;
                     }
                 }
