@@ -1507,13 +1507,13 @@ class SR5ActorSheet extends ActorSheet {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
             let track = event.currentTarget.closest('.attribute').dataset.track;
-            this.actor.rollNaturalRecovery(track, event);
+            yield this.actor.rollNaturalRecovery(track, event);
         });
     }
     _onRollPrompt(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
-            this.actor.promptRoll({ event: event });
+            yield this.actor.promptRoll({ event: event });
         });
     }
     _onRollItem(event) {
@@ -1522,10 +1522,7 @@ class SR5ActorSheet extends ActorSheet {
             const iid = event.currentTarget.closest('.item').dataset.itemId;
             const item = this.actor.getOwnedItem(iid);
             if (item) {
-                // if shiftKey, post just a card, otherwise roll
-                if (event.shiftKey || !item.hasRoll)
-                    return item.postCard();
-                return item.rollTestOld(event);
+                yield item.postCard(event);
             }
         });
     }
@@ -2491,7 +2488,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ShadowrunRollDialog = void 0;
 const helpers_1 = require("../../helpers");
-const ShadowrunRoller_1 = require("../../rolls/ShadowrunRoller");
+const template_1 = require("../../template");
 class ShadowrunRollDialog extends Dialog {
     static fromItemRoll(item, event) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -2517,21 +2514,10 @@ class ShadowrunRollDialog extends Dialog {
             }
             if (templatePath) {
                 const dialog = yield renderTemplate(templatePath, templateData);
-                return new ShadowrunRollDialog(mergeObject(dialogData, {
+                return mergeObject(dialogData, {
                     content: dialog,
-                }));
+                });
             }
-            ShadowrunRoller_1.ShadowrunRoller.itemRoll({ event: dialogData['event'], item }).then((roll) => __awaiter(this, void 0, void 0, function* () {
-                if (roll && item.data.type === 'weapon') {
-                    const attackData = item.getAttackData(roll.total);
-                    if (attackData) {
-                        yield item.setLastAttack(attackData);
-                    }
-                    if (item.hasAmmo) {
-                        yield item.useAmmo(1);
-                    }
-                }
-            }));
             return undefined;
         });
     }
@@ -2544,10 +2530,12 @@ class ShadowrunRollDialog extends Dialog {
     }
      */
     static addComplexFormData(templateData, dialogData, item) {
+        var _a;
         const fade = item.getFade();
         const title = `${helpers_1.Helpers.label(item.name)} Level`;
+        const level = ((_a = item.getLastComplexFormLevel()) === null || _a === void 0 ? void 0 : _a.value) || 2 - fade;
         templateData['fade'] = fade >= 0 ? `+${fade}` : fade;
-        templateData['level'] = 2 - fade;
+        templateData['level'] = level;
         templateData['title'] = title;
         let cancel = true;
         dialogData.buttons = {
@@ -2562,20 +2550,15 @@ class ShadowrunRollDialog extends Dialog {
                 return;
             const level = helpers_1.Helpers.parseInputToNumber($(html).find('[name=level]').val());
             yield item.setLastComplexFormLevel({ value: level });
-            ShadowrunRoller_1.ShadowrunRoller.itemRoll({
-                event: dialogData['event'],
-                item,
-            }).then((roll) => __awaiter(this, void 0, void 0, function* () {
-                const totalFade = Math.max(item.getFade() + level, 2);
-                item.actor.rollFade({ event: dialogData['event'] }, totalFade);
-            }));
         });
     }
     static addSpellData(templateData, dialogData, item) {
+        var _a;
         const title = `${helpers_1.Helpers.label(item.name)} Force`;
         const drain = item.getDrain();
+        const force = ((_a = item.getLastSpellForce()) === null || _a === void 0 ? void 0 : _a.value) || 2 - drain;
         templateData['drain'] = drain >= 0 ? `+${drain}` : `${drain}`;
-        templateData['force'] = 2 - drain;
+        templateData['force'] = force;
         templateData['title'] = title;
         dialogData.title = title;
         let cancel = true;
@@ -2595,22 +2578,16 @@ class ShadowrunRollDialog extends Dialog {
         };
         dialogData.default = 'normal';
         dialogData.close = (html) => __awaiter(this, void 0, void 0, function* () {
+            if (cancel)
+                return;
             const force = helpers_1.Helpers.parseInputToNumber($(html).find('[name=force]').val());
-            yield item.setLastSpellForce({ value: force });
-            ShadowrunRoller_1.ShadowrunRoller.itemRoll({
-                event: dialogData['event'],
-                item,
-            }).then((roll) => __awaiter(this, void 0, void 0, function* () {
-                var _a;
-                if (item.data.data.category === 'combat' && roll) {
-                    const attackData = item.getAttackData(roll.total);
-                    if (attackData) {
-                        yield item.setLastAttack(attackData);
-                    }
+            yield item.setLastSpellForce({ value: force, reckless });
+            if (item.hasTemplate) {
+                const template = template_1.default.fromItem(item);
+                if (template) {
+                    template.drawPreview();
                 }
-                const drain = Math.max(item.getDrain() + force + (reckless ? 3 : 0), 2);
-                (_a = item.actor) === null || _a === void 0 ? void 0 : _a.rollDrain({ event: dialogData['event'] }, drain);
-            }));
+            }
         });
     }
     static addRangedWeaponData(templateData, dialogData, item) {
@@ -2679,7 +2656,6 @@ class ShadowrunRollDialog extends Dialog {
             if (fireMode) {
                 const fireModeString = fireModes[fireMode];
                 const defenseModifier = helpers_1.Helpers.mapRoundsToDefenseDesc(fireMode);
-                console.log(fireModeString);
                 const fireModeData = {
                     label: fireModeString,
                     value: fireMode,
@@ -2687,25 +2663,18 @@ class ShadowrunRollDialog extends Dialog {
                 };
                 yield item.setLastFireMode(fireModeData);
             }
-            ShadowrunRoller_1.ShadowrunRoller.itemRoll({
-                event: dialogData['event'],
-                item,
-            }).then((roll) => {
-                if (roll) {
-                    item.useAmmo(fireMode).then(() => __awaiter(this, void 0, void 0, function* () {
-                        const attackData = item.getAttackData(roll.total);
-                        if (attackData) {
-                            yield item.setLastAttack(attackData);
-                        }
-                    }));
+            if (item.hasTemplate) {
+                const template = template_1.default.fromItem(item);
+                if (template) {
+                    template.drawPreview();
                 }
-            });
+            }
         });
     }
 }
 exports.ShadowrunRollDialog = ShadowrunRollDialog;
 
-},{"../../helpers":14,"../../rolls/ShadowrunRoller":21}],5:[function(require,module,exports){
+},{"../../helpers":14,"../../template":23}],5:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -3059,7 +3028,6 @@ exports.addRollListeners = exports.addChatMessageContextOptions = void 0;
 const SR5Actor_1 = require("./actor/SR5Actor");
 const SR5Item_1 = require("./item/SR5Item");
 const template_1 = require("./template");
-const ShadowrunRoller_1 = require("./rolls/ShadowrunRoller");
 exports.addChatMessageContextOptions = function (html, options) {
     const canRoll = (li) => {
         const msg = game.messages.get(li.data().messageId);
@@ -3087,7 +3055,7 @@ exports.addRollListeners = (app, html) => {
         event.preventDefault();
         const item = SR5Item_1.SR5Item.getItemFromMessage(html);
         if (item) {
-            const roll = yield ShadowrunRoller_1.ShadowrunRoller.itemRoll({ item, event }, { hideRollMessage: true });
+            const roll = yield item.rollTest(event, { hideRollMessage: true });
             if (roll && roll.templateData) {
                 const template = `systems/shadowrun5e/templates/rolls/roll-card.html`;
                 const html = yield renderTemplate(template, roll.templateData);
@@ -3112,7 +3080,6 @@ exports.addRollListeners = (app, html) => {
             const template = template_1.default.fromItem(item);
             template === null || template === void 0 ? void 0 : template.drawPreview(event);
         }
-        console.log(event);
     });
     html.on('click', '.card-title', (event) => {
         event.preventDefault();
@@ -3121,7 +3088,7 @@ exports.addRollListeners = (app, html) => {
     $(html).find('.card-description').hide();
 };
 
-},{"./actor/SR5Actor":1,"./item/SR5Item":16,"./rolls/ShadowrunRoller":21,"./template":23}],11:[function(require,module,exports){
+},{"./actor/SR5Actor":1,"./item/SR5Item":16,"./template":23}],11:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -4119,7 +4086,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5Item = void 0;
 const helpers_1 = require("../helpers");
 const ShadowrunRollDialog_1 = require("../apps/dialogs/ShadowrunRollDialog");
-const template_1 = require("../template");
 const ChatData_1 = require("./ChatData");
 const ShadowrunRollCard_1 = require("../rolls/ShadowrunRollCard");
 const ShadowrunRoller_1 = require("../rolls/ShadowrunRoller");
@@ -4288,24 +4254,35 @@ class SR5Item extends Item {
         this.labels = labels;
         item['properties'] = this.getChatData().properties;
     }
-    postCard() {
+    postCard(event) {
         return __awaiter(this, void 0, void 0, function* () {
             // we won't work if we don't have an actor
             if (!this.actor)
                 return;
-            const { token } = this.actor;
-            const chatData = yield ShadowrunRollCard_1.ShadowrunRollChatData({
-                header: {
-                    name: this.name,
-                    img: this.img,
-                },
-                testName: this.getRollName(),
-                actor: this.actor,
-                tokenId: token ? `${token.scene._id}.${token.id}` : undefined,
-                description: this.getChatData(),
-                item: this,
-            });
-            return ChatMessage.create(chatData, { displaySheet: false });
+            const post = (bonus = {}) => {
+                const { token } = this.actor;
+                const attack = this.getAttackData(0);
+                attack === null || attack === void 0 ? true : delete attack.hits;
+                ShadowrunRollCard_1.ShadowrunRollChatData(Object.assign({ header: {
+                        name: this.name,
+                        img: this.img,
+                    }, testName: this.getRollName(), actor: this.actor, tokenId: token ? `${token.scene._id}.${token.id}` : undefined, description: this.getChatData(), item: this, previewTemplate: this.hasTemplate, attack }, bonus)).then((chatData) => {
+                    return ChatMessage.create(chatData, { displaySheet: false });
+                });
+            };
+            const dialogData = yield ShadowrunRollDialog_1.ShadowrunRollDialog.fromItemRoll(this, event);
+            if (dialogData) {
+                const oldClose = dialogData.close;
+                dialogData.close = (html) => __awaiter(this, void 0, void 0, function* () {
+                    if (oldClose)
+                        yield oldClose(html);
+                    post();
+                });
+                return new Dialog(dialogData).render(true);
+            }
+            else {
+                post();
+            }
         });
     }
     getChatData(htmlOptions) {
@@ -4534,16 +4511,51 @@ class SR5Item extends Item {
             }
         });
     }
-    rollTestOld(event) {
+    /**
+     * Rolls a test using the latest stored data on the item (force, fireMode, level)
+     * @param event - mouse event
+     * @param options - any additional roll options to pass along - note that currently the Item will overwrite -- WIP
+     */
+    rollTest(event, options) {
         return __awaiter(this, void 0, void 0, function* () {
-            const dialog = yield ShadowrunRollDialog_1.ShadowrunRollDialog.fromItemRoll(this, event);
-            if (dialog)
-                return dialog.render(true);
-        });
-    }
-    rollTest(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            return ShadowrunRoller_1.ShadowrunRoller.itemRoll({ event, item: this });
+            const promise = ShadowrunRoller_1.ShadowrunRoller.itemRoll({ event, item: this }, options);
+            promise.then((roll) => __awaiter(this, void 0, void 0, function* () {
+                var _a, _b;
+                if (this.isComplexForm()) {
+                    const totalFade = Math.max(this.getFade() + this.getLastComplexFormLevel().value, 2);
+                    yield this.actor.rollFade({ event }, totalFade);
+                }
+                else if (this.isSpell()) {
+                    if (this.isCombatSpell() && roll) {
+                        const attackData = this.getAttackData(roll.total);
+                        if (attackData) {
+                            yield this.setLastAttack(attackData);
+                        }
+                    }
+                    const forceData = this.getLastSpellForce();
+                    const drain = Math.max(this.getDrain() + forceData.value + (forceData.reckless ? 3 : 0), 2);
+                    yield ((_a = this.actor) === null || _a === void 0 ? void 0 : _a.rollDrain({ event }, drain));
+                }
+                else if (this.isRangedWeapon()) {
+                    const fireMode = (_b = this.getLastFireMode()) === null || _b === void 0 ? void 0 : _b.value;
+                    this.useAmmo(fireMode).then(() => __awaiter(this, void 0, void 0, function* () {
+                        const attackData = this.getAttackData((roll === null || roll === void 0 ? void 0 : roll.total) || 0);
+                        if (attackData) {
+                            yield this.setLastAttack(attackData);
+                        }
+                    }));
+                }
+                else if (roll && this.data.type === 'weapon') {
+                    const attackData = this.getAttackData(roll.total);
+                    if (attackData) {
+                        yield this.setLastAttack(attackData);
+                    }
+                    if (this.hasAmmo) {
+                        yield this.useAmmo(1);
+                    }
+                }
+            }));
+            return promise;
         });
     }
     static getItemFromMessage(html) {
@@ -4574,41 +4586,6 @@ class SR5Item extends Item {
             return;
         const itemId = card.data('itemId');
         return actor.getOwnedItem(itemId);
-    }
-    static chatListeners(html) {
-        html.on('click', '.card-buttons button', (ev) => {
-            ev.preventDefault();
-            const button = $(ev.currentTarget);
-            const messageId = button.parents('.message').data('messageId');
-            const senderId = game.messages.get(messageId).user._id;
-            const action = button.data('action');
-            const opposedRoll = action === 'opposed-roll';
-            if (!opposedRoll && !game.user.isGM && game.user._id !== senderId)
-                return;
-            const item = this.getItemFromMessage(html);
-            if (!item)
-                return;
-            if (action === 'roll')
-                item.rollTestOld(ev);
-            if (opposedRoll) {
-                const targets = this.getTargets();
-                for (const t of targets) {
-                    item.rollOpposedTest(t, ev);
-                }
-            }
-            if (action === 'place-template') {
-                const template = template_1.default.fromItem(item);
-                console.log(template);
-                if (template) {
-                    template.drawPreview();
-                }
-            }
-        });
-        html.on('click', '.card-header', (ev) => {
-            ev.preventDefault();
-            $(ev.currentTarget).siblings('.card-description').toggle();
-        });
-        $(html).find('.card-description').hide();
     }
     static getTargets() {
         const { character } = game.user;
@@ -4955,7 +4932,7 @@ class SR5Item extends Item {
 }
 exports.SR5Item = SR5Item;
 
-},{"../apps/dialogs/ShadowrunRollDialog":4,"../helpers":14,"../rolls/ShadowrunRollCard":20,"../rolls/ShadowrunRoller":21,"../template":23,"./ChatData":15}],17:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunRollDialog":4,"../helpers":14,"../rolls/ShadowrunRollCard":20,"../rolls/ShadowrunRoller":21,"./ChatData":15}],17:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -5333,8 +5310,6 @@ Hooks.on('ready', function () {
 });
 Hooks.on('preUpdateCombat', combat_1.preCombatUpdate);
 Hooks.on('renderChatMessage', (app, html) => {
-    if (!app.isRoll)
-        SR5Item_1.SR5Item.chatListeners(html);
     if (app.isRoll)
         chat.addRollListeners(app, html);
 });

@@ -1,12 +1,9 @@
 import { SR5Item } from '../../item/SR5Item';
 import { Helpers } from '../../helpers';
-import { ShadowrunRoller } from '../../rolls/ShadowrunRoller';
+import Template from '../../template';
 
 export class ShadowrunRollDialog extends Dialog {
-    static async fromItemRoll(
-        item: SR5Item,
-        event?: MouseEvent
-    ): Promise<ShadowrunRollDialog | undefined> {
+    static async fromItemRoll(item: SR5Item, event?: MouseEvent): Promise<DialogData | undefined> {
         const dialogData: DialogData = {
             title: item.name,
             buttons: {},
@@ -29,26 +26,10 @@ export class ShadowrunRollDialog extends Dialog {
 
         if (templatePath) {
             const dialog = await renderTemplate(templatePath, templateData);
-            return new ShadowrunRollDialog(
-                mergeObject(dialogData, {
-                    content: dialog,
-                })
-            );
+            return mergeObject(dialogData, {
+                content: dialog,
+            });
         }
-
-        ShadowrunRoller.itemRoll({ event: dialogData['event'], item }).then(
-            async (roll: Roll | undefined) => {
-                if (roll && item.data.type === 'weapon') {
-                    const attackData = item.getAttackData(roll.total);
-                    if (attackData) {
-                        await item.setLastAttack(attackData);
-                    }
-                    if (item.hasAmmo) {
-                        await item.useAmmo(1);
-                    }
-                }
-            }
-        );
 
         return undefined;
     }
@@ -66,8 +47,10 @@ export class ShadowrunRollDialog extends Dialog {
         const fade = item.getFade();
         const title = `${Helpers.label(item.name)} Level`;
 
+        const level = item.getLastComplexFormLevel()?.value || 2 - fade;
+
         templateData['fade'] = fade >= 0 ? `+${fade}` : fade;
-        templateData['level'] = 2 - fade;
+        templateData['level'] = level;
         templateData['title'] = title;
 
         let cancel = true;
@@ -82,13 +65,6 @@ export class ShadowrunRollDialog extends Dialog {
             if (cancel) return;
             const level = Helpers.parseInputToNumber($(html).find('[name=level]').val());
             await item.setLastComplexFormLevel({ value: level });
-            ShadowrunRoller.itemRoll({
-                event: dialogData['event'],
-                item,
-            }).then(async (roll: Roll | undefined) => {
-                const totalFade = Math.max(item.getFade() + level, 2);
-                item.actor.rollFade({ event: dialogData['event'] }, totalFade);
-            });
         };
     }
 
@@ -96,8 +72,10 @@ export class ShadowrunRollDialog extends Dialog {
         const title = `${Helpers.label(item.name)} Force`;
         const drain = item.getDrain();
 
+        const force = item.getLastSpellForce()?.value || 2 - drain;
+
         templateData['drain'] = drain >= 0 ? `+${drain}` : `${drain}`;
-        templateData['force'] = 2 - drain;
+        templateData['force'] = force;
         templateData['title'] = title;
 
         dialogData.title = title;
@@ -118,21 +96,15 @@ export class ShadowrunRollDialog extends Dialog {
         };
         dialogData.default = 'normal';
         dialogData.close = async (html) => {
+            if (cancel) return;
             const force = Helpers.parseInputToNumber($(html).find('[name=force]').val());
-            await item.setLastSpellForce({ value: force });
-            ShadowrunRoller.itemRoll({
-                event: dialogData['event'],
-                item,
-            }).then(async (roll: Roll | undefined) => {
-                if (item.data.data.category === 'combat' && roll) {
-                    const attackData = item.getAttackData(roll.total);
-                    if (attackData) {
-                        await item.setLastAttack(attackData);
-                    }
+            await item.setLastSpellForce({ value: force, reckless });
+            if (item.hasTemplate) {
+                const template = Template.fromItem(item);
+                if (template) {
+                    template.drawPreview();
                 }
-                const drain = Math.max(item.getDrain() + force + (reckless ? 3 : 0), 2);
-                item.actor?.rollDrain({ event: dialogData['event'] }, drain);
-            });
+            }
         };
     }
 
@@ -208,7 +180,6 @@ export class ShadowrunRollDialog extends Dialog {
             if (fireMode) {
                 const fireModeString = fireModes[fireMode];
                 const defenseModifier = Helpers.mapRoundsToDefenseDesc(fireMode);
-                console.log(fireModeString);
                 const fireModeData = {
                     label: fireModeString,
                     value: fireMode,
@@ -216,19 +187,12 @@ export class ShadowrunRollDialog extends Dialog {
                 };
                 await item.setLastFireMode(fireModeData);
             }
-            ShadowrunRoller.itemRoll({
-                event: dialogData['event'],
-                item,
-            }).then((roll: Roll | undefined) => {
-                if (roll) {
-                    item.useAmmo(fireMode).then(async () => {
-                        const attackData = item.getAttackData(roll.total);
-                        if (attackData) {
-                            await item.setLastAttack(attackData);
-                        }
-                    });
+            if (item.hasTemplate) {
+                const template = Template.fromItem(item);
+                if (template) {
+                    template.drawPreview();
                 }
-            });
+            }
         };
     }
 }

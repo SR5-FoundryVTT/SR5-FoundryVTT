@@ -395,6 +395,12 @@
 .sr5.roll-card .test-line .test-name {
   font-style: italic;
 }
+.sr5.roll-card .test-line .test-name.test-roll {
+  text-decoration: underline;
+}
+.sr5.roll-card .test-line .test-name.test-roll:hover {
+  cursor: pointer;
+}
 .sr5.roll-card .test-line .place-template {
   padding: 2px 5px;
   line-height: 1em;
@@ -423,9 +429,22 @@
 .sr5.roll-card .card-content .right-side {
   display: flex;
   flex-flow: column;
+  font-size: 12px;
+  text-align: right;
+  align-content: flex-end;
+}
+.sr5.roll-card .card-content .right-side .limit-line {
+  justify-content: flex-end;
 }
 .sr5.roll-card .card-content .key {
   margin-right: 0.35em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 10em;
+}
+.sr5.roll-card .card-content .key.bold {
+  font-weight: bold;
 }
 .sr5.roll-card .card-content .value {
   font-weight: bold;

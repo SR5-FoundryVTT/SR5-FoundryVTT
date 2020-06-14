@@ -82,7 +82,6 @@ Hooks.on('ready', function () {
 
 Hooks.on('preUpdateCombat', preCombatUpdate);
 Hooks.on('renderChatMessage', (app, html) => {
-    if (!app.isRoll) SR5Item.chatListeners(html);
     if (app.isRoll) chat.addRollListeners(app, html);
 });
 Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);

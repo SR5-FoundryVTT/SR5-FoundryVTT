@@ -9,7 +9,7 @@ import AttackData = Shadowrun.AttackData;
 import DamageData = Shadowrun.DamageData;
 import { ShadowrunRollCardProps, ShadowrunRollChatData } from './ShadowrunRollCard';
 
-interface BasicRollProps {
+export interface BasicRollProps {
     name?: string;
     img?: string;
     parts: ModList<number>;
@@ -33,12 +33,12 @@ interface BasicRollProps {
     hideRollMessage?: boolean;
 }
 
-interface RollDialogOptions {
+export interface RollDialogOptions {
     environmental?: number | boolean;
     prompt?: boolean;
 }
 
-interface AdvancedRollProps extends BasicRollProps {
+export interface AdvancedRollProps extends BasicRollProps {
     event?: RollEvent;
     extended?: boolean;
     wounds?: boolean;
@@ -46,7 +46,7 @@ interface AdvancedRollProps extends BasicRollProps {
     dialogOptions?: RollDialogOptions;
 }
 
-interface ItemRollProps {
+export interface ItemRollProps {
     event: RollEvent;
     item: SR5Item;
 }

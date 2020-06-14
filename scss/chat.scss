@@ -100,6 +100,12 @@
             justify-content: space-between;
             .test-name {
                 font-style: italic;
+                &.test-roll {
+                    text-decoration: underline;
+                    &:hover {
+                        cursor: pointer;
+                    }
+                }
             }
             .place-template {
                 padding: 2px 5px;
@@ -129,9 +135,22 @@
             .right-side {
                 display: flex;
                 flex-flow: column;
+                font-size: 12px;
+                text-align: right;
+                align-content: flex-end;
+                .limit-line {
+                    justify-content: flex-end;
+                }
             }
             .key {
                 margin-right: 0.35em;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                max-width: 10em;
+                &.bold {
+                    font-weight: bold;
+                }
             }
             .value {
                 font-weight: bold;

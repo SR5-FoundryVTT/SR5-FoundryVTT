@@ -1,7 +1,6 @@
 import { Helpers } from '../helpers';
 import { SR5Actor } from '../actor/SR5Actor';
 import { ShadowrunRollDialog } from '../apps/dialogs/ShadowrunRollDialog';
-import Template from '../template';
 import ModList = Shadowrun.ModList;
 import AttackData = Shadowrun.AttackData;
 import AttributeField = Shadowrun.AttributeField;
@@ -14,7 +13,7 @@ import FireRangeData = Shadowrun.FireRangeData;
 import BlastData = Shadowrun.BlastData;
 import { ChatData } from './ChatData';
 import { ShadowrunRollChatData } from '../rolls/ShadowrunRollCard';
-import { ShadowrunRoll, ShadowrunRoller } from '../rolls/ShadowrunRoller';
+import { AdvancedRollProps, ShadowrunRoll, ShadowrunRoller } from '../rolls/ShadowrunRoller';
 
 export class SR5Item extends Item {
     labels: {} = {};
@@ -183,23 +182,42 @@ export class SR5Item extends Item {
         item['properties'] = this.getChatData().properties;
     }
 
-    async postCard() {
+    async postCard(event?) {
         // we won't work if we don't have an actor
         if (!this.actor) return;
-        const { token } = this.actor;
-        const chatData = await ShadowrunRollChatData({
-            header: {
-                name: this.name,
-                img: this.img,
-            },
-            testName: this.getRollName(),
-            actor: this.actor,
-            tokenId: token ? `${token.scene._id}.${token.id}` : undefined,
-            description: this.getChatData(),
-            item: this,
-        });
 
-        return ChatMessage.create(chatData, { displaySheet: false });
+        const post = (bonus = {}) => {
+            const { token } = this.actor;
+            const attack = this.getAttackData(0);
+            delete attack?.hits;
+            ShadowrunRollChatData({
+                header: {
+                    name: this.name,
+                    img: this.img,
+                },
+                testName: this.getRollName(),
+                actor: this.actor,
+                tokenId: token ? `${token.scene._id}.${token.id}` : undefined,
+                description: this.getChatData(),
+                item: this,
+                previewTemplate: this.hasTemplate,
+                attack,
+                ...bonus,
+            }).then((chatData) => {
+                return ChatMessage.create(chatData, { displaySheet: false });
+            });
+        };
+        const dialogData = await ShadowrunRollDialog.fromItemRoll(this, event);
+        if (dialogData) {
+            const oldClose = dialogData.close;
+            dialogData.close = async (html) => {
+                if (oldClose) await oldClose(html);
+                post();
+            };
+            return new Dialog(dialogData).render(true);
+        } else {
+            post();
+        }
     }
 
     getChatData(htmlOptions?) {
@@ -430,13 +448,56 @@ export class SR5Item extends Item {
         }
     }
 
-    async rollTestOld(event) {
-        const dialog = await ShadowrunRollDialog.fromItemRoll(this, event);
-        if (dialog) return dialog.render(true);
-    }
+    /**
+     * Rolls a test using the latest stored data on the item (force, fireMode, level)
+     * @param event - mouse event
+     * @param options - any additional roll options to pass along - note that currently the Item will overwrite -- WIP
+     */
+    async rollTest(
+        event,
+        options?: Partial<AdvancedRollProps>
+    ): Promise<ShadowrunRoll | undefined> {
+        const promise = ShadowrunRoller.itemRoll({ event, item: this }, options);
+        promise.then(async (roll) => {
+            if (this.isComplexForm()) {
+                const totalFade = Math.max(
+                    this.getFade() + this.getLastComplexFormLevel().value,
+                    2
+                );
+                await this.actor.rollFade({ event }, totalFade);
+            } else if (this.isSpell()) {
+                if (this.isCombatSpell() && roll) {
+                    const attackData = this.getAttackData(roll.total);
+                    if (attackData) {
+                        await this.setLastAttack(attackData);
+                    }
+                }
+                const forceData = this.getLastSpellForce();
+                const drain = Math.max(
+                    this.getDrain() + forceData.value + (forceData.reckless ? 3 : 0),
+                    2
+                );
+                await this.actor?.rollDrain({ event }, drain);
+            } else if (this.isRangedWeapon()) {
+                const fireMode = this.getLastFireMode()?.value;
+                this.useAmmo(fireMode).then(async () => {
+                    const attackData = this.getAttackData(roll?.total || 0);
+                    if (attackData) {
+                        await this.setLastAttack(attackData);
+                    }
+                });
+            } else if (roll && this.data.type === 'weapon') {
+                const attackData = this.getAttackData(roll.total);
+                if (attackData) {
+                    await this.setLastAttack(attackData);
+                }
+                if (this.hasAmmo) {
+                    await this.useAmmo(1);
+                }
+            }
+        });
 
-    async rollTest(event): Promise<ShadowrunRoll | undefined> {
-        return ShadowrunRoller.itemRoll({ event, item: this });
+        return promise;
     }
 
     static getItemFromMessage(html): SR5Item | undefined {
@@ -461,42 +522,6 @@ export class SR5Item extends Item {
         if (!actor) return;
         const itemId = card.data('itemId');
         return actor.getOwnedItem(itemId);
-    }
-
-    static chatListeners(html) {
-        html.on('click', '.card-buttons button', (ev) => {
-            ev.preventDefault();
-            const button = $(ev.currentTarget);
-            const messageId = button.parents('.message').data('messageId');
-            const senderId = game.messages.get(messageId).user._id;
-            const action = button.data('action');
-
-            const opposedRoll = action === 'opposed-roll';
-            if (!opposedRoll && !game.user.isGM && game.user._id !== senderId) return;
-
-            const item = this.getItemFromMessage(html);
-            if (!item) return;
-
-            if (action === 'roll') item.rollTestOld(ev);
-            if (opposedRoll) {
-                const targets = this.getTargets();
-                for (const t of targets) {
-                    item.rollOpposedTest(t, ev);
-                }
-            }
-            if (action === 'place-template') {
-                const template = Template.fromItem(item);
-                console.log(template);
-                if (template) {
-                    template.drawPreview();
-                }
-            }
-        });
-        html.on('click', '.card-header', (ev) => {
-            ev.preventDefault();
-            $(ev.currentTarget).siblings('.card-description').toggle();
-        });
-        $(html).find('.card-description').hide();
     }
 
     static getTargets() {

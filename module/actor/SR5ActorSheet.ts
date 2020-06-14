@@ -457,12 +457,12 @@ export class SR5ActorSheet extends ActorSheet {
     async _onRollTrack(event) {
         event.preventDefault();
         let track = event.currentTarget.closest('.attribute').dataset.track;
-        this.actor.rollNaturalRecovery(track, event);
+        await this.actor.rollNaturalRecovery(track, event);
     }
 
     async _onRollPrompt(event) {
         event.preventDefault();
-        this.actor.promptRoll({ event: event });
+        await this.actor.promptRoll({ event: event });
     }
 
     async _onRollItem(event) {
@@ -470,9 +470,7 @@ export class SR5ActorSheet extends ActorSheet {
         const iid = event.currentTarget.closest('.item').dataset.itemId;
         const item = this.actor.getOwnedItem(iid);
         if (item) {
-            // if shiftKey, post just a card, otherwise roll
-            if (event.shiftKey || !item.hasRoll) return item.postCard();
-            return item.rollTestOld(event);
+            await item.postCard(event);
         }
     }
 

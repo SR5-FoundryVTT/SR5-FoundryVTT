@@ -8,6 +8,7 @@ declare namespace Shadowrun {
 
     export type SpellForceData = {
         value: number;
+        reckless?: boolean;
     }
 
     export type ComplexFormLevelData = {

@@ -5,7 +5,7 @@
     data-token-id="{{tokenId}}"
 >
     <div class="card-title card-header flexrow">
-        <img src='{{header.img}}' title='{{header.name}}' width='36' height='36'>
+        <img src="{{header.img}}" title="{{header.name}}" width="36" height="36" />
         <h3 class="header-name">{{header.name}}</h3>
     </div>
     {{#if description}}
@@ -13,16 +13,15 @@
         <div class="card-description-content">
             {{{description.description.value}}}
         </div>
-        <footer class='card-footer'>
+        <footer class="card-footer">
             {{#each description.properties}}
-            <span style="white-space: nowrap">{{this}}</span>
+            <span style="white-space: nowrap;">{{this}}</span>
             {{/each}}
         </footer>
     </div>
     {{/if}}
-    {{#if (isDefined hits)}}
     <div class="test-line">
-        <span class="test-name">
+        <span class="test-name {{#unless (isDefined hits)}}test-roll{{/unless}}">
             {{testName}}
         </span>
         {{#if previewTemplate}}
@@ -33,13 +32,12 @@
     </div>
     <div class="card-content">
         <div class="left-side">
-            {{#if hits}}
+            {{#if (isDefined hits)}}
             <div class="limit-line">
                 <span class="key">{{localize "SR5.Hits"}}: </span
                 ><span class="value">{{hits}}</span>
             </div>
-            {{/if}}
-            {{#if limit.value}}
+            {{/if}} {{#if limit.value}}
             <div class="limit-line" title="{{localize limit.label}}">
                 <span class="key">{{localize "SR5.Limit"}}: </span>
                 <span class="value">{{limit.value}}</span>
@@ -49,7 +47,10 @@
                 {{#if attack.damage.value}}
                 <div>
                     <span class="key">{{localize "SR5.DV"}}: </span>
-                    <span class="value">{{attack.damage.value}}{{damageAbbreviation attack.damage.type.value}}</span>
+                    <span class="value"
+                        >{{attack.damage.value}}{{damageAbbreviation
+                        attack.damage.type.value}}</span
+                    >
                 </div>
                 {{/if}} {{#if attack.damage.ap.value}}
                 <div>
@@ -69,19 +70,19 @@
             <div class="damage-line">
                 {{#if soak.value}}
                 <div>
-                    <span class="key">{{localize "SR5.Incoming"}} {{localize "SR5.DV"}}: </span>
+                    <span class="key">{{localize "SR5.Incoming"}} {{localize "SR5.Damage"}}: </span>
                     <span class="value">{{soak.value}}{{damageAbbreviation soak.type.value}}</span>
                 </div>
                 {{/if}} {{#if soak.element.value}}
                 <div>
                     <i
-                            class="{{elementIcon soak.element.value}} icon"
-                            title="{{localize soak.element.value}}"
+                        class="{{elementIcon soak.element.value}} icon"
+                        title="{{localize soak.element.value}}"
                     ></i>
                 </div>
                 {{/if}}
             </div>
-            {{/if}} {{#if incomingAttack.hits}}
+            {{/if}} {{#if (isDefined incomingAttack.hits)}}
             <div class="limit-line">
                 <span class="key">{{localize "SR5.AttackerHits"}}</span>
                 <span class="value">{{incomingAttack.hits}}</span>
@@ -117,25 +118,27 @@
                 <span class="key">{{localize "SR5.Dropoff"}}: </span>
                 <span class="value">{{attack.blast.dropoff}}/m</span>
             </div>
-            {{/if}}
-            {{#if incomingDrain}}
+            {{/if}} {{#if incomingDrain}}
             <div class="limit-line">
-                <span class="key">{{localize "SR5.Incoming"}} {{localize incomingDrain.label}}: </span>
+                <span class="key"
+                    >{{localize "SR5.Incoming"}} {{localize incomingDrain.label}}:
+                </span>
                 <span class="value">{{incomingDrain.value}}</span>
             </div>
             {{/if}}
         </div>
         <div class="right-side">
-            <div class="parts-list vertical">
+            <div class="roll-parts">
                 {{#each parts as |part id|}}
-                <div class="part">
-                    <span>{{localize id}}</span>: <span class="value">{{part}}</span>
+                <div class="limit-line">
+                    <span class="key" title="{{localize id}}">{{localize id}}:</span> <span class="value">{{part}}</span>
                 </div>
-                {{/each}}
-                <div class="part">
-                    <span class="value">{{localize 'SR5.DicePool'}}</span>:
+                {{/each}} {{#if (isDefined dicePool)}}
+                <div class="limit-line">
+                    <span class="key bold">{{localize 'SR5.DicePool'}}:</span>
                     <span class="value">{{dicePool}}</span>
                 </div>
+                {{/if}}
             </div>
         </div>
     </div>
@@ -153,13 +156,6 @@
             {{test.label}}
         </div>
         {{/each}}
-    </div>
-    {{/if}}
-    {{else}}
-    <div class="card-buttons">
-        <div class="button test-roll">
-            {{testName}}
-        </div>
     </div>
     {{/if}}
 </div>
