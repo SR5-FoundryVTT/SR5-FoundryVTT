@@ -187,7 +187,7 @@ export class ShadowrunRoller {
         let dialogData = {
             options: dialogOptions,
             extended,
-            dice_poll: Helpers.totalMods(parts),
+            dice_pool: Helpers.totalMods(parts),
             parts,
             limit: limit?.value,
             wounds,

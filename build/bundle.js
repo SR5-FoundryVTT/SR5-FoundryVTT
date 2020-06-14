@@ -5885,7 +5885,7 @@ class ShadowrunRoller {
         let dialogData = {
             options: dialogOptions,
             extended,
-            dice_poll: helpers_1.Helpers.totalMods(parts),
+            dice_pool: helpers_1.Helpers.totalMods(parts),
             parts,
             limit: limit === null || limit === void 0 ? void 0 : limit.value,
             wounds,
