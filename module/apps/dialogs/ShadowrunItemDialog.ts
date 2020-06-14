@@ -107,7 +107,8 @@ export class ShadowrunItemDialog extends Dialog {
         const itemData = item.data.data;
         const fireModes = {};
 
-        const { modes, ranges, ammo } = itemData.range;
+        const { modes, ranges } = itemData.range;
+        const { ammo } = itemData;
         if (modes.single_shot) {
             fireModes['1'] = 'SS';
         }
