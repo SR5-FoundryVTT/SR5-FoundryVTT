@@ -7,6 +7,7 @@ import LabelField = Shadowrun.LabelField;
 import { SR5Item } from '../item/SR5Item';
 import AttackData = Shadowrun.AttackData;
 import DamageData = Shadowrun.DamageData;
+import { ShadowrunRollChatData } from './ShadowrunRollCard';
 
 interface BasicRollProps {
     name?: string;
@@ -140,16 +141,17 @@ export class ShadowrunRoller {
                 });
             }
         }
+
         // start of custom message
         const dice = roll?.parts[0].rolls;
         const token = actor?.token;
         const templateData = {
             actor: actor,
             header: {
-                name,
-                img,
+                name: name || '',
+                img: img || '',
             },
-            tokenId: token ? `${token.scene._id}.${token.id}` : null,
+            tokenId: token ? `${token.scene._id}.${token.id}` : undefined,
             dice,
             limit,
             testName: title,
@@ -159,33 +161,8 @@ export class ShadowrunRoller {
             ...props,
         };
 
-        const template = `systems/shadowrun5e/templates/rolls/roll-card.html`;
-        const html = await renderTemplate(template, templateData);
-
-        const chatData = {
-            user: game.user._id,
-            type: CONST.CHAT_MESSAGE_TYPES.ROLL,
-            content: html,
-            roll,
-            sound: CONFIG.sounds.dice,
-            speaker: {
-                actor: actor?._id,
-                token: actor?.token,
-                alias: actor?.name,
-            },
-            flags: {
-                shadowrun5e: {
-                    customRoll: true,
-                },
-            },
-        };
-
-        if (['gmroll', 'blindroll'].includes(rollMode))
-            chatData['whisper'] = ChatMessage.getWhisperIDs('GM');
-        if (rollMode === 'blindroll') chatData['blind'] = true;
-
+        const chatData = await ShadowrunRollChatData(templateData, roll);
         await ChatMessage.create(chatData, { displaySheet: false });
-
         return roll;
     }
 

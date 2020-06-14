@@ -20,6 +20,7 @@
         </footer>
     </div>
     {{/if}}
+    {{#if (isDefined hits)}}
     <div class="test-line">
         <span class="test-name">
             {{testName}}
@@ -32,10 +33,12 @@
     </div>
     <div class="card-content">
         <div class="left-side">
+            {{#if hits}}
             <div class="limit-line">
                 <span class="key">{{localize "SR5.Hits"}}: </span
                 ><span class="value">{{hits}}</span>
             </div>
+            {{/if}}
             {{#if limit.value}}
             <div class="limit-line" title="{{localize limit.label}}">
                 <span class="key">{{localize "SR5.Limit"}}: </span>
@@ -150,6 +153,13 @@
             {{test.label}}
         </div>
         {{/each}}
+    </div>
+    {{/if}}
+    {{else}}
+    <div class="card-buttons">
+        <div class="button test-roll">
+            {{testName}}
+        </div>
     </div>
     {{/if}}
 </div>
