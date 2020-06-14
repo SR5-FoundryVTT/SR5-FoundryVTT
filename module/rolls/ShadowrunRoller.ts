@@ -212,7 +212,7 @@ export class ShadowrunRoller {
         };
         let template = 'systems/shadowrun5e/templates/rolls/roll-dialog.html';
         let edge = false;
-        let cancel = false;
+        let cancel = true;
 
         const buttons = {
             roll: {

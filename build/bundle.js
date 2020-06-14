@@ -484,7 +484,7 @@ class SR5Actor extends Actor {
             event: options.event,
             actor: this,
             parts,
-            title: 'Armor',
+            title: game.i18n.localize('SR5.Armor'),
             wounds: false,
         });
     }
@@ -502,7 +502,7 @@ class SR5Actor extends Actor {
         return new Promise((resolve) => {
             renderTemplate(template, dialogData).then((dlg) => {
                 new Dialog({
-                    title: 'Defense',
+                    title: game.i18n.localize('SR5.Defense'),
                     content: dlg,
                     buttons: {
                         normal: {
@@ -5914,7 +5914,7 @@ class ShadowrunRoller {
         };
         let template = 'systems/shadowrun5e/templates/rolls/roll-dialog.html';
         let edge = false;
-        let cancel = false;
+        let cancel = true;
         const buttons = {
             roll: {
                 label: 'Roll',
