@@ -2486,10 +2486,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ShadowrunRollDialog = void 0;
+exports.ShadowrunItemDialog = void 0;
 const helpers_1 = require("../../helpers");
-class ShadowrunRollDialog extends Dialog {
-    static fromItemRoll(item, event) {
+class ShadowrunItemDialog extends Dialog {
+    static fromItem(item, event) {
         return __awaiter(this, void 0, void 0, function* () {
             const dialogData = {
                 title: item.name,
@@ -2500,15 +2500,15 @@ class ShadowrunRollDialog extends Dialog {
             const templateData = {};
             let templatePath = '';
             if (item.isRangedWeapon()) {
-                ShadowrunRollDialog.addRangedWeaponData(templateData, dialogData, item);
+                ShadowrunItemDialog.addRangedWeaponData(templateData, dialogData, item);
                 templatePath = 'systems/shadowrun5e/templates/rolls/range-weapon-roll.html';
             }
             else if (item.isSpell()) {
-                ShadowrunRollDialog.addSpellData(templateData, dialogData, item);
+                ShadowrunItemDialog.addSpellData(templateData, dialogData, item);
                 templatePath = 'systems/shadowrun5e/templates/rolls/roll-spell.html';
             }
             else if (item.isComplexForm()) {
-                ShadowrunRollDialog.addComplexFormData(templateData, dialogData, item);
+                ShadowrunItemDialog.addComplexFormData(templateData, dialogData, item);
                 templatePath = 'systems/shadowrun5e/templates/rolls/roll-complex-form.html';
             }
             if (templatePath) {
@@ -2659,7 +2659,7 @@ class ShadowrunRollDialog extends Dialog {
         });
     }
 }
-exports.ShadowrunRollDialog = ShadowrunRollDialog;
+exports.ShadowrunItemDialog = ShadowrunItemDialog;
 
 },{"../../helpers":14}],5:[function(require,module,exports){
 "use strict";
@@ -4102,7 +4102,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5Item = void 0;
 const helpers_1 = require("../helpers");
-const ShadowrunRollDialog_1 = require("../apps/dialogs/ShadowrunRollDialog");
+const ShadowrunItemDialog_1 = require("../apps/dialogs/ShadowrunItemDialog");
 const ChatData_1 = require("./ChatData");
 const ShadowrunRoller_1 = require("../rolls/ShadowrunRoller");
 const template_1 = require("../template");
@@ -4277,26 +4277,40 @@ class SR5Item extends Item {
             // we won't work if we don't have an actor
             if (!this.actor)
                 return;
+            const postOnly = event === null || event === void 0 ? void 0 : event.shiftKey;
             const post = (bonus = {}) => {
-                if (this.hasTemplate) {
-                    const template = template_1.default.fromItem(this);
+                // if only post, don't roll and post a card version -- otherwise roll
+                const onComplete = postOnly ? () => {
+                    const { token } = this.actor;
+                    const attack = this.getAttackData(0);
+                    // don't include any hits
+                    attack === null || attack === void 0 ? true : delete attack.hits;
+                    // generate chat data
+                    chat_1.createChatData(Object.assign({ header: {
+                            name: this.name,
+                            img: this.img,
+                        }, testName: this.getRollName(), actor: this.actor, tokenId: token ? `${token.scene._id}.${token.id}` : undefined, description: this.getChatData(), item: this, previewTemplate: this.hasTemplate, attack }, bonus)).then((chatData) => {
+                        // create the message
+                        return ChatMessage.create(chatData, { displaySheet: false });
+                    });
+                } : () => this.rollTest(event);
+                if (!postOnly && this.hasTemplate) {
+                    // onComplete is called when template is finished
+                    const template = template_1.default.fromItem(this, onComplete);
                     if (template) {
                         template.drawPreview();
                     }
                 }
-                const { token } = this.actor;
-                const attack = this.getAttackData(0);
-                attack === null || attack === void 0 ? true : delete attack.hits;
-                chat_1.createChatData(Object.assign({ header: {
-                        name: this.name,
-                        img: this.img,
-                    }, testName: this.getRollName(), actor: this.actor, tokenId: token ? `${token.scene._id}.${token.id}` : undefined, description: this.getChatData(), item: this, previewTemplate: this.hasTemplate, attack }, bonus)).then((chatData) => {
-                    return ChatMessage.create(chatData, { displaySheet: false });
-                });
+                else {
+                    onComplete();
+                }
             };
-            const dialogData = yield ShadowrunRollDialog_1.ShadowrunRollDialog.fromItemRoll(this, event);
+            // prompt user if needed
+            const dialogData = yield ShadowrunItemDialog_1.ShadowrunItemDialog.fromItem(this, event);
             if (dialogData) {
+                // keep track of old close function
                 const oldClose = dialogData.close;
+                // call post() after dialog closes
                 dialogData.close = (html) => __awaiter(this, void 0, void 0, function* () {
                     if (oldClose)
                         yield oldClose(html);
@@ -4956,7 +4970,7 @@ class SR5Item extends Item {
 }
 exports.SR5Item = SR5Item;
 
-},{"../apps/dialogs/ShadowrunRollDialog":4,"../chat":10,"../helpers":14,"../rolls/ShadowrunRoller":20,"../template":22,"./ChatData":15}],17:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunItemDialog":4,"../chat":10,"../helpers":14,"../rolls/ShadowrunRoller":20,"../template":22,"./ChatData":15}],17:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -5265,7 +5279,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// Import Modules
 const SR5ItemSheet_1 = require("./item/SR5ItemSheet");
 const SR5ActorSheet_1 = require("./actor/SR5ActorSheet");
 const SR5Actor_1 = require("./actor/SR5Actor");
@@ -6024,7 +6037,7 @@ exports.registerSystemSettings = () => {
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Template extends MeasuredTemplate {
-    static fromItem(item) {
+    static fromItem(item, onComplete) {
         const templateShape = 'circle';
         const templateData = {
             t: templateShape,
@@ -6041,6 +6054,7 @@ class Template extends MeasuredTemplate {
         // @ts-ignore
         const template = new this(templateData);
         template.item = item;
+        template.onComplete = onComplete;
         return template;
     }
     drawPreview(event) {
@@ -6076,16 +6090,22 @@ class Template extends MeasuredTemplate {
         };
         // Cancel the workflow (right-click)
         handlers['rc'] = () => {
+            var _a, _b;
             this.layer.preview.removeChildren();
             canvas.stage.off('mousemove', handlers['mm']);
             canvas.stage.off('mousedown', handlers['lc']);
             canvas.app.view.oncontextmenu = null;
             canvas.app.view.onwheel = null;
             initialLayer.activate();
+            if (this.item && this.item.actor) {
+                // @ts-ignore
+                (_b = (_a = this.item.actor) === null || _a === void 0 ? void 0 : _a.sheet) === null || _b === void 0 ? void 0 : _b.maximize();
+            }
+            if (this.onComplete)
+                this.onComplete();
         };
         // Confirm the workflow (left-click)
         handlers['lc'] = (event) => {
-            var _a, _b;
             handlers['rc'](event);
             // Confirm final snapped position
             const destination = canvas.grid.getSnappedPosition(this.x, this.y, 2);
@@ -6093,10 +6113,6 @@ class Template extends MeasuredTemplate {
             this.data.y = destination.y;
             // Create the template
             canvas.scene.createEmbeddedEntity('MeasuredTemplate', this.data);
-            if (this.item && this.item.actor) {
-                // @ts-ignore
-                (_b = (_a = this.item.actor) === null || _a === void 0 ? void 0 : _a.sheet) === null || _b === void 0 ? void 0 : _b.maximize();
-            }
         };
         // Rotate the template by 3 degree increments (mouse-wheel)
         handlers['mw'] = (event) => {

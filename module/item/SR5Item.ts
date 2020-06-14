@@ -1,6 +1,6 @@
 import { Helpers } from '../helpers';
 import { SR5Actor } from '../actor/SR5Actor';
-import { ShadowrunRollDialog } from '../apps/dialogs/ShadowrunRollDialog';
+import { ShadowrunItemDialog } from '../apps/dialogs/ShadowrunItemDialog';
 import ModList = Shadowrun.ModList;
 import AttackData = Shadowrun.AttackData;
 import AttributeField = Shadowrun.AttributeField;
@@ -187,36 +187,51 @@ export class SR5Item extends Item {
         // we won't work if we don't have an actor
         if (!this.actor) return;
 
+        const postOnly = event?.shiftKey;
+
         const post = (bonus = {}) => {
-            if (this.hasTemplate) {
-                const template = Template.fromItem(this);
+            // if only post, don't roll and post a card version -- otherwise roll
+            const onComplete = postOnly ? () => {
+                const { token } = this.actor;
+                const attack = this.getAttackData(0);
+                // don't include any hits
+                delete attack?.hits;
+                // generate chat data
+                createChatData({
+                    header: {
+                        name: this.name,
+                        img: this.img,
+                    },
+                    testName: this.getRollName(),
+                    actor: this.actor,
+                    tokenId: token ? `${token.scene._id}.${token.id}` : undefined,
+                    description: this.getChatData(),
+                    item: this,
+                    previewTemplate: this.hasTemplate,
+                    attack,
+                    ...bonus,
+                }).then((chatData) => {
+                    // create the message
+                    return ChatMessage.create(chatData, { displaySheet: false });
+                });
+            } : () => this.rollTest(event);
+
+            if (!postOnly && this.hasTemplate) {
+                // onComplete is called when template is finished
+                const template = Template.fromItem(this, onComplete);
                 if (template) {
                     template.drawPreview();
                 }
+            } else {
+                onComplete();
             }
-            const { token } = this.actor;
-            const attack = this.getAttackData(0);
-            delete attack?.hits;
-            createChatData({
-                header: {
-                    name: this.name,
-                    img: this.img,
-                },
-                testName: this.getRollName(),
-                actor: this.actor,
-                tokenId: token ? `${token.scene._id}.${token.id}` : undefined,
-                description: this.getChatData(),
-                item: this,
-                previewTemplate: this.hasTemplate,
-                attack,
-                ...bonus,
-            }).then((chatData) => {
-                return ChatMessage.create(chatData, { displaySheet: false });
-            });
         };
-        const dialogData = await ShadowrunRollDialog.fromItemRoll(this, event);
+        // prompt user if needed
+        const dialogData = await ShadowrunItemDialog.fromItem(this, event);
         if (dialogData) {
+            // keep track of old close function
             const oldClose = dialogData.close;
+            // call post() after dialog closes
             dialogData.close = async (html) => {
                 if (oldClose) await oldClose(html);
                 post();

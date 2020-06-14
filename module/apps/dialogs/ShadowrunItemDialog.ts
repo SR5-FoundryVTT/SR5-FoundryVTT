@@ -1,9 +1,8 @@
 import { SR5Item } from '../../item/SR5Item';
 import { Helpers } from '../../helpers';
-import Template from '../../template';
 
-export class ShadowrunRollDialog extends Dialog {
-    static async fromItemRoll(item: SR5Item, event?: MouseEvent): Promise<DialogData | undefined> {
+export class ShadowrunItemDialog extends Dialog {
+    static async fromItem(item: SR5Item, event?: MouseEvent): Promise<DialogData | undefined> {
         const dialogData: DialogData = {
             title: item.name,
             buttons: {},
@@ -14,13 +13,13 @@ export class ShadowrunRollDialog extends Dialog {
         let templatePath = '';
 
         if (item.isRangedWeapon()) {
-            ShadowrunRollDialog.addRangedWeaponData(templateData, dialogData, item);
+            ShadowrunItemDialog.addRangedWeaponData(templateData, dialogData, item);
             templatePath = 'systems/shadowrun5e/templates/rolls/range-weapon-roll.html';
         } else if (item.isSpell()) {
-            ShadowrunRollDialog.addSpellData(templateData, dialogData, item);
+            ShadowrunItemDialog.addSpellData(templateData, dialogData, item);
             templatePath = 'systems/shadowrun5e/templates/rolls/roll-spell.html';
         } else if (item.isComplexForm()) {
-            ShadowrunRollDialog.addComplexFormData(templateData, dialogData, item);
+            ShadowrunItemDialog.addComplexFormData(templateData, dialogData, item);
             templatePath = 'systems/shadowrun5e/templates/rolls/roll-complex-form.html';
         }
 

@@ -17,8 +17,9 @@ class Template extends MeasuredTemplate {
     x: number;
     y: number;
     item?: SR5Item;
+    onComplete?: () => void;
 
-    static fromItem(item: SR5Item): Template | undefined {
+    static fromItem(item: SR5Item, onComplete?: () => void): Template | undefined {
         const templateShape = 'circle';
 
         const templateData = {
@@ -37,6 +38,7 @@ class Template extends MeasuredTemplate {
         // @ts-ignore
         const template = new this(templateData);
         template.item = item;
+        template.onComplete = onComplete;
         return template;
     }
 
@@ -80,6 +82,12 @@ class Template extends MeasuredTemplate {
             canvas.app.view.oncontextmenu = null;
             canvas.app.view.onwheel = null;
             initialLayer.activate();
+
+            if (this.item && this.item.actor) {
+                // @ts-ignore
+                this.item.actor?.sheet?.maximize();
+            }
+            if (this.onComplete) this.onComplete();
         };
 
         // Confirm the workflow (left-click)
@@ -93,11 +101,6 @@ class Template extends MeasuredTemplate {
 
             // Create the template
             canvas.scene.createEmbeddedEntity('MeasuredTemplate', this.data);
-
-            if (this.item && this.item.actor) {
-                // @ts-ignore
-                this.item.actor?.sheet?.maximize();
-            }
         };
 
         // Rotate the template by 3 degree increments (mouse-wheel)
