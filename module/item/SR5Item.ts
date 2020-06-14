@@ -14,6 +14,7 @@ import BlastData = Shadowrun.BlastData;
 import { ChatData } from './ChatData';
 import { ShadowrunRollChatData } from '../rolls/ShadowrunRollCard';
 import { AdvancedRollProps, ShadowrunRoll, ShadowrunRoller } from '../rolls/ShadowrunRoller';
+import Template from '../template';
 
 export class SR5Item extends Item {
     labels: {} = {};
@@ -187,6 +188,12 @@ export class SR5Item extends Item {
         if (!this.actor) return;
 
         const post = (bonus = {}) => {
+            if (this.hasTemplate) {
+                const template = Template.fromItem(this);
+                if (template) {
+                    template.drawPreview();
+                }
+            }
             const { token } = this.actor;
             const attack = this.getAttackData(0);
             delete attack?.hits;

@@ -2488,7 +2488,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ShadowrunRollDialog = void 0;
 const helpers_1 = require("../../helpers");
-const template_1 = require("../../template");
 class ShadowrunRollDialog extends Dialog {
     static fromItemRoll(item, event) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -2582,12 +2581,6 @@ class ShadowrunRollDialog extends Dialog {
                 return;
             const force = helpers_1.Helpers.parseInputToNumber($(html).find('[name=force]').val());
             yield item.setLastSpellForce({ value: force, reckless });
-            if (item.hasTemplate) {
-                const template = template_1.default.fromItem(item);
-                if (template) {
-                    template.drawPreview();
-                }
-            }
         });
     }
     static addRangedWeaponData(templateData, dialogData, item) {
@@ -2663,18 +2656,12 @@ class ShadowrunRollDialog extends Dialog {
                 };
                 yield item.setLastFireMode(fireModeData);
             }
-            if (item.hasTemplate) {
-                const template = template_1.default.fromItem(item);
-                if (template) {
-                    template.drawPreview();
-                }
-            }
         });
     }
 }
 exports.ShadowrunRollDialog = ShadowrunRollDialog;
 
-},{"../../helpers":14,"../../template":23}],5:[function(require,module,exports){
+},{"../../helpers":14}],5:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -4089,6 +4076,7 @@ const ShadowrunRollDialog_1 = require("../apps/dialogs/ShadowrunRollDialog");
 const ChatData_1 = require("./ChatData");
 const ShadowrunRollCard_1 = require("../rolls/ShadowrunRollCard");
 const ShadowrunRoller_1 = require("../rolls/ShadowrunRoller");
+const template_1 = require("../template");
 class SR5Item extends Item {
     constructor() {
         super(...arguments);
@@ -4260,6 +4248,12 @@ class SR5Item extends Item {
             if (!this.actor)
                 return;
             const post = (bonus = {}) => {
+                if (this.hasTemplate) {
+                    const template = template_1.default.fromItem(this);
+                    if (template) {
+                        template.drawPreview();
+                    }
+                }
                 const { token } = this.actor;
                 const attack = this.getAttackData(0);
                 attack === null || attack === void 0 ? true : delete attack.hits;
@@ -4932,7 +4926,7 @@ class SR5Item extends Item {
 }
 exports.SR5Item = SR5Item;
 
-},{"../apps/dialogs/ShadowrunRollDialog":4,"../helpers":14,"../rolls/ShadowrunRollCard":20,"../rolls/ShadowrunRoller":21,"./ChatData":15}],17:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunRollDialog":4,"../helpers":14,"../rolls/ShadowrunRollCard":20,"../rolls/ShadowrunRoller":21,"../template":23,"./ChatData":15}],17:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -6059,9 +6053,12 @@ class Template extends MeasuredTemplate {
         templateData['distance'] = blast === null || blast === void 0 ? void 0 : blast.radius;
         templateData['dropoff'] = blast === null || blast === void 0 ? void 0 : blast.dropoff;
         // @ts-ignore
-        return new this(templateData);
+        const template = new this(templateData);
+        template.item = item;
+        return template;
     }
     drawPreview(event) {
+        var _a, _b;
         const initialLayer = canvas.activeLayer;
         // @ts-ignore
         this.draw();
@@ -6070,6 +6067,9 @@ class Template extends MeasuredTemplate {
         // @ts-ignore
         this.layer.preview.addChild(this);
         this.activatePreviewListeners(initialLayer);
+        if (this.item && this.item.actor) {
+            (_b = (_a = this.item.actor) === null || _a === void 0 ? void 0 : _a.sheet) === null || _b === void 0 ? void 0 : _b.minimize();
+        }
     }
     activatePreviewListeners(initialLayer) {
         const handlers = {};
@@ -6089,7 +6089,7 @@ class Template extends MeasuredTemplate {
             moveTime = now;
         };
         // Cancel the workflow (right-click)
-        handlers['rc'] = (event) => {
+        handlers['rc'] = () => {
             this.layer.preview.removeChildren();
             canvas.stage.off('mousemove', handlers['mm']);
             canvas.stage.off('mousedown', handlers['lc']);
@@ -6099,6 +6099,7 @@ class Template extends MeasuredTemplate {
         };
         // Confirm the workflow (left-click)
         handlers['lc'] = (event) => {
+            var _a, _b;
             handlers['rc'](event);
             // Confirm final snapped position
             const destination = canvas.grid.getSnappedPosition(this.x, this.y, 2);
@@ -6106,6 +6107,10 @@ class Template extends MeasuredTemplate {
             this.data.y = destination.y;
             // Create the template
             canvas.scene.createEmbeddedEntity('MeasuredTemplate', this.data);
+            if (this.item && this.item.actor) {
+                // @ts-ignore
+                (_b = (_a = this.item.actor) === null || _a === void 0 ? void 0 : _a.sheet) === null || _b === void 0 ? void 0 : _b.maximize();
+            }
         };
         // Rotate the template by 3 degree increments (mouse-wheel)
         handlers['mw'] = (event) => {

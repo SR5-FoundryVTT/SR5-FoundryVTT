@@ -99,12 +99,6 @@ export class ShadowrunRollDialog extends Dialog {
             if (cancel) return;
             const force = Helpers.parseInputToNumber($(html).find('[name=force]').val());
             await item.setLastSpellForce({ value: force, reckless });
-            if (item.hasTemplate) {
-                const template = Template.fromItem(item);
-                if (template) {
-                    template.drawPreview();
-                }
-            }
         };
     }
 
@@ -186,12 +180,6 @@ export class ShadowrunRollDialog extends Dialog {
                     defense: defenseModifier,
                 };
                 await item.setLastFireMode(fireModeData);
-            }
-            if (item.hasTemplate) {
-                const template = Template.fromItem(item);
-                if (template) {
-                    template.drawPreview();
-                }
             }
         };
     }

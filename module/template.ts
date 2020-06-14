@@ -16,6 +16,7 @@ class Template extends MeasuredTemplate {
     layer: PlaceablesLayer;
     x: number;
     y: number;
+    item?: SR5Item;
 
     static fromItem(item: SR5Item): Template | undefined {
         const templateShape = 'circle';
@@ -34,7 +35,9 @@ class Template extends MeasuredTemplate {
         templateData['dropoff'] = blast?.dropoff;
 
         // @ts-ignore
-        return new this(templateData);
+        const template = new this(templateData);
+        template.item = item;
+        return template;
     }
 
     drawPreview(event?: Event) {
@@ -46,6 +49,9 @@ class Template extends MeasuredTemplate {
         // @ts-ignore
         this.layer.preview.addChild(this);
         this.activatePreviewListeners(initialLayer);
+        if (this.item && this.item.actor) {
+            this.item.actor?.sheet?.minimize();
+        }
     }
 
     activatePreviewListeners(initialLayer: CanvasLayer) {
@@ -67,7 +73,7 @@ class Template extends MeasuredTemplate {
         };
 
         // Cancel the workflow (right-click)
-        handlers['rc'] = (event) => {
+        handlers['rc'] = () => {
             this.layer.preview.removeChildren();
             canvas.stage.off('mousemove', handlers['mm']);
             canvas.stage.off('mousedown', handlers['lc']);
@@ -87,6 +93,11 @@ class Template extends MeasuredTemplate {
 
             // Create the template
             canvas.scene.createEmbeddedEntity('MeasuredTemplate', this.data);
+
+            if (this.item && this.item.actor) {
+                // @ts-ignore
+                this.item.actor?.sheet?.maximize();
+            }
         };
 
         // Rotate the template by 3 degree increments (mouse-wheel)
