@@ -3204,7 +3204,6 @@ exports.shadowrunCombatUpdate = (changes, options) => __awaiter(void 0, void 0, 
     if (combatants.length === 0) {
         const messages = [];
         const messageOptions = options.messageOptions || {};
-        let sound = true;
         for (const c of removedCombatants) {
             const actorData = c.actor ? c.actor.data : {};
             // @ts-ignore
@@ -3221,17 +3220,8 @@ exports.shadowrunCombatUpdate = (changes, options) => __awaiter(void 0, void 0, 
                 },
                 flavor: `${c.token.name} rolls for Initiative!`,
             }, messageOptions);
-            roll.toMessage(messageData, {
+            yield roll.toMessage(messageData, {
                 rollMode,
-                create: false,
-            }).then((chatData) => {
-                // only make the sound once
-                if (sound)
-                    sound = false;
-                else
-                    chatData.sound = null;
-                // @ts-ignore
-                messages.push(chatData);
             });
         }
         yield combat.createEmbeddedEntity('Combatant', removedCombatants, {});
