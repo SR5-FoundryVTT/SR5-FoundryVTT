@@ -174,7 +174,7 @@ function rollItemMacro(itemName) {
         );
     }
 
-    return item.roll();
+    return item.rollTest(event);
 }
 
 registerHandlebarHelpers();

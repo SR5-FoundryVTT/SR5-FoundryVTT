@@ -4796,10 +4796,6 @@ class SR5Item extends Item {
         const blastData = this.getBlastData();
         if (blastData)
             data.blast = blastData;
-        console.log('atkData');
-        console.log('');
-        console.log(data);
-        console.log('');
         return data;
     }
     getActionSkill() {
@@ -4931,7 +4927,7 @@ class SR5Item extends Item {
     }
     getBlastData() {
         // can only handle spells and grenade right now
-        if (this.isSpell()) {
+        if (this.isSpell() && this.isAreaOfEffect()) {
             // distance on spells is equal to force
             let distance = this.getLastSpellForce().value;
             // extended spells multiply by 10
@@ -5431,7 +5427,7 @@ function rollItemMacro(itemName) {
         // @ts-ignore
         return ui.notifications.warn(`Your controlled Actor does not have an item named ${itemName}`);
     }
-    return item.roll();
+    return item.rollTest(event);
 }
 handlebars_1.registerHandlebarHelpers();
 

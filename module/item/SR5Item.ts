@@ -730,11 +730,6 @@ export class SR5Item extends Item {
         const blastData = this.getBlastData();
         if (blastData) data.blast = blastData;
 
-        console.log('atkData');
-        console.log('');
-        console.log(data);
-        console.log('');
-
         return data;
     }
 
@@ -865,7 +860,7 @@ export class SR5Item extends Item {
 
     getBlastData(): BlastData | undefined {
         // can only handle spells and grenade right now
-        if (this.isSpell()) {
+        if (this.isSpell() && this.isAreaOfEffect()) {
             // distance on spells is equal to force
             let distance = this.getLastSpellForce().value;
             // extended spells multiply by 10
