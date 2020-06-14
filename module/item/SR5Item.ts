@@ -187,7 +187,7 @@ export class SR5Item extends Item {
         // we won't work if we don't have an actor
         if (!this.actor) return;
 
-        const postOnly = event?.shiftKey;
+        const postOnly = event?.shiftKey || !this.hasRoll;
 
         const post = (bonus = {}) => {
             // if only post, don't roll and post a card version -- otherwise roll
