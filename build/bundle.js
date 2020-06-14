@@ -4843,16 +4843,16 @@ class SR5Item extends Item {
     }
     getRollName() {
         if (this.isRangedWeapon()) {
-            return 'SR5.RangedWeaponAttack';
+            return game.i18n.localize('SR5.RangeWeaponAttack');
         }
         if (this.isMeleeWeapon()) {
-            return 'SR5.MeleeWeaponAttack';
+            return game.i18n.localize('SR5.MeleeWeaponAttack');
         }
         if (this.isCombatSpell()) {
-            return 'SR5.SpellAttack';
+            return game.i18n.localize('SR5.SpellAttack');
         }
         if (this.isSpell()) {
-            return 'SR5.SpellCast';
+            return game.i18n.localize('SR5.SpellCast');
         }
         return this.name;
     }
