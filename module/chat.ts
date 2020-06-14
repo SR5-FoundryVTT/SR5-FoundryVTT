@@ -1,38 +1,76 @@
 import { SR5Actor } from './actor/SR5Actor';
+import { SR5Item } from './item/SR5Item';
+import Template from './template';
+import ModList = Shadowrun.ModList;
+import BaseValuePair = Shadowrun.BaseValuePair;
+import DamageData = Shadowrun.DamageData;
+import AttackData = Shadowrun.AttackData;
+import LabelField = Shadowrun.LabelField;
 
-export const highlightSuccessFailure = (message, html) => {
-    if (!message) return;
-    if (!message.isContentVisible || !message.roll.parts.length) return;
-    const { roll } = message;
-    if (!roll.parts.length) return;
-    if (!roll.parts[0].rolls) return;
+export type TemplateData = {
+    header: {
+        name: string;
+        img: string;
+    };
+    tokenId?: string;
+    dice?: Die[];
+    parts?: ModList<number>;
+    limit?: BaseValuePair<number> & LabelField;
+    testName?: string;
+    actor?: SR5Actor;
+    item?: SR5Item;
+    attack?: AttackData;
+    incomingAttack?: AttackData;
+    incomingDrain?: LabelField & {
+        value: number;
+    };
+    soak?: DamageData;
+    tests?: {
+        label: string;
+        type: string;
+    }[];
+    description?: object;
+    previewTemplate?: boolean;
+};
 
-    const khreg = /kh\d+/;
-    const match = roll.formula.match(khreg);
+export const createChatData = async (templateData: TemplateData, roll?) => {
+    const template = `systems/shadowrun5e/templates/rolls/roll-card.html`;
+    const html = await renderTemplate(template, templateData);
+    const actor = templateData.actor;
 
-    const limit = match ? +match[0].replace('kh', '') : 0;
-
-    const hits = roll.total;
-    const fails = roll.parts[0].rolls.reduce((fails, r) => (r.roll === 1 ? fails + 1 : fails), 0);
-    const count = roll.parts[0].rolls.length;
-    const glitch = fails > count / 2.0;
-
-    if (limit && hits >= limit) {
-        html.find('.dice-total').addClass('limit-hit');
-    } else if (glitch) {
-        html.find('.dice-total').addClass('glitch');
+    const chatData = {
+        user: game.user._id,
+        type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+        content: html,
+        roll,
+        speaker: {
+            actor: actor?._id,
+            token: actor?.token,
+            alias: actor?.name,
+        },
+        flags: {
+            shadowrun5e: {
+                customRoll: true,
+            },
+        },
+    };
+    if (roll) {
+        chatData['sound'] = CONFIG.sounds.dice;
     }
+    const rollMode = game.settings.get('core', 'rollMode');
+
+    if (['gmroll', 'blindroll'].includes(rollMode))
+        chatData['whisper'] = ChatMessage.getWhisperIDs('GM');
+    if (rollMode === 'blindroll') chatData['blind'] = true;
+
+    return chatData;
 };
 
 export const addChatMessageContextOptions = function (html, options) {
     const canRoll = (li) => {
         const msg = game.messages.get(li.data().messageId);
 
-        return !!(
-            li.find('.dice-roll').length &&
-            msg &&
-            (msg.user.id === game.user.id || game.user.isGM)
-        );
+        msg.getFlag('shadowrun5e', 'customRoll');
     };
 
     options.push(
@@ -50,4 +88,43 @@ export const addChatMessageContextOptions = function (html, options) {
         }
     );
     return options;
+};
+
+export const addRollListeners = (app: ChatMessage, html) => {
+    if (!app.getFlag('shadowrun5e', 'customRoll')) return;
+    html.on('click', '.test-roll', async (event) => {
+        event.preventDefault();
+        const item = SR5Item.getItemFromMessage(html);
+        if (item) {
+            const roll = await item.rollTest(event, { hideRollMessage: true });
+            if (roll && roll.templateData) {
+                const template = `systems/shadowrun5e/templates/rolls/roll-card.html`;
+                const html = await renderTemplate(template, roll.templateData);
+                const data = {};
+                data['content'] = html;
+                await app.update(data);
+            }
+        }
+    });
+    html.on('click', '.test', async (event) => {
+        event.preventDefault();
+        const type = event.currentTarget.dataset.action;
+        const item = SR5Item.getItemFromMessage(html);
+        if (item) {
+            await item.rollExtraTest(type, event);
+        }
+    });
+    html.on('click', '.place-template', (event) => {
+        event.preventDefault();
+        const item = SR5Item.getItemFromMessage(html);
+        if (item) {
+            const template = Template.fromItem(item);
+            template?.drawPreview(event);
+        }
+    });
+    html.on('click', '.card-title', (event) => {
+        event.preventDefault();
+        $(event.currentTarget).siblings('.card-description').toggle();
+    });
+    $(html).find('.card-description').hide();
 };

@@ -1,111 +1,5 @@
 (function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-class ShadowrunTemplate extends MeasuredTemplate {
-    static fromItem(item) {
-        const templateShape = 'circle';
-        const templateData = {
-            t: templateShape,
-            user: game.user._id,
-            direction: 0,
-            x: 0,
-            y: 0,
-            // @ts-ignore
-            fillColor: game.user.color,
-        };
-        // can only handle spells and grenade right now
-        if (item.isSpell()) {
-            const force = item.getLastSpellForce();
-            // distance on spells is equal to force (I'm probably wrong for certain spells)
-            let distance = force;
-            // extended spells multiply by 10
-            if (item.data.data.extended)
-                distance *= 10;
-            templateData['distance'] = distance;
-        }
-        else if (item.isGrenade()) {
-            // use blast radius
-            const distance = item.data.data.thrown.blast.radius;
-            const dropoff = item.data.data.thrown.blast.dropoff;
-            templateData['distance'] = distance;
-        }
-        else if (item.hasExplosiveAmmo()) {
-            const ammo = item.getEquippedAmmo();
-            const distance = ammo.data.data.blast.radius;
-            const dropoff = ammo.data.data.blast.dropoff;
-            templateData['distance'] = distance;
-        }
-        // @ts-ignore
-        return new this(templateData);
-    }
-    drawPreview(event) {
-        const initialLayer = canvas.activeLayer;
-        // @ts-ignore
-        this.draw();
-        // @ts-ignore
-        this.layer.activate();
-        // @ts-ignore
-        this.layer.preview.addChild(this);
-        this.activatePreviewListeners(initialLayer);
-    }
-    activatePreviewListeners(initialLayer) {
-        const handlers = {};
-        let moveTime = 0;
-        // Update placement (mouse-move)
-        handlers['mm'] = (event) => {
-            event.stopPropagation();
-            let now = Date.now(); // Apply a 20ms throttle
-            if (now - moveTime <= 20)
-                return;
-            const center = event.data.getLocalPosition(this.layer);
-            const snapped = canvas.grid.getSnappedPosition(center.x, center.y, 2);
-            this.data.x = snapped.x;
-            this.data.y = snapped.y;
-            // @ts-ignore
-            this.refresh();
-            moveTime = now;
-        };
-        // Cancel the workflow (right-click)
-        handlers['rc'] = (event) => {
-            this.layer.preview.removeChildren();
-            canvas.stage.off('mousemove', handlers['mm']);
-            canvas.stage.off('mousedown', handlers['lc']);
-            canvas.app.view.oncontextmenu = null;
-            canvas.app.view.onwheel = null;
-            initialLayer.activate();
-        };
-        // Confirm the workflow (left-click)
-        handlers['lc'] = (event) => {
-            handlers['rc'](event);
-            // Confirm final snapped position
-            const destination = canvas.grid.getSnappedPosition(this.x, this.y, 2);
-            this.data.x = destination.x;
-            this.data.y = destination.y;
-            // Create the template
-            canvas.scene.createEmbeddedEntity('MeasuredTemplate', this.data);
-        };
-        // Rotate the template by 3 degree increments (mouse-wheel)
-        handlers['mw'] = (event) => {
-            if (event.ctrlKey)
-                event.preventDefault(); // Avoid zooming the browser window
-            event.stopPropagation();
-            let delta = canvas.grid.type > CONST.GRID_TYPES.SQUARE ? 30 : 15;
-            let snap = event.shiftKey ? delta : 5;
-            this.data.direction += snap * Math.sign(event.deltaY);
-            // @ts-ignore
-            this.refresh();
-        };
-        // Activate listeners
-        canvas.stage.on('mousemove', handlers['mm']);
-        canvas.stage.on('mousedown', handlers['lc']);
-        canvas.app.view.oncontextmenu = handlers['rc'];
-        canvas.app.view.onwheel = handlers['mw'];
-    }
-}
-exports.default = ShadowrunTemplate;
-
-},{}],2:[function(require,module,exports){
-"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -117,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5Actor = void 0;
-const dice_1 = require("../dice");
+const ShadowrunRoller_1 = require("../rolls/ShadowrunRoller");
 const helpers_1 = require("../helpers");
 class SR5Actor extends Actor {
     update(data, options) {
@@ -200,7 +94,7 @@ class SR5Actor extends Actor {
         data.modifiers = modifiers;
         let totalEssence = 6;
         armor.value = 0;
-        armor.mod = 0;
+        armor.mod = {};
         for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
             armor[element] = 0;
         }
@@ -220,11 +114,14 @@ class SR5Actor extends Actor {
             const equipped = (_a = itemData.technology) === null || _a === void 0 ? void 0 : _a.equipped;
             if (equipped) {
                 if (itemData.armor && itemData.armor.value) {
-                    if (itemData.armor.mod)
-                        armor.mod += itemData.armor.value;
                     // if it's a mod, add to the mod field
-                    else
-                        armor.value = itemData.armor.value; // if not a mod, set armor.value to the items value
+                    if (itemData.armor.mod) {
+                        armor.mod[item.name] = itemData.armor.value;
+                    } // if not a mod, set armor.value to the items value
+                    else {
+                        armor.base = itemData.armor.value;
+                        armor.label = item.name;
+                    }
                     for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
                         armor[element] = itemData.armor[element];
                     }
@@ -254,6 +151,8 @@ class SR5Actor extends Actor {
                 }
             }
         }
+        // SET ARMOR
+        armor.value = armor.base + helpers_1.Helpers.totalMods(armor.mod) + modifiers['armor'];
         // ATTRIBUTES
         for (let [, att] of Object.entries(attributes)) {
             if (!att.hidden) {
@@ -306,7 +205,7 @@ class SR5Actor extends Actor {
         // TECHNOMANCER LIVING PERSONA
         if (data.special === 'resonance') {
             // if we don't have a device, use living persona
-            if (matrix.device === undefined) {
+            if (matrix.device === '') {
                 // we should use living persona
                 matrix.firewall.value += attributes.willpower.value;
                 matrix.data_processing.value += attributes.logic.value;
@@ -370,8 +269,6 @@ class SR5Actor extends Actor {
             mod: matrix.sleaze.mod,
             hidden: true,
         };
-        // SET ARMOR
-        armor.value += armor.mod + modifiers['armor'];
         // SET ESSENCE
         actorData.data.attributes.essence.value = +(totalEssence + modifiers['essence']).toFixed(3);
         // SETUP LIMITS
@@ -463,6 +360,9 @@ class SR5Actor extends Actor {
             tr.label = CONFIG.SR5.damageTypes[t];
         }
     }
+    getModifier(modifierName) {
+        return this.data.data.modifiers[modifierName];
+    }
     findActiveSkill(skillName) {
         if (skillName === undefined)
             return undefined;
@@ -472,6 +372,16 @@ class SR5Actor extends Actor {
         if (attributeName === undefined)
             return undefined;
         return this.data.data.attributes[attributeName];
+    }
+    getWounds() {
+        var _a;
+        return ((_a = this.data.data.wounds) === null || _a === void 0 ? void 0 : _a.value) || 0;
+    }
+    getEdge() {
+        return this.data.data.attributes.edge;
+    }
+    getArmor() {
+        return this.data.data.armor;
     }
     getOwnedItem(itemId) {
         return super.getOwnedItem(itemId);
@@ -532,15 +442,18 @@ class SR5Actor extends Actor {
         parts[res.label] = res.value;
         if (data.modifiers.fade)
             parts['SR5.Bonus'] = data.modifiers.fade;
-        let title = 'Fade';
-        if (incoming >= 0)
-            title += ` (${incoming} incoming)`;
-        dice_1.DiceSR.rollTest({
+        let title = `${game.i18n.localize('SR5.Resist')} ${game.i18n.localize('SR5.Fade')}`;
+        const incomingDrain = {
+            label: 'SR5.Fade',
+            value: incoming,
+        };
+        return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
             event: options.event,
             parts,
             actor: this,
             title: title,
             wounds: false,
+            incomingDrain,
         });
     }
     rollDrain(options = {}, incoming = -1) {
@@ -551,46 +464,49 @@ class SR5Actor extends Actor {
         parts[drainAtt.label] = drainAtt.value;
         if (this.data.data.modifiers.drain)
             parts['SR5.Bonus'] = this.data.data.modifiers.drain;
-        let title = 'Drain';
-        if (incoming >= 0)
-            title += ` (${incoming} incoming)`;
-        dice_1.DiceSR.rollTest({
+        let title = `${game.i18n.localize('SR5.Resist')} ${game.i18n.localize('SR5.Drain')}`;
+        const incomingDrain = {
+            label: 'SR5.Drain',
+            value: incoming,
+        };
+        return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
             event: options.event,
             parts,
             actor: this,
             title: title,
             wounds: false,
+            incomingDrain,
         });
     }
-    rollArmor(options = {}) {
-        const armor = this.data.data.armor.value;
-        const parts = {};
-        parts['SR5.Armor'] = armor;
-        return dice_1.DiceSR.rollTest({
+    rollArmor(options = {}, parts = {}) {
+        this._addArmorParts(parts);
+        return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
             event: options.event,
             actor: this,
             parts,
-            title: 'Armor',
+            title: game.i18n.localize('SR5.Armor'),
             wounds: false,
         });
     }
-    rollDefense(options = {}) {
+    rollDefense(options = {}, parts = {}) {
+        this._addDefenseParts(parts);
         let dialogData = {
-            defense: this.data.data.rolls.defense,
-            fireMode: options.fireModeDefense,
+            parts,
             cover: options.cover,
         };
         let template = 'systems/shadowrun5e/templates/rolls/roll-defense.html';
         let special = '';
         let cancel = true;
+        const incomingAttack = options.incomingAttack;
+        const event = options.event;
         return new Promise((resolve) => {
             renderTemplate(template, dialogData).then((dlg) => {
                 new Dialog({
-                    title: 'Defense',
+                    title: game.i18n.localize('SR5.Defense'),
                     content: dlg,
                     buttons: {
                         normal: {
-                            label: game.i18n.localize('Normal'),
+                            label: game.i18n.localize('SR5.Normal'),
                             callback: () => (cancel = false),
                         },
                         full_defense: {
@@ -605,14 +521,6 @@ class SR5Actor extends Actor {
                     close: (html) => __awaiter(this, void 0, void 0, function* () {
                         if (cancel)
                             return;
-                        const rea = this.data.data.attributes.reaction;
-                        const int = this.data.data.attributes.intuition;
-                        const parts = {};
-                        parts[rea.label] = rea.value;
-                        parts[int.label] = int.value;
-                        if (this.data.data.modifiers.defense)
-                            parts['SR5.Bonus'] = this.data.data.modifiers.defense;
-                        let fireMode = helpers_1.Helpers.parseInputToNumber($(html).find('[name=fireMode]').val());
                         let cover = helpers_1.Helpers.parseInputToNumber($(html).find('[name=cover]').val());
                         if (special === 'full_defense')
                             parts['SR5.FullDefense'] = this.data.data.attributes.willpower.value;
@@ -620,28 +528,26 @@ class SR5Actor extends Actor {
                             parts['SR5.Dodge'] = this.data.data.skills.active.gymnastics.value;
                         if (special === 'block')
                             parts['SR5.Block'] = this.data.data.skills.active.unarmed_combat.value;
-                        if (fireMode)
-                            parts['SR5.FireMode'] = fireMode;
                         if (cover)
                             parts['SR5.Cover'] = cover;
-                        resolve(dice_1.DiceSR.rollTest({
-                            event: options.event,
+                        resolve(ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
+                            event: event,
                             actor: this,
                             parts,
-                            title: 'Defense',
+                            title: game.i18n.localize('SR5.DefenseTest'),
+                            incomingAttack,
                         }).then((roll) => __awaiter(this, void 0, void 0, function* () {
-                            if (options.incomingAttack && roll) {
+                            if (incomingAttack && roll) {
                                 let defenderHits = roll.total;
-                                let attack = options.incomingAttack;
-                                let attackerHits = attack.hits || 0;
+                                let attackerHits = incomingAttack.hits || 0;
                                 let netHits = attackerHits - defenderHits;
                                 if (netHits >= 0) {
+                                    const damage = incomingAttack.damage;
+                                    damage.mod['SR5.NetHits'] = netHits;
+                                    damage.value = damage.base + helpers_1.Helpers.totalMods(damage.mod);
                                     const soakRollOptions = {
-                                        event: options.event,
-                                        attackerHits,
-                                        defenderHits,
-                                        netHits,
-                                        damage: options.incomingAttack.damage,
+                                        event: event,
+                                        damage: incomingAttack.damage,
                                     };
                                     yield this.rollSoak(soakRollOptions);
                                 }
@@ -652,13 +558,11 @@ class SR5Actor extends Actor {
             });
         });
     }
-    rollSoak(options) {
-        var _a, _b;
-        const totalDamage = (((_a = options === null || options === void 0 ? void 0 : options.damage) === null || _a === void 0 ? void 0 : _a.value) || 0) + ((options === null || options === void 0 ? void 0 : options.netHits) || 0);
+    rollSoak(options, parts = {}) {
+        this._addSoakParts(parts);
         let dialogData = {
-            damage: totalDamage,
-            ap: (_b = options === null || options === void 0 ? void 0 : options.damage) === null || _b === void 0 ? void 0 : _b.ap,
-            soak: this.data.data.rolls.soak.default,
+            damage: options === null || options === void 0 ? void 0 : options.damage,
+            parts,
         };
         let id = '';
         let cancel = true;
@@ -666,7 +570,7 @@ class SR5Actor extends Actor {
         return new Promise((resolve) => {
             renderTemplate(template, dialogData).then((dlg) => {
                 new Dialog({
-                    title: 'Soak Test',
+                    title: 'SR5.DamageResistanceTest',
                     content: dlg,
                     buttons: {
                         base: {
@@ -721,13 +625,7 @@ class SR5Actor extends Actor {
                     close: (html) => __awaiter(this, void 0, void 0, function* () {
                         if (cancel)
                             return;
-                        const body = this.data.data.attributes.body;
-                        const armor = this.data.data.armor;
-                        const parts = {};
-                        parts[body.label] = body.value;
-                        parts['SR5.Armor'] = armor.value;
-                        if (this.data.data.modifiers.soak)
-                            parts['SR5.Bonus'] = this.data.data.modifiers.soak;
+                        const armor = this.getArmor();
                         const armorId = id === 'default' ? '' : id;
                         const bonusArmor = armor[armorId] || 0;
                         if (bonusArmor)
@@ -738,13 +636,11 @@ class SR5Actor extends Actor {
                             // don't take more AP than armor
                             parts['SR5.AP'] = Math.max(ap, -armorVal);
                         }
-                        const label = helpers_1.Helpers.label(id);
-                        let title = `Soak - ${label}`;
-                        if (totalDamage)
-                            title += ` - Incoming Damage: ${totalDamage}`;
-                        resolve(dice_1.DiceSR.rollTest({
+                        let title = game.i18n.localize('SR5.SoakTest');
+                        resolve(ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
                             event: options === null || options === void 0 ? void 0 : options.event,
                             actor: this,
+                            soak: options === null || options === void 0 ? void 0 : options.damage,
                             parts,
                             title: title,
                             wounds: false,
@@ -760,7 +656,7 @@ class SR5Actor extends Actor {
         parts[attr.label] = attr.value;
         this._addMatrixParts(parts, attr);
         this._addGlobalParts(parts);
-        return dice_1.DiceSR.rollTest({
+        return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
             event: options === null || options === void 0 ? void 0 : options.event,
             actor: this,
             parts,
@@ -777,7 +673,7 @@ class SR5Actor extends Actor {
         parts[attr2.label] = attr2.value;
         this._addMatrixParts(parts, [attr1, attr2]);
         this._addGlobalParts(parts);
-        return dice_1.DiceSR.rollTest({
+        return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
             event: options === null || options === void 0 ? void 0 : options.event,
             actor: this,
             parts,
@@ -800,7 +696,7 @@ class SR5Actor extends Actor {
         const parts = {};
         parts[att1.label] = att1.value;
         parts[att2.label] = att2.value;
-        return dice_1.DiceSR.rollTest({
+        return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
             event: options === null || options === void 0 ? void 0 : options.event,
             actor: this,
             parts,
@@ -828,7 +724,7 @@ class SR5Actor extends Actor {
             if (options && options.event && options.event[CONFIG.SR5.kbmod.SPEC])
                 parts['SR5.Specialization'] = 2;
             if (helpers_1.Helpers.hasModifiers(options === null || options === void 0 ? void 0 : options.event)) {
-                return dice_1.DiceSR.rollTest({
+                return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
                     event: options === null || options === void 0 ? void 0 : options.event,
                     actor: this,
                     parts,
@@ -867,7 +763,7 @@ class SR5Actor extends Actor {
                                 parts[att.label] = att.value;
                             this._addMatrixParts(parts, true);
                             this._addGlobalParts(parts);
-                            return dice_1.DiceSR.rollTest({
+                            return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
                                 event: options === null || options === void 0 ? void 0 : options.event,
                                 actor: this,
                                 parts,
@@ -880,8 +776,9 @@ class SR5Actor extends Actor {
         });
     }
     promptRoll(options) {
-        return dice_1.DiceSR.rollTest({
+        return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
             event: options === null || options === void 0 ? void 0 : options.event,
+            parts: {},
             actor: this,
             dialogOptions: {
                 prompt: true,
@@ -917,7 +814,7 @@ class SR5Actor extends Actor {
             if (modifiers.memory)
                 parts['SR5.Bonus'] = modifiers.memory;
         }
-        return dice_1.DiceSR.rollTest({
+        return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
             event: options === null || options === void 0 ? void 0 : options.event,
             actor: this,
             parts,
@@ -939,11 +836,11 @@ class SR5Actor extends Actor {
                 parts['SR5.Specialization'] = 2;
             this._addMatrixParts(parts, [att, skill]);
             this._addGlobalParts(parts);
-            return dice_1.DiceSR.rollTest({
+            return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
                 event: options.event,
                 actor: this,
                 parts,
-                limit: limit ? limit.value : undefined,
+                limit,
                 title: `${title} Test`,
             });
         }
@@ -991,11 +888,11 @@ class SR5Actor extends Actor {
                         parts['SR5.Specialization'] = 2;
                     this._addMatrixParts(parts, [att, skill]);
                     this._addGlobalParts(parts);
-                    return dice_1.DiceSR.rollTest({
+                    return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
                         event: options === null || options === void 0 ? void 0 : options.event,
                         actor: this,
                         parts,
-                        limit: limit ? limit.value : undefined,
+                        limit,
                         title: `${title} Test`,
                     });
                 }),
@@ -1045,7 +942,6 @@ class SR5Actor extends Actor {
                 close: (html) => __awaiter(this, void 0, void 0, function* () {
                     if (cancel)
                         return;
-                    let limit = undefined;
                     const att2Id = helpers_1.Helpers.parseInputToString($(html).find('[name=attribute2]').val());
                     let att2 = undefined;
                     if (att2Id !== 'none') {
@@ -1061,12 +957,11 @@ class SR5Actor extends Actor {
                     }
                     this._addMatrixParts(parts, [att, att2]);
                     this._addGlobalParts(parts);
-                    return dice_1.DiceSR.rollTest({
+                    return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
                         event: options === null || options === void 0 ? void 0 : options.event,
                         title: `${title} Test`,
                         actor: this,
                         parts,
-                        limit: limit,
                     });
                 }),
             }).render(true);
@@ -1086,47 +981,110 @@ class SR5Actor extends Actor {
             parts['SR5.Global'] = this.data.data.modifiers.global;
         }
     }
-    static pushTheLimit(roll) {
+    _addDefenseParts(parts) {
+        const reaction = this.findAttribute('reaction');
+        const intuition = this.findAttribute('intuition');
+        const mod = this.getModifier('defense');
+        if (reaction) {
+            parts[reaction.label || 'SR5.Reaction'] = reaction.value;
+        }
+        if (intuition) {
+            parts[intuition.label || 'SR5.Intuition'] = intuition.value;
+        }
+        if (mod) {
+            parts['SR5.Bonus'] = mod;
+        }
+    }
+    _addArmorParts(parts) {
+        const armor = this.getArmor();
+        if (armor) {
+            parts[armor.label || 'SR5.Armor'] = armor.base;
+            for (let [key, val] of Object.entries(armor.mod)) {
+                parts[key] = val;
+            }
+        }
+    }
+    _addSoakParts(parts) {
+        const body = this.findAttribute('body');
+        if (body) {
+            parts[body.label || 'SR5.Body'] = body.value;
+        }
+        this._addArmorParts(parts);
+    }
+    static pushTheLimit(li) {
         return __awaiter(this, void 0, void 0, function* () {
-            let title = roll.find('.flavor-text').text();
-            let msg = game.messages.get(roll.data().messageId);
-            const actor = msg.user.character;
-            if (actor) {
-                return dice_1.DiceSR.rollTest({
-                    event: { shiftKey: true, altKey: true },
-                    title: `${title} - Push the Limit`,
-                    actor: actor,
-                    wounds: false,
-                });
+            let msg = game.messages.get(li.data().messageId);
+            if (msg.getFlag('shadowrun5e', 'customRoll')) {
+                let actor = msg.user.character;
+                if (!actor) {
+                    // get controlled tokens
+                    const tokens = canvas.tokens.controlled;
+                    console.log(tokens);
+                    if (tokens.length > 0) {
+                        for (let token of tokens) {
+                            if (token.actor.owner) {
+                                actor = token.actor;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (actor) {
+                    const parts = {};
+                    parts['SR5.PushTheLimit'] = actor.getEdge().max;
+                    ShadowrunRoller_1.ShadowrunRoller.basicRoll({
+                        title: ` - ${game.i18n.localize('SR5.PushTheLimit')}`,
+                        parts: parts,
+                        actor: actor,
+                    }).then(() => {
+                        actor.update({
+                            'data.attributes.edge.value': actor.getEdge().value - 1,
+                        });
+                    });
+                }
             }
         });
     }
-    static secondChance(roll) {
+    static secondChance(li) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            let formula = roll.find('.dice-formula').text();
-            let hits = parseInt(roll.find('.dice-total').text());
-            let title = roll.find('.flavor-text').text();
+            let msg = game.messages.get(li.data().messageId);
+            // @ts-ignore
+            let roll = JSON.parse((_a = msg.data) === null || _a === void 0 ? void 0 : _a.roll);
+            let formula = roll.formula;
+            let hits = roll.total;
             let re = /(\d+)d6/;
+            console.log(formula);
             let matches = formula.match(re);
-            if (matches[1]) {
+            if (matches && matches[1]) {
                 let match = matches[1];
                 let pool = parseInt(match.replace('d6', ''));
                 if (!isNaN(pool) && !isNaN(hits)) {
-                    let msg = game.messages.get(roll.data().messageId);
-                    const actor = msg.user.character;
+                    let actor = msg.user.character;
+                    if (!actor) {
+                        // get controlled tokens
+                        const tokens = canvas.tokens.controlled;
+                        console.log(tokens);
+                        if (tokens.length > 0) {
+                            for (let token of tokens) {
+                                if (token.actor.owner) {
+                                    actor = token.actor;
+                                    break;
+                                }
+                            }
+                        }
+                    }
                     if (actor) {
                         const parts = {};
                         parts['SR5.OriginalDicePool'] = pool;
                         parts['SR5.Successes'] = -hits;
-                        return dice_1.DiceSR.rollTest({
-                            event: { shiftKey: true },
-                            title: `${title} - Second Chance`,
+                        return ShadowrunRoller_1.ShadowrunRoller.basicRoll({
+                            title: ` - Second Chance`,
                             parts,
-                            wounds: false,
                             actor: actor,
                         }).then(() => {
                             actor.update({
-                                'data.attributes.edge.value': actor.data.data.attributes.edge.value - 1,
+                                'data.attributes.edge.value': actor.getEdge().value - 1,
                             });
                         });
                     }
@@ -1137,7 +1095,7 @@ class SR5Actor extends Actor {
 }
 exports.SR5Actor = SR5Actor;
 
-},{"../dice":14,"../helpers":15}],3:[function(require,module,exports){
+},{"../helpers":14,"../rolls/ShadowrunRoller":20}],2:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -1212,7 +1170,7 @@ class SR5ActorSheet extends ActorSheet {
         const { modifiers: mods } = data.data;
         for (let [key, value] of Object.entries(mods)) {
             if (value === 0)
-                mods[key] = "";
+                mods[key] = '';
         }
         this._prepareItems(data);
         this._prepareSkills(data);
@@ -1335,7 +1293,6 @@ class SR5ActorSheet extends ActorSheet {
         complex_forms.sort(sortByName);
         items.sort(sortByName);
         spells.sort(sortByName);
-        complex_forms.sort(sortByName);
         contacts.sort(sortByName);
         lifestyles.sort(sortByName);
         sins.sort(sortByName);
@@ -1397,6 +1354,7 @@ class SR5ActorSheet extends ActorSheet {
         html.find('.drain-roll').click(this._onRollDrain.bind(this));
         html.find('.fade-roll').click(this._onRollFade.bind(this));
         html.find('.item-roll').click(this._onRollItem.bind(this));
+        // $(html).find('.item-roll').on('contextmenu', () => console.log('TEST'));
         html.find('.item-equip-toggle').click(this._onEquipItem.bind(this));
         html.find('.item-qty').change(this._onChangeQty.bind(this));
         html.find('.item-rtg').change(this._onChangeRtg.bind(this));
@@ -1581,13 +1539,13 @@ class SR5ActorSheet extends ActorSheet {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
             let track = event.currentTarget.closest('.attribute').dataset.track;
-            this.actor.rollNaturalRecovery(track, event);
+            yield this.actor.rollNaturalRecovery(track, event);
         });
     }
     _onRollPrompt(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
-            this.actor.promptRoll({ event: event });
+            yield this.actor.promptRoll({ event: event });
         });
     }
     _onRollItem(event) {
@@ -1595,8 +1553,9 @@ class SR5ActorSheet extends ActorSheet {
             event.preventDefault();
             const iid = event.currentTarget.closest('.item').dataset.itemId;
             const item = this.actor.getOwnedItem(iid);
-            if (item)
-                return item.roll(event);
+            if (item) {
+                yield item.postCard(event);
+            }
         });
     }
     _onRollFade(event) {
@@ -1749,7 +1708,7 @@ class SR5ActorSheet extends ActorSheet {
 }
 exports.SR5ActorSheet = SR5ActorSheet;
 
-},{"../apps/chummer-import-form":4,"../apps/knowledge-skill-edit":7,"../apps/language-skill-edit":8,"../apps/skill-edit":9,"../helpers":15}],4:[function(require,module,exports){
+},{"../apps/chummer-import-form":3,"../apps/knowledge-skill-edit":6,"../apps/language-skill-edit":7,"../apps/skill-edit":8,"../helpers":14}],3:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -2547,7 +2506,7 @@ var ChummerImportForm = /*#__PURE__*/function (_FormApplication) {
 
 exports.ChummerImportForm = ChummerImportForm;
 
-},{"@babel/runtime/helpers/asyncToGenerator":23,"@babel/runtime/helpers/classCallCheck":24,"@babel/runtime/helpers/createClass":25,"@babel/runtime/helpers/get":27,"@babel/runtime/helpers/getPrototypeOf":28,"@babel/runtime/helpers/inherits":29,"@babel/runtime/helpers/interopRequireDefault":30,"@babel/runtime/helpers/possibleConstructorReturn":31,"@babel/runtime/regenerator":35}],5:[function(require,module,exports){
+},{"@babel/runtime/helpers/asyncToGenerator":24,"@babel/runtime/helpers/classCallCheck":25,"@babel/runtime/helpers/createClass":26,"@babel/runtime/helpers/get":28,"@babel/runtime/helpers/getPrototypeOf":29,"@babel/runtime/helpers/inherits":30,"@babel/runtime/helpers/interopRequireDefault":31,"@babel/runtime/helpers/possibleConstructorReturn":32,"@babel/runtime/regenerator":36}],4:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -2559,11 +2518,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ShadowrunRollDialog = void 0;
+exports.ShadowrunItemDialog = void 0;
 const helpers_1 = require("../../helpers");
-const dice_1 = require("../../dice");
-class ShadowrunRollDialog extends Dialog {
-    static fromItemRoll(item, event) {
+class ShadowrunItemDialog extends Dialog {
+    static fromItem(item, event) {
         return __awaiter(this, void 0, void 0, function* () {
             const dialogData = {
                 title: item.name,
@@ -2574,22 +2532,22 @@ class ShadowrunRollDialog extends Dialog {
             const templateData = {};
             let templatePath = '';
             if (item.isRangedWeapon()) {
-                ShadowrunRollDialog.addRangedWeaponData(templateData, dialogData, item);
+                ShadowrunItemDialog.addRangedWeaponData(templateData, dialogData, item);
                 templatePath = 'systems/shadowrun5e/templates/rolls/range-weapon-roll.html';
             }
             else if (item.isSpell()) {
-                ShadowrunRollDialog.addSpellData(templateData, dialogData, item);
+                ShadowrunItemDialog.addSpellData(templateData, dialogData, item);
                 templatePath = 'systems/shadowrun5e/templates/rolls/roll-spell.html';
             }
             else if (item.isComplexForm()) {
-                ShadowrunRollDialog.addComplexFormData(templateData, dialogData, item);
+                ShadowrunItemDialog.addComplexFormData(templateData, dialogData, item);
                 templatePath = 'systems/shadowrun5e/templates/rolls/roll-complex-form.html';
             }
             if (templatePath) {
                 const dialog = yield renderTemplate(templatePath, templateData);
-                return new ShadowrunRollDialog(mergeObject(dialogData, {
+                return mergeObject(dialogData, {
                     content: dialog,
-                }));
+                });
             }
             return undefined;
         });
@@ -2603,11 +2561,12 @@ class ShadowrunRollDialog extends Dialog {
     }
      */
     static addComplexFormData(templateData, dialogData, item) {
-        const parts = item.getRollPartsList();
+        var _a;
         const fade = item.getFade();
         const title = `${helpers_1.Helpers.label(item.name)} Level`;
+        const level = ((_a = item.getLastComplexFormLevel()) === null || _a === void 0 ? void 0 : _a.value) || 2 - fade;
         templateData['fade'] = fade >= 0 ? `+${fade}` : fade;
-        templateData['level'] = 2 - fade;
+        templateData['level'] = level;
         templateData['title'] = title;
         let cancel = true;
         dialogData.buttons = {
@@ -2619,30 +2578,19 @@ class ShadowrunRollDialog extends Dialog {
         };
         dialogData.close = (html) => __awaiter(this, void 0, void 0, function* () {
             if (cancel)
-                return;
+                return false;
             const level = helpers_1.Helpers.parseInputToNumber($(html).find('[name=level]').val());
-            yield item.setLastComplexFormLevel(level);
-            dice_1.DiceSR.rollTest({
-                event: dialogData['event'],
-                dialogOptions: {
-                    environmental: false,
-                },
-                parts,
-                actor: item.actor,
-                limit: level,
-                title,
-            }).then(() => {
-                const totalFade = Math.max(item.getFade() + level, 2);
-                item.actor.rollFade({ event: dialogData['event'] }, totalFade);
-            });
+            yield item.setLastComplexFormLevel({ value: level });
+            return true;
         });
     }
     static addSpellData(templateData, dialogData, item) {
-        const parts = item.getRollPartsList();
+        var _a;
         const title = `${helpers_1.Helpers.label(item.name)} Force`;
         const drain = item.getDrain();
+        const force = ((_a = item.getLastSpellForce()) === null || _a === void 0 ? void 0 : _a.value) || 2 - drain;
         templateData['drain'] = drain >= 0 ? `+${drain}` : `${drain}`;
-        templateData['force'] = 2 - drain;
+        templateData['force'] = force;
         templateData['title'] = title;
         dialogData.title = title;
         let cancel = true;
@@ -2662,37 +2610,19 @@ class ShadowrunRollDialog extends Dialog {
         };
         dialogData.default = 'normal';
         dialogData.close = (html) => __awaiter(this, void 0, void 0, function* () {
+            if (cancel)
+                return false;
             const force = helpers_1.Helpers.parseInputToNumber($(html).find('[name=force]').val());
-            yield item.setLastSpellForce(force);
-            dice_1.DiceSR.rollTest({
-                event: dialogData['event'],
-                dialogOptions: {
-                    environmental: true,
-                },
-                parts,
-                actor: item.actor,
-                limit: force,
-                title: `${title} ${force}`,
-            }).then((roll) => __awaiter(this, void 0, void 0, function* () {
-                var _a;
-                if (item.data.data.category === 'combat' && roll) {
-                    const attackData = item.getAttackData(roll.total, force);
-                    if (attackData) {
-                        yield item.setLastAttack(attackData);
-                    }
-                }
-                const drain = Math.max(item.getDrain() + force + (reckless ? 3 : 0), 2);
-                (_a = item.actor) === null || _a === void 0 ? void 0 : _a.rollDrain({ event: dialogData['event'] }, drain);
-            }));
+            yield item.setLastSpellForce({ value: force, reckless });
+            return true;
         });
     }
     static addRangedWeaponData(templateData, dialogData, item) {
-        let limit = item.getActionLimit();
-        const parts = item.getRollPartsList();
         let title = dialogData.title || item.name;
         const itemData = item.data.data;
         const fireModes = {};
-        const { modes, ranges, ammo } = itemData.range;
+        const { modes, ranges } = itemData.range;
+        const { ammo } = itemData;
         if (modes.single_shot) {
             fireModes['1'] = 'SS';
         }
@@ -2714,7 +2644,7 @@ class ShadowrunRollDialog extends Dialog {
         const fireMode = item.getLastFireMode();
         const rc = item.getRecoilCompensation(true);
         templateData['fireModes'] = fireModes;
-        templateData['fireMode'] = fireMode;
+        templateData['fireMode'] = fireMode === null || fireMode === void 0 ? void 0 : fireMode.value;
         templateData['rc'] = rc;
         templateData['ammo'] = ammo;
         templateData['title'] = title;
@@ -2749,44 +2679,25 @@ class ShadowrunRollDialog extends Dialog {
         dialogData.buttons = buttons;
         dialogData.close = (html) => __awaiter(this, void 0, void 0, function* () {
             if (cancel)
-                return;
+                return false;
             const fireMode = helpers_1.Helpers.parseInputToNumber($(html).find('[name="fireMode"]').val());
-            yield item.setLastFireMode(fireMode);
             if (fireMode) {
-                if (fireMode) {
-                    title += ` - Defender (${helpers_1.Helpers.mapRoundsToDefenseDesc(fireMode)})`;
-                }
-                // suppressing fire doesn't cause recoil
-                if (fireMode > rc && fireMode !== 20) {
-                    parts['SR5.Recoil'] = rc - fireMode;
-                }
-                dice_1.DiceSR.rollTest({
-                    event: dialogData['event'],
-                    parts,
-                    actor: item.actor,
-                    limit,
-                    title,
-                    dialogOptions: {
-                        environmental,
-                    },
-                }).then((roll) => {
-                    if (roll) {
-                        item.useAmmo(fireMode).then(() => __awaiter(this, void 0, void 0, function* () {
-                            const attackData = item.getAttackData(roll.total);
-                            if (attackData) {
-                                yield item.setLastAttack(attackData);
-                            }
-                            yield item.setLastFireMode(fireMode);
-                        }));
-                    }
-                });
+                const fireModeString = fireModes[fireMode];
+                const defenseModifier = helpers_1.Helpers.mapRoundsToDefenseDesc(fireMode);
+                const fireModeData = {
+                    label: fireModeString,
+                    value: fireMode,
+                    defense: defenseModifier,
+                };
+                yield item.setLastFireMode(fireModeData);
             }
+            return true;
         });
     }
 }
-exports.ShadowrunRollDialog = ShadowrunRollDialog;
+exports.ShadowrunItemDialog = ShadowrunItemDialog;
 
-},{"../../dice":14,"../../helpers":15}],6:[function(require,module,exports){
+},{"../../helpers":14}],5:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -2949,7 +2860,7 @@ var OverwatchScoreTracker = /*#__PURE__*/function (_Application) {
 exports.OverwatchScoreTracker = OverwatchScoreTracker;
 (0, _defineProperty2["default"])(OverwatchScoreTracker, "MatrixOverwatchDiceCount", '2d6');
 
-},{"@babel/runtime/helpers/classCallCheck":24,"@babel/runtime/helpers/createClass":25,"@babel/runtime/helpers/defineProperty":26,"@babel/runtime/helpers/get":27,"@babel/runtime/helpers/getPrototypeOf":28,"@babel/runtime/helpers/inherits":29,"@babel/runtime/helpers/interopRequireDefault":30,"@babel/runtime/helpers/possibleConstructorReturn":31}],7:[function(require,module,exports){
+},{"@babel/runtime/helpers/classCallCheck":25,"@babel/runtime/helpers/createClass":26,"@babel/runtime/helpers/defineProperty":27,"@babel/runtime/helpers/get":28,"@babel/runtime/helpers/getPrototypeOf":29,"@babel/runtime/helpers/inherits":30,"@babel/runtime/helpers/interopRequireDefault":31,"@babel/runtime/helpers/possibleConstructorReturn":32}],6:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KnowledgeSkillEditForm = void 0;
@@ -2965,7 +2876,7 @@ class KnowledgeSkillEditForm extends language_skill_edit_1.LanguageSkillEditForm
 }
 exports.KnowledgeSkillEditForm = KnowledgeSkillEditForm;
 
-},{"./language-skill-edit":8}],8:[function(require,module,exports){
+},{"./language-skill-edit":7}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LanguageSkillEditForm = void 0;
@@ -2989,7 +2900,7 @@ class LanguageSkillEditForm extends skill_edit_1.SkillEditForm {
 }
 exports.LanguageSkillEditForm = LanguageSkillEditForm;
 
-},{"./skill-edit":9}],9:[function(require,module,exports){
+},{"./skill-edit":8}],8:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -3088,7 +2999,7 @@ class SkillEditForm extends BaseEntitySheet {
 }
 exports.SkillEditForm = SkillEditForm;
 
-},{}],10:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.measureDistance = void 0;
@@ -3124,41 +3035,56 @@ exports.measureDistance = function (p0, p1, { gridSpaces = true } = {}) {
     return (nStraight + nDiagonal) * canvas.scene.data.gridDistance;
 };
 
-},{}],11:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.addChatMessageContextOptions = exports.highlightSuccessFailure = void 0;
-const SR5Actor_1 = require("./actor/SR5Actor");
-exports.highlightSuccessFailure = (message, html) => {
-    if (!message)
-        return;
-    if (!message.isContentVisible || !message.roll.parts.length)
-        return;
-    const { roll } = message;
-    if (!roll.parts.length)
-        return;
-    if (!roll.parts[0].rolls)
-        return;
-    const khreg = /kh\d+/;
-    const match = roll.formula.match(khreg);
-    const limit = match ? +match[0].replace('kh', '') : 0;
-    const hits = roll.total;
-    const fails = roll.parts[0].rolls.reduce((fails, r) => (r.roll === 1 ? fails + 1 : fails), 0);
-    const count = roll.parts[0].rolls.length;
-    const glitch = fails > count / 2.0;
-    if (limit && hits >= limit) {
-        html.find('.dice-total').addClass('limit-hit');
-    }
-    else if (glitch) {
-        html.find('.dice-total').addClass('glitch');
-    }
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
 };
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.addRollListeners = exports.addChatMessageContextOptions = exports.createChatData = void 0;
+const SR5Actor_1 = require("./actor/SR5Actor");
+const SR5Item_1 = require("./item/SR5Item");
+const template_1 = require("./template");
+exports.createChatData = (templateData, roll) => __awaiter(void 0, void 0, void 0, function* () {
+    const template = `systems/shadowrun5e/templates/rolls/roll-card.html`;
+    const html = yield renderTemplate(template, templateData);
+    const actor = templateData.actor;
+    const chatData = {
+        user: game.user._id,
+        type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+        content: html,
+        roll,
+        speaker: {
+            actor: actor === null || actor === void 0 ? void 0 : actor._id,
+            token: actor === null || actor === void 0 ? void 0 : actor.token,
+            alias: actor === null || actor === void 0 ? void 0 : actor.name,
+        },
+        flags: {
+            shadowrun5e: {
+                customRoll: true,
+            },
+        },
+    };
+    if (roll) {
+        chatData['sound'] = CONFIG.sounds.dice;
+    }
+    const rollMode = game.settings.get('core', 'rollMode');
+    if (['gmroll', 'blindroll'].includes(rollMode))
+        chatData['whisper'] = ChatMessage.getWhisperIDs('GM');
+    if (rollMode === 'blindroll')
+        chatData['blind'] = true;
+    return chatData;
+});
 exports.addChatMessageContextOptions = function (html, options) {
     const canRoll = (li) => {
         const msg = game.messages.get(li.data().messageId);
-        return !!(li.find('.dice-roll').length &&
-            msg &&
-            (msg.user.id === game.user.id || game.user.isGM));
+        msg.getFlag('shadowrun5e', 'customRoll');
     };
     options.push({
         name: 'Push the Limit',
@@ -3173,8 +3099,47 @@ exports.addChatMessageContextOptions = function (html, options) {
     });
     return options;
 };
+exports.addRollListeners = (app, html) => {
+    if (!app.getFlag('shadowrun5e', 'customRoll'))
+        return;
+    html.on('click', '.test-roll', (event) => __awaiter(void 0, void 0, void 0, function* () {
+        event.preventDefault();
+        const item = SR5Item_1.SR5Item.getItemFromMessage(html);
+        if (item) {
+            const roll = yield item.rollTest(event, { hideRollMessage: true });
+            if (roll && roll.templateData) {
+                const template = `systems/shadowrun5e/templates/rolls/roll-card.html`;
+                const html = yield renderTemplate(template, roll.templateData);
+                const data = {};
+                data['content'] = html;
+                yield app.update(data);
+            }
+        }
+    }));
+    html.on('click', '.test', (event) => __awaiter(void 0, void 0, void 0, function* () {
+        event.preventDefault();
+        const type = event.currentTarget.dataset.action;
+        const item = SR5Item_1.SR5Item.getItemFromMessage(html);
+        if (item) {
+            yield item.rollExtraTest(type, event);
+        }
+    }));
+    html.on('click', '.place-template', (event) => {
+        event.preventDefault();
+        const item = SR5Item_1.SR5Item.getItemFromMessage(html);
+        if (item) {
+            const template = template_1.default.fromItem(item);
+            template === null || template === void 0 ? void 0 : template.drawPreview(event);
+        }
+    });
+    html.on('click', '.card-title', (event) => {
+        event.preventDefault();
+        $(event.currentTarget).siblings('.card-description').toggle();
+    });
+    $(html).find('.card-description').hide();
+};
 
-},{"./actor/SR5Actor":2}],12:[function(require,module,exports){
+},{"./actor/SR5Actor":1,"./item/SR5Item":16,"./template":22}],11:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -3283,7 +3248,7 @@ exports.shadowrunCombatUpdate = (changes, options) => __awaiter(void 0, void 0, 
     }
 });
 
-},{}],13:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5 = void 0;
@@ -3531,7 +3496,7 @@ exports.SR5['kbmod'] = {
     SPEC: 'ctrlKey',
 };
 
-},{}],14:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -3543,173 +3508,152 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DiceSR = void 0;
+exports.registerHandlebarHelpers = exports.preloadHandlebarsTemplates = void 0;
 const helpers_1 = require("./helpers");
-class DiceSR {
-    static basicRoll({ count, limit, explode, title, actor }) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (count <= 0) {
-                // @ts-ignore
-                ui.notifications.error(game.i18n.localize('SR5.RollOneDie'));
-                return;
+exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, function* () {
+    const templatePaths = [
+        'systems/shadowrun5e/templates/actor/parts/actor-equipment.html',
+        'systems/shadowrun5e/templates/actor/parts/actor-spellbook.html',
+        'systems/shadowrun5e/templates/actor/parts/actor-skills.html',
+        'systems/shadowrun5e/templates/actor/parts/actor-matrix.html',
+        'systems/shadowrun5e/templates/actor/parts/actor-actions.html',
+        'systems/shadowrun5e/templates/actor/parts/actor-config.html',
+        'systems/shadowrun5e/templates/actor/parts/actor-bio.html',
+        'systems/shadowrun5e/templates/actor/parts/actor-social.html',
+        'systems/shadowrun5e/templates/item/parts/description.html',
+        'systems/shadowrun5e/templates/item/parts/technology.html',
+        'systems/shadowrun5e/templates/item/parts/header.html',
+        'systems/shadowrun5e/templates/item/parts/weapon-ammo-list.html',
+        'systems/shadowrun5e/templates/item/parts/weapon-mods-list.html',
+        'systems/shadowrun5e/templates/item/parts/action.html',
+        'systems/shadowrun5e/templates/item/parts/damage.html',
+        'systems/shadowrun5e/templates/item/parts/opposed.html',
+        'systems/shadowrun5e/templates/item/parts/spell.html',
+        'systems/shadowrun5e/templates/item/parts/complex_form.html',
+        'systems/shadowrun5e/templates/item/parts/weapon.html',
+        'systems/shadowrun5e/templates/item/parts/armor.html',
+        'systems/shadowrun5e/templates/item/parts/matrix.html',
+        'systems/shadowrun5e/templates/item/parts/sin.html',
+        'systems/shadowrun5e/templates/item/parts/contact.html',
+        'systems/shadowrun5e/templates/item/parts/lifestyle.html',
+        'systems/shadowrun5e/templates/item/parts/ammo.html',
+        'systems/shadowrun5e/templates/item/parts/modification.html',
+        'systems/shadowrun5e/templates/rolls/parts/parts-list.html',
+    ];
+    return loadTemplates(templatePaths);
+});
+exports.registerHandlebarHelpers = () => {
+    Handlebars.registerHelper('localizeOb', function (strId, obj) {
+        if (obj)
+            strId = obj[strId];
+        return game.i18n.localize(strId);
+    });
+    Handlebars.registerHelper('toHeaderCase', function (str) {
+        if (str)
+            return helpers_1.Helpers.label(str);
+        return '';
+    });
+    Handlebars.registerHelper('concat', function (strs, c = ',') {
+        if (Array.isArray(strs)) {
+            return strs.join(c);
+        }
+        return strs;
+    });
+    Handlebars.registerHelper('hasprop', function (obj, prop, options) {
+        if (obj.hasOwnProperty(prop)) {
+            return options.fn(this);
+        }
+        else
+            return options.inverse(this);
+    });
+    Handlebars.registerHelper('ifin', function (val, arr, options) {
+        if (arr.includes(val))
+            return options.fn(this);
+        else
+            return options.inverse(this);
+    });
+    // if greater than
+    Handlebars.registerHelper('ifgt', function (v1, v2, options) {
+        if (v1 > v2)
+            return options.fn(this);
+        else
+            return options.inverse(this);
+    });
+    // if not equal
+    Handlebars.registerHelper('ifne', function (v1, v2, options) {
+        if (v1 !== v2)
+            return options.fn(this);
+        else
+            return options.inverse(this);
+    });
+    // if equal
+    Handlebars.registerHelper('ife', function (v1, v2, options) {
+        if (v1 === v2)
+            return options.fn(this);
+        else
+            return options.inverse(this);
+    });
+    Handlebars.registerHelper('sum', function (v1, v2) {
+        return v1 + v2;
+    });
+    Handlebars.registerHelper('damageAbbreviation', function (damage) {
+        if (damage === 'physical')
+            return 'P';
+        if (damage === 'stun')
+            return 'S';
+        if (damage === 'matrix')
+            return 'M';
+        return '';
+    });
+    Handlebars.registerHelper('diceIcon', function (roll) {
+        if (roll.roll) {
+            switch (roll.roll) {
+                case 1:
+                    return 'red';
+                case 2:
+                    return 'grey';
+                case 3:
+                    return 'grey';
+                case 4:
+                    return 'grey';
+                case 5:
+                    return 'green';
+                case 6:
+                    return 'green';
             }
-            let formula = `${count}d6`;
-            if (explode) {
-                formula += 'x6';
-            }
-            if (limit) {
-                formula += `kh${limit}`;
-            }
-            formula += 'cs>=5';
-            let roll = new Roll(formula);
-            let rollMode = game.settings.get('core', 'rollMode');
-            roll.toMessage({
-                speaker: ChatMessage.getSpeaker({ actor: actor }),
-                flavor: title,
-                rollMode: rollMode,
-            });
-            return roll;
-        });
-    }
-    /**
-     *
-     * @param event {MouseEvent} - mouse event that caused this
-     * @param actor {SR5Actor} - actor this roll is associated with
-     * @param parts {Object} - object where keys should be the 'name' that can be translated/is translated and value should be the numerical values to add to dice pool
-     * @param limit {Number} - Limit to apply to the roll, leave empty for no limit
-     * @param extended {Boolean} - if this is an extended test (automatically sets the dropdown in the dialog)
-     * @param dialogOptions {Object} - Options to provide to the dialog window
-     * @param dialogOptions.environmental {Number} - value of Environmental Modifiers
-     * @param dialogOptions.prompt {Boolean} - if this is prompting the user to enter the dice pool of the roll (enables the Dice Pool box)
-     * @param after {Function} - Function to run after each roll. Needed to capture rolls of extended tests, otherwise Promise will work
-     * @param base {Number} - base value to use for the dice pool, default to 0 (parts are preferred method)
-     * @param title {String} - title to display for the roll
-     * @param wounds {Boolean} - if wounds should be applied, defaults to true
-     * @returns {Promise<Roll>|Promise<*>}
-     */
-    static rollTest({ event, actor, parts = {}, limit, extended, dialogOptions, after, base = 0, title = 'Roll', wounds = true, }) {
-        // if we aren't for soaking some damage
-        if (actor &&
-            !(title.includes('Soak') || title.includes('Drain') || title.includes('Fade'))) {
-            if (wounds)
-                wounds = actor.data.data.wounds.value;
         }
-        if (!game.settings.get('shadowrun5e', 'applyLimits')) {
-            limit = undefined;
+    });
+    Handlebars.registerHelper('elementIcon', function (element) {
+        let icon = '';
+        if (element === 'electricity') {
+            icon = 'fas fa-bolt';
         }
-        let dice_pool = base;
-        const edgeAttMax = actor ? actor.data.data.attributes.edge.max : 0;
-        if (event && event[CONFIG.SR5.kbmod.EDGE]) {
-            parts['SR5.Edge'] = +edgeAttMax;
-            actor === null || actor === void 0 ? void 0 : actor.update({
-                'data.attributes.edge.value': actor.data.data.attributes.edge.value - 1,
-            });
+        else if (element === 'radiation') {
+            icon = 'fas fa-radiation-alt';
         }
-        // add mods to dice pool
-        dice_pool += Object.values(parts).reduce((prev, cur) => prev + cur, 0);
-        if (event && event[CONFIG.SR5.kbmod.STANDARD]) {
-            const edge = parts['SR5.Edge'] !== undefined || undefined;
-            return this.basicRoll({
-                count: dice_pool,
-                explode: edge,
-                limit: edge ? undefined : limit,
-                title,
-                actor,
-            });
+        else if (element === 'fire') {
+            icon = 'fas fa-fire';
         }
-        let dialogData = {
-            options: dialogOptions,
-            extended,
-            dice_pool,
-            base,
-            parts,
-            limit,
-            wounds,
-        };
-        let template = 'systems/shadowrun5e/templates/rolls/roll-dialog.html';
-        let edge = false;
-        let cancel = true;
-        return new Promise((resolve) => {
-            renderTemplate(template, dialogData).then((dlg) => {
-                new Dialog({
-                    title: title,
-                    content: dlg,
-                    buttons: {
-                        roll: {
-                            label: 'Roll',
-                            icon: '<i class="fas fa-dice-six"></i>',
-                            callback: () => (cancel = false),
-                        },
-                        edge: {
-                            label: `Push the Limit (+${edgeAttMax})`,
-                            icon: '<i class="fas fa-bomb"></i>',
-                            callback: () => {
-                                edge = true;
-                                cancel = false;
-                            },
-                        },
-                    },
-                    default: 'roll',
-                    close: (html) => __awaiter(this, void 0, void 0, function* () {
-                        if (cancel)
-                            return;
-                        // get the actual dice_pool from the difference of initial parts and value in the dialog
-                        let dicePool = helpers_1.Helpers.parseInputToNumber($(html).find('[name="dice_pool"]').val()) +
-                            helpers_1.Helpers.parseInputToNumber($(html).find('[name="dp_mod"]').val()) -
-                            helpers_1.Helpers.parseInputToNumber($(html).find('[name="wounds"]').val()) -
-                            helpers_1.Helpers.parseInputToNumber($(html).find('[name="options.environmental"]').val());
-                        const limit = helpers_1.Helpers.parseInputToNumber($(html).find('[name="limit"]').val());
-                        const extendedString = helpers_1.Helpers.parseInputToString($(html).find('[name="extended"]').val());
-                        console.log(extendedString);
-                        const extended = extendedString === 'true';
-                        if (edge && actor) {
-                            dicePool += actor.data.data.attributes.edge.max;
-                            yield actor.update({
-                                'data.attributes.edge.value': actor.data.data.attributes.edge.value - 1,
-                            });
-                        }
-                        const r = this.basicRoll({
-                            count: dicePool,
-                            explode: edge,
-                            limit: edge ? undefined : limit,
-                            title,
-                            actor,
-                        });
-                        if (extended && r) {
-                            const currentExtended = parts['SR5.Extended'] || 0;
-                            parts['SR5.Extended'] = currentExtended - 1;
-                            // add a bit of a delay to roll again
-                            setTimeout(() => DiceSR.rollTest({
-                                event,
-                                base,
-                                parts,
-                                actor,
-                                limit,
-                                title,
-                                extended,
-                                dialogOptions,
-                                wounds,
-                                after,
-                            }), 400);
-                        }
-                        resolve(r);
-                        if (after && r)
-                            r.then((roll) => after(roll));
-                    }),
-                }).render(true);
-            });
-        });
-    }
-}
-exports.DiceSR = DiceSR;
+        else if (element === 'acid') {
+            icon = 'fas fa-vials';
+        }
+        else if (element === 'cold') {
+            icon = 'fas fa-snowflake';
+        }
+        return icon;
+    });
+    Handlebars.registerHelper('isDefined', function (value) {
+        return value !== undefined;
+    });
+};
 
-},{"./helpers":15}],15:[function(require,module,exports){
+},{"./helpers":14}],14:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Helpers = void 0;
 class Helpers {
     static totalMods(mods) {
-        const reducer = (acc, cur) => acc + cur;
+        const reducer = (acc, cur) => +acc + +cur;
         if (!mods)
             return 0;
         if (Array.isArray(mods))
@@ -3807,16 +3751,16 @@ class Helpers {
     }
     static mapRoundsToDefenseDesc(rounds) {
         if (rounds === 1)
-            return 'No Mod';
+            return '';
         if (rounds === 3)
-            return '-2 Mod';
+            return '-2';
         if (rounds === 6)
-            return '-5 Mod';
+            return '-5';
         if (rounds === 10)
-            return '-9 Mod';
+            return '-9';
         if (rounds === 20)
-            return 'Duck or Cover';
-        return 'unknown';
+            return 'SR5.DuckOrCover';
+        return '';
     }
     static label(str) {
         const frags = str.split('_');
@@ -3887,7 +3831,298 @@ class Helpers {
 }
 exports.Helpers = Helpers;
 
-},{}],16:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ChatData = void 0;
+const helpers_1 = require("../helpers");
+exports.ChatData = {
+    action: (data, labels, props) => {
+        if (data.action) {
+            const labelStringList = [];
+            if (data.action.skill) {
+                labelStringList.push(helpers_1.Helpers.label(data.action.skill));
+                labelStringList.push(helpers_1.Helpers.label(data.action.attribute));
+            }
+            else if (data.action.attribute2) {
+                labelStringList.push(helpers_1.Helpers.label(data.action.attribute));
+                labelStringList.push(helpers_1.Helpers.label(data.action.attribute2));
+            }
+            else if (data.action.attribute) {
+                labelStringList.push(helpers_1.Helpers.label(data.action.attribute));
+            }
+            if (data.action.mod) {
+                labelStringList.push(`${game.i18n.localize('SR5.ItemMod')} (${data.action.mod})`);
+                // TODO when all mods are modlists
+                // Object.entries(data.action.mod).forEach(([key, value]) =>
+                //     labelStringList.push(`${game.i18n.localize(key)} (${value})`)
+                // );
+            }
+            if (labelStringList.length) {
+                labels.roll = labelStringList.join(' + ');
+            }
+            if (data.action.opposed.type) {
+                const { opposed } = data.action;
+                if (opposed.type !== 'custom')
+                    labels.opposedRoll = `vs. ${helpers_1.Helpers.label(opposed.type)}`;
+                else if (opposed.skill)
+                    labels.opposedRoll = `vs. ${helpers_1.Helpers.label(opposed.skill)}+${helpers_1.Helpers.label(opposed.attribute)}`;
+                else if (opposed.attribute2)
+                    labels.opposedRoll = `vs. ${helpers_1.Helpers.label(opposed.attribute)}+${helpers_1.Helpers.label(opposed.attribute2)}`;
+                else if (opposed.attribute)
+                    labels.opposedRoll = `vs. ${helpers_1.Helpers.label(opposed.attribute)}`;
+            }
+            // setup action props
+            // go in order of "Limit/Accuracy" "Damage" "AP"
+            // don't add action type if set to 'varies' or 'none' as that's pretty much useless info
+            if (data.action.type !== '' &&
+                data.action.type !== 'varies' &&
+                data.action.type !== 'none') {
+                props.push(`${helpers_1.Helpers.label(data.action.type)} Action`);
+            }
+            if (data.action.limit.value)
+                props.push(`Limit ${data.action.limit.value}`);
+            if (data.action.damage.type.value) {
+                const { damage } = data.action;
+                let damageString = '';
+                let elementString = '';
+                if (damage.value) {
+                    damageString = `DV ${damage.value}${damage.type.value ? damage.type.value.toUpperCase().charAt(0) : ''}`;
+                }
+                if (damage.element.value) {
+                    // if we have a damage value and are electric, follow the convention of (e) after
+                    if (damage.value) {
+                        if (damage.element.value === 'electricity') {
+                            damageString += ' (e)';
+                        }
+                        else {
+                            elementString = helpers_1.Helpers.label(damage.element.value);
+                        }
+                    }
+                    else {
+                        elementString = helpers_1.Helpers.label(damage.element.value);
+                    }
+                }
+                if (damageString)
+                    props.push(damageString);
+                if (elementString)
+                    props.push(elementString);
+                if (damage.ap && damage.ap.value)
+                    props.push(`AP ${damage.ap.value}`);
+            }
+        }
+    },
+    sin: (data, labels, props) => {
+        props.push(`Rating ${data.technology.rating}`);
+        data.licenses.forEach((license) => {
+            props.push(`${license.name} R${license.rtg}`);
+        });
+    },
+    contact: (data, labels, props) => {
+        props.push(data.type);
+        props.push(`Connection ${data.connection}`);
+        props.push(`Loyalty ${data.loyalty}`);
+    },
+    lifestyle: (data, labels, props) => {
+        props.push(helpers_1.Helpers.label(data.type));
+        if (data.cost)
+            props.push(`¥${data.cost}`);
+        if (data.comforts)
+            props.push(`Comforts ${data.comforts}`);
+        if (data.security)
+            props.push(`Security ${data.security}`);
+        if (data.neighborhood)
+            props.push(`Neighborhood ${data.neighborhood}`);
+        if (data.guests)
+            props.push(`Guests ${data.guests}`);
+    },
+    adept_power: (data, labels, props) => {
+        exports.ChatData.action(data, labels, props);
+        props.push(`PP ${data.pp}`);
+        props.push(helpers_1.Helpers.label(data.type));
+    },
+    armor: (data, labels, props) => {
+        if (data.armor) {
+            if (data.armor.value)
+                props.push(`Armor ${data.armor.mod ? '+' : ''}${data.armor.value}`);
+            if (data.armor.acid)
+                props.push(`Acid ${data.armor.acid}`);
+            if (data.armor.cold)
+                props.push(`Cold ${data.armor.cold}`);
+            if (data.armor.fire)
+                props.push(`Fire ${data.armor.fire}`);
+            if (data.armor.electricity)
+                props.push(`Electricity ${data.armor.electricity}`);
+            if (data.armor.radiation)
+                props.push(`Radiation ${data.armor.radiation}`);
+        }
+    },
+    complex_form: (data, labels, props) => {
+        exports.ChatData.action(data, labels, props);
+        props.push(helpers_1.Helpers.label(data.target), helpers_1.Helpers.label(data.duration));
+        const { fade } = data;
+        if (fade > 0)
+            props.push(`Fade L+${fade}`);
+        else if (fade < 0)
+            props.push(`Fade L${fade}`);
+        else
+            props.push('Fade L');
+    },
+    cyberware: (data, labels, props) => {
+        exports.ChatData.action(data, labels, props);
+        exports.ChatData.armor(data, labels, props);
+        if (data.essence)
+            props.push(`Ess ${data.essence}`);
+    },
+    device: (data, labels, props) => {
+        if (data.technology && data.technology.rating)
+            props.push(`Rating ${data.technology.rating}`);
+        if (data.category === 'cyberdeck') {
+            for (const attN of Object.values(data.atts)) {
+                props.push(`${helpers_1.Helpers.label(attN.att)} ${attN.value}`);
+            }
+        }
+    },
+    equipment: (data, labels, props) => {
+        if (data.technology && data.technology.rating)
+            props.push(`Rating ${data.technology.rating}`);
+    },
+    quality: (data, labels, props) => {
+        exports.ChatData.action(data, labels, props);
+        props.push(helpers_1.Helpers.label(data.type));
+    },
+    // add properties for spell data, follow order in book
+    spell: (data, labels, props) => {
+        // first category and type
+        props.push(helpers_1.Helpers.label(data.category), helpers_1.Helpers.label(data.type));
+        // add subtype tags
+        if (data.category === 'combat') {
+            props.push(helpers_1.Helpers.label(data.combat.type));
+        }
+        else if (data.category === 'health') {
+        }
+        else if (data.category === 'illusion') {
+            props.push(data.illusion.type);
+            props.push(data.illusion.sense);
+        }
+        else if (data.category === 'manipulation') {
+            if (data.manipulation.damaging)
+                props.push('Damaging');
+            if (data.manipulation.mental)
+                props.push('Mental');
+            if (data.manipulation.environmental)
+                props.push('Environmental');
+            if (data.manipulation.physical)
+                props.push('Physical');
+        }
+        else if (data.category === 'detection') {
+            props.push(data.illusion.type);
+            props.push(data.illusion.passive ? 'Passive' : 'Active');
+            if (data.illusion.extended)
+                props.push('Extended');
+        }
+        // add range
+        props.push(helpers_1.Helpers.label(data.range));
+        // add action data
+        exports.ChatData.action(data, labels, props);
+        // add duration data
+        props.push(helpers_1.Helpers.label(data.duration));
+        // add drain data
+        const { drain } = data;
+        if (drain > 0)
+            props.push(`Drain F+${drain}`);
+        else if (drain < 0)
+            props.push(`Drain F${drain}`);
+        else
+            props.push('Drain F');
+        labels.roll = 'Cast';
+    },
+    weapon: (data, labels, props, item) => {
+        var _a, _b, _c;
+        exports.ChatData.action(data, labels, props);
+        for (let i = 0; i < props.length; i++) {
+            const prop = props[i];
+            if (prop.includes('Limit')) {
+                props[i] = prop.replace('Limit', 'Accuracy');
+            }
+        }
+        const equippedAmmo = item === null || item === void 0 ? void 0 : item.getEquippedAmmo();
+        if (equippedAmmo && data.ammo && ((_a = data.ammo.current) === null || _a === void 0 ? void 0 : _a.max)) {
+            if (equippedAmmo) {
+                const { current, spare_clips } = data.ammo;
+                if (equippedAmmo.name)
+                    props.push(`${equippedAmmo.name} (${current.value}/${current.max})`);
+                if (equippedAmmo.data.data.blast.radius)
+                    props.push(`${game.i18n.localize('SR5.BlastRadius')} ${equippedAmmo.data.data.blast.radius}m`);
+                if (equippedAmmo.data.data.blast.dropoff)
+                    props.push(`${game.i18n.localize('SR5.Dropoff')} ${equippedAmmo.data.data.blast.dropoff}/m`);
+                if (spare_clips && spare_clips.max)
+                    props.push(`${game.i18n.localize('SR5.SpareClips')} (${spare_clips.value}/${spare_clips.max})`);
+            }
+        }
+        if ((_c = (_b = data.technology) === null || _b === void 0 ? void 0 : _b.conceal) === null || _c === void 0 ? void 0 : _c.value) {
+            props.push(`${game.i18n.localize('SR5.Conceal')} ${data.technology.conceal.value}`);
+        }
+        if (data.category === 'range') {
+            if (data.range.rc) {
+                let rcString = `${game.i18n.localize('SR5.RecoilCompensation')} ${data.range.rc.value}`;
+                if (item === null || item === void 0 ? void 0 : item.actor) {
+                    rcString += ` (${game.i18n.localize('SR5.Total')} ${item.actor.data.data.recoil_compensation + data.range.rc.value})`;
+                }
+                props.push(rcString);
+            }
+            if (data.range.modes) {
+                const newModes = [];
+                const { modes } = data.range;
+                if (modes.single_shot)
+                    newModes.push('SR5.WeaponModeSingleShotShort');
+                if (modes.semi_auto)
+                    newModes.push('SR5.WeaponModeSemiAutoShort');
+                if (modes.burst_fire)
+                    newModes.push('SR5.WeaponModeBurstFireShort');
+                if (modes.full_auto)
+                    newModes.push('SR5.WeaponModeFullAutoShort');
+                props.push(newModes.map((m) => game.i18n.localize(m)).join('/'));
+            }
+            if (data.range.ranges)
+                props.push(Array.from(Object.values(data.range.ranges)).join('/'));
+        }
+        else if (data.category === 'melee') {
+            if (data.melee.reach) {
+                const reachString = `${game.i18n.localize('SR5.Reach')} ${data.melee.reach}`;
+                // find accuracy in props and insert ourselves after it
+                const accIndex = props.findIndex((p) => p.includes('Accuracy'));
+                if (accIndex > -1) {
+                    props.splice(accIndex + 1, 0, reachString);
+                }
+                else {
+                    props.push(reachString);
+                }
+            }
+        }
+        else if (data.category === 'thrown') {
+            const { blast } = data.thrown;
+            if (blast === null || blast === void 0 ? void 0 : blast.radius)
+                props.push(`${game.i18n.localize('SR5.BlastRadius')} ${blast.radius}m`);
+            if (blast === null || blast === void 0 ? void 0 : blast.dropoff)
+                props.push(`${game.i18n.localize('SR5.Dropoff')} ${blast.dropoff}/m`);
+            if (data.thrown.ranges) {
+                const mult = data.thrown.ranges.attribute && (item === null || item === void 0 ? void 0 : item.actor)
+                    ? item.actor.data.data.attributes[data.thrown.ranges.attribute].value
+                    : 1;
+                const ranges = [
+                    data.thrown.ranges.short,
+                    data.thrown.ranges.medium,
+                    data.thrown.ranges.long,
+                    data.thrown.ranges.extreme,
+                ];
+                props.push(ranges.map((v) => v * mult).join('/'));
+            }
+        }
+    },
+};
+
+},{"../helpers":14}],16:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -3900,10 +4135,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5Item = void 0;
-const dice_1 = require("../dice");
 const helpers_1 = require("../helpers");
-const ShadowrunRollDialog_1 = require("../apps/dialogs/ShadowrunRollDialog");
-const ShadowrunTemplate_1 = require("../ShadowrunTemplate");
+const ShadowrunItemDialog_1 = require("../apps/dialogs/ShadowrunItemDialog");
+const ChatData_1 = require("./ChatData");
+const ShadowrunRoller_1 = require("../rolls/ShadowrunRoller");
+const template_1 = require("../template");
+const chat_1 = require("../chat");
 class SR5Item extends Item {
     constructor() {
         super(...arguments);
@@ -3911,22 +4148,28 @@ class SR5Item extends Item {
     }
     // Flag Functions
     getLastFireMode() {
-        return this.getFlag('shadowrun5e', 'lastFireMode') || 0;
+        return this.getFlag('shadowrun5e', 'lastFireMode');
     }
     setLastFireMode(fireMode) {
-        return this.setFlag('shadowrun5e', 'lastFireMode', fireMode);
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.setFlag('shadowrun5e', 'lastFireMode', fireMode);
+        });
     }
     getLastSpellForce() {
-        return this.getFlag('shadowrun5e', 'lastSpellForce') || 0;
+        return this.getFlag('shadowrun5e', 'lastSpellForce');
     }
     setLastSpellForce(force) {
-        return this.setFlag('shadowrun5e', 'lastSpellForce', force);
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.setFlag('shadowrun5e', 'lastSpellForce', force);
+        });
     }
     getLastComplexFormLevel() {
-        return this.getFlag('shadowrun5e', 'lastComplexFormLevel') || 0;
+        return this.getFlag('shadowrun5e', 'lastComplexFormLevel');
     }
     setLastComplexFormLevel(level) {
-        return this.setFlag('shadowrun5e', 'lastComplexFormLevel', level);
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.setFlag('shadowrun5e', 'lastComplexFormLevel', level);
+        });
     }
     getLastFireRange() {
         return this.getFlag('shadowrun5e', 'lastFireRange') || 0;
@@ -3938,10 +4181,11 @@ class SR5Item extends Item {
         return this.getFlag('shadowrun5e', 'lastAttack');
     }
     setLastAttack(attack) {
-        return this.setFlag('shadowrun5e', 'lastAttack', attack);
-    }
-    clearLastAttack() {
-        return this.unsetFlag('shadowrun5e', 'lastAttack');
+        return __awaiter(this, void 0, void 0, function* () {
+            // unset the flag first to clear old data, data can get weird if not done
+            yield this.unsetFlag('shadowrun5e', 'lastAttack');
+            return this.setFlag('shadowrun5e', 'lastAttack', attack);
+        });
     }
     update(data, options) {
         const _super = Object.create(null, {
@@ -3964,9 +4208,7 @@ class SR5Item extends Item {
         return !!(this.data.data.action && this.data.data.action.type !== '');
     }
     get hasTemplate() {
-        return ((this.data.type === 'spell' && this.data.data.range === 'los_a') ||
-            this.isGrenade() ||
-            this.hasExplosiveAmmo());
+        return this.isAreaOfEffect();
     }
     prepareData() {
         var _a;
@@ -4064,45 +4306,59 @@ class SR5Item extends Item {
         this.labels = labels;
         item['properties'] = this.getChatData().properties;
     }
-    roll(event) {
+    postCard(event) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (helpers_1.Helpers.hasModifiers(event)) {
-                return this.rollTest(event);
-            }
             // we won't work if we don't have an actor
             if (!this.actor)
                 return;
-            const { token } = this.actor;
-            const templateData = {
-                actor: this.actor,
-                tokenId: token ? `${token.scene._id}.${token.id}` : null,
-                item: this.data,
-                type: this.data.type,
-                data: this.getChatData(),
-                hasRoll: this.hasRoll,
-                hasOpposedRoll: this.hasOpposedRoll,
-                hasTemplate: this.hasTemplate,
-                labels: this.labels,
+            const postOnly = (event === null || event === void 0 ? void 0 : event.shiftKey) || !this.hasRoll;
+            const post = (bonus = {}) => {
+                // if only post, don't roll and post a card version -- otherwise roll
+                const onComplete = postOnly ? () => {
+                    const { token } = this.actor;
+                    const attack = this.getAttackData(0);
+                    // don't include any hits
+                    attack === null || attack === void 0 ? true : delete attack.hits;
+                    // generate chat data
+                    chat_1.createChatData(Object.assign({ header: {
+                            name: this.name,
+                            img: this.img,
+                        }, testName: this.getRollName(), actor: this.actor, tokenId: token ? `${token.scene._id}.${token.id}` : undefined, description: this.getChatData(), item: this, previewTemplate: this.hasTemplate, attack }, bonus)).then((chatData) => {
+                        // create the message
+                        return ChatMessage.create(chatData, { displaySheet: false });
+                    });
+                } : () => this.rollTest(event);
+                if (!postOnly && this.hasTemplate) {
+                    // onComplete is called when template is finished
+                    const template = template_1.default.fromItem(this, onComplete);
+                    if (template) {
+                        template.drawPreview();
+                    }
+                }
+                else {
+                    onComplete();
+                }
             };
-            const templateType = 'item';
-            const template = `systems/shadowrun5e/templates/rolls/${templateType}-card.html`;
-            const html = yield renderTemplate(template, templateData);
-            const chatData = {
-                user: game.user._id,
-                type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-                content: html,
-                speaker: {
-                    actor: this.actor._id,
-                    token: this.actor.token,
-                    alias: this.actor.name,
-                },
-            };
-            const rollMode = game.settings.get('core', 'rollMode');
-            if (['gmroll', 'blindroll'].includes(rollMode))
-                chatData['whisper'] = ChatMessage.getWhisperIDs('GM');
-            if (rollMode === 'blindroll')
-                chatData['blind'] = true;
-            return ChatMessage.create(chatData, { displaySheet: false });
+            // prompt user if needed
+            const dialogData = yield ShadowrunItemDialog_1.ShadowrunItemDialog.fromItem(this, event);
+            if (dialogData) {
+                // keep track of old close function
+                const oldClose = dialogData.close;
+                // call post() after dialog closes
+                dialogData.close = (html) => __awaiter(this, void 0, void 0, function* () {
+                    if (oldClose) {
+                        // the oldClose we put on the dialog will return a boolean
+                        const ret = yield oldClose(html);
+                        if (!ret)
+                            return;
+                    }
+                    post();
+                });
+                return new Dialog(dialogData).render(true);
+            }
+            else {
+                post();
+            }
         });
     }
     getChatData(htmlOptions) {
@@ -4112,294 +4368,34 @@ class SR5Item extends Item {
             data.description = {};
         data.description.value = TextEditor.enrichHTML(data.description.value, htmlOptions);
         const props = [];
-        this[`_${this.data.type}ChatData`](duplicate(data), labels, props);
+        const func = ChatData_1.ChatData[this.data.type];
+        if (func)
+            func(duplicate(data), labels, props, this);
         data.properties = props.filter((p) => !!p);
         return data;
     }
-    _ammoChatData(data, labels, props) { }
-    _modificationChatData(data, labels, props) { }
-    _actionChatData(data, labels, props) {
-        if (data.action) {
-            const labelStringList = [];
-            if (data.action.skill) {
-                labelStringList.push(helpers_1.Helpers.label(data.action.skill));
-                labelStringList.push(helpers_1.Helpers.label(data.action.attribute));
+    getOpposedTestName() {
+        var _a, _b;
+        let name = '';
+        if ((_b = (_a = this.data.data.action) === null || _a === void 0 ? void 0 : _a.opposed) === null || _b === void 0 ? void 0 : _b.type) {
+            const { opposed } = this.data.data.action;
+            if (opposed.type !== 'custom') {
+                name = `${helpers_1.Helpers.label(opposed.type)}`;
             }
-            else if (data.action.attribute2) {
-                labelStringList.push(helpers_1.Helpers.label(data.action.attribute));
-                labelStringList.push(helpers_1.Helpers.label(data.action.attribute2));
+            else if (opposed.skill) {
+                name = `${helpers_1.Helpers.label(opposed.skill)}+${helpers_1.Helpers.label(opposed.attribute)}`;
             }
-            else if (data.action.attribute) {
-                labelStringList.push(helpers_1.Helpers.label(data.action.attribute));
+            else if (opposed.attribute2) {
+                name = `${helpers_1.Helpers.label(opposed.attribute)}+${helpers_1.Helpers.label(opposed.attribute2)}`;
             }
-            if (data.action.mod) {
-                labelStringList.push(`${game.i18n.localize('SR5.ItemMod')} (${data.action.mod})`);
-                // TODO when all mods are modlists
-                // Object.entries(data.action.mod).forEach(([key, value]) =>
-                //     labelStringList.push(`${game.i18n.localize(key)} (${value})`)
-                // );
-            }
-            if (labelStringList.length) {
-                labels.roll = labelStringList.join(' + ');
-            }
-            if (data.action.opposed.type) {
-                const { opposed } = data.action;
-                if (opposed.type !== 'custom')
-                    labels.opposedRoll = `vs. ${helpers_1.Helpers.label(opposed.type)}`;
-                else if (opposed.skill)
-                    labels.opposedRoll = `vs. ${helpers_1.Helpers.label(opposed.skill)}+${helpers_1.Helpers.label(opposed.attribute)}`;
-                else if (opposed.attribute2)
-                    labels.opposedRoll = `vs. ${helpers_1.Helpers.label(opposed.attribute)}+${helpers_1.Helpers.label(opposed.attribute2)}`;
-                else if (opposed.attribute)
-                    labels.opposedRoll = `vs. ${helpers_1.Helpers.label(opposed.attribute)}`;
-            }
-            // setup action props
-            // go in order of "Limit/Accuracy" "Damage" "AP"
-            // don't add action type if set to 'varies' or 'none' as that's pretty much useless info
-            if (data.action.type !== '' &&
-                data.action.type !== 'varies' &&
-                data.action.type !== 'none') {
-                props.push(`${helpers_1.Helpers.label(data.action.type)} Action`);
-            }
-            if (data.action.limit.value)
-                props.push(`Limit ${data.action.limit.value}`);
-            if (data.action.damage.type.value) {
-                const { damage } = data.action;
-                let damageString = '';
-                let elementString = '';
-                if (damage.value) {
-                    damageString = `DV ${damage.value}${damage.type.value ? damage.type.value.toUpperCase().charAt(0) : ''}`;
-                }
-                if (damage.element.value) {
-                    // if we have a damage value and are electric, follow the convention of (e) after
-                    if (damage.value) {
-                        if (damage.element.value === 'electricity') {
-                            damageString += ' (e)';
-                        }
-                        else {
-                            elementString = helpers_1.Helpers.label(damage.element.value);
-                        }
-                    }
-                    else {
-                        elementString = helpers_1.Helpers.label(damage.element.value);
-                    }
-                }
-                if (damageString)
-                    props.push(damageString);
-                if (elementString)
-                    props.push(elementString);
-                if (damage.ap && damage.ap.value)
-                    props.push(`AP ${damage.ap.value}`);
+            else if (opposed.attribute) {
+                name = `${helpers_1.Helpers.label(opposed.attribute)}`;
             }
         }
-    }
-    _sinChatData(data, labels, props) {
-        props.push(`Rating ${data.technology.rating}`);
-        data.licenses.forEach((license) => {
-            props.push(`${license.name} R${license.rtg}`);
-        });
-    }
-    _contactChatData(data, labels, props) {
-        props.push(data.type);
-        props.push(`Connection ${data.connection}`);
-        props.push(`Loyalty ${data.loyalty}`);
-    }
-    _lifestyleChatData(data, labels, props) {
-        props.push(helpers_1.Helpers.label(data.type));
-        if (data.cost)
-            props.push(`¥${data.cost}`);
-        if (data.comforts)
-            props.push(`Comforts ${data.comforts}`);
-        if (data.security)
-            props.push(`Security ${data.security}`);
-        if (data.neighborhood)
-            props.push(`Neighborhood ${data.neighborhood}`);
-        if (data.guests)
-            props.push(`Guests ${data.guests}`);
-    }
-    _adept_powerChatData(data, labels, props) {
-        this._actionChatData(data, labels, props);
-        props.push(`PP ${data.pp}`);
-        props.push(helpers_1.Helpers.label(data.type));
-    }
-    _armorChatData(data, labels, props) {
-        if (data.armor) {
-            if (data.armor.value)
-                props.push(`Armor ${data.armor.mod ? '+' : ''}${data.armor.value}`);
-            if (data.armor.acid)
-                props.push(`Acid ${data.armor.acid}`);
-            if (data.armor.cold)
-                props.push(`Cold ${data.armor.cold}`);
-            if (data.armor.fire)
-                props.push(`Fire ${data.armor.fire}`);
-            if (data.armor.electricity)
-                props.push(`Electricity ${data.armor.electricity}`);
-            if (data.armor.radiation)
-                props.push(`Radiation ${data.armor.radiation}`);
-        }
-    }
-    _complex_formChatData(data, labels, props) {
-        this._actionChatData(data, labels, props);
-        props.push(helpers_1.Helpers.label(data.target), helpers_1.Helpers.label(data.duration));
-        const { fade } = data;
-        if (fade > 0)
-            props.push(`Fade L+${fade}`);
-        else if (fade < 0)
-            props.push(`Fade L${fade}`);
-        else
-            props.push('Fade L');
-    }
-    _cyberwareChatData(data, labels, props) {
-        this._actionChatData(data, labels, props);
-        this._armorChatData(data, labels, props);
-        if (data.essence)
-            props.push(`Ess ${data.essence}`);
-    }
-    _deviceChatData(data, labels, props) {
-        if (data.technology && data.technology.rating)
-            props.push(`Rating ${data.technology.rating}`);
-        if (data.category === 'cyberdeck') {
-            for (const attN of Object.values(data.atts)) {
-                props.push(`${helpers_1.Helpers.label(attN.att)} ${attN.value}`);
-            }
-        }
-    }
-    _equipmentChatData(data, labels, props) {
-        if (data.technology && data.technology.rating)
-            props.push(`Rating ${data.technology.rating}`);
-    }
-    _qualityChatData(data, labels, props) {
-        this._actionChatData(data, labels, props);
-        props.push(helpers_1.Helpers.label(data.type));
-    }
-    // add properties for spell data, follow order in book
-    _spellChatData(data, labels, props) {
-        // first category and type
-        props.push(helpers_1.Helpers.label(data.category), helpers_1.Helpers.label(data.type));
-        // add subtype tags
-        if (data.category === 'combat') {
-            props.push(helpers_1.Helpers.label(data.combat.type));
-        }
-        else if (data.category === 'health') {
-        }
-        else if (data.category === 'illusion') {
-            props.push(data.illusion.type);
-            props.push(data.illusion.sense);
-        }
-        else if (data.category === 'manipulation') {
-            if (data.manipulation.damaging)
-                props.push('Damaging');
-            if (data.manipulation.mental)
-                props.push('Mental');
-            if (data.manipulation.environmental)
-                props.push('Environmental');
-            if (data.manipulation.physical)
-                props.push('Physical');
-        }
-        else if (data.category === 'detection') {
-            props.push(data.illusion.type);
-            props.push(data.illusion.passive ? 'Passive' : 'Active');
-            if (data.illusion.extended)
-                props.push('Extended');
-        }
-        // add range
-        props.push(helpers_1.Helpers.label(data.range));
-        // add action data
-        this._actionChatData(data, labels, props);
-        // add duration data
-        props.push(helpers_1.Helpers.label(data.duration));
-        // add drain data
-        const { drain } = data;
-        if (drain > 0)
-            props.push(`Drain F+${drain}`);
-        else if (drain < 0)
-            props.push(`Drain F${drain}`);
-        else
-            props.push('Drain F');
-        labels.roll = 'Cast';
-    }
-    _weaponChatData(data, labels, props) {
-        var _a, _b, _c;
-        this._actionChatData(data, labels, props);
-        for (let i = 0; i < props.length; i++) {
-            const prop = props[i];
-            if (prop.includes('Limit')) {
-                props[i] = prop.replace('Limit', 'Accuracy');
-            }
-        }
-        const equippedAmmo = this.getEquippedAmmo();
-        if (equippedAmmo && data.ammo && ((_a = data.ammo.current) === null || _a === void 0 ? void 0 : _a.max)) {
-            if (equippedAmmo) {
-                const { current, spare_clips } = data.ammo;
-                if (equippedAmmo.name)
-                    props.push(`${equippedAmmo.name} (${current.value}/${current.max})`);
-                if (equippedAmmo.data.data.blast.radius)
-                    props.push(`${game.i18n.localize('SR5.BlastRadius')} ${equippedAmmo.data.data.blast.radius}m`);
-                if (equippedAmmo.data.data.blast.dropoff)
-                    props.push(`${game.i18n.localize('SR5.Dropoff')} ${equippedAmmo.data.data.blast.dropoff}/m`);
-                if (spare_clips && spare_clips.max)
-                    props.push(`${game.i18n.localize('SR5.SpareClips')} (${spare_clips.value}/${spare_clips.max})`);
-            }
-        }
-        if ((_c = (_b = data.technology) === null || _b === void 0 ? void 0 : _b.conceal) === null || _c === void 0 ? void 0 : _c.value) {
-            props.push(`${game.i18n.localize('SR5.Conceal')} ${data.technology.conceal.value}`);
-        }
-        if (data.category === 'range') {
-            if (data.range.rc) {
-                let rcString = `${game.i18n.localize('SR5.RecoilCompensation')} ${data.range.rc.value}`;
-                if (this.actor) {
-                    rcString += ` (${game.i18n.localize('SR5.Total')} ${this.actor.data.data.recoil_compensation + data.range.rc.value})`;
-                }
-                props.push(rcString);
-            }
-            if (data.range.modes) {
-                const newModes = [];
-                const { modes } = data.range;
-                if (modes.single_shot)
-                    newModes.push('SR5.WeaponModeSingleShotShort');
-                if (modes.semi_auto)
-                    newModes.push('SR5.WeaponModeSemiAutoShort');
-                if (modes.burst_fire)
-                    newModes.push('SR5.WeaponModeBurstFireShort');
-                if (modes.full_auto)
-                    newModes.push('SR5.WeaponModeFullAutoShort');
-                props.push(newModes.map((m) => game.i18n.localize(m)).join('/'));
-            }
-            if (data.range.ranges)
-                props.push(Array.from(Object.values(data.range.ranges)).join('/'));
-        }
-        else if (data.category === 'melee') {
-            if (data.melee.reach) {
-                const reachString = `${game.i18n.localize('SR5.Reach')} ${data.melee.reach}`;
-                // find accuracy in props and insert ourselves after it
-                const accIndex = props.findIndex((p) => p.includes('Accuracy'));
-                if (accIndex > -1) {
-                    props.splice(accIndex + 1, 0, reachString);
-                }
-                else {
-                    props.push(reachString);
-                }
-            }
-        }
-        else if (data.category === 'thrown') {
-            const { blast } = data.thrown;
-            if (blast === null || blast === void 0 ? void 0 : blast.radius)
-                props.push(`${game.i18n.localize('SR5.BlastRadius')} ${blast.radius}m`);
-            if (blast === null || blast === void 0 ? void 0 : blast.dropoff)
-                props.push(`${game.i18n.localize('SR5.Dropoff')} ${blast.dropoff}/m`);
-            if (data.thrown.ranges) {
-                const mult = data.thrown.ranges.attribute && this.actor
-                    ? this.actor.data.data.attributes[data.thrown.ranges.attribute].value
-                    : 1;
-                const ranges = [
-                    data.thrown.ranges.short,
-                    data.thrown.ranges.medium,
-                    data.thrown.ranges.long,
-                    data.thrown.ranges.extreme,
-                ];
-                props.push(ranges.map((v) => v * mult).join('/'));
-            }
-        }
+        const mod = this.getOpposedTestModifier();
+        if (mod)
+            name += ` ${mod}`;
+        return name;
     }
     getEquippedAmmo() {
         return (this.items || []).filter((item) => { var _a, _b; return item.type === 'ammo' && ((_b = (_a = item.data.data) === null || _a === void 0 ? void 0 : _a.technology) === null || _b === void 0 ? void 0 : _b.equipped); })[0];
@@ -4420,6 +4416,9 @@ class SR5Item extends Item {
                 yield this.updateOwnedItem(dupData);
             }
         });
+    }
+    get hasAmmo() {
+        return this.data.data.ammo !== undefined;
     }
     useAmmo(fireMode) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -4515,7 +4514,19 @@ class SR5Item extends Item {
         // add global parts from actor
         this.actor._addGlobalParts(parts);
         this.actor._addMatrixParts(parts, atts);
+        this._addWeaponParts(parts);
         return parts;
+    }
+    calculateRecoil() {
+        var _a;
+        return Math.min(this.getRecoilCompensation(true) - (((_a = this.getLastFireMode()) === null || _a === void 0 ? void 0 : _a.value) || 0), 0);
+    }
+    _addWeaponParts(parts) {
+        if (this.isRangedWeapon()) {
+            const recoil = this.calculateRecoil();
+            if (recoil)
+                parts['SR5.Recoil'] = recoil;
+        }
     }
     removeLicense(index) {
         const data = duplicate(this.data);
@@ -4524,125 +4535,129 @@ class SR5Item extends Item {
         this.update(data);
     }
     rollOpposedTest(target, ev) {
-        const itemData = this.data.data;
-        const options = {
-            event: ev,
-            incomingAttack: {},
-            fireModeDefense: 0,
-            cover: false,
-            incomingAction: {},
-        };
-        const lastAttack = this.getLastAttack();
-        if (lastAttack) {
-            options.incomingAttack = lastAttack;
-            options.cover = true;
-            options.fireModeDefense = helpers_1.Helpers.mapRoundsToDefenseMod(this.getLastFireMode());
-        }
-        options.incomingAction = this.getFlag('shadowrun5e', 'action');
-        const { opposed } = itemData.action;
-        if (opposed.type === 'defense')
-            target.rollDefense(options);
-        else if (opposed.type === 'soak')
-            target.rollSoak(options);
-        else if (opposed.type === 'armor')
-            target.rollSoak(options);
-        else {
-            if (opposed.skill && opposed.attribute)
-                target.rollSkill(opposed.skill, Object.assign(Object.assign({}, options), { attribute: opposed.attribute }));
-            if (opposed.attribute && opposed.attribute2)
-                target.rollTwoAttributes([opposed.attribute, opposed.attribute2], options);
-            else if (opposed.attribute)
-                target.rollSingleAttribute(opposed.attribute, options);
-        }
-    }
-    rollTest(event) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            const dialog = yield ShadowrunRollDialog_1.ShadowrunRollDialog.fromItemRoll(this, event);
-            if (dialog)
-                return dialog.render(true);
-            let title = this.data.name;
-            const parts = this.getRollPartsList();
-            const limit = this.getActionLimit();
-            return dice_1.DiceSR.rollTest({
-                event,
-                parts,
-                dialogOptions: {
-                    environmental: true,
-                },
-                actor: this.actor,
-                limit,
-                title,
-            }).then((roll) => {
-                if (roll && this.data.type === 'weapon') {
-                    this.useAmmo(1).then(() => {
-                        this.setFlag('shadowrun5e', 'action', {
-                            hits: roll.total,
-                        });
-                    });
+            const itemData = this.data.data;
+            const options = {
+                event: ev,
+                fireModeDefense: 0,
+                cover: false,
+            };
+            const lastAttack = this.getLastAttack();
+            const parts = this.getOpposedTestMod();
+            const { opposed } = itemData.action;
+            if (opposed.type === 'defense') {
+                if (lastAttack) {
+                    options['incomingAttack'] = lastAttack;
+                    options.cover = true;
+                    if ((_a = lastAttack.fireMode) === null || _a === void 0 ? void 0 : _a.defense) {
+                        options.fireModeDefense = +lastAttack.fireMode.defense;
+                    }
                 }
-            });
+                return target.rollDefense(options, parts);
+            }
+            else if (opposed.type === 'soak') {
+                options['damage'] = lastAttack === null || lastAttack === void 0 ? void 0 : lastAttack.damage;
+                options['attackerHits'] = lastAttack === null || lastAttack === void 0 ? void 0 : lastAttack.hits;
+                return target.rollSoak(options, parts);
+            }
+            else if (opposed.type === 'armor') {
+                return target.rollArmor(options);
+            }
+            else {
+                if (opposed.skill && opposed.attribute) {
+                    return target.rollSkill(opposed.skill, Object.assign(Object.assign({}, options), { attribute: opposed.attribute }));
+                }
+                else if (opposed.attribute && opposed.attribute2) {
+                    return target.rollTwoAttributes([opposed.attribute, opposed.attribute2], options);
+                }
+                else if (opposed.attribute) {
+                    return target.rollSingleAttribute(opposed.attribute, options);
+                }
+            }
         });
     }
-    static chatListeners(html) {
-        html.on('click', '.card-buttons button', (ev) => {
-            ev.preventDefault();
-            const button = $(ev.currentTarget);
-            const messageId = button.parents('.message').data('messageId');
-            const senderId = game.messages.get(messageId).user._id;
-            const card = button.parents('.chat-card');
-            const action = button.data('action');
-            const opposedRoll = action === 'opposed-roll';
-            if (!opposedRoll && !game.user.isGM && game.user._id !== senderId)
-                return;
-            let actor;
-            const tokenKey = card.data('tokenId');
-            if (tokenKey) {
-                const [sceneId, tokenId] = tokenKey.split('.');
-                let token;
-                if (sceneId === canvas.scene._id)
-                    token = canvas.tokens.get(tokenId);
-                else {
-                    const scene = game.scenes.get(sceneId);
-                    if (!scene)
-                        return;
-                    // @ts-ignore
-                    const tokenData = scene.data.tokens.find((t) => t.id === Number(tokenId));
-                    if (tokenData)
-                        token = new Token(tokenData);
-                }
-                if (!token)
-                    return;
-                actor = Actor.fromToken(token);
-            }
-            else
-                actor = game.actors.get(card.data('actorId'));
-            if (!actor)
-                return;
-            const itemId = card.data('itemId');
-            const item = actor.getOwnedItem(itemId);
-            if (action === 'roll')
-                item.rollTest(ev);
-            if (opposedRoll) {
-                const targets = this._getChatCardTargets();
+    rollExtraTest(type, event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const targets = SR5Item.getTargets();
+            if (type === 'opposed') {
                 for (const t of targets) {
-                    item.rollOpposedTest(t, ev);
-                }
-            }
-            if (action === 'place-template') {
-                const template = ShadowrunTemplate_1.default.fromItem(item);
-                console.log(template);
-                if (template) {
-                    template.drawPreview();
+                    yield this.rollOpposedTest(t, event);
                 }
             }
         });
-        html.on('click', '.card-header', (ev) => {
-            ev.preventDefault();
-            $(ev.currentTarget).siblings('.card-content').toggle();
-        });
-        $(html).find('.card-content').hide();
     }
-    static _getChatCardTargets() {
+    /**
+     * Rolls a test using the latest stored data on the item (force, fireMode, level)
+     * @param event - mouse event
+     * @param options - any additional roll options to pass along - note that currently the Item will overwrite -- WIP
+     */
+    rollTest(event, options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const promise = ShadowrunRoller_1.ShadowrunRoller.itemRoll(event, this, options);
+            // handle promise when it resolves for our own stuff
+            promise.then((roll) => __awaiter(this, void 0, void 0, function* () {
+                var _a, _b;
+                // complex form handles fade
+                if (this.isComplexForm()) {
+                    const totalFade = Math.max(this.getFade() + this.getLastComplexFormLevel().value, 2);
+                    yield this.actor.rollFade({ event }, totalFade);
+                } // spells handle drain, force, and attack data
+                else if (this.isSpell()) {
+                    if (this.isCombatSpell() && roll) {
+                        const attackData = this.getAttackData(roll.total);
+                        if (attackData) {
+                            yield this.setLastAttack(attackData);
+                        }
+                    }
+                    const forceData = this.getLastSpellForce();
+                    const drain = Math.max(this.getDrain() + forceData.value + (forceData.reckless ? 3 : 0), 2);
+                    yield ((_a = this.actor) === null || _a === void 0 ? void 0 : _a.rollDrain({ event }, drain));
+                } // weapons handle ammo and attack data
+                else if (this.data.type === 'weapon') {
+                    const attackData = this.getAttackData((roll === null || roll === void 0 ? void 0 : roll.total) || 0);
+                    if (attackData) {
+                        yield this.setLastAttack(attackData);
+                    }
+                    if (this.hasAmmo) {
+                        const fireMode = ((_b = this.getLastFireMode()) === null || _b === void 0 ? void 0 : _b.value) || 1;
+                        yield this.useAmmo(fireMode);
+                    }
+                }
+            }));
+            return promise;
+        });
+    }
+    static getItemFromMessage(html) {
+        const card = html.find('.chat-card');
+        let actor;
+        const tokenKey = card.data('tokenId');
+        if (tokenKey) {
+            const [sceneId, tokenId] = tokenKey.split('.');
+            let token;
+            if (sceneId === canvas.scene._id)
+                token = canvas.tokens.get(tokenId);
+            else {
+                const scene = game.scenes.get(sceneId);
+                if (!scene)
+                    return;
+                // @ts-ignore
+                const tokenData = scene.data.tokens.find((t) => t.id === Number(tokenId));
+                if (tokenData)
+                    token = new Token(tokenData);
+            }
+            if (!token)
+                return;
+            actor = Actor.fromToken(token);
+        }
+        else
+            actor = game.actors.get(card.data('actorId'));
+        if (!actor)
+            return;
+        const itemId = card.data('itemId');
+        return actor.getOwnedItem(itemId);
+    }
+    static getTargets() {
         const { character } = game.user;
         const { controlled } = canvas.tokens;
         const targets = controlled.reduce((arr, t) => (t.actor ? arr.concat([t.actor]) : arr), []);
@@ -4764,9 +4779,13 @@ class SR5Item extends Item {
             return true;
         });
     }
+    isAreaOfEffect() {
+        return (this.isGrenade() ||
+            (this.isSpell() && this.data.data.range === 'los_a') ||
+            this.hasExplosiveAmmo());
+    }
     isGrenade() {
         var _a, _b;
-        console.log(this.data.data.thrown);
         return this.data.type === 'weapon' && ((_b = (_a = this.data.data.thrown) === null || _a === void 0 ? void 0 : _a.blast) === null || _b === void 0 ? void 0 : _b.radius);
     }
     isCombatSpell() {
@@ -4781,21 +4800,41 @@ class SR5Item extends Item {
     isComplexForm() {
         return this.data.type === 'complex_form';
     }
-    getAttackData(hits, force) {
+    isMeleeWeapon() {
+        return this.data.type === 'weapon' && this.data.data.category === 'melee';
+    }
+    getAttackData(hits) {
         var _a;
         if (!((_a = this.data.data.action) === null || _a === void 0 ? void 0 : _a.damage))
             return undefined;
         const damage = this.data.data.action.damage;
-        let ap = damage.ap.value;
-        let itemValue = damage.value;
-        if (this.isCombatSpell() && force) {
-            itemValue = force;
-            ap = -force;
-        }
-        return {
+        const data = {
             hits,
-            damage: Object.assign(Object.assign({}, damage), { value: itemValue, ap }),
+            damage: damage,
         };
+        if (this.isCombatSpell()) {
+            const force = this.getLastSpellForce().value;
+            data.force = force;
+            data.damage.base = force;
+            data.damage.value = force + helpers_1.Helpers.totalMods(data.damage.mod);
+            data.damage.ap.value = -force + helpers_1.Helpers.totalMods(data.damage.mod);
+            data.damage.ap.base = -force;
+        }
+        if (this.isComplexForm()) {
+            data.level = this.getLastComplexFormLevel().value;
+        }
+        if (this.isMeleeWeapon()) {
+            data.reach = this.getReach();
+            data.accuracy = this.getActionLimit();
+        }
+        if (this.isRangedWeapon()) {
+            data.fireMode = this.getLastFireMode();
+            data.accuracy = this.getActionLimit();
+        }
+        const blastData = this.getBlastData();
+        if (blastData)
+            data.blast = blastData;
+        return data;
     }
     getActionSkill() {
         var _a;
@@ -4808,6 +4847,43 @@ class SR5Item extends Item {
     getActionAttribute2() {
         var _a;
         return (_a = this.data.data.action) === null || _a === void 0 ? void 0 : _a.attribute2;
+    }
+    getRollName() {
+        if (this.isRangedWeapon()) {
+            return game.i18n.localize('SR5.RangeWeaponAttack');
+        }
+        if (this.isMeleeWeapon()) {
+            return game.i18n.localize('SR5.MeleeWeaponAttack');
+        }
+        if (this.isCombatSpell()) {
+            return game.i18n.localize('SR5.SpellAttack');
+        }
+        if (this.isSpell()) {
+            return game.i18n.localize('SR5.SpellCast');
+        }
+        return this.name;
+    }
+    getLimit() {
+        var _a;
+        const limit = (_a = this.data.data.action) === null || _a === void 0 ? void 0 : _a.limit;
+        if (this.data.type === 'weapon') {
+            limit.label = 'SR5.Accuracy';
+        }
+        else if (limit === null || limit === void 0 ? void 0 : limit.attribute) {
+            limit.label = CONFIG.SR5.attributes[limit.attribute];
+        }
+        else if (this.isSpell()) {
+            limit.value = this.getLastSpellForce().value;
+            limit.label = 'SR5.Force';
+        }
+        else if (this.isComplexForm()) {
+            limit.value = this.getLastComplexFormLevel().value;
+            limit.label = 'SR5.Level';
+        }
+        else {
+            limit.label = 'SR5.Limit';
+        }
+        return limit;
     }
     getActionLimit() {
         var _a, _b;
@@ -4835,15 +4911,94 @@ class SR5Item extends Item {
             base += parseInt(this.actor.data.data.recoil_compensation);
         return base;
     }
+    getReach() {
+        var _a;
+        if (this.isMeleeWeapon()) {
+            return (_a = this.data.data.melee) === null || _a === void 0 ? void 0 : _a.reach;
+        }
+        return 0;
+    }
     hasExplosiveAmmo() {
         var _a, _b, _c;
         const ammo = this.getEquippedAmmo();
         return ((_c = (_b = (_a = ammo === null || ammo === void 0 ? void 0 : ammo.data) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.blast) === null || _c === void 0 ? void 0 : _c.radius) > 0;
     }
+    hasDefenseTest() {
+        var _a, _b;
+        return ((_b = (_a = this.data.data.action) === null || _a === void 0 ? void 0 : _a.opposed) === null || _b === void 0 ? void 0 : _b.type) === 'defense';
+    }
+    getOpposedTestMod() {
+        const parts = {};
+        if (this.hasDefenseTest()) {
+            if (this.isAreaOfEffect()) {
+                parts['SR5.Aoe'] = -2;
+            }
+            if (this.isRangedWeapon()) {
+                const fireModeData = this.getLastFireMode();
+                if (fireModeData === null || fireModeData === void 0 ? void 0 : fireModeData.defense) {
+                    if (fireModeData.defense !== 'SR5.DuckOrCover') {
+                        const fireMode = +fireModeData.defense;
+                        if (fireMode)
+                            parts['SR5.FireMode'] = fireMode;
+                    }
+                }
+            }
+        }
+        return parts;
+    }
+    getOpposedTestModifier() {
+        const testMod = this.getOpposedTestMod();
+        const total = helpers_1.Helpers.totalMods(testMod);
+        if (total)
+            return `(${total})`;
+        else {
+            if (this.isRangedWeapon()) {
+                const fireModeData = this.getLastFireMode();
+                if (fireModeData === null || fireModeData === void 0 ? void 0 : fireModeData.defense) {
+                    if (fireModeData.defense === 'SR5.DuckOrCover') {
+                        return game.i18n.localize('SR5.DuckOrCover');
+                    }
+                }
+            }
+        }
+        return '';
+    }
+    getBlastData() {
+        // can only handle spells and grenade right now
+        if (this.isSpell() && this.isAreaOfEffect()) {
+            // distance on spells is equal to force
+            let distance = this.getLastSpellForce().value;
+            // extended spells multiply by 10
+            if (this.data.data.extended)
+                distance *= 10;
+            return {
+                radius: distance,
+                dropoff: 0,
+            };
+        }
+        else if (this.isGrenade()) {
+            // use blast radius
+            const distance = this.data.data.thrown.blast.radius;
+            const dropoff = this.data.data.thrown.blast.dropoff;
+            return {
+                radius: distance,
+                dropoff: dropoff,
+            };
+        }
+        else if (this.hasExplosiveAmmo()) {
+            const ammo = this.getEquippedAmmo();
+            const distance = ammo.data.data.blast.radius;
+            const dropoff = ammo.data.data.blast.dropoff;
+            return {
+                radius: distance,
+                dropoff,
+            };
+        }
+    }
 }
 exports.SR5Item = SR5Item;
 
-},{"../ShadowrunTemplate":1,"../apps/dialogs/ShadowrunRollDialog":5,"../dice":14,"../helpers":15}],17:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunItemDialog":4,"../chat":10,"../helpers":14,"../rolls/ShadowrunRoller":20,"../template":22,"./ChatData":15}],17:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -4964,6 +5119,7 @@ class SR5ItemSheet extends ItemSheet {
         html.find('.mod-equip').click(this._onWeaponModEquip.bind(this));
         html.find('.mod-delete').click(this._onWeaponModRemove.bind(this));
         html.find('.add-new-license').click(this._onAddLicense.bind(this));
+        // html.find('.remove-license').click(this._onRemoveLicense.bind(this));
         html.find('.has-desc').click((event) => {
             event.preventDefault();
             const item = $(event.currentTarget).parents('.item');
@@ -5139,7 +5295,7 @@ class SR5ItemSheet extends ItemSheet {
 }
 exports.SR5ItemSheet = SR5ItemSheet;
 
-},{"../helpers":15}],18:[function(require,module,exports){
+},{"../helpers":14}],18:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -5151,7 +5307,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// Import Modules
 const SR5ItemSheet_1 = require("./item/SR5ItemSheet");
 const SR5ActorSheet_1 = require("./actor/SR5ActorSheet");
 const SR5Actor_1 = require("./actor/SR5Actor");
@@ -5159,13 +5314,13 @@ const SR5Item_1 = require("./item/SR5Item");
 const config_1 = require("./config");
 const helpers_1 = require("./helpers");
 const settings_1 = require("./settings");
-const templates_1 = require("./templates");
-const dice_1 = require("./dice");
 const combat_1 = require("./combat");
 const canvas_1 = require("./canvas");
 const chat = require("./chat");
 const migrations = require("./migration");
 const OverwatchScoreTracker_1 = require("./apps/gmtools/OverwatchScoreTracker");
+const handlebars_1 = require("./handlebars");
+const ShadowrunRoller_1 = require("./rolls/ShadowrunRoller");
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
 /* -------------------------------------------- */
@@ -5174,7 +5329,7 @@ Hooks.once('init', function () {
     // Create a shadowrun5e namespace within the game global
     game['shadowrun5e'] = {
         SR5Actor: SR5Actor_1.SR5Actor,
-        DiceSR: dice_1.DiceSR,
+        ShadowrunRoller: ShadowrunRoller_1.ShadowrunRoller,
         SR5Item: SR5Item_1.SR5Item,
         rollItemMacro,
     };
@@ -5190,7 +5345,7 @@ Hooks.once('init', function () {
     ['renderSR5ActorSheet', 'renderSR5ItemSheet'].forEach((s) => {
         Hooks.on(s, (app, html) => helpers_1.Helpers.setupCustomCheckbox(app, html));
     });
-    templates_1.preloadHandlebarsTemplates();
+    handlebars_1.preloadHandlebarsTemplates();
     // CONFIG.debug.hooks = true;
 });
 Hooks.on('canvasInit', function () {
@@ -5220,10 +5375,8 @@ Hooks.on('ready', function () {
 });
 Hooks.on('preUpdateCombat', combat_1.preCombatUpdate);
 Hooks.on('renderChatMessage', (app, html) => {
-    if (!app.isRoll)
-        SR5Item_1.SR5Item.chatListeners(html);
     if (app.isRoll)
-        chat.highlightSuccessFailure(app, html);
+        chat.addRollListeners(app, html);
 });
 Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);
 /* -------------------------------------------- */
@@ -5312,72 +5465,11 @@ function rollItemMacro(itemName) {
         // @ts-ignore
         return ui.notifications.warn(`Your controlled Actor does not have an item named ${itemName}`);
     }
-    return item.roll();
+    return item.rollTest(event);
 }
-Handlebars.registerHelper('localizeOb', function (strId, obj) {
-    if (obj)
-        strId = obj[strId];
-    return game.i18n.localize(strId);
-});
-Handlebars.registerHelper('toHeaderCase', function (str) {
-    if (str)
-        return helpers_1.Helpers.label(str);
-    return '';
-});
-Handlebars.registerHelper('concat', function (strs, c = ',') {
-    if (Array.isArray(strs)) {
-        return strs.join(c);
-    }
-    return strs;
-});
-Handlebars.registerHelper('hasprop', function (obj, prop, options) {
-    if (obj.hasOwnProperty(prop)) {
-        return options.fn(this);
-    }
-    else
-        return options.inverse(this);
-});
-Handlebars.registerHelper('ifin', function (val, arr, options) {
-    if (arr.includes(val))
-        return options.fn(this);
-    else
-        return options.inverse(this);
-});
-// if greater than
-Handlebars.registerHelper('ifgt', function (v1, v2, options) {
-    if (v1 > v2)
-        return options.fn(this);
-    else
-        return options.inverse(this);
-});
-// if not equal
-Handlebars.registerHelper('ifne', function (v1, v2, options) {
-    if (v1 !== v2)
-        return options.fn(this);
-    else
-        return options.inverse(this);
-});
-// if equal
-Handlebars.registerHelper('ife', function (v1, v2, options) {
-    if (v1 === v2)
-        return options.fn(this);
-    else
-        return options.inverse(this);
-});
-Handlebars.registerHelper('sum', function (v1, v2) {
-    return v1 + v2;
-});
-Handlebars.registerHelper('damageAbbreviation', function (damage) {
-    if (damage === 'physical')
-        return 'P';
-    if (damage === 'stun')
-        return 'S';
-    if (damage === 'matrix')
-        return 'M';
-    return '';
-});
+handlebars_1.registerHandlebarHelpers();
 
-},{"./actor/SR5Actor":2,"./actor/SR5ActorSheet":3,"./apps/gmtools/OverwatchScoreTracker":6,"./canvas":10,"./chat":11,"./combat":12,"./config":13,"./dice":14,"./helpers":15,"./item/SR5Item":16,"./item/SR5ItemSheet":17,"./migration":19,"./settings":20,"./templates":21}],19:[function(require,module,exports){
+},{"./actor/SR5Actor":1,"./actor/SR5ActorSheet":2,"./apps/gmtools/OverwatchScoreTracker":5,"./canvas":9,"./chat":10,"./combat":11,"./config":12,"./handlebars":13,"./helpers":14,"./item/SR5Item":16,"./item/SR5ItemSheet":17,"./migration":19,"./rolls/ShadowrunRoller":20,"./settings":21}],19:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -5710,6 +5802,215 @@ const _migrateItemsAddActions = function (item, updateData) {
 
 },{}],20:[function(require,module,exports){
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ShadowrunRoller = exports.ShadowrunRoll = void 0;
+const helpers_1 = require("../helpers");
+const chat_1 = require("../chat");
+class ShadowrunRoll extends Roll {
+}
+exports.ShadowrunRoll = ShadowrunRoll;
+class ShadowrunRoller {
+    static itemRoll(event, item, options) {
+        var _a;
+        const parts = item.getRollPartsList();
+        let limit = item.getLimit();
+        let title = item.getRollName();
+        const rollData = Object.assign(Object.assign({}, options), { event: event, dialogOptions: {
+                environmental: true,
+            }, parts, actor: item.actor, item,
+            limit,
+            title, name: item.name, img: item.img, previewTemplate: item.hasTemplate });
+        rollData['attack'] = item.getAttackData(0);
+        rollData['blast'] = item.getBlastData();
+        if (item.hasOpposedRoll) {
+            rollData['tests'] = [
+                {
+                    label: item.getOpposedTestName(),
+                    type: 'opposed',
+                },
+            ];
+        }
+        if (item.isMeleeWeapon()) {
+            rollData['reach'] = item.getReach();
+        }
+        if (item.isRangedWeapon()) {
+            rollData['fireMode'] = (_a = item.getLastFireMode()) === null || _a === void 0 ? void 0 : _a.label;
+        }
+        rollData.description = item.getChatData();
+        return ShadowrunRoller.advancedRoll(rollData);
+    }
+    static shadowrunFormula({ parts, limit, explode }) {
+        const count = helpers_1.Helpers.totalMods(parts);
+        if (count <= 0) {
+            // @ts-ignore
+            ui.notifications.error(game.i18n.localize('SR5.RollOneDie'));
+            return '0d6cs>=5';
+        }
+        let formula = `${count}d6`;
+        if (explode) {
+            formula += 'x6';
+        }
+        if (limit === null || limit === void 0 ? void 0 : limit.value) {
+            formula += `kh${limit.value}`;
+        }
+        formula += 'cs>=5';
+        return formula;
+    }
+    static basicRoll(_a) {
+        var { parts, limit, explodeSixes, title, actor, img = actor === null || actor === void 0 ? void 0 : actor.img, name = actor === null || actor === void 0 ? void 0 : actor.name, hideRollMessage } = _a, props = __rest(_a, ["parts", "limit", "explodeSixes", "title", "actor", "img", "name", "hideRollMessage"]);
+        return __awaiter(this, void 0, void 0, function* () {
+            let roll;
+            const rollMode = game.settings.get('core', 'rollMode');
+            if (Object.keys(parts).length > 0) {
+                const formula = this.shadowrunFormula({ parts, limit, explode: explodeSixes });
+                if (!formula)
+                    return;
+                roll = new ShadowrunRoll(formula);
+                roll.roll();
+                if (game.settings.get('shadowrun5e', 'displayDefaultRollCard')) {
+                    yield roll.toMessage({
+                        speaker: ChatMessage.getSpeaker({ actor: actor }),
+                        flavor: title,
+                        rollMode: rollMode,
+                    });
+                }
+            }
+            // start of custom message
+            const dice = roll === null || roll === void 0 ? void 0 : roll.parts[0].rolls;
+            const token = actor === null || actor === void 0 ? void 0 : actor.token;
+            const templateData = Object.assign({ actor: actor, header: {
+                    name: name || '',
+                    img: img || '',
+                }, tokenId: token ? `${token.scene._id}.${token.id}` : undefined, dice,
+                limit, testName: title, dicePool: helpers_1.Helpers.totalMods(parts), parts, hits: roll === null || roll === void 0 ? void 0 : roll.total }, props);
+            roll.templateData = templateData;
+            if (!hideRollMessage) {
+                const chatData = yield chat_1.createChatData(templateData, roll);
+                yield ChatMessage.create(chatData, { displaySheet: false });
+            }
+            return roll;
+        });
+    }
+    static advancedRoll(props) {
+        // destructure what we need to use from props
+        // any value pulled out needs to be updated back in props if changed
+        const { title, actor, parts, limit, extended, wounds = true, after, dialogOptions } = props;
+        // remove limits if game settings is set
+        if (!game.settings.get('shadowrun5e', 'applyLimits')) {
+            delete props.limit;
+        }
+        // TODO create "fast roll" option
+        let dialogData = {
+            options: dialogOptions,
+            extended,
+            dice_pool: helpers_1.Helpers.totalMods(parts),
+            parts,
+            limit: limit === null || limit === void 0 ? void 0 : limit.value,
+            wounds,
+            woundValue: actor === null || actor === void 0 ? void 0 : actor.getWounds(),
+        };
+        let template = 'systems/shadowrun5e/templates/rolls/roll-dialog.html';
+        let edge = false;
+        let cancel = true;
+        const buttons = {
+            roll: {
+                label: game.i18n.localize('SR5.Roll'),
+                icon: '<i class="fas fa-dice-six"></i>',
+                callback: () => (cancel = false),
+            },
+        };
+        if (actor) {
+            buttons['edge'] = {
+                label: `${game.i18n.localize('SR5.PushTheLimit')} (+${actor.getEdge().max})`,
+                icon: '<i class="fas fa-bomb"></i>',
+                callback: () => {
+                    edge = true;
+                    cancel = false;
+                },
+            };
+        }
+        return new Promise((resolve) => {
+            renderTemplate(template, dialogData).then((dlg) => {
+                new Dialog({
+                    title: title,
+                    content: dlg,
+                    buttons,
+                    default: 'roll',
+                    close: (html) => __awaiter(this, void 0, void 0, function* () {
+                        if (cancel)
+                            return;
+                        // get the actual dice_pool from the difference of initial parts and value in the dialog
+                        const limitValue = helpers_1.Helpers.parseInputToNumber($(html).find('[name="limit"]').val());
+                        if (limit && limit.value !== limitValue) {
+                            limit.value = limitValue;
+                            limit.base = limitValue;
+                            limit.label = 'SR5.Override';
+                        }
+                        const woundValue = -helpers_1.Helpers.parseInputToNumber($(html).find('[name="wounds"]').val());
+                        const situationMod = helpers_1.Helpers.parseInputToNumber($(html).find('[name="dp_mod"]').val());
+                        const environmentMod = -helpers_1.Helpers.parseInputToNumber($(html).find('[name="options.environmental"]').val());
+                        if (wounds && woundValue !== 0) {
+                            parts['SR5.Wounds'] = woundValue;
+                            props.wounds = true;
+                        }
+                        if (situationMod)
+                            parts['SR5.SituationalModifier'] = situationMod;
+                        if (environmentMod) {
+                            parts['SR5.EnvironmentModifier'] = environmentMod;
+                            if (!props.dialogOptions)
+                                props.dialogOptions = {};
+                            props.dialogOptions.environmental = true;
+                        }
+                        const extendedString = helpers_1.Helpers.parseInputToString($(html).find('[name="extended"]').val());
+                        const extended = extendedString === 'true';
+                        if (edge && actor) {
+                            props.explodeSixes = true;
+                            parts['SR5.PushTheLimit'] = actor.getEdge().max;
+                            yield actor.update({
+                                'data.attributes.edge.value': actor.data.data.attributes.edge.value - 1,
+                            });
+                        }
+                        props.parts = parts;
+                        const r = this.basicRoll(Object.assign({}, props));
+                        if (extended && r) {
+                            const currentExtended = parts['SR5.Extended'] || 0;
+                            parts['SR5.Extended'] = currentExtended - 1;
+                            // add a bit of a delay to roll again
+                            setTimeout(() => this.advancedRoll(props), 400);
+                        }
+                        resolve(r);
+                        if (after && r)
+                            r.then((roll) => after(roll));
+                    }),
+                }).render(true);
+            });
+        });
+    }
+}
+exports.ShadowrunRoller = ShadowrunRoller;
+
+},{"../chat":10,"../helpers":14}],21:[function(require,module,exports){
+"use strict";
 // game settings for shadowrun 5e
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerSystemSettings = void 0;
@@ -5751,54 +6052,118 @@ exports.registerSystemSettings = () => {
         type: Boolean,
         default: true,
     });
-};
-
-},{}],21:[function(require,module,exports){
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    game.settings.register('shadowrun5e', 'displayDefaultRollCard', {
+        name: 'SETTINGS.DisplayDefaultRollCardName',
+        hint: 'SETTINGS.DisplayDefaultRollCardDescription',
+        scope: 'user',
+        config: true,
+        type: Boolean,
+        default: false
     });
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.preloadHandlebarsTemplates = void 0;
-exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, function* () {
-    const templatePaths = [
-        'systems/shadowrun5e/templates/actor/parts/actor-equipment.html',
-        'systems/shadowrun5e/templates/actor/parts/actor-spellbook.html',
-        'systems/shadowrun5e/templates/actor/parts/actor-skills.html',
-        'systems/shadowrun5e/templates/actor/parts/actor-matrix.html',
-        'systems/shadowrun5e/templates/actor/parts/actor-actions.html',
-        'systems/shadowrun5e/templates/actor/parts/actor-config.html',
-        'systems/shadowrun5e/templates/actor/parts/actor-bio.html',
-        'systems/shadowrun5e/templates/actor/parts/actor-social.html',
-        'systems/shadowrun5e/templates/item/parts/description.html',
-        'systems/shadowrun5e/templates/item/parts/technology.html',
-        'systems/shadowrun5e/templates/item/parts/header.html',
-        'systems/shadowrun5e/templates/item/parts/weapon-ammo-list.html',
-        'systems/shadowrun5e/templates/item/parts/weapon-mods-list.html',
-        'systems/shadowrun5e/templates/item/parts/action.html',
-        'systems/shadowrun5e/templates/item/parts/damage.html',
-        'systems/shadowrun5e/templates/item/parts/opposed.html',
-        'systems/shadowrun5e/templates/item/parts/spell.html',
-        'systems/shadowrun5e/templates/item/parts/complex_form.html',
-        'systems/shadowrun5e/templates/item/parts/weapon.html',
-        'systems/shadowrun5e/templates/item/parts/armor.html',
-        'systems/shadowrun5e/templates/item/parts/matrix.html',
-        'systems/shadowrun5e/templates/item/parts/sin.html',
-        'systems/shadowrun5e/templates/item/parts/contact.html',
-        'systems/shadowrun5e/templates/item/parts/lifestyle.html',
-        'systems/shadowrun5e/templates/item/parts/ammo.html',
-        'systems/shadowrun5e/templates/item/parts/modification.html',
-    ];
-    return loadTemplates(templatePaths);
-});
 
 },{}],22:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+class Template extends MeasuredTemplate {
+    static fromItem(item, onComplete) {
+        const templateShape = 'circle';
+        const templateData = {
+            t: templateShape,
+            user: game.user._id,
+            direction: 0,
+            x: 0,
+            y: 0,
+            // @ts-ignore
+            fillColor: game.user.color,
+        };
+        const blast = item.getBlastData();
+        templateData['distance'] = blast === null || blast === void 0 ? void 0 : blast.radius;
+        templateData['dropoff'] = blast === null || blast === void 0 ? void 0 : blast.dropoff;
+        // @ts-ignore
+        const template = new this(templateData);
+        template.item = item;
+        template.onComplete = onComplete;
+        return template;
+    }
+    drawPreview(event) {
+        var _a, _b;
+        const initialLayer = canvas.activeLayer;
+        // @ts-ignore
+        this.draw();
+        // @ts-ignore
+        this.layer.activate();
+        // @ts-ignore
+        this.layer.preview.addChild(this);
+        this.activatePreviewListeners(initialLayer);
+        if (this.item && this.item.actor) {
+            (_b = (_a = this.item.actor) === null || _a === void 0 ? void 0 : _a.sheet) === null || _b === void 0 ? void 0 : _b.minimize();
+        }
+    }
+    activatePreviewListeners(initialLayer) {
+        const handlers = {};
+        let moveTime = 0;
+        // Update placement (mouse-move)
+        handlers['mm'] = (event) => {
+            event.stopPropagation();
+            let now = Date.now(); // Apply a 20ms throttle
+            if (now - moveTime <= 20)
+                return;
+            const center = event.data.getLocalPosition(this.layer);
+            const snapped = canvas.grid.getSnappedPosition(center.x, center.y, 2);
+            this.data.x = snapped.x;
+            this.data.y = snapped.y;
+            // @ts-ignore
+            this.refresh();
+            moveTime = now;
+        };
+        // Cancel the workflow (right-click)
+        handlers['rc'] = () => {
+            var _a, _b;
+            this.layer.preview.removeChildren();
+            canvas.stage.off('mousemove', handlers['mm']);
+            canvas.stage.off('mousedown', handlers['lc']);
+            canvas.app.view.oncontextmenu = null;
+            canvas.app.view.onwheel = null;
+            initialLayer.activate();
+            if (this.item && this.item.actor) {
+                // @ts-ignore
+                (_b = (_a = this.item.actor) === null || _a === void 0 ? void 0 : _a.sheet) === null || _b === void 0 ? void 0 : _b.maximize();
+            }
+            if (this.onComplete)
+                this.onComplete();
+        };
+        // Confirm the workflow (left-click)
+        handlers['lc'] = (event) => {
+            handlers['rc'](event);
+            // Confirm final snapped position
+            const destination = canvas.grid.getSnappedPosition(this.x, this.y, 2);
+            this.data.x = destination.x;
+            this.data.y = destination.y;
+            // Create the template
+            canvas.scene.createEmbeddedEntity('MeasuredTemplate', this.data);
+        };
+        // Rotate the template by 3 degree increments (mouse-wheel)
+        handlers['mw'] = (event) => {
+            if (event.ctrlKey)
+                event.preventDefault(); // Avoid zooming the browser window
+            event.stopPropagation();
+            let delta = canvas.grid.type > CONST.GRID_TYPES.SQUARE ? 30 : 15;
+            let snap = event.shiftKey ? delta : 5;
+            this.data.direction += snap * Math.sign(event.deltaY);
+            // @ts-ignore
+            this.refresh();
+        };
+        // Activate listeners
+        canvas.stage.on('mousemove', handlers['mm']);
+        canvas.stage.on('mousedown', handlers['lc']);
+        canvas.app.view.oncontextmenu = handlers['rc'];
+        canvas.app.view.onwheel = handlers['mw'];
+    }
+}
+exports.default = Template;
+
+},{}],23:[function(require,module,exports){
 function _assertThisInitialized(self) {
   if (self === void 0) {
     throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
@@ -5808,7 +6173,7 @@ function _assertThisInitialized(self) {
 }
 
 module.exports = _assertThisInitialized;
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
   try {
     var info = gen[key](arg);
@@ -5846,7 +6211,7 @@ function _asyncToGenerator(fn) {
 }
 
 module.exports = _asyncToGenerator;
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -5854,7 +6219,7 @@ function _classCallCheck(instance, Constructor) {
 }
 
 module.exports = _classCallCheck;
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 function _defineProperties(target, props) {
   for (var i = 0; i < props.length; i++) {
     var descriptor = props[i];
@@ -5872,7 +6237,7 @@ function _createClass(Constructor, protoProps, staticProps) {
 }
 
 module.exports = _createClass;
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 function _defineProperty(obj, key, value) {
   if (key in obj) {
     Object.defineProperty(obj, key, {
@@ -5889,7 +6254,7 @@ function _defineProperty(obj, key, value) {
 }
 
 module.exports = _defineProperty;
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 var superPropBase = require("./superPropBase");
 
 function _get(target, property, receiver) {
@@ -5913,7 +6278,7 @@ function _get(target, property, receiver) {
 }
 
 module.exports = _get;
-},{"./superPropBase":33}],28:[function(require,module,exports){
+},{"./superPropBase":34}],29:[function(require,module,exports){
 function _getPrototypeOf(o) {
   module.exports = _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
     return o.__proto__ || Object.getPrototypeOf(o);
@@ -5922,7 +6287,7 @@ function _getPrototypeOf(o) {
 }
 
 module.exports = _getPrototypeOf;
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 var setPrototypeOf = require("./setPrototypeOf");
 
 function _inherits(subClass, superClass) {
@@ -5941,7 +6306,7 @@ function _inherits(subClass, superClass) {
 }
 
 module.exports = _inherits;
-},{"./setPrototypeOf":32}],30:[function(require,module,exports){
+},{"./setPrototypeOf":33}],31:[function(require,module,exports){
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : {
     "default": obj
@@ -5949,7 +6314,7 @@ function _interopRequireDefault(obj) {
 }
 
 module.exports = _interopRequireDefault;
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 var _typeof = require("../helpers/typeof");
 
 var assertThisInitialized = require("./assertThisInitialized");
@@ -5963,7 +6328,7 @@ function _possibleConstructorReturn(self, call) {
 }
 
 module.exports = _possibleConstructorReturn;
-},{"../helpers/typeof":34,"./assertThisInitialized":22}],32:[function(require,module,exports){
+},{"../helpers/typeof":35,"./assertThisInitialized":23}],33:[function(require,module,exports){
 function _setPrototypeOf(o, p) {
   module.exports = _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
     o.__proto__ = p;
@@ -5974,7 +6339,7 @@ function _setPrototypeOf(o, p) {
 }
 
 module.exports = _setPrototypeOf;
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 var getPrototypeOf = require("./getPrototypeOf");
 
 function _superPropBase(object, property) {
@@ -5987,7 +6352,7 @@ function _superPropBase(object, property) {
 }
 
 module.exports = _superPropBase;
-},{"./getPrototypeOf":28}],34:[function(require,module,exports){
+},{"./getPrototypeOf":29}],35:[function(require,module,exports){
 function _typeof(obj) {
   "@babel/helpers - typeof";
 
@@ -6005,10 +6370,10 @@ function _typeof(obj) {
 }
 
 module.exports = _typeof;
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 module.exports = require("regenerator-runtime");
 
-},{"regenerator-runtime":36}],36:[function(require,module,exports){
+},{"regenerator-runtime":37}],37:[function(require,module,exports){
 /**
  * Copyright (c) 2014-present, Facebook, Inc.
  *

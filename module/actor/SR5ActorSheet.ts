@@ -78,7 +78,7 @@ export class SR5ActorSheet extends ActorSheet {
 
         const { modifiers: mods } = data.data;
         for (let [key, value] of Object.entries(mods)) {
-            if (value === 0) mods[key] = "";
+            if (value === 0) mods[key] = '';
         }
 
         this._prepareItems(data);
@@ -215,7 +215,6 @@ export class SR5ActorSheet extends ActorSheet {
         complex_forms.sort(sortByName);
         items.sort(sortByName);
         spells.sort(sortByName);
-        complex_forms.sort(sortByName);
         contacts.sort(sortByName);
         lifestyles.sort(sortByName);
         sins.sort(sortByName);
@@ -282,6 +281,7 @@ export class SR5ActorSheet extends ActorSheet {
         html.find('.drain-roll').click(this._onRollDrain.bind(this));
         html.find('.fade-roll').click(this._onRollFade.bind(this));
         html.find('.item-roll').click(this._onRollItem.bind(this));
+        // $(html).find('.item-roll').on('contextmenu', () => console.log('TEST'));
         html.find('.item-equip-toggle').click(this._onEquipItem.bind(this));
         html.find('.item-qty').change(this._onChangeQty.bind(this));
         html.find('.item-rtg').change(this._onChangeRtg.bind(this));
@@ -457,19 +457,21 @@ export class SR5ActorSheet extends ActorSheet {
     async _onRollTrack(event) {
         event.preventDefault();
         let track = event.currentTarget.closest('.attribute').dataset.track;
-        this.actor.rollNaturalRecovery(track, event);
+        await this.actor.rollNaturalRecovery(track, event);
     }
 
     async _onRollPrompt(event) {
         event.preventDefault();
-        this.actor.promptRoll({ event: event });
+        await this.actor.promptRoll({ event: event });
     }
 
     async _onRollItem(event) {
         event.preventDefault();
         const iid = event.currentTarget.closest('.item').dataset.itemId;
         const item = this.actor.getOwnedItem(iid);
-        if (item) return item.roll(event);
+        if (item) {
+            await item.postCard(event);
+        }
     }
 
     async _onRollFade(event) {

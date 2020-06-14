@@ -11,13 +11,15 @@ export type ShadowrunTemplateData = {
 };
 
 export default // @ts-ignore
-class ShadowrunTemplate extends MeasuredTemplate {
+class Template extends MeasuredTemplate {
     data: ShadowrunTemplateData;
     layer: PlaceablesLayer;
     x: number;
     y: number;
+    item?: SR5Item;
+    onComplete?: () => void;
 
-    static fromItem(item): ShadowrunTemplate | undefined {
+    static fromItem(item: SR5Item, onComplete?: () => void): Template | undefined {
         const templateShape = 'circle';
 
         const templateData = {
@@ -29,29 +31,15 @@ class ShadowrunTemplate extends MeasuredTemplate {
             // @ts-ignore
             fillColor: game.user.color,
         };
-
-        // can only handle spells and grenade right now
-        if (item.isSpell()) {
-            const force = item.getLastSpellForce();
-            // distance on spells is equal to force (I'm probably wrong for certain spells)
-            let distance = force;
-            // extended spells multiply by 10
-            if (item.data.data.extended) distance *= 10;
-            templateData['distance'] = distance;
-        } else if (item.isGrenade()) {
-            // use blast radius
-            const distance = item.data.data.thrown.blast.radius;
-            const dropoff = item.data.data.thrown.blast.dropoff;
-            templateData['distance'] = distance;
-        } else if (item.hasExplosiveAmmo()) {
-            const ammo = item.getEquippedAmmo();
-            const distance = ammo.data.data.blast.radius;
-            const dropoff = ammo.data.data.blast.dropoff;
-            templateData['distance'] = distance;
-        }
+        const blast = item.getBlastData();
+        templateData['distance'] = blast?.radius;
+        templateData['dropoff'] = blast?.dropoff;
 
         // @ts-ignore
-        return new this(templateData);
+        const template = new this(templateData);
+        template.item = item;
+        template.onComplete = onComplete;
+        return template;
     }
 
     drawPreview(event?: Event) {
@@ -63,6 +51,9 @@ class ShadowrunTemplate extends MeasuredTemplate {
         // @ts-ignore
         this.layer.preview.addChild(this);
         this.activatePreviewListeners(initialLayer);
+        if (this.item && this.item.actor) {
+            this.item.actor?.sheet?.minimize();
+        }
     }
 
     activatePreviewListeners(initialLayer: CanvasLayer) {
@@ -84,13 +75,19 @@ class ShadowrunTemplate extends MeasuredTemplate {
         };
 
         // Cancel the workflow (right-click)
-        handlers['rc'] = (event) => {
+        handlers['rc'] = () => {
             this.layer.preview.removeChildren();
             canvas.stage.off('mousemove', handlers['mm']);
             canvas.stage.off('mousedown', handlers['lc']);
             canvas.app.view.oncontextmenu = null;
             canvas.app.view.onwheel = null;
             initialLayer.activate();
+
+            if (this.item && this.item.actor) {
+                // @ts-ignore
+                this.item.actor?.sheet?.maximize();
+            }
+            if (this.onComplete) this.onComplete();
         };
 
         // Confirm the workflow (left-click)
