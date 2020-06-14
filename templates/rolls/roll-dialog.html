@@ -32,6 +32,7 @@
         />
     </div>
     {{/if}} {{#if wounds}}
+    {{#if woundValue}}
     <div class="form-group">
         <label>Wounds (-{{woundValue}})</label>
         <select style="flex: 2;" name="wounds">
@@ -41,6 +42,7 @@
             {{/select}}
         </select>
     </div>
+    {{/if}}
     {{/if}}
     <div class="form-group">
         <label>Environment</label>

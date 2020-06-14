@@ -5917,14 +5917,14 @@ class ShadowrunRoller {
         let cancel = true;
         const buttons = {
             roll: {
-                label: 'Roll',
+                label: game.i18n.localize('SR5.Roll'),
                 icon: '<i class="fas fa-dice-six"></i>',
                 callback: () => (cancel = false),
             },
         };
         if (actor) {
             buttons['edge'] = {
-                label: `Push the Limit (+${actor.getEdge().max})`,
+                label: `${game.i18n.localize('SR5.PushTheLimit')} (+${actor.getEdge().max})`,
                 icon: '<i class="fas fa-bomb"></i>',
                 callback: () => {
                     edge = true;
