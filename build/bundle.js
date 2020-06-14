@@ -5960,6 +5960,12 @@ class ShadowrunRoller {
                         if (cancel)
                             return;
                         // get the actual dice_pool from the difference of initial parts and value in the dialog
+                        const limitValue = helpers_1.Helpers.parseInputToNumber($(html).find('[name="limit"]').val());
+                        if (limit && limit.value !== limitValue) {
+                            limit.value = limitValue;
+                            limit.base = limitValue;
+                            limit.label = 'SR5.Override';
+                        }
                         const woundValue = -helpers_1.Helpers.parseInputToNumber($(html).find('[name="wounds"]').val());
                         const situationMod = helpers_1.Helpers.parseInputToNumber($(html).find('[name="dp_mod"]').val());
                         const environmentMod = -helpers_1.Helpers.parseInputToNumber($(html).find('[name="options.environmental"]').val());
