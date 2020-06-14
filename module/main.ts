@@ -1,4 +1,3 @@
-// Import Modules
 import { SR5ItemSheet } from './item/SR5ItemSheet';
 import { SR5ActorSheet } from './actor/SR5ActorSheet';
 import { SR5Actor } from './actor/SR5Actor';

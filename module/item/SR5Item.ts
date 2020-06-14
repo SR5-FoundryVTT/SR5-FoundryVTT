@@ -12,9 +12,9 @@ import ComplexFormLevelData = Shadowrun.ComplexFormLevelData;
 import FireRangeData = Shadowrun.FireRangeData;
 import BlastData = Shadowrun.BlastData;
 import { ChatData } from './ChatData';
-import { ShadowrunRollChatData } from '../rolls/ShadowrunRollCard';
 import { AdvancedRollProps, ShadowrunRoll, ShadowrunRoller } from '../rolls/ShadowrunRoller';
 import Template from '../template';
+import { createChatData } from '../chat';
 
 export class SR5Item extends Item {
     labels: {} = {};
@@ -197,7 +197,7 @@ export class SR5Item extends Item {
             const { token } = this.actor;
             const attack = this.getAttackData(0);
             delete attack?.hits;
-            ShadowrunRollChatData({
+            createChatData({
                 header: {
                     name: this.name,
                     img: this.img,

@@ -7,7 +7,7 @@ import LabelField = Shadowrun.LabelField;
 import { SR5Item } from '../item/SR5Item';
 import AttackData = Shadowrun.AttackData;
 import DamageData = Shadowrun.DamageData;
-import { ShadowrunRollCardProps, ShadowrunRollChatData } from './ShadowrunRollCard';
+import { createChatData, TemplateData } from '../chat';
 
 export interface BasicRollProps {
     name?: string;
@@ -52,7 +52,7 @@ export interface ItemRollProps {
 }
 
 export class ShadowrunRoll extends Roll {
-    templateData: ShadowrunRollCardProps | undefined;
+    templateData: TemplateData | undefined;
 }
 
 export class ShadowrunRoller {
@@ -172,7 +172,7 @@ export class ShadowrunRoller {
         roll.templateData = templateData;
 
         if (!hideRollMessage) {
-            const chatData = await ShadowrunRollChatData(templateData, roll);
+            const chatData = await createChatData(templateData, roll);
             await ChatMessage.create(chatData, { displaySheet: false });
         }
         return roll;
