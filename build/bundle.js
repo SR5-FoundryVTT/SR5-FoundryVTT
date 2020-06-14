@@ -1525,7 +1525,7 @@ class SR5ActorSheet extends ActorSheet {
                 // if shiftKey, post just a card, otherwise roll
                 if (event.shiftKey || !item.hasRoll)
                     return item.postCard();
-                return item.rollTest(event);
+                return item.rollTestOld(event);
             }
         });
     }
@@ -3059,6 +3059,7 @@ exports.addRollListeners = exports.addChatMessageContextOptions = void 0;
 const SR5Actor_1 = require("./actor/SR5Actor");
 const SR5Item_1 = require("./item/SR5Item");
 const template_1 = require("./template");
+const ShadowrunRoller_1 = require("./rolls/ShadowrunRoller");
 exports.addChatMessageContextOptions = function (html, options) {
     const canRoll = (li) => {
         const msg = game.messages.get(li.data().messageId);
@@ -3082,6 +3083,20 @@ exports.addChatMessageContextOptions = function (html, options) {
 exports.addRollListeners = (app, html) => {
     if (!app.getFlag('shadowrun5e', 'customRoll'))
         return;
+    html.on('click', '.test-roll', (event) => __awaiter(void 0, void 0, void 0, function* () {
+        event.preventDefault();
+        const item = SR5Item_1.SR5Item.getItemFromMessage(html);
+        if (item) {
+            const roll = yield ShadowrunRoller_1.ShadowrunRoller.itemRoll({ item, event }, { hideRollMessage: true });
+            if (roll && roll.templateData) {
+                const template = `systems/shadowrun5e/templates/rolls/roll-card.html`;
+                const html = yield renderTemplate(template, roll.templateData);
+                const data = {};
+                data['content'] = html;
+                app.update(data);
+            }
+        }
+    }));
     html.on('click', '.test', (event) => __awaiter(void 0, void 0, void 0, function* () {
         event.preventDefault();
         const type = event.currentTarget.dataset.action;
@@ -3106,7 +3121,7 @@ exports.addRollListeners = (app, html) => {
     $(html).find('.card-description').hide();
 };
 
-},{"./actor/SR5Actor":1,"./item/SR5Item":16,"./template":23}],11:[function(require,module,exports){
+},{"./actor/SR5Actor":1,"./item/SR5Item":16,"./rolls/ShadowrunRoller":21,"./template":23}],11:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -4106,6 +4121,8 @@ const helpers_1 = require("../helpers");
 const ShadowrunRollDialog_1 = require("../apps/dialogs/ShadowrunRollDialog");
 const template_1 = require("../template");
 const ChatData_1 = require("./ChatData");
+const ShadowrunRollCard_1 = require("../rolls/ShadowrunRollCard");
+const ShadowrunRoller_1 = require("../rolls/ShadowrunRoller");
 class SR5Item extends Item {
     constructor() {
         super(...arguments);
@@ -4277,35 +4294,17 @@ class SR5Item extends Item {
             if (!this.actor)
                 return;
             const { token } = this.actor;
-            const templateData = {
-                actor: this.actor,
-                tokenId: token ? `${token.scene._id}.${token.id}` : null,
-                item: this.data,
-                type: this.data.type,
-                data: this.getChatData(),
-                hasRoll: this.hasRoll,
-                hasOpposedRoll: this.hasOpposedRoll,
-                hasTemplate: this.hasTemplate,
-                labels: this.labels,
-            };
-            const templateType = 'item';
-            const template = `systems/shadowrun5e/templates/rolls/${templateType}-card.html`;
-            const html = yield renderTemplate(template, templateData);
-            const chatData = {
-                user: game.user._id,
-                type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-                content: html,
-                speaker: {
-                    actor: this.actor._id,
-                    token: this.actor.token,
-                    alias: this.actor.name,
+            const chatData = yield ShadowrunRollCard_1.ShadowrunRollChatData({
+                header: {
+                    name: this.name,
+                    img: this.img,
                 },
-            };
-            const rollMode = game.settings.get('core', 'rollMode');
-            if (['gmroll', 'blindroll'].includes(rollMode))
-                chatData['whisper'] = ChatMessage.getWhisperIDs('GM');
-            if (rollMode === 'blindroll')
-                chatData['blind'] = true;
+                testName: this.getRollName(),
+                actor: this.actor,
+                tokenId: token ? `${token.scene._id}.${token.id}` : undefined,
+                description: this.getChatData(),
+                item: this,
+            });
             return ChatMessage.create(chatData, { displaySheet: false });
         });
     }
@@ -4535,11 +4534,16 @@ class SR5Item extends Item {
             }
         });
     }
-    rollTest(event) {
+    rollTestOld(event) {
         return __awaiter(this, void 0, void 0, function* () {
             const dialog = yield ShadowrunRollDialog_1.ShadowrunRollDialog.fromItemRoll(this, event);
             if (dialog)
                 return dialog.render(true);
+        });
+    }
+    rollTest(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return ShadowrunRoller_1.ShadowrunRoller.itemRoll({ event, item: this });
         });
     }
     static getItemFromMessage(html) {
@@ -4585,7 +4589,7 @@ class SR5Item extends Item {
             if (!item)
                 return;
             if (action === 'roll')
-                item.rollTest(ev);
+                item.rollTestOld(ev);
             if (opposedRoll) {
                 const targets = this.getTargets();
                 for (const t of targets) {
@@ -4951,7 +4955,7 @@ class SR5Item extends Item {
 }
 exports.SR5Item = SR5Item;
 
-},{"../apps/dialogs/ShadowrunRollDialog":4,"../helpers":14,"../template":23,"./ChatData":15}],17:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunRollDialog":4,"../helpers":14,"../rolls/ShadowrunRollCard":20,"../rolls/ShadowrunRoller":21,"../template":23,"./ChatData":15}],17:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -5778,7 +5782,6 @@ exports.ShadowrunRollChatData = (templateData, roll) => __awaiter(void 0, void 0
         type: CONST.CHAT_MESSAGE_TYPES.ROLL,
         content: html,
         roll,
-        sound: CONFIG.sounds.dice,
         speaker: {
             actor: actor === null || actor === void 0 ? void 0 : actor._id,
             token: actor === null || actor === void 0 ? void 0 : actor.token,
@@ -5790,6 +5793,9 @@ exports.ShadowrunRollChatData = (templateData, roll) => __awaiter(void 0, void 0
             },
         },
     };
+    if (roll) {
+        chatData['sound'] = CONFIG.sounds.dice;
+    }
     const rollMode = game.settings.get('core', 'rollMode');
     if (['gmroll', 'blindroll'].includes(rollMode))
         chatData['whisper'] = ChatMessage.getWhisperIDs('GM');
@@ -5821,29 +5827,23 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ShadowrunRoller = void 0;
+exports.ShadowrunRoller = exports.ShadowrunRoll = void 0;
 const helpers_1 = require("../helpers");
 const ShadowrunRollCard_1 = require("./ShadowrunRollCard");
+class ShadowrunRoll extends Roll {
+}
+exports.ShadowrunRoll = ShadowrunRoll;
 class ShadowrunRoller {
-    static itemRoll({ event, item }) {
+    static itemRoll({ event, item }, options) {
         var _a;
         const parts = item.getRollPartsList();
         let limit = item.getLimit();
         let title = item.getRollName();
-        const rollData = {
-            event: event,
-            dialogOptions: {
+        const rollData = Object.assign(Object.assign({}, options), { event: event, dialogOptions: {
                 environmental: true,
-            },
-            parts,
-            actor: item.actor,
-            item,
+            }, parts, actor: item.actor, item,
             limit,
-            title,
-            name: item.name,
-            img: item.img,
-            previewTemplate: item.hasTemplate,
-        };
+            title, name: item.name, img: item.img, previewTemplate: item.hasTemplate });
         rollData['attack'] = item.getAttackData(0);
         rollData['blast'] = item.getBlastData();
         if (item.hasOpposedRoll) {
@@ -5887,7 +5887,7 @@ class ShadowrunRoller {
         return formula;
     }
     static basicRoll(_a) {
-        var { parts, limit, explodeSixes, title, actor, img = actor === null || actor === void 0 ? void 0 : actor.img, name = actor === null || actor === void 0 ? void 0 : actor.name } = _a, props = __rest(_a, ["parts", "limit", "explodeSixes", "title", "actor", "img", "name"]);
+        var { parts, limit, explodeSixes, title, actor, img = actor === null || actor === void 0 ? void 0 : actor.img, name = actor === null || actor === void 0 ? void 0 : actor.name, hideRollMessage } = _a, props = __rest(_a, ["parts", "limit", "explodeSixes", "title", "actor", "img", "name", "hideRollMessage"]);
         return __awaiter(this, void 0, void 0, function* () {
             let roll;
             const rollMode = game.settings.get('core', 'rollMode');
@@ -5895,7 +5895,7 @@ class ShadowrunRoller {
                 const formula = this.shadowrunFormula({ parts, limit, explode: explodeSixes });
                 if (!formula)
                     return;
-                roll = new Roll(formula);
+                roll = new ShadowrunRoll(formula);
                 roll.roll();
                 if (game.settings.get('shadowrun5e', 'displayDefaultRollCard')) {
                     yield roll.toMessage({
@@ -5913,9 +5913,11 @@ class ShadowrunRoller {
                     img: img || '',
                 }, tokenId: token ? `${token.scene._id}.${token.id}` : undefined, dice,
                 limit, testName: title, dicePool: helpers_1.Helpers.totalMods(parts), parts, hits: roll === null || roll === void 0 ? void 0 : roll.total }, props);
-            const chatData = yield ShadowrunRollCard_1.ShadowrunRollChatData(templateData, roll);
-            console.log(chatData);
-            yield ChatMessage.create(chatData, { displaySheet: false });
+            roll.templateData = templateData;
+            if (!hideRollMessage) {
+                const chatData = yield ShadowrunRollCard_1.ShadowrunRollChatData(templateData, roll);
+                yield ChatMessage.create(chatData, { displaySheet: false });
+            }
             return roll;
         });
     }

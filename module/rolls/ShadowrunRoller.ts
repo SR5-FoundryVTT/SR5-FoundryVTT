@@ -7,7 +7,7 @@ import LabelField = Shadowrun.LabelField;
 import { SR5Item } from '../item/SR5Item';
 import AttackData = Shadowrun.AttackData;
 import DamageData = Shadowrun.DamageData;
-import { ShadowrunRollChatData } from './ShadowrunRollCard';
+import { ShadowrunRollCardProps, ShadowrunRollChatData } from './ShadowrunRollCard';
 
 interface BasicRollProps {
     name?: string;
@@ -25,11 +25,12 @@ interface BasicRollProps {
     };
     soak?: DamageData;
     tests?: {
-        label: string,
-        type: string
+        label: string;
+        type: string;
     }[];
     description?: object;
     previewTemplate?: boolean;
+    hideRollMessage?: boolean;
 }
 
 interface RollDialogOptions {
@@ -50,13 +51,18 @@ interface ItemRollProps {
     item: SR5Item;
 }
 
+export class ShadowrunRoll extends Roll {
+    templateData: ShadowrunRollCardProps | undefined;
+}
+
 export class ShadowrunRoller {
-    static itemRoll({ event, item }: ItemRollProps): Promise<Roll | undefined> {
+    static itemRoll({ event, item }: ItemRollProps, options?: Partial<AdvancedRollProps>): Promise<ShadowrunRoll | undefined> {
         const parts = item.getRollPartsList();
         let limit = item.getLimit();
         let title = item.getRollName();
 
         const rollData: AdvancedRollProps = {
+            ...options,
             event: event,
             dialogOptions: {
                 environmental: true,
@@ -90,13 +96,14 @@ export class ShadowrunRoller {
         rollData.description = item.getChatData();
 
         const r = ShadowrunRoller.advancedRoll(rollData);
-        r.then(async (roll: Roll | undefined) => {
+        r.then(async (roll: ShadowrunRoll | undefined) => {
             if (roll && item.data.type === 'weapon') {
                 await item.useAmmo(1);
             }
         });
         return r;
     }
+
     static shadowrunFormula({ parts, limit, explode }): string {
         const count = Helpers.totalMods(parts);
         if (count <= 0) {
@@ -123,14 +130,15 @@ export class ShadowrunRoller {
         actor,
         img = actor?.img,
         name = actor?.name,
+        hideRollMessage,
         ...props
-    }: BasicRollProps): Promise<Roll | undefined> {
+    }: BasicRollProps): Promise<ShadowrunRoll | undefined> {
         let roll;
         const rollMode = game.settings.get('core', 'rollMode');
         if (Object.keys(parts).length > 0) {
             const formula = this.shadowrunFormula({ parts, limit, explode: explodeSixes });
             if (!formula) return;
-            roll = new Roll(formula);
+            roll = new ShadowrunRoll(formula);
             roll.roll();
 
             if (game.settings.get('shadowrun5e', 'displayDefaultRollCard')) {
@@ -161,12 +169,16 @@ export class ShadowrunRoller {
             ...props,
         };
 
-        const chatData = await ShadowrunRollChatData(templateData, roll);
-        await ChatMessage.create(chatData, { displaySheet: false });
+        roll.templateData = templateData;
+
+        if (!hideRollMessage) {
+            const chatData = await ShadowrunRollChatData(templateData, roll);
+            await ChatMessage.create(chatData, { displaySheet: false });
+        }
         return roll;
     }
 
-    static advancedRoll(props: AdvancedRollProps): Promise<Roll | undefined> {
+    static advancedRoll(props: AdvancedRollProps): Promise<ShadowrunRoll | undefined> {
         // destructure what we need to use from props
         // any value pulled out needs to be updated back in props if changed
         const { title, actor, parts, limit, extended, wounds = true, after, dialogOptions } = props;

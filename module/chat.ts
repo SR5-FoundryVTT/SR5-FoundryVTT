@@ -1,6 +1,7 @@
 import { SR5Actor } from './actor/SR5Actor';
 import { SR5Item } from './item/SR5Item';
 import Template from './template';
+import { ShadowrunRoller } from './rolls/ShadowrunRoller';
 
 export const addChatMessageContextOptions = function (html, options) {
     const canRoll = (li) => {
@@ -32,6 +33,20 @@ export const addChatMessageContextOptions = function (html, options) {
 
 export const addRollListeners = (app, html) => {
     if (!app.getFlag('shadowrun5e', 'customRoll')) return;
+    html.on('click', '.test-roll', async (event) => {
+        event.preventDefault();
+        const item = SR5Item.getItemFromMessage(html);
+        if (item) {
+            const roll = await ShadowrunRoller.itemRoll({ item, event }, { hideRollMessage: true });
+            if (roll && roll.templateData) {
+                const template = `systems/shadowrun5e/templates/rolls/roll-card.html`;
+                const html = await renderTemplate(template, roll.templateData);
+                const data = {};
+                data['content'] = html;
+                app.update(data);
+            }
+        }
+    });
     html.on('click', '.test', async (event) => {
         event.preventDefault();
         const type = event.currentTarget.dataset.action;
@@ -48,7 +63,7 @@ export const addRollListeners = (app, html) => {
             template?.drawPreview(event);
         }
         console.log(event);
-    })
+    });
     html.on('click', '.card-title', (event) => {
         event.preventDefault();
         $(event.currentTarget).siblings('.card-description').toggle();

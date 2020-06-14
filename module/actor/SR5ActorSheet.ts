@@ -472,7 +472,7 @@ export class SR5ActorSheet extends ActorSheet {
         if (item) {
             // if shiftKey, post just a card, otherwise roll
             if (event.shiftKey || !item.hasRoll) return item.postCard();
-            return item.rollTest(event);
+            return item.rollTestOld(event);
         }
     }
 

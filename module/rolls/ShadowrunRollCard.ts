@@ -1,7 +1,6 @@
 import { SR5Actor } from '../actor/SR5Actor';
 import ModList = Shadowrun.ModList;
 import BaseValuePair = Shadowrun.BaseValuePair;
-import { Helpers } from '../helpers';
 import DamageData = Shadowrun.DamageData;
 import { SR5Item } from '../item/SR5Item';
 import AttackData = Shadowrun.AttackData;
@@ -14,10 +13,9 @@ export type ShadowrunRollCardProps = {
     };
     tokenId?: string;
     dice?: Die[];
-    parts: ModList<number>;
+    parts?: ModList<number>;
     limit?: BaseValuePair<number> & LabelField;
-    explodeSixes?: boolean;
-    title?: string;
+    testName?: string;
     actor?: SR5Actor;
     item?: SR5Item;
     attack?: AttackData;
@@ -44,7 +42,6 @@ export const ShadowrunRollChatData = async (templateData: ShadowrunRollCardProps
         type: CONST.CHAT_MESSAGE_TYPES.ROLL,
         content: html,
         roll,
-        sound: CONFIG.sounds.dice,
         speaker: {
             actor: actor?._id,
             token: actor?.token,
@@ -56,6 +53,9 @@ export const ShadowrunRollChatData = async (templateData: ShadowrunRollCardProps
             },
         },
     };
+    if (roll) {
+        chatData['sound'] = CONFIG.sounds.dice;
+    }
     const rollMode = game.settings.get('core', 'rollMode');
 
     if (['gmroll', 'blindroll'].includes(rollMode))

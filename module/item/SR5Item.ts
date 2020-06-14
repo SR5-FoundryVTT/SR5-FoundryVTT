@@ -13,6 +13,8 @@ import ComplexFormLevelData = Shadowrun.ComplexFormLevelData;
 import FireRangeData = Shadowrun.FireRangeData;
 import BlastData = Shadowrun.BlastData;
 import { ChatData } from './ChatData';
+import { ShadowrunRollChatData } from '../rolls/ShadowrunRollCard';
+import { ShadowrunRoll, ShadowrunRoller } from '../rolls/ShadowrunRoller';
 
 export class SR5Item extends Item {
     labels: {} = {};
@@ -185,37 +187,17 @@ export class SR5Item extends Item {
         // we won't work if we don't have an actor
         if (!this.actor) return;
         const { token } = this.actor;
-        const templateData = {
-            actor: this.actor,
-            tokenId: token ? `${token.scene._id}.${token.id}` : null,
-            item: this.data,
-            type: this.data.type,
-            data: this.getChatData(),
-            hasRoll: this.hasRoll,
-            hasOpposedRoll: this.hasOpposedRoll,
-            hasTemplate: this.hasTemplate,
-            labels: this.labels,
-        };
-
-        const templateType = 'item';
-        const template = `systems/shadowrun5e/templates/rolls/${templateType}-card.html`;
-        const html = await renderTemplate(template, templateData);
-
-        const chatData = {
-            user: game.user._id,
-            type: CONST.CHAT_MESSAGE_TYPES.OTHER,
-            content: html,
-            speaker: {
-                actor: this.actor._id,
-                token: this.actor.token,
-                alias: this.actor.name,
+        const chatData = await ShadowrunRollChatData({
+            header: {
+                name: this.name,
+                img: this.img,
             },
-        };
-
-        const rollMode = game.settings.get('core', 'rollMode');
-        if (['gmroll', 'blindroll'].includes(rollMode))
-            chatData['whisper'] = ChatMessage.getWhisperIDs('GM');
-        if (rollMode === 'blindroll') chatData['blind'] = true;
+            testName: this.getRollName(),
+            actor: this.actor,
+            tokenId: token ? `${token.scene._id}.${token.id}` : undefined,
+            description: this.getChatData(),
+            item: this,
+        });
 
         return ChatMessage.create(chatData, { displaySheet: false });
     }
@@ -419,16 +401,13 @@ export class SR5Item extends Item {
                 }
             }
             return target.rollDefense(options, parts);
-        }
-        else if (opposed.type === 'soak') {
+        } else if (opposed.type === 'soak') {
             options['damage'] = lastAttack?.damage;
             options['attackerHits'] = lastAttack?.hits;
             return target.rollSoak(options, parts);
-        }
-        else if (opposed.type === 'armor') {
+        } else if (opposed.type === 'armor') {
             return target.rollArmor(options);
-        }
-        else {
+        } else {
             if (opposed.skill && opposed.attribute) {
                 return target.rollSkill(opposed.skill, {
                     ...options,
@@ -451,9 +430,13 @@ export class SR5Item extends Item {
         }
     }
 
-    async rollTest(event) {
+    async rollTestOld(event) {
         const dialog = await ShadowrunRollDialog.fromItemRoll(this, event);
         if (dialog) return dialog.render(true);
+    }
+
+    async rollTest(event): Promise<ShadowrunRoll | undefined> {
+        return ShadowrunRoller.itemRoll({ event, item: this });
     }
 
     static getItemFromMessage(html): SR5Item | undefined {
@@ -494,7 +477,7 @@ export class SR5Item extends Item {
             const item = this.getItemFromMessage(html);
             if (!item) return;
 
-            if (action === 'roll') item.rollTest(ev);
+            if (action === 'roll') item.rollTestOld(ev);
             if (opposedRoll) {
                 const targets = this.getTargets();
                 for (const t of targets) {
