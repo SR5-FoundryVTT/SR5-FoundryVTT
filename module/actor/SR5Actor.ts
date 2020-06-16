@@ -146,7 +146,8 @@ export class SR5Actor extends Actor {
             // MODIFIES MATRIX ATTRIBUTES
             if (item.type === 'device' && itemData.technology?.equipped) {
                 matrix.device = item._id;
-                matrix.condition_monitor.max = itemData.condition_monitor?.max || 0;
+                matrix.condition_monitor.max = itemData.technology.condition_monitor?.max || 0;
+                matrix.condition_monitor.value = itemData.technology.condition_monitor?.value || 0;
                 matrix.rating = itemData.technology.rating;
                 matrix.is_cyberdeck = itemData.category === 'cyberdeck';
                 matrix.name = item.name;
@@ -433,6 +434,13 @@ export class SR5Actor extends Actor {
 
     getOwnedItem(itemId: string): SR5Item | null {
         return (super.getOwnedItem(itemId) as unknown) as SR5Item;
+    }
+
+    getMatrixDevice(): SR5Item | undefined | null {
+        const matrix = this.data.data.matrix;
+        console.log(matrix);
+        if (matrix.device) return this.getOwnedItem(matrix.device);
+        return undefined;
     }
 
     addKnowledgeSkill(category, skill?) {

@@ -46,7 +46,7 @@ class SR5Actor extends Actor {
         });
     }
     prepareData() {
-        var _a, _b, _c;
+        var _a, _b, _c, _d;
         super.prepareData();
         const actorData = this.data;
         // @ts-ignore
@@ -135,7 +135,8 @@ class SR5Actor extends Actor {
             // MODIFIES MATRIX ATTRIBUTES
             if (item.type === 'device' && ((_b = itemData.technology) === null || _b === void 0 ? void 0 : _b.equipped)) {
                 matrix.device = item._id;
-                matrix.condition_monitor.max = ((_c = itemData.condition_monitor) === null || _c === void 0 ? void 0 : _c.max) || 0;
+                matrix.condition_monitor.max = ((_c = itemData.technology.condition_monitor) === null || _c === void 0 ? void 0 : _c.max) || 0;
+                matrix.condition_monitor.value = ((_d = itemData.technology.condition_monitor) === null || _d === void 0 ? void 0 : _d.value) || 0;
                 matrix.rating = itemData.technology.rating;
                 matrix.is_cyberdeck = itemData.category === 'cyberdeck';
                 matrix.name = item.name;
@@ -386,6 +387,13 @@ class SR5Actor extends Actor {
     }
     getOwnedItem(itemId) {
         return super.getOwnedItem(itemId);
+    }
+    getMatrixDevice() {
+        const matrix = this.data.data.matrix;
+        console.log(matrix);
+        if (matrix.device)
+            return this.getOwnedItem(matrix.device);
+        return undefined;
     }
     addKnowledgeSkill(category, skill) {
         const defaultSkill = {
@@ -1322,7 +1330,7 @@ class SR5ActorSheet extends ActorSheet {
     /* -------------------------------------------- */
     /**
      * Activate event listeners using the prepared sheet HTML
-     * @param html {HTML}   The prepared HTML object ready to be rendered into the DOM
+     * @param html The prepared HTML object ready to be rendered into the DOM
      */
     activateListeners(html) {
         super.activateListeners(html);
@@ -1375,6 +1383,20 @@ class SR5ActorSheet extends ActorSheet {
         html.find('.skill-edit').click(this._onShowEditSkill.bind(this));
         html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
         html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
+        html.find('.matrix-condition-value').on('change', (event) => __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            console.log(event);
+            const value = helpers_1.Helpers.parseInputToNumber(event.currentTarget.value);
+            console.log(value);
+            const matrixDevice = this.actor.getMatrixDevice();
+            console.log(matrixDevice);
+            if (matrixDevice && !isNaN(value)) {
+                console.log(matrixDevice);
+                const updateData = {};
+                updateData['data.technology.condition_monitor.value'] = value;
+                yield matrixDevice.update(updateData);
+            }
+        }));
         // Update Inventory Item
         html.find('.item-edit').click((event) => {
             event.preventDefault();
@@ -4214,7 +4236,12 @@ class SR5Item extends Item {
         const equippedMods = this.getEquippedMods();
         const equippedAmmo = this.getEquippedAmmo();
         const { technology, range, action } = item.data;
-        if (technology === null || technology === void 0 ? void 0 : technology.conceal) {
+        if (technology) {
+            if (!technology.condition_monitor)
+                technology.condition_monitor = { value: 0 };
+            technology.condition_monitor.max = 8 + Math.ceil(technology.rating / 2);
+            if (!technology.conceal)
+                technology.conceal = {};
             technology.conceal.mod = {};
             equippedMods.forEach((mod) => {
                 if ((technology === null || technology === void 0 ? void 0 : technology.conceal) && mod.data.data.technology.conceal.value) {
@@ -4288,9 +4315,6 @@ class SR5Item extends Item {
                     range.rc.value = range.rc.base + helpers_1.Helpers.totalMods(range.rc.mod);
             }
         }
-        if (item.data.condition_monitor) {
-            item.data.condition_monitor.max = 8 + Math.ceil(item.data.technology.rating / 2);
-        }
         if (item.type === 'adept_power') {
             item.data.type = ((_a = item.data.action) === null || _a === void 0 ? void 0 : _a.type) ? 'active' : 'passive';
         }
@@ -4305,20 +4329,22 @@ class SR5Item extends Item {
             const postOnly = (event === null || event === void 0 ? void 0 : event.shiftKey) || !this.hasRoll;
             const post = (bonus = {}) => {
                 // if only post, don't roll and post a card version -- otherwise roll
-                const onComplete = postOnly ? () => {
-                    const { token } = this.actor;
-                    const attack = this.getAttackData(0);
-                    // don't include any hits
-                    attack === null || attack === void 0 ? true : delete attack.hits;
-                    // generate chat data
-                    chat_1.createChatData(Object.assign({ header: {
-                            name: this.name,
-                            img: this.img,
-                        }, testName: this.getRollName(), actor: this.actor, tokenId: token ? `${token.scene._id}.${token.id}` : undefined, description: this.getChatData(), item: this, previewTemplate: this.hasTemplate, attack }, bonus)).then((chatData) => {
-                        // create the message
-                        return ChatMessage.create(chatData, { displaySheet: false });
-                    });
-                } : () => this.rollTest(event);
+                const onComplete = postOnly
+                    ? () => {
+                        const { token } = this.actor;
+                        const attack = this.getAttackData(0);
+                        // don't include any hits
+                        attack === null || attack === void 0 ? true : delete attack.hits;
+                        // generate chat data
+                        chat_1.createChatData(Object.assign({ header: {
+                                name: this.name,
+                                img: this.img,
+                            }, testName: this.getRollName(), actor: this.actor, tokenId: token ? `${token.scene._id}.${token.id}` : undefined, description: this.getChatData(), item: this, previewTemplate: this.hasTemplate, attack }, bonus)).then((chatData) => {
+                            // create the message
+                            return ChatMessage.create(chatData, { displaySheet: false });
+                        });
+                    }
+                    : () => this.rollTest(event);
                 if (!postOnly && this.hasTemplate) {
                     // onComplete is called when template is finished
                     const template = template_1.default.fromItem(this, onComplete);
@@ -4339,7 +4365,7 @@ class SR5Item extends Item {
                 dialogData.close = (html) => __awaiter(this, void 0, void 0, function* () {
                     if (oldClose) {
                         // the oldClose we put on the dialog will return a boolean
-                        const ret = yield oldClose(html);
+                        const ret = (yield oldClose(html));
                         if (!ret)
                             return;
                     }

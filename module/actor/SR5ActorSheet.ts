@@ -246,7 +246,7 @@ export class SR5ActorSheet extends ActorSheet {
 
     /**
      * Activate event listeners using the prepared sheet HTML
-     * @param html {HTML}   The prepared HTML object ready to be rendered into the DOM
+     * @param html The prepared HTML object ready to be rendered into the DOM
      */
     activateListeners(html) {
         super.activateListeners(html);
@@ -301,6 +301,20 @@ export class SR5ActorSheet extends ActorSheet {
         html.find('.skill-edit').click(this._onShowEditSkill.bind(this));
         html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
         html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
+        html.find('.matrix-condition-value').on('change', async (event) => {
+            event.preventDefault();
+            console.log(event);
+            const value = Helpers.parseInputToNumber(event.currentTarget.value);
+            console.log(value);
+            const matrixDevice = this.actor.getMatrixDevice();
+            console.log(matrixDevice);
+            if (matrixDevice && !isNaN(value)) {
+                console.log(matrixDevice);
+                const updateData = {};
+                updateData['data.technology.condition_monitor.value'] = value;
+                await matrixDevice.update(updateData);
+            }
+        });
 
         // Update Inventory Item
         html.find('.item-edit').click((event) => {
