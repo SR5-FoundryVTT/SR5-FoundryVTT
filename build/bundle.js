@@ -1455,7 +1455,7 @@ class SR5ActorSheet extends ActorSheet {
             data: duplicate(header.dataset),
         };
         delete itemData.data['type'];
-        return this.actor.createOwnedItem(itemData);
+        return this.actor.createOwnedItem(itemData, { renderSheet: true });
     }
     _onAddLanguageSkill(event) {
         return __awaiter(this, void 0, void 0, function* () {
