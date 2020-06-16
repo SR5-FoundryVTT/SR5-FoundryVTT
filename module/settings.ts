@@ -40,4 +40,13 @@ export const registerSystemSettings = () => {
         type: Boolean,
         default: true,
     });
+
+    game.settings.register('shadowrun5e', 'displayDefaultRollCard', {
+        name: 'SETTINGS.DisplayDefaultRollCardName',
+        hint: 'SETTINGS.DisplayDefaultRollCardDescription',
+        scope: 'user',
+        config: true,
+        type: Boolean,
+        default: false
+    })
 };

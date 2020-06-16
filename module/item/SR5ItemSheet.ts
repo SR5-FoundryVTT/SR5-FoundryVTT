@@ -117,6 +117,7 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.mod-delete').click(this._onWeaponModRemove.bind(this));
 
         html.find('.add-new-license').click(this._onAddLicense.bind(this));
+        // html.find('.remove-license').click(this._onRemoveLicense.bind(this));
 
         html.find('.has-desc').click((event) => {
             event.preventDefault();

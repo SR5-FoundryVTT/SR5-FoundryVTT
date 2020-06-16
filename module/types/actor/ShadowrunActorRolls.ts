@@ -1,4 +1,4 @@
-/// <reference path="./Shadowrun.ts" />
+/// <reference path="../Shadowrun.ts" />
 declare namespace Shadowrun {
     export type RollEvent = MouseEvent | { shiftKey?: boolean; altKey?: boolean };
 
@@ -7,13 +7,19 @@ declare namespace Shadowrun {
     };
     type DefenseRollOptions = ActorRollOptions & {
         fireModeDefense?: number;
-        cover?: number;
+        cover?: number | boolean;
         incomingAttack?: AttackData;
     };
 
     type AttackData = {
-        hits: number;
+        hits?: number;
+        fireMode?: FireModeData;
+        reach?: number;
+        force?: number;
+        level?: number;
+        accuracy?: number;
         damage: DamageData;
+        blast?: BlastData;
     };
 
     type SoakRollOptions = ActorRollOptions & {

@@ -1,6 +1,7 @@
 @import 'config.scss';
 @import 'item.scss';
 @import 'actor.scss';
+@import 'chat.scss';
 
 @font-face {
     font-family: 'Nodesto';
@@ -203,15 +204,28 @@ select.display {
 }
 
 .sr5 {
-    &.roll-dialog {
-        .parts-list {
-            display: flex;
-            flex-flow: row wrap;
-            justify-content: center;
-            align-items: center;
-            > * {
-                margin: 0 0.5em;
+    .parts-list {
+        font-size: 12px;
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: center;
+        align-items: center;
+        &.vertical {
+            flex-flow: column nowrap;
+            justify-content: flex-end;
+            align-items: flex-end;
+        }
+        .part {
+            white-space: nowrap;
+            .value {
+                font-weight: bold;
             }
+            &.underline {
+                text-decoration: underline;
+            }
+        }
+        > * {
+            margin: 0 0.5em;
         }
     }
     .window-content {
@@ -368,11 +382,15 @@ select.display {
                 font-size: 1em;
                 width: 100%;
                 .props {
+                    display: flex;
+                    flex-flow: wrap row;
                     padding: 0.25em 0;
                     > * {
+                        flex-shrink: 0;
                         border-right: $groove;
                         border-bottom: $groove;
                         padding: 0.25em 0.5em;
+                        margin: .1em .25em;
                         box-shadow: .2em .2em .3em $black;
                     }
                 }
@@ -446,76 +464,6 @@ select.display {
             }
             &.skill-header {
                 @include rollable;
-            }
-        }
-    }
-    &.chat-card {
-        font-style: normal;
-        font-size: 1rem;
-
-        .card-header {
-            padding: 0.25em 0;
-            border-top: $groove;
-            border-bottom: $groove;
-
-            img {
-                flex: 0 0 36px;
-                margin-right: 0.5em;
-            }
-
-            h3 {
-                font-size: 1.75em;
-                align-self: center;
-                flex: 1;
-                margin: 0;
-                @include nodesto;
-            }
-        }
-        .card-content {
-            padding: 0.5em 0;
-            border-bottom: $groove;
-            p {
-                font-size: 0.8em;
-            }
-            h3 {
-                font-size: 1em;
-                margin: 0;
-                font-weight: bold;
-            }
-        }
-
-        .card-buttons {
-            margin: 0.5em 0;
-            span {
-                display: block;
-                line-height: 2em;
-                text-align: center;
-            }
-
-            button {
-                font-size: 1em;
-                height: 1.5em;
-                line-height: 1.25em;
-                margin: 0.25em 0;
-                color: $light;
-                background: $dark;
-            }
-        }
-
-        .card-footer {
-            padding: 0.25em 0 0;
-            border-top: $groove;
-
-            span {
-                border-right: $groove;
-                padding: 0;
-                padding-right: 0.3em;
-                font-size: 0.75em;
-
-                &:last-child {
-                    border-right: none;
-                    padding-right: 0;
-                }
             }
         }
     }

@@ -51,14 +51,12 @@ export const shadowrunCombatUpdate = async (changes, options) => {
         const messages = [];
         const messageOptions = options.messageOptions || {};
 
-        let sound = true;
-
         for (const c of removedCombatants) {
             const actorData = c.actor ? c.actor.data : {};
             // @ts-ignore
             const formula = combat._getInitiativeFormula(c);
 
-            const roll = new Roll(formula, actorData).roll();
+            const roll: Roll = new Roll(formula, actorData).roll();
             c.initiative = roll.total;
 
             const rollMode =
@@ -75,15 +73,8 @@ export const shadowrunCombatUpdate = async (changes, options) => {
                 },
                 messageOptions
             );
-            roll.toMessage(messageData, {
+            await roll.toMessage(messageData, {
                 rollMode,
-                create: false,
-            }).then((chatData) => {
-                // only make the sound once
-                if (sound) sound = false;
-                else chatData.sound = null;
-                // @ts-ignore
-                messages.push(chatData);
             });
         }
         await combat.createEmbeddedEntity('Combatant', removedCombatants, {});

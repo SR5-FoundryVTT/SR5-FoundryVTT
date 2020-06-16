@@ -1,7 +1,13 @@
+@mixin basic-rollable {
+    &:hover {
+        @include rolloutline;
+    }
+}
 @mixin rollable {
     &:hover {
         @include rolloutline;
         cursor: pointer;
+        color: $cornflower;
     }
 }
 

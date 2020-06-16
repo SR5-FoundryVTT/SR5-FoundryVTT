@@ -1,6 +1,167 @@
-<div class="sr5 chat-card roll-card" data-actor-id='{{actor._id}}' data-item-id='{{item._id}}' {{#if tokenId}}data-token-id='{{tokenId}}'{{/if}}>
-  <div class="card-content">
-    <p>{{actor.name}} rolled {{count}} dice and got {{hits}} hits</p>
-  </div>
+<div
+    class="sr5 chat-card roll-card"
+    data-actor-id="{{actor._id}}"
+    data-item-id="{{item._id}}"
+    data-token-id="{{tokenId}}"
+>
+    <div class="card-title card-header flexrow">
+        <img src="{{header.img}}" title="{{header.name}}" width="36" height="36" />
+        <h3 class="header-name">{{header.name}}</h3>
+    </div>
+    {{#if description}}
+    <div class="card-description">
+        <div class="card-description-content">
+            {{{description.description.value}}}
+        </div>
+        <footer class="card-footer">
+            {{#each description.properties}}
+            <span style="white-space: nowrap;">{{this}}</span>
+            {{/each}}
+        </footer>
+    </div>
+    {{/if}}
+    <div class="test-line">
+        <span class="test-name {{#unless (isDefined hits)}}test-roll{{/unless}}">
+            {{testName}}
+        </span>
+        {{#if previewTemplate}}
+        <div class="roll" title="{{localize 'SR5.PlaceTemplate'}}">
+            <i class="fas fa-bullseye place-template"></i>
+        </div>
+        {{/if}}
+    </div>
+    <div class="card-content">
+        <div class="left-side">
+            {{#if (isDefined hits)}}
+            <div class="limit-line">
+                <span class="key">{{localize "SR5.Hits"}}: </span
+                ><span class="value">{{hits}}</span>
+            </div>
+            {{/if}} {{#if limit.value}}
+            <div class="limit-line" title="{{localize limit.label}}">
+                <span class="key">{{localize "SR5.Limit"}}: </span>
+                <span class="value">{{limit.value}}</span>
+            </div>
+            {{/if}} {{#if attack.damage}}
+            <div class="damage-line">
+                {{#if attack.damage.value}}
+                <div>
+                    <span class="key">{{localize "SR5.DV"}}: </span>
+                    <span class="value"
+                        >{{attack.damage.value}}{{damageAbbreviation
+                        attack.damage.type.value}}</span
+                    >
+                </div>
+                {{/if}} {{#if attack.damage.ap.value}}
+                <div>
+                    <span class="key">{{localize "SR5.AP"}}: </span>
+                    <span class="value">{{attack.damage.ap.value}}</span>
+                </div>
+                {{/if}} {{#if attack.damage.element.value}}
+                <div>
+                    <i
+                        class="{{elementIcon attack.damage.element.value}} icon"
+                        title="{{localize attack.damage.element.value}}"
+                    ></i>
+                </div>
+                {{/if}}
+            </div>
+            {{/if}} {{#if attack.force}}
+            <div class="limit-line">
+                <span class="key">{{localize "SR5.Force"}}</span>
+                <span class="value">{{attack.force}}</span>
+            </div>
+            {{/if}} {{#if attack.level}}
+            <div class="limit-line">
+                <span class="key">{{localize "SR5.Level"}}</span>
+                <span class="value">{{attack.level}}</span>
+            </div>
+            {{/if}} {{#if attack.reach}}
+            <div class="limit-line">
+                <span class="key">{{localize "SR5.Reach"}}</span>
+                <span class="value">{{attack.reach}}</span>
+            </div>
+            {{/if}} {{#if attack.fireMode.value}}
+            <div class="limit-line">
+                <span class="key">{{attack.fireMode.label}}</span>
+            </div>
+            {{/if}} {{#if attack.blast.radius}}
+            <div class="limit-line">
+                <div>
+                    <span class="key">{{localize "SR5.Radius"}}: </span>
+                    <span class="value">{{attack.blast.radius}}m</span>
+                </div>
+            </div>
+            {{/if}} {{#if attack.blast.dropoff}}
+            <div class="limit-line">
+                <span class="key">{{localize "SR5.Dropoff"}}: </span>
+                <span class="value">{{attack.blast.dropoff}}/m</span>
+            </div>
+            {{/if}} {{#if soak}}
+            <div class="category-line">
+                {{localize "SR5.Incoming"}}
+            </div>
+            <div class="damage-line">
+                {{#if soak.value}}
+                <div>
+                    <span class="key">{{localize "SR5.Damage"}}: </span>
+                    <span class="value">{{soak.value}}{{damageAbbreviation soak.type.value}}</span>
+                </div>
+                {{/if}} {{#if soak.element.value}}
+                <div>
+                    <i
+                            class="{{elementIcon soak.element.value}} icon"
+                            title="{{localize soak.element.value}}"
+                    ></i>
+                </div>
+                {{/if}}
+            </div>
+            {{/if}} {{#if (isDefined incomingAttack.hits)}}
+            <div class="limit-line">
+                <span class="key">{{localize "SR5.AttackerHits"}}</span>
+                <span class="value">{{incomingAttack.hits}}</span>
+            </div>
+            {{/if}} {{#if incomingDrain}}
+            <div class="category-line">
+                {{localize "SR5.Incoming"}}
+            </div>
+            <div class="limit-line">
+                <span class="key"
+                    >{{localize incomingDrain.label}}:
+                </span>
+                <span class="value">{{incomingDrain.value}}</span>
+            </div>
+            {{/if}}
+        </div>
+        <div class="right-side">
+            <div class="roll-parts">
+                {{#each parts as |part id|}}
+                <div class="limit-line">
+                    <span class="key" title="{{localize id}}">{{localize id}}:</span> <span class="value">{{part}}</span>
+                </div>
+                {{/each}} {{#if (isDefined dicePool)}}
+                <div class="limit-line">
+                    <span class="key bold">{{localize 'SR5.DicePool'}}:</span>
+                    <span class="value">{{dicePool}}</span>
+                </div>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+    <div class="dice-roll-content">
+        {{#each dice}}
+        <div class="dice-roll {{diceIcon this}}">
+            <div class="result-text">{{this.roll}}</div>
+        </div>
+        {{/each}}
+    </div>
+    {{#if tests}}
+    <div class="card-buttons">
+        {{#each tests as |test index|}}
+        <div class="button test" data-action="{{test.type}}">
+            {{test.label}}
+        </div>
+        {{/each}}
+    </div>
+    {{/if}}
 </div>
-
