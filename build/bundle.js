@@ -4238,9 +4238,9 @@ class SR5Item extends Item {
             });
             if (equippedAmmo) {
                 // add mods to damage from ammo
-                action.damage.mod[`SR5.Ammo ${equippedAmmo.name}`] = equippedAmmo.data.data.damage;
+                action.damage.mod[`${equippedAmmo.name}`] = equippedAmmo.data.data.damage;
                 // add mods to ap from ammo
-                action.damage.ap.mod[`SR5.Ammo ${equippedAmmo.name}`] = equippedAmmo.data.data.ap;
+                action.damage.ap.mod[`${equippedAmmo.name}`] = equippedAmmo.data.data.ap;
                 // override element
                 if (equippedAmmo.data.data.element) {
                     action.damage.element.value = equippedAmmo.data.data.element;
