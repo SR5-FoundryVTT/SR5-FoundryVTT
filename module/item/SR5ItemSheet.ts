@@ -117,7 +117,7 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.mod-delete').click(this._onWeaponModRemove.bind(this));
 
         html.find('.add-new-license').click(this._onAddLicense.bind(this));
-        // html.find('.remove-license').click(this._onRemoveLicense.bind(this));
+        html.find('.license-delete').on('click', this._onRemoveLicense.bind(this));
 
         html.find('.has-desc').click((event) => {
             event.preventDefault();
@@ -198,6 +198,12 @@ export class SR5ItemSheet extends ItemSheet {
     async _onAddLicense(event) {
         event.preventDefault();
         this.item.addNewLicense();
+    }
+
+    async _onRemoveLicense(event) {
+        event.preventDefault();
+        const index = event.currentTarget.dataset.index;
+        if (index >= 0) this.item.removeLicense(index);
     }
 
     async _onWeaponModRemove(event) {

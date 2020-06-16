@@ -5110,7 +5110,7 @@ class SR5ItemSheet extends ItemSheet {
         html.find('.mod-equip').click(this._onWeaponModEquip.bind(this));
         html.find('.mod-delete').click(this._onWeaponModRemove.bind(this));
         html.find('.add-new-license').click(this._onAddLicense.bind(this));
-        // html.find('.remove-license').click(this._onRemoveLicense.bind(this));
+        html.find('.license-delete').on('click', this._onRemoveLicense.bind(this));
         html.find('.has-desc').click((event) => {
             event.preventDefault();
             const item = $(event.currentTarget).parents('.item');
@@ -5191,6 +5191,14 @@ class SR5ItemSheet extends ItemSheet {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
             this.item.addNewLicense();
+        });
+    }
+    _onRemoveLicense(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const index = event.currentTarget.dataset.index;
+            if (index >= 0)
+                this.item.removeLicense(index);
         });
     }
     _onWeaponModRemove(event) {
