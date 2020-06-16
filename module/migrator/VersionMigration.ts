@@ -6,8 +6,8 @@ import { SR5Actor } from '../actor/SR5Actor';
  *  other methods are implementable purely for convenience and atomicity.
  */
 export abstract class VersionMigration {
-    static readonly MODULE_NAME = "shadowrun5e";
-    static readonly KEY_DATA_VERSION = "systemDataVersion";
+    static readonly MODULE_NAME = 'shadowrun5e';
+    static readonly KEY_DATA_VERSION = 'systemDataVersion';
     static readonly NO_VERSION = 0;
 
     private m_Abort: boolean = false;
@@ -23,10 +23,10 @@ export abstract class VersionMigration {
     public abstract get TargetVersion(): number;
 
     public get SourceVersionFriendlyName(): string {
-        return `v${this.SourceVersion}`
+        return `v${this.SourceVersion}`;
     }
     public get TargetVersionFriendlyName(): string {
-        return `v${this.TargetVersion}`
+        return `v${this.TargetVersion}`;
     }
 
     /**
@@ -53,10 +53,12 @@ export abstract class VersionMigration {
             // Migrate the Owned Item
             const migratedItemData = await this.MigrateItemData(item);
             if (!isObjectEmpty(migratedItemData)) {
-                accumulator.push(migratedItemData);
+                // need to copy id over of embedded entities
+                migratedItemData._id = item._id;
+                accumulator.then((acc) => acc.push(migratedItemData));
             }
             return accumulator;
-        }, []);
+        }, Promise.resolve([]));
     }
 
     // TODO: Extract to extendable functions...
@@ -73,8 +75,10 @@ export abstract class VersionMigration {
             try {
                 let updateData;
                 if (entity === 'Item') updateData = await this.MigrateItemData(contentEntity.data);
-                else if (entity === 'Actor') updateData = await this.MigrateActorData(contentEntity.data);
-                else if (entity === 'Scene') updateData = await this.MigrateSceneData(contentEntity.data);
+                else if (entity === 'Actor')
+                    updateData = await this.MigrateActorData(contentEntity.data);
+                else if (entity === 'Scene')
+                    updateData = await this.MigrateSceneData(contentEntity.data);
 
                 if (isObjectEmpty(updateData) || updateData === null) {
                     continue;
@@ -92,16 +96,21 @@ export abstract class VersionMigration {
             }
         }
         console.log(`Migrated all ${entity} entities from Compendium ${pack.collection}`);
-    };
+    }
 
     /**
      * Begin migration for the specified game.
      * @param game The world that should be migrated.
      */
     public async Migrate(game: Game) {
-        ui.notifications.info(`Beginning Shadowrun system migration from version ${this.SourceVersionFriendlyName} to ${this.TargetVersionFriendlyName}.`);
         // @ts-ignore
-        ui.notifications.warn(`Please do not close your game or shutdown FoundryVTT.`, { permanent: true });
+        ui.notifications.info(
+            `Beginning Shadowrun system migration from version ${this.SourceVersionFriendlyName} to ${this.TargetVersionFriendlyName}.`
+        );
+        // @ts-ignore
+        ui.notifications.warn(`Please do not close your game or shutdown FoundryVTT.`, {
+            permanent: true,
+        });
 
         // Map of entities to update, store until later to reduce chance of partial updates
         // which may result in impossible game states.
@@ -129,7 +138,7 @@ export abstract class VersionMigration {
                 expandObject(updateData);
                 entityUpdates.set(item, {
                     updateData,
-                    embeddedItems: null
+                    embeddedItems: null,
                 });
             } catch (error) {
                 console.error(error);
@@ -157,15 +166,15 @@ export abstract class VersionMigration {
                 console.log(`Migrating Actor ${actor.name}`);
                 const updateData = this.MigrateActorData(duplicate(actor.data));
 
-                if (isObjectEmpty(updateData)) {
+                const items = await this.getMigratedActorItems(actor.data);
+                if (isObjectEmpty(updateData) && items.length === 0) {
                     continue;
                 }
 
                 expandObject(updateData);
-                const items = await this.getMigratedActorItems(actor.data);
                 entityUpdates.set(actor, {
                     updateData,
-                    embeddedItems: items
+                    embeddedItems: items,
                 });
             } catch (error) {
                 console.error(error);
@@ -199,7 +208,7 @@ export abstract class VersionMigration {
                 expandObject(updateData);
                 entityUpdates.set(scene, {
                     updateData,
-                    embeddedItems: null
+                    embeddedItems: null,
                 });
             } catch (error) {
                 console.error(error);
@@ -215,8 +224,15 @@ export abstract class VersionMigration {
         // Apply the updates, this should *always* work, now that parsing is complete.
         await this.Apply(entityUpdates);
 
-        await game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
-        ui.notifications.info(`Shadowrun system migration successfully migrated to version ${this.TargetVersion}.`);
+        await game.settings.set(
+            VersionMigration.MODULE_NAME,
+            VersionMigration.KEY_DATA_VERSION,
+            this.TargetVersion
+        );
+        // @ts-ignore
+        ui.notifications.info(
+            `Shadowrun system migration successfully migrated to version ${this.TargetVersion}.`
+        );
 
         return Promise.resolve();
     }
@@ -226,17 +242,19 @@ export abstract class VersionMigration {
      * @param entityUpdates A mapping of entity updateData pairs.
      */
     protected async Apply(entityUpdates: Map<Entity, EntityUpdate>) {
-        for (const [ entity, { updateData, embeddedItems } ] of entityUpdates) {
+        for (const [entity, { updateData, embeddedItems }] of entityUpdates) {
             await entity.update(updateData, { enforceTypes: false });
             if (embeddedItems !== null) {
-                const actor = (entity as SR5Actor);
+                const actor = entity as SR5Actor;
                 await actor.updateOwnedItem(embeddedItems);
             }
         }
 
         // Migrate World Compendium Packs
-        const packs = game.packs.filter((pack) =>
-            pack.metadata.package === 'world' && ['Actor', 'Item', 'Scene'].includes(pack.metadata.entity)
+        const packs = game.packs.filter(
+            (pack) =>
+                pack.metadata.package === 'world' &&
+                ['Actor', 'Item', 'Scene'].includes(pack.metadata.entity)
         );
         for (const pack of packs) {
             await this.migrateCompendium(pack);
@@ -260,13 +278,19 @@ export abstract class VersionMigration {
      * @param game The game to be updated.
      * @param entityUpdates The current map of entity updates.
      */
-    protected async PreMigrateSceneData(game: Game, entityUpdates: Map<Entity, EntityUpdate>): Promise<void> { }
+    protected async PreMigrateSceneData(
+        game: Game,
+        entityUpdates: Map<Entity, EntityUpdate>
+    ): Promise<void> {}
     /**
      * Do something right before scene data is migrated.
      * @param game The game to be updated.
      * @param entityUpdates The current map of entity updates.
      */
-    protected async PostMigrateSceneData(game: Game, entityUpdates: Map<Entity, EntityUpdate>): Promise<void> { }
+    protected async PostMigrateSceneData(
+        game: Game,
+        entityUpdates: Map<Entity, EntityUpdate>
+    ): Promise<void> {}
 
     /**
      * Check if an item requires updates.
@@ -285,13 +309,19 @@ export abstract class VersionMigration {
      * @param game The game to be updated.
      * @param entityUpdates The current map of entity updates.
      */
-    protected async PreMigrateItemData(game: Game, entityUpdates: Map<Entity, EntityUpdate>): Promise<void> { }
+    protected async PreMigrateItemData(
+        game: Game,
+        entityUpdates: Map<Entity, EntityUpdate>
+    ): Promise<void> {}
     /**
      * Do something right before item data is migrated.
      * @param game The game to be updated.
      * @param entityUpdates The current map of entity updates.
      */
-    protected async PostMigrateItemData(game: Game, entityUpdates: Map<Entity, EntityUpdate>): Promise<void> { }
+    protected async PostMigrateItemData(
+        game: Game,
+        entityUpdates: Map<Entity, EntityUpdate>
+    ): Promise<void> {}
 
     /**
      * Check if an actor requires updates.
@@ -310,16 +340,22 @@ export abstract class VersionMigration {
      * @param game The game to be updated.
      * @param entityUpdates The current map of entity updates.
      */
-    protected async PreMigrateActorData(game: Game, entityUpdates: Map<Entity, EntityUpdate>): Promise<void> { }
+    protected async PreMigrateActorData(
+        game: Game,
+        entityUpdates: Map<Entity, EntityUpdate>
+    ): Promise<void> {}
     /**
      * Do something right after actor data is migrated.
      * @param game The game to be updated.
      * @param entityUpdates The current map of entity updates.
      */
-    protected async PostMigrateActorData(game: Game, entityUpdates: Map<Entity, EntityUpdate>): Promise<void> { }
+    protected async PostMigrateActorData(
+        game: Game,
+        entityUpdates: Map<Entity, EntityUpdate>
+    ): Promise<void> {}
 }
 
 type EntityUpdate = {
-    updateData: any,
-    embeddedItems: null|any[]
+    updateData: any;
+    embeddedItems: null | any[];
 };

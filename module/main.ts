@@ -8,10 +8,10 @@ import { registerSystemSettings } from './settings';
 import { preCombatUpdate, shadowrunCombatUpdate } from './combat';
 import { measureDistance } from './canvas';
 import * as chat from './chat';
-import * as migrations from './migration';
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
 import { registerHandlebarHelpers, preloadHandlebarsTemplates } from './handlebars';
 import { ShadowrunRoller } from './rolls/ShadowrunRoller';
+import { Migrator } from './migrator/Migrator';
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -64,19 +64,7 @@ Hooks.on('ready', function () {
         }
     });
 
-    if (game.user.isGM) {
-        // Determine whether a system migration is required and feasible
-        const currentVersion = game.settings.get('shadowrun5e', 'systemMigrationVersion');
-        // the latest version that requires migration
-        const NEEDS_MIGRATION_VERSION = '0.5.12';
-        let needMigration =
-            currentVersion === null || compareVersion(currentVersion, NEEDS_MIGRATION_VERSION) < 0;
-
-        // Perform the migration
-        if (needMigration && game.user.isGM) {
-            migrations.migrateWorld();
-        }
-    }
+    Migrator.BeginMigration();
 });
 
 Hooks.on('preUpdateCombat', preCombatUpdate);
