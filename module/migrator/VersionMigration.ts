@@ -42,7 +42,10 @@ export abstract class VersionMigration {
     }
 
     // TODO: Extract to extendable functions...
-    protected async getMigratedActorItems(actorData: any): Promise<Item[]> {
+    protected async getMigratedActorItems(
+        actorData: any,
+        diffOnly: boolean = true
+    ): Promise<Item[]> {
         // Migrate Owned Items
         //TODO: When SR5ActorData gets updated, remove ts-ignore
         // @ts-ignore
@@ -51,8 +54,9 @@ export abstract class VersionMigration {
         // @ts-ignore
         return await actorData.items.reduce(async (accumulator, item) => {
             // Migrate the Owned Item
-            const migratedItemData = await this.MigrateItemData(item);
+            let migratedItemData = await this.MigrateItemData(item);
             if (!isObjectEmpty(migratedItemData)) {
+                if (!diffOnly) migratedItemData = mergeObject(item, migratedItemData);
                 // need to copy id over of embedded entities
                 migratedItemData._id = item._id;
                 accumulator.then((acc) => acc.push(migratedItemData));
@@ -89,12 +93,10 @@ export abstract class VersionMigration {
                 }
                 // migrate token actor items
                 if (token.data.actorData.items) {
-                    const updateItems = await this.getMigratedActorItems(token.data.actorData);
-                    t.actorData.items = duplicate(token.data.actorData.items).map((item) => {
-                        const update = updateItems.find((i) => i._id === item._id);
-                        if (update) return mergeObject(item, update);
-                        return item;
-                    });
+                    t.actorData.items = await this.getMigratedActorItems(
+                        token.data.actorData,
+                        false
+                    );
                 }
                 return t;
             })
@@ -117,10 +119,13 @@ export abstract class VersionMigration {
                 if (entity === 'Item') updateData = await this.MigrateItemData(contentEntity.data);
                 else if (entity === 'Actor') {
                     updateData = await this.MigrateActorData(contentEntity.data);
+                    // TODO uncomment when items can be set on compendiums without causing errors
+                    // updateData.items = await this.getMigratedActorItems(contentEntity.data, false);
+                    updateData._id = contentEntity.data._id;
                 } else if (entity === 'Scene')
                     updateData = await this.MigrateSceneData(contentEntity.data);
 
-                if (isObjectEmpty(updateData) || updateData === null) {
+                if (updateData === null || isObjectEmpty(updateData)) {
                     continue;
                 }
 

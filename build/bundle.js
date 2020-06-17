@@ -5634,7 +5634,7 @@ let VersionMigration = /** @class */ (() => {
             ui.notifications.error(`Data migration has been aborted: ${reason}`, { permanent: true });
         }
         // TODO: Extract to extendable functions...
-        getMigratedActorItems(actorData) {
+        getMigratedActorItems(actorData, diffOnly = true) {
             return __awaiter(this, void 0, void 0, function* () {
                 // Migrate Owned Items
                 //TODO: When SR5ActorData gets updated, remove ts-ignore
@@ -5645,8 +5645,10 @@ let VersionMigration = /** @class */ (() => {
                 // @ts-ignore
                 return yield actorData.items.reduce((accumulator, item) => __awaiter(this, void 0, void 0, function* () {
                     // Migrate the Owned Item
-                    const migratedItemData = yield this.MigrateItemData(item);
+                    let migratedItemData = yield this.MigrateItemData(item);
                     if (!isObjectEmpty(migratedItemData)) {
+                        if (!diffOnly)
+                            migratedItemData = mergeObject(item, migratedItemData);
                         // need to copy id over of embedded entities
                         migratedItemData._id = item._id;
                         accumulator.then((acc) => acc.push(migratedItemData));
@@ -5683,13 +5685,7 @@ let VersionMigration = /** @class */ (() => {
                     }
                     // migrate token actor items
                     if (token.data.actorData.items) {
-                        const updateItems = yield this.getMigratedActorItems(token.data.actorData);
-                        t.actorData.items = duplicate(token.data.actorData.items).map((item) => {
-                            const update = updateItems.find((i) => i._id === item._id);
-                            if (update)
-                                return mergeObject(item, update);
-                            return item;
-                        });
+                        t.actorData.items = yield this.getMigratedActorItems(token.data.actorData, false);
                     }
                     return t;
                 })));
@@ -5712,10 +5708,13 @@ let VersionMigration = /** @class */ (() => {
                             updateData = yield this.MigrateItemData(contentEntity.data);
                         else if (entity === 'Actor') {
                             updateData = yield this.MigrateActorData(contentEntity.data);
+                            // TODO uncomment when items can be set on compendiums without causing errors
+                            // updateData.items = await this.getMigratedActorItems(contentEntity.data, false);
+                            updateData._id = contentEntity.data._id;
                         }
                         else if (entity === 'Scene')
                             updateData = yield this.MigrateSceneData(contentEntity.data);
-                        if (isObjectEmpty(updateData) || updateData === null) {
+                        if (updateData === null || isObjectEmpty(updateData)) {
                             continue;
                         }
                         expandObject(updateData);
