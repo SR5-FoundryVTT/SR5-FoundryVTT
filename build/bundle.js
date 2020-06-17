@@ -168,13 +168,21 @@ class SR5Actor extends Actor {
                 language.value = {};
             language.attribute = 'intuition';
         }
+        const prepareSkill = (skill) => {
+            var _a;
+            skill.mod = {};
+            if (!skill.base)
+                skill.base = 0;
+            if ((_a = skill.bonus) === null || _a === void 0 ? void 0 : _a.length) {
+                for (let bonus of skill.bonus) {
+                    skill.mod[bonus.key] = bonus.value;
+                }
+            }
+            skill.value = skill.base + helpers_1.Helpers.totalMods(skill.mod);
+        };
         for (const skill of Object.values(active)) {
             if (!skill.hidden) {
-                if (!skill.mod)
-                    skill.mod = {};
-                if (!skill.base)
-                    skill.base = 0;
-                skill.value = skill.base + helpers_1.Helpers.totalMods(skill.mod);
+                prepareSkill(skill);
             }
         }
         {
@@ -183,11 +191,7 @@ class SR5Actor extends Actor {
             entries.forEach(([key, val]) => val._delete && delete data.skills.language.value[key]);
         }
         for (let skill of Object.values(language.value)) {
-            if (!skill.mod)
-                skill.mod = {};
-            if (!skill.base)
-                skill.base = 0;
-            skill.value = skill.base + helpers_1.Helpers.totalMods(skill.mod);
+            prepareSkill(skill);
         }
         for (let [, group] of Object.entries(knowledge)) {
             const entries = Object.entries(group.value);
@@ -195,11 +199,7 @@ class SR5Actor extends Actor {
             group.value = entries
                 .filter(([, val]) => !val._delete)
                 .reduce((acc, [id, skill]) => {
-                if (!skill.mod)
-                    skill.mod = {};
-                if (!skill.base)
-                    skill.base = 0;
-                skill.value = skill.base + helpers_1.Helpers.totalMods(skill.mod);
+                prepareSkill(skill);
                 acc[id] = skill;
                 return acc;
             }, {});
@@ -2959,59 +2959,118 @@ class SkillEditForm extends BaseEntitySheet {
     }
     get title() {
         const data = this.getData().data;
-        return `Edit Skill - ${(data === null || data === void 0 ? void 0 : data.label) ? game.i18n.localize(data.label) : ''}`;
+        return `${game.i18n.localize('SR5.EditSkill')} - ${(data === null || data === void 0 ? void 0 : data.label) ? game.i18n.localize(data.label) : ''}`;
     }
     _onUpdateObject(event, formData, updateData) {
+        // get base value
         const base = formData['data.base'];
-        const regex = /data\.specs\.(\d+)/;
+        // process specializations
+        const specsRegex = /data\.specs\.(\d+)/;
         const specs = Object.entries(formData).reduce((running, [key, val]) => {
-            const found = key.match(regex);
+            const found = key.match(specsRegex);
             if (found && found[0]) {
                 running.push(val);
             }
             return running;
         }, []);
+        // process bonuses
+        const bonusKeyRegex = /data\.bonus\.(\d+).key/;
+        const bonusValueRegex = /data\.bonus\.(\d+).value/;
+        const bonus = Object.entries(formData).reduce((running, [key, value]) => {
+            const foundKey = key.match(bonusKeyRegex);
+            const foundVal = key.match(bonusValueRegex);
+            if (foundKey && foundKey[0] && foundKey[1]) {
+                const index = foundKey[1];
+                if (running[index] === undefined)
+                    running[index] = {};
+                running[index].key = value;
+            }
+            else if (foundVal && foundVal[0] && foundVal[1]) {
+                const index = foundVal[1];
+                if (running[index] === undefined)
+                    running[index] = {};
+                running[index].value = value;
+            }
+            return running;
+        }, []);
         const currentData = updateData[this._updateString()] || {};
         updateData[this._updateString()] = Object.assign(Object.assign({}, currentData), { base,
-            specs });
+            specs,
+            bonus });
     }
     /** @override */
     _updateObject(event, formData) {
         return __awaiter(this, void 0, void 0, function* () {
             const updateData = {};
             this._onUpdateObject(event, formData, updateData);
-            this.entity.update(updateData);
+            console.log(formData);
+            yield this.entity.update(updateData);
         });
     }
     activateListeners(html) {
         super.activateListeners(html);
-        html.find('.add-spec').click(this._addNewSpec.bind(this));
-        html.find('.remove-spec').click(this._removeSpec.bind(this));
+        $(html).find('.add-spec').on('click', this._addNewSpec.bind(this));
+        $(html).find('.remove-spec').on('click', this._removeSpec.bind(this));
+        $(html).find('.add-bonus').on('click', this._addNewBonus.bind(this));
+        $(html).find('.remove-bonus').on('click', this._removeBonus.bind(this));
+    }
+    _addNewBonus(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const updateData = {};
+            const data = this.getData().data;
+            if (!data)
+                return;
+            const { bonus = [] } = data;
+            // add blank line for new bonus
+            updateData[`${this._updateString()}.bonus`] = [...bonus, { key: '', value: 0 }];
+            yield this.entity.update(updateData);
+        });
+    }
+    _removeBonus(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const updateData = {};
+            const data = this.getData().data;
+            if (data === null || data === void 0 ? void 0 : data.bonus) {
+                const { bonus } = data;
+                const index = event.currentTarget.dataset.spec;
+                if (index >= 0) {
+                    bonus.splice(index, 1);
+                    updateData[`${this._updateString()}.bonus`] = bonus;
+                    yield this.entity.update(updateData);
+                }
+            }
+        });
     }
     _addNewSpec(event) {
-        event.preventDefault();
-        const updateData = {};
-        const data = this.getData().data;
-        if (data === null || data === void 0 ? void 0 : data.specs) {
-            // add a blank line to specs
-            const { specs } = data;
-            updateData[`${this._updateString()}.specs`] = [...specs, ''];
-        }
-        this.entity.update(updateData);
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const updateData = {};
+            const data = this.getData().data;
+            if (data === null || data === void 0 ? void 0 : data.specs) {
+                // add a blank line to specs
+                const { specs } = data;
+                updateData[`${this._updateString()}.specs`] = [...specs, ''];
+            }
+            yield this.entity.update(updateData);
+        });
     }
     _removeSpec(event) {
-        event.preventDefault();
-        const updateData = {};
-        const data = this.getData().data;
-        if (data === null || data === void 0 ? void 0 : data.specs) {
-            const { specs } = data;
-            const index = event.currentTarget.dataset.spec;
-            if (index >= 0) {
-                specs.splice(index, 1);
-                updateData[`${this._updateString()}.specs`] = specs;
-                this.entity.update(updateData);
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const updateData = {};
+            const data = this.getData().data;
+            if (data === null || data === void 0 ? void 0 : data.specs) {
+                const { specs } = data;
+                const index = event.currentTarget.dataset.spec;
+                if (index >= 0) {
+                    specs.splice(index, 1);
+                    updateData[`${this._updateString()}.specs`] = specs;
+                    yield this.entity.update(updateData);
+                }
             }
-        }
+        });
     }
     getData() {
         const data = super.getData();

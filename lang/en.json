@@ -407,11 +407,15 @@
   "SR5.Level": "Level",
   "SR5.Override": "Override",
 
+  "SR5.Item": "Item",
+  "SR5.Bonuses": "Bonuses",
+  "SR5.EditSkill": "Edit Skill",
+  "SR5.Name": "Name",
+
   "SETTINGS.DiagonalMovementName": "Diagonal Movement",
   "SETTINGS.DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
   "SETTINGS.IgnoreDiagonal": "Ignore Diagonal Movement (1-1-1)",
   "SETTINGS.EstimateDiagonal": "Estimate Diagonal Movement (1-2-1)",
-
   "SETTINGS.ApplyLimitsName": "Apply Limits to Rolls",
   "SETTINGS.ApplyLimitsDescription": "Should limits be applied to roll"
 }

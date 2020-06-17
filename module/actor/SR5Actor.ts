@@ -181,11 +181,20 @@ export class SR5Actor extends Actor {
             language.attribute = 'intuition';
         }
 
+        const prepareSkill = (skill) => {
+            skill.mod = {};
+            if (!skill.base) skill.base = 0;
+            if (skill.bonus?.length) {
+                for (let bonus of skill.bonus) {
+                    skill.mod[bonus.key] = bonus.value;
+                }
+            }
+            skill.value = skill.base + Helpers.totalMods(skill.mod);
+        };
+
         for (const skill of Object.values(active)) {
             if (!skill.hidden) {
-                if (!skill.mod) skill.mod = {};
-                if (!skill.base) skill.base = 0;
-                skill.value = skill.base + Helpers.totalMods(skill.mod);
+                prepareSkill(skill);
             }
         }
 
@@ -199,9 +208,7 @@ export class SR5Actor extends Actor {
         }
 
         for (let skill of Object.values(language.value)) {
-            if (!skill.mod) skill.mod = {};
-            if (!skill.base) skill.base = 0;
-            skill.value = skill.base + Helpers.totalMods(skill.mod);
+            prepareSkill(skill);
         }
 
         for (let [, group] of Object.entries(knowledge)) {
@@ -210,9 +217,7 @@ export class SR5Actor extends Actor {
             group.value = entries
                 .filter(([, val]) => !val._delete)
                 .reduce((acc, [id, skill]) => {
-                    if (!skill.mod) skill.mod = {};
-                    if (!skill.base) skill.base = 0;
-                    skill.value = skill.base + Helpers.totalMods(skill.mod);
+                    prepareSkill(skill);
                     acc[id] = skill;
                     return acc;
                 }, {});
