@@ -119,6 +119,10 @@ export const ChatData = {
         }
     },
 
+    program: (data, labels, props) => {
+        props.push(game.i18n.localize(CONFIG.SR5.programTypes[data.type]));
+    },
+
     complex_form: (data, labels, props) => {
         ChatData.action(data, labels, props);
         props.push(Helpers.label(data.target), Helpers.label(data.duration));

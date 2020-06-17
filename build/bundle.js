@@ -4083,6 +4083,9 @@ exports.ChatData = {
                 props.push(`Radiation ${data.armor.radiation}`);
         }
     },
+    program: (data, labels, props) => {
+        props.push(game.i18n.localize(CONFIG.SR5.programTypes[data.type]));
+    },
     complex_form: (data, labels, props) => {
         exports.ChatData.action(data, labels, props);
         props.push(helpers_1.Helpers.label(data.target), helpers_1.Helpers.label(data.duration));
