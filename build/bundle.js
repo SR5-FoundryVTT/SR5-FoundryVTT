@@ -3646,6 +3646,7 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/templates/item/parts/lifestyle.html',
         'systems/shadowrun5e/templates/item/parts/ammo.html',
         'systems/shadowrun5e/templates/item/parts/modification.html',
+        'systems/shadowrun5e/templates/item/parts/program.html',
         'systems/shadowrun5e/templates/rolls/parts/parts-list.html',
     ];
     return loadTemplates(templatePaths);

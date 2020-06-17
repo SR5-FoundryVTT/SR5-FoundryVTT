@@ -1,0 +1,18 @@
+<div class="item-form">
+    <div class="header">
+        {{header}}
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.ProgramType"}}
+        </div>
+        <div class="inputs">
+            <select name="data.type">
+                {{#select data.type}} {{#each config.programTypes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
+    </div>
+    <h4>Cool program stuff to come...</h4>
+</div>

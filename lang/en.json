@@ -428,6 +428,12 @@
     "SR5.StunTrack": "Strun Track",
     "SR5.WoundTolerance": "Wound Tolerance",
 
+    "SR5.Program": "Program",
+    "SR5.CommonProgram": "Common Program",
+    "SR5.HackingProgram": "Hacking Program",
+    "SR5.Agent": "Agent",
+    "SR5.ProgramType": "Type",
+
     "SETTINGS.DiagonalMovementName": "Diagonal Movement",
     "SETTINGS.DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
     "SETTINGS.IgnoreDiagonal": "Ignore Diagonal Movement (1-1-1)",
