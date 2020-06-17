@@ -1119,9 +1119,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ActorSheet = void 0;
 const helpers_1 = require("../helpers");
 const chummer_import_form_1 = require("../apps/chummer-import-form");
-const skill_edit_1 = require("../apps/skill-edit");
-const knowledge_skill_edit_1 = require("../apps/knowledge-skill-edit");
-const language_skill_edit_1 = require("../apps/language-skill-edit");
+const SkillEditForm_1 = require("../apps/skills/SkillEditForm");
+const KnowledgeSkillEditForm_1 = require("../apps/skills/KnowledgeSkillEditForm");
+const LanguageSkillEditForm_1 = require("../apps/skills/LanguageSkillEditForm");
 /**
  * Extend the basic ActorSheet with some very simple modifications
  */
@@ -1706,19 +1706,19 @@ class SR5ActorSheet extends ActorSheet {
         event.preventDefault();
         const skill = event.currentTarget.dataset.skill;
         const category = event.currentTarget.dataset.category;
-        new knowledge_skill_edit_1.KnowledgeSkillEditForm(this.actor, skill, category, {
+        new KnowledgeSkillEditForm_1.KnowledgeSkillEditForm(this.actor, skill, category, {
             event: event,
         }).render(true);
     }
     _onShowEditLanguageSkill(event) {
         event.preventDefault();
         const skill = event.currentTarget.dataset.skill;
-        new language_skill_edit_1.LanguageSkillEditForm(this.actor, skill, { event: event }).render(true);
+        new LanguageSkillEditForm_1.LanguageSkillEditForm(this.actor, skill, { event: event }).render(true);
     }
     _onShowEditSkill(event) {
         event.preventDefault();
         const skill = event.currentTarget.dataset.skill;
-        new skill_edit_1.SkillEditForm(this.actor, skill, { event: event }).render(true);
+        new SkillEditForm_1.SkillEditForm(this.actor, skill, { event: event }).render(true);
     }
     _onShowImportCharacter(event) {
         event.preventDefault();
@@ -1731,7 +1731,7 @@ class SR5ActorSheet extends ActorSheet {
 }
 exports.SR5ActorSheet = SR5ActorSheet;
 
-},{"../apps/chummer-import-form":3,"../apps/knowledge-skill-edit":6,"../apps/language-skill-edit":7,"../apps/skill-edit":8,"../helpers":14}],3:[function(require,module,exports){
+},{"../apps/chummer-import-form":3,"../apps/skills/KnowledgeSkillEditForm":6,"../apps/skills/LanguageSkillEditForm":7,"../apps/skills/SkillEditForm":8,"../helpers":14}],3:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -2887,8 +2887,8 @@ exports.OverwatchScoreTracker = OverwatchScoreTracker;
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KnowledgeSkillEditForm = void 0;
-const language_skill_edit_1 = require("./language-skill-edit");
-class KnowledgeSkillEditForm extends language_skill_edit_1.LanguageSkillEditForm {
+const LanguageSkillEditForm_1 = require("./LanguageSkillEditForm");
+class KnowledgeSkillEditForm extends LanguageSkillEditForm_1.LanguageSkillEditForm {
     constructor(actor, skillId, category, options) {
         super(actor, skillId, options);
         this.category = category;
@@ -2899,12 +2899,12 @@ class KnowledgeSkillEditForm extends language_skill_edit_1.LanguageSkillEditForm
 }
 exports.KnowledgeSkillEditForm = KnowledgeSkillEditForm;
 
-},{"./language-skill-edit":7}],7:[function(require,module,exports){
+},{"./LanguageSkillEditForm":7}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LanguageSkillEditForm = void 0;
-const skill_edit_1 = require("./skill-edit");
-class LanguageSkillEditForm extends skill_edit_1.SkillEditForm {
+const SkillEditForm_1 = require("./SkillEditForm");
+class LanguageSkillEditForm extends SkillEditForm_1.SkillEditForm {
     _updateString() {
         return `data.skills.language.value.${this.skillId}`;
     }
@@ -2923,7 +2923,7 @@ class LanguageSkillEditForm extends skill_edit_1.SkillEditForm {
 }
 exports.LanguageSkillEditForm = LanguageSkillEditForm;
 
-},{"./skill-edit":8}],8:[function(require,module,exports){
+},{"./SkillEditForm":8}],8:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }

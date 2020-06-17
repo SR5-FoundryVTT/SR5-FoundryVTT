@@ -1,8 +1,8 @@
 import { Helpers } from '../helpers';
 import { ChummerImportForm } from '../apps/chummer-import-form';
-import { SkillEditForm } from '../apps/skill-edit';
-import { KnowledgeSkillEditForm } from '../apps/knowledge-skill-edit';
-import { LanguageSkillEditForm } from '../apps/language-skill-edit';
+import { SkillEditForm } from '../apps/skills/SkillEditForm';
+import { KnowledgeSkillEditForm } from '../apps/skills/KnowledgeSkillEditForm';
+import { LanguageSkillEditForm } from '../apps/skills/LanguageSkillEditForm';
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import Skills = Shadowrun.Skills;
