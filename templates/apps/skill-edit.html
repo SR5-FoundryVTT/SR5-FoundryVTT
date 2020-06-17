@@ -4,7 +4,7 @@
         <div class="item item-section">
             <div class="item-left">
                 <div class="item-text item-name">
-                    {{localize "Name"}}
+                    {{localize "SR5.Name"}}
                 </div>
             </div>
             <div class="item-right">
@@ -17,7 +17,7 @@
         <div class="item item-section">
             <div class="item-left">
                 <div class="item-text item-name">
-                    {{localize "Total"}} {{localize "Value"}}
+                    {{localize "SR5.Total"}} {{localize "SR5.Value"}}
                 </div>
             </div>
             <div class="item-right">
@@ -35,7 +35,7 @@
         <div class="item">
             <div class="item-left">
                 <div class="item-text item-name">
-                    {{localize "Base"}} {{localize "Value"}}
+                    {{localize "SR5.Base"}} {{localize "SR5.Value"}}
                 </div>
             </div>
             <div class="item-right">
@@ -54,7 +54,7 @@
         <div class="item">
             <div class="item-left">
                 <div class="item-text item-name">
-                    {{localize "Item"}} {{localize "Value"}}
+                    {{localize "SR5.Item"}} {{localize "SR5.Value"}}
                 </div>
             </div>
             <div class="item-right">
@@ -69,6 +69,49 @@
                     />
                 </div>
             </div>
+        </div>
+        <div class="item item-section">
+            <div class="item-left">
+                <div class="item-text item-name">
+                    {{localize "SR5.Bonuses"}}
+                </div>
+            </div>
+            <div class="item-right">
+                <div class="item-text item-icons rtg">
+                    <a class="add-bonus">
+                        <i class="fas fa-plus"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-area">
+            {{#each data.bonus as |bonus id|}}
+            <div class="item">
+                <div class="item-left flex1">
+                    <input
+                            class="display"
+                            type="text"
+                            name="data.bonus.{{id}}.key"
+                            value="{{bonus.key}}"
+                            placeholder='{{localize "SR5.Bonus"}}'
+                    />
+                    <input
+                            class="display"
+                            type="text"
+                            name="data.bonus.{{id}}.value"
+                            value="{{bonus.value}}"
+                            placeholder='0'
+                    />
+                </div>
+                <div class="item-right">
+                    <div class="item-text item-icons rtg">
+                        <a class="remove-bonus" title="Remove Bonus" data-spec="{{id}}">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
         </div>
         <div class="item item-section">
             <div class="item-left">

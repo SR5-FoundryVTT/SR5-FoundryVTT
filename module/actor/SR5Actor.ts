@@ -146,7 +146,8 @@ export class SR5Actor extends Actor {
             // MODIFIES MATRIX ATTRIBUTES
             if (item.type === 'device' && itemData.technology?.equipped) {
                 matrix.device = item._id;
-                matrix.condition_monitor.max = itemData.condition_monitor?.max || 0;
+                matrix.condition_monitor.max = itemData.technology.condition_monitor?.max || 0;
+                matrix.condition_monitor.value = itemData.technology.condition_monitor?.value || 0;
                 matrix.rating = itemData.technology.rating;
                 matrix.is_cyberdeck = itemData.category === 'cyberdeck';
                 matrix.name = item.name;
@@ -180,11 +181,20 @@ export class SR5Actor extends Actor {
             language.attribute = 'intuition';
         }
 
+        const prepareSkill = (skill) => {
+            skill.mod = {};
+            if (!skill.base) skill.base = 0;
+            if (skill.bonus?.length) {
+                for (let bonus of skill.bonus) {
+                    skill.mod[bonus.key] = bonus.value;
+                }
+            }
+            skill.value = skill.base + Helpers.totalMods(skill.mod);
+        };
+
         for (const skill of Object.values(active)) {
             if (!skill.hidden) {
-                if (!skill.mod) skill.mod = {};
-                if (!skill.base) skill.base = 0;
-                skill.value = skill.base + Helpers.totalMods(skill.mod);
+                prepareSkill(skill);
             }
         }
 
@@ -198,9 +208,7 @@ export class SR5Actor extends Actor {
         }
 
         for (let skill of Object.values(language.value)) {
-            if (!skill.mod) skill.mod = {};
-            if (!skill.base) skill.base = 0;
-            skill.value = skill.base + Helpers.totalMods(skill.mod);
+            prepareSkill(skill);
         }
 
         for (let [, group] of Object.entries(knowledge)) {
@@ -209,9 +217,7 @@ export class SR5Actor extends Actor {
             group.value = entries
                 .filter(([, val]) => !val._delete)
                 .reduce((acc, [id, skill]) => {
-                    if (!skill.mod) skill.mod = {};
-                    if (!skill.base) skill.base = 0;
-                    skill.value = skill.base + Helpers.totalMods(skill.mod);
+                    prepareSkill(skill);
                     acc[id] = skill;
                     return acc;
                 }, {});
@@ -433,6 +439,13 @@ export class SR5Actor extends Actor {
 
     getOwnedItem(itemId: string): SR5Item | null {
         return (super.getOwnedItem(itemId) as unknown) as SR5Item;
+    }
+
+    getMatrixDevice(): SR5Item | undefined | null {
+        const matrix = this.data.data.matrix;
+        console.log(matrix);
+        if (matrix.device) return this.getOwnedItem(matrix.device);
+        return undefined;
     }
 
     addKnowledgeSkill(category, skill?) {

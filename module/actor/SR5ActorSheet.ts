@@ -1,8 +1,8 @@
 import { Helpers } from '../helpers';
 import { ChummerImportForm } from '../apps/chummer-import-form';
-import { SkillEditForm } from '../apps/skill-edit';
-import { KnowledgeSkillEditForm } from '../apps/knowledge-skill-edit';
-import { LanguageSkillEditForm } from '../apps/language-skill-edit';
+import { SkillEditForm } from '../apps/skills/SkillEditForm';
+import { KnowledgeSkillEditForm } from '../apps/skills/KnowledgeSkillEditForm';
+import { LanguageSkillEditForm } from '../apps/skills/LanguageSkillEditForm';
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import Skills = Shadowrun.Skills;
@@ -246,7 +246,7 @@ export class SR5ActorSheet extends ActorSheet {
 
     /**
      * Activate event listeners using the prepared sheet HTML
-     * @param html {HTML}   The prepared HTML object ready to be rendered into the DOM
+     * @param html The prepared HTML object ready to be rendered into the DOM
      */
     activateListeners(html) {
         super.activateListeners(html);
@@ -301,6 +301,20 @@ export class SR5ActorSheet extends ActorSheet {
         html.find('.skill-edit').click(this._onShowEditSkill.bind(this));
         html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
         html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
+        html.find('.matrix-condition-value').on('change', async (event) => {
+            event.preventDefault();
+            console.log(event);
+            const value = Helpers.parseInputToNumber(event.currentTarget.value);
+            console.log(value);
+            const matrixDevice = this.actor.getMatrixDevice();
+            console.log(matrixDevice);
+            if (matrixDevice && !isNaN(value)) {
+                console.log(matrixDevice);
+                const updateData = {};
+                updateData['data.technology.condition_monitor.value'] = value;
+                await matrixDevice.update(updateData);
+            }
+        });
 
         // Update Inventory Item
         html.find('.item-edit').click((event) => {

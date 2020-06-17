@@ -46,7 +46,7 @@ class SR5Actor extends Actor {
         });
     }
     prepareData() {
-        var _a, _b, _c;
+        var _a, _b, _c, _d;
         super.prepareData();
         const actorData = this.data;
         // @ts-ignore
@@ -135,7 +135,8 @@ class SR5Actor extends Actor {
             // MODIFIES MATRIX ATTRIBUTES
             if (item.type === 'device' && ((_b = itemData.technology) === null || _b === void 0 ? void 0 : _b.equipped)) {
                 matrix.device = item._id;
-                matrix.condition_monitor.max = ((_c = itemData.condition_monitor) === null || _c === void 0 ? void 0 : _c.max) || 0;
+                matrix.condition_monitor.max = ((_c = itemData.technology.condition_monitor) === null || _c === void 0 ? void 0 : _c.max) || 0;
+                matrix.condition_monitor.value = ((_d = itemData.technology.condition_monitor) === null || _d === void 0 ? void 0 : _d.value) || 0;
                 matrix.rating = itemData.technology.rating;
                 matrix.is_cyberdeck = itemData.category === 'cyberdeck';
                 matrix.name = item.name;
@@ -167,13 +168,21 @@ class SR5Actor extends Actor {
                 language.value = {};
             language.attribute = 'intuition';
         }
+        const prepareSkill = (skill) => {
+            var _a;
+            skill.mod = {};
+            if (!skill.base)
+                skill.base = 0;
+            if ((_a = skill.bonus) === null || _a === void 0 ? void 0 : _a.length) {
+                for (let bonus of skill.bonus) {
+                    skill.mod[bonus.key] = bonus.value;
+                }
+            }
+            skill.value = skill.base + helpers_1.Helpers.totalMods(skill.mod);
+        };
         for (const skill of Object.values(active)) {
             if (!skill.hidden) {
-                if (!skill.mod)
-                    skill.mod = {};
-                if (!skill.base)
-                    skill.base = 0;
-                skill.value = skill.base + helpers_1.Helpers.totalMods(skill.mod);
+                prepareSkill(skill);
             }
         }
         {
@@ -182,11 +191,7 @@ class SR5Actor extends Actor {
             entries.forEach(([key, val]) => val._delete && delete data.skills.language.value[key]);
         }
         for (let skill of Object.values(language.value)) {
-            if (!skill.mod)
-                skill.mod = {};
-            if (!skill.base)
-                skill.base = 0;
-            skill.value = skill.base + helpers_1.Helpers.totalMods(skill.mod);
+            prepareSkill(skill);
         }
         for (let [, group] of Object.entries(knowledge)) {
             const entries = Object.entries(group.value);
@@ -194,11 +199,7 @@ class SR5Actor extends Actor {
             group.value = entries
                 .filter(([, val]) => !val._delete)
                 .reduce((acc, [id, skill]) => {
-                if (!skill.mod)
-                    skill.mod = {};
-                if (!skill.base)
-                    skill.base = 0;
-                skill.value = skill.base + helpers_1.Helpers.totalMods(skill.mod);
+                prepareSkill(skill);
                 acc[id] = skill;
                 return acc;
             }, {});
@@ -386,6 +387,13 @@ class SR5Actor extends Actor {
     }
     getOwnedItem(itemId) {
         return super.getOwnedItem(itemId);
+    }
+    getMatrixDevice() {
+        const matrix = this.data.data.matrix;
+        console.log(matrix);
+        if (matrix.device)
+            return this.getOwnedItem(matrix.device);
+        return undefined;
     }
     addKnowledgeSkill(category, skill) {
         const defaultSkill = {
@@ -1111,9 +1119,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ActorSheet = void 0;
 const helpers_1 = require("../helpers");
 const chummer_import_form_1 = require("../apps/chummer-import-form");
-const skill_edit_1 = require("../apps/skill-edit");
-const knowledge_skill_edit_1 = require("../apps/knowledge-skill-edit");
-const language_skill_edit_1 = require("../apps/language-skill-edit");
+const SkillEditForm_1 = require("../apps/skills/SkillEditForm");
+const KnowledgeSkillEditForm_1 = require("../apps/skills/KnowledgeSkillEditForm");
+const LanguageSkillEditForm_1 = require("../apps/skills/LanguageSkillEditForm");
 /**
  * Extend the basic ActorSheet with some very simple modifications
  */
@@ -1322,7 +1330,7 @@ class SR5ActorSheet extends ActorSheet {
     /* -------------------------------------------- */
     /**
      * Activate event listeners using the prepared sheet HTML
-     * @param html {HTML}   The prepared HTML object ready to be rendered into the DOM
+     * @param html The prepared HTML object ready to be rendered into the DOM
      */
     activateListeners(html) {
         super.activateListeners(html);
@@ -1375,6 +1383,20 @@ class SR5ActorSheet extends ActorSheet {
         html.find('.skill-edit').click(this._onShowEditSkill.bind(this));
         html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
         html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
+        html.find('.matrix-condition-value').on('change', (event) => __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            console.log(event);
+            const value = helpers_1.Helpers.parseInputToNumber(event.currentTarget.value);
+            console.log(value);
+            const matrixDevice = this.actor.getMatrixDevice();
+            console.log(matrixDevice);
+            if (matrixDevice && !isNaN(value)) {
+                console.log(matrixDevice);
+                const updateData = {};
+                updateData['data.technology.condition_monitor.value'] = value;
+                yield matrixDevice.update(updateData);
+            }
+        }));
         // Update Inventory Item
         html.find('.item-edit').click((event) => {
             event.preventDefault();
@@ -1684,19 +1706,19 @@ class SR5ActorSheet extends ActorSheet {
         event.preventDefault();
         const skill = event.currentTarget.dataset.skill;
         const category = event.currentTarget.dataset.category;
-        new knowledge_skill_edit_1.KnowledgeSkillEditForm(this.actor, skill, category, {
+        new KnowledgeSkillEditForm_1.KnowledgeSkillEditForm(this.actor, skill, category, {
             event: event,
         }).render(true);
     }
     _onShowEditLanguageSkill(event) {
         event.preventDefault();
         const skill = event.currentTarget.dataset.skill;
-        new language_skill_edit_1.LanguageSkillEditForm(this.actor, skill, { event: event }).render(true);
+        new LanguageSkillEditForm_1.LanguageSkillEditForm(this.actor, skill, { event: event }).render(true);
     }
     _onShowEditSkill(event) {
         event.preventDefault();
         const skill = event.currentTarget.dataset.skill;
-        new skill_edit_1.SkillEditForm(this.actor, skill, { event: event }).render(true);
+        new SkillEditForm_1.SkillEditForm(this.actor, skill, { event: event }).render(true);
     }
     _onShowImportCharacter(event) {
         event.preventDefault();
@@ -1709,7 +1731,7 @@ class SR5ActorSheet extends ActorSheet {
 }
 exports.SR5ActorSheet = SR5ActorSheet;
 
-},{"../apps/chummer-import-form":3,"../apps/knowledge-skill-edit":6,"../apps/language-skill-edit":7,"../apps/skill-edit":8,"../helpers":14}],3:[function(require,module,exports){
+},{"../apps/chummer-import-form":3,"../apps/skills/KnowledgeSkillEditForm":6,"../apps/skills/LanguageSkillEditForm":7,"../apps/skills/SkillEditForm":8,"../helpers":14}],3:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -2865,8 +2887,8 @@ exports.OverwatchScoreTracker = OverwatchScoreTracker;
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KnowledgeSkillEditForm = void 0;
-const language_skill_edit_1 = require("./language-skill-edit");
-class KnowledgeSkillEditForm extends language_skill_edit_1.LanguageSkillEditForm {
+const LanguageSkillEditForm_1 = require("./LanguageSkillEditForm");
+class KnowledgeSkillEditForm extends LanguageSkillEditForm_1.LanguageSkillEditForm {
     constructor(actor, skillId, category, options) {
         super(actor, skillId, options);
         this.category = category;
@@ -2877,12 +2899,12 @@ class KnowledgeSkillEditForm extends language_skill_edit_1.LanguageSkillEditForm
 }
 exports.KnowledgeSkillEditForm = KnowledgeSkillEditForm;
 
-},{"./language-skill-edit":7}],7:[function(require,module,exports){
+},{"./LanguageSkillEditForm":7}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LanguageSkillEditForm = void 0;
-const skill_edit_1 = require("./skill-edit");
-class LanguageSkillEditForm extends skill_edit_1.SkillEditForm {
+const SkillEditForm_1 = require("./SkillEditForm");
+class LanguageSkillEditForm extends SkillEditForm_1.SkillEditForm {
     _updateString() {
         return `data.skills.language.value.${this.skillId}`;
     }
@@ -2901,7 +2923,7 @@ class LanguageSkillEditForm extends skill_edit_1.SkillEditForm {
 }
 exports.LanguageSkillEditForm = LanguageSkillEditForm;
 
-},{"./skill-edit":8}],8:[function(require,module,exports){
+},{"./SkillEditForm":8}],8:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -2937,59 +2959,118 @@ class SkillEditForm extends BaseEntitySheet {
     }
     get title() {
         const data = this.getData().data;
-        return `Edit Skill - ${(data === null || data === void 0 ? void 0 : data.label) ? game.i18n.localize(data.label) : ''}`;
+        return `${game.i18n.localize('SR5.EditSkill')} - ${(data === null || data === void 0 ? void 0 : data.label) ? game.i18n.localize(data.label) : ''}`;
     }
     _onUpdateObject(event, formData, updateData) {
+        // get base value
         const base = formData['data.base'];
-        const regex = /data\.specs\.(\d+)/;
+        // process specializations
+        const specsRegex = /data\.specs\.(\d+)/;
         const specs = Object.entries(formData).reduce((running, [key, val]) => {
-            const found = key.match(regex);
+            const found = key.match(specsRegex);
             if (found && found[0]) {
                 running.push(val);
             }
             return running;
         }, []);
+        // process bonuses
+        const bonusKeyRegex = /data\.bonus\.(\d+).key/;
+        const bonusValueRegex = /data\.bonus\.(\d+).value/;
+        const bonus = Object.entries(formData).reduce((running, [key, value]) => {
+            const foundKey = key.match(bonusKeyRegex);
+            const foundVal = key.match(bonusValueRegex);
+            if (foundKey && foundKey[0] && foundKey[1]) {
+                const index = foundKey[1];
+                if (running[index] === undefined)
+                    running[index] = {};
+                running[index].key = value;
+            }
+            else if (foundVal && foundVal[0] && foundVal[1]) {
+                const index = foundVal[1];
+                if (running[index] === undefined)
+                    running[index] = {};
+                running[index].value = value;
+            }
+            return running;
+        }, []);
         const currentData = updateData[this._updateString()] || {};
         updateData[this._updateString()] = Object.assign(Object.assign({}, currentData), { base,
-            specs });
+            specs,
+            bonus });
     }
     /** @override */
     _updateObject(event, formData) {
         return __awaiter(this, void 0, void 0, function* () {
             const updateData = {};
             this._onUpdateObject(event, formData, updateData);
-            this.entity.update(updateData);
+            console.log(formData);
+            yield this.entity.update(updateData);
         });
     }
     activateListeners(html) {
         super.activateListeners(html);
-        html.find('.add-spec').click(this._addNewSpec.bind(this));
-        html.find('.remove-spec').click(this._removeSpec.bind(this));
+        $(html).find('.add-spec').on('click', this._addNewSpec.bind(this));
+        $(html).find('.remove-spec').on('click', this._removeSpec.bind(this));
+        $(html).find('.add-bonus').on('click', this._addNewBonus.bind(this));
+        $(html).find('.remove-bonus').on('click', this._removeBonus.bind(this));
+    }
+    _addNewBonus(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const updateData = {};
+            const data = this.getData().data;
+            if (!data)
+                return;
+            const { bonus = [] } = data;
+            // add blank line for new bonus
+            updateData[`${this._updateString()}.bonus`] = [...bonus, { key: '', value: 0 }];
+            yield this.entity.update(updateData);
+        });
+    }
+    _removeBonus(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const updateData = {};
+            const data = this.getData().data;
+            if (data === null || data === void 0 ? void 0 : data.bonus) {
+                const { bonus } = data;
+                const index = event.currentTarget.dataset.spec;
+                if (index >= 0) {
+                    bonus.splice(index, 1);
+                    updateData[`${this._updateString()}.bonus`] = bonus;
+                    yield this.entity.update(updateData);
+                }
+            }
+        });
     }
     _addNewSpec(event) {
-        event.preventDefault();
-        const updateData = {};
-        const data = this.getData().data;
-        if (data === null || data === void 0 ? void 0 : data.specs) {
-            // add a blank line to specs
-            const { specs } = data;
-            updateData[`${this._updateString()}.specs`] = [...specs, ''];
-        }
-        this.entity.update(updateData);
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const updateData = {};
+            const data = this.getData().data;
+            if (data === null || data === void 0 ? void 0 : data.specs) {
+                // add a blank line to specs
+                const { specs } = data;
+                updateData[`${this._updateString()}.specs`] = [...specs, ''];
+            }
+            yield this.entity.update(updateData);
+        });
     }
     _removeSpec(event) {
-        event.preventDefault();
-        const updateData = {};
-        const data = this.getData().data;
-        if (data === null || data === void 0 ? void 0 : data.specs) {
-            const { specs } = data;
-            const index = event.currentTarget.dataset.spec;
-            if (index >= 0) {
-                specs.splice(index, 1);
-                updateData[`${this._updateString()}.specs`] = specs;
-                this.entity.update(updateData);
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const updateData = {};
+            const data = this.getData().data;
+            if (data === null || data === void 0 ? void 0 : data.specs) {
+                const { specs } = data;
+                const index = event.currentTarget.dataset.spec;
+                if (index >= 0) {
+                    specs.splice(index, 1);
+                    updateData[`${this._updateString()}.specs`] = specs;
+                    yield this.entity.update(updateData);
+                }
             }
-        }
+        });
     }
     getData() {
         const data = super.getData();
@@ -4214,7 +4295,12 @@ class SR5Item extends Item {
         const equippedMods = this.getEquippedMods();
         const equippedAmmo = this.getEquippedAmmo();
         const { technology, range, action } = item.data;
-        if (technology === null || technology === void 0 ? void 0 : technology.conceal) {
+        if (technology) {
+            if (!technology.condition_monitor)
+                technology.condition_monitor = { value: 0 };
+            technology.condition_monitor.max = 8 + Math.ceil(technology.rating / 2);
+            if (!technology.conceal)
+                technology.conceal = {};
             technology.conceal.mod = {};
             equippedMods.forEach((mod) => {
                 if ((technology === null || technology === void 0 ? void 0 : technology.conceal) && mod.data.data.technology.conceal.value) {
@@ -4288,9 +4374,6 @@ class SR5Item extends Item {
                     range.rc.value = range.rc.base + helpers_1.Helpers.totalMods(range.rc.mod);
             }
         }
-        if (item.data.condition_monitor) {
-            item.data.condition_monitor.max = 8 + Math.ceil(item.data.technology.rating / 2);
-        }
         if (item.type === 'adept_power') {
             item.data.type = ((_a = item.data.action) === null || _a === void 0 ? void 0 : _a.type) ? 'active' : 'passive';
         }
@@ -4305,20 +4388,22 @@ class SR5Item extends Item {
             const postOnly = (event === null || event === void 0 ? void 0 : event.shiftKey) || !this.hasRoll;
             const post = (bonus = {}) => {
                 // if only post, don't roll and post a card version -- otherwise roll
-                const onComplete = postOnly ? () => {
-                    const { token } = this.actor;
-                    const attack = this.getAttackData(0);
-                    // don't include any hits
-                    attack === null || attack === void 0 ? true : delete attack.hits;
-                    // generate chat data
-                    chat_1.createChatData(Object.assign({ header: {
-                            name: this.name,
-                            img: this.img,
-                        }, testName: this.getRollName(), actor: this.actor, tokenId: token ? `${token.scene._id}.${token.id}` : undefined, description: this.getChatData(), item: this, previewTemplate: this.hasTemplate, attack }, bonus)).then((chatData) => {
-                        // create the message
-                        return ChatMessage.create(chatData, { displaySheet: false });
-                    });
-                } : () => this.rollTest(event);
+                const onComplete = postOnly
+                    ? () => {
+                        const { token } = this.actor;
+                        const attack = this.getAttackData(0);
+                        // don't include any hits
+                        attack === null || attack === void 0 ? true : delete attack.hits;
+                        // generate chat data
+                        chat_1.createChatData(Object.assign({ header: {
+                                name: this.name,
+                                img: this.img,
+                            }, testName: this.getRollName(), actor: this.actor, tokenId: token ? `${token.scene._id}.${token.id}` : undefined, description: this.getChatData(), item: this, previewTemplate: this.hasTemplate, attack }, bonus)).then((chatData) => {
+                            // create the message
+                            return ChatMessage.create(chatData, { displaySheet: false });
+                        });
+                    }
+                    : () => this.rollTest(event);
                 if (!postOnly && this.hasTemplate) {
                     // onComplete is called when template is finished
                     const template = template_1.default.fromItem(this, onComplete);
@@ -4339,7 +4424,7 @@ class SR5Item extends Item {
                 dialogData.close = (html) => __awaiter(this, void 0, void 0, function* () {
                     if (oldClose) {
                         // the oldClose we put on the dialog will return a boolean
-                        const ret = yield oldClose(html);
+                        const ret = (yield oldClose(html));
                         if (!ret)
                             return;
                     }
@@ -5110,7 +5195,7 @@ class SR5ItemSheet extends ItemSheet {
         html.find('.mod-equip').click(this._onWeaponModEquip.bind(this));
         html.find('.mod-delete').click(this._onWeaponModRemove.bind(this));
         html.find('.add-new-license').click(this._onAddLicense.bind(this));
-        // html.find('.remove-license').click(this._onRemoveLicense.bind(this));
+        html.find('.license-delete').on('click', this._onRemoveLicense.bind(this));
         html.find('.has-desc').click((event) => {
             event.preventDefault();
             const item = $(event.currentTarget).parents('.item');
@@ -5191,6 +5276,14 @@ class SR5ItemSheet extends ItemSheet {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
             this.item.addNewLicense();
+        });
+    }
+    _onRemoveLicense(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const index = event.currentTarget.dataset.index;
+            if (index >= 0)
+                this.item.removeLicense(index);
         });
     }
     _onWeaponModRemove(event) {
