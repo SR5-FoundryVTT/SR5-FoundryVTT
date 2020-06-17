@@ -73,8 +73,12 @@ class SR5Actor extends Actor {
             'mental_limit',
             'stun_track',
             'physical_track',
-            'initiative',
-            'initiative_dice',
+            'meat_initiative',
+            'meat_initiative_dice',
+            'astral_initiative',
+            'astral_initiative_dice',
+            'matrix_initiative',
+            'matrix_initiative_dice',
             'composure',
             'lift_carry',
             'judge_intentions',
@@ -301,12 +305,12 @@ class SR5Actor extends Actor {
         data.recoil_compensation = 1 + Math.ceil(attributes.strength.value / 3);
         // INITIATIVE
         const init = data.initiative;
-        init.meatspace.base.base = attributes.intuition.value + attributes.reaction.value;
-        init.meatspace.dice.base = 1;
-        init.astral.base.base = attributes.intuition.value * 2;
-        init.astral.dice.base = 2;
-        init.matrix.base.base = attributes.intuition.value + data.matrix.data_processing.value;
-        init.matrix.dice.base = data.matrix.hot_sim ? 4 : 3;
+        init.meatspace.base.base = attributes.intuition.value + attributes.reaction.value + modifiers['meat_initiative'];
+        init.meatspace.dice.base = 1 + modifiers['meat_initiative_dice'];
+        init.astral.base.base = attributes.intuition.value * 2 + modifiers['astral_initiative'];
+        init.astral.dice.base = 2 + modifiers['astral_initiative_dice'];
+        init.matrix.base.base = attributes.intuition.value + data.matrix.data_processing.value + modifiers['matrix_initiative'];
+        init.matrix.dice.base = data.matrix.hot_sim ? 4 : 3 + modifiers['matrix_initiative_dice'];
         if (init.perception === 'matrix')
             init.current = init.matrix;
         else if (init.perception === 'astral')
@@ -315,12 +319,12 @@ class SR5Actor extends Actor {
             init.current = init.meatspace;
             init.perception = 'meatspace';
         }
-        init.current.dice.value = init.current.dice.base + modifiers['initiative_dice'];
+        init.current.dice.value = init.current.dice.base;
         if (init.edge)
             init.current.dice.value = 5;
         init.current.dice.value = Math.min(5, init.current.dice.value); // maximum of 5d6 for initiative
         init.current.dice.text = `${init.current.dice.value}d6`;
-        init.current.base.value = init.current.base.base + modifiers['initiative'];
+        init.current.base.value = init.current.base.base;
         const soak = attributes.body.value + armor.value + modifiers['soak'];
         const drainAtt = attributes[data.magic.attribute];
         if (data.magic.drain && !data.magic.drain.mod)
@@ -3566,6 +3570,33 @@ exports.SR5['kbmod'] = {
     STANDARD: 'shiftKey',
     EDGE: 'altKey',
     SPEC: 'ctrlKey',
+};
+exports.SR5['actorModifiers'] = {
+    soak: 'SR5.RollSoak',
+    drain: 'SR5.Drain',
+    armor: 'SR5.Armor',
+    physical_limit: 'SR5.PhysicalLimit',
+    social_limit: 'SR5.SocialLimit',
+    mental_limit: 'SR5.MentalLimit',
+    stun_track: 'SR5.StunTrack',
+    physical_track: 'SR5.PhysicalTrack',
+    meat_initiative: 'SR5.MeatSpaceInit',
+    meat_initiative_dice: 'SR5.MeatSpaceDice',
+    astral_initiative: 'SR5.AstralInit',
+    astral_initiative_dice: 'SR5.AstralDice',
+    matrix_initiative: 'SR5.MatrixInit',
+    matrix_initiative_dice: 'SR5.MatrixDice',
+    composure: 'SR5.RollComposure',
+    lift_carry: 'SR5.RollLiftCarry',
+    judge_intentions: 'SR5.RollJudgeIntentions',
+    memory: 'SR5.RollMemory',
+    walk: 'SR5.Walk',
+    run: 'SR5.Run',
+    defense: 'SR5.RollDefense',
+    wound_tolerance: 'SR5.WoundTolerance',
+    essence: 'SR5.AttrEssence',
+    fade: 'SR5.RollFade',
+    global: 'SR5.Global',
 };
 
 },{}],13:[function(require,module,exports){
