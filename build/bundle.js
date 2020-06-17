@@ -935,7 +935,7 @@ class SR5Actor extends Actor {
         const att = this.data.data.attributes[attId];
         const atts = this.data.data.attributes;
         const parts = {};
-        parts[att.label] = att.value;
+        parts[att.label] = att.label === 'SR5.AttrEdge' ? this.getEdge().max : att.value;
         let dialogData = {
             attribute: att,
             attributes: atts,
@@ -960,7 +960,7 @@ class SR5Actor extends Actor {
                     if (att2Id !== 'none') {
                         att2 = atts[att2Id];
                         if (att2 === null || att2 === void 0 ? void 0 : att2.label) {
-                            parts[att2.label] = att2.value;
+                            parts[att2.label] = att2.label === 'SR5.AttrEdge' ? this.getEdge().max : att2.value;
                             const att2IdLabel = game.i18n.localize(CONFIG.SR5.attributes[att2Id]);
                             title += ` + ${att2IdLabel}`;
                         }
