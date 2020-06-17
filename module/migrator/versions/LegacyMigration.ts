@@ -33,7 +33,7 @@ export class LegacyMigration extends VersionMigration {
     }
 
     protected async MigrateSceneData(scene: any): Promise<any> {
-        return undefined;
+        return {};
     }
 
     protected async ShouldMigrateActorData(actor: ActorData): Promise<boolean> {
@@ -45,7 +45,8 @@ export class LegacyMigration extends VersionMigration {
     }
 
     protected async ShouldMigrateSceneData(scene: Scene): Promise<boolean> {
-        return false;
+        // @ts-ignore
+        return scene.data.tokens?.length > 0;
     }
 
     /**
@@ -67,6 +68,7 @@ export class LegacyMigration extends VersionMigration {
      * @param updateData
      */
     private static migrateActorSkills(actor, updateData) {
+        if (!actor.data?.skills?.active) return;
         const splitRegex = /[,\/|.]+/;
 
         const reducer = (running, [key, val]) => {

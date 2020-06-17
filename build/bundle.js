@@ -5655,6 +5655,46 @@ let VersionMigration = /** @class */ (() => {
                 }), Promise.resolve([]));
             });
         }
+        /**
+         * Get the Migrated Tokens for a scene
+         *  returns ALL data, not just changes (scenes need all data for tokens)
+         * @param sceneData
+         */
+        getMigratedSceneTokens(sceneData) {
+            return __awaiter(this, void 0, void 0, function* () {
+                if (!sceneData.tokens)
+                    return [];
+                return Promise.all(duplicate(sceneData.tokens).map((t) => __awaiter(this, void 0, void 0, function* () {
+                    // if we have nothing useful or are linked, return
+                    if (!t.actorId || t.actorLink || !t.actorData.data) {
+                        t.actorData = {};
+                        return t;
+                    }
+                    // create a token from the tokenData
+                    const token = new Token(t);
+                    if (!token.actor) {
+                        // no actor, no data to migrate
+                        t.actorId = null;
+                        t.actorData = {};
+                    } // don't want to update actors that are linked
+                    else {
+                        const updateData = yield this.MigrateActorData(token.data.actorData);
+                        t.actorData = mergeObject(token.data.actorData, updateData);
+                    }
+                    // migrate token actor items
+                    if (token.data.actorData.items) {
+                        const updateItems = yield this.getMigratedActorItems(token.data.actorData);
+                        t.actorData.items = duplicate(token.data.actorData.items).map((item) => {
+                            const update = updateItems.find((i) => i._id === item._id);
+                            if (update)
+                                return mergeObject(item, update);
+                            return item;
+                        });
+                    }
+                    return t;
+                })));
+            });
+        }
         // TODO: Extract to extendable functions...
         migrateCompendium(pack) {
             return __awaiter(this, void 0, void 0, function* () {
@@ -5670,8 +5710,9 @@ let VersionMigration = /** @class */ (() => {
                         let updateData;
                         if (entity === 'Item')
                             updateData = yield this.MigrateItemData(contentEntity.data);
-                        else if (entity === 'Actor')
+                        else if (entity === 'Actor') {
                             updateData = yield this.MigrateActorData(contentEntity.data);
+                        }
                         else if (entity === 'Scene')
                             updateData = yield this.MigrateSceneData(contentEntity.data);
                         if (isObjectEmpty(updateData) || updateData === null) {
@@ -5778,6 +5819,7 @@ let VersionMigration = /** @class */ (() => {
                         }
                         console.log(`Migrating Scene entity ${scene.name}`);
                         const updateData = yield this.MigrateSceneData(duplicate(scene.data));
+                        updateData.tokens = yield this.getMigratedSceneTokens(scene.data);
                         if (isObjectEmpty(updateData)) {
                             continue;
                         }
@@ -5930,7 +5972,7 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
     }
     MigrateSceneData(scene) {
         return __awaiter(this, void 0, void 0, function* () {
-            return undefined;
+            return {};
         });
     }
     ShouldMigrateActorData(actor) {
@@ -5944,8 +5986,10 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
         });
     }
     ShouldMigrateSceneData(scene) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            return false;
+            // @ts-ignore
+            return ((_a = scene.data.tokens) === null || _a === void 0 ? void 0 : _a.length) > 0;
         });
     }
     /**
@@ -5966,6 +6010,9 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
      * @param updateData
      */
     static migrateActorSkills(actor, updateData) {
+        var _a, _b;
+        if (!((_b = (_a = actor.data) === null || _a === void 0 ? void 0 : _a.skills) === null || _b === void 0 ? void 0 : _b.active))
+            return;
         const splitRegex = /[,\/|.]+/;
         const reducer = (running, [key, val]) => {
             if (!Array.isArray(val.specs) && val.specs) {

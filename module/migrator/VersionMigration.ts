@@ -61,6 +61,46 @@ export abstract class VersionMigration {
         }, Promise.resolve([]));
     }
 
+    /**
+     * Get the Migrated Tokens for a scene
+     *  returns ALL data, not just changes (scenes need all data for tokens)
+     * @param sceneData
+     */
+    protected async getMigratedSceneTokens(sceneData: any): Promise<Token[]> {
+        if (!sceneData.tokens) return [];
+        return Promise.all(
+            duplicate(sceneData.tokens).map(async (t) => {
+                // if we have nothing useful or are linked, return
+                if (!t.actorId || t.actorLink || !t.actorData.data) {
+                    t.actorData = {};
+                    return t;
+                }
+
+                // create a token from the tokenData
+                const token = new Token(t);
+                if (!token.actor) {
+                    // no actor, no data to migrate
+                    t.actorId = null;
+                    t.actorData = {};
+                } // don't want to update actors that are linked
+                else {
+                    const updateData = await this.MigrateActorData(token.data.actorData);
+                    t.actorData = mergeObject(token.data.actorData, updateData);
+                }
+                // migrate token actor items
+                if (token.data.actorData.items) {
+                    const updateItems = await this.getMigratedActorItems(token.data.actorData);
+                    t.actorData.items = duplicate(token.data.actorData.items).map((item) => {
+                        const update = updateItems.find((i) => i._id === item._id);
+                        if (update) return mergeObject(item, update);
+                        return item;
+                    });
+                }
+                return t;
+            })
+        );
+    }
+
     // TODO: Extract to extendable functions...
     protected async migrateCompendium(pack) {
         const { entity } = pack.metadata;
@@ -75,9 +115,9 @@ export abstract class VersionMigration {
             try {
                 let updateData;
                 if (entity === 'Item') updateData = await this.MigrateItemData(contentEntity.data);
-                else if (entity === 'Actor')
+                else if (entity === 'Actor') {
                     updateData = await this.MigrateActorData(contentEntity.data);
-                else if (entity === 'Scene')
+                } else if (entity === 'Scene')
                     updateData = await this.MigrateSceneData(contentEntity.data);
 
                 if (isObjectEmpty(updateData) || updateData === null) {
@@ -201,6 +241,7 @@ export abstract class VersionMigration {
 
                 console.log(`Migrating Scene entity ${scene.name}`);
                 const updateData = await this.MigrateSceneData(duplicate(scene.data));
+                updateData.tokens = await this.getMigratedSceneTokens(scene.data);
                 if (isObjectEmpty(updateData)) {
                     continue;
                 }
