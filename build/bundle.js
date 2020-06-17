@@ -1315,10 +1315,13 @@ class SR5ActorSheet extends ActorSheet {
         lifestyles.sort(sortByName);
         sins.sort(sortByName);
         programs.sort((left, right) => {
-            if (left.isEquipped() && !right.isEquipped())
-                return 1;
-            if (right.isEquipped() && !left.isEquipped())
+            var _a, _b, _c, _d;
+            const leftEquipped = (_b = (_a = left.data) === null || _a === void 0 ? void 0 : _a.technology) === null || _b === void 0 ? void 0 : _b.equipped;
+            const rightEquipped = (_d = (_c = right.data) === null || _c === void 0 ? void 0 : _c.technology) === null || _d === void 0 ? void 0 : _d.equipped;
+            if (leftEquipped && !rightEquipped)
                 return -1;
+            if (rightEquipped && !leftEquipped)
+                return 1;
             if (left.name > right.name)
                 return 1;
             if (left.name < right.name)

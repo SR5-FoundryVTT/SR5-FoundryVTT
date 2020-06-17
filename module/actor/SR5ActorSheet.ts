@@ -177,8 +177,8 @@ export class SR5ActorSheet extends ActorSheet {
                 },
             },
             programs: {
-                label: game.i18n.localize('SR5.Program')
-            }
+                label: game.i18n.localize('SR5.Program'),
+            },
         };
 
         let [
@@ -224,8 +224,10 @@ export class SR5ActorSheet extends ActorSheet {
         lifestyles.sort(sortByName);
         sins.sort(sortByName);
         programs.sort((left, right) => {
-            if (left.isEquipped() && !right.isEquipped()) return 1;
-            if (right.isEquipped() && !left.isEquipped()) return -1;
+            const leftEquipped = left.data?.technology?.equipped;
+            const rightEquipped = right.data?.technology?.equipped;
+            if (leftEquipped && !rightEquipped) return -1;
+            if (rightEquipped && !leftEquipped) return 1;
             if (left.name > right.name) return 1;
             if (left.name < right.name) return -1;
             return 0;
