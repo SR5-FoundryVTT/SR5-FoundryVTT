@@ -1237,42 +1237,45 @@ class SR5ActorSheet extends ActorSheet {
     _prepareItems(data) {
         const inventory = {
             weapon: {
-                label: game.i18n.localize('weapon'),
+                label: game.i18n.localize('SR5.Weapon'),
                 items: [],
                 dataset: {
                     type: 'weapon',
                 },
             },
             armor: {
-                label: game.i18n.localize('armor'),
+                label: game.i18n.localize('SR5.Armor'),
                 items: [],
                 dataset: {
                     type: 'armor',
                 },
             },
             device: {
-                label: game.i18n.localize('device'),
+                label: game.i18n.localize('SR5.Device'),
                 items: [],
                 dataset: {
                     type: 'device',
                 },
             },
             equipment: {
-                label: game.i18n.localize('equipment'),
+                label: game.i18n.localize('SR5.Equipment'),
                 items: [],
                 dataset: {
                     type: 'equipment',
                 },
             },
             cyberware: {
-                label: game.i18n.localize('cyberware'),
+                label: game.i18n.localize('SR5.Cyberware'),
                 items: [],
                 dataset: {
                     type: 'cyberware',
                 },
             },
+            programs: {
+                label: game.i18n.localize('SR5.Program')
+            }
         };
-        let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins,] = data.items.reduce((arr, item) => {
+        let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs,] = data.items.reduce((arr, item) => {
             item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
             if (item.type === 'spell')
                 arr[1].push(item);
@@ -1290,10 +1293,12 @@ class SR5ActorSheet extends ActorSheet {
                 arr[7].push(item);
             else if (item.type === 'sin')
                 arr[8].push(item);
+            else if (item.type === 'program')
+                arr[9].push(item);
             else if (Object.keys(inventory).includes(item.type))
                 arr[0].push(item);
             return arr;
-        }, [[], [], [], [], [], [], [], [], []]);
+        }, [[], [], [], [], [], [], [], [], [], []]);
         const sortByName = (i1, i2) => {
             if (i1.name > i2.name)
                 return 1;
@@ -1309,6 +1314,17 @@ class SR5ActorSheet extends ActorSheet {
         contacts.sort(sortByName);
         lifestyles.sort(sortByName);
         sins.sort(sortByName);
+        programs.sort((left, right) => {
+            if (left.isEquipped() && !right.isEquipped())
+                return 1;
+            if (right.isEquipped() && !left.isEquipped())
+                return -1;
+            if (left.name > right.name)
+                return 1;
+            if (left.name < right.name)
+                return -1;
+            return 0;
+        });
         items.forEach((item) => {
             inventory[item.type].items.push(item);
         });
@@ -1322,6 +1338,7 @@ class SR5ActorSheet extends ActorSheet {
         data.lifestyles = lifestyles;
         data.contacts = contacts;
         data.sins = sins;
+        data.programs = programs;
         qualities.sort((a, b) => {
             if (a.data.type === 'positive' && b.data.type === 'negative')
                 return -1;
@@ -4915,6 +4932,10 @@ class SR5Item extends Item {
     }
     isMeleeWeapon() {
         return this.data.type === 'weapon' && this.data.data.category === 'melee';
+    }
+    isEquipped() {
+        var _a;
+        return ((_a = this.data.data.technology) === null || _a === void 0 ? void 0 : _a.equipped) || false;
     }
     getAttackData(hits) {
         var _a;

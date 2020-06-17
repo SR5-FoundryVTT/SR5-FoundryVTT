@@ -703,6 +703,10 @@ export class SR5Item extends Item {
         return this.data.type === 'weapon' && this.data.data.category === 'melee';
     }
 
+    isEquipped(): boolean {
+        return this.data.data.technology?.equipped || false;
+    }
+
     getAttackData(hits: number): AttackData | undefined {
         if (!this.data.data.action?.damage) return undefined;
         const damage = this.data.data.action.damage;
