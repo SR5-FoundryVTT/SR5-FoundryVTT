@@ -3598,6 +3598,11 @@ exports.SR5['actorModifiers'] = {
     fade: 'SR5.RollFade',
     global: 'SR5.Global',
 };
+exports.SR5['programTypes'] = {
+    common_program: 'SR5.CommonProgram',
+    hacking_program: 'SR5.HackingProgram',
+    agent: 'SR5.Agent',
+};
 
 },{}],13:[function(require,module,exports){
 "use strict";
