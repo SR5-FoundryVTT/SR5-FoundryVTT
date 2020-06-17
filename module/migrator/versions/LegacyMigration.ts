@@ -1,31 +1,34 @@
 import { VersionMigration } from '../VersionMigration';
 
 /**
- * Migrates the data model from version 0 (undefined version) to 1.
+ * Migrates the data model for Legacy migrations prior to 0.6.4
  */
-export class Version1 extends VersionMigration {
-    get SourceVersion(): number {
-        return 0;
+export class LegacyMigration extends VersionMigration {
+    get SourceVersion(): string {
+        return '0';
     }
-    get TargetVersion(): number {
-        return 1;
+    get TargetVersion(): string {
+        return '0.6.4';
+    }
+    static get MigrationVersion(): string {
+        return '0.6.4';
     }
 
     protected async MigrateActorData(actor: ActorData): Promise<any> {
         const updateData = {};
-        Version1.migrateActorOverflow(actor, updateData);
-        Version1.migrateActorSkills(actor, updateData);
+        LegacyMigration.migrateActorOverflow(actor, updateData);
+        LegacyMigration.migrateActorSkills(actor, updateData);
         return updateData;
     }
 
     protected async MigrateItemData(item: BaseEntityData): Promise<any> {
         const updateData = {};
-        Version1.migrateDamageTypeAndElement(item, updateData);
-        Version1.migrateItemsAddActions(item, updateData);
-        Version1.migrateActorOverflow(item, updateData);
-        Version1.migrateItemsAddCapacity(item, updateData);
-        Version1.migrateItemsAmmo(item, updateData);
-        Version1.migrateItemsConceal(item, updateData);
+        LegacyMigration.migrateDamageTypeAndElement(item, updateData);
+        LegacyMigration.migrateItemsAddActions(item, updateData);
+        LegacyMigration.migrateActorOverflow(item, updateData);
+        LegacyMigration.migrateItemsAddCapacity(item, updateData);
+        LegacyMigration.migrateItemsAmmo(item, updateData);
+        LegacyMigration.migrateItemsConceal(item, updateData);
         return updateData;
     }
 
@@ -34,11 +37,11 @@ export class Version1 extends VersionMigration {
     }
 
     protected async ShouldMigrateActorData(actor: ActorData): Promise<boolean> {
-        return false;
+        return true;
     }
 
     protected async ShouldMigrateItemData(item: BaseEntityData): Promise<boolean> {
-        return false;
+        return true;
     }
 
     protected async ShouldMigrateSceneData(scene: Scene): Promise<boolean> {

@@ -5478,25 +5478,6 @@ Hooks.on('getSceneControlButtons', (controls) => {
         });
     }
 });
-// found at: https://helloacm.com/the-javascript-function-to-compare-version-number-strings/
-function compareVersion(v1, v2) {
-    if (typeof v1 !== 'string')
-        return false;
-    if (typeof v2 !== 'string')
-        return false;
-    v1 = v1.split('.');
-    v2 = v2.split('.');
-    const k = Math.min(v1.length, v2.length);
-    for (let i = 0; i < k; ++i) {
-        v1[i] = parseInt(v1[i], 10);
-        v2[i] = parseInt(v2[i], 10);
-        if (v1[i] > v2[i])
-            return 1;
-        if (v1[i] < v2[i])
-            return -1;
-    }
-    return v1.length === v2.length ? 0 : v1.length < v2.length ? -1 : 1;
-}
 /**
  * Create a Macro from an Item drop.
  * Get an existing item macro if one exists, otherwise create a new one.
@@ -5557,7 +5538,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Migrator = void 0;
 const VersionMigration_1 = require("./VersionMigration");
-const Version1_1 = require("./versions/Version1");
+const LegacyMigration_1 = require("./versions/LegacyMigration");
 let Migrator = /** @class */ (() => {
     class Migrator {
         //TODO: Call on Init()
@@ -5567,14 +5548,13 @@ let Migrator = /** @class */ (() => {
                 if (currentVersion === undefined || currentVersion === null) {
                     currentVersion = VersionMigration_1.VersionMigration.NO_VERSION;
                 }
-                // Ensure int for safety.
-                currentVersion = parseInt(currentVersion);
                 const migrations = Migrator.s_Versions.filter(({ versionNumber }) => {
-                    return currentVersion >= versionNumber;
+                    // if versionNUmber is greater than currentVersion, we need to apply this migration
+                    return this.compareVersion(versionNumber, currentVersion) === 1;
                 });
                 // we want to apply migrations in ascending order until we're up to the latest
                 migrations.sort((a, b) => {
-                    return a.versionNumber - b.versionNumber;
+                    return this.compareVersion(a.versionNumber, b.versionNumber);
                 });
                 // Run the migrations in order
                 for (const migrationInfo of migrations) {
@@ -5583,18 +5563,37 @@ let Migrator = /** @class */ (() => {
                 }
             });
         }
+        // found at: https://helloacm.com/the-javascript-function-to-compare-version-number-strings/
+        // updated for typescript
+        /**
+         * compare two version numbers, returns 1 if v1 > v2, -1 if v1 < v2, 0 if equal
+         * @param v1
+         * @param v2
+         */
+        static compareVersion(v1, v2) {
+            const s1 = v1.split('.').map((s) => parseInt(s, 10));
+            const s2 = v2.split('.').map((s) => parseInt(s, 10));
+            const k = Math.min(v1.length, v2.length);
+            for (let i = 0; i < k; ++i) {
+                if (s1[i] > s2[i])
+                    return 1;
+                if (s1[i] < s2[i])
+                    return -1;
+            }
+            return v1.length === v2.length ? 0 : v1.length < v2.length ? -1 : 1;
+        }
     }
     // This maps version number to migration.
     // It is capable of supporting *multiple* migrations for a single version,
     //  but this should be done with care, as both will run.
     Migrator.s_Versions = [
-        { versionNumber: VersionMigration_1.VersionMigration.NO_VERSION, migration: Version1_1.Version1 }
+        { versionNumber: LegacyMigration_1.LegacyMigration.MigrationVersion, migration: LegacyMigration_1.LegacyMigration },
     ];
     return Migrator;
 })();
 exports.Migrator = Migrator;
 
-},{"./VersionMigration":20,"./versions/Version1":21}],20:[function(require,module,exports){
+},{"./VersionMigration":20,"./versions/LegacyMigration":21}],20:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -5713,7 +5712,7 @@ let VersionMigration = /** @class */ (() => {
                 }
                 for (const item of game.items.entities) {
                     try {
-                        if (!this.ShouldMigrateItemData(item.data)) {
+                        if (!(yield this.ShouldMigrateItemData(item.data))) {
                             continue;
                         }
                         console.log(`Migrating Item: ${item.name}`);
@@ -5743,11 +5742,11 @@ let VersionMigration = /** @class */ (() => {
                 }
                 for (const actor of game.actors.entities) {
                     try {
-                        if (!this.ShouldMigrateActorData(actor.data)) {
+                        if (!(yield this.ShouldMigrateActorData(actor.data))) {
                             continue;
                         }
                         console.log(`Migrating Actor ${actor.name}`);
-                        const updateData = this.MigrateActorData(duplicate(actor.data));
+                        const updateData = yield this.MigrateActorData(duplicate(actor.data));
                         const items = yield this.getMigratedActorItems(actor.data);
                         if (isObjectEmpty(updateData) && items.length === 0) {
                             continue;
@@ -5774,11 +5773,11 @@ let VersionMigration = /** @class */ (() => {
                 }
                 for (const scene of game.scenes.entities) {
                     try {
-                        if (!this.ShouldMigrateSceneData(scene)) {
+                        if (!(yield this.ShouldMigrateSceneData(scene))) {
                             continue;
                         }
                         console.log(`Migrating Scene entity ${scene.name}`);
-                        const updateData = this.MigrateSceneData(duplicate(scene.data));
+                        const updateData = yield this.MigrateSceneData(duplicate(scene.data));
                         if (isObjectEmpty(updateData)) {
                             continue;
                         }
@@ -5812,11 +5811,11 @@ let VersionMigration = /** @class */ (() => {
         Apply(entityUpdates) {
             return __awaiter(this, void 0, void 0, function* () {
                 for (const [entity, { updateData, embeddedItems }] of entityUpdates) {
-                    yield entity.update(updateData, { enforceTypes: false });
                     if (embeddedItems !== null) {
                         const actor = entity;
                         yield actor.updateOwnedItem(embeddedItems);
                     }
+                    yield entity.update(updateData, { enforceTypes: false });
                 }
                 // Migrate World Compendium Packs
                 const packs = game.packs.filter((pack) => pack.metadata.package === 'world' &&
@@ -5876,8 +5875,8 @@ let VersionMigration = /** @class */ (() => {
         }
     }
     VersionMigration.MODULE_NAME = 'shadowrun5e';
-    VersionMigration.KEY_DATA_VERSION = 'systemDataVersion';
-    VersionMigration.NO_VERSION = 0;
+    VersionMigration.KEY_DATA_VERSION = 'systemMigrationVersion';
+    VersionMigration.NO_VERSION = '0';
     return VersionMigration;
 })();
 exports.VersionMigration = VersionMigration;
@@ -5894,35 +5893,38 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Version1 = void 0;
+exports.LegacyMigration = void 0;
 const VersionMigration_1 = require("../VersionMigration");
 /**
- * Migrates the data model from version 0 (undefined version) to 1.
+ * Migrates the data model for Legacy migrations prior to 0.6.4
  */
-class Version1 extends VersionMigration_1.VersionMigration {
+class LegacyMigration extends VersionMigration_1.VersionMigration {
     get SourceVersion() {
-        return 0;
+        return '0';
     }
     get TargetVersion() {
-        return 1;
+        return '0.6.4';
+    }
+    static get MigrationVersion() {
+        return '0.6.4';
     }
     MigrateActorData(actor) {
         return __awaiter(this, void 0, void 0, function* () {
             const updateData = {};
-            Version1.migrateActorOverflow(actor, updateData);
-            Version1.migrateActorSkills(actor, updateData);
+            LegacyMigration.migrateActorOverflow(actor, updateData);
+            LegacyMigration.migrateActorSkills(actor, updateData);
             return updateData;
         });
     }
     MigrateItemData(item) {
         return __awaiter(this, void 0, void 0, function* () {
             const updateData = {};
-            Version1.migrateDamageTypeAndElement(item, updateData);
-            Version1.migrateItemsAddActions(item, updateData);
-            Version1.migrateActorOverflow(item, updateData);
-            Version1.migrateItemsAddCapacity(item, updateData);
-            Version1.migrateItemsAmmo(item, updateData);
-            Version1.migrateItemsConceal(item, updateData);
+            LegacyMigration.migrateDamageTypeAndElement(item, updateData);
+            LegacyMigration.migrateItemsAddActions(item, updateData);
+            LegacyMigration.migrateActorOverflow(item, updateData);
+            LegacyMigration.migrateItemsAddCapacity(item, updateData);
+            LegacyMigration.migrateItemsAmmo(item, updateData);
+            LegacyMigration.migrateItemsConceal(item, updateData);
             return updateData;
         });
     }
@@ -5933,12 +5935,12 @@ class Version1 extends VersionMigration_1.VersionMigration {
     }
     ShouldMigrateActorData(actor) {
         return __awaiter(this, void 0, void 0, function* () {
-            return false;
+            return true;
         });
     }
     ShouldMigrateItemData(item) {
         return __awaiter(this, void 0, void 0, function* () {
-            return false;
+            return true;
         });
     }
     ShouldMigrateSceneData(scene) {
@@ -6095,7 +6097,7 @@ class Version1 extends VersionMigration_1.VersionMigration {
         }
     }
 }
-exports.Version1 = Version1;
+exports.LegacyMigration = LegacyMigration;
 
 },{"../VersionMigration":20}],22:[function(require,module,exports){
 "use strict";

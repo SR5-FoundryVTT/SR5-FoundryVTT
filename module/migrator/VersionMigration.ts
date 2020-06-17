@@ -7,8 +7,8 @@ import { SR5Actor } from '../actor/SR5Actor';
  */
 export abstract class VersionMigration {
     static readonly MODULE_NAME = 'shadowrun5e';
-    static readonly KEY_DATA_VERSION = 'systemDataVersion';
-    static readonly NO_VERSION = 0;
+    static readonly KEY_DATA_VERSION = 'systemMigrationVersion';
+    static readonly NO_VERSION = '0';
 
     private m_Abort: boolean = false;
     private m_AbortReason: string;
@@ -16,11 +16,11 @@ export abstract class VersionMigration {
     /**
      * The allowed version this migrator should be able to operate on.
      */
-    public abstract get SourceVersion(): number;
+    public abstract get SourceVersion(): string;
     /**
      * The resulting version this migrator will produce.
      */
-    public abstract get TargetVersion(): number;
+    public abstract get TargetVersion(): string;
 
     public get SourceVersionFriendlyName(): string {
         return `v${this.SourceVersion}`;
@@ -124,7 +124,7 @@ export abstract class VersionMigration {
 
         for (const item of game.items.entities) {
             try {
-                if (!this.ShouldMigrateItemData(item.data)) {
+                if (!(await this.ShouldMigrateItemData(item.data))) {
                     continue;
                 }
 
@@ -159,12 +159,12 @@ export abstract class VersionMigration {
 
         for (const actor of game.actors.entities) {
             try {
-                if (!this.ShouldMigrateActorData(actor.data)) {
+                if (!(await this.ShouldMigrateActorData(actor.data))) {
                     continue;
                 }
 
                 console.log(`Migrating Actor ${actor.name}`);
-                const updateData = this.MigrateActorData(duplicate(actor.data));
+                const updateData = await this.MigrateActorData(duplicate(actor.data));
 
                 const items = await this.getMigratedActorItems(actor.data);
                 if (isObjectEmpty(updateData) && items.length === 0) {
@@ -195,12 +195,12 @@ export abstract class VersionMigration {
 
         for (const scene of game.scenes.entities) {
             try {
-                if (!this.ShouldMigrateSceneData(scene)) {
+                if (!(await this.ShouldMigrateSceneData(scene))) {
                     continue;
                 }
 
                 console.log(`Migrating Scene entity ${scene.name}`);
-                const updateData = this.MigrateSceneData(duplicate(scene.data));
+                const updateData = await this.MigrateSceneData(duplicate(scene.data));
                 if (isObjectEmpty(updateData)) {
                     continue;
                 }
@@ -243,11 +243,11 @@ export abstract class VersionMigration {
      */
     protected async Apply(entityUpdates: Map<Entity, EntityUpdate>) {
         for (const [entity, { updateData, embeddedItems }] of entityUpdates) {
-            await entity.update(updateData, { enforceTypes: false });
             if (embeddedItems !== null) {
                 const actor = entity as SR5Actor;
                 await actor.updateOwnedItem(embeddedItems);
             }
+            await entity.update(updateData, { enforceTypes: false });
         }
 
         // Migrate World Compendium Packs
