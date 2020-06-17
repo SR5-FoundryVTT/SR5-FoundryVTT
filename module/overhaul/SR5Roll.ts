@@ -50,6 +50,10 @@ export class SR5Roll extends Roll {
     protected m_Explode: boolean;
 
     constructor(count: number, limit: number = -1, explode: boolean = false) {
+        if (count <= 0) {
+            throw new DiceError("Must request least one die be rolled.");
+        }
+
         super(SR5Roll.ToFormula(count, limit, explode));
         this.m_Count = count;
         this.m_Limit = limit;
