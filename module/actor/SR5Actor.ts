@@ -339,11 +339,15 @@ export class SR5Actor extends Actor {
 
         // INITIATIVE
         const init = data.initiative;
-        init.meatspace.base.base = attributes.intuition.value + attributes.reaction.value + modifiers['meat_initiative'];
+        init.meatspace.base.base =
+            attributes.intuition.value + attributes.reaction.value + modifiers['meat_initiative'];
         init.meatspace.dice.base = 1 + modifiers['meat_initiative_dice'];
         init.astral.base.base = attributes.intuition.value * 2 + modifiers['astral_initiative'];
         init.astral.dice.base = 2 + modifiers['astral_initiative_dice'];
-        init.matrix.base.base = attributes.intuition.value + data.matrix.data_processing.value + modifiers['matrix_initiative'];
+        init.matrix.base.base =
+            attributes.intuition.value +
+            data.matrix.data_processing.value +
+            modifiers['matrix_initiative'];
         init.matrix.dice.base = data.matrix.hot_sim ? 4 : 3 + modifiers['matrix_initiative_dice'];
         if (init.perception === 'matrix') init.current = init.matrix;
         else if (init.perception === 'astral') init.current = init.astral;
@@ -1066,7 +1070,8 @@ export class SR5Actor extends Actor {
                     if (att2Id !== 'none') {
                         att2 = atts[att2Id];
                         if (att2?.label) {
-                            parts[att2.label] = att2.label === 'SR5.AttrEdge' ? this.getEdge().max : att2.value;
+                            parts[att2.label] =
+                                att2.label === 'SR5.AttrEdge' ? this.getEdge().max : att2.value;
                             const att2IdLabel = game.i18n.localize(CONFIG.SR5.attributes[att2Id]);
                             title += ` + ${att2IdLabel}`;
                         }
@@ -1164,6 +1169,9 @@ export class SR5Actor extends Actor {
                         'data.attributes.edge.value': actor.getEdge().value - 1,
                     });
                 });
+            } else {
+                // @ts-ignore
+                ui.notifications.warn(game.i18n.localize('SR5.SelectTokenMessage'))
             }
         }
     }
@@ -1175,7 +1183,6 @@ export class SR5Actor extends Actor {
         let formula = roll.formula;
         let hits = roll.total;
         let re = /(\d+)d6/;
-        console.log(formula);
         let matches = formula.match(re);
         if (matches && matches[1]) {
             let match = matches[1];
@@ -1209,6 +1216,9 @@ export class SR5Actor extends Actor {
                             'data.attributes.edge.value': actor.getEdge().value - 1,
                         });
                     });
+                } else {
+                    // @ts-ignore
+                    ui.notifications.warn(game.i18n.localize('SR5.SelectTokenMessage'))
                 }
             }
         }

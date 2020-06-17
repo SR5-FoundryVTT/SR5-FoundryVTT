@@ -66,11 +66,11 @@ export const createChatData = async (templateData: TemplateData, roll?) => {
     return chatData;
 };
 
-export const addChatMessageContextOptions = function (html, options) {
+export const addChatMessageContextOptions = (html, options) => {
     const canRoll = (li) => {
         const msg = game.messages.get(li.data().messageId);
 
-        msg.getFlag('shadowrun5e', 'customRoll');
+        return msg.getFlag('shadowrun5e', 'customRoll');
     };
 
     options.push(

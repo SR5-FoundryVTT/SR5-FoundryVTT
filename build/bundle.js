@@ -305,11 +305,15 @@ class SR5Actor extends Actor {
         data.recoil_compensation = 1 + Math.ceil(attributes.strength.value / 3);
         // INITIATIVE
         const init = data.initiative;
-        init.meatspace.base.base = attributes.intuition.value + attributes.reaction.value + modifiers['meat_initiative'];
+        init.meatspace.base.base =
+            attributes.intuition.value + attributes.reaction.value + modifiers['meat_initiative'];
         init.meatspace.dice.base = 1 + modifiers['meat_initiative_dice'];
         init.astral.base.base = attributes.intuition.value * 2 + modifiers['astral_initiative'];
         init.astral.dice.base = 2 + modifiers['astral_initiative_dice'];
-        init.matrix.base.base = attributes.intuition.value + data.matrix.data_processing.value + modifiers['matrix_initiative'];
+        init.matrix.base.base =
+            attributes.intuition.value +
+                data.matrix.data_processing.value +
+                modifiers['matrix_initiative'];
         init.matrix.dice.base = data.matrix.hot_sim ? 4 : 3 + modifiers['matrix_initiative_dice'];
         if (init.perception === 'matrix')
             init.current = init.matrix;
@@ -960,7 +964,8 @@ class SR5Actor extends Actor {
                     if (att2Id !== 'none') {
                         att2 = atts[att2Id];
                         if (att2 === null || att2 === void 0 ? void 0 : att2.label) {
-                            parts[att2.label] = att2.label === 'SR5.AttrEdge' ? this.getEdge().max : att2.value;
+                            parts[att2.label] =
+                                att2.label === 'SR5.AttrEdge' ? this.getEdge().max : att2.value;
                             const att2IdLabel = game.i18n.localize(CONFIG.SR5.attributes[att2Id]);
                             title += ` + ${att2IdLabel}`;
                         }
@@ -1055,6 +1060,10 @@ class SR5Actor extends Actor {
                         });
                     });
                 }
+                else {
+                    // @ts-ignore
+                    ui.notifications.warn(game.i18n.localize('SR5.SelectTokenMessage'));
+                }
             }
         });
     }
@@ -1067,7 +1076,6 @@ class SR5Actor extends Actor {
             let formula = roll.formula;
             let hits = roll.total;
             let re = /(\d+)d6/;
-            console.log(formula);
             let matches = formula.match(re);
             if (matches && matches[1]) {
                 let match = matches[1];
@@ -1100,6 +1108,10 @@ class SR5Actor extends Actor {
                                 'data.attributes.edge.value': actor.getEdge().value - 1,
                             });
                         });
+                    }
+                    else {
+                        // @ts-ignore
+                        ui.notifications.warn(game.i18n.localize('SR5.SelectTokenMessage'));
                     }
                 }
             }
@@ -1272,8 +1284,8 @@ class SR5ActorSheet extends ActorSheet {
                 },
             },
             programs: {
-                label: game.i18n.localize('SR5.Program')
-            }
+                label: game.i18n.localize('SR5.Program'),
+            },
         };
         let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs,] = data.items.reduce((arr, item) => {
             item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
@@ -3187,10 +3199,10 @@ exports.createChatData = (templateData, roll) => __awaiter(void 0, void 0, void 
         chatData['blind'] = true;
     return chatData;
 });
-exports.addChatMessageContextOptions = function (html, options) {
+exports.addChatMessageContextOptions = (html, options) => {
     const canRoll = (li) => {
         const msg = game.messages.get(li.data().messageId);
-        msg.getFlag('shadowrun5e', 'customRoll');
+        return msg.getFlag('shadowrun5e', 'customRoll');
     };
     options.push({
         name: 'Push the Limit',

@@ -436,6 +436,13 @@
     "SR5.Programs": "Programs",
     "SR5.Loaded": "Loaded",
     "SR5.Load": "Load",
+    "SR5.Normal": "Normal",
+    "SR5.Defense": "Defense",
+
+    "SR5.OriginalDicePool": "Original Dice Pool",
+    "SR5.Successes": "Successes",
+
+    "SR5.SelectTokenMessage": "You must select a token first",
 
     "SETTINGS.DiagonalMovementName": "Diagonal Movement",
     "SETTINGS.DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
