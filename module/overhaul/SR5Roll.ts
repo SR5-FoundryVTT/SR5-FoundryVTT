@@ -1,3 +1,15 @@
+/**
+ * An error that occurs during the rolling of dice.
+ */
+export class DiceError extends Error {
+    constructor(message: string) {
+        super(message);
+    }
+}
+
+/**
+ * A six-sided Shadowrun die.
+ */
 export class SR5Die extends Die {
     constructor() {
         super(6);
@@ -108,13 +120,19 @@ export class SR5Roll extends Roll {
     get isCriticalGlitch(): boolean {
         return this.isGlitch && this.hits === 0;
     }
-}
 
-/**
- * An error that occurs during the rolling of dice.
- */
-export class DiceError extends Error {
-    constructor(message: string) {
-        super(message);
+    // Override to define how it looks, what template renders, etc...
+    toMessage(chatData: object, { rollMode, create }: { rollMode?: string; create?: boolean }): Promise<ChatMessage | any> {
+        return super.toMessage(chatData, { rollMode, create });
+    }
+
+    // Override to define how it looks, what template renders, etc...
+    getTooltip(): Promise<JQuery | HTMLElement> {
+        return super.getTooltip();
+    }
+
+    // Override to define how it looks, what template renders, etc...
+    render(chatOptions?: object): Promise<JQuery | HTMLElement> {
+        return super.render(chatOptions);
     }
 }
