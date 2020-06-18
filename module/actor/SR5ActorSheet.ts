@@ -1,8 +1,8 @@
 import { Helpers } from '../helpers';
 import { ChummerImportForm } from '../apps/chummer-import-form';
-import { SkillEditForm } from '../apps/skill-edit';
-import { KnowledgeSkillEditForm } from '../apps/knowledge-skill-edit';
-import { LanguageSkillEditForm } from '../apps/language-skill-edit';
+import { SkillEditForm } from '../apps/skills/SkillEditForm';
+import { KnowledgeSkillEditForm } from '../apps/skills/KnowledgeSkillEditForm';
+import { LanguageSkillEditForm } from '../apps/skills/LanguageSkillEditForm';
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import Skills = Shadowrun.Skills;
@@ -78,7 +78,7 @@ export class SR5ActorSheet extends ActorSheet {
 
         const { modifiers: mods } = data.data;
         for (let [key, value] of Object.entries(mods)) {
-            if (value === 0) mods[key] = "";
+            if (value === 0) mods[key] = '';
         }
 
         this._prepareItems(data);
@@ -215,7 +215,6 @@ export class SR5ActorSheet extends ActorSheet {
         complex_forms.sort(sortByName);
         items.sort(sortByName);
         spells.sort(sortByName);
-        complex_forms.sort(sortByName);
         contacts.sort(sortByName);
         lifestyles.sort(sortByName);
         sins.sort(sortByName);
@@ -247,7 +246,7 @@ export class SR5ActorSheet extends ActorSheet {
 
     /**
      * Activate event listeners using the prepared sheet HTML
-     * @param html {HTML}   The prepared HTML object ready to be rendered into the DOM
+     * @param html The prepared HTML object ready to be rendered into the DOM
      */
     activateListeners(html) {
         super.activateListeners(html);
@@ -282,6 +281,7 @@ export class SR5ActorSheet extends ActorSheet {
         html.find('.drain-roll').click(this._onRollDrain.bind(this));
         html.find('.fade-roll').click(this._onRollFade.bind(this));
         html.find('.item-roll').click(this._onRollItem.bind(this));
+        // $(html).find('.item-roll').on('contextmenu', () => console.log('TEST'));
         html.find('.item-equip-toggle').click(this._onEquipItem.bind(this));
         html.find('.item-qty').change(this._onChangeQty.bind(this));
         html.find('.item-rtg').change(this._onChangeRtg.bind(this));
@@ -301,6 +301,20 @@ export class SR5ActorSheet extends ActorSheet {
         html.find('.skill-edit').click(this._onShowEditSkill.bind(this));
         html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
         html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
+        html.find('.matrix-condition-value').on('change', async (event) => {
+            event.preventDefault();
+            console.log(event);
+            const value = Helpers.parseInputToNumber(event.currentTarget.value);
+            console.log(value);
+            const matrixDevice = this.actor.getMatrixDevice();
+            console.log(matrixDevice);
+            if (matrixDevice && !isNaN(value)) {
+                console.log(matrixDevice);
+                const updateData = {};
+                updateData['data.technology.condition_monitor.value'] = value;
+                await matrixDevice.update(updateData);
+            }
+        });
 
         // Update Inventory Item
         html.find('.item-edit').click((event) => {
@@ -380,7 +394,7 @@ export class SR5ActorSheet extends ActorSheet {
             data: duplicate(header.dataset),
         };
         delete itemData.data['type'];
-        return this.actor.createOwnedItem(itemData);
+        return this.actor.createOwnedItem(itemData, { renderSheet: true });
     }
 
     async _onAddLanguageSkill(event) {
@@ -457,19 +471,21 @@ export class SR5ActorSheet extends ActorSheet {
     async _onRollTrack(event) {
         event.preventDefault();
         let track = event.currentTarget.closest('.attribute').dataset.track;
-        this.actor.rollNaturalRecovery(track, event);
+        await this.actor.rollNaturalRecovery(track, event);
     }
 
     async _onRollPrompt(event) {
         event.preventDefault();
-        this.actor.promptRoll({ event: event });
+        await this.actor.promptRoll({ event: event });
     }
 
     async _onRollItem(event) {
         event.preventDefault();
         const iid = event.currentTarget.closest('.item').dataset.itemId;
         const item = this.actor.getOwnedItem(iid);
-        if (item) return item.roll(event);
+        if (item) {
+            await item.postCard(event);
+        }
     }
 
     async _onRollFade(event) {

@@ -1,12 +1,8 @@
 import { SR5Item } from '../../item/SR5Item';
 import { Helpers } from '../../helpers';
-import { DiceSR } from '../../dice';
 
-export class ShadowrunRollDialog extends Dialog {
-    static async fromItemRoll(
-        item: SR5Item,
-        event?: MouseEvent
-    ): Promise<ShadowrunRollDialog | undefined> {
+export class ShadowrunItemDialog extends Dialog {
+    static async fromItem(item: SR5Item, event?: MouseEvent): Promise<DialogData | undefined> {
         const dialogData: DialogData = {
             title: item.name,
             buttons: {},
@@ -17,23 +13,21 @@ export class ShadowrunRollDialog extends Dialog {
         let templatePath = '';
 
         if (item.isRangedWeapon()) {
-            ShadowrunRollDialog.addRangedWeaponData(templateData, dialogData, item);
+            ShadowrunItemDialog.addRangedWeaponData(templateData, dialogData, item);
             templatePath = 'systems/shadowrun5e/templates/rolls/range-weapon-roll.html';
         } else if (item.isSpell()) {
-            ShadowrunRollDialog.addSpellData(templateData, dialogData, item);
+            ShadowrunItemDialog.addSpellData(templateData, dialogData, item);
             templatePath = 'systems/shadowrun5e/templates/rolls/roll-spell.html';
         } else if (item.isComplexForm()) {
-            ShadowrunRollDialog.addComplexFormData(templateData, dialogData, item);
+            ShadowrunItemDialog.addComplexFormData(templateData, dialogData, item);
             templatePath = 'systems/shadowrun5e/templates/rolls/roll-complex-form.html';
         }
 
         if (templatePath) {
             const dialog = await renderTemplate(templatePath, templateData);
-            return new ShadowrunRollDialog(
-                mergeObject(dialogData, {
-                    content: dialog,
-                })
-            );
+            return mergeObject(dialogData, {
+                content: dialog,
+            });
         }
 
         return undefined;
@@ -49,12 +43,13 @@ export class ShadowrunRollDialog extends Dialog {
      */
 
     static addComplexFormData(templateData: object, dialogData: DialogData, item: SR5Item): void {
-        const parts = item.getRollPartsList();
         const fade = item.getFade();
         const title = `${Helpers.label(item.name)} Level`;
 
+        const level = item.getLastComplexFormLevel()?.value || 2 - fade;
+
         templateData['fade'] = fade >= 0 ? `+${fade}` : fade;
-        templateData['level'] = 2 - fade;
+        templateData['level'] = level;
         templateData['title'] = title;
 
         let cancel = true;
@@ -66,33 +61,21 @@ export class ShadowrunRollDialog extends Dialog {
             },
         };
         dialogData.close = async (html) => {
-            if (cancel) return;
+            if (cancel) return false;
             const level = Helpers.parseInputToNumber($(html).find('[name=level]').val());
-            await item.setLastComplexFormLevel(level);
-            DiceSR.rollTest({
-                event: dialogData['event'],
-                dialogOptions: {
-                    environmental: false,
-                },
-                parts,
-                actor: item.actor,
-                limit: level,
-                title,
-            }).then(() => {
-                const totalFade = Math.max(item.getFade() + level, 2);
-                item.actor.rollFade({ event: dialogData['event'] }, totalFade);
-            });
+            await item.setLastComplexFormLevel({ value: level });
+            return true;
         };
     }
 
     static addSpellData(templateData: object, dialogData: DialogData, item: SR5Item): void {
-        const parts = item.getRollPartsList();
-
         const title = `${Helpers.label(item.name)} Force`;
-
         const drain = item.getDrain();
+
+        const force = item.getLastSpellForce()?.value || 2 - drain;
+
         templateData['drain'] = drain >= 0 ? `+${drain}` : `${drain}`;
-        templateData['force'] = 2 - drain;
+        templateData['force'] = force;
         templateData['title'] = title;
 
         dialogData.title = title;
@@ -113,39 +96,21 @@ export class ShadowrunRollDialog extends Dialog {
         };
         dialogData.default = 'normal';
         dialogData.close = async (html) => {
+            if (cancel) return false;
             const force = Helpers.parseInputToNumber($(html).find('[name=force]').val());
-            await item.setLastSpellForce(force);
-            DiceSR.rollTest({
-                event: dialogData['event'],
-                dialogOptions: {
-                    environmental: true,
-                },
-                parts,
-                actor: item.actor,
-                limit: force,
-                title: `${title} ${force}`,
-            }).then(async (roll: Roll | undefined) => {
-                if (item.data.data.category === 'combat' && roll) {
-                    const attackData = item.getAttackData(roll.total, force);
-                    if (attackData) {
-                        await item.setLastAttack(attackData);
-                    }
-                }
-                const drain = Math.max(item.getDrain() + force + (reckless ? 3 : 0), 2);
-                item.actor?.rollDrain({ event: dialogData['event'] }, drain);
-            });
+            await item.setLastSpellForce({ value: force, reckless });
+            return true;
         };
     }
 
     static addRangedWeaponData(templateData: object, dialogData: DialogData, item: SR5Item): void {
-        let limit = item.getActionLimit();
-        const parts = item.getRollPartsList();
         let title = dialogData.title || item.name;
 
         const itemData = item.data.data;
         const fireModes = {};
 
-        const { modes, ranges, ammo } = itemData.range;
+        const { modes, ranges } = itemData.range;
+        const { ammo } = itemData;
         if (modes.single_shot) {
             fireModes['1'] = 'SS';
         }
@@ -169,7 +134,7 @@ export class ShadowrunRollDialog extends Dialog {
         const fireMode = item.getLastFireMode();
         const rc = item.getRecoilCompensation(true);
         templateData['fireModes'] = fireModes;
-        templateData['fireMode'] = fireMode;
+        templateData['fireMode'] = fireMode?.value;
         templateData['rc'] = rc;
         templateData['ammo'] = ammo;
         templateData['title'] = title;
@@ -205,38 +170,20 @@ export class ShadowrunRollDialog extends Dialog {
         dialogData.buttons = buttons;
 
         dialogData.close = async (html) => {
-            if (cancel) return;
+            if (cancel) return false;
             const fireMode = Helpers.parseInputToNumber($(html).find('[name="fireMode"]').val());
-            await item.setLastFireMode(fireMode);
+
             if (fireMode) {
-                if (fireMode) {
-                    title += ` - Defender (${Helpers.mapRoundsToDefenseDesc(fireMode)})`;
-                }
-                // suppressing fire doesn't cause recoil
-                if (fireMode > rc && fireMode !== 20) {
-                    parts['SR5.Recoil'] = rc - fireMode;
-                }
-                DiceSR.rollTest({
-                    event: dialogData['event'],
-                    parts,
-                    actor: item.actor,
-                    limit,
-                    title,
-                    dialogOptions: {
-                        environmental,
-                    },
-                }).then((roll: Roll | undefined) => {
-                    if (roll) {
-                        item.useAmmo(fireMode).then(async () => {
-                            const attackData = item.getAttackData(roll.total);
-                            if (attackData) {
-                                await item.setLastAttack(attackData);
-                            }
-                            await item.setLastFireMode(fireMode);
-                        });
-                    }
-                });
+                const fireModeString = fireModes[fireMode];
+                const defenseModifier = Helpers.mapRoundsToDefenseDesc(fireMode);
+                const fireModeData = {
+                    label: fireModeString,
+                    value: fireMode,
+                    defense: defenseModifier,
+                };
+                await item.setLastFireMode(fireModeData);
             }
+            return true;
         };
     }
 }

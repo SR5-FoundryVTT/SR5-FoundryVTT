@@ -317,7 +317,7 @@
         <div class="track">
             <div class="attribute-input-container">
                 <input
-                    class="display track-input"
+                    class="display track-input matrix-condition-value"
                     size="2"
                     maxlength="2"
                     type="text"
@@ -362,7 +362,7 @@
                     {{localize "SR5.Fade"}}
                 </div>
                 <div class="item-text item-icons">
-                    <a class="item-create" title="Create Item" data-type="adept_power">
+                    <a class="item-create" title="Create Item" data-type="complex_form">
                         <i class="fas fa-plus"></i>
                         {{localize "SR5.Add"}}
                     </a>
@@ -396,13 +396,15 @@
             </div>
         </div>
         <div class="item hidden">
-            <div class="props">
-                {{#each item.properties}}
-                <span>{{this}}</span>
-                {{/each}}
-            </div>
             <div class="item-desc">
-                {{{item.data.description.value}}}
+                <div class="props">
+                    {{#each item.properties}}
+                    <span>{{this}}</span>
+                    {{/each}}
+                </div>
+                <div class="item-desc">
+                    {{{item.data.description.value}}}
+                </div>
             </div>
         </div>
         {{/each}}

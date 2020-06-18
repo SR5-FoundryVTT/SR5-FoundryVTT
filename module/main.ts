@@ -1,4 +1,3 @@
-// Import Modules
 import { SR5ItemSheet } from './item/SR5ItemSheet';
 import { SR5ActorSheet } from './actor/SR5ActorSheet';
 import { SR5Actor } from './actor/SR5Actor';
@@ -6,13 +5,13 @@ import { SR5Item } from './item/SR5Item';
 import { SR5 } from './config';
 import { Helpers } from './helpers';
 import { registerSystemSettings } from './settings';
-import { preloadHandlebarsTemplates } from './templates';
-import { DiceSR } from './dice';
 import { preCombatUpdate, shadowrunCombatUpdate } from './combat';
 import { measureDistance } from './canvas';
 import * as chat from './chat';
-import * as migrations from './migration';
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
+import { registerHandlebarHelpers, preloadHandlebarsTemplates } from './handlebars';
+import { ShadowrunRoller } from './rolls/ShadowrunRoller';
+import { Migrator } from './migrator/Migrator';
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -24,7 +23,7 @@ Hooks.once('init', function () {
     // Create a shadowrun5e namespace within the game global
     game['shadowrun5e'] = {
         SR5Actor,
-        DiceSR,
+        ShadowrunRoller,
         SR5Item,
         rollItemMacro,
     };
@@ -65,25 +64,12 @@ Hooks.on('ready', function () {
         }
     });
 
-    if (game.user.isGM) {
-        // Determine whether a system migration is required and feasible
-        const currentVersion = game.settings.get('shadowrun5e', 'systemMigrationVersion');
-        // the latest version that requires migration
-        const NEEDS_MIGRATION_VERSION = '0.5.12';
-        let needMigration =
-            currentVersion === null || compareVersion(currentVersion, NEEDS_MIGRATION_VERSION) < 0;
-
-        // Perform the migration
-        if (needMigration && game.user.isGM) {
-            migrations.migrateWorld();
-        }
-    }
+    Migrator.BeginMigration();
 });
 
 Hooks.on('preUpdateCombat', preCombatUpdate);
 Hooks.on('renderChatMessage', (app, html) => {
-    if (!app.isRoll) SR5Item.chatListeners(html);
-    if (app.isRoll) chat.highlightSuccessFailure(app, html);
+    if (app.isRoll) chat.addRollListeners(app, html);
 });
 Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);
 
@@ -115,22 +101,6 @@ Hooks.on('getSceneControlButtons', (controls) => {
         });
     }
 });
-
-// found at: https://helloacm.com/the-javascript-function-to-compare-version-number-strings/
-function compareVersion(v1, v2) {
-    if (typeof v1 !== 'string') return false;
-    if (typeof v2 !== 'string') return false;
-    v1 = v1.split('.');
-    v2 = v2.split('.');
-    const k = Math.min(v1.length, v2.length);
-    for (let i = 0; i < k; ++i) {
-        v1[i] = parseInt(v1[i], 10);
-        v2[i] = parseInt(v2[i], 10);
-        if (v1[i] > v2[i]) return 1;
-        if (v1[i] < v2[i]) return -1;
-    }
-    return v1.length === v2.length ? 0 : v1.length < v2.length ? -1 : 1;
-}
 
 /**
  * Create a Macro from an Item drop.
@@ -176,55 +146,7 @@ function rollItemMacro(itemName) {
         );
     }
 
-    return item.roll();
+    return item.rollTest(event);
 }
 
-Handlebars.registerHelper('localizeOb', function (strId, obj) {
-    if (obj) strId = obj[strId];
-    return game.i18n.localize(strId);
-});
-
-Handlebars.registerHelper('toHeaderCase', function (str) {
-    if (str) return Helpers.label(str);
-    return '';
-});
-
-Handlebars.registerHelper('concat', function (strs, c = ',') {
-    if (Array.isArray(strs)) {
-        return strs.join(c);
-    }
-    return strs;
-});
-Handlebars.registerHelper('hasprop', function (obj, prop, options) {
-    if (obj.hasOwnProperty(prop)) {
-        return options.fn(this);
-    } else return options.inverse(this);
-});
-Handlebars.registerHelper('ifin', function (val, arr, options) {
-    if (arr.includes(val)) return options.fn(this);
-    else return options.inverse(this);
-});
-// if greater than
-Handlebars.registerHelper('ifgt', function (v1, v2, options) {
-    if (v1 > v2) return options.fn(this);
-    else return options.inverse(this);
-});
-// if not equal
-Handlebars.registerHelper('ifne', function (v1, v2, options) {
-    if (v1 !== v2) return options.fn(this);
-    else return options.inverse(this);
-});
-// if equal
-Handlebars.registerHelper('ife', function (v1, v2, options) {
-    if (v1 === v2) return options.fn(this);
-    else return options.inverse(this);
-});
-Handlebars.registerHelper('sum', function (v1, v2) {
-    return v1 + v2;
-});
-Handlebars.registerHelper('damageAbbreviation', function (damage) {
-    if (damage === 'physical') return 'P';
-    if (damage === 'stun') return 'S';
-    if (damage === 'matrix') return 'M';
-    return '';
-});
+registerHandlebarHelpers();

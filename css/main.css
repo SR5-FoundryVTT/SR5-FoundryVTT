@@ -244,6 +244,7 @@
 .sr5.actor .attributes .attribute > .attribute-name.roll:hover {
   text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
   cursor: pointer;
+  color: #6495ed;
 }
 .sr5.actor .attributes .attribute .attribute-input-container {
   text-align: center;
@@ -303,6 +304,200 @@
   align-content: center;
 }
 
+.sr5.chat-card {
+  font-style: normal;
+  font-size: 1rem;
+}
+.sr5.chat-card .card-header {
+  padding: 0.25em 0;
+  border-top: 1px solid #4d4d4d;
+  border-bottom: 1px solid #4d4d4d;
+}
+.sr5.chat-card .card-header img {
+  flex: 0 0 36px;
+  margin-right: 0.5em;
+}
+.sr5.chat-card .card-header h3 {
+  font-size: 1.75em;
+  align-self: center;
+  flex: 1;
+  margin: 0;
+  font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
+}
+.sr5.chat-card .card-content {
+  padding: 0.5em 0;
+  border-bottom: 1px solid #4d4d4d;
+}
+.sr5.chat-card .card-content p {
+  font-size: 0.8em;
+}
+.sr5.chat-card .card-content h3 {
+  font-size: 1em;
+  margin: 0;
+  font-weight: bold;
+}
+.sr5.chat-card .card-buttons {
+  border-top: 1px solid #4d4d4d;
+}
+.sr5.chat-card .card-buttons .button {
+  box-shadow: 0 0 0.25em 0.15em #4d4d4d;
+  cursor: pointer;
+  border: 1px solid #4d4d4d;
+  background: grey;
+  margin-top: 0.5em;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+  font-size: 16px;
+  font-style: italic;
+  font-weight: bold;
+}
+.sr5.chat-card .card-buttons .button:hover {
+  box-shadow: 0 0 0.25em 0.15em black;
+}
+.sr5.chat-card .card-footer {
+  padding: 0.25em 0 0;
+  border-top: 1px solid #4d4d4d;
+}
+.sr5.chat-card .card-footer span {
+  border-right: 1px solid #4d4d4d;
+  padding: 0;
+  padding-right: 0.3em;
+  font-size: 0.75em;
+}
+.sr5.chat-card .card-footer span:last-child {
+  border-right: none;
+  padding-right: 0;
+}
+.sr5.roll-card {
+  margin: 0.15em;
+}
+.sr5.roll-card .card-title {
+  font-size: 14px;
+  border-bottom: 1px solid #4d4d4d;
+  justify-content: left;
+  align-content: center;
+  align-items: flex-end;
+}
+.sr5.roll-card .card-title > * {
+  margin-left: 0.15em;
+  margin-right: 0.15em;
+}
+.sr5.roll-card .card-title .header-name:hover {
+  text-shadow: -1px -1px 0 #6495ed, 1px -1px 0 #6495ed, -1px 1px 0 #6495ed, 1px 1px 0 #6495ed;
+}
+.sr5.roll-card .test-line {
+  margin-top: 0.25em;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+}
+.sr5.roll-card .test-line .test-name {
+  font-style: italic;
+}
+.sr5.roll-card .test-line .test-name.test-roll {
+  text-decoration: underline;
+}
+.sr5.roll-card .test-line .test-name.test-roll:hover {
+  cursor: pointer;
+}
+.sr5.roll-card .test-line .place-template {
+  padding: 2px 5px;
+  line-height: 1em;
+  color: black;
+  font-size: 18px;
+  margin-right: 1em;
+  flex: 0;
+}
+.sr5.roll-card .card-description {
+  padding: 0.25em;
+  font-size: 14px;
+  border-bottom: 1px solid #4d4d4d;
+}
+.sr5.roll-card .card-content {
+  font-size: 14px;
+  padding: 0 0.25em;
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
+}
+.sr5.roll-card .card-content .left-side {
+  display: flex;
+  flex: 1;
+  flex-flow: column;
+}
+.sr5.roll-card .card-content .right-side {
+  display: flex;
+  flex: 1;
+  flex-flow: column;
+  font-size: 12px;
+  text-align: right;
+  align-content: flex-end;
+}
+.sr5.roll-card .card-content .right-side .limit-line {
+  justify-content: flex-end;
+}
+.sr5.roll-card .card-content .key {
+  margin-right: 0.35em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 10em;
+}
+.sr5.roll-card .card-content .key.bold {
+  font-weight: bold;
+}
+.sr5.roll-card .card-content .value {
+  font-weight: bold;
+  align-self: flex-end;
+}
+.sr5.roll-card .card-content .limit-line {
+  display: flex;
+  flex-flow: nowrap row;
+  justify-content: flex-start;
+}
+.sr5.roll-card .card-content .category-line {
+  font-style: italic;
+}
+.sr5.roll-card .card-content .damage-line {
+  display: flex;
+  flex-flow: nowrap row;
+  justify-content: flex-start;
+  align-items: flex-end;
+  text-align: left;
+}
+.sr5.roll-card .card-content .damage-line > :not(:first-child) {
+  margin-left: 0.1em;
+}
+.sr5.roll-card .card-content .damage-line > :not(:last-child) {
+  margin-right: 0.1em;
+}
+.sr5.roll-card .card-content .damage-line .icon {
+  font-style: italic;
+}
+.sr5.roll-card .dice-roll-content {
+  padding: 0.5em 0.5em;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: center;
+}
+.sr5.roll-card .dice-roll-content .dice-roll {
+  background-image: url(/icons/svg/d6-grey.svg);
+  background-size: 24px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  text-align: center;
+  width: 24px;
+  line-height: 24px;
+}
+.sr5.roll-card .dice-roll-content .dice-roll.red {
+  color: #aa0200;
+  filter: sepia(0.5) hue-rotate(-60deg);
+}
+.sr5.roll-card .dice-roll-content .dice-roll.green {
+  color: #18520b;
+  filter: sepia(0.5) hue-rotate(60deg);
+}
+
 @font-face {
   font-family: "Nodesto";
   src: url("../fonts/NodestoCapsCondensed.otf");
@@ -310,6 +505,7 @@
 .roll:hover {
   text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
   cursor: pointer;
+  color: #6495ed;
 }
 
 .flexrow {
@@ -518,13 +714,28 @@ select.display > option {
   background-color: #4d4d4d;
 }
 
-.sr5.roll-dialog .parts-list {
+.sr5 .parts-list {
+  font-size: 12px;
   display: flex;
   flex-flow: row wrap;
   justify-content: center;
   align-items: center;
 }
-.sr5.roll-dialog .parts-list > * {
+.sr5 .parts-list.vertical {
+  flex-flow: column nowrap;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+.sr5 .parts-list .part {
+  white-space: nowrap;
+}
+.sr5 .parts-list .part .value {
+  font-weight: bold;
+}
+.sr5 .parts-list .part.underline {
+  text-decoration: underline;
+}
+.sr5 .parts-list > * {
   margin: 0 0.5em;
 }
 .sr5 .window-content {
@@ -570,6 +781,7 @@ select.display > option {
 .sr5 .tabs > a:hover {
   text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
   cursor: pointer;
+  color: #6495ed;
 }
 .sr5 .tabs > a.active {
   text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
@@ -633,6 +845,7 @@ select.display > option {
 .sr5 .inventory .item .has-desc:hover {
   text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
   cursor: pointer;
+  color: #6495ed;
 }
 .sr5 .inventory .item.no-border {
   border-bottom: none;
@@ -664,6 +877,7 @@ select.display > option {
 .sr5 .inventory .item .item-img.item-roll:hover {
   text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
   cursor: pointer;
+  color: #6495ed;
 }
 .sr5 .inventory .item .item-img.item-roll:hover > img {
   content: url("../ui/dice-solid.svg");
@@ -685,12 +899,16 @@ select.display > option {
   width: 100%;
 }
 .sr5 .inventory .item .item-desc .props {
+  display: flex;
+  flex-flow: wrap row;
   padding: 0.25em 0;
 }
 .sr5 .inventory .item .item-desc .props > * {
+  flex-shrink: 0;
   border-right: 1px solid #4d4d4d;
   border-bottom: 1px solid #4d4d4d;
   padding: 0.25em 0.5em;
+  margin: 0.1em 0.25em;
   box-shadow: 0.2em 0.2em 0.3em black;
 }
 .sr5 .inventory .item .item-desc .description {
@@ -759,68 +977,7 @@ select.display > option {
 .sr5 .inventory .item.skill-header:hover {
   text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
   cursor: pointer;
-}
-.sr5.chat-card {
-  font-style: normal;
-  font-size: 1rem;
-}
-.sr5.chat-card .card-header {
-  padding: 0.25em 0;
-  border-top: 1px solid #4d4d4d;
-  border-bottom: 1px solid #4d4d4d;
-}
-.sr5.chat-card .card-header img {
-  flex: 0 0 36px;
-  margin-right: 0.5em;
-}
-.sr5.chat-card .card-header h3 {
-  font-size: 1.75em;
-  align-self: center;
-  flex: 1;
-  margin: 0;
-  font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
-}
-.sr5.chat-card .card-content {
-  padding: 0.5em 0;
-  border-bottom: 1px solid #4d4d4d;
-}
-.sr5.chat-card .card-content p {
-  font-size: 0.8em;
-}
-.sr5.chat-card .card-content h3 {
-  font-size: 1em;
-  margin: 0;
-  font-weight: bold;
-}
-.sr5.chat-card .card-buttons {
-  margin: 0.5em 0;
-}
-.sr5.chat-card .card-buttons span {
-  display: block;
-  line-height: 2em;
-  text-align: center;
-}
-.sr5.chat-card .card-buttons button {
-  font-size: 1em;
-  height: 1.5em;
-  line-height: 1.25em;
-  margin: 0.25em 0;
-  color: #e6e6e6;
-  background: #4d4d4d;
-}
-.sr5.chat-card .card-footer {
-  padding: 0.25em 0 0;
-  border-top: 1px solid #4d4d4d;
-}
-.sr5.chat-card .card-footer span {
-  border-right: 1px solid #4d4d4d;
-  padding: 0;
-  padding-right: 0.3em;
-  font-size: 0.75em;
-}
-.sr5.chat-card .card-footer span:last-child {
-  border-right: none;
-  padding-right: 0;
+  color: #6495ed;
 }
 
 /*# sourceMappingURL=main.css.map */
