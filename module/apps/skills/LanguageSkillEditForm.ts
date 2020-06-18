@@ -1,7 +1,6 @@
-import { SkillEditForm } from './skill-edit';
+import { SkillEditForm } from './SkillEditForm';
 
 export class LanguageSkillEditForm extends SkillEditForm {
-    skillId: string;
     _updateString() {
         return `data.skills.language.value.${this.skillId}`;
     }

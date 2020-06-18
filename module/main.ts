@@ -77,12 +77,17 @@ Hooks.on('ready', function () {
             migrations.migrateWorld();
         }
     }
+
+    // add listener to d20 icon for rolling
+    const diceIconSelector = '#chat-controls .roll-type-select .fa-dice-d20';
+    $(document).on('click', diceIconSelector, () => ShadowrunRoller.promptRoll());
 });
 
 Hooks.on('preUpdateCombat', preCombatUpdate);
 Hooks.on('renderChatMessage', (app, html) => {
     if (app.isRoll) chat.addRollListeners(app, html);
 });
+
 Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);
 
 /* -------------------------------------------- */

@@ -91,8 +91,13 @@ export class SR5Item extends Item {
 
         const { technology, range, action } = item.data;
 
-        if (technology?.conceal) {
+        if (technology) {
+            if (!technology.condition_monitor) technology.condition_monitor = { value: 0 };
+            technology.condition_monitor.max = 8 + Math.ceil(technology.rating / 2);
+
+            if (!technology.conceal) technology.conceal = {};
             technology.conceal.mod = {};
+
             equippedMods.forEach((mod) => {
                 if (technology?.conceal && mod.data.data.technology.conceal.value) {
                     technology.conceal.mod[mod.name] = mod.data.data.technology.conceal.value;
@@ -118,9 +123,9 @@ export class SR5Item extends Item {
 
             if (equippedAmmo) {
                 // add mods to damage from ammo
-                action.damage.mod[`SR5.Ammo ${equippedAmmo.name}`] = equippedAmmo.data.data.damage;
+                action.damage.mod[`${equippedAmmo.name}`] = equippedAmmo.data.data.damage;
                 // add mods to ap from ammo
-                action.damage.ap.mod[`SR5.Ammo ${equippedAmmo.name}`] = equippedAmmo.data.data.ap;
+                action.damage.ap.mod[`${equippedAmmo.name}`] = equippedAmmo.data.data.ap;
 
                 // override element
                 if (equippedAmmo.data.data.element) {
@@ -171,10 +176,6 @@ export class SR5Item extends Item {
             }
         }
 
-        if (item.data.condition_monitor) {
-            item.data.condition_monitor.max = 8 + Math.ceil(item.data.technology.rating / 2);
-        }
-
         if (item.type === 'adept_power') {
             item.data.type = item.data.action?.type ? 'active' : 'passive';
         }
@@ -191,30 +192,32 @@ export class SR5Item extends Item {
 
         const post = (bonus = {}) => {
             // if only post, don't roll and post a card version -- otherwise roll
-            const onComplete = postOnly ? () => {
-                const { token } = this.actor;
-                const attack = this.getAttackData(0);
-                // don't include any hits
-                delete attack?.hits;
-                // generate chat data
-                createChatData({
-                    header: {
-                        name: this.name,
-                        img: this.img,
-                    },
-                    testName: this.getRollName(),
-                    actor: this.actor,
-                    tokenId: token ? `${token.scene._id}.${token.id}` : undefined,
-                    description: this.getChatData(),
-                    item: this,
-                    previewTemplate: this.hasTemplate,
-                    attack,
-                    ...bonus,
-                }).then((chatData) => {
-                    // create the message
-                    return ChatMessage.create(chatData, { displaySheet: false });
-                });
-            } : () => this.rollTest(event);
+            const onComplete = postOnly
+                ? () => {
+                      const { token } = this.actor;
+                      const attack = this.getAttackData(0);
+                      // don't include any hits
+                      delete attack?.hits;
+                      // generate chat data
+                      createChatData({
+                          header: {
+                              name: this.name,
+                              img: this.img,
+                          },
+                          testName: this.getRollName(),
+                          actor: this.actor,
+                          tokenId: token ? `${token.scene._id}.${token.id}` : undefined,
+                          description: this.getChatData(),
+                          item: this,
+                          previewTemplate: this.hasTemplate,
+                          attack,
+                          ...bonus,
+                      }).then((chatData) => {
+                          // create the message
+                          return ChatMessage.create(chatData, { displaySheet: false });
+                      });
+                  }
+                : () => this.rollTest(event);
 
             if (!postOnly && this.hasTemplate) {
                 // onComplete is called when template is finished
@@ -235,7 +238,7 @@ export class SR5Item extends Item {
             dialogData.close = async (html) => {
                 if (oldClose) {
                     // the oldClose we put on the dialog will return a boolean
-                    const ret = await oldClose(html) as unknown as boolean;
+                    const ret = ((await oldClose(html)) as unknown) as boolean;
                     if (!ret) return;
                 }
                 post();
@@ -698,6 +701,10 @@ export class SR5Item extends Item {
 
     isMeleeWeapon(): boolean {
         return this.data.type === 'weapon' && this.data.data.category === 'melee';
+    }
+
+    isEquipped(): boolean {
+        return this.data.data.technology?.equipped || false;
     }
 
     getAttackData(hits: number): AttackData | undefined {

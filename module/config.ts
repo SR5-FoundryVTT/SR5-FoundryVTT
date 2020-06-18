@@ -269,3 +269,37 @@ SR5['kbmod'] = {
     EDGE: 'altKey',
     SPEC: 'ctrlKey',
 };
+
+SR5['actorModifiers'] = {
+    soak: 'SR5.RollSoak',
+    drain: 'SR5.Drain',
+    armor: 'SR5.Armor',
+    physical_limit: 'SR5.PhysicalLimit',
+    social_limit: 'SR5.SocialLimit',
+    mental_limit: 'SR5.MentalLimit',
+    stun_track: 'SR5.StunTrack',
+    physical_track: 'SR5.PhysicalTrack',
+    meat_initiative: 'SR5.MeatSpaceInit',
+    meat_initiative_dice: 'SR5.MeatSpaceDice',
+    astral_initiative: 'SR5.AstralInit',
+    astral_initiative_dice: 'SR5.AstralDice',
+    matrix_initiative: 'SR5.MatrixInit',
+    matrix_initiative_dice: 'SR5.MatrixDice',
+    composure: 'SR5.RollComposure',
+    lift_carry: 'SR5.RollLiftCarry',
+    judge_intentions: 'SR5.RollJudgeIntentions',
+    memory: 'SR5.RollMemory',
+    walk: 'SR5.Walk',
+    run: 'SR5.Run',
+    defense: 'SR5.RollDefense',
+    wound_tolerance: 'SR5.WoundTolerance',
+    essence: 'SR5.AttrEssence',
+    fade: 'SR5.RollFade',
+    global: 'SR5.Global',
+};
+
+SR5['programTypes'] = {
+    common_program: 'SR5.CommonProgram',
+    hacking_program: 'SR5.HackingProgram',
+    agent: 'SR5.Agent',
+};

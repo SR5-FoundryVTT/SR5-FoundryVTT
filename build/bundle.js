@@ -46,7 +46,7 @@ class SR5Actor extends Actor {
         });
     }
     prepareData() {
-        var _a, _b, _c;
+        var _a, _b, _c, _d;
         super.prepareData();
         const actorData = this.data;
         // @ts-ignore
@@ -73,8 +73,12 @@ class SR5Actor extends Actor {
             'mental_limit',
             'stun_track',
             'physical_track',
-            'initiative',
-            'initiative_dice',
+            'meat_initiative',
+            'meat_initiative_dice',
+            'astral_initiative',
+            'astral_initiative_dice',
+            'matrix_initiative',
+            'matrix_initiative_dice',
             'composure',
             'lift_carry',
             'judge_intentions',
@@ -93,6 +97,7 @@ class SR5Actor extends Actor {
         }
         data.modifiers = modifiers;
         let totalEssence = 6;
+        armor.base = 0;
         armor.value = 0;
         armor.mod = {};
         for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
@@ -134,7 +139,8 @@ class SR5Actor extends Actor {
             // MODIFIES MATRIX ATTRIBUTES
             if (item.type === 'device' && ((_b = itemData.technology) === null || _b === void 0 ? void 0 : _b.equipped)) {
                 matrix.device = item._id;
-                matrix.condition_monitor.max = ((_c = itemData.condition_monitor) === null || _c === void 0 ? void 0 : _c.max) || 0;
+                matrix.condition_monitor.max = ((_c = itemData.technology.condition_monitor) === null || _c === void 0 ? void 0 : _c.max) || 0;
+                matrix.condition_monitor.value = ((_d = itemData.technology.condition_monitor) === null || _d === void 0 ? void 0 : _d.value) || 0;
                 matrix.rating = itemData.technology.rating;
                 matrix.is_cyberdeck = itemData.category === 'cyberdeck';
                 matrix.name = item.name;
@@ -166,13 +172,21 @@ class SR5Actor extends Actor {
                 language.value = {};
             language.attribute = 'intuition';
         }
+        const prepareSkill = (skill) => {
+            var _a;
+            skill.mod = {};
+            if (!skill.base)
+                skill.base = 0;
+            if ((_a = skill.bonus) === null || _a === void 0 ? void 0 : _a.length) {
+                for (let bonus of skill.bonus) {
+                    skill.mod[bonus.key] = bonus.value;
+                }
+            }
+            skill.value = skill.base + helpers_1.Helpers.totalMods(skill.mod);
+        };
         for (const skill of Object.values(active)) {
             if (!skill.hidden) {
-                if (!skill.mod)
-                    skill.mod = {};
-                if (!skill.base)
-                    skill.base = 0;
-                skill.value = skill.base + helpers_1.Helpers.totalMods(skill.mod);
+                prepareSkill(skill);
             }
         }
         {
@@ -181,11 +195,7 @@ class SR5Actor extends Actor {
             entries.forEach(([key, val]) => val._delete && delete data.skills.language.value[key]);
         }
         for (let skill of Object.values(language.value)) {
-            if (!skill.mod)
-                skill.mod = {};
-            if (!skill.base)
-                skill.base = 0;
-            skill.value = skill.base + helpers_1.Helpers.totalMods(skill.mod);
+            prepareSkill(skill);
         }
         for (let [, group] of Object.entries(knowledge)) {
             const entries = Object.entries(group.value);
@@ -193,11 +203,7 @@ class SR5Actor extends Actor {
             group.value = entries
                 .filter(([, val]) => !val._delete)
                 .reduce((acc, [id, skill]) => {
-                if (!skill.mod)
-                    skill.mod = {};
-                if (!skill.base)
-                    skill.base = 0;
-                skill.value = skill.base + helpers_1.Helpers.totalMods(skill.mod);
+                prepareSkill(skill);
                 acc[id] = skill;
                 return acc;
             }, {});
@@ -299,12 +305,16 @@ class SR5Actor extends Actor {
         data.recoil_compensation = 1 + Math.ceil(attributes.strength.value / 3);
         // INITIATIVE
         const init = data.initiative;
-        init.meatspace.base.base = attributes.intuition.value + attributes.reaction.value;
-        init.meatspace.dice.base = 1;
-        init.astral.base.base = attributes.intuition.value * 2;
-        init.astral.dice.base = 2;
-        init.matrix.base.base = attributes.intuition.value + data.matrix.data_processing.value;
-        init.matrix.dice.base = data.matrix.hot_sim ? 4 : 3;
+        init.meatspace.base.base =
+            attributes.intuition.value + attributes.reaction.value + modifiers['meat_initiative'];
+        init.meatspace.dice.base = 1 + modifiers['meat_initiative_dice'];
+        init.astral.base.base = attributes.intuition.value * 2 + modifiers['astral_initiative'];
+        init.astral.dice.base = 2 + modifiers['astral_initiative_dice'];
+        init.matrix.base.base =
+            attributes.intuition.value +
+                data.matrix.data_processing.value +
+                modifiers['matrix_initiative'];
+        init.matrix.dice.base = data.matrix.hot_sim ? 4 : 3 + modifiers['matrix_initiative_dice'];
         if (init.perception === 'matrix')
             init.current = init.matrix;
         else if (init.perception === 'astral')
@@ -313,12 +323,12 @@ class SR5Actor extends Actor {
             init.current = init.meatspace;
             init.perception = 'meatspace';
         }
-        init.current.dice.value = init.current.dice.base + modifiers['initiative_dice'];
+        init.current.dice.value = init.current.dice.base;
         if (init.edge)
             init.current.dice.value = 5;
         init.current.dice.value = Math.min(5, init.current.dice.value); // maximum of 5d6 for initiative
         init.current.dice.text = `${init.current.dice.value}d6`;
-        init.current.base.value = init.current.base.base + modifiers['initiative'];
+        init.current.base.value = init.current.base.base;
         const soak = attributes.body.value + armor.value + modifiers['soak'];
         const drainAtt = attributes[data.magic.attribute];
         if (data.magic.drain && !data.magic.drain.mod)
@@ -385,6 +395,13 @@ class SR5Actor extends Actor {
     }
     getOwnedItem(itemId) {
         return super.getOwnedItem(itemId);
+    }
+    getMatrixDevice() {
+        const matrix = this.data.data.matrix;
+        console.log(matrix);
+        if (matrix.device)
+            return this.getOwnedItem(matrix.device);
+        return undefined;
     }
     addKnowledgeSkill(category, skill) {
         const defaultSkill = {
@@ -922,7 +939,7 @@ class SR5Actor extends Actor {
         const att = this.data.data.attributes[attId];
         const atts = this.data.data.attributes;
         const parts = {};
-        parts[att.label] = att.value;
+        parts[att.label] = att.label === 'SR5.AttrEdge' ? this.getEdge().max : att.value;
         let dialogData = {
             attribute: att,
             attributes: atts,
@@ -947,7 +964,8 @@ class SR5Actor extends Actor {
                     if (att2Id !== 'none') {
                         att2 = atts[att2Id];
                         if (att2 === null || att2 === void 0 ? void 0 : att2.label) {
-                            parts[att2.label] = att2.value;
+                            parts[att2.label] =
+                                att2.label === 'SR5.AttrEdge' ? this.getEdge().max : att2.value;
                             const att2IdLabel = game.i18n.localize(CONFIG.SR5.attributes[att2Id]);
                             title += ` + ${att2IdLabel}`;
                         }
@@ -1042,6 +1060,10 @@ class SR5Actor extends Actor {
                         });
                     });
                 }
+                else {
+                    // @ts-ignore
+                    ui.notifications.warn(game.i18n.localize('SR5.SelectTokenMessage'));
+                }
             }
         });
     }
@@ -1054,7 +1076,6 @@ class SR5Actor extends Actor {
             let formula = roll.formula;
             let hits = roll.total;
             let re = /(\d+)d6/;
-            console.log(formula);
             let matches = formula.match(re);
             if (matches && matches[1]) {
                 let match = matches[1];
@@ -1088,6 +1109,10 @@ class SR5Actor extends Actor {
                             });
                         });
                     }
+                    else {
+                        // @ts-ignore
+                        ui.notifications.warn(game.i18n.localize('SR5.SelectTokenMessage'));
+                    }
                 }
             }
         });
@@ -1110,9 +1135,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ActorSheet = void 0;
 const helpers_1 = require("../helpers");
 const chummer_import_form_1 = require("../apps/chummer-import-form");
-const skill_edit_1 = require("../apps/skill-edit");
-const knowledge_skill_edit_1 = require("../apps/knowledge-skill-edit");
-const language_skill_edit_1 = require("../apps/language-skill-edit");
+const SkillEditForm_1 = require("../apps/skills/SkillEditForm");
+const KnowledgeSkillEditForm_1 = require("../apps/skills/KnowledgeSkillEditForm");
+const LanguageSkillEditForm_1 = require("../apps/skills/LanguageSkillEditForm");
 /**
  * Extend the basic ActorSheet with some very simple modifications
  */
@@ -1224,42 +1249,45 @@ class SR5ActorSheet extends ActorSheet {
     _prepareItems(data) {
         const inventory = {
             weapon: {
-                label: game.i18n.localize('weapon'),
+                label: game.i18n.localize('SR5.Weapon'),
                 items: [],
                 dataset: {
                     type: 'weapon',
                 },
             },
             armor: {
-                label: game.i18n.localize('armor'),
+                label: game.i18n.localize('SR5.Armor'),
                 items: [],
                 dataset: {
                     type: 'armor',
                 },
             },
             device: {
-                label: game.i18n.localize('device'),
+                label: game.i18n.localize('SR5.Device'),
                 items: [],
                 dataset: {
                     type: 'device',
                 },
             },
             equipment: {
-                label: game.i18n.localize('equipment'),
+                label: game.i18n.localize('SR5.Equipment'),
                 items: [],
                 dataset: {
                     type: 'equipment',
                 },
             },
             cyberware: {
-                label: game.i18n.localize('cyberware'),
+                label: game.i18n.localize('SR5.Cyberware'),
                 items: [],
                 dataset: {
                     type: 'cyberware',
                 },
             },
+            programs: {
+                label: game.i18n.localize('SR5.Program'),
+            },
         };
-        let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins,] = data.items.reduce((arr, item) => {
+        let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs,] = data.items.reduce((arr, item) => {
             item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
             if (item.type === 'spell')
                 arr[1].push(item);
@@ -1277,10 +1305,12 @@ class SR5ActorSheet extends ActorSheet {
                 arr[7].push(item);
             else if (item.type === 'sin')
                 arr[8].push(item);
+            else if (item.type === 'program')
+                arr[9].push(item);
             else if (Object.keys(inventory).includes(item.type))
                 arr[0].push(item);
             return arr;
-        }, [[], [], [], [], [], [], [], [], []]);
+        }, [[], [], [], [], [], [], [], [], [], []]);
         const sortByName = (i1, i2) => {
             if (i1.name > i2.name)
                 return 1;
@@ -1296,6 +1326,20 @@ class SR5ActorSheet extends ActorSheet {
         contacts.sort(sortByName);
         lifestyles.sort(sortByName);
         sins.sort(sortByName);
+        programs.sort((left, right) => {
+            var _a, _b, _c, _d;
+            const leftEquipped = (_b = (_a = left.data) === null || _a === void 0 ? void 0 : _a.technology) === null || _b === void 0 ? void 0 : _b.equipped;
+            const rightEquipped = (_d = (_c = right.data) === null || _c === void 0 ? void 0 : _c.technology) === null || _d === void 0 ? void 0 : _d.equipped;
+            if (leftEquipped && !rightEquipped)
+                return -1;
+            if (rightEquipped && !leftEquipped)
+                return 1;
+            if (left.name > right.name)
+                return 1;
+            if (left.name < right.name)
+                return -1;
+            return 0;
+        });
         items.forEach((item) => {
             inventory[item.type].items.push(item);
         });
@@ -1309,6 +1353,7 @@ class SR5ActorSheet extends ActorSheet {
         data.lifestyles = lifestyles;
         data.contacts = contacts;
         data.sins = sins;
+        data.programs = programs;
         qualities.sort((a, b) => {
             if (a.data.type === 'positive' && b.data.type === 'negative')
                 return -1;
@@ -1321,7 +1366,7 @@ class SR5ActorSheet extends ActorSheet {
     /* -------------------------------------------- */
     /**
      * Activate event listeners using the prepared sheet HTML
-     * @param html {HTML}   The prepared HTML object ready to be rendered into the DOM
+     * @param html The prepared HTML object ready to be rendered into the DOM
      */
     activateListeners(html) {
         super.activateListeners(html);
@@ -1374,6 +1419,20 @@ class SR5ActorSheet extends ActorSheet {
         html.find('.skill-edit').click(this._onShowEditSkill.bind(this));
         html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
         html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
+        html.find('.matrix-condition-value').on('change', (event) => __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            console.log(event);
+            const value = helpers_1.Helpers.parseInputToNumber(event.currentTarget.value);
+            console.log(value);
+            const matrixDevice = this.actor.getMatrixDevice();
+            console.log(matrixDevice);
+            if (matrixDevice && !isNaN(value)) {
+                console.log(matrixDevice);
+                const updateData = {};
+                updateData['data.technology.condition_monitor.value'] = value;
+                yield matrixDevice.update(updateData);
+            }
+        }));
         // Update Inventory Item
         html.find('.item-edit').click((event) => {
             event.preventDefault();
@@ -1455,7 +1514,7 @@ class SR5ActorSheet extends ActorSheet {
             data: duplicate(header.dataset),
         };
         delete itemData.data['type'];
-        return this.actor.createOwnedItem(itemData);
+        return this.actor.createOwnedItem(itemData, { renderSheet: true });
     }
     _onAddLanguageSkill(event) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -1683,19 +1742,19 @@ class SR5ActorSheet extends ActorSheet {
         event.preventDefault();
         const skill = event.currentTarget.dataset.skill;
         const category = event.currentTarget.dataset.category;
-        new knowledge_skill_edit_1.KnowledgeSkillEditForm(this.actor, skill, category, {
+        new KnowledgeSkillEditForm_1.KnowledgeSkillEditForm(this.actor, skill, category, {
             event: event,
         }).render(true);
     }
     _onShowEditLanguageSkill(event) {
         event.preventDefault();
         const skill = event.currentTarget.dataset.skill;
-        new language_skill_edit_1.LanguageSkillEditForm(this.actor, skill, { event: event }).render(true);
+        new LanguageSkillEditForm_1.LanguageSkillEditForm(this.actor, skill, { event: event }).render(true);
     }
     _onShowEditSkill(event) {
         event.preventDefault();
         const skill = event.currentTarget.dataset.skill;
-        new skill_edit_1.SkillEditForm(this.actor, skill, { event: event }).render(true);
+        new SkillEditForm_1.SkillEditForm(this.actor, skill, { event: event }).render(true);
     }
     _onShowImportCharacter(event) {
         event.preventDefault();
@@ -1708,7 +1767,7 @@ class SR5ActorSheet extends ActorSheet {
 }
 exports.SR5ActorSheet = SR5ActorSheet;
 
-},{"../apps/chummer-import-form":3,"../apps/knowledge-skill-edit":6,"../apps/language-skill-edit":7,"../apps/skill-edit":8,"../helpers":14}],3:[function(require,module,exports){
+},{"../apps/chummer-import-form":3,"../apps/skills/KnowledgeSkillEditForm":6,"../apps/skills/LanguageSkillEditForm":7,"../apps/skills/SkillEditForm":8,"../helpers":14}],3:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -2864,8 +2923,8 @@ exports.OverwatchScoreTracker = OverwatchScoreTracker;
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KnowledgeSkillEditForm = void 0;
-const language_skill_edit_1 = require("./language-skill-edit");
-class KnowledgeSkillEditForm extends language_skill_edit_1.LanguageSkillEditForm {
+const LanguageSkillEditForm_1 = require("./LanguageSkillEditForm");
+class KnowledgeSkillEditForm extends LanguageSkillEditForm_1.LanguageSkillEditForm {
     constructor(actor, skillId, category, options) {
         super(actor, skillId, options);
         this.category = category;
@@ -2876,12 +2935,12 @@ class KnowledgeSkillEditForm extends language_skill_edit_1.LanguageSkillEditForm
 }
 exports.KnowledgeSkillEditForm = KnowledgeSkillEditForm;
 
-},{"./language-skill-edit":7}],7:[function(require,module,exports){
+},{"./LanguageSkillEditForm":7}],7:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LanguageSkillEditForm = void 0;
-const skill_edit_1 = require("./skill-edit");
-class LanguageSkillEditForm extends skill_edit_1.SkillEditForm {
+const SkillEditForm_1 = require("./SkillEditForm");
+class LanguageSkillEditForm extends SkillEditForm_1.SkillEditForm {
     _updateString() {
         return `data.skills.language.value.${this.skillId}`;
     }
@@ -2900,7 +2959,7 @@ class LanguageSkillEditForm extends skill_edit_1.SkillEditForm {
 }
 exports.LanguageSkillEditForm = LanguageSkillEditForm;
 
-},{"./skill-edit":8}],8:[function(require,module,exports){
+},{"./SkillEditForm":8}],8:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -2936,59 +2995,118 @@ class SkillEditForm extends BaseEntitySheet {
     }
     get title() {
         const data = this.getData().data;
-        return `Edit Skill - ${(data === null || data === void 0 ? void 0 : data.label) ? game.i18n.localize(data.label) : ''}`;
+        return `${game.i18n.localize('SR5.EditSkill')} - ${(data === null || data === void 0 ? void 0 : data.label) ? game.i18n.localize(data.label) : ''}`;
     }
     _onUpdateObject(event, formData, updateData) {
+        // get base value
         const base = formData['data.base'];
-        const regex = /data\.specs\.(\d+)/;
+        // process specializations
+        const specsRegex = /data\.specs\.(\d+)/;
         const specs = Object.entries(formData).reduce((running, [key, val]) => {
-            const found = key.match(regex);
+            const found = key.match(specsRegex);
             if (found && found[0]) {
                 running.push(val);
             }
             return running;
         }, []);
+        // process bonuses
+        const bonusKeyRegex = /data\.bonus\.(\d+).key/;
+        const bonusValueRegex = /data\.bonus\.(\d+).value/;
+        const bonus = Object.entries(formData).reduce((running, [key, value]) => {
+            const foundKey = key.match(bonusKeyRegex);
+            const foundVal = key.match(bonusValueRegex);
+            if (foundKey && foundKey[0] && foundKey[1]) {
+                const index = foundKey[1];
+                if (running[index] === undefined)
+                    running[index] = {};
+                running[index].key = value;
+            }
+            else if (foundVal && foundVal[0] && foundVal[1]) {
+                const index = foundVal[1];
+                if (running[index] === undefined)
+                    running[index] = {};
+                running[index].value = value;
+            }
+            return running;
+        }, []);
         const currentData = updateData[this._updateString()] || {};
         updateData[this._updateString()] = Object.assign(Object.assign({}, currentData), { base,
-            specs });
+            specs,
+            bonus });
     }
     /** @override */
     _updateObject(event, formData) {
         return __awaiter(this, void 0, void 0, function* () {
             const updateData = {};
             this._onUpdateObject(event, formData, updateData);
-            this.entity.update(updateData);
+            console.log(formData);
+            yield this.entity.update(updateData);
         });
     }
     activateListeners(html) {
         super.activateListeners(html);
-        html.find('.add-spec').click(this._addNewSpec.bind(this));
-        html.find('.remove-spec').click(this._removeSpec.bind(this));
+        $(html).find('.add-spec').on('click', this._addNewSpec.bind(this));
+        $(html).find('.remove-spec').on('click', this._removeSpec.bind(this));
+        $(html).find('.add-bonus').on('click', this._addNewBonus.bind(this));
+        $(html).find('.remove-bonus').on('click', this._removeBonus.bind(this));
+    }
+    _addNewBonus(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const updateData = {};
+            const data = this.getData().data;
+            if (!data)
+                return;
+            const { bonus = [] } = data;
+            // add blank line for new bonus
+            updateData[`${this._updateString()}.bonus`] = [...bonus, { key: '', value: 0 }];
+            yield this.entity.update(updateData);
+        });
+    }
+    _removeBonus(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const updateData = {};
+            const data = this.getData().data;
+            if (data === null || data === void 0 ? void 0 : data.bonus) {
+                const { bonus } = data;
+                const index = event.currentTarget.dataset.spec;
+                if (index >= 0) {
+                    bonus.splice(index, 1);
+                    updateData[`${this._updateString()}.bonus`] = bonus;
+                    yield this.entity.update(updateData);
+                }
+            }
+        });
     }
     _addNewSpec(event) {
-        event.preventDefault();
-        const updateData = {};
-        const data = this.getData().data;
-        if (data === null || data === void 0 ? void 0 : data.specs) {
-            // add a blank line to specs
-            const { specs } = data;
-            updateData[`${this._updateString()}.specs`] = [...specs, ''];
-        }
-        this.entity.update(updateData);
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const updateData = {};
+            const data = this.getData().data;
+            if (data === null || data === void 0 ? void 0 : data.specs) {
+                // add a blank line to specs
+                const { specs } = data;
+                updateData[`${this._updateString()}.specs`] = [...specs, ''];
+            }
+            yield this.entity.update(updateData);
+        });
     }
     _removeSpec(event) {
-        event.preventDefault();
-        const updateData = {};
-        const data = this.getData().data;
-        if (data === null || data === void 0 ? void 0 : data.specs) {
-            const { specs } = data;
-            const index = event.currentTarget.dataset.spec;
-            if (index >= 0) {
-                specs.splice(index, 1);
-                updateData[`${this._updateString()}.specs`] = specs;
-                this.entity.update(updateData);
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const updateData = {};
+            const data = this.getData().data;
+            if (data === null || data === void 0 ? void 0 : data.specs) {
+                const { specs } = data;
+                const index = event.currentTarget.dataset.spec;
+                if (index >= 0) {
+                    specs.splice(index, 1);
+                    updateData[`${this._updateString()}.specs`] = specs;
+                    yield this.entity.update(updateData);
+                }
             }
-        }
+        });
     }
     getData() {
         const data = super.getData();
@@ -3057,9 +3175,9 @@ exports.createChatData = (templateData, roll) => __awaiter(void 0, void 0, void 
     const actor = templateData.actor;
     const chatData = {
         user: game.user._id,
-        type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+        type: roll ? CONST.CHAT_MESSAGE_TYPES.ROLL : CONST.CHAT_MESSAGE_TYPES.OTHER,
         content: html,
-        roll,
+        roll: roll ? JSON.stringify(roll) : undefined,
         speaker: {
             actor: actor === null || actor === void 0 ? void 0 : actor._id,
             token: actor === null || actor === void 0 ? void 0 : actor.token,
@@ -3081,10 +3199,10 @@ exports.createChatData = (templateData, roll) => __awaiter(void 0, void 0, void 
         chatData['blind'] = true;
     return chatData;
 });
-exports.addChatMessageContextOptions = function (html, options) {
+exports.addChatMessageContextOptions = (html, options) => {
     const canRoll = (li) => {
         const msg = game.messages.get(li.data().messageId);
-        msg.getFlag('shadowrun5e', 'customRoll');
+        return msg.getFlag('shadowrun5e', 'customRoll');
     };
     options.push({
         name: 'Push the Limit',
@@ -3485,6 +3603,38 @@ exports.SR5['kbmod'] = {
     EDGE: 'altKey',
     SPEC: 'ctrlKey',
 };
+exports.SR5['actorModifiers'] = {
+    soak: 'SR5.RollSoak',
+    drain: 'SR5.Drain',
+    armor: 'SR5.Armor',
+    physical_limit: 'SR5.PhysicalLimit',
+    social_limit: 'SR5.SocialLimit',
+    mental_limit: 'SR5.MentalLimit',
+    stun_track: 'SR5.StunTrack',
+    physical_track: 'SR5.PhysicalTrack',
+    meat_initiative: 'SR5.MeatSpaceInit',
+    meat_initiative_dice: 'SR5.MeatSpaceDice',
+    astral_initiative: 'SR5.AstralInit',
+    astral_initiative_dice: 'SR5.AstralDice',
+    matrix_initiative: 'SR5.MatrixInit',
+    matrix_initiative_dice: 'SR5.MatrixDice',
+    composure: 'SR5.RollComposure',
+    lift_carry: 'SR5.RollLiftCarry',
+    judge_intentions: 'SR5.RollJudgeIntentions',
+    memory: 'SR5.RollMemory',
+    walk: 'SR5.Walk',
+    run: 'SR5.Run',
+    defense: 'SR5.RollDefense',
+    wound_tolerance: 'SR5.WoundTolerance',
+    essence: 'SR5.AttrEssence',
+    fade: 'SR5.RollFade',
+    global: 'SR5.Global',
+};
+exports.SR5['programTypes'] = {
+    common_program: 'SR5.CommonProgram',
+    hacking_program: 'SR5.HackingProgram',
+    agent: 'SR5.Agent',
+};
 
 },{}],13:[function(require,module,exports){
 "use strict";
@@ -3528,6 +3678,7 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/templates/item/parts/lifestyle.html',
         'systems/shadowrun5e/templates/item/parts/ammo.html',
         'systems/shadowrun5e/templates/item/parts/modification.html',
+        'systems/shadowrun5e/templates/item/parts/program.html',
         'systems/shadowrun5e/templates/rolls/parts/parts-list.html',
     ];
     return loadTemplates(templatePaths);
@@ -3947,6 +4098,9 @@ exports.ChatData = {
                 props.push(`Radiation ${data.armor.radiation}`);
         }
     },
+    program: (data, labels, props) => {
+        props.push(game.i18n.localize(CONFIG.SR5.programTypes[data.type]));
+    },
     complex_form: (data, labels, props) => {
         exports.ChatData.action(data, labels, props);
         props.push(helpers_1.Helpers.label(data.target), helpers_1.Helpers.label(data.duration));
@@ -4213,7 +4367,12 @@ class SR5Item extends Item {
         const equippedMods = this.getEquippedMods();
         const equippedAmmo = this.getEquippedAmmo();
         const { technology, range, action } = item.data;
-        if (technology === null || technology === void 0 ? void 0 : technology.conceal) {
+        if (technology) {
+            if (!technology.condition_monitor)
+                technology.condition_monitor = { value: 0 };
+            technology.condition_monitor.max = 8 + Math.ceil(technology.rating / 2);
+            if (!technology.conceal)
+                technology.conceal = {};
             technology.conceal.mod = {};
             equippedMods.forEach((mod) => {
                 if ((technology === null || technology === void 0 ? void 0 : technology.conceal) && mod.data.data.technology.conceal.value) {
@@ -4238,9 +4397,9 @@ class SR5Item extends Item {
             });
             if (equippedAmmo) {
                 // add mods to damage from ammo
-                action.damage.mod[`SR5.Ammo ${equippedAmmo.name}`] = equippedAmmo.data.data.damage;
+                action.damage.mod[`${equippedAmmo.name}`] = equippedAmmo.data.data.damage;
                 // add mods to ap from ammo
-                action.damage.ap.mod[`SR5.Ammo ${equippedAmmo.name}`] = equippedAmmo.data.data.ap;
+                action.damage.ap.mod[`${equippedAmmo.name}`] = equippedAmmo.data.data.ap;
                 // override element
                 if (equippedAmmo.data.data.element) {
                     action.damage.element.value = equippedAmmo.data.data.element;
@@ -4287,9 +4446,6 @@ class SR5Item extends Item {
                     range.rc.value = range.rc.base + helpers_1.Helpers.totalMods(range.rc.mod);
             }
         }
-        if (item.data.condition_monitor) {
-            item.data.condition_monitor.max = 8 + Math.ceil(item.data.technology.rating / 2);
-        }
         if (item.type === 'adept_power') {
             item.data.type = ((_a = item.data.action) === null || _a === void 0 ? void 0 : _a.type) ? 'active' : 'passive';
         }
@@ -4304,20 +4460,22 @@ class SR5Item extends Item {
             const postOnly = (event === null || event === void 0 ? void 0 : event.shiftKey) || !this.hasRoll;
             const post = (bonus = {}) => {
                 // if only post, don't roll and post a card version -- otherwise roll
-                const onComplete = postOnly ? () => {
-                    const { token } = this.actor;
-                    const attack = this.getAttackData(0);
-                    // don't include any hits
-                    attack === null || attack === void 0 ? true : delete attack.hits;
-                    // generate chat data
-                    chat_1.createChatData(Object.assign({ header: {
-                            name: this.name,
-                            img: this.img,
-                        }, testName: this.getRollName(), actor: this.actor, tokenId: token ? `${token.scene._id}.${token.id}` : undefined, description: this.getChatData(), item: this, previewTemplate: this.hasTemplate, attack }, bonus)).then((chatData) => {
-                        // create the message
-                        return ChatMessage.create(chatData, { displaySheet: false });
-                    });
-                } : () => this.rollTest(event);
+                const onComplete = postOnly
+                    ? () => {
+                        const { token } = this.actor;
+                        const attack = this.getAttackData(0);
+                        // don't include any hits
+                        attack === null || attack === void 0 ? true : delete attack.hits;
+                        // generate chat data
+                        chat_1.createChatData(Object.assign({ header: {
+                                name: this.name,
+                                img: this.img,
+                            }, testName: this.getRollName(), actor: this.actor, tokenId: token ? `${token.scene._id}.${token.id}` : undefined, description: this.getChatData(), item: this, previewTemplate: this.hasTemplate, attack }, bonus)).then((chatData) => {
+                            // create the message
+                            return ChatMessage.create(chatData, { displaySheet: false });
+                        });
+                    }
+                    : () => this.rollTest(event);
                 if (!postOnly && this.hasTemplate) {
                     // onComplete is called when template is finished
                     const template = template_1.default.fromItem(this, onComplete);
@@ -4338,7 +4496,7 @@ class SR5Item extends Item {
                 dialogData.close = (html) => __awaiter(this, void 0, void 0, function* () {
                     if (oldClose) {
                         // the oldClose we put on the dialog will return a boolean
-                        const ret = yield oldClose(html);
+                        const ret = (yield oldClose(html));
                         if (!ret)
                             return;
                     }
@@ -4793,6 +4951,10 @@ class SR5Item extends Item {
     isMeleeWeapon() {
         return this.data.type === 'weapon' && this.data.data.category === 'melee';
     }
+    isEquipped() {
+        var _a;
+        return ((_a = this.data.data.technology) === null || _a === void 0 ? void 0 : _a.equipped) || false;
+    }
     getAttackData(hits) {
         var _a;
         if (!((_a = this.data.data.action) === null || _a === void 0 ? void 0 : _a.damage))
@@ -5109,7 +5271,7 @@ class SR5ItemSheet extends ItemSheet {
         html.find('.mod-equip').click(this._onWeaponModEquip.bind(this));
         html.find('.mod-delete').click(this._onWeaponModRemove.bind(this));
         html.find('.add-new-license').click(this._onAddLicense.bind(this));
-        // html.find('.remove-license').click(this._onRemoveLicense.bind(this));
+        html.find('.license-delete').on('click', this._onRemoveLicense.bind(this));
         html.find('.has-desc').click((event) => {
             event.preventDefault();
             const item = $(event.currentTarget).parents('.item');
@@ -5190,6 +5352,14 @@ class SR5ItemSheet extends ItemSheet {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
             this.item.addNewLicense();
+        });
+    }
+    _onRemoveLicense(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const index = event.currentTarget.dataset.index;
+            if (index >= 0)
+                this.item.removeLicense(index);
         });
     }
     _onWeaponModRemove(event) {
@@ -5336,7 +5506,7 @@ Hooks.once('init', function () {
         Hooks.on(s, (app, html) => helpers_1.Helpers.setupCustomCheckbox(app, html));
     });
     handlebars_1.preloadHandlebarsTemplates();
-    // CONFIG.debug.hooks = true;
+    CONFIG.debug.hooks = true;
 });
 Hooks.on('canvasInit', function () {
     // this does actually exist. Fix in types?
@@ -5362,6 +5532,9 @@ Hooks.on('ready', function () {
             migrations.migrateWorld();
         }
     }
+    // add listener to d20 icon for rolling
+    const diceIconSelector = '#chat-controls .roll-type-select .fa-dice-d20';
+    $(document).on('click', diceIconSelector, () => ShadowrunRoller_1.ShadowrunRoller.promptRoll());
 });
 Hooks.on('preUpdateCombat', combat_1.preCombatUpdate);
 Hooks.on('renderChatMessage', (app, html) => {
@@ -5817,6 +5990,11 @@ exports.ShadowrunRoller = exports.ShadowrunRoll = void 0;
 const helpers_1 = require("../helpers");
 const chat_1 = require("../chat");
 class ShadowrunRoll extends Roll {
+    toJSON() {
+        const data = super.toJSON();
+        data.class = "Roll";
+        return data;
+    }
 }
 exports.ShadowrunRoll = ShadowrunRoll;
 class ShadowrunRoller {
@@ -5867,7 +6045,7 @@ class ShadowrunRoller {
         return formula;
     }
     static basicRoll(_a) {
-        var { parts, limit, explodeSixes, title, actor, img = actor === null || actor === void 0 ? void 0 : actor.img, name = actor === null || actor === void 0 ? void 0 : actor.name, hideRollMessage } = _a, props = __rest(_a, ["parts", "limit", "explodeSixes", "title", "actor", "img", "name", "hideRollMessage"]);
+        var { parts = {}, limit, explodeSixes, title, actor, img = actor === null || actor === void 0 ? void 0 : actor.img, name = actor === null || actor === void 0 ? void 0 : actor.name, hideRollMessage } = _a, props = __rest(_a, ["parts", "limit", "explodeSixes", "title", "actor", "img", "name", "hideRollMessage"]);
         return __awaiter(this, void 0, void 0, function* () {
             let roll;
             const rollMode = game.settings.get('core', 'rollMode');
@@ -5896,15 +6074,32 @@ class ShadowrunRoller {
             roll.templateData = templateData;
             if (!hideRollMessage) {
                 const chatData = yield chat_1.createChatData(templateData, roll);
-                yield ChatMessage.create(chatData, { displaySheet: false });
+                ChatMessage.create(chatData, { displaySheet: false }).then(message => {
+                    console.log(message);
+                });
             }
             return roll;
         });
     }
+    /**
+     * Prompt a roll for the user
+     */
+    static promptRoll() {
+        const lastRoll = game.user.getFlag('shadowrun5e', 'lastRollPromptValue') || 0;
+        const parts = {
+            'SR5.LastRoll': lastRoll,
+        };
+        return ShadowrunRoller.advancedRoll({ parts, dialogOptions: { prompt: true } });
+    }
+    /**
+     * Start an advanced roll
+     * - Prompts the user for modifiers
+     * @param props
+     */
     static advancedRoll(props) {
         // destructure what we need to use from props
         // any value pulled out needs to be updated back in props if changed
-        const { title, actor, parts, limit, extended, wounds = true, after, dialogOptions } = props;
+        const { title, actor, parts = {}, limit, extended, wounds = true, after, dialogOptions, } = props;
         // remove limits if game settings is set
         if (!game.settings.get('shadowrun5e', 'applyLimits')) {
             delete props.limit;
@@ -5950,6 +6145,14 @@ class ShadowrunRoller {
                         if (cancel)
                             return;
                         // get the actual dice_pool from the difference of initial parts and value in the dialog
+                        const dicePoolValue = helpers_1.Helpers.parseInputToNumber($(html).find('[name="dice_pool"]').val());
+                        if ((dialogOptions === null || dialogOptions === void 0 ? void 0 : dialogOptions.prompt) && dicePoolValue > 0) {
+                            for (const key in parts) {
+                                delete parts[key];
+                            }
+                            game.user.setFlag('shadowrun5e', 'lastRollPromptValue', dicePoolValue);
+                            parts['SR5.Base'] = dicePoolValue;
+                        }
                         const limitValue = helpers_1.Helpers.parseInputToNumber($(html).find('[name="limit"]').val());
                         if (limit && limit.value !== limitValue) {
                             limit.value = limitValue;

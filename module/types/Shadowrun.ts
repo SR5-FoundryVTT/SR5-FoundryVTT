@@ -69,4 +69,13 @@ declare namespace Shadowrun {
     export type LabelField = {
         label?: string;
     };
+
+    export type HasBonus = {
+        bonus: KeyValuePair[];
+    }
+
+    type KeyValuePair = {
+        key: string;
+        value: number;
+    };
 }

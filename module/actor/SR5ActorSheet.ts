@@ -1,8 +1,8 @@
 import { Helpers } from '../helpers';
 import { ChummerImportForm } from '../apps/chummer-import-form';
-import { SkillEditForm } from '../apps/skill-edit';
-import { KnowledgeSkillEditForm } from '../apps/knowledge-skill-edit';
-import { LanguageSkillEditForm } from '../apps/language-skill-edit';
+import { SkillEditForm } from '../apps/skills/SkillEditForm';
+import { KnowledgeSkillEditForm } from '../apps/skills/KnowledgeSkillEditForm';
+import { LanguageSkillEditForm } from '../apps/skills/LanguageSkillEditForm';
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import Skills = Shadowrun.Skills;
@@ -142,39 +142,42 @@ export class SR5ActorSheet extends ActorSheet {
     _prepareItems(data) {
         const inventory = {
             weapon: {
-                label: game.i18n.localize('weapon'),
+                label: game.i18n.localize('SR5.Weapon'),
                 items: [],
                 dataset: {
                     type: 'weapon',
                 },
             },
             armor: {
-                label: game.i18n.localize('armor'),
+                label: game.i18n.localize('SR5.Armor'),
                 items: [],
                 dataset: {
                     type: 'armor',
                 },
             },
             device: {
-                label: game.i18n.localize('device'),
+                label: game.i18n.localize('SR5.Device'),
                 items: [],
                 dataset: {
                     type: 'device',
                 },
             },
             equipment: {
-                label: game.i18n.localize('equipment'),
+                label: game.i18n.localize('SR5.Equipment'),
                 items: [],
                 dataset: {
                     type: 'equipment',
                 },
             },
             cyberware: {
-                label: game.i18n.localize('cyberware'),
+                label: game.i18n.localize('SR5.Cyberware'),
                 items: [],
                 dataset: {
                     type: 'cyberware',
                 },
+            },
+            programs: {
+                label: game.i18n.localize('SR5.Program'),
             },
         };
 
@@ -188,6 +191,7 @@ export class SR5ActorSheet extends ActorSheet {
             lifestyles,
             contacts,
             sins,
+            programs,
         ] = data.items.reduce(
             (arr, item) => {
                 item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
@@ -199,10 +203,11 @@ export class SR5ActorSheet extends ActorSheet {
                 else if (item.type === 'lifestyle') arr[6].push(item);
                 else if (item.type === 'contact') arr[7].push(item);
                 else if (item.type === 'sin') arr[8].push(item);
+                else if (item.type === 'program') arr[9].push(item);
                 else if (Object.keys(inventory).includes(item.type)) arr[0].push(item);
                 return arr;
             },
-            [[], [], [], [], [], [], [], [], []]
+            [[], [], [], [], [], [], [], [], [], []]
         );
 
         const sortByName = (i1, i2) => {
@@ -218,6 +223,15 @@ export class SR5ActorSheet extends ActorSheet {
         contacts.sort(sortByName);
         lifestyles.sort(sortByName);
         sins.sort(sortByName);
+        programs.sort((left, right) => {
+            const leftEquipped = left.data?.technology?.equipped;
+            const rightEquipped = right.data?.technology?.equipped;
+            if (leftEquipped && !rightEquipped) return -1;
+            if (rightEquipped && !leftEquipped) return 1;
+            if (left.name > right.name) return 1;
+            if (left.name < right.name) return -1;
+            return 0;
+        });
 
         items.forEach((item) => {
             inventory[item.type].items.push(item);
@@ -233,6 +247,7 @@ export class SR5ActorSheet extends ActorSheet {
         data.lifestyles = lifestyles;
         data.contacts = contacts;
         data.sins = sins;
+        data.programs = programs;
 
         qualities.sort((a, b) => {
             if (a.data.type === 'positive' && b.data.type === 'negative') return -1;
@@ -246,7 +261,7 @@ export class SR5ActorSheet extends ActorSheet {
 
     /**
      * Activate event listeners using the prepared sheet HTML
-     * @param html {HTML}   The prepared HTML object ready to be rendered into the DOM
+     * @param html The prepared HTML object ready to be rendered into the DOM
      */
     activateListeners(html) {
         super.activateListeners(html);
@@ -301,6 +316,20 @@ export class SR5ActorSheet extends ActorSheet {
         html.find('.skill-edit').click(this._onShowEditSkill.bind(this));
         html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
         html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
+        html.find('.matrix-condition-value').on('change', async (event) => {
+            event.preventDefault();
+            console.log(event);
+            const value = Helpers.parseInputToNumber(event.currentTarget.value);
+            console.log(value);
+            const matrixDevice = this.actor.getMatrixDevice();
+            console.log(matrixDevice);
+            if (matrixDevice && !isNaN(value)) {
+                console.log(matrixDevice);
+                const updateData = {};
+                updateData['data.technology.condition_monitor.value'] = value;
+                await matrixDevice.update(updateData);
+            }
+        });
 
         // Update Inventory Item
         html.find('.item-edit').click((event) => {
@@ -380,7 +409,7 @@ export class SR5ActorSheet extends ActorSheet {
             data: duplicate(header.dataset),
         };
         delete itemData.data['type'];
-        return this.actor.createOwnedItem(itemData);
+        return this.actor.createOwnedItem(itemData, { renderSheet: true });
     }
 
     async _onAddLanguageSkill(event) {
