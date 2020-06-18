@@ -78,8 +78,12 @@ export class SR5Actor extends Actor {
             'mental_limit',
             'stun_track',
             'physical_track',
-            'initiative',
-            'initiative_dice',
+            'meat_initiative',
+            'meat_initiative_dice',
+            'astral_initiative',
+            'astral_initiative_dice',
+            'matrix_initiative',
+            'matrix_initiative_dice',
             'composure',
             'lift_carry',
             'judge_intentions',
@@ -335,23 +339,27 @@ export class SR5Actor extends Actor {
 
         // INITIATIVE
         const init = data.initiative;
-        init.meatspace.base.base = attributes.intuition.value + attributes.reaction.value;
-        init.meatspace.dice.base = 1;
-        init.astral.base.base = attributes.intuition.value * 2;
-        init.astral.dice.base = 2;
-        init.matrix.base.base = attributes.intuition.value + data.matrix.data_processing.value;
-        init.matrix.dice.base = data.matrix.hot_sim ? 4 : 3;
+        init.meatspace.base.base =
+            attributes.intuition.value + attributes.reaction.value + modifiers['meat_initiative'];
+        init.meatspace.dice.base = 1 + modifiers['meat_initiative_dice'];
+        init.astral.base.base = attributes.intuition.value * 2 + modifiers['astral_initiative'];
+        init.astral.dice.base = 2 + modifiers['astral_initiative_dice'];
+        init.matrix.base.base =
+            attributes.intuition.value +
+            data.matrix.data_processing.value +
+            modifiers['matrix_initiative'];
+        init.matrix.dice.base = data.matrix.hot_sim ? 4 : 3 + modifiers['matrix_initiative_dice'];
         if (init.perception === 'matrix') init.current = init.matrix;
         else if (init.perception === 'astral') init.current = init.astral;
         else {
             init.current = init.meatspace;
             init.perception = 'meatspace';
         }
-        init.current.dice.value = init.current.dice.base + modifiers['initiative_dice'];
+        init.current.dice.value = init.current.dice.base;
         if (init.edge) init.current.dice.value = 5;
         init.current.dice.value = Math.min(5, init.current.dice.value); // maximum of 5d6 for initiative
         init.current.dice.text = `${init.current.dice.value}d6`;
-        init.current.base.value = init.current.base.base + modifiers['initiative'];
+        init.current.base.value = init.current.base.base;
 
         const soak = attributes.body.value + armor.value + modifiers['soak'];
         const drainAtt = attributes[data.magic.attribute];
@@ -1032,7 +1040,7 @@ export class SR5Actor extends Actor {
         const att = this.data.data.attributes[attId];
         const atts = this.data.data.attributes;
         const parts = {};
-        parts[att.label] = att.value;
+        parts[att.label] = att.label === 'SR5.AttrEdge' ? this.getEdge().max : att.value;
         let dialogData = {
             attribute: att,
             attributes: atts,
@@ -1062,7 +1070,8 @@ export class SR5Actor extends Actor {
                     if (att2Id !== 'none') {
                         att2 = atts[att2Id];
                         if (att2?.label) {
-                            parts[att2.label] = att2.value;
+                            parts[att2.label] =
+                                att2.label === 'SR5.AttrEdge' ? this.getEdge().max : att2.value;
                             const att2IdLabel = game.i18n.localize(CONFIG.SR5.attributes[att2Id]);
                             title += ` + ${att2IdLabel}`;
                         }
@@ -1160,6 +1169,9 @@ export class SR5Actor extends Actor {
                         'data.attributes.edge.value': actor.getEdge().value - 1,
                     });
                 });
+            } else {
+                // @ts-ignore
+                ui.notifications.warn(game.i18n.localize('SR5.SelectTokenMessage'))
             }
         }
     }
@@ -1171,7 +1183,6 @@ export class SR5Actor extends Actor {
         let formula = roll.formula;
         let hits = roll.total;
         let re = /(\d+)d6/;
-        console.log(formula);
         let matches = formula.match(re);
         if (matches && matches[1]) {
             let match = matches[1];
@@ -1205,6 +1216,9 @@ export class SR5Actor extends Actor {
                             'data.attributes.edge.value': actor.getEdge().value - 1,
                         });
                     });
+                } else {
+                    // @ts-ignore
+                    ui.notifications.warn(game.i18n.localize('SR5.SelectTokenMessage'))
                 }
             }
         }

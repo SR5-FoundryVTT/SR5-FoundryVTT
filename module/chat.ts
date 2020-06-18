@@ -33,16 +33,16 @@ export type TemplateData = {
     previewTemplate?: boolean;
 };
 
-export const createChatData = async (templateData: TemplateData, roll?) => {
+export const createChatData = async (templateData: TemplateData, roll?: Roll) => {
     const template = `systems/shadowrun5e/templates/rolls/roll-card.html`;
     const html = await renderTemplate(template, templateData);
     const actor = templateData.actor;
 
     const chatData = {
         user: game.user._id,
-        type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+        type: roll ? CONST.CHAT_MESSAGE_TYPES.ROLL : CONST.CHAT_MESSAGE_TYPES.OTHER,
         content: html,
-        roll,
+        roll: roll ? JSON.stringify(roll) : undefined,
         speaker: {
             actor: actor?._id,
             token: actor?.token,
@@ -66,11 +66,11 @@ export const createChatData = async (templateData: TemplateData, roll?) => {
     return chatData;
 };
 
-export const addChatMessageContextOptions = function (html, options) {
+export const addChatMessageContextOptions = (html, options) => {
     const canRoll = (li) => {
         const msg = game.messages.get(li.data().messageId);
 
-        msg.getFlag('shadowrun5e', 'customRoll');
+        return msg.getFlag('shadowrun5e', 'customRoll');
     };
 
     options.push(

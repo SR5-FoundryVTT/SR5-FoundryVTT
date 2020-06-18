@@ -73,8 +73,12 @@ class SR5Actor extends Actor {
             'mental_limit',
             'stun_track',
             'physical_track',
-            'initiative',
-            'initiative_dice',
+            'meat_initiative',
+            'meat_initiative_dice',
+            'astral_initiative',
+            'astral_initiative_dice',
+            'matrix_initiative',
+            'matrix_initiative_dice',
             'composure',
             'lift_carry',
             'judge_intentions',
@@ -301,12 +305,16 @@ class SR5Actor extends Actor {
         data.recoil_compensation = 1 + Math.ceil(attributes.strength.value / 3);
         // INITIATIVE
         const init = data.initiative;
-        init.meatspace.base.base = attributes.intuition.value + attributes.reaction.value;
-        init.meatspace.dice.base = 1;
-        init.astral.base.base = attributes.intuition.value * 2;
-        init.astral.dice.base = 2;
-        init.matrix.base.base = attributes.intuition.value + data.matrix.data_processing.value;
-        init.matrix.dice.base = data.matrix.hot_sim ? 4 : 3;
+        init.meatspace.base.base =
+            attributes.intuition.value + attributes.reaction.value + modifiers['meat_initiative'];
+        init.meatspace.dice.base = 1 + modifiers['meat_initiative_dice'];
+        init.astral.base.base = attributes.intuition.value * 2 + modifiers['astral_initiative'];
+        init.astral.dice.base = 2 + modifiers['astral_initiative_dice'];
+        init.matrix.base.base =
+            attributes.intuition.value +
+                data.matrix.data_processing.value +
+                modifiers['matrix_initiative'];
+        init.matrix.dice.base = data.matrix.hot_sim ? 4 : 3 + modifiers['matrix_initiative_dice'];
         if (init.perception === 'matrix')
             init.current = init.matrix;
         else if (init.perception === 'astral')
@@ -315,12 +323,12 @@ class SR5Actor extends Actor {
             init.current = init.meatspace;
             init.perception = 'meatspace';
         }
-        init.current.dice.value = init.current.dice.base + modifiers['initiative_dice'];
+        init.current.dice.value = init.current.dice.base;
         if (init.edge)
             init.current.dice.value = 5;
         init.current.dice.value = Math.min(5, init.current.dice.value); // maximum of 5d6 for initiative
         init.current.dice.text = `${init.current.dice.value}d6`;
-        init.current.base.value = init.current.base.base + modifiers['initiative'];
+        init.current.base.value = init.current.base.base;
         const soak = attributes.body.value + armor.value + modifiers['soak'];
         const drainAtt = attributes[data.magic.attribute];
         if (data.magic.drain && !data.magic.drain.mod)
@@ -931,7 +939,7 @@ class SR5Actor extends Actor {
         const att = this.data.data.attributes[attId];
         const atts = this.data.data.attributes;
         const parts = {};
-        parts[att.label] = att.value;
+        parts[att.label] = att.label === 'SR5.AttrEdge' ? this.getEdge().max : att.value;
         let dialogData = {
             attribute: att,
             attributes: atts,
@@ -956,7 +964,8 @@ class SR5Actor extends Actor {
                     if (att2Id !== 'none') {
                         att2 = atts[att2Id];
                         if (att2 === null || att2 === void 0 ? void 0 : att2.label) {
-                            parts[att2.label] = att2.value;
+                            parts[att2.label] =
+                                att2.label === 'SR5.AttrEdge' ? this.getEdge().max : att2.value;
                             const att2IdLabel = game.i18n.localize(CONFIG.SR5.attributes[att2Id]);
                             title += ` + ${att2IdLabel}`;
                         }
@@ -1051,6 +1060,10 @@ class SR5Actor extends Actor {
                         });
                     });
                 }
+                else {
+                    // @ts-ignore
+                    ui.notifications.warn(game.i18n.localize('SR5.SelectTokenMessage'));
+                }
             }
         });
     }
@@ -1063,7 +1076,6 @@ class SR5Actor extends Actor {
             let formula = roll.formula;
             let hits = roll.total;
             let re = /(\d+)d6/;
-            console.log(formula);
             let matches = formula.match(re);
             if (matches && matches[1]) {
                 let match = matches[1];
@@ -1096,6 +1108,10 @@ class SR5Actor extends Actor {
                                 'data.attributes.edge.value': actor.getEdge().value - 1,
                             });
                         });
+                    }
+                    else {
+                        // @ts-ignore
+                        ui.notifications.warn(game.i18n.localize('SR5.SelectTokenMessage'));
                     }
                 }
             }
@@ -1233,42 +1249,45 @@ class SR5ActorSheet extends ActorSheet {
     _prepareItems(data) {
         const inventory = {
             weapon: {
-                label: game.i18n.localize('weapon'),
+                label: game.i18n.localize('SR5.Weapon'),
                 items: [],
                 dataset: {
                     type: 'weapon',
                 },
             },
             armor: {
-                label: game.i18n.localize('armor'),
+                label: game.i18n.localize('SR5.Armor'),
                 items: [],
                 dataset: {
                     type: 'armor',
                 },
             },
             device: {
-                label: game.i18n.localize('device'),
+                label: game.i18n.localize('SR5.Device'),
                 items: [],
                 dataset: {
                     type: 'device',
                 },
             },
             equipment: {
-                label: game.i18n.localize('equipment'),
+                label: game.i18n.localize('SR5.Equipment'),
                 items: [],
                 dataset: {
                     type: 'equipment',
                 },
             },
             cyberware: {
-                label: game.i18n.localize('cyberware'),
+                label: game.i18n.localize('SR5.Cyberware'),
                 items: [],
                 dataset: {
                     type: 'cyberware',
                 },
             },
+            programs: {
+                label: game.i18n.localize('SR5.Program'),
+            },
         };
-        let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins,] = data.items.reduce((arr, item) => {
+        let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs,] = data.items.reduce((arr, item) => {
             item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
             if (item.type === 'spell')
                 arr[1].push(item);
@@ -1286,10 +1305,12 @@ class SR5ActorSheet extends ActorSheet {
                 arr[7].push(item);
             else if (item.type === 'sin')
                 arr[8].push(item);
+            else if (item.type === 'program')
+                arr[9].push(item);
             else if (Object.keys(inventory).includes(item.type))
                 arr[0].push(item);
             return arr;
-        }, [[], [], [], [], [], [], [], [], []]);
+        }, [[], [], [], [], [], [], [], [], [], []]);
         const sortByName = (i1, i2) => {
             if (i1.name > i2.name)
                 return 1;
@@ -1305,6 +1326,20 @@ class SR5ActorSheet extends ActorSheet {
         contacts.sort(sortByName);
         lifestyles.sort(sortByName);
         sins.sort(sortByName);
+        programs.sort((left, right) => {
+            var _a, _b, _c, _d;
+            const leftEquipped = (_b = (_a = left.data) === null || _a === void 0 ? void 0 : _a.technology) === null || _b === void 0 ? void 0 : _b.equipped;
+            const rightEquipped = (_d = (_c = right.data) === null || _c === void 0 ? void 0 : _c.technology) === null || _d === void 0 ? void 0 : _d.equipped;
+            if (leftEquipped && !rightEquipped)
+                return -1;
+            if (rightEquipped && !leftEquipped)
+                return 1;
+            if (left.name > right.name)
+                return 1;
+            if (left.name < right.name)
+                return -1;
+            return 0;
+        });
         items.forEach((item) => {
             inventory[item.type].items.push(item);
         });
@@ -1318,6 +1353,7 @@ class SR5ActorSheet extends ActorSheet {
         data.lifestyles = lifestyles;
         data.contacts = contacts;
         data.sins = sins;
+        data.programs = programs;
         qualities.sort((a, b) => {
             if (a.data.type === 'positive' && b.data.type === 'negative')
                 return -1;
@@ -3139,9 +3175,9 @@ exports.createChatData = (templateData, roll) => __awaiter(void 0, void 0, void 
     const actor = templateData.actor;
     const chatData = {
         user: game.user._id,
-        type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+        type: roll ? CONST.CHAT_MESSAGE_TYPES.ROLL : CONST.CHAT_MESSAGE_TYPES.OTHER,
         content: html,
-        roll,
+        roll: roll ? JSON.stringify(roll) : undefined,
         speaker: {
             actor: actor === null || actor === void 0 ? void 0 : actor._id,
             token: actor === null || actor === void 0 ? void 0 : actor.token,
@@ -3163,10 +3199,10 @@ exports.createChatData = (templateData, roll) => __awaiter(void 0, void 0, void 
         chatData['blind'] = true;
     return chatData;
 });
-exports.addChatMessageContextOptions = function (html, options) {
+exports.addChatMessageContextOptions = (html, options) => {
     const canRoll = (li) => {
         const msg = game.messages.get(li.data().messageId);
-        msg.getFlag('shadowrun5e', 'customRoll');
+        return msg.getFlag('shadowrun5e', 'customRoll');
     };
     options.push({
         name: 'Push the Limit',
@@ -3567,6 +3603,38 @@ exports.SR5['kbmod'] = {
     EDGE: 'altKey',
     SPEC: 'ctrlKey',
 };
+exports.SR5['actorModifiers'] = {
+    soak: 'SR5.RollSoak',
+    drain: 'SR5.Drain',
+    armor: 'SR5.Armor',
+    physical_limit: 'SR5.PhysicalLimit',
+    social_limit: 'SR5.SocialLimit',
+    mental_limit: 'SR5.MentalLimit',
+    stun_track: 'SR5.StunTrack',
+    physical_track: 'SR5.PhysicalTrack',
+    meat_initiative: 'SR5.MeatSpaceInit',
+    meat_initiative_dice: 'SR5.MeatSpaceDice',
+    astral_initiative: 'SR5.AstralInit',
+    astral_initiative_dice: 'SR5.AstralDice',
+    matrix_initiative: 'SR5.MatrixInit',
+    matrix_initiative_dice: 'SR5.MatrixDice',
+    composure: 'SR5.RollComposure',
+    lift_carry: 'SR5.RollLiftCarry',
+    judge_intentions: 'SR5.RollJudgeIntentions',
+    memory: 'SR5.RollMemory',
+    walk: 'SR5.Walk',
+    run: 'SR5.Run',
+    defense: 'SR5.RollDefense',
+    wound_tolerance: 'SR5.WoundTolerance',
+    essence: 'SR5.AttrEssence',
+    fade: 'SR5.RollFade',
+    global: 'SR5.Global',
+};
+exports.SR5['programTypes'] = {
+    common_program: 'SR5.CommonProgram',
+    hacking_program: 'SR5.HackingProgram',
+    agent: 'SR5.Agent',
+};
 
 },{}],13:[function(require,module,exports){
 "use strict";
@@ -3610,6 +3678,7 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/templates/item/parts/lifestyle.html',
         'systems/shadowrun5e/templates/item/parts/ammo.html',
         'systems/shadowrun5e/templates/item/parts/modification.html',
+        'systems/shadowrun5e/templates/item/parts/program.html',
         'systems/shadowrun5e/templates/rolls/parts/parts-list.html',
     ];
     return loadTemplates(templatePaths);
@@ -4028,6 +4097,9 @@ exports.ChatData = {
             if (data.armor.radiation)
                 props.push(`Radiation ${data.armor.radiation}`);
         }
+    },
+    program: (data, labels, props) => {
+        props.push(game.i18n.localize(CONFIG.SR5.programTypes[data.type]));
     },
     complex_form: (data, labels, props) => {
         exports.ChatData.action(data, labels, props);
@@ -4879,6 +4951,10 @@ class SR5Item extends Item {
     isMeleeWeapon() {
         return this.data.type === 'weapon' && this.data.data.category === 'melee';
     }
+    isEquipped() {
+        var _a;
+        return ((_a = this.data.data.technology) === null || _a === void 0 ? void 0 : _a.equipped) || false;
+    }
     getAttackData(hits) {
         var _a;
         if (!((_a = this.data.data.action) === null || _a === void 0 ? void 0 : _a.damage))
@@ -5445,7 +5521,20 @@ Hooks.on('ready', function () {
             combat_1.shadowrunCombatUpdate(data.gmCombatUpdate.changes, data.gmCombatUpdate.options);
         }
     });
-    Migrator_1.Migrator.BeginMigration();
+    if (game.user.isGM) {
+        // Determine whether a system migration is required and feasible
+        const currentVersion = game.settings.get('shadowrun5e', 'systemMigrationVersion');
+        // the latest version that requires migration
+        const NEEDS_MIGRATION_VERSION = '0.5.12';
+        let needMigration = currentVersion === null || compareVersion(currentVersion, NEEDS_MIGRATION_VERSION) < 0;
+        // Perform the migration
+        if (needMigration && game.user.isGM) {
+            migrations.migrateWorld();
+        }
+    }
+    // add listener to d20 icon for rolling
+    const diceIconSelector = '#chat-controls .roll-type-select .fa-dice-d20';
+    $(document).on('click', diceIconSelector, () => ShadowrunRoller_1.ShadowrunRoller.promptRoll());
 });
 Hooks.on('preUpdateCombat', combat_1.preCombatUpdate);
 Hooks.on('renderChatMessage', (app, html) => {
@@ -6172,6 +6261,11 @@ exports.ShadowrunRoller = exports.ShadowrunRoll = void 0;
 const helpers_1 = require("../helpers");
 const chat_1 = require("../chat");
 class ShadowrunRoll extends Roll {
+    toJSON() {
+        const data = super.toJSON();
+        data.class = "Roll";
+        return data;
+    }
 }
 exports.ShadowrunRoll = ShadowrunRoll;
 class ShadowrunRoller {
@@ -6222,7 +6316,7 @@ class ShadowrunRoller {
         return formula;
     }
     static basicRoll(_a) {
-        var { parts, limit, explodeSixes, title, actor, img = actor === null || actor === void 0 ? void 0 : actor.img, name = actor === null || actor === void 0 ? void 0 : actor.name, hideRollMessage } = _a, props = __rest(_a, ["parts", "limit", "explodeSixes", "title", "actor", "img", "name", "hideRollMessage"]);
+        var { parts = {}, limit, explodeSixes, title, actor, img = actor === null || actor === void 0 ? void 0 : actor.img, name = actor === null || actor === void 0 ? void 0 : actor.name, hideRollMessage } = _a, props = __rest(_a, ["parts", "limit", "explodeSixes", "title", "actor", "img", "name", "hideRollMessage"]);
         return __awaiter(this, void 0, void 0, function* () {
             let roll;
             const rollMode = game.settings.get('core', 'rollMode');
@@ -6251,15 +6345,32 @@ class ShadowrunRoller {
             roll.templateData = templateData;
             if (!hideRollMessage) {
                 const chatData = yield chat_1.createChatData(templateData, roll);
-                yield ChatMessage.create(chatData, { displaySheet: false });
+                ChatMessage.create(chatData, { displaySheet: false }).then(message => {
+                    console.log(message);
+                });
             }
             return roll;
         });
     }
+    /**
+     * Prompt a roll for the user
+     */
+    static promptRoll() {
+        const lastRoll = game.user.getFlag('shadowrun5e', 'lastRollPromptValue') || 0;
+        const parts = {
+            'SR5.LastRoll': lastRoll,
+        };
+        return ShadowrunRoller.advancedRoll({ parts, dialogOptions: { prompt: true } });
+    }
+    /**
+     * Start an advanced roll
+     * - Prompts the user for modifiers
+     * @param props
+     */
     static advancedRoll(props) {
         // destructure what we need to use from props
         // any value pulled out needs to be updated back in props if changed
-        const { title, actor, parts, limit, extended, wounds = true, after, dialogOptions } = props;
+        const { title, actor, parts = {}, limit, extended, wounds = true, after, dialogOptions, } = props;
         // remove limits if game settings is set
         if (!game.settings.get('shadowrun5e', 'applyLimits')) {
             delete props.limit;
@@ -6305,6 +6416,14 @@ class ShadowrunRoller {
                         if (cancel)
                             return;
                         // get the actual dice_pool from the difference of initial parts and value in the dialog
+                        const dicePoolValue = helpers_1.Helpers.parseInputToNumber($(html).find('[name="dice_pool"]').val());
+                        if ((dialogOptions === null || dialogOptions === void 0 ? void 0 : dialogOptions.prompt) && dicePoolValue > 0) {
+                            for (const key in parts) {
+                                delete parts[key];
+                            }
+                            game.user.setFlag('shadowrun5e', 'lastRollPromptValue', dicePoolValue);
+                            parts['SR5.Base'] = dicePoolValue;
+                        }
                         const limitValue = helpers_1.Helpers.parseInputToNumber($(html).find('[name="limit"]').val());
                         if (limit && limit.value !== limitValue) {
                             limit.value = limitValue;

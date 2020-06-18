@@ -8,16 +8,49 @@ export class LegacyMigration extends VersionMigration {
         return '0';
     }
     get TargetVersion(): string {
-        return '0.6.4';
+        return '0.6.3';
     }
     static get MigrationVersion(): string {
         return '0.6.4';
     }
 
-    protected async MigrateActorData(actor: ActorData): Promise<any> {
-        const updateData = {};
-        LegacyMigration.migrateActorOverflow(actor, updateData);
-        LegacyMigration.migrateActorSkills(actor, updateData);
+    protected async MigrateActorData(actorData: ActorData): Promise<any> {
+        const updateData: any = {};
+        LegacyMigration.migrateActorOverflow(actorData, updateData);
+        LegacyMigration.migrateActorSkills(actorData, updateData);
+
+        // @ts-ignore
+        if (!actorData.items) {
+            return updateData;
+        }
+
+        console.log('Pre-item map');
+        // @ts-ignore
+        console.log(actorData.items);
+        let hasItemUpdates = false;
+        const items = await Promise.all(
+            // @ts-ignore
+            actorData.items.map(async (item) => {
+                let itemUpdate = await this.MigrateItemData(item);
+
+                if (!isObjectEmpty(itemUpdate)) {
+                    hasItemUpdates = true;
+                    itemUpdate['_id'] = item._id;
+                    return await mergeObject(item, itemUpdate, {
+                        enforceTypes: false,
+                        inplace: false,
+                    });
+                } else {
+                    return item;
+                }
+            })
+        );
+        console.log('Post-item map');
+        console.log(items);
+        if (hasItemUpdates) {
+            updateData.items = items;
+        }
+
         return updateData;
     }
 
@@ -36,7 +69,7 @@ export class LegacyMigration extends VersionMigration {
         return {};
     }
 
-    protected async ShouldMigrateActorData(actor: ActorData): Promise<boolean> {
+    protected async ShouldMigrateActorData(actorData: ActorData): Promise<boolean> {
         return true;
     }
 
@@ -52,11 +85,11 @@ export class LegacyMigration extends VersionMigration {
     /**
      * Migrate actor overflow from an integer to an object
      * - it wasn't even displayed before so we know it is 0
-     * @param actor
+     * @param actorData
      * @param updateData
      */
-    private static migrateActorOverflow(actor, updateData) {
-        if (getProperty(actor.data, 'track.physical.overflow') === 0) {
+    private static migrateActorOverflow(actorData, updateData) {
+        if (getProperty(actorData.data, 'track.physical.overflow') === 0) {
             updateData['data.track.physical.overflow.value'] = 0;
             updateData['data.track.physical.overflow.max'] = 0;
         }
@@ -64,11 +97,11 @@ export class LegacyMigration extends VersionMigration {
 
     /**
      * Migrate actor skills specializations to be a list instead of string
-     * @param actor
+     * @param actorData
      * @param updateData
      */
-    private static migrateActorSkills(actor, updateData) {
-        if (!actor.data?.skills?.active) return;
+    private static migrateActorSkills(actorData, updateData) {
+        if (!actorData.data?.skills?.active) return;
         const splitRegex = /[,\/|.]+/;
 
         const reducer = (running, [key, val]) => {
@@ -80,25 +113,12 @@ export class LegacyMigration extends VersionMigration {
             return running;
         };
 
-        updateData['data.skills.active'] = Object.entries(actor.data.skills.active).reduce(
-            reducer,
-            {}
-        );
-        updateData['data.skills.knowledge.street.value'] = Object.entries(
-            actor.data.skills.knowledge.street.value
-        ).reduce(reducer, {});
-        updateData['data.skills.knowledge.professional.value'] = Object.entries(
-            actor.data.skills.knowledge.professional.value
-        ).reduce(reducer, {});
-        updateData['data.skills.knowledge.academic.value'] = Object.entries(
-            actor.data.skills.knowledge.academic.value
-        ).reduce(reducer, {});
-        updateData['data.skills.knowledge.interests.value'] = Object.entries(
-            actor.data.skills.knowledge.interests.value
-        ).reduce(reducer, {});
-        updateData['data.skills.language.value'] = Object.entries(
-            actor.data.skills.language.value
-        ).reduce(reducer, {});
+        updateData['data.skills.active'] = Object.entries(actorData.data.skills.active).reduce(reducer, {});
+        updateData['data.skills.knowledge.street.value'] = Object.entries(actorData.data.skills.knowledge.street.value).reduce(reducer, {});
+        updateData['data.skills.knowledge.professional.value'] = Object.entries(actorData.data.skills.knowledge.professional.value).reduce(reducer, {});
+        updateData['data.skills.knowledge.academic.value'] = Object.entries(actorData.data.skills.knowledge.academic.value).reduce(reducer, {});
+        updateData['data.skills.knowledge.interests.value'] = Object.entries(actorData.data.skills.knowledge.interests.value).reduce(reducer, {});
+        updateData['data.skills.language.value'] = Object.entries(actorData.data.skills.language.value).reduce(reducer, {});
     }
 
     /**
@@ -107,7 +127,7 @@ export class LegacyMigration extends VersionMigration {
      * @param updateData
      */
     private static migrateDamageTypeAndElement(item, updateData) {
-        console.log('Migrating Damage and Elements');
+        // console.log('Migrating Damage and Elements');
         if (item.data.action) {
             const action = item.data.action;
             if (typeof action.damage.type === 'string') {
@@ -125,7 +145,7 @@ export class LegacyMigration extends VersionMigration {
      * @param updateData
      */
     private static migrateItemsAmmo(item, updateData) {
-        console.log('Migrating Ammo');
+        // console.log('Migrating Ammo');
         if (item.type === 'weapon' && item.data.ammo === undefined) {
             let currentAmmo = { value: 0, max: 0 };
             if (item.data.category === 'range' && item.data.range && item.data.range.ammo) {

@@ -12,7 +12,7 @@ import { createChatData, TemplateData } from '../chat';
 export interface BasicRollProps {
     name?: string;
     img?: string;
-    parts: ModList<number>;
+    parts?: ModList<number>;
     limit?: BaseValuePair<number> & LabelField;
     explodeSixes?: boolean;
     title?: string;
@@ -48,6 +48,11 @@ export interface AdvancedRollProps extends BasicRollProps {
 
 export class ShadowrunRoll extends Roll {
     templateData: TemplateData | undefined;
+    toJSON(): any {
+        const data = super.toJSON();
+        data.class = "Roll";
+        return data;
+    }
 }
 
 export class ShadowrunRoller {
@@ -116,7 +121,7 @@ export class ShadowrunRoller {
     }
 
     static async basicRoll({
-        parts,
+        parts = {},
         limit,
         explodeSixes,
         title,
@@ -166,15 +171,42 @@ export class ShadowrunRoller {
 
         if (!hideRollMessage) {
             const chatData = await createChatData(templateData, roll);
-            await ChatMessage.create(chatData, { displaySheet: false });
+            ChatMessage.create(chatData, { displaySheet: false }).then(message => {
+                console.log(message);
+            });
         }
         return roll;
     }
 
+    /**
+     * Prompt a roll for the user
+     */
+    static promptRoll(): Promise<ShadowrunRoll | undefined> {
+        const lastRoll = game.user.getFlag('shadowrun5e', 'lastRollPromptValue') || 0;
+        const parts = {
+            'SR5.LastRoll': lastRoll,
+        };
+        return ShadowrunRoller.advancedRoll({ parts, dialogOptions: { prompt: true } });
+    }
+
+    /**
+     * Start an advanced roll
+     * - Prompts the user for modifiers
+     * @param props
+     */
     static advancedRoll(props: AdvancedRollProps): Promise<ShadowrunRoll | undefined> {
         // destructure what we need to use from props
         // any value pulled out needs to be updated back in props if changed
-        const { title, actor, parts, limit, extended, wounds = true, after, dialogOptions } = props;
+        const {
+            title,
+            actor,
+            parts = {},
+            limit,
+            extended,
+            wounds = true,
+            after,
+            dialogOptions,
+        } = props;
 
         // remove limits if game settings is set
         if (!game.settings.get('shadowrun5e', 'applyLimits')) {
@@ -225,6 +257,18 @@ export class ShadowrunRoller {
                     close: async (html) => {
                         if (cancel) return;
                         // get the actual dice_pool from the difference of initial parts and value in the dialog
+
+                        const dicePoolValue = Helpers.parseInputToNumber(
+                            $(html).find('[name="dice_pool"]').val()
+                        );
+
+                        if (dialogOptions?.prompt && dicePoolValue > 0) {
+                            for (const key in parts) {
+                                delete parts[key];
+                            }
+                            game.user.setFlag('shadowrun5e', 'lastRollPromptValue', dicePoolValue);
+                            parts['SR5.Base'] = dicePoolValue;
+                        }
 
                         const limitValue = Helpers.parseInputToNumber(
                             $(html).find('[name="limit"]').val()
