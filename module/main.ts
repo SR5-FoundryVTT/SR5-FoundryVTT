@@ -46,7 +46,7 @@ Hooks.once('init', function () {
 
     preloadHandlebarsTemplates();
 
-    CONFIG.debug.hooks = true;
+    // CONFIG.debug.hooks = true;
 });
 
 Hooks.on('canvasInit', function () {
