@@ -5506,7 +5506,7 @@ Hooks.once('init', function () {
         Hooks.on(s, (app, html) => helpers_1.Helpers.setupCustomCheckbox(app, html));
     });
     handlebars_1.preloadHandlebarsTemplates();
-    CONFIG.debug.hooks = true;
+    // CONFIG.debug.hooks = true;
 });
 Hooks.on('canvasInit', function () {
     // this does actually exist. Fix in types?
