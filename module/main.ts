@@ -46,7 +46,7 @@ Hooks.once('init', function () {
 
     preloadHandlebarsTemplates();
 
-    // CONFIG.debug.hooks = true;
+    CONFIG.debug.hooks = true;
 });
 
 Hooks.on('canvasInit', function () {
@@ -87,6 +87,7 @@ Hooks.on('preUpdateCombat', preCombatUpdate);
 Hooks.on('renderChatMessage', (app, html) => {
     if (app.isRoll) chat.addRollListeners(app, html);
 });
+
 Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);
 
 /* -------------------------------------------- */

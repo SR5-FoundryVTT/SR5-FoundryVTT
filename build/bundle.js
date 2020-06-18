@@ -3173,11 +3173,14 @@ exports.createChatData = (templateData, roll) => __awaiter(void 0, void 0, void 
     const template = `systems/shadowrun5e/templates/rolls/roll-card.html`;
     const html = yield renderTemplate(template, templateData);
     const actor = templateData.actor;
+    console.log('');
+    console.log(roll);
+    console.log('');
     const chatData = {
         user: game.user._id,
         type: CONST.CHAT_MESSAGE_TYPES.ROLL,
         content: html,
-        roll,
+        roll: JSON.stringify(roll),
         speaker: {
             actor: actor === null || actor === void 0 ? void 0 : actor._id,
             token: actor === null || actor === void 0 ? void 0 : actor.token,
@@ -5506,7 +5509,7 @@ Hooks.once('init', function () {
         Hooks.on(s, (app, html) => helpers_1.Helpers.setupCustomCheckbox(app, html));
     });
     handlebars_1.preloadHandlebarsTemplates();
-    // CONFIG.debug.hooks = true;
+    CONFIG.debug.hooks = true;
 });
 Hooks.on('canvasInit', function () {
     // this does actually exist. Fix in types?
@@ -5990,6 +5993,11 @@ exports.ShadowrunRoller = exports.ShadowrunRoll = void 0;
 const helpers_1 = require("../helpers");
 const chat_1 = require("../chat");
 class ShadowrunRoll extends Roll {
+    toJSON() {
+        const data = super.toJSON();
+        data.class = "Roll";
+        return data;
+    }
 }
 exports.ShadowrunRoll = ShadowrunRoll;
 class ShadowrunRoller {
@@ -6069,7 +6077,9 @@ class ShadowrunRoller {
             roll.templateData = templateData;
             if (!hideRollMessage) {
                 const chatData = yield chat_1.createChatData(templateData, roll);
-                yield ChatMessage.create(chatData, { displaySheet: false });
+                ChatMessage.create(chatData, { displaySheet: false }).then(message => {
+                    console.log(message);
+                });
             }
             return roll;
         });

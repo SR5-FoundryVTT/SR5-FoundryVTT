@@ -33,16 +33,20 @@ export type TemplateData = {
     previewTemplate?: boolean;
 };
 
-export const createChatData = async (templateData: TemplateData, roll?) => {
+export const createChatData = async (templateData: TemplateData, roll?: Roll) => {
     const template = `systems/shadowrun5e/templates/rolls/roll-card.html`;
     const html = await renderTemplate(template, templateData);
     const actor = templateData.actor;
+
+    console.log('');
+    console.log(roll);
+    console.log('');
 
     const chatData = {
         user: game.user._id,
         type: CONST.CHAT_MESSAGE_TYPES.ROLL,
         content: html,
-        roll,
+        roll: JSON.stringify(roll),
         speaker: {
             actor: actor?._id,
             token: actor?.token,

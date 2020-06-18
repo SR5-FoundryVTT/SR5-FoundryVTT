@@ -48,6 +48,11 @@ export interface AdvancedRollProps extends BasicRollProps {
 
 export class ShadowrunRoll extends Roll {
     templateData: TemplateData | undefined;
+    toJSON(): any {
+        const data = super.toJSON();
+        data.class = "Roll";
+        return data;
+    }
 }
 
 export class ShadowrunRoller {
@@ -166,7 +171,9 @@ export class ShadowrunRoller {
 
         if (!hideRollMessage) {
             const chatData = await createChatData(templateData, roll);
-            await ChatMessage.create(chatData, { displaySheet: false });
+            ChatMessage.create(chatData, { displaySheet: false }).then(message => {
+                console.log(message);
+            });
         }
         return roll;
     }
