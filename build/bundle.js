@@ -6037,7 +6037,7 @@ class ShadowrunRoller {
         return formula;
     }
     static basicRoll(_a) {
-        var { parts, limit, explodeSixes, title, actor, img = actor === null || actor === void 0 ? void 0 : actor.img, name = actor === null || actor === void 0 ? void 0 : actor.name, hideRollMessage } = _a, props = __rest(_a, ["parts", "limit", "explodeSixes", "title", "actor", "img", "name", "hideRollMessage"]);
+        var { parts = {}, limit, explodeSixes, title, actor, img = actor === null || actor === void 0 ? void 0 : actor.img, name = actor === null || actor === void 0 ? void 0 : actor.name, hideRollMessage } = _a, props = __rest(_a, ["parts", "limit", "explodeSixes", "title", "actor", "img", "name", "hideRollMessage"]);
         return __awaiter(this, void 0, void 0, function* () {
             let roll;
             const rollMode = game.settings.get('core', 'rollMode');
@@ -6071,10 +6071,21 @@ class ShadowrunRoller {
             return roll;
         });
     }
+    /**
+     * Prompt a roll for the user
+     */
+    static promptRoll() {
+        return ShadowrunRoller.advancedRoll({ dialogOptions: { prompt: true } });
+    }
+    /**
+     * Start an advanced roll
+     * - Prompts the user for modifiers
+     * @param props
+     */
     static advancedRoll(props) {
         // destructure what we need to use from props
         // any value pulled out needs to be updated back in props if changed
-        const { title, actor, parts, limit, extended, wounds = true, after, dialogOptions } = props;
+        const { title, actor, parts = {}, limit, extended, wounds = true, after, dialogOptions, } = props;
         // remove limits if game settings is set
         if (!game.settings.get('shadowrun5e', 'applyLimits')) {
             delete props.limit;
@@ -6120,6 +6131,10 @@ class ShadowrunRoller {
                         if (cancel)
                             return;
                         // get the actual dice_pool from the difference of initial parts and value in the dialog
+                        const dicePoolValue = helpers_1.Helpers.parseInputToNumber($(html).find('[name="dice_pool"]').val());
+                        if (isObjectEmpty(parts) && dicePoolValue > 0) {
+                            parts['SR5.Base'] = dicePoolValue;
+                        }
                         const limitValue = helpers_1.Helpers.parseInputToNumber($(html).find('[name="limit"]').val());
                         if (limit && limit.value !== limitValue) {
                             limit.value = limitValue;
