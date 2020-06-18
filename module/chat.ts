@@ -38,15 +38,11 @@ export const createChatData = async (templateData: TemplateData, roll?: Roll) =>
     const html = await renderTemplate(template, templateData);
     const actor = templateData.actor;
 
-    console.log('');
-    console.log(roll);
-    console.log('');
-
     const chatData = {
         user: game.user._id,
-        type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+        type: roll ? CONST.CHAT_MESSAGE_TYPES.ROLL : CONST.CHAT_MESSAGE_TYPES.OTHER,
         content: html,
-        roll: JSON.stringify(roll),
+        roll: roll ? JSON.stringify(roll) : undefined,
         speaker: {
             actor: actor?._id,
             token: actor?.token,

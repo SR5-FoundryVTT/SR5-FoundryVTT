@@ -3173,14 +3173,11 @@ exports.createChatData = (templateData, roll) => __awaiter(void 0, void 0, void 
     const template = `systems/shadowrun5e/templates/rolls/roll-card.html`;
     const html = yield renderTemplate(template, templateData);
     const actor = templateData.actor;
-    console.log('');
-    console.log(roll);
-    console.log('');
     const chatData = {
         user: game.user._id,
-        type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+        type: roll ? CONST.CHAT_MESSAGE_TYPES.ROLL : CONST.CHAT_MESSAGE_TYPES.OTHER,
         content: html,
-        roll: JSON.stringify(roll),
+        roll: roll ? JSON.stringify(roll) : undefined,
         speaker: {
             actor: actor === null || actor === void 0 ? void 0 : actor._id,
             token: actor === null || actor === void 0 ? void 0 : actor.token,
