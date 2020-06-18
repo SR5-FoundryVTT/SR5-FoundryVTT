@@ -438,6 +438,7 @@
     "SR5.Load": "Load",
     "SR5.Normal": "Normal",
     "SR5.Defense": "Defense",
+    "SR5.LastRoll": "Last Prompted Roll",
 
     "SR5.OriginalDicePool": "Original Dice Pool",
     "SR5.Successes": "Successes",

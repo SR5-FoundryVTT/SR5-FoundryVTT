@@ -6078,7 +6078,11 @@ class ShadowrunRoller {
      * Prompt a roll for the user
      */
     static promptRoll() {
-        return ShadowrunRoller.advancedRoll({ dialogOptions: { prompt: true } });
+        const lastRoll = game.user.getFlag('shadowrun5e', 'lastRollPromptValue') || 0;
+        const parts = {
+            'SR5.LastRoll': lastRoll,
+        };
+        return ShadowrunRoller.advancedRoll({ parts, dialogOptions: { prompt: true } });
     }
     /**
      * Start an advanced roll
@@ -6135,7 +6139,11 @@ class ShadowrunRoller {
                             return;
                         // get the actual dice_pool from the difference of initial parts and value in the dialog
                         const dicePoolValue = helpers_1.Helpers.parseInputToNumber($(html).find('[name="dice_pool"]').val());
-                        if (isObjectEmpty(parts) && dicePoolValue > 0) {
+                        if ((dialogOptions === null || dialogOptions === void 0 ? void 0 : dialogOptions.prompt) && dicePoolValue > 0) {
+                            for (const key in parts) {
+                                delete parts[key];
+                            }
+                            game.user.setFlag('shadowrun5e', 'lastRollPromptValue', dicePoolValue);
                             parts['SR5.Base'] = dicePoolValue;
                         }
                         const limitValue = helpers_1.Helpers.parseInputToNumber($(html).find('[name="limit"]').val());

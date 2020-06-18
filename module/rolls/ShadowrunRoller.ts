@@ -175,7 +175,11 @@ export class ShadowrunRoller {
      * Prompt a roll for the user
      */
     static promptRoll(): Promise<ShadowrunRoll | undefined> {
-        return ShadowrunRoller.advancedRoll({ dialogOptions: { prompt: true } });
+        const lastRoll = game.user.getFlag('shadowrun5e', 'lastRollPromptValue') || 0;
+        const parts = {
+            'SR5.LastRoll': lastRoll,
+        };
+        return ShadowrunRoller.advancedRoll({ parts, dialogOptions: { prompt: true } });
     }
 
     /**
@@ -251,7 +255,11 @@ export class ShadowrunRoller {
                             $(html).find('[name="dice_pool"]').val()
                         );
 
-                        if (isObjectEmpty(parts) && dicePoolValue > 0) {
+                        if (dialogOptions?.prompt && dicePoolValue > 0) {
+                            for (const key in parts) {
+                                delete parts[key];
+                            }
+                            game.user.setFlag('shadowrun5e', 'lastRollPromptValue', dicePoolValue);
                             parts['SR5.Base'] = dicePoolValue;
                         }
 
