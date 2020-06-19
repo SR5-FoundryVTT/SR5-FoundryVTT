@@ -445,6 +445,11 @@
 
     "SR5.SelectTokenMessage": "You must select a token first",
 
+    "SR5.MigrationComplete": "Migration Complete",
+    "SR5.MigrationUpdateCompendiumUpdateMessage": "Any world compendium packs that exist in the world were also updated",
+    "SR5.MigrationUpdateCompendiumNoUpdateActor": "Due to technical limitations with FoundryVTT, actor compendium packs are unable to be updated at this time. You will have to manually update these packs.",
+    "SR5.Close": "Close",
+
     "SETTINGS.DiagonalMovementName": "Diagonal Movement",
     "SETTINGS.DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
     "SETTINGS.IgnoreDiagonal": "Ignore Diagonal Movement (1-1-1)",

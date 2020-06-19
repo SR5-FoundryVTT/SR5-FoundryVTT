@@ -5594,15 +5594,14 @@ let Migrator = /** @class */ (() => {
                 yield this.migrateCompendium(game, migrations);
                 //TODO: Localization
                 const packsDialog = new Dialog({
-                    title: 'Migration complete!',
-                    content: '<h3>Migration Complete</h3>' +
-                        '<p>Any world compendium packs that exist in the world were also updated.</p>' +
-                        '<p style="color: red">Due to technical limitations with FoundryVTT, actor compendium packs are unable to be updated at this time.' +
-                        ' You will have to manually update these packs.</p>',
+                    title: `${game.i18n.localize('SR5.MigrationComplete')}!`,
+                    content: `<h3>${game.i18n.localize('SR5.MigrationComplete')}</h3>` +
+                        `<p>${game.i18n.localize('SR5.MigrationUpdateCompendiumUpdateMessage')}</p>` +
+                        `<p style="color: red">${game.i18n.localize('SR5.MigrationUpdateCompendiumNoUpdateActor')}</p>`,
                     buttons: {
                         ok: {
                             icon: '<i class="fas fa-check"></i>',
-                            label: 'Close',
+                            label: game.i18n.localize('SR5.Close'),
                         },
                     },
                     default: 'ok',
