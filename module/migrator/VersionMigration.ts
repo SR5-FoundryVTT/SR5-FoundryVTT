@@ -41,206 +41,28 @@ export abstract class VersionMigration {
         ui.notifications.error(`Data migration has been aborted: ${reason}`, { permanent: true });
     }
 
-    // // TODO: Extract to extendable functions...
-    // protected async getMigratedActorItems(
-    //     actorData: any,
-    //     diffOnly: boolean = true
-    // ): Promise<Item[]> {
-    //     // Migrate Owned Items
-    //     //TODO: When SR5ActorData gets updated, remove ts-ignore
-    //     // @ts-ignore
-    //     if (!actorData.items) return [];
-    //     //TODO: When SR5ActorData gets updated, remove ts-ignore
-    //     // @ts-ignore
-    //     return await actorData.items.reduce(async (accumulator, item) => {
-    //         // Migrate the Owned Item
-    //         let migratedItemData = await this.MigrateItemData(item);
-    //         if (!isObjectEmpty(migratedItemData)) {
-    //             if (!diffOnly) migratedItemData = mergeObject(item, migratedItemData);
-    //             // need to copy id over of embedded entities
-    //             migratedItemData._id = item._id;
-    //             accumulator.then((acc) => acc.push(migratedItemData));
-    //         }
-    //         return accumulator;
-    //     }, Promise.resolve([]));
-    // }
-
-    // /**
-    //  * Get the Migrated Tokens for a scene
-    //  *  returns ALL data, not just changes (scenes need all data for tokens)
-    //  * @param sceneData
-    //  */
-    // protected async getMigratedSceneTokens(sceneData: any): Promise<Token[]> {
-    //     if (!sceneData.tokens) return [];
-    //     return Promise.all(
-    //         duplicate(sceneData.tokens).map(async (t) => {
-    //             // if we have nothing useful or are linked, return
-    //             if (!t.actorId || t.actorLink || !t.actorData.data) {
-    //                 t.actorData = {};
-    //                 return t;
-    //             }
-    //
-    //             // create a token from the tokenData
-    //             const token = new Token(t);
-    //             if (!token.actor) {
-    //                 // no actor, no data to migrate
-    //                 t.actorId = null;
-    //                 t.actorData = {};
-    //             } // don't want to update actors that are linked
-    //             else {
-    //                 const updateData = await this.MigrateActorData(token.data.actorData);
-    //                 t.actorData = mergeObject(token.data.actorData, updateData);
-    //             }
-    //             // migrate token actor items
-    //             if (token.data.actorData.items) {
-    //                 t.actorData.items = await this.getMigratedActorItems(
-    //                     token.data.actorData,
-    //                     false
-    //                 );
-    //             }
-    //             return t;
-    //         })
-    //     );
-    // }
-
-    // // TODO: Extract to extendable functions...
-    // protected async migrateCompendium(pack) {
-    //     const { entity } = pack.metadata;
-    //     if (!['Actor', 'Item', 'Scene'].includes(entity)) return;
-    //
-    //     // Begin by requesting server-side data model migration and get the migrated content
-    //     await pack.migrate();
-    //     const content = await pack.getContent();
-    //
-    //     // Iterate over compendium entries - applying fine-tuned migration functions
-    //     for (const contentEntity of content) {
-    //         try {
-    //             let updateData = null;
-    //             if (entity === 'Item') updateData = await this.MigrateItemData(contentEntity.data);
-    //             else if (entity === 'Actor') {
-    //                 updateData = await this.MigrateActorData(contentEntity.data);
-    //                 // TODO uncomment when items can be set on compendiums without causing errors
-    //                 updateData.items = await this.getMigratedActorItems(contentEntity.data, false);
-    //                 updateData._id = contentEntity.data._id;
-    //             } else if (entity === 'Scene') { updateData = await this.MigrateSceneData(contentEntity.data); }
-    //
-    //             if (updateData === null || isObjectEmpty(updateData)) {
-    //                 continue;
-    //             }
-    //
-    //             expandObject(updateData);
-    //             updateData._id = contentEntity._id;
-    //             await pack.updateEntity(updateData);
-    //             console.log(
-    //                 `Migrated ${entity} entity ${contentEntity.name} in Compendium ${pack.collection}`
-    //             );
-    //         } catch (error) {
-    //             console.error(error);
-    //             return Promise.reject(error);
-    //         }
-    //     }
-    //     console.log(`Migrated all ${entity} entities from Compendium ${pack.collection}`);
-    // }
-
-    protected async migrateCompendium(pack) {
-        const entity = pack.metadata.entity;
-        if (!['Actor', 'Item', 'Scene'].includes(entity)) return;
-
-        // Begin by requesting server-side data model migration and get the migrated content
-        await pack.migrate();
-        const content = await pack.getContent();
-
-        // Iterate over compendium entries - applying fine-tuned migration functions
-        for (let ent of content) {
-            try {
-                let updateData: any = null;
-                if (entity === 'Item') {
-                    updateData = await this.MigrateItemData(ent.data);
-
-                    if (isObjectEmpty(updateData)) {
-                        continue;
-                    }
-
-                    expandObject(updateData);
-                    updateData['_id'] = ent._id;
-                    await pack.updateEntity(updateData);
-                    // } else if (entity === 'Actor') {
-                    //     console.log('-');
-                    //     console.log(ent);
-                    //     updateData = await this.MigrateActorData(ent.data);
-                    //
-                    //     if (isObjectEmpty(updateData)) {
-                    //         continue;
-                    //     }
-                    //
-                    //     updateData['_id'] = ent._id;
-                    //     console.log('push data');
-                    //     console.log(updateData);
-                    //     await pack.updateEntity(updateData);
-                } else if (entity === 'Scene') {
-                    updateData = await this.MigrateSceneData(ent.data);
-
-                    if (isObjectEmpty(updateData)) {
-                        continue;
-                    }
-
-                    expandObject(updateData);
-                    updateData['_id'] = ent._id;
-                    await pack.updateEntity(updateData);
-                }
-            } catch (err) {
-                console.error(err);
-            }
-        }
-        console.log(`Migrated all ${entity} entities from Compendium ${pack.collection}`);
-    }
-
     /**
      * Begin migration for the specified game.
      * @param game The world that should be migrated.
      */
     public async Migrate(game: Game) {
-        // @ts-ignore
+        // @ts-ignore TODO Unignore when Foundry Types updates
         ui.notifications.info(`Beginning Shadowrun system migration from version ${this.SourceVersionFriendlyName} to ${this.TargetVersionFriendlyName}.`);
-        // @ts-ignore
+        // @ts-ignore TODO Unignore when Foundry Types updates
         ui.notifications.warn(`Please do not close your game or shutdown FoundryVTT.`, {
             permanent: true,
         });
 
         // Map of entities to update, store until later to reduce chance of partial updates
         // which may result in impossible game states.
-        const entityUpdates: Map<Entity, EntityUpdate> = new Map();
+        const entityUpdates: Map<Entity, EntityUpdate> = new Map<Entity, EntityUpdate>();
 
         // Migrate World Items
         await this.PreMigrateItemData(game, entityUpdates);
         if (this.m_Abort) {
             return Promise.reject(this.m_AbortReason);
         }
-
-        for (const item of game.items.entities) {
-            try {
-                if (!(await this.ShouldMigrateItemData(item.data))) {
-                    continue;
-                }
-
-                console.log(`Migrating Item: ${item.name}`);
-                const updateData = await this.MigrateItemData(item.data);
-
-                if (isObjectEmpty(updateData)) {
-                    continue;
-                }
-
-                expandObject(updateData);
-                entityUpdates.set(item, {
-                    updateData,
-                    embeddedItems: null,
-                });
-            } catch (error) {
-                console.error(error);
-                return Promise.reject(error);
-            }
-        }
-
+        await this.IterateItems(game, entityUpdates);
         await this.PostMigrateItemData(game, entityUpdates);
         if (this.m_Abort) {
             return Promise.reject(this.m_AbortReason);
@@ -251,32 +73,7 @@ export abstract class VersionMigration {
         if (this.m_Abort) {
             return Promise.reject(this.m_AbortReason);
         }
-
-        for (const actor of game.actors.entities) {
-            try {
-                if (!(await this.ShouldMigrateActorData(actor.data))) {
-                    continue;
-                }
-
-                console.log(`Migrating Actor ${actor.name}`);
-                const updateData = await this.MigrateActorData(duplicate(actor.data));
-                let items = [];
-                if (updateData.items) {
-                    items = updateData.items;
-                    delete updateData.items;
-                }
-
-                expandObject(updateData);
-                entityUpdates.set(actor, {
-                    updateData,
-                    embeddedItems: items,
-                });
-            } catch (error) {
-                console.error(error);
-                return Promise.reject(error);
-            }
-        }
-
+        await this.IterateActors(game, entityUpdates);
         await this.PostMigrateActorData(game, entityUpdates);
         if (this.m_Abort) {
             return Promise.reject(this.m_AbortReason);
@@ -287,7 +84,40 @@ export abstract class VersionMigration {
         if (this.m_Abort) {
             return Promise.reject(this.m_AbortReason);
         }
+        await this.IterateScenes(game, entityUpdates);
+        await this.PostMigrateSceneData(game, entityUpdates);
+        if (this.m_Abort) {
+            return Promise.reject(this.m_AbortReason);
+        }
 
+        // Apply the updates, this should *always* work, now that parsing is complete.
+        await this.Apply(entityUpdates);
+
+        await game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
+        // @ts-ignore TODO Unignore when Foundry Types updates
+        ui.notifications.info(`Shadowrun system migration successfully migrated to version ${this.TargetVersion}.`, { permanent: true });
+    }
+
+    /**
+     * Applies the specified mapping of entities, iteratively updating each.
+     * @param entityUpdates A mapping of entity updateData pairs.
+     */
+    protected async Apply(entityUpdates: Map<Entity, EntityUpdate>) {
+        for (const [entity, { updateData, embeddedItems }] of entityUpdates) {
+            if (embeddedItems !== null) {
+                const actor = entity as SR5Actor;
+                await actor.updateOwnedItem(embeddedItems);
+            }
+            await entity.update(updateData, { enforceTypes: false });
+        }
+    }
+
+    /**
+     * Iterate through all scenes and migrate each if needed.
+     * @param game
+     * @param entityUpdates
+     */
+    protected async IterateScenes(game: Game, entityUpdates: Map<Entity, EntityUpdate>) {
         for (const scene of game.scenes.entities) {
             try {
                 if (!(await this.ShouldMigrateSceneData(scene))) {
@@ -311,39 +141,66 @@ export abstract class VersionMigration {
                 return Promise.reject(error);
             }
         }
-
-        await this.PostMigrateSceneData(game, entityUpdates);
-        if (this.m_Abort) {
-            return Promise.reject(this.m_AbortReason);
-        }
-
-        // Apply the updates, this should *always* work, now that parsing is complete.
-        await this.Apply(entityUpdates);
-
-        await game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
-        // @ts-ignore
-        ui.notifications.info(`Shadowrun system migration successfully migrated to version ${this.TargetVersion}.`, { permanent: true });
-
-        return Promise.resolve();
     }
-
     /**
-     * Applies the specified mapping of entities, iteratively updating each.
-     * @param entityUpdates A mapping of entity updateData pairs.
+     * Iterate through all items and migrate each if needed.
+     * @param game The game to be updated.
+     * @param entityUpdates The current map of entity updates.
      */
-    protected async Apply(entityUpdates: Map<Entity, EntityUpdate>) {
-        for (const [entity, { updateData, embeddedItems }] of entityUpdates) {
-            if (embeddedItems !== null) {
-                const actor = entity as SR5Actor;
-                await actor.updateOwnedItem(embeddedItems);
-            }
-            await entity.update(updateData, { enforceTypes: false });
-        }
+    protected async IterateItems(game: Game, entityUpdates: Map<Entity, EntityUpdate>) {
+        for (const item of game.items.entities) {
+            try {
+                if (!(await this.ShouldMigrateItemData(item.data))) {
+                    continue;
+                }
 
-        // Migrate World Compendium Packs
-        const packs = game.packs.filter((pack) => pack.metadata.package === 'world' && ['Actor', 'Item', 'Scene'].includes(pack.metadata.entity));
-        for (const pack of packs) {
-            await this.migrateCompendium(pack);
+                console.log(`Migrating Item: ${item.name}`);
+                const updateData = await this.MigrateItemData(item.data);
+
+                if (isObjectEmpty(updateData)) {
+                    continue;
+                }
+
+                expandObject(updateData);
+                entityUpdates.set(item, {
+                    updateData,
+                    embeddedItems: null,
+                });
+            } catch (error) {
+                console.error(error);
+                return Promise.reject(error);
+            }
+        }
+    }
+    /**
+     * Iterate through all actors and migrate each if needed.
+     * @param game The game to be updated.
+     * @param entityUpdates The current map of entity updates.
+     */
+    protected async IterateActors(game: Game, entityUpdates: Map<Entity, EntityUpdate>) {
+        for (const actor of game.actors.entities) {
+            try {
+                if (!(await this.ShouldMigrateActorData(actor.data))) {
+                    continue;
+                }
+
+                console.log(`Migrating Actor ${actor.name}`);
+                const updateData = await this.MigrateActorData(duplicate(actor.data));
+                let items = [];
+                if (updateData.items) {
+                    items = updateData.items;
+                    delete updateData.items;
+                }
+
+                expandObject(updateData);
+                entityUpdates.set(actor, {
+                    updateData,
+                    embeddedItems: items,
+                });
+            } catch (error) {
+                console.error(error);
+                return Promise.reject(error);
+            }
         }
     }
 
@@ -421,6 +278,60 @@ export abstract class VersionMigration {
      * @param entityUpdates The current map of entity updates.
      */
     protected async PostMigrateActorData(game: Game, entityUpdates: Map<Entity, EntityUpdate>): Promise<void> {}
+
+    /**
+     * Migrate a compendium pack
+     * @param pack
+     */
+    public async MigrateCompendiumPack(pack: Compendium) {
+        const entity = pack.metadata.entity;
+        if (!['Actor', 'Item', 'Scene'].includes(entity)) return;
+
+        // Begin by requesting server-side data model migration and get the migrated content
+        await pack.migrate({});
+        const content = await pack.getContent();
+
+        // Iterate over compendium entries - applying fine-tuned migration functions
+        for (let ent of content) {
+            try {
+                let updateData: any = null;
+                if (entity === 'Item') {
+                    updateData = await this.MigrateItemData(ent.data);
+
+                    if (isObjectEmpty(updateData)) {
+                        continue;
+                    }
+
+                    expandObject(updateData);
+                    updateData['_id'] = ent._id;
+                    await pack.updateEntity(updateData);
+                    // TODO: Uncomment when foundry allows embeddeds to be updated in packs
+                    // } else if (entity === 'Actor') {
+                    //     updateData = await this.MigrateActorData(ent.data);
+                    //
+                    //     if (isObjectEmpty(updateData)) {
+                    //         continue;
+                    //     }
+                    //
+                    //     updateData['_id'] = ent._id;
+                    //     await pack.updateEntity(updateData);
+                } else if (entity === 'Scene') {
+                    updateData = await this.MigrateSceneData(ent.data);
+
+                    if (isObjectEmpty(updateData)) {
+                        continue;
+                    }
+
+                    expandObject(updateData);
+                    updateData['_id'] = ent._id;
+                    await pack.updateEntity(updateData);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+        console.log(`Migrated all ${entity} entities from Compendium ${pack.collection}`);
+    }
 }
 
 type EntityUpdate = {

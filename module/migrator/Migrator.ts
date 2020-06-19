@@ -1,20 +1,17 @@
 import { VersionMigration } from './VersionMigration';
 import { LegacyMigration } from './versions/LegacyMigration';
 
+type VersionDefinition = {
+    versionNumber: string;
+    migration: VersionMigration;
+};
 export class Migrator {
-    // This maps version number to migration.
-    // It is capable of supporting *multiple* migrations for a single version,
-    //  but this should be done with care, as both will run.
-    private static readonly s_Versions = [
-        { versionNumber: LegacyMigration.MigrationVersion, migration: LegacyMigration },
-    ];
+    // Map of all version migrations to their target version numbers.
+    private static readonly s_Versions: VersionDefinition[] = [{ versionNumber: LegacyMigration.TargetVersion, migration: new LegacyMigration() }];
 
     //TODO: Call on Init()
     public static async BeginMigration() {
-        let currentVersion = game.settings.get(
-            VersionMigration.MODULE_NAME,
-            VersionMigration.KEY_DATA_VERSION
-        );
+        let currentVersion = game.settings.get(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION);
         if (currentVersion === undefined || currentVersion === null) {
             currentVersion = VersionMigration.NO_VERSION;
         }
@@ -27,10 +24,55 @@ export class Migrator {
         migrations.sort((a, b) => {
             return this.compareVersion(a.versionNumber, b.versionNumber);
         });
+
+        await this.migrateWorld(game, migrations);
+        await this.migrateCompendium(game, migrations);
+
+        //TODO: Localization
+        const packsDialog = new Dialog({
+            title: 'Migration complete!',
+            content:
+                '<h3>Migration Complete</h3>' +
+                '<p>Any world compendium packs that exist in the world were also updated.</p>' +
+                '<p style="color: red">Due to technical limitations with FoundryVTT, actor compendium packs are unable to be updated at this time.' +
+                ' You will have to manually update these packs.</p>',
+            buttons: {
+                ok: {
+                    icon: '<i class="fas fa-check"></i>',
+                    label: 'Close',
+                },
+            },
+            default: 'ok',
+        });
+        packsDialog.render(true);
+    }
+
+    /**
+     * Migrate all world objects
+     * @param game
+     * @param migrations
+     */
+    private static async migrateWorld(game: Game, migrations: VersionDefinition[]) {
         // Run the migrations in order
-        for (const migrationInfo of migrations) {
-            const migration = new migrationInfo.migration();
+        for (const { migration } of migrations) {
             await migration.Migrate(game);
+        }
+    }
+
+    /**
+     * Iterate over all world compendium packs
+     * @param game Game that will be migrated
+     * @param migrations Instances of the version migration
+     */
+    private static async migrateCompendium(game: Game, migrations: VersionDefinition[]) {
+        // Migrate World Compendium Packs
+        const packs = game.packs.filter((pack) => pack.metadata.package === 'world' && ['Actor', 'Item', 'Scene'].includes(pack.metadata.entity));
+
+        // Run the migrations in order on each pack.
+        for (const pack of packs) {
+            for (const { migration } of migrations) {
+                await migration.MigrateCompendiumPack(pack);
+            }
         }
     }
 

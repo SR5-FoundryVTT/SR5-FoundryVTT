@@ -8,9 +8,9 @@ export class LegacyMigration extends VersionMigration {
         return '0';
     }
     get TargetVersion(): string {
-        return '0.6.3';
+        return LegacyMigration.TargetVersion;
     }
-    static get MigrationVersion(): string {
+    static get TargetVersion(): string {
         return '0.6.4';
     }
 

@@ -64,7 +64,9 @@ Hooks.on('ready', function () {
         }
     });
 
-    Migrator.BeginMigration();
+    if (game.user.isGM) {
+        Migrator.BeginMigration();
+    }
 });
 
 Hooks.on('preUpdateCombat', preCombatUpdate);
@@ -142,9 +144,7 @@ function rollItemMacro(itemName) {
     const item = actor ? actor.items.find((i) => i.name === itemName) : null;
     if (!item) {
         // @ts-ignore
-        return ui.notifications.warn(
-            `Your controlled Actor does not have an item named ${itemName}`
-        );
+        return ui.notifications.warn(`Your controlled Actor does not have an item named ${itemName}`);
     }
 
     return item.rollTest(event);
