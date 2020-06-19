@@ -279,20 +279,10 @@ class SR5Actor extends Actor {
         actorData.data.attributes.essence.value = +(totalEssence + modifiers['essence']).toFixed(3);
         // SETUP LIMITS
         limits.physical.value =
-            Math.ceil((2 * attributes.strength.value +
-                attributes.body.value +
-                attributes.reaction.value) /
-                3) + modifiers['physical_limit'];
-        limits.mental.value =
-            Math.ceil((2 * attributes.logic.value +
-                attributes.intuition.value +
-                attributes.willpower.value) /
-                3) + modifiers['mental_limit'];
+            Math.ceil((2 * attributes.strength.value + attributes.body.value + attributes.reaction.value) / 3) + modifiers['physical_limit'];
+        limits.mental.value = Math.ceil((2 * attributes.logic.value + attributes.intuition.value + attributes.willpower.value) / 3) + modifiers['mental_limit'];
         limits.social.value =
-            Math.ceil((2 * attributes.charisma.value +
-                attributes.willpower.value +
-                attributes.essence.value) /
-                3) + modifiers['social_limit'];
+            Math.ceil((2 * attributes.charisma.value + attributes.willpower.value + attributes.essence.value) / 3) + modifiers['social_limit'];
         // MOVEMENT
         const movement = data.movement;
         movement.walk.value = attributes.agility.value * (2 + modifiers['walk']);
@@ -305,15 +295,11 @@ class SR5Actor extends Actor {
         data.recoil_compensation = 1 + Math.ceil(attributes.strength.value / 3);
         // INITIATIVE
         const init = data.initiative;
-        init.meatspace.base.base =
-            attributes.intuition.value + attributes.reaction.value + modifiers['meat_initiative'];
+        init.meatspace.base.base = attributes.intuition.value + attributes.reaction.value + modifiers['meat_initiative'];
         init.meatspace.dice.base = 1 + modifiers['meat_initiative_dice'];
         init.astral.base.base = attributes.intuition.value * 2 + modifiers['astral_initiative'];
         init.astral.dice.base = 2 + modifiers['astral_initiative_dice'];
-        init.matrix.base.base =
-            attributes.intuition.value +
-                data.matrix.data_processing.value +
-                modifiers['matrix_initiative'];
+        init.matrix.base.base = attributes.intuition.value + data.matrix.data_processing.value + modifiers['matrix_initiative'];
         init.matrix.dice.base = data.matrix.hot_sim ? 4 : 3 + modifiers['matrix_initiative_dice'];
         if (init.perception === 'matrix')
             init.current = init.matrix;
@@ -340,9 +326,7 @@ class SR5Actor extends Actor {
                 acid: soak + armor.acid,
                 electricity: soak + armor.electricity,
                 radiation: soak + armor.radiation,
-            }, composure: attributes.charisma.value + attributes.willpower.value + modifiers['composure'], judge_intentions: attributes.charisma.value +
-                attributes.intuition.value +
-                modifiers['judge_intentions'], lift_carry: attributes.strength.value + attributes.body.value + modifiers['lift_carry'], memory: attributes.willpower.value + attributes.logic.value + modifiers['memory'] });
+            }, composure: attributes.charisma.value + attributes.willpower.value + modifiers['composure'], judge_intentions: attributes.charisma.value + attributes.intuition.value + modifiers['judge_intentions'], lift_carry: attributes.strength.value + attributes.body.value + modifiers['lift_carry'], memory: attributes.willpower.value + attributes.logic.value + modifiers['memory'] });
         {
             const count = 3 + modifiers['wound_tolerance'];
             const stunWounds = Math.floor(data.track.stun.value / count);
@@ -964,8 +948,7 @@ class SR5Actor extends Actor {
                     if (att2Id !== 'none') {
                         att2 = atts[att2Id];
                         if (att2 === null || att2 === void 0 ? void 0 : att2.label) {
-                            parts[att2.label] =
-                                att2.label === 'SR5.AttrEdge' ? this.getEdge().max : att2.value;
+                            parts[att2.label] = att2.label === 'SR5.AttrEdge' ? this.getEdge().max : att2.value;
                             const att2IdLabel = game.i18n.localize(CONFIG.SR5.attributes[att2Id]);
                             title += ` + ${att2IdLabel}`;
                         }
@@ -1287,7 +1270,7 @@ class SR5ActorSheet extends ActorSheet {
                 label: game.i18n.localize('SR5.Program'),
             },
         };
-        let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs,] = data.items.reduce((arr, item) => {
+        let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs] = data.items.reduce((arr, item) => {
             item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
             if (item.type === 'spell')
                 arr[1].push(item);
@@ -1714,8 +1697,7 @@ class SR5ActorSheet extends ActorSheet {
                 if (element) {
                     element.focus();
                     // set the selection range on the focus formed from before (keeps track of cursor in input)
-                    element.setSelectionRange &&
-                        element.setSelectionRange(focus.selectionStart, focus.selectionEnd);
+                    element.setSelectionRange && element.setSelectionRange(focus.selectionStart, focus.selectionEnd);
                 }
             }
         });
@@ -3807,17 +3789,7 @@ class Helpers {
             return false;
         if (typeof atts === 'boolean' && atts)
             return true;
-        const matrixAtts = [
-            'firewall',
-            'data_processing',
-            'sleaze',
-            'attack',
-            'computer',
-            'hacking',
-            'cybercombat',
-            'electronic_warfare',
-            'software',
-        ];
+        const matrixAtts = ['firewall', 'data_processing', 'sleaze', 'attack', 'computer', 'hacking', 'cybercombat', 'electronic_warfare', 'software'];
         const matrixLabels = matrixAtts.map((s) => this.label(s));
         if (!Array.isArray(atts))
             atts = [atts];
@@ -4016,9 +3988,7 @@ exports.ChatData = {
             // setup action props
             // go in order of "Limit/Accuracy" "Damage" "AP"
             // don't add action type if set to 'varies' or 'none' as that's pretty much useless info
-            if (data.action.type !== '' &&
-                data.action.type !== 'varies' &&
-                data.action.type !== 'none') {
+            if (data.action.type !== '' && data.action.type !== 'varies' && data.action.type !== 'none') {
                 props.push(`${helpers_1.Helpers.label(data.action.type)} Action`);
             }
             if (data.action.limit.value)
@@ -4251,15 +4221,8 @@ exports.ChatData = {
             if (blast === null || blast === void 0 ? void 0 : blast.dropoff)
                 props.push(`${game.i18n.localize('SR5.Dropoff')} ${blast.dropoff}/m`);
             if (data.thrown.ranges) {
-                const mult = data.thrown.ranges.attribute && (item === null || item === void 0 ? void 0 : item.actor)
-                    ? item.actor.data.data.attributes[data.thrown.ranges.attribute].value
-                    : 1;
-                const ranges = [
-                    data.thrown.ranges.short,
-                    data.thrown.ranges.medium,
-                    data.thrown.ranges.long,
-                    data.thrown.ranges.extreme,
-                ];
+                const mult = data.thrown.ranges.attribute && (item === null || item === void 0 ? void 0 : item.actor) ? item.actor.data.data.attributes[data.thrown.ranges.attribute].value : 1;
+                const ranges = [data.thrown.ranges.short, data.thrown.ranges.medium, data.thrown.ranges.long, data.thrown.ranges.extreme];
                 props.push(ranges.map((v) => v * mult).join('/'));
             }
         }
@@ -4379,8 +4342,7 @@ class SR5Item extends Item {
                     technology.conceal.mod[mod.name] = mod.data.data.technology.conceal.value;
                 }
             });
-            technology.conceal.value =
-                technology.conceal.base + helpers_1.Helpers.totalMods(technology.conceal.mod);
+            technology.conceal.value = technology.conceal.base + helpers_1.Helpers.totalMods(technology.conceal.mod);
         }
         if (action) {
             action.alt_mod = 0;
@@ -4422,8 +4384,7 @@ class SR5Item extends Item {
             }
             // once all damage mods have been accounted for, sum base and mod to value
             action.damage.value = action.damage.base + helpers_1.Helpers.totalMods(action.damage.mod);
-            action.damage.ap.value =
-                action.damage.ap.base + helpers_1.Helpers.totalMods(action.damage.ap.mod);
+            action.damage.ap.value = action.damage.ap.base + helpers_1.Helpers.totalMods(action.damage.ap.mod);
             action.limit.value = action.limit.base + helpers_1.Helpers.totalMods(action.limit.mod);
             if (this.actor) {
                 if (action.damage.attribute) {
@@ -4549,11 +4510,7 @@ class SR5Item extends Item {
         return (this.items || []).filter((item) => { var _a, _b; return item.type === 'ammo' && ((_b = (_a = item.data.data) === null || _a === void 0 ? void 0 : _a.technology) === null || _b === void 0 ? void 0 : _b.equipped); })[0];
     }
     getEquippedMods() {
-        return (this.items || []).filter((item) => {
-            var _a, _b;
-            return item.type === 'modification' &&
-                item.data.data.type === 'weapon' && ((_b = (_a = item.data.data) === null || _a === void 0 ? void 0 : _a.technology) === null || _b === void 0 ? void 0 : _b.equipped);
-        });
+        return (this.items || []).filter((item) => { var _a, _b; return item.type === 'modification' && item.data.data.type === 'weapon' && ((_b = (_a = item.data.data) === null || _a === void 0 ? void 0 : _a.technology) === null || _b === void 0 ? void 0 : _b.equipped); });
     }
     equipWeaponMod(iid) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -4928,9 +4885,7 @@ class SR5Item extends Item {
         });
     }
     isAreaOfEffect() {
-        return (this.isGrenade() ||
-            (this.isSpell() && this.data.data.range === 'los_a') ||
-            this.hasExplosiveAmmo());
+        return this.isGrenade() || (this.isSpell() && this.data.data.range === 'los_a') || this.hasExplosiveAmmo();
     }
     isGrenade() {
         var _a, _b;
@@ -5310,9 +5265,7 @@ class SR5ItemSheet extends ItemSheet {
             // Case 1 - Data explicitly provided
             if (data.data) {
                 // TODO test
-                if (this.item.isOwned &&
-                    data.actorId === ((_a = this.item.actor) === null || _a === void 0 ? void 0 : _a._id) &&
-                    data.data._id === this.item._id) {
+                if (this.item.isOwned && data.actorId === ((_a = this.item.actor) === null || _a === void 0 ? void 0 : _a._id) && data.data._id === this.item._id) {
                     console.log('Shadowrun5e | Cant drop item on itself');
                     // @ts-ignore
                     ui.notifications.error('Are you trying to break the game??');
@@ -5522,19 +5475,8 @@ Hooks.on('ready', function () {
         }
     });
     if (game.user.isGM) {
-        // Determine whether a system migration is required and feasible
-        const currentVersion = game.settings.get('shadowrun5e', 'systemMigrationVersion');
-        // the latest version that requires migration
-        const NEEDS_MIGRATION_VERSION = '0.5.12';
-        let needMigration = currentVersion === null || compareVersion(currentVersion, NEEDS_MIGRATION_VERSION) < 0;
-        // Perform the migration
-        if (needMigration && game.user.isGM) {
-            migrations.migrateWorld();
-        }
+        Migrator_1.Migrator.BeginMigration();
     }
-    // add listener to d20 icon for rolling
-    const diceIconSelector = '#chat-controls .roll-type-select .fa-dice-d20';
-    $(document).on('click', diceIconSelector, () => ShadowrunRoller_1.ShadowrunRoller.promptRoll());
 });
 Hooks.on('preUpdateCombat', combat_1.preCombatUpdate);
 Hooks.on('renderChatMessage', (app, html) => {
@@ -5641,14 +5583,60 @@ let Migrator = /** @class */ (() => {
                     // if versionNUmber is greater than currentVersion, we need to apply this migration
                     return this.compareVersion(versionNumber, currentVersion) === 1;
                 });
+                if (migrations.length === 0) {
+                    return;
+                }
                 // we want to apply migrations in ascending order until we're up to the latest
                 migrations.sort((a, b) => {
                     return this.compareVersion(a.versionNumber, b.versionNumber);
                 });
+                yield this.migrateWorld(game, migrations);
+                yield this.migrateCompendium(game, migrations);
+                //TODO: Localization
+                const packsDialog = new Dialog({
+                    title: 'Migration complete!',
+                    content: '<h3>Migration Complete</h3>' +
+                        '<p>Any world compendium packs that exist in the world were also updated.</p>' +
+                        '<p style="color: red">Due to technical limitations with FoundryVTT, actor compendium packs are unable to be updated at this time.' +
+                        ' You will have to manually update these packs.</p>',
+                    buttons: {
+                        ok: {
+                            icon: '<i class="fas fa-check"></i>',
+                            label: 'Close',
+                        },
+                    },
+                    default: 'ok',
+                });
+                packsDialog.render(true);
+            });
+        }
+        /**
+         * Migrate all world objects
+         * @param game
+         * @param migrations
+         */
+        static migrateWorld(game, migrations) {
+            return __awaiter(this, void 0, void 0, function* () {
                 // Run the migrations in order
-                for (const migrationInfo of migrations) {
-                    const migration = new migrationInfo.migration();
+                for (const { migration } of migrations) {
                     yield migration.Migrate(game);
+                }
+            });
+        }
+        /**
+         * Iterate over all world compendium packs
+         * @param game Game that will be migrated
+         * @param migrations Instances of the version migration
+         */
+        static migrateCompendium(game, migrations) {
+            return __awaiter(this, void 0, void 0, function* () {
+                // Migrate World Compendium Packs
+                const packs = game.packs.filter((pack) => pack.metadata.package === 'world' && ['Actor', 'Item', 'Scene'].includes(pack.metadata.entity));
+                // Run the migrations in order on each pack.
+                for (const pack of packs) {
+                    for (const { migration } of migrations) {
+                        yield migration.MigrateCompendiumPack(pack);
+                    }
                 }
             });
         }
@@ -5672,12 +5660,8 @@ let Migrator = /** @class */ (() => {
             return v1.length === v2.length ? 0 : v1.length < v2.length ? -1 : 1;
         }
     }
-    // This maps version number to migration.
-    // It is capable of supporting *multiple* migrations for a single version,
-    //  but this should be done with care, as both will run.
-    Migrator.s_Versions = [
-        { versionNumber: LegacyMigration_1.LegacyMigration.MigrationVersion, migration: LegacyMigration_1.LegacyMigration },
-    ];
+    // Map of all version migrations to their target version numbers.
+    Migrator.s_Versions = [{ versionNumber: LegacyMigration_1.LegacyMigration.TargetVersion, migration: new LegacyMigration_1.LegacyMigration() }];
     return Migrator;
 })();
 exports.Migrator = Migrator;
@@ -5722,112 +5706,15 @@ let VersionMigration = /** @class */ (() => {
             // @ts-ignore
             ui.notifications.error(`Data migration has been aborted: ${reason}`, { permanent: true });
         }
-        // TODO: Extract to extendable functions...
-        getMigratedActorItems(actorData, diffOnly = true) {
-            return __awaiter(this, void 0, void 0, function* () {
-                // Migrate Owned Items
-                //TODO: When SR5ActorData gets updated, remove ts-ignore
-                // @ts-ignore
-                if (!actorData.items)
-                    return [];
-                //TODO: When SR5ActorData gets updated, remove ts-ignore
-                // @ts-ignore
-                return yield actorData.items.reduce((accumulator, item) => __awaiter(this, void 0, void 0, function* () {
-                    // Migrate the Owned Item
-                    let migratedItemData = yield this.MigrateItemData(item);
-                    if (!isObjectEmpty(migratedItemData)) {
-                        if (!diffOnly)
-                            migratedItemData = mergeObject(item, migratedItemData);
-                        // need to copy id over of embedded entities
-                        migratedItemData._id = item._id;
-                        accumulator.then((acc) => acc.push(migratedItemData));
-                    }
-                    return accumulator;
-                }), Promise.resolve([]));
-            });
-        }
-        /**
-         * Get the Migrated Tokens for a scene
-         *  returns ALL data, not just changes (scenes need all data for tokens)
-         * @param sceneData
-         */
-        getMigratedSceneTokens(sceneData) {
-            return __awaiter(this, void 0, void 0, function* () {
-                if (!sceneData.tokens)
-                    return [];
-                return Promise.all(duplicate(sceneData.tokens).map((t) => __awaiter(this, void 0, void 0, function* () {
-                    // if we have nothing useful or are linked, return
-                    if (!t.actorId || t.actorLink || !t.actorData.data) {
-                        t.actorData = {};
-                        return t;
-                    }
-                    // create a token from the tokenData
-                    const token = new Token(t);
-                    if (!token.actor) {
-                        // no actor, no data to migrate
-                        t.actorId = null;
-                        t.actorData = {};
-                    } // don't want to update actors that are linked
-                    else {
-                        const updateData = yield this.MigrateActorData(token.data.actorData);
-                        t.actorData = mergeObject(token.data.actorData, updateData);
-                    }
-                    // migrate token actor items
-                    if (token.data.actorData.items) {
-                        t.actorData.items = yield this.getMigratedActorItems(token.data.actorData, false);
-                    }
-                    return t;
-                })));
-            });
-        }
-        // TODO: Extract to extendable functions...
-        migrateCompendium(pack) {
-            return __awaiter(this, void 0, void 0, function* () {
-                const { entity } = pack.metadata;
-                if (!['Actor', 'Item', 'Scene'].includes(entity))
-                    return;
-                // Begin by requesting server-side data model migration and get the migrated content
-                yield pack.migrate();
-                const content = yield pack.getContent();
-                // Iterate over compendium entries - applying fine-tuned migration functions
-                for (const contentEntity of content) {
-                    try {
-                        let updateData;
-                        if (entity === 'Item')
-                            updateData = yield this.MigrateItemData(contentEntity.data);
-                        else if (entity === 'Actor') {
-                            updateData = yield this.MigrateActorData(contentEntity.data);
-                            // TODO uncomment when items can be set on compendiums without causing errors
-                            // updateData.items = await this.getMigratedActorItems(contentEntity.data, false);
-                            updateData._id = contentEntity.data._id;
-                        }
-                        else if (entity === 'Scene')
-                            updateData = yield this.MigrateSceneData(contentEntity.data);
-                        if (updateData === null || isObjectEmpty(updateData)) {
-                            continue;
-                        }
-                        expandObject(updateData);
-                        updateData._id = contentEntity._id;
-                        yield pack.updateEntity(updateData);
-                        console.log(`Migrated ${entity} entity ${contentEntity.name} in Compendium ${pack.collection}`);
-                    }
-                    catch (error) {
-                        console.error(error);
-                        return Promise.reject(error);
-                    }
-                }
-                console.log(`Migrated all ${entity} entities from Compendium ${pack.collection}`);
-            });
-        }
         /**
          * Begin migration for the specified game.
          * @param game The world that should be migrated.
          */
         Migrate(game) {
             return __awaiter(this, void 0, void 0, function* () {
-                // @ts-ignore
+                // @ts-ignore TODO Unignore when Foundry Types updates
                 ui.notifications.info(`Beginning Shadowrun system migration from version ${this.SourceVersionFriendlyName} to ${this.TargetVersionFriendlyName}.`);
-                // @ts-ignore
+                // @ts-ignore TODO Unignore when Foundry Types updates
                 ui.notifications.warn(`Please do not close your game or shutdown FoundryVTT.`, {
                     permanent: true,
                 });
@@ -5839,6 +5726,91 @@ let VersionMigration = /** @class */ (() => {
                 if (this.m_Abort) {
                     return Promise.reject(this.m_AbortReason);
                 }
+                yield this.IterateItems(game, entityUpdates);
+                yield this.PostMigrateItemData(game, entityUpdates);
+                if (this.m_Abort) {
+                    return Promise.reject(this.m_AbortReason);
+                }
+                // Migrate World Actors
+                yield this.PreMigrateActorData(game, entityUpdates);
+                if (this.m_Abort) {
+                    return Promise.reject(this.m_AbortReason);
+                }
+                yield this.IterateActors(game, entityUpdates);
+                yield this.PostMigrateActorData(game, entityUpdates);
+                if (this.m_Abort) {
+                    return Promise.reject(this.m_AbortReason);
+                }
+                // Migrate Actor Tokens
+                yield this.PreMigrateSceneData(game, entityUpdates);
+                if (this.m_Abort) {
+                    return Promise.reject(this.m_AbortReason);
+                }
+                yield this.IterateScenes(game, entityUpdates);
+                yield this.PostMigrateSceneData(game, entityUpdates);
+                if (this.m_Abort) {
+                    return Promise.reject(this.m_AbortReason);
+                }
+                // Apply the updates, this should *always* work, now that parsing is complete.
+                yield this.Apply(entityUpdates);
+                yield game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
+                // @ts-ignore TODO Unignore when Foundry Types updates
+                ui.notifications.info(`Shadowrun system migration successfully migrated to version ${this.TargetVersion}.`, { permanent: true });
+            });
+        }
+        /**
+         * Applies the specified mapping of entities, iteratively updating each.
+         * @param entityUpdates A mapping of entity updateData pairs.
+         */
+        Apply(entityUpdates) {
+            return __awaiter(this, void 0, void 0, function* () {
+                for (const [entity, { updateData, embeddedItems }] of entityUpdates) {
+                    if (embeddedItems !== null) {
+                        const actor = entity;
+                        yield actor.updateOwnedItem(embeddedItems);
+                    }
+                    yield entity.update(updateData, { enforceTypes: false });
+                }
+            });
+        }
+        /**
+         * Iterate through all scenes and migrate each if needed.
+         * @param game
+         * @param entityUpdates
+         */
+        IterateScenes(game, entityUpdates) {
+            return __awaiter(this, void 0, void 0, function* () {
+                for (const scene of game.scenes.entities) {
+                    try {
+                        if (!(yield this.ShouldMigrateSceneData(scene))) {
+                            continue;
+                        }
+                        console.log(`Migrating Scene entity ${scene.name}`);
+                        const updateData = yield this.MigrateSceneData(duplicate(scene.data));
+                        // updateData.tokens = await this.getMigratedSceneTokens(scene.data);
+                        if (isObjectEmpty(updateData)) {
+                            continue;
+                        }
+                        expandObject(updateData);
+                        entityUpdates.set(scene, {
+                            updateData,
+                            embeddedItems: null,
+                        });
+                    }
+                    catch (error) {
+                        console.error(error);
+                        return Promise.reject(error);
+                    }
+                }
+            });
+        }
+        /**
+         * Iterate through all items and migrate each if needed.
+         * @param game The game to be updated.
+         * @param entityUpdates The current map of entity updates.
+         */
+        IterateItems(game, entityUpdates) {
+            return __awaiter(this, void 0, void 0, function* () {
                 for (const item of game.items.entities) {
                     try {
                         if (!(yield this.ShouldMigrateItemData(item.data))) {
@@ -5860,15 +5832,15 @@ let VersionMigration = /** @class */ (() => {
                         return Promise.reject(error);
                     }
                 }
-                yield this.PostMigrateItemData(game, entityUpdates);
-                if (this.m_Abort) {
-                    return Promise.reject(this.m_AbortReason);
-                }
-                // Migrate World Actors
-                yield this.PreMigrateActorData(game, entityUpdates);
-                if (this.m_Abort) {
-                    return Promise.reject(this.m_AbortReason);
-                }
+            });
+        }
+        /**
+         * Iterate through all actors and migrate each if needed.
+         * @param game The game to be updated.
+         * @param entityUpdates The current map of entity updates.
+         */
+        IterateActors(game, entityUpdates) {
+            return __awaiter(this, void 0, void 0, function* () {
                 for (const actor of game.actors.entities) {
                     try {
                         if (!(yield this.ShouldMigrateActorData(actor.data))) {
@@ -5876,9 +5848,10 @@ let VersionMigration = /** @class */ (() => {
                         }
                         console.log(`Migrating Actor ${actor.name}`);
                         const updateData = yield this.MigrateActorData(duplicate(actor.data));
-                        const items = yield this.getMigratedActorItems(actor.data);
-                        if (isObjectEmpty(updateData) && items.length === 0) {
-                            continue;
+                        let items = [];
+                        if (updateData.items) {
+                            items = updateData.items;
+                            delete updateData.items;
                         }
                         expandObject(updateData);
                         entityUpdates.set(actor, {
@@ -5890,68 +5863,6 @@ let VersionMigration = /** @class */ (() => {
                         console.error(error);
                         return Promise.reject(error);
                     }
-                }
-                yield this.PostMigrateActorData(game, entityUpdates);
-                if (this.m_Abort) {
-                    return Promise.reject(this.m_AbortReason);
-                }
-                // Migrate Actor Tokens
-                yield this.PreMigrateSceneData(game, entityUpdates);
-                if (this.m_Abort) {
-                    return Promise.reject(this.m_AbortReason);
-                }
-                for (const scene of game.scenes.entities) {
-                    try {
-                        if (!(yield this.ShouldMigrateSceneData(scene))) {
-                            continue;
-                        }
-                        console.log(`Migrating Scene entity ${scene.name}`);
-                        const updateData = yield this.MigrateSceneData(duplicate(scene.data));
-                        updateData.tokens = yield this.getMigratedSceneTokens(scene.data);
-                        if (isObjectEmpty(updateData)) {
-                            continue;
-                        }
-                        expandObject(updateData);
-                        entityUpdates.set(scene, {
-                            updateData,
-                            embeddedItems: null,
-                        });
-                    }
-                    catch (error) {
-                        console.error(error);
-                        return Promise.reject(error);
-                    }
-                }
-                yield this.PostMigrateSceneData(game, entityUpdates);
-                if (this.m_Abort) {
-                    return Promise.reject(this.m_AbortReason);
-                }
-                // Apply the updates, this should *always* work, now that parsing is complete.
-                yield this.Apply(entityUpdates);
-                yield game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
-                // @ts-ignore
-                ui.notifications.info(`Shadowrun system migration successfully migrated to version ${this.TargetVersion}.`);
-                return Promise.resolve();
-            });
-        }
-        /**
-         * Applies the specified mapping of entities, iteratively updating each.
-         * @param entityUpdates A mapping of entity updateData pairs.
-         */
-        Apply(entityUpdates) {
-            return __awaiter(this, void 0, void 0, function* () {
-                for (const [entity, { updateData, embeddedItems }] of entityUpdates) {
-                    if (embeddedItems !== null) {
-                        const actor = entity;
-                        yield actor.updateOwnedItem(embeddedItems);
-                    }
-                    yield entity.update(updateData, { enforceTypes: false });
-                }
-                // Migrate World Compendium Packs
-                const packs = game.packs.filter((pack) => pack.metadata.package === 'world' &&
-                    ['Actor', 'Item', 'Scene'].includes(pack.metadata.entity));
-                for (const pack of packs) {
-                    yield this.migrateCompendium(pack);
                 }
             });
         }
@@ -6003,6 +5914,58 @@ let VersionMigration = /** @class */ (() => {
         PostMigrateActorData(game, entityUpdates) {
             return __awaiter(this, void 0, void 0, function* () { });
         }
+        /**
+         * Migrate a compendium pack
+         * @param pack
+         */
+        MigrateCompendiumPack(pack) {
+            return __awaiter(this, void 0, void 0, function* () {
+                const entity = pack.metadata.entity;
+                if (!['Actor', 'Item', 'Scene'].includes(entity))
+                    return;
+                // Begin by requesting server-side data model migration and get the migrated content
+                yield pack.migrate({});
+                const content = yield pack.getContent();
+                // Iterate over compendium entries - applying fine-tuned migration functions
+                for (let ent of content) {
+                    try {
+                        let updateData = null;
+                        if (entity === 'Item') {
+                            updateData = yield this.MigrateItemData(ent.data);
+                            if (isObjectEmpty(updateData)) {
+                                continue;
+                            }
+                            expandObject(updateData);
+                            updateData['_id'] = ent._id;
+                            yield pack.updateEntity(updateData);
+                            // TODO: Uncomment when foundry allows embeddeds to be updated in packs
+                            // } else if (entity === 'Actor') {
+                            //     updateData = await this.MigrateActorData(ent.data);
+                            //
+                            //     if (isObjectEmpty(updateData)) {
+                            //         continue;
+                            //     }
+                            //
+                            //     updateData['_id'] = ent._id;
+                            //     await pack.updateEntity(updateData);
+                        }
+                        else if (entity === 'Scene') {
+                            updateData = yield this.MigrateSceneData(ent.data);
+                            if (isObjectEmpty(updateData)) {
+                                continue;
+                            }
+                            expandObject(updateData);
+                            updateData['_id'] = ent._id;
+                            yield pack.updateEntity(updateData);
+                        }
+                    }
+                    catch (err) {
+                        console.error(err);
+                    }
+                }
+                console.log(`Migrated all ${entity} entities from Compendium ${pack.collection}`);
+            });
+        }
     }
     VersionMigration.MODULE_NAME = 'shadowrun5e';
     VersionMigration.KEY_DATA_VERSION = 'systemMigrationVersion';
@@ -6033,16 +5996,45 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
         return '0';
     }
     get TargetVersion() {
+        return LegacyMigration.TargetVersion;
+    }
+    static get TargetVersion() {
         return '0.6.4';
     }
-    static get MigrationVersion() {
-        return '0.6.4';
-    }
-    MigrateActorData(actor) {
+    MigrateActorData(actorData) {
         return __awaiter(this, void 0, void 0, function* () {
             const updateData = {};
-            LegacyMigration.migrateActorOverflow(actor, updateData);
-            LegacyMigration.migrateActorSkills(actor, updateData);
+            LegacyMigration.migrateActorOverflow(actorData, updateData);
+            LegacyMigration.migrateActorSkills(actorData, updateData);
+            // @ts-ignore
+            if (!actorData.items) {
+                return updateData;
+            }
+            console.log('Pre-item map');
+            // @ts-ignore
+            console.log(actorData.items);
+            let hasItemUpdates = false;
+            const items = yield Promise.all(
+            // @ts-ignore
+            actorData.items.map((item) => __awaiter(this, void 0, void 0, function* () {
+                let itemUpdate = yield this.MigrateItemData(item);
+                if (!isObjectEmpty(itemUpdate)) {
+                    hasItemUpdates = true;
+                    itemUpdate['_id'] = item._id;
+                    return yield mergeObject(item, itemUpdate, {
+                        enforceTypes: false,
+                        inplace: false,
+                    });
+                }
+                else {
+                    return item;
+                }
+            })));
+            console.log('Post-item map');
+            console.log(items);
+            if (hasItemUpdates) {
+                updateData.items = items;
+            }
             return updateData;
         });
     }
@@ -6063,7 +6055,7 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
             return {};
         });
     }
-    ShouldMigrateActorData(actor) {
+    ShouldMigrateActorData(actorData) {
         return __awaiter(this, void 0, void 0, function* () {
             return true;
         });
@@ -6083,23 +6075,23 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
     /**
      * Migrate actor overflow from an integer to an object
      * - it wasn't even displayed before so we know it is 0
-     * @param actor
+     * @param actorData
      * @param updateData
      */
-    static migrateActorOverflow(actor, updateData) {
-        if (getProperty(actor.data, 'track.physical.overflow') === 0) {
+    static migrateActorOverflow(actorData, updateData) {
+        if (getProperty(actorData.data, 'track.physical.overflow') === 0) {
             updateData['data.track.physical.overflow.value'] = 0;
             updateData['data.track.physical.overflow.max'] = 0;
         }
     }
     /**
      * Migrate actor skills specializations to be a list instead of string
-     * @param actor
+     * @param actorData
      * @param updateData
      */
-    static migrateActorSkills(actor, updateData) {
+    static migrateActorSkills(actorData, updateData) {
         var _a, _b;
-        if (!((_b = (_a = actor.data) === null || _a === void 0 ? void 0 : _a.skills) === null || _b === void 0 ? void 0 : _b.active))
+        if (!((_b = (_a = actorData.data) === null || _a === void 0 ? void 0 : _a.skills) === null || _b === void 0 ? void 0 : _b.active))
             return;
         const splitRegex = /[,\/|.]+/;
         const reducer = (running, [key, val]) => {
@@ -6110,12 +6102,12 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
             }
             return running;
         };
-        updateData['data.skills.active'] = Object.entries(actor.data.skills.active).reduce(reducer, {});
-        updateData['data.skills.knowledge.street.value'] = Object.entries(actor.data.skills.knowledge.street.value).reduce(reducer, {});
-        updateData['data.skills.knowledge.professional.value'] = Object.entries(actor.data.skills.knowledge.professional.value).reduce(reducer, {});
-        updateData['data.skills.knowledge.academic.value'] = Object.entries(actor.data.skills.knowledge.academic.value).reduce(reducer, {});
-        updateData['data.skills.knowledge.interests.value'] = Object.entries(actor.data.skills.knowledge.interests.value).reduce(reducer, {});
-        updateData['data.skills.language.value'] = Object.entries(actor.data.skills.language.value).reduce(reducer, {});
+        updateData['data.skills.active'] = Object.entries(actorData.data.skills.active).reduce(reducer, {});
+        updateData['data.skills.knowledge.street.value'] = Object.entries(actorData.data.skills.knowledge.street.value).reduce(reducer, {});
+        updateData['data.skills.knowledge.professional.value'] = Object.entries(actorData.data.skills.knowledge.professional.value).reduce(reducer, {});
+        updateData['data.skills.knowledge.academic.value'] = Object.entries(actorData.data.skills.knowledge.academic.value).reduce(reducer, {});
+        updateData['data.skills.knowledge.interests.value'] = Object.entries(actorData.data.skills.knowledge.interests.value).reduce(reducer, {});
+        updateData['data.skills.language.value'] = Object.entries(actorData.data.skills.language.value).reduce(reducer, {});
     }
     /**
      *
@@ -6123,7 +6115,7 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
      * @param updateData
      */
     static migrateDamageTypeAndElement(item, updateData) {
-        console.log('Migrating Damage and Elements');
+        // console.log('Migrating Damage and Elements');
         if (item.data.action) {
             const action = item.data.action;
             if (typeof action.damage.type === 'string') {
@@ -6140,7 +6132,7 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
      * @param updateData
      */
     static migrateItemsAmmo(item, updateData) {
-        console.log('Migrating Ammo');
+        // console.log('Migrating Ammo');
         if (item.type === 'weapon' && item.data.ammo === undefined) {
             let currentAmmo = { value: 0, max: 0 };
             if (item.data.category === 'range' && item.data.range && item.data.range.ammo) {
@@ -6263,7 +6255,7 @@ const chat_1 = require("../chat");
 class ShadowrunRoll extends Roll {
     toJSON() {
         const data = super.toJSON();
-        data.class = "Roll";
+        data.class = 'Roll';
         return data;
     }
 }
@@ -6345,7 +6337,7 @@ class ShadowrunRoller {
             roll.templateData = templateData;
             if (!hideRollMessage) {
                 const chatData = yield chat_1.createChatData(templateData, roll);
-                ChatMessage.create(chatData, { displaySheet: false }).then(message => {
+                ChatMessage.create(chatData, { displaySheet: false }).then((message) => {
                     console.log(message);
                 });
             }
@@ -6370,7 +6362,7 @@ class ShadowrunRoller {
     static advancedRoll(props) {
         // destructure what we need to use from props
         // any value pulled out needs to be updated back in props if changed
-        const { title, actor, parts = {}, limit, extended, wounds = true, after, dialogOptions, } = props;
+        const { title, actor, parts = {}, limit, extended, wounds = true, after, dialogOptions } = props;
         // remove limits if game settings is set
         if (!game.settings.get('shadowrun5e', 'applyLimits')) {
             delete props.limit;
