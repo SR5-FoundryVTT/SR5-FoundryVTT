@@ -58,5 +58,5 @@ export const registerSystemSettings = () => {
         config: false,
         type: String,
         default: '0',
-    })
+    });
 };

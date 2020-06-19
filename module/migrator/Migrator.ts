@@ -20,6 +20,11 @@ export class Migrator {
             // if versionNUmber is greater than currentVersion, we need to apply this migration
             return this.compareVersion(versionNumber, currentVersion) === 1;
         });
+
+        if (migrations.length === 0) {
+            return;
+        }
+
         // we want to apply migrations in ascending order until we're up to the latest
         migrations.sort((a, b) => {
             return this.compareVersion(a.versionNumber, b.versionNumber);

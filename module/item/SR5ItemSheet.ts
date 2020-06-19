@@ -78,10 +78,8 @@ export class SR5ItemSheet extends ItemSheet {
         const [ammunition, weaponMods, armorMods] = items.reduce(
             (parts: [BaseEntityData[], BaseEntityData[], BaseEntityData[]], item: SR5Item) => {
                 if (item.type === 'ammo') parts[0].push(item.data);
-                if (item.type === 'modification' && item.data.data.type === 'weapon')
-                    parts[1].push(item.data);
-                if (item.type === 'modification' && item.data.data.type === 'armor')
-                    parts[2].push(item.data);
+                if (item.type === 'modification' && item.data.data.type === 'weapon') parts[1].push(item.data);
+                if (item.type === 'modification' && item.data.data.type === 'armor') parts[2].push(item.data);
                 return parts;
             },
             [[], [], []]
@@ -155,11 +153,7 @@ export class SR5ItemSheet extends ItemSheet {
         // Case 1 - Data explicitly provided
         if (data.data) {
             // TODO test
-            if (
-                this.item.isOwned &&
-                data.actorId === this.item.actor?._id &&
-                data.data._id === this.item._id
-            ) {
+            if (this.item.isOwned && data.actorId === this.item.actor?._id && data.data._id === this.item._id) {
                 console.log('Shadowrun5e | Cant drop item on itself');
                 // @ts-ignore
                 ui.notifications.error('Are you trying to break the game??');
