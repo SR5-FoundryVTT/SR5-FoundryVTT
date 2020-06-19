@@ -78,10 +78,8 @@ export class SR5ItemSheet extends ItemSheet {
         const [ammunition, weaponMods, armorMods] = items.reduce(
             (parts: [BaseEntityData[], BaseEntityData[], BaseEntityData[]], item: SR5Item) => {
                 if (item.type === 'ammo') parts[0].push(item.data);
-                if (item.type === 'modification' && item.data.data.type === 'weapon')
-                    parts[1].push(item.data);
-                if (item.type === 'modification' && item.data.data.type === 'armor')
-                    parts[2].push(item.data);
+                if (item.type === 'modification' && item.data.data.type === 'weapon') parts[1].push(item.data);
+                if (item.type === 'modification' && item.data.data.type === 'armor') parts[2].push(item.data);
                 return parts;
             },
             [[], [], []]
@@ -117,7 +115,7 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.mod-delete').click(this._onWeaponModRemove.bind(this));
 
         html.find('.add-new-license').click(this._onAddLicense.bind(this));
-        // html.find('.remove-license').click(this._onRemoveLicense.bind(this));
+        html.find('.license-delete').on('click', this._onRemoveLicense.bind(this));
 
         html.find('.has-desc').click((event) => {
             event.preventDefault();
@@ -155,11 +153,7 @@ export class SR5ItemSheet extends ItemSheet {
         // Case 1 - Data explicitly provided
         if (data.data) {
             // TODO test
-            if (
-                this.item.isOwned &&
-                data.actorId === this.item.actor?._id &&
-                data.data._id === this.item._id
-            ) {
+            if (this.item.isOwned && data.actorId === this.item.actor?._id && data.data._id === this.item._id) {
                 console.log('Shadowrun5e | Cant drop item on itself');
                 // @ts-ignore
                 ui.notifications.error('Are you trying to break the game??');
@@ -198,6 +192,12 @@ export class SR5ItemSheet extends ItemSheet {
     async _onAddLicense(event) {
         event.preventDefault();
         this.item.addNewLicense();
+    }
+
+    async _onRemoveLicense(event) {
+        event.preventDefault();
+        const index = event.currentTarget.dataset.index;
+        if (index >= 0) this.item.removeLicense(index);
     }
 
     async _onWeaponModRemove(event) {

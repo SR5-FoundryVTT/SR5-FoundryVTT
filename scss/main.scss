@@ -142,6 +142,10 @@ button.display {
     &.short {
         line-height: 1.3em;
     }
+    &.light {
+        color: $black;
+        background: $light;
+    }
 }
 
 input[type='checkbox'].hidden {

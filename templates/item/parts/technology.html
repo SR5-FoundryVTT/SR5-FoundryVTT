@@ -62,6 +62,7 @@
                 placeholder="1"
             />
         </div>
+        {{#unless hideConceal}}
         <div class="flexrow nowrap">
             <label>{{localize "SR5.Conceal"}}</label>
             <input
@@ -74,6 +75,7 @@
                 placeholder="0"
             />
         </div>
+        {{/unless}}
         <div class="flexrow nowrap">
             <label>{{localize "SR5.Cost"}}</label>
             <div class="input">
@@ -100,6 +102,7 @@
                 placeholder="2R"
             />
         </div>
+        {{#unless hideConditionMonitor}}
         <div class="flexrow nowrap">
             <label>{{localize "SR5.ConditionMonitor"}}</label>
             <div class="flexrow">
@@ -108,20 +111,22 @@
                     type="text"
                     size="2"
                     maxlength="2"
-                    name="data.condition_monitor.value"
-                    value="{{data.condition_monitor.value}}"
+                    name=""
+                    value="{{data.technology.condition_monitor.value}}"
                     placeholder="0"
+                    data-dtype="Number"
                 />
                 <input
                     class="display"
                     type="text"
                     size="3"
                     maxlength="3"
-                    value="/{{data.condition_monitor.max}}"
+                    value="/{{data.technology.condition_monitor.max}}"
                     disabled
                 />
             </div>
         </div>
+        {{/unless}}
         <div class="flexrow nowrap">
             {{localize "SR5.Equipped"}}<input
                 class="checkbox"

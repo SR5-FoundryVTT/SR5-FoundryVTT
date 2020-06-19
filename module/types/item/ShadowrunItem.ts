@@ -16,7 +16,6 @@ declare namespace Shadowrun {
         Partial<CyberwareData> &
         Partial<DeviceData> & {
             description: DescriptionData;
-            condition_monitor?: ConditionData;
         };
 
     /**
@@ -30,6 +29,7 @@ declare namespace Shadowrun {
             cost: NumberOrEmpty;
             equipped: boolean;
             conceal: ModifiableValue;
+            condition_monitor?: ConditionData;
         };
     };
 

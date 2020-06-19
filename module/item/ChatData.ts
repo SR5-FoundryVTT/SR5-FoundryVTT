@@ -27,28 +27,16 @@ export const ChatData = {
 
             if (data.action.opposed.type) {
                 const { opposed } = data.action;
-                if (opposed.type !== 'custom')
-                    labels.opposedRoll = `vs. ${Helpers.label(opposed.type)}`;
-                else if (opposed.skill)
-                    labels.opposedRoll = `vs. ${Helpers.label(opposed.skill)}+${Helpers.label(
-                        opposed.attribute
-                    )}`;
-                else if (opposed.attribute2)
-                    labels.opposedRoll = `vs. ${Helpers.label(opposed.attribute)}+${Helpers.label(
-                        opposed.attribute2
-                    )}`;
-                else if (opposed.attribute)
-                    labels.opposedRoll = `vs. ${Helpers.label(opposed.attribute)}`;
+                if (opposed.type !== 'custom') labels.opposedRoll = `vs. ${Helpers.label(opposed.type)}`;
+                else if (opposed.skill) labels.opposedRoll = `vs. ${Helpers.label(opposed.skill)}+${Helpers.label(opposed.attribute)}`;
+                else if (opposed.attribute2) labels.opposedRoll = `vs. ${Helpers.label(opposed.attribute)}+${Helpers.label(opposed.attribute2)}`;
+                else if (opposed.attribute) labels.opposedRoll = `vs. ${Helpers.label(opposed.attribute)}`;
             }
 
             // setup action props
             // go in order of "Limit/Accuracy" "Damage" "AP"
             // don't add action type if set to 'varies' or 'none' as that's pretty much useless info
-            if (
-                data.action.type !== '' &&
-                data.action.type !== 'varies' &&
-                data.action.type !== 'none'
-            ) {
+            if (data.action.type !== '' && data.action.type !== 'varies' && data.action.type !== 'none') {
                 props.push(`${Helpers.label(data.action.type)} Action`);
             }
             if (data.action.limit.value) props.push(`Limit ${data.action.limit.value}`);
@@ -57,9 +45,7 @@ export const ChatData = {
                 let damageString = '';
                 let elementString = '';
                 if (damage.value) {
-                    damageString = `DV ${damage.value}${
-                        damage.type.value ? damage.type.value.toUpperCase().charAt(0) : ''
-                    }`;
+                    damageString = `DV ${damage.value}${damage.type.value ? damage.type.value.toUpperCase().charAt(0) : ''}`;
                 }
                 if (damage.element.value) {
                     // if we have a damage value and are electric, follow the convention of (e) after
@@ -109,14 +95,17 @@ export const ChatData = {
 
     armor: (data, labels, props) => {
         if (data.armor) {
-            if (data.armor.value)
-                props.push(`Armor ${data.armor.mod ? '+' : ''}${data.armor.value}`);
+            if (data.armor.value) props.push(`Armor ${data.armor.mod ? '+' : ''}${data.armor.value}`);
             if (data.armor.acid) props.push(`Acid ${data.armor.acid}`);
             if (data.armor.cold) props.push(`Cold ${data.armor.cold}`);
             if (data.armor.fire) props.push(`Fire ${data.armor.fire}`);
             if (data.armor.electricity) props.push(`Electricity ${data.armor.electricity}`);
             if (data.armor.radiation) props.push(`Radiation ${data.armor.radiation}`);
         }
+    },
+
+    program: (data, labels, props) => {
+        props.push(game.i18n.localize(CONFIG.SR5.programTypes[data.type]));
     },
 
     complex_form: (data, labels, props) => {
@@ -135,8 +124,7 @@ export const ChatData = {
     },
 
     device: (data: DeviceData, labels, props) => {
-        if (data.technology && data.technology.rating)
-            props.push(`Rating ${data.technology.rating}`);
+        if (data.technology && data.technology.rating) props.push(`Rating ${data.technology.rating}`);
         if (data.category === 'cyberdeck') {
             for (const attN of Object.values(data.atts)) {
                 props.push(`${Helpers.label(attN.att)} ${attN.value}`);
@@ -145,8 +133,7 @@ export const ChatData = {
     },
 
     equipment: (data, labels, props) => {
-        if (data.technology && data.technology.rating)
-            props.push(`Rating ${data.technology.rating}`);
+        if (data.technology && data.technology.rating) props.push(`Rating ${data.technology.rating}`);
     },
 
     quality: (data, labels, props) => {
@@ -207,26 +194,10 @@ export const ChatData = {
         if (equippedAmmo && data.ammo && data.ammo.current?.max) {
             if (equippedAmmo) {
                 const { current, spare_clips } = data.ammo;
-                if (equippedAmmo.name)
-                    props.push(`${equippedAmmo.name} (${current.value}/${current.max})`);
-                if (equippedAmmo.data.data.blast.radius)
-                    props.push(
-                        `${game.i18n.localize('SR5.BlastRadius')} ${
-                            equippedAmmo.data.data.blast.radius
-                        }m`
-                    );
-                if (equippedAmmo.data.data.blast.dropoff)
-                    props.push(
-                        `${game.i18n.localize('SR5.Dropoff')} ${
-                            equippedAmmo.data.data.blast.dropoff
-                        }/m`
-                    );
-                if (spare_clips && spare_clips.max)
-                    props.push(
-                        `${game.i18n.localize('SR5.SpareClips')} (${spare_clips.value}/${
-                            spare_clips.max
-                        })`
-                    );
+                if (equippedAmmo.name) props.push(`${equippedAmmo.name} (${current.value}/${current.max})`);
+                if (equippedAmmo.data.data.blast.radius) props.push(`${game.i18n.localize('SR5.BlastRadius')} ${equippedAmmo.data.data.blast.radius}m`);
+                if (equippedAmmo.data.data.blast.dropoff) props.push(`${game.i18n.localize('SR5.Dropoff')} ${equippedAmmo.data.data.blast.dropoff}/m`);
+                if (spare_clips && spare_clips.max) props.push(`${game.i18n.localize('SR5.SpareClips')} (${spare_clips.value}/${spare_clips.max})`);
             }
         }
 
@@ -236,13 +207,9 @@ export const ChatData = {
 
         if (data.category === 'range') {
             if (data.range.rc) {
-                let rcString = `${game.i18n.localize('SR5.RecoilCompensation')} ${
-                    data.range.rc.value
-                }`;
+                let rcString = `${game.i18n.localize('SR5.RecoilCompensation')} ${data.range.rc.value}`;
                 if (item?.actor) {
-                    rcString += ` (${game.i18n.localize('SR5.Total')} ${
-                        item.actor.data.data.recoil_compensation + data.range.rc.value
-                    })`;
+                    rcString += ` (${game.i18n.localize('SR5.Total')} ${item.actor.data.data.recoil_compensation + data.range.rc.value})`;
                 }
                 props.push(rcString);
             }
@@ -255,8 +222,7 @@ export const ChatData = {
                 if (modes.full_auto) newModes.push('SR5.WeaponModeFullAutoShort');
                 props.push(newModes.map((m) => game.i18n.localize(m)).join('/'));
             }
-            if (data.range.ranges)
-                props.push(Array.from(Object.values(data.range.ranges)).join('/'));
+            if (data.range.ranges) props.push(Array.from(Object.values(data.range.ranges)).join('/'));
         } else if (data.category === 'melee') {
             if (data.melee.reach) {
                 const reachString = `${game.i18n.localize('SR5.Reach')} ${data.melee.reach}`;
@@ -270,22 +236,12 @@ export const ChatData = {
             }
         } else if (data.category === 'thrown') {
             const { blast } = data.thrown;
-            if (blast?.radius)
-                props.push(`${game.i18n.localize('SR5.BlastRadius')} ${blast.radius}m`);
-            if (blast?.dropoff)
-                props.push(`${game.i18n.localize('SR5.Dropoff')} ${blast.dropoff}/m`);
+            if (blast?.radius) props.push(`${game.i18n.localize('SR5.BlastRadius')} ${blast.radius}m`);
+            if (blast?.dropoff) props.push(`${game.i18n.localize('SR5.Dropoff')} ${blast.dropoff}/m`);
 
             if (data.thrown.ranges) {
-                const mult =
-                    data.thrown.ranges.attribute && item?.actor
-                        ? item.actor.data.data.attributes[data.thrown.ranges.attribute].value
-                        : 1;
-                const ranges = [
-                    data.thrown.ranges.short,
-                    data.thrown.ranges.medium,
-                    data.thrown.ranges.long,
-                    data.thrown.ranges.extreme,
-                ];
+                const mult = data.thrown.ranges.attribute && item?.actor ? item.actor.data.data.attributes[data.thrown.ranges.attribute].value : 1;
+                const ranges = [data.thrown.ranges.short, data.thrown.ranges.medium, data.thrown.ranges.long, data.thrown.ranges.extreme];
                 props.push(ranges.map((v) => v * mult).join('/'));
             }
         }

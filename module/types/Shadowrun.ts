@@ -7,12 +7,7 @@ declare namespace Shadowrun {
     /**
      * Any valid attribute that an actor can have.
      */
-    export type ActorAttribute =
-        | PhysicalAttribute
-        | MentalAttribute
-        | SpecialAttribute
-        | MatrixAttribute
-        | '';
+    export type ActorAttribute = PhysicalAttribute | MentalAttribute | SpecialAttribute | MatrixAttribute | '';
 
     export type DamageType = 'physical' | 'stun' | 'matrix' | '';
 
@@ -68,5 +63,14 @@ declare namespace Shadowrun {
 
     export type LabelField = {
         label?: string;
+    };
+
+    export type HasBonus = {
+        bonus: KeyValuePair[];
+    };
+
+    type KeyValuePair = {
+        key: string;
+        value: number;
     };
 }

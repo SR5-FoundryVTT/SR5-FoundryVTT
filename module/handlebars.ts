@@ -28,6 +28,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/templates/item/parts/lifestyle.html',
         'systems/shadowrun5e/templates/item/parts/ammo.html',
         'systems/shadowrun5e/templates/item/parts/modification.html',
+        'systems/shadowrun5e/templates/item/parts/program.html',
         'systems/shadowrun5e/templates/rolls/parts/parts-list.html',
     ];
 
@@ -119,7 +120,7 @@ export const registerHandlebarHelpers = () => {
         return icon;
     });
 
-    Handlebars.registerHelper('isDefined', function(value) {
+    Handlebars.registerHelper('isDefined', function (value) {
         return value !== undefined;
-    })
+    });
 };
