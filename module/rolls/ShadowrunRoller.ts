@@ -50,17 +50,13 @@ export class ShadowrunRoll extends Roll {
     templateData: TemplateData | undefined;
     toJSON(): any {
         const data = super.toJSON();
-        data.class = "Roll";
+        data.class = 'Roll';
         return data;
     }
 }
 
 export class ShadowrunRoller {
-    static itemRoll(
-        event,
-        item,
-        options?: Partial<AdvancedRollProps>
-    ): Promise<ShadowrunRoll | undefined> {
+    static itemRoll(event, item, options?: Partial<AdvancedRollProps>): Promise<ShadowrunRoll | undefined> {
         const parts = item.getRollPartsList();
         let limit = item.getLimit();
         let title = item.getRollName();
@@ -171,7 +167,7 @@ export class ShadowrunRoller {
 
         if (!hideRollMessage) {
             const chatData = await createChatData(templateData, roll);
-            ChatMessage.create(chatData, { displaySheet: false }).then(message => {
+            ChatMessage.create(chatData, { displaySheet: false }).then((message) => {
                 console.log(message);
             });
         }
@@ -197,16 +193,7 @@ export class ShadowrunRoller {
     static advancedRoll(props: AdvancedRollProps): Promise<ShadowrunRoll | undefined> {
         // destructure what we need to use from props
         // any value pulled out needs to be updated back in props if changed
-        const {
-            title,
-            actor,
-            parts = {},
-            limit,
-            extended,
-            wounds = true,
-            after,
-            dialogOptions,
-        } = props;
+        const { title, actor, parts = {}, limit, extended, wounds = true, after, dialogOptions } = props;
 
         // remove limits if game settings is set
         if (!game.settings.get('shadowrun5e', 'applyLimits')) {
@@ -258,9 +245,7 @@ export class ShadowrunRoller {
                         if (cancel) return;
                         // get the actual dice_pool from the difference of initial parts and value in the dialog
 
-                        const dicePoolValue = Helpers.parseInputToNumber(
-                            $(html).find('[name="dice_pool"]').val()
-                        );
+                        const dicePoolValue = Helpers.parseInputToNumber($(html).find('[name="dice_pool"]').val());
 
                         if (dialogOptions?.prompt && dicePoolValue > 0) {
                             for (const key in parts) {
@@ -270,9 +255,7 @@ export class ShadowrunRoller {
                             parts['SR5.Base'] = dicePoolValue;
                         }
 
-                        const limitValue = Helpers.parseInputToNumber(
-                            $(html).find('[name="limit"]').val()
-                        );
+                        const limitValue = Helpers.parseInputToNumber($(html).find('[name="limit"]').val());
 
                         if (limit && limit.value !== limitValue) {
                             limit.value = limitValue;
@@ -280,15 +263,9 @@ export class ShadowrunRoller {
                             limit.label = 'SR5.Override';
                         }
 
-                        const woundValue = -Helpers.parseInputToNumber(
-                            $(html).find('[name="wounds"]').val()
-                        );
-                        const situationMod = Helpers.parseInputToNumber(
-                            $(html).find('[name="dp_mod"]').val()
-                        );
-                        const environmentMod = -Helpers.parseInputToNumber(
-                            $(html).find('[name="options.environmental"]').val()
-                        );
+                        const woundValue = -Helpers.parseInputToNumber($(html).find('[name="wounds"]').val());
+                        const situationMod = Helpers.parseInputToNumber($(html).find('[name="dp_mod"]').val());
+                        const environmentMod = -Helpers.parseInputToNumber($(html).find('[name="options.environmental"]').val());
 
                         if (wounds && woundValue !== 0) {
                             parts['SR5.Wounds'] = woundValue;
@@ -301,17 +278,14 @@ export class ShadowrunRoller {
                             props.dialogOptions.environmental = true;
                         }
 
-                        const extendedString = Helpers.parseInputToString(
-                            $(html).find('[name="extended"]').val()
-                        );
+                        const extendedString = Helpers.parseInputToString($(html).find('[name="extended"]').val());
                         const extended = extendedString === 'true';
 
                         if (edge && actor) {
                             props.explodeSixes = true;
                             parts['SR5.PushTheLimit'] = actor.getEdge().max;
                             await actor.update({
-                                'data.attributes.edge.value':
-                                    actor.data.data.attributes.edge.value - 1,
+                                'data.attributes.edge.value': actor.data.data.attributes.edge.value - 1,
                             });
                         }
 

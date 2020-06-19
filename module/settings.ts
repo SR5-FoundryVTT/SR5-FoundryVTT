@@ -1,5 +1,7 @@
 // game settings for shadowrun 5e
 
+import { VersionMigration } from './migrator/VersionMigration';
+
 export const registerSystemSettings = () => {
     /**
      * Track system version upon which a migration was last applied
@@ -47,6 +49,14 @@ export const registerSystemSettings = () => {
         scope: 'user',
         config: true,
         type: Boolean,
-        default: false
-    })
+        default: false,
+    });
+
+    game.settings.register('shadowrun5e', VersionMigration.KEY_DATA_VERSION, {
+        name: 'System Data Version.',
+        scope: 'world',
+        config: false,
+        type: String,
+        default: '0',
+    });
 };
