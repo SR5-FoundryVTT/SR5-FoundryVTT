@@ -611,7 +611,7 @@ export class SR5Actor extends Actor {
                                         await this.rollSoak(soakRollOptions);
                                     }
                                 }
-                            })
+                            }),
                         );
                     },
                 }).render(true);
@@ -708,7 +708,7 @@ export class SR5Actor extends Actor {
                                 parts,
                                 title: title,
                                 wounds: false,
-                            })
+                            }),
                         );
                     },
                 }).render(true);
@@ -934,7 +934,7 @@ export class SR5Actor extends Actor {
                             cancel = false;
                             spec = s;
                         },
-                    })
+                    }),
             );
         }
         renderTemplate('systems/shadowrun5e/templates/rolls/skill-roll.html', dialogData).then((dlg) => {

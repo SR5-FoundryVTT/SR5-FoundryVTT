@@ -44,7 +44,7 @@ export const shadowrunCombatUpdate = async (changes, options) => {
     await combat.deleteEmbeddedEntity(
         'Combatant',
         removedCombatants.map((c) => c._id),
-        {}
+        {},
     );
     await combat.updateEmbeddedEntity('Combatant', combatants, {});
     if (combatants.length === 0) {
@@ -70,7 +70,7 @@ export const shadowrunCombatUpdate = async (changes, options) => {
                     },
                     flavor: `${c.token.name} rolls for Initiative!`,
                 },
-                messageOptions
+                messageOptions,
             );
             await roll.toMessage(messageData, {
                 rollMode,

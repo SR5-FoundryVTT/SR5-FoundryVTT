@@ -194,7 +194,7 @@ export class SR5ActorSheet extends ActorSheet {
                 else if (Object.keys(inventory).includes(item.type)) arr[0].push(item);
                 return arr;
             },
-            [[], [], [], [], [], [], [], [], [], []]
+            [[], [], [], [], [], [], [], [], [], []],
         );
 
         const sortByName = (i1, i2) => {
@@ -454,13 +454,13 @@ export class SR5ActorSheet extends ActorSheet {
                 // if clicking the equipped, toggle it
                 for (let ite of this.actor.items.filter((i) => i.type === 'device')) {
                     newItems.push({
-                        _id: ite._id,
+                        '_id': ite._id,
                         'data.technology.equipped': ite._id === iid ? !itemData.technology.equipped : false,
                     });
                 }
             } else {
                 newItems.push({
-                    _id: iid,
+                    '_id': iid,
                     'data.technology.equipped': !itemData.technology.equipped,
                 });
             }

@@ -43,7 +43,7 @@ export class LegacyMigration extends VersionMigration {
                 } else {
                     return item;
                 }
-            })
+            }),
         );
         console.log('Post-item map');
         console.log(items);

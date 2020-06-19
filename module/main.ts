@@ -124,7 +124,7 @@ async function createItemMacro(item, slot) {
                 command: command,
                 flags: { 'shadowrun5e.itemMacro': true },
             },
-            { displaySheet: false }
+            { displaySheet: false },
         )) as Macro;
     }
     if (macro) game.user.assignHotbarMacro(macro, slot);

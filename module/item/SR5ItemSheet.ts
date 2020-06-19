@@ -82,7 +82,7 @@ export class SR5ItemSheet extends ItemSheet {
                 if (item.type === 'modification' && item.data.data.type === 'armor') parts[2].push(item.data);
                 return parts;
             },
-            [[], [], []]
+            [[], [], []],
         );
         data['ammunition'] = ammunition;
         data['weaponMods'] = weaponMods;

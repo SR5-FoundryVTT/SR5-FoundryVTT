@@ -84,7 +84,7 @@ export const addChatMessageContextOptions = (html, options) => {
             callback: (li) => SR5Actor.secondChance(li),
             condition: canRoll,
             icon: '<i class="fas fa-dice-d6"></i>',
-        }
+        },
     );
     return options;
 };

@@ -26,8 +26,12 @@ export class SR5Roll extends Roll {
      */
     public static ToFormula(count: number, limit: number = -1, explode: boolean = false): string {
         let formula = `${count}d6`;
-        if (explode) { formula += 'x6'; }
-        if (limit > 0) { formula += `kh${limit}`; }
+        if (explode) {
+            formula += 'x6';
+        }
+        if (limit > 0) {
+            formula += `kh${limit}`;
+        }
 
         return `${formula}cs>=5`;
     }
@@ -40,7 +44,7 @@ export class SR5Roll extends Roll {
      */
     public static Roll(count: number, limit: number = -1, explode: boolean = false): SR5Roll {
         if (count <= 0) {
-            throw new DiceError("Must request least one die be rolled.");
+            throw new DiceError('Must request least one die be rolled.');
         }
 
         return new SR5Roll(count, limit, explode).roll();
@@ -63,7 +67,7 @@ export class SR5Roll extends Roll {
 
     constructor(count: number, limit: number = -1, explode: boolean = false) {
         if (count <= 0) {
-            throw new DiceError("Must request least one die be rolled.");
+            throw new DiceError('Must request least one die be rolled.');
         }
 
         super(SR5Roll.ToFormula(count, limit, explode));
@@ -111,7 +115,7 @@ export class SR5Roll extends Roll {
      * Is this roll a regular (non-critical) glitch?
      */
     get isGlitch(): boolean {
-        return this.glitches > (this.dice.length/2);
+        return this.glitches > this.dice.length / 2;
     }
 
     /**
