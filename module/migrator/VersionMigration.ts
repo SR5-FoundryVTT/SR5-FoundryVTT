@@ -124,9 +124,43 @@ export abstract class VersionMigration {
                     continue;
                 }
 
+                if (scene._id === 'MAwSFhlXRipixOWw') {
+                    console.log('Scene Pre-Update');
+                    console.log(scene);
+                }
+
                 console.log(`Migrating Scene entity ${scene.name}`);
                 const updateData = await this.MigrateSceneData(duplicate(scene.data));
-                // updateData.tokens = await this.getMigratedSceneTokens(scene.data);
+
+                let hasTokenUpdates = false;
+                updateData.tokens = await Promise.all(
+                    // @ts-ignore
+                    scene.data.tokens.map(async (token) => {
+                        if (isObjectEmpty(token.actorData)) {
+                            return token;
+                        }
+
+                        let tokenDataUpdate = await this.MigrateActorData(token.actorData);
+                        if (!isObjectEmpty(tokenDataUpdate)) {
+                            hasTokenUpdates = true;
+                            tokenDataUpdate['_id'] = token._id;
+
+                            const newToken = duplicate(token);
+                            newToken.actorData = await mergeObject(token.actorData, tokenDataUpdate, {
+                                enforceTypes: false,
+                                inplace: false,
+                            });
+                            return newToken;
+                        } else {
+                            return token;
+                        }
+                    })
+                );
+                if (scene._id === 'MAwSFhlXRipixOWw') {
+                    console.log('Scene Pre-Update');
+                    console.log(scene);
+                }
+
                 if (isObjectEmpty(updateData)) {
                     continue;
                 }
@@ -185,7 +219,9 @@ export abstract class VersionMigration {
                 }
 
                 console.log(`Migrating Actor ${actor.name}`);
+                console.log(actor);
                 const updateData = await this.MigrateActorData(duplicate(actor.data));
+                console.log(updateData);
                 let items = [];
                 if (updateData.items) {
                     items = updateData.items;
@@ -202,6 +238,37 @@ export abstract class VersionMigration {
                 return Promise.reject(error);
             }
         }
+    }
+
+    /**
+     * Iterate over an actor's items, updating those that need updating.
+     * @param actorData The actor to iterate over
+     * @param updateData The existing update data to merge into
+     */
+    protected async IterateActorItems(actorData: ActorData, updateData) {
+        let hasItemUpdates = false;
+        const items = await Promise.all(
+            // @ts-ignore
+            actorData.items.map(async (item) => {
+                let itemUpdate = await this.MigrateItemData(item);
+
+                if (!isObjectEmpty(itemUpdate)) {
+                    hasItemUpdates = true;
+                    itemUpdate['_id'] = item._id;
+                    return await mergeObject(item, itemUpdate, {
+                        enforceTypes: false,
+                        inplace: false,
+                    });
+                } else {
+                    return item;
+                }
+            })
+        );
+        if (hasItemUpdates) {
+            updateData.items = items;
+        }
+
+        return updateData;
     }
 
     /**
