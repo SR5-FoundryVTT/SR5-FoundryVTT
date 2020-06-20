@@ -450,5 +450,18 @@
     "SETTINGS.IgnoreDiagonal": "Ignore Diagonal Movement (1-1-1)",
     "SETTINGS.EstimateDiagonal": "Estimate Diagonal Movement (1-2-1)",
     "SETTINGS.ApplyLimitsName": "Apply Limits to Rolls",
-    "SETTINGS.ApplyLimitsDescription": "Should limits be applied to roll"
+    "SETTINGS.ApplyLimitsDescription": "Should limits be applied to roll",
+
+    "SR5.MIGRATION.WarningTitle": "Alert",
+    "SR5.MIGRATION.WarningHeader": "Migration Warning",
+    "SR5.MIGRATION.WarningRequired": "The Shadowrun 5E system must begin a required update.",
+    "SR5.MIGRATION.WarningDescription": "Only the GM can perform the update and shutting down the server while the update is in progress may cause irreparable damage to your world.",
+    "SR5.MIGRATION.WarningBackup": "If you have not backed up your world, do so before you press the 'Begin Migration' button below.",
+    "SR5.MIGRATION.BeginMigration": "Begin Migration",
+
+    "SR5.MIGRATION.SuccessTitle": "Success",
+    "SR5.MIGRATION.SuccessHeader": "Migration Complete",
+    "SR5.MIGRATION.SuccessDescription": "Existing compendium packs belonging to this world have been updated in the process of this migration.",
+    "SR5.MIGRATION.SuccessPacksInfo": "Due to current technical limitations with FoundryVTT, actor packs must be updated manually.",
+    "SR5.MIGRATION.SuccessConfirm": "Close"
 }

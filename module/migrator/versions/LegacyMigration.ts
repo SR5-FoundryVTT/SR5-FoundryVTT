@@ -15,41 +15,11 @@ export class LegacyMigration extends VersionMigration {
     }
 
     protected async MigrateActorData(actorData: ActorData): Promise<any> {
-        const updateData: any = {};
+        let updateData: any = {};
         LegacyMigration.migrateActorOverflow(actorData, updateData);
         LegacyMigration.migrateActorSkills(actorData, updateData);
 
-        // @ts-ignore
-        if (!actorData.items) {
-            return updateData;
-        }
-
-        console.log('Pre-item map');
-        // @ts-ignore
-        console.log(actorData.items);
-        let hasItemUpdates = false;
-        const items = await Promise.all(
-            // @ts-ignore
-            actorData.items.map(async (item) => {
-                let itemUpdate = await this.MigrateItemData(item);
-
-                if (!isObjectEmpty(itemUpdate)) {
-                    hasItemUpdates = true;
-                    itemUpdate['_id'] = item._id;
-                    return await mergeObject(item, itemUpdate, {
-                        enforceTypes: false,
-                        inplace: false,
-                    });
-                } else {
-                    return item;
-                }
-            })
-        );
-        console.log('Post-item map');
-        console.log(items);
-        if (hasItemUpdates) {
-            updateData.items = items;
-        }
+        updateData = await this.IterateActorItems(actorData, updateData);
 
         return updateData;
     }

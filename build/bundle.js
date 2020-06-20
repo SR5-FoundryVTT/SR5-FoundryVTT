@@ -5583,26 +5583,55 @@ let Migrator = /** @class */ (() => {
                     // if versionNUmber is greater than currentVersion, we need to apply this migration
                     return this.compareVersion(versionNumber, currentVersion) === 1;
                 });
+                // No migrations are required, exit.
                 if (migrations.length === 0) {
                     return;
                 }
+                const localizedWarningTitle = game.i18n.localize('SR5.MIGRATION.WarningTitle');
+                const localizedWarningHeader = game.i18n.localize('SR5.MIGRATION.WarningHeader');
+                const localizedWarningRequired = game.i18n.localize('SR5.MIGRATION.WarningRequired');
+                const localizedWarningDescription = game.i18n.localize('SR5.MIGRATION.WarningDescription');
+                const localizedWarningBackup = game.i18n.localize('SR5.MIGRATION.WarningBackup');
+                const localizedWarningBegin = game.i18n.localize('SR5.MIGRATION.BeginMigration');
+                const d = new Dialog({
+                    title: localizedWarningTitle,
+                    content: `<h2 style="color: red; text-align: center">${localizedWarningHeader}</h2>` +
+                        `<p style="text-align: center"><i>${localizedWarningRequired}</i></p>` +
+                        `<p>${localizedWarningDescription}</p>` +
+                        `<h3 style="color: red">${localizedWarningBackup}</h3>`,
+                    buttons: {
+                        ok: {
+                            label: localizedWarningBegin,
+                            callback: () => this.migrate(migrations),
+                        },
+                    },
+                    default: 'ok',
+                });
+                d.render(true);
+            });
+        }
+        static migrate(migrations) {
+            return __awaiter(this, void 0, void 0, function* () {
                 // we want to apply migrations in ascending order until we're up to the latest
                 migrations.sort((a, b) => {
                     return this.compareVersion(a.versionNumber, b.versionNumber);
                 });
                 yield this.migrateWorld(game, migrations);
                 yield this.migrateCompendium(game, migrations);
-                //TODO: Localization
+                const localizedWarningTitle = game.i18n.localize('SR5.MIGRATION.SuccessTitle');
+                const localizedWarningHeader = game.i18n.localize('SR5.MIGRATION.SuccessHeader');
+                const localizedSuccessDescription = game.i18n.localize('SR5.MIGRATION.SuccessDescription');
+                const localizedSuccessPacksInfo = game.i18n.localize('SR5.MIGRATION.SuccessPacksInfo');
+                const localizedSuccessConfirm = game.i18n.localize('SR5.MIGRATION.SuccessConfirm');
                 const packsDialog = new Dialog({
-                    title: 'Migration complete!',
-                    content: '<h3>Migration Complete</h3>' +
-                        '<p>Any world compendium packs that exist in the world were also updated.</p>' +
-                        '<p style="color: red">Due to technical limitations with FoundryVTT, actor compendium packs are unable to be updated at this time.' +
-                        ' You will have to manually update these packs.</p>',
+                    title: localizedWarningTitle,
+                    content: `<h2 style="text-align: center; color: green">${localizedWarningHeader}</h2>` +
+                        `<p>${localizedSuccessDescription}</p>` +
+                        `<p style="text-align: center"><i>${localizedSuccessPacksInfo}</i></p>`,
                     buttons: {
                         ok: {
                             icon: '<i class="fas fa-check"></i>',
-                            label: 'Close',
+                            label: localizedSuccessConfirm,
                         },
                     },
                     default: 'ok',
@@ -5785,9 +5814,38 @@ let VersionMigration = /** @class */ (() => {
                         if (!(yield this.ShouldMigrateSceneData(scene))) {
                             continue;
                         }
+                        if (scene._id === 'MAwSFhlXRipixOWw') {
+                            console.log('Scene Pre-Update');
+                            console.log(scene);
+                        }
                         console.log(`Migrating Scene entity ${scene.name}`);
                         const updateData = yield this.MigrateSceneData(duplicate(scene.data));
-                        // updateData.tokens = await this.getMigratedSceneTokens(scene.data);
+                        let hasTokenUpdates = false;
+                        updateData.tokens = yield Promise.all(
+                        // @ts-ignore
+                        scene.data.tokens.map((token) => __awaiter(this, void 0, void 0, function* () {
+                            if (isObjectEmpty(token.actorData)) {
+                                return token;
+                            }
+                            let tokenDataUpdate = yield this.MigrateActorData(token.actorData);
+                            if (!isObjectEmpty(tokenDataUpdate)) {
+                                hasTokenUpdates = true;
+                                tokenDataUpdate['_id'] = token._id;
+                                const newToken = duplicate(token);
+                                newToken.actorData = yield mergeObject(token.actorData, tokenDataUpdate, {
+                                    enforceTypes: false,
+                                    inplace: false,
+                                });
+                                return newToken;
+                            }
+                            else {
+                                return token;
+                            }
+                        })));
+                        if (scene._id === 'MAwSFhlXRipixOWw') {
+                            console.log('Scene Pre-Update');
+                            console.log(scene);
+                        }
                         if (isObjectEmpty(updateData)) {
                             continue;
                         }
@@ -5847,7 +5905,9 @@ let VersionMigration = /** @class */ (() => {
                             continue;
                         }
                         console.log(`Migrating Actor ${actor.name}`);
+                        console.log(actor);
                         const updateData = yield this.MigrateActorData(duplicate(actor.data));
+                        console.log(updateData);
                         let items = [];
                         if (updateData.items) {
                             items = updateData.items;
@@ -5864,6 +5924,36 @@ let VersionMigration = /** @class */ (() => {
                         return Promise.reject(error);
                     }
                 }
+            });
+        }
+        /**
+         * Iterate over an actor's items, updating those that need updating.
+         * @param actorData The actor to iterate over
+         * @param updateData The existing update data to merge into
+         */
+        IterateActorItems(actorData, updateData) {
+            return __awaiter(this, void 0, void 0, function* () {
+                let hasItemUpdates = false;
+                const items = yield Promise.all(
+                // @ts-ignore
+                actorData.items.map((item) => __awaiter(this, void 0, void 0, function* () {
+                    let itemUpdate = yield this.MigrateItemData(item);
+                    if (!isObjectEmpty(itemUpdate)) {
+                        hasItemUpdates = true;
+                        itemUpdate['_id'] = item._id;
+                        return yield mergeObject(item, itemUpdate, {
+                            enforceTypes: false,
+                            inplace: false,
+                        });
+                    }
+                    else {
+                        return item;
+                    }
+                })));
+                if (hasItemUpdates) {
+                    updateData.items = items;
+                }
+                return updateData;
             });
         }
         /**
@@ -6003,38 +6093,10 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
     }
     MigrateActorData(actorData) {
         return __awaiter(this, void 0, void 0, function* () {
-            const updateData = {};
+            let updateData = {};
             LegacyMigration.migrateActorOverflow(actorData, updateData);
             LegacyMigration.migrateActorSkills(actorData, updateData);
-            // @ts-ignore
-            if (!actorData.items) {
-                return updateData;
-            }
-            console.log('Pre-item map');
-            // @ts-ignore
-            console.log(actorData.items);
-            let hasItemUpdates = false;
-            const items = yield Promise.all(
-            // @ts-ignore
-            actorData.items.map((item) => __awaiter(this, void 0, void 0, function* () {
-                let itemUpdate = yield this.MigrateItemData(item);
-                if (!isObjectEmpty(itemUpdate)) {
-                    hasItemUpdates = true;
-                    itemUpdate['_id'] = item._id;
-                    return yield mergeObject(item, itemUpdate, {
-                        enforceTypes: false,
-                        inplace: false,
-                    });
-                }
-                else {
-                    return item;
-                }
-            })));
-            console.log('Post-item map');
-            console.log(items);
-            if (hasItemUpdates) {
-                updateData.items = items;
-            }
+            updateData = yield this.IterateActorItems(actorData, updateData);
             return updateData;
         });
     }
