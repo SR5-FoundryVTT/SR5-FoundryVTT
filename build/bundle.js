@@ -5934,24 +5934,27 @@ let VersionMigration = /** @class */ (() => {
         IterateActorItems(actorData, updateData) {
             return __awaiter(this, void 0, void 0, function* () {
                 let hasItemUpdates = false;
-                const items = yield Promise.all(
                 // @ts-ignore
-                actorData.items.map((item) => __awaiter(this, void 0, void 0, function* () {
-                    let itemUpdate = yield this.MigrateItemData(item);
-                    if (!isObjectEmpty(itemUpdate)) {
-                        hasItemUpdates = true;
-                        itemUpdate['_id'] = item._id;
-                        return yield mergeObject(item, itemUpdate, {
-                            enforceTypes: false,
-                            inplace: false,
-                        });
+                if (actorData.items !== undefined) {
+                    const items = yield Promise.all(
+                    // @ts-ignore
+                    actorData.items.map((item) => __awaiter(this, void 0, void 0, function* () {
+                        let itemUpdate = yield this.MigrateItemData(item);
+                        if (!isObjectEmpty(itemUpdate)) {
+                            hasItemUpdates = true;
+                            itemUpdate['_id'] = item._id;
+                            return yield mergeObject(item, itemUpdate, {
+                                enforceTypes: false,
+                                inplace: false,
+                            });
+                        }
+                        else {
+                            return item;
+                        }
+                    })));
+                    if (hasItemUpdates) {
+                        updateData.items = items;
                     }
-                    else {
-                        return item;
-                    }
-                })));
-                if (hasItemUpdates) {
-                    updateData.items = items;
                 }
                 return updateData;
             });

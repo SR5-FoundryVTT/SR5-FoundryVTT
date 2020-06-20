@@ -247,25 +247,28 @@ export abstract class VersionMigration {
      */
     protected async IterateActorItems(actorData: ActorData, updateData) {
         let hasItemUpdates = false;
-        const items = await Promise.all(
-            // @ts-ignore
-            actorData.items.map(async (item) => {
-                let itemUpdate = await this.MigrateItemData(item);
+        // @ts-ignore
+        if (actorData.items !== undefined) {
+            const items = await Promise.all(
+                // @ts-ignore
+                actorData.items.map(async (item) => {
+                    let itemUpdate = await this.MigrateItemData(item);
 
-                if (!isObjectEmpty(itemUpdate)) {
-                    hasItemUpdates = true;
-                    itemUpdate['_id'] = item._id;
-                    return await mergeObject(item, itemUpdate, {
-                        enforceTypes: false,
-                        inplace: false,
-                    });
-                } else {
-                    return item;
-                }
-            })
-        );
-        if (hasItemUpdates) {
-            updateData.items = items;
+                    if (!isObjectEmpty(itemUpdate)) {
+                        hasItemUpdates = true;
+                        itemUpdate['_id'] = item._id;
+                        return await mergeObject(item, itemUpdate, {
+                            enforceTypes: false,
+                            inplace: false,
+                        });
+                    } else {
+                        return item;
+                    }
+                })
+            );
+            if (hasItemUpdates) {
+                updateData.items = items;
+            }
         }
 
         return updateData;
