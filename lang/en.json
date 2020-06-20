@@ -455,7 +455,7 @@
     "SR5.MIGRATION.WarningTitle": "Alert",
     "SR5.MIGRATION.WarningHeader": "Migration Warning",
     "SR5.MIGRATION.WarningRequired": "The Shadowrun 5E system must begin a required update.",
-    "SR5.MIGRATION.WarningDescription": "Only the GM can perform the update and shutting down the server while the update is in progress may cause irreparable damage to your world.",
+    "SR5.MIGRATION.WarningDescription": "Only the GM can perform the update and shutting down the server or closing your browser while the update is in progress may cause irreparable damage to your world.",
     "SR5.MIGRATION.WarningBackup": "If you have not backed up your world, do so before you press the 'Begin Migration' button below.",
     "SR5.MIGRATION.BeginMigration": "Begin Migration",
 
