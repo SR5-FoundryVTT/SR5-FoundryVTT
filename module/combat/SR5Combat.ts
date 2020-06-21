@@ -1,11 +1,11 @@
+import SR5CombatData = Shadowrun.SR5CombatData;
+
 export class SR5Combat extends Combat {
     get initiativePass(): number {
         return this.data?.initiativePass || 0;
     }
 
-    data: BaseEntityData & {
-        initiativePass?: number;
-    };
+    data: SR5CombatData;
 
     protected _onUpdate(data: object, options: object, userId: string, context: object) {
         console.log(data);
@@ -14,9 +14,46 @@ export class SR5Combat extends Combat {
 
     async adjustInitiative(combatantId: string, adjustment: number): Promise<void> {
         console.log('adjustInit');
+        console.log(combatantId);
+        console.log(adjustment);
     }
 
-    // remove the turn of anyone that is below 0 initiative
+    static sortByRERIC(left, right): number {
+        // First sort by initiative value if different
+        const leftInit = Number(left.initiative);
+        const rightInit = Number(right.initiative);
+        if (isNaN(leftInit)) return 1;
+        if (isNaN(rightInit)) return -1;
+        if (leftInit > rightInit) return -1;
+        if (leftInit < rightInit) return 1;
+
+        // now we sort by ERIC
+        const genData = (actor) => {
+            // edge, reaction, intuition, coinflip
+            return [
+                Number(actor.getEdge().max),
+                Number(actor.findAttribute('reaction')?.value),
+                Number(actor.findAttribute('intuition')?.value),
+                new Roll('1d2').roll().total,
+            ];
+        };
+
+        const leftData = genData(left.actor);
+        const rightData = genData(right.actor);
+        // if we find a difference that isn't 0, return it
+        for (let index = 0; index < leftData.length; index++) {
+            const diff = rightData[index] - leftData[index];
+            if (diff !== 0) return diff;
+        }
+
+        return 0;
+    }
+
+    /**
+     * @Override
+     * remove any turns that are less than 0
+     * filter using ERIC
+     */
     setupTurns(): any[] {
         const turns = super.setupTurns().filter((turn) => {
             const init = Number(turn.initiative);
@@ -24,10 +61,16 @@ export class SR5Combat extends Combat {
             return init > 0;
         });
         // @ts-ignore
-        this.turns = turns;
+        this.turns = turns.sort(SR5Combat.sortByRERIC);
         return turns;
     }
 
+
+    /**
+     * @Override
+     * proceed to the next turn
+     * - handles going to next initiative pass or combat round.
+     */
     async nextTurn(): Promise<void> {
         let turn = this.turn;
         let skip = this.settings.skipDefeated;

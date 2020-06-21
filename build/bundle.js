@@ -3283,9 +3283,48 @@ class SR5Combat extends Combat {
     adjustInitiative(combatantId, adjustment) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log('adjustInit');
+            console.log(combatantId);
+            console.log(adjustment);
         });
     }
-    // remove the turn of anyone that is below 0 initiative
+    static sortByRERIC(left, right) {
+        // First sort by initiative value if different
+        const leftInit = Number(left.initiative);
+        const rightInit = Number(right.initiative);
+        if (isNaN(leftInit))
+            return 1;
+        if (isNaN(rightInit))
+            return -1;
+        if (leftInit > rightInit)
+            return -1;
+        if (leftInit < rightInit)
+            return 1;
+        // now we sort by ERIC
+        const genData = (actor) => {
+            var _a, _b;
+            // edge, reaction, intuition, coinflip
+            return [
+                Number(actor.getEdge().max),
+                Number((_a = actor.findAttribute('reaction')) === null || _a === void 0 ? void 0 : _a.value),
+                Number((_b = actor.findAttribute('intuition')) === null || _b === void 0 ? void 0 : _b.value),
+                new Roll('1d2').roll().total,
+            ];
+        };
+        const leftData = genData(left.actor);
+        const rightData = genData(right.actor);
+        // if we find a difference that isn't 0, return it
+        for (let index = 0; index < leftData.length; index++) {
+            const diff = rightData[index] - leftData[index];
+            if (diff !== 0)
+                return diff;
+        }
+        return 0;
+    }
+    /**
+     * @Override
+     * remove any turns that are less than 0
+     * filter using ERIC
+     */
     setupTurns() {
         const turns = super.setupTurns().filter((turn) => {
             const init = Number(turn.initiative);
@@ -3294,9 +3333,14 @@ class SR5Combat extends Combat {
             return init > 0;
         });
         // @ts-ignore
-        this.turns = turns;
+        this.turns = turns.sort(SR5Combat.sortByRERIC);
         return turns;
     }
+    /**
+     * @Override
+     * proceed to the next turn
+     * - handles going to next initiative pass or combat round.
+     */
     nextTurn() {
         return __awaiter(this, void 0, void 0, function* () {
             let turn = this.turn;
