@@ -3272,19 +3272,87 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5Combat = void 0;
 class SR5Combat extends Combat {
+    constructor(...args) {
+        // @ts-ignore
+        super(...args);
+        Hooks.on('updateActor', (actor) => {
+            const combatant = this.getActorCombatant(actor);
+            if (combatant) {
+                // TODO handle monitoring Wound changes
+            }
+        });
+    }
     get initiativePass() {
         var _a;
         return ((_a = this.data) === null || _a === void 0 ? void 0 : _a.initiativePass) || 0;
+    }
+    getActorCombatant(actor) {
+        return this.combatants.find(c => c.actor._id === actor._id);
+    }
+    /**
+     * Add ContextMenu options to CombatTracker Entries -- adds the basic Initiative Subtractions
+     * @param html
+     * @param options
+     */
+    static addCombatTrackerContextOptions(html, options) {
+        options.push({
+            name: game.i18n.localize('SR5.COMBAT.ReduceInitByOne'),
+            icon: '<i class="fas fa-caret-down"></i>',
+            callback: (li) => __awaiter(this, void 0, void 0, function* () {
+                // @ts-ignore
+                const combatant = yield game.combat.getCombatant(li.data('combatant-id'));
+                if (combatant) {
+                    const combat = game.combat;
+                    yield combat.adjustInitiative(combatant, -1);
+                }
+            }),
+        }, {
+            name: game.i18n.localize('SR5.COMBAT.ReduceInitByFive'),
+            icon: '<i class="fas fa-angle-down"></i>',
+            callback: (li) => __awaiter(this, void 0, void 0, function* () {
+                // @ts-ignore
+                const combatant = yield game.combat.getCombatant(li.data('combatant-id'));
+                if (combatant) {
+                    const combat = game.combat;
+                    yield combat.adjustInitiative(combatant, -5);
+                }
+            }),
+        }, {
+            name: game.i18n.localize('SR5.COMBAT.ReduceInitByTen'),
+            icon: '<i class="fas fa-angle-double-down"></i>',
+            callback: (li) => __awaiter(this, void 0, void 0, function* () {
+                // @ts-ignore
+                const combatant = yield game.combat.getCombatant(li.data('combatant-id'));
+                if (combatant) {
+                    const combat = game.combat;
+                    yield combat.adjustInitiative(combatant, -10);
+                }
+            }),
+        });
+        return options;
     }
     _onUpdate(data, options, userId, context) {
         console.log(data);
         super._onUpdate(data, options, userId, context);
     }
-    adjustInitiative(combatantId, adjustment) {
+    /**
+     *
+     * @param combatant
+     * @param adjustment
+     */
+    adjustInitiative(combatant, adjustment) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('adjustInit');
-            console.log(combatantId);
-            console.log(adjustment);
+            combatant = typeof combatant === 'string' ? this.combatants.find((c) => c._id === combatant) : combatant;
+            if (!combatant || typeof combatant === 'string') {
+                console.error('Could not find combatant with id ', combatant);
+                return;
+            }
+            const newCombatant = {
+                _id: combatant._id,
+                initiative: Number(combatant.initiative) + adjustment,
+            };
+            // @ts-ignore
+            yield this.updateCombatant(newCombatant);
         });
     }
     static sortByRERIC(left, right) {
@@ -5606,6 +5674,7 @@ Hooks.on('renderChatMessage', (app, html) => {
         chat.addRollListeners(app, html);
 });
 Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);
+Hooks.on('getCombatTrackerEntryContext', SR5Combat_1.SR5Combat.addCombatTrackerContextOptions);
 /* -------------------------------------------- */
 /*  Hotbar Macros                               */
 /* -------------------------------------------- */

@@ -67,6 +67,7 @@ Hooks.on('renderChatMessage', (app, html) => {
 });
 
 Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);
+Hooks.on('getCombatTrackerEntryContext', SR5Combat.addCombatTrackerContextOptions);
 
 /* -------------------------------------------- */
 /*  Hotbar Macros                               */
@@ -116,7 +117,7 @@ async function createItemMacro(item, slot) {
                 command: command,
                 flags: { 'shadowrun5e.itemMacro': true },
             },
-            { displaySheet: false }
+            { displaySheet: false },
         )) as Macro;
     }
     if (macro) game.user.assignHotbarMacro(macro, slot);

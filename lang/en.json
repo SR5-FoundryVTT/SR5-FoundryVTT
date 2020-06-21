@@ -450,6 +450,10 @@
     "SR5.MigrationUpdateCompendiumNoUpdateActor": "Due to technical limitations with FoundryVTT, actor compendium packs are unable to be updated at this time. You will have to manually update these packs.",
     "SR5.Close": "Close",
 
+    "SR5.COMBAT.ReduceInitByOne": "Initiative -1",
+    "SR5.COMBAT.ReduceInitByFive": "Initiative -5",
+    "SR5.COMBAT.ReduceInitByTen": "Initiative -10",
+
     "SETTINGS.DiagonalMovementName": "Diagonal Movement",
     "SETTINGS.DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
     "SETTINGS.IgnoreDiagonal": "Ignore Diagonal Movement (1-1-1)",

@@ -5,6 +5,69 @@ export class SR5Combat extends Combat {
         return this.data?.initiativePass || 0;
     }
 
+    constructor(...args) {
+        // @ts-ignore
+        super(...args);
+
+        Hooks.on('updateActor', (actor) => {
+            const combatant = this.getActorCombatant(actor);
+            if (combatant) {
+                // TODO handle monitoring Wound changes
+            }
+        })
+    }
+
+    getActorCombatant(actor: Actor): undefined | any {
+        return this.combatants.find(c => c.actor._id === actor._id);
+    }
+
+    /**
+     * Add ContextMenu options to CombatTracker Entries -- adds the basic Initiative Subtractions
+     * @param html
+     * @param options
+     */
+    static addCombatTrackerContextOptions(html, options: any[]) {
+        options.push(
+            {
+                name: game.i18n.localize('SR5.COMBAT.ReduceInitByOne'),
+                icon: '<i class="fas fa-caret-down"></i>',
+                callback: async (li) => {
+                    // @ts-ignore
+                    const combatant = await game.combat.getCombatant(li.data('combatant-id'));
+                    if (combatant) {
+                        const combat: SR5Combat = game.combat as SR5Combat;
+                        await combat.adjustInitiative(combatant, -1);
+                    }
+                },
+            },
+            {
+                name: game.i18n.localize('SR5.COMBAT.ReduceInitByFive'),
+                icon: '<i class="fas fa-angle-down"></i>',
+                callback: async (li) => {
+                    // @ts-ignore
+                    const combatant = await game.combat.getCombatant(li.data('combatant-id'));
+                    if (combatant) {
+                        const combat: SR5Combat = game.combat as SR5Combat;
+                        await combat.adjustInitiative(combatant, -5);
+                    }
+                },
+            },
+            {
+                name: game.i18n.localize('SR5.COMBAT.ReduceInitByTen'),
+                icon: '<i class="fas fa-angle-double-down"></i>',
+                callback: async (li) => {
+                    // @ts-ignore
+                    const combatant = await game.combat.getCombatant(li.data('combatant-id'));
+                    if (combatant) {
+                        const combat: SR5Combat = game.combat as SR5Combat;
+                        await combat.adjustInitiative(combatant, -10);
+                    }
+                },
+            },
+        );
+        return options;
+    }
+
     data: SR5CombatData;
 
     protected _onUpdate(data: object, options: object, userId: string, context: object) {
@@ -12,10 +75,23 @@ export class SR5Combat extends Combat {
         super._onUpdate(data, options, userId, context);
     }
 
-    async adjustInitiative(combatantId: string, adjustment: number): Promise<void> {
-        console.log('adjustInit');
-        console.log(combatantId);
-        console.log(adjustment);
+    /**
+     *
+     * @param combatant
+     * @param adjustment
+     */
+    async adjustInitiative(combatant: string | any, adjustment: number): Promise<void> {
+        combatant = typeof combatant === 'string' ? this.combatants.find((c) => c._id === combatant) : combatant;
+        if (!combatant || typeof combatant === 'string') {
+            console.error('Could not find combatant with id ', combatant);
+            return;
+        }
+        const newCombatant = {
+            _id: combatant._id,
+            initiative: Number(combatant.initiative) + adjustment,
+        };
+        // @ts-ignore
+        await this.updateCombatant(newCombatant);
     }
 
     static sortByRERIC(left, right): number {
@@ -64,7 +140,6 @@ export class SR5Combat extends Combat {
         this.turns = turns.sort(SR5Combat.sortByRERIC);
         return turns;
     }
-
 
     /**
      * @Override
