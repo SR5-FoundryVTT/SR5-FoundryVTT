@@ -611,7 +611,7 @@ export class SR5Actor extends Actor {
                                         await this.rollSoak(soakRollOptions);
                                     }
                                 }
-                            })
+                            }),
                         );
                     },
                 }).render(true);
@@ -708,7 +708,7 @@ export class SR5Actor extends Actor {
                                 parts,
                                 title: title,
                                 wounds: false,
-                            })
+                            }),
                         );
                     },
                 }).render(true);
@@ -934,7 +934,7 @@ export class SR5Actor extends Actor {
                             cancel = false;
                             spec = s;
                         },
-                    })
+                    }),
             );
         }
         renderTemplate('systems/shadowrun5e/templates/rolls/skill-roll.html', dialogData).then((dlg) => {
@@ -1168,5 +1168,26 @@ export class SR5Actor extends Actor {
                 }
             }
         }
+    }
+
+    /**
+     * Override setFlag to remove the 'SR5.' from keys in modlists, otherwise it handles them as embedded keys
+     * @param scope
+     * @param key
+     * @param value
+     */
+    setFlag(scope: string, key: string, value: any): Promise<Entity> {
+        const newValue = Helpers.onSetFlag(value);
+        return super.setFlag(scope, key, newValue);
+    }
+
+    /**
+     * Override getFlag to add back the 'SR5.' keys correctly to be handled
+     * @param scope
+     * @param key
+     */
+    getFlag(scope: string, key: string): any {
+        const data = super.getFlag(scope, key);
+        return Helpers.onGetFlag(data);
     }
 }

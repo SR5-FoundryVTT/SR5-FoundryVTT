@@ -10,6 +10,27 @@ export class Helpers {
         return Object.values(mods).reduce(reducer, 0);
     }
 
+    // replace 'SR5.'s on keys with 'SR5_DOT_'
+    static onSetFlag(data) {
+        if (typeof data !== 'object') return data;
+        const newData = {};
+        for (const [key, value] of Object.entries(data)) {
+            const newKey = key.replace('SR5.', 'SR5_DOT_');
+            newData[newKey] = this.onSetFlag(value);
+        }
+        return newData;
+    }
+    // replace 'SR5_DOT_' with 'SR5.' on keys
+    static onGetFlag(data) {
+        if (typeof data !== 'object') return data;
+        const newData = {};
+        for (const [key, value] of Object.entries(data)) {
+            const newKey = key.replace('SR5_DOT_', 'SR5.');
+            newData[newKey] = this.onGetFlag(value);
+        }
+        return newData;
+    }
+
     static isMatrix(atts?: boolean | (AttributeField | SkillField)[] | AttributeField | SkillField) {
         if (!atts) return false;
         if (typeof atts === 'boolean' && atts) return true;

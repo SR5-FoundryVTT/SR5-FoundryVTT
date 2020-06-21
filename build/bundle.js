@@ -1100,6 +1100,25 @@ class SR5Actor extends Actor {
             }
         });
     }
+    /**
+     * Override setFlag to remove the 'SR5.' from keys in modlists, otherwise it handles them as embedded keys
+     * @param scope
+     * @param key
+     * @param value
+     */
+    setFlag(scope, key, value) {
+        const newValue = helpers_1.Helpers.onSetFlag(value);
+        return super.setFlag(scope, key, newValue);
+    }
+    /**
+     * Override getFlag to add back the 'SR5.' keys correctly to be handled
+     * @param scope
+     * @param key
+     */
+    getFlag(scope, key) {
+        const data = super.getFlag(scope, key);
+        return helpers_1.Helpers.onGetFlag(data);
+    }
 }
 exports.SR5Actor = SR5Actor;
 
@@ -3784,6 +3803,28 @@ class Helpers {
         // assume object of key/values
         return Object.values(mods).reduce(reducer, 0);
     }
+    // replace 'SR5.'s on keys with 'SR5_DOT_'
+    static onSetFlag(data) {
+        if (typeof data !== 'object')
+            return data;
+        const newData = {};
+        for (const [key, value] of Object.entries(data)) {
+            const newKey = key.replace('SR5.', 'SR5_DOT_');
+            newData[newKey] = this.onSetFlag(value);
+        }
+        return newData;
+    }
+    // replace 'SR5_DOT_' with 'SR5.' on keys
+    static onGetFlag(data) {
+        if (typeof data !== 'object')
+            return data;
+        const newData = {};
+        for (const [key, value] of Object.entries(data)) {
+            const newKey = key.replace('SR5_DOT_', 'SR5.');
+            newData[newKey] = this.onGetFlag(value);
+        }
+        return newData;
+    }
     static isMatrix(atts) {
         if (!atts)
             return false;
@@ -4388,10 +4429,14 @@ class SR5Item extends Item {
             action.limit.value = action.limit.base + helpers_1.Helpers.totalMods(action.limit.mod);
             if (this.actor) {
                 if (action.damage.attribute) {
-                    action.damage.value += this.actor.data.data.attributes[action.damage.attribute].value;
+                    const { attribute } = action.damage;
+                    action.damage.mod[CONFIG.SR5.attributes[attribute]] = this.actor.data.data.attributes[attribute].value;
+                    action.damage.value = action.damage.base + helpers_1.Helpers.totalMods(action.damage.mod);
                 }
                 if (action.limit.attribute) {
-                    action.limit.value += this.actor.data.data.limits[action.limit.attribute].value;
+                    const { attribute } = action.limit;
+                    action.limit.mod[CONFIG.SR5.attributes[attribute]] = this.actor.data.data.limits[action.limit.attribute].value;
+                    action.limit.value = action.limit.base + helpers_1.Helpers.totalMods(action.limit.mod);
                 }
             }
         }
@@ -5101,6 +5146,25 @@ class SR5Item extends Item {
                 dropoff,
             };
         }
+    }
+    /**
+     * Override setFlag to remove the 'SR5.' from keys in modlists, otherwise it handles them as embedded keys
+     * @param scope
+     * @param key
+     * @param value
+     */
+    setFlag(scope, key, value) {
+        const newValue = helpers_1.Helpers.onSetFlag(value);
+        return super.setFlag(scope, key, newValue);
+    }
+    /**
+     * Override getFlag to add back the 'SR5.' keys correctly to be handled
+     * @param scope
+     * @param key
+     */
+    getFlag(scope, key) {
+        const data = super.getFlag(scope, key);
+        return helpers_1.Helpers.onGetFlag(data);
     }
 }
 exports.SR5Item = SR5Item;

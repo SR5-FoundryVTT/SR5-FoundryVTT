@@ -152,10 +152,14 @@ export class SR5Item extends Item {
 
             if (this.actor) {
                 if (action.damage.attribute) {
-                    action.damage.value += this.actor.data.data.attributes[action.damage.attribute].value;
+                    const { attribute } = action.damage;
+                    action.damage.mod[CONFIG.SR5.attributes[attribute]] = this.actor.data.data.attributes[attribute].value;
+                    action.damage.value = action.damage.base + Helpers.totalMods(action.damage.mod);
                 }
                 if (action.limit.attribute) {
-                    action.limit.value += this.actor.data.data.limits[action.limit.attribute].value;
+                    const { attribute } = action.limit;
+                    action.limit.mod[CONFIG.SR5.attributes[attribute]] = this.actor.data.data.limits[action.limit.attribute].value;
+                    action.limit.value = action.limit.base + Helpers.totalMods(action.limit.mod);
                 }
             }
         }
@@ -867,5 +871,26 @@ export class SR5Item extends Item {
                 dropoff,
             };
         }
+    }
+
+    /**
+     * Override setFlag to remove the 'SR5.' from keys in modlists, otherwise it handles them as embedded keys
+     * @param scope
+     * @param key
+     * @param value
+     */
+    setFlag(scope: string, key: string, value: any): Promise<Entity> {
+        const newValue = Helpers.onSetFlag(value);
+        return super.setFlag(scope, key, newValue);
+    }
+
+    /**
+     * Override getFlag to add back the 'SR5.' keys correctly to be handled
+     * @param scope
+     * @param key
+     */
+    getFlag(scope: string, key: string): any {
+        const data = super.getFlag(scope, key);
+        return Helpers.onGetFlag(data);
     }
 }
