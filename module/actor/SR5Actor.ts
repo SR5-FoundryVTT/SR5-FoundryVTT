@@ -404,8 +404,8 @@ export class SR5Actor extends Actor {
         return this.data.data.attributes[attributeName];
     }
 
-    getWounds(): number {
-        return this.data.data.wounds?.value || 0;
+    getWoundModifier(): number {
+        return -1 * this.data.data.wounds?.value || 0;
     }
 
     getEdge(): AttributeField & ValueMaxPair<number> {

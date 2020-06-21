@@ -367,9 +367,9 @@ class SR5Actor extends Actor {
             return undefined;
         return this.data.data.attributes[attributeName];
     }
-    getWounds() {
+    getWoundModifier() {
         var _a;
-        return ((_a = this.data.data.wounds) === null || _a === void 0 ? void 0 : _a.value) || 0;
+        return -1 * ((_a = this.data.data.wounds) === null || _a === void 0 ? void 0 : _a.value) || 0;
     }
     getEdge() {
         return this.data.data.attributes.edge;
@@ -2709,39 +2709,22 @@ class ShadowrunItemDialog extends Dialog {
         templateData['rc'] = rc;
         templateData['ammo'] = ammo;
         templateData['title'] = title;
-        let environmental = true;
+        templateData['ranges'] = this._getRangeWeaponTemplateData(ranges);
         let cancel = true;
-        const buttons = {};
-        buttons['short'] = {
-            label: `Short (${ranges.short})`,
-            callback: () => (cancel = false),
-        };
-        buttons['medium'] = {
-            label: `Medium (${ranges.medium})`,
-            callback: () => {
-                environmental = 1;
-                cancel = false;
+        dialogData.buttons = {
+            continue: {
+                label: game.i18n.localize('SR5.Continue'),
+                callback: () => (cancel = false),
             },
         };
-        buttons['long'] = {
-            label: `Long (${ranges.long})`,
-            callback: () => {
-                environmental = 3;
-                cancel = false;
-            },
-        };
-        buttons['extreme'] = {
-            label: `Extreme (${ranges.extreme})`,
-            callback: () => {
-                environmental = 6;
-                cancel = false;
-            },
-        };
-        dialogData.buttons = buttons;
         dialogData.close = (html) => __awaiter(this, void 0, void 0, function* () {
             if (cancel)
                 return false;
             const fireMode = helpers_1.Helpers.parseInputToNumber($(html).find('[name="fireMode"]').val());
+            const range = helpers_1.Helpers.parseInputToNumber($(html).find('[name="range"]').val());
+            if (range) {
+                yield item.setLastFireRangeMod({ value: range });
+            }
             if (fireMode) {
                 const fireModeString = fireModes[fireMode];
                 const defenseModifier = helpers_1.Helpers.mapRoundsToDefenseDesc(fireMode);
@@ -2754,6 +2737,23 @@ class ShadowrunItemDialog extends Dialog {
             }
             return true;
         });
+    }
+    static _getRangeWeaponTemplateData(ranges) {
+        const lookup = {
+            short: 0,
+            medium: -1,
+            long: -3,
+            extreme: -6,
+        };
+        const newRanges = {};
+        for (const [key, value] of Object.entries(ranges)) {
+            newRanges[key] = {
+                distance: value,
+                label: CONFIG.SR5.weaponRanges[key],
+                modifier: lookup[key],
+            };
+        }
+        return newRanges;
     }
 }
 exports.ShadowrunItemDialog = ShadowrunItemDialog;
@@ -3596,6 +3596,12 @@ exports.SR5['weaponCategories'] = {
     range: 'SR5.WeaponCatRange',
     melee: 'SR5.WeaponCatMelee',
     thrown: 'SR5.WeaponCatThrown',
+};
+exports.SR5['weaponRanges'] = {
+    short: 'SR5.WeaponRangeShort',
+    medium: 'SR5.WeaponRangeMedium',
+    long: 'SR5.WeaponRangeLong',
+    extreme: 'SR5.WeaponRangeExtreme',
 };
 exports.SR5['qualityTypes'] = {
     positive: 'SR5.QualityTypePositive',
@@ -4453,11 +4459,13 @@ class SR5Item extends Item {
             return this.setFlag('shadowrun5e', 'lastComplexFormLevel', level);
         });
     }
-    getLastFireRange() {
-        return this.getFlag('shadowrun5e', 'lastFireRange') || 0;
+    getLastFireRangeMod() {
+        return this.getFlag('shadowrun5e', 'lastFireRange');
     }
-    setLastFireRange(environmentalMod) {
-        return this.setFlag('shadowrun5e', 'lastFireRange', environmentalMod);
+    setLastFireRangeMod(environmentalMod) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.setFlag('shadowrun5e', 'lastFireRange', environmentalMod);
+        });
     }
     getLastAttack() {
         return this.getFlag('shadowrun5e', 'lastAttack');
@@ -6543,6 +6551,7 @@ class ShadowrunRoller {
         }
         if (item.isRangedWeapon()) {
             rollData['fireMode'] = (_a = item.getLastFireMode()) === null || _a === void 0 ? void 0 : _a.label;
+            rollData.dialogOptions.environmental = item.getLastFireRangeMod().value;
         }
         rollData.description = item.getChatData();
         return ShadowrunRoller.advancedRoll(rollData);
@@ -6632,7 +6641,7 @@ class ShadowrunRoller {
             parts,
             limit: limit === null || limit === void 0 ? void 0 : limit.value,
             wounds,
-            woundValue: actor === null || actor === void 0 ? void 0 : actor.getWounds(),
+            woundValue: actor === null || actor === void 0 ? void 0 : actor.getWoundModifier(),
         };
         let template = 'systems/shadowrun5e/templates/rolls/roll-dialog.html';
         let edge = false;
@@ -6670,7 +6679,7 @@ class ShadowrunRoller {
                             for (const key in parts) {
                                 delete parts[key];
                             }
-                            game.user.setFlag('shadowrun5e', 'lastRollPromptValue', dicePoolValue);
+                            yield game.user.setFlag('shadowrun5e', 'lastRollPromptValue', dicePoolValue);
                             parts['SR5.Base'] = dicePoolValue;
                         }
                         const limitValue = helpers_1.Helpers.parseInputToNumber($(html).find('[name="limit"]').val());
@@ -6679,9 +6688,9 @@ class ShadowrunRoller {
                             limit.base = limitValue;
                             limit.label = 'SR5.Override';
                         }
-                        const woundValue = -helpers_1.Helpers.parseInputToNumber($(html).find('[name="wounds"]').val());
+                        const woundValue = helpers_1.Helpers.parseInputToNumber($(html).find('[name="wounds"]').val());
                         const situationMod = helpers_1.Helpers.parseInputToNumber($(html).find('[name="dp_mod"]').val());
-                        const environmentMod = -helpers_1.Helpers.parseInputToNumber($(html).find('[name="options.environmental"]').val());
+                        const environmentMod = helpers_1.Helpers.parseInputToNumber($(html).find('[name="options.environmental"]').val());
                         if (wounds && woundValue !== 0) {
                             parts['SR5.Wounds'] = woundValue;
                             props.wounds = true;

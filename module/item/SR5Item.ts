@@ -40,10 +40,10 @@ export class SR5Item extends Item {
     async setLastComplexFormLevel(level: ComplexFormLevelData) {
         return this.setFlag('shadowrun5e', 'lastComplexFormLevel', level);
     }
-    getLastFireRange(): FireRangeData {
-        return this.getFlag('shadowrun5e', 'lastFireRange') || 0;
+    getLastFireRangeMod(): FireRangeData {
+        return this.getFlag('shadowrun5e', 'lastFireRange');
     }
-    setLastFireRange(environmentalMod: FireRangeData) {
+    async setLastFireRangeMod(environmentalMod: FireRangeData) {
         return this.setFlag('shadowrun5e', 'lastFireRange', environmentalMod);
     }
 
