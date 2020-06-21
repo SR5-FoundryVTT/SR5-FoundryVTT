@@ -5,13 +5,13 @@ import { SR5Item } from './item/SR5Item';
 import { SR5 } from './config';
 import { Helpers } from './helpers';
 import { registerSystemSettings } from './settings';
-import { preCombatUpdate, shadowrunCombatUpdate } from './combat';
 import { measureDistance } from './canvas';
 import * as chat from './chat';
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
 import { registerHandlebarHelpers, preloadHandlebarsTemplates } from './handlebars';
 import { ShadowrunRoller } from './rolls/ShadowrunRoller';
 import { Migrator } from './migrator/Migrator';
+import { SR5Combat } from './combat/SR5Combat';
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -31,6 +31,7 @@ Hooks.once('init', function () {
     CONFIG.SR5 = SR5;
     CONFIG.Actor.entityClass = SR5Actor;
     CONFIG.Item.entityClass = SR5Item;
+    CONFIG.Combat.entityClass = SR5Combat;
 
     registerSystemSettings();
 
@@ -56,20 +57,11 @@ Hooks.on('canvasInit', function () {
 });
 
 Hooks.on('ready', function () {
-    // this is correct, will need to be fixed in foundry types
-    // @ts-ignore
-    game.socket.on('system.shadowrun5e', (data) => {
-        if (game.user.isGM && data.gmCombatUpdate) {
-            shadowrunCombatUpdate(data.gmCombatUpdate.changes, data.gmCombatUpdate.options);
-        }
-    });
-
     if (game.user.isGM) {
         Migrator.BeginMigration();
     }
 });
 
-Hooks.on('preUpdateCombat', preCombatUpdate);
 Hooks.on('renderChatMessage', (app, html) => {
     if (app.isRoll) chat.addRollListeners(app, html);
 });
