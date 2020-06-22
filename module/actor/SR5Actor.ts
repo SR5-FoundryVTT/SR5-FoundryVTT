@@ -427,6 +427,14 @@ export class SR5Actor extends Actor {
         return undefined;
     }
 
+    getFullDefenseAttribute(): AttributeField | undefined {
+        return this.findAttribute('willpower');
+    }
+
+    getEquippedWeapons(): SR5Item[] {
+        return this.items.filter(item => (item.isEquipped() && item.data.type === 'weapon'));
+    }
+
     addKnowledgeSkill(category, skill?) {
         const defaultSkill = {
             name: '',
@@ -550,12 +558,49 @@ export class SR5Actor extends Actor {
 
     rollDefense(options: DefenseRollOptions = {}, parts: ModList<number> = {}) {
         this._addDefenseParts(parts);
+        // full defense is always added
+        const activeDefenses = {
+            full_defense: {
+                label: 'SR5.FullDefense',
+                value: this.getFullDefenseAttribute()?.value,
+                initMod: -10,
+            },
+        };
+        // if we have a melee attack
+        if (options.incomingAttack?.reach) {
+            activeDefenses['dodge'] = {
+                label: 'SR5.Dodge',
+                value: this.findActiveSkill('gymnastics')?.value,
+                initMod: -5,
+            };
+            activeDefenses['block'] = {
+                label: 'SR5.Block',
+                value: this.findActiveSkill('unarmed_combat')?.value,
+                initMod: -5,
+            };
+            const equippedMeleeWeapons = this.getEquippedWeapons().filter(w => w.isMeleeWeapon());
+            let defenseReach = 0;
+            equippedMeleeWeapons.forEach((weapon) => {
+                activeDefenses[`parry-${weapon.name}`] = {
+                    label: 'SR5.Parry',
+                    weapon: weapon.name,
+                    value: this.findActiveSkill(weapon.getActionSkill())?.value,
+                    init: -5,
+                }
+                defenseReach = Math.max(defenseReach, weapon.getReach());
+            })
+            const incomingReach = options.incomingAttack.reach;
+            const netReach = defenseReach - incomingReach;
+            if (netReach !== 0) {
+                parts['SR5.Reach'] = netReach;
+            }
+        }
         let dialogData = {
             parts,
             cover: options.cover,
+            activeDefenses,
         };
         let template = 'systems/shadowrun5e/templates/rolls/roll-defense.html';
-        let special = '';
         let cancel = true;
         const incomingAttack = options.incomingAttack;
         const event = options.event;
@@ -565,25 +610,20 @@ export class SR5Actor extends Actor {
                     title: game.i18n.localize('SR5.Defense'),
                     content: dlg,
                     buttons: {
-                        normal: {
-                            label: game.i18n.localize('SR5.Normal'),
+                        continue: {
+                            label: game.i18n.localize('SR5.Continue'),
                             callback: () => (cancel = false),
-                        },
-                        full_defense: {
-                            label: `${game.i18n.localize('SR5.FullDefense')} (+${this.data.data.attributes.willpower.value})`,
-                            callback: () => {
-                                special = 'full_defense';
-                                cancel = false;
-                            },
                         },
                     },
                     default: 'normal',
                     close: async (html) => {
                         if (cancel) return;
                         let cover = Helpers.parseInputToNumber($(html).find('[name=cover]').val());
-                        if (special === 'full_defense') parts['SR5.FullDefense'] = this.data.data.attributes.willpower.value;
-                        if (special === 'dodge') parts['SR5.Dodge'] = this.data.data.skills.active.gymnastics.value;
-                        if (special === 'block') parts['SR5.Block'] = this.data.data.skills.active.unarmed_combat.value;
+                        let special = Helpers.parseInputToString($(html).find('[name=activeDefense]').val());
+                        if (special) {
+                            const defense = activeDefenses[special];
+                            parts[defense.label] = defense.value;
+                        }
                         if (cover) parts['SR5.Cover'] = cover;
 
                         resolve(
