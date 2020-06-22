@@ -463,6 +463,7 @@
     "SR5.EnvironmentVeryHigh": "Very High",
     "SR5.WoundModifier": "Wound Mod",
     "SR5.ExtendedTest": "Extended Test",
+    "SR5.IncomingDamage": "Incoming Damage",
 
     "SETTINGS.DiagonalMovementName": "Diagonal Movement",
     "SETTINGS.DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",

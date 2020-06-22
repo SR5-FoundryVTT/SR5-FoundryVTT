@@ -137,9 +137,9 @@ export class SR5Actor extends Actor {
                     else {
                         armor.base = itemData.armor.value;
                         armor.label = item.name;
-                    }
-                    for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
-                        armor[element] = itemData.armor[element];
+                        for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
+                            armor[element] = itemData.armor[element];
+                        }
                     }
                 }
             }
@@ -624,6 +624,7 @@ export class SR5Actor extends Actor {
         let dialogData = {
             damage: options?.damage,
             parts,
+            elementTypes: CONFIG.SR5.elementTypes,
         };
         let id = '';
         let cancel = true;
@@ -634,51 +635,10 @@ export class SR5Actor extends Actor {
                     title: 'SR5.DamageResistanceTest',
                     content: dlg,
                     buttons: {
-                        base: {
-                            label: 'Base',
-                            icon: '<i class="fas fa-shield-alt"></i>',
+                        continue: {
+                            label: game.i18n.localize('SR5.Continue'),
                             callback: () => {
                                 id = 'default';
-                                cancel = false;
-                            },
-                        },
-                        acid: {
-                            label: 'Acid',
-                            icon: '<i class="fas fa-vial"></i>',
-                            callback: () => {
-                                id = 'acid';
-                                cancel = false;
-                            },
-                        },
-                        cold: {
-                            label: 'Cold',
-                            icon: '<i class="fas fa-snowflake"></i>',
-                            callback: () => {
-                                id = 'cold';
-                                cancel = false;
-                            },
-                        },
-                        electricity: {
-                            label: 'Elec',
-                            icon: '<i class="fas fa-bolt"></i>',
-                            callback: () => {
-                                id = 'electricity';
-                                cancel = false;
-                            },
-                        },
-                        fire: {
-                            label: 'Fire',
-                            icon: '<i class="fas fa-fire"></i>',
-                            callback: () => {
-                                id = 'fire';
-                                cancel = false;
-                            },
-                        },
-                        radiation: {
-                            label: 'Rad',
-                            icon: '<i class="fas fa-radiation"></i>',
-                            callback: () => {
-                                id = 'radiation';
                                 cancel = false;
                             },
                         },
@@ -687,9 +647,14 @@ export class SR5Actor extends Actor {
                         if (cancel) return;
 
                         const armor = this.getArmor();
-                        const armorId = id === 'default' ? '' : id;
+                        const armorId = Helpers.parseInputToString($(html).find('[name=element]').val());
+
+                        console.log(armorId);
+
+                        console.log(armor);
                         const bonusArmor = armor[armorId] || 0;
-                        if (bonusArmor) parts[Helpers.label(armorId)] = bonusArmor;
+                        console.log(bonusArmor);
+                        if (bonusArmor) parts[CONFIG.SR5.elementTypes[armorId]] = bonusArmor;
 
                         const ap = Helpers.parseInputToNumber($(html).find('[name=ap]').val());
                         if (ap) {
