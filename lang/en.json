@@ -465,6 +465,15 @@
     "SR5.ExtendedTest": "Extended Test",
     "SR5.IncomingDamage": "Incoming Damage",
 
+    "SR5.NoCover": "No Cover",
+    "SR5.PartialCover": "Partial Cover",
+    "SR5.GoodCover": "Good Cover",
+    "SR5.None": "None",
+    "SR5.ActiveDefense": "Active Defense",
+    "SR5.Dodge": "Dodge",
+    "SR5.Block": "Block",
+    "SR5.Parry": "Parry",
+
     "SETTINGS.DiagonalMovementName": "Diagonal Movement",
     "SETTINGS.DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
     "SETTINGS.IgnoreDiagonal": "Ignore Diagonal Movement (1-1-1)",
