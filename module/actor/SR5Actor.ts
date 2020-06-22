@@ -621,6 +621,7 @@ export class SR5Actor extends Actor {
                         let cover = Helpers.parseInputToNumber($(html).find('[name=cover]').val());
                         let special = Helpers.parseInputToString($(html).find('[name=activeDefense]').val());
                         if (special) {
+                            // TODO subtract initiative score when Foundry updates to 0.7.0
                             const defense = activeDefenses[special];
                             parts[defense.label] = defense.value;
                         }
