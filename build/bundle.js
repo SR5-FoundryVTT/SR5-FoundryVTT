@@ -2700,8 +2700,7 @@ class ShadowrunItemDialog extends Dialog {
             fireModes['10'] = 'FA(c)';
             fireModes['20'] = game.i18n.localize('SR5.Suppressing');
         }
-        const targets = game.user.targets;
-        console.log(targets);
+        const templateRanges = this._getRangeWeaponTemplateData(ranges);
         const fireMode = item.getLastFireMode();
         const rc = item.getRecoilCompensation(true);
         templateData['fireModes'] = fireModes;
@@ -2709,7 +2708,8 @@ class ShadowrunItemDialog extends Dialog {
         templateData['rc'] = rc;
         templateData['ammo'] = ammo;
         templateData['title'] = title;
-        templateData['ranges'] = this._getRangeWeaponTemplateData(ranges);
+        templateData['ranges'] = templateRanges;
+        templateData['targetRange'] = item.getLastFireRangeMod();
         let cancel = true;
         dialogData.buttons = {
             continue: {
@@ -3271,225 +3271,92 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SR5Combat = void 0;
-class SR5Combat extends Combat {
-    constructor(...args) {
-        // @ts-ignore
-        super(...args);
-        Hooks.on('updateActor', (actor) => {
-            const combatant = this.getActorCombatant(actor);
-            if (combatant) {
-                // TODO handle monitoring Wound changes
+exports.shadowrunCombatUpdate = exports.preCombatUpdate = void 0;
+exports.preCombatUpdate = function (combat, changes, options) {
+    return __awaiter(this, void 0, void 0, function* () {
+        // triggers when combat round changes
+        if (changes.round && combat.round && changes.round > combat.round) {
+            let initPassEnd = true;
+            for (const c of combat.combatants) {
+                let init = Number(c.initiative);
+                init -= 10;
+                if (init > 0)
+                    initPassEnd = false;
             }
-        });
-    }
-    get initiativePass() {
-        var _a;
-        return ((_a = this.data) === null || _a === void 0 ? void 0 : _a.initiativePass) || 0;
-    }
-    getActorCombatant(actor) {
-        return this.combatants.find(c => c.actor._id === actor._id);
-    }
-    /**
-     * Add ContextMenu options to CombatTracker Entries -- adds the basic Initiative Subtractions
-     * @param html
-     * @param options
-     */
-    static addCombatTrackerContextOptions(html, options) {
-        options.push({
-            name: game.i18n.localize('SR5.COMBAT.ReduceInitByOne'),
-            icon: '<i class="fas fa-caret-down"></i>',
-            callback: (li) => __awaiter(this, void 0, void 0, function* () {
-                // @ts-ignore
-                const combatant = yield game.combat.getCombatant(li.data('combatant-id'));
-                if (combatant) {
-                    const combat = game.combat;
-                    yield combat.adjustInitiative(combatant, -1);
-                }
-            }),
-        }, {
-            name: game.i18n.localize('SR5.COMBAT.ReduceInitByFive'),
-            icon: '<i class="fas fa-angle-down"></i>',
-            callback: (li) => __awaiter(this, void 0, void 0, function* () {
-                // @ts-ignore
-                const combatant = yield game.combat.getCombatant(li.data('combatant-id'));
-                if (combatant) {
-                    const combat = game.combat;
-                    yield combat.adjustInitiative(combatant, -5);
-                }
-            }),
-        }, {
-            name: game.i18n.localize('SR5.COMBAT.ReduceInitByTen'),
-            icon: '<i class="fas fa-angle-double-down"></i>',
-            callback: (li) => __awaiter(this, void 0, void 0, function* () {
-                // @ts-ignore
-                const combatant = yield game.combat.getCombatant(li.data('combatant-id'));
-                if (combatant) {
-                    const combat = game.combat;
-                    yield combat.adjustInitiative(combatant, -10);
-                }
-            }),
-        });
-        return options;
-    }
-    _onUpdate(data, options, userId, context) {
-        console.log(data);
-        super._onUpdate(data, options, userId, context);
-    }
-    /**
-     *
-     * @param combatant
-     * @param adjustment
-     */
-    adjustInitiative(combatant, adjustment) {
-        return __awaiter(this, void 0, void 0, function* () {
-            combatant = typeof combatant === 'string' ? this.combatants.find((c) => c._id === combatant) : combatant;
-            if (!combatant || typeof combatant === 'string') {
-                console.error('Could not find combatant with id ', combatant);
-                return;
+            if (!initPassEnd) {
+                changes.round = combat.round;
             }
-            const newCombatant = {
-                _id: combatant._id,
-                initiative: Number(combatant.initiative) + adjustment,
-            };
-            // @ts-ignore
-            yield this.updateCombatant(newCombatant);
-        });
-    }
-    static sortByRERIC(left, right) {
-        // First sort by initiative value if different
-        const leftInit = Number(left.initiative);
-        const rightInit = Number(right.initiative);
-        if (isNaN(leftInit))
-            return 1;
-        if (isNaN(rightInit))
-            return -1;
-        if (leftInit > rightInit)
-            return -1;
-        if (leftInit < rightInit)
-            return 1;
-        // now we sort by ERIC
-        const genData = (actor) => {
-            var _a, _b;
-            // edge, reaction, intuition, coinflip
-            return [
-                Number(actor.getEdge().max),
-                Number((_a = actor.findAttribute('reaction')) === null || _a === void 0 ? void 0 : _a.value),
-                Number((_b = actor.findAttribute('intuition')) === null || _b === void 0 ? void 0 : _b.value),
-                new Roll('1d2').roll().total,
-            ];
-        };
-        const leftData = genData(left.actor);
-        const rightData = genData(right.actor);
-        // if we find a difference that isn't 0, return it
-        for (let index = 0; index < leftData.length; index++) {
-            const diff = rightData[index] - leftData[index];
-            if (diff !== 0)
-                return diff;
+            // if we are gm, call function normally
+            // if not gm, send a socket message for the gm to update the combatants
+            // for new initative passes or reroll
+            if (game.user.isGM) {
+                yield exports.shadowrunCombatUpdate(changes, options);
+            }
+            else {
+                // @ts-ignore
+                game.socket.emit('system.shadowrun5e', {
+                    gmCombatUpdate: {
+                        changes,
+                        options,
+                    },
+                });
+            }
         }
-        return 0;
+    });
+};
+exports.shadowrunCombatUpdate = (changes, options) => __awaiter(void 0, void 0, void 0, function* () {
+    const { combat } = game;
+    // subtact 10 from all initiative, we just went into the next initiative pass
+    const removedCombatants = combat.getFlag('shadowrun5e', 'removedCombatants') || [];
+    const combatants = [];
+    for (const c of combat.combatants) {
+        let init = Number(c.initiative);
+        init -= 10;
+        if (init <= 0)
+            removedCombatants.push(Object.assign({}, c));
+        else {
+            // @ts-ignore
+            combatants.push({ _id: c._id, initiative: init });
+        }
     }
-    /**
-     * @Override
-     * remove any turns that are less than 0
-     * filter using ERIC
-     */
-    setupTurns() {
-        const turns = super.setupTurns().filter((turn) => {
-            const init = Number(turn.initiative);
-            if (isNaN(init))
-                return true;
-            return init > 0;
-        });
+    yield combat.deleteEmbeddedEntity('Combatant', removedCombatants.map((c) => c._id), {});
+    yield combat.updateEmbeddedEntity('Combatant', combatants, {});
+    if (combatants.length === 0) {
+        const messages = [];
+        const messageOptions = options.messageOptions || {};
+        for (const c of removedCombatants) {
+            const actorData = c.actor ? c.actor.data : {};
+            // @ts-ignore
+            const formula = combat._getInitiativeFormula(c);
+            const roll = new Roll(formula, actorData).roll();
+            c.initiative = roll.total;
+            const rollMode = messageOptions.rollMode || c.token.hidden || c.hidden ? 'gmroll' : 'roll';
+            const messageData = mergeObject({
+                speaker: {
+                    scene: canvas.scene._id,
+                    actor: c.actor ? c.actor._id : null,
+                    token: c.token._id,
+                    alias: c.token.name,
+                },
+                flavor: `${c.token.name} rolls for Initiative!`,
+            }, messageOptions);
+            yield roll.toMessage(messageData, {
+                rollMode,
+            });
+        }
+        yield combat.createEmbeddedEntity('Combatant', removedCombatants, {});
+        yield ChatMessage.create(messages);
+        yield combat.unsetFlag('shadowrun5e', 'removedCombatants');
         // @ts-ignore
-        this.turns = turns.sort(SR5Combat.sortByRERIC);
-        return turns;
+        yield combat.resetAll();
+        yield combat.rollAll();
+        yield combat.update({ turn: 0 });
     }
-    /**
-     * @Override
-     * proceed to the next turn
-     * - handles going to next initiative pass or combat round.
-     */
-    nextTurn() {
-        return __awaiter(this, void 0, void 0, function* () {
-            let turn = this.turn;
-            let skip = this.settings.skipDefeated;
-            // Determine the next turn number
-            let next = null;
-            if (skip) {
-                for (let [i, t] of this.turns.entries()) {
-                    if (i <= turn)
-                        continue;
-                    // @ts-ignore
-                    if (!t.defeated) {
-                        next = i;
-                        break;
-                    }
-                }
-            }
-            else
-                next = turn + 1;
-            // Maybe advance to the next round/init pass
-            let round = this.round;
-            let initPass = this.initiativePass;
-            // if both are 0, we just started so set both to 1
-            if (round === 0 && initPass === 0) {
-                initPass = initPass + 1;
-                round = round + 1;
-                next = 0;
-            }
-            else if (next === null || next >= this.turns.length) {
-                const combatants = [];
-                // check for initpass
-                const over10Init = this.combatants.reduce((accumulator, running) => {
-                    return accumulator || Number(running.initiative) > 10;
-                }, false);
-                // do an initiative pass
-                if (over10Init) {
-                    next = 0;
-                    initPass = initPass + 1;
-                    // adjust combatants
-                    for (const c of this.combatants) {
-                        let init = Number(c.initiative);
-                        init -= 10;
-                        // @ts-ignore
-                        combatants.push({ _id: c._id, initiative: init });
-                    }
-                }
-                else {
-                    next = 0;
-                    round = round + 1;
-                    initPass = 0;
-                    for (const c of this.combatants) {
-                        const actorData = c.actor ? c.actor.data.data : {};
-                        // @ts-ignore
-                        const formula = this._getInitiativeFormula(c);
-                        const roll = new Roll(formula, actorData).roll();
-                        const init = roll.total;
-                        // @ts-ignore
-                        combatants.push({ _id: c._id, initiative: init });
-                    }
-                }
-                if (combatants.length > 0) {
-                    // @ts-ignore
-                    yield this.updateCombatant(combatants);
-                }
-                if (skip) {
-                    // @ts-ignore
-                    next = this.turns.findIndex((t) => !t.defeated);
-                    if (next === -1) {
-                        // @ts-ignore
-                        ui.notifications.warn(game.i18n.localize('COMBAT.NoneRemaining'));
-                        next = 0;
-                    }
-                }
-            }
-            // Update the encounter
-            yield this.update({ round: round, turn: next, initiativePass: initPass });
-        });
+    else if (removedCombatants.length) {
+        yield combat.setFlag('shadowrun5e', 'removedCombatants', removedCombatants);
+        yield combat.update({ turn: 0 });
     }
-}
-exports.SR5Combat = SR5Combat;
+});
 
 },{}],12:[function(require,module,exports){
 "use strict";
@@ -5633,13 +5500,13 @@ const SR5Item_1 = require("./item/SR5Item");
 const config_1 = require("./config");
 const helpers_1 = require("./helpers");
 const settings_1 = require("./settings");
+const combat_1 = require("./combat");
 const canvas_1 = require("./canvas");
 const chat = require("./chat");
 const OverwatchScoreTracker_1 = require("./apps/gmtools/OverwatchScoreTracker");
 const handlebars_1 = require("./handlebars");
 const ShadowrunRoller_1 = require("./rolls/ShadowrunRoller");
 const Migrator_1 = require("./migrator/Migrator");
-const SR5Combat_1 = require("./combat/SR5Combat");
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
 /* -------------------------------------------- */
@@ -5655,7 +5522,6 @@ Hooks.once('init', function () {
     CONFIG.SR5 = config_1.SR5;
     CONFIG.Actor.entityClass = SR5Actor_1.SR5Actor;
     CONFIG.Item.entityClass = SR5Item_1.SR5Item;
-    CONFIG.Combat.entityClass = SR5Combat_1.SR5Combat;
     settings_1.registerSystemSettings();
     // Register sheet application classes
     Actors.unregisterSheet('core', ActorSheet);
@@ -5674,16 +5540,23 @@ Hooks.on('canvasInit', function () {
     SquareGrid.prototype.measureDistance = canvas_1.measureDistance;
 });
 Hooks.on('ready', function () {
+    // this is correct, will need to be fixed in foundry types
+    // @ts-ignore
+    game.socket.on('system.shadowrun5e', (data) => {
+        if (game.user.isGM && data.gmCombatUpdate) {
+            combat_1.shadowrunCombatUpdate(data.gmCombatUpdate.changes, data.gmCombatUpdate.options);
+        }
+    });
     if (game.user.isGM) {
         Migrator_1.Migrator.BeginMigration();
     }
 });
+Hooks.on('preUpdateCombat', combat_1.preCombatUpdate);
 Hooks.on('renderChatMessage', (app, html) => {
     if (app.isRoll)
         chat.addRollListeners(app, html);
 });
 Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);
-Hooks.on('getCombatTrackerEntryContext', SR5Combat_1.SR5Combat.addCombatTrackerContextOptions);
 /* -------------------------------------------- */
 /*  Hotbar Macros                               */
 /* -------------------------------------------- */
@@ -5755,7 +5628,7 @@ function rollItemMacro(itemName) {
 }
 handlebars_1.registerHandlebarHelpers();
 
-},{"./actor/SR5Actor":1,"./actor/SR5ActorSheet":2,"./apps/gmtools/OverwatchScoreTracker":5,"./canvas":9,"./chat":10,"./combat/SR5Combat":11,"./config":12,"./handlebars":13,"./helpers":14,"./item/SR5Item":16,"./item/SR5ItemSheet":17,"./migrator/Migrator":19,"./rolls/ShadowrunRoller":22,"./settings":23}],19:[function(require,module,exports){
+},{"./actor/SR5Actor":1,"./actor/SR5ActorSheet":2,"./apps/gmtools/OverwatchScoreTracker":5,"./canvas":9,"./chat":10,"./combat":11,"./config":12,"./handlebars":13,"./helpers":14,"./item/SR5Item":16,"./item/SR5ItemSheet":17,"./migrator/Migrator":19,"./rolls/ShadowrunRoller":22,"./settings":23}],19:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }

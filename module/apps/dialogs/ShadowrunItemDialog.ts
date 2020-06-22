@@ -128,9 +128,7 @@ export class ShadowrunItemDialog extends Dialog {
             fireModes['20'] = game.i18n.localize('SR5.Suppressing');
         }
 
-        const targets = game.user.targets;
-        console.log(targets);
-
+        const templateRanges = this._getRangeWeaponTemplateData(ranges);
         const fireMode = item.getLastFireMode();
         const rc = item.getRecoilCompensation(true);
         templateData['fireModes'] = fireModes;
@@ -138,7 +136,8 @@ export class ShadowrunItemDialog extends Dialog {
         templateData['rc'] = rc;
         templateData['ammo'] = ammo;
         templateData['title'] = title;
-        templateData['ranges'] = this._getRangeWeaponTemplateData(ranges);
+        templateData['ranges'] = templateRanges;
+        templateData['targetRange'] = item.getLastFireRangeMod();
 
         let cancel = true;
         dialogData.buttons = {
