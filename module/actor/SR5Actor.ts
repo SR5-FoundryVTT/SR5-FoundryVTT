@@ -428,11 +428,13 @@ export class SR5Actor extends Actor {
     }
 
     getFullDefenseAttribute(): AttributeField | undefined {
-        return this.findAttribute('willpower');
+        let att = this.data.data.full_defense_attribute;
+        if (!att) att = 'willpower';
+        return this.findAttribute(att);
     }
 
     getEquippedWeapons(): SR5Item[] {
-        return this.items.filter(item => (item.isEquipped() && item.data.type === 'weapon'));
+        return this.items.filter((item) => item.isEquipped() && item.data.type === 'weapon');
     }
 
     addKnowledgeSkill(category, skill?) {
@@ -578,7 +580,7 @@ export class SR5Actor extends Actor {
                 value: this.findActiveSkill('unarmed_combat')?.value,
                 initMod: -5,
             };
-            const equippedMeleeWeapons = this.getEquippedWeapons().filter(w => w.isMeleeWeapon());
+            const equippedMeleeWeapons = this.getEquippedWeapons().filter((w) => w.isMeleeWeapon());
             let defenseReach = 0;
             equippedMeleeWeapons.forEach((weapon) => {
                 activeDefenses[`parry-${weapon.name}`] = {
@@ -586,9 +588,9 @@ export class SR5Actor extends Actor {
                     weapon: weapon.name,
                     value: this.findActiveSkill(weapon.getActionSkill())?.value,
                     init: -5,
-                }
+                };
                 defenseReach = Math.max(defenseReach, weapon.getReach());
-            })
+            });
             const incomingReach = options.incomingAttack.reach;
             const netReach = defenseReach - incomingReach;
             if (netReach !== 0) {

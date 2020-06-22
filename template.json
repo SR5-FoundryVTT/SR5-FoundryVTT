@@ -775,6 +775,7 @@
                 "notoriety": 0,
                 "public_awareness": 0,
                 "special": "mundane",
+                "full_defense_attribute": "willpower",
                 "description": {
                     "value": ""
                 },

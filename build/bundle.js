@@ -388,10 +388,13 @@ class SR5Actor extends Actor {
         return undefined;
     }
     getFullDefenseAttribute() {
-        return this.findAttribute('willpower');
+        let att = this.data.data.full_defense_attribute;
+        if (!att)
+            att = 'willpower';
+        return this.findAttribute(att);
     }
     getEquippedWeapons() {
-        return this.items.filter(item => (item.isEquipped() && item.data.type === 'weapon'));
+        return this.items.filter((item) => item.isEquipped() && item.data.type === 'weapon');
     }
     addKnowledgeSkill(category, skill) {
         const defaultSkill = {
@@ -518,7 +521,7 @@ class SR5Actor extends Actor {
                 value: (_d = this.findActiveSkill('unarmed_combat')) === null || _d === void 0 ? void 0 : _d.value,
                 initMod: -5,
             };
-            const equippedMeleeWeapons = this.getEquippedWeapons().filter(w => w.isMeleeWeapon());
+            const equippedMeleeWeapons = this.getEquippedWeapons().filter((w) => w.isMeleeWeapon());
             let defenseReach = 0;
             equippedMeleeWeapons.forEach((weapon) => {
                 var _a;
@@ -563,6 +566,7 @@ class SR5Actor extends Actor {
                         let cover = helpers_1.Helpers.parseInputToNumber($(html).find('[name=cover]').val());
                         let special = helpers_1.Helpers.parseInputToString($(html).find('[name=activeDefense]').val());
                         if (special) {
+                            // TODO subtract initiative score when Foundry updates to 0.7.0
                             const defense = activeDefenses[special];
                             parts[defense.label] = defense.value;
                         }
