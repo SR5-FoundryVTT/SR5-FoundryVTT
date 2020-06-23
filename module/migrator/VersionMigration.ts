@@ -150,6 +150,7 @@ export abstract class VersionMigration {
                                 enforceTypes: false,
                                 inplace: false,
                             });
+                            console.log(newToken);
                             return newToken;
                         } else {
                             return token;
