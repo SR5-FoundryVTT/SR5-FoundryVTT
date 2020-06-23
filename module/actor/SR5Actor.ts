@@ -20,6 +20,7 @@ import ModList = Shadowrun.ModList;
 import BaseValuePair = Shadowrun.BaseValuePair;
 import ModifiableValue = Shadowrun.ModifiableValue;
 import LabelField = Shadowrun.LabelField;
+import LimitField = Shadowrun.LimitField;
 
 export class SR5Actor extends Actor {
     async update(data, options?) {
@@ -382,6 +383,18 @@ export class SR5Actor extends Actor {
     findAttribute(attributeName?: string): AttributeField | undefined {
         if (attributeName === undefined) return undefined;
         return this.data.data.attributes[attributeName];
+    }
+
+    findLimitFromAttribute(attributeName?: string): LimitField | undefined {
+        if (attributeName === undefined) return undefined;
+        const attribute = this.findAttribute(attributeName);
+        if (!attribute?.limit) return undefined;
+        return this.findLimit(attribute.limit);
+    }
+
+    findLimit(limitName?: string): LimitField | undefined {
+        if (!limitName) return undefined;
+        return this.data.data.limits[limitName];
     }
 
     getWoundModifier(): number {

@@ -153,14 +153,14 @@ export class SR5Item extends Item {
             if (this.actor) {
                 if (action.damage.attribute) {
                     const { attribute } = action.damage;
-                    // TODO fix so you don't have SR5.
-                    // action.damage.mod[CONFIG.SR5.attributes[attribute]] = this.actor.data.data.attributes[attribute].value;
+                    // TODO convert this in the template
+                    action.damage.mod[game.i18n.localize(CONFIG.SR5.attributes[attribute])] = this.actor.findAttribute(attribute)?.value;
                     action.damage.value = action.damage.base + Helpers.totalMods(action.damage.mod);
                 }
                 if (action.limit.attribute) {
                     const { attribute } = action.limit;
-                    // TODO fix so you don't have SR5.
-                    // action.limit.mod[CONFIG.SR5.attributes[attribute]] = this.actor.data.data.limits[action.limit.attribute].value;
+                    // TODO convert this in the template
+                    action.limit.mod[game.i18n.localize(CONFIG.SR5.limits[attribute])] = this.actor.findLimit(attribute)?.value;
                     action.limit.value = action.limit.base + Helpers.totalMods(action.limit.mod);
                 }
             }
