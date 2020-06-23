@@ -1,6 +1,6 @@
 import { VersionMigration } from './VersionMigration';
 import { LegacyMigration } from './versions/LegacyMigration';
-import { InitFullDefenseAttributeMigration } from './versions/InitFullDefenseAttributeMigration';
+import { Version0_6_5 } from './versions/Version0_6_5';
 
 type VersionDefinition = {
     versionNumber: string;
@@ -10,7 +10,7 @@ export class Migrator {
     // Map of all version migrations to their target version numbers.
     private static readonly s_Versions: VersionDefinition[] = [
         { versionNumber: LegacyMigration.TargetVersion, migration: new LegacyMigration() },
-        { versionNumber: InitFullDefenseAttributeMigration.TargetVersion, migration: new InitFullDefenseAttributeMigration() },
+        { versionNumber: Version0_6_5.TargetVersion, migration: new Version0_6_5() },
     ];
 
     //TODO: Call on Init()

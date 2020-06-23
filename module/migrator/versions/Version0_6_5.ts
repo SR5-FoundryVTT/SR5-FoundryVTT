@@ -1,14 +1,14 @@
 import { VersionMigration } from '../VersionMigration';
 
 /**
- * Migrates the data model for Legacy migrations prior to 0.6.4
+ * Add default value of willpower to the full_defense_attribute field
  */
-export class InitFullDefenseAttributeMigration extends VersionMigration {
+export class Version0_6_5 extends VersionMigration {
     get SourceVersion(): string {
         return '0.6.4';
     }
     get TargetVersion(): string {
-        return InitFullDefenseAttributeMigration.TargetVersion;
+        return Version0_6_5.TargetVersion;
     }
     static get TargetVersion(): string {
         return '0.6.5';
@@ -18,24 +18,11 @@ export class InitFullDefenseAttributeMigration extends VersionMigration {
         let updateData: any = {};
         if (updateData.data === undefined) updateData.data = {};
         updateData.data.full_defense_attribute = 'willpower';
-        updateData = await this.IterateActorItems(actorData, updateData);
         return updateData;
-    }
-
-    protected async MigrateItemData(itemData: any): Promise<any> {
-        return {};
-    }
-
-    protected async MigrateSceneData(scene: any): Promise<any> {
-        return {};
     }
 
     protected async ShouldMigrateActorData(actorData: any): Promise<boolean> {
         return actorData.data.full_defense_attribute === undefined;
-    }
-
-    protected async ShouldMigrateItemData(item: BaseEntityData): Promise<boolean> {
-        return true;
     }
 
     protected async ShouldMigrateSceneData(scene: Scene): Promise<boolean> {
