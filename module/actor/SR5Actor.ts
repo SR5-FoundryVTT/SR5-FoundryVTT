@@ -337,27 +337,7 @@ export class SR5Actor extends Actor {
         init.current.dice.text = `${init.current.dice.value}d6`;
         init.current.base.value = init.current.base.base;
 
-        const soak = attributes.body.value + armor.value + modifiers['soak'];
-        const drainAtt = attributes[data.magic.attribute];
         if (data.magic.drain && !data.magic.drain.mod) data.magic.drain.mod = {};
-        data.rolls = {
-            ...data.rolls,
-            defense: attributes.reaction.value + attributes.intuition.value + modifiers['defense'],
-            drain: attributes.willpower.value + (drainAtt ? drainAtt.value : 0) + modifiers['drain'],
-            fade: attributes.willpower.value + attributes.resonance.value + modifiers['fade'],
-            soak: {
-                default: soak,
-                cold: soak + armor.cold,
-                fire: soak + armor.fire,
-                acid: soak + armor.acid,
-                electricity: soak + armor.electricity,
-                radiation: soak + armor.radiation,
-            },
-            composure: attributes.charisma.value + attributes.willpower.value + modifiers['composure'],
-            judge_intentions: attributes.charisma.value + attributes.intuition.value + modifiers['judge_intentions'],
-            lift_carry: attributes.strength.value + attributes.body.value + modifiers['lift_carry'],
-            memory: attributes.willpower.value + attributes.logic.value + modifiers['memory'],
-        };
 
         {
             const count = 3 + modifiers['wound_tolerance'];
