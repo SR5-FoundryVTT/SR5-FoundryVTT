@@ -155,7 +155,7 @@ export abstract class VersionMigration {
                         } else {
                             return token;
                         }
-                    })
+                    }),
                 );
                 if (scene._id === 'MAwSFhlXRipixOWw') {
                     console.log('Scene Pre-Update');
@@ -265,7 +265,7 @@ export abstract class VersionMigration {
                     } else {
                         return item;
                     }
-                })
+                }),
             );
             if (hasItemUpdates) {
                 updateData.items = items;
@@ -280,13 +280,17 @@ export abstract class VersionMigration {
      * @param scene The scene to check.
      * @return A promise that resolves true or false.
      */
-    protected abstract async ShouldMigrateSceneData(scene: Scene): Promise<boolean>;
+    protected async ShouldMigrateSceneData(scene: Scene): Promise<boolean> {
+        return false;
+    }
     /**
      * Migrate the specified scene's data.
      * @param scene The scene to migrate.
      * @return A promise that resolves with the update data.
      */
-    protected abstract async MigrateSceneData(scene: any): Promise<any>;
+    protected async MigrateSceneData(scene: any): Promise<any> {
+        return {};
+    }
     /**
      * Do something right before scene data is migrated.
      * @param game The game to be updated.
@@ -305,13 +309,17 @@ export abstract class VersionMigration {
      * @param item The item to check.
      * @return A promise that resolves true or false.
      */
-    protected abstract async ShouldMigrateItemData(item: BaseEntityData): Promise<boolean>;
+    protected async ShouldMigrateItemData(item: BaseEntityData): Promise<boolean> {
+        return false;
+    }
     /**
      * Migrate the specified item's data.
      * @param item The item to migrate.
      * @return A promise that resolves with the update data.
      */
-    protected abstract async MigrateItemData(item: BaseEntityData): Promise<any>;
+    protected async MigrateItemData(item: BaseEntityData): Promise<any> {
+        return {};
+    }
     /**
      * Do something right before item data is migrated.
      * @param game The game to be updated.
@@ -330,13 +338,17 @@ export abstract class VersionMigration {
      * @param actor The actor to check.
      * @return A promise that resolves true or false.
      */
-    protected abstract async ShouldMigrateActorData(actor: ActorData): Promise<boolean>;
+    protected async ShouldMigrateActorData(actor: ActorData): Promise<boolean> {
+        return false;
+    }
     /**
      * Migrate the specified actor's data.
      * @param actor The actor to migrate.
      * @return A promise that resolves with the update data.
      */
-    protected abstract async MigrateActorData(actor: ActorData): Promise<any>;
+    protected async MigrateActorData(actor: ActorData): Promise<any> {
+        return {};
+    }
     /**
      * Do something right before actor data is migrated.
      * @param game The game to be updated.
