@@ -92,7 +92,9 @@ export class ShadowrunRoller {
         }
         if (item.isRangedWeapon()) {
             rollData['fireMode'] = item.getLastFireMode()?.label;
-            rollData.dialogOptions!.environmental = item.getLastFireRangeMod().value;
+            if (rollData.dialogOptions) {
+                rollData.dialogOptions.environmental = item.getLastFireRangeMod().value;
+            }
         }
         rollData.description = item.getChatData();
 

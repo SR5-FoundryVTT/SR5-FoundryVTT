@@ -22,26 +22,26 @@ export class SR5Item extends Item {
     actor: SR5Actor;
 
     // Flag Functions
-    getLastFireMode(): FireModeData | undefined {
-        return this.getFlag('shadowrun5e', 'lastFireMode');
+    getLastFireMode(): FireModeData {
+        return this.getFlag('shadowrun5e', 'lastFireMode') || { value: 0 };
     }
     async setLastFireMode(fireMode: FireModeData) {
         return this.setFlag('shadowrun5e', 'lastFireMode', fireMode);
     }
     getLastSpellForce(): SpellForceData {
-        return this.getFlag('shadowrun5e', 'lastSpellForce');
+        return this.getFlag('shadowrun5e', 'lastSpellForce') || { value: 0 };
     }
     async setLastSpellForce(force: SpellForceData) {
         return this.setFlag('shadowrun5e', 'lastSpellForce', force);
     }
     getLastComplexFormLevel(): ComplexFormLevelData {
-        return this.getFlag('shadowrun5e', 'lastComplexFormLevel');
+        return this.getFlag('shadowrun5e', 'lastComplexFormLevel') || { value: 0 };
     }
     async setLastComplexFormLevel(level: ComplexFormLevelData) {
         return this.setFlag('shadowrun5e', 'lastComplexFormLevel', level);
     }
     getLastFireRangeMod(): FireRangeData {
-        return this.getFlag('shadowrun5e', 'lastFireRange');
+        return this.getFlag('shadowrun5e', 'lastFireRange') || { value: 0 };
     }
     async setLastFireRangeMod(environmentalMod: FireRangeData) {
         return this.setFlag('shadowrun5e', 'lastFireRange', environmentalMod);
@@ -199,6 +199,7 @@ export class SR5Item extends Item {
                       const attack = this.getAttackData(0);
                       // don't include any hits
                       delete attack?.hits;
+                      console.log(attack);
                       // generate chat data
                       createChatData({
                           header: {
