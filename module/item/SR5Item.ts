@@ -70,7 +70,8 @@ export class SR5Item extends Item {
     }
 
     get hasRoll(): boolean {
-        return !!(this.data.data.action && this.data.data.action.type !== '');
+        const { action } = this.data.data;
+        return !!(action && action.type !== '' && (action.skill || action.attribute) );
     }
     get hasTemplate(): boolean {
         return this.isAreaOfEffect();
@@ -199,7 +200,6 @@ export class SR5Item extends Item {
                       const attack = this.getAttackData(0);
                       // don't include any hits
                       delete attack?.hits;
-                      console.log(attack);
                       // generate chat data
                       createChatData({
                           header: {
@@ -733,7 +733,7 @@ export class SR5Item extends Item {
         return this.data.data.action?.attribute2;
     }
 
-    getRollName(): string {
+    getRollName(): string | undefined {
         if (this.isRangedWeapon()) {
             return game.i18n.localize('SR5.RangeWeaponAttack');
         }
@@ -746,7 +746,8 @@ export class SR5Item extends Item {
         if (this.isSpell()) {
             return game.i18n.localize('SR5.SpellCast');
         }
-        return this.name;
+        if (this.hasRoll) return this.name;
+        return undefined;
     }
 
     getLimit(): LimitField {

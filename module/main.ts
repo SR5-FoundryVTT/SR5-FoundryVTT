@@ -71,7 +71,7 @@ Hooks.on('ready', function () {
 
 Hooks.on('preUpdateCombat', preCombatUpdate);
 Hooks.on('renderChatMessage', (app, html) => {
-    if (app.isRoll) chat.addRollListeners(app, html);
+    chat.addRollListeners(app, html);
 });
 
 Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);
@@ -124,7 +124,7 @@ async function createItemMacro(item, slot) {
                 command: command,
                 flags: { 'shadowrun5e.itemMacro': true },
             },
-            { displaySheet: false }
+            { displaySheet: false },
         )) as Macro;
     }
     if (macro) game.user.assignHotbarMacro(macro, slot);

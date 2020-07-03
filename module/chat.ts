@@ -91,9 +91,9 @@ export const addChatMessageContextOptions = (html, options) => {
 
 export const addRollListeners = (app: ChatMessage, html) => {
     if (!app.getFlag('shadowrun5e', 'customRoll')) return;
+    const item = SR5Item.getItemFromMessage(html);
     html.on('click', '.test-roll', async (event) => {
         event.preventDefault();
-        const item = SR5Item.getItemFromMessage(html);
         if (item) {
             const roll = await item.rollTest(event, { hideRollMessage: true });
             if (roll && roll.templateData) {
@@ -108,14 +108,12 @@ export const addRollListeners = (app: ChatMessage, html) => {
     html.on('click', '.test', async (event) => {
         event.preventDefault();
         const type = event.currentTarget.dataset.action;
-        const item = SR5Item.getItemFromMessage(html);
         if (item) {
             await item.rollExtraTest(type, event);
         }
     });
     html.on('click', '.place-template', (event) => {
         event.preventDefault();
-        const item = SR5Item.getItemFromMessage(html);
         if (item) {
             const template = Template.fromItem(item);
             template?.drawPreview(event);
@@ -125,5 +123,5 @@ export const addRollListeners = (app: ChatMessage, html) => {
         event.preventDefault();
         $(event.currentTarget).siblings('.card-description').toggle();
     });
-    $(html).find('.card-description').hide();
+    if (item?.hasRoll && app.isRoll) $(html).find('.card-description').hide();
 };

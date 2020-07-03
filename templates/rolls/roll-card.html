@@ -20,6 +20,7 @@
         </footer>
     </div>
     {{/if}}
+    {{#if (isDefined testName)}}
     <div class="test-line">
         <span class="test-name {{#unless (isDefined hits)}}test-roll{{/unless}}">
             {{testName}}
@@ -155,6 +156,7 @@
         </div>
         {{/each}}
     </div>
+    {{/if}}
     {{#if tests}}
     <div class="card-buttons">
         {{#each tests as |test index|}}
