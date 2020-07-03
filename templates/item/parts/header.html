@@ -5,13 +5,7 @@
     <div class="item-info">
         <div class="flexrow">
             <div class="item-name">
-                <input
-                    type="text"
-                    class="display text"
-                    name="name"
-                    value="{{item.name}}"
-                    placeholder='{{localize "SR5.ItemName"}}'
-                />
+                <input type="text" class="display text" name="name" value="{{item.name}}" placeholder='{{localize "SR5.ItemName"}}' />
             </div>
             <div class="item-type">
                 {{localize item.type}}
@@ -19,6 +13,11 @@
         </div>
         <div class="flexrow">
             <div class="source">
+                {{#if hasSourcePdfAvailable}}
+                <div class="source-button roll open-source-pdf" title="{{localize 'SR5.OpenSourcePdf'}}">
+                    <i class="fas fa-file"></i>
+                </div>
+                {{/if}}
                 <input
                     class="display text"
                     type="text"

@@ -652,6 +652,15 @@ export class SR5Item extends Item {
         return true;
     }
 
+    async openPdfSource() {
+        const source = this.getBookSource();
+        if (source === '') { // @ts-ignore
+            ui.notifications.error(game.i18n.localize('SR5.SourceFieldEmptyError'))
+        }
+        // TODO open PDF to correct location
+        // parse however you need, all "buttons" will lead to this function
+    }
+
     isAreaOfEffect(): boolean {
         return this.isGrenade() || (this.isSpell() && this.data.data.range === 'los_a') || this.hasExplosiveAmmo();
     }
@@ -682,6 +691,10 @@ export class SR5Item extends Item {
 
     isEquipped(): boolean {
         return this.data.data.technology?.equipped || false;
+    }
+
+    getBookSource(): string {
+        return this.data.data.description.source;
     }
 
     getAttackData(hits: number): AttackData | undefined {

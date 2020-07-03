@@ -29,6 +29,18 @@
 }
 .sr5.item .item-header .source {
   flex: 1;
+  display: flex;
+  flex-flow: row nowrap;
+  position: relative;
+}
+.sr5.item .item-header .source .source-button {
+  position: absolute;
+  left: 0.5em;
+  top: 0.5em;
+  font-size: 16px;
+  color: #e6e6e6;
+  width: 2em;
+  height: 2em;
 }
 .sr5.item .item-header .source .display {
   padding-top: 1em;
