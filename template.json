@@ -895,7 +895,8 @@
             "quality",
             "sin",
             "spell",
-            "weapon"
+            "weapon",
+            "PDFoundry_PDF"
         ],
         "templates": {
             "description": {
@@ -1150,6 +1151,12 @@
         },
         "equipment": {
             "templates": ["description", "technology"]
+        },
+        "PDFoundry_PDF": {
+            "url": "",
+            "code": "",
+            "offset": 0,
+            "cache": false
         }
     }
 }

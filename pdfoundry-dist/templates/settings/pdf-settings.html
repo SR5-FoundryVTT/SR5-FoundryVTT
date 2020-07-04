@@ -1,0 +1,35 @@
+<!--
+Copyright 2020 Andrew Cuccinello
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<form class="pdf-settings" autocomplete="off">
+    <h1>Configure PDFs for {{ name }}</h1>
+    <div class="wrap">
+        {{#each pdfs as |pdf|}}
+        <div class="row">
+            <div class="row-header clearfix">
+                <span class="pdf-code" title="{{pdf.code}}">{{pdf.code}}</span>
+                <span class="pdf-name" title="{{pdf.name}}">{{pdf.name}}</span>
+            </div>
+            <div class="row-body clearfix">
+                <button class="pdf-browse" title="Browse">Browse</button>
+                <input type="text" placeholder="File URL" title="File URL" class="pdf-url" value="{{ pdf.url }}">
+                <button class="pdf-test" title="Open this PDF to page 5">Test</button>
+                <input type="number" placeholder="Page Offset" title="Page Offset" class="pdf-offset" value="{{ pdf.offset }}">
+            </div>
+        </div>
+        {{/each}}
+    </div>
+</form>

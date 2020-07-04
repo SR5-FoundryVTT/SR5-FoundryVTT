@@ -5,7 +5,10 @@
   "version": "0.6.5",
   "templateVersion": "1.4",
   "author": "Shawn Milligan [n3rf_herder#9026], Andrew Cuccinello [DJ#1982]",
-  "esmodules": ["build/bundle.js"],
+  "esmodules": [
+    "build/bundle.js",
+    "pdfoundry-dist/bundle.js"
+  ],
   "styles": ["css/main.css"],
   "minimumCoreVersion": "0.6.0",
   "compatibleCoreVersion": "0.6.1",
