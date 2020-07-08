@@ -12,7 +12,7 @@
         <label>{{localize 'SR5.Element'}}</label>
         <select name="element">
             {{#select damage.element.value}}
-            <option value="">{{localize "SR5.Normal"}}</option>
+            <option value="">{{localize "SR5.None"}}</option>
             {{#each elementTypes as |val key|}}
             <option value="{{key}}">{{localize val}}</option>
             {{/each}}
