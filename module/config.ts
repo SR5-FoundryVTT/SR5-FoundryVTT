@@ -117,6 +117,13 @@ SR5['weaponCategories'] = {
     thrown: 'SR5.WeaponCatThrown',
 };
 
+SR5['weaponRanges'] = {
+    short: 'SR5.WeaponRangeShort',
+    medium: 'SR5.WeaponRangeMedium',
+    long: 'SR5.WeaponRangeLong',
+    extreme: 'SR5.WeaponRangeExtreme',
+};
+
 SR5['qualityTypes'] = {
     positive: 'SR5.QualityTypePositive',
     negative: 'SR5.QualityTypeNegative',

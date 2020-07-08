@@ -775,6 +775,7 @@
                 "notoriety": 0,
                 "public_awareness": 0,
                 "special": "mundane",
+                "full_defense_attribute": "willpower",
                 "description": {
                     "value": ""
                 },
@@ -894,7 +895,8 @@
             "quality",
             "sin",
             "spell",
-            "weapon"
+            "weapon",
+            "PDFoundry_PDF"
         ],
         "templates": {
             "description": {
@@ -1149,6 +1151,12 @@
         },
         "equipment": {
             "templates": ["description", "technology"]
+        },
+        "PDFoundry_PDF": {
+            "url": "",
+            "code": "",
+            "offset": 0,
+            "cache": false
         }
     }
 }

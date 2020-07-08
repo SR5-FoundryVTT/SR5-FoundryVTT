@@ -128,9 +128,7 @@ export class ShadowrunItemDialog extends Dialog {
             fireModes['20'] = game.i18n.localize('SR5.Suppressing');
         }
 
-        const targets = game.user.targets;
-        console.log(targets);
-
+        const templateRanges = this._getRangeWeaponTemplateData(ranges);
         const fireMode = item.getLastFireMode();
         const rc = item.getRecoilCompensation(true);
         templateData['fireModes'] = fireModes;
@@ -138,40 +136,25 @@ export class ShadowrunItemDialog extends Dialog {
         templateData['rc'] = rc;
         templateData['ammo'] = ammo;
         templateData['title'] = title;
+        templateData['ranges'] = templateRanges;
+        templateData['targetRange'] = item.getLastFireRangeMod();
 
-        let environmental: boolean | number = true;
         let cancel = true;
-        const buttons = {};
-        buttons['short'] = {
-            label: `Short (${ranges.short})`,
-            callback: () => (cancel = false),
-        };
-        buttons['medium'] = {
-            label: `Medium (${ranges.medium})`,
-            callback: () => {
-                environmental = 1;
-                cancel = false;
+        dialogData.buttons = {
+            continue: {
+                label: game.i18n.localize('SR5.Continue'),
+                callback: () => (cancel = false),
             },
         };
-        buttons['long'] = {
-            label: `Long (${ranges.long})`,
-            callback: () => {
-                environmental = 3;
-                cancel = false;
-            },
-        };
-        buttons['extreme'] = {
-            label: `Extreme (${ranges.extreme})`,
-            callback: () => {
-                environmental = 6;
-                cancel = false;
-            },
-        };
-        dialogData.buttons = buttons;
 
         dialogData.close = async (html) => {
             if (cancel) return false;
             const fireMode = Helpers.parseInputToNumber($(html).find('[name="fireMode"]').val());
+            const range = Helpers.parseInputToNumber($(html).find('[name="range"]').val());
+
+            if (range) {
+                await item.setLastFireRangeMod({ value: range });
+            }
 
             if (fireMode) {
                 const fireModeString = fireModes[fireMode];
@@ -185,5 +168,23 @@ export class ShadowrunItemDialog extends Dialog {
             }
             return true;
         };
+    }
+
+    static _getRangeWeaponTemplateData(ranges) {
+        const lookup = {
+            short: 0,
+            medium: -1,
+            long: -3,
+            extreme: -6,
+        };
+        const newRanges = {};
+        for (const [key, value] of Object.entries(ranges)) {
+            newRanges[key] = {
+                distance: value,
+                label: CONFIG.SR5.weaponRanges[key],
+                modifier: lookup[key],
+            };
+        }
+        return newRanges;
     }
 }

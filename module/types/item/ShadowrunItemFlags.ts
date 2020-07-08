@@ -9,22 +9,22 @@ declare namespace Shadowrun {
     export type SpellForceData = {
         value: number;
         reckless?: boolean;
-    }
+    };
 
     export type ComplexFormLevelData = {
         value: number;
-    }
+    };
 
     export type FireRangeData = {
         value: number;
-    }
+    };
 
     export type ReachData = {
         attacker: {
             value: number;
-        }
+        };
         defender?: {
             value: number;
-        }
-    }
+        };
+    };
 }

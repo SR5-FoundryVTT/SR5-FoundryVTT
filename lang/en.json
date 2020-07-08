@@ -445,10 +445,55 @@
 
     "SR5.SelectTokenMessage": "You must select a token first",
 
+    "SR5.MigrationComplete": "Migration Complete",
+    "SR5.MigrationUpdateCompendiumUpdateMessage": "Any world compendium packs that exist in the world were also updated",
+    "SR5.MigrationUpdateCompendiumNoUpdateActor": "Due to technical limitations with FoundryVTT, actor compendium packs are unable to be updated at this time. You will have to manually update these packs.",
+    "SR5.Close": "Close",
+
+    "SR5.WeaponRangeShort": "Short",
+    "SR5.WeaponRangeMedium": "Medium",
+    "SR5.WeaponRangeLong": "Long",
+    "SR5.WeaponRangeExtreme": "Extreme",
+    "SR5.Range": "Range",
+    "SR5.Continue": "Continue",
+    "SR5.EnvironmentNone": "None",
+    "SR5.EnvironmentLow": "Low",
+    "SR5.EnvironmentMedium": "Medium",
+    "SR5.EnvironmentHigh": "High",
+    "SR5.EnvironmentVeryHigh": "Very High",
+    "SR5.WoundModifier": "Wound Mod",
+    "SR5.ExtendedTest": "Extended Test",
+    "SR5.IncomingDamage": "Incoming Damage",
+
+    "SR5.NoCover": "No Cover",
+    "SR5.PartialCover": "Partial Cover",
+    "SR5.GoodCover": "Good Cover",
+    "SR5.None": "None",
+    "SR5.ActiveDefense": "Active Defense",
+    "SR5.Dodge": "Dodge",
+    "SR5.Block": "Block",
+    "SR5.Parry": "Parry",
+
+    "SR5.OpenSourcePdf": "Open Source PDF to the item",
+    "SR5.SourceFieldEmptyError": "The Source field is empty, please enter valid text for the source",
+
     "SETTINGS.DiagonalMovementName": "Diagonal Movement",
     "SETTINGS.DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
     "SETTINGS.IgnoreDiagonal": "Ignore Diagonal Movement (1-1-1)",
     "SETTINGS.EstimateDiagonal": "Estimate Diagonal Movement (1-2-1)",
     "SETTINGS.ApplyLimitsName": "Apply Limits to Rolls",
-    "SETTINGS.ApplyLimitsDescription": "Should limits be applied to roll"
+    "SETTINGS.ApplyLimitsDescription": "Should limits be applied to roll",
+
+    "SR5.MIGRATION.WarningTitle": "Alert",
+    "SR5.MIGRATION.WarningHeader": "Migration Warning",
+    "SR5.MIGRATION.WarningRequired": "The Shadowrun 5E system must begin a required update.",
+    "SR5.MIGRATION.WarningDescription": "Only the GM can perform the update and shutting down the server or closing your browser while the update is in progress may cause irreparable damage to your world.",
+    "SR5.MIGRATION.WarningBackup": "If you have not backed up your world, do so before you press the 'Begin Migration' button below.",
+    "SR5.MIGRATION.BeginMigration": "Begin Migration",
+
+    "SR5.MIGRATION.SuccessTitle": "Success",
+    "SR5.MIGRATION.SuccessHeader": "Migration Complete",
+    "SR5.MIGRATION.SuccessDescription": "Existing compendium packs belonging to this world have been updated in the process of this migration.",
+    "SR5.MIGRATION.SuccessPacksInfo": "Due to current technical limitations with FoundryVTT, actor packs must be updated manually.",
+    "SR5.MIGRATION.SuccessConfirm": "Close"
 }

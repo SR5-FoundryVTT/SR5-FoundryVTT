@@ -78,10 +78,8 @@ export class SR5ItemSheet extends ItemSheet {
         const [ammunition, weaponMods, armorMods] = items.reduce(
             (parts: [BaseEntityData[], BaseEntityData[], BaseEntityData[]], item: SR5Item) => {
                 if (item.type === 'ammo') parts[0].push(item.data);
-                if (item.type === 'modification' && item.data.data.type === 'weapon')
-                    parts[1].push(item.data);
-                if (item.type === 'modification' && item.data.data.type === 'armor')
-                    parts[2].push(item.data);
+                if (item.type === 'modification' && item.data.data.type === 'weapon') parts[1].push(item.data);
+                if (item.type === 'modification' && item.data.data.type === 'armor') parts[2].push(item.data);
                 return parts;
             },
             [[], [], []]
@@ -89,6 +87,9 @@ export class SR5ItemSheet extends ItemSheet {
         data['ammunition'] = ammunition;
         data['weaponMods'] = weaponMods;
         data['armorMods'] = armorMods;
+        // TODO set to the proper boolean for if the source PDF can be accessed
+        // I'm thinking maybe check for the mod being installed?
+        data['hasSourcePdfAvailable'] = true;
 
         return data;
     }
@@ -118,6 +119,8 @@ export class SR5ItemSheet extends ItemSheet {
 
         html.find('.add-new-license').click(this._onAddLicense.bind(this));
         html.find('.license-delete').on('click', this._onRemoveLicense.bind(this));
+
+        html.find('.open-source-pdf').on('click', this._onOpenSourcePdf.bind(this));
 
         html.find('.has-desc').click((event) => {
             event.preventDefault();
@@ -155,11 +158,7 @@ export class SR5ItemSheet extends ItemSheet {
         // Case 1 - Data explicitly provided
         if (data.data) {
             // TODO test
-            if (
-                this.item.isOwned &&
-                data.actorId === this.item.actor?._id &&
-                data.data._id === this.item._id
-            ) {
+            if (this.item.isOwned && data.actorId === this.item.actor?._id && data.data._id === this.item._id) {
                 console.log('Shadowrun5e | Cant drop item on itself');
                 // @ts-ignore
                 ui.notifications.error('Are you trying to break the game??');
@@ -186,6 +185,11 @@ export class SR5ItemSheet extends ItemSheet {
     _eventId(event) {
         event.preventDefault();
         return event.currentTarget.closest('.item').dataset.itemId;
+    }
+
+    async _onOpenSourcePdf(event) {
+        event.preventDefault();
+        await this.item.openPdfSource();
     }
 
     async _onEditItem(event) {

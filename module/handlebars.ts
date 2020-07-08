@@ -120,7 +120,7 @@ export const registerHandlebarHelpers = () => {
         return icon;
     });
 
-    Handlebars.registerHelper('isDefined', function(value) {
+    Handlebars.registerHelper('isDefined', function (value) {
         return value !== undefined;
-    })
+    });
 };

@@ -14,13 +14,7 @@
                 </div>
                 <div class="item-right">
                     <div class="item-text input">
-                        <input
-                            class="display"
-                            type="text"
-                            name="data.nuyen"
-                            value="{{data.nuyen}}"
-                            data-dtype="Number"
-                        />
+                        <input class="display" type="text" name="data.nuyen" value="{{data.nuyen}}" data-dtype="Number" />
                         <span class="unit">
                             <i class="fas fa-yen-sign"></i>
                         </span>
@@ -35,14 +29,7 @@
                 </div>
                 <div class="item-right">
                     <div class="item-text">
-                        <input
-                            class="display"
-                            type="text"
-                            size="10"
-                            name="data.karma.value"
-                            value="{{data.karma.value}}"
-                            data-dtype="Number"
-                        />
+                        <input class="display" type="text" size="10" name="data.karma.value" value="{{data.karma.value}}" data-dtype="Number" />
                     </div>
                 </div>
             </div>
@@ -54,14 +41,7 @@
                 </div>
                 <div class="item-right">
                     <div class="item-text">
-                        <input
-                            class="display"
-                            type="text"
-                            size="10"
-                            name="data.karma.max"
-                            value="{{data.karma.max}}"
-                            data-dtype="Number"
-                        />
+                        <input class="display" type="text" size="10" name="data.karma.max" value="{{data.karma.max}}" data-dtype="Number" />
                     </div>
                 </div>
             </div>
@@ -73,14 +53,7 @@
                 </div>
                 <div class="item-right">
                     <div class="item-text">
-                        <input
-                            class="display"
-                            type="text"
-                            size="10"
-                            name="data.notoriety"
-                            value="{{data.notoriety}}"
-                            data-dtype="Number"
-                        />
+                        <input class="display" type="text" size="10" name="data.notoriety" value="{{data.notoriety}}" data-dtype="Number" />
                     </div>
                 </div>
             </div>
@@ -92,14 +65,7 @@
                 </div>
                 <div class="item-right">
                     <div class="item-text">
-                        <input
-                            class="display"
-                            type="text"
-                            size="10"
-                            name="data.public_awareness"
-                            value="{{data.public_awareness}}"
-                            data-dtype="Number"
-                        />
+                        <input class="display" type="text" size="10" name="data.public_awareness" value="{{data.public_awareness}}" data-dtype="Number" />
                     </div>
                 </div>
             </div>
@@ -111,14 +77,7 @@
                 </div>
                 <div class="item-right">
                     <div class="item-text">
-                        <input
-                            class="display"
-                            type="text"
-                            size="10"
-                            name="data.street_cred"
-                            value="{{data.street_cred}}"
-                            data-dtype="Number"
-                        />
+                        <input class="display" type="text" size="10" name="data.street_cred" value="{{data.street_cred}}" data-dtype="Number" />
                     </div>
                 </div>
             </div>
@@ -148,8 +107,7 @@
                 <div class="item-right">
                     <div class="item-text input">
                         <select name="data.magic.attribute" class="display">
-                            {{#select data.magic.attribute}} {{#each config.attributes as |name
-                            type|}}
+                            {{#select data.magic.attribute}} {{#each config.attributes as |name type|}}
                             <option value="{{type}}">{{localize name}}</option>
                             {{/each}} {{/select}}
                         </select>
@@ -157,6 +115,22 @@
                 </div>
             </div>
             {{/if}}
+            <div class="item">
+                <div class="item-left">
+                    <div class="item-text item-name">
+                        {{localize "SR5.FullDefenseAttribute"}}
+                    </div>
+                </div>
+                <div class="item-right">
+                    <div class="item-text input">
+                        <select name="data.full_defense_attribute" class="display">
+                            {{#select data.full_defense_attribute}} {{#each config.attributes as |name type|}}
+                            <option value="{{type}}">{{localize name}}</option>
+                            {{/each}} {{/select}}
+                        </select>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="flexcol">
             <div class="item item-section">

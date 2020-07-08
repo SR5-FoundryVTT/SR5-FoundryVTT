@@ -59,8 +59,7 @@ export const shadowrunCombatUpdate = async (changes, options) => {
             const roll: Roll = new Roll(formula, actorData).roll();
             c.initiative = roll.total;
 
-            const rollMode =
-                messageOptions.rollMode || c.token.hidden || c.hidden ? 'gmroll' : 'roll';
+            const rollMode = messageOptions.rollMode || c.token.hidden || c.hidden ? 'gmroll' : 'roll';
             const messageData = mergeObject(
                 {
                     speaker: {

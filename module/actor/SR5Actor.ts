@@ -20,6 +20,7 @@ import ModList = Shadowrun.ModList;
 import BaseValuePair = Shadowrun.BaseValuePair;
 import ModifiableValue = Shadowrun.ModifiableValue;
 import LabelField = Shadowrun.LabelField;
+import LimitField = Shadowrun.LimitField;
 
 export class SR5Actor extends Actor {
     async update(data, options?) {
@@ -137,9 +138,9 @@ export class SR5Actor extends Actor {
                     else {
                         armor.base = itemData.armor.value;
                         armor.label = item.name;
-                    }
-                    for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
-                        armor[element] = itemData.armor[element];
+                        for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
+                            armor[element] = itemData.armor[element];
+                        }
                     }
                 }
             }
@@ -205,10 +206,7 @@ export class SR5Actor extends Actor {
         {
             const entries = Object.entries(data.skills.language.value);
             // remove entries which are deleted TODO figure out how to delete these from the data
-            entries.forEach(
-                ([key, val]: [string, { _delete?: boolean }]) =>
-                    val._delete && delete data.skills.language.value[key]
-            );
+            entries.forEach(([key, val]: [string, { _delete?: boolean }]) => val._delete && delete data.skills.language.value[key]);
         }
 
         for (let skill of Object.values(language.value)) {
@@ -244,8 +242,7 @@ export class SR5Actor extends Actor {
         }
 
         // set matrix condition monitor to max if greater than
-        if (matrix.condition_monitor.value > matrix.condition_monitor.max)
-            matrix.condition_monitor.value = matrix.condition_monitor.max;
+        if (matrix.condition_monitor.value > matrix.condition_monitor.max) matrix.condition_monitor.value = matrix.condition_monitor.max;
 
         // ADD MATRIX ATTS TO LIMITS
         limits.firewall = {
@@ -303,26 +300,10 @@ export class SR5Actor extends Actor {
 
         // SETUP LIMITS
         limits.physical.value =
-            Math.ceil(
-                (2 * attributes.strength.value +
-                    attributes.body.value +
-                    attributes.reaction.value) /
-                    3
-            ) + modifiers['physical_limit'];
-        limits.mental.value =
-            Math.ceil(
-                (2 * attributes.logic.value +
-                    attributes.intuition.value +
-                    attributes.willpower.value) /
-                    3
-            ) + modifiers['mental_limit'];
+            Math.ceil((2 * attributes.strength.value + attributes.body.value + attributes.reaction.value) / 3) + modifiers['physical_limit'];
+        limits.mental.value = Math.ceil((2 * attributes.logic.value + attributes.intuition.value + attributes.willpower.value) / 3) + modifiers['mental_limit'];
         limits.social.value =
-            Math.ceil(
-                (2 * attributes.charisma.value +
-                    attributes.willpower.value +
-                    attributes.essence.value) /
-                    3
-            ) + modifiers['social_limit'];
+            Math.ceil((2 * attributes.charisma.value + attributes.willpower.value + attributes.essence.value) / 3) + modifiers['social_limit'];
 
         // MOVEMENT
         const movement = data.movement;
@@ -339,15 +320,11 @@ export class SR5Actor extends Actor {
 
         // INITIATIVE
         const init = data.initiative;
-        init.meatspace.base.base =
-            attributes.intuition.value + attributes.reaction.value + modifiers['meat_initiative'];
+        init.meatspace.base.base = attributes.intuition.value + attributes.reaction.value + modifiers['meat_initiative'];
         init.meatspace.dice.base = 1 + modifiers['meat_initiative_dice'];
         init.astral.base.base = attributes.intuition.value * 2 + modifiers['astral_initiative'];
         init.astral.dice.base = 2 + modifiers['astral_initiative_dice'];
-        init.matrix.base.base =
-            attributes.intuition.value +
-            data.matrix.data_processing.value +
-            modifiers['matrix_initiative'];
+        init.matrix.base.base = attributes.intuition.value + data.matrix.data_processing.value + modifiers['matrix_initiative'];
         init.matrix.dice.base = data.matrix.hot_sim ? 4 : 3 + modifiers['matrix_initiative_dice'];
         if (init.perception === 'matrix') init.current = init.matrix;
         else if (init.perception === 'astral') init.current = init.astral;
@@ -361,32 +338,7 @@ export class SR5Actor extends Actor {
         init.current.dice.text = `${init.current.dice.value}d6`;
         init.current.base.value = init.current.base.base;
 
-        const soak = attributes.body.value + armor.value + modifiers['soak'];
-        const drainAtt = attributes[data.magic.attribute];
         if (data.magic.drain && !data.magic.drain.mod) data.magic.drain.mod = {};
-        data.rolls = {
-            ...data.rolls,
-            defense: attributes.reaction.value + attributes.intuition.value + modifiers['defense'],
-            drain:
-                attributes.willpower.value + (drainAtt ? drainAtt.value : 0) + modifiers['drain'],
-            fade: attributes.willpower.value + attributes.resonance.value + modifiers['fade'],
-            soak: {
-                default: soak,
-                cold: soak + armor.cold,
-                fire: soak + armor.fire,
-                acid: soak + armor.acid,
-                electricity: soak + armor.electricity,
-                radiation: soak + armor.radiation,
-            },
-            composure:
-                attributes.charisma.value + attributes.willpower.value + modifiers['composure'],
-            judge_intentions:
-                attributes.charisma.value +
-                attributes.intuition.value +
-                modifiers['judge_intentions'],
-            lift_carry: attributes.strength.value + attributes.body.value + modifiers['lift_carry'],
-            memory: attributes.willpower.value + attributes.logic.value + modifiers['memory'],
-        };
 
         {
             const count = 3 + modifiers['wound_tolerance'];
@@ -433,8 +385,20 @@ export class SR5Actor extends Actor {
         return this.data.data.attributes[attributeName];
     }
 
-    getWounds(): number {
-        return this.data.data.wounds?.value || 0;
+    findLimitFromAttribute(attributeName?: string): LimitField | undefined {
+        if (attributeName === undefined) return undefined;
+        const attribute = this.findAttribute(attributeName);
+        if (!attribute?.limit) return undefined;
+        return this.findLimit(attribute.limit);
+    }
+
+    findLimit(limitName?: string): LimitField | undefined {
+        if (!limitName) return undefined;
+        return this.data.data.limits[limitName];
+    }
+
+    getWoundModifier(): number {
+        return -1 * this.data.data.wounds?.value || 0;
     }
 
     getEdge(): AttributeField & ValueMaxPair<number> {
@@ -454,6 +418,16 @@ export class SR5Actor extends Actor {
         console.log(matrix);
         if (matrix.device) return this.getOwnedItem(matrix.device);
         return undefined;
+    }
+
+    getFullDefenseAttribute(): AttributeField | undefined {
+        let att = this.data.data.full_defense_attribute;
+        if (!att) att = 'willpower';
+        return this.findAttribute(att);
+    }
+
+    getEquippedWeapons(): SR5Item[] {
+        return this.items.filter((item) => item.isEquipped() && item.data.type === 'weapon');
     }
 
     addKnowledgeSkill(category, skill?) {
@@ -579,12 +553,49 @@ export class SR5Actor extends Actor {
 
     rollDefense(options: DefenseRollOptions = {}, parts: ModList<number> = {}) {
         this._addDefenseParts(parts);
+        // full defense is always added
+        const activeDefenses = {
+            full_defense: {
+                label: 'SR5.FullDefense',
+                value: this.getFullDefenseAttribute()?.value,
+                initMod: -10,
+            },
+        };
+        // if we have a melee attack
+        if (options.incomingAttack?.reach) {
+            activeDefenses['dodge'] = {
+                label: 'SR5.Dodge',
+                value: this.findActiveSkill('gymnastics')?.value,
+                initMod: -5,
+            };
+            activeDefenses['block'] = {
+                label: 'SR5.Block',
+                value: this.findActiveSkill('unarmed_combat')?.value,
+                initMod: -5,
+            };
+            const equippedMeleeWeapons = this.getEquippedWeapons().filter((w) => w.isMeleeWeapon());
+            let defenseReach = 0;
+            equippedMeleeWeapons.forEach((weapon) => {
+                activeDefenses[`parry-${weapon.name}`] = {
+                    label: 'SR5.Parry',
+                    weapon: weapon.name,
+                    value: this.findActiveSkill(weapon.getActionSkill())?.value,
+                    init: -5,
+                };
+                defenseReach = Math.max(defenseReach, weapon.getReach());
+            });
+            const incomingReach = options.incomingAttack.reach;
+            const netReach = defenseReach - incomingReach;
+            if (netReach !== 0) {
+                parts['SR5.Reach'] = netReach;
+            }
+        }
         let dialogData = {
             parts,
             cover: options.cover,
+            activeDefenses,
         };
         let template = 'systems/shadowrun5e/templates/rolls/roll-defense.html';
-        let special = '';
         let cancel = true;
         const incomingAttack = options.incomingAttack;
         const event = options.event;
@@ -594,30 +605,21 @@ export class SR5Actor extends Actor {
                     title: game.i18n.localize('SR5.Defense'),
                     content: dlg,
                     buttons: {
-                        normal: {
-                            label: game.i18n.localize('SR5.Normal'),
+                        continue: {
+                            label: game.i18n.localize('SR5.Continue'),
                             callback: () => (cancel = false),
-                        },
-                        full_defense: {
-                            label: `${game.i18n.localize('SR5.FullDefense')} (+${
-                                this.data.data.attributes.willpower.value
-                            })`,
-                            callback: () => {
-                                special = 'full_defense';
-                                cancel = false;
-                            },
                         },
                     },
                     default: 'normal',
                     close: async (html) => {
                         if (cancel) return;
                         let cover = Helpers.parseInputToNumber($(html).find('[name=cover]').val());
-                        if (special === 'full_defense')
-                            parts['SR5.FullDefense'] = this.data.data.attributes.willpower.value;
-                        if (special === 'dodge')
-                            parts['SR5.Dodge'] = this.data.data.skills.active.gymnastics.value;
-                        if (special === 'block')
-                            parts['SR5.Block'] = this.data.data.skills.active.unarmed_combat.value;
+                        let special = Helpers.parseInputToString($(html).find('[name=activeDefense]').val());
+                        if (special) {
+                            // TODO subtract initiative score when Foundry updates to 0.7.0
+                            const defense = activeDefenses[special];
+                            parts[defense.label] = defense.value;
+                        }
                         if (cover) parts['SR5.Cover'] = cover;
 
                         resolve(
@@ -645,7 +647,7 @@ export class SR5Actor extends Actor {
                                         await this.rollSoak(soakRollOptions);
                                     }
                                 }
-                            })
+                            }),
                         );
                     },
                 }).render(true);
@@ -658,6 +660,7 @@ export class SR5Actor extends Actor {
         let dialogData = {
             damage: options?.damage,
             parts,
+            elementTypes: CONFIG.SR5.elementTypes,
         };
         let id = '';
         let cancel = true;
@@ -668,51 +671,10 @@ export class SR5Actor extends Actor {
                     title: 'SR5.DamageResistanceTest',
                     content: dlg,
                     buttons: {
-                        base: {
-                            label: 'Base',
-                            icon: '<i class="fas fa-shield-alt"></i>',
+                        continue: {
+                            label: game.i18n.localize('SR5.Continue'),
                             callback: () => {
                                 id = 'default';
-                                cancel = false;
-                            },
-                        },
-                        acid: {
-                            label: 'Acid',
-                            icon: '<i class="fas fa-vial"></i>',
-                            callback: () => {
-                                id = 'acid';
-                                cancel = false;
-                            },
-                        },
-                        cold: {
-                            label: 'Cold',
-                            icon: '<i class="fas fa-snowflake"></i>',
-                            callback: () => {
-                                id = 'cold';
-                                cancel = false;
-                            },
-                        },
-                        electricity: {
-                            label: 'Elec',
-                            icon: '<i class="fas fa-bolt"></i>',
-                            callback: () => {
-                                id = 'electricity';
-                                cancel = false;
-                            },
-                        },
-                        fire: {
-                            label: 'Fire',
-                            icon: '<i class="fas fa-fire"></i>',
-                            callback: () => {
-                                id = 'fire';
-                                cancel = false;
-                            },
-                        },
-                        radiation: {
-                            label: 'Rad',
-                            icon: '<i class="fas fa-radiation"></i>',
-                            callback: () => {
-                                id = 'radiation';
                                 cancel = false;
                             },
                         },
@@ -721,9 +683,14 @@ export class SR5Actor extends Actor {
                         if (cancel) return;
 
                         const armor = this.getArmor();
-                        const armorId = id === 'default' ? '' : id;
+                        const armorId = Helpers.parseInputToString($(html).find('[name=element]').val());
+
+                        console.log(armorId);
+
+                        console.log(armor);
                         const bonusArmor = armor[armorId] || 0;
-                        if (bonusArmor) parts[Helpers.label(armorId)] = bonusArmor;
+                        console.log(bonusArmor);
+                        if (bonusArmor) parts[CONFIG.SR5.elementTypes[armorId]] = bonusArmor;
 
                         const ap = Helpers.parseInputToNumber($(html).find('[name=ap]').val());
                         if (ap) {
@@ -742,7 +709,7 @@ export class SR5Actor extends Actor {
                                 parts,
                                 title: title,
                                 wounds: false,
-                            })
+                            }),
                         );
                     },
                 }).render(true);
@@ -825,8 +792,7 @@ export class SR5Actor extends Actor {
         let title = game.i18n.localize(CONFIG.SR5.matrixAttributes[attr]);
         const parts = {};
         parts[CONFIG.SR5.matrixAttributes[attr]] = matrix_att.value;
-        if (options && options.event && options.event[CONFIG.SR5.kbmod.SPEC])
-            parts['SR5.Specialization'] = 2;
+        if (options && options.event && options.event[CONFIG.SR5.kbmod.SPEC]) parts['SR5.Specialization'] = 2;
         if (Helpers.hasModifiers(options?.event)) {
             return ShadowrunRoller.advancedRoll({
                 event: options?.event,
@@ -835,10 +801,7 @@ export class SR5Actor extends Actor {
                 title: title,
             });
         }
-        const attributes = Helpers.filter(
-            this.data.data.attributes,
-            ([, value]) => value.value > 0
-        );
+        const attributes = Helpers.filter(this.data.data.attributes, ([, value]) => value.value > 0);
         const attribute = 'willpower';
 
         let dialogData = {
@@ -853,37 +816,33 @@ export class SR5Actor extends Actor {
         };
 
         let cancel = true;
-        renderTemplate('systems/shadowrun5e/templates/rolls/matrix-roll.html', dialogData).then(
-            (dlg) => {
-                new Dialog({
-                    title: `${title} Test`,
-                    content: dlg,
-                    buttons: buttons,
-                    close: async (html) => {
-                        if (cancel) return;
-                        const newAtt = Helpers.parseInputToString(
-                            $(html).find('[name=attribute]').val()
-                        );
-                        let att: AttributeField | undefined = undefined;
-                        if (newAtt) {
-                            att = this.data.data.attributes[newAtt];
-                            title += ` + ${game.i18n.localize(CONFIG.SR5.attributes[newAtt])}`;
-                        }
-                        if (att !== undefined) {
-                            if (att.value && att.label) parts[att.label] = att.value;
-                            this._addMatrixParts(parts, true);
-                            this._addGlobalParts(parts);
-                            return ShadowrunRoller.advancedRoll({
-                                event: options?.event,
-                                actor: this,
-                                parts,
-                                title: title,
-                            });
-                        }
-                    },
-                }).render(true);
-            }
-        );
+        renderTemplate('systems/shadowrun5e/templates/rolls/matrix-roll.html', dialogData).then((dlg) => {
+            new Dialog({
+                title: `${title} Test`,
+                content: dlg,
+                buttons: buttons,
+                close: async (html) => {
+                    if (cancel) return;
+                    const newAtt = Helpers.parseInputToString($(html).find('[name=attribute]').val());
+                    let att: AttributeField | undefined = undefined;
+                    if (newAtt) {
+                        att = this.data.data.attributes[newAtt];
+                        title += ` + ${game.i18n.localize(CONFIG.SR5.attributes[newAtt])}`;
+                    }
+                    if (att !== undefined) {
+                        if (att.value && att.label) parts[att.label] = att.value;
+                        this._addMatrixParts(parts, true);
+                        this._addGlobalParts(parts);
+                        return ShadowrunRoller.advancedRoll({
+                            event: options?.event,
+                            actor: this,
+                            parts,
+                            title: title,
+                        });
+                    }
+                },
+            }).render(true);
+        });
     }
 
     promptRoll(options?: ActorRollOptions) {
@@ -976,42 +935,36 @@ export class SR5Actor extends Actor {
                             cancel = false;
                             spec = s;
                         },
-                    })
+                    }),
             );
         }
-        renderTemplate('systems/shadowrun5e/templates/rolls/skill-roll.html', dialogData).then(
-            (dlg) => {
-                new Dialog({
-                    title: `${title} Test`,
-                    content: dlg,
-                    buttons,
-                    close: async (html) => {
-                        if (cancel) return;
-                        const newAtt = Helpers.parseInputToString(
-                            $(html).find('[name="attribute"]').val()
-                        );
-                        const newLimit = Helpers.parseInputToString(
-                            $(html).find('[name="attribute.limit"]').val()
-                        );
-                        att = this.data.data.attributes[newAtt];
-                        title += ` + ${game.i18n.localize(CONFIG.SR5.attributes[newAtt])}`;
-                        limit = this.data.data.limits[newLimit];
-                        parts[att.label] = att.value;
-                        if (skill.value === 0) parts['SR5.Defaulting'] = -1;
-                        if (spec) parts['SR5.Specialization'] = 2;
-                        this._addMatrixParts(parts, [att, skill]);
-                        this._addGlobalParts(parts);
-                        return ShadowrunRoller.advancedRoll({
-                            event: options?.event,
-                            actor: this,
-                            parts,
-                            limit,
-                            title: `${title} Test`,
-                        });
-                    },
-                }).render(true);
-            }
-        );
+        renderTemplate('systems/shadowrun5e/templates/rolls/skill-roll.html', dialogData).then((dlg) => {
+            new Dialog({
+                title: `${title} Test`,
+                content: dlg,
+                buttons,
+                close: async (html) => {
+                    if (cancel) return;
+                    const newAtt = Helpers.parseInputToString($(html).find('[name="attribute"]').val());
+                    const newLimit = Helpers.parseInputToString($(html).find('[name="attribute.limit"]').val());
+                    att = this.data.data.attributes[newAtt];
+                    title += ` + ${game.i18n.localize(CONFIG.SR5.attributes[newAtt])}`;
+                    limit = this.data.data.limits[newLimit];
+                    parts[att.label] = att.value;
+                    if (skill.value === 0) parts['SR5.Defaulting'] = -1;
+                    if (spec) parts['SR5.Specialization'] = 2;
+                    this._addMatrixParts(parts, [att, skill]);
+                    this._addGlobalParts(parts);
+                    return ShadowrunRoller.advancedRoll({
+                        event: options?.event,
+                        actor: this,
+                        parts,
+                        limit,
+                        title: `${title} Test`,
+                    });
+                },
+            }).render(true);
+        });
     }
 
     rollKnowledgeSkill(catId, skillId, options?: SkillRollOptions) {
@@ -1046,10 +999,7 @@ export class SR5Actor extends Actor {
             attributes: atts,
         };
         let cancel = true;
-        renderTemplate(
-            'systems/shadowrun5e/templates/rolls/single-attribute.html',
-            dialogData
-        ).then((dlg) => {
+        renderTemplate('systems/shadowrun5e/templates/rolls/single-attribute.html', dialogData).then((dlg) => {
             new Dialog({
                 title: `${title} Attribute Test`,
                 content: dlg,
@@ -1063,15 +1013,12 @@ export class SR5Actor extends Actor {
                 close: async (html) => {
                     if (cancel) return;
 
-                    const att2Id: string = Helpers.parseInputToString(
-                        $(html).find('[name=attribute2]').val()
-                    );
+                    const att2Id: string = Helpers.parseInputToString($(html).find('[name=attribute2]').val());
                     let att2: AttributeField | undefined = undefined;
                     if (att2Id !== 'none') {
                         att2 = atts[att2Id];
                         if (att2?.label) {
-                            parts[att2.label] =
-                                att2.label === 'SR5.AttrEdge' ? this.getEdge().max : att2.value;
+                            parts[att2.label] = att2.label === 'SR5.AttrEdge' ? this.getEdge().max : att2.value;
                             const att2IdLabel = game.i18n.localize(CONFIG.SR5.attributes[att2Id]);
                             title += ` + ${att2IdLabel}`;
                         }
@@ -1171,7 +1118,7 @@ export class SR5Actor extends Actor {
                 });
             } else {
                 // @ts-ignore
-                ui.notifications.warn(game.i18n.localize('SR5.SelectTokenMessage'))
+                ui.notifications.warn(game.i18n.localize('SR5.SelectTokenMessage'));
             }
         }
     }
@@ -1218,9 +1165,30 @@ export class SR5Actor extends Actor {
                     });
                 } else {
                     // @ts-ignore
-                    ui.notifications.warn(game.i18n.localize('SR5.SelectTokenMessage'))
+                    ui.notifications.warn(game.i18n.localize('SR5.SelectTokenMessage'));
                 }
             }
         }
+    }
+
+    /**
+     * Override setFlag to remove the 'SR5.' from keys in modlists, otherwise it handles them as embedded keys
+     * @param scope
+     * @param key
+     * @param value
+     */
+    setFlag(scope: string, key: string, value: any): Promise<Entity> {
+        const newValue = Helpers.onSetFlag(value);
+        return super.setFlag(scope, key, newValue);
+    }
+
+    /**
+     * Override getFlag to add back the 'SR5.' keys correctly to be handled
+     * @param scope
+     * @param key
+     */
+    getFlag(scope: string, key: string): any {
+        const data = super.getFlag(scope, key);
+        return Helpers.onGetFlag(data);
     }
 }

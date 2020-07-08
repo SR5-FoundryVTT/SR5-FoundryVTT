@@ -28,9 +28,7 @@ export class SkillEditForm extends BaseEntitySheet {
 
     get title(): string {
         const data = this.getData().data;
-        return `${game.i18n.localize('SR5.EditSkill')} - ${
-            data?.label ? game.i18n.localize(data.label) : ''
-        }`;
+        return `${game.i18n.localize('SR5.EditSkill')} - ${data?.label ? game.i18n.localize(data.label) : ''}`;
     }
 
     _onUpdateObject(event, formData, updateData) {

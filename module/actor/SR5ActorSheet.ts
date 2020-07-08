@@ -112,9 +112,7 @@ export class SR5ActorSheet extends ActorSheet {
             }
         };
 
-        ['firewall', 'data_processing', 'sleaze', 'attack'].forEach((att: MatrixAttribute) =>
-            cleanupAttribute(att)
-        );
+        ['firewall', 'data_processing', 'sleaze', 'attack'].forEach((att: MatrixAttribute) => cleanupAttribute(att));
     }
 
     _prepareSkills(data) {
@@ -181,18 +179,7 @@ export class SR5ActorSheet extends ActorSheet {
             },
         };
 
-        let [
-            items,
-            spells,
-            qualities,
-            adept_powers,
-            actions,
-            complex_forms,
-            lifestyles,
-            contacts,
-            sins,
-            programs,
-        ] = data.items.reduce(
+        let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs] = data.items.reduce(
             (arr, item) => {
                 item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
                 if (item.type === 'spell') arr[1].push(item);
@@ -215,15 +202,7 @@ export class SR5ActorSheet extends ActorSheet {
             if (i1.name < i2.name) return -1;
             return 0;
         };
-        actions.sort(sortByName);
-        adept_powers.sort(sortByName);
-        complex_forms.sort(sortByName);
-        items.sort(sortByName);
-        spells.sort(sortByName);
-        contacts.sort(sortByName);
-        lifestyles.sort(sortByName);
-        sins.sort(sortByName);
-        programs.sort((left, right) => {
+        const sortByEquipped = (left, right) => {
             const leftEquipped = left.data?.technology?.equipped;
             const rightEquipped = right.data?.technology?.equipped;
             if (leftEquipped && !rightEquipped) return -1;
@@ -231,7 +210,16 @@ export class SR5ActorSheet extends ActorSheet {
             if (left.name > right.name) return 1;
             if (left.name < right.name) return -1;
             return 0;
-        });
+        }
+        actions.sort(sortByName);
+        adept_powers.sort(sortByName);
+        complex_forms.sort(sortByName);
+        items.sort(sortByEquipped);
+        spells.sort(sortByName);
+        contacts.sort(sortByName);
+        lifestyles.sort(sortByName);
+        sins.sort(sortByName);
+        programs.sort(sortByEquipped);
 
         items.forEach((item) => {
             inventory[item.type].items.push(item);
@@ -468,8 +456,7 @@ export class SR5ActorSheet extends ActorSheet {
                 for (let ite of this.actor.items.filter((i) => i.type === 'device')) {
                     newItems.push({
                         _id: ite._id,
-                        'data.technology.equipped':
-                            ite._id === iid ? !itemData.technology.equipped : false,
+                        'data.technology.equipped': ite._id === iid ? !itemData.technology.equipped : false,
                     });
                 }
             } else {
@@ -588,8 +575,7 @@ export class SR5ActorSheet extends ActorSheet {
             if (element) {
                 element.focus();
                 // set the selection range on the focus formed from before (keeps track of cursor in input)
-                element.setSelectionRange &&
-                    element.setSelectionRange(focus.selectionStart, focus.selectionEnd);
+                element.setSelectionRange && element.setSelectionRange(focus.selectionStart, focus.selectionEnd);
             }
         }
     }
