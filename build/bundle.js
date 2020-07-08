@@ -4950,6 +4950,7 @@ class SR5Item extends Item {
     openPdfSource() {
         return __awaiter(this, void 0, void 0, function* () {
             const source = this.getBookSource();
+            console.warn(source);
             if (source === '') { // @ts-ignore
                 ui.notifications.error(game.i18n.localize('SR5.SourceFieldEmptyError'));
             }
@@ -4957,7 +4958,7 @@ class SR5Item extends Item {
             // parse however you need, all "buttons" will lead to this function
             const [code, page] = source.split(' ');
             //@ts-ignore
-            ui.PDFoundry.open(code, page);
+            ui.PDFoundry.openPDFByCode(code, parseInt(page));
         });
     }
     isAreaOfEffect() {
@@ -5593,10 +5594,6 @@ Hooks.on('renderChatMessage', (app, html) => {
     chat.addRollListeners(app, html);
 });
 Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);
-Hooks.on('setup', () => {
-    // @ts-ignore
-    ui.PDFoundry.registerSystem('shadowrun5e');
-});
 /* -------------------------------------------- */
 /*  Hotbar Macros                               */
 /* -------------------------------------------- */

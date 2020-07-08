@@ -12,6 +12,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+a.pdf-sheet-manual {
+  color: orangered; }
+
+div.pdfoundry-viewer section.window-content {
+  padding: 0; }
+
+div.pdfoundry-viewer iframe {
+  border: 0; }
+
 form.pdf-sheet input, form.pdf-sheet label {
   border: 0;
   padding: 0;

@@ -31,8 +31,17 @@
         "Browse": "Browse"
       }
     },
+    "VIEWER": {
+      "ViewPDF": "View PDF"
+    },
+    "ERROR": {
+      "NoPDFWithCode": "Unable to find PDF with specified code.",
+      "NoPDFWithName": "Unable to find PDF with specified name."
+    },
     "SETTINGS": {
-      "OpenHelp": "Open PDFoundry Manual"
+      "OpenHelp": "Open PDFoundry Manual",
+      "CacheSizeName": "PDF Cache Size",
+      "CacheSizeHint": "How many MB of hard drive space should be allowed to be taken up by the PDF cache? Must be between 64 and 1024 inclusive."
     }
   }
 }

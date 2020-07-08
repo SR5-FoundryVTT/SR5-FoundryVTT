@@ -135,8 +135,8 @@ Object.defineProperty(exports, "WorkerMessageHandler", {
 
 var _worker = __w_pdfjs_require__(1);
 
-const pdfjsVersion = '2.6.76';
-const pdfjsBuild = '68de3045';
+const pdfjsVersion = '2.6.103';
+const pdfjsBuild = 'a5f9a902';
 
 /***/ }),
 /* 1 */
@@ -229,7 +229,7 @@ class WorkerMessageHandler {
     var WorkerTasks = [];
     const verbosity = (0, _util.getVerbosityLevel)();
     const apiVersion = docParams.apiVersion;
-    const workerVersion = '2.6.76';
+    const workerVersion = '2.6.103';
 
     if (apiVersion !== workerVersion) {
       throw new Error(`The API version "${apiVersion}" does not match ` + `the Worker version "${workerVersion}".`);
@@ -2841,8 +2841,6 @@ var _operator_list = __w_pdfjs_require__(26);
 
 var _evaluator = __w_pdfjs_require__(27);
 
-var _function = __w_pdfjs_require__(41);
-
 const DEFAULT_USER_UNIT = 1.0;
 const LETTER_SIZE_MEDIABOX = [0, 0, 612, 792];
 
@@ -2859,8 +2857,7 @@ class Page {
     ref,
     fontCache,
     builtInCMapCache,
-    globalImageCache,
-    pdfFunctionFactory
+    globalImageCache
   }) {
     this.pdfManager = pdfManager;
     this.pageIndex = pageIndex;
@@ -2870,7 +2867,6 @@ class Page {
     this.fontCache = fontCache;
     this.builtInCMapCache = builtInCMapCache;
     this.globalImageCache = globalImageCache;
-    this.pdfFunctionFactory = pdfFunctionFactory;
     this.evaluatorOptions = pdfManager.evaluatorOptions;
     this.resourcesPromise = null;
     const idCounters = {
@@ -3033,8 +3029,7 @@ class Page {
       fontCache: this.fontCache,
       builtInCMapCache: this.builtInCMapCache,
       globalImageCache: this.globalImageCache,
-      options: this.evaluatorOptions,
-      pdfFunctionFactory: this.pdfFunctionFactory
+      options: this.evaluatorOptions
     });
     const dataPromises = Promise.all([contentStreamPromise, resourcesPromise]);
     const pageListPromise = dataPromises.then(([contentStream]) => {
@@ -3107,8 +3102,7 @@ class Page {
         fontCache: this.fontCache,
         builtInCMapCache: this.builtInCMapCache,
         globalImageCache: this.globalImageCache,
-        options: this.evaluatorOptions,
-        pdfFunctionFactory: this.pdfFunctionFactory
+        options: this.evaluatorOptions
       });
       return partialEvaluator.getTextContent({
         stream: contentStream,
@@ -3235,10 +3229,6 @@ class PDFDocument {
     this.pdfManager = pdfManager;
     this.stream = stream;
     this.xref = new _obj.XRef(stream, pdfManager);
-    this.pdfFunctionFactory = new _function.PDFFunctionFactory({
-      xref: this.xref,
-      isEvalSupported: pdfManager.evaluatorOptions.isEvalSupported
-    });
     this._pagePromises = [];
   }
 
@@ -3530,8 +3520,7 @@ class PDFDocument {
         ref,
         fontCache: catalog.fontCache,
         builtInCMapCache: catalog.builtInCMapCache,
-        globalImageCache: catalog.globalImageCache,
-        pdfFunctionFactory: this.pdfFunctionFactory
+        globalImageCache: catalog.globalImageCache
       });
     });
   }
@@ -17675,7 +17664,7 @@ class ColorSpace {
           const name = xref.fetchIfRef(cs[1]);
           numComps = Array.isArray(name) ? name.length : 1;
           alt = this.parseToIR(cs[2], xref, resources, pdfFunctionFactory);
-          const tintFn = pdfFunctionFactory.create(xref.fetchIfRef(cs[3]));
+          const tintFn = pdfFunctionFactory.create(cs[3]);
           return ["AlternateCS", numComps, alt, tintFn];
 
         case "Lab":
@@ -18396,20 +18385,23 @@ const LabCS = function LabCSClosure() {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.GlobalImageCache = exports.LocalColorSpaceCache = exports.LocalImageCache = void 0;
+exports.GlobalImageCache = exports.LocalFunctionCache = exports.LocalColorSpaceCache = exports.LocalImageCache = void 0;
 
 var _util = __w_pdfjs_require__(2);
 
 var _primitives = __w_pdfjs_require__(5);
 
 class BaseLocalCache {
-  constructor() {
+  constructor(options) {
     if (this.constructor === BaseLocalCache) {
       (0, _util.unreachable)("Cannot initialize BaseLocalCache.");
     }
 
-    this._nameRefMap = new Map();
-    this._imageMap = new Map();
+    if (!options || !options.onlyRefs) {
+      this._nameRefMap = new Map();
+      this._imageMap = new Map();
+    }
+
     this._imageCache = new _primitives.RefSetCache();
   }
 
@@ -18492,6 +18484,33 @@ class LocalColorSpaceCache extends BaseLocalCache {
 }
 
 exports.LocalColorSpaceCache = LocalColorSpaceCache;
+
+class LocalFunctionCache extends BaseLocalCache {
+  constructor(options) {
+    super({
+      onlyRefs: true
+    });
+  }
+
+  getByName(name) {
+    (0, _util.unreachable)("Should not call `getByName` method.");
+  }
+
+  set(name = null, ref, data) {
+    if (!ref) {
+      throw new Error('LocalFunctionCache.set - expected "ref" argument.');
+    }
+
+    if (this._imageCache.has(ref)) {
+      return;
+    }
+
+    this._imageCache.put(ref, data);
+  }
+
+}
+
+exports.LocalFunctionCache = LocalFunctionCache;
 
 class GlobalImageCache {
   static get NUM_PAGES_THRESHOLD() {
@@ -20360,11 +20379,13 @@ var _standard_fonts = __w_pdfjs_require__(34);
 
 var _pattern = __w_pdfjs_require__(38);
 
+var _function = __w_pdfjs_require__(39);
+
 var _parser = __w_pdfjs_require__(11);
 
 var _image_utils = __w_pdfjs_require__(24);
 
-var _bidi = __w_pdfjs_require__(39);
+var _bidi = __w_pdfjs_require__(41);
 
 var _colorspace = __w_pdfjs_require__(23);
 
@@ -20372,9 +20393,7 @@ var _stream = __w_pdfjs_require__(12);
 
 var _glyphlist = __w_pdfjs_require__(33);
 
-var _metrics = __w_pdfjs_require__(40);
-
-var _function = __w_pdfjs_require__(41);
+var _metrics = __w_pdfjs_require__(42);
 
 var _murmurhash = __w_pdfjs_require__(43);
 
@@ -20399,8 +20418,7 @@ var PartialEvaluator = function PartialEvaluatorClosure() {
     fontCache,
     builtInCMapCache,
     globalImageCache,
-    options = null,
-    pdfFunctionFactory
+    options = null
   }) {
     this.xref = xref;
     this.handler = handler;
@@ -20410,7 +20428,6 @@ var PartialEvaluator = function PartialEvaluatorClosure() {
     this.builtInCMapCache = builtInCMapCache;
     this.globalImageCache = globalImageCache;
     this.options = options || DefaultPartialEvaluatorOptions;
-    this.pdfFunctionFactory = pdfFunctionFactory;
     this.parsingType3Font = false;
     this._fetchBuiltInCMapBound = this.fetchBuiltInCMap.bind(this);
   }
@@ -20522,6 +20539,14 @@ var PartialEvaluator = function PartialEvaluatorClosure() {
   var TILING_PATTERN = 1,
       SHADING_PATTERN = 2;
   PartialEvaluator.prototype = {
+    get _pdfFunctionFactory() {
+      const pdfFunctionFactory = new _function.PDFFunctionFactory({
+        xref: this.xref,
+        isEvalSupported: this.options.isEvalSupported
+      });
+      return (0, _util.shadow)(this, "_pdfFunctionFactory", pdfFunctionFactory);
+    },
+
     clone(newOptions = DefaultPartialEvaluatorOptions) {
       var newEvaluator = Object.create(this);
       newEvaluator.options = newOptions;
@@ -20861,7 +20886,7 @@ var PartialEvaluator = function PartialEvaluatorClosure() {
           res: resources,
           image,
           isInline,
-          pdfFunctionFactory: this.pdfFunctionFactory,
+          pdfFunctionFactory: this._pdfFunctionFactory,
           localColorSpaceCache
         });
         imgData = imageObj.createImageData(true);
@@ -20890,7 +20915,7 @@ var PartialEvaluator = function PartialEvaluatorClosure() {
         res: resources,
         image,
         isInline,
-        pdfFunctionFactory: this.pdfFunctionFactory,
+        pdfFunctionFactory: this._pdfFunctionFactory,
         localColorSpaceCache
       }).then(imageObj => {
         imgData = imageObj.createImageData(false);
@@ -20938,7 +20963,8 @@ var PartialEvaluator = function PartialEvaluatorClosure() {
       var transferObj = smask.get("TR");
 
       if ((0, _function.isPDFFunction)(transferObj)) {
-        const transferFn = this.pdfFunctionFactory.create(transferObj);
+        const transferFn = this._pdfFunctionFactory.create(transferObj);
+
         var transferMap = new Uint8Array(256);
         var tmp = new Float32Array(1);
 
@@ -21326,7 +21352,7 @@ var PartialEvaluator = function PartialEvaluatorClosure() {
         cs,
         xref: this.xref,
         resources,
-        pdfFunctionFactory: this.pdfFunctionFactory,
+        pdfFunctionFactory: this._pdfFunctionFactory,
         localColorSpaceCache
       }).catch(reason => {
         if (reason instanceof _util.AbortException) {
@@ -21359,7 +21385,7 @@ var PartialEvaluator = function PartialEvaluatorClosure() {
         } else if (typeNum === SHADING_PATTERN) {
           var shading = dict.get("Shading");
           var matrix = dict.getArray("Matrix");
-          pattern = _pattern.Pattern.parseShading(shading, matrix, this.xref, resources, this.handler, this.pdfFunctionFactory, localColorSpaceCache);
+          pattern = _pattern.Pattern.parseShading(shading, matrix, this.xref, resources, this.handler, this._pdfFunctionFactory, localColorSpaceCache);
           operatorList.addOp(fn, pattern.getIR());
           return undefined;
         }
@@ -21759,7 +21785,7 @@ var PartialEvaluator = function PartialEvaluatorClosure() {
                 throw new _util.FormatError("No shading object found");
               }
 
-              var shadingFill = _pattern.Pattern.parseShading(shading, null, xref, resources, self.handler, self.pdfFunctionFactory, localColorSpaceCache);
+              var shadingFill = _pattern.Pattern.parseShading(shading, null, xref, resources, self.handler, self._pdfFunctionFactory, localColorSpaceCache);
 
               var patternIR = shadingFill.getIR();
               args = [patternIR];
@@ -39095,7 +39121,7 @@ Shadings.RadialAxial = function RadialAxialClosure() {
 
     this.extendStart = extendStart;
     this.extendEnd = extendEnd;
-    var fnObj = dict.get("Function");
+    var fnObj = dict.getRaw("Function");
     var fn = pdfFunctionFactory.createFromArray(fnObj);
     const NUMBER_OF_SAMPLES = 10;
     const step = (t1 - t0) / NUMBER_OF_SAMPLES;
@@ -39811,7 +39837,7 @@ Shadings.Mesh = function MeshClosure() {
 
     this.cs = cs;
     this.background = dict.has("Background") ? cs.getRgb(dict.get("Background"), 0) : null;
-    var fnObj = dict.get("Function");
+    var fnObj = dict.getRaw("Function");
     var fn = fnObj ? pdfFunctionFactory.createFromArray(fnObj) : null;
     this.coords = [];
     this.colors = [];
@@ -39910,6 +39936,1683 @@ function getTilingPatternIR(operatorList, dict, args) {
 
 /***/ }),
 /* 39 */
+/***/ (function(module, exports, __w_pdfjs_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.isPDFFunction = isPDFFunction;
+exports.PostScriptCompiler = exports.PostScriptEvaluator = exports.PDFFunctionFactory = void 0;
+
+var _primitives = __w_pdfjs_require__(5);
+
+var _util = __w_pdfjs_require__(2);
+
+var _ps_parser = __w_pdfjs_require__(40);
+
+var _image_utils = __w_pdfjs_require__(24);
+
+class PDFFunctionFactory {
+  constructor({
+    xref,
+    isEvalSupported = true
+  }) {
+    this.xref = xref;
+    this.isEvalSupported = isEvalSupported !== false;
+    this._localFunctionCache = null;
+  }
+
+  create(fn) {
+    const cachedFunction = this.getCached(fn);
+
+    if (cachedFunction) {
+      return cachedFunction;
+    }
+
+    const parsedFunction = PDFFunction.parse({
+      xref: this.xref,
+      isEvalSupported: this.isEvalSupported,
+      fn: fn instanceof _primitives.Ref ? this.xref.fetch(fn) : fn
+    });
+
+    this._cache(fn, parsedFunction);
+
+    return parsedFunction;
+  }
+
+  createFromArray(fnObj) {
+    const cachedFunction = this.getCached(fnObj);
+
+    if (cachedFunction) {
+      return cachedFunction;
+    }
+
+    const parsedFunction = PDFFunction.parseArray({
+      xref: this.xref,
+      isEvalSupported: this.isEvalSupported,
+      fnObj: fnObj instanceof _primitives.Ref ? this.xref.fetch(fnObj) : fnObj
+    });
+
+    this._cache(fnObj, parsedFunction);
+
+    return parsedFunction;
+  }
+
+  getCached(cacheKey) {
+    let fnRef;
+
+    if (cacheKey instanceof _primitives.Ref) {
+      fnRef = cacheKey;
+    } else if (cacheKey instanceof _primitives.Dict) {
+      fnRef = cacheKey.objId;
+    } else if ((0, _primitives.isStream)(cacheKey)) {
+      fnRef = cacheKey.dict && cacheKey.dict.objId;
+    }
+
+    if (fnRef) {
+      if (!this._localFunctionCache) {
+        this._localFunctionCache = new _image_utils.LocalFunctionCache();
+      }
+
+      const localFunction = this._localFunctionCache.getByRef(fnRef);
+
+      if (localFunction) {
+        return localFunction;
+      }
+    }
+
+    return null;
+  }
+
+  _cache(cacheKey, parsedFunction) {
+    if (!parsedFunction) {
+      throw new Error('PDFFunctionFactory._cache - expected "parsedFunction" argument.');
+    }
+
+    let fnRef;
+
+    if (cacheKey instanceof _primitives.Ref) {
+      fnRef = cacheKey;
+    } else if (cacheKey instanceof _primitives.Dict) {
+      fnRef = cacheKey.objId;
+    } else if ((0, _primitives.isStream)(cacheKey)) {
+      fnRef = cacheKey.dict && cacheKey.dict.objId;
+    }
+
+    if (fnRef) {
+      if (!this._localFunctionCache) {
+        this._localFunctionCache = new _image_utils.LocalFunctionCache();
+      }
+
+      this._localFunctionCache.set(null, fnRef, parsedFunction);
+    }
+  }
+
+}
+
+exports.PDFFunctionFactory = PDFFunctionFactory;
+
+function toNumberArray(arr) {
+  if (!Array.isArray(arr)) {
+    return null;
+  }
+
+  const length = arr.length;
+
+  for (let i = 0; i < length; i++) {
+    if (typeof arr[i] !== "number") {
+      const result = new Array(length);
+
+      for (let j = 0; j < length; j++) {
+        result[j] = +arr[j];
+      }
+
+      return result;
+    }
+  }
+
+  return arr;
+}
+
+var PDFFunction = function PDFFunctionClosure() {
+  const CONSTRUCT_SAMPLED = 0;
+  const CONSTRUCT_INTERPOLATED = 2;
+  const CONSTRUCT_STICHED = 3;
+  const CONSTRUCT_POSTSCRIPT = 4;
+  return {
+    getSampleArray(size, outputSize, bps, stream) {
+      var i, ii;
+      var length = 1;
+
+      for (i = 0, ii = size.length; i < ii; i++) {
+        length *= size[i];
+      }
+
+      length *= outputSize;
+      var array = new Array(length);
+      var codeSize = 0;
+      var codeBuf = 0;
+      var sampleMul = 1.0 / (2.0 ** bps - 1);
+      var strBytes = stream.getBytes((length * bps + 7) / 8);
+      var strIdx = 0;
+
+      for (i = 0; i < length; i++) {
+        while (codeSize < bps) {
+          codeBuf <<= 8;
+          codeBuf |= strBytes[strIdx++];
+          codeSize += 8;
+        }
+
+        codeSize -= bps;
+        array[i] = (codeBuf >> codeSize) * sampleMul;
+        codeBuf &= (1 << codeSize) - 1;
+      }
+
+      return array;
+    },
+
+    getIR({
+      xref,
+      isEvalSupported,
+      fn
+    }) {
+      var dict = fn.dict;
+
+      if (!dict) {
+        dict = fn;
+      }
+
+      var types = [this.constructSampled, null, this.constructInterpolated, this.constructStiched, this.constructPostScript];
+      var typeNum = dict.get("FunctionType");
+      var typeFn = types[typeNum];
+
+      if (!typeFn) {
+        throw new _util.FormatError("Unknown type of function");
+      }
+
+      return typeFn.call(this, {
+        xref,
+        isEvalSupported,
+        fn,
+        dict
+      });
+    },
+
+    fromIR({
+      xref,
+      isEvalSupported,
+      IR
+    }) {
+      var type = IR[0];
+
+      switch (type) {
+        case CONSTRUCT_SAMPLED:
+          return this.constructSampledFromIR({
+            xref,
+            isEvalSupported,
+            IR
+          });
+
+        case CONSTRUCT_INTERPOLATED:
+          return this.constructInterpolatedFromIR({
+            xref,
+            isEvalSupported,
+            IR
+          });
+
+        case CONSTRUCT_STICHED:
+          return this.constructStichedFromIR({
+            xref,
+            isEvalSupported,
+            IR
+          });
+
+        default:
+          return this.constructPostScriptFromIR({
+            xref,
+            isEvalSupported,
+            IR
+          });
+      }
+    },
+
+    parse({
+      xref,
+      isEvalSupported,
+      fn
+    }) {
+      const IR = this.getIR({
+        xref,
+        isEvalSupported,
+        fn
+      });
+      return this.fromIR({
+        xref,
+        isEvalSupported,
+        IR
+      });
+    },
+
+    parseArray({
+      xref,
+      isEvalSupported,
+      fnObj
+    }) {
+      if (!Array.isArray(fnObj)) {
+        return this.parse({
+          xref,
+          isEvalSupported,
+          fn: fnObj
+        });
+      }
+
+      var fnArray = [];
+
+      for (var j = 0, jj = fnObj.length; j < jj; j++) {
+        fnArray.push(this.parse({
+          xref,
+          isEvalSupported,
+          fn: xref.fetchIfRef(fnObj[j])
+        }));
+      }
+
+      return function (src, srcOffset, dest, destOffset) {
+        for (var i = 0, ii = fnArray.length; i < ii; i++) {
+          fnArray[i](src, srcOffset, dest, destOffset + i);
+        }
+      };
+    },
+
+    constructSampled({
+      xref,
+      isEvalSupported,
+      fn,
+      dict
+    }) {
+      function toMultiArray(arr) {
+        var inputLength = arr.length;
+        var out = [];
+        var index = 0;
+
+        for (var i = 0; i < inputLength; i += 2) {
+          out[index] = [arr[i], arr[i + 1]];
+          ++index;
+        }
+
+        return out;
+      }
+
+      var domain = toNumberArray(dict.getArray("Domain"));
+      var range = toNumberArray(dict.getArray("Range"));
+
+      if (!domain || !range) {
+        throw new _util.FormatError("No domain or range");
+      }
+
+      var inputSize = domain.length / 2;
+      var outputSize = range.length / 2;
+      domain = toMultiArray(domain);
+      range = toMultiArray(range);
+      var size = toNumberArray(dict.getArray("Size"));
+      var bps = dict.get("BitsPerSample");
+      var order = dict.get("Order") || 1;
+
+      if (order !== 1) {
+        (0, _util.info)("No support for cubic spline interpolation: " + order);
+      }
+
+      var encode = toNumberArray(dict.getArray("Encode"));
+
+      if (!encode) {
+        encode = [];
+
+        for (var i = 0; i < inputSize; ++i) {
+          encode.push([0, size[i] - 1]);
+        }
+      } else {
+        encode = toMultiArray(encode);
+      }
+
+      var decode = toNumberArray(dict.getArray("Decode"));
+
+      if (!decode) {
+        decode = range;
+      } else {
+        decode = toMultiArray(decode);
+      }
+
+      var samples = this.getSampleArray(size, outputSize, bps, fn);
+      return [CONSTRUCT_SAMPLED, inputSize, domain, encode, decode, samples, size, outputSize, 2 ** bps - 1, range];
+    },
+
+    constructSampledFromIR({
+      xref,
+      isEvalSupported,
+      IR
+    }) {
+      function interpolate(x, xmin, xmax, ymin, ymax) {
+        return ymin + (x - xmin) * ((ymax - ymin) / (xmax - xmin));
+      }
+
+      return function constructSampledFromIRResult(src, srcOffset, dest, destOffset) {
+        var m = IR[1];
+        var domain = IR[2];
+        var encode = IR[3];
+        var decode = IR[4];
+        var samples = IR[5];
+        var size = IR[6];
+        var n = IR[7];
+        var range = IR[9];
+        var cubeVertices = 1 << m;
+        var cubeN = new Float64Array(cubeVertices);
+        var cubeVertex = new Uint32Array(cubeVertices);
+        var i, j;
+
+        for (j = 0; j < cubeVertices; j++) {
+          cubeN[j] = 1;
+        }
+
+        var k = n,
+            pos = 1;
+
+        for (i = 0; i < m; ++i) {
+          var domain_2i = domain[i][0];
+          var domain_2i_1 = domain[i][1];
+          var xi = Math.min(Math.max(src[srcOffset + i], domain_2i), domain_2i_1);
+          var e = interpolate(xi, domain_2i, domain_2i_1, encode[i][0], encode[i][1]);
+          var size_i = size[i];
+          e = Math.min(Math.max(e, 0), size_i - 1);
+          var e0 = e < size_i - 1 ? Math.floor(e) : e - 1;
+          var n0 = e0 + 1 - e;
+          var n1 = e - e0;
+          var offset0 = e0 * k;
+          var offset1 = offset0 + k;
+
+          for (j = 0; j < cubeVertices; j++) {
+            if (j & pos) {
+              cubeN[j] *= n1;
+              cubeVertex[j] += offset1;
+            } else {
+              cubeN[j] *= n0;
+              cubeVertex[j] += offset0;
+            }
+          }
+
+          k *= size_i;
+          pos <<= 1;
+        }
+
+        for (j = 0; j < n; ++j) {
+          var rj = 0;
+
+          for (i = 0; i < cubeVertices; i++) {
+            rj += samples[cubeVertex[i] + j] * cubeN[i];
+          }
+
+          rj = interpolate(rj, 0, 1, decode[j][0], decode[j][1]);
+          dest[destOffset + j] = Math.min(Math.max(rj, range[j][0]), range[j][1]);
+        }
+      };
+    },
+
+    constructInterpolated({
+      xref,
+      isEvalSupported,
+      fn,
+      dict
+    }) {
+      var c0 = toNumberArray(dict.getArray("C0")) || [0];
+      var c1 = toNumberArray(dict.getArray("C1")) || [1];
+      var n = dict.get("N");
+      var length = c0.length;
+      var diff = [];
+
+      for (var i = 0; i < length; ++i) {
+        diff.push(c1[i] - c0[i]);
+      }
+
+      return [CONSTRUCT_INTERPOLATED, c0, diff, n];
+    },
+
+    constructInterpolatedFromIR({
+      xref,
+      isEvalSupported,
+      IR
+    }) {
+      var c0 = IR[1];
+      var diff = IR[2];
+      var n = IR[3];
+      var length = diff.length;
+      return function constructInterpolatedFromIRResult(src, srcOffset, dest, destOffset) {
+        var x = n === 1 ? src[srcOffset] : src[srcOffset] ** n;
+
+        for (var j = 0; j < length; ++j) {
+          dest[destOffset + j] = c0[j] + x * diff[j];
+        }
+      };
+    },
+
+    constructStiched({
+      xref,
+      isEvalSupported,
+      fn,
+      dict
+    }) {
+      var domain = toNumberArray(dict.getArray("Domain"));
+
+      if (!domain) {
+        throw new _util.FormatError("No domain");
+      }
+
+      var inputSize = domain.length / 2;
+
+      if (inputSize !== 1) {
+        throw new _util.FormatError("Bad domain for stiched function");
+      }
+
+      var fnRefs = dict.get("Functions");
+      var fns = [];
+
+      for (var i = 0, ii = fnRefs.length; i < ii; ++i) {
+        fns.push(this.parse({
+          xref,
+          isEvalSupported,
+          fn: xref.fetchIfRef(fnRefs[i])
+        }));
+      }
+
+      var bounds = toNumberArray(dict.getArray("Bounds"));
+      var encode = toNumberArray(dict.getArray("Encode"));
+      return [CONSTRUCT_STICHED, domain, bounds, encode, fns];
+    },
+
+    constructStichedFromIR({
+      xref,
+      isEvalSupported,
+      IR
+    }) {
+      var domain = IR[1];
+      var bounds = IR[2];
+      var encode = IR[3];
+      var fns = IR[4];
+      var tmpBuf = new Float32Array(1);
+      return function constructStichedFromIRResult(src, srcOffset, dest, destOffset) {
+        var clip = function constructStichedFromIRClip(v, min, max) {
+          if (v > max) {
+            v = max;
+          } else if (v < min) {
+            v = min;
+          }
+
+          return v;
+        };
+
+        var v = clip(src[srcOffset], domain[0], domain[1]);
+
+        for (var i = 0, ii = bounds.length; i < ii; ++i) {
+          if (v < bounds[i]) {
+            break;
+          }
+        }
+
+        var dmin = domain[0];
+
+        if (i > 0) {
+          dmin = bounds[i - 1];
+        }
+
+        var dmax = domain[1];
+
+        if (i < bounds.length) {
+          dmax = bounds[i];
+        }
+
+        var rmin = encode[2 * i];
+        var rmax = encode[2 * i + 1];
+        tmpBuf[0] = dmin === dmax ? rmin : rmin + (v - dmin) * (rmax - rmin) / (dmax - dmin);
+        fns[i](tmpBuf, 0, dest, destOffset);
+      };
+    },
+
+    constructPostScript({
+      xref,
+      isEvalSupported,
+      fn,
+      dict
+    }) {
+      var domain = toNumberArray(dict.getArray("Domain"));
+      var range = toNumberArray(dict.getArray("Range"));
+
+      if (!domain) {
+        throw new _util.FormatError("No domain.");
+      }
+
+      if (!range) {
+        throw new _util.FormatError("No range.");
+      }
+
+      var lexer = new _ps_parser.PostScriptLexer(fn);
+      var parser = new _ps_parser.PostScriptParser(lexer);
+      var code = parser.parse();
+      return [CONSTRUCT_POSTSCRIPT, domain, range, code];
+    },
+
+    constructPostScriptFromIR({
+      xref,
+      isEvalSupported,
+      IR
+    }) {
+      var domain = IR[1];
+      var range = IR[2];
+      var code = IR[3];
+
+      if (isEvalSupported && _util.IsEvalSupportedCached.value) {
+        const compiled = new PostScriptCompiler().compile(code, domain, range);
+
+        if (compiled) {
+          return new Function("src", "srcOffset", "dest", "destOffset", compiled);
+        }
+      }
+
+      (0, _util.info)("Unable to compile PS function");
+      var numOutputs = range.length >> 1;
+      var numInputs = domain.length >> 1;
+      var evaluator = new PostScriptEvaluator(code);
+      var cache = Object.create(null);
+      var MAX_CACHE_SIZE = 2048 * 4;
+      var cache_available = MAX_CACHE_SIZE;
+      var tmpBuf = new Float32Array(numInputs);
+      return function constructPostScriptFromIRResult(src, srcOffset, dest, destOffset) {
+        var i, value;
+        var key = "";
+        var input = tmpBuf;
+
+        for (i = 0; i < numInputs; i++) {
+          value = src[srcOffset + i];
+          input[i] = value;
+          key += value + "_";
+        }
+
+        var cachedValue = cache[key];
+
+        if (cachedValue !== undefined) {
+          dest.set(cachedValue, destOffset);
+          return;
+        }
+
+        var output = new Float32Array(numOutputs);
+        var stack = evaluator.execute(input);
+        var stackIndex = stack.length - numOutputs;
+
+        for (i = 0; i < numOutputs; i++) {
+          value = stack[stackIndex + i];
+          var bound = range[i * 2];
+
+          if (value < bound) {
+            value = bound;
+          } else {
+            bound = range[i * 2 + 1];
+
+            if (value > bound) {
+              value = bound;
+            }
+          }
+
+          output[i] = value;
+        }
+
+        if (cache_available > 0) {
+          cache_available--;
+          cache[key] = output;
+        }
+
+        dest.set(output, destOffset);
+      };
+    }
+
+  };
+}();
+
+function isPDFFunction(v) {
+  var fnDict;
+
+  if (typeof v !== "object") {
+    return false;
+  } else if ((0, _primitives.isDict)(v)) {
+    fnDict = v;
+  } else if ((0, _primitives.isStream)(v)) {
+    fnDict = v.dict;
+  } else {
+    return false;
+  }
+
+  return fnDict.has("FunctionType");
+}
+
+var PostScriptStack = function PostScriptStackClosure() {
+  var MAX_STACK_SIZE = 100;
+
+  function PostScriptStack(initialStack) {
+    this.stack = !initialStack ? [] : Array.prototype.slice.call(initialStack, 0);
+  }
+
+  PostScriptStack.prototype = {
+    push: function PostScriptStack_push(value) {
+      if (this.stack.length >= MAX_STACK_SIZE) {
+        throw new Error("PostScript function stack overflow.");
+      }
+
+      this.stack.push(value);
+    },
+    pop: function PostScriptStack_pop() {
+      if (this.stack.length <= 0) {
+        throw new Error("PostScript function stack underflow.");
+      }
+
+      return this.stack.pop();
+    },
+    copy: function PostScriptStack_copy(n) {
+      if (this.stack.length + n >= MAX_STACK_SIZE) {
+        throw new Error("PostScript function stack overflow.");
+      }
+
+      var stack = this.stack;
+
+      for (var i = stack.length - n, j = n - 1; j >= 0; j--, i++) {
+        stack.push(stack[i]);
+      }
+    },
+    index: function PostScriptStack_index(n) {
+      this.push(this.stack[this.stack.length - n - 1]);
+    },
+    roll: function PostScriptStack_roll(n, p) {
+      var stack = this.stack;
+      var l = stack.length - n;
+      var r = stack.length - 1,
+          c = l + (p - Math.floor(p / n) * n),
+          i,
+          j,
+          t;
+
+      for (i = l, j = r; i < j; i++, j--) {
+        t = stack[i];
+        stack[i] = stack[j];
+        stack[j] = t;
+      }
+
+      for (i = l, j = c - 1; i < j; i++, j--) {
+        t = stack[i];
+        stack[i] = stack[j];
+        stack[j] = t;
+      }
+
+      for (i = c, j = r; i < j; i++, j--) {
+        t = stack[i];
+        stack[i] = stack[j];
+        stack[j] = t;
+      }
+    }
+  };
+  return PostScriptStack;
+}();
+
+var PostScriptEvaluator = function PostScriptEvaluatorClosure() {
+  function PostScriptEvaluator(operators) {
+    this.operators = operators;
+  }
+
+  PostScriptEvaluator.prototype = {
+    execute: function PostScriptEvaluator_execute(initialStack) {
+      var stack = new PostScriptStack(initialStack);
+      var counter = 0;
+      var operators = this.operators;
+      var length = operators.length;
+      var operator, a, b;
+
+      while (counter < length) {
+        operator = operators[counter++];
+
+        if (typeof operator === "number") {
+          stack.push(operator);
+          continue;
+        }
+
+        switch (operator) {
+          case "jz":
+            b = stack.pop();
+            a = stack.pop();
+
+            if (!a) {
+              counter = b;
+            }
+
+            break;
+
+          case "j":
+            a = stack.pop();
+            counter = a;
+            break;
+
+          case "abs":
+            a = stack.pop();
+            stack.push(Math.abs(a));
+            break;
+
+          case "add":
+            b = stack.pop();
+            a = stack.pop();
+            stack.push(a + b);
+            break;
+
+          case "and":
+            b = stack.pop();
+            a = stack.pop();
+
+            if ((0, _util.isBool)(a) && (0, _util.isBool)(b)) {
+              stack.push(a && b);
+            } else {
+              stack.push(a & b);
+            }
+
+            break;
+
+          case "atan":
+            a = stack.pop();
+            stack.push(Math.atan(a));
+            break;
+
+          case "bitshift":
+            b = stack.pop();
+            a = stack.pop();
+
+            if (a > 0) {
+              stack.push(a << b);
+            } else {
+              stack.push(a >> b);
+            }
+
+            break;
+
+          case "ceiling":
+            a = stack.pop();
+            stack.push(Math.ceil(a));
+            break;
+
+          case "copy":
+            a = stack.pop();
+            stack.copy(a);
+            break;
+
+          case "cos":
+            a = stack.pop();
+            stack.push(Math.cos(a));
+            break;
+
+          case "cvi":
+            a = stack.pop() | 0;
+            stack.push(a);
+            break;
+
+          case "cvr":
+            break;
+
+          case "div":
+            b = stack.pop();
+            a = stack.pop();
+            stack.push(a / b);
+            break;
+
+          case "dup":
+            stack.copy(1);
+            break;
+
+          case "eq":
+            b = stack.pop();
+            a = stack.pop();
+            stack.push(a === b);
+            break;
+
+          case "exch":
+            stack.roll(2, 1);
+            break;
+
+          case "exp":
+            b = stack.pop();
+            a = stack.pop();
+            stack.push(a ** b);
+            break;
+
+          case "false":
+            stack.push(false);
+            break;
+
+          case "floor":
+            a = stack.pop();
+            stack.push(Math.floor(a));
+            break;
+
+          case "ge":
+            b = stack.pop();
+            a = stack.pop();
+            stack.push(a >= b);
+            break;
+
+          case "gt":
+            b = stack.pop();
+            a = stack.pop();
+            stack.push(a > b);
+            break;
+
+          case "idiv":
+            b = stack.pop();
+            a = stack.pop();
+            stack.push(a / b | 0);
+            break;
+
+          case "index":
+            a = stack.pop();
+            stack.index(a);
+            break;
+
+          case "le":
+            b = stack.pop();
+            a = stack.pop();
+            stack.push(a <= b);
+            break;
+
+          case "ln":
+            a = stack.pop();
+            stack.push(Math.log(a));
+            break;
+
+          case "log":
+            a = stack.pop();
+            stack.push(Math.log(a) / Math.LN10);
+            break;
+
+          case "lt":
+            b = stack.pop();
+            a = stack.pop();
+            stack.push(a < b);
+            break;
+
+          case "mod":
+            b = stack.pop();
+            a = stack.pop();
+            stack.push(a % b);
+            break;
+
+          case "mul":
+            b = stack.pop();
+            a = stack.pop();
+            stack.push(a * b);
+            break;
+
+          case "ne":
+            b = stack.pop();
+            a = stack.pop();
+            stack.push(a !== b);
+            break;
+
+          case "neg":
+            a = stack.pop();
+            stack.push(-a);
+            break;
+
+          case "not":
+            a = stack.pop();
+
+            if ((0, _util.isBool)(a)) {
+              stack.push(!a);
+            } else {
+              stack.push(~a);
+            }
+
+            break;
+
+          case "or":
+            b = stack.pop();
+            a = stack.pop();
+
+            if ((0, _util.isBool)(a) && (0, _util.isBool)(b)) {
+              stack.push(a || b);
+            } else {
+              stack.push(a | b);
+            }
+
+            break;
+
+          case "pop":
+            stack.pop();
+            break;
+
+          case "roll":
+            b = stack.pop();
+            a = stack.pop();
+            stack.roll(a, b);
+            break;
+
+          case "round":
+            a = stack.pop();
+            stack.push(Math.round(a));
+            break;
+
+          case "sin":
+            a = stack.pop();
+            stack.push(Math.sin(a));
+            break;
+
+          case "sqrt":
+            a = stack.pop();
+            stack.push(Math.sqrt(a));
+            break;
+
+          case "sub":
+            b = stack.pop();
+            a = stack.pop();
+            stack.push(a - b);
+            break;
+
+          case "true":
+            stack.push(true);
+            break;
+
+          case "truncate":
+            a = stack.pop();
+            a = a < 0 ? Math.ceil(a) : Math.floor(a);
+            stack.push(a);
+            break;
+
+          case "xor":
+            b = stack.pop();
+            a = stack.pop();
+
+            if ((0, _util.isBool)(a) && (0, _util.isBool)(b)) {
+              stack.push(a !== b);
+            } else {
+              stack.push(a ^ b);
+            }
+
+            break;
+
+          default:
+            throw new _util.FormatError(`Unknown operator ${operator}`);
+        }
+      }
+
+      return stack.stack;
+    }
+  };
+  return PostScriptEvaluator;
+}();
+
+exports.PostScriptEvaluator = PostScriptEvaluator;
+
+var PostScriptCompiler = function PostScriptCompilerClosure() {
+  function AstNode(type) {
+    this.type = type;
+  }
+
+  AstNode.prototype.visit = function (visitor) {
+    (0, _util.unreachable)("abstract method");
+  };
+
+  function AstArgument(index, min, max) {
+    AstNode.call(this, "args");
+    this.index = index;
+    this.min = min;
+    this.max = max;
+  }
+
+  AstArgument.prototype = Object.create(AstNode.prototype);
+
+  AstArgument.prototype.visit = function (visitor) {
+    visitor.visitArgument(this);
+  };
+
+  function AstLiteral(number) {
+    AstNode.call(this, "literal");
+    this.number = number;
+    this.min = number;
+    this.max = number;
+  }
+
+  AstLiteral.prototype = Object.create(AstNode.prototype);
+
+  AstLiteral.prototype.visit = function (visitor) {
+    visitor.visitLiteral(this);
+  };
+
+  function AstBinaryOperation(op, arg1, arg2, min, max) {
+    AstNode.call(this, "binary");
+    this.op = op;
+    this.arg1 = arg1;
+    this.arg2 = arg2;
+    this.min = min;
+    this.max = max;
+  }
+
+  AstBinaryOperation.prototype = Object.create(AstNode.prototype);
+
+  AstBinaryOperation.prototype.visit = function (visitor) {
+    visitor.visitBinaryOperation(this);
+  };
+
+  function AstMin(arg, max) {
+    AstNode.call(this, "max");
+    this.arg = arg;
+    this.min = arg.min;
+    this.max = max;
+  }
+
+  AstMin.prototype = Object.create(AstNode.prototype);
+
+  AstMin.prototype.visit = function (visitor) {
+    visitor.visitMin(this);
+  };
+
+  function AstVariable(index, min, max) {
+    AstNode.call(this, "var");
+    this.index = index;
+    this.min = min;
+    this.max = max;
+  }
+
+  AstVariable.prototype = Object.create(AstNode.prototype);
+
+  AstVariable.prototype.visit = function (visitor) {
+    visitor.visitVariable(this);
+  };
+
+  function AstVariableDefinition(variable, arg) {
+    AstNode.call(this, "definition");
+    this.variable = variable;
+    this.arg = arg;
+  }
+
+  AstVariableDefinition.prototype = Object.create(AstNode.prototype);
+
+  AstVariableDefinition.prototype.visit = function (visitor) {
+    visitor.visitVariableDefinition(this);
+  };
+
+  function ExpressionBuilderVisitor() {
+    this.parts = [];
+  }
+
+  ExpressionBuilderVisitor.prototype = {
+    visitArgument(arg) {
+      this.parts.push("Math.max(", arg.min, ", Math.min(", arg.max, ", src[srcOffset + ", arg.index, "]))");
+    },
+
+    visitVariable(variable) {
+      this.parts.push("v", variable.index);
+    },
+
+    visitLiteral(literal) {
+      this.parts.push(literal.number);
+    },
+
+    visitBinaryOperation(operation) {
+      this.parts.push("(");
+      operation.arg1.visit(this);
+      this.parts.push(" ", operation.op, " ");
+      operation.arg2.visit(this);
+      this.parts.push(")");
+    },
+
+    visitVariableDefinition(definition) {
+      this.parts.push("var ");
+      definition.variable.visit(this);
+      this.parts.push(" = ");
+      definition.arg.visit(this);
+      this.parts.push(";");
+    },
+
+    visitMin(max) {
+      this.parts.push("Math.min(");
+      max.arg.visit(this);
+      this.parts.push(", ", max.max, ")");
+    },
+
+    toString() {
+      return this.parts.join("");
+    }
+
+  };
+
+  function buildAddOperation(num1, num2) {
+    if (num2.type === "literal" && num2.number === 0) {
+      return num1;
+    }
+
+    if (num1.type === "literal" && num1.number === 0) {
+      return num2;
+    }
+
+    if (num2.type === "literal" && num1.type === "literal") {
+      return new AstLiteral(num1.number + num2.number);
+    }
+
+    return new AstBinaryOperation("+", num1, num2, num1.min + num2.min, num1.max + num2.max);
+  }
+
+  function buildMulOperation(num1, num2) {
+    if (num2.type === "literal") {
+      if (num2.number === 0) {
+        return new AstLiteral(0);
+      } else if (num2.number === 1) {
+        return num1;
+      } else if (num1.type === "literal") {
+        return new AstLiteral(num1.number * num2.number);
+      }
+    }
+
+    if (num1.type === "literal") {
+      if (num1.number === 0) {
+        return new AstLiteral(0);
+      } else if (num1.number === 1) {
+        return num2;
+      }
+    }
+
+    var min = Math.min(num1.min * num2.min, num1.min * num2.max, num1.max * num2.min, num1.max * num2.max);
+    var max = Math.max(num1.min * num2.min, num1.min * num2.max, num1.max * num2.min, num1.max * num2.max);
+    return new AstBinaryOperation("*", num1, num2, min, max);
+  }
+
+  function buildSubOperation(num1, num2) {
+    if (num2.type === "literal") {
+      if (num2.number === 0) {
+        return num1;
+      } else if (num1.type === "literal") {
+        return new AstLiteral(num1.number - num2.number);
+      }
+    }
+
+    if (num2.type === "binary" && num2.op === "-" && num1.type === "literal" && num1.number === 1 && num2.arg1.type === "literal" && num2.arg1.number === 1) {
+      return num2.arg2;
+    }
+
+    return new AstBinaryOperation("-", num1, num2, num1.min - num2.max, num1.max - num2.min);
+  }
+
+  function buildMinOperation(num1, max) {
+    if (num1.min >= max) {
+      return new AstLiteral(max);
+    } else if (num1.max <= max) {
+      return num1;
+    }
+
+    return new AstMin(num1, max);
+  }
+
+  function PostScriptCompiler() {}
+
+  PostScriptCompiler.prototype = {
+    compile: function PostScriptCompiler_compile(code, domain, range) {
+      var stack = [];
+      var instructions = [];
+      var inputSize = domain.length >> 1,
+          outputSize = range.length >> 1;
+      var lastRegister = 0;
+      var n, j;
+      var num1, num2, ast1, ast2, tmpVar, item;
+
+      for (let i = 0; i < inputSize; i++) {
+        stack.push(new AstArgument(i, domain[i * 2], domain[i * 2 + 1]));
+      }
+
+      for (let i = 0, ii = code.length; i < ii; i++) {
+        item = code[i];
+
+        if (typeof item === "number") {
+          stack.push(new AstLiteral(item));
+          continue;
+        }
+
+        switch (item) {
+          case "add":
+            if (stack.length < 2) {
+              return null;
+            }
+
+            num2 = stack.pop();
+            num1 = stack.pop();
+            stack.push(buildAddOperation(num1, num2));
+            break;
+
+          case "cvr":
+            if (stack.length < 1) {
+              return null;
+            }
+
+            break;
+
+          case "mul":
+            if (stack.length < 2) {
+              return null;
+            }
+
+            num2 = stack.pop();
+            num1 = stack.pop();
+            stack.push(buildMulOperation(num1, num2));
+            break;
+
+          case "sub":
+            if (stack.length < 2) {
+              return null;
+            }
+
+            num2 = stack.pop();
+            num1 = stack.pop();
+            stack.push(buildSubOperation(num1, num2));
+            break;
+
+          case "exch":
+            if (stack.length < 2) {
+              return null;
+            }
+
+            ast1 = stack.pop();
+            ast2 = stack.pop();
+            stack.push(ast1, ast2);
+            break;
+
+          case "pop":
+            if (stack.length < 1) {
+              return null;
+            }
+
+            stack.pop();
+            break;
+
+          case "index":
+            if (stack.length < 1) {
+              return null;
+            }
+
+            num1 = stack.pop();
+
+            if (num1.type !== "literal") {
+              return null;
+            }
+
+            n = num1.number;
+
+            if (n < 0 || !Number.isInteger(n) || stack.length < n) {
+              return null;
+            }
+
+            ast1 = stack[stack.length - n - 1];
+
+            if (ast1.type === "literal" || ast1.type === "var") {
+              stack.push(ast1);
+              break;
+            }
+
+            tmpVar = new AstVariable(lastRegister++, ast1.min, ast1.max);
+            stack[stack.length - n - 1] = tmpVar;
+            stack.push(tmpVar);
+            instructions.push(new AstVariableDefinition(tmpVar, ast1));
+            break;
+
+          case "dup":
+            if (stack.length < 1) {
+              return null;
+            }
+
+            if (typeof code[i + 1] === "number" && code[i + 2] === "gt" && code[i + 3] === i + 7 && code[i + 4] === "jz" && code[i + 5] === "pop" && code[i + 6] === code[i + 1]) {
+              num1 = stack.pop();
+              stack.push(buildMinOperation(num1, code[i + 1]));
+              i += 6;
+              break;
+            }
+
+            ast1 = stack[stack.length - 1];
+
+            if (ast1.type === "literal" || ast1.type === "var") {
+              stack.push(ast1);
+              break;
+            }
+
+            tmpVar = new AstVariable(lastRegister++, ast1.min, ast1.max);
+            stack[stack.length - 1] = tmpVar;
+            stack.push(tmpVar);
+            instructions.push(new AstVariableDefinition(tmpVar, ast1));
+            break;
+
+          case "roll":
+            if (stack.length < 2) {
+              return null;
+            }
+
+            num2 = stack.pop();
+            num1 = stack.pop();
+
+            if (num2.type !== "literal" || num1.type !== "literal") {
+              return null;
+            }
+
+            j = num2.number;
+            n = num1.number;
+
+            if (n <= 0 || !Number.isInteger(n) || !Number.isInteger(j) || stack.length < n) {
+              return null;
+            }
+
+            j = (j % n + n) % n;
+
+            if (j === 0) {
+              break;
+            }
+
+            Array.prototype.push.apply(stack, stack.splice(stack.length - n, n - j));
+            break;
+
+          default:
+            return null;
+        }
+      }
+
+      if (stack.length !== outputSize) {
+        return null;
+      }
+
+      var result = [];
+      instructions.forEach(function (instruction) {
+        var statementBuilder = new ExpressionBuilderVisitor();
+        instruction.visit(statementBuilder);
+        result.push(statementBuilder.toString());
+      });
+      stack.forEach(function (expr, i) {
+        var statementBuilder = new ExpressionBuilderVisitor();
+        expr.visit(statementBuilder);
+        var min = range[i * 2],
+            max = range[i * 2 + 1];
+        var out = [statementBuilder.toString()];
+
+        if (min > expr.min) {
+          out.unshift("Math.max(", min, ", ");
+          out.push(")");
+        }
+
+        if (max < expr.max) {
+          out.unshift("Math.min(", max, ", ");
+          out.push(")");
+        }
+
+        out.unshift("dest[destOffset + ", i, "] = ");
+        out.push(";");
+        result.push(out.join(""));
+      });
+      return result.join("\n");
+    }
+  };
+  return PostScriptCompiler;
+}();
+
+exports.PostScriptCompiler = PostScriptCompiler;
+
+/***/ }),
+/* 40 */
+/***/ (function(module, exports, __w_pdfjs_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.PostScriptParser = exports.PostScriptLexer = void 0;
+
+var _util = __w_pdfjs_require__(2);
+
+var _primitives = __w_pdfjs_require__(5);
+
+var _core_utils = __w_pdfjs_require__(8);
+
+class PostScriptParser {
+  constructor(lexer) {
+    this.lexer = lexer;
+    this.operators = [];
+    this.token = null;
+    this.prev = null;
+  }
+
+  nextToken() {
+    this.prev = this.token;
+    this.token = this.lexer.getToken();
+  }
+
+  accept(type) {
+    if (this.token.type === type) {
+      this.nextToken();
+      return true;
+    }
+
+    return false;
+  }
+
+  expect(type) {
+    if (this.accept(type)) {
+      return true;
+    }
+
+    throw new _util.FormatError(`Unexpected symbol: found ${this.token.type} expected ${type}.`);
+  }
+
+  parse() {
+    this.nextToken();
+    this.expect(PostScriptTokenTypes.LBRACE);
+    this.parseBlock();
+    this.expect(PostScriptTokenTypes.RBRACE);
+    return this.operators;
+  }
+
+  parseBlock() {
+    while (true) {
+      if (this.accept(PostScriptTokenTypes.NUMBER)) {
+        this.operators.push(this.prev.value);
+      } else if (this.accept(PostScriptTokenTypes.OPERATOR)) {
+        this.operators.push(this.prev.value);
+      } else if (this.accept(PostScriptTokenTypes.LBRACE)) {
+        this.parseCondition();
+      } else {
+        return;
+      }
+    }
+  }
+
+  parseCondition() {
+    const conditionLocation = this.operators.length;
+    this.operators.push(null, null);
+    this.parseBlock();
+    this.expect(PostScriptTokenTypes.RBRACE);
+
+    if (this.accept(PostScriptTokenTypes.IF)) {
+      this.operators[conditionLocation] = this.operators.length;
+      this.operators[conditionLocation + 1] = "jz";
+    } else if (this.accept(PostScriptTokenTypes.LBRACE)) {
+      const jumpLocation = this.operators.length;
+      this.operators.push(null, null);
+      const endOfTrue = this.operators.length;
+      this.parseBlock();
+      this.expect(PostScriptTokenTypes.RBRACE);
+      this.expect(PostScriptTokenTypes.IFELSE);
+      this.operators[jumpLocation] = this.operators.length;
+      this.operators[jumpLocation + 1] = "j";
+      this.operators[conditionLocation] = endOfTrue;
+      this.operators[conditionLocation + 1] = "jz";
+    } else {
+      throw new _util.FormatError("PS Function: error parsing conditional.");
+    }
+  }
+
+}
+
+exports.PostScriptParser = PostScriptParser;
+const PostScriptTokenTypes = {
+  LBRACE: 0,
+  RBRACE: 1,
+  NUMBER: 2,
+  OPERATOR: 3,
+  IF: 4,
+  IFELSE: 5
+};
+
+const PostScriptToken = function PostScriptTokenClosure() {
+  const opCache = Object.create(null);
+
+  class PostScriptToken {
+    constructor(type, value) {
+      this.type = type;
+      this.value = value;
+    }
+
+    static getOperator(op) {
+      const opValue = opCache[op];
+
+      if (opValue) {
+        return opValue;
+      }
+
+      return opCache[op] = new PostScriptToken(PostScriptTokenTypes.OPERATOR, op);
+    }
+
+    static get LBRACE() {
+      return (0, _util.shadow)(this, "LBRACE", new PostScriptToken(PostScriptTokenTypes.LBRACE, "{"));
+    }
+
+    static get RBRACE() {
+      return (0, _util.shadow)(this, "RBRACE", new PostScriptToken(PostScriptTokenTypes.RBRACE, "}"));
+    }
+
+    static get IF() {
+      return (0, _util.shadow)(this, "IF", new PostScriptToken(PostScriptTokenTypes.IF, "IF"));
+    }
+
+    static get IFELSE() {
+      return (0, _util.shadow)(this, "IFELSE", new PostScriptToken(PostScriptTokenTypes.IFELSE, "IFELSE"));
+    }
+
+  }
+
+  return PostScriptToken;
+}();
+
+class PostScriptLexer {
+  constructor(stream) {
+    this.stream = stream;
+    this.nextChar();
+    this.strBuf = [];
+  }
+
+  nextChar() {
+    return this.currentChar = this.stream.getByte();
+  }
+
+  getToken() {
+    let comment = false;
+    let ch = this.currentChar;
+
+    while (true) {
+      if (ch < 0) {
+        return _primitives.EOF;
+      }
+
+      if (comment) {
+        if (ch === 0x0a || ch === 0x0d) {
+          comment = false;
+        }
+      } else if (ch === 0x25) {
+        comment = true;
+      } else if (!(0, _core_utils.isWhiteSpace)(ch)) {
+        break;
+      }
+
+      ch = this.nextChar();
+    }
+
+    switch (ch | 0) {
+      case 0x30:
+      case 0x31:
+      case 0x32:
+      case 0x33:
+      case 0x34:
+      case 0x35:
+      case 0x36:
+      case 0x37:
+      case 0x38:
+      case 0x39:
+      case 0x2b:
+      case 0x2d:
+      case 0x2e:
+        return new PostScriptToken(PostScriptTokenTypes.NUMBER, this.getNumber());
+
+      case 0x7b:
+        this.nextChar();
+        return PostScriptToken.LBRACE;
+
+      case 0x7d:
+        this.nextChar();
+        return PostScriptToken.RBRACE;
+    }
+
+    const strBuf = this.strBuf;
+    strBuf.length = 0;
+    strBuf[0] = String.fromCharCode(ch);
+
+    while ((ch = this.nextChar()) >= 0 && (ch >= 0x41 && ch <= 0x5a || ch >= 0x61 && ch <= 0x7a)) {
+      strBuf.push(String.fromCharCode(ch));
+    }
+
+    const str = strBuf.join("");
+
+    switch (str.toLowerCase()) {
+      case "if":
+        return PostScriptToken.IF;
+
+      case "ifelse":
+        return PostScriptToken.IFELSE;
+
+      default:
+        return PostScriptToken.getOperator(str);
+    }
+  }
+
+  getNumber() {
+    let ch = this.currentChar;
+    const strBuf = this.strBuf;
+    strBuf.length = 0;
+    strBuf[0] = String.fromCharCode(ch);
+
+    while ((ch = this.nextChar()) >= 0) {
+      if (ch >= 0x30 && ch <= 0x39 || ch === 0x2d || ch === 0x2e) {
+        strBuf.push(String.fromCharCode(ch));
+      } else {
+        break;
+      }
+    }
+
+    const value = parseFloat(strBuf.join(""));
+
+    if (isNaN(value)) {
+      throw new _util.FormatError(`Invalid floating point number: ${value}`);
+    }
+
+    return value;
+  }
+
+}
+
+exports.PostScriptLexer = PostScriptLexer;
+
+/***/ }),
+/* 41 */
 /***/ (function(module, exports, __w_pdfjs_require__) {
 
 "use strict";
@@ -40221,7 +41924,7 @@ function bidi(str, startLevel, vertical) {
 }
 
 /***/ }),
-/* 40 */
+/* 42 */
 /***/ (function(module, exports, __w_pdfjs_require__) {
 
 "use strict";
@@ -43175,1610 +44878,6 @@ var getMetrics = (0, _core_utils.getLookupTableFactory)(function (t) {
 exports.getMetrics = getMetrics;
 
 /***/ }),
-/* 41 */
-/***/ (function(module, exports, __w_pdfjs_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.isPDFFunction = isPDFFunction;
-exports.PostScriptCompiler = exports.PostScriptEvaluator = exports.PDFFunctionFactory = void 0;
-
-var _util = __w_pdfjs_require__(2);
-
-var _primitives = __w_pdfjs_require__(5);
-
-var _ps_parser = __w_pdfjs_require__(42);
-
-class PDFFunctionFactory {
-  constructor({
-    xref,
-    isEvalSupported = true
-  }) {
-    this.xref = xref;
-    this.isEvalSupported = isEvalSupported !== false;
-  }
-
-  create(fn) {
-    return PDFFunction.parse({
-      xref: this.xref,
-      isEvalSupported: this.isEvalSupported,
-      fn
-    });
-  }
-
-  createFromArray(fnObj) {
-    return PDFFunction.parseArray({
-      xref: this.xref,
-      isEvalSupported: this.isEvalSupported,
-      fnObj
-    });
-  }
-
-}
-
-exports.PDFFunctionFactory = PDFFunctionFactory;
-
-function toNumberArray(arr) {
-  if (!Array.isArray(arr)) {
-    return null;
-  }
-
-  const length = arr.length;
-
-  for (let i = 0; i < length; i++) {
-    if (typeof arr[i] !== "number") {
-      const result = new Array(length);
-
-      for (let j = 0; j < length; j++) {
-        result[j] = +arr[j];
-      }
-
-      return result;
-    }
-  }
-
-  return arr;
-}
-
-var PDFFunction = function PDFFunctionClosure() {
-  const CONSTRUCT_SAMPLED = 0;
-  const CONSTRUCT_INTERPOLATED = 2;
-  const CONSTRUCT_STICHED = 3;
-  const CONSTRUCT_POSTSCRIPT = 4;
-  return {
-    getSampleArray(size, outputSize, bps, stream) {
-      var i, ii;
-      var length = 1;
-
-      for (i = 0, ii = size.length; i < ii; i++) {
-        length *= size[i];
-      }
-
-      length *= outputSize;
-      var array = new Array(length);
-      var codeSize = 0;
-      var codeBuf = 0;
-      var sampleMul = 1.0 / (2.0 ** bps - 1);
-      var strBytes = stream.getBytes((length * bps + 7) / 8);
-      var strIdx = 0;
-
-      for (i = 0; i < length; i++) {
-        while (codeSize < bps) {
-          codeBuf <<= 8;
-          codeBuf |= strBytes[strIdx++];
-          codeSize += 8;
-        }
-
-        codeSize -= bps;
-        array[i] = (codeBuf >> codeSize) * sampleMul;
-        codeBuf &= (1 << codeSize) - 1;
-      }
-
-      return array;
-    },
-
-    getIR({
-      xref,
-      isEvalSupported,
-      fn
-    }) {
-      var dict = fn.dict;
-
-      if (!dict) {
-        dict = fn;
-      }
-
-      var types = [this.constructSampled, null, this.constructInterpolated, this.constructStiched, this.constructPostScript];
-      var typeNum = dict.get("FunctionType");
-      var typeFn = types[typeNum];
-
-      if (!typeFn) {
-        throw new _util.FormatError("Unknown type of function");
-      }
-
-      return typeFn.call(this, {
-        xref,
-        isEvalSupported,
-        fn,
-        dict
-      });
-    },
-
-    fromIR({
-      xref,
-      isEvalSupported,
-      IR
-    }) {
-      var type = IR[0];
-
-      switch (type) {
-        case CONSTRUCT_SAMPLED:
-          return this.constructSampledFromIR({
-            xref,
-            isEvalSupported,
-            IR
-          });
-
-        case CONSTRUCT_INTERPOLATED:
-          return this.constructInterpolatedFromIR({
-            xref,
-            isEvalSupported,
-            IR
-          });
-
-        case CONSTRUCT_STICHED:
-          return this.constructStichedFromIR({
-            xref,
-            isEvalSupported,
-            IR
-          });
-
-        default:
-          return this.constructPostScriptFromIR({
-            xref,
-            isEvalSupported,
-            IR
-          });
-      }
-    },
-
-    parse({
-      xref,
-      isEvalSupported,
-      fn
-    }) {
-      const IR = this.getIR({
-        xref,
-        isEvalSupported,
-        fn
-      });
-      return this.fromIR({
-        xref,
-        isEvalSupported,
-        IR
-      });
-    },
-
-    parseArray({
-      xref,
-      isEvalSupported,
-      fnObj
-    }) {
-      if (!Array.isArray(fnObj)) {
-        return this.parse({
-          xref,
-          isEvalSupported,
-          fn: fnObj
-        });
-      }
-
-      var fnArray = [];
-
-      for (var j = 0, jj = fnObj.length; j < jj; j++) {
-        fnArray.push(this.parse({
-          xref,
-          isEvalSupported,
-          fn: xref.fetchIfRef(fnObj[j])
-        }));
-      }
-
-      return function (src, srcOffset, dest, destOffset) {
-        for (var i = 0, ii = fnArray.length; i < ii; i++) {
-          fnArray[i](src, srcOffset, dest, destOffset + i);
-        }
-      };
-    },
-
-    constructSampled({
-      xref,
-      isEvalSupported,
-      fn,
-      dict
-    }) {
-      function toMultiArray(arr) {
-        var inputLength = arr.length;
-        var out = [];
-        var index = 0;
-
-        for (var i = 0; i < inputLength; i += 2) {
-          out[index] = [arr[i], arr[i + 1]];
-          ++index;
-        }
-
-        return out;
-      }
-
-      var domain = toNumberArray(dict.getArray("Domain"));
-      var range = toNumberArray(dict.getArray("Range"));
-
-      if (!domain || !range) {
-        throw new _util.FormatError("No domain or range");
-      }
-
-      var inputSize = domain.length / 2;
-      var outputSize = range.length / 2;
-      domain = toMultiArray(domain);
-      range = toMultiArray(range);
-      var size = toNumberArray(dict.getArray("Size"));
-      var bps = dict.get("BitsPerSample");
-      var order = dict.get("Order") || 1;
-
-      if (order !== 1) {
-        (0, _util.info)("No support for cubic spline interpolation: " + order);
-      }
-
-      var encode = toNumberArray(dict.getArray("Encode"));
-
-      if (!encode) {
-        encode = [];
-
-        for (var i = 0; i < inputSize; ++i) {
-          encode.push([0, size[i] - 1]);
-        }
-      } else {
-        encode = toMultiArray(encode);
-      }
-
-      var decode = toNumberArray(dict.getArray("Decode"));
-
-      if (!decode) {
-        decode = range;
-      } else {
-        decode = toMultiArray(decode);
-      }
-
-      var samples = this.getSampleArray(size, outputSize, bps, fn);
-      return [CONSTRUCT_SAMPLED, inputSize, domain, encode, decode, samples, size, outputSize, 2 ** bps - 1, range];
-    },
-
-    constructSampledFromIR({
-      xref,
-      isEvalSupported,
-      IR
-    }) {
-      function interpolate(x, xmin, xmax, ymin, ymax) {
-        return ymin + (x - xmin) * ((ymax - ymin) / (xmax - xmin));
-      }
-
-      return function constructSampledFromIRResult(src, srcOffset, dest, destOffset) {
-        var m = IR[1];
-        var domain = IR[2];
-        var encode = IR[3];
-        var decode = IR[4];
-        var samples = IR[5];
-        var size = IR[6];
-        var n = IR[7];
-        var range = IR[9];
-        var cubeVertices = 1 << m;
-        var cubeN = new Float64Array(cubeVertices);
-        var cubeVertex = new Uint32Array(cubeVertices);
-        var i, j;
-
-        for (j = 0; j < cubeVertices; j++) {
-          cubeN[j] = 1;
-        }
-
-        var k = n,
-            pos = 1;
-
-        for (i = 0; i < m; ++i) {
-          var domain_2i = domain[i][0];
-          var domain_2i_1 = domain[i][1];
-          var xi = Math.min(Math.max(src[srcOffset + i], domain_2i), domain_2i_1);
-          var e = interpolate(xi, domain_2i, domain_2i_1, encode[i][0], encode[i][1]);
-          var size_i = size[i];
-          e = Math.min(Math.max(e, 0), size_i - 1);
-          var e0 = e < size_i - 1 ? Math.floor(e) : e - 1;
-          var n0 = e0 + 1 - e;
-          var n1 = e - e0;
-          var offset0 = e0 * k;
-          var offset1 = offset0 + k;
-
-          for (j = 0; j < cubeVertices; j++) {
-            if (j & pos) {
-              cubeN[j] *= n1;
-              cubeVertex[j] += offset1;
-            } else {
-              cubeN[j] *= n0;
-              cubeVertex[j] += offset0;
-            }
-          }
-
-          k *= size_i;
-          pos <<= 1;
-        }
-
-        for (j = 0; j < n; ++j) {
-          var rj = 0;
-
-          for (i = 0; i < cubeVertices; i++) {
-            rj += samples[cubeVertex[i] + j] * cubeN[i];
-          }
-
-          rj = interpolate(rj, 0, 1, decode[j][0], decode[j][1]);
-          dest[destOffset + j] = Math.min(Math.max(rj, range[j][0]), range[j][1]);
-        }
-      };
-    },
-
-    constructInterpolated({
-      xref,
-      isEvalSupported,
-      fn,
-      dict
-    }) {
-      var c0 = toNumberArray(dict.getArray("C0")) || [0];
-      var c1 = toNumberArray(dict.getArray("C1")) || [1];
-      var n = dict.get("N");
-      var length = c0.length;
-      var diff = [];
-
-      for (var i = 0; i < length; ++i) {
-        diff.push(c1[i] - c0[i]);
-      }
-
-      return [CONSTRUCT_INTERPOLATED, c0, diff, n];
-    },
-
-    constructInterpolatedFromIR({
-      xref,
-      isEvalSupported,
-      IR
-    }) {
-      var c0 = IR[1];
-      var diff = IR[2];
-      var n = IR[3];
-      var length = diff.length;
-      return function constructInterpolatedFromIRResult(src, srcOffset, dest, destOffset) {
-        var x = n === 1 ? src[srcOffset] : src[srcOffset] ** n;
-
-        for (var j = 0; j < length; ++j) {
-          dest[destOffset + j] = c0[j] + x * diff[j];
-        }
-      };
-    },
-
-    constructStiched({
-      xref,
-      isEvalSupported,
-      fn,
-      dict
-    }) {
-      var domain = toNumberArray(dict.getArray("Domain"));
-
-      if (!domain) {
-        throw new _util.FormatError("No domain");
-      }
-
-      var inputSize = domain.length / 2;
-
-      if (inputSize !== 1) {
-        throw new _util.FormatError("Bad domain for stiched function");
-      }
-
-      var fnRefs = dict.get("Functions");
-      var fns = [];
-
-      for (var i = 0, ii = fnRefs.length; i < ii; ++i) {
-        fns.push(this.parse({
-          xref,
-          isEvalSupported,
-          fn: xref.fetchIfRef(fnRefs[i])
-        }));
-      }
-
-      var bounds = toNumberArray(dict.getArray("Bounds"));
-      var encode = toNumberArray(dict.getArray("Encode"));
-      return [CONSTRUCT_STICHED, domain, bounds, encode, fns];
-    },
-
-    constructStichedFromIR({
-      xref,
-      isEvalSupported,
-      IR
-    }) {
-      var domain = IR[1];
-      var bounds = IR[2];
-      var encode = IR[3];
-      var fns = IR[4];
-      var tmpBuf = new Float32Array(1);
-      return function constructStichedFromIRResult(src, srcOffset, dest, destOffset) {
-        var clip = function constructStichedFromIRClip(v, min, max) {
-          if (v > max) {
-            v = max;
-          } else if (v < min) {
-            v = min;
-          }
-
-          return v;
-        };
-
-        var v = clip(src[srcOffset], domain[0], domain[1]);
-
-        for (var i = 0, ii = bounds.length; i < ii; ++i) {
-          if (v < bounds[i]) {
-            break;
-          }
-        }
-
-        var dmin = domain[0];
-
-        if (i > 0) {
-          dmin = bounds[i - 1];
-        }
-
-        var dmax = domain[1];
-
-        if (i < bounds.length) {
-          dmax = bounds[i];
-        }
-
-        var rmin = encode[2 * i];
-        var rmax = encode[2 * i + 1];
-        tmpBuf[0] = dmin === dmax ? rmin : rmin + (v - dmin) * (rmax - rmin) / (dmax - dmin);
-        fns[i](tmpBuf, 0, dest, destOffset);
-      };
-    },
-
-    constructPostScript({
-      xref,
-      isEvalSupported,
-      fn,
-      dict
-    }) {
-      var domain = toNumberArray(dict.getArray("Domain"));
-      var range = toNumberArray(dict.getArray("Range"));
-
-      if (!domain) {
-        throw new _util.FormatError("No domain.");
-      }
-
-      if (!range) {
-        throw new _util.FormatError("No range.");
-      }
-
-      var lexer = new _ps_parser.PostScriptLexer(fn);
-      var parser = new _ps_parser.PostScriptParser(lexer);
-      var code = parser.parse();
-      return [CONSTRUCT_POSTSCRIPT, domain, range, code];
-    },
-
-    constructPostScriptFromIR({
-      xref,
-      isEvalSupported,
-      IR
-    }) {
-      var domain = IR[1];
-      var range = IR[2];
-      var code = IR[3];
-
-      if (isEvalSupported && _util.IsEvalSupportedCached.value) {
-        const compiled = new PostScriptCompiler().compile(code, domain, range);
-
-        if (compiled) {
-          return new Function("src", "srcOffset", "dest", "destOffset", compiled);
-        }
-      }
-
-      (0, _util.info)("Unable to compile PS function");
-      var numOutputs = range.length >> 1;
-      var numInputs = domain.length >> 1;
-      var evaluator = new PostScriptEvaluator(code);
-      var cache = Object.create(null);
-      var MAX_CACHE_SIZE = 2048 * 4;
-      var cache_available = MAX_CACHE_SIZE;
-      var tmpBuf = new Float32Array(numInputs);
-      return function constructPostScriptFromIRResult(src, srcOffset, dest, destOffset) {
-        var i, value;
-        var key = "";
-        var input = tmpBuf;
-
-        for (i = 0; i < numInputs; i++) {
-          value = src[srcOffset + i];
-          input[i] = value;
-          key += value + "_";
-        }
-
-        var cachedValue = cache[key];
-
-        if (cachedValue !== undefined) {
-          dest.set(cachedValue, destOffset);
-          return;
-        }
-
-        var output = new Float32Array(numOutputs);
-        var stack = evaluator.execute(input);
-        var stackIndex = stack.length - numOutputs;
-
-        for (i = 0; i < numOutputs; i++) {
-          value = stack[stackIndex + i];
-          var bound = range[i * 2];
-
-          if (value < bound) {
-            value = bound;
-          } else {
-            bound = range[i * 2 + 1];
-
-            if (value > bound) {
-              value = bound;
-            }
-          }
-
-          output[i] = value;
-        }
-
-        if (cache_available > 0) {
-          cache_available--;
-          cache[key] = output;
-        }
-
-        dest.set(output, destOffset);
-      };
-    }
-
-  };
-}();
-
-function isPDFFunction(v) {
-  var fnDict;
-
-  if (typeof v !== "object") {
-    return false;
-  } else if ((0, _primitives.isDict)(v)) {
-    fnDict = v;
-  } else if ((0, _primitives.isStream)(v)) {
-    fnDict = v.dict;
-  } else {
-    return false;
-  }
-
-  return fnDict.has("FunctionType");
-}
-
-var PostScriptStack = function PostScriptStackClosure() {
-  var MAX_STACK_SIZE = 100;
-
-  function PostScriptStack(initialStack) {
-    this.stack = !initialStack ? [] : Array.prototype.slice.call(initialStack, 0);
-  }
-
-  PostScriptStack.prototype = {
-    push: function PostScriptStack_push(value) {
-      if (this.stack.length >= MAX_STACK_SIZE) {
-        throw new Error("PostScript function stack overflow.");
-      }
-
-      this.stack.push(value);
-    },
-    pop: function PostScriptStack_pop() {
-      if (this.stack.length <= 0) {
-        throw new Error("PostScript function stack underflow.");
-      }
-
-      return this.stack.pop();
-    },
-    copy: function PostScriptStack_copy(n) {
-      if (this.stack.length + n >= MAX_STACK_SIZE) {
-        throw new Error("PostScript function stack overflow.");
-      }
-
-      var stack = this.stack;
-
-      for (var i = stack.length - n, j = n - 1; j >= 0; j--, i++) {
-        stack.push(stack[i]);
-      }
-    },
-    index: function PostScriptStack_index(n) {
-      this.push(this.stack[this.stack.length - n - 1]);
-    },
-    roll: function PostScriptStack_roll(n, p) {
-      var stack = this.stack;
-      var l = stack.length - n;
-      var r = stack.length - 1,
-          c = l + (p - Math.floor(p / n) * n),
-          i,
-          j,
-          t;
-
-      for (i = l, j = r; i < j; i++, j--) {
-        t = stack[i];
-        stack[i] = stack[j];
-        stack[j] = t;
-      }
-
-      for (i = l, j = c - 1; i < j; i++, j--) {
-        t = stack[i];
-        stack[i] = stack[j];
-        stack[j] = t;
-      }
-
-      for (i = c, j = r; i < j; i++, j--) {
-        t = stack[i];
-        stack[i] = stack[j];
-        stack[j] = t;
-      }
-    }
-  };
-  return PostScriptStack;
-}();
-
-var PostScriptEvaluator = function PostScriptEvaluatorClosure() {
-  function PostScriptEvaluator(operators) {
-    this.operators = operators;
-  }
-
-  PostScriptEvaluator.prototype = {
-    execute: function PostScriptEvaluator_execute(initialStack) {
-      var stack = new PostScriptStack(initialStack);
-      var counter = 0;
-      var operators = this.operators;
-      var length = operators.length;
-      var operator, a, b;
-
-      while (counter < length) {
-        operator = operators[counter++];
-
-        if (typeof operator === "number") {
-          stack.push(operator);
-          continue;
-        }
-
-        switch (operator) {
-          case "jz":
-            b = stack.pop();
-            a = stack.pop();
-
-            if (!a) {
-              counter = b;
-            }
-
-            break;
-
-          case "j":
-            a = stack.pop();
-            counter = a;
-            break;
-
-          case "abs":
-            a = stack.pop();
-            stack.push(Math.abs(a));
-            break;
-
-          case "add":
-            b = stack.pop();
-            a = stack.pop();
-            stack.push(a + b);
-            break;
-
-          case "and":
-            b = stack.pop();
-            a = stack.pop();
-
-            if ((0, _util.isBool)(a) && (0, _util.isBool)(b)) {
-              stack.push(a && b);
-            } else {
-              stack.push(a & b);
-            }
-
-            break;
-
-          case "atan":
-            a = stack.pop();
-            stack.push(Math.atan(a));
-            break;
-
-          case "bitshift":
-            b = stack.pop();
-            a = stack.pop();
-
-            if (a > 0) {
-              stack.push(a << b);
-            } else {
-              stack.push(a >> b);
-            }
-
-            break;
-
-          case "ceiling":
-            a = stack.pop();
-            stack.push(Math.ceil(a));
-            break;
-
-          case "copy":
-            a = stack.pop();
-            stack.copy(a);
-            break;
-
-          case "cos":
-            a = stack.pop();
-            stack.push(Math.cos(a));
-            break;
-
-          case "cvi":
-            a = stack.pop() | 0;
-            stack.push(a);
-            break;
-
-          case "cvr":
-            break;
-
-          case "div":
-            b = stack.pop();
-            a = stack.pop();
-            stack.push(a / b);
-            break;
-
-          case "dup":
-            stack.copy(1);
-            break;
-
-          case "eq":
-            b = stack.pop();
-            a = stack.pop();
-            stack.push(a === b);
-            break;
-
-          case "exch":
-            stack.roll(2, 1);
-            break;
-
-          case "exp":
-            b = stack.pop();
-            a = stack.pop();
-            stack.push(a ** b);
-            break;
-
-          case "false":
-            stack.push(false);
-            break;
-
-          case "floor":
-            a = stack.pop();
-            stack.push(Math.floor(a));
-            break;
-
-          case "ge":
-            b = stack.pop();
-            a = stack.pop();
-            stack.push(a >= b);
-            break;
-
-          case "gt":
-            b = stack.pop();
-            a = stack.pop();
-            stack.push(a > b);
-            break;
-
-          case "idiv":
-            b = stack.pop();
-            a = stack.pop();
-            stack.push(a / b | 0);
-            break;
-
-          case "index":
-            a = stack.pop();
-            stack.index(a);
-            break;
-
-          case "le":
-            b = stack.pop();
-            a = stack.pop();
-            stack.push(a <= b);
-            break;
-
-          case "ln":
-            a = stack.pop();
-            stack.push(Math.log(a));
-            break;
-
-          case "log":
-            a = stack.pop();
-            stack.push(Math.log(a) / Math.LN10);
-            break;
-
-          case "lt":
-            b = stack.pop();
-            a = stack.pop();
-            stack.push(a < b);
-            break;
-
-          case "mod":
-            b = stack.pop();
-            a = stack.pop();
-            stack.push(a % b);
-            break;
-
-          case "mul":
-            b = stack.pop();
-            a = stack.pop();
-            stack.push(a * b);
-            break;
-
-          case "ne":
-            b = stack.pop();
-            a = stack.pop();
-            stack.push(a !== b);
-            break;
-
-          case "neg":
-            a = stack.pop();
-            stack.push(-a);
-            break;
-
-          case "not":
-            a = stack.pop();
-
-            if ((0, _util.isBool)(a)) {
-              stack.push(!a);
-            } else {
-              stack.push(~a);
-            }
-
-            break;
-
-          case "or":
-            b = stack.pop();
-            a = stack.pop();
-
-            if ((0, _util.isBool)(a) && (0, _util.isBool)(b)) {
-              stack.push(a || b);
-            } else {
-              stack.push(a | b);
-            }
-
-            break;
-
-          case "pop":
-            stack.pop();
-            break;
-
-          case "roll":
-            b = stack.pop();
-            a = stack.pop();
-            stack.roll(a, b);
-            break;
-
-          case "round":
-            a = stack.pop();
-            stack.push(Math.round(a));
-            break;
-
-          case "sin":
-            a = stack.pop();
-            stack.push(Math.sin(a));
-            break;
-
-          case "sqrt":
-            a = stack.pop();
-            stack.push(Math.sqrt(a));
-            break;
-
-          case "sub":
-            b = stack.pop();
-            a = stack.pop();
-            stack.push(a - b);
-            break;
-
-          case "true":
-            stack.push(true);
-            break;
-
-          case "truncate":
-            a = stack.pop();
-            a = a < 0 ? Math.ceil(a) : Math.floor(a);
-            stack.push(a);
-            break;
-
-          case "xor":
-            b = stack.pop();
-            a = stack.pop();
-
-            if ((0, _util.isBool)(a) && (0, _util.isBool)(b)) {
-              stack.push(a !== b);
-            } else {
-              stack.push(a ^ b);
-            }
-
-            break;
-
-          default:
-            throw new _util.FormatError(`Unknown operator ${operator}`);
-        }
-      }
-
-      return stack.stack;
-    }
-  };
-  return PostScriptEvaluator;
-}();
-
-exports.PostScriptEvaluator = PostScriptEvaluator;
-
-var PostScriptCompiler = function PostScriptCompilerClosure() {
-  function AstNode(type) {
-    this.type = type;
-  }
-
-  AstNode.prototype.visit = function (visitor) {
-    (0, _util.unreachable)("abstract method");
-  };
-
-  function AstArgument(index, min, max) {
-    AstNode.call(this, "args");
-    this.index = index;
-    this.min = min;
-    this.max = max;
-  }
-
-  AstArgument.prototype = Object.create(AstNode.prototype);
-
-  AstArgument.prototype.visit = function (visitor) {
-    visitor.visitArgument(this);
-  };
-
-  function AstLiteral(number) {
-    AstNode.call(this, "literal");
-    this.number = number;
-    this.min = number;
-    this.max = number;
-  }
-
-  AstLiteral.prototype = Object.create(AstNode.prototype);
-
-  AstLiteral.prototype.visit = function (visitor) {
-    visitor.visitLiteral(this);
-  };
-
-  function AstBinaryOperation(op, arg1, arg2, min, max) {
-    AstNode.call(this, "binary");
-    this.op = op;
-    this.arg1 = arg1;
-    this.arg2 = arg2;
-    this.min = min;
-    this.max = max;
-  }
-
-  AstBinaryOperation.prototype = Object.create(AstNode.prototype);
-
-  AstBinaryOperation.prototype.visit = function (visitor) {
-    visitor.visitBinaryOperation(this);
-  };
-
-  function AstMin(arg, max) {
-    AstNode.call(this, "max");
-    this.arg = arg;
-    this.min = arg.min;
-    this.max = max;
-  }
-
-  AstMin.prototype = Object.create(AstNode.prototype);
-
-  AstMin.prototype.visit = function (visitor) {
-    visitor.visitMin(this);
-  };
-
-  function AstVariable(index, min, max) {
-    AstNode.call(this, "var");
-    this.index = index;
-    this.min = min;
-    this.max = max;
-  }
-
-  AstVariable.prototype = Object.create(AstNode.prototype);
-
-  AstVariable.prototype.visit = function (visitor) {
-    visitor.visitVariable(this);
-  };
-
-  function AstVariableDefinition(variable, arg) {
-    AstNode.call(this, "definition");
-    this.variable = variable;
-    this.arg = arg;
-  }
-
-  AstVariableDefinition.prototype = Object.create(AstNode.prototype);
-
-  AstVariableDefinition.prototype.visit = function (visitor) {
-    visitor.visitVariableDefinition(this);
-  };
-
-  function ExpressionBuilderVisitor() {
-    this.parts = [];
-  }
-
-  ExpressionBuilderVisitor.prototype = {
-    visitArgument(arg) {
-      this.parts.push("Math.max(", arg.min, ", Math.min(", arg.max, ", src[srcOffset + ", arg.index, "]))");
-    },
-
-    visitVariable(variable) {
-      this.parts.push("v", variable.index);
-    },
-
-    visitLiteral(literal) {
-      this.parts.push(literal.number);
-    },
-
-    visitBinaryOperation(operation) {
-      this.parts.push("(");
-      operation.arg1.visit(this);
-      this.parts.push(" ", operation.op, " ");
-      operation.arg2.visit(this);
-      this.parts.push(")");
-    },
-
-    visitVariableDefinition(definition) {
-      this.parts.push("var ");
-      definition.variable.visit(this);
-      this.parts.push(" = ");
-      definition.arg.visit(this);
-      this.parts.push(";");
-    },
-
-    visitMin(max) {
-      this.parts.push("Math.min(");
-      max.arg.visit(this);
-      this.parts.push(", ", max.max, ")");
-    },
-
-    toString() {
-      return this.parts.join("");
-    }
-
-  };
-
-  function buildAddOperation(num1, num2) {
-    if (num2.type === "literal" && num2.number === 0) {
-      return num1;
-    }
-
-    if (num1.type === "literal" && num1.number === 0) {
-      return num2;
-    }
-
-    if (num2.type === "literal" && num1.type === "literal") {
-      return new AstLiteral(num1.number + num2.number);
-    }
-
-    return new AstBinaryOperation("+", num1, num2, num1.min + num2.min, num1.max + num2.max);
-  }
-
-  function buildMulOperation(num1, num2) {
-    if (num2.type === "literal") {
-      if (num2.number === 0) {
-        return new AstLiteral(0);
-      } else if (num2.number === 1) {
-        return num1;
-      } else if (num1.type === "literal") {
-        return new AstLiteral(num1.number * num2.number);
-      }
-    }
-
-    if (num1.type === "literal") {
-      if (num1.number === 0) {
-        return new AstLiteral(0);
-      } else if (num1.number === 1) {
-        return num2;
-      }
-    }
-
-    var min = Math.min(num1.min * num2.min, num1.min * num2.max, num1.max * num2.min, num1.max * num2.max);
-    var max = Math.max(num1.min * num2.min, num1.min * num2.max, num1.max * num2.min, num1.max * num2.max);
-    return new AstBinaryOperation("*", num1, num2, min, max);
-  }
-
-  function buildSubOperation(num1, num2) {
-    if (num2.type === "literal") {
-      if (num2.number === 0) {
-        return num1;
-      } else if (num1.type === "literal") {
-        return new AstLiteral(num1.number - num2.number);
-      }
-    }
-
-    if (num2.type === "binary" && num2.op === "-" && num1.type === "literal" && num1.number === 1 && num2.arg1.type === "literal" && num2.arg1.number === 1) {
-      return num2.arg2;
-    }
-
-    return new AstBinaryOperation("-", num1, num2, num1.min - num2.max, num1.max - num2.min);
-  }
-
-  function buildMinOperation(num1, max) {
-    if (num1.min >= max) {
-      return new AstLiteral(max);
-    } else if (num1.max <= max) {
-      return num1;
-    }
-
-    return new AstMin(num1, max);
-  }
-
-  function PostScriptCompiler() {}
-
-  PostScriptCompiler.prototype = {
-    compile: function PostScriptCompiler_compile(code, domain, range) {
-      var stack = [];
-      var instructions = [];
-      var inputSize = domain.length >> 1,
-          outputSize = range.length >> 1;
-      var lastRegister = 0;
-      var n, j;
-      var num1, num2, ast1, ast2, tmpVar, item;
-
-      for (let i = 0; i < inputSize; i++) {
-        stack.push(new AstArgument(i, domain[i * 2], domain[i * 2 + 1]));
-      }
-
-      for (let i = 0, ii = code.length; i < ii; i++) {
-        item = code[i];
-
-        if (typeof item === "number") {
-          stack.push(new AstLiteral(item));
-          continue;
-        }
-
-        switch (item) {
-          case "add":
-            if (stack.length < 2) {
-              return null;
-            }
-
-            num2 = stack.pop();
-            num1 = stack.pop();
-            stack.push(buildAddOperation(num1, num2));
-            break;
-
-          case "cvr":
-            if (stack.length < 1) {
-              return null;
-            }
-
-            break;
-
-          case "mul":
-            if (stack.length < 2) {
-              return null;
-            }
-
-            num2 = stack.pop();
-            num1 = stack.pop();
-            stack.push(buildMulOperation(num1, num2));
-            break;
-
-          case "sub":
-            if (stack.length < 2) {
-              return null;
-            }
-
-            num2 = stack.pop();
-            num1 = stack.pop();
-            stack.push(buildSubOperation(num1, num2));
-            break;
-
-          case "exch":
-            if (stack.length < 2) {
-              return null;
-            }
-
-            ast1 = stack.pop();
-            ast2 = stack.pop();
-            stack.push(ast1, ast2);
-            break;
-
-          case "pop":
-            if (stack.length < 1) {
-              return null;
-            }
-
-            stack.pop();
-            break;
-
-          case "index":
-            if (stack.length < 1) {
-              return null;
-            }
-
-            num1 = stack.pop();
-
-            if (num1.type !== "literal") {
-              return null;
-            }
-
-            n = num1.number;
-
-            if (n < 0 || !Number.isInteger(n) || stack.length < n) {
-              return null;
-            }
-
-            ast1 = stack[stack.length - n - 1];
-
-            if (ast1.type === "literal" || ast1.type === "var") {
-              stack.push(ast1);
-              break;
-            }
-
-            tmpVar = new AstVariable(lastRegister++, ast1.min, ast1.max);
-            stack[stack.length - n - 1] = tmpVar;
-            stack.push(tmpVar);
-            instructions.push(new AstVariableDefinition(tmpVar, ast1));
-            break;
-
-          case "dup":
-            if (stack.length < 1) {
-              return null;
-            }
-
-            if (typeof code[i + 1] === "number" && code[i + 2] === "gt" && code[i + 3] === i + 7 && code[i + 4] === "jz" && code[i + 5] === "pop" && code[i + 6] === code[i + 1]) {
-              num1 = stack.pop();
-              stack.push(buildMinOperation(num1, code[i + 1]));
-              i += 6;
-              break;
-            }
-
-            ast1 = stack[stack.length - 1];
-
-            if (ast1.type === "literal" || ast1.type === "var") {
-              stack.push(ast1);
-              break;
-            }
-
-            tmpVar = new AstVariable(lastRegister++, ast1.min, ast1.max);
-            stack[stack.length - 1] = tmpVar;
-            stack.push(tmpVar);
-            instructions.push(new AstVariableDefinition(tmpVar, ast1));
-            break;
-
-          case "roll":
-            if (stack.length < 2) {
-              return null;
-            }
-
-            num2 = stack.pop();
-            num1 = stack.pop();
-
-            if (num2.type !== "literal" || num1.type !== "literal") {
-              return null;
-            }
-
-            j = num2.number;
-            n = num1.number;
-
-            if (n <= 0 || !Number.isInteger(n) || !Number.isInteger(j) || stack.length < n) {
-              return null;
-            }
-
-            j = (j % n + n) % n;
-
-            if (j === 0) {
-              break;
-            }
-
-            Array.prototype.push.apply(stack, stack.splice(stack.length - n, n - j));
-            break;
-
-          default:
-            return null;
-        }
-      }
-
-      if (stack.length !== outputSize) {
-        return null;
-      }
-
-      var result = [];
-      instructions.forEach(function (instruction) {
-        var statementBuilder = new ExpressionBuilderVisitor();
-        instruction.visit(statementBuilder);
-        result.push(statementBuilder.toString());
-      });
-      stack.forEach(function (expr, i) {
-        var statementBuilder = new ExpressionBuilderVisitor();
-        expr.visit(statementBuilder);
-        var min = range[i * 2],
-            max = range[i * 2 + 1];
-        var out = [statementBuilder.toString()];
-
-        if (min > expr.min) {
-          out.unshift("Math.max(", min, ", ");
-          out.push(")");
-        }
-
-        if (max < expr.max) {
-          out.unshift("Math.min(", max, ", ");
-          out.push(")");
-        }
-
-        out.unshift("dest[destOffset + ", i, "] = ");
-        out.push(";");
-        result.push(out.join(""));
-      });
-      return result.join("\n");
-    }
-  };
-  return PostScriptCompiler;
-}();
-
-exports.PostScriptCompiler = PostScriptCompiler;
-
-/***/ }),
-/* 42 */
-/***/ (function(module, exports, __w_pdfjs_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.PostScriptParser = exports.PostScriptLexer = void 0;
-
-var _util = __w_pdfjs_require__(2);
-
-var _primitives = __w_pdfjs_require__(5);
-
-var _core_utils = __w_pdfjs_require__(8);
-
-class PostScriptParser {
-  constructor(lexer) {
-    this.lexer = lexer;
-    this.operators = [];
-    this.token = null;
-    this.prev = null;
-  }
-
-  nextToken() {
-    this.prev = this.token;
-    this.token = this.lexer.getToken();
-  }
-
-  accept(type) {
-    if (this.token.type === type) {
-      this.nextToken();
-      return true;
-    }
-
-    return false;
-  }
-
-  expect(type) {
-    if (this.accept(type)) {
-      return true;
-    }
-
-    throw new _util.FormatError(`Unexpected symbol: found ${this.token.type} expected ${type}.`);
-  }
-
-  parse() {
-    this.nextToken();
-    this.expect(PostScriptTokenTypes.LBRACE);
-    this.parseBlock();
-    this.expect(PostScriptTokenTypes.RBRACE);
-    return this.operators;
-  }
-
-  parseBlock() {
-    while (true) {
-      if (this.accept(PostScriptTokenTypes.NUMBER)) {
-        this.operators.push(this.prev.value);
-      } else if (this.accept(PostScriptTokenTypes.OPERATOR)) {
-        this.operators.push(this.prev.value);
-      } else if (this.accept(PostScriptTokenTypes.LBRACE)) {
-        this.parseCondition();
-      } else {
-        return;
-      }
-    }
-  }
-
-  parseCondition() {
-    const conditionLocation = this.operators.length;
-    this.operators.push(null, null);
-    this.parseBlock();
-    this.expect(PostScriptTokenTypes.RBRACE);
-
-    if (this.accept(PostScriptTokenTypes.IF)) {
-      this.operators[conditionLocation] = this.operators.length;
-      this.operators[conditionLocation + 1] = "jz";
-    } else if (this.accept(PostScriptTokenTypes.LBRACE)) {
-      const jumpLocation = this.operators.length;
-      this.operators.push(null, null);
-      const endOfTrue = this.operators.length;
-      this.parseBlock();
-      this.expect(PostScriptTokenTypes.RBRACE);
-      this.expect(PostScriptTokenTypes.IFELSE);
-      this.operators[jumpLocation] = this.operators.length;
-      this.operators[jumpLocation + 1] = "j";
-      this.operators[conditionLocation] = endOfTrue;
-      this.operators[conditionLocation + 1] = "jz";
-    } else {
-      throw new _util.FormatError("PS Function: error parsing conditional.");
-    }
-  }
-
-}
-
-exports.PostScriptParser = PostScriptParser;
-const PostScriptTokenTypes = {
-  LBRACE: 0,
-  RBRACE: 1,
-  NUMBER: 2,
-  OPERATOR: 3,
-  IF: 4,
-  IFELSE: 5
-};
-
-const PostScriptToken = function PostScriptTokenClosure() {
-  const opCache = Object.create(null);
-
-  class PostScriptToken {
-    constructor(type, value) {
-      this.type = type;
-      this.value = value;
-    }
-
-    static getOperator(op) {
-      const opValue = opCache[op];
-
-      if (opValue) {
-        return opValue;
-      }
-
-      return opCache[op] = new PostScriptToken(PostScriptTokenTypes.OPERATOR, op);
-    }
-
-    static get LBRACE() {
-      return (0, _util.shadow)(this, "LBRACE", new PostScriptToken(PostScriptTokenTypes.LBRACE, "{"));
-    }
-
-    static get RBRACE() {
-      return (0, _util.shadow)(this, "RBRACE", new PostScriptToken(PostScriptTokenTypes.RBRACE, "}"));
-    }
-
-    static get IF() {
-      return (0, _util.shadow)(this, "IF", new PostScriptToken(PostScriptTokenTypes.IF, "IF"));
-    }
-
-    static get IFELSE() {
-      return (0, _util.shadow)(this, "IFELSE", new PostScriptToken(PostScriptTokenTypes.IFELSE, "IFELSE"));
-    }
-
-  }
-
-  return PostScriptToken;
-}();
-
-class PostScriptLexer {
-  constructor(stream) {
-    this.stream = stream;
-    this.nextChar();
-    this.strBuf = [];
-  }
-
-  nextChar() {
-    return this.currentChar = this.stream.getByte();
-  }
-
-  getToken() {
-    let comment = false;
-    let ch = this.currentChar;
-
-    while (true) {
-      if (ch < 0) {
-        return _primitives.EOF;
-      }
-
-      if (comment) {
-        if (ch === 0x0a || ch === 0x0d) {
-          comment = false;
-        }
-      } else if (ch === 0x25) {
-        comment = true;
-      } else if (!(0, _core_utils.isWhiteSpace)(ch)) {
-        break;
-      }
-
-      ch = this.nextChar();
-    }
-
-    switch (ch | 0) {
-      case 0x30:
-      case 0x31:
-      case 0x32:
-      case 0x33:
-      case 0x34:
-      case 0x35:
-      case 0x36:
-      case 0x37:
-      case 0x38:
-      case 0x39:
-      case 0x2b:
-      case 0x2d:
-      case 0x2e:
-        return new PostScriptToken(PostScriptTokenTypes.NUMBER, this.getNumber());
-
-      case 0x7b:
-        this.nextChar();
-        return PostScriptToken.LBRACE;
-
-      case 0x7d:
-        this.nextChar();
-        return PostScriptToken.RBRACE;
-    }
-
-    const strBuf = this.strBuf;
-    strBuf.length = 0;
-    strBuf[0] = String.fromCharCode(ch);
-
-    while ((ch = this.nextChar()) >= 0 && (ch >= 0x41 && ch <= 0x5a || ch >= 0x61 && ch <= 0x7a)) {
-      strBuf.push(String.fromCharCode(ch));
-    }
-
-    const str = strBuf.join("");
-
-    switch (str.toLowerCase()) {
-      case "if":
-        return PostScriptToken.IF;
-
-      case "ifelse":
-        return PostScriptToken.IFELSE;
-
-      default:
-        return PostScriptToken.getOperator(str);
-    }
-  }
-
-  getNumber() {
-    let ch = this.currentChar;
-    const strBuf = this.strBuf;
-    strBuf.length = 0;
-    strBuf[0] = String.fromCharCode(ch);
-
-    while ((ch = this.nextChar()) >= 0) {
-      if (ch >= 0x30 && ch <= 0x39 || ch === 0x2d || ch === 0x2e) {
-        strBuf.push(String.fromCharCode(ch));
-      } else {
-        break;
-      }
-    }
-
-    const value = parseFloat(strBuf.join(""));
-
-    if (isNaN(value)) {
-      throw new _util.FormatError(`Invalid floating point number: ${value}`);
-    }
-
-    return value;
-  }
-
-}
-
-exports.PostScriptLexer = PostScriptLexer;
-
-/***/ }),
 /* 43 */
 /***/ (function(module, exports, __w_pdfjs_require__) {
 
@@ -44928,58 +45027,58 @@ var _jpeg_stream = __w_pdfjs_require__(18);
 
 var _jpx = __w_pdfjs_require__(21);
 
-var PDFImage = function PDFImageClosure() {
-  function decodeAndClamp(value, addend, coefficient, max) {
-    value = addend + value * coefficient;
+function decodeAndClamp(value, addend, coefficient, max) {
+  value = addend + value * coefficient;
 
-    if (value < 0) {
-      value = 0;
-    } else if (value > max) {
-      value = max;
-    }
-
-    return value;
+  if (value < 0) {
+    value = 0;
+  } else if (value > max) {
+    value = max;
   }
 
-  function resizeImageMask(src, bpc, w1, h1, w2, h2) {
-    var length = w2 * h2;
-    let dest;
+  return value;
+}
 
-    if (bpc <= 8) {
-      dest = new Uint8Array(length);
-    } else if (bpc <= 16) {
-      dest = new Uint16Array(length);
-    } else {
-      dest = new Uint32Array(length);
-    }
+function resizeImageMask(src, bpc, w1, h1, w2, h2) {
+  var length = w2 * h2;
+  let dest;
 
-    var xRatio = w1 / w2;
-    var yRatio = h1 / h2;
-    var i,
-        j,
-        py,
-        newIndex = 0,
-        oldIndex;
-    var xScaled = new Uint16Array(w2);
-    var w1Scanline = w1;
-
-    for (i = 0; i < w2; i++) {
-      xScaled[i] = Math.floor(i * xRatio);
-    }
-
-    for (i = 0; i < h2; i++) {
-      py = Math.floor(i * yRatio) * w1Scanline;
-
-      for (j = 0; j < w2; j++) {
-        oldIndex = py + xScaled[j];
-        dest[newIndex++] = src[oldIndex];
-      }
-    }
-
-    return dest;
+  if (bpc <= 8) {
+    dest = new Uint8Array(length);
+  } else if (bpc <= 16) {
+    dest = new Uint16Array(length);
+  } else {
+    dest = new Uint32Array(length);
   }
 
-  function PDFImage({
+  var xRatio = w1 / w2;
+  var yRatio = h1 / h2;
+  var i,
+      j,
+      py,
+      newIndex = 0,
+      oldIndex;
+  var xScaled = new Uint16Array(w2);
+  var w1Scanline = w1;
+
+  for (i = 0; i < w2; i++) {
+    xScaled[i] = Math.floor(i * xRatio);
+  }
+
+  for (i = 0; i < h2; i++) {
+    py = Math.floor(i * yRatio) * w1Scanline;
+
+    for (j = 0; j < w2; j++) {
+      oldIndex = py + xScaled[j];
+      dest[newIndex++] = src[oldIndex];
+    }
+  }
+
+  return dest;
+}
+
+class PDFImage {
+  constructor({
     xref,
     res,
     image,
@@ -45132,7 +45231,7 @@ var PDFImage = function PDFImageClosure() {
     }
   }
 
-  PDFImage.buildImage = async function ({
+  static async buildImage({
     xref,
     res,
     image,
@@ -45166,9 +45265,9 @@ var PDFImage = function PDFImageClosure() {
       pdfFunctionFactory,
       localColorSpaceCache
     });
-  };
+  }
 
-  PDFImage.createMask = function ({
+  static createMask({
     imgArray,
     width,
     height,
@@ -45205,379 +45304,376 @@ var PDFImage = function PDFImageClosure() {
       width,
       height
     };
-  };
+  }
 
-  PDFImage.prototype = {
-    get drawWidth() {
-      return Math.max(this.width, this.smask && this.smask.width || 0, this.mask && this.mask.width || 0);
-    },
+  get drawWidth() {
+    return Math.max(this.width, this.smask && this.smask.width || 0, this.mask && this.mask.width || 0);
+  }
 
-    get drawHeight() {
-      return Math.max(this.height, this.smask && this.smask.height || 0, this.mask && this.mask.height || 0);
-    },
+  get drawHeight() {
+    return Math.max(this.height, this.smask && this.smask.height || 0, this.mask && this.mask.height || 0);
+  }
 
-    decodeBuffer(buffer) {
-      var bpc = this.bpc;
-      var numComps = this.numComps;
-      var decodeAddends = this.decodeAddends;
-      var decodeCoefficients = this.decodeCoefficients;
-      var max = (1 << bpc) - 1;
-      var i, ii;
+  decodeBuffer(buffer) {
+    var bpc = this.bpc;
+    var numComps = this.numComps;
+    var decodeAddends = this.decodeAddends;
+    var decodeCoefficients = this.decodeCoefficients;
+    var max = (1 << bpc) - 1;
+    var i, ii;
 
-      if (bpc === 1) {
-        for (i = 0, ii = buffer.length; i < ii; i++) {
-          buffer[i] = +!buffer[i];
-        }
-
-        return;
+    if (bpc === 1) {
+      for (i = 0, ii = buffer.length; i < ii; i++) {
+        buffer[i] = +!buffer[i];
       }
 
-      var index = 0;
-
-      for (i = 0, ii = this.width * this.height; i < ii; i++) {
-        for (var j = 0; j < numComps; j++) {
-          buffer[index] = decodeAndClamp(buffer[index], decodeAddends[j], decodeCoefficients[j], max);
-          index++;
-        }
-      }
-    },
-
-    getComponents(buffer) {
-      var bpc = this.bpc;
-
-      if (bpc === 8) {
-        return buffer;
-      }
-
-      var width = this.width;
-      var height = this.height;
-      var numComps = this.numComps;
-      var length = width * height * numComps;
-      var bufferPos = 0;
-      let output;
-
-      if (bpc <= 8) {
-        output = new Uint8Array(length);
-      } else if (bpc <= 16) {
-        output = new Uint16Array(length);
-      } else {
-        output = new Uint32Array(length);
-      }
-
-      var rowComps = width * numComps;
-      var max = (1 << bpc) - 1;
-      var i = 0,
-          ii,
-          buf;
-
-      if (bpc === 1) {
-        var mask, loop1End, loop2End;
-
-        for (var j = 0; j < height; j++) {
-          loop1End = i + (rowComps & ~7);
-          loop2End = i + rowComps;
-
-          while (i < loop1End) {
-            buf = buffer[bufferPos++];
-            output[i] = buf >> 7 & 1;
-            output[i + 1] = buf >> 6 & 1;
-            output[i + 2] = buf >> 5 & 1;
-            output[i + 3] = buf >> 4 & 1;
-            output[i + 4] = buf >> 3 & 1;
-            output[i + 5] = buf >> 2 & 1;
-            output[i + 6] = buf >> 1 & 1;
-            output[i + 7] = buf & 1;
-            i += 8;
-          }
-
-          if (i < loop2End) {
-            buf = buffer[bufferPos++];
-            mask = 128;
-
-            while (i < loop2End) {
-              output[i++] = +!!(buf & mask);
-              mask >>= 1;
-            }
-          }
-        }
-      } else {
-        var bits = 0;
-        buf = 0;
-
-        for (i = 0, ii = length; i < ii; ++i) {
-          if (i % rowComps === 0) {
-            buf = 0;
-            bits = 0;
-          }
-
-          while (bits < bpc) {
-            buf = buf << 8 | buffer[bufferPos++];
-            bits += 8;
-          }
-
-          var remainingBits = bits - bpc;
-          let value = buf >> remainingBits;
-
-          if (value < 0) {
-            value = 0;
-          } else if (value > max) {
-            value = max;
-          }
-
-          output[i] = value;
-          buf = buf & (1 << remainingBits) - 1;
-          bits = remainingBits;
-        }
-      }
-
-      return output;
-    },
-
-    fillOpacity(rgbaBuf, width, height, actualHeight, image) {
-      var smask = this.smask;
-      var mask = this.mask;
-      var alphaBuf, sw, sh, i, ii, j;
-
-      if (smask) {
-        sw = smask.width;
-        sh = smask.height;
-        alphaBuf = new Uint8ClampedArray(sw * sh);
-        smask.fillGrayBuffer(alphaBuf);
-
-        if (sw !== width || sh !== height) {
-          alphaBuf = resizeImageMask(alphaBuf, smask.bpc, sw, sh, width, height);
-        }
-      } else if (mask) {
-        if (mask instanceof PDFImage) {
-          sw = mask.width;
-          sh = mask.height;
-          alphaBuf = new Uint8ClampedArray(sw * sh);
-          mask.numComps = 1;
-          mask.fillGrayBuffer(alphaBuf);
-
-          for (i = 0, ii = sw * sh; i < ii; ++i) {
-            alphaBuf[i] = 255 - alphaBuf[i];
-          }
-
-          if (sw !== width || sh !== height) {
-            alphaBuf = resizeImageMask(alphaBuf, mask.bpc, sw, sh, width, height);
-          }
-        } else if (Array.isArray(mask)) {
-          alphaBuf = new Uint8ClampedArray(width * height);
-          var numComps = this.numComps;
-
-          for (i = 0, ii = width * height; i < ii; ++i) {
-            var opacity = 0;
-            var imageOffset = i * numComps;
-
-            for (j = 0; j < numComps; ++j) {
-              var color = image[imageOffset + j];
-              var maskOffset = j * 2;
-
-              if (color < mask[maskOffset] || color > mask[maskOffset + 1]) {
-                opacity = 255;
-                break;
-              }
-            }
-
-            alphaBuf[i] = opacity;
-          }
-        } else {
-          throw new _util.FormatError("Unknown mask format.");
-        }
-      }
-
-      if (alphaBuf) {
-        for (i = 0, j = 3, ii = width * actualHeight; i < ii; ++i, j += 4) {
-          rgbaBuf[j] = alphaBuf[i];
-        }
-      } else {
-        for (i = 0, j = 3, ii = width * actualHeight; i < ii; ++i, j += 4) {
-          rgbaBuf[j] = 255;
-        }
-      }
-    },
-
-    undoPreblend(buffer, width, height) {
-      var matte = this.smask && this.smask.matte;
-
-      if (!matte) {
-        return;
-      }
-
-      var matteRgb = this.colorSpace.getRgb(matte, 0);
-      var matteR = matteRgb[0];
-      var matteG = matteRgb[1];
-      var matteB = matteRgb[2];
-      var length = width * height * 4;
-
-      for (var i = 0; i < length; i += 4) {
-        var alpha = buffer[i + 3];
-
-        if (alpha === 0) {
-          buffer[i] = 255;
-          buffer[i + 1] = 255;
-          buffer[i + 2] = 255;
-          continue;
-        }
-
-        var k = 255 / alpha;
-        buffer[i] = (buffer[i] - matteR) * k + matteR;
-        buffer[i + 1] = (buffer[i + 1] - matteG) * k + matteG;
-        buffer[i + 2] = (buffer[i + 2] - matteB) * k + matteB;
-      }
-    },
-
-    createImageData(forceRGBA = false) {
-      var drawWidth = this.drawWidth;
-      var drawHeight = this.drawHeight;
-      var imgData = {
-        width: drawWidth,
-        height: drawHeight,
-        kind: 0,
-        data: null
-      };
-      var numComps = this.numComps;
-      var originalWidth = this.width;
-      var originalHeight = this.height;
-      var bpc = this.bpc;
-      var rowBytes = originalWidth * numComps * bpc + 7 >> 3;
-      var imgArray;
-
-      if (!forceRGBA) {
-        var kind;
-
-        if (this.colorSpace.name === "DeviceGray" && bpc === 1) {
-          kind = _util.ImageKind.GRAYSCALE_1BPP;
-        } else if (this.colorSpace.name === "DeviceRGB" && bpc === 8 && !this.needsDecode) {
-          kind = _util.ImageKind.RGB_24BPP;
-        }
-
-        if (kind && !this.smask && !this.mask && drawWidth === originalWidth && drawHeight === originalHeight) {
-          imgData.kind = kind;
-          imgArray = this.getImageBytes(originalHeight * rowBytes);
-
-          if (this.image instanceof _stream.DecodeStream) {
-            imgData.data = imgArray;
-          } else {
-            var newArray = new Uint8ClampedArray(imgArray.length);
-            newArray.set(imgArray);
-            imgData.data = newArray;
-          }
-
-          if (this.needsDecode) {
-            (0, _util.assert)(kind === _util.ImageKind.GRAYSCALE_1BPP, "PDFImage.createImageData: The image must be grayscale.");
-            var buffer = imgData.data;
-
-            for (var i = 0, ii = buffer.length; i < ii; i++) {
-              buffer[i] ^= 0xff;
-            }
-          }
-
-          return imgData;
-        }
-
-        if (this.image instanceof _jpeg_stream.JpegStream && !this.smask && !this.mask) {
-          let imageLength = originalHeight * rowBytes;
-
-          switch (this.colorSpace.name) {
-            case "DeviceGray":
-              imageLength *= 3;
-
-            case "DeviceRGB":
-            case "DeviceCMYK":
-              imgData.kind = _util.ImageKind.RGB_24BPP;
-              imgData.data = this.getImageBytes(imageLength, drawWidth, drawHeight, true);
-              return imgData;
-          }
-        }
-      }
-
-      imgArray = this.getImageBytes(originalHeight * rowBytes);
-      var actualHeight = 0 | imgArray.length / rowBytes * drawHeight / originalHeight;
-      var comps = this.getComponents(imgArray);
-      var alpha01, maybeUndoPreblend;
-
-      if (!forceRGBA && !this.smask && !this.mask) {
-        imgData.kind = _util.ImageKind.RGB_24BPP;
-        imgData.data = new Uint8ClampedArray(drawWidth * drawHeight * 3);
-        alpha01 = 0;
-        maybeUndoPreblend = false;
-      } else {
-        imgData.kind = _util.ImageKind.RGBA_32BPP;
-        imgData.data = new Uint8ClampedArray(drawWidth * drawHeight * 4);
-        alpha01 = 1;
-        maybeUndoPreblend = true;
-        this.fillOpacity(imgData.data, drawWidth, drawHeight, actualHeight, comps);
-      }
-
-      if (this.needsDecode) {
-        this.decodeBuffer(comps);
-      }
-
-      this.colorSpace.fillRgb(imgData.data, originalWidth, originalHeight, drawWidth, drawHeight, actualHeight, bpc, comps, alpha01);
-
-      if (maybeUndoPreblend) {
-        this.undoPreblend(imgData.data, drawWidth, actualHeight);
-      }
-
-      return imgData;
-    },
-
-    fillGrayBuffer(buffer) {
-      var numComps = this.numComps;
-
-      if (numComps !== 1) {
-        throw new _util.FormatError(`Reading gray scale from a color image: ${numComps}`);
-      }
-
-      var width = this.width;
-      var height = this.height;
-      var bpc = this.bpc;
-      var rowBytes = width * numComps * bpc + 7 >> 3;
-      var imgArray = this.getImageBytes(height * rowBytes);
-      var comps = this.getComponents(imgArray);
-      var i, length;
-
-      if (bpc === 1) {
-        length = width * height;
-
-        if (this.needsDecode) {
-          for (i = 0; i < length; ++i) {
-            buffer[i] = comps[i] - 1 & 255;
-          }
-        } else {
-          for (i = 0; i < length; ++i) {
-            buffer[i] = -comps[i] & 255;
-          }
-        }
-
-        return;
-      }
-
-      if (this.needsDecode) {
-        this.decodeBuffer(comps);
-      }
-
-      length = width * height;
-      var scale = 255 / ((1 << bpc) - 1);
-
-      for (i = 0; i < length; ++i) {
-        buffer[i] = scale * comps[i];
-      }
-    },
-
-    getImageBytes(length, drawWidth, drawHeight, forceRGB = false) {
-      this.image.reset();
-      this.image.drawWidth = drawWidth || this.width;
-      this.image.drawHeight = drawHeight || this.height;
-      this.image.forceRGB = !!forceRGB;
-      return this.image.getBytes(length, true);
+      return;
     }
 
-  };
-  return PDFImage;
-}();
+    var index = 0;
+
+    for (i = 0, ii = this.width * this.height; i < ii; i++) {
+      for (var j = 0; j < numComps; j++) {
+        buffer[index] = decodeAndClamp(buffer[index], decodeAddends[j], decodeCoefficients[j], max);
+        index++;
+      }
+    }
+  }
+
+  getComponents(buffer) {
+    var bpc = this.bpc;
+
+    if (bpc === 8) {
+      return buffer;
+    }
+
+    var width = this.width;
+    var height = this.height;
+    var numComps = this.numComps;
+    var length = width * height * numComps;
+    var bufferPos = 0;
+    let output;
+
+    if (bpc <= 8) {
+      output = new Uint8Array(length);
+    } else if (bpc <= 16) {
+      output = new Uint16Array(length);
+    } else {
+      output = new Uint32Array(length);
+    }
+
+    var rowComps = width * numComps;
+    var max = (1 << bpc) - 1;
+    var i = 0,
+        ii,
+        buf;
+
+    if (bpc === 1) {
+      var mask, loop1End, loop2End;
+
+      for (var j = 0; j < height; j++) {
+        loop1End = i + (rowComps & ~7);
+        loop2End = i + rowComps;
+
+        while (i < loop1End) {
+          buf = buffer[bufferPos++];
+          output[i] = buf >> 7 & 1;
+          output[i + 1] = buf >> 6 & 1;
+          output[i + 2] = buf >> 5 & 1;
+          output[i + 3] = buf >> 4 & 1;
+          output[i + 4] = buf >> 3 & 1;
+          output[i + 5] = buf >> 2 & 1;
+          output[i + 6] = buf >> 1 & 1;
+          output[i + 7] = buf & 1;
+          i += 8;
+        }
+
+        if (i < loop2End) {
+          buf = buffer[bufferPos++];
+          mask = 128;
+
+          while (i < loop2End) {
+            output[i++] = +!!(buf & mask);
+            mask >>= 1;
+          }
+        }
+      }
+    } else {
+      var bits = 0;
+      buf = 0;
+
+      for (i = 0, ii = length; i < ii; ++i) {
+        if (i % rowComps === 0) {
+          buf = 0;
+          bits = 0;
+        }
+
+        while (bits < bpc) {
+          buf = buf << 8 | buffer[bufferPos++];
+          bits += 8;
+        }
+
+        var remainingBits = bits - bpc;
+        let value = buf >> remainingBits;
+
+        if (value < 0) {
+          value = 0;
+        } else if (value > max) {
+          value = max;
+        }
+
+        output[i] = value;
+        buf = buf & (1 << remainingBits) - 1;
+        bits = remainingBits;
+      }
+    }
+
+    return output;
+  }
+
+  fillOpacity(rgbaBuf, width, height, actualHeight, image) {
+    var smask = this.smask;
+    var mask = this.mask;
+    var alphaBuf, sw, sh, i, ii, j;
+
+    if (smask) {
+      sw = smask.width;
+      sh = smask.height;
+      alphaBuf = new Uint8ClampedArray(sw * sh);
+      smask.fillGrayBuffer(alphaBuf);
+
+      if (sw !== width || sh !== height) {
+        alphaBuf = resizeImageMask(alphaBuf, smask.bpc, sw, sh, width, height);
+      }
+    } else if (mask) {
+      if (mask instanceof PDFImage) {
+        sw = mask.width;
+        sh = mask.height;
+        alphaBuf = new Uint8ClampedArray(sw * sh);
+        mask.numComps = 1;
+        mask.fillGrayBuffer(alphaBuf);
+
+        for (i = 0, ii = sw * sh; i < ii; ++i) {
+          alphaBuf[i] = 255 - alphaBuf[i];
+        }
+
+        if (sw !== width || sh !== height) {
+          alphaBuf = resizeImageMask(alphaBuf, mask.bpc, sw, sh, width, height);
+        }
+      } else if (Array.isArray(mask)) {
+        alphaBuf = new Uint8ClampedArray(width * height);
+        var numComps = this.numComps;
+
+        for (i = 0, ii = width * height; i < ii; ++i) {
+          var opacity = 0;
+          var imageOffset = i * numComps;
+
+          for (j = 0; j < numComps; ++j) {
+            var color = image[imageOffset + j];
+            var maskOffset = j * 2;
+
+            if (color < mask[maskOffset] || color > mask[maskOffset + 1]) {
+              opacity = 255;
+              break;
+            }
+          }
+
+          alphaBuf[i] = opacity;
+        }
+      } else {
+        throw new _util.FormatError("Unknown mask format.");
+      }
+    }
+
+    if (alphaBuf) {
+      for (i = 0, j = 3, ii = width * actualHeight; i < ii; ++i, j += 4) {
+        rgbaBuf[j] = alphaBuf[i];
+      }
+    } else {
+      for (i = 0, j = 3, ii = width * actualHeight; i < ii; ++i, j += 4) {
+        rgbaBuf[j] = 255;
+      }
+    }
+  }
+
+  undoPreblend(buffer, width, height) {
+    var matte = this.smask && this.smask.matte;
+
+    if (!matte) {
+      return;
+    }
+
+    var matteRgb = this.colorSpace.getRgb(matte, 0);
+    var matteR = matteRgb[0];
+    var matteG = matteRgb[1];
+    var matteB = matteRgb[2];
+    var length = width * height * 4;
+
+    for (var i = 0; i < length; i += 4) {
+      var alpha = buffer[i + 3];
+
+      if (alpha === 0) {
+        buffer[i] = 255;
+        buffer[i + 1] = 255;
+        buffer[i + 2] = 255;
+        continue;
+      }
+
+      var k = 255 / alpha;
+      buffer[i] = (buffer[i] - matteR) * k + matteR;
+      buffer[i + 1] = (buffer[i + 1] - matteG) * k + matteG;
+      buffer[i + 2] = (buffer[i + 2] - matteB) * k + matteB;
+    }
+  }
+
+  createImageData(forceRGBA = false) {
+    var drawWidth = this.drawWidth;
+    var drawHeight = this.drawHeight;
+    var imgData = {
+      width: drawWidth,
+      height: drawHeight,
+      kind: 0,
+      data: null
+    };
+    var numComps = this.numComps;
+    var originalWidth = this.width;
+    var originalHeight = this.height;
+    var bpc = this.bpc;
+    var rowBytes = originalWidth * numComps * bpc + 7 >> 3;
+    var imgArray;
+
+    if (!forceRGBA) {
+      var kind;
+
+      if (this.colorSpace.name === "DeviceGray" && bpc === 1) {
+        kind = _util.ImageKind.GRAYSCALE_1BPP;
+      } else if (this.colorSpace.name === "DeviceRGB" && bpc === 8 && !this.needsDecode) {
+        kind = _util.ImageKind.RGB_24BPP;
+      }
+
+      if (kind && !this.smask && !this.mask && drawWidth === originalWidth && drawHeight === originalHeight) {
+        imgData.kind = kind;
+        imgArray = this.getImageBytes(originalHeight * rowBytes);
+
+        if (this.image instanceof _stream.DecodeStream) {
+          imgData.data = imgArray;
+        } else {
+          var newArray = new Uint8ClampedArray(imgArray.length);
+          newArray.set(imgArray);
+          imgData.data = newArray;
+        }
+
+        if (this.needsDecode) {
+          (0, _util.assert)(kind === _util.ImageKind.GRAYSCALE_1BPP, "PDFImage.createImageData: The image must be grayscale.");
+          var buffer = imgData.data;
+
+          for (var i = 0, ii = buffer.length; i < ii; i++) {
+            buffer[i] ^= 0xff;
+          }
+        }
+
+        return imgData;
+      }
+
+      if (this.image instanceof _jpeg_stream.JpegStream && !this.smask && !this.mask) {
+        let imageLength = originalHeight * rowBytes;
+
+        switch (this.colorSpace.name) {
+          case "DeviceGray":
+            imageLength *= 3;
+
+          case "DeviceRGB":
+          case "DeviceCMYK":
+            imgData.kind = _util.ImageKind.RGB_24BPP;
+            imgData.data = this.getImageBytes(imageLength, drawWidth, drawHeight, true);
+            return imgData;
+        }
+      }
+    }
+
+    imgArray = this.getImageBytes(originalHeight * rowBytes);
+    var actualHeight = 0 | imgArray.length / rowBytes * drawHeight / originalHeight;
+    var comps = this.getComponents(imgArray);
+    var alpha01, maybeUndoPreblend;
+
+    if (!forceRGBA && !this.smask && !this.mask) {
+      imgData.kind = _util.ImageKind.RGB_24BPP;
+      imgData.data = new Uint8ClampedArray(drawWidth * drawHeight * 3);
+      alpha01 = 0;
+      maybeUndoPreblend = false;
+    } else {
+      imgData.kind = _util.ImageKind.RGBA_32BPP;
+      imgData.data = new Uint8ClampedArray(drawWidth * drawHeight * 4);
+      alpha01 = 1;
+      maybeUndoPreblend = true;
+      this.fillOpacity(imgData.data, drawWidth, drawHeight, actualHeight, comps);
+    }
+
+    if (this.needsDecode) {
+      this.decodeBuffer(comps);
+    }
+
+    this.colorSpace.fillRgb(imgData.data, originalWidth, originalHeight, drawWidth, drawHeight, actualHeight, bpc, comps, alpha01);
+
+    if (maybeUndoPreblend) {
+      this.undoPreblend(imgData.data, drawWidth, actualHeight);
+    }
+
+    return imgData;
+  }
+
+  fillGrayBuffer(buffer) {
+    var numComps = this.numComps;
+
+    if (numComps !== 1) {
+      throw new _util.FormatError(`Reading gray scale from a color image: ${numComps}`);
+    }
+
+    var width = this.width;
+    var height = this.height;
+    var bpc = this.bpc;
+    var rowBytes = width * numComps * bpc + 7 >> 3;
+    var imgArray = this.getImageBytes(height * rowBytes);
+    var comps = this.getComponents(imgArray);
+    var i, length;
+
+    if (bpc === 1) {
+      length = width * height;
+
+      if (this.needsDecode) {
+        for (i = 0; i < length; ++i) {
+          buffer[i] = comps[i] - 1 & 255;
+        }
+      } else {
+        for (i = 0; i < length; ++i) {
+          buffer[i] = -comps[i] & 255;
+        }
+      }
+
+      return;
+    }
+
+    if (this.needsDecode) {
+      this.decodeBuffer(comps);
+    }
+
+    length = width * height;
+    var scale = 255 / ((1 << bpc) - 1);
+
+    for (i = 0; i < length; ++i) {
+      buffer[i] = scale * comps[i];
+    }
+  }
+
+  getImageBytes(length, drawWidth, drawHeight, forceRGB = false) {
+    this.image.reset();
+    this.image.drawWidth = drawWidth || this.width;
+    this.image.drawHeight = drawHeight || this.height;
+    this.image.forceRGB = !!forceRGB;
+    return this.image.getBytes(length, true);
+  }
+
+}
 
 exports.PDFImage = PDFImage;
 

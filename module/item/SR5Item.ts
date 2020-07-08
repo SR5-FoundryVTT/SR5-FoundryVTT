@@ -654,6 +654,7 @@ export class SR5Item extends Item {
 
     async openPdfSource() {
         const source = this.getBookSource();
+        console.warn(source);
         if (source === '') { // @ts-ignore
             ui.notifications.error(game.i18n.localize('SR5.SourceFieldEmptyError'))
         }
@@ -661,7 +662,7 @@ export class SR5Item extends Item {
         // parse however you need, all "buttons" will lead to this function
         const [code, page] = source.split(' ');
         //@ts-ignore
-        ui.PDFoundry.open(code, page);
+        ui.PDFoundry.openPDFByCode(code, parseInt(page));
     }
 
     isAreaOfEffect(): boolean {

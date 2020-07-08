@@ -76,11 +76,6 @@ Hooks.on('renderChatMessage', (app, html) => {
 
 Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);
 
-Hooks.on('setup', () => {
-    // @ts-ignore
-    ui.PDFoundry.registerSystem('shadowrun5e');
-});
-
 /* -------------------------------------------- */
 /*  Hotbar Macros                               */
 /* -------------------------------------------- */

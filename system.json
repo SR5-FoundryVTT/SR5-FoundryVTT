@@ -1,37 +1,39 @@
 {
-  "name": "shadowrun5e",
-  "title": "Shadowrun 5th Edition",
-  "description": "Shadowrun 5th Edition game",
-  "version": "0.6.5",
-  "templateVersion": "1.4",
-  "author": "Shawn Milligan [n3rf_herder#9026], Andrew Cuccinello [DJ#1982]",
-  "esmodules": [
-    "build/bundle.js",
-    "pdfoundry-dist/bundle.js"
-  ],
-  "styles": ["css/main.css"],
-  "minimumCoreVersion": "0.6.0",
-  "compatibleCoreVersion": "0.6.1",
-  "languages": [
-    {
-      "lang": "en",
-      "name": "English",
-      "path": "lang/en.json"
-    },
-    {
-      "lang": "de",
-      "name": "Deutsch",
-      "path": "lang/de.json"
-    }
-  ],
-  "packs": [],
-  "initiative": "@initiative.current.base.value + @initiative.current.dice.text - @wounds.value",
-  "primaryTokenAttribute": "track.physical",
-  "secondaryTokenAttribute": "track.stun",
-  "gridDistance": 1,
-  "gridUnits": "m",
-  "socket": true,
-  "manifest": "https://raw.githubusercontent.com/smilligan93/SR5-FoundryVTT/master/system.json",
-  "url": "https://github.com/smilligan93/SR5-FoundryVTT",
-  "download": "https://github.com/smilligan93/SR5-FoundryVTT/archive/v0.6.4.zip"
+    "name": "shadowrun5e",
+    "title": "Shadowrun 5th Edition",
+    "description": "Shadowrun 5th Edition game",
+    "version": "0.6.5",
+    "templateVersion": "1.4",
+    "author": "Shawn Milligan [n3rf_herder#9026], Andrew Cuccinello [DJ#1982]",
+    "esmodules": [
+        "build/bundle.js",
+        "pdfoundry-dist/bundle.js"
+    ],
+    "styles": [
+        "css/main.css"
+    ],
+    "minimumCoreVersion": "0.6.0",
+    "compatibleCoreVersion": "0.6.1",
+    "languages": [
+        {
+            "lang": "en",
+            "name": "English",
+            "path": "lang/en.json"
+        },
+        {
+            "lang": "de",
+            "name": "Deutsch",
+            "path": "lang/de.json"
+        }
+    ],
+    "packs": [],
+    "initiative": "@initiative.current.base.value + @initiative.current.dice.text - @wounds.value",
+    "primaryTokenAttribute": "track.physical",
+    "secondaryTokenAttribute": "track.stun",
+    "gridDistance": 1,
+    "gridUnits": "m",
+    "socket": true,
+    "manifest": "https://raw.githubusercontent.com/smilligan93/SR5-FoundryVTT/master/system.json",
+    "url": "https://github.com/smilligan93/SR5-FoundryVTT",
+    "download": "https://github.com/smilligan93/SR5-FoundryVTT/archive/v0.6.4.zip"
 }
