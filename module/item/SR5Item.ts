@@ -654,7 +654,6 @@ export class SR5Item extends Item {
 
     async openPdfSource() {
         const source = this.getBookSource();
-        console.warn(source);
         if (source === '') { // @ts-ignore
             ui.notifications.error(game.i18n.localize('SR5.SourceFieldEmptyError'))
         }

@@ -167,7 +167,6 @@ class PDFoundryAPI {
         const pdf = game.items.find((item) => {
             return item.type === PDFSettings_1.PDFSettings.PDF_ENTITY_TYPE && comparer(item);
         });
-        console.log(pdf);
         return PDFUtil_1.PDFUtil.getPDFDataFromItem(pdf);
     }
     // </editor-fold>
@@ -186,7 +185,6 @@ class PDFoundryAPI {
                 }
                 return Promise.reject(error);
             }
-            console.log(pdf);
             return this.openPDF(pdf, page);
         });
     }

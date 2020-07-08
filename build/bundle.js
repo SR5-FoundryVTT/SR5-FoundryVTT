@@ -4950,7 +4950,6 @@ class SR5Item extends Item {
     openPdfSource() {
         return __awaiter(this, void 0, void 0, function* () {
             const source = this.getBookSource();
-            console.warn(source);
             if (source === '') { // @ts-ignore
                 ui.notifications.error(game.i18n.localize('SR5.SourceFieldEmptyError'));
             }
