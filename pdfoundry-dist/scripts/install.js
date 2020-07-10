@@ -19,22 +19,20 @@ async function main() {
     const fs = require('fs');
     const readline = require('readline');
 
-    if (!exists(fs, 'template.json'))
-        return;
-    if (!exists(fs, 'system.json'))
-        return;
+    if (!exists(fs, 'template.json')) return;
+    if (!exists(fs, 'system.json')) return;
 
     let backups = await new Promise((resolve, reject) => {
         const rl = readline.createInterface({
             input: process.stdin,
-            output: process.stdout
+            output: process.stdout,
         });
 
         function prompt() {
             rl.question('Would you like to backup modified files? Y/N >> ', (answer) => {
                 answer = answer.toUpperCase();
                 if (answer === 'Y' || answer === 'N') {
-                    resolve((answer === 'Y'));
+                    resolve(answer === 'Y');
                 } else {
                     prompt();
                 }
@@ -65,10 +63,10 @@ async function main() {
     }
 
     const properties = [
-        ['url',         ''],
-        ['code',        ''],
-        ['offset',      0],
-        ['cache',       false],
+        ['url', ''],
+        ['code', ''],
+        ['offset', 0],
+        ['cache', false],
     ];
 
     for (const [key, value] of properties) {
@@ -84,7 +82,6 @@ async function main() {
 
     const templateContents = JSON.stringify(template, null, 4);
     fs.writeFileSync('template.json', templateContents);
-    
 
     const system = JSON.parse(fs.readFileSync('system.json').toString());
     if (!system.hasOwnProperty('esmodules')) {

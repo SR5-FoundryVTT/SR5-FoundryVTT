@@ -577,8 +577,18 @@ export class SR5Item extends Item {
      */
     prepareEmbeddedEntities() {
         super.prepareEmbeddedEntities();
-        const items = this.getFlag('shadowrun5e', 'embeddedItems');
+        let items = this.getFlag('shadowrun5e', 'embeddedItems');
         if (items) {
+            //TODO: This is a hotfix. Items should either always be
+            // stored as an array or always be stored as a object.
+            if (!Array.isArray(items)) {
+                let newItems: any[] = [];
+                for (const key of Object.keys(items)) {
+                    newItems.push(items[key]);
+                }
+                items = newItems;
+            }
+
             const existing = (this.items || []).reduce((object, i) => {
                 object[i.id] = i;
                 return object;

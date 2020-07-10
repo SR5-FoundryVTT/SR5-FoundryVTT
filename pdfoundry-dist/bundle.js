@@ -77,6 +77,20 @@ class PDFUtil {
         })
             .map((user) => user.id);
     }
+    static fileExists(path) {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: path,
+                type: 'HEAD',
+                success: function () {
+                    resolve(true);
+                },
+                error: function () {
+                    resolve(false);
+                },
+            });
+        });
+    }
 }
 exports.PDFUtil = PDFUtil;
 },{}],2:[function(require,module,exports){
@@ -1272,10 +1286,24 @@ class PDFSettings {
         button.on('click', PDFSettings.showHelp);
         html.find('h2').last().before(button);
     }
+    //TODO: Move out of settings
     static showHelp() {
         return __awaiter(this, void 0, void 0, function* () {
             yield game.user.setFlag(PDFSettings.INTERNAL_MODULE_NAME, PDFSettings.HELP_SEEN_KEY, true);
-            return PDFoundryAPI_1.PDFoundryAPI.openURL(`${window.origin}/systems/${PDFSettings.EXTERNAL_SYSTEM_NAME}/${PDFSettings.DIST_FOLDER}/assets/PDFoundry Manual.pdf`, 1, false);
+            const lang = game.i18n.lang;
+            let manualPath = `${window.origin}/systems/${PDFSettings.EXTERNAL_SYSTEM_NAME}/${PDFSettings.DIST_FOLDER}/assets/manual/${lang}/manual.pdf`;
+            const manualExists = yield PDFUtil_1.PDFUtil.fileExists(manualPath);
+            if (!manualExists) {
+                manualPath = `${window.origin}/systems/${PDFSettings.EXTERNAL_SYSTEM_NAME}/${PDFSettings.DIST_FOLDER}/assets/manual/en/manual.pdf`;
+            }
+            const pdfData = {
+                name: game.i18n.localize('PDFOUNDRY.MANUAL.Name'),
+                code: '',
+                offset: 0,
+                url: manualPath,
+                cache: false,
+            };
+            return PDFoundryAPI_1.PDFoundryAPI.openPDF(pdfData);
         });
     }
 }
