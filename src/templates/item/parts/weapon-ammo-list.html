@@ -1,0 +1,145 @@
+<div class="inventory">
+    <div class="scroll-area">
+        <div class="item item-section">
+            <div class="item-left">
+                <div class="item-text item-rtg"></div>
+                <div class="item-text item-name">
+                    {{localize "SR5.Ammo"}}
+                </div>
+            </div>
+            <div class="item-right">
+                <div class="item-text rtg">
+                    {{localize "SR5.Qty"}}
+                </div>
+                <div class="item-text six">
+                    {{localize "SR5.Damage"}}
+                </div>
+                <div class="item-text element">
+                    {{localize "SR5.Element"}}
+                </div>
+                <div class="item-text rtg">
+                    {{localize "SR5.AP"}}
+                </div>
+                <div class="item-text radius">
+                    {{localize "SR5.Radius"}}
+                </div>
+                <div class="item-text dropoff">
+                    {{localize "SR5.Dropoff"}}
+                </div>
+                <div class="item-text item-icons">
+                    <a class="add-new-ammo roll" title="Add Ammo">
+                        <i class="fas fa-plus"></i>
+                        {{localize "SR5.Add"}}
+                    </a>
+                </div>
+            </div>
+        </div>
+        {{#each ammunition as |ammo index|}}
+        <div class="item" data-item-id="{{ammo._id}}">
+            <div class="item-left">
+                <div class="item-text rtg">
+                    <i
+                        title="{{localize 'SR5.ToggleEquip'}}"
+                        class="ammo-equip roll
+                             {{#if ammo.data.technology.equipped}}
+                              fas fa-check-circle
+                             {{else}}
+                              far fa-circle
+                             {{/if}}"
+                    >
+                    </i>
+                </div>
+                <div class="item-text item-name has-desc">
+                    {{ammo.name}}
+                </div>
+            </div>
+            <div class="item-right">
+                <div class="item-text rtg">
+                    <input
+                        class="display"
+                        size="3"
+                        maxlength="3"
+                        type="text"
+                        disabled
+                        value="{{ammo.data.technology.quantity}}"
+                        data-dtype="Number"
+                        placeholder="0"
+                    />
+                </div>
+                <div class="item-text center six">
+                    <input
+                        class="display"
+                        type="text"
+                        disabled
+                        value="{{ammo.data.damage}}{{damageAbbreviation ammo.data.damageType}}"
+                        data-dtype="Text"
+                    />
+                </div>
+                <div class="item-text element">
+                    <input
+                        class="display"
+                        type="text"
+                        disabled
+                        value="{{localizeOb ammo.data.element ../config.elementTypes}}"
+                        data-dtype="Text"
+                    />
+                </div>
+                <div class="item-text rtg">
+                    <input
+                        class="display"
+                        size="3"
+                        maxlength="3"
+                        type="text"
+                        disabled
+                        value="{{ammo.data.ap}}"
+                        data-dtype="Number"
+                        placeholder="0"
+                    />
+                </div>
+                <div class="item-text center radius">
+                    <input
+                        class="display"
+                        type="text"
+                        maxlength="2"
+                        size="2"
+                        disabled
+                        value="{{ammo.data.blast.radius}}"
+                        data-dtype="Number"
+                        placeholder="0"
+                    />
+                    <div class="track-max-value">m</div>
+                </div>
+                <div class="item-text center dropoff">
+                    <input
+                        class="display"
+                        size="2"
+                        maxlength="2"
+                        type="text"
+                        disabled
+                        value="{{ammo.data.blast.dropoff}}"
+                        data-dtype="Number"
+                        placeholder="0"
+                    />
+                    <div class="track-max-value">/m</div>
+                </div>
+                <div class="item-text item-icons">
+                    <i class="edit-item roll fas fa-edit" title="Edit Ammo"></i>
+                    <i class="ammo-delete roll fas fa-trash" title="Delete Ammo"></i>
+                </div>
+            </div>
+        </div>
+        <div class="item hidden">
+            <div class="item-desc">
+                <div class="props">
+                    {{#each item.properties}}
+                    <span>{{this}}</span>
+                    {{/each}}
+                </div>
+                <div class="description">
+                    {{{ammo.data.description.value}}}
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+</div>

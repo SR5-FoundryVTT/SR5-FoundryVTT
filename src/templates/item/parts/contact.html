@@ -1,0 +1,41 @@
+<div class="item-form">
+    <div class="header">
+        {{header}}
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.ContactType"}}
+        </div>
+        <div class="inputs">
+            <input type="text" name="data.type" value="{{data.type}}" placeholder="" />
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.Connection"}}
+        </div>
+        <div class="inputs">
+            <input
+                type="text"
+                name="data.connection"
+                value="{{data.connection}}"
+                data-dtype="Number"
+                placeholder="1"
+            />
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.Loyalty"}}
+        </div>
+        <div class="inputs">
+            <input
+                type="text"
+                name="data.loyalty"
+                value="{{data.loyalty}}"
+                data-dtype="Number"
+                placeholder="1"
+            />
+        </div>
+    </div>
+</div>

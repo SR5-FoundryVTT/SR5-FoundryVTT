@@ -1,0 +1,181 @@
+<div class="item-form">
+    <div class="header">
+        {{header}}
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.SpellCategory"}}
+        </div>
+        <div class="inputs">
+            <select name="data.category">
+                {{#select data.category}}
+                <option value=""></option>
+                {{#each config.spellCategories as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
+    </div>
+    {{#if data.category}}
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.SpellType"}}
+        </div>
+        <div class="inputs">
+            <select name="data.type">
+                {{#select data.type}} {{#each config.spellTypes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.SpellRange"}}
+        </div>
+        <div class="inputs">
+            <select name="data.range">
+                {{#select data.range}} {{#each config.spellRanges as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.Duration"}}
+        </div>
+        <div class="inputs">
+            <select name="data.duration">
+                {{#select data.duration}} {{#each config.durations as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.DrainValue"}}
+        </div>
+        <div class="inputs">
+            <input
+                type="text"
+                maxlength="2"
+                size="2"
+                name="data.drain"
+                value="{{data.drain}}"
+                data-dtype="Number"
+                placeholder="-2"
+                data-dtype="Number"
+            />
+        </div>
+    </div>
+    {{#ife data.category "combat"}}
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.SpellCatCombat"}}
+        </div>
+        <div class="inputs">
+            <select name="data.combat.type">
+                {{#select data.combat.type}} {{#each config.combatSpellTypes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
+    </div>
+    {{/ife}} {{#ife data.category "detection"}}
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.SpellCatDetection"}}
+        </div>
+        <div class="inputs between">
+            <select name="data.detection.passive" data-dtype="Boolean">
+                {{#select data.detection.passive}}
+                <option value="false">{{localize "SR5.Active"}}</option>
+                <option value="true">{{localize "SR5.Passive"}}</option>
+                {{/select}}
+            </select>
+            <select name="data.detection.type">
+                {{#select data.detection.type}} {{#each config.detectionSpellTypes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+            <label>
+                <input
+                    class="display"
+                    type="checkbox"
+                    name="data.detection.extended"
+                    {{checked
+                    data.detection.extended}}
+                />{{localize "SR5.DetectionSpellExtended"}}
+            </label>
+        </div>
+    </div>
+    {{/ife}} {{#ife data.category "illusion"}}
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.SpellCatIllusion"}}
+        </div>
+        <div class="inputs between">
+            <select name="data.illusion.type">
+                {{#select data.illusion.type}} {{#each config.illusionSpellTypes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+            <select name="data.illusion.sense">
+                {{#select data.illusion.sense}} {{#each config.illusionSpellSenses as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
+    </div>
+    {{/ife}} {{#ife data.category "manipulation"}}
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.SpellCatManipulation"}}
+        </div>
+        <div class="inputs">
+            <label>
+                {{localize "SR5.SpellManipulationDamaging"}}
+                <input
+                    class="display"
+                    type="checkbox"
+                    name="data.manipulation.damaging"
+                    {{checked
+                    data.manipulation.damaging}}
+                />
+            </label>
+            <label>
+                {{localize "SR5.SpellManipulationMental"}}
+                <input
+                    class="display"
+                    type="checkbox"
+                    name="data.manipulation.mental"
+                    {{checked
+                    data.manipulation.mental}}
+                />
+            </label>
+            <label>
+                {{localize "SR5.SpellManipulationEnvironmental"}}
+                <input
+                    class="display"
+                    type="checkbox"
+                    name="data.manipulation.environmental"
+                    {{checked
+                    data.manipulation.environmental}}
+                />
+            </label>
+            <label>
+                {{localize "SR5.SpellManipulationPhysical"}}
+                <input
+                    class="display"
+                    type="checkbox"
+                    name="data.manipulation.physical"
+                    {{checked
+                    data.manipulation.physical}}
+                />
+            </label>
+        </div>
+    </div>
+    {{/ife}} {{/if}}
+</div>

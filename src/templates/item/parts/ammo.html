@@ -1,0 +1,99 @@
+<div class="item-form">
+    <div class="header">
+        {{header}}
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.DamageType"}}
+        </div>
+        <div class="inputs">
+            <select name="data.damageType">
+                <option value=""></option>
+                {{#select data.damageType}} {{#each config.damageTypes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
+    </div>
+    {{#if data.damageType}}
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.DamageValue"}}
+        </div>
+        <div class="inputs around">
+            <input
+                size="4"
+                maxlength="3"
+                type="text"
+                name="data.damage"
+                value="{{data.damage}}"
+                data-dtype="Number"
+                placeholder="DV Modifier"
+            />
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.Element"}}
+        </div>
+        <div class="inputs">
+            <select name="data.element">
+                {{#select data.element}}
+                <option value=""></option>
+                {{#each config.elementTypes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.AP"}}
+        </div>
+        <div class="inputs">
+            <input
+                type="text"
+                maxlength="2"
+                size="2"
+                name="data.ap"
+                value="{{data.ap}}"
+                data-dtype="Number"
+                placeholder="AP"
+            />
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.BlastRadius"}}
+        </div>
+        <div class="inputs">
+            <input
+                type="text"
+                maxlength="2"
+                size="2"
+                name="data.blast.radius"
+                value="{{data.blast.radius}}"
+                data-dtype="Number"
+                placeholder="Radius"
+            />
+        </div>
+    </div>
+    {{#if data.blast.radius}}
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.DropOff"}}
+        </div>
+        <div class="inputs">
+            <input
+                type="text"
+                maxlength="2"
+                size="2"
+                name="data.blast.dropoff"
+                value="{{data.blast.dropoff}}"
+                data-dtype="Number"
+                placeholder="Drop Off"
+            />
+        </div>
+    </div>
+    {{/if}} {{/if}}
+</div>

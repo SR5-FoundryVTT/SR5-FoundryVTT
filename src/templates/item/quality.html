@@ -1,0 +1,39 @@
+<form class="{{cssClass}} wholesheet" autocomplete="off">
+    {{> "systems/shadowrun5e/dist/templates/item/parts/header.html" }}
+    <nav class="tabs" data-group="primary">
+        <a class="item" data-tab="description">{{localize "SR5.Description"}}</a>
+        <a class="item" data-tab="action">{{localize "SR5.Action"}}</a>
+    </nav>
+    <section class="sheetbody">
+        <div class="tab" data-group="primary" data-tab="description">
+            <div class="flexrow align-start">
+                <div class="flexcol flex0">
+                    <div class="technology">
+                        <div class="flexrow nowrap">
+                            <label>{{localize "SR5.QualityType"}}</label>
+                            <select name="data.type" class="display">
+                                {{#select data.type}} {{#each config.qualityTypes as |name type|}}
+                                <option value="{{type}}">{{localize name}}</option>
+                                {{/each}} {{/select}}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                {{> "systems/shadowrun5e/dist/templates/item/parts/description.html"}}
+            </div>
+        </div>
+        <div class="tab" data-group="primary" data-tab="action">
+            <div class="tabbody">
+                <div class="inventory">
+                    <div class="scroll-area">
+                        {{> "systems/shadowrun5e/dist/templates/item/parts/action.html" header="Test
+                        Details"}} {{> "systems/shadowrun5e/dist/templates/item/parts/damage.html"
+                        header="Damage"}} {{>
+                        "systems/shadowrun5e/dist/templates/item/parts/opposed.html" header="Opposed
+                        Test"}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</form>

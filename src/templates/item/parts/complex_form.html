@@ -1,0 +1,52 @@
+<div class="item-form">
+    <div class="header">
+        {{header}}
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.MatrixTarget"}}
+        </div>
+        <div class="inputs">
+            <select name="data.target">
+                {{#select data.target}}
+                <option value=""></option>
+                {{#each config.matrixTargets as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
+    </div>
+    {{#if data.target}}
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.Duration"}}
+        </div>
+        <div class="inputs">
+            <select name="data.duration">
+                {{#select data.duration}}
+                <option value=""></option>
+                {{#each config.durations as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.FadeValue"}}
+        </div>
+        <div class="inputs">
+            <input
+                type="text"
+                maxlength="2"
+                size="2"
+                name="data.fade"
+                value="{{data.fade}}"
+                data-dtype="Number"
+                placeholder="-2"
+                data-dtype="Number"
+            />
+        </div>
+    </div>
+    {{/if}}
+</div>
