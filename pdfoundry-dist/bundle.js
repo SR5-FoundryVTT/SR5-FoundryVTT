@@ -15,6 +15,193 @@
  * limitations under the License.
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.PDFEvents = void 0;
+const PDFLog_1 = require("../log/PDFLog");
+/**
+ * @private
+ */
+class EventStore {
+    constructor(name) {
+        this._name = name;
+        this._callbacks = [];
+    }
+    /**
+     * Turn on an event callback for this event.
+     * @param callback The callback to turn on
+     */
+    on(callback) {
+        if (this._callbacks === undefined) {
+            return;
+        }
+        for (let i = 0; i < this._callbacks.length; i++) {
+            if (this._callbacks[i] === callback)
+                return;
+        }
+        this._callbacks.push(callback);
+    }
+    /**
+     * Turn off an event callback for this event.
+     * @param callback The callback to turn off
+     */
+    off(callback) {
+        if (this._callbacks === undefined) {
+            return;
+        }
+        for (let i = this._callbacks.length; i >= 0; i--) {
+            if (this._callbacks[i] === callback) {
+                this._callbacks.splice(i, 1);
+            }
+        }
+    }
+    /**
+     * Fire an event and forward the args to all handlers
+     * @param args Any arguments that should be passed to handlers
+     */
+    fire(...args) {
+        if (PDFEvents.DEBUG) {
+            PDFLog_1.PDFLog.log(`<${this._name}>`);
+            console.log(args);
+        }
+        for (const cb of this._callbacks) {
+            cb(...args);
+        }
+    }
+}
+/**
+ * Tracks and publishes events for PDF related occurrences. This class is callable through `ui.PDFoundry.events`.
+ * All event properties of this class are accessible with the `on` method or via helper methods which contain additional
+ * type hinting.
+ */
+class PDFEvents {
+    // <editor-fold desc="Setup & Initialization Events">
+    /**
+     * Called when all PDFoundry init stage tasks are done.
+     * @param cb
+     */
+    static init(cb) {
+        return PDFEvents._EVENTS['init'].on(cb);
+    }
+    /**
+     * Called when all PDFoundry setup stage tasks are done.
+     * @param cb
+     */
+    static setup(cb) {
+        return PDFEvents._EVENTS['setup'].on(cb);
+    }
+    /**
+     * Called when all PDFoundry ready stage tasks are done.
+     * @param cb
+     */
+    static ready(cb) {
+        return PDFEvents._EVENTS['ready'].on(cb);
+    }
+    // </editor-fold>
+    // <editor-fold desc="Viewer Events">
+    /**
+     * Called when a PDF viewer begins opening
+     * @param cb
+     */
+    static viewerOpen(cb) {
+        return PDFEvents._EVENTS['viewerOpen'].on(cb);
+    }
+    /**
+     * Called when a PDF viewer begins closing
+     * @param cb
+     */
+    static viewerClose(cb) {
+        return PDFEvents._EVENTS['viewerClose'].on(cb);
+    }
+    /**
+     * Called when a PDF viewer is ready to use
+     * @param cb
+     */
+    static viewerReady(cb) {
+        return PDFEvents._EVENTS['viewerReady'].on(cb);
+    }
+    /**
+     * Called when a new page has finished rendering. The inner HTML of the div provided by this event will
+     * be replaced if the user scrolls the page out of view.
+     * @param cb
+     */
+    static viewerPageRendered(cb) {
+        return PDFEvents._EVENTS['viewerPageRendered'].on(cb);
+    }
+    /**
+     * Called when the page is changed.
+     * @param cb
+     */
+    static viewerPageChanging(cb) {
+        return PDFEvents._EVENTS['viewerPageChanging'].on(cb);
+    }
+    // </editor-fold>
+    /**
+     * Like {@link PDFEvents.on} but fires the event only once, then calls off. See individual events for callback
+     * function parameters.
+     * @param event
+     * @param callback
+     */
+    static once(event, callback) {
+        const wrapper = function (...args) {
+            callback(args);
+            PDFEvents.off(event, wrapper);
+        };
+        PDFEvents.on(event, wrapper);
+    }
+    /**
+     * Turn on an event callback for an event.
+     * @param event The name of the event
+     * @param callback The callback to turn on
+     */
+    static on(event, callback) {
+        PDFEvents._EVENTS[event].on(callback);
+    }
+    /**
+     * Turn off an event callback for an event.
+     * @param event The name of the event
+     * @param callback The callback to turn off
+     */
+    static off(event, callback) {
+        PDFEvents._EVENTS[event].off(callback);
+    }
+    static fire(event, ...args) {
+        if (PDFEvents.DEBUG) {
+            PDFLog_1.PDFLog.verbose(`Firing Event: ${event}`);
+            console.debug(args);
+        }
+        PDFEvents._EVENTS[event].fire(args);
+    }
+}
+exports.PDFEvents = PDFEvents;
+/**
+ * If set to true, every event call will be logged. Functions much in the same manner that `CONFIG.debug.hooks` does.
+ */
+PDFEvents.DEBUG = false;
+PDFEvents._EVENTS = {
+    init: new EventStore('init'),
+    setup: new EventStore('setup'),
+    ready: new EventStore('ready'),
+    viewerOpen: new EventStore('viewerOpen'),
+    viewerClose: new EventStore('viewerClose'),
+    viewerReady: new EventStore('viewerReady'),
+    viewerPageRendered: new EventStore('viewerPageRendered'),
+};
+},{"../log/PDFLog":6}],2:[function(require,module,exports){
+"use strict";
+/* Copyright 2020 Andrew Cuccinello
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.PDFUtil = void 0;
 /**
  * Contains various utility functions for common operations.
@@ -93,7 +280,7 @@ class PDFUtil {
     }
 }
 exports.PDFUtil = PDFUtil;
-},{}],2:[function(require,module,exports){
+},{}],3:[function(require,module,exports){
 "use strict";
 /* Copyright 2020 Andrew Cuccinello
  *
@@ -123,12 +310,13 @@ exports.PDFoundryAPI = void 0;
 const PDFSettings_1 = require("../settings/PDFSettings");
 const PDFViewer_1 = require("../viewer/PDFViewer");
 const PDFCache_1 = require("../cache/PDFCache");
-const PDFEvents_1 = require("../events/PDFEvents");
+const PDFEvents_1 = require("./PDFEvents");
 const PDFUtil_1 = require("./PDFUtil");
 /**
  * The PDFoundry API <br>
- * You can access the API with `ui.PDFoundry`
- * @module API
+ *
+ * You can access the API with `ui.PDFoundry`. Note the primary way to observe behavior of the PDF viewer is to use
+ * the provided {@link PDFEvents} class.
  */
 class PDFoundryAPI {
     /**
@@ -284,7 +472,7 @@ class PDFoundryAPI {
     }
 }
 exports.PDFoundryAPI = PDFoundryAPI;
-},{"../cache/PDFCache":4,"../events/PDFEvents":5,"../settings/PDFSettings":9,"../viewer/PDFViewer":15,"./PDFUtil":1}],3:[function(require,module,exports){
+},{"../cache/PDFCache":5,"../settings/PDFSettings":9,"../viewer/PDFViewer":15,"./PDFEvents":1,"./PDFUtil":2}],4:[function(require,module,exports){
 "use strict";
 /* Copyright 2020 Andrew Cuccinello
  *
@@ -315,6 +503,7 @@ const PDFSettings_1 = require("../settings/PDFSettings");
 const PDFoundryAPI_1 = require("../api/PDFoundryAPI");
 /**
  * Extends the base ItemSheet for linked PDF viewing.
+ * @private
  */
 class PDFItemSheet extends ItemSheet {
     static get defaultOptions() {
@@ -398,7 +587,7 @@ class PDFItemSheet extends ItemSheet {
     }
 }
 exports.PDFItemSheet = PDFItemSheet;
-},{"../api/PDFoundryAPI":2,"../settings/PDFSettings":9}],4:[function(require,module,exports){
+},{"../api/PDFoundryAPI":3,"../settings/PDFSettings":9}],5:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -410,22 +599,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.PDFCache = exports.IDBHelperError = void 0;
+exports.PDFCache = exports.CacheError = void 0;
 const PDFSettings_1 = require("../settings/PDFSettings");
 const PDFLog_1 = require("../log/PDFLog");
 /**
- * Error that occurs during IDB operations
+ * An error that occurs during cache operations
  */
-class IDBHelperError extends Error {
+class CacheError extends Error {
     constructor(index, store, message) {
         super(`Error in ${index}>${store}: ${message}`);
     }
 }
-exports.IDBHelperError = IDBHelperError;
+exports.CacheError = CacheError;
 /**
  * Class that deals with getting/setting from an indexed db
  * Mostly exists to separate logic for the PDFCache from logic
- *  dealing with the database
+ * dealing with the database
+ * @private
  */
 class IDBHelper {
     constructor(indexName, storeNames, version) {
@@ -478,7 +668,7 @@ class IDBHelper {
     set(key, value, storeName, force = false) {
         return new Promise((resolve, reject) => {
             if (!this._db) {
-                throw new IDBHelperError(this._indexName, storeName, 'Database is not initialized.');
+                throw new CacheError(this._indexName, storeName, 'Database is not initialized.');
             }
             else {
                 const that = this;
@@ -501,7 +691,7 @@ class IDBHelper {
                             });
                         }
                         else {
-                            throw new IDBHelperError(that._indexName, storeName, `Key ${key} already exists.`);
+                            throw new CacheError(that._indexName, storeName, `Key ${key} already exists.`);
                         }
                     }
                     else {
@@ -515,7 +705,7 @@ class IDBHelper {
     get(key, storeName) {
         return new Promise((resolve, reject) => {
             if (!this._db) {
-                throw new IDBHelperError(this._indexName, storeName, 'Database is not initialized.');
+                throw new CacheError(this._indexName, storeName, 'Database is not initialized.');
             }
             else {
                 let { transaction, store } = this.newTransaction(storeName);
@@ -599,7 +789,7 @@ class IDBHelper {
 class PDFCache {
     // <editor-fold desc="Static Properties">
     /**
-     * Max size of the cache, defaults to 256 MB.
+     * Max size of the cache for the active user, defaults to 256 MB.
      */
     static get MAX_BYTES() {
         return game.settings.get(PDFSettings_1.PDFSettings.EXTERNAL_SYSTEM_NAME, 'CacheSize') * Math.pow(2, 20);
@@ -610,6 +800,10 @@ class PDFCache {
             PDFCache._cacheHelper = yield IDBHelper.createAndOpen(PDFCache.IDB_NAME, [PDFCache.CACHE, PDFCache.META], PDFCache.IDB_VERSION);
         });
     }
+    /**
+     * Get meta information about a provided key (url).
+     * @param key
+     */
     static getMeta(key) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -620,11 +814,20 @@ class PDFCache {
             }
         });
     }
+    /**
+     * Set meta information about a provided key (url). See {@link CacheMeta}.
+     * @param key
+     * @param meta
+     */
     static setMeta(key, meta) {
         return __awaiter(this, void 0, void 0, function* () {
             yield PDFCache._cacheHelper.set(key, meta, PDFCache.META, true);
         });
     }
+    /**
+     * Get the byte array representing the key (url) from the user's cache.
+     * @param key
+     */
     static getCache(key) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -641,6 +844,11 @@ class PDFCache {
             }
         });
     }
+    /**
+     * Set the value of the cache for the specific key (url) to the provided byte array.
+     * @param key
+     * @param bytes
+     */
     static setCache(key, bytes) {
         return __awaiter(this, void 0, void 0, function* () {
             const meta = {
@@ -652,6 +860,10 @@ class PDFCache {
             yield this.prune();
         });
     }
+    /**
+     * Preload the PDF at the specified key (url), caching it immediately.
+     * @param key
+     */
     static preload(key) {
         return new Promise((resolve, reject) => __awaiter(this, void 0, void 0, function* () {
             const cachedBytes = yield PDFCache.getCache(key);
@@ -676,6 +888,9 @@ class PDFCache {
             }
         }));
     }
+    /**
+     * Prune the active user's cache until it is below the user's cache size limit.
+     */
     static prune() {
         return __awaiter(this, void 0, void 0, function* () {
             const keys = yield this._cacheHelper.keys(PDFCache.META);
@@ -728,176 +943,7 @@ PDFCache.IDB_NAME = 'PDFoundry';
 PDFCache.IDB_VERSION = 1;
 PDFCache.CACHE = `Cache`;
 PDFCache.META = `Meta`;
-},{"../log/PDFLog":6,"../settings/PDFSettings":9}],5:[function(require,module,exports){
-"use strict";
-/* Copyright 2020 Andrew Cuccinello
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.PDFEvents = void 0;
-const PDFLog_1 = require("../log/PDFLog");
-/**
- * @private
- */
-class EventStore {
-    constructor(name) {
-        this._name = name;
-        this._callbacks = [];
-    }
-    /**
-     * Turn on an event callback for this event.
-     * @param callback The callback to turn on
-     */
-    on(callback) {
-        if (this._callbacks === undefined) {
-            return;
-        }
-        for (let i = 0; i < this._callbacks.length; i++) {
-            if (this._callbacks[i] === callback)
-                return;
-        }
-        this._callbacks.push(callback);
-    }
-    /**
-     * Turn off an event callback for this event.
-     * @param callback The callback to turn off
-     */
-    off(callback) {
-        if (this._callbacks === undefined) {
-            return;
-        }
-        for (let i = this._callbacks.length; i >= 0; i--) {
-            if (this._callbacks[i] === callback) {
-                this._callbacks.splice(i, 1);
-            }
-        }
-    }
-    /**
-     * Fire an event and forward the args to all handlers
-     * @param args Any arguments that should be passed to handlers
-     */
-    fire(...args) {
-        if (PDFEvents.DEBUG) {
-            PDFLog_1.PDFLog.log(`<${this._name}>`);
-            console.log(args);
-        }
-        for (const cb of this._callbacks) {
-            cb(...args);
-        }
-    }
-}
-/**
- * Tracks and publishes events for PDF related occurrences.
- * This class is callable through `ui.PDFoundry.events`
- */
-class PDFEvents {
-    // <editor-fold desc="Setup & Initialization Events">
-    /**
-     * Helper method version of {@link PDFEvents.on}
-     * Called when all PDFoundry init stage events are done.
-     */
-    static get init() {
-        return PDFEvents._EVENTS['init'].on;
-    }
-    /**
-     * Helper method version of {@link PDFEvents.on}
-     * Called when all PDFoundry setup stage events are done.
-     */
-    static get setup() {
-        return PDFEvents._EVENTS['setup'].on;
-    }
-    /**
-     * Helper method version of {@link PDFEvents.on}
-     * Called when all PDFoundry ready stage events are done.
-     */
-    static get ready() {
-        return PDFEvents._EVENTS['ready'].on;
-    }
-    // </editor-fold>
-    // <editor-fold desc="Viewer Events">
-    /**
-     * Helper method version of {@link PDFEvents.on}
-     * Called when a PDF viewer begins opening
-     */
-    static get viewerOpen() {
-        return PDFEvents._EVENTS['viewerOpen'].on;
-    }
-    /**
-     * Helper method version of {@link PDFEvents.on}
-     * Called when a PDF viewer begins closing
-     */
-    static get viewerClose() {
-        return PDFEvents._EVENTS['viewerClose'].on;
-    }
-    /**
-     * Helper method version of {@link PDFEvents.on}
-     * Called when a PDF viewer is ready to use
-     */
-    static get viewerReady() {
-        return PDFEvents._EVENTS['viewerReady'].on;
-    }
-    // </editor-fold>
-    /**
-     * Like @see {@link PDFEvents.on} but fires the event only once, then calls off.
-     * @param event
-     * @param callback
-     */
-    static once(event, callback) {
-        const wrapper = function (...args) {
-            callback(args);
-            PDFEvents.off(event, wrapper);
-        };
-        PDFEvents.on(event, wrapper);
-    }
-    /**
-     * Turn on an event callback for an event.
-     * @param event The name of the event
-     * @param callback The callback to turn on
-     */
-    static on(event, callback) {
-        PDFEvents._EVENTS[event].on(callback);
-    }
-    /**
-     * Turn off an event callback for an event.
-     * @param event The name of the event
-     * @param callback The callback to turn off
-     */
-    static off(event, callback) {
-        PDFEvents._EVENTS[event].off(callback);
-    }
-    static fire(event, ...args) {
-        if (PDFEvents.DEBUG) {
-            PDFLog_1.PDFLog.verbose(`Firing Event: ${event}`);
-            console.debug(args);
-        }
-        PDFEvents._EVENTS[event].fire(args);
-    }
-}
-exports.PDFEvents = PDFEvents;
-/**
- * Should every event call's event name and arguments be logged?
- */
-PDFEvents.DEBUG = false;
-PDFEvents._EVENTS = {
-    init: new EventStore('init'),
-    setup: new EventStore('setup'),
-    ready: new EventStore('ready'),
-    viewerOpen: new EventStore('viewerOpen'),
-    viewerClose: new EventStore('viewerClose'),
-    viewerReady: new EventStore('viewerReady'),
-};
-},{"../log/PDFLog":6}],6:[function(require,module,exports){
+},{"../log/PDFLog":6,"../settings/PDFSettings":9}],6:[function(require,module,exports){
 "use strict";
 /* Copyright 2020 Andrew Cuccinello
  *
@@ -916,8 +962,8 @@ PDFEvents._EVENTS = {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PDFLog = void 0;
 /**
- * A console logging wrapper that includes some additional information
- *  with output to help filter messages easier.
+ * A console logging wrapper that includes some additional information with output to help filter messages easier.
+ * @private
  */
 class PDFLog {
     static format(message) {
@@ -1058,25 +1104,35 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const PDFSetup_1 = require("./setup/PDFSetup");
 const PDFCache_1 = require("./cache/PDFCache");
-const PDFEvents_1 = require("./events/PDFEvents");
+const PDFEvents_1 = require("./api/PDFEvents");
 const PDFI18n_1 = require("./settings/PDFI18n");
 const PDFSettings_1 = require("./settings/PDFSettings");
 const PDFSocketHandler_1 = require("./socket/PDFSocketHandler");
+const PDFoundryAPI_1 = require("./api/PDFoundryAPI");
 PDFSetup_1.PDFSetup.registerSystem();
 PDFSetup_1.PDFSetup.registerAPI();
+/**
+ * @private
+ */
 const init = () => __awaiter(void 0, void 0, void 0, function* () {
     // Inject the css into the page
     PDFSetup_1.PDFSetup.registerCSS();
-    PDFEvents_1.PDFEvents.fire('init');
+    PDFEvents_1.PDFEvents.fire('init', PDFoundryAPI_1.PDFoundryAPI);
     yield setup();
 });
+/**
+ * @private
+ */
 const setup = () => __awaiter(void 0, void 0, void 0, function* () {
     // Initialize the cache system, creating the DB
     yield PDFCache_1.PDFCache.initialize();
     // Load the relevant internationalization file.
     yield PDFI18n_1.PDFI18n.initialize();
-    PDFEvents_1.PDFEvents.fire('setup');
+    PDFEvents_1.PDFEvents.fire('setup', PDFoundryAPI_1.PDFoundryAPI);
 });
+/**
+ * @private
+ */
 const ready = () => __awaiter(void 0, void 0, void 0, function* () {
     // Register the PDF sheet with the class picker, unregister others
     PDFSetup_1.PDFSetup.registerPDFSheet();
@@ -1084,7 +1140,7 @@ const ready = () => __awaiter(void 0, void 0, void 0, function* () {
     yield PDFSettings_1.PDFSettings.registerSettings();
     PDFSetup_1.PDFSetup.userLogin();
     PDFSocketHandler_1.PDFSocketHandler.registerHandlers();
-    PDFEvents_1.PDFEvents.fire('ready');
+    PDFEvents_1.PDFEvents.fire('ready', PDFoundryAPI_1.PDFoundryAPI);
 });
 Hooks.once('setup', init);
 Hooks.once('ready', ready);
@@ -1096,7 +1152,7 @@ Hooks.on('getItemDirectoryEntryContext', PDFSettings_1.PDFSettings.getItemContex
 // renderSettings - Inject a 'Open Manual' button into help section
 Hooks.on('renderSettings', PDFSettings_1.PDFSettings.onRenderSettings);
 // </editor-fold>
-},{"./cache/PDFCache":4,"./events/PDFEvents":5,"./settings/PDFI18n":8,"./settings/PDFSettings":9,"./setup/PDFSetup":10,"./socket/PDFSocketHandler":11}],8:[function(require,module,exports){
+},{"./api/PDFEvents":1,"./api/PDFoundryAPI":3,"./cache/PDFCache":5,"./settings/PDFI18n":8,"./settings/PDFSettings":9,"./setup/PDFSetup":10,"./socket/PDFSocketHandler":11}],8:[function(require,module,exports){
 "use strict";
 /* Copyright 2020 Andrew Cuccinello
  *
@@ -1126,6 +1182,7 @@ exports.PDFI18n = void 0;
 const PDFSettings_1 = require("./PDFSettings");
 /**
  * Localization helper
+ * @private
  */
 class PDFI18n {
     /**
@@ -1193,6 +1250,7 @@ const PDFUtil_1 = require("../api/PDFUtil");
 const PDFPreloadEvent_1 = require("../socket/events/PDFPreloadEvent");
 /**
  * Internal settings and helper methods for PDFoundry.
+ * @private
  */
 class PDFSettings {
     static get SOCKET_NAME() {
@@ -1318,7 +1376,7 @@ PDFSettings.EXTERNAL_SYSTEM_NAME = '../modules/pdfoundry';
 PDFSettings.INTERNAL_MODULE_NAME = 'pdfoundry';
 PDFSettings.PDF_ENTITY_TYPE = 'PDFoundry_PDF';
 PDFSettings.HELP_SEEN_KEY = 'HelpSeen';
-},{"../api/PDFUtil":1,"../api/PDFoundryAPI":2,"../cache/PDFCache":4,"../log/PDFLog":6,"../socket/events/PDFPreloadEvent":12}],10:[function(require,module,exports){
+},{"../api/PDFUtil":2,"../api/PDFoundryAPI":3,"../cache/PDFCache":5,"../log/PDFLog":6,"../socket/events/PDFPreloadEvent":12}],10:[function(require,module,exports){
 "use strict";
 /* Copyright 2020 Andrew Cuccinello
  *
@@ -1341,6 +1399,7 @@ const PDFItemSheet_1 = require("../app/PDFItemSheet");
 const PDFoundryAPI_1 = require("../api/PDFoundryAPI");
 /**
  * A collection of methods used for setting up the API & system state.
+ * @private
  */
 class PDFSetup {
     /**
@@ -1411,7 +1470,7 @@ class PDFSetup {
     }
 }
 exports.PDFSetup = PDFSetup;
-},{"../api/PDFoundryAPI":2,"../app/PDFItemSheet":3,"../settings/PDFSettings":9}],11:[function(require,module,exports){
+},{"../api/PDFoundryAPI":3,"../app/PDFItemSheet":4,"../settings/PDFSettings":9}],11:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PDFSocketHandler = void 0;
@@ -1421,6 +1480,9 @@ const PDFSetViewEvent_1 = require("./events/PDFSetViewEvent");
 const PDFoundryAPI_1 = require("../api/PDFoundryAPI");
 const PDFPreloadEvent_1 = require("./events/PDFPreloadEvent");
 const PDFCache_1 = require("../cache/PDFCache");
+/**
+ * @private
+ */
 class PDFSocketHandler {
     static registerHandlers() {
         // @ts-ignore
@@ -1456,7 +1518,7 @@ class PDFSocketHandler {
     }
 }
 exports.PDFSocketHandler = PDFSocketHandler;
-},{"../api/PDFoundryAPI":2,"../cache/PDFCache":4,"../log/PDFLog":6,"../settings/PDFSettings":9,"./events/PDFPreloadEvent":12,"./events/PDFSetViewEvent":13}],12:[function(require,module,exports){
+},{"../api/PDFoundryAPI":3,"../cache/PDFCache":5,"../log/PDFLog":6,"../settings/PDFSettings":9,"./events/PDFPreloadEvent":12,"./events/PDFSetViewEvent":13}],12:[function(require,module,exports){
 "use strict";
 /* Copyright 2020 Andrew Cuccinello
  *
@@ -1475,6 +1537,9 @@ exports.PDFSocketHandler = PDFSocketHandler;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PDFPreloadEvent = void 0;
 const PDFSocketEvent_1 = require("./PDFSocketEvent");
+/**
+ * @private
+ */
 class PDFPreloadEvent extends PDFSocketEvent_1.PDFSocketEvent {
     constructor(userIds, url) {
         super(userIds);
@@ -1512,6 +1577,9 @@ exports.PDFPreloadEvent = PDFPreloadEvent;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PDFSetViewEvent = void 0;
 const PDFSocketEvent_1 = require("./PDFSocketEvent");
+/**
+ * @private
+ */
 class PDFSetViewEvent extends PDFSocketEvent_1.PDFSocketEvent {
     constructor(userIds, pdfData, page) {
         super(userIds);
@@ -1551,6 +1619,9 @@ exports.PDFSetViewEvent = PDFSetViewEvent;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PDFSocketEvent = void 0;
 const PDFSettings_1 = require("../../settings/PDFSettings");
+/**
+ * @private
+ */
 class PDFSocketEvent {
     constructor(userIds) {
         this.userIds = userIds;
@@ -1605,7 +1676,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PDFViewer = void 0;
 const PDFSettings_1 = require("../settings/PDFSettings");
-const PDFEvents_1 = require("../events/PDFEvents");
+const PDFEvents_1 = require("../api/PDFEvents");
 const PDFSetViewEvent_1 = require("../socket/events/PDFSetViewEvent");
 const PDFUtil_1 = require("../api/PDFUtil");
 class PDFViewer extends Application {
@@ -1823,6 +1894,6 @@ class PDFViewer extends Application {
     }
 }
 exports.PDFViewer = PDFViewer;
-},{"../api/PDFUtil":1,"../events/PDFEvents":5,"../settings/PDFSettings":9,"../socket/events/PDFSetViewEvent":13}]},{},[7])
+},{"../api/PDFEvents":1,"../api/PDFUtil":2,"../settings/PDFSettings":9,"../socket/events/PDFSetViewEvent":13}]},{},[7])
 
 //# sourceMappingURL=bundle.js.map
