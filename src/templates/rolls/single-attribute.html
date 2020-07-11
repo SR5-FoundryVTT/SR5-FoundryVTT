@@ -1,0 +1,12 @@
+<form>
+    <div class="form-group">
+        <label>Second Attribute</label>
+        <select name="attribute2">
+            {{#select attribute2}}
+            <option value="none">None</option>
+            {{#each attributes as |att a|}} {{#ifne att attribute}}
+            <option value="{{a}}">{{toHeaderCase a}}</option>
+            {{/ifne}} {{/each}} {{/select}}
+        </select>
+    </div>
+</form>

@@ -1,0 +1,352 @@
+<form class="{{cssClass}} wholesheet" autocomplete="off">
+    <header>
+        <div class="flexrow">
+            <div class="profile-img">
+                <img
+                    class="profile"
+                    src="{{actor.img}}"
+                    data-edit="img"
+                    title="{{actor.name}}"
+                    height="80px"
+                    width="80px"
+                />
+            </div>
+            <div class="flex4">
+                <div class="flexrow">
+                    <div class="flex4">
+                        <div class="name">
+                            <input
+                                class="display text left"
+                                name="name"
+                                type="text"
+                                value="{{actor.name}}"
+                                placeholder="Name"
+                            />
+                        </div>
+                    </div>
+                    {{#each data.limits as |limit id|}} {{#unless limit.hidden}}
+                    <div class="limit">
+                        <div class="limit-row">
+                            <span class="limit-title">{{localize limit.label}}</span>
+                            <span class="limit-value" value="{{limit.value}}">{{limit.value}}</span>
+                        </div>
+                    </div>
+                    {{/unless}} {{/each}} {{#if data.wounds.value}}
+                    <div class="limit">
+                        <div class="limit-row">
+                            <span class="limit-title">({{localize "SR5.Wounds"}}</span>
+                            <span class="limit-value">-{{data.wounds.value}})</span>
+                        </div>
+                    </div>
+                    {{/if}}
+                </div>
+                <div class="attributes smooth">
+                    {{#each data.track as |track id|}}
+                    <div class="attribute" data-track="{{id}}">
+                        <div class="attribute-name track-roll roll">
+                            {{localize track.label}}
+                        </div>
+                        <div class="track">
+                            <div class="attribute-input-container">
+                                <input
+                                    class="display attribute-input"
+                                    size="2"
+                                    maxlength="2"
+                                    type="text"
+                                    name="data.track.{{id}}.value"
+                                    value="{{track.value}}"
+                                    data-dtype="Number"
+                                />
+                            </div>
+                            <div class="track-slash"></div>
+                            <div class="attribute-input-container">
+                                <input
+                                    class="display attribute-input"
+                                    size="2"
+                                    maxlength="2"
+                                    type="text"
+                                    name="data.track.{{id}}.max"
+                                    value="{{track.max}}"
+                                    disabled
+                                    data-dtype="Number"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    {{#ife track.max track.value}} {{#if track.overflow}}
+                    <div class="attribute">
+                        <div class="attribute-name">
+                            {{localize "SR5.Overflow"}}
+                        </div>
+                        <div class="track">
+                            <div class="attribute-input-container">
+                                <input
+                                    class="display attribute-input"
+                                    size="2"
+                                    maxlength="2"
+                                    type="text"
+                                    name="data.track.{{id}}.overflow.value"
+                                    value="{{track.overflow.value}}"
+                                    data-dtype="Number"
+                                />
+                            </div>
+                            <div class="track-slash"></div>
+                            <div class="attribute-input-container">
+                                <input
+                                    class="display attribute-input"
+                                    size="2"
+                                    maxlength="2"
+                                    type="text"
+                                    name="data.track.{{id}}.overflow.max"
+                                    value="{{track.overflow.max}}"
+                                    disabled
+                                    data-dtype="Number"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    {{/if}} {{/ife}} {{/each}}
+                    <div class="attribute">
+                        <div class="attribute-name attribute-roll roll" data-attribute="edge">
+                            {{localize "SR5.AttrEdge"}}
+                        </div>
+                        <div class="track">
+                            <div class="attribute-input-container">
+                                <input
+                                    class="display attribute-input"
+                                    size="2"
+                                    maxlength="2"
+                                    type="text"
+                                    name="data.attributes.edge.value"
+                                    value="{{data.attributes.edge.value}}"
+                                    data-dtype="Number"
+                                />
+                            </div>
+                            <div class="track-slash"></div>
+                            <div class="attribute-input-container">
+                                <input
+                                    class="display attribute-input"
+                                    size="2"
+                                    maxlength="2"
+                                    type="text"
+                                    name="data.attributes.edge.max"
+                                    value="{{data.attributes.edge.max}}"
+                                    data-dtype="Number"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="attribute">
+                        <div class="attribute-name">
+                            {{localize "SR5.Movement"}}
+                        </div>
+                        <div class="track">
+                            <div class="attribute-input-container">
+                                <input
+                                    class="display attribute-input"
+                                    size="2"
+                                    maxlength="2"
+                                    type="text"
+                                    name="data.movement.walk.value"
+                                    value="{{data.movement.walk.value}}"
+                                    data-dtype="Number"
+                                    disabled
+                                />
+                            </div>
+                            <div class="track-slash"></div>
+                            <div class="attribute-input-container">
+                                <input
+                                    class="display attribute-input"
+                                    size="2"
+                                    maxlength="2"
+                                    type="text"
+                                    name="data.movement.run.value"
+                                    value="{{data.movement.run.value}}"
+                                    data-dtype="Number"
+                                    disabled
+                                />
+                            </div>
+                            <div class="track-slash"></div>
+                            <div class="input attribute-input-container">
+                                <input
+                                    class="display attribute-input"
+                                    size="2"
+                                    maxlength="2"
+                                    type="text"
+                                    name="data.movement.sprint"
+                                    value="{{data.movement.sprint}}"
+                                    data-dtype="Number"
+                                />
+                                <span class="unit">
+                                    +
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="attribute">
+                        <div class="track">
+                            <div class="attribute-name">
+                                <select name="data.initiative.perception" class="display">
+                                    {{#select data.initiative.perception}}
+                                    <option value="meatspace"
+                                        >{{localize "SR5.InitCatMeatspace"}}</option
+                                    >
+                                    <option value="matrix">{{localize "SR5.InitCatMatrix"}}</option>
+                                    {{#ife data.special 'magic'}}
+                                    <option value="astral">{{localize "SR5.InitCatAstral"}}</option>
+                                    {{/ife}} {{/select}}
+                                </select>
+                            </div>
+                            <label
+                                title="Use Edge in next Initiative Roll"
+                                class="checkbox init-edge-label"
+                            >
+                                <input
+                                    type="checkbox"
+                                    class="submit-checkbox"
+                                    name="data.initiative.edge"
+                                    {{checked
+                                    data.initiative.edge}}
+                                />
+                                <span class="checkmark far"></span>
+                            </label>
+                        </div>
+                        <div class="track">
+                            <div class="attribute-input-container">
+                                <input
+                                    class="display"
+                                    size="4"
+                                    type="text"
+                                    value="{{data.initiative.current.base.value}}"
+                                    disabled
+                                />
+                            </div>
+                            <div class="track-plus"></div>
+                            <div class="attribute-input-container">
+                                <input
+                                    class="display"
+                                    size="4"
+                                    type="text"
+                                    value="{{data.initiative.current.dice.text}}"
+                                    disabled
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="attribute">
+                        <div class="attribute-name roll attribute-roll" data-attribute="essence">
+                            {{localize "SR5.AttrEssence"}}
+                        </div>
+                        <div class="attribute-input-container">
+                            <input
+                                class="display attribute-input"
+                                type="text"
+                                size="4"
+                                name="data.attributes.essence.value"
+                                value="{{data.attributes.essence.value}}"
+                                data-dtype="Number"
+                                disabled
+                                placeholder="1"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="attributes no-border">
+            <div class="attribute row space-around">
+                <div class="attribute-only-roll roll attribute-name" data-roll="composure">
+                    {{localize "SR5.RollComposure"}}
+                </div>
+                <div class="attribute-only-roll roll attribute-name" data-roll="judge_intentions">
+                    {{localize "SR5.RollJudgeIntentions"}}
+                </div>
+                <div class="attribute-only-roll roll attribute-name" data-roll="lift_carry">
+                    {{localize "SR5.RollLiftCarry"}}
+                </div>
+                <div class="attribute-only-roll roll attribute-name" data-roll="memory">
+                    {{localize "SR5.RollMemory"}}
+                </div>
+                <div
+                    title="Roll"
+                    class="attribute-name basic-roll roll fas fa-dice-six"
+                    data-roll="basic"
+                ></div>
+                <div title="Defense" class="attribute-name defense-roll roll">
+                    {{localize "SR5.RollDefense"}}
+                </div>
+                <div title="Soak" class="attribute-name soak-roll roll">
+                    {{localize "SR5.RollSoak"}}
+                </div>
+                <div class="attribute-name roll armor-roll">
+                    {{localize "SR5.RollArmor"}} ({{data.armor.value}})
+                </div>
+                {{#if awakened}}
+                <div class="attribute-name roll drain-roll">
+                    {{localize "SR5.RollDrain"}}
+                </div>
+                {{/if}} {{#if emerged}}
+                <div class="attribute-name roll fade-roll">
+                    {{localize "SR5.RollFade"}}
+                </div>
+                {{/if}}
+            </div>
+        </div>
+    </header>
+    <nav class="tabs" data-group="primary">
+        <a class="item" data-tab="actions">{{localize "SR5.Actions"}}</a>
+        <a class="item" data-tab="skills">{{localize "SR5.Skills"}}</a>
+        <a class="item active" data-tab="equipment">{{localize "SR5.Gear"}}</a>
+        {{#ife data.special 'magic'}}
+        <a class="item" data-tab="magic">{{localize "SR5.Magic"}}</a>
+        {{/ife}}
+        <a class="item" data-tab="matrix">{{localize "SR5.Matrix"}}</a>
+        <a class="item" data-tab="bio">{{localize "SR5.Biography"}}</a>
+        <a class="item" data-tab="social">{{localize "SR5.Social"}}</a>
+        <a class="item" data-tab="config">{{localize "SR5.Miscellaneous"}}</a>
+    </nav>
+    <section class="sheetbody">
+        <div class="tab" data-group="primary" data-tab="skills">
+            <div class="tabbody">
+                {{> "systems/shadowrun5e/dist/templates/actor/parts/actor-skills.html"}}
+            </div>
+        </div>
+        <div class="tab" data-group="primary" data-tab="equipment">
+            <div class="tabbody">
+                {{> "systems/shadowrun5e/dist/templates/actor/parts/actor-equipment.html"
+                sections=inventory data=data}}
+            </div>
+        </div>
+        <div class="tab" data-group="primary" data-tab="magic">
+            <div class="tabbody">
+                {{> "systems/shadowrun5e/dist/templates/actor/parts/actor-spellbook.html"
+                spells=magic.spellbook powers=magic.powers}}
+            </div>
+        </div>
+        <div class="tab" data-group="primary" data-tab="matrix">
+            <div class="tabbody">
+                {{> "systems/shadowrun5e/dist/templates/actor/parts/actor-matrix.html" }}
+            </div>
+        </div>
+        <div class="tab" data-group="primary" data-tab="actions">
+            <div class="tabbody">
+                {{> "systems/shadowrun5e/dist/templates/actor/parts/actor-actions.html"}}
+            </div>
+        </div>
+        <div class="tab" data-group="primary" data-tab="bio">
+            <div class="tabbody">
+                {{> "systems/shadowrun5e/dist/templates/actor/parts/actor-bio.html" }}
+            </div>
+        </div>
+        <div class="tab" data-group="primary" data-tab="social">
+            <div class="tabbody">
+                {{> "systems/shadowrun5e/dist/templates/actor/parts/actor-social.html" }}
+            </div>
+        </div>
+        <div class="tab" data-group="primary" data-tab="config">
+            <div class="tabbody">
+                {{> "systems/shadowrun5e/dist/templates/actor/parts/actor-config.html" }}
+            </div>
+        </div>
+    </section>
+</form>

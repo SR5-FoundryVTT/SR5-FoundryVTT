@@ -1,0 +1,99 @@
+<div class="item-form">
+    <div class="header">
+        {{header}}
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.DeviceType"}}
+        </div>
+        <div class="inputs">
+            <select name="data.category">
+                {{#select data.category}} {{#each config.deviceCategories as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
+    </div>
+    {{#ife data.category "cyberdeck"}}
+    <div class="form-line">
+        <div class="label">
+            <select name="data.atts.att1.att">
+                {{#select data.atts.att1.att}} {{#each config.matrixAttributes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
+        <div class="inputs">
+            <input
+                type="text"
+                maxlength="2"
+                size="2"
+                name="data.atts.att1.value"
+                value="{{data.atts.att1.value}}"
+                data-dtype="Number"
+                placeholder="1"
+            />
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
+            <select name="data.atts.att2.att">
+                {{#select data.atts.att2.att}} {{#each config.matrixAttributes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
+        <div class="inputs">
+            <input
+                type="text"
+                maxlength="2"
+                size="2"
+                name="data.atts.att2.value"
+                value="{{data.atts.att2.value}}"
+                data-dtype="Number"
+                placeholder="1"
+            />
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
+            <select name="data.atts.att3.att">
+                {{#select data.atts.att3.att}} {{#each config.matrixAttributes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
+        <div class="inputs">
+            <input
+                type="text"
+                maxlength="2"
+                size="2"
+                name="data.atts.att3.value"
+                value="{{data.atts.att3.value}}"
+                data-dtype="Number"
+                placeholder="1"
+            />
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
+            <select name="data.atts.att4.att">
+                {{#select data.atts.att4.att}} {{#each config.matrixAttributes as |name type|}}
+                <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
+        <div class="inputs">
+            <input
+                type="text"
+                maxlength="2"
+                size="2"
+                name="data.atts.att4.value"
+                value="{{data.atts.att4.value}}"
+                data-dtype="Number"
+                placeholder="1"
+            />
+        </div>
+    </div>
+    {{/ife}}
+</div>

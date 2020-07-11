@@ -6,11 +6,11 @@
     "templateVersion": "1.4",
     "author": "Shawn Milligan [n3rf_herder#9026], Andrew Cuccinello [DJ#1982]",
     "esmodules": [
-        "build/bundle.js",
+        "dist/bundle.js",
         "pdfoundry-dist/bundle.js"
     ],
     "styles": [
-        "css/main.css"
+        "dist/bundle.css"
     ],
     "minimumCoreVersion": "0.6.0",
     "compatibleCoreVersion": "0.6.1",
@@ -18,12 +18,12 @@
         {
             "lang": "en",
             "name": "English",
-            "path": "lang/en.json"
+            "path": "dist/locale/en/config.json"
         },
         {
             "lang": "de",
             "name": "Deutsch",
-            "path": "lang/de.json"
+            "path": "dist/locale/de/config.json"
         }
     ],
     "packs": [],

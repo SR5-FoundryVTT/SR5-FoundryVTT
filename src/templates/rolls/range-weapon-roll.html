@@ -1,0 +1,26 @@
+<form>
+    {{#if ammo}}
+    <div class="form-group">
+        <label>Rounds Remaining</label>
+        <label>{{ammo.current.value}}/{{ammo.current.max}}</label>
+    </div>
+    {{/if}}
+    <div class="form-group">
+        <label>{{localize 'SR5.FireMode'}}{{#if rc}} ({{localize 'SR5.Total'}} {{localize 'SR5.RecoilCompensation'}}{{rc}}){{/if}}</label>
+        <select name="fireMode">
+            {{#select fireMode}} {{#each fireModes as |description count|}}
+            <option value="{{count}}"
+                >{{description}} - {{count}} Round{{#ifgt count 1}}s{{/ifgt}}</option
+            >
+            {{/each}} {{/select}}
+        </select>
+    </div>
+    <div class="form-group">
+        <label>{{localize 'SR5.Range'}}</label>
+        <select name="range">
+            {{#select targetRange}} {{#each ranges as |range key|}}
+            <option value="{{range.modifier}}">{{localize range.label}} ({{range.distance}} m)</option>
+            {{/each}} {{/select}}
+        </select>
+    </div>
+</form>

@@ -1,25 +1,9 @@
-/* Copyright 2020 Andrew Cuccinello
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 'use strict';
 const fs = require('fs');
 const path = require('path');
 const del = require('del');
 const assign = require('lodash.assign');
 const chalk = require('chalk');
-const { exec } = require('child_process');
 
 // Browserify
 const browserify = require('browserify');
@@ -39,7 +23,7 @@ const logger = require('gulplog');
 const sourcemaps = require('gulp-sourcemaps');
 
 // Config
-const distName = 'pdfoundry-dist';
+const distName = 'dist';
 const destFolder = path.resolve(process.cwd(), distName);
 const jsBundle = 'bundle.js';
 
@@ -94,12 +78,8 @@ async function buildJS() {
  */
 async function copyAssets() {
     gulp.src('assets/**/*').pipe(gulp.dest(path.resolve(destFolder, 'assets')));
-    gulp.src('manual/**/*.pdf').pipe(gulp.dest(path.resolve(destFolder, 'assets', 'manual')));
     gulp.src('src/templates/**/*').pipe(gulp.dest(path.resolve(destFolder, 'templates')));
     gulp.src('locale/**/*').pipe(gulp.dest(path.resolve(destFolder, 'locale')));
-    gulp.src('pdfjs/**/*').pipe(gulp.dest(path.resolve(destFolder, 'pdfjs')));
-    gulp.src('src/scripts/**/*').pipe(gulp.dest(path.resolve(destFolder, 'scripts')));
-    gulp.src('LICENSE').pipe(gulp.dest(destFolder));
 }
 
 /**
@@ -112,14 +92,10 @@ async function watch() {
     }
 
     watch('assets/**/*', 'assets');
-    watch('manual/**/*.pdf', ['assets', 'manual']);
     watch('src/templates/**/*', 'templates');
     watch('locale/**/*', 'locale');
-    watch('pdfjs/**/*', 'pdfjs');
-    watch('src/scripts/**/*', 'scripts');
-    watch('LICENSE', '');
 
-    gulp.watch('src/css/**/*.scss').on('change', async () => await buildSass());
+    gulp.watch('src/**/*.scss').on('change', async () => await buildSass());
 
     // Watchify setup
     const watchArgs = assign({}, watchify.args, baseArgs);
@@ -160,8 +136,8 @@ async function buildSass() {
 }
 
 exports.clean = cleanDist;
-exports.assets = copyAssets;
 exports.sass = buildSass;
+exports.assets = copyAssets;
 exports.build = gulp.series(copyAssets, buildSass, buildJS);
 exports.watch = gulp.series(exports.build, watch);
 exports.rebuild = gulp.series(cleanDist, exports.build);
