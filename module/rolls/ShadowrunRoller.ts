@@ -56,7 +56,7 @@ export class ShadowrunRoll extends Roll {
 }
 
 export class ShadowrunRoller {
-    static itemRoll(event, item, options?: Partial<AdvancedRollProps>): Promise<ShadowrunRoll | undefined> {
+    static itemRoll(event, item: SR5Item, options?: Partial<AdvancedRollProps>): Promise<ShadowrunRoll | undefined> {
         const parts = item.getRollPartsList();
         let limit = item.getLimit();
         let title = item.getRollName();
@@ -92,6 +92,9 @@ export class ShadowrunRoller {
         }
         if (item.isRangedWeapon()) {
             rollData['fireMode'] = item.getLastFireMode()?.label;
+            if (rollData.dialogOptions) {
+                rollData.dialogOptions.environmental = item.getLastFireRangeMod().value;
+            }
         }
         rollData.description = item.getChatData();
 
@@ -209,7 +212,7 @@ export class ShadowrunRoller {
             parts,
             limit: limit?.value,
             wounds,
-            woundValue: actor?.getWounds(),
+            woundValue: actor?.getWoundModifier(),
         };
         let template = 'systems/shadowrun5e/templates/rolls/roll-dialog.html';
         let edge = false;
@@ -251,7 +254,7 @@ export class ShadowrunRoller {
                             for (const key in parts) {
                                 delete parts[key];
                             }
-                            game.user.setFlag('shadowrun5e', 'lastRollPromptValue', dicePoolValue);
+                            await game.user.setFlag('shadowrun5e', 'lastRollPromptValue', dicePoolValue);
                             parts['SR5.Base'] = dicePoolValue;
                         }
 
@@ -263,9 +266,9 @@ export class ShadowrunRoller {
                             limit.label = 'SR5.Override';
                         }
 
-                        const woundValue = -Helpers.parseInputToNumber($(html).find('[name="wounds"]').val());
+                        const woundValue = Helpers.parseInputToNumber($(html).find('[name="wounds"]').val());
                         const situationMod = Helpers.parseInputToNumber($(html).find('[name="dp_mod"]').val());
-                        const environmentMod = -Helpers.parseInputToNumber($(html).find('[name="options.environmental"]').val());
+                        const environmentMod = Helpers.parseInputToNumber($(html).find('[name="options.environmental"]').val());
 
                         if (wounds && woundValue !== 0) {
                             parts['SR5.Wounds'] = woundValue;

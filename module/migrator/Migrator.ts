@@ -1,5 +1,6 @@
 import { VersionMigration } from './VersionMigration';
 import { LegacyMigration } from './versions/LegacyMigration';
+import { Version0_6_5 } from './versions/Version0_6_5';
 
 type VersionDefinition = {
     versionNumber: string;
@@ -7,7 +8,10 @@ type VersionDefinition = {
 };
 export class Migrator {
     // Map of all version migrations to their target version numbers.
-    private static readonly s_Versions: VersionDefinition[] = [{ versionNumber: LegacyMigration.TargetVersion, migration: new LegacyMigration() }];
+    private static readonly s_Versions: VersionDefinition[] = [
+        { versionNumber: LegacyMigration.TargetVersion, migration: new LegacyMigration() },
+        { versionNumber: Version0_6_5.TargetVersion, migration: new Version0_6_5() },
+    ];
 
     //TODO: Call on Init()
     public static async BeginMigration() {
@@ -21,10 +25,37 @@ export class Migrator {
             return this.compareVersion(versionNumber, currentVersion) === 1;
         });
 
+        // No migrations are required, exit.
         if (migrations.length === 0) {
             return;
         }
 
+        const localizedWarningTitle = game.i18n.localize('SR5.MIGRATION.WarningTitle');
+        const localizedWarningHeader = game.i18n.localize('SR5.MIGRATION.WarningHeader');
+        const localizedWarningRequired = game.i18n.localize('SR5.MIGRATION.WarningRequired');
+        const localizedWarningDescription = game.i18n.localize('SR5.MIGRATION.WarningDescription');
+        const localizedWarningBackup = game.i18n.localize('SR5.MIGRATION.WarningBackup');
+        const localizedWarningBegin = game.i18n.localize('SR5.MIGRATION.BeginMigration');
+
+        const d = new Dialog({
+            title: localizedWarningTitle,
+            content:
+                `<h2 style="color: red; text-align: center">${localizedWarningHeader}</h2>` +
+                `<p style="text-align: center"><i>${localizedWarningRequired}</i></p>` +
+                `<p>${localizedWarningDescription}</p>` +
+                `<h3 style="color: red">${localizedWarningBackup}</h3>`,
+            buttons: {
+                ok: {
+                    label: localizedWarningBegin,
+                    callback: () => this.migrate(migrations),
+                },
+            },
+            default: 'ok',
+        });
+        d.render(true);
+    }
+
+    private static async migrate(migrations: VersionDefinition[]) {
         // we want to apply migrations in ascending order until we're up to the latest
         migrations.sort((a, b) => {
             return this.compareVersion(a.versionNumber, b.versionNumber);
@@ -33,18 +64,21 @@ export class Migrator {
         await this.migrateWorld(game, migrations);
         await this.migrateCompendium(game, migrations);
 
-        //TODO: Localization
+        const localizedWarningTitle = game.i18n.localize('SR5.MIGRATION.SuccessTitle');
+        const localizedWarningHeader = game.i18n.localize('SR5.MIGRATION.SuccessHeader');
+        const localizedSuccessDescription = game.i18n.localize('SR5.MIGRATION.SuccessDescription');
+        const localizedSuccessPacksInfo = game.i18n.localize('SR5.MIGRATION.SuccessPacksInfo');
+        const localizedSuccessConfirm = game.i18n.localize('SR5.MIGRATION.SuccessConfirm');
         const packsDialog = new Dialog({
-            title: 'Migration complete!',
+            title: localizedWarningTitle,
             content:
-                '<h3>Migration Complete</h3>' +
-                '<p>Any world compendium packs that exist in the world were also updated.</p>' +
-                '<p style="color: red">Due to technical limitations with FoundryVTT, actor compendium packs are unable to be updated at this time.' +
-                ' You will have to manually update these packs.</p>',
+                `<h2 style="text-align: center; color: green">${localizedWarningHeader}</h2>` +
+                `<p>${localizedSuccessDescription}</p>` +
+                `<p style="text-align: center"><i>${localizedSuccessPacksInfo}</i></p>`,
             buttons: {
                 ok: {
                     icon: '<i class="fas fa-check"></i>',
-                    label: 'Close',
+                    label: localizedSuccessConfirm,
                 },
             },
             default: 'ok',

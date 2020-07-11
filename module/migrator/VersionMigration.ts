@@ -124,9 +124,44 @@ export abstract class VersionMigration {
                     continue;
                 }
 
+                if (scene._id === 'MAwSFhlXRipixOWw') {
+                    console.log('Scene Pre-Update');
+                    console.log(scene);
+                }
+
                 console.log(`Migrating Scene entity ${scene.name}`);
                 const updateData = await this.MigrateSceneData(duplicate(scene.data));
-                // updateData.tokens = await this.getMigratedSceneTokens(scene.data);
+
+                let hasTokenUpdates = false;
+                updateData.tokens = await Promise.all(
+                    // @ts-ignore
+                    scene.data.tokens.map(async (token) => {
+                        if (isObjectEmpty(token.actorData)) {
+                            return token;
+                        }
+
+                        let tokenDataUpdate = await this.MigrateActorData(token.actorData);
+                        if (!isObjectEmpty(tokenDataUpdate)) {
+                            hasTokenUpdates = true;
+                            tokenDataUpdate['_id'] = token._id;
+
+                            const newToken = duplicate(token);
+                            newToken.actorData = await mergeObject(token.actorData, tokenDataUpdate, {
+                                enforceTypes: false,
+                                inplace: false,
+                            });
+                            console.log(newToken);
+                            return newToken;
+                        } else {
+                            return token;
+                        }
+                    }),
+                );
+                if (scene._id === 'MAwSFhlXRipixOWw') {
+                    console.log('Scene Pre-Update');
+                    console.log(scene);
+                }
+
                 if (isObjectEmpty(updateData)) {
                     continue;
                 }
@@ -185,7 +220,9 @@ export abstract class VersionMigration {
                 }
 
                 console.log(`Migrating Actor ${actor.name}`);
+                console.log(actor);
                 const updateData = await this.MigrateActorData(duplicate(actor.data));
+                console.log(updateData);
                 let items = [];
                 if (updateData.items) {
                     items = updateData.items;
@@ -205,17 +242,55 @@ export abstract class VersionMigration {
     }
 
     /**
+     * Iterate over an actor's items, updating those that need updating.
+     * @param actorData The actor to iterate over
+     * @param updateData The existing update data to merge into
+     */
+    protected async IterateActorItems(actorData: ActorData, updateData) {
+        let hasItemUpdates = false;
+        // @ts-ignore
+        if (actorData.items !== undefined) {
+            const items = await Promise.all(
+                // @ts-ignore
+                actorData.items.map(async (item) => {
+                    let itemUpdate = await this.MigrateItemData(item);
+
+                    if (!isObjectEmpty(itemUpdate)) {
+                        hasItemUpdates = true;
+                        itemUpdate['_id'] = item._id;
+                        return await mergeObject(item, itemUpdate, {
+                            enforceTypes: false,
+                            inplace: false,
+                        });
+                    } else {
+                        return item;
+                    }
+                }),
+            );
+            if (hasItemUpdates) {
+                updateData.items = items;
+            }
+        }
+
+        return updateData;
+    }
+
+    /**
      * Check if a scene requires updates.
      * @param scene The scene to check.
      * @return A promise that resolves true or false.
      */
-    protected abstract async ShouldMigrateSceneData(scene: Scene): Promise<boolean>;
+    protected async ShouldMigrateSceneData(scene: Scene): Promise<boolean> {
+        return false;
+    }
     /**
      * Migrate the specified scene's data.
      * @param scene The scene to migrate.
      * @return A promise that resolves with the update data.
      */
-    protected abstract async MigrateSceneData(scene: any): Promise<any>;
+    protected async MigrateSceneData(scene: any): Promise<any> {
+        return {};
+    }
     /**
      * Do something right before scene data is migrated.
      * @param game The game to be updated.
@@ -234,13 +309,17 @@ export abstract class VersionMigration {
      * @param item The item to check.
      * @return A promise that resolves true or false.
      */
-    protected abstract async ShouldMigrateItemData(item: BaseEntityData): Promise<boolean>;
+    protected async ShouldMigrateItemData(item: BaseEntityData): Promise<boolean> {
+        return false;
+    }
     /**
      * Migrate the specified item's data.
      * @param item The item to migrate.
      * @return A promise that resolves with the update data.
      */
-    protected abstract async MigrateItemData(item: BaseEntityData): Promise<any>;
+    protected async MigrateItemData(item: BaseEntityData): Promise<any> {
+        return {};
+    }
     /**
      * Do something right before item data is migrated.
      * @param game The game to be updated.
@@ -259,13 +338,17 @@ export abstract class VersionMigration {
      * @param actor The actor to check.
      * @return A promise that resolves true or false.
      */
-    protected abstract async ShouldMigrateActorData(actor: ActorData): Promise<boolean>;
+    protected async ShouldMigrateActorData(actor: ActorData): Promise<boolean> {
+        return false;
+    }
     /**
      * Migrate the specified actor's data.
      * @param actor The actor to migrate.
      * @return A promise that resolves with the update data.
      */
-    protected abstract async MigrateActorData(actor: ActorData): Promise<any>;
+    protected async MigrateActorData(actor: ActorData): Promise<any> {
+        return {};
+    }
     /**
      * Do something right before actor data is migrated.
      * @param game The game to be updated.

@@ -202,15 +202,7 @@ export class SR5ActorSheet extends ActorSheet {
             if (i1.name < i2.name) return -1;
             return 0;
         };
-        actions.sort(sortByName);
-        adept_powers.sort(sortByName);
-        complex_forms.sort(sortByName);
-        items.sort(sortByName);
-        spells.sort(sortByName);
-        contacts.sort(sortByName);
-        lifestyles.sort(sortByName);
-        sins.sort(sortByName);
-        programs.sort((left, right) => {
+        const sortByEquipped = (left, right) => {
             const leftEquipped = left.data?.technology?.equipped;
             const rightEquipped = right.data?.technology?.equipped;
             if (leftEquipped && !rightEquipped) return -1;
@@ -218,7 +210,16 @@ export class SR5ActorSheet extends ActorSheet {
             if (left.name > right.name) return 1;
             if (left.name < right.name) return -1;
             return 0;
-        });
+        }
+        actions.sort(sortByName);
+        adept_powers.sort(sortByName);
+        complex_forms.sort(sortByName);
+        items.sort(sortByEquipped);
+        spells.sort(sortByName);
+        contacts.sort(sortByName);
+        lifestyles.sort(sortByName);
+        sins.sort(sortByName);
+        programs.sort(sortByEquipped);
 
         items.forEach((item) => {
             inventory[item.type].items.push(item);

@@ -1,6 +1,8 @@
 {
     "Actor": {
-        "types": ["character"],
+        "types": [
+            "character"
+        ],
         "templates": {
             "matrix": {
                 "matrix": {
@@ -775,6 +777,7 @@
                 "notoriety": 0,
                 "public_awareness": 0,
                 "special": "mundane",
+                "full_defense_attribute": "willpower",
                 "description": {
                     "value": ""
                 },
@@ -860,7 +863,13 @@
             }
         },
         "character": {
-            "templates": ["common", "skills", "attributes", "matrix", "limits"],
+            "templates": [
+                "common",
+                "skills",
+                "attributes",
+                "matrix",
+                "limits"
+            ],
             "track": {
                 "stun": {
                     "value": 0,
@@ -894,7 +903,8 @@
             "quality",
             "sin",
             "spell",
-            "weapon"
+            "weapon",
+            "PDFoundry_PDF"
         ],
         "templates": {
             "description": {
@@ -1024,10 +1034,17 @@
             }
         },
         "armor": {
-            "templates": ["description", "armor", "technology"]
+            "templates": [
+                "description",
+                "armor",
+                "technology"
+            ]
         },
         "ammo": {
-            "templates": ["description", "technology"],
+            "templates": [
+                "description",
+                "technology"
+            ],
             "element": "",
             "ap": 0,
             "damage": 0,
@@ -1038,7 +1055,10 @@
             }
         },
         "modification": {
-            "templates": ["description", "technology"],
+            "templates": [
+                "description",
+                "technology"
+            ],
             "type": "",
             "mount_point": "",
             "dice_pool": 0,
@@ -1046,7 +1066,10 @@
             "rc": 0
         },
         "spell": {
-            "templates": ["description", "action"],
+            "templates": [
+                "description",
+                "action"
+            ],
             "drain": 0,
             "category": "",
             "type": "",
@@ -1072,46 +1095,76 @@
             }
         },
         "complex_form": {
-            "templates": ["description", "action"],
+            "templates": [
+                "description",
+                "action"
+            ],
             "target": "",
             "duration": "",
             "fade": 0
         },
         "weapon": {
-            "templates": ["description", "action", "technology", "weapon"]
+            "templates": [
+                "description",
+                "action",
+                "technology",
+                "weapon"
+            ]
         },
         "cyberware": {
-            "templates": ["description", "technology", "action", "armor"],
+            "templates": [
+                "description",
+                "technology",
+                "action",
+                "armor"
+            ],
             "essence": 0,
             "grade": "standard",
             "capacity": 0
         },
         "adept_power": {
-            "templates": ["description", "action", "armor"],
+            "templates": [
+                "description",
+                "action",
+                "armor"
+            ],
             "pp": 0,
             "type": "",
             "drain": false,
             "level": 0
         },
         "quality": {
-            "templates": ["description", "action"],
+            "templates": [
+                "description",
+                "action"
+            ],
             "type": "positive"
         },
         "action": {
-            "templates": ["description", "action"]
+            "templates": [
+                "description",
+                "action"
+            ]
         },
         "contact": {
-            "templates": ["description"],
+            "templates": [
+                "description"
+            ],
             "type": "",
             "connection": 0,
             "loyalty": 0
         },
         "sin": {
-            "templates": ["description", "technology"],
+            "templates": [
+                "description",
+                "technology"
+            ],
             "licenses": []
         },
         "lifestyle": {
-            "templates": ["description"],
+            "templates": [
+                "description"
+            ],
             "type": "",
             "comforts": 0,
             "security": 0,
@@ -1122,7 +1175,10 @@
             "mods": []
         },
         "device": {
-            "templates": ["description", "technology"],
+            "templates": [
+                "description",
+                "technology"
+            ],
             "category": "commlink",
             "atts": {
                 "att1": {
@@ -1144,11 +1200,23 @@
             }
         },
         "program": {
-            "templates": ["description", "technology"],
+            "templates": [
+                "description",
+                "technology"
+            ],
             "type": "common_program"
         },
         "equipment": {
-            "templates": ["description", "technology"]
+            "templates": [
+                "description",
+                "technology"
+            ]
+        },
+        "PDFoundry_PDF": {
+            "url": "",
+            "code": "",
+            "offset": 0,
+            "cache": false
         }
     }
 }

@@ -1,25 +1,22 @@
 <form class="{{cssClass}}" autocomplete="off" onsubmit="event.preventDefault()">
     <header class="flexcol">
         <h1>Chummer Import</h1>
+        <ol>
+            <li>Enter career mode in Chummer</li>
+            <li>Select language English in Chummer </li>
+            <li>In Chummer... Click File then Export, select JSON in the drop down, then copy all text from the box</li>
+            <li>Paste the text you copied into this box, check the appropriate boxes, then click import</li>
+        </ol>
     </header>
     <section>
         Uncheck items to not import. ONLY IMPORT CHARACTER ONCE.
         <div class="flexrow">
-            Weapons<input type="checkbox" class="weapons" checked /> Armor<input
-                type="checkbox"
-                class="armor"
-                checked
-            />
-            Cyberware<input type="checkbox" class="cyberware" checked /> Equipment<input
-                type="checkbox"
-                class="gear"
-                checked
-            />
-            Qualities<input type="checkbox" class="qualities" checked /> Powers<input
-                type="checkbox"
-                class="powers"
-                checked
-            />
+            Weapons<input type="checkbox" class="weapons" checked />
+            Armor<input type="checkbox" class="armor" checked />
+            Cyberware<input type="checkbox" class="cyberware" checked />
+            Equipment<input type="checkbox" class="gear" checked />
+            Qualities<input type="checkbox" class="qualities" checked />
+            Powers<input type="checkbox" class="powers" checked />
             Spells<input type="checkbox" class="spells" checked />
         </div>
         <textarea class="chummer-text" rows="20" cols="50"> </textarea>

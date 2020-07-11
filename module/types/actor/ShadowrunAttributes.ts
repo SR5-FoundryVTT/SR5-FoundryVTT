@@ -9,5 +9,7 @@ declare namespace Shadowrun {
     export type AttributeField = BaseValuePair<number> &
         CanHideFiled &
         ModifiableValue &
-        LabelField;
+        LabelField & {
+            limit?: string;
+        };
 }

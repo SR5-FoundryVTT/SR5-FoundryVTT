@@ -87,6 +87,9 @@ export class SR5ItemSheet extends ItemSheet {
         data['ammunition'] = ammunition;
         data['weaponMods'] = weaponMods;
         data['armorMods'] = armorMods;
+        // TODO set to the proper boolean for if the source PDF can be accessed
+        // I'm thinking maybe check for the mod being installed?
+        data['hasSourcePdfAvailable'] = true;
 
         return data;
     }
@@ -116,6 +119,8 @@ export class SR5ItemSheet extends ItemSheet {
 
         html.find('.add-new-license').click(this._onAddLicense.bind(this));
         html.find('.license-delete').on('click', this._onRemoveLicense.bind(this));
+
+        html.find('.open-source-pdf').on('click', this._onOpenSourcePdf.bind(this));
 
         html.find('.has-desc').click((event) => {
             event.preventDefault();
@@ -180,6 +185,11 @@ export class SR5ItemSheet extends ItemSheet {
     _eventId(event) {
         event.preventDefault();
         return event.currentTarget.closest('.item').dataset.itemId;
+    }
+
+    async _onOpenSourcePdf(event) {
+        event.preventDefault();
+        await this.item.openPdfSource();
     }
 
     async _onEditItem(event) {

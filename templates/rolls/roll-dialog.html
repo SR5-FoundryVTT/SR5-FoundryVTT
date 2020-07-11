@@ -2,39 +2,21 @@
     {{> "systems/shadowrun5e/templates/rolls/parts/parts-list.html" }}
     <div class="form-group">
         <label style="font-weight: bold;">{{localize "SR5.DicePool"}}</label>
-        <input style='flex: 1' type='text' name='dice_pool' size='3' maxlength='3'
-        value='{{dice_pool}}' data-dtype="Number" {{#unless options.prompt}} disabled {{/unless}} />
+        <input style='flex: 1' type='text' name='dice_pool' size='3' maxlength='3' value='{{dice_pool}}' data-dtype="Number" {{#unless options.prompt}} disabled
+        {{/unless}} />
     </div>
     <div class="form-group">
         <label>{{localize "SR5.SituationalModifier"}}</label>
-        <input
-            style="flex: 1;"
-            type="text"
-            name="dp_mod"
-            size="3"
-            maxlength="10"
-            value="{{dp_mod}}"
-            data-dtype="Number"
-            placeholder="+/- mod"
-        />
+        <input style="flex: 1;" type="text" name="dp_mod" size="3" maxlength="10" value="{{dp_mod}}" data-dtype="Number" placeholder="+/- mod" />
     </div>
     {{#if limit}}
     <div class="form-group">
-        <label>Limit</label>
-        <input
-            style="flex: 1;"
-            type="text"
-            name="limit"
-            size="3"
-            maxlength="3"
-            value="{{limit}}"
-            data-dtype="Number"
-        />
+        <label>{{localize 'SR5.Limit'}}</label>
+        <input style="flex: 1;" type="text" name="limit" size="3" maxlength="3" value="{{limit}}" data-dtype="Number" />
     </div>
-    {{/if}} {{#if wounds}}
-    {{#if woundValue}}
+    {{/if}} {{#if wounds}} {{#if woundValue}}
     <div class="form-group">
-        <label>Wounds (-{{woundValue}})</label>
+        <label>{{localize 'SR5.WoundModifier'}} ({{woundValue}})</label>
         <select style="flex: 2;" name="wounds">
             {{#select wounds}}
             <option value="{{woundValue}}">Apply Wounds</option>
@@ -42,22 +24,21 @@
             {{/select}}
         </select>
     </div>
-    {{/if}}
-    {{/if}}
+    {{/if}} {{/if}}
     <div class="form-group">
-        <label>Environment</label>
+        <label>{{localize 'SR5.EnvironmentModifier'}}</label>
         <select style="flex: 2;" name="options.environmental">
             {{#select options.environmental}}
-            <option value="0">Nada</option>
-            <option value="1">Bit (-1)</option>
-            <option value="3">Drek (-3)</option>
-            <option value="6">Frag (-6)</option>
-            <option value="10">RIP (-10)</option>
+            <option value="0">{{localize "SR5.EnvironmentNone"}}</option>
+            <option value="-1">{{localize "SR5.EnvironmentLow"}} (-1)</option>
+            <option value="-3">{{localize "SR5.EnvironmentMedium"}} (-3)</option>
+            <option value="-6">{{localize "SR5.EnvironmentHigh"}} (-6)</option>
+            <option value="-10">{{localize "SR5.EnvironmentVeryHigh"}} (-10)</option>
             {{/select}}
         </select>
     </div>
     <div class="form-group">
-        <label>Extended Test</label>
+        <label>{{localize 'SR5.ExtendedTest'}}</label>
         <select style="flex: 2;" name="extended">
             {{#select extended}}
             <option value="">{{localize "SR5.NotExtended"}}</option>

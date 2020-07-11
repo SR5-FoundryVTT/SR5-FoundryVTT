@@ -22,28 +22,28 @@ export class SR5Item extends Item {
     actor: SR5Actor;
 
     // Flag Functions
-    getLastFireMode(): FireModeData | undefined {
-        return this.getFlag('shadowrun5e', 'lastFireMode');
+    getLastFireMode(): FireModeData {
+        return this.getFlag('shadowrun5e', 'lastFireMode') || { value: 0 };
     }
     async setLastFireMode(fireMode: FireModeData) {
         return this.setFlag('shadowrun5e', 'lastFireMode', fireMode);
     }
     getLastSpellForce(): SpellForceData {
-        return this.getFlag('shadowrun5e', 'lastSpellForce');
+        return this.getFlag('shadowrun5e', 'lastSpellForce') || { value: 0 };
     }
     async setLastSpellForce(force: SpellForceData) {
         return this.setFlag('shadowrun5e', 'lastSpellForce', force);
     }
     getLastComplexFormLevel(): ComplexFormLevelData {
-        return this.getFlag('shadowrun5e', 'lastComplexFormLevel');
+        return this.getFlag('shadowrun5e', 'lastComplexFormLevel') || { value: 0 };
     }
     async setLastComplexFormLevel(level: ComplexFormLevelData) {
         return this.setFlag('shadowrun5e', 'lastComplexFormLevel', level);
     }
-    getLastFireRange(): FireRangeData {
-        return this.getFlag('shadowrun5e', 'lastFireRange') || 0;
+    getLastFireRangeMod(): FireRangeData {
+        return this.getFlag('shadowrun5e', 'lastFireRange') || { value: 0 };
     }
-    setLastFireRange(environmentalMod: FireRangeData) {
+    async setLastFireRangeMod(environmentalMod: FireRangeData) {
         return this.setFlag('shadowrun5e', 'lastFireRange', environmentalMod);
     }
 
@@ -70,7 +70,8 @@ export class SR5Item extends Item {
     }
 
     get hasRoll(): boolean {
-        return !!(this.data.data.action && this.data.data.action.type !== '');
+        const { action } = this.data.data;
+        return !!(action && action.type !== '' && (action.skill || action.attribute) );
     }
     get hasTemplate(): boolean {
         return this.isAreaOfEffect();
@@ -152,10 +153,16 @@ export class SR5Item extends Item {
 
             if (this.actor) {
                 if (action.damage.attribute) {
-                    action.damage.value += this.actor.data.data.attributes[action.damage.attribute].value;
+                    const { attribute } = action.damage;
+                    // TODO convert this in the template
+                    action.damage.mod[game.i18n.localize(CONFIG.SR5.attributes[attribute])] = this.actor.findAttribute(attribute)?.value;
+                    action.damage.value = action.damage.base + Helpers.totalMods(action.damage.mod);
                 }
                 if (action.limit.attribute) {
-                    action.limit.value += this.actor.data.data.limits[action.limit.attribute].value;
+                    const { attribute } = action.limit;
+                    // TODO convert this in the template
+                    action.limit.mod[game.i18n.localize(CONFIG.SR5.limits[attribute])] = this.actor.findLimit(attribute)?.value;
+                    action.limit.value = action.limit.base + Helpers.totalMods(action.limit.mod);
                 }
             }
         }
@@ -570,8 +577,18 @@ export class SR5Item extends Item {
      */
     prepareEmbeddedEntities() {
         super.prepareEmbeddedEntities();
-        const items = this.getFlag('shadowrun5e', 'embeddedItems');
+        let items = this.getFlag('shadowrun5e', 'embeddedItems');
         if (items) {
+            //TODO: This is a hotfix. Items should either always be
+            // stored as an array or always be stored as a object.
+            if (!Array.isArray(items)) {
+                let newItems: any[] = [];
+                for (const key of Object.keys(items)) {
+                    newItems.push(items[key]);
+                }
+                items = newItems;
+            }
+
             const existing = (this.items || []).reduce((object, i) => {
                 object[i.id] = i;
                 return object;
@@ -645,6 +662,18 @@ export class SR5Item extends Item {
         return true;
     }
 
+    async openPdfSource() {
+        const source = this.getBookSource();
+        if (source === '') { // @ts-ignore
+            ui.notifications.error(game.i18n.localize('SR5.SourceFieldEmptyError'))
+        }
+        // TODO open PDF to correct location
+        // parse however you need, all "buttons" will lead to this function
+        const [code, page] = source.split(' ');
+        //@ts-ignore
+        ui.PDFoundry.openPDFByCode(code, parseInt(page));
+    }
+
     isAreaOfEffect(): boolean {
         return this.isGrenade() || (this.isSpell() && this.data.data.range === 'los_a') || this.hasExplosiveAmmo();
     }
@@ -675,6 +704,10 @@ export class SR5Item extends Item {
 
     isEquipped(): boolean {
         return this.data.data.technology?.equipped || false;
+    }
+
+    getBookSource(): string {
+        return this.data.data.description.source;
     }
 
     getAttackData(hits: number): AttackData | undefined {
@@ -726,7 +759,7 @@ export class SR5Item extends Item {
         return this.data.data.action?.attribute2;
     }
 
-    getRollName(): string {
+    getRollName(): string | undefined {
         if (this.isRangedWeapon()) {
             return game.i18n.localize('SR5.RangeWeaponAttack');
         }
@@ -739,7 +772,8 @@ export class SR5Item extends Item {
         if (this.isSpell()) {
             return game.i18n.localize('SR5.SpellCast');
         }
-        return this.name;
+        if (this.hasRoll) return this.name;
+        return undefined;
     }
 
     getLimit(): LimitField {
@@ -867,5 +901,26 @@ export class SR5Item extends Item {
                 dropoff,
             };
         }
+    }
+
+    /**
+     * Override setFlag to remove the 'SR5.' from keys in modlists, otherwise it handles them as embedded keys
+     * @param scope
+     * @param key
+     * @param value
+     */
+    setFlag(scope: string, key: string, value: any): Promise<Entity> {
+        const newValue = Helpers.onSetFlag(value);
+        return super.setFlag(scope, key, newValue);
+    }
+
+    /**
+     * Override getFlag to add back the 'SR5.' keys correctly to be handled
+     * @param scope
+     * @param key
+     */
+    getFlag(scope: string, key: string): any {
+        const data = super.getFlag(scope, key);
+        return Helpers.onGetFlag(data);
     }
 }
