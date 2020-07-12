@@ -3,16 +3,6 @@
 import { VersionMigration } from './migrator/VersionMigration';
 
 export const registerSystemSettings = () => {
-    /**
-     * Track system version upon which a migration was last applied
-     */
-    game.settings.register('shadowrun5e', 'systemMigrationVersion', {
-        name: 'System Migration Version',
-        scope: 'world',
-        config: false,
-        type: String,
-        default: '',
-    });
 
     /**
      * Register diagonal movement rule setting
@@ -52,6 +42,9 @@ export const registerSystemSettings = () => {
         default: false,
     });
 
+    /**
+     * Track system version upon which a migration was last applied
+     */
     game.settings.register('shadowrun5e', VersionMigration.KEY_DATA_VERSION, {
         name: 'System Data Version.',
         scope: 'world',
