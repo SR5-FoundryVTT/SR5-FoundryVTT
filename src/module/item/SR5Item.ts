@@ -47,6 +47,38 @@ export class SR5Item extends Item {
         return this.setFlag('shadowrun5e', 'lastFireRange', environmentalMod);
     }
 
+    /**
+     * Return an Array of the Embedded Item Data
+     * TODO properly types this
+     */
+    getEmbeddedItems(): any[] {
+        let items = this.getFlag('shadowrun5e', 'embeddedItems');
+        if (items) {
+            // moved this "hotfix" to here so that everywhere that accesses the flag just gets an array -- Shawn
+            //TODO: This is a hotfix. Items should either always be
+            // stored as an array or always be stored as a object.
+            if (!Array.isArray(items)) {
+                let newItems: any[] = [];
+                for (const key of Object.keys(items)) {
+                    newItems.push(items[key]);
+                }
+                return newItems;
+            }
+            return items;
+        }
+        return [];
+    }
+
+    /**
+     * Set the embedded item data
+     * @param items
+     */
+    async setEmbeddedItems(items: any[]) {
+        // clear the flag first to remove the previous items - if we don't do this then it doesn't actually "delete" any items
+        await this.unsetFlag('shadowrun5e', 'embeddedItems');
+        await this.setFlag('shadowrun5e', 'embeddedItems', items);
+    }
+
     getLastAttack(): AttackData | undefined {
         return this.getFlag('shadowrun5e', 'lastAttack');
     }
@@ -71,7 +103,7 @@ export class SR5Item extends Item {
 
     get hasRoll(): boolean {
         const { action } = this.data.data;
-        return !!(action && action.type !== '' && (action.skill || action.attribute) );
+        return !!(action && action.type !== '' && (action.skill || action.attribute));
     }
     get hasTemplate(): boolean {
         return this.isAreaOfEffect();
@@ -558,16 +590,20 @@ export class SR5Item extends Item {
         if (!Array.isArray(itemData)) itemData = [itemData];
         // weapons accept items
         if (this.type === 'weapon') {
-            const currentItems = duplicate(this.getFlag('shadowrun5e', 'embeddedItems') || []);
+            const currentItems = duplicate(this.getEmbeddedItems());
 
-            itemData.forEach((item) => {
+            itemData.forEach((ogItem) => {
+                const item = duplicate(ogItem);
                 item._id = randomID(16);
                 if (item.type === 'ammo' || item.type === 'modification') {
+                    if (item?.data?.technology?.equipped) {
+                        item.data.technology.equipped = false;
+                    }
                     currentItems.push(item);
                 }
             });
 
-            await this.setFlag('shadowrun5e', 'embeddedItems', currentItems);
+            await this.setEmbeddedItems(currentItems);
         }
         await this.prepareEmbeddedEntities();
         await this.prepareData();
@@ -580,18 +616,8 @@ export class SR5Item extends Item {
      */
     prepareEmbeddedEntities() {
         super.prepareEmbeddedEntities();
-        let items = this.getFlag('shadowrun5e', 'embeddedItems');
+        let items = this.getEmbeddedItems();
         if (items) {
-            //TODO: This is a hotfix. Items should either always be
-            // stored as an array or always be stored as a object.
-            if (!Array.isArray(items)) {
-                let newItems: any[] = [];
-                for (const key of Object.keys(items)) {
-                    newItems.push(items[key]);
-                }
-                items = newItems;
-            }
-
             const existing = (this.items || []).reduce((object, i) => {
                 object[i.id] = i;
                 return object;
@@ -618,7 +644,7 @@ export class SR5Item extends Item {
     }
 
     async updateOwnedItem(changes) {
-        const items = duplicate(this.getFlag('shadowrun5e', 'embeddedItems'));
+        const items = duplicate(this.getEmbeddedItems());
         if (!items) return;
         changes = Array.isArray(changes) ? changes : [changes];
         if (!changes || changes.length === 0) return;
@@ -634,7 +660,7 @@ export class SR5Item extends Item {
             }
         });
 
-        await this.setFlag('shadowrun5e', 'embeddedItems', items);
+        await this.setEmbeddedItems(items);
         await this.prepareEmbeddedEntities();
         await this.prepareData();
         await this.render(false);
@@ -652,13 +678,13 @@ export class SR5Item extends Item {
      * @returns {Promise<boolean>}
      */
     async deleteOwnedItem(deleted) {
-        const items = duplicate(this.getFlag('shadowrun5e', 'embeddedItems'));
+        const items = duplicate(this.getEmbeddedItems());
         if (!items) return;
 
         const idx = items.findIndex((i) => i._id === deleted || Number(i._id) === deleted);
         if (idx === -1) throw new Error(`Shadowrun5e | Couldn't find owned item ${deleted}`);
         items.splice(idx, 1);
-        await this.setFlag('shadowrun5e', 'embeddedItems', items);
+        await this.setEmbeddedItems(items);
         await this.prepareEmbeddedEntities();
         await this.prepareData();
         await this.render(false);
@@ -667,8 +693,9 @@ export class SR5Item extends Item {
 
     async openPdfSource() {
         const source = this.getBookSource();
-        if (source === '') { // @ts-ignore
-            ui.notifications.error(game.i18n.localize('SR5.SourceFieldEmptyError'))
+        if (source === '') {
+            // @ts-ignore
+            ui.notifications.error(game.i18n.localize('SR5.SourceFieldEmptyError'));
         }
         // TODO open PDF to correct location
         // parse however you need, all "buttons" will lead to this function
