@@ -23,6 +23,7 @@ export class Helpers {
     // replace 'SR5_DOT_' with 'SR5.' on keys
     static onGetFlag(data) {
         if (typeof data !== 'object') return data;
+        if (data === undefined || data === null) return data;
         const newData = {};
         for (const [key, value] of Object.entries(data)) {
             const newKey = key.replace('SR5_DOT_', 'SR5.');
