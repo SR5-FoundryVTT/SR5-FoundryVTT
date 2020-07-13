@@ -4761,6 +4761,8 @@ class Helpers {
     static onGetFlag(data) {
         if (typeof data !== 'object')
             return data;
+        if (data === undefined || data === null)
+            return data;
         const newData = {};
         for (const [key, value] of Object.entries(data)) {
             const newKey = key.replace('SR5_DOT_', 'SR5.');
@@ -7261,7 +7263,7 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
      * @param updateData
      */
     static migrateActorSkills(actorData, updateData) {
-        var _a, _b;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r;
         if (!((_b = (_a = actorData.data) === null || _a === void 0 ? void 0 : _a.skills) === null || _b === void 0 ? void 0 : _b.active))
             return;
         const splitRegex = /[,\/|.]+/;
@@ -7273,12 +7275,18 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
             }
             return running;
         };
-        updateData['data.skills.active'] = Object.entries(actorData.data.skills.active).reduce(reducer, {});
-        updateData['data.skills.knowledge.street.value'] = Object.entries(actorData.data.skills.knowledge.street.value).reduce(reducer, {});
-        updateData['data.skills.knowledge.professional.value'] = Object.entries(actorData.data.skills.knowledge.professional.value).reduce(reducer, {});
-        updateData['data.skills.knowledge.academic.value'] = Object.entries(actorData.data.skills.knowledge.academic.value).reduce(reducer, {});
-        updateData['data.skills.knowledge.interests.value'] = Object.entries(actorData.data.skills.knowledge.interests.value).reduce(reducer, {});
-        updateData['data.skills.language.value'] = Object.entries(actorData.data.skills.language.value).reduce(reducer, {});
+        if (actorData.data.skills) {
+            updateData['data.skills.active'] = Object.entries(actorData.data.skills.active).reduce(reducer, {});
+            if (actorData.data.skills.knowledge) {
+                updateData['data.skills.knowledge.street.value'] = Object.entries((_e = (_d = (_c = actorData.data.skills) === null || _c === void 0 ? void 0 : _c.knowledge) === null || _d === void 0 ? void 0 : _d.street) === null || _e === void 0 ? void 0 : _e.value).reduce(reducer, {});
+                updateData['data.skills.knowledge.professional.value'] = Object.entries((_h = (_g = (_f = actorData.data.skills) === null || _f === void 0 ? void 0 : _f.knowledge) === null || _g === void 0 ? void 0 : _g.professional) === null || _h === void 0 ? void 0 : _h.value).reduce(reducer, {});
+                updateData['data.skills.knowledge.academic.value'] = Object.entries((_l = (_k = (_j = actorData.data.skills) === null || _j === void 0 ? void 0 : _j.knowledge) === null || _k === void 0 ? void 0 : _k.academic) === null || _l === void 0 ? void 0 : _l.value).reduce(reducer, {});
+                updateData['data.skills.knowledge.interests.value'] = Object.entries((_p = (_o = (_m = actorData.data.skills) === null || _m === void 0 ? void 0 : _m.knowledge) === null || _o === void 0 ? void 0 : _o.interests) === null || _p === void 0 ? void 0 : _p.value).reduce(reducer, {});
+            }
+            if (actorData.data.skills.language) {
+                updateData['data.skills.language.value'] = Object.entries((_r = (_q = actorData.data.skills) === null || _q === void 0 ? void 0 : _q.language) === null || _r === void 0 ? void 0 : _r.value).reduce(reducer, {});
+            }
+        }
     }
     /**
      *
@@ -7695,16 +7703,6 @@ exports.registerSystemSettings = void 0;
 const VersionMigration_1 = require("./migrator/VersionMigration");
 exports.registerSystemSettings = () => {
     /**
-     * Track system version upon which a migration was last applied
-     */
-    game.settings.register('shadowrun5e', 'systemMigrationVersion', {
-        name: 'System Migration Version',
-        scope: 'world',
-        config: false,
-        type: String,
-        default: '',
-    });
-    /**
      * Register diagonal movement rule setting
      */
     game.settings.register('shadowrun5e', 'diagonalMovement', {
@@ -7739,6 +7737,9 @@ exports.registerSystemSettings = () => {
         type: Boolean,
         default: false,
     });
+    /**
+     * Track system version upon which a migration was last applied
+     */
     game.settings.register('shadowrun5e', VersionMigration_1.VersionMigration.KEY_DATA_VERSION, {
         name: 'System Data Version.',
         scope: 'world',

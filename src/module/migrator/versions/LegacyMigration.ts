@@ -83,12 +83,18 @@ export class LegacyMigration extends VersionMigration {
             return running;
         };
 
-        updateData['data.skills.active'] = Object.entries(actorData.data.skills.active).reduce(reducer, {});
-        updateData['data.skills.knowledge.street.value'] = Object.entries(actorData.data.skills.knowledge.street.value).reduce(reducer, {});
-        updateData['data.skills.knowledge.professional.value'] = Object.entries(actorData.data.skills.knowledge.professional.value).reduce(reducer, {});
-        updateData['data.skills.knowledge.academic.value'] = Object.entries(actorData.data.skills.knowledge.academic.value).reduce(reducer, {});
-        updateData['data.skills.knowledge.interests.value'] = Object.entries(actorData.data.skills.knowledge.interests.value).reduce(reducer, {});
-        updateData['data.skills.language.value'] = Object.entries(actorData.data.skills.language.value).reduce(reducer, {});
+        if (actorData.data.skills) {
+            updateData['data.skills.active'] = Object.entries(actorData.data.skills.active).reduce(reducer, {});
+            if (actorData.data.skills.knowledge) {
+                updateData['data.skills.knowledge.street.value'] = Object.entries(actorData.data.skills?.knowledge?.street?.value).reduce(reducer, {});
+                updateData['data.skills.knowledge.professional.value'] = Object.entries(actorData.data.skills?.knowledge?.professional?.value).reduce(reducer, {});
+                updateData['data.skills.knowledge.academic.value'] = Object.entries(actorData.data.skills?.knowledge?.academic?.value).reduce(reducer, {});
+                updateData['data.skills.knowledge.interests.value'] = Object.entries(actorData.data.skills?.knowledge?.interests?.value).reduce(reducer, {});
+            }
+            if (actorData.data.skills.language) {
+                updateData['data.skills.language.value'] = Object.entries(actorData.data.skills?.language?.value).reduce(reducer, {});
+            }
+        }
     }
 
     /**
