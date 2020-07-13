@@ -405,6 +405,9 @@ export class SR5Item extends Item {
     }
 
     calculateRecoil() {
+        const lastFireMode = this.getLastFireMode();
+        if (!lastFireMode) return 0;
+        if (lastFireMode.value === 20) return 0;
         return Math.min(this.getRecoilCompensation(true) - (this.getLastFireMode()?.value || 0), 0);
     }
 

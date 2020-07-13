@@ -5617,6 +5617,11 @@ class SR5Item extends Item {
     }
     calculateRecoil() {
         var _a;
+        const lastFireMode = this.getLastFireMode();
+        if (!lastFireMode)
+            return 0;
+        if (lastFireMode.value === 20)
+            return 0;
         return Math.min(this.getRecoilCompensation(true) - (((_a = this.getLastFireMode()) === null || _a === void 0 ? void 0 : _a.value) || 0), 0);
     }
     _addWeaponParts(parts) {
