@@ -15,6 +15,7 @@ import { ChatData } from './ChatData';
 import { AdvancedRollProps, ShadowrunRoll, ShadowrunRoller } from '../rolls/ShadowrunRoller';
 import Template from '../template';
 import { createChatData } from '../chat';
+import { SYSTEM_NAME } from '../constants';
 
 export class SR5Item extends Item {
     labels: {} = {};
@@ -23,28 +24,28 @@ export class SR5Item extends Item {
 
     // Flag Functions
     getLastFireMode(): FireModeData {
-        return this.getFlag('shadowrun5e', 'lastFireMode') || { value: 0 };
+        return this.getFlag(SYSTEM_NAME, 'lastFireMode') || { value: 0 };
     }
     async setLastFireMode(fireMode: FireModeData) {
-        return this.setFlag('shadowrun5e', 'lastFireMode', fireMode);
+        return this.setFlag(SYSTEM_NAME, 'lastFireMode', fireMode);
     }
     getLastSpellForce(): SpellForceData {
-        return this.getFlag('shadowrun5e', 'lastSpellForce') || { value: 0 };
+        return this.getFlag(SYSTEM_NAME, 'lastSpellForce') || { value: 0 };
     }
     async setLastSpellForce(force: SpellForceData) {
-        return this.setFlag('shadowrun5e', 'lastSpellForce', force);
+        return this.setFlag(SYSTEM_NAME, 'lastSpellForce', force);
     }
     getLastComplexFormLevel(): ComplexFormLevelData {
-        return this.getFlag('shadowrun5e', 'lastComplexFormLevel') || { value: 0 };
+        return this.getFlag(SYSTEM_NAME, 'lastComplexFormLevel') || { value: 0 };
     }
     async setLastComplexFormLevel(level: ComplexFormLevelData) {
-        return this.setFlag('shadowrun5e', 'lastComplexFormLevel', level);
+        return this.setFlag(SYSTEM_NAME, 'lastComplexFormLevel', level);
     }
     getLastFireRangeMod(): FireRangeData {
-        return this.getFlag('shadowrun5e', 'lastFireRange') || { value: 0 };
+        return this.getFlag(SYSTEM_NAME, 'lastFireRange') || { value: 0 };
     }
     async setLastFireRangeMod(environmentalMod: FireRangeData) {
-        return this.setFlag('shadowrun5e', 'lastFireRange', environmentalMod);
+        return this.setFlag(SYSTEM_NAME, 'lastFireRange', environmentalMod);
     }
 
     /**
@@ -52,7 +53,7 @@ export class SR5Item extends Item {
      * TODO properly types this
      */
     getEmbeddedItems(): any[] {
-        let items = this.getFlag('shadowrun5e', 'embeddedItems');
+        let items = this.getFlag(SYSTEM_NAME, 'embeddedItems');
         if (items) {
             // moved this "hotfix" to here so that everywhere that accesses the flag just gets an array -- Shawn
             //TODO: This is a hotfix. Items should either always be
@@ -75,17 +76,17 @@ export class SR5Item extends Item {
      */
     async setEmbeddedItems(items: any[]) {
         // clear the flag first to remove the previous items - if we don't do this then it doesn't actually "delete" any items
-        await this.unsetFlag('shadowrun5e', 'embeddedItems');
-        await this.setFlag('shadowrun5e', 'embeddedItems', items);
+        await this.unsetFlag(SYSTEM_NAME, 'embeddedItems');
+        await this.setFlag(SYSTEM_NAME, 'embeddedItems', items);
     }
 
     getLastAttack(): AttackData | undefined {
-        return this.getFlag('shadowrun5e', 'lastAttack');
+        return this.getFlag(SYSTEM_NAME, 'lastAttack');
     }
     async setLastAttack(attack: AttackData) {
         // unset the flag first to clear old data, data can get weird if not done
-        await this.unsetFlag('shadowrun5e', 'lastAttack');
-        return this.setFlag('shadowrun5e', 'lastAttack', attack);
+        await this.unsetFlag(SYSTEM_NAME, 'lastAttack');
+        return this.setFlag(SYSTEM_NAME, 'lastAttack', attack);
     }
 
     async update(data, options?) {

@@ -12,6 +12,7 @@ import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
 import { registerHandlebarHelpers, preloadHandlebarsTemplates } from './handlebars';
 import { ShadowrunRoller } from './rolls/ShadowrunRoller';
 import { Migrator } from './migrator/Migrator';
+import { SYSTEM_NAME } from './constants';
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -36,9 +37,9 @@ Hooks.once('init', function () {
 
     // Register sheet application classes
     Actors.unregisterSheet('core', ActorSheet);
-    Actors.registerSheet('shadowrun5e', SR5ActorSheet, { makeDefault: true });
+    Actors.registerSheet(SYSTEM_NAME, SR5ActorSheet, { makeDefault: true });
     Items.unregisterSheet('core', ItemSheet);
-    Items.registerSheet('shadowrun5e', SR5ItemSheet, { makeDefault: true });
+    Items.registerSheet(SYSTEM_NAME, SR5ItemSheet, { makeDefault: true });
 
     ['renderSR5ActorSheet', 'renderSR5ItemSheet'].forEach((s) => {
         Hooks.on(s, (app, html) => Helpers.setupCustomCheckbox(app, html));

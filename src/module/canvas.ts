@@ -7,6 +7,8 @@
  * @param {boolean} gridSpaces  Enforce grid distance (if true) vs. direct point-to-point (if false)
  * @return {number}             The distance between p1 and p0
  */
+import { SYSTEM_NAME } from './constants';
+
 export const measureDistance = function (p0, p1, { gridSpaces = true } = {}) {
     if (!gridSpaces)
         {  // BaseGrid exists... fix in foundry types
@@ -24,7 +26,7 @@ export const measureDistance = function (p0, p1, { gridSpaces = true } = {}) {
     const nDiagonal = Math.min(nx, ny);
     const nStraight = Math.abs(ny - nx);
 
-    const diagonalRule = game.settings.get('shadowrun5e', 'diagonalMovement');
+    const diagonalRule = game.settings.get(SYSTEM_NAME, 'diagonalMovement');
 
     if (diagonalRule === '1-2-1') {
         const nd10 = Math.floor(nDiagonal / 2);

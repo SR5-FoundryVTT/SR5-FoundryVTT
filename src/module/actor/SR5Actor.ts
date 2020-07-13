@@ -21,6 +21,7 @@ import BaseValuePair = Shadowrun.BaseValuePair;
 import ModifiableValue = Shadowrun.ModifiableValue;
 import LabelField = Shadowrun.LabelField;
 import LimitField = Shadowrun.LimitField;
+import { SYSTEM_NAME } from '../constants';
 
 export class SR5Actor extends Actor {
     async update(data, options?) {
@@ -39,14 +40,14 @@ export class SR5Actor extends Actor {
     }
 
     getOverwatchScore() {
-        const os = this.getFlag('shadowrun5e', 'overwatchScore');
+        const os = this.getFlag(SYSTEM_NAME, 'overwatchScore');
         return os !== undefined ? os : 0;
     }
 
     async setOverwatchScore(value) {
         const num = parseInt(value);
         if (!isNaN(num)) {
-            return this.setFlag('shadowrun5e', 'overwatchScore', num);
+            return this.setFlag(SYSTEM_NAME, 'overwatchScore', num);
         }
     }
 
@@ -1090,7 +1091,7 @@ export class SR5Actor extends Actor {
     static async pushTheLimit(li) {
         let msg: ChatMessage = game.messages.get(li.data().messageId);
 
-        if (msg.getFlag('shadowrun5e', 'customRoll')) {
+        if (msg.getFlag(SYSTEM_NAME, 'customRoll')) {
             let actor = (msg.user.character as unknown) as SR5Actor;
             if (!actor) {
                 // get controlled tokens

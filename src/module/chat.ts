@@ -6,6 +6,7 @@ import BaseValuePair = Shadowrun.BaseValuePair;
 import DamageData = Shadowrun.DamageData;
 import AttackData = Shadowrun.AttackData;
 import LabelField = Shadowrun.LabelField;
+import { SYSTEM_NAME } from './constants';
 
 export type TemplateData = {
     header: {
@@ -69,7 +70,7 @@ export const addChatMessageContextOptions = (html, options) => {
     const canRoll = (li) => {
         const msg = game.messages.get(li.data().messageId);
 
-        return msg.getFlag('shadowrun5e', 'customRoll');
+        return msg.getFlag(SYSTEM_NAME, 'customRoll');
     };
 
     options.push(
@@ -90,7 +91,7 @@ export const addChatMessageContextOptions = (html, options) => {
 };
 
 export const addRollListeners = (app: ChatMessage, html) => {
-    if (!app.getFlag('shadowrun5e', 'customRoll')) return;
+    if (!app.getFlag(SYSTEM_NAME, 'customRoll')) return;
     const item = SR5Item.getItemFromMessage(html);
     html.on('click', '.test-roll', async (event) => {
         event.preventDefault();

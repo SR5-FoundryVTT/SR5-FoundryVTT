@@ -8,6 +8,7 @@ import { Helpers } from '../helpers';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
 import { createChatData, TemplateData } from '../chat';
+import { SYSTEM_NAME } from '../constants';
 
 export interface BasicRollProps {
     name?: string;
@@ -138,7 +139,7 @@ export class ShadowrunRoller {
             roll = new ShadowrunRoll(formula);
             roll.roll();
 
-            if (game.settings.get('shadowrun5e', 'displayDefaultRollCard')) {
+            if (game.settings.get(SYSTEM_NAME, 'displayDefaultRollCard')) {
                 await roll.toMessage({
                     speaker: ChatMessage.getSpeaker({ actor: actor }),
                     flavor: title,
@@ -181,7 +182,7 @@ export class ShadowrunRoller {
      * Prompt a roll for the user
      */
     static promptRoll(): Promise<ShadowrunRoll | undefined> {
-        const lastRoll = game.user.getFlag('shadowrun5e', 'lastRollPromptValue') || 0;
+        const lastRoll = game.user.getFlag(SYSTEM_NAME, 'lastRollPromptValue') || 0;
         const parts = {
             'SR5.LastRoll': lastRoll,
         };
@@ -199,7 +200,7 @@ export class ShadowrunRoller {
         const { title, actor, parts = {}, limit, extended, wounds = true, after, dialogOptions } = props;
 
         // remove limits if game settings is set
-        if (!game.settings.get('shadowrun5e', 'applyLimits')) {
+        if (!game.settings.get(SYSTEM_NAME, 'applyLimits')) {
             delete props.limit;
         }
 
@@ -254,7 +255,7 @@ export class ShadowrunRoller {
                             for (const key in parts) {
                                 delete parts[key];
                             }
-                            await game.user.setFlag('shadowrun5e', 'lastRollPromptValue', dicePoolValue);
+                            await game.user.setFlag(SYSTEM_NAME, 'lastRollPromptValue', dicePoolValue);
                             parts['SR5.Base'] = dicePoolValue;
                         }
 
