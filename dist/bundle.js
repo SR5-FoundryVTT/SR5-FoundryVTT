@@ -1098,8 +1098,9 @@ class SR5Actor extends Actor {
                 }
             }
         }
+        armor.mod[game.i18n.localize('SR5.Bonus')] = modifiers['armor'];
         // SET ARMOR
-        armor.value = armor.base + helpers_1.Helpers.totalMods(armor.mod) + modifiers['armor'];
+        armor.value = armor.base + helpers_1.Helpers.totalMods(armor.mod);
         // ATTRIBUTES
         for (let [, att] of Object.entries(attributes)) {
             if (!att.hidden) {
