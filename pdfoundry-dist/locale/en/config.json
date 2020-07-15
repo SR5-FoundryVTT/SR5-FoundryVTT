@@ -32,7 +32,13 @@
       }
     },
     "VIEWER": {
-      "ViewPDF": "View PDF"
+      "ViewPDF": "View PDF",
+
+      "ShowToPlayersText": "Show to …",
+      "ShowToPlayersTitle": "Press SHIFT to show to ALL players except yourself.",
+
+      "SelectPlayers": "Select Players",
+      "SelectPlayersConfirm": "Make it so!"
     },
     "MANUAL": {
       "Name": "PDFoundry User Manual"
@@ -44,7 +50,9 @@
     "SETTINGS": {
       "OpenHelp": "Open PDFoundry Manual",
       "CacheSizeName": "PDF Cache Size",
-      "CacheSizeHint": "How many MB of hard drive space should be allowed to be taken up by the PDF cache? Must be between 64 and 1024 inclusive."
+      "CacheSizeHint": "How many MB of hard drive space should be allowed to be taken up by the PDF cache? Must be between 64 and 1024 inclusive.",
+      "ShowInExistingViewerName": "Show Shared PDFs in Existing Viewer",
+      "ShowInExistingViewerHint": "If enabled, when another player shows a PDF to you, if you have the PDF open already the page will change instead of opening a new window."
     }
   }
 }
