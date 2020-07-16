@@ -6,15 +6,17 @@ declare namespace Shadowrun {
      */
     export type Weapon = Item & {
         type: 'weapon';
-        data: {
-            action: ActionData;
-            category: WeaponCategory;
-            ammo: AmmunitionData;
-            range: RangeWeaponData;
-            melee: MeleeWeaponData;
-            thrown: ThrownWeaponData;
-        };
+        data: WeaponData;
     };
+
+    export type WeaponData = {
+        action: ActionData;
+        category: WeaponCategory;
+        ammo: AmmunitionData;
+        range: RangeWeaponData;
+        melee: MeleeWeaponData;
+        thrown: ThrownWeaponData;
+    }
 
     /**
      * Weapon action data.

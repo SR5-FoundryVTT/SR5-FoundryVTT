@@ -1,7 +1,6 @@
 import { ShadowrunRoller } from '../rolls/ShadowrunRoller';
 import { Helpers } from '../helpers';
 import { SR5Item } from '../item/SR5Item';
-import ItemData = Shadowrun.ItemData;
 import Attributes = Shadowrun.Attributes;
 import Skills = Shadowrun.Skills;
 import KnowledgeSkillList = Shadowrun.KnowledgeSkillList;
@@ -13,7 +12,6 @@ import DefenseRollOptions = Shadowrun.DefenseRollOptions;
 import SoakRollOptions = Shadowrun.SoakRollOptions;
 import AttributeField = Shadowrun.AttributeField;
 import SkillRollOptions = Shadowrun.SkillRollOptions;
-import Matrix = Shadowrun.Matrix;
 import SkillField = Shadowrun.SkillField;
 import ValueMaxPair = Shadowrun.ValueMaxPair;
 import ModList = Shadowrun.ModList;
@@ -22,6 +20,8 @@ import ModifiableValue = Shadowrun.ModifiableValue;
 import LabelField = Shadowrun.LabelField;
 import LimitField = Shadowrun.LimitField;
 import { SYSTEM_NAME } from '../constants';
+import SR5ActorData = Shadowrun.SR5ActorData;
+import { SR5ItemDataWrapper } from '../item/SR5ItemDataWrapper';
 
 export class SR5Actor extends Actor {
     async update(data, options?) {
@@ -51,15 +51,118 @@ export class SR5Actor extends Actor {
         }
     }
 
+    static prepareMatrix(data: SR5ActorData, items: SR5ItemDataWrapper[]) {
+        const { matrix, attributes, limits } = data;
+
+        // clear matrix data to defaults
+        matrix.firewall.value = Helpers.totalMods(matrix.firewall.mod);
+        matrix.data_processing.value = Helpers.totalMods(matrix.data_processing.mod);
+        matrix.attack.value = Helpers.totalMods(matrix.attack.mod);
+        matrix.sleaze.value = Helpers.totalMods(matrix.sleaze.mod);
+        matrix.condition_monitor.max = 0;
+        matrix.rating = 0;
+        matrix.name = '';
+        matrix.device = '';
+
+        const device = items.filter((item) => item.isEquipped() && item.isDevice())[0];
+        if (device) {
+            const conditionMonitor = device.getConditionMonitor();
+            matrix.device = device.getId();
+            matrix.condition_monitor.max = conditionMonitor.max;
+            matrix.condition_monitor.value = conditionMonitor.value;
+            matrix.rating = device.getRating();
+            matrix.is_cyberdeck = device.isCyberdeck();
+            matrix.name = device.getName();
+            const deviceAtts = device.getASDF();
+            if (deviceAtts) {
+                for (const [key, value] of Object.entries(deviceAtts)) {
+                    if (value && matrix[key]) {
+                        matrix[key].value += value.value;
+                        matrix[key].device_att = value.att;
+                    }
+                }
+            }
+        } // if we don't have a device, use living persona
+        else if (data.special === 'resonance') {
+            matrix.firewall.value += attributes.willpower.value;
+            matrix.data_processing.value += attributes.logic.value;
+            matrix.rating = attributes.resonance.value;
+            matrix.attack.value += attributes.charisma.value;
+            matrix.sleaze.value += attributes.intuition.value;
+            matrix.name = game.i18n.localize('SR5.LivingPersona');
+        }
+
+        // set matrix condition monitor to max if greater than
+        if (matrix.condition_monitor.value > matrix.condition_monitor.max) matrix.condition_monitor.value = matrix.condition_monitor.max;
+
+        // add matrix attributes to both limits and attributes as hidden entries
+        ['firewall', 'sleaze', 'data_processing', 'firewall'].forEach((key) => {
+            if (matrix[key]) {
+                limits[key] = {
+                    value: matrix[key].value,
+                    base: matrix[key].base,
+                    mod: matrix[key].mod,
+                    hidden: true,
+                };
+                attributes[key] = {
+                    value: matrix[key].value,
+                    base: matrix[key].base,
+                    mod: matrix[key].mod,
+                    hidden: true,
+                };
+            }
+        });
+    }
+
+    static prepareArmor(data: SR5ActorData, items: SR5ItemDataWrapper[]) {
+        const { armor } = data;
+        armor.base = 0;
+        armor.value = 0;
+        armor.mod = {};
+        for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
+            armor[element] = 0;
+        }
+
+        const equippedArmor = items.filter((item) => item.isArmor() && item.isEquipped());
+        equippedArmor?.forEach((item) => {
+            if (item.isArmorAccessory()) {
+                armor.mod[item.getName()] = item.getArmorValue();
+            } // if not a mod, set armor.value to the items value
+            else {
+                armor.base = item.getArmorValue();
+                armor.label = item.getName();
+                for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
+                    armor[element] = item.getArmorElements()[element];
+                }
+            }
+        });
+
+        if (data.modifiers['armor']) armor.mod[game.i18n.localize('SR5.Bonus')] = data.modifiers['armor'];
+        // SET ARMOR
+        armor.value = armor.base + Helpers.totalMods(armor.mod);
+    }
+
+    static prepareCyberware(data: SR5ActorData, items: SR5ItemDataWrapper[]) {
+        const { attributes } = data;
+        let totalEssence = 6;
+        items
+            .filter((item) => item.isCyberware() && item.isEquipped())
+            .forEach((item) => {
+                if (item.getEssenceLoss()) {
+                    totalEssence -= item.getEssenceLoss();
+                }
+            });
+        attributes.essence.value = totalEssence;
+    }
+
     prepareData() {
         super.prepareData();
 
         const actorData = this.data;
         // @ts-ignore
-        const items: SR5Item[] = actorData.items;
+        const items: SR5ItemDataWrapper[] = actorData.items.map((item) => new SR5ItemDataWrapper(item));
         const data = actorData.data;
         const { attributes }: { attributes: Attributes } = data;
-        const armor = data.armor;
         const { limits }: { limits: Limits } = data;
         const { language }: { language: KnowledgeSkillList } = data.skills;
         const { active }: { active: Skills } = data.skills;
@@ -107,73 +210,12 @@ export class SR5Actor extends Actor {
         data.modifiers = modifiers;
 
         let totalEssence = 6;
-        armor.base = 0;
-        armor.value = 0;
-        armor.mod = {};
-        for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
-            armor[element] = 0;
-        }
-
-        // DEFAULT MATRIX ATTS TO MOD VALUE
-        const matrix: Matrix = data.matrix;
-        matrix.firewall.value = Helpers.totalMods(matrix.firewall.mod);
-        matrix.data_processing.value = Helpers.totalMods(matrix.data_processing.mod);
-        matrix.attack.value = Helpers.totalMods(matrix.attack.mod);
-        matrix.sleaze.value = Helpers.totalMods(matrix.sleaze.mod);
-        matrix.condition_monitor.max = 0;
-        matrix.rating = 0;
-        matrix.name = '';
-        matrix.device = '';
 
         // PARSE WEAPONS AND SET VALUES AS NEEDED
-        for (let item of Object.values(items)) {
-            const itemData: ItemData = (item.data as unknown) as ItemData;
 
-            const equipped = itemData.technology?.equipped;
-            if (equipped) {
-                if (itemData.armor && itemData.armor.value) {
-                    // if it's a mod, add to the mod field
-                    if (itemData.armor.mod) {
-                        armor.mod[item.name] = itemData.armor.value;
-                    } // if not a mod, set armor.value to the items value
-                    else {
-                        armor.base = itemData.armor.value;
-                        armor.label = item.name;
-                        for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
-                            armor[element] = itemData.armor[element];
-                        }
-                    }
-                }
-            }
-            // MODIFIES ESSENCE
-            if (itemData.essence && itemData.technology && itemData.technology.equipped) {
-                totalEssence -= itemData.essence;
-            }
-            // MODIFIES MATRIX ATTRIBUTES
-            if (item.type === 'device' && itemData.technology?.equipped) {
-                matrix.device = item._id;
-                matrix.condition_monitor.max = itemData.technology.condition_monitor?.max || 0;
-                matrix.condition_monitor.value = itemData.technology.condition_monitor?.value || 0;
-                matrix.rating = itemData.technology.rating;
-                matrix.is_cyberdeck = itemData.category === 'cyberdeck';
-                matrix.name = item.name;
-                matrix.item = itemData;
-
-                if (itemData.category === 'cyberdeck' && itemData.atts) {
-                    for (let [key, att] of Object.entries(itemData.atts)) {
-                        matrix[att.att].value += att.value;
-                        matrix[att.att].device_att = key;
-                    }
-                } else {
-                    matrix.firewall.value += matrix.rating || 0;
-                    matrix.data_processing.value += matrix.rating || 0;
-                }
-            }
-        }
-
-        armor.mod[game.i18n.localize('SR5.Bonus')] = modifiers['armor'];
-        // SET ARMOR
-        armor.value = armor.base + Helpers.totalMods(armor.mod);
+        SR5Actor.prepareMatrix(data, items);
+        SR5Actor.prepareArmor(data, items);
+        SR5Actor.prepareCyberware(data, items);
 
         // ATTRIBUTES
         for (let [, att] of Object.entries(attributes)) {
@@ -226,76 +268,6 @@ export class SR5Actor extends Actor {
                     return acc;
                 }, {});
         }
-
-        // TECHNOMANCER LIVING PERSONA
-        if (data.special === 'resonance') {
-            // if we don't have a device, use living persona
-            if (matrix.device === '') {
-                // we should use living persona
-                matrix.firewall.value += attributes.willpower.value;
-                matrix.data_processing.value += attributes.logic.value;
-                matrix.rating = attributes.resonance.value;
-                matrix.attack.value += attributes.charisma.value;
-                matrix.sleaze.value += attributes.intuition.value;
-                matrix.name = 'Living Persona';
-                matrix.device = '';
-                matrix.condition_monitor.max = 0;
-            }
-        }
-
-        // set matrix condition monitor to max if greater than
-        if (matrix.condition_monitor.value > matrix.condition_monitor.max) matrix.condition_monitor.value = matrix.condition_monitor.max;
-
-        // ADD MATRIX ATTS TO LIMITS
-        limits.firewall = {
-            value: matrix.firewall.value,
-            base: matrix.firewall.base,
-            mod: matrix.firewall.mod,
-            hidden: true,
-        };
-        limits.data_processing = {
-            value: matrix.data_processing.value,
-            base: matrix.data_processing.base,
-            mod: matrix.data_processing.mod,
-            hidden: true,
-        };
-        limits.attack = {
-            value: matrix.attack.value,
-            base: matrix.attack.base,
-            mod: matrix.attack.mod,
-            hidden: true,
-        };
-        limits.sleaze = {
-            value: matrix.sleaze.value,
-            base: matrix.sleaze.base,
-            mod: matrix.sleaze.mod,
-            hidden: true,
-        };
-
-        attributes.firewall = {
-            value: matrix.firewall.value,
-            base: matrix.firewall.base,
-            mod: matrix.firewall.mod,
-            hidden: true,
-        };
-        attributes.data_processing = {
-            value: matrix.data_processing.value,
-            base: matrix.data_processing.base,
-            mod: matrix.data_processing.mod,
-            hidden: true,
-        };
-        attributes.attack = {
-            value: matrix.attack.value,
-            base: matrix.attack.base,
-            mod: matrix.attack.mod,
-            hidden: true,
-        };
-        attributes.sleaze = {
-            value: matrix.sleaze.value,
-            base: matrix.sleaze.base,
-            mod: matrix.sleaze.mod,
-            hidden: true,
-        };
 
         // SET ESSENCE
         actorData.data.attributes.essence.value = +(totalEssence + modifiers['essence']).toFixed(3);
@@ -387,6 +359,14 @@ export class SR5Actor extends Actor {
         return this.data.data.attributes[attributeName];
     }
 
+    getEquippedMatrixDevice(): SR5Item | undefined {
+        return this.items.filter((item: SR5Item) => item.isDevice())[0];
+    }
+
+    getEquippedArmor(): SR5Item[] | undefined {
+        return this.items.filter((item: SR5Item) => item.isArmor());
+    }
+
     findLimitFromAttribute(attributeName?: string): LimitField | undefined {
         if (attributeName === undefined) return undefined;
         const attribute = this.findAttribute(attributeName);
@@ -430,6 +410,10 @@ export class SR5Actor extends Actor {
 
     getEquippedWeapons(): SR5Item[] {
         return this.items.filter((item) => item.isEquipped() && item.data.type === 'weapon');
+    }
+
+    getRecoilCompensation(): number {
+        return this.data.data.recoil_compensation ?? 0;
     }
 
     addKnowledgeSkill(category, skill?) {

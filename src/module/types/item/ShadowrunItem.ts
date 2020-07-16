@@ -2,6 +2,7 @@
 declare namespace Shadowrun {
     export type Item = {
         name: string;
+        _id: string;
         folder: string | null;
         type: string;
         data: ItemData;
@@ -14,7 +15,10 @@ declare namespace Shadowrun {
         Partial<ArmorData> &
         Partial<ActionData> &
         Partial<CyberwareData> &
-        Partial<DeviceData> & {
+        Partial<DeviceData> &
+        Partial<WeaponData> &
+        Partial<SpellData> &
+        Partial<ComplexFormData> & {
             description: DescriptionData;
         };
 
@@ -42,10 +46,8 @@ declare namespace Shadowrun {
      * Description data for an item.
      */
     export type DescriptionData = {
-        description: {
-            value: string;
-            chat: string;
-            source: string;
-        };
+        value: string;
+        chat: string;
+        source: string;
     };
 }

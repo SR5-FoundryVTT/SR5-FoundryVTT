@@ -23,6 +23,7 @@ declare namespace Shadowrun {
         magic: Magic;
         modifiers: Modifiers;
         special: SpecialTrait;
+        armor:  ActorArmor;
     };
 
     export type Modifiers = {
