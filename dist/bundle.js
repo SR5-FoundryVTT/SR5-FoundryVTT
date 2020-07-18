@@ -988,6 +988,13 @@ class SR5Actor extends Actor {
             }
         });
     }
+    /**
+     * Prepare Matrix data on the actor
+     * - if an item is equipped, it will use that data
+     * - if it isn't and player is technomancer, it will use that data
+     * @param data
+     * @param items
+     */
     static prepareMatrix(data, items) {
         const { matrix, attributes, limits } = data;
         // clear matrix data to defaults
@@ -999,6 +1006,7 @@ class SR5Actor extends Actor {
         matrix.rating = 0;
         matrix.name = '';
         matrix.device = '';
+        // get the first equipped device, we don't care if they have more equipped -- it shouldn't happen
         const device = items.filter((item) => item.isEquipped() && item.isDevice())[0];
         if (device) {
             const conditionMonitor = device.getConditionMonitor();
@@ -1008,12 +1016,14 @@ class SR5Actor extends Actor {
             matrix.rating = device.getRating();
             matrix.is_cyberdeck = device.isCyberdeck();
             matrix.name = device.getName();
+            matrix.item = device.getData();
             const deviceAtts = device.getASDF();
             if (deviceAtts) {
+                // setup the actual matrix attributes for the actor
                 for (const [key, value] of Object.entries(deviceAtts)) {
                     if (value && matrix[key]) {
                         matrix[key].value += value.value;
-                        matrix[key].device_att = value.att;
+                        matrix[key].device_att = value.device_att;
                     }
                 }
             }
@@ -1047,6 +1057,13 @@ class SR5Actor extends Actor {
             }
         });
     }
+    /**
+     * Prepare the armor data for the Item
+     * - will only allow one "Base" armor item to be used
+     * - all "accessories" will be added to the armor
+     * @param data
+     * @param items
+     */
     static prepareArmor(data, items) {
         const { armor } = data;
         armor.base = 0;
@@ -1073,6 +1090,12 @@ class SR5Actor extends Actor {
         // SET ARMOR
         armor.value = armor.base + helpers_1.Helpers.totalMods(armor.mod);
     }
+    /**
+     * Prepare actor data for cyberware changes
+     * - this calculates the actors essence
+     * @param data
+     * @param items
+     */
     static prepareCyberware(data, items) {
         const { attributes } = data;
         let totalEssence = 6;
@@ -1083,22 +1106,132 @@ class SR5Actor extends Actor {
                 totalEssence -= item.getEssenceLoss();
             }
         });
-        attributes.essence.value = totalEssence;
+        attributes.essence.value = +(totalEssence + Number(data.modifiers['essence'])).toFixed(3);
     }
-    prepareData() {
-        super.prepareData();
-        const actorData = this.data;
-        // @ts-ignore
-        const items = actorData.items.map((item) => new SR5ItemDataWrapper_1.SR5ItemDataWrapper(item));
-        const data = actorData.data;
+    /**
+     * Prepare actor data for attributes
+     * @param data
+     */
+    static prepareAttributes(data) {
         const { attributes } = data;
-        const { limits } = data;
-        const { language } = data.skills;
-        const { active } = data.skills;
-        const { knowledge: knowledge } = data.skills;
-        const { track } = data;
-        attributes.magic.hidden = !(data.special === 'magic');
-        attributes.resonance.hidden = !(data.special === 'resonance');
+        // set the value for the attributes
+        for (let [, att] of Object.entries(attributes)) {
+            if (!att.hidden) {
+                if (!att.mod)
+                    att.mod = {};
+                att.value = att.base + helpers_1.Helpers.totalMods(att.mod);
+            }
+        }
+        // attribute labels
+        for (let [a, att] of Object.entries(attributes)) {
+            att.label = CONFIG.SR5.attributes[a];
+        }
+    }
+    /**
+     * Prepare actor data for skills
+     * @param data
+     */
+    static prepareSkills(data) {
+        const { language, active, knowledge } = data.skills;
+        if (language) {
+            if (!language.value)
+                language.value = {};
+            language.attribute = 'intuition';
+        }
+        // function that will set the total of a skill correctly
+        const prepareSkill = (skill) => {
+            var _a;
+            skill.mod = {};
+            if (!skill.base)
+                skill.base = 0;
+            if ((_a = skill.bonus) === null || _a === void 0 ? void 0 : _a.length) {
+                for (let bonus of skill.bonus) {
+                    skill.mod[bonus.key] = bonus.value;
+                }
+            }
+            skill.value = skill.base + helpers_1.Helpers.totalMods(skill.mod);
+        };
+        // setup active skills
+        for (const skill of Object.values(active)) {
+            if (!skill.hidden) {
+                prepareSkill(skill);
+            }
+        }
+        const entries = Object.entries(data.skills.language.value);
+        // remove entries which are deleted TODO figure out how to delete these from the data
+        entries.forEach(([key, val]) => val._delete && delete data.skills.language.value[key]);
+        for (let skill of Object.values(language.value)) {
+            prepareSkill(skill);
+            skill.attribute = 'intuition';
+        }
+        // setup knowledge skills
+        for (let [, group] of Object.entries(knowledge)) {
+            const entries = Object.entries(group.value);
+            // remove entries which are deleted TODO figure out how to delete these from the data
+            group.value = entries
+                .filter(([, val]) => !val._delete)
+                .reduce((acc, [id, skill]) => {
+                prepareSkill(skill);
+                // set the attribute on the skill
+                skill.attribute = group.attribute;
+                acc[id] = skill;
+                return acc;
+            }, {});
+        }
+        // skill labels
+        for (let [s, skill] of Object.entries(active)) {
+            skill.label = CONFIG.SR5.activeSkills[s];
+        }
+    }
+    /**
+     * Prepare the actor data limits
+     * @param data
+     */
+    static prepareLimits(data) {
+        const { limits, attributes, modifiers } = data;
+        // SETUP LIMITS
+        limits.physical.value =
+            Math.ceil((2 * attributes.strength.value + attributes.body.value + attributes.reaction.value) / 3) + Number(modifiers['physical_limit']);
+        limits.mental.value =
+            Math.ceil((2 * attributes.logic.value + attributes.intuition.value + attributes.willpower.value) / 3) + Number(modifiers['mental_limit']);
+        limits.social.value =
+            Math.ceil((2 * attributes.charisma.value + attributes.willpower.value + attributes.essence.value) / 3) + Number(modifiers['social_limit']);
+        // limit labels
+        for (let [l, limit] of Object.entries(limits)) {
+            limit.label = CONFIG.SR5.limits[l];
+        }
+    }
+    /**
+     * Prepare actor data condition monitors (aka Tracks)
+     * @param data
+     */
+    static prepareConditionMonitors(data) {
+        const { track, attributes, modifiers } = data;
+        // TODO we will have grunts eventually that only have one track
+        track.physical.max = 8 + Math.ceil(attributes.body.value / 2) + Number(modifiers['physical_track']);
+        track.physical.overflow.max = attributes.body.value;
+        track.stun.max = 8 + Math.ceil(attributes.willpower.value / 2) + Number(modifiers['stun_track']);
+        // tracks
+        for (let [t, tr] of Object.entries(track)) {
+            tr.label = CONFIG.SR5.damageTypes[t];
+        }
+    }
+    /**
+     * Prepare actor data movement
+     * @param data
+     */
+    static prepareMovement(data) {
+        const { attributes, modifiers } = data;
+        const movement = data.movement;
+        // default movement: WALK = AGI * 2, RUN = AGI * 4
+        movement.walk.value = attributes.agility.value * (2 + Number(modifiers['walk']));
+        movement.run.value = attributes.agility.value * (4 + Number(modifiers['run']));
+    }
+    /**
+     * Prepare the modifiers that are displayed in the Misc. tab
+     * @param data
+     */
+    static prepareModifiers(data) {
         if (!data.modifiers)
             data.modifiers = {};
         const modifiers = {};
@@ -1129,133 +1262,80 @@ class SR5Actor extends Actor {
             'fade',
         ];
         miscTabModifiers.sort();
+        // force global to the top
         miscTabModifiers.unshift('global');
         for (let item of miscTabModifiers) {
-            modifiers[item] = data.modifiers[item] || 0;
+            modifiers[item] = Number(data.modifiers[item]) || 0;
         }
         data.modifiers = modifiers;
-        let totalEssence = 6;
+    }
+    /**
+     * Prepare actor data for initiative
+     * @param data
+     */
+    static prepareInitiative(data) {
+        const { initiative, attributes, modifiers, matrix } = data;
+        initiative.meatspace.base.base = attributes.intuition.value + attributes.reaction.value + Number(modifiers['meat_initiative']);
+        initiative.meatspace.dice.base = 1 + Number(modifiers['meat_initiative_dice']);
+        initiative.astral.base.base = attributes.intuition.value * 2 + Number(modifiers['astral_initiative']);
+        initiative.astral.dice.base = 2 + Number(modifiers['astral_initiative_dice']);
+        initiative.matrix.base.base = attributes.intuition.value + data.matrix.data_processing.value + Number(modifiers['matrix_initiative']);
+        initiative.matrix.dice.base = matrix.hot_sim ? 4 : 3 + Number(modifiers['matrix_initiative_dice']);
+        if (initiative.perception === 'matrix')
+            initiative.current = initiative.matrix;
+        else if (initiative.perception === 'astral')
+            initiative.current = initiative.astral;
+        else {
+            initiative.current = initiative.meatspace;
+            initiative.perception = 'meatspace';
+        }
+        initiative.current.dice.value = initiative.current.dice.base;
+        if (initiative.edge)
+            initiative.current.dice.value = 5;
+        initiative.current.dice.value = Math.min(5, initiative.current.dice.value); // maximum of 5d6 for initiative
+        initiative.current.dice.text = `${initiative.current.dice.value}d6`;
+        initiative.current.base.value = initiative.current.base.base;
+    }
+    /**
+     * Prepare actor data for wounds
+     * @param data
+     */
+    static prepareWounds(data) {
+        const { modifiers, track } = data;
+        const count = 3 + Number(modifiers['wound_tolerance']);
+        const stunWounds = Math.floor(data.track.stun.value / count);
+        const physicalWounds = Math.floor(data.track.physical.value / count);
+        track.stun.wounds = stunWounds;
+        track.physical.wounds = physicalWounds;
+        data.wounds = {
+            value: stunWounds + physicalWounds,
+        };
+    }
+    prepareData() {
+        super.prepareData();
+        const actorData = this.data;
+        // @ts-ignore
+        const items = actorData.items.map((item) => new SR5ItemDataWrapper_1.SR5ItemDataWrapper(item));
+        const data = actorData.data;
+        const { attributes } = data;
+        attributes.magic.hidden = !(data.special === 'magic');
+        attributes.resonance.hidden = !(data.special === 'resonance');
         // PARSE WEAPONS AND SET VALUES AS NEEDED
+        SR5Actor.prepareModifiers(data);
         SR5Actor.prepareMatrix(data, items);
         SR5Actor.prepareArmor(data, items);
         SR5Actor.prepareCyberware(data, items);
-        // ATTRIBUTES
-        for (let [, att] of Object.entries(attributes)) {
-            if (!att.hidden) {
-                if (!att.mod)
-                    att.mod = {};
-                att.value = att.base + helpers_1.Helpers.totalMods(att.mod);
-            }
-        }
-        if (language) {
-            if (!language.value)
-                language.value = {};
-            language.attribute = 'intuition';
-        }
-        const prepareSkill = (skill) => {
-            var _a;
-            skill.mod = {};
-            if (!skill.base)
-                skill.base = 0;
-            if ((_a = skill.bonus) === null || _a === void 0 ? void 0 : _a.length) {
-                for (let bonus of skill.bonus) {
-                    skill.mod[bonus.key] = bonus.value;
-                }
-            }
-            skill.value = skill.base + helpers_1.Helpers.totalMods(skill.mod);
-        };
-        for (const skill of Object.values(active)) {
-            if (!skill.hidden) {
-                prepareSkill(skill);
-            }
-        }
-        {
-            const entries = Object.entries(data.skills.language.value);
-            // remove entries which are deleted TODO figure out how to delete these from the data
-            entries.forEach(([key, val]) => val._delete && delete data.skills.language.value[key]);
-        }
-        for (let skill of Object.values(language.value)) {
-            prepareSkill(skill);
-        }
-        for (let [, group] of Object.entries(knowledge)) {
-            const entries = Object.entries(group.value);
-            // remove entries which are deleted TODO figure out how to delete these from the data
-            group.value = entries
-                .filter(([, val]) => !val._delete)
-                .reduce((acc, [id, skill]) => {
-                prepareSkill(skill);
-                acc[id] = skill;
-                return acc;
-            }, {});
-        }
-        // SET ESSENCE
-        actorData.data.attributes.essence.value = +(totalEssence + modifiers['essence']).toFixed(3);
-        // SETUP LIMITS
-        limits.physical.value =
-            Math.ceil((2 * attributes.strength.value + attributes.body.value + attributes.reaction.value) / 3) + modifiers['physical_limit'];
-        limits.mental.value = Math.ceil((2 * attributes.logic.value + attributes.intuition.value + attributes.willpower.value) / 3) + modifiers['mental_limit'];
-        limits.social.value =
-            Math.ceil((2 * attributes.charisma.value + attributes.willpower.value + attributes.essence.value) / 3) + modifiers['social_limit'];
-        // MOVEMENT
-        const movement = data.movement;
-        movement.walk.value = attributes.agility.value * (2 + modifiers['walk']);
-        movement.run.value = attributes.agility.value * (4 + modifiers['run']);
-        // CONDITION_MONITORS
-        track.physical.max = 8 + Math.ceil(attributes.body.value / 2) + modifiers['physical_track'];
-        track.physical.overflow.max = attributes.body.value;
-        track.stun.max = 8 + Math.ceil(attributes.willpower.value / 2) + modifiers['stun_track'];
+        SR5Actor.prepareAttributes(data);
+        SR5Actor.prepareSkills(data);
+        SR5Actor.prepareLimits(data);
+        SR5Actor.prepareConditionMonitors(data);
+        SR5Actor.prepareMovement(data);
+        SR5Actor.prepareInitiative(data);
+        SR5Actor.prepareWounds(data);
         // CALCULATE RECOIL
         data.recoil_compensation = 1 + Math.ceil(attributes.strength.value / 3);
-        // INITIATIVE
-        const init = data.initiative;
-        init.meatspace.base.base = attributes.intuition.value + attributes.reaction.value + modifiers['meat_initiative'];
-        init.meatspace.dice.base = 1 + modifiers['meat_initiative_dice'];
-        init.astral.base.base = attributes.intuition.value * 2 + modifiers['astral_initiative'];
-        init.astral.dice.base = 2 + modifiers['astral_initiative_dice'];
-        init.matrix.base.base = attributes.intuition.value + data.matrix.data_processing.value + modifiers['matrix_initiative'];
-        init.matrix.dice.base = data.matrix.hot_sim ? 4 : 3 + modifiers['matrix_initiative_dice'];
-        if (init.perception === 'matrix')
-            init.current = init.matrix;
-        else if (init.perception === 'astral')
-            init.current = init.astral;
-        else {
-            init.current = init.meatspace;
-            init.perception = 'meatspace';
-        }
-        init.current.dice.value = init.current.dice.base;
-        if (init.edge)
-            init.current.dice.value = 5;
-        init.current.dice.value = Math.min(5, init.current.dice.value); // maximum of 5d6 for initiative
-        init.current.dice.text = `${init.current.dice.value}d6`;
-        init.current.base.value = init.current.base.base;
         if (data.magic.drain && !data.magic.drain.mod)
             data.magic.drain.mod = {};
-        {
-            const count = 3 + modifiers['wound_tolerance'];
-            const stunWounds = Math.floor(data.track.stun.value / count);
-            const physicalWounds = Math.floor(data.track.physical.value / count);
-            data.track.stun.wounds = stunWounds;
-            data.track.physical.wounds = physicalWounds;
-            data.wounds = {
-                value: stunWounds + physicalWounds,
-            };
-        }
-        // limit labels
-        for (let [l, limit] of Object.entries(limits)) {
-            limit.label = CONFIG.SR5.limits[l];
-        }
-        // skill labels
-        for (let [s, skill] of Object.entries(active)) {
-            skill.label = CONFIG.SR5.activeSkills[s];
-        }
-        // attribute labels
-        for (let [a, att] of Object.entries(attributes)) {
-            att.label = CONFIG.SR5.attributes[a];
-        }
-        // tracks
-        for (let [t, tr] of Object.entries(track)) {
-            tr.label = CONFIG.SR5.damageTypes[t];
-        }
     }
     getModifier(modifierName) {
         return this.data.data.modifiers[modifierName];
@@ -1304,7 +1384,6 @@ class SR5Actor extends Actor {
     }
     getMatrixDevice() {
         const matrix = this.data.data.matrix;
-        console.log(matrix);
         if (matrix.device)
             return this.getOwnedItem(matrix.device);
         return undefined;
@@ -1555,10 +1634,7 @@ class SR5Actor extends Actor {
                             return;
                         const armor = this.getArmor();
                         const armorId = helpers_1.Helpers.parseInputToString($(html).find('[name=element]').val());
-                        console.log(armorId);
-                        console.log(armor);
                         const bonusArmor = armor[armorId] || 0;
-                        console.log(bonusArmor);
                         if (bonusArmor)
                             parts[CONFIG.SR5.elementTypes[armorId]] = bonusArmor;
                         const ap = helpers_1.Helpers.parseInputToNumber($(html).find('[name=ap]').val());
@@ -1950,7 +2026,6 @@ class SR5Actor extends Actor {
                 if (!actor) {
                     // get controlled tokens
                     const tokens = canvas.tokens.controlled;
-                    console.log(tokens);
                     if (tokens.length > 0) {
                         for (let token of tokens) {
                             if (token.actor.owner) {
@@ -1998,7 +2073,6 @@ class SR5Actor extends Actor {
                     if (!actor) {
                         // get controlled tokens
                         const tokens = canvas.tokens.controlled;
-                        console.log(tokens);
                         if (tokens.length > 0) {
                             for (let token of tokens) {
                                 if (token.actor.owner) {
@@ -6229,6 +6303,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ItemDataWrapper = void 0;
 const AbstractDataWrapper_1 = require("../dataWrappers/AbstractDataWrapper");
 class SR5ItemDataWrapper extends AbstractDataWrapper_1.AbstractDataWrapper {
+    getData() {
+        return this.data.data;
+    }
     isAreaOfEffect() {
         // TODO figure out how to detect explosive ammo
         return this.isGrenade() || (this.isSpell() && this.data.data.range === 'los_a'); //|| this.hasExplosiveAmmo();
@@ -6319,19 +6396,19 @@ class SR5ItemDataWrapper extends AbstractDataWrapper_1.AbstractDataWrapper {
         const matrix = {
             attack: {
                 value: 0,
-                att: '',
+                device_att: '',
             },
             sleaze: {
                 value: 0,
-                att: '',
+                device_att: '',
             },
             data_processing: {
                 value: this.getRating(),
-                att: '',
+                device_att: '',
             },
             firewall: {
                 value: this.getRating(),
-                att: '',
+                device_att: '',
             },
         };
         /**

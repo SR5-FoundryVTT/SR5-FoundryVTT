@@ -5,13 +5,13 @@ declare namespace Shadowrun {
         _id: string;
         folder: string | null;
         type: string;
-        data: ItemData;
+        data: SR5ItemData;
         permission: {
             default: 2;
         };
     };
 
-    type ItemData = Partial<TechnologyData> &
+    type SR5ItemData = Partial<TechnologyData> &
         Partial<ArmorData> &
         Partial<ActionData> &
         Partial<CyberwareData> &

@@ -23,11 +23,33 @@ declare namespace Shadowrun {
         magic: Magic;
         modifiers: Modifiers;
         special: SpecialTrait;
-        armor:  ActorArmor;
+        armor: ActorArmor;
+        initiative: Initiative;
+        wounds: WoundType;
     };
+
+    export type WoundType = {
+        value: number;
+    }
 
     export type Modifiers = {
         [name: string]: NumberOrEmpty;
+    };
+
+    export type InitiativeType = {
+        base: BaseValuePair<number> & ModifiableValue;
+        dice: BaseValuePair<number> & ModifiableValue & {
+            text: string;
+        };
+    };
+
+    export type Initiative = {
+        perception: string;
+        meatspace: InitiativeType;
+        matrix: InitiativeType;
+        astral: InitiativeType;
+        current: InitiativeType;
+        edge?: boolean;
     };
 
     export type SkillEditFormData = BaseEntitySheetData & {

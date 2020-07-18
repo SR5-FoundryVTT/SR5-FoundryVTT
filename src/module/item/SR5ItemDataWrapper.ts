@@ -2,11 +2,16 @@ import { AbstractDataWrapper } from '../dataWrappers/AbstractDataWrapper';
 import Item = Shadowrun.Item;
 import ConditionData = Shadowrun.ConditionData;
 import ModList = Shadowrun.ModList;
+import SR5ItemData = Shadowrun.SR5ItemData;
 
 export class SR5ItemDataWrapper extends AbstractDataWrapper<Item> {
+    getData(): SR5ItemData {
+        return this.data.data;
+    }
+
     isAreaOfEffect(): boolean {
         // TODO figure out how to detect explosive ammo
-        return this.isGrenade() || (this.isSpell() && this.data.data.range === 'los_a');//|| this.hasExplosiveAmmo();
+        return this.isGrenade() || (this.isSpell() && this.data.data.range === 'los_a'); //|| this.hasExplosiveAmmo();
     }
 
     isArmor(): boolean {
@@ -110,19 +115,19 @@ export class SR5ItemDataWrapper extends AbstractDataWrapper<Item> {
         const matrix = {
             attack: {
                 value: 0,
-                att: '',
+                device_att: '',
             },
             sleaze: {
                 value: 0,
-                att: '',
+                device_att: '',
             },
             data_processing: {
                 value: this.getRating(),
-                att: '',
+                device_att: '',
             },
             firewall: {
                 value: this.getRating(),
-                att: '',
+                device_att: '',
             },
         };
 
