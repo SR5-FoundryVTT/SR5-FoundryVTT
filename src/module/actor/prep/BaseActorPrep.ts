@@ -15,8 +15,6 @@ export class BaseActorPrep {
      * Prepare Matrix data on the actor
      * - if an item is equipped, it will use that data
      * - if it isn't and player is technomancer, it will use that data
-     * @param data
-     * @param items
      */
     prepareMatrix() {
         const { matrix, attributes, limits } = this.data;
@@ -97,8 +95,6 @@ export class BaseActorPrep {
      * Prepare the armor data for the Item
      * - will only allow one "Base" armor item to be used
      * - all "accessories" will be added to the armor
-     * @param data
-     * @param items
      */
     prepareArmor() {
         const { armor } = this.data;
@@ -131,8 +127,6 @@ export class BaseActorPrep {
     /**
      * Prepare actor data for cyberware changes
      * - this calculates the actors essence
-     * @param data
-     * @param items
      */
     prepareCyberware() {
         const { attributes } = this.data;
@@ -141,18 +135,21 @@ export class BaseActorPrep {
             .filter((item) => item.isCyberware() && item.isEquipped())
             .forEach((item) => {
                 if (item.getEssenceLoss()) {
-                    totalEssence -= item.getEssenceLoss();
+                    totalEssence -= Number(item.getEssenceLoss());
                 }
             });
-        attributes.essence.value = +(totalEssence + Number(this.data.modifiers['essence'])).toFixed(3);
+        attributes.essence.base = +(totalEssence + Number(this.data.modifiers['essence'] || 0)).toFixed(3);
     }
 
     /**
      * Prepare actor data for attributes
-     * @param data
      */
     prepareAttributes() {
         const { attributes } = this.data;
+
+        // hide attributes if we aren't special
+        attributes.magic.hidden = !(this.data.special === 'magic');
+        attributes.resonance.hidden = !(this.data.special === 'resonance');
 
         // set the value for the attributes
         for (let [key, attribute] of Object.entries(attributes)) {
@@ -161,16 +158,12 @@ export class BaseActorPrep {
             attribute.label = CONFIG.SR5.attributes[key];
         }
 
-        attributes.magic.hidden = !(this.data.special === 'magic');
-        attributes.resonance.hidden = !(this.data.special === 'resonance');
-
         // CALCULATE RECOIL
         this.data.recoil_compensation = 1 + Math.ceil(attributes.strength.value / 3);
     }
 
     /**
      * Prepare actor data for skills
-     * @param data
      */
     prepareSkills() {
         const { language, active, knowledge } = this.data.skills;
@@ -231,7 +224,6 @@ export class BaseActorPrep {
 
     /**
      * Prepare the actor data limits
-     * @param data
      */
     prepareLimits() {
         const { limits, attributes, modifiers } = this.data;
@@ -252,7 +244,6 @@ export class BaseActorPrep {
 
     /**
      * Prepare actor data condition monitors (aka Tracks)
-     * @param data
      */
     prepareConditionMonitors() {
         const { track, attributes, modifiers } = this.data;
@@ -270,7 +261,6 @@ export class BaseActorPrep {
 
     /**
      * Prepare actor data movement
-     * @param data
      */
     prepareMovement() {
         const { attributes, modifiers } = this.data;
@@ -282,7 +272,6 @@ export class BaseActorPrep {
 
     /**
      * Prepare the modifiers that are displayed in the Misc. tab
-     * @param data
      */
     prepareModifiers() {
         if (!this.data.modifiers) this.data.modifiers = {};
@@ -326,7 +315,6 @@ export class BaseActorPrep {
 
     /**
      * Prepare actor data for initiative
-     * @param data
      */
     prepareInitiative() {
         const { initiative, attributes, modifiers, matrix } = this.data;
@@ -351,7 +339,6 @@ export class BaseActorPrep {
 
     /**
      * Prepare actor data for wounds
-     * @param data
      */
     prepareWounds() {
         const { modifiers, track } = this.data;

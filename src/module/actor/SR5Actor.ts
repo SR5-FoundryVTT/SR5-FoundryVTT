@@ -1,7 +1,6 @@
 import { ShadowrunRoller } from '../rolls/ShadowrunRoller';
 import { Helpers } from '../helpers';
 import { SR5Item } from '../item/SR5Item';
-import Attributes = Shadowrun.Attributes;
 import ActorRollOptions = Shadowrun.ActorRollOptions;
 import DefenseRollOptions = Shadowrun.DefenseRollOptions;
 import SoakRollOptions = Shadowrun.SoakRollOptions;
@@ -15,8 +14,6 @@ import ModifiableValue = Shadowrun.ModifiableValue;
 import LabelField = Shadowrun.LabelField;
 import LimitField = Shadowrun.LimitField;
 import { SYSTEM_NAME } from '../constants';
-import SR5ActorData = Shadowrun.SR5ActorData;
-import { SR5ItemDataWrapper } from '../item/SR5ItemDataWrapper';
 import { BaseActorPrep } from './prep/BaseActorPrep';
 import SR5ActorType = Shadowrun.SR5ActorType;
 
@@ -63,6 +60,7 @@ export class SR5Actor extends Actor {
         prepper.prepareConditionMonitors();
         prepper.prepareMovement();
         prepper.prepareWounds();
+        prepper.prepareInitiative();
 
         const data = actorData.data;
         if (data.magic.drain && !data.magic.drain.mod) data.magic.drain.mod = {};
