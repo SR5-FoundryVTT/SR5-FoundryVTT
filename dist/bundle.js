@@ -955,7 +955,7 @@ exports.SR5Actor = void 0;
 const ShadowrunRoller_1 = require("../rolls/ShadowrunRoller");
 const helpers_1 = require("../helpers");
 const constants_1 = require("../constants");
-const SR5ItemDataWrapper_1 = require("../item/SR5ItemDataWrapper");
+const BaseActorPrep_1 = require("./prep/BaseActorPrep");
 class SR5Actor extends Actor {
     update(data, options) {
         const _super = Object.create(null, {
@@ -988,352 +988,21 @@ class SR5Actor extends Actor {
             }
         });
     }
-    /**
-     * Prepare Matrix data on the actor
-     * - if an item is equipped, it will use that data
-     * - if it isn't and player is technomancer, it will use that data
-     * @param data
-     * @param items
-     */
-    static prepareMatrix(data, items) {
-        const { matrix, attributes, limits } = data;
-        // clear matrix data to defaults
-        matrix.firewall.value = helpers_1.Helpers.totalMods(matrix.firewall.mod);
-        matrix.data_processing.value = helpers_1.Helpers.totalMods(matrix.data_processing.mod);
-        matrix.attack.value = helpers_1.Helpers.totalMods(matrix.attack.mod);
-        matrix.sleaze.value = helpers_1.Helpers.totalMods(matrix.sleaze.mod);
-        matrix.condition_monitor.max = 0;
-        matrix.rating = 0;
-        matrix.name = '';
-        matrix.device = '';
-        // get the first equipped device, we don't care if they have more equipped -- it shouldn't happen
-        const device = items.filter((item) => item.isEquipped() && item.isDevice())[0];
-        if (device) {
-            const conditionMonitor = device.getConditionMonitor();
-            matrix.device = device.getId();
-            matrix.condition_monitor.max = conditionMonitor.max;
-            matrix.condition_monitor.value = conditionMonitor.value;
-            matrix.rating = device.getRating();
-            matrix.is_cyberdeck = device.isCyberdeck();
-            matrix.name = device.getName();
-            matrix.item = device.getData();
-            const deviceAtts = device.getASDF();
-            if (deviceAtts) {
-                // setup the actual matrix attributes for the actor
-                for (const [key, value] of Object.entries(deviceAtts)) {
-                    if (value && matrix[key]) {
-                        matrix[key].value += value.value;
-                        matrix[key].device_att = value.device_att;
-                    }
-                }
-            }
-        } // if we don't have a device, use living persona
-        else if (data.special === 'resonance') {
-            matrix.firewall.value += attributes.willpower.value;
-            matrix.data_processing.value += attributes.logic.value;
-            matrix.rating = attributes.resonance.value;
-            matrix.attack.value += attributes.charisma.value;
-            matrix.sleaze.value += attributes.intuition.value;
-            matrix.name = game.i18n.localize('SR5.LivingPersona');
-        }
-        // set matrix condition monitor to max if greater than
-        if (matrix.condition_monitor.value > matrix.condition_monitor.max)
-            matrix.condition_monitor.value = matrix.condition_monitor.max;
-        // add matrix attributes to both limits and attributes as hidden entries
-        ['firewall', 'sleaze', 'data_processing', 'firewall'].forEach((key) => {
-            if (matrix[key]) {
-                limits[key] = {
-                    value: matrix[key].value,
-                    base: matrix[key].base,
-                    mod: matrix[key].mod,
-                    hidden: true,
-                };
-                attributes[key] = {
-                    value: matrix[key].value,
-                    base: matrix[key].base,
-                    mod: matrix[key].mod,
-                    hidden: true,
-                };
-            }
-        });
-    }
-    /**
-     * Prepare the armor data for the Item
-     * - will only allow one "Base" armor item to be used
-     * - all "accessories" will be added to the armor
-     * @param data
-     * @param items
-     */
-    static prepareArmor(data, items) {
-        const { armor } = data;
-        armor.base = 0;
-        armor.value = 0;
-        armor.mod = {};
-        for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
-            armor[element] = 0;
-        }
-        const equippedArmor = items.filter((item) => item.isArmor() && item.isEquipped());
-        equippedArmor === null || equippedArmor === void 0 ? void 0 : equippedArmor.forEach((item) => {
-            if (item.isArmorAccessory()) {
-                armor.mod[item.getName()] = item.getArmorValue();
-            } // if not a mod, set armor.value to the items value
-            else {
-                armor.base = item.getArmorValue();
-                armor.label = item.getName();
-                for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
-                    armor[element] = item.getArmorElements()[element];
-                }
-            }
-        });
-        if (data.modifiers['armor'])
-            armor.mod[game.i18n.localize('SR5.Bonus')] = data.modifiers['armor'];
-        // SET ARMOR
-        armor.value = armor.base + helpers_1.Helpers.totalMods(armor.mod);
-    }
-    /**
-     * Prepare actor data for cyberware changes
-     * - this calculates the actors essence
-     * @param data
-     * @param items
-     */
-    static prepareCyberware(data, items) {
-        const { attributes } = data;
-        let totalEssence = 6;
-        items
-            .filter((item) => item.isCyberware() && item.isEquipped())
-            .forEach((item) => {
-            if (item.getEssenceLoss()) {
-                totalEssence -= item.getEssenceLoss();
-            }
-        });
-        attributes.essence.value = +(totalEssence + Number(data.modifiers['essence'])).toFixed(3);
-    }
-    /**
-     * Prepare actor data for attributes
-     * @param data
-     */
-    static prepareAttributes(data) {
-        const { attributes } = data;
-        // set the value for the attributes
-        for (let [, att] of Object.entries(attributes)) {
-            if (!att.hidden) {
-                if (!att.mod)
-                    att.mod = {};
-                att.value = att.base + helpers_1.Helpers.totalMods(att.mod);
-            }
-        }
-        // attribute labels
-        for (let [a, att] of Object.entries(attributes)) {
-            att.label = CONFIG.SR5.attributes[a];
-        }
-    }
-    /**
-     * Prepare actor data for skills
-     * @param data
-     */
-    static prepareSkills(data) {
-        const { language, active, knowledge } = data.skills;
-        if (language) {
-            if (!language.value)
-                language.value = {};
-            language.attribute = 'intuition';
-        }
-        // function that will set the total of a skill correctly
-        const prepareSkill = (skill) => {
-            var _a;
-            skill.mod = {};
-            if (!skill.base)
-                skill.base = 0;
-            if ((_a = skill.bonus) === null || _a === void 0 ? void 0 : _a.length) {
-                for (let bonus of skill.bonus) {
-                    skill.mod[bonus.key] = bonus.value;
-                }
-            }
-            skill.value = skill.base + helpers_1.Helpers.totalMods(skill.mod);
-        };
-        // setup active skills
-        for (const skill of Object.values(active)) {
-            if (!skill.hidden) {
-                prepareSkill(skill);
-            }
-        }
-        const entries = Object.entries(data.skills.language.value);
-        // remove entries which are deleted TODO figure out how to delete these from the data
-        entries.forEach(([key, val]) => val._delete && delete data.skills.language.value[key]);
-        for (let skill of Object.values(language.value)) {
-            prepareSkill(skill);
-            skill.attribute = 'intuition';
-        }
-        // setup knowledge skills
-        for (let [, group] of Object.entries(knowledge)) {
-            const entries = Object.entries(group.value);
-            // remove entries which are deleted TODO figure out how to delete these from the data
-            group.value = entries
-                .filter(([, val]) => !val._delete)
-                .reduce((acc, [id, skill]) => {
-                prepareSkill(skill);
-                // set the attribute on the skill
-                skill.attribute = group.attribute;
-                acc[id] = skill;
-                return acc;
-            }, {});
-        }
-        // skill labels
-        for (let [s, skill] of Object.entries(active)) {
-            skill.label = CONFIG.SR5.activeSkills[s];
-        }
-    }
-    /**
-     * Prepare the actor data limits
-     * @param data
-     */
-    static prepareLimits(data) {
-        const { limits, attributes, modifiers } = data;
-        // SETUP LIMITS
-        limits.physical.value =
-            Math.ceil((2 * attributes.strength.value + attributes.body.value + attributes.reaction.value) / 3) + Number(modifiers['physical_limit']);
-        limits.mental.value =
-            Math.ceil((2 * attributes.logic.value + attributes.intuition.value + attributes.willpower.value) / 3) + Number(modifiers['mental_limit']);
-        limits.social.value =
-            Math.ceil((2 * attributes.charisma.value + attributes.willpower.value + attributes.essence.value) / 3) + Number(modifiers['social_limit']);
-        // limit labels
-        for (let [l, limit] of Object.entries(limits)) {
-            limit.label = CONFIG.SR5.limits[l];
-        }
-    }
-    /**
-     * Prepare actor data condition monitors (aka Tracks)
-     * @param data
-     */
-    static prepareConditionMonitors(data) {
-        const { track, attributes, modifiers } = data;
-        // TODO we will have grunts eventually that only have one track
-        track.physical.max = 8 + Math.ceil(attributes.body.value / 2) + Number(modifiers['physical_track']);
-        track.physical.overflow.max = attributes.body.value;
-        track.stun.max = 8 + Math.ceil(attributes.willpower.value / 2) + Number(modifiers['stun_track']);
-        // tracks
-        for (let [t, tr] of Object.entries(track)) {
-            tr.label = CONFIG.SR5.damageTypes[t];
-        }
-    }
-    /**
-     * Prepare actor data movement
-     * @param data
-     */
-    static prepareMovement(data) {
-        const { attributes, modifiers } = data;
-        const movement = data.movement;
-        // default movement: WALK = AGI * 2, RUN = AGI * 4
-        movement.walk.value = attributes.agility.value * (2 + Number(modifiers['walk']));
-        movement.run.value = attributes.agility.value * (4 + Number(modifiers['run']));
-    }
-    /**
-     * Prepare the modifiers that are displayed in the Misc. tab
-     * @param data
-     */
-    static prepareModifiers(data) {
-        if (!data.modifiers)
-            data.modifiers = {};
-        const modifiers = {};
-        let miscTabModifiers = [
-            'soak',
-            'drain',
-            'armor',
-            'physical_limit',
-            'social_limit',
-            'mental_limit',
-            'stun_track',
-            'physical_track',
-            'meat_initiative',
-            'meat_initiative_dice',
-            'astral_initiative',
-            'astral_initiative_dice',
-            'matrix_initiative',
-            'matrix_initiative_dice',
-            'composure',
-            'lift_carry',
-            'judge_intentions',
-            'memory',
-            'walk',
-            'run',
-            'defense',
-            'wound_tolerance',
-            'essence',
-            'fade',
-        ];
-        miscTabModifiers.sort();
-        // force global to the top
-        miscTabModifiers.unshift('global');
-        for (let item of miscTabModifiers) {
-            modifiers[item] = Number(data.modifiers[item]) || 0;
-        }
-        data.modifiers = modifiers;
-    }
-    /**
-     * Prepare actor data for initiative
-     * @param data
-     */
-    static prepareInitiative(data) {
-        const { initiative, attributes, modifiers, matrix } = data;
-        initiative.meatspace.base.base = attributes.intuition.value + attributes.reaction.value + Number(modifiers['meat_initiative']);
-        initiative.meatspace.dice.base = 1 + Number(modifiers['meat_initiative_dice']);
-        initiative.astral.base.base = attributes.intuition.value * 2 + Number(modifiers['astral_initiative']);
-        initiative.astral.dice.base = 2 + Number(modifiers['astral_initiative_dice']);
-        initiative.matrix.base.base = attributes.intuition.value + data.matrix.data_processing.value + Number(modifiers['matrix_initiative']);
-        initiative.matrix.dice.base = matrix.hot_sim ? 4 : 3 + Number(modifiers['matrix_initiative_dice']);
-        if (initiative.perception === 'matrix')
-            initiative.current = initiative.matrix;
-        else if (initiative.perception === 'astral')
-            initiative.current = initiative.astral;
-        else {
-            initiative.current = initiative.meatspace;
-            initiative.perception = 'meatspace';
-        }
-        initiative.current.dice.value = initiative.current.dice.base;
-        if (initiative.edge)
-            initiative.current.dice.value = 5;
-        initiative.current.dice.value = Math.min(5, initiative.current.dice.value); // maximum of 5d6 for initiative
-        initiative.current.dice.text = `${initiative.current.dice.value}d6`;
-        initiative.current.base.value = initiative.current.base.base;
-    }
-    /**
-     * Prepare actor data for wounds
-     * @param data
-     */
-    static prepareWounds(data) {
-        const { modifiers, track } = data;
-        const count = 3 + Number(modifiers['wound_tolerance']);
-        const stunWounds = Math.floor(data.track.stun.value / count);
-        const physicalWounds = Math.floor(data.track.physical.value / count);
-        track.stun.wounds = stunWounds;
-        track.physical.wounds = physicalWounds;
-        data.wounds = {
-            value: stunWounds + physicalWounds,
-        };
-    }
     prepareData() {
         super.prepareData();
         const actorData = this.data;
-        // @ts-ignore
-        const items = actorData.items.map((item) => new SR5ItemDataWrapper_1.SR5ItemDataWrapper(item));
+        const prepper = new BaseActorPrep_1.BaseActorPrep(actorData);
+        prepper.prepareModifiers();
+        prepper.prepareArmor();
+        prepper.prepareCyberware();
+        prepper.prepareSkills();
+        prepper.prepareAttributes();
+        prepper.prepareMatrix();
+        prepper.prepareLimits();
+        prepper.prepareConditionMonitors();
+        prepper.prepareMovement();
+        prepper.prepareWounds();
         const data = actorData.data;
-        const { attributes } = data;
-        attributes.magic.hidden = !(data.special === 'magic');
-        attributes.resonance.hidden = !(data.special === 'resonance');
-        // PARSE WEAPONS AND SET VALUES AS NEEDED
-        SR5Actor.prepareModifiers(data);
-        SR5Actor.prepareMatrix(data, items);
-        SR5Actor.prepareArmor(data, items);
-        SR5Actor.prepareCyberware(data, items);
-        SR5Actor.prepareAttributes(data);
-        SR5Actor.prepareSkills(data);
-        SR5Actor.prepareLimits(data);
-        SR5Actor.prepareConditionMonitors(data);
-        SR5Actor.prepareMovement(data);
-        SR5Actor.prepareInitiative(data);
-        SR5Actor.prepareWounds(data);
-        // CALCULATE RECOIL
-        data.recoil_compensation = 1 + Math.ceil(attributes.strength.value / 3);
         if (data.magic.drain && !data.magic.drain.mod)
             data.magic.drain.mod = {};
     }
@@ -1351,7 +1020,7 @@ class SR5Actor extends Actor {
         return this.data.data.attributes[attributeName];
     }
     getEquippedMatrixDevice() {
-        return this.items.filter((item) => item.isDevice())[0];
+        return this.items.find((item) => item.isDevice());
     }
     getEquippedArmor() {
         return this.items.filter((item) => item.isArmor());
@@ -2125,7 +1794,7 @@ class SR5Actor extends Actor {
     }
 }
 exports.SR5Actor = SR5Actor;
-},{"../constants":28,"../helpers":31,"../item/SR5ItemDataWrapper":34,"../rolls/ShadowrunRoller":41}],17:[function(require,module,exports){
+},{"../constants":29,"../helpers":32,"../rolls/ShadowrunRoller":42,"./prep/BaseActorPrep":18}],17:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -2771,7 +2440,347 @@ class SR5ActorSheet extends ActorSheet {
     }
 }
 exports.SR5ActorSheet = SR5ActorSheet;
-},{"../apps/chummer-import-form":18,"../apps/skills/KnowledgeSkillEditForm":21,"../apps/skills/LanguageSkillEditForm":22,"../apps/skills/SkillEditForm":23,"../helpers":31}],18:[function(require,module,exports){
+},{"../apps/chummer-import-form":19,"../apps/skills/KnowledgeSkillEditForm":22,"../apps/skills/LanguageSkillEditForm":23,"../apps/skills/SkillEditForm":24,"../helpers":32}],18:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.BaseActorPrep = void 0;
+const SR5ItemDataWrapper_1 = require("../../item/SR5ItemDataWrapper");
+const helpers_1 = require("../../helpers");
+class BaseActorPrep {
+    constructor(data) {
+        this.data = data.data;
+        this.items = data.items.map((item) => new SR5ItemDataWrapper_1.SR5ItemDataWrapper(item));
+    }
+    /**
+     * Prepare Matrix data on the actor
+     * - if an item is equipped, it will use that data
+     * - if it isn't and player is technomancer, it will use that data
+     * @param data
+     * @param items
+     */
+    prepareMatrix() {
+        const { matrix, attributes, limits } = this.data;
+        // clear matrix data to defaults
+        matrix.firewall.value = helpers_1.Helpers.totalMods(matrix.firewall.mod);
+        matrix.data_processing.value = helpers_1.Helpers.totalMods(matrix.data_processing.mod);
+        matrix.attack.value = helpers_1.Helpers.totalMods(matrix.attack.mod);
+        matrix.sleaze.value = helpers_1.Helpers.totalMods(matrix.sleaze.mod);
+        matrix.condition_monitor.max = 0;
+        matrix.rating = 0;
+        matrix.name = '';
+        matrix.device = '';
+        // get the first equipped device, we don't care if they have more equipped -- it shouldn't happen
+        const device = this.items.find((item) => item.isEquipped() && item.isDevice());
+        if (device) {
+            const conditionMonitor = device.getConditionMonitor();
+            matrix.device = device.getId();
+            matrix.condition_monitor.max = conditionMonitor.max;
+            matrix.condition_monitor.value = conditionMonitor.value;
+            matrix.rating = device.getRating();
+            matrix.is_cyberdeck = device.isCyberdeck();
+            matrix.name = device.getName();
+            matrix.item = device.getData();
+            const deviceAtts = device.getASDF();
+            if (deviceAtts) {
+                // setup the actual matrix attributes for the actor
+                for (const [key, value] of Object.entries(deviceAtts)) {
+                    if (value && matrix[key]) {
+                        matrix[key].value += value.value;
+                        matrix[key].device_att = value.device_att;
+                    }
+                }
+            }
+        } // if we don't have a device, use living persona
+        else if (this.data.special === 'resonance') {
+            matrix.firewall.value += helpers_1.Helpers.calcTotal(attributes.willpower);
+            matrix.data_processing.value += helpers_1.Helpers.calcTotal(attributes.logic);
+            matrix.rating = helpers_1.Helpers.calcTotal(attributes.resonance);
+            matrix.attack.value += helpers_1.Helpers.calcTotal(attributes.charisma);
+            matrix.sleaze.value += helpers_1.Helpers.calcTotal(attributes.intuition);
+            matrix.name = game.i18n.localize('SR5.LivingPersona');
+        }
+        // set matrix condition monitor to max if greater than
+        if (matrix.condition_monitor.value > matrix.condition_monitor.max) {
+            matrix.condition_monitor.value = matrix.condition_monitor.max;
+        }
+        // add matrix attributes to both limits and attributes as hidden entries
+        ['firewall', 'sleaze', 'data_processing', 'firewall'].forEach((key) => {
+            if (matrix[key]) {
+                const label = CONFIG.SR5.matrixAttributes[key];
+                const { value, base, mod } = matrix[key];
+                const hidden = true;
+                limits[key] = {
+                    value,
+                    base,
+                    mod,
+                    label,
+                    hidden,
+                };
+                attributes[key] = {
+                    value,
+                    base,
+                    mod,
+                    label,
+                    hidden,
+                };
+            }
+        });
+    }
+    /**
+     * Prepare the armor data for the Item
+     * - will only allow one "Base" armor item to be used
+     * - all "accessories" will be added to the armor
+     * @param data
+     * @param items
+     */
+    prepareArmor() {
+        const { armor } = this.data;
+        armor.base = 0;
+        armor.value = 0;
+        armor.mod = {};
+        for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
+            armor[element] = 0;
+        }
+        const equippedArmor = this.items.filter((item) => item.isArmor() && item.isEquipped());
+        equippedArmor === null || equippedArmor === void 0 ? void 0 : equippedArmor.forEach((item) => {
+            if (item.isArmorAccessory()) {
+                armor.mod[item.getName()] = item.getArmorValue();
+            } // if not a mod, set armor.value to the items value
+            else {
+                armor.base = item.getArmorValue();
+                armor.label = item.getName();
+                for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
+                    armor[element] = item.getArmorElements()[element];
+                }
+            }
+        });
+        if (this.data.modifiers['armor'])
+            armor.mod[game.i18n.localize('SR5.Bonus')] = this.data.modifiers['armor'];
+        // SET ARMOR
+        armor.value = armor.base + helpers_1.Helpers.totalMods(armor.mod);
+    }
+    /**
+     * Prepare actor data for cyberware changes
+     * - this calculates the actors essence
+     * @param data
+     * @param items
+     */
+    prepareCyberware() {
+        const { attributes } = this.data;
+        let totalEssence = 6;
+        this.items
+            .filter((item) => item.isCyberware() && item.isEquipped())
+            .forEach((item) => {
+            if (item.getEssenceLoss()) {
+                totalEssence -= item.getEssenceLoss();
+            }
+        });
+        attributes.essence.value = +(totalEssence + Number(this.data.modifiers['essence'])).toFixed(3);
+    }
+    /**
+     * Prepare actor data for attributes
+     * @param data
+     */
+    prepareAttributes() {
+        const { attributes } = this.data;
+        // set the value for the attributes
+        for (let [key, attribute] of Object.entries(attributes)) {
+            helpers_1.Helpers.calcTotal(attribute);
+            // add labels
+            attribute.label = CONFIG.SR5.attributes[key];
+        }
+        attributes.magic.hidden = !(this.data.special === 'magic');
+        attributes.resonance.hidden = !(this.data.special === 'resonance');
+        // CALCULATE RECOIL
+        this.data.recoil_compensation = 1 + Math.ceil(attributes.strength.value / 3);
+    }
+    /**
+     * Prepare actor data for skills
+     * @param data
+     */
+    prepareSkills() {
+        const { language, active, knowledge } = this.data.skills;
+        if (language) {
+            if (!language.value)
+                language.value = {};
+            language.attribute = 'intuition';
+        }
+        // function that will set the total of a skill correctly
+        const prepareSkill = (skill) => {
+            var _a;
+            skill.mod = {};
+            if (!skill.base)
+                skill.base = 0;
+            if ((_a = skill.bonus) === null || _a === void 0 ? void 0 : _a.length) {
+                for (let bonus of skill.bonus) {
+                    skill.mod[bonus.key] = bonus.value;
+                }
+            }
+            helpers_1.Helpers.calcTotal(skill);
+        };
+        // setup active skills
+        for (const skill of Object.values(active)) {
+            if (!skill.hidden) {
+                prepareSkill(skill);
+            }
+        }
+        const entries = Object.entries(this.data.skills.language.value);
+        // remove entries which are deleted TODO figure out how to delete these from the data
+        entries.forEach(([key, val]) => val._delete && delete this.data.skills.language.value[key]);
+        for (let skill of Object.values(language.value)) {
+            prepareSkill(skill);
+            skill.attribute = 'intuition';
+        }
+        // setup knowledge skills
+        for (let [, group] of Object.entries(knowledge)) {
+            const entries = Object.entries(group.value);
+            // remove entries which are deleted TODO figure out how to delete these from the data
+            group.value = entries
+                .filter(([, val]) => !val._delete)
+                .reduce((acc, [id, skill]) => {
+                prepareSkill(skill);
+                // set the attribute on the skill
+                skill.attribute = group.attribute;
+                acc[id] = skill;
+                return acc;
+            }, {});
+        }
+        // skill labels
+        for (let [skillKey, skillValue] of Object.entries(active)) {
+            skillValue.label = CONFIG.SR5.activeSkills[skillKey];
+        }
+    }
+    /**
+     * Prepare the actor data limits
+     * @param data
+     */
+    prepareLimits() {
+        const { limits, attributes, modifiers } = this.data;
+        // SETUP LIMITS
+        limits.physical.value =
+            Math.ceil((2 * attributes.strength.value + attributes.body.value + attributes.reaction.value) / 3) + Number(modifiers['physical_limit']);
+        limits.mental.value =
+            Math.ceil((2 * attributes.logic.value + attributes.intuition.value + attributes.willpower.value) / 3) + Number(modifiers['mental_limit']);
+        limits.social.value =
+            Math.ceil((2 * attributes.charisma.value + attributes.willpower.value + attributes.essence.value) / 3) + Number(modifiers['social_limit']);
+        // limit labels
+        for (let [limitKey, limitValue] of Object.entries(limits)) {
+            limitValue.label = CONFIG.SR5.limits[limitKey];
+        }
+    }
+    /**
+     * Prepare actor data condition monitors (aka Tracks)
+     * @param data
+     */
+    prepareConditionMonitors() {
+        const { track, attributes, modifiers } = this.data;
+        // TODO we will have grunts eventually that only have one track
+        track.physical.max = 8 + Math.ceil(attributes.body.value / 2) + Number(modifiers['physical_track']);
+        track.physical.overflow.max = attributes.body.value;
+        track.stun.max = 8 + Math.ceil(attributes.willpower.value / 2) + Number(modifiers['stun_track']);
+        // tracks
+        for (let [trackKey, trackValue] of Object.entries(track)) {
+            trackValue.label = CONFIG.SR5.damageTypes[trackKey];
+        }
+    }
+    /**
+     * Prepare actor data movement
+     * @param data
+     */
+    prepareMovement() {
+        const { attributes, modifiers } = this.data;
+        const movement = this.data.movement;
+        // default movement: WALK = AGI * 2, RUN = AGI * 4
+        movement.walk.value = attributes.agility.value * (2 + Number(modifiers['walk']));
+        movement.run.value = attributes.agility.value * (4 + Number(modifiers['run']));
+    }
+    /**
+     * Prepare the modifiers that are displayed in the Misc. tab
+     * @param data
+     */
+    prepareModifiers() {
+        if (!this.data.modifiers)
+            this.data.modifiers = {};
+        const modifiers = {};
+        let miscTabModifiers = [
+            'soak',
+            'drain',
+            'armor',
+            'physical_limit',
+            'social_limit',
+            'mental_limit',
+            'stun_track',
+            'physical_track',
+            'meat_initiative',
+            'meat_initiative_dice',
+            'astral_initiative',
+            'astral_initiative_dice',
+            'matrix_initiative',
+            'matrix_initiative_dice',
+            'composure',
+            'lift_carry',
+            'judge_intentions',
+            'memory',
+            'walk',
+            'run',
+            'defense',
+            'wound_tolerance',
+            'essence',
+            'fade',
+        ];
+        miscTabModifiers.sort();
+        // force global to the top
+        miscTabModifiers.unshift('global');
+        for (let item of miscTabModifiers) {
+            modifiers[item] = Number(this.data.modifiers[item]) || 0;
+        }
+        this.data.modifiers = modifiers;
+    }
+    /**
+     * Prepare actor data for initiative
+     * @param data
+     */
+    prepareInitiative() {
+        const { initiative, attributes, modifiers, matrix } = this.data;
+        initiative.meatspace.base.base = attributes.intuition.value + attributes.reaction.value + Number(modifiers['meat_initiative']);
+        initiative.meatspace.dice.base = 1 + Number(modifiers['meat_initiative_dice']);
+        initiative.astral.base.base = attributes.intuition.value * 2 + Number(modifiers['astral_initiative']);
+        initiative.astral.dice.base = 2 + Number(modifiers['astral_initiative_dice']);
+        initiative.matrix.base.base = attributes.intuition.value + this.data.matrix.data_processing.value + Number(modifiers['matrix_initiative']);
+        initiative.matrix.dice.base = matrix.hot_sim ? 4 : 3 + Number(modifiers['matrix_initiative_dice']);
+        if (initiative.perception === 'matrix')
+            initiative.current = initiative.matrix;
+        else if (initiative.perception === 'astral')
+            initiative.current = initiative.astral;
+        else {
+            initiative.current = initiative.meatspace;
+            initiative.perception = 'meatspace';
+        }
+        initiative.current.dice.value = initiative.current.dice.base;
+        if (initiative.edge)
+            initiative.current.dice.value = 5;
+        initiative.current.dice.value = Math.min(5, initiative.current.dice.value); // maximum of 5d6 for initiative
+        initiative.current.dice.text = `${initiative.current.dice.value}d6`;
+        initiative.current.base.value = initiative.current.base.base;
+    }
+    /**
+     * Prepare actor data for wounds
+     * @param data
+     */
+    prepareWounds() {
+        const { modifiers, track } = this.data;
+        const count = 3 + Number(modifiers['wound_tolerance']);
+        const stunWounds = Math.floor(this.data.track.stun.value / count);
+        const physicalWounds = Math.floor(this.data.track.physical.value / count);
+        track.stun.wounds = stunWounds;
+        track.physical.wounds = physicalWounds;
+        this.data.wounds = {
+            value: stunWounds + physicalWounds,
+        };
+    }
+}
+exports.BaseActorPrep = BaseActorPrep;
+},{"../../helpers":32,"../../item/SR5ItemDataWrapper":35}],19:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -3569,7 +3578,7 @@ var ChummerImportForm = /*#__PURE__*/function (_FormApplication) {
 
 exports.ChummerImportForm = ChummerImportForm;
 
-},{"@babel/runtime/helpers/asyncToGenerator":2,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10,"@babel/runtime/regenerator":14}],19:[function(require,module,exports){
+},{"@babel/runtime/helpers/asyncToGenerator":2,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10,"@babel/runtime/regenerator":14}],20:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -3759,7 +3768,7 @@ class ShadowrunItemDialog extends Dialog {
     }
 }
 exports.ShadowrunItemDialog = ShadowrunItemDialog;
-},{"../../helpers":31}],20:[function(require,module,exports){
+},{"../../helpers":32}],21:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -3922,7 +3931,7 @@ var OverwatchScoreTracker = /*#__PURE__*/function (_Application) {
 exports.OverwatchScoreTracker = OverwatchScoreTracker;
 (0, _defineProperty2["default"])(OverwatchScoreTracker, "MatrixOverwatchDiceCount", '2d6');
 
-},{"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10}],21:[function(require,module,exports){
+},{"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10}],22:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KnowledgeSkillEditForm = void 0;
@@ -3937,7 +3946,7 @@ class KnowledgeSkillEditForm extends LanguageSkillEditForm_1.LanguageSkillEditFo
     }
 }
 exports.KnowledgeSkillEditForm = KnowledgeSkillEditForm;
-},{"./LanguageSkillEditForm":22}],22:[function(require,module,exports){
+},{"./LanguageSkillEditForm":23}],23:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LanguageSkillEditForm = void 0;
@@ -3960,7 +3969,7 @@ class LanguageSkillEditForm extends SkillEditForm_1.SkillEditForm {
     }
 }
 exports.LanguageSkillEditForm = LanguageSkillEditForm;
-},{"./SkillEditForm":23}],23:[function(require,module,exports){
+},{"./SkillEditForm":24}],24:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -4117,7 +4126,7 @@ class SkillEditForm extends BaseEntitySheet {
     }
 }
 exports.SkillEditForm = SkillEditForm;
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.measureDistance = void 0;
@@ -4153,7 +4162,7 @@ exports.measureDistance = function (p0, p1, { gridSpaces = true } = {}) {
     }
     return (nStraight + nDiagonal) * canvas.scene.data.gridDistance;
 };
-},{"./constants":28}],25:[function(require,module,exports){
+},{"./constants":29}],26:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -4256,7 +4265,7 @@ exports.addRollListeners = (app, html) => {
     if ((item === null || item === void 0 ? void 0 : item.hasRoll) && app.isRoll)
         $(html).find('.card-description').hide();
 };
-},{"./actor/SR5Actor":16,"./constants":28,"./item/SR5Item":33,"./template":43}],26:[function(require,module,exports){
+},{"./actor/SR5Actor":16,"./constants":29,"./item/SR5Item":34,"./template":44}],27:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -4355,7 +4364,7 @@ exports.shadowrunCombatUpdate = (changes, options) => __awaiter(void 0, void 0, 
         yield combat.update({ turn: 0 });
     }
 });
-},{"./constants":28}],27:[function(require,module,exports){
+},{"./constants":29}],28:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5 = void 0;
@@ -4640,22 +4649,22 @@ exports.SR5['programTypes'] = {
     hacking_program: 'SR5.HackingProgram',
     agent: 'SR5.Agent',
 };
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SYSTEM_NAME = void 0;
 exports.SYSTEM_NAME = 'shadowrun5e';
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AbstractDataWrapper = void 0;
-class AbstractDataWrapper {
+exports.DataWrapper = void 0;
+class DataWrapper {
     constructor(data) {
         this.data = data;
     }
 }
-exports.AbstractDataWrapper = AbstractDataWrapper;
-},{}],30:[function(require,module,exports){
+exports.DataWrapper = DataWrapper;
+},{}],31:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -4807,7 +4816,7 @@ exports.registerHandlebarHelpers = () => {
         return value !== undefined;
     });
 };
-},{"./helpers":31}],31:[function(require,module,exports){
+},{"./helpers":32}],32:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Helpers = void 0;
@@ -4820,6 +4829,17 @@ class Helpers {
             return mods.reduce(reducer, 0);
         // assume object of key/values
         return Object.values(mods).reduce(reducer, 0);
+    }
+    /**
+     * Calculate the total value for a data object
+     * - stores the total value and returns it
+     * @param data
+     */
+    static calcTotal(data) {
+        if (data.mod === undefined)
+            data.mod = {};
+        data.value = this.totalMods(data.mod) + data.base;
+        return data.value;
     }
     // replace 'SR5.'s on keys with 'SR5_DOT_'
     static onSetFlag(data) {
@@ -5006,7 +5026,7 @@ class Helpers {
     }
 }
 exports.Helpers = Helpers;
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatData = void 0;
@@ -5290,7 +5310,7 @@ exports.ChatData = {
         }
     },
 };
-},{"../helpers":31}],33:[function(require,module,exports){
+},{"../helpers":32}],34:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -5317,7 +5337,7 @@ class SR5Item extends Item {
         this.labels = {};
     }
     get wrapper() {
-        // @ts-ignore
+        // we need to cast here to unknown first to make ts happy
         return new SR5ItemDataWrapper_1.SR5ItemDataWrapper(this.data);
     }
     // Flag Functions
@@ -5778,8 +5798,6 @@ class SR5Item extends Item {
         const attribute2 = this.actor.findAttribute(this.getActionAttribute2());
         if (attribute && attribute.label)
             parts[attribute.label] = attribute.value;
-        console.log(skill);
-        console.log(attribute);
         // if we have a valid skill, don't look for a second attribute
         if (skill && skill.label)
             parts[skill.label] = skill.value;
@@ -5803,7 +5821,6 @@ class SR5Item extends Item {
         this.actor._addGlobalParts(parts);
         this.actor._addMatrixParts(parts, atts);
         this._addWeaponParts(parts);
-        console.log(parts);
         return parts;
     }
     calculateRecoil() {
@@ -6298,12 +6315,12 @@ class SR5Item extends Item {
     }
 }
 exports.SR5Item = SR5Item;
-},{"../apps/dialogs/ShadowrunItemDialog":19,"../chat":25,"../constants":28,"../helpers":31,"../rolls/ShadowrunRoller":41,"../template":43,"./ChatData":32,"./SR5ItemDataWrapper":34}],34:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunItemDialog":20,"../chat":26,"../constants":29,"../helpers":32,"../rolls/ShadowrunRoller":42,"../template":44,"./ChatData":33,"./SR5ItemDataWrapper":35}],35:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ItemDataWrapper = void 0;
-const AbstractDataWrapper_1 = require("../dataWrappers/AbstractDataWrapper");
-class SR5ItemDataWrapper extends AbstractDataWrapper_1.AbstractDataWrapper {
+const DataWrapper_1 = require("../dataWrappers/DataWrapper");
+class SR5ItemDataWrapper extends DataWrapper_1.DataWrapper {
     getData() {
         return this.data.data;
     }
@@ -6481,7 +6498,7 @@ class SR5ItemDataWrapper extends AbstractDataWrapper_1.AbstractDataWrapper {
     }
 }
 exports.SR5ItemDataWrapper = SR5ItemDataWrapper;
-},{"../dataWrappers/AbstractDataWrapper":29}],35:[function(require,module,exports){
+},{"../dataWrappers/DataWrapper":30}],36:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -6793,7 +6810,7 @@ class SR5ItemSheet extends ItemSheet {
     }
 }
 exports.SR5ItemSheet = SR5ItemSheet;
-},{"../helpers":31}],36:[function(require,module,exports){
+},{"../helpers":32}],37:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -6939,7 +6956,7 @@ function rollItemMacro(itemName) {
     return item.rollTest(event);
 }
 handlebars_1.registerHandlebarHelpers();
-},{"./actor/SR5Actor":16,"./actor/SR5ActorSheet":17,"./apps/gmtools/OverwatchScoreTracker":20,"./canvas":24,"./chat":25,"./combat":26,"./config":27,"./constants":28,"./handlebars":30,"./helpers":31,"./item/SR5Item":33,"./item/SR5ItemSheet":35,"./migrator/Migrator":37,"./rolls/ShadowrunRoller":41,"./settings":42}],37:[function(require,module,exports){
+},{"./actor/SR5Actor":16,"./actor/SR5ActorSheet":17,"./apps/gmtools/OverwatchScoreTracker":21,"./canvas":25,"./chat":26,"./combat":27,"./config":28,"./constants":29,"./handlebars":31,"./helpers":32,"./item/SR5Item":34,"./item/SR5ItemSheet":36,"./migrator/Migrator":38,"./rolls/ShadowrunRoller":42,"./settings":43}],38:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -7082,7 +7099,7 @@ let Migrator = /** @class */ (() => {
     return Migrator;
 })();
 exports.Migrator = Migrator;
-},{"./VersionMigration":38,"./versions/LegacyMigration":39,"./versions/Version0_6_5":40}],38:[function(require,module,exports){
+},{"./VersionMigration":39,"./versions/LegacyMigration":40,"./versions/Version0_6_5":41}],39:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -7514,7 +7531,7 @@ let VersionMigration = /** @class */ (() => {
     return VersionMigration;
 })();
 exports.VersionMigration = VersionMigration;
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -7743,7 +7760,7 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
     }
 }
 exports.LegacyMigration = LegacyMigration;
-},{"../VersionMigration":38}],40:[function(require,module,exports){
+},{"../VersionMigration":39}],41:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -7793,7 +7810,7 @@ class Version0_6_5 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_6_5 = Version0_6_5;
-},{"../VersionMigration":38}],41:[function(require,module,exports){
+},{"../VersionMigration":39}],42:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -8035,7 +8052,7 @@ class ShadowrunRoller {
     }
 }
 exports.ShadowrunRoller = ShadowrunRoller;
-},{"../chat":25,"../constants":28,"../helpers":31}],42:[function(require,module,exports){
+},{"../chat":26,"../constants":29,"../helpers":32}],43:[function(require,module,exports){
 "use strict";
 // game settings for shadowrun 5e
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -8089,7 +8106,7 @@ exports.registerSystemSettings = () => {
         default: '0',
     });
 };
-},{"./constants":28,"./migrator/VersionMigration":38}],43:[function(require,module,exports){
+},{"./constants":29,"./migrator/VersionMigration":39}],44:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Template extends MeasuredTemplate {
@@ -8189,6 +8206,6 @@ class Template extends MeasuredTemplate {
     }
 }
 exports.default = Template;
-},{}]},{},[36])
+},{}]},{},[37])
 
 //# sourceMappingURL=bundle.js.map

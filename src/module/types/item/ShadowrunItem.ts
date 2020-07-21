@@ -8,7 +8,7 @@ declare namespace Shadowrun {
         data: SR5ItemData;
         flags: object;
         permission: {
-            default: 2;
+            default: number;
         };
     };
 
