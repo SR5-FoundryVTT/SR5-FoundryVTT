@@ -53,7 +53,7 @@ export class SR5Actor extends Actor {
      * @param data
      * @param items
      */
-    static prepareMatrix(data: SR5ActorData, items: SR5ItemDataWrapper[]) {
+    private static prepareMatrix(data: SR5ActorData, items: SR5ItemDataWrapper[]) {
         const { matrix, attributes, limits } = data;
 
         // clear matrix data to defaults
@@ -67,7 +67,7 @@ export class SR5Actor extends Actor {
         matrix.device = '';
 
         // get the first equipped device, we don't care if they have more equipped -- it shouldn't happen
-        const device = items.filter((item) => item.isEquipped() && item.isDevice())[0];
+        const device = items.find((item) => item.isEquipped() && item.isDevice());
 
         if (device) {
             const conditionMonitor = device.getConditionMonitor();
@@ -90,31 +90,39 @@ export class SR5Actor extends Actor {
             }
         } // if we don't have a device, use living persona
         else if (data.special === 'resonance') {
-            matrix.firewall.value += attributes.willpower.value;
-            matrix.data_processing.value += attributes.logic.value;
-            matrix.rating = attributes.resonance.value;
-            matrix.attack.value += attributes.charisma.value;
-            matrix.sleaze.value += attributes.intuition.value;
+            matrix.firewall.value += Helpers.calcTotal(attributes.willpower);
+            matrix.data_processing.value += Helpers.calcTotal(attributes.logic);
+            matrix.rating = Helpers.calcTotal(attributes.resonance);
+            matrix.attack.value += Helpers.calcTotal(attributes.charisma);
+            matrix.sleaze.value += Helpers.calcTotal(attributes.intuition);
             matrix.name = game.i18n.localize('SR5.LivingPersona');
         }
 
         // set matrix condition monitor to max if greater than
-        if (matrix.condition_monitor.value > matrix.condition_monitor.max) matrix.condition_monitor.value = matrix.condition_monitor.max;
+        if (matrix.condition_monitor.value > matrix.condition_monitor.max) {
+            matrix.condition_monitor.value = matrix.condition_monitor.max;
+        }
 
         // add matrix attributes to both limits and attributes as hidden entries
         ['firewall', 'sleaze', 'data_processing', 'firewall'].forEach((key) => {
             if (matrix[key]) {
+                const label = CONFIG.SR5.matrixAttributes[key];
+                const { value, base, mod } = matrix[key];
+                const hidden = true;
+
                 limits[key] = {
-                    value: matrix[key].value,
-                    base: matrix[key].base,
-                    mod: matrix[key].mod,
-                    hidden: true,
+                    value,
+                    base,
+                    mod,
+                    label,
+                    hidden,
                 };
                 attributes[key] = {
-                    value: matrix[key].value,
-                    base: matrix[key].base,
-                    mod: matrix[key].mod,
-                    hidden: true,
+                    value,
+                    base,
+                    mod,
+                    label,
+                    hidden,
                 };
             }
         });
@@ -127,7 +135,7 @@ export class SR5Actor extends Actor {
      * @param data
      * @param items
      */
-    static prepareArmor(data: SR5ActorData, items: SR5ItemDataWrapper[]) {
+    private static prepareArmor(data: SR5ActorData, items: SR5ItemDataWrapper[]) {
         const { armor } = data;
         armor.base = 0;
         armor.value = 0;
@@ -161,7 +169,7 @@ export class SR5Actor extends Actor {
      * @param data
      * @param items
      */
-    static prepareCyberware(data: SR5ActorData, items: SR5ItemDataWrapper[]) {
+    private static prepareCyberware(data: SR5ActorData, items: SR5ItemDataWrapper[]) {
         const { attributes } = data;
         let totalEssence = 6;
         items
@@ -178,20 +186,14 @@ export class SR5Actor extends Actor {
      * Prepare actor data for attributes
      * @param data
      */
-    static prepareAttributes(data: SR5ActorData) {
+    private static prepareAttributes(data: SR5ActorData) {
         const { attributes } = data;
 
         // set the value for the attributes
-        for (let [, att] of Object.entries(attributes)) {
-            if (!att.hidden) {
-                if (!att.mod) att.mod = {};
-                att.value = att.base + Helpers.totalMods(att.mod);
-            }
-        }
-
-        // attribute labels
-        for (let [a, att] of Object.entries(attributes)) {
-            att.label = CONFIG.SR5.attributes[a];
+        for (let [key, attribute] of Object.entries(attributes)) {
+            Helpers.calcTotal(attribute);
+            // add labels
+            attribute.label = CONFIG.SR5.attributes[key];
         }
     }
 
@@ -199,7 +201,7 @@ export class SR5Actor extends Actor {
      * Prepare actor data for skills
      * @param data
      */
-    static prepareSkills(data: SR5ActorData) {
+    private static prepareSkills(data: SR5ActorData) {
         const { language, active, knowledge } = data.skills;
         if (language) {
             if (!language.value) language.value = {};
@@ -215,7 +217,7 @@ export class SR5Actor extends Actor {
                     skill.mod[bonus.key] = bonus.value;
                 }
             }
-            skill.value = skill.base + Helpers.totalMods(skill.mod);
+            Helpers.calcTotal(skill);
         };
 
         // setup active skills
@@ -251,8 +253,8 @@ export class SR5Actor extends Actor {
         }
 
         // skill labels
-        for (let [s, skill] of Object.entries(active)) {
-            skill.label = CONFIG.SR5.activeSkills[s];
+        for (let [skillKey, skillValue] of Object.entries(active)) {
+            skillValue.label = CONFIG.SR5.activeSkills[skillKey];
         }
     }
 
@@ -260,7 +262,7 @@ export class SR5Actor extends Actor {
      * Prepare the actor data limits
      * @param data
      */
-    static prepareLimits(data: SR5ActorData) {
+    private static prepareLimits(data: SR5ActorData) {
         const { limits, attributes, modifiers } = data;
 
         // SETUP LIMITS
@@ -272,8 +274,8 @@ export class SR5Actor extends Actor {
             Math.ceil((2 * attributes.charisma.value + attributes.willpower.value + attributes.essence.value) / 3) + Number(modifiers['social_limit']);
 
         // limit labels
-        for (let [l, limit] of Object.entries(limits)) {
-            limit.label = CONFIG.SR5.limits[l];
+        for (let [limitKey, limitValue] of Object.entries(limits)) {
+            limitValue.label = CONFIG.SR5.limits[limitKey];
         }
     }
 
@@ -281,7 +283,7 @@ export class SR5Actor extends Actor {
      * Prepare actor data condition monitors (aka Tracks)
      * @param data
      */
-    static prepareConditionMonitors(data: SR5ActorData) {
+    private static prepareConditionMonitors(data: SR5ActorData) {
         const { track, attributes, modifiers } = data;
 
         // TODO we will have grunts eventually that only have one track
@@ -290,8 +292,8 @@ export class SR5Actor extends Actor {
         track.stun.max = 8 + Math.ceil(attributes.willpower.value / 2) + Number(modifiers['stun_track']);
 
         // tracks
-        for (let [t, tr] of Object.entries(track)) {
-            tr.label = CONFIG.SR5.damageTypes[t];
+        for (let [trackKey, trackValue] of Object.entries(track)) {
+            trackValue.label = CONFIG.SR5.damageTypes[trackKey];
         }
     }
 
@@ -299,7 +301,7 @@ export class SR5Actor extends Actor {
      * Prepare actor data movement
      * @param data
      */
-    static prepareMovement(data: SR5ActorData) {
+    private static prepareMovement(data: SR5ActorData) {
         const { attributes, modifiers } = data;
         const movement = data.movement;
         // default movement: WALK = AGI * 2, RUN = AGI * 4
@@ -311,7 +313,7 @@ export class SR5Actor extends Actor {
      * Prepare the modifiers that are displayed in the Misc. tab
      * @param data
      */
-    static prepareModifiers(data: SR5ActorData) {
+    private static prepareModifiers(data: SR5ActorData) {
         if (!data.modifiers) data.modifiers = {};
         const modifiers = {};
         let miscTabModifiers = [
@@ -355,7 +357,7 @@ export class SR5Actor extends Actor {
      * Prepare actor data for initiative
      * @param data
      */
-    static prepareInitiative(data: SR5ActorData) {
+    private static prepareInitiative(data: SR5ActorData) {
         const { initiative, attributes, modifiers, matrix } = data;
         initiative.meatspace.base.base = attributes.intuition.value + attributes.reaction.value + Number(modifiers['meat_initiative']);
         initiative.meatspace.dice.base = 1 + Number(modifiers['meat_initiative_dice']);
@@ -380,7 +382,7 @@ export class SR5Actor extends Actor {
      * Prepare actor data for wounds
      * @param data
      */
-    static prepareWounds(data: SR5ActorData) {
+    private static prepareWounds(data: SR5ActorData) {
         const { modifiers, track } = data;
         const count = 3 + Number(modifiers['wound_tolerance']);
         const stunWounds = Math.floor(data.track.stun.value / count);
@@ -408,12 +410,16 @@ export class SR5Actor extends Actor {
 
         // PARSE WEAPONS AND SET VALUES AS NEEDED
 
+        // modifiers must be handled first
         SR5Actor.prepareModifiers(data);
-        SR5Actor.prepareMatrix(data, items);
+        // items preparations
         SR5Actor.prepareArmor(data, items);
         SR5Actor.prepareCyberware(data, items);
-        SR5Actor.prepareAttributes(data);
         SR5Actor.prepareSkills(data);
+        SR5Actor.prepareAttributes(data);
+        // matrix prep must happen after attributes
+        SR5Actor.prepareMatrix(data, items);
+        // limits prep must happen after attributes
         SR5Actor.prepareLimits(data);
         SR5Actor.prepareConditionMonitors(data);
         SR5Actor.prepareMovement(data);
@@ -441,7 +447,7 @@ export class SR5Actor extends Actor {
     }
 
     getEquippedMatrixDevice(): SR5Item | undefined {
-        return this.items.filter((item: SR5Item) => item.isDevice())[0];
+        return this.items.find((item: SR5Item) => item.isDevice());
     }
 
     getEquippedArmor(): SR5Item[] | undefined {

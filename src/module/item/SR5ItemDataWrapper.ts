@@ -1,10 +1,10 @@
 import { AbstractDataWrapper } from '../dataWrappers/AbstractDataWrapper';
-import Item = Shadowrun.Item;
+import SR5ItemType = Shadowrun.SR5ItemType;
 import ConditionData = Shadowrun.ConditionData;
 import ModList = Shadowrun.ModList;
 import SR5ItemData = Shadowrun.SR5ItemData;
 
-export class SR5ItemDataWrapper extends AbstractDataWrapper<Item> {
+export class SR5ItemDataWrapper extends AbstractDataWrapper<SR5ItemType> {
     getData(): SR5ItemData {
         return this.data.data;
     }

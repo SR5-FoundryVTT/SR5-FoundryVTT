@@ -18,6 +18,7 @@ import { createChatData } from '../chat';
 import { SYSTEM_NAME } from '../constants';
 import ConditionData = Shadowrun.ConditionData;
 import { SR5ItemDataWrapper } from './SR5ItemDataWrapper';
+import SR5ItemType = Shadowrun.SR5ItemType;
 
 export class SR5Item extends Item {
     labels: {} = {};
@@ -25,8 +26,8 @@ export class SR5Item extends Item {
     actor: SR5Actor;
 
     private get wrapper(): SR5ItemDataWrapper {
-        // @ts-ignore
-        return new SR5ItemDataWrapper(this.data);
+        // we need to cast here to unknown first to make ts happy
+        return new SR5ItemDataWrapper(this.data as unknown as SR5ItemType);
     }
 
     // Flag Functions
@@ -492,9 +493,6 @@ export class SR5Item extends Item {
 
         if (attribute && attribute.label) parts[attribute.label] = attribute.value;
 
-        console.log(skill);
-        console.log(attribute);
-
         // if we have a valid skill, don't look for a second attribute
         if (skill && skill.label) parts[skill.label] = skill.value;
         else if (attribute2 && attribute2.label) parts[attribute2.label] = attribute2.value;
@@ -514,8 +512,6 @@ export class SR5Item extends Item {
         this.actor._addGlobalParts(parts);
         this.actor._addMatrixParts(parts, atts);
         this._addWeaponParts(parts);
-
-        console.log(parts);
 
         return parts;
     }

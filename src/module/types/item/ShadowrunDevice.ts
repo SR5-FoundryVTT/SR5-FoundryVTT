@@ -1,6 +1,6 @@
 /// <reference path="../Shadowrun.ts" />
 declare namespace Shadowrun {
-    export type Device = Item & {
+    export type Device = SR5ItemType & {
         type: 'device';
         data: DeviceData;
     };

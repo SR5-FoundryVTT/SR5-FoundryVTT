@@ -1,11 +1,12 @@
 /// <reference path="../Shadowrun.ts" />
 declare namespace Shadowrun {
-    export type Item = {
+    export type SR5ItemType = {
         name: string;
         _id: string;
         folder: string | null;
         type: string;
         data: SR5ItemData;
+        flags: object;
         permission: {
             default: 2;
         };

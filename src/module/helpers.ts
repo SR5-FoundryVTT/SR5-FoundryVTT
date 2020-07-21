@@ -1,5 +1,6 @@
 import AttributeField = Shadowrun.AttributeField;
 import SkillField = Shadowrun.SkillField;
+import ModifiableValue = Shadowrun.ModifiableValue;
 
 export class Helpers {
     static totalMods(mods) {
@@ -8,6 +9,17 @@ export class Helpers {
         if (Array.isArray(mods)) return mods.reduce(reducer, 0);
         // assume object of key/values
         return Object.values(mods).reduce(reducer, 0);
+    }
+
+    /**
+     * Calculate the total value for a data object
+     * - stores the total value and returns it
+     * @param data
+     */
+    static calcTotal(data: ModifiableValue): number {
+        if (data.mod === undefined) data.mod = {};
+        data.value = this.totalMods(data.mod) + data.base;
+        return data.value;
     }
 
     // replace 'SR5.'s on keys with 'SR5_DOT_'
