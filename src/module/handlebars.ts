@@ -34,6 +34,7 @@ export const preloadHandlebarsTemplates = async () => {
 
         'systems/shadowrun5e/dist/templates/common/ValueInput.html',
         'systems/shadowrun5e/dist/templates/common/ConditionMonitor.html',
+        'systems/shadowrun5e/dist/templates/common/ValueMaxInput.html',
     ];
 
     return loadTemplates(templatePaths);
@@ -140,7 +141,11 @@ export const registerHandlebarHelpers = () => {
     });
 
     Handlebars.registerHelper('buildName', function (options) {
-        const { hash } = options;
-        return new Handlebars.SafeString(`${hash.part1}.${hash.key}.${hash.part2}`);
+        const hash: string[] = Helpers.orderKeys(options.hash);
+        const name = Object.values(hash).reduce((retVal, current, index) => {
+            if (index > 0) retVal += '.';
+            return retVal + current;
+        }, '');
+        return new Handlebars.SafeString(name);
     });
 };

@@ -41,7 +41,7 @@ declare namespace Shadowrun {
     /**
      * Condition data for an item.
      */
-    export type ConditionData = ValueMaxPair<number>;
+    export type ConditionData = ValueMaxPair<number> & LabelField;
 
     /**
      * Description data for an item.

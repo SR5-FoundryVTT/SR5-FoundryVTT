@@ -28,6 +28,7 @@ export class BaseActorPrep {
         matrix.rating = 0;
         matrix.name = '';
         matrix.device = '';
+        matrix.condition_monitor.label = 'SR5.ConditionMonitor';
 
         // get the first equipped device, we don't care if they have more equipped -- it shouldn't happen
         const device = this.items.find((item) => item.isEquipped() && item.isDevice());

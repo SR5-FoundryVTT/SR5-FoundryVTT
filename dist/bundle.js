@@ -2095,13 +2095,11 @@ class SR5ActorSheet extends ActorSheet {
         html.find('.skill-edit').click(this._onShowEditSkill.bind(this));
         html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
         html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
-        html.find('.matrix-condition-value').on('change', (event) => __awaiter(this, void 0, void 0, function* () {
+        // updates matrix condition monitor on the device the actor has equipped
+        $(html).find('[name="data.matrix.condition_monitor.value"]').on('change', (event) => __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
-            console.log(event);
             const value = helpers_1.Helpers.parseInputToNumber(event.currentTarget.value);
-            console.log(value);
             const matrixDevice = this.actor.getMatrixDevice();
-            console.log(matrixDevice);
             if (matrixDevice && !isNaN(value)) {
                 console.log(matrixDevice);
                 const updateData = {};
@@ -2468,6 +2466,7 @@ class BaseActorPrep {
         matrix.rating = 0;
         matrix.name = '';
         matrix.device = '';
+        matrix.condition_monitor.label = 'SR5.ConditionMonitor';
         // get the first equipped device, we don't care if they have more equipped -- it shouldn't happen
         const device = this.items.find((item) => item.isEquipped() && item.isDevice());
         if (device) {
@@ -4699,6 +4698,7 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/dist/templates/rolls/parts/parts-list.html',
         'systems/shadowrun5e/dist/templates/common/ValueInput.html',
         'systems/shadowrun5e/dist/templates/common/ConditionMonitor.html',
+        'systems/shadowrun5e/dist/templates/common/ValueMaxInput.html',
     ];
     return loadTemplates(templatePaths);
 });
@@ -4815,8 +4815,13 @@ exports.registerHandlebarHelpers = () => {
         console.log(value);
     });
     Handlebars.registerHelper('buildName', function (options) {
-        const { hash } = options;
-        return new Handlebars.SafeString(`${hash.part1}.${hash.key}.${hash.part2}`);
+        const hash = helpers_1.Helpers.orderKeys(options.hash);
+        const name = Object.values(hash).reduce((retVal, current, index) => {
+            if (index > 0)
+                retVal += '.';
+            return retVal + current;
+        }, '');
+        return new Handlebars.SafeString(name);
     });
 };
 },{"./helpers":32}],32:[function(require,module,exports){

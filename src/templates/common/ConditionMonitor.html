@@ -1,60 +1,21 @@
-{{log track}}
-{{log trackPath}}
-<div class="attribute" data-track="{{id}}">
-    <div class="attribute-name {{nameCssClass}} {{#if isRoll}}roll{{/if}}">
-        {{localize track.label}}
-    </div>
-    <div class="track">
-        <div class="attribute-input-container">
-            {{> "systems/shadowrun5e/dist/templates/common/ValueInput.html"
-                cssClass="attribute-input"
-                size="2"
-                maxLength="2"
-                value=track.value
-                name=(buildName part1=trackPath key=id part2="value")
-                disable=disableValue
-            }}
-        </div>
-        <div class="track-slash"></div>
-        <div class="attribute-input-container">
-            {{> "systems/shadowrun5e/dist/templates/common/ValueInput.html"
-                cssClass="attribute-input"
-                size="2"
-                maxLength="2"
-                value=track.max
-                name=(buildName part1=trackPath key=id part2="max")
-                disabled=disableMax
-            }}
-        </div>
-    </div>
-</div>
-{{#ife track.max track.value}} {{#if track.overflow}}
-<div class="attribute">
-    <div class="attribute-name">
-        {{localize "SR5.Overflow"}}
-    </div>
-    <div class="track">
-        <div class="attribute-input-container">
-            {{> "systems/shadowrun5e/dist/templates/common/ValueInput.html"
-                    cssClass="attribute-input"
-                    size="2"
-                    maxLength="2"
-                    value=track.overflow.value
-                    name=(buildName part1=trackPath key=id part2="overflow.value")
-                    disable=disableValue
-            }}
-        </div>
-        <div class="track-slash"></div>
-        <div class="attribute-input-container">
-            {{> "systems/shadowrun5e/dist/templates/common/ValueInput.html"
-                    cssClass="attribute-input"
-                    size="2"
-                    maxLength="2"
-                    value=track.overflow.max
-                    name=(buildName part1=trackPath key=id part2="overflow.max")
-                    disabled=disableOverflowMax
-            }}
-        </div>
-    </div>
-</div>
+{{> 'systems/shadowrun5e/dist/templates/common/ValueMaxInput.html'
+    pair=object
+    name=(localize object.label)
+    path=(buildName part1=path)
+    nameCssClass=nameCssClass
+    isRoll=isRoll
+    dataId=id
+    disableMax="true"
+    dataName="track"
+}}
+{{#ife object.max object.value}} {{#if object.overflow}}
+    {{> 'systems/shadowrun5e/dist/templates/common/ValueMaxInput.html'
+            pair=object.overflow
+            name=(localize 'SR5.Overflow')
+            path=(buildName part1=path part2='overflow')
+            nameCssClass=nameCssClass
+            id='overflow'
+            isRoll=isRoll
+            disableMax="true"
+    }}
 {{/if}} {{/ife}}

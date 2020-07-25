@@ -43,11 +43,13 @@
                 <div class="attributes smooth">
                     {{#each data.track as |track id|}}
                         {{> 'systems/shadowrun5e/dist/templates/common/ConditionMonitor.html'
-                            track=track
-                            trackPath="data.track"
+                            object=track
+                            path=(buildName part1="data.track" part2=id)
                             id=id
                             disableMax="true"
                             disableOverflowMax="true"
+                            isRoll="true"
+                            nameCssClass="track-roll"
                         }}
                     {{/each}}
                     <div class="attribute">

@@ -32,35 +32,11 @@
             matrixAttributes=../config/matrixAttributes
             item=../data.matrix.item }}
     {{/each}}
-    <div class="attribute">
-        <div class="attribute-name">{{localize "SR5.ConditionMonitor"}}</div>
-        <div class="track">
-            <div class="attribute-input-container">
-                <input
-                    class="display track-input matrix-condition-value"
-                    size="2"
-                    maxlength="2"
-                    type="text"
-                    name="data.matrix.condition_monitor.value"
-                    value="{{data.matrix.condition_monitor.value}}"
-                    data-dtype="Number"
-                />
-            </div>
-            <div class="track-slash flex0"></div>
-            <div class="attribute-input-container">
-                <input
-                    class="display track-input"
-                    size="2"
-                    maxlength="2"
-                    type="text"
-                    name="data.matrix.condition_monitor.max"
-                    value="{{data.matrix.condition_monitor.max}}"
-                    data-dtype="Number"
-                    disabled
-                />
-            </div>
-        </div>
-    </div>
+    {{> 'systems/shadowrun5e/dist/templates/common/ConditionMonitor.html'
+            object=data.matrix.condition_monitor
+            path="data.matrix.condition_monitor"
+            id='matrix'
+    }}
 </div>
 {{#if emerged}}
 <div class="inventory">
