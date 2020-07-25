@@ -1,4 +1,4 @@
-{{> 'systems/shadowrun5e/dist/templates/common/ValueMaxInput.html'
+{{> 'systems/shadowrun5e/dist/templates/common/ValueMaxAttribute.html'
     pair=object
     name=(localize object.label)
     path=(buildName part1=path)
@@ -9,7 +9,7 @@
     dataName="track"
 }}
 {{#ife object.max object.value}} {{#if object.overflow}}
-    {{> 'systems/shadowrun5e/dist/templates/common/ValueMaxInput.html'
+    {{> 'systems/shadowrun5e/dist/templates/common/ValueMaxAttribute.html'
             pair=object.overflow
             name=(localize 'SR5.Overflow')
             path=(buildName part1=path part2='overflow')
