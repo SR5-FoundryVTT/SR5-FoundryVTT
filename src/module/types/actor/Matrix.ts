@@ -14,8 +14,8 @@ declare namespace Shadowrun {
         name: string;
         device: string;
         is_cyberdeck: boolean;
-        // TODO fix this
-        item: any;
+        hot_sim: boolean;
+        item?: any;
     };
 
     export type MatrixAttributeField = AttributeField & {
