@@ -41,137 +41,44 @@
 {{#if emerged}}
 <div class="inventory">
     <div class="scroll-area">
-        <div class="item item-section">
-            <div class="item-left">
-                <div class="item-text item-name">
-                    {{localize "SR5.ComplexForms"}}
-                </div>
-            </div>
-            <div class="item-right">
-                <div class="item-text">
-                    {{localize "SR5.Target"}}
-                </div>
-                <div class="item-text">
-                    {{localize "SR5.Duration"}}
-                </div>
-                <div class="item-text">
-                    {{localize "SR5.Fade"}}
-                </div>
-                <div class="item-text item-icons">
-                    <a class="item-create" title="Create Item" data-type="complex_form">
-                        <i class="fas fa-plus"></i>
-                        {{localize "SR5.Add"}}
-                    </a>
-                </div>
-            </div>
-        </div>
+        {{> (ListHeader)
+            name=(localize 'SR5.ComplexForms')
+            icons=(ItemHeaderIcons 'complex_form')
+            rightSide=(ItemHeaderRightSide 'complex_form')
+        }}
         {{#each complex_forms as |item iid|}}
-        <div class="item" data-item-id="{{item._id}}">
-            <div class="item-left">
-                <div class="item-img item-roll roll">
-                    <img src="{{item.img}}" title="{{item.name}}" height="24px" width="24px" />
-                </div>
-                <div class="item-text item-name has-desc">
-                    {{item.name}}
-                </div>
-            </div>
-            <div class="item-right">
-                <div class="item-text">
-                    {{localizeOb item.data.target ../config.matrixTargets}}
-                </div>
-                <div class="item-text">
-                    {{localizeOb item.data.duration ../config.durations}}
-                </div>
-                <div class="item-text">
-                    {{item.data.fade}}
-                </div>
-                <div class="item-text item-icons">
-                    <i class="item-edit roll fas fa-edit"></i>
-                    <i class="item-delete roll fas fa-trash"></i>
-                </div>
-            </div>
-        </div>
-        <div class="item hidden">
-            <div class="item-desc">
-                <div class="props">
-                    {{#each item.properties}}
-                    <span>{{this}}</span>
-                    {{/each}}
-                </div>
-                <div class="item-desc">
-                    {{{item.data.description.value}}}
-                </div>
-            </div>
-        </div>
+            {{> (ListItem)
+                img=item.img
+                name=item.name
+                itemId=item._id
+                icons=(ItemIcons item)
+                rightSide=(ItemRightSide item)
+                hasDesc="true"
+                hasRoll="true"
+                description=item.data.description.value
+            }}
         {{/each}}
     </div>
 </div>
 {{else}}
 <div class="inventory">
     <div class="scroll-area">
-        <div class="item item-section">
-            <div class="item-left">
-                <div class="item-text item-name">
-                    {{localize "SR5.Programs"}}
-                </div>
-            </div>
-            <div class="item-right">
-                <div class="item-text item-icons">
-                    <a class="item-create" title="Create Program" data-type="program">
-                        <i class="fas fa-plus"></i>
-                        {{localize "SR5.Add"}}
-                    </a>
-                </div>
-            </div>
-        </div>
+        {{> (ListHeader)
+                name=(localize 'SR5.Programs')
+                icons=(ItemHeaderIcons 'program')
+                rightSide=(ItemHeaderRightSide 'program')
+        }}
         {{#each programs as |item iid|}}
-        <div class="item" data-item-id="{{item._id}}">
-            <div class="item-left">
-                <div class="item-img item-roll roll">
-                    <img src="{{item.img}}" title="{{item.name}}" height="24px" width="24px" />
-                </div>
-                <div class="item-text item-name has-desc">
-                    {{item.name}}
-                </div>
-            </div>
-            <div class="item-right">
-                <div class="item-input">
-                    <button class="display item-equip-toggle short {{#if item.data.technology.equipped}}light{{/if}}">
-                        {{#if item.data.technology.equipped}}
-                        {{localize "SR5.Loaded"}}
-                        {{else}}
-                        {{localize "SR5.Load"}}  >>
-                        {{/if}}
-                    </button>
-                </div>
-                <div class="item-text item-icons">
-                    <i
-                        title="{{localize 'SR5.ToggleEquip'}}"
-                        class="item-equip-toggle roll
-                             {{#if item.data.technology.equipped}}
-                              fas fa-check-circle
-                             {{else}}
-                              far fa-circle
-                             {{/if}}"
-                    >
-                    </i>
-                    <i class="item-edit roll fas fa-edit"></i>
-                    <i class="item-delete roll fas fa-trash"></i>
-                </div>
-            </div>
-        </div>
-        <div class="item hidden">
-            <div class="item-desc">
-                <div class="props">
-                    {{#each item.properties}}
-                    <span>{{this}}</span>
-                    {{/each}}
-                </div>
-                <div class="item-desc">
-                    {{{item.data.description.value}}}
-                </div>
-            </div>
-        </div>
+            {{> (ListItem)
+                    img=item.img
+                    name=item.name
+                    itemId=item._id
+                    icons=(ItemIcons item)
+                    rightSide=(ItemRightSide item)
+                    hasDesc="true"
+                    hasRoll="true"
+                    description=item.data.description.value
+            }}
         {{/each}}
     </div>
 </div>

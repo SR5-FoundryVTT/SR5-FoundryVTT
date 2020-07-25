@@ -1,4 +1,6 @@
 import { Helpers } from './helpers';
+import SR5ItemType = Shadowrun.SR5ItemType;
+import { SR5ItemDataWrapper } from './item/SR5ItemDataWrapper';
 
 export const preloadHandlebarsTemplates = async () => {
     const templatePaths = [
@@ -35,6 +37,9 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/common/ValueInput.html',
         'systems/shadowrun5e/dist/templates/common/ConditionMonitor.html',
         'systems/shadowrun5e/dist/templates/common/ValueMaxAttribute.html',
+        'systems/shadowrun5e/dist/templates/common/Attribute.html',
+        'systems/shadowrun5e/dist/templates/common/List/ListItem.html',
+        'systems/shadowrun5e/dist/templates/common/List/ListHeader.html',
     ];
 
     return loadTemplates(templatePaths);
@@ -126,7 +131,7 @@ export const registerHandlebarHelpers = () => {
     });
 
     Handlebars.registerHelper('isDefined', function (value) {
-        return value !== undefined;
+        return value !== undefined && value !== null;
     });
 
     /**
@@ -147,5 +152,127 @@ export const registerHandlebarHelpers = () => {
             return retVal + current;
         }, '');
         return new Handlebars.SafeString(name);
+    });
+
+    Handlebars.registerHelper('ItemHeaderIcons', function (id) {
+        const PlusIcon = 'fas fa-plus';
+        const AddText = game.i18n.localize('SR5.Add');
+        switch (id) {
+            case 'complex_form':
+                return [
+                    {
+                        icon: PlusIcon,
+                        text: AddText,
+                        title: game.i18n.localize('SR5.AddComplexForm'),
+                    },
+                ];
+            case 'program':
+                return [
+                    {
+                        icon: PlusIcon,
+                        text: AddText,
+                        title: game.i18n.localize('SR5.AddProgram'),
+                    },
+                ];
+        }
+    });
+
+    Handlebars.registerHelper('ItemHeaderRightSide', function (id) {
+        switch (id) {
+            case 'complex_form':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Target')
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Duration')
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Fade')
+                        },
+                    },
+                ];
+            case 'program':
+                return [];
+            default:
+                return [];
+        }
+    });
+
+    Handlebars.registerHelper('ItemRightSide', function (item: SR5ItemType) {
+        const wrapper = new SR5ItemDataWrapper(item);
+        switch (item.type) {
+            case 'complex_form':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize(CONFIG.SR5.matrixTargets[item.data.target ?? '']),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize(CONFIG.SR5.durations[item.data.duration ?? '']),
+                        },
+                    },
+                    {
+                        text: {
+                            text: String(item.data.fade),
+                        },
+                    },
+                ];
+            case 'program':
+                return [
+                    {
+                        button: {
+                            cssClass: `item-equip-toggle ${wrapper.isEquipped() ? 'light' : ''}`,
+                            short: true,
+                            text: wrapper.isEquipped() ? game.i18n.localize('SR5.Loaded') : game.i18n.localize('SR5.Load') + ' >>',
+                        },
+                    },
+                ];
+            default:
+                return [];
+        }
+    });
+
+    Handlebars.registerHelper('ItemIcons', function (item: SR5ItemType) {
+        const addIcon = {
+            icon: 'fas fa-plus',
+            title: game.i18n.localize('SR5.AddItem'),
+        };
+        const editIcon = {
+            icon: 'fas fa-edit',
+            title: game.i18n.localize('SR5.EditItem'),
+        };
+        const removeIcon = {
+            icon: 'fas fa-trash',
+            title: game.i18n.localize('SR5.DeleteItem'),
+        };
+        const equipIcon = {
+            icon: `${item.data.technology?.equipped ? 'fas fa-check-circle' : 'far fa-circle'} item-equip-toggle`,
+            title: game.i18n.localize('SR5.ToggleEquip'),
+        };
+
+        switch (item.type) {
+            case 'program':
+                return [equipIcon, editIcon, removeIcon];
+            default:
+                return [editIcon, removeIcon];
+        }
+    });
+
+    Handlebars.registerHelper('ListItem', function () {
+        return 'systems/shadowrun5e/dist/templates/common/List/ListItem.html';
+    });
+    Handlebars.registerHelper('ListHeader', function () {
+        return 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html';
+    });
+    Handlebars.registerHelper('ValueInput', function () {
+        return 'systems/shadowrun5e/dist/templates/common/ValueInput.html';
     });
 };

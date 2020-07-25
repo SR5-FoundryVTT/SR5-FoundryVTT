@@ -1,11 +1,11 @@
 {{!-- pair id path dataName nameCssClass isRoll name --}}
-<div class="attribute" data-{{dataName}}="{{dataId}}">
+{{#> "systems/shadowrun5e/dist/templates/common/Attribute.html" dataName=dataName dataId=dataId}}
     <div class="attribute-name {{nameCssClass}} {{#if isRoll}}roll{{/if}}">
         {{name}}
     </div>
     <div class="track">
         <div class="attribute-input-container">
-            {{> "systems/shadowrun5e/dist/templates/common/ValueInput.html"
+            {{> (ValueInput)
                     cssClass="attribute-input"
                     size="2"
                     maxLength="2"
@@ -16,7 +16,7 @@
         </div>
         <div class="track-slash"></div>
         <div class="attribute-input-container">
-            {{> "systems/shadowrun5e/dist/templates/common/ValueInput.html"
+            {{> (ValueInput)
                     cssClass="attribute-input"
                     size="2"
                     maxLength="2"
@@ -26,4 +26,4 @@
             }}
         </div>
     </div>
-</div>
+{{/"systems/shadowrun5e/dist/templates/common/Attribute.html"}}
