@@ -549,7 +549,7 @@ export class SR5ActorSheet extends ActorSheet {
 
     async _onRollAttribute(event) {
         event.preventDefault();
-        const attr = event.currentTarget.dataset.attribute;
+        const attr = event.currentTarget.closest('.attribute').dataset.attribute;
         return this.actor.rollAttribute(attr, { event: event });
     }
 

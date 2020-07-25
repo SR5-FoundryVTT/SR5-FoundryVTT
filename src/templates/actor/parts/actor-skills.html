@@ -1,7 +1,7 @@
 <div class="attributes">
     {{#each data.attributes as |attribute a|}} {{#unless attribute.hidden}}
-    <div class="attribute">
-        <div class="attribute-name roll attribute-roll" data-attribute="{{a}}">
+    <div class="attribute" data-attribute="{{a}}">
+        <div class="attribute-name roll attribute-roll">
             {{localize attribute.label}}
         </div>
         <div class="track">

@@ -52,36 +52,15 @@
                             nameCssClass="track-roll"
                         }}
                     {{/each}}
-                    <div class="attribute">
-                        <div class="attribute-name attribute-roll roll" data-attribute="edge">
-                            {{localize "SR5.AttrEdge"}}
-                        </div>
-                        <div class="track">
-                            <div class="attribute-input-container">
-                                <input
-                                    class="display attribute-input"
-                                    size="2"
-                                    maxlength="2"
-                                    type="text"
-                                    name="data.attributes.edge.value"
-                                    value="{{data.attributes.edge.value}}"
-                                    data-dtype="Number"
-                                />
-                            </div>
-                            <div class="track-slash"></div>
-                            <div class="attribute-input-container">
-                                <input
-                                    class="display attribute-input"
-                                    size="2"
-                                    maxlength="2"
-                                    type="text"
-                                    name="data.attributes.edge.max"
-                                    value="{{data.attributes.edge.max}}"
-                                    data-dtype="Number"
-                                />
-                            </div>
-                        </div>
-                    </div>
+                    {{> 'systems/shadowrun5e/dist/templates/common/ValueMaxInput.html'
+                            name=(localize 'SR5.AttrEdge')
+                            pair=data.attributes.edge
+                            path="data.attributes.edge"
+                            isRoll="true"
+                            dataName="attribute"
+                            dataId="edge"
+                            nameCssClass="attribute-roll"
+                    }}
                     <div class="attribute">
                         <div class="attribute-name">
                             {{localize "SR5.Movement"}}

@@ -2096,7 +2096,9 @@ class SR5ActorSheet extends ActorSheet {
         html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
         html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
         // updates matrix condition monitor on the device the actor has equipped
-        $(html).find('[name="data.matrix.condition_monitor.value"]').on('change', (event) => __awaiter(this, void 0, void 0, function* () {
+        $(html)
+            .find('[name="data.matrix.condition_monitor.value"]')
+            .on('change', (event) => __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
             const value = helpers_1.Helpers.parseInputToNumber(event.currentTarget.value);
             const matrixDevice = this.actor.getMatrixDevice();
@@ -2360,7 +2362,7 @@ class SR5ActorSheet extends ActorSheet {
     _onRollAttribute(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
-            const attr = event.currentTarget.dataset.attribute;
+            const attr = event.currentTarget.closest('.attribute').dataset.attribute;
             return this.actor.rollAttribute(attr, { event: event });
         });
     }
