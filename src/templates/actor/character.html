@@ -42,70 +42,14 @@
                 </div>
                 <div class="attributes smooth">
                     {{#each data.track as |track id|}}
-                    <div class="attribute" data-track="{{id}}">
-                        <div class="attribute-name track-roll roll">
-                            {{localize track.label}}
-                        </div>
-                        <div class="track">
-                            <div class="attribute-input-container">
-                                <input
-                                    class="display attribute-input"
-                                    size="2"
-                                    maxlength="2"
-                                    type="text"
-                                    name="data.track.{{id}}.value"
-                                    value="{{track.value}}"
-                                    data-dtype="Number"
-                                />
-                            </div>
-                            <div class="track-slash"></div>
-                            <div class="attribute-input-container">
-                                <input
-                                    class="display attribute-input"
-                                    size="2"
-                                    maxlength="2"
-                                    type="text"
-                                    name="data.track.{{id}}.max"
-                                    value="{{track.max}}"
-                                    disabled
-                                    data-dtype="Number"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    {{#ife track.max track.value}} {{#if track.overflow}}
-                    <div class="attribute">
-                        <div class="attribute-name">
-                            {{localize "SR5.Overflow"}}
-                        </div>
-                        <div class="track">
-                            <div class="attribute-input-container">
-                                <input
-                                    class="display attribute-input"
-                                    size="2"
-                                    maxlength="2"
-                                    type="text"
-                                    name="data.track.{{id}}.overflow.value"
-                                    value="{{track.overflow.value}}"
-                                    data-dtype="Number"
-                                />
-                            </div>
-                            <div class="track-slash"></div>
-                            <div class="attribute-input-container">
-                                <input
-                                    class="display attribute-input"
-                                    size="2"
-                                    maxlength="2"
-                                    type="text"
-                                    name="data.track.{{id}}.overflow.max"
-                                    value="{{track.overflow.max}}"
-                                    disabled
-                                    data-dtype="Number"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    {{/if}} {{/ife}} {{/each}}
+                        {{> 'systems/shadowrun5e/dist/templates/common/ConditionMonitor.html'
+                            track=track
+                            trackPath="data.track"
+                            id=id
+                            disableMax="true"
+                            disableOverflowMax="true"
+                        }}
+                    {{/each}}
                     <div class="attribute">
                         <div class="attribute-name attribute-roll roll" data-attribute="edge">
                             {{localize "SR5.AttrEdge"}}

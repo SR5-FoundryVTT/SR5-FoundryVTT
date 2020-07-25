@@ -4698,6 +4698,7 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/dist/templates/item/parts/program.html',
         'systems/shadowrun5e/dist/templates/rolls/parts/parts-list.html',
         'systems/shadowrun5e/dist/templates/common/ValueInput.html',
+        'systems/shadowrun5e/dist/templates/common/ConditionMonitor.html',
     ];
     return loadTemplates(templatePaths);
 });
