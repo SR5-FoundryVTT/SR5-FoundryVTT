@@ -31,6 +31,8 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/item/parts/modification.html',
         'systems/shadowrun5e/dist/templates/item/parts/program.html',
         'systems/shadowrun5e/dist/templates/rolls/parts/parts-list.html',
+
+        'systems/shadowrun5e/dist/templates/common/ValueInput.html',
     ];
 
     return loadTemplates(templatePaths);
@@ -123,5 +125,21 @@ export const registerHandlebarHelpers = () => {
 
     Handlebars.registerHelper('isDefined', function (value) {
         return value !== undefined;
+    });
+
+    /**
+     * Return a default value if the provided value is not defined (null or undefined)
+     */
+    Handlebars.registerHelper('default', function (value: string, defaultValue: string) {
+        return new Handlebars.SafeString(value ?? defaultValue);
+    });
+
+    Handlebars.registerHelper('log', function (value: string) {
+        console.log(value);
+    });
+
+    Handlebars.registerHelper('buildName', function (options) {
+        const { hash } = options;
+        return new Handlebars.SafeString(`${hash.part1}.${hash.key}.${hash.part2}`);
     });
 };

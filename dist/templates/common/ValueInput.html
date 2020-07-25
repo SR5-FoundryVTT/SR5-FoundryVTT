@@ -1,0 +1,17 @@
+{{log name}}
+{{log value}}
+<input
+    class="display {{cssClass}}"
+    type="text"
+    maxlength="{{maxLength}}"
+    size="{{size}}"
+    name="{{name}}"
+    value="{{value}}"
+
+    data-dtype="{{default fieldType 'Number'}}"
+
+    placeholder="{{placeholder}}"
+    {{#if (isDefined disabled)}}
+    disabled
+    {{/if}}
+/>

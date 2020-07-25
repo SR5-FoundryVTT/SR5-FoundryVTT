@@ -4697,6 +4697,7 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/dist/templates/item/parts/modification.html',
         'systems/shadowrun5e/dist/templates/item/parts/program.html',
         'systems/shadowrun5e/dist/templates/rolls/parts/parts-list.html',
+        'systems/shadowrun5e/dist/templates/common/ValueInput.html',
     ];
     return loadTemplates(templatePaths);
 });
@@ -4802,6 +4803,19 @@ exports.registerHandlebarHelpers = () => {
     });
     Handlebars.registerHelper('isDefined', function (value) {
         return value !== undefined;
+    });
+    /**
+     * Return a default value if the provided value is not defined (null or undefined)
+     */
+    Handlebars.registerHelper('default', function (value, defaultValue) {
+        return new Handlebars.SafeString(value !== null && value !== void 0 ? value : defaultValue);
+    });
+    Handlebars.registerHelper('log', function (value) {
+        console.log(value);
+    });
+    Handlebars.registerHelper('buildName', function (options) {
+        const { hash } = options;
+        return new Handlebars.SafeString(`${hash.part1}.${hash.key}.${hash.part2}`);
     });
 };
 },{"./helpers":32}],32:[function(require,module,exports){
