@@ -265,14 +265,4 @@ export const registerHandlebarHelpers = () => {
                 return [editIcon, removeIcon];
         }
     });
-
-    Handlebars.registerHelper('ListItem', function () {
-        return 'systems/shadowrun5e/dist/templates/common/List/ListItem.html';
-    });
-    Handlebars.registerHelper('ListHeader', function () {
-        return 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html';
-    });
-    Handlebars.registerHelper('ValueInput', function () {
-        return 'systems/shadowrun5e/dist/templates/common/ValueInput.html';
-    });
 };

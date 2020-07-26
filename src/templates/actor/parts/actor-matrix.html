@@ -41,13 +41,13 @@
 {{#if emerged}}
 <div class="inventory">
     <div class="scroll-area">
-        {{> (ListHeader)
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
             name=(localize 'SR5.ComplexForms')
             icons=(ItemHeaderIcons 'complex_form')
             rightSide=(ItemHeaderRightSide 'complex_form')
         }}
         {{#each complex_forms as |item iid|}}
-            {{> (ListItem)
+            {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
                 img=item.img
                 name=item.name
                 itemId=item._id
@@ -63,13 +63,13 @@
 {{else}}
 <div class="inventory">
     <div class="scroll-area">
-        {{> (ListHeader)
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
                 name=(localize 'SR5.Programs')
                 icons=(ItemHeaderIcons 'program')
                 rightSide=(ItemHeaderRightSide 'program')
         }}
         {{#each programs as |item iid|}}
-            {{> (ListItem)
+            {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
                     img=item.img
                     name=item.name
                     itemId=item._id
