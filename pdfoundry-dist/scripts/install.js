@@ -92,6 +92,10 @@ async function main() {
         system.esmodules.push('pdfoundry-dist/bundle.js');
     }
 
+    if (!systemData.socket) {
+        systemData.socket = true;
+    }
+
     const systemContents = JSON.stringify(system, null, 4);
     fs.writeFileSync('system.json', systemContents);
 

@@ -335,8 +335,8 @@ var _text_layer = __w_pdfjs_require__(18);
 
 var _svg = __w_pdfjs_require__(19);
 
-const pdfjsVersion = '2.6.103';
-const pdfjsBuild = 'a5f9a902';
+const pdfjsVersion = '2.6.145';
+const pdfjsBuild = '535a6be8';
 {
   const {
     isNodeJS
@@ -1737,7 +1737,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.isNodeJS = void 0;
-const isNodeJS = typeof process === "object" && process + "" === "[object process]" && !process.versions.nw && !process.versions.electron;
+const isNodeJS = typeof process === "object" && process + "" === "[object process]" && !process.versions.nw && !(process.versions.electron && process.type && process.type !== "browser");
 exports.isNodeJS = isNodeJS;
 
 /***/ }),
@@ -1951,7 +1951,7 @@ function _fetchDocument(worker, source, pdfDataRangeTransport, docId) {
 
   return worker.messageHandler.sendWithPromise("GetDocRequest", {
     docId,
-    apiVersion: '2.6.103',
+    apiVersion: '2.6.145',
     source: {
       data: source.data,
       url: source.url,
@@ -3830,9 +3830,9 @@ const InternalRenderTask = function InternalRenderTaskClosure() {
   return InternalRenderTask;
 }();
 
-const version = '2.6.103';
+const version = '2.6.145';
 exports.version = version;
-const build = 'a5f9a902';
+const build = '535a6be8';
 exports.build = build;
 
 /***/ }),
@@ -6316,9 +6316,6 @@ var CanvasGraphics = function CanvasGraphicsClosure() {
     },
     paintSolidColorImageMask: function CanvasGraphics_paintSolidColorImageMask() {
       this.ctx.fillRect(0, 0, 1, 1);
-    },
-    paintXObject: function CanvasGraphics_paintXObject() {
-      (0, _util.warn)("Unsupported 'paintXObject' command.");
     },
     markPoint: function CanvasGraphics_markPoint(tag) {},
     markPointProps: function CanvasGraphics_markPointProps(tag, properties) {},
