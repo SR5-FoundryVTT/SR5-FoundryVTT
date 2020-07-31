@@ -1,6 +1,5 @@
 import { Helpers } from '../helpers';
 import { SR5Item } from './SR5Item';
-
 /**
  * Extend the basic ItemSheet with some very simple modifications
  */
@@ -265,10 +264,35 @@ export class SR5ItemSheet extends ItemSheet {
         return $(this.element).find('.tab.active .scroll-area');
     }
 
+    /** There exist a very specific timing issue when triggering these conditions:
+     * - Have a very, very specific latency / timing to the server
+     *      (for example: local network server connected with a tablet pc over wifi but with no power cable connected
+     *      - no, I'm not joking) - taM
+     * - Within the same item open and close two embedded items consecutively, each triggering a
+     *  -- unsetFlag => update with null
+     *  -- setFlag => update with data
+     * - The first embedded item will visually close but keep it's internal _state as RENDERED.
+     * - The second embedded item will do the do same.
+     * - Since the fist embedded items app is stored as RENDERED, it will show a window at the next _render since it's
+     *   told to render with current data.
+     * - This will repeat for each closed embedded item app, so long as two or more embedded apps have been opened.
+     *
+     * @private
+     */
+    private fixStaleRenderedState() {
+        if (this._state === Application.RENDER_STATES.RENDERED && ui.windows[this.appId] === undefined) {
+            console.warn(`SR5ItemSheet app for ${this.entity.name} is set as RENDERED but has no window registered. Fixing app internal render state. This is a known bug.`);
+            this._state = Application.RENDER_STATES.CLOSED;
+        }
+    }
+
     /**
      * @private
      */
     async _render(force = false, options = {}) {
+        // NOTE: This is for a timing bug. See function doc for code removal. Good luck, there be dragons here. - taM
+        this.fixStaleRenderedState();
+
         this._saveScrollPositions();
         await super._render(force, options);
         this._restoreScrollPositions();
