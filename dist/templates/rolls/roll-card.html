@@ -4,10 +4,16 @@
     data-item-id="{{item._id}}"
     data-token-id="{{tokenId}}"
 >
-    <div class="card-title card-header flexrow">
-        <img src="{{header.img}}" title="{{header.name}}" width="36" height="36" />
-        <h3 class="header-name">{{header.name}}</h3>
-    </div>
+    {{#if header}}
+        <div class="card-title card-header flexrow">
+            {{#if header.img}}
+                <img src="{{header.img}}" title="{{header.name}}" width="36" height="36" />
+            {{/if}}
+            {{#if header.name}}
+                <h3 class="header-name">{{header.name}}</h3>
+            {{/if}}
+        </div>
+    {{/if}}
     {{#if description}}
     <div class="card-description">
         <div class="card-description-content">
