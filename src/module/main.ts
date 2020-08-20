@@ -68,6 +68,8 @@ Hooks.on('ready', function () {
     if (game.user.isGM) {
         Migrator.BeginMigration();
     }
+    const diceIconSelector = '#chat-controls .roll-type-select .fa-dice-d20';
+    $(document).on('click', diceIconSelector, () => ShadowrunRoller.promptRoll());
 });
 
 Hooks.on('preUpdateCombat', preCombatUpdate);
