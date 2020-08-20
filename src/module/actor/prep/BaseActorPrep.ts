@@ -159,6 +159,7 @@ export class BaseActorPrep {
 
         // set the value for the attributes
         for (let [key, attribute] of Object.entries(attributes)) {
+            if (key === 'edge') return;
             // this turns the Object model into the list mod
             if (typeof attribute.mod === 'object') {
                 attribute.mod = new PartsList(attribute.mod).list;

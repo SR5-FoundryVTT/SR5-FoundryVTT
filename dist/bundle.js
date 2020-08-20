@@ -1795,8 +1795,6 @@ class SR5Actor extends Actor {
      */
     getFlag(scope, key) {
         const data = super.getFlag(scope, key);
-        console.log('getFlag');
-        console.log(data);
         return helpers_1.Helpers.onGetFlag(data);
     }
 }
@@ -2492,8 +2490,6 @@ class BaseActorPrep {
             matrix.item = device.getData();
             const deviceAtts = device.getASDF();
             if (deviceAtts) {
-                console.log('');
-                console.log(deviceAtts);
                 // setup the actual matrix attributes for the actor
                 for (const [key, value] of Object.entries(deviceAtts)) {
                     if (value && matrix[key]) {
@@ -2596,6 +2592,8 @@ class BaseActorPrep {
         attributes.resonance.hidden = !(this.data.special === 'resonance');
         // set the value for the attributes
         for (let [key, attribute] of Object.entries(attributes)) {
+            if (key === 'edge')
+                return;
             // this turns the Object model into the list mod
             if (typeof attribute.mod === 'object') {
                 attribute.mod = new PartsList_1.PartsList(attribute.mod).list;
