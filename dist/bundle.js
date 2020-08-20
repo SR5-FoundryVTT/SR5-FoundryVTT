@@ -1459,6 +1459,7 @@ class SR5Actor extends Actor {
     promptRoll(options) {
         return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
             event: options === null || options === void 0 ? void 0 : options.event,
+            title: 'Roll',
             parts: [],
             actor: this,
             dialogOptions: {
@@ -6207,8 +6208,6 @@ class SR5Item extends Item {
      */
     getFlag(scope, key) {
         const data = super.getFlag(scope, key);
-        console.log('getFlagItem');
-        console.log(data);
         return helpers_1.Helpers.onGetFlag(data);
     }
     /**
@@ -6962,7 +6961,7 @@ function rollItemMacro(itemName) {
         // @ts-ignore
         return ui.notifications.warn(`Your controlled Actor does not have an item named ${itemName}`);
     }
-    return item.rollTest(event);
+    return item.promptRoll();
 }
 handlebars_1.registerHandlebarHelpers();
 },{"./actor/SR5Actor":16,"./actor/SR5ActorSheet":17,"./apps/gmtools/OverwatchScoreTracker":21,"./canvas":25,"./chat":26,"./combat":27,"./config":28,"./constants":29,"./handlebars":31,"./helpers":32,"./item/SR5Item":34,"./item/SR5ItemSheet":36,"./migrator/Migrator":38,"./rolls/ShadowrunRoller":43,"./settings":44}],38:[function(require,module,exports){
@@ -8039,7 +8038,7 @@ class ShadowrunRoller {
     static promptRoll() {
         const lastRoll = game.user.getFlag(constants_1.SYSTEM_NAME, 'lastRollPromptValue') || 0;
         const parts = [{ name: 'SR5.LastRoll', value: lastRoll }];
-        return ShadowrunRoller.advancedRoll({ parts, dialogOptions: { prompt: true } });
+        return ShadowrunRoller.advancedRoll({ parts, title: 'Roll', dialogOptions: { prompt: true } });
     }
     /**
      * Start an advanced roll

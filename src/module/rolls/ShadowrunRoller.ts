@@ -195,7 +195,7 @@ export class ShadowrunRoller {
     static promptRoll(): Promise<ShadowrunRoll | undefined> {
         const lastRoll = game.user.getFlag(SYSTEM_NAME, 'lastRollPromptValue') || 0;
         const parts = [{ name: 'SR5.LastRoll', value: lastRoll }];
-        return ShadowrunRoller.advancedRoll({ parts, dialogOptions: { prompt: true } });
+        return ShadowrunRoller.advancedRoll({ parts, title: 'Roll', dialogOptions: { prompt: true } });
     }
 
     /**
