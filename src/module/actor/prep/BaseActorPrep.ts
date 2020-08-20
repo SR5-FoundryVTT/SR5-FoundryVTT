@@ -2,6 +2,7 @@ import SR5ActorType = Shadowrun.SR5ActorType;
 import { SR5ItemDataWrapper } from '../../item/SR5ItemDataWrapper';
 import SR5ActorData = Shadowrun.SR5ActorData;
 import { Helpers } from '../../helpers';
+import { PartsList } from '../../parts/PartsList';
 
 export class BaseActorPrep {
     data: SR5ActorData;
@@ -19,11 +20,15 @@ export class BaseActorPrep {
     prepareMatrix() {
         const { matrix, attributes, limits } = this.data;
 
+        const MatrixList = ['firewall', 'sleaze', 'data_processing', 'attack'];
+
         // clear matrix data to defaults
-        matrix.firewall.value = Helpers.totalMods(matrix.firewall.mod);
-        matrix.data_processing.value = Helpers.totalMods(matrix.data_processing.mod);
-        matrix.attack.value = Helpers.totalMods(matrix.attack.mod);
-        matrix.sleaze.value = Helpers.totalMods(matrix.sleaze.mod);
+        MatrixList.forEach((key) => {
+            const parts = new PartsList(matrix[key].mod);
+            parts.addUniquePart('SR5.Temporary', matrix[key].temp);
+            matrix[key].mod = parts.list;
+            matrix[key].value = parts.total;
+        });
         matrix.condition_monitor.max = 0;
         matrix.rating = 0;
         matrix.name = '';
@@ -67,7 +72,7 @@ export class BaseActorPrep {
         }
 
         // add matrix attributes to both limits and attributes as hidden entries
-        ['firewall', 'sleaze', 'data_processing', 'firewall'].forEach((key) => {
+        MatrixList.forEach((key) => {
             if (matrix[key]) {
                 const label = CONFIG.SR5.matrixAttributes[key];
                 const { value, base, mod } = matrix[key];
@@ -100,15 +105,16 @@ export class BaseActorPrep {
         const { armor } = this.data;
         armor.base = 0;
         armor.value = 0;
-        armor.mod = {};
+        armor.mod = [];
         for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
             armor[element] = 0;
         }
 
         const equippedArmor = this.items.filter((item) => item.isArmor() && item.isEquipped());
+        const armorModParts = new PartsList<number>(armor.mod);
         equippedArmor?.forEach((item) => {
             if (item.isArmorAccessory()) {
-                armor.mod[item.getName()] = item.getArmorValue();
+                armorModParts.addUniquePart(item.getName(), item.getArmorValue());
             } // if not a mod, set armor.value to the items value
             else {
                 armor.base = item.getArmorValue();
@@ -119,9 +125,9 @@ export class BaseActorPrep {
             }
         });
 
-        if (this.data.modifiers['armor']) armor.mod[game.i18n.localize('SR5.Bonus')] = this.data.modifiers['armor'];
+        if (this.data.modifiers['armor']) armorModParts.addUniquePart(game.i18n.localize('SR5.Bonus'), this.data.modifiers['armor']);
         // SET ARMOR
-        armor.value = armor.base + Helpers.totalMods(armor.mod);
+        armor.value = Helpers.calcTotal(armor);
     }
 
     /**
@@ -153,6 +159,11 @@ export class BaseActorPrep {
 
         // set the value for the attributes
         for (let [key, attribute] of Object.entries(attributes)) {
+            // this turns the Object model into the list mod
+            if (typeof attribute.mod === 'object') {
+                attribute.mod = new PartsList(attribute.mod).list;
+            }
+            PartsList.AddUniquePart(attribute.mod, 'SR5.Temporary', attribute.temp);
             Helpers.calcTotal(attribute);
             // add labels
             attribute.label = CONFIG.SR5.attributes[key];
@@ -174,11 +185,11 @@ export class BaseActorPrep {
 
         // function that will set the total of a skill correctly
         const prepareSkill = (skill) => {
-            skill.mod = {};
+            skill.mod = [];
             if (!skill.base) skill.base = 0;
             if (skill.bonus?.length) {
                 for (let bonus of skill.bonus) {
-                    skill.mod[bonus.key] = bonus.value;
+                    PartsList.AddUniquePart(skill.mod, bonus.key, bonus.value);
                 }
             }
             Helpers.calcTotal(skill);

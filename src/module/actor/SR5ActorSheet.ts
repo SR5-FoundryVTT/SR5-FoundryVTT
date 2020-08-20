@@ -69,12 +69,14 @@ export class SR5ActorSheet extends ActorSheet {
         const attrs = data.data.attributes;
         for (let [, att] of Object.entries(attrs)) {
             if (!att.hidden) {
-                if (att.mod['Temporary'] === 0) delete att.mod;
+                if (att.temp === 0) delete att.temp;
             }
         }
 
+        /*c
         const { magic } = data.data;
-        if (magic.drain && magic.drain.mod['Temporary'] === 0) delete magic.drain.mod['Temporary'];
+        if (magic.drain && magic.drain.temp === 0) delete magic.drain.temp;
+         */
 
         const { modifiers: mods } = data.data;
         for (let [key, value] of Object.entries(mods)) {
@@ -108,7 +110,7 @@ export class SR5ActorSheet extends ActorSheet {
             const att = matrix[attribute];
             if (att) {
                 if (!att.mod) att.mod = {};
-                if (att.mod['Temporary'] === 0) delete att.mod['Temporary'];
+                if (att.temp === 0) delete att.temp;
             }
         };
 

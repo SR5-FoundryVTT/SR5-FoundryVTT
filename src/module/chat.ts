@@ -7,6 +7,7 @@ import DamageData = Shadowrun.DamageData;
 import AttackData = Shadowrun.AttackData;
 import LabelField = Shadowrun.LabelField;
 import { SYSTEM_NAME } from './constants';
+import { PartsList } from './parts/PartsList';
 
 export type TemplateData = {
     header: {
@@ -36,7 +37,11 @@ export type TemplateData = {
 
 export const createChatData = async (templateData: TemplateData, roll?: Roll) => {
     const template = `systems/shadowrun5e/dist/templates/rolls/roll-card.html`;
-    const html = await renderTemplate(template, templateData);
+    const hackyTemplateData = {
+        ...templateData,
+        parts: new PartsList(templateData.parts).getMessageOutput(),
+    };
+    const html = await renderTemplate(template, hackyTemplateData);
     const actor = templateData.actor;
 
     const chatData = {

@@ -11,5 +11,6 @@ declare namespace Shadowrun {
         ModifiableValue &
         LabelField & {
             limit?: string;
+            temp?: number;
         };
 }

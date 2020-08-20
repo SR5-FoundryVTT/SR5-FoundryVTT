@@ -142,7 +142,7 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
         const atts: { [key: string]: { value: number; att: string } } | undefined = this.data.data.atts;
         if (atts) {
             for (let [key, att] of Object.entries(atts)) {
-                matrix[att.att].value += att.value;
+                matrix[att.att].value = att.value;
                 matrix[att.att].device_att = key;
             }
         }
@@ -167,7 +167,7 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
     }
 
     getModifierList(): ModList<number> {
-        return this.data.data.action?.dice_pool_mod || {};
+        return this.data.data.action?.dice_pool_mod || [];
     }
 
     getActionSpecialization(): string | undefined {
