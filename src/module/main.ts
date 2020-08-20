@@ -148,7 +148,7 @@ function rollItemMacro(itemName) {
         return ui.notifications.warn(`Your controlled Actor does not have an item named ${itemName}`);
     }
 
-    return item.promptRoll();
+    return item.postCard();
 }
 
 registerHandlebarHelpers();

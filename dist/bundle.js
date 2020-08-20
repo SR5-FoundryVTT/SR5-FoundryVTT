@@ -6961,7 +6961,7 @@ function rollItemMacro(itemName) {
         // @ts-ignore
         return ui.notifications.warn(`Your controlled Actor does not have an item named ${itemName}`);
     }
-    return item.promptRoll();
+    return item.postCard();
 }
 handlebars_1.registerHandlebarHelpers();
 },{"./actor/SR5Actor":16,"./actor/SR5ActorSheet":17,"./apps/gmtools/OverwatchScoreTracker":21,"./canvas":25,"./chat":26,"./combat":27,"./config":28,"./constants":29,"./handlebars":31,"./helpers":32,"./item/SR5Item":34,"./item/SR5ItemSheet":36,"./migrator/Migrator":38,"./rolls/ShadowrunRoller":43,"./settings":44}],38:[function(require,module,exports){
