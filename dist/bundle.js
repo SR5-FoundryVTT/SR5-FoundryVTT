@@ -4234,6 +4234,7 @@ const template_1 = require("./template");
 const constants_1 = require("./constants");
 const PartsList_1 = require("./parts/PartsList");
 exports.createChatData = (templateData, roll) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     const template = `systems/shadowrun5e/dist/templates/rolls/roll-card.html`;
     const hackyTemplateData = Object.assign(Object.assign({}, templateData), { parts: new PartsList_1.PartsList(templateData.parts).getMessageOutput() });
     const html = yield renderTemplate(template, hackyTemplateData);
@@ -4257,7 +4258,7 @@ exports.createChatData = (templateData, roll) => __awaiter(void 0, void 0, void 
     if (roll) {
         chatData['sound'] = CONFIG.sounds.dice;
     }
-    const rollMode = game.settings.get('core', 'rollMode');
+    const rollMode = (_a = templateData.rollMode) !== null && _a !== void 0 ? _a : game.settings.get('core', 'rollMode');
     if (['gmroll', 'blindroll'].includes(rollMode))
         chatData['whisper'] = ChatMessage.getWhisperIDs('GM');
     if (rollMode === 'blindroll')
@@ -8065,11 +8066,10 @@ class ShadowrunRoller {
         return formula;
     }
     static basicRoll(_a) {
-        var { parts: partsProps = [], limit, explodeSixes, title, actor, img = actor === null || actor === void 0 ? void 0 : actor.img, name = actor === null || actor === void 0 ? void 0 : actor.name, hideRollMessage } = _a, props = __rest(_a, ["parts", "limit", "explodeSixes", "title", "actor", "img", "name", "hideRollMessage"]);
+        var { parts: partsProps = [], limit, explodeSixes, title, actor, img = actor === null || actor === void 0 ? void 0 : actor.img, name = actor === null || actor === void 0 ? void 0 : actor.name, hideRollMessage, rollMode } = _a, props = __rest(_a, ["parts", "limit", "explodeSixes", "title", "actor", "img", "name", "hideRollMessage", "rollMode"]);
         return __awaiter(this, void 0, void 0, function* () {
             let roll;
             const parts = new PartsList_1.PartsList(partsProps);
-            const rollMode = game.settings.get('core', 'rollMode');
             if (parts.length) {
                 const formula = this.shadowrunFormula({ parts: parts.list, limit, explode: explodeSixes });
                 if (!formula)
@@ -8097,14 +8097,13 @@ class ShadowrunRoller {
                         }
                     });
                 });
-                console.log(oneCount);
-                console.log(roll.total);
                 glitch = oneCount > Math.floor(parts.total / 2);
             }
             const templateData = Object.assign({ actor: actor, header: {
                     name: name || '',
                     img: img || '',
-                }, tokenId: token ? `${token.scene._id}.${token.id}` : undefined, dice,
+                }, tokenId: token ? `${token.scene._id}.${token.id}` : undefined, rollMode,
+                dice,
                 limit, testName: title, dicePool: parts.total, parts: parts.list, hits: roll === null || roll === void 0 ? void 0 : roll.total, glitch }, props);
             if (roll) {
                 roll.templateData = templateData;
@@ -8141,6 +8140,7 @@ class ShadowrunRoller {
             delete props.limit;
         }
         // TODO create "fast roll" option
+        const rollMode = game.settings.get('core', 'rollMode');
         let dialogData = {
             options: dialogOptions,
             extended,
@@ -8149,6 +8149,8 @@ class ShadowrunRoller {
             limit: limit === null || limit === void 0 ? void 0 : limit.value,
             wounds,
             woundValue: actor === null || actor === void 0 ? void 0 : actor.getWoundModifier(),
+            rollMode,
+            rollModes: CONFIG.Dice.rollModes,
         };
         let template = 'systems/shadowrun5e/dist/templates/rolls/roll-dialog.html';
         let edge = false;
@@ -8220,6 +8222,7 @@ class ShadowrunRoller {
                                 'data.attributes.edge.value': actor.data.data.attributes.edge.value - 1,
                             });
                         }
+                        props.rollMode = helpers_1.Helpers.parseInputToString($(html).find('[name=rollMode]').val());
                         props.parts = parts.list;
                         const r = this.basicRoll(Object.assign({}, props));
                         if (extended && r) {

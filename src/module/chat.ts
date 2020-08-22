@@ -34,6 +34,7 @@ export type TemplateData = {
     }[];
     description?: object;
     previewTemplate?: boolean;
+    rollMode?: keyof typeof CONFIG.Dice.rollModes,
 };
 
 export const createChatData = async (templateData: TemplateData, roll?: Roll) => {
@@ -64,7 +65,7 @@ export const createChatData = async (templateData: TemplateData, roll?: Roll) =>
     if (roll) {
         chatData['sound'] = CONFIG.sounds.dice;
     }
-    const rollMode = game.settings.get('core', 'rollMode');
+    const rollMode = templateData.rollMode ?? game.settings.get('core', 'rollMode');
 
     if (['gmroll', 'blindroll'].includes(rollMode)) chatData['whisper'] = ChatMessage.getWhisperIDs('GM');
     if (rollMode === 'blindroll') chatData['blind'] = true;

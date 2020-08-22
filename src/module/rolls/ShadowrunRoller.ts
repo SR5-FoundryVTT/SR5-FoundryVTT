@@ -33,6 +33,7 @@ export interface BasicRollProps {
     description?: object;
     previewTemplate?: boolean;
     hideRollMessage?: boolean;
+    rollMode?: keyof typeof CONFIG.Dice.rollModes;
 }
 
 export interface RollDialogOptions {
@@ -140,11 +141,11 @@ export class ShadowrunRoller {
         img = actor?.img,
         name = actor?.name,
         hideRollMessage,
+        rollMode,
         ...props
     }: BasicRollProps): Promise<ShadowrunRoll | undefined> {
         let roll;
         const parts = new PartsList(partsProps);
-        const rollMode = game.settings.get('core', 'rollMode');
         if (parts.length) {
             const formula = this.shadowrunFormula({ parts: parts.list, limit, explode: explodeSixes });
             if (!formula) return;
@@ -174,10 +175,9 @@ export class ShadowrunRoller {
                     }
                 });
             });
-            console.log(oneCount);
-            console.log(roll.total);
             glitch = oneCount > Math.floor(parts.total / 2);
         }
+
         const templateData = {
             actor: actor,
             header: {
@@ -185,6 +185,7 @@ export class ShadowrunRoller {
                 img: img || '',
             },
             tokenId: token ? `${token.scene._id}.${token.id}` : undefined,
+            rollMode,
             dice,
             limit,
             testName: title,
@@ -235,6 +236,8 @@ export class ShadowrunRoller {
 
         // TODO create "fast roll" option
 
+        const rollMode = game.settings.get('core', 'rollMode');
+
         let dialogData = {
             options: dialogOptions,
             extended,
@@ -243,6 +246,8 @@ export class ShadowrunRoller {
             limit: limit?.value,
             wounds,
             woundValue: actor?.getWoundModifier(),
+            rollMode,
+            rollModes: CONFIG.Dice.rollModes,
         };
         let template = 'systems/shadowrun5e/dist/templates/rolls/roll-dialog.html';
         let edge = false;
@@ -322,6 +327,8 @@ export class ShadowrunRoller {
                                 'data.attributes.edge.value': actor.data.data.attributes.edge.value - 1,
                             });
                         }
+
+                        props.rollMode = Helpers.parseInputToString($(html).find('[name=rollMode]').val());
 
                         props.parts = parts.list;
                         const r = this.basicRoll({
