@@ -5455,8 +5455,10 @@ class SR5Item extends Item {
         const equippedAmmo = this.getEquippedAmmo();
         const { technology, range, action } = item.data;
         if (technology) {
-            if (!technology.condition_monitor)
+            if (technology.condition_monitor === undefined) {
                 technology.condition_monitor = { value: 0 };
+            }
+            console.log(technology.condition_monitor);
             technology.condition_monitor.max = 8 + Math.ceil(technology.rating / 2);
             if (!technology.conceal)
                 technology.conceal = {};
