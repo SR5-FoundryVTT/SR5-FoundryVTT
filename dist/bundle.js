@@ -5383,7 +5383,6 @@ const helpers_1 = require("../helpers");
 const ShadowrunItemDialog_1 = require("../apps/dialogs/ShadowrunItemDialog");
 const ChatData_1 = require("./ChatData");
 const ShadowrunRoller_1 = require("../rolls/ShadowrunRoller");
-const template_1 = require("../template");
 const chat_1 = require("../chat");
 const constants_1 = require("../constants");
 const SR5ItemDataWrapper_1 = require("./SR5ItemDataWrapper");
@@ -5613,31 +5612,22 @@ class SR5Item extends Item {
             const postOnly = (event === null || event === void 0 ? void 0 : event.shiftKey) || !this.hasRoll;
             const post = (bonus = {}) => {
                 // if only post, don't roll and post a card version -- otherwise roll
-                const onComplete = postOnly
-                    ? () => {
-                        const { token } = this.actor;
-                        const attack = this.getAttackData(0);
-                        // don't include any hits
-                        attack === null || attack === void 0 ? true : delete attack.hits;
-                        // generate chat data
-                        chat_1.createChatData(Object.assign({ header: {
-                                name: this.name,
-                                img: this.img,
-                            }, testName: this.getRollName(), actor: this.actor, tokenId: token ? `${token.scene._id}.${token.id}` : undefined, description: this.getChatData(), item: this, previewTemplate: this.hasTemplate, attack }, bonus)).then((chatData) => {
-                            // create the message
-                            return ChatMessage.create(chatData, { displaySheet: false });
-                        });
-                    }
-                    : () => this.rollTest(event);
-                if (!postOnly && this.hasTemplate) {
-                    // onComplete is called when template is finished
-                    const template = template_1.default.fromItem(this, onComplete);
-                    if (template) {
-                        template.drawPreview();
-                    }
+                if (postOnly) {
+                    const { token } = this.actor;
+                    const attack = this.getAttackData(0);
+                    // don't include any hits
+                    attack === null || attack === void 0 ? true : delete attack.hits;
+                    // generate chat data
+                    chat_1.createChatData(Object.assign({ header: {
+                            name: this.name,
+                            img: this.img,
+                        }, testName: this.getRollName(), actor: this.actor, tokenId: token ? `${token.scene._id}.${token.id}` : undefined, description: this.getChatData(), item: this, previewTemplate: this.hasTemplate, attack }, bonus)).then((chatData) => {
+                        // create the message
+                        return ChatMessage.create(chatData, { displaySheet: false });
+                    });
                 }
                 else {
-                    onComplete();
+                    this.rollTest(event);
                 }
             };
             // prompt user if needed
@@ -6382,7 +6372,7 @@ class SR5Item extends Item {
     }
 }
 exports.SR5Item = SR5Item;
-},{"../apps/dialogs/ShadowrunItemDialog":20,"../chat":26,"../constants":29,"../helpers":32,"../parts/PartsList":42,"../rolls/ShadowrunRoller":43,"../template":45,"./ChatData":33,"./SR5ItemDataWrapper":35}],35:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunItemDialog":20,"../chat":26,"../constants":29,"../helpers":32,"../parts/PartsList":42,"../rolls/ShadowrunRoller":43,"./ChatData":33,"./SR5ItemDataWrapper":35}],35:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ItemDataWrapper = void 0;
@@ -8320,8 +8310,7 @@ class Template extends MeasuredTemplate {
         template.onComplete = onComplete;
         return template;
     }
-    drawPreview(event) {
-        var _a, _b;
+    drawPreview() {
         const initialLayer = canvas.activeLayer;
         // @ts-ignore
         this.draw();
@@ -8330,9 +8319,6 @@ class Template extends MeasuredTemplate {
         // @ts-ignore
         this.layer.preview.addChild(this);
         this.activatePreviewListeners(initialLayer);
-        if (this.item && this.item.actor) {
-            (_b = (_a = this.item.actor) === null || _a === void 0 ? void 0 : _a.sheet) === null || _b === void 0 ? void 0 : _b.minimize();
-        }
     }
     activatePreviewListeners(initialLayer) {
         const handlers = {};
@@ -8353,17 +8339,12 @@ class Template extends MeasuredTemplate {
         };
         // Cancel the workflow (right-click)
         handlers['rc'] = () => {
-            var _a, _b;
             this.layer.preview.removeChildren();
             canvas.stage.off('mousemove', handlers['mm']);
             canvas.stage.off('mousedown', handlers['lc']);
             canvas.app.view.oncontextmenu = null;
             canvas.app.view.onwheel = null;
             initialLayer.activate();
-            if (this.item && this.item.actor) {
-                // @ts-ignore
-                (_b = (_a = this.item.actor) === null || _a === void 0 ? void 0 : _a.sheet) === null || _b === void 0 ? void 0 : _b.maximize();
-            }
             if (this.onComplete)
                 this.onComplete();
         };

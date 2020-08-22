@@ -124,7 +124,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
         event.preventDefault();
         if (item) {
             const template = Template.fromItem(item);
-            template?.drawPreview(event);
+            template?.drawPreview();
         }
     });
     html.on('click', '.card-title', (event) => {
