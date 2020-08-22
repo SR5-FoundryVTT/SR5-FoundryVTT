@@ -1964,9 +1964,6 @@ class SR5ActorSheet extends ActorSheet {
                     type: 'cyberware',
                 },
             },
-            programs: {
-                label: game.i18n.localize('SR5.Program'),
-            },
         };
         let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs] = data.items.reduce((arr, item) => {
             item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
@@ -5458,7 +5455,6 @@ class SR5Item extends Item {
             if (technology.condition_monitor === undefined) {
                 technology.condition_monitor = { value: 0 };
             }
-            console.log(technology.condition_monitor);
             technology.condition_monitor.max = 8 + Math.ceil(technology.rating / 2);
             if (!technology.conceal)
                 technology.conceal = {};

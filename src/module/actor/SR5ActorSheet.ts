@@ -176,9 +176,6 @@ export class SR5ActorSheet extends ActorSheet {
                     type: 'cyberware',
                 },
             },
-            programs: {
-                label: game.i18n.localize('SR5.Program'),
-            },
         };
 
         let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs] = data.items.reduce(
