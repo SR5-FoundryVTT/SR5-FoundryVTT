@@ -507,13 +507,16 @@ export class SR5Item extends Item {
         if (attribute && attribute.label) parts.addPart(attribute.label, attribute.value);
 
         // if we have a valid skill, don't look for a second attribute
-        if (skill && skill.label) parts.addUniquePart(skill.label, skill.value);
-        else if (attribute2 && attribute2.label) parts.addUniquePart(attribute2.label, attribute2.value);
+        if (skill && skill.label) {
+            parts.addUniquePart(skill.label, skill.value);
+            if (skill.value === 0) {
+                parts.addUniquePart('SR5.Defaulting', -1);
+            }
+        } else if (attribute2 && attribute2.label) parts.addUniquePart(attribute2.label, attribute2.value);
 
         const spec = this.getActionSpecialization();
         if (spec) parts.addUniquePart(spec, 2);
 
-        // TODO remove these (by making them not used, not just delete)
         const mod = parseInt(this.data.data.action.mod || 0);
         if (mod) parts.addUniquePart('SR5.ItemMod', mod);
 
