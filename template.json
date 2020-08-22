@@ -1152,7 +1152,9 @@
             ],
             "type": "",
             "connection": 0,
-            "loyalty": 0
+            "loyalty": 0,
+            "family": false,
+            "blackmail": false
         },
         "sin": {
             "templates": [

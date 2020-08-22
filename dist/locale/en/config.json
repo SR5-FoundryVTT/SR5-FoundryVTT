@@ -480,6 +480,9 @@
     "SR5.Cyberware": "Cyberware",
     "SR5.FullDefenseAttribute": "Full Defense Attribute",
 
+    "SR5.Blackmail": "Blackmail",
+    "SR5.Family": "Family",
+
     "SR5.OpenSourcePdf": "Open Source PDF to the item",
     "SR5.SourceFieldEmptyError": "The Source field is empty, please enter valid text for the source",
 

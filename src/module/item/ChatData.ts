@@ -74,8 +74,14 @@ export const ChatData = {
 
     contact: (data, labels, props) => {
         props.push(data.type);
-        props.push(`Connection ${data.connection}`);
-        props.push(`Loyalty ${data.loyalty}`);
+        props.push(`${game.i18n.localize('SR5.Connection')} ${data.connection}`);
+        props.push(`${game.i18n.localize('SR5.Loyalty')} ${data.loyalty}`);
+        if (data.blackmail) {
+            props.push(`${game.i18n.localize('SR5.Blackmail')}`);
+        }
+        if (data.family) {
+            props.push(game.i18n.localize('SR5.Family'));
+        }
     },
 
     lifestyle: (data, labels, props) => {
