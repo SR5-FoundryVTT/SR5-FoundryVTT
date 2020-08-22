@@ -13,7 +13,6 @@ import FireRangeData = Shadowrun.FireRangeData;
 import BlastData = Shadowrun.BlastData;
 import { ChatData } from './ChatData';
 import { AdvancedRollProps, ShadowrunRoll, ShadowrunRoller } from '../rolls/ShadowrunRoller';
-import Template from '../template';
 import { createChatData } from '../chat';
 import { SYSTEM_NAME } from '../constants';
 import ConditionData = Shadowrun.ConditionData;
@@ -216,7 +215,11 @@ export class SR5Item extends Item {
                 if (action.limit.attribute) {
                     const { attribute } = action.limit;
                     // TODO convert this in the template
-                    action.limit.mod = PartsList.AddUniquePart(action.limit.mod, game.i18n.localize(CONFIG.SR5.limits[attribute]), this.actor.findLimit(attribute)?.value);
+                    action.limit.mod = PartsList.AddUniquePart(
+                        action.limit.mod,
+                        game.i18n.localize(CONFIG.SR5.limits[attribute]),
+                        this.actor.findLimit(attribute)?.value,
+                    );
                     action.limit.value = Helpers.calcTotal(action.limit);
                 }
             }
@@ -250,41 +253,31 @@ export class SR5Item extends Item {
 
         const post = (bonus = {}) => {
             // if only post, don't roll and post a card version -- otherwise roll
-            const onComplete = postOnly
-                ? () => {
-                      const { token } = this.actor;
-                      const attack = this.getAttackData(0);
-                      // don't include any hits
-                      delete attack?.hits;
-                      // generate chat data
-                      createChatData({
-                          header: {
-                              name: this.name,
-                              img: this.img,
-                          },
-                          testName: this.getRollName(),
-                          actor: this.actor,
-                          tokenId: token ? `${token.scene._id}.${token.id}` : undefined,
-                          description: this.getChatData(),
-                          item: this,
-                          previewTemplate: this.hasTemplate,
-                          attack,
-                          ...bonus,
-                      }).then((chatData) => {
-                          // create the message
-                          return ChatMessage.create(chatData, { displaySheet: false });
-                      });
-                  }
-                : () => this.rollTest(event);
-
-            if (!postOnly && this.hasTemplate) {
-                // onComplete is called when template is finished
-                const template = Template.fromItem(this, onComplete);
-                if (template) {
-                    template.drawPreview();
-                }
+            if (postOnly) {
+                const { token } = this.actor;
+                const attack = this.getAttackData(0);
+                // don't include any hits
+                delete attack?.hits;
+                // generate chat data
+                createChatData({
+                    header: {
+                        name: this.name,
+                        img: this.img,
+                    },
+                    testName: this.getRollName(),
+                    actor: this.actor,
+                    tokenId: token ? `${token.scene._id}.${token.id}` : undefined,
+                    description: this.getChatData(),
+                    item: this,
+                    previewTemplate: this.hasTemplate,
+                    attack,
+                    ...bonus,
+                }).then((chatData) => {
+                    // create the message
+                    return ChatMessage.create(chatData, { displaySheet: false });
+                });
             } else {
-                onComplete();
+                this.rollTest(event);
             }
         };
         // prompt user if needed

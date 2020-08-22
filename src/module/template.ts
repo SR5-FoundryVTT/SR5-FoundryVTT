@@ -42,7 +42,7 @@ class Template extends MeasuredTemplate {
         return template;
     }
 
-    drawPreview(event?: Event) {
+    drawPreview() {
         const initialLayer = canvas.activeLayer;
         // @ts-ignore
         this.draw();
@@ -51,9 +51,6 @@ class Template extends MeasuredTemplate {
         // @ts-ignore
         this.layer.preview.addChild(this);
         this.activatePreviewListeners(initialLayer);
-        if (this.item && this.item.actor) {
-            this.item.actor?.sheet?.minimize();
-        }
     }
 
     activatePreviewListeners(initialLayer: CanvasLayer) {
@@ -83,10 +80,6 @@ class Template extends MeasuredTemplate {
             canvas.app.view.onwheel = null;
             initialLayer.activate();
 
-            if (this.item && this.item.actor) {
-                // @ts-ignore
-                this.item.actor?.sheet?.maximize();
-            }
             if (this.onComplete) this.onComplete();
         };
 
