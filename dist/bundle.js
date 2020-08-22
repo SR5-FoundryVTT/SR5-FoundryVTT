@@ -2754,7 +2754,7 @@ class BaseActorPrep {
         initiative.astral.base.base = attributes.intuition.value * 2 + Number(modifiers['astral_initiative']);
         initiative.astral.dice.base = 2 + Number(modifiers['astral_initiative_dice']);
         initiative.matrix.base.base = attributes.intuition.value + this.data.matrix.data_processing.value + Number(modifiers['matrix_initiative']);
-        initiative.matrix.dice.base = matrix.hot_sim ? 4 : 3 + Number(modifiers['matrix_initiative_dice']);
+        initiative.matrix.dice.base = (matrix.hot_sim ? 4 : 3) + Number(modifiers['matrix_initiative_dice']);
         if (initiative.perception === 'matrix')
             initiative.current = initiative.matrix;
         else if (initiative.perception === 'astral')
