@@ -43,7 +43,7 @@ export class PartsList<TType> {
                             actualParts.push({
                                 name: (value as ModListEntry<TType>).name,
                                 value: (value as ModListEntry<TType>).value,
-                            })
+                            });
                         } else {
                             actualParts.push({
                                 name,

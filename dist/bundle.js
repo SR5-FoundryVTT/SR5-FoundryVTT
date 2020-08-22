@@ -7898,7 +7898,6 @@ class PartsList {
                         }
                     }
                 }
-                parts = actualParts;
             }
         }
         this._list = actualParts;
