@@ -2,13 +2,13 @@
     "name": "shadowrun5e",
     "title": "Shadowrun 5th Edition",
     "description": "Shadowrun 5th Edition game",
-    "version": "0.6.8",
+    "version": "0.6.9",
     "templateVersion": "1.4",
     "author": "Shawn Milligan [n3rf_herder#9026], Andrew Cuccinello [DJ#1982]",
     "esmodules": ["dist/bundle.js", "pdfoundry-dist/bundle.js"],
     "styles": ["dist/bundle.css"],
     "minimumCoreVersion": "0.6.0",
-    "compatibleCoreVersion": "0.6.1",
+    "compatibleCoreVersion": "0.6.5",
     "languages": [
         {
             "lang": "en",
@@ -30,5 +30,5 @@
     "socket": true,
     "manifest": "https://raw.githubusercontent.com/smilligan93/SR5-FoundryVTT/master/system.json",
     "url": "https://github.com/smilligan93/SR5-FoundryVTT",
-    "download": "https://github.com/smilligan93/SR5-FoundryVTT/archive/v0.6.8.zip"
+    "download": "https://github.com/smilligan93/SR5-FoundryVTT/archive/v0.6.9.zip"
 }
