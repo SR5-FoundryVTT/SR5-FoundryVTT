@@ -7948,11 +7948,15 @@ class PartsList {
         }
     }
     getMessageOutput() {
-        const mods = {};
-        for (const part of this._list) {
-            mods[part.name] = part.value;
-        }
-        return mods;
+        return this.list;
+        // const mods = {};
+        // for (const part of this._list) {
+        //     if (mods[part.name] !== undefined) {
+        //     } else {
+        //         mods[part.name] = part.value;
+        //     }
+        // }
+        // return mods;
     }
     static AddUniquePart(list, name, value, overwrite = true) {
         const parts = new PartsList(list);

@@ -80,12 +80,16 @@ export class PartsList<TType> {
         }
     }
 
-    getMessageOutput(): { [name: string]: TType } {
-        const mods = {};
-        for (const part of this._list) {
-            mods[part.name] = part.value;
-        }
-        return mods;
+    getMessageOutput() {
+        return this.list;
+        // const mods = {};
+        // for (const part of this._list) {
+        //     if (mods[part.name] !== undefined) {
+        //     } else {
+        //         mods[part.name] = part.value;
+        //     }
+        // }
+        // return mods;
     }
 
     static AddUniquePart<TType>(list: ModList<TType>, name: string, value: TType, overwrite = true): ModList<TType> {

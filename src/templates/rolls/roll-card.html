@@ -144,7 +144,7 @@
             <div class="roll-parts">
                 {{#each parts as |part id|}}
                 <div class="limit-line">
-                    <span class="key" title="{{localize id}}">{{localize id}}:</span> <span class="value">{{part}}</span>
+                    <span class="key" title="{{localize part.name}}">{{localize part.name}}:</span> <span class="value">{{part.value}}</span>
                 </div>
                 {{/each}} {{#if (isDefined dicePool)}}
                 <div class="limit-line">
