@@ -2605,8 +2605,6 @@ class BaseActorPrep {
             // add labels
             attribute.label = CONFIG.SR5.attributes[key];
         }
-        // CALCULATE RECOIL
-        this.data.recoil_compensation = 1 + Math.ceil(attributes.strength.value / 3);
     }
     /**
      * Prepare actor data for skills
