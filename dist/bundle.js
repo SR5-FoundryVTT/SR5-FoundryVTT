@@ -4311,7 +4311,7 @@ exports.addRollListeners = (app, html) => {
         event.preventDefault();
         if (item) {
             const template = template_1.default.fromItem(item);
-            template === null || template === void 0 ? void 0 : template.drawPreview(event);
+            template === null || template === void 0 ? void 0 : template.drawPreview();
         }
     });
     html.on('click', '.card-title', (event) => {
@@ -7899,7 +7899,6 @@ class PartsList {
                     }
                 }
                 parts = actualParts;
-                console.log(parts);
             }
         }
         this._list = actualParts;

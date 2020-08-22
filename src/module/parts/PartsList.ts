@@ -52,8 +52,6 @@ export class PartsList<TType> {
                         }
                     }
                 }
-                parts = actualParts;
-                console.log(parts);
             }
         }
         this._list = actualParts;
