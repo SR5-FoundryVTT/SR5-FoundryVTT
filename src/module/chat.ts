@@ -26,6 +26,7 @@ export type TemplateData = {
     incomingDrain?: LabelField & {
         value: number;
     };
+    hits?: number;
     soak?: DamageData;
     tests?: {
         label: string;

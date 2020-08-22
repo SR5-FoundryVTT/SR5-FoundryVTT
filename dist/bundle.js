@@ -8087,11 +8087,25 @@ class ShadowrunRoller {
             // start of custom message
             const dice = roll === null || roll === void 0 ? void 0 : roll.parts[0].rolls;
             const token = actor === null || actor === void 0 ? void 0 : actor.token;
+            let glitch = false;
+            if (roll !== undefined) {
+                let oneCount = 0;
+                roll.dice.forEach((die) => {
+                    die.rolls.forEach((result) => {
+                        if (result.roll === 1) {
+                            oneCount += 1;
+                        }
+                    });
+                });
+                console.log(oneCount);
+                console.log(roll.total);
+                glitch = oneCount > Math.floor(parts.total / 2);
+            }
             const templateData = Object.assign({ actor: actor, header: {
                     name: name || '',
                     img: img || '',
                 }, tokenId: token ? `${token.scene._id}.${token.id}` : undefined, dice,
-                limit, testName: title, dicePool: parts.total, parts: parts.list, hits: roll === null || roll === void 0 ? void 0 : roll.total }, props);
+                limit, testName: title, dicePool: parts.total, parts: parts.list, hits: roll === null || roll === void 0 ? void 0 : roll.total, glitch }, props);
             if (roll) {
                 roll.templateData = templateData;
             }

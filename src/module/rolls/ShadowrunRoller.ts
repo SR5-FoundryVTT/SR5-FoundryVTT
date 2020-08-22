@@ -163,6 +163,21 @@ export class ShadowrunRoller {
         // start of custom message
         const dice = roll?.parts[0].rolls;
         const token = actor?.token;
+
+        let glitch = false;
+        if (roll !== undefined) {
+            let oneCount = 0;
+            roll.dice.forEach((die) => {
+                die.rolls.forEach((result) => {
+                    if (result.roll === 1) {
+                        oneCount += 1;
+                    }
+                });
+            });
+            console.log(oneCount);
+            console.log(roll.total);
+            glitch = oneCount > Math.floor(parts.total / 2);
+        }
         const templateData = {
             actor: actor,
             header: {
@@ -176,6 +191,7 @@ export class ShadowrunRoller {
             dicePool: parts.total,
             parts: parts.list,
             hits: roll?.total,
+            glitch,
             ...props,
         };
 

@@ -163,6 +163,13 @@
         {{/each}}
     </div>
     {{/if}}
+    {{#if glitch}}
+    <div class="glitch-content">
+        <div class="glitch" data-glitch="{{localize 'SR5.Glitch'}}">
+            {{localize "SR5.Glitch"}}
+        </div>
+    </div>
+    {{/if}}
     {{#if tests}}
     <div class="card-buttons">
         {{#each tests as |test index|}}

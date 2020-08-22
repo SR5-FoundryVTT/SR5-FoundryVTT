@@ -484,6 +484,7 @@
     "SR5.Family": "Family",
 
     "SR5.DamageResistanceTest": "Damage Resistance Test",
+    "SR5.Glitch": "Glitch!",
 
     "SR5.OpenSourcePdf": "Open Source PDF to the item",
     "SR5.SourceFieldEmptyError": "The Source field is empty, please enter valid text for the source",
