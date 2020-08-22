@@ -45,7 +45,14 @@
     },
     "ERROR": {
       "NoPDFWithCode": "Unable to find PDF with specified code.",
-      "NoPDFWithName": "Unable to find PDF with specified name."
+      "NoPDFWithName": "Unable to find PDF with specified name.",
+      "PageMustBePositive": "Page must be greater than or equal to 1."
+    },
+    "ENRICH": {
+      "InvalidFormat": "Invalid format for @PDF tag.",
+      "EmptyLinkText": "Link text is required for @PDF tags.",
+      "LinkTitleOpen": "Open",
+      "LinkTitlePage": "p."
     },
     "SETTINGS": {
       "OpenHelp": "Open PDFoundry Manual",

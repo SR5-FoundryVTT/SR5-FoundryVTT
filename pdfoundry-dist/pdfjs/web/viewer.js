@@ -342,6 +342,8 @@ const ViewOnLoad = {
   PREVIOUS: 0,
   INITIAL: 1
 };
+const KNOWN_VERSIONS = ["1.0", "1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7", "1.8", "1.9", "2.0", "2.1", "2.2", "2.3"];
+const KNOWN_GENERATORS = ["acrobat distiller", "acrobat pdfwriter", "adobe livecycle", "adobe pdf library", "adobe photoshop", "ghostscript", "tcpdf", "cairo", "dvipdfm", "dvips", "pdftex", "pdfkit", "itext", "prince", "quarkxpress", "mac os x", "microsoft", "openoffice", "oracle", "luradocument", "pdf-xchange", "antenna house", "aspose.cells", "fpdf"];
 
 class DefaultExternalServices {
   constructor() {
@@ -428,8 +430,7 @@ const PDFViewerApplication = {
   externalServices: DefaultExternalServices,
   _boundEvents: {},
   contentDispositionFilename: null,
-  _hasInteracted: false,
-  _delayedFallbackFeatureIds: [],
+  triggerDelayedFallback: null,
 
   async initialize(appConfig) {
     this.preferences = this.externalServices.createPreferences();
@@ -819,6 +820,7 @@ const PDFViewerApplication = {
     this.url = "";
     this.baseUrl = "";
     this.contentDispositionFilename = null;
+    this.triggerDelayedFallback = null;
     this.pdfSidebar.reset();
     this.pdfOutlineViewer.reset();
     this.pdfAttachmentViewer.reset();
@@ -958,17 +960,25 @@ const PDFViewerApplication = {
     }).catch(downloadByUrl);
   },
 
-  _recordFallbackErrorTelemetry(featureId) {},
+  _delayedFallback(featureId) {
+    this.externalServices.reportTelemetry({
+      type: "unsupportedFeature",
+      featureId
+    });
+
+    if (!this.triggerDelayedFallback) {
+      this.triggerDelayedFallback = () => {
+        this.fallback(featureId);
+        this.triggerDelayedFallback = null;
+      };
+    }
+  },
 
   fallback(featureId) {
-    if (featureId) {
-      this._recordFallbackErrorTelemetry(featureId);
-    }
-
-    if (this._delayedFallbackFeatureIds.length >= 1 && this._hasInteracted) {
-      featureId = this._delayedFallbackFeatureIds[0];
-      this._delayedFallbackFeatureIds = [];
-    }
+    this.externalServices.reportTelemetry({
+      type: "unsupportedFeature",
+      featureId
+    });
 
     if (this.fellback) {
       return;
@@ -1250,9 +1260,7 @@ const PDFViewerApplication = {
 
         console.warn("Warning: JavaScript is not supported");
 
-        this._delayedFallbackFeatureIds.push(_pdfjsLib.UNSUPPORTED_FEATURES.javaScript);
-
-        this._recordFallbackErrorTelemetry(_pdfjsLib.UNSUPPORTED_FEATURES.javaScript);
+        this._delayedFallback(_pdfjsLib.UNSUPPORTED_FEATURES.javaScript);
 
         return true;
       });
@@ -1317,20 +1325,16 @@ const PDFViewerApplication = {
     if (info.IsAcroFormPresent) {
       console.warn("Warning: AcroForm/XFA is not supported");
 
-      this._delayedFallbackFeatureIds.push(_pdfjsLib.UNSUPPORTED_FEATURES.forms);
-
-      this._recordFallbackErrorTelemetry(_pdfjsLib.UNSUPPORTED_FEATURES.forms);
+      this._delayedFallback(_pdfjsLib.UNSUPPORTED_FEATURES.forms);
     }
 
     let versionId = "other";
-    const KNOWN_VERSIONS = ["1.0", "1.1", "1.2", "1.3", "1.4", "1.5", "1.6", "1.7", "1.8", "1.9", "2.0", "2.1", "2.2", "2.3"];
 
     if (KNOWN_VERSIONS.includes(info.PDFFormatVersion)) {
       versionId = `v${info.PDFFormatVersion.replace(".", "_")}`;
     }
 
     let generatorId = "other";
-    const KNOWN_GENERATORS = ["acrobat distiller", "acrobat pdfwriter", "adobe livecycle", "adobe pdf library", "adobe photoshop", "ghostscript", "tcpdf", "cairo", "dvipdfm", "dvips", "pdftex", "pdfkit", "itext", "prince", "quarkxpress", "mac os x", "microsoft", "openoffice", "oracle", "luradocument", "pdf-xchange", "antenna house", "aspose.cells", "fpdf"];
 
     if (info.Producer) {
       const producer = info.Producer.toLowerCase();
@@ -2425,10 +2429,8 @@ function webViewerWheel(evt) {
 }
 
 function webViewerClick(evt) {
-  PDFViewerApplication._hasInteracted = true;
-
-  if (PDFViewerApplication._delayedFallbackFeatureIds.length >= 1 && PDFViewerApplication.pdfViewer.containsElement(evt.target)) {
-    PDFViewerApplication.fallback();
+  if (PDFViewerApplication.triggerDelayedFallback && PDFViewerApplication.pdfViewer.containsElement(evt.target)) {
+    PDFViewerApplication.triggerDelayedFallback();
   }
 
   if (!PDFViewerApplication.secondaryToolbar.isOpen) {
@@ -2444,10 +2446,8 @@ function webViewerClick(evt) {
 
 function webViewerKeyUp(evt) {
   if (evt.keyCode === 9) {
-    PDFViewerApplication._hasInteracted = true;
-
-    if (PDFViewerApplication._delayedFallbackFeatureIds.length >= 1) {
-      PDFViewerApplication.fallback();
+    if (PDFViewerApplication.triggerDelayedFallback) {
+      PDFViewerApplication.triggerDelayedFallback();
     }
   }
 }
@@ -9833,9 +9833,8 @@ class BaseViewer {
       return pagesOverview;
     }
 
-    const isFirstPagePortrait = (0, _ui_utils.isPortraitOrientation)(pagesOverview[0]);
     return pagesOverview.map(function (size) {
-      if (isFirstPagePortrait === (0, _ui_utils.isPortraitOrientation)(size)) {
+      if ((0, _ui_utils.isPortraitOrientation)(size)) {
         return size;
       }
 
