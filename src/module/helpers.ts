@@ -13,6 +13,7 @@ export class Helpers {
         if (data.mod === undefined) data.mod = [];
         const parts = new PartsList(data.mod);
         data.value = parts.total + data.base;
+        data.mod = parts.list;
         return data.value;
     }
 

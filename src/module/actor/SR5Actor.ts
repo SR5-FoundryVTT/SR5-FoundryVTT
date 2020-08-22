@@ -17,6 +17,8 @@ import { SYSTEM_NAME } from '../constants';
 import { BaseActorPrep } from './prep/BaseActorPrep';
 import SR5ActorType = Shadowrun.SR5ActorType;
 import { PartsList } from '../parts/PartsList';
+import DamageData = Shadowrun.DamageData;
+import DamageElement = Shadowrun.DamageElement;
 
 export class SR5Actor extends Actor {
     async update(data, options?) {
@@ -265,7 +267,7 @@ export class SR5Actor extends Actor {
     }
 
     rollDefense(options: DefenseRollOptions = {}, partsProps: ModList<number> = []) {
-        const parts = new PartsList(partsProps)
+        const parts = new PartsList(partsProps);
         this._addDefenseParts(parts);
         // full defense is always added
         const activeDefenses = {
@@ -351,12 +353,12 @@ export class SR5Actor extends Actor {
 
                                     if (netHits >= 0) {
                                         const damage = incomingAttack.damage;
-                                        PartsList.AddUniquePart(damage.mod, 'SR5.NetHits', netHits);
+                                        damage.mod = PartsList.AddUniquePart(damage.mod, 'SR5.NetHits', netHits);
                                         damage.value = Helpers.calcTotal(damage);
 
                                         const soakRollOptions = {
                                             event: event,
-                                            damage: incomingAttack.damage,
+                                            damage: damage,
                                         };
                                         await this.rollSoak(soakRollOptions);
                                     }
@@ -383,7 +385,7 @@ export class SR5Actor extends Actor {
         return new Promise((resolve) => {
             renderTemplate(template, dialogData).then((dlg) => {
                 new Dialog({
-                    title: 'SR5.DamageResistanceTest',
+                    title: game.i18n.localize('SR5.DamageResistanceTest'),
                     content: dlg,
                     buttons: {
                         continue: {
@@ -397,12 +399,41 @@ export class SR5Actor extends Actor {
                     close: async (html) => {
                         if (cancel) return;
 
+                        const soak: DamageData = options?.damage
+                            ? options.damage
+                            : {
+                                  base: 0,
+                                  value: 0,
+                                  mod: [],
+                                  ap: {
+                                      base: 0,
+                                      value: 0,
+                                      mod: [],
+                                  },
+                                  attribute: '' as const,
+                                  type: {
+                                      base: '',
+                                      value: '',
+                                  },
+                                  element: {
+                                      base: '',
+                                      value: '',
+                                  },
+                              };
+
                         const armor = this.getArmor();
-                        const armorId = Helpers.parseInputToString($(html).find('[name=element]').val());
 
-                        const bonusArmor = armor[armorId] || 0;
-                        if (bonusArmor) parts.addUniquePart(CONFIG.SR5.elementTypes[armorId], bonusArmor);
+                        // handle element changes
+                        const element = Helpers.parseInputToString($(html).find('[name=element]').val());
+                        if (element) {
+                            soak.element.value = element as DamageElement;
+                        }
+                        const bonusArmor = armor[element] ?? 0;
+                        if (bonusArmor) {
+                            parts.addUniquePart(CONFIG.SR5.elementTypes[element], bonusArmor);
+                        }
 
+                        // handle ap changes
                         const ap = Helpers.parseInputToNumber($(html).find('[name=ap]').val());
                         if (ap) {
                             let armorVal = armor.value + bonusArmor;
@@ -411,12 +442,34 @@ export class SR5Actor extends Actor {
                             parts.addUniquePart('SR5.AP', Math.max(ap, -armorVal));
                         }
 
+                        // handle incoming damage changes
+                        const incomingDamage = Helpers.parseInputToNumber($(html).find('[name=incomingDamage]').val());
+                        if (incomingDamage) {
+                            const totalDamage = Helpers.calcTotal(soak);
+                            if (totalDamage !== incomingDamage) {
+                                const diff = incomingDamage - totalDamage;
+                                // add part and calc total again
+                                soak.mod = PartsList.AddUniquePart(soak.mod, 'SR5.UserInput', diff);
+                                soak.value = Helpers.calcTotal(soak);
+                                console.log(soak);
+                            }
+                            console.log(soak);
+
+                            const totalAp = Helpers.calcTotal(soak.ap);
+                            if (totalAp !== ap) {
+                                const diff = ap - totalAp;
+                                // add part and calc total
+                                soak.ap.mod = PartsList.AddUniquePart(soak.ap.mod, 'SR5.UserInput', diff);
+                                soak.ap.value = Helpers.calcTotal(soak.ap);
+                            }
+                        }
+
                         let title = game.i18n.localize('SR5.SoakTest');
                         resolve(
                             ShadowrunRoller.advancedRoll({
                                 event: options?.event,
                                 actor: this,
-                                soak: options?.damage,
+                                soak: soak,
                                 parts: parts.list,
                                 title: title,
                                 wounds: false,

@@ -1267,11 +1267,11 @@ class SR5Actor extends Actor {
                                 let netHits = attackerHits - defenderHits;
                                 if (netHits >= 0) {
                                     const damage = incomingAttack.damage;
-                                    PartsList_1.PartsList.AddUniquePart(damage.mod, 'SR5.NetHits', netHits);
+                                    damage.mod = PartsList_1.PartsList.AddUniquePart(damage.mod, 'SR5.NetHits', netHits);
                                     damage.value = helpers_1.Helpers.calcTotal(damage);
                                     const soakRollOptions = {
                                         event: event,
-                                        damage: incomingAttack.damage,
+                                        damage: damage,
                                     };
                                     yield this.rollSoak(soakRollOptions);
                                 }
@@ -1296,7 +1296,7 @@ class SR5Actor extends Actor {
         return new Promise((resolve) => {
             renderTemplate(template, dialogData).then((dlg) => {
                 new Dialog({
-                    title: 'SR5.DamageResistanceTest',
+                    title: game.i18n.localize('SR5.DamageResistanceTest'),
                     content: dlg,
                     buttons: {
                         continue: {
@@ -1308,24 +1308,71 @@ class SR5Actor extends Actor {
                         },
                     },
                     close: (html) => __awaiter(this, void 0, void 0, function* () {
+                        var _a;
                         if (cancel)
                             return;
+                        const soak = (options === null || options === void 0 ? void 0 : options.damage) ? options.damage
+                            : {
+                                base: 0,
+                                value: 0,
+                                mod: [],
+                                ap: {
+                                    base: 0,
+                                    value: 0,
+                                    mod: [],
+                                },
+                                attribute: '',
+                                type: {
+                                    base: '',
+                                    value: '',
+                                },
+                                element: {
+                                    base: '',
+                                    value: '',
+                                },
+                            };
                         const armor = this.getArmor();
-                        const armorId = helpers_1.Helpers.parseInputToString($(html).find('[name=element]').val());
-                        const bonusArmor = armor[armorId] || 0;
-                        if (bonusArmor)
-                            parts.addUniquePart(CONFIG.SR5.elementTypes[armorId], bonusArmor);
+                        // handle element changes
+                        const element = helpers_1.Helpers.parseInputToString($(html).find('[name=element]').val());
+                        if (element) {
+                            soak.element.value = element;
+                        }
+                        const bonusArmor = (_a = armor[element]) !== null && _a !== void 0 ? _a : 0;
+                        if (bonusArmor) {
+                            parts.addUniquePart(CONFIG.SR5.elementTypes[element], bonusArmor);
+                        }
+                        // handle ap changes
                         const ap = helpers_1.Helpers.parseInputToNumber($(html).find('[name=ap]').val());
                         if (ap) {
                             let armorVal = armor.value + bonusArmor;
                             // don't take more AP than armor
                             parts.addUniquePart('SR5.AP', Math.max(ap, -armorVal));
                         }
+                        // handle incoming damage changes
+                        const incomingDamage = helpers_1.Helpers.parseInputToNumber($(html).find('[name=incomingDamage]').val());
+                        if (incomingDamage) {
+                            const totalDamage = helpers_1.Helpers.calcTotal(soak);
+                            if (totalDamage !== incomingDamage) {
+                                const diff = incomingDamage - totalDamage;
+                                // add part and calc total again
+                                soak.mod = PartsList_1.PartsList.AddUniquePart(soak.mod, 'SR5.UserInput', diff);
+                                soak.value = helpers_1.Helpers.calcTotal(soak);
+                                console.log(soak);
+                            }
+                            console.log(soak);
+                            const totalAp = helpers_1.Helpers.calcTotal(soak.ap);
+                            if (totalAp !== ap) {
+                                const diff = ap - totalAp;
+                                // add part and calc total
+                                soak.ap.mod = PartsList_1.PartsList.AddUniquePart(soak.ap.mod, 'SR5.UserInput', diff);
+                                soak.ap.value = helpers_1.Helpers.calcTotal(soak.ap);
+                            }
+                        }
                         let title = game.i18n.localize('SR5.SoakTest');
                         resolve(ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
                             event: options === null || options === void 0 ? void 0 : options.event,
                             actor: this,
-                            soak: options === null || options === void 0 ? void 0 : options.damage,
+                            soak: soak,
                             parts: parts.list,
                             title: title,
                             wounds: false,
@@ -2588,6 +2635,7 @@ class BaseActorPrep {
      * Prepare actor data for attributes
      */
     prepareAttributes() {
+        var _a;
         const { attributes } = this.data;
         // hide attributes if we aren't special
         attributes.magic.hidden = !(this.data.special === 'magic');
@@ -2600,7 +2648,7 @@ class BaseActorPrep {
             if (typeof attribute.mod === 'object') {
                 attribute.mod = new PartsList_1.PartsList(attribute.mod).list;
             }
-            PartsList_1.PartsList.AddUniquePart(attribute.mod, 'SR5.Temporary', attribute.temp);
+            attribute.mod = PartsList_1.PartsList.AddUniquePart(attribute.mod, 'SR5.Temporary', (_a = attribute.temp) !== null && _a !== void 0 ? _a : 0);
             helpers_1.Helpers.calcTotal(attribute);
             // add labels
             attribute.label = CONFIG.SR5.attributes[key];
@@ -2624,7 +2672,7 @@ class BaseActorPrep {
                 skill.base = 0;
             if ((_a = skill.bonus) === null || _a === void 0 ? void 0 : _a.length) {
                 for (let bonus of skill.bonus) {
-                    PartsList_1.PartsList.AddUniquePart(skill.mod, bonus.key, bonus.value);
+                    skill.mod = PartsList_1.PartsList.AddUniquePart(skill.mod, bonus.key, bonus.value);
                 }
             }
             helpers_1.Helpers.calcTotal(skill);
@@ -4839,6 +4887,7 @@ class Helpers {
             data.mod = [];
         const parts = new PartsList_1.PartsList(data.mod);
         data.value = parts.total + data.base;
+        data.mod = parts.list;
         return data.value;
     }
     // replace 'SR5.'s on keys with 'SR5_DOT_'
@@ -5494,9 +5543,9 @@ class SR5Item extends Item {
             });
             if (equippedAmmo) {
                 // add mods to damage from ammo
-                PartsList_1.PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name, equippedAmmo.data.data.damage);
+                action.damage.mod = PartsList_1.PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name, equippedAmmo.data.data.damage);
                 // add mods to ap from ammo
-                PartsList_1.PartsList.AddUniquePart(action.damage.ap.mod, equippedAmmo.name, equippedAmmo.data.data.ap);
+                action.damage.ap.mod = PartsList_1.PartsList.AddUniquePart(action.damage.ap.mod, equippedAmmo.name, equippedAmmo.data.data.ap);
                 // override element
                 if (equippedAmmo.data.data.element) {
                     action.damage.element.value = equippedAmmo.data.data.element;
@@ -5525,13 +5574,13 @@ class SR5Item extends Item {
                 if (action.damage.attribute) {
                     const { attribute } = action.damage;
                     // TODO convert this in the template
-                    PartsList_1.PartsList.AddUniquePart(action.damage.mod, game.i18n.localize(CONFIG.SR5.attributes[attribute]), (_a = this.actor.findAttribute(attribute)) === null || _a === void 0 ? void 0 : _a.value);
+                    action.damage.mod = PartsList_1.PartsList.AddUniquePart(action.damage.mod, game.i18n.localize(CONFIG.SR5.attributes[attribute]), (_a = this.actor.findAttribute(attribute)) === null || _a === void 0 ? void 0 : _a.value);
                     action.damage.value = helpers_1.Helpers.calcTotal(action.damage);
                 }
                 if (action.limit.attribute) {
                     const { attribute } = action.limit;
                     // TODO convert this in the template
-                    PartsList_1.PartsList.AddUniquePart(action.limit.mod, game.i18n.localize(CONFIG.SR5.limits[attribute]), (_b = this.actor.findLimit(attribute)) === null || _b === void 0 ? void 0 : _b.value);
+                    action.limit.mod = PartsList_1.PartsList.AddUniquePart(action.limit.mod, game.i18n.localize(CONFIG.SR5.limits[attribute]), (_b = this.actor.findLimit(attribute)) === null || _b === void 0 ? void 0 : _b.value);
                     action.limit.value = helpers_1.Helpers.calcTotal(action.limit);
                 }
             }
@@ -7840,13 +7889,22 @@ class PartsList {
             if (Array.isArray(parts)) {
                 actualParts = parts;
             }
-            if (!Array.isArray(parts) && typeof parts === 'object') {
+            else if (typeof parts === 'object') {
                 for (const [name, value] of Object.entries(parts)) {
                     if (value !== null && value !== undefined) {
-                        actualParts.push({
-                            name,
-                            value,
-                        });
+                        // if it's a number, we are dealing with an array as an object
+                        if (!isNaN(Number(name)) && typeof value === 'object') {
+                            actualParts.push({
+                                name: value.name,
+                                value: value.value,
+                            });
+                        }
+                        else {
+                            actualParts.push({
+                                name,
+                                value,
+                            });
+                        }
                     }
                 }
                 parts = actualParts;

@@ -35,14 +35,21 @@ export class PartsList<TType> {
         if (parts) {
             if (Array.isArray(parts)) {
                 actualParts = parts;
-            }
-            if (!Array.isArray(parts) && typeof parts === 'object') {
+            } else if (typeof parts === 'object') {
                 for (const [name, value] of Object.entries(parts)) {
                     if (value !== null && value !== undefined) {
-                        actualParts.push({
-                            name,
-                            value,
-                        } as ModListEntry<TType>);
+                        // if it's a number, we are dealing with an array as an object
+                        if (!isNaN(Number(name)) && typeof value === 'object') {
+                            actualParts.push({
+                                name: (value as ModListEntry<TType>).name,
+                                value: (value as ModListEntry<TType>).value,
+                            })
+                        } else {
+                            actualParts.push({
+                                name,
+                                value,
+                            } as ModListEntry<TType>);
+                        }
                     }
                 }
                 parts = actualParts;

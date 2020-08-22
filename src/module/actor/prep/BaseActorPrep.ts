@@ -164,7 +164,7 @@ export class BaseActorPrep {
             if (typeof attribute.mod === 'object') {
                 attribute.mod = new PartsList(attribute.mod).list;
             }
-            PartsList.AddUniquePart(attribute.mod, 'SR5.Temporary', attribute.temp);
+            attribute.mod = PartsList.AddUniquePart(attribute.mod, 'SR5.Temporary', attribute.temp ?? 0);
             Helpers.calcTotal(attribute);
             // add labels
             attribute.label = CONFIG.SR5.attributes[key];
@@ -187,7 +187,7 @@ export class BaseActorPrep {
             if (!skill.base) skill.base = 0;
             if (skill.bonus?.length) {
                 for (let bonus of skill.bonus) {
-                    PartsList.AddUniquePart(skill.mod, bonus.key, bonus.value);
+                    skill.mod = PartsList.AddUniquePart(skill.mod, bonus.key, bonus.value);
                 }
             }
             Helpers.calcTotal(skill);

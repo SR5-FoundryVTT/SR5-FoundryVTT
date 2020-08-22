@@ -173,9 +173,9 @@ export class SR5Item extends Item {
 
             if (equippedAmmo) {
                 // add mods to damage from ammo
-                PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name, equippedAmmo.data.data.damage);
+                action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name, equippedAmmo.data.data.damage);
                 // add mods to ap from ammo
-                PartsList.AddUniquePart(action.damage.ap.mod, equippedAmmo.name, equippedAmmo.data.data.ap);
+                action.damage.ap.mod = PartsList.AddUniquePart(action.damage.ap.mod, equippedAmmo.name, equippedAmmo.data.data.ap);
 
                 // override element
                 if (equippedAmmo.data.data.element) {
@@ -206,7 +206,7 @@ export class SR5Item extends Item {
                 if (action.damage.attribute) {
                     const { attribute } = action.damage;
                     // TODO convert this in the template
-                    PartsList.AddUniquePart(
+                    action.damage.mod = PartsList.AddUniquePart(
                         action.damage.mod,
                         game.i18n.localize(CONFIG.SR5.attributes[attribute]),
                         this.actor.findAttribute(attribute)?.value,
@@ -216,7 +216,7 @@ export class SR5Item extends Item {
                 if (action.limit.attribute) {
                     const { attribute } = action.limit;
                     // TODO convert this in the template
-                    PartsList.AddUniquePart(action.limit.mod, game.i18n.localize(CONFIG.SR5.limits[attribute]), this.actor.findLimit(attribute)?.value);
+                    action.limit.mod = PartsList.AddUniquePart(action.limit.mod, game.i18n.localize(CONFIG.SR5.limits[attribute]), this.actor.findLimit(attribute)?.value);
                     action.limit.value = Helpers.calcTotal(action.limit);
                 }
             }
