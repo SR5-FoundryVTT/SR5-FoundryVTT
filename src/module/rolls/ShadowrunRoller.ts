@@ -50,6 +50,7 @@ export interface AdvancedRollProps extends BasicRollProps {
 
 export class ShadowrunRoll extends Roll {
     templateData: TemplateData | undefined;
+    // add class Roll to the json so dice-so-nice works
     toJSON(): any {
         const data = super.toJSON();
         data.class = 'Roll';
@@ -178,7 +179,9 @@ export class ShadowrunRoller {
             ...props,
         };
 
-        roll.templateData = templateData;
+        if (roll) {
+            roll.templateData = templateData;
+        }
 
         if (!hideRollMessage) {
             const chatData = await createChatData(templateData, roll);
@@ -261,7 +264,7 @@ export class ShadowrunRoller {
 
                         const dicePoolValue = Helpers.parseInputToNumber($(html).find('[name="dice_pool"]').val());
 
-                        if (dialogOptions?.prompt && dicePoolValue > 0) {
+                        if (dialogOptions?.prompt) {
                             parts.clear();
                             await game.user.setFlag(SYSTEM_NAME, 'lastRollPromptValue', dicePoolValue);
                             parts.addUniquePart('SR5.Base', dicePoolValue);
@@ -298,6 +301,7 @@ export class ShadowrunRoller {
                         if (edge && actor) {
                             props.explodeSixes = true;
                             parts.addUniquePart('SR5.PushTheLimit', actor.getEdge().max);
+                            delete props.limit;
                             await actor.update({
                                 'data.attributes.edge.value': actor.data.data.attributes.edge.value - 1,
                             });

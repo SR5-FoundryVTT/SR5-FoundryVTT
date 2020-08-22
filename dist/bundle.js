@@ -7947,6 +7947,7 @@ const chat_1 = require("../chat");
 const constants_1 = require("../constants");
 const PartsList_1 = require("../parts/PartsList");
 class ShadowrunRoll extends Roll {
+    // add class Roll to the json so dice-so-nice works
     toJSON() {
         const data = super.toJSON();
         data.class = 'Roll';
@@ -8033,7 +8034,9 @@ class ShadowrunRoller {
                     img: img || '',
                 }, tokenId: token ? `${token.scene._id}.${token.id}` : undefined, dice,
                 limit, testName: title, dicePool: parts.total, parts: parts.list, hits: roll === null || roll === void 0 ? void 0 : roll.total }, props);
-            roll.templateData = templateData;
+            if (roll) {
+                roll.templateData = templateData;
+            }
             if (!hideRollMessage) {
                 const chatData = yield chat_1.createChatData(templateData, roll);
                 ChatMessage.create(chatData, { displaySheet: false }).then((message) => {
@@ -8108,7 +8111,7 @@ class ShadowrunRoller {
                             return;
                         // get the actual dice_pool from the difference of initial parts and value in the dialog
                         const dicePoolValue = helpers_1.Helpers.parseInputToNumber($(html).find('[name="dice_pool"]').val());
-                        if ((dialogOptions === null || dialogOptions === void 0 ? void 0 : dialogOptions.prompt) && dicePoolValue > 0) {
+                        if (dialogOptions === null || dialogOptions === void 0 ? void 0 : dialogOptions.prompt) {
                             parts.clear();
                             yield game.user.setFlag(constants_1.SYSTEM_NAME, 'lastRollPromptValue', dicePoolValue);
                             parts.addUniquePart('SR5.Base', dicePoolValue);
@@ -8140,6 +8143,7 @@ class ShadowrunRoller {
                         if (edge && actor) {
                             props.explodeSixes = true;
                             parts.addUniquePart('SR5.PushTheLimit', actor.getEdge().max);
+                            delete props.limit;
                             yield actor.update({
                                 'data.attributes.edge.value': actor.data.data.attributes.edge.value - 1,
                             });
