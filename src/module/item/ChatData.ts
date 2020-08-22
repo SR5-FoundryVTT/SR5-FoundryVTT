@@ -215,7 +215,7 @@ export const ChatData = {
             if (data.range.rc) {
                 let rcString = `${game.i18n.localize('SR5.RecoilCompensation')} ${data.range.rc.value}`;
                 if (item?.actor) {
-                    rcString += ` (${game.i18n.localize('SR5.Total')} ${item.actor.data.data.recoil_compensation + data.range.rc.value})`;
+                    rcString += ` (${game.i18n.localize('SR5.Total')} ${item.actor.getRecoilCompensation()})`;
                 }
                 props.push(rcString);
             }

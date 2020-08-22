@@ -134,7 +134,12 @@ export class SR5Actor extends Actor {
     }
 
     getRecoilCompensation(): number {
-        return this.data.data.recoil_compensation ?? 0;
+        let total = 1; // always get 1
+        const strength = this.findAttribute('strength');
+        if (strength) {
+            total += Math.ceil(strength.value / 3);
+        }
+        return total;
     }
 
     addKnowledgeSkill(category, skill?) {

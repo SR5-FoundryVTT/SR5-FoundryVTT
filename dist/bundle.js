@@ -1069,8 +1069,12 @@ class SR5Actor extends Actor {
         return this.items.filter((item) => item.isEquipped() && item.data.type === 'weapon');
     }
     getRecoilCompensation() {
-        var _a;
-        return (_a = this.data.data.recoil_compensation) !== null && _a !== void 0 ? _a : 0;
+        let total = 1; // always get 1
+        const strength = this.findAttribute('strength');
+        if (strength) {
+            total += Math.ceil(strength.value / 3);
+        }
+        return total;
     }
     addKnowledgeSkill(category, skill) {
         const defaultSkill = {
@@ -5267,7 +5271,7 @@ exports.ChatData = {
             if (data.range.rc) {
                 let rcString = `${game.i18n.localize('SR5.RecoilCompensation')} ${data.range.rc.value}`;
                 if (item === null || item === void 0 ? void 0 : item.actor) {
-                    rcString += ` (${game.i18n.localize('SR5.Total')} ${item.actor.data.data.recoil_compensation + data.range.rc.value})`;
+                    rcString += ` (${game.i18n.localize('SR5.Total')} ${item.actor.getRecoilCompensation()})`;
                 }
                 props.push(rcString);
             }
