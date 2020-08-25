@@ -83,6 +83,11 @@
             &:not(:last-child) {
                 border-right: $groove;
             }
+            > .attribute-value {
+                font-size: 125%;
+                width: 100%;
+                text-align: center;
+            }
             > .attribute-name {
                 font-size: 115%;
                 width: 100%;
@@ -131,7 +136,7 @@
                     }
                 }
                 .track-plus {
-                    width: 1.5em;
+                    width: 1em;
                     flex: 0 0;
                     &:after {
                         content: '+';

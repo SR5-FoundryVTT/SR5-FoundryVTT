@@ -1,6 +1,8 @@
 import { Helpers } from './helpers';
 import SR5ItemType = Shadowrun.SR5ItemType;
 import { SR5ItemDataWrapper } from './item/SR5ItemDataWrapper';
+import ModList = Shadowrun.ModList;
+import { PartsList } from './parts/PartsList';
 
 export const preloadHandlebarsTemplates = async () => {
     const templatePaths = [
@@ -13,6 +15,8 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/parts/actor-bio.html',
         'systems/shadowrun5e/dist/templates/actor/parts/actor-social.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/matrix-attribute.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/skills/ActorAttribute.html',
+
         'systems/shadowrun5e/dist/templates/item/parts/description.html',
         'systems/shadowrun5e/dist/templates/item/parts/technology.html',
         'systems/shadowrun5e/dist/templates/item/parts/header.html',
@@ -153,6 +157,11 @@ export const registerHandlebarHelpers = () => {
         }, '');
         return new Handlebars.SafeString(name);
     });
+
+    Handlebars.registerHelper('partsTotal', function (partsList: ModList<number>) {
+        const parts = new PartsList(partsList);
+        return parts.total;
+    })
 
     Handlebars.registerHelper('ItemHeaderIcons', function (id) {
         const PlusIcon = 'fas fa-plus';

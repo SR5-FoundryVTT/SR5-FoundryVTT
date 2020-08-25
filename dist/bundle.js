@@ -4747,6 +4747,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerHandlebarHelpers = exports.preloadHandlebarsTemplates = void 0;
 const helpers_1 = require("./helpers");
 const SR5ItemDataWrapper_1 = require("./item/SR5ItemDataWrapper");
+const PartsList_1 = require("./parts/PartsList");
 exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, function* () {
     const templatePaths = [
         'systems/shadowrun5e/dist/templates/actor/parts/actor-equipment.html',
@@ -4758,6 +4759,7 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/dist/templates/actor/parts/actor-bio.html',
         'systems/shadowrun5e/dist/templates/actor/parts/actor-social.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/matrix-attribute.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/skills/ActorAttribute.html',
         'systems/shadowrun5e/dist/templates/item/parts/description.html',
         'systems/shadowrun5e/dist/templates/item/parts/technology.html',
         'systems/shadowrun5e/dist/templates/item/parts/header.html',
@@ -4908,6 +4910,10 @@ exports.registerHandlebarHelpers = () => {
         }, '');
         return new Handlebars.SafeString(name);
     });
+    Handlebars.registerHelper('partsTotal', function (partsList) {
+        const parts = new PartsList_1.PartsList(partsList);
+        return parts.total;
+    });
     Handlebars.registerHelper('ItemHeaderIcons', function (id) {
         const PlusIcon = 'fas fa-plus';
         const AddText = game.i18n.localize('SR5.Add');
@@ -5017,17 +5023,8 @@ exports.registerHandlebarHelpers = () => {
                 return [editIcon, removeIcon];
         }
     });
-    Handlebars.registerHelper('ListItem', function () {
-        return 'systems/shadowrun5e/dist/templates/common/List/ListItem.html';
-    });
-    Handlebars.registerHelper('ListHeader', function () {
-        return 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html';
-    });
-    Handlebars.registerHelper('ValueInput', function () {
-        return 'systems/shadowrun5e/dist/templates/common/ValueInput.html';
-    });
 };
-},{"./helpers":32,"./item/SR5ItemDataWrapper":35}],32:[function(require,module,exports){
+},{"./helpers":32,"./item/SR5ItemDataWrapper":35,"./parts/PartsList":42}],32:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Helpers = void 0;

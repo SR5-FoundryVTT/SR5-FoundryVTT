@@ -197,6 +197,17 @@ input[type='text'].display {
     }
 }
 
+.show-child-on-hover {
+    .child-on-hover {
+        visibility: hidden;
+    }
+    &:hover {
+        .child-on-hover {
+            visibility: visible;
+        }
+    }
+}
+
 select.display {
     color: $color;
     background: rgba($black, 0.05);

@@ -1,50 +1,9 @@
 <div class="attributes">
     {{#each data.attributes as |attribute a|}} {{#unless attribute.hidden}}
-    <div class="attribute" data-attribute="{{a}}">
-        <div class="attribute-name roll attribute-roll">
-            {{localize attribute.label}}
-        </div>
-        <div class="track">
-            {{#unless attribute.temp}}
-            <div class="attribute-input-container">
-                <input
-                    class="display attribute-input"
-                    type="text"
-                    maxlength="2"
-                    size="2"
-                    name="data.attributes.{{a}}.base"
-                    value="{{attribute.base}}"
-                    data-dtype="Number"
-                    placeholder="1"
-                />
-            </div>
-            {{else}}
-            <div class="attribute-input-container">
-                <input
-                    class="display attribute-input"
-                    type="text"
-                    maxlength="2"
-                    size="2"
-                    value="{{attribute.value}}"
-                    disabled
-                    placeholder="1"
-                />
-            </div>
-            {{/unless}}
-        </div>
-        <div class="attribute-input-container">
-            <input
-                class="display short attribute-input"
-                type="text"
-                maxlength="5"
-                size="5"
-                name="data.attributes.{{a}}.temp"
-                value="{{attribute.temp}}"
-                data-dtype="Number"
-                placeholder="+Tmp"
-            />
-        </div>
-    </div>
+        {{> "systems/shadowrun5e/dist/templates/actor/parts/skills/ActorAttribute.html"
+            attributeId=a
+            attribute=attribute
+        }}
     {{/unless}} {{/each}}
 </div>
 <div class="inventory">
@@ -105,7 +64,7 @@
                             />
                         </div>
                         <div class="item-text item-icons rtg">
-                            <i class="skill-edit roll fas fa-edit" data-skill="{{sid}}"></i>
+                            <i class="skill-edit roll fas fa-edit" data-skill="{{sid}}"></i>c
                         </div>
                     </div>
                 </div>

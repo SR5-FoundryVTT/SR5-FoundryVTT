@@ -40,15 +40,13 @@
     {{/if}}
 
     <div class="attribute-input-container">
-        <input
-            class="display track-input"
+        {{> "systems/shadowrun5e/dist/templates/common/ValueInput.html"
+            cssClass="track-input"
             size="4"
-            maxlength="4"
-            type="text"
-            name="data.matrix.{{key}}.temp"
-            value="{{matrixAtt.temp}}"
-            data-dtype="Number"
+            maxLength="4"
+            value=matrixAtt.temp
             placeholder="+Mod"
-        />
+            name=(buildName part1="data.matrix" part2=key part3="mod.Temporary")
+        }}
     </div>
 </div>
