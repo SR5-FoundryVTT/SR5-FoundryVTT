@@ -496,6 +496,10 @@
     "SETTINGS.EstimateDiagonal": "Estimate Diagonal Movement (1-2-1)",
     "SETTINGS.ApplyLimitsName": "Apply Limits to Rolls",
     "SETTINGS.ApplyLimitsDescription": "Should limits be applied to roll",
+    "SETTINGS.DisplayDefaultRollCardName": "Display Default Roll Card",
+    "SETTINGS.DisplayDefaultRollCardDescription": "Should the default roll-card be displayed along with the shadowrun roll-card",
+    "SETTINGS.ShowGlitchAnimationName": "Display Glitch Animation",
+    "SETTINGS.ShowGlitchAnimationDescription": "Should display the animation as part of the glitch text on the roll card",
 
     "SR5.MIGRATION.WarningTitle": "Alert",
     "SR5.MIGRATION.WarningHeader": "Migration Warning",

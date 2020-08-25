@@ -2621,15 +2621,23 @@ class BaseActorPrep {
      */
     prepareCyberware() {
         const { attributes } = this.data;
-        let totalEssence = 6;
+        const parts = new PartsList_1.PartsList();
+        // add Items as values to lower the total value of essence
         this.items
             .filter((item) => item.isCyberware() && item.isEquipped())
             .forEach((item) => {
             if (item.getEssenceLoss()) {
-                totalEssence -= Number(item.getEssenceLoss());
+                parts.addUniquePart(item.getName(), -Number(item.getEssenceLoss()));
             }
         });
-        attributes.essence.base = +(totalEssence + Number(this.data.modifiers['essence'] || 0)).toFixed(3);
+        // add the bonus from the misc tab if applied
+        const essenceMod = this.data.modifiers['essence'];
+        if (essenceMod && !Number.isNaN(essenceMod)) {
+            parts.addUniquePart('SR5.Bonus', Number(essenceMod));
+        }
+        attributes.essence.base = 6;
+        attributes.essence.mod = parts.list;
+        attributes.essence.value = helpers_1.Helpers.calcTotal(attributes.essence);
     }
     /**
      * Prepare actor data for attributes
@@ -4236,7 +4244,7 @@ const PartsList_1 = require("./parts/PartsList");
 exports.createChatData = (templateData, roll) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const template = `systems/shadowrun5e/dist/templates/rolls/roll-card.html`;
-    const hackyTemplateData = Object.assign(Object.assign({}, templateData), { parts: new PartsList_1.PartsList(templateData.parts).getMessageOutput() });
+    const hackyTemplateData = Object.assign(Object.assign({}, templateData), { parts: new PartsList_1.PartsList(templateData.parts).getMessageOutput(), showGlitchAnimation: game.settings.get(constants_1.SYSTEM_NAME, constants_1.FLAGS.ShowGlitchAnimation) });
     const html = yield renderTemplate(template, hackyTemplateData);
     const actor = templateData.actor;
     const chatData = {
@@ -4708,8 +4716,11 @@ exports.SR5['programTypes'] = {
 },{}],29:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SYSTEM_NAME = void 0;
+exports.FLAGS = exports.SYSTEM_NAME = void 0;
 exports.SYSTEM_NAME = 'shadowrun5e';
+exports.FLAGS = {
+    ShowGlitchAnimation: 'showGlitchAnimation',
+};
 },{}],30:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -8286,6 +8297,14 @@ exports.registerSystemSettings = () => {
         config: false,
         type: String,
         default: '0',
+    });
+    game.settings.register(constants_1.SYSTEM_NAME, constants_1.FLAGS.ShowGlitchAnimation, {
+        name: 'SETTINGS.ShowGlitchAnimationName',
+        hint: 'SETTINGS.ShowGlitchAnimationDescription',
+        scope: 'user',
+        config: true,
+        type: Boolean,
+        default: true,
     });
 };
 },{"./constants":29,"./migrator/VersionMigration":39}],45:[function(require,module,exports){

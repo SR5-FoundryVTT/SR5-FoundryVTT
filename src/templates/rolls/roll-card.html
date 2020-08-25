@@ -165,7 +165,7 @@
     {{/if}}
     {{#if glitch}}
     <div class="glitch-content">
-        <div class="glitch" data-glitch="{{localize 'SR5.Glitch'}}">
+        <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Glitch'}}" {{/if}}>
             {{localize "SR5.Glitch"}}
         </div>
     </div>
