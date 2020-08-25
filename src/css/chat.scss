@@ -88,8 +88,7 @@
 
             .header-name {
                 &:hover {
-                    text-shadow: -1px -1px 0 $cornflower, 1px -1px 0 $cornflower, -1px 1px 0 $cornflower,
-                    1px 1px 0 $cornflower;
+                    text-shadow: -1px -1px 0 $cornflower, 1px -1px 0 $cornflower, -1px 1px 0 $cornflower, 1px 1px 0 $cornflower;
                 }
             }
         }
@@ -201,6 +200,90 @@
                 &.green {
                     color: #18520b;
                     filter: sepia(0.5) hue-rotate(60deg);
+                }
+            }
+        }
+        .glitch-content {
+            display: flex;
+            flex-flow: column;
+            border-top: $groove;
+            .glitch {
+                position: relative;
+                text-decoration: none;
+                text-transform: uppercase;
+                margin: 0;
+                letter-spacing: 5px;
+                text-align: center;
+                padding-top: 4px;
+                font-weight: bold;
+                z-index: 1;
+            }
+            .glitch:before,
+            .glitch:after {
+                display: inline;
+                position: absolute;
+                top: 4px;
+                right: 0;
+                left: 0;
+                content: attr(data-glitch);
+                text-transform: uppercase;
+                font-weight: normal;
+            }
+
+            .glitch:after {
+                color: #a0a;
+                opacity: 0;
+                z-index: -1;
+                animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) reverse both 5;
+            }
+
+            .glitch:before {
+                color: #0aa;
+                opacity: 0;
+                z-index: -2;
+                animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both 5;
+            }
+            .message:hover .glitch:before {
+                animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both infinite;
+                opacity: 1;
+            }
+            .message:hover .glitch:after {
+                animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) reverse both infinite;
+                opacity: 1;
+            }
+
+            @media only screen and (max-width: 400px) {
+                .glitch {
+                    font-size: 3em;
+                }
+            }
+
+            @keyframes glitch {
+                from {
+                    opacity: 1;
+                }
+                0% {
+                    transform: translate(0);
+                    opacity: 0;
+                }
+                1% {
+                    opacity: 1;
+                }
+                20% {
+                    transform: translate(-2px, 2px);
+                }
+                40% {
+                    transform: translate(-2px, -2px);
+                }
+                60% {
+                    transform: translate(2px, 2px);
+                }
+                80% {
+                    transform: translate(2px, -2px);
+                    opacity: 1;
+                }
+                to {
+                    transform: translate(0);
                 }
             }
         }

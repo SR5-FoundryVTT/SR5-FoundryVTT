@@ -13,12 +13,12 @@ import FireRangeData = Shadowrun.FireRangeData;
 import BlastData = Shadowrun.BlastData;
 import { ChatData } from './ChatData';
 import { AdvancedRollProps, ShadowrunRoll, ShadowrunRoller } from '../rolls/ShadowrunRoller';
-import Template from '../template';
 import { createChatData } from '../chat';
 import { SYSTEM_NAME } from '../constants';
 import ConditionData = Shadowrun.ConditionData;
 import { SR5ItemDataWrapper } from './SR5ItemDataWrapper';
 import SR5ItemType = Shadowrun.SR5ItemType;
+import { PartsList } from '../parts/PartsList';
 
 export class SR5Item extends Item {
     labels: {} = {};
@@ -27,7 +27,7 @@ export class SR5Item extends Item {
 
     private get wrapper(): SR5ItemDataWrapper {
         // we need to cast here to unknown first to make ts happy
-        return new SR5ItemDataWrapper(this.data as unknown as SR5ItemType);
+        return new SR5ItemDataWrapper((this.data as unknown) as SR5ItemType);
     }
 
     // Flag Functions
@@ -134,38 +134,47 @@ export class SR5Item extends Item {
         const { technology, range, action } = item.data;
 
         if (technology) {
-            if (!technology.condition_monitor) technology.condition_monitor = { value: 0 };
+            if (technology.condition_monitor === undefined) {
+                technology.condition_monitor = { value: 0 };
+            }
             technology.condition_monitor.max = 8 + Math.ceil(technology.rating / 2);
 
             if (!technology.conceal) technology.conceal = {};
-            technology.conceal.mod = {};
 
+            const concealParts = new PartsList<number>();
             equippedMods.forEach((mod) => {
-                if (technology?.conceal && mod.data.data.technology.conceal.value) {
-                    technology.conceal.mod[mod.name] = mod.data.data.technology.conceal.value;
+                if (mod.data.data.technology.conceal.value) {
+                    concealParts.addUniquePart(mod.name, mod.data.data.technology.conceal.value);
                 }
             });
+            technology.conceal.mod = concealParts.list;
 
-            technology.conceal.value = technology.conceal.base + Helpers.totalMods(technology.conceal.mod);
+            technology.conceal.value = Helpers.calcTotal(technology.conceal);
         }
 
         if (action) {
             action.alt_mod = 0;
-            action.limit.mod = {};
-            action.damage.mod = {};
-            action.damage.ap.mod = {};
-            action.dice_pool_mod = {};
+            action.limit.mod = [];
+            action.damage.mod = [];
+            action.damage.ap.mod = [];
+            action.dice_pool_mod = [];
             // handle overrides from mods
+            const limitParts = new PartsList(action.limit.mod);
+            const dpParts = new PartsList(action.dice_pool_mod);
             equippedMods.forEach((mod) => {
-                if (mod.data.data.accuracy) action.limit.mod[mod.name] = mod.data.data.accuracy;
-                if (mod.data.data.dice_pool) action.dice_pool_mod[mod.name] = mod.data.data.dice_pool;
+                if (mod.data.data.accuracy) {
+                    limitParts.addUniquePart(mod.name, mod.data.data.accuracy);
+                }
+                if (mod.data.data.dice_pool) {
+                    dpParts.addUniquePart(mod.name, mod.data.data.dice_pool);
+                }
             });
 
             if (equippedAmmo) {
                 // add mods to damage from ammo
-                action.damage.mod[`${equippedAmmo.name}`] = equippedAmmo.data.data.damage;
+                action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name, equippedAmmo.data.data.damage);
                 // add mods to ap from ammo
-                action.damage.ap.mod[`${equippedAmmo.name}`] = equippedAmmo.data.data.ap;
+                action.damage.ap.mod = PartsList.AddUniquePart(action.damage.ap.mod, equippedAmmo.name, equippedAmmo.data.data.ap);
 
                 // override element
                 if (equippedAmmo.data.data.element) {
@@ -187,35 +196,44 @@ export class SR5Item extends Item {
             }
 
             // once all damage mods have been accounted for, sum base and mod to value
-            action.damage.value = action.damage.base + Helpers.totalMods(action.damage.mod);
-            action.damage.ap.value = action.damage.ap.base + Helpers.totalMods(action.damage.ap.mod);
+            action.damage.value = Helpers.calcTotal(action.damage);
+            action.damage.ap.value = Helpers.calcTotal(action.damage.ap);
 
-            action.limit.value = action.limit.base + Helpers.totalMods(action.limit.mod);
+            action.limit.value = Helpers.calcTotal(action.limit);
 
             if (this.actor) {
                 if (action.damage.attribute) {
                     const { attribute } = action.damage;
                     // TODO convert this in the template
-                    action.damage.mod[game.i18n.localize(CONFIG.SR5.attributes[attribute])] = this.actor.findAttribute(attribute)?.value;
-                    action.damage.value = action.damage.base + Helpers.totalMods(action.damage.mod);
+                    action.damage.mod = PartsList.AddUniquePart(
+                        action.damage.mod,
+                        game.i18n.localize(CONFIG.SR5.attributes[attribute]),
+                        this.actor.findAttribute(attribute)?.value,
+                    );
+                    action.damage.value = Helpers.calcTotal(action.damage);
                 }
                 if (action.limit.attribute) {
                     const { attribute } = action.limit;
                     // TODO convert this in the template
-                    action.limit.mod[game.i18n.localize(CONFIG.SR5.limits[attribute])] = this.actor.findLimit(attribute)?.value;
-                    action.limit.value = action.limit.base + Helpers.totalMods(action.limit.mod);
+                    action.limit.mod = PartsList.AddUniquePart(
+                        action.limit.mod,
+                        game.i18n.localize(CONFIG.SR5.limits[attribute]),
+                        this.actor.findLimit(attribute)?.value,
+                    );
+                    action.limit.value = Helpers.calcTotal(action.limit);
                 }
             }
         }
 
         if (range) {
             if (range.rc) {
-                range.rc.mod = {};
+                const rangeParts = new PartsList();
                 equippedMods.forEach((mod) => {
-                    if (mod.data.data.rc) range.rc.mod[mod.name] = mod.data.data.rc;
+                    if (mod.data.data.rc) rangeParts.addUniquePart(mod.name, mod.data.data.rc);
                     // handle overrides from ammo
                 });
-                if (range.rc) range.rc.value = range.rc.base + Helpers.totalMods(range.rc.mod);
+                range.rc.mod = rangeParts.list;
+                if (range.rc) range.rc.value = Helpers.calcTotal(range.rc);
             }
         }
 
@@ -235,41 +253,31 @@ export class SR5Item extends Item {
 
         const post = (bonus = {}) => {
             // if only post, don't roll and post a card version -- otherwise roll
-            const onComplete = postOnly
-                ? () => {
-                      const { token } = this.actor;
-                      const attack = this.getAttackData(0);
-                      // don't include any hits
-                      delete attack?.hits;
-                      // generate chat data
-                      createChatData({
-                          header: {
-                              name: this.name,
-                              img: this.img,
-                          },
-                          testName: this.getRollName(),
-                          actor: this.actor,
-                          tokenId: token ? `${token.scene._id}.${token.id}` : undefined,
-                          description: this.getChatData(),
-                          item: this,
-                          previewTemplate: this.hasTemplate,
-                          attack,
-                          ...bonus,
-                      }).then((chatData) => {
-                          // create the message
-                          return ChatMessage.create(chatData, { displaySheet: false });
-                      });
-                  }
-                : () => this.rollTest(event);
-
-            if (!postOnly && this.hasTemplate) {
-                // onComplete is called when template is finished
-                const template = Template.fromItem(this, onComplete);
-                if (template) {
-                    template.drawPreview();
-                }
+            if (postOnly) {
+                const { token } = this.actor;
+                const attack = this.getAttackData(0);
+                // don't include any hits
+                delete attack?.hits;
+                // generate chat data
+                createChatData({
+                    header: {
+                        name: this.name,
+                        img: this.img,
+                    },
+                    testName: this.getRollName(),
+                    actor: this.actor,
+                    tokenId: token ? `${token.scene._id}.${token.id}` : undefined,
+                    description: this.getChatData(),
+                    item: this,
+                    previewTemplate: this.hasTemplate,
+                    attack,
+                    ...bonus,
+                }).then((chatData) => {
+                    // create the message
+                    return ChatMessage.create(chatData, { displaySheet: false });
+                });
             } else {
-                onComplete();
+                this.rollTest(event);
             }
         };
         // prompt user if needed
@@ -327,18 +335,18 @@ export class SR5Item extends Item {
         return name;
     }
 
-    getOpposedTestMod(): ModList<number> {
-        const parts = {};
+    getOpposedTestMod(): PartsList<number> {
+        const parts = new PartsList<number>();
         if (this.hasDefenseTest()) {
             if (this.isAreaOfEffect()) {
-                parts['SR5.Aoe'] = -2;
+                parts.addUniquePart('SR5.Aoe', -2);
             }
             if (this.isRangedWeapon()) {
                 const fireModeData = this.getLastFireMode();
                 if (fireModeData?.defense) {
                     if (fireModeData.defense !== 'SR5.DuckOrCover') {
                         const fireMode = +fireModeData.defense;
-                        if (fireMode) parts['SR5.FireMode'] = fireMode;
+                        parts.addUniquePart('SR5.FireMode', fireMode);
                     }
                 }
             }
@@ -348,7 +356,7 @@ export class SR5Item extends Item {
 
     getOpposedTestModifier(): string {
         const testMod = this.getOpposedTestMod();
-        const total = Helpers.totalMods(testMod);
+        const total = testMod.total;
         if (total) return `(${total})`;
         else {
             if (this.isRangedWeapon()) {
@@ -483,26 +491,29 @@ export class SR5Item extends Item {
 
     getRollPartsList(): ModList<number> {
         // we only have a roll if we have an action or an actor
-        if (!this.data.data.action || !this.actor) return {};
+        if (!this.data.data.action || !this.actor) return [];
 
-        const parts = duplicate(this.getModifierList());
+        const parts = new PartsList(duplicate(this.getModifierList()));
 
         const skill = this.actor.findActiveSkill(this.getActionSkill());
         const attribute = this.actor.findAttribute(this.getActionAttribute());
         const attribute2 = this.actor.findAttribute(this.getActionAttribute2());
 
-        if (attribute && attribute.label) parts[attribute.label] = attribute.value;
+        if (attribute && attribute.label) parts.addPart(attribute.label, attribute.value);
 
         // if we have a valid skill, don't look for a second attribute
-        if (skill && skill.label) parts[skill.label] = skill.value;
-        else if (attribute2 && attribute2.label) parts[attribute2.label] = attribute2.value;
+        if (skill && skill.label) {
+            parts.addUniquePart(skill.label, skill.value);
+            if (skill.value === 0) {
+                parts.addUniquePart('SR5.Defaulting', -1);
+            }
+        } else if (attribute2 && attribute2.label) parts.addUniquePart(attribute2.label, attribute2.value);
 
         const spec = this.getActionSpecialization();
-        if (spec) parts[spec] = 2;
+        if (spec) parts.addUniquePart(spec, 2);
 
-        // TODO remove these (by making them not used, not just delete)
         const mod = parseInt(this.data.data.action.mod || 0);
-        if (mod) parts['SR5.ItemMod'] = mod;
+        if (mod) parts.addUniquePart('SR5.ItemMod', mod);
 
         const atts: (AttributeField | SkillField)[] | boolean = [];
         if (attribute !== undefined) atts.push(attribute);
@@ -513,7 +524,7 @@ export class SR5Item extends Item {
         this.actor._addMatrixParts(parts, atts);
         this._addWeaponParts(parts);
 
-        return parts;
+        return parts.list;
     }
 
     calculateRecoil() {
@@ -523,10 +534,10 @@ export class SR5Item extends Item {
         return Math.min(this.getRecoilCompensation(true) - (this.getLastFireMode()?.value || 0), 0);
     }
 
-    _addWeaponParts(parts: ModList<number>) {
+    _addWeaponParts(parts: PartsList<number>) {
         if (this.isRangedWeapon()) {
             const recoil = this.calculateRecoil();
-            if (recoil) parts['SR5.Recoil'] = recoil;
+            if (recoil) parts.addUniquePart('SR5.Recoil', recoil);
         }
     }
 
@@ -557,11 +568,11 @@ export class SR5Item extends Item {
                     options.fireModeDefense = +lastAttack.fireMode.defense;
                 }
             }
-            return target.rollDefense(options, parts);
+            return target.rollDefense(options, parts.list);
         } else if (opposed.type === 'soak') {
             options['damage'] = lastAttack?.damage;
             options['attackerHits'] = lastAttack?.hits;
-            return target.rollSoak(options, parts);
+            return target.rollSoak(options, parts.list);
         } else if (opposed.type === 'armor') {
             return target.rollArmor(options);
         } else {
@@ -794,10 +805,11 @@ export class SR5Item extends Item {
 
         if (this.isCombatSpell()) {
             const force = this.getLastSpellForce().value;
+            const damageParts = new PartsList(data.damage.mod);
             data.force = force;
             data.damage.base = force;
-            data.damage.value = force + Helpers.totalMods(data.damage.mod);
-            data.damage.ap.value = -force + Helpers.totalMods(data.damage.mod);
+            data.damage.value = force + damageParts.total;
+            data.damage.ap.value = -force + damageParts.total;
             data.damage.ap.base = -force;
         }
 

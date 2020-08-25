@@ -6,7 +6,8 @@ import BaseValuePair = Shadowrun.BaseValuePair;
 import DamageData = Shadowrun.DamageData;
 import AttackData = Shadowrun.AttackData;
 import LabelField = Shadowrun.LabelField;
-import { SYSTEM_NAME } from './constants';
+import { FLAGS, SYSTEM_NAME } from './constants';
+import { PartsList } from './parts/PartsList';
 
 export type TemplateData = {
     header: {
@@ -25,6 +26,7 @@ export type TemplateData = {
     incomingDrain?: LabelField & {
         value: number;
     };
+    hits?: number;
     soak?: DamageData;
     tests?: {
         label: string;
@@ -32,11 +34,17 @@ export type TemplateData = {
     }[];
     description?: object;
     previewTemplate?: boolean;
+    rollMode?: keyof typeof CONFIG.Dice.rollModes;
 };
 
 export const createChatData = async (templateData: TemplateData, roll?: Roll) => {
     const template = `systems/shadowrun5e/dist/templates/rolls/roll-card.html`;
-    const html = await renderTemplate(template, templateData);
+    const hackyTemplateData = {
+        ...templateData,
+        parts: new PartsList(templateData.parts).getMessageOutput(),
+        showGlitchAnimation: game.settings.get(SYSTEM_NAME, FLAGS.ShowGlitchAnimation),
+    };
+    const html = await renderTemplate(template, hackyTemplateData);
     const actor = templateData.actor;
 
     const chatData = {
@@ -58,7 +66,7 @@ export const createChatData = async (templateData: TemplateData, roll?: Roll) =>
     if (roll) {
         chatData['sound'] = CONFIG.sounds.dice;
     }
-    const rollMode = game.settings.get('core', 'rollMode');
+    const rollMode = templateData.rollMode ?? game.settings.get('core', 'rollMode');
 
     if (['gmroll', 'blindroll'].includes(rollMode)) chatData['whisper'] = ChatMessage.getWhisperIDs('GM');
     if (rollMode === 'blindroll') chatData['blind'] = true;
@@ -117,7 +125,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
         event.preventDefault();
         if (item) {
             const template = Template.fromItem(item);
-            template?.drawPreview(event);
+            template?.drawPreview();
         }
     });
     html.on('click', '.card-title', (event) => {

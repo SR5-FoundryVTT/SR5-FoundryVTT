@@ -68,6 +68,8 @@ Hooks.on('ready', function () {
     if (game.user.isGM) {
         Migrator.BeginMigration();
     }
+    const diceIconSelector = '#chat-controls .roll-type-select .fa-dice-d20';
+    $(document).on('click', diceIconSelector, () => ShadowrunRoller.promptRoll());
 });
 
 Hooks.on('preUpdateCombat', preCombatUpdate);
@@ -148,7 +150,7 @@ function rollItemMacro(itemName) {
         return ui.notifications.warn(`Your controlled Actor does not have an item named ${itemName}`);
     }
 
-    return item.rollTest(event);
+    return item.postCard();
 }
 
 registerHandlebarHelpers();

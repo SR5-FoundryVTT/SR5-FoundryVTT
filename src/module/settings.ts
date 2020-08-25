@@ -1,7 +1,7 @@
 // game settings for shadowrun 5e
 
 import { VersionMigration } from './migrator/VersionMigration';
-import { SYSTEM_NAME } from './constants';
+import { FLAGS, SYSTEM_NAME } from './constants';
 
 export const registerSystemSettings = () => {
 
@@ -53,4 +53,13 @@ export const registerSystemSettings = () => {
         type: String,
         default: '0',
     });
+
+    game.settings.register(SYSTEM_NAME, FLAGS.ShowGlitchAnimation, {
+        name: 'SETTINGS.ShowGlitchAnimationName',
+        hint: 'SETTINGS.ShowGlitchAnimationDescription',
+        scope: 'user',
+        config: true,
+        type: Boolean,
+        default: true,
+    })
 };

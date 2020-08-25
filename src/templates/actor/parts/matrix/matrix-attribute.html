@@ -11,7 +11,7 @@
             {{/each}}
             {{/select}}
         </select>
-        {{#if matrixAtt.mod.Temporary}}
+        {{#if matrixAtt.temp}}
         <input
             class="display attribute-input"
             type="text"
@@ -44,7 +44,7 @@
             cssClass="track-input"
             size="4"
             maxLength="4"
-            value=matrixAtt.mod.Temporary
+            value=matrixAtt.temp
             placeholder="+Mod"
             name=(buildName part1="data.matrix" part2=key part3="mod.Temporary")
         }}

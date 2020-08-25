@@ -4,10 +4,16 @@
     data-item-id="{{item._id}}"
     data-token-id="{{tokenId}}"
 >
-    <div class="card-title card-header flexrow">
-        <img src="{{header.img}}" title="{{header.name}}" width="36" height="36" />
-        <h3 class="header-name">{{header.name}}</h3>
-    </div>
+    {{#if header}}
+        <div class="card-title card-header flexrow">
+            {{#if header.img}}
+                <img src="{{header.img}}" title="{{header.name}}" width="36" height="36" />
+            {{/if}}
+            {{#if header.name}}
+                <h3 class="header-name">{{header.name}}</h3>
+            {{/if}}
+        </div>
+    {{/if}}
     {{#if description}}
     <div class="card-description">
         <div class="card-description-content">
@@ -138,7 +144,7 @@
             <div class="roll-parts">
                 {{#each parts as |part id|}}
                 <div class="limit-line">
-                    <span class="key" title="{{localize id}}">{{localize id}}:</span> <span class="value">{{part}}</span>
+                    <span class="key" title="{{localize part.name}}">{{localize part.name}}:</span> <span class="value">{{part.value}}</span>
                 </div>
                 {{/each}} {{#if (isDefined dicePool)}}
                 <div class="limit-line">
@@ -155,6 +161,13 @@
             <div class="result-text">{{this.roll}}</div>
         </div>
         {{/each}}
+    </div>
+    {{/if}}
+    {{#if glitch}}
+    <div class="glitch-content">
+        <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Glitch'}}" {{/if}}>
+            {{localize "SR5.Glitch"}}
+        </div>
     </div>
     {{/if}}
     {{#if tests}}

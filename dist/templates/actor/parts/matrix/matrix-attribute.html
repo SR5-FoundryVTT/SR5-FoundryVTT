@@ -11,7 +11,7 @@
             {{/each}}
             {{/select}}
         </select>
-        {{#if matrixAtt.mod.Temporary}}
+        {{#if matrixAtt.temp}}
         <input
             class="display attribute-input"
             type="text"
@@ -40,13 +40,15 @@
     {{/if}}
 
     <div class="attribute-input-container">
-        {{> "systems/shadowrun5e/dist/templates/common/ValueInput.html"
-            cssClass="track-input"
+        <input
+            class="display track-input"
             size="4"
-            maxLength="4"
-            value=matrixAtt.mod.Temporary
+            maxlength="4"
+            type="text"
+            name="data.matrix.{{key}}.temp"
+            value="{{matrixAtt.temp}}"
+            data-dtype="Number"
             placeholder="+Mod"
-            name=(buildName part1="data.matrix" part2=key part3="mod.Temporary")
-        }}
+        />
     </div>
 </div>

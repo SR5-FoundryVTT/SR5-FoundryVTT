@@ -16,6 +16,9 @@ import LimitField = Shadowrun.LimitField;
 import { SYSTEM_NAME } from '../constants';
 import { BaseActorPrep } from './prep/BaseActorPrep';
 import SR5ActorType = Shadowrun.SR5ActorType;
+import { PartsList } from '../parts/PartsList';
+import DamageData = Shadowrun.DamageData;
+import DamageElement = Shadowrun.DamageElement;
 
 export class SR5Actor extends Actor {
     async update(data, options?) {
@@ -63,7 +66,7 @@ export class SR5Actor extends Actor {
         prepper.prepareInitiative();
 
         const data = actorData.data;
-        if (data.magic.drain && !data.magic.drain.mod) data.magic.drain.mod = {};
+        if (data.magic.drain && !data.magic.drain.mod) data.magic.drain.mod = [];
     }
 
     getModifier(modifierName: string): number | undefined {
@@ -133,7 +136,12 @@ export class SR5Actor extends Actor {
     }
 
     getRecoilCompensation(): number {
-        return this.data.data.recoil_compensation ?? 0;
+        let total = 1; // always get 1
+        const strength = this.findAttribute('strength');
+        if (strength) {
+            total += Math.ceil(strength.value / 3);
+        }
+        return total;
     }
 
     addKnowledgeSkill(category, skill?) {
@@ -202,10 +210,10 @@ export class SR5Actor extends Actor {
         const res = this.data.data.attributes.resonance;
         const data = this.data.data;
 
-        const parts = {};
-        parts[wil.label] = wil.value;
-        parts[res.label] = res.value;
-        if (data.modifiers.fade) parts['SR5.Bonus'] = data.modifiers.fade;
+        const parts = new PartsList<number>();
+        parts.addUniquePart(wil.label, wil.value);
+        parts.addUniquePart(res.label, res.value);
+        if (data.modifiers.fade) parts.addUniquePart('SR5.Bonus', data.modifiers.fade);
 
         let title = `${game.i18n.localize('SR5.Resist')} ${game.i18n.localize('SR5.Fade')}`;
         const incomingDrain = {
@@ -214,7 +222,7 @@ export class SR5Actor extends Actor {
         };
         return ShadowrunRoller.advancedRoll({
             event: options.event,
-            parts,
+            parts: parts.list,
             actor: this,
             title: title,
             wounds: false,
@@ -226,10 +234,10 @@ export class SR5Actor extends Actor {
         const wil = this.data.data.attributes.willpower;
         const drainAtt = this.data.data.attributes[this.data.data.magic.attribute];
 
-        const parts = {};
-        parts[wil.label] = wil.value;
-        parts[drainAtt.label] = drainAtt.value;
-        if (this.data.data.modifiers.drain) parts['SR5.Bonus'] = this.data.data.modifiers.drain;
+        const parts = new PartsList<number>();
+        parts.addPart(wil.label, wil.value);
+        parts.addPart(drainAtt.label, drainAtt.value);
+        if (this.data.data.modifiers.drain) parts.addUniquePart('SR5.Bonus', this.data.data.modifiers.drain);
 
         let title = `${game.i18n.localize('SR5.Resist')} ${game.i18n.localize('SR5.Drain')}`;
         const incomingDrain = {
@@ -238,7 +246,7 @@ export class SR5Actor extends Actor {
         };
         return ShadowrunRoller.advancedRoll({
             event: options.event,
-            parts,
+            parts: parts.list,
             actor: this,
             title: title,
             wounds: false,
@@ -246,18 +254,20 @@ export class SR5Actor extends Actor {
         });
     }
 
-    rollArmor(options: ActorRollOptions = {}, parts: ModList<number> = {}) {
+    rollArmor(options: ActorRollOptions = {}, partsProps: ModList<number> = []) {
+        const parts = new PartsList(partsProps);
         this._addArmorParts(parts);
         return ShadowrunRoller.advancedRoll({
             event: options.event,
             actor: this,
-            parts,
+            parts: parts.list,
             title: game.i18n.localize('SR5.Armor'),
             wounds: false,
         });
     }
 
-    rollDefense(options: DefenseRollOptions = {}, parts: ModList<number> = {}) {
+    rollDefense(options: DefenseRollOptions = {}, partsProps: ModList<number> = []) {
+        const parts = new PartsList(partsProps);
         this._addDefenseParts(parts);
         // full defense is always added
         const activeDefenses = {
@@ -293,11 +303,11 @@ export class SR5Actor extends Actor {
             const incomingReach = options.incomingAttack.reach;
             const netReach = defenseReach - incomingReach;
             if (netReach !== 0) {
-                parts['SR5.Reach'] = netReach;
+                parts.addUniquePart('SR5.Reach', netReach);
             }
         }
         let dialogData = {
-            parts,
+            parts: parts.getMessageOutput(),
             cover: options.cover,
             activeDefenses,
         };
@@ -324,15 +334,15 @@ export class SR5Actor extends Actor {
                         if (special) {
                             // TODO subtract initiative score when Foundry updates to 0.7.0
                             const defense = activeDefenses[special];
-                            parts[defense.label] = defense.value;
+                            parts.addUniquePart(defense.label, defense.value);
                         }
-                        if (cover) parts['SR5.Cover'] = cover;
+                        if (cover) parts.addUniquePart('SR5.Cover', cover);
 
                         resolve(
                             ShadowrunRoller.advancedRoll({
                                 event: event,
                                 actor: this,
-                                parts,
+                                parts: parts.list,
                                 title: game.i18n.localize('SR5.DefenseTest'),
                                 incomingAttack,
                             }).then(async (roll: Roll | undefined) => {
@@ -343,12 +353,12 @@ export class SR5Actor extends Actor {
 
                                     if (netHits >= 0) {
                                         const damage = incomingAttack.damage;
-                                        damage.mod['SR5.NetHits'] = netHits;
-                                        damage.value = damage.base + Helpers.totalMods(damage.mod);
+                                        damage.mod = PartsList.AddUniquePart(damage.mod, 'SR5.NetHits', netHits);
+                                        damage.value = Helpers.calcTotal(damage);
 
                                         const soakRollOptions = {
                                             event: event,
-                                            damage: incomingAttack.damage,
+                                            damage: damage,
                                         };
                                         await this.rollSoak(soakRollOptions);
                                     }
@@ -361,11 +371,12 @@ export class SR5Actor extends Actor {
         });
     }
 
-    rollSoak(options?: SoakRollOptions, parts: ModList<number> = {}) {
+    rollSoak(options?: SoakRollOptions, partsProps: ModList<number> = []) {
+        const parts = new PartsList(partsProps);
         this._addSoakParts(parts);
         let dialogData = {
             damage: options?.damage,
-            parts,
+            parts: parts.getMessageOutput(),
             elementTypes: CONFIG.SR5.elementTypes,
         };
         let id = '';
@@ -374,7 +385,7 @@ export class SR5Actor extends Actor {
         return new Promise((resolve) => {
             renderTemplate(template, dialogData).then((dlg) => {
                 new Dialog({
-                    title: 'SR5.DamageResistanceTest',
+                    title: game.i18n.localize('SR5.DamageResistanceTest'),
                     content: dlg,
                     buttons: {
                         continue: {
@@ -388,18 +399,69 @@ export class SR5Actor extends Actor {
                     close: async (html) => {
                         if (cancel) return;
 
+                        const soak: DamageData = options?.damage
+                            ? options.damage
+                            : {
+                                  base: 0,
+                                  value: 0,
+                                  mod: [],
+                                  ap: {
+                                      base: 0,
+                                      value: 0,
+                                      mod: [],
+                                  },
+                                  attribute: '' as const,
+                                  type: {
+                                      base: '',
+                                      value: '',
+                                  },
+                                  element: {
+                                      base: '',
+                                      value: '',
+                                  },
+                              };
+
                         const armor = this.getArmor();
-                        const armorId = Helpers.parseInputToString($(html).find('[name=element]').val());
 
-                        const bonusArmor = armor[armorId] || 0;
-                        if (bonusArmor) parts[CONFIG.SR5.elementTypes[armorId]] = bonusArmor;
+                        // handle element changes
+                        const element = Helpers.parseInputToString($(html).find('[name=element]').val());
+                        if (element) {
+                            soak.element.value = element as DamageElement;
+                        }
+                        const bonusArmor = armor[element] ?? 0;
+                        if (bonusArmor) {
+                            parts.addUniquePart(CONFIG.SR5.elementTypes[element], bonusArmor);
+                        }
 
+                        // handle ap changes
                         const ap = Helpers.parseInputToNumber($(html).find('[name=ap]').val());
                         if (ap) {
                             let armorVal = armor.value + bonusArmor;
 
                             // don't take more AP than armor
-                            parts['SR5.AP'] = Math.max(ap, -armorVal);
+                            parts.addUniquePart('SR5.AP', Math.max(ap, -armorVal));
+                        }
+
+                        // handle incoming damage changes
+                        const incomingDamage = Helpers.parseInputToNumber($(html).find('[name=incomingDamage]').val());
+                        if (incomingDamage) {
+                            const totalDamage = Helpers.calcTotal(soak);
+                            if (totalDamage !== incomingDamage) {
+                                const diff = incomingDamage - totalDamage;
+                                // add part and calc total again
+                                soak.mod = PartsList.AddUniquePart(soak.mod, 'SR5.UserInput', diff);
+                                soak.value = Helpers.calcTotal(soak);
+                                console.log(soak);
+                            }
+                            console.log(soak);
+
+                            const totalAp = Helpers.calcTotal(soak.ap);
+                            if (totalAp !== ap) {
+                                const diff = ap - totalAp;
+                                // add part and calc total
+                                soak.ap.mod = PartsList.AddUniquePart(soak.ap.mod, 'SR5.UserInput', diff);
+                                soak.ap.value = Helpers.calcTotal(soak.ap);
+                            }
                         }
 
                         let title = game.i18n.localize('SR5.SoakTest');
@@ -407,8 +469,8 @@ export class SR5Actor extends Actor {
                             ShadowrunRoller.advancedRoll({
                                 event: options?.event,
                                 actor: this,
-                                soak: options?.damage,
-                                parts,
+                                soak: soak,
+                                parts: parts.list,
                                 title: title,
                                 wounds: false,
                             }),
@@ -421,14 +483,14 @@ export class SR5Actor extends Actor {
 
     rollSingleAttribute(attId, options: ActorRollOptions) {
         const attr = this.data.data.attributes[attId];
-        const parts = {};
-        parts[attr.label] = attr.value;
+        const parts = new PartsList<number>();
+        parts.addUniquePart(attr.label, attr.value);
         this._addMatrixParts(parts, attr);
         this._addGlobalParts(parts);
         return ShadowrunRoller.advancedRoll({
             event: options?.event,
             actor: this,
-            parts,
+            parts: parts.list,
             title: Helpers.label(attId),
         });
     }
@@ -438,15 +500,15 @@ export class SR5Actor extends Actor {
         const attr2 = this.data.data.attributes[id2];
         const label1 = Helpers.label(id1);
         const label2 = Helpers.label(id2);
-        const parts = {};
-        parts[attr1.label] = attr1.value;
-        parts[attr2.label] = attr2.value;
+        const parts = new PartsList<number>();
+        parts.addPart(attr1.label, attr1.value);
+        parts.addPart(attr2.label, attr2.value);
         this._addMatrixParts(parts, [attr1, attr2]);
         this._addGlobalParts(parts);
         return ShadowrunRoller.advancedRoll({
             event: options?.event,
             actor: this,
-            parts,
+            parts: parts.list,
             title: `${label1} + ${label2}`,
         });
     }
@@ -463,14 +525,14 @@ export class SR5Actor extends Actor {
         }
         let att1 = this.data.data.attributes[id1];
         let att2 = this.data.data.attributes[id2];
-        const parts = {};
-        parts[att1.label] = att1.value;
-        parts[att2.label] = att2.value;
+        const parts = new PartsList<number>();
+        parts.addPart(att1.label, att1.value);
+        parts.addPart(att2.label, att2.value);
 
         return ShadowrunRoller.advancedRoll({
             event: options?.event,
             actor: this,
-            parts,
+            parts: parts.list,
             title: title,
             extended: true,
             after: async (roll: Roll | undefined) => {
@@ -492,14 +554,15 @@ export class SR5Actor extends Actor {
     async rollMatrixAttribute(attr, options?: ActorRollOptions) {
         let matrix_att = this.data.data.matrix[attr];
         let title = game.i18n.localize(CONFIG.SR5.matrixAttributes[attr]);
-        const parts = {};
-        parts[CONFIG.SR5.matrixAttributes[attr]] = matrix_att.value;
-        if (options && options.event && options.event[CONFIG.SR5.kbmod.SPEC]) parts['SR5.Specialization'] = 2;
+        const parts = new PartsList<number>();
+        parts.addPart(CONFIG.SR5.matrixAttributes[attr], matrix_att.value);
+
+        if (options && options.event && options.event[CONFIG.SR5.kbmod.SPEC]) parts.addUniquePart('SR5.Specialization', 2);
         if (Helpers.hasModifiers(options?.event)) {
             return ShadowrunRoller.advancedRoll({
                 event: options?.event,
                 actor: this,
-                parts,
+                parts: parts.list,
                 title: title,
             });
         }
@@ -532,13 +595,13 @@ export class SR5Actor extends Actor {
                         title += ` + ${game.i18n.localize(CONFIG.SR5.attributes[newAtt])}`;
                     }
                     if (att !== undefined) {
-                        if (att.value && att.label) parts[att.label] = att.value;
+                        if (att.value && att.label) parts.addPart(att.label, att.value);
                         this._addMatrixParts(parts, true);
                         this._addGlobalParts(parts);
                         return ShadowrunRoller.advancedRoll({
                             event: options?.event,
                             actor: this,
-                            parts,
+                            parts: parts.list,
                             title: title,
                         });
                     }
@@ -550,7 +613,8 @@ export class SR5Actor extends Actor {
     promptRoll(options?: ActorRollOptions) {
         return ShadowrunRoller.advancedRoll({
             event: options?.event,
-            parts: {},
+            title: 'Roll',
+            parts: [],
             actor: this,
             dialogOptions: {
                 prompt: true,
@@ -562,29 +626,29 @@ export class SR5Actor extends Actor {
         const title = game.i18n.localize(CONFIG.SR5.attributeRolls[rollId]);
         const atts = this.data.data.attributes;
         const modifiers = this.data.data.modifiers;
-        const parts = {};
+        const parts = new PartsList<number>();
         if (rollId === 'composure') {
-            parts[atts.charisma.label] = atts.charisma.value;
-            parts[atts.willpower.label] = atts.willpower.value;
-            if (modifiers.composure) parts['SR5.Bonus'] = modifiers.composure;
+            parts.addUniquePart(atts.charisma.label, atts.charisma.value);
+            parts.addUniquePart(atts.willpower.label, atts.willpower.value);
+            if (modifiers.composure) parts.addUniquePart('SR5.Bonus', modifiers.composure);
         } else if (rollId === 'judge_intentions') {
-            parts[atts.charisma.label] = atts.charisma.value;
-            parts[atts.intuition.label] = atts.intuition.value;
-            if (modifiers.judge_intentions) parts['SR5.Bonus'] = modifiers.judge_intentions;
+            parts.addUniquePart(atts.charisma.label, atts.charisma.value);
+            parts.addUniquePart(atts.intuition.label, atts.intuition.value);
+            if (modifiers.judge_intentions) parts.addUniquePart('SR5.Bonus', modifiers.judge_intentions);
         } else if (rollId === 'lift_carry') {
-            parts[atts.strength.label] = atts.strength.value;
-            parts[atts.body.label] = atts.body.value;
-            if (modifiers.lift_carry) parts['SR5.Bonus'] = modifiers.lift_carry;
+            parts.addUniquePart(atts.strength.label, atts.strength.value);
+            parts.addUniquePart(atts.body.label, atts.body.value);
+            if (modifiers.lift_carry) parts.addUniquePart('SR5.Bonus', modifiers.lift_carry);
         } else if (rollId === 'memory') {
-            parts[atts.willpower.label] = atts.willpower.value;
-            parts[atts.logic.label] = atts.logic.value;
-            if (modifiers.memory) parts['SR5.Bonus'] = modifiers.memory;
+            parts.addUniquePart(atts.willpower.label, atts.willpower.value);
+            parts.addUniquePart(atts.logic.label, atts.logic.value);
+            if (modifiers.memory) parts.addUniquePart('SR5.Bonus', modifiers.memory);
         }
 
         return ShadowrunRoller.advancedRoll({
             event: options?.event,
             actor: this,
-            parts,
+            parts: parts.list,
             title: `${title} Test`,
         });
     }
@@ -595,19 +659,19 @@ export class SR5Actor extends Actor {
 
         if (options?.attribute) att = this.data.data.attributes[options.attribute];
         let limit = this.data.data.limits[att.limit];
-        const parts = {};
-        parts[skill.label] = skill.value;
+        const parts = new PartsList<number>();
+        parts.addUniquePart(skill.label, skill.value);
 
         if (options?.event && Helpers.hasModifiers(options?.event)) {
-            parts[att.label] = att.value;
-            if (options.event[CONFIG.SR5.kbmod.SPEC]) parts['SR5.Specialization'] = 2;
+            parts.addUniquePart(att.label, att.value);
+            if (options.event[CONFIG.SR5.kbmod.SPEC]) parts.addUniquePart('SR5.Specialization', 2);
 
             this._addMatrixParts(parts, [att, skill]);
             this._addGlobalParts(parts);
             return ShadowrunRoller.advancedRoll({
                 event: options.event,
                 actor: this,
-                parts,
+                parts: parts.list,
                 limit,
                 title: `${title} Test`,
             });
@@ -652,15 +716,15 @@ export class SR5Actor extends Actor {
                     att = this.data.data.attributes[newAtt];
                     title += ` + ${game.i18n.localize(CONFIG.SR5.attributes[newAtt])}`;
                     limit = this.data.data.limits[newLimit];
-                    parts[att.label] = att.value;
-                    if (skill.value === 0) parts['SR5.Defaulting'] = -1;
-                    if (spec) parts['SR5.Specialization'] = 2;
+                    parts.addUniquePart(att.label, att.value);
+                    if (skill.value === 0) parts.addUniquePart('SR5.Defaulting', -1);
+                    if (spec) parts.addUniquePart('SR5.Specialization', 2);
                     this._addMatrixParts(parts, [att, skill]);
                     this._addGlobalParts(parts);
                     return ShadowrunRoller.advancedRoll({
                         event: options?.event,
                         actor: this,
-                        parts,
+                        parts: parts.list,
                         limit,
                         title: `${title} Test`,
                     });
@@ -694,8 +758,8 @@ export class SR5Actor extends Actor {
         let title = game.i18n.localize(CONFIG.SR5.attributes[attId]);
         const att = this.data.data.attributes[attId];
         const atts = this.data.data.attributes;
-        const parts = {};
-        parts[att.label] = att.label === 'SR5.AttrEdge' ? this.getEdge().max : att.value;
+        const parts = new PartsList<number>();
+        parts.addUniquePart(att.label, att.label === 'SR5.AttrEdge' ? this.getEdge().max : att.value);
         let dialogData = {
             attribute: att,
             attributes: atts,
@@ -720,13 +784,13 @@ export class SR5Actor extends Actor {
                     if (att2Id !== 'none') {
                         att2 = atts[att2Id];
                         if (att2?.label) {
-                            parts[att2.label] = att2.label === 'SR5.AttrEdge' ? this.getEdge().max : att2.value;
+                            parts.addUniquePart(att2.label, att2.label === 'SR5.AttrEdge' ? this.getEdge().max : att2.value);
                             const att2IdLabel = game.i18n.localize(CONFIG.SR5.attributes[att2Id]);
                             title += ` + ${att2IdLabel}`;
                         }
                     }
                     if (att2Id === 'default') {
-                        parts['SR5.Defaulting'] = -1;
+                        parts.addUniquePart('SR5.Defaulting', -1);
                     }
                     this._addMatrixParts(parts, [att, att2]);
                     this._addGlobalParts(parts);
@@ -734,56 +798,56 @@ export class SR5Actor extends Actor {
                         event: options?.event,
                         title: `${title} Test`,
                         actor: this,
-                        parts,
+                        parts: parts.list,
                     });
                 },
             }).render(true);
         });
     }
 
-    _addMatrixParts(parts, atts) {
+    _addMatrixParts(parts: PartsList<number>, atts) {
         if (Helpers.isMatrix(atts)) {
             const m = this.data.data.matrix;
-            if (m.hot_sim) parts['SR5.HotSim'] = 2;
-            if (m.running_silent) parts['SR5.RunningSilent'] = -2;
+            if (m.hot_sim) parts.addUniquePart('SR5.HotSim', 2);
+            if (m.running_silent) parts.addUniquePart('SR5.RunningSilent', -2);
         }
     }
-    _addGlobalParts(parts) {
+    _addGlobalParts(parts: PartsList<number>) {
         if (this.data.data.modifiers.global) {
-            parts['SR5.Global'] = this.data.data.modifiers.global;
+            parts.addUniquePart('SR5.Global', this.data.data.modifiers.global);
         }
     }
 
-    _addDefenseParts(parts) {
+    _addDefenseParts(parts: PartsList<number>) {
         const reaction = this.findAttribute('reaction');
         const intuition = this.findAttribute('intuition');
         const mod = this.getModifier('defense');
 
         if (reaction) {
-            parts[reaction.label || 'SR5.Reaction'] = reaction.value;
+            parts.addUniquePart(reaction.label || 'SR5.Reaction', reaction.value);
         }
         if (intuition) {
-            parts[intuition.label || 'SR5.Intuition'] = intuition.value;
+            parts.addUniquePart(intuition.label || 'SR5.Intuition', intuition.value);
         }
         if (mod) {
-            parts['SR5.Bonus'] = mod;
+            parts.addUniquePart('SR5.Bonus', mod);
         }
     }
 
-    _addArmorParts(parts: ModList<number>) {
+    _addArmorParts(parts: PartsList<number>) {
         const armor = this.getArmor();
         if (armor) {
-            parts[armor.label || 'SR5.Armor'] = armor.base;
-            for (let [key, val] of Object.entries(armor.mod)) {
-                parts[key] = val;
+            parts.addUniquePart(armor.label || 'SR5.Armor', armor.base);
+            for (let part of armor.mod) {
+                parts.addUniquePart(part.name, part.value);
             }
         }
     }
 
-    _addSoakParts(parts: ModList<number>) {
+    _addSoakParts(parts: PartsList<number>) {
         const body = this.findAttribute('body');
         if (body) {
-            parts[body.label || 'SR5.Body'] = body.value;
+            parts.addUniquePart(body.label || 'SR5.Body', body.value);
         }
         this._addArmorParts(parts);
     }
@@ -806,11 +870,11 @@ export class SR5Actor extends Actor {
                 }
             }
             if (actor) {
-                const parts = {};
-                parts['SR5.PushTheLimit'] = actor.getEdge().max;
+                const parts = new PartsList<number>();
+                parts.addUniquePart('SR5.PushTheLimit', actor.getEdge().max);
                 ShadowrunRoller.basicRoll({
                     title: ` - ${game.i18n.localize('SR5.PushTheLimit')}`,
-                    parts: parts,
+                    parts: parts.list,
                     actor: actor,
                 }).then(() => {
                     actor.update({
@@ -850,13 +914,13 @@ export class SR5Actor extends Actor {
                     }
                 }
                 if (actor) {
-                    const parts = {};
-                    parts['SR5.OriginalDicePool'] = pool;
-                    parts['SR5.Successes'] = -hits;
+                    const parts = new PartsList<number>();
+                    parts.addUniquePart('SR5.OriginalDicePool', pool);
+                    parts.addUniquePart('SR5.Successes', -hits);
 
                     return ShadowrunRoller.basicRoll({
                         title: ` - Second Chance`,
-                        parts,
+                        parts: parts.list,
                         actor: actor,
                     }).then(() => {
                         actor.update({
