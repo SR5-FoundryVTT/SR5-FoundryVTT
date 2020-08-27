@@ -5,7 +5,7 @@
     </div>
     {{/if}} {{#each parts as |part id|}}
     <div class="part">
-        <span>{{localize id}}</span> (<span class="value">{{part}}</span>)
+        <span>{{localize part.name}}</span> (<span class="value">{{part.value}}</span>)
     </div>
     {{/each}}
 </div>

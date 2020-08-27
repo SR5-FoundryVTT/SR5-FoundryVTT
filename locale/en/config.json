@@ -368,6 +368,7 @@
 
     "SR5.RollOneDie": "You can't roll less than 1 die, chummer",
 
+    "SR5.OverwatchScore": "Overwatch Score",
     "SR5.OverwatchScoreTrackerTitle": "Mr. Johnson's Baby Monitor",
     "SR5.PlusFifteenMinutes": "+15min",
     "SR5.Character": "Character",
@@ -474,6 +475,18 @@
     "SR5.Block": "Block",
     "SR5.Parry": "Parry",
 
+    "SR5.Equipment": "Equipment",
+    "SR5.Device": "Device",
+    "SR5.Cyberware": "Cyberware",
+    "SR5.FullDefenseAttribute": "Full Defense Attribute",
+
+    "SR5.Blackmail": "Blackmail",
+    "SR5.Family": "Family",
+
+    "SR5.DamageResistanceTest": "Damage Resistance Test",
+    "SR5.Glitch": "Glitch!",
+    "SR5.RollMode": "Roll Mode",
+
     "SR5.OpenSourcePdf": "Open Source PDF to the item",
     "SR5.SourceFieldEmptyError": "The Source field is empty, please enter valid text for the source",
 
@@ -495,5 +508,7 @@
     "SR5.MIGRATION.SuccessHeader": "Migration Complete",
     "SR5.MIGRATION.SuccessDescription": "Existing compendium packs belonging to this world have been updated in the process of this migration.",
     "SR5.MIGRATION.SuccessPacksInfo": "Due to current technical limitations with FoundryVTT, actor packs must be updated manually.",
-    "SR5.MIGRATION.SuccessConfirm": "Close"
+    "SR5.MIGRATION.SuccessConfirm": "Close",
+
+    "CONTROLS.SR5.OverwatchScoreTracker": "Overwatch Score Tracker"
 }

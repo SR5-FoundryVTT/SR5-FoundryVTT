@@ -13,38 +13,47 @@ import FireRangeData = Shadowrun.FireRangeData;
 import BlastData = Shadowrun.BlastData;
 import { ChatData } from './ChatData';
 import { AdvancedRollProps, ShadowrunRoll, ShadowrunRoller } from '../rolls/ShadowrunRoller';
-import Template from '../template';
 import { createChatData } from '../chat';
+import { SYSTEM_NAME } from '../constants';
+import ConditionData = Shadowrun.ConditionData;
+import { SR5ItemDataWrapper } from './SR5ItemDataWrapper';
+import SR5ItemType = Shadowrun.SR5ItemType;
+import { PartsList } from '../parts/PartsList';
 
 export class SR5Item extends Item {
     labels: {} = {};
     items: SR5Item[];
     actor: SR5Actor;
 
+    private get wrapper(): SR5ItemDataWrapper {
+        // we need to cast here to unknown first to make ts happy
+        return new SR5ItemDataWrapper((this.data as unknown) as SR5ItemType);
+    }
+
     // Flag Functions
     getLastFireMode(): FireModeData {
-        return this.getFlag('shadowrun5e', 'lastFireMode') || { value: 0 };
+        return this.getFlag(SYSTEM_NAME, 'lastFireMode') || { value: 0 };
     }
     async setLastFireMode(fireMode: FireModeData) {
-        return this.setFlag('shadowrun5e', 'lastFireMode', fireMode);
+        return this.setFlag(SYSTEM_NAME, 'lastFireMode', fireMode);
     }
     getLastSpellForce(): SpellForceData {
-        return this.getFlag('shadowrun5e', 'lastSpellForce') || { value: 0 };
+        return this.getFlag(SYSTEM_NAME, 'lastSpellForce') || { value: 0 };
     }
     async setLastSpellForce(force: SpellForceData) {
-        return this.setFlag('shadowrun5e', 'lastSpellForce', force);
+        return this.setFlag(SYSTEM_NAME, 'lastSpellForce', force);
     }
     getLastComplexFormLevel(): ComplexFormLevelData {
-        return this.getFlag('shadowrun5e', 'lastComplexFormLevel') || { value: 0 };
+        return this.getFlag(SYSTEM_NAME, 'lastComplexFormLevel') || { value: 0 };
     }
     async setLastComplexFormLevel(level: ComplexFormLevelData) {
-        return this.setFlag('shadowrun5e', 'lastComplexFormLevel', level);
+        return this.setFlag(SYSTEM_NAME, 'lastComplexFormLevel', level);
     }
     getLastFireRangeMod(): FireRangeData {
-        return this.getFlag('shadowrun5e', 'lastFireRange') || { value: 0 };
+        return this.getFlag(SYSTEM_NAME, 'lastFireRange') || { value: 0 };
     }
     async setLastFireRangeMod(environmentalMod: FireRangeData) {
-        return this.setFlag('shadowrun5e', 'lastFireRange', environmentalMod);
+        return this.setFlag(SYSTEM_NAME, 'lastFireRange', environmentalMod);
     }
 
     /**
@@ -52,7 +61,7 @@ export class SR5Item extends Item {
      * TODO properly types this
      */
     getEmbeddedItems(): any[] {
-        let items = this.getFlag('shadowrun5e', 'embeddedItems');
+        let items = this.getFlag(SYSTEM_NAME, 'embeddedItems');
         if (items) {
             // moved this "hotfix" to here so that everywhere that accesses the flag just gets an array -- Shawn
             //TODO: This is a hotfix. Items should either always be
@@ -75,17 +84,17 @@ export class SR5Item extends Item {
      */
     async setEmbeddedItems(items: any[]) {
         // clear the flag first to remove the previous items - if we don't do this then it doesn't actually "delete" any items
-        await this.unsetFlag('shadowrun5e', 'embeddedItems');
-        await this.setFlag('shadowrun5e', 'embeddedItems', items);
+        await this.unsetFlag(SYSTEM_NAME, 'embeddedItems');
+        await this.setFlag(SYSTEM_NAME, 'embeddedItems', items);
     }
 
     getLastAttack(): AttackData | undefined {
-        return this.getFlag('shadowrun5e', 'lastAttack');
+        return this.getFlag(SYSTEM_NAME, 'lastAttack');
     }
     async setLastAttack(attack: AttackData) {
         // unset the flag first to clear old data, data can get weird if not done
-        await this.unsetFlag('shadowrun5e', 'lastAttack');
-        return this.setFlag('shadowrun5e', 'lastAttack', attack);
+        await this.unsetFlag(SYSTEM_NAME, 'lastAttack');
+        return this.setFlag(SYSTEM_NAME, 'lastAttack', attack);
     }
 
     async update(data, options?) {
@@ -125,38 +134,47 @@ export class SR5Item extends Item {
         const { technology, range, action } = item.data;
 
         if (technology) {
-            if (!technology.condition_monitor) technology.condition_monitor = { value: 0 };
+            if (technology.condition_monitor === undefined) {
+                technology.condition_monitor = { value: 0 };
+            }
             technology.condition_monitor.max = 8 + Math.ceil(technology.rating / 2);
 
             if (!technology.conceal) technology.conceal = {};
-            technology.conceal.mod = {};
 
+            const concealParts = new PartsList<number>();
             equippedMods.forEach((mod) => {
-                if (technology?.conceal && mod.data.data.technology.conceal.value) {
-                    technology.conceal.mod[mod.name] = mod.data.data.technology.conceal.value;
+                if (mod.data.data.technology.conceal.value) {
+                    concealParts.addUniquePart(mod.name, mod.data.data.technology.conceal.value);
                 }
             });
+            technology.conceal.mod = concealParts.list;
 
-            technology.conceal.value = technology.conceal.base + Helpers.totalMods(technology.conceal.mod);
+            technology.conceal.value = Helpers.calcTotal(technology.conceal);
         }
 
         if (action) {
             action.alt_mod = 0;
-            action.limit.mod = {};
-            action.damage.mod = {};
-            action.damage.ap.mod = {};
-            action.dice_pool_mod = {};
+            action.limit.mod = [];
+            action.damage.mod = [];
+            action.damage.ap.mod = [];
+            action.dice_pool_mod = [];
             // handle overrides from mods
+            const limitParts = new PartsList(action.limit.mod);
+            const dpParts = new PartsList(action.dice_pool_mod);
             equippedMods.forEach((mod) => {
-                if (mod.data.data.accuracy) action.limit.mod[mod.name] = mod.data.data.accuracy;
-                if (mod.data.data.dice_pool) action.dice_pool_mod[mod.name] = mod.data.data.dice_pool;
+                if (mod.data.data.accuracy) {
+                    limitParts.addUniquePart(mod.name, mod.data.data.accuracy);
+                }
+                if (mod.data.data.dice_pool) {
+                    dpParts.addUniquePart(mod.name, mod.data.data.dice_pool);
+                }
             });
 
             if (equippedAmmo) {
                 // add mods to damage from ammo
-                action.damage.mod[`${equippedAmmo.name}`] = equippedAmmo.data.data.damage;
+                action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name, equippedAmmo.data.data.damage);
                 // add mods to ap from ammo
-                action.damage.ap.mod[`${equippedAmmo.name}`] = equippedAmmo.data.data.ap;
+                action.damage.ap.mod = PartsList.AddUniquePart(action.damage.ap.mod, equippedAmmo.name, equippedAmmo.data.data.ap);
 
                 // override element
                 if (equippedAmmo.data.data.element) {
@@ -178,35 +196,44 @@ export class SR5Item extends Item {
             }
 
             // once all damage mods have been accounted for, sum base and mod to value
-            action.damage.value = action.damage.base + Helpers.totalMods(action.damage.mod);
-            action.damage.ap.value = action.damage.ap.base + Helpers.totalMods(action.damage.ap.mod);
+            action.damage.value = Helpers.calcTotal(action.damage);
+            action.damage.ap.value = Helpers.calcTotal(action.damage.ap);
 
-            action.limit.value = action.limit.base + Helpers.totalMods(action.limit.mod);
+            action.limit.value = Helpers.calcTotal(action.limit);
 
             if (this.actor) {
                 if (action.damage.attribute) {
                     const { attribute } = action.damage;
                     // TODO convert this in the template
-                    action.damage.mod[game.i18n.localize(CONFIG.SR5.attributes[attribute])] = this.actor.findAttribute(attribute)?.value;
-                    action.damage.value = action.damage.base + Helpers.totalMods(action.damage.mod);
+                    action.damage.mod = PartsList.AddUniquePart(
+                        action.damage.mod,
+                        game.i18n.localize(CONFIG.SR5.attributes[attribute]),
+                        this.actor.findAttribute(attribute)?.value,
+                    );
+                    action.damage.value = Helpers.calcTotal(action.damage);
                 }
                 if (action.limit.attribute) {
                     const { attribute } = action.limit;
                     // TODO convert this in the template
-                    action.limit.mod[game.i18n.localize(CONFIG.SR5.limits[attribute])] = this.actor.findLimit(attribute)?.value;
-                    action.limit.value = action.limit.base + Helpers.totalMods(action.limit.mod);
+                    action.limit.mod = PartsList.AddUniquePart(
+                        action.limit.mod,
+                        game.i18n.localize(CONFIG.SR5.limits[attribute]),
+                        this.actor.findLimit(attribute)?.value,
+                    );
+                    action.limit.value = Helpers.calcTotal(action.limit);
                 }
             }
         }
 
         if (range) {
             if (range.rc) {
-                range.rc.mod = {};
+                const rangeParts = new PartsList();
                 equippedMods.forEach((mod) => {
-                    if (mod.data.data.rc) range.rc.mod[mod.name] = mod.data.data.rc;
+                    if (mod.data.data.rc) rangeParts.addUniquePart(mod.name, mod.data.data.rc);
                     // handle overrides from ammo
                 });
-                if (range.rc) range.rc.value = range.rc.base + Helpers.totalMods(range.rc.mod);
+                range.rc.mod = rangeParts.list;
+                if (range.rc) range.rc.value = Helpers.calcTotal(range.rc);
             }
         }
 
@@ -226,41 +253,31 @@ export class SR5Item extends Item {
 
         const post = (bonus = {}) => {
             // if only post, don't roll and post a card version -- otherwise roll
-            const onComplete = postOnly
-                ? () => {
-                      const { token } = this.actor;
-                      const attack = this.getAttackData(0);
-                      // don't include any hits
-                      delete attack?.hits;
-                      // generate chat data
-                      createChatData({
-                          header: {
-                              name: this.name,
-                              img: this.img,
-                          },
-                          testName: this.getRollName(),
-                          actor: this.actor,
-                          tokenId: token ? `${token.scene._id}.${token.id}` : undefined,
-                          description: this.getChatData(),
-                          item: this,
-                          previewTemplate: this.hasTemplate,
-                          attack,
-                          ...bonus,
-                      }).then((chatData) => {
-                          // create the message
-                          return ChatMessage.create(chatData, { displaySheet: false });
-                      });
-                  }
-                : () => this.rollTest(event);
-
-            if (!postOnly && this.hasTemplate) {
-                // onComplete is called when template is finished
-                const template = Template.fromItem(this, onComplete);
-                if (template) {
-                    template.drawPreview();
-                }
+            if (postOnly) {
+                const { token } = this.actor;
+                const attack = this.getAttackData(0);
+                // don't include any hits
+                delete attack?.hits;
+                // generate chat data
+                createChatData({
+                    header: {
+                        name: this.name,
+                        img: this.img,
+                    },
+                    testName: this.getRollName(),
+                    actor: this.actor,
+                    tokenId: token ? `${token.scene._id}.${token.id}` : undefined,
+                    description: this.getChatData(),
+                    item: this,
+                    previewTemplate: this.hasTemplate,
+                    attack,
+                    ...bonus,
+                }).then((chatData) => {
+                    // create the message
+                    return ChatMessage.create(chatData, { displaySheet: false });
+                });
             } else {
-                onComplete();
+                this.rollTest(event);
             }
         };
         // prompt user if needed
@@ -318,12 +335,83 @@ export class SR5Item extends Item {
         return name;
     }
 
+    getOpposedTestMod(): PartsList<number> {
+        const parts = new PartsList<number>();
+        if (this.hasDefenseTest()) {
+            if (this.isAreaOfEffect()) {
+                parts.addUniquePart('SR5.Aoe', -2);
+            }
+            if (this.isRangedWeapon()) {
+                const fireModeData = this.getLastFireMode();
+                if (fireModeData?.defense) {
+                    if (fireModeData.defense !== 'SR5.DuckOrCover') {
+                        const fireMode = +fireModeData.defense;
+                        parts.addUniquePart('SR5.FireMode', fireMode);
+                    }
+                }
+            }
+        }
+        return parts;
+    }
+
+    getOpposedTestModifier(): string {
+        const testMod = this.getOpposedTestMod();
+        const total = testMod.total;
+        if (total) return `(${total})`;
+        else {
+            if (this.isRangedWeapon()) {
+                const fireModeData = this.getLastFireMode();
+                if (fireModeData?.defense) {
+                    if (fireModeData.defense === 'SR5.DuckOrCover') {
+                        return game.i18n.localize('SR5.DuckOrCover');
+                    }
+                }
+            }
+        }
+        return '';
+    }
+
+    getBlastData(): BlastData | undefined {
+        // can only handle spells and grenade right now
+        if (this.isSpell() && this.isAreaOfEffect()) {
+            // distance on spells is equal to force
+            let distance = this.getLastSpellForce().value;
+            // extended spells multiply by 10
+            if (this.data.data.extended) distance *= 10;
+            return {
+                radius: distance,
+                dropoff: 0,
+            };
+        } else if (this.isGrenade()) {
+            // use blast radius
+            const distance = this.data.data.thrown.blast.radius;
+            const dropoff = this.data.data.thrown.blast.dropoff;
+            return {
+                radius: distance,
+                dropoff: dropoff,
+            };
+        } else if (this.hasExplosiveAmmo()) {
+            const ammo = this.getEquippedAmmo();
+            const distance = ammo.data.data.blast.radius;
+            const dropoff = ammo.data.data.blast.dropoff;
+            return {
+                radius: distance,
+                dropoff,
+            };
+        }
+    }
+
     getEquippedAmmo() {
         return (this.items || []).filter((item) => item.type === 'ammo' && item.data.data?.technology?.equipped)[0];
     }
 
     getEquippedMods() {
         return (this.items || []).filter((item) => item.type === 'modification' && item.data.data.type === 'weapon' && item.data.data?.technology?.equipped);
+    }
+
+    hasExplosiveAmmo(): boolean {
+        const ammo = this.getEquippedAmmo();
+        return ammo?.data?.data?.blast?.radius > 0;
     }
 
     async equipWeaponMod(iid) {
@@ -403,26 +491,29 @@ export class SR5Item extends Item {
 
     getRollPartsList(): ModList<number> {
         // we only have a roll if we have an action or an actor
-        if (!this.data.data.action || !this.actor) return {};
+        if (!this.data.data.action || !this.actor) return [];
 
-        const parts = duplicate(this.getModifierList());
+        const parts = new PartsList(duplicate(this.getModifierList()));
 
         const skill = this.actor.findActiveSkill(this.getActionSkill());
         const attribute = this.actor.findAttribute(this.getActionAttribute());
         const attribute2 = this.actor.findAttribute(this.getActionAttribute2());
 
-        if (attribute && attribute.label) parts[attribute.label] = attribute.value;
+        if (attribute && attribute.label) parts.addPart(attribute.label, attribute.value);
 
         // if we have a valid skill, don't look for a second attribute
-        if (skill && skill.label) parts[skill.label] = skill.value;
-        else if (attribute2 && attribute2.label) parts[attribute2.label] = attribute2.value;
+        if (skill && skill.label) {
+            parts.addUniquePart(skill.label, skill.value);
+            if (skill.value === 0) {
+                parts.addUniquePart('SR5.Defaulting', -1);
+            }
+        } else if (attribute2 && attribute2.label) parts.addUniquePart(attribute2.label, attribute2.value);
 
         const spec = this.getActionSpecialization();
-        if (spec) parts[spec] = 2;
+        if (spec) parts.addUniquePart(spec, 2);
 
-        // TODO remove these (by making them not used, not just delete)
         const mod = parseInt(this.data.data.action.mod || 0);
-        if (mod) parts['SR5.ItemMod'] = mod;
+        if (mod) parts.addUniquePart('SR5.ItemMod', mod);
 
         const atts: (AttributeField | SkillField)[] | boolean = [];
         if (attribute !== undefined) atts.push(attribute);
@@ -433,7 +524,7 @@ export class SR5Item extends Item {
         this.actor._addMatrixParts(parts, atts);
         this._addWeaponParts(parts);
 
-        return parts;
+        return parts.list;
     }
 
     calculateRecoil() {
@@ -443,10 +534,10 @@ export class SR5Item extends Item {
         return Math.min(this.getRecoilCompensation(true) - (this.getLastFireMode()?.value || 0), 0);
     }
 
-    _addWeaponParts(parts: ModList<number>) {
+    _addWeaponParts(parts: PartsList<number>) {
         if (this.isRangedWeapon()) {
             const recoil = this.calculateRecoil();
-            if (recoil) parts['SR5.Recoil'] = recoil;
+            if (recoil) parts.addUniquePart('SR5.Recoil', recoil);
         }
     }
 
@@ -477,11 +568,11 @@ export class SR5Item extends Item {
                     options.fireModeDefense = +lastAttack.fireMode.defense;
                 }
             }
-            return target.rollDefense(options, parts);
+            return target.rollDefense(options, parts.list);
         } else if (opposed.type === 'soak') {
             options['damage'] = lastAttack?.damage;
             options['attackerHits'] = lastAttack?.hits;
-            return target.rollSoak(options, parts);
+            return target.rollSoak(options, parts.list);
         } else if (opposed.type === 'armor') {
             return target.rollArmor(options);
         } else {
@@ -704,42 +795,6 @@ export class SR5Item extends Item {
         ui.PDFoundry.openPDFByCode(code, parseInt(page));
     }
 
-    isAreaOfEffect(): boolean {
-        return this.isGrenade() || (this.isSpell() && this.data.data.range === 'los_a') || this.hasExplosiveAmmo();
-    }
-
-    isGrenade(): boolean {
-        return this.data.type === 'weapon' && this.data.data.thrown?.blast?.radius;
-    }
-
-    isCombatSpell(): boolean {
-        return this.isSpell() && this.data.data.category === 'combat';
-    }
-
-    isRangedWeapon(): boolean {
-        return this.data.type === 'weapon' && this.data.data.category === 'range';
-    }
-
-    isSpell(): boolean {
-        return this.data.type === 'spell';
-    }
-
-    isComplexForm(): boolean {
-        return this.data.type === 'complex_form';
-    }
-
-    isMeleeWeapon(): boolean {
-        return this.data.type === 'weapon' && this.data.data.category === 'melee';
-    }
-
-    isEquipped(): boolean {
-        return this.data.data.technology?.equipped || false;
-    }
-
-    getBookSource(): string {
-        return this.data.data.description.source;
-    }
-
     getAttackData(hits: number): AttackData | undefined {
         if (!this.data.data.action?.damage) return undefined;
         const damage = this.data.data.action.damage;
@@ -750,10 +805,11 @@ export class SR5Item extends Item {
 
         if (this.isCombatSpell()) {
             const force = this.getLastSpellForce().value;
+            const damageParts = new PartsList(data.damage.mod);
             data.force = force;
             data.damage.base = force;
-            data.damage.value = force + Helpers.totalMods(data.damage.mod);
-            data.damage.ap.value = -force + Helpers.totalMods(data.damage.mod);
+            data.damage.value = force + damageParts.total;
+            data.damage.ap.value = -force + damageParts.total;
             data.damage.ap.base = -force;
         }
 
@@ -777,18 +833,6 @@ export class SR5Item extends Item {
         return data;
     }
 
-    getActionSkill(): string | undefined {
-        return this.data.data.action?.skill;
-    }
-
-    getActionAttribute(): string | undefined {
-        return this.data.data.action?.attribute;
-    }
-
-    getActionAttribute2(): string | undefined {
-        return this.data.data.action?.attribute2;
-    }
-
     getRollName(): string | undefined {
         if (this.isRangedWeapon()) {
             return game.i18n.localize('SR5.RangeWeaponAttack');
@@ -806,8 +850,9 @@ export class SR5Item extends Item {
         return undefined;
     }
 
-    getLimit(): LimitField {
+    getLimit(): LimitField | undefined {
         const limit = this.data.data.action?.limit;
+        if (!limit) return undefined;
         if (this.data.type === 'weapon') {
             limit.label = 'SR5.Accuracy';
         } else if (limit?.attribute) {
@@ -822,115 +867,6 @@ export class SR5Item extends Item {
             limit.label = 'SR5.Limit';
         }
         return limit;
-    }
-
-    getActionLimit(): number | undefined {
-        return this.data.data.action?.limit?.value;
-    }
-
-    getModifierList(): ModList<number> {
-        return this.data.data.action?.dice_pool_mod || [];
-    }
-
-    getActionSpecialization(): string | undefined {
-        if (this.data.data.action?.spec) return 'SR5.Specialization';
-        return undefined;
-    }
-
-    getDrain(): number {
-        return this.data.data.drain || 0;
-    }
-
-    getFade(): number {
-        return this.data.data.fade || 0;
-    }
-
-    getRecoilCompensation(includeActor: boolean = true): number {
-        let base = parseInt(this.data.data.range.rc.value);
-        if (includeActor) base += parseInt(this.actor.data.data.recoil_compensation);
-        return base;
-    }
-
-    getReach(): number {
-        if (this.isMeleeWeapon()) {
-            return this.data.data.melee?.reach;
-        }
-        return 0;
-    }
-
-    hasExplosiveAmmo(): boolean {
-        const ammo = this.getEquippedAmmo();
-        return ammo?.data?.data?.blast?.radius > 0;
-    }
-
-    hasDefenseTest(): boolean {
-        return this.data.data.action?.opposed?.type === 'defense';
-    }
-
-    getOpposedTestMod(): ModList<number> {
-        const parts = {};
-        if (this.hasDefenseTest()) {
-            if (this.isAreaOfEffect()) {
-                parts['SR5.Aoe'] = -2;
-            }
-            if (this.isRangedWeapon()) {
-                const fireModeData = this.getLastFireMode();
-                if (fireModeData?.defense) {
-                    if (fireModeData.defense !== 'SR5.DuckOrCover') {
-                        const fireMode = +fireModeData.defense;
-                        if (fireMode) parts['SR5.FireMode'] = fireMode;
-                    }
-                }
-            }
-        }
-        return parts;
-    }
-
-    getOpposedTestModifier(): string {
-        const testMod = this.getOpposedTestMod();
-        const total = Helpers.totalMods(testMod);
-        if (total) return `(${total})`;
-        else {
-            if (this.isRangedWeapon()) {
-                const fireModeData = this.getLastFireMode();
-                if (fireModeData?.defense) {
-                    if (fireModeData.defense === 'SR5.DuckOrCover') {
-                        return game.i18n.localize('SR5.DuckOrCover');
-                    }
-                }
-            }
-        }
-        return '';
-    }
-
-    getBlastData(): BlastData | undefined {
-        // can only handle spells and grenade right now
-        if (this.isSpell() && this.isAreaOfEffect()) {
-            // distance on spells is equal to force
-            let distance = this.getLastSpellForce().value;
-            // extended spells multiply by 10
-            if (this.data.data.extended) distance *= 10;
-            return {
-                radius: distance,
-                dropoff: 0,
-            };
-        } else if (this.isGrenade()) {
-            // use blast radius
-            const distance = this.data.data.thrown.blast.radius;
-            const dropoff = this.data.data.thrown.blast.dropoff;
-            return {
-                radius: distance,
-                dropoff: dropoff,
-            };
-        } else if (this.hasExplosiveAmmo()) {
-            const ammo = this.getEquippedAmmo();
-            const distance = ammo.data.data.blast.radius;
-            const dropoff = ammo.data.data.blast.dropoff;
-            return {
-                radius: distance,
-                dropoff,
-            };
-        }
     }
 
     /**
@@ -952,5 +888,147 @@ export class SR5Item extends Item {
     getFlag(scope: string, key: string): any {
         const data = super.getFlag(scope, key);
         return Helpers.onGetFlag(data);
+    }
+
+    /**
+     * Passthrough functions
+     */
+    isAreaOfEffect(): boolean {
+        return this.wrapper.isAreaOfEffect();
+    }
+
+    isArmor(): boolean {
+        return this.wrapper.isArmor();
+    }
+
+    isArmorBase(): boolean {
+        return this.wrapper.isArmorBase();
+    }
+
+    isArmorAccessory(): boolean {
+        return this.wrapper.isArmorAccessory();
+    }
+
+    isGrenade(): boolean {
+        return this.wrapper.isGrenade();
+    }
+
+    isWeapon(): boolean {
+        return this.wrapper.isWeapon();
+    }
+
+    isCyberware(): boolean {
+        return this.wrapper.isCyberware();
+    }
+
+    isCombatSpell(): boolean {
+        return this.wrapper.isCombatSpell();
+    }
+
+    isRangedWeapon(): boolean {
+        return this.wrapper.isRangedWeapon();
+    }
+
+    isSpell(): boolean {
+        return this.wrapper.isSpell();
+    }
+
+    isComplexForm(): boolean {
+        return this.wrapper.isComplexForm();
+    }
+
+    isMeleeWeapon(): boolean {
+        return this.wrapper.isMeleeWeapon();
+    }
+
+    isDevice(): boolean {
+        return this.wrapper.isDevice();
+    }
+
+    isEquipped(): boolean {
+        return this.wrapper.isEquipped();
+    }
+
+    isCyberdeck(): boolean {
+        return this.wrapper.isCyberdeck();
+    }
+
+    getBookSource(): string {
+        return this.wrapper.getBookSource();
+    }
+
+    getConditionMonitor(): ConditionData {
+        return this.wrapper.getConditionMonitor();
+    }
+
+    getRating(): number {
+        return this.wrapper.getRating();
+    }
+
+    getArmorValue(): number {
+        return this.wrapper.getArmorValue();
+    }
+
+    getArmorElements(): { [key: string]: number } {
+        return this.wrapper.getArmorElements();
+    }
+
+    getEssenceLoss(): number {
+        return this.wrapper.getEssenceLoss();
+    }
+
+    getASDF() {
+        return this.wrapper.getASDF();
+    }
+
+    getActionSkill(): string | undefined {
+        return this.wrapper.getActionSkill();
+    }
+
+    getActionAttribute(): string | undefined {
+        return this.wrapper.getActionAttribute();
+    }
+
+    getActionAttribute2(): string | undefined {
+        return this.wrapper.getActionAttribute2();
+    }
+
+    getActionLimit(): number | undefined {
+        return this.wrapper.getActionLimit();
+    }
+
+    getModifierList(): ModList<number> {
+        return this.wrapper.getModifierList();
+    }
+
+    getActionSpecialization(): string | undefined {
+        return this.wrapper.getActionSpecialization();
+    }
+
+    getDrain(): number {
+        return this.wrapper.getDrain();
+    }
+
+    getFade(): number {
+        return this.wrapper.getFade();
+    }
+
+    getRecoilCompensation(includeActor: boolean = true): number {
+        let rc = this.wrapper.getRecoilCompensation();
+        if (includeActor && this.actor) {
+            rc += this.actor.getRecoilCompensation();
+        }
+        return rc;
+    }
+
+    getReach(): number {
+        if (this.isMeleeWeapon()) {
+            return this.data.data.melee?.reach ?? 0;
+        }
+        return 0;
+    }
+
+    hasDefenseTest(): boolean {
+        return this.data.data.action?.opposed?.type === 'defense';
     }
 }

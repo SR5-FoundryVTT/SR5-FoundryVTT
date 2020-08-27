@@ -1,13 +1,14 @@
 // game settings for shadowrun 5e
 
 import { VersionMigration } from './migrator/VersionMigration';
+import { SYSTEM_NAME } from './constants';
 
 export const registerSystemSettings = () => {
 
     /**
      * Register diagonal movement rule setting
      */
-    game.settings.register('shadowrun5e', 'diagonalMovement', {
+    game.settings.register(SYSTEM_NAME, 'diagonalMovement', {
         name: 'SETTINGS.DiagonalMovementName',
         hint: 'SETTINGS.DiagonalMovementDescription',
         scope: 'world',
@@ -24,7 +25,7 @@ export const registerSystemSettings = () => {
     /**
      * Default limit behavior
      */
-    game.settings.register('shadowrun5e', 'applyLimits', {
+    game.settings.register(SYSTEM_NAME, 'applyLimits', {
         name: 'SETTINGS.ApplyLimitsName',
         hint: 'SETTINGS.ApplyLimitsDescription',
         scope: 'world',
@@ -33,7 +34,7 @@ export const registerSystemSettings = () => {
         default: true,
     });
 
-    game.settings.register('shadowrun5e', 'displayDefaultRollCard', {
+    game.settings.register(SYSTEM_NAME, 'displayDefaultRollCard', {
         name: 'SETTINGS.DisplayDefaultRollCardName',
         hint: 'SETTINGS.DisplayDefaultRollCardDescription',
         scope: 'user',
@@ -45,7 +46,7 @@ export const registerSystemSettings = () => {
     /**
      * Track system version upon which a migration was last applied
      */
-    game.settings.register('shadowrun5e', VersionMigration.KEY_DATA_VERSION, {
+    game.settings.register(SYSTEM_NAME, VersionMigration.KEY_DATA_VERSION, {
         name: 'System Data Version.',
         scope: 'world',
         config: false,

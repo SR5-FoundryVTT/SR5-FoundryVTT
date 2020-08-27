@@ -1,13 +1,20 @@
 import AttributeField = Shadowrun.AttributeField;
 import SkillField = Shadowrun.SkillField;
+import ModifiableValue = Shadowrun.ModifiableValue;
+import { PartsList } from './parts/PartsList';
 
 export class Helpers {
-    static totalMods(mods) {
-        const reducer = (acc, cur) => +acc + +cur;
-        if (!mods) return 0;
-        if (Array.isArray(mods)) return mods.reduce(reducer, 0);
-        // assume object of key/values
-        return Object.values(mods).reduce(reducer, 0);
+    /**
+     * Calculate the total value for a data object
+     * - stores the total value and returns it
+     * @param data
+     */
+    static calcTotal(data: ModifiableValue): number {
+        if (data.mod === undefined) data.mod = [];
+        const parts = new PartsList(data.mod);
+        data.value = parts.total + data.base;
+        data.mod = parts.list;
+        return data.value;
     }
 
     // replace 'SR5.'s on keys with 'SR5_DOT_'

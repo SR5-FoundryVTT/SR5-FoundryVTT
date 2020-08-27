@@ -12,6 +12,7 @@ import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
 import { registerHandlebarHelpers, preloadHandlebarsTemplates } from './handlebars';
 import { ShadowrunRoller } from './rolls/ShadowrunRoller';
 import { Migrator } from './migrator/Migrator';
+import { SYSTEM_NAME } from './constants';
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -36,9 +37,9 @@ Hooks.once('init', function () {
 
     // Register sheet application classes
     Actors.unregisterSheet('core', ActorSheet);
-    Actors.registerSheet('shadowrun5e', SR5ActorSheet, { makeDefault: true });
+    Actors.registerSheet(SYSTEM_NAME, SR5ActorSheet, { makeDefault: true });
     Items.unregisterSheet('core', ItemSheet);
-    Items.registerSheet('shadowrun5e', SR5ItemSheet, { makeDefault: true });
+    Items.registerSheet(SYSTEM_NAME, SR5ItemSheet, { makeDefault: true });
 
     ['renderSR5ActorSheet', 'renderSR5ItemSheet'].forEach((s) => {
         Hooks.on(s, (app, html) => Helpers.setupCustomCheckbox(app, html));
@@ -67,6 +68,8 @@ Hooks.on('ready', function () {
     if (game.user.isGM) {
         Migrator.BeginMigration();
     }
+    const diceIconSelector = '#chat-controls .roll-type-select .fa-dice-d20';
+    $(document).on('click', diceIconSelector, () => ShadowrunRoller.promptRoll());
 });
 
 Hooks.on('preUpdateCombat', preCombatUpdate);
@@ -147,7 +150,7 @@ function rollItemMacro(itemName) {
         return ui.notifications.warn(`Your controlled Actor does not have an item named ${itemName}`);
     }
 
-    return item.rollTest(event);
+    return item.postCard();
 }
 
 registerHandlebarHelpers();

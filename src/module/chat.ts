@@ -6,6 +6,8 @@ import BaseValuePair = Shadowrun.BaseValuePair;
 import DamageData = Shadowrun.DamageData;
 import AttackData = Shadowrun.AttackData;
 import LabelField = Shadowrun.LabelField;
+import { SYSTEM_NAME } from './constants';
+import { PartsList } from './parts/PartsList';
 
 export type TemplateData = {
     header: {
@@ -24,6 +26,7 @@ export type TemplateData = {
     incomingDrain?: LabelField & {
         value: number;
     };
+    hits?: number;
     soak?: DamageData;
     tests?: {
         label: string;
@@ -31,11 +34,16 @@ export type TemplateData = {
     }[];
     description?: object;
     previewTemplate?: boolean;
+    rollMode?: keyof typeof CONFIG.Dice.rollModes,
 };
 
 export const createChatData = async (templateData: TemplateData, roll?: Roll) => {
     const template = `systems/shadowrun5e/dist/templates/rolls/roll-card.html`;
-    const html = await renderTemplate(template, templateData);
+    const hackyTemplateData = {
+        ...templateData,
+        parts: new PartsList(templateData.parts).getMessageOutput(),
+    };
+    const html = await renderTemplate(template, hackyTemplateData);
     const actor = templateData.actor;
 
     const chatData = {
@@ -57,7 +65,7 @@ export const createChatData = async (templateData: TemplateData, roll?: Roll) =>
     if (roll) {
         chatData['sound'] = CONFIG.sounds.dice;
     }
-    const rollMode = game.settings.get('core', 'rollMode');
+    const rollMode = templateData.rollMode ?? game.settings.get('core', 'rollMode');
 
     if (['gmroll', 'blindroll'].includes(rollMode)) chatData['whisper'] = ChatMessage.getWhisperIDs('GM');
     if (rollMode === 'blindroll') chatData['blind'] = true;
@@ -69,7 +77,7 @@ export const addChatMessageContextOptions = (html, options) => {
     const canRoll = (li) => {
         const msg = game.messages.get(li.data().messageId);
 
-        return msg.getFlag('shadowrun5e', 'customRoll');
+        return msg.getFlag(SYSTEM_NAME, 'customRoll');
     };
 
     options.push(
@@ -90,7 +98,7 @@ export const addChatMessageContextOptions = (html, options) => {
 };
 
 export const addRollListeners = (app: ChatMessage, html) => {
-    if (!app.getFlag('shadowrun5e', 'customRoll')) return;
+    if (!app.getFlag(SYSTEM_NAME, 'customRoll')) return;
     const item = SR5Item.getItemFromMessage(html);
     html.on('click', '.test-roll', async (event) => {
         event.preventDefault();
@@ -116,7 +124,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
         event.preventDefault();
         if (item) {
             const template = Template.fromItem(item);
-            template?.drawPreview(event);
+            template?.drawPreview();
         }
     });
     html.on('click', '.card-title', (event) => {

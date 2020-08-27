@@ -41,9 +41,9 @@ declare namespace Shadowrun {
     /**
      * A list of mods to apply to a value.
      */
-    export type ModList<TType> = {
-        [name: string]: TType;
-    };
+    export type ModList<TType> = Array<ModListEntry<TType>>;
+
+    export type ModListEntry<TType> = { name: string; value: TType };
     /**
      * A value that is modifiable, having a base and current value, along with associated mod list.
      */

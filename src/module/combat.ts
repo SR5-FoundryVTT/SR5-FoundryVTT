@@ -1,3 +1,5 @@
+import { SYSTEM_NAME } from './constants';
+
 export const preCombatUpdate = async function (combat, changes, options) {
     // triggers when combat round changes
     if (changes.round && combat.round && changes.round > combat.round) {
@@ -30,7 +32,7 @@ export const preCombatUpdate = async function (combat, changes, options) {
 export const shadowrunCombatUpdate = async (changes, options) => {
     const { combat } = game;
     // subtact 10 from all initiative, we just went into the next initiative pass
-    const removedCombatants = combat.getFlag('shadowrun5e', 'removedCombatants') || [];
+    const removedCombatants = combat.getFlag(SYSTEM_NAME, 'removedCombatants') || [];
     const combatants = [];
     for (const c of combat.combatants) {
         let init = Number(c.initiative);
@@ -78,13 +80,13 @@ export const shadowrunCombatUpdate = async (changes, options) => {
         }
         await combat.createEmbeddedEntity('Combatant', removedCombatants, {});
         await ChatMessage.create(messages);
-        await combat.unsetFlag('shadowrun5e', 'removedCombatants');
+        await combat.unsetFlag(SYSTEM_NAME, 'removedCombatants');
         // @ts-ignore
         await combat.resetAll();
         await combat.rollAll();
         await combat.update({ turn: 0 });
     } else if (removedCombatants.length) {
-        await combat.setFlag('shadowrun5e', 'removedCombatants', removedCombatants);
+        await combat.setFlag(SYSTEM_NAME, 'removedCombatants', removedCombatants);
         await combat.update({ turn: 0 });
     }
 };

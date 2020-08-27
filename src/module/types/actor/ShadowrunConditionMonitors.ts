@@ -1,9 +1,15 @@
 /// <reference path="../Shadowrun.ts" />
 declare namespace Shadowrun {
     export type Tracks = {
-        physical: ValueMaxPair<number> & LabelField & ModifiableValue & Overflow;
-        stun: ValueMaxPair<number> & LabelField & ModifiableValue;
+        physical: TrackType & Overflow;
+        stun: TrackType;
     };
+
+    export type TrackType = ValueMaxPair<number> &
+        LabelField &
+        ModifiableValue & {
+            wounds: number;
+        };
 
     export type Overflow = {
         overflow: ValueMaxPair<number>;

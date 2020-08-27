@@ -8,6 +8,8 @@ import { Helpers } from '../helpers';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
 import { createChatData, TemplateData } from '../chat';
+import { SYSTEM_NAME } from '../constants';
+import { PartsList } from '../parts/PartsList';
 
 export interface BasicRollProps {
     name?: string;
@@ -31,6 +33,7 @@ export interface BasicRollProps {
     description?: object;
     previewTemplate?: boolean;
     hideRollMessage?: boolean;
+    rollMode?: keyof typeof CONFIG.Dice.rollModes;
 }
 
 export interface RollDialogOptions {
@@ -48,6 +51,7 @@ export interface AdvancedRollProps extends BasicRollProps {
 
 export class ShadowrunRoll extends Roll {
     templateData: TemplateData | undefined;
+    // add class Roll to the json so dice-so-nice works
     toJSON(): any {
         const data = super.toJSON();
         data.class = 'Roll';
@@ -101,8 +105,17 @@ export class ShadowrunRoller {
         return ShadowrunRoller.advancedRoll(rollData);
     }
 
-    static shadowrunFormula({ parts, limit, explode }): string {
-        const count = Helpers.totalMods(parts);
+    static shadowrunFormula({
+        parts: partsProps,
+        limit,
+        explode,
+    }: {
+        parts: ModList<number>;
+        limit?: BaseValuePair<number> & LabelField;
+        explode?: boolean;
+    }): string {
+        const parts = new PartsList(partsProps);
+        const count = parts.total;
         if (count <= 0) {
             // @ts-ignore
             ui.notifications.error(game.i18n.localize('SR5.RollOneDie'));
@@ -120,7 +133,7 @@ export class ShadowrunRoller {
     }
 
     static async basicRoll({
-        parts = {},
+        parts: partsProps = [],
         limit,
         explodeSixes,
         title,
@@ -128,17 +141,18 @@ export class ShadowrunRoller {
         img = actor?.img,
         name = actor?.name,
         hideRollMessage,
+        rollMode,
         ...props
     }: BasicRollProps): Promise<ShadowrunRoll | undefined> {
         let roll;
-        const rollMode = game.settings.get('core', 'rollMode');
-        if (Object.keys(parts).length > 0) {
-            const formula = this.shadowrunFormula({ parts, limit, explode: explodeSixes });
+        const parts = new PartsList(partsProps);
+        if (parts.length) {
+            const formula = this.shadowrunFormula({ parts: parts.list, limit, explode: explodeSixes });
             if (!formula) return;
             roll = new ShadowrunRoll(formula);
             roll.roll();
 
-            if (game.settings.get('shadowrun5e', 'displayDefaultRollCard')) {
+            if (game.settings.get(SYSTEM_NAME, 'displayDefaultRollCard')) {
                 await roll.toMessage({
                     speaker: ChatMessage.getSpeaker({ actor: actor }),
                     flavor: title,
@@ -150,6 +164,20 @@ export class ShadowrunRoller {
         // start of custom message
         const dice = roll?.parts[0].rolls;
         const token = actor?.token;
+
+        let glitch = false;
+        if (roll !== undefined) {
+            let oneCount = 0;
+            roll.dice.forEach((die) => {
+                die.rolls.forEach((result) => {
+                    if (result.roll === 1) {
+                        oneCount += 1;
+                    }
+                });
+            });
+            glitch = oneCount > Math.floor(parts.total / 2);
+        }
+
         const templateData = {
             actor: actor,
             header: {
@@ -157,16 +185,20 @@ export class ShadowrunRoller {
                 img: img || '',
             },
             tokenId: token ? `${token.scene._id}.${token.id}` : undefined,
+            rollMode,
             dice,
             limit,
             testName: title,
-            dicePool: Helpers.totalMods(parts),
-            parts,
+            dicePool: parts.total,
+            parts: parts.list,
             hits: roll?.total,
+            glitch,
             ...props,
         };
 
-        roll.templateData = templateData;
+        if (roll) {
+            roll.templateData = templateData;
+        }
 
         if (!hideRollMessage) {
             const chatData = await createChatData(templateData, roll);
@@ -181,11 +213,9 @@ export class ShadowrunRoller {
      * Prompt a roll for the user
      */
     static promptRoll(): Promise<ShadowrunRoll | undefined> {
-        const lastRoll = game.user.getFlag('shadowrun5e', 'lastRollPromptValue') || 0;
-        const parts = {
-            'SR5.LastRoll': lastRoll,
-        };
-        return ShadowrunRoller.advancedRoll({ parts, dialogOptions: { prompt: true } });
+        const lastRoll = game.user.getFlag(SYSTEM_NAME, 'lastRollPromptValue') || 0;
+        const parts = [{ name: 'SR5.LastRoll', value: lastRoll }];
+        return ShadowrunRoller.advancedRoll({ parts, title: 'Roll', dialogOptions: { prompt: true } });
     }
 
     /**
@@ -196,23 +226,28 @@ export class ShadowrunRoller {
     static advancedRoll(props: AdvancedRollProps): Promise<ShadowrunRoll | undefined> {
         // destructure what we need to use from props
         // any value pulled out needs to be updated back in props if changed
-        const { title, actor, parts = {}, limit, extended, wounds = true, after, dialogOptions } = props;
+        const { title, actor, parts: partsProps = [], limit, extended, wounds = true, after, dialogOptions } = props;
+        const parts = new PartsList(partsProps);
 
         // remove limits if game settings is set
-        if (!game.settings.get('shadowrun5e', 'applyLimits')) {
+        if (!game.settings.get(SYSTEM_NAME, 'applyLimits')) {
             delete props.limit;
         }
 
         // TODO create "fast roll" option
 
+        const rollMode = game.settings.get('core', 'rollMode');
+
         let dialogData = {
             options: dialogOptions,
             extended,
-            dice_pool: Helpers.totalMods(parts),
-            parts,
+            dice_pool: parts.total,
+            parts: parts.getMessageOutput(),
             limit: limit?.value,
             wounds,
             woundValue: actor?.getWoundModifier(),
+            rollMode,
+            rollModes: CONFIG.Dice.rollModes,
         };
         let template = 'systems/shadowrun5e/dist/templates/rolls/roll-dialog.html';
         let edge = false;
@@ -250,12 +285,10 @@ export class ShadowrunRoller {
 
                         const dicePoolValue = Helpers.parseInputToNumber($(html).find('[name="dice_pool"]').val());
 
-                        if (dialogOptions?.prompt && dicePoolValue > 0) {
-                            for (const key in parts) {
-                                delete parts[key];
-                            }
-                            await game.user.setFlag('shadowrun5e', 'lastRollPromptValue', dicePoolValue);
-                            parts['SR5.Base'] = dicePoolValue;
+                        if (dialogOptions?.prompt) {
+                            parts.clear();
+                            await game.user.setFlag(SYSTEM_NAME, 'lastRollPromptValue', dicePoolValue);
+                            parts.addUniquePart('SR5.Base', dicePoolValue);
                         }
 
                         const limitValue = Helpers.parseInputToNumber($(html).find('[name="limit"]').val());
@@ -271,12 +304,14 @@ export class ShadowrunRoller {
                         const environmentMod = Helpers.parseInputToNumber($(html).find('[name="options.environmental"]').val());
 
                         if (wounds && woundValue !== 0) {
-                            parts['SR5.Wounds'] = woundValue;
+                            parts.addUniquePart('SR5.Wounds', woundValue);
                             props.wounds = true;
                         }
-                        if (situationMod) parts['SR5.SituationalModifier'] = situationMod;
+                        if (situationMod) {
+                            parts.addUniquePart('SR5.SituationalModifier', situationMod);
+                        }
                         if (environmentMod) {
-                            parts['SR5.EnvironmentModifier'] = environmentMod;
+                            parts.addUniquePart('SR5.EnvironmentModifier', environmentMod);
                             if (!props.dialogOptions) props.dialogOptions = {};
                             props.dialogOptions.environmental = true;
                         }
@@ -286,20 +321,24 @@ export class ShadowrunRoller {
 
                         if (edge && actor) {
                             props.explodeSixes = true;
-                            parts['SR5.PushTheLimit'] = actor.getEdge().max;
+                            parts.addUniquePart('SR5.PushTheLimit', actor.getEdge().max);
+                            delete props.limit;
                             await actor.update({
                                 'data.attributes.edge.value': actor.data.data.attributes.edge.value - 1,
                             });
                         }
 
-                        props.parts = parts;
+                        props.rollMode = Helpers.parseInputToString($(html).find('[name=rollMode]').val());
+
+                        props.parts = parts.list;
                         const r = this.basicRoll({
                             ...props,
                         });
 
                         if (extended && r) {
-                            const currentExtended = parts['SR5.Extended'] || 0;
-                            parts['SR5.Extended'] = currentExtended - 1;
+                            const currentExtended = parts.getPartValue('SR5.Extended') ?? 0;
+                            parts.addUniquePart('SR5.Extended', currentExtended - 1);
+                            props.parts = parts.list;
                             // add a bit of a delay to roll again
                             setTimeout(() => this.advancedRoll(props), 400);
                         }
