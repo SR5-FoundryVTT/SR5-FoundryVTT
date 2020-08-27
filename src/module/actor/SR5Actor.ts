@@ -7,7 +7,6 @@ import SoakRollOptions = Shadowrun.SoakRollOptions;
 import AttributeField = Shadowrun.AttributeField;
 import SkillRollOptions = Shadowrun.SkillRollOptions;
 import SkillField = Shadowrun.SkillField;
-import ValueMaxPair = Shadowrun.ValueMaxPair;
 import ModList = Shadowrun.ModList;
 import BaseValuePair = Shadowrun.BaseValuePair;
 import ModifiableValue = Shadowrun.ModifiableValue;
@@ -19,6 +18,7 @@ import SR5ActorType = Shadowrun.SR5ActorType;
 import { PartsList } from '../parts/PartsList';
 import DamageData = Shadowrun.DamageData;
 import DamageElement = Shadowrun.DamageElement;
+import EdgeAttributeField = Shadowrun.EdgeAttributeField;
 
 export class SR5Actor extends Actor {
     async update(data, options?) {
@@ -107,7 +107,7 @@ export class SR5Actor extends Actor {
         return -1 * this.data.data.wounds?.value || 0;
     }
 
-    getEdge(): AttributeField & ValueMaxPair<number> {
+    getEdge(): EdgeAttributeField {
         return this.data.data.attributes.edge;
     }
 
@@ -733,7 +733,7 @@ export class SR5Actor extends Actor {
         });
     }
 
-    rollKnowledgeSkill(catId, skillId, options?: SkillRollOptions) {
+    rollKnowledgeSkill(catId: string, skillId: string, options?: SkillRollOptions) {
         const category = this.data.data.skills.knowledge[catId];
         const skill = duplicate(category.value[skillId]);
         skill.attribute = category.attribute;
@@ -741,14 +741,14 @@ export class SR5Actor extends Actor {
         return this.rollSkill(skill, options);
     }
 
-    rollLanguageSkill(skillId, options?: SkillRollOptions) {
+    rollLanguageSkill(skillId: string, options?: SkillRollOptions) {
         const skill = duplicate(this.data.data.skills.language.value[skillId]);
         skill.attribute = 'intuition';
         skill.label = skill.name;
         return this.rollSkill(skill, options);
     }
 
-    rollActiveSkill(skillId, options?: SkillRollOptions) {
+    rollActiveSkill(skillId: string, options?: SkillRollOptions) {
         const skill = this.data.data.skills.active[skillId];
         skill.label = game.i18n.localize(CONFIG.SR5.activeSkills[skillId]);
         return this.rollSkill(skill, options);
@@ -759,7 +759,7 @@ export class SR5Actor extends Actor {
         const att = this.data.data.attributes[attId];
         const atts = this.data.data.attributes;
         const parts = new PartsList<number>();
-        parts.addUniquePart(att.label, att.label === 'SR5.AttrEdge' ? this.getEdge().max : att.value);
+        parts.addUniquePart(att.label, att.value);
         let dialogData = {
             attribute: att,
             attributes: atts,
@@ -784,7 +784,7 @@ export class SR5Actor extends Actor {
                     if (att2Id !== 'none') {
                         att2 = atts[att2Id];
                         if (att2?.label) {
-                            parts.addUniquePart(att2.label, att2.label === 'SR5.AttrEdge' ? this.getEdge().max : att2.value);
+                            parts.addUniquePart(att2.label, att2.value);
                             const att2IdLabel = game.i18n.localize(CONFIG.SR5.attributes[att2Id]);
                             title += ` + ${att2IdLabel}`;
                         }
@@ -871,14 +871,15 @@ export class SR5Actor extends Actor {
             }
             if (actor) {
                 const parts = new PartsList<number>();
-                parts.addUniquePart('SR5.PushTheLimit', actor.getEdge().max);
+                parts.addUniquePart('SR5.PushTheLimit', actor.getEdge().value);
                 ShadowrunRoller.basicRoll({
                     title: ` - ${game.i18n.localize('SR5.PushTheLimit')}`,
                     parts: parts.list,
                     actor: actor,
                 }).then(() => {
+                    actor;
                     actor.update({
-                        'data.attributes.edge.value': actor.getEdge().value - 1,
+                        'data.attributes.edge.uses': actor.getEdge().uses - 1,
                     });
                 });
             } else {
@@ -924,7 +925,7 @@ export class SR5Actor extends Actor {
                         actor: actor,
                     }).then(() => {
                         actor.update({
-                            'data.attributes.edge.value': actor.getEdge().value - 1,
+                            'data.attributes.edge.uses': actor.getEdge().uses - 1,
                         });
                     });
                 } else {

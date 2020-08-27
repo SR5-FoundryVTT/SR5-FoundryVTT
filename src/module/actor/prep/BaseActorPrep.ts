@@ -136,15 +136,24 @@ export class BaseActorPrep {
      */
     prepareCyberware() {
         const { attributes } = this.data;
-        let totalEssence = 6;
+        const parts = new PartsList<number>();
+        // add Items as values to lower the total value of essence
         this.items
             .filter((item) => item.isCyberware() && item.isEquipped())
             .forEach((item) => {
                 if (item.getEssenceLoss()) {
-                    totalEssence -= Number(item.getEssenceLoss());
+                    parts.addUniquePart(item.getName(), -Number(item.getEssenceLoss()));
                 }
             });
-        attributes.essence.base = +(totalEssence + Number(this.data.modifiers['essence'] || 0)).toFixed(3);
+        // add the bonus from the misc tab if applied
+        const essenceMod = this.data.modifiers['essence'];
+        if (essenceMod && !Number.isNaN(essenceMod)) {
+            parts.addUniquePart('SR5.Bonus', Number(essenceMod));
+        }
+
+        attributes.essence.base = 6;
+        attributes.essence.mod = parts.list;
+        attributes.essence.value = Helpers.calcTotal(attributes.essence);
     }
 
     /**
@@ -159,7 +168,9 @@ export class BaseActorPrep {
 
         // set the value for the attributes
         for (let [key, attribute] of Object.entries(attributes)) {
-            if (key === 'edge') return;
+            // don't manage the attribute if it is using the old method of edge tracking
+            // needed to be able to migrate things correctly
+            if (key === 'edge' && attribute['uses'] === undefined) return;
             // this turns the Object model into the list mod
             if (typeof attribute.mod === 'object') {
                 attribute.mod = new PartsList(attribute.mod).list;

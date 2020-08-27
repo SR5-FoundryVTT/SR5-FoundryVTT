@@ -1,6 +1,7 @@
 import { VersionMigration } from './VersionMigration';
 import { LegacyMigration } from './versions/LegacyMigration';
 import { Version0_6_5 } from './versions/Version0_6_5';
+import { Version0_6_10 } from './versions/Version0_6_10';
 
 type VersionDefinition = {
     versionNumber: string;
@@ -11,6 +12,7 @@ export class Migrator {
     private static readonly s_Versions: VersionDefinition[] = [
         { versionNumber: LegacyMigration.TargetVersion, migration: new LegacyMigration() },
         { versionNumber: Version0_6_5.TargetVersion, migration: new Version0_6_5() },
+        { versionNumber: Version0_6_10.TargetVersion, migration: new Version0_6_10() },
     ];
 
     //TODO: Call on Init()

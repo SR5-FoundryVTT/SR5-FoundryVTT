@@ -1655,7 +1655,7 @@ class SR5Actor extends Actor {
         const att = this.data.data.attributes[attId];
         const atts = this.data.data.attributes;
         const parts = new PartsList_1.PartsList();
-        parts.addUniquePart(att.label, att.label === 'SR5.AttrEdge' ? this.getEdge().max : att.value);
+        parts.addUniquePart(att.label, att.value);
         let dialogData = {
             attribute: att,
             attributes: atts,
@@ -1680,7 +1680,7 @@ class SR5Actor extends Actor {
                     if (att2Id !== 'none') {
                         att2 = atts[att2Id];
                         if (att2 === null || att2 === void 0 ? void 0 : att2.label) {
-                            parts.addUniquePart(att2.label, att2.label === 'SR5.AttrEdge' ? this.getEdge().max : att2.value);
+                            parts.addUniquePart(att2.label, att2.value);
                             const att2IdLabel = game.i18n.localize(CONFIG.SR5.attributes[att2Id]);
                             title += ` + ${att2IdLabel}`;
                         }
@@ -1763,14 +1763,15 @@ class SR5Actor extends Actor {
                 }
                 if (actor) {
                     const parts = new PartsList_1.PartsList();
-                    parts.addUniquePart('SR5.PushTheLimit', actor.getEdge().max);
+                    parts.addUniquePart('SR5.PushTheLimit', actor.getEdge().value);
                     ShadowrunRoller_1.ShadowrunRoller.basicRoll({
                         title: ` - ${game.i18n.localize('SR5.PushTheLimit')}`,
                         parts: parts.list,
                         actor: actor,
                     }).then(() => {
+                        actor;
                         actor.update({
-                            'data.attributes.edge.value': actor.getEdge().value - 1,
+                            'data.attributes.edge.uses': actor.getEdge().uses - 1,
                         });
                     });
                 }
@@ -1818,7 +1819,7 @@ class SR5Actor extends Actor {
                             actor: actor,
                         }).then(() => {
                             actor.update({
-                                'data.attributes.edge.value': actor.getEdge().value - 1,
+                                'data.attributes.edge.uses': actor.getEdge().uses - 1,
                             });
                         });
                     }
@@ -1851,7 +1852,7 @@ class SR5Actor extends Actor {
     }
 }
 exports.SR5Actor = SR5Actor;
-},{"../constants":29,"../helpers":32,"../parts/PartsList":42,"../rolls/ShadowrunRoller":43,"./prep/BaseActorPrep":18}],17:[function(require,module,exports){
+},{"../constants":29,"../helpers":32,"../parts/PartsList":43,"../rolls/ShadowrunRoller":44,"./prep/BaseActorPrep":18}],17:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -2621,15 +2622,23 @@ class BaseActorPrep {
      */
     prepareCyberware() {
         const { attributes } = this.data;
-        let totalEssence = 6;
+        const parts = new PartsList_1.PartsList();
+        // add Items as values to lower the total value of essence
         this.items
             .filter((item) => item.isCyberware() && item.isEquipped())
             .forEach((item) => {
             if (item.getEssenceLoss()) {
-                totalEssence -= Number(item.getEssenceLoss());
+                parts.addUniquePart(item.getName(), -Number(item.getEssenceLoss()));
             }
         });
-        attributes.essence.base = +(totalEssence + Number(this.data.modifiers['essence'] || 0)).toFixed(3);
+        // add the bonus from the misc tab if applied
+        const essenceMod = this.data.modifiers['essence'];
+        if (essenceMod && !Number.isNaN(essenceMod)) {
+            parts.addUniquePart('SR5.Bonus', Number(essenceMod));
+        }
+        attributes.essence.base = 6;
+        attributes.essence.mod = parts.list;
+        attributes.essence.value = helpers_1.Helpers.calcTotal(attributes.essence);
     }
     /**
      * Prepare actor data for attributes
@@ -2642,7 +2651,9 @@ class BaseActorPrep {
         attributes.resonance.hidden = !(this.data.special === 'resonance');
         // set the value for the attributes
         for (let [key, attribute] of Object.entries(attributes)) {
-            if (key === 'edge')
+            // don't manage the attribute if it is using the old method of edge tracking
+            // needed to be able to migrate things correctly
+            if (key === 'edge' && attribute['uses'] === undefined)
                 return;
             // this turns the Object model into the list mod
             if (typeof attribute.mod === 'object') {
@@ -2833,7 +2844,7 @@ class BaseActorPrep {
     }
 }
 exports.BaseActorPrep = BaseActorPrep;
-},{"../../helpers":32,"../../item/SR5ItemDataWrapper":35,"../../parts/PartsList":42}],19:[function(require,module,exports){
+},{"../../helpers":32,"../../item/SR5ItemDataWrapper":35,"../../parts/PartsList":43}],19:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -4236,7 +4247,7 @@ const PartsList_1 = require("./parts/PartsList");
 exports.createChatData = (templateData, roll) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const template = `systems/shadowrun5e/dist/templates/rolls/roll-card.html`;
-    const hackyTemplateData = Object.assign(Object.assign({}, templateData), { parts: new PartsList_1.PartsList(templateData.parts).getMessageOutput() });
+    const hackyTemplateData = Object.assign(Object.assign({}, templateData), { parts: new PartsList_1.PartsList(templateData.parts).getMessageOutput(), showGlitchAnimation: game.settings.get(constants_1.SYSTEM_NAME, constants_1.FLAGS.ShowGlitchAnimation) });
     const html = yield renderTemplate(template, hackyTemplateData);
     const actor = templateData.actor;
     const chatData = {
@@ -4321,7 +4332,7 @@ exports.addRollListeners = (app, html) => {
     if ((item === null || item === void 0 ? void 0 : item.hasRoll) && app.isRoll)
         $(html).find('.card-description').hide();
 };
-},{"./actor/SR5Actor":16,"./constants":29,"./item/SR5Item":34,"./parts/PartsList":42,"./template":45}],27:[function(require,module,exports){
+},{"./actor/SR5Actor":16,"./constants":29,"./item/SR5Item":34,"./parts/PartsList":43,"./template":46}],27:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -4708,8 +4719,11 @@ exports.SR5['programTypes'] = {
 },{}],29:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SYSTEM_NAME = void 0;
+exports.FLAGS = exports.SYSTEM_NAME = void 0;
 exports.SYSTEM_NAME = 'shadowrun5e';
+exports.FLAGS = {
+    ShowGlitchAnimation: 'showGlitchAnimation',
+};
 },{}],30:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -5076,7 +5090,7 @@ class Helpers {
     }
 }
 exports.Helpers = Helpers;
-},{"./parts/PartsList":42}],33:[function(require,module,exports){
+},{"./parts/PartsList":43}],33:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatData = void 0;
@@ -6372,7 +6386,7 @@ class SR5Item extends Item {
     }
 }
 exports.SR5Item = SR5Item;
-},{"../apps/dialogs/ShadowrunItemDialog":20,"../chat":26,"../constants":29,"../helpers":32,"../parts/PartsList":42,"../rolls/ShadowrunRoller":43,"./ChatData":33,"./SR5ItemDataWrapper":35}],35:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunItemDialog":20,"../chat":26,"../constants":29,"../helpers":32,"../parts/PartsList":43,"../rolls/ShadowrunRoller":44,"./ChatData":33,"./SR5ItemDataWrapper":35}],35:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ItemDataWrapper = void 0;
@@ -7015,7 +7029,7 @@ function rollItemMacro(itemName) {
     return item.postCard();
 }
 handlebars_1.registerHandlebarHelpers();
-},{"./actor/SR5Actor":16,"./actor/SR5ActorSheet":17,"./apps/gmtools/OverwatchScoreTracker":21,"./canvas":25,"./chat":26,"./combat":27,"./config":28,"./constants":29,"./handlebars":31,"./helpers":32,"./item/SR5Item":34,"./item/SR5ItemSheet":36,"./migrator/Migrator":38,"./rolls/ShadowrunRoller":43,"./settings":44}],38:[function(require,module,exports){
+},{"./actor/SR5Actor":16,"./actor/SR5ActorSheet":17,"./apps/gmtools/OverwatchScoreTracker":21,"./canvas":25,"./chat":26,"./combat":27,"./config":28,"./constants":29,"./handlebars":31,"./helpers":32,"./item/SR5Item":34,"./item/SR5ItemSheet":36,"./migrator/Migrator":38,"./rolls/ShadowrunRoller":44,"./settings":45}],38:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -7031,6 +7045,7 @@ exports.Migrator = void 0;
 const VersionMigration_1 = require("./VersionMigration");
 const LegacyMigration_1 = require("./versions/LegacyMigration");
 const Version0_6_5_1 = require("./versions/Version0_6_5");
+const Version0_6_10_1 = require("./versions/Version0_6_10");
 let Migrator = /** @class */ (() => {
     class Migrator {
         //TODO: Call on Init()
@@ -7154,11 +7169,12 @@ let Migrator = /** @class */ (() => {
     Migrator.s_Versions = [
         { versionNumber: LegacyMigration_1.LegacyMigration.TargetVersion, migration: new LegacyMigration_1.LegacyMigration() },
         { versionNumber: Version0_6_5_1.Version0_6_5.TargetVersion, migration: new Version0_6_5_1.Version0_6_5() },
+        { versionNumber: Version0_6_10_1.Version0_6_10.TargetVersion, migration: new Version0_6_10_1.Version0_6_10() },
     ];
     return Migrator;
 })();
 exports.Migrator = Migrator;
-},{"./VersionMigration":39,"./versions/LegacyMigration":40,"./versions/Version0_6_5":41}],39:[function(require,module,exports){
+},{"./VersionMigration":39,"./versions/LegacyMigration":40,"./versions/Version0_6_10":41,"./versions/Version0_6_5":42}],39:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -7831,6 +7847,65 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Version0_6_10 = void 0;
+const VersionMigration_1 = require("../VersionMigration");
+/**
+ * Add default value of willpower to the full_defense_attribute field
+ */
+class Version0_6_10 extends VersionMigration_1.VersionMigration {
+    get SourceVersion() {
+        return '0.6.9';
+    }
+    get TargetVersion() {
+        return Version0_6_10.TargetVersion;
+    }
+    static get TargetVersion() {
+        return '0.6.10';
+    }
+    MigrateActorData(actorData) {
+        var _a, _b;
+        return __awaiter(this, void 0, void 0, function* () {
+            if (((_b = (_a = actorData.data) === null || _a === void 0 ? void 0 : _a.attributes) === null || _b === void 0 ? void 0 : _b.edge) === undefined)
+                return {};
+            return {
+                data: {
+                    attributes: {
+                        edge: {
+                            base: actorData.data.attributes.edge.max,
+                            value: actorData.data.attributes.edge.max,
+                            uses: actorData.data.attributes.edge.value,
+                        },
+                    },
+                },
+            };
+        });
+    }
+    ShouldMigrateActorData(actorData) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return actorData.data.attributes.edge.uses === undefined;
+        });
+    }
+    ShouldMigrateSceneData(scene) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            // @ts-ignore
+            return ((_a = scene.data.tokens) === null || _a === void 0 ? void 0 : _a.length) > 0;
+        });
+    }
+}
+exports.Version0_6_10 = Version0_6_10;
+},{"../VersionMigration":39}],42:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.Version0_6_5 = void 0;
 const VersionMigration_1 = require("../VersionMigration");
 /**
@@ -7869,7 +7944,7 @@ class Version0_6_5 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_6_5 = Version0_6_5;
-},{"../VersionMigration":39}],42:[function(require,module,exports){
+},{"../VersionMigration":39}],43:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PartsList = void 0;
@@ -7969,7 +8044,7 @@ class PartsList {
     }
 }
 exports.PartsList = PartsList;
-},{}],43:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -8156,7 +8231,7 @@ class ShadowrunRoller {
         };
         if (actor) {
             buttons['edge'] = {
-                label: `${game.i18n.localize('SR5.PushTheLimit')} (+${actor.getEdge().max})`,
+                label: `${game.i18n.localize('SR5.PushTheLimit')} (+${actor.getEdge().value})`,
                 icon: '<i class="fas fa-bomb"></i>',
                 callback: () => {
                     edge = true;
@@ -8208,10 +8283,10 @@ class ShadowrunRoller {
                         const extended = extendedString === 'true';
                         if (edge && actor) {
                             props.explodeSixes = true;
-                            parts.addUniquePart('SR5.PushTheLimit', actor.getEdge().max);
+                            parts.addUniquePart('SR5.PushTheLimit', actor.getEdge().value);
                             delete props.limit;
                             yield actor.update({
-                                'data.attributes.edge.value': actor.data.data.attributes.edge.value - 1,
+                                'data.attributes.edge.uses': actor.data.data.attributes.edge.uses - 1,
                             });
                         }
                         props.rollMode = helpers_1.Helpers.parseInputToString($(html).find('[name=rollMode]').val());
@@ -8234,7 +8309,7 @@ class ShadowrunRoller {
     }
 }
 exports.ShadowrunRoller = ShadowrunRoller;
-},{"../chat":26,"../constants":29,"../helpers":32,"../parts/PartsList":42}],44:[function(require,module,exports){
+},{"../chat":26,"../constants":29,"../helpers":32,"../parts/PartsList":43}],45:[function(require,module,exports){
 "use strict";
 // game settings for shadowrun 5e
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -8287,8 +8362,16 @@ exports.registerSystemSettings = () => {
         type: String,
         default: '0',
     });
+    game.settings.register(constants_1.SYSTEM_NAME, constants_1.FLAGS.ShowGlitchAnimation, {
+        name: 'SETTINGS.ShowGlitchAnimationName',
+        hint: 'SETTINGS.ShowGlitchAnimationDescription',
+        scope: 'user',
+        config: true,
+        type: Boolean,
+        default: true,
+    });
 };
-},{"./constants":29,"./migrator/VersionMigration":39}],45:[function(require,module,exports){
+},{"./constants":29,"./migrator/VersionMigration":39}],46:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Template extends MeasuredTemplate {

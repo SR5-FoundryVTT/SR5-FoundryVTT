@@ -6,7 +6,7 @@ import BaseValuePair = Shadowrun.BaseValuePair;
 import DamageData = Shadowrun.DamageData;
 import AttackData = Shadowrun.AttackData;
 import LabelField = Shadowrun.LabelField;
-import { SYSTEM_NAME } from './constants';
+import { FLAGS, SYSTEM_NAME } from './constants';
 import { PartsList } from './parts/PartsList';
 
 export type TemplateData = {
@@ -34,7 +34,7 @@ export type TemplateData = {
     }[];
     description?: object;
     previewTemplate?: boolean;
-    rollMode?: keyof typeof CONFIG.Dice.rollModes,
+    rollMode?: keyof typeof CONFIG.Dice.rollModes;
 };
 
 export const createChatData = async (templateData: TemplateData, roll?: Roll) => {
@@ -42,6 +42,7 @@ export const createChatData = async (templateData: TemplateData, roll?: Roll) =>
     const hackyTemplateData = {
         ...templateData,
         parts: new PartsList(templateData.parts).getMessageOutput(),
+        showGlitchAnimation: game.settings.get(SYSTEM_NAME, FLAGS.ShowGlitchAnimation),
     };
     const html = await renderTemplate(template, hackyTemplateData);
     const actor = templateData.actor;
