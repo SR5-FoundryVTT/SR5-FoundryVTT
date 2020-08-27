@@ -4,7 +4,12 @@ declare namespace Shadowrun {
 
     export type Attributes = {
         [name: string]: AttributeField;
+        edge: EdgeAttributeField;
     };
+
+    export type EdgeAttributeField = AttributeField & {
+        uses: number;
+    }
 
     export type AttributeField = BaseValuePair<number> &
         CanHideFiled &

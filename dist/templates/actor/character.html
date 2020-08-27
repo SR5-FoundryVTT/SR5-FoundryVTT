@@ -117,8 +117,8 @@
                                     size="2"
                                     maxlength="2"
                                     type="text"
-                                    name="data.attributes.edge.value"
-                                    value="{{data.attributes.edge.value}}"
+                                    name="data.attributes.edge.uses"
+                                    value="{{data.attributes.edge.uses}}"
                                     data-dtype="Number"
                                 />
                             </div>
@@ -129,8 +129,8 @@
                                     size="2"
                                     maxlength="2"
                                     type="text"
-                                    name="data.attributes.edge.max"
-                                    value="{{data.attributes.edge.max}}"
+                                    name="data.attributes.edge.base"
+                                    value="{{data.attributes.edge.base}}"
                                     data-dtype="Number"
                                 />
                             </div>
@@ -203,7 +203,7 @@
                             >
                                 <input
                                     type="checkbox"
-                                    class="submit-checkbox"
+                                    class="submit-checkbox hidden"
                                     name="data.initiative.edge"
                                     {{checked
                                     data.initiative.edge}}

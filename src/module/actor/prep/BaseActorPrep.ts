@@ -168,7 +168,9 @@ export class BaseActorPrep {
 
         // set the value for the attributes
         for (let [key, attribute] of Object.entries(attributes)) {
-            if (key === 'edge') return;
+            // don't manage the attribute if it is using the old method of edge tracking
+            // needed to be able to migrate things correctly
+            if (key === 'edge' && attribute['uses'] === undefined) return;
             // this turns the Object model into the list mod
             if (typeof attribute.mod === 'object') {
                 attribute.mod = new PartsList(attribute.mod).list;

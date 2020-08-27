@@ -564,9 +564,10 @@ label.checkbox {
     top: 0.95em;
     left: -0.5em; }
   label.checkbox input {
+    cursor: pointer; }
+  label.checkbox input.hidden {
     position: absolute;
     opacity: 0;
-    cursor: pointer;
     height: 0;
     width: 0; }
   label.checkbox .checkmark {

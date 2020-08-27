@@ -262,7 +262,7 @@ export class ShadowrunRoller {
         };
         if (actor) {
             buttons['edge'] = {
-                label: `${game.i18n.localize('SR5.PushTheLimit')} (+${actor.getEdge().max})`,
+                label: `${game.i18n.localize('SR5.PushTheLimit')} (+${actor.getEdge().value})`,
                 icon: '<i class="fas fa-bomb"></i>',
                 callback: () => {
                     edge = true;
@@ -321,10 +321,10 @@ export class ShadowrunRoller {
 
                         if (edge && actor) {
                             props.explodeSixes = true;
-                            parts.addUniquePart('SR5.PushTheLimit', actor.getEdge().max);
+                            parts.addUniquePart('SR5.PushTheLimit', actor.getEdge().value);
                             delete props.limit;
                             await actor.update({
-                                'data.attributes.edge.value': actor.data.data.attributes.edge.value - 1,
+                                'data.attributes.edge.uses': actor.data.data.attributes.edge.uses - 1,
                             });
                         }
 
