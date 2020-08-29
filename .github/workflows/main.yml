@@ -30,7 +30,7 @@ jobs:
         with:
           # The arguments for the `git add` command (see the paragraph below for more info)
           # Default: '.'
-          add: 'dist/bundle.js'
+          add: 'dist'
 
           # The message for the commit
           # Default: 'Commit from GitHub Actions'
