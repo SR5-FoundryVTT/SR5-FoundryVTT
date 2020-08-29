@@ -25,7 +25,7 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Run a one-line script
-        run: gupl build
+        run: gulp build
       - uses: EndBug/add-and-commit@v4 # You can change this to use a specific version
         with:
           # The arguments for the `git add` command (see the paragraph below for more info)
