@@ -24,6 +24,8 @@ export class BaseActorPrep {
 
         // clear matrix data to defaults
         MatrixList.forEach((key) => {
+            // delete the Temporary mod that may exist on the object
+            delete matrix[key].mod["Temporary"];
             const parts = new PartsList(matrix[key].mod);
             parts.addUniquePart('SR5.Temporary', matrix[key].temp);
             matrix[key].mod = parts.list;

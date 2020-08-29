@@ -135,19 +135,21 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
             },
         };
 
-        /**
-         * {
-         *     attN: {
-         *         value: number,
-         *         att: string (the ASDF attribute)
-         *     }
-         * }
-         */
-        const atts: { [key: string]: { value: number; att: string } } | undefined = this.data.data.atts;
-        if (atts) {
-            for (let [key, att] of Object.entries(atts)) {
-                matrix[att.att].value = att.value;
-                matrix[att.att].device_att = key;
+        if (this.isCyberdeck()) {
+            /**
+             * {
+             *     attN: {
+             *         value: number,
+             *         att: string (the ASDF attribute)
+             *     }
+             * }
+             */
+            const atts: { [key: string]: { value: number; att: string } } | undefined = this.data.data.atts;
+            if (atts) {
+                for (let [key, att] of Object.entries(atts)) {
+                    matrix[att.att].value = att.value;
+                    matrix[att.att].device_att = key;
+                }
             }
         }
 
