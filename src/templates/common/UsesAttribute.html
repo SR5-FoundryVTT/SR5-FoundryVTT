@@ -1,0 +1,30 @@
+{{!-- pair id path dataName nameCssClass isRoll name --}}
+{{!-- This is currently only used with edge, this doesn't show the "value" yet and would need modification to do so --}}
+{{#> "systems/shadowrun5e/dist/templates/common/Attribute.html" dataName=dataName dataId=dataId}}
+    <div class="attribute-name {{nameCssClass}} {{#if isRoll}}roll{{/if}}">
+        {{name}}
+    </div>
+    <div class="track">
+        <div class="attribute-input-container">
+            {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.html'
+                    cssClass="attribute-input"
+                    size="2"
+                    maxLength="2"
+                    value=pair.uses
+                    name=(buildName part1=path part2="uses")
+                    disable=disableValue
+            }}
+        </div>
+        <div class="track-slash"></div>
+        <div class="attribute-input-container">
+            {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.html'
+                    cssClass="attribute-input"
+                    size="2"
+                    maxLength="2"
+                    value=pair.base
+                    name=(buildName part1=path part2="base")
+                    disabled=disableMax
+            }}
+        </div>
+    </div>
+{{/"systems/shadowrun5e/dist/templates/common/Attribute.html"}}

@@ -490,6 +490,8 @@
     "SR5.OpenSourcePdf": "Open Source PDF to the item",
     "SR5.SourceFieldEmptyError": "The Source field is empty, please enter valid text for the source",
 
+    "SR5.TemporaryModifiers": "Temporary Modifiers",
+
     "SETTINGS.DiagonalMovementName": "Diagonal Movement",
     "SETTINGS.DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
     "SETTINGS.IgnoreDiagonal": "Ignore Diagonal Movement (1-1-1)",

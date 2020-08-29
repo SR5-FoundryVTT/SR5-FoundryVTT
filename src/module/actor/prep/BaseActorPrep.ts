@@ -26,6 +26,8 @@ export class BaseActorPrep {
         MatrixList.forEach((key) => {
             const parts = new PartsList(matrix[key].mod);
             parts.addUniquePart('SR5.Temporary', matrix[key].temp);
+            // TODO LEGACY from when the sheet used 'mod.Temporary'
+            parts.removePart('Temporary');
             matrix[key].mod = parts.list;
             matrix[key].value = parts.total;
         });

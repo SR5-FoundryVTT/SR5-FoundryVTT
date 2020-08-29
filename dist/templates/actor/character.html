@@ -42,100 +42,25 @@
                 </div>
                 <div class="attributes smooth">
                     {{#each data.track as |track id|}}
-                    <div class="attribute" data-track="{{id}}">
-                        <div class="attribute-name track-roll roll">
-                            {{localize track.label}}
-                        </div>
-                        <div class="track">
-                            <div class="attribute-input-container">
-                                <input
-                                    class="display attribute-input"
-                                    size="2"
-                                    maxlength="2"
-                                    type="text"
-                                    name="data.track.{{id}}.value"
-                                    value="{{track.value}}"
-                                    data-dtype="Number"
-                                />
-                            </div>
-                            <div class="track-slash"></div>
-                            <div class="attribute-input-container">
-                                <input
-                                    class="display attribute-input"
-                                    size="2"
-                                    maxlength="2"
-                                    type="text"
-                                    name="data.track.{{id}}.max"
-                                    value="{{track.max}}"
-                                    disabled
-                                    data-dtype="Number"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    {{#ife track.max track.value}} {{#if track.overflow}}
-                    <div class="attribute">
-                        <div class="attribute-name">
-                            {{localize "SR5.Overflow"}}
-                        </div>
-                        <div class="track">
-                            <div class="attribute-input-container">
-                                <input
-                                    class="display attribute-input"
-                                    size="2"
-                                    maxlength="2"
-                                    type="text"
-                                    name="data.track.{{id}}.overflow.value"
-                                    value="{{track.overflow.value}}"
-                                    data-dtype="Number"
-                                />
-                            </div>
-                            <div class="track-slash"></div>
-                            <div class="attribute-input-container">
-                                <input
-                                    class="display attribute-input"
-                                    size="2"
-                                    maxlength="2"
-                                    type="text"
-                                    name="data.track.{{id}}.overflow.max"
-                                    value="{{track.overflow.max}}"
-                                    disabled
-                                    data-dtype="Number"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    {{/if}} {{/ife}} {{/each}}
-                    <div class="attribute">
-                        <div class="attribute-name attribute-roll roll" data-attribute="edge">
-                            {{localize "SR5.AttrEdge"}}
-                        </div>
-                        <div class="track">
-                            <div class="attribute-input-container">
-                                <input
-                                    class="display attribute-input"
-                                    size="2"
-                                    maxlength="2"
-                                    type="text"
-                                    name="data.attributes.edge.uses"
-                                    value="{{data.attributes.edge.uses}}"
-                                    data-dtype="Number"
-                                />
-                            </div>
-                            <div class="track-slash"></div>
-                            <div class="attribute-input-container">
-                                <input
-                                    class="display attribute-input"
-                                    size="2"
-                                    maxlength="2"
-                                    type="text"
-                                    name="data.attributes.edge.base"
-                                    value="{{data.attributes.edge.base}}"
-                                    data-dtype="Number"
-                                />
-                            </div>
-                        </div>
-                    </div>
+                        {{> 'systems/shadowrun5e/dist/templates/common/ConditionMonitor.html'
+                            object=track
+                            path=(buildName part1="data.track" part2=id)
+                            id=id
+                            disableMax="true"
+                            disableOverflowMax="true"
+                            isRoll="true"
+                            nameCssClass="track-roll"
+                        }}
+                    {{/each}}
+                    {{> 'systems/shadowrun5e/dist/templates/common/UsesAttribute.html'
+                            name=(localize 'SR5.AttrEdge')
+                            pair=data.attributes.edge
+                            path="data.attributes.edge"
+                            isRoll="true"
+                            dataName="attribute"
+                            dataId="edge"
+                            nameCssClass="attribute-roll"
+                    }}
                     <div class="attribute">
                         <div class="attribute-name">
                             {{localize "SR5.Movement"}}

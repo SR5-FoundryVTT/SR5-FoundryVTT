@@ -41,6 +41,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/common/ValueInput.html',
         'systems/shadowrun5e/dist/templates/common/ConditionMonitor.html',
         'systems/shadowrun5e/dist/templates/common/ValueMaxAttribute.html',
+        'systems/shadowrun5e/dist/templates/common/UsesAttribute.html',
         'systems/shadowrun5e/dist/templates/common/Attribute.html',
         'systems/shadowrun5e/dist/templates/common/List/ListItem.html',
         'systems/shadowrun5e/dist/templates/common/List/ListHeader.html',

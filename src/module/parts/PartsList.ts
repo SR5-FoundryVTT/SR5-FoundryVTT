@@ -80,6 +80,15 @@ export class PartsList<TType> {
         }
     }
 
+    removePart(name: string): boolean {
+        const index = this._list.findIndex((part) => part.name === name);
+        if (index > -1) {
+            this._list.splice(index, 1);
+            return true;
+        }
+        return false;
+    }
+
     getMessageOutput() {
         return this.list;
         // const mods = {};
