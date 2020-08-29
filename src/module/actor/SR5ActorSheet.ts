@@ -407,20 +407,19 @@ export class SR5ActorSheet extends ActorSheet {
 
     async _onRemoveLanguageSkill(event) {
         event.preventDefault();
-        const skillId = event.currentTarget.dataset.skill;
+        const skillId = event.currentTarget.closest('.item').dataset.itemId;
         this.actor.removeLanguageSkill(skillId);
     }
 
     async _onAddKnowledgeSkill(event) {
         event.preventDefault();
-        const category = event.currentTarget.dataset.category;
+        const category = event.currentTarget.closest('.item').dataset.itemId;
         this.actor.addKnowledgeSkill(category);
     }
 
     async _onRemoveKnowledgeSkill(event) {
         event.preventDefault();
-        const skillId = event.currentTarget.dataset.skill;
-        const category = event.currentTarget.dataset.category;
+        const [skillId, category] = event.currentTarget.closest('.item').dataset.itemId.split('.');
         this.actor.removeKnowledgeSkill(skillId, category);
     }
 
@@ -529,14 +528,14 @@ export class SR5ActorSheet extends ActorSheet {
 
     async _onRollKnowledgeSkill(event) {
         event.preventDefault();
-        const skill = event.currentTarget.dataset.skill;
-        const category = event.currentTarget.dataset.category;
+        const id = event.currentTarget.closest('.item').dataset.itemId;
+        const [skill, category] = id.split('.');
         return this.actor.rollKnowledgeSkill(category, skill, { event: event });
     }
 
     async _onRollLanguageSkill(event) {
         event.preventDefault();
-        const skill = event.currentTarget.dataset.skill;
+        const skill = event.currentTarget.closest('.item').dataset.itemId;
         return this.actor.rollLanguageSkill(skill, { event: event });
     }
 
@@ -602,8 +601,7 @@ export class SR5ActorSheet extends ActorSheet {
 
     _onShowEditKnowledgeSkill(event) {
         event.preventDefault();
-        const skill = event.currentTarget.dataset.skill;
-        const category = event.currentTarget.dataset.category;
+        const [skill, category] = event.currentTarget.closest('.item').dataset.itemId.split('.');
         new KnowledgeSkillEditForm(this.actor, skill, category, {
             event: event,
         }).render(true);
@@ -611,7 +609,7 @@ export class SR5ActorSheet extends ActorSheet {
 
     _onShowEditLanguageSkill(event) {
         event.preventDefault();
-        const skill = event.currentTarget.dataset.skill;
+        const skill = event.currentTarget.closest('.item').dataset.itemId;
         new LanguageSkillEditForm(this.actor, skill, { event: event }).render(true);
     }
 

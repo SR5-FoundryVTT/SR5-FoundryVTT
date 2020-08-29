@@ -220,31 +220,45 @@ export const registerHandlebarHelpers = () => {
     });
 
     Handlebars.registerHelper('SkillHeaderIcons', function (id) {
+        const addIcon = {
+            icon: 'fas fa-plus',
+            title: game.i18n.localize('SR5.AddItem'),
+            text: game.i18n.localize('SR5.Add'),
+            cssClass: '',
+        };
         switch (id) {
             case 'active':
                 return [{}];
+            case 'language':
+                addIcon.cssClass = 'add-language';
+                return [addIcon];
+            case 'knowledge':
+                addIcon.cssClass = 'add-knowledge';
+                return [addIcon];
             default:
                 return [];
         }
     });
 
     Handlebars.registerHelper('SkillHeaderRightSide', function (id) {
+        const specs = {
+            text: {
+                text: game.i18n.localize('SR5.Specialization'),
+                cssClass: 'skill-spec-item',
+            },
+        };
+        const rtg = {
+            text: {
+                text: game.i18n.localize('SR5.Rtg'),
+                cssClass: 'rtg',
+            },
+        };
+
         switch (id) {
             case 'active':
-                return [
-                    {
-                        text: {
-                            text: game.i18n.localize('SR5.Specialization'),
-                            cssClass: 'skill-spec-item',
-                        },
-                    },
-                    {
-                        text: {
-                            text: game.i18n.localize('SR5.Rtg'),
-                            cssClass: 'rtg',
-                        },
-                    },
-                ];
+            case 'knowledge':
+            case 'language':
+                return [specs, rtg];
             default:
                 return [];
         }
@@ -287,10 +301,11 @@ export const registerHandlebarHelpers = () => {
     });
 
     Handlebars.registerHelper('SkillRightSide', function (skillType: string, skill: SkillField) {
+        const specs = Array.isArray(skill.specs) ? skill.specs : [skill.specs];
         return [
             {
                 text: {
-                    text: skill.specs.join(', '),
+                    text: specs.join(', ') ?? '',
                     cssClass: 'skill-spec-item',
                 },
             },
@@ -309,12 +324,26 @@ export const registerHandlebarHelpers = () => {
             title: game.i18n.localize('SR5.EditSkill'),
             cssClass: '',
         };
+        const removeIcon = {
+            icon: 'fas fa-trash',
+            title: game.i18n.localize('SR5.DeleteSkill'),
+            cssClass: '',
+        };
         switch (skillType) {
             case 'active':
-                editIcon.cssClass = 'skill-edit'
-                break;
+                editIcon.cssClass = 'skill-edit';
+                return [editIcon];
+            case 'language':
+                editIcon.cssClass = 'language-skill-edit';
+                removeIcon.cssClass = 'remove-language';
+                return [editIcon, removeIcon];
+            case 'knowledge':
+                editIcon.cssClass = 'knowledge-skill-edit';
+                removeIcon.cssClass = 'remove-knowledge';
+                return [editIcon, removeIcon];
+            default:
+                return [editIcon];
         }
-        return [editIcon];
     });
 
     Handlebars.registerHelper('ItemIcons', function (item: SR5ItemType) {

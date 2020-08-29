@@ -2256,22 +2256,21 @@ class SR5ActorSheet extends ActorSheet {
     _onRemoveLanguageSkill(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
-            const skillId = event.currentTarget.dataset.skill;
+            const skillId = event.currentTarget.closest('.item').dataset.itemId;
             this.actor.removeLanguageSkill(skillId);
         });
     }
     _onAddKnowledgeSkill(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
-            const category = event.currentTarget.dataset.category;
+            const category = event.currentTarget.closest('.item').dataset.itemId;
             this.actor.addKnowledgeSkill(category);
         });
     }
     _onRemoveKnowledgeSkill(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
-            const skillId = event.currentTarget.dataset.skill;
-            const category = event.currentTarget.dataset.category;
+            const [skillId, category] = event.currentTarget.closest('.item').dataset.itemId.split('.');
             this.actor.removeKnowledgeSkill(skillId, category);
         });
     }
@@ -2395,15 +2394,15 @@ class SR5ActorSheet extends ActorSheet {
     _onRollKnowledgeSkill(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
-            const skill = event.currentTarget.dataset.skill;
-            const category = event.currentTarget.dataset.category;
+            const id = event.currentTarget.closest('.item').dataset.itemId;
+            const [skill, category] = id.split('.');
             return this.actor.rollKnowledgeSkill(category, skill, { event: event });
         });
     }
     _onRollLanguageSkill(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
-            const skill = event.currentTarget.dataset.skill;
+            const skill = event.currentTarget.closest('.item').dataset.itemId;
             return this.actor.rollLanguageSkill(skill, { event: event });
         });
     }
@@ -2470,15 +2469,14 @@ class SR5ActorSheet extends ActorSheet {
     }
     _onShowEditKnowledgeSkill(event) {
         event.preventDefault();
-        const skill = event.currentTarget.dataset.skill;
-        const category = event.currentTarget.dataset.category;
+        const [skill, category] = event.currentTarget.closest('.item').dataset.itemId.split('.');
         new KnowledgeSkillEditForm_1.KnowledgeSkillEditForm(this.actor, skill, category, {
             event: event,
         }).render(true);
     }
     _onShowEditLanguageSkill(event) {
         event.preventDefault();
-        const skill = event.currentTarget.dataset.skill;
+        const skill = event.currentTarget.closest('.item').dataset.itemId;
         new LanguageSkillEditForm_1.LanguageSkillEditForm(this.actor, skill, { event: event }).render(true);
     }
     _onShowEditSkill(event) {
@@ -4972,30 +4970,43 @@ exports.registerHandlebarHelpers = () => {
         }
     });
     Handlebars.registerHelper('SkillHeaderIcons', function (id) {
+        const addIcon = {
+            icon: 'fas fa-plus',
+            title: game.i18n.localize('SR5.AddItem'),
+            text: game.i18n.localize('SR5.Add'),
+            cssClass: '',
+        };
         switch (id) {
             case 'active':
                 return [{}];
+            case 'language':
+                addIcon.cssClass = 'add-language';
+                return [addIcon];
+            case 'knowledge':
+                addIcon.cssClass = 'add-knowledge';
+                return [addIcon];
             default:
                 return [];
         }
     });
     Handlebars.registerHelper('SkillHeaderRightSide', function (id) {
+        const specs = {
+            text: {
+                text: game.i18n.localize('SR5.Specialization'),
+                cssClass: 'skill-spec-item',
+            },
+        };
+        const rtg = {
+            text: {
+                text: game.i18n.localize('SR5.Rtg'),
+                cssClass: 'rtg',
+            },
+        };
         switch (id) {
             case 'active':
-                return [
-                    {
-                        text: {
-                            text: game.i18n.localize('SR5.Specialization'),
-                            cssClass: 'skill-spec-item',
-                        },
-                    },
-                    {
-                        text: {
-                            text: game.i18n.localize('SR5.Rtg'),
-                            cssClass: 'rtg',
-                        },
-                    },
-                ];
+            case 'knowledge':
+            case 'language':
+                return [specs, rtg];
             default:
                 return [];
         }
@@ -5037,10 +5048,12 @@ exports.registerHandlebarHelpers = () => {
         }
     });
     Handlebars.registerHelper('SkillRightSide', function (skillType, skill) {
+        var _a;
+        const specs = Array.isArray(skill.specs) ? skill.specs : [skill.specs];
         return [
             {
                 text: {
-                    text: skill.specs.join(', '),
+                    text: (_a = specs.join(', ')) !== null && _a !== void 0 ? _a : '',
                     cssClass: 'skill-spec-item',
                 },
             },
@@ -5058,12 +5071,26 @@ exports.registerHandlebarHelpers = () => {
             title: game.i18n.localize('SR5.EditSkill'),
             cssClass: '',
         };
+        const removeIcon = {
+            icon: 'fas fa-trash',
+            title: game.i18n.localize('SR5.DeleteSkill'),
+            cssClass: '',
+        };
         switch (skillType) {
             case 'active':
                 editIcon.cssClass = 'skill-edit';
-                break;
+                return [editIcon];
+            case 'language':
+                editIcon.cssClass = 'language-skill-edit';
+                removeIcon.cssClass = 'remove-language';
+                return [editIcon, removeIcon];
+            case 'knowledge':
+                editIcon.cssClass = 'knowledge-skill-edit';
+                removeIcon.cssClass = 'remove-knowledge';
+                return [editIcon, removeIcon];
+            default:
+                return [editIcon];
         }
-        return [editIcon];
     });
     Handlebars.registerHelper('ItemIcons', function (item) {
         var _a;

@@ -41,111 +41,36 @@
             </div>
         </div>
         <div class="scroll-area">
-            <div class="item item-section">
-                <div class="item-left">
-                    <div class="item-text item-name">
-                        {{localize "SR5.Languages"}}
-                    </div>
-                </div>
-                <div class="item-right">
-                    <div class="item-text skill-spec-item">
-                        {{localize "SR5.Specializations"}}
-                    </div>
-                    <div class="item-text rtg">
-                        {{localize "SR5.Rtg"}}
-                    </div>
-                    <div class="item-text item-icons rtg">
-                        <a class="add-language">
-                            <i class="fas fa-plus"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
+            {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+                    name=(localize 'SR5.Languages')
+                    icons=(SkillHeaderIcons 'language')
+                    rightSide=(SkillHeaderRightSide 'language')
+            }}
             {{#each data.skills.language.value as |skill sid|}}
-            <div class="item">
-                <div class="item-left">
-                    <div class="item-text item-name language-skill roll" data-skill="{{sid}}">
-                        {{skill.name}}
-                    </div>
-                </div>
-                <div class="item-right">
-                    <div class="item-text skill-spec-item">
-                        <input class="display text" type="text" disabled value="{{skill.specs}}" />
-                    </div>
-                    <div class="item-text rtg">
-                        <input
-                            class="display"
-                            type="text"
-                            value="{{skill.value}}"
-                            disabled
-                            data-dtype="Number"
-                        />
-                    </div>
-                    <div class="item-text item-icons rtg">
-                        <i class="language-skill-edit roll fas fa-edit" data-skill="{{sid}}"></i>
-                        <i class="remove-language roll fas fa-trash" data-skill="{{sid}}"></i>
-                    </div>
-                </div>
-            </div>
+                {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                        name=skill.name
+                        itemNameCssClass="language-skill"
+                        itemId=sid
+                        icons=(SkillIcons 'language' skill)
+                        rightSide=(SkillRightSide 'language' skill)
+                        hasRoll="true"
+                }}
             {{/each}} {{#each data.skills.knowledge as |cat cid|}}
-            <div class="item item-section" data-category="{{cid}}">
-                <div class="item-left">
-                    <div class="item-text item-name">
-                        {{localizeOb cid ../config.knowledgeSkillCategories}}
-                    </div>
-                </div>
-                <div class="item-right">
-                    <div class="item-text skill-spec-item">
-                        {{localize "SR5.Specializations"}}
-                    </div>
-                    <div class="item-text rtg">
-                        {{localize "SR5.Rtg"}}
-                    </div>
-                    <div class="item-text item-icons rtg">
-                        <a class="add-knowledge" data-category="{{cid}}">
-                            <i class="fas fa-plus"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
+                {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+                        name=(localizeOb cid ../config.knowledgeSkillCategories)
+                        itemId=cid
+                        icons=(SkillHeaderIcons 'knowledge')
+                        rightSide=(SkillHeaderRightSide 'knowledge')
+                }}
             {{#each cat.value as |skill sid|}}
-            <div class="item">
-                <div class="item-left">
-                    <div
-                        class="item-text item-name roll knowledge-skill"
-                        data-skill="{{sid}}"
-                        data-category="{{cid}}"
-                    >
-                        {{skill.name}}
-                    </div>
-                </div>
-                <div class="item-right">
-                    <div class="item-text skill-spec-item">
-                        <input class="display text" type="text" disabled value="{{skill.specs}}" />
-                    </div>
-                    <div class="item-text rtg">
-                        <input
-                            class="display"
-                            type="text"
-                            value="{{skill.value}}"
-                            disabled
-                            data-dtype="Number"
-                        />
-                    </div>
-                    <div class="item-text item-icons rtg">
-                        <i
-                            class="knowledge-skill-edit roll fas fa-edit"
-                            data-skill="{{sid}}"
-                            data-category="{{cid}}"
-                        ></i>
-                        <i
-                            class="remove-knowledge roll fas fa-trash"
-                            data-skill="{{sid}}"
-                            data-category="{{cid}}"
-                        ></i>
-                    </div>
-                </div>
-            </div>
+                {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                        name=skill.name
+                        itemNameCssClass="knowledge-skill"
+                        itemId=(buildName part1=sid part2=cid)
+                        icons=(SkillIcons 'knowledge' skill)
+                        rightSide=(SkillRightSide 'knowledge' skill)
+                        hasRoll="true"
+                }}
             {{/each}} {{/each}}
         </div>
     </div>
