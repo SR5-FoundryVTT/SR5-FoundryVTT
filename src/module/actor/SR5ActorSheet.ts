@@ -542,7 +542,7 @@ export class SR5ActorSheet extends ActorSheet {
 
     async _onRollActiveSkill(event) {
         event.preventDefault();
-        const skill = event.currentTarget.dataset.skill;
+        const skill = event.currentTarget.closest('.item').dataset.itemId;
         return this.actor.rollActiveSkill(skill, { event: event });
     }
 
@@ -617,7 +617,7 @@ export class SR5ActorSheet extends ActorSheet {
 
     _onShowEditSkill(event) {
         event.preventDefault();
-        const skill = event.currentTarget.dataset.skill;
+        const skill = event.currentTarget.closest('.item').dataset.itemId;
         new SkillEditForm(this.actor, skill, { event: event }).render(true);
     }
 

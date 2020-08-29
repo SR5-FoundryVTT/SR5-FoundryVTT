@@ -6,7 +6,8 @@
                 <img src="{{img}}" title="{{name}}" height="24px" width="24px" />
             </div>
         {{/if}}
-        <div class="item-text item-name {{#if hasDesc}}has-desc{{/if}}">
+        <div class="item-text item-name {{#if hasDesc}}has-desc{{/if}} {{#if itemNameCssClass}}{{itemNameCssClass}}{{/if}} {{#unless img}}{{#if hasRoll}}roll{{/if}}{{/unless}}"
+        >
             {{name}}
         </div>
     </div>
@@ -14,7 +15,7 @@
         {{!-- Iterate over all right-side options --}}
         {{#each rightSide as |option id|}}
             {{#if option.text}}
-                <div class="item-text">
+                <div class="item-text {{option.text.cssClass}}">
                     {{option.text.text}}
                 </div>
             {{/if}}

@@ -3,6 +3,7 @@ import SR5ItemType = Shadowrun.SR5ItemType;
 import { SR5ItemDataWrapper } from './item/SR5ItemDataWrapper';
 import ModList = Shadowrun.ModList;
 import { PartsList } from './parts/PartsList';
+import SkillField = Shadowrun.SkillField;
 
 export const preloadHandlebarsTemplates = async () => {
     const templatePaths = [
@@ -59,6 +60,10 @@ export const registerHandlebarHelpers = () => {
     Handlebars.registerHelper('toHeaderCase', function (str) {
         if (str) return Helpers.label(str);
         return '';
+    });
+
+    Handlebars.registerHelper('concatStrings', function (...args) {
+        return args.join(' ');
     });
 
     Handlebars.registerHelper('concat', function (strs, c = ',') {
@@ -162,7 +167,7 @@ export const registerHandlebarHelpers = () => {
     Handlebars.registerHelper('partsTotal', function (partsList: ModList<number>) {
         const parts = new PartsList(partsList);
         return parts.total;
-    })
+    });
 
     Handlebars.registerHelper('ItemHeaderIcons', function (id) {
         const PlusIcon = 'fas fa-plus';
@@ -193,22 +198,53 @@ export const registerHandlebarHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize('SR5.Target')
+                            text: game.i18n.localize('SR5.Target'),
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize('SR5.Duration')
+                            text: game.i18n.localize('SR5.Duration'),
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize('SR5.Fade')
+                            text: game.i18n.localize('SR5.Fade'),
                         },
                     },
                 ];
             case 'program':
                 return [];
+            default:
+                return [];
+        }
+    });
+
+    Handlebars.registerHelper('SkillHeaderIcons', function (id) {
+        switch (id) {
+            case 'active':
+                return [{}];
+            default:
+                return [];
+        }
+    });
+
+    Handlebars.registerHelper('SkillHeaderRightSide', function (id) {
+        switch (id) {
+            case 'active':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Specialization'),
+                            cssClass: 'skill-spec-item',
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Rtg'),
+                            cssClass: 'rtg',
+                        },
+                    },
+                ];
             default:
                 return [];
         }
@@ -248,6 +284,37 @@ export const registerHandlebarHelpers = () => {
             default:
                 return [];
         }
+    });
+
+    Handlebars.registerHelper('SkillRightSide', function (skillType: string, skill: SkillField) {
+        return [
+            {
+                text: {
+                    text: skill.specs.join(', '),
+                    cssClass: 'skill-spec-item',
+                },
+            },
+            {
+                text: {
+                    text: Helpers.calcTotal(skill),
+                    cssClass: 'rtg',
+                },
+            },
+        ];
+    });
+
+    Handlebars.registerHelper('SkillIcons', function (skillType: string, skill: SkillField) {
+        const editIcon = {
+            icon: 'fas fa-edit',
+            title: game.i18n.localize('SR5.EditSkill'),
+            cssClass: '',
+        };
+        switch (skillType) {
+            case 'active':
+                editIcon.cssClass = 'skill-edit'
+                break;
+        }
+        return [editIcon];
     });
 
     Handlebars.registerHelper('ItemIcons', function (item: SR5ItemType) {

@@ -9,22 +9,12 @@
 <div class="inventory">
     <div class="split-container">
         <div class="flexcol">
-            <div class="item item-section skill-header" data-category="skills.active">
-                <div class="item-left">
-                    <div class="item-text item-name">
-                        {{localize "SR5.ActiveSkills"}}
-                    </div>
-                </div>
-                <div class="item-right">
-                    <div class="item-text skill-spec-item">
-                        {{localize "SR5.Specializations"}}
-                    </div>
-                    <div class="item-text rtg">
-                        {{localize "SR5.Rtg"}}
-                    </div>
-                    <div class="item-text rtg"></div>
-                </div>
-            </div>
+            {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+                    name=(localize 'SR5.ActiveSkills')
+                    itemCssClass="skill-header"
+                    icons=(SkillHeaderIcons 'active')
+                    rightSide=(SkillHeaderRightSide 'active')
+            }}
             <div class="item">
                 <div class="item-text skill-spec-item">
                     <input
@@ -39,35 +29,14 @@
             </div>
             <div class="scroll-area left light-border-right">
                 {{#each data.skills.active as |skill sid|}}
-                <div class="item">
-                    <div class="item-left">
-                        <div class="item-text item-name skill-roll roll" data-skill="{{sid}}">
-                            {{localizeOb sid ../config.activeSkills}}
-                        </div>
-                    </div>
-                    <div class="item-right">
-                        <div class="item-text skill-spec-item">
-                            <input
-                                class="display text"
-                                type="text"
-                                disabled
-                                value="{{skill.specs}}"
-                            />
-                        </div>
-                        <div class="item-text rtg">
-                            <input
-                                class="display"
-                                type="text"
-                                value="{{skill.value}}"
-                                disabled
-                                data-dtype="Number"
-                            />
-                        </div>
-                        <div class="item-text item-icons rtg">
-                            <i class="skill-edit roll fas fa-edit" data-skill="{{sid}}"></i>c
-                        </div>
-                    </div>
-                </div>
+                    {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                            name=(localizeOb sid ../config.activeSkills)
+                            itemNameCssClass="skill-roll"
+                            itemId=sid
+                            icons=(SkillIcons 'active' skill)
+                            rightSide=(SkillRightSide 'active' skill)
+                            hasRoll="true"
+                    }}
                 {{/each}}
             </div>
         </div>
