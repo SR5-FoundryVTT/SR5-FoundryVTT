@@ -53,7 +53,7 @@
                         }}
                     {{/each}}
                     {{> 'systems/shadowrun5e/dist/templates/common/UsesAttribute.html'
-                            name=(localize 'SR5.AttrEdge')
+                            name=(localize 'SR5.EdgeUses')
                             pair=data.attributes.edge
                             path="data.attributes.edge"
                             isRoll="true"
@@ -156,23 +156,6 @@
                                     disabled
                                 />
                             </div>
-                        </div>
-                    </div>
-                    <div class="attribute">
-                        <div class="attribute-name roll attribute-roll" data-attribute="essence">
-                            {{localize "SR5.AttrEssence"}}
-                        </div>
-                        <div class="attribute-input-container">
-                            <input
-                                class="display attribute-input"
-                                type="text"
-                                size="4"
-                                name="data.attributes.essence.value"
-                                value="{{data.attributes.essence.value}}"
-                                data-dtype="Number"
-                                disabled
-                                placeholder="1"
-                            />
                         </div>
                     </div>
                 </div>

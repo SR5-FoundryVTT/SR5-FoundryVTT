@@ -165,9 +165,11 @@ export class BaseActorPrep {
     prepareAttributes() {
         const { attributes } = this.data;
 
-        // hide attributes if we aren't special
-        attributes.magic.hidden = !(this.data.special === 'magic');
-        attributes.resonance.hidden = !(this.data.special === 'resonance');
+        // always have special attributes set to hidden
+        attributes.magic.hidden = true;
+        attributes.resonance.hidden = true;
+        attributes.edge.hidden = true;
+        attributes.essence.hidden = true;
 
         // set the value for the attributes
         for (let [key, attribute] of Object.entries(attributes)) {

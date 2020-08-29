@@ -333,10 +333,10 @@ select.display {
         overflow-y: hidden;
         height: 100%;
         width: 100%;
-        font-size: 85%;
         display: flex;
         flex-flow: column nowrap;
         .item {
+            font-size: 85%;
             display: flex;
             flex-flow: row nowrap;
             justify-content: space-between;

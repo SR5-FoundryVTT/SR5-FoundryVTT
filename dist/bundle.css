@@ -230,6 +230,12 @@
         justify-content: space-evenly;
         margin-bottom: 0.1em;
         width: 100%; }
+        .sr5.actor .attributes .attribute .track.center {
+          justify-content: center; }
+          .sr5.actor .attributes .attribute .track.center > *:not(:first-child) {
+            margin-left: 4px; }
+          .sr5.actor .attributes .attribute .track.center > *:not(:last-child) {
+            margin-right: 4px; }
         .sr5.actor .attributes .attribute .track.between {
           justify-content: space-between; }
         .sr5.actor .attributes .attribute .track .track-slash {
@@ -758,10 +764,10 @@ select.display {
   overflow-y: hidden;
   height: 100%;
   width: 100%;
-  font-size: 85%;
   display: flex;
   flex-flow: column nowrap; }
   .sr5 .inventory .item {
+    font-size: 85%;
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-between;
