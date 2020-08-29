@@ -18,12 +18,16 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
         return this.data.type === 'armor';
     }
 
-    isArmorBase(): boolean {
-        return this.isArmor() && !this.data.data.armor?.mod;
+    hasArmorBase(): boolean {
+        return this.hasArmor() && !this.data.data.armor?.mod;
     }
 
-    isArmorAccessory(): boolean {
-        return this.isArmor() && (this.data.data.armor?.mod ?? false);
+    hasArmorAccessory(): boolean {
+        return this.hasArmor() && (this.data.data.armor?.mod ?? false);
+    }
+
+    hasArmor(): boolean {
+        return this.getArmorValue() > 0;
     }
 
     isGrenade(): boolean {

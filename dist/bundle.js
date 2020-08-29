@@ -2597,10 +2597,10 @@ class BaseActorPrep {
         for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
             armor[element] = 0;
         }
-        const equippedArmor = this.items.filter((item) => item.isArmor() && item.isEquipped());
+        const equippedArmor = this.items.filter((item) => item.hasArmor() && item.isEquipped());
         const armorModParts = new PartsList_1.PartsList(armor.mod);
         equippedArmor === null || equippedArmor === void 0 ? void 0 : equippedArmor.forEach((item) => {
-            if (item.isArmorAccessory()) {
+            if (item.hasArmorAccessory()) {
                 armorModParts.addUniquePart(item.getName(), item.getArmorValue());
             } // if not a mod, set armor.value to the items value
             else {
@@ -6282,11 +6282,14 @@ class SR5Item extends Item {
     isArmor() {
         return this.wrapper.isArmor();
     }
-    isArmorBase() {
-        return this.wrapper.isArmorBase();
+    hasArmorBase() {
+        return this.wrapper.hasArmorBase();
     }
-    isArmorAccessory() {
-        return this.wrapper.isArmorAccessory();
+    hasArmorAccessory() {
+        return this.wrapper.hasArmorAccessory();
+    }
+    hasArmor() {
+        return this.wrapper.hasArmor();
     }
     isGrenade() {
         return this.wrapper.isGrenade();
@@ -6402,13 +6405,16 @@ class SR5ItemDataWrapper extends DataWrapper_1.DataWrapper {
     isArmor() {
         return this.data.type === 'armor';
     }
-    isArmorBase() {
+    hasArmorBase() {
         var _a;
-        return this.isArmor() && !((_a = this.data.data.armor) === null || _a === void 0 ? void 0 : _a.mod);
+        return this.hasArmor() && !((_a = this.data.data.armor) === null || _a === void 0 ? void 0 : _a.mod);
     }
-    isArmorAccessory() {
+    hasArmorAccessory() {
         var _a, _b;
-        return this.isArmor() && ((_b = (_a = this.data.data.armor) === null || _a === void 0 ? void 0 : _a.mod) !== null && _b !== void 0 ? _b : false);
+        return this.hasArmor() && ((_b = (_a = this.data.data.armor) === null || _a === void 0 ? void 0 : _a.mod) !== null && _b !== void 0 ? _b : false);
+    }
+    hasArmor() {
+        return this.getArmorValue() > 0;
     }
     isGrenade() {
         var _a, _b;
