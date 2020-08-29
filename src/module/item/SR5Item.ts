@@ -901,12 +901,16 @@ export class SR5Item extends Item {
         return this.wrapper.isArmor();
     }
 
-    isArmorBase(): boolean {
-        return this.wrapper.isArmorBase();
+    hasArmorBase(): boolean {
+        return this.wrapper.hasArmorBase();
     }
 
-    isArmorAccessory(): boolean {
-        return this.wrapper.isArmorAccessory();
+    hasArmorAccessory(): boolean {
+        return this.wrapper.hasArmorAccessory();
+    }
+
+    hasArmor(): boolean {
+        return this.wrapper.hasArmor();
     }
 
     isGrenade(): boolean {
