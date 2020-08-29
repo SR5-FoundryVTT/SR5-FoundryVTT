@@ -2150,13 +2150,13 @@ class SR5ActorSheet extends ActorSheet {
         html.find('.skill-edit').click(this._onShowEditSkill.bind(this));
         html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
         html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
-        // updates matrix condition monitor on the device the actor has equipped
-        $(html)
-            .find('[name="data.matrix.condition_monitor.value"]')
-            .on('change', (event) => __awaiter(this, void 0, void 0, function* () {
+        html.find('.matrix-condition-value').on('change', (event) => __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
+            console.log(event);
             const value = helpers_1.Helpers.parseInputToNumber(event.currentTarget.value);
+            console.log(value);
             const matrixDevice = this.actor.getMatrixDevice();
+            console.log(matrixDevice);
             if (matrixDevice && !isNaN(value)) {
                 console.log(matrixDevice);
                 const updateData = {};
@@ -2417,7 +2417,7 @@ class SR5ActorSheet extends ActorSheet {
     _onRollAttribute(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
-            const attr = event.currentTarget.closest('.attribute').dataset.attribute;
+            const attr = event.currentTarget.dataset.attribute;
             return this.actor.rollAttribute(attr, { event: event });
         });
     }
@@ -2518,10 +2518,10 @@ class BaseActorPrep {
         const MatrixList = ['firewall', 'sleaze', 'data_processing', 'attack'];
         // clear matrix data to defaults
         MatrixList.forEach((key) => {
+            // delete the Temporary mod that may exist on the object
+            delete matrix[key].mod["Temporary"];
             const parts = new PartsList_1.PartsList(matrix[key].mod);
             parts.addUniquePart('SR5.Temporary', matrix[key].temp);
-            // TODO LEGACY from when the sheet used 'mod.Temporary'
-            parts.removePart('Temporary');
             matrix[key].mod = parts.list;
             matrix[key].value = parts.total;
         });
@@ -2529,7 +2529,6 @@ class BaseActorPrep {
         matrix.rating = 0;
         matrix.name = '';
         matrix.device = '';
-        matrix.condition_monitor.label = 'SR5.ConditionMonitor';
         // get the first equipped device, we don't care if they have more equipped -- it shouldn't happen
         const device = this.items.find((item) => item.isEquipped() && item.isDevice());
         if (device) {
@@ -4751,8 +4750,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerHandlebarHelpers = exports.preloadHandlebarsTemplates = void 0;
 const helpers_1 = require("./helpers");
-const SR5ItemDataWrapper_1 = require("./item/SR5ItemDataWrapper");
-const PartsList_1 = require("./parts/PartsList");
 exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, function* () {
     const templatePaths = [
         'systems/shadowrun5e/dist/templates/actor/parts/actor-equipment.html',
@@ -4764,7 +4761,6 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/dist/templates/actor/parts/actor-bio.html',
         'systems/shadowrun5e/dist/templates/actor/parts/actor-social.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/matrix-attribute.html',
-        'systems/shadowrun5e/dist/templates/actor/parts/skills/ActorAttribute.html',
         'systems/shadowrun5e/dist/templates/item/parts/description.html',
         'systems/shadowrun5e/dist/templates/item/parts/technology.html',
         'systems/shadowrun5e/dist/templates/item/parts/header.html',
@@ -4785,13 +4781,6 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/dist/templates/item/parts/modification.html',
         'systems/shadowrun5e/dist/templates/item/parts/program.html',
         'systems/shadowrun5e/dist/templates/rolls/parts/parts-list.html',
-        'systems/shadowrun5e/dist/templates/common/ValueInput.html',
-        'systems/shadowrun5e/dist/templates/common/ConditionMonitor.html',
-        'systems/shadowrun5e/dist/templates/common/ValueMaxAttribute.html',
-        'systems/shadowrun5e/dist/templates/common/UsesAttribute.html',
-        'systems/shadowrun5e/dist/templates/common/Attribute.html',
-        'systems/shadowrun5e/dist/templates/common/List/ListItem.html',
-        'systems/shadowrun5e/dist/templates/common/List/ListHeader.html',
     ];
     return loadTemplates(templatePaths);
 });
@@ -4896,141 +4885,10 @@ exports.registerHandlebarHelpers = () => {
         return icon;
     });
     Handlebars.registerHelper('isDefined', function (value) {
-        return value !== undefined && value !== null;
-    });
-    /**
-     * Return a default value if the provided value is not defined (null or undefined)
-     */
-    Handlebars.registerHelper('default', function (value, defaultValue) {
-        return new Handlebars.SafeString(value !== null && value !== void 0 ? value : defaultValue);
-    });
-    Handlebars.registerHelper('log', function (value) {
-        console.log(value);
-    });
-    Handlebars.registerHelper('buildName', function (options) {
-        const hash = helpers_1.Helpers.orderKeys(options.hash);
-        const name = Object.values(hash).reduce((retVal, current, index) => {
-            if (index > 0)
-                retVal += '.';
-            return retVal + current;
-        }, '');
-        return new Handlebars.SafeString(name);
-    });
-    Handlebars.registerHelper('partsTotal', function (partsList) {
-        const parts = new PartsList_1.PartsList(partsList);
-        return parts.total;
-    });
-    Handlebars.registerHelper('ItemHeaderIcons', function (id) {
-        const PlusIcon = 'fas fa-plus';
-        const AddText = game.i18n.localize('SR5.Add');
-        switch (id) {
-            case 'complex_form':
-                return [
-                    {
-                        icon: PlusIcon,
-                        text: AddText,
-                        title: game.i18n.localize('SR5.AddComplexForm'),
-                    },
-                ];
-            case 'program':
-                return [
-                    {
-                        icon: PlusIcon,
-                        text: AddText,
-                        title: game.i18n.localize('SR5.AddProgram'),
-                    },
-                ];
-        }
-    });
-    Handlebars.registerHelper('ItemHeaderRightSide', function (id) {
-        switch (id) {
-            case 'complex_form':
-                return [
-                    {
-                        text: {
-                            text: game.i18n.localize('SR5.Target')
-                        },
-                    },
-                    {
-                        text: {
-                            text: game.i18n.localize('SR5.Duration')
-                        },
-                    },
-                    {
-                        text: {
-                            text: game.i18n.localize('SR5.Fade')
-                        },
-                    },
-                ];
-            case 'program':
-                return [];
-            default:
-                return [];
-        }
-    });
-    Handlebars.registerHelper('ItemRightSide', function (item) {
-        var _a, _b;
-        const wrapper = new SR5ItemDataWrapper_1.SR5ItemDataWrapper(item);
-        switch (item.type) {
-            case 'complex_form':
-                return [
-                    {
-                        text: {
-                            text: game.i18n.localize(CONFIG.SR5.matrixTargets[(_a = item.data.target) !== null && _a !== void 0 ? _a : '']),
-                        },
-                    },
-                    {
-                        text: {
-                            text: game.i18n.localize(CONFIG.SR5.durations[(_b = item.data.duration) !== null && _b !== void 0 ? _b : '']),
-                        },
-                    },
-                    {
-                        text: {
-                            text: String(item.data.fade),
-                        },
-                    },
-                ];
-            case 'program':
-                return [
-                    {
-                        button: {
-                            cssClass: `item-equip-toggle ${wrapper.isEquipped() ? 'light' : ''}`,
-                            short: true,
-                            text: wrapper.isEquipped() ? game.i18n.localize('SR5.Loaded') : game.i18n.localize('SR5.Load') + ' >>',
-                        },
-                    },
-                ];
-            default:
-                return [];
-        }
-    });
-    Handlebars.registerHelper('ItemIcons', function (item) {
-        var _a;
-        const addIcon = {
-            icon: 'fas fa-plus',
-            title: game.i18n.localize('SR5.AddItem'),
-        };
-        const editIcon = {
-            icon: 'fas fa-edit',
-            title: game.i18n.localize('SR5.EditItem'),
-        };
-        const removeIcon = {
-            icon: 'fas fa-trash',
-            title: game.i18n.localize('SR5.DeleteItem'),
-        };
-        const equipIcon = {
-            icon: `${((_a = item.data.technology) === null || _a === void 0 ? void 0 : _a.equipped) ? 'fas fa-check-circle' : 'far fa-circle'} item-equip-toggle`,
-            title: game.i18n.localize('SR5.ToggleEquip'),
-        };
-        switch (item.type) {
-            case 'program':
-                return [equipIcon, editIcon, removeIcon];
-            default:
-                return [editIcon, removeIcon];
-        }
+        return value !== undefined;
     });
 };
-},{"./helpers":32,"./item/SR5ItemDataWrapper":35,"./parts/PartsList":43}],32:[function(require,module,exports){
+},{"./helpers":32}],32:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Helpers = void 0;
@@ -6650,19 +6508,21 @@ class SR5ItemDataWrapper extends DataWrapper_1.DataWrapper {
                 device_att: '',
             },
         };
-        /**
-         * {
-         *     attN: {
-         *         value: number,
-         *         att: string (the ASDF attribute)
-         *     }
-         * }
-         */
-        const atts = this.data.data.atts;
-        if (atts) {
-            for (let [key, att] of Object.entries(atts)) {
-                matrix[att.att].value = att.value;
-                matrix[att.att].device_att = key;
+        if (this.isCyberdeck()) {
+            /**
+             * {
+             *     attN: {
+             *         value: number,
+             *         att: string (the ASDF attribute)
+             *     }
+             * }
+             */
+            const atts = this.data.data.atts;
+            if (atts) {
+                for (let [key, att] of Object.entries(atts)) {
+                    matrix[att.att].value = att.value;
+                    matrix[att.att].device_att = key;
+                }
             }
         }
         return matrix;
@@ -8171,14 +8031,6 @@ class PartsList {
         else if (value) {
             this.addPart(name, value);
         }
-    }
-    removePart(name) {
-        const index = this._list.findIndex((part) => part.name === name);
-        if (index > -1) {
-            this._list.splice(index, 1);
-            return true;
-        }
-        return false;
     }
     getMessageOutput() {
         return this.list;
