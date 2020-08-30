@@ -9,7 +9,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/parts/actor-bio.html',
         'systems/shadowrun5e/dist/templates/actor/parts/actor-social.html',
 
-        'systems/shadowrun5e/dist/templates/actor/parts/matrix/matrix-attribute.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.html',
         'systems/shadowrun5e/dist/templates/actor/parts/skills/ActorAttribute.html',
 
         'systems/shadowrun5e/dist/templates/item/parts/description.html',
@@ -47,4 +47,3 @@ export const preloadHandlebarsTemplates = async () => {
 
     return loadTemplates(templatePaths);
 };
-

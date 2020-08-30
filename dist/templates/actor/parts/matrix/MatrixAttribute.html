@@ -25,8 +25,19 @@
                 {{/select}}
             </select>
         </div>
-        <div class="track-plus"></div>
+        {{else}}
+        <div class="attribute-input-container">
+            {{> "systems/shadowrun5e/dist/templates/common/ValueInput.html"
+                    cssClass="attribute-input short"
+                    title=(localize 'SR5.BaseValue')
+                    size="2"
+                    maxLength="2"
+                    value=matrixAtt.base
+                    disabled="true"
+            }}
+        </div>
         {{/if}}
+        <div class="track-plus"></div>
         <div class="attribute-input-container">
             {{> "systems/shadowrun5e/dist/templates/common/ValueInput.html"
                 cssClass="attribute-input short"

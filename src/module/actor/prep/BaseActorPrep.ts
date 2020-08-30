@@ -54,18 +54,18 @@ export class BaseActorPrep {
                 // setup the actual matrix attributes for the actor
                 for (const [key, value] of Object.entries(deviceAtts)) {
                     if (value && matrix[key]) {
-                        matrix[key].value += value.value;
+                        matrix[key].base = value.value;
                         matrix[key].device_att = value.device_att;
                     }
                 }
             }
         } // if we don't have a device, use living persona
         else if (this.data.special === 'resonance') {
-            matrix.firewall.value += Helpers.calcTotal(attributes.willpower);
-            matrix.data_processing.value += Helpers.calcTotal(attributes.logic);
+            matrix.firewall.base = Helpers.calcTotal(attributes.willpower);
+            matrix.data_processing.base = Helpers.calcTotal(attributes.logic);
             matrix.rating = Helpers.calcTotal(attributes.resonance);
-            matrix.attack.value += Helpers.calcTotal(attributes.charisma);
-            matrix.sleaze.value += Helpers.calcTotal(attributes.intuition);
+            matrix.attack.base = Helpers.calcTotal(attributes.charisma);
+            matrix.sleaze.base = Helpers.calcTotal(attributes.intuition);
             matrix.name = game.i18n.localize('SR5.LivingPersona');
         }
 
@@ -76,6 +76,7 @@ export class BaseActorPrep {
 
         // add matrix attributes to both limits and attributes as hidden entries
         MatrixList.forEach((key) => {
+            Helpers.calcTotal(matrix[key]);
             if (matrix[key]) {
                 const label = CONFIG.SR5.matrixAttributes[key];
                 const { value, base, mod } = matrix[key];

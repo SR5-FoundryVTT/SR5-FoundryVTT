@@ -37,7 +37,7 @@
                 </div>
             </div>
             {{#each config.matrixAttributes as |label key|}}
-                {{> "systems/shadowrun5e/dist/templates/actor/parts/matrix/matrix-attribute.html"
+                {{> "systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.html"
                         matrixAtt=(lookup ../data.matrix key)
                         isCyberdeck=../data.matrix.is_cyberdeck
                         key=key

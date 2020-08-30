@@ -2607,18 +2607,18 @@ class BaseActorPrep {
                 // setup the actual matrix attributes for the actor
                 for (const [key, value] of Object.entries(deviceAtts)) {
                     if (value && matrix[key]) {
-                        matrix[key].value += value.value;
+                        matrix[key].base = value.value;
                         matrix[key].device_att = value.device_att;
                     }
                 }
             }
         } // if we don't have a device, use living persona
         else if (this.data.special === 'resonance') {
-            matrix.firewall.value += helpers_1.Helpers.calcTotal(attributes.willpower);
-            matrix.data_processing.value += helpers_1.Helpers.calcTotal(attributes.logic);
+            matrix.firewall.base = helpers_1.Helpers.calcTotal(attributes.willpower);
+            matrix.data_processing.base = helpers_1.Helpers.calcTotal(attributes.logic);
             matrix.rating = helpers_1.Helpers.calcTotal(attributes.resonance);
-            matrix.attack.value += helpers_1.Helpers.calcTotal(attributes.charisma);
-            matrix.sleaze.value += helpers_1.Helpers.calcTotal(attributes.intuition);
+            matrix.attack.base = helpers_1.Helpers.calcTotal(attributes.charisma);
+            matrix.sleaze.base = helpers_1.Helpers.calcTotal(attributes.intuition);
             matrix.name = game.i18n.localize('SR5.LivingPersona');
         }
         // set matrix condition monitor to max if greater than
@@ -2627,6 +2627,7 @@ class BaseActorPrep {
         }
         // add matrix attributes to both limits and attributes as hidden entries
         MatrixList.forEach((key) => {
+            helpers_1.Helpers.calcTotal(matrix[key]);
             if (matrix[key]) {
                 const label = CONFIG.SR5.matrixAttributes[key];
                 const { value, base, mod } = matrix[key];
@@ -4964,7 +4965,7 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/dist/templates/actor/parts/actor-config.html',
         'systems/shadowrun5e/dist/templates/actor/parts/actor-bio.html',
         'systems/shadowrun5e/dist/templates/actor/parts/actor-social.html',
-        'systems/shadowrun5e/dist/templates/actor/parts/matrix/matrix-attribute.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.html',
         'systems/shadowrun5e/dist/templates/actor/parts/skills/ActorAttribute.html',
         'systems/shadowrun5e/dist/templates/item/parts/description.html',
         'systems/shadowrun5e/dist/templates/item/parts/technology.html',
