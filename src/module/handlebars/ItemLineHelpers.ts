@@ -9,6 +9,7 @@ export const registerItemLineHelpers = () => {
             icon: PlusIcon,
             text: AddText,
             title: game.i18n.localize('SR5.CreateItem'),
+            cssClass: 'item-create',
         };
         switch (id) {
             case 'lifestyle':
@@ -129,11 +130,42 @@ export const registerItemLineHelpers = () => {
                         },
                     },
                 ];
+            case 'adept_power':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.PowerType'),
+                        },
+                    },
+                ];
+            case 'spell':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.SpellType'),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.SpellRange'),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Duration'),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Drain'),
+                        },
+                    },
+                ];
             case 'quality':
                 return [
                     {
                         text: {
-                            text: game.i18n.localize('SR5.Type'),
+                            text: game.i18n.localize('SR5.QualityType'),
                         },
                     },
                 ];
@@ -228,6 +260,38 @@ export const registerItemLineHelpers = () => {
                     },
                 ];
 
+            case 'adept_power':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize(item.data.type ?? ''),
+                        },
+                    },
+                ];
+            case 'spell':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize(CONFIG.SR5.spellTypes[item.data.type ?? '']),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize(CONFIG.SR5.spellRanges[item.data.range ?? '']),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize(CONFIG.SR5.durations[item.data.duration ?? '']),
+                        },
+                    },
+                    {
+                        text: {
+                            text: wrapper.getDrain(),
+                        },
+                    },
+                ];
+
             case 'complex_form':
                 return [
                     {
@@ -262,10 +326,6 @@ export const registerItemLineHelpers = () => {
     });
 
     Handlebars.registerHelper('ItemIcons', function (item: SR5ItemType) {
-        const addIcon = {
-            icon: 'fas fa-plus',
-            title: game.i18n.localize('SR5.AddItem'),
-        };
         const editIcon = {
             icon: 'fas fa-edit item-edit',
             title: game.i18n.localize('SR5.EditItem'),

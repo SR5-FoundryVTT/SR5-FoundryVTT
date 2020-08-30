@@ -394,14 +394,12 @@ export class SR5ActorSheet extends ActorSheet {
 
     _onItemCreate(event) {
         event.preventDefault();
-        const header = event.currentTarget;
-        const type = header.dataset.type;
+        const type = event.currentTarget.closest('.item').dataset.itemId;
+        console.log(type);
         const itemData = {
-            name: `New ${Helpers.label(type)}`,
+            name: `New ${type}`,
             type: type,
-            data: duplicate(header.dataset),
         };
-        delete itemData.data['type'];
         return this.actor.createOwnedItem(itemData, { renderSheet: true });
     }
 

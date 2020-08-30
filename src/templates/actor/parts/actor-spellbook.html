@@ -1,124 +1,40 @@
 <div class="inventory">
     <div class="scroll-area">
-        <div class="item item-section">
-            <div class="item-left">
-                <div class="item-text item-name">
-                    {{localize "SR5.Powers"}}
-                </div>
-            </div>
-            <div class="item-right">
-                <div class="item-text">
-                    {{localize "SR5.PowerType"}}
-                </div>
-                <div class="item-text item-icons">
-                    <a class="item-create" title="{{localize 'SR5.CreateItemAdeptPower'}}" data-type="adept_power">
-                        <i class="fas fa-plus"></i>
-                        {{localize "SR5.Add"}}
-                    </a>
-                </div>
-            </div>
-        </div>
-        {{#each powers as |item iid|}}
-        <div class="item" data-item-id="{{item._id}}">
-            <div class="item-left">
-                <div class="item-img item-roll roll">
-                    <img src="{{item.img}}" title="{{item.name}}" height="24px" width="24px" />
-                </div>
-                <div class="item-text item-name has-desc">
-                    {{item.name}}
-                </div>
-            </div>
-            <div class="item-right">
-                <div class="item-text">
-                    {{localize item.data.type}}
-                </div>
-                <div class="item-text item-icons">
-                    <i class="item-edit roll fas fa-edit"></i>
-                    <i class="item-delete roll fas fa-trash"></i>
-                </div>
-            </div>
-        </div>
-        <div class="item hidden">
-            <div class="item-desc">
-                <div class="props">
-                    {{#each item.properties}}
-                    <span>{{this}}</span>
-                    {{/each}}
-                </div>
-                <div class="description">
-                    {{{item.data.description.value}}}
-                </div>
-            </div>
-        </div>
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+                name=(localize 'SR5.Powers')
+                itemId='adept_power'
+                icons=(ItemHeaderIcons 'adept_power')
+                rightSide=(ItemHeaderRightSide 'adept_power')
+        }}
+        {{#each powers as |item i|}}
+            {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                    img=item.img
+                    name=item.name
+                    itemId=item._id
+                    icons=(ItemIcons item)
+                    rightSide=(ItemRightSide item)
+                    hasDesc="true"
+                    hasRoll="true"
+                    description=item.data.description.value
+            }}
         {{/each}}
-        <div class="item item-section">
-            <div class="item-left">
-                <div class="item-text item-name">
-                    {{localize "SR5.Spells"}}
-                </div>
-            </div>
-            <div class="item-right">
-                <div class="item-text">
-                    {{localize "SR5.SpellType"}}
-                </div>
-                <div class="item-text">
-                    {{localize "SR5.SpellRange"}}
-                </div>
-                <div class="item-text">
-                    {{localize "SR5.Duration"}}
-                </div>
-                <div class="item-text">
-                    {{localize "SR5.Drain"}}
-                </div>
-                <div class="item-text item-icons">
-                    <a class="item-create" title="{{localize 'SR5.CreateItemSpell'}}" data-type="spell">
-                        <i class="fas fa-plus"></i>
-                        {{localize "SR5.Add"}}
-                    </a>
-                </div>
-            </div>
-        </div>
-        {{#each spells as |item iid|}}
-        <div class="item" data-item-id="{{item._id}}">
-            <div class="item-left">
-                <div class="item-img item-roll">
-                    <img src="{{item.img}}" title="{{item.name}}" height="24px" width="24px" />
-                </div>
-                <div class="item-text item-name has-desc">
-                    {{item.name}}
-                </div>
-            </div>
-            <div class="item-right">
-                <div class="item-text">
-                    {{localizeOb item.data.type ../config.spellTypes}}
-                </div>
-                <div class="item-text">
-                    {{localizeOb item.data.range ../config.spellRanges}}
-                </div>
-                <div class="item-text">
-                    {{localizeOb item.data.duration ../config.durations}}
-                </div>
-                <div class="item-text">
-                    {{item.data.drain}}
-                </div>
-                <div class="item-text item-icons">
-                    <i class="item-edit roll fas fa-edit"></i>
-                    <i class="item-delete roll fas fa-trash"></i>
-                </div>
-            </div>
-        </div>
-        <div class="item hidden">
-            <div class="item-desc">
-                <div class="props">
-                    {{#each item.properties}}
-                    <span>{{this}}</span>
-                    {{/each}}
-                </div>
-                <div class="description">
-                    {{{item.data.description.value}}}
-                </div>
-            </div>
-        </div>
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+                name=(localize 'SR5.Spells')
+                itemId='spell'
+                icons=(ItemHeaderIcons 'spell')
+                rightSide=(ItemHeaderRightSide 'spell')
+        }}
+        {{#each spells as |item i|}}
+            {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                    img=item.img
+                    name=item.name
+                    itemId=item._id
+                    icons=(ItemIcons item)
+                    rightSide=(ItemRightSide item)
+                    hasDesc="true"
+                    hasRoll="true"
+                    description=item.data.description.value
+            }}
         {{/each}}
     </div>
 </div>

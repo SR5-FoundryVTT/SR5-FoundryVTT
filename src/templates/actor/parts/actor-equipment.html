@@ -3,6 +3,7 @@
     {{#each sections as |section sid|}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
                 name=(localize section.label)
+                itemId=section.dataset.type
                 icons=(ItemHeaderIcons section.dataset.type)
                 rightSide=(ItemHeaderRightSide section.dataset.type)
         }}

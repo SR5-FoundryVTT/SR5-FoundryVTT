@@ -2240,14 +2240,12 @@ class SR5ActorSheet extends ActorSheet {
     }
     _onItemCreate(event) {
         event.preventDefault();
-        const header = event.currentTarget;
-        const type = header.dataset.type;
+        const type = event.currentTarget.closest('.item').dataset.itemId;
+        console.log(type);
         const itemData = {
-            name: `New ${helpers_1.Helpers.label(type)}`,
+            name: `New ${type}`,
             type: type,
-            data: duplicate(header.dataset),
         };
-        delete itemData.data['type'];
         return this.actor.createOwnedItem(itemData, { renderSheet: true });
     }
     _onAddLanguageSkill(event) {
@@ -5012,6 +5010,7 @@ exports.registerItemLineHelpers = () => {
             icon: PlusIcon,
             text: AddText,
             title: game.i18n.localize('SR5.CreateItem'),
+            cssClass: 'item-create',
         };
         switch (id) {
             case 'lifestyle':
@@ -5131,11 +5130,42 @@ exports.registerItemLineHelpers = () => {
                         },
                     },
                 ];
+            case 'adept_power':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.PowerType'),
+                        },
+                    },
+                ];
+            case 'spell':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.SpellType'),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.SpellRange'),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Duration'),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Drain'),
+                        },
+                    },
+                ];
             case 'quality':
                 return [
                     {
                         text: {
-                            text: game.i18n.localize('SR5.Type'),
+                            text: game.i18n.localize('SR5.QualityType'),
                         },
                     },
                 ];
@@ -5146,7 +5176,7 @@ exports.registerItemLineHelpers = () => {
         }
     });
     Handlebars.registerHelper('ItemRightSide', function (item) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
         const wrapper = new SR5ItemDataWrapper_1.SR5ItemDataWrapper(item);
         const qtyInput = {
             input: {
@@ -5229,16 +5259,47 @@ exports.registerItemLineHelpers = () => {
                         },
                     },
                 ];
-            case 'complex_form':
+            case 'adept_power':
                 return [
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.matrixTargets[(_k = item.data.target) !== null && _k !== void 0 ? _k : '']),
+                            text: game.i18n.localize((_k = item.data.type) !== null && _k !== void 0 ? _k : ''),
+                        },
+                    },
+                ];
+            case 'spell':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize(CONFIG.SR5.spellTypes[(_l = item.data.type) !== null && _l !== void 0 ? _l : '']),
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.durations[(_l = item.data.duration) !== null && _l !== void 0 ? _l : '']),
+                            text: game.i18n.localize(CONFIG.SR5.spellRanges[(_m = item.data.range) !== null && _m !== void 0 ? _m : '']),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize(CONFIG.SR5.durations[(_o = item.data.duration) !== null && _o !== void 0 ? _o : '']),
+                        },
+                    },
+                    {
+                        text: {
+                            text: wrapper.getDrain(),
+                        },
+                    },
+                ];
+            case 'complex_form':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize(CONFIG.SR5.matrixTargets[(_p = item.data.target) !== null && _p !== void 0 ? _p : '']),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize(CONFIG.SR5.durations[(_q = item.data.duration) !== null && _q !== void 0 ? _q : '']),
                         },
                     },
                     {
@@ -5263,10 +5324,6 @@ exports.registerItemLineHelpers = () => {
     });
     Handlebars.registerHelper('ItemIcons', function (item) {
         var _a;
-        const addIcon = {
-            icon: 'fas fa-plus',
-            title: game.i18n.localize('SR5.AddItem'),
-        };
         const editIcon = {
             icon: 'fas fa-edit item-edit',
             title: game.i18n.localize('SR5.EditItem'),
