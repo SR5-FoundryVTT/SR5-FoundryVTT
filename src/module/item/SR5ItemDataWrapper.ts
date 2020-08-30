@@ -156,6 +156,14 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
         return matrix;
     }
 
+    getActionDicePoolMod(): number | undefined {
+        return this.data.data.action?.mod;
+    }
+
+    getLimitAttribute(): string | undefined {
+        return this.data.data.action?.limit?.attribute;
+    }
+
     getActionSkill(): string | undefined {
         return this.data.data.action?.skill;
     }
