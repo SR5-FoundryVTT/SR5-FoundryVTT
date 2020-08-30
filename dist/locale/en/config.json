@@ -491,6 +491,8 @@
     "SR5.SourceFieldEmptyError": "The Source field is empty, please enter valid text for the source",
 
     "SR5.TemporaryModifiers": "Temporary Modifiers",
+    "SR5.Attributes": "Attributes",
+    "SR5.SpecialAttributes": "Special Attributes",
 
     "SETTINGS.DiagonalMovementName": "Diagonal Movement",
     "SETTINGS.DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
