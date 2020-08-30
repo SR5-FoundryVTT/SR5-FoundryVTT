@@ -32,6 +32,7 @@
     "SR5.Limit": "Limit",
     "SR5.Modifier": "Modifier",
     "SR5.Wounds": "Wounds",
+    "SR5.Filter": "Filter",
 
     "SR5.Movement": "Movement",
     "SR5.Overflow": "Overflow",
@@ -56,6 +57,8 @@
     "SR5.RollFade": "Fade",
     "SR5.RollArmor": "Armor",
     "SR5.RollCustom": "Custom",
+
+    "SR5.SecondAttribute": "Second Attribute",
 
     "SR5.WeaponReload": "Reload",
     "SR5.HotSim": "Hot Sim",
@@ -127,6 +130,19 @@
     "SR5.AP": "AP",
     "SR5.OpposedType": "Type",
     "SR5.Extended": "Extended",
+
+    "SR5.CreateItem": "Create Item",
+    "SR5.CreateItemGear": "Create Gear",
+    "SR5.CreateItemSpell": "Create Spell",
+    "SR5.CreateItemAction": "Create Action",
+    "SR5.CreateItemComplexForm": "Create Complex Form",
+    "SR5.CreateItemAdeptPower": "Create Adept Power",
+    "SR5.CreateItemProgram": "Create Program",
+    "SR5.CreateItemQuality": "Create Quality",
+    "SR5.CreateItemLicense": "Create License",
+    "SR5.CreateItemSIN": "Create SIN",
+    "SR5.CreateItemLifestyle": "Create Lifestyle",
+    "SR5.CreateItemContact": "Create Contact",
 
     "SR5.Weapon": "Weapon",
     "SR5.Ammo": "Ammo",
@@ -365,6 +381,9 @@
     "SR5.BlastRadius": "Blast Radius",
     "SR5.Modification": "Modification",
     "SR5.AmmoFull": "Ammo Full",
+    "SR5.RoundsRemaining": "Rounds Remaining",
+    "SR5.Bullet": "Round",
+    "SR5.Bullets": "Rounds",
 
     "SR5.RollOneDie": "You can't roll less than 1 die, chummer",
 
@@ -379,7 +398,9 @@
 
     "SR5.WeaponModeSingleShotShort": "SS",
     "SR5.WeaponModeSemiAutoShort": "SA",
+    "SR5.WeaponModeSemiAutoBurst": "SB",
     "SR5.WeaponModeBurstFireShort": "BF",
+    "SR5.WeaponModeBurstFireLong": "LB",
     "SR5.WeaponModeFullAutoShort": "FA",
 
     "SR5.Total": "Total",
@@ -465,6 +486,9 @@
     "SR5.WoundModifier": "Wound Mod",
     "SR5.ExtendedTest": "Extended Test",
     "SR5.IncomingDamage": "Incoming Damage",
+
+    "SR5.ApplyWounds": "Apply Wounds",
+    "SR5.DontApplyWounds": "Don't Apply Wounds",
 
     "SR5.NoCover": "No Cover",
     "SR5.PartialCover": "Partial Cover",

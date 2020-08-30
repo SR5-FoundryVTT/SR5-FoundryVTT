@@ -24,6 +24,8 @@ export class BaseActorPrep {
 
         // clear matrix data to defaults
         MatrixList.forEach((key) => {
+            // delete the Temporary mod that may exist on the object
+            delete matrix[key].mod["Temporary"];
             const parts = new PartsList(matrix[key].mod);
             parts.addUniquePart('SR5.Temporary', matrix[key].temp);
             matrix[key].mod = parts.list;
@@ -110,10 +112,10 @@ export class BaseActorPrep {
             armor[element] = 0;
         }
 
-        const equippedArmor = this.items.filter((item) => item.isArmor() && item.isEquipped());
+        const equippedArmor = this.items.filter((item) => item.hasArmor() && item.isEquipped());
         const armorModParts = new PartsList<number>(armor.mod);
         equippedArmor?.forEach((item) => {
-            if (item.isArmorAccessory()) {
+            if (item.hasArmorAccessory()) {
                 armorModParts.addUniquePart(item.getName(), item.getArmorValue());
             } // if not a mod, set armor.value to the items value
             else {
