@@ -5047,6 +5047,21 @@ exports.registerItemLineHelpers = () => {
             case 'program':
                 addIcon.title = game.i18n.localize('SR5.CreateItemProgram');
                 return [addIcon];
+            case 'weapon':
+                addIcon.title = game.i18n.localize('SR5.CreateItemWeapon');
+                return [addIcon];
+            case 'armor':
+                addIcon.title = game.i18n.localize('SR5.CreateItemArmor');
+                return [addIcon];
+            case 'device':
+                addIcon.title = game.i18n.localize('SR5.CreateItemDevice');
+                return [addIcon];
+            case 'equipment':
+                addIcon.title = game.i18n.localize('SR5.CreateItemEquipment');
+                return [addIcon];
+            case 'cyberware':
+                addIcon.title = game.i18n.localize('SR5.CreateItemCyberware');
+                return [addIcon];
             default:
                 return [];
         }
@@ -5086,6 +5101,18 @@ exports.registerItemLineHelpers = () => {
                         },
                     },
                 ];
+            case 'weapon':
+            case 'armor':
+            case 'device':
+            case 'equipment':
+            case 'cyberware':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Qty'),
+                        },
+                    },
+                ];
             case 'complex_form':
                 return [
                     {
@@ -5111,8 +5138,15 @@ exports.registerItemLineHelpers = () => {
         }
     });
     Handlebars.registerHelper('ItemRightSide', function (item) {
-        var _a, _b, _c, _d, _e, _f;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
         const wrapper = new SR5ItemDataWrapper_1.SR5ItemDataWrapper(item);
+        const qtyInput = {
+            input: {
+                type: 'number',
+                value: wrapper.getQuantity(),
+                cssClass: 'item-qty',
+            },
+        };
         switch (item.type) {
             case 'action':
                 return [
@@ -5149,16 +5183,46 @@ exports.registerItemLineHelpers = () => {
                         },
                     },
                 ];
+            case 'armor':
+            case 'device':
+            case 'equipment':
+            case 'cyberware':
+                return [qtyInput];
+            case 'weapon':
+                if (wrapper.isRangedWeapon()) {
+                    const count = (_f = (_e = wrapper.getAmmo()) === null || _e === void 0 ? void 0 : _e.current.value) !== null && _f !== void 0 ? _f : 0;
+                    const max = (_h = (_g = wrapper.getAmmo()) === null || _g === void 0 ? void 0 : _g.current.max) !== null && _h !== void 0 ? _h : 0;
+                    const text = count < max ? `${game.i18n.localize('SR5.WeaponReload')} (${count}/${max})` : game.i18n.localize('SR5.AmmoFull');
+                    const cssClass = 'no-break' + (count < max ? ' reload-ammo roll' : ' faded');
+                    return [
+                        {
+                            text: {
+                                title: `${game.i18n.localize('SR5.WeaponAmmoCount')}: ${count}`,
+                                text,
+                                cssClass,
+                            },
+                        },
+                        {
+                            text: {
+                                text: '',
+                            },
+                        },
+                        qtyInput,
+                    ];
+                }
+                else {
+                    return [qtyInput];
+                }
             case 'complex_form':
                 return [
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.matrixTargets[(_e = item.data.target) !== null && _e !== void 0 ? _e : '']),
+                            text: game.i18n.localize(CONFIG.SR5.matrixTargets[(_j = item.data.target) !== null && _j !== void 0 ? _j : '']),
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.durations[(_f = item.data.duration) !== null && _f !== void 0 ? _f : '']),
+                            text: game.i18n.localize(CONFIG.SR5.durations[(_k = item.data.duration) !== null && _k !== void 0 ? _k : '']),
                         },
                     },
                     {
@@ -5188,11 +5252,11 @@ exports.registerItemLineHelpers = () => {
             title: game.i18n.localize('SR5.AddItem'),
         };
         const editIcon = {
-            icon: 'fas fa-edit',
+            icon: 'fas fa-edit item-edit',
             title: game.i18n.localize('SR5.EditItem'),
         };
         const removeIcon = {
-            icon: 'fas fa-trash',
+            icon: 'fas fa-trash item-delete',
             title: game.i18n.localize('SR5.DeleteItem'),
         };
         const equipIcon = {
@@ -5201,6 +5265,11 @@ exports.registerItemLineHelpers = () => {
         };
         switch (item.type) {
             case 'program':
+            case 'armor':
+            case 'device':
+            case 'equipment':
+            case 'cyberware':
+            case 'weapon':
                 return [equipIcon, editIcon, removeIcon];
             default:
                 return [editIcon, removeIcon];
@@ -6956,6 +7025,9 @@ class SR5ItemDataWrapper extends DataWrapper_1.DataWrapper {
         var _a, _b;
         return (_b = (_a = this.data.data) === null || _a === void 0 ? void 0 : _a.essence) !== null && _b !== void 0 ? _b : 0;
     }
+    getAmmo() {
+        return this.data.data.ammo;
+    }
     getASDF() {
         if (!this.isDevice())
             return undefined;
@@ -6996,6 +7068,10 @@ class SR5ItemDataWrapper extends DataWrapper_1.DataWrapper {
             }
         }
         return matrix;
+    }
+    getQuantity() {
+        var _a, _b;
+        return ((_b = (_a = this.data.data) === null || _a === void 0 ? void 0 : _a.technology) === null || _b === void 0 ? void 0 : _b.quantity) || 1;
     }
     getActionDicePoolMod() {
         var _a;

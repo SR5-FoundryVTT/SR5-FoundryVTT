@@ -44,6 +44,21 @@ export const registerItemLineHelpers = () => {
             case 'program':
                 addIcon.title = game.i18n.localize('SR5.CreateItemProgram');
                 return [addIcon];
+            case 'weapon':
+                addIcon.title = game.i18n.localize('SR5.CreateItemWeapon');
+                return [addIcon];
+            case 'armor':
+                addIcon.title = game.i18n.localize('SR5.CreateItemArmor');
+                return [addIcon];
+            case 'device':
+                addIcon.title = game.i18n.localize('SR5.CreateItemDevice');
+                return [addIcon];
+            case 'equipment':
+                addIcon.title = game.i18n.localize('SR5.CreateItemEquipment');
+                return [addIcon];
+            case 'cyberware':
+                addIcon.title = game.i18n.localize('SR5.CreateItemCyberware');
+                return [addIcon];
             default:
                 return [];
         }
@@ -84,6 +99,18 @@ export const registerItemLineHelpers = () => {
                         },
                     },
                 ];
+            case 'weapon':
+            case 'armor':
+            case 'device':
+            case 'equipment':
+            case 'cyberware':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Qty'),
+                        },
+                    },
+                ];
             case 'complex_form':
                 return [
                     {
@@ -111,6 +138,13 @@ export const registerItemLineHelpers = () => {
 
     Handlebars.registerHelper('ItemRightSide', function (item: SR5ItemType) {
         const wrapper = new SR5ItemDataWrapper(item);
+        const qtyInput = {
+            input: {
+                type: 'number',
+                value: wrapper.getQuantity(),
+                cssClass: 'item-qty',
+            },
+        };
         switch (item.type) {
             case 'action':
                 return [
@@ -147,6 +181,36 @@ export const registerItemLineHelpers = () => {
                         },
                     },
                 ];
+            case 'armor':
+            case 'device':
+            case 'equipment':
+            case 'cyberware':
+                return [qtyInput];
+            case 'weapon':
+                if (wrapper.isRangedWeapon()) {
+                    const count = wrapper.getAmmo()?.current.value ?? 0;
+                    const max = wrapper.getAmmo()?.current.max ?? 0;
+                    const text = count < max ? `${game.i18n.localize('SR5.WeaponReload')} (${count}/${max})` : game.i18n.localize('SR5.AmmoFull');
+                    const cssClass = 'no-break' + (count < max ? ' reload-ammo roll' : ' faded');
+                    return [
+                        {
+                            text: {
+                                title: `${game.i18n.localize('SR5.WeaponAmmoCount')}: ${count}`,
+                                text,
+                                cssClass,
+                            },
+                        },
+                        {
+                            text: {
+                                text: '',
+                            },
+                        },
+                        qtyInput,
+                    ];
+                } else {
+                    return [qtyInput];
+                }
+
             case 'complex_form':
                 return [
                     {
@@ -186,11 +250,11 @@ export const registerItemLineHelpers = () => {
             title: game.i18n.localize('SR5.AddItem'),
         };
         const editIcon = {
-            icon: 'fas fa-edit',
+            icon: 'fas fa-edit item-edit',
             title: game.i18n.localize('SR5.EditItem'),
         };
         const removeIcon = {
-            icon: 'fas fa-trash',
+            icon: 'fas fa-trash item-delete',
             title: game.i18n.localize('SR5.DeleteItem'),
         };
         const equipIcon = {
@@ -200,6 +264,11 @@ export const registerItemLineHelpers = () => {
 
         switch (item.type) {
             case 'program':
+            case 'armor':
+            case 'device':
+            case 'equipment':
+            case 'cyberware':
+            case 'weapon':
                 return [equipIcon, editIcon, removeIcon];
             default:
                 return [editIcon, removeIcon];

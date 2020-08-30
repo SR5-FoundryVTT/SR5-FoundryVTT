@@ -32,6 +32,19 @@
                     </button>
                 </div>
             {{/if}}
+            {{#if option.input}}
+                {{#ife option.input.type 'number'}}
+                    <div class="item-text {{option.cssClass}}">
+                        {{> "systems/shadowrun5e/dist/templates/common/ValueInput.html"
+                                cssClass=(concatStrings "short " option.input.cssClass)
+                                title=(localize 'SR5.Quantity')
+                                size="5"
+                                maxLength="5"
+                                value=option.input.value
+                        }}
+                    </div>
+                {{/ife}}
+            {{/if}}
         {{/each}}
         {{#if icons}}
             <div class="item-text item-icons">
