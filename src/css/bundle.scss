@@ -112,7 +112,7 @@ label.checkbox {
         height: 0;
         width: 0;
     }
-	
+
     .checkmark {
         position: absolute;
         font-size: 1.25em;
@@ -166,6 +166,11 @@ input[type='checkbox'].display {
         background: transparent;
         border: $groove;
     }
+}
+
+input[type='text'].disabled-for-display {
+    color: $black;
+    background-color: rgba(0, 0, 0, 0);
 }
 
 input[type='text'].display {
