@@ -1,11 +1,11 @@
 <form>
     <div class="form-group">
-        <label>Second Attribute</label>
+        <label>{{localize "SR5.SecondAttribute"}}</label>
         <select name="attribute2">
             {{#select attribute2}}
-            <option value="none">None</option>
+            <option value="none">{{localize "SR5.None"}}</option>
             {{#each attributes as |att a|}} {{#ifne att attribute}}
-            <option value="{{a}}">{{toHeaderCase a}}</option>
+            <option value="{{a}}">{{localize att.label}}</option>
             {{/ifne}} {{/each}} {{/select}}
         </select>
     </div>
