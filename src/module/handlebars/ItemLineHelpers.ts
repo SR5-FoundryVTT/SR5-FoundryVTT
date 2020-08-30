@@ -129,6 +129,14 @@ export const registerItemLineHelpers = () => {
                         },
                     },
                 ];
+            case 'quality':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Type'),
+                        },
+                    },
+                ];
             case 'program':
                 return [];
             default:
@@ -210,6 +218,15 @@ export const registerItemLineHelpers = () => {
                 } else {
                     return [qtyInput];
                 }
+
+            case 'quality':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize(CONFIG.SR5.qualityTypes[item.data.type ?? '']),
+                        },
+                    },
+                ];
 
             case 'complex_form':
                 return [

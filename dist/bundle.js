@@ -5131,6 +5131,14 @@ exports.registerItemLineHelpers = () => {
                         },
                     },
                 ];
+            case 'quality':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.Type'),
+                        },
+                    },
+                ];
             case 'program':
                 return [];
             default:
@@ -5138,7 +5146,7 @@ exports.registerItemLineHelpers = () => {
         }
     });
     Handlebars.registerHelper('ItemRightSide', function (item) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
         const wrapper = new SR5ItemDataWrapper_1.SR5ItemDataWrapper(item);
         const qtyInput = {
             input: {
@@ -5213,16 +5221,24 @@ exports.registerItemLineHelpers = () => {
                 else {
                     return [qtyInput];
                 }
+            case 'quality':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize(CONFIG.SR5.qualityTypes[(_j = item.data.type) !== null && _j !== void 0 ? _j : '']),
+                        },
+                    },
+                ];
             case 'complex_form':
                 return [
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.matrixTargets[(_j = item.data.target) !== null && _j !== void 0 ? _j : '']),
+                            text: game.i18n.localize(CONFIG.SR5.matrixTargets[(_k = item.data.target) !== null && _k !== void 0 ? _k : '']),
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.durations[(_k = item.data.duration) !== null && _k !== void 0 ? _k : '']),
+                            text: game.i18n.localize(CONFIG.SR5.durations[(_l = item.data.duration) !== null && _l !== void 0 ? _l : '']),
                         },
                     },
                     {
