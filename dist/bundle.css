@@ -626,6 +626,10 @@ input[type='checkbox'].display {
     background: transparent;
     border: 1px solid #4d4d4d; }
 
+input[type='text'].disabled-for-display {
+  color: black;
+  background-color: rgba(0, 0, 0, 0); }
+
 input[type='text'].display {
   color: white;
   text-shadow: -1px -1px 0 black, 1px -1px 0 black, -1px 1px 0 black, 1px 1px 0 black;

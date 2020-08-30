@@ -168,6 +168,11 @@ input[type='checkbox'].display {
     }
 }
 
+input[type='text'].disabled-for-display {
+    color: $black;
+    background-color: rgba(0, 0, 0, 0);
+}
+
 input[type='text'].display {
     @include textOutline;
     background: rgba($light, 0.1);

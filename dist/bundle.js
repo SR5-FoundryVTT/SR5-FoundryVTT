@@ -3826,19 +3826,19 @@ class ShadowrunItemDialog extends Dialog {
         const { modes, ranges } = itemData.range;
         const { ammo } = itemData;
         if (modes.single_shot) {
-            fireModes['1'] = 'SS';
+            fireModes['1'] = game.i18n.localize("SR5.WeaponModeSingleShotShort");
         }
         if (modes.semi_auto) {
-            fireModes['1'] = 'SA';
-            fireModes['3'] = 'SB';
+            fireModes['1'] = game.i18n.localize("SR5.WeaponModeSemiAutoShort");
+            fireModes['3'] = game.i18n.localize("SR5.WeaponModeSemiAutoBurst");
         }
         if (modes.burst_fire) {
-            fireModes['3'] = `${modes.semi_auto ? 'SB/' : ''}BF`;
-            fireModes['6'] = 'LB';
+            fireModes['3'] = `${modes.semi_auto ? `${game.i18n.localize("SR5.WeaponModeSemiAutoBurst")}/` : ''}${game.i18n.localize("SR5.WeaponModeBurstFireShort")}`;
+            fireModes['6'] = game.i18n.localize("SR5.WeaponModeBurstFireLong");
         }
         if (modes.full_auto) {
-            fireModes['6'] = `${modes.burst_fire ? 'LB/' : ''}FA(s)`;
-            fireModes['10'] = 'FA(c)';
+            fireModes['6'] = `${modes.burst_fire ? 'LB/' : ''}${game.i18n.localize("SR5.WeaponModeFullAutoShort")}(s)`;
+            fireModes['10'] = `${game.i18n.localize("SR5.WeaponModeFullAutoShort")}(c)`;
             fireModes['20'] = game.i18n.localize('SR5.Suppressing');
         }
         const templateRanges = this._getRangeWeaponTemplateData(ranges);
