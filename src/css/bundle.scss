@@ -201,6 +201,10 @@ input[type='text'].display {
     }
 }
 
+.invisible {
+    visibility: hidden;
+}
+
 .show-child-on-hover {
     .child-on-hover {
         visibility: hidden;
@@ -409,6 +413,9 @@ select.display {
             &.no-border {
                 border-bottom: none;
             }
+            &.center {
+                justify-content: center;
+            }
             &.item-section {
                 border: $groove-width solid $black;
                 margin-right: 0;
@@ -416,6 +423,12 @@ select.display {
                 background: rgba($grey, 0.2);
                 padding: 0.25em;
                 border-radius: 0.2em;
+            }
+            .item-center {
+                display: flex;
+                flex-flow: row nowrap;
+                align-items: center;
+                align-self: center;
             }
             .item-left {
                 display: flex;

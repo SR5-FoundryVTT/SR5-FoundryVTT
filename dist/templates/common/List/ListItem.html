@@ -6,7 +6,10 @@
                 <img src="{{img}}" title="{{name}}" height="24px" width="24px" />
             </div>
         {{/if}}
-        <div class="item-text item-name {{#if hasDesc}}has-desc{{/if}} {{#if itemNameCssClass}}{{itemNameCssClass}}{{/if}} {{#unless img}}{{#if hasRoll}}roll{{/if}}{{/unless}}"
+        <div class="item-text item-name
+            {{#if hasDesc}}has-desc{{/if}}
+            {{#if itemNameCssClass}}{{itemNameCssClass}}{{/if}}
+            {{#unless img}}{{#if hasRoll}}roll{{/if}}{{/unless}}"
         >
             {{name}}
         </div>

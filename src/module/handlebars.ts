@@ -46,10 +46,10 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/common/UsesAttribute.html',
         'systems/shadowrun5e/dist/templates/common/Attribute.html',
         'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html',
+        'systems/shadowrun5e/dist/templates/common/HeaderBlock.html',
 
         'systems/shadowrun5e/dist/templates/common/List/ListItem.html',
         'systems/shadowrun5e/dist/templates/common/List/ListHeader.html',
-
     ];
 
     return loadTemplates(templatePaths);
@@ -126,6 +126,10 @@ export const registerHandlebarHelpers = () => {
         if (v1 === v2) return options.fn(this);
         else return options.inverse(this);
     });
+    Handlebars.registerHelper('not', function (v1) {
+        console.log(v1);
+        return !v1;
+    });
     Handlebars.registerHelper('sum', function (v1, v2) {
         return v1 + v2;
     });
@@ -183,6 +187,11 @@ export const registerHandlebarHelpers = () => {
 
     Handlebars.registerHelper('log', function (value: string) {
         console.log(value);
+    });
+
+    Handlebars.registerHelper('disabledHelper', function (value) {
+        const val = Boolean(value);
+        return val ? val : undefined;
     });
 
     Handlebars.registerHelper('buildName', function (options) {

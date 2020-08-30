@@ -1,10 +1,17 @@
-<div class="attributes">
-    {{#each data.attributes as |attribute a|}} {{#unless attribute.hidden}}
-        {{> "systems/shadowrun5e/dist/templates/actor/parts/skills/ActorAttribute.html"
-            attributeId=a
-            attribute=attribute
+<div>
+    <div class="inventory">
+        {{> "systems/shadowrun5e/dist/templates/common/HeaderBlock.html"
+                name=(localize "SR5.Attributes")
         }}
-    {{/unless}} {{/each}}
+        <div class="attributes">
+            {{#each data.attributes as |attribute a|}} {{#unless attribute.hidden}}
+                {{> "systems/shadowrun5e/dist/templates/actor/parts/skills/ActorAttribute.html"
+                        attributeId=a
+                        attribute=attribute
+                }}
+            {{/unless}} {{/each}}
+        </div>
+    </div>
 </div>
 <div class="inventory">
     <div class="split-container">
@@ -41,19 +48,10 @@
             </div>
         </div>
         <div class="flexcol">
+            {{> "systems/shadowrun5e/dist/templates/common/HeaderBlock.html"
+                name=(localize "SR5.SpecialAttributes")
+            }}
             <div class="attributes">
-                {{#if awakened}}
-                    {{> "systems/shadowrun5e/dist/templates/actor/parts/skills/ActorAttribute.html"
-                            attributeId='magic'
-                            attribute=data.attributes.magic
-                    }}
-                {{/if}}
-                {{#if emerged}}
-                    {{> "systems/shadowrun5e/dist/templates/actor/parts/skills/ActorAttribute.html"
-                            attributeId='resonance'
-                            attribute=data.attributes.resonance
-                    }}
-                {{/if}}
                 {{> "systems/shadowrun5e/dist/templates/actor/parts/skills/ActorAttribute.html"
                         attributeId='edge'
                         attribute=data.attributes.edge
@@ -61,6 +59,18 @@
                 {{> "systems/shadowrun5e/dist/templates/actor/parts/skills/ActorAttribute.html"
                         attributeId='essence'
                         attribute=data.attributes.essence
+                }}
+                {{> "systems/shadowrun5e/dist/templates/actor/parts/skills/ActorAttribute.html"
+                        attributeId='magic'
+                        attribute=data.attributes.magic
+                        disableBase=(not awakened)
+                        disableManual=(not awakened)
+                }}
+                {{> "systems/shadowrun5e/dist/templates/actor/parts/skills/ActorAttribute.html"
+                        attributeId='resonance'
+                        attribute=data.attributes.resonance
+                        disableBase=(not emerged)
+                        disableManual=(not emerged)
                 }}
             </div>
             <div class="scroll-area">

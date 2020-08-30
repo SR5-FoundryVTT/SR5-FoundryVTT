@@ -1,5 +1,5 @@
-{{log attribute}}
-{{log attributeId}}
+{{log disableBase}}
+{{log disableManual}}
 {{#> "systems/shadowrun5e/dist/templates/common/Attribute.html" dataName="attribute" dataId=attributeId}}
     <div class="attribute-name attribute-roll roll">
         {{localize attribute.label}}
@@ -7,7 +7,7 @@
     <div class="attribute-value" title="{{localize 'SR5.Total'}}">
         {{attribute.value}}
     </div>
-    <div class="track center">
+    <div class="track center {{#if disableBase}}{{#if disableManual}}invisible{{/if}}{{/if}}">
         <div class="attribute-input-container">
             {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.html'
                     cssClass="attribute-input short"
@@ -16,6 +16,7 @@
                     maxLength="2"
                     value=attribute.base
                     name=(buildName part1="data.attributes" part2=attributeId part3="base")
+                    disabled=(disabledHelper disableBase)
             }}
         </div>
         <div class="track-plus"></div>
@@ -27,6 +28,7 @@
                     maxLength="2"
                     value=attribute.temp
                     name=(buildName part1="data.attributes" part2=attributeId part3="temp")
+                    disabled=(disabledHelper disableManual)
             }}
         </div>
         {{!--
