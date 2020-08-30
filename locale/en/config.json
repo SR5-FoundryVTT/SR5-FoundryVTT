@@ -493,6 +493,7 @@
     "SR5.TemporaryModifiers": "Temporary Modifiers",
     "SR5.Attributes": "Attributes",
     "SR5.SpecialAttributes": "Special Attributes",
+    "SR5.RightClickToClear": "Right Click to Clear",
 
     "SETTINGS.DiagonalMovementName": "Diagonal Movement",
     "SETTINGS.DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
