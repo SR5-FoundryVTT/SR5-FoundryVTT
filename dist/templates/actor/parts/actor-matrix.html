@@ -1,97 +1,55 @@
 <div>
-    <div class="inventory">
-        {{> "systems/shadowrun5e/dist/templates/common/HeaderBlock.html"
-                name=(localize "SR5.Matrix")
-        }}
-        <div class="attributes">
-            <div class="block">
-                <div class="block-line gap-4 border-bottom center">
-                    <label>
-                        {{localize "SR5.HotSim"}}
-                        <input
-                                type="checkbox"
-                                class="submit-checkbox"
-                                name="data.matrix.hot_sim"
-                            {{checked data.matrix.hot_sim}}
-                        />
-                    </label>
-                    <label>
-                        {{localize "SR5.RunningSilent"}}
-                        <input
-                                type="checkbox"
-                                class="submit-checkbox"
-                                name="data.matrix.running_silent"
-                            {{checked data.matrix.running_silent}}
-                        />
-                    </label>
-                </div>
-                <div class="attribute">
-                    <div class="attribute-name">
-                        {{localize "SR5.ConditionMonitor"}}
-                    </div>
-                    {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
-                            value=data.matrix.condition_monitor.value
-                            max=data.matrix.condition_monitor.max
-                            id="matrix"
-                    }}
-                </div>
+    {{> "systems/shadowrun5e/dist/templates/common/HeaderBlock.html"
+            name=(localize "SR5.Matrix")
+    }}
+    <div class="attributes">
+        <div class="block">
+            <div class="block-line gap-4 border-bottom center">
+                <label>
+                    {{localize "SR5.HotSim"}}
+                    <input
+                            type="checkbox"
+                            class="submit-checkbox"
+                            name="data.matrix.hot_sim"
+                        {{checked data.matrix.hot_sim}}
+                    />
+                </label>
+                <label>
+                    {{localize "SR5.RunningSilent"}}
+                    <input
+                            type="checkbox"
+                            class="submit-checkbox"
+                            name="data.matrix.running_silent"
+                        {{checked data.matrix.running_silent}}
+                    />
+                </label>
             </div>
-            {{#each config.matrixAttributes as |label key|}}
-                {{> "systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.html"
-                        matrixAtt=(lookup ../data.matrix key)
-                        isCyberdeck=../data.matrix.is_cyberdeck
-                        key=key
-                        label=label
-                        matrixAttributes=../config/matrixAttributes
-                        item=../data.matrix.item }}
-            {{/each}}
+            <div class="attribute">
+                <div class="attribute-name">
+                    {{localize "SR5.ConditionMonitor"}}
+                </div>
+                {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
+                        value=data.matrix.condition_monitor.value
+                        max=data.matrix.condition_monitor.max
+                        id="matrix"
+                }}
+            </div>
         </div>
+        {{#each config.matrixAttributes as |label key|}}
+            {{> "systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.html"
+                    matrixAtt=(lookup ../data.matrix key)
+                    isCyberdeck=../data.matrix.is_cyberdeck
+                    key=key
+                    label=label
+                    matrixAttributes=../config/matrixAttributes
+                    item=../data.matrix.item }}
+        {{/each}}
     </div>
 </div>
+<div class="inventory">
 {{#if emerged}}
-<div class="inventory">
-    <div class="scroll-area">
-        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
-            name=(localize 'SR5.ComplexForms')
-            itemId='complex_form'
-            icons=(ItemHeaderIcons 'complex_form')
-            rightSide=(ItemHeaderRightSide 'complex_form')
-        }}
-        {{#each complex_forms as |item iid|}}
-            {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
-                img=item.img
-                name=item.name
-                itemId=item._id
-                icons=(ItemIcons item)
-                rightSide=(ItemRightSide item)
-                hasDesc="true"
-                hasRoll="true"
-                description=item.data.description.value
-            }}
-        {{/each}}
-    </div>
-</div>
+    {{> 'systems/shadowrun5e/dist/templates/actor/parts/ActorComplexFormList.html' }}
 {{else}}
-<div class="inventory">
-    <div class="scroll-area">
-        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
-                name=(localize 'SR5.Programs')
-                itemId='program'
-                icons=(ItemHeaderIcons 'program')
-                rightSide=(ItemHeaderRightSide 'program')
-        }}
-        {{#each programs as |item iid|}}
-            {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
-                    img=item.img
-                    name=item.name
-                    itemId=item._id
-                    icons=(ItemIcons item)
-                    rightSide=(ItemRightSide item)
-                    hasDesc="true"
-                    hasRoll="true"
-                    description=item.data.description.value
-            }}
-        {{/each}}
-    </div>
-</div>
+    {{> 'systems/shadowrun5e/dist/templates/actor/parts/ActorProgramList.html' }}
 {{/if}}
+</div>

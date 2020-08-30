@@ -2111,7 +2111,7 @@ class SR5ActorSheet extends ActorSheet {
         });
         html.find('.has-desc').click((event) => {
             event.preventDefault();
-            const item = $(event.currentTarget).parents('.item');
+            const item = $(event.currentTarget).parents('.list-item');
             const iid = $(item).data().item;
             const field = item.next();
             field.toggle();
@@ -2170,7 +2170,7 @@ class SR5ActorSheet extends ActorSheet {
         // Update Inventory Item
         html.find('.item-edit').click((event) => {
             event.preventDefault();
-            const iid = event.currentTarget.closest('.item').dataset.itemId;
+            const iid = helpers_1.Helpers.listItemId(event);
             const item = this.actor.getOwnedItem(iid);
             if (item)
                 item.sheet.render(true);
@@ -2178,14 +2178,14 @@ class SR5ActorSheet extends ActorSheet {
         // Delete Inventory Item
         html.find('.item-delete').click((event) => {
             event.preventDefault();
-            const iid = event.currentTarget.closest('.item').dataset.itemId;
-            const el = $(event.currentTarget).parents('.item');
+            const iid = helpers_1.Helpers.listItemId(event);
+            const el = $(event.currentTarget).parents('.list-item');
             this.actor.deleteOwnedItem(iid);
             el.slideUp(200, () => this.render(false));
         });
         // Drag inventory item
         let handler = (ev) => this._onDragItemStart(ev);
-        html.find('.item').each((i, item) => {
+        html.find('.list-item').each((i, item) => {
             if (item.dataset && item.dataset.itemId) {
                 item.setAttribute('draggable', true);
                 item.addEventListener('dragstart', handler, false);
@@ -2201,7 +2201,7 @@ class SR5ActorSheet extends ActorSheet {
     _onReloadAmmo(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
-            const iid = event.currentTarget.closest('.item').dataset.itemId;
+            const iid = helpers_1.Helpers.listItemId(event);
             const item = this.actor.getOwnedItem(iid);
             if (item)
                 return item.reloadAmmo();
@@ -2240,7 +2240,7 @@ class SR5ActorSheet extends ActorSheet {
     }
     _onItemCreate(event) {
         event.preventDefault();
-        const type = event.currentTarget.closest('.item').dataset.itemId;
+        const type = helpers_1.Helpers.listItemId(event);
         console.log(type);
         const itemData = {
             name: `New ${type}`,
@@ -2257,27 +2257,27 @@ class SR5ActorSheet extends ActorSheet {
     _onRemoveLanguageSkill(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
-            const skillId = event.currentTarget.closest('.item').dataset.itemId;
+            const skillId = helpers_1.Helpers.listItemId(event);
             this.actor.removeLanguageSkill(skillId);
         });
     }
     _onAddKnowledgeSkill(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
-            const category = event.currentTarget.closest('.item').dataset.itemId;
+            const category = helpers_1.Helpers.listItemId(event);
             this.actor.addKnowledgeSkill(category);
         });
     }
     _onRemoveKnowledgeSkill(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
-            const [skillId, category] = event.currentTarget.closest('.item').dataset.itemId.split('.');
+            const [skillId, category] = helpers_1.Helpers.listItemId(event).split('.');
             this.actor.removeKnowledgeSkill(skillId, category);
         });
     }
     _onChangeRtg(event) {
         return __awaiter(this, void 0, void 0, function* () {
-            const iid = event.currentTarget.closest('.item').dataset.itemId;
+            const iid = helpers_1.Helpers.listItemId(event);
             const item = this.actor.getOwnedItem(iid);
             const rtg = parseInt(event.currentTarget.value);
             if (item && rtg) {
@@ -2287,7 +2287,7 @@ class SR5ActorSheet extends ActorSheet {
     }
     _onChangeQty(event) {
         return __awaiter(this, void 0, void 0, function* () {
-            const iid = event.currentTarget.closest('.item').dataset.itemId;
+            const iid = helpers_1.Helpers.listItemId(event);
             const item = this.actor.getOwnedItem(iid);
             const qty = parseInt(event.currentTarget.value);
             if (item && qty) {
@@ -2299,7 +2299,7 @@ class SR5ActorSheet extends ActorSheet {
     _onEquipItem(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
-            const iid = event.currentTarget.closest('.item').dataset.itemId;
+            const iid = helpers_1.Helpers.listItemId(event);
             const item = this.actor.getOwnedItem(iid);
             if (item) {
                 const itemData = item.data.data;
@@ -2401,7 +2401,7 @@ class SR5ActorSheet extends ActorSheet {
     _onRollItem(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
-            const iid = event.currentTarget.closest('.item').dataset.itemId;
+            const iid = helpers_1.Helpers.listItemId(event);
             const item = this.actor.getOwnedItem(iid);
             if (item) {
                 yield item.postCard(event);
@@ -2455,7 +2455,7 @@ class SR5ActorSheet extends ActorSheet {
     _onRollKnowledgeSkill(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
-            const id = event.currentTarget.closest('.item').dataset.itemId;
+            const id = helpers_1.Helpers.listItemId(event);
             const [skill, category] = id.split('.');
             return this.actor.rollKnowledgeSkill(category, skill, { event: event });
         });
@@ -2463,14 +2463,14 @@ class SR5ActorSheet extends ActorSheet {
     _onRollLanguageSkill(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
-            const skill = event.currentTarget.closest('.item').dataset.itemId;
+            const skill = helpers_1.Helpers.listItemId(event);
             return this.actor.rollLanguageSkill(skill, { event: event });
         });
     }
     _onRollActiveSkill(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
-            const skill = event.currentTarget.closest('.item').dataset.itemId;
+            const skill = helpers_1.Helpers.listItemId(event);
             return this.actor.rollActiveSkill(skill, { event: event });
         });
     }
@@ -2530,19 +2530,19 @@ class SR5ActorSheet extends ActorSheet {
     }
     _onShowEditKnowledgeSkill(event) {
         event.preventDefault();
-        const [skill, category] = event.currentTarget.closest('.item').dataset.itemId.split('.');
+        const [skill, category] = helpers_1.Helpers.listItemId(event).split('.');
         new KnowledgeSkillEditForm_1.KnowledgeSkillEditForm(this.actor, skill, category, {
             event: event,
         }).render(true);
     }
     _onShowEditLanguageSkill(event) {
         event.preventDefault();
-        const skill = event.currentTarget.closest('.item').dataset.itemId;
+        const skill = helpers_1.Helpers.listItemId(event);
         new LanguageSkillEditForm_1.LanguageSkillEditForm(this.actor, skill, { event: event }).render(true);
     }
     _onShowEditSkill(event) {
         event.preventDefault();
-        const skill = event.currentTarget.closest('.item').dataset.itemId;
+        const skill = helpers_1.Helpers.listItemId(event);
         new SkillEditForm_1.SkillEditForm(this.actor, skill, { event: event }).render(true);
     }
     _onShowImportCharacter(event) {
@@ -4955,16 +4955,34 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.preloadHandlebarsTemplates = void 0;
 exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, function* () {
     const templatePaths = [
-        'systems/shadowrun5e/dist/templates/actor/parts/actor-equipment.html',
-        'systems/shadowrun5e/dist/templates/actor/parts/actor-spellbook.html',
-        'systems/shadowrun5e/dist/templates/actor/parts/actor-skills.html',
-        'systems/shadowrun5e/dist/templates/actor/parts/actor-matrix.html',
-        'systems/shadowrun5e/dist/templates/actor/parts/actor-actions.html',
-        'systems/shadowrun5e/dist/templates/actor/parts/actor-config.html',
-        'systems/shadowrun5e/dist/templates/actor/parts/actor-bio.html',
-        'systems/shadowrun5e/dist/templates/actor/parts/actor-social.html',
+        // actor tabs
+        'systems/shadowrun5e/dist/templates/actor/tabs/ActionsTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/BioTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/GearTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/MagicTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/MatrixTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/MiscTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/SkillsTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/SocialTab.html',
+        // uncategorized lists
+        'systems/shadowrun5e/dist/templates/actor/parts/ActionList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/ContactList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/SinAndLifestyleList.html',
+        // magic
+        'systems/shadowrun5e/dist/templates/actor/parts/magic/AdeptPowerList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/magic/SpellList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/magic/SpellAndAdeptPowerList.html',
+        // matrix
+        'systems/shadowrun5e/dist/templates/actor/parts/matrix/ProgramList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/matrix/ComplexFormList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.html',
-        'systems/shadowrun5e/dist/templates/actor/parts/skills/ActorAttribute.html',
+        // attributes
+        'systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/attributes/AttributeList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/attributes/SpecialAttributeList.html',
+        // skills
+        'systems/shadowrun5e/dist/templates/actor/parts/skills/ActiveSkillList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/skills/LanguageAndKnowledgeSkillList.html',
         'systems/shadowrun5e/dist/templates/item/parts/description.html',
         'systems/shadowrun5e/dist/templates/item/parts/technology.html',
         'systems/shadowrun5e/dist/templates/item/parts/header.html',
@@ -4985,13 +5003,18 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/dist/templates/item/parts/modification.html',
         'systems/shadowrun5e/dist/templates/item/parts/program.html',
         'systems/shadowrun5e/dist/templates/rolls/parts/parts-list.html',
+        // to wrap the bodies of tabs
+        'systems/shadowrun5e/dist/templates/common/TabWrapper.html',
         'systems/shadowrun5e/dist/templates/common/ValueInput.html',
-        'systems/shadowrun5e/dist/templates/common/ConditionMonitor.html',
+        // Useful wrapper and implemented components
         'systems/shadowrun5e/dist/templates/common/ValueMaxAttribute.html',
         'systems/shadowrun5e/dist/templates/common/UsesAttribute.html',
         'systems/shadowrun5e/dist/templates/common/Attribute.html',
+        // to create the condition monitors and edge counter
         'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html',
+        // looks like a ListHeader
         'systems/shadowrun5e/dist/templates/common/HeaderBlock.html',
+        // list components
         'systems/shadowrun5e/dist/templates/common/List/ListItem.html',
         'systems/shadowrun5e/dist/templates/common/List/ListHeader.html',
     ];
@@ -5518,6 +5541,9 @@ class Helpers {
         data.value = parts.total + data.base;
         data.mod = parts.list;
         return data.value;
+    }
+    static listItemId(event) {
+        return event.currentTarget.closest('.list-item').dataset.itemId;
     }
     // replace 'SR5.'s on keys with 'SR5_DOT_'
     static onSetFlag(data) {
@@ -7334,7 +7360,7 @@ class SR5ItemSheet extends ItemSheet {
         html.find('.open-source-pdf').on('click', this._onOpenSourcePdf.bind(this));
         html.find('.has-desc').click((event) => {
             event.preventDefault();
-            const item = $(event.currentTarget).parents('.item');
+            const item = $(event.currentTarget).parents('.list-item');
             const iid = $(item).data().item;
             const field = item.next();
             field.toggle();

@@ -132,6 +132,11 @@
     "SR5.Extended": "Extended",
 
     "SR5.CreateItem": "Create Item",
+    "SR5.CreateItemWeapon": "Create Weapon",
+    "SR5.CreateItemArmor": "Create Armor",
+    "SR5.CreateItemDevice": "Create Device",
+    "SR5.CreateItemEquipment": "Create Equipment",
+    "SR5.CreateItemCyberware": "Create Cyberware",
     "SR5.CreateItemGear": "Create Gear",
     "SR5.CreateItemSpell": "Create Spell",
     "SR5.CreateItemAction": "Create Action",
@@ -510,6 +515,8 @@
     "SR5.DamageResistanceTest": "Damage Resistance Test",
     "SR5.Glitch": "Glitch!",
     "SR5.RollMode": "Roll Mode",
+
+    "SR5.SIN": "SIN",
 
     "SR5.OpenSourcePdf": "Open Source PDF to the item",
     "SR5.SourceFieldEmptyError": "The Source field is empty, please enter valid text for the source",

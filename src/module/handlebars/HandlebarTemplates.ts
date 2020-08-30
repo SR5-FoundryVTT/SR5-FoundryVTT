@@ -1,16 +1,38 @@
 export const preloadHandlebarsTemplates = async () => {
     const templatePaths = [
-        'systems/shadowrun5e/dist/templates/actor/parts/actor-equipment.html',
-        'systems/shadowrun5e/dist/templates/actor/parts/actor-spellbook.html',
-        'systems/shadowrun5e/dist/templates/actor/parts/actor-skills.html',
-        'systems/shadowrun5e/dist/templates/actor/parts/actor-matrix.html',
-        'systems/shadowrun5e/dist/templates/actor/parts/actor-actions.html',
-        'systems/shadowrun5e/dist/templates/actor/parts/actor-config.html',
-        'systems/shadowrun5e/dist/templates/actor/parts/actor-bio.html',
-        'systems/shadowrun5e/dist/templates/actor/parts/actor-social.html',
+        // actor tabs
+        'systems/shadowrun5e/dist/templates/actor/tabs/ActionsTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/BioTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/GearTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/MagicTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/MatrixTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/MiscTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/SkillsTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/SocialTab.html',
 
+        // uncategorized lists
+        'systems/shadowrun5e/dist/templates/actor/parts/ActionList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/ContactList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/SinAndLifestyleList.html',
+
+        // magic
+        'systems/shadowrun5e/dist/templates/actor/parts/magic/AdeptPowerList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/magic/SpellList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/magic/SpellAndAdeptPowerList.html',
+
+        // matrix
+        'systems/shadowrun5e/dist/templates/actor/parts/matrix/ProgramList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/matrix/ComplexFormList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.html',
-        'systems/shadowrun5e/dist/templates/actor/parts/skills/ActorAttribute.html',
+
+        // attributes
+        'systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/attributes/AttributeList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/attributes/SpecialAttributeList.html',
+
+        // skills
+        'systems/shadowrun5e/dist/templates/actor/parts/skills/ActiveSkillList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/skills/LanguageAndKnowledgeSkillList.html',
 
         'systems/shadowrun5e/dist/templates/item/parts/description.html',
         'systems/shadowrun5e/dist/templates/item/parts/technology.html',
@@ -33,14 +55,22 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/item/parts/program.html',
         'systems/shadowrun5e/dist/templates/rolls/parts/parts-list.html',
 
+        // to wrap the bodies of tabs
+        'systems/shadowrun5e/dist/templates/common/TabWrapper.html',
         'systems/shadowrun5e/dist/templates/common/ValueInput.html',
-        'systems/shadowrun5e/dist/templates/common/ConditionMonitor.html',
+
+        // Useful wrapper and implemented components
         'systems/shadowrun5e/dist/templates/common/ValueMaxAttribute.html',
         'systems/shadowrun5e/dist/templates/common/UsesAttribute.html',
         'systems/shadowrun5e/dist/templates/common/Attribute.html',
+
+        // to create the condition monitors and edge counter
         'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html',
+
+        // looks like a ListHeader
         'systems/shadowrun5e/dist/templates/common/HeaderBlock.html',
 
+        // list components
         'systems/shadowrun5e/dist/templates/common/List/ListItem.html',
         'systems/shadowrun5e/dist/templates/common/List/ListHeader.html',
     ];

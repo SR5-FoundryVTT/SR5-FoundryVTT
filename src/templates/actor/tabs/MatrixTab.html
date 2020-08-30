@@ -1,5 +1,5 @@
-<div>
-    <div class="inventory">
+{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.html' tabId='matrix'}}
+    <div>
         {{> "systems/shadowrun5e/dist/templates/common/HeaderBlock.html"
                 name=(localize "SR5.Matrix")
         }}
@@ -47,51 +47,11 @@
             {{/each}}
         </div>
     </div>
-</div>
-{{#if emerged}}
-<div class="inventory">
-    <div class="scroll-area">
-        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
-            name=(localize 'SR5.ComplexForms')
-            itemId='complex_form'
-            icons=(ItemHeaderIcons 'complex_form')
-            rightSide=(ItemHeaderRightSide 'complex_form')
-        }}
-        {{#each complex_forms as |item iid|}}
-            {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
-                img=item.img
-                name=item.name
-                itemId=item._id
-                icons=(ItemIcons item)
-                rightSide=(ItemRightSide item)
-                hasDesc="true"
-                hasRoll="true"
-                description=item.data.description.value
-            }}
-        {{/each}}
+    <div class="inventory">
+        {{#if emerged}}
+            {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/ComplexFormList.html' }}
+        {{else}}
+            {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/ProgramList.html' }}
+        {{/if}}
     </div>
-</div>
-{{else}}
-<div class="inventory">
-    <div class="scroll-area">
-        {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
-                name=(localize 'SR5.Programs')
-                itemId='program'
-                icons=(ItemHeaderIcons 'program')
-                rightSide=(ItemHeaderRightSide 'program')
-        }}
-        {{#each programs as |item iid|}}
-            {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
-                    img=item.img
-                    name=item.name
-                    itemId=item._id
-                    icons=(ItemIcons item)
-                    rightSide=(ItemRightSide item)
-                    hasDesc="true"
-                    hasRoll="true"
-                    description=item.data.description.value
-            }}
-        {{/each}}
-    </div>
-</div>
-{{/if}}
+{{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.html'}}

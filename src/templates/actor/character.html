@@ -220,57 +220,23 @@
     <nav class="tabs" data-group="primary">
         <a class="item" data-tab="actions">{{localize "SR5.Actions"}}</a>
         <a class="item" data-tab="skills">{{localize "SR5.Skills"}}</a>
-        <a class="item active" data-tab="equipment">{{localize "SR5.Gear"}}</a>
+        <a class="item active" data-tab="gear">{{localize "SR5.Gear"}}</a>
         {{#ife data.special 'magic'}}
         <a class="item" data-tab="magic">{{localize "SR5.Magic"}}</a>
         {{/ife}}
         <a class="item" data-tab="matrix">{{localize "SR5.Matrix"}}</a>
         <a class="item" data-tab="bio">{{localize "SR5.Biography"}}</a>
         <a class="item" data-tab="social">{{localize "SR5.Social"}}</a>
-        <a class="item" data-tab="config">{{localize "SR5.Miscellaneous"}}</a>
+        <a class="item" data-tab="misc">{{localize "SR5.Miscellaneous"}}</a>
     </nav>
     <section class="sheetbody">
-        <div class="tab" data-group="primary" data-tab="skills">
-            <div class="tabbody">
-                {{> "systems/shadowrun5e/dist/templates/actor/parts/actor-skills.html"}}
-            </div>
-        </div>
-        <div class="tab" data-group="primary" data-tab="equipment">
-            <div class="tabbody">
-                {{> "systems/shadowrun5e/dist/templates/actor/parts/actor-equipment.html"
-                sections=inventory data=data}}
-            </div>
-        </div>
-        <div class="tab" data-group="primary" data-tab="magic">
-            <div class="tabbody">
-                {{> "systems/shadowrun5e/dist/templates/actor/parts/actor-spellbook.html"
-                spells=magic.spellbook powers=magic.powers}}
-            </div>
-        </div>
-        <div class="tab" data-group="primary" data-tab="matrix">
-            <div class="tabbody">
-                {{> "systems/shadowrun5e/dist/templates/actor/parts/actor-matrix.html" }}
-            </div>
-        </div>
-        <div class="tab" data-group="primary" data-tab="actions">
-            <div class="tabbody">
-                {{> "systems/shadowrun5e/dist/templates/actor/parts/actor-actions.html"}}
-            </div>
-        </div>
-        <div class="tab" data-group="primary" data-tab="bio">
-            <div class="tabbody">
-                {{> "systems/shadowrun5e/dist/templates/actor/parts/actor-bio.html" }}
-            </div>
-        </div>
-        <div class="tab" data-group="primary" data-tab="social">
-            <div class="tabbody">
-                {{> "systems/shadowrun5e/dist/templates/actor/parts/actor-social.html" }}
-            </div>
-        </div>
-        <div class="tab" data-group="primary" data-tab="config">
-            <div class="tabbody">
-                {{> "systems/shadowrun5e/dist/templates/actor/parts/actor-config.html" }}
-            </div>
-        </div>
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/ActionsTab.html"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/SkillsTab.html"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/MatrixTab.html"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/GearTab.html"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/MagicTab.html"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/BioTab.html"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/SocialTab.html"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/MiscTab.html"}}
     </section>
 </form>

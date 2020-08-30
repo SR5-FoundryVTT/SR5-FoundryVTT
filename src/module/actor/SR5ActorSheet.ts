@@ -265,7 +265,7 @@ export class SR5ActorSheet extends ActorSheet {
 
         html.find('.has-desc').click((event) => {
             event.preventDefault();
-            const item = $(event.currentTarget).parents('.item');
+            const item = $(event.currentTarget).parents('.list-item');
             const iid = $(item).data().item;
             const field = item.next();
             field.toggle();
@@ -327,21 +327,21 @@ export class SR5ActorSheet extends ActorSheet {
         // Update Inventory Item
         html.find('.item-edit').click((event) => {
             event.preventDefault();
-            const iid = event.currentTarget.closest('.item').dataset.itemId;
+            const iid = Helpers.listItemId(event);
             const item = this.actor.getOwnedItem(iid);
             if (item) item.sheet.render(true);
         });
         // Delete Inventory Item
         html.find('.item-delete').click((event) => {
             event.preventDefault();
-            const iid = event.currentTarget.closest('.item').dataset.itemId;
-            const el = $(event.currentTarget).parents('.item');
+            const iid = Helpers.listItemId(event);
+            const el = $(event.currentTarget).parents('.list-item');
             this.actor.deleteOwnedItem(iid);
             el.slideUp(200, () => this.render(false));
         });
         // Drag inventory item
         let handler = (ev) => this._onDragItemStart(ev);
-        html.find('.item').each((i, item) => {
+        html.find('.list-item').each((i, item) => {
             if (item.dataset && item.dataset.itemId) {
                 item.setAttribute('draggable', true);
                 item.addEventListener('dragstart', handler, false);
@@ -356,7 +356,7 @@ export class SR5ActorSheet extends ActorSheet {
 
     async _onReloadAmmo(event) {
         event.preventDefault();
-        const iid = event.currentTarget.closest('.item').dataset.itemId;
+        const iid = Helpers.listItemId(event);
         const item = this.actor.getOwnedItem(iid);
         if (item) return item.reloadAmmo();
     }
@@ -394,7 +394,7 @@ export class SR5ActorSheet extends ActorSheet {
 
     _onItemCreate(event) {
         event.preventDefault();
-        const type = event.currentTarget.closest('.item').dataset.itemId;
+        const type = Helpers.listItemId(event);
         console.log(type);
         const itemData = {
             name: `New ${type}`,
@@ -410,24 +410,24 @@ export class SR5ActorSheet extends ActorSheet {
 
     async _onRemoveLanguageSkill(event) {
         event.preventDefault();
-        const skillId = event.currentTarget.closest('.item').dataset.itemId;
+        const skillId = Helpers.listItemId(event);
         this.actor.removeLanguageSkill(skillId);
     }
 
     async _onAddKnowledgeSkill(event) {
         event.preventDefault();
-        const category = event.currentTarget.closest('.item').dataset.itemId;
+        const category = Helpers.listItemId(event);
         this.actor.addKnowledgeSkill(category);
     }
 
     async _onRemoveKnowledgeSkill(event) {
         event.preventDefault();
-        const [skillId, category] = event.currentTarget.closest('.item').dataset.itemId.split('.');
+        const [skillId, category] = Helpers.listItemId(event).split('.');
         this.actor.removeKnowledgeSkill(skillId, category);
     }
 
     async _onChangeRtg(event) {
-        const iid = event.currentTarget.closest('.item').dataset.itemId;
+        const iid = Helpers.listItemId(event);
         const item = this.actor.getOwnedItem(iid);
         const rtg = parseInt(event.currentTarget.value);
         if (item && rtg) {
@@ -436,7 +436,7 @@ export class SR5ActorSheet extends ActorSheet {
     }
 
     async _onChangeQty(event) {
-        const iid = event.currentTarget.closest('.item').dataset.itemId;
+        const iid = Helpers.listItemId(event);
         const item = this.actor.getOwnedItem(iid);
         const qty = parseInt(event.currentTarget.value);
         if (item && qty) {
@@ -447,7 +447,7 @@ export class SR5ActorSheet extends ActorSheet {
 
     async _onEquipItem(event) {
         event.preventDefault();
-        const iid = event.currentTarget.closest('.item').dataset.itemId;
+        const iid = Helpers.listItemId(event);
         const item = this.actor.getOwnedItem(iid);
         if (item) {
             const itemData = item.data.data;
@@ -536,7 +536,7 @@ export class SR5ActorSheet extends ActorSheet {
 
     async _onRollItem(event) {
         event.preventDefault();
-        const iid = event.currentTarget.closest('.item').dataset.itemId;
+        const iid = Helpers.listItemId(event);
         const item = this.actor.getOwnedItem(iid);
         if (item) {
             await item.postCard(event);
@@ -582,20 +582,20 @@ export class SR5ActorSheet extends ActorSheet {
 
     async _onRollKnowledgeSkill(event) {
         event.preventDefault();
-        const id = event.currentTarget.closest('.item').dataset.itemId;
+        const id = Helpers.listItemId(event);
         const [skill, category] = id.split('.');
         return this.actor.rollKnowledgeSkill(category, skill, { event: event });
     }
 
     async _onRollLanguageSkill(event) {
         event.preventDefault();
-        const skill = event.currentTarget.closest('.item').dataset.itemId;
+        const skill = Helpers.listItemId(event);
         return this.actor.rollLanguageSkill(skill, { event: event });
     }
 
     async _onRollActiveSkill(event) {
         event.preventDefault();
-        const skill = event.currentTarget.closest('.item').dataset.itemId;
+        const skill = Helpers.listItemId(event);
         return this.actor.rollActiveSkill(skill, { event: event });
     }
 
@@ -655,7 +655,7 @@ export class SR5ActorSheet extends ActorSheet {
 
     _onShowEditKnowledgeSkill(event) {
         event.preventDefault();
-        const [skill, category] = event.currentTarget.closest('.item').dataset.itemId.split('.');
+        const [skill, category] = Helpers.listItemId(event).split('.');
         new KnowledgeSkillEditForm(this.actor, skill, category, {
             event: event,
         }).render(true);
@@ -663,13 +663,13 @@ export class SR5ActorSheet extends ActorSheet {
 
     _onShowEditLanguageSkill(event) {
         event.preventDefault();
-        const skill = event.currentTarget.closest('.item').dataset.itemId;
+        const skill = Helpers.listItemId(event);
         new LanguageSkillEditForm(this.actor, skill, { event: event }).render(true);
     }
 
     _onShowEditSkill(event) {
         event.preventDefault();
-        const skill = event.currentTarget.closest('.item').dataset.itemId;
+        const skill = Helpers.listItemId(event);
         new SkillEditForm(this.actor, skill, { event: event }).render(true);
     }
 

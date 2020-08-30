@@ -1,5 +1,5 @@
 {{log icons}}
-<div class="item {{itemCssClass}}" {{#if itemId}}data-item-id="{{itemId}}"{{/if}}>
+<div class="list-item {{itemCssClass}}" {{#if itemId}}data-item-id="{{itemId}}"{{/if}}>
     <div class="item-left">
         {{#if img}}
             <div class="item-img {{#if hasRoll}}item-roll{{/if}} roll">
@@ -61,7 +61,7 @@
     </div>
 </div>
 {{#if properties}}
-<div class="item hidden">
+<div class="list-item hidden">
     <div class="item-desc">
         <div class="props">
             {{#each properties}}
