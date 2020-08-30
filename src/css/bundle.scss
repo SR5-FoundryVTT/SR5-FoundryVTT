@@ -112,7 +112,7 @@ label.checkbox {
         height: 0;
         width: 0;
     }
-	
+
     .checkmark {
         position: absolute;
         font-size: 1.25em;
@@ -267,7 +267,7 @@ select.display {
 
     .profile-img {
         padding: 0.25em;
-        max-width: 100px;
+        max-width: 110px;
         border-right: $groove;
         border-bottom: $groove;
     }
@@ -327,6 +327,61 @@ select.display {
         > *:not(:last-child) {
             border-right: $groove;
             padding-right: 0.25em;
+        }
+    }
+    .block {
+        padding: 2px 4px;
+        &:not(:last-child) {
+            border-right: $groove;
+        }
+    }
+    .horizontal-cell-input {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: start;
+        padding: 4px;
+        &.stun .cell {
+            box-shadow: 0 0 5px 1px rgba($stun, 0.5);
+        }
+        &.physical .cell {
+            box-shadow: 0 0 5px 1px rgba($physical, 0.5);
+        }
+        &.edge .cell {
+            box-shadow: 0 0 5px 1px rgba($edge, 0.5);
+        }
+        .roll {
+            width: 60px;
+            margin-right: 8px;
+        }
+        .cell-container {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: stretch;
+            .cell {
+                cursor: pointer;
+                text-align: center;
+                font-size: 80%;
+                border: $groove;
+                color: $light-2;
+                border-radius: 4px;
+                background: $black;
+                min-width: 26px;
+                height: 18px;
+                &:not(:first-child) {
+                    margin-left: 2px;
+                }
+                &:not(:last-child) {
+                    margin-right: 2px;
+                }
+                &.filled {
+                    background: $light-2;
+                    border-color: $black;
+                    color: $black;
+                }
+                &:hover {
+                    border-color: $light;
+                }
+            }
         }
     }
     .inventory {
@@ -410,14 +465,14 @@ select.display {
                         border-right: $groove;
                         border-bottom: $groove;
                         padding: 0.25em 0.5em;
-                        margin: .1em .25em;
-                        box-shadow: .2em .2em .3em $black;
+                        margin: 0.1em 0.25em;
+                        box-shadow: 0.2em 0.2em 0.3em $black;
                     }
                 }
                 .description {
                     //border-right: $light 2px solid;
                     // border-top: $light 2px solid;
-                    margin: 0.5em .25em;
+                    margin: 0.5em 0.25em;
                     padding: 0.5em;
                     // margin-right: 0.5em;
                     //padding-right: 0.5em;

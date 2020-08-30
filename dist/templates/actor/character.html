@@ -7,8 +7,8 @@
                     src="{{actor.img}}"
                     data-edit="img"
                     title="{{actor.name}}"
-                    height="80px"
-                    width="80px"
+                    height="100px"
+                    width="100px"
                 />
             </div>
             <div class="flex4">
@@ -41,18 +41,34 @@
                     {{/if}}
                 </div>
                 <div class="attributes smooth">
-                    {{#each data.track as |track id|}}
-                        {{> 'systems/shadowrun5e/dist/templates/common/ConditionMonitor.html'
-                            object=track
-                            path=(buildName part1="data.track" part2=id)
-                            id=id
-                            disableMax="true"
-                            disableOverflowMax="true"
-                            isRoll="true"
-                            nameCssClass="track-roll"
+                    <div class="block">
+                        {{#each data.track as |track id|}}
+                            {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
+                                name=(localize track.label)
+                                value=track.value
+                                max=track.max
+                                id=id
+                                tolerance=../woundTolerance
+                            }}
+                            {{#if track.overflow}}
+                                {{#ife track.value track.max}}
+                                    {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
+                                            name=(localize "SR5.Overflow")
+                                            value=track.overflow.value
+                                            max=track.overflow.max
+                                            id="overflow"
+                                    }}
+                                {{/ife}}
+                            {{/if}}
+                        {{/each}}
+                        {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
+                                name=(localize "SR5.AttrEdge")
+                                value=data.attributes.edge.uses
+                                max=data.attributes.edge.value
+                                id="edge"
                         }}
-                    {{/each}}
-                    {{> 'systems/shadowrun5e/dist/templates/common/UsesAttribute.html'
+                    </div>
+                    {{!--> 'systems/shadowrun5e/dist/templates/common/UsesAttribute.html'
                             name=(localize 'SR5.EdgeUses')
                             pair=data.attributes.edge
                             path="data.attributes.edge"
@@ -60,7 +76,7 @@
                             dataName="attribute"
                             dataId="edge"
                             nameCssClass="attribute-roll"
-                    }}
+                    --}}
                     <div class="attribute">
                         <div class="attribute-name">
                             {{localize "SR5.Movement"}}

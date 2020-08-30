@@ -1935,6 +1935,8 @@ class SR5ActorSheet extends ActorSheet {
         data['config'] = CONFIG.SR5;
         data['awakened'] = data.data.special === 'magic';
         data['emerged'] = data.data.special === 'resonance';
+        data['woundTolerance'] = 3 + (Number(mods['wound_tolerance']) || 0);
+        console.log(data['woundTolerance']);
         data.filters = this._filters;
         return data;
     }
@@ -2121,7 +2123,7 @@ class SR5ActorSheet extends ActorSheet {
             }
         });
         html.find('#filter-skills').on('input', this._onFilterSkills.bind(this));
-        html.find('.track-roll').click(this._onRollTrack.bind(this));
+        html.find('.cell-input-roll').click(this._onRollCellInput.bind(this));
         html.find('.attribute-roll').click(this._onRollAttribute.bind(this));
         html.find('.skill-roll').click(this._onRollActiveSkill.bind(this));
         html.find('.defense-roll').click(this._onRollDefense.bind(this));
@@ -2150,7 +2152,9 @@ class SR5ActorSheet extends ActorSheet {
         html.find('.skill-edit').click(this._onShowEditSkill.bind(this));
         html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
         html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
-        // updates matrix condition monitor on the device the actor has equipped
+        $(html).find('.horizontal-cell-input .cell').on('click', this._onSetCellInput.bind(this));
+        $(html).find('.horizontal-cell-input .cell').on('contextmenu', this._onClearCellInput.bind(this));
+        // updates matrix condition monitor on the device the actor has equippe
         $(html)
             .find('[name="data.matrix.condition_monitor.value"]')
             .on('change', (event) => __awaiter(this, void 0, void 0, function* () {
@@ -2324,11 +2328,55 @@ class SR5ActorSheet extends ActorSheet {
             }
         });
     }
-    _onRollTrack(event) {
+    _onSetCellInput(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const value = Number(event.currentTarget.dataset.value);
+            const cmId = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
+            const data = {};
+            if (cmId === 'stun' || cmId === 'physical') {
+                const property = `data.track.${cmId}.value`;
+                data[property] = value;
+            }
+            else if (cmId === 'edge') {
+                const property = `data.attributes.edge.uses`;
+                data[property] = value;
+            }
+            else if (cmId === 'overflow') {
+                const property = 'data.track.physical.overflow.value';
+                data[property] = value;
+            }
+            yield this.actor.update(data);
+        });
+    }
+    _onClearCellInput(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const cmId = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
+            const data = {};
+            if (cmId === 'stun' || cmId === 'physical') {
+                const property = `data.track.${cmId}.value`;
+                data[property] = 0;
+            }
+            else if (cmId === 'edge') {
+                const property = `data.attributes.edge.uses`;
+                data[property] = 0;
+            }
+            else if (cmId === 'overflow') {
+                const property = 'data.track.physical.overflow.value';
+                data[property] = 0;
+            }
+            yield this.actor.update(data);
+        });
+    }
+    _onRollCellInput(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
-            let track = event.currentTarget.closest('.attribute').dataset.track;
-            yield this.actor.rollNaturalRecovery(track, event);
+            let track = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
+            if (track === 'stun' || track === 'physical') {
+                yield this.actor.rollNaturalRecovery(track, event);
+            }
+            else if (track === 'edge') {
+                yield this.actor.rollAttribute('edge');
+            }
         });
     }
     _onRollPrompt(event) {
@@ -4790,6 +4838,7 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/dist/templates/common/ValueMaxAttribute.html',
         'systems/shadowrun5e/dist/templates/common/UsesAttribute.html',
         'systems/shadowrun5e/dist/templates/common/Attribute.html',
+        'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html',
         'systems/shadowrun5e/dist/templates/common/List/ListItem.html',
         'systems/shadowrun5e/dist/templates/common/List/ListHeader.html',
     ];
@@ -4815,6 +4864,21 @@ exports.registerHandlebarHelpers = () => {
         }
         return strs;
     });
+    Handlebars.registerHelper('for', function (from, to, options) {
+        let accum = '';
+        for (let i = from; i < to; i += 1) {
+            accum += options.fn(i);
+        }
+        return accum;
+    });
+    Handlebars.registerHelper('modulo', function (v1, v2) {
+        return v1 % v2;
+    });
+    Handlebars.registerHelper('divide', function (v1, v2) {
+        if (v2 === 0)
+            return 0;
+        return v1 / v2;
+    });
     Handlebars.registerHelper('hasprop', function (obj, prop, options) {
         if (obj.hasOwnProperty(prop)) {
             return options.fn(this);
@@ -4831,6 +4895,20 @@ exports.registerHandlebarHelpers = () => {
     // if greater than
     Handlebars.registerHelper('ifgt', function (v1, v2, options) {
         if (v1 > v2)
+            return options.fn(this);
+        else
+            return options.inverse(this);
+    });
+    // if less than
+    Handlebars.registerHelper('iflt', function (v1, v2, options) {
+        if (v1 < v2)
+            return options.fn(this);
+        else
+            return options.inverse(this);
+    });
+    // if less than or equal
+    Handlebars.registerHelper('iflte', function (v1, v2, options) {
+        if (v1 <= v2)
             return options.fn(this);
         else
             return options.inverse(this);

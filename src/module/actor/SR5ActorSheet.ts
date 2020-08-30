@@ -89,6 +89,8 @@ export class SR5ActorSheet extends ActorSheet {
         data['config'] = CONFIG.SR5;
         data['awakened'] = data.data.special === 'magic';
         data['emerged'] = data.data.special === 'resonance';
+        data['woundTolerance'] = 3 + (Number(mods['wound_tolerance']) || 0);
+        console.log(data['woundTolerance']);
 
         data.filters = this._filters;
 
@@ -274,7 +276,7 @@ export class SR5ActorSheet extends ActorSheet {
         });
 
         html.find('#filter-skills').on('input', this._onFilterSkills.bind(this));
-        html.find('.track-roll').click(this._onRollTrack.bind(this));
+        html.find('.cell-input-roll').click(this._onRollCellInput.bind(this));
         html.find('.attribute-roll').click(this._onRollAttribute.bind(this));
         html.find('.skill-roll').click(this._onRollActiveSkill.bind(this));
         html.find('.defense-roll').click(this._onRollDefense.bind(this));
@@ -304,7 +306,11 @@ export class SR5ActorSheet extends ActorSheet {
         html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
         html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
 
-        // updates matrix condition monitor on the device the actor has equipped
+        $(html).find('.horizontal-cell-input .cell').on('click', this._onSetCellInput.bind(this));
+
+        $(html).find('.horizontal-cell-input .cell').on('contextmenu', this._onClearCellInput.bind(this));
+
+        // updates matrix condition monitor on the device the actor has equippe
         $(html)
             .find('[name="data.matrix.condition_monitor.value"]')
             .on('change', async (event: any) => {
@@ -469,10 +475,47 @@ export class SR5ActorSheet extends ActorSheet {
         }
     }
 
-    async _onRollTrack(event) {
+    async _onSetCellInput(event) {
+        const value = Number(event.currentTarget.dataset.value);
+        const cmId = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
+        const data = {};
+        if (cmId === 'stun' || cmId === 'physical') {
+            const property = `data.track.${cmId}.value`;
+            data[property] = value;
+        } else if (cmId === 'edge') {
+            const property = `data.attributes.edge.uses`;
+            data[property] = value;
+        } else if (cmId === 'overflow') {
+            const property = 'data.track.physical.overflow.value';
+            data[property] = value;
+        }
+        await this.actor.update(data);
+    }
+
+    async _onClearCellInput(event) {
+        const cmId = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
+        const data = {};
+        if (cmId === 'stun' || cmId === 'physical') {
+            const property = `data.track.${cmId}.value`;
+            data[property] = 0;
+        } else if (cmId === 'edge') {
+            const property = `data.attributes.edge.uses`;
+            data[property] = 0;
+        } else if (cmId === 'overflow') {
+            const property = 'data.track.physical.overflow.value';
+            data[property] = 0;
+        }
+        await this.actor.update(data);
+    }
+
+    async _onRollCellInput(event) {
         event.preventDefault();
-        let track = event.currentTarget.closest('.attribute').dataset.track;
-        await this.actor.rollNaturalRecovery(track, event);
+        let track = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
+        if (track === 'stun' || track === 'physical') {
+            await this.actor.rollNaturalRecovery(track, event);
+        } else if (track === 'edge') {
+            await this.actor.rollAttribute('edge');
+        }
     }
 
     async _onRollPrompt(event) {

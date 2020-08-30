@@ -704,7 +704,7 @@ select.display {
 
 .sr5 .profile-img {
   padding: 0.25em;
-  max-width: 100px;
+  max-width: 110px;
   border-right: 1px solid #4d4d4d;
   border-bottom: 1px solid #4d4d4d; }
 
@@ -759,6 +759,50 @@ select.display {
   .sr5 .split-container > *:not(:last-child) {
     border-right: 1px solid #4d4d4d;
     padding-right: 0.25em; }
+
+.sr5 .block {
+  padding: 2px 4px; }
+  .sr5 .block:not(:last-child) {
+    border-right: 1px solid #4d4d4d; }
+
+.sr5 .horizontal-cell-input {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: start;
+  padding: 4px; }
+  .sr5 .horizontal-cell-input.stun .cell {
+    box-shadow: 0 0 5px 1px rgba(0, 0, 255, 0.5); }
+  .sr5 .horizontal-cell-input.physical .cell {
+    box-shadow: 0 0 5px 1px rgba(255, 0, 0, 0.5); }
+  .sr5 .horizontal-cell-input.edge .cell {
+    box-shadow: 0 0 5px 1px rgba(199, 176, 2, 0.5); }
+  .sr5 .horizontal-cell-input .roll {
+    width: 60px;
+    margin-right: 8px; }
+  .sr5 .horizontal-cell-input .cell-container {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: stretch; }
+    .sr5 .horizontal-cell-input .cell-container .cell {
+      cursor: pointer;
+      text-align: center;
+      font-size: 80%;
+      border: 1px solid #4d4d4d;
+      color: #b3b3b3;
+      border-radius: 4px;
+      background: black;
+      min-width: 26px;
+      height: 18px; }
+      .sr5 .horizontal-cell-input .cell-container .cell:not(:first-child) {
+        margin-left: 2px; }
+      .sr5 .horizontal-cell-input .cell-container .cell:not(:last-child) {
+        margin-right: 2px; }
+      .sr5 .horizontal-cell-input .cell-container .cell.filled {
+        background: #b3b3b3;
+        border-color: black;
+        color: black; }
+      .sr5 .horizontal-cell-input .cell-container .cell:hover {
+        border-color: #e6e6e6; }
 
 .sr5 .inventory {
   overflow-y: hidden;
@@ -832,10 +876,10 @@ select.display {
           border-right: 1px solid #4d4d4d;
           border-bottom: 1px solid #4d4d4d;
           padding: 0.25em 0.5em;
-          margin: .1em .25em;
+          margin: 0.1em 0.25em;
           box-shadow: 0.2em 0.2em 0.3em black; }
       .sr5 .inventory .item .item-desc .description {
-        margin: 0.5em .25em;
+        margin: 0.5em 0.25em;
         padding: 0.5em; }
     .sr5 .inventory .item .item-icons {
       display: flex;

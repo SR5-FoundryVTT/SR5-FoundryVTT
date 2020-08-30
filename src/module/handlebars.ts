@@ -15,6 +15,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/parts/actor-config.html',
         'systems/shadowrun5e/dist/templates/actor/parts/actor-bio.html',
         'systems/shadowrun5e/dist/templates/actor/parts/actor-social.html',
+
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/matrix-attribute.html',
         'systems/shadowrun5e/dist/templates/actor/parts/skills/ActorAttribute.html',
 
@@ -44,8 +45,11 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/common/ValueMaxAttribute.html',
         'systems/shadowrun5e/dist/templates/common/UsesAttribute.html',
         'systems/shadowrun5e/dist/templates/common/Attribute.html',
+        'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html',
+
         'systems/shadowrun5e/dist/templates/common/List/ListItem.html',
         'systems/shadowrun5e/dist/templates/common/List/ListHeader.html',
+
     ];
 
     return loadTemplates(templatePaths);
@@ -72,6 +76,22 @@ export const registerHandlebarHelpers = () => {
         }
         return strs;
     });
+
+    Handlebars.registerHelper('for', function (from: number, to: number, options) {
+        let accum = '';
+        for (let i = from; i < to; i += 1) {
+            accum += options.fn(i);
+        }
+
+        return accum;
+    });
+    Handlebars.registerHelper('modulo', function (v1: number, v2: number) {
+        return v1 % v2;
+    });
+    Handlebars.registerHelper('divide', function (v1: number, v2: number) {
+        if (v2 === 0) return 0;
+        return v1 / v2;
+    });
     Handlebars.registerHelper('hasprop', function (obj, prop, options) {
         if (obj.hasOwnProperty(prop)) {
             return options.fn(this);
@@ -84,6 +104,16 @@ export const registerHandlebarHelpers = () => {
     // if greater than
     Handlebars.registerHelper('ifgt', function (v1, v2, options) {
         if (v1 > v2) return options.fn(this);
+        else return options.inverse(this);
+    });
+    // if less than
+    Handlebars.registerHelper('iflt', function (v1, v2, options) {
+        if (v1 < v2) return options.fn(this);
+        else return options.inverse(this);
+    });
+    // if less than or equal
+    Handlebars.registerHelper('iflte', function (v1, v2, options) {
+        if (v1 <= v2) return options.fn(this);
         else return options.inverse(this);
     });
     // if not equal
