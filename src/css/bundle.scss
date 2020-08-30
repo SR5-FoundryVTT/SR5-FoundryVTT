@@ -251,6 +251,9 @@ select.display {
             margin: 0 0.5em;
         }
     }
+    .no-break {
+        white-space: nowrap;
+    }
     .window-content {
         font-size: 115%;
         background: $sheetbackground;
@@ -334,9 +337,31 @@ select.display {
         }
     }
     .block {
+        display: flex;
+        flex-flow: column;
         padding: 2px 4px;
+        justify-content: space-around;
         &:not(:last-child) {
             border-right: $groove;
+        }
+        .block-line {
+            display: flex;
+            flex-flow: row nowrap;
+            padding: 4px;
+            &.center {
+                justify-content: center;
+            }
+            &.border-bottom {
+                border-bottom: $groove;
+            }
+            &.gap-4 {
+                >:not(:first-child){
+                    margin-left: 4px;
+                }
+                >:not(:last-child){
+                    margin-right: 4px;
+                }
+            }
         }
     }
     .horizontal-cell-input {
@@ -352,6 +377,9 @@ select.display {
         }
         &.edge .cell {
             box-shadow: 0 0 5px 1px rgba($edge, 0.5);
+        }
+        &.matrix .cell {
+            box-shadow: 0 0 5px 1px rgba($matrix, 0.5);
         }
         .roll {
             width: 60px;

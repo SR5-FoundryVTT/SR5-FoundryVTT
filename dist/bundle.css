@@ -178,6 +178,8 @@
       padding: 0 0.25em;
       flex: 1 0 auto;
       min-width: 4em; }
+      .sr5.actor .attributes .attribute.no-border {
+        border-right: none; }
       .sr5.actor .attributes .attribute:hover .attribute-input-container.row {
         visibility: visible; }
       .sr5.actor .attributes .attribute.flex0 {
@@ -688,6 +690,9 @@ select.display {
   .sr5 .parts-list > * {
     margin: 0 0.5em; }
 
+.sr5 .no-break {
+  white-space: nowrap; }
+
 .sr5 .window-content {
   font-size: 115%;
   background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("assets/brushed_metal.jpg") repeat;
@@ -764,9 +769,24 @@ select.display {
     padding-right: 0.25em; }
 
 .sr5 .block {
-  padding: 2px 4px; }
+  display: flex;
+  flex-flow: column;
+  padding: 2px 4px;
+  justify-content: space-around; }
   .sr5 .block:not(:last-child) {
     border-right: 1px solid #4d4d4d; }
+  .sr5 .block .block-line {
+    display: flex;
+    flex-flow: row nowrap;
+    padding: 4px; }
+    .sr5 .block .block-line.center {
+      justify-content: center; }
+    .sr5 .block .block-line.border-bottom {
+      border-bottom: 1px solid #4d4d4d; }
+    .sr5 .block .block-line.gap-4 > :not(:first-child) {
+      margin-left: 4px; }
+    .sr5 .block .block-line.gap-4 > :not(:last-child) {
+      margin-right: 4px; }
 
 .sr5 .horizontal-cell-input {
   display: flex;
@@ -779,6 +799,8 @@ select.display {
     box-shadow: 0 0 5px 1px rgba(255, 0, 0, 0.5); }
   .sr5 .horizontal-cell-input.edge .cell {
     box-shadow: 0 0 5px 1px rgba(199, 176, 2, 0.5); }
+  .sr5 .horizontal-cell-input.matrix .cell {
+    box-shadow: 0 0 5px 1px rgba(7, 145, 35, 0.5); }
   .sr5 .horizontal-cell-input .roll {
     width: 60px;
     margin-right: 8px; }

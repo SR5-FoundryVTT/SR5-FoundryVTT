@@ -1,42 +1,52 @@
-<div class="attributes smooth">
-    <div class="attribute">
-        <div class="track between">
-            <div class="attribute-name">
-                {{localize "SR5.HotSim"}}
+<div>
+    <div class="inventory">
+        {{> "systems/shadowrun5e/dist/templates/common/HeaderBlock.html"
+                name=(localize "SR5.Matrix")
+        }}
+        <div class="attributes">
+            <div class="block">
+                <div class="block-line gap-4 border-bottom center">
+                    <label>
+                        {{localize "SR5.HotSim"}}
+                        <input
+                                type="checkbox"
+                                class="submit-checkbox"
+                                name="data.matrix.hot_sim"
+                            {{checked data.matrix.hot_sim}}
+                        />
+                    </label>
+                    <label>
+                        {{localize "SR5.RunningSilent"}}
+                        <input
+                                type="checkbox"
+                                class="submit-checkbox"
+                                name="data.matrix.running_silent"
+                            {{checked data.matrix.running_silent}}
+                        />
+                    </label>
+                </div>
+                <div class="attribute">
+                    <div class="attribute-name">
+                        {{localize "SR5.ConditionMonitor"}}
+                    </div>
+                    {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
+                            value=data.matrix.condition_monitor.value
+                            max=data.matrix.condition_monitor.max
+                            id="matrix"
+                    }}
+                </div>
             </div>
-            <input
-                type="checkbox"
-                class="submit-checkbox"
-                name="data.matrix.hot_sim"
-                {{checked data.matrix.hot_sim}}
-            />
-        </div>
-        <div class="track between">
-            <div class="attribute-name">
-                {{localize "SR5.RunningSilent"}}
-            </div>
-            <input
-                type="checkbox"
-                class="submit-checkbox"
-                name="data.matrix.running_silent"
-                {{checked data.matrix.running_silent}}
-            />
+            {{#each config.matrixAttributes as |label key|}}
+                {{> "systems/shadowrun5e/dist/templates/actor/parts/matrix/matrix-attribute.html"
+                        matrixAtt=(lookup ../data.matrix key)
+                        isCyberdeck=../data.matrix.is_cyberdeck
+                        key=key
+                        label=label
+                        matrixAttributes=../config/matrixAttributes
+                        item=../data.matrix.item }}
+            {{/each}}
         </div>
     </div>
-    {{#each config.matrixAttributes as |label key|}}
-    {{> "systems/shadowrun5e/dist/templates/actor/parts/matrix/matrix-attribute.html"
-            matrixAtt=(lookup ../data.matrix key)
-            isCyberdeck=../data.matrix.is_cyberdeck
-            key=key
-            label=label
-            matrixAttributes=../config/matrixAttributes
-            item=../data.matrix.item }}
-    {{/each}}
-    {{> 'systems/shadowrun5e/dist/templates/common/ConditionMonitor.html'
-            object=data.matrix.condition_monitor
-            path="data.matrix.condition_monitor"
-            id='matrix'
-    }}
 </div>
 {{#if emerged}}
 <div class="inventory">

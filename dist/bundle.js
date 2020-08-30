@@ -2162,7 +2162,6 @@ class SR5ActorSheet extends ActorSheet {
             const value = helpers_1.Helpers.parseInputToNumber(event.currentTarget.value);
             const matrixDevice = this.actor.getMatrixDevice();
             if (matrixDevice && !isNaN(value)) {
-                console.log(matrixDevice);
                 const updateData = {};
                 updateData['data.technology.condition_monitor.value'] = value;
                 yield matrixDevice.update(updateData);
@@ -2345,6 +2344,14 @@ class SR5ActorSheet extends ActorSheet {
                 const property = 'data.track.physical.overflow.value';
                 data[property] = value;
             }
+            else if (cmId === 'matrix') {
+                const matrixDevice = this.actor.getMatrixDevice();
+                if (matrixDevice && !isNaN(value)) {
+                    const updateData = {};
+                    updateData['data.technology.condition_monitor.value'] = value;
+                    yield matrixDevice.update(updateData);
+                }
+            }
             yield this.actor.update(data);
         });
     }
@@ -2363,6 +2370,14 @@ class SR5ActorSheet extends ActorSheet {
             else if (cmId === 'overflow') {
                 const property = 'data.track.physical.overflow.value';
                 data[property] = 0;
+            }
+            else if (cmId === 'matrix') {
+                const matrixDevice = this.actor.getMatrixDevice();
+                if (matrixDevice) {
+                    const updateData = {};
+                    updateData['data.technology.condition_monitor.value'] = 0;
+                    yield matrixDevice.update(updateData);
+                }
             }
             yield this.actor.update(data);
         });
