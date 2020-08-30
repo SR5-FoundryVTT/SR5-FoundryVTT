@@ -1852,6 +1852,7 @@ class SR5Actor extends Actor {
     }
 }
 exports.SR5Actor = SR5Actor;
+
 },{"../constants":29,"../helpers":32,"../parts/PartsList":43,"../rolls/ShadowrunRoller":44,"./prep/BaseActorPrep":18}],17:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -2496,6 +2497,7 @@ class SR5ActorSheet extends ActorSheet {
     }
 }
 exports.SR5ActorSheet = SR5ActorSheet;
+
 },{"../apps/chummer-import-form":19,"../apps/skills/KnowledgeSkillEditForm":22,"../apps/skills/LanguageSkillEditForm":23,"../apps/skills/SkillEditForm":24,"../helpers":32}],18:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2846,6 +2848,7 @@ class BaseActorPrep {
     }
 }
 exports.BaseActorPrep = BaseActorPrep;
+
 },{"../../helpers":32,"../../item/SR5ItemDataWrapper":35,"../../parts/PartsList":43}],19:[function(require,module,exports){
 "use strict";
 
@@ -3834,6 +3837,7 @@ class ShadowrunItemDialog extends Dialog {
     }
 }
 exports.ShadowrunItemDialog = ShadowrunItemDialog;
+
 },{"../../helpers":32}],21:[function(require,module,exports){
 "use strict";
 
@@ -4012,6 +4016,7 @@ class KnowledgeSkillEditForm extends LanguageSkillEditForm_1.LanguageSkillEditFo
     }
 }
 exports.KnowledgeSkillEditForm = KnowledgeSkillEditForm;
+
 },{"./LanguageSkillEditForm":23}],23:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4035,6 +4040,7 @@ class LanguageSkillEditForm extends SkillEditForm_1.SkillEditForm {
     }
 }
 exports.LanguageSkillEditForm = LanguageSkillEditForm;
+
 },{"./SkillEditForm":24}],24:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -4192,6 +4198,7 @@ class SkillEditForm extends BaseEntitySheet {
     }
 }
 exports.SkillEditForm = SkillEditForm;
+
 },{}],25:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4228,6 +4235,7 @@ exports.measureDistance = function (p0, p1, { gridSpaces = true } = {}) {
     }
     return (nStraight + nDiagonal) * canvas.scene.data.gridDistance;
 };
+
 },{"./constants":29}],26:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -4334,6 +4342,7 @@ exports.addRollListeners = (app, html) => {
     if ((item === null || item === void 0 ? void 0 : item.hasRoll) && app.isRoll)
         $(html).find('.card-description').hide();
 };
+
 },{"./actor/SR5Actor":16,"./constants":29,"./item/SR5Item":34,"./parts/PartsList":43,"./template":46}],27:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -4433,6 +4442,7 @@ exports.shadowrunCombatUpdate = (changes, options) => __awaiter(void 0, void 0, 
         yield combat.update({ turn: 0 });
     }
 });
+
 },{"./constants":29}],28:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4718,6 +4728,7 @@ exports.SR5['programTypes'] = {
     hacking_program: 'SR5.HackingProgram',
     agent: 'SR5.Agent',
 };
+
 },{}],29:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4726,6 +4737,7 @@ exports.SYSTEM_NAME = 'shadowrun5e';
 exports.FLAGS = {
     ShowGlitchAnimation: 'showGlitchAnimation',
 };
+
 },{}],30:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4736,6 +4748,7 @@ class DataWrapper {
     }
 }
 exports.DataWrapper = DataWrapper;
+
 },{}],31:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -4888,6 +4901,7 @@ exports.registerHandlebarHelpers = () => {
         return value !== undefined;
     });
 };
+
 },{"./helpers":32}],32:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -5092,6 +5106,7 @@ class Helpers {
     }
 }
 exports.Helpers = Helpers;
+
 },{"./parts/PartsList":43}],33:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -5382,6 +5397,7 @@ exports.ChatData = {
         }
     },
 };
+
 },{"../helpers":32}],34:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -6391,6 +6407,7 @@ class SR5Item extends Item {
     }
 }
 exports.SR5Item = SR5Item;
+
 },{"../apps/dialogs/ShadowrunItemDialog":20,"../chat":26,"../constants":29,"../helpers":32,"../parts/PartsList":43,"../rolls/ShadowrunRoller":44,"./ChatData":33,"./SR5ItemDataWrapper":35}],35:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -6579,6 +6596,7 @@ class SR5ItemDataWrapper extends DataWrapper_1.DataWrapper {
     }
 }
 exports.SR5ItemDataWrapper = SR5ItemDataWrapper;
+
 },{"../dataWrappers/DataWrapper":30}],36:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -6891,6 +6909,7 @@ class SR5ItemSheet extends ItemSheet {
     }
 }
 exports.SR5ItemSheet = SR5ItemSheet;
+
 },{"../helpers":32}],37:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -7039,6 +7058,7 @@ function rollItemMacro(itemName) {
     return item.postCard();
 }
 handlebars_1.registerHandlebarHelpers();
+
 },{"./actor/SR5Actor":16,"./actor/SR5ActorSheet":17,"./apps/gmtools/OverwatchScoreTracker":21,"./canvas":25,"./chat":26,"./combat":27,"./config":28,"./constants":29,"./handlebars":31,"./helpers":32,"./item/SR5Item":34,"./item/SR5ItemSheet":36,"./migrator/Migrator":38,"./rolls/ShadowrunRoller":44,"./settings":45}],38:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -7184,6 +7204,7 @@ let Migrator = /** @class */ (() => {
     return Migrator;
 })();
 exports.Migrator = Migrator;
+
 },{"./VersionMigration":39,"./versions/LegacyMigration":40,"./versions/Version0_6_10":41,"./versions/Version0_6_5":42}],39:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -7616,6 +7637,7 @@ let VersionMigration = /** @class */ (() => {
     return VersionMigration;
 })();
 exports.VersionMigration = VersionMigration;
+
 },{}],40:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -7845,6 +7867,7 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
     }
 }
 exports.LegacyMigration = LegacyMigration;
+
 },{"../VersionMigration":39}],41:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -7904,6 +7927,7 @@ class Version0_6_10 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_6_10 = Version0_6_10;
+
 },{"../VersionMigration":39}],42:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -7954,6 +7978,7 @@ class Version0_6_5 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_6_5 = Version0_6_5;
+
 },{"../VersionMigration":39}],43:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -8054,6 +8079,7 @@ class PartsList {
     }
 }
 exports.PartsList = PartsList;
+
 },{}],44:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -8319,6 +8345,7 @@ class ShadowrunRoller {
     }
 }
 exports.ShadowrunRoller = ShadowrunRoller;
+
 },{"../chat":26,"../constants":29,"../helpers":32,"../parts/PartsList":43}],45:[function(require,module,exports){
 "use strict";
 // game settings for shadowrun 5e
@@ -8381,6 +8408,7 @@ exports.registerSystemSettings = () => {
         default: true,
     });
 };
+
 },{"./constants":29,"./migrator/VersionMigration":39}],46:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -8472,6 +8500,7 @@ class Template extends MeasuredTemplate {
     }
 }
 exports.default = Template;
+
 },{}]},{},[37])
 
 //# sourceMappingURL=bundle.js.map
