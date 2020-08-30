@@ -1,17 +1,17 @@
 <form>
     <div class="form-group">
-        <label>Attribute</label>
+        <label>{{localize "SR5.Attribute"}}</label>
         <select name="attribute">
             {{#select attribute}} {{#each attributes as |att a|}}
-            <option value="{{a}}">{{toHeaderCase a}}</option>
+            <option value="{{a}}">{{localize att.label}}</option>
             {{/each}} {{/select}}
         </select>
     </div>
     <div class="form-group">
-        <label>Limit</label>
+        <label>{{localize "SR5.Limit"}}</label>
         <select name="attribute.limit">
             {{#select limit}} {{#each limits as |lim l|}}
-            <option value="{{l}}">{{toHeaderCase l}}</option>
+            <option value="{{l}}">{{localize lim.label}}</option>
             {{/each}} {{/select}}
         </select>
     </div>

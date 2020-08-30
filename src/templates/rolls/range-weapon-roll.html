@@ -1,17 +1,17 @@
 <form>
     {{#if ammo}}
     <div class="form-group">
-        <label>Rounds Remaining</label>
-        <label>{{ammo.current.value}}/{{ammo.current.max}}</label>
+        <label>{{localize "SR5.RoundsRemaining"}}</label>
+        <input name="roundsRemaining" type="text" class="disabled-for-display" disabled value="{{ammo.current.value}}/{{ammo.current.max}}"/>
     </div>
     {{/if}}
     <div class="form-group">
         <label>{{localize 'SR5.FireMode'}}{{#if rc}} ({{localize 'SR5.Total'}} {{localize 'SR5.RecoilCompensation'}}{{rc}}){{/if}}</label>
         <select name="fireMode">
             {{#select fireMode}} {{#each fireModes as |description count|}}
-            <option value="{{count}}"
-                >{{description}} - {{count}} Round{{#ifgt count 1}}s{{/ifgt}}</option
-            >
+            <option value="{{count}}">
+                {{description}} - {{count}} {{#ifgt count 1}}{{localize "SR5.Bullets"}}{{else}}{{localize "SR5.Bullet"}}{{/ifgt}}
+            </option>
             {{/each}} {{/select}}
         </select>
     </div>

@@ -19,8 +19,8 @@
         <label>{{localize 'SR5.WoundModifier'}} ({{woundValue}})</label>
         <select style="flex: 2;" name="wounds">
             {{#select wounds}}
-            <option value="{{woundValue}}">Apply Wounds</option>
-            <option value="0">Don't Apply Wounds</option>
+            <option value="{{woundValue}}">{{localize "SR5.ApplyWounds"}}</option>
+            <option value="0">{{localize "SR5.DontApplyWounds"}}</option>
             {{/select}}
         </select>
     </div>
