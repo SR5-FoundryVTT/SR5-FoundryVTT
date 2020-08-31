@@ -520,6 +520,13 @@
 .align-center {
   align-items: center; }
 
+.flexcol-rev {
+  display: flex;
+  flex-direction: column-reverse;
+  flex-wrap: nowrap; }
+  .flexcol-rev > * {
+    flex: 0; }
+
 .flexcol {
   display: flex;
   flex-direction: column;
@@ -720,7 +727,7 @@ select.display {
 
 .sr5 .profile-img {
   padding: 0.25em;
-  max-width: 110px;
+  max-width: 100px;
   border-right: 1px solid #4d4d4d;
   border-bottom: 1px solid #4d4d4d; }
 

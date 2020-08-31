@@ -39,6 +39,15 @@
 .align-center {
     align-items: center;
 }
+.flexcol-rev {
+    display: flex;
+    flex-direction: column-reverse;
+    flex-wrap: nowrap;
+
+    > * {
+        flex: 0;
+    }
+}
 .flexcol {
     display: flex;
     flex-direction: column;
@@ -282,7 +291,7 @@ select.display {
 
     .profile-img {
         padding: 0.25em;
-        max-width: 110px;
+        max-width: 100px;
         border-right: $groove;
         border-bottom: $groove;
     }
