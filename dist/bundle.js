@@ -1936,7 +1936,6 @@ class SR5ActorSheet extends ActorSheet {
         data['awakened'] = data.data.special === 'magic';
         data['emerged'] = data.data.special === 'resonance';
         data['woundTolerance'] = 3 + (Number(mods['wound_tolerance']) || 0);
-        console.log(data['woundTolerance']);
         data.filters = this._filters;
         return data;
     }
