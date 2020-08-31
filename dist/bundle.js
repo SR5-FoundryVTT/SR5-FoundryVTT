@@ -4965,6 +4965,10 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/dist/templates/actor/tabs/SkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/SocialTab.html',
         // uncategorized lists
+        'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/Movement.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/ProfileImage.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/NameInput.html',
         'systems/shadowrun5e/dist/templates/actor/parts/ActionList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/ContactList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/SinAndLifestyleList.html',
@@ -4980,6 +4984,7 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html',
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/AttributeList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/SpecialAttributeList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/attributes/Limits.html',
         // skills
         'systems/shadowrun5e/dist/templates/actor/parts/skills/ActiveSkillList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/skills/LanguageAndKnowledgeSkillList.html',
@@ -5008,7 +5013,6 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/dist/templates/common/ValueInput.html',
         // Useful wrapper and implemented components
         'systems/shadowrun5e/dist/templates/common/ValueMaxAttribute.html',
-        'systems/shadowrun5e/dist/templates/common/UsesAttribute.html',
         'systems/shadowrun5e/dist/templates/common/Attribute.html',
         // to create the condition monitors and edge counter
         'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html',

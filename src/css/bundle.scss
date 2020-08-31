@@ -270,6 +270,9 @@ select.display {
         width: 100%;
         color: $color;
     }
+    .border-right {
+        border-right: $groove;
+    }
     .scroll-area {
         height: 100%;
         margin-bottom: 0.5em;
@@ -449,6 +452,9 @@ select.display {
         }
         &.center {
             justify-content: center;
+        }
+        &.space-evenly {
+            justify-content: space-evenly;
         }
         &.item-section {
             border: $groove-width solid $black;

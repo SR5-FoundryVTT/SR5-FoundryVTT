@@ -11,6 +11,10 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/tabs/SocialTab.html',
 
         // uncategorized lists
+        'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/Movement.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/ProfileImage.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/NameInput.html',
         'systems/shadowrun5e/dist/templates/actor/parts/ActionList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/ContactList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/SinAndLifestyleList.html',
@@ -29,6 +33,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html',
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/AttributeList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/SpecialAttributeList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/attributes/Limits.html',
 
         // skills
         'systems/shadowrun5e/dist/templates/actor/parts/skills/ActiveSkillList.html',

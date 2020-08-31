@@ -1,54 +1,18 @@
 <form class="{{cssClass}} wholesheet" autocomplete="off">
     <header>
         <div class="flexrow">
-            <div class="profile-img">
-                <img
-                    class="profile"
-                    src="{{actor.img}}"
-                    data-edit="img"
-                    title="{{actor.name}}"
-                    height="100px"
-                    width="100px"
-                />
-            </div>
-            <div class="flex4">
-                <div class="flexrow">
-                    <div class="flex4">
-                        <div class="name">
-                            <input
-                                class="display text left"
-                                name="name"
-                                type="text"
-                                value="{{actor.name}}"
-                                placeholder="Name"
-                            />
-                        </div>
-                    </div>
-                    {{#each data.limits as |limit id|}} {{#unless limit.hidden}}
-                    <div class="limit">
-                        <div class="limit-row">
-                            <span class="limit-title">{{localize limit.label}}</span>
-                            <span class="limit-value" value="{{limit.value}}">{{limit.value}}</span>
-                        </div>
-                    </div>
-                    {{/unless}} {{/each}} {{#if data.wounds.value}}
-                    <div class="limit">
-                        <div class="limit-row">
-                            <span class="limit-title">({{localize "SR5.Wounds"}}</span>
-                            <span class="limit-value">-{{data.wounds.value}})</span>
-                        </div>
-                    </div>
-                    {{/if}}
-                </div>
+            {{> 'systems/shadowrun5e/dist/templates/actor/parts/ProfileImage.html' }}
+            <div class="flexcol border-right">
+                {{> 'systems/shadowrun5e/dist/templates/actor/parts/NameInput.html' }}
                 <div class="attributes smooth">
                     <div class="block">
                         {{#each data.track as |track id|}}
                             {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
-                                name=(localize track.label)
-                                value=track.value
-                                max=track.max
-                                id=id
-                                tolerance=../woundTolerance
+                                    name=(localize track.label)
+                                    value=track.value
+                                    max=track.max
+                                    id=id
+                                    tolerance=../woundTolerance
                             }}
                             {{#if track.overflow}}
                                 {{#ife track.value track.max}}
@@ -68,103 +32,12 @@
                                 id="edge"
                         }}
                     </div>
-                    <div class="attribute">
-                        <div class="attribute-name">
-                            {{localize "SR5.Movement"}}
-                        </div>
-                        <div class="track">
-                            <div class="attribute-input-container">
-                                <input
-                                    class="display attribute-input"
-                                    size="2"
-                                    maxlength="2"
-                                    type="text"
-                                    name="data.movement.walk.value"
-                                    value="{{data.movement.walk.value}}"
-                                    data-dtype="Number"
-                                    disabled
-                                />
-                            </div>
-                            <div class="track-slash"></div>
-                            <div class="attribute-input-container">
-                                <input
-                                    class="display attribute-input"
-                                    size="2"
-                                    maxlength="2"
-                                    type="text"
-                                    name="data.movement.run.value"
-                                    value="{{data.movement.run.value}}"
-                                    data-dtype="Number"
-                                    disabled
-                                />
-                            </div>
-                            <div class="track-slash"></div>
-                            <div class="input attribute-input-container">
-                                <input
-                                    class="display attribute-input"
-                                    size="2"
-                                    maxlength="2"
-                                    type="text"
-                                    name="data.movement.sprint"
-                                    value="{{data.movement.sprint}}"
-                                    data-dtype="Number"
-                                />
-                                <span class="unit">
-                                    +
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="attribute">
-                        <div class="track">
-                            <div class="attribute-name">
-                                <select name="data.initiative.perception" class="display">
-                                    {{#select data.initiative.perception}}
-                                    <option value="meatspace"
-                                        >{{localize "SR5.InitCatMeatspace"}}</option
-                                    >
-                                    <option value="matrix">{{localize "SR5.InitCatMatrix"}}</option>
-                                    {{#ife data.special 'magic'}}
-                                    <option value="astral">{{localize "SR5.InitCatAstral"}}</option>
-                                    {{/ife}} {{/select}}
-                                </select>
-                            </div>
-                            <label
-                                title="Use Edge in next Initiative Roll"
-                                class="checkbox init-edge-label"
-                            >
-                                <input
-                                    type="checkbox"
-                                    class="submit-checkbox hidden"
-                                    name="data.initiative.edge"
-                                    {{checked
-                                    data.initiative.edge}}
-                                />
-                                <span class="checkmark far"></span>
-                            </label>
-                        </div>
-                        <div class="track">
-                            <div class="attribute-input-container">
-                                <input
-                                    class="display"
-                                    size="4"
-                                    type="text"
-                                    value="{{data.initiative.current.base.value}}"
-                                    disabled
-                                />
-                            </div>
-                            <div class="track-plus"></div>
-                            <div class="attribute-input-container">
-                                <input
-                                    class="display"
-                                    size="4"
-                                    type="text"
-                                    value="{{data.initiative.current.dice.text}}"
-                                    disabled
-                                />
-                            </div>
-                        </div>
-                    </div>
+                </div>
+            </div>
+            <div class="flexcol" style="justify-content: flex-end">
+                <div class="attributes">
+                    {{> 'systems/shadowrun5e/dist/templates/actor/parts/Movement.html' }}
+                    {{> 'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html' }}
                 </div>
             </div>
         </div>

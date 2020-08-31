@@ -259,6 +259,7 @@
     padding: 0 0.1em;
     margin-top: -2px;
     text-align: center;
+    font-size: 115%;
     display: flex;
     flex-flow: column nowrap;
     justify-content: center;
@@ -708,6 +709,9 @@ select.display {
   width: 100%;
   color: white; }
 
+.sr5 .border-right {
+  border-right: 1px solid #4d4d4d; }
+
 .sr5 .scroll-area {
   height: 100%;
   margin-bottom: 0.5em;
@@ -861,6 +865,8 @@ select.display {
     border-bottom: none; }
   .sr5 .list-item.center {
     justify-content: center; }
+  .sr5 .list-item.space-evenly {
+    justify-content: space-evenly; }
   .sr5 .list-item.item-section {
     border: 1px solid black;
     margin-right: 0;
