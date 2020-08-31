@@ -61,7 +61,6 @@ export const preloadHandlebarsTemplates = async () => {
 
         // Useful wrapper and implemented components
         'systems/shadowrun5e/dist/templates/common/ValueMaxAttribute.html',
-        'systems/shadowrun5e/dist/templates/common/UsesAttribute.html',
         'systems/shadowrun5e/dist/templates/common/Attribute.html',
 
         // to create the condition monitors and edge counter
