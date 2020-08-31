@@ -3,7 +3,7 @@ import SkillEditFormData = Shadowrun.SkillEditFormData;
 export class SkillEditForm extends BaseEntitySheet {
     skillId: string;
 
-    constructor(actor, skillId, options) {
+    constructor(actor, options, skillId) {
         super(actor, options);
         this.skillId = skillId;
     }
