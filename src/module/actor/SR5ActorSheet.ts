@@ -9,6 +9,11 @@ import Skills = Shadowrun.Skills;
 import { SR5Actor } from './SR5Actor';
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 
+// Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditForm instance.
+// Should multiple instances be open, Foundry will cause cross talk between skills and actors,
+// when opened in succession, causing SkillEditForm to wrongfully overwrite the wrong data.
+let globalSkillAppId:number = -1;
+
 /**
  * Extend the basic ActorSheet with some very simple modifications
  */
@@ -652,24 +657,49 @@ export class SR5ActorSheet extends ActorSheet {
         }
     }
 
+    async _closeOpenSkillApp() {
+        if (globalSkillAppId !== -1) {
+            if (ui.windows[globalSkillAppId]) {
+                await ui.windows[globalSkillAppId].close();
+            }
+            globalSkillAppId = -1;
+        }
+    }
+
+    /** Keep track of each SkillEditForm instance and close before opening another.
+     *
+     * @param skillEditFormImplementation Any extending class! of SkillEditForm
+     * @param actor
+     * @param options
+     * @param args Collect arguments of the different renderWithSkill implementations.
+     */
+    async _showSkillEditForm(skillEditFormImplementation, actor: SR5Actor, options: object, ...args) {
+        await this._closeOpenSkillApp();
+
+        const skillEditForm = new skillEditFormImplementation(actor, options, ...args);
+        globalSkillAppId = skillEditForm.appId;
+        await skillEditForm.render(true)
+    }
+
     _onShowEditKnowledgeSkill(event) {
         event.preventDefault();
         const [skill, category] = Helpers.listItemId(event).split('.');
-        new KnowledgeSkillEditForm(this.actor, skill, category, {
-            event: event,
-        }).render(true);
+        this._showSkillEditForm(KnowledgeSkillEditForm, this.actor, {
+            event: event}, skill, category);
     }
 
     _onShowEditLanguageSkill(event) {
         event.preventDefault();
         const skill = Helpers.listItemId(event);
-        new LanguageSkillEditForm(this.actor, skill, { event: event }).render(true);
+        // new LanguageSkillEditForm(this.actor, skill, { event: event }).render(true);
+        this._showSkillEditForm(LanguageSkillEditForm, this.actor, {event: event}, skill);
     }
 
     _onShowEditSkill(event) {
         event.preventDefault();
         const skill = Helpers.listItemId(event);
-        new SkillEditForm(this.actor, skill, { event: event }).render(true);
+        // new SkillEditForm(this.actor, skill, { event: event }).render(true);
+        this._showSkillEditForm(SkillEditForm, this.actor, {event: event}, skill);
     }
 
     _onShowImportCharacter(event) {

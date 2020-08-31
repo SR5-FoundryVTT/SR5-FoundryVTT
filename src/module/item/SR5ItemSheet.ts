@@ -265,10 +265,28 @@ export class SR5ItemSheet extends ItemSheet {
         return $(this.element).find('.tab.active .scroll-area');
     }
 
+    /** This is needed to circumvent Application.close setting closed state early, due to it's async animation
+     * - The length of the closing animation can't be longer then any await time in the closing cycle
+     * - FormApplication._onSubmit will otherwise set ._state to RENDERED even if the Application window has closed already
+     * - Subsequent render calls then will show the window again, due to it's state
+     *
+     * @private
+     */
+    private fixStaleRenderedState() {
+        if (this._state === Application.RENDER_STATES.RENDERED && ui.windows[this.appId] === undefined) {
+            console.warn(`SR5ItemSheet app for ${this.entity.name} is set as RENDERED but has no window registered. Fixing app internal render state. This is a known bug.`);
+            // Hotfixing instead of this.close() since FormApplication.close() expects form elements, which don't exist anymore.
+            this._state = Application.RENDER_STATES.CLOSED;
+        }
+    }
+
     /**
      * @private
      */
     async _render(force = false, options = {}) {
+        // NOTE: This is for a timing bug. See function doc for code removal. Good luck, there be dragons here. - taM
+        this.fixStaleRenderedState();
+
         this._saveScrollPositions();
         await super._render(force, options);
         this._restoreScrollPositions();
