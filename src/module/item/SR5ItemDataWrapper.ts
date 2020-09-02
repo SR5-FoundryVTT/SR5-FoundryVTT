@@ -112,6 +112,10 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
         return this.data.data?.essence ?? 0;
     }
 
+    getAmmo() {
+        return this.data.data.ammo;
+    }
+
     getASDF() {
         if (!this.isDevice()) return undefined;
 
@@ -154,6 +158,18 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
         }
 
         return matrix;
+    }
+
+    getQuantity(): number | undefined {
+        return this.data.data?.technology?.quantity || 1;
+    }
+
+    getActionDicePoolMod(): number | undefined {
+        return this.data.data.action?.mod;
+    }
+
+    getLimitAttribute(): string | undefined {
+        return this.data.data.action?.limit?.attribute;
     }
 
     getActionSkill(): string | undefined {

@@ -9,10 +9,10 @@ import { preCombatUpdate, shadowrunCombatUpdate } from './combat';
 import { measureDistance } from './canvas';
 import * as chat from './chat';
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
-import { registerHandlebarHelpers, preloadHandlebarsTemplates } from './handlebars';
 import { ShadowrunRoller } from './rolls/ShadowrunRoller';
 import { Migrator } from './migrator/Migrator';
 import { SYSTEM_NAME } from './constants';
+import { HandlebarManager } from './handlebars/HandlebarManager';
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -45,7 +45,7 @@ Hooks.once('init', function () {
         Hooks.on(s, (app, html) => Helpers.setupCustomCheckbox(app, html));
     });
 
-    preloadHandlebarsTemplates();
+    HandlebarManager.loadTemplates();
 
     // CONFIG.debug.hooks = true;
 });
@@ -153,4 +153,5 @@ function rollItemMacro(itemName) {
     return item.postCard();
 }
 
-registerHandlebarHelpers();
+HandlebarManager.registerHelpers();
+

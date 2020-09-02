@@ -39,6 +39,15 @@
 .align-center {
     align-items: center;
 }
+.flexcol-rev {
+    display: flex;
+    flex-direction: column-reverse;
+    flex-wrap: nowrap;
+
+    > * {
+        flex: 0;
+    }
+}
 .flexcol {
     display: flex;
     flex-direction: column;
@@ -206,6 +215,21 @@ input[type='text'].display {
     }
 }
 
+.invisible {
+    visibility: hidden;
+}
+
+.show-child-on-hover {
+    .child-on-hover {
+        visibility: hidden;
+    }
+    &:hover {
+        .child-on-hover {
+            visibility: visible;
+        }
+    }
+}
+
 select.display {
     color: $color;
     background: rgba($black, 0.05);
@@ -241,6 +265,9 @@ select.display {
             margin: 0 0.5em;
         }
     }
+    .no-break {
+        white-space: nowrap;
+    }
     .window-content {
         font-size: 115%;
         background: $sheetbackground;
@@ -251,6 +278,9 @@ select.display {
         height: 15em;
         width: 100%;
         color: $color;
+    }
+    .border-right {
+        border-right: $groove;
     }
     .scroll-area {
         height: 100%;
@@ -323,161 +353,254 @@ select.display {
             padding-right: 0.25em;
         }
     }
+    .block {
+        display: flex;
+        flex-flow: column;
+        padding: 2px 4px;
+        justify-content: space-around;
+        &:not(:last-child) {
+            border-right: $groove;
+        }
+        .block-line {
+            display: flex;
+            flex-flow: row nowrap;
+            padding: 4px;
+            &.center {
+                justify-content: center;
+            }
+            &.border-bottom {
+                border-bottom: $groove;
+            }
+            &.gap-4 {
+                > :not(:first-child) {
+                    margin-left: 4px;
+                }
+                > :not(:last-child) {
+                    margin-right: 4px;
+                }
+            }
+        }
+    }
+    .horizontal-cell-input {
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: start;
+        padding: 4px;
+        &.stun .cell {
+            box-shadow: 0 0 5px 1px rgba($stun, 0.5);
+        }
+        &.physical .cell {
+            box-shadow: 0 0 5px 1px rgba($physical, 0.5);
+        }
+        &.edge .cell {
+            box-shadow: 0 0 5px 1px rgba($edge, 0.5);
+        }
+        &.matrix .cell {
+            box-shadow: 0 0 5px 1px rgba($matrix, 0.5);
+        }
+        .roll {
+            width: 60px;
+            margin-right: 8px;
+        }
+        .cell-container {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: stretch;
+            .cell {
+                cursor: pointer;
+                text-align: center;
+                font-size: 80%;
+                border: $groove;
+                color: $light-2;
+                border-radius: 4px;
+                background: $black;
+                min-width: 26px;
+                height: 18px;
+                &:not(:first-child) {
+                    margin-left: 2px;
+                }
+                &:not(:last-child) {
+                    margin-right: 2px;
+                }
+                &.filled {
+                    background: $light-2;
+                    border-color: $black;
+                    color: $black;
+                }
+                &:hover {
+                    border-color: $light;
+                }
+            }
+        }
+    }
     .inventory {
         overflow-y: hidden;
         height: 100%;
         width: 100%;
-        font-size: 85%;
         display: flex;
         flex-flow: column nowrap;
-        .item {
+    }
+    .list-item {
+        font-size: 85%;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-between;
+        align-items: center;
+        align-content: center;
+        padding: 0.1em 0.25em;
+        min-height: 26px;
+        margin: 0.1em;
+        margin-right: $groove-width;
+        margin-left: $groove-width;
+        border-bottom: 1px solid $grey;
+        .has-desc {
+            @include rollable;
+        }
+        &.no-border {
+            border-bottom: none;
+        }
+        &.center {
+            justify-content: center;
+        }
+        &.space-evenly {
+            justify-content: space-evenly;
+        }
+        &.item-section {
+            border: $groove-width solid $black;
+            margin-right: 0;
+            margin-left: 0;
+            background: rgba($grey, 0.2);
+            padding: 0.25em;
+            border-radius: 0.2em;
+        }
+        .item-center {
             display: flex;
             flex-flow: row nowrap;
-            justify-content: space-between;
             align-items: center;
-            align-content: center;
-            padding: 0.1em 0.25em;
-            margin: 0.1em;
-            margin-right: $groove-width;
-            margin-left: $groove-width;
-            border-bottom: 1px solid $grey;
-            .has-desc {
+            align-self: center;
+        }
+        .item-left {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: flex-start;
+            align-items: center;
+        }
+        .item-right {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: flex-end;
+            align-items: center;
+        }
+        .item-img {
+            padding-right: 0.25em;
+            max-width: 50px;
+            &.item-roll {
                 @include rollable;
-            }
-            &.no-border {
-                border-bottom: none;
-            }
-            &.item-section {
-                border: $groove-width solid $black;
-                margin-right: 0;
-                margin-left: 0;
-                background: rgba($grey, 0.2);
-                padding: 0.25em;
-                border-radius: 0.2em;
-            }
-            .item-left {
-                display: flex;
-                flex-flow: row nowrap;
-                justify-content: flex-start;
-                align-items: center;
-            }
-            .item-right {
-                display: flex;
-                flex-flow: row nowrap;
-                justify-content: flex-end;
-                align-items: center;
-            }
-            .item-img {
-                padding-right: 0.25em;
-                max-width: 50px;
-                &.item-roll {
-                    @include rollable;
-                    &:hover {
-                        > img {
-                            content: url('assets/dice-solid.svg');
-                            filter: invert(1);
-                        }
+                &:hover {
+                    > img {
+                        content: url('assets/dice-solid.svg');
+                        filter: invert(1);
                     }
                 }
-                > img {
-                    margin: 0;
-                    transform: translateY(10%);
-                }
-                & + .item-name {
-                    border-left: none !important;
+            }
+            > img {
+                margin: 0;
+                transform: translateY(10%);
+            }
+            & + .item-name {
+                border-left: none !important;
+            }
+        }
+        .item-input {
+            width: 9.5em;
+        }
+        .item-desc {
+            padding: 0.25em;
+            font-size: 1em;
+            width: 100%;
+            .props {
+                display: flex;
+                flex-flow: wrap row;
+                padding: 0.25em 0;
+                > * {
+                    flex-shrink: 0;
+                    border-right: $groove;
+                    border-bottom: $groove;
+                    padding: 0.25em 0.5em;
+                    margin: 0.1em 0.25em;
+                    box-shadow: 0.2em 0.2em 0.3em $black;
                 }
             }
-            .item-input {
+            .description {
+                //border-right: $light 2px solid;
+                // border-top: $light 2px solid;
+                margin: 0.5em 0.25em;
+                padding: 0.5em;
+                // margin-right: 0.5em;
+                //padding-right: 0.5em;
+            }
+        }
+        .item-icons {
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-evenly;
+            align-items: center;
+            color: $grey;
+            font-size: 12px;
+            height: 100%;
+        }
+        .item-text {
+            width: 5em;
+            margin: 0 0.1rem;
+            flex: 1 0 auto;
+            text-align: center;
+            height: 100%;
+            border: $light;
+            &.faded {
+                color: $dark;
+            }
+            &.center {
+                display: flex;
+                flex-flow: row;
+                justify-content: space-around;
+                align-items: center;
+                align-content: center;
+            }
+            &.item-name {
+                text-align: left;
+                width: auto;
+            }
+            &.element {
+                width: 7em;
+            }
+            &.radius {
+                width: 4em;
+            }
+            &.dropoff {
+                width: 4em;
+            }
+            &.rtg {
+                width: 3em;
+                &.active-skills-rating {
+                    padding-right: 1em;
+                }
+            }
+            &.input {
+                text-align: right;
                 width: 9.5em;
             }
-            .item-desc {
-                padding: 0.25em;
-                font-size: 1em;
-                width: 100%;
-                .props {
-                    display: flex;
-                    flex-flow: wrap row;
-                    padding: 0.25em 0;
-                    > * {
-                        flex-shrink: 0;
-                        border-right: $groove;
-                        border-bottom: $groove;
-                        padding: 0.25em 0.5em;
-                        margin: .1em .25em;
-                        box-shadow: .2em .2em .3em $black;
-                    }
-                }
-                .description {
-                    //border-right: $light 2px solid;
-                    // border-top: $light 2px solid;
-                    margin: 0.5em .25em;
-                    padding: 0.5em;
-                    // margin-right: 0.5em;
-                    //padding-right: 0.5em;
-                }
+            &.desc {
+                width: 16em;
             }
-            .item-icons {
-                display: flex;
-                flex-flow: row nowrap;
-                justify-content: space-evenly;
-                align-items: center;
-                color: $grey;
-                font-size: 12px;
-                height: 100%;
-            }
-            .item-text {
-                width: 5em;
-                margin: 0 0.1rem;
-                flex: 1 0 auto;
-                text-align: center;
-                height: 100%;
-                border: $light;
-                &.faded {
-                    color: $dark;
-                }
-                &.center {
-                    display: flex;
-                    flex-flow: row;
-                    justify-content: space-around;
-                    align-items: center;
-                    align-content: center;
-                }
-                &.item-name {
-                    text-align: left;
-                    width: auto;
-                }
-                &.element {
-                    width: 7em;
-                }
-                &.radius {
-                    width: 4em;
-                }
-                &.dropoff {
-                    width: 4em;
-                }
-                &.rtg {
-                    width: 3em;
-                    &.active-skills-rating {
-                        padding-right: 1em;
-                    }
-                }
-                &.input {
-                    text-align: right;
-                    width: 9.5em;
-                }
-                &.desc {
-                    width: 16em;
-                }
-            }
-            .skill-item {
-                width: 8em;
-            }
-            .skill-spec-item {
-                width: 15em;
-            }
-            &.skill-header {
-                @include rollable;
-            }
+        }
+        .skill-item {
+            width: 8em;
+        }
+        .skill-spec-item {
+            width: 15em;
+        }
+        &.skill-header {
+            @include rollable;
         }
     }
 }

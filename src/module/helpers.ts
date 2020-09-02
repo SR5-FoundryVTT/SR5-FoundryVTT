@@ -2,6 +2,7 @@ import AttributeField = Shadowrun.AttributeField;
 import SkillField = Shadowrun.SkillField;
 import ModifiableValue = Shadowrun.ModifiableValue;
 import { PartsList } from './parts/PartsList';
+import LabelField = Shadowrun.LabelField;
 
 export class Helpers {
     /**
@@ -15,6 +16,10 @@ export class Helpers {
         data.value = parts.total + data.base;
         data.mod = parts.list;
         return data.value;
+    }
+
+    static listItemId(event) {
+        return event.currentTarget.closest('.list-item').dataset.itemId;
     }
 
     // replace 'SR5.'s on keys with 'SR5_DOT_'
@@ -40,17 +45,36 @@ export class Helpers {
         return newData;
     }
 
-    static isMatrix(atts?: boolean | (AttributeField | SkillField)[] | AttributeField | SkillField) {
+    static isMatrix(atts?: boolean | (AttributeField | string | SkillField)[] | AttributeField | string | SkillField) {
         if (!atts) return false;
-        if (typeof atts === 'boolean' && atts) return true;
-        const matrixAtts = ['firewall', 'data_processing', 'sleaze', 'attack', 'computer', 'hacking', 'cybercombat', 'electronic_warfare', 'software'];
-        const matrixLabels = matrixAtts.map((s) => this.label(s));
+        if (typeof atts === 'boolean') return atts;
+        // array of labels to check for on the incoming data
+        const matrixLabels = [
+            'SR5.MatrixAttrFirewall',
+            'SR5.MatrixAttrDataProcessing',
+            'SR5.MatrixAttrSleaze',
+            'SR5.MatrixAttrAttack',
+            'SR5.SkillComputer',
+            'SR5.SkillHacking',
+            'SR5.SkillCybercombat',
+            'SR5.SkillElectronicWarfare',
+            'SR5.Software',
+        ];
         if (!Array.isArray(atts)) atts = [atts];
         atts = atts.filter((att) => att);
-        atts.forEach((att) => {
-            if (typeof att === 'string' && matrixAtts.includes(att)) return true;
-            else if (matrixLabels.includes(att.label)) return true;
-        });
+        // iterate over the attributes and return true if we find a matrix att
+        for (const att of atts) {
+            if (typeof att === 'string') {
+                if (matrixLabels.indexOf(att) >= 0) {
+                    return true;
+                }
+            } else if (typeof att === 'object' && (att as LabelField).label !== undefined) {
+                if (matrixLabels.indexOf(att.label ?? '') >= 0) {
+                    return true;
+                }
+            }
+        }
+        // if we don't find anything return false
         return false;
     }
 

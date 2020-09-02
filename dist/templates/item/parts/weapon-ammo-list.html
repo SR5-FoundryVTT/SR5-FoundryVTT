@@ -1,6 +1,6 @@
 <div class="inventory">
     <div class="scroll-area">
-        <div class="item item-section">
+        <div class="list-item item-section">
             <div class="item-left">
                 <div class="item-text item-rtg"></div>
                 <div class="item-text item-name">
@@ -35,7 +35,7 @@
             </div>
         </div>
         {{#each ammunition as |ammo index|}}
-        <div class="item" data-item-id="{{ammo._id}}">
+        <div class="list-item" data-item-id="{{ammo._id}}">
             <div class="item-left">
                 <div class="item-text rtg">
                     <i
@@ -128,7 +128,7 @@
                 </div>
             </div>
         </div>
-        <div class="item hidden">
+        <div class="list-item hidden">
             <div class="item-desc">
                 <div class="props">
                     {{#each item.properties}}

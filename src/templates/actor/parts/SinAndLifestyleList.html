@@ -1,0 +1,38 @@
+<div class="scroll-area">
+    {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+            name=(localize 'SR5.SIN')
+            itemId='sin'
+            icons=(ItemHeaderIcons 'sin')
+            rightSide=(ItemHeaderRightSide 'sin')
+    }}
+    {{#each sins as |item i|}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                img=item.img
+                name=item.name
+                itemId=item._id
+                icons=(ItemIcons item)
+                rightSide=(ItemRightSide item)
+                hasDesc="true"
+                hasRoll="true"
+                description=item.data.description.value
+        }}
+    {{/each}}
+    {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+            name=(localize 'SR5.Lifestyles')
+            itemId='lifestyle'
+            icons=(ItemHeaderIcons 'lifestyle')
+            rightSide=(ItemHeaderRightSide 'lifestyle')
+    }}
+    {{#each lifestyles as |item i|}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                img=item.img
+                name=item.name
+                itemId=item._id
+                icons=(ItemIcons item)
+                rightSide=(ItemRightSide item)
+                hasDesc="true"
+                hasRoll="true"
+                description=item.data.description.value
+        }}
+    {{/each}}
+</div>

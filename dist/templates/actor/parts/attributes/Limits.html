@@ -1,0 +1,11 @@
+{{!-- Expected to be put in a row --}}
+<div class="list-item item-section space-evenly">
+    {{#each data.limits as |limit id|}} {{#unless limit.hidden}}
+        <div class="limit">
+            <div class="limit-row">
+                <span class="limit-title">{{localize limit.label}}</span>
+                <span class="limit-value" value="{{limit.value}}">{{limit.value}}</span>
+            </div>
+        </div>
+    {{/unless}} {{/each}}
+</div>
