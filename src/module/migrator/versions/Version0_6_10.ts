@@ -31,7 +31,7 @@ export class Version0_6_10 extends VersionMigration {
     }
 
     protected async ShouldMigrateActorData(actorData: SR5ActorData): Promise<boolean> {
-        return actorData.data.attributes.edge.uses === undefined;
+        return actorData.data.attributes.edge?.uses === undefined;
     }
 
     protected async ShouldMigrateSceneData(scene: Scene): Promise<boolean> {

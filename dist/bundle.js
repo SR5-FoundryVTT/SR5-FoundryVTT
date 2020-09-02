@@ -8547,8 +8547,9 @@ class Version0_6_10 extends VersionMigration_1.VersionMigration {
         });
     }
     ShouldMigrateActorData(actorData) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            return actorData.data.attributes.edge.uses === undefined;
+            return ((_a = actorData.data.attributes.edge) === null || _a === void 0 ? void 0 : _a.uses) === undefined;
         });
     }
     ShouldMigrateSceneData(scene) {
