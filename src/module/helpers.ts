@@ -17,6 +17,10 @@ export class Helpers {
         return data.value;
     }
 
+    static listItemId(event) {
+       return event.currentTarget.closest('.list-item').dataset.itemId;
+    }
+
     // replace 'SR5.'s on keys with 'SR5_DOT_'
     static onSetFlag(data) {
         if (typeof data !== 'object') return data;

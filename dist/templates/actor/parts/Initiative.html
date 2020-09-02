@@ -1,0 +1,51 @@
+{{#> "systems/shadowrun5e/dist/templates/common/Attribute.html" }}
+    <div class="track">
+        <div class="attribute-name">
+            <select name="data.initiative.perception" class="display">
+                {{#select data.initiative.perception}}
+                    <option value="meatspace"
+                    >{{localize "SR5.InitCatMeatspace"}}</option
+                    >
+                    <option value="matrix">{{localize "SR5.InitCatMatrix"}}</option>
+                    {{#ife data.special 'magic'}}
+                        <option value="astral">{{localize "SR5.InitCatAstral"}}</option>
+                    {{/ife}} {{/select}}
+            </select>
+        </div>
+        <div class="attribute-name">
+            <label
+                    title="{{localize SR5.UseEdgeForInitiativeRoll}}"
+                    class="checkbox init-edge-label"
+            >
+                <input
+                        type="checkbox"
+                        class="submit-checkbox hidden"
+                        name="data.initiative.edge"
+                    {{checked data.initiative.edge}}
+                />
+                <span class="checkmark far"></span>
+            </label>
+        </div>
+    </div>
+    <div class="track">
+        <div class="attribute-input-container">
+            <input
+                    class="display"
+                    size="4"
+                    type="text"
+                    value="{{data.initiative.current.base.value}}"
+                    disabled
+            />
+        </div>
+        <div class="track-plus"></div>
+        <div class="attribute-input-container">
+            <input
+                    class="display"
+                    size="4"
+                    type="text"
+                    value="{{data.initiative.current.dice.text}}"
+                    disabled
+            />
+        </div>
+    </div>
+{{/"systems/shadowrun5e/dist/templates/common/Attribute.html"}}

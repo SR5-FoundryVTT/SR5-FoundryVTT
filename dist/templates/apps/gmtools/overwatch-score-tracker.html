@@ -1,7 +1,7 @@
 <form class="{{cssClass}}" autocomplete="off">
     <div class="inventory">
         <div class="scroll-area">
-            <div class="item item-section">
+            <div class="list-item item-section">
                 <div class="item-left">
                     <div class="item-text item-name">
                         {{localize "SR5.Character"}}
@@ -9,7 +9,7 @@
                 </div>
             </div>
             {{#each actors as |actor index|}}
-            <div class="item" data-actor-id="{{actor._id}}">
+            <div class="list-item" data-actor-id="{{actor._id}}">
                 <div class="item-left">
                     <div class="item-img">
                         <img

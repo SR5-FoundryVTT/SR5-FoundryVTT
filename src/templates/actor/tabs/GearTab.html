@@ -1,0 +1,26 @@
+{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.html' tabId='gear'}}
+    <div class="inventory">
+        <div class="scroll-area">
+            {{#each inventory as |section sid|}}
+                {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+                        name=(localize section.label)
+                        itemId=section.dataset.type
+                        icons=(ItemHeaderIcons section.dataset.type)
+                        rightSide=(ItemHeaderRightSide section.dataset.type)
+                }}
+                {{#each section.items as |item i|}}
+                    {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                            img=item.img
+                            name=item.name
+                            itemId=item._id
+                            icons=(ItemIcons item)
+                            rightSide=(ItemRightSide item)
+                            hasDesc="true"
+                            hasRoll="true"
+                            description=item.data.description.value
+                    }}
+                {{/each}}
+            {{/each}}
+        </div>
+    </div>
+{{/'systems/shadowrun5e/dist/templates/common/TabWrapper.html'}}

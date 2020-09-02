@@ -1,7 +1,7 @@
 <form class="{{cssClass}} wholesheet" autocomplete="off">
     <div class="inventory">
         {{#if editable_name}}
-        <div class="item item-section">
+        <div class="list-item item-section">
             <div class="item-left">
                 <div class="item-text item-name">
                     {{localize "SR5.Name"}}
@@ -14,7 +14,7 @@
             </div>
         </div>
         {{/if}}
-        <div class="item item-section">
+        <div class="list-item item-section">
             <div class="item-left">
                 <div class="item-text item-name">
                     {{localize "SR5.Total"}} {{localize "SR5.Value"}}
@@ -32,7 +32,7 @@
                 </div>
             </div>
         </div>
-        <div class="item">
+        <div class="list-item">
             <div class="item-left">
                 <div class="item-text item-name">
                     {{localize "SR5.Base"}} {{localize "SR5.Value"}}
@@ -51,7 +51,7 @@
                 </div>
             </div>
         </div>
-        <div class="item">
+        <div class="list-item">
             <div class="item-left">
                 <div class="item-text item-name">
                     {{localize "SR5.Item"}} {{localize "SR5.Value"}}
@@ -70,7 +70,7 @@
                 </div>
             </div>
         </div>
-        <div class="item item-section">
+        <div class="list-item item-section">
             <div class="item-left">
                 <div class="item-text item-name">
                     {{localize "SR5.Bonuses"}}
@@ -86,7 +86,7 @@
         </div>
         <div class="scroll-area">
             {{#each data.bonus as |bonus id|}}
-            <div class="item">
+            <div class="list-item">
                 <div class="item-left flex1">
                     <input
                             class="display"
@@ -113,7 +113,7 @@
             </div>
             {{/each}}
         </div>
-        <div class="item item-section">
+        <div class="list-item item-section">
             <div class="item-left">
                 <div class="item-text item-name">
                     {{localize "SR5.Specializations"}}
@@ -129,7 +129,7 @@
         </div>
         <div class="scroll-area">
             {{#each data.specs as |spec id|}}
-            <div class="item">
+            <div class="list-item">
                 <div class="item-left flex1">
                     <input
                         class="display"

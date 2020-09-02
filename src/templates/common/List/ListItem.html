@@ -1,0 +1,75 @@
+<div class="list-item {{itemCssClass}}" {{#if itemId}}data-item-id="{{itemId}}"{{/if}}>
+    <div class="item-left">
+        {{#if img}}
+            <div class="item-img {{#if hasRoll}}item-roll{{/if}} roll">
+                <img src="{{img}}" title="{{name}}" height="24px" width="24px" />
+            </div>
+        {{/if}}
+        <div class="item-text item-name
+            {{#if hasDesc}}has-desc{{/if}}
+            {{#if itemNameCssClass}}{{itemNameCssClass}}{{/if}}
+            {{#unless img}}{{#if hasRoll}}roll{{/if}}{{/unless}}"
+        >
+            {{name}}
+        </div>
+    </div>
+    <div class="item-right">
+        {{!-- Iterate over all right-side options --}}
+        {{#each rightSide as |option id|}}
+            {{#if option.text}}
+                <div class="item-text {{option.text.cssClass}}">
+                    {{option.text.text}}
+                </div>
+            {{/if}}
+            {{#if option.button}}
+                <div class="item-input">
+                    <button class="display
+                        {{option.button.cssClass}}
+                        {{#if option.button.short}}short{{/if}}"
+                    >
+                        {{option.button.text}}
+                    </button>
+                </div>
+            {{/if}}
+            {{#if option.input}}
+                {{#ife option.input.type 'number'}}
+                    <div class="item-text {{option.cssClass}}">
+                        {{> "systems/shadowrun5e/dist/templates/common/ValueInput.html"
+                                cssClass=(concatStrings "short " option.input.cssClass)
+                                title=(localize 'SR5.Quantity')
+                                size="5"
+                                maxLength="5"
+                                value=option.input.value
+                        }}
+                    </div>
+                {{/ife}}
+            {{/if}}
+        {{/each}}
+        {{#if icons}}
+            <div class="item-text item-icons">
+                {{#each icons as |icon id|}}
+                    <a class="{{icon.cssClass}} roll" title="{{icon.title}}">
+                        <i class="{{icon.icon}}"></i>
+                        {{#if (isDefined icon.text)}}
+                            {{icon.text}}
+                        {{/if}}
+                    </a>
+                {{/each}}
+            </div>
+        {{/if}}
+    </div>
+</div>
+{{#if properties}}
+<div class="list-item hidden">
+    <div class="item-desc">
+        <div class="props">
+            {{#each properties}}
+                <span>{{this}}</span>
+            {{/each}}
+        </div>
+        <div class="item-desc">
+            {{{description}}}
+        </div>
+    </div>
+</div>
+{{/if}}

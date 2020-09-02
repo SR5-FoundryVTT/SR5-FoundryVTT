@@ -1,0 +1,40 @@
+{{#> "systems/shadowrun5e/dist/templates/common/Attribute.html"}}
+    <div class="attribute-name">
+        {{localize "SR5.Movement"}}
+    </div>
+    <div class="track">
+        <div class="attribute-input-container">
+            {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.html'
+                    cssClass="attribute-input"
+                    title=(localize 'SR5.WalkingSpeed')
+                    size="2"
+                    maxLength="2"
+                    value=data.movement.walk.value
+                    disabled="true"
+            }}
+        </div>
+        <div class="track-slash"></div>
+        <div class="attribute-input-container">
+            {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.html'
+                    cssClass="attribute-input"
+                    title=(localize 'SR5.RunningSpeed')
+                    size="2"
+                    maxLength="2"
+                    value=data.movement.run.value
+                    disabled="true"
+            }}
+        </div>
+        <div class="track-slash"></div>
+        <div class="input attribute-input-container">
+            {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.html'
+                    cssClass="attribute-input"
+                    title=(localize 'SR5.RunningSpeed')
+                    size="2"
+                    maxLength="2"
+                    value=data.movement.sprint
+                    name="data.movement.sprint"
+            }}
+            <span class="unit"> + </span>
+        </div>
+    </div>
+{{/"systems/shadowrun5e/dist/templates/common/Attribute.html"}}

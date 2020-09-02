@@ -89,6 +89,7 @@ export class SR5ActorSheet extends ActorSheet {
         data['config'] = CONFIG.SR5;
         data['awakened'] = data.data.special === 'magic';
         data['emerged'] = data.data.special === 'resonance';
+        data['woundTolerance'] = 3 + (Number(mods['wound_tolerance']) || 0);
 
         data.filters = this._filters;
 
@@ -209,7 +210,7 @@ export class SR5ActorSheet extends ActorSheet {
             if (left.name > right.name) return 1;
             if (left.name < right.name) return -1;
             return 0;
-        }
+        };
         actions.sort(sortByName);
         adept_powers.sort(sortByName);
         complex_forms.sort(sortByName);
@@ -263,7 +264,7 @@ export class SR5ActorSheet extends ActorSheet {
 
         html.find('.has-desc').click((event) => {
             event.preventDefault();
-            const item = $(event.currentTarget).parents('.item');
+            const item = $(event.currentTarget).parents('.list-item');
             const iid = $(item).data().item;
             const field = item.next();
             field.toggle();
@@ -274,7 +275,7 @@ export class SR5ActorSheet extends ActorSheet {
         });
 
         html.find('#filter-skills').on('input', this._onFilterSkills.bind(this));
-        html.find('.track-roll').click(this._onRollTrack.bind(this));
+        html.find('.cell-input-roll').click(this._onRollCellInput.bind(this));
         html.find('.attribute-roll').click(this._onRollAttribute.bind(this));
         html.find('.skill-roll').click(this._onRollActiveSkill.bind(this));
         html.find('.defense-roll').click(this._onRollDefense.bind(this));
@@ -303,39 +304,43 @@ export class SR5ActorSheet extends ActorSheet {
         html.find('.skill-edit').click(this._onShowEditSkill.bind(this));
         html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
         html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
-        html.find('.matrix-condition-value').on('change', async (event) => {
-            event.preventDefault();
-            console.log(event);
-            const value = Helpers.parseInputToNumber(event.currentTarget.value);
-            console.log(value);
-            const matrixDevice = this.actor.getMatrixDevice();
-            console.log(matrixDevice);
-            if (matrixDevice && !isNaN(value)) {
-                console.log(matrixDevice);
-                const updateData = {};
-                updateData['data.technology.condition_monitor.value'] = value;
-                await matrixDevice.update(updateData);
-            }
-        });
+
+        $(html).find('.horizontal-cell-input .cell').on('click', this._onSetCellInput.bind(this));
+
+        $(html).find('.horizontal-cell-input .cell').on('contextmenu', this._onClearCellInput.bind(this));
+
+        // updates matrix condition monitor on the device the actor has equippe
+        $(html)
+            .find('[name="data.matrix.condition_monitor.value"]')
+            .on('change', async (event: any) => {
+                event.preventDefault();
+                const value = Helpers.parseInputToNumber(event.currentTarget.value);
+                const matrixDevice = this.actor.getMatrixDevice();
+                if (matrixDevice && !isNaN(value)) {
+                    const updateData = {};
+                    updateData['data.technology.condition_monitor.value'] = value;
+                    await matrixDevice.update(updateData);
+                }
+            });
 
         // Update Inventory Item
         html.find('.item-edit').click((event) => {
             event.preventDefault();
-            const iid = event.currentTarget.closest('.item').dataset.itemId;
+            const iid = Helpers.listItemId(event);
             const item = this.actor.getOwnedItem(iid);
             if (item) item.sheet.render(true);
         });
         // Delete Inventory Item
         html.find('.item-delete').click((event) => {
             event.preventDefault();
-            const iid = event.currentTarget.closest('.item').dataset.itemId;
-            const el = $(event.currentTarget).parents('.item');
+            const iid = Helpers.listItemId(event);
+            const el = $(event.currentTarget).parents('.list-item');
             this.actor.deleteOwnedItem(iid);
             el.slideUp(200, () => this.render(false));
         });
         // Drag inventory item
         let handler = (ev) => this._onDragItemStart(ev);
-        html.find('.item').each((i, item) => {
+        html.find('.list-item').each((i, item) => {
             if (item.dataset && item.dataset.itemId) {
                 item.setAttribute('draggable', true);
                 item.addEventListener('dragstart', handler, false);
@@ -350,7 +355,7 @@ export class SR5ActorSheet extends ActorSheet {
 
     async _onReloadAmmo(event) {
         event.preventDefault();
-        const iid = event.currentTarget.closest('.item').dataset.itemId;
+        const iid = Helpers.listItemId(event);
         const item = this.actor.getOwnedItem(iid);
         if (item) return item.reloadAmmo();
     }
@@ -388,14 +393,12 @@ export class SR5ActorSheet extends ActorSheet {
 
     _onItemCreate(event) {
         event.preventDefault();
-        const header = event.currentTarget;
-        const type = header.dataset.type;
+        const type = Helpers.listItemId(event);
+        console.log(type);
         const itemData = {
-            name: `New ${Helpers.label(type)}`,
+            name: `New ${type}`,
             type: type,
-            data: duplicate(header.dataset),
         };
-        delete itemData.data['type'];
         return this.actor.createOwnedItem(itemData, { renderSheet: true });
     }
 
@@ -406,25 +409,24 @@ export class SR5ActorSheet extends ActorSheet {
 
     async _onRemoveLanguageSkill(event) {
         event.preventDefault();
-        const skillId = event.currentTarget.dataset.skill;
+        const skillId = Helpers.listItemId(event);
         this.actor.removeLanguageSkill(skillId);
     }
 
     async _onAddKnowledgeSkill(event) {
         event.preventDefault();
-        const category = event.currentTarget.dataset.category;
+        const category = Helpers.listItemId(event);
         this.actor.addKnowledgeSkill(category);
     }
 
     async _onRemoveKnowledgeSkill(event) {
         event.preventDefault();
-        const skillId = event.currentTarget.dataset.skill;
-        const category = event.currentTarget.dataset.category;
+        const [skillId, category] = Helpers.listItemId(event).split('.');
         this.actor.removeKnowledgeSkill(skillId, category);
     }
 
     async _onChangeRtg(event) {
-        const iid = event.currentTarget.closest('.item').dataset.itemId;
+        const iid = Helpers.listItemId(event);
         const item = this.actor.getOwnedItem(iid);
         const rtg = parseInt(event.currentTarget.value);
         if (item && rtg) {
@@ -433,7 +435,7 @@ export class SR5ActorSheet extends ActorSheet {
     }
 
     async _onChangeQty(event) {
-        const iid = event.currentTarget.closest('.item').dataset.itemId;
+        const iid = Helpers.listItemId(event);
         const item = this.actor.getOwnedItem(iid);
         const qty = parseInt(event.currentTarget.value);
         if (item && qty) {
@@ -444,7 +446,7 @@ export class SR5ActorSheet extends ActorSheet {
 
     async _onEquipItem(event) {
         event.preventDefault();
-        const iid = event.currentTarget.closest('.item').dataset.itemId;
+        const iid = Helpers.listItemId(event);
         const item = this.actor.getOwnedItem(iid);
         if (item) {
             const itemData = item.data.data;
@@ -469,10 +471,61 @@ export class SR5ActorSheet extends ActorSheet {
         }
     }
 
-    async _onRollTrack(event) {
+    async _onSetCellInput(event) {
+        const value = Number(event.currentTarget.dataset.value);
+        const cmId = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
+        const data = {};
+        if (cmId === 'stun' || cmId === 'physical') {
+            const property = `data.track.${cmId}.value`;
+            data[property] = value;
+        } else if (cmId === 'edge') {
+            const property = `data.attributes.edge.uses`;
+            data[property] = value;
+        } else if (cmId === 'overflow') {
+            const property = 'data.track.physical.overflow.value';
+            data[property] = value;
+        } else if (cmId === 'matrix') {
+            const matrixDevice = this.actor.getMatrixDevice();
+            if (matrixDevice && !isNaN(value)) {
+                const updateData = {};
+                updateData['data.technology.condition_monitor.value'] = value;
+                await matrixDevice.update(updateData);
+            }
+        }
+        await this.actor.update(data);
+    }
+
+    async _onClearCellInput(event) {
+        const cmId = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
+        const data = {};
+        if (cmId === 'stun' || cmId === 'physical') {
+            const property = `data.track.${cmId}.value`;
+            data[property] = 0;
+        } else if (cmId === 'edge') {
+            const property = `data.attributes.edge.uses`;
+            data[property] = 0;
+        } else if (cmId === 'overflow') {
+            const property = 'data.track.physical.overflow.value';
+            data[property] = 0;
+        } else if (cmId === 'matrix') {
+            const matrixDevice = this.actor.getMatrixDevice();
+            if (matrixDevice) {
+                const updateData = {};
+                updateData['data.technology.condition_monitor.value'] = 0;
+                await matrixDevice.update(updateData);
+            }
+        }
+        await this.actor.update(data);
+    }
+
+    async _onRollCellInput(event) {
         event.preventDefault();
-        let track = event.currentTarget.closest('.attribute').dataset.track;
-        await this.actor.rollNaturalRecovery(track, event);
+        let track = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
+        if (track === 'stun' || track === 'physical') {
+            await this.actor.rollNaturalRecovery(track, event);
+        } else if (track === 'edge') {
+            await this.actor.rollAttribute('edge');
+        }
     }
 
     async _onRollPrompt(event) {
@@ -482,7 +535,7 @@ export class SR5ActorSheet extends ActorSheet {
 
     async _onRollItem(event) {
         event.preventDefault();
-        const iid = event.currentTarget.closest('.item').dataset.itemId;
+        const iid = Helpers.listItemId(event);
         const item = this.actor.getOwnedItem(iid);
         if (item) {
             await item.postCard(event);
@@ -528,26 +581,26 @@ export class SR5ActorSheet extends ActorSheet {
 
     async _onRollKnowledgeSkill(event) {
         event.preventDefault();
-        const skill = event.currentTarget.dataset.skill;
-        const category = event.currentTarget.dataset.category;
+        const id = Helpers.listItemId(event);
+        const [skill, category] = id.split('.');
         return this.actor.rollKnowledgeSkill(category, skill, { event: event });
     }
 
     async _onRollLanguageSkill(event) {
         event.preventDefault();
-        const skill = event.currentTarget.dataset.skill;
+        const skill = Helpers.listItemId(event);
         return this.actor.rollLanguageSkill(skill, { event: event });
     }
 
     async _onRollActiveSkill(event) {
         event.preventDefault();
-        const skill = event.currentTarget.dataset.skill;
+        const skill = Helpers.listItemId(event);
         return this.actor.rollActiveSkill(skill, { event: event });
     }
 
     async _onRollAttribute(event) {
         event.preventDefault();
-        const attr = event.currentTarget.dataset.attribute;
+        const attr = event.currentTarget.closest('.attribute').dataset.attribute;
         return this.actor.rollAttribute(attr, { event: event });
     }
 
@@ -601,8 +654,7 @@ export class SR5ActorSheet extends ActorSheet {
 
     _onShowEditKnowledgeSkill(event) {
         event.preventDefault();
-        const skill = event.currentTarget.dataset.skill;
-        const category = event.currentTarget.dataset.category;
+        const [skill, category] = Helpers.listItemId(event).split('.');
         new KnowledgeSkillEditForm(this.actor, skill, category, {
             event: event,
         }).render(true);
@@ -610,13 +662,13 @@ export class SR5ActorSheet extends ActorSheet {
 
     _onShowEditLanguageSkill(event) {
         event.preventDefault();
-        const skill = event.currentTarget.dataset.skill;
+        const skill = Helpers.listItemId(event);
         new LanguageSkillEditForm(this.actor, skill, { event: event }).render(true);
     }
 
     _onShowEditSkill(event) {
         event.preventDefault();
-        const skill = event.currentTarget.dataset.skill;
+        const skill = Helpers.listItemId(event);
         new SkillEditForm(this.actor, skill, { event: event }).render(true);
     }
 

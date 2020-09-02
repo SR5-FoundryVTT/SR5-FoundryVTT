@@ -24,10 +24,10 @@ export class BaseActorPrep {
 
         // clear matrix data to defaults
         MatrixList.forEach((key) => {
-            // delete the Temporary mod that may exist on the object
-            delete matrix[key].mod["Temporary"];
             const parts = new PartsList(matrix[key].mod);
             parts.addUniquePart('SR5.Temporary', matrix[key].temp);
+            // TODO LEGACY from when the sheet used 'mod.Temporary'
+            parts.removePart('Temporary');
             matrix[key].mod = parts.list;
             matrix[key].value = parts.total;
         });
@@ -35,6 +35,7 @@ export class BaseActorPrep {
         matrix.rating = 0;
         matrix.name = '';
         matrix.device = '';
+        matrix.condition_monitor.label = 'SR5.ConditionMonitor';
 
         // get the first equipped device, we don't care if they have more equipped -- it shouldn't happen
         const device = this.items.find((item) => item.isEquipped() && item.isDevice());
@@ -53,18 +54,18 @@ export class BaseActorPrep {
                 // setup the actual matrix attributes for the actor
                 for (const [key, value] of Object.entries(deviceAtts)) {
                     if (value && matrix[key]) {
-                        matrix[key].value += value.value;
+                        matrix[key].base = value.value;
                         matrix[key].device_att = value.device_att;
                     }
                 }
             }
         } // if we don't have a device, use living persona
         else if (this.data.special === 'resonance') {
-            matrix.firewall.value += Helpers.calcTotal(attributes.willpower);
-            matrix.data_processing.value += Helpers.calcTotal(attributes.logic);
+            matrix.firewall.base = Helpers.calcTotal(attributes.willpower);
+            matrix.data_processing.base = Helpers.calcTotal(attributes.logic);
             matrix.rating = Helpers.calcTotal(attributes.resonance);
-            matrix.attack.value += Helpers.calcTotal(attributes.charisma);
-            matrix.sleaze.value += Helpers.calcTotal(attributes.intuition);
+            matrix.attack.base = Helpers.calcTotal(attributes.charisma);
+            matrix.sleaze.base = Helpers.calcTotal(attributes.intuition);
             matrix.name = game.i18n.localize('SR5.LivingPersona');
         }
 
@@ -75,6 +76,7 @@ export class BaseActorPrep {
 
         // add matrix attributes to both limits and attributes as hidden entries
         MatrixList.forEach((key) => {
+            Helpers.calcTotal(matrix[key]);
             if (matrix[key]) {
                 const label = CONFIG.SR5.matrixAttributes[key];
                 const { value, base, mod } = matrix[key];
@@ -164,9 +166,11 @@ export class BaseActorPrep {
     prepareAttributes() {
         const { attributes } = this.data;
 
-        // hide attributes if we aren't special
-        attributes.magic.hidden = !(this.data.special === 'magic');
-        attributes.resonance.hidden = !(this.data.special === 'resonance');
+        // always have special attributes set to hidden
+        attributes.magic.hidden = true;
+        attributes.resonance.hidden = true;
+        attributes.edge.hidden = true;
+        attributes.essence.hidden = true;
 
         // set the value for the attributes
         for (let [key, attribute] of Object.entries(attributes)) {

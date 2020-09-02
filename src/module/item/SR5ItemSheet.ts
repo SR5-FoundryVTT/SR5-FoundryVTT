@@ -124,7 +124,7 @@ export class SR5ItemSheet extends ItemSheet {
 
         html.find('.has-desc').click((event) => {
             event.preventDefault();
-            const item = $(event.currentTarget).parents('.item');
+            const item = $(event.currentTarget).parents('.list-item');
             const iid = $(item).data().item;
             const field = item.next();
             field.toggle();
