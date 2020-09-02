@@ -1124,8 +1124,8 @@ class SR5Actor extends Actor {
         this.update(updateData);
     }
     rollFade(options = {}, incoming = -1) {
-        const wil = this.data.data.attributes.willpower;
-        const res = this.data.data.attributes.resonance;
+        const wil = duplicate(this.data.data.attributes.willpower);
+        const res = duplicate(this.data.data.attributes.resonance);
         const data = this.data.data;
         const parts = new PartsList_1.PartsList();
         parts.addUniquePart(wil.label, wil.value);
@@ -1147,8 +1147,8 @@ class SR5Actor extends Actor {
         });
     }
     rollDrain(options = {}, incoming = -1) {
-        const wil = this.data.data.attributes.willpower;
-        const drainAtt = this.data.data.attributes[this.data.data.magic.attribute];
+        const wil = duplicate(this.data.data.attributes.willpower);
+        const drainAtt = duplicate(this.data.data.attributes[this.data.data.magic.attribute]);
         const parts = new PartsList_1.PartsList();
         parts.addPart(wil.label, wil.value);
         parts.addPart(drainAtt.label, drainAtt.value);
@@ -1383,7 +1383,7 @@ class SR5Actor extends Actor {
         });
     }
     rollSingleAttribute(attId, options) {
-        const attr = this.data.data.attributes[attId];
+        const attr = duplicate(this.data.data.attributes[attId]);
         const parts = new PartsList_1.PartsList();
         parts.addUniquePart(attr.label, attr.value);
         this._addMatrixParts(parts, attr);
@@ -1396,8 +1396,8 @@ class SR5Actor extends Actor {
         });
     }
     rollTwoAttributes([id1, id2], options) {
-        const attr1 = this.data.data.attributes[id1];
-        const attr2 = this.data.data.attributes[id2];
+        const attr1 = duplicate(this.data.data.attributes[id1]);
+        const attr2 = duplicate(this.data.data.attributes[id2]);
         const label1 = helpers_1.Helpers.label(id1);
         const label2 = helpers_1.Helpers.label(id2);
         const parts = new PartsList_1.PartsList();
@@ -1423,8 +1423,8 @@ class SR5Actor extends Actor {
         else {
             title += ' - Stun - 1 Hour';
         }
-        let att1 = this.data.data.attributes[id1];
-        let att2 = this.data.data.attributes[id2];
+        let att1 = duplicate(this.data.data.attributes[id1]);
+        let att2 = duplicate(this.data.data.attributes[id2]);
         const parts = new PartsList_1.PartsList();
         parts.addPart(att1.label, att1.value);
         parts.addPart(att2.label, att2.value);
@@ -1449,7 +1449,7 @@ class SR5Actor extends Actor {
     }
     rollMatrixAttribute(attr, options) {
         return __awaiter(this, void 0, void 0, function* () {
-            let matrix_att = this.data.data.matrix[attr];
+            let matrix_att = duplicate(this.data.data.matrix[attr]);
             let title = game.i18n.localize(CONFIG.SR5.matrixAttributes[attr]);
             const parts = new PartsList_1.PartsList();
             parts.addPart(CONFIG.SR5.matrixAttributes[attr], matrix_att.value);
@@ -1556,8 +1556,8 @@ class SR5Actor extends Actor {
     }
     rollSkill(skill, options) {
         var _a;
-        let att = this.data.data.attributes[skill.attribute];
-        let title = skill.label;
+        let att = duplicate(this.data.data.attributes[skill.attribute]);
+        let title = game.i18n.localize(skill.label);
         if (options === null || options === void 0 ? void 0 : options.attribute)
             att = this.data.data.attributes[options.attribute];
         let limit = this.data.data.limits[att.limit];
@@ -1633,7 +1633,7 @@ class SR5Actor extends Actor {
         });
     }
     rollKnowledgeSkill(catId, skillId, options) {
-        const category = this.data.data.skills.knowledge[catId];
+        const category = duplicate(this.data.data.skills.knowledge[catId]);
         const skill = duplicate(category.value[skillId]);
         skill.attribute = category.attribute;
         skill.label = skill.name;
@@ -1646,14 +1646,13 @@ class SR5Actor extends Actor {
         return this.rollSkill(skill, options);
     }
     rollActiveSkill(skillId, options) {
-        const skill = this.data.data.skills.active[skillId];
-        skill.label = game.i18n.localize(CONFIG.SR5.activeSkills[skillId]);
+        const skill = duplicate(this.data.data.skills.active[skillId]);
         return this.rollSkill(skill, options);
     }
     rollAttribute(attId, options) {
         let title = game.i18n.localize(CONFIG.SR5.attributes[attId]);
-        const att = this.data.data.attributes[attId];
-        const atts = this.data.data.attributes;
+        const att = duplicate(this.data.data.attributes[attId]);
+        const atts = duplicate(this.data.data.attributes);
         const parts = new PartsList_1.PartsList();
         parts.addUniquePart(att.label, att.value);
         let dialogData = {
@@ -5575,21 +5574,40 @@ class Helpers {
         return newData;
     }
     static isMatrix(atts) {
+        var _a;
         if (!atts)
             return false;
-        if (typeof atts === 'boolean' && atts)
-            return true;
-        const matrixAtts = ['firewall', 'data_processing', 'sleaze', 'attack', 'computer', 'hacking', 'cybercombat', 'electronic_warfare', 'software'];
-        const matrixLabels = matrixAtts.map((s) => this.label(s));
+        if (typeof atts === 'boolean')
+            return atts;
+        // array of labels to check for on the incoming data
+        const matrixLabels = [
+            'SR5.MatrixAttrFirewall',
+            'SR5.MatrixAttrDataProcessing',
+            'SR5.MatrixAttrSleaze',
+            'SR5.MatrixAttrAttack',
+            'SR5.SkillComputer',
+            'SR5.SkillHacking',
+            'SR5.SkillCybercombat',
+            'SR5.SkillElectronicWarfare',
+            'SR5.Software',
+        ];
         if (!Array.isArray(atts))
             atts = [atts];
         atts = atts.filter((att) => att);
-        atts.forEach((att) => {
-            if (typeof att === 'string' && matrixAtts.includes(att))
-                return true;
-            else if (matrixLabels.includes(att.label))
-                return true;
-        });
+        // iterate over the attributes and return true if we find a matrix att
+        for (const att of atts) {
+            if (typeof att === 'string') {
+                if (matrixLabels.indexOf(att) >= 0) {
+                    return true;
+                }
+            }
+            else if (typeof att === 'object' && att.label !== undefined) {
+                if (matrixLabels.indexOf((_a = att.label) !== null && _a !== void 0 ? _a : '') >= 0) {
+                    return true;
+                }
+            }
+        }
+        // if we don't find anything return false
         return false;
     }
     static parseInputToString(val) {

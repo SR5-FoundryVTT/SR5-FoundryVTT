@@ -206,8 +206,8 @@ export class SR5Actor extends Actor {
     }
 
     rollFade(options: ActorRollOptions = {}, incoming = -1) {
-        const wil = this.data.data.attributes.willpower;
-        const res = this.data.data.attributes.resonance;
+        const wil = duplicate(this.data.data.attributes.willpower);
+        const res = duplicate(this.data.data.attributes.resonance);
         const data = this.data.data;
 
         const parts = new PartsList<number>();
@@ -231,8 +231,8 @@ export class SR5Actor extends Actor {
     }
 
     rollDrain(options: ActorRollOptions = {}, incoming = -1) {
-        const wil = this.data.data.attributes.willpower;
-        const drainAtt = this.data.data.attributes[this.data.data.magic.attribute];
+        const wil = duplicate(this.data.data.attributes.willpower);
+        const drainAtt = duplicate(this.data.data.attributes[this.data.data.magic.attribute]);
 
         const parts = new PartsList<number>();
         parts.addPart(wil.label, wil.value);
@@ -482,7 +482,7 @@ export class SR5Actor extends Actor {
     }
 
     rollSingleAttribute(attId, options: ActorRollOptions) {
-        const attr = this.data.data.attributes[attId];
+        const attr = duplicate(this.data.data.attributes[attId]);
         const parts = new PartsList<number>();
         parts.addUniquePart(attr.label, attr.value);
         this._addMatrixParts(parts, attr);
@@ -496,8 +496,8 @@ export class SR5Actor extends Actor {
     }
 
     rollTwoAttributes([id1, id2], options: ActorRollOptions) {
-        const attr1 = this.data.data.attributes[id1];
-        const attr2 = this.data.data.attributes[id2];
+        const attr1 = duplicate(this.data.data.attributes[id1]);
+        const attr2 = duplicate(this.data.data.attributes[id2]);
         const label1 = Helpers.label(id1);
         const label2 = Helpers.label(id2);
         const parts = new PartsList<number>();
@@ -523,8 +523,8 @@ export class SR5Actor extends Actor {
         } else {
             title += ' - Stun - 1 Hour';
         }
-        let att1 = this.data.data.attributes[id1];
-        let att2 = this.data.data.attributes[id2];
+        let att1 = duplicate(this.data.data.attributes[id1]);
+        let att2 = duplicate(this.data.data.attributes[id2]);
         const parts = new PartsList<number>();
         parts.addPart(att1.label, att1.value);
         parts.addPart(att2.label, att2.value);
@@ -552,7 +552,7 @@ export class SR5Actor extends Actor {
     }
 
     async rollMatrixAttribute(attr, options?: ActorRollOptions) {
-        let matrix_att = this.data.data.matrix[attr];
+        let matrix_att = duplicate(this.data.data.matrix[attr]);
         let title = game.i18n.localize(CONFIG.SR5.matrixAttributes[attr]);
         const parts = new PartsList<number>();
         parts.addPart(CONFIG.SR5.matrixAttributes[attr], matrix_att.value);
@@ -654,8 +654,8 @@ export class SR5Actor extends Actor {
     }
 
     rollSkill(skill, options?: SkillRollOptions) {
-        let att = this.data.data.attributes[skill.attribute];
-        let title = skill.label;
+        let att = duplicate(this.data.data.attributes[skill.attribute]);
+        let title = game.i18n.localize(skill.label);
 
         if (options?.attribute) att = this.data.data.attributes[options.attribute];
         let limit = this.data.data.limits[att.limit];
@@ -734,7 +734,7 @@ export class SR5Actor extends Actor {
     }
 
     rollKnowledgeSkill(catId: string, skillId: string, options?: SkillRollOptions) {
-        const category = this.data.data.skills.knowledge[catId];
+        const category = duplicate(this.data.data.skills.knowledge[catId]);
         const skill = duplicate(category.value[skillId]);
         skill.attribute = category.attribute;
         skill.label = skill.name;
@@ -749,15 +749,14 @@ export class SR5Actor extends Actor {
     }
 
     rollActiveSkill(skillId: string, options?: SkillRollOptions) {
-        const skill = this.data.data.skills.active[skillId];
-        skill.label = game.i18n.localize(CONFIG.SR5.activeSkills[skillId]);
+        const skill = duplicate(this.data.data.skills.active[skillId]);
         return this.rollSkill(skill, options);
     }
 
     rollAttribute(attId, options?: ActorRollOptions) {
         let title = game.i18n.localize(CONFIG.SR5.attributes[attId]);
-        const att = this.data.data.attributes[attId];
-        const atts = this.data.data.attributes;
+        const att = duplicate(this.data.data.attributes[attId]);
+        const atts = duplicate(this.data.data.attributes);
         const parts = new PartsList<number>();
         parts.addUniquePart(att.label, att.value);
         let dialogData = {
