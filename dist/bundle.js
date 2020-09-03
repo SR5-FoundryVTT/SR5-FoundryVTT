@@ -1851,7 +1851,6 @@ class SR5Actor extends Actor {
     }
 }
 exports.SR5Actor = SR5Actor;
-
 },{"../constants":29,"../helpers":37,"../parts/PartsList":48,"../rolls/ShadowrunRoller":49,"./prep/BaseActorPrep":18}],17:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -1870,6 +1869,10 @@ const chummer_import_form_1 = require("../apps/chummer-import-form");
 const SkillEditForm_1 = require("../apps/skills/SkillEditForm");
 const KnowledgeSkillEditForm_1 = require("../apps/skills/KnowledgeSkillEditForm");
 const LanguageSkillEditForm_1 = require("../apps/skills/LanguageSkillEditForm");
+// Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditForm instance.
+// Should multiple instances be open, Foundry will cause cross talk between skills and actors,
+// when opened in succession, causing SkillEditForm to wrongfully overwrite the wrong data.
+let globalSkillAppId = -1;
 /**
  * Extend the basic ActorSheet with some very simple modifications
  */
@@ -2527,22 +2530,49 @@ class SR5ActorSheet extends ActorSheet {
             this._scroll = activeList.prop('scrollTop');
         }
     }
+    _closeOpenSkillApp() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (globalSkillAppId !== -1) {
+                if (ui.windows[globalSkillAppId]) {
+                    yield ui.windows[globalSkillAppId].close();
+                }
+                globalSkillAppId = -1;
+            }
+        });
+    }
+    /** Keep track of each SkillEditForm instance and close before opening another.
+     *
+     * @param skillEditFormImplementation Any extending class! of SkillEditForm
+     * @param actor
+     * @param options
+     * @param args Collect arguments of the different renderWithSkill implementations.
+     */
+    _showSkillEditForm(skillEditFormImplementation, actor, options, ...args) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this._closeOpenSkillApp();
+            const skillEditForm = new skillEditFormImplementation(actor, options, ...args);
+            globalSkillAppId = skillEditForm.appId;
+            yield skillEditForm.render(true);
+        });
+    }
     _onShowEditKnowledgeSkill(event) {
         event.preventDefault();
         const [skill, category] = helpers_1.Helpers.listItemId(event).split('.');
-        new KnowledgeSkillEditForm_1.KnowledgeSkillEditForm(this.actor, skill, category, {
-            event: event,
-        }).render(true);
+        this._showSkillEditForm(KnowledgeSkillEditForm_1.KnowledgeSkillEditForm, this.actor, {
+            event: event
+        }, skill, category);
     }
     _onShowEditLanguageSkill(event) {
         event.preventDefault();
         const skill = helpers_1.Helpers.listItemId(event);
-        new LanguageSkillEditForm_1.LanguageSkillEditForm(this.actor, skill, { event: event }).render(true);
+        // new LanguageSkillEditForm(this.actor, skill, { event: event }).render(true);
+        this._showSkillEditForm(LanguageSkillEditForm_1.LanguageSkillEditForm, this.actor, { event: event }, skill);
     }
     _onShowEditSkill(event) {
         event.preventDefault();
         const skill = helpers_1.Helpers.listItemId(event);
-        new SkillEditForm_1.SkillEditForm(this.actor, skill, { event: event }).render(true);
+        // new SkillEditForm(this.actor, skill, { event: event }).render(true);
+        this._showSkillEditForm(SkillEditForm_1.SkillEditForm, this.actor, { event: event }, skill);
     }
     _onShowImportCharacter(event) {
         event.preventDefault();
@@ -2554,7 +2584,6 @@ class SR5ActorSheet extends ActorSheet {
     }
 }
 exports.SR5ActorSheet = SR5ActorSheet;
-
 },{"../apps/chummer-import-form":19,"../apps/skills/KnowledgeSkillEditForm":22,"../apps/skills/LanguageSkillEditForm":23,"../apps/skills/SkillEditForm":24,"../helpers":37}],18:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -2913,7 +2942,6 @@ class BaseActorPrep {
     }
 }
 exports.BaseActorPrep = BaseActorPrep;
-
 },{"../../helpers":37,"../../item/SR5ItemDataWrapper":40,"../../parts/PartsList":48}],19:[function(require,module,exports){
 "use strict";
 
@@ -3902,7 +3930,6 @@ class ShadowrunItemDialog extends Dialog {
     }
 }
 exports.ShadowrunItemDialog = ShadowrunItemDialog;
-
 },{"../../helpers":37}],21:[function(require,module,exports){
 "use strict";
 
@@ -4072,8 +4099,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.KnowledgeSkillEditForm = void 0;
 const LanguageSkillEditForm_1 = require("./LanguageSkillEditForm");
 class KnowledgeSkillEditForm extends LanguageSkillEditForm_1.LanguageSkillEditForm {
-    constructor(actor, skillId, category, options) {
-        super(actor, skillId, options);
+    constructor(actor, options, skillId, category) {
+        super(actor, options, skillId);
         this.category = category;
     }
     _updateString() {
@@ -4081,7 +4108,6 @@ class KnowledgeSkillEditForm extends LanguageSkillEditForm_1.LanguageSkillEditFo
     }
 }
 exports.KnowledgeSkillEditForm = KnowledgeSkillEditForm;
-
 },{"./LanguageSkillEditForm":23}],23:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4105,7 +4131,6 @@ class LanguageSkillEditForm extends SkillEditForm_1.SkillEditForm {
     }
 }
 exports.LanguageSkillEditForm = LanguageSkillEditForm;
-
 },{"./SkillEditForm":24}],24:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -4120,7 +4145,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SkillEditForm = void 0;
 class SkillEditForm extends BaseEntitySheet {
-    constructor(actor, skillId, options) {
+    constructor(actor, options, skillId) {
         super(actor, options);
         this.skillId = skillId;
     }
@@ -4263,7 +4288,6 @@ class SkillEditForm extends BaseEntitySheet {
     }
 }
 exports.SkillEditForm = SkillEditForm;
-
 },{}],25:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4300,7 +4324,6 @@ exports.measureDistance = function (p0, p1, { gridSpaces = true } = {}) {
     }
     return (nStraight + nDiagonal) * canvas.scene.data.gridDistance;
 };
-
 },{"./constants":29}],26:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -4407,7 +4430,6 @@ exports.addRollListeners = (app, html) => {
     if ((item === null || item === void 0 ? void 0 : item.hasRoll) && app.isRoll)
         $(html).find('.card-description').hide();
 };
-
 },{"./actor/SR5Actor":16,"./constants":29,"./item/SR5Item":39,"./parts/PartsList":48,"./template":51}],27:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -4507,7 +4529,6 @@ exports.shadowrunCombatUpdate = (changes, options) => __awaiter(void 0, void 0, 
         yield combat.update({ turn: 0 });
     }
 });
-
 },{"./constants":29}],28:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4793,7 +4814,6 @@ exports.SR5['programTypes'] = {
     hacking_program: 'SR5.HackingProgram',
     agent: 'SR5.Agent',
 };
-
 },{}],29:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4803,7 +4823,6 @@ exports.FLAGS = {
     ShowGlitchAnimation: 'showGlitchAnimation',
     ShowTokenNameForChatOutput: 'showTokenNameInsteadOfActor'
 };
-
 },{}],30:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4814,7 +4833,6 @@ class DataWrapper {
     }
 }
 exports.DataWrapper = DataWrapper;
-
 },{}],31:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4935,7 +4953,6 @@ exports.registerBasicHelpers = () => {
         return val ? val : undefined;
     });
 };
-
 },{"../helpers":37}],32:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -4957,7 +4974,6 @@ class HandlebarManager {
     }
 }
 exports.HandlebarManager = HandlebarManager;
-
 },{"./BasicHelpers":31,"./HandlebarTemplates":33,"./ItemLineHelpers":34,"./RollAndLabelHelpers":35,"./SkillLineHelpers":36}],33:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -5042,7 +5058,6 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
     ];
     return loadTemplates(templatePaths);
 });
-
 },{}],34:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -5395,7 +5410,6 @@ exports.registerItemLineHelpers = () => {
         }
     });
 };
-
 },{"../item/SR5ItemDataWrapper":40}],35:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -5453,7 +5467,6 @@ exports.registerRollAndLabelHelpers = () => {
         return parts.total;
     });
 };
-
 },{"../parts/PartsList":48}],36:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -5548,7 +5561,6 @@ exports.registerSkillLineHelpers = () => {
         }
     });
 };
-
 },{"../helpers":37}],37:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -5775,7 +5787,6 @@ class Helpers {
     }
 }
 exports.Helpers = Helpers;
-
 },{"./parts/PartsList":48}],38:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -6066,7 +6077,6 @@ exports.ChatData = {
         }
     },
 };
-
 },{"../helpers":37}],39:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -7082,7 +7092,6 @@ class SR5Item extends Item {
     }
 }
 exports.SR5Item = SR5Item;
-
 },{"../apps/dialogs/ShadowrunItemDialog":20,"../chat":26,"../constants":29,"../helpers":37,"../parts/PartsList":48,"../rolls/ShadowrunRoller":49,"./ChatData":38,"./SR5ItemDataWrapper":40}],40:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -7286,7 +7295,6 @@ class SR5ItemDataWrapper extends DataWrapper_1.DataWrapper {
     }
 }
 exports.SR5ItemDataWrapper = SR5ItemDataWrapper;
-
 },{"../dataWrappers/DataWrapper":30}],41:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -7477,7 +7485,7 @@ class SR5ItemSheet extends ItemSheet {
     }
     _eventId(event) {
         event.preventDefault();
-        return event.currentTarget.closest('.item').dataset.itemId;
+        return event.currentTarget.closest('.list-item').dataset.itemId;
     }
     _onOpenSourcePdf(event) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -7566,6 +7574,20 @@ class SR5ItemSheet extends ItemSheet {
     _findActiveList() {
         return $(this.element).find('.tab.active .scroll-area');
     }
+    /** This is needed to circumvent Application.close setting closed state early, due to it's async animation
+     * - The length of the closing animation can't be longer then any await time in the closing cycle
+     * - FormApplication._onSubmit will otherwise set ._state to RENDERED even if the Application window has closed already
+     * - Subsequent render calls then will show the window again, due to it's state
+     *
+     * @private
+     */
+    fixStaleRenderedState() {
+        if (this._state === Application.RENDER_STATES.RENDERED && ui.windows[this.appId] === undefined) {
+            console.warn(`SR5ItemSheet app for ${this.entity.name} is set as RENDERED but has no window registered. Fixing app internal render state. This is a known bug.`);
+            // Hotfixing instead of this.close() since FormApplication.close() expects form elements, which don't exist anymore.
+            this._state = Application.RENDER_STATES.CLOSED;
+        }
+    }
     /**
      * @private
      */
@@ -7574,6 +7596,8 @@ class SR5ItemSheet extends ItemSheet {
             _render: { get: () => super._render }
         });
         return __awaiter(this, void 0, void 0, function* () {
+            // NOTE: This is for a timing bug. See function doc for code removal. Good luck, there be dragons here. - taM
+            this.fixStaleRenderedState();
             this._saveScrollPositions();
             yield _super._render.call(this, force, options);
             this._restoreScrollPositions();
@@ -7599,7 +7623,6 @@ class SR5ItemSheet extends ItemSheet {
     }
 }
 exports.SR5ItemSheet = SR5ItemSheet;
-
 },{"../helpers":37}],42:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -7748,7 +7771,6 @@ function rollItemMacro(itemName) {
     return item.postCard();
 }
 HandlebarManager_1.HandlebarManager.registerHelpers();
-
 },{"./actor/SR5Actor":16,"./actor/SR5ActorSheet":17,"./apps/gmtools/OverwatchScoreTracker":21,"./canvas":25,"./chat":26,"./combat":27,"./config":28,"./constants":29,"./handlebars/HandlebarManager":32,"./helpers":37,"./item/SR5Item":39,"./item/SR5ItemSheet":41,"./migrator/Migrator":43,"./rolls/ShadowrunRoller":49,"./settings":50}],43:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -7894,7 +7916,6 @@ let Migrator = /** @class */ (() => {
     return Migrator;
 })();
 exports.Migrator = Migrator;
-
 },{"./VersionMigration":44,"./versions/LegacyMigration":45,"./versions/Version0_6_10":46,"./versions/Version0_6_5":47}],44:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -8327,7 +8348,6 @@ let VersionMigration = /** @class */ (() => {
     return VersionMigration;
 })();
 exports.VersionMigration = VersionMigration;
-
 },{}],45:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -8557,7 +8577,6 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
     }
 }
 exports.LegacyMigration = LegacyMigration;
-
 },{"../VersionMigration":44}],46:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -8618,7 +8637,6 @@ class Version0_6_10 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_6_10 = Version0_6_10;
-
 },{"../VersionMigration":44}],47:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -8669,7 +8687,6 @@ class Version0_6_5 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_6_5 = Version0_6_5;
-
 },{"../VersionMigration":44}],48:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -8778,7 +8795,6 @@ class PartsList {
     }
 }
 exports.PartsList = PartsList;
-
 },{}],49:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -9058,7 +9074,6 @@ class ShadowrunRoller {
     }
 }
 exports.ShadowrunRoller = ShadowrunRoller;
-
 },{"../chat":26,"../constants":29,"../helpers":37,"../parts/PartsList":48}],50:[function(require,module,exports){
 "use strict";
 // game settings for shadowrun 5e
@@ -9129,7 +9144,6 @@ exports.registerSystemSettings = () => {
         default: true
     });
 };
-
 },{"./constants":29,"./migrator/VersionMigration":44}],51:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -9221,7 +9235,6 @@ class Template extends MeasuredTemplate {
     }
 }
 exports.default = Template;
-
 },{}]},{},[42])
 
 //# sourceMappingURL=bundle.js.map
