@@ -184,7 +184,7 @@ export class SR5ItemSheet extends ItemSheet {
 
     _eventId(event) {
         event.preventDefault();
-        return event.currentTarget.closest('.item').dataset.itemId;
+        return event.currentTarget.closest('.list-item').dataset.itemId;
     }
 
     async _onOpenSourcePdf(event) {
