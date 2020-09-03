@@ -2724,7 +2724,11 @@ class BaseActorPrep {
             if (typeof attribute.mod === 'object') {
                 attribute.mod = new PartsList_1.PartsList(attribute.mod).list;
             }
-            attribute.mod = PartsList_1.PartsList.AddUniquePart(attribute.mod, 'SR5.Temporary', (_a = attribute.temp) !== null && _a !== void 0 ? _a : 0);
+            const parts = new PartsList_1.PartsList(attribute.mod);
+            parts.addUniquePart('SR5.Temporary', (_a = attribute.temp) !== null && _a !== void 0 ? _a : 0);
+            // TODO legacy from previous sheet
+            parts.removePart('Temporary');
+            attribute.mod = parts.list;
             helpers_1.Helpers.calcTotal(attribute);
             // add labels
             attribute.label = CONFIG.SR5.attributes[key];

@@ -181,7 +181,13 @@ export class BaseActorPrep {
             if (typeof attribute.mod === 'object') {
                 attribute.mod = new PartsList(attribute.mod).list;
             }
-            attribute.mod = PartsList.AddUniquePart(attribute.mod, 'SR5.Temporary', attribute.temp ?? 0);
+            const parts = new PartsList(attribute.mod);
+
+            parts.addUniquePart('SR5.Temporary', attribute.temp ?? 0);
+            // TODO legacy from previous sheet
+            parts.removePart('Temporary');
+
+            attribute.mod = parts.list;
             Helpers.calcTotal(attribute);
             // add labels
             attribute.label = CONFIG.SR5.attributes[key];
