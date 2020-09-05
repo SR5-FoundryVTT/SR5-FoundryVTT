@@ -34,6 +34,16 @@
                 {{> 'systems/shadowrun5e/dist/templates/actor/parts/Movement.html' }}
                 {{> 'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html' }}
             </div>
+            <div class="attributes">
+                <div class="attribute">
+                    {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
+                            name=(localize "SR5.AttrEdge")
+                            value=data.attributes.edge.uses
+                            max=data.attributes.edge.value
+                            id="edge"
+                    }}
+                </div>
+            </div>
         </div>
     </header>
     <div class="attributes no-border">
@@ -87,7 +97,7 @@
     </nav>
     <section class="sheetbody">
         {{> "systems/shadowrun5e/dist/templates/actor/tabs/ActionsTab.html"}}
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/SkillsTab.html"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/spirit/SpiritSkillsTab.html"}}
         {{> "systems/shadowrun5e/dist/templates/actor/tabs/MagicTab.html"}}
         {{> "systems/shadowrun5e/dist/templates/actor/tabs/BioTab.html"}}
         {{> "systems/shadowrun5e/dist/templates/actor/tabs/MiscTab.html"}}

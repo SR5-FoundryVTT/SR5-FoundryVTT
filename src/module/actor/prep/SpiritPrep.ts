@@ -1,7 +1,6 @@
 import { BaseActorPrep } from './BaseActorPrep';
 import SpiritActorData = Shadowrun.SpiritActorData;
 import SR5SpiritType = Shadowrun.SR5SpiritType;
-import { ItemPrep } from './functions/ItemPrep';
 import { SkillsPrep } from './functions/SkillsPrep';
 import { AttributesPrep } from './functions/AttributesPrep';
 import { LimitsPrep } from './functions/LimitsPrep';
@@ -11,17 +10,19 @@ import { WoundsPrep } from './functions/WoundsPrep';
 import { ModifiersPrep } from './functions/ModifiersPrep';
 import { InitiativePrep } from './functions/InitiativePrep';
 import SpiritType = Shadowrun.SpiritType;
+import { Helpers } from '../../helpers';
 
 export class SpiritPrep extends BaseActorPrep<SR5SpiritType, SpiritActorData> {
     prepare() {
         ModifiersPrep.prepareModifiers(this.data);
-        ItemPrep.prepareArmor(this.data, this.items);
 
         SpiritPrep.prepareSpiritBaseData(this.data);
 
         SkillsPrep.prepareSkills(this.data);
         AttributesPrep.prepareAttributes(this.data);
         LimitsPrep.prepareLimits(this.data);
+
+        SpiritPrep.prepareSpiritArmor(this.data);
 
         ConditionMonitorsPrep.prepareStun(this.data);
         ConditionMonitorsPrep.preparePhysical(this.data);
@@ -57,6 +58,12 @@ export class SpiritPrep extends BaseActorPrep<SR5SpiritType, SpiritActorData> {
             initiative.astral.base.base = force * 2 + overrides.astral_init + Number(modifiers['astral_initiative_dice']);
             initiative.astral.dice.base = 3;
         }
+    }
+
+    static prepareSpiritArmor(data: SpiritActorData) {
+        const { armor, attributes } = data;
+        armor.base = (attributes.essence.value ?? 0) * 2;
+        armor.value = Helpers.calcTotal(armor);
     }
 
     /**
@@ -104,6 +111,7 @@ export class SpiritPrep extends BaseActorPrep<SR5SpiritType, SpiritActorData> {
      */
     static getSpiritStatModifiers(spiritType: SpiritType) {
         const overrides = {
+            // value of 0 for attribute makes it equal to the Force
             attributes: {
                 body: 0,
                 agility: 0,
@@ -114,9 +122,12 @@ export class SpiritPrep extends BaseActorPrep<SR5SpiritType, SpiritActorData> {
                 intuition: 0,
                 charisma: 0,
                 magic: 0,
+                essence: 0,
             },
+            // modifiers for after the Force x 2 calculation
             init: 0,
             astral_init: 0,
+            // skills are all set to Force
             skills: [] as string[],
         };
         switch (spiritType) {

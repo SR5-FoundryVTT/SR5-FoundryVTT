@@ -10,6 +10,8 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/tabs/SkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/SocialTab.html',
 
+        'systems/shadowrun5e/dist/templates/actor/tabs/spirit/SpiritSkillsTab.html',
+
         // uncategorized lists
         'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html',
         'systems/shadowrun5e/dist/templates/actor/parts/Movement.html',
@@ -23,6 +25,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/parts/magic/AdeptPowerList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/magic/SpellList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/magic/SpellAndAdeptPowerList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/magic/SpiritOptions.html',
 
         // matrix
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/ProgramList.html',

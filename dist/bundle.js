@@ -2649,7 +2649,6 @@ exports.CharacterPrep = CharacterPrep;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpiritPrep = void 0;
 const BaseActorPrep_1 = require("./BaseActorPrep");
-const ItemPrep_1 = require("./functions/ItemPrep");
 const SkillsPrep_1 = require("./functions/SkillsPrep");
 const AttributesPrep_1 = require("./functions/AttributesPrep");
 const LimitsPrep_1 = require("./functions/LimitsPrep");
@@ -2658,14 +2657,15 @@ const MovementPrep_1 = require("./functions/MovementPrep");
 const WoundsPrep_1 = require("./functions/WoundsPrep");
 const ModifiersPrep_1 = require("./functions/ModifiersPrep");
 const InitiativePrep_1 = require("./functions/InitiativePrep");
+const helpers_1 = require("../../helpers");
 class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
     prepare() {
         ModifiersPrep_1.ModifiersPrep.prepareModifiers(this.data);
-        ItemPrep_1.ItemPrep.prepareArmor(this.data, this.items);
         SpiritPrep.prepareSpiritBaseData(this.data);
         SkillsPrep_1.SkillsPrep.prepareSkills(this.data);
         AttributesPrep_1.AttributesPrep.prepareAttributes(this.data);
         LimitsPrep_1.LimitsPrep.prepareLimits(this.data);
+        SpiritPrep.prepareSpiritArmor(this.data);
         ConditionMonitorsPrep_1.ConditionMonitorsPrep.prepareStun(this.data);
         ConditionMonitorsPrep_1.ConditionMonitorsPrep.preparePhysical(this.data);
         MovementPrep_1.MovementPrep.prepareMovement(this.data);
@@ -2676,7 +2676,7 @@ class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
     static prepareSpiritBaseData(data) {
         const overrides = this.getSpiritStatModifiers(data.spiritType);
         if (overrides) {
-            const { attributes, skills, initiative, force, modifiers } = data;
+            const { attributes, skills, initiative, force, modifiers, armor } = data;
             // set the base of attributes to the provided value
             for (const [attId, value] of Object.entries(overrides.attributes)) {
                 if (attributes[attId] !== undefined) {
@@ -2692,6 +2692,12 @@ class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
             initiative.astral.base.base = force * 2 + overrides.astral_init + Number(modifiers['astral_initiative_dice']);
             initiative.astral.dice.base = 3;
         }
+    }
+    static prepareSpiritArmor(data) {
+        var _a;
+        const { armor, attributes } = data;
+        armor.base = ((_a = attributes.essence.value) !== null && _a !== void 0 ? _a : 0) * 2;
+        armor.value = helpers_1.Helpers.calcTotal(armor);
     }
     /**
     // base types
@@ -2738,6 +2744,7 @@ class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
      */
     static getSpiritStatModifiers(spiritType) {
         const overrides = {
+            // value of 0 for attribute makes it equal to the Force
             attributes: {
                 body: 0,
                 agility: 0,
@@ -2748,9 +2755,12 @@ class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
                 intuition: 0,
                 charisma: 0,
                 magic: 0,
+                essence: 0,
             },
+            // modifiers for after the Force x 2 calculation
             init: 0,
             astral_init: 0,
+            // skills are all set to Force
             skills: [],
         };
         switch (spiritType) {
@@ -2832,7 +2842,7 @@ class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
     }
 }
 exports.SpiritPrep = SpiritPrep;
-},{"./BaseActorPrep":19,"./functions/AttributesPrep":22,"./functions/ConditionMonitorsPrep":23,"./functions/InitiativePrep":24,"./functions/ItemPrep":25,"./functions/LimitsPrep":26,"./functions/ModifiersPrep":28,"./functions/MovementPrep":29,"./functions/SkillsPrep":30,"./functions/WoundsPrep":31}],22:[function(require,module,exports){
+},{"../../helpers":50,"./BaseActorPrep":19,"./functions/AttributesPrep":22,"./functions/ConditionMonitorsPrep":23,"./functions/InitiativePrep":24,"./functions/LimitsPrep":26,"./functions/ModifiersPrep":28,"./functions/MovementPrep":29,"./functions/SkillsPrep":30,"./functions/WoundsPrep":31}],22:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AttributesPrep = void 0;
@@ -5343,6 +5353,7 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/dist/templates/actor/tabs/MiscTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/SkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/SocialTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/spirit/SpiritSkillsTab.html',
         // uncategorized lists
         'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html',
         'systems/shadowrun5e/dist/templates/actor/parts/Movement.html',
@@ -5355,6 +5366,7 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/dist/templates/actor/parts/magic/AdeptPowerList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/magic/SpellList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/magic/SpellAndAdeptPowerList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/magic/SpiritOptions.html',
         // matrix
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/ProgramList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/ComplexFormList.html',

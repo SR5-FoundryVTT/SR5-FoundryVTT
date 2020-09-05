@@ -155,6 +155,8 @@
     flex-flow: row;
     flex-wrap: nowrap;
     justify-content: space-between; }
+    .sr5.actor .attributes.center {
+      justify-content: center; }
     .sr5.actor .attributes.no-border {
       border-top: none;
       border-bottom: none; }
@@ -180,6 +182,8 @@
       min-width: 4em; }
       .sr5.actor .attributes .attribute.no-border {
         border-right: none; }
+      .sr5.actor .attributes .attribute.no-grow {
+        flex-grow: 0; }
       .sr5.actor .attributes .attribute:hover .attribute-input-container.row {
         visibility: visible; }
       .sr5.actor .attributes .attribute.flex0 {
