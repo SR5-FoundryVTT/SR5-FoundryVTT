@@ -5393,6 +5393,7 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/dist/templates/actor/tabs/MiscTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/SkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/SocialTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/SpellsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/CritterPowersTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/spirit/SpiritSkillsTab.html',
         // uncategorized lists
