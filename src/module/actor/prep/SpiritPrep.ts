@@ -67,47 +67,7 @@ export class SpiritPrep extends BaseActorPrep<SR5SpiritType, SpiritActorData> {
     }
 
     /**
-    // base types
-    air: 'SR5.Spirit.Air',
-    beasts: 'SR5.Spirit.Beasts',
-    earth: 'SR5.Spirit.Earth',
-    fire: 'SR5.Spirit.Fire',
-    guardian: 'SR5.Spirit.Guardian',
-    guidance: 'SR5.Spirit.Guidance',
-    man: 'SR5.Spirit.Man',
-    plant: 'SR5.Spirit.Plant',
-    task: 'SR5.Spirit.Task',
-    water: 'SR5.Spirit.Water',
-
-    // toxic types
-    toxic_air: 'SR5.Spirit.ToxicAir',
-    toxic_beasts: 'SR5.Spirit.ToxicBeasts',
-    toxic_earth: 'SR5.Spirit.ToxicEarth',
-    toxic_fire: 'SR5.Spirit.ToxicFire',
-    toxic_man: 'SR5.Spirit.ToxicMan',
-    toxic_water: 'SR5.Spirit.ToxicWater',
-
-    // blood types
-    blood: 'SR5.Spirit.Blood',
-
-    // shadow types
-    muse: 'SR5.Spirit.Muse',
-    nightmare: 'SR5.Spirit.Nightmare',
-    shade: 'SR5.Spirit.Shade',
-    succubus: 'SR5.Spirit.Succubus',
-    wraith: 'SR5.Spirit.Wraith',
-
-    // shedim types
-    shedim: 'SR5.Spirit.Shedim',
-    master_shedim: 'SR5.Spirit.MasterShedim',
-
-    // insect types
-    caretaker: 'SR5.Spirit.Caretaker',
-    nymph: 'SR5.Spirit.Nymph',
-    scout: 'SR5.Spirit.Scout',
-    soldier: 'SR5.Spirit.Soldier',
-    worker: 'SR5.Spirit.Worker',
-    queen: 'SR5.Spirit.Queen',
+     * get the attribute and initiative modifiers and skills
      */
     static getSpiritStatModifiers(spiritType: SpiritType) {
         const overrides = {
@@ -203,6 +163,175 @@ export class SpiritPrep extends BaseActorPrep<SR5SpiritType, SpiritActorData> {
                 overrides.attributes.reaction = 2;
                 overrides.init = 2;
                 overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'unarmed_combat');
+                break;
+
+            case 'toxic_air':
+                overrides.attributes.body = -2;
+                overrides.attributes.agility = 3;
+                overrides.attributes.reaction = 4;
+                overrides.attributes.strength = -3;
+                overrides.init = 4;
+                overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'running', 'unarmed_combat');
+                break;
+            case 'toxic_beasts':
+                overrides.attributes.body = 2;
+                overrides.attributes.agility = 1;
+                overrides.attributes.strength = 2;
+                overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'gymnastics', 'perception', 'running', 'unarmed_combat');
+                break;
+            case 'toxic_earth':
+                overrides.attributes.body = 4;
+                overrides.attributes.agility = -2;
+                overrides.attributes.reaction = -1;
+                overrides.attributes.strength = 4;
+                overrides.attributes.logic = -1;
+                overrides.init = -1;
+                overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'unarmed_combat');
+                break;
+            case 'toxic_fire':
+                overrides.attributes.body = 1;
+                overrides.attributes.agility = 2;
+                overrides.attributes.reaction = 3;
+                overrides.attributes.strength = -2;
+                overrides.attributes.intuition = 1;
+                overrides.init = 3;
+                overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'flight', 'unarmed_combat');
+                break;
+            case 'toxic_man':
+                overrides.attributes.reaction = 2;
+                overrides.attributes.strength = -2;
+                overrides.attributes.intuition = 1;
+                overrides.init = 2;
+                overrides.skills.push('assensing', 'astral_combat', 'perception', 'spell_casting', 'unarmed_combat');
+                break;
+            case 'toxic_water':
+                overrides.attributes.body = 1;
+                overrides.attributes.agility = 1;
+                overrides.attributes.reaction = 2;
+                overrides.init = 2;
+                overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'unarmed_combat');
+                break;
+
+            case 'blood':
+                overrides.attributes.body = 2;
+                overrides.attributes.agility = 2;
+                overrides.attributes.strength = 2;
+                overrides.attributes.logic = -1;
+                overrides.skills.push('assensing', 'astral_combat', 'perception', 'running', 'unarmed_combat');
+                break;
+
+            case 'muse':
+                overrides.attributes.agility = 3;
+                overrides.attributes.reaction = 2;
+                overrides.attributes.willpower = 1;
+                overrides.init = 3;
+                overrides.skills.push('assensing', 'astral_combat', 'con', 'gymnastics', 'intimidation', 'perception', 'unarmed_combat');
+                break;
+            case 'nightmare':
+                overrides.attributes.agility = 3;
+                overrides.attributes.reaction = 2;
+                overrides.attributes.willpower = 1;
+                overrides.attributes.intuition = 1;
+                overrides.attributes.charisma = 2;
+                overrides.init = 3;
+                overrides.skills.push('assensing', 'astral_combat', 'con', 'gymnastics', 'intimidation', 'perception', 'unarmed_combat');
+                break;
+            case 'shade':
+                overrides.attributes.agility = 3;
+                overrides.attributes.reaction = 2;
+                overrides.attributes.willpower = 1;
+                overrides.attributes.intuition = 1;
+                overrides.attributes.charisma = 2;
+                overrides.init = 3;
+                overrides.skills.push('assensing', 'astral_combat', 'con', 'gymnastics', 'intimidation', 'perception', 'unarmed_combat');
+                break;
+            case 'succubus':
+                overrides.attributes.agility = 3;
+                overrides.attributes.reaction = 2;
+                overrides.attributes.willpower = 1;
+                overrides.attributes.intuition = 1;
+                overrides.attributes.charisma = 2;
+                overrides.init = 3;
+                overrides.skills.push('assensing', 'astral_combat', 'con', 'gymnastics', 'intimidation', 'perception', 'unarmed_combat');
+                break;
+            case 'wraith':
+                overrides.attributes.agility = 3;
+                overrides.attributes.reaction = 2;
+                overrides.attributes.willpower = 1;
+                overrides.attributes.intuition = 1;
+                overrides.attributes.charisma = 2;
+                overrides.init = 3;
+                overrides.skills.push('assensing', 'astral_combat', 'con', 'gymnastics', 'intimidation', 'perception', 'unarmed_combat');
+                break;
+
+            case 'shedim':
+                overrides.attributes.reaction = 2;
+                overrides.attributes.strength = 1;
+                overrides.init = 2;
+                overrides.skills.push('assensing', 'astral_combat', 'perception', 'unarmed_combat');
+                break;
+            case 'master_shedim':
+                overrides.attributes.reaction = 2;
+                overrides.attributes.strength = 1;
+                overrides.attributes.logic = 1;
+                overrides.attributes.intuition = 1;
+                overrides.init = 3;
+                overrides.skills.push('assensing', 'astral_combat', 'counterspelling', 'perception', 'spellcasting', 'unarmed_combat');
+                break;
+
+            // insect
+            case 'caretaker':
+                overrides.attributes.agility = 1;
+                overrides.attributes.reaction = 1;
+                overrides.init = 1;
+                overrides.skills.push('assensing', 'astral_combat', 'leadership', 'perception', 'unarmed_combat');
+                break;
+            case 'nymph':
+                overrides.attributes.body = 1;
+                overrides.attributes.reaction = 3;
+                overrides.attributes.strength = 1;
+                overrides.init = 3;
+                overrides.skills.push('assensing', 'astral_combat', 'perception', 'gymnastics', 'spellcasting', 'unarmed_combat');
+                break;
+            case 'scout':
+                overrides.attributes.agility = 2;
+                overrides.attributes.reaction = 2;
+                overrides.init = 2;
+                overrides.skills.push('assensing', 'astral_combat', 'perception', 'gymnastics', 'sneaking', 'unarmed_combat');
+                break;
+            case 'soldier':
+                overrides.attributes.body = 3;
+                overrides.attributes.agility = 1;
+                overrides.attributes.reaction = 1;
+                overrides.attributes.strength = 3;
+                overrides.init = 1;
+                overrides.skills.push('assensing', 'astral_combat', 'counterspelling', 'exotic_range', 'gymnastics', 'perception', 'unarmed_combat');
+                break;
+            case 'worker':
+                overrides.attributes.strength = 1;
+                overrides.skills.push('assensing', 'astral_combat', 'perception', 'unarmed_combat');
+                break;
+            case 'queen':
+                overrides.attributes.body = 5;
+                overrides.attributes.agility = 3;
+                overrides.attributes.reaction = 4;
+                overrides.attributes.strength = 5;
+                overrides.attributes.willpower = 1;
+                overrides.attributes.logic = 1;
+                overrides.attributes.intuition = 1;
+                overrides.init = 5;
+                overrides.skills.push(
+                    'assensing',
+                    'astral_combat',
+                    'con',
+                    'counterspelling',
+                    'gymnastics',
+                    'leadership',
+                    'negotiation',
+                    'perception',
+                    'spellcasting',
+                    'unarmed_combat',
+                );
                 break;
         }
         return overrides;

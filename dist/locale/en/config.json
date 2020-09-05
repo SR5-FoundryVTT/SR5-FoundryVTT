@@ -583,12 +583,12 @@
             "Task": "Task",
             "Water": "Water",
 
-            "ToxicAir": "Toxic Air",
-            "ToxicBeasts": "Toxic Beasts",
-            "ToxicEarth": "Toxic Earth",
-            "ToxicFire": "Toxic Fire",
-            "ToxicMan": "Toxic Man",
-            "ToxicWater": "Toxic Water",
+            "ToxicAir": "Noxious",
+            "ToxicBeasts": "Abomination",
+            "ToxicEarth": "Barren",
+            "ToxicFire": "Nuclear",
+            "ToxicMan": "Plague",
+            "ToxicWater": "Sludge",
 
             "Blood": "Blood",
 
