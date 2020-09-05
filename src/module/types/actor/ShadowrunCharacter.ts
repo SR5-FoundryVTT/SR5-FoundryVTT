@@ -10,11 +10,12 @@ declare namespace Shadowrun {
         skills: string;
     };
 
-    export type SR5ActorType = ActorData & {
+    export type SR5ActorType = SR5SpiritType | SR5CharacterType;
+
+    export type SR5ActorBase = ActorData & {
         name: string;
         _id: string;
         folder: string | null;
-        type: string;
         data: SR5ActorData;
         items: Collection<Item>;
         flags: object;
@@ -23,7 +24,21 @@ declare namespace Shadowrun {
         };
     };
 
-    export type SR5ActorData = ActorData & {
+    export type SR5SpiritType = SR5ActorBase & {
+        data: SpiritActorData;
+        type: 'spirit';
+    };
+
+    export type SR5CharacterType = SR5ActorBase & {
+        data: CharacterActorData;
+        type: 'character';
+    }
+
+    export type SR5ActorData = SpiritActorData | CharacterActorData;
+
+    export type SpiritActorData = MagicActorData & {
+        spiritType: SpiritType;
+        force: number;
         attributes: Attributes;
         limits: Limits;
         skills: {
@@ -33,8 +48,23 @@ declare namespace Shadowrun {
         };
         track: Tracks;
         movement: Movement;
-        matrix: Matrix;
-        magic: Magic;
+        modifiers: Modifiers;
+        special: SpecialTrait;
+        initiative: Initiative;
+        armor: ActorArmor;
+        wounds: WoundType;
+    }
+
+    export type CharacterActorData = MatrixActorData & MagicActorData & {
+        attributes: Attributes;
+        limits: Limits;
+        skills: {
+            active: Skills;
+            language: KnowledgeSkillList;
+            knowledge: KnowledgeSkills;
+        };
+        track: Tracks;
+        movement: Movement;
         modifiers: Modifiers;
         special: SpecialTrait;
         armor: ActorArmor;
@@ -42,6 +72,14 @@ declare namespace Shadowrun {
         wounds: WoundType;
         recoil_compensation: number;
     };
+
+    export type MagicActorData = {
+        magic: Magic;
+    }
+
+    export type MatrixActorData = {
+        matrix: ActorMatrix;
+    }
 
     export type WoundType = {
         value: number;

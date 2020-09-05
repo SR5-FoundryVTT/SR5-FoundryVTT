@@ -13,9 +13,9 @@ import ModifiableValue = Shadowrun.ModifiableValue;
 import LabelField = Shadowrun.LabelField;
 import LimitField = Shadowrun.LimitField;
 import { SYSTEM_NAME } from '../constants';
-import { BaseActorPrep } from './prep/BaseActorPrep';
 import SR5ActorType = Shadowrun.SR5ActorType;
 import { PartsList } from '../parts/PartsList';
+import { ActorPrepFactory } from './prep/ActorPrepFactory';
 import DamageData = Shadowrun.DamageData;
 import DamageElement = Shadowrun.DamageElement;
 import EdgeAttributeField = Shadowrun.EdgeAttributeField;
@@ -52,23 +52,10 @@ export class SR5Actor extends Actor {
         super.prepareData();
 
         const actorData = this.data as SR5ActorType;
-        const prepper = new BaseActorPrep(actorData);
-        prepper.prepareModifiers();
-        prepper.prepareArmor();
-        prepper.prepareCyberware();
-        prepper.prepareSkills();
-        prepper.prepareAttributes();
-        if (actorData.type !== 'spirit') {
-            prepper.prepareMatrix();
+        const prepper = ActorPrepFactory.Create(actorData);
+        if (prepper) {
+            prepper.prepare();
         }
-        prepper.prepareLimits();
-        prepper.prepareConditionMonitors();
-        prepper.prepareMovement();
-        prepper.prepareWounds();
-        prepper.prepareInitiative();
-
-        const data = actorData.data;
-        if (data.magic.drain && !data.magic.drain.mod) data.magic.drain.mod = [];
     }
 
     getModifier(modifierName: string): number | undefined {
