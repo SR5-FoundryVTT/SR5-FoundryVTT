@@ -147,6 +147,18 @@ export const ChatData = {
         props.push(Helpers.label(data.type));
     },
 
+    critter_power: (data, labels, props) => {
+        // power type
+        props.push(game.i18n.localize(CONFIG.SR5.critterPower.types[data.powerType]));
+        // duration
+        props.push(game.i18n.localize(CONFIG.SR5.critterPower.durations[data.duration]));
+        // range
+        props.push(game.i18n.localize(CONFIG.SR5.critterPower.ranges[data.range]));
+
+        // add action data
+        ChatData.action(data, labels, props);
+    },
+
     // add properties for spell data, follow order in book
     spell: (data, labels, props) => {
         // first category and type

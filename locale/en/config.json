@@ -560,7 +560,8 @@
 
     "SR5.Labels": {
         "ActorSheet": {
-            "SpiritConfiguration": "Spirit Configuration"
+            "SpiritConfiguration": "Spirit Configuration",
+            "CritterPowers": "Critter Powers"
         }
     },
 

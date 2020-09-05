@@ -2017,7 +2017,7 @@ class SR5ActorSheet extends ActorSheet {
                 },
             },
         };
-        let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs] = data.items.reduce((arr, item) => {
+        let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs, critter_powers] = data.items.reduce((arr, item) => {
             item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
             if (item.type === 'spell')
                 arr[1].push(item);
@@ -2037,10 +2037,12 @@ class SR5ActorSheet extends ActorSheet {
                 arr[8].push(item);
             else if (item.type === 'program')
                 arr[9].push(item);
+            else if (item.type === 'critter_power')
+                arr[10].push(item);
             else if (Object.keys(inventory).includes(item.type))
                 arr[0].push(item);
             return arr;
-        }, [[], [], [], [], [], [], [], [], [], []]);
+        }, [[], [], [], [], [], [], [], [], [], [], []]);
         const sortByName = (i1, i2) => {
             if (i1.name > i2.name)
                 return 1;
@@ -2071,6 +2073,7 @@ class SR5ActorSheet extends ActorSheet {
         lifestyles.sort(sortByName);
         sins.sort(sortByName);
         programs.sort(sortByEquipped);
+        critter_powers.sort(sortByName);
         items.forEach((item) => {
             inventory[item.type].items.push(item);
         });
@@ -2085,6 +2088,7 @@ class SR5ActorSheet extends ActorSheet {
         data.contacts = contacts;
         data.sins = sins;
         data.programs = programs;
+        data.critter_powers = critter_powers;
         qualities.sort((a, b) => {
             if (a.data.type === 'positive' && b.data.type === 'negative')
                 return -1;
@@ -5389,6 +5393,7 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/dist/templates/actor/tabs/MiscTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/SkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/SocialTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/CritterPowersTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/spirit/SpiritSkillsTab.html',
         // uncategorized lists
         'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html',
@@ -5516,6 +5521,9 @@ exports.registerItemLineHelpers = () => {
             case 'cyberware':
                 addIcon.title = game.i18n.localize('SR5.CreateItemCyberware');
                 return [addIcon];
+            case 'critter_power':
+                addIcon.title = game.i18n.localize('SR5.CreateItemCritterPower');
+                return [addIcon];
             default:
                 return [];
         }
@@ -5616,6 +5624,24 @@ exports.registerItemLineHelpers = () => {
                         },
                     },
                 ];
+            case 'critter_power':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.CritterPower.Type'),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.CritterPower.Range'),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.CritterPower.Duration'),
+                        },
+                    },
+                ];
             case 'quality':
                 return [
                     {
@@ -5631,7 +5657,7 @@ exports.registerItemLineHelpers = () => {
         }
     });
     Handlebars.registerHelper('ItemRightSide', function (item) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t;
         const wrapper = new SR5ItemDataWrapper_1.SR5ItemDataWrapper(item);
         const qtyInput = {
             input: {
@@ -5745,16 +5771,34 @@ exports.registerItemLineHelpers = () => {
                         },
                     },
                 ];
-            case 'complex_form':
+            case 'critter_power':
                 return [
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.matrixTargets[(_p = item.data.target) !== null && _p !== void 0 ? _p : '']),
+                            text: game.i18n.localize(CONFIG.SR5.critterPower.types[(_p = item.data.powerType) !== null && _p !== void 0 ? _p : '']),
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.durations[(_q = item.data.duration) !== null && _q !== void 0 ? _q : '']),
+                            text: game.i18n.localize(CONFIG.SR5.critterPower.durations[(_q = item.data.duration) !== null && _q !== void 0 ? _q : '']),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize(CONFIG.SR5.critterPower.ranges[(_r = item.data.range) !== null && _r !== void 0 ? _r : '']),
+                        },
+                    },
+                ];
+            case 'complex_form':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize(CONFIG.SR5.matrixTargets[(_s = item.data.target) !== null && _s !== void 0 ? _s : '']),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize(CONFIG.SR5.durations[(_t = item.data.duration) !== null && _t !== void 0 ? _t : '']),
                         },
                     },
                     {
@@ -6347,6 +6391,16 @@ exports.ChatData = {
     quality: (data, labels, props) => {
         exports.ChatData.action(data, labels, props);
         props.push(helpers_1.Helpers.label(data.type));
+    },
+    critter_power: (data, labels, props) => {
+        // power type
+        props.push(game.i18n.localize(CONFIG.SR5.critterPower.types[data.powerType]));
+        // duration
+        props.push(game.i18n.localize(CONFIG.SR5.critterPower.durations[data.duration]));
+        // range
+        props.push(game.i18n.localize(CONFIG.SR5.critterPower.ranges[data.range]));
+        // add action data
+        exports.ChatData.action(data, labels, props);
     },
     // add properties for spell data, follow order in book
     spell: (data, labels, props) => {

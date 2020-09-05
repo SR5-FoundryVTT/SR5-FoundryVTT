@@ -60,6 +60,9 @@ export const registerItemLineHelpers = () => {
             case 'cyberware':
                 addIcon.title = game.i18n.localize('SR5.CreateItemCyberware');
                 return [addIcon];
+            case 'critter_power':
+                addIcon.title = game.i18n.localize('SR5.CreateItemCritterPower');
+                return [addIcon];
             default:
                 return [];
         }
@@ -158,6 +161,24 @@ export const registerItemLineHelpers = () => {
                     {
                         text: {
                             text: game.i18n.localize('SR5.Drain'),
+                        },
+                    },
+                ];
+            case 'critter_power':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.CritterPower.Type'),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.CritterPower.Range'),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.CritterPower.Duration'),
                         },
                     },
                 ];
@@ -291,6 +312,24 @@ export const registerItemLineHelpers = () => {
                         },
                     },
                 ];
+            case 'critter_power':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize(CONFIG.SR5.critterPower.types[item.data.powerType ?? '']),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize(CONFIG.SR5.critterPower.durations[item.data.duration ?? '']),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize(CONFIG.SR5.critterPower.ranges[item.data.range ?? '']),
+                        },
+                    },
+                ]
 
             case 'complex_form':
                 return [

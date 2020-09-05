@@ -12,7 +12,7 @@ import MatrixAttribute = Shadowrun.MatrixAttribute;
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditForm instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
 // when opened in succession, causing SkillEditForm to wrongfully overwrite the wrong data.
-let globalSkillAppId:number = -1;
+let globalSkillAppId: number = -1;
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -193,7 +193,7 @@ export class SR5ActorSheet extends ActorSheet {
             },
         };
 
-        let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs] = data.items.reduce(
+        let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs, critter_powers] = data.items.reduce(
             (arr, item) => {
                 item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
                 if (item.type === 'spell') arr[1].push(item);
@@ -205,10 +205,11 @@ export class SR5ActorSheet extends ActorSheet {
                 else if (item.type === 'contact') arr[7].push(item);
                 else if (item.type === 'sin') arr[8].push(item);
                 else if (item.type === 'program') arr[9].push(item);
+                else if (item.type === 'critter_power') arr[10].push(item);
                 else if (Object.keys(inventory).includes(item.type)) arr[0].push(item);
                 return arr;
             },
-            [[], [], [], [], [], [], [], [], [], []],
+            [[], [], [], [], [], [], [], [], [], [], []],
         );
 
         const sortByName = (i1, i2) => {
@@ -234,6 +235,7 @@ export class SR5ActorSheet extends ActorSheet {
         lifestyles.sort(sortByName);
         sins.sort(sortByName);
         programs.sort(sortByEquipped);
+        critter_powers.sort(sortByName);
 
         items.forEach((item) => {
             inventory[item.type].items.push(item);
@@ -250,6 +252,7 @@ export class SR5ActorSheet extends ActorSheet {
         data.contacts = contacts;
         data.sins = sins;
         data.programs = programs;
+        data.critter_powers = critter_powers;
 
         qualities.sort((a, b) => {
             if (a.data.type === 'positive' && b.data.type === 'negative') return -1;
@@ -687,28 +690,35 @@ export class SR5ActorSheet extends ActorSheet {
 
         const skillEditForm = new skillEditFormImplementation(actor, options, ...args);
         globalSkillAppId = skillEditForm.appId;
-        await skillEditForm.render(true)
+        await skillEditForm.render(true);
     }
 
     _onShowEditKnowledgeSkill(event) {
         event.preventDefault();
         const [skill, category] = Helpers.listItemId(event).split('.');
-        this._showSkillEditForm(KnowledgeSkillEditForm, this.actor, {
-            event: event}, skill, category);
+        this._showSkillEditForm(
+            KnowledgeSkillEditForm,
+            this.actor,
+            {
+                event: event,
+            },
+            skill,
+            category,
+        );
     }
 
     _onShowEditLanguageSkill(event) {
         event.preventDefault();
         const skill = Helpers.listItemId(event);
         // new LanguageSkillEditForm(this.actor, skill, { event: event }).render(true);
-        this._showSkillEditForm(LanguageSkillEditForm, this.actor, {event: event}, skill);
+        this._showSkillEditForm(LanguageSkillEditForm, this.actor, { event: event }, skill);
     }
 
     _onShowEditSkill(event) {
         event.preventDefault();
         const skill = Helpers.listItemId(event);
         // new SkillEditForm(this.actor, skill, { event: event }).render(true);
-        this._showSkillEditForm(SkillEditForm, this.actor, {event: event}, skill);
+        this._showSkillEditForm(SkillEditForm, this.actor, { event: event }, skill);
     }
 
     _onShowImportCharacter(event) {
