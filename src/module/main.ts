@@ -13,6 +13,7 @@ import { ShadowrunRoller } from './rolls/ShadowrunRoller';
 import { Migrator } from './migrator/Migrator';
 import { SYSTEM_NAME } from './constants';
 import { HandlebarManager } from './handlebars/HandlebarManager';
+import { SR5NPCSheet } from './actor/SR5NPCSheet';
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -38,6 +39,7 @@ Hooks.once('init', function () {
     // Register sheet application classes
     Actors.unregisterSheet('core', ActorSheet);
     Actors.registerSheet(SYSTEM_NAME, SR5ActorSheet, { makeDefault: true });
+    Actors.registerSheet(SYSTEM_NAME, SR5NPCSheet, { makeDefault: false });
     Items.unregisterSheet('core', ItemSheet);
     Items.registerSheet(SYSTEM_NAME, SR5ItemSheet, { makeDefault: true });
 
