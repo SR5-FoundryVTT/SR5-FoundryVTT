@@ -1,7 +1,8 @@
 {
     "Actor": {
         "types": [
-            "character"
+            "character",
+            "spirit"
         ],
         "templates": {
             "matrix": {
@@ -756,70 +757,76 @@
                         },
                         "interests": {
                             "attribute": "intuition",
-                            "value": {}
+                            "value": []
                         }
                     },
                     "language": {
                         "attribute": "intuition",
-                        "value": {}
+                        "value": []
+                    }
+                },
+                "armor": {
+                    "armor": {
+                        "value": 0,
+                        "mod": 0,
+                        "acid": 0,
+                        "cold": 0,
+                        "fire": 0,
+                        "electricity": 0,
+                        "radiation": 0
+                    }
+                },
+                "magic": {
+                    "magic": {
+                        "attribute": "logic",
+                        "projecting": false,
+                        "drain": {
+                            "value": 0,
+                            "base": 0,
+                            "mod": []
+                        }
+                    }
+                },
+                "movement": {
+                    "movement": {
+                        "walk": {
+                            "value": 1
+                        },
+                        "run": {
+                            "value": 2
+                        },
+                        "sprint": 2,
+                        "swimming": 2
+                    }
+                },
+                "condition_monitors": {
+                    "track": {
+                        "stun": {
+                            "value": 0,
+                            "max": 0
+                        },
+                        "physical": {
+                            "value": 0,
+                            "max": 0,
+                            "overflow": {
+                                "value": 0,
+                                "max": 0
+                            }
+                        }
                     }
                 }
             },
             "common": {
                 "name": "",
                 "metatype": "",
-                "ethnicity": "",
-                "age": "",
-                "sex": "",
-                "height": "",
-                "weight": "",
-                "street_cred": 0,
-                "notoriety": 0,
-                "public_awareness": 0,
                 "special": "mundane",
                 "full_defense_attribute": "willpower",
                 "description": {
                     "value": ""
                 },
-                "karma": {
-                    "value": 0,
-                    "max": 0
-                },
                 "nuyen": 0,
-                "rent": {
-                    "cost": 0,
-                    "locations": []
-                },
-                "movement": {
-                    "walk": {
-                        "value": 1
-                    },
-                    "run": {
-                        "value": 2
-                    },
-                    "sprint": 2,
-                    "swimming": 2
-                },
-                "magic": {
-                    "attribute": "logic",
-                    "projecting": false,
-                    "drain": {
-                        "value": 0,
-                        "base": 0,
-                        "mod": []
-                    }
-                },
                 "wounds": {
                     "value": 0
-                },
-                "armor": {
-                    "value": 0,
-                    "mod": 0,
-                    "acid": 0,
-                    "cold": 0,
-                    "fire": 0,
-                    "electricity": 0,
-                    "radiation": 0
                 },
                 "initiative": {
                     "perception": "meatspace",
@@ -868,22 +875,44 @@
                 "skills",
                 "attributes",
                 "matrix",
-                "limits"
+                "limits",
+                "armor",
+                "magic",
+                "movement",
+                "condition_monitor"
             ],
-            "track": {
-                "stun": {
-                    "value": 0,
-                    "max": 0
-                },
-                "physical": {
-                    "value": 0,
-                    "max": 0,
-                    "overflow": {
-                        "value": 0,
-                        "max": 0
-                    }
-                }
+            "ethnicity": "",
+            "age": "",
+            "sex": "",
+            "height": "",
+            "weight": "",
+            "street_cred": 0,
+            "notoriety": 0,
+            "public_awareness": 0,
+            "karma": {
+                "value": 0,
+                "max": 0
+            },
+            "rent": {
+                "cost": 0,
+                "locations": []
             }
+        },
+        "spirit": {
+            "templates": [
+                "common",
+                "skills",
+                "attributes",
+                "limits",
+                "armor",
+                "magic",
+                "movement",
+                "condition_monitor"
+            ],
+            "services": 0,
+            "bound": false,
+            "force": 0,
+            "spiritType": ""
         }
     },
     "Item": {
