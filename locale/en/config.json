@@ -558,11 +558,54 @@
 
     "CONTROLS.SR5.OverwatchScoreTracker": "Overwatch Score Tracker",
 
+    "SR5.Labels": {
+        "ActorSheet": {
+            "SpiritConfiguration": "Spirit Configuration"
+        }
+    },
+
     "SR5.Spirit": {
         "Force": "Force",
         "Type": "Type",
         "Services": "Services",
-        "Bound": "Bound"
+        "Bound": "Bound",
+        "Types": {
+            "Air": "Air",
+            "Beasts": "Beasts",
+            "Earth": "Earth",
+            "Fire": "Fire",
+            "Guardian": "Guardian",
+            "Guidance": "Guidance",
+            "Man": "Man",
+            "Plant": "Plant",
+            "Task": "Task",
+            "Water": "Water",
+
+            "ToxicAir": "Toxic Air",
+            "ToxicBeasts": "Toxic Beasts",
+            "ToxicEarth": "Toxic Earth",
+            "ToxicFire": "Toxic Fire",
+            "ToxicMan": "Toxic Man",
+            "ToxicWater": "Toxic Water",
+
+            "Blood": "Blood",
+
+            "Muse": "Muse",
+            "Nightmare": "Nightmare",
+            "Shade": "Shade",
+            "Succubus": "Succubus",
+            "Wraith": "Wraith",
+
+            "Shedim": "Shedim",
+            "MasterShedim": "MasterShedim",
+
+            "Caretaker": "Insect Caretaker",
+            "Nymph": "Insect Nymph",
+            "Scout": "Insect Scout",
+            "Soldier": "Insect Soldier",
+            "Worker": "Insect Worker",
+            "Queen": "Insect Queen"
+        }
     },
 
     "SR5.CritterPower": {
