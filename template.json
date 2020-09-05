@@ -923,6 +923,7 @@
             "armor",
             "complex_form",
             "contact",
+            "critter_power",
             "cyberware",
             "device",
             "equipment",
@@ -1122,6 +1123,15 @@
                 "environmental": false,
                 "physical": false
             }
+        },
+        "critter_power": {
+            "templates": [
+                "description",
+                "action"
+            ],
+            "powerType": "",
+            "range": "",
+            "duration": ""
         },
         "complex_form": {
             "templates": [

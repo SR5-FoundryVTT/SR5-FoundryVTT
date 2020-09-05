@@ -61,6 +61,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/item/parts/ammo.html',
         'systems/shadowrun5e/dist/templates/item/parts/modification.html',
         'systems/shadowrun5e/dist/templates/item/parts/program.html',
+        'systems/shadowrun5e/dist/templates/item/parts/critter_power.html',
         'systems/shadowrun5e/dist/templates/rolls/parts/parts-list.html',
 
         // to wrap the bodies of tabs

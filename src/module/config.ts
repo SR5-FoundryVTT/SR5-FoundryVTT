@@ -1,5 +1,24 @@
 export const SR5 = {};
 
+SR5['itemTypes'] = {
+    "action": "SR5.ItemTypes.Action",
+    "adept_power": "SR5.ItemTypes.AdeptPower",
+    "ammo": "SR5.ItemTypes.Ammo",
+    "armor": "SR5.ItemTypes.Armor",
+    "complex_form": "SR5.ItemTypes.ComplexForm",
+    "contact": "SR5.ItemTypes.Contact",
+    "critter_power": "SR5.ItemTypes.CritterPower",
+    "cyberware": "SR5.ItemTypes.Cyberware",
+    "device": "SR5.ItemTypes.Device",
+    "equipment": "SR5.ItemTypes.Equipment",
+    "lifestyle": "SR5.ItemTypes.Lifestyle",
+    "modification": "SR5.ItemTypes.Modification",
+    "quality": "SR5.ItemTypes.Quality",
+    "sin": "SR5.ItemTypes.Sin",
+    "spell": "SR5.ItemTypes.Spell",
+    "weapon": "SR5.ItemTypes.Weapon"
+}
+
 SR5['attributes'] = {
     body: 'SR5.AttrBody',
     agility: 'SR5.AttrAgility',
@@ -313,44 +332,63 @@ SR5['programTypes'] = {
 
 SR5['spiritTypes'] = {
     // base types
-    air: 'SR5.Spirit.Air',
-    beasts: 'SR5.Spirit.Beasts',
-    earth: 'SR5.Spirit.Earth',
-    fire: 'SR5.Spirit.Fire',
-    guardian: 'SR5.Spirit.Guardian',
-    guidance: 'SR5.Spirit.Guidance',
-    man: 'SR5.Spirit.Man',
-    plant: 'SR5.Spirit.Plant',
-    task: 'SR5.Spirit.Task',
-    water: 'SR5.Spirit.Water',
+    air: 'SR5.Spirit.Types.Air',
+    beasts: 'SR5.Spirit.Types.Beasts',
+    earth: 'SR5.Spirit.Types.Earth',
+    fire: 'SR5.Spirit.Types.Fire',
+    guardian: 'SR5.Spirit.Types.Guardian',
+    guidance: 'SR5.Spirit.Types.Guidance',
+    man: 'SR5.Spirit.Types.Man',
+    plant: 'SR5.Spirit.Types.Plant',
+    task: 'SR5.Spirit.Types.Task',
+    water: 'SR5.Spirit.Types.Water',
 
     // toxic types
-    toxic_air: 'SR5.Spirit.ToxicAir',
-    toxic_beasts: 'SR5.Spirit.ToxicBeasts',
-    toxic_earth: 'SR5.Spirit.ToxicEarth',
-    toxic_fire: 'SR5.Spirit.ToxicFire',
-    toxic_man: 'SR5.Spirit.ToxicMan',
-    toxic_water: 'SR5.Spirit.ToxicWater',
+    toxic_air: 'SR5.Spirit.Types.ToxicAir',
+    toxic_beasts: 'SR5.Spirit.Types.ToxicBeasts',
+    toxic_earth: 'SR5.Spirit.Types.ToxicEarth',
+    toxic_fire: 'SR5.Spirit.Types.ToxicFire',
+    toxic_man: 'SR5.Spirit.Types.ToxicMan',
+    toxic_water: 'SR5.Spirit.Types.ToxicWater',
 
     // blood types
-    blood: 'SR5.Spirit.Blood',
+    blood: 'SR5.Spirit.Types.Blood',
 
     // shadow types
-    muse: 'SR5.Spirit.Muse',
-    nightmare: 'SR5.Spirit.Nightmare',
-    shade: 'SR5.Spirit.Shade',
-    succubus: 'SR5.Spirit.Succubus',
-    wraith: 'SR5.Spirit.Wraith',
+    muse: 'SR5.Spirit.Types.Muse',
+    nightmare: 'SR5.Spirit.Types.Nightmare',
+    shade: 'SR5.Spirit.Types.Shade',
+    succubus: 'SR5.Spirit.Types.Succubus',
+    wraith: 'SR5.Spirit.Types.Wraith',
 
     // shedim types
-    shedim: 'SR5.Spirit.Shedim',
-    master_shedim: 'SR5.Spirit.MasterShedim',
+    shedim: 'SR5.Spirit.Types.Shedim',
+    master_shedim: 'SR5.Spirit.Types.MasterShedim',
 
     // insect types
-    caretaker: 'SR5.Spirit.Caretaker',
-    nymph: 'SR5.Spirit.Nymph',
-    scout: 'SR5.Spirit.Scout',
-    soldier: 'SR5.Spirit.Soldier',
-    worker: 'SR5.Spirit.Worker',
-    queen: 'SR5.Spirit.Queen',
+    caretaker: 'SR5.Spirit.Types.Caretaker',
+    nymph: 'SR5.Spirit.Types.Nymph',
+    scout: 'SR5.Spirit.Types.Scout',
+    soldier: 'SR5.Spirit.Types.Soldier',
+    worker: 'SR5.Spirit.Types.Worker',
+    queen: 'SR5.Spirit.Types.Queen',
+};
+
+SR5['critterPower'] = {
+    types: {
+        mana: 'SR5.CritterPower.Types.Mana',
+        physical: 'SR5.CritterPower.Types.Physical',
+    },
+    ranges: {
+        los: 'SR5.CritterPower.Ranges.LineOfSight',
+        self: 'SR5.CritterPower.Ranges.Self',
+        touch: 'SR5.CritterPower.Ranges.Touch',
+    },
+    durations: {
+        always: 'SR5.CritterPower.Durations.Always',
+        instant: 'SR5.CritterPower.Durations.Instant',
+        sustained: 'SR5.CritterPower.Durations.Sustained',
+        permanent: 'SR5.CritterPower.Durations.Permanent',
+        special: 'SR5.CritterPower.Durations.Special',
+    }
 };

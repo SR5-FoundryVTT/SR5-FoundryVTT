@@ -1,0 +1,42 @@
+<div class="item-form">
+    <div class="header">
+        {{header}}
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.CritterPower.Type"}}
+        </div>
+        <div class="inputs">
+            <select name="data.powerType">
+                {{#select data.powerType}}
+                    {{#each config.critterPower.types as |name type|}}
+                        <option value="{{type}}">{{localize name}}</option>
+                    {{/each}} {{/select}}
+            </select>
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.CritterPower.Duration"}}
+        </div>
+        <div class="inputs">
+            <select name="data.duration">
+                {{#select data.duration}} {{#each config.critterPower.durations as |name type|}}
+                    <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
+    </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.CritterPower.Range"}}
+        </div>
+        <div class="inputs">
+            <select name="data.range">
+                {{#select data.range}} {{#each config.critterPower.ranges as |name type|}}
+                    <option value="{{type}}">{{localize name}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
+    </div>
+</div>

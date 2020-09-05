@@ -1,21 +1,27 @@
 {
-    "action": "Action",
-    "adept_power": "Adept Power",
-    "armor": "Armor",
-    "complex_form": "Complex Form",
-    "cyberware": "Cyberware",
-    "device": "Device",
-    "equipment": "Equipment",
-    "quality": "Quality",
-    "spell": "Spell",
-    "weapon": "Weapon",
-    "sin": "SIN",
-    "lifestyle": "Lifestyle",
-    "contact": "Contact",
-    "modification": "Modification",
-    "ammo": "Ammo",
-    "active": "Active",
-    "passive": "Passive",
+    "SR5.ItemTypes": {
+        "Action": "Action",
+        "AdeptPower": "Adept Power",
+        "Ammo": "Ammo",
+        "Armor": "Armor",
+        "ComplexForm": "Complex Form",
+        "Contact": "Contact",
+        "CritterPower": "Critter Power",
+        "Cyberware": "Cyberware",
+        "Device": "Device",
+        "Equipment": "Equipment",
+        "Lifestyle": "Lifestyle",
+        "Modification": "Modification",
+        "Quality": "Quality",
+        "Sin": "SIN",
+        "Spell": "Spell",
+        "Weapon": "Weapon"
+    },
+
+    "SR5.ActorTypes": {
+        "Character": "Character",
+        "Spirit": "Spirit"
+    },
 
     "SR5.ActiveSkills": "Active Skills",
     "SR5.Specializations": "Specializations",
@@ -557,5 +563,27 @@
         "Type": "Type",
         "Services": "Services",
         "Bound": "Bound"
+    },
+
+    "SR5.CritterPower": {
+        "Type": "Type",
+        "Duration": "Duration",
+        "Range": "Range",
+        "Types": {
+            "Mana": "Mana",
+            "Physical": "Physical"
+        },
+        "Durations": {
+            "Always": "Always",
+            "Instant": "Instant",
+            "Sustained": "Sustained",
+            "Permanent": "Permanent",
+            "Special": "Special"
+        },
+        "Ranges": {
+            "LineOfSight": "Line Of Sight",
+            "Touch": "Touch",
+            "Self": "Self"
+        }
     }
 }
