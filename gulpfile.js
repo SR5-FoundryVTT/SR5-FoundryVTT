@@ -8,3 +8,4 @@ gulp.task('rebuild', tasks.rebuild);
 gulp.task('watch', tasks.watch);
 gulp.task('clean', tasks.clean);
 gulp.task('sass', tasks.sass);
+gulp.task('link', tasks.link)

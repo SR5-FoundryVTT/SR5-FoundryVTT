@@ -1,5 +1,6 @@
 'use strict';
-const fs = require('fs');
+// const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 const del = require('del');
 const assign = require('lodash.assign');
@@ -135,9 +136,39 @@ async function buildSass() {
         .pipe(gulp.dest(destFolder));
 }
 
+
+async function linkUserData() {
+    const config = fs.readJSONSync('foundryconfig.json');
+    const projectConfig = fs.readJSONSync(path.resolve('.', 'system.json'));
+
+    let name = projectConfig.name;
+	try {
+		let linkDir;
+		if (config.dataPath) {
+			if (!fs.existsSync(path.join(config.dataPath, 'Data')))
+				throw Error('User Data path invalid, no Data directory found');
+
+			linkDir = path.join(config.dataPath, 'Data', 'systems', name);
+		} else {
+			throw Error('No User Data path defined in foundryconfig.json');
+		}
+
+		if (!fs.existsSync(linkDir)) {
+			console.log(
+				chalk.green(`Copying build to ${chalk.blueBright(linkDir)}`)
+			);
+			await fs.symlink(path.resolve('./'), linkDir);
+		}
+		return Promise.resolve();
+	} catch (err) {
+		Promise.reject(err);
+	}
+}
+
 exports.clean = cleanDist;
 exports.sass = buildSass;
 exports.assets = copyAssets;
 exports.build = gulp.series(copyAssets, buildSass, buildJS);
 exports.watch = gulp.series(exports.build, watch);
 exports.rebuild = gulp.series(cleanDist, exports.build);
+exports.link = linkUserData;

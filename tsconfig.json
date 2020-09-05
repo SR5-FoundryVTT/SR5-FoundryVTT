@@ -3,7 +3,8 @@
       "target": "es6",
       "strictNullChecks": true,
       "types": [
-        "foundry-pc-types"
+        "foundry-pc-types",
+        "node"
       ]
     }
   }
