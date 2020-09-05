@@ -310,3 +310,47 @@ SR5['programTypes'] = {
     hacking_program: 'SR5.HackingProgram',
     agent: 'SR5.Agent',
 };
+
+SR5['spiritTypes'] = {
+    // base types
+    air: 'SR5.Spirit.Air',
+    beasts: 'SR5.Spirit.Beasts',
+    earth: 'SR5.Spirit.Earth',
+    fire: 'SR5.Spirit.Fire',
+    guardian: 'SR5.Spirit.Guardian',
+    guidance: 'SR5.Spirit.Guidance',
+    man: 'SR5.Spirit.Man',
+    plant: 'SR5.Spirit.Plant',
+    task: 'SR5.Spirit.Task',
+    water: 'SR5.Spirit.Water',
+
+    // toxic types
+    toxic_air: 'SR5.Spirit.ToxicAir',
+    toxic_beasts: 'SR5.Spirit.ToxicBeasts',
+    toxic_earth: 'SR5.Spirit.ToxicEarth',
+    toxic_fire: 'SR5.Spirit.ToxicFire',
+    toxic_man: 'SR5.Spirit.ToxicMan',
+    toxic_water: 'SR5.Spirit.ToxicWater',
+
+    // blood types
+    blood: 'SR5.Spirit.Blood',
+
+    // shadow types
+    muse: 'SR5.Spirit.Muse',
+    nightmare: 'SR5.Spirit.Nightmare',
+    shade: 'SR5.Spirit.Shade',
+    succubus: 'SR5.Spirit.Succubus',
+    wraith: 'SR5.Spirit.Wraith',
+
+    // shedim types
+    shedim: 'SR5.Spirit.Shedim',
+    master_shedim: 'SR5.Spirit.MasterShedim',
+
+    // insect types
+    caretaker: 'SR5.Spirit.Caretaker',
+    nymph: 'SR5.Spirit.Nymph',
+    scout: 'SR5.Spirit.Scout',
+    soldier: 'SR5.Spirit.Soldier',
+    worker: 'SR5.Spirit.Worker',
+    queen: 'SR5.Spirit.Queen',
+};

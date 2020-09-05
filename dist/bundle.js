@@ -998,7 +998,9 @@ class SR5Actor extends Actor {
         prepper.prepareCyberware();
         prepper.prepareSkills();
         prepper.prepareAttributes();
-        prepper.prepareMatrix();
+        if (actorData.type !== 'spirit') {
+            prepper.prepareMatrix();
+        }
         prepper.prepareLimits();
         prepper.prepareConditionMonitors();
         prepper.prepareMovement();
@@ -1897,7 +1899,6 @@ class SR5ActorSheet extends ActorSheet {
     static get defaultOptions() {
         return mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'actor'],
-            template: 'systems/shadowrun5e/dist/templates/actor/character.html',
             width: 880,
             height: 690,
             tabs: [
@@ -1908,6 +1909,10 @@ class SR5ActorSheet extends ActorSheet {
                 },
             ],
         });
+    }
+    get template() {
+        const path = 'systems/shadowrun5e/dist/templates/actor/';
+        return `${path}${this.actor.data.type}.html`;
     }
     /* -------------------------------------------- */
     /**
@@ -1940,6 +1945,8 @@ class SR5ActorSheet extends ActorSheet {
         data['emerged'] = data.data.special === 'resonance';
         data['woundTolerance'] = 3 + (Number(mods['wound_tolerance']) || 0);
         data.filters = this._filters;
+        data['isCharacter'] = this.actor.data.type === 'character';
+        data['isSpirit'] = this.actor.data.type === 'spirit';
         return data;
     }
     _isSkillMagic(id, skill) {
@@ -1952,16 +1959,18 @@ class SR5ActorSheet extends ActorSheet {
     }
     _prepareMatrixAttributes(data) {
         const { matrix } = data.data;
-        const cleanupAttribute = (attribute) => {
-            const att = matrix[attribute];
-            if (att) {
-                if (!att.mod)
-                    att.mod = {};
-                if (att.temp === 0)
-                    delete att.temp;
-            }
-        };
-        ['firewall', 'data_processing', 'sleaze', 'attack'].forEach((att) => cleanupAttribute(att));
+        if (matrix) {
+            const cleanupAttribute = (attribute) => {
+                const att = matrix[attribute];
+                if (att) {
+                    if (!att.mod)
+                        att.mod = {};
+                    if (att.temp === 0)
+                        delete att.temp;
+                }
+            };
+            ['firewall', 'data_processing', 'sleaze', 'attack'].forEach((att) => cleanupAttribute(att));
+        }
     }
     _prepareSkills(data) {
         const activeSkills = {};
@@ -2909,8 +2918,11 @@ class BaseActorPrep {
         initiative.meatspace.dice.base = 1 + Number(modifiers['meat_initiative_dice']);
         initiative.astral.base.base = attributes.intuition.value * 2 + Number(modifiers['astral_initiative']);
         initiative.astral.dice.base = 2 + Number(modifiers['astral_initiative_dice']);
-        initiative.matrix.base.base = attributes.intuition.value + this.data.matrix.data_processing.value + Number(modifiers['matrix_initiative']);
-        initiative.matrix.dice.base = (matrix.hot_sim ? 4 : 3) + Number(modifiers['matrix_initiative_dice']);
+        // TODO better way to handle not having matrix stats
+        if (this.data.matrix) {
+            initiative.matrix.base.base = attributes.intuition.value + this.data.matrix.data_processing.value + Number(modifiers['matrix_initiative']);
+            initiative.matrix.dice.base = (matrix.hot_sim ? 4 : 3) + Number(modifiers['matrix_initiative_dice']);
+        }
         if (initiative.perception === 'matrix')
             initiative.current = initiative.matrix;
         else if (initiative.perception === 'astral')
@@ -4813,6 +4825,44 @@ exports.SR5['programTypes'] = {
     common_program: 'SR5.CommonProgram',
     hacking_program: 'SR5.HackingProgram',
     agent: 'SR5.Agent',
+};
+exports.SR5['spiritTypes'] = {
+    // base types
+    air: 'SR5.Spirit.Air',
+    beasts: 'SR5.Spirit.Beasts',
+    earth: 'SR5.Spirit.Earth',
+    fire: 'SR5.Spirit.Fire',
+    guardian: 'SR5.Spirit.Guardian',
+    guidance: 'SR5.Spirit.Guidance',
+    man: 'SR5.Spirit.Man',
+    plant: 'SR5.Spirit.Plant',
+    task: 'SR5.Spirit.Task',
+    water: 'SR5.Spirit.Water',
+    // toxic types
+    toxic_air: 'SR5.Spirit.ToxicAir',
+    toxic_beasts: 'SR5.Spirit.ToxicBeasts',
+    toxic_earth: 'SR5.Spirit.ToxicEarth',
+    toxic_fire: 'SR5.Spirit.ToxicFire',
+    toxic_man: 'SR5.Spirit.ToxicMan',
+    toxic_water: 'SR5.Spirit.ToxicWater',
+    // blood types
+    blood: 'SR5.Spirit.Blood',
+    // shadow types
+    muse: 'SR5.Spirit.Muse',
+    nightmare: 'SR5.Spirit.Nightmare',
+    shade: 'SR5.Spirit.Shade',
+    succubus: 'SR5.Spirit.Succubus',
+    wraith: 'SR5.Spirit.Wraith',
+    // shedim types
+    shedim: 'SR5.Spirit.Shedim',
+    master_shedim: 'SR5.Spirit.MasterShedim',
+    // insect types
+    caretaker: 'SR5.Spirit.Caretaker',
+    nymph: 'SR5.Spirit.Nymph',
+    scout: 'SR5.Spirit.Scout',
+    soldier: 'SR5.Spirit.Soldier',
+    worker: 'SR5.Spirit.Worker',
+    queen: 'SR5.Spirit.Queen',
 };
 },{}],29:[function(require,module,exports){
 "use strict";

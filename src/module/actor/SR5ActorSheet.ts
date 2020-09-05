@@ -47,7 +47,6 @@ export class SR5ActorSheet extends ActorSheet {
     static get defaultOptions() {
         return mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'actor'],
-            template: 'systems/shadowrun5e/dist/templates/actor/character.html',
             width: 880,
             height: 690,
             tabs: [
@@ -58,6 +57,11 @@ export class SR5ActorSheet extends ActorSheet {
                 },
             ],
         });
+    }
+
+    get template() {
+        const path = 'systems/shadowrun5e/dist/templates/actor/';
+        return `${path}${this.actor.data.type}.html`;
     }
 
     /* -------------------------------------------- */
@@ -98,6 +102,9 @@ export class SR5ActorSheet extends ActorSheet {
 
         data.filters = this._filters;
 
+        data['isCharacter'] = this.actor.data.type === 'character';
+        data['isSpirit'] = this.actor.data.type === 'spirit';
+
         return data;
     }
 
@@ -112,15 +119,17 @@ export class SR5ActorSheet extends ActorSheet {
 
     _prepareMatrixAttributes(data) {
         const { matrix } = data.data;
-        const cleanupAttribute = (attribute: MatrixAttribute) => {
-            const att = matrix[attribute];
-            if (att) {
-                if (!att.mod) att.mod = {};
-                if (att.temp === 0) delete att.temp;
-            }
-        };
+        if (matrix) {
+            const cleanupAttribute = (attribute: MatrixAttribute) => {
+                const att = matrix[attribute];
+                if (att) {
+                    if (!att.mod) att.mod = {};
+                    if (att.temp === 0) delete att.temp;
+                }
+            };
 
-        ['firewall', 'data_processing', 'sleaze', 'attack'].forEach((att: MatrixAttribute) => cleanupAttribute(att));
+            ['firewall', 'data_processing', 'sleaze', 'attack'].forEach((att: MatrixAttribute) => cleanupAttribute(att));
+        }
     }
 
     _prepareSkills(data) {

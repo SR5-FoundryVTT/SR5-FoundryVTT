@@ -58,7 +58,9 @@ export class SR5Actor extends Actor {
         prepper.prepareCyberware();
         prepper.prepareSkills();
         prepper.prepareAttributes();
-        prepper.prepareMatrix();
+        if (actorData.type !== 'spirit') {
+            prepper.prepareMatrix();
+        }
         prepper.prepareLimits();
         prepper.prepareConditionMonitors();
         prepper.prepareMovement();

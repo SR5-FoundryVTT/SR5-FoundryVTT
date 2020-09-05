@@ -7,81 +7,137 @@
                         {{localize "SR5.ImportCharacter"}}
                     </button>
                 </div>
-                <div class="list-item">
-                    <div class="item-left">
-                        <div class="item-text item-name">
-                            {{localize "SR5.Nuyen"}}
+                {{#if isCharacter}}
+                    <div class="list-item">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.Nuyen"}}
+                            </div>
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text input">
+                                <input class="display" type="text" name="data.nuyen" value="{{data.nuyen}}" data-dtype="Number" />
+                                <span class="unit">
+                                <i class="fas fa-yen-sign"></i>
+                            </span>
+                            </div>
                         </div>
                     </div>
-                    <div class="item-right">
-                        <div class="item-text input">
-                            <input class="display" type="text" name="data.nuyen" value="{{data.nuyen}}" data-dtype="Number" />
-                            <span class="unit">
-                            <i class="fas fa-yen-sign"></i>
-                        </span>
+                    <div class="list-item">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.Karma"}}
+                            </div>
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text">
+                                <input class="display" type="text" size="10" name="data.karma.value" value="{{data.karma.value}}" data-dtype="Number" />
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="list-item">
-                    <div class="item-left">
-                        <div class="item-text item-name">
-                            {{localize "SR5.Karma"}}
+                    <div class="list-item">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.CareerKarma"}}
+                            </div>
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text">
+                                <input class="display" type="text" size="10" name="data.karma.max" value="{{data.karma.max}}" data-dtype="Number" />
+                            </div>
                         </div>
                     </div>
-                    <div class="item-right">
-                        <div class="item-text">
-                            <input class="display" type="text" size="10" name="data.karma.value" value="{{data.karma.value}}" data-dtype="Number" />
+                    <div class="list-item">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.Notoriety"}}
+                            </div>
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text">
+                                <input class="display" type="text" size="10" name="data.notoriety" value="{{data.notoriety}}" data-dtype="Number" />
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="list-item">
-                    <div class="item-left">
-                        <div class="item-text item-name">
-                            {{localize "SR5.CareerKarma"}}
+                    <div class="list-item">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.PublicAwareness"}}
+                            </div>
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text">
+                                <input class="display" type="text" size="10" name="data.public_awareness" value="{{data.public_awareness}}" data-dtype="Number" />
+                            </div>
                         </div>
                     </div>
-                    <div class="item-right">
-                        <div class="item-text">
-                            <input class="display" type="text" size="10" name="data.karma.max" value="{{data.karma.max}}" data-dtype="Number" />
+                    <div class="list-item">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.StreetCred"}}
+                            </div>
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text">
+                                <input class="display" type="text" size="10" name="data.street_cred" value="{{data.street_cred}}" data-dtype="Number" />
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="list-item">
-                    <div class="item-left">
-                        <div class="item-text item-name">
-                            {{localize "SR5.Notoriety"}}
+                {{/if}}
+                {{#if isSpirit}}
+                    <div class="list-item">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.SpiritType"}}
+                            </div>
+                        </div>
+                        <div class="item-right">
+                            <div>
+                                <select name="data.spiritType" class="display">
+                                    {{#select data.spiritType}} {{#each config.spiritTypes as |name type|}}
+                                        <option value="{{type}}">{{localize name}}</option>
+                                    {{/each}} {{/select}}
+                                </select>
+                            </div>
                         </div>
                     </div>
-                    <div class="item-right">
-                        <div class="item-text">
-                            <input class="display" type="text" size="10" name="data.notoriety" value="{{data.notoriety}}" data-dtype="Number" />
+                    <div class="list-item">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.SpiritForce"}}
+                            </div>
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text">
+                                <input class="display" type="text" size="2" name="data.force" value="{{data.force}}" data-dtype="Number" />
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="list-item">
-                    <div class="item-left">
-                        <div class="item-text item-name">
-                            {{localize "SR5.PublicAwareness"}}
+                    <div class="list-item">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.Services"}}
+                            </div>
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text">
+                                <input class="display" type="text" size="2" name="data.services" value="{{data.services}}" data-dtype="Number" />
+                            </div>
                         </div>
                     </div>
-                    <div class="item-right">
-                        <div class="item-text">
-                            <input class="display" type="text" size="10" name="data.public_awareness" value="{{data.public_awareness}}" data-dtype="Number" />
+                    <div class="list-item">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.Bound"}}
+                            </div>
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text input">
+                                <input type="checkbox" class="checkbox" {{checked data.bound}}/>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="list-item">
-                    <div class="item-left">
-                        <div class="item-text item-name">
-                            {{localize "SR5.StreetCred"}}
-                        </div>
-                    </div>
-                    <div class="item-right">
-                        <div class="item-text">
-                            <input class="display" type="text" size="10" name="data.street_cred" value="{{data.street_cred}}" data-dtype="Number" />
-                        </div>
-                    </div>
-                </div>
+                {{/if}}
                 <div class="list-item">
                     <div class="item-left">
                         <div class="item-text item-name">

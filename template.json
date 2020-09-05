@@ -764,54 +764,54 @@
                         "attribute": "intuition",
                         "value": []
                     }
-                },
+                }
+            },
+            "armor": {
                 "armor": {
-                    "armor": {
-                        "value": 0,
-                        "mod": 0,
-                        "acid": 0,
-                        "cold": 0,
-                        "fire": 0,
-                        "electricity": 0,
-                        "radiation": 0
-                    }
-                },
+                    "value": 0,
+                    "mod": 0,
+                    "acid": 0,
+                    "cold": 0,
+                    "fire": 0,
+                    "electricity": 0,
+                    "radiation": 0
+                }
+            },
+            "magic": {
                 "magic": {
-                    "magic": {
-                        "attribute": "logic",
-                        "projecting": false,
-                        "drain": {
-                            "value": 0,
-                            "base": 0,
-                            "mod": []
-                        }
+                    "attribute": "logic",
+                    "projecting": false,
+                    "drain": {
+                        "value": 0,
+                        "base": 0,
+                        "mod": []
                     }
-                },
+                }
+            },
+            "movement": {
                 "movement": {
-                    "movement": {
-                        "walk": {
-                            "value": 1
-                        },
-                        "run": {
-                            "value": 2
-                        },
-                        "sprint": 2,
-                        "swimming": 2
-                    }
-                },
-                "condition_monitors": {
-                    "track": {
-                        "stun": {
+                    "walk": {
+                        "value": 1
+                    },
+                    "run": {
+                        "value": 2
+                    },
+                    "sprint": 2,
+                    "swimming": 2
+                }
+            },
+            "condition_monitors": {
+                "track": {
+                    "stun": {
+                        "value": 0,
+                        "max": 0
+                    },
+                    "physical": {
+                        "value": 0,
+                        "max": 0,
+                        "overflow": {
                             "value": 0,
                             "max": 0
-                        },
-                        "physical": {
-                            "value": 0,
-                            "max": 0,
-                            "overflow": {
-                                "value": 0,
-                                "max": 0
-                            }
                         }
                     }
                 }
@@ -879,7 +879,7 @@
                 "armor",
                 "magic",
                 "movement",
-                "condition_monitor"
+                "condition_monitors"
             ],
             "ethnicity": "",
             "age": "",
@@ -907,7 +907,7 @@
                 "armor",
                 "magic",
                 "movement",
-                "condition_monitor"
+                "condition_monitors"
             ],
             "services": 0,
             "bound": false,

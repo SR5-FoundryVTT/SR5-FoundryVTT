@@ -34,16 +34,6 @@
                 {{> 'systems/shadowrun5e/dist/templates/actor/parts/Movement.html' }}
                 {{> 'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html' }}
             </div>
-            <div class="attributes">
-                <div class="attribute">
-                    {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
-                            name=(localize "SR5.AttrEdge")
-                            value=data.attributes.edge.uses
-                            max=data.attributes.edge.value
-                            id="edge"
-                    }}
-                </div>
-            </div>
         </div>
     </header>
     <div class="attributes no-border">
@@ -61,9 +51,9 @@
                 {{localize "SR5.RollMemory"}}
             </div>
             <div
-                title="Roll"
-                class="attribute-name basic-roll roll fas fa-dice-six"
-                data-roll="basic"
+                    title="Roll"
+                    class="attribute-name basic-roll roll fas fa-dice-six"
+                    data-roll="basic"
             ></div>
             <div title="Defense" class="attribute-name defense-roll roll">
                 {{localize "SR5.RollDefense"}}
@@ -74,11 +64,14 @@
             <div class="attribute-name roll armor-roll">
                 {{localize "SR5.RollArmor"}} ({{data.armor.value}})
             </div>
+
             {{#if awakened}}
-            <div class="attribute-name roll drain-roll">
-                {{localize "SR5.RollDrain"}}
-            </div>
-            {{/if}} {{#if emerged}}
+                <div class="attribute-name roll drain-roll">
+                    {{localize "SR5.RollDrain"}}
+                </div>
+            {{/if}}
+
+            {{#if emerged}}
             <div class="attribute-name roll fade-roll">
                 {{localize "SR5.RollFade"}}
             </div>
@@ -88,23 +81,15 @@
     <nav class="tabs" data-group="primary">
         <a class="item" data-tab="actions">{{localize "SR5.Actions"}}</a>
         <a class="item" data-tab="skills">{{localize "SR5.Skills"}}</a>
-        <a class="item active" data-tab="gear">{{localize "SR5.Gear"}}</a>
-        {{#ife data.special 'magic'}}
         <a class="item" data-tab="magic">{{localize "SR5.Magic"}}</a>
-        {{/ife}}
-        <a class="item" data-tab="matrix">{{localize "SR5.Matrix"}}</a>
         <a class="item" data-tab="bio">{{localize "SR5.Biography"}}</a>
-        <a class="item" data-tab="social">{{localize "SR5.Social"}}</a>
         <a class="item" data-tab="misc">{{localize "SR5.Miscellaneous"}}</a>
     </nav>
     <section class="sheetbody">
         {{> "systems/shadowrun5e/dist/templates/actor/tabs/ActionsTab.html"}}
         {{> "systems/shadowrun5e/dist/templates/actor/tabs/SkillsTab.html"}}
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/MatrixTab.html"}}
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/GearTab.html"}}
         {{> "systems/shadowrun5e/dist/templates/actor/tabs/MagicTab.html"}}
         {{> "systems/shadowrun5e/dist/templates/actor/tabs/BioTab.html"}}
-        {{> "systems/shadowrun5e/dist/templates/actor/tabs/SocialTab.html"}}
         {{> "systems/shadowrun5e/dist/templates/actor/tabs/MiscTab.html"}}
     </section>
 </form>
