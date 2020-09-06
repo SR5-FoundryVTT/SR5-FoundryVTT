@@ -10,7 +10,7 @@ declare namespace Shadowrun {
         skills: string;
     };
 
-    export type SR5ActorType = SR5SpiritType | SR5CharacterType | SR5SpriteType;
+    export type SR5ActorType = SR5SpiritType | SR5CharacterType | SR5SpriteType | SR5VehicleType;
 
     export type SR5ActorBase = ActorData & {
         name: string;
@@ -37,8 +37,12 @@ declare namespace Shadowrun {
         data: SpriteActorData;
         type: 'sprite';
     };
+    export type SR5VehicleType = SR5ActorBase & {
+        data: VehicleActorData;
+        type: 'vehicle';
+    };
 
-    export type SR5ActorData = SpiritActorData | CharacterActorData | SpriteActorData;
+    export type SR5ActorData = SpiritActorData | CharacterActorData | SpriteActorData | VehicleActorData;
 
     export type SpiritActorData = MagicActorData &
         TwoTrackActorData &
@@ -95,6 +99,41 @@ declare namespace Shadowrun {
         modifiers: Modifiers;
     };
 
+    export type VehicleActorData = ArmorActorData &
+        MatrixActorData &
+        MovementActorData &
+        PhysicalTrackActorData & {
+            vehicleType: VehicleTypes;
+            pilot_rating: ModifiableValue;
+            handling: ModifiableValue;
+            off_road_handling: ModifiableValue;
+            speed: ModifiableValue;
+            acceleration: ModifiableValue;
+            sensor_rating: ModifiableValue;
+
+            attributes: Attributes;
+            limits: Limits;
+            skills: {
+                active: Skills;
+                language: KnowledgeSkillList;
+                knowledge: KnowledgeSkills;
+            };
+            initiative: Initiative;
+            modifiers: Modifiers;
+            special: SpecialTrait;
+        };
+
+    export type PhysicalTrackActorData = {
+        track: {
+            physical: PhysicalTrack;
+        };
+    };
+    export type StunTrackActorData = {
+        track: {
+            stun: StunTrack;
+        };
+    };
+
     export type MovementActorData = {
         movement: Movement;
     };
@@ -105,7 +144,7 @@ declare namespace Shadowrun {
 
     export type WoundsActorData = {
         wounds: WoundType;
-    }
+    };
 
     export type TwoTrackActorData = {
         track: Tracks;

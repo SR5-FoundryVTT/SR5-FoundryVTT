@@ -400,3 +400,9 @@ SR5['spriteTypes'] = {
     fault: 'SR5.Sprite.Types.Fault',
     machine: 'SR5.Sprite.Types.Machine',
 };
+
+SR5['vehicleTypes'] = {
+    air: 'SR5.Vehicle.Types.Air',
+    water: 'SR5.Vehicle.Types.Water',
+    ground: 'SR5.Vehicle.Types.Ground',
+};
