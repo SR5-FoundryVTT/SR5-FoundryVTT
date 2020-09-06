@@ -947,6 +947,7 @@
             "quality",
             "sin",
             "spell",
+            "sprite_power",
             "weapon",
             "PDFoundry_PDF"
         ],
@@ -1141,7 +1142,8 @@
         "critter_power": {
             "templates": [
                 "description",
-                "action"
+                "action",
+                "armor"
             ],
             "powerType": "",
             "range": "",
@@ -1194,6 +1196,12 @@
             "type": "positive"
         },
         "action": {
+            "templates": [
+                "description",
+                "action"
+            ]
+        },
+        "sprite_power": {
             "templates": [
                 "description",
                 "action"

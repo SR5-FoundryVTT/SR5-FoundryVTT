@@ -1,0 +1,29 @@
+<form class="{{cssClass}} wholesheet" autocomplete="off">
+    {{> "systems/shadowrun5e/dist/templates/item/parts/header.html"}}
+    <nav class="tabs" data-group="primary">
+        <a class="item" data-tab="description">{{localize "SR5.Description"}}</a>
+        <a class="item" data-tab="sprite_powers">{{localize "SR5.SpritePowers"}}</a>
+    </nav>
+    <section class="sheetbody">
+        <div class="tab" data-group="primary" data-tab="description">
+            {{> "systems/shadowrun5e/dist/templates/item/parts/description.html"}}
+        </div>
+        <div class="tab" data-group="primary" data-tab="sprite_powers">
+            <div class="tabbody">
+                <div class="inventory">
+                    <div class="scroll-area">
+                        {{> "systems/shadowrun5e/dist/templates/item/parts/action.html"
+                            header="Test Details"
+                        }}
+                        {{> "systems/shadowrun5e/dist/templates/item/parts/damage.html"
+                            header="Damage"
+                        }}
+                        {{>"systems/shadowrun5e/dist/templates/item/parts/opposed.html"
+                            header="Opposed Test"
+                        }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</form>

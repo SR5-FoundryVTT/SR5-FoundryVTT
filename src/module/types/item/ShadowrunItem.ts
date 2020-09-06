@@ -20,6 +20,7 @@ declare namespace Shadowrun {
         Partial<WeaponData> &
         Partial<SpellData> &
         Partial<CritterPowerData> &
+        Partial<SpritePowerData> &
         Partial<ComplexFormData> & {
             description: DescriptionData;
         };

@@ -6644,6 +6644,10 @@ exports.ChatData = {
         exports.ChatData.action(data, labels, props);
         props.push(helpers_1.Helpers.label(data.type));
     },
+    sprite_power: (data, labels, props) => {
+        // add action data
+        exports.ChatData.action(data, labels, props);
+    },
     critter_power: (data, labels, props) => {
         // power type
         props.push(game.i18n.localize(CONFIG.SR5.critterPower.types[data.powerType]));

@@ -147,6 +147,11 @@ export const ChatData = {
         props.push(Helpers.label(data.type));
     },
 
+    sprite_power: (data, labels, props) => {
+        // add action data
+        ChatData.action(data, labels, props);
+    },
+
     critter_power: (data, labels, props) => {
         // power type
         props.push(game.i18n.localize(CONFIG.SR5.critterPower.types[data.powerType]));
