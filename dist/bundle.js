@@ -1872,7 +1872,7 @@ class SR5ActorSheet extends ActorSheet {
          * Keep track of the currently active sheet tab
          * @type {string}
          */
-        this._shownUntrainedSkills = true;
+        this._shownUntrainedSkills = false;
         this._shownDesc = [];
         this._filters = {
             skills: '',
@@ -2017,7 +2017,7 @@ class SR5ActorSheet extends ActorSheet {
                 },
             },
         };
-        let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs, critter_powers] = data.items.reduce((arr, item) => {
+        let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs, critter_powers, sprite_powers] = data.items.reduce((arr, item) => {
             item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
             if (item.type === 'spell')
                 arr[1].push(item);
@@ -2039,10 +2039,12 @@ class SR5ActorSheet extends ActorSheet {
                 arr[9].push(item);
             else if (item.type === 'critter_power')
                 arr[10].push(item);
+            else if (item.type === 'sprite_power')
+                arr[11].push(item);
             else if (Object.keys(inventory).includes(item.type))
                 arr[0].push(item);
             return arr;
-        }, [[], [], [], [], [], [], [], [], [], [], []]);
+        }, [[], [], [], [], [], [], [], [], [], [], [], []]);
         const sortByName = (i1, i2) => {
             if (i1.name > i2.name)
                 return 1;
@@ -2074,6 +2076,7 @@ class SR5ActorSheet extends ActorSheet {
         sins.sort(sortByName);
         programs.sort(sortByEquipped);
         critter_powers.sort(sortByName);
+        sprite_powers.sort(sortByName);
         items.forEach((item) => {
             inventory[item.type].items.push(item);
         });
@@ -2089,6 +2092,7 @@ class SR5ActorSheet extends ActorSheet {
         data.sins = sins;
         data.programs = programs;
         data.critter_powers = critter_powers;
+        data.sprite_powers = sprite_powers;
         qualities.sort((a, b) => {
             if (a.data.type === 'positive' && b.data.type === 'negative')
                 return -1;
@@ -5664,6 +5668,7 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/ProgramList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/ComplexFormList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/matrix/SpritePowerList.html',
         // attributes
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html',
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/AttributeList.html',
@@ -5775,6 +5780,9 @@ exports.registerItemLineHelpers = () => {
                 return [addIcon];
             case 'critter_power':
                 addIcon.title = game.i18n.localize('SR5.CreateItemCritterPower');
+                return [addIcon];
+            case 'sprite_power':
+                addIcon.title = game.i18n.localize('SR5.CreateItemSpritePower');
                 return [addIcon];
             default:
                 return [];
@@ -5902,8 +5910,6 @@ exports.registerItemLineHelpers = () => {
                         },
                     },
                 ];
-            case 'program':
-                return [];
             default:
                 return [];
         }

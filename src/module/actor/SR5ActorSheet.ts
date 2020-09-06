@@ -31,7 +31,7 @@ export class SR5ActorSheet extends ActorSheet {
          * Keep track of the currently active sheet tab
          * @type {string}
          */
-        this._shownUntrainedSkills = true;
+        this._shownUntrainedSkills = false;
         this._shownDesc = [];
         this._filters = {
             skills: '',
@@ -193,7 +193,7 @@ export class SR5ActorSheet extends ActorSheet {
             },
         };
 
-        let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs, critter_powers] = data.items.reduce(
+        let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs, critter_powers, sprite_powers] = data.items.reduce(
             (arr, item) => {
                 item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
                 if (item.type === 'spell') arr[1].push(item);
@@ -206,10 +206,11 @@ export class SR5ActorSheet extends ActorSheet {
                 else if (item.type === 'sin') arr[8].push(item);
                 else if (item.type === 'program') arr[9].push(item);
                 else if (item.type === 'critter_power') arr[10].push(item);
+                else if (item.type === 'sprite_power') arr[11].push(item);
                 else if (Object.keys(inventory).includes(item.type)) arr[0].push(item);
                 return arr;
             },
-            [[], [], [], [], [], [], [], [], [], [], []],
+            [[], [], [], [], [], [], [], [], [], [], [], []],
         );
 
         const sortByName = (i1, i2) => {
@@ -236,6 +237,7 @@ export class SR5ActorSheet extends ActorSheet {
         sins.sort(sortByName);
         programs.sort(sortByEquipped);
         critter_powers.sort(sortByName);
+        sprite_powers.sort(sortByName);
 
         items.forEach((item) => {
             inventory[item.type].items.push(item);
@@ -253,6 +255,7 @@ export class SR5ActorSheet extends ActorSheet {
         data.sins = sins;
         data.programs = programs;
         data.critter_powers = critter_powers;
+        data.sprite_powers = sprite_powers;
 
         qualities.sort((a, b) => {
             if (a.data.type === 'positive' && b.data.type === 'negative') return -1;

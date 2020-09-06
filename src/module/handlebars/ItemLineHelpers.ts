@@ -63,6 +63,9 @@ export const registerItemLineHelpers = () => {
             case 'critter_power':
                 addIcon.title = game.i18n.localize('SR5.CreateItemCritterPower');
                 return [addIcon];
+            case 'sprite_power':
+                addIcon.title = game.i18n.localize('SR5.CreateItemSpritePower');
+                return [addIcon];
             default:
                 return [];
         }
@@ -190,8 +193,6 @@ export const registerItemLineHelpers = () => {
                         },
                     },
                 ];
-            case 'program':
-                return [];
             default:
                 return [];
         }
@@ -329,7 +330,7 @@ export const registerItemLineHelpers = () => {
                             text: game.i18n.localize(CONFIG.SR5.critterPower.ranges[item.data.range ?? '']),
                         },
                     },
-                ]
+                ];
 
             case 'complex_form':
                 return [
