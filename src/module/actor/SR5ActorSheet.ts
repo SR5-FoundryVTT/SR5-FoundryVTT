@@ -510,6 +510,8 @@ export class SR5ActorSheet extends ActorSheet {
                 const updateData = {};
                 updateData['data.technology.condition_monitor.value'] = value;
                 await matrixDevice.update(updateData);
+            } else {
+                data['data.matrix.condition_monitor.value'] = value;
             }
         }
         await this.actor.update(data);
@@ -533,6 +535,8 @@ export class SR5ActorSheet extends ActorSheet {
                 const updateData = {};
                 updateData['data.technology.condition_monitor.value'] = 0;
                 await matrixDevice.update(updateData);
+            } else {
+                data['data.matrix.condition_monitor.value'] = 0;
             }
         }
         await this.actor.update(data);

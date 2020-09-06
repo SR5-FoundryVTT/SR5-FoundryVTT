@@ -68,6 +68,10 @@ export class MatrixPrep {
         }
     }
 
+    /**
+     * Add Matrix Attributes to Limits and Attributes
+     * @param data
+     */
     static prepareMatrixToLimitsAndAttributes(data: SR5ActorData & MatrixActorData) {
         const { matrix, attributes, limits } = data;
         const MatrixList = ['firewall', 'sleaze', 'data_processing', 'attack'];

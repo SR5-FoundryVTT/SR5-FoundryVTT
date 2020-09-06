@@ -15,6 +15,7 @@
         "Quality": "Quality",
         "Sin": "SIN",
         "Spell": "Spell",
+        "SpritePower": "Sprite Power",
         "Weapon": "Weapon"
     },
 
@@ -562,7 +563,9 @@
         "ActorSheet": {
             "SpiritConfiguration": "Spirit Configuration",
             "CritterPowers": "Critter Powers",
-            "Spells": "Spells"
+            "Spells": "Spells",
+            "SpritePowers": "Sprite Powers",
+            "DeviceRating": "DeviceRating"
         }
     },
 
@@ -630,5 +633,24 @@
             "Touch": "Touch",
             "Self": "Self"
         }
+    },
+
+    "SR5.Sprite": {
+        "Level": "Level",
+        "Registered": "Registered",
+        "Type": "Type",
+        "Services": "Services",
+        "Types": {
+            "Machine": "Machine",
+            "Courier": "Courier",
+            "Crack": "Crack",
+            "Data": "Data",
+            "Fault": "Fault"
+        }
+    },
+
+    "SR5.SpritePower": {
+        "Type": "Type"
+
     }
 }

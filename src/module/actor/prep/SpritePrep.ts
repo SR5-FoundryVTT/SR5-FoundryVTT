@@ -57,6 +57,7 @@ export class SpritePrep extends BaseActorPrep<SR5SpriteType, SpriteActorData> {
         }
 
         matrix.rating = level;
+        matrix.condition_monitor.max = 8 + Math.ceil(level / 2);
     }
 
     static getSpriteStatModifiers(spriteType: SpriteType) {

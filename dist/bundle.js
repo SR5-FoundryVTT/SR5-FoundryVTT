@@ -2355,6 +2355,9 @@ class SR5ActorSheet extends ActorSheet {
                     updateData['data.technology.condition_monitor.value'] = value;
                     yield matrixDevice.update(updateData);
                 }
+                else {
+                    data['data.matrix.condition_monitor.value'] = value;
+                }
             }
             yield this.actor.update(data);
         });
@@ -2381,6 +2384,9 @@ class SR5ActorSheet extends ActorSheet {
                     const updateData = {};
                     updateData['data.technology.condition_monitor.value'] = 0;
                     yield matrixDevice.update(updateData);
+                }
+                else {
+                    data['data.matrix.condition_monitor.value'] = 0;
                 }
             }
             yield this.actor.update(data);
@@ -3015,6 +3021,7 @@ class SpritePrep extends BaseActorPrep_1.BaseActorPrep {
             skill.base = overrides.skills.find((s) => s === skillId) ? level : 0;
         }
         matrix.rating = level;
+        matrix.condition_monitor.max = 8 + Math.ceil(level / 2);
     }
     static getSpriteStatModifiers(spriteType) {
         const overrides = {
@@ -3324,6 +3331,10 @@ class MatrixPrep {
             matrix.condition_monitor.value = matrix.condition_monitor.max;
         }
     }
+    /**
+     * Add Matrix Attributes to Limits and Attributes
+     * @param data
+     */
     static prepareMatrixToLimitsAndAttributes(data) {
         const { matrix, attributes, limits } = data;
         const MatrixList = ['firewall', 'sleaze', 'data_processing', 'attack'];

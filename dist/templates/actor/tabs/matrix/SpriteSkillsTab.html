@@ -1,5 +1,5 @@
 {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.html' tabId='skills'}}
-    <div class="inventory">
+    <div>
         {{> "systems/shadowrun5e/dist/templates/common/HeaderBlock.html"
                 name=(localize "SR5.Matrix")
         }}
@@ -66,6 +66,8 @@
 
             </div>
         </div>
+    </div>
+    <div class="inventory">
         <div class="split-container">
             {{> 'systems/shadowrun5e/dist/templates/actor/parts/skills/ActiveSkillList.html' }}
             {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/SpritePowerList.html' }}
