@@ -11,7 +11,7 @@ export class MatrixPrep {
      * - if it isn't and player is technomancer, it will use that data
      */
     static prepareMatrix(actorData: SR5ActorData & MatrixActorData, items: SR5ItemDataWrapper[]) {
-        const { matrix, attributes, limits } = actorData;
+        const { matrix, attributes } = actorData;
 
         const MatrixList = ['firewall', 'sleaze', 'data_processing', 'attack'];
 
@@ -66,6 +66,11 @@ export class MatrixPrep {
         if (matrix.condition_monitor.value > matrix.condition_monitor.max) {
             matrix.condition_monitor.value = matrix.condition_monitor.max;
         }
+    }
+
+    static prepareMatrixToLimitsAndAttributes(data: SR5ActorData & MatrixActorData) {
+        const { matrix, attributes, limits } = data;
+        const MatrixList = ['firewall', 'sleaze', 'data_processing', 'attack'];
 
         // add matrix attributes to both limits and attributes as hidden entries
         MatrixList.forEach((key) => {
@@ -91,5 +96,23 @@ export class MatrixPrep {
                 };
             }
         });
+
+    }
+
+    /**
+     * Prepare the mental attributes for a sheet that just has a device rating
+     * @param data
+     */
+    static prepareAttributesForDevice(data: SR5ActorData & MatrixActorData) {
+        const { matrix, attributes } = data;
+        const rating = matrix.rating || 0;
+        const mentalAttributes = ['intuition', 'logic', 'charisma', 'willpower'];
+
+        mentalAttributes.forEach(attLabel => {
+            if (attributes[attLabel] !== undefined) {
+                attributes[attLabel].base = rating;
+            }
+        })
+
     }
 }

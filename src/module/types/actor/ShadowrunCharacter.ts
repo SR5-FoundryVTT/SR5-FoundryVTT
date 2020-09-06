@@ -10,7 +10,7 @@ declare namespace Shadowrun {
         skills: string;
     };
 
-    export type SR5ActorType = SR5SpiritType | SR5CharacterType;
+    export type SR5ActorType = SR5SpiritType | SR5CharacterType | SR5SpriteType;
 
     export type SR5ActorBase = ActorData & {
         name: string;
@@ -32,13 +32,57 @@ declare namespace Shadowrun {
     export type SR5CharacterType = SR5ActorBase & {
         data: CharacterActorData;
         type: 'character';
-    }
+    };
+    export type SR5SpriteType = SR5ActorBase & {
+        data: SpriteActorData;
+        type: 'sprite';
+    };
 
-    export type SR5ActorData = SpiritActorData | CharacterActorData;
+    export type SR5ActorData = SpiritActorData | CharacterActorData | SpriteActorData;
 
-    export type SpiritActorData = MagicActorData & {
-        spiritType: SpiritType;
-        force: number;
+    export type SpiritActorData = MagicActorData &
+        TwoTrackActorData &
+        ArmorActorData &
+        WoundsActorData &
+        MovementActorData & {
+            spiritType: SpiritType;
+            force: number;
+            attributes: Attributes;
+            limits: Limits;
+            skills: {
+                active: Skills;
+                language: KnowledgeSkillList;
+                knowledge: KnowledgeSkills;
+            };
+            modifiers: Modifiers;
+            special: SpecialTrait;
+            initiative: Initiative;
+        };
+
+    export type CharacterActorData = MatrixActorData &
+        TwoTrackActorData &
+        ArmorActorData &
+        MagicActorData &
+        WoundsActorData &
+        MovementActorData & {
+            attributes: Attributes;
+            limits: Limits;
+            skills: {
+                active: Skills;
+                language: KnowledgeSkillList;
+                knowledge: KnowledgeSkills;
+            };
+            modifiers: Modifiers;
+            special: SpecialTrait;
+            initiative: Initiative;
+            recoil_compensation: number;
+        };
+
+    export type SpriteActorData = MatrixActorData & {
+        level: number;
+        services: number;
+        registered: boolean;
+        spriteType: SpriteType;
         attributes: Attributes;
         limits: Limits;
         skills: {
@@ -46,40 +90,34 @@ declare namespace Shadowrun {
             language: KnowledgeSkillList;
             knowledge: KnowledgeSkills;
         };
-        track: Tracks;
-        movement: Movement;
-        modifiers: Modifiers;
         special: SpecialTrait;
         initiative: Initiative;
+        modifiers: Modifiers;
+    };
+
+    export type MovementActorData = {
+        movement: Movement;
+    };
+
+    export type ArmorActorData = {
         armor: ActorArmor;
+    };
+
+    export type WoundsActorData = {
         wounds: WoundType;
     }
 
-    export type CharacterActorData = MatrixActorData & MagicActorData & {
-        attributes: Attributes;
-        limits: Limits;
-        skills: {
-            active: Skills;
-            language: KnowledgeSkillList;
-            knowledge: KnowledgeSkills;
-        };
+    export type TwoTrackActorData = {
         track: Tracks;
-        movement: Movement;
-        modifiers: Modifiers;
-        special: SpecialTrait;
-        armor: ActorArmor;
-        initiative: Initiative;
-        wounds: WoundType;
-        recoil_compensation: number;
     };
 
     export type MagicActorData = {
         magic: Magic;
-    }
+    };
 
     export type MatrixActorData = {
         matrix: ActorMatrix;
-    }
+    };
 
     export type WoundType = {
         value: number;

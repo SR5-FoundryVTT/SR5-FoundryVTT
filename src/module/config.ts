@@ -1,23 +1,23 @@
 export const SR5 = {};
 
 SR5['itemTypes'] = {
-    "action": "SR5.ItemTypes.Action",
-    "adept_power": "SR5.ItemTypes.AdeptPower",
-    "ammo": "SR5.ItemTypes.Ammo",
-    "armor": "SR5.ItemTypes.Armor",
-    "complex_form": "SR5.ItemTypes.ComplexForm",
-    "contact": "SR5.ItemTypes.Contact",
-    "critter_power": "SR5.ItemTypes.CritterPower",
-    "cyberware": "SR5.ItemTypes.Cyberware",
-    "device": "SR5.ItemTypes.Device",
-    "equipment": "SR5.ItemTypes.Equipment",
-    "lifestyle": "SR5.ItemTypes.Lifestyle",
-    "modification": "SR5.ItemTypes.Modification",
-    "quality": "SR5.ItemTypes.Quality",
-    "sin": "SR5.ItemTypes.Sin",
-    "spell": "SR5.ItemTypes.Spell",
-    "weapon": "SR5.ItemTypes.Weapon"
-}
+    action: 'SR5.ItemTypes.Action',
+    adept_power: 'SR5.ItemTypes.AdeptPower',
+    ammo: 'SR5.ItemTypes.Ammo',
+    armor: 'SR5.ItemTypes.Armor',
+    complex_form: 'SR5.ItemTypes.ComplexForm',
+    contact: 'SR5.ItemTypes.Contact',
+    critter_power: 'SR5.ItemTypes.CritterPower',
+    cyberware: 'SR5.ItemTypes.Cyberware',
+    device: 'SR5.ItemTypes.Device',
+    equipment: 'SR5.ItemTypes.Equipment',
+    lifestyle: 'SR5.ItemTypes.Lifestyle',
+    modification: 'SR5.ItemTypes.Modification',
+    quality: 'SR5.ItemTypes.Quality',
+    sin: 'SR5.ItemTypes.Sin',
+    spell: 'SR5.ItemTypes.Spell',
+    weapon: 'SR5.ItemTypes.Weapon',
+};
 
 SR5['attributes'] = {
     body: 'SR5.AttrBody',
@@ -390,5 +390,13 @@ SR5['critterPower'] = {
         sustained: 'SR5.CritterPower.Durations.Sustained',
         permanent: 'SR5.CritterPower.Durations.Permanent',
         special: 'SR5.CritterPower.Durations.Special',
-    }
+    },
+};
+
+SR5['spriteTypes'] = {
+    courier: 'SR5.Sprite.Types.Courier',
+    crack: 'SR5.Sprite.Types.Crack',
+    data: 'SR5.Sprite.Types.Data',
+    fault: 'SR5.Sprite.Types.Fault',
+    machine: 'SR5.Sprite.Types.Machine',
 };

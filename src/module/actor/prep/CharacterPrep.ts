@@ -24,6 +24,7 @@ export class CharacterPrep extends BaseActorPrep<SR5CharacterType, CharacterActo
         LimitsPrep.prepareLimits(this.data);
 
         MatrixPrep.prepareMatrix(this.data, this.items);
+        MatrixPrep.prepareMatrixToLimitsAndAttributes(this.data);
 
         ConditionMonitorsPrep.preparePhysical(this.data);
         ConditionMonitorsPrep.prepareStun(this.data);

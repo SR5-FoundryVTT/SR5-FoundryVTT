@@ -2,6 +2,7 @@ import SR5ActorData = Shadowrun.SR5ActorData;
 import { SR5ItemDataWrapper } from '../../../item/SR5ItemDataWrapper';
 import { Helpers } from '../../../helpers';
 import { PartsList } from '../../../parts/PartsList';
+import ArmorActorData = Shadowrun.ArmorActorData;
 
 export class ItemPrep {
     /**
@@ -9,7 +10,7 @@ export class ItemPrep {
      * - will only allow one "Base" armor item to be used
      * - all "accessories" will be added to the armor
      */
-    static prepareArmor(data: SR5ActorData, items: SR5ItemDataWrapper[]) {
+    static prepareArmor(data: SR5ActorData & ArmorActorData, items: SR5ItemDataWrapper[]) {
         const { armor } = data;
         armor.base = 0;
         armor.value = 0;

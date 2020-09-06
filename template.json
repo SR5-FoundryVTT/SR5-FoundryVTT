@@ -2,7 +2,8 @@
     "Actor": {
         "types": [
             "character",
-            "spirit"
+            "spirit",
+            "sprite"
         ],
         "templates": {
             "matrix": {
@@ -913,6 +914,19 @@
             "bound": false,
             "force": 0,
             "spiritType": ""
+        },
+        "sprite": {
+            "templates": [
+                "common",
+                "skills",
+                "attributes",
+                "limits",
+                "matrix"
+            ],
+            "services": 0,
+            "registered": false,
+            "level": 0,
+            "spriteType": ""
         }
     },
     "Item": {
