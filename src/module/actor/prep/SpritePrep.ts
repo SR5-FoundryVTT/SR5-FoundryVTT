@@ -11,6 +11,9 @@ import SpriteType = Shadowrun.SpriteType;
 import { Helpers } from '../../helpers';
 import { PartsList } from '../../parts/PartsList';
 
+/**
+ * Prepare a Sprite Type of Actor
+ */
 export class SpritePrep extends BaseActorPrep<SR5SpriteType, SpriteActorData> {
     prepare() {
         ModifiersPrep.prepareModifiers(this.data);
@@ -25,8 +28,19 @@ export class SpritePrep extends BaseActorPrep<SR5SpriteType, SpriteActorData> {
         MatrixPrep.prepareMatrixToLimitsAndAttributes(this.data);
 
         InitiativePrep.prepareCurrentInitiative(this.data);
+
+        this.data.special = 'resonance';
     }
 
+    /**
+     * Prepares basic Sprite specific data
+     * - matrix attribute values
+     * - device rating
+     * - matrix condition monitor
+     * - matrix initiative
+     * - skills
+     * @param data
+     */
     static prepareSpriteData(data: SpriteActorData) {
         const { level, skills, matrix, spriteType, initiative, attributes, modifiers } = data;
 
@@ -34,6 +48,7 @@ export class SpritePrep extends BaseActorPrep<SR5SpriteType, SpriteActorData> {
 
         const overrides = this.getSpriteStatModifiers(spriteType);
 
+        // apply the matrix overrides
         matrixAtts.forEach((att) => {
             if (matrix[att] !== undefined) {
                 matrix[att].base = level + overrides[att];
@@ -41,17 +56,24 @@ export class SpritePrep extends BaseActorPrep<SR5SpriteType, SpriteActorData> {
             }
         });
 
+        // setup initiative from overrides
         initiative.matrix.base.base = level * 2 + overrides.init;
         PartsList.AddUniquePart(initiative.matrix.base.mod, 'SR5.Bonus', modifiers['matrix_initiative']);
         Helpers.calcTotal(initiative.matrix.base);
+
         initiative.matrix.dice.base = 4;
         PartsList.AddUniquePart(initiative.matrix.dice.mod, 'SR5.Bonus', modifiers['matrix_initiative_dice']);
         Helpers.calcTotal(initiative.matrix.dice);
+
+        // always in matrix perception
         initiative.perception = 'matrix';
 
+        // calculate resonance value
         attributes.resonance.base = level + overrides.resonance;
         Helpers.calcTotal(attributes.resonance);
 
+        // apply skill levels
+        // clear skills that we don't have
         for (const [skillId, skill] of Object.entries(skills.active)) {
             skill.base = overrides.skills.find((s) => s === skillId) ? level : 0;
         }
@@ -60,6 +82,10 @@ export class SpritePrep extends BaseActorPrep<SR5SpriteType, SpriteActorData> {
         matrix.condition_monitor.max = 8 + Math.ceil(level / 2);
     }
 
+    /**
+     * Get the stat modifiers for the specified type of sprite
+     * @param spriteType
+     */
     static getSpriteStatModifiers(spriteType: SpriteType) {
         const overrides = {
             attack: 0,
@@ -68,6 +94,7 @@ export class SpritePrep extends BaseActorPrep<SR5SpriteType, SpriteActorData> {
             firewall: 0,
             resonance: 0,
             init: 0,
+            // all sprites have computer
             skills: ['computer'],
         };
         switch (spriteType) {

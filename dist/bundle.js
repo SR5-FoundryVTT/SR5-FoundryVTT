@@ -2987,6 +2987,9 @@ const LimitsPrep_1 = require("./functions/LimitsPrep");
 const MatrixPrep_1 = require("./functions/MatrixPrep");
 const helpers_1 = require("../../helpers");
 const PartsList_1 = require("../../parts/PartsList");
+/**
+ * Prepare a Sprite Type of Actor
+ */
 class SpritePrep extends BaseActorPrep_1.BaseActorPrep {
     prepare() {
         ModifiersPrep_1.ModifiersPrep.prepareModifiers(this.data);
@@ -2997,32 +3000,52 @@ class SpritePrep extends BaseActorPrep_1.BaseActorPrep {
         LimitsPrep_1.LimitsPrep.prepareLimits(this.data);
         MatrixPrep_1.MatrixPrep.prepareMatrixToLimitsAndAttributes(this.data);
         InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(this.data);
+        this.data.special = 'resonance';
     }
+    /**
+     * Prepares basic Sprite specific data
+     * - matrix attribute values
+     * - device rating
+     * - matrix condition monitor
+     * - matrix initiative
+     * - skills
+     * @param data
+     */
     static prepareSpriteData(data) {
         const { level, skills, matrix, spriteType, initiative, attributes, modifiers } = data;
         const matrixAtts = ['attack', 'sleaze', 'data_processing', 'firewall'];
         const overrides = this.getSpriteStatModifiers(spriteType);
+        // apply the matrix overrides
         matrixAtts.forEach((att) => {
             if (matrix[att] !== undefined) {
                 matrix[att].base = level + overrides[att];
                 matrix[att].value = helpers_1.Helpers.calcTotal(matrix[att]);
             }
         });
+        // setup initiative from overrides
         initiative.matrix.base.base = level * 2 + overrides.init;
         PartsList_1.PartsList.AddUniquePart(initiative.matrix.base.mod, 'SR5.Bonus', modifiers['matrix_initiative']);
         helpers_1.Helpers.calcTotal(initiative.matrix.base);
         initiative.matrix.dice.base = 4;
         PartsList_1.PartsList.AddUniquePart(initiative.matrix.dice.mod, 'SR5.Bonus', modifiers['matrix_initiative_dice']);
         helpers_1.Helpers.calcTotal(initiative.matrix.dice);
+        // always in matrix perception
         initiative.perception = 'matrix';
+        // calculate resonance value
         attributes.resonance.base = level + overrides.resonance;
         helpers_1.Helpers.calcTotal(attributes.resonance);
+        // apply skill levels
+        // clear skills that we don't have
         for (const [skillId, skill] of Object.entries(skills.active)) {
             skill.base = overrides.skills.find((s) => s === skillId) ? level : 0;
         }
         matrix.rating = level;
         matrix.condition_monitor.max = 8 + Math.ceil(level / 2);
     }
+    /**
+     * Get the stat modifiers for the specified type of sprite
+     * @param spriteType
+     */
     static getSpriteStatModifiers(spriteType) {
         const overrides = {
             attack: 0,
@@ -3031,6 +3054,7 @@ class SpritePrep extends BaseActorPrep_1.BaseActorPrep {
             firewall: 0,
             resonance: 0,
             init: 0,
+            // all sprites have computer
             skills: ['computer'],
         };
         switch (spriteType) {
