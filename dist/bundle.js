@@ -3131,6 +3131,7 @@ class VehiclePrep extends BaseActorPrep_1.BaseActorPrep {
         VehiclePrep.prepareMeatspaceInit(this.data);
         InitiativePrep_1.InitiativePrep.prepareMatrixInit(this.data);
         InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(this.data);
+        VehiclePrep.prepareArmor(this.data);
         console.log(this.data);
     }
     static prepareVehicleStats(data) {
@@ -3211,6 +3212,11 @@ class VehiclePrep extends BaseActorPrep_1.BaseActorPrep {
         initiative.meatspace.dice.base = 4;
         helpers_1.Helpers.calcTotal(initiative.meatspace.base);
         helpers_1.Helpers.calcTotal(initiative.meatspace.dice);
+    }
+    static prepareArmor(data) {
+        const { armor } = data;
+        armor.mod = PartsList_1.PartsList.AddUniquePart(armor.mod, "SR5.Temporary", armor['temp']);
+        helpers_1.Helpers.calcTotal(armor);
     }
 }
 exports.VehiclePrep = VehiclePrep;

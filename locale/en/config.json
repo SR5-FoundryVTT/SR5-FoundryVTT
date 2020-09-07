@@ -570,7 +570,8 @@
             "DeviceRating": "Device Rating",
             "RollDronePerception": "Drone Perception",
             "RollPilotVehicleTest": "Pilot Vehicle",
-            "RollDroneInfiltration": "Drone Infiltration"
+            "RollDroneInfiltration": "Drone Infiltration",
+            "VehicleConfiguration": "Vehicle Configuration"
         }
     },
 
@@ -660,6 +661,7 @@
 
     "SR5.Vehicle": {
         "IsDrone": "Is Drone",
+        "IsOffRoad": "Is Off Road",
         "ControlMode": "Control Mode",
         "Type": "Type",
         "Stats": {

@@ -33,6 +33,8 @@ export class VehiclePrep extends BaseActorPrep<SR5VehicleType, VehicleActorData>
         InitiativePrep.prepareMatrixInit(this.data);
         InitiativePrep.prepareCurrentInitiative(this.data);
 
+        VehiclePrep.prepareArmor(this.data);
+
         console.log(this.data);
     }
 
@@ -131,5 +133,11 @@ export class VehiclePrep extends BaseActorPrep<SR5VehicleType, VehicleActorData>
         initiative.meatspace.dice.base = 4;
         Helpers.calcTotal(initiative.meatspace.base);
         Helpers.calcTotal(initiative.meatspace.dice);
+    }
+
+    static prepareArmor(data: VehicleActorData) {
+        const { armor } = data;
+        armor.mod = PartsList.AddUniquePart(armor.mod, "SR5.Temporary", armor['temp']);
+        Helpers.calcTotal(armor);
     }
 }
