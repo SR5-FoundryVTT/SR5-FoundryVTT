@@ -193,7 +193,20 @@ export class SR5ActorSheet extends ActorSheet {
             },
         };
 
-        let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs, critter_powers, sprite_powers] = data.items.reduce(
+        let [
+            items,
+            spells,
+            qualities,
+            adept_powers,
+            actions,
+            complex_forms,
+            lifestyles,
+            contacts,
+            sins,
+            programs,
+            critter_powers,
+            sprite_powers,
+        ] = data.items.reduce(
             (arr, item) => {
                 item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
                 if (item.type === 'spell') arr[1].push(item);
@@ -329,6 +342,13 @@ export class SR5ActorSheet extends ActorSheet {
 
         $(html).find('.horizontal-cell-input .cell').on('contextmenu', this._onClearCellInput.bind(this));
 
+        /**
+         * New API to use for rolling from the actor sheet
+         * the clickable label needs the css class Roll
+         * a parent of the label needs to have the css class RollId, and then have data-roll-id set
+         */
+        $(html).find('.Roll').on('click', this._onRollFromSheet.bind(this));
+
         // updates matrix condition monitor on the device the actor has equippe
         $(html)
             .find('[name="data.matrix.condition_monitor.value"]')
@@ -366,6 +386,31 @@ export class SR5ActorSheet extends ActorSheet {
                 item.addEventListener('dragstart', handler, false);
             }
         });
+    }
+
+    async _onRollFromSheet(event) {
+        event.preventDefault();
+        const rollId = $(event.currentTarget).parent('.RollId').data().rollId;
+        console.log('');
+        console.log(rollId);
+
+        const split = rollId.split('.');
+        const options = { event };
+        switch (split[0]) {
+            case 'armor':
+                this.actor.rollArmor(options);
+                break;
+            case 'vehicleStat':
+                console.log('roll vehicle stat', rollId);
+                break;
+            case 'attribute':
+                const attribute = split[1];
+                if (attribute) this.actor.rollAttribute(attribute, options);
+                break;
+            case 'fade':
+                this.actor.rollFade(options);
+                break;
+        }
     }
 
     async _onFilterSkills(event) {

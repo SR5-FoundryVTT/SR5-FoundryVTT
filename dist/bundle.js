@@ -2017,7 +2017,7 @@ class SR5ActorSheet extends ActorSheet {
                 },
             },
         };
-        let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs, critter_powers, sprite_powers] = data.items.reduce((arr, item) => {
+        let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs, critter_powers, sprite_powers,] = data.items.reduce((arr, item) => {
             item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
             if (item.type === 'spell')
                 arr[1].push(item);
@@ -2160,6 +2160,12 @@ class SR5ActorSheet extends ActorSheet {
         html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
         $(html).find('.horizontal-cell-input .cell').on('click', this._onSetCellInput.bind(this));
         $(html).find('.horizontal-cell-input .cell').on('contextmenu', this._onClearCellInput.bind(this));
+        /**
+         * New API to use for rolling from the actor sheet
+         * the clickable label needs the css class Roll
+         * a parent of the label needs to have the css class RollId, and then have data-roll-id set
+         */
+        $(html).find('.Roll').on('click', this._onRollFromSheet.bind(this));
         // updates matrix condition monitor on the device the actor has equippe
         $(html)
             .find('[name="data.matrix.condition_monitor.value"]')
@@ -2195,6 +2201,32 @@ class SR5ActorSheet extends ActorSheet {
             if (item.dataset && item.dataset.itemId) {
                 item.setAttribute('draggable', true);
                 item.addEventListener('dragstart', handler, false);
+            }
+        });
+    }
+    _onRollFromSheet(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const rollId = $(event.currentTarget).parent('.RollId').data().rollId;
+            console.log('');
+            console.log(rollId);
+            const split = rollId.split('.');
+            const options = { event };
+            switch (split[0]) {
+                case 'armor':
+                    this.actor.rollArmor(options);
+                    break;
+                case 'vehicleStat':
+                    console.log('roll vehicle stat', rollId);
+                    break;
+                case 'attribute':
+                    const attribute = split[1];
+                    if (attribute)
+                        this.actor.rollAttribute(attribute, options);
+                    break;
+                case 'fade':
+                    this.actor.rollFade(options);
+                    break;
             }
         });
     }
@@ -5686,7 +5718,7 @@ exports.registerBasicHelpers = () => {
         return '';
     });
     Handlebars.registerHelper('concatStrings', function (...args) {
-        return args.join(' ');
+        return args.filter(a => typeof a === 'string').join('');
     });
     Handlebars.registerHelper('concat', function (strs, c = ',') {
         if (Array.isArray(strs)) {

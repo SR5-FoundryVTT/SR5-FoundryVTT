@@ -1,5 +1,5 @@
 {{#> "systems/shadowrun5e/dist/templates/common/Attribute.html" dataName="attribute" dataId=attributeId}}
-    <div class="attribute-name attribute-roll roll">
+    <div class="attribute-name roll {{#if rollId}}Roll{{/if}}">
         {{#if label}}
             {{localize label}}
         {{else}}
