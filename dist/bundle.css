@@ -825,7 +825,7 @@ select.display {
     margin-right: 8px; }
   .sr5 .horizontal-cell-input .cell-container {
     display: flex;
-    flex-flow: row nowrap;
+    flex-flow: row;
     justify-content: stretch; }
     .sr5 .horizontal-cell-input .cell-container .cell {
       cursor: pointer;

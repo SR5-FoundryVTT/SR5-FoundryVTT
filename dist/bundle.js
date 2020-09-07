@@ -3131,6 +3131,7 @@ class VehiclePrep extends BaseActorPrep_1.BaseActorPrep {
         InitiativePrep_1.InitiativePrep.prepareMeatspaceInit(this.data);
         InitiativePrep_1.InitiativePrep.prepareMatrixInit(this.data);
         InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(this.data);
+        console.log(this.data);
     }
     static prepareVehicleStats(data) {
         var _a;
@@ -3177,15 +3178,16 @@ class VehiclePrep extends BaseActorPrep_1.BaseActorPrep {
         limits.speed = Object.assign(Object.assign({}, (isOffRoad ? vehicle_stats.off_road_speed : vehicle_stats.speed)), { hidden: true });
     }
     static prepareVehicleConditionMonitors(data) {
-        const { track, attributes, matrix, isDrone } = data;
+        const { track, attributes, matrix, isDrone, modifiers } = data;
         const halfBody = Math.ceil(helpers_1.Helpers.calcTotal(attributes.body) / 2);
         // CRB pg 199 drone vs vehicle physical condition monitor rules
         if (isDrone) {
-            track.physical.base = 6 + halfBody;
+            track.physical.max = 6 + halfBody + (Number(modifiers['physical_track']) || 0);
         }
         else {
-            track.physical.base = 12 + halfBody;
+            track.physical.max = 12 + halfBody + (Number(modifiers['physical_track']) || 0);
         }
+        track.physical.label = CONFIG.SR5.damageTypes.physical;
         const rating = matrix.rating || 0;
         matrix.condition_monitor.max = 8 + Math.ceil(rating / 2);
     }
@@ -5602,8 +5604,9 @@ exports.SR5['spriteTypes'] = {
 exports.SR5['vehicle'] = {
     types: {
         air: 'SR5.Vehicle.Types.Air',
-        water: 'SR5.Vehicle.Types.Water',
+        aerospace: 'SR5.Vehicle.Types.Aerospace',
         ground: 'SR5.Vehicle.Types.Ground',
+        water: 'SR5.Vehicle.Types.Water'
     },
     stats: {
         handling: 'SR5.Vehicle.Stats.Handling',
@@ -5839,6 +5842,7 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         // vehicle
         'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleStatsList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleSecondStatsList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleMovement.html',
         'systems/shadowrun5e/dist/templates/item/parts/description.html',
         'systems/shadowrun5e/dist/templates/item/parts/technology.html',
         'systems/shadowrun5e/dist/templates/item/parts/header.html',
@@ -5866,10 +5870,13 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         // Useful wrapper and implemented components
         'systems/shadowrun5e/dist/templates/common/ValueMaxAttribute.html',
         'systems/shadowrun5e/dist/templates/common/Attribute.html',
+        // useful select template for the common pattern
+        'systems/shadowrun5e/dist/templates/common/Select.html',
         // to create the condition monitors and edge counter
         'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html',
         // looks like a ListHeader
         'systems/shadowrun5e/dist/templates/common/HeaderBlock.html',
+        'systems/shadowrun5e/dist/templates/common/NameLineBlock.html',
         // list components
         'systems/shadowrun5e/dist/templates/common/List/ListItem.html',
         'systems/shadowrun5e/dist/templates/common/List/ListHeader.html',

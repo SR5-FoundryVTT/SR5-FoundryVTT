@@ -51,6 +51,7 @@ export const preloadHandlebarsTemplates = async () => {
         // vehicle
         'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleStatsList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleSecondStatsList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleMovement.html',
 
         'systems/shadowrun5e/dist/templates/item/parts/description.html',
         'systems/shadowrun5e/dist/templates/item/parts/technology.html',
@@ -82,15 +83,21 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/common/ValueMaxAttribute.html',
         'systems/shadowrun5e/dist/templates/common/Attribute.html',
 
+        // useful select template for the common pattern
+        'systems/shadowrun5e/dist/templates/common/Select.html',
+
         // to create the condition monitors and edge counter
         'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html',
 
         // looks like a ListHeader
         'systems/shadowrun5e/dist/templates/common/HeaderBlock.html',
 
+        'systems/shadowrun5e/dist/templates/common/NameLineBlock.html',
+
         // list components
         'systems/shadowrun5e/dist/templates/common/List/ListItem.html',
         'systems/shadowrun5e/dist/templates/common/List/ListHeader.html',
+
     ];
 
     return loadTemplates(templatePaths);

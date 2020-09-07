@@ -667,6 +667,12 @@
             "Acceleration": "Acceleration",
             "Pilot": "Pilot",
             "Sensor": "Sensor"
+        },
+        "Types": {
+            "Air": "Air Craft",
+            "Ground": "Ground Craft",
+            "Aerospace": "Space Craft",
+            "Water": "Water Craft"
         }
     }
 }

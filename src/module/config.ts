@@ -404,8 +404,9 @@ SR5['spriteTypes'] = {
 SR5['vehicle'] = {
     types: {
         air: 'SR5.Vehicle.Types.Air',
-        water: 'SR5.Vehicle.Types.Water',
+        aerospace: 'SR5.Vehicle.Types.Aerospace',
         ground: 'SR5.Vehicle.Types.Ground',
+        water: 'SR5.Vehicle.Types.Water'
     },
     stats: {
         handling: 'SR5.Vehicle.Stats.Handling',

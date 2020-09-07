@@ -7,31 +7,18 @@
             </div>
             <div class="attributes smooth">
                 <div class="block">
-                    {{#each data.track as |track id|}}
-                        {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
-                                name=(localize track.label)
-                                value=track.value
-                                max=track.max
-                                id=id
-                                tolerance=../woundTolerance
-                        }}
-                        {{#if track.overflow}}
-                            {{#ife track.value track.max}}
-                                {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
-                                        name=(localize "SR5.Overflow")
-                                        value=track.overflow.value
-                                        max=track.overflow.max
-                                        id="overflow"
-                                }}
-                            {{/ife}}
-                        {{/if}}
-                    {{/each}}
+                    {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
+                            name=(localize data.track.physical.label)
+                            value=data.track.physical.value
+                            max=data.track.physical.max
+                            id='physical'
+                    }}
                 </div>
             </div>
         </div>
         <div class="flexcol flex-end">
-            <div class="attributes">
-                {{> 'systems/shadowrun5e/dist/templates/actor/parts/Movement.html' }}
+            <div class="attributes center">
+                {{> 'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleMovement.html' }}
                 {{> 'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html' }}
             </div>
         </div>

@@ -32,6 +32,8 @@ export class VehiclePrep extends BaseActorPrep<SR5VehicleType, VehicleActorData>
         InitiativePrep.prepareMeatspaceInit(this.data);
         InitiativePrep.prepareMatrixInit(this.data);
         InitiativePrep.prepareCurrentInitiative(this.data);
+
+        console.log(this.data);
     }
 
     static prepareVehicleStats(data: VehicleActorData) {
@@ -87,15 +89,16 @@ export class VehiclePrep extends BaseActorPrep<SR5VehicleType, VehicleActorData>
     }
 
     static prepareVehicleConditionMonitors(data: VehicleActorData) {
-        const { track, attributes, matrix, isDrone } = data;
+        const { track, attributes, matrix, isDrone, modifiers } = data;
 
         const halfBody = Math.ceil(Helpers.calcTotal(attributes.body) / 2);
         // CRB pg 199 drone vs vehicle physical condition monitor rules
         if (isDrone) {
-            track.physical.base = 6 + halfBody;
+            track.physical.max = 6 + halfBody + (Number(modifiers['physical_track']) || 0);
         } else {
-            track.physical.base = 12 + halfBody;
+            track.physical.max = 12 + halfBody + (Number(modifiers['physical_track']) || 0);
         }
+        track.physical.label = CONFIG.SR5.damageTypes.physical;
 
         const rating = matrix.rating || 0;
         matrix.condition_monitor.max = 8 + Math.ceil(rating / 2);
