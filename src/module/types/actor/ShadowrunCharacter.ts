@@ -24,44 +24,14 @@ declare namespace Shadowrun {
         };
     };
 
-    export type SR5SpiritType = SR5ActorBase & {
-        data: SpiritActorData;
-        type: 'spirit';
-    };
 
     export type SR5CharacterType = SR5ActorBase & {
         data: CharacterActorData;
         type: 'character';
     };
-    export type SR5SpriteType = SR5ActorBase & {
-        data: SpriteActorData;
-        type: 'sprite';
-    };
-    export type SR5VehicleType = SR5ActorBase & {
-        data: VehicleActorData;
-        type: 'vehicle';
-    };
 
     export type SR5ActorData = SpiritActorData | CharacterActorData | SpriteActorData | VehicleActorData;
 
-    export type SpiritActorData = MagicActorData &
-        TwoTrackActorData &
-        ArmorActorData &
-        WoundsActorData &
-        MovementActorData & {
-            spiritType: SpiritType;
-            force: number;
-            attributes: Attributes;
-            limits: Limits;
-            skills: {
-                active: Skills;
-                language: KnowledgeSkillList;
-                knowledge: KnowledgeSkills;
-            };
-            modifiers: Modifiers;
-            special: SpecialTrait;
-            initiative: Initiative;
-        };
 
     export type CharacterActorData = MatrixActorData &
         TwoTrackActorData &
@@ -80,47 +50,6 @@ declare namespace Shadowrun {
             special: SpecialTrait;
             initiative: Initiative;
             recoil_compensation: number;
-        };
-
-    export type SpriteActorData = MatrixActorData & {
-        level: number;
-        services: number;
-        registered: boolean;
-        spriteType: SpriteType;
-        attributes: Attributes;
-        limits: Limits;
-        skills: {
-            active: Skills;
-            language: KnowledgeSkillList;
-            knowledge: KnowledgeSkills;
-        };
-        special: SpecialTrait;
-        initiative: Initiative;
-        modifiers: Modifiers;
-    };
-
-    export type VehicleActorData = ArmorActorData &
-        MatrixActorData &
-        MovementActorData &
-        PhysicalTrackActorData & {
-            vehicleType: VehicleTypes;
-            pilot_rating: ModifiableValue;
-            handling: ModifiableValue;
-            off_road_handling: ModifiableValue;
-            speed: ModifiableValue;
-            acceleration: ModifiableValue;
-            sensor_rating: ModifiableValue;
-
-            attributes: Attributes;
-            limits: Limits;
-            skills: {
-                active: Skills;
-                language: KnowledgeSkillList;
-                knowledge: KnowledgeSkills;
-            };
-            initiative: Initiative;
-            modifiers: Modifiers;
-            special: SpecialTrait;
         };
 
     export type PhysicalTrackActorData = {

@@ -14,6 +14,7 @@ export const preloadHandlebarsTemplates = async () => {
 
         'systems/shadowrun5e/dist/templates/actor/tabs/spirit/SpiritSkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/matrix/SpriteSkillsTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/vehicle/VehicleSkillsTab.html',
 
         // uncategorized lists
         'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html',
@@ -35,6 +36,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/ComplexFormList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/SpritePowerList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/matrix/DeviceRating.html',
 
         // attributes
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html',
@@ -45,6 +47,10 @@ export const preloadHandlebarsTemplates = async () => {
         // skills
         'systems/shadowrun5e/dist/templates/actor/parts/skills/ActiveSkillList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/skills/LanguageAndKnowledgeSkillList.html',
+
+        // vehicle
+        'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleStatsList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleSecondStatsList.html',
 
         'systems/shadowrun5e/dist/templates/item/parts/description.html',
         'systems/shadowrun5e/dist/templates/item/parts/technology.html',

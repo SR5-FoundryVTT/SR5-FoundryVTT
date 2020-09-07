@@ -9,7 +9,11 @@
                         "max": 0
                     },
                     "vr": false,
-                    "rating": 0,
+                    "rating": {
+                        "value": 0,
+                        "mod": [],
+                        "base": 0
+                    },
                     "is_cyberdeck": false,
                     "name": "",
                     "silent": false,
@@ -765,6 +769,7 @@
             },
             "armor": {
                 "armor": {
+                    "base": 0,
                     "value": 0,
                     "mod": 0,
                     "acid": 0,
@@ -902,41 +907,53 @@
         "vehicle": {
             "templates": ["common", "skills", "attributes", "limits", "armor", "matrix", "movement"],
             "vehicleType": "",
-            "pilot_rating": {
-                "base": 0,
-                "value": 0,
-                "mod": []
-            },
-            "handling": {
-                "base": 0,
-                "value": 0,
-                "mod": []
-            },
-            "off_road_handling": {
-                "base": 0,
-                "value": 0,
-                "mod": []
-            },
-            "speed": {
-                "base": 0,
-                "value": 0,
-                "mod": []
-            },
-            "acceleration": {
-                "base": 0,
-                "value": 0,
-                "mod": []
-            },
-            "sensor_rating": {
-                "base": 0,
-                "value": 0,
-                "mod": []
+            "controlMode": "",
+            "isDrone": false,
+            "isOffRoad": false,
+            "vehicle_stats": {
+                "pilot": {
+                    "base": 0,
+                    "value": 0,
+                    "mod": []
+                },
+                "handling": {
+                    "base": 0,
+                    "value": 0,
+                    "mod": []
+                },
+                "off_road_handling": {
+                    "base": 0,
+                    "value": 0,
+                    "mod": []
+                },
+                "speed": {
+                    "base": 0,
+                    "value": 0,
+                    "mod": []
+                },
+                "off_road_speed": {
+                    "base": 0,
+                    "value": 0,
+                    "mod": []
+                },
+                "acceleration": {
+                    "base": 0,
+                    "value": 0,
+                    "mod": []
+                },
+                "sensor": {
+                    "base": 0,
+                    "value": 0,
+                    "mod": []
+                }
             },
             "track": {
                 "physical": {
+                    "base": 0,
                     "value": 0,
                     "max": 0,
                     "overflow": {
+                        "base": 0,
                         "value": 0,
                         "max": 0
                     }

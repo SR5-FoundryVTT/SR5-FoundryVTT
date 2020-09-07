@@ -1,0 +1,15 @@
+{{#> "systems/shadowrun5e/dist/templates/common/Attribute.html" dataName="matrix" dataId='rating'}}
+    <div class="attribute-name attribute-roll roll">
+        {{localize "SR5.Labels.ActorSheet.DeviceRating"}}
+    </div>
+    <div class="attribute-input-container">
+        {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.html'
+                cssClass="attribute-input"
+                title=(localize 'SR5.TotalValue')
+                size="2"
+                maxLength="2"
+                value=data.matrix.rating
+                name='data.matrix.rating'
+        }}
+    </div>
+{{/"systems/shadowrun5e/dist/templates/common/Attribute.html"}}

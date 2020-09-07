@@ -401,8 +401,25 @@ SR5['spriteTypes'] = {
     machine: 'SR5.Sprite.Types.Machine',
 };
 
-SR5['vehicleTypes'] = {
-    air: 'SR5.Vehicle.Types.Air',
-    water: 'SR5.Vehicle.Types.Water',
-    ground: 'SR5.Vehicle.Types.Ground',
+SR5['vehicle'] = {
+    types: {
+        air: 'SR5.Vehicle.Types.Air',
+        water: 'SR5.Vehicle.Types.Water',
+        ground: 'SR5.Vehicle.Types.Ground',
+    },
+    stats: {
+        handling: 'SR5.Vehicle.Stats.Handling',
+        off_road_handling: 'SR5.Vehicle.Stats.OffRoadHandling',
+        speed: 'SR5.Vehicle.Stats.Speed',
+        off_road_speed: 'SR5.Vehicle.Stats.OffRoadSpeed',
+        acceleration: 'SR5.Vehicle.Stats.Acceleration',
+        pilot: 'SR5.Vehicle.Stats.Pilot',
+        sensor: 'SR5.Vehicle.Stats.Sensor',
+    },
+    control_modes: {
+        manual: 'SR5.Vehicle.ControlModes.Manual',
+        remote: 'SR5.Vehicle.ControlModes.Remote',
+        rigger: 'SR5.Vehicle.ControlModes.Rigger',
+        autopilot: 'SR5.Vehicle.ControlModes.Autopilot',
+    },
 };

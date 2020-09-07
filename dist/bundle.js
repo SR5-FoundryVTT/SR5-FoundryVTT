@@ -3110,31 +3110,88 @@ const BaseActorPrep_1 = require("./BaseActorPrep");
 const SkillsPrep_1 = require("./functions/SkillsPrep");
 const ModifiersPrep_1 = require("./functions/ModifiersPrep");
 const InitiativePrep_1 = require("./functions/InitiativePrep");
-const ItemPrep_1 = require("./functions/ItemPrep");
-const ConditionMonitorsPrep_1 = require("./functions/ConditionMonitorsPrep");
 const MovementPrep_1 = require("./functions/MovementPrep");
 const AttributesPrep_1 = require("./functions/AttributesPrep");
 const LimitsPrep_1 = require("./functions/LimitsPrep");
 const MatrixPrep_1 = require("./functions/MatrixPrep");
+const helpers_1 = require("../../helpers");
+const PartsList_1 = require("../../parts/PartsList");
 class VehiclePrep extends BaseActorPrep_1.BaseActorPrep {
     prepare() {
         ModifiersPrep_1.ModifiersPrep.prepareModifiers(this.data);
-        ItemPrep_1.ItemPrep.prepareArmor(this.data, this.items);
-        ItemPrep_1.ItemPrep.prepareCyberware(this.data, this.items);
+        VehiclePrep.prepareVehicleStats(this.data);
+        VehiclePrep.prepareVehicleAttributesAndLimits(this.data);
         SkillsPrep_1.SkillsPrep.prepareSkills(this.data);
         AttributesPrep_1.AttributesPrep.prepareAttributes(this.data);
         LimitsPrep_1.LimitsPrep.prepareLimits(this.data);
-        MatrixPrep_1.MatrixPrep.prepareMatrix(this.data, this.items);
+        VehiclePrep.prepareVehicleConditionMonitors(this.data);
         MatrixPrep_1.MatrixPrep.prepareMatrixToLimitsAndAttributes(this.data);
-        ConditionMonitorsPrep_1.ConditionMonitorsPrep.preparePhysical(this.data);
+        MatrixPrep_1.MatrixPrep.prepareAttributesForDevice(this.data);
         MovementPrep_1.MovementPrep.prepareMovement(this.data);
         InitiativePrep_1.InitiativePrep.prepareMeatspaceInit(this.data);
         InitiativePrep_1.InitiativePrep.prepareMatrixInit(this.data);
         InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(this.data);
     }
+    static prepareVehicleStats(data) {
+        var _a;
+        const { vehicle_stats, isOffRoad } = data;
+        // set the value for the stats
+        for (let [key, stat] of Object.entries(vehicle_stats)) {
+            // this turns the Object model into the list mod
+            if (typeof stat.mod === 'object') {
+                stat.mod = new PartsList_1.PartsList(stat.mod).list;
+            }
+            const parts = new PartsList_1.PartsList(stat.mod);
+            parts.addUniquePart('SR5.Temporary', (_a = stat.temp) !== null && _a !== void 0 ? _a : 0);
+            stat.mod = parts.list;
+            helpers_1.Helpers.calcTotal(stat);
+            // add labels
+            stat.label = CONFIG.SR5.vehicle.stats[key];
+        }
+        if (isOffRoad) {
+            vehicle_stats.off_road_speed.hidden = false;
+            vehicle_stats.off_road_handling.hidden = false;
+            vehicle_stats.speed.hidden = true;
+            vehicle_stats.handling.hidden = true;
+        }
+        else {
+            vehicle_stats.off_road_speed.hidden = true;
+            vehicle_stats.off_road_handling.hidden = true;
+            vehicle_stats.speed.hidden = false;
+            vehicle_stats.handling.hidden = false;
+        }
+    }
+    static prepareVehicleAttributesAndLimits(data) {
+        const { attributes, limits, vehicle_stats, isOffRoad } = data;
+        const attributeIds = ['agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma'];
+        const totalPilot = helpers_1.Helpers.calcTotal(vehicle_stats.pilot);
+        attributeIds.forEach((attId) => {
+            if (attributes[attId] !== undefined) {
+                attributes[attId].base = totalPilot;
+            }
+        });
+        limits.mental.base = helpers_1.Helpers.calcTotal(vehicle_stats.sensor);
+        // add sensor, handling, and speed as limits
+        limits.sensor = Object.assign(Object.assign({}, vehicle_stats.sensor), { hidden: true });
+        limits.handling = Object.assign(Object.assign({}, (isOffRoad ? vehicle_stats.off_road_handling : vehicle_stats.handling)), { hidden: true });
+        limits.speed = Object.assign(Object.assign({}, (isOffRoad ? vehicle_stats.off_road_speed : vehicle_stats.speed)), { hidden: true });
+    }
+    static prepareVehicleConditionMonitors(data) {
+        const { track, attributes, matrix, isDrone } = data;
+        const halfBody = Math.ceil(helpers_1.Helpers.calcTotal(attributes.body) / 2);
+        // CRB pg 199 drone vs vehicle physical condition monitor rules
+        if (isDrone) {
+            track.physical.base = 6 + halfBody;
+        }
+        else {
+            track.physical.base = 12 + halfBody;
+        }
+        const rating = matrix.rating || 0;
+        matrix.condition_monitor.max = 8 + Math.ceil(rating / 2);
+    }
 }
 exports.VehiclePrep = VehiclePrep;
-},{"./BaseActorPrep":19,"./functions/AttributesPrep":24,"./functions/ConditionMonitorsPrep":25,"./functions/InitiativePrep":26,"./functions/ItemPrep":27,"./functions/LimitsPrep":28,"./functions/MatrixPrep":29,"./functions/ModifiersPrep":30,"./functions/MovementPrep":31,"./functions/SkillsPrep":32}],24:[function(require,module,exports){
+},{"../../helpers":52,"../../parts/PartsList":63,"./BaseActorPrep":19,"./functions/AttributesPrep":24,"./functions/InitiativePrep":26,"./functions/LimitsPrep":28,"./functions/MatrixPrep":29,"./functions/ModifiersPrep":30,"./functions/MovementPrep":31,"./functions/SkillsPrep":32}],24:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AttributesPrep = void 0;
@@ -3310,24 +3367,30 @@ exports.ItemPrep = ItemPrep;
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LimitsPrep = void 0;
+const PartsList_1 = require("../../../parts/PartsList");
+const helpers_1 = require("../../../helpers");
 class LimitsPrep {
     static prepareLimits(data) {
-        const { limits, attributes, modifiers } = data;
+        const { limits, modifiers } = data;
         // SETUP LIMITS
-        limits.physical.value =
-            Math.ceil((2 * attributes.strength.value + attributes.body.value + attributes.reaction.value) / 3) + Number(modifiers['physical_limit']);
-        limits.mental.value =
-            Math.ceil((2 * attributes.logic.value + attributes.intuition.value + attributes.willpower.value) / 3) + Number(modifiers['mental_limit']);
-        limits.social.value =
-            Math.ceil((2 * attributes.charisma.value + attributes.willpower.value + attributes.essence.value) / 3) + Number(modifiers['social_limit']);
+        limits.physical.mod = PartsList_1.PartsList.AddUniquePart(limits.physical.mod, 'SR5.Bonus', Number(modifiers['physical_limit']));
+        limits.mental.mod = PartsList_1.PartsList.AddUniquePart(limits.mental.mod, 'SR5.Bonus', Number(modifiers['mental_limit']));
+        limits.social.mod = PartsList_1.PartsList.AddUniquePart(limits.social.mod, "SR5.Bonus", Number(modifiers['social_limit']));
         // limit labels
         for (let [limitKey, limitValue] of Object.entries(limits)) {
+            helpers_1.Helpers.calcTotal(limitValue);
             limitValue.label = CONFIG.SR5.limits[limitKey];
         }
     }
+    static prepareLimitBaseFromAttributes(data) {
+        const { limits, attributes } = data;
+        limits.physical.base = Math.ceil((2 * attributes.strength.value + attributes.body.value + attributes.reaction.value) / 3);
+        limits.mental.base = Math.ceil((2 * attributes.logic.value + attributes.intuition.value + attributes.willpower.value) / 3);
+        limits.social.base = Math.ceil((2 * attributes.charisma.value + attributes.willpower.value + attributes.essence.value) / 3);
+    }
 }
 exports.LimitsPrep = LimitsPrep;
-},{}],29:[function(require,module,exports){
+},{"../../../helpers":52,"../../../parts/PartsList":63}],29:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatrixPrep = void 0;
@@ -3430,9 +3493,10 @@ class MatrixPrep {
         const { matrix, attributes } = data;
         const rating = matrix.rating || 0;
         const mentalAttributes = ['intuition', 'logic', 'charisma', 'willpower'];
-        mentalAttributes.forEach(attLabel => {
+        mentalAttributes.forEach((attLabel) => {
             if (attributes[attLabel] !== undefined) {
                 attributes[attLabel].base = rating;
+                helpers_1.Helpers.calcTotal(attributes[attLabel]);
             }
         });
     }
@@ -5535,10 +5599,27 @@ exports.SR5['spriteTypes'] = {
     fault: 'SR5.Sprite.Types.Fault',
     machine: 'SR5.Sprite.Types.Machine',
 };
-exports.SR5['vehicleTypes'] = {
-    air: 'SR5.Vehicle.Types.Air',
-    water: 'SR5.Vehicle.Types.Water',
-    ground: 'SR5.Vehicle.Types.Ground',
+exports.SR5['vehicle'] = {
+    types: {
+        air: 'SR5.Vehicle.Types.Air',
+        water: 'SR5.Vehicle.Types.Water',
+        ground: 'SR5.Vehicle.Types.Ground',
+    },
+    stats: {
+        handling: 'SR5.Vehicle.Stats.Handling',
+        off_road_handling: 'SR5.Vehicle.Stats.OffRoadHandling',
+        speed: 'SR5.Vehicle.Stats.Speed',
+        off_road_speed: 'SR5.Vehicle.Stats.OffRoadSpeed',
+        acceleration: 'SR5.Vehicle.Stats.Acceleration',
+        pilot: 'SR5.Vehicle.Stats.Pilot',
+        sensor: 'SR5.Vehicle.Stats.Sensor',
+    },
+    control_modes: {
+        manual: 'SR5.Vehicle.ControlModes.Manual',
+        remote: 'SR5.Vehicle.ControlModes.Remote',
+        rigger: 'SR5.Vehicle.ControlModes.Rigger',
+        autopilot: 'SR5.Vehicle.ControlModes.Autopilot',
+    },
 };
 },{}],44:[function(require,module,exports){
 "use strict";
@@ -5727,6 +5808,7 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/dist/templates/actor/tabs/CritterPowersTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/spirit/SpiritSkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/matrix/SpriteSkillsTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/vehicle/VehicleSkillsTab.html',
         // uncategorized lists
         'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html',
         'systems/shadowrun5e/dist/templates/actor/parts/Movement.html',
@@ -5745,6 +5827,7 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/ComplexFormList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/SpritePowerList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/matrix/DeviceRating.html',
         // attributes
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html',
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/AttributeList.html',
@@ -5753,6 +5836,9 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         // skills
         'systems/shadowrun5e/dist/templates/actor/parts/skills/ActiveSkillList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/skills/LanguageAndKnowledgeSkillList.html',
+        // vehicle
+        'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleStatsList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleSecondStatsList.html',
         'systems/shadowrun5e/dist/templates/item/parts/description.html',
         'systems/shadowrun5e/dist/templates/item/parts/technology.html',
         'systems/shadowrun5e/dist/templates/item/parts/header.html',

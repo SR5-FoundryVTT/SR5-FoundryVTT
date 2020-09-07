@@ -65,6 +65,10 @@ declare namespace Shadowrun {
         label?: string;
     };
 
+    export type ManualModField = {
+        temp: number;
+    }
+
     export type HasBonus = {
         bonus: KeyValuePair[];
     };

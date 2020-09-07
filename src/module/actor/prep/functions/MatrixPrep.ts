@@ -100,7 +100,6 @@ export class MatrixPrep {
                 };
             }
         });
-
     }
 
     /**
@@ -112,11 +111,11 @@ export class MatrixPrep {
         const rating = matrix.rating || 0;
         const mentalAttributes = ['intuition', 'logic', 'charisma', 'willpower'];
 
-        mentalAttributes.forEach(attLabel => {
+        mentalAttributes.forEach((attLabel) => {
             if (attributes[attLabel] !== undefined) {
                 attributes[attLabel].base = rating;
+                Helpers.calcTotal(attributes[attLabel]);
             }
-        })
-
+        });
     }
 }

@@ -1,0 +1,69 @@
+<div class="flexcol">
+    {{> "systems/shadowrun5e/dist/templates/common/HeaderBlock.html"
+            name=(localize "SR5.Labels.ActorSheet.VehicleProperties")
+    }}
+    <div class="list-item">
+        <div class="item-left">
+            <div class="item-text item-name">
+                {{localize "SR5.Spirit.Type"}}
+            </div>
+        </div>
+        <div class="item-right">
+            <div>
+                <select name="data.spiritType" class="display">
+                    {{#select data.spiritType}} {{#each config.spiritTypes as |name type|}}
+                        <option value="{{type}}">{{localize name}}</option>
+                    {{/each}} {{/select}}
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="list-item">
+        <div class="item-left">
+            <div class="item-text item-name">
+                {{localize "SR5.Spirit.Force"}}
+            </div>
+        </div>
+        <div class="item-right">
+            <div class="item-text">
+                {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.html'
+                        cssClass="attribute-input"
+                        size="2"
+                        maxLength="2"
+                        value=data.force
+                        name="data.force"
+                }}
+            </div>
+        </div>
+    </div>
+    <div class="list-item">
+        <div class="item-left">
+            <div class="item-text item-name">
+                {{localize "SR5.Spirit.Services"}}
+            </div>
+        </div>
+        <div class="item-right">
+            <div class="item-text">
+                {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.html'
+                        cssClass="attribute-input"
+                        size="2"
+                        maxLength="2"
+                        value=data.services
+                        name="data.services"
+                }}
+            </div>
+        </div>
+    </div>
+    <div class="list-item">
+        <div class="item-left">
+            <div class="item-text item-name">
+                {{localize "SR5.Spirit.Bound"}}
+            </div>
+        </div>
+        <div class="item-right">
+            <div class="item-text">
+                <input type="checkbox" class="checkbox" {{checked data.bound}}/>
+            </div>
+        </div>
+    </div>
+</div>

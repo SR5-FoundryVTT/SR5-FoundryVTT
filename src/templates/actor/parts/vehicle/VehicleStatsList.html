@@ -1,0 +1,24 @@
+<div class="flexcol">
+    {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Limits.html" }}
+    <div class="attributes">
+        {{#each data.vehicle_stats as |attribute a|}}
+            {{#unless attribute.hidden}}
+                {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                        attributeId=a
+                        attribute=attribute
+                        attributesPath="data.vehicle_stats"
+                }}
+            {{/unless}}
+        {{/each}}
+        {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                attributeId='body'
+                attribute=data.attributes.body
+        }}
+        {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                attributeId='armor'
+                attribute=data.armor
+                attributePath='data'
+                label="SR5.Armor"
+        }}
+    </div>
+</div>
