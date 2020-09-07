@@ -659,6 +659,9 @@
     },
 
     "SR5.Vehicle": {
+        "IsDrone": "Is Drone",
+        "ControlMode": "Control Mode",
+        "Type": "Type",
         "Stats": {
             "Handling": "Handling",
             "OffRoadHandling": "Handling (Off Road)",
@@ -673,6 +676,12 @@
             "Ground": "Ground Craft",
             "Aerospace": "Space Craft",
             "Water": "Water Craft"
+        },
+        "ControlModes": {
+            "Autopilot": "Autopilot",
+            "Manual": "Manual",
+            "Rigger": "Rigger",
+            "Remote": "Remote"
         }
     }
 }

@@ -3110,7 +3110,6 @@ const BaseActorPrep_1 = require("./BaseActorPrep");
 const SkillsPrep_1 = require("./functions/SkillsPrep");
 const ModifiersPrep_1 = require("./functions/ModifiersPrep");
 const InitiativePrep_1 = require("./functions/InitiativePrep");
-const MovementPrep_1 = require("./functions/MovementPrep");
 const AttributesPrep_1 = require("./functions/AttributesPrep");
 const LimitsPrep_1 = require("./functions/LimitsPrep");
 const MatrixPrep_1 = require("./functions/MatrixPrep");
@@ -3120,15 +3119,16 @@ class VehiclePrep extends BaseActorPrep_1.BaseActorPrep {
     prepare() {
         ModifiersPrep_1.ModifiersPrep.prepareModifiers(this.data);
         VehiclePrep.prepareVehicleStats(this.data);
-        VehiclePrep.prepareVehicleAttributesAndLimits(this.data);
+        VehiclePrep.prepareAttributes(this.data);
+        VehiclePrep.prepareLimits(this.data);
         SkillsPrep_1.SkillsPrep.prepareSkills(this.data);
         AttributesPrep_1.AttributesPrep.prepareAttributes(this.data);
         LimitsPrep_1.LimitsPrep.prepareLimits(this.data);
-        VehiclePrep.prepareVehicleConditionMonitors(this.data);
+        VehiclePrep.prepareConditionMonitor(this.data);
         MatrixPrep_1.MatrixPrep.prepareMatrixToLimitsAndAttributes(this.data);
         MatrixPrep_1.MatrixPrep.prepareAttributesForDevice(this.data);
-        MovementPrep_1.MovementPrep.prepareMovement(this.data);
-        InitiativePrep_1.InitiativePrep.prepareMeatspaceInit(this.data);
+        VehiclePrep.prepareMovement(this.data);
+        VehiclePrep.prepareMeatspaceInit(this.data);
         InitiativePrep_1.InitiativePrep.prepareMatrixInit(this.data);
         InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(this.data);
         console.log(this.data);
@@ -3149,6 +3149,7 @@ class VehiclePrep extends BaseActorPrep_1.BaseActorPrep {
             // add labels
             stat.label = CONFIG.SR5.vehicle.stats[key];
         }
+        // hide certain stats depending on if we're offroad
         if (isOffRoad) {
             vehicle_stats.off_road_speed.hidden = false;
             vehicle_stats.off_road_handling.hidden = false;
@@ -3162,8 +3163,8 @@ class VehiclePrep extends BaseActorPrep_1.BaseActorPrep {
             vehicle_stats.handling.hidden = false;
         }
     }
-    static prepareVehicleAttributesAndLimits(data) {
-        const { attributes, limits, vehicle_stats, isOffRoad } = data;
+    static prepareAttributes(data) {
+        const { attributes, vehicle_stats } = data;
         const attributeIds = ['agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma'];
         const totalPilot = helpers_1.Helpers.calcTotal(vehicle_stats.pilot);
         attributeIds.forEach((attId) => {
@@ -3171,13 +3172,16 @@ class VehiclePrep extends BaseActorPrep_1.BaseActorPrep {
                 attributes[attId].base = totalPilot;
             }
         });
+    }
+    static prepareLimits(data) {
+        const { limits, vehicle_stats, isOffRoad } = data;
         limits.mental.base = helpers_1.Helpers.calcTotal(vehicle_stats.sensor);
         // add sensor, handling, and speed as limits
         limits.sensor = Object.assign(Object.assign({}, vehicle_stats.sensor), { hidden: true });
         limits.handling = Object.assign(Object.assign({}, (isOffRoad ? vehicle_stats.off_road_handling : vehicle_stats.handling)), { hidden: true });
         limits.speed = Object.assign(Object.assign({}, (isOffRoad ? vehicle_stats.off_road_speed : vehicle_stats.speed)), { hidden: true });
     }
-    static prepareVehicleConditionMonitors(data) {
+    static prepareConditionMonitor(data) {
         const { track, attributes, matrix, isDrone, modifiers } = data;
         const halfBody = Math.ceil(helpers_1.Helpers.calcTotal(attributes.body) / 2);
         // CRB pg 199 drone vs vehicle physical condition monitor rules
@@ -3191,9 +3195,26 @@ class VehiclePrep extends BaseActorPrep_1.BaseActorPrep {
         const rating = matrix.rating || 0;
         matrix.condition_monitor.max = 8 + Math.ceil(rating / 2);
     }
+    static prepareMovement(data) {
+        const { vehicle_stats, movement, isOffRoad } = data;
+        let speedTotal = helpers_1.Helpers.calcTotal(isOffRoad ? vehicle_stats.off_road_speed : vehicle_stats.speed);
+        // algorithm to determine speed, CRB pg 202 table
+        movement.walk.base = 5 * Math.pow(2, speedTotal - 1);
+        movement.walk.value = movement.walk.base;
+        movement.run.base = 10 * Math.pow(2, speedTotal - 1);
+        movement.run.value = movement.run.base;
+    }
+    static prepareMeatspaceInit(data) {
+        const { vehicle_stats, initiative } = data;
+        const pilot = helpers_1.Helpers.calcTotal(vehicle_stats.pilot);
+        initiative.meatspace.base.base = pilot * 2;
+        initiative.meatspace.dice.base = 4;
+        helpers_1.Helpers.calcTotal(initiative.meatspace.base);
+        helpers_1.Helpers.calcTotal(initiative.meatspace.dice);
+    }
 }
 exports.VehiclePrep = VehiclePrep;
-},{"../../helpers":52,"../../parts/PartsList":63,"./BaseActorPrep":19,"./functions/AttributesPrep":24,"./functions/InitiativePrep":26,"./functions/LimitsPrep":28,"./functions/MatrixPrep":29,"./functions/ModifiersPrep":30,"./functions/MovementPrep":31,"./functions/SkillsPrep":32}],24:[function(require,module,exports){
+},{"../../helpers":52,"../../parts/PartsList":63,"./BaseActorPrep":19,"./functions/AttributesPrep":24,"./functions/InitiativePrep":26,"./functions/LimitsPrep":28,"./functions/MatrixPrep":29,"./functions/ModifiersPrep":30,"./functions/SkillsPrep":32}],24:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AttributesPrep = void 0;

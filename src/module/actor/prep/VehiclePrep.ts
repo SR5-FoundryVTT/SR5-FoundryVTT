@@ -4,7 +4,6 @@ import VehicleActorData = Shadowrun.VehicleActorData;
 import { SkillsPrep } from './functions/SkillsPrep';
 import { ModifiersPrep } from './functions/ModifiersPrep';
 import { InitiativePrep } from './functions/InitiativePrep';
-import { MovementPrep } from './functions/MovementPrep';
 import { AttributesPrep } from './functions/AttributesPrep';
 import { LimitsPrep } from './functions/LimitsPrep';
 import { MatrixPrep } from './functions/MatrixPrep';
@@ -16,20 +15,21 @@ export class VehiclePrep extends BaseActorPrep<SR5VehicleType, VehicleActorData>
         ModifiersPrep.prepareModifiers(this.data);
 
         VehiclePrep.prepareVehicleStats(this.data);
-        VehiclePrep.prepareVehicleAttributesAndLimits(this.data);
+        VehiclePrep.prepareAttributes(this.data);
+        VehiclePrep.prepareLimits(this.data);
 
         SkillsPrep.prepareSkills(this.data);
         AttributesPrep.prepareAttributes(this.data);
         LimitsPrep.prepareLimits(this.data);
 
-        VehiclePrep.prepareVehicleConditionMonitors(this.data);
+        VehiclePrep.prepareConditionMonitor(this.data);
 
         MatrixPrep.prepareMatrixToLimitsAndAttributes(this.data);
         MatrixPrep.prepareAttributesForDevice(this.data);
 
-        MovementPrep.prepareMovement(this.data);
+        VehiclePrep.prepareMovement(this.data);
 
-        InitiativePrep.prepareMeatspaceInit(this.data);
+        VehiclePrep.prepareMeatspaceInit(this.data);
         InitiativePrep.prepareMatrixInit(this.data);
         InitiativePrep.prepareCurrentInitiative(this.data);
 
@@ -54,6 +54,7 @@ export class VehiclePrep extends BaseActorPrep<SR5VehicleType, VehicleActorData>
             stat.label = CONFIG.SR5.vehicle.stats[key];
         }
 
+        // hide certain stats depending on if we're offroad
         if (isOffRoad) {
             vehicle_stats.off_road_speed.hidden = false;
             vehicle_stats.off_road_handling.hidden = false;
@@ -67,8 +68,8 @@ export class VehiclePrep extends BaseActorPrep<SR5VehicleType, VehicleActorData>
         }
     }
 
-    static prepareVehicleAttributesAndLimits(data: VehicleActorData) {
-        const { attributes, limits, vehicle_stats, isOffRoad } = data;
+    static prepareAttributes(data: VehicleActorData) {
+        const { attributes, vehicle_stats } = data;
 
         const attributeIds = ['agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma'];
 
@@ -79,6 +80,10 @@ export class VehiclePrep extends BaseActorPrep<SR5VehicleType, VehicleActorData>
                 attributes[attId].base = totalPilot;
             }
         });
+    }
+
+    static prepareLimits(data: VehicleActorData) {
+        const { limits, vehicle_stats, isOffRoad } = data;
 
         limits.mental.base = Helpers.calcTotal(vehicle_stats.sensor);
 
@@ -88,7 +93,7 @@ export class VehiclePrep extends BaseActorPrep<SR5VehicleType, VehicleActorData>
         limits.speed = { ...(isOffRoad ? vehicle_stats.off_road_speed : vehicle_stats.speed), hidden: true };
     }
 
-    static prepareVehicleConditionMonitors(data: VehicleActorData) {
+    static prepareConditionMonitor(data: VehicleActorData) {
         const { track, attributes, matrix, isDrone, modifiers } = data;
 
         const halfBody = Math.ceil(Helpers.calcTotal(attributes.body) / 2);
@@ -102,5 +107,29 @@ export class VehiclePrep extends BaseActorPrep<SR5VehicleType, VehicleActorData>
 
         const rating = matrix.rating || 0;
         matrix.condition_monitor.max = 8 + Math.ceil(rating / 2);
+    }
+
+    static prepareMovement(data: VehicleActorData) {
+        const { vehicle_stats, movement, isOffRoad } = data;
+
+        let speedTotal = Helpers.calcTotal(isOffRoad ? vehicle_stats.off_road_speed : vehicle_stats.speed);
+
+        // algorithm to determine speed, CRB pg 202 table
+        movement.walk.base = 5 * Math.pow(2, speedTotal - 1);
+        movement.walk.value = movement.walk.base;
+
+        movement.run.base = 10 * Math.pow(2, speedTotal - 1);
+        movement.run.value = movement.run.base;
+    }
+
+    static prepareMeatspaceInit(data: VehicleActorData) {
+        const { vehicle_stats, initiative } = data;
+
+        const pilot = Helpers.calcTotal(vehicle_stats.pilot);
+
+        initiative.meatspace.base.base = pilot * 2;
+        initiative.meatspace.dice.base = 4;
+        Helpers.calcTotal(initiative.meatspace.base);
+        Helpers.calcTotal(initiative.meatspace.dice);
     }
 }
