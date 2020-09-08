@@ -783,6 +783,12 @@ export class SR5Item extends Item {
     }
 
     async openPdfSource() {
+        // Check for PDFoundry module hook: https://github.com/Djphoenix719/PDFoundry
+        if (!ui.PDFoundry) {
+            ui.notifications.warn(game.i18n.localize('SR5.DIALOG.MissingModuleContent'));
+            return;
+        }
+
         const source = this.getBookSource();
         if (source === '') {
             // @ts-ignore
@@ -791,6 +797,7 @@ export class SR5Item extends Item {
         // TODO open PDF to correct location
         // parse however you need, all "buttons" will lead to this function
         const [code, page] = source.split(' ');
+
         //@ts-ignore
         ui.PDFoundry.openPDFByCode(code, parseInt(page));
     }
