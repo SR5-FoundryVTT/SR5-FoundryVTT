@@ -258,6 +258,7 @@ export class SR5Item extends Item {
                 const attack = this.getAttackData(0);
                 // don't include any hits
                 delete attack?.hits;
+                console.error('SR5Item Roll');
                 // generate chat data
                 createChatData({
                     header: {

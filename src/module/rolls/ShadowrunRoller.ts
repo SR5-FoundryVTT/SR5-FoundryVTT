@@ -8,7 +8,7 @@ import { Helpers } from '../helpers';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
 import { createChatData, TemplateData } from '../chat';
-import { SYSTEM_NAME } from '../constants';
+import {FLAGS, SYSTEM_NAME} from '../constants';
 import { PartsList } from '../parts/PartsList';
 
 export interface BasicRollProps {
@@ -177,6 +177,13 @@ export class ShadowrunRoller {
             });
             glitch = oneCount > Math.floor(parts.total / 2);
         }
+
+        const useTokenNameForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
+        if (useTokenNameForChatOutput && token) {
+            img = token?.data.img;
+            name = token?.data.name;
+        }
+
 
         const templateData = {
             actor: actor,

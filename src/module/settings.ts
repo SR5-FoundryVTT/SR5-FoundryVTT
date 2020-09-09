@@ -61,5 +61,14 @@ export const registerSystemSettings = () => {
         config: true,
         type: Boolean,
         default: true,
-    })
+    });
+
+    game.settings.register(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput, {
+        name: 'SETTINGS.ShowTokenNameForChatOutputName',
+        hint: 'SETTINGS.ShowTokenNameForChatOutputDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: true
+    });
 };
