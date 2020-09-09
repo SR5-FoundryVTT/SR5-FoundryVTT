@@ -1,11 +1,10 @@
 <form class="{{cssClass}} wholesheet" autocomplete="off">
     <header class="flexrow">
-        <div class="block">
-            {{> 'systems/shadowrun5e/dist/templates/actor/parts/ProfileImage.html' }}
-        </div>
-        <div class="block">
+            {{> 'systems/shadowrun5e/dist/templates/actor/parts/ProfileImage.html'
+                    height='45px'
+                    width='45px'
+            }}
             {{> 'systems/shadowrun5e/dist/templates/actor/parts/NameInput.html' }}
-        </div>
         <div class="block">
             {{#each data.track as |track id|}}
                 {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
@@ -29,6 +28,20 @@
         </div>
     </header>
     <section class="sheetbody">
-        {{> 'systems/shadowrun5e/dist/templates/npc/parts/ActiveSkillList.html' }}
+        <div>
+            Attributes
+            {{> 'systems/shadowrun5e/dist/templates/npc/parts/attributes/AttributeHeaders.html' }}
+        </div>
+        <div class="inventory">
+            <div class="split-container">
+                <div class="scroll-area">
+                    {{> 'systems/shadowrun5e/dist/templates/npc/parts/skills/ActiveSkillList.html' }}
+                    {{> 'systems/shadowrun5e/dist/templates/npc/parts/skills/LanguageAndKnowledgeSkillList.html' }}
+                </div>
+                <div>
+                    Right
+                </div>
+            </div>
+        </div>
     </section>
 </form>

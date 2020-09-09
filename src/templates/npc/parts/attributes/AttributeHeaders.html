@@ -1,0 +1,5 @@
+<div class="flexcol">
+    {{#each data.attributes as |attribute a|}} {{#unless attribute.hidden}}
+        <div>{{#LocalizeShortened label=attribute.label length=3}}</div>
+    {{/unless}} {{/each}}
+</div>

@@ -1,4 +1,5 @@
 import { Helpers } from '../helpers';
+import {SafeString} from "handlebars";
 
 export const registerBasicHelpers = () => {
     Handlebars.registerHelper('localizeOb', function (strId, obj) {
@@ -102,5 +103,10 @@ export const registerBasicHelpers = () => {
     Handlebars.registerHelper('disabledHelper', function (value) {
         const val = Boolean(value);
         return val ? val : undefined;
+    });
+    // TODO: This helper doesn't work... Don't why, but it doesn't.
+    Handlebars.registerHelper('LocalizeShortened', function (label: string, length: number, options: any): SafeString {
+        console.error('options', options);
+        return new Handlebars.SafeString(Helpers.shortenAttributeLocalization(label, length));
     });
 };
