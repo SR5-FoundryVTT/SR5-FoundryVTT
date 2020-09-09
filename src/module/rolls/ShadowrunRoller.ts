@@ -178,12 +178,7 @@ export class ShadowrunRoller {
             glitch = oneCount > Math.floor(parts.total / 2);
         }
 
-        const useTokenNameForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
-        if (useTokenNameForChatOutput && token) {
-            img = token?.data.img;
-            name = token?.data.name;
-        }
-
+        [name, img] = ShadowrunRoller.getPreferedNameAndImageSource(name, img, actor, token);
 
         const templateData = {
             actor: actor,
@@ -355,5 +350,22 @@ export class ShadowrunRoller {
                 }).render(true);
             });
         });
+    }
+
+    /** Use either the actor or the tokens name and image, depending on system settings.
+     *
+     * However don't change anything if a custom name or image has been given.
+     */
+    static getPreferedNameAndImageSource(name?: string, img?: string, actor?: SR5Actor, token?: Token): [string|undefined, string|undefined] {
+
+        const namedAndImageMatchActor = name === actor?.name && img === actor?.img;
+        const useTokenNameForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
+
+        if (namedAndImageMatchActor && useTokenNameForChatOutput && token) {
+            img = token?.data.img;
+            name = token?.data.name;
+        }
+
+        return [name, img];
     }
 }
