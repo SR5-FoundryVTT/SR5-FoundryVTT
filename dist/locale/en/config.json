@@ -536,6 +536,8 @@
     "SETTINGS.DisplayDefaultRollCardDescription": "Should the default roll-card be displayed along with the shadowrun roll-card",
     "SETTINGS.ShowGlitchAnimationName": "Display Glitch Animation",
     "SETTINGS.ShowGlitchAnimationDescription": "Should display the animation as part of the glitch text on the roll card",
+    "SETTINGS.ShowTokenNameForChatOutputName": "Use Token Name for Roll Card",
+    "SETTINGS.ShowTokenNameForChatOutputDescription": "Should the token name be used for roll card output instead of the actor name when available",
 
     "SR5.MIGRATION.WarningTitle": "Alert",
     "SR5.MIGRATION.WarningHeader": "Migration Warning",

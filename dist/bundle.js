@@ -4333,7 +4333,7 @@ exports.createChatData = (templateData, roll) => __awaiter(void 0, void 0, void 
         speaker: {
             actor: actor === null || actor === void 0 ? void 0 : actor._id,
             token: actor === null || actor === void 0 ? void 0 : actor.token,
-            alias: actor === null || actor === void 0 ? void 0 : actor.name,
+            alias: templateData.header.name,
         },
         flags: {
             shadowrun5e: {
@@ -4801,6 +4801,7 @@ exports.FLAGS = exports.SYSTEM_NAME = void 0;
 exports.SYSTEM_NAME = 'shadowrun5e';
 exports.FLAGS = {
     ShowGlitchAnimation: 'showGlitchAnimation',
+    ShowTokenNameForChatOutput: 'showTokenNameInsteadOfActor'
 };
 
 },{}],30:[function(require,module,exports){
@@ -6317,6 +6318,7 @@ class SR5Item extends Item {
                     const attack = this.getAttackData(0);
                     // don't include any hits
                     attack === null || attack === void 0 ? true : delete attack.hits;
+                    console.error('SR5Item Roll');
                     // generate chat data
                     chat_1.createChatData(Object.assign({ header: {
                             name: this.name,
@@ -8899,6 +8901,7 @@ class ShadowrunRoller {
                 });
                 glitch = oneCount > Math.floor(parts.total / 2);
             }
+            [name, img] = ShadowrunRoller.getPreferedNameAndImageSource(name, img, actor, token);
             const templateData = Object.assign({ actor: actor, header: {
                     name: name || '',
                     img: img || '',
@@ -9040,6 +9043,19 @@ class ShadowrunRoller {
             });
         });
     }
+    /** Use either the actor or the tokens name and image, depending on system settings.
+     *
+     * However don't change anything if a custom name or image has been given.
+     */
+    static getPreferedNameAndImageSource(name, img, actor, token) {
+        const namedAndImageMatchActor = name === (actor === null || actor === void 0 ? void 0 : actor.name) && img === (actor === null || actor === void 0 ? void 0 : actor.img);
+        const useTokenNameForChatOutput = game.settings.get(constants_1.SYSTEM_NAME, constants_1.FLAGS.ShowTokenNameForChatOutput);
+        if (namedAndImageMatchActor && useTokenNameForChatOutput && token) {
+            img = token === null || token === void 0 ? void 0 : token.data.img;
+            name = token === null || token === void 0 ? void 0 : token.data.name;
+        }
+        return [name, img];
+    }
 }
 exports.ShadowrunRoller = ShadowrunRoller;
 
@@ -9103,6 +9119,14 @@ exports.registerSystemSettings = () => {
         config: true,
         type: Boolean,
         default: true,
+    });
+    game.settings.register(constants_1.SYSTEM_NAME, constants_1.FLAGS.ShowTokenNameForChatOutput, {
+        name: 'SETTINGS.ShowTokenNameForChatOutputName',
+        hint: 'SETTINGS.ShowTokenNameForChatOutputDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: true
     });
 };
 
