@@ -36,13 +36,10 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/AttributeList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/SpecialAttributeList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/Limits.html',
-        'systems/shadowrun5e/dist/templates/npc/parts/attributes/AttributeHeaders.html',
 
         // skills
         'systems/shadowrun5e/dist/templates/actor/parts/skills/ActiveSkillList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/skills/LanguageAndKnowledgeSkillList.html',
-        'systems/shadowrun5e/dist/templates/npc/parts/skills/ActiveSkillList.html',
-        'systems/shadowrun5e/dist/templates/npc/parts/skills/LanguageAndKnowledgeSkillList.html',
 
         'systems/shadowrun5e/dist/templates/item/parts/description.html',
         'systems/shadowrun5e/dist/templates/item/parts/technology.html',
@@ -85,8 +82,11 @@ export const preloadHandlebarsTemplates = async () => {
 
         // npc sheet
         SR5NPCSheet.template,
-        'systems/shadowrun5e/dist/templates/npc/parts/ActiveSkillList.html',
-        'systems/shadowrun5e/dist/templates/npc/parts/SkillListItem.html',
+        'systems/shadowrun5e/dist/templates/npc/parts/attributes/AttributeHeaders.html',
+        'systems/shadowrun5e/dist/templates/npc/parts/skills/ActiveSkillList.html',
+        'systems/shadowrun5e/dist/templates/npc/parts/skills/LanguageAndKnowledgeSkillList.html',
+        'systems/shadowrun5e/dist/templates/npc/parts/attributes/Attributes.html',
+        'systems/shadowrun5e/dist/templates/npc/parts/attributes/Attribute.html',
     ];
 
     return loadTemplates(templatePaths);

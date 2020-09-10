@@ -1,0 +1,26 @@
+<div class="flexrow">
+    {{#each data.attributes as |attribute a|}} {{#unless attribute.hidden}}
+        {{> "systems/shadowrun5e/dist/templates/npc/parts/attributes/Attribute.html"
+                attributeId=a
+                attribute=attribute
+        }}
+    {{/unless}} {{/each}}
+    {{> "systems/shadowrun5e/dist/templates/npc/parts/attributes/Attribute.html"
+                attributeId='edge'
+                attribute=data.attributes.edge
+    }}
+    {{> "systems/shadowrun5e/dist/templates/npc/parts/attributes/Attribute.html"
+            attributeId='essence'
+            attribute=data.attributes.essence
+    }}
+    {{> "systems/shadowrun5e/dist/templates/npc/parts/attributes/Attribute.html"
+            attributeId='magic'
+            attribute=data.attributes.magic
+            hide=(not awakened)
+    }}
+    {{> "systems/shadowrun5e/dist/templates/npc/parts/attributes/Attribute.html"
+            attributeId='resonance'
+            attribute=data.attributes.resonance
+            hide=(not emerged)
+    }}
+</div>

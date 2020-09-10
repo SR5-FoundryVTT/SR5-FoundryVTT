@@ -100,8 +100,14 @@ export class SR5ActorSheet extends ActorSheet {
         return skill.attribute === 'magic' || id === 'astral_combat' || id === 'assensing';
     }
 
+    _getSkillLabelOrName(skill) {
+        // Custom skills don't have labels, use their name instead.
+        return skill.label ? game.i18n.localize(skill.label) : skill.name;
+    }
+
     _doesSkillContainText(key, skill, text) {
-        let searchString = `${key} ${game.i18n.localize(skill.label)} ${skill?.specs?.join(' ')}`;
+        const name = this._getSkillLabelOrName(skill);
+        let searchString = `${key} ${name} ${skill?.specs?.join(' ')}`;
         return searchString.toLowerCase().search(text.toLowerCase()) > -1;
     }
 
