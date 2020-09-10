@@ -450,7 +450,7 @@ export class SR5Item extends Item {
 
         const newAmmunition = (this.items || [])
             .filter((i) => i.data.type === 'ammo')
-            .reduce((acc: BaseEntityData[], item) => {
+            .reduce((acc: EntityData[], item) => {
                 const { technology } = item.data.data;
                 if (technology.equipped) {
                     const qty = technology.quantity;
@@ -785,7 +785,7 @@ export class SR5Item extends Item {
 
     async openPdfSource() {
         // Check for PDFoundry module hook: https://github.com/Djphoenix719/PDFoundry
-        if (!ui.PDFoundry) {
+        if (!ui['PDFoundry']) {
             ui.notifications.warn(game.i18n.localize('SR5.DIALOG.MissingModuleContent'));
             return;
         }
@@ -883,7 +883,7 @@ export class SR5Item extends Item {
      * @param key
      * @param value
      */
-    setFlag(scope: string, key: string, value: any): Promise<Entity> {
+    setFlag(scope: string, key: string, value: any): Promise<this> {
         const newValue = Helpers.onSetFlag(value);
         return super.setFlag(scope, key, newValue);
     }

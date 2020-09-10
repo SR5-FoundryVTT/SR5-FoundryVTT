@@ -104,13 +104,13 @@ export class SR5Actor extends Actor {
         return this.data.data.armor;
     }
 
-    getOwnedItem(itemId: string): SR5Item | null {
+    getOwnedSR5Item(itemId: string): SR5Item | null {
         return (super.getOwnedItem(itemId) as unknown) as SR5Item;
     }
 
     getMatrixDevice(): SR5Item | undefined | null {
         const matrix = this.data.data.matrix;
-        if (matrix.device) return this.getOwnedItem(matrix.device);
+        if (matrix.device) return this.getOwnedSR5Item(matrix.device);
         return undefined;
     }
 
@@ -930,7 +930,7 @@ export class SR5Actor extends Actor {
      * @param key
      * @param value
      */
-    setFlag(scope: string, key: string, value: any): Promise<Entity> {
+    setFlag(scope: string, key: string, value: any): Promise<this> {
         const newValue = Helpers.onSetFlag(value);
         return super.setFlag(scope, key, newValue);
     }

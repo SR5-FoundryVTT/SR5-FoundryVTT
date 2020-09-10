@@ -76,7 +76,7 @@ export class SR5ItemSheet extends ItemSheet {
         data['config'] = CONFIG.SR5;
         const items = this.getEmbeddedItems();
         const [ammunition, weaponMods, armorMods] = items.reduce(
-            (parts: [BaseEntityData[], BaseEntityData[], BaseEntityData[]], item: SR5Item) => {
+            (parts: [ItemData[], ItemData[], ItemData[]], item: SR5Item) => {
                 if (item.type === 'ammo') parts[0].push(item.data);
                 if (item.type === 'modification' && item.data.data.type === 'weapon') parts[1].push(item.data);
                 if (item.type === 'modification' && item.data.data.type === 'armor') parts[2].push(item.data);
@@ -98,7 +98,7 @@ export class SR5ItemSheet extends ItemSheet {
 
     /**
      * Activate event listeners using the prepared sheet HTML
-     * @param html {HTML}   The prepared HTML object ready to be rendered into the DOM
+     * @param html -  The prepared HTML object ready to be rendered into the DOM
      */
     activateListeners(html) {
         super.activateListeners(html);

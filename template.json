@@ -1245,10 +1245,7 @@
             "type": "common_program"
         },
         "equipment": {
-            "templates": [
-                "description",
-                "technology"
-            ]
+            "templates": ["description", "technology"]
         }
     }
 }

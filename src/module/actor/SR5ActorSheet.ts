@@ -367,7 +367,7 @@ export class SR5ActorSheet extends ActorSheet {
         html.find('.item-edit').click((event) => {
             event.preventDefault();
             const iid = Helpers.listItemId(event);
-            const item = this.actor.getOwnedItem(iid);
+            const item = this.actor.getOwnedSR5Item(iid);
             if (item) item.sheet.render(true);
         });
         // Delete Inventory Item
@@ -421,13 +421,13 @@ export class SR5ActorSheet extends ActorSheet {
     async _onReloadAmmo(event) {
         event.preventDefault();
         const iid = Helpers.listItemId(event);
-        const item = this.actor.getOwnedItem(iid);
+        const item = this.actor.getOwnedSR5Item(iid);
         if (item) return item.reloadAmmo();
     }
 
     async _onMatrixAttributeSelected(event) {
         let iid = this.actor.data.data.matrix.device;
-        let item = this.actor.getOwnedItem(iid);
+        let item = this.actor.getOwnedSR5Item(iid);
         if (!item) {
             console.error('could not find item');
             return;
@@ -492,7 +492,7 @@ export class SR5ActorSheet extends ActorSheet {
 
     async _onChangeRtg(event) {
         const iid = Helpers.listItemId(event);
-        const item = this.actor.getOwnedItem(iid);
+        const item = this.actor.getOwnedSR5Item(iid);
         const rtg = parseInt(event.currentTarget.value);
         if (item && rtg) {
             item.update({ 'data.technology.rating': rtg });
@@ -501,7 +501,7 @@ export class SR5ActorSheet extends ActorSheet {
 
     async _onChangeQty(event) {
         const iid = Helpers.listItemId(event);
-        const item = this.actor.getOwnedItem(iid);
+        const item = this.actor.getOwnedSR5Item(iid);
         const qty = parseInt(event.currentTarget.value);
         if (item && qty) {
             item.data.data.technology.quantity = qty;
@@ -512,7 +512,7 @@ export class SR5ActorSheet extends ActorSheet {
     async _onEquipItem(event) {
         event.preventDefault();
         const iid = Helpers.listItemId(event);
-        const item = this.actor.getOwnedItem(iid);
+        const item = this.actor.getOwnedSR5Item(iid);
         if (item) {
             const itemData = item.data.data;
             const newItems = [] as any[];
@@ -605,7 +605,7 @@ export class SR5ActorSheet extends ActorSheet {
     async _onRollItem(event) {
         event.preventDefault();
         const iid = Helpers.listItemId(event);
-        const item = this.actor.getOwnedItem(iid);
+        const item = this.actor.getOwnedSR5Item(iid);
         if (item) {
             await item.postCard(event);
         }
