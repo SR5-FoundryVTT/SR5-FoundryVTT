@@ -524,6 +524,8 @@
   "SETTINGS.DisplayDefaultRollCardDescription": "Soll die Standard Würfelkarte zusammen mit der Shadowrun Würfelkarte angezeigt werden",
   "SETTINGS.ShowGlitchAnimationName": "Zeige Patzeranimation",
   "SETTINGS.ShowGlitchAnimationDescription": "Soll die Patzeranimation als Teil des Textes der Würfelkarte angezeigt werden",
+  "SETTINGS.ShowTokenNameForChatOutputName": "Token Namen für Würfelkarte",
+  "SETTINGS.ShowTokenNameForChatOutputDescription": "Soll der Namen des Tokens für die Würfelkarte angezeigt werden anstelle dem Namen des Actors, wenn ein Token verfügbar ist",
 
   "SR5.MIGRATION.WarningTitle": "Alarm",
   "SR5.MIGRATION.WarningHeader": "Migrationswarnung",
@@ -538,5 +540,7 @@
   "SR5.MIGRATION.SuccessPacksInfo": "Aufgrund technischer Limitierungen von FoundryVTT müssen Kommpendien vom Typ Actor manuell aktualisiert werden.",
   "SR5.MIGRATION.SuccessConfirm": "Schließen",
 
-  "CONTROLS.SR5.OverwatchScoreTracker": "Overwatch Wert Übersicht"
+  "CONTROLS.SR5.OverwatchScoreTracker": "Overwatch Wert Übersicht",
+
+  "SR5.DIALOG.MissingModuleContent": "Um das Quell-PDF anzuzeigen, muss das Modul PDFoundry installiert sein und ein PDF mit passendem Code erstellt werden.",
 }

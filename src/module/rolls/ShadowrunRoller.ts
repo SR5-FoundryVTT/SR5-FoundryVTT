@@ -8,7 +8,7 @@ import { Helpers } from '../helpers';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
 import { createChatData, TemplateData } from '../chat';
-import { SYSTEM_NAME } from '../constants';
+import {FLAGS, SYSTEM_NAME} from '../constants';
 import { PartsList } from '../parts/PartsList';
 
 export interface BasicRollProps {
@@ -177,6 +177,8 @@ export class ShadowrunRoller {
             });
             glitch = oneCount > Math.floor(parts.total / 2);
         }
+
+        [name, img] = ShadowrunRoller.getPreferedNameAndImageSource(name, img, actor, token);
 
         const templateData = {
             actor: actor,
@@ -348,5 +350,22 @@ export class ShadowrunRoller {
                 }).render(true);
             });
         });
+    }
+
+    /** Use either the actor or the tokens name and image, depending on system settings.
+     *
+     * However don't change anything if a custom name or image has been given.
+     */
+    static getPreferedNameAndImageSource(name?: string, img?: string, actor?: SR5Actor, token?: Token): [string|undefined, string|undefined] {
+
+        const namedAndImageMatchActor = name === actor?.name && img === actor?.img;
+        const useTokenNameForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
+
+        if (namedAndImageMatchActor && useTokenNameForChatOutput && token) {
+            img = token?.data.img;
+            name = token?.data.name;
+        }
+
+        return [name, img];
     }
 }

@@ -980,8 +980,7 @@
             "sin",
             "spell",
             "sprite_power",
-            "weapon",
-            "PDFoundry_PDF"
+            "weapon"
         ],
         "templates": {
             "description": {
@@ -1246,13 +1245,10 @@
             "type": "common_program"
         },
         "equipment": {
-            "templates": ["description", "technology"]
-        },
-        "PDFoundry_PDF": {
-            "url": "",
-            "code": "",
-            "offset": 0,
-            "cache": false
+            "templates": [
+                "description",
+                "technology"
+            ]
         }
     }
 }
