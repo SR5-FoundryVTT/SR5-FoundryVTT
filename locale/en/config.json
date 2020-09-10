@@ -550,5 +550,7 @@
     "SR5.MIGRATION.SuccessPacksInfo": "Due to current technical limitations with FoundryVTT, actor packs must be updated manually.",
     "SR5.MIGRATION.SuccessConfirm": "Close",
 
-    "CONTROLS.SR5.OverwatchScoreTracker": "Overwatch Score Tracker"
+    "CONTROLS.SR5.OverwatchScoreTracker": "Overwatch Score Tracker",
+
+    "SR5.DIALOG.MissingModuleContent": "In order for source PDFs to be shown, the PDFoundry module must be installed and a PDF matching the code created."
 }
