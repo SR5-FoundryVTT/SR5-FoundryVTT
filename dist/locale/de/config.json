@@ -538,5 +538,7 @@
   "SR5.MIGRATION.SuccessPacksInfo": "Aufgrund technischer Limitierungen von FoundryVTT müssen Kommpendien vom Typ Actor manuell aktualisiert werden.",
   "SR5.MIGRATION.SuccessConfirm": "Schließen",
 
-  "CONTROLS.SR5.OverwatchScoreTracker": "Overwatch Wert Übersicht"
+  "CONTROLS.SR5.OverwatchScoreTracker": "Overwatch Wert Übersicht",
+
+  "SR5.DIALOG.MissingModuleContent": "Um das Quell-PDF anzuzeigen, muss das Modul PDFoundry installiert sein und ein PDF mit passendem Code erstellt werden.",
 }

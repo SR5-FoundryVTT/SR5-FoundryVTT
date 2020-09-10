@@ -6853,6 +6853,11 @@ class SR5Item extends Item {
     }
     openPdfSource() {
         return __awaiter(this, void 0, void 0, function* () {
+            // Check for PDFoundry module hook: https://github.com/Djphoenix719/PDFoundry
+            if (!ui.PDFoundry) {
+                ui.notifications.warn(game.i18n.localize('SR5.DIALOG.MissingModuleContent'));
+                return;
+            }
             const source = this.getBookSource();
             if (source === '') {
                 // @ts-ignore
