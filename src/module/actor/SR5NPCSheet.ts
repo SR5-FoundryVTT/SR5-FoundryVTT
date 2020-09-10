@@ -3,6 +3,8 @@ import { SR5ActorSheet } from "./SR5ActorSheet";
 import ActorAttribute = Shadowrun.ActorAttribute;
 import {Helpers} from "../helpers";
 import Skills = Shadowrun.Skills;
+import KnowledgeSkills = Shadowrun.KnowledgeSkills;
+import RemovableSkills = Shadowrun.RemovableSkills;
 /* This is dev todos that should be done before it's going live. If you, a trusted user, can read this, please heckle
     taM#9507 lovingly about it.
 
@@ -26,7 +28,7 @@ export class SR5NPCSheet extends SR5ActorSheet {
         return data;
     }
 
-    _filterSkills(data: SR5ActorSheetData, skills: typeof Skills) {
+    _filterSkills(data: SR5ActorSheetData, skills: Skills | RemovableSkills) {
         const filteredSkills = {};
         for (let [key, skill] of Object.entries(skills)) {
             // if filter isn't empty, we are doing custom filtering
