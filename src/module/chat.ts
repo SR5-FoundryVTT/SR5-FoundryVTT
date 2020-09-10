@@ -55,7 +55,7 @@ export const createChatData = async (templateData: TemplateData, roll?: Roll) =>
         speaker: {
             actor: actor?._id,
             token: actor?.token,
-            alias: actor?.name,
+            alias: templateData.header.name,
         },
         flags: {
             shadowrun5e: {
