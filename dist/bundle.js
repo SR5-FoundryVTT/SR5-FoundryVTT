@@ -2124,43 +2124,44 @@ class SR5ActorSheet extends ActorSheet {
         data.data.skills.active = activeSkills;
     }
     _prepareItems(data) {
-        const inventory = {
-            weapon: {
-                label: game.i18n.localize('SR5.Weapon'),
-                items: [],
-                dataset: {
-                    type: 'weapon',
-                },
+        const inventory = {};
+        inventory['weapon'] = {
+            label: game.i18n.localize('SR5.Weapon'),
+            items: [],
+            dataset: {
+                type: 'weapon',
             },
-            armor: {
+        };
+        if (this.actor.data.type === 'character') {
+            inventory['armor'] = {
                 label: game.i18n.localize('SR5.Armor'),
                 items: [],
                 dataset: {
                     type: 'armor',
                 },
-            },
-            device: {
+            };
+            inventory['device'] = {
                 label: game.i18n.localize('SR5.Device'),
                 items: [],
                 dataset: {
                     type: 'device',
                 },
-            },
-            equipment: {
+            };
+            inventory['equipment'] = {
                 label: game.i18n.localize('SR5.Equipment'),
                 items: [],
                 dataset: {
                     type: 'equipment',
                 },
-            },
-            cyberware: {
+            };
+            inventory['cyberware'] = {
                 label: game.i18n.localize('SR5.Cyberware'),
                 items: [],
                 dataset: {
                     type: 'cyberware',
                 },
-            },
-        };
+            };
+        }
         let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs, critter_powers, sprite_powers,] = data.items.reduce((arr, item) => {
             item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
             if (item.type === 'spell')
@@ -2368,7 +2369,7 @@ class SR5ActorSheet extends ActorSheet {
                 case 'defense':
                     this.actor.rollDefense(options);
                     break;
-                case 'damage-resit':
+                case 'damage-resist':
                     this.actor.rollSoak(options);
                     break;
                 // attribute only rolls
@@ -2389,7 +2390,6 @@ class SR5ActorSheet extends ActorSheet {
                     break;
                 case 'drone':
                     const prop = split[1]; // we expect another for "drone" category
-                    console.log('roll drone', prop);
                     switch (prop) {
                         case 'perception':
                             this.actor.rollDronePerception(options);

@@ -83,23 +83,23 @@
                             </div>
                         </div>
                     </div>
+                    <div class="list-item">
+                        <div class="item-left">
+                            <div class="item-text item-name">
+                                {{localize "SR5.AwakenedEmerged"}}
+                            </div>
+                        </div>
+                        <div class="item-right">
+                            <div class="item-text input">
+                                <select class="display" name="data.special">
+                                    {{#select data.special}} {{#each config.specialTypes as |name type|}}
+                                        <option value="{{type}}">{{localize name}}</option>
+                                    {{/each}} {{/select}}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 {{/if}}
-                <div class="list-item">
-                    <div class="item-left">
-                        <div class="item-text item-name">
-                            {{localize "SR5.AwakenedEmerged"}}
-                        </div>
-                    </div>
-                    <div class="item-right">
-                        <div class="item-text input">
-                            <select class="display" name="data.special">
-                                {{#select data.special}} {{#each config.specialTypes as |name type|}}
-                                    <option value="{{type}}">{{localize name}}</option>
-                                {{/each}} {{/select}}
-                            </select>
-                        </div>
-                    </div>
-                </div>
                 {{#if awakened}}
                     <div class="list-item">
                         <div class="item-left">
