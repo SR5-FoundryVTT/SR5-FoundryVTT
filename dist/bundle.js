@@ -4956,6 +4956,15 @@ var OverwatchScoreTracker = /*#__PURE__*/function (_Application) {
 
         return acc;
       }, []);
+      OverwatchScoreTracker.addedActors.forEach(function (id) {
+        var actor = game.actors.find(function (a) {
+          return a._id === id;
+        });
+
+        if (actor) {
+          actors.push(actor.data);
+        }
+      });
       return {
         actors: actors
       };
@@ -4967,20 +4976,41 @@ var OverwatchScoreTracker = /*#__PURE__*/function (_Application) {
       html.find('.overwatch-score-add').on('click', this._addOverwatchScore.bind(this));
       html.find('.overwatch-score-input').on('change', this._setOverwatchScore.bind(this));
       html.find('.overwatch-score-roll-15-minutes').on('click', this._rollFor15Minutes.bind(this));
+      html.find('.overwatch-score-add-actor').on('click', this._onAddActor.bind(this));
     } // returns the actor that this event is acting on
 
   }, {
     key: "_getActorFromEvent",
     value: function _getActorFromEvent(event) {
-      var id = event.currentTarget.closest('.item').dataset.actorId;
+      var id = event.currentTarget.closest('.list-item').dataset.actorId;
       if (id) return game.actors.find(function (a) {
         return a._id === id;
       });
     }
   }, {
+    key: "_onAddActor",
+    value: function _onAddActor(event) {
+      var _this = this;
+
+      event.preventDefault();
+      var tokens = canvas.tokens.controlled;
+
+      if (tokens.length === 0) {
+        ui.notifications.warn(game.i18n.localize('SR5.OverwatchScoreTracker.NotifyNoSelectedTokens'));
+        return;
+      }
+
+      tokens.forEach(function (token) {
+        var actorId = token.data.actorId;
+        OverwatchScoreTracker.addedActors.push(actorId);
+
+        _this.render();
+      });
+    }
+  }, {
     key: "_setOverwatchScore",
     value: function _setOverwatchScore(event) {
-      var _this = this;
+      var _this2 = this;
 
       var actor = this._getActorFromEvent(event);
 
@@ -4988,14 +5018,14 @@ var OverwatchScoreTracker = /*#__PURE__*/function (_Application) {
 
       if (amount && actor) {
         actor.setOverwatchScore(amount).then(function () {
-          return _this.render();
+          return _this2.render();
         });
       }
     }
   }, {
     key: "_addOverwatchScore",
     value: function _addOverwatchScore(event) {
-      var _this2 = this;
+      var _this3 = this;
 
       var actor = this._getActorFromEvent(event);
 
@@ -5004,14 +5034,14 @@ var OverwatchScoreTracker = /*#__PURE__*/function (_Application) {
       if (amount && actor) {
         var os = actor.getOverwatchScore();
         actor.setOverwatchScore(os + amount).then(function () {
-          return _this2.render();
+          return _this3.render();
         });
       }
     }
   }, {
     key: "_resetOverwatchScore",
     value: function _resetOverwatchScore(event) {
-      var _this3 = this;
+      var _this4 = this;
 
       event.preventDefault();
 
@@ -5019,14 +5049,14 @@ var OverwatchScoreTracker = /*#__PURE__*/function (_Application) {
 
       if (actor) {
         actor.setOverwatchScore(0).then(function () {
-          return _this3.render();
+          return _this4.render();
         });
       }
     }
   }, {
     key: "_rollFor15Minutes",
     value: function _rollFor15Minutes(event) {
-      var _this4 = this;
+      var _this5 = this;
 
       event.preventDefault();
 
@@ -5042,7 +5072,7 @@ var OverwatchScoreTracker = /*#__PURE__*/function (_Application) {
         if (roll.total) {
           var os = actor.getOverwatchScore();
           actor.setOverwatchScore(os + roll.total).then(function () {
-            return _this4.render();
+            return _this5.render();
           });
         }
       }
@@ -5066,6 +5096,7 @@ var OverwatchScoreTracker = /*#__PURE__*/function (_Application) {
 
 exports.OverwatchScoreTracker = OverwatchScoreTracker;
 (0, _defineProperty2["default"])(OverwatchScoreTracker, "MatrixOverwatchDiceCount", '2d6');
+(0, _defineProperty2["default"])(OverwatchScoreTracker, "addedActors", []);
 
 },{"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10}],37:[function(require,module,exports){
 "use strict";
