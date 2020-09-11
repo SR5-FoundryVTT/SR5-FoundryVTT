@@ -7,18 +7,28 @@
                         {{localize "SR5.Character"}}
                     </div>
                 </div>
+                <div class="item-right">
+                    <div class="item-icons item-text">
+                        <a class="roll overwatch-score-add-actor" title="{{localize "SR5.OverwatchScoreTracker.AddSelect"}}">
+                            <i class="fas fa-plus"></i>
+                            {{localize "SR5.Add"}}
+                        </a>
+                    </div>
+                </div>
             </div>
             {{#each actors as |actor index|}}
             <div class="list-item" data-actor-id="{{actor._id}}">
                 <div class="item-left">
-                    <div class="item-img">
-                        <img
-                            src="{{actor.img}}"
-                            title="{{actor.name}}"
-                            height="24px"
-                            width="24px"
-                        />
-                    </div>
+                    {{#if actor.img}}
+                        <div class="item-img">
+                            <img
+                                src="{{actor.img}}"
+                                title="{{actor.name}}"
+                                height="24px"
+                                width="24px"
+                            />
+                        </div>
+                    {{/if}}
                     <div class="item-text item-name">
                         {{actor.name}}
                     </div>

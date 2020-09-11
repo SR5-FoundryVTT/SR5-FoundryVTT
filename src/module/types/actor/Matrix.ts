@@ -1,6 +1,6 @@
 /// <reference path="../Shadowrun.ts" />
 declare namespace Shadowrun {
-    export type Matrix = {
+    export type ActorMatrix = {
         dice: BaseValuePair<number> & ModifiableValue;
         base: BaseValuePair<number> & ModifiableValue;
 

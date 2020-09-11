@@ -1,6 +1,10 @@
 {{#> "systems/shadowrun5e/dist/templates/common/Attribute.html" dataName="attribute" dataId=attributeId}}
-    <div class="attribute-name attribute-roll roll">
-        {{localize attribute.label}}
+    <div class="attribute-name roll {{#if rollId}}Roll{{/if}}">
+        {{#if label}}
+            {{localize label}}
+        {{else}}
+            {{localize attribute.label}}
+        {{/if}}
     </div>
     <div class="attribute-value" title="{{localize 'SR5.Total'}}">
         {{attribute.value}}
@@ -13,7 +17,7 @@
                     size="2"
                     maxLength="2"
                     value=attribute.base
-                    name=(buildName part1="data.attributes" part2=attributeId part3="base")
+                    name=(buildName part1=(default attributesPath "data.attributes") part2=attributeId part3="base")
                     disabled=(disabledHelper disableBase)
             }}
         </div>
@@ -25,7 +29,7 @@
                     size="2"
                     maxLength="2"
                     value=attribute.temp
-                    name=(buildName part1="data.attributes" part2=attributeId part3="temp")
+                    name=(buildName part1=(default attributesPath "data.attributes") part2=attributeId part3="temp")
                     disabled=(disabledHelper disableManual)
             }}
         </div>

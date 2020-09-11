@@ -3,8 +3,10 @@
     <div class="attributes">
         {{#each data.attributes as |attribute a|}} {{#unless attribute.hidden}}
             {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                    rollId=(concatStrings "attribute." a)
                     attributeId=a
                     attribute=attribute
+                    disableBase=../autoBase
             }}
         {{/unless}} {{/each}}
     </div>

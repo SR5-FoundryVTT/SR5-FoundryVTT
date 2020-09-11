@@ -1,0 +1,76 @@
+{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.html' tabId='skills'}}
+    <div>
+        {{> "systems/shadowrun5e/dist/templates/common/HeaderBlock.html"
+                name=(localize "SR5.Matrix")
+        }}
+        <div class="attributes">
+            {{#each config.matrixAttributes as |label key|}}
+                {{> "systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.html"
+                        matrixAtt=(lookup ../data.matrix key)
+                        key=key
+                        label=label
+                        matrixAttributes=../config/matrixAttributes
+                }}
+            {{/each}}
+            {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                    attributeId='resonance'
+                    attribute=data.attributes.resonance
+            }}
+            <div>
+                <div class="list-item">
+                    <div class="item-left">
+                        <div class="item-text item-name">
+                            {{localize "SR5.Sprite.Type"}}
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <div>
+                            <select name="data.spriteType" class="display">
+                                {{#select data.spriteType}} {{#each config.spriteTypes as |name type|}}
+                                    <option value="{{type}}">{{localize name}}</option>
+                                {{/each}} {{/select}}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="list-item">
+                    <div class="item-left">
+                        <div class="item-text item-name">
+                            {{localize "SR5.Sprite.Level"}}
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <div class="item-text">
+                            {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.html'
+                                    cssClass="attribute-input"
+                                    size="2"
+                                    maxLength="2"
+                                    value=data.level
+                                    name="data.level"
+                            }}
+                        </div>
+                    </div>
+                </div>
+                <div class="list-item">
+                    <div class="item-left">
+                        <div class="item-text item-name">
+                            {{localize "SR5.Sprite.Registered"}}
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <div class="item-text">
+                            <input type="checkbox" class="checkbox" name="data.registered" {{checked data.registered}}/>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="inventory">
+        <div class="split-container">
+            {{> 'systems/shadowrun5e/dist/templates/actor/parts/skills/ActiveSkillList.html' }}
+            {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/SpritePowerList.html' }}
+        </div>
+    </div>
+{{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.html'}}

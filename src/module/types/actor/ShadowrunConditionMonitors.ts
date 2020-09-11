@@ -5,6 +5,9 @@ declare namespace Shadowrun {
         stun: TrackType;
     };
 
+    export type PhysicalTrack = TrackType & Overflow;
+    export type StunTrack = TrackType;
+
     export type TrackType = ValueMaxPair<number> &
         LabelField &
         ModifiableValue & {

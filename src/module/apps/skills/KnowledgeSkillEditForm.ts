@@ -3,12 +3,11 @@ import KnowledgeSkillCategory = Shadowrun.KnowledgeSkillCategory;
 
 export class KnowledgeSkillEditForm extends LanguageSkillEditForm {
     category: KnowledgeSkillCategory;
+    constructor(actor, options, skillId, category) {
+        super(actor, options, skillId);
+        this.category = category;
+    }
     _updateString() {
         return `data.skills.knowledge.${this.category}.value.${this.skillId}`;
-    }
-
-    constructor(actor, skillId, category, options) {
-        super(actor, skillId, options);
-        this.category = category;
     }
 }

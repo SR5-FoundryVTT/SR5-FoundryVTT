@@ -12,7 +12,7 @@ export const registerBasicHelpers = () => {
     });
 
     Handlebars.registerHelper('concatStrings', function (...args) {
-        return args.join(' ');
+        return args.filter(a => typeof a === 'string').join('');
     });
 
     Handlebars.registerHelper('concat', function (strs, c = ',') {
