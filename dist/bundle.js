@@ -2295,6 +2295,18 @@ class SR5ActorSheet extends ActorSheet {
         html.find('.skill-edit').click(this._onShowEditSkill.bind(this));
         html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
         html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
+        /**
+         * Open the PDF for an item on the actor
+         */
+        $(html).find('.open-source-pdf').on('click', (event) => __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const field = $(event.currentTarget).parents('.list-item');
+            const iid = $(field).data().itemId;
+            const item = this.actor.getOwnedSR5Item(iid);
+            if (item) {
+                yield item.openPdfSource();
+            }
+        }));
         $(html).find('.horizontal-cell-input .cell').on('click', this._onSetCellInput.bind(this));
         $(html).find('.horizontal-cell-input .cell').on('contextmenu', this._onClearCellInput.bind(this));
         /**
@@ -6336,6 +6348,7 @@ exports.registerItemLineHelpers = () => {
     });
     Handlebars.registerHelper('ItemRightSide', function (item) {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t;
+        // TODO add button for accessing the PDF if PDFoundry is available and the source field is filled in
         const wrapper = new SR5ItemDataWrapper_1.SR5ItemDataWrapper(item);
         const qtyInput = {
             input: {
@@ -6513,6 +6526,14 @@ exports.registerItemLineHelpers = () => {
             icon: `${((_a = item.data.technology) === null || _a === void 0 ? void 0 : _a.equipped) ? 'fas fa-check-circle' : 'far fa-circle'} item-equip-toggle`,
             title: game.i18n.localize('SR5.ToggleEquip'),
         };
+        const pdfIcon = {
+            icon: 'fas fa-file open-source-pdf',
+            title: game.i18n.localize('SR5.OpenSourcePdf'),
+        };
+        const icons = [editIcon, removeIcon];
+        if (ui['PDFoundry']) {
+            icons.unshift(pdfIcon);
+        }
         switch (item.type) {
             case 'program':
             case 'armor':
@@ -6520,10 +6541,9 @@ exports.registerItemLineHelpers = () => {
             case 'equipment':
             case 'cyberware':
             case 'weapon':
-                return [equipIcon, editIcon, removeIcon];
-            default:
-                return [editIcon, removeIcon];
+                icons.unshift(equipIcon);
         }
+        return icons;
     });
 };
 },{"../item/SR5ItemDataWrapper":55}],50:[function(require,module,exports){

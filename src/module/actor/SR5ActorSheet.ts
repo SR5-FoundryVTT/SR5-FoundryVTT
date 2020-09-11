@@ -331,6 +331,21 @@ export class SR5ActorSheet extends ActorSheet {
         html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
         html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
 
+        /**
+         * Open the PDF for an item on the actor
+         */
+        $(html)
+            .find('.open-source-pdf')
+            .on('click', async (event) => {
+                event.preventDefault();
+                const field = $(event.currentTarget).parents('.list-item');
+                const iid = $(field).data().itemId;
+                const item = this.actor.getOwnedSR5Item(iid);
+                if (item) {
+                    await item.openPdfSource();
+                }
+            });
+
         $(html).find('.horizontal-cell-input .cell').on('click', this._onSetCellInput.bind(this));
 
         $(html).find('.horizontal-cell-input .cell').on('contextmenu', this._onClearCellInput.bind(this));

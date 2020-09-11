@@ -378,6 +378,16 @@ export const registerItemLineHelpers = () => {
             icon: `${item.data.technology?.equipped ? 'fas fa-check-circle' : 'far fa-circle'} item-equip-toggle`,
             title: game.i18n.localize('SR5.ToggleEquip'),
         };
+        const pdfIcon = {
+            icon: 'fas fa-file open-source-pdf',
+            title: game.i18n.localize('SR5.OpenSourcePdf'),
+        };
+
+        const icons = [editIcon, removeIcon];
+
+        if (ui['PDFoundry']) {
+            icons.unshift(pdfIcon);
+        }
 
         switch (item.type) {
             case 'program':
@@ -386,9 +396,9 @@ export const registerItemLineHelpers = () => {
             case 'equipment':
             case 'cyberware':
             case 'weapon':
-                return [equipIcon, editIcon, removeIcon];
-            default:
-                return [editIcon, removeIcon];
+                icons.unshift(equipIcon);
         }
+
+        return icons;
     });
 };
