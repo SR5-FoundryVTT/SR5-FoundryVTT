@@ -20,6 +20,7 @@ export class SpiritPrep extends BaseActorPrep<SR5SpiritType, SpiritActorData> {
 
         SkillsPrep.prepareSkills(this.data);
         AttributesPrep.prepareAttributes(this.data);
+        LimitsPrep.prepareLimitBaseFromAttributes(this.data);
         LimitsPrep.prepareLimits(this.data);
 
         SpiritPrep.prepareSpiritArmor(this.data);

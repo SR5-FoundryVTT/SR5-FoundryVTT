@@ -21,6 +21,7 @@ export class CharacterPrep extends BaseActorPrep<SR5CharacterType, CharacterActo
 
         SkillsPrep.prepareSkills(this.data);
         AttributesPrep.prepareAttributes(this.data);
+        LimitsPrep.prepareLimitBaseFromAttributes(this.data);
         LimitsPrep.prepareLimits(this.data);
 
         MatrixPrep.prepareMatrix(this.data, this.items);

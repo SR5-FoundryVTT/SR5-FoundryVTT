@@ -2853,6 +2853,7 @@ class CharacterPrep extends BaseActorPrep_1.BaseActorPrep {
         ItemPrep_1.ItemPrep.prepareCyberware(this.data, this.items);
         SkillsPrep_1.SkillsPrep.prepareSkills(this.data);
         AttributesPrep_1.AttributesPrep.prepareAttributes(this.data);
+        LimitsPrep_1.LimitsPrep.prepareLimitBaseFromAttributes(this.data);
         LimitsPrep_1.LimitsPrep.prepareLimits(this.data);
         MatrixPrep_1.MatrixPrep.prepareMatrix(this.data, this.items);
         MatrixPrep_1.MatrixPrep.prepareMatrixToLimitsAndAttributes(this.data);
@@ -2887,6 +2888,7 @@ class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
         SpiritPrep.prepareSpiritBaseData(this.data);
         SkillsPrep_1.SkillsPrep.prepareSkills(this.data);
         AttributesPrep_1.AttributesPrep.prepareAttributes(this.data);
+        LimitsPrep_1.LimitsPrep.prepareLimitBaseFromAttributes(this.data);
         LimitsPrep_1.LimitsPrep.prepareLimits(this.data);
         SpiritPrep.prepareSpiritArmor(this.data);
         ConditionMonitorsPrep_1.ConditionMonitorsPrep.prepareStun(this.data);
