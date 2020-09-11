@@ -62,7 +62,7 @@ declare namespace Shadowrun {
     };
 
     export type LabelField = {
-        label?: string;
+        label: string;
     };
 
     export type ManualModField = {

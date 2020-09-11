@@ -906,8 +906,9 @@
         },
         "vehicle": {
             "templates": ["common", "skills", "attributes", "limits", "armor", "matrix", "movement"],
-            "vehicleType": "",
-            "controlMode": "",
+            "vehicleType": "ground",
+            "controlMode": "autopilot",
+            "environment": "speed",
             "isDrone": false,
             "isOffRoad": false,
             "vehicle_stats": {

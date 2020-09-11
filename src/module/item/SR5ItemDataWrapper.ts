@@ -87,7 +87,7 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
     }
 
     getConditionMonitor(): ConditionData {
-        return this.data.data.technology?.condition_monitor ?? { value: 0, max: 0 };
+        return this.data.data.technology?.condition_monitor ?? { value: 0, max: 0, label: '' };
     }
 
     getRating(): number {

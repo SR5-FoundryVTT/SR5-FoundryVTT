@@ -497,6 +497,11 @@
   cursor: pointer;
   color: #6495ed; }
 
+.Roll:hover {
+  text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
+  cursor: pointer;
+  color: #6495ed; }
+
 .flexrow {
   display: flex;
   flex-direction: row;

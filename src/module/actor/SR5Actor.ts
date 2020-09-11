@@ -19,6 +19,7 @@ import { ActorPrepFactory } from './prep/ActorPrepFactory';
 import DamageData = Shadowrun.DamageData;
 import DamageElement = Shadowrun.DamageElement;
 import EdgeAttributeField = Shadowrun.EdgeAttributeField;
+import VehicleActorData = Shadowrun.VehicleActorData;
 
 export class SR5Actor extends Actor {
     async update(data, options?) {
@@ -72,14 +73,6 @@ export class SR5Actor extends Actor {
         return this.data.data.attributes[attributeName];
     }
 
-    getEquippedMatrixDevice(): SR5Item | undefined {
-        return this.items.find((item: SR5Item) => item.isDevice());
-    }
-
-    getEquippedArmor(): SR5Item[] | undefined {
-        return this.items.filter((item: SR5Item) => item.isArmor());
-    }
-
     findLimitFromAttribute(attributeName?: string): LimitField | undefined {
         if (attributeName === undefined) return undefined;
         const attribute = this.findAttribute(attributeName);
@@ -131,6 +124,14 @@ export class SR5Actor extends Actor {
             total += Math.ceil(strength.value / 3);
         }
         return total;
+    }
+
+    getDeviceRating(): number {
+        return this.data.data.matrix.rating;
+    }
+
+    isVehicle() {
+        return this.data.type === 'vehicle';
     }
 
     addKnowledgeSkill(category, skill?) {
@@ -611,6 +612,22 @@ export class SR5Actor extends Actor {
         });
     }
 
+    rollDeviceRating(options?: ActorRollOptions) {
+        const title = game.i18n.localize('SR5.Labels.ActorSheet.DeviceRating');
+        const parts = new PartsList<number>();
+        const rating = this.getDeviceRating();
+        // add device rating twice as this is the most common roll
+        parts.addPart(title, rating);
+        parts.addPart(title, rating);
+        this._addGlobalParts(parts);
+        return ShadowrunRoller.advancedRoll({
+            event: options?.event,
+            title,
+            parts: parts.list,
+            actor: this,
+        });
+    }
+
     rollAttributesTest(rollId, options?: ActorRollOptions) {
         const title = game.i18n.localize(CONFIG.SR5.attributeRolls[rollId]);
         const atts = this.data.data.attributes;
@@ -634,6 +651,7 @@ export class SR5Actor extends Actor {
             if (modifiers.memory) parts.addUniquePart('SR5.Bonus', modifiers.memory);
         }
 
+        this._addGlobalParts(parts);
         return ShadowrunRoller.advancedRoll({
             event: options?.event,
             actor: this,
@@ -642,7 +660,7 @@ export class SR5Actor extends Actor {
         });
     }
 
-    rollSkill(skill, options?: SkillRollOptions) {
+    rollSkill(skill: SkillField, options?: SkillRollOptions) {
         let att = duplicate(this.data.data.attributes[skill.attribute]);
         let title = game.i18n.localize(skill.label);
 
@@ -720,6 +738,128 @@ export class SR5Actor extends Actor {
                 },
             }).render(true);
         });
+    }
+
+    rollDronePerception(options?: ActorRollOptions) {
+        if (!this.isVehicle()) {
+            return undefined;
+        }
+        const actorData = duplicate(this.data.data) as VehicleActorData;
+        if (actorData.controlMode === 'autopilot') {
+            const parts = new PartsList<number>();
+
+            const pilot = Helpers.calcTotal(actorData.vehicle_stats.pilot);
+            // TODO possibly look for autosoft item level?
+            const perception = this.findActiveSkill('perception');
+            const limit = this.findLimit('sensor');
+
+            if (perception && limit) {
+                parts.addPart('SR5.Vehicle.Clearsight', Helpers.calcTotal(perception));
+                parts.addPart('SR5.Vehicle.Stats.Pilot', pilot);
+
+                this._addGlobalParts(parts);
+
+                return ShadowrunRoller.advancedRoll({
+                    event: options?.event,
+                    actor: this,
+                    parts: parts.list,
+                    limit,
+                    title: game.i18n.localize('SR5.Labels.ActorSheet.RollDronePerception'),
+                });
+            }
+        } else {
+            this.rollActiveSkill('perception', options);
+        }
+    }
+
+    rollPilotVehicle(options?: ActorRollOptions) {
+        if (!this.isVehicle()) {
+            return undefined;
+        }
+        const actorData = duplicate(this.data.data) as VehicleActorData;
+        if (actorData.controlMode === 'autopilot') {
+            const parts = new PartsList<number>();
+
+            const pilot = Helpers.calcTotal(actorData.vehicle_stats.pilot);
+            let skill: SkillField | undefined = undefined;
+            switch (actorData.vehicleType) {
+                case 'air':
+                    skill = this.findActiveSkill('pilot_aircraft');
+                    break;
+                case 'ground':
+                    skill = this.findActiveSkill('pilot_ground_craft');
+                    break;
+                case 'water':
+                    skill = this.findActiveSkill('pilot_water_craft');
+                    break;
+                case 'aerospace':
+                    skill = this.findActiveSkill('pilot_aerospace');
+                    break;
+                case 'walker':
+                    skill = this.findActiveSkill('pilot_walker');
+                    break;
+                case 'exotic':
+                    skill = this.findActiveSkill('pilot_exotic_vehicle');
+                    break;
+                default:
+                    break;
+            }
+            const environment = actorData.environment;
+            //
+            const limit = this.findLimit(environment);
+
+            console.log(skill, limit);
+
+            if (skill && limit) {
+                parts.addPart('SR5.Vehicle.Stats.Pilot', pilot);
+                // TODO possibly look for autosoft item level?
+                parts.addPart(skill.label, Helpers.calcTotal(skill));
+
+                this._addGlobalParts(parts);
+
+                return ShadowrunRoller.advancedRoll({
+                    event: options?.event,
+                    actor: this,
+                    parts: parts.list,
+                    limit,
+                    title: game.i18n.localize('SR5.Labels.ActorSheet.RollPilotVehicleTest'),
+                });
+            }
+        } else {
+            this.rollActiveSkill('perception', options);
+        }
+    }
+
+    rollDroneInfiltration(options?: ActorRollOptions) {
+        if (!this.isVehicle()) {
+            return undefined;
+        }
+        const actorData = duplicate(this.data.data) as VehicleActorData;
+        if (actorData.controlMode === 'autopilot') {
+            const parts = new PartsList<number>();
+
+            const pilot = Helpers.calcTotal(actorData.vehicle_stats.pilot);
+            // TODO possibly look for autosoft item level?
+            const sneaking = this.findActiveSkill('sneaking');
+            const limit = this.findLimit('sensor');
+
+            if (sneaking && limit) {
+                parts.addPart('SR5.Vehicle.Stealth', Helpers.calcTotal(sneaking));
+                parts.addPart('SR5.Vehicle.Stats.Pilot', pilot);
+
+                this._addGlobalParts(parts);
+
+                return ShadowrunRoller.advancedRoll({
+                    event: options?.event,
+                    actor: this,
+                    parts: parts.list,
+                    limit,
+                    title: game.i18n.localize('SR5.Labels.ActorSheet.RollDroneInfiltration'),
+                });
+            }
+        } else {
+            this.rollActiveSkill('sneaking', options);
+        }
     }
 
     rollKnowledgeSkill(catId: string, skillId: string, options?: SkillRollOptions) {

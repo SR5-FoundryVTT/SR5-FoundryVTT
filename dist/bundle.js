@@ -1029,12 +1029,6 @@ class SR5Actor extends Actor {
             return undefined;
         return this.data.data.attributes[attributeName];
     }
-    getEquippedMatrixDevice() {
-        return this.items.find((item) => item.isDevice());
-    }
-    getEquippedArmor() {
-        return this.items.filter((item) => item.isArmor());
-    }
     findLimitFromAttribute(attributeName) {
         if (attributeName === undefined)
             return undefined;
@@ -1083,6 +1077,12 @@ class SR5Actor extends Actor {
             total += Math.ceil(strength.value / 3);
         }
         return total;
+    }
+    getDeviceRating() {
+        return this.data.data.matrix.rating;
+    }
+    isVehicle() {
+        return this.data.type === 'vehicle';
     }
     addKnowledgeSkill(category, skill) {
         const defaultSkill = {
@@ -1526,6 +1526,21 @@ class SR5Actor extends Actor {
             },
         });
     }
+    rollDeviceRating(options) {
+        const title = game.i18n.localize('SR5.Labels.ActorSheet.DeviceRating');
+        const parts = new PartsList_1.PartsList();
+        const rating = this.getDeviceRating();
+        // add device rating twice as this is the most common roll
+        parts.addPart(title, rating);
+        parts.addPart(title, rating);
+        this._addGlobalParts(parts);
+        return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
+            event: options === null || options === void 0 ? void 0 : options.event,
+            title,
+            parts: parts.list,
+            actor: this,
+        });
+    }
     rollAttributesTest(rollId, options) {
         const title = game.i18n.localize(CONFIG.SR5.attributeRolls[rollId]);
         const atts = this.data.data.attributes;
@@ -1555,6 +1570,7 @@ class SR5Actor extends Actor {
             if (modifiers.memory)
                 parts.addUniquePart('SR5.Bonus', modifiers.memory);
         }
+        this._addGlobalParts(parts);
         return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
             event: options === null || options === void 0 ? void 0 : options.event,
             actor: this,
@@ -1639,6 +1655,115 @@ class SR5Actor extends Actor {
                 }),
             }).render(true);
         });
+    }
+    rollDronePerception(options) {
+        if (!this.isVehicle()) {
+            return undefined;
+        }
+        const actorData = duplicate(this.data.data);
+        if (actorData.controlMode === 'autopilot') {
+            const parts = new PartsList_1.PartsList();
+            const pilot = helpers_1.Helpers.calcTotal(actorData.vehicle_stats.pilot);
+            // TODO possibly look for autosoft item level?
+            const perception = this.findActiveSkill('perception');
+            const limit = this.findLimit('sensor');
+            if (perception && limit) {
+                parts.addPart('SR5.Vehicle.Clearsight', helpers_1.Helpers.calcTotal(perception));
+                parts.addPart('SR5.Vehicle.Stats.Pilot', pilot);
+                this._addGlobalParts(parts);
+                return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
+                    event: options === null || options === void 0 ? void 0 : options.event,
+                    actor: this,
+                    parts: parts.list,
+                    limit,
+                    title: game.i18n.localize('SR5.Labels.ActorSheet.RollDronePerception'),
+                });
+            }
+        }
+        else {
+            this.rollActiveSkill('perception', options);
+        }
+    }
+    rollPilotVehicle(options) {
+        if (!this.isVehicle()) {
+            return undefined;
+        }
+        const actorData = duplicate(this.data.data);
+        if (actorData.controlMode === 'autopilot') {
+            const parts = new PartsList_1.PartsList();
+            const pilot = helpers_1.Helpers.calcTotal(actorData.vehicle_stats.pilot);
+            let skill = undefined;
+            switch (actorData.vehicleType) {
+                case 'air':
+                    skill = this.findActiveSkill('pilot_aircraft');
+                    break;
+                case 'ground':
+                    skill = this.findActiveSkill('pilot_ground_craft');
+                    break;
+                case 'water':
+                    skill = this.findActiveSkill('pilot_water_craft');
+                    break;
+                case 'aerospace':
+                    skill = this.findActiveSkill('pilot_aerospace');
+                    break;
+                case 'walker':
+                    skill = this.findActiveSkill('pilot_walker');
+                    break;
+                case 'exotic':
+                    skill = this.findActiveSkill('pilot_exotic_vehicle');
+                    break;
+                default:
+                    break;
+            }
+            const environment = actorData.environment;
+            //
+            const limit = this.findLimit(environment);
+            console.log(skill, limit);
+            if (skill && limit) {
+                parts.addPart('SR5.Vehicle.Stats.Pilot', pilot);
+                // TODO possibly look for autosoft item level?
+                parts.addPart(skill.label, helpers_1.Helpers.calcTotal(skill));
+                this._addGlobalParts(parts);
+                return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
+                    event: options === null || options === void 0 ? void 0 : options.event,
+                    actor: this,
+                    parts: parts.list,
+                    limit,
+                    title: game.i18n.localize('SR5.Labels.ActorSheet.RollPilotVehicleTest'),
+                });
+            }
+        }
+        else {
+            this.rollActiveSkill('perception', options);
+        }
+    }
+    rollDroneInfiltration(options) {
+        if (!this.isVehicle()) {
+            return undefined;
+        }
+        const actorData = duplicate(this.data.data);
+        if (actorData.controlMode === 'autopilot') {
+            const parts = new PartsList_1.PartsList();
+            const pilot = helpers_1.Helpers.calcTotal(actorData.vehicle_stats.pilot);
+            // TODO possibly look for autosoft item level?
+            const sneaking = this.findActiveSkill('sneaking');
+            const limit = this.findLimit('sensor');
+            if (sneaking && limit) {
+                parts.addPart('SR5.Vehicle.Stealth', helpers_1.Helpers.calcTotal(sneaking));
+                parts.addPart('SR5.Vehicle.Stats.Pilot', pilot);
+                this._addGlobalParts(parts);
+                return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
+                    event: options === null || options === void 0 ? void 0 : options.event,
+                    actor: this,
+                    parts: parts.list,
+                    limit,
+                    title: game.i18n.localize('SR5.Labels.ActorSheet.RollDroneInfiltration'),
+                });
+            }
+        }
+        else {
+            this.rollActiveSkill('sneaking', options);
+        }
     }
     rollKnowledgeSkill(catId, skillId, options) {
         const category = duplicate(this.data.data.skills.knowledge[catId]);
@@ -2151,21 +2276,13 @@ class SR5ActorSheet extends ActorSheet {
         html.find('.cell-input-roll').click(this._onRollCellInput.bind(this));
         html.find('.attribute-roll').click(this._onRollAttribute.bind(this));
         html.find('.skill-roll').click(this._onRollActiveSkill.bind(this));
-        html.find('.defense-roll').click(this._onRollDefense.bind(this));
-        html.find('.attribute-only-roll').click(this._onRollAttributesOnly.bind(this));
-        html.find('.soak-roll').click(this._onRollSoak.bind(this));
-        html.find('.drain-roll').click(this._onRollDrain.bind(this));
-        html.find('.fade-roll').click(this._onRollFade.bind(this));
         html.find('.item-roll').click(this._onRollItem.bind(this));
         // $(html).find('.item-roll').on('contextmenu', () => console.log('TEST'));
         html.find('.item-equip-toggle').click(this._onEquipItem.bind(this));
         html.find('.item-qty').change(this._onChangeQty.bind(this));
         html.find('.item-rtg').change(this._onChangeRtg.bind(this));
         html.find('.item-create').click(this._onItemCreate.bind(this));
-        html.find('.matrix-roll').click(this._onRollMatrixAttribute.bind(this));
         html.find('.matrix-att-selector').change(this._onMatrixAttributeSelected.bind(this));
-        html.find('.basic-roll').click(this._onRollPrompt.bind(this));
-        html.find('.armor-roll').click(this._onRollArmor.bind(this));
         html.find('.add-knowledge').click(this._onAddKnowledgeSkill.bind(this));
         html.find('.knowledge-skill').click(this._onRollKnowledgeSkill.bind(this));
         html.find('.remove-knowledge').click(this._onRemoveKnowledgeSkill.bind(this));
@@ -2224,28 +2341,110 @@ class SR5ActorSheet extends ActorSheet {
         });
     }
     _onRollFromSheet(event) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
-            const rollId = $(event.currentTarget).parent('.RollId').data().rollId;
+            // look for roll id data in the current line
+            let rollId = (_a = $(event.currentTarget).data()) === null || _a === void 0 ? void 0 : _a.rollId;
+            // if that doesn't exist, look for a prent with RollId name
+            rollId = rollId !== null && rollId !== void 0 ? rollId : $(event.currentTarget).parent('.RollId').data().rollId;
             console.log('');
             console.log(rollId);
             const split = rollId.split('.');
             const options = { event };
             switch (split[0]) {
+                case 'prompt-roll':
+                    this.actor.promptRoll(options);
+                    break;
                 case 'armor':
                     this.actor.rollArmor(options);
-                    break;
-                case 'vehicleStat':
-                    console.log('roll vehicle stat', rollId);
-                    break;
-                case 'attribute':
-                    const attribute = split[1];
-                    if (attribute)
-                        this.actor.rollAttribute(attribute, options);
                     break;
                 case 'fade':
                     this.actor.rollFade(options);
                     break;
+                case 'drain':
+                    this.actor.rollDrain(options);
+                    break;
+                case 'defense':
+                    this.actor.rollDefense(options);
+                    break;
+                case 'damage-resit':
+                    this.actor.rollSoak(options);
+                    break;
+                // attribute only rolls
+                case 'composure':
+                    this.actor.rollAttributesTest('composure');
+                    break;
+                case 'judge-intentions':
+                    this.actor.rollAttributesTest('judge_intentions');
+                    break;
+                case 'lift-carry':
+                    this.actor.rollAttributesTest('lift_carry');
+                    break;
+                case 'memory':
+                    this.actor.rollAttributesTest('memory');
+                    break;
+                case 'vehicle-stat':
+                    console.log('roll vehicle stat', rollId);
+                    break;
+                case 'drone':
+                    const prop = split[1]; // we expect another for "drone" category
+                    console.log('roll drone', prop);
+                    switch (prop) {
+                        case 'perception':
+                            this.actor.rollDronePerception(options);
+                            break;
+                        case 'infiltration':
+                            this.actor.rollDroneInfiltration(options);
+                            break;
+                        case 'pilot-vehicle':
+                            this.actor.rollPilotVehicle(options);
+                            break;
+                    }
+                    break;
+                // end drone
+                case 'attribute':
+                    const attribute = split[1];
+                    if (attribute) {
+                        this.actor.rollAttribute(attribute, options);
+                    }
+                    break;
+                // end attribute
+                case 'skill':
+                    const skillType = split[1];
+                    switch (skillType) {
+                        case 'active': {
+                            const skillId = split[2];
+                            this.actor.rollActiveSkill(skillId, options);
+                            break;
+                        }
+                        case 'language': {
+                            const skillId = split[2];
+                            this.actor.rollLanguageSkill(skillId, options);
+                            break;
+                        }
+                        case 'knowledge': {
+                            const category = split[2];
+                            const skillId = split[3];
+                            this.actor.rollKnowledgeSkill(category, skillId, options);
+                            break;
+                        }
+                    }
+                    break;
+                // end skill
+                case 'matrix':
+                    const subkey = split[1];
+                    switch (subkey) {
+                        case 'attribute':
+                            const attr = split[2];
+                            this.actor.rollMatrixAttribute(attr, options);
+                            break;
+                        case 'device-rating':
+                            this.actor.rollDeviceRating(options);
+                            break;
+                    }
+                    break;
+                // end matrix
             }
         });
     }
@@ -2455,12 +2654,6 @@ class SR5ActorSheet extends ActorSheet {
             }
         });
     }
-    _onRollPrompt(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            yield this.actor.promptRoll({ event: event });
-        });
-    }
     _onRollItem(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
@@ -2469,50 +2662,6 @@ class SR5ActorSheet extends ActorSheet {
             if (item) {
                 yield item.postCard(event);
             }
-        });
-    }
-    _onRollFade(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            this.actor.rollFade({ event: event });
-        });
-    }
-    _onRollDrain(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            this.actor.rollDrain({ event: event });
-        });
-    }
-    _onRollArmor(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            return this.actor.rollArmor({ event: event });
-        });
-    }
-    _onRollDefense(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            return this.actor.rollDefense({ event: event });
-        });
-    }
-    _onRollMatrixAttribute(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            const attr = event.currentTarget.dataset.attribute;
-            return this.actor.rollMatrixAttribute(attr, { event: event });
-        });
-    }
-    _onRollSoak(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            return this.actor.rollSoak({ event: event });
-        });
-    }
-    _onRollAttributesOnly(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            const roll = event.currentTarget.dataset.roll;
-            return this.actor.rollAttributesTest(roll, { event: event });
         });
     }
     _onRollKnowledgeSkill(event) {
@@ -3578,6 +3727,9 @@ class MatrixPrep {
                 attributes[attLabel].base = rating;
                 helpers_1.Helpers.calcTotal(attributes[attLabel]);
             }
+        });
+        ['firewall', 'data_processing'].forEach(attId => {
+            matrix[attId].base = rating;
         });
     }
 }
@@ -5317,389 +5469,396 @@ exports.shadowrunCombatUpdate = (changes, options) => __awaiter(void 0, void 0, 
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5 = void 0;
-exports.SR5 = {};
-exports.SR5['itemTypes'] = {
-    action: 'SR5.ItemTypes.Action',
-    adept_power: 'SR5.ItemTypes.AdeptPower',
-    ammo: 'SR5.ItemTypes.Ammo',
-    armor: 'SR5.ItemTypes.Armor',
-    complex_form: 'SR5.ItemTypes.ComplexForm',
-    contact: 'SR5.ItemTypes.Contact',
-    critter_power: 'SR5.ItemTypes.CritterPower',
-    cyberware: 'SR5.ItemTypes.Cyberware',
-    device: 'SR5.ItemTypes.Device',
-    equipment: 'SR5.ItemTypes.Equipment',
-    lifestyle: 'SR5.ItemTypes.Lifestyle',
-    modification: 'SR5.ItemTypes.Modification',
-    quality: 'SR5.ItemTypes.Quality',
-    sin: 'SR5.ItemTypes.Sin',
-    spell: 'SR5.ItemTypes.Spell',
-    weapon: 'SR5.ItemTypes.Weapon',
-};
-exports.SR5['attributes'] = {
-    body: 'SR5.AttrBody',
-    agility: 'SR5.AttrAgility',
-    reaction: 'SR5.AttrReaction',
-    strength: 'SR5.AttrStrength',
-    willpower: 'SR5.AttrWillpower',
-    logic: 'SR5.AttrLogic',
-    intuition: 'SR5.AttrIntuition',
-    charisma: 'SR5.AttrCharisma',
-    magic: 'SR5.AttrMagic',
-    resonance: 'SR5.AttrResonance',
-    edge: 'SR5.AttrEdge',
-    essence: 'SR5.AttrEssence',
-    attack: 'SR5.MatrixAttrAttack',
-    sleaze: 'SR5.MatrixAttrSleaze',
-    data_processing: 'SR5.MatrixAttrDataProc',
-    firewall: 'SR5.MatrixAttrFirewall',
-};
-exports.SR5['limits'] = {
-    physical: 'SR5.LimitPhysical',
-    social: 'SR5.LimitSocial',
-    mental: 'SR5.LimitMental',
-    attack: 'SR5.MatrixAttrAttack',
-    sleaze: 'SR5.MatrixAttrSleaze',
-    data_processing: 'SR5.MatrixAttrDataProc',
-    firewall: 'SR5.MatrixAttrFirewall',
-};
-exports.SR5['specialTypes'] = {
-    mundane: 'SR5.Mundane',
-    magic: 'SR5.Awakened',
-    resonance: 'SR5.Emerged',
-};
-exports.SR5['damageTypes'] = {
-    physical: 'SR5.DmgTypePhysical',
-    stun: 'SR5.DmgTypeStun',
-    matrix: 'SR5.DmgTypeMatrix',
-};
-exports.SR5['elementTypes'] = {
-    fire: 'SR5.ElementFire',
-    cold: 'SR5.ElementCold',
-    acid: 'SR5.ElementAcid',
-    electricity: 'SR5.ElementElectricity',
-    radiation: 'SR5.ElementRadiation',
-};
-exports.SR5['spellCategories'] = {
-    combat: 'SR5.SpellCatCombat',
-    detection: 'SR5.SpellCatDetection',
-    health: 'SR5.SpellCatHealth',
-    illusion: 'SR5.SpellCatIllusion',
-    manipulation: 'SR5.SpellCatManipulation',
-};
-exports.SR5['spellTypes'] = {
-    physical: 'SR5.SpellTypePhysical',
-    mana: 'SR5.SpellTypeMana',
-};
-exports.SR5['spellRanges'] = {
-    touch: 'SR5.SpellRangeTouch',
-    los: 'SR5.SpellRangeLos',
-    los_a: 'SR5.SpellRangeLosA',
-};
-exports.SR5['combatSpellTypes'] = {
-    direct: 'SR5.SpellCombatDirect',
-    indirect: 'SR5.SpellCombatIndirect',
-};
-exports.SR5['detectionSpellTypes'] = {
-    directional: 'SR5.SpellDetectionDirectional',
-    psychic: 'SR5.SpellDetectionPsychic',
-    area: 'SR5.SpellDetectionArea',
-};
-exports.SR5['illusionSpellTypes'] = {
-    obvious: 'SR5.SpellIllusionObvious',
-    realistic: 'SR5.SpellIllusionRealistic',
-};
-exports.SR5['illusionSpellSenses'] = {
-    'single-sense': 'SR5.SpellIllusionSingleSense',
-    'multi-sense': 'SR5.SpellIllusionMultiSense',
-};
-exports.SR5['attributeRolls'] = {
-    composure: 'SR5.RollComposure',
-    lift_carry: 'SR5.RollLiftCarry',
-    judge_intentions: 'SR5.RollJudgeIntentions',
-    memory: 'SR5.RollMemory',
-};
-exports.SR5['matrixTargets'] = {
-    persona: 'SR5.TargetPersona',
-    device: 'SR5.TargetDevice',
-    file: 'SR5.TargetFile',
-    self: 'SR5.TargetSelf',
-    sprite: 'SR5.TargetSprite',
-    other: 'SR5.TargetOther',
-};
-exports.SR5['durations'] = {
-    instant: 'SR5.DurationInstant',
-    sustained: 'SR5.DurationSustained',
-    permanent: 'SR5.DurationPermanent',
-};
-exports.SR5['weaponCategories'] = {
-    range: 'SR5.WeaponCatRange',
-    melee: 'SR5.WeaponCatMelee',
-    thrown: 'SR5.WeaponCatThrown',
-};
-exports.SR5['weaponRanges'] = {
-    short: 'SR5.WeaponRangeShort',
-    medium: 'SR5.WeaponRangeMedium',
-    long: 'SR5.WeaponRangeLong',
-    extreme: 'SR5.WeaponRangeExtreme',
-};
-exports.SR5['qualityTypes'] = {
-    positive: 'SR5.QualityTypePositive',
-    negative: 'SR5.QualityTypeNegative',
-};
-exports.SR5['deviceCategories'] = {
-    commlink: 'SR5.DeviceCatCommlink',
-    cyberdeck: 'SR5.DeviceCatCyberdeck',
-};
-exports.SR5['cyberwareGrades'] = {
-    standard: 'SR5.CyberwareGradeStandard',
-    alpha: 'SR5.CyberwareGradeAlpha',
-    beta: 'SR5.CyberwareGradeBeta',
-    delta: 'SR5.CyberwareGradeDelta',
-    used: 'SR5.CyberwareGradeUsed',
-};
-exports.SR5['knowledgeSkillCategories'] = {
-    street: 'SR5.KnowledgeSkillStreet',
-    academic: 'SR5.KnowledgeSkillAcademic',
-    professional: 'SR5.KnowledgeSkillProfessional',
-    interests: 'SR5.KnowledgeSkillInterests',
-};
-exports.SR5['activeSkills'] = {
-    archery: 'SR5.SkillArchery',
-    automatics: 'SR5.SkillAutomatics',
-    blades: 'SR5.SkillBlades',
-    clubs: 'SR5.SkillClubs',
-    exotic_melee: 'SR5.SkillExoticMelee',
-    exotic_range: 'SR5.SkillExoticRange',
-    heavy_weapons: 'SR5.SkillHeavyWeapons',
-    longarms: 'SR5.SkillLongarms',
-    pistols: 'SR5.SkillPistols',
-    throwing_weapons: 'SR5.SkillThrowingWeapons',
-    unarmed_combat: 'SR5.SkillUnarmedCombat',
-    disguise: 'SR5.SkillDisguise',
-    diving: 'SR5.SkillDiving',
-    escape_artist: 'SR5.SkillEscapeArtist',
-    free_fall: 'SR5.SkillFreeFall',
-    gymnastics: 'SR5.SkillGymnastics',
-    palming: 'SR5.SkillPalming',
-    perception: 'SR5.SkillPerception',
-    running: 'SR5.SkillRunning',
-    sneaking: 'SR5.SkillSneaking',
-    survival: 'SR5.SkillSurvival',
-    swimming: 'SR5.SkillSwimming',
-    tracking: 'SR5.SkillTracking',
-    con: 'SR5.SkillCon',
-    etiquette: 'SR5.SkillEtiquette',
-    impersonation: 'SR5.SkillImpersonation',
-    instruction: 'SR5.SkillInstruction',
-    intimidation: 'SR5.SkillIntimidation',
-    leadership: 'SR5.SkillLeadership',
-    negotiation: 'SR5.SkillNegotiation',
-    performance: 'SR5.SkillPerformance',
-    alchemy: 'SR5.SkillAlchemy',
-    arcana: 'SR5.SkillArcana',
-    artificing: 'SR5.SkillArtificing',
-    assensing: 'SR5.SkillAssensing',
-    astral_combat: 'SR5.SkillAstralCombat',
-    banishing: 'SR5.SkillBanishing',
-    binding: 'SR5.SkillBinding',
-    counterspelling: 'SR5.SkillCounterspelling',
-    disenchanting: 'SR5.SkillDisenchanting',
-    ritual_spellcasting: 'SR5.SkillRitualSpellcasting',
-    spellcasting: 'SR5.SkillSpellcasting',
-    summoning: 'SR5.SkillSummoning',
-    compiling: 'SR5.SkillCompiling',
-    decompiling: 'SR5.SkillDecompiling',
-    registering: 'SR5.SkillRegistering',
-    aeronautics_mechanic: 'SR5.SkillAeronauticsMechanic',
-    automotive_mechanic: 'SR5.SkillAutomotiveMechanic',
-    industrial_mechanic: 'SR5.SkillIndustrialMechanic',
-    nautical_mechanic: 'SR5.SkillNauticalMechanic',
-    animal_handling: 'SR5.SkillAnimalHandling',
-    armorer: 'SR5.SkillArmorer',
-    artisan: 'SR5.SkillArtisan',
-    biotechnology: 'SR5.SkillBiotechnology',
-    chemistry: 'SR5.SkillChemistry',
-    computer: 'SR5.SkillComputer',
-    cybercombat: 'SR5.SkillCybercombat',
-    cybertechnology: 'SR5.SkillCybertechnology',
-    demolitions: 'SR5.SkillDemolitions',
-    electronic_warfare: 'SR5.SkillElectronicWarfare',
-    first_aid: 'SR5.SkillFirstAid',
-    forgery: 'SR5.SkillForgery',
-    hacking: 'SR5.SkillHacking',
-    hardware: 'SR5.SkillHardware',
-    locksmith: 'SR5.SkillLocksmith',
-    medicine: 'SR5.SkillMedicine',
-    navigation: 'SR5.SkillNavigation',
-    software: 'SR5.SkillSoftware',
-    gunnery: 'SR5.SkillGunnery',
-    pilot_aerospace: 'SR5.SkillPilotAerospace',
-    pilot_aircraft: 'SR5.SkillPilotAircraft',
-    pilot_walker: 'SR5.SkillPilotWalker',
-    pilot_ground_craft: 'SR5.SkillPilotGroundCraft',
-    pilot_water_craft: 'SR5.SkillPilotWaterCraft',
-    pilot_exotic_vehicle: 'SR5.SkillPilotExoticVehicle',
-};
-exports.SR5['actionTypes'] = {
-    none: 'SR5.ActionTypeNone',
-    free: 'SR5.ActionTypeFree',
-    simple: 'SR5.ActionTypeSimple',
-    complex: 'SR5.ActionTypeComplex',
-    varies: 'SR5.ActionTypeVaries',
-};
-exports.SR5['matrixAttributes'] = {
-    attack: 'SR5.MatrixAttrAttack',
-    sleaze: 'SR5.MatrixAttrSleaze',
-    data_processing: 'SR5.MatrixAttrDataProc',
-    firewall: 'SR5.MatrixAttrFirewall',
-};
-exports.SR5['initiativeCategories'] = {
-    meatspace: 'SR5.InitCatMeatspace',
-    astral: 'SR5.InitCatAstral',
-    matrix: 'SR5.InitCatMatrix',
-};
-exports.SR5['modificationTypes'] = {
-    weapon: 'SR5.Weapon',
-    armor: 'SR5.Armor',
-};
-exports.SR5['mountPoints'] = {
-    barrel: 'SR5.Barrel',
-    stock: 'SR5.Stock',
-    top: 'SR5.Top',
-    side: 'SR5.Side',
-    internal: 'SR5.Internal',
-};
-exports.SR5['lifestyleTypes'] = {
-    street: 'SR5.LifestyleStreet',
-    squatter: 'SR5.LifestyleSquatter',
-    low: 'SR5.LifestyleLow',
-    medium: 'SR5.LifestyleMiddle',
-    high: 'SR5.LifestyleHigh',
-    luxory: 'SR5.LifestyleLuxory',
-    other: 'SR5.LifestyleOther',
-};
-exports.SR5['kbmod'] = {
-    STANDARD: 'shiftKey',
-    EDGE: 'altKey',
-    SPEC: 'ctrlKey',
-};
-exports.SR5['actorModifiers'] = {
-    soak: 'SR5.RollSoak',
-    drain: 'SR5.Drain',
-    armor: 'SR5.Armor',
-    physical_limit: 'SR5.PhysicalLimit',
-    social_limit: 'SR5.SocialLimit',
-    mental_limit: 'SR5.MentalLimit',
-    stun_track: 'SR5.StunTrack',
-    physical_track: 'SR5.PhysicalTrack',
-    meat_initiative: 'SR5.MeatSpaceInit',
-    meat_initiative_dice: 'SR5.MeatSpaceDice',
-    astral_initiative: 'SR5.AstralInit',
-    astral_initiative_dice: 'SR5.AstralDice',
-    matrix_initiative: 'SR5.MatrixInit',
-    matrix_initiative_dice: 'SR5.MatrixDice',
-    composure: 'SR5.RollComposure',
-    lift_carry: 'SR5.RollLiftCarry',
-    judge_intentions: 'SR5.RollJudgeIntentions',
-    memory: 'SR5.RollMemory',
-    walk: 'SR5.Walk',
-    run: 'SR5.Run',
-    defense: 'SR5.RollDefense',
-    wound_tolerance: 'SR5.WoundTolerance',
-    essence: 'SR5.AttrEssence',
-    fade: 'SR5.RollFade',
-    global: 'SR5.Global',
-};
-exports.SR5['programTypes'] = {
-    common_program: 'SR5.CommonProgram',
-    hacking_program: 'SR5.HackingProgram',
-    agent: 'SR5.Agent',
-};
-exports.SR5['spiritTypes'] = {
-    // base types
-    air: 'SR5.Spirit.Types.Air',
-    beasts: 'SR5.Spirit.Types.Beasts',
-    earth: 'SR5.Spirit.Types.Earth',
-    fire: 'SR5.Spirit.Types.Fire',
-    guardian: 'SR5.Spirit.Types.Guardian',
-    guidance: 'SR5.Spirit.Types.Guidance',
-    man: 'SR5.Spirit.Types.Man',
-    plant: 'SR5.Spirit.Types.Plant',
-    task: 'SR5.Spirit.Types.Task',
-    water: 'SR5.Spirit.Types.Water',
-    // toxic types
-    toxic_air: 'SR5.Spirit.Types.ToxicAir',
-    toxic_beasts: 'SR5.Spirit.Types.ToxicBeasts',
-    toxic_earth: 'SR5.Spirit.Types.ToxicEarth',
-    toxic_fire: 'SR5.Spirit.Types.ToxicFire',
-    toxic_man: 'SR5.Spirit.Types.ToxicMan',
-    toxic_water: 'SR5.Spirit.Types.ToxicWater',
-    // blood types
-    blood: 'SR5.Spirit.Types.Blood',
-    // shadow types
-    muse: 'SR5.Spirit.Types.Muse',
-    nightmare: 'SR5.Spirit.Types.Nightmare',
-    shade: 'SR5.Spirit.Types.Shade',
-    succubus: 'SR5.Spirit.Types.Succubus',
-    wraith: 'SR5.Spirit.Types.Wraith',
-    // shedim types
-    shedim: 'SR5.Spirit.Types.Shedim',
-    master_shedim: 'SR5.Spirit.Types.MasterShedim',
-    // insect types
-    caretaker: 'SR5.Spirit.Types.Caretaker',
-    nymph: 'SR5.Spirit.Types.Nymph',
-    scout: 'SR5.Spirit.Types.Scout',
-    soldier: 'SR5.Spirit.Types.Soldier',
-    worker: 'SR5.Spirit.Types.Worker',
-    queen: 'SR5.Spirit.Types.Queen',
-};
-exports.SR5['critterPower'] = {
-    types: {
-        mana: 'SR5.CritterPower.Types.Mana',
-        physical: 'SR5.CritterPower.Types.Physical',
+exports.SR5 = {
+    itemTypes: {
+        action: 'SR5.ItemTypes.Action',
+        adept_power: 'SR5.ItemTypes.AdeptPower',
+        ammo: 'SR5.ItemTypes.Ammo',
+        armor: 'SR5.ItemTypes.Armor',
+        complex_form: 'SR5.ItemTypes.ComplexForm',
+        contact: 'SR5.ItemTypes.Contact',
+        critter_power: 'SR5.ItemTypes.CritterPower',
+        cyberware: 'SR5.ItemTypes.Cyberware',
+        device: 'SR5.ItemTypes.Device',
+        equipment: 'SR5.ItemTypes.Equipment',
+        lifestyle: 'SR5.ItemTypes.Lifestyle',
+        modification: 'SR5.ItemTypes.Modification',
+        quality: 'SR5.ItemTypes.Quality',
+        sin: 'SR5.ItemTypes.Sin',
+        spell: 'SR5.ItemTypes.Spell',
+        weapon: 'SR5.ItemTypes.Weapon',
     },
-    ranges: {
-        los: 'SR5.CritterPower.Ranges.LineOfSight',
-        self: 'SR5.CritterPower.Ranges.Self',
-        touch: 'SR5.CritterPower.Ranges.Touch',
+    attributes: {
+        body: 'SR5.AttrBody',
+        agility: 'SR5.AttrAgility',
+        reaction: 'SR5.AttrReaction',
+        strength: 'SR5.AttrStrength',
+        willpower: 'SR5.AttrWillpower',
+        logic: 'SR5.AttrLogic',
+        intuition: 'SR5.AttrIntuition',
+        charisma: 'SR5.AttrCharisma',
+        magic: 'SR5.AttrMagic',
+        resonance: 'SR5.AttrResonance',
+        edge: 'SR5.AttrEdge',
+        essence: 'SR5.AttrEssence',
+        attack: 'SR5.MatrixAttrAttack',
+        sleaze: 'SR5.MatrixAttrSleaze',
+        data_processing: 'SR5.MatrixAttrDataProc',
+        firewall: 'SR5.MatrixAttrFirewall',
+    },
+    limits: {
+        physical: 'SR5.LimitPhysical',
+        social: 'SR5.LimitSocial',
+        mental: 'SR5.LimitMental',
+        attack: 'SR5.MatrixAttrAttack',
+        sleaze: 'SR5.MatrixAttrSleaze',
+        data_processing: 'SR5.MatrixAttrDataProc',
+        firewall: 'SR5.MatrixAttrFirewall',
+    },
+    specialTypes: {
+        mundane: 'SR5.Mundane',
+        magic: 'SR5.Awakened',
+        resonance: 'SR5.Emerged',
+    },
+    damageTypes: {
+        physical: 'SR5.DmgTypePhysical',
+        stun: 'SR5.DmgTypeStun',
+        matrix: 'SR5.DmgTypeMatrix',
+    },
+    elementTypes: {
+        fire: 'SR5.ElementFire',
+        cold: 'SR5.ElementCold',
+        acid: 'SR5.ElementAcid',
+        electricity: 'SR5.ElementElectricity',
+        radiation: 'SR5.ElementRadiation',
+    },
+    spellCategories: {
+        combat: 'SR5.SpellCatCombat',
+        detection: 'SR5.SpellCatDetection',
+        health: 'SR5.SpellCatHealth',
+        illusion: 'SR5.SpellCatIllusion',
+        manipulation: 'SR5.SpellCatManipulation',
+    },
+    spellTypes: {
+        physical: 'SR5.SpellTypePhysical',
+        mana: 'SR5.SpellTypeMana',
+    },
+    spellRanges: {
+        touch: 'SR5.SpellRangeTouch',
+        los: 'SR5.SpellRangeLos',
+        los_a: 'SR5.SpellRangeLosA',
+    },
+    combatSpellTypes: {
+        direct: 'SR5.SpellCombatDirect',
+        indirect: 'SR5.SpellCombatIndirect',
+    },
+    detectionSpellTypes: {
+        directional: 'SR5.SpellDetectionDirectional',
+        psychic: 'SR5.SpellDetectionPsychic',
+        area: 'SR5.SpellDetectionArea',
+    },
+    illusionSpellTypes: {
+        obvious: 'SR5.SpellIllusionObvious',
+        realistic: 'SR5.SpellIllusionRealistic',
+    },
+    illusionSpellSenses: {
+        'single-sense': 'SR5.SpellIllusionSingleSense',
+        'multi-sense': 'SR5.SpellIllusionMultiSense',
+    },
+    attributeRolls: {
+        composure: 'SR5.RollComposure',
+        lift_carry: 'SR5.RollLiftCarry',
+        judge_intentions: 'SR5.RollJudgeIntentions',
+        memory: 'SR5.RollMemory',
+    },
+    matrixTargets: {
+        persona: 'SR5.TargetPersona',
+        device: 'SR5.TargetDevice',
+        file: 'SR5.TargetFile',
+        self: 'SR5.TargetSelf',
+        sprite: 'SR5.TargetSprite',
+        other: 'SR5.TargetOther',
     },
     durations: {
-        always: 'SR5.CritterPower.Durations.Always',
-        instant: 'SR5.CritterPower.Durations.Instant',
-        sustained: 'SR5.CritterPower.Durations.Sustained',
-        permanent: 'SR5.CritterPower.Durations.Permanent',
-        special: 'SR5.CritterPower.Durations.Special',
+        instant: 'SR5.DurationInstant',
+        sustained: 'SR5.DurationSustained',
+        permanent: 'SR5.DurationPermanent',
     },
-};
-exports.SR5['spriteTypes'] = {
-    courier: 'SR5.Sprite.Types.Courier',
-    crack: 'SR5.Sprite.Types.Crack',
-    data: 'SR5.Sprite.Types.Data',
-    fault: 'SR5.Sprite.Types.Fault',
-    machine: 'SR5.Sprite.Types.Machine',
-};
-exports.SR5['vehicle'] = {
-    types: {
-        air: 'SR5.Vehicle.Types.Air',
-        aerospace: 'SR5.Vehicle.Types.Aerospace',
-        ground: 'SR5.Vehicle.Types.Ground',
-        water: 'SR5.Vehicle.Types.Water'
+    weaponCategories: {
+        range: 'SR5.WeaponCatRange',
+        melee: 'SR5.WeaponCatMelee',
+        thrown: 'SR5.WeaponCatThrown',
     },
-    stats: {
-        handling: 'SR5.Vehicle.Stats.Handling',
-        off_road_handling: 'SR5.Vehicle.Stats.OffRoadHandling',
-        speed: 'SR5.Vehicle.Stats.Speed',
-        off_road_speed: 'SR5.Vehicle.Stats.OffRoadSpeed',
-        acceleration: 'SR5.Vehicle.Stats.Acceleration',
-        pilot: 'SR5.Vehicle.Stats.Pilot',
-        sensor: 'SR5.Vehicle.Stats.Sensor',
+    weaponRanges: {
+        short: 'SR5.WeaponRangeShort',
+        medium: 'SR5.WeaponRangeMedium',
+        long: 'SR5.WeaponRangeLong',
+        extreme: 'SR5.WeaponRangeExtreme',
     },
-    control_modes: {
-        manual: 'SR5.Vehicle.ControlModes.Manual',
-        remote: 'SR5.Vehicle.ControlModes.Remote',
-        rigger: 'SR5.Vehicle.ControlModes.Rigger',
-        autopilot: 'SR5.Vehicle.ControlModes.Autopilot',
+    qualityTypes: {
+        positive: 'SR5.QualityTypePositive',
+        negative: 'SR5.QualityTypeNegative',
+    },
+    deviceCategories: {
+        commlink: 'SR5.DeviceCatCommlink',
+        cyberdeck: 'SR5.DeviceCatCyberdeck',
+    },
+    cyberwareGrades: {
+        standard: 'SR5.CyberwareGradeStandard',
+        alpha: 'SR5.CyberwareGradeAlpha',
+        beta: 'SR5.CyberwareGradeBeta',
+        delta: 'SR5.CyberwareGradeDelta',
+        used: 'SR5.CyberwareGradeUsed',
+    },
+    knowledgeSkillCategories: {
+        street: 'SR5.KnowledgeSkillStreet',
+        academic: 'SR5.KnowledgeSkillAcademic',
+        professional: 'SR5.KnowledgeSkillProfessional',
+        interests: 'SR5.KnowledgeSkillInterests',
+    },
+    activeSkills: {
+        archery: 'SR5.SkillArchery',
+        automatics: 'SR5.SkillAutomatics',
+        blades: 'SR5.SkillBlades',
+        clubs: 'SR5.SkillClubs',
+        exotic_melee: 'SR5.SkillExoticMelee',
+        exotic_range: 'SR5.SkillExoticRange',
+        heavy_weapons: 'SR5.SkillHeavyWeapons',
+        longarms: 'SR5.SkillLongarms',
+        pistols: 'SR5.SkillPistols',
+        throwing_weapons: 'SR5.SkillThrowingWeapons',
+        unarmed_combat: 'SR5.SkillUnarmedCombat',
+        disguise: 'SR5.SkillDisguise',
+        diving: 'SR5.SkillDiving',
+        escape_artist: 'SR5.SkillEscapeArtist',
+        free_fall: 'SR5.SkillFreeFall',
+        gymnastics: 'SR5.SkillGymnastics',
+        palming: 'SR5.SkillPalming',
+        perception: 'SR5.SkillPerception',
+        running: 'SR5.SkillRunning',
+        sneaking: 'SR5.SkillSneaking',
+        survival: 'SR5.SkillSurvival',
+        swimming: 'SR5.SkillSwimming',
+        tracking: 'SR5.SkillTracking',
+        con: 'SR5.SkillCon',
+        etiquette: 'SR5.SkillEtiquette',
+        impersonation: 'SR5.SkillImpersonation',
+        instruction: 'SR5.SkillInstruction',
+        intimidation: 'SR5.SkillIntimidation',
+        leadership: 'SR5.SkillLeadership',
+        negotiation: 'SR5.SkillNegotiation',
+        performance: 'SR5.SkillPerformance',
+        alchemy: 'SR5.SkillAlchemy',
+        arcana: 'SR5.SkillArcana',
+        artificing: 'SR5.SkillArtificing',
+        assensing: 'SR5.SkillAssensing',
+        astral_combat: 'SR5.SkillAstralCombat',
+        banishing: 'SR5.SkillBanishing',
+        binding: 'SR5.SkillBinding',
+        counterspelling: 'SR5.SkillCounterspelling',
+        disenchanting: 'SR5.SkillDisenchanting',
+        ritual_spellcasting: 'SR5.SkillRitualSpellcasting',
+        spellcasting: 'SR5.SkillSpellcasting',
+        summoning: 'SR5.SkillSummoning',
+        compiling: 'SR5.SkillCompiling',
+        decompiling: 'SR5.SkillDecompiling',
+        registering: 'SR5.SkillRegistering',
+        aeronautics_mechanic: 'SR5.SkillAeronauticsMechanic',
+        automotive_mechanic: 'SR5.SkillAutomotiveMechanic',
+        industrial_mechanic: 'SR5.SkillIndustrialMechanic',
+        nautical_mechanic: 'SR5.SkillNauticalMechanic',
+        animal_handling: 'SR5.SkillAnimalHandling',
+        armorer: 'SR5.SkillArmorer',
+        artisan: 'SR5.SkillArtisan',
+        biotechnology: 'SR5.SkillBiotechnology',
+        chemistry: 'SR5.SkillChemistry',
+        computer: 'SR5.SkillComputer',
+        cybercombat: 'SR5.SkillCybercombat',
+        cybertechnology: 'SR5.SkillCybertechnology',
+        demolitions: 'SR5.SkillDemolitions',
+        electronic_warfare: 'SR5.SkillElectronicWarfare',
+        first_aid: 'SR5.SkillFirstAid',
+        forgery: 'SR5.SkillForgery',
+        hacking: 'SR5.SkillHacking',
+        hardware: 'SR5.SkillHardware',
+        locksmith: 'SR5.SkillLocksmith',
+        medicine: 'SR5.SkillMedicine',
+        navigation: 'SR5.SkillNavigation',
+        software: 'SR5.SkillSoftware',
+        gunnery: 'SR5.SkillGunnery',
+        pilot_aerospace: 'SR5.SkillPilotAerospace',
+        pilot_aircraft: 'SR5.SkillPilotAircraft',
+        pilot_walker: 'SR5.SkillPilotWalker',
+        pilot_ground_craft: 'SR5.SkillPilotGroundCraft',
+        pilot_water_craft: 'SR5.SkillPilotWaterCraft',
+        pilot_exotic_vehicle: 'SR5.SkillPilotExoticVehicle',
+    },
+    actionTypes: {
+        none: 'SR5.ActionTypeNone',
+        free: 'SR5.ActionTypeFree',
+        simple: 'SR5.ActionTypeSimple',
+        complex: 'SR5.ActionTypeComplex',
+        varies: 'SR5.ActionTypeVaries',
+    },
+    matrixAttributes: {
+        attack: 'SR5.MatrixAttrAttack',
+        sleaze: 'SR5.MatrixAttrSleaze',
+        data_processing: 'SR5.MatrixAttrDataProc',
+        firewall: 'SR5.MatrixAttrFirewall',
+    },
+    initiativeCategories: {
+        meatspace: 'SR5.InitCatMeatspace',
+        astral: 'SR5.InitCatAstral',
+        matrix: 'SR5.InitCatMatrix',
+    },
+    modificationTypes: {
+        weapon: 'SR5.Weapon',
+        armor: 'SR5.Armor',
+    },
+    mountPoints: {
+        barrel: 'SR5.Barrel',
+        stock: 'SR5.Stock',
+        top: 'SR5.Top',
+        side: 'SR5.Side',
+        internal: 'SR5.Internal',
+    },
+    lifestyleTypes: {
+        street: 'SR5.LifestyleStreet',
+        squatter: 'SR5.LifestyleSquatter',
+        low: 'SR5.LifestyleLow',
+        medium: 'SR5.LifestyleMiddle',
+        high: 'SR5.LifestyleHigh',
+        luxory: 'SR5.LifestyleLuxory',
+        other: 'SR5.LifestyleOther',
+    },
+    kbmod: {
+        STANDARD: 'shiftKey',
+        EDGE: 'altKey',
+        SPEC: 'ctrlKey',
+    },
+    actorModifiers: {
+        soak: 'SR5.RollSoak',
+        drain: 'SR5.Drain',
+        armor: 'SR5.Armor',
+        physical_limit: 'SR5.PhysicalLimit',
+        social_limit: 'SR5.SocialLimit',
+        mental_limit: 'SR5.MentalLimit',
+        stun_track: 'SR5.StunTrack',
+        physical_track: 'SR5.PhysicalTrack',
+        meat_initiative: 'SR5.MeatSpaceInit',
+        meat_initiative_dice: 'SR5.MeatSpaceDice',
+        astral_initiative: 'SR5.AstralInit',
+        astral_initiative_dice: 'SR5.AstralDice',
+        matrix_initiative: 'SR5.MatrixInit',
+        matrix_initiative_dice: 'SR5.MatrixDice',
+        composure: 'SR5.RollComposure',
+        lift_carry: 'SR5.RollLiftCarry',
+        judge_intentions: 'SR5.RollJudgeIntentions',
+        memory: 'SR5.RollMemory',
+        walk: 'SR5.Walk',
+        run: 'SR5.Run',
+        defense: 'SR5.RollDefense',
+        wound_tolerance: 'SR5.WoundTolerance',
+        essence: 'SR5.AttrEssence',
+        fade: 'SR5.RollFade',
+        global: 'SR5.Global',
+    },
+    programTypes: {
+        common_program: 'SR5.CommonProgram',
+        hacking_program: 'SR5.HackingProgram',
+        agent: 'SR5.Agent',
+    },
+    spiritTypes: {
+        // base types
+        air: 'SR5.Spirit.Types.Air',
+        beasts: 'SR5.Spirit.Types.Beasts',
+        earth: 'SR5.Spirit.Types.Earth',
+        fire: 'SR5.Spirit.Types.Fire',
+        guardian: 'SR5.Spirit.Types.Guardian',
+        guidance: 'SR5.Spirit.Types.Guidance',
+        man: 'SR5.Spirit.Types.Man',
+        plant: 'SR5.Spirit.Types.Plant',
+        task: 'SR5.Spirit.Types.Task',
+        water: 'SR5.Spirit.Types.Water',
+        // toxic types
+        toxic_air: 'SR5.Spirit.Types.ToxicAir',
+        toxic_beasts: 'SR5.Spirit.Types.ToxicBeasts',
+        toxic_earth: 'SR5.Spirit.Types.ToxicEarth',
+        toxic_fire: 'SR5.Spirit.Types.ToxicFire',
+        toxic_man: 'SR5.Spirit.Types.ToxicMan',
+        toxic_water: 'SR5.Spirit.Types.ToxicWater',
+        // blood types
+        blood: 'SR5.Spirit.Types.Blood',
+        // shadow types
+        muse: 'SR5.Spirit.Types.Muse',
+        nightmare: 'SR5.Spirit.Types.Nightmare',
+        shade: 'SR5.Spirit.Types.Shade',
+        succubus: 'SR5.Spirit.Types.Succubus',
+        wraith: 'SR5.Spirit.Types.Wraith',
+        // shedim types
+        shedim: 'SR5.Spirit.Types.Shedim',
+        master_shedim: 'SR5.Spirit.Types.MasterShedim',
+        // insect types
+        caretaker: 'SR5.Spirit.Types.Caretaker',
+        nymph: 'SR5.Spirit.Types.Nymph',
+        scout: 'SR5.Spirit.Types.Scout',
+        soldier: 'SR5.Spirit.Types.Soldier',
+        worker: 'SR5.Spirit.Types.Worker',
+        queen: 'SR5.Spirit.Types.Queen',
+    },
+    critterPower: {
+        types: {
+            mana: 'SR5.CritterPower.Types.Mana',
+            physical: 'SR5.CritterPower.Types.Physical',
+        },
+        ranges: {
+            los: 'SR5.CritterPower.Ranges.LineOfSight',
+            self: 'SR5.CritterPower.Ranges.Self',
+            touch: 'SR5.CritterPower.Ranges.Touch',
+        },
+        durations: {
+            always: 'SR5.CritterPower.Durations.Always',
+            instant: 'SR5.CritterPower.Durations.Instant',
+            sustained: 'SR5.CritterPower.Durations.Sustained',
+            permanent: 'SR5.CritterPower.Durations.Permanent',
+            special: 'SR5.CritterPower.Durations.Special',
+        },
+    },
+    spriteTypes: {
+        courier: 'SR5.Sprite.Types.Courier',
+        crack: 'SR5.Sprite.Types.Crack',
+        data: 'SR5.Sprite.Types.Data',
+        fault: 'SR5.Sprite.Types.Fault',
+        machine: 'SR5.Sprite.Types.Machine',
+    },
+    vehicle: {
+        types: {
+            air: 'SR5.Vehicle.Types.Air',
+            aerospace: 'SR5.Vehicle.Types.Aerospace',
+            ground: 'SR5.Vehicle.Types.Ground',
+            water: 'SR5.Vehicle.Types.Water',
+            walker: 'SR5.Vehicle.Types.Walker',
+            exotic: 'SR5.Vehicle.Types.Exotic',
+        },
+        stats: {
+            handling: 'SR5.Vehicle.Stats.Handling',
+            off_road_handling: 'SR5.Vehicle.Stats.OffRoadHandling',
+            speed: 'SR5.Vehicle.Stats.Speed',
+            off_road_speed: 'SR5.Vehicle.Stats.OffRoadSpeed',
+            acceleration: 'SR5.Vehicle.Stats.Acceleration',
+            pilot: 'SR5.Vehicle.Stats.Pilot',
+            sensor: 'SR5.Vehicle.Stats.Sensor',
+        },
+        control_modes: {
+            manual: 'SR5.Vehicle.ControlModes.Manual',
+            remote: 'SR5.Vehicle.ControlModes.Remote',
+            rigger: 'SR5.Vehicle.ControlModes.Rigger',
+            autopilot: 'SR5.Vehicle.ControlModes.Autopilot',
+        },
+        environments: {
+            speed: "SR5.Vehicle.Environments.Speed",
+            handling: "SR5.Vehicle.Environments.Handling"
+        }
     },
 };
 },{}],44:[function(require,module,exports){
@@ -8123,7 +8282,7 @@ class SR5ItemDataWrapper extends DataWrapper_1.DataWrapper {
     }
     getConditionMonitor() {
         var _a, _b;
-        return (_b = (_a = this.data.data.technology) === null || _a === void 0 ? void 0 : _a.condition_monitor) !== null && _b !== void 0 ? _b : { value: 0, max: 0 };
+        return (_b = (_a = this.data.data.technology) === null || _a === void 0 ? void 0 : _a.condition_monitor) !== null && _b !== void 0 ? _b : { value: 0, max: 0, label: '' };
     }
     getRating() {
         var _a;

@@ -12,6 +12,11 @@
     @include rollable;
 }
 
+// .Roll class is used for labels that will look for data-roll-id on itself or a parent RollId
+.Roll {
+    @include rollable;
+}
+
 .flexrow {
     display: flex;
     flex-direction: row;

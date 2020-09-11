@@ -48,40 +48,43 @@
     </header>
     <div class="attributes no-border">
         <div class="attribute row space-around">
-            <div class="attribute-only-roll roll attribute-name" data-roll="composure">
+            <div class="Roll attribute-name" data-roll-id="composure">
                 {{localize "SR5.RollComposure"}}
             </div>
-            <div class="attribute-only-roll roll attribute-name" data-roll="judge_intentions">
+            <div class="Roll attribute-name" data-roll-id="judge-intentions">
                 {{localize "SR5.RollJudgeIntentions"}}
             </div>
-            <div class="attribute-only-roll roll attribute-name" data-roll="lift_carry">
+            <div class="Roll attribute-name" data-roll-id="lift-carry">
                 {{localize "SR5.RollLiftCarry"}}
             </div>
-            <div class="attribute-only-roll roll attribute-name" data-roll="memory">
+            <div class="Roll attribute-name" data-roll-id="memory">
                 {{localize "SR5.RollMemory"}}
             </div>
             <div
-                title="Roll"
-                class="attribute-name basic-roll roll fas fa-dice-six"
-                data-roll="basic"
+                    title="Roll"
+                    class="attribute-name Roll fas fa-dice-six"
+                    data-roll-id="prompt-roll"
             ></div>
-            <div title="Defense" class="attribute-name defense-roll roll">
+            <div title="Defense" class="attribute-name Roll" data-roll-id="defense">
                 {{localize "SR5.RollDefense"}}
             </div>
-            <div title="Soak" class="attribute-name soak-roll roll">
+            <div title="Soak" class="attribute-name Roll" data-roll-id="damage-resist">
                 {{localize "SR5.RollSoak"}}
             </div>
-            <div class="attribute-name roll armor-roll">
+            <div class="attribute-name Roll" data-roll-id="armor">
                 {{localize "SR5.RollArmor"}} ({{data.armor.value}})
             </div>
+
             {{#if awakened}}
-            <div class="attribute-name roll drain-roll">
-                {{localize "SR5.RollDrain"}}
-            </div>
-            {{/if}} {{#if emerged}}
-            <div class="attribute-name roll fade-roll">
-                {{localize "SR5.RollFade"}}
-            </div>
+                <div class="attribute-name Roll" data-roll-id="drain">
+                    {{localize "SR5.RollDrain"}}
+                </div>
+            {{/if}}
+
+            {{#if emerged}}
+                <div class="attribute-name Roll" data-roll-id="fade">
+                    {{localize "SR5.RollFade"}}
+                </div>
             {{/if}}
         </div>
     </div>

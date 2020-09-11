@@ -117,5 +117,8 @@ export class MatrixPrep {
                 Helpers.calcTotal(attributes[attLabel]);
             }
         });
+        ['firewall', 'data_processing'].forEach(attId => {
+            matrix[attId].base = rating;
+        })
     }
 }

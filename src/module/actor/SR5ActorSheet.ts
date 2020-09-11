@@ -311,21 +311,13 @@ export class SR5ActorSheet extends ActorSheet {
         html.find('.cell-input-roll').click(this._onRollCellInput.bind(this));
         html.find('.attribute-roll').click(this._onRollAttribute.bind(this));
         html.find('.skill-roll').click(this._onRollActiveSkill.bind(this));
-        html.find('.defense-roll').click(this._onRollDefense.bind(this));
-        html.find('.attribute-only-roll').click(this._onRollAttributesOnly.bind(this));
-        html.find('.soak-roll').click(this._onRollSoak.bind(this));
-        html.find('.drain-roll').click(this._onRollDrain.bind(this));
-        html.find('.fade-roll').click(this._onRollFade.bind(this));
         html.find('.item-roll').click(this._onRollItem.bind(this));
         // $(html).find('.item-roll').on('contextmenu', () => console.log('TEST'));
         html.find('.item-equip-toggle').click(this._onEquipItem.bind(this));
         html.find('.item-qty').change(this._onChangeQty.bind(this));
         html.find('.item-rtg').change(this._onChangeRtg.bind(this));
         html.find('.item-create').click(this._onItemCreate.bind(this));
-        html.find('.matrix-roll').click(this._onRollMatrixAttribute.bind(this));
         html.find('.matrix-att-selector').change(this._onMatrixAttributeSelected.bind(this));
-        html.find('.basic-roll').click(this._onRollPrompt.bind(this));
-        html.find('.armor-roll').click(this._onRollArmor.bind(this));
         html.find('.add-knowledge').click(this._onAddKnowledgeSkill.bind(this));
         html.find('.knowledge-skill').click(this._onRollKnowledgeSkill.bind(this));
         html.find('.remove-knowledge').click(this._onRemoveKnowledgeSkill.bind(this));
@@ -390,26 +382,115 @@ export class SR5ActorSheet extends ActorSheet {
 
     async _onRollFromSheet(event) {
         event.preventDefault();
-        const rollId = $(event.currentTarget).parent('.RollId').data().rollId;
+        // look for roll id data in the current line
+        let rollId = $(event.currentTarget).data()?.rollId;
+        // if that doesn't exist, look for a prent with RollId name
+        rollId = rollId ?? $(event.currentTarget).parent('.RollId').data().rollId;
         console.log('');
         console.log(rollId);
 
         const split = rollId.split('.');
         const options = { event };
         switch (split[0]) {
+            case 'prompt-roll':
+                this.actor.promptRoll(options);
+                break;
             case 'armor':
                 this.actor.rollArmor(options);
-                break;
-            case 'vehicleStat':
-                console.log('roll vehicle stat', rollId);
-                break;
-            case 'attribute':
-                const attribute = split[1];
-                if (attribute) this.actor.rollAttribute(attribute, options);
                 break;
             case 'fade':
                 this.actor.rollFade(options);
                 break;
+            case 'drain':
+                this.actor.rollDrain(options);
+                break;
+            case 'defense':
+                this.actor.rollDefense(options);
+                break;
+            case 'damage-resit':
+                this.actor.rollSoak(options);
+                break;
+
+            // attribute only rolls
+            case 'composure':
+                this.actor.rollAttributesTest('composure');
+                break;
+            case 'judge-intentions':
+                this.actor.rollAttributesTest('judge_intentions');
+                break;
+            case 'lift-carry':
+                this.actor.rollAttributesTest('lift_carry');
+                break;
+            case 'memory':
+                this.actor.rollAttributesTest('memory');
+                break;
+
+            case 'vehicle-stat':
+                console.log('roll vehicle stat', rollId);
+                break;
+
+            case 'drone':
+                const prop = split[1]; // we expect another for "drone" category
+                console.log('roll drone', prop);
+                switch (prop) {
+                    case 'perception':
+                        this.actor.rollDronePerception(options);
+                        break;
+                    case 'infiltration':
+                        this.actor.rollDroneInfiltration(options);
+                        break;
+                    case 'pilot-vehicle':
+                        this.actor.rollPilotVehicle(options);
+                        break;
+                }
+                break;
+            // end drone
+
+            case 'attribute':
+                const attribute = split[1];
+                if (attribute) {
+                    this.actor.rollAttribute(attribute, options);
+                }
+                break;
+            // end attribute
+
+            case 'skill':
+                const skillType = split[1];
+                switch (skillType) {
+                    case 'active': {
+                        const skillId = split[2];
+                        this.actor.rollActiveSkill(skillId, options);
+                        break;
+                    }
+                    case 'language': {
+                        const skillId = split[2];
+                        this.actor.rollLanguageSkill(skillId, options);
+                        break;
+                    }
+                    case 'knowledge': {
+                        const category = split[2];
+                        const skillId = split[3];
+                        this.actor.rollKnowledgeSkill(category, skillId, options);
+                        break;
+                    }
+                }
+                break;
+            // end skill
+
+            case 'matrix':
+                const subkey = split[1];
+                switch (subkey) {
+                    case 'attribute':
+                        const attr = split[2];
+                        this.actor.rollMatrixAttribute(attr, options);
+                        break;
+                    case 'device-rating':
+                        this.actor.rollDeviceRating(options);
+                        break;
+                }
+
+                break;
+            // end matrix
         }
     }
 
@@ -597,11 +678,6 @@ export class SR5ActorSheet extends ActorSheet {
         }
     }
 
-    async _onRollPrompt(event) {
-        event.preventDefault();
-        await this.actor.promptRoll({ event: event });
-    }
-
     async _onRollItem(event) {
         event.preventDefault();
         const iid = Helpers.listItemId(event);
@@ -609,43 +685,6 @@ export class SR5ActorSheet extends ActorSheet {
         if (item) {
             await item.postCard(event);
         }
-    }
-
-    async _onRollFade(event) {
-        event.preventDefault();
-        this.actor.rollFade({ event: event });
-    }
-
-    async _onRollDrain(event) {
-        event.preventDefault();
-        this.actor.rollDrain({ event: event });
-    }
-
-    async _onRollArmor(event) {
-        event.preventDefault();
-        return this.actor.rollArmor({ event: event });
-    }
-
-    async _onRollDefense(event) {
-        event.preventDefault();
-        return this.actor.rollDefense({ event: event });
-    }
-
-    async _onRollMatrixAttribute(event) {
-        event.preventDefault();
-        const attr = event.currentTarget.dataset.attribute;
-        return this.actor.rollMatrixAttribute(attr, { event: event });
-    }
-
-    async _onRollSoak(event: MouseEvent) {
-        event.preventDefault();
-        return this.actor.rollSoak({ event: event });
-    }
-
-    async _onRollAttributesOnly(event) {
-        event.preventDefault();
-        const roll = event.currentTarget.dataset.roll;
-        return this.actor.rollAttributesTest(roll, { event: event });
     }
 
     async _onRollKnowledgeSkill(event) {

@@ -668,6 +668,10 @@
         "IsOffRoad": "Is Off Road",
         "ControlMode": "Control Mode",
         "Type": "Type",
+        "ChaseEnvironment": "Chase Environment",
+        "Clearsight": "Clearsight",
+        "Stealth": "Stealth",
+
         "Stats": {
             "Handling": "Handling",
             "OffRoadHandling": "Handling (Off Road)",
@@ -681,13 +685,19 @@
             "Air": "Air Craft",
             "Ground": "Ground Craft",
             "Aerospace": "Space Craft",
-            "Water": "Water Craft"
+            "Water": "Water Craft",
+            "Walker": "Walker",
+            "Exotic": "Exotic Craft"
         },
         "ControlModes": {
             "Autopilot": "Autopilot",
             "Manual": "Manual",
             "Rigger": "Rigger",
             "Remote": "Remote"
+        },
+        "Environments": {
+            "Speed": "Speed",
+            "Handling": "Handling"
         }
     }
 }
