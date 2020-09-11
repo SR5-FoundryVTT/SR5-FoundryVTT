@@ -5605,6 +5605,12 @@ exports.SR5 = {
         positive: 'SR5.QualityTypePositive',
         negative: 'SR5.QualityTypeNegative',
     },
+    adeptPower: {
+        types: {
+            active: 'SR5.AdeptPower.Types.Active',
+            passive: 'SR5.AdeptPower.Types.Passive',
+        },
+    },
     deviceCategories: {
         commlink: 'SR5.DeviceCatCommlink',
         cyberdeck: 'SR5.DeviceCatCyberdeck',
@@ -5862,9 +5868,9 @@ exports.SR5 = {
             autopilot: 'SR5.Vehicle.ControlModes.Autopilot',
         },
         environments: {
-            speed: "SR5.Vehicle.Environments.Speed",
-            handling: "SR5.Vehicle.Environments.Handling"
-        }
+            speed: 'SR5.Vehicle.Environments.Speed',
+            handling: 'SR5.Vehicle.Environments.Handling',
+        },
     },
 };
 },{}],44:[function(require,module,exports){
@@ -6416,7 +6422,7 @@ exports.registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize((_k = item.data.type) !== null && _k !== void 0 ? _k : ''),
+                            text: game.i18n.localize(CONFIG.SR5.adeptPower.types[(_k = item.data.type) !== null && _k !== void 0 ? _k : '']),
                         },
                     },
                 ];

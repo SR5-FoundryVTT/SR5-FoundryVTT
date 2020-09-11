@@ -147,6 +147,13 @@ export const SR5 = {
         negative: 'SR5.QualityTypeNegative',
     },
 
+    adeptPower: {
+        types: {
+            active: 'SR5.AdeptPower.Types.Active',
+            passive: 'SR5.AdeptPower.Types.Passive',
+        },
+    },
+
     deviceCategories: {
         commlink: 'SR5.DeviceCatCommlink',
         cyberdeck: 'SR5.DeviceCatCyberdeck',

@@ -286,7 +286,7 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize(item.data.type ?? ''),
+                            text: game.i18n.localize(CONFIG.SR5.adeptPower.types[item.data.type ?? '']),
                         },
                     },
                 ];

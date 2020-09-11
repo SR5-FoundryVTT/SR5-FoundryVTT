@@ -663,6 +663,13 @@
         "Type": "Type"
     },
 
+    "SR5.AdeptPower": {
+        "Types": {
+            "Active": "Active",
+            "Passive": "Passive"
+        }
+    },
+
     "SR5.Vehicle": {
         "IsDrone": "Is Drone",
         "IsOffRoad": "Is Off Road",
