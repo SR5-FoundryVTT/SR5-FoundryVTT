@@ -2,26 +2,35 @@
     {{> "systems/shadowrun5e/dist/templates/common/HeaderBlock.html"
             name=(localize "SR5.SpecialAttributes")
     }}
-    <div class="attributes">
+    <div class="attributes center">
         {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                cssClass='no-grow'
                 attributeId='edge'
                 attribute=data.attributes.edge
         }}
         {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                cssClass='no-grow'
                 attributeId='essence'
                 attribute=data.attributes.essence
         }}
+            {{#if awakened}}
         {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                cssClass='no-grow'
                 attributeId='magic'
                 attribute=data.attributes.magic
                 disableBase=(not awakened)
                 disableManual=(not awakened)
         }}
+            {{/if}}
+            {{#if emerged}}
         {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                cssClass='no-grow'
                 attributeId='resonance'
                 attribute=data.attributes.resonance
                 disableBase=(not emerged)
                 disableManual=(not emerged)
         }}
+
+            {{/if}}
     </div>
 </div>

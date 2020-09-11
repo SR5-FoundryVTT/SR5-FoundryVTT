@@ -227,6 +227,24 @@ var runtime = (function (exports) {
   var asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator";
   var toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag";
 
+  function define(obj, key, value) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+    return obj[key];
+  }
+  try {
+    // IE 8 has a broken Object.defineProperty that only works on DOM objects.
+    define({}, "");
+  } catch (err) {
+    define = function(obj, key, value) {
+      return obj[key] = value;
+    };
+  }
+
   function wrap(innerFn, outerFn, self, tryLocsList) {
     // If outerFn provided and outerFn.prototype is a Generator, then outerFn.prototype instanceof Generator.
     var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator;
@@ -297,16 +315,19 @@ var runtime = (function (exports) {
     Generator.prototype = Object.create(IteratorPrototype);
   GeneratorFunction.prototype = Gp.constructor = GeneratorFunctionPrototype;
   GeneratorFunctionPrototype.constructor = GeneratorFunction;
-  GeneratorFunctionPrototype[toStringTagSymbol] =
-    GeneratorFunction.displayName = "GeneratorFunction";
+  GeneratorFunction.displayName = define(
+    GeneratorFunctionPrototype,
+    toStringTagSymbol,
+    "GeneratorFunction"
+  );
 
   // Helper for defining the .next, .throw, and .return methods of the
   // Iterator interface in terms of a single ._invoke method.
   function defineIteratorMethods(prototype) {
     ["next", "throw", "return"].forEach(function(method) {
-      prototype[method] = function(arg) {
+      define(prototype, method, function(arg) {
         return this._invoke(method, arg);
-      };
+      });
     });
   }
 
@@ -325,9 +346,7 @@ var runtime = (function (exports) {
       Object.setPrototypeOf(genFun, GeneratorFunctionPrototype);
     } else {
       genFun.__proto__ = GeneratorFunctionPrototype;
-      if (!(toStringTagSymbol in genFun)) {
-        genFun[toStringTagSymbol] = "GeneratorFunction";
-      }
+      define(genFun, toStringTagSymbol, "GeneratorFunction");
     }
     genFun.prototype = Object.create(Gp);
     return genFun;
@@ -597,7 +616,7 @@ var runtime = (function (exports) {
   // unified ._invoke helper method.
   defineIteratorMethods(Gp);
 
-  Gp[toStringTagSymbol] = "Generator";
+  define(Gp, toStringTagSymbol, "Generator");
 
   // A Generator should always return itself as the iterator object when the
   // @@iterator function is called on it. Some browsers' implementations of the
@@ -955,8 +974,8 @@ exports.SR5Actor = void 0;
 const ShadowrunRoller_1 = require("../rolls/ShadowrunRoller");
 const helpers_1 = require("../helpers");
 const constants_1 = require("../constants");
-const BaseActorPrep_1 = require("./prep/BaseActorPrep");
 const PartsList_1 = require("../parts/PartsList");
+const ActorPrepFactory_1 = require("./prep/ActorPrepFactory");
 class SR5Actor extends Actor {
     update(data, options) {
         const _super = Object.create(null, {
@@ -992,21 +1011,10 @@ class SR5Actor extends Actor {
     prepareData() {
         super.prepareData();
         const actorData = this.data;
-        const prepper = new BaseActorPrep_1.BaseActorPrep(actorData);
-        prepper.prepareModifiers();
-        prepper.prepareArmor();
-        prepper.prepareCyberware();
-        prepper.prepareSkills();
-        prepper.prepareAttributes();
-        prepper.prepareMatrix();
-        prepper.prepareLimits();
-        prepper.prepareConditionMonitors();
-        prepper.prepareMovement();
-        prepper.prepareWounds();
-        prepper.prepareInitiative();
-        const data = actorData.data;
-        if (data.magic.drain && !data.magic.drain.mod)
-            data.magic.drain.mod = [];
+        const prepper = ActorPrepFactory_1.ActorPrepFactory.Create(actorData);
+        if (prepper) {
+            prepper.prepare();
+        }
     }
     getModifier(modifierName) {
         return this.data.data.modifiers[modifierName];
@@ -1021,11 +1029,10 @@ class SR5Actor extends Actor {
             return undefined;
         return this.data.data.attributes[attributeName];
     }
-    getEquippedMatrixDevice() {
-        return this.items.find((item) => item.isDevice());
-    }
-    getEquippedArmor() {
-        return this.items.filter((item) => item.isArmor());
+    findVehicleStat(statName) {
+        if (statName === undefined)
+            return undefined;
+        return this.data.data.vehicle_stats[statName];
     }
     findLimitFromAttribute(attributeName) {
         if (attributeName === undefined)
@@ -1050,20 +1057,25 @@ class SR5Actor extends Actor {
     getArmor() {
         return this.data.data.armor;
     }
-    getOwnedItem(itemId) {
+    getOwnedSR5Item(itemId) {
         return super.getOwnedItem(itemId);
     }
     getMatrixDevice() {
         const matrix = this.data.data.matrix;
         if (matrix.device)
-            return this.getOwnedItem(matrix.device);
+            return this.getOwnedSR5Item(matrix.device);
         return undefined;
     }
     getFullDefenseAttribute() {
-        let att = this.data.data.full_defense_attribute;
-        if (!att)
-            att = 'willpower';
-        return this.findAttribute(att);
+        if (this.isVehicle()) {
+            return this.findVehicleStat('pilot');
+        }
+        else {
+            let att = this.data.data.full_defense_attribute;
+            if (!att)
+                att = 'willpower';
+            return this.findAttribute(att);
+        }
     }
     getEquippedWeapons() {
         return this.items.filter((item) => item.isEquipped() && item.data.type === 'weapon');
@@ -1075,6 +1087,38 @@ class SR5Actor extends Actor {
             total += Math.ceil(strength.value / 3);
         }
         return total;
+    }
+    getDeviceRating() {
+        return this.data.data.matrix.rating;
+    }
+    isVehicle() {
+        return this.data.type === 'vehicle';
+    }
+    getVehicleTypeSkill() {
+        let skill;
+        switch (this.data.data.vehicleType) {
+            case 'air':
+                skill = this.findActiveSkill('pilot_aircraft');
+                break;
+            case 'ground':
+                skill = this.findActiveSkill('pilot_ground_craft');
+                break;
+            case 'water':
+                skill = this.findActiveSkill('pilot_water_craft');
+                break;
+            case 'aerospace':
+                skill = this.findActiveSkill('pilot_aerospace');
+                break;
+            case 'walker':
+                skill = this.findActiveSkill('pilot_walker');
+                break;
+            case 'exotic':
+                skill = this.findActiveSkill('pilot_exotic_vehicle');
+                break;
+            default:
+                break;
+        }
+        return skill;
     }
     addKnowledgeSkill(category, skill) {
         const defaultSkill = {
@@ -1357,9 +1401,7 @@ class SR5Actor extends Actor {
                                 // add part and calc total again
                                 soak.mod = PartsList_1.PartsList.AddUniquePart(soak.mod, 'SR5.UserInput', diff);
                                 soak.value = helpers_1.Helpers.calcTotal(soak);
-                                console.log(soak);
                             }
-                            console.log(soak);
                             const totalAp = helpers_1.Helpers.calcTotal(soak.ap);
                             if (totalAp !== ap) {
                                 const diff = ap - totalAp;
@@ -1518,6 +1560,21 @@ class SR5Actor extends Actor {
             },
         });
     }
+    rollDeviceRating(options) {
+        const title = game.i18n.localize('SR5.Labels.ActorSheet.DeviceRating');
+        const parts = new PartsList_1.PartsList();
+        const rating = this.getDeviceRating();
+        // add device rating twice as this is the most common roll
+        parts.addPart(title, rating);
+        parts.addPart(title, rating);
+        this._addGlobalParts(parts);
+        return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
+            event: options === null || options === void 0 ? void 0 : options.event,
+            title,
+            parts: parts.list,
+            actor: this,
+        });
+    }
     rollAttributesTest(rollId, options) {
         const title = game.i18n.localize(CONFIG.SR5.attributeRolls[rollId]);
         const atts = this.data.data.attributes;
@@ -1547,6 +1604,7 @@ class SR5Actor extends Actor {
             if (modifiers.memory)
                 parts.addUniquePart('SR5.Bonus', modifiers.memory);
         }
+        this._addGlobalParts(parts);
         return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
             event: options === null || options === void 0 ? void 0 : options.event,
             actor: this,
@@ -1632,6 +1690,91 @@ class SR5Actor extends Actor {
             }).render(true);
         });
     }
+    rollDronePerception(options) {
+        if (!this.isVehicle()) {
+            return undefined;
+        }
+        const actorData = duplicate(this.data.data);
+        if (actorData.controlMode === 'autopilot') {
+            const parts = new PartsList_1.PartsList();
+            const pilot = helpers_1.Helpers.calcTotal(actorData.vehicle_stats.pilot);
+            // TODO possibly look for autosoft item level?
+            const perception = this.findActiveSkill('perception');
+            const limit = this.findLimit('sensor');
+            if (perception && limit) {
+                parts.addPart('SR5.Vehicle.Clearsight', helpers_1.Helpers.calcTotal(perception));
+                parts.addPart('SR5.Vehicle.Stats.Pilot', pilot);
+                this._addGlobalParts(parts);
+                return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
+                    event: options === null || options === void 0 ? void 0 : options.event,
+                    actor: this,
+                    parts: parts.list,
+                    limit,
+                    title: game.i18n.localize('SR5.Labels.ActorSheet.RollDronePerception'),
+                });
+            }
+        }
+        else {
+            this.rollActiveSkill('perception', options);
+        }
+    }
+    rollPilotVehicle(options) {
+        if (!this.isVehicle()) {
+            return undefined;
+        }
+        const actorData = duplicate(this.data.data);
+        if (actorData.controlMode === 'autopilot') {
+            const parts = new PartsList_1.PartsList();
+            const pilot = helpers_1.Helpers.calcTotal(actorData.vehicle_stats.pilot);
+            let skill = this.getVehicleTypeSkill();
+            const environment = actorData.environment;
+            const limit = this.findLimit(environment);
+            if (skill && limit) {
+                parts.addPart('SR5.Vehicle.Stats.Pilot', pilot);
+                // TODO possibly look for autosoft item level?
+                parts.addPart('SR5.Vehicle.Maneuvering', helpers_1.Helpers.calcTotal(skill));
+                this._addGlobalParts(parts);
+                return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
+                    event: options === null || options === void 0 ? void 0 : options.event,
+                    actor: this,
+                    parts: parts.list,
+                    limit,
+                    title: game.i18n.localize('SR5.Labels.ActorSheet.RollPilotVehicleTest'),
+                });
+            }
+        }
+        else {
+            this.rollActiveSkill('perception', options);
+        }
+    }
+    rollDroneInfiltration(options) {
+        if (!this.isVehicle()) {
+            return undefined;
+        }
+        const actorData = duplicate(this.data.data);
+        if (actorData.controlMode === 'autopilot') {
+            const parts = new PartsList_1.PartsList();
+            const pilot = helpers_1.Helpers.calcTotal(actorData.vehicle_stats.pilot);
+            // TODO possibly look for autosoft item level?
+            const sneaking = this.findActiveSkill('sneaking');
+            const limit = this.findLimit('sensor');
+            if (sneaking && limit) {
+                parts.addPart('SR5.Vehicle.Stealth', helpers_1.Helpers.calcTotal(sneaking));
+                parts.addPart('SR5.Vehicle.Stats.Pilot', pilot);
+                this._addGlobalParts(parts);
+                return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
+                    event: options === null || options === void 0 ? void 0 : options.event,
+                    actor: this,
+                    parts: parts.list,
+                    limit,
+                    title: game.i18n.localize('SR5.Labels.ActorSheet.RollDroneInfiltration'),
+                });
+            }
+        }
+        else {
+            this.rollActiveSkill('sneaking', options);
+        }
+    }
     rollKnowledgeSkill(catId, skillId, options) {
         const category = duplicate(this.data.data.skills.knowledge[catId]);
         const skill = duplicate(category.value[skillId]);
@@ -1714,15 +1857,27 @@ class SR5Actor extends Actor {
         }
     }
     _addDefenseParts(parts) {
-        const reaction = this.findAttribute('reaction');
-        const intuition = this.findAttribute('intuition');
+        if (this.isVehicle()) {
+            const pilot = this.findVehicleStat('pilot');
+            if (pilot) {
+                parts.addUniquePart(pilot.label, helpers_1.Helpers.calcTotal(pilot));
+            }
+            const skill = this.getVehicleTypeSkill();
+            if (skill) {
+                parts.addUniquePart('SR5.Vehicle.Maneuvering', helpers_1.Helpers.calcTotal(skill));
+            }
+        }
+        else {
+            const reaction = this.findAttribute('reaction');
+            const intuition = this.findAttribute('intuition');
+            if (reaction) {
+                parts.addUniquePart(reaction.label || 'SR5.Reaction', reaction.value);
+            }
+            if (intuition) {
+                parts.addUniquePart(intuition.label || 'SR5.Intuition', intuition.value);
+            }
+        }
         const mod = this.getModifier('defense');
-        if (reaction) {
-            parts.addUniquePart(reaction.label || 'SR5.Reaction', reaction.value);
-        }
-        if (intuition) {
-            parts.addUniquePart(intuition.label || 'SR5.Intuition', intuition.value);
-        }
         if (mod) {
             parts.addUniquePart('SR5.Bonus', mod);
         }
@@ -1851,7 +2006,7 @@ class SR5Actor extends Actor {
     }
 }
 exports.SR5Actor = SR5Actor;
-},{"../constants":29,"../helpers":37,"../parts/PartsList":48,"../rolls/ShadowrunRoller":49,"./prep/BaseActorPrep":18}],17:[function(require,module,exports){
+},{"../constants":44,"../helpers":52,"../parts/PartsList":63,"../rolls/ShadowrunRoller":64,"./prep/ActorPrepFactory":18}],17:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -1883,7 +2038,7 @@ class SR5ActorSheet extends ActorSheet {
          * Keep track of the currently active sheet tab
          * @type {string}
          */
-        this._shownUntrainedSkills = true;
+        this._shownUntrainedSkills = false;
         this._shownDesc = [];
         this._filters = {
             skills: '',
@@ -1897,7 +2052,6 @@ class SR5ActorSheet extends ActorSheet {
     static get defaultOptions() {
         return mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'actor'],
-            template: 'systems/shadowrun5e/dist/templates/actor/character.html',
             width: 880,
             height: 690,
             tabs: [
@@ -1908,6 +2062,10 @@ class SR5ActorSheet extends ActorSheet {
                 },
             ],
         });
+    }
+    get template() {
+        const path = 'systems/shadowrun5e/dist/templates/actor/';
+        return `${path}${this.actor.data.type}.html`;
     }
     /* -------------------------------------------- */
     /**
@@ -1940,6 +2098,8 @@ class SR5ActorSheet extends ActorSheet {
         data['emerged'] = data.data.special === 'resonance';
         data['woundTolerance'] = 3 + (Number(mods['wound_tolerance']) || 0);
         data.filters = this._filters;
+        data['isCharacter'] = this.actor.data.type === 'character';
+        data['isSpirit'] = this.actor.data.type === 'spirit';
         return data;
     }
     _isSkillMagic(id, skill) {
@@ -1952,16 +2112,18 @@ class SR5ActorSheet extends ActorSheet {
     }
     _prepareMatrixAttributes(data) {
         const { matrix } = data.data;
-        const cleanupAttribute = (attribute) => {
-            const att = matrix[attribute];
-            if (att) {
-                if (!att.mod)
-                    att.mod = {};
-                if (att.temp === 0)
-                    delete att.temp;
-            }
-        };
-        ['firewall', 'data_processing', 'sleaze', 'attack'].forEach((att) => cleanupAttribute(att));
+        if (matrix) {
+            const cleanupAttribute = (attribute) => {
+                const att = matrix[attribute];
+                if (att) {
+                    if (!att.mod)
+                        att.mod = {};
+                    if (att.temp === 0)
+                        delete att.temp;
+                }
+            };
+            ['firewall', 'data_processing', 'sleaze', 'attack'].forEach((att) => cleanupAttribute(att));
+        }
     }
     _prepareSkills(data) {
         const activeSkills = {};
@@ -1984,44 +2146,45 @@ class SR5ActorSheet extends ActorSheet {
         data.data.skills.active = activeSkills;
     }
     _prepareItems(data) {
-        const inventory = {
-            weapon: {
-                label: game.i18n.localize('SR5.Weapon'),
-                items: [],
-                dataset: {
-                    type: 'weapon',
-                },
+        const inventory = {};
+        inventory['weapon'] = {
+            label: game.i18n.localize('SR5.Weapon'),
+            items: [],
+            dataset: {
+                type: 'weapon',
             },
-            armor: {
+        };
+        if (this.actor.data.type === 'character') {
+            inventory['armor'] = {
                 label: game.i18n.localize('SR5.Armor'),
                 items: [],
                 dataset: {
                     type: 'armor',
                 },
-            },
-            device: {
+            };
+            inventory['device'] = {
                 label: game.i18n.localize('SR5.Device'),
                 items: [],
                 dataset: {
                     type: 'device',
                 },
-            },
-            equipment: {
+            };
+            inventory['equipment'] = {
                 label: game.i18n.localize('SR5.Equipment'),
                 items: [],
                 dataset: {
                     type: 'equipment',
                 },
-            },
-            cyberware: {
+            };
+            inventory['cyberware'] = {
                 label: game.i18n.localize('SR5.Cyberware'),
                 items: [],
                 dataset: {
                     type: 'cyberware',
                 },
-            },
-        };
-        let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs] = data.items.reduce((arr, item) => {
+            };
+        }
+        let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs, critter_powers, sprite_powers,] = data.items.reduce((arr, item) => {
             item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
             if (item.type === 'spell')
                 arr[1].push(item);
@@ -2041,10 +2204,14 @@ class SR5ActorSheet extends ActorSheet {
                 arr[8].push(item);
             else if (item.type === 'program')
                 arr[9].push(item);
+            else if (item.type === 'critter_power')
+                arr[10].push(item);
+            else if (item.type === 'sprite_power')
+                arr[11].push(item);
             else if (Object.keys(inventory).includes(item.type))
                 arr[0].push(item);
             return arr;
-        }, [[], [], [], [], [], [], [], [], [], []]);
+        }, [[], [], [], [], [], [], [], [], [], [], [], []]);
         const sortByName = (i1, i2) => {
             if (i1.name > i2.name)
                 return 1;
@@ -2075,6 +2242,8 @@ class SR5ActorSheet extends ActorSheet {
         lifestyles.sort(sortByName);
         sins.sort(sortByName);
         programs.sort(sortByEquipped);
+        critter_powers.sort(sortByName);
+        sprite_powers.sort(sortByName);
         items.forEach((item) => {
             inventory[item.type].items.push(item);
         });
@@ -2089,6 +2258,8 @@ class SR5ActorSheet extends ActorSheet {
         data.contacts = contacts;
         data.sins = sins;
         data.programs = programs;
+        data.critter_powers = critter_powers;
+        data.sprite_powers = sprite_powers;
         qualities.sort((a, b) => {
             if (a.data.type === 'positive' && b.data.type === 'negative')
                 return -1;
@@ -2128,21 +2299,13 @@ class SR5ActorSheet extends ActorSheet {
         html.find('.cell-input-roll').click(this._onRollCellInput.bind(this));
         html.find('.attribute-roll').click(this._onRollAttribute.bind(this));
         html.find('.skill-roll').click(this._onRollActiveSkill.bind(this));
-        html.find('.defense-roll').click(this._onRollDefense.bind(this));
-        html.find('.attribute-only-roll').click(this._onRollAttributesOnly.bind(this));
-        html.find('.soak-roll').click(this._onRollSoak.bind(this));
-        html.find('.drain-roll').click(this._onRollDrain.bind(this));
-        html.find('.fade-roll').click(this._onRollFade.bind(this));
         html.find('.item-roll').click(this._onRollItem.bind(this));
         // $(html).find('.item-roll').on('contextmenu', () => console.log('TEST'));
         html.find('.item-equip-toggle').click(this._onEquipItem.bind(this));
         html.find('.item-qty').change(this._onChangeQty.bind(this));
         html.find('.item-rtg').change(this._onChangeRtg.bind(this));
         html.find('.item-create').click(this._onItemCreate.bind(this));
-        html.find('.matrix-roll').click(this._onRollMatrixAttribute.bind(this));
         html.find('.matrix-att-selector').change(this._onMatrixAttributeSelected.bind(this));
-        html.find('.basic-roll').click(this._onRollPrompt.bind(this));
-        html.find('.armor-roll').click(this._onRollArmor.bind(this));
         html.find('.add-knowledge').click(this._onAddKnowledgeSkill.bind(this));
         html.find('.knowledge-skill').click(this._onRollKnowledgeSkill.bind(this));
         html.find('.remove-knowledge').click(this._onRemoveKnowledgeSkill.bind(this));
@@ -2154,8 +2317,28 @@ class SR5ActorSheet extends ActorSheet {
         html.find('.skill-edit').click(this._onShowEditSkill.bind(this));
         html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
         html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
+        /**
+         * Open the PDF for an item on the actor
+         */
+        $(html)
+            .find('.open-source-pdf')
+            .on('click', (event) => __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const field = $(event.currentTarget).parents('.list-item');
+            const iid = $(field).data().itemId;
+            const item = this.actor.getOwnedSR5Item(iid);
+            if (item) {
+                yield item.openPdfSource();
+            }
+        }));
         $(html).find('.horizontal-cell-input .cell').on('click', this._onSetCellInput.bind(this));
         $(html).find('.horizontal-cell-input .cell').on('contextmenu', this._onClearCellInput.bind(this));
+        /**
+         * New API to use for rolling from the actor sheet
+         * the clickable label needs the css class Roll
+         * a parent of the label needs to have the css class RollId, and then have data-roll-id set
+         */
+        $(html).find('.Roll').on('click', this._onRollFromSheet.bind(this));
         // updates matrix condition monitor on the device the actor has equippe
         $(html)
             .find('[name="data.matrix.condition_monitor.value"]')
@@ -2173,7 +2356,7 @@ class SR5ActorSheet extends ActorSheet {
         html.find('.item-edit').click((event) => {
             event.preventDefault();
             const iid = helpers_1.Helpers.listItemId(event);
-            const item = this.actor.getOwnedItem(iid);
+            const item = this.actor.getOwnedSR5Item(iid);
             if (item)
                 item.sheet.render(true);
         });
@@ -2194,6 +2377,111 @@ class SR5ActorSheet extends ActorSheet {
             }
         });
     }
+    _onRollFromSheet(event) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            // look for roll id data in the current line
+            let rollId = (_a = $(event.currentTarget).data()) === null || _a === void 0 ? void 0 : _a.rollId;
+            // if that doesn't exist, look for a prent with RollId name
+            rollId = rollId !== null && rollId !== void 0 ? rollId : $(event.currentTarget).parent('.RollId').data().rollId;
+            const split = rollId.split('.');
+            const options = { event };
+            switch (split[0]) {
+                case 'prompt-roll':
+                    this.actor.promptRoll(options);
+                    break;
+                case 'armor':
+                    this.actor.rollArmor(options);
+                    break;
+                case 'fade':
+                    this.actor.rollFade(options);
+                    break;
+                case 'drain':
+                    this.actor.rollDrain(options);
+                    break;
+                case 'defense':
+                    this.actor.rollDefense(options);
+                    break;
+                case 'damage-resist':
+                    this.actor.rollSoak(options);
+                    break;
+                // attribute only rolls
+                case 'composure':
+                    this.actor.rollAttributesTest('composure');
+                    break;
+                case 'judge-intentions':
+                    this.actor.rollAttributesTest('judge_intentions');
+                    break;
+                case 'lift-carry':
+                    this.actor.rollAttributesTest('lift_carry');
+                    break;
+                case 'memory':
+                    this.actor.rollAttributesTest('memory');
+                    break;
+                case 'vehicle-stat':
+                    console.log('roll vehicle stat', rollId);
+                    break;
+                case 'drone':
+                    const prop = split[1]; // we expect another for "drone" category
+                    switch (prop) {
+                        case 'perception':
+                            this.actor.rollDronePerception(options);
+                            break;
+                        case 'infiltration':
+                            this.actor.rollDroneInfiltration(options);
+                            break;
+                        case 'pilot-vehicle':
+                            this.actor.rollPilotVehicle(options);
+                            break;
+                    }
+                    break;
+                // end drone
+                case 'attribute':
+                    const attribute = split[1];
+                    if (attribute) {
+                        this.actor.rollAttribute(attribute, options);
+                    }
+                    break;
+                // end attribute
+                case 'skill':
+                    const skillType = split[1];
+                    switch (skillType) {
+                        case 'active': {
+                            const skillId = split[2];
+                            this.actor.rollActiveSkill(skillId, options);
+                            break;
+                        }
+                        case 'language': {
+                            const skillId = split[2];
+                            this.actor.rollLanguageSkill(skillId, options);
+                            break;
+                        }
+                        case 'knowledge': {
+                            const category = split[2];
+                            const skillId = split[3];
+                            this.actor.rollKnowledgeSkill(category, skillId, options);
+                            break;
+                        }
+                    }
+                    break;
+                // end skill
+                case 'matrix':
+                    const subkey = split[1];
+                    switch (subkey) {
+                        case 'attribute':
+                            const attr = split[2];
+                            this.actor.rollMatrixAttribute(attr, options);
+                            break;
+                        case 'device-rating':
+                            this.actor.rollDeviceRating(options);
+                            break;
+                    }
+                    break;
+                // end matrix
+            }
+        });
+    }
     _onFilterSkills(event) {
         return __awaiter(this, void 0, void 0, function* () {
             this._filters.skills = event.currentTarget.value;
@@ -2204,7 +2492,7 @@ class SR5ActorSheet extends ActorSheet {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
             const iid = helpers_1.Helpers.listItemId(event);
-            const item = this.actor.getOwnedItem(iid);
+            const item = this.actor.getOwnedSR5Item(iid);
             if (item)
                 return item.reloadAmmo();
         });
@@ -2212,7 +2500,7 @@ class SR5ActorSheet extends ActorSheet {
     _onMatrixAttributeSelected(event) {
         return __awaiter(this, void 0, void 0, function* () {
             let iid = this.actor.data.data.matrix.device;
-            let item = this.actor.getOwnedItem(iid);
+            let item = this.actor.getOwnedSR5Item(iid);
             if (!item) {
                 console.error('could not find item');
                 return;
@@ -2243,7 +2531,6 @@ class SR5ActorSheet extends ActorSheet {
     _onItemCreate(event) {
         event.preventDefault();
         const type = helpers_1.Helpers.listItemId(event);
-        console.log(type);
         const itemData = {
             name: `New ${type}`,
             type: type,
@@ -2280,7 +2567,7 @@ class SR5ActorSheet extends ActorSheet {
     _onChangeRtg(event) {
         return __awaiter(this, void 0, void 0, function* () {
             const iid = helpers_1.Helpers.listItemId(event);
-            const item = this.actor.getOwnedItem(iid);
+            const item = this.actor.getOwnedSR5Item(iid);
             const rtg = parseInt(event.currentTarget.value);
             if (item && rtg) {
                 item.update({ 'data.technology.rating': rtg });
@@ -2290,7 +2577,7 @@ class SR5ActorSheet extends ActorSheet {
     _onChangeQty(event) {
         return __awaiter(this, void 0, void 0, function* () {
             const iid = helpers_1.Helpers.listItemId(event);
-            const item = this.actor.getOwnedItem(iid);
+            const item = this.actor.getOwnedSR5Item(iid);
             const qty = parseInt(event.currentTarget.value);
             if (item && qty) {
                 item.data.data.technology.quantity = qty;
@@ -2302,7 +2589,7 @@ class SR5ActorSheet extends ActorSheet {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
             const iid = helpers_1.Helpers.listItemId(event);
-            const item = this.actor.getOwnedItem(iid);
+            const item = this.actor.getOwnedSR5Item(iid);
             if (item) {
                 const itemData = item.data.data;
                 const newItems = [];
@@ -2351,6 +2638,9 @@ class SR5ActorSheet extends ActorSheet {
                     updateData['data.technology.condition_monitor.value'] = value;
                     yield matrixDevice.update(updateData);
                 }
+                else {
+                    data['data.matrix.condition_monitor.value'] = value;
+                }
             }
             yield this.actor.update(data);
         });
@@ -2378,6 +2668,9 @@ class SR5ActorSheet extends ActorSheet {
                     updateData['data.technology.condition_monitor.value'] = 0;
                     yield matrixDevice.update(updateData);
                 }
+                else {
+                    data['data.matrix.condition_monitor.value'] = 0;
+                }
             }
             yield this.actor.update(data);
         });
@@ -2394,64 +2687,14 @@ class SR5ActorSheet extends ActorSheet {
             }
         });
     }
-    _onRollPrompt(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            yield this.actor.promptRoll({ event: event });
-        });
-    }
     _onRollItem(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
             const iid = helpers_1.Helpers.listItemId(event);
-            const item = this.actor.getOwnedItem(iid);
+            const item = this.actor.getOwnedSR5Item(iid);
             if (item) {
                 yield item.postCard(event);
             }
-        });
-    }
-    _onRollFade(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            this.actor.rollFade({ event: event });
-        });
-    }
-    _onRollDrain(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            this.actor.rollDrain({ event: event });
-        });
-    }
-    _onRollArmor(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            return this.actor.rollArmor({ event: event });
-        });
-    }
-    _onRollDefense(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            return this.actor.rollDefense({ event: event });
-        });
-    }
-    _onRollMatrixAttribute(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            const attr = event.currentTarget.dataset.attribute;
-            return this.actor.rollMatrixAttribute(attr, { event: event });
-        });
-    }
-    _onRollSoak(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            return this.actor.rollSoak({ event: event });
-        });
-    }
-    _onRollAttributesOnly(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            const roll = event.currentTarget.dataset.roll;
-            return this.actor.rollAttributesTest(roll, { event: event });
         });
     }
     _onRollKnowledgeSkill(event) {
@@ -2559,7 +2802,7 @@ class SR5ActorSheet extends ActorSheet {
         event.preventDefault();
         const [skill, category] = helpers_1.Helpers.listItemId(event).split('.');
         this._showSkillEditForm(KnowledgeSkillEditForm_1.KnowledgeSkillEditForm, this.actor, {
-            event: event
+            event: event,
         }, skill, category);
     }
     _onShowEditLanguageSkill(event) {
@@ -2584,160 +2827,646 @@ class SR5ActorSheet extends ActorSheet {
     }
 }
 exports.SR5ActorSheet = SR5ActorSheet;
-},{"../apps/chummer-import-form":19,"../apps/skills/KnowledgeSkillEditForm":22,"../apps/skills/LanguageSkillEditForm":23,"../apps/skills/SkillEditForm":24,"../helpers":37}],18:[function(require,module,exports){
+},{"../apps/chummer-import-form":34,"../apps/skills/KnowledgeSkillEditForm":37,"../apps/skills/LanguageSkillEditForm":38,"../apps/skills/SkillEditForm":39,"../helpers":52}],18:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ActorPrepFactory = void 0;
+const CharacterPrep_1 = require("./CharacterPrep");
+const SpiritPrep_1 = require("./SpiritPrep");
+const SpritePrep_1 = require("./SpritePrep");
+const VehiclePrep_1 = require("./VehiclePrep");
+class ActorPrepFactory {
+    static Create(data) {
+        if (data.type === 'character') {
+            return new CharacterPrep_1.CharacterPrep(data);
+        }
+        else if (data.type === 'spirit') {
+            return new SpiritPrep_1.SpiritPrep(data);
+        }
+        else if (data.type === 'sprite') {
+            return new SpritePrep_1.SpritePrep(data);
+        }
+        else if (data.type === 'vehicle') {
+            return new VehiclePrep_1.VehiclePrep(data);
+        }
+    }
+}
+exports.ActorPrepFactory = ActorPrepFactory;
+},{"./CharacterPrep":20,"./SpiritPrep":21,"./SpritePrep":22,"./VehiclePrep":23}],19:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BaseActorPrep = void 0;
 const SR5ItemDataWrapper_1 = require("../../item/SR5ItemDataWrapper");
-const helpers_1 = require("../../helpers");
-const PartsList_1 = require("../../parts/PartsList");
 class BaseActorPrep {
     constructor(data) {
         this.data = data.data;
         this.items = data.items.map((item) => new SR5ItemDataWrapper_1.SR5ItemDataWrapper(item));
     }
-    /**
-     * Prepare Matrix data on the actor
-     * - if an item is equipped, it will use that data
-     * - if it isn't and player is technomancer, it will use that data
-     */
-    prepareMatrix() {
-        const { matrix, attributes, limits } = this.data;
-        const MatrixList = ['firewall', 'sleaze', 'data_processing', 'attack'];
-        // clear matrix data to defaults
-        MatrixList.forEach((key) => {
-            const parts = new PartsList_1.PartsList(matrix[key].mod);
-            parts.addUniquePart('SR5.Temporary', matrix[key].temp);
-            // TODO LEGACY from when the sheet used 'mod.Temporary'
-            parts.removePart('Temporary');
-            matrix[key].mod = parts.list;
-            matrix[key].value = parts.total;
-        });
-        matrix.condition_monitor.max = 0;
-        matrix.rating = 0;
-        matrix.name = '';
-        matrix.device = '';
-        matrix.condition_monitor.label = 'SR5.ConditionMonitor';
-        // get the first equipped device, we don't care if they have more equipped -- it shouldn't happen
-        const device = this.items.find((item) => item.isEquipped() && item.isDevice());
-        if (device) {
-            const conditionMonitor = device.getConditionMonitor();
-            matrix.device = device.getId();
-            matrix.condition_monitor.max = conditionMonitor.max;
-            matrix.condition_monitor.value = conditionMonitor.value;
-            matrix.rating = device.getRating();
-            matrix.is_cyberdeck = device.isCyberdeck();
-            matrix.name = device.getName();
-            matrix.item = device.getData();
-            const deviceAtts = device.getASDF();
-            if (deviceAtts) {
-                // setup the actual matrix attributes for the actor
-                for (const [key, value] of Object.entries(deviceAtts)) {
-                    if (value && matrix[key]) {
-                        matrix[key].base = value.value;
-                        matrix[key].device_att = value.device_att;
-                    }
-                }
-            }
-        } // if we don't have a device, use living persona
-        else if (this.data.special === 'resonance') {
-            matrix.firewall.base = helpers_1.Helpers.calcTotal(attributes.willpower);
-            matrix.data_processing.base = helpers_1.Helpers.calcTotal(attributes.logic);
-            matrix.rating = helpers_1.Helpers.calcTotal(attributes.resonance);
-            matrix.attack.base = helpers_1.Helpers.calcTotal(attributes.charisma);
-            matrix.sleaze.base = helpers_1.Helpers.calcTotal(attributes.intuition);
-            matrix.name = game.i18n.localize('SR5.LivingPersona');
-        }
-        // set matrix condition monitor to max if greater than
-        if (matrix.condition_monitor.value > matrix.condition_monitor.max) {
-            matrix.condition_monitor.value = matrix.condition_monitor.max;
-        }
-        // add matrix attributes to both limits and attributes as hidden entries
-        MatrixList.forEach((key) => {
-            helpers_1.Helpers.calcTotal(matrix[key]);
-            if (matrix[key]) {
-                const label = CONFIG.SR5.matrixAttributes[key];
-                const { value, base, mod } = matrix[key];
-                const hidden = true;
-                limits[key] = {
-                    value,
-                    base,
-                    mod,
-                    label,
-                    hidden,
-                };
-                attributes[key] = {
-                    value,
-                    base,
-                    mod,
-                    label,
-                    hidden,
-                };
-            }
-        });
+}
+exports.BaseActorPrep = BaseActorPrep;
+},{"../../item/SR5ItemDataWrapper":55}],20:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CharacterPrep = void 0;
+const BaseActorPrep_1 = require("./BaseActorPrep");
+const InitiativePrep_1 = require("./functions/InitiativePrep");
+const ModifiersPrep_1 = require("./functions/ModifiersPrep");
+const MatrixPrep_1 = require("./functions/MatrixPrep");
+const ItemPrep_1 = require("./functions/ItemPrep");
+const SkillsPrep_1 = require("./functions/SkillsPrep");
+const LimitsPrep_1 = require("./functions/LimitsPrep");
+const ConditionMonitorsPrep_1 = require("./functions/ConditionMonitorsPrep");
+const MovementPrep_1 = require("./functions/MovementPrep");
+const WoundsPrep_1 = require("./functions/WoundsPrep");
+const AttributesPrep_1 = require("./functions/AttributesPrep");
+class CharacterPrep extends BaseActorPrep_1.BaseActorPrep {
+    prepare() {
+        ModifiersPrep_1.ModifiersPrep.prepareModifiers(this.data);
+        ItemPrep_1.ItemPrep.prepareArmor(this.data, this.items);
+        ItemPrep_1.ItemPrep.prepareCyberware(this.data, this.items);
+        SkillsPrep_1.SkillsPrep.prepareSkills(this.data);
+        AttributesPrep_1.AttributesPrep.prepareAttributes(this.data);
+        LimitsPrep_1.LimitsPrep.prepareLimitBaseFromAttributes(this.data);
+        LimitsPrep_1.LimitsPrep.prepareLimits(this.data);
+        MatrixPrep_1.MatrixPrep.prepareMatrix(this.data, this.items);
+        MatrixPrep_1.MatrixPrep.prepareMatrixToLimitsAndAttributes(this.data);
+        ConditionMonitorsPrep_1.ConditionMonitorsPrep.preparePhysical(this.data);
+        ConditionMonitorsPrep_1.ConditionMonitorsPrep.prepareStun(this.data);
+        MovementPrep_1.MovementPrep.prepareMovement(this.data);
+        WoundsPrep_1.WoundsPrep.prepareWounds(this.data);
+        InitiativePrep_1.InitiativePrep.prepareMeatspaceInit(this.data);
+        InitiativePrep_1.InitiativePrep.prepareAstralInit(this.data);
+        InitiativePrep_1.InitiativePrep.prepareMatrixInit(this.data);
+        InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(this.data);
     }
-    /**
-     * Prepare the armor data for the Item
-     * - will only allow one "Base" armor item to be used
-     * - all "accessories" will be added to the armor
-     */
-    prepareArmor() {
-        const { armor } = this.data;
-        armor.base = 0;
-        armor.value = 0;
-        armor.mod = [];
-        for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
-            armor[element] = 0;
-        }
-        const equippedArmor = this.items.filter((item) => item.hasArmor() && item.isEquipped());
-        const armorModParts = new PartsList_1.PartsList(armor.mod);
-        equippedArmor === null || equippedArmor === void 0 ? void 0 : equippedArmor.forEach((item) => {
-            if (item.hasArmorAccessory()) {
-                armorModParts.addUniquePart(item.getName(), item.getArmorValue());
-            } // if not a mod, set armor.value to the items value
-            else {
-                armor.base = item.getArmorValue();
-                armor.label = item.getName();
-                for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
-                    armor[element] = item.getArmorElements()[element];
+}
+exports.CharacterPrep = CharacterPrep;
+},{"./BaseActorPrep":19,"./functions/AttributesPrep":24,"./functions/ConditionMonitorsPrep":25,"./functions/InitiativePrep":26,"./functions/ItemPrep":27,"./functions/LimitsPrep":28,"./functions/MatrixPrep":29,"./functions/ModifiersPrep":30,"./functions/MovementPrep":31,"./functions/SkillsPrep":32,"./functions/WoundsPrep":33}],21:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SpiritPrep = void 0;
+const BaseActorPrep_1 = require("./BaseActorPrep");
+const SkillsPrep_1 = require("./functions/SkillsPrep");
+const AttributesPrep_1 = require("./functions/AttributesPrep");
+const LimitsPrep_1 = require("./functions/LimitsPrep");
+const ConditionMonitorsPrep_1 = require("./functions/ConditionMonitorsPrep");
+const MovementPrep_1 = require("./functions/MovementPrep");
+const WoundsPrep_1 = require("./functions/WoundsPrep");
+const ModifiersPrep_1 = require("./functions/ModifiersPrep");
+const InitiativePrep_1 = require("./functions/InitiativePrep");
+const helpers_1 = require("../../helpers");
+class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
+    prepare() {
+        ModifiersPrep_1.ModifiersPrep.prepareModifiers(this.data);
+        SpiritPrep.prepareSpiritBaseData(this.data);
+        SkillsPrep_1.SkillsPrep.prepareSkills(this.data);
+        AttributesPrep_1.AttributesPrep.prepareAttributes(this.data);
+        LimitsPrep_1.LimitsPrep.prepareLimitBaseFromAttributes(this.data);
+        LimitsPrep_1.LimitsPrep.prepareLimits(this.data);
+        SpiritPrep.prepareSpiritArmor(this.data);
+        ConditionMonitorsPrep_1.ConditionMonitorsPrep.prepareStun(this.data);
+        ConditionMonitorsPrep_1.ConditionMonitorsPrep.preparePhysical(this.data);
+        MovementPrep_1.MovementPrep.prepareMovement(this.data);
+        WoundsPrep_1.WoundsPrep.prepareWounds(this.data);
+        InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(this.data);
+        this.data.special = 'magic';
+    }
+    static prepareSpiritBaseData(data) {
+        const overrides = this.getSpiritStatModifiers(data.spiritType);
+        if (overrides) {
+            const { attributes, skills, initiative, force, modifiers } = data;
+            // set the base of attributes to the provided value
+            for (const [attId, value] of Object.entries(overrides.attributes)) {
+                if (attributes[attId] !== undefined) {
+                    attributes[attId].base = value + force;
                 }
             }
-        });
-        if (this.data.modifiers['armor'])
-            armorModParts.addUniquePart(game.i18n.localize('SR5.Bonus'), this.data.modifiers['armor']);
-        // SET ARMOR
+            for (const [skillId, skill] of Object.entries(skills.active)) {
+                skill.base = overrides.skills.find((s) => s === skillId) ? force : 0;
+            }
+            // prepare initiative data
+            initiative.meatspace.base.base = force * 2 + overrides.init + Number(modifiers['astral_initiative']);
+            initiative.meatspace.dice.base = 2;
+            initiative.astral.base.base = force * 2 + overrides.astral_init + Number(modifiers['astral_initiative_dice']);
+            initiative.astral.dice.base = 3;
+        }
+    }
+    static prepareSpiritArmor(data) {
+        var _a;
+        const { armor, attributes } = data;
+        armor.base = ((_a = attributes.essence.value) !== null && _a !== void 0 ? _a : 0) * 2;
         armor.value = helpers_1.Helpers.calcTotal(armor);
     }
     /**
-     * Prepare actor data for cyberware changes
-     * - this calculates the actors essence
+     * get the attribute and initiative modifiers and skills
      */
-    prepareCyberware() {
-        const { attributes } = this.data;
-        const parts = new PartsList_1.PartsList();
-        // add Items as values to lower the total value of essence
-        this.items
-            .filter((item) => item.isCyberware() && item.isEquipped())
-            .forEach((item) => {
-            if (item.getEssenceLoss()) {
-                parts.addUniquePart(item.getName(), -Number(item.getEssenceLoss()));
+    static getSpiritStatModifiers(spiritType) {
+        const overrides = {
+            // value of 0 for attribute makes it equal to the Force
+            attributes: {
+                body: 0,
+                agility: 0,
+                reaction: 0,
+                strength: 0,
+                willpower: 0,
+                logic: 0,
+                intuition: 0,
+                charisma: 0,
+                magic: 0,
+                essence: 0,
+            },
+            // modifiers for after the Force x 2 calculation
+            init: 0,
+            astral_init: 0,
+            // skills are all set to Force
+            skills: [],
+        };
+        switch (spiritType) {
+            case 'air':
+                overrides.attributes.body = -2;
+                overrides.attributes.agility = 3;
+                overrides.attributes.reaction = 4;
+                overrides.attributes.strength = -3;
+                overrides.init = 4;
+                overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'unarmed_combat');
+                break;
+            case 'beasts':
+                overrides.attributes.body = 2;
+                overrides.attributes.agility = 1;
+                overrides.attributes.strength = 2;
+                overrides.skills.push('assensing', 'astral_combat', 'perception', 'unarmed_combat');
+                break;
+            case 'earth':
+                overrides.attributes.body = 4;
+                overrides.attributes.agility = -2;
+                overrides.attributes.reaction = -1;
+                overrides.attributes.strength = 4;
+                overrides.attributes.logic = -1;
+                overrides.init = -1;
+                overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'unarmed_combat');
+                break;
+            case 'fire':
+                overrides.attributes.body = 1;
+                overrides.attributes.agility = 2;
+                overrides.attributes.reaction = 3;
+                overrides.attributes.strength = -2;
+                overrides.attributes.intuition = 1;
+                overrides.init = 3;
+                overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'flight', 'perception', 'unarmed_combat');
+                break;
+            case 'guardian':
+                overrides.attributes.body = 1;
+                overrides.attributes.agility = 2;
+                overrides.attributes.reaction = 3;
+                overrides.attributes.strength = 2;
+                overrides.init = 1;
+                overrides.skills.push('assensing', 'astral_combat', 'blades', 'clubs', 'counter_spelling', 'exotic_range', 'perception', 'unarmed_combat');
+                break;
+            case 'guidance':
+                overrides.attributes.body = 3;
+                overrides.attributes.agility = -1;
+                overrides.attributes.reaction = 2;
+                overrides.attributes.strength = 1;
+                overrides.skills.push('arcana', 'assensing', 'astral_combat', 'counter_spelling', 'perception', 'unarmed_combat');
+                break;
+            case 'man':
+                overrides.attributes.body = 1;
+                overrides.attributes.reaction = 2;
+                overrides.attributes.strength = -2;
+                overrides.attributes.logic = 1;
+                overrides.skills.push('assensing', 'astral_combat', 'perception', 'spellcasting', 'unarmed_combat');
+                break;
+            case 'plant':
+                overrides.attributes.body = 2;
+                overrides.attributes.agility = -1;
+                overrides.attributes.strength = 1;
+                overrides.attributes.logic = -1;
+                overrides.skills.push('assensing', 'astral_combat', 'perception', 'exotic_range', 'unarmed_combat');
+                break;
+            case 'task':
+                overrides.attributes.reaction = 2;
+                overrides.attributes.strength = 2;
+                overrides.init = 2;
+                overrides.skills.push('artisan', 'assensing', 'astral_combat', 'perception', 'unarmed_combat');
+                break;
+            case 'water':
+                overrides.attributes.agility = 1;
+                overrides.attributes.reaction = 2;
+                overrides.init = 2;
+                overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'unarmed_combat');
+                break;
+            case 'toxic_air':
+                overrides.attributes.body = -2;
+                overrides.attributes.agility = 3;
+                overrides.attributes.reaction = 4;
+                overrides.attributes.strength = -3;
+                overrides.init = 4;
+                overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'running', 'unarmed_combat');
+                break;
+            case 'toxic_beasts':
+                overrides.attributes.body = 2;
+                overrides.attributes.agility = 1;
+                overrides.attributes.strength = 2;
+                overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'gymnastics', 'perception', 'running', 'unarmed_combat');
+                break;
+            case 'toxic_earth':
+                overrides.attributes.body = 4;
+                overrides.attributes.agility = -2;
+                overrides.attributes.reaction = -1;
+                overrides.attributes.strength = 4;
+                overrides.attributes.logic = -1;
+                overrides.init = -1;
+                overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'unarmed_combat');
+                break;
+            case 'toxic_fire':
+                overrides.attributes.body = 1;
+                overrides.attributes.agility = 2;
+                overrides.attributes.reaction = 3;
+                overrides.attributes.strength = -2;
+                overrides.attributes.intuition = 1;
+                overrides.init = 3;
+                overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'flight', 'unarmed_combat');
+                break;
+            case 'toxic_man':
+                overrides.attributes.reaction = 2;
+                overrides.attributes.strength = -2;
+                overrides.attributes.intuition = 1;
+                overrides.init = 2;
+                overrides.skills.push('assensing', 'astral_combat', 'perception', 'spell_casting', 'unarmed_combat');
+                break;
+            case 'toxic_water':
+                overrides.attributes.body = 1;
+                overrides.attributes.agility = 1;
+                overrides.attributes.reaction = 2;
+                overrides.init = 2;
+                overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'unarmed_combat');
+                break;
+            case 'blood':
+                overrides.attributes.body = 2;
+                overrides.attributes.agility = 2;
+                overrides.attributes.strength = 2;
+                overrides.attributes.logic = -1;
+                overrides.skills.push('assensing', 'astral_combat', 'perception', 'running', 'unarmed_combat');
+                break;
+            case 'muse':
+                overrides.attributes.agility = 3;
+                overrides.attributes.reaction = 2;
+                overrides.attributes.willpower = 1;
+                overrides.init = 3;
+                overrides.skills.push('assensing', 'astral_combat', 'con', 'gymnastics', 'intimidation', 'perception', 'unarmed_combat');
+                break;
+            case 'nightmare':
+                overrides.attributes.agility = 3;
+                overrides.attributes.reaction = 2;
+                overrides.attributes.willpower = 1;
+                overrides.attributes.intuition = 1;
+                overrides.attributes.charisma = 2;
+                overrides.init = 3;
+                overrides.skills.push('assensing', 'astral_combat', 'con', 'gymnastics', 'intimidation', 'perception', 'unarmed_combat');
+                break;
+            case 'shade':
+                overrides.attributes.agility = 3;
+                overrides.attributes.reaction = 2;
+                overrides.attributes.willpower = 1;
+                overrides.attributes.intuition = 1;
+                overrides.attributes.charisma = 2;
+                overrides.init = 3;
+                overrides.skills.push('assensing', 'astral_combat', 'con', 'gymnastics', 'intimidation', 'perception', 'unarmed_combat');
+                break;
+            case 'succubus':
+                overrides.attributes.agility = 3;
+                overrides.attributes.reaction = 2;
+                overrides.attributes.willpower = 1;
+                overrides.attributes.intuition = 1;
+                overrides.attributes.charisma = 2;
+                overrides.init = 3;
+                overrides.skills.push('assensing', 'astral_combat', 'con', 'gymnastics', 'intimidation', 'perception', 'unarmed_combat');
+                break;
+            case 'wraith':
+                overrides.attributes.agility = 3;
+                overrides.attributes.reaction = 2;
+                overrides.attributes.willpower = 1;
+                overrides.attributes.intuition = 1;
+                overrides.attributes.charisma = 2;
+                overrides.init = 3;
+                overrides.skills.push('assensing', 'astral_combat', 'con', 'gymnastics', 'intimidation', 'perception', 'unarmed_combat');
+                break;
+            case 'shedim':
+                overrides.attributes.reaction = 2;
+                overrides.attributes.strength = 1;
+                overrides.init = 2;
+                overrides.skills.push('assensing', 'astral_combat', 'perception', 'unarmed_combat');
+                break;
+            case 'master_shedim':
+                overrides.attributes.reaction = 2;
+                overrides.attributes.strength = 1;
+                overrides.attributes.logic = 1;
+                overrides.attributes.intuition = 1;
+                overrides.init = 3;
+                overrides.skills.push('assensing', 'astral_combat', 'counterspelling', 'perception', 'spellcasting', 'unarmed_combat');
+                break;
+            // insect
+            case 'caretaker':
+                overrides.attributes.agility = 1;
+                overrides.attributes.reaction = 1;
+                overrides.init = 1;
+                overrides.skills.push('assensing', 'astral_combat', 'leadership', 'perception', 'unarmed_combat');
+                break;
+            case 'nymph':
+                overrides.attributes.body = 1;
+                overrides.attributes.reaction = 3;
+                overrides.attributes.strength = 1;
+                overrides.init = 3;
+                overrides.skills.push('assensing', 'astral_combat', 'perception', 'gymnastics', 'spellcasting', 'unarmed_combat');
+                break;
+            case 'scout':
+                overrides.attributes.agility = 2;
+                overrides.attributes.reaction = 2;
+                overrides.init = 2;
+                overrides.skills.push('assensing', 'astral_combat', 'perception', 'gymnastics', 'sneaking', 'unarmed_combat');
+                break;
+            case 'soldier':
+                overrides.attributes.body = 3;
+                overrides.attributes.agility = 1;
+                overrides.attributes.reaction = 1;
+                overrides.attributes.strength = 3;
+                overrides.init = 1;
+                overrides.skills.push('assensing', 'astral_combat', 'counterspelling', 'exotic_range', 'gymnastics', 'perception', 'unarmed_combat');
+                break;
+            case 'worker':
+                overrides.attributes.strength = 1;
+                overrides.skills.push('assensing', 'astral_combat', 'perception', 'unarmed_combat');
+                break;
+            case 'queen':
+                overrides.attributes.body = 5;
+                overrides.attributes.agility = 3;
+                overrides.attributes.reaction = 4;
+                overrides.attributes.strength = 5;
+                overrides.attributes.willpower = 1;
+                overrides.attributes.logic = 1;
+                overrides.attributes.intuition = 1;
+                overrides.init = 5;
+                overrides.skills.push('assensing', 'astral_combat', 'con', 'counterspelling', 'gymnastics', 'leadership', 'negotiation', 'perception', 'spellcasting', 'unarmed_combat');
+                break;
+        }
+        return overrides;
+    }
+}
+exports.SpiritPrep = SpiritPrep;
+},{"../../helpers":52,"./BaseActorPrep":19,"./functions/AttributesPrep":24,"./functions/ConditionMonitorsPrep":25,"./functions/InitiativePrep":26,"./functions/LimitsPrep":28,"./functions/ModifiersPrep":30,"./functions/MovementPrep":31,"./functions/SkillsPrep":32,"./functions/WoundsPrep":33}],22:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SpritePrep = void 0;
+const BaseActorPrep_1 = require("./BaseActorPrep");
+const SkillsPrep_1 = require("./functions/SkillsPrep");
+const ModifiersPrep_1 = require("./functions/ModifiersPrep");
+const InitiativePrep_1 = require("./functions/InitiativePrep");
+const AttributesPrep_1 = require("./functions/AttributesPrep");
+const LimitsPrep_1 = require("./functions/LimitsPrep");
+const MatrixPrep_1 = require("./functions/MatrixPrep");
+const helpers_1 = require("../../helpers");
+const PartsList_1 = require("../../parts/PartsList");
+/**
+ * Prepare a Sprite Type of Actor
+ */
+class SpritePrep extends BaseActorPrep_1.BaseActorPrep {
+    prepare() {
+        ModifiersPrep_1.ModifiersPrep.prepareModifiers(this.data);
+        SpritePrep.prepareSpriteData(this.data);
+        MatrixPrep_1.MatrixPrep.prepareAttributesForDevice(this.data);
+        SkillsPrep_1.SkillsPrep.prepareSkills(this.data);
+        AttributesPrep_1.AttributesPrep.prepareAttributes(this.data);
+        LimitsPrep_1.LimitsPrep.prepareLimits(this.data);
+        MatrixPrep_1.MatrixPrep.prepareMatrixToLimitsAndAttributes(this.data);
+        InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(this.data);
+        this.data.special = 'resonance';
+    }
+    /**
+     * Prepares basic Sprite specific data
+     * - matrix attribute values
+     * - device rating
+     * - matrix condition monitor
+     * - matrix initiative
+     * - skills
+     * @param data
+     */
+    static prepareSpriteData(data) {
+        const { level, skills, matrix, spriteType, initiative, attributes, modifiers } = data;
+        const matrixAtts = ['attack', 'sleaze', 'data_processing', 'firewall'];
+        const overrides = this.getSpriteStatModifiers(spriteType);
+        // apply the matrix overrides
+        matrixAtts.forEach((att) => {
+            if (matrix[att] !== undefined) {
+                matrix[att].base = level + overrides[att];
+                matrix[att].value = helpers_1.Helpers.calcTotal(matrix[att]);
             }
         });
-        // add the bonus from the misc tab if applied
-        const essenceMod = this.data.modifiers['essence'];
-        if (essenceMod && !Number.isNaN(essenceMod)) {
-            parts.addUniquePart('SR5.Bonus', Number(essenceMod));
+        // setup initiative from overrides
+        initiative.matrix.base.base = level * 2 + overrides.init;
+        PartsList_1.PartsList.AddUniquePart(initiative.matrix.base.mod, 'SR5.Bonus', modifiers['matrix_initiative']);
+        helpers_1.Helpers.calcTotal(initiative.matrix.base);
+        initiative.matrix.dice.base = 4;
+        PartsList_1.PartsList.AddUniquePart(initiative.matrix.dice.mod, 'SR5.Bonus', modifiers['matrix_initiative_dice']);
+        helpers_1.Helpers.calcTotal(initiative.matrix.dice);
+        // always in matrix perception
+        initiative.perception = 'matrix';
+        // calculate resonance value
+        attributes.resonance.base = level + overrides.resonance;
+        helpers_1.Helpers.calcTotal(attributes.resonance);
+        // apply skill levels
+        // clear skills that we don't have
+        for (const [skillId, skill] of Object.entries(skills.active)) {
+            skill.base = overrides.skills.find((s) => s === skillId) ? level : 0;
         }
-        attributes.essence.base = 6;
-        attributes.essence.mod = parts.list;
-        attributes.essence.value = helpers_1.Helpers.calcTotal(attributes.essence);
+        matrix.rating = level;
+        matrix.condition_monitor.max = 8 + Math.ceil(level / 2);
     }
+    /**
+     * Get the stat modifiers for the specified type of sprite
+     * @param spriteType
+     */
+    static getSpriteStatModifiers(spriteType) {
+        const overrides = {
+            attack: 0,
+            sleaze: 0,
+            data_processing: 0,
+            firewall: 0,
+            resonance: 0,
+            init: 0,
+            // all sprites have computer
+            skills: ['computer'],
+        };
+        switch (spriteType) {
+            case 'courier':
+                overrides.sleaze = 3;
+                overrides.data_processing = 1;
+                overrides.firewall = 2;
+                overrides.init = 1;
+                overrides.skills.push('hacking');
+                break;
+            case 'crack':
+                overrides.sleaze = 3;
+                overrides.data_processing = 2;
+                overrides.firewall = 1;
+                overrides.init = 2;
+                overrides.skills.push('hacking', 'electronic_warfare');
+                break;
+            case 'data':
+                overrides.attack = -1;
+                overrides.data_processing = 4;
+                overrides.firewall = 1;
+                overrides.init = 4;
+                overrides.skills.push('electronic_warfare');
+                break;
+            case 'fault':
+                overrides.attack = 3;
+                overrides.data_processing = 1;
+                overrides.firewall = 2;
+                overrides.init = 1;
+                overrides.skills.push('cybercombat', 'hacking');
+                break;
+            case 'machine':
+                overrides.attack = 1;
+                overrides.data_processing = 3;
+                overrides.firewall = 2;
+                overrides.init = 3;
+                overrides.skills.push('electronic_warfare', 'hardware');
+                break;
+        }
+        return overrides;
+    }
+}
+exports.SpritePrep = SpritePrep;
+},{"../../helpers":52,"../../parts/PartsList":63,"./BaseActorPrep":19,"./functions/AttributesPrep":24,"./functions/InitiativePrep":26,"./functions/LimitsPrep":28,"./functions/MatrixPrep":29,"./functions/ModifiersPrep":30,"./functions/SkillsPrep":32}],23:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.VehiclePrep = void 0;
+const BaseActorPrep_1 = require("./BaseActorPrep");
+const SkillsPrep_1 = require("./functions/SkillsPrep");
+const ModifiersPrep_1 = require("./functions/ModifiersPrep");
+const InitiativePrep_1 = require("./functions/InitiativePrep");
+const AttributesPrep_1 = require("./functions/AttributesPrep");
+const LimitsPrep_1 = require("./functions/LimitsPrep");
+const MatrixPrep_1 = require("./functions/MatrixPrep");
+const helpers_1 = require("../../helpers");
+const PartsList_1 = require("../../parts/PartsList");
+class VehiclePrep extends BaseActorPrep_1.BaseActorPrep {
+    prepare() {
+        ModifiersPrep_1.ModifiersPrep.prepareModifiers(this.data);
+        VehiclePrep.prepareVehicleStats(this.data);
+        VehiclePrep.prepareAttributes(this.data);
+        VehiclePrep.prepareLimits(this.data);
+        SkillsPrep_1.SkillsPrep.prepareSkills(this.data);
+        AttributesPrep_1.AttributesPrep.prepareAttributes(this.data);
+        LimitsPrep_1.LimitsPrep.prepareLimits(this.data);
+        VehiclePrep.prepareConditionMonitor(this.data);
+        MatrixPrep_1.MatrixPrep.prepareMatrixToLimitsAndAttributes(this.data);
+        MatrixPrep_1.MatrixPrep.prepareAttributesForDevice(this.data);
+        VehiclePrep.prepareMovement(this.data);
+        VehiclePrep.prepareMeatspaceInit(this.data);
+        InitiativePrep_1.InitiativePrep.prepareMatrixInit(this.data);
+        InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(this.data);
+        VehiclePrep.prepareArmor(this.data);
+    }
+    static prepareVehicleStats(data) {
+        var _a;
+        const { vehicle_stats, isOffRoad } = data;
+        // set the value for the stats
+        for (let [key, stat] of Object.entries(vehicle_stats)) {
+            // this turns the Object model into the list mod
+            if (typeof stat.mod === 'object') {
+                stat.mod = new PartsList_1.PartsList(stat.mod).list;
+            }
+            const parts = new PartsList_1.PartsList(stat.mod);
+            parts.addUniquePart('SR5.Temporary', (_a = stat.temp) !== null && _a !== void 0 ? _a : 0);
+            stat.mod = parts.list;
+            helpers_1.Helpers.calcTotal(stat);
+            // add labels
+            stat.label = CONFIG.SR5.vehicle.stats[key];
+        }
+        // hide certain stats depending on if we're offroad
+        if (isOffRoad) {
+            vehicle_stats.off_road_speed.hidden = false;
+            vehicle_stats.off_road_handling.hidden = false;
+            vehicle_stats.speed.hidden = true;
+            vehicle_stats.handling.hidden = true;
+        }
+        else {
+            vehicle_stats.off_road_speed.hidden = true;
+            vehicle_stats.off_road_handling.hidden = true;
+            vehicle_stats.speed.hidden = false;
+            vehicle_stats.handling.hidden = false;
+        }
+    }
+    static prepareAttributes(data) {
+        const { attributes, vehicle_stats } = data;
+        const attributeIds = ['agility', 'reaction', 'strength', 'willpower', 'logic', 'intuition', 'charisma'];
+        const totalPilot = helpers_1.Helpers.calcTotal(vehicle_stats.pilot);
+        attributeIds.forEach((attId) => {
+            if (attributes[attId] !== undefined) {
+                attributes[attId].base = totalPilot;
+            }
+        });
+    }
+    static prepareLimits(data) {
+        const { limits, vehicle_stats, isOffRoad } = data;
+        limits.mental.base = helpers_1.Helpers.calcTotal(vehicle_stats.sensor);
+        // add sensor, handling, and speed as limits
+        limits.sensor = Object.assign(Object.assign({}, vehicle_stats.sensor), { hidden: true });
+        limits.handling = Object.assign(Object.assign({}, (isOffRoad ? vehicle_stats.off_road_handling : vehicle_stats.handling)), { hidden: true });
+        limits.speed = Object.assign(Object.assign({}, (isOffRoad ? vehicle_stats.off_road_speed : vehicle_stats.speed)), { hidden: true });
+    }
+    static prepareConditionMonitor(data) {
+        const { track, attributes, matrix, isDrone, modifiers } = data;
+        const halfBody = Math.ceil(helpers_1.Helpers.calcTotal(attributes.body) / 2);
+        // CRB pg 199 drone vs vehicle physical condition monitor rules
+        if (isDrone) {
+            track.physical.max = 6 + halfBody + (Number(modifiers['physical_track']) || 0);
+        }
+        else {
+            track.physical.max = 12 + halfBody + (Number(modifiers['physical_track']) || 0);
+        }
+        track.physical.label = CONFIG.SR5.damageTypes.physical;
+        const rating = matrix.rating || 0;
+        matrix.condition_monitor.max = 8 + Math.ceil(rating / 2);
+    }
+    static prepareMovement(data) {
+        const { vehicle_stats, movement, isOffRoad } = data;
+        let speedTotal = helpers_1.Helpers.calcTotal(isOffRoad ? vehicle_stats.off_road_speed : vehicle_stats.speed);
+        // algorithm to determine speed, CRB pg 202 table
+        movement.walk.base = 5 * Math.pow(2, speedTotal - 1);
+        movement.walk.value = movement.walk.base;
+        movement.run.base = 10 * Math.pow(2, speedTotal - 1);
+        movement.run.value = movement.run.base;
+    }
+    static prepareMeatspaceInit(data) {
+        const { vehicle_stats, initiative } = data;
+        const pilot = helpers_1.Helpers.calcTotal(vehicle_stats.pilot);
+        initiative.meatspace.base.base = pilot * 2;
+        initiative.meatspace.dice.base = 4;
+        helpers_1.Helpers.calcTotal(initiative.meatspace.base);
+        helpers_1.Helpers.calcTotal(initiative.meatspace.dice);
+    }
+    static prepareArmor(data) {
+        const { armor } = data;
+        armor.mod = PartsList_1.PartsList.AddUniquePart(armor.mod, 'SR5.Temporary', armor['temp']);
+        helpers_1.Helpers.calcTotal(armor);
+    }
+}
+exports.VehiclePrep = VehiclePrep;
+},{"../../helpers":52,"../../parts/PartsList":63,"./BaseActorPrep":19,"./functions/AttributesPrep":24,"./functions/InitiativePrep":26,"./functions/LimitsPrep":28,"./functions/MatrixPrep":29,"./functions/ModifiersPrep":30,"./functions/SkillsPrep":32}],24:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AttributesPrep = void 0;
+const PartsList_1 = require("../../../parts/PartsList");
+const helpers_1 = require("../../../helpers");
+class AttributesPrep {
     /**
      * Prepare actor data for attributes
      */
-    prepareAttributes() {
+    static prepareAttributes(data) {
         var _a;
-        const { attributes } = this.data;
+        const { attributes } = data;
         // always have special attributes set to hidden
         attributes.magic.hidden = true;
         attributes.resonance.hidden = true;
@@ -2763,108 +3492,297 @@ class BaseActorPrep {
             attribute.label = CONFIG.SR5.attributes[key];
         }
     }
-    /**
-     * Prepare actor data for skills
-     */
-    prepareSkills() {
-        const { language, active, knowledge } = this.data.skills;
-        if (language) {
-            if (!language.value)
-                language.value = {};
-            language.attribute = 'intuition';
+}
+exports.AttributesPrep = AttributesPrep;
+},{"../../../helpers":52,"../../../parts/PartsList":63}],25:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ConditionMonitorsPrep = void 0;
+class ConditionMonitorsPrep {
+    static prepareStun(data) {
+        const { track, attributes, modifiers } = data;
+        track.stun.max = 8 + Math.ceil(attributes.willpower.value / 2) + Number(modifiers['stun_track']);
+        track.stun.label = CONFIG.SR5.damageTypes.stun;
+    }
+    static preparePhysical(data) {
+        const { track, attributes, modifiers } = data;
+        track.physical.max = 8 + Math.ceil(attributes.body.value / 2) + Number(modifiers['physical_track']);
+        track.physical.overflow.max = attributes.body.value;
+        track.physical.label = CONFIG.SR5.damageTypes.physical;
+    }
+}
+exports.ConditionMonitorsPrep = ConditionMonitorsPrep;
+},{}],26:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.InitiativePrep = void 0;
+const helpers_1 = require("../../../helpers");
+const PartsList_1 = require("../../../parts/PartsList");
+class InitiativePrep {
+    static prepareCurrentInitiative(data) {
+        const { initiative } = data;
+        if (initiative.perception === 'matrix')
+            initiative.current = initiative.matrix;
+        else if (initiative.perception === 'astral')
+            initiative.current = initiative.astral;
+        else {
+            initiative.current = initiative.meatspace;
+            initiative.perception = 'meatspace';
         }
-        // function that will set the total of a skill correctly
-        const prepareSkill = (skill) => {
-            var _a;
-            skill.mod = [];
-            if (!skill.base)
-                skill.base = 0;
-            if ((_a = skill.bonus) === null || _a === void 0 ? void 0 : _a.length) {
-                for (let bonus of skill.bonus) {
-                    skill.mod = PartsList_1.PartsList.AddUniquePart(skill.mod, bonus.key, bonus.value);
-                }
-            }
-            helpers_1.Helpers.calcTotal(skill);
-        };
-        // setup active skills
-        for (const skill of Object.values(active)) {
-            if (!skill.hidden) {
-                prepareSkill(skill);
-            }
-        }
-        const entries = Object.entries(this.data.skills.language.value);
-        // remove entries which are deleted TODO figure out how to delete these from the data
-        entries.forEach(([key, val]) => val._delete && delete this.data.skills.language.value[key]);
-        for (let skill of Object.values(language.value)) {
-            prepareSkill(skill);
-            skill.attribute = 'intuition';
-        }
-        // setup knowledge skills
-        for (let [, group] of Object.entries(knowledge)) {
-            const entries = Object.entries(group.value);
-            // remove entries which are deleted TODO figure out how to delete these from the data
-            group.value = entries
-                .filter(([, val]) => !val._delete)
-                .reduce((acc, [id, skill]) => {
-                prepareSkill(skill);
-                // set the attribute on the skill
-                skill.attribute = group.attribute;
-                acc[id] = skill;
-                return acc;
-            }, {});
-        }
-        // skill labels
-        for (let [skillKey, skillValue] of Object.entries(active)) {
-            skillValue.label = CONFIG.SR5.activeSkills[skillKey];
+        initiative.current.dice.value = helpers_1.Helpers.calcTotal(initiative.current.dice);
+        if (initiative.edge)
+            initiative.current.dice.value = 5;
+        initiative.current.dice.value = Math.min(5, initiative.current.dice.value); // maximum of 5d6 for initiative
+        initiative.current.dice.text = `${initiative.current.dice.value}d6`;
+        initiative.current.base.value = helpers_1.Helpers.calcTotal(initiative.current.base);
+    }
+    static prepareMeatspaceInit(data) {
+        const { initiative, attributes, modifiers } = data;
+        initiative.meatspace.base.base = attributes.intuition.value + attributes.reaction.value;
+        initiative.meatspace.base.mod = PartsList_1.PartsList.AddUniquePart(initiative.meatspace.base.mod, "SR5.Bonus", Number(modifiers['meatspace_initiative']));
+        initiative.meatspace.dice.base = 1;
+        initiative.meatspace.dice.mod = PartsList_1.PartsList.AddUniquePart(initiative.meatspace.dice.mod, "SR5.Bonus", Number(modifiers['meatspace_initiative_dice']));
+    }
+    static prepareAstralInit(data) {
+        const { initiative, attributes, modifiers } = data;
+        initiative.astral.base.base = attributes.intuition.value * 2;
+        initiative.astral.base.mod = PartsList_1.PartsList.AddUniquePart(initiative.astral.base.mod, "SR5.Bonus", Number(modifiers['astral_initiative']));
+        initiative.astral.dice.base = 2;
+        initiative.astral.dice.mod = PartsList_1.PartsList.AddUniquePart(initiative.astral.dice.mod, "SR5.Bonus", Number(modifiers['astral_initiative_dice']));
+    }
+    static prepareMatrixInit(data) {
+        const { initiative, attributes, modifiers, matrix } = data;
+        if (matrix) {
+            initiative.matrix.base.base = attributes.intuition.value + data.matrix.data_processing.value;
+            initiative.matrix.base.mod = PartsList_1.PartsList.AddUniquePart(initiative.matrix.base.mod, "SR5.Bonus", Number(modifiers['matrix_initiative']));
+            initiative.matrix.dice.base = (matrix.hot_sim ? 4 : 3);
+            initiative.matrix.dice.mod = PartsList_1.PartsList.AddUniquePart(initiative.matrix.dice.mod, "SR5.Bonus", Number(modifiers['matrix_initiative_dice']));
         }
     }
+}
+exports.InitiativePrep = InitiativePrep;
+},{"../../../helpers":52,"../../../parts/PartsList":63}],27:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ItemPrep = void 0;
+const helpers_1 = require("../../../helpers");
+const PartsList_1 = require("../../../parts/PartsList");
+class ItemPrep {
     /**
-     * Prepare the actor data limits
+     * Prepare the armor data for the Item
+     * - will only allow one "Base" armor item to be used
+     * - all "accessories" will be added to the armor
      */
-    prepareLimits() {
-        const { limits, attributes, modifiers } = this.data;
+    static prepareArmor(data, items) {
+        const { armor } = data;
+        armor.base = 0;
+        armor.value = 0;
+        armor.mod = [];
+        for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
+            armor[element] = 0;
+        }
+        const equippedArmor = items.filter((item) => item.hasArmor() && item.isEquipped());
+        const armorModParts = new PartsList_1.PartsList(armor.mod);
+        equippedArmor === null || equippedArmor === void 0 ? void 0 : equippedArmor.forEach((item) => {
+            if (item.hasArmorAccessory()) {
+                armorModParts.addUniquePart(item.getName(), item.getArmorValue());
+            } // if not a mod, set armor.value to the items value
+            else {
+                armor.base = item.getArmorValue();
+                armor.label = item.getName();
+                for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
+                    armor[element] = item.getArmorElements()[element];
+                }
+            }
+        });
+        if (data.modifiers['armor'])
+            armorModParts.addUniquePart(game.i18n.localize('SR5.Bonus'), data.modifiers['armor']);
+        // SET ARMOR
+        armor.value = helpers_1.Helpers.calcTotal(armor);
+    }
+    /**
+     * Prepare actor data for cyberware changes
+     * - this calculates the actors essence
+     */
+    static prepareCyberware(data, items) {
+        const { attributes } = data;
+        const parts = new PartsList_1.PartsList();
+        // add Items as values to lower the total value of essence
+        items
+            .filter((item) => item.isCyberware() && item.isEquipped())
+            .forEach((item) => {
+            if (item.getEssenceLoss()) {
+                parts.addUniquePart(item.getName(), -Number(item.getEssenceLoss()));
+            }
+        });
+        // add the bonus from the misc tab if applied
+        const essenceMod = data.modifiers['essence'];
+        if (essenceMod && !Number.isNaN(essenceMod)) {
+            parts.addUniquePart('SR5.Bonus', Number(essenceMod));
+        }
+        attributes.essence.base = 6;
+        attributes.essence.mod = parts.list;
+        attributes.essence.value = helpers_1.Helpers.calcTotal(attributes.essence);
+    }
+}
+exports.ItemPrep = ItemPrep;
+},{"../../../helpers":52,"../../../parts/PartsList":63}],28:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.LimitsPrep = void 0;
+const PartsList_1 = require("../../../parts/PartsList");
+const helpers_1 = require("../../../helpers");
+class LimitsPrep {
+    static prepareLimits(data) {
+        const { limits, modifiers } = data;
         // SETUP LIMITS
-        limits.physical.value =
-            Math.ceil((2 * attributes.strength.value + attributes.body.value + attributes.reaction.value) / 3) + Number(modifiers['physical_limit']);
-        limits.mental.value =
-            Math.ceil((2 * attributes.logic.value + attributes.intuition.value + attributes.willpower.value) / 3) + Number(modifiers['mental_limit']);
-        limits.social.value =
-            Math.ceil((2 * attributes.charisma.value + attributes.willpower.value + attributes.essence.value) / 3) + Number(modifiers['social_limit']);
+        limits.physical.mod = PartsList_1.PartsList.AddUniquePart(limits.physical.mod, 'SR5.Bonus', Number(modifiers['physical_limit']));
+        limits.mental.mod = PartsList_1.PartsList.AddUniquePart(limits.mental.mod, 'SR5.Bonus', Number(modifiers['mental_limit']));
+        limits.social.mod = PartsList_1.PartsList.AddUniquePart(limits.social.mod, "SR5.Bonus", Number(modifiers['social_limit']));
         // limit labels
         for (let [limitKey, limitValue] of Object.entries(limits)) {
+            helpers_1.Helpers.calcTotal(limitValue);
             limitValue.label = CONFIG.SR5.limits[limitKey];
         }
     }
+    static prepareLimitBaseFromAttributes(data) {
+        const { limits, attributes } = data;
+        limits.physical.base = Math.ceil((2 * attributes.strength.value + attributes.body.value + attributes.reaction.value) / 3);
+        limits.mental.base = Math.ceil((2 * attributes.logic.value + attributes.intuition.value + attributes.willpower.value) / 3);
+        limits.social.base = Math.ceil((2 * attributes.charisma.value + attributes.willpower.value + attributes.essence.value) / 3);
+    }
+}
+exports.LimitsPrep = LimitsPrep;
+},{"../../../helpers":52,"../../../parts/PartsList":63}],29:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MatrixPrep = void 0;
+const helpers_1 = require("../../../helpers");
+const PartsList_1 = require("../../../parts/PartsList");
+class MatrixPrep {
     /**
-     * Prepare actor data condition monitors (aka Tracks)
+     * Prepare Matrix data on the actor
+     * - if an item is equipped, it will use that data
+     * - if it isn't and player is technomancer, it will use that data
      */
-    prepareConditionMonitors() {
-        const { track, attributes, modifiers } = this.data;
-        // TODO we will have grunts eventually that only have one track
-        track.physical.max = 8 + Math.ceil(attributes.body.value / 2) + Number(modifiers['physical_track']);
-        track.physical.overflow.max = attributes.body.value;
-        track.stun.max = 8 + Math.ceil(attributes.willpower.value / 2) + Number(modifiers['stun_track']);
-        // tracks
-        for (let [trackKey, trackValue] of Object.entries(track)) {
-            trackValue.label = CONFIG.SR5.damageTypes[trackKey];
+    static prepareMatrix(actorData, items) {
+        const { matrix, attributes } = actorData;
+        const MatrixList = ['firewall', 'sleaze', 'data_processing', 'attack'];
+        // clear matrix data to defaults
+        MatrixList.forEach((key) => {
+            const parts = new PartsList_1.PartsList(matrix[key].mod);
+            parts.addUniquePart('SR5.Temporary', matrix[key].temp);
+            // TODO LEGACY from when the sheet used 'mod.Temporary'
+            parts.removePart('Temporary');
+            matrix[key].mod = parts.list;
+            matrix[key].value = parts.total;
+        });
+        matrix.condition_monitor.max = 0;
+        matrix.rating = 0;
+        matrix.name = '';
+        matrix.device = '';
+        matrix.condition_monitor.label = 'SR5.ConditionMonitor';
+        // get the first equipped device, we don't care if they have more equipped -- it shouldn't happen
+        const device = items.find((item) => item.isEquipped() && item.isDevice());
+        if (device) {
+            const conditionMonitor = device.getConditionMonitor();
+            matrix.device = device.getId();
+            matrix.condition_monitor.max = conditionMonitor.max;
+            matrix.condition_monitor.value = conditionMonitor.value;
+            matrix.rating = device.getRating();
+            matrix.is_cyberdeck = device.isCyberdeck();
+            matrix.name = device.getName();
+            matrix.item = device.getData();
+            const deviceAtts = device.getASDF();
+            if (deviceAtts) {
+                // setup the actual matrix attributes for the actor
+                for (const [key, value] of Object.entries(deviceAtts)) {
+                    if (value && matrix[key]) {
+                        matrix[key].base = value.value;
+                        matrix[key].device_att = value.device_att;
+                    }
+                }
+            }
+        } // if we don't have a device, use living persona
+        else if (actorData.special === 'resonance') {
+            matrix.firewall.base = helpers_1.Helpers.calcTotal(attributes.willpower);
+            matrix.data_processing.base = helpers_1.Helpers.calcTotal(attributes.logic);
+            matrix.rating = helpers_1.Helpers.calcTotal(attributes.resonance);
+            matrix.attack.base = helpers_1.Helpers.calcTotal(attributes.charisma);
+            matrix.sleaze.base = helpers_1.Helpers.calcTotal(attributes.intuition);
+            matrix.name = game.i18n.localize('SR5.LivingPersona');
+        }
+        // set matrix condition monitor to max if greater than
+        if (matrix.condition_monitor.value > matrix.condition_monitor.max) {
+            matrix.condition_monitor.value = matrix.condition_monitor.max;
         }
     }
     /**
-     * Prepare actor data movement
+     * Add Matrix Attributes to Limits and Attributes
+     * @param data
      */
-    prepareMovement() {
-        const { attributes, modifiers } = this.data;
-        const movement = this.data.movement;
-        // default movement: WALK = AGI * 2, RUN = AGI * 4
-        movement.walk.value = attributes.agility.value * (2 + Number(modifiers['walk']));
-        movement.run.value = attributes.agility.value * (4 + Number(modifiers['run']));
+    static prepareMatrixToLimitsAndAttributes(data) {
+        const { matrix, attributes, limits } = data;
+        const MatrixList = ['firewall', 'sleaze', 'data_processing', 'attack'];
+        // add matrix attributes to both limits and attributes as hidden entries
+        MatrixList.forEach((key) => {
+            helpers_1.Helpers.calcTotal(matrix[key]);
+            if (matrix[key]) {
+                const label = CONFIG.SR5.matrixAttributes[key];
+                const { value, base, mod } = matrix[key];
+                const hidden = true;
+                limits[key] = {
+                    value,
+                    base,
+                    mod,
+                    label,
+                    hidden,
+                };
+                attributes[key] = {
+                    value,
+                    base,
+                    mod,
+                    label,
+                    hidden,
+                };
+            }
+        });
     }
+    /**
+     * Prepare the mental attributes for a sheet that just has a device rating
+     * @param data
+     */
+    static prepareAttributesForDevice(data) {
+        const { matrix, attributes } = data;
+        const rating = matrix.rating || 0;
+        const mentalAttributes = ['intuition', 'logic', 'charisma', 'willpower'];
+        mentalAttributes.forEach((attLabel) => {
+            if (attributes[attLabel] !== undefined) {
+                attributes[attLabel].base = rating;
+                helpers_1.Helpers.calcTotal(attributes[attLabel]);
+            }
+        });
+        const basic = ['firewall', 'data_processing'];
+        basic.forEach((attId) => {
+            matrix[attId].base = rating;
+        });
+        [...basic, 'sleaze', 'attack'].forEach((attId) => {
+            helpers_1.Helpers.calcTotal(matrix[attId]);
+        });
+    }
+}
+exports.MatrixPrep = MatrixPrep;
+},{"../../../helpers":52,"../../../parts/PartsList":63}],30:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ModifiersPrep = void 0;
+class ModifiersPrep {
     /**
      * Prepare the modifiers that are displayed in the Misc. tab
      */
-    prepareModifiers() {
-        if (!this.data.modifiers)
-            this.data.modifiers = {};
+    static prepareModifiers(data) {
+        if (!data.modifiers)
+            data.modifiers = {};
         const modifiers = {};
         let miscTabModifiers = [
             'soak',
@@ -2896,53 +3814,109 @@ class BaseActorPrep {
         // force global to the top
         miscTabModifiers.unshift('global');
         for (let item of miscTabModifiers) {
-            modifiers[item] = Number(this.data.modifiers[item]) || 0;
+            modifiers[item] = Number(data.modifiers[item]) || 0;
         }
-        this.data.modifiers = modifiers;
+        data.modifiers = modifiers;
     }
+}
+exports.ModifiersPrep = ModifiersPrep;
+},{}],31:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MovementPrep = void 0;
+class MovementPrep {
+    static prepareMovement(data) {
+        const { attributes, modifiers } = data;
+        const movement = data.movement;
+        // default movement: WALK = AGI * 2, RUN = AGI * 4
+        movement.walk.value = attributes.agility.value * (2 + Number(modifiers['walk']));
+        movement.run.value = attributes.agility.value * (4 + Number(modifiers['run']));
+    }
+}
+exports.MovementPrep = MovementPrep;
+},{}],32:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SkillsPrep = void 0;
+const helpers_1 = require("../../../helpers");
+const PartsList_1 = require("../../../parts/PartsList");
+class SkillsPrep {
     /**
-     * Prepare actor data for initiative
+     * Prepare actor data for skills
      */
-    prepareInitiative() {
-        const { initiative, attributes, modifiers, matrix } = this.data;
-        initiative.meatspace.base.base = attributes.intuition.value + attributes.reaction.value + Number(modifiers['meat_initiative']);
-        initiative.meatspace.dice.base = 1 + Number(modifiers['meat_initiative_dice']);
-        initiative.astral.base.base = attributes.intuition.value * 2 + Number(modifiers['astral_initiative']);
-        initiative.astral.dice.base = 2 + Number(modifiers['astral_initiative_dice']);
-        initiative.matrix.base.base = attributes.intuition.value + this.data.matrix.data_processing.value + Number(modifiers['matrix_initiative']);
-        initiative.matrix.dice.base = (matrix.hot_sim ? 4 : 3) + Number(modifiers['matrix_initiative_dice']);
-        if (initiative.perception === 'matrix')
-            initiative.current = initiative.matrix;
-        else if (initiative.perception === 'astral')
-            initiative.current = initiative.astral;
-        else {
-            initiative.current = initiative.meatspace;
-            initiative.perception = 'meatspace';
+    static prepareSkills(data) {
+        const { language, active, knowledge } = data.skills;
+        if (language) {
+            if (!language.value)
+                language.value = {};
+            language.attribute = 'intuition';
         }
-        initiative.current.dice.value = initiative.current.dice.base;
-        if (initiative.edge)
-            initiative.current.dice.value = 5;
-        initiative.current.dice.value = Math.min(5, initiative.current.dice.value); // maximum of 5d6 for initiative
-        initiative.current.dice.text = `${initiative.current.dice.value}d6`;
-        initiative.current.base.value = initiative.current.base.base;
+        // function that will set the total of a skill correctly
+        const prepareSkill = (skill) => {
+            var _a;
+            skill.mod = [];
+            if (!skill.base)
+                skill.base = 0;
+            if ((_a = skill.bonus) === null || _a === void 0 ? void 0 : _a.length) {
+                for (let bonus of skill.bonus) {
+                    skill.mod = PartsList_1.PartsList.AddUniquePart(skill.mod, bonus.key, bonus.value);
+                }
+            }
+            helpers_1.Helpers.calcTotal(skill);
+        };
+        // setup active skills
+        for (const skill of Object.values(active)) {
+            if (!skill.hidden) {
+                prepareSkill(skill);
+            }
+        }
+        const entries = Object.entries(data.skills.language.value);
+        // remove entries which are deleted TODO figure out how to delete these from the data
+        entries.forEach(([key, val]) => val._delete && delete data.skills.language.value[key]);
+        for (let skill of Object.values(language.value)) {
+            prepareSkill(skill);
+            skill.attribute = 'intuition';
+        }
+        // setup knowledge skills
+        for (let [, group] of Object.entries(knowledge)) {
+            const entries = Object.entries(group.value);
+            // remove entries which are deleted TODO figure out how to delete these from the data
+            group.value = entries
+                .filter(([, val]) => !val._delete)
+                .reduce((acc, [id, skill]) => {
+                prepareSkill(skill);
+                // set the attribute on the skill
+                skill.attribute = group.attribute;
+                acc[id] = skill;
+                return acc;
+            }, {});
+        }
+        // skill labels
+        for (let [skillKey, skillValue] of Object.entries(active)) {
+            skillValue.label = CONFIG.SR5.activeSkills[skillKey];
+        }
     }
-    /**
-     * Prepare actor data for wounds
-     */
-    prepareWounds() {
-        const { modifiers, track } = this.data;
+}
+exports.SkillsPrep = SkillsPrep;
+},{"../../../helpers":52,"../../../parts/PartsList":63}],33:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.WoundsPrep = void 0;
+class WoundsPrep {
+    static prepareWounds(data) {
+        const { modifiers, track } = data;
         const count = 3 + Number(modifiers['wound_tolerance']);
-        const stunWounds = Math.floor(this.data.track.stun.value / count);
-        const physicalWounds = Math.floor(this.data.track.physical.value / count);
+        const stunWounds = Math.floor(data.track.stun.value / count);
+        const physicalWounds = Math.floor(data.track.physical.value / count);
         track.stun.wounds = stunWounds;
         track.physical.wounds = physicalWounds;
-        this.data.wounds = {
+        data.wounds = {
             value: stunWounds + physicalWounds,
         };
     }
 }
-exports.BaseActorPrep = BaseActorPrep;
-},{"../../helpers":37,"../../item/SR5ItemDataWrapper":40,"../../parts/PartsList":48}],19:[function(require,module,exports){
+exports.WoundsPrep = WoundsPrep;
+},{}],34:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -3740,7 +4714,7 @@ var ChummerImportForm = /*#__PURE__*/function (_FormApplication) {
 
 exports.ChummerImportForm = ChummerImportForm;
 
-},{"@babel/runtime/helpers/asyncToGenerator":2,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10,"@babel/runtime/regenerator":14}],20:[function(require,module,exports){
+},{"@babel/runtime/helpers/asyncToGenerator":2,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10,"@babel/runtime/regenerator":14}],35:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -3930,7 +4904,7 @@ class ShadowrunItemDialog extends Dialog {
     }
 }
 exports.ShadowrunItemDialog = ShadowrunItemDialog;
-},{"../../helpers":37}],21:[function(require,module,exports){
+},{"../../helpers":52}],36:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -4093,7 +5067,7 @@ var OverwatchScoreTracker = /*#__PURE__*/function (_Application) {
 exports.OverwatchScoreTracker = OverwatchScoreTracker;
 (0, _defineProperty2["default"])(OverwatchScoreTracker, "MatrixOverwatchDiceCount", '2d6');
 
-},{"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10}],22:[function(require,module,exports){
+},{"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10}],37:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KnowledgeSkillEditForm = void 0;
@@ -4108,7 +5082,7 @@ class KnowledgeSkillEditForm extends LanguageSkillEditForm_1.LanguageSkillEditFo
     }
 }
 exports.KnowledgeSkillEditForm = KnowledgeSkillEditForm;
-},{"./LanguageSkillEditForm":23}],23:[function(require,module,exports){
+},{"./LanguageSkillEditForm":38}],38:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LanguageSkillEditForm = void 0;
@@ -4131,7 +5105,7 @@ class LanguageSkillEditForm extends SkillEditForm_1.SkillEditForm {
     }
 }
 exports.LanguageSkillEditForm = LanguageSkillEditForm;
-},{"./SkillEditForm":24}],24:[function(require,module,exports){
+},{"./SkillEditForm":39}],39:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -4211,7 +5185,6 @@ class SkillEditForm extends BaseEntitySheet {
         return __awaiter(this, void 0, void 0, function* () {
             const updateData = {};
             this._onUpdateObject(event, formData, updateData);
-            console.log(formData);
             yield this.entity.update(updateData);
         });
     }
@@ -4288,7 +5261,7 @@ class SkillEditForm extends BaseEntitySheet {
     }
 }
 exports.SkillEditForm = SkillEditForm;
-},{}],25:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.measureDistance = void 0;
@@ -4324,7 +5297,7 @@ exports.measureDistance = function (p0, p1, { gridSpaces = true } = {}) {
     }
     return (nStraight + nDiagonal) * canvas.scene.data.gridDistance;
 };
-},{"./constants":29}],26:[function(require,module,exports){
+},{"./constants":44}],41:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -4430,7 +5403,7 @@ exports.addRollListeners = (app, html) => {
     if ((item === null || item === void 0 ? void 0 : item.hasRoll) && app.isRoll)
         $(html).find('.card-description').hide();
 };
-},{"./actor/SR5Actor":16,"./constants":29,"./item/SR5Item":39,"./parts/PartsList":48,"./template":51}],27:[function(require,module,exports){
+},{"./actor/SR5Actor":16,"./constants":44,"./item/SR5Item":54,"./parts/PartsList":63,"./template":66}],42:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -4529,292 +5502,409 @@ exports.shadowrunCombatUpdate = (changes, options) => __awaiter(void 0, void 0, 
         yield combat.update({ turn: 0 });
     }
 });
-},{"./constants":29}],28:[function(require,module,exports){
+},{"./constants":44}],43:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5 = void 0;
-exports.SR5 = {};
-exports.SR5['attributes'] = {
-    body: 'SR5.AttrBody',
-    agility: 'SR5.AttrAgility',
-    reaction: 'SR5.AttrReaction',
-    strength: 'SR5.AttrStrength',
-    willpower: 'SR5.AttrWillpower',
-    logic: 'SR5.AttrLogic',
-    intuition: 'SR5.AttrIntuition',
-    charisma: 'SR5.AttrCharisma',
-    magic: 'SR5.AttrMagic',
-    resonance: 'SR5.AttrResonance',
-    edge: 'SR5.AttrEdge',
-    essence: 'SR5.AttrEssence',
-    attack: 'SR5.MatrixAttrAttack',
-    sleaze: 'SR5.MatrixAttrSleaze',
-    data_processing: 'SR5.MatrixAttrDataProc',
-    firewall: 'SR5.MatrixAttrFirewall',
+exports.SR5 = {
+    itemTypes: {
+        action: 'SR5.ItemTypes.Action',
+        adept_power: 'SR5.ItemTypes.AdeptPower',
+        ammo: 'SR5.ItemTypes.Ammo',
+        armor: 'SR5.ItemTypes.Armor',
+        complex_form: 'SR5.ItemTypes.ComplexForm',
+        contact: 'SR5.ItemTypes.Contact',
+        critter_power: 'SR5.ItemTypes.CritterPower',
+        cyberware: 'SR5.ItemTypes.Cyberware',
+        device: 'SR5.ItemTypes.Device',
+        equipment: 'SR5.ItemTypes.Equipment',
+        lifestyle: 'SR5.ItemTypes.Lifestyle',
+        modification: 'SR5.ItemTypes.Modification',
+        quality: 'SR5.ItemTypes.Quality',
+        sin: 'SR5.ItemTypes.Sin',
+        spell: 'SR5.ItemTypes.Spell',
+        weapon: 'SR5.ItemTypes.Weapon',
+    },
+    attributes: {
+        body: 'SR5.AttrBody',
+        agility: 'SR5.AttrAgility',
+        reaction: 'SR5.AttrReaction',
+        strength: 'SR5.AttrStrength',
+        willpower: 'SR5.AttrWillpower',
+        logic: 'SR5.AttrLogic',
+        intuition: 'SR5.AttrIntuition',
+        charisma: 'SR5.AttrCharisma',
+        magic: 'SR5.AttrMagic',
+        resonance: 'SR5.AttrResonance',
+        edge: 'SR5.AttrEdge',
+        essence: 'SR5.AttrEssence',
+        attack: 'SR5.MatrixAttrAttack',
+        sleaze: 'SR5.MatrixAttrSleaze',
+        data_processing: 'SR5.MatrixAttrDataProc',
+        firewall: 'SR5.MatrixAttrFirewall',
+    },
+    limits: {
+        physical: 'SR5.LimitPhysical',
+        social: 'SR5.LimitSocial',
+        mental: 'SR5.LimitMental',
+        attack: 'SR5.MatrixAttrAttack',
+        sleaze: 'SR5.MatrixAttrSleaze',
+        data_processing: 'SR5.MatrixAttrDataProc',
+        firewall: 'SR5.MatrixAttrFirewall',
+    },
+    specialTypes: {
+        mundane: 'SR5.Mundane',
+        magic: 'SR5.Awakened',
+        resonance: 'SR5.Emerged',
+    },
+    damageTypes: {
+        physical: 'SR5.DmgTypePhysical',
+        stun: 'SR5.DmgTypeStun',
+        matrix: 'SR5.DmgTypeMatrix',
+    },
+    elementTypes: {
+        fire: 'SR5.ElementFire',
+        cold: 'SR5.ElementCold',
+        acid: 'SR5.ElementAcid',
+        electricity: 'SR5.ElementElectricity',
+        radiation: 'SR5.ElementRadiation',
+    },
+    spellCategories: {
+        combat: 'SR5.SpellCatCombat',
+        detection: 'SR5.SpellCatDetection',
+        health: 'SR5.SpellCatHealth',
+        illusion: 'SR5.SpellCatIllusion',
+        manipulation: 'SR5.SpellCatManipulation',
+    },
+    spellTypes: {
+        physical: 'SR5.SpellTypePhysical',
+        mana: 'SR5.SpellTypeMana',
+    },
+    spellRanges: {
+        touch: 'SR5.SpellRangeTouch',
+        los: 'SR5.SpellRangeLos',
+        los_a: 'SR5.SpellRangeLosA',
+    },
+    combatSpellTypes: {
+        direct: 'SR5.SpellCombatDirect',
+        indirect: 'SR5.SpellCombatIndirect',
+    },
+    detectionSpellTypes: {
+        directional: 'SR5.SpellDetectionDirectional',
+        psychic: 'SR5.SpellDetectionPsychic',
+        area: 'SR5.SpellDetectionArea',
+    },
+    illusionSpellTypes: {
+        obvious: 'SR5.SpellIllusionObvious',
+        realistic: 'SR5.SpellIllusionRealistic',
+    },
+    illusionSpellSenses: {
+        'single-sense': 'SR5.SpellIllusionSingleSense',
+        'multi-sense': 'SR5.SpellIllusionMultiSense',
+    },
+    attributeRolls: {
+        composure: 'SR5.RollComposure',
+        lift_carry: 'SR5.RollLiftCarry',
+        judge_intentions: 'SR5.RollJudgeIntentions',
+        memory: 'SR5.RollMemory',
+    },
+    matrixTargets: {
+        persona: 'SR5.TargetPersona',
+        device: 'SR5.TargetDevice',
+        file: 'SR5.TargetFile',
+        self: 'SR5.TargetSelf',
+        sprite: 'SR5.TargetSprite',
+        other: 'SR5.TargetOther',
+    },
+    durations: {
+        instant: 'SR5.DurationInstant',
+        sustained: 'SR5.DurationSustained',
+        permanent: 'SR5.DurationPermanent',
+    },
+    weaponCategories: {
+        range: 'SR5.WeaponCatRange',
+        melee: 'SR5.WeaponCatMelee',
+        thrown: 'SR5.WeaponCatThrown',
+    },
+    weaponRanges: {
+        short: 'SR5.WeaponRangeShort',
+        medium: 'SR5.WeaponRangeMedium',
+        long: 'SR5.WeaponRangeLong',
+        extreme: 'SR5.WeaponRangeExtreme',
+    },
+    qualityTypes: {
+        positive: 'SR5.QualityTypePositive',
+        negative: 'SR5.QualityTypeNegative',
+    },
+    adeptPower: {
+        types: {
+            active: 'SR5.AdeptPower.Types.Active',
+            passive: 'SR5.AdeptPower.Types.Passive',
+        },
+    },
+    deviceCategories: {
+        commlink: 'SR5.DeviceCatCommlink',
+        cyberdeck: 'SR5.DeviceCatCyberdeck',
+    },
+    cyberwareGrades: {
+        standard: 'SR5.CyberwareGradeStandard',
+        alpha: 'SR5.CyberwareGradeAlpha',
+        beta: 'SR5.CyberwareGradeBeta',
+        delta: 'SR5.CyberwareGradeDelta',
+        used: 'SR5.CyberwareGradeUsed',
+    },
+    knowledgeSkillCategories: {
+        street: 'SR5.KnowledgeSkillStreet',
+        academic: 'SR5.KnowledgeSkillAcademic',
+        professional: 'SR5.KnowledgeSkillProfessional',
+        interests: 'SR5.KnowledgeSkillInterests',
+    },
+    activeSkills: {
+        archery: 'SR5.SkillArchery',
+        automatics: 'SR5.SkillAutomatics',
+        blades: 'SR5.SkillBlades',
+        clubs: 'SR5.SkillClubs',
+        exotic_melee: 'SR5.SkillExoticMelee',
+        exotic_range: 'SR5.SkillExoticRange',
+        heavy_weapons: 'SR5.SkillHeavyWeapons',
+        longarms: 'SR5.SkillLongarms',
+        pistols: 'SR5.SkillPistols',
+        throwing_weapons: 'SR5.SkillThrowingWeapons',
+        unarmed_combat: 'SR5.SkillUnarmedCombat',
+        disguise: 'SR5.SkillDisguise',
+        diving: 'SR5.SkillDiving',
+        escape_artist: 'SR5.SkillEscapeArtist',
+        free_fall: 'SR5.SkillFreeFall',
+        gymnastics: 'SR5.SkillGymnastics',
+        palming: 'SR5.SkillPalming',
+        perception: 'SR5.SkillPerception',
+        running: 'SR5.SkillRunning',
+        sneaking: 'SR5.SkillSneaking',
+        survival: 'SR5.SkillSurvival',
+        swimming: 'SR5.SkillSwimming',
+        tracking: 'SR5.SkillTracking',
+        con: 'SR5.SkillCon',
+        etiquette: 'SR5.SkillEtiquette',
+        impersonation: 'SR5.SkillImpersonation',
+        instruction: 'SR5.SkillInstruction',
+        intimidation: 'SR5.SkillIntimidation',
+        leadership: 'SR5.SkillLeadership',
+        negotiation: 'SR5.SkillNegotiation',
+        performance: 'SR5.SkillPerformance',
+        alchemy: 'SR5.SkillAlchemy',
+        arcana: 'SR5.SkillArcana',
+        artificing: 'SR5.SkillArtificing',
+        assensing: 'SR5.SkillAssensing',
+        astral_combat: 'SR5.SkillAstralCombat',
+        banishing: 'SR5.SkillBanishing',
+        binding: 'SR5.SkillBinding',
+        counterspelling: 'SR5.SkillCounterspelling',
+        disenchanting: 'SR5.SkillDisenchanting',
+        ritual_spellcasting: 'SR5.SkillRitualSpellcasting',
+        spellcasting: 'SR5.SkillSpellcasting',
+        summoning: 'SR5.SkillSummoning',
+        compiling: 'SR5.SkillCompiling',
+        decompiling: 'SR5.SkillDecompiling',
+        registering: 'SR5.SkillRegistering',
+        aeronautics_mechanic: 'SR5.SkillAeronauticsMechanic',
+        automotive_mechanic: 'SR5.SkillAutomotiveMechanic',
+        industrial_mechanic: 'SR5.SkillIndustrialMechanic',
+        nautical_mechanic: 'SR5.SkillNauticalMechanic',
+        animal_handling: 'SR5.SkillAnimalHandling',
+        armorer: 'SR5.SkillArmorer',
+        artisan: 'SR5.SkillArtisan',
+        biotechnology: 'SR5.SkillBiotechnology',
+        chemistry: 'SR5.SkillChemistry',
+        computer: 'SR5.SkillComputer',
+        cybercombat: 'SR5.SkillCybercombat',
+        cybertechnology: 'SR5.SkillCybertechnology',
+        demolitions: 'SR5.SkillDemolitions',
+        electronic_warfare: 'SR5.SkillElectronicWarfare',
+        first_aid: 'SR5.SkillFirstAid',
+        forgery: 'SR5.SkillForgery',
+        hacking: 'SR5.SkillHacking',
+        hardware: 'SR5.SkillHardware',
+        locksmith: 'SR5.SkillLocksmith',
+        medicine: 'SR5.SkillMedicine',
+        navigation: 'SR5.SkillNavigation',
+        software: 'SR5.SkillSoftware',
+        gunnery: 'SR5.SkillGunnery',
+        pilot_aerospace: 'SR5.SkillPilotAerospace',
+        pilot_aircraft: 'SR5.SkillPilotAircraft',
+        pilot_walker: 'SR5.SkillPilotWalker',
+        pilot_ground_craft: 'SR5.SkillPilotGroundCraft',
+        pilot_water_craft: 'SR5.SkillPilotWaterCraft',
+        pilot_exotic_vehicle: 'SR5.SkillPilotExoticVehicle',
+    },
+    actionTypes: {
+        none: 'SR5.ActionTypeNone',
+        free: 'SR5.ActionTypeFree',
+        simple: 'SR5.ActionTypeSimple',
+        complex: 'SR5.ActionTypeComplex',
+        varies: 'SR5.ActionTypeVaries',
+    },
+    matrixAttributes: {
+        attack: 'SR5.MatrixAttrAttack',
+        sleaze: 'SR5.MatrixAttrSleaze',
+        data_processing: 'SR5.MatrixAttrDataProc',
+        firewall: 'SR5.MatrixAttrFirewall',
+    },
+    initiativeCategories: {
+        meatspace: 'SR5.InitCatMeatspace',
+        astral: 'SR5.InitCatAstral',
+        matrix: 'SR5.InitCatMatrix',
+    },
+    modificationTypes: {
+        weapon: 'SR5.Weapon',
+        armor: 'SR5.Armor',
+    },
+    mountPoints: {
+        barrel: 'SR5.Barrel',
+        stock: 'SR5.Stock',
+        top: 'SR5.Top',
+        side: 'SR5.Side',
+        internal: 'SR5.Internal',
+    },
+    lifestyleTypes: {
+        street: 'SR5.LifestyleStreet',
+        squatter: 'SR5.LifestyleSquatter',
+        low: 'SR5.LifestyleLow',
+        medium: 'SR5.LifestyleMiddle',
+        high: 'SR5.LifestyleHigh',
+        luxory: 'SR5.LifestyleLuxory',
+        other: 'SR5.LifestyleOther',
+    },
+    kbmod: {
+        STANDARD: 'shiftKey',
+        EDGE: 'altKey',
+        SPEC: 'ctrlKey',
+    },
+    actorModifiers: {
+        soak: 'SR5.RollSoak',
+        drain: 'SR5.Drain',
+        armor: 'SR5.Armor',
+        physical_limit: 'SR5.PhysicalLimit',
+        social_limit: 'SR5.SocialLimit',
+        mental_limit: 'SR5.MentalLimit',
+        stun_track: 'SR5.StunTrack',
+        physical_track: 'SR5.PhysicalTrack',
+        meat_initiative: 'SR5.MeatSpaceInit',
+        meat_initiative_dice: 'SR5.MeatSpaceDice',
+        astral_initiative: 'SR5.AstralInit',
+        astral_initiative_dice: 'SR5.AstralDice',
+        matrix_initiative: 'SR5.MatrixInit',
+        matrix_initiative_dice: 'SR5.MatrixDice',
+        composure: 'SR5.RollComposure',
+        lift_carry: 'SR5.RollLiftCarry',
+        judge_intentions: 'SR5.RollJudgeIntentions',
+        memory: 'SR5.RollMemory',
+        walk: 'SR5.Walk',
+        run: 'SR5.Run',
+        defense: 'SR5.RollDefense',
+        wound_tolerance: 'SR5.WoundTolerance',
+        essence: 'SR5.AttrEssence',
+        fade: 'SR5.RollFade',
+        global: 'SR5.Global',
+    },
+    programTypes: {
+        common_program: 'SR5.CommonProgram',
+        hacking_program: 'SR5.HackingProgram',
+        agent: 'SR5.Agent',
+    },
+    spiritTypes: {
+        // base types
+        air: 'SR5.Spirit.Types.Air',
+        beasts: 'SR5.Spirit.Types.Beasts',
+        earth: 'SR5.Spirit.Types.Earth',
+        fire: 'SR5.Spirit.Types.Fire',
+        guardian: 'SR5.Spirit.Types.Guardian',
+        guidance: 'SR5.Spirit.Types.Guidance',
+        man: 'SR5.Spirit.Types.Man',
+        plant: 'SR5.Spirit.Types.Plant',
+        task: 'SR5.Spirit.Types.Task',
+        water: 'SR5.Spirit.Types.Water',
+        // toxic types
+        toxic_air: 'SR5.Spirit.Types.ToxicAir',
+        toxic_beasts: 'SR5.Spirit.Types.ToxicBeasts',
+        toxic_earth: 'SR5.Spirit.Types.ToxicEarth',
+        toxic_fire: 'SR5.Spirit.Types.ToxicFire',
+        toxic_man: 'SR5.Spirit.Types.ToxicMan',
+        toxic_water: 'SR5.Spirit.Types.ToxicWater',
+        // blood types
+        blood: 'SR5.Spirit.Types.Blood',
+        // shadow types
+        muse: 'SR5.Spirit.Types.Muse',
+        nightmare: 'SR5.Spirit.Types.Nightmare',
+        shade: 'SR5.Spirit.Types.Shade',
+        succubus: 'SR5.Spirit.Types.Succubus',
+        wraith: 'SR5.Spirit.Types.Wraith',
+        // shedim types
+        shedim: 'SR5.Spirit.Types.Shedim',
+        master_shedim: 'SR5.Spirit.Types.MasterShedim',
+        // insect types
+        caretaker: 'SR5.Spirit.Types.Caretaker',
+        nymph: 'SR5.Spirit.Types.Nymph',
+        scout: 'SR5.Spirit.Types.Scout',
+        soldier: 'SR5.Spirit.Types.Soldier',
+        worker: 'SR5.Spirit.Types.Worker',
+        queen: 'SR5.Spirit.Types.Queen',
+    },
+    critterPower: {
+        types: {
+            mana: 'SR5.CritterPower.Types.Mana',
+            physical: 'SR5.CritterPower.Types.Physical',
+        },
+        ranges: {
+            los: 'SR5.CritterPower.Ranges.LineOfSight',
+            self: 'SR5.CritterPower.Ranges.Self',
+            touch: 'SR5.CritterPower.Ranges.Touch',
+        },
+        durations: {
+            always: 'SR5.CritterPower.Durations.Always',
+            instant: 'SR5.CritterPower.Durations.Instant',
+            sustained: 'SR5.CritterPower.Durations.Sustained',
+            permanent: 'SR5.CritterPower.Durations.Permanent',
+            special: 'SR5.CritterPower.Durations.Special',
+        },
+    },
+    spriteTypes: {
+        courier: 'SR5.Sprite.Types.Courier',
+        crack: 'SR5.Sprite.Types.Crack',
+        data: 'SR5.Sprite.Types.Data',
+        fault: 'SR5.Sprite.Types.Fault',
+        machine: 'SR5.Sprite.Types.Machine',
+    },
+    vehicle: {
+        types: {
+            air: 'SR5.Vehicle.Types.Air',
+            aerospace: 'SR5.Vehicle.Types.Aerospace',
+            ground: 'SR5.Vehicle.Types.Ground',
+            water: 'SR5.Vehicle.Types.Water',
+            walker: 'SR5.Vehicle.Types.Walker',
+            exotic: 'SR5.Vehicle.Types.Exotic',
+        },
+        stats: {
+            handling: 'SR5.Vehicle.Stats.Handling',
+            off_road_handling: 'SR5.Vehicle.Stats.OffRoadHandling',
+            speed: 'SR5.Vehicle.Stats.Speed',
+            off_road_speed: 'SR5.Vehicle.Stats.OffRoadSpeed',
+            acceleration: 'SR5.Vehicle.Stats.Acceleration',
+            pilot: 'SR5.Vehicle.Stats.Pilot',
+            sensor: 'SR5.Vehicle.Stats.Sensor',
+        },
+        control_modes: {
+            manual: 'SR5.Vehicle.ControlModes.Manual',
+            remote: 'SR5.Vehicle.ControlModes.Remote',
+            rigger: 'SR5.Vehicle.ControlModes.Rigger',
+            autopilot: 'SR5.Vehicle.ControlModes.Autopilot',
+        },
+        environments: {
+            speed: 'SR5.Vehicle.Environments.Speed',
+            handling: 'SR5.Vehicle.Environments.Handling',
+        },
+    },
 };
-exports.SR5['limits'] = {
-    physical: 'SR5.LimitPhysical',
-    social: 'SR5.LimitSocial',
-    mental: 'SR5.LimitMental',
-    attack: 'SR5.MatrixAttrAttack',
-    sleaze: 'SR5.MatrixAttrSleaze',
-    data_processing: 'SR5.MatrixAttrDataProc',
-    firewall: 'SR5.MatrixAttrFirewall',
-};
-exports.SR5['specialTypes'] = {
-    mundane: 'SR5.Mundane',
-    magic: 'SR5.Awakened',
-    resonance: 'SR5.Emerged',
-};
-exports.SR5['damageTypes'] = {
-    physical: 'SR5.DmgTypePhysical',
-    stun: 'SR5.DmgTypeStun',
-    matrix: 'SR5.DmgTypeMatrix',
-};
-exports.SR5['elementTypes'] = {
-    fire: 'SR5.ElementFire',
-    cold: 'SR5.ElementCold',
-    acid: 'SR5.ElementAcid',
-    electricity: 'SR5.ElementElectricity',
-    radiation: 'SR5.ElementRadiation',
-};
-exports.SR5['spellCategories'] = {
-    combat: 'SR5.SpellCatCombat',
-    detection: 'SR5.SpellCatDetection',
-    health: 'SR5.SpellCatHealth',
-    illusion: 'SR5.SpellCatIllusion',
-    manipulation: 'SR5.SpellCatManipulation',
-};
-exports.SR5['spellTypes'] = {
-    physical: 'SR5.SpellTypePhysical',
-    mana: 'SR5.SpellTypeMana',
-};
-exports.SR5['spellRanges'] = {
-    touch: 'SR5.SpellRangeTouch',
-    los: 'SR5.SpellRangeLos',
-    los_a: 'SR5.SpellRangeLosA',
-};
-exports.SR5['combatSpellTypes'] = {
-    direct: 'SR5.SpellCombatDirect',
-    indirect: 'SR5.SpellCombatIndirect',
-};
-exports.SR5['detectionSpellTypes'] = {
-    directional: 'SR5.SpellDetectionDirectional',
-    psychic: 'SR5.SpellDetectionPsychic',
-    area: 'SR5.SpellDetectionArea',
-};
-exports.SR5['illusionSpellTypes'] = {
-    obvious: 'SR5.SpellIllusionObvious',
-    realistic: 'SR5.SpellIllusionRealistic',
-};
-exports.SR5['illusionSpellSenses'] = {
-    'single-sense': 'SR5.SpellIllusionSingleSense',
-    'multi-sense': 'SR5.SpellIllusionMultiSense',
-};
-exports.SR5['attributeRolls'] = {
-    composure: 'SR5.RollComposure',
-    lift_carry: 'SR5.RollLiftCarry',
-    judge_intentions: 'SR5.RollJudgeIntentions',
-    memory: 'SR5.RollMemory',
-};
-exports.SR5['matrixTargets'] = {
-    persona: 'SR5.TargetPersona',
-    device: 'SR5.TargetDevice',
-    file: 'SR5.TargetFile',
-    self: 'SR5.TargetSelf',
-    sprite: 'SR5.TargetSprite',
-    other: 'SR5.TargetOther',
-};
-exports.SR5['durations'] = {
-    instant: 'SR5.DurationInstant',
-    sustained: 'SR5.DurationSustained',
-    permanent: 'SR5.DurationPermanent',
-};
-exports.SR5['weaponCategories'] = {
-    range: 'SR5.WeaponCatRange',
-    melee: 'SR5.WeaponCatMelee',
-    thrown: 'SR5.WeaponCatThrown',
-};
-exports.SR5['weaponRanges'] = {
-    short: 'SR5.WeaponRangeShort',
-    medium: 'SR5.WeaponRangeMedium',
-    long: 'SR5.WeaponRangeLong',
-    extreme: 'SR5.WeaponRangeExtreme',
-};
-exports.SR5['qualityTypes'] = {
-    positive: 'SR5.QualityTypePositive',
-    negative: 'SR5.QualityTypeNegative',
-};
-exports.SR5['deviceCategories'] = {
-    commlink: 'SR5.DeviceCatCommlink',
-    cyberdeck: 'SR5.DeviceCatCyberdeck',
-};
-exports.SR5['cyberwareGrades'] = {
-    standard: 'SR5.CyberwareGradeStandard',
-    alpha: 'SR5.CyberwareGradeAlpha',
-    beta: 'SR5.CyberwareGradeBeta',
-    delta: 'SR5.CyberwareGradeDelta',
-    used: 'SR5.CyberwareGradeUsed',
-};
-exports.SR5['knowledgeSkillCategories'] = {
-    street: 'SR5.KnowledgeSkillStreet',
-    academic: 'SR5.KnowledgeSkillAcademic',
-    professional: 'SR5.KnowledgeSkillProfessional',
-    interests: 'SR5.KnowledgeSkillInterests',
-};
-exports.SR5['activeSkills'] = {
-    archery: 'SR5.SkillArchery',
-    automatics: 'SR5.SkillAutomatics',
-    blades: 'SR5.SkillBlades',
-    clubs: 'SR5.SkillClubs',
-    exotic_melee: 'SR5.SkillExoticMelee',
-    exotic_range: 'SR5.SkillExoticRange',
-    heavy_weapons: 'SR5.SkillHeavyWeapons',
-    longarms: 'SR5.SkillLongarms',
-    pistols: 'SR5.SkillPistols',
-    throwing_weapons: 'SR5.SkillThrowingWeapons',
-    unarmed_combat: 'SR5.SkillUnarmedCombat',
-    disguise: 'SR5.SkillDisguise',
-    diving: 'SR5.SkillDiving',
-    escape_artist: 'SR5.SkillEscapeArtist',
-    free_fall: 'SR5.SkillFreeFall',
-    gymnastics: 'SR5.SkillGymnastics',
-    palming: 'SR5.SkillPalming',
-    perception: 'SR5.SkillPerception',
-    running: 'SR5.SkillRunning',
-    sneaking: 'SR5.SkillSneaking',
-    survival: 'SR5.SkillSurvival',
-    swimming: 'SR5.SkillSwimming',
-    tracking: 'SR5.SkillTracking',
-    con: 'SR5.SkillCon',
-    etiquette: 'SR5.SkillEtiquette',
-    impersonation: 'SR5.SkillImpersonation',
-    instruction: 'SR5.SkillInstruction',
-    intimidation: 'SR5.SkillIntimidation',
-    leadership: 'SR5.SkillLeadership',
-    negotiation: 'SR5.SkillNegotiation',
-    performance: 'SR5.SkillPerformance',
-    alchemy: 'SR5.SkillAlchemy',
-    arcana: 'SR5.SkillArcana',
-    artificing: 'SR5.SkillArtificing',
-    assensing: 'SR5.SkillAssensing',
-    astral_combat: 'SR5.SkillAstralCombat',
-    banishing: 'SR5.SkillBanishing',
-    binding: 'SR5.SkillBinding',
-    counterspelling: 'SR5.SkillCounterspelling',
-    disenchanting: 'SR5.SkillDisenchanting',
-    ritual_spellcasting: 'SR5.SkillRitualSpellcasting',
-    spellcasting: 'SR5.SkillSpellcasting',
-    summoning: 'SR5.SkillSummoning',
-    compiling: 'SR5.SkillCompiling',
-    decompiling: 'SR5.SkillDecompiling',
-    registering: 'SR5.SkillRegistering',
-    aeronautics_mechanic: 'SR5.SkillAeronauticsMechanic',
-    automotive_mechanic: 'SR5.SkillAutomotiveMechanic',
-    industrial_mechanic: 'SR5.SkillIndustrialMechanic',
-    nautical_mechanic: 'SR5.SkillNauticalMechanic',
-    animal_handling: 'SR5.SkillAnimalHandling',
-    armorer: 'SR5.SkillArmorer',
-    artisan: 'SR5.SkillArtisan',
-    biotechnology: 'SR5.SkillBiotechnology',
-    chemistry: 'SR5.SkillChemistry',
-    computer: 'SR5.SkillComputer',
-    cybercombat: 'SR5.SkillCybercombat',
-    cybertechnology: 'SR5.SkillCybertechnology',
-    demolitions: 'SR5.SkillDemolitions',
-    electronic_warfare: 'SR5.SkillElectronicWarfare',
-    first_aid: 'SR5.SkillFirstAid',
-    forgery: 'SR5.SkillForgery',
-    hacking: 'SR5.SkillHacking',
-    hardware: 'SR5.SkillHardware',
-    locksmith: 'SR5.SkillLocksmith',
-    medicine: 'SR5.SkillMedicine',
-    navigation: 'SR5.SkillNavigation',
-    software: 'SR5.SkillSoftware',
-    gunnery: 'SR5.SkillGunnery',
-    pilot_aerospace: 'SR5.SkillPilotAerospace',
-    pilot_aircraft: 'SR5.SkillPilotAircraft',
-    pilot_walker: 'SR5.SkillPilotWalker',
-    pilot_ground_craft: 'SR5.SkillPilotGroundCraft',
-    pilot_water_craft: 'SR5.SkillPilotWaterCraft',
-    pilot_exotic_vehicle: 'SR5.SkillPilotExoticVehicle',
-};
-exports.SR5['actionTypes'] = {
-    none: 'SR5.ActionTypeNone',
-    free: 'SR5.ActionTypeFree',
-    simple: 'SR5.ActionTypeSimple',
-    complex: 'SR5.ActionTypeComplex',
-    varies: 'SR5.ActionTypeVaries',
-};
-exports.SR5['matrixAttributes'] = {
-    attack: 'SR5.MatrixAttrAttack',
-    sleaze: 'SR5.MatrixAttrSleaze',
-    data_processing: 'SR5.MatrixAttrDataProc',
-    firewall: 'SR5.MatrixAttrFirewall',
-};
-exports.SR5['initiativeCategories'] = {
-    meatspace: 'SR5.InitCatMeatspace',
-    astral: 'SR5.InitCatAstral',
-    matrix: 'SR5.InitCatMatrix',
-};
-exports.SR5['modificationTypes'] = {
-    weapon: 'SR5.Weapon',
-    armor: 'SR5.Armor',
-};
-exports.SR5['mountPoints'] = {
-    barrel: 'SR5.Barrel',
-    stock: 'SR5.Stock',
-    top: 'SR5.Top',
-    side: 'SR5.Side',
-    internal: 'SR5.Internal',
-};
-exports.SR5['lifestyleTypes'] = {
-    street: 'SR5.LifestyleStreet',
-    squatter: 'SR5.LifestyleSquatter',
-    low: 'SR5.LifestyleLow',
-    medium: 'SR5.LifestyleMiddle',
-    high: 'SR5.LifestyleHigh',
-    luxory: 'SR5.LifestyleLuxory',
-    other: 'SR5.LifestyleOther',
-};
-exports.SR5['kbmod'] = {
-    STANDARD: 'shiftKey',
-    EDGE: 'altKey',
-    SPEC: 'ctrlKey',
-};
-exports.SR5['actorModifiers'] = {
-    soak: 'SR5.RollSoak',
-    drain: 'SR5.Drain',
-    armor: 'SR5.Armor',
-    physical_limit: 'SR5.PhysicalLimit',
-    social_limit: 'SR5.SocialLimit',
-    mental_limit: 'SR5.MentalLimit',
-    stun_track: 'SR5.StunTrack',
-    physical_track: 'SR5.PhysicalTrack',
-    meat_initiative: 'SR5.MeatSpaceInit',
-    meat_initiative_dice: 'SR5.MeatSpaceDice',
-    astral_initiative: 'SR5.AstralInit',
-    astral_initiative_dice: 'SR5.AstralDice',
-    matrix_initiative: 'SR5.MatrixInit',
-    matrix_initiative_dice: 'SR5.MatrixDice',
-    composure: 'SR5.RollComposure',
-    lift_carry: 'SR5.RollLiftCarry',
-    judge_intentions: 'SR5.RollJudgeIntentions',
-    memory: 'SR5.RollMemory',
-    walk: 'SR5.Walk',
-    run: 'SR5.Run',
-    defense: 'SR5.RollDefense',
-    wound_tolerance: 'SR5.WoundTolerance',
-    essence: 'SR5.AttrEssence',
-    fade: 'SR5.RollFade',
-    global: 'SR5.Global',
-};
-exports.SR5['programTypes'] = {
-    common_program: 'SR5.CommonProgram',
-    hacking_program: 'SR5.HackingProgram',
-    agent: 'SR5.Agent',
-};
-},{}],29:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FLAGS = exports.SYSTEM_NAME = void 0;
@@ -4823,7 +5913,7 @@ exports.FLAGS = {
     ShowGlitchAnimation: 'showGlitchAnimation',
     ShowTokenNameForChatOutput: 'showTokenNameInsteadOfActor'
 };
-},{}],30:[function(require,module,exports){
+},{}],45:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataWrapper = void 0;
@@ -4833,7 +5923,7 @@ class DataWrapper {
     }
 }
 exports.DataWrapper = DataWrapper;
-},{}],31:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerBasicHelpers = void 0;
@@ -4850,7 +5940,7 @@ exports.registerBasicHelpers = () => {
         return '';
     });
     Handlebars.registerHelper('concatStrings', function (...args) {
-        return args.join(' ');
+        return args.filter(a => typeof a === 'string').join('');
     });
     Handlebars.registerHelper('concat', function (strs, c = ',') {
         if (Array.isArray(strs)) {
@@ -4953,7 +6043,7 @@ exports.registerBasicHelpers = () => {
         return val ? val : undefined;
     });
 };
-},{"../helpers":37}],32:[function(require,module,exports){
+},{"../helpers":52}],47:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HandlebarManager = void 0;
@@ -4974,7 +6064,7 @@ class HandlebarManager {
     }
 }
 exports.HandlebarManager = HandlebarManager;
-},{"./BasicHelpers":31,"./HandlebarTemplates":33,"./ItemLineHelpers":34,"./RollAndLabelHelpers":35,"./SkillLineHelpers":36}],33:[function(require,module,exports){
+},{"./BasicHelpers":46,"./HandlebarTemplates":48,"./ItemLineHelpers":49,"./RollAndLabelHelpers":50,"./SkillLineHelpers":51}],48:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -4998,6 +6088,12 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/dist/templates/actor/tabs/MiscTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/SkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/SocialTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/SpellsTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/CritterPowersTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/spirit/SpiritSkillsTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/matrix/SpriteSkillsTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/vehicle/VehicleSkillsTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/vehicle/VehicleMatrixTab.html',
         // uncategorized lists
         'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html',
         'systems/shadowrun5e/dist/templates/actor/parts/Movement.html',
@@ -5010,10 +6106,13 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/dist/templates/actor/parts/magic/AdeptPowerList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/magic/SpellList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/magic/SpellAndAdeptPowerList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/magic/SpiritOptions.html',
         // matrix
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/ProgramList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/ComplexFormList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/matrix/SpritePowerList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/matrix/DeviceRating.html',
         // attributes
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html',
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/AttributeList.html',
@@ -5022,6 +6121,10 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         // skills
         'systems/shadowrun5e/dist/templates/actor/parts/skills/ActiveSkillList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/skills/LanguageAndKnowledgeSkillList.html',
+        // vehicle
+        'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleStatsList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleSecondStatsList.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleMovement.html',
         'systems/shadowrun5e/dist/templates/item/parts/description.html',
         'systems/shadowrun5e/dist/templates/item/parts/technology.html',
         'systems/shadowrun5e/dist/templates/item/parts/header.html',
@@ -5041,6 +6144,7 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/dist/templates/item/parts/ammo.html',
         'systems/shadowrun5e/dist/templates/item/parts/modification.html',
         'systems/shadowrun5e/dist/templates/item/parts/program.html',
+        'systems/shadowrun5e/dist/templates/item/parts/critter_power.html',
         'systems/shadowrun5e/dist/templates/rolls/parts/parts-list.html',
         // to wrap the bodies of tabs
         'systems/shadowrun5e/dist/templates/common/TabWrapper.html',
@@ -5048,17 +6152,20 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         // Useful wrapper and implemented components
         'systems/shadowrun5e/dist/templates/common/ValueMaxAttribute.html',
         'systems/shadowrun5e/dist/templates/common/Attribute.html',
+        // useful select template for the common pattern
+        'systems/shadowrun5e/dist/templates/common/Select.html',
         // to create the condition monitors and edge counter
         'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html',
         // looks like a ListHeader
         'systems/shadowrun5e/dist/templates/common/HeaderBlock.html',
+        'systems/shadowrun5e/dist/templates/common/NameLineBlock.html',
         // list components
         'systems/shadowrun5e/dist/templates/common/List/ListItem.html',
         'systems/shadowrun5e/dist/templates/common/List/ListHeader.html',
     ];
     return loadTemplates(templatePaths);
 });
-},{}],34:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerItemLineHelpers = void 0;
@@ -5121,6 +6228,12 @@ exports.registerItemLineHelpers = () => {
                 return [addIcon];
             case 'cyberware':
                 addIcon.title = game.i18n.localize('SR5.CreateItemCyberware');
+                return [addIcon];
+            case 'critter_power':
+                addIcon.title = game.i18n.localize('SR5.CreateItemCritterPower');
+                return [addIcon];
+            case 'sprite_power':
+                addIcon.title = game.i18n.localize('SR5.CreateItemSpritePower');
                 return [addIcon];
             default:
                 return [];
@@ -5222,6 +6335,24 @@ exports.registerItemLineHelpers = () => {
                         },
                     },
                 ];
+            case 'critter_power':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.CritterPower.Type'),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.CritterPower.Range'),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.CritterPower.Duration'),
+                        },
+                    },
+                ];
             case 'quality':
                 return [
                     {
@@ -5230,14 +6361,12 @@ exports.registerItemLineHelpers = () => {
                         },
                     },
                 ];
-            case 'program':
-                return [];
             default:
                 return [];
         }
     });
     Handlebars.registerHelper('ItemRightSide', function (item) {
-        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q;
+        var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t;
         const wrapper = new SR5ItemDataWrapper_1.SR5ItemDataWrapper(item);
         const qtyInput = {
             input: {
@@ -5324,7 +6453,7 @@ exports.registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize((_k = item.data.type) !== null && _k !== void 0 ? _k : ''),
+                            text: game.i18n.localize(CONFIG.SR5.adeptPower.types[(_k = item.data.type) !== null && _k !== void 0 ? _k : '']),
                         },
                     },
                 ];
@@ -5351,16 +6480,34 @@ exports.registerItemLineHelpers = () => {
                         },
                     },
                 ];
-            case 'complex_form':
+            case 'critter_power':
                 return [
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.matrixTargets[(_p = item.data.target) !== null && _p !== void 0 ? _p : '']),
+                            text: game.i18n.localize(CONFIG.SR5.critterPower.types[(_p = item.data.powerType) !== null && _p !== void 0 ? _p : '']),
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.durations[(_q = item.data.duration) !== null && _q !== void 0 ? _q : '']),
+                            text: game.i18n.localize(CONFIG.SR5.critterPower.ranges[(_q = item.data.range) !== null && _q !== void 0 ? _q : '']),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize(CONFIG.SR5.critterPower.durations[(_r = item.data.duration) !== null && _r !== void 0 ? _r : '']),
+                        },
+                    },
+                ];
+            case 'complex_form':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize(CONFIG.SR5.matrixTargets[(_s = item.data.target) !== null && _s !== void 0 ? _s : '']),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize(CONFIG.SR5.durations[(_t = item.data.duration) !== null && _t !== void 0 ? _t : '']),
                         },
                     },
                     {
@@ -5397,6 +6544,14 @@ exports.registerItemLineHelpers = () => {
             icon: `${((_a = item.data.technology) === null || _a === void 0 ? void 0 : _a.equipped) ? 'fas fa-check-circle' : 'far fa-circle'} item-equip-toggle`,
             title: game.i18n.localize('SR5.ToggleEquip'),
         };
+        const pdfIcon = {
+            icon: 'fas fa-file open-source-pdf',
+            title: game.i18n.localize('SR5.OpenSourcePdf'),
+        };
+        const icons = [editIcon, removeIcon];
+        if (ui['PDFoundry']) {
+            icons.unshift(pdfIcon);
+        }
         switch (item.type) {
             case 'program':
             case 'armor':
@@ -5404,13 +6559,12 @@ exports.registerItemLineHelpers = () => {
             case 'equipment':
             case 'cyberware':
             case 'weapon':
-                return [equipIcon, editIcon, removeIcon];
-            default:
-                return [editIcon, removeIcon];
+                icons.unshift(equipIcon);
         }
+        return icons;
     });
 };
-},{"../item/SR5ItemDataWrapper":40}],35:[function(require,module,exports){
+},{"../item/SR5ItemDataWrapper":55}],50:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerRollAndLabelHelpers = void 0;
@@ -5467,7 +6621,7 @@ exports.registerRollAndLabelHelpers = () => {
         return parts.total;
     });
 };
-},{"../parts/PartsList":48}],36:[function(require,module,exports){
+},{"../parts/PartsList":63}],51:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerSkillLineHelpers = void 0;
@@ -5561,7 +6715,7 @@ exports.registerSkillLineHelpers = () => {
         }
     });
 };
-},{"../helpers":37}],37:[function(require,module,exports){
+},{"../helpers":52}],52:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Helpers = void 0;
@@ -5576,6 +6730,10 @@ class Helpers {
         if (data.mod === undefined)
             data.mod = [];
         const parts = new PartsList_1.PartsList(data.mod);
+        // if a temp field is found, add it as a unique part
+        if (data['temp'] !== undefined) {
+            parts.addUniquePart('SR5.Temporary', data['temp']);
+        }
         data.value = parts.total + data.base;
         data.mod = parts.list;
         return data.value;
@@ -5751,17 +6909,6 @@ class Helpers {
         }
         return obj;
     }
-    static setNestedValue(obj, prop, val) {
-        console.log(obj);
-        console.log(prop);
-        console.log(val);
-        const props = prop.split('.');
-        props.forEach((p) => (obj = p in obj ? obj[p] : null));
-        if (obj) {
-            console.log(`setting ${obj} to ${val}`);
-            obj = val;
-        }
-    }
     static hasModifiers(event) {
         return event && (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey);
     }
@@ -5787,7 +6934,7 @@ class Helpers {
     }
 }
 exports.Helpers = Helpers;
-},{"./parts/PartsList":48}],38:[function(require,module,exports){
+},{"./parts/PartsList":63}],53:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatData = void 0;
@@ -5954,6 +7101,20 @@ exports.ChatData = {
         exports.ChatData.action(data, labels, props);
         props.push(helpers_1.Helpers.label(data.type));
     },
+    sprite_power: (data, labels, props) => {
+        // add action data
+        exports.ChatData.action(data, labels, props);
+    },
+    critter_power: (data, labels, props) => {
+        // power type
+        props.push(game.i18n.localize(CONFIG.SR5.critterPower.types[data.powerType]));
+        // duration
+        props.push(game.i18n.localize(CONFIG.SR5.critterPower.durations[data.duration]));
+        // range
+        props.push(game.i18n.localize(CONFIG.SR5.critterPower.ranges[data.range]));
+        // add action data
+        exports.ChatData.action(data, labels, props);
+    },
     // add properties for spell data, follow order in book
     spell: (data, labels, props) => {
         // first category and type
@@ -6077,7 +7238,7 @@ exports.ChatData = {
         }
     },
 };
-},{"../helpers":37}],39:[function(require,module,exports){
+},{"../helpers":52}],54:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -6676,7 +7837,11 @@ class SR5Item extends Item {
             const promise = ShadowrunRoller_1.ShadowrunRoller.itemRoll(event, this, options);
             // handle promise when it resolves for our own stuff
             promise.then((roll) => __awaiter(this, void 0, void 0, function* () {
-                var _a, _b;
+                var _a, _b, _c;
+                const attackData = this.getAttackData((_a = roll === null || roll === void 0 ? void 0 : roll.total) !== null && _a !== void 0 ? _a : 0);
+                if (attackData) {
+                    yield this.setLastAttack(attackData);
+                }
                 // complex form handles fade
                 if (this.isComplexForm()) {
                     const totalFade = Math.max(this.getFade() + this.getLastComplexFormLevel().value, 2);
@@ -6684,22 +7849,14 @@ class SR5Item extends Item {
                 } // spells handle drain, force, and attack data
                 else if (this.isSpell()) {
                     if (this.isCombatSpell() && roll) {
-                        const attackData = this.getAttackData(roll.total);
-                        if (attackData) {
-                            yield this.setLastAttack(attackData);
-                        }
                     }
                     const forceData = this.getLastSpellForce();
                     const drain = Math.max(this.getDrain() + forceData.value + (forceData.reckless ? 3 : 0), 2);
-                    yield ((_a = this.actor) === null || _a === void 0 ? void 0 : _a.rollDrain({ event }, drain));
+                    yield ((_b = this.actor) === null || _b === void 0 ? void 0 : _b.rollDrain({ event }, drain));
                 } // weapons handle ammo and attack data
                 else if (this.data.type === 'weapon') {
-                    const attackData = this.getAttackData((roll === null || roll === void 0 ? void 0 : roll.total) || 0);
-                    if (attackData) {
-                        yield this.setLastAttack(attackData);
-                    }
                     if (this.hasAmmo) {
-                        const fireMode = ((_b = this.getLastFireMode()) === null || _b === void 0 ? void 0 : _b.value) || 1;
+                        const fireMode = ((_c = this.getLastFireMode()) === null || _c === void 0 ? void 0 : _c.value) || 1;
                         yield this.useAmmo(fireMode);
                     }
                 }
@@ -6866,7 +8023,7 @@ class SR5Item extends Item {
     openPdfSource() {
         return __awaiter(this, void 0, void 0, function* () {
             // Check for PDFoundry module hook: https://github.com/Djphoenix719/PDFoundry
-            if (!ui.PDFoundry) {
+            if (!ui['PDFoundry']) {
                 ui.notifications.warn(game.i18n.localize('SR5.DIALOG.MissingModuleContent'));
                 return;
             }
@@ -6884,7 +8041,7 @@ class SR5Item extends Item {
     }
     getAttackData(hits) {
         var _a;
-        if (!((_a = this.data.data.action) === null || _a === void 0 ? void 0 : _a.damage))
+        if (!((_a = this.data.data.action) === null || _a === void 0 ? void 0 : _a.damage.type))
             return undefined;
         const damage = this.data.data.action.damage;
         const data = {
@@ -7092,7 +8249,7 @@ class SR5Item extends Item {
     }
 }
 exports.SR5Item = SR5Item;
-},{"../apps/dialogs/ShadowrunItemDialog":20,"../chat":26,"../constants":29,"../helpers":37,"../parts/PartsList":48,"../rolls/ShadowrunRoller":49,"./ChatData":38,"./SR5ItemDataWrapper":40}],40:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunItemDialog":35,"../chat":41,"../constants":44,"../helpers":52,"../parts/PartsList":63,"../rolls/ShadowrunRoller":64,"./ChatData":53,"./SR5ItemDataWrapper":55}],55:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ItemDataWrapper = void 0;
@@ -7165,7 +8322,7 @@ class SR5ItemDataWrapper extends DataWrapper_1.DataWrapper {
     }
     getConditionMonitor() {
         var _a, _b;
-        return (_b = (_a = this.data.data.technology) === null || _a === void 0 ? void 0 : _a.condition_monitor) !== null && _b !== void 0 ? _b : { value: 0, max: 0 };
+        return (_b = (_a = this.data.data.technology) === null || _a === void 0 ? void 0 : _a.condition_monitor) !== null && _b !== void 0 ? _b : { value: 0, max: 0, label: '' };
     }
     getRating() {
         var _a;
@@ -7295,7 +8452,7 @@ class SR5ItemDataWrapper extends DataWrapper_1.DataWrapper {
     }
 }
 exports.SR5ItemDataWrapper = SR5ItemDataWrapper;
-},{"../dataWrappers/DataWrapper":30}],41:[function(require,module,exports){
+},{"../dataWrappers/DataWrapper":45}],56:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -7402,7 +8559,7 @@ class SR5ItemSheet extends ItemSheet {
     /* -------------------------------------------- */
     /**
      * Activate event listeners using the prepared sheet HTML
-     * @param html {HTML}   The prepared HTML object ready to be rendered into the DOM
+     * @param html -  The prepared HTML object ready to be rendered into the DOM
      */
     activateListeners(html) {
         super.activateListeners(html);
@@ -7623,7 +8780,7 @@ class SR5ItemSheet extends ItemSheet {
     }
 }
 exports.SR5ItemSheet = SR5ItemSheet;
-},{"../helpers":37}],42:[function(require,module,exports){
+},{"../helpers":52}],57:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -7771,7 +8928,7 @@ function rollItemMacro(itemName) {
     return item.postCard();
 }
 HandlebarManager_1.HandlebarManager.registerHelpers();
-},{"./actor/SR5Actor":16,"./actor/SR5ActorSheet":17,"./apps/gmtools/OverwatchScoreTracker":21,"./canvas":25,"./chat":26,"./combat":27,"./config":28,"./constants":29,"./handlebars/HandlebarManager":32,"./helpers":37,"./item/SR5Item":39,"./item/SR5ItemSheet":41,"./migrator/Migrator":43,"./rolls/ShadowrunRoller":49,"./settings":50}],43:[function(require,module,exports){
+},{"./actor/SR5Actor":16,"./actor/SR5ActorSheet":17,"./apps/gmtools/OverwatchScoreTracker":36,"./canvas":40,"./chat":41,"./combat":42,"./config":43,"./constants":44,"./handlebars/HandlebarManager":47,"./helpers":52,"./item/SR5Item":54,"./item/SR5ItemSheet":56,"./migrator/Migrator":58,"./rolls/ShadowrunRoller":64,"./settings":65}],58:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -7788,135 +8945,132 @@ const VersionMigration_1 = require("./VersionMigration");
 const LegacyMigration_1 = require("./versions/LegacyMigration");
 const Version0_6_5_1 = require("./versions/Version0_6_5");
 const Version0_6_10_1 = require("./versions/Version0_6_10");
-let Migrator = /** @class */ (() => {
-    class Migrator {
-        //TODO: Call on Init()
-        static BeginMigration() {
-            return __awaiter(this, void 0, void 0, function* () {
-                let currentVersion = game.settings.get(VersionMigration_1.VersionMigration.MODULE_NAME, VersionMigration_1.VersionMigration.KEY_DATA_VERSION);
-                if (currentVersion === undefined || currentVersion === null) {
-                    currentVersion = VersionMigration_1.VersionMigration.NO_VERSION;
-                }
-                const migrations = Migrator.s_Versions.filter(({ versionNumber }) => {
-                    // if versionNUmber is greater than currentVersion, we need to apply this migration
-                    return this.compareVersion(versionNumber, currentVersion) === 1;
-                });
-                // No migrations are required, exit.
-                if (migrations.length === 0) {
-                    return;
-                }
-                const localizedWarningTitle = game.i18n.localize('SR5.MIGRATION.WarningTitle');
-                const localizedWarningHeader = game.i18n.localize('SR5.MIGRATION.WarningHeader');
-                const localizedWarningRequired = game.i18n.localize('SR5.MIGRATION.WarningRequired');
-                const localizedWarningDescription = game.i18n.localize('SR5.MIGRATION.WarningDescription');
-                const localizedWarningBackup = game.i18n.localize('SR5.MIGRATION.WarningBackup');
-                const localizedWarningBegin = game.i18n.localize('SR5.MIGRATION.BeginMigration');
-                const d = new Dialog({
-                    title: localizedWarningTitle,
-                    content: `<h2 style="color: red; text-align: center">${localizedWarningHeader}</h2>` +
-                        `<p style="text-align: center"><i>${localizedWarningRequired}</i></p>` +
-                        `<p>${localizedWarningDescription}</p>` +
-                        `<h3 style="color: red">${localizedWarningBackup}</h3>`,
-                    buttons: {
-                        ok: {
-                            label: localizedWarningBegin,
-                            callback: () => this.migrate(migrations),
-                        },
-                    },
-                    default: 'ok',
-                });
-                d.render(true);
-            });
-        }
-        static migrate(migrations) {
-            return __awaiter(this, void 0, void 0, function* () {
-                // we want to apply migrations in ascending order until we're up to the latest
-                migrations.sort((a, b) => {
-                    return this.compareVersion(a.versionNumber, b.versionNumber);
-                });
-                yield this.migrateWorld(game, migrations);
-                yield this.migrateCompendium(game, migrations);
-                const localizedWarningTitle = game.i18n.localize('SR5.MIGRATION.SuccessTitle');
-                const localizedWarningHeader = game.i18n.localize('SR5.MIGRATION.SuccessHeader');
-                const localizedSuccessDescription = game.i18n.localize('SR5.MIGRATION.SuccessDescription');
-                const localizedSuccessPacksInfo = game.i18n.localize('SR5.MIGRATION.SuccessPacksInfo');
-                const localizedSuccessConfirm = game.i18n.localize('SR5.MIGRATION.SuccessConfirm');
-                const packsDialog = new Dialog({
-                    title: localizedWarningTitle,
-                    content: `<h2 style="text-align: center; color: green">${localizedWarningHeader}</h2>` +
-                        `<p>${localizedSuccessDescription}</p>` +
-                        `<p style="text-align: center"><i>${localizedSuccessPacksInfo}</i></p>`,
-                    buttons: {
-                        ok: {
-                            icon: '<i class="fas fa-check"></i>',
-                            label: localizedSuccessConfirm,
-                        },
-                    },
-                    default: 'ok',
-                });
-                packsDialog.render(true);
-            });
-        }
-        /**
-         * Migrate all world objects
-         * @param game
-         * @param migrations
-         */
-        static migrateWorld(game, migrations) {
-            return __awaiter(this, void 0, void 0, function* () {
-                // Run the migrations in order
-                for (const { migration } of migrations) {
-                    yield migration.Migrate(game);
-                }
-            });
-        }
-        /**
-         * Iterate over all world compendium packs
-         * @param game Game that will be migrated
-         * @param migrations Instances of the version migration
-         */
-        static migrateCompendium(game, migrations) {
-            return __awaiter(this, void 0, void 0, function* () {
-                // Migrate World Compendium Packs
-                const packs = game.packs.filter((pack) => pack.metadata.package === 'world' && ['Actor', 'Item', 'Scene'].includes(pack.metadata.entity));
-                // Run the migrations in order on each pack.
-                for (const pack of packs) {
-                    for (const { migration } of migrations) {
-                        yield migration.MigrateCompendiumPack(pack);
-                    }
-                }
-            });
-        }
-        // found at: https://helloacm.com/the-javascript-function-to-compare-version-number-strings/
-        // updated for typescript
-        /**
-         * compare two version numbers, returns 1 if v1 > v2, -1 if v1 < v2, 0 if equal
-         * @param v1
-         * @param v2
-         */
-        static compareVersion(v1, v2) {
-            const s1 = v1.split('.').map((s) => parseInt(s, 10));
-            const s2 = v2.split('.').map((s) => parseInt(s, 10));
-            const k = Math.min(v1.length, v2.length);
-            for (let i = 0; i < k; ++i) {
-                if (s1[i] > s2[i])
-                    return 1;
-                if (s1[i] < s2[i])
-                    return -1;
+class Migrator {
+    //TODO: Call on Init()
+    static BeginMigration() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let currentVersion = game.settings.get(VersionMigration_1.VersionMigration.MODULE_NAME, VersionMigration_1.VersionMigration.KEY_DATA_VERSION);
+            if (currentVersion === undefined || currentVersion === null) {
+                currentVersion = VersionMigration_1.VersionMigration.NO_VERSION;
             }
-            return v1.length === v2.length ? 0 : v1.length < v2.length ? -1 : 1;
-        }
+            const migrations = Migrator.s_Versions.filter(({ versionNumber }) => {
+                // if versionNUmber is greater than currentVersion, we need to apply this migration
+                return this.compareVersion(versionNumber, currentVersion) === 1;
+            });
+            // No migrations are required, exit.
+            if (migrations.length === 0) {
+                return;
+            }
+            const localizedWarningTitle = game.i18n.localize('SR5.MIGRATION.WarningTitle');
+            const localizedWarningHeader = game.i18n.localize('SR5.MIGRATION.WarningHeader');
+            const localizedWarningRequired = game.i18n.localize('SR5.MIGRATION.WarningRequired');
+            const localizedWarningDescription = game.i18n.localize('SR5.MIGRATION.WarningDescription');
+            const localizedWarningBackup = game.i18n.localize('SR5.MIGRATION.WarningBackup');
+            const localizedWarningBegin = game.i18n.localize('SR5.MIGRATION.BeginMigration');
+            const d = new Dialog({
+                title: localizedWarningTitle,
+                content: `<h2 style="color: red; text-align: center">${localizedWarningHeader}</h2>` +
+                    `<p style="text-align: center"><i>${localizedWarningRequired}</i></p>` +
+                    `<p>${localizedWarningDescription}</p>` +
+                    `<h3 style="color: red">${localizedWarningBackup}</h3>`,
+                buttons: {
+                    ok: {
+                        label: localizedWarningBegin,
+                        callback: () => this.migrate(migrations),
+                    },
+                },
+                default: 'ok',
+            });
+            d.render(true);
+        });
     }
-    // Map of all version migrations to their target version numbers.
-    Migrator.s_Versions = [
-        { versionNumber: LegacyMigration_1.LegacyMigration.TargetVersion, migration: new LegacyMigration_1.LegacyMigration() },
-        { versionNumber: Version0_6_5_1.Version0_6_5.TargetVersion, migration: new Version0_6_5_1.Version0_6_5() },
-        { versionNumber: Version0_6_10_1.Version0_6_10.TargetVersion, migration: new Version0_6_10_1.Version0_6_10() },
-    ];
-    return Migrator;
-})();
+    static migrate(migrations) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // we want to apply migrations in ascending order until we're up to the latest
+            migrations.sort((a, b) => {
+                return this.compareVersion(a.versionNumber, b.versionNumber);
+            });
+            yield this.migrateWorld(game, migrations);
+            yield this.migrateCompendium(game, migrations);
+            const localizedWarningTitle = game.i18n.localize('SR5.MIGRATION.SuccessTitle');
+            const localizedWarningHeader = game.i18n.localize('SR5.MIGRATION.SuccessHeader');
+            const localizedSuccessDescription = game.i18n.localize('SR5.MIGRATION.SuccessDescription');
+            const localizedSuccessPacksInfo = game.i18n.localize('SR5.MIGRATION.SuccessPacksInfo');
+            const localizedSuccessConfirm = game.i18n.localize('SR5.MIGRATION.SuccessConfirm');
+            const packsDialog = new Dialog({
+                title: localizedWarningTitle,
+                content: `<h2 style="text-align: center; color: green">${localizedWarningHeader}</h2>` +
+                    `<p>${localizedSuccessDescription}</p>` +
+                    `<p style="text-align: center"><i>${localizedSuccessPacksInfo}</i></p>`,
+                buttons: {
+                    ok: {
+                        icon: '<i class="fas fa-check"></i>',
+                        label: localizedSuccessConfirm,
+                    },
+                },
+                default: 'ok',
+            });
+            packsDialog.render(true);
+        });
+    }
+    /**
+     * Migrate all world objects
+     * @param game
+     * @param migrations
+     */
+    static migrateWorld(game, migrations) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // Run the migrations in order
+            for (const { migration } of migrations) {
+                yield migration.Migrate(game);
+            }
+        });
+    }
+    /**
+     * Iterate over all world compendium packs
+     * @param game Game that will be migrated
+     * @param migrations Instances of the version migration
+     */
+    static migrateCompendium(game, migrations) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // Migrate World Compendium Packs
+            const packs = game.packs.filter((pack) => pack.metadata.package === 'world' && ['Actor', 'Item', 'Scene'].includes(pack.metadata.entity));
+            // Run the migrations in order on each pack.
+            for (const pack of packs) {
+                for (const { migration } of migrations) {
+                    yield migration.MigrateCompendiumPack(pack);
+                }
+            }
+        });
+    }
+    // found at: https://helloacm.com/the-javascript-function-to-compare-version-number-strings/
+    // updated for typescript
+    /**
+     * compare two version numbers, returns 1 if v1 > v2, -1 if v1 < v2, 0 if equal
+     * @param v1
+     * @param v2
+     */
+    static compareVersion(v1, v2) {
+        const s1 = v1.split('.').map((s) => parseInt(s, 10));
+        const s2 = v2.split('.').map((s) => parseInt(s, 10));
+        const k = Math.min(v1.length, v2.length);
+        for (let i = 0; i < k; ++i) {
+            if (s1[i] > s2[i])
+                return 1;
+            if (s1[i] < s2[i])
+                return -1;
+        }
+        return v1.length === v2.length ? 0 : v1.length < v2.length ? -1 : 1;
+    }
+}
 exports.Migrator = Migrator;
-},{"./VersionMigration":44,"./versions/LegacyMigration":45,"./versions/Version0_6_10":46,"./versions/Version0_6_5":47}],44:[function(require,module,exports){
+// Map of all version migrations to their target version numbers.
+Migrator.s_Versions = [
+    { versionNumber: LegacyMigration_1.LegacyMigration.TargetVersion, migration: new LegacyMigration_1.LegacyMigration() },
+    { versionNumber: Version0_6_5_1.Version0_6_5.TargetVersion, migration: new Version0_6_5_1.Version0_6_5() },
+    { versionNumber: Version0_6_10_1.Version0_6_10.TargetVersion, migration: new Version0_6_10_1.Version0_6_10() },
+];
+},{"./VersionMigration":59,"./versions/LegacyMigration":60,"./versions/Version0_6_10":61,"./versions/Version0_6_5":62}],59:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -7934,421 +9088,418 @@ exports.VersionMigration = void 0;
  * Extending classes are only required to handle items, actors, and scenes,
  *  other methods are implementable purely for convenience and atomicity.
  */
-let VersionMigration = /** @class */ (() => {
-    class VersionMigration {
-        constructor() {
-            this.m_Abort = false;
-        }
-        get SourceVersionFriendlyName() {
-            return `v${this.SourceVersion}`;
-        }
-        get TargetVersionFriendlyName() {
-            return `v${this.TargetVersion}`;
-        }
-        /**
-         * Flag the migration to be aborted.
-         * @param reason The reason that the migration must be aborted, to be displayed
-         *  to the user and returned from the migration call.
-         */
-        abort(reason) {
-            this.m_Abort = true;
-            this.m_AbortReason = reason;
-            // @ts-ignore
-            ui.notifications.error(`Data migration has been aborted: ${reason}`, { permanent: true });
-        }
-        /**
-         * Begin migration for the specified game.
-         * @param game The world that should be migrated.
-         */
-        Migrate(game) {
-            return __awaiter(this, void 0, void 0, function* () {
-                // @ts-ignore TODO Unignore when Foundry Types updates
-                ui.notifications.info(`Beginning Shadowrun system migration from version ${this.SourceVersionFriendlyName} to ${this.TargetVersionFriendlyName}.`);
-                // @ts-ignore TODO Unignore when Foundry Types updates
-                ui.notifications.warn(`Please do not close your game or shutdown FoundryVTT.`, {
-                    permanent: true,
-                });
-                // Map of entities to update, store until later to reduce chance of partial updates
-                // which may result in impossible game states.
-                const entityUpdates = new Map();
-                // Migrate World Items
-                yield this.PreMigrateItemData(game, entityUpdates);
-                if (this.m_Abort) {
-                    return Promise.reject(this.m_AbortReason);
-                }
-                yield this.IterateItems(game, entityUpdates);
-                yield this.PostMigrateItemData(game, entityUpdates);
-                if (this.m_Abort) {
-                    return Promise.reject(this.m_AbortReason);
-                }
-                // Migrate World Actors
-                yield this.PreMigrateActorData(game, entityUpdates);
-                if (this.m_Abort) {
-                    return Promise.reject(this.m_AbortReason);
-                }
-                yield this.IterateActors(game, entityUpdates);
-                yield this.PostMigrateActorData(game, entityUpdates);
-                if (this.m_Abort) {
-                    return Promise.reject(this.m_AbortReason);
-                }
-                // Migrate Actor Tokens
-                yield this.PreMigrateSceneData(game, entityUpdates);
-                if (this.m_Abort) {
-                    return Promise.reject(this.m_AbortReason);
-                }
-                yield this.IterateScenes(game, entityUpdates);
-                yield this.PostMigrateSceneData(game, entityUpdates);
-                if (this.m_Abort) {
-                    return Promise.reject(this.m_AbortReason);
-                }
-                // Apply the updates, this should *always* work, now that parsing is complete.
-                yield this.Apply(entityUpdates);
-                yield game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
-                // @ts-ignore TODO Unignore when Foundry Types updates
-                ui.notifications.info(`Shadowrun system migration successfully migrated to version ${this.TargetVersion}.`, { permanent: true });
+class VersionMigration {
+    constructor() {
+        this.m_Abort = false;
+    }
+    get SourceVersionFriendlyName() {
+        return `v${this.SourceVersion}`;
+    }
+    get TargetVersionFriendlyName() {
+        return `v${this.TargetVersion}`;
+    }
+    /**
+     * Flag the migration to be aborted.
+     * @param reason The reason that the migration must be aborted, to be displayed
+     *  to the user and returned from the migration call.
+     */
+    abort(reason) {
+        this.m_Abort = true;
+        this.m_AbortReason = reason;
+        // @ts-ignore
+        ui.notifications.error(`Data migration has been aborted: ${reason}`, { permanent: true });
+    }
+    /**
+     * Begin migration for the specified game.
+     * @param game The world that should be migrated.
+     */
+    Migrate(game) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // @ts-ignore TODO Unignore when Foundry Types updates
+            ui.notifications.info(`Beginning Shadowrun system migration from version ${this.SourceVersionFriendlyName} to ${this.TargetVersionFriendlyName}.`);
+            // @ts-ignore TODO Unignore when Foundry Types updates
+            ui.notifications.warn(`Please do not close your game or shutdown FoundryVTT.`, {
+                permanent: true,
             });
-        }
-        /**
-         * Applies the specified mapping of entities, iteratively updating each.
-         * @param entityUpdates A mapping of entity updateData pairs.
-         */
-        Apply(entityUpdates) {
-            return __awaiter(this, void 0, void 0, function* () {
-                for (const [entity, { updateData, embeddedItems }] of entityUpdates) {
-                    if (embeddedItems !== null) {
-                        const actor = entity;
-                        yield actor.updateOwnedItem(embeddedItems);
-                    }
-                    yield entity.update(updateData, { enforceTypes: false });
+            // Map of entities to update, store until later to reduce chance of partial updates
+            // which may result in impossible game states.
+            const entityUpdates = new Map();
+            // Migrate World Items
+            yield this.PreMigrateItemData(game, entityUpdates);
+            if (this.m_Abort) {
+                return Promise.reject(this.m_AbortReason);
+            }
+            yield this.IterateItems(game, entityUpdates);
+            yield this.PostMigrateItemData(game, entityUpdates);
+            if (this.m_Abort) {
+                return Promise.reject(this.m_AbortReason);
+            }
+            // Migrate World Actors
+            yield this.PreMigrateActorData(game, entityUpdates);
+            if (this.m_Abort) {
+                return Promise.reject(this.m_AbortReason);
+            }
+            yield this.IterateActors(game, entityUpdates);
+            yield this.PostMigrateActorData(game, entityUpdates);
+            if (this.m_Abort) {
+                return Promise.reject(this.m_AbortReason);
+            }
+            // Migrate Actor Tokens
+            yield this.PreMigrateSceneData(game, entityUpdates);
+            if (this.m_Abort) {
+                return Promise.reject(this.m_AbortReason);
+            }
+            yield this.IterateScenes(game, entityUpdates);
+            yield this.PostMigrateSceneData(game, entityUpdates);
+            if (this.m_Abort) {
+                return Promise.reject(this.m_AbortReason);
+            }
+            // Apply the updates, this should *always* work, now that parsing is complete.
+            yield this.Apply(entityUpdates);
+            yield game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
+            // @ts-ignore TODO Unignore when Foundry Types updates
+            ui.notifications.info(`Shadowrun system migration successfully migrated to version ${this.TargetVersion}.`, { permanent: true });
+        });
+    }
+    /**
+     * Applies the specified mapping of entities, iteratively updating each.
+     * @param entityUpdates A mapping of entity updateData pairs.
+     */
+    Apply(entityUpdates) {
+        return __awaiter(this, void 0, void 0, function* () {
+            for (const [entity, { updateData, embeddedItems }] of entityUpdates) {
+                if (embeddedItems !== null) {
+                    const actor = entity;
+                    yield actor.updateOwnedItem(embeddedItems);
                 }
-            });
-        }
-        /**
-         * Iterate through all scenes and migrate each if needed.
-         * @param game
-         * @param entityUpdates
-         */
-        IterateScenes(game, entityUpdates) {
-            return __awaiter(this, void 0, void 0, function* () {
-                for (const scene of game.scenes.entities) {
-                    try {
-                        if (!(yield this.ShouldMigrateSceneData(scene))) {
-                            continue;
-                        }
-                        if (scene._id === 'MAwSFhlXRipixOWw') {
-                            console.log('Scene Pre-Update');
-                            console.log(scene);
-                        }
-                        console.log(`Migrating Scene entity ${scene.name}`);
-                        const updateData = yield this.MigrateSceneData(duplicate(scene.data));
-                        let hasTokenUpdates = false;
-                        updateData.tokens = yield Promise.all(
-                        // @ts-ignore
-                        scene.data.tokens.map((token) => __awaiter(this, void 0, void 0, function* () {
-                            if (isObjectEmpty(token.actorData)) {
-                                return token;
-                            }
-                            let tokenDataUpdate = yield this.MigrateActorData(token.actorData);
-                            if (!isObjectEmpty(tokenDataUpdate)) {
-                                hasTokenUpdates = true;
-                                tokenDataUpdate['_id'] = token._id;
-                                const newToken = duplicate(token);
-                                newToken.actorData = yield mergeObject(token.actorData, tokenDataUpdate, {
-                                    enforceTypes: false,
-                                    inplace: false,
-                                });
-                                console.log(newToken);
-                                return newToken;
-                            }
-                            else {
-                                return token;
-                            }
-                        })));
-                        if (scene._id === 'MAwSFhlXRipixOWw') {
-                            console.log('Scene Pre-Update');
-                            console.log(scene);
-                        }
-                        if (isObjectEmpty(updateData)) {
-                            continue;
-                        }
-                        expandObject(updateData);
-                        entityUpdates.set(scene, {
-                            updateData,
-                            embeddedItems: null,
-                        });
+                yield entity.update(updateData, { enforceTypes: false });
+            }
+        });
+    }
+    /**
+     * Iterate through all scenes and migrate each if needed.
+     * @param game
+     * @param entityUpdates
+     */
+    IterateScenes(game, entityUpdates) {
+        return __awaiter(this, void 0, void 0, function* () {
+            for (const scene of game.scenes.entities) {
+                try {
+                    if (!(yield this.ShouldMigrateSceneData(scene))) {
+                        continue;
                     }
-                    catch (error) {
-                        console.error(error);
-                        return Promise.reject(error);
+                    if (scene._id === 'MAwSFhlXRipixOWw') {
+                        console.log('Scene Pre-Update');
+                        console.log(scene);
                     }
-                }
-            });
-        }
-        /**
-         * Iterate through all items and migrate each if needed.
-         * @param game The game to be updated.
-         * @param entityUpdates The current map of entity updates.
-         */
-        IterateItems(game, entityUpdates) {
-            return __awaiter(this, void 0, void 0, function* () {
-                for (const item of game.items.entities) {
-                    try {
-                        if (!(yield this.ShouldMigrateItemData(item.data))) {
-                            continue;
-                        }
-                        console.log(`Migrating Item: ${item.name}`);
-                        const updateData = yield this.MigrateItemData(item.data);
-                        if (isObjectEmpty(updateData)) {
-                            continue;
-                        }
-                        expandObject(updateData);
-                        entityUpdates.set(item, {
-                            updateData,
-                            embeddedItems: null,
-                        });
-                    }
-                    catch (error) {
-                        console.error(error);
-                        return Promise.reject(error);
-                    }
-                }
-            });
-        }
-        /**
-         * Iterate through all actors and migrate each if needed.
-         * @param game The game to be updated.
-         * @param entityUpdates The current map of entity updates.
-         */
-        IterateActors(game, entityUpdates) {
-            return __awaiter(this, void 0, void 0, function* () {
-                for (const actor of game.actors.entities) {
-                    try {
-                        if (!(yield this.ShouldMigrateActorData(actor.data))) {
-                            continue;
-                        }
-                        console.log(`Migrating Actor ${actor.name}`);
-                        console.log(actor);
-                        const updateData = yield this.MigrateActorData(duplicate(actor.data));
-                        console.log(updateData);
-                        let items = [];
-                        if (updateData.items) {
-                            items = updateData.items;
-                            delete updateData.items;
-                        }
-                        expandObject(updateData);
-                        entityUpdates.set(actor, {
-                            updateData,
-                            embeddedItems: items,
-                        });
-                    }
-                    catch (error) {
-                        console.error(error);
-                        return Promise.reject(error);
-                    }
-                }
-            });
-        }
-        /**
-         * Iterate over an actor's items, updating those that need updating.
-         * @param actorData The actor to iterate over
-         * @param updateData The existing update data to merge into
-         */
-        IterateActorItems(actorData, updateData) {
-            return __awaiter(this, void 0, void 0, function* () {
-                let hasItemUpdates = false;
-                // @ts-ignore
-                if (actorData.items !== undefined) {
-                    const items = yield Promise.all(
+                    console.log(`Migrating Scene entity ${scene.name}`);
+                    const updateData = yield this.MigrateSceneData(duplicate(scene.data));
+                    let hasTokenUpdates = false;
+                    updateData.tokens = yield Promise.all(
                     // @ts-ignore
-                    actorData.items.map((item) => __awaiter(this, void 0, void 0, function* () {
-                        let itemUpdate = yield this.MigrateItemData(item);
-                        if (!isObjectEmpty(itemUpdate)) {
-                            hasItemUpdates = true;
-                            itemUpdate['_id'] = item._id;
-                            return yield mergeObject(item, itemUpdate, {
+                    scene.data.tokens.map((token) => __awaiter(this, void 0, void 0, function* () {
+                        if (isObjectEmpty(token.actorData)) {
+                            return token;
+                        }
+                        let tokenDataUpdate = yield this.MigrateActorData(token.actorData);
+                        if (!isObjectEmpty(tokenDataUpdate)) {
+                            hasTokenUpdates = true;
+                            tokenDataUpdate['_id'] = token._id;
+                            const newToken = duplicate(token);
+                            newToken.actorData = yield mergeObject(token.actorData, tokenDataUpdate, {
                                 enforceTypes: false,
                                 inplace: false,
                             });
+                            console.log(newToken);
+                            return newToken;
                         }
                         else {
-                            return item;
+                            return token;
                         }
                     })));
-                    if (hasItemUpdates) {
-                        updateData.items = items;
+                    if (scene._id === 'MAwSFhlXRipixOWw') {
+                        console.log('Scene Pre-Update');
+                        console.log(scene);
                     }
+                    if (isObjectEmpty(updateData)) {
+                        continue;
+                    }
+                    expandObject(updateData);
+                    entityUpdates.set(scene, {
+                        updateData,
+                        embeddedItems: null,
+                    });
                 }
-                return updateData;
-            });
-        }
-        /**
-         * Check if a scene requires updates.
-         * @param scene The scene to check.
-         * @return A promise that resolves true or false.
-         */
-        ShouldMigrateSceneData(scene) {
-            return __awaiter(this, void 0, void 0, function* () {
-                return false;
-            });
-        }
-        /**
-         * Migrate the specified scene's data.
-         * @param scene The scene to migrate.
-         * @return A promise that resolves with the update data.
-         */
-        MigrateSceneData(scene) {
-            return __awaiter(this, void 0, void 0, function* () {
-                return {};
-            });
-        }
-        /**
-         * Do something right before scene data is migrated.
-         * @param game The game to be updated.
-         * @param entityUpdates The current map of entity updates.
-         */
-        PreMigrateSceneData(game, entityUpdates) {
-            return __awaiter(this, void 0, void 0, function* () { });
-        }
-        /**
-         * Do something right before scene data is migrated.
-         * @param game The game to be updated.
-         * @param entityUpdates The current map of entity updates.
-         */
-        PostMigrateSceneData(game, entityUpdates) {
-            return __awaiter(this, void 0, void 0, function* () { });
-        }
-        /**
-         * Check if an item requires updates.
-         * @param item The item to check.
-         * @return A promise that resolves true or false.
-         */
-        ShouldMigrateItemData(item) {
-            return __awaiter(this, void 0, void 0, function* () {
-                return false;
-            });
-        }
-        /**
-         * Migrate the specified item's data.
-         * @param item The item to migrate.
-         * @return A promise that resolves with the update data.
-         */
-        MigrateItemData(item) {
-            return __awaiter(this, void 0, void 0, function* () {
-                return {};
-            });
-        }
-        /**
-         * Do something right before item data is migrated.
-         * @param game The game to be updated.
-         * @param entityUpdates The current map of entity updates.
-         */
-        PreMigrateItemData(game, entityUpdates) {
-            return __awaiter(this, void 0, void 0, function* () { });
-        }
-        /**
-         * Do something right before item data is migrated.
-         * @param game The game to be updated.
-         * @param entityUpdates The current map of entity updates.
-         */
-        PostMigrateItemData(game, entityUpdates) {
-            return __awaiter(this, void 0, void 0, function* () { });
-        }
-        /**
-         * Check if an actor requires updates.
-         * @param actor The actor to check.
-         * @return A promise that resolves true or false.
-         */
-        ShouldMigrateActorData(actor) {
-            return __awaiter(this, void 0, void 0, function* () {
-                return false;
-            });
-        }
-        /**
-         * Migrate the specified actor's data.
-         * @param actor The actor to migrate.
-         * @return A promise that resolves with the update data.
-         */
-        MigrateActorData(actor) {
-            return __awaiter(this, void 0, void 0, function* () {
-                return {};
-            });
-        }
-        /**
-         * Do something right before actor data is migrated.
-         * @param game The game to be updated.
-         * @param entityUpdates The current map of entity updates.
-         */
-        PreMigrateActorData(game, entityUpdates) {
-            return __awaiter(this, void 0, void 0, function* () { });
-        }
-        /**
-         * Do something right after actor data is migrated.
-         * @param game The game to be updated.
-         * @param entityUpdates The current map of entity updates.
-         */
-        PostMigrateActorData(game, entityUpdates) {
-            return __awaiter(this, void 0, void 0, function* () { });
-        }
-        /**
-         * Migrate a compendium pack
-         * @param pack
-         */
-        MigrateCompendiumPack(pack) {
-            return __awaiter(this, void 0, void 0, function* () {
-                const entity = pack.metadata.entity;
-                if (!['Actor', 'Item', 'Scene'].includes(entity))
-                    return;
-                // Begin by requesting server-side data model migration and get the migrated content
-                yield pack.migrate({});
-                const content = yield pack.getContent();
-                // Iterate over compendium entries - applying fine-tuned migration functions
-                for (let ent of content) {
-                    try {
-                        let updateData = null;
-                        if (entity === 'Item') {
-                            updateData = yield this.MigrateItemData(ent.data);
-                            if (isObjectEmpty(updateData)) {
-                                continue;
-                            }
-                            expandObject(updateData);
-                            updateData['_id'] = ent._id;
-                            yield pack.updateEntity(updateData);
-                            // TODO: Uncomment when foundry allows embeddeds to be updated in packs
-                            // } else if (entity === 'Actor') {
-                            //     updateData = await this.MigrateActorData(ent.data);
-                            //
-                            //     if (isObjectEmpty(updateData)) {
-                            //         continue;
-                            //     }
-                            //
-                            //     updateData['_id'] = ent._id;
-                            //     await pack.updateEntity(updateData);
-                        }
-                        else if (entity === 'Scene') {
-                            updateData = yield this.MigrateSceneData(ent.data);
-                            if (isObjectEmpty(updateData)) {
-                                continue;
-                            }
-                            expandObject(updateData);
-                            updateData['_id'] = ent._id;
-                            yield pack.updateEntity(updateData);
-                        }
-                    }
-                    catch (err) {
-                        console.error(err);
-                    }
+                catch (error) {
+                    console.error(error);
+                    return Promise.reject(error);
                 }
-                console.log(`Migrated all ${entity} entities from Compendium ${pack.collection}`);
-            });
-        }
+            }
+        });
     }
-    VersionMigration.MODULE_NAME = 'shadowrun5e';
-    VersionMigration.KEY_DATA_VERSION = 'systemMigrationVersion';
-    VersionMigration.NO_VERSION = '0';
-    return VersionMigration;
-})();
+    /**
+     * Iterate through all items and migrate each if needed.
+     * @param game The game to be updated.
+     * @param entityUpdates The current map of entity updates.
+     */
+    IterateItems(game, entityUpdates) {
+        return __awaiter(this, void 0, void 0, function* () {
+            for (const item of game.items.entities) {
+                try {
+                    if (!(yield this.ShouldMigrateItemData(item.data))) {
+                        continue;
+                    }
+                    console.log(`Migrating Item: ${item.name}`);
+                    const updateData = yield this.MigrateItemData(item.data);
+                    if (isObjectEmpty(updateData)) {
+                        continue;
+                    }
+                    expandObject(updateData);
+                    entityUpdates.set(item, {
+                        updateData,
+                        embeddedItems: null,
+                    });
+                }
+                catch (error) {
+                    console.error(error);
+                    return Promise.reject(error);
+                }
+            }
+        });
+    }
+    /**
+     * Iterate through all actors and migrate each if needed.
+     * @param game The game to be updated.
+     * @param entityUpdates The current map of entity updates.
+     */
+    IterateActors(game, entityUpdates) {
+        return __awaiter(this, void 0, void 0, function* () {
+            for (const actor of game.actors.entities) {
+                try {
+                    if (!(yield this.ShouldMigrateActorData(actor.data))) {
+                        continue;
+                    }
+                    console.log(`Migrating Actor ${actor.name}`);
+                    console.log(actor);
+                    const updateData = yield this.MigrateActorData(duplicate(actor.data));
+                    console.log(updateData);
+                    let items = [];
+                    if (updateData.items) {
+                        items = updateData.items;
+                        delete updateData.items;
+                    }
+                    expandObject(updateData);
+                    entityUpdates.set(actor, {
+                        updateData,
+                        embeddedItems: items,
+                    });
+                }
+                catch (error) {
+                    console.error(error);
+                    return Promise.reject(error);
+                }
+            }
+        });
+    }
+    /**
+     * Iterate over an actor's items, updating those that need updating.
+     * @param actorData The actor to iterate over
+     * @param updateData The existing update data to merge into
+     */
+    IterateActorItems(actorData, updateData) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let hasItemUpdates = false;
+            // @ts-ignore
+            if (actorData.items !== undefined) {
+                const items = yield Promise.all(
+                // @ts-ignore
+                actorData.items.map((item) => __awaiter(this, void 0, void 0, function* () {
+                    let itemUpdate = yield this.MigrateItemData(item);
+                    if (!isObjectEmpty(itemUpdate)) {
+                        hasItemUpdates = true;
+                        itemUpdate['_id'] = item._id;
+                        return yield mergeObject(item, itemUpdate, {
+                            enforceTypes: false,
+                            inplace: false,
+                        });
+                    }
+                    else {
+                        return item;
+                    }
+                })));
+                if (hasItemUpdates) {
+                    updateData.items = items;
+                }
+            }
+            return updateData;
+        });
+    }
+    /**
+     * Check if a scene requires updates.
+     * @param scene The scene to check.
+     * @return A promise that resolves true or false.
+     */
+    ShouldMigrateSceneData(scene) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return false;
+        });
+    }
+    /**
+     * Migrate the specified scene's data.
+     * @param scene The scene to migrate.
+     * @return A promise that resolves with the update data.
+     */
+    MigrateSceneData(scene) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return {};
+        });
+    }
+    /**
+     * Do something right before scene data is migrated.
+     * @param game The game to be updated.
+     * @param entityUpdates The current map of entity updates.
+     */
+    PreMigrateSceneData(game, entityUpdates) {
+        return __awaiter(this, void 0, void 0, function* () { });
+    }
+    /**
+     * Do something right before scene data is migrated.
+     * @param game The game to be updated.
+     * @param entityUpdates The current map of entity updates.
+     */
+    PostMigrateSceneData(game, entityUpdates) {
+        return __awaiter(this, void 0, void 0, function* () { });
+    }
+    /**
+     * Check if an item requires updates.
+     * @param item The item to check.
+     * @return A promise that resolves true or false.
+     */
+    ShouldMigrateItemData(item) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return false;
+        });
+    }
+    /**
+     * Migrate the specified item's data.
+     * @param item The item to migrate.
+     * @return A promise that resolves with the update data.
+     */
+    MigrateItemData(item) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return {};
+        });
+    }
+    /**
+     * Do something right before item data is migrated.
+     * @param game The game to be updated.
+     * @param entityUpdates The current map of entity updates.
+     */
+    PreMigrateItemData(game, entityUpdates) {
+        return __awaiter(this, void 0, void 0, function* () { });
+    }
+    /**
+     * Do something right before item data is migrated.
+     * @param game The game to be updated.
+     * @param entityUpdates The current map of entity updates.
+     */
+    PostMigrateItemData(game, entityUpdates) {
+        return __awaiter(this, void 0, void 0, function* () { });
+    }
+    /**
+     * Check if an actor requires updates.
+     * @param actor The actor to check.
+     * @return A promise that resolves true or false.
+     */
+    ShouldMigrateActorData(actor) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return false;
+        });
+    }
+    /**
+     * Migrate the specified actor's data.
+     * @param actor The actor to migrate.
+     * @return A promise that resolves with the update data.
+     */
+    MigrateActorData(actor) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return {};
+        });
+    }
+    /**
+     * Do something right before actor data is migrated.
+     * @param game The game to be updated.
+     * @param entityUpdates The current map of entity updates.
+     */
+    PreMigrateActorData(game, entityUpdates) {
+        return __awaiter(this, void 0, void 0, function* () { });
+    }
+    /**
+     * Do something right after actor data is migrated.
+     * @param game The game to be updated.
+     * @param entityUpdates The current map of entity updates.
+     */
+    PostMigrateActorData(game, entityUpdates) {
+        return __awaiter(this, void 0, void 0, function* () { });
+    }
+    /**
+     * Migrate a compendium pack
+     * @param pack
+     */
+    MigrateCompendiumPack(pack) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const entity = pack.metadata.entity;
+            if (!['Actor', 'Item', 'Scene'].includes(entity))
+                return;
+            // Begin by requesting server-side data model migration and get the migrated content
+            yield pack.migrate({});
+            const content = yield pack.getContent();
+            // Iterate over compendium entries - applying fine-tuned migration functions
+            for (let ent of content) {
+                try {
+                    let updateData = null;
+                    if (entity === 'Item') {
+                        updateData = yield this.MigrateItemData(ent.data);
+                        if (isObjectEmpty(updateData)) {
+                            continue;
+                        }
+                        expandObject(updateData);
+                        updateData['_id'] = ent._id;
+                        yield pack.updateEntity(updateData);
+                        // TODO: Uncomment when foundry allows embeddeds to be updated in packs
+                        // } else if (entity === 'Actor') {
+                        //     updateData = await this.MigrateActorData(ent.data);
+                        //
+                        //     if (isObjectEmpty(updateData)) {
+                        //         continue;
+                        //     }
+                        //
+                        //     updateData['_id'] = ent._id;
+                        //     await pack.updateEntity(updateData);
+                    }
+                    else if (entity === 'Scene') {
+                        updateData = yield this.MigrateSceneData(ent.data);
+                        if (isObjectEmpty(updateData)) {
+                            continue;
+                        }
+                        expandObject(updateData);
+                        updateData['_id'] = ent._id;
+                        yield pack.updateEntity(updateData);
+                    }
+                }
+                catch (err) {
+                    console.error(err);
+                }
+            }
+            console.log(`Migrated all ${entity} entities from Compendium ${pack.collection}`);
+        });
+    }
+}
 exports.VersionMigration = VersionMigration;
-},{}],45:[function(require,module,exports){
+VersionMigration.MODULE_NAME = 'shadowrun5e';
+VersionMigration.KEY_DATA_VERSION = 'systemMigrationVersion';
+VersionMigration.NO_VERSION = '0';
+},{}],60:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -8577,7 +9728,7 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
     }
 }
 exports.LegacyMigration = LegacyMigration;
-},{"../VersionMigration":44}],46:[function(require,module,exports){
+},{"../VersionMigration":59}],61:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -8637,7 +9788,7 @@ class Version0_6_10 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_6_10 = Version0_6_10;
-},{"../VersionMigration":44}],47:[function(require,module,exports){
+},{"../VersionMigration":59}],62:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -8687,7 +9838,7 @@ class Version0_6_5 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_6_5 = Version0_6_5;
-},{"../VersionMigration":44}],48:[function(require,module,exports){
+},{"../VersionMigration":59}],63:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PartsList = void 0;
@@ -8795,7 +9946,7 @@ class PartsList {
     }
 }
 exports.PartsList = PartsList;
-},{}],49:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -9074,7 +10225,7 @@ class ShadowrunRoller {
     }
 }
 exports.ShadowrunRoller = ShadowrunRoller;
-},{"../chat":26,"../constants":29,"../helpers":37,"../parts/PartsList":48}],50:[function(require,module,exports){
+},{"../chat":41,"../constants":44,"../helpers":52,"../parts/PartsList":63}],65:[function(require,module,exports){
 "use strict";
 // game settings for shadowrun 5e
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -9144,7 +10295,7 @@ exports.registerSystemSettings = () => {
         default: true
     });
 };
-},{"./constants":29,"./migrator/VersionMigration":44}],51:[function(require,module,exports){
+},{"./constants":44,"./migrator/VersionMigration":59}],66:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Template extends MeasuredTemplate {
@@ -9235,6 +10386,6 @@ class Template extends MeasuredTemplate {
     }
 }
 exports.default = Template;
-},{}]},{},[42])
+},{}]},{},[57])
 
 //# sourceMappingURL=bundle.js.map

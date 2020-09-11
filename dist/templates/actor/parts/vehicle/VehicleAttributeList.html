@@ -1,0 +1,12 @@
+<div class="flexcol">
+    {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Limits.html" }}
+    <div class="attributes">
+        {{#each data.vehicle_stats as |attribute a|}}
+            {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                    attribute=attribute
+                    attributesPath="data.vehicle_stats"
+                    disableBase=../autoBase
+            }}
+        {{/each}}
+    </div>
+</div>

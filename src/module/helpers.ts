@@ -13,6 +13,10 @@ export class Helpers {
     static calcTotal(data: ModifiableValue): number {
         if (data.mod === undefined) data.mod = [];
         const parts = new PartsList(data.mod);
+        // if a temp field is found, add it as a unique part
+        if (data['temp'] !== undefined) {
+            parts.addUniquePart('SR5.Temporary', data['temp']);
+        }
         data.value = parts.total + data.base;
         data.mod = parts.list;
         return data.value;
@@ -170,18 +174,6 @@ export class Helpers {
             obj[keys[i]] = after[keys[i]];
         }
         return obj;
-    }
-
-    static setNestedValue(obj, prop, val) {
-        console.log(obj);
-        console.log(prop);
-        console.log(val);
-        const props = prop.split('.');
-        props.forEach((p) => (obj = p in obj ? obj[p] : null));
-        if (obj) {
-            console.log(`setting ${obj} to ${val}`);
-            obj = val;
-        }
     }
 
     static hasModifiers(event) {

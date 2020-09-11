@@ -24,7 +24,7 @@ export class LegacyMigration extends VersionMigration {
         return updateData;
     }
 
-    protected async MigrateItemData(item: BaseEntityData): Promise<any> {
+    protected async MigrateItemData(item: EntityData): Promise<any> {
         const updateData = {};
         LegacyMigration.migrateDamageTypeAndElement(item, updateData);
         LegacyMigration.migrateItemsAddActions(item, updateData);
@@ -43,7 +43,7 @@ export class LegacyMigration extends VersionMigration {
         return true;
     }
 
-    protected async ShouldMigrateItemData(item: BaseEntityData): Promise<boolean> {
+    protected async ShouldMigrateItemData(item: EntityData): Promise<boolean> {
         return true;
     }
 

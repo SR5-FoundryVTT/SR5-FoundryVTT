@@ -155,6 +155,8 @@
     flex-flow: row;
     flex-wrap: nowrap;
     justify-content: space-between; }
+    .sr5.actor .attributes.center {
+      justify-content: center; }
     .sr5.actor .attributes.no-border {
       border-top: none;
       border-bottom: none; }
@@ -180,6 +182,8 @@
       min-width: 4em; }
       .sr5.actor .attributes .attribute.no-border {
         border-right: none; }
+      .sr5.actor .attributes .attribute.no-grow {
+        flex-grow: 0; }
       .sr5.actor .attributes .attribute:hover .attribute-input-container.row {
         visibility: visible; }
       .sr5.actor .attributes .attribute.flex0 {
@@ -489,6 +493,11 @@
   src: url("assets/fonts/NodestoCapsCondensed.otf"); }
 
 .roll:hover {
+  text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
+  cursor: pointer;
+  color: #6495ed; }
+
+.Roll:hover {
   text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
   cursor: pointer;
   color: #6495ed; }
@@ -821,7 +830,7 @@ select.display {
     margin-right: 8px; }
   .sr5 .horizontal-cell-input .cell-container {
     display: flex;
-    flex-flow: row nowrap;
+    flex-flow: row;
     justify-content: stretch; }
     .sr5 .horizontal-cell-input .cell-container .cell {
       cursor: pointer;

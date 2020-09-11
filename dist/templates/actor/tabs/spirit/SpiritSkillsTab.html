@@ -1,0 +1,16 @@
+{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.html' tabId='skills'}}
+    <div>
+        {{> 'systems/shadowrun5e/dist/templates/actor/parts/attributes/AttributeList.html' autoBase="true" }}
+    </div>
+    <div class="inventory">
+        <div class="split-container">
+            {{> 'systems/shadowrun5e/dist/templates/actor/parts/skills/ActiveSkillList.html' }}
+            <div class="flexcol">
+                {{> 'systems/shadowrun5e/dist/templates/actor/parts/attributes/SpecialAttributeList.html' }}
+                <div>
+                    {{> 'systems/shadowrun5e/dist/templates/actor/parts/magic/SpiritOptions.html' }}
+                </div>
+            </div>
+        </div>
+    </div>
+{{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.html'}}
