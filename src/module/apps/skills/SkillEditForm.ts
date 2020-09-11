@@ -77,7 +77,6 @@ export class SkillEditForm extends BaseEntitySheet {
     async _updateObject(event, formData) {
         const updateData = {};
         this._onUpdateObject(event, formData, updateData);
-        console.log(formData);
         await this.entity.update(updateData);
     }
 

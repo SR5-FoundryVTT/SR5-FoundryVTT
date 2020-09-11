@@ -1305,8 +1305,6 @@ class SR5Actor extends Actor {
                             title: game.i18n.localize('SR5.DefenseTest'),
                             incomingAttack,
                         }).then((roll) => __awaiter(this, void 0, void 0, function* () {
-                            console.log('roll', roll);
-                            console.log('incomingAttack', incomingAttack);
                             if (incomingAttack && roll) {
                                 let defenderHits = roll.total;
                                 let attackerHits = incomingAttack.hits || 0;
@@ -1403,9 +1401,7 @@ class SR5Actor extends Actor {
                                 // add part and calc total again
                                 soak.mod = PartsList_1.PartsList.AddUniquePart(soak.mod, 'SR5.UserInput', diff);
                                 soak.value = helpers_1.Helpers.calcTotal(soak);
-                                console.log(soak);
                             }
-                            console.log(soak);
                             const totalAp = helpers_1.Helpers.calcTotal(soak.ap);
                             if (totalAp !== ap) {
                                 const diff = ap - totalAp;
@@ -1736,7 +1732,7 @@ class SR5Actor extends Actor {
             if (skill && limit) {
                 parts.addPart('SR5.Vehicle.Stats.Pilot', pilot);
                 // TODO possibly look for autosoft item level?
-                parts.addPart("SR5.Vehicle.Maneuvering", helpers_1.Helpers.calcTotal(skill));
+                parts.addPart('SR5.Vehicle.Maneuvering', helpers_1.Helpers.calcTotal(skill));
                 this._addGlobalParts(parts);
                 return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
                     event: options === null || options === void 0 ? void 0 : options.event,
@@ -2324,7 +2320,9 @@ class SR5ActorSheet extends ActorSheet {
         /**
          * Open the PDF for an item on the actor
          */
-        $(html).find('.open-source-pdf').on('click', (event) => __awaiter(this, void 0, void 0, function* () {
+        $(html)
+            .find('.open-source-pdf')
+            .on('click', (event) => __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
             const field = $(event.currentTarget).parents('.list-item');
             const iid = $(field).data().itemId;
@@ -2387,8 +2385,6 @@ class SR5ActorSheet extends ActorSheet {
             let rollId = (_a = $(event.currentTarget).data()) === null || _a === void 0 ? void 0 : _a.rollId;
             // if that doesn't exist, look for a prent with RollId name
             rollId = rollId !== null && rollId !== void 0 ? rollId : $(event.currentTarget).parent('.RollId').data().rollId;
-            console.log('');
-            console.log(rollId);
             const split = rollId.split('.');
             const options = { event };
             switch (split[0]) {
@@ -2535,7 +2531,6 @@ class SR5ActorSheet extends ActorSheet {
     _onItemCreate(event) {
         event.preventDefault();
         const type = helpers_1.Helpers.listItemId(event);
-        console.log(type);
         const itemData = {
             name: `New ${type}`,
             type: type,
@@ -3372,7 +3367,6 @@ class VehiclePrep extends BaseActorPrep_1.BaseActorPrep {
         InitiativePrep_1.InitiativePrep.prepareMatrixInit(this.data);
         InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(this.data);
         VehiclePrep.prepareArmor(this.data);
-        console.log(this.data);
     }
     static prepareVehicleStats(data) {
         var _a;
@@ -3455,7 +3449,7 @@ class VehiclePrep extends BaseActorPrep_1.BaseActorPrep {
     }
     static prepareArmor(data) {
         const { armor } = data;
-        armor.mod = PartsList_1.PartsList.AddUniquePart(armor.mod, "SR5.Temporary", armor['temp']);
+        armor.mod = PartsList_1.PartsList.AddUniquePart(armor.mod, 'SR5.Temporary', armor['temp']);
         helpers_1.Helpers.calcTotal(armor);
     }
 }
@@ -5191,7 +5185,6 @@ class SkillEditForm extends BaseEntitySheet {
         return __awaiter(this, void 0, void 0, function* () {
             const updateData = {};
             this._onUpdateObject(event, formData, updateData);
-            console.log(formData);
             yield this.entity.update(updateData);
         });
     }
@@ -6916,17 +6909,6 @@ class Helpers {
         }
         return obj;
     }
-    static setNestedValue(obj, prop, val) {
-        console.log(obj);
-        console.log(prop);
-        console.log(val);
-        const props = prop.split('.');
-        props.forEach((p) => (obj = p in obj ? obj[p] : null));
-        if (obj) {
-            console.log(`setting ${obj} to ${val}`);
-            obj = val;
-        }
-    }
     static hasModifiers(event) {
         return event && (event.shiftKey || event.altKey || event.ctrlKey || event.metaKey);
     }
@@ -7805,8 +7787,6 @@ class SR5Item extends Item {
             const parts = this.getOpposedTestMod();
             const { opposed } = itemData.action;
             if (opposed.type === 'defense') {
-                console.log('defense roll');
-                console.log(lastAttack);
                 if (lastAttack) {
                     options['incomingAttack'] = lastAttack;
                     options.cover = true;

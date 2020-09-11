@@ -562,8 +562,6 @@ export class SR5Item extends Item {
         const { opposed } = itemData.action;
 
         if (opposed.type === 'defense') {
-            console.log('defense roll');
-            console.log(lastAttack);
             if (lastAttack) {
                 options['incomingAttack'] = lastAttack;
                 options.cover = true;

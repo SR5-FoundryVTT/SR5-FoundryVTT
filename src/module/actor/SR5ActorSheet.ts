@@ -402,8 +402,6 @@ export class SR5ActorSheet extends ActorSheet {
         let rollId = $(event.currentTarget).data()?.rollId;
         // if that doesn't exist, look for a prent with RollId name
         rollId = rollId ?? $(event.currentTarget).parent('.RollId').data().rollId;
-        console.log('');
-        console.log(rollId);
 
         const split = rollId.split('.');
         const options = { event };
@@ -555,7 +553,6 @@ export class SR5ActorSheet extends ActorSheet {
     _onItemCreate(event) {
         event.preventDefault();
         const type = Helpers.listItemId(event);
-        console.log(type);
         const itemData = {
             name: `New ${type}`,
             type: type,
