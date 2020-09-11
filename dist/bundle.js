@@ -1305,6 +1305,8 @@ class SR5Actor extends Actor {
                             title: game.i18n.localize('SR5.DefenseTest'),
                             incomingAttack,
                         }).then((roll) => __awaiter(this, void 0, void 0, function* () {
+                            console.log('roll', roll);
+                            console.log('incomingAttack', incomingAttack);
                             if (incomingAttack && roll) {
                                 let defenderHits = roll.total;
                                 let attackerHits = incomingAttack.hits || 0;
@@ -7803,6 +7805,8 @@ class SR5Item extends Item {
             const parts = this.getOpposedTestMod();
             const { opposed } = itemData.action;
             if (opposed.type === 'defense') {
+                console.log('defense roll');
+                console.log(lastAttack);
                 if (lastAttack) {
                     options['incomingAttack'] = lastAttack;
                     options.cover = true;
@@ -7853,7 +7857,11 @@ class SR5Item extends Item {
             const promise = ShadowrunRoller_1.ShadowrunRoller.itemRoll(event, this, options);
             // handle promise when it resolves for our own stuff
             promise.then((roll) => __awaiter(this, void 0, void 0, function* () {
-                var _a, _b;
+                var _a, _b, _c;
+                const attackData = this.getAttackData((_a = roll === null || roll === void 0 ? void 0 : roll.total) !== null && _a !== void 0 ? _a : 0);
+                if (attackData) {
+                    yield this.setLastAttack(attackData);
+                }
                 // complex form handles fade
                 if (this.isComplexForm()) {
                     const totalFade = Math.max(this.getFade() + this.getLastComplexFormLevel().value, 2);
@@ -7861,22 +7869,14 @@ class SR5Item extends Item {
                 } // spells handle drain, force, and attack data
                 else if (this.isSpell()) {
                     if (this.isCombatSpell() && roll) {
-                        const attackData = this.getAttackData(roll.total);
-                        if (attackData) {
-                            yield this.setLastAttack(attackData);
-                        }
                     }
                     const forceData = this.getLastSpellForce();
                     const drain = Math.max(this.getDrain() + forceData.value + (forceData.reckless ? 3 : 0), 2);
-                    yield ((_a = this.actor) === null || _a === void 0 ? void 0 : _a.rollDrain({ event }, drain));
+                    yield ((_b = this.actor) === null || _b === void 0 ? void 0 : _b.rollDrain({ event }, drain));
                 } // weapons handle ammo and attack data
                 else if (this.data.type === 'weapon') {
-                    const attackData = this.getAttackData((roll === null || roll === void 0 ? void 0 : roll.total) || 0);
-                    if (attackData) {
-                        yield this.setLastAttack(attackData);
-                    }
                     if (this.hasAmmo) {
-                        const fireMode = ((_b = this.getLastFireMode()) === null || _b === void 0 ? void 0 : _b.value) || 1;
+                        const fireMode = ((_c = this.getLastFireMode()) === null || _c === void 0 ? void 0 : _c.value) || 1;
                         yield this.useAmmo(fireMode);
                     }
                 }
@@ -8061,7 +8061,7 @@ class SR5Item extends Item {
     }
     getAttackData(hits) {
         var _a;
-        if (!((_a = this.data.data.action) === null || _a === void 0 ? void 0 : _a.damage))
+        if (!((_a = this.data.data.action) === null || _a === void 0 ? void 0 : _a.damage.type))
             return undefined;
         const damage = this.data.data.action.damage;
         const data = {

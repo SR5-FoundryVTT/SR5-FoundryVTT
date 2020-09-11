@@ -562,6 +562,8 @@ export class SR5Item extends Item {
         const { opposed } = itemData.action;
 
         if (opposed.type === 'defense') {
+            console.log('defense roll');
+            console.log(lastAttack);
             if (lastAttack) {
                 options['incomingAttack'] = lastAttack;
                 options.cover = true;
@@ -609,6 +611,11 @@ export class SR5Item extends Item {
 
         // handle promise when it resolves for our own stuff
         promise.then(async (roll) => {
+            const attackData = this.getAttackData(roll?.total ?? 0);
+            if (attackData) {
+                await this.setLastAttack(attackData);
+            }
+
             // complex form handles fade
             if (this.isComplexForm()) {
                 const totalFade = Math.max(this.getFade() + this.getLastComplexFormLevel().value, 2);
@@ -616,20 +623,12 @@ export class SR5Item extends Item {
             } // spells handle drain, force, and attack data
             else if (this.isSpell()) {
                 if (this.isCombatSpell() && roll) {
-                    const attackData = this.getAttackData(roll.total);
-                    if (attackData) {
-                        await this.setLastAttack(attackData);
-                    }
                 }
                 const forceData = this.getLastSpellForce();
                 const drain = Math.max(this.getDrain() + forceData.value + (forceData.reckless ? 3 : 0), 2);
                 await this.actor?.rollDrain({ event }, drain);
             } // weapons handle ammo and attack data
             else if (this.data.type === 'weapon') {
-                const attackData = this.getAttackData(roll?.total || 0);
-                if (attackData) {
-                    await this.setLastAttack(attackData);
-                }
                 if (this.hasAmmo) {
                     const fireMode = this.getLastFireMode()?.value || 1;
                     await this.useAmmo(fireMode);
@@ -804,7 +803,7 @@ export class SR5Item extends Item {
     }
 
     getAttackData(hits: number): AttackData | undefined {
-        if (!this.data.data.action?.damage) return undefined;
+        if (!this.data.data.action?.damage.type) return undefined;
         const damage = this.data.data.action.damage;
         const data: AttackData = {
             hits,

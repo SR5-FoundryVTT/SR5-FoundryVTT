@@ -373,6 +373,8 @@ export class SR5Actor extends Actor {
                                 title: game.i18n.localize('SR5.DefenseTest'),
                                 incomingAttack,
                             }).then(async (roll: Roll | undefined) => {
+                                console.log('roll', roll);
+                                console.log('incomingAttack', incomingAttack);
                                 if (incomingAttack && roll) {
                                     let defenderHits = roll.total;
                                     let attackerHits = incomingAttack.hits || 0;
