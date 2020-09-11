@@ -34,15 +34,18 @@
                 {{> 'systems/shadowrun5e/dist/templates/actor/parts/Movement.html' }}
                 {{> 'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html' }}
             </div>
-            <div class="attributes">
-                <div class="attribute">
-                    {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
-                            name=(localize "SR5.AttrEdge")
-                            value=data.attributes.edge.uses
-                            max=data.attributes.edge.value
-                            id="edge"
-                    }}
-                </div>
+            <div>
+                {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Spirit.Services") }}
+                    <div class="item-text">
+                        {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.html'
+                                cssClass="attribute-input"
+                                size="2"
+                                maxLength="2"
+                                value=data.services
+                                name="data.services"
+                        }}
+                    </div>
+                {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
             </div>
         </div>
     </header>
