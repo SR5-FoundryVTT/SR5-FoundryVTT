@@ -6348,7 +6348,6 @@ exports.registerItemLineHelpers = () => {
     });
     Handlebars.registerHelper('ItemRightSide', function (item) {
         var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t;
-        // TODO add button for accessing the PDF if PDFoundry is available and the source field is filled in
         const wrapper = new SR5ItemDataWrapper_1.SR5ItemDataWrapper(item);
         const qtyInput = {
             input: {
