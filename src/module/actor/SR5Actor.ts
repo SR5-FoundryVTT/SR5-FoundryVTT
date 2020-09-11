@@ -20,6 +20,7 @@ import DamageData = Shadowrun.DamageData;
 import DamageElement = Shadowrun.DamageElement;
 import EdgeAttributeField = Shadowrun.EdgeAttributeField;
 import VehicleActorData = Shadowrun.VehicleActorData;
+import VehicleStat = Shadowrun.VehicleStat;
 
 export class SR5Actor extends Actor {
     async update(data, options?) {
@@ -73,6 +74,11 @@ export class SR5Actor extends Actor {
         return this.data.data.attributes[attributeName];
     }
 
+    findVehicleStat(statName?: string): VehicleStat | undefined {
+        if (statName === undefined) return undefined;
+        return this.data.data.vehicle_stats[statName];
+    }
+
     findLimitFromAttribute(attributeName?: string): LimitField | undefined {
         if (attributeName === undefined) return undefined;
         const attribute = this.findAttribute(attributeName);
@@ -108,9 +114,13 @@ export class SR5Actor extends Actor {
     }
 
     getFullDefenseAttribute(): AttributeField | undefined {
-        let att = this.data.data.full_defense_attribute;
-        if (!att) att = 'willpower';
-        return this.findAttribute(att);
+        if (this.isVehicle()) {
+            return this.findVehicleStat('pilot');
+        } else {
+            let att = this.data.data.full_defense_attribute;
+            if (!att) att = 'willpower';
+            return this.findAttribute(att);
+        }
     }
 
     getEquippedWeapons(): SR5Item[] {
@@ -132,6 +142,33 @@ export class SR5Actor extends Actor {
 
     isVehicle() {
         return this.data.type === 'vehicle';
+    }
+
+    getVehicleTypeSkill(): SkillField | undefined {
+        let skill: SkillField | undefined;
+        switch (this.data.data.vehicleType) {
+            case 'air':
+                skill = this.findActiveSkill('pilot_aircraft');
+                break;
+            case 'ground':
+                skill = this.findActiveSkill('pilot_ground_craft');
+                break;
+            case 'water':
+                skill = this.findActiveSkill('pilot_water_craft');
+                break;
+            case 'aerospace':
+                skill = this.findActiveSkill('pilot_aerospace');
+                break;
+            case 'walker':
+                skill = this.findActiveSkill('pilot_walker');
+                break;
+            case 'exotic':
+                skill = this.findActiveSkill('pilot_exotic_vehicle');
+                break;
+            default:
+                break;
+        }
+        return skill;
     }
 
     addKnowledgeSkill(category, skill?) {
@@ -781,39 +818,14 @@ export class SR5Actor extends Actor {
             const parts = new PartsList<number>();
 
             const pilot = Helpers.calcTotal(actorData.vehicle_stats.pilot);
-            let skill: SkillField | undefined = undefined;
-            switch (actorData.vehicleType) {
-                case 'air':
-                    skill = this.findActiveSkill('pilot_aircraft');
-                    break;
-                case 'ground':
-                    skill = this.findActiveSkill('pilot_ground_craft');
-                    break;
-                case 'water':
-                    skill = this.findActiveSkill('pilot_water_craft');
-                    break;
-                case 'aerospace':
-                    skill = this.findActiveSkill('pilot_aerospace');
-                    break;
-                case 'walker':
-                    skill = this.findActiveSkill('pilot_walker');
-                    break;
-                case 'exotic':
-                    skill = this.findActiveSkill('pilot_exotic_vehicle');
-                    break;
-                default:
-                    break;
-            }
+            let skill: SkillField | undefined = this.getVehicleTypeSkill();
             const environment = actorData.environment;
-            //
             const limit = this.findLimit(environment);
-
-            console.log(skill, limit);
 
             if (skill && limit) {
                 parts.addPart('SR5.Vehicle.Stats.Pilot', pilot);
                 // TODO possibly look for autosoft item level?
-                parts.addPart(skill.label, Helpers.calcTotal(skill));
+                parts.addPart("SR5.Vehicle.Maneuvering", Helpers.calcTotal(skill));
 
                 this._addGlobalParts(parts);
 
@@ -947,16 +959,28 @@ export class SR5Actor extends Actor {
     }
 
     _addDefenseParts(parts: PartsList<number>) {
-        const reaction = this.findAttribute('reaction');
-        const intuition = this.findAttribute('intuition');
-        const mod = this.getModifier('defense');
+        if (this.isVehicle()) {
+            const pilot = this.findVehicleStat('pilot');
+            if (pilot) {
+                parts.addUniquePart(pilot.label, Helpers.calcTotal(pilot));
+            }
+            const skill = this.getVehicleTypeSkill();
+            if (skill) {
+                parts.addUniquePart('SR5.Vehicle.Maneuvering', Helpers.calcTotal(skill));
+            }
+        } else {
+            const reaction = this.findAttribute('reaction');
+            const intuition = this.findAttribute('intuition');
 
-        if (reaction) {
-            parts.addUniquePart(reaction.label || 'SR5.Reaction', reaction.value);
+            if (reaction) {
+                parts.addUniquePart(reaction.label || 'SR5.Reaction', reaction.value);
+            }
+            if (intuition) {
+                parts.addUniquePart(intuition.label || 'SR5.Intuition', intuition.value);
+            }
         }
-        if (intuition) {
-            parts.addUniquePart(intuition.label || 'SR5.Intuition', intuition.value);
-        }
+
+        const mod = this.getModifier('defense');
         if (mod) {
             parts.addUniquePart('SR5.Bonus', mod);
         }
