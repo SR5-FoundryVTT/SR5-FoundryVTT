@@ -322,12 +322,12 @@ export const registerItemLineHelpers = () => {
                     },
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.critterPower.durations[item.data.duration ?? '']),
+                            text: game.i18n.localize(CONFIG.SR5.critterPower.ranges[item.data.range ?? '']),
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.critterPower.ranges[item.data.range ?? '']),
+                            text: game.i18n.localize(CONFIG.SR5.critterPower.durations[item.data.duration ?? '']),
                         },
                     },
                 ];

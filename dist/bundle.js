@@ -6494,12 +6494,12 @@ exports.registerItemLineHelpers = () => {
                     },
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.critterPower.durations[(_q = item.data.duration) !== null && _q !== void 0 ? _q : '']),
+                            text: game.i18n.localize(CONFIG.SR5.critterPower.ranges[(_q = item.data.range) !== null && _q !== void 0 ? _q : '']),
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.critterPower.ranges[(_r = item.data.range) !== null && _r !== void 0 ? _r : '']),
+                            text: game.i18n.localize(CONFIG.SR5.critterPower.durations[(_r = item.data.duration) !== null && _r !== void 0 ? _r : '']),
                         },
                     },
                 ];
