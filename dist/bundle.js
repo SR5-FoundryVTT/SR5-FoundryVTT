@@ -3728,8 +3728,12 @@ class MatrixPrep {
                 helpers_1.Helpers.calcTotal(attributes[attLabel]);
             }
         });
-        ['firewall', 'data_processing'].forEach(attId => {
+        const basic = ['firewall', 'data_processing'];
+        basic.forEach((attId) => {
             matrix[attId].base = rating;
+        });
+        [...basic, 'sleaze', 'attack'].forEach((attId) => {
+            helpers_1.Helpers.calcTotal(matrix[attId]);
         });
     }
 }
@@ -6050,6 +6054,7 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/dist/templates/actor/tabs/spirit/SpiritSkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/matrix/SpriteSkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/vehicle/VehicleSkillsTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/vehicle/VehicleMatrixTab.html',
         // uncategorized lists
         'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html',
         'systems/shadowrun5e/dist/templates/actor/parts/Movement.html',
@@ -6679,6 +6684,10 @@ class Helpers {
         if (data.mod === undefined)
             data.mod = [];
         const parts = new PartsList_1.PartsList(data.mod);
+        // if a temp field is found, add it as a unique part
+        if (data['temp'] !== undefined) {
+            parts.addUniquePart('SR5.Temporary', data['temp']);
+        }
         data.value = parts.total + data.base;
         data.mod = parts.list;
         return data.value;

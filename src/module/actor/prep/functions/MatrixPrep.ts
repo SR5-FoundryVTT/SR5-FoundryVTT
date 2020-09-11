@@ -117,8 +117,12 @@ export class MatrixPrep {
                 Helpers.calcTotal(attributes[attLabel]);
             }
         });
-        ['firewall', 'data_processing'].forEach(attId => {
+        const basic = ['firewall', 'data_processing'];
+        basic.forEach((attId) => {
             matrix[attId].base = rating;
-        })
+        });
+        [...basic, 'sleaze', 'attack'].forEach((attId) => {
+            Helpers.calcTotal(matrix[attId]);
+        });
     }
 }
