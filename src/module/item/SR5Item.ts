@@ -794,7 +794,7 @@ export class SR5Item extends Item {
         }
         // TODO open PDF to correct location
         // parse however you need, all "buttons" will lead to this function
-        const [code, page] = source.split(' ');        
+        const [code, page] = source.split(' ');
 
         //@ts-ignore
         ui.PDFoundry.openPDFByCode(code, {page: parseInt(page)});
