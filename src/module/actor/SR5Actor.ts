@@ -999,6 +999,10 @@ export class SR5Actor extends Actor {
         if (body) {
             parts.addUniquePart(body.label || 'SR5.Body', body.value);
         }
+        const mod = this.getModifier('soak');
+        if (mod) {
+            parts.addUniquePart("SR5.Bonus", mod);
+        }
         this._addArmorParts(parts);
     }
 
