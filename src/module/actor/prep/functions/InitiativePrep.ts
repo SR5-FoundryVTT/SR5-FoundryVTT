@@ -27,10 +27,10 @@ export class InitiativePrep {
         const { initiative, attributes, modifiers } = data;
 
         initiative.meatspace.base.base = attributes.intuition.value + attributes.reaction.value;
-        initiative.meatspace.base.mod = PartsList.AddUniquePart(initiative.meatspace.base.mod, "SR5.Bonus", Number(modifiers['meatspace_initiative']));
+        initiative.meatspace.base.mod = PartsList.AddUniquePart(initiative.meatspace.base.mod, "SR5.Bonus", Number(modifiers['meat_initiative']));
 
         initiative.meatspace.dice.base = 1;
-        initiative.meatspace.dice.mod = PartsList.AddUniquePart(initiative.meatspace.dice.mod, "SR5.Bonus", Number(modifiers['meatspace_initiative_dice']));
+        initiative.meatspace.dice.mod = PartsList.AddUniquePart(initiative.meatspace.dice.mod, "SR5.Bonus", Number(modifiers['meat_initiative_dice']));
     }
 
     static prepareAstralInit(data: SR5ActorData & MagicActorData) {
