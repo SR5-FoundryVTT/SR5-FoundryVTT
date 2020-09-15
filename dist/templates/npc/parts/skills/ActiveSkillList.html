@@ -1,0 +1,19 @@
+
+<div class="left light-border-right">
+    {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+            name=(localize 'SR5.ActiveSkills')
+            itemId=cid
+            icons=(SkillHeaderIcons 'active')
+            rightSide=(SkillHeaderRightSide 'active')
+    }}
+    {{#each data.skills.active as |skill sid|}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                name=(localizeOb sid ../config.activeSkills)
+                itemNameCssClass="skill-roll"
+                itemId=sid
+                icons=(SkillIcons 'active' skill)
+                rightSide=(SkillRightSide 'active' skill)
+                hasRoll="true"
+        }}
+    {{/each}}
+</div>
