@@ -309,7 +309,7 @@ export abstract class VersionMigration {
      * @param item The item to check.
      * @return A promise that resolves true or false.
      */
-    protected async ShouldMigrateItemData(item: BaseEntityData): Promise<boolean> {
+    protected async ShouldMigrateItemData(item: EntityData): Promise<boolean> {
         return false;
     }
     /**
@@ -317,7 +317,7 @@ export abstract class VersionMigration {
      * @param item The item to migrate.
      * @return A promise that resolves with the update data.
      */
-    protected async MigrateItemData(item: BaseEntityData): Promise<any> {
+    protected async MigrateItemData(item: EntityData): Promise<any> {
         return {};
     }
     /**

@@ -60,6 +60,12 @@ export const registerItemLineHelpers = () => {
             case 'cyberware':
                 addIcon.title = game.i18n.localize('SR5.CreateItemCyberware');
                 return [addIcon];
+            case 'critter_power':
+                addIcon.title = game.i18n.localize('SR5.CreateItemCritterPower');
+                return [addIcon];
+            case 'sprite_power':
+                addIcon.title = game.i18n.localize('SR5.CreateItemSpritePower');
+                return [addIcon];
             default:
                 return [];
         }
@@ -161,6 +167,24 @@ export const registerItemLineHelpers = () => {
                         },
                     },
                 ];
+            case 'critter_power':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.CritterPower.Type'),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.CritterPower.Range'),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize('SR5.CritterPower.Duration'),
+                        },
+                    },
+                ];
             case 'quality':
                 return [
                     {
@@ -169,8 +193,6 @@ export const registerItemLineHelpers = () => {
                         },
                     },
                 ];
-            case 'program':
-                return [];
             default:
                 return [];
         }
@@ -264,7 +286,7 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize(item.data.type ?? ''),
+                            text: game.i18n.localize(CONFIG.SR5.adeptPower.types[item.data.type ?? '']),
                         },
                     },
                 ];
@@ -288,6 +310,24 @@ export const registerItemLineHelpers = () => {
                     {
                         text: {
                             text: wrapper.getDrain(),
+                        },
+                    },
+                ];
+            case 'critter_power':
+                return [
+                    {
+                        text: {
+                            text: game.i18n.localize(CONFIG.SR5.critterPower.types[item.data.powerType ?? '']),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize(CONFIG.SR5.critterPower.ranges[item.data.range ?? '']),
+                        },
+                    },
+                    {
+                        text: {
+                            text: game.i18n.localize(CONFIG.SR5.critterPower.durations[item.data.duration ?? '']),
                         },
                     },
                 ];
@@ -338,6 +378,16 @@ export const registerItemLineHelpers = () => {
             icon: `${item.data.technology?.equipped ? 'fas fa-check-circle' : 'far fa-circle'} item-equip-toggle`,
             title: game.i18n.localize('SR5.ToggleEquip'),
         };
+        const pdfIcon = {
+            icon: 'fas fa-file open-source-pdf',
+            title: game.i18n.localize('SR5.OpenSourcePdf'),
+        };
+
+        const icons = [editIcon, removeIcon];
+
+        if (ui['PDFoundry']) {
+            icons.unshift(pdfIcon);
+        }
 
         switch (item.type) {
             case 'program':
@@ -346,9 +396,9 @@ export const registerItemLineHelpers = () => {
             case 'equipment':
             case 'cyberware':
             case 'weapon':
-                return [equipIcon, editIcon, removeIcon];
-            default:
-                return [editIcon, removeIcon];
+                icons.unshift(equipIcon);
         }
+
+        return icons;
     });
 };

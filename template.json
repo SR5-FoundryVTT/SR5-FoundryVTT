@@ -1,8 +1,6 @@
 {
     "Actor": {
-        "types": [
-            "character"
-        ],
+        "types": ["character", "spirit", "sprite", "vehicle"],
         "templates": {
             "matrix": {
                 "matrix": {
@@ -11,7 +9,11 @@
                         "max": 0
                     },
                     "vr": false,
-                    "rating": 0,
+                    "rating": {
+                        "value": 0,
+                        "mod": [],
+                        "base": 0
+                    },
                     "is_cyberdeck": false,
                     "name": "",
                     "silent": false,
@@ -756,40 +758,39 @@
                         },
                         "interests": {
                             "attribute": "intuition",
-                            "value": {}
+                            "value": []
                         }
                     },
                     "language": {
                         "attribute": "intuition",
-                        "value": {}
+                        "value": []
                     }
                 }
             },
-            "common": {
-                "name": "",
-                "metatype": "",
-                "ethnicity": "",
-                "age": "",
-                "sex": "",
-                "height": "",
-                "weight": "",
-                "street_cred": 0,
-                "notoriety": 0,
-                "public_awareness": 0,
-                "special": "mundane",
-                "full_defense_attribute": "willpower",
-                "description": {
-                    "value": ""
-                },
-                "karma": {
+            "armor": {
+                "armor": {
+                    "base": 0,
                     "value": 0,
-                    "max": 0
-                },
-                "nuyen": 0,
-                "rent": {
-                    "cost": 0,
-                    "locations": []
-                },
+                    "mod": 0,
+                    "acid": 0,
+                    "cold": 0,
+                    "fire": 0,
+                    "electricity": 0,
+                    "radiation": 0
+                }
+            },
+            "magic": {
+                "magic": {
+                    "attribute": "logic",
+                    "projecting": false,
+                    "drain": {
+                        "value": 0,
+                        "base": 0,
+                        "mod": []
+                    }
+                }
+            },
+            "movement": {
                 "movement": {
                     "walk": {
                         "value": 1
@@ -799,27 +800,35 @@
                     },
                     "sprint": 2,
                     "swimming": 2
-                },
-                "magic": {
-                    "attribute": "logic",
-                    "projecting": false,
-                    "drain": {
+                }
+            },
+            "condition_monitors": {
+                "track": {
+                    "stun": {
                         "value": 0,
-                        "base": 0,
-                        "mod": []
+                        "max": 0
+                    },
+                    "physical": {
+                        "value": 0,
+                        "max": 0,
+                        "overflow": {
+                            "value": 0,
+                            "max": 0
+                        }
                     }
+                }
+            },
+            "common": {
+                "name": "",
+                "metatype": "",
+                "special": "mundane",
+                "full_defense_attribute": "willpower",
+                "description": {
+                    "value": ""
                 },
+                "nuyen": 0,
                 "wounds": {
                     "value": 0
-                },
-                "armor": {
-                    "value": 0,
-                    "mod": 0,
-                    "acid": 0,
-                    "cold": 0,
-                    "fire": 0,
-                    "electricity": 0,
-                    "radiation": 0
                 },
                 "initiative": {
                     "perception": "meatspace",
@@ -863,22 +872,89 @@
             }
         },
         "character": {
-            "templates": [
-                "common",
-                "skills",
-                "attributes",
-                "matrix",
-                "limits"
-            ],
-            "track": {
-                "stun": {
+            "templates": ["common", "skills", "attributes", "matrix", "limits", "armor", "magic", "movement", "condition_monitors"],
+            "ethnicity": "",
+            "age": "",
+            "sex": "",
+            "height": "",
+            "weight": "",
+            "street_cred": 0,
+            "notoriety": 0,
+            "public_awareness": 0,
+            "karma": {
+                "value": 0,
+                "max": 0
+            },
+            "rent": {
+                "cost": 0,
+                "locations": []
+            }
+        },
+        "spirit": {
+            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "movement", "condition_monitors"],
+            "services": 0,
+            "bound": false,
+            "force": 0,
+            "spiritType": ""
+        },
+        "sprite": {
+            "templates": ["common", "skills", "attributes", "limits", "matrix"],
+            "services": 0,
+            "registered": false,
+            "level": 0,
+            "spriteType": ""
+        },
+        "vehicle": {
+            "templates": ["common", "skills", "attributes", "limits", "armor", "matrix", "movement"],
+            "vehicleType": "ground",
+            "controlMode": "autopilot",
+            "environment": "speed",
+            "isDrone": false,
+            "isOffRoad": false,
+            "vehicle_stats": {
+                "pilot": {
+                    "base": 0,
                     "value": 0,
-                    "max": 0
+                    "mod": []
                 },
+                "handling": {
+                    "base": 0,
+                    "value": 0,
+                    "mod": []
+                },
+                "off_road_handling": {
+                    "base": 0,
+                    "value": 0,
+                    "mod": []
+                },
+                "speed": {
+                    "base": 0,
+                    "value": 0,
+                    "mod": []
+                },
+                "off_road_speed": {
+                    "base": 0,
+                    "value": 0,
+                    "mod": []
+                },
+                "acceleration": {
+                    "base": 0,
+                    "value": 0,
+                    "mod": []
+                },
+                "sensor": {
+                    "base": 0,
+                    "value": 0,
+                    "mod": []
+                }
+            },
+            "track": {
                 "physical": {
+                    "base": 0,
                     "value": 0,
                     "max": 0,
                     "overflow": {
+                        "base": 0,
                         "value": 0,
                         "max": 0
                     }
@@ -894,6 +970,7 @@
             "armor",
             "complex_form",
             "contact",
+            "critter_power",
             "cyberware",
             "device",
             "equipment",
@@ -903,8 +980,8 @@
             "quality",
             "sin",
             "spell",
-            "weapon",
-            "PDFoundry_PDF"
+            "sprite_power",
+            "weapon"
         ],
         "templates": {
             "description": {
@@ -1034,17 +1111,10 @@
             }
         },
         "armor": {
-            "templates": [
-                "description",
-                "armor",
-                "technology"
-            ]
+            "templates": ["description", "armor", "technology"]
         },
         "ammo": {
-            "templates": [
-                "description",
-                "technology"
-            ],
+            "templates": ["description", "technology"],
             "element": "",
             "ap": 0,
             "damage": 0,
@@ -1055,10 +1125,7 @@
             }
         },
         "modification": {
-            "templates": [
-                "description",
-                "technology"
-            ],
+            "templates": ["description", "technology"],
             "type": "",
             "mount_point": "",
             "dice_pool": 0,
@@ -1066,10 +1133,7 @@
             "rc": 0
         },
         "spell": {
-            "templates": [
-                "description",
-                "action"
-            ],
+            "templates": ["description", "action"],
             "drain": 0,
             "category": "",
             "type": "",
@@ -1094,62 +1158,46 @@
                 "physical": false
             }
         },
+        "critter_power": {
+            "templates": ["description", "action", "armor"],
+            "powerType": "",
+            "range": "",
+            "duration": ""
+        },
         "complex_form": {
-            "templates": [
-                "description",
-                "action"
-            ],
+            "templates": ["description", "action"],
             "target": "",
             "duration": "",
             "fade": 0
         },
         "weapon": {
-            "templates": [
-                "description",
-                "action",
-                "technology",
-                "weapon"
-            ]
+            "templates": ["description", "action", "technology", "weapon"]
         },
         "cyberware": {
-            "templates": [
-                "description",
-                "technology",
-                "action",
-                "armor"
-            ],
+            "templates": ["description", "technology", "action", "armor"],
             "essence": 0,
             "grade": "standard",
             "capacity": 0
         },
         "adept_power": {
-            "templates": [
-                "description",
-                "action",
-                "armor"
-            ],
+            "templates": ["description", "action", "armor"],
             "pp": 0,
             "type": "",
             "drain": false,
             "level": 0
         },
         "quality": {
-            "templates": [
-                "description",
-                "action"
-            ],
+            "templates": ["description", "action"],
             "type": "positive"
         },
         "action": {
-            "templates": [
-                "description",
-                "action"
-            ]
+            "templates": ["description", "action"]
+        },
+        "sprite_power": {
+            "templates": ["description", "action"]
         },
         "contact": {
-            "templates": [
-                "description"
-            ],
+            "templates": ["description"],
             "type": "",
             "connection": 0,
             "loyalty": 0,
@@ -1157,16 +1205,11 @@
             "blackmail": false
         },
         "sin": {
-            "templates": [
-                "description",
-                "technology"
-            ],
+            "templates": ["description", "technology"],
             "licenses": []
         },
         "lifestyle": {
-            "templates": [
-                "description"
-            ],
+            "templates": ["description"],
             "type": "",
             "comforts": 0,
             "security": 0,
@@ -1177,10 +1220,7 @@
             "mods": []
         },
         "device": {
-            "templates": [
-                "description",
-                "technology"
-            ],
+            "templates": ["description", "technology"],
             "category": "commlink",
             "atts": {
                 "att1": {
@@ -1202,23 +1242,11 @@
             }
         },
         "program": {
-            "templates": [
-                "description",
-                "technology"
-            ],
+            "templates": ["description", "technology"],
             "type": "common_program"
         },
         "equipment": {
-            "templates": [
-                "description",
-                "technology"
-            ]
-        },
-        "PDFoundry_PDF": {
-            "url": "",
-            "code": "",
-            "offset": 0,
-            "cache": false
+            "templates": ["description", "technology"]
         }
     }
 }

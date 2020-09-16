@@ -13,12 +13,14 @@ import ModifiableValue = Shadowrun.ModifiableValue;
 import LabelField = Shadowrun.LabelField;
 import LimitField = Shadowrun.LimitField;
 import { SYSTEM_NAME } from '../constants';
-import { BaseActorPrep } from './prep/BaseActorPrep';
 import SR5ActorType = Shadowrun.SR5ActorType;
 import { PartsList } from '../parts/PartsList';
+import { ActorPrepFactory } from './prep/ActorPrepFactory';
 import DamageData = Shadowrun.DamageData;
 import DamageElement = Shadowrun.DamageElement;
 import EdgeAttributeField = Shadowrun.EdgeAttributeField;
+import VehicleActorData = Shadowrun.VehicleActorData;
+import VehicleStat = Shadowrun.VehicleStat;
 
 export class SR5Actor extends Actor {
     async update(data, options?) {
@@ -52,21 +54,10 @@ export class SR5Actor extends Actor {
         super.prepareData();
 
         const actorData = this.data as SR5ActorType;
-        const prepper = new BaseActorPrep(actorData);
-        prepper.prepareModifiers();
-        prepper.prepareArmor();
-        prepper.prepareCyberware();
-        prepper.prepareSkills();
-        prepper.prepareAttributes();
-        prepper.prepareMatrix();
-        prepper.prepareLimits();
-        prepper.prepareConditionMonitors();
-        prepper.prepareMovement();
-        prepper.prepareWounds();
-        prepper.prepareInitiative();
-
-        const data = actorData.data;
-        if (data.magic.drain && !data.magic.drain.mod) data.magic.drain.mod = [];
+        const prepper = ActorPrepFactory.Create(actorData);
+        if (prepper) {
+            prepper.prepare();
+        }
     }
 
     getModifier(modifierName: string): number | undefined {
@@ -83,12 +74,9 @@ export class SR5Actor extends Actor {
         return this.data.data.attributes[attributeName];
     }
 
-    getEquippedMatrixDevice(): SR5Item | undefined {
-        return this.items.find((item: SR5Item) => item.isDevice());
-    }
-
-    getEquippedArmor(): SR5Item[] | undefined {
-        return this.items.filter((item: SR5Item) => item.isArmor());
+    findVehicleStat(statName?: string): VehicleStat | undefined {
+        if (statName === undefined) return undefined;
+        return this.data.data.vehicle_stats[statName];
     }
 
     findLimitFromAttribute(attributeName?: string): LimitField | undefined {
@@ -115,20 +103,24 @@ export class SR5Actor extends Actor {
         return this.data.data.armor;
     }
 
-    getOwnedItem(itemId: string): SR5Item | null {
+    getOwnedSR5Item(itemId: string): SR5Item | null {
         return (super.getOwnedItem(itemId) as unknown) as SR5Item;
     }
 
     getMatrixDevice(): SR5Item | undefined | null {
         const matrix = this.data.data.matrix;
-        if (matrix.device) return this.getOwnedItem(matrix.device);
+        if (matrix.device) return this.getOwnedSR5Item(matrix.device);
         return undefined;
     }
 
     getFullDefenseAttribute(): AttributeField | undefined {
-        let att = this.data.data.full_defense_attribute;
-        if (!att) att = 'willpower';
-        return this.findAttribute(att);
+        if (this.isVehicle()) {
+            return this.findVehicleStat('pilot');
+        } else {
+            let att = this.data.data.full_defense_attribute;
+            if (!att) att = 'willpower';
+            return this.findAttribute(att);
+        }
     }
 
     getEquippedWeapons(): SR5Item[] {
@@ -142,6 +134,41 @@ export class SR5Actor extends Actor {
             total += Math.ceil(strength.value / 3);
         }
         return total;
+    }
+
+    getDeviceRating(): number {
+        return this.data.data.matrix.rating;
+    }
+
+    isVehicle() {
+        return this.data.type === 'vehicle';
+    }
+
+    getVehicleTypeSkill(): SkillField | undefined {
+        let skill: SkillField | undefined;
+        switch (this.data.data.vehicleType) {
+            case 'air':
+                skill = this.findActiveSkill('pilot_aircraft');
+                break;
+            case 'ground':
+                skill = this.findActiveSkill('pilot_ground_craft');
+                break;
+            case 'water':
+                skill = this.findActiveSkill('pilot_water_craft');
+                break;
+            case 'aerospace':
+                skill = this.findActiveSkill('pilot_aerospace');
+                break;
+            case 'walker':
+                skill = this.findActiveSkill('pilot_walker');
+                break;
+            case 'exotic':
+                skill = this.findActiveSkill('pilot_exotic_vehicle');
+                break;
+            default:
+                break;
+        }
+        return skill;
     }
 
     addKnowledgeSkill(category, skill?) {
@@ -451,9 +478,7 @@ export class SR5Actor extends Actor {
                                 // add part and calc total again
                                 soak.mod = PartsList.AddUniquePart(soak.mod, 'SR5.UserInput', diff);
                                 soak.value = Helpers.calcTotal(soak);
-                                console.log(soak);
                             }
-                            console.log(soak);
 
                             const totalAp = Helpers.calcTotal(soak.ap);
                             if (totalAp !== ap) {
@@ -622,6 +647,22 @@ export class SR5Actor extends Actor {
         });
     }
 
+    rollDeviceRating(options?: ActorRollOptions) {
+        const title = game.i18n.localize('SR5.Labels.ActorSheet.DeviceRating');
+        const parts = new PartsList<number>();
+        const rating = this.getDeviceRating();
+        // add device rating twice as this is the most common roll
+        parts.addPart(title, rating);
+        parts.addPart(title, rating);
+        this._addGlobalParts(parts);
+        return ShadowrunRoller.advancedRoll({
+            event: options?.event,
+            title,
+            parts: parts.list,
+            actor: this,
+        });
+    }
+
     rollAttributesTest(rollId, options?: ActorRollOptions) {
         const title = game.i18n.localize(CONFIG.SR5.attributeRolls[rollId]);
         const atts = this.data.data.attributes;
@@ -645,6 +686,7 @@ export class SR5Actor extends Actor {
             if (modifiers.memory) parts.addUniquePart('SR5.Bonus', modifiers.memory);
         }
 
+        this._addGlobalParts(parts);
         return ShadowrunRoller.advancedRoll({
             event: options?.event,
             actor: this,
@@ -653,7 +695,7 @@ export class SR5Actor extends Actor {
         });
     }
 
-    rollSkill(skill, options?: SkillRollOptions) {
+    rollSkill(skill: SkillField, options?: SkillRollOptions) {
         let att = duplicate(this.data.data.attributes[skill.attribute]);
         let title = game.i18n.localize(skill.label);
 
@@ -731,6 +773,103 @@ export class SR5Actor extends Actor {
                 },
             }).render(true);
         });
+    }
+
+    rollDronePerception(options?: ActorRollOptions) {
+        if (!this.isVehicle()) {
+            return undefined;
+        }
+        const actorData = duplicate(this.data.data) as VehicleActorData;
+        if (actorData.controlMode === 'autopilot') {
+            const parts = new PartsList<number>();
+
+            const pilot = Helpers.calcTotal(actorData.vehicle_stats.pilot);
+            // TODO possibly look for autosoft item level?
+            const perception = this.findActiveSkill('perception');
+            const limit = this.findLimit('sensor');
+
+            if (perception && limit) {
+                parts.addPart('SR5.Vehicle.Clearsight', Helpers.calcTotal(perception));
+                parts.addPart('SR5.Vehicle.Stats.Pilot', pilot);
+
+                this._addGlobalParts(parts);
+
+                return ShadowrunRoller.advancedRoll({
+                    event: options?.event,
+                    actor: this,
+                    parts: parts.list,
+                    limit,
+                    title: game.i18n.localize('SR5.Labels.ActorSheet.RollDronePerception'),
+                });
+            }
+        } else {
+            this.rollActiveSkill('perception', options);
+        }
+    }
+
+    rollPilotVehicle(options?: ActorRollOptions) {
+        if (!this.isVehicle()) {
+            return undefined;
+        }
+        const actorData = duplicate(this.data.data) as VehicleActorData;
+        if (actorData.controlMode === 'autopilot') {
+            const parts = new PartsList<number>();
+
+            const pilot = Helpers.calcTotal(actorData.vehicle_stats.pilot);
+            let skill: SkillField | undefined = this.getVehicleTypeSkill();
+            const environment = actorData.environment;
+            const limit = this.findLimit(environment);
+
+            if (skill && limit) {
+                parts.addPart('SR5.Vehicle.Stats.Pilot', pilot);
+                // TODO possibly look for autosoft item level?
+                parts.addPart('SR5.Vehicle.Maneuvering', Helpers.calcTotal(skill));
+
+                this._addGlobalParts(parts);
+
+                return ShadowrunRoller.advancedRoll({
+                    event: options?.event,
+                    actor: this,
+                    parts: parts.list,
+                    limit,
+                    title: game.i18n.localize('SR5.Labels.ActorSheet.RollPilotVehicleTest'),
+                });
+            }
+        } else {
+            this.rollActiveSkill('perception', options);
+        }
+    }
+
+    rollDroneInfiltration(options?: ActorRollOptions) {
+        if (!this.isVehicle()) {
+            return undefined;
+        }
+        const actorData = duplicate(this.data.data) as VehicleActorData;
+        if (actorData.controlMode === 'autopilot') {
+            const parts = new PartsList<number>();
+
+            const pilot = Helpers.calcTotal(actorData.vehicle_stats.pilot);
+            // TODO possibly look for autosoft item level?
+            const sneaking = this.findActiveSkill('sneaking');
+            const limit = this.findLimit('sensor');
+
+            if (sneaking && limit) {
+                parts.addPart('SR5.Vehicle.Stealth', Helpers.calcTotal(sneaking));
+                parts.addPart('SR5.Vehicle.Stats.Pilot', pilot);
+
+                this._addGlobalParts(parts);
+
+                return ShadowrunRoller.advancedRoll({
+                    event: options?.event,
+                    actor: this,
+                    parts: parts.list,
+                    limit,
+                    title: game.i18n.localize('SR5.Labels.ActorSheet.RollDroneInfiltration'),
+                });
+            }
+        } else {
+            this.rollActiveSkill('sneaking', options);
+        }
     }
 
     rollKnowledgeSkill(catId: string, skillId: string, options?: SkillRollOptions) {
@@ -818,16 +957,28 @@ export class SR5Actor extends Actor {
     }
 
     _addDefenseParts(parts: PartsList<number>) {
-        const reaction = this.findAttribute('reaction');
-        const intuition = this.findAttribute('intuition');
-        const mod = this.getModifier('defense');
+        if (this.isVehicle()) {
+            const pilot = this.findVehicleStat('pilot');
+            if (pilot) {
+                parts.addUniquePart(pilot.label, Helpers.calcTotal(pilot));
+            }
+            const skill = this.getVehicleTypeSkill();
+            if (skill) {
+                parts.addUniquePart('SR5.Vehicle.Maneuvering', Helpers.calcTotal(skill));
+            }
+        } else {
+            const reaction = this.findAttribute('reaction');
+            const intuition = this.findAttribute('intuition');
 
-        if (reaction) {
-            parts.addUniquePart(reaction.label || 'SR5.Reaction', reaction.value);
+            if (reaction) {
+                parts.addUniquePart(reaction.label || 'SR5.Reaction', reaction.value);
+            }
+            if (intuition) {
+                parts.addUniquePart(intuition.label || 'SR5.Intuition', intuition.value);
+            }
         }
-        if (intuition) {
-            parts.addUniquePart(intuition.label || 'SR5.Intuition', intuition.value);
-        }
+
+        const mod = this.getModifier('defense');
         if (mod) {
             parts.addUniquePart('SR5.Bonus', mod);
         }
@@ -847,6 +998,10 @@ export class SR5Actor extends Actor {
         const body = this.findAttribute('body');
         if (body) {
             parts.addUniquePart(body.label || 'SR5.Body', body.value);
+        }
+        const mod = this.getModifier('soak');
+        if (mod) {
+            parts.addUniquePart("SR5.Bonus", mod);
         }
         this._addArmorParts(parts);
     }
@@ -941,7 +1096,7 @@ export class SR5Actor extends Actor {
      * @param key
      * @param value
      */
-    setFlag(scope: string, key: string, value: any): Promise<Entity> {
+    setFlag(scope: string, key: string, value: any): Promise<this> {
         const newValue = Helpers.onSetFlag(value);
         return super.setFlag(scope, key, newValue);
     }

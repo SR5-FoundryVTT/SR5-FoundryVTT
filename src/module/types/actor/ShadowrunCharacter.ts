@@ -10,11 +10,12 @@ declare namespace Shadowrun {
         skills: string;
     };
 
-    export type SR5ActorType = ActorData & {
+    export type SR5ActorType = SR5SpiritType | SR5CharacterType | SR5SpriteType | SR5VehicleType;
+
+    export type SR5ActorBase = ActorData & {
         name: string;
         _id: string;
         folder: string | null;
-        type: string;
         data: SR5ActorData;
         items: Collection<Item>;
         flags: object;
@@ -23,24 +24,67 @@ declare namespace Shadowrun {
         };
     };
 
-    export type SR5ActorData = ActorData & {
-        attributes: Attributes;
-        limits: Limits;
-        skills: {
-            active: Skills;
-            language: KnowledgeSkillList;
-            knowledge: KnowledgeSkills;
+
+    export type SR5CharacterType = SR5ActorBase & {
+        data: CharacterActorData;
+        type: 'character';
+    };
+
+    export type SR5ActorData = SpiritActorData | CharacterActorData | SpriteActorData | VehicleActorData;
+
+
+    export type CharacterActorData = MatrixActorData &
+        TwoTrackActorData &
+        ArmorActorData &
+        MagicActorData &
+        WoundsActorData &
+        MovementActorData & {
+            attributes: Attributes;
+            limits: Limits;
+            skills: {
+                active: Skills;
+                language: KnowledgeSkillList;
+                knowledge: KnowledgeSkills;
+            };
+            modifiers: Modifiers;
+            special: SpecialTrait;
+            initiative: Initiative;
+            recoil_compensation: number;
         };
-        track: Tracks;
+
+    export type PhysicalTrackActorData = {
+        track: {
+            physical: PhysicalTrack;
+        };
+    };
+    export type StunTrackActorData = {
+        track: {
+            stun: StunTrack;
+        };
+    };
+
+    export type MovementActorData = {
         movement: Movement;
-        matrix: Matrix;
-        magic: Magic;
-        modifiers: Modifiers;
-        special: SpecialTrait;
+    };
+
+    export type ArmorActorData = {
         armor: ActorArmor;
-        initiative: Initiative;
+    };
+
+    export type WoundsActorData = {
         wounds: WoundType;
-        recoil_compensation: number;
+    };
+
+    export type TwoTrackActorData = {
+        track: Tracks;
+    };
+
+    export type MagicActorData = {
+        magic: Magic;
+    };
+
+    export type MatrixActorData = {
+        matrix: ActorMatrix;
     };
 
     export type WoundType = {

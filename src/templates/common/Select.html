@@ -1,0 +1,7 @@
+<label>
+    <select name="{{path}}" class="display">
+        {{#select value}} {{#each options as |name type|}}
+            <option value="{{type}}">{{localize name}}</option>
+        {{/each}} {{/select}}
+    </select>
+</label>

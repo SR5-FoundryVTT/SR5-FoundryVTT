@@ -1,21 +1,30 @@
 {
-    "action": "Action",
-    "adept_power": "Adept Power",
-    "armor": "Armor",
-    "complex_form": "Complex Form",
-    "cyberware": "Cyberware",
-    "device": "Device",
-    "equipment": "Equipment",
-    "quality": "Quality",
-    "spell": "Spell",
-    "weapon": "Weapon",
-    "sin": "SIN",
-    "lifestyle": "Lifestyle",
-    "contact": "Contact",
-    "modification": "Modification",
-    "ammo": "Ammo",
-    "active": "Active",
-    "passive": "Passive",
+    "SR5.ItemTypes": {
+        "Action": "Action",
+        "AdeptPower": "Adept Power",
+        "Ammo": "Ammo",
+        "Armor": "Armor",
+        "ComplexForm": "Complex Form",
+        "Contact": "Contact",
+        "CritterPower": "Critter Power",
+        "Cyberware": "Cyberware",
+        "Device": "Device",
+        "Equipment": "Equipment",
+        "Lifestyle": "Lifestyle",
+        "Modification": "Modification",
+        "Quality": "Quality",
+        "Sin": "SIN",
+        "Spell": "Spell",
+        "SpritePower": "Sprite Power",
+        "Weapon": "Weapon"
+    },
+
+    "SR5.ActorTypes": {
+        "Character": "Character",
+        "Spirit": "Spirit",
+        "Sprite": "Sprite",
+        "Vehicle": "Vehicle"
+    },
 
     "SR5.ActiveSkills": "Active Skills",
     "SR5.Specializations": "Specializations",
@@ -536,6 +545,8 @@
     "SETTINGS.DisplayDefaultRollCardDescription": "Should the default roll-card be displayed along with the shadowrun roll-card",
     "SETTINGS.ShowGlitchAnimationName": "Display Glitch Animation",
     "SETTINGS.ShowGlitchAnimationDescription": "Should display the animation as part of the glitch text on the roll card",
+    "SETTINGS.ShowTokenNameForChatOutputName": "Use Token Name for Roll Card",
+    "SETTINGS.ShowTokenNameForChatOutputDescription": "Should the token name be used for roll card output instead of the actor name when available",
 
     "SR5.MIGRATION.WarningTitle": "Alert",
     "SR5.MIGRATION.WarningHeader": "Migration Warning",
@@ -550,5 +561,151 @@
     "SR5.MIGRATION.SuccessPacksInfo": "Due to current technical limitations with FoundryVTT, actor packs must be updated manually.",
     "SR5.MIGRATION.SuccessConfirm": "Close",
 
-    "CONTROLS.SR5.OverwatchScoreTracker": "Overwatch Score Tracker"
+    "CONTROLS.SR5.OverwatchScoreTracker": "Overwatch Score Tracker",
+
+    "SR5.DIALOG.MissingModuleContent": "In order for source PDFs to be shown, the PDFoundry module must be installed and a PDF matching the code created.",
+
+    "SR5.Labels": {
+        "ActorSheet": {
+            "SpiritConfiguration": "Spirit Configuration",
+            "CritterPowers": "Critter Powers",
+            "Spells": "Spells",
+            "SpritePowers": "Sprite Powers",
+            "DeviceRating": "Device Rating",
+            "RollDronePerception": "Drone Perception",
+            "RollPilotVehicleTest": "Pilot Vehicle",
+            "RollDroneInfiltration": "Drone Infiltration",
+            "VehicleConfiguration": "Vehicle Configuration"
+        }
+    },
+
+    "SR5.Spirit": {
+        "Force": "Force",
+        "Type": "Type",
+        "Services": "Services",
+        "Bound": "Bound",
+        "Types": {
+            "Air": "Air",
+            "Beasts": "Beasts",
+            "Earth": "Earth",
+            "Fire": "Fire",
+            "Guardian": "Guardian",
+            "Guidance": "Guidance",
+            "Man": "Man",
+            "Plant": "Plant",
+            "Task": "Task",
+            "Water": "Water",
+
+            "ToxicAir": "Noxious",
+            "ToxicBeasts": "Abomination",
+            "ToxicEarth": "Barren",
+            "ToxicFire": "Nuclear",
+            "ToxicMan": "Plague",
+            "ToxicWater": "Sludge",
+
+            "Blood": "Blood",
+
+            "Muse": "Muse",
+            "Nightmare": "Nightmare",
+            "Shade": "Shade",
+            "Succubus": "Succubus",
+            "Wraith": "Wraith",
+
+            "Shedim": "Shedim",
+            "MasterShedim": "MasterShedim",
+
+            "Caretaker": "Insect Caretaker",
+            "Nymph": "Insect Nymph",
+            "Scout": "Insect Scout",
+            "Soldier": "Insect Soldier",
+            "Worker": "Insect Worker",
+            "Queen": "Insect Queen"
+        }
+    },
+
+    "SR5.CritterPower": {
+        "Type": "Type",
+        "Duration": "Duration",
+        "Range": "Range",
+        "Types": {
+            "Mana": "Mana",
+            "Physical": "Physical"
+        },
+        "Durations": {
+            "Always": "Always",
+            "Instant": "Instant",
+            "Sustained": "Sustained",
+            "Permanent": "Permanent",
+            "Special": "Special"
+        },
+        "Ranges": {
+            "LineOfSight": "Line Of Sight",
+            "Touch": "Touch",
+            "Self": "Self"
+        }
+    },
+
+    "SR5.Sprite": {
+        "Level": "Level",
+        "Registered": "Registered",
+        "Type": "Type",
+        "Services": "Services",
+        "Types": {
+            "Machine": "Machine",
+            "Courier": "Courier",
+            "Crack": "Crack",
+            "Data": "Data",
+            "Fault": "Fault"
+        }
+    },
+
+    "SR5.SpritePower": {
+        "Type": "Type"
+    },
+
+    "SR5.AdeptPower": {
+        "Types": {
+            "Active": "Active",
+            "Passive": "Passive"
+        }
+    },
+
+    "SR5.Vehicle": {
+        "IsDrone": "Is Drone",
+        "IsOffRoad": "Is Off Road",
+        "ControlMode": "Control Mode",
+        "Type": "Type",
+        "ChaseEnvironment": "Chase Environment",
+        "Clearsight": "Clearsight",
+        "Stealth": "Stealth",
+        "Maneuvering": "Maneuvering",
+
+        "Stats": {
+            "Handling": "Handling",
+            "OffRoadHandling": "Handling (Off Road)",
+            "Speed": "Speed",
+            "OffRoadSpeed": "Speed (Off Road)",
+            "Acceleration": "Acceleration",
+            "Pilot": "Pilot",
+            "Sensor": "Sensor"
+        },
+        "Types": {
+            "Air": "Air Craft",
+            "Ground": "Ground Craft",
+            "Aerospace": "Space Craft",
+            "Water": "Water Craft",
+            "Walker": "Walker",
+            "Exotic": "Exotic Craft"
+        },
+        "ControlModes": {
+            "Autopilot": "Autopilot",
+            "Manual": "Manual",
+            "Rigger": "Rigger",
+            "Remote": "Remote"
+        },
+        "Environments": {
+            "Speed": "Speed",
+            "Handling": "Handling"
+        }
+    }
 }

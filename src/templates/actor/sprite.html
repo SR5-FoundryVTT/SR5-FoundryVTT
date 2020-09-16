@@ -1,0 +1,63 @@
+<form class="{{cssClass}} wholesheet" autocomplete="off">
+    <header class="flexrow">
+        {{> 'systems/shadowrun5e/dist/templates/actor/parts/ProfileImage.html' }}
+        <div class="flexcol flex-end border-right">
+            <div class="block">
+                {{> 'systems/shadowrun5e/dist/templates/actor/parts/NameInput.html' }}
+            </div>
+            <div class="attributes smooth">
+                <div class="block">
+                    {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
+                            value=data.matrix.condition_monitor.value
+                            max=data.matrix.condition_monitor.max
+                            id="matrix"
+                            name=(localize "SR5.ConditionMonitor")
+                    }}
+                </div>
+            </div>
+        </div>
+        <div class="flexcol flex-end">
+            <div class="attributes center">
+                {{> 'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html' }}
+                {{#> "systems/shadowrun5e/dist/templates/common/Attribute.html" cssClass="no-grow"}}
+                    <div class="attribute-name">
+                        {{localize "SR5.Labels.ActorSheet.DeviceRating"}}
+                    </div>
+                    <div class="attribute-value" title="{{localize 'SR5.Total'}}">
+                        {{data.matrix.rating}}
+                    </div>
+                {{/"systems/shadowrun5e/dist/templates/common/Attribute.html"}}
+            </div>
+            <div>
+                <div class="list-item">
+                    <div class="item-left">
+                        <div class="item-text item-name">
+                            {{localize "SR5.Sprite.Services"}}
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <div class="item-text">
+                            {{> 'systems/shadowrun5e/dist/templates/common/ValueInput.html'
+                                    cssClass="attribute-input"
+                                    size="2"
+                                    maxLength="2"
+                                    value=data.services
+                                    name="data.services"
+                            }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <nav class="tabs" data-group="primary">
+        <a class="item" data-tab="actions">{{localize "SR5.Actions"}}</a>
+        <a class="item" data-tab="skills">{{localize "SR5.Skills"}}</a>
+        <a class="item" data-tab="misc">{{localize "SR5.Miscellaneous"}}</a>
+    </nav>
+    <section class="sheetbody">
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/ActionsTab.html"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/matrix/SpriteSkillsTab.html"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/MiscTab.html"}}
+    </section>
+</form>
