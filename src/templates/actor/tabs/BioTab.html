@@ -2,23 +2,11 @@
     <div class="inventory">
         <div class="split-container">
             <div class="scroll-area">
-                <div class="list-item">
-                    <div class="item-left">
-                        <div class="item-text item-name">
-                            {{localize "SR5.Metatype"}}
-                        </div>
-                    </div>
-                    <div class="item-right">
-                        <div class="item-text">
-                            <input
-                                    class="display text"
-                                    type="text"
-                                    name="data.metatype"
-                                    value="{{data.metatype}}"
-                            />
-                        </div>
-                    </div>
-                </div>
+                {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+                        name=(localize 'SR5.Biography')
+                        itemId='biography'
+                        icons=(ItemHeaderIcons 'biography')
+                }}
                 {{editor content=data.description.value target="data.description.value" button=true
                          editable=true}}
             </div>

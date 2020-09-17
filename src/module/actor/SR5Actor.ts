@@ -144,6 +144,10 @@ export class SR5Actor extends Actor {
         return this.data.type === 'vehicle';
     }
 
+    isGrunt() {
+        return this.data.data.is_npc && this.data.data.npc.is_grunt;
+    }
+
     getVehicleTypeSkill(): SkillField | undefined {
         let skill: SkillField | undefined;
         switch (this.data.data.vehicleType) {
@@ -1004,6 +1008,10 @@ export class SR5Actor extends Actor {
             parts.addUniquePart("SR5.Bonus", mod);
         }
         this._addArmorParts(parts);
+    }
+
+    saveAsRole(name: string) {
+        console.error(game);
     }
 
     static async pushTheLimit(li) {

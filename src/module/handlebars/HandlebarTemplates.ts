@@ -1,5 +1,3 @@
-import { SR5NPCSheet } from "../actor/SR5NPCSheet";
-
 export const preloadHandlebarsTemplates = async () => {
     const templatePaths = [
         // actor tabs
@@ -101,15 +99,7 @@ export const preloadHandlebarsTemplates = async () => {
 
         // list components
         'systems/shadowrun5e/dist/templates/common/List/ListItem.html',
-        'systems/shadowrun5e/dist/templates/common/List/ListHeader.html',
-
-        // npc sheet
-        SR5NPCSheet.template,
-        'systems/shadowrun5e/dist/templates/npc/parts/attributes/AttributeHeaders.html',
-        'systems/shadowrun5e/dist/templates/npc/parts/skills/ActiveSkillList.html',
-        'systems/shadowrun5e/dist/templates/npc/parts/skills/LanguageAndKnowledgeSkillList.html',
-        'systems/shadowrun5e/dist/templates/npc/parts/attributes/Attributes.html',
-        'systems/shadowrun5e/dist/templates/npc/parts/attributes/Attribute.html',
+        'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
     ];
 
     return loadTemplates(templatePaths);

@@ -806,11 +806,13 @@
                 "track": {
                     "stun": {
                         "value": 0,
-                        "max": 0
+                        "max": 0,
+                        "disabled": false
                     },
                     "physical": {
                         "value": 0,
                         "max": 0,
+                        "disabled": false,
                         "overflow": {
                             "value": 0,
                             "max": 0
@@ -881,6 +883,7 @@
             "street_cred": 0,
             "notoriety": 0,
             "public_awareness": 0,
+            "is_npc": false,
             "karma": {
                 "value": 0,
                 "max": 0
@@ -888,6 +891,10 @@
             "rent": {
                 "cost": 0,
                 "locations": []
+            },
+            "npc": {
+                "is_grunt": false,
+                "professional_rating": 0
             }
         },
         "spirit": {

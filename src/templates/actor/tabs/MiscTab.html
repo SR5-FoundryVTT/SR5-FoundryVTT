@@ -134,6 +134,50 @@
                         </div>
                     </div>
                 </div>
+                <div class="list-item">
+                    <div class="item-left">
+                        <div class="item-text item-name">
+                            {{localize "SR5.IsNPC"}}
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <div class="item-text input">
+                            <input type="checkbox" class="checkbox" name="data.is_npc" {{checked data.is_npc}}/>
+                        </div>
+                    </div>
+                </div>
+                {{#if data.is_npc }}
+                <div class="list-item">
+                    <div class="item-left">
+                        <div class="item-text item-name">
+                            {{localize "SR5.IsGrunt"}}
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <div class="item-text input">
+                            <div class="item-text input">
+                            <input type="checkbox" class="checkbox" name="data.npc.is_grunt" {{checked data.npc.is_grunt}}/>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+                {{/if}}
+                <div class="list-item">
+                    <div class="item-left">
+                        <div class="item-text item-name">
+                            {{localize "SR5.Metatype"}}
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <div class="item-text input">
+                            <select name="data.metatype" class="display">
+                                {{#select data.metatype}} {{#each config.character.types as |name type|}}
+                                    <option value="{{type}}">{{localize name}}</option>
+                                {{/each}} {{/select}}
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="flexcol">
                 <div class="list-item item-section">
