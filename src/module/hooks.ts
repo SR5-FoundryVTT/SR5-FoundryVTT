@@ -29,7 +29,6 @@ export class HooksManager {
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
         Hooks.on('renderSceneControls', HooksManager.renderSceneControls);
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons);
-        Hooks.on('preCreateToken', HooksManager.preCreateToken);
 
         Hooks.on('preUpdateCombat', preCombatUpdate);
     }
@@ -114,45 +113,5 @@ export class HooksManager {
 
     static readyChatMessage(app, html) {
         chat.addRollListeners(app, html);
-    }
-
-    static preCreateToken(scene, tokenData, options, tokenId) {
-        console.error('preCreateToken', tokenData);
-
-        /** Grunt mechanism
-         * Stuff we need:
-         *  1. Connect multiple tokens to one actor
-         *  Doable (see below) token.actor and game.actor[x] are referential equal!
-         *  2. Add all tokens to combat, however change all token combat entries initiatives at the same time
-         *      Do this with the assumption that each grunt actor is one 'role' in the grunt group. Therefore, rules
-         *      'better' rules within the same group are interpreted to mean each role has one initiative.
-         *  3. Remove P/S track and add a simple damage track
-         *    (Zustandsmonitor hat eine Anzahl Kästchen, die der aufgerundeten
-                Hälfte ihrer Konstitution oder Willenskraft (dem höheren
-                der beiden Werte) plus 8 entspricht)
-         Stuff to test
-            ToDos
-            - Role aus Daten und template entfernen
-            - Check if prepareNPCData is needed for new actor fields
-
-
-            preCreateToken tokenData beinhaltet Feld 'randomImg'... Wie kann das denn benutzt werden?
-         */
-
-        const actor = game.actors.get(tokenData.actorId);
-        if (actor.data.data.is_npc && actor.data.data.npc.is_grunt) {
-            if (!tokenData.actorLink) {
-                console.error('Token needs to be directly linked!');
-            } else {
-                console.error('Grunt has been added!');
-                canvas.tokens.placeables.forEach(token => {
-                    console.error('-------------');
-                    console.error(token);
-                    console.error(token.data.actorLink, token.data.actorId);
-                    console.error(token.actor);
-                    console.error(token.actor === actor);
-                })
-            }
-        }
     }
 }
