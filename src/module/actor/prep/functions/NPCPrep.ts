@@ -3,11 +3,12 @@ import {DataTemplates} from "../../../dataTemplates";
 import {SR5} from "../../../config";
 
 export class NPCPrep {
-    // TODO: This is only for dev until it's ready and needs to be moved to data migration.
+    // TODO: This is only for dev until it's ready and most of it might solved by migration.
     static prepareNPCData(data: CharacterActorData)  {
         data.is_npc = data.is_npc ? data.is_npc : false;
         data.npc = data.npc ? data.npc : {
             is_grunt: false,
+            // TODO: npc.professional_rating is unused, as of yet.
             professional_rating: 0
         };
 
@@ -15,7 +16,7 @@ export class NPCPrep {
             NPCPrep.applyMetatypeModifiers(data);
         }
 
-        // TODO: metatype should go into migration for false metatypes. This is a dev todo and taMiF should be scolded for it...
+        // Match custom metatypes to pre-defined metatypes. Overwrite as human if not mappable.
         //@ts-ignore
         const type = data.metatype.toLowerCase();
         data.metatype = SR5.character.types.hasOwnProperty(type) ? data.metatype : 'human';

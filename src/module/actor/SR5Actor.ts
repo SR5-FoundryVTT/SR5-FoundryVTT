@@ -1010,10 +1010,6 @@ export class SR5Actor extends Actor {
         this._addArmorParts(parts);
     }
 
-    saveAsRole(name: string) {
-        console.error(game);
-    }
-
     static async pushTheLimit(li) {
         let msg: ChatMessage = game.messages.get(li.data().messageId);
 

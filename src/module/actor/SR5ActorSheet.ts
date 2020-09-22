@@ -405,7 +405,6 @@ export class SR5ActorSheet extends ActorSheet {
         html.find('.skill-edit').click(this._onShowEditSkill.bind(this));
         html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
         html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
-        html.find('.add-role').change(this._onAddRole.bind(this));
 
         /**
          * Open the PDF for an item on the actor
@@ -914,11 +913,5 @@ export class SR5ActorSheet extends ActorSheet {
             title: 'Chummer Import',
         };
         new ChummerImportForm(this.actor, options).render(true);
-    }
-
-    _onAddRole(event) {
-        event.preventDefault();
-        const name = event.target.value;
-        this.actor.saveAsRole(name)
     }
 }
