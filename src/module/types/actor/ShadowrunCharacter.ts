@@ -26,6 +26,7 @@ declare namespace Shadowrun {
         data: SR5ActorData;
         items: Collection<Item>;
         flags: object;
+        type: string;
         permission: {
             default: string;
         };
@@ -58,7 +59,6 @@ declare namespace Shadowrun {
             special: SpecialTrait;
             initiative: Initiative;
             recoil_compensation: number;
-            is_npc: boolean;
             metatype: string | keyof typeof CONFIG.SR5.character.types
         };
 
@@ -98,6 +98,7 @@ declare namespace Shadowrun {
     };
 
     export type NPCActorData = {
+        is_npc: boolean;
         npc: NPC
     }
 

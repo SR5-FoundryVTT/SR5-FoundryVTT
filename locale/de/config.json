@@ -711,6 +711,9 @@
             "Ork": "Ork",
             "Dwarf": "Zwerg",
             "Troll": "Troll"
+        },
+        "Modifiers": {
+            "NPCMetatypeAttribute": "NPC Metatyp Attribute"
         }
     }
 }
