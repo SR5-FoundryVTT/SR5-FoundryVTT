@@ -93,10 +93,34 @@
                 border-right: $groove;
             }
             > .attribute-value {
-                font-size: 125%;
-                width: 100%;
-                text-align: center;
+                > .attribute-value-total {
+                    font-size: 125%;
+                    width: 100%;
+                    text-align: center;
+                }
+                > .attribute-value-mods {
+                    display: none;
+                    visibility: hidden;
+
+                    background: $popupbackground;
+
+                    position: absolute;
+                    z-index: 9999999;
+
+
+                    opacity: 0;
+                    transition: opacity 0.3s;
+                    > .value-modifiers .value-modifiers-total {
+                        border-top: 1px double white;
+                    }
+                }
+                &:hover .attribute-value-mods {
+                    display: block;
+                    visibility: visible;
+                    opacity: 1;
+                }
             }
+
             > .attribute-name {
                 font-size: 115%;
                 width: 100%;

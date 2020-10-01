@@ -1,0 +1,7 @@
+<div class="value-modifiers">
+    <div class="value-modifiers-base" title="{{localize 'SR5.BaseValue'}}">Base: {{attribute.base}}</div>
+    {{#each attribute.mod}}
+    <div class="value-modifiers-modifier">{{localize this.name}} : {{signedValue this.value}}</div>
+    {{/each}}
+    <div class="value-modifiers-total" title="{{localize 'SR5.Total'}}">Total: {{attribute.value}}</div>
+</div>
