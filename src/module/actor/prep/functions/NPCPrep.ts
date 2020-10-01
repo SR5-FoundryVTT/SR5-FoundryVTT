@@ -1,5 +1,8 @@
 import CharacterActorData = Shadowrun.CharacterActorData;
 import {DataTemplates} from "../../../dataTemplates";
+import {Helpers} from "../../../helpers";
+import {METATYPEMODIFIER} from "../../../constants";
+import {PartsList} from "../../../parts/PartsList";
 
 export class NPCPrep {
     static prepareNPCData(data: CharacterActorData) {
@@ -8,32 +11,39 @@ export class NPCPrep {
         }
     }
 
+    /** Replace current metatype modifiers with, even if nothing has changed.
+     *
+     */
     static applyMetatypeModifiers(data: CharacterActorData) {
         const {metatype} = data;
-        const modifiers = DataTemplates.grunt.metatype_modifiers[metatype];
-        if (!modifiers) {
-            return;
-        }
+        let modifiers = DataTemplates.grunt.metatype_modifiers[metatype];
+        modifiers = modifiers ? modifiers : {};
 
         const {attributes} = data;
 
-        for (const [attId, value] of Object.entries(modifiers.attributes)) {
-            if (attributes[attId] !== undefined) {
-                const attribute = attributes[attId];
-                // Transformation is happening in AttributePrep and is needed here.
-                if (!Array.isArray(attribute.mod)) {
+        for (const [attId, attribute] of Object.entries(attributes)) {
+            // old-style object mod transformation is happening in AttributePrep and is needed here. Order is important.
+            if (!Array.isArray(attribute.mod)) {
                     console.error('Actor data contains wrong data type for attribute.mod', attribute, !Array.isArray(attribute.mod));
-                } else {
-                    attribute.mod = attribute.mod.filter(mod => mod.name !== 'SR5.Character.Modifiers.NPCMetatypeAttribute');
-                    attribute.mod.push(NPCPrep.AddNPCMetatypeAttributeModifier(value));
+            } else {
+                const modifyBy = modifiers?.attributes?.[attId];
+                const parts = new PartsList(attribute.mod);
+                parts.removePart(METATYPEMODIFIER);
+
+                if (modifyBy) {
+                    parts.addPart(METATYPEMODIFIER, modifyBy);
                 }
+
+                attribute.mod = parts.list;
+
+                Helpers.calcTotal(attribute);
             }
         }
     }
 
     static AddNPCMetatypeAttributeModifier(value) {
         return {
-            name: 'SR5.Character.Modifiers.NPCMetatypeAttribute',
+            name: METATYPEMODIFIER,
             value: value as number
         }
     }
