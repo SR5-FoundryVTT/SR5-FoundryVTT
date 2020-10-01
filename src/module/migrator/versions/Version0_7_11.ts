@@ -3,12 +3,9 @@
 
 
 import {VersionMigration} from "../VersionMigration";
-import SR5ActorData = Shadowrun.SR5ActorData;
-import SR5CharacterType = Shadowrun.SR5CharacterType;
-import SR5ActorBase = Shadowrun.SR5ActorBase;
 import {SR5} from "../../config";
+import SR5ActorBase = Shadowrun.SR5ActorBase;
 
-// TODO: A lot of ts-ignores only needed for 0.7.11, even though older migrations used the same type signatures...
 /** NPC / Grunt feature set
  * - Add npc character data.
  * - Add track disabled feature
@@ -26,33 +23,48 @@ export class Version0_7_11 extends VersionMigration {
         return '0.7.11';
     }
 
-    static MigrateCustomMetatype(metatype: string): string {
-        const type = metatype.toLowerCase();
-        // TODO: What to do with custom metatypes?
-        return SR5.character.types.hasOwnProperty(type) ? type : 'human';
+    static NoNPCDataForCharacter(actorData: SR5ActorBase): boolean {
+        return actorData.type === 'character' && (
+            actorData?.data?.is_npc === undefined ||
+            actorData?.data?.npc === undefined
+        );
+    }
+
+    static UnsupportedMetatype(actorData: SR5ActorBase): boolean {
+        const type = actorData.data.metatype.toLowerCase();
+        return actorData.type === 'character' &&
+            SR5.character.types.hasOwnProperty(type);
     }
 
     protected async MigrateActorData(actorData: SR5ActorBase): Promise<any> {
-        // By default, no one is an npc.
-        return {
-            data: {
+        const updateData: {
+            data?: object,
+            attributes?: object
+        } = {};
+
+        if (Version0_7_11.UnsupportedMetatype(actorData)) {
+            const type = actorData.data.metatype.toLowerCase();
+            // TODO: What to do with custom metatypes?
+            const metatypeData = {metatype: SR5.character.types.hasOwnProperty(type) ? type : 'human'};
+            updateData.data = {...updateData.data, ...metatypeData};
+        }
+
+        if (Version0_7_11.NoNPCDataForCharacter(actorData)) {
+            updateData.data = updateData.data ? updateData.data : {};
+            const npcData = {
                 is_npc: false,
                 npc: {
                     is_grunt: false,
                     professional_rating: 0
-                },
-                metatype: Version0_7_11.MigrateCustomMetatype(actorData.data.metatype)
+                }
             }
+            updateData.data = {...updateData.data, ...npcData};
         }
+
+        return updateData;
     }
 
     protected async ShouldMigrateActorData(actorData: SR5ActorBase): Promise<boolean> {
-        if (actorData.type !== 'character') {
-            return false;
-        }
-
-
-        console.error('Should', actorData, actorData?.data?.is_npc === undefined || actorData?.data?.npc === undefined);
-        return actorData?.data?.is_npc === undefined || actorData?.data?.npc === undefined;
+        return Version0_7_11.UnsupportedMetatype(actorData) || Version0_7_11.NoNPCDataForCharacter(actorData);
     }
 }

@@ -2,7 +2,6 @@ import CharacterActorData = Shadowrun.CharacterActorData;
 import {DataTemplates} from "../../../dataTemplates";
 
 export class NPCPrep {
-    // TODO: This is only for dev until it's ready and most of it might solved by migration.
     static prepareNPCData(data: CharacterActorData) {
         if (data.is_npc) {
             NPCPrep.applyMetatypeModifiers(data);
@@ -16,13 +15,18 @@ export class NPCPrep {
             return;
         }
 
-
         const {attributes} = data;
+
         for (const [attId, value] of Object.entries(modifiers.attributes)) {
             if (attributes[attId] !== undefined) {
                 const attribute = attributes[attId];
-                attribute.mod = attribute.mod.filter(mod => mod.name !== 'SR5.Character.Modifiers.NPCMetatypeAttribute');
-                attribute.mod.push(NPCPrep.AddNPCMetatypeAttributeModifier(value));
+                // Transformation is happening in AttributePrep and is needed here.
+                if (!Array.isArray(attribute.mod)) {
+                    console.error('Actor data contains wrong data type for attribute.mod', attribute, !Array.isArray(attribute.mod));
+                } else {
+                    attribute.mod = attribute.mod.filter(mod => mod.name !== 'SR5.Character.Modifiers.NPCMetatypeAttribute');
+                    attribute.mod.push(NPCPrep.AddNPCMetatypeAttributeModifier(value));
+                }
             }
         }
     }

@@ -16,8 +16,6 @@ import CharacterActorData = Shadowrun.CharacterActorData;
 
 export class CharacterPrep extends BaseActorPrep<SR5CharacterType, CharacterActorData> {
     prepare() {
-        NPCPrep.prepareNPCData(this.data);
-
         ModifiersPrep.prepareModifiers(this.data);
 
         ItemPrep.prepareArmor(this.data, this.items);
@@ -46,6 +44,7 @@ export class CharacterPrep extends BaseActorPrep<SR5CharacterType, CharacterActo
         InitiativePrep.prepareMatrixInit(this.data);
         InitiativePrep.prepareCurrentInitiative(this.data);
 
-
+        // NPCPrep is reliant to be called after AttributesPrep.
+        NPCPrep.prepareNPCData(this.data);
     }
 }
