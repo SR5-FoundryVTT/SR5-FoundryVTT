@@ -8,7 +8,7 @@ import { Helpers } from '../helpers';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
 import { createChatData, TemplateData } from '../chat';
-import {FLAGS, SYSTEM_NAME} from '../constants';
+import {FLAGS, GLITCH_DIE, SYSTEM_NAME} from '../constants';
 import { PartsList } from '../parts/PartsList';
 
 export interface BasicRollProps {
@@ -56,6 +56,45 @@ export class ShadowrunRoll extends Roll {
         const data = super.toJSON();
         data.class = 'Roll';
         return data;
+    }
+
+    get sides(): number[] {
+        //@ts-ignore
+        // 0.7.x foundryVTT
+        if (this.terms) {
+            //@ts-ignore
+            return this.terms[0].results.map(result => result.result);
+        }
+
+        //@ts-ignore
+        // 0.6.x foundryVTT
+        return this.parts[0].rolls.map(roll => roll.roll);
+    }
+
+    count(side: number): number {
+        const results = this.sides;
+        return results.reduce((counted, result) => result === side ? counted + 1 : counted, 0);
+    }
+
+    get hits(): number {
+        return this.total;
+    }
+
+    get pool(): number {
+        //@ts-ignore
+        // 0.7.x foundryVTT
+        if (this.terms) {
+            //@ts-ignore
+            return this.dice[0].number;
+        }
+
+        //@ts-ignore
+        // 0.6.x foundryVTT
+        return this.parts[0].rolls.length;
+    }
+
+    get glitched(): boolean {
+        return this.count(GLITCH_DIE) > Math.floor(this.pool / 2);
     }
 }
 
@@ -162,21 +201,11 @@ export class ShadowrunRoller {
         }
 
         // start of custom message
-        const dice = roll?.parts[0].rolls;
+        const dice = roll.sides;
         const token = actor?.token;
-
-        let glitch = false;
-        if (roll !== undefined) {
-            let oneCount = 0;
-            roll.dice.forEach((die) => {
-                die.rolls.forEach((result) => {
-                    if (result.roll === 1) {
-                        oneCount += 1;
-                    }
-                });
-            });
-            glitch = oneCount > Math.floor(parts.total / 2);
-        }
+        const hits = roll.hits;
+        const dicePool = roll.pool;
+        const glitch = roll.glitched;
 
         [name, img] = ShadowrunRoller.getPreferedNameAndImageSource(name, img, actor, token);
 
@@ -191,19 +220,21 @@ export class ShadowrunRoller {
             dice,
             limit,
             testName: title,
-            dicePool: parts.total,
+            dicePool,
             parts: parts.list,
-            hits: roll?.total,
+            hits,
             glitch,
             ...props,
         };
 
+        // In what case would no roll be present? No parts? Why would this reach any logic then?
         if (roll) {
             roll.templateData = templateData;
         }
 
         if (!hideRollMessage) {
             const chatData = await createChatData(templateData, roll);
+            console.error(hideRollMessage, chatData);
             ChatMessage.create(chatData, { displaySheet: false }).then((message) => {
                 console.log(message);
             });
