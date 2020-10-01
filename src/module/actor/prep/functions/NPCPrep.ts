@@ -6,9 +6,8 @@ import {PartsList} from "../../../parts/PartsList";
 
 export class NPCPrep {
     static prepareNPCData(data: CharacterActorData) {
-        if (data.is_npc) {
-            NPCPrep.applyMetatypeModifiers(data);
-        }
+        // Apply to NPC and none NPC to remove lingering modifiers after actor has been removed it's npc status.
+        NPCPrep.applyMetatypeModifiers(data);
     }
 
     /** Replace current metatype modifiers with, even if nothing has changed.
@@ -30,7 +29,7 @@ export class NPCPrep {
                 const parts = new PartsList(attribute.mod);
                 parts.removePart(METATYPEMODIFIER);
 
-                if (modifyBy) {
+                if (data.is_npc && modifyBy) {
                     parts.addPart(METATYPEMODIFIER, modifyBy);
                 }
 
