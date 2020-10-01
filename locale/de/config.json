@@ -500,6 +500,7 @@
   "SR5.WoundModifier": "Verletzungsmodi",
   "SR5.ExtendedTest": "Ausgedehnte Probe",
   "SR5.IncomingDamage": "Kommender Schaden",
+  "SR5.Temporary": "Temporär",
 
   "SR5.ApplyWounds": "Anwenden",
   "SR5.DontApplyWounds": "Nicht anwenden",
