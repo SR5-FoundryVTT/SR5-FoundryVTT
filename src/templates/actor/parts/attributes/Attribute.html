@@ -6,11 +6,9 @@
             {{localize attribute.label}}
         {{/if}}
     </div>
-    <div class="attribute-value">
+    <div class="attribute-value value">
         <span class="attribute-value-total">{{attribute.value}}</span>
-        <span class="attribute-value-mods">
-            {{> "systems/shadowrun5e/dist/templates/common/ValueModifiers.html" value=attribute}}
-        </span>
+        {{> "systems/shadowrun5e/dist/templates/common/ValueModifiers.html" value=attribute}}
     </div>
     <div class="track center {{#if disableBase}}{{#if disableManual}}invisible{{/if}}{{/if}}">
         <div class="attribute-input-container">

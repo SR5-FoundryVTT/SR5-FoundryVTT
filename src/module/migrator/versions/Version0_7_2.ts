@@ -10,17 +10,17 @@ import SR5ActorBase = Shadowrun.SR5ActorBase;
  * - Add npc character data.
  * - Add track disabled feature
  */
-export class Version0_7_11 extends VersionMigration {
+export class Version0_7_2 extends VersionMigration {
     get SourceVersion(): string {
-        return '0.7.10';
+        return '0.7.1';
     }
 
     get TargetVersion(): string {
-        return Version0_7_11.TargetVersion;
+        return Version0_7_2.TargetVersion;
     }
 
     static get TargetVersion(): string {
-        return '0.7.11';
+        return '0.7.2';
     }
 
     static NoNPCDataForCharacter(actorData: SR5ActorBase): boolean {
@@ -42,14 +42,14 @@ export class Version0_7_11 extends VersionMigration {
             attributes?: object
         } = {};
 
-        if (Version0_7_11.UnsupportedMetatype(actorData)) {
+        if (Version0_7_2.UnsupportedMetatype(actorData)) {
             const type = actorData.data.metatype.toLowerCase();
             // TODO: What to do with custom metatypes?
             const metatypeData = {metatype: SR5.character.types.hasOwnProperty(type) ? type : 'human'};
             updateData.data = {...updateData.data, ...metatypeData};
         }
 
-        if (Version0_7_11.NoNPCDataForCharacter(actorData)) {
+        if (Version0_7_2.NoNPCDataForCharacter(actorData)) {
             updateData.data = updateData.data ? updateData.data : {};
             const npcData = {
                 is_npc: false,
@@ -65,6 +65,6 @@ export class Version0_7_11 extends VersionMigration {
     }
 
     protected async ShouldMigrateActorData(actorData: SR5ActorBase): Promise<boolean> {
-        return Version0_7_11.UnsupportedMetatype(actorData) || Version0_7_11.NoNPCDataForCharacter(actorData);
+        return Version0_7_2.UnsupportedMetatype(actorData) || Version0_7_2.NoNPCDataForCharacter(actorData);
     }
 }
