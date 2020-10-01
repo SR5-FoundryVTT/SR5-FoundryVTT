@@ -8,9 +8,9 @@ export const registerRollAndLabelHelpers = () => {
         if (damage === 'matrix') return 'M';
         return '';
     });
-    Handlebars.registerHelper('diceIcon', function (roll) {
-        if (roll.roll) {
-            switch (roll.roll) {
+    Handlebars.registerHelper('diceIcon', function (side) {
+        if (side) {
+            switch (side) {
                 case 1:
                     return 'red';
                 case 2:
