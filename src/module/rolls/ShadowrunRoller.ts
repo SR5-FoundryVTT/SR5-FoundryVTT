@@ -199,13 +199,7 @@ export class ShadowrunRoller {
                 });
             }
         }
-
-        // start of custom message
-        const dice = roll.sides;
         const token = actor?.token;
-        const hits = roll.hits;
-        const dicePool = roll.pool;
-        const glitch = roll.glitched;
 
         [name, img] = ShadowrunRoller.getPreferedNameAndImageSource(name, img, actor, token);
 
@@ -217,13 +211,13 @@ export class ShadowrunRoller {
             },
             tokenId: token ? `${token.scene._id}.${token.id}` : undefined,
             rollMode,
-            dice,
+            dice: roll.sides,
             limit,
             testName: title,
-            dicePool,
+            dicePool: roll.pool,
             parts: parts.list,
-            hits,
-            glitch,
+            hits: roll.hits,
+            glitch: roll.glitched,
             ...props,
         };
 
@@ -355,6 +349,7 @@ export class ShadowrunRoller {
                             props.explodeSixes = true;
                             parts.addUniquePart('SR5.PushTheLimit', actor.getEdge().value);
                             delete props.limit;
+                            // TODO: Edge usage doesn't seem to apply on actor sheet.
                             await actor.update({
                                 'data.attributes.edge.uses': actor.data.data.attributes.edge.uses - 1,
                             });

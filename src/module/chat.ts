@@ -78,7 +78,7 @@ export const addChatMessageContextOptions = (html, options) => {
     const canRoll = (li) => {
         const msg = game.messages.get(li.data().messageId);
 
-        return msg.getFlag(SYSTEM_NAME, 'customRoll');
+        return msg.getFlag(SYSTEM_NAME, FLAGS.MessageCustomRoll);
     };
 
     options.push(
@@ -99,7 +99,7 @@ export const addChatMessageContextOptions = (html, options) => {
 };
 
 export const addRollListeners = (app: ChatMessage, html) => {
-    if (!app.getFlag(SYSTEM_NAME, 'customRoll')) return;
+    if (!app.getFlag(SYSTEM_NAME, FLAGS.MessageCustomRoll)) return;
     const item = SR5Item.getItemFromMessage(html);
     html.on('click', '.test-roll', async (event) => {
         event.preventDefault();
