@@ -12,7 +12,7 @@ import BaseValuePair = Shadowrun.BaseValuePair;
 import ModifiableValue = Shadowrun.ModifiableValue;
 import LabelField = Shadowrun.LabelField;
 import LimitField = Shadowrun.LimitField;
-import { SYSTEM_NAME } from '../constants';
+import { SYSTEM_NAME, FLAGS } from '../constants';
 import SR5ActorType = Shadowrun.SR5ActorType;
 import { PartsList } from '../parts/PartsList';
 import { ActorPrepFactory } from './prep/ActorPrepFactory';
@@ -1009,7 +1009,7 @@ export class SR5Actor extends Actor {
     static async pushTheLimit(li) {
         let msg: ChatMessage = game.messages.get(li.data().messageId);
 
-        if (msg.getFlag(SYSTEM_NAME, 'customRoll')) {
+        if (msg.getFlag(SYSTEM_NAME, FLAGS.MessageCustomRoll)) {
             let actor = (msg.user.character as unknown) as SR5Actor;
             if (!actor) {
                 // get controlled tokens
@@ -1031,7 +1031,6 @@ export class SR5Actor extends Actor {
                     parts: parts.list,
                     actor: actor,
                 }).then(() => {
-                    actor;
                     actor.update({
                         'data.attributes.edge.uses': actor.getEdge().uses - 1,
                     });
