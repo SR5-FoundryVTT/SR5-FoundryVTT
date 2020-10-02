@@ -12,7 +12,7 @@ import BaseValuePair = Shadowrun.BaseValuePair;
 import ModifiableValue = Shadowrun.ModifiableValue;
 import LabelField = Shadowrun.LabelField;
 import LimitField = Shadowrun.LimitField;
-import { SYSTEM_NAME } from '../constants';
+import { SYSTEM_NAME, FLAGS } from '../constants';
 import SR5ActorType = Shadowrun.SR5ActorType;
 import { PartsList } from '../parts/PartsList';
 import { ActorPrepFactory } from './prep/ActorPrepFactory';
@@ -21,6 +21,7 @@ import DamageElement = Shadowrun.DamageElement;
 import EdgeAttributeField = Shadowrun.EdgeAttributeField;
 import VehicleActorData = Shadowrun.VehicleActorData;
 import VehicleStat = Shadowrun.VehicleStat;
+import RemovableSkills = Shadowrun.RemovableSkills;
 
 export class SR5Actor extends Actor {
     async update(data, options?) {
@@ -173,6 +174,28 @@ export class SR5Actor extends Actor {
                 break;
         }
         return skill;
+    }
+
+    getSkill(skillId: string): SkillField|undefined {
+        const {skills} = this.data.data;
+        if (skills.active.hasOwnProperty(skillId)) {
+            return skills.active[skillId];
+        }
+        if (skills.language.value.hasOwnProperty(skillId)) {
+            return skills.language.value[skillId];
+        }
+        if (skills.knowledge.value.hasOwnProperty(skillId)) {
+            return skills.knowledge.value[skillId];
+        }
+    }
+
+    getSkillLabel(skillId: string): string {
+        const skill = this.getSkill(skillId);
+        if (!skill) {
+            return '';
+        }
+
+        return skill.label ? skill.label : skill.name ? skill.name : '';
     }
 
     addKnowledgeSkill(category, skill?) {
@@ -1013,7 +1036,7 @@ export class SR5Actor extends Actor {
     static async pushTheLimit(li) {
         let msg: ChatMessage = game.messages.get(li.data().messageId);
 
-        if (msg.getFlag(SYSTEM_NAME, 'customRoll')) {
+        if (msg.getFlag(SYSTEM_NAME, FLAGS.MessageCustomRoll)) {
             let actor = (msg.user.character as unknown) as SR5Actor;
             if (!actor) {
                 // get controlled tokens
@@ -1035,7 +1058,6 @@ export class SR5Actor extends Actor {
                     parts: parts.list,
                     actor: actor,
                 }).then(() => {
-                    actor;
                     actor.update({
                         'data.attributes.edge.uses': actor.getEdge().uses - 1,
                     });

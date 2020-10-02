@@ -382,29 +382,34 @@ export class SR5ActorSheet extends ActorSheet {
         });
 
         html.find('.skill-header').click(this._onFilterUntrainedSkills.bind(this));
-        html.find('#filter-skills').on('input', this._onFilterSkills.bind(this));
 
         html.find('.cell-input-roll').click(this._onRollCellInput.bind(this));
         html.find('.attribute-roll').click(this._onRollAttribute.bind(this));
         html.find('.skill-roll').click(this._onRollActiveSkill.bind(this));
+
+        html.find('#filter-skills').on('input', this._onFilterSkills.bind(this));
+
+        html.find('.skill-edit').click(this._onShowEditSkill.bind(this));
+        html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
+        html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
+        html.find('.add-knowledge').click(this._onAddKnowledgeSkill.bind(this));
+        html.find('.add-language').click(this._onAddLanguageSkill.bind(this));
+        html.find('.remove-knowledge').click(this._onRemoveKnowledgeSkill.bind(this));
+        html.find('.remove-language').click(this._onRemoveLanguageSkill.bind(this));
+        html.find('.knowledge-skill').click(this._onRollKnowledgeSkill.bind(this));
+        html.find('.language-skill').click(this._onRollLanguageSkill.bind(this));
+
         html.find('.item-roll').click(this._onRollItem.bind(this));
-        // $(html).find('.item-roll').on('contextmenu', () => console.log('TEST'));
         html.find('.item-equip-toggle').click(this._onEquipItem.bind(this));
         html.find('.item-qty').change(this._onChangeQty.bind(this));
         html.find('.item-rtg').change(this._onChangeRtg.bind(this));
         html.find('.item-create').click(this._onItemCreate.bind(this));
-        html.find('.matrix-att-selector').change(this._onMatrixAttributeSelected.bind(this));
-        html.find('.add-knowledge').click(this._onAddKnowledgeSkill.bind(this));
-        html.find('.knowledge-skill').click(this._onRollKnowledgeSkill.bind(this));
-        html.find('.remove-knowledge').click(this._onRemoveKnowledgeSkill.bind(this));
-        html.find('.add-language').click(this._onAddLanguageSkill.bind(this));
-        html.find('.language-skill').click(this._onRollLanguageSkill.bind(this));
-        html.find('.remove-language').click(this._onRemoveLanguageSkill.bind(this));
-        html.find('.import-character').click(this._onShowImportCharacter.bind(this));
         html.find('.reload-ammo').click(this._onReloadAmmo.bind(this));
-        html.find('.skill-edit').click(this._onShowEditSkill.bind(this));
-        html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
-        html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
+        html.find('.matrix-att-selector').change(this._onMatrixAttributeSelected.bind(this));
+
+        html.find('.import-character').click(this._onShowImportCharacter.bind(this));
+
+
 
         /**
          * Open the PDF for an item on the actor
