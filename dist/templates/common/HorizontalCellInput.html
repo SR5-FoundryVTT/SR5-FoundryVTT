@@ -1,4 +1,5 @@
 {{!-- value max id tolerance--}}
+{{#if (not disabled)}}
 <div class="horizontal-cell-input {{id}}" data-id="{{id}}">
     {{#if (isDefined name)}}<div class="roll cell-input-roll no-break">{{name}}</div>{{/if}}
     <div class="cell-container">
@@ -9,3 +10,4 @@
         {{/for}}
     </div>
 </div>
+{{/if}}
