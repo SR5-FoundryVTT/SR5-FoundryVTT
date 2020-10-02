@@ -10,7 +10,8 @@ declare namespace Shadowrun {
 
     export type TrackType = ValueMaxPair<number> &
         LabelField &
-        ModifiableValue & {
+        ModifiableValue &
+        DisableField & {
             wounds: number;
         };
 

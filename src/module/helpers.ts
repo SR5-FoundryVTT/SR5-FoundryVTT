@@ -200,4 +200,19 @@ export class Helpers {
                 .forEach(([key, value]) => Helpers.addLabels(value, key));
         }
     }
+
+    /* Handle Shadowrun style shortened attribute names with typical three letter shortening. */
+    static shortenAttributeLocalization(label: string, length: number=3): string {
+        const name = game.i18n.localize(label);
+
+        if (length <= 0) {
+            return name;
+        }
+
+        if (name.length < length) {
+            length = name.length;
+        }
+
+        return name.slice(0, length).toUpperCase();
+    }
 }

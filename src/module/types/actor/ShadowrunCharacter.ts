@@ -2,12 +2,19 @@
 
 declare namespace Shadowrun {
     export type SR5ActorSheetData = ActorSheetData & {
+        config: typeof CONFIG.SR5;
         data: SR5ActorData;
         filters: SR5SheetFilters;
+        isCharacter: boolean;
+        isSpirit: boolean;
+        awakened: boolean;
+        emerged: boolean;
+        woundTolerance: number
     };
 
     export type SR5SheetFilters = {
         skills: string;
+        showUntrainedSkills
     };
 
     export type SR5ActorType = SR5SpiritType | SR5CharacterType | SR5SpriteType | SR5VehicleType;
@@ -19,6 +26,7 @@ declare namespace Shadowrun {
         data: SR5ActorData;
         items: Collection<Item>;
         flags: object;
+        type: string;
         permission: {
             default: string;
         };
@@ -38,7 +46,8 @@ declare namespace Shadowrun {
         ArmorActorData &
         MagicActorData &
         WoundsActorData &
-        MovementActorData & {
+        MovementActorData &
+        NPCActorData & {
             attributes: Attributes;
             limits: Limits;
             skills: {
@@ -50,6 +59,7 @@ declare namespace Shadowrun {
             special: SpecialTrait;
             initiative: Initiative;
             recoil_compensation: number;
+            metatype: string | keyof typeof CONFIG.SR5.character.types
         };
 
     export type PhysicalTrackActorData = {
@@ -86,6 +96,11 @@ declare namespace Shadowrun {
     export type MatrixActorData = {
         matrix: ActorMatrix;
     };
+
+    export type NPCActorData = {
+        is_npc: boolean;
+        npc: NPC
+    }
 
     export type WoundType = {
         value: number;

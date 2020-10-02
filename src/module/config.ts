@@ -436,4 +436,14 @@ export const SR5 = {
             handling: 'SR5.Vehicle.Environments.Handling',
         },
     },
+
+    character: {
+        types: {
+            human: 'SR5.Character.Types.Human',
+            elf: 'SR5.Character.Types.Elf',
+            ork: 'SR5.Character.Types.Ork',
+            dwarf: 'SR5.Character.Types.Dwarf',
+            troll: 'SR5.Character.Types.Troll'
+        }
+    }
 };

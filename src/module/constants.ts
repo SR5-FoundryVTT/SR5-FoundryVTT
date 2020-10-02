@@ -5,3 +5,4 @@ export const FLAGS = {
     MessageCustomRoll: 'customRoll'
 };
 export const GLITCH_DIE = 1;
+export const METATYPEMODIFIER = 'SR5.Character.Modifiers.NPCMetatypeAttribute';

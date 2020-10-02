@@ -30,6 +30,7 @@
     "SR5.Specializations": "Specializations",
     "SR5.Specialization": "Specialization",
     "SR5.Rtg": "Rtg",
+    "SR5.RtgAboveZero": "Rtg > 0",
     "SR5.Qty": "Qty",
     "SR5.Add": "Add",
     "SR5.Languages": "Languages",
@@ -404,7 +405,6 @@
     "SR5.OverwatchScore": "Overwatch Score",
     "SR5.OverwatchScoreTrackerTitle": "Mr. Johnson's Baby Monitor",
     "SR5.PlusFifteenMinutes": "+15min",
-    "SR5.Character": "Character",
     "SR5.AddOneToOverwatch": "+1 to OS",
     "SR5.AddFiveToOverwatch": "+5 to OS",
     "SR5.AddFifteenMinutesToOverwatch": "Roll 2d6 for 15 minutes in the matrix",
@@ -500,6 +500,7 @@
     "SR5.WoundModifier": "Wound Mod",
     "SR5.ExtendedTest": "Extended Test",
     "SR5.IncomingDamage": "Incoming Damage",
+    "SR5.Temporary": "Temporary",
 
     "SR5.ApplyWounds": "Apply Wounds",
     "SR5.DontApplyWounds": "Don't Apply Wounds",
@@ -517,6 +518,8 @@
     "SR5.Device": "Device",
     "SR5.Cyberware": "Cyberware",
     "SR5.FullDefenseAttribute": "Full Defense Attribute",
+    "SR5.IsNPC": "NPC",
+    "SR5.IsGrunt": "Grunt",
 
     "SR5.Blackmail": "Blackmail",
     "SR5.Family": "Family",
@@ -706,6 +709,19 @@
         "Environments": {
             "Speed": "Speed",
             "Handling": "Handling"
+        }
+    },
+
+    "SR5.Character": {
+        "Types": {
+            "Human": "Human",
+            "Elf": "Elf",
+            "Ork": "Ork",
+            "Dwarf": "Dwarf",
+            "Troll": "Troll"
+        },
+        "Modifiers": {
+            "NPCMetatypeAttribute": "NPC Metatype Attribute"
         }
     }
 }

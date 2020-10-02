@@ -1,6 +1,9 @@
 <form class="{{cssClass}} wholesheet" autocomplete="off">
     <header class="flexrow">
-        {{> 'systems/shadowrun5e/dist/templates/actor/parts/ProfileImage.html' }}
+        {{> 'systems/shadowrun5e/dist/templates/actor/parts/ProfileImage.html'
+            height='90px'
+            width='90px'
+        }}
         <div class="flexcol flex-end border-right">
             <div class="block">
                 {{> 'systems/shadowrun5e/dist/templates/actor/parts/NameInput.html' }}
@@ -14,6 +17,7 @@
                                 max=track.max
                                 id=id
                                 tolerance=../woundTolerance
+                                disabled=track.disabled
                         }}
                         {{#if track.overflow}}
                             {{#ife track.value track.max}}

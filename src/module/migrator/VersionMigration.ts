@@ -230,6 +230,7 @@ export abstract class VersionMigration {
                 }
 
                 expandObject(updateData);
+
                 entityUpdates.set(actor, {
                     updateData,
                     embeddedItems: items,

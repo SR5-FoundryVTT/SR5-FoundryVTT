@@ -85,6 +85,7 @@ export const preloadHandlebarsTemplates = async () => {
         // Useful wrapper and implemented components
         'systems/shadowrun5e/dist/templates/common/ValueMaxAttribute.html',
         'systems/shadowrun5e/dist/templates/common/Attribute.html',
+        'systems/shadowrun5e/dist/templates/common/ValueModifiers.html',
 
         // useful select template for the common pattern
         'systems/shadowrun5e/dist/templates/common/Select.html',
@@ -99,8 +100,7 @@ export const preloadHandlebarsTemplates = async () => {
 
         // list components
         'systems/shadowrun5e/dist/templates/common/List/ListItem.html',
-        'systems/shadowrun5e/dist/templates/common/List/ListHeader.html',
-
+        'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
     ];
 
     return loadTemplates(templatePaths);

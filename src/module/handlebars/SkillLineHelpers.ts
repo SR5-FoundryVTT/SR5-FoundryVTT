@@ -1,5 +1,6 @@
 import SkillField = Shadowrun.SkillField;
 import { Helpers } from '../helpers';
+import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 
 export const registerSkillLineHelpers = () => {
     Handlebars.registerHelper('SkillHeaderIcons', function (id) {
@@ -23,16 +24,20 @@ export const registerSkillLineHelpers = () => {
         }
     });
 
-    Handlebars.registerHelper('SkillHeaderRightSide', function (id) {
+    Handlebars.registerHelper('SkillHeaderRightSide', function (id, filters: SR5SheetFilters) {
         const specs = {
             text: {
                 text: game.i18n.localize('SR5.Specialization'),
                 cssClass: 'skill-spec-item',
             },
         };
+
         const rtg = {
+            // Change Rating header to show active filtering.
             text: {
-                text: game.i18n.localize('SR5.Rtg'),
+                text: !filters || filters.showUntrainedSkills ?
+                    game.i18n.localize('SR5.Rtg') :
+                    game.i18n.localize('SR5.RtgAboveZero'),
                 cssClass: 'rtg',
             },
         };
