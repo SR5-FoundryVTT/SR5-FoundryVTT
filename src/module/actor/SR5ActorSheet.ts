@@ -8,6 +8,8 @@ import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import Skills = Shadowrun.Skills;
 import { SR5Actor } from './SR5Actor';
 import MatrixAttribute = Shadowrun.MatrixAttribute;
+import {SR5} from "../config";
+import SkillField = Shadowrun.SkillField;
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditForm instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
@@ -18,7 +20,6 @@ let globalSkillAppId: number = -1;
  * Extend the basic ActorSheet with some very simple modifications
  */
 export class SR5ActorSheet extends ActorSheet {
-    _shownUntrainedSkills: boolean;
     _shownDesc: string[];
     _filters: SR5SheetFilters;
     actor: SR5Actor;
@@ -31,10 +32,10 @@ export class SR5ActorSheet extends ActorSheet {
          * Keep track of the currently active sheet tab
          * @type {string}
          */
-        this._shownUntrainedSkills = false;
         this._shownDesc = [];
         this._filters = {
             skills: '',
+            showUntrainedSkills: true
         };
     }
 
@@ -73,37 +74,17 @@ export class SR5ActorSheet extends ActorSheet {
     getData() {
         const data: SR5ActorSheetData = (super.getData() as unknown) as SR5ActorSheetData;
 
-        this._prepareMatrixAttributes(data);
-
-        const attrs = data.data.attributes;
-        for (let [, att] of Object.entries(attrs)) {
-            if (!att.hidden) {
-                if (att.temp === 0) delete att.temp;
-            }
-        }
-
-        /*c
-        const { magic } = data.data;
-        if (magic.drain && magic.drain.temp === 0) delete magic.drain.temp;
-         */
-
-        const { modifiers: mods } = data.data;
-        for (let [key, value] of Object.entries(mods)) {
-            if (value === 0) mods[key] = '';
-        }
-
-        this._prepareItems(data);
-        this._prepareSkills(data);
-
-        data['config'] = CONFIG.SR5;
-        data['awakened'] = data.data.special === 'magic';
-        data['emerged'] = data.data.special === 'resonance';
-        data['woundTolerance'] = 3 + (Number(mods['wound_tolerance']) || 0);
-
+        // General purpose fields...
+        data.config = CONFIG.SR5;
         data.filters = this._filters;
 
-        data['isCharacter'] = this.actor.data.type === 'character';
-        data['isSpirit'] = this.actor.data.type === 'spirit';
+        this._prepareMatrixAttributes(data);
+        this._prepareActorAttributes(data);
+
+        this._prepareItems(data);
+        this._prepareSkillsWithFilters(data);
+        this._prepareActorTypeFields(data);
+        this._prepareCharacterFields(data);
 
         return data;
     }
@@ -112,9 +93,43 @@ export class SR5ActorSheet extends ActorSheet {
         return skill.attribute === 'magic' || id === 'astral_combat' || id === 'assensing';
     }
 
+    _isSkillResonance(skill) {
+        return skill.attribute === 'resonance'
+    }
+
+    _getSkillLabelOrName(skill) {
+        // Custom skills don't have labels, use their name instead.
+        return skill.label ? game.i18n.localize(skill.label) : skill.name;
+    }
+
     _doesSkillContainText(key, skill, text) {
-        let searchString = `${key} ${game.i18n.localize(skill.label)} ${skill?.specs?.join(' ')}`;
+        if (!text) {
+            return true;
+        }
+
+        // Search both english keys, localized labels and all specializations.
+        const name = this._getSkillLabelOrName(skill);
+        const searchKey = skill.name === undefined ? key : '';
+        let searchString = `${searchKey} ${name} ${skill?.specs?.join(' ')}`;
+
         return searchString.toLowerCase().search(text.toLowerCase()) > -1;
+    }
+
+    _prepareCharacterFields(data: SR5ActorSheetData) {
+        // Empty zero value modifiers for display purposes.
+        const { modifiers: mods } = data.data;
+        for (let [key, value] of Object.entries(mods)) {
+            if (value === 0) mods[key] = '';
+        }
+
+        data.awakened = data.data.special === 'magic';
+        data.emerged = data.data.special === 'resonance';
+        data.woundTolerance = 3 + (Number(mods['wound_tolerance']) || 0);
+    }
+
+    _prepareActorTypeFields(data: SR5ActorSheetData) {
+        data.isCharacter = this.actor.data.type === 'character';
+        data.isSpirit = this.actor.data.type === 'spirit';
     }
 
     _prepareMatrixAttributes(data) {
@@ -132,26 +147,90 @@ export class SR5ActorSheet extends ActorSheet {
         }
     }
 
-    _prepareSkills(data) {
-        const activeSkills = {};
-        const oldSkills: Skills = data.data.skills.active;
-        for (let [key, skill] of Object.entries(oldSkills)) {
-            // if filter isn't empty, we are doing custom filtering
-            if (this._filters.skills !== '') {
-                if (this._doesSkillContainText(key, skill, this._filters.skills)) {
-                    activeSkills[key] = skill;
-                }
-                // general check if we aren't filtering
-            } else if (
-                (skill.value > 0 || this._shownUntrainedSkills) &&
-                !(this._isSkillMagic(key, skill) && data.data.special !== 'magic') &&
-                !(skill.attribute === 'resonance' && data.data.special !== 'resonance')
-            ) {
-                activeSkills[key] = skill;
+    _prepareActorAttributes(data: SR5ActorSheetData) {
+        // Clear visible, zero value attributes temporary modifiers so they appear blank.
+        const attrs = data.data.attributes;
+        for (let [, att] of Object.entries(attrs)) {
+            if (!att.hidden) {
+                if (att.temp === 0) delete att.temp;
             }
         }
-        Helpers.orderKeys(activeSkills);
-        data.data.skills.active = activeSkills;
+    }
+
+    _prepareSkillsWithFilters(data: SR5ActorSheetData) {
+        this._filterActiveSkills(data);
+        this._filterKnowledgeSkills(data);
+        this._filterLanguageSkills(data);
+    }
+
+    _filterActiveSkills(data: SR5ActorSheetData) {
+        // Handle active skills directly, as it doesn't use sub-categories.
+        data.data.skills.active = this._filterSkills(data, data.data.skills.active);
+    }
+
+    _filterKnowledgeSkills(data: SR5ActorSheetData) {
+        // Knowledge skill have separate sub-categories.
+        Object.keys(SR5.knowledgeSkillCategories).forEach(category => {
+            if (!data.data.skills.knowledge.hasOwnProperty(category)) {
+                console.warn(`Knowledge Skill doesn't provide configured category ${category}`);
+                return;
+            }
+            data.data.skills.knowledge[category].value = this._filterSkills(data, data.data.skills.knowledge[category].value);
+        });
+    }
+
+    _filterLanguageSkills(data: SR5ActorSheetData) {
+        // Language Skills have no sub-categories.
+        data.data.skills.language.value = this._filterSkills(data, data.data.skills.language.value);
+    }
+
+    _filterSkills(data: SR5ActorSheetData, skills: Skills) {
+        const filteredSkills = {};
+        for (let [key, skill] of Object.entries(skills)) {
+            if (this._showSkill(key, skill, data)) {
+                filteredSkills[key] = skill;
+            }
+        }
+        Helpers.orderKeys(filteredSkills);
+        return filteredSkills
+    }
+
+    _showSkill(key, skill, data) {
+        if (this._showMagicSkills(key, skill, data)) {
+            return true;
+        }
+        if (this._showResonanceSkills(key, skill, data)) {
+            return true;
+        }
+
+        return this._showGeneralSkill(key, skill);
+    }
+
+    _isSkillFiltered(skillId, skill) {
+        // a newly created skill should be filtered, no matter what.
+        const isFilterable = this._getSkillLabelOrName(skill).length > 0;
+        const isHiddenForText = !this._doesSkillContainText(skillId, skill, this._filters.skills);
+        const isHiddenForUntrained = !this._filters.showUntrainedSkills && skill.value === 0;
+
+        return !(isFilterable && (isHiddenForUntrained || isHiddenForText))
+    }
+
+    _showGeneralSkill(skillId, skill: SkillField) {
+        return !this._isSkillMagic(skillId, skill) &&
+               !this._isSkillResonance(skill) &&
+               this._isSkillFiltered(skillId, skill);
+    }
+
+    _showMagicSkills(skillId, skill: SkillField, data: SR5ActorSheetData) {
+        return this._isSkillMagic(skillId, skill) &&
+              data.data.special === 'magic' &&
+              this._isSkillFiltered(skillId, skill);
+    }
+
+    _showResonanceSkills(skillId, skill: SkillField, data: SR5ActorSheetData) {
+        return this._isSkillResonance(skill) &&
+               data.data.special === 'resonance' &&
+               this._isSkillFiltered(skillId, skill);
     }
 
     _prepareItems(data) {
@@ -290,12 +369,6 @@ export class SR5ActorSheet extends ActorSheet {
 
         html.find('.hidden').hide();
 
-        html.find('.skill-header').click((event) => {
-            event.preventDefault();
-            this._shownUntrainedSkills = !this._shownUntrainedSkills;
-            this._render(true);
-        });
-
         html.find('.has-desc').click((event) => {
             event.preventDefault();
             const item = $(event.currentTarget).parents('.list-item');
@@ -308,7 +381,9 @@ export class SR5ActorSheet extends ActorSheet {
             }
         });
 
+        html.find('.skill-header').click(this._onFilterUntrainedSkills.bind(this));
         html.find('#filter-skills').on('input', this._onFilterSkills.bind(this));
+
         html.find('.cell-input-roll').click(this._onRollCellInput.bind(this));
         html.find('.attribute-roll').click(this._onRollAttribute.bind(this));
         html.find('.skill-roll').click(this._onRollActiveSkill.bind(this));
@@ -347,7 +422,6 @@ export class SR5ActorSheet extends ActorSheet {
             });
 
         $(html).find('.horizontal-cell-input .cell').on('click', this._onSetCellInput.bind(this));
-
         $(html).find('.horizontal-cell-input .cell').on('contextmenu', this._onClearCellInput.bind(this));
 
         /**
@@ -507,9 +581,17 @@ export class SR5ActorSheet extends ActorSheet {
         }
     }
 
+    // Setup skill name filter within getData
     async _onFilterSkills(event) {
         this._filters.skills = event.currentTarget.value;
-        this.render();
+        await this.render();
+    }
+
+    // Setup untrained skill filter within getData
+    async _onFilterUntrainedSkills(event) {
+        event.preventDefault();
+        this._filters.showUntrainedSkills = !this._filters.showUntrainedSkills;
+        await this.render();
     }
 
     async _onReloadAmmo(event) {

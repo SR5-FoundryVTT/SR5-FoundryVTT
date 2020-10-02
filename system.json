@@ -21,7 +21,15 @@
             "path": "dist/locale/de/config.json"
         }
     ],
-    "packs": [],
+    "packs": [
+        {
+            "name": "roles",
+            "label": "SR5e NPCs",
+            "system": "shadowrun5e",
+            "path": "./packs/sr5e-npcs.db",
+            "entity": "Actor"
+        }
+    ],
     "initiative": "@initiative.current.base.value + @initiative.current.dice.text - @wounds.value",
     "primaryTokenAttribute": "track.physical",
     "secondaryTokenAttribute": "track.stun",

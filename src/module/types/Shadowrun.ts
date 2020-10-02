@@ -19,6 +19,10 @@ declare namespace Shadowrun {
 
     export type SkillName = string;
 
+    export type NameField = {
+        name: SkillName
+    }
+
     export type CanHideFiled = {
         hidden: boolean;
     };
@@ -77,4 +81,8 @@ declare namespace Shadowrun {
         key: string;
         value: number;
     };
+
+    export type DisableField = {
+        disabled: boolean
+    }
 }

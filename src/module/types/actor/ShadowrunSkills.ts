@@ -9,6 +9,7 @@ declare namespace Shadowrun {
     };
 
     export type SkillField = BaseValuePair<number> &
+        NameField &
         CanHideFiled &
         ModifiableValue &
         LabelField &
