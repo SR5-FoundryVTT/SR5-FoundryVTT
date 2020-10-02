@@ -68,7 +68,7 @@ export const createChatData = async (templateData: TemplateData, roll?: Roll) =>
     }
     const rollMode = templateData.rollMode ?? game.settings.get('core', 'rollMode');
 
-    if (['gmroll', 'blindroll'].includes(rollMode)) chatData['whisper'] = ChatMessage.getWhisperIDs('GM');
+    if (['gmroll', 'blindroll'].includes(rollMode)) chatData['whisper'] = ChatMessage.getWhisperRecipients('GM');
     if (rollMode === 'blindroll') chatData['blind'] = true;
 
     return chatData;

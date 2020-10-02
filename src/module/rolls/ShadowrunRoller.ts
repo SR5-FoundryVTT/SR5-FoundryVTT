@@ -234,7 +234,6 @@ export class ShadowrunRoller {
 
         if (!hideRollMessage) {
             const chatData = await createChatData(templateData, roll);
-            console.error(hideRollMessage, chatData);
             ChatMessage.create(chatData, { displaySheet: false }).then((message) => {
                 console.log(message);
             });
