@@ -7334,8 +7334,11 @@ class HooksManager {
             if (game.user.isGM) {
                 yield Migrator_1.Migrator.BeginMigration();
             }
+            // TODO make based on foundry version
             const diceIconSelector = '#chat-controls .roll-type-select .fa-dice-d20';
             $(document).on('click', diceIconSelector, () => ShadowrunRoller_1.ShadowrunRoller.promptRoll());
+            const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
+            $(document).on('click', diceIconSelectorNew, () => ShadowrunRoller_1.ShadowrunRoller.promptRoll());
         });
     }
     static canvasInit() {
