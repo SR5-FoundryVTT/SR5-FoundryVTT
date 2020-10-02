@@ -69,10 +69,6 @@ declare namespace Shadowrun {
         label: string;
     };
 
-    export type NameField = {
-        name?: string;
-    }
-
     export type ManualModField = {
         temp: number;
     }
