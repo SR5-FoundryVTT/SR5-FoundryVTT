@@ -27,8 +27,8 @@ export class SkillEditForm extends BaseEntitySheet {
     }
 
     get title(): string {
-        const data = this.getData().data;
-        return `${game.i18n.localize('SR5.EditSkill')} - ${data?.label ? game.i18n.localize(data.label) : ''}`;
+        const label = this.entity.getSkillLabel(this.skillId);
+        return `${game.i18n.localize('SR5.EditSkill')} - ${game.i18n.localize(label)}`;
     }
 
     _onUpdateObject(event, formData, updateData) {
@@ -143,7 +143,7 @@ export class SkillEditForm extends BaseEntitySheet {
 
     getData(): SkillEditFormData {
         const data = super.getData();
-        const actor = super.getData().entity;
+        const actor = data.entity;
         data['data'] = actor ? getProperty(actor, this._updateString()) : {};
         return data;
     }
