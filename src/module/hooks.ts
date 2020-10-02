@@ -1,18 +1,18 @@
-import {SR5} from "./config";
-import {Migrator} from "./migrator/Migrator";
-import {registerSystemSettings} from "./settings";
-import {SYSTEM_NAME} from "./constants";
-import {SR5Actor} from "./actor/SR5Actor";
-import {SR5ActorSheet} from "./actor/SR5ActorSheet";
-import {SR5Item} from "./item/SR5Item";
-import {SR5ItemSheet} from "./item/SR5ItemSheet";
-import {ShadowrunRoller} from "./rolls/ShadowrunRoller";
-import {Helpers} from "./helpers";
-import {HandlebarManager} from "./handlebars/HandlebarManager";
-import {measureDistance} from "./canvas";
-import {preCombatUpdate, shadowrunCombatUpdate} from "./combat";
-import * as chat from "./chat";
-import {createItemMacro, rollItemMacro} from "./macros";
+import { SR5 } from './config';
+import { Migrator } from './migrator/Migrator';
+import { registerSystemSettings } from './settings';
+import { SYSTEM_NAME } from './constants';
+import { SR5Actor } from './actor/SR5Actor';
+import { SR5ActorSheet } from './actor/SR5ActorSheet';
+import { SR5Item } from './item/SR5Item';
+import { SR5ItemSheet } from './item/SR5ItemSheet';
+import { ShadowrunRoller } from './rolls/ShadowrunRoller';
+import { Helpers } from './helpers';
+import { HandlebarManager } from './handlebars/HandlebarManager';
+import { measureDistance } from './canvas';
+import { preCombatUpdate, shadowrunCombatUpdate } from './combat';
+import * as chat from './chat';
+import { createItemMacro, rollItemMacro } from './macros';
 
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
 
@@ -52,9 +52,9 @@ export class HooksManager {
 
         // Register sheet application classes
         Actors.unregisterSheet('core', ActorSheet);
-        Actors.registerSheet(SYSTEM_NAME, SR5ActorSheet, {makeDefault: true});
+        Actors.registerSheet(SYSTEM_NAME, SR5ActorSheet, { makeDefault: true });
         Items.unregisterSheet('core', ItemSheet);
-        Items.registerSheet(SYSTEM_NAME, SR5ItemSheet, {makeDefault: true});
+        Items.registerSheet(SYSTEM_NAME, SR5ItemSheet, { makeDefault: true });
 
         ['renderSR5ActorSheet', 'renderSR5ItemSheet'].forEach((s) => {
             Hooks.on(s, (app, html) => Helpers.setupCustomCheckbox(app, html));
@@ -74,8 +74,11 @@ export class HooksManager {
             await Migrator.BeginMigration();
         }
 
+        // TODO make based on foundry version
         const diceIconSelector = '#chat-controls .roll-type-select .fa-dice-d20';
         $(document).on('click', diceIconSelector, () => ShadowrunRoller.promptRoll());
+        const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
+        $(document).on('click', diceIconSelectorNew, () => ShadowrunRoller.promptRoll());
     }
 
     static canvasInit() {
