@@ -1123,6 +1123,25 @@ class SR5Actor extends Actor {
         }
         return skill;
     }
+    getSkill(skillId) {
+        const { skills } = this.data.data;
+        if (skills.active.hasOwnProperty(skillId)) {
+            return skills.active[skillId];
+        }
+        if (skills.language.value.hasOwnProperty(skillId)) {
+            return skills.language.value[skillId];
+        }
+        if (skills.knowledge.value.hasOwnProperty(skillId)) {
+            return skills.knowledge.value[skillId];
+        }
+    }
+    getSkillLabel(skillId) {
+        const skill = this.getSkill(skillId);
+        if (!skill) {
+            return '';
+        }
+        return skill.label ? skill.label : skill.name ? skill.name : '';
+    }
     addKnowledgeSkill(category, skill) {
         const defaultSkill = {
             name: '',
@@ -1908,7 +1927,7 @@ class SR5Actor extends Actor {
     static pushTheLimit(li) {
         return __awaiter(this, void 0, void 0, function* () {
             let msg = game.messages.get(li.data().messageId);
-            if (msg.getFlag(constants_1.SYSTEM_NAME, 'customRoll')) {
+            if (msg.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.MessageCustomRoll)) {
                 let actor = msg.user.character;
                 if (!actor) {
                     // get controlled tokens
@@ -1930,7 +1949,6 @@ class SR5Actor extends Actor {
                         parts: parts.list,
                         actor: actor,
                     }).then(() => {
-                        actor;
                         actor.update({
                             'data.attributes.edge.uses': actor.getEdge().uses - 1,
                         });
@@ -2365,28 +2383,27 @@ class SR5ActorSheet extends ActorSheet {
             }
         });
         html.find('.skill-header').click(this._onFilterUntrainedSkills.bind(this));
-        html.find('#filter-skills').on('input', this._onFilterSkills.bind(this));
         html.find('.cell-input-roll').click(this._onRollCellInput.bind(this));
         html.find('.attribute-roll').click(this._onRollAttribute.bind(this));
         html.find('.skill-roll').click(this._onRollActiveSkill.bind(this));
+        html.find('#filter-skills').on('input', this._onFilterSkills.bind(this));
+        html.find('.skill-edit').click(this._onShowEditSkill.bind(this));
+        html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
+        html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
+        html.find('.add-knowledge').click(this._onAddKnowledgeSkill.bind(this));
+        html.find('.add-language').click(this._onAddLanguageSkill.bind(this));
+        html.find('.remove-knowledge').click(this._onRemoveKnowledgeSkill.bind(this));
+        html.find('.remove-language').click(this._onRemoveLanguageSkill.bind(this));
+        html.find('.knowledge-skill').click(this._onRollKnowledgeSkill.bind(this));
+        html.find('.language-skill').click(this._onRollLanguageSkill.bind(this));
         html.find('.item-roll').click(this._onRollItem.bind(this));
-        // $(html).find('.item-roll').on('contextmenu', () => console.log('TEST'));
         html.find('.item-equip-toggle').click(this._onEquipItem.bind(this));
         html.find('.item-qty').change(this._onChangeQty.bind(this));
         html.find('.item-rtg').change(this._onChangeRtg.bind(this));
         html.find('.item-create').click(this._onItemCreate.bind(this));
-        html.find('.matrix-att-selector').change(this._onMatrixAttributeSelected.bind(this));
-        html.find('.add-knowledge').click(this._onAddKnowledgeSkill.bind(this));
-        html.find('.knowledge-skill').click(this._onRollKnowledgeSkill.bind(this));
-        html.find('.remove-knowledge').click(this._onRemoveKnowledgeSkill.bind(this));
-        html.find('.add-language').click(this._onAddLanguageSkill.bind(this));
-        html.find('.language-skill').click(this._onRollLanguageSkill.bind(this));
-        html.find('.remove-language').click(this._onRemoveLanguageSkill.bind(this));
-        html.find('.import-character').click(this._onShowImportCharacter.bind(this));
         html.find('.reload-ammo').click(this._onReloadAmmo.bind(this));
-        html.find('.skill-edit').click(this._onShowEditSkill.bind(this));
-        html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
-        html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
+        html.find('.matrix-att-selector').change(this._onMatrixAttributeSelected.bind(this));
+        html.find('.import-character').click(this._onShowImportCharacter.bind(this));
         /**
          * Open the PDF for an item on the actor
          */
@@ -5345,8 +5362,8 @@ class SkillEditForm extends BaseEntitySheet {
         });
     }
     get title() {
-        const data = this.getData().data;
-        return `${game.i18n.localize('SR5.EditSkill')} - ${(data === null || data === void 0 ? void 0 : data.label) ? game.i18n.localize(data.label) : ''}`;
+        const label = this.entity.getSkillLabel(this.skillId);
+        return `${game.i18n.localize('SR5.EditSkill')} - ${game.i18n.localize(label)}`;
     }
     _onUpdateObject(event, formData, updateData) {
         // get base value
@@ -5460,7 +5477,7 @@ class SkillEditForm extends BaseEntitySheet {
     }
     getData() {
         const data = super.getData();
-        const actor = super.getData().entity;
+        const actor = data.entity;
         data['data'] = actor ? getProperty(actor, this._updateString()) : {};
         return data;
     }
@@ -5549,7 +5566,7 @@ exports.createChatData = (templateData, roll) => __awaiter(void 0, void 0, void 
     }
     const rollMode = (_a = templateData.rollMode) !== null && _a !== void 0 ? _a : game.settings.get('core', 'rollMode');
     if (['gmroll', 'blindroll'].includes(rollMode))
-        chatData['whisper'] = ChatMessage.getWhisperIDs('GM');
+        chatData['whisper'] = ChatMessage.getWhisperRecipients('GM');
     if (rollMode === 'blindroll')
         chatData['blind'] = true;
     return chatData;
@@ -5557,7 +5574,7 @@ exports.createChatData = (templateData, roll) => __awaiter(void 0, void 0, void 
 exports.addChatMessageContextOptions = (html, options) => {
     const canRoll = (li) => {
         const msg = game.messages.get(li.data().messageId);
-        return msg.getFlag(constants_1.SYSTEM_NAME, 'customRoll');
+        return msg.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.MessageCustomRoll);
     };
     options.push({
         name: 'Push the Limit',
@@ -5573,7 +5590,7 @@ exports.addChatMessageContextOptions = (html, options) => {
     return options;
 };
 exports.addRollListeners = (app, html) => {
-    if (!app.getFlag(constants_1.SYSTEM_NAME, 'customRoll'))
+    if (!app.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.MessageCustomRoll))
         return;
     const item = SR5Item_1.SR5Item.getItemFromMessage(html);
     html.on('click', '.test-roll', (event) => __awaiter(void 0, void 0, void 0, function* () {
@@ -6126,12 +6143,14 @@ exports.SR5 = {
 },{}],45:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.METATYPEMODIFIER = exports.FLAGS = exports.SYSTEM_NAME = void 0;
+exports.METATYPEMODIFIER = exports.GLITCH_DIE = exports.FLAGS = exports.SYSTEM_NAME = void 0;
 exports.SYSTEM_NAME = 'shadowrun5e';
 exports.FLAGS = {
     ShowGlitchAnimation: 'showGlitchAnimation',
-    ShowTokenNameForChatOutput: 'showTokenNameInsteadOfActor'
+    ShowTokenNameForChatOutput: 'showTokenNameInsteadOfActor',
+    MessageCustomRoll: 'customRoll'
 };
+exports.GLITCH_DIE = 1;
 exports.METATYPEMODIFIER = 'SR5.Character.Modifiers.NPCMetatypeAttribute';
 
 },{}],46:[function(require,module,exports){
@@ -6860,9 +6879,9 @@ exports.registerRollAndLabelHelpers = () => {
             return 'M';
         return '';
     });
-    Handlebars.registerHelper('diceIcon', function (roll) {
-        if (roll.roll) {
-            switch (roll.roll) {
+    Handlebars.registerHelper('diceIcon', function (side) {
+        if (side) {
+            switch (side) {
                 case 1:
                     return 'red';
                 case 2:
@@ -10351,14 +10370,6 @@ class PartsList {
     }
     getMessageOutput() {
         return this.list;
-        // const mods = {};
-        // for (const part of this._list) {
-        //     if (mods[part.name] !== undefined) {
-        //     } else {
-        //         mods[part.name] = part.value;
-        //     }
-        // }
-        // return mods;
     }
     static AddUniquePart(list, name, value, overwrite = true) {
         const parts = new PartsList(list);
@@ -10406,6 +10417,38 @@ class ShadowrunRoll extends Roll {
         const data = super.toJSON();
         data.class = 'Roll';
         return data;
+    }
+    get sides() {
+        //@ts-ignore
+        // 0.7.x foundryVTT
+        if (this.terms) {
+            //@ts-ignore
+            return this.terms[0].results.map(result => result.result);
+        }
+        //@ts-ignore
+        // 0.6.x foundryVTT
+        return this.parts[0].rolls.map(roll => roll.roll);
+    }
+    count(side) {
+        const results = this.sides;
+        return results.reduce((counted, result) => result === side ? counted + 1 : counted, 0);
+    }
+    get hits() {
+        return this.total;
+    }
+    get pool() {
+        //@ts-ignore
+        // 0.7.x foundryVTT
+        if (this.terms) {
+            //@ts-ignore
+            return this.dice[0].number;
+        }
+        //@ts-ignore
+        // 0.6.x foundryVTT
+        return this.parts[0].rolls.length;
+    }
+    get glitched() {
+        return this.count(constants_1.GLITCH_DIE) > Math.floor(this.pool / 2);
     }
 }
 exports.ShadowrunRoll = ShadowrunRoll;
@@ -10479,28 +10522,13 @@ class ShadowrunRoller {
                     });
                 }
             }
-            // start of custom message
-            const dice = roll === null || roll === void 0 ? void 0 : roll.parts[0].rolls;
             const token = actor === null || actor === void 0 ? void 0 : actor.token;
-            let glitch = false;
-            if (roll !== undefined) {
-                let oneCount = 0;
-                roll.dice.forEach((die) => {
-                    die.rolls.forEach((result) => {
-                        if (result.roll === 1) {
-                            oneCount += 1;
-                        }
-                    });
-                });
-                glitch = oneCount > Math.floor(parts.total / 2);
-            }
             [name, img] = ShadowrunRoller.getPreferedNameAndImageSource(name, img, actor, token);
             const templateData = Object.assign({ actor: actor, header: {
                     name: name || '',
                     img: img || '',
-                }, tokenId: token ? `${token.scene._id}.${token.id}` : undefined, rollMode,
-                dice,
-                limit, testName: title, dicePool: parts.total, parts: parts.list, hits: roll === null || roll === void 0 ? void 0 : roll.total, glitch }, props);
+                }, tokenId: token ? `${token.scene._id}.${token.id}` : undefined, rollMode, dice: roll.sides, limit, testName: title, dicePool: roll.pool, parts: parts.list, hits: roll.hits, glitch: roll.glitched }, props);
+            // In what case would no roll be present? No parts? Why would this reach any logic then?
             if (roll) {
                 roll.templateData = templateData;
             }
@@ -10614,6 +10642,7 @@ class ShadowrunRoller {
                             props.explodeSixes = true;
                             parts.addUniquePart('SR5.PushTheLimit', actor.getEdge().value);
                             delete props.limit;
+                            // TODO: Edge usage doesn't seem to apply on actor sheet.
                             yield actor.update({
                                 'data.attributes.edge.uses': actor.data.data.attributes.edge.uses - 1,
                             });
