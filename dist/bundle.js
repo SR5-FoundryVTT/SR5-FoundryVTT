@@ -8478,7 +8478,7 @@ class SR5Item extends Item {
             // parse however you need, all "buttons" will lead to this function
             const [code, page] = source.split(' ');
             //@ts-ignore
-            ui.PDFoundry.openPDFByCode(code, parseInt(page));
+            ui.PDFoundry.openPDFByCode(code, { page: parseInt(page) });
         });
     }
     getAttackData(hits) {
