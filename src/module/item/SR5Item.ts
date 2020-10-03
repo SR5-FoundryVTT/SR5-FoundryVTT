@@ -797,7 +797,7 @@ export class SR5Item extends Item {
         const [code, page] = source.split(' ');
 
         //@ts-ignore
-        ui.PDFoundry.openPDFByCode(code, parseInt(page));
+        ui.PDFoundry.openPDFByCode(code, {page: parseInt(page)});
     }
 
     getAttackData(hits: number): AttackData | undefined {
