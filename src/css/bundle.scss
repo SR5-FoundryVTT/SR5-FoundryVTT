@@ -8,10 +8,6 @@
     src: url('assets/fonts/NodestoCapsCondensed.otf');
 }
 
-.roll {
-    @include rollable;
-}
-
 // .Roll class is used for labels that will look for data-roll-id on itself or a parent RollId
 .Roll {
     @include rollable;
@@ -246,6 +242,14 @@ select.display {
 }
 
 .sr5 {
+    .roll {
+        @include rollable;
+    }
+    .editor .tox-edit-area {
+        background: $mce-background;
+    }
+
+
     .parts-list {
         font-size: 12px;
         display: flex;
