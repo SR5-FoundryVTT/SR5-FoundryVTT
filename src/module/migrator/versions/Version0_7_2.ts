@@ -31,7 +31,7 @@ export class Version0_7_2 extends VersionMigration {
     }
 
     static UnsupportedMetatype(actorData: SR5ActorBase): boolean {
-        const type = actorData.data.metatype.toLowerCase();
+        const type = actorData.data.metatype?.toLowerCase() ?? '';
         return actorData.type === 'character' &&
             SR5.character.types.hasOwnProperty(type);
     }
@@ -43,7 +43,7 @@ export class Version0_7_2 extends VersionMigration {
         } = {};
 
         if (Version0_7_2.UnsupportedMetatype(actorData)) {
-            const type = actorData.data.metatype.toLowerCase();
+            const type = actorData.data.metatype?.toLowerCase() ?? '';
             // TODO: What to do with custom metatypes?
             const metatypeData = {metatype: SR5.character.types.hasOwnProperty(type) ? type : 'human'};
             updateData.data = {...updateData.data, ...metatypeData};
