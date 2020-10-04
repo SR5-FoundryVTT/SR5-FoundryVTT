@@ -10244,15 +10244,17 @@ class Version0_7_2 extends VersionMigration_1.VersionMigration {
             ((_b = actorData === null || actorData === void 0 ? void 0 : actorData.data) === null || _b === void 0 ? void 0 : _b.npc) === undefined);
     }
     static UnsupportedMetatype(actorData) {
-        const type = actorData.data.metatype.toLowerCase();
+        var _a, _b;
+        const type = (_b = (_a = actorData.data.metatype) === null || _a === void 0 ? void 0 : _a.toLowerCase()) !== null && _b !== void 0 ? _b : '';
         return actorData.type === 'character' &&
             config_1.SR5.character.types.hasOwnProperty(type);
     }
     MigrateActorData(actorData) {
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
             const updateData = {};
             if (Version0_7_2.UnsupportedMetatype(actorData)) {
-                const type = actorData.data.metatype.toLowerCase();
+                const type = (_b = (_a = actorData.data.metatype) === null || _a === void 0 ? void 0 : _a.toLowerCase()) !== null && _b !== void 0 ? _b : '';
                 // TODO: What to do with custom metatypes?
                 const metatypeData = { metatype: config_1.SR5.character.types.hasOwnProperty(type) ? type : 'human' };
                 updateData.data = Object.assign(Object.assign({}, updateData.data), metatypeData);
