@@ -1,8 +1,16 @@
-import { SR5Item } from '../../item/SR5Item';
-import { Helpers } from '../../helpers';
+import {SR5Item} from '../../item/SR5Item';
+import {Helpers} from '../../helpers';
+import {SR} from "../../constants";
 
+type ItemDialogData = {
+    dialogData: DialogData | undefined,
+    getSelectedData: Function | undefined,
+    itemHasNoDialog: boolean
+};
+
+// TODO: Why extend dialog when internal dialog structures aren't used? Could resolve the whole flag / data flow issue.
 export class ShadowrunItemDialog extends Dialog {
-    static async fromItem(item: SR5Item, event?: MouseEvent): Promise<DialogData | undefined> {
+    static async fromItem(item: SR5Item, event?: MouseEvent): Promise<ItemDialogData> {
         const dialogData: DialogData = {
             title: item.name,
             buttons: {},
@@ -12,8 +20,15 @@ export class ShadowrunItemDialog extends Dialog {
         const templateData = {};
         let templatePath = '';
 
+
+        const itemData: ItemDialogData = {
+            dialogData: undefined,
+            getSelectedData: undefined,
+            itemHasNoDialog: true
+        };
+
         if (item.isRangedWeapon()) {
-            ShadowrunItemDialog.addRangedWeaponData(templateData, dialogData, item);
+            itemData.getSelectedData = ShadowrunItemDialog.addRangedWeaponData(templateData, dialogData, item);
             templatePath = 'systems/shadowrun5e/dist/templates/rolls/range-weapon-roll.html';
         } else if (item.isSpell()) {
             ShadowrunItemDialog.addSpellData(templateData, dialogData, item);
@@ -25,22 +40,15 @@ export class ShadowrunItemDialog extends Dialog {
 
         if (templatePath) {
             const dialog = await renderTemplate(templatePath, templateData);
-            return mergeObject(dialogData, {
+
+            itemData.dialogData = mergeObject(dialogData, {
                 content: dialog,
             });
+            itemData.itemHasNoDialog = false;
         }
 
-        return undefined;
+        return itemData;
     }
-
-    /*
-    static get defaultOptions() {
-        const options = super.defaultOptions;
-        return mergeObject(options, {
-            classes: ['sr5', 'sheet'],
-        });
-    }
-     */
 
     static addComplexFormData(templateData: object, dialogData: DialogData, item: SR5Item): void {
         const fade = item.getFade();
@@ -63,7 +71,7 @@ export class ShadowrunItemDialog extends Dialog {
         dialogData.close = async (html) => {
             if (cancel) return false;
             const level = Helpers.parseInputToNumber($(html).find('[name=level]').val());
-            await item.setLastComplexFormLevel({ value: level });
+            await item.setLastComplexFormLevel({value: level});
             return true;
         };
     }
@@ -98,19 +106,19 @@ export class ShadowrunItemDialog extends Dialog {
         dialogData.close = async (html) => {
             if (cancel) return false;
             const force = Helpers.parseInputToNumber($(html).find('[name=force]').val());
-            await item.setLastSpellForce({ value: force, reckless });
+            await item.setLastSpellForce({value: force, reckless});
             return true;
         };
     }
 
-    static addRangedWeaponData(templateData: object, dialogData: DialogData, item: SR5Item): void {
+    static addRangedWeaponData(templateData: object, dialogData: DialogData, item: SR5Item): Function {
         let title = dialogData.title || item.name;
 
         const itemData = item.data.data;
         const fireModes = {};
 
-        const { modes, ranges } = itemData.range;
-        const { ammo } = itemData;
+        const {modes, ranges} = itemData.range;
+        const {ammo} = itemData;
         if (modes.single_shot) {
             fireModes['1'] = game.i18n.localize("SR5.WeaponModeSingleShotShort");
         }
@@ -139,6 +147,9 @@ export class ShadowrunItemDialog extends Dialog {
         templateData['ranges'] = templateRanges;
         templateData['targetRange'] = item.getLastFireRangeMod();
 
+        // Get user target tokens for range calulations.
+        templateData['targets'] = Helpers.getUserTargets();
+
         let cancel = true;
         dialogData.buttons = {
             continue: {
@@ -147,13 +158,23 @@ export class ShadowrunItemDialog extends Dialog {
             },
         };
 
-        dialogData.close = async (html) => {
-            if (cancel) return false;
-            const fireMode = Helpers.parseInputToNumber($(html).find('[name="fireMode"]').val());
-            const range = Helpers.parseInputToNumber($(html).find('[name="range"]').val());
+        return async (html): Promise<object> => {
+            if (cancel) {
+                return {}
+            }
 
+            const fireMode = Helpers.parseInputToNumber($(html).find('[name="fireMode"]').val());
+            const selectedTargetId = $(html).find('[name="target"]').val() as string;
+
+            let targetToken = Helpers.getToken(selectedTargetId);
+            if (targetToken) {
+                console.error(item, item.actor);
+                console.error('Distance', Helpers.measureGridDistance(item.actor.token, targetToken));
+            }
+
+            const range = Helpers.parseInputToNumber($(html).find('[name="range"]').val());
             if (range) {
-                await item.setLastFireRangeMod({ value: range });
+                await item.setLastFireRangeMod({value: range});
             }
 
             if (fireMode) {
@@ -166,23 +187,18 @@ export class ShadowrunItemDialog extends Dialog {
                 };
                 await item.setLastFireMode(fireModeData);
             }
-            return true;
+            return {targetToken};
         };
     }
 
     static _getRangeWeaponTemplateData(ranges) {
-        const lookup = {
-            short: 0,
-            medium: -1,
-            long: -3,
-            extreme: -6,
-        };
+        const {range_modifiers} = SR.combat.environmental;
         const newRanges = {};
         for (const [key, value] of Object.entries(ranges)) {
             newRanges[key] = {
                 distance: value,
                 label: CONFIG.SR5.weaponRanges[key],
-                modifier: lookup[key],
+                modifier: range_modifiers[key],
             };
         }
         return newRanges;

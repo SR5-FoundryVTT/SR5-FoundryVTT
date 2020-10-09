@@ -501,6 +501,7 @@
     "SR5.ExtendedTest": "Extended Test",
     "SR5.IncomingDamage": "Incoming Damage",
     "SR5.Temporary": "Temporary",
+    "SR5.SelectedTargets": "Selected Targets",
 
     "SR5.ApplyWounds": "Apply Wounds",
     "SR5.DontApplyWounds": "Don't Apply Wounds",

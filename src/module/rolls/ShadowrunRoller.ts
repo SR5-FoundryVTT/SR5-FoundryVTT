@@ -99,7 +99,7 @@ export class ShadowrunRoll extends Roll {
 }
 
 export class ShadowrunRoller {
-    static itemRoll(event, item: SR5Item, options?: Partial<AdvancedRollProps>): Promise<ShadowrunRoll | undefined> {
+    static itemRoll(event, item: SR5Item, selectedData?: object, options?: Partial<AdvancedRollProps>): Promise<ShadowrunRoll | undefined> {
         const parts = item.getRollPartsList();
         let limit = item.getLimit();
         let title = item.getRollName();
@@ -119,7 +119,7 @@ export class ShadowrunRoller {
             img: item.img,
             previewTemplate: item.hasTemplate,
         };
-        rollData['attack'] = item.getAttackData(0);
+        rollData['attack'] = item.getAttackData(0, selectedData);
         rollData['blast'] = item.getBlastData();
 
         if (item.hasOpposedRoll) {

@@ -501,6 +501,7 @@
   "SR5.ExtendedTest": "Ausgedehnte Probe",
   "SR5.IncomingDamage": "Kommender Schaden",
   "SR5.Temporary": "Temporär",
+  "SR5.SelectedTargets": "Ausgew. Ziele",
 
   "SR5.ApplyWounds": "Anwenden",
   "SR5.DontApplyWounds": "Nicht anwenden",
@@ -514,12 +515,12 @@
   "SR5.Block": "Blocken",
   "SR5.Parry": "Parrieren",
 
-    "SR5.Equipment": "Ausrüstung",
-    "SR5.Device": "Gerät",
-    "SR5.Cyberware": "Cyberware",
-    "SR5.FullDefenseAttribute": "Attribut für Volle Verteidigung",
-    "SR5.IsNPC": "NPC",
-    "SR5.IsGrunt": "Scherge (Grunt)",
+  "SR5.Equipment": "Ausrüstung",
+  "SR5.Device": "Gerät",
+  "SR5.Cyberware": "Cyberware",
+  "SR5.FullDefenseAttribute": "Attribut für Volle Verteidigung",
+  "SR5.IsNPC": "NPC",
+  "SR5.IsGrunt": "Scherge (Grunt)",
 
   "SR5.Blackmail": "Erpressung",
   "SR5.Family": "Familie",

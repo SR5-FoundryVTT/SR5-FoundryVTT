@@ -23,4 +23,12 @@
             {{/each}} {{/select}}
         </select>
     </div>
+    <div class="form-group">
+        <label>{{localize 'SR5.SelectedTargets'}}</label>
+        <select name="target">
+            {{#select targetToken}} {{#each targets as |target|}}
+            <option value="{{target.id}}">{{target.name}}</option>
+            {{/each}} {{/select}}
+        </select>
+    </div>
 </form>

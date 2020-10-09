@@ -245,61 +245,67 @@ export class SR5Item extends Item {
         item['properties'] = this.getChatData().properties;
     }
 
-    async postCard(event?) {
-        // we won't work if we don't have an actor
-        if (!this.actor) return;
+    async post(dontRollTest: boolean, selectedData?: object) {
+        // if only post, don't roll and post a card version -- otherwise roll
+        // TODO: Check post DontRollTest path.
+        if (dontRollTest) {
+            const { token } = this.actor;
+            const attack = this.getAttackData(0);
+            // don't include any hits
+            delete attack?.hits;
 
-        const postOnly = event?.shiftKey || !this.hasRoll;
+            const chatData = await createChatData({
+                header: {
+                    name: this.name,
+                    img: this.img,
+                },
+                testName: this.getRollName(),
+                actor: this.actor,
+                tokenId: token ? `${token.scene._id}.${token.id}` : undefined,
+                description: this.getChatData(),
+                item: this,
+                previewTemplate: this.hasTemplate,
+                attack
+            });
 
-        const post = (bonus = {}) => {
-            // if only post, don't roll and post a card version -- otherwise roll
-            if (postOnly) {
-                const { token } = this.actor;
-                const attack = this.getAttackData(0);
-                // don't include any hits
-                delete attack?.hits;
-                console.error('SR5Item Roll');
-                // generate chat data
-                createChatData({
-                    header: {
-                        name: this.name,
-                        img: this.img,
-                    },
-                    testName: this.getRollName(),
-                    actor: this.actor,
-                    tokenId: token ? `${token.scene._id}.${token.id}` : undefined,
-                    description: this.getChatData(),
-                    item: this,
-                    previewTemplate: this.hasTemplate,
-                    attack,
-                    ...bonus,
-                }).then((chatData) => {
-                    // create the message
-                    return ChatMessage.create(chatData, { displaySheet: false });
-                });
-            } else {
-                this.rollTest(event);
-            }
-        };
-        // prompt user if needed
-        const dialogData = await ShadowrunItemDialog.fromItem(this, event);
-        if (dialogData) {
-            // keep track of old close function
-            const oldClose = dialogData.close;
-            // call post() after dialog closes
-            dialogData.close = async (html) => {
-                if (oldClose) {
-                    // the oldClose we put on the dialog will return a boolean
-                    const ret = ((await oldClose(html)) as unknown) as boolean;
-                    if (!ret) return;
-                }
-                post();
-            };
-            return new Dialog(dialogData).render(true);
+            return await ChatMessage.create(chatData, { displaySheet: false });
+
         } else {
-            post();
+            await this.rollTest(event, selectedData);
         }
     }
+
+    async postCard(event?) {
+        if (!this.actor) return;
+
+        const dontRollTest = event?.shiftKey || !this.hasRoll;
+
+        // Switch possible dialog content based on item type.
+        const {dialogData, getSelectedData, itemHasNoDialog}  = await ShadowrunItemDialog.fromItem(this, event);
+
+        if (itemHasNoDialog) {
+            return await this.post(dontRollTest);
+        }
+
+        // Alter dialog close method to be called after dialog to fetch data.
+        // TODO: This could utilize a subclassing of Dialog to avoid this.
+        if (dialogData && getSelectedData) {
+            dialogData.close = async (html) => {
+                const selectedData = await getSelectedData(html) as unknown as object;
+                console.error('close', selectedData)
+
+                if (selectedData) {
+                    await this.post(dontRollTest, selectedData);
+                }
+            };
+        }
+
+        if (dialogData) {
+            return new Dialog(dialogData).render(true);
+        }
+
+        console.error('Item has no configuration for posting to chat or performing a roll.');
+}
 
     getChatData(htmlOptions?) {
         const data = duplicate(this.data.data);
@@ -602,39 +608,38 @@ export class SR5Item extends Item {
     /**
      * Rolls a test using the latest stored data on the item (force, fireMode, level)
      * @param event - mouse event
+     * @param selectedData
      * @param options - any additional roll options to pass along - note that currently the Item will overwrite -- WIP
      */
-    async rollTest(event, options?: Partial<AdvancedRollProps>): Promise<ShadowrunRoll | undefined> {
-        const promise = ShadowrunRoller.itemRoll(event, this, options);
+    async rollTest(event, selectedData?: object, options?: Partial<AdvancedRollProps>): Promise<ShadowrunRoll | undefined> {
+        const roll = await ShadowrunRoller.itemRoll(event, this, selectedData, options);
 
         // handle promise when it resolves for our own stuff
-        promise.then(async (roll) => {
-            const attackData = this.getAttackData(roll?.total ?? 0);
-            if (attackData) {
-                await this.setLastAttack(attackData);
-            }
+        const attackData = this.getAttackData(roll?.total ?? 0);
+        if (attackData) {
+            await this.setLastAttack(attackData);
+        }
 
-            // complex form handles fade
-            if (this.isComplexForm()) {
-                const totalFade = Math.max(this.getFade() + this.getLastComplexFormLevel().value, 2);
-                await this.actor.rollFade({ event }, totalFade);
-            } // spells handle drain, force, and attack data
-            else if (this.isSpell()) {
-                if (this.isCombatSpell() && roll) {
-                }
-                const forceData = this.getLastSpellForce();
-                const drain = Math.max(this.getDrain() + forceData.value + (forceData.reckless ? 3 : 0), 2);
-                await this.actor?.rollDrain({ event }, drain);
-            } // weapons handle ammo and attack data
-            else if (this.data.type === 'weapon') {
-                if (this.hasAmmo) {
-                    const fireMode = this.getLastFireMode()?.value || 1;
-                    await this.useAmmo(fireMode);
-                }
+        // complex form handles fade
+        if (this.isComplexForm()) {
+            const totalFade = Math.max(this.getFade() + this.getLastComplexFormLevel().value, 2);
+            await this.actor.rollFade({ event }, totalFade);
+        } // spells handle drain, force, and attack data
+        else if (this.isSpell()) {
+            if (this.isCombatSpell() && roll) {
             }
-        });
+            const forceData = this.getLastSpellForce();
+            const drain = Math.max(this.getDrain() + forceData.value + (forceData.reckless ? 3 : 0), 2);
+            await this.actor?.rollDrain({ event }, drain);
+        } // weapons handle ammo and attack data
+        else if (this.data.type === 'weapon') {
+            if (this.hasAmmo) {
+                const fireMode = this.getLastFireMode()?.value || 1;
+                await this.useAmmo(fireMode);
+            }
+        }
 
-        return promise;
+        return roll;
     }
 
     static getItemFromMessage(html): SR5Item | undefined {
@@ -800,7 +805,9 @@ export class SR5Item extends Item {
         ui.PDFoundry.openPDFByCode(code, {page: parseInt(page)});
     }
 
-    getAttackData(hits: number): AttackData | undefined {
+    // TODO: Check usages for second paramater selectedData
+    getAttackData(hits: number, selectedData?: object): AttackData | undefined {
+        console.error('getAttackdata', selectedData);
         if (!this.data.data.action?.damage.type) return undefined;
         const damage = this.data.data.action.damage;
         const data: AttackData = {
