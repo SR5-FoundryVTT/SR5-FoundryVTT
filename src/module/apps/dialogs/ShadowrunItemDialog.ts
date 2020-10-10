@@ -33,7 +33,7 @@ export class ShadowrunItemDialog extends Dialog {
             itemData.getSelectedData = ShadowrunItemDialog.addRangedWeaponData(templateData, dialogData, item);
             templatePath = 'systems/shadowrun5e/dist/templates/rolls/range-weapon-roll.html';
         } else if (item.isSpell()) {
-            ShadowrunItemDialog.addSpellData(templateData, dialogData, item);
+            itemData.getSelectedData = ShadowrunItemDialog.addSpellData(templateData, dialogData, item);
             templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-spell.html';
         } else if (item.isComplexForm()) {
             ShadowrunItemDialog.addComplexFormData(templateData, dialogData, item);
@@ -52,7 +52,7 @@ export class ShadowrunItemDialog extends Dialog {
         return itemData;
     }
 
-    static addComplexFormData(templateData: object, dialogData: DialogData, item: SR5Item): void {
+    static addComplexFormData(templateData: object, dialogData: DialogData, item: SR5Item): Function {
         const fade = item.getFade();
         const title = `${Helpers.label(item.name)} Level`;
 
@@ -70,7 +70,8 @@ export class ShadowrunItemDialog extends Dialog {
                 callback: () => (cancel = false),
             },
         };
-        dialogData.close = async (html) => {
+
+        return async (html) => {
             if (cancel) return false;
             const level = Helpers.parseInputToNumber($(html).find('[name=level]').val());
             await item.setLastComplexFormLevel({value: level});
@@ -78,7 +79,7 @@ export class ShadowrunItemDialog extends Dialog {
         };
     }
 
-    static addSpellData(templateData: object, dialogData: DialogData, item: SR5Item): void {
+    static addSpellData(templateData: object, dialogData: DialogData, item: SR5Item): Function {
         const title = `${Helpers.label(item.name)} Force`;
         const drain = item.getDrain();
 
@@ -105,7 +106,8 @@ export class ShadowrunItemDialog extends Dialog {
             },
         };
         dialogData.default = 'normal';
-        dialogData.close = async (html) => {
+
+        return async (html) => {
             if (cancel) return false;
             const force = Helpers.parseInputToNumber($(html).find('[name=force]').val());
             await item.setLastSpellForce({value: force, reckless});
