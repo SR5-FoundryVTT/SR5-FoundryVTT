@@ -145,10 +145,35 @@ export class ShadowrunItemDialog extends Dialog {
         templateData['ammo'] = ammo;
         templateData['title'] = title;
         templateData['ranges'] = templateRanges;
+        console.error('ranges', templateRanges);
         templateData['targetRange'] = item.getLastFireRangeMod();
+        console.error(templateRanges);
 
-        // Get user target tokens for range calulations.
-        templateData['targets'] = Helpers.getUserTargets();
+        // TODO: Move this mess into a little function.
+        const attacker = Helpers.getActorToken(item.actor);
+        const userTargets = Helpers.getUserTargets();
+        let targetData;
+        if (userTargets && !attacker) {
+            // TODO: User warning message.
+            console.error(`Actor ${item.actor.name} has no token active`);
+        } else {
+            targetData = userTargets.map(target => {
+                //@ts-ignore
+                const distance = Helpers.measureTokenDistance(attacker, target);
+                const range = Helpers.getWeaponRange(distance, templateRanges);
+                // TODO: Handle outside of range.
+                return range ? {
+                    id: target.id,
+                    name: target.name,
+                    range: range,
+                    unit: 'm',
+                    distance
+                } : undefined;
+            });
+            console.error(targetData);
+        }
+
+        templateData['targets'] = targetData;
 
         let cancel = true;
         dialogData.buttons = {
@@ -164,15 +189,10 @@ export class ShadowrunItemDialog extends Dialog {
             }
 
             const fireMode = Helpers.parseInputToNumber($(html).find('[name="fireMode"]').val());
-            const selectedTargetId = $(html).find('[name="target"]').val() as string;
+            const targetRangeModifier = Helpers.parseInputToNumber($(html).find('[name="target-range-modifier"]').val());
 
-            let targetToken = Helpers.getToken(selectedTargetId);
-            if (targetToken) {
-                console.error(item, item.actor);
-                console.error('Distance', Helpers.measureGridDistance(item.actor.token, targetToken));
-            }
-
-            const range = Helpers.parseInputToNumber($(html).find('[name="range"]').val());
+            // TODO: This here is difficult to parse and should instead be handled during dialog rendering...
+            let range = targetRangeModifier ? targetRangeModifier : Helpers.parseInputToNumber($(html).find('[name="range"]').val());
             if (range) {
                 await item.setLastFireRangeMod({value: range});
             }
@@ -187,7 +207,7 @@ export class ShadowrunItemDialog extends Dialog {
                 };
                 await item.setLastFireMode(fireModeData);
             }
-            return {targetToken};
+            return {targetModifier: targetRangeModifier};
         };
     }
 

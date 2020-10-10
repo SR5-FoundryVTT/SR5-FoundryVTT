@@ -3,6 +3,7 @@ import SkillField = Shadowrun.SkillField;
 import ModifiableValue = Shadowrun.ModifiableValue;
 import { PartsList } from './parts/PartsList';
 import LabelField = Shadowrun.LabelField;
+import {LENGTH_UNIT_MULTIPLIERS} from "./constants";
 
 export class Helpers {
     /**
@@ -234,9 +235,62 @@ export class Helpers {
         }
     }
 
-    static measureGridDistance(tokenA: Token, tokenB: Token): number {
-        console.error(tokenA, tokenB);
-        console.error(tokenA, tokenB);
-        return 0;
+    static measureTokenDistance(tokenOrigin: Token, tokenDest: Token): number {
+        console.error('token', tokenOrigin);
+        const origin = new PIXI.Point(...canvas.grid.getCenter(tokenOrigin.data.x, tokenOrigin.data.y));
+        const dest = new PIXI.Point(...canvas.grid.getCenter(tokenDest.data.x, tokenDest.data.y));
+
+        const distanceInGridUnits = canvas.grid.measureDistance(origin, dest, {gridSpaces: true});
+        const sceneUnit = canvas.scene.data.gridUnits;
+        const targetUnit = 'meters';
+        // TODO: Define weapon range units somewhere (settings)
+        return Helpers.convertLengthUnit(distanceInGridUnits, sceneUnit, targetUnit);
+    }
+
+    /* Convert to
+     * TODO: Implement SR Setting to provide what unit to use (meters or feet)
+     */
+    static convertLengthUnit(length:number, fromUnit: string, toUnit:"meters"|"feet"  = 'meters'): number {
+        //@ts-ignore
+        fromUnit = fromUnit.toLowerCase();
+        //@ts-ignore
+        toUnit = toUnit.toLowerCase();
+        if (fromUnit === toUnit) {
+            return length;
+        }
+
+
+        const unitMultipliers = LENGTH_UNIT_MULTIPLIERS[toUnit];
+        if (!unitMultipliers || !unitMultipliers.hasOwnProperty(fromUnit)) {
+            // TODO: Make a user message also.
+            console.error(`Distance can't be converted from ${fromUnit} to ${toUnit}`);
+            return 0;
+        }
+
+        // Round down since X.8 will hit X and not X+1.
+        return Math.floor(length * unitMultipliers[fromUnit]);
+    }
+
+    static isActorTokenLinked(actor: Actor) {
+        //@ts-ignore
+        return actor.data.token.actorLink;
+    }
+
+    static getActorToken(actor: Actor): Token|undefined {
+        let token: Token;
+        if (Helpers.isActorTokenLinked(actor)) {
+            // Linked actors can only have one token, which isn't stored within actor data...
+            const tokens = actor.getActiveTokens();
+            token = tokens[0];
+        } else {
+            // Unlinked actors can have multiple active token and is stored within actor data...
+            token = actor.token;
+        }
+        return token;
+    }
+
+    static getWeaponRange(distance: number, ranges: object): { label: string, distance: number, modifier: number }|undefined {
+        const rangeKey = Object.keys(ranges).find(range => distance < ranges[range].distance );
+        return rangeKey ? ranges[rangeKey] : undefined;
     }
 }

@@ -25,9 +25,9 @@
     </div>
     <div class="form-group">
         <label>{{localize 'SR5.SelectedTargets'}}</label>
-        <select name="target">
+        <select name="target-range-modifier">
             {{#select targetToken}} {{#each targets as |target|}}
-            <option value="{{target.id}}">{{target.name}}</option>
+            <option value="{{target.range.modifier}}">{{target.name}} [{{localize target.range.label}} ({{target.distance}}/{{target.range.distance}}{{target.unit}})]</option>
             {{/each}} {{/select}}
         </select>
     </div>
