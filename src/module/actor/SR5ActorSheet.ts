@@ -780,10 +780,9 @@ export class SR5ActorSheet extends ActorSheet {
     async _onRollItem(event) {
         event.preventDefault();
         const iid = Helpers.listItemId(event);
-        console.error('actor', this.actor, this.actor.token);
         const item = this.actor.getOwnedSR5Item(iid);
         if (item) {
-            await item.postCard(event);
+            await item.castAction(event);
         }
     }
 

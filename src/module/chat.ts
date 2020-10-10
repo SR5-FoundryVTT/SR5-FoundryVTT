@@ -101,24 +101,12 @@ export const addChatMessageContextOptions = (html, options) => {
 export const addRollListeners = (app: ChatMessage, html) => {
     if (!app.getFlag(SYSTEM_NAME, FLAGS.MessageCustomRoll)) return;
     const item = SR5Item.getItemFromMessage(html);
-    html.on('click', '.test-roll', async (event) => {
-        event.preventDefault();
-        if (item) {
-            const roll = await item.rollTest(event, { hideRollMessage: true });
-            if (roll && roll.templateData) {
-                const template = `systems/shadowrun5e/dist/templates/rolls/roll-card.html`;
-                const html = await renderTemplate(template, roll.templateData);
-                const data = {};
-                data['content'] = html;
-                await app.update(data);
-            }
-        }
-    });
+
     html.on('click', '.test', async (event) => {
         event.preventDefault();
         const type = event.currentTarget.dataset.action;
         if (item) {
-            await item.rollExtraTest(type, event);
+            await item.rollTestType(type, event);
         }
     });
     html.on('click', '.place-template', (event) => {

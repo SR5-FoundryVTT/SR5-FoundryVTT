@@ -8,24 +8,16 @@ export const GLITCH_DIE = 1;
 export const METATYPEMODIFIER = 'SR5.Character.Modifiers.NPCMetatypeAttribute';
 
 // TODO: Reduce duplication
-export const LENGTH_UNIT_MULTIPLIERS = {
-    meters: {
-        'm': 1,
-        'meter': 1,
-        'meters': 1,
-        'km': 1000,
-        'kilometers': 1000,
-        'kilometer': 1000,
-    },
-    feet: {
-        'ft': 1,
-        'feet': 1,
-        'foot': 1,
-        'mile': 5280,
-        'miles': 5280,
-        'mi': 5280
-    }
-}
+export const LENGTH_UNIT_TO_METERS_MULTIPLIERS = {
+    'm': 1,
+    'meter': 1,
+    'meters': 1,
+    'km': 1000,
+    'kilometers': 1000,
+    'kilometer': 1000,
+};
+
+export const LENGTH_UNIT = 'm';
 
 // Contain data regarding shadowrun rules, mostly whatever is stated in some table to be looked up in other places.
 export const SR = {

@@ -1,6 +1,8 @@
 import {SR5Item} from '../../item/SR5Item';
 import {Helpers} from '../../helpers';
-import {SR} from "../../constants";
+import {LENGTH_UNIT, SR} from "../../constants";
+import {SR5Actor} from "../../actor/SR5Actor";
+import FireModeData = Shadowrun.FireModeData;
 
 type ItemDialogData = {
     dialogData: DialogData | undefined,
@@ -119,6 +121,7 @@ export class ShadowrunItemDialog extends Dialog {
 
         const {modes, ranges} = itemData.range;
         const {ammo} = itemData;
+        // TODO: This should be moved into constants or some kind of 'rulesData'
         if (modes.single_shot) {
             fireModes['1'] = game.i18n.localize("SR5.WeaponModeSingleShotShort");
         }
@@ -145,35 +148,12 @@ export class ShadowrunItemDialog extends Dialog {
         templateData['ammo'] = ammo;
         templateData['title'] = title;
         templateData['ranges'] = templateRanges;
-        console.error('ranges', templateRanges);
         templateData['targetRange'] = item.getLastFireRangeMod();
-        console.error(templateRanges);
 
-        // TODO: Move this mess into a little function.
-        const attacker = Helpers.getActorToken(item.actor);
-        const userTargets = Helpers.getUserTargets();
-        let targetData;
-        if (userTargets && !attacker) {
-            // TODO: User warning message.
-            console.error(`Actor ${item.actor.name} has no token active`);
-        } else {
-            targetData = userTargets.map(target => {
-                //@ts-ignore
-                const distance = Helpers.measureTokenDistance(attacker, target);
-                const range = Helpers.getWeaponRange(distance, templateRanges);
-                // TODO: Handle outside of range.
-                return range ? {
-                    id: target.id,
-                    name: target.name,
-                    range: range,
-                    unit: 'm',
-                    distance
-                } : undefined;
-            });
-            console.error(targetData);
+        templateData['targetsSelected']= Helpers.userHasTargets();
+        if (item.actor.hasToken() && Helpers.userHasTargets()) {
+            templateData['targets'] = ShadowrunItemDialog._getTargetRangeTemplateData(item.actor, templateRanges);
         }
-
-        templateData['targets'] = targetData;
 
         let cancel = true;
         dialogData.buttons = {
@@ -183,31 +163,45 @@ export class ShadowrunItemDialog extends Dialog {
             },
         };
 
+        // TODO: Move this selection handler to an appropriate place. Maybe split ShadowrunItemDialog into subclasses.
         return async (html): Promise<object> => {
             if (cancel) {
                 return {}
             }
 
-            const fireMode = Helpers.parseInputToNumber($(html).find('[name="fireMode"]').val());
-            const targetRangeModifier = Helpers.parseInputToNumber($(html).find('[name="target-range-modifier"]').val());
+            type AttackModifierData = {
+                environmental?: object,
+                fireMode?: FireModeData
+            }
+            const modifierData: AttackModifierData = {};
 
-            // TODO: This here is difficult to parse and should instead be handled during dialog rendering...
-            let range = targetRangeModifier ? targetRangeModifier : Helpers.parseInputToNumber($(html).find('[name="range"]').val());
-            if (range) {
-                await item.setLastFireRangeMod({value: range});
+            if (Helpers.userHasTargets()) {
+                const rangeModifier = Helpers.parseInputToNumber($(html).find('[name="target-range-modifier"]').val());
+                modifierData.environmental = {range: rangeModifier};
+                // Don't store lastFireRange for specific target selection.
+            } else {
+                const rangeModifier = Helpers.parseInputToNumber($(html).find('[name="range"]').val());
+                modifierData.environmental = {range: rangeModifier}
+                // Store lastFireRange for generic range selection.
+                if (rangeModifier) {
+                    await item.setLastFireRangeMod({value: rangeModifier});
+                }
             }
 
+            const fireMode = Helpers.parseInputToNumber($(html).find('[name="fireMode"]').val());
             if (fireMode) {
                 const fireModeString = fireModes[fireMode];
                 const defenseModifier = Helpers.mapRoundsToDefenseDesc(fireMode);
-                const fireModeData = {
+                const fireModeData: FireModeData = {
                     label: fireModeString,
                     value: fireMode,
                     defense: defenseModifier,
                 };
                 await item.setLastFireMode(fireModeData);
+                modifierData.fireMode = fireModeData;
             }
-            return {targetModifier: targetRangeModifier};
+
+            return modifierData;
         };
     }
 
@@ -222,5 +216,34 @@ export class ShadowrunItemDialog extends Dialog {
             };
         }
         return newRanges;
+    }
+
+    /** Build template data for target distances and resulting range modifiers
+     *
+     * It is mandatory for an actor to have token placed,
+     * so distance measurements can be taken.
+     *
+     */
+    static _getTargetRangeTemplateData(actor: SR5Actor, ranges) {
+        if (!actor.hasToken() || !Helpers.userHasTargets()) {
+            return [];
+        }
+
+        const attacker = actor.getToken();
+        const targets = Helpers.getUserTargets();
+
+        return targets.map(target => {
+            //@ts-ignore // undefined actor is okay
+            const distance = Helpers.measureTokenDistance(attacker, target);
+            const range = Helpers.getWeaponRange(distance, ranges);
+            // TODO: Handle outside of range.
+            return range ? {
+                id: target.id,
+                name: target.name,
+                range: range,
+                unit: LENGTH_UNIT,
+                distance
+            } : undefined;
+        });
     }
 }

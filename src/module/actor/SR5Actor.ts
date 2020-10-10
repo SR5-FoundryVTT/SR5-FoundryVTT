@@ -1039,8 +1039,7 @@ export class SR5Actor extends Actor {
         if (msg.getFlag(SYSTEM_NAME, FLAGS.MessageCustomRoll)) {
             let actor = (msg.user.character as unknown) as SR5Actor;
             if (!actor) {
-                // get controlled tokens
-                const tokens = canvas.tokens.controlled;
+                const tokens = Helpers.getControlledTokens();
                 if (tokens.length > 0) {
                     for (let token of tokens) {
                         if (token.actor.owner) {
@@ -1083,8 +1082,7 @@ export class SR5Actor extends Actor {
             if (!isNaN(pool) && !isNaN(hits)) {
                 let actor = (msg.user.character as unknown) as SR5Actor;
                 if (!actor) {
-                    // get controlled tokens
-                    const tokens = canvas.tokens.controlled;
+                    const tokens = Helpers.getControlledTokens();
                     if (tokens.length > 0) {
                         for (let token of tokens) {
                             if (token.actor.owner) {
@@ -1136,4 +1134,34 @@ export class SR5Actor extends Actor {
         const data = super.getFlag(scope, key);
         return Helpers.onGetFlag(data);
     }
+
+    /** Return either the linked token or the token of the synthetic actor.
+     *
+     * @retrun Will return null should no token have been placed on scene.
+     */
+    getToken(): Token {
+        // Linked actors can only have one token, which isn't stored within actor data...
+        if (this._isLinkedToToken() && this.hasToken()) {
+            const linked = true;
+            const tokens = this.getActiveTokens(linked);
+            // This assumes for a token to be exist and should fail if not.
+            return tokens[0];
+        }
+
+        // Unlinked actors can have multiple active token and is stored within actor data...
+        return this.token;
+    }
+
+    /**
+     * There is no need for a token to placed. The prototype token is enough.
+     */
+    _isLinkedToToken(): boolean {
+        //@ts-ignore
+        return this.data.token.actorLink;
+    }
+
+    hasToken(): boolean {
+        return this.getActiveTokens().length > 0;
+    }
+
 }

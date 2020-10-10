@@ -245,58 +245,53 @@ export class SR5Item extends Item {
         item['properties'] = this.getChatData().properties;
     }
 
-    async post(dontRollTest: boolean, selectedData?: object) {
-        // if only post, don't roll and post a card version -- otherwise roll
-        // TODO: Check post DontRollTest path.
-        if (dontRollTest) {
-            const { token } = this.actor;
-            const attack = this.getAttackData(0);
-            // don't include any hits
-            delete attack?.hits;
+    async postItemCard() {
+        const { token } = this.actor;
 
-            const chatData = await createChatData({
-                header: {
-                    name: this.name,
-                    img: this.img,
-                },
-                testName: this.getRollName(),
-                actor: this.actor,
-                tokenId: token ? `${token.scene._id}.${token.id}` : undefined,
-                description: this.getChatData(),
-                item: this,
-                previewTemplate: this.hasTemplate,
-                attack
-            });
+        const testName = this.getRollName();
+        const tests =  [{
+            label: this.getActionTestName(),
+            type: 'action',
+        }];
 
-            return await ChatMessage.create(chatData, { displaySheet: false });
+        const chatData = await createChatData({
+            header: {
+                name: this.name,
+                img: this.img,
+            },
+            testName,
+            actor: this.actor,
+            tokenId: token ? `${token.scene._id}.${token.id}` : undefined,
+            description: this.getChatData(),
+            item: this,
+            previewTemplate: this.hasTemplate,
+            tests
+        });
 
-        } else {
-            await this.rollTest(event, selectedData);
-        }
+        return await ChatMessage.create(chatData, { displaySheet: false });
     }
 
-    async postCard(event?) {
+    async castAction(event?) {
         if (!this.actor) return;
 
         const dontRollTest = event?.shiftKey || !this.hasRoll;
+        if (dontRollTest) {
+            return await this.postItemCard();
+        }
 
         // Switch possible dialog content based on item type.
         const {dialogData, getSelectedData, itemHasNoDialog}  = await ShadowrunItemDialog.fromItem(this, event);
 
         if (itemHasNoDialog) {
-            return await this.post(dontRollTest);
+            return await this.rollTest(event);
         }
 
-        // Alter dialog close method to be called after dialog to fetch data.
-        // TODO: This could utilize a subclassing of Dialog to avoid this.
+        // TODO: Could utilize a subclassing of Dialog to avoid this.
+        // Allow different item types to utilize what's been selected in the items dialog.
         if (dialogData && getSelectedData) {
             dialogData.close = async (html) => {
                 const selectedData = await getSelectedData(html) as unknown as object;
-                console.error('close', selectedData)
-
-                if (selectedData) {
-                    await this.post(dontRollTest, selectedData);
-                }
+                await this.rollTest(event, undefined, selectedData);
             };
         }
 
@@ -321,6 +316,11 @@ export class SR5Item extends Item {
         data.properties = props.filter((p) => !!p);
 
         return data;
+    }
+
+    getActionTestName(): string {
+        const testName = this.getRollName();
+        return testName ? testName :  game.i18n.localize('SR5.Action');
     }
 
     getOpposedTestName(): string {
@@ -596,26 +596,29 @@ export class SR5Item extends Item {
         }
     }
 
-    async rollExtraTest(type: string, event) {
-        const targets = SR5Item.getTargets();
+    async rollTestType(type: string, event) {
         if (type === 'opposed') {
-            for (const t of targets) {
-                await this.rollOpposedTest(t, event);
+            const targets = Helpers.getSelectedActorsOrCharacter();
+            for (const target of targets) {
+                await this.rollOpposedTest(target, event);
             }
+        }
+        if (type === 'action') {
+            await this.castAction(event);
         }
     }
 
     /**
      * Rolls a test using the latest stored data on the item (force, fireMode, level)
      * @param event - mouse event
-     * @param selectedData
+     * @param modifierData
      * @param options - any additional roll options to pass along - note that currently the Item will overwrite -- WIP
      */
-    async rollTest(event, selectedData?: object, options?: Partial<AdvancedRollProps>): Promise<ShadowrunRoll | undefined> {
-        const roll = await ShadowrunRoller.itemRoll(event, this, selectedData, options);
+    async rollTest(event, options?: Partial<AdvancedRollProps>, modifierData?): Promise<ShadowrunRoll | undefined> {
+        const roll = await ShadowrunRoller.itemRoll(event, this, options, modifierData);
 
         // handle promise when it resolves for our own stuff
-        const attackData = this.getAttackData(roll?.total ?? 0);
+        const attackData = this.getAttackData(roll?.total ?? 0, modifierData);
         if (attackData) {
             await this.setLastAttack(attackData);
         }
@@ -664,15 +667,6 @@ export class SR5Item extends Item {
         if (!actor) return;
         const itemId = card.data('itemId');
         return actor.getOwnedItem(itemId);
-    }
-
-    static getTargets() {
-        const { character } = game.user;
-        const { controlled } = canvas.tokens;
-        const targets = controlled.reduce((arr, t) => (t.actor ? arr.concat([t.actor]) : arr), []);
-        if (character && controlled.length === 0) targets.push(character);
-        if (!targets.length) throw new Error(`You must designate a specific Token as the roll target`);
-        return targets;
     }
 
     /**
@@ -805,14 +799,25 @@ export class SR5Item extends Item {
         ui.PDFoundry.openPDFByCode(code, {page: parseInt(page)});
     }
 
+    _canDealDamage(): boolean {
+        // NOTE: Double negation to force boolean comparison casting.
+        return !!this.data.data.action?.damage.type;
+    }
+
+    getAction() {
+        return this.data.data.action;
+    }
+
     // TODO: Check usages for second paramater selectedData
-    getAttackData(hits: number, selectedData?: object): AttackData | undefined {
-        console.error('getAttackdata', selectedData);
-        if (!this.data.data.action?.damage.type) return undefined;
-        const damage = this.data.data.action.damage;
+    getAttackData(hits: number, modifierData?): AttackData | undefined {
+        if (!this._canDealDamage()) {
+            return undefined;
+        }
+
+        const {damage} = this.getAction();
         const data: AttackData = {
             hits,
-            damage: damage,
+            damage,
         };
 
         if (this.isCombatSpell()) {
@@ -835,7 +840,7 @@ export class SR5Item extends Item {
         }
 
         if (this.isRangedWeapon()) {
-            data.fireMode = this.getLastFireMode();
+            data.fireMode = modifierData?.fireMode;
             data.accuracy = this.getActionLimit();
         }
 

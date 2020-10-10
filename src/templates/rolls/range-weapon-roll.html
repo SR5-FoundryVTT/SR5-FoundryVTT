@@ -15,14 +15,7 @@
             {{/each}} {{/select}}
         </select>
     </div>
-    <div class="form-group">
-        <label>{{localize 'SR5.Range'}}</label>
-        <select name="range">
-            {{#select targetRange}} {{#each ranges as |range key|}}
-            <option value="{{range.modifier}}">{{localize range.label}} ({{range.distance}} m)</option>
-            {{/each}} {{/select}}
-        </select>
-    </div>
+    {{#if targetsSelected}}
     <div class="form-group">
         <label>{{localize 'SR5.SelectedTargets'}}</label>
         <select name="target-range-modifier">
@@ -31,4 +24,14 @@
             {{/each}} {{/select}}
         </select>
     </div>
+    {{else}}
+    <div class="form-group">
+        <label>{{localize 'SR5.Range'}}</label>
+        <select name="range">
+            {{#select targetRange}} {{#each ranges as |range key|}}
+            <option value="{{range.modifier}}">{{localize range.label}} ({{range.distance}} m)</option>
+            {{/each}} {{/select}}
+        </select>
+    </div>
+    {{/if}}
 </form>

@@ -1,6 +1,8 @@
 /**
  * A GM-Tool to keep track of all players overwatch scores
  */
+import {Helpers} from "../../helpers";
+
 export class OverwatchScoreTracker extends Application {
     static MatrixOverwatchDiceCount = '2d6';
     static get defaultOptions() {
@@ -54,7 +56,7 @@ export class OverwatchScoreTracker extends Application {
 
     _onAddActor(event) {
         event.preventDefault();
-        const tokens = canvas.tokens.controlled;
+        const tokens = Helpers.getControlledTokens();
         if (tokens.length === 0) {
             ui.notifications.warn(game.i18n.localize('SR5.OverwatchScoreTracker.NotifyNoSelectedTokens'));
             return;
