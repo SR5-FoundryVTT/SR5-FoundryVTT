@@ -3,6 +3,7 @@ import {Helpers} from '../../helpers';
 import {LENGTH_UNIT, SR} from "../../constants";
 import {SR5Actor} from "../../actor/SR5Actor";
 import FireModeData = Shadowrun.FireModeData;
+import RangesDescription = Shadowrun.RangesDescription;
 
 type ItemDialogData = {
     dialogData: DialogData | undefined,
@@ -207,15 +208,12 @@ export class ShadowrunItemDialog extends Dialog {
         };
     }
 
-    static _getRangeWeaponTemplateData(ranges) {
+    static _getRangeWeaponTemplateData(ranges): RangesDescription {
         const {range_modifiers} = SR.combat.environmental;
-        const newRanges = {};
+        const newRanges = {} as RangesDescription;
         for (const [key, value] of Object.entries(ranges)) {
-            newRanges[key] = {
-                distance: value,
-                label: CONFIG.SR5.weaponRanges[key],
-                modifier: range_modifiers[key],
-            };
+            const distance = value as number;
+            newRanges[key] =  Helpers.createRangeDescription(CONFIG.SR5.weaponRanges[key], distance, range_modifiers[key]);
         }
         return newRanges;
     }
@@ -238,14 +236,13 @@ export class ShadowrunItemDialog extends Dialog {
             //@ts-ignore // undefined actor is okay
             const distance = Helpers.measureTokenDistance(attacker, target);
             const range = Helpers.getWeaponRange(distance, ranges);
-            // TODO: Handle outside of range.
-            return range ? {
+            return  {
                 id: target.id,
                 name: target.name,
                 range: range,
                 unit: LENGTH_UNIT,
                 distance
-            } : undefined;
+            };
         });
     }
 }

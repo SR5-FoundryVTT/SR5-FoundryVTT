@@ -83,6 +83,10 @@ declare namespace Shadowrun {
     };
 
     export type DisableField = {
-        disabled: boolean
+        disabled: boolean;
+    }
+
+    export type ModifierField = {
+        modifier: number;
     }
 }

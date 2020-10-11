@@ -28,6 +28,8 @@ export const SR = {
                 medium: -1,
                 long: -3,
                 extreme: -6,
+                // A modifier of zero will allow for users/gm to still test oor targets with their own judgement.
+                out_of_range: 0
             }
         }
     }

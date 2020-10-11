@@ -179,6 +179,7 @@
     "SR5.RecoilCompensation": "RC",
     "SR5.Equip": "Equip",
     "SR5.Damage": "Damage",
+    "SR5.OutOfRange": "Out of Range",
 
     "SR5.Spell": "Spell",
     "SR5.SpellCategory": "Category",

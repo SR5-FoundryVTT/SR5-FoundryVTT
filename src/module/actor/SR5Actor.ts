@@ -1043,7 +1043,7 @@ export class SR5Actor extends Actor {
                 if (tokens.length > 0) {
                     for (let token of tokens) {
                         if (token.actor.owner) {
-                            actor = token.actor;
+                            actor = token.actor as SR5Actor;
                             break;
                         }
                     }
@@ -1086,7 +1086,7 @@ export class SR5Actor extends Actor {
                     if (tokens.length > 0) {
                         for (let token of tokens) {
                             if (token.actor.owner) {
-                                actor = token.actor;
+                                actor = token.actor as SR5Actor;
                                 break;
                             }
                         }
