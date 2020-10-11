@@ -3,7 +3,8 @@ import {Helpers} from '../../helpers';
 import {LENGTH_UNIT, SR} from "../../constants";
 import {SR5Actor} from "../../actor/SR5Actor";
 import FireModeData = Shadowrun.FireModeData;
-import RangesDescription = Shadowrun.RangesDescription;
+import RangesTemplateData = Shadowrun.RangesTemplateData;
+import RangeData = Shadowrun.RangeData;
 
 type ItemDialogData = {
     dialogData: DialogData | undefined,
@@ -37,7 +38,7 @@ export class ShadowrunItemDialog extends Dialog {
             itemData.getSelectedData = ShadowrunItemDialog.addSpellData(templateData, dialogData, item);
             templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-spell.html';
         } else if (item.isComplexForm()) {
-            ShadowrunItemDialog.addComplexFormData(templateData, dialogData, item);
+            itemData.getSelectedData = ShadowrunItemDialog.addComplexFormData(templateData, dialogData, item);
             templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-complex-form.html';
         }
 
@@ -208,9 +209,9 @@ export class ShadowrunItemDialog extends Dialog {
         };
     }
 
-    static _getRangeWeaponTemplateData(ranges): RangesDescription {
+    static _getRangeWeaponTemplateData(ranges: RangeData): RangesTemplateData {
         const {range_modifiers} = SR.combat.environmental;
-        const newRanges = {} as RangesDescription;
+        const newRanges = {} as RangesTemplateData;
         for (const [key, value] of Object.entries(ranges)) {
             const distance = value as number;
             newRanges[key] =  Helpers.createRangeDescription(CONFIG.SR5.weaponRanges[key], distance, range_modifiers[key]);

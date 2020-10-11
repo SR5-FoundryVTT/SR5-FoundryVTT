@@ -1,12 +1,12 @@
 declare namespace Shadowrun {
-    export type RangesDescription = {
-        short: RangeDescription,
-        medium: RangeDescription,
-        long: RangeDescription,
-        extreme: RangeDescription,
+    export type RangesTemplateData = {
+        short: RangeTemplateData,
+        medium: RangeTemplateData,
+        long: RangeTemplateData,
+        extreme: RangeTemplateData,
     }
 
-    export type RangeDescription =
+    export type RangeTemplateData =
         LabelField &
         ModifierField & {
         distance: number

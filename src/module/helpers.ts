@@ -5,8 +5,8 @@ import { PartsList } from './parts/PartsList';
 import LabelField = Shadowrun.LabelField;
 import {LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SR} from "./constants";
 import {SR5Actor} from "./actor/SR5Actor";
-import RangesDescription = Shadowrun.RangesDescription;
-import RangeDescription = Shadowrun.RangeDescription;
+import RangesTemplateData = Shadowrun.RangesTemplateData;
+import RangeTemplateData = Shadowrun.RangeTemplateData;
 
 export class Helpers {
     /**
@@ -271,7 +271,7 @@ export class Helpers {
         return Math.floor(length * LENGTH_UNIT_TO_METERS_MULTIPLIERS[fromUnit]);
     }
 
-    static getWeaponRange(distance: number, ranges: RangesDescription): RangeDescription {
+    static getWeaponRange(distance: number, ranges: RangesTemplateData): RangeTemplateData {
         // Assume ranges to be in ASC order and to define their max range.
         // Should no range be found, assume distance to be out of range.
         const rangeKey = Object.keys(ranges).find(range => distance < ranges[range].distance);
@@ -298,7 +298,7 @@ export class Helpers {
         return actors;
     }
 
-    static createRangeDescription(label: string, distance: number, modifier: number): RangeDescription {
+    static createRangeDescription(label: string, distance: number, modifier: number): RangeTemplateData {
         label = game.i18n.localize(label);
         return {label, distance, modifier}
     }
