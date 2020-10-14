@@ -175,13 +175,19 @@ export class ShadowrunItemDialog extends Dialog {
 
             type AttackModifierData = {
                 environmental?: object,
-                fireMode?: FireModeData
+                fireMode?: FireModeData,
+                target?: Token
             }
             const modifierData: AttackModifierData = {};
 
             if (Helpers.userHasTargets()) {
-                const rangeModifier = Helpers.parseInputToNumber($(html).find('[name="target-range-modifier"]').val());
+                const selectElement = $(html).find('[name="selected-target"]');
+                const rangeModifier = Helpers.parseInputToNumber(selectElement.find(':selected').data('range-modifier'));
+                const targetId = selectElement.val() as string;
+                const token = Helpers.getToken(targetId);
+
                 modifierData.environmental = {range: rangeModifier};
+                modifierData.target = token;
                 // Don't store lastFireRange for specific target selection.
             } else {
                 const rangeModifier = Helpers.parseInputToNumber($(html).find('[name="range"]').val());

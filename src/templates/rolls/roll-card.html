@@ -14,6 +14,12 @@
             {{/if}}
         </div>
     {{/if}}
+    {{#if target}}
+     <div class="card-title card-header flexrow">
+        <img src="{{target.data.img}}" title="{{target.name}}" width="36" height="36" />
+        <h3 class="header-name">Target: {{target.name}}</h3>
+    </div>
+    {{/if}}
     {{#if description}}
     <div class="card-description">
         <div class="card-description-content">

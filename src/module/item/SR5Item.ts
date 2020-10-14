@@ -291,6 +291,7 @@ export class SR5Item extends Item {
         if (dialogData && getSelectedData) {
             dialogData.close = async (html) => {
                 const selectedData = await getSelectedData(html) as unknown as object;
+                console.error('item', selectedData);
                 await this.rollTest(event, undefined, selectedData);
             };
         }

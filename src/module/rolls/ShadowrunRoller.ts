@@ -47,6 +47,7 @@ export interface AdvancedRollProps extends BasicRollProps {
     wounds?: boolean;
     after?: (roll: Roll | undefined) => void;
     dialogOptions?: RollDialogOptions;
+    target?: Token;
 }
 
 export class ShadowrunRoll extends Roll {
@@ -139,7 +140,14 @@ export class ShadowrunRoller {
                 rollData.dialogOptions.environmental = modifierData.environmental.range;
             }
         }
+        // TODO: This here is manual mapping and manual work is bad.
+        if (modifierData && modifierData.target) {
+            rollData.target = modifierData.target;
+        }
+
         rollData.description = item.getChatData();
+
+        console.error('itemRoll', rollData);
 
         return ShadowrunRoller.advancedRoll(rollData);
     }
@@ -220,6 +228,8 @@ export class ShadowrunRoller {
             glitch: roll.glitched,
             ...props,
         };
+        console.error('basicRoll', templateData);
+
 
         // In what case would no roll be present? No parts? Why would this reach any logic then?
         if (roll) {
@@ -228,9 +238,8 @@ export class ShadowrunRoller {
 
         if (!hideRollMessage) {
             const chatData = await createChatData(templateData, roll);
-            ChatMessage.create(chatData, { displaySheet: false }).then((message) => {
-                console.log(message);
-            });
+            const message = await ChatMessage.create(chatData, { displaySheet: false });
+            console.log(message);
         }
         return roll;
     }

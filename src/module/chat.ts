@@ -20,6 +20,7 @@ export type TemplateData = {
     limit?: BaseValuePair<number> & LabelField;
     testName?: string;
     actor?: SR5Actor;
+    target?: SR5Actor;
     item?: SR5Item;
     attack?: AttackData;
     incomingAttack?: AttackData;
@@ -46,6 +47,7 @@ export const createChatData = async (templateData: TemplateData, roll?: Roll) =>
     };
     const html = await renderTemplate(template, hackyTemplateData);
     const actor = templateData.actor;
+    console.error('createChatData-template', templateData);
 
     const chatData = {
         user: game.user._id,
