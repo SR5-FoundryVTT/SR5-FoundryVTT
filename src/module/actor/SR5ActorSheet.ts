@@ -466,7 +466,7 @@ export class SR5ActorSheet extends ActorSheet {
             el.slideUp(200, () => this.render(false));
         });
         // Drag inventory item
-        let handler = (ev) => this._onDragItemStart(ev);
+        let handler = (ev) => this._onDragStart(ev);
         html.find('.list-item').each((i, item) => {
             if (item.dataset && item.dataset.itemId) {
                 item.setAttribute('draggable', true);
