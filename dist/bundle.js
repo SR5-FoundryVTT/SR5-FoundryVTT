@@ -2462,7 +2462,7 @@ class SR5ActorSheet extends ActorSheet {
             el.slideUp(200, () => this.render(false));
         });
         // Drag inventory item
-        let handler = (ev) => this._onDragItemStart(ev);
+        let handler = (ev) => this._onDragStart(ev);
         html.find('.list-item').each((i, item) => {
             if (item.dataset && item.dataset.itemId) {
                 item.setAttribute('draggable', true);
@@ -7931,7 +7931,6 @@ class SR5Item extends Item {
                     const attack = this.getAttackData(0);
                     // don't include any hits
                     attack === null || attack === void 0 ? true : delete attack.hits;
-                    console.error('SR5Item Roll');
                     // generate chat data
                     chat_1.createChatData(Object.assign({ header: {
                             name: this.name,
