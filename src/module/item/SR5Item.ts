@@ -62,6 +62,8 @@ export class SR5Item extends Item {
      */
     getEmbeddedItems(): any[] {
         let items = this.getFlag(SYSTEM_NAME, 'embeddedItems');
+        console.log('get');
+        console.log(items);
         if (items) {
             // moved this "hotfix" to here so that everywhere that accesses the flag just gets an array -- Shawn
             //TODO: This is a hotfix. Items should either always be
@@ -84,8 +86,15 @@ export class SR5Item extends Item {
      */
     async setEmbeddedItems(items: any[]) {
         // clear the flag first to remove the previous items - if we don't do this then it doesn't actually "delete" any items
-        await this.unsetFlag(SYSTEM_NAME, 'embeddedItems');
+        // await this.unsetFlag(SYSTEM_NAME, 'embeddedItems');
+        console.log('set');
+        console.log(items);
         await this.setFlag(SYSTEM_NAME, 'embeddedItems', items);
+    }
+
+    async clearEmbeddedItems() {
+        console.log('clear');
+        await this.unsetFlag(SYSTEM_NAME, 'embeddedItems');
     }
 
     getLastAttack(): AttackData | undefined {
@@ -101,7 +110,7 @@ export class SR5Item extends Item {
         const ret = super.update(data, options);
         ret.then(() => {
             if (this.actor) {
-                this.actor.render();
+                this.actor.render(false);
             }
         });
         return ret;
@@ -772,6 +781,8 @@ export class SR5Item extends Item {
         const idx = items.findIndex((i) => i._id === deleted || Number(i._id) === deleted);
         if (idx === -1) throw new Error(`Shadowrun5e | Couldn't find owned item ${deleted}`);
         items.splice(idx, 1);
+        // we need to clear the items when one is deleted or it won't actually be deleted
+        await this.clearEmbeddedItems();
         await this.setEmbeddedItems(items);
         await this.prepareEmbeddedEntities();
         await this.prepareData();

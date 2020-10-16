@@ -7717,6 +7717,8 @@ class SR5Item extends Item {
      */
     getEmbeddedItems() {
         let items = this.getFlag(constants_1.SYSTEM_NAME, 'embeddedItems');
+        console.log('get');
+        console.log(items);
         if (items) {
             // moved this "hotfix" to here so that everywhere that accesses the flag just gets an array -- Shawn
             //TODO: This is a hotfix. Items should either always be
@@ -7739,8 +7741,16 @@ class SR5Item extends Item {
     setEmbeddedItems(items) {
         return __awaiter(this, void 0, void 0, function* () {
             // clear the flag first to remove the previous items - if we don't do this then it doesn't actually "delete" any items
-            yield this.unsetFlag(constants_1.SYSTEM_NAME, 'embeddedItems');
+            // await this.unsetFlag(SYSTEM_NAME, 'embeddedItems');
+            console.log('set');
+            console.log(items);
             yield this.setFlag(constants_1.SYSTEM_NAME, 'embeddedItems', items);
+        });
+    }
+    clearEmbeddedItems() {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log('clear');
+            yield this.unsetFlag(constants_1.SYSTEM_NAME, 'embeddedItems');
         });
     }
     getLastAttack() {
@@ -7761,7 +7771,7 @@ class SR5Item extends Item {
             const ret = _super.update.call(this, data, options);
             ret.then(() => {
                 if (this.actor) {
-                    this.actor.render();
+                    this.actor.render(false);
                 }
             });
             return ret;
@@ -8422,6 +8432,8 @@ class SR5Item extends Item {
             if (idx === -1)
                 throw new Error(`Shadowrun5e | Couldn't find owned item ${deleted}`);
             items.splice(idx, 1);
+            // we need to clear the items when one is deleted or it won't actually be deleted
+            yield this.clearEmbeddedItems();
             yield this.setEmbeddedItems(items);
             yield this.prepareEmbeddedEntities();
             yield this.prepareData();
