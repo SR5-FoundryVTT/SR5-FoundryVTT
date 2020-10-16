@@ -5621,94 +5621,224 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.shadowrunCombatUpdate = exports.preCombatUpdate = void 0;
-const constants_1 = require("./constants");
-exports.preCombatUpdate = function (combat, changes, options) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // triggers when combat round changes
-        if (changes.round && combat.round && changes.round > combat.round) {
-            let initPassEnd = true;
-            for (const c of combat.combatants) {
-                let init = Number(c.initiative);
-                init -= 10;
-                if (init > 0)
-                    initPassEnd = false;
-            }
-            if (!initPassEnd) {
-                changes.round = combat.round;
-            }
-            // if we are gm, call function normally
-            // if not gm, send a socket message for the gm to update the combatants
-            // for new initative passes or reroll
-            if (game.user.isGM) {
-                yield exports.shadowrunCombatUpdate(changes, options);
-            }
-            else {
-                // @ts-ignore
-                game.socket.emit('system.shadowrun5e', {
-                    gmCombatUpdate: {
-                        changes,
-                        options,
-                    },
-                });
-            }
-        }
-    });
-};
-exports.shadowrunCombatUpdate = (changes, options) => __awaiter(void 0, void 0, void 0, function* () {
-    const { combat } = game;
-    // subtact 10 from all initiative, we just went into the next initiative pass
-    const removedCombatants = combat.getFlag(constants_1.SYSTEM_NAME, 'removedCombatants') || [];
-    const combatants = [];
-    for (const c of combat.combatants) {
-        let init = Number(c.initiative);
-        init -= 10;
-        if (init <= 0)
-            removedCombatants.push(Object.assign({}, c));
-        else {
-            // @ts-ignore
-            combatants.push({ _id: c._id, initiative: init });
-        }
-    }
-    yield combat.deleteEmbeddedEntity('Combatant', removedCombatants.map((c) => c._id), {});
-    yield combat.updateEmbeddedEntity('Combatant', combatants, {});
-    if (combatants.length === 0) {
-        const messages = [];
-        const messageOptions = options.messageOptions || {};
-        for (const c of removedCombatants) {
-            const actorData = c.actor ? c.actor.data : {};
-            // @ts-ignore
-            const formula = combat._getInitiativeFormula(c);
-            const roll = new Roll(formula, actorData).roll();
-            c.initiative = roll.total;
-            const rollMode = messageOptions.rollMode || c.token.hidden || c.hidden ? 'gmroll' : 'roll';
-            const messageData = mergeObject({
-                speaker: {
-                    scene: canvas.scene._id,
-                    actor: c.actor ? c.actor._id : null,
-                    token: c.token._id,
-                    alias: c.token.name,
-                },
-                flavor: `${c.token.name} rolls for Initiative!`,
-            }, messageOptions);
-            yield roll.toMessage(messageData, {
-                rollMode,
-            });
-        }
-        yield combat.createEmbeddedEntity('Combatant', removedCombatants, {});
-        yield ChatMessage.create(messages);
-        yield combat.unsetFlag(constants_1.SYSTEM_NAME, 'removedCombatants');
+exports.SR5Combat = void 0;
+class SR5Combat extends Combat {
+    constructor(...args) {
         // @ts-ignore
-        yield combat.resetAll();
-        yield combat.rollAll();
-        yield combat.update({ turn: 0 });
+        super(...args);
+        Hooks.on('updateActor', (actor) => {
+            const combatant = this.getActorCombatant(actor);
+            if (combatant) {
+                // TODO handle monitoring Wound changes
+            }
+        });
     }
-    else if (removedCombatants.length) {
-        yield combat.setFlag(constants_1.SYSTEM_NAME, 'removedCombatants', removedCombatants);
-        yield combat.update({ turn: 0 });
+    get initiativePass() {
+        var _a;
+        return ((_a = this.data) === null || _a === void 0 ? void 0 : _a.initiativePass) || 0;
     }
-});
-},{"./constants":45}],44:[function(require,module,exports){
+    getActorCombatant(actor) {
+        return this.combatants.find((c) => c.actor._id === actor._id);
+    }
+    /**
+     * Add ContextMenu options to CombatTracker Entries -- adds the basic Initiative Subtractions
+     * @param html
+     * @param options
+     */
+    static addCombatTrackerContextOptions(html, options) {
+        options.push({
+            name: game.i18n.localize('SR5.COMBAT.ReduceInitByOne'),
+            icon: '<i class="fas fa-caret-down"></i>',
+            callback: (li) => __awaiter(this, void 0, void 0, function* () {
+                // @ts-ignore
+                const combatant = yield game.combat.getCombatant(li.data('combatant-id'));
+                if (combatant) {
+                    const combat = game.combat;
+                    yield combat.adjustInitiative(combatant, -1);
+                }
+            }),
+        }, {
+            name: game.i18n.localize('SR5.COMBAT.ReduceInitByFive'),
+            icon: '<i class="fas fa-angle-down"></i>',
+            callback: (li) => __awaiter(this, void 0, void 0, function* () {
+                // @ts-ignore
+                const combatant = yield game.combat.getCombatant(li.data('combatant-id'));
+                if (combatant) {
+                    const combat = game.combat;
+                    yield combat.adjustInitiative(combatant, -5);
+                }
+            }),
+        }, {
+            name: game.i18n.localize('SR5.COMBAT.ReduceInitByTen'),
+            icon: '<i class="fas fa-angle-double-down"></i>',
+            callback: (li) => __awaiter(this, void 0, void 0, function* () {
+                // @ts-ignore
+                const combatant = yield game.combat.getCombatant(li.data('combatant-id'));
+                if (combatant) {
+                    const combat = game.combat;
+                    yield combat.adjustInitiative(combatant, -10);
+                }
+            }),
+        });
+        return options;
+    }
+    _onUpdate(data, ...args) {
+        console.log(data);
+        // @ts-ignore
+        super._onUpdate(data, ...args);
+    }
+    /**
+     *
+     * @param combatant
+     * @param adjustment
+     */
+    adjustInitiative(combatant, adjustment) {
+        return __awaiter(this, void 0, void 0, function* () {
+            combatant = typeof combatant === 'string' ? this.combatants.find((c) => c._id === combatant) : combatant;
+            if (!combatant || typeof combatant === 'string') {
+                console.error('Could not find combatant with id ', combatant);
+                return;
+            }
+            const newCombatant = {
+                _id: combatant._id,
+                initiative: Number(combatant.initiative) + adjustment,
+            };
+            // @ts-ignore
+            yield this.updateCombatant(newCombatant);
+        });
+    }
+    static sortByRERIC(left, right) {
+        // First sort by initiative value if different
+        const leftInit = Number(left.initiative);
+        const rightInit = Number(right.initiative);
+        if (isNaN(leftInit))
+            return 1;
+        if (isNaN(rightInit))
+            return -1;
+        if (leftInit > rightInit)
+            return -1;
+        if (leftInit < rightInit)
+            return 1;
+        // now we sort by ERIC
+        const genData = (actor) => {
+            var _a, _b;
+            // edge, reaction, intuition, coinflip
+            return [
+                Number(actor.getEdge().max),
+                Number((_a = actor.findAttribute('reaction')) === null || _a === void 0 ? void 0 : _a.value),
+                Number((_b = actor.findAttribute('intuition')) === null || _b === void 0 ? void 0 : _b.value),
+                new Roll('1d2').roll().total,
+            ];
+        };
+        const leftData = genData(left.actor);
+        const rightData = genData(right.actor);
+        // if we find a difference that isn't 0, return it
+        for (let index = 0; index < leftData.length; index++) {
+            const diff = rightData[index] - leftData[index];
+            if (diff !== 0)
+                return diff;
+        }
+        return 0;
+    }
+    /**
+     * @Override
+     * remove any turns that are less than 0
+     * filter using ERIC
+     */
+    setupTurns() {
+        const turns = super.setupTurns().filter((turn) => {
+            if (turn.initiative === null)
+                return true;
+            const init = Number(turn.initiative);
+            if (isNaN(init))
+                return true;
+            return init > 0;
+        });
+        // @ts-ignore
+        this.turns = turns.sort(SR5Combat.sortByRERIC);
+        return turns;
+    }
+    /**
+     * @Override
+     * proceed to the next turn
+     * - handles going to next initiative pass or combat round.
+     */
+    nextTurn() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let turn = this.turn;
+            let skip = this.settings.skipDefeated;
+            // Determine the next turn number
+            let next = null;
+            if (skip) {
+                for (let [i, t] of this.turns.entries()) {
+                    if (i <= turn)
+                        continue;
+                    // @ts-ignore
+                    if (!t.defeated) {
+                        next = i;
+                        break;
+                    }
+                }
+            }
+            else
+                next = turn + 1;
+            // Maybe advance to the next round/init pass
+            let round = this.round;
+            let initPass = this.initiativePass;
+            // if both are 0, we just started so set both to 1
+            if (round === 0 && initPass === 0) {
+                initPass = initPass + 1;
+                round = round + 1;
+                next = 0;
+            }
+            else if (next === null || next >= this.turns.length) {
+                const combatants = [];
+                // check for initpass
+                const over10Init = this.combatants.reduce((accumulator, running) => {
+                    return accumulator || Number(running.initiative) > 10;
+                }, false);
+                // do an initiative pass
+                if (over10Init) {
+                    next = 0;
+                    initPass = initPass + 1;
+                    // adjust combatants
+                    for (const c of this.combatants) {
+                        let init = Number(c.initiative);
+                        init -= 10;
+                        // @ts-ignore
+                        combatants.push({ _id: c._id, initiative: init });
+                    }
+                }
+                else {
+                    next = 0;
+                    round = round + 1;
+                    initPass = 0;
+                    // resetall isn't typed
+                    // @ts-ignore
+                    yield this.resetAll();
+                    yield this.rollAll();
+                }
+                if (combatants.length > 0) {
+                    // @ts-ignore
+                    yield this.updateCombatant(combatants);
+                }
+                if (skip) {
+                    // @ts-ignore
+                    next = this.turns.findIndex((t) => !t.defeated);
+                    if (next === -1) {
+                        // @ts-ignore
+                        ui.notifications.warn(game.i18n.localize('COMBAT.NoneRemaining'));
+                        next = 0;
+                    }
+                }
+            }
+            // Update the encounter
+            yield this.update({ round: round, turn: next, initiativePass: initPass });
+        });
+    }
+}
+exports.SR5Combat = SR5Combat;
+},{}],44:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5 = void 0;
@@ -7253,10 +7383,10 @@ const ShadowrunRoller_1 = require("./rolls/ShadowrunRoller");
 const helpers_1 = require("./helpers");
 const HandlebarManager_1 = require("./handlebars/HandlebarManager");
 const canvas_1 = require("./canvas");
-const combat_1 = require("./combat");
 const chat = require("./chat");
 const macros_1 = require("./macros");
 const OverwatchScoreTracker_1 = require("./apps/gmtools/OverwatchScoreTracker");
+const SR5Combat_1 = require("./combat/SR5Combat");
 class HooksManager {
     static registerHooks() {
         // Register your highest level hook callbacks here for a quick overview of what's hooked into.
@@ -7268,7 +7398,7 @@ class HooksManager {
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
         Hooks.on('renderSceneControls', HooksManager.renderSceneControls);
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons);
-        Hooks.on('preUpdateCombat', combat_1.preCombatUpdate);
+        Hooks.on('getCombatTrackerEntryContext', SR5Combat_1.SR5Combat.addCombatTrackerContextOptions);
     }
     static init() {
         console.log('Loading Shadowrun 5e System');
@@ -7282,6 +7412,7 @@ class HooksManager {
         CONFIG.SR5 = config_1.SR5;
         CONFIG.Actor.entityClass = SR5Actor_1.SR5Actor;
         CONFIG.Item.entityClass = SR5Item_1.SR5Item;
+        CONFIG.Combat.entityClass = SR5Combat_1.SR5Combat;
         settings_1.registerSystemSettings();
         // Register sheet application classes
         Actors.unregisterSheet('core', ActorSheet);
@@ -7295,11 +7426,6 @@ class HooksManager {
     }
     static ready() {
         return __awaiter(this, void 0, void 0, function* () {
-            game.socket.on('system.shadowrun5e', (data) => __awaiter(this, void 0, void 0, function* () {
-                if (game.user.isGM && data.gmCombatUpdate) {
-                    yield combat_1.shadowrunCombatUpdate(data.gmCombatUpdate.changes, data.gmCombatUpdate.options);
-                }
-            }));
             if (game.user.isGM) {
                 yield Migrator_1.Migrator.BeginMigration();
             }
@@ -7344,7 +7470,7 @@ class HooksManager {
     }
 }
 exports.HooksManager = HooksManager;
-},{"./actor/SR5Actor":16,"./actor/SR5ActorSheet":17,"./apps/gmtools/OverwatchScoreTracker":37,"./canvas":41,"./chat":42,"./combat":43,"./config":44,"./constants":45,"./handlebars/HandlebarManager":49,"./helpers":54,"./item/SR5Item":57,"./item/SR5ItemSheet":59,"./macros":60,"./migrator/Migrator":62,"./rolls/ShadowrunRoller":69,"./settings":70}],56:[function(require,module,exports){
+},{"./actor/SR5Actor":16,"./actor/SR5ActorSheet":17,"./apps/gmtools/OverwatchScoreTracker":37,"./canvas":41,"./chat":42,"./combat/SR5Combat":43,"./config":44,"./constants":45,"./handlebars/HandlebarManager":49,"./helpers":54,"./item/SR5Item":57,"./item/SR5ItemSheet":59,"./macros":60,"./migrator/Migrator":62,"./rolls/ShadowrunRoller":69,"./settings":70}],56:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatData = void 0;
@@ -7717,8 +7843,6 @@ class SR5Item extends Item {
      */
     getEmbeddedItems() {
         let items = this.getFlag(constants_1.SYSTEM_NAME, 'embeddedItems');
-        console.log('get');
-        console.log(items);
         if (items) {
             // moved this "hotfix" to here so that everywhere that accesses the flag just gets an array -- Shawn
             //TODO: This is a hotfix. Items should either always be
@@ -7742,14 +7866,11 @@ class SR5Item extends Item {
         return __awaiter(this, void 0, void 0, function* () {
             // clear the flag first to remove the previous items - if we don't do this then it doesn't actually "delete" any items
             // await this.unsetFlag(SYSTEM_NAME, 'embeddedItems');
-            console.log('set');
-            console.log(items);
             yield this.setFlag(constants_1.SYSTEM_NAME, 'embeddedItems', items);
         });
     }
     clearEmbeddedItems() {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('clear');
             yield this.unsetFlag(constants_1.SYSTEM_NAME, 'embeddedItems');
         });
     }

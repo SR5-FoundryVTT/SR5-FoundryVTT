@@ -14,11 +14,11 @@ export class SR5Combat extends Combat {
             if (combatant) {
                 // TODO handle monitoring Wound changes
             }
-        })
+        });
     }
 
     getActorCombatant(actor: Actor): undefined | any {
-        return this.combatants.find(c => c.actor._id === actor._id);
+        return this.combatants.find((c) => c.actor._id === actor._id);
     }
 
     /**
@@ -70,9 +70,10 @@ export class SR5Combat extends Combat {
 
     data: SR5CombatData;
 
-    protected _onUpdate(data: object, options: object, userId: string, context: object) {
+    protected _onUpdate(data: object, ...args) {
         console.log(data);
-        super._onUpdate(data, options, userId, context);
+        // @ts-ignore
+        super._onUpdate(data, ...args);
     }
 
     /**
@@ -132,6 +133,8 @@ export class SR5Combat extends Combat {
      */
     setupTurns(): any[] {
         const turns = super.setupTurns().filter((turn) => {
+            if (turn.initiative === null) return true;
+
             const init = Number(turn.initiative);
             if (isNaN(init)) return true;
             return init > 0;
@@ -194,15 +197,10 @@ export class SR5Combat extends Combat {
                 next = 0;
                 round = round + 1;
                 initPass = 0;
-                for (const c of this.combatants) {
-                    const actorData = c.actor ? c.actor.data.data : {};
-                    // @ts-ignore
-                    const formula = this._getInitiativeFormula(c);
-                    const roll: Roll = new Roll(formula, actorData).roll();
-                    const init = roll.total;
-                    // @ts-ignore
-                    combatants.push({ _id: c._id, initiative: init });
-                }
+                // resetall isn't typed
+                // @ts-ignore
+                await this.resetAll();
+                await this.rollAll();
             }
 
             if (combatants.length > 0) {

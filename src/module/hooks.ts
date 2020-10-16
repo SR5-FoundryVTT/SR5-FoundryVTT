@@ -10,11 +10,11 @@ import { ShadowrunRoller } from './rolls/ShadowrunRoller';
 import { Helpers } from './helpers';
 import { HandlebarManager } from './handlebars/HandlebarManager';
 import { measureDistance } from './canvas';
-import { preCombatUpdate, shadowrunCombatUpdate } from './combat';
 import * as chat from './chat';
 import { createItemMacro, rollItemMacro } from './macros';
 
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
+import { SR5Combat } from './combat/SR5Combat';
 
 export class HooksManager {
     static registerHooks() {
@@ -29,8 +29,7 @@ export class HooksManager {
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
         Hooks.on('renderSceneControls', HooksManager.renderSceneControls);
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons);
-
-        Hooks.on('preUpdateCombat', preCombatUpdate);
+        Hooks.on('getCombatTrackerEntryContext', SR5Combat.addCombatTrackerContextOptions);
     }
 
     static init() {
@@ -47,6 +46,7 @@ export class HooksManager {
         CONFIG.SR5 = SR5;
         CONFIG.Actor.entityClass = SR5Actor;
         CONFIG.Item.entityClass = SR5Item;
+        CONFIG.Combat.entityClass = SR5Combat;
 
         registerSystemSettings();
 
@@ -64,12 +64,6 @@ export class HooksManager {
     }
 
     static async ready() {
-        game.socket.on('system.shadowrun5e', async (data) => {
-            if (game.user.isGM && data.gmCombatUpdate) {
-                await shadowrunCombatUpdate(data.gmCombatUpdate.changes, data.gmCombatUpdate.options);
-            }
-        });
-
         if (game.user.isGM) {
             await Migrator.BeginMigration();
         }

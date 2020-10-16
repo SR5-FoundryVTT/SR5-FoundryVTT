@@ -554,6 +554,12 @@
         "Euclidean": "Euclidean"
     },
 
+    "SR5.COMBAT": {
+        "ReduceInitByOne": "Initiative -1",
+        "ReduceInitByFive": "Initiative -5",
+        "ReduceInitByTen": "Initiative -10"
+    },
+
     "SR5.MIGRATION.WarningTitle": "Alert",
     "SR5.MIGRATION.WarningHeader": "Migration Warning",
     "SR5.MIGRATION.WarningRequired": "The Shadowrun 5E system must begin a required update.",
