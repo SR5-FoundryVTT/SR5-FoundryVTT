@@ -643,7 +643,7 @@ export class SR5Item extends Item {
         if (tokenKey) {
             const [sceneId, tokenId] = tokenKey.split('.');
             let token;
-            if (sceneId === canvas.scene._id) token = canvas.tokens.get(tokenId);
+            if (sceneId === canvas?.scene._id) token = canvas.tokens.get(tokenId);
             else {
                 const scene: Scene = game.scenes.get(sceneId);
                 if (!scene) return;
@@ -796,7 +796,7 @@ export class SR5Item extends Item {
         const [code, page] = source.split(' ');
 
         //@ts-ignore
-        ui.PDFoundry.openPDFByCode(code, {page: parseInt(page)});
+        ui.PDFoundry.openPDFByCode(code, { page: parseInt(page) });
     }
 
     getAttackData(hits: number): AttackData | undefined {

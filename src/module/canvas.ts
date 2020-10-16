@@ -1,37 +1,40 @@
-/**
- * Measure the distance between two pixel coordinates
- * See BaseGrid.measureDistance for more details
- *
- * @param {Object} p0           The origin coordinate {x, y}
- * @param {Object} p1           The destination coordinate {x, y}
- * @param {boolean} gridSpaces  Enforce grid distance (if true) vs. direct point-to-point (if false)
- * @return {number}             The distance between p1 and p0
- */
-import { SYSTEM_NAME } from './constants';
+// directly pulled from DND5e, just changed the
+export const measureDistance = function (segments, options = {}) {
+    //@ts-ignore
+    // basegrid isn't typed, options aren't really important
+    if (!options.gridSpaces) return BaseGrid.prototype.measureDistances.call(this, segments, options);
 
-export const measureDistance = function (p0, p1, { gridSpaces = true } = {}) {
-    if (!gridSpaces)
-        {  // BaseGrid exists... fix in foundry types
-            // @ts-ignore
-            return BaseGrid.prototype.measureDistance.bind(this)(p0, p1, {
-                        gridSpaces,
-                    });
+    // Track the total number of diagonals
+    let nDiagonal = 0;
+    const rule = this.parent.diagonalRule;
+    const d = canvas.dimensions;
+
+    // Iterate over measured segments
+    return segments.map((s) => {
+        let r = s.ray;
+
+        // Determine the total distance traveled
+        let nx = Math.abs(Math.ceil(r.dx / d.size));
+        let ny = Math.abs(Math.ceil(r.dy / d.size));
+
+        // Determine the number of straight and diagonal moves
+        let nd = Math.min(nx, ny);
+        let ns = Math.abs(ny - nx);
+        nDiagonal += nd;
+
+        // Common houserule variant
+        if (rule === '1-2-1') {
+            let nd10 = Math.floor(nDiagonal / 2) - Math.floor((nDiagonal - nd) / 2);
+            let spaces = nd10 * 2 + (nd - nd10) + ns;
+            return spaces * canvas.dimensions.distance;
         }
-    const gs = canvas.dimensions.size;
-    const ray = new Ray(p0, p1);
-    const nx = Math.abs(Math.ceil(ray.dx / gs));
-    const ny = Math.abs(Math.ceil(ray.dy / gs));
 
-    // Get the number of straight and diagonal moves
-    const nDiagonal = Math.min(nx, ny);
-    const nStraight = Math.abs(ny - nx);
+        // Euclidean Measurement
+        else if (rule === 'EUCL') {
+            return Math.round(Math.hypot(nx, ny) * canvas.scene.data.gridDistance);
+        }
 
-    const diagonalRule = game.settings.get(SYSTEM_NAME, 'diagonalMovement');
-
-    if (diagonalRule === '1-2-1') {
-        const nd10 = Math.floor(nDiagonal / 2);
-        const spaces = nd10 * 2 + (nDiagonal - nd10) + nStraight;
-        return spaces * canvas.dimensions.distance;
-    }
-    return (nStraight + nDiagonal) * canvas.scene.data.gridDistance;
+        // diag and straight are same space count
+        else return (ns + nd) * canvas.scene.data.gridDistance;
+    });
 };

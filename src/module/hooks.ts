@@ -82,9 +82,10 @@ export class HooksManager {
     }
 
     static canvasInit() {
+        canvas.grid.diagonalRule = game.settings.get(SYSTEM_NAME, 'diagonalMovement');
         //@ts-ignore
         // SquareGrid isn't typed.
-        SquareGrid.prototype.measureDistance = measureDistance;
+        SquareGrid.prototype.measureDistances = measureDistance;
     }
 
     static hotbarDrop(bar, data, slot): boolean {
