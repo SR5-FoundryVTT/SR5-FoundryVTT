@@ -553,6 +553,9 @@
         "ShowTokenNameForChatOutputDescription": "Should the token name be used for roll card output instead of the actor name when available",
         "Euclidean": "Euclidean"
     },
+    "SR5.COMBAT.ReduceInitByOne": "Initiative -1",
+    "SR5.COMBAT.ReduceInitByFive": "Initiative -5",
+    "SR5.COMBAT.ReduceInitByTen": "Initiative -10",
 
     "SR5.MIGRATION.WarningTitle": "Alert",
     "SR5.MIGRATION.WarningHeader": "Migration Warning",
