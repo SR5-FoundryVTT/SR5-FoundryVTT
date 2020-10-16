@@ -7744,7 +7744,7 @@ exports.ChatData = {
                 props[i] = prop.replace('Limit', 'Accuracy');
             }
         }
-        const equippedAmmo = item === null || item === void 0 ? void 0 : item.getEquippedAmmo();
+        const equippedAmmo = item.getEquippedAmmo();
         if (equippedAmmo && data.ammo && ((_a = data.ammo.current) === null || _a === void 0 ? void 0 : _a.max)) {
             if (equippedAmmo) {
                 const { current, spare_clips } = data.ammo;
@@ -7809,6 +7809,12 @@ exports.ChatData = {
                 const ranges = [data.thrown.ranges.short, data.thrown.ranges.medium, data.thrown.ranges.long, data.thrown.ranges.extreme];
                 props.push(ranges.map((v) => v * mult).join('/'));
             }
+        }
+        const equippedMods = item.getEquippedMods();
+        if (equippedMods) {
+            equippedMods.forEach((mod) => {
+                props.push(`${mod.name}`);
+            });
         }
     },
 };
