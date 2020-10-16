@@ -62,8 +62,6 @@ export class SR5Item extends Item {
      */
     getEmbeddedItems(): any[] {
         let items = this.getFlag(SYSTEM_NAME, 'embeddedItems');
-        console.log('get');
-        console.log(items);
         if (items) {
             // moved this "hotfix" to here so that everywhere that accesses the flag just gets an array -- Shawn
             //TODO: This is a hotfix. Items should either always be
@@ -87,13 +85,10 @@ export class SR5Item extends Item {
     async setEmbeddedItems(items: any[]) {
         // clear the flag first to remove the previous items - if we don't do this then it doesn't actually "delete" any items
         // await this.unsetFlag(SYSTEM_NAME, 'embeddedItems');
-        console.log('set');
-        console.log(items);
         await this.setFlag(SYSTEM_NAME, 'embeddedItems', items);
     }
 
     async clearEmbeddedItems() {
-        console.log('clear');
         await this.unsetFlag(SYSTEM_NAME, 'embeddedItems');
     }
 
