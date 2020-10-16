@@ -43,4 +43,11 @@ export class ModifiersPrep {
 
         data.modifiers = modifiers;
     }
+
+    static clearAttributeMods(data: SR5ActorData) {
+        const { attributes } = data;
+        for (const [, attribute] of Object.entries(attributes)) {
+            attribute.mod = [];
+        }
+    }
 }

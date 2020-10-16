@@ -2979,6 +2979,7 @@ const NPCPrep_1 = require("./functions/NPCPrep");
 class CharacterPrep extends BaseActorPrep_1.BaseActorPrep {
     prepare() {
         ModifiersPrep_1.ModifiersPrep.prepareModifiers(this.data);
+        ModifiersPrep_1.ModifiersPrep.clearAttributeMods(this.data);
         ItemPrep_1.ItemPrep.prepareArmor(this.data, this.items);
         ItemPrep_1.ItemPrep.prepareCyberware(this.data, this.items);
         SkillsPrep_1.SkillsPrep.prepareSkills(this.data);
@@ -3022,6 +3023,7 @@ const helpers_1 = require("../../helpers");
 class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
     prepare() {
         ModifiersPrep_1.ModifiersPrep.prepareModifiers(this.data);
+        ModifiersPrep_1.ModifiersPrep.clearAttributeMods(this.data);
         SpiritPrep.prepareSpiritBaseData(this.data);
         SkillsPrep_1.SkillsPrep.prepareSkills(this.data);
         AttributesPrep_1.AttributesPrep.prepareAttributes(this.data);
@@ -3336,6 +3338,7 @@ const PartsList_1 = require("../../parts/PartsList");
 class SpritePrep extends BaseActorPrep_1.BaseActorPrep {
     prepare() {
         ModifiersPrep_1.ModifiersPrep.prepareModifiers(this.data);
+        ModifiersPrep_1.ModifiersPrep.clearAttributeMods(this.data);
         SpritePrep.prepareSpriteData(this.data);
         MatrixPrep_1.MatrixPrep.prepareAttributesForDevice(this.data);
         SkillsPrep_1.SkillsPrep.prepareSkills(this.data);
@@ -3457,6 +3460,7 @@ const PartsList_1 = require("../../parts/PartsList");
 class VehiclePrep extends BaseActorPrep_1.BaseActorPrep {
     prepare() {
         ModifiersPrep_1.ModifiersPrep.prepareModifiers(this.data);
+        ModifiersPrep_1.ModifiersPrep.clearAttributeMods(this.data);
         VehiclePrep.prepareVehicleStats(this.data);
         VehiclePrep.prepareAttributes(this.data);
         VehiclePrep.prepareLimits(this.data);
@@ -3581,8 +3585,6 @@ class AttributesPrep {
             // needed to be able to migrate things correctly
             if (key === 'edge' && attribute['uses'] === undefined)
                 return;
-            // always clear the mod list on prep
-            attribute.mod = [];
             const parts = new PartsList_1.PartsList(attribute.mod);
             attribute.mod = parts.list;
             helpers_1.Helpers.calcTotal(attribute);
@@ -3934,6 +3936,12 @@ class ModifiersPrep {
             modifiers[item] = Number(data.modifiers[item]) || 0;
         }
         data.modifiers = modifiers;
+    }
+    static clearAttributeMods(data) {
+        const { attributes } = data;
+        for (const [, attribute] of Object.entries(attributes)) {
+            attribute.mod = [];
+        }
     }
 }
 exports.ModifiersPrep = ModifiersPrep;

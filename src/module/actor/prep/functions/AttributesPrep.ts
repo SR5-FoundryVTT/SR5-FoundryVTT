@@ -20,8 +20,6 @@ export class AttributesPrep {
             // don't manage the attribute if it is using the old method of edge tracking
             // needed to be able to migrate things correctly
             if (key === 'edge' && attribute['uses'] === undefined) return;
-            // always clear the mod list on prep
-            attribute.mod = [];
             const parts = new PartsList(attribute.mod);
 
             attribute.mod = parts.list;

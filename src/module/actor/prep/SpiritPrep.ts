@@ -15,6 +15,7 @@ import { Helpers } from '../../helpers';
 export class SpiritPrep extends BaseActorPrep<SR5SpiritType, SpiritActorData> {
     prepare() {
         ModifiersPrep.prepareModifiers(this.data);
+        ModifiersPrep.clearAttributeMods(this.data);
 
         SpiritPrep.prepareSpiritBaseData(this.data);
 
