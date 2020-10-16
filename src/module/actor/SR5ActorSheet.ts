@@ -8,7 +8,7 @@ import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import Skills = Shadowrun.Skills;
 import { SR5Actor } from './SR5Actor';
 import MatrixAttribute = Shadowrun.MatrixAttribute;
-import {SR5} from "../config";
+import { SR5 } from '../config';
 import SkillField = Shadowrun.SkillField;
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditForm instance.
@@ -35,7 +35,7 @@ export class SR5ActorSheet extends ActorSheet {
         this._shownDesc = [];
         this._filters = {
             skills: '',
-            showUntrainedSkills: true
+            showUntrainedSkills: true,
         };
     }
 
@@ -94,7 +94,7 @@ export class SR5ActorSheet extends ActorSheet {
     }
 
     _isSkillResonance(skill) {
-        return skill.attribute === 'resonance'
+        return skill.attribute === 'resonance';
     }
 
     _getSkillLabelOrName(skill) {
@@ -110,7 +110,9 @@ export class SR5ActorSheet extends ActorSheet {
         // Search both english keys, localized labels and all specializations.
         const name = this._getSkillLabelOrName(skill);
         const searchKey = skill.name === undefined ? key : '';
-        let searchString = `${searchKey} ${name} ${skill?.specs?.join(' ')}`;
+        // some "specs" were a string from old code I think
+        const specs = skill.specs !== undefined && Array.isArray(skill.specs) ? skill.specs.join(' ') : '';
+        let searchString = `${searchKey} ${name} ${specs}`;
 
         return searchString.toLowerCase().search(text.toLowerCase()) > -1;
     }
@@ -170,7 +172,7 @@ export class SR5ActorSheet extends ActorSheet {
 
     _filterKnowledgeSkills(data: SR5ActorSheetData) {
         // Knowledge skill have separate sub-categories.
-        Object.keys(SR5.knowledgeSkillCategories).forEach(category => {
+        Object.keys(SR5.knowledgeSkillCategories).forEach((category) => {
             if (!data.data.skills.knowledge.hasOwnProperty(category)) {
                 console.warn(`Knowledge Skill doesn't provide configured category ${category}`);
                 return;
@@ -192,7 +194,7 @@ export class SR5ActorSheet extends ActorSheet {
             }
         }
         Helpers.orderKeys(filteredSkills);
-        return filteredSkills
+        return filteredSkills;
     }
 
     _showSkill(key, skill, data) {
@@ -212,25 +214,19 @@ export class SR5ActorSheet extends ActorSheet {
         const isHiddenForText = !this._doesSkillContainText(skillId, skill, this._filters.skills);
         const isHiddenForUntrained = !this._filters.showUntrainedSkills && skill.value === 0;
 
-        return !(isFilterable && (isHiddenForUntrained || isHiddenForText))
+        return !(isFilterable && (isHiddenForUntrained || isHiddenForText));
     }
 
     _showGeneralSkill(skillId, skill: SkillField) {
-        return !this._isSkillMagic(skillId, skill) &&
-               !this._isSkillResonance(skill) &&
-               this._isSkillFiltered(skillId, skill);
+        return !this._isSkillMagic(skillId, skill) && !this._isSkillResonance(skill) && this._isSkillFiltered(skillId, skill);
     }
 
     _showMagicSkills(skillId, skill: SkillField, data: SR5ActorSheetData) {
-        return this._isSkillMagic(skillId, skill) &&
-              data.data.special === 'magic' &&
-              this._isSkillFiltered(skillId, skill);
+        return this._isSkillMagic(skillId, skill) && data.data.special === 'magic' && this._isSkillFiltered(skillId, skill);
     }
 
     _showResonanceSkills(skillId, skill: SkillField, data: SR5ActorSheetData) {
-        return this._isSkillResonance(skill) &&
-               data.data.special === 'resonance' &&
-               this._isSkillFiltered(skillId, skill);
+        return this._isSkillResonance(skill) && data.data.special === 'resonance' && this._isSkillFiltered(skillId, skill);
     }
 
     _prepareItems(data) {
@@ -408,8 +404,6 @@ export class SR5ActorSheet extends ActorSheet {
         html.find('.matrix-att-selector').change(this._onMatrixAttributeSelected.bind(this));
 
         html.find('.import-character').click(this._onShowImportCharacter.bind(this));
-
-
 
         /**
          * Open the PDF for an item on the actor

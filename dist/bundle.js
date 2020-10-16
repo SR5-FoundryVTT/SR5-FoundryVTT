@@ -2073,7 +2073,7 @@ class SR5ActorSheet extends ActorSheet {
         this._shownDesc = [];
         this._filters = {
             skills: '',
-            showUntrainedSkills: true
+            showUntrainedSkills: true,
         };
     }
     /* -------------------------------------------- */
@@ -2128,14 +2128,15 @@ class SR5ActorSheet extends ActorSheet {
         return skill.label ? game.i18n.localize(skill.label) : skill.name;
     }
     _doesSkillContainText(key, skill, text) {
-        var _a;
         if (!text) {
             return true;
         }
         // Search both english keys, localized labels and all specializations.
         const name = this._getSkillLabelOrName(skill);
         const searchKey = skill.name === undefined ? key : '';
-        let searchString = `${searchKey} ${name} ${(_a = skill === null || skill === void 0 ? void 0 : skill.specs) === null || _a === void 0 ? void 0 : _a.join(' ')}`;
+        // some "specs" were a string from old code I think
+        const specs = skill.specs !== undefined && Array.isArray(skill.specs) ? skill.specs.join(' ') : '';
+        let searchString = `${searchKey} ${name} ${specs}`;
         return searchString.toLowerCase().search(text.toLowerCase()) > -1;
     }
     _prepareCharacterFields(data) {
@@ -2189,7 +2190,7 @@ class SR5ActorSheet extends ActorSheet {
     }
     _filterKnowledgeSkills(data) {
         // Knowledge skill have separate sub-categories.
-        Object.keys(config_1.SR5.knowledgeSkillCategories).forEach(category => {
+        Object.keys(config_1.SR5.knowledgeSkillCategories).forEach((category) => {
             if (!data.data.skills.knowledge.hasOwnProperty(category)) {
                 console.warn(`Knowledge Skill doesn't provide configured category ${category}`);
                 return;
@@ -2228,19 +2229,13 @@ class SR5ActorSheet extends ActorSheet {
         return !(isFilterable && (isHiddenForUntrained || isHiddenForText));
     }
     _showGeneralSkill(skillId, skill) {
-        return !this._isSkillMagic(skillId, skill) &&
-            !this._isSkillResonance(skill) &&
-            this._isSkillFiltered(skillId, skill);
+        return !this._isSkillMagic(skillId, skill) && !this._isSkillResonance(skill) && this._isSkillFiltered(skillId, skill);
     }
     _showMagicSkills(skillId, skill, data) {
-        return this._isSkillMagic(skillId, skill) &&
-            data.data.special === 'magic' &&
-            this._isSkillFiltered(skillId, skill);
+        return this._isSkillMagic(skillId, skill) && data.data.special === 'magic' && this._isSkillFiltered(skillId, skill);
     }
     _showResonanceSkills(skillId, skill, data) {
-        return this._isSkillResonance(skill) &&
-            data.data.special === 'resonance' &&
-            this._isSkillFiltered(skillId, skill);
+        return this._isSkillResonance(skill) && data.data.special === 'resonance' && this._isSkillFiltered(skillId, skill);
     }
     _prepareItems(data) {
         const inventory = {};
