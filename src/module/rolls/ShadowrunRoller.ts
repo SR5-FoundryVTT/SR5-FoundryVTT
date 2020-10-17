@@ -306,83 +306,83 @@ export class ShadowrunRoller {
             };
         }
 
-        return new Promise((resolve) => {
-            renderTemplate(template, dialogData).then((dlg) => {
-                new Dialog({
-                    title: title,
-                    content: dlg,
-                    buttons,
-                    default: 'roll',
+        return new Promise(async (resolve) => {
+            const content = await renderTemplate(template, dialogData);
+            const dialog = new Dialog({
+                title: title,
+                content,
+                buttons,
+                default: 'roll',
 
-                    close: async (html) => {
-                        if (cancel) return;
-                        // get the actual dice_pool from the difference of initial parts and value in the dialog
+                close: async (html) => {
+                    if (cancel) return;
+                    // get the actual dice_pool from the difference of initial parts and value in the dialog
 
-                        const dicePoolValue = Helpers.parseInputToNumber($(html).find('[name="dice_pool"]').val());
+                    const dicePoolValue = Helpers.parseInputToNumber($(html).find('[name="dice_pool"]').val());
 
-                        if (dialogOptions?.prompt) {
-                            parts.clear();
-                            await game.user.setFlag(SYSTEM_NAME, 'lastRollPromptValue', dicePoolValue);
-                            parts.addUniquePart('SR5.Base', dicePoolValue);
-                        }
+                    if (dialogOptions?.prompt) {
+                        parts.clear();
+                        await game.user.setFlag(SYSTEM_NAME, 'lastRollPromptValue', dicePoolValue);
+                        parts.addUniquePart('SR5.Base', dicePoolValue);
+                    }
 
-                        const limitValue = Helpers.parseInputToNumber($(html).find('[name="limit"]').val());
+                    const limitValue = Helpers.parseInputToNumber($(html).find('[name="limit"]').val());
 
-                        if (limit && limit.value !== limitValue) {
-                            limit.value = limitValue;
-                            limit.base = limitValue;
-                            limit.label = 'SR5.Override';
-                        }
+                    if (limit && limit.value !== limitValue) {
+                        limit.value = limitValue;
+                        limit.base = limitValue;
+                        limit.label = 'SR5.Override';
+                    }
 
-                        const woundValue = Helpers.parseInputToNumber($(html).find('[name="wounds"]').val());
-                        const situationMod = Helpers.parseInputToNumber($(html).find('[name="dp_mod"]').val());
-                        const environmentMod = Helpers.parseInputToNumber($(html).find('[name="options.environmental"]').val());
+                    const woundValue = Helpers.parseInputToNumber($(html).find('[name="wounds"]').val());
+                    const situationMod = Helpers.parseInputToNumber($(html).find('[name="dp_mod"]').val());
+                    const environmentMod = Helpers.parseInputToNumber($(html).find('[name="options.environmental"]').val());
 
-                        if (wounds && woundValue !== 0) {
-                            parts.addUniquePart('SR5.Wounds', woundValue);
-                            props.wounds = true;
-                        }
-                        if (situationMod) {
-                            parts.addUniquePart('SR5.SituationalModifier', situationMod);
-                        }
-                        if (environmentMod) {
-                            parts.addUniquePart('SR5.EnvironmentModifier', environmentMod);
-                            if (!props.dialogOptions) props.dialogOptions = {};
-                            props.dialogOptions.environmental = true;
-                        }
+                    if (wounds && woundValue !== 0) {
+                        parts.addUniquePart('SR5.Wounds', woundValue);
+                        props.wounds = true;
+                    }
+                    if (situationMod) {
+                        parts.addUniquePart('SR5.SituationalModifier', situationMod);
+                    }
+                    if (environmentMod) {
+                        parts.addUniquePart('SR5.EnvironmentModifier', environmentMod);
+                        if (!props.dialogOptions) props.dialogOptions = {};
+                        props.dialogOptions.environmental = true;
+                    }
 
-                        const extendedString = Helpers.parseInputToString($(html).find('[name="extended"]').val());
-                        const extended = extendedString === 'true';
+                    const extendedString = Helpers.parseInputToString($(html).find('[name="extended"]').val());
+                    const extended = extendedString === 'true';
 
-                        if (edge && actor) {
-                            props.explodeSixes = true;
-                            parts.addUniquePart('SR5.PushTheLimit', actor.getEdge().value);
-                            delete props.limit;
-                            // TODO: Edge usage doesn't seem to apply on actor sheet.
-                            await actor.update({
-                                'data.attributes.edge.uses': actor.data.data.attributes.edge.uses - 1,
-                            });
-                        }
-
-                        props.rollMode = Helpers.parseInputToString($(html).find('[name=rollMode]').val());
-
-                        props.parts = parts.list;
-                        const r = this.basicRoll({
-                            ...props,
+                    if (edge && actor) {
+                        props.explodeSixes = true;
+                        parts.addUniquePart('SR5.PushTheLimit', actor.getEdge().value);
+                        delete props.limit;
+                        // TODO: Edge usage doesn't seem to apply on actor sheet.
+                        await actor.update({
+                            'data.attributes.edge.uses': actor.data.data.attributes.edge.uses - 1,
                         });
+                    }
 
-                        if (extended && r) {
-                            const currentExtended = parts.getPartValue('SR5.Extended') ?? 0;
-                            parts.addUniquePart('SR5.Extended', currentExtended - 1);
-                            props.parts = parts.list;
-                            // add a bit of a delay to roll again
-                            setTimeout(() => this.advancedRoll(props), 400);
-                        }
-                        resolve(r);
-                        if (after && r) r.then((roll) => after(roll));
-                    },
-                }).render(true);
+                    props.rollMode = Helpers.parseInputToString($(html).find('[name=rollMode]').val());
+
+                    props.parts = parts.list;
+                    const r = this.basicRoll({
+                        ...props,
+                    });
+
+                    if (extended && r) {
+                        const currentExtended = parts.getPartValue('SR5.Extended') ?? 0;
+                        parts.addUniquePart('SR5.Extended', currentExtended - 1);
+                        props.parts = parts.list;
+                        // add a bit of a delay to roll again
+                        setTimeout(() => this.advancedRoll(props), 400);
+                    }
+                    resolve(r);
+                    if (after && r) r.then((roll) => after(roll));
+                },
             });
+            dialog.render(true);
         });
     }
 
