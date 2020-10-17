@@ -23,11 +23,18 @@
     ],
     "packs": [
         {
-            "name": "roles",
+            "name": "Roles",
             "label": "SR5e NPCs",
             "system": "shadowrun5e",
             "path": "./packs/sr5e-npcs.db",
             "entity": "Actor"
+        },
+        {
+            "name": "Matrix Actions",
+            "label": "SR5e Matrix Actions",
+            "system": "shadowrun5e",
+            "path": "./packs/sr5e-matrix-actions.db",
+            "entity": "Item"
         }
     ],
     "initiative": "@initiative.current.base.value + @initiative.current.dice.text - @wounds.value",
