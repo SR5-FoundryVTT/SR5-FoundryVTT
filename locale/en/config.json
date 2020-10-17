@@ -540,18 +540,27 @@
     "SR5.SpecialAttributes": "Special Attributes",
     "SR5.RightClickToClear": "Right Click to Clear",
 
-    "SETTINGS.DiagonalMovementName": "Diagonal Movement",
-    "SETTINGS.DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
-    "SETTINGS.IgnoreDiagonal": "Ignore Diagonal Movement (1-1-1)",
-    "SETTINGS.EstimateDiagonal": "Estimate Diagonal Movement (1-2-1)",
-    "SETTINGS.ApplyLimitsName": "Apply Limits to Rolls",
-    "SETTINGS.ApplyLimitsDescription": "Should limits be applied to roll",
-    "SETTINGS.DisplayDefaultRollCardName": "Display Default Roll Card",
-    "SETTINGS.DisplayDefaultRollCardDescription": "Should the default roll-card be displayed along with the shadowrun roll-card",
-    "SETTINGS.ShowGlitchAnimationName": "Display Glitch Animation",
-    "SETTINGS.ShowGlitchAnimationDescription": "Should display the animation as part of the glitch text on the roll card",
-    "SETTINGS.ShowTokenNameForChatOutputName": "Use Token Name for Roll Card",
-    "SETTINGS.ShowTokenNameForChatOutputDescription": "Should the token name be used for roll card output instead of the actor name when available",
+    "SETTINGS": {
+        "DiagonalMovementName": "Diagonal Movement",
+        "DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
+        "IgnoreDiagonal": "Ignore Diagonal Movement (1-1-1)",
+        "EstimateDiagonal": "Estimate Diagonal Movement (1-2-1)",
+        "ApplyLimitsName": "Apply Limits to Rolls",
+        "ApplyLimitsDescription": "Should limits be applied to roll",
+        "DisplayDefaultRollCardName": "Display Default Roll Card",
+        "DisplayDefaultRollCardDescription": "Should the default roll-card be displayed along with the shadowrun roll-card",
+        "ShowGlitchAnimationName": "Display Glitch Animation",
+        "ShowGlitchAnimationDescription": "Should display the animation as part of the glitch text on the roll card",
+        "ShowTokenNameForChatOutputName": "Use Token Name for Roll Card",
+        "ShowTokenNameForChatOutputDescription": "Should the token name be used for roll card output instead of the actor name when available",
+        "Euclidean": "Euclidean"
+    },
+
+    "SR5.COMBAT": {
+        "ReduceInitByOne": "Initiative -1",
+        "ReduceInitByFive": "Initiative -5",
+        "ReduceInitByTen": "Initiative -10"
+    },
 
     "SR5.MIGRATION.WarningTitle": "Alert",
     "SR5.MIGRATION.WarningHeader": "Migration Warning",

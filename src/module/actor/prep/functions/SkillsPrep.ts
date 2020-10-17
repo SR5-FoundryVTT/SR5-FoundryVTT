@@ -19,10 +19,10 @@ export class SkillsPrep {
             if (!skill.base) skill.base = 0;
             if (skill.bonus?.length) {
                 for (let bonus of skill.bonus) {
-                    skill.mod = PartsList.AddUniquePart(skill.mod, bonus.key, bonus.value);
+                    skill.mod = PartsList.AddUniquePart(skill.mod, bonus.key, Number(bonus.value));
                 }
             }
-            Helpers.calcTotal(skill);
+            skill.value = Helpers.calcTotal(skill);
         };
 
         // setup active skills

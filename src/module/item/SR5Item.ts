@@ -84,8 +84,12 @@ export class SR5Item extends Item {
      */
     async setEmbeddedItems(items: any[]) {
         // clear the flag first to remove the previous items - if we don't do this then it doesn't actually "delete" any items
-        await this.unsetFlag(SYSTEM_NAME, 'embeddedItems');
+        // await this.unsetFlag(SYSTEM_NAME, 'embeddedItems');
         await this.setFlag(SYSTEM_NAME, 'embeddedItems', items);
+    }
+
+    async clearEmbeddedItems() {
+        await this.unsetFlag(SYSTEM_NAME, 'embeddedItems');
     }
 
     getLastAttack(): AttackData | undefined {
@@ -101,7 +105,7 @@ export class SR5Item extends Item {
         const ret = super.update(data, options);
         ret.then(() => {
             if (this.actor) {
-                this.actor.render();
+                this.actor.render(false);
             }
         });
         return ret;
@@ -653,7 +657,7 @@ export class SR5Item extends Item {
         if (tokenKey) {
             const [sceneId, tokenId] = tokenKey.split('.');
             let token;
-            if (sceneId === canvas.scene._id) token = canvas.tokens.get(tokenId);
+            if (sceneId === canvas?.scene._id) token = canvas.tokens.get(tokenId);
             else {
                 const scene: Scene = game.scenes.get(sceneId);
                 if (!scene) return;
@@ -668,6 +672,15 @@ export class SR5Item extends Item {
         if (!actor) return;
         const itemId = card.data('itemId');
         return actor.getOwnedItem(itemId);
+    }
+
+    static getTargets() {
+        const { character } = game.user;
+        const { controlled } = canvas.tokens;
+        const targets = controlled.reduce((arr, t) => (t.actor ? arr.concat([t.actor]) : arr), []);
+        if (character && controlled.length === 0) targets.push(character);
+        if (!targets.length) throw new Error(`You must designate a specific Token as the roll target`);
+        return targets;
     }
 
     /**
@@ -773,6 +786,8 @@ export class SR5Item extends Item {
         const idx = items.findIndex((i) => i._id === deleted || Number(i._id) === deleted);
         if (idx === -1) throw new Error(`Shadowrun5e | Couldn't find owned item ${deleted}`);
         items.splice(idx, 1);
+        // we need to clear the items when one is deleted or it won't actually be deleted
+        await this.clearEmbeddedItems();
         await this.setEmbeddedItems(items);
         await this.prepareEmbeddedEntities();
         await this.prepareData();
@@ -797,7 +812,7 @@ export class SR5Item extends Item {
         const [code, page] = source.split(' ');
 
         //@ts-ignore
-        ui.PDFoundry.openPDFByCode(code, {page: parseInt(page)});
+        ui.PDFoundry.openPDFByCode(code, { page: parseInt(page) });
     }
 
     _canDealDamage(): boolean {

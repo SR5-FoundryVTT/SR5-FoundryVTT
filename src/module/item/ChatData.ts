@@ -1,5 +1,6 @@
 import { Helpers } from '../helpers';
 import DeviceData = Shadowrun.DeviceData;
+import { SR5Item } from './SR5Item';
 
 export const ChatData = {
     action: (data, labels, props) => {
@@ -204,7 +205,7 @@ export const ChatData = {
         labels.roll = 'Cast';
     },
 
-    weapon: (data, labels, props, item) => {
+    weapon: (data, labels, props, item: SR5Item) => {
         ChatData.action(data, labels, props);
         for (let i = 0; i < props.length; i++) {
             const prop = props[i];
@@ -213,7 +214,7 @@ export const ChatData = {
             }
         }
 
-        const equippedAmmo = item?.getEquippedAmmo();
+        const equippedAmmo = item.getEquippedAmmo();
         if (equippedAmmo && data.ammo && data.ammo.current?.max) {
             if (equippedAmmo) {
                 const { current, spare_clips } = data.ammo;
@@ -267,6 +268,13 @@ export const ChatData = {
                 const ranges = [data.thrown.ranges.short, data.thrown.ranges.medium, data.thrown.ranges.long, data.thrown.ranges.extreme];
                 props.push(ranges.map((v) => v * mult).join('/'));
             }
+        }
+
+        const equippedMods = item.getEquippedMods();
+        if (equippedMods) {
+            equippedMods.forEach((mod) => {
+                props.push(`${mod.name}`);
+            });
         }
     },
 };

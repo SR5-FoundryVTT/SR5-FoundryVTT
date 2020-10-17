@@ -1131,8 +1131,14 @@ class SR5Actor extends Actor {
         if (skills.language.value.hasOwnProperty(skillId)) {
             return skills.language.value[skillId];
         }
-        if (skills.knowledge.value.hasOwnProperty(skillId)) {
-            return skills.knowledge.value[skillId];
+        // Knowledge skills are de-normalized into categories (street, hobby, ...)
+        for (const categoryKey in skills.knowledge) {
+            if (skills.knowledge.hasOwnProperty(categoryKey)) {
+                const category = skills.knowledge[categoryKey];
+                if (category.value.hasOwnProperty(skillId)) {
+                    return category.value[skillId];
+                }
+            }
         }
     }
     getSkillLabel(skillId) {
@@ -2068,7 +2074,7 @@ class SR5ActorSheet extends ActorSheet {
         this._shownDesc = [];
         this._filters = {
             skills: '',
-            showUntrainedSkills: true
+            showUntrainedSkills: true,
         };
     }
     /* -------------------------------------------- */
@@ -2123,14 +2129,15 @@ class SR5ActorSheet extends ActorSheet {
         return skill.label ? game.i18n.localize(skill.label) : skill.name;
     }
     _doesSkillContainText(key, skill, text) {
-        var _a;
         if (!text) {
             return true;
         }
         // Search both english keys, localized labels and all specializations.
         const name = this._getSkillLabelOrName(skill);
         const searchKey = skill.name === undefined ? key : '';
-        let searchString = `${searchKey} ${name} ${(_a = skill === null || skill === void 0 ? void 0 : skill.specs) === null || _a === void 0 ? void 0 : _a.join(' ')}`;
+        // some "specs" were a string from old code I think
+        const specs = skill.specs !== undefined && Array.isArray(skill.specs) ? skill.specs.join(' ') : '';
+        let searchString = `${searchKey} ${name} ${specs}`;
         return searchString.toLowerCase().search(text.toLowerCase()) > -1;
     }
     _prepareCharacterFields(data) {
@@ -2184,7 +2191,7 @@ class SR5ActorSheet extends ActorSheet {
     }
     _filterKnowledgeSkills(data) {
         // Knowledge skill have separate sub-categories.
-        Object.keys(config_1.SR5.knowledgeSkillCategories).forEach(category => {
+        Object.keys(config_1.SR5.knowledgeSkillCategories).forEach((category) => {
             if (!data.data.skills.knowledge.hasOwnProperty(category)) {
                 console.warn(`Knowledge Skill doesn't provide configured category ${category}`);
                 return;
@@ -2223,19 +2230,13 @@ class SR5ActorSheet extends ActorSheet {
         return !(isFilterable && (isHiddenForUntrained || isHiddenForText));
     }
     _showGeneralSkill(skillId, skill) {
-        return !this._isSkillMagic(skillId, skill) &&
-            !this._isSkillResonance(skill) &&
-            this._isSkillFiltered(skillId, skill);
+        return !this._isSkillMagic(skillId, skill) && !this._isSkillResonance(skill) && this._isSkillFiltered(skillId, skill);
     }
     _showMagicSkills(skillId, skill, data) {
-        return this._isSkillMagic(skillId, skill) &&
-            data.data.special === 'magic' &&
-            this._isSkillFiltered(skillId, skill);
+        return this._isSkillMagic(skillId, skill) && data.data.special === 'magic' && this._isSkillFiltered(skillId, skill);
     }
     _showResonanceSkills(skillId, skill, data) {
-        return this._isSkillResonance(skill) &&
-            data.data.special === 'resonance' &&
-            this._isSkillFiltered(skillId, skill);
+        return this._isSkillResonance(skill) && data.data.special === 'resonance' && this._isSkillFiltered(skillId, skill);
     }
     _prepareItems(data) {
         const inventory = {};
@@ -2456,7 +2457,7 @@ class SR5ActorSheet extends ActorSheet {
             el.slideUp(200, () => this.render(false));
         });
         // Drag inventory item
-        let handler = (ev) => this._onDragItemStart(ev);
+        let handler = (ev) => this._onDragStart(ev);
         html.find('.list-item').each((i, item) => {
             if (item.dataset && item.dataset.itemId) {
                 item.setAttribute('draggable', true);
@@ -2982,6 +2983,7 @@ const NPCPrep_1 = require("./functions/NPCPrep");
 class CharacterPrep extends BaseActorPrep_1.BaseActorPrep {
     prepare() {
         ModifiersPrep_1.ModifiersPrep.prepareModifiers(this.data);
+        ModifiersPrep_1.ModifiersPrep.clearAttributeMods(this.data);
         ItemPrep_1.ItemPrep.prepareArmor(this.data, this.items);
         ItemPrep_1.ItemPrep.prepareCyberware(this.data, this.items);
         SkillsPrep_1.SkillsPrep.prepareSkills(this.data);
@@ -3026,6 +3028,7 @@ const helpers_1 = require("../../helpers");
 class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
     prepare() {
         ModifiersPrep_1.ModifiersPrep.prepareModifiers(this.data);
+        ModifiersPrep_1.ModifiersPrep.clearAttributeMods(this.data);
         SpiritPrep.prepareSpiritBaseData(this.data);
         SkillsPrep_1.SkillsPrep.prepareSkills(this.data);
         AttributesPrep_1.AttributesPrep.prepareAttributes(this.data);
@@ -3341,6 +3344,7 @@ const PartsList_1 = require("../../parts/PartsList");
 class SpritePrep extends BaseActorPrep_1.BaseActorPrep {
     prepare() {
         ModifiersPrep_1.ModifiersPrep.prepareModifiers(this.data);
+        ModifiersPrep_1.ModifiersPrep.clearAttributeMods(this.data);
         SpritePrep.prepareSpriteData(this.data);
         MatrixPrep_1.MatrixPrep.prepareAttributesForDevice(this.data);
         SkillsPrep_1.SkillsPrep.prepareSkills(this.data);
@@ -3463,6 +3467,7 @@ const PartsList_1 = require("../../parts/PartsList");
 class VehiclePrep extends BaseActorPrep_1.BaseActorPrep {
     prepare() {
         ModifiersPrep_1.ModifiersPrep.prepareModifiers(this.data);
+        ModifiersPrep_1.ModifiersPrep.clearAttributeMods(this.data);
         VehiclePrep.prepareVehicleStats(this.data);
         VehiclePrep.prepareAttributes(this.data);
         VehiclePrep.prepareLimits(this.data);
@@ -3576,7 +3581,6 @@ class AttributesPrep {
      * Prepare actor data for attributes
      */
     static prepareAttributes(data) {
-        var _a;
         const { attributes } = data;
         // always have special attributes set to hidden
         attributes.magic.hidden = true;
@@ -3589,14 +3593,7 @@ class AttributesPrep {
             // needed to be able to migrate things correctly
             if (key === 'edge' && attribute['uses'] === undefined)
                 return;
-            // this turns the Object model into the list mod
-            if (typeof attribute.mod === 'object') {
-                attribute.mod = new PartsList_1.PartsList(attribute.mod).list;
-            }
             const parts = new PartsList_1.PartsList(attribute.mod);
-            parts.addUniquePart('SR5.Temporary', (_a = attribute.temp) !== null && _a !== void 0 ? _a : 0);
-            // TODO legacy from previous sheet
-            parts.removePart('Temporary');
             attribute.mod = parts.list;
             helpers_1.Helpers.calcTotal(attribute);
             // add labels
@@ -3954,6 +3951,12 @@ class ModifiersPrep {
         }
         data.modifiers = modifiers;
     }
+    static clearAttributeMods(data) {
+        const { attributes } = data;
+        for (const [, attribute] of Object.entries(attributes)) {
+            attribute.mod = [];
+        }
+    }
 }
 exports.ModifiersPrep = ModifiersPrep;
 
@@ -4045,10 +4048,10 @@ class SkillsPrep {
                 skill.base = 0;
             if ((_a = skill.bonus) === null || _a === void 0 ? void 0 : _a.length) {
                 for (let bonus of skill.bonus) {
-                    skill.mod = PartsList_1.PartsList.AddUniquePart(skill.mod, bonus.key, bonus.value);
+                    skill.mod = PartsList_1.PartsList.AddUniquePart(skill.mod, bonus.key, Number(bonus.value));
                 }
             }
-            helpers_1.Helpers.calcTotal(skill);
+            skill.value = helpers_1.Helpers.calcTotal(skill);
         };
         // setup active skills
         for (const skill of Object.values(active)) {
@@ -5488,40 +5491,43 @@ exports.SkillEditForm = SkillEditForm;
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.measureDistance = void 0;
-/**
- * Measure the distance between two pixel coordinates
- * See BaseGrid.measureDistance for more details
- *
- * @param {Object} p0           The origin coordinate {x, y}
- * @param {Object} p1           The destination coordinate {x, y}
- * @param {boolean} gridSpaces  Enforce grid distance (if true) vs. direct point-to-point (if false)
- * @return {number}             The distance between p1 and p0
- */
-const constants_1 = require("./constants");
-exports.measureDistance = function (p0, p1, { gridSpaces = true } = {}) {
-    if (!gridSpaces) { // BaseGrid exists... fix in foundry types
-        // @ts-ignore
-        return BaseGrid.prototype.measureDistance.bind(this)(p0, p1, {
-            gridSpaces,
-        });
-    }
-    const gs = canvas.dimensions.size;
-    const ray = new Ray(p0, p1);
-    const nx = Math.abs(Math.ceil(ray.dx / gs));
-    const ny = Math.abs(Math.ceil(ray.dy / gs));
-    // Get the number of straight and diagonal moves
-    const nDiagonal = Math.min(nx, ny);
-    const nStraight = Math.abs(ny - nx);
-    const diagonalRule = game.settings.get(constants_1.SYSTEM_NAME, 'diagonalMovement');
-    if (diagonalRule === '1-2-1') {
-        const nd10 = Math.floor(nDiagonal / 2);
-        const spaces = nd10 * 2 + (nDiagonal - nd10) + nStraight;
-        return spaces * canvas.dimensions.distance;
-    }
-    return (nStraight + nDiagonal) * canvas.scene.data.gridDistance;
+// directly pulled from DND5e, just changed the
+exports.measureDistance = function (segments, options = {}) {
+    //@ts-ignore
+    // basegrid isn't typed, options aren't really important
+    if (!options.gridSpaces)
+        return BaseGrid.prototype.measureDistances.call(this, segments, options);
+    // Track the total number of diagonals
+    let nDiagonal = 0;
+    const rule = this.parent.diagonalRule;
+    const d = canvas.dimensions;
+    // Iterate over measured segments
+    return segments.map((s) => {
+        let r = s.ray;
+        // Determine the total distance traveled
+        let nx = Math.abs(Math.ceil(r.dx / d.size));
+        let ny = Math.abs(Math.ceil(r.dy / d.size));
+        // Determine the number of straight and diagonal moves
+        let nd = Math.min(nx, ny);
+        let ns = Math.abs(ny - nx);
+        nDiagonal += nd;
+        // Common houserule variant
+        if (rule === '1-2-1') {
+            let nd10 = Math.floor(nDiagonal / 2) - Math.floor((nDiagonal - nd) / 2);
+            let spaces = nd10 * 2 + (nd - nd10) + ns;
+            return spaces * canvas.dimensions.distance;
+        }
+        // Euclidean Measurement
+        else if (rule === 'EUCL') {
+            return Math.round(Math.hypot(nx, ny) * canvas.scene.data.gridDistance);
+        }
+        // diag and straight are same space count
+        else
+            return (ns + nd) * canvas.scene.data.gridDistance;
+    });
 };
 
-},{"./constants":45}],42:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -5640,95 +5646,225 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.shadowrunCombatUpdate = exports.preCombatUpdate = void 0;
-const constants_1 = require("./constants");
-exports.preCombatUpdate = function (combat, changes, options) {
-    return __awaiter(this, void 0, void 0, function* () {
-        // triggers when combat round changes
-        if (changes.round && combat.round && changes.round > combat.round) {
-            let initPassEnd = true;
-            for (const c of combat.combatants) {
-                let init = Number(c.initiative);
-                init -= 10;
-                if (init > 0)
-                    initPassEnd = false;
-            }
-            if (!initPassEnd) {
-                changes.round = combat.round;
-            }
-            // if we are gm, call function normally
-            // if not gm, send a socket message for the gm to update the combatants
-            // for new initative passes or reroll
-            if (game.user.isGM) {
-                yield exports.shadowrunCombatUpdate(changes, options);
-            }
-            else {
-                // @ts-ignore
-                game.socket.emit('system.shadowrun5e', {
-                    gmCombatUpdate: {
-                        changes,
-                        options,
-                    },
-                });
-            }
-        }
-    });
-};
-exports.shadowrunCombatUpdate = (changes, options) => __awaiter(void 0, void 0, void 0, function* () {
-    const { combat } = game;
-    // subtact 10 from all initiative, we just went into the next initiative pass
-    const removedCombatants = combat.getFlag(constants_1.SYSTEM_NAME, 'removedCombatants') || [];
-    const combatants = [];
-    for (const c of combat.combatants) {
-        let init = Number(c.initiative);
-        init -= 10;
-        if (init <= 0)
-            removedCombatants.push(Object.assign({}, c));
-        else {
-            // @ts-ignore
-            combatants.push({ _id: c._id, initiative: init });
-        }
-    }
-    yield combat.deleteEmbeddedEntity('Combatant', removedCombatants.map((c) => c._id), {});
-    yield combat.updateEmbeddedEntity('Combatant', combatants, {});
-    if (combatants.length === 0) {
-        const messages = [];
-        const messageOptions = options.messageOptions || {};
-        for (const c of removedCombatants) {
-            const actorData = c.actor ? c.actor.data : {};
-            // @ts-ignore
-            const formula = combat._getInitiativeFormula(c);
-            const roll = new Roll(formula, actorData).roll();
-            c.initiative = roll.total;
-            const rollMode = messageOptions.rollMode || c.token.hidden || c.hidden ? 'gmroll' : 'roll';
-            const messageData = mergeObject({
-                speaker: {
-                    scene: canvas.scene._id,
-                    actor: c.actor ? c.actor._id : null,
-                    token: c.token._id,
-                    alias: c.token.name,
-                },
-                flavor: `${c.token.name} rolls for Initiative!`,
-            }, messageOptions);
-            yield roll.toMessage(messageData, {
-                rollMode,
-            });
-        }
-        yield combat.createEmbeddedEntity('Combatant', removedCombatants, {});
-        yield ChatMessage.create(messages);
-        yield combat.unsetFlag(constants_1.SYSTEM_NAME, 'removedCombatants');
+exports.SR5Combat = void 0;
+class SR5Combat extends Combat {
+    constructor(...args) {
         // @ts-ignore
-        yield combat.resetAll();
-        yield combat.rollAll();
-        yield combat.update({ turn: 0 });
+        super(...args);
+        Hooks.on('updateActor', (actor) => {
+            const combatant = this.getActorCombatant(actor);
+            if (combatant) {
+                // TODO handle monitoring Wound changes
+            }
+        });
     }
-    else if (removedCombatants.length) {
-        yield combat.setFlag(constants_1.SYSTEM_NAME, 'removedCombatants', removedCombatants);
-        yield combat.update({ turn: 0 });
+    get initiativePass() {
+        var _a;
+        return ((_a = this.data) === null || _a === void 0 ? void 0 : _a.initiativePass) || 0;
     }
-});
+    getActorCombatant(actor) {
+        return this.combatants.find((c) => c.actor._id === actor._id);
+    }
+    /**
+     * Add ContextMenu options to CombatTracker Entries -- adds the basic Initiative Subtractions
+     * @param html
+     * @param options
+     */
+    static addCombatTrackerContextOptions(html, options) {
+        options.push({
+            name: game.i18n.localize('SR5.COMBAT.ReduceInitByOne'),
+            icon: '<i class="fas fa-caret-down"></i>',
+            callback: (li) => __awaiter(this, void 0, void 0, function* () {
+                // @ts-ignore
+                const combatant = yield game.combat.getCombatant(li.data('combatant-id'));
+                if (combatant) {
+                    const combat = game.combat;
+                    yield combat.adjustInitiative(combatant, -1);
+                }
+            }),
+        }, {
+            name: game.i18n.localize('SR5.COMBAT.ReduceInitByFive'),
+            icon: '<i class="fas fa-angle-down"></i>',
+            callback: (li) => __awaiter(this, void 0, void 0, function* () {
+                // @ts-ignore
+                const combatant = yield game.combat.getCombatant(li.data('combatant-id'));
+                if (combatant) {
+                    const combat = game.combat;
+                    yield combat.adjustInitiative(combatant, -5);
+                }
+            }),
+        }, {
+            name: game.i18n.localize('SR5.COMBAT.ReduceInitByTen'),
+            icon: '<i class="fas fa-angle-double-down"></i>',
+            callback: (li) => __awaiter(this, void 0, void 0, function* () {
+                // @ts-ignore
+                const combatant = yield game.combat.getCombatant(li.data('combatant-id'));
+                if (combatant) {
+                    const combat = game.combat;
+                    yield combat.adjustInitiative(combatant, -10);
+                }
+            }),
+        });
+        return options;
+    }
+    _onUpdate(data, ...args) {
+        console.log(data);
+        // @ts-ignore
+        super._onUpdate(data, ...args);
+    }
+    /**
+     *
+     * @param combatant
+     * @param adjustment
+     */
+    adjustInitiative(combatant, adjustment) {
+        return __awaiter(this, void 0, void 0, function* () {
+            combatant = typeof combatant === 'string' ? this.combatants.find((c) => c._id === combatant) : combatant;
+            if (!combatant || typeof combatant === 'string') {
+                console.error('Could not find combatant with id ', combatant);
+                return;
+            }
+            const newCombatant = {
+                _id: combatant._id,
+                initiative: Number(combatant.initiative) + adjustment,
+            };
+            // @ts-ignore
+            yield this.updateCombatant(newCombatant);
+        });
+    }
+    static sortByRERIC(left, right) {
+        // First sort by initiative value if different
+        const leftInit = Number(left.initiative);
+        const rightInit = Number(right.initiative);
+        if (isNaN(leftInit))
+            return 1;
+        if (isNaN(rightInit))
+            return -1;
+        if (leftInit > rightInit)
+            return -1;
+        if (leftInit < rightInit)
+            return 1;
+        // now we sort by ERIC
+        const genData = (actor) => {
+            var _a, _b;
+            // edge, reaction, intuition, coinflip
+            return [
+                Number(actor.getEdge().max),
+                Number((_a = actor.findAttribute('reaction')) === null || _a === void 0 ? void 0 : _a.value),
+                Number((_b = actor.findAttribute('intuition')) === null || _b === void 0 ? void 0 : _b.value),
+                new Roll('1d2').roll().total,
+            ];
+        };
+        const leftData = genData(left.actor);
+        const rightData = genData(right.actor);
+        // if we find a difference that isn't 0, return it
+        for (let index = 0; index < leftData.length; index++) {
+            const diff = rightData[index] - leftData[index];
+            if (diff !== 0)
+                return diff;
+        }
+        return 0;
+    }
+    /**
+     * @Override
+     * remove any turns that are less than 0
+     * filter using ERIC
+     */
+    setupTurns() {
+        const turns = super.setupTurns().filter((turn) => {
+            if (turn.initiative === null)
+                return true;
+            const init = Number(turn.initiative);
+            if (isNaN(init))
+                return true;
+            return init > 0;
+        });
+        // @ts-ignore
+        this.turns = turns.sort(SR5Combat.sortByRERIC);
+        return turns;
+    }
+    /**
+     * @Override
+     * proceed to the next turn
+     * - handles going to next initiative pass or combat round.
+     */
+    nextTurn() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let turn = this.turn;
+            let skip = this.settings.skipDefeated;
+            // Determine the next turn number
+            let next = null;
+            if (skip) {
+                for (let [i, t] of this.turns.entries()) {
+                    if (i <= turn)
+                        continue;
+                    // @ts-ignore
+                    if (!t.defeated) {
+                        next = i;
+                        break;
+                    }
+                }
+            }
+            else
+                next = turn + 1;
+            // Maybe advance to the next round/init pass
+            let round = this.round;
+            let initPass = this.initiativePass;
+            // if both are 0, we just started so set both to 1
+            if (round === 0 && initPass === 0) {
+                initPass = initPass + 1;
+                round = round + 1;
+                next = 0;
+            }
+            else if (next === null || next >= this.turns.length) {
+                const combatants = [];
+                // check for initpass
+                const over10Init = this.combatants.reduce((accumulator, running) => {
+                    return accumulator || Number(running.initiative) > 10;
+                }, false);
+                // do an initiative pass
+                if (over10Init) {
+                    next = 0;
+                    initPass = initPass + 1;
+                    // adjust combatants
+                    for (const c of this.combatants) {
+                        let init = Number(c.initiative);
+                        init -= 10;
+                        // @ts-ignore
+                        combatants.push({ _id: c._id, initiative: init });
+                    }
+                }
+                else {
+                    next = 0;
+                    round = round + 1;
+                    initPass = 0;
+                    // resetall isn't typed
+                    // @ts-ignore
+                    yield this.resetAll();
+                    yield this.rollAll();
+                }
+                if (combatants.length > 0) {
+                    // @ts-ignore
+                    yield this.updateCombatant(combatants);
+                }
+                if (skip) {
+                    // @ts-ignore
+                    next = this.turns.findIndex((t) => !t.defeated);
+                    if (next === -1) {
+                        // @ts-ignore
+                        ui.notifications.warn(game.i18n.localize('COMBAT.NoneRemaining'));
+                        next = 0;
+                    }
+                }
+            }
+            // Update the encounter
+            yield this.update({ round: round, turn: next, initiativePass: initPass });
+        });
+    }
+}
+exports.SR5Combat = SR5Combat;
 
-},{"./constants":45}],44:[function(require,module,exports){
+},{}],44:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5 = void 0;
@@ -7284,10 +7420,10 @@ const ShadowrunRoller_1 = require("./rolls/ShadowrunRoller");
 const helpers_1 = require("./helpers");
 const HandlebarManager_1 = require("./handlebars/HandlebarManager");
 const canvas_1 = require("./canvas");
-const combat_1 = require("./combat");
 const chat = require("./chat");
 const macros_1 = require("./macros");
 const OverwatchScoreTracker_1 = require("./apps/gmtools/OverwatchScoreTracker");
+const SR5Combat_1 = require("./combat/SR5Combat");
 class HooksManager {
     static registerHooks() {
         // Register your highest level hook callbacks here for a quick overview of what's hooked into.
@@ -7299,7 +7435,7 @@ class HooksManager {
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
         Hooks.on('renderSceneControls', HooksManager.renderSceneControls);
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons);
-        Hooks.on('preUpdateCombat', combat_1.preCombatUpdate);
+        Hooks.on('getCombatTrackerEntryContext', SR5Combat_1.SR5Combat.addCombatTrackerContextOptions);
     }
     static init() {
         console.log('Loading Shadowrun 5e System');
@@ -7313,6 +7449,7 @@ class HooksManager {
         CONFIG.SR5 = config_1.SR5;
         CONFIG.Actor.entityClass = SR5Actor_1.SR5Actor;
         CONFIG.Item.entityClass = SR5Item_1.SR5Item;
+        CONFIG.Combat.entityClass = SR5Combat_1.SR5Combat;
         settings_1.registerSystemSettings();
         // Register sheet application classes
         Actors.unregisterSheet('core', ActorSheet);
@@ -7326,11 +7463,6 @@ class HooksManager {
     }
     static ready() {
         return __awaiter(this, void 0, void 0, function* () {
-            game.socket.on('system.shadowrun5e', (data) => __awaiter(this, void 0, void 0, function* () {
-                if (game.user.isGM && data.gmCombatUpdate) {
-                    yield combat_1.shadowrunCombatUpdate(data.gmCombatUpdate.changes, data.gmCombatUpdate.options);
-                }
-            }));
             if (game.user.isGM) {
                 yield Migrator_1.Migrator.BeginMigration();
             }
@@ -7342,9 +7474,10 @@ class HooksManager {
         });
     }
     static canvasInit() {
+        canvas.grid.diagonalRule = game.settings.get(constants_1.SYSTEM_NAME, 'diagonalMovement');
         //@ts-ignore
         // SquareGrid isn't typed.
-        SquareGrid.prototype.measureDistance = canvas_1.measureDistance;
+        SquareGrid.prototype.measureDistances = canvas_1.measureDistance;
     }
     static hotbarDrop(bar, data, slot) {
         if (data.type === 'Item') {
@@ -7375,7 +7508,7 @@ class HooksManager {
 }
 exports.HooksManager = HooksManager;
 
-},{"./actor/SR5Actor":16,"./actor/SR5ActorSheet":17,"./apps/gmtools/OverwatchScoreTracker":37,"./canvas":41,"./chat":42,"./combat":43,"./config":44,"./constants":45,"./handlebars/HandlebarManager":49,"./helpers":54,"./item/SR5Item":57,"./item/SR5ItemSheet":59,"./macros":60,"./migrator/Migrator":62,"./rolls/ShadowrunRoller":69,"./settings":70}],56:[function(require,module,exports){
+},{"./actor/SR5Actor":16,"./actor/SR5ActorSheet":17,"./apps/gmtools/OverwatchScoreTracker":37,"./canvas":41,"./chat":42,"./combat/SR5Combat":43,"./config":44,"./constants":45,"./handlebars/HandlebarManager":49,"./helpers":54,"./item/SR5Item":57,"./item/SR5ItemSheet":59,"./macros":60,"./migrator/Migrator":62,"./rolls/ShadowrunRoller":69,"./settings":70}],56:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatData = void 0;
@@ -7611,7 +7744,7 @@ exports.ChatData = {
                 props[i] = prop.replace('Limit', 'Accuracy');
             }
         }
-        const equippedAmmo = item === null || item === void 0 ? void 0 : item.getEquippedAmmo();
+        const equippedAmmo = item.getEquippedAmmo();
         if (equippedAmmo && data.ammo && ((_a = data.ammo.current) === null || _a === void 0 ? void 0 : _a.max)) {
             if (equippedAmmo) {
                 const { current, spare_clips } = data.ammo;
@@ -7676,6 +7809,12 @@ exports.ChatData = {
                 const ranges = [data.thrown.ranges.short, data.thrown.ranges.medium, data.thrown.ranges.long, data.thrown.ranges.extreme];
                 props.push(ranges.map((v) => v * mult).join('/'));
             }
+        }
+        const equippedMods = item.getEquippedMods();
+        if (equippedMods) {
+            equippedMods.forEach((mod) => {
+                props.push(`${mod.name}`);
+            });
         }
     },
 };
@@ -7771,8 +7910,13 @@ class SR5Item extends Item {
     setEmbeddedItems(items) {
         return __awaiter(this, void 0, void 0, function* () {
             // clear the flag first to remove the previous items - if we don't do this then it doesn't actually "delete" any items
-            yield this.unsetFlag(constants_1.SYSTEM_NAME, 'embeddedItems');
+            // await this.unsetFlag(SYSTEM_NAME, 'embeddedItems');
             yield this.setFlag(constants_1.SYSTEM_NAME, 'embeddedItems', items);
+        });
+    }
+    clearEmbeddedItems() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.unsetFlag(constants_1.SYSTEM_NAME, 'embeddedItems');
         });
     }
     getLastAttack() {
@@ -7793,7 +7937,7 @@ class SR5Item extends Item {
             const ret = _super.update.call(this, data, options);
             ret.then(() => {
                 if (this.actor) {
-                    this.actor.render();
+                    this.actor.render(false);
                 }
             });
             return ret;
@@ -7931,7 +8075,6 @@ class SR5Item extends Item {
                     const attack = this.getAttackData(0);
                     // don't include any hits
                     attack === null || attack === void 0 ? true : delete attack.hits;
-                    console.error('SR5Item Roll');
                     // generate chat data
                     chat_1.createChatData(Object.assign({ header: {
                             name: this.name,
@@ -8313,7 +8456,7 @@ class SR5Item extends Item {
         if (tokenKey) {
             const [sceneId, tokenId] = tokenKey.split('.');
             let token;
-            if (sceneId === canvas.scene._id)
+            if (sceneId === (canvas === null || canvas === void 0 ? void 0 : canvas.scene._id))
                 token = canvas.tokens.get(tokenId);
             else {
                 const scene = game.scenes.get(sceneId);
@@ -8455,6 +8598,8 @@ class SR5Item extends Item {
             if (idx === -1)
                 throw new Error(`Shadowrun5e | Couldn't find owned item ${deleted}`);
             items.splice(idx, 1);
+            // we need to clear the items when one is deleted or it won't actually be deleted
+            yield this.clearEmbeddedItems();
             yield this.setEmbeddedItems(items);
             yield this.prepareEmbeddedEntities();
             yield this.prepareData();
@@ -10250,15 +10395,17 @@ class Version0_7_2 extends VersionMigration_1.VersionMigration {
             ((_b = actorData === null || actorData === void 0 ? void 0 : actorData.data) === null || _b === void 0 ? void 0 : _b.npc) === undefined);
     }
     static UnsupportedMetatype(actorData) {
-        const type = actorData.data.metatype.toLowerCase();
+        var _a, _b;
+        const type = (_b = (_a = actorData.data.metatype) === null || _a === void 0 ? void 0 : _a.toLowerCase()) !== null && _b !== void 0 ? _b : '';
         return actorData.type === 'character' &&
             config_1.SR5.character.types.hasOwnProperty(type);
     }
     MigrateActorData(actorData) {
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
             const updateData = {};
             if (Version0_7_2.UnsupportedMetatype(actorData)) {
-                const type = actorData.data.metatype.toLowerCase();
+                const type = (_b = (_a = actorData.data.metatype) === null || _a === void 0 ? void 0 : _a.toLowerCase()) !== null && _b !== void 0 ? _b : '';
                 // TODO: What to do with custom metatypes?
                 const metatypeData = { metatype: config_1.SR5.character.types.hasOwnProperty(type) ? type : 'human' };
                 updateData.data = Object.assign(Object.assign({}, updateData.data), metatypeData);
@@ -10705,6 +10852,7 @@ exports.registerSystemSettings = () => {
         choices: {
             '1-1-1': 'SETTINGS.IgnoreDiagonal',
             '1-2-1': 'SETTINGS.EstimateDiagonal',
+            'EUCL': 'SETTINGS.Euclidean',
         },
         onChange: (rule) => (canvas.grid.diagonalRule = rule),
     });
@@ -10751,7 +10899,7 @@ exports.registerSystemSettings = () => {
         scope: 'world',
         config: true,
         type: Boolean,
-        default: true
+        default: true,
     });
 };
 

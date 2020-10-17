@@ -17,6 +17,7 @@ import { PartsList } from '../../parts/PartsList';
 export class SpritePrep extends BaseActorPrep<SR5SpriteType, SpriteActorData> {
     prepare() {
         ModifiersPrep.prepareModifiers(this.data);
+        ModifiersPrep.clearAttributeMods(this.data);
 
         SpritePrep.prepareSpriteData(this.data);
         MatrixPrep.prepareAttributesForDevice(this.data);

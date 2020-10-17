@@ -184,8 +184,14 @@ export class SR5Actor extends Actor {
         if (skills.language.value.hasOwnProperty(skillId)) {
             return skills.language.value[skillId];
         }
-        if (skills.knowledge.value.hasOwnProperty(skillId)) {
-            return skills.knowledge.value[skillId];
+        // Knowledge skills are de-normalized into categories (street, hobby, ...)
+        for (const categoryKey in skills.knowledge) {
+            if (skills.knowledge.hasOwnProperty(categoryKey)) {
+                const category = skills.knowledge[categoryKey];
+                if (category.value.hasOwnProperty(skillId)) {
+                    return category.value[skillId];
+                }
+            }
         }
     }
 

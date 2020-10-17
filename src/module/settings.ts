@@ -4,7 +4,6 @@ import { VersionMigration } from './migrator/VersionMigration';
 import { FLAGS, SYSTEM_NAME } from './constants';
 
 export const registerSystemSettings = () => {
-
     /**
      * Register diagonal movement rule setting
      */
@@ -18,6 +17,7 @@ export const registerSystemSettings = () => {
         choices: {
             '1-1-1': 'SETTINGS.IgnoreDiagonal',
             '1-2-1': 'SETTINGS.EstimateDiagonal',
+            'EUCL': 'SETTINGS.Euclidean',
         },
         onChange: (rule) => (canvas.grid.diagonalRule = rule),
     });
@@ -69,6 +69,6 @@ export const registerSystemSettings = () => {
         scope: 'world',
         config: true,
         type: Boolean,
-        default: true
+        default: true,
     });
 };

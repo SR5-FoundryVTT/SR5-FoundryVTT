@@ -13,6 +13,7 @@ import { PartsList } from '../../parts/PartsList';
 export class VehiclePrep extends BaseActorPrep<SR5VehicleType, VehicleActorData> {
     prepare() {
         ModifiersPrep.prepareModifiers(this.data);
+        ModifiersPrep.clearAttributeMods(this.data);
 
         VehiclePrep.prepareVehicleStats(this.data);
         VehiclePrep.prepareAttributes(this.data);

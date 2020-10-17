@@ -519,11 +519,6 @@
   font-family: 'Nodesto';
   src: url("assets/fonts/NodestoCapsCondensed.otf"); }
 
-.roll:hover {
-  text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
-  cursor: pointer;
-  color: #6495ed; }
-
 .Roll:hover {
   text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
   cursor: pointer;
@@ -718,6 +713,14 @@ select.display {
   border-color: #4d4d4d; }
   select.display > option {
     background-color: #4d4d4d; }
+
+.sr5 .roll:hover {
+  text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
+  cursor: pointer;
+  color: #6495ed; }
+
+.sr5 .editor .tox-edit-area {
+  background: #939393; }
 
 .sr5 .parts-list {
   font-size: 12px;
