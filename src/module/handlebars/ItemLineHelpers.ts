@@ -366,6 +366,7 @@ export const registerItemLineHelpers = () => {
     });
 
     Handlebars.registerHelper('ItemIcons', function (item: SR5ItemType) {
+        const wrapper = new SR5ItemDataWrapper(item);
         const editIcon = {
             icon: 'fas fa-edit item-edit',
             title: game.i18n.localize('SR5.EditItem'),
@@ -375,7 +376,7 @@ export const registerItemLineHelpers = () => {
             title: game.i18n.localize('SR5.DeleteItem'),
         };
         const equipIcon = {
-            icon: `${item.data.technology?.equipped ? 'fas fa-check-circle' : 'far fa-circle'} item-equip-toggle`,
+            icon: `${wrapper.isEquipped() ? 'fas fa-check-circle' : 'far fa-circle'} item-equip-toggle`,
             title: game.i18n.localize('SR5.ToggleEquip'),
         };
         const pdfIcon = {
@@ -389,7 +390,7 @@ export const registerItemLineHelpers = () => {
             icons.unshift(pdfIcon);
         }
 
-        switch (item.type) {
+        switch (wrapper.getType()) {
             case 'program':
             case 'armor':
             case 'device':

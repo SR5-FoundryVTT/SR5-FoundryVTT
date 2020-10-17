@@ -1,42 +1,49 @@
 /// <reference path="../Shadowrun.ts" />
 declare namespace Shadowrun {
-    export type SR5ItemType = {
-        name: string;
-        _id: string;
-        folder: string | null;
-        type: string;
-        data: SR5ItemData;
-        flags: object;
-        permission: {
-            default: number;
-        };
-    };
+    export type SR5ItemType =
+        | Action
+        | AdeptPower
+        | Ammo
+        | Armor
+        | ComplexForm
+        | Contact
+        | CritterPower
+        | Cyberware
+        | Device
+        | Equipment
+        | Lifestyle
+        | Modification
+        | Program
+        | Quality
+        | Sin
+        | Spell
+        | SpritePower
+        | Weapon;
 
-    type SR5ItemData = Partial<TechnologyData> &
+    export type SR5ItemDataPartial = Partial<ActionData> &
+        Partial<AdeptPowerData> &
+        Partial<AmmoData> &
         Partial<ArmorData> &
-        Partial<ActionData> &
+        Partial<ComplexFormData> &
+        Partial<ContactData> &
+        Partial<CritterPowerData> &
         Partial<CyberwareData> &
         Partial<DeviceData> &
-        Partial<WeaponData> &
+        Partial<EquipmentData> &
+        Partial<LifestyleData> &
+        Partial<ModificationData> &
+        Partial<ProgramData> &
+        Partial<QualityData> &
+        Partial<SinData> &
         Partial<SpellData> &
-        Partial<CritterPowerData> &
         Partial<SpritePowerData> &
-        Partial<ComplexFormData> & {
-            description: DescriptionData;
-        };
+        Partial<WeaponData>;
 
-    /**
-     * Technology data for an item.
-     */
-    export type TechnologyData = {
-        technology: {
-            rating: NumberOrEmpty;
-            availability: string;
-            quantity: NumberOrEmpty;
-            cost: NumberOrEmpty;
-            equipped: boolean;
-            conceal: ModifiableValue;
-            condition_monitor?: ConditionData;
+    export type SR5ItemData<DataType> = ItemData<DataType> & {
+        _id: string;
+        folder?: string | null;
+        permission?: {
+            default: number;
         };
     };
 
@@ -44,13 +51,4 @@ declare namespace Shadowrun {
      * Condition data for an item.
      */
     export type ConditionData = ValueMaxPair<number> & LabelField;
-
-    /**
-     * Description data for an item.
-     */
-    export type DescriptionData = {
-        value: string;
-        chat: string;
-        source: string;
-    };
 }

@@ -4,61 +4,19 @@ declare namespace Shadowrun {
      * A valid weapon with all associated fields. Weapons still have all possible fields, but some
      * may be ignored based on the value of @category.
      */
-    export type Weapon = SR5ItemType & {
+    export type Weapon = SR5ItemData<WeaponData> & {
         type: 'weapon';
-        data: WeaponData;
     };
 
-    export type WeaponData = {
-        action: ActionData;
+    export type WeaponData = WeaponPartData & ActionPartData & TechnologyPartData & DescriptionPartData;
+
+    export type WeaponPartData = {
         category: WeaponCategory;
+        subcategory: string;
         ammo: AmmunitionData;
         range: RangeWeaponData;
         melee: MeleeWeaponData;
         thrown: ThrownWeaponData;
-    };
-
-    /**
-     * Weapon action data.
-     */
-    export type ActionData = {
-        type: 'varies';
-        category: string;
-        attribute: ActorAttribute;
-        attribute2: ActorAttribute;
-        skill: SkillName;
-        spec: boolean;
-        mod: number;
-        mod_description: string;
-        limit: LimitData;
-        extended: boolean;
-        damage: DamageData;
-        opposed: OpposedTestData;
-        alt_mod: number;
-        dice_pool_mod: ModList<number>;
-    };
-    /**
-     * Action limit data.
-     */
-    export type LimitData = ModifiableValueLinked;
-    /**
-     * Action damage data.
-     */
-    export type DamageData = ModifiableValueLinked & {
-        type: BaseValuePair<DamageType>;
-        element: BaseValuePair<DamageElement>;
-        ap: ModifiableValue;
-    };
-    /**
-     * Action opposed test data.
-     */
-    export type OpposedTestData = {
-        type: OpposedType;
-        attribute: ActorAttribute;
-        attribute2: ActorAttribute;
-        skill: SkillName;
-        mod: number;
-        description: string;
     };
 
     /**

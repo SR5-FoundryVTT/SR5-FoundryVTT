@@ -999,6 +999,7 @@
                 }
             },
             "weapon": {
+                "type": "",
                 "category": "",
                 "ammo": {
                     "spare_clips": {
