@@ -147,8 +147,6 @@ export class ShadowrunRoller {
 
         rollData.description = item.getChatData();
 
-        console.error('itemRoll', rollData);
-
         return ShadowrunRoller.advancedRoll(rollData);
     }
 

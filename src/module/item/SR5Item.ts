@@ -284,7 +284,7 @@ export class SR5Item extends Item {
         }
 
         // Switch possible dialog content based on item type.
-        const {dialogData, getSelectedData, itemHasNoDialog}  = await ShadowrunItemDialog.fromItem(this, event);
+        const {dialogData, getModifierData, itemHasNoDialog}  = await ShadowrunItemDialog.fromItem(this, event);
 
         if (itemHasNoDialog) {
             return await this.rollTest(event);
@@ -292,11 +292,17 @@ export class SR5Item extends Item {
 
         // TODO: Could utilize a subclassing of Dialog to avoid this.
         // Allow different item types to utilize what's been selected in the items dialog.
-        if (dialogData && getSelectedData) {
+        if (dialogData && getModifierData) {
             dialogData.close = async (html) => {
-                const selectedData = await getSelectedData(html) as unknown as object;
-                console.error('item', selectedData);
-                await this.rollTest(event, undefined, selectedData);
+                const modifierData = await getModifierData(html) as unknown as object;
+                console.error('item', modifierData);
+
+                // No dialog selection means dialog has been closed and no roll is needed;
+                if (!modifierData) {
+                    return;
+                }
+
+                await this.rollTest(event, undefined, modifierData);
             };
         }
 

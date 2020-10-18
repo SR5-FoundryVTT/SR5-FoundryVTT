@@ -8,9 +8,17 @@ import RangeData = Shadowrun.RangeData;
 
 type ItemDialogData = {
     dialogData: DialogData | undefined,
-    getSelectedData: Function | undefined,
+    getModifierData: Function | undefined,
     itemHasNoDialog: boolean
 };
+
+type AttackModifierData = {
+    environmental?: {
+        range?: number
+    },
+    fireMode?: FireModeData,
+    target?: Token
+}
 
 // TODO: Why extend dialog when internal dialog structures aren't used? Could resolve the whole flag / data flow issue.
 export class ShadowrunItemDialog extends Dialog {
@@ -27,18 +35,18 @@ export class ShadowrunItemDialog extends Dialog {
 
         const itemData: ItemDialogData = {
             dialogData: undefined,
-            getSelectedData: undefined,
+            getModifierData: undefined,
             itemHasNoDialog: true
         };
 
         if (item.isRangedWeapon()) {
-            itemData.getSelectedData = ShadowrunItemDialog.addRangedWeaponData(templateData, dialogData, item);
+            itemData.getModifierData = ShadowrunItemDialog.addRangedWeaponData(templateData, dialogData, item);
             templatePath = 'systems/shadowrun5e/dist/templates/rolls/range-weapon-roll.html';
         } else if (item.isSpell()) {
-            itemData.getSelectedData = ShadowrunItemDialog.addSpellData(templateData, dialogData, item);
+            itemData.getModifierData = ShadowrunItemDialog.addSpellData(templateData, dialogData, item);
             templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-spell.html';
         } else if (item.isComplexForm()) {
-            itemData.getSelectedData = ShadowrunItemDialog.addComplexFormData(templateData, dialogData, item);
+            itemData.getModifierData = ShadowrunItemDialog.addComplexFormData(templateData, dialogData, item);
             templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-complex-form.html';
         }
 
@@ -154,7 +162,7 @@ export class ShadowrunItemDialog extends Dialog {
         templateData['ranges'] = templateRanges;
         templateData['targetRange'] = item.getLastFireRangeMod();
 
-        templateData['targetsSelected']= Helpers.userHasTargets();
+        templateData['targetsSelected'] = Helpers.userHasTargets();
         if (item.actor.hasToken() && Helpers.userHasTargets()) {
             templateData['targets'] = ShadowrunItemDialog._getTargetRangeTemplateData(item.actor, templateRanges);
         }
@@ -168,49 +176,31 @@ export class ShadowrunItemDialog extends Dialog {
         };
 
         // TODO: Move this selection handler to an appropriate place. Maybe split ShadowrunItemDialog into subclasses.
-        return async (html): Promise<object> => {
+        return async (html): Promise<AttackModifierData|undefined> => {
             if (cancel) {
-                return {}
+                return;
             }
 
-            type AttackModifierData = {
-                environmental?: object,
-                fireMode?: FireModeData,
-                target?: Token
-            }
             const modifierData: AttackModifierData = {};
 
             if (Helpers.userHasTargets()) {
-                const selectElement = $(html).find('[name="selected-target"]');
-                const rangeModifier = Helpers.parseInputToNumber(selectElement.find(':selected').data('range-modifier'));
-                const targetId = selectElement.val() as string;
-                const token = Helpers.getToken(targetId);
-
-                modifierData.environmental = {range: rangeModifier};
-                modifierData.target = token;
-                // Don't store lastFireRange for specific target selection.
+                mergeObject(modifierData, ShadowrunItemDialog._getSelectedTargetRangeModifier(html));
             } else {
-                const rangeModifier = Helpers.parseInputToNumber($(html).find('[name="range"]').val());
-                modifierData.environmental = {range: rangeModifier}
+                mergeObject(modifierData, ShadowrunItemDialog._getSelectedRangeModifier(html));
                 // Store lastFireRange for generic range selection.
-                if (rangeModifier) {
-                    await item.setLastFireRangeMod({value: rangeModifier});
-                }
             }
 
-            const fireMode = Helpers.parseInputToNumber($(html).find('[name="fireMode"]').val());
-            if (fireMode) {
-                const fireModeString = fireModes[fireMode];
-                const defenseModifier = Helpers.mapRoundsToDefenseDesc(fireMode);
-                const fireModeData: FireModeData = {
-                    label: fireModeString,
-                    value: fireMode,
-                    defense: defenseModifier,
-                };
-                await item.setLastFireMode(fireModeData);
-                modifierData.fireMode = fireModeData;
+            mergeObject(modifierData, ShadowrunItemDialog._getSelectedFireMode(html, fireModes))
+
+            // Store selections for next dialog.
+            if (modifierData.environmental?.range) {
+                await item.setLastFireRangeMod({value: modifierData.environmental.range});
+            }
+            if (modifierData.fireMode) {
+                await item.setLastFireMode(modifierData.fireMode);
             }
 
+            console.error('rangeGetModifierData', modifierData);
             return modifierData;
         };
     }
@@ -220,7 +210,7 @@ export class ShadowrunItemDialog extends Dialog {
         const newRanges = {} as RangesTemplateData;
         for (const [key, value] of Object.entries(ranges)) {
             const distance = value as number;
-            newRanges[key] =  Helpers.createRangeDescription(CONFIG.SR5.weaponRanges[key], distance, range_modifiers[key]);
+            newRanges[key] = Helpers.createRangeDescription(CONFIG.SR5.weaponRanges[key], distance, range_modifiers[key]);
         }
         return newRanges;
     }
@@ -243,7 +233,7 @@ export class ShadowrunItemDialog extends Dialog {
             //@ts-ignore // undefined actor is okay
             const distance = Helpers.measureTokenDistance(attacker, target);
             const range = Helpers.getWeaponRange(distance, ranges);
-            return  {
+            return {
                 id: target.id,
                 name: target.name,
                 range: range,
@@ -251,5 +241,41 @@ export class ShadowrunItemDialog extends Dialog {
                 distance
             };
         });
+    }
+
+    static _getSelectedTargetRangeModifier(html: JQuery): object {
+        const selectElement = $(html).find('[name="selected-target"]');
+        const range = Helpers.parseInputToNumber(selectElement.find(':selected').data('range-modifier'));
+        const targetId = selectElement.val() as string;
+        const target = Helpers.getToken(targetId);
+
+        return {
+            environmental: {range},
+            target
+        };
+    }
+
+    static _getSelectedRangeModifier(html: JQuery): object {
+        const range = Helpers.parseInputToNumber($(html).find('[name="range"]').val());
+
+        return {environmental: {range}}
+    }
+
+    static _getSelectedFireMode(html: JQuery, fireModes): object {
+        const fireModeValue = Helpers.parseInputToNumber($(html).find('[name="fireMode"]').val());
+        if (fireModeValue) {
+            const fireModeString = fireModes[fireModeValue];
+            const defenseModifier = Helpers.mapRoundsToDefenseDesc(fireModeValue);
+
+            const fireMode: FireModeData = {
+                label: fireModeString,
+                value: fireModeValue,
+                defense: defenseModifier,
+            };
+
+            return {fireMode};
+        }
+
+        return {};
     }
 }
