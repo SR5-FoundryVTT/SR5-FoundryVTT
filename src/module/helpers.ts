@@ -254,15 +254,11 @@ export class Helpers {
         return Helpers.convertLengthUnit(distanceInGridUnits, sceneUnit);
     }
 
-    /* Convert to
-     * TODO: Implement SR Setting to provide what unit to use (meters or feet)
-     */
     static convertLengthUnit(length:number, fromUnit: string): number {
         //@ts-ignore
         fromUnit = fromUnit.toLowerCase();
 
         if (!LENGTH_UNIT_TO_METERS_MULTIPLIERS.hasOwnProperty(fromUnit)) {
-            // TODO: Make a user message also.
             console.error(`Distance can't be converted from ${fromUnit} to ${LENGTH_UNIT}`);
             return 0;
         }

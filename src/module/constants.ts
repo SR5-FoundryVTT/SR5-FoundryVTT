@@ -10,7 +10,6 @@ export const CORE_NAME = 'core';
 export const CORE_FLAGS = {
     RollMode: 'rollMode'
 }
-export const GLITCH_DIE = 1;
 export const METATYPEMODIFIER = 'SR5.Character.Modifiers.NPCMetatypeAttribute';
 
 // TODO: Reduce duplication
@@ -38,5 +37,9 @@ export const SR = {
                 out_of_range: 0
             }
         }
+    },
+    die: {
+        glitch: [1],
+        success: [5, 6]
     }
 }

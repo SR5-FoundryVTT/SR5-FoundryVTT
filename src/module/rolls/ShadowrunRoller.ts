@@ -8,7 +8,7 @@ import { Helpers } from '../helpers';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
 import { createChatData, TemplateData } from '../chat';
-import {CORE_FLAGS, CORE_NAME, FLAGS, GLITCH_DIE, SYSTEM_NAME} from '../constants';
+import {CORE_FLAGS, CORE_NAME, FLAGS, SR, SYSTEM_NAME} from '../constants';
 import { PartsList } from '../parts/PartsList';
 import {ActionTestData} from "../apps/dialogs/ShadowrunItemDialog";
 import BlastData = Shadowrun.BlastData;
@@ -101,7 +101,9 @@ export class ShadowrunRoll extends Roll {
     }
 
     get glitched(): boolean {
-        return this.count(GLITCH_DIE) > Math.floor(this.pool / 2);
+        let glitched = 0;
+        SR.die.glitch.forEach(die => glitched += this.count(die));
+        return glitched > Math.floor(this.pool / 2);
     }
 }
 
