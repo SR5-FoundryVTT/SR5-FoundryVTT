@@ -32,10 +32,10 @@
         </footer>
     </div>
     {{/if}}
-    {{#if (isDefined testName)}}
+    {{#if (isDefined title)}}
     <div class="test-line">
-        <span class="test-name {{#unless (isDefined hits)}}test-roll{{/unless}}">
-            {{testName}}
+        <span class="test-name {{#unless (isDefined roll.hits)}}test-roll{{/unless}}">
+            {{title}}
         </span>
         {{#if previewTemplate}}
         <div class="roll" title="{{localize 'SR5.PlaceTemplate'}}">
@@ -45,25 +45,25 @@
     </div>
     <div class="card-content">
         <div class="left-side">
-            {{#if (isDefined hits)}}
+            {{#if (isDefined roll.hits)}}
             <div class="limit-line">
                 <span class="key">{{localize "SR5.Hits"}}: </span
-                ><span class="value">{{hits}}</span>
+                ><span class="value">{{roll.hits}}</span>
             </div>
-            {{/if}} {{#if limit.value}}
+            {{/if}} {{#if roll.limit.value}}
             <div class="limit-line" title="{{localize limit.label}}">
                 <span class="key">{{localize "SR5.Limit"}}: </span>
-                <span class="value">{{limit.value}}</span>
+                <span class="value">{{roll.limit.value}}</span>
             </div>
-            {{/if}} {{#if attack.damage}}
+            {{/if}}
+            {{#if attack.damage}}
             <div class="damage-line">
                 {{#if attack.damage.value}}
                 <div>
                     <span class="key">{{localize "SR5.DV"}}: </span>
-                    <span class="value"
-                        >{{attack.damage.value}}{{damageAbbreviation
-                        attack.damage.type.value}}</span
-                    >
+                    <span class="value">
+                        {{attack.damage.value}}{{damageAbbreviation attack.damage.type.value}}
+                    </span>
                 </div>
                 {{/if}} {{#if attack.damage.ap.value}}
                 <div>
@@ -148,28 +148,28 @@
         </div>
         <div class="right-side">
             <div class="roll-parts">
-                {{#each parts as |part id|}}
+                {{#each roll.parts as |part id|}}
                 <div class="limit-line">
                     <span class="key" title="{{localize part.name}}">{{localize part.name}}:</span> <span class="value">{{part.value}}</span>
                 </div>
-                {{/each}} {{#if (isDefined dicePool)}}
+                {{/each}} {{#if (isDefined roll)}}
                 <div class="limit-line">
                     <span class="key bold">{{localize 'SR5.DicePool'}}:</span>
-                    <span class="value">{{dicePool}}</span>
+                    <span class="value">{{roll.pool}}</span>
                 </div>
                 {{/if}}
             </div>
         </div>
     </div>
     <div class="dice-roll-content">
-        {{#each dice}}
+        {{#each roll.sides}}
         <div class="dice-roll {{diceIcon this}}">
             <div class="result-text">{{this}}</div>
         </div>
         {{/each}}
     </div>
     {{/if}}
-    {{#if glitch}}
+    {{#if roll.glitched}}
     <div class="glitch-content">
         <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Glitch'}}" {{/if}}>
             {{localize "SR5.Glitch"}}

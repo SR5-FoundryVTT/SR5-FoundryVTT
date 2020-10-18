@@ -4,7 +4,8 @@ export const FLAGS = {
     ShowTokenNameForChatOutput: 'showTokenNameInsteadOfActor',
     MessageCustomRoll: 'customRoll',
     ApplyLimits: 'applyLimits',
-    LastRollPromptValue: 'lastRollPromptValue'
+    LastRollPromptValue: 'lastRollPromptValue',
+    DisplayDefaultRollCard: 'displayDefaultRollCard',
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {
@@ -21,6 +22,8 @@ export const LENGTH_UNIT_TO_METERS_MULTIPLIERS = {
     'kilometers': 1000,
     'kilometer': 1000,
 };
+
+export const DEFAULT_ROLL_NAME = 'Roll';
 
 export const LENGTH_UNIT = 'm';
 

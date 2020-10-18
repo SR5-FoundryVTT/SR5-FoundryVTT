@@ -7,12 +7,19 @@ import DamageData = Shadowrun.DamageData;
 import { Helpers } from '../helpers';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
-import { createChatData, TemplateData } from '../chat';
-import {CORE_FLAGS, CORE_NAME, FLAGS, SR, SYSTEM_NAME} from '../constants';
+import {createChatData, createRollChatMessage, getPreferedNameAndImageSource, TemplateData} from '../chat';
+import {CORE_FLAGS, CORE_NAME, DEFAULT_ROLL_NAME, FLAGS, SR, SYSTEM_NAME} from '../constants';
 import { PartsList } from '../parts/PartsList';
 import {ActionTestData} from "../apps/dialogs/ShadowrunItemDialog";
 import BlastData = Shadowrun.BlastData;
 import FireModeData = Shadowrun.FireModeData;
+
+// TODO: Split up BasicRollProps into the different types of calls
+// item, actor, dicePool, attack, defense, spell, form
+export type Test =  {
+    label: string;
+    type: string;
+}
 
 export interface BasicRollProps {
     name?: string;
@@ -22,16 +29,17 @@ export interface BasicRollProps {
     explodeSixes?: boolean;
     title?: string;
     actor?: SR5Actor;
+    target?: Token;
     item?: SR5Item;
+    // Personal attack
+    attack?: AttackData
+    // Incoming attack for a defense test
     incomingAttack?: AttackData;
     incomingDrain?: LabelField & {
         value: number;
     };
     soak?: DamageData;
-    tests?: {
-        label: string;
-        type: string;
-    }[];
+    tests?: Test[];
     description?: object;
     previewTemplate?: boolean;
     hideRollMessage?: boolean;
@@ -49,14 +57,21 @@ export interface AdvancedRollProps extends BasicRollProps {
     wounds?: boolean;
     after?: (roll: Roll | undefined) => void;
     dialogOptions?: RollDialogOptions;
-    target?: Token;
     attack?: AttackData;
     blast?: BlastData;
     reach?: number
     fireMode?: FireModeData
 }
 
+type ShadowrunRollData = {
+    limit: number
+    threshold: number
+    parts: ModList<number>
+    explodeSixes: boolean
+}
 export class ShadowrunRoll extends Roll {
+    data: ShadowrunRollData
+    // TODO: is this needed ?
     templateData: TemplateData | undefined;
     // add class Roll to the json so dice-so-nice works
     toJSON(): any {
@@ -76,6 +91,22 @@ export class ShadowrunRoll extends Roll {
         //@ts-ignore
         // 0.6.x foundryVTT
         return this.parts[0].rolls.map(roll => roll.roll);
+    }
+
+    get limit(): number {
+        return this.data.limit;
+    }
+
+    get threshold(): number {
+        return this.data.threshold;
+    }
+
+    get parts(): ModList<number> {
+        return this.data.parts;
+    }
+
+    get explodeSixes(): boolean {
+        return this.data.explodeSixes;
     }
 
     count(side: number): number {
@@ -113,7 +144,7 @@ export class ShadowrunRoller {
         let limit = item.getLimit();
         let title = item.getRollName();
 
-        const rollData: AdvancedRollProps = {
+        const rollData = {
             ...options,
             event: event,
             dialogOptions: {
@@ -129,7 +160,7 @@ export class ShadowrunRoller {
             previewTemplate: item.hasTemplate,
             attack:  item.getAttackData(0, actionTestData),
             blast: item.getBlastData(actionTestData)
-        };
+        } as AdvancedRollProps;
 
         if (item.hasOpposedRoll) {
             rollData.tests = [{
@@ -215,26 +246,34 @@ export class ShadowrunRoller {
     }
 
     static async basicRoll({
-        parts: partsProps = [],
-        limit,
-        explodeSixes,
-        title,
         actor,
+        item,
+        title = DEFAULT_ROLL_NAME,
         img = actor?.img,
         name = actor?.name,
-        hideRollMessage,
-        rollMode,
+        parts: partsProps = [],
+        limit,
+        explodeSixes = false,
+        hideRollMessage = false,
+        rollMode = CONFIG.Dice.rollModes.roll,
+        previewTemplate = false,
+        description,
+        attack,
+        target,
+        tests,
         ...props
     }: BasicRollProps): Promise<ShadowrunRoll | undefined> {
         let roll;
         const parts = new PartsList(partsProps);
+
         if (parts.length) {
             const formula = this.shadowrunFormula({ parts: parts.list, limit, explode: explodeSixes });
             if (!formula) return;
-            roll = new ShadowrunRoll(formula);
+            const rollData = {limit, explodeSixes, parts: parts.list};
+            roll = new ShadowrunRoll(formula, rollData);
             roll.roll();
 
-            if (game.settings.get(SYSTEM_NAME, 'displayDefaultRollCard')) {
+            if (game.settings.get(SYSTEM_NAME, FLAGS.DisplayDefaultRollCard)) {
                 await roll.toMessage({
                     speaker: ChatMessage.getSpeaker({ actor: actor }),
                     flavor: title,
@@ -243,33 +282,44 @@ export class ShadowrunRoller {
             }
         }
         const token = actor?.token;
+        const tokenSceneId = token ? `${token.scene._id}.${token.id}` : undefined;
 
-        [name, img] = ShadowrunRoller.getPreferedNameAndImageSource(name, img, actor, token);
+        [name, img] = getPreferedNameAndImageSource(name, img, actor, token);
 
         const templateData = {
-            actor: actor,
+            actor,
+            token,
+            tokenId: tokenSceneId,
+            target,
             header: {
                 name: name || '',
                 img: img || '',
             },
-            tokenId: token ? `${token.scene._id}.${token.id}` : undefined,
+            title,
+            description,
             rollMode,
-            dice: roll.sides,
             limit,
-            testName: title,
-            dicePool: roll.pool,
-            parts: parts.list,
-            hits: roll.hits,
-            glitch: roll.glitched,
+            previewTemplate,
+            attack,
+            item,
+            tests,
             ...props,
+            roll
         };
 
         // In what case would no roll be present? No parts? Why would this reach any logic then?
         if (roll) {
+            // TODO: When and where is accessed?
             roll.templateData = templateData;
         }
 
+        console.error('basicProps', props);
+        console.error('templateOld', templateData);
+
         if (!hideRollMessage) {
+            const rollChatMessageOptions = {actor, token, target, item, name, img, rollMode, description, title, previewTemplate, attack, tests};
+            await createRollChatMessage(roll, rollChatMessageOptions);
+
             const chatData = await createChatData(templateData, roll);
             const message = await ChatMessage.create(chatData, { displaySheet: false });
             console.log(message);
@@ -283,7 +333,8 @@ export class ShadowrunRoller {
     static promptRoll(): Promise<ShadowrunRoll | undefined> {
         const lastRoll = game.user.getFlag(SYSTEM_NAME, 'lastRollPromptValue') || 0;
         const parts = [{ name: 'SR5.LastRoll', value: lastRoll }];
-        return ShadowrunRoller.advancedRoll({ parts, title: 'Roll', dialogOptions: { prompt: true } });
+        const advancedRollProps = { parts, title: 'Roll', dialogOptions: { prompt: true } } as AdvancedRollProps;
+        return ShadowrunRoller.advancedRoll(advancedRollProps);
     }
 
     /**
@@ -417,22 +468,5 @@ export class ShadowrunRoller {
             });
             dialog.render(true);
         });
-    }
-
-    /** Use either the actor or the tokens name and image, depending on system settings.
-     *
-     * However don't change anything if a custom name or image has been given.
-     */
-    static getPreferedNameAndImageSource(name?: string, img?: string, actor?: SR5Actor, token?: Token): [string|undefined, string|undefined] {
-
-        const namedAndImageMatchActor = name === actor?.name && img === actor?.img;
-        const useTokenNameForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
-
-        if (namedAndImageMatchActor && useTokenNameForChatOutput && token) {
-            img = token?.data.img;
-            name = token?.data.name;
-        }
-
-        return [name, img];
     }
 }
