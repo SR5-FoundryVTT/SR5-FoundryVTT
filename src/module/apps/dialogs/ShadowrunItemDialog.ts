@@ -8,17 +8,33 @@ import RangeData = Shadowrun.RangeData;
 
 type ItemDialogData = {
     dialogData: DialogData | undefined,
-    getModifierData: Function | undefined,
+    getActionTestData: Function | undefined,
     itemHasNoDialog: boolean
 };
 
-type AttackModifierData = {
-    environmental?: {
+export type RangedWeaponActionTestData = {
+    environmental: {
         range?: number
     },
-    fireMode?: FireModeData,
-    target?: Token
+    fireMode: FireModeData,
 }
+
+export type SpellActionTestData = {
+    force: number,
+    reckless: boolean,
+}
+
+export type ComplexFormTestData = {
+    level: number
+}
+
+export type ActionTestData = {
+    rangedWeapon?: RangedWeaponActionTestData,
+    spell?: SpellActionTestData,
+    complexForm?: ComplexFormTestData,
+    targetId?: string
+}
+
 
 // TODO: Why extend dialog when internal dialog structures aren't used? Could resolve the whole flag / data flow issue.
 export class ShadowrunItemDialog extends Dialog {
@@ -35,27 +51,25 @@ export class ShadowrunItemDialog extends Dialog {
 
         const itemData: ItemDialogData = {
             dialogData: undefined,
-            getModifierData: undefined,
+            getActionTestData: undefined,
             itemHasNoDialog: true
         };
 
         if (item.isRangedWeapon()) {
-            itemData.getModifierData = ShadowrunItemDialog.addRangedWeaponData(templateData, dialogData, item);
+            itemData.getActionTestData = ShadowrunItemDialog.addRangedWeaponData(templateData, dialogData, item);
             templatePath = 'systems/shadowrun5e/dist/templates/rolls/range-weapon-roll.html';
         } else if (item.isSpell()) {
-            itemData.getModifierData = ShadowrunItemDialog.addSpellData(templateData, dialogData, item);
+            itemData.getActionTestData = ShadowrunItemDialog.addSpellData(templateData, dialogData, item);
             templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-spell.html';
         } else if (item.isComplexForm()) {
-            itemData.getModifierData = ShadowrunItemDialog.addComplexFormData(templateData, dialogData, item);
+            itemData.getActionTestData = ShadowrunItemDialog.addComplexFormData(templateData, dialogData, item);
             templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-complex-form.html';
         }
 
         if (templatePath) {
-            const dialog = await renderTemplate(templatePath, templateData);
+            const content = await renderTemplate(templatePath, templateData);
 
-            itemData.dialogData = mergeObject(dialogData, {
-                content: dialog,
-            });
+            itemData.dialogData = mergeObject(dialogData, {content});
             itemData.itemHasNoDialog = false;
         }
 
@@ -81,12 +95,22 @@ export class ShadowrunItemDialog extends Dialog {
             },
         };
 
-        return async (html) => {
-            if (cancel) return false;
-            const level = Helpers.parseInputToNumber($(html).find('[name=level]').val());
-            await item.setLastComplexFormLevel({value: level});
-            return true;
+        return async (html: JQuery): Promise<ActionTestData|undefined> => {
+            if (cancel) return;
+
+            const actionTestData = {} as ComplexFormTestData;
+
+            mergeObject(actionTestData, ShadowrunItemDialog._getSelectedComplexFormLevel(html))
+
+            await item.setLastComplexFormLevel({value: actionTestData.level});
+
+            return {complexForm: actionTestData};
         };
+    }
+
+    static _getSelectedComplexFormLevel(html: JQuery): object {
+        const level = Helpers.parseInputToNumber($(html).find('[name=level]').val());
+        return {level};
     }
 
     static addSpellData(templateData: object, dialogData: DialogData, item: SR5Item): Function {
@@ -117,12 +141,27 @@ export class ShadowrunItemDialog extends Dialog {
         };
         dialogData.default = 'normal';
 
-        return async (html) => {
-            if (cancel) return false;
-            const force = Helpers.parseInputToNumber($(html).find('[name=force]').val());
-            await item.setLastSpellForce({value: force, reckless});
-            return true;
+        return async (html: JQuery): Promise<ActionTestData|undefined> => {
+            if (cancel) return;
+
+            const actionTestData = {} as SpellActionTestData;
+
+            mergeObject(actionTestData, ShadowrunItemDialog._getSelectedSpellForce(html));
+            mergeObject(actionTestData, ShadowrunItemDialog._getSelectedSpellReckless(reckless));
+
+            await item.setLastSpellForce({value: actionTestData.force, reckless: actionTestData.reckless});
+
+            return {spell: actionTestData};
         };
+    }
+
+    static _getSelectedSpellForce(html: JQuery): object {
+        const force = Helpers.parseInputToNumber($(html).find('[name=force]').val());
+        return {force}
+    }
+
+    static _getSelectedSpellReckless(reckless: boolean): object {
+        return {reckless}
     }
 
     static addRangedWeaponData(templateData: object, dialogData: DialogData, item: SR5Item): Function {
@@ -176,32 +215,31 @@ export class ShadowrunItemDialog extends Dialog {
         };
 
         // TODO: Move this selection handler to an appropriate place. Maybe split ShadowrunItemDialog into subclasses.
-        return async (html): Promise<AttackModifierData|undefined> => {
+        return async (html): Promise<ActionTestData|undefined> => {
             if (cancel) {
                 return;
             }
 
-            const modifierData: AttackModifierData = {};
+            const actionTestData = {} as RangedWeaponActionTestData;
 
             if (Helpers.userHasTargets()) {
-                mergeObject(modifierData, ShadowrunItemDialog._getSelectedTargetRangeModifier(html));
+                mergeObject(actionTestData, ShadowrunItemDialog._getSelectedTargetRangeModifier(html));
             } else {
-                mergeObject(modifierData, ShadowrunItemDialog._getSelectedRangeModifier(html));
+                mergeObject(actionTestData, ShadowrunItemDialog._getSelectedRangeModifier(html));
                 // Store lastFireRange for generic range selection.
             }
 
-            mergeObject(modifierData, ShadowrunItemDialog._getSelectedFireMode(html, fireModes))
+            mergeObject(actionTestData, ShadowrunItemDialog._getSelectedFireMode(html, fireModes))
 
             // Store selections for next dialog.
-            if (modifierData.environmental?.range) {
-                await item.setLastFireRangeMod({value: modifierData.environmental.range});
+            if (actionTestData.environmental?.range) {
+                await item.setLastFireRangeMod({value: actionTestData.environmental.range});
             }
-            if (modifierData.fireMode) {
-                await item.setLastFireMode(modifierData.fireMode);
+            if (actionTestData.fireMode) {
+                await item.setLastFireMode(actionTestData.fireMode);
             }
 
-            console.error('rangeGetModifierData', modifierData);
-            return modifierData;
+            return {rangedWeapon: actionTestData};
         };
     }
 
@@ -247,11 +285,10 @@ export class ShadowrunItemDialog extends Dialog {
         const selectElement = $(html).find('[name="selected-target"]');
         const range = Helpers.parseInputToNumber(selectElement.find(':selected').data('range-modifier'));
         const targetId = selectElement.val() as string;
-        const target = Helpers.getToken(targetId);
 
         return {
             environmental: {range},
-            target
+            targetId
         };
     }
 

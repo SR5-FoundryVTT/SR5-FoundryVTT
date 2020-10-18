@@ -1,6 +1,6 @@
 import { Helpers } from '../helpers';
 import { SR5Actor } from '../actor/SR5Actor';
-import { ShadowrunItemDialog } from '../apps/dialogs/ShadowrunItemDialog';
+import {ActionTestData, ShadowrunItemDialog} from '../apps/dialogs/ShadowrunItemDialog';
 import ModList = Shadowrun.ModList;
 import AttackData = Shadowrun.AttackData;
 import AttributeField = Shadowrun.AttributeField;
@@ -99,6 +99,14 @@ export class SR5Item extends Item {
         // unset the flag first to clear old data, data can get weird if not done
         await this.unsetFlag(SYSTEM_NAME, 'lastAttack');
         return this.setFlag(SYSTEM_NAME, 'lastAttack', attack);
+    }
+
+    async setLastAttackForRoll(roll: ShadowrunRoll|undefined, actionTestData?: ActionTestData) {
+        const hits = roll?.total ?? 0;
+        const attackData = this.getAttackData(hits, actionTestData);
+        if (attackData) {
+            await this.setLastAttack(attackData);
+        }
     }
 
     async update(data, options?) {
@@ -284,7 +292,7 @@ export class SR5Item extends Item {
         }
 
         // Switch possible dialog content based on item type.
-        const {dialogData, getModifierData, itemHasNoDialog}  = await ShadowrunItemDialog.fromItem(this, event);
+        const {dialogData, getActionTestData, itemHasNoDialog}  = await ShadowrunItemDialog.fromItem(this, event);
 
         if (itemHasNoDialog) {
             return await this.rollTest(event);
@@ -292,17 +300,17 @@ export class SR5Item extends Item {
 
         // TODO: Could utilize a subclassing of Dialog to avoid this.
         // Allow different item types to utilize what's been selected in the items dialog.
-        if (dialogData && getModifierData) {
+        if (dialogData && getActionTestData) {
             dialogData.close = async (html) => {
-                const modifierData = await getModifierData(html) as unknown as object;
-                console.error('item', modifierData);
+                const actionTestData = await getActionTestData(html) as unknown as object;
+                console.error('item', actionTestData);
 
                 // No dialog selection means dialog has been closed and no roll is needed;
-                if (!modifierData) {
+                if (!actionTestData) {
                     return;
                 }
 
-                await this.rollTest(event, undefined, modifierData);
+                await this.rollTest(event, undefined, actionTestData);
             };
         }
 
@@ -389,11 +397,17 @@ export class SR5Item extends Item {
         return '';
     }
 
-    getBlastData(): BlastData | undefined {
+    getBlastData(actionTestData?: ActionTestData): BlastData | undefined {
         // can only handle spells and grenade right now
         if (this.isSpell() && this.isAreaOfEffect()) {
             // distance on spells is equal to force
             let distance = this.getLastSpellForce().value;
+
+            // overwrite last usage from test selection, when available.
+            if (actionTestData?.spell) {
+                distance = actionTestData.spell.force;
+            }
+
             // extended spells multiply by 10
             if (this.data.data.extended) distance *= 10;
             return {
@@ -441,7 +455,7 @@ export class SR5Item extends Item {
         }
     }
 
-    get hasAmmo() {
+    hasAmmo() {
         return this.data.data.ammo !== undefined;
     }
 
@@ -622,33 +636,40 @@ export class SR5Item extends Item {
     /**
      * Rolls a test using the latest stored data on the item (force, fireMode, level)
      * @param event - mouse event
-     * @param modifierData
+     * @param actionTestData
      * @param options - any additional roll options to pass along - note that currently the Item will overwrite -- WIP
      */
-    async rollTest(event, options?: Partial<AdvancedRollProps>, modifierData?): Promise<ShadowrunRoll | undefined> {
-        const roll = await ShadowrunRoller.itemRoll(event, this, options, modifierData);
+    async rollTest(event, options?: Partial<AdvancedRollProps>, actionTestData?: ActionTestData): Promise<ShadowrunRoll | undefined> {
+        // Cast Success Test for item Actions.
+        const roll = await ShadowrunRoller.itemRoll(event, this, options, actionTestData);
 
-        // handle promise when it resolves for our own stuff
-        const attackData = this.getAttackData(roll?.total ?? 0, modifierData);
-        if (attackData) {
-            await this.setLastAttack(attackData);
-        }
+        await this.setLastAttackForRoll(roll, actionTestData);
 
-        // complex form handles fade
-        if (this.isComplexForm()) {
-            const totalFade = Math.max(this.getFade() + this.getLastComplexFormLevel().value, 2);
+        // Cast resulting tests from above Success Test depending on item type.
+        if (this.isComplexForm() && actionTestData?.complexForm) {
+            const level = actionTestData.complexForm.level;
+            const fade = this.getFade() + level;
+            const minFade = 2;
+            const totalFade = Math.max(fade, minFade);
             await this.actor.rollFade({ event }, totalFade);
-        } // spells handle drain, force, and attack data
+        }
         else if (this.isSpell()) {
             if (this.isCombatSpell() && roll) {
+                // TODO: isCombatSpell and roll does something but isn't handled.
             }
-            const forceData = this.getLastSpellForce();
-            const drain = Math.max(this.getDrain() + forceData.value + (forceData.reckless ? 3 : 0), 2);
-            await this.actor?.rollDrain({ event }, drain);
-        } // weapons handle ammo and attack data
-        else if (this.data.type === 'weapon') {
-            if (this.hasAmmo) {
-                const fireMode = this.getLastFireMode()?.value || 1;
+            if (actionTestData?.spell) {
+                const force = actionTestData.spell.force;
+                const reckless = actionTestData.spell.reckless;
+                const drain = this.getDrain() + force + (reckless ? 3 : 0);
+                const minDrain = 2;
+                const totalDrain = Math.max(drain, minDrain);
+
+                await this.actor.rollDrain({ event }, totalDrain);
+            }
+        }
+        else if (this.isWeapon()) {
+            if (this.hasAmmo() && actionTestData?.rangedWeapon) {
+                const fireMode = actionTestData.rangedWeapon.fireMode.value || 1;
                 await this.useAmmo(fireMode);
             }
         }
@@ -830,8 +851,7 @@ export class SR5Item extends Item {
         return this.data.data.action;
     }
 
-    // TODO: Check usages for second paramater selectedData
-    getAttackData(hits: number, modifierData?): AttackData | undefined {
+    getAttackData(hits: number, actionTestData?: ActionTestData): AttackData | undefined {
         if (!this._canDealDamage()) {
             return undefined;
         }
@@ -842,8 +862,8 @@ export class SR5Item extends Item {
             damage,
         };
 
-        if (this.isCombatSpell()) {
-            const force = this.getLastSpellForce().value;
+        if (this.isCombatSpell() && actionTestData?.spell) {
+            const force = actionTestData.spell.force;
             const damageParts = new PartsList(data.damage.mod);
             data.force = force;
             data.damage.base = force;
@@ -852,8 +872,8 @@ export class SR5Item extends Item {
             data.damage.ap.base = -force;
         }
 
-        if (this.isComplexForm()) {
-            data.level = this.getLastComplexFormLevel().value;
+        if (this.isComplexForm() && actionTestData?.complexForm) {
+            data.level = actionTestData.complexForm.level;
         }
 
         if (this.isMeleeWeapon()) {
@@ -862,11 +882,11 @@ export class SR5Item extends Item {
         }
 
         if (this.isRangedWeapon()) {
-            data.fireMode = modifierData?.fireMode;
+            data.fireMode = actionTestData?.rangedWeapon?.fireMode;
             data.accuracy = this.getActionLimit();
         }
 
-        const blastData = this.getBlastData();
+        const blastData = this.getBlastData(actionTestData);
         if (blastData) data.blast = blastData;
 
         return data;

@@ -8,8 +8,11 @@ import { Helpers } from '../helpers';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
 import { createChatData, TemplateData } from '../chat';
-import {FLAGS, GLITCH_DIE, SYSTEM_NAME} from '../constants';
+import {CORE_FLAGS, CORE_NAME, FLAGS, GLITCH_DIE, SYSTEM_NAME} from '../constants';
 import { PartsList } from '../parts/PartsList';
+import {ActionTestData} from "../apps/dialogs/ShadowrunItemDialog";
+import BlastData = Shadowrun.BlastData;
+import FireModeData = Shadowrun.FireModeData;
 
 export interface BasicRollProps {
     name?: string;
@@ -20,7 +23,6 @@ export interface BasicRollProps {
     title?: string;
     actor?: SR5Actor;
     item?: SR5Item;
-    attack?: AttackData;
     incomingAttack?: AttackData;
     incomingDrain?: LabelField & {
         value: number;
@@ -48,6 +50,10 @@ export interface AdvancedRollProps extends BasicRollProps {
     after?: (roll: Roll | undefined) => void;
     dialogOptions?: RollDialogOptions;
     target?: Token;
+    attack?: AttackData;
+    blast?: BlastData;
+    reach?: number
+    fireMode?: FireModeData
 }
 
 export class ShadowrunRoll extends Roll {
@@ -100,7 +106,7 @@ export class ShadowrunRoll extends Roll {
 }
 
 export class ShadowrunRoller {
-    static itemRoll(event, item: SR5Item, options?: Partial<AdvancedRollProps>, modifierData?): Promise<ShadowrunRoll | undefined> {
+    static itemRoll(event, item: SR5Item, options?: Partial<AdvancedRollProps>, actionTestData?: ActionTestData): Promise<ShadowrunRoll | undefined> {
         const parts = item.getRollPartsList();
         let limit = item.getLimit();
         let title = item.getRollName();
@@ -119,30 +125,29 @@ export class ShadowrunRoller {
             name: item.name,
             img: item.img,
             previewTemplate: item.hasTemplate,
+            attack:  item.getAttackData(0, actionTestData),
+            blast: item.getBlastData(actionTestData)
         };
-        rollData['attack'] = item.getAttackData(0, modifierData);
-        rollData['blast'] = item.getBlastData();
 
         if (item.hasOpposedRoll) {
-            rollData['tests'] = [
-                {
-                    label: item.getOpposedTestName(),
-                    type: 'opposed',
-                },
-            ];
+            rollData.tests = [{
+                label: item.getOpposedTestName(),
+                type: 'opposed',
+            }];
         }
         if (item.isMeleeWeapon()) {
-            rollData['reach'] = item.getReach();
+            rollData.reach = item.getReach();
         }
-        if (item.isRangedWeapon()) {
-            rollData['fireMode'] = item.getLastFireMode()?.label;
+        if (item.isRangedWeapon() && actionTestData?.rangedWeapon) {
+            // TODO: is rollData.fireMode ever used anywhere?!
+            rollData.fireMode = actionTestData.rangedWeapon.fireMode;
             if (rollData.dialogOptions) {
-                rollData.dialogOptions.environmental = modifierData.environmental.range;
+                rollData.dialogOptions.environmental = actionTestData.rangedWeapon.environmental.range;
             }
         }
         // TODO: This here is manual mapping and manual work is bad.
-        if (modifierData && modifierData.target) {
-            rollData.target = modifierData.target;
+        if (actionTestData && actionTestData.targetId) {
+            rollData.target = Helpers.getToken(actionTestData.targetId);
         }
 
         rollData.description = item.getChatData();
@@ -226,8 +231,6 @@ export class ShadowrunRoller {
             glitch: roll.glitched,
             ...props,
         };
-        console.error('basicRoll', templateData);
-
 
         // In what case would no roll be present? No parts? Why would this reach any logic then?
         if (roll) {
@@ -263,13 +266,13 @@ export class ShadowrunRoller {
         const parts = new PartsList(partsProps);
 
         // remove limits if game settings is set
-        if (!game.settings.get(SYSTEM_NAME, 'applyLimits')) {
+        if (!game.settings.get(SYSTEM_NAME, FLAGS.ApplyLimits)) {
             delete props.limit;
         }
 
         // TODO create "fast roll" option
 
-        const rollMode = game.settings.get('core', 'rollMode');
+        const rollMode = game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
 
         let dialogData = {
             options: dialogOptions,
@@ -320,7 +323,7 @@ export class ShadowrunRoller {
 
                     if (dialogOptions?.prompt) {
                         parts.clear();
-                        await game.user.setFlag(SYSTEM_NAME, 'lastRollPromptValue', dicePoolValue);
+                        await game.user.setFlag(SYSTEM_NAME, FLAGS.LastRollPromptValue, dicePoolValue);
                         parts.addUniquePart('SR5.Base', dicePoolValue);
                     }
 
