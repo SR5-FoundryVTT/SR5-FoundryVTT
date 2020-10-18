@@ -145,7 +145,6 @@ export class ShadowrunRoller {
                 rollData.dialogOptions.environmental = actionTestData.rangedWeapon.environmental.range;
             }
         }
-        // TODO: This here is manual mapping and manual work is bad.
         if (actionTestData && actionTestData.targetId) {
             rollData.target = Helpers.getToken(actionTestData.targetId);
         }
@@ -153,6 +152,37 @@ export class ShadowrunRoller {
         rollData.description = item.getChatData();
 
         return ShadowrunRoller.advancedRoll(rollData);
+    }
+
+    static async resultingItemRolls(event, item: SR5Item, actionTestData? : ActionTestData) {
+        // Cast resulting tests from above Success Test depending on item type.
+        if (item.isComplexForm() && actionTestData?.complexForm) {
+            const level = actionTestData.complexForm.level;
+            const fade = item.getFade() + level;
+            const minFade = 2;
+            const totalFade = Math.max(fade, minFade);
+            await item.actor.rollFade({ event }, totalFade);
+        }
+        else if (item.isSpell()) {
+            // if (item.isCombatSpell() && roll) {
+            //     // TODO: isCombatSpell and roll does something but isn't handled.
+            // }
+            if (actionTestData?.spell) {
+                const force = actionTestData.spell.force;
+                const reckless = actionTestData.spell.reckless;
+                const drain = item.getDrain() + force + (reckless ? 3 : 0);
+                const minDrain = 2;
+                const totalDrain = Math.max(drain, minDrain);
+
+                await item.actor.rollDrain({ event }, totalDrain);
+            }
+        }
+        else if (item.isWeapon()) {
+            if (item.hasAmmo() && actionTestData?.rangedWeapon) {
+                const fireMode = actionTestData.rangedWeapon.fireMode.value || 1;
+                await item.useAmmo(fireMode);
+            }
+        }
     }
 
     static shadowrunFormula({

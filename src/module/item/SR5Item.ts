@@ -298,12 +298,10 @@ export class SR5Item extends Item {
             return await this.rollTest(event);
         }
 
-        // TODO: Could utilize a subclassing of Dialog to avoid this.
         // Allow different item types to utilize what's been selected in the items dialog.
         if (dialogData && getActionTestData) {
             dialogData.close = async (html) => {
                 const actionTestData = await getActionTestData(html) as unknown as object;
-                console.error('item', actionTestData);
 
                 // No dialog selection means dialog has been closed and no roll is needed;
                 if (!actionTestData) {
@@ -644,35 +642,7 @@ export class SR5Item extends Item {
         const roll = await ShadowrunRoller.itemRoll(event, this, options, actionTestData);
 
         await this.setLastAttackForRoll(roll, actionTestData);
-
-        // Cast resulting tests from above Success Test depending on item type.
-        if (this.isComplexForm() && actionTestData?.complexForm) {
-            const level = actionTestData.complexForm.level;
-            const fade = this.getFade() + level;
-            const minFade = 2;
-            const totalFade = Math.max(fade, minFade);
-            await this.actor.rollFade({ event }, totalFade);
-        }
-        else if (this.isSpell()) {
-            if (this.isCombatSpell() && roll) {
-                // TODO: isCombatSpell and roll does something but isn't handled.
-            }
-            if (actionTestData?.spell) {
-                const force = actionTestData.spell.force;
-                const reckless = actionTestData.spell.reckless;
-                const drain = this.getDrain() + force + (reckless ? 3 : 0);
-                const minDrain = 2;
-                const totalDrain = Math.max(drain, minDrain);
-
-                await this.actor.rollDrain({ event }, totalDrain);
-            }
-        }
-        else if (this.isWeapon()) {
-            if (this.hasAmmo() && actionTestData?.rangedWeapon) {
-                const fireMode = actionTestData.rangedWeapon.fireMode.value || 1;
-                await this.useAmmo(fireMode);
-            }
-        }
+        await ShadowrunRoller.resultingItemRolls(event, this, actionTestData);
 
         return roll;
     }

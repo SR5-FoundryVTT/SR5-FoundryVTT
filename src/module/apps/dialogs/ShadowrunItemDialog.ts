@@ -231,6 +231,8 @@ export class ShadowrunItemDialog extends Dialog {
 
             mergeObject(actionTestData, ShadowrunItemDialog._getSelectedFireMode(html, fireModes))
 
+            const {targetId} = ShadowrunItemDialog._getSelectedTargetTokenId(html);
+
             // Store selections for next dialog.
             if (actionTestData.environmental?.range) {
                 await item.setLastFireRangeMod({value: actionTestData.environmental.range});
@@ -239,7 +241,7 @@ export class ShadowrunItemDialog extends Dialog {
                 await item.setLastFireMode(actionTestData.fireMode);
             }
 
-            return {rangedWeapon: actionTestData};
+            return {rangedWeapon: actionTestData, targetId};
         };
     }
 
@@ -284,12 +286,16 @@ export class ShadowrunItemDialog extends Dialog {
     static _getSelectedTargetRangeModifier(html: JQuery): object {
         const selectElement = $(html).find('[name="selected-target"]');
         const range = Helpers.parseInputToNumber(selectElement.find(':selected').data('range-modifier'));
-        const targetId = selectElement.val() as string;
 
         return {
-            environmental: {range},
-            targetId
+            environmental: {range}
         };
+    }
+
+    static _getSelectedTargetTokenId(html: JQuery) {
+        const selectElement = $(html).find('[name="selected-target"]');
+        const targetId = selectElement.val() as string;
+        return {targetId};
     }
 
     static _getSelectedRangeModifier(html: JQuery): object {

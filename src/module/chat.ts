@@ -47,7 +47,6 @@ export const createChatData = async (templateData: TemplateData, roll?: Roll) =>
     };
     const html = await renderTemplate(template, hackyTemplateData);
     const actor = templateData.actor;
-    console.error('createChatData-template', templateData);
 
     const chatData = {
         user: game.user._id,
