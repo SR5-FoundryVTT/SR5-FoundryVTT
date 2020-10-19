@@ -20,6 +20,10 @@ export class PartsList<TType> {
         return total;
     }
 
+    get isEmpty(): boolean {
+        return this.total === 0;
+    }
+
     getPartValue(name: string): TType | undefined {
         return this._list.find((part) => part.name === name)?.value;
     }

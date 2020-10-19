@@ -7,7 +7,10 @@ import DamageData = Shadowrun.DamageData;
 import { Helpers } from '../helpers';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
-import {createChatData, createRollChatMessage, getPreferedNameAndImageSource, TemplateData} from '../chat';
+import {
+    createRollChatMessage,
+    ifConfiguredCreateDefaultChatMessage
+} from '../chat';
 import {CORE_FLAGS, CORE_NAME, DEFAULT_ROLL_NAME, FLAGS, SR, SYSTEM_NAME} from '../constants';
 import { PartsList } from '../parts/PartsList';
 import {ActionTestData} from "../apps/dialogs/ShadowrunItemDialog";
@@ -70,8 +73,6 @@ type ShadowrunRollData = {
 }
 export class ShadowrunRoll extends Roll {
     data: ShadowrunRollData
-    // TODO: is this needed ?
-    templateData: TemplateData | undefined;
     // add class Roll to the json so dice-so-nice works
     toJSON(): any {
         const data = super.toJSON();
@@ -162,17 +163,12 @@ export class ShadowrunRoller {
         } as AdvancedRollProps;
 
         if (item.hasOpposedRoll) {
-            rollData.tests = [{
-                label: item.getOpposedTestName(),
-                type: 'opposed',
-            }];
+            rollData.tests = item.getOpposedTests();
         }
         if (item.isMeleeWeapon()) {
             rollData.reach = item.getReach();
         }
         if (item.isRangedWeapon() && actionTestData?.rangedWeapon) {
-            // TODO: is rollData.fireMode ever used anywhere?!
-            rollData.fireMode = actionTestData.rangedWeapon.fireMode;
             if (rollData.dialogOptions) {
                 rollData.dialogOptions.environmental = actionTestData.rangedWeapon.environmental.range;
             }
@@ -265,40 +261,39 @@ export class ShadowrunRoller {
         tests,
         ...props
     }: BasicRollProps): Promise<ShadowrunRoll | undefined> {
-        let roll;
         const parts = new PartsList(partsProps);
 
-        if (parts.length) {
-            const formula = this.shadowrunFormula({ parts: parts.list, limit, explode: explodeSixes });
-            if (!formula) return;
-            const rollData = {limit, explodeSixes, parts: parts.list};
-            roll = new ShadowrunRoll(formula, rollData);
-            roll.roll();
-
-            if (game.settings.get(SYSTEM_NAME, FLAGS.DisplayDefaultRollCard)) {
-                await roll.toMessage({
-                    speaker: ChatMessage.getSpeaker({ actor: actor }),
-                    flavor: title,
-                    rollMode: rollMode,
-                });
-            }
+        // Abort on nothing to roll.
+        if (parts.isEmpty) {
+            return;
         }
-        const token = actor?.token;
 
+        // Prepare SR Success Test with foundry formula.
+        const formula = this.shadowrunFormula({ parts: parts.list, limit, explode: explodeSixes });
+        if (!formula) {
+            return
+        }
+
+        // Execute the Success Test.
+        const rollData = {limit, explodeSixes, parts: parts.list};
+        const roll = new ShadowrunRoll(formula, rollData);
+        roll.roll();
+
+        await ifConfiguredCreateDefaultChatMessage(roll, {actor, title, rollMode});
+
+        // NOTE: Keep template data extraction to see basicProps that come through unused.
         const templateData = {
             // tokenId: tokenSceneId,
-            actor, token, target, header: {name: name || '', img: img || '',}, title, description, rollMode, limit, previewTemplate,
+            actor, token: actor?.token, target, header: {name: name || '', img: img || '',}, title, description, rollMode, limit, previewTemplate,
             attack, incomingAttack, incomingDrain, incomingSoak, item, tests, ...props, roll};
         console.warn('basicProps unused', props);
 
         if (!hideRollMessage) {
-            const rollChatMessageOptions = {actor, token, target, item, name, img, rollMode, description, title, previewTemplate, attack, incomingAttack, incomingDrain, incomingSoak, tests};
+            const rollChatMessageOptions = {actor, target, item, name, img, rollMode, description, title, previewTemplate, attack, incomingAttack, incomingDrain, incomingSoak, tests};
             const message = await createRollChatMessage(roll, rollChatMessageOptions);
-
-            // const chatData = await createChatData(templateData, roll);
-            // const message = await ChatMessage.create(chatData, { displaySheet: false });
             console.log(message);
         }
+
         return roll;
     }
 

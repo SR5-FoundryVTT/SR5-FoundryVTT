@@ -1,6 +1,12 @@
-import { Helpers } from '../helpers';
-import { SR5Actor } from '../actor/SR5Actor';
+import {Helpers} from '../helpers';
+import {SR5Actor} from '../actor/SR5Actor';
 import {ActionTestData, ShadowrunItemDialog} from '../apps/dialogs/ShadowrunItemDialog';
+import {ChatData} from './ChatData';
+import {AdvancedRollProps, ShadowrunRoll, ShadowrunRoller, Test} from '../rolls/ShadowrunRoller';
+import {createItemChatMessage} from '../chat';
+import {DEFAULT_ROLL_NAME, SYSTEM_NAME} from '../constants';
+import {SR5ItemDataWrapper} from './SR5ItemDataWrapper';
+import {PartsList} from '../parts/PartsList';
 import ModList = Shadowrun.ModList;
 import AttackData = Shadowrun.AttackData;
 import AttributeField = Shadowrun.AttributeField;
@@ -11,14 +17,8 @@ import SpellForceData = Shadowrun.SpellForceData;
 import ComplexFormLevelData = Shadowrun.ComplexFormLevelData;
 import FireRangeData = Shadowrun.FireRangeData;
 import BlastData = Shadowrun.BlastData;
-import { ChatData } from './ChatData';
-import { AdvancedRollProps, ShadowrunRoll, ShadowrunRoller } from '../rolls/ShadowrunRoller';
-import { createChatData } from '../chat';
-import { SYSTEM_NAME } from '../constants';
 import ConditionData = Shadowrun.ConditionData;
-import { SR5ItemDataWrapper } from './SR5ItemDataWrapper';
 import SR5ItemType = Shadowrun.SR5ItemType;
-import { PartsList } from '../parts/PartsList';
 
 export class SR5Item extends Item {
     labels: {} = {};
@@ -258,29 +258,19 @@ export class SR5Item extends Item {
     }
 
     async postItemCard() {
-        const { token } = this.actor;
-
-        const testName = this.getRollName();
-        const tests =  [{
-            label: this.getActionTestName(),
-            type: 'action',
-        }];
-
-        const chatData = await createChatData({
+        const tests =  this.getActionTests();
+        const options = {
             header: {
                 name: this.name,
                 img: this.img,
             },
-            testName,
             actor: this.actor,
-            tokenId: token ? `${token.scene._id}.${token.id}` : undefined,
             description: this.getChatData(),
             item: this,
             previewTemplate: this.hasTemplate,
             tests
-        });
-
-        return await ChatMessage.create(chatData, { displaySheet: false });
+        };
+        return await createItemChatMessage(options);
     }
 
     async castAction(event?) {
@@ -683,6 +673,23 @@ export class SR5Item extends Item {
         return targets;
     }
 
+    getActionTests(): Test[] {
+        return [{
+            label: this.getActionTestName(),
+            type: 'action',
+        }];
+    }
+
+    getOpposedTests(): Test[] {
+        if (!this.hasOpposedRoll) {
+            return [];
+        }
+        return [{
+            label: this.getOpposedTestName(),
+            type: 'opposed',
+        }];
+    }
+
     /**
      * Create an item in this item
      * @param itemData
@@ -865,7 +872,7 @@ export class SR5Item extends Item {
         return data;
     }
 
-    getRollName(): string | undefined {
+    getRollName(): string {
         if (this.isRangedWeapon()) {
             return game.i18n.localize('SR5.RangeWeaponAttack');
         }
@@ -878,8 +885,11 @@ export class SR5Item extends Item {
         if (this.isSpell()) {
             return game.i18n.localize('SR5.SpellCast');
         }
-        if (this.hasRoll) return this.name;
-        return undefined;
+        if (this.hasRoll) {
+            return this.name
+        }
+
+        return DEFAULT_ROLL_NAME;
     }
 
     getLimit(): LimitField | undefined {

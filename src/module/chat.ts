@@ -1,53 +1,91 @@
 import { SR5Actor } from './actor/SR5Actor';
 import { SR5Item } from './item/SR5Item';
 import Template from './template';
-import ModList = Shadowrun.ModList;
-import BaseValuePair = Shadowrun.BaseValuePair;
 import DamageData = Shadowrun.DamageData;
 import AttackData = Shadowrun.AttackData;
-import LabelField = Shadowrun.LabelField;
 import {CORE_FLAGS, CORE_NAME, FLAGS, SYSTEM_NAME} from './constants';
-import { PartsList } from './parts/PartsList';
 import {ShadowrunRoll, ShadowrunRoller, Test} from "./rolls/ShadowrunRoller";
 import DrainData = Shadowrun.DrainData;
 
-export type TemplateData = {
+// Simple card text messages
+interface ItemChatMessageOptions {
+    actor: SR5Actor
+    item: SR5Item
     header: {
-        name: string;
-        img: string;
-    };
-    tokenId?: string;
-    dice?: Die[];
-    parts?: ModList<number>;
-    limit?: BaseValuePair<number> & LabelField;
-    testName?: string;
-    actor?: SR5Actor;
-    target?: Token;
-    item?: SR5Item;
-    attack?: AttackData;
-    incomingAttack?: AttackData;
-    incomingDrain?: LabelField & {
-        value: number;
-    };
-    hits?: number;
-    soak?: DamageData;
-    tests?: {
-        label: string;
-        type: string;
-    }[];
-    description?: object;
-    previewTemplate?: boolean;
-    rollMode?: keyof typeof CONFIG.Dice.rollModes;
-};
+        name: string
+        img: string
+    }
+    description: object
+    tests?: Test[]
+}
 
-export const createChatData = async (templateData: TemplateData, roll?: Roll) => {
+interface RollChatMessageOptions {
+    actor?: SR5Actor
+    target?: Token
+
+    item?: SR5Item
+
+    name?: string
+    img?: string
+    title: string
+    description?: object
+
+    rollMode?: keyof typeof CONFIG.dice.rollModes
+    previewTemplate?: boolean
+
+    attack?: AttackData
+    incomingAttack?: AttackData
+    incomingDrain?: DrainData
+    incomingSoak?: DamageData
+    tests?: Test[];
+}
+
+interface ItemChatTemplateData {
+    actor: SR5Actor
+    item: SR5Item
+    header: {
+        name: string
+        img: string
+    }
+    description: object
+    tests?: Test[]
+}
+
+interface RollChatTemplateData {
+    actor?: SR5Actor
+    header: {
+        name: string
+        img: string
+    }
+    tokenId?: string
+    target?: Token
+    item?: SR5Item
+
+    title: string
+    description?: object;
+
+    roll: ShadowrunRoll
+
+    rollMode: keyof typeof CONFIG.dice.rollModes
+    previewTemplate?: boolean
+
+    attack?: AttackData
+    // TODO: group 'incoming' with type field instead of multiple incoming types.
+    incomingAttack?: AttackData
+    incomingDrain?: DrainData
+    incomingSoak?: DamageData
+    tests?: Test[];
+}
+
+// templateData has no datatype to pipe through whatever it's given.
+// Clean up your data within templateData creation functions!
+const createChatData = async (templateData, roll?: Roll) => {
     const template = `systems/shadowrun5e/dist/templates/rolls/roll-card.html`;
-    const hackyTemplateData = {
+    const enhancedTemplateData = {
         ...templateData,
-        parts: new PartsList(templateData.parts).getMessageOutput(),
         showGlitchAnimation: game.settings.get(SYSTEM_NAME, FLAGS.ShowGlitchAnimation),
     };
-    const html = await renderTemplate(template, hackyTemplateData);
+    const html = await renderTemplate(template, enhancedTemplateData);
     const actor = templateData.actor;
 
     const chatData = {
@@ -71,11 +109,108 @@ export const createChatData = async (templateData: TemplateData, roll?: Roll) =>
     }
     const rollMode = templateData.rollMode ?? game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
 
-    if (['gmroll', 'blindroll'].includes(rollMode)) chatData['whisper'] = ChatMessage.getWhisperRecipients('GM');
+    if (['gmroll', 'blindroll'].includes(rollMode as string)) chatData['whisper'] = ChatMessage.getWhisperRecipients('GM');
     if (rollMode === 'blindroll') chatData['blind'] = true;
 
     return chatData;
 };
+
+
+
+export async function ifConfiguredCreateDefaultChatMessage(roll: ShadowrunRoll, {actor, title, rollMode}) {
+    if (game.settings.get(SYSTEM_NAME, FLAGS.DisplayDefaultRollCard)) {
+        await roll.toMessage({
+            speaker: ChatMessage.getSpeaker({ actor: actor }),
+            flavor: title,
+            rollMode: rollMode,
+        });
+    }
+}
+
+export async function createItemChatMessage(options: ItemChatMessageOptions) {
+    const templateData = createChatTemplateData(options);
+    const chatData = await createChatData(templateData);
+    return await ChatMessage.create(chatData);
+}
+
+function createChatTemplateData(options: ItemChatMessageOptions): ItemChatTemplateData {
+    // field extraction is explicit to enforce visible data flow to ensure clean data.
+    // NOTE: As soon as clear data dynamic data flow can be established, this should be removed for a simple {...options}
+    let {actor, item, description, tests, header} = options;
+
+    return {
+        actor,
+        item,
+        header,
+        description,
+        tests
+    }
+}
+
+export async function createRollChatMessage(roll: ShadowrunRoll, options: RollChatMessageOptions): Promise<Entity<any>> {
+    const templateData = getRollChatTemplateData(roll, options);
+    const chatData = await createChatData(templateData, roll);
+    // TODO: What does displaySheet even do?
+    return await ChatMessage.create(chatData, {displaySheet: false});
+}
+
+
+function getRollChatTemplateData(roll: ShadowrunRoll, options: RollChatMessageOptions): RollChatTemplateData {
+    // field extraction is explicit to enforce visible data flow to ensure clean data.
+    // NOTE: As soon as clear data dynamic data flow can be established, this should be removed for a simple {...options}
+    let {actor, item, name, img, target, description, title, previewTemplate,
+        attack, incomingAttack, incomingDrain, incomingSoak, tests} = options;
+
+    const rollMode = options.rollMode ?? game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
+
+    const token = actor?.token;
+
+    [name, img] = getPreferedNameAndImageSource(name, img, actor, token);
+    const header = {name, img};
+    const tokenId = getTokenSceneId(token);
+
+    return {
+        roll,
+        actor,
+        item,
+        header,
+        tokenId,
+        target,
+        rollMode,
+        title,
+        description,
+        previewTemplate,
+        attack,
+        incomingAttack,
+        incomingDrain,
+        incomingSoak,
+        tests
+    }
+}
+
+/** Use either the actor or the tokens name and image, depending on system settings.
+ *
+ * However don't change anything if a custom name or image has been given.
+ */
+function getPreferedNameAndImageSource(name?: string, img?: string, actor?: SR5Actor, token?: Token): [string, string] {
+
+    const namedAndImageMatchActor = name === actor?.name && img === actor?.img;
+    const useTokenNameForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
+
+    if (namedAndImageMatchActor && useTokenNameForChatOutput && token) {
+        img = token?.data.img;
+        name = token?.data.name;
+    }
+
+    name = name ? name : '';
+    img = img ? img : '';
+
+    return [name, img];
+}
+
+function getTokenSceneId(token: Token|undefined): string|undefined {
+    return token ? `${token.scene._id}.${token.id}` : undefined;
+}
 
 export const addChatMessageContextOptions = (html, options) => {
     const canRoll = (li) => {
@@ -129,111 +264,3 @@ export const addRollListeners = (app: ChatMessage, html) => {
     });
     if (item?.hasRoll && app.isRoll) $(html).find('.card-description').hide();
 };
-
-interface RollChatMessageOptions {
-    actor?: SR5Actor
-    token?: Token
-    target?: Token
-
-    item?: SR5Item
-
-    name?: string
-    img?: string
-    title: string
-    description?: object
-
-    rollMode: keyof typeof CONFIG.dice.rollModes
-    previewTemplate?: boolean
-
-    attack?: AttackData
-    incomingAttack?: AttackData
-    incomingDrain?: DrainData
-    incomingSoak?: DamageData
-    tests?: Test[];
-}
-
-interface RollChatTemplateData {
-    actor?: SR5Actor
-    header: {
-        name: string
-        img: string
-    }
-    tokenId?: string
-    target?: Token
-    item?: SR5Item
-
-    title: string
-    description?: object;
-
-    roll?: ShadowrunRoll
-
-    rollMode: keyof typeof CONFIG.dice.rollModes
-    previewTemplate?: boolean
-
-    attack?: AttackData
-    // TODO: group 'incoming' with type field instead of multiple incoming types.
-    incomingAttack?: AttackData
-    incomingDrain?: DrainData
-    incomingSoak?: DamageData
-    tests?: Test[];
-}
-
-export async function createRollChatMessage(roll: ShadowrunRoll, options: RollChatMessageOptions): Promise<Entity<any>> {
-    const templateData = getRollChatTemplateData(roll, options);
-    const chatData = await createChatData(templateData, roll);
-    // TODO: What does displaySheet even do?
-    return await ChatMessage.create(chatData, {displaySheet: false});
-}
-
-export function getRollChatTemplateData(roll: ShadowrunRoll, options: RollChatMessageOptions): RollChatTemplateData {
-    // field extraction is explicit to enforce visible data flow to ensure clean data.
-    // NOTE: As soon as clear data dynamic data flow can be established, this should be removed for a simple {...options}
-    let {actor, token, item, name, img, rollMode, target, description, title, previewTemplate,
-        attack, incomingAttack, incomingDrain, incomingSoak, tests} = options;
-
-    [name, img] = getPreferedNameAndImageSource(name, img, actor, token);
-    const header = {name, img};
-    const tokenId = getTokenSceneId(token);
-
-    return {
-        roll,
-        actor,
-        item,
-        header,
-        tokenId,
-        target,
-        rollMode,
-        title,
-        description,
-        previewTemplate,
-        attack,
-        incomingAttack,
-        incomingDrain,
-        incomingSoak,
-        tests
-    }
-}
-
-/** Use either the actor or the tokens name and image, depending on system settings.
- *
- * However don't change anything if a custom name or image has been given.
- */
-export function getPreferedNameAndImageSource(name?: string, img?: string, actor?: SR5Actor, token?: Token): [string, string] {
-
-    const namedAndImageMatchActor = name === actor?.name && img === actor?.img;
-    const useTokenNameForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
-
-    if (namedAndImageMatchActor && useTokenNameForChatOutput && token) {
-        img = token?.data.img;
-        name = token?.data.name;
-    }
-
-    name = name ? name : '';
-    img = img ? img : '';
-
-    return [name, img];
-}
-
-function getTokenSceneId(token: Token|undefined): string|undefined {
-    return token ? `${token.scene._id}.${token.id}` : undefined;
-}
