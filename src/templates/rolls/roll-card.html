@@ -110,21 +110,21 @@
                 <span class="key">{{localize "SR5.Dropoff"}}: </span>
                 <span class="value">{{attack.blast.dropoff}}/m</span>
             </div>
-            {{/if}} {{#if soak}}
+            {{/if}} {{#if incomingSoak}}
             <div class="category-line">
                 {{localize "SR5.Incoming"}}
             </div>
             <div class="damage-line">
-                {{#if soak.value}}
+                {{#if incomingSoak.value}}
                 <div>
                     <span class="key">{{localize "SR5.Damage"}}: </span>
-                    <span class="value">{{soak.value}}{{damageAbbreviation soak.type.value}}</span>
+                    <span class="value">{{incomingSoak.value}}{{damageAbbreviation incomingSoak.type.value}}</span>
                 </div>
-                {{/if}} {{#if soak.element.value}}
+                {{/if}} {{#if incomingSoak.element.value}}
                 <div>
                     <i
-                            class="{{elementIcon soak.element.value}} icon"
-                            title="{{localize soak.element.value}}"
+                            class="{{elementIcon incomingSoak.element.value}} icon"
+                            title="{{localize incomingSoak.element.value}}"
                     ></i>
                 </div>
                 {{/if}}
@@ -139,8 +139,8 @@
                 {{localize "SR5.Incoming"}}
             </div>
             <div class="limit-line">
-                <span class="key"
-                    >{{localize incomingDrain.label}}:
+                <span class="key">
+                    {{localize incomingDrain.label}}:
                 </span>
                 <span class="value">{{incomingDrain.value}}</span>
             </div>

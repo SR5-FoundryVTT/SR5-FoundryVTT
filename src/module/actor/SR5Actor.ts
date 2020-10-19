@@ -326,7 +326,7 @@ export class SR5Actor extends Actor {
         });
     }
 
-    rollDefense(options: DefenseRollOptions = {}, partsProps: ModList<number> = []) {
+    async rollDefense(options: DefenseRollOptions = {}, partsProps: ModList<number> = []) {
         const parts = new PartsList(partsProps);
         this._addDefenseParts(parts);
         // full defense is always added
@@ -375,63 +375,65 @@ export class SR5Actor extends Actor {
         let cancel = true;
         const incomingAttack = options.incomingAttack;
         const event = options.event;
-        return new Promise((resolve) => {
-            renderTemplate(template, dialogData).then((dlg) => {
-                new Dialog({
-                    title: game.i18n.localize('SR5.Defense'),
-                    content: dlg,
-                    buttons: {
-                        continue: {
-                            label: game.i18n.localize('SR5.Continue'),
-                            callback: () => (cancel = false),
-                        },
-                    },
-                    default: 'normal',
-                    close: async (html) => {
-                        if (cancel) return;
-                        let cover = Helpers.parseInputToNumber($(html).find('[name=cover]').val());
-                        let special = Helpers.parseInputToString($(html).find('[name=activeDefense]').val());
-                        if (special) {
-                            // TODO subtract initiative score when Foundry updates to 0.7.0
-                            const defense = activeDefenses[special];
-                            parts.addUniquePart(defense.label, defense.value);
-                        }
-                        if (cover) parts.addUniquePart('SR5.Cover', cover);
 
-                        resolve(
-                            ShadowrunRoller.advancedRoll({
-                                event: event,
-                                actor: this,
-                                parts: parts.list,
-                                title: game.i18n.localize('SR5.DefenseTest'),
-                                incomingAttack,
-                            }).then(async (roll: Roll | undefined) => {
-                                if (incomingAttack && roll) {
-                                    let defenderHits = roll.total;
-                                    let attackerHits = incomingAttack.hits || 0;
-                                    let netHits = attackerHits - defenderHits;
+        // Show Defense Test input dialog before Defense Test.
+        const content = await renderTemplate(template, dialogData);
+        const dialog = await new Dialog({
+            title: game.i18n.localize('SR5.Defense'),
+            content,
+            buttons: {
+                continue: {
+                    label: game.i18n.localize('SR5.Continue'),
+                    callback: () => (cancel = false),
+                },
+            },
+            default: 'normal',
+            close: async (html) => {
+                if (cancel) return;
+                let cover = Helpers.parseInputToNumber($(html).find('[name=cover]').val());
+                let special = Helpers.parseInputToString($(html).find('[name=activeDefense]').val());
+                if (special) {
+                    // TODO subtract initiative score when Foundry updates to 0.7.0
+                    const defense = activeDefenses[special];
+                    parts.addUniquePart(defense.label, defense.value);
+                }
+                if (cover) {
+                    parts.addUniquePart('SR5.Cover', cover)
+                }
 
-                                    if (netHits >= 0) {
-                                        const damage = incomingAttack.damage;
-                                        damage.mod = PartsList.AddUniquePart(damage.mod, 'SR5.NetHits', netHits);
-                                        damage.value = Helpers.calcTotal(damage);
+                // Show actual Defense Test.
+                const roll = await ShadowrunRoller.advancedRoll({
+                    event: event,
+                    actor: this,
+                    parts: parts.list,
+                    title: game.i18n.localize('SR5.DefenseTest'),
+                    incomingAttack,
+                });
 
-                                        const soakRollOptions = {
-                                            event: event,
-                                            damage: damage,
-                                        };
-                                        await this.rollSoak(soakRollOptions);
-                                    }
-                                }
-                            }),
-                        );
-                    },
-                }).render(true);
-            });
+                // Prepare Soak Test.
+                if (incomingAttack && roll) {
+                    let defenderHits = roll.total;
+                    let attackerHits = incomingAttack.hits || 0;
+                    let netHits = attackerHits - defenderHits;
+
+                    if (netHits >= 0) {
+                        const damage = incomingAttack.damage;
+                        damage.mod = PartsList.AddUniquePart(damage.mod, 'SR5.NetHits', netHits);
+                        damage.value = Helpers.calcTotal(damage);
+
+                        const soakRollOptions = {
+                            event: event,
+                            damage: damage,
+                        };
+                        await this.rollSoak(soakRollOptions);
+                    }
+                }
+            }
         });
+        return await dialog.render(true)
     }
 
-    rollSoak(options?: SoakRollOptions, partsProps: ModList<number> = []) {
+    async rollSoak(options?: SoakRollOptions, partsProps: ModList<number> = []) {
         const parts = new PartsList(partsProps);
         this._addSoakParts(parts);
         let dialogData = {
@@ -442,101 +444,99 @@ export class SR5Actor extends Actor {
         let id = '';
         let cancel = true;
         let template = 'systems/shadowrun5e/dist/templates/rolls/roll-soak.html';
-        return new Promise((resolve) => {
-            renderTemplate(template, dialogData).then((dlg) => {
-                new Dialog({
-                    title: game.i18n.localize('SR5.DamageResistanceTest'),
-                    content: dlg,
-                    buttons: {
-                        continue: {
-                            label: game.i18n.localize('SR5.Continue'),
-                            callback: () => {
-                                id = 'default';
-                                cancel = false;
-                            },
-                        },
+        // Show Soak Test input field dialog before actual Soak Test.
+        const content = await renderTemplate(template, dialogData);
+        const dialog = await new Dialog({
+            title: game.i18n.localize('SR5.DamageResistanceTest'),
+            content,
+            buttons: {
+                continue: {
+                    label: game.i18n.localize('SR5.Continue'),
+                    callback: () => {
+                        id = 'default';
+                        cancel = false;
                     },
-                    close: async (html) => {
-                        if (cancel) return;
+                },
+            },
+            close: async (html) => {
+                if (cancel) return;
 
-                        const soak: DamageData = options?.damage
-                            ? options.damage
-                            : {
-                                  base: 0,
-                                  value: 0,
-                                  mod: [],
-                                  ap: {
-                                      base: 0,
-                                      value: 0,
-                                      mod: [],
-                                  },
-                                  attribute: '' as const,
-                                  type: {
-                                      base: '',
-                                      value: '',
-                                  },
-                                  element: {
-                                      base: '',
-                                      value: '',
-                                  },
-                              };
+                const soak: DamageData = options?.damage
+                    ? options.damage
+                    : {
+                          base: 0,
+                          value: 0,
+                          mod: [],
+                          ap: {
+                              base: 0,
+                              value: 0,
+                              mod: [],
+                          },
+                          attribute: '' as const,
+                          type: {
+                              base: '',
+                              value: '',
+                          },
+                          element: {
+                              base: '',
+                              value: '',
+                          },
+                      };
 
-                        const armor = this.getArmor();
+                const armor = this.getArmor();
 
-                        // handle element changes
-                        const element = Helpers.parseInputToString($(html).find('[name=element]').val());
-                        if (element) {
-                            soak.element.value = element as DamageElement;
-                        }
-                        const bonusArmor = armor[element] ?? 0;
-                        if (bonusArmor) {
-                            parts.addUniquePart(CONFIG.SR5.elementTypes[element], bonusArmor);
-                        }
+                // handle element changes
+                const element = Helpers.parseInputToString($(html).find('[name=element]').val());
+                if (element) {
+                    soak.element.value = element as DamageElement;
+                }
+                const bonusArmor = armor[element] ?? 0;
+                if (bonusArmor) {
+                    parts.addUniquePart(CONFIG.SR5.elementTypes[element], bonusArmor);
+                }
 
-                        // handle ap changes
-                        const ap = Helpers.parseInputToNumber($(html).find('[name=ap]').val());
-                        if (ap) {
-                            let armorVal = armor.value + bonusArmor;
+                // handle ap changes
+                const ap = Helpers.parseInputToNumber($(html).find('[name=ap]').val());
+                if (ap) {
+                    let armorVal = armor.value + bonusArmor;
 
-                            // don't take more AP than armor
-                            parts.addUniquePart('SR5.AP', Math.max(ap, -armorVal));
-                        }
+                    // don't take more AP than armor
+                    parts.addUniquePart('SR5.AP', Math.max(ap, -armorVal));
+                }
 
-                        // handle incoming damage changes
-                        const incomingDamage = Helpers.parseInputToNumber($(html).find('[name=incomingDamage]').val());
-                        if (incomingDamage) {
-                            const totalDamage = Helpers.calcTotal(soak);
-                            if (totalDamage !== incomingDamage) {
-                                const diff = incomingDamage - totalDamage;
-                                // add part and calc total again
-                                soak.mod = PartsList.AddUniquePart(soak.mod, 'SR5.UserInput', diff);
-                                soak.value = Helpers.calcTotal(soak);
-                            }
+                // handle incoming damage changes
+                const incomingDamage = Helpers.parseInputToNumber($(html).find('[name=incomingDamage]').val());
+                if (incomingDamage) {
+                    const totalDamage = Helpers.calcTotal(soak);
+                    if (totalDamage !== incomingDamage) {
+                        const diff = incomingDamage - totalDamage;
+                        // add part and calc total again
+                        soak.mod = PartsList.AddUniquePart(soak.mod, 'SR5.UserInput', diff);
+                        soak.value = Helpers.calcTotal(soak);
+                    }
 
-                            const totalAp = Helpers.calcTotal(soak.ap);
-                            if (totalAp !== ap) {
-                                const diff = ap - totalAp;
-                                // add part and calc total
-                                soak.ap.mod = PartsList.AddUniquePart(soak.ap.mod, 'SR5.UserInput', diff);
-                                soak.ap.value = Helpers.calcTotal(soak.ap);
-                            }
-                        }
+                    const totalAp = Helpers.calcTotal(soak.ap);
+                    if (totalAp !== ap) {
+                        const diff = ap - totalAp;
+                        // add part and calc total
+                        soak.ap.mod = PartsList.AddUniquePart(soak.ap.mod, 'SR5.UserInput', diff);
+                        soak.ap.value = Helpers.calcTotal(soak.ap);
+                    }
+                }
 
-                        let title = game.i18n.localize('SR5.SoakTest');
-                        resolve(
-                            ShadowrunRoller.advancedRoll({
-                                event: options?.event,
-                                actor: this,
-                                soak: soak,
-                                parts: parts.list,
-                                title: title,
-                                wounds: false,
-                            }),
-                        );
-                    },
-                }).render(true);
-            });
-        });
+                // Show the actual Soak Test.
+                let title = game.i18n.localize('SR5.SoakTest');
+                await ShadowrunRoller.advancedRoll({
+                    event: options?.event,
+                    actor: this,
+                    incomingSoak: soak,
+                    parts: parts.list,
+                    title,
+                    wounds: false,
+                });
+            }
+        })
+        return await dialog.render(true);
     }
 
     rollSingleAttribute(attId, options: ActorRollOptions) {

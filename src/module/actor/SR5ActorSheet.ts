@@ -492,10 +492,10 @@ export class SR5ActorSheet extends ActorSheet {
                 this.actor.rollDrain(options);
                 break;
             case 'defense':
-                this.actor.rollDefense(options);
+                await this.actor.rollDefense(options);
                 break;
             case 'damage-resist':
-                this.actor.rollSoak(options);
+                await this.actor.rollSoak(options);
                 break;
 
             // attribute only rolls

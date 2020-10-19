@@ -9,6 +9,7 @@ import LabelField = Shadowrun.LabelField;
 import {CORE_FLAGS, CORE_NAME, FLAGS, SYSTEM_NAME} from './constants';
 import { PartsList } from './parts/PartsList';
 import {ShadowrunRoll, ShadowrunRoller, Test} from "./rolls/ShadowrunRoller";
+import DrainData = Shadowrun.DrainData;
 
 export type TemplateData = {
     header: {
@@ -129,7 +130,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
     if (item?.hasRoll && app.isRoll) $(html).find('.card-description').hide();
 };
 
-type RollChatMessageOptions = {
+interface RollChatMessageOptions {
     actor?: SR5Actor
     token?: Token
     target?: Token
@@ -145,10 +146,13 @@ type RollChatMessageOptions = {
     previewTemplate?: boolean
 
     attack?: AttackData
+    incomingAttack?: AttackData
+    incomingDrain?: DrainData
+    incomingSoak?: DamageData
     tests?: Test[];
 }
 
-type RollChatTemplateData = {
+interface RollChatTemplateData {
     actor?: SR5Actor
     header: {
         name: string
@@ -167,6 +171,10 @@ type RollChatTemplateData = {
     previewTemplate?: boolean
 
     attack?: AttackData
+    // TODO: group 'incoming' with type field instead of multiple incoming types.
+    incomingAttack?: AttackData
+    incomingDrain?: DrainData
+    incomingSoak?: DamageData
     tests?: Test[];
 }
 
@@ -174,20 +182,21 @@ export async function createRollChatMessage(roll: ShadowrunRoll, options: RollCh
     const templateData = getRollChatTemplateData(roll, options);
     const chatData = await createChatData(templateData, roll);
     // TODO: What does displaySheet even do?
-    const message = await ChatMessage.create(chatData, {displaySheet: false});
-    console.error('New ', templateData);
-    return message;
+    return await ChatMessage.create(chatData, {displaySheet: false});
 }
 
 export function getRollChatTemplateData(roll: ShadowrunRoll, options: RollChatMessageOptions): RollChatTemplateData {
     // field extraction is explicit to enforce visible data flow to ensure clean data.
     // NOTE: As soon as clear data dynamic data flow can be established, this should be removed for a simple {...options}
-    let {actor, token, item, name, img, rollMode, target, description, title, previewTemplate, attack, tests} = options;
+    let {actor, token, item, name, img, rollMode, target, description, title, previewTemplate,
+        attack, incomingAttack, incomingDrain, incomingSoak, tests} = options;
 
     [name, img] = getPreferedNameAndImageSource(name, img, actor, token);
     const header = {name, img};
     const tokenId = getTokenSceneId(token);
+
     return {
+        roll,
         actor,
         item,
         header,
@@ -196,9 +205,11 @@ export function getRollChatTemplateData(roll: ShadowrunRoll, options: RollChatMe
         rollMode,
         title,
         description,
-        roll,
         previewTemplate,
         attack,
+        incomingAttack,
+        incomingDrain,
+        incomingSoak,
         tests
     }
 }

@@ -13,6 +13,7 @@ import { PartsList } from '../parts/PartsList';
 import {ActionTestData} from "../apps/dialogs/ShadowrunItemDialog";
 import BlastData = Shadowrun.BlastData;
 import FireModeData = Shadowrun.FireModeData;
+import DrainData = Shadowrun.DrainData;
 
 // TODO: Split up BasicRollProps into the different types of calls
 // item, actor, dicePool, attack, defense, spell, form
@@ -35,10 +36,8 @@ export interface BasicRollProps {
     attack?: AttackData
     // Incoming attack for a defense test
     incomingAttack?: AttackData;
-    incomingDrain?: LabelField & {
-        value: number;
-    };
-    soak?: DamageData;
+    incomingDrain?: DrainData;
+    incomingSoak?: DamageData;
     tests?: Test[];
     description?: object;
     previewTemplate?: boolean;
@@ -259,6 +258,9 @@ export class ShadowrunRoller {
         previewTemplate = false,
         description,
         attack,
+        incomingAttack,
+        incomingDrain,
+        incomingSoak,
         target,
         tests,
         ...props
@@ -282,46 +284,19 @@ export class ShadowrunRoller {
             }
         }
         const token = actor?.token;
-        const tokenSceneId = token ? `${token.scene._id}.${token.id}` : undefined;
-
-        [name, img] = getPreferedNameAndImageSource(name, img, actor, token);
 
         const templateData = {
-            actor,
-            token,
-            tokenId: tokenSceneId,
-            target,
-            header: {
-                name: name || '',
-                img: img || '',
-            },
-            title,
-            description,
-            rollMode,
-            limit,
-            previewTemplate,
-            attack,
-            item,
-            tests,
-            ...props,
-            roll
-        };
-
-        // In what case would no roll be present? No parts? Why would this reach any logic then?
-        if (roll) {
-            // TODO: When and where is accessed?
-            roll.templateData = templateData;
-        }
-
-        console.error('basicProps', props);
-        console.error('templateOld', templateData);
+            // tokenId: tokenSceneId,
+            actor, token, target, header: {name: name || '', img: img || '',}, title, description, rollMode, limit, previewTemplate,
+            attack, incomingAttack, incomingDrain, incomingSoak, item, tests, ...props, roll};
+        console.warn('basicProps unused', props);
 
         if (!hideRollMessage) {
-            const rollChatMessageOptions = {actor, token, target, item, name, img, rollMode, description, title, previewTemplate, attack, tests};
-            await createRollChatMessage(roll, rollChatMessageOptions);
+            const rollChatMessageOptions = {actor, token, target, item, name, img, rollMode, description, title, previewTemplate, attack, incomingAttack, incomingDrain, incomingSoak, tests};
+            const message = await createRollChatMessage(roll, rollChatMessageOptions);
 
-            const chatData = await createChatData(templateData, roll);
-            const message = await ChatMessage.create(chatData, { displaySheet: false });
+            // const chatData = await createChatData(templateData, roll);
+            // const message = await ChatMessage.create(chatData, { displaySheet: false });
             console.log(message);
         }
         return roll;

@@ -22,6 +22,10 @@ declare namespace Shadowrun {
         blast?: BlastData;
     };
 
+    type DrainData = LabelField & {
+        value: number;
+    }
+
     type SoakRollOptions = ActorRollOptions & {
         damage?: DamageData;
         attackerHits?: number;

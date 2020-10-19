@@ -578,10 +578,10 @@ export class SR5Item extends Item {
         this.update(data);
     }
 
-    async rollOpposedTest(target: SR5Actor, ev) {
+    async rollOpposedTest(target: SR5Actor, event) {
         const itemData = this.data.data;
         const options = {
-            event: ev,
+            event,
             fireModeDefense: 0,
             cover: false,
         };
@@ -598,13 +598,16 @@ export class SR5Item extends Item {
                     options.fireModeDefense = +lastAttack.fireMode.defense;
                 }
             }
-            return target.rollDefense(options, parts.list);
+            return await target.rollDefense(options, parts.list);
+
         } else if (opposed.type === 'soak') {
             options['damage'] = lastAttack?.damage;
             options['attackerHits'] = lastAttack?.hits;
-            return target.rollSoak(options, parts.list);
+            return await target.rollSoak(options, parts.list);
+
         } else if (opposed.type === 'armor') {
             return target.rollArmor(options);
+
         } else {
             if (opposed.skill && opposed.attribute) {
                 return target.rollSkill(opposed.skill, {
