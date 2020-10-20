@@ -23,21 +23,6 @@ import VehicleActorData = Shadowrun.VehicleActorData;
 import VehicleStat = Shadowrun.VehicleStat;
 
 export class SR5Actor extends Actor {
-    async update(data, options?) {
-        await super.update(data, options);
-        // trigger update for all items with action
-        // needed for rolls to properly update when items or attributes update
-        const itemUpdates: Item[] = [];
-        // @ts-ignore
-        for (let item of this.data.items) {
-            if (item && item.data.action) {
-                itemUpdates.push(item);
-            }
-        }
-        await this.updateEmbeddedEntity('OwnedItem', itemUpdates);
-        return this;
-    }
-
     getOverwatchScore() {
         const os = this.getFlag(SYSTEM_NAME, 'overwatchScore');
         return os !== undefined ? os : 0;
