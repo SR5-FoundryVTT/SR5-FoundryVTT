@@ -7,8 +7,8 @@
     "author": "Shawn Milligan [n3rf_herder#9026], Andrew Cuccinello [DJ#1982], Jan Schoska [taM#9507]",
     "esmodules": ["dist/bundle.js"],
     "styles": ["dist/bundle.css"],
-    "minimumCoreVersion": "0.6.0",
-    "compatibleCoreVersion": "0.6.6",
+    "minimumCoreVersion": "0.7.1",
+    "compatibleCoreVersion": "0.7.4",
     "languages": [
         {
             "lang": "en",
