@@ -788,8 +788,8 @@ export class SR5Item extends Item {
     }
 
     getAttackData(hits: number): AttackData | undefined {
-        const action = duplicate(this.wrapper.getData().action); // TODO replace with getAction() when available
-        if (!action?.damage.type) return undefined;
+        if (!this.data.data.action?.damage.type) return undefined;
+        const action = duplicate(this.data.data.action); // TODO replace with getAction() when available
 
         // add attribute value to the damage if we
         if (action.damage.attribute) {
