@@ -1135,7 +1135,7 @@ export class SR5Actor extends Actor {
         if (this._isLinkedToToken() && this.hasToken()) {
             const linked = true;
             const tokens = this.getActiveTokens(linked);
-            // This assumes for a token to be exist and should fail if not.
+            // This assumes for a token to exist and should fail if not.
             return tokens[0];
         }
 

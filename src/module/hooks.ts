@@ -25,7 +25,7 @@ export class HooksManager {
 
         Hooks.on('canvasInit', HooksManager.canvasInit);
         Hooks.on('ready', HooksManager.ready);
-        Hooks.on('renderChatMessage', HooksManager.readyChatMessage);
+        Hooks.on('renderChatMessage', HooksManager.renderChatMessage);
         Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
         Hooks.on('renderSceneControls', HooksManager.renderSceneControls);
@@ -111,7 +111,7 @@ export class HooksManager {
         }
     }
 
-    static readyChatMessage(app, html) {
+    static renderChatMessage(app, html) {
         chat.addRollListeners(app, html);
     }
 

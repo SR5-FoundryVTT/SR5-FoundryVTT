@@ -115,11 +115,12 @@ const createChatData = async (templateData, options?: ChatDataOptions) => {
     const chatData = {
         user: game.user._id,
         type: options?.roll ? CONST.CHAT_MESSAGE_TYPES.ROLL : CONST.CHAT_MESSAGE_TYPES.OTHER,
+        sound: options?.roll ? CONFIG.sounds.dice : undefined,
         content: html,
         roll: options?.roll ? JSON.stringify(options?.roll) : undefined,
         speaker: {
             actor: actor?._id,
-            token: actor?.token,
+            token: actor?.getToken(),
             alias: templateData.header.name,
         },
         flags: {
@@ -128,10 +129,7 @@ const createChatData = async (templateData, options?: ChatDataOptions) => {
             },
         },
     };
-    if (options?.roll) {
-        console.error('should play sound');
-        chatData['sound'] = CONFIG.sounds.dice;
-    }
+
     const rollMode = templateData.rollMode ?? game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
 
     if (['gmroll', 'blindroll'].includes(rollMode as string)) chatData['whisper'] = ChatMessage.getWhisperRecipients('GM');
@@ -189,7 +187,9 @@ function createChatTemplateData(options: ItemChatMessageOptions): ItemChatTempla
 
 export async function createRollChatMessage(options: RollChatMessageOptions): Promise<Entity<any>> {
     const templateData = getRollChatTemplateData(options);
-    return await createChatMessage(templateData);
+    // TODO: Double data is bad.
+    const chatOptions = {roll: options.roll};
+    return await createChatMessage(templateData, chatOptions);
 }
 
 
@@ -280,9 +280,12 @@ export const addRollListeners = (app: ChatMessage, html) => {
     }
 
     const item = SR5Item.getItemFromMessage(html);
+    // TODO: Move layout functionality into template
+    if (item?.hasRoll && app.isRoll) $(html).find('.card-description').hide();
 
     html.on('click', '.test', async (event) => {
         event.preventDefault();
+        const item = SR5Item.getItemFromMessage(html);
         const type = event.currentTarget.dataset.action;
         if (!item) {
             console.error(`Test of type '${type}' can't be rolled without an item dataset. This is a bug.`);
@@ -293,6 +296,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
     });
     html.on('click', '.place-template', (event) => {
         event.preventDefault();
+        const item = SR5Item.getItemFromMessage(html);
         console.error(item);
         if (item) {
             const template = Template.fromItem(item);
@@ -303,5 +307,4 @@ export const addRollListeners = (app: ChatMessage, html) => {
         event.preventDefault();
         $(event.currentTarget).siblings('.card-description').toggle();
     });
-    if (item?.hasRoll && app.isRoll) $(html).find('.card-description').hide();
 };
