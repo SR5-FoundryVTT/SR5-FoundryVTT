@@ -8,8 +8,8 @@ import { Helpers } from '../helpers';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
 import {
-    createRollChatMessage,
-    ifConfiguredCreateDefaultChatMessage
+    createRollChatMessage, createTargetChatMessage,
+    ifConfiguredCreateDefaultChatMessage, TargetChatMessageOptions
 } from '../chat';
 import {CORE_FLAGS, CORE_NAME, DEFAULT_ROLL_NAME, FLAGS, SR, SYSTEM_NAME} from '../constants';
 import { PartsList } from '../parts/PartsList';
@@ -288,10 +288,33 @@ export class ShadowrunRoller {
             attack, incomingAttack, incomingDrain, incomingSoak, item, tests, ...props, roll};
         console.warn('basicProps unused', props);
 
+
+
         if (!hideRollMessage) {
-            const rollChatMessageOptions = {actor, target, item, name, img, rollMode, description, title, previewTemplate, attack, incomingAttack, incomingDrain, incomingSoak, tests};
-            const message = await createRollChatMessage(roll, rollChatMessageOptions);
-            console.log(message);
+            const rollChatMessageOptions = {roll, actor, target, item, name, img, rollMode, description, title, previewTemplate, attack, incomingAttack, incomingDrain, incomingSoak, tests};
+            await createRollChatMessage(rollChatMessageOptions);
+        }
+
+        if (target) {
+            console.error('target', target);
+            for (const user of game.users.entities) {
+                 if (!user.character) {
+                    continue;
+                }
+
+                console.error(user.character.id === target.actor.id);
+                const targetChatMessage = {
+                    actor,
+                    target: {
+                        user, token: target
+                    },
+                    item,
+                    incomingAttack,
+                    tests
+                } as TargetChatMessageOptions;
+                await createTargetChatMessage(targetChatMessage);
+
+            }
         }
 
         return roll;

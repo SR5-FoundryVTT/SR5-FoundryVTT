@@ -4,11 +4,22 @@ import Template from './template';
 import DamageData = Shadowrun.DamageData;
 import AttackData = Shadowrun.AttackData;
 import {CORE_FLAGS, CORE_NAME, FLAGS, SYSTEM_NAME} from './constants';
-import {ShadowrunRoll, ShadowrunRoller, Test} from "./rolls/ShadowrunRoller";
+import {ShadowrunRoll, Test} from "./rolls/ShadowrunRoller";
 import DrainData = Shadowrun.DrainData;
 
+export interface TargetChatMessageOptions {
+    actor: Actor
+    target: {
+        user: User,
+        token: Token
+    }
+    item: SR5Item
+    incomingAttack: AttackData
+    tests: Test[]
+}
+
 // Simple card text messages
-interface ItemChatMessageOptions {
+export interface ItemChatMessageOptions {
     actor: SR5Actor
     item: SR5Item
     header: {
@@ -19,7 +30,8 @@ interface ItemChatMessageOptions {
     tests?: Test[]
 }
 
-interface RollChatMessageOptions {
+export interface RollChatMessageOptions {
+    roll: ShadowrunRoll
     actor?: SR5Actor
     target?: Token
 
@@ -77,9 +89,20 @@ interface RollChatTemplateData {
     tests?: Test[];
 }
 
+async function createChatMessage(templateData, options?: ChatDataOptions): Promise<Entity<any>> {
+    const chatData = await createChatData(templateData, options);
+    const message = await ChatMessage.create(chatData);
+    console.log(message);
+    return message;
+}
+
+interface ChatDataOptions {
+    roll?: ShadowrunRoll,
+    whisperTo?: User
+}
 // templateData has no datatype to pipe through whatever it's given.
 // Clean up your data within templateData creation functions!
-const createChatData = async (templateData, roll?: Roll) => {
+const createChatData = async (templateData, options?: ChatDataOptions) => {
     const template = `systems/shadowrun5e/dist/templates/rolls/roll-card.html`;
     const enhancedTemplateData = {
         ...templateData,
@@ -88,11 +111,12 @@ const createChatData = async (templateData, roll?: Roll) => {
     const html = await renderTemplate(template, enhancedTemplateData);
     const actor = templateData.actor;
 
+
     const chatData = {
         user: game.user._id,
-        type: roll ? CONST.CHAT_MESSAGE_TYPES.ROLL : CONST.CHAT_MESSAGE_TYPES.OTHER,
+        type: options?.roll ? CONST.CHAT_MESSAGE_TYPES.ROLL : CONST.CHAT_MESSAGE_TYPES.OTHER,
         content: html,
-        roll: roll ? JSON.stringify(roll) : undefined,
+        roll: options?.roll ? JSON.stringify(options?.roll) : undefined,
         speaker: {
             actor: actor?._id,
             token: actor?.token,
@@ -104,13 +128,20 @@ const createChatData = async (templateData, roll?: Roll) => {
             },
         },
     };
-    if (roll) {
+    if (options?.roll) {
+        console.error('should play sound');
         chatData['sound'] = CONFIG.sounds.dice;
     }
     const rollMode = templateData.rollMode ?? game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
 
     if (['gmroll', 'blindroll'].includes(rollMode as string)) chatData['whisper'] = ChatMessage.getWhisperRecipients('GM');
     if (rollMode === 'blindroll') chatData['blind'] = true;
+
+    if (options?.whisperTo) {
+        const {whisperTo} = options;
+        console.error('whsiper to', whisperTo);
+        chatData['whisper'] = ChatMessage.getWhisperRecipients(whisperTo.name);
+    }
 
     return chatData;
 };
@@ -127,10 +158,19 @@ export async function ifConfiguredCreateDefaultChatMessage(roll: ShadowrunRoll, 
     }
 }
 
+export async function createTargetChatMessage(options: TargetChatMessageOptions) {
+    const {user, token} = options.target;
+
+    const rollChatOptions = {...options, header: {name: token.name, img: token.data.img}, target: token};
+    const messageOptions = {whisperTo: user};
+    //@ts-ignore
+    const templateData = getRollChatTemplateData(rollChatOptions);
+    return await createChatMessage(templateData, messageOptions);
+}
+
 export async function createItemChatMessage(options: ItemChatMessageOptions) {
     const templateData = createChatTemplateData(options);
-    const chatData = await createChatData(templateData);
-    return await ChatMessage.create(chatData);
+    return await createChatMessage(templateData);
 }
 
 function createChatTemplateData(options: ItemChatMessageOptions): ItemChatTemplateData {
@@ -147,18 +187,16 @@ function createChatTemplateData(options: ItemChatMessageOptions): ItemChatTempla
     }
 }
 
-export async function createRollChatMessage(roll: ShadowrunRoll, options: RollChatMessageOptions): Promise<Entity<any>> {
-    const templateData = getRollChatTemplateData(roll, options);
-    const chatData = await createChatData(templateData, roll);
-    // TODO: What does displaySheet even do?
-    return await ChatMessage.create(chatData, {displaySheet: false});
+export async function createRollChatMessage(options: RollChatMessageOptions): Promise<Entity<any>> {
+    const templateData = getRollChatTemplateData(options);
+    return await createChatMessage(templateData);
 }
 
 
-function getRollChatTemplateData(roll: ShadowrunRoll, options: RollChatMessageOptions): RollChatTemplateData {
+function getRollChatTemplateData(options: RollChatMessageOptions): RollChatTemplateData {
     // field extraction is explicit to enforce visible data flow to ensure clean data.
     // NOTE: As soon as clear data dynamic data flow can be established, this should be removed for a simple {...options}
-    let {actor, item, name, img, target, description, title, previewTemplate,
+    let {roll, actor, item, name, img, target, description, title, previewTemplate,
         attack, incomingAttack, incomingDrain, incomingSoak, tests} = options;
 
     const rollMode = options.rollMode ?? game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
@@ -246,9 +284,12 @@ export const addRollListeners = (app: ChatMessage, html) => {
     html.on('click', '.test', async (event) => {
         event.preventDefault();
         const type = event.currentTarget.dataset.action;
-        if (item) {
-            await item.rollTestType(type, event);
+        if (!item) {
+            console.error(`Test of type '${type}' can't be rolled without an item dataset. This is a bug.`);
+            return;
         }
+
+        await item.rollTestType(type, event);
     });
     html.on('click', '.place-template', (event) => {
         event.preventDefault();
