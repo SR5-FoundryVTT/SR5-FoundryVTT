@@ -2,16 +2,19 @@ import { DataWrapper } from '../dataWrappers/DataWrapper';
 import SR5ItemType = Shadowrun.SR5ItemType;
 import ConditionData = Shadowrun.ConditionData;
 import ModList = Shadowrun.ModList;
-import SR5ItemData = Shadowrun.SR5ItemData;
+import SR5ItemDataPartial = Shadowrun.SR5ItemDataPartial;
 
 export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
-    getData(): SR5ItemData {
-        return this.data.data;
+    getType() {
+        return this.data.type;
+    }
+    getData(): SR5ItemDataPartial {
+        return (this.data.data as unknown) as SR5ItemDataPartial;
     }
 
     isAreaOfEffect(): boolean {
         // TODO figure out how to detect explosive ammo
-        return this.isGrenade() || (this.isSpell() && this.data.data.range === 'los_a'); //|| this.hasExplosiveAmmo();
+        return this.isGrenade() || (this.isSpell() && this.getData().range === 'los_a'); //|| this.hasExplosiveAmmo();
     }
 
     isArmor(): boolean {
@@ -19,11 +22,11 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
     }
 
     hasArmorBase(): boolean {
-        return this.hasArmor() && !this.data.data.armor?.mod;
+        return this.hasArmor() && !this.getData().armor?.mod;
     }
 
     hasArmorAccessory(): boolean {
-        return this.hasArmor() && (this.data.data.armor?.mod ?? false);
+        return this.hasArmor() && (this.getData().armor?.mod ?? false);
     }
 
     hasArmor(): boolean {
@@ -31,11 +34,11 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
     }
 
     isGrenade(): boolean {
-        return this.isThrownWeapon() && (this.data.data.thrown?.blast.radius ?? 0) > 0;
+        return this.isThrownWeapon() && (this.getData().thrown?.blast.radius ?? 0) > 0;
     }
 
     isThrownWeapon(): boolean {
-        return this.isWeapon() && this.data.data.category === 'thrown';
+        return this.isWeapon() && this.getData().category === 'thrown';
     }
 
     isWeapon(): boolean {
@@ -47,11 +50,11 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
     }
 
     isCombatSpell(): boolean {
-        return this.isSpell() && this.data.data.category === 'combat';
+        return this.isSpell() && this.getData().category === 'combat';
     }
 
     isRangedWeapon(): boolean {
-        return this.isWeapon() && this.data.data.category === 'range';
+        return this.isWeapon() && this.getData().category === 'range';
     }
 
     isSpell(): boolean {
@@ -63,7 +66,7 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
     }
 
     isMeleeWeapon(): boolean {
-        return this.data.type === 'weapon' && this.data.data.category === 'melee';
+        return this.data.type === 'weapon' && this.getData().category === 'melee';
     }
 
     isDevice(): boolean {
@@ -71,11 +74,11 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
     }
 
     isEquipped(): boolean {
-        return this.data.data.technology?.equipped || false;
+        return this.getData().technology?.equipped || false;
     }
 
     isCyberdeck(): boolean {
-        return this.isDevice() && this.data.data.category === 'cyberdeck';
+        return this.isDevice() && this.getData().category === 'cyberdeck';
     }
 
     getId(): string {
@@ -83,24 +86,24 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
     }
 
     getBookSource(): string {
-        return this.data.data.description.source;
+        return this.getData().description?.source ?? '';
     }
 
     getConditionMonitor(): ConditionData {
-        return this.data.data.technology?.condition_monitor ?? { value: 0, max: 0, label: '' };
+        return this.getData().technology?.condition_monitor ?? { value: 0, max: 0, label: '' };
     }
 
     getRating(): number {
-        return this.data.data.technology?.rating || 0;
+        return this.getData().technology?.rating || 0;
     }
 
     getArmorValue(): number {
-        return this.data.data?.armor?.value ?? 0;
+        return this.getData()?.armor?.value ?? 0;
     }
 
     getArmorElements(): { [key: string]: number } {
         // TODO clean this up
-        const { fire, electricity, cold, acid } = this.data.data.armor || {};
+        const { fire, electricity, cold, acid } = this.getData().armor || {};
         return { fire: fire ?? 0, electricity: electricity ?? 0, cold: cold ?? 0, acid: acid ?? 0 };
     }
 
@@ -109,11 +112,11 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
     }
 
     getEssenceLoss(): number {
-        return this.data.data?.essence ?? 0;
+        return this.getData()?.essence ?? 0;
     }
 
     getAmmo() {
-        return this.data.data.ammo;
+        return this.getData().ammo;
     }
 
     getASDF() {
@@ -148,7 +151,7 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
              *     }
              * }
              */
-            const atts: { [key: string]: { value: number; att: string } } | undefined = this.data.data.atts;
+            const atts: { [key: string]: { value: number; att: string } } | undefined = this.getData().atts;
             if (atts) {
                 for (let [key, att] of Object.entries(atts)) {
                     matrix[att.att].value = att.value;
@@ -161,64 +164,64 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
     }
 
     getQuantity(): number | undefined {
-        return this.data.data?.technology?.quantity || 1;
+        return this.getData()?.technology?.quantity || 1;
     }
 
     getActionDicePoolMod(): number | undefined {
-        return this.data.data.action?.mod;
+        return this.getData().action?.mod;
     }
 
     getLimitAttribute(): string | undefined {
-        return this.data.data.action?.limit?.attribute;
+        return this.getData().action?.limit?.attribute;
     }
 
     getActionSkill(): string | undefined {
-        return this.data.data.action?.skill;
+        return this.getData().action?.skill;
     }
 
     getActionAttribute(): string | undefined {
-        return this.data.data.action?.attribute;
+        return this.getData().action?.attribute;
     }
 
     getActionAttribute2(): string | undefined {
-        return this.data.data.action?.attribute2;
+        return this.getData().action?.attribute2;
     }
 
     getActionLimit(): number | undefined {
-        return this.data.data.action?.limit?.value;
+        return this.getData().action?.limit?.value;
     }
 
     getModifierList(): ModList<number> {
-        return this.data.data.action?.dice_pool_mod || [];
+        return this.getData().action?.dice_pool_mod || [];
     }
 
     getActionSpecialization(): string | undefined {
-        if (this.data.data.action?.spec) return 'SR5.Specialization';
+        if (this.getData().action?.spec) return 'SR5.Specialization';
         return undefined;
     }
 
     getDrain(): number {
-        return this.data.data.drain || 0;
+        return this.getData().drain || 0;
     }
 
     getFade(): number {
-        return this.data.data.fade || 0;
+        return this.getData().fade || 0;
     }
 
     getRecoilCompensation(): number {
         if (!this.isRangedWeapon()) return 0;
-        const base = this.data.data?.range?.rc.value ?? '0';
+        const base = this.getData()?.range?.rc.value ?? '0';
         return Number(base);
     }
 
     getReach(): number {
         if (this.isMeleeWeapon()) {
-            return this.data.data.melee?.reach ?? 0;
+            return this.getData().melee?.reach ?? 0;
         }
         return 0;
     }
 
     hasDefenseTest(): boolean {
-        return this.data.data.action?.opposed?.type === 'defense';
+        return this.getData().action?.opposed?.type === 'defense';
     }
 }

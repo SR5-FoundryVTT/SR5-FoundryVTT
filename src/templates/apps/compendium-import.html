@@ -1,0 +1,37 @@
+<form class="{{cssClass}}" autocomplete="off" onsubmit="event.preventDefault()">
+    <!-- <script src="modules/shadowrun5e-compendiums/module/external/xml-js.min.js"></script> -->
+    <header class="flexcol">
+        <h1>Chummer XML Data Import</h1>
+    </header>
+    <section>
+        <div class="flexcol">
+            <h3>Translation (optional for English) [lang\xx-xx_data.xml]</h3>
+            <input type="file" class="langDataFileDrop" accept="text/*"
+                   style="width: 250px; height: 250px; border: 1px solid gray;"/>
+            <div>Selected translation file: {{#if langDataFile}}<b>{{langDataFile}}</b>{{else}}None{{/if}}</div>
+            <h3>Data [data\*.xml]</h3>
+            <input type="file" class="filedatadrop" accept="text/*"
+                   style="width: 250px; height: 250px; border: 1px solid gray;" multiple/>
+            <div>(It's possible to simply select all data files)</div>
+            <p>Supported data files:</p>
+            <div style="display: grid; grid-template-columns: 200px 200px">
+                {{#each dataFiles}}
+                <div>{{this.name}}:</div>
+                <div>
+                    {{#if this.parsed}}
+                        Imported
+                    {{else}}
+                        {{#if this.missing}}<b>Missing</b>{{else}}Selected{{/if}}
+                    {{/if}}
+                </div>
+                {{/each}}
+                {{#if finishedOverallParsing}}
+                    <div><b>All files:</b></div>
+                    <div><b>Imported, enjoy.</b></div>
+                {{/if}}
+            </div>
+
+        </div>
+        <button name='import' type="submit" {{#if disableImportButton}}disabled{{/if}}>Import</button>
+    </section>
+</form>

@@ -15,6 +15,7 @@ import { createItemMacro, rollItemMacro } from './macros';
 
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
 import { SR5Combat } from './combat/SR5Combat';
+import { Import } from './importer/apps/import-form';
 
 export class HooksManager {
     static registerHooks() {
@@ -30,6 +31,7 @@ export class HooksManager {
         Hooks.on('renderSceneControls', HooksManager.renderSceneControls);
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons);
         Hooks.on('getCombatTrackerEntryContext', SR5Combat.addCombatTrackerContextOptions);
+        Hooks.on('renderItemDirectory', HooksManager.renderItemDirectory);
     }
 
     static init() {
@@ -111,5 +113,13 @@ export class HooksManager {
 
     static readyChatMessage(app, html) {
         chat.addRollListeners(app, html);
+    }
+
+    static renderItemDirectory(app: Application, html: JQuery) {
+        const button = $('<button>Import Chummer Data</button>');
+        html.find('footer').before(button);
+        button.on('click', (event) => {
+            new Import().render(true);
+        });
     }
 }

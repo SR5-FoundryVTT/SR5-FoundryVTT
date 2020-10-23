@@ -130,6 +130,11 @@ export class SR5Item extends Item {
         return this.isAreaOfEffect();
     }
 
+    /**
+     * PREPARE DATA CANNOT PULL FROM this.actor at ALL
+     * - as of foundry v0.7.4, actor data isn't prepared by the time we prepare items
+     * - this caused issues with Actions that have a Limit or Damage attribute and so those were moved
+     */
     prepareData() {
         super.prepareData();
         const labels = {};
@@ -212,29 +217,6 @@ export class SR5Item extends Item {
             action.damage.ap.value = Helpers.calcTotal(action.damage.ap);
 
             action.limit.value = Helpers.calcTotal(action.limit);
-
-            if (this.actor) {
-                if (action.damage.attribute) {
-                    const { attribute } = action.damage;
-                    // TODO convert this in the template
-                    action.damage.mod = PartsList.AddUniquePart(
-                        action.damage.mod,
-                        game.i18n.localize(CONFIG.SR5.attributes[attribute]),
-                        this.actor.findAttribute(attribute)?.value,
-                    );
-                    action.damage.value = Helpers.calcTotal(action.damage);
-                }
-                if (action.limit.attribute) {
-                    const { attribute } = action.limit;
-                    // TODO convert this in the template
-                    action.limit.mod = PartsList.AddUniquePart(
-                        action.limit.mod,
-                        game.i18n.localize(CONFIG.SR5.limits[attribute]),
-                        this.actor.findLimit(attribute)?.value,
-                    );
-                    action.limit.value = Helpers.calcTotal(action.limit);
-                }
-            }
         }
 
         if (range) {
@@ -836,6 +818,17 @@ export class SR5Item extends Item {
             return undefined;
         }
 
+        const action = duplicate(this.data.data.action); // TODO replace with getAction() when available
+
+        // add attribute value to the damage if we
+        if (action.damage.attribute) {
+            const { attribute } = action.damage;
+            const att = this.actor.findAttribute(attribute);
+            if (att) {
+                action.damage.mod = PartsList.AddUniquePart(action.damage.mod, att.label, att.value);
+                action.damage.value = Helpers.calcTotal(action.damage);
+            }
+        }
         const {damage} = this.getAction();
         const data: AttackData = {
             hits,
@@ -893,12 +886,13 @@ export class SR5Item extends Item {
     }
 
     getLimit(): LimitField | undefined {
-        const limit = this.data.data.action?.limit;
+        const limit = duplicate(this.data.data.action?.limit);
         if (!limit) return undefined;
+        // go through and set the label correctly
         if (this.data.type === 'weapon') {
             limit.label = 'SR5.Accuracy';
         } else if (limit?.attribute) {
-            limit.label = CONFIG.SR5.attributes[limit.attribute];
+            limit.label = CONFIG.SR5.limits[limit.attribute];
         } else if (this.isSpell()) {
             limit.value = this.getLastSpellForce().value;
             limit.label = 'SR5.Force';
@@ -908,6 +902,16 @@ export class SR5Item extends Item {
         } else {
             limit.label = 'SR5.Limit';
         }
+
+        // adjust limit value for actor data
+        if (limit.attribute) {
+            const att = this.actor.findLimit(limit.attribute);
+            if (att) {
+                limit.mod = PartsList.AddUniquePart(limit.mod, att.label, att.value);
+                Helpers.calcTotal(limit);
+            }
+        }
+
         return limit;
     }
 
@@ -1040,7 +1044,17 @@ export class SR5Item extends Item {
     }
 
     getActionLimit(): number | undefined {
-        return this.wrapper.getActionLimit();
+        let limit = this.wrapper.getActionLimit();
+        // get the limit modifiers from the actor if we have them
+        const action = this.wrapper.getData().action; // TODO replace with the getAction() when available
+        if (action?.limit.attribute && limit && this.actor) {
+            const { attribute } = action.limit;
+            const att = this.actor.findAttribute(attribute);
+            if (att) {
+                limit += att.value;
+            }
+        }
+        return limit;
     }
 
     getModifierList(): ModList<number> {

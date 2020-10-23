@@ -40,13 +40,33 @@ export const ChatData = {
             if (data.action.type !== '' && data.action.type !== 'varies' && data.action.type !== 'none') {
                 props.push(`${Helpers.label(data.action.type)} Action`);
             }
-            if (data.action.limit.value) props.push(`Limit ${data.action.limit.value}`);
+            if (data.action.limit) {
+                const { limit } = data.action;
+                const attribute = limit.attribute ? `${game.i18n.localize(CONFIG.SR5.limits[limit.attribute])}` : '';
+                const limitVal = limit.value ? limit.value : '';
+                let limitStr = '';
+                if (attribute) {
+                    limitStr += attribute;
+                }
+                if (limitVal) {
+                    if (attribute) {
+                        limitStr += ' + ';
+                    }
+                    limitStr += limitVal;
+                }
+
+                if (limitStr) {
+                    props.push(`Limit ${limitStr}`);
+                }
+            }
             if (data.action.damage.type.value) {
                 const { damage } = data.action;
                 let damageString = '';
                 let elementString = '';
-                if (damage.value) {
-                    damageString = `DV ${damage.value}${damage.type.value ? damage.type.value.toUpperCase().charAt(0) : ''}`;
+                const attribute = damage.attribute ? `${game.i18n.localize(CONFIG.SR5.attributes[damage.attribute])} + ` : '';
+                if (damage.value || attribute) {
+                    const type = damage.type.value ? damage.type.value.toUpperCase().charAt(0) : '';
+                    damageString = `DV ${attribute}${damage.value}${type}`;
                 }
                 if (damage.element.value) {
                     // if we have a damage value and are electric, follow the convention of (e) after

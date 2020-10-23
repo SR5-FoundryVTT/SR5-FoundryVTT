@@ -21,24 +21,8 @@ import DamageElement = Shadowrun.DamageElement;
 import EdgeAttributeField = Shadowrun.EdgeAttributeField;
 import VehicleActorData = Shadowrun.VehicleActorData;
 import VehicleStat = Shadowrun.VehicleStat;
-import RemovableSkills = Shadowrun.RemovableSkills;
 
 export class SR5Actor extends Actor {
-    async update(data, options?) {
-        await super.update(data, options);
-        // trigger update for all items with action
-        // needed for rolls to properly update when items or attributes update
-        const itemUpdates: Item[] = [];
-        // @ts-ignore
-        for (let item of this.data.items) {
-            if (item && item.data.action) {
-                itemUpdates.push(item);
-            }
-        }
-        await this.updateEmbeddedEntity('OwnedItem', itemUpdates);
-        return this;
-    }
-
     getOverwatchScore() {
         const os = this.getFlag(SYSTEM_NAME, 'overwatchScore');
         return os !== undefined ? os : 0;
@@ -176,8 +160,8 @@ export class SR5Actor extends Actor {
         return skill;
     }
 
-    getSkill(skillId: string): SkillField|undefined {
-        const {skills} = this.data.data;
+    getSkill(skillId: string): SkillField | undefined {
+        const { skills } = this.data.data;
         if (skills.active.hasOwnProperty(skillId)) {
             return skills.active[skillId];
         }
@@ -336,30 +320,31 @@ export class SR5Actor extends Actor {
                 value: this.getFullDefenseAttribute()?.value,
                 initMod: -10,
             },
-        };
-        // if we have a melee attack
-        if (options.incomingAttack?.reach) {
-            activeDefenses['dodge'] = {
+            dodge: {
                 label: 'SR5.Dodge',
                 value: this.findActiveSkill('gymnastics')?.value,
                 initMod: -5,
-            };
-            activeDefenses['block'] = {
+            },
+            block: {
                 label: 'SR5.Block',
                 value: this.findActiveSkill('unarmed_combat')?.value,
                 initMod: -5,
+            },
+        };
+
+        const equippedMeleeWeapons = this.getEquippedWeapons().filter((w) => w.isMeleeWeapon());
+        let defenseReach = 0;
+        equippedMeleeWeapons.forEach((weapon) => {
+            activeDefenses[`parry-${weapon.name}`] = {
+                label: 'SR5.Parry',
+                weapon: weapon.name,
+                value: this.findActiveSkill(weapon.getActionSkill())?.value,
+                init: -5,
             };
-            const equippedMeleeWeapons = this.getEquippedWeapons().filter((w) => w.isMeleeWeapon());
-            let defenseReach = 0;
-            equippedMeleeWeapons.forEach((weapon) => {
-                activeDefenses[`parry-${weapon.name}`] = {
-                    label: 'SR5.Parry',
-                    weapon: weapon.name,
-                    value: this.findActiveSkill(weapon.getActionSkill())?.value,
-                    init: -5,
-                };
-                defenseReach = Math.max(defenseReach, weapon.getReach());
-            });
+            defenseReach = Math.max(defenseReach, weapon.getReach());
+        });
+        // if we are defending a melee attack
+        if (options.incomingAttack?.reach) {
             const incomingReach = options.incomingAttack.reach;
             const netReach = defenseReach - incomingReach;
             if (netReach !== 0) {
@@ -1034,7 +1019,7 @@ export class SR5Actor extends Actor {
         }
         const mod = this.getModifier('soak');
         if (mod) {
-            parts.addUniquePart("SR5.Bonus", mod);
+            parts.addUniquePart('SR5.Bonus', mod);
         }
         this._addArmorParts(parts);
     }
