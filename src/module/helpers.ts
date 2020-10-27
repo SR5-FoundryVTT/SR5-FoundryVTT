@@ -215,4 +215,13 @@ export class Helpers {
 
         return name.slice(0, length).toUpperCase();
     }
+
+    static convertIndexedObjectToArray(indexedObject: object): object[] {
+        return Object.keys(indexedObject).map(index => {
+            if (Number.isNaN(index)) {
+                console.warn('An object with no numerical index was given, which is likely a bug.', indexedObject);
+            }
+            return indexedObject[index];
+        })
+    }
 }
