@@ -17,13 +17,22 @@
         "gulp-sass": "^4.1.0",
         "gulp-sourcemaps": "^2.6.5",
         "gulplog": "^1.0.0",
+        "jest": "^26.6.3",
+        "jest-playwright-preset": "^1.4.4",
         "lodash.assign": "^4.2.0",
         "node-sass": "^4.14.1",
+        "playwright": "^1.7.1",
+        "ts-jest": "^26.4.3",
         "tsify": "^4.0.2",
         "typescript": "^3.9.7",
         "vinyl-buffer": "^1.0.1",
         "vinyl-source-stream": "^2.0.0",
         "watchify": "^3.11.1",
         "xml2js": "^0.4.23"
+    },
+    "dependencies": {},
+    "scripts": {
+        "test": "jest",
+        "test.watch": "jest --watchAll"
     }
 }

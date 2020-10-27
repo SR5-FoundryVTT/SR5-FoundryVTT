@@ -36,3 +36,11 @@ docker-compose down
 docker-compose up
 ```
 
+# Tests
+
+The current system has a very basic test harness using
+[`playwright`](https://github.com/microsoft/playwright).
+
+To run the tests use `npm test` - this will lauch a `chromium` browser against
+`localhost:30000` and attempt to create a new world for the Shadowrun rulesystem
+to run tests against.

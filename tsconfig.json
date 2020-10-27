@@ -1,10 +1,14 @@
 {
     "compilerOptions": {
-      "target": "es6",
-      "strictNullChecks": true,
-      "types": [
-        "foundry-pc-types",
-        "node"
-      ]
+        "target": "es6",
+        "strictNullChecks": true,
+        "moduleResolution": "node",
+        "types": [
+            "foundry-pc-types",
+            "node",
+            "jest",
+            "jest-playwright-preset",
+            "expect-playwright"
+        ]
     }
-  }
+}
