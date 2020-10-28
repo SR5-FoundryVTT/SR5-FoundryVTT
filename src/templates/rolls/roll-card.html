@@ -4,8 +4,12 @@
     data-item-id="{{item._id}}"
     data-token-id="{{tokenId}}"
 >
+     <div class="card-title card-header flexrow">
+         <a class="chat-select-link" data-token-id="{{speaker.token.id}}"><img src="{{speaker.token.data.img}}" class="entity-selectable" title="{{speaker.token.name}}" width="36" height="36"/></a>
+         <h3 class="header-name"><a class="chat-entity-link" data-entity="Token" data-id="{{speaker.token.id}}">{{speaker.token.name}}</a></h3>
+    </div>
     {{#if header}}
-        <div class="card-title card-header flexrow">
+        <div class="header-title card-header flexrow">
             {{#if header.img}}
                 <img src="{{header.img}}" title="{{header.name}}" width="36" height="36" />
             {{/if}}
@@ -13,12 +17,6 @@
                 <h3 class="header-name">{{header.name}}</h3>
             {{/if}}
         </div>
-    {{/if}}
-    {{#if target}}
-     <div class="card-title card-header flexrow">
-        <img src="{{target.data.img}}" title="{{target.name}}" width="36" height="36" />
-        <h3 class="header-name">Target: {{target.name}}</h3>
-    </div>
     {{/if}}
     {{#if description}}
     <div class="card-description">
@@ -174,6 +172,12 @@
         <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Glitch'}}" {{/if}}>
             {{localize "SR5.Glitch"}}
         </div>
+    </div>
+    {{/if}}
+    {{#if target}}
+     <div class="card-title card-header flexrow">
+         <a class="chat-select-link" data-token-id="{{target.id}}"><img src="{{target.data.img}}" title="{{target.name}}" width="36" height="36" /></a>
+        <h3 class="header-name"><a class="chat-entity-link" draggable="false" data-entity="Token" data-id="{{target.id}}">{{target.name}}</a></h3>
     </div>
     {{/if}}
     {{#if tests}}

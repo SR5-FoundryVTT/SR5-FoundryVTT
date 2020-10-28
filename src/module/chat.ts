@@ -92,7 +92,7 @@ interface RollChatTemplateData {
 async function createChatMessage(templateData, options?: ChatDataOptions): Promise<Entity<any>> {
     const chatData = await createChatData(templateData, options);
     const message = await ChatMessage.create(chatData);
-    console.log(message);
+    console.log('Chat Message', message, chatData);
     return message;
 }
 
@@ -104,12 +104,20 @@ interface ChatDataOptions {
 // Clean up your data within templateData creation functions!
 const createChatData = async (templateData, options?: ChatDataOptions) => {
     const template = `systems/shadowrun5e/dist/templates/rolls/roll-card.html`;
+    const actor = templateData.actor;
+    const token = actor?.getToken();
+
+    console.error(actor, token);
+    //@ts-ignore
     const enhancedTemplateData = {
         ...templateData,
+        speaker: {
+            actor, token
+        },
         showGlitchAnimation: game.settings.get(SYSTEM_NAME, FLAGS.ShowGlitchAnimation),
     };
     const html = await renderTemplate(template, enhancedTemplateData);
-    const actor = templateData.actor;
+
 
 
     const chatData = {
@@ -121,13 +129,13 @@ const createChatData = async (templateData, options?: ChatDataOptions) => {
         speaker: {
             actor: actor?._id,
             token: actor?.getToken(),
-            alias: templateData.header.name,
+            alias: templateData.header.name
         },
         flags: {
             shadowrun5e: {
                 customRoll: true,
             },
-        },
+        }
     };
 
     const rollMode = templateData.rollMode ?? game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
@@ -303,8 +311,33 @@ export const addRollListeners = (app: ChatMessage, html) => {
             template?.drawPreview();
         }
     });
-    html.on('click', '.card-title', (event) => {
+    html.on('click', '.header-title', (event) => {
         event.preventDefault();
         $(event.currentTarget).siblings('.card-description').toggle();
+    });
+
+    html.on('click', '.chat-entity-link', event => {
+        event.preventDefault();
+        const entityLink = $(event.currentTarget);
+        const id = entityLink.data('id');
+        const type = entityLink.data('entity');
+        // TODO: Refactor for multi entity type usability.
+        if (id && type === 'Token') {
+            const token = canvas.tokens.get(id);
+            const sheet = token.actor.sheet;
+            sheet.render(true, {token: token});
+        }
+    });
+
+    html.on('click', '.chat-select-link', event => {
+        event.preventDefault();
+
+        const selectLink = $(event.currentTarget);
+        const tokenId = selectLink.data('tokenId');
+        const token = canvas.tokens.get(tokenId);
+
+        if (token) {
+            token.control();
+        }
     });
 };
