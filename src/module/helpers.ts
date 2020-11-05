@@ -290,7 +290,8 @@ export class Helpers {
         const tokens = Helpers.getControlledTokens();
         const actors = tokens.map(token => token.actor) as SR5Actor[];
 
-        if (actors.length === 0) {
+        // Try to default to a users character.
+        if (actors.length === 0 && game.user?.character) {
             actors.push(game.user.character as SR5Actor);
         }
 
