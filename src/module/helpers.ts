@@ -231,6 +231,29 @@ export class Helpers {
         }
     }
 
+    static getSceneToken(sceneTokenId: string): Token|undefined {
+        const [sceneId, tokenId] = sceneTokenId.split('.');
+
+        const isActiveScene = sceneId === canvas?.scene._id;
+        if (isActiveScene) {
+            return canvas.tokens.get(tokenId);
+        }
+
+        // Build Token using it's data from the connected scene as a fallback.
+        const scene = game.scenes.get(sceneId);
+        if (!scene) {
+            return;
+        }
+
+        //@ts-ignore
+        const tokenData = scene.data.tokens.find((t) => t.id === Number(tokenId));
+        if (!tokenData) {
+            return;
+        }
+
+        return new Token(tokenData);
+    }
+
     static getUserTargets(user?: User): Token[] {
         user = user ? user : game.user;
 

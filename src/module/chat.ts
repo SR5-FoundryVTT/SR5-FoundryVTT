@@ -6,6 +6,7 @@ import AttackData = Shadowrun.AttackData;
 import {CORE_FLAGS, CORE_NAME, FLAGS, SYSTEM_NAME} from './constants';
 import {ShadowrunRoll, Test} from "./rolls/ShadowrunRoller";
 import DrainData = Shadowrun.DrainData;
+import {Helpers} from "./helpers";
 
 export interface TargetChatMessageOptions {
     actor: Actor
@@ -185,6 +186,7 @@ function createChatTemplateData(options: ItemChatMessageOptions): ItemChatTempla
 
 export async function createRollChatMessage(options: RollChatMessageOptions): Promise<Entity<any>> {
     const templateData = getRollChatTemplateData(options);
+    console.warn(templateData);
     // TODO: Double data is bad.
     const chatOptions = {roll: options.roll};
     return await createChatMessage(templateData, chatOptions);
@@ -310,12 +312,32 @@ export const addRollListeners = (app: ChatMessage, html) => {
         const entityLink = $(event.currentTarget);
         const id = entityLink.data('id');
         const type = entityLink.data('entity');
+
+        if (!id) return;
+
         // TODO: Refactor for multi entity type usability.
-        if (id && type === 'Token') {
-            const token = canvas.tokens.get(id);
-            const sheet = token.actor.sheet;
-            sheet.render(true, {token: token});
-        }
+       if (type === 'Token') {
+           const token = canvas.tokens.get(id);
+           const sheet = token.actor.sheet;
+           sheet.render(true, {token: token});
+       }
+
+       else if (type === 'Item') {
+           const card = entityLink.closest('.chat-card');
+           const sceneTokenId = card.data('tokenId');
+
+           const token = Helpers.getSceneToken(sceneTokenId)
+
+           console.error(sceneTokenId, token);
+
+           if (!token) return;
+
+           const item = token.actor.getOwnedItem(id);
+
+           console.error(id, item);
+
+           if (item) item.sheet.render(true);
+       }
     });
 
     html.on('click', '.chat-select-link', event => {
