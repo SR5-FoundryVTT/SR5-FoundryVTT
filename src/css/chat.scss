@@ -76,9 +76,10 @@
     &.roll-card {
         margin: 0.15em;
         .card-title {
+            display: flex;
             font-size: 14px;
             border-bottom: $groove;
-            justify-content: left;
+            justify-content: flex-start;
             align-content: center;
             align-items: flex-end;
             > * {

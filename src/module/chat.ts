@@ -311,7 +311,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
             template?.drawPreview();
         }
     });
-    html.on('click', '.header-title', (event) => {
+    html.on('click', '.card-title', (event) => {
         event.preventDefault();
         $(event.currentTarget).siblings('.card-description').toggle();
     });
