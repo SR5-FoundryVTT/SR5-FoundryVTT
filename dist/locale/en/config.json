@@ -179,6 +179,7 @@
     "SR5.RecoilCompensation": "RC",
     "SR5.Equip": "Equip",
     "SR5.Damage": "Damage",
+    "SR5.OutOfRange": "Out of Range",
 
     "SR5.Spell": "Spell",
     "SR5.SpellCategory": "Category",
@@ -502,6 +503,7 @@
     "SR5.ExtendedTest": "Extended Test",
     "SR5.IncomingDamage": "Incoming Damage",
     "SR5.Temporary": "Temporary",
+    "SR5.SelectedTargets": "Selected Targets",
 
     "SR5.ApplyWounds": "Apply Wounds",
     "SR5.DontApplyWounds": "Don't Apply Wounds",

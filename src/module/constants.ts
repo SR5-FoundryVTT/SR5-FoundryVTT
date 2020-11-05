@@ -6,6 +6,7 @@ export const FLAGS = {
     ApplyLimits: 'applyLimits',
     LastRollPromptValue: 'lastRollPromptValue',
     DisplayDefaultRollCard: 'displayDefaultRollCard',
+    EmbeddedItems: 'embeddedItems'
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {

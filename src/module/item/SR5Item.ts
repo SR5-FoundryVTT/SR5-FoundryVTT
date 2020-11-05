@@ -4,7 +4,7 @@ import {ActionTestData, ShadowrunItemDialog} from '../apps/dialogs/ShadowrunItem
 import {ChatData} from './ChatData';
 import {AdvancedRollProps, ShadowrunRoll, ShadowrunRoller, Test} from '../rolls/ShadowrunRoller';
 import {createItemChatMessage} from '../chat';
-import {DEFAULT_ROLL_NAME, SYSTEM_NAME} from '../constants';
+import {DEFAULT_ROLL_NAME, FLAGS, SYSTEM_NAME} from '../constants';
 import {SR5ItemDataWrapper} from './SR5ItemDataWrapper';
 import {PartsList} from '../parts/PartsList';
 import ModList = Shadowrun.ModList;
@@ -17,10 +17,6 @@ import SpellForceData = Shadowrun.SpellForceData;
 import ComplexFormLevelData = Shadowrun.ComplexFormLevelData;
 import FireRangeData = Shadowrun.FireRangeData;
 import BlastData = Shadowrun.BlastData;
-import { ChatData } from './ChatData';
-import { AdvancedRollProps, ShadowrunRoll, ShadowrunRoller } from '../rolls/ShadowrunRoller';
-import { createChatData } from '../chat';
-import { SYSTEM_NAME } from '../constants';
 import ConditionData = Shadowrun.ConditionData;
 import SR5ItemType = Shadowrun.SR5ItemType;
 

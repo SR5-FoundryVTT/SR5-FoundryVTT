@@ -4,8 +4,12 @@
     data-item-id="{{item._id}}"
     data-token-id="{{tokenId}}"
 >
+     <div class="card-title card-header flexrow">
+         <a class="chat-select-link" data-token-id="{{speaker.token.id}}"><img src="{{speaker.token.data.img}}" class="entity-selectable" title="{{speaker.token.name}}" width="36" height="36"/></a>
+         <h3 class="header-name"><a class="chat-entity-link" data-entity="Token" data-id="{{speaker.token.id}}">{{speaker.token.name}}</a></h3>
+    </div>
     {{#if header}}
-        <div class="card-title card-header flexrow">
+        <div class="header-title card-header flexrow">
             {{#if header.img}}
                 <img src="{{header.img}}" title="{{header.name}}" width="36" height="36" />
             {{/if}}
@@ -26,10 +30,10 @@
         </footer>
     </div>
     {{/if}}
-    {{#if (isDefined testName)}}
+    {{#if (isDefined title)}}
     <div class="test-line">
-        <span class="test-name {{#unless (isDefined hits)}}test-roll{{/unless}}">
-            {{testName}}
+        <span class="test-name {{#unless (isDefined roll.hits)}}test-roll{{/unless}}">
+            {{title}}
         </span>
         {{#if previewTemplate}}
         <div class="roll" title="{{localize 'SR5.PlaceTemplate'}}">
@@ -39,25 +43,25 @@
     </div>
     <div class="card-content">
         <div class="left-side">
-            {{#if (isDefined hits)}}
+            {{#if (isDefined roll.hits)}}
             <div class="limit-line">
                 <span class="key">{{localize "SR5.Hits"}}: </span
-                ><span class="value">{{hits}}</span>
+                ><span class="value">{{roll.hits}}</span>
             </div>
-            {{/if}} {{#if limit.value}}
+            {{/if}} {{#if roll.limit.value}}
             <div class="limit-line" title="{{localize limit.label}}">
                 <span class="key">{{localize "SR5.Limit"}}: </span>
-                <span class="value">{{limit.value}}</span>
+                <span class="value">{{roll.limit.value}}</span>
             </div>
-            {{/if}} {{#if attack.damage}}
+            {{/if}}
+            {{#if attack.damage}}
             <div class="damage-line">
                 {{#if attack.damage.value}}
                 <div>
                     <span class="key">{{localize "SR5.DV"}}: </span>
-                    <span class="value"
-                        >{{attack.damage.value}}{{damageAbbreviation
-                        attack.damage.type.value}}</span
-                    >
+                    <span class="value">
+                        {{attack.damage.value}}{{damageAbbreviation attack.damage.type.value}}
+                    </span>
                 </div>
                 {{/if}} {{#if attack.damage.ap.value}}
                 <div>
@@ -104,21 +108,21 @@
                 <span class="key">{{localize "SR5.Dropoff"}}: </span>
                 <span class="value">{{attack.blast.dropoff}}/m</span>
             </div>
-            {{/if}} {{#if soak}}
+            {{/if}} {{#if incomingSoak}}
             <div class="category-line">
                 {{localize "SR5.Incoming"}}
             </div>
             <div class="damage-line">
-                {{#if soak.value}}
+                {{#if incomingSoak.value}}
                 <div>
                     <span class="key">{{localize "SR5.Damage"}}: </span>
-                    <span class="value">{{soak.value}}{{damageAbbreviation soak.type.value}}</span>
+                    <span class="value">{{incomingSoak.value}}{{damageAbbreviation incomingSoak.type.value}}</span>
                 </div>
-                {{/if}} {{#if soak.element.value}}
+                {{/if}} {{#if incomingSoak.element.value}}
                 <div>
                     <i
-                            class="{{elementIcon soak.element.value}} icon"
-                            title="{{localize soak.element.value}}"
+                            class="{{elementIcon incomingSoak.element.value}} icon"
+                            title="{{localize incomingSoak.element.value}}"
                     ></i>
                 </div>
                 {{/if}}
@@ -133,8 +137,8 @@
                 {{localize "SR5.Incoming"}}
             </div>
             <div class="limit-line">
-                <span class="key"
-                    >{{localize incomingDrain.label}}:
+                <span class="key">
+                    {{localize incomingDrain.label}}:
                 </span>
                 <span class="value">{{incomingDrain.value}}</span>
             </div>
@@ -142,32 +146,38 @@
         </div>
         <div class="right-side">
             <div class="roll-parts">
-                {{#each parts as |part id|}}
+                {{#each roll.parts as |part id|}}
                 <div class="limit-line">
                     <span class="key" title="{{localize part.name}}">{{localize part.name}}:</span> <span class="value">{{part.value}}</span>
                 </div>
-                {{/each}} {{#if (isDefined dicePool)}}
+                {{/each}} {{#if (isDefined roll)}}
                 <div class="limit-line">
                     <span class="key bold">{{localize 'SR5.DicePool'}}:</span>
-                    <span class="value">{{dicePool}}</span>
+                    <span class="value">{{roll.pool}}</span>
                 </div>
                 {{/if}}
             </div>
         </div>
     </div>
     <div class="dice-roll-content">
-        {{#each dice}}
+        {{#each roll.sides}}
         <div class="dice-roll {{diceIcon this}}">
             <div class="result-text">{{this}}</div>
         </div>
         {{/each}}
     </div>
     {{/if}}
-    {{#if glitch}}
+    {{#if roll.glitched}}
     <div class="glitch-content">
         <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Glitch'}}" {{/if}}>
             {{localize "SR5.Glitch"}}
         </div>
+    </div>
+    {{/if}}
+    {{#if target}}
+     <div class="card-title card-header flexrow">
+         <a class="chat-select-link" data-token-id="{{target.id}}"><img src="{{target.data.img}}" title="{{target.name}}" width="36" height="36" /></a>
+        <h3 class="header-name"><a class="chat-entity-link" draggable="false" data-entity="Token" data-id="{{target.id}}">{{target.name}}</a></h3>
     </div>
     {{/if}}
     {{#if tests}}
