@@ -18367,6 +18367,7 @@ exports.SR5 = {
     },
     mountPoints: {
         barrel: 'SR5.Barrel',
+        under_barrel: 'SR5.UnderBarrel',
         stock: 'SR5.Stock',
         top: 'SR5.Top',
         side: 'SR5.Side',
@@ -18516,9 +18517,9 @@ exports.SR5 = {
             elf: 'SR5.Character.Types.Elf',
             ork: 'SR5.Character.Types.Ork',
             dwarf: 'SR5.Character.Types.Dwarf',
-            troll: 'SR5.Character.Types.Troll'
-        }
-    }
+            troll: 'SR5.Character.Types.Troll',
+        },
+    },
 };
 
 },{}],114:[function(require,module,exports){
@@ -18529,7 +18530,8 @@ exports.SYSTEM_NAME = 'shadowrun5e';
 exports.FLAGS = {
     ShowGlitchAnimation: 'showGlitchAnimation',
     ShowTokenNameForChatOutput: 'showTokenNameInsteadOfActor',
-    MessageCustomRoll: 'customRoll'
+    MessageCustomRoll: 'customRoll',
+    EmbeddedItems: 'embeddedItems'
 };
 exports.GLITCH_DIE = 1;
 exports.METATYPEMODIFIER = 'SR5.Character.Modifiers.NPCMetatypeAttribute';
@@ -19428,7 +19430,9 @@ class Helpers {
         if (data['temp'] !== undefined) {
             parts.addUniquePart('SR5.Temporary', data['temp']);
         }
-        data.value = parts.total + data.base;
+        const decimalCount = 3;
+        const mult = Math.pow(10, decimalCount);
+        data.value = Math.round((parts.total + data.base) * mult) / mult;
         data.mod = parts.list;
         return data.value;
     }
@@ -19636,6 +19640,14 @@ class Helpers {
             length = name.length;
         }
         return name.slice(0, length).toUpperCase();
+    }
+    static convertIndexedObjectToArray(indexedObject) {
+        return Object.keys(indexedObject).map((index) => {
+            if (Number.isNaN(index)) {
+                console.warn('An object with no numerical index was given, which is likely a bug.', indexedObject);
+            }
+            return indexedObject[index];
+        });
     }
 }
 exports.Helpers = Helpers;
@@ -22715,21 +22727,22 @@ class SR5Item extends Item {
      * TODO properly types this
      */
     getEmbeddedItems() {
-        let items = this.getFlag(constants_1.SYSTEM_NAME, 'embeddedItems');
-        if (items) {
-            // moved this "hotfix" to here so that everywhere that accesses the flag just gets an array -- Shawn
-            //TODO: This is a hotfix. Items should either always be
-            // stored as an array or always be stored as a object.
-            if (!Array.isArray(items)) {
-                let newItems = [];
-                for (const key of Object.keys(items)) {
-                    newItems.push(items[key]);
-                }
-                return newItems;
-            }
-            return items;
+        let items = this.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.EmbeddedItems);
+        items = items ? items : [];
+        // moved this "hotfix" to here so that everywhere that accesses the flag just gets an array -- Shawn
+        //TODO: This is a hotfix. Items should either always be
+        // stored as an array or always be stored as a object.
+        if (items && !Array.isArray(items)) {
+            items = helpers_1.Helpers.convertIndexedObjectToArray(items);
         }
-        return [];
+        // Manually map wrongly converted array fields...
+        items = items.map(item => {
+            if (item.effects && !Array.isArray(item.effects)) {
+                item.effects = helpers_1.Helpers.convertIndexedObjectToArray(item.effects);
+            }
+            return item;
+        });
+        return items;
     }
     /**
      * Set the embedded item data
@@ -22739,12 +22752,12 @@ class SR5Item extends Item {
         return __awaiter(this, void 0, void 0, function* () {
             // clear the flag first to remove the previous items - if we don't do this then it doesn't actually "delete" any items
             // await this.unsetFlag(SYSTEM_NAME, 'embeddedItems');
-            yield this.setFlag(constants_1.SYSTEM_NAME, 'embeddedItems', items);
+            yield this.setFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.EmbeddedItems, items);
         });
     }
     clearEmbeddedItems() {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.unsetFlag(constants_1.SYSTEM_NAME, 'embeddedItems');
+            yield this.unsetFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.EmbeddedItems);
         });
     }
     getLastAttack() {

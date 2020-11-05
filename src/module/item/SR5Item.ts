@@ -17,6 +17,10 @@ import SpellForceData = Shadowrun.SpellForceData;
 import ComplexFormLevelData = Shadowrun.ComplexFormLevelData;
 import FireRangeData = Shadowrun.FireRangeData;
 import BlastData = Shadowrun.BlastData;
+import { ChatData } from './ChatData';
+import { AdvancedRollProps, ShadowrunRoll, ShadowrunRoller } from '../rolls/ShadowrunRoller';
+import { createChatData } from '../chat';
+import { SYSTEM_NAME } from '../constants';
 import ConditionData = Shadowrun.ConditionData;
 import SR5ItemType = Shadowrun.SR5ItemType;
 
@@ -61,21 +65,26 @@ export class SR5Item extends Item {
      * TODO properly types this
      */
     getEmbeddedItems(): any[] {
-        let items = this.getFlag(SYSTEM_NAME, 'embeddedItems');
-        if (items) {
-            // moved this "hotfix" to here so that everywhere that accesses the flag just gets an array -- Shawn
-            //TODO: This is a hotfix. Items should either always be
-            // stored as an array or always be stored as a object.
-            if (!Array.isArray(items)) {
-                let newItems: any[] = [];
-                for (const key of Object.keys(items)) {
-                    newItems.push(items[key]);
-                }
-                return newItems;
-            }
-            return items;
+        let items = this.getFlag(SYSTEM_NAME, FLAGS.EmbeddedItems);
+
+        items = items ? items : [];
+
+        // moved this "hotfix" to here so that everywhere that accesses the flag just gets an array -- Shawn
+        //TODO: This is a hotfix. Items should either always be
+        // stored as an array or always be stored as a object.
+        if (items && !Array.isArray(items)) {
+            items = Helpers.convertIndexedObjectToArray(items);
         }
-        return [];
+
+        // Manually map wrongly converted array fields...
+        items = items.map(item => {
+            if (item.effects && !Array.isArray(item.effects)) {
+                item.effects = Helpers.convertIndexedObjectToArray(item.effects);
+            }
+            return item;
+        });
+
+        return items;
     }
 
     /**
@@ -85,11 +94,11 @@ export class SR5Item extends Item {
     async setEmbeddedItems(items: any[]) {
         // clear the flag first to remove the previous items - if we don't do this then it doesn't actually "delete" any items
         // await this.unsetFlag(SYSTEM_NAME, 'embeddedItems');
-        await this.setFlag(SYSTEM_NAME, 'embeddedItems', items);
+        await this.setFlag(SYSTEM_NAME, FLAGS.EmbeddedItems, items);
     }
 
     async clearEmbeddedItems() {
-        await this.unsetFlag(SYSTEM_NAME, 'embeddedItems');
+        await this.unsetFlag(SYSTEM_NAME, FLAGS.EmbeddedItems);
     }
 
     getLastAttack(): AttackData | undefined {
@@ -699,6 +708,7 @@ export class SR5Item extends Item {
         await this.prepareEmbeddedEntities();
         await this.prepareData();
         await this.render(false);
+
         return true;
     }
 

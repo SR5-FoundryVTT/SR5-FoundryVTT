@@ -280,6 +280,7 @@ export const SR5 = {
 
     mountPoints: {
         barrel: 'SR5.Barrel',
+        under_barrel: 'SR5.UnderBarrel',
         stock: 'SR5.Stock',
         top: 'SR5.Top',
         side: 'SR5.Side',
@@ -443,7 +444,7 @@ export const SR5 = {
             elf: 'SR5.Character.Types.Elf',
             ork: 'SR5.Character.Types.Ork',
             dwarf: 'SR5.Character.Types.Dwarf',
-            troll: 'SR5.Character.Types.Troll'
-        }
-    }
+            troll: 'SR5.Character.Types.Troll',
+        },
+    },
 };

@@ -21,7 +21,10 @@ export class Helpers {
         if (data['temp'] !== undefined) {
             parts.addUniquePart('SR5.Temporary', data['temp']);
         }
-        data.value = parts.total + data.base;
+        const decimalCount = 3;
+        const mult = Math.pow(10, decimalCount);
+
+        data.value = Math.round((parts.total + data.base) * mult) / mult;
         data.mod = parts.list;
         return data.value;
     }
@@ -206,7 +209,7 @@ export class Helpers {
     }
 
     /* Handle Shadowrun style shortened attribute names with typical three letter shortening. */
-    static shortenAttributeLocalization(label: string, length: number=3): string {
+    static shortenAttributeLocalization(label: string, length: number = 3): string {
         const name = game.i18n.localize(label);
 
         if (length <= 0) {
@@ -297,5 +300,14 @@ export class Helpers {
     static createRangeDescription(label: string, distance: number, modifier: number): RangeTemplateData {
         label = game.i18n.localize(label);
         return {label, distance, modifier}
+    }
+
+    static convertIndexedObjectToArray(indexedObject: object): object[] {
+        return Object.keys(indexedObject).map((index) => {
+            if (Number.isNaN(index)) {
+                console.warn('An object with no numerical index was given, which is likely a bug.', indexedObject);
+            }
+            return indexedObject[index];
+        });
     }
 }
