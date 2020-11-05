@@ -1155,4 +1155,26 @@ export class SR5Actor extends Actor {
         return this.getActiveTokens().length > 0;
     }
 
+    hasActivePlayer(): boolean {
+        const player = this.getActivePlayer();
+        return player !== null;
+    }
+
+    getActivePlayer(): User|null {
+        //@ts-ignore
+        if (!this.hasPlayerOwner) {
+            return null;
+        }
+
+        for (const user of game.users.entities) {
+            if (!user.active || user.isGM) {
+                continue;
+            }
+            if (this.id === user.character.id) {
+                return user;
+            }
+        }
+
+        return null;
+    }
 }

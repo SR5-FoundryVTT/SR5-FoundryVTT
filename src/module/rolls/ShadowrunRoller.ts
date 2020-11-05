@@ -26,8 +26,6 @@ export type Test =  {
 }
 
 export interface BasicRollProps {
-    name?: string;
-    img?: string;
     parts?: ModList<number>;
     limit?: BaseValuePair<number> & LabelField;
     explodeSixes?: boolean;
@@ -244,8 +242,6 @@ export class ShadowrunRoller {
         actor,
         item,
         title = DEFAULT_ROLL_NAME,
-        img = actor?.img,
-        name = actor?.name,
         parts: partsProps = [],
         limit,
         explodeSixes = false,
@@ -284,37 +280,31 @@ export class ShadowrunRoller {
         // NOTE: Keep template data extraction to see basicProps that come through unused.
         const templateData = {
             // tokenId: tokenSceneId,
-            actor, token: actor?.token, target, header: {name: name || '', img: img || '',}, title, description, rollMode, limit, previewTemplate,
+            actor, token: actor?.token, target, title, description, rollMode, limit, previewTemplate,
             attack, incomingAttack, incomingDrain, incomingSoak, item, tests, ...props, roll};
         console.warn('basicProps unused', props);
 
-
-
         if (!hideRollMessage) {
-            const rollChatMessageOptions = {roll, actor, target, item, name, img, rollMode, description, title, previewTemplate, attack, incomingAttack, incomingDrain, incomingSoak, tests};
+            const rollChatMessageOptions = {roll, actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, incomingDrain, incomingSoak, tests};
             await createRollChatMessage(rollChatMessageOptions);
         }
 
-        if (target) {
-            console.error('target', target);
-            for (const user of game.users.entities) {
-                 if (!user.character) {
-                    continue;
-                }
+        console.error('target', target, target?.actor);
+        // TODO: Move Target section into AdvancedRoll
+        // @ts-ignore // target.actor is of type Actor instead of SR5Actor
+        if (target && target.actor.hasActivePlayer()) {
+            // @ts-ignore
+            const user = target.actor.getActivePlayer();
 
-                console.error(user.character.id === target.actor.id);
-                const targetChatMessage = {
-                    actor,
-                    target: {
-                        user, token: target
-                    },
-                    item,
-                    incomingAttack,
-                    tests
-                } as TargetChatMessageOptions;
-                await createTargetChatMessage(targetChatMessage);
-
-            }
+            const targetChatMessage = {
+                actor,
+                target,
+                item,
+                incomingAttack,
+                tests,
+                whisperTo: user
+            } as TargetChatMessageOptions;
+            await createTargetChatMessage(targetChatMessage);
         }
 
         return roll;

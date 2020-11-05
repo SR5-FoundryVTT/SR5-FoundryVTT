@@ -8,13 +8,13 @@
          <a class="chat-select-link" data-token-id="{{speaker.token.id}}"><img src="{{speaker.token.data.img}}" class="entity-selectable" title="{{speaker.token.name}}" width="36" height="36"/></a>
          <h3 class="header-name"><a class="chat-entity-link" data-entity="Token" data-id="{{speaker.token.id}}">{{speaker.token.name}}</a></h3>
     </div>
-    {{#if header}}
+    {{#if item}}
         <div class="card-title card-header">
-            {{#if header.img}}
-                <img src="{{header.img}}" title="{{header.name}}" width="36" height="36" />
+            {{#if item.data.img}}
+                <img src="{{item.data.img}}" title="{{item.data.name}}" width="36" height="36" />
             {{/if}}
-            {{#if header.name}}
-                <h3 class="header-name">{{header.name}}</h3>
+            {{#if item.data.name}}
+                <h3 class="header-name">{{item.data.name}}</h3>
             {{/if}}
         </div>
     {{/if}}

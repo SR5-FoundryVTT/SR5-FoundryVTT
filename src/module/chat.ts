@@ -9,13 +9,11 @@ import DrainData = Shadowrun.DrainData;
 
 export interface TargetChatMessageOptions {
     actor: Actor
-    target: {
-        user: User,
-        token: Token
-    }
+    target: Token
     item: SR5Item
     incomingAttack: AttackData
     tests: Test[]
+    whisperTo: User
 }
 
 // Simple card text messages
@@ -37,8 +35,6 @@ export interface RollChatMessageOptions {
 
     item?: SR5Item
 
-    name?: string
-    img?: string
     title: string
     description?: object
 
@@ -65,10 +61,6 @@ interface ItemChatTemplateData {
 
 interface RollChatTemplateData {
     actor?: SR5Actor
-    header: {
-        name: string
-        img: string
-    }
     tokenId?: string
     target?: Token
     item?: SR5Item
@@ -129,7 +121,7 @@ const createChatData = async (templateData, options?: ChatDataOptions) => {
         speaker: {
             actor: actor?._id,
             token: actor?.getToken(),
-            alias: templateData.header.name
+            //alias: templateData.header.name
         },
         flags: {
             shadowrun5e: {
@@ -165,10 +157,8 @@ export async function ifConfiguredCreateDefaultChatMessage(roll: ShadowrunRoll, 
 }
 
 export async function createTargetChatMessage(options: TargetChatMessageOptions) {
-    const {user, token} = options.target;
-
-    const rollChatOptions = {...options, header: {name: token.name, img: token.data.img}, target: token};
-    const messageOptions = {whisperTo: user};
+    const rollChatOptions = {...options};
+    const messageOptions = {whisperTo: options.whisperTo};
     //@ts-ignore
     const templateData = getRollChatTemplateData(rollChatOptions);
     return await createChatMessage(templateData, messageOptions);
@@ -204,22 +194,21 @@ export async function createRollChatMessage(options: RollChatMessageOptions): Pr
 function getRollChatTemplateData(options: RollChatMessageOptions): RollChatTemplateData {
     // field extraction is explicit to enforce visible data flow to ensure clean data.
     // NOTE: As soon as clear data dynamic data flow can be established, this should be removed for a simple {...options}
-    let {roll, actor, item, name, img, target, description, title, previewTemplate,
+    let {roll, actor, item, target, description, title, previewTemplate,
         attack, incomingAttack, incomingDrain, incomingSoak, tests} = options;
 
     const rollMode = options.rollMode ?? game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
 
     const token = actor?.token;
 
-    [name, img] = getPreferedNameAndImageSource(name, img, actor, token);
-    const header = {name, img};
+    // [name, img] = getPreferedNameAndImageSource(name, img, actor, token);
+    // const header = {name, img};
     const tokenId = getTokenSceneId(token);
 
     return {
         roll,
         actor,
         item,
-        header,
         tokenId,
         target,
         rollMode,
