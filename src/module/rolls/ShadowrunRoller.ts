@@ -289,7 +289,6 @@ export class ShadowrunRoller {
             await createRollChatMessage(rollChatMessageOptions);
         }
 
-        console.error('target', target, target?.actor);
         // TODO: Move Target section into AdvancedRoll
         // @ts-ignore // target.actor is of type Actor instead of SR5Actor
         if (target && target.actor.hasActivePlayer()) {

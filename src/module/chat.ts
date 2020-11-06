@@ -100,7 +100,8 @@ const createChatData = async (templateData, options?: ChatDataOptions) => {
     const actor = templateData.actor;
     const token = actor?.getToken();
 
-    console.error(actor, token);
+    console.warn('chatData', actor, token);
+    console.warn('templateData', templateData);
     //@ts-ignore
     const enhancedTemplateData = {
         ...templateData,
@@ -186,7 +187,6 @@ function createChatTemplateData(options: ItemChatMessageOptions): ItemChatTempla
 
 export async function createRollChatMessage(options: RollChatMessageOptions): Promise<Entity<any>> {
     const templateData = getRollChatTemplateData(options);
-    console.warn(templateData);
     // TODO: Double data is bad.
     const chatOptions = {roll: options.roll};
     return await createChatMessage(templateData, chatOptions);
@@ -201,7 +201,7 @@ function getRollChatTemplateData(options: RollChatMessageOptions): RollChatTempl
 
     const rollMode = options.rollMode ?? game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
 
-    const token = actor?.token;
+    const token = actor?.getToken();
 
     // [name, img] = getPreferedNameAndImageSource(name, img, actor, token);
     // const header = {name, img};
@@ -328,14 +328,9 @@ export const addRollListeners = (app: ChatMessage, html) => {
 
            const token = Helpers.getSceneToken(sceneTokenId)
 
-           console.error(sceneTokenId, token);
-
            if (!token) return;
 
            const item = token.actor.getOwnedItem(id);
-
-           console.error(id, item);
-
            if (item) item.sheet.render(true);
        }
     });
