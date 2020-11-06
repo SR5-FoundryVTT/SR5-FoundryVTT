@@ -278,9 +278,9 @@ export const addRollListeners = (app: ChatMessage, html) => {
         return
     }
 
-    const item = SR5Item.getItemFromMessage(html);
+    // const item = SR5Item.getItemFromMessage(html);
     // TODO: Move layout functionality into template
-    if (item?.hasRoll && app.isRoll) $(html).find('.card-description').hide();
+    // if (item?.hasRoll && app.isRoll) $(html).find('.card-description').hide();
 
     html.on('click', '.test', async (event) => {
         event.preventDefault();
@@ -302,9 +302,19 @@ export const addRollListeners = (app: ChatMessage, html) => {
             template?.drawPreview();
         }
     });
-    html.on('click', '.card-title', (event) => {
+    html.on('click', '.show-display-description', (event) => {
         event.preventDefault();
-        $(event.currentTarget).siblings('.card-description').toggle();
+        // NOTE: This depends on the exact card template HTML structure.
+        $(event.currentTarget).parent().siblings('.card-description').toggle();
+        $(event.currentTarget).hide();
+        $(event.currentTarget).siblings('.hide-display-description').show();
+    });
+    html.on('click', '.hide-display-description', (event) => {
+        event.preventDefault();
+        // NOTE: This depends on the exact card template HTML structure.
+        $(event.currentTarget).parent().siblings('.card-description').toggle();
+        $(event.currentTarget).hide();
+        $(event.currentTarget).siblings('.show-display-description').show();
     });
 
     html.on('click', '.chat-entity-link', event => {

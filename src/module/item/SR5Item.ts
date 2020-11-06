@@ -284,8 +284,8 @@ export class SR5Item extends Item {
                 if (!actionTestData) {
                     return;
                 }
-
-                await this.rollTest(event, undefined, actionTestData);
+                const options = undefined;
+                await this.rollTest(event, options, actionTestData);
             };
         }
 

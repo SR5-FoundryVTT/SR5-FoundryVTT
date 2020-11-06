@@ -138,28 +138,25 @@ export class ShadowrunRoll extends Roll {
 
 export class ShadowrunRoller {
     static itemRoll(event, item: SR5Item, options?: Partial<AdvancedRollProps>, actionTestData?: ActionTestData): Promise<ShadowrunRoll | undefined> {
-        const parts = item.getRollPartsList();
-        let limit = item.getLimit();
-        let title = item.getRollName();
-
+        // Create common data for all item types...
         const rollData = {
             ...options,
             event: event,
             dialogOptions: {
                 environmental: true,
             },
-            parts,
-            actor: item.actor,
             item,
-            limit,
-            title,
-            name: item.name,
-            img: item.img,
+            actor: item.actor,
+            parts: item.getRollPartsList(),
+            limit: item.getLimit(),
+            title: item.getRollName(),
             previewTemplate: item.hasTemplate,
             attack:  item.getAttackData(0, actionTestData),
-            blast: item.getBlastData(actionTestData)
+            blast: item.getBlastData(actionTestData),
+            description: item.getChatData()
         } as AdvancedRollProps;
 
+        // Add item type specific data...
         if (item.hasOpposedRoll) {
             rollData.tests = item.getOpposedTests();
         }
@@ -175,7 +172,6 @@ export class ShadowrunRoller {
             rollData.target = Helpers.getToken(actionTestData.targetId);
         }
 
-        rollData.description = item.getChatData();
 
         return ShadowrunRoller.advancedRoll(rollData);
     }
