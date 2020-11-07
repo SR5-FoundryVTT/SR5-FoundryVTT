@@ -17,6 +17,7 @@ import {ActionTestData} from "../apps/dialogs/ShadowrunItemDialog";
 import BlastData = Shadowrun.BlastData;
 import FireModeData = Shadowrun.FireModeData;
 import DrainData = Shadowrun.DrainData;
+import {ShadowrunTestDialog} from "../apps/dialogs/ShadowrunTestDialog";
 
 // TODO: Split up BasicRollProps into the different types of calls
 // item, actor, dicePool, attack, defense, spell, form
@@ -319,7 +320,7 @@ export class ShadowrunRoller {
      * - Prompts the user for modifiers
      * @param props
      */
-    static advancedRoll(props: AdvancedRollProps): Promise<ShadowrunRoll | undefined> {
+    static async advancedRoll(props: AdvancedRollProps): Promise<ShadowrunRoll | undefined> {
         // destructure what we need to use from props
         // any value pulled out needs to be updated back in props if changed
         const { title, actor, parts: partsProps = [], limit, extended, wounds = true, after, dialogOptions } = props;
@@ -331,119 +332,50 @@ export class ShadowrunRoller {
         }
 
         // TODO create "fast roll" option
-
-        const rollMode = game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
-
-        let dialogData = {
-            options: dialogOptions,
+        const testDialogOptions = {
+            title,
+            dialogOptions,
             extended,
-            dice_pool: parts.total,
-            parts: parts.getMessageOutput(),
-            limit: limit?.value,
+            limit,
             wounds,
-            woundValue: actor?.getWoundModifier(),
-            rollMode,
-            rollModes: CONFIG.Dice.rollModes,
         };
-        let template = 'systems/shadowrun5e/dist/templates/rolls/roll-dialog.html';
-        let edge = false;
-        let cancel = true;
+        const testDialog = await ShadowrunTestDialog.create(actor, testDialogOptions, partsProps);
+        const testData = await testDialog.select();
 
-        const buttons = {
-            roll: {
-                label: game.i18n.localize('SR5.Roll'),
-                icon: '<i class="fas fa-dice-six"></i>',
-                callback: () => (cancel = false),
-            },
-        };
-        if (actor) {
-            buttons['edge'] = {
-                label: `${game.i18n.localize('SR5.PushTheLimit')} (+${actor.getEdge().value})`,
-                icon: '<i class="fas fa-bomb"></i>',
-                callback: () => {
-                    edge = true;
-                    cancel = false;
-                },
-            };
+        if (testDialog.canceled) return;
+
+
+        const basicRollProps = {...props};
+        basicRollProps.wounds = testData.wounds;
+        // TODO: Check for error potential of overwriting this one.
+        basicRollProps.dialogOptions = testData.dialogOptions;
+        basicRollProps.rollMode = testData.rollMode;
+
+        if (testDialog.selectedButton === 'edge' && actor) {
+            basicRollProps.explodeSixes = true;
+            testData.parts.addUniquePart('SR5.PushTheLimit', actor.getEdge().value);
+            delete basicRollProps.limit;
+            // TODO: Edge usage doesn't seem to apply on actor sheet.
+            await actor.update({
+                'data.attributes.edge.uses': actor.data.data.attributes.edge.uses - 1,
+            });
         }
 
-        return new Promise(async (resolve) => {
-            const content = await renderTemplate(template, dialogData);
-            const dialog = new Dialog({
-                title: title,
-                content,
-                buttons,
-                default: 'roll',
+        basicRollProps.parts = testData.parts.list;
 
-                close: async (html) => {
-                    if (cancel) return;
-                    // get the actual dice_pool from the difference of initial parts and value in the dialog
 
-                    const dicePoolValue = Helpers.parseInputToNumber($(html).find('[name="dice_pool"]').val());
+        const roll = await this.basicRoll(basicRollProps);
 
-                    if (dialogOptions?.prompt) {
-                        parts.clear();
-                        await game.user.setFlag(SYSTEM_NAME, FLAGS.LastRollPromptValue, dicePoolValue);
-                        parts.addUniquePart('SR5.Base', dicePoolValue);
-                    }
+        if (testData.extended && roll) {
+            const currentExtended = parts.getPartValue('SR5.Extended') ?? 0;
+            parts.addUniquePart('SR5.Extended', currentExtended - 1);
+            props.parts = parts.list;
+            // add a bit of a delay to roll again
+            setTimeout(() => this.advancedRoll(props), 400);
+        }
 
-                    const limitValue = Helpers.parseInputToNumber($(html).find('[name="limit"]').val());
+        if (after && roll) after(roll);
 
-                    if (limit && limit.value !== limitValue) {
-                        limit.value = limitValue;
-                        limit.base = limitValue;
-                        limit.label = 'SR5.Override';
-                    }
-
-                    const woundValue = Helpers.parseInputToNumber($(html).find('[name="wounds"]').val());
-                    const situationMod = Helpers.parseInputToNumber($(html).find('[name="dp_mod"]').val());
-                    const environmentMod = Helpers.parseInputToNumber($(html).find('[name="options.environmental"]').val());
-
-                    if (wounds && woundValue !== 0) {
-                        parts.addUniquePart('SR5.Wounds', woundValue);
-                        props.wounds = true;
-                    }
-                    if (situationMod) {
-                        parts.addUniquePart('SR5.SituationalModifier', situationMod);
-                    }
-                    if (environmentMod) {
-                        parts.addUniquePart('SR5.EnvironmentModifier', environmentMod);
-                        if (!props.dialogOptions) props.dialogOptions = {};
-                        props.dialogOptions.environmental = true;
-                    }
-
-                    const extendedString = Helpers.parseInputToString($(html).find('[name="extended"]').val());
-                    const extended = extendedString === 'true';
-
-                    if (edge && actor) {
-                        props.explodeSixes = true;
-                        parts.addUniquePart('SR5.PushTheLimit', actor.getEdge().value);
-                        delete props.limit;
-                        // TODO: Edge usage doesn't seem to apply on actor sheet.
-                        await actor.update({
-                            'data.attributes.edge.uses': actor.data.data.attributes.edge.uses - 1,
-                        });
-                    }
-
-                    props.rollMode = Helpers.parseInputToString($(html).find('[name=rollMode]').val());
-
-                    props.parts = parts.list;
-                    const r = this.basicRoll({
-                        ...props,
-                    });
-
-                    if (extended && r) {
-                        const currentExtended = parts.getPartValue('SR5.Extended') ?? 0;
-                        parts.addUniquePart('SR5.Extended', currentExtended - 1);
-                        props.parts = parts.list;
-                        // add a bit of a delay to roll again
-                        setTimeout(() => this.advancedRoll(props), 400);
-                    }
-                    resolve(r);
-                    if (after && r) r.then((roll) => after(roll));
-                },
-            });
-            dialog.render(true);
-        });
+        return roll;
     }
 }
