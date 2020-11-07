@@ -374,7 +374,7 @@ export class ShadowrunRoller {
             setTimeout(() => this.advancedRoll(props), 400);
         }
 
-        if (after && roll) after(roll);
+        if (after && roll) await after(roll);
 
         return roll;
     }
