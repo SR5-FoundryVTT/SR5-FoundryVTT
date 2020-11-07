@@ -104,44 +104,6 @@ export class ShadowrunItemDialog {
         return new FormDialog(dialogData);
     }
 
-    static async fromItem(item: SR5Item, event?: MouseEvent): Promise<ItemDialogData> {
-        const dialogData: DialogData = {
-            title: item.name,
-            buttons: {},
-        };
-        if (event) dialogData['event'] = event;
-
-        const templateData = {};
-        let templatePath = '';
-
-
-        const itemData: ItemDialogData = {
-            dialogData: undefined,
-            getActionTestData: undefined,
-            itemHasNoDialog: true
-        };
-
-        if (item.isRangedWeapon()) {
-            itemData.getActionTestData = ShadowrunItemDialog.addRangedWeaponData(templateData, dialogData, item);
-            templatePath = 'systems/shadowrun5e/dist/templates/rolls/range-weapon-roll.html';
-        } else if (item.isSpell()) {
-            itemData.getActionTestData = ShadowrunItemDialog.addSpellData(templateData, dialogData, item);
-            templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-spell.html';
-        } else if (item.isComplexForm()) {
-            itemData.getActionTestData = ShadowrunItemDialog.addComplexFormData(templateData, dialogData, item);
-            templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-complex-form.html';
-        }
-
-        if (templatePath) {
-            const content = await renderTemplate(templatePath, templateData);
-
-            itemData.dialogData = mergeObject(dialogData, {content});
-            itemData.itemHasNoDialog = false;
-        }
-
-        return itemData;
-    }
-
     static addComplexFormData(templateData: object, dialogData: DialogData, item: SR5Item): Function {
         const fade = item.getFade();
         const title = `${Helpers.label(item.name)} Level`;

@@ -1,4 +1,3 @@
-// TODO: How to use the different buttons...
 interface FormDialogData {
     title?: string;
 	buttons?: Record<string, DialogButton>;
@@ -96,5 +95,10 @@ export class FormDialog extends Dialog {
      */
     get canceled(): boolean {
         return !this.selectedButton;
+    }
+
+    /** @override */
+    static getButtons(): Record<string, DialogButton> {
+        return {};
     }
 }

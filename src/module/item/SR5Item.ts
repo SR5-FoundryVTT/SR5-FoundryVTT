@@ -265,54 +265,16 @@ export class SR5Item extends Item {
         if (!this.actor) return;
 
         const dontRollTest = event?.shiftKey || !this.hasRoll;
-        if (dontRollTest) {
-            return await this.postItemCard();
-        }
+        if (dontRollTest) return await this.postItemCard();
 
-        const item = this;
-        const dialog = await ShadowrunItemDialog.create(item, event);
-
-        if (!dialog) {
-            return await this.rollTest(event);
-        }
+        const dialog = await ShadowrunItemDialog.create(this, event);
+        if (!dialog) return await this.rollTest(event);
 
         const actionTestData = await dialog.select();
+        if (dialog.canceled) return;
 
-        if (dialog.canceled) {
-            return;
-        }
-
-        console.warn('After selection', actionTestData, dialog.selectedButton, dialog.selection);
         const options = undefined;
         return await this.rollTest(event, options, actionTestData);
-
-
-        // // Switch possible dialog content based on item type.
-        // const {dialogData, getActionTestData, itemHasNoDialog}  = await ShadowrunItemDialog.fromItem(this, event);
-        //
-        // if (itemHasNoDialog) {
-        //     return await this.rollTest(event);
-        // }
-        //
-        // // Allow different item types to utilize what's been selected in the items dialog.
-        // if (dialogData && getActionTestData) {
-        //     dialogData.close = async (html) => {
-        //         const actionTestData = await getActionTestData(html) as unknown as object;
-        //
-        //         // No dialog selection means dialog has been closed and no roll is needed;
-        //         if (!actionTestData) {
-        //             return;
-        //         }
-        //         const options = undefined;
-        //         await this.rollTest(event, options, actionTestData);
-        //     };
-        // }
-        //
-        // if (dialogData) {
-        //     return new Dialog(dialogData).render(true);
-        // }
-
-        // console.error('Item has no configuration for posting to chat or performing a roll.');
 }
 
     getChatData(htmlOptions?) {
@@ -637,9 +599,8 @@ export class SR5Item extends Item {
      * @param options - any additional roll options to pass along - note that currently the Item will overwrite -- WIP
      */
     async rollTest(event, options?: Partial<AdvancedRollProps>, actionTestData?: ActionTestData): Promise<ShadowrunRoll | undefined> {
-        // Cast Success Test for item Actions.
-        const roll = await ShadowrunRoller.itemRoll(event, this, options, actionTestData);
 
+        const roll = await ShadowrunRoller.itemRoll(event, this, options, actionTestData);
         await this.setLastAttackForRoll(roll, actionTestData);
         await ShadowrunRoller.resultingItemRolls(event, this, actionTestData);
 

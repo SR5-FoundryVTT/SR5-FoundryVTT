@@ -172,7 +172,6 @@ export class ShadowrunRoller {
             rollData.target = Helpers.getToken(actionTestData.targetId);
         }
 
-
         return ShadowrunRoller.advancedRoll(rollData);
     }
 
