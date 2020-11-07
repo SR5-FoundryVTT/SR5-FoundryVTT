@@ -1,4 +1,4 @@
-interface FormDialogData {
+export interface FormDialogData {
     title?: string;
 	buttons?: Record<string, DialogButton>;
 	default?: string;
@@ -66,7 +66,7 @@ export class FormDialog extends Dialog {
         });
     }
 
-    async select(): Promise<object> {
+    async select(): Promise<any> {
         await this.render(true);
 
         if (this._selectionPromise === undefined || this.selection === undefined) {

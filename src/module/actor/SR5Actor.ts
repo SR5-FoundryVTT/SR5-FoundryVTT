@@ -21,6 +21,7 @@ import DamageElement = Shadowrun.DamageElement;
 import EdgeAttributeField = Shadowrun.EdgeAttributeField;
 import VehicleActorData = Shadowrun.VehicleActorData;
 import VehicleStat = Shadowrun.VehicleStat;
+import {ShadowrunActorDialogs} from "../apps/dialogs/ShadowrunActorDialogs";
 
 export class SR5Actor extends Actor {
     getOverwatchScore() {
@@ -311,111 +312,47 @@ export class SR5Actor extends Actor {
     }
 
     async rollDefense(options: DefenseRollOptions = {}, partsProps: ModList<number> = []) {
-        const parts = new PartsList(partsProps);
-        this._addDefenseParts(parts);
-        // full defense is always added
-        const activeDefenses = {
-            full_defense: {
-                label: 'SR5.FullDefense',
-                value: this.getFullDefenseAttribute()?.value,
-                initMod: -10,
-            },
-            dodge: {
-                label: 'SR5.Dodge',
-                value: this.findActiveSkill('gymnastics')?.value,
-                initMod: -5,
-            },
-            block: {
-                label: 'SR5.Block',
-                value: this.findActiveSkill('unarmed_combat')?.value,
-                initMod: -5,
-            },
-        };
+        // TODO: Check melee weapon reach display...
+        // TODO: Check incomingAttack stuffy
 
-        const equippedMeleeWeapons = this.getEquippedWeapons().filter((w) => w.isMeleeWeapon());
-        let defenseReach = 0;
-        equippedMeleeWeapons.forEach((weapon) => {
-            activeDefenses[`parry-${weapon.name}`] = {
-                label: 'SR5.Parry',
-                weapon: weapon.name,
-                value: this.findActiveSkill(weapon.getActionSkill())?.value,
-                init: -5,
-            };
-            defenseReach = Math.max(defenseReach, weapon.getReach());
-        });
-        // if we are defending a melee attack
-        if (options.incomingAttack?.reach) {
-            const incomingReach = options.incomingAttack.reach;
-            const netReach = defenseReach - incomingReach;
-            if (netReach !== 0) {
-                parts.addUniquePart('SR5.Reach', netReach);
-            }
+        const defenseDialog = await ShadowrunActorDialogs.createDefenseDialog(this, options, partsProps);
+        const defenseActionData = await defenseDialog.select();
+
+        if (defenseDialog.canceled) {
+            return;
         }
-        let dialogData = {
-            parts: parts.getMessageOutput(),
-            cover: options.cover,
-            activeDefenses,
-        };
-        let template = 'systems/shadowrun5e/dist/templates/rolls/roll-defense.html';
-        let cancel = true;
-        const incomingAttack = options.incomingAttack;
-        const event = options.event;
 
-        // Show Defense Test input dialog before Defense Test.
-        const content = await renderTemplate(template, dialogData);
-        const dialog = await new Dialog({
-            title: game.i18n.localize('SR5.Defense'),
-            content,
-            buttons: {
-                continue: {
-                    label: game.i18n.localize('SR5.Continue'),
-                    callback: () => (cancel = false),
-                },
-            },
-            default: 'normal',
-            close: async (html) => {
-                if (cancel) return;
-                let cover = Helpers.parseInputToNumber($(html).find('[name=cover]').val());
-                let special = Helpers.parseInputToString($(html).find('[name=activeDefense]').val());
-                if (special) {
-                    // TODO subtract initiative score when Foundry updates to 0.7.0
-                    const defense = activeDefenses[special];
-                    parts.addUniquePart(defense.label, defense.value);
-                }
-                if (cover) {
-                    parts.addUniquePart('SR5.Cover', cover)
-                }
-
-                // Show actual Defense Test.
-                const roll = await ShadowrunRoller.advancedRoll({
-                    event: event,
-                    actor: this,
-                    parts: parts.list,
-                    title: game.i18n.localize('SR5.DefenseTest'),
-                    incomingAttack,
-                });
-
-                // Prepare Soak Test.
-                if (incomingAttack && roll) {
-                    let defenderHits = roll.total;
-                    let attackerHits = incomingAttack.hits || 0;
-                    let netHits = attackerHits - defenderHits;
-
-                    if (netHits >= 0) {
-                        const damage = incomingAttack.damage;
-                        damage.mod = PartsList.AddUniquePart(damage.mod, 'SR5.NetHits', netHits);
-                        damage.value = Helpers.calcTotal(damage);
-
-                        const soakRollOptions = {
-                            event: event,
-                            damage: damage,
-                        };
-                        await this.rollSoak(soakRollOptions);
-                    }
-                }
-            }
+        const roll = await ShadowrunRoller.advancedRoll({
+            event: options.event,
+            actor: this,
+            parts: defenseActionData.parts.list,
+            title: game.i18n.localize('SR5.DefenseTest'),
+            incomingAttack: options.incomingAttack,
         });
-        return await dialog.render(true)
+
+        const {incomingAttack} = options;
+
+        if (!roll) return;
+        if (!incomingAttack) return;
+
+        // Prepare Soak Test.
+        let defenderHits = roll.total;
+        let attackerHits = incomingAttack.hits || 0;
+        let netHits = attackerHits - defenderHits;
+
+        if (netHits === 0) return;
+
+        const damage = incomingAttack.damage;
+        damage.mod = PartsList.AddUniquePart(damage.mod, 'SR5.NetHits', netHits);
+        damage.value = Helpers.calcTotal(damage);
+
+        const soakRollOptions = {
+            event: options.event,
+            damage,
+        };
+
+        await this.rollSoak(soakRollOptions);
+
     }
 
     async rollSoak(options?: SoakRollOptions, partsProps: ModList<number> = []) {
