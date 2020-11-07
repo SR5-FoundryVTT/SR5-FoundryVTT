@@ -1,9 +1,12 @@
 import {FormDialog, FormDialogData} from "./FormDialog";
 import {SR5Actor} from "../../actor/SR5Actor";
 import {PartsList} from "../../parts/PartsList";
+import {Helpers} from "../../helpers";
 import DefenseRollOptions = Shadowrun.DefenseRollOptions;
 import ModList = Shadowrun.ModList;
-import {Helpers} from "../../helpers";
+import SoakRollOptions = Shadowrun.SoakRollOptions;
+import DamageData = Shadowrun.DamageData;
+import DamageElement = Shadowrun.DamageElement;
 
 
 export class ShadowrunActorDialogs {
@@ -11,6 +14,12 @@ export class ShadowrunActorDialogs {
         const defenseDialogData = ShadowrunActorDialogs.getDefenseDialogData(actor, options, partsProps);
 
         return new FormDialog(defenseDialogData);
+    }
+
+    static async createSoakDialog(actor: SR5Actor, options: SoakRollOptions, partsProps: ModList<number>): Promise<FormDialog> {
+        const soakDialogData = ShadowrunActorDialogs.getSoakDialogData(actor, options, partsProps);
+
+        return new FormDialog(soakDialogData);
     }
 
     static getDefenseDialogData(actor: SR5Actor,  options: DefenseRollOptions, partsProps: ModList<number>): FormDialogData {
@@ -48,7 +57,6 @@ export class ShadowrunActorDialogs {
 
         const parts = new PartsList(partsProps);
         actor._addDefenseParts(parts);
-        console.error('Not Working', parts);
 
         // if we are defending a melee attack
         if (options.incomingAttack?.reach) {
@@ -93,6 +101,102 @@ export class ShadowrunActorDialogs {
             title,
             templateData,
             templatePath,
+            buttons,
+            onAfterClose
+        }
+    }
+
+    static getSoakDialogData(actor: SR5Actor, options: SoakRollOptions, partsProps: ModList<number>): FormDialogData {
+        const title = game.i18n.localize('SR5.DamageResistanceTest');
+
+        const parts = new PartsList(partsProps);
+        actor._addSoakParts(parts);
+
+        const templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-soak.html';
+        const templateData = {
+            damage: options?.damage,
+            parts: parts.getMessageOutput(),
+            elementTypes: CONFIG.SR5.elementTypes,
+        };
+
+        const buttons =  {
+            continue: {
+                label: game.i18n.localize('SR5.Continue'),
+                callback: () => {},
+            },
+        };
+
+        const onAfterClose = (html: JQuery) => {
+            const soak: DamageData = options?.damage
+                    ? options.damage
+                : {
+                    base: 0,
+                    value: 0,
+                    mod: [],
+                    ap: {
+                        base: 0,
+                        value: 0,
+                        mod: [],
+                    },
+                    attribute: '' as const,
+                    type: {
+                        base: '',
+                        value: '',
+                    },
+                    element: {
+                        base: '',
+                        value: '',
+                    },
+                };
+
+            const armor = actor.getArmor();
+
+            // handle element changes
+            const element = Helpers.parseInputToString($(html).find('[name=element]').val());
+            if (element) {
+                soak.element.value = element as DamageElement;
+            }
+            const bonusArmor = armor[element] ?? 0;
+            if (bonusArmor) {
+                parts.addUniquePart(CONFIG.SR5.elementTypes[element], bonusArmor);
+            }
+
+            // handle ap changes
+            const ap = Helpers.parseInputToNumber($(html).find('[name=ap]').val());
+            if (ap) {
+                let armorVal = armor.value + bonusArmor;
+
+                // don't take more AP than armor
+                parts.addUniquePart('SR5.AP', Math.max(ap, -armorVal));
+            }
+
+            // handle incoming damage changes
+            const incomingDamage = Helpers.parseInputToNumber($(html).find('[name=incomingDamage]').val());
+            if (incomingDamage) {
+                const totalDamage = Helpers.calcTotal(soak);
+                if (totalDamage !== incomingDamage) {
+                    const diff = incomingDamage - totalDamage;
+                    // add part and calc total again
+                    soak.mod = PartsList.AddUniquePart(soak.mod, 'SR5.UserInput', diff);
+                    soak.value = Helpers.calcTotal(soak);
+                }
+
+                const totalAp = Helpers.calcTotal(soak.ap);
+                if (totalAp !== ap) {
+                    const diff = ap - totalAp;
+                    // add part and calc total
+                    soak.ap.mod = PartsList.AddUniquePart(soak.ap.mod, 'SR5.UserInput', diff);
+                    soak.ap.value = Helpers.calcTotal(soak.ap);
+                }
+            }
+
+            return {soak, parts};
+        }
+
+        return {
+            title,
+            templatePath,
+            templateData,
             buttons,
             onAfterClose
         }

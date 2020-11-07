@@ -318,9 +318,7 @@ export class SR5Actor extends Actor {
         const defenseDialog = await ShadowrunActorDialogs.createDefenseDialog(this, options, partsProps);
         const defenseActionData = await defenseDialog.select();
 
-        if (defenseDialog.canceled) {
-            return;
-        }
+        if (defenseDialog.canceled) return;
 
         const roll = await ShadowrunRoller.advancedRoll({
             event: options.event,
@@ -352,113 +350,24 @@ export class SR5Actor extends Actor {
         };
 
         await this.rollSoak(soakRollOptions);
-
     }
 
-    async rollSoak(options?: SoakRollOptions, partsProps: ModList<number> = []) {
-        const parts = new PartsList(partsProps);
-        this._addSoakParts(parts);
-        let dialogData = {
-            damage: options?.damage,
-            parts: parts.getMessageOutput(),
-            elementTypes: CONFIG.SR5.elementTypes,
-        };
-        let id = '';
-        let cancel = true;
-        let template = 'systems/shadowrun5e/dist/templates/rolls/roll-soak.html';
-        // Show Soak Test input field dialog before actual Soak Test.
-        const content = await renderTemplate(template, dialogData);
-        const dialog = await new Dialog({
-            title: game.i18n.localize('SR5.DamageResistanceTest'),
-            content,
-            buttons: {
-                continue: {
-                    label: game.i18n.localize('SR5.Continue'),
-                    callback: () => {
-                        id = 'default';
-                        cancel = false;
-                    },
-                },
-            },
-            close: async (html) => {
-                if (cancel) return;
+    async rollSoak(options: SoakRollOptions, partsProps: ModList<number> = []) {
+        const soakDialog = await ShadowrunActorDialogs.createSoakDialog(this, options, partsProps);
+        const soakActionData = await soakDialog.select();
 
-                const soak: DamageData = options?.damage
-                    ? options.damage
-                    : {
-                          base: 0,
-                          value: 0,
-                          mod: [],
-                          ap: {
-                              base: 0,
-                              value: 0,
-                              mod: [],
-                          },
-                          attribute: '' as const,
-                          type: {
-                              base: '',
-                              value: '',
-                          },
-                          element: {
-                              base: '',
-                              value: '',
-                          },
-                      };
+        if (soakDialog.canceled) return;
 
-                const armor = this.getArmor();
-
-                // handle element changes
-                const element = Helpers.parseInputToString($(html).find('[name=element]').val());
-                if (element) {
-                    soak.element.value = element as DamageElement;
-                }
-                const bonusArmor = armor[element] ?? 0;
-                if (bonusArmor) {
-                    parts.addUniquePart(CONFIG.SR5.elementTypes[element], bonusArmor);
-                }
-
-                // handle ap changes
-                const ap = Helpers.parseInputToNumber($(html).find('[name=ap]').val());
-                if (ap) {
-                    let armorVal = armor.value + bonusArmor;
-
-                    // don't take more AP than armor
-                    parts.addUniquePart('SR5.AP', Math.max(ap, -armorVal));
-                }
-
-                // handle incoming damage changes
-                const incomingDamage = Helpers.parseInputToNumber($(html).find('[name=incomingDamage]').val());
-                if (incomingDamage) {
-                    const totalDamage = Helpers.calcTotal(soak);
-                    if (totalDamage !== incomingDamage) {
-                        const diff = incomingDamage - totalDamage;
-                        // add part and calc total again
-                        soak.mod = PartsList.AddUniquePart(soak.mod, 'SR5.UserInput', diff);
-                        soak.value = Helpers.calcTotal(soak);
-                    }
-
-                    const totalAp = Helpers.calcTotal(soak.ap);
-                    if (totalAp !== ap) {
-                        const diff = ap - totalAp;
-                        // add part and calc total
-                        soak.ap.mod = PartsList.AddUniquePart(soak.ap.mod, 'SR5.UserInput', diff);
-                        soak.ap.value = Helpers.calcTotal(soak.ap);
-                    }
-                }
-
-                // Show the actual Soak Test.
-                let title = game.i18n.localize('SR5.SoakTest');
-                await ShadowrunRoller.advancedRoll({
-                    event: options?.event,
-                    actor: this,
-                    incomingSoak: soak,
-                    parts: parts.list,
-                    title,
-                    wounds: false,
-                });
-            }
-        })
-        return await dialog.render(true);
+        // Show the actual Soak Test.
+        const title = game.i18n.localize('SR5.SoakTest');
+        await ShadowrunRoller.advancedRoll({
+            event: options?.event,
+            actor: this,
+            incomingSoak: soakActionData.soak,
+            parts: soakActionData.parts.list,
+            title,
+            wounds: false,
+        });
     }
 
     rollSingleAttribute(attId, options: ActorRollOptions) {
