@@ -5,6 +5,7 @@ import {SR5Actor} from "../../actor/SR5Actor";
 import FireModeData = Shadowrun.FireModeData;
 import RangesTemplateData = Shadowrun.RangesTemplateData;
 import RangeData = Shadowrun.RangeData;
+import {FormDialog} from "./FormDialog";
 
 type ItemDialogData = {
     dialogData: DialogData | undefined,
@@ -36,8 +37,73 @@ export type ActionTestData = {
 }
 
 
-// TODO: Why extend dialog when internal dialog structures aren't used? Could resolve the whole flag / data flow issue.
-export class ShadowrunItemDialog extends Dialog {
+export class ShadowrunItemDialog {
+    static async create(item: SR5Item, event?: MouseEvent): Promise<FormDialog|undefined> {
+
+        if (item.isRangedWeapon()) {
+            return ShadowrunItemDialog.createRangedWeaponDialog(item, event);
+        }
+
+        if (item.isSpell()) {
+            return ShadowrunItemDialog.createSpellDialog(item, event);
+        }
+
+        if (item.isComplexForm()) {
+            return ShadowrunItemDialog.createComplexFormDialog(item, event);
+        }
+    }
+
+    static async createRangedWeaponDialog(item: SR5Item, event?: MouseEvent): Promise<FormDialog> {
+        const dialogData = {title: item.name,
+                            event,
+        };
+
+        const templatePath = 'systems/shadowrun5e/dist/templates/rolls/range-weapon-roll.html';
+        const templateData = {};
+        const onAfterClose = ShadowrunItemDialog.addRangedWeaponData(templateData, dialogData, item);
+
+        dialogData['templateData'] = templateData;
+        dialogData['templatePath'] = templatePath;
+        dialogData['onAfterClose'] = onAfterClose;
+
+        //@ts-ignore
+        return new FormDialog(dialogData);
+    }
+
+    static async createSpellDialog(item: SR5Item, event?: MouseEvent): Promise<FormDialog> {
+        const dialogData = {title: item.name,
+                            event,
+        };
+
+        const templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-spell.html';
+        const templateData = {};
+        const onAfterClose = ShadowrunItemDialog.addSpellData(templateData, dialogData, item);
+
+        dialogData['templateData'] = templateData;
+        dialogData['templatePath'] = templatePath;
+        dialogData['onAfterClose'] = onAfterClose;
+
+        //@ts-ignore
+        return new FormDialog(dialogData);
+    }
+
+    static async createComplexFormDialog(item: SR5Item, event?: MouseEvent): Promise<FormDialog> {
+        const dialogData = {title: item.name,
+                            event,
+        };
+
+        const templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-complex-form.html';
+        const templateData = {};
+        const onAfterClose = ShadowrunItemDialog.addComplexFormData(templateData, dialogData, item);
+
+        dialogData['templateData'] = templateData;
+        dialogData['templatePath'] = templatePath;
+        dialogData['onAfterClose'] = onAfterClose;
+
+        //@ts-ignore
+        return new FormDialog(dialogData);
+    }
+
     static async fromItem(item: SR5Item, event?: MouseEvent): Promise<ItemDialogData> {
         const dialogData: DialogData = {
             title: item.name,

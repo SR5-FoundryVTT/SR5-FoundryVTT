@@ -136,9 +136,7 @@ const createChatData = async (templateData, options?: ChatDataOptions) => {
     if (rollMode === 'blindroll') chatData['blind'] = true;
 
     if (options?.whisperTo) {
-        const {whisperTo} = options;
-        console.error('whsiper to', whisperTo);
-        chatData['whisper'] = ChatMessage.getWhisperRecipients(whisperTo.name);
+        chatData['whisper'] = ChatMessage.getWhisperRecipients(options.whisperTo.name);
     }
 
     return chatData;

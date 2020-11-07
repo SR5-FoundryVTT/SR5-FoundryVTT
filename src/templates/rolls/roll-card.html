@@ -12,8 +12,10 @@
     <div class="card-title card-header">
         <img src="{{item.data.img}}" title="{{item.data.name}}" width="36" height="36" />
         <h3 class="header-name"><a class="chat-entity-link" data-entity="Item" data-id="{{item.id}}">{{item.data.name}}</a></h3>
+        {{#if description}}
         <img src="icons/svg/down.svg" class="show-display-description">
         <img src="icons/svg/up.svg" class="hide-display-description">
+        {{/if}}
     </div>
     {{/if}}
     {{#if description}}

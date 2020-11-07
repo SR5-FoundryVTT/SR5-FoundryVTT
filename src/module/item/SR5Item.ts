@@ -19,6 +19,7 @@ import FireRangeData = Shadowrun.FireRangeData;
 import BlastData = Shadowrun.BlastData;
 import ConditionData = Shadowrun.ConditionData;
 import SR5ItemType = Shadowrun.SR5ItemType;
+import {FormDialog} from "../apps/dialogs/FormDialog";
 
 export class SR5Item extends Item {
     labels: {} = {};
@@ -268,32 +269,50 @@ export class SR5Item extends Item {
             return await this.postItemCard();
         }
 
-        // Switch possible dialog content based on item type.
-        const {dialogData, getActionTestData, itemHasNoDialog}  = await ShadowrunItemDialog.fromItem(this, event);
+        const item = this;
+        const dialog = await ShadowrunItemDialog.create(item, event);
 
-        if (itemHasNoDialog) {
+        if (!dialog) {
             return await this.rollTest(event);
         }
 
-        // Allow different item types to utilize what's been selected in the items dialog.
-        if (dialogData && getActionTestData) {
-            dialogData.close = async (html) => {
-                const actionTestData = await getActionTestData(html) as unknown as object;
+        const actionTestData = await dialog.select();
 
-                // No dialog selection means dialog has been closed and no roll is needed;
-                if (!actionTestData) {
-                    return;
-                }
-                const options = undefined;
-                await this.rollTest(event, options, actionTestData);
-            };
+        if (dialog.canceled) {
+            return;
         }
 
-        if (dialogData) {
-            return new Dialog(dialogData).render(true);
-        }
+        console.warn('After selection', actionTestData, dialog.selectedButton, dialog.selection);
+        const options = undefined;
+        return await this.rollTest(event, options, actionTestData);
 
-        console.error('Item has no configuration for posting to chat or performing a roll.');
+
+        // // Switch possible dialog content based on item type.
+        // const {dialogData, getActionTestData, itemHasNoDialog}  = await ShadowrunItemDialog.fromItem(this, event);
+        //
+        // if (itemHasNoDialog) {
+        //     return await this.rollTest(event);
+        // }
+        //
+        // // Allow different item types to utilize what's been selected in the items dialog.
+        // if (dialogData && getActionTestData) {
+        //     dialogData.close = async (html) => {
+        //         const actionTestData = await getActionTestData(html) as unknown as object;
+        //
+        //         // No dialog selection means dialog has been closed and no roll is needed;
+        //         if (!actionTestData) {
+        //             return;
+        //         }
+        //         const options = undefined;
+        //         await this.rollTest(event, options, actionTestData);
+        //     };
+        // }
+        //
+        // if (dialogData) {
+        //     return new Dialog(dialogData).render(true);
+        // }
+
+        // console.error('Item has no configuration for posting to chat or performing a roll.');
 }
 
     getChatData(htmlOptions?) {
