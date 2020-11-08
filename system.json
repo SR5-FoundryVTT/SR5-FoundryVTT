@@ -19,6 +19,11 @@
             "lang": "de",
             "name": "Deutsch",
             "path": "dist/locale/de/config.json"
+        },
+        {
+            "lang": "pt-BR",
+            "name": "Português (Brasil)",
+            "path": "dist/locale/pt-BR/config.json"
         }
     ],
     "packs": [
