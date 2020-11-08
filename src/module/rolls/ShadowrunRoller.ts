@@ -299,13 +299,7 @@ export class ShadowrunRoller {
             // @ts-ignore // Token.actor is of type Actor instead of SR5Actor
             const user = target.actor.getActivePlayer();
 
-            const targetChatMessage = {
-                actor,
-                target,
-                item,
-                incomingAttack,
-                tests,
-                whisperTo: user
+            const targetChatMessage = {actor, target, item, incomingAttack, tests, whisperTo: user
             } as TargetChatMessageOptions;
             await createTargetChatMessage(targetChatMessage);
         }
