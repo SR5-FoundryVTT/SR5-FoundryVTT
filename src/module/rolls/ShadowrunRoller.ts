@@ -294,9 +294,9 @@ export class ShadowrunRoller {
         }
 
         // TODO: Move Target section into AdvancedRoll
-        // @ts-ignore // target.actor is of type Actor instead of SR5Actor
+        // @ts-ignore // Token.actor is of type Actor instead of SR5Actor
         if (!hideRollMessage && target && target.actor.hasActivePlayer()) {
-            // @ts-ignore
+            // @ts-ignore // Token.actor is of type Actor instead of SR5Actor
             const user = target.actor.getActivePlayer();
 
             const targetChatMessage = {
