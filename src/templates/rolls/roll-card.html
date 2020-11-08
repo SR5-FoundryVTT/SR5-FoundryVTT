@@ -20,11 +20,9 @@
     {{/if}}
     {{#if description}}
     <div class="card-description">
-        <footer class="card-footer">
-            {{#each description.properties}}
-            <span style="white-space: nowrap;">{{this}}</span>
-            {{/each}}
-        </footer>
+        {{#each description.properties}}
+        <span style="white-space: nowrap;">{{this}}</span>
+        {{/each}}
     </div>
     {{/if}}
     {{#if (isDefined title)}}
