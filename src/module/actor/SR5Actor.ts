@@ -16,8 +16,6 @@ import { SYSTEM_NAME, FLAGS } from '../constants';
 import SR5ActorType = Shadowrun.SR5ActorType;
 import { PartsList } from '../parts/PartsList';
 import { ActorPrepFactory } from './prep/ActorPrepFactory';
-import DamageData = Shadowrun.DamageData;
-import DamageElement = Shadowrun.DamageElement;
 import EdgeAttributeField = Shadowrun.EdgeAttributeField;
 import VehicleActorData = Shadowrun.VehicleActorData;
 import VehicleStat = Shadowrun.VehicleStat;

@@ -9,9 +9,9 @@ import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
 import {
     createRollChatMessage, createTargetChatMessage,
-    ifConfiguredCreateDefaultChatMessage, TargetChatMessageOptions
+    TargetChatMessageOptions
 } from '../chat';
-import {CORE_FLAGS, CORE_NAME, DEFAULT_ROLL_NAME, FLAGS, SR, SYSTEM_NAME} from '../constants';
+import {DEFAULT_ROLL_NAME, FLAGS, SR, SYSTEM_NAME} from '../constants';
 import { PartsList } from '../parts/PartsList';
 import {ActionTestData} from "../apps/dialogs/ShadowrunItemDialog";
 import BlastData = Shadowrun.BlastData;
@@ -27,9 +27,9 @@ export type Test =  {
 }
 
 interface RollProps {
-    parts: ModList<number>,
+    parts?: ModList<number>,
     limit?: any,
-    explodeSixes: boolean
+    explodeSixes?: boolean
 }
 
 export interface BasicRollProps {
@@ -53,6 +53,17 @@ export interface BasicRollProps {
     rollMode?: keyof typeof CONFIG.Dice.rollModes;
 }
 
+/** Provide a clear interface of which value are guaranteed to be defined.
+     */
+export interface BasicRollPropsDefaulted extends BasicRollProps {
+    title: string
+    parts: ModList<number>
+    explodeSixes: boolean
+    hideRollMessage: boolean
+    previewTemplate: boolean
+    rollMode: keyof typeof CONFIG.Dice.rollModes
+}
+
 export interface RollDialogOptions {
     environmental?: number | boolean;
     prompt?: boolean;
@@ -68,6 +79,13 @@ export interface AdvancedRollProps extends BasicRollProps {
     blast?: BlastData;
     reach?: number
     fireMode?: FireModeData
+}
+
+/** Provide a clear interface of which value are guaranteed to be defined.
+     */
+export interface AdvancedRollPropsDefaulted extends AdvancedRollProps {
+    parts: ModList<number>;
+    wounds: boolean;
 }
 
 type ShadowrunRollData = {
@@ -145,7 +163,7 @@ export class ShadowrunRoll extends Roll {
 
 export class ShadowrunRoller {
     static itemRoll(event, item: SR5Item, options?: Partial<AdvancedRollProps>, actionTestData?: ActionTestData): Promise<ShadowrunRoll | undefined> {
-        // Create common data for all item types...
+        // Create common data for all item types.
         const rollData = {
             ...options,
             event: event,
@@ -163,7 +181,7 @@ export class ShadowrunRoller {
             description: item.getChatData()
         } as AdvancedRollProps;
 
-        // Add item type specific data...
+        // Add item type specific data.
         if (item.hasOpposedRoll) {
             rollData.tests = item.getOpposedTests();
         }
@@ -175,6 +193,7 @@ export class ShadowrunRoller {
                 rollData.dialogOptions.environmental = actionTestData.rangedWeapon.environmental.range;
             }
         }
+        // Add target specific data.
         if (actionTestData && actionTestData.targetId) {
             rollData.target = Helpers.getToken(actionTestData.targetId);
         }
@@ -249,7 +268,8 @@ export class ShadowrunRoller {
         };
 
         // Prepare SR Success Test with foundry formula.
-        const formula = this.shadowrunFormula({ parts: parts.list, limit: props.limit, explode: props.explodeSixes });
+        const formulaOptions = { parts: parts.list, limit: props.limit, explode: props.explodeSixes };
+        const formula = this.shadowrunFormula(formulaOptions);
         if (!formula) {
             return;
         }
@@ -263,48 +283,39 @@ export class ShadowrunRoller {
         return roll;
     }
 
-    static async basicRoll({
-        actor,
-        item,
-        title = DEFAULT_ROLL_NAME,
-        parts = [],
-        limit,
-        explodeSixes = false,
-        hideRollMessage = false,
-        rollMode = CONFIG.Dice.rollModes.roll,
-        previewTemplate = false,
-        description,
-        attack,
-        incomingAttack,
-        incomingDrain,
-        incomingSoak,
-        target,
-        tests,
-        ...props
-    }: BasicRollProps): Promise<ShadowrunRoll | undefined> {
-        const roll = await ShadowrunRoller.roll({parts, limit, explodeSixes});
+    static async basicRoll(basicProps: BasicRollProps): Promise<ShadowrunRoll | undefined> {
+        const props = ShadowrunRoller.basicRollPropsDefaults(basicProps);
+
+        const roll = await ShadowrunRoller.roll({parts: props.parts, limit: props.limit, explodeSixes: props.explodeSixes});
         if (!roll) return;
 
-        // NOTE: Show unused basicRollProps
-        console.warn('basicProps unused', props);
-
-        if (!hideRollMessage) {
-            const rollChatMessageOptions = {roll, actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, incomingDrain, incomingSoak, tests};
-            await createRollChatMessage(rollChatMessageOptions);
-        }
-
-        // TODO: Move Target section into AdvancedRoll
-        // @ts-ignore // Token.actor is of type Actor instead of SR5Actor
-        if (!hideRollMessage && target && target.actor.hasActivePlayer()) {
-            // @ts-ignore // Token.actor is of type Actor instead of SR5Actor
-            const user = target.actor.getActivePlayer();
-
-            const targetChatMessage = {actor, target, item, incomingAttack, tests, whisperTo: user
-            } as TargetChatMessageOptions;
-            await createTargetChatMessage(targetChatMessage);
+        if (!props.hideRollMessage) {
+            await ShadowrunRoller.rollChatMessage(roll, props);
         }
 
         return roll;
+    }
+
+    /** Provide a clear interface of which value are guaranteed to be defined.
+     */
+    static basicRollPropsDefaults(props: BasicRollProps): BasicRollPropsDefaulted {
+        props.title = props.title ?? DEFAULT_ROLL_NAME;
+        props.parts = props.parts ?? [];
+        props.explodeSixes = props.explodeSixes ?? false;
+        props.hideRollMessage = props.hideRollMessage ?? false;
+        props.rollMode = props.rollMode ?? CONFIG.Dice.rollModes.roll;
+        props.previewTemplate = props.previewTemplate ?? false;
+
+        return {...props} as BasicRollPropsDefaulted;
+    }
+
+    /** Provide a clear interface of which value are guaranteed to be defined.
+     */
+    static advancedRollPropsDefaults(props: AdvancedRollProps): AdvancedRollPropsDefaulted {
+        props.parts = props.parts ?? [];
+        props.wounds = props.wounds ?? true;
+
+        return {...props} as AdvancedRollPropsDefaulted;
     }
 
     /**
@@ -320,47 +331,45 @@ export class ShadowrunRoller {
     /**
      * Start an advanced roll
      * - Prompts the user for modifiers
-     * @param props
      */
-    static async advancedRoll(props: AdvancedRollProps): Promise<ShadowrunRoll | undefined> {
-        // destructure what we need to use from props
-        // any value pulled out needs to be updated back in props if changed
-        const { title, actor, parts: partsProps = [], limit, extended, wounds = true, after, dialogOptions } = props;
-        const parts = new PartsList(partsProps);
+    static async advancedRoll(advancedProps: AdvancedRollProps): Promise<ShadowrunRoll | undefined> {
+        // Remove after roll callback as to not move it further into other function calls.
+        const {after} = advancedProps;
+
+        const props = ShadowrunRoller.advancedRollPropsDefaults(advancedProps);
 
         // remove limits if game settings is set
         if (!game.settings.get(SYSTEM_NAME, FLAGS.ApplyLimits)) {
             delete props.limit;
         }
 
-        // TODO create "fast roll" option
+        // Ask user for additional, general success test role modifiers.
         const testDialogOptions = {
-            title,
-            dialogOptions,
-            extended,
-            limit,
-            wounds,
+            title: props.title,
+            dialogOptions: props.dialogOptions,
+            extended: props.extended,
+            limit: props.limit,
+            wounds: props.wounds,
         };
-        const testDialog = await ShadowrunTestDialog.create(actor, testDialogOptions, partsProps);
+        const testDialog = await ShadowrunTestDialog.create(props.actor, testDialogOptions, props.parts);
         const testData = await testDialog.select();
 
         if (testDialog.canceled) return;
 
 
-        // Prepare Test Roll...
+        // Prepare Test Roll.
         const basicRollProps = {...props};
         basicRollProps.wounds = testData.wounds;
-        // TODO: Check for error potential of overwriting this one.
         basicRollProps.dialogOptions = testData.dialogOptions;
         basicRollProps.rollMode = testData.rollMode;
 
-        if (testDialog.selectedButton === 'edge' && actor) {
+        if (testDialog.selectedButton === 'edge' && props.actor) {
             basicRollProps.explodeSixes = true;
-            testData.parts.addUniquePart('SR5.PushTheLimit', actor.getEdge().value);
+            testData.parts.addUniquePart('SR5.PushTheLimit', props.actor.getEdge().value);
             delete basicRollProps.limit;
             // TODO: Edge usage doesn't seem to apply on actor sheet.
-            await actor.update({
-                'data.attributes.edge.uses': actor.data.data.attributes.edge.uses - 1,
+            await props.actor.update({
+                'data.attributes.edge.uses': props.actor.data.data.attributes.edge.uses - 1,
             });
         }
 
@@ -368,13 +377,19 @@ export class ShadowrunRoller {
 
         // Execute Test roll...
         const roll = await this.basicRoll(basicRollProps);
+        if (!roll) return;
 
-        if (!roll) return roll;
+        // @ts-ignore // Token.actor is of type Actor instead of SR5Actor
+        if (!props.hideRollMessage && props.target && props.target.actor.hasActivePlayer()) {
+            await ShadowrunRoller.targetChatMessage(props);
+        }
 
         if (testData.extended) {
-            const currentExtended = parts.getPartValue('SR5.Extended') ?? 0;
-            parts.addUniquePart('SR5.Extended', currentExtended - 1);
-            props.parts = parts.list;
+            const currentExtended = testData.parts.getPartValue('SR5.Extended') ?? 0;
+            testData.parts.addUniquePart('SR5.Extended', currentExtended - 1);
+
+            props.parts = testData.parts.list;
+            props.extended = true;
             // add a bit of a delay to roll again
             setTimeout(() => this.advancedRoll(props), 400);
         }
@@ -382,5 +397,21 @@ export class ShadowrunRoller {
         if (after) await after(roll);
 
         return roll;
+    }
+
+    static async rollChatMessage(roll: ShadowrunRoll, props: BasicRollPropsDefaulted) {
+        const {actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, incomingDrain, incomingSoak, tests} = props;
+        const rollChatMessageOptions = {roll, actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, incomingDrain, incomingSoak, tests};
+        await createRollChatMessage(rollChatMessageOptions);
+    }
+
+    static async targetChatMessage(props: AdvancedRollPropsDefaulted) {
+        // @ts-ignore // Token.actor is of type Actor instead of SR5Actor
+        const user = props.target.actor.getActivePlayer();
+
+        const targetChatMessage = {actor: props.actor, target: props.target, item: props.item,
+            incomingAttack: props.incomingAttack, tests: props.tests, whisperTo: user
+        } as TargetChatMessageOptions;
+        await createTargetChatMessage(targetChatMessage);
     }
 }

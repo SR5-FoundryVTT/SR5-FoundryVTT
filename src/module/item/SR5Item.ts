@@ -19,7 +19,6 @@ import FireRangeData = Shadowrun.FireRangeData;
 import BlastData = Shadowrun.BlastData;
 import ConditionData = Shadowrun.ConditionData;
 import SR5ItemType = Shadowrun.SR5ItemType;
-import {FormDialog} from "../apps/dialogs/FormDialog";
 
 export class SR5Item extends Item {
     labels: {} = {};
@@ -268,6 +267,7 @@ export class SR5Item extends Item {
         if (dontRollTest) return await this.postItemCard();
 
         const dialog = await ShadowrunItemDialog.create(this, event);
+        // Some items might not have an additional dialog.
         if (!dialog) return await this.rollTest(event);
 
         const actionTestData = await dialog.select();

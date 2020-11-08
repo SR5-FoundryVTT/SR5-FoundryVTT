@@ -39,8 +39,8 @@ export interface RollChatMessageOptions {
     title: string
     description?: object
 
-    rollMode?: keyof typeof CONFIG.dice.rollModes
-    previewTemplate?: boolean
+    rollMode: keyof typeof CONFIG.dice.rollModes
+    previewTemplate: boolean
 
     attack?: AttackData
     incomingAttack?: AttackData
