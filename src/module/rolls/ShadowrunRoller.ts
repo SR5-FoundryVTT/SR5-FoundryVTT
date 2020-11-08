@@ -254,8 +254,6 @@ export class ShadowrunRoller {
             return;
         }
 
-        console.warn(parts, formula);
-
         // Execute the Success Test.
         const rollData = {parts: parts.list, limit: props.limit, explodeSixes: props.explodeSixes};
         const roll = new ShadowrunRoll(formula, rollData);

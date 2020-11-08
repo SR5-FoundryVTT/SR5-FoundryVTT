@@ -311,6 +311,11 @@ export const addRollListeners = (app: ChatMessage, html) => {
         $(event.currentTarget).hide();
         $(event.currentTarget).siblings('.show-display-description').show();
     });
+    html.on('click', '.card-content', event => {
+       event.preventDefault();
+       // NOTE: This depends on the exact card template HTML structure.
+       $(event.currentTarget).siblings('.dice-rolls').toggle();
+    });
 
     html.on('click', '.chat-entity-link', event => {
         event.preventDefault();

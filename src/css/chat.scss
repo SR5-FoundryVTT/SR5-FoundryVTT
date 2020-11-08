@@ -26,6 +26,7 @@
         .card-content {
             padding: 0.5em 0;
             border-bottom: $groove;
+            cursor: pointer;
             p {
                 font-size: 0.8em;
             }
@@ -197,6 +198,9 @@
                     font-style: italic;
                 }
             }
+        }
+        .dice-rolls {
+            display: none;
         }
         .dice-roll-content {
             padding: 0.5em 0.5em;
