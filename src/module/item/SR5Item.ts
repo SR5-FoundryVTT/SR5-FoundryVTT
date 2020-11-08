@@ -601,6 +601,8 @@ export class SR5Item extends Item {
     async rollTest(event, options?: Partial<AdvancedRollProps>, actionTestData?: ActionTestData): Promise<ShadowrunRoll | undefined> {
 
         const roll = await ShadowrunRoller.itemRoll(event, this, options, actionTestData);
+        if (!roll) return;
+
         await this.setLastAttackForRoll(roll, actionTestData);
         await ShadowrunRoller.resultingItemRolls(event, this, actionTestData);
 

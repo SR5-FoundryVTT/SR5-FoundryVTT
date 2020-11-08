@@ -20,6 +20,11 @@
     {{/if}}
     {{#if description}}
     <div class="card-description">
+        {{#if description.description.value}}
+        <div class="card-description-content">
+            {{{description.description.value}}}
+        </div>
+        {{/if}}
         {{#each description.properties}}
         <span style="white-space: nowrap;">{{this}}</span>
         {{/each}}

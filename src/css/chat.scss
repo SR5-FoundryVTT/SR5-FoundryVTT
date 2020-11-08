@@ -69,6 +69,9 @@
                     padding-right: 0;
                 }
             }
+            .card-description-content {
+                border-bottom: $groove;
+            }
         }
     }
     &.roll-card {
