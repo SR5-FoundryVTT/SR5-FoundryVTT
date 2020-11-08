@@ -26,6 +26,12 @@ export type Test =  {
     type: string;
 }
 
+interface RollProps {
+    parts: ModList<number>,
+    limit?: any,
+    explodeSixes: boolean
+}
+
 export interface BasicRollProps {
     parts?: ModList<number>;
     limit?: BaseValuePair<number> & LabelField;
@@ -234,11 +240,36 @@ export class ShadowrunRoller {
         return formula;
     }
 
+    static roll(props: RollProps): ShadowrunRoll|undefined {
+        const parts = new PartsList(props.parts);
+
+        if (parts.isEmpty || parts.total < 1) {
+            ui.notifications.error(game.i18n.localize('SR5.RollOneDie'));
+            return
+        };
+
+        // Prepare SR Success Test with foundry formula.
+        const formula = this.shadowrunFormula({ parts: parts.list, limit: props.limit, explode: props.explodeSixes });
+        if (!formula) {
+            return;
+        }
+
+        console.warn(parts, formula);
+
+        // Execute the Success Test.
+        const rollData = {parts: parts.list, limit: props.limit, explodeSixes: props.explodeSixes};
+        const roll = new ShadowrunRoll(formula, rollData);
+
+        // Return roll reference instead roll() return to avoid typing issues.
+        roll.roll();
+        return roll;
+    }
+
     static async basicRoll({
         actor,
         item,
         title = DEFAULT_ROLL_NAME,
-        parts: partsProps = [],
+        parts = [],
         limit,
         explodeSixes = false,
         hideRollMessage = false,
@@ -253,31 +284,12 @@ export class ShadowrunRoller {
         tests,
         ...props
     }: BasicRollProps): Promise<ShadowrunRoll | undefined> {
-        const parts = new PartsList(partsProps);
+        const roll = await ShadowrunRoller.roll({parts, limit, explodeSixes});
+        if (!roll) return;
 
-        // Abort on nothing to roll.
-        if (parts.isEmpty) {
-            return;
-        }
+        await ifConfiguredCreateDefaultChatMessage({roll, actor, title, rollMode});
 
-        // Prepare SR Success Test with foundry formula.
-        const formula = this.shadowrunFormula({ parts: parts.list, limit, explode: explodeSixes });
-        if (!formula) {
-            return
-        }
-
-        // Execute the Success Test.
-        const rollData = {limit, explodeSixes, parts: parts.list};
-        const roll = new ShadowrunRoll(formula, rollData);
-        roll.roll();
-
-        await ifConfiguredCreateDefaultChatMessage(roll, {actor, title, rollMode});
-
-        // NOTE: Keep template data extraction to see basicProps that come through unused.
-        const templateData = {
-            // tokenId: tokenSceneId,
-            actor, token: actor?.token, target, title, description, rollMode, limit, previewTemplate,
-            attack, incomingAttack, incomingDrain, incomingSoak, item, tests, ...props, roll};
+        // NOTE: Show unused basicRollProps
         console.warn('basicProps unused', props);
 
         if (!hideRollMessage) {
@@ -345,6 +357,7 @@ export class ShadowrunRoller {
         if (testDialog.canceled) return;
 
 
+        // Prepare Test Roll...
         const basicRollProps = {...props};
         basicRollProps.wounds = testData.wounds;
         // TODO: Check for error potential of overwriting this one.
@@ -363,10 +376,12 @@ export class ShadowrunRoller {
 
         basicRollProps.parts = testData.parts.list;
 
-
+        // Execute Test roll...
         const roll = await this.basicRoll(basicRollProps);
 
-        if (testData.extended && roll) {
+        if (!roll) return roll;
+
+        if (testData.extended) {
             const currentExtended = parts.getPartValue('SR5.Extended') ?? 0;
             parts.addUniquePart('SR5.Extended', currentExtended - 1);
             props.parts = parts.list;
@@ -374,7 +389,7 @@ export class ShadowrunRoller {
             setTimeout(() => this.advancedRoll(props), 400);
         }
 
-        if (after && roll) await after(roll);
+        if (after) await after(roll);
 
         return roll;
     }

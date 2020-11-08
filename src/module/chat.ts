@@ -143,8 +143,7 @@ const createChatData = async (templateData, options?: ChatDataOptions) => {
 };
 
 
-
-export async function ifConfiguredCreateDefaultChatMessage(roll: ShadowrunRoll, {actor, title, rollMode}) {
+export async function ifConfiguredCreateDefaultChatMessage({roll, actor, title, rollMode}) {
     if (game.settings.get(SYSTEM_NAME, FLAGS.DisplayDefaultRollCard)) {
         await roll.toMessage({
             speaker: ChatMessage.getSpeaker({ actor: actor }),
