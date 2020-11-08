@@ -143,8 +143,8 @@ const createChatData = async (templateData, options?: ChatDataOptions) => {
 };
 
 
-export async function ifConfiguredCreateDefaultChatMessage({roll, actor, title, rollMode}) {
-    if (game.settings.get(SYSTEM_NAME, FLAGS.DisplayDefaultRollCard)) {
+export async function ifConfiguredCreateDefaultChatMessage({roll, actor, title, rollMode}: Partial<RollChatMessageOptions>) {
+    if (game.settings.get(SYSTEM_NAME, FLAGS.DisplayDefaultRollCard) && roll) {
         await roll.toMessage({
             speaker: ChatMessage.getSpeaker({ actor: actor }),
             flavor: title,
@@ -181,6 +181,8 @@ function createChatTemplateData(options: ItemChatMessageOptions): ItemChatTempla
 }
 
 export async function createRollChatMessage(options: RollChatMessageOptions): Promise<Entity<any>> {
+    await ifConfiguredCreateDefaultChatMessage(options);
+
     const templateData = getRollChatTemplateData(options);
     // TODO: Double data is bad.
     const chatOptions = {roll: options.roll};

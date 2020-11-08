@@ -285,8 +285,6 @@ export class ShadowrunRoller {
         const roll = await ShadowrunRoller.roll({parts, limit, explodeSixes});
         if (!roll) return;
 
-        await ifConfiguredCreateDefaultChatMessage({roll, actor, title, rollMode});
-
         // NOTE: Show unused basicRollProps
         console.warn('basicProps unused', props);
 
@@ -297,7 +295,7 @@ export class ShadowrunRoller {
 
         // TODO: Move Target section into AdvancedRoll
         // @ts-ignore // target.actor is of type Actor instead of SR5Actor
-        if (target && target.actor.hasActivePlayer()) {
+        if (!hideRollMessage && target && target.actor.hasActivePlayer()) {
             // @ts-ignore
             const user = target.actor.getActivePlayer();
 
