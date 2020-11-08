@@ -388,10 +388,11 @@ export class ShadowrunRoller {
             const currentExtended = testData.parts.getPartValue('SR5.Extended') ?? 0;
             testData.parts.addUniquePart('SR5.Extended', currentExtended - 1);
 
+            // Prepare the next, extended test roll.
             props.parts = testData.parts.list;
             props.extended = true;
-            // add a bit of a delay to roll again
-            setTimeout(() => this.advancedRoll(props), 400);
+            const delayInMs = 400;
+            setTimeout(() => this.advancedRoll(props), delayInMs);
         }
 
         if (after) await after(roll);

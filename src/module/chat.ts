@@ -255,17 +255,17 @@ export const addChatMessageContextOptions = (html, options) => {
 
     options.push(
         {
-            name: 'Push the Limit',
+            name: game.i18n.localize('SR5.PushTheLimit'),
             callback: (li) => SR5Actor.pushTheLimit(li),
             condition: canRoll,
             icon: '<i class="fas fa-meteor"></i>',
         },
         {
-            name: 'Second Chance',
+            name: game.i18n.localize('SR5.SecondChange'),
             callback: (li) => SR5Actor.secondChance(li),
             condition: canRoll,
             icon: '<i class="fas fa-dice-d6"></i>',
-        },
+        }
     );
     return options;
 };
