@@ -84,13 +84,10 @@ export class HooksManager {
         SquareGrid.prototype.measureDistances = measureDistance;
     }
 
-    static hotbarDrop(bar, data, slot): boolean {
+    static hotbarDrop(bar, data, slot) {
         if (data.type === 'Item') {
-            // Promise can't be honored in this non-async function scope, as it needs to return a boolean.
             createItemMacro(data.data, slot);
         }
-
-        return false;
     }
 
     static renderSceneControls(controls, html) {
