@@ -85,9 +85,10 @@ export class HooksManager {
     }
 
     static hotbarDrop(bar, data, slot) {
-        if (data.type === 'Item') {
-            createItemMacro(data.data, slot);
-        }
+        if (data.type !== 'Item') return;
+
+        createItemMacro(data.data, slot);
+        return false;
     }
 
     static renderSceneControls(controls, html) {
