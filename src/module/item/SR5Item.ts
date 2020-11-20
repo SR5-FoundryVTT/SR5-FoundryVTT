@@ -281,6 +281,8 @@ export class SR5Item extends Item {
         const data = duplicate(this.data.data);
         const { labels } = this;
         if (!data.description) data.description = {};
+        // TextEditor.enrichHTML will return null as a string, making later handling difficult.
+        if (!data.description.value) data.description.value = '';
 
         data.description.value = TextEditor.enrichHTML(data.description.value, htmlOptions);
 
