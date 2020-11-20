@@ -108,25 +108,16 @@
                 <span class="key">{{localize "SR5.Dropoff"}}: </span>
                 <span class="value">{{attack.blast.dropoff}}/m</span>
             </div>
-            {{/if}} {{#if incomingSoak}}
-            <div class="category-line">
-                {{localize "SR5.Incoming"}}
-            </div>
-            <div class="damage-line">
-                {{#if incomingSoak.value}}
-                <div>
-                    <span class="key">{{localize "SR5.Damage"}}: </span>
-                    <span class="value">{{incomingSoak.value}}{{damageAbbreviation incomingSoak.type.value}}</span>
-                </div>
-                {{/if}} {{#if incomingSoak.element.value}}
-                <div>
-                    <i
-                            class="{{elementIcon incomingSoak.element.value}} icon"
-                            title="{{localize incomingSoak.element.value}}"
-                    ></i>
-                </div>
-                {{/if}}
-            </div>
+            {{/if}} {{#if damage}}
+                <div class="category-line">{{localize 'SR5.IncomingDamage'}}</div>
+                {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.html'
+                        name=(localize "SR5.Incoming")
+                        damage=damage.incoming
+                }}
+                {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.html'
+                        name=(localize "SR5.Modified")
+                        damage=damage.modified
+                }}
             {{/if}} {{#if (isDefined incomingAttack.hits)}}
             <div class="limit-line">
                 <span class="key">{{localize "SR5.AttackerHits"}}</span>
@@ -141,6 +132,12 @@
                     {{localize incomingDrain.label}}:
                 </span>
                 <span class="value">{{incomingDrain.value}}</span>
+            </div>
+            {{/if}}
+            {{#if opposed}}
+            <div class="category-line">
+                <span class="key">{{localize "SR5.NetHits"}}</span>
+                <span class="value">{{opposed.netHits}}</span>
             </div>
             {{/if}}
         </div>

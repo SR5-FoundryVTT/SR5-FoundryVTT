@@ -423,6 +423,7 @@
   "SR5.Defaulting": "Improvisieren",
   "SR5.NotExtended": "Nicht Ausgedehnt",
   "SR5.Hits": "Erfolge",
+  "SR5.NetHits": "Netto Erfolge",
 
   "SR5.NormalSpellButton": "Normal",
   "SR5.RecklessSpellButton": "Schnell",
@@ -438,6 +439,7 @@
   "SR5.SoakTest": "Schadenswiderstandsprobe",
   "SR5.AttackerHits": "Angreifer Erfolge",
   "SR5.Incoming": "Kommend",
+  "SR5.Modified": "Modifiziert",
   "SR5.Resist": "Widerstehen",
   "SR5.Force": "Kraft",
   "SR5.Roll": "Werfen",

@@ -22,6 +22,11 @@ declare namespace Shadowrun {
         blast?: BlastData;
     };
 
+    type ModifiedDamageData = {
+        incoming: DamageData
+        modified?: DamageData
+    }
+
     type DrainData = LabelField & {
         value: number;
     }

@@ -18,6 +18,7 @@ import BlastData = Shadowrun.BlastData;
 import FireModeData = Shadowrun.FireModeData;
 import DrainData = Shadowrun.DrainData;
 import {ShadowrunTestDialog} from "../apps/dialogs/ShadowrunTestDialog";
+import ModifiedDamageData = Shadowrun.ModifiedDamageData;
 
 // TODO: Split up BasicRollProps into the different types of calls
 // item, actor, dicePool, attack, defense, spell, form
@@ -32,6 +33,7 @@ interface RollProps {
     explodeSixes?: boolean
 }
 
+// TODO: Separate into 'roll data' and 'template data', which only passes through but isn't used.
 export interface BasicRollProps {
     parts?: ModList<number>;
     limit?: BaseValuePair<number> & LabelField;
@@ -45,7 +47,7 @@ export interface BasicRollProps {
     // Incoming attack for a defense test
     incomingAttack?: AttackData;
     incomingDrain?: DrainData;
-    incomingSoak?: DamageData;
+    damage?: ModifiedDamageData;
     tests?: Test[];
     description?: object;
     previewTemplate?: boolean;
@@ -401,8 +403,8 @@ export class ShadowrunRoller {
     }
 
     static async rollChatMessage(roll: ShadowrunRoll, props: BasicRollPropsDefaulted) {
-        const {actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, incomingDrain, incomingSoak, tests} = props;
-        const rollChatMessageOptions = {roll, actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, incomingDrain, incomingSoak, tests};
+        const {actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, incomingDrain, damage, tests} = props;
+        const rollChatMessageOptions = {roll, actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, incomingDrain, damage, tests};
         await createRollChatMessage(rollChatMessageOptions);
     }
 

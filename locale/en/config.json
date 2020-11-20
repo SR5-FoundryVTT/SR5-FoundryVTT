@@ -424,6 +424,7 @@
     "SR5.Defaulting": "Defaulting",
     "SR5.NotExtended": "Not Extended",
     "SR5.Hits": "Hits",
+    "SR5.NetHits": "Net Hits",
 
     "SR5.NormalSpellButton": "Normal",
     "SR5.RecklessSpellButton": "Reckless",
@@ -439,6 +440,7 @@
     "SR5.SoakTest": "Damage Resist Test",
     "SR5.AttackerHits": "Attacker Hits",
     "SR5.Incoming": "Incoming",
+    "SR5.Modified": "Modified",
     "SR5.Resist": "Resist",
     "SR5.Force": "Force",
     "SR5.Roll": "Roll",

@@ -1,12 +1,12 @@
 import { SR5Actor } from './actor/SR5Actor';
 import { SR5Item } from './item/SR5Item';
 import Template from './template';
-import DamageData = Shadowrun.DamageData;
 import AttackData = Shadowrun.AttackData;
 import {CORE_FLAGS, CORE_NAME, FLAGS, SYSTEM_NAME} from './constants';
 import {ShadowrunRoll, Test} from "./rolls/ShadowrunRoller";
 import DrainData = Shadowrun.DrainData;
 import {Helpers} from "./helpers";
+import ModifiedDamageData = Shadowrun.ModifiedDamageData;
 
 export interface TargetChatMessageOptions {
     actor: Actor
@@ -30,22 +30,22 @@ export interface ItemChatMessageOptions {
 }
 
 export interface RollChatMessageOptions {
+    title: string
     roll: ShadowrunRoll
     actor?: SR5Actor
     target?: Token
 
     item?: SR5Item
 
-    title: string
     description?: object
 
-    rollMode: keyof typeof CONFIG.dice.rollModes
-    previewTemplate: boolean
+    rollMode?: keyof typeof CONFIG.dice.rollModes
+    previewTemplate?: boolean
 
     attack?: AttackData
     incomingAttack?: AttackData
     incomingDrain?: DrainData
-    incomingSoak?: DamageData
+    damage?: ModifiedDamageData
     tests?: Test[];
 }
 
@@ -78,7 +78,7 @@ interface RollChatTemplateData {
     // TODO: group 'incoming' with type field instead of multiple incoming types.
     incomingAttack?: AttackData
     incomingDrain?: DrainData
-    incomingSoak?: DamageData
+    damage?: ModifiedDamageData
     tests?: Test[];
 }
 
@@ -194,7 +194,7 @@ function getRollChatTemplateData(options: RollChatMessageOptions): RollChatTempl
     // field extraction is explicit to enforce visible data flow to ensure clean data.
     // NOTE: As soon as clear data dynamic data flow can be established, this should be removed for a simple {...options}
     let {roll, actor, item, target, description, title, previewTemplate,
-        attack, incomingAttack, incomingDrain, incomingSoak, tests} = options;
+        attack, incomingAttack, incomingDrain, damage, tests} = options;
 
     const rollMode = options.rollMode ?? game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
 
@@ -217,7 +217,7 @@ function getRollChatTemplateData(options: RollChatMessageOptions): RollChatTempl
         attack,
         incomingAttack,
         incomingDrain,
-        incomingSoak,
+        damage,
         tests
     }
 }

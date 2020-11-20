@@ -20,6 +20,8 @@ import EdgeAttributeField = Shadowrun.EdgeAttributeField;
 import VehicleActorData = Shadowrun.VehicleActorData;
 import VehicleStat = Shadowrun.VehicleStat;
 import {ShadowrunActorDialogs} from "../apps/dialogs/ShadowrunActorDialogs";
+import {createRollChatMessage} from "../chat";
+import ModifiedDamageData = Shadowrun.ModifiedDamageData;
 
 export class SR5Actor extends Actor {
     getOverwatchScore() {
@@ -312,26 +314,26 @@ export class SR5Actor extends Actor {
     async rollDefense(options: DefenseRollOptions = {}, partsProps: ModList<number> = []) {
         // TODO: Check melee weapon reach display...
         // TODO: Check incomingAttack stuffy
+        const {incomingAttack} = options;
 
         const defenseDialog = await ShadowrunActorDialogs.createDefenseDialog(this, options, partsProps);
         const defenseActionData = await defenseDialog.select();
 
         if (defenseDialog.canceled) return;
 
+
         const roll = await ShadowrunRoller.advancedRoll({
             event: options.event,
             actor: this,
             parts: defenseActionData.parts.list,
             title: game.i18n.localize('SR5.DefenseTest'),
-            incomingAttack: options.incomingAttack,
+            incomingAttack
         });
-
-        const {incomingAttack} = options;
 
         if (!roll) return;
         if (!incomingAttack) return;
 
-        // Prepare Soak Test.
+        // Collect defense information.
         let defenderHits = roll.total;
         let attackerHits = incomingAttack.hits || 0;
         let netHits = attackerHits - defenderHits;
@@ -350,6 +352,7 @@ export class SR5Actor extends Actor {
         await this.rollSoak(soakRollOptions);
     }
 
+    // TODO: Abstract handling of const damage : ModifiedDamageData
     async rollSoak(options: SoakRollOptions, partsProps: ModList<number> = []) {
         const soakDialog = await ShadowrunActorDialogs.createSoakDialog(this, options, partsProps);
         const soakActionData = await soakDialog.select();
@@ -358,14 +361,27 @@ export class SR5Actor extends Actor {
 
         // Show the actual Soak Test.
         const title = game.i18n.localize('SR5.SoakTest');
-        await ShadowrunRoller.advancedRoll({
+        const actor = this;
+        const roll = await ShadowrunRoller.advancedRoll({
             event: options?.event,
-            actor: this,
-            incomingSoak: soakActionData.soak,
+            actor,
             parts: soakActionData.parts.list,
             title,
             wounds: false,
+            hideRollMessage: true
         });
+
+        if (!roll) return;
+
+        // Reduce damage by soak
+        const incoming = soakActionData.soak;
+        const modified = {...incoming};
+        modified.mod = PartsList.AddUniquePart(modified.mod, 'SR5.SoakTest', -roll.hits);
+        modified.value = Helpers.calcTotal(modified);
+
+        const damage = {incoming, modified};
+
+        await createRollChatMessage({title, roll, actor, damage});
     }
 
     rollSingleAttribute(attId, options: ActorRollOptions) {
