@@ -20032,10 +20032,9 @@ class HooksManager {
         SquareGrid.prototype.measureDistances = canvas_1.measureDistance;
     }
     static hotbarDrop(bar, data, slot) {
-        if (data.type === 'Item') {
-            // Promise can't be honored in this non-async function scope, as it needs to return a boolean.
-            macros_1.createItemMacro(data.data, slot);
-        }
+        if (data.type !== 'Item')
+            return;
+        macros_1.createItemMacro(data.data, slot);
         return false;
     }
     static renderSceneControls(controls, html) {
