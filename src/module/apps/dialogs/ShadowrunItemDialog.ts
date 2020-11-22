@@ -229,9 +229,12 @@ export class ShadowrunItemDialog {
         templateData['ranges'] = templateRanges;
         templateData['targetRange'] = item.getLastFireRangeMod();
 
-        templateData['targetsSelected'] = Helpers.userHasTargets();
-        if (item.actor.hasToken() && Helpers.userHasTargets()) {
+        if (item.actor.getToken() && Helpers.userHasTargets()) {
+            templateData['targetsSelected'] = Helpers.userHasTargets();
             templateData['targets'] = ShadowrunItemDialog._getTargetRangeTemplateData(item.actor, templateRanges);
+        } else if (!item.actor.getToken() && Helpers.userHasTargets()) {
+            // Inform user about usage of actors without tokens!
+            ui.notifications.warn(game.i18n.localize('SR5.TargetingNeedsActorWithToken'));
         }
 
         let cancel = true;
@@ -290,11 +293,13 @@ export class ShadowrunItemDialog {
      *
      */
     static _getTargetRangeTemplateData(actor: SR5Actor, ranges) {
-        if (!actor.hasToken() || !Helpers.userHasTargets()) {
+        const attacker = actor.getToken();
+
+        if (!attacker || !Helpers.userHasTargets()) {
+            ui.notifications.warn(game.i18n.localize('SR5.TargetingNeedsActorWithToken'));
             return [];
         }
 
-        const attacker = actor.getToken();
         const targets = Helpers.getUserTargets();
 
         return targets.map(target => {

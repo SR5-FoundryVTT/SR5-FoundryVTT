@@ -271,6 +271,8 @@ export class Helpers {
     }
 
     static measureTokenDistance(tokenOrigin: Token, tokenDest: Token): number {
+        if (!tokenOrigin || !tokenDest) return 0;
+
         const origin = new PIXI.Point(...canvas.grid.getCenter(tokenOrigin.data.x, tokenOrigin.data.y));
         const dest = new PIXI.Point(...canvas.grid.getCenter(tokenDest.data.x, tokenDest.data.y));
 

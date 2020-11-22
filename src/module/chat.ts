@@ -200,8 +200,6 @@ function getRollChatTemplateData(options: RollChatMessageOptions): RollChatTempl
 
     const token = actor?.getToken();
 
-    // [name, img] = getPreferedNameAndImageSource(name, img, actor, token);
-    // const header = {name, img};
     const tokenId = getTokenSceneId(token);
 
     return {
@@ -220,26 +218,6 @@ function getRollChatTemplateData(options: RollChatMessageOptions): RollChatTempl
         damage,
         tests
     }
-}
-
-/** Use either the actor or the tokens name and image, depending on system settings.
- *
- * However don't change anything if a custom name or image has been given.
- */
-function getPreferedNameAndImageSource(name?: string, img?: string, actor?: SR5Actor, token?: Token): [string, string] {
-
-    const namedAndImageMatchActor = name === actor?.name && img === actor?.img;
-    const useTokenNameForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
-
-    if (namedAndImageMatchActor && useTokenNameForChatOutput && token) {
-        img = token?.data.img;
-        name = token?.data.name;
-    }
-
-    name = name ? name : '';
-    img = img ? img : '';
-
-    return [name, img];
 }
 
 function getTokenSceneId(token: Token|undefined): string|undefined {
@@ -284,7 +262,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
         const item = SR5Item.getItemFromMessage(html);
         const type = event.currentTarget.dataset.action;
         if (!item) {
-            console.error(`Test of type '${type}' can't be rolled without an item dataset. This is a bug.`);
+            ui.notifications.error(game.i18n.localize('SR5.MissingItemForOpposedTest'));
             return;
         }
 
@@ -314,13 +292,14 @@ export const addRollListeners = (app: ChatMessage, html) => {
 
         if (!id) return;
 
-        // TODO: Refactor for multi entity type usability.
        if (type === 'Token') {
            const token = canvas.tokens.get(id);
-           const sheet = token.actor.sheet;
-           sheet.render(true, {token: token});
+           token.actor.sheet.render(true, {token});
        }
-
+       else if (type === 'Actor') {
+           const actor = game.actors.get(id);
+           actor.sheet.render(true);
+       }
        else if (type === 'Item') {
            const card = entityLink.closest('.chat-card');
            const sceneTokenId = card.data('tokenId');
@@ -343,6 +322,8 @@ export const addRollListeners = (app: ChatMessage, html) => {
 
         if (token) {
             token.control();
+        } else {
+            ui.notifications.warn(game.i18n.localize('SR5.NoSelectableToken'))
         }
     });
 };
