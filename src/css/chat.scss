@@ -7,12 +7,13 @@
 
         .card-header {
             padding: 0.25em 0;
-            border-top: $groove;
             border-bottom: $groove;
 
             img {
                 flex: 0 0 36px;
                 margin-right: 0.5em;
+                padding: 1px 1px 1px 1px;
+                border: 0;
             }
 
             h3 {
@@ -22,6 +23,9 @@
                 margin: 0;
                 @include nodesto;
             }
+        }
+        .card-header:first-of-type {
+            border-top: $groove;
         }
         .card-content {
             padding: 0.5em 0;
@@ -310,18 +314,8 @@
             }
         }
     }
-    .entity-selectable {
-        background:
-            linear-gradient(to right, black 1px, transparent 1px) 0 0,
-            linear-gradient(to right, black 1px, transparent 1px) 0 100%,
-            linear-gradient(to left, black 1px, transparent 1px) 100% 0,
-            linear-gradient(to left, black 1px, transparent 1px) 100% 100%,
-            linear-gradient(to bottom, black 1px, transparent 1px) 0 0,
-            linear-gradient(to bottom, black 1px, transparent 1px) 100% 0,
-            linear-gradient(to top, black 1px, transparent 1px) 0 100%,
-            linear-gradient(to top, black 1px, transparent 1px) 100% 100%;
-
-          background-repeat: no-repeat;
-          background-size: 36px 36px;
+    .chat-select-link img:hover {
+        padding: 0;
+        border: $groove;
     }
 }
