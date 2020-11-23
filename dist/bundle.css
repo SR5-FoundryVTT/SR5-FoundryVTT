@@ -302,67 +302,81 @@
   font-size: 1rem; }
   .sr5.chat-card .card-header {
     padding: 0.25em 0;
-    border-top: 1px solid #4d4d4d;
     border-bottom: 1px solid #4d4d4d; }
     .sr5.chat-card .card-header img {
       flex: 0 0 36px;
-      margin-right: 0.5em; }
+      margin-right: 0.5em;
+      padding: 1px 1px 1px 1px;
+      border: 0; }
     .sr5.chat-card .card-header h3 {
       font-size: 1.75em;
       align-self: center;
       flex: 1;
       margin: 0;
       font-family: "Nodesto", "Signika", "Palatino Linotype", serif; }
+  .sr5.chat-card .card-header:first-of-type {
+    border-top: 1px solid #4d4d4d; }
   .sr5.chat-card .card-content {
     padding: 0.5em 0;
-    border-bottom: 1px solid #4d4d4d; }
+    border-bottom: 1px solid #4d4d4d;
+    cursor: pointer; }
     .sr5.chat-card .card-content p {
       font-size: 0.8em; }
     .sr5.chat-card .card-content h3 {
       font-size: 1em;
       margin: 0;
       font-weight: bold; }
-  .sr5.chat-card .card-buttons {
-    border-top: 1px solid #4d4d4d; }
-    .sr5.chat-card .card-buttons .button {
-      box-shadow: 0 0 0.25em 0.15em #4d4d4d;
-      cursor: pointer;
-      border: 1px solid #4d4d4d;
-      background: grey;
-      margin-top: 0.5em;
-      margin-left: auto;
-      margin-right: auto;
-      text-align: center;
-      font-size: 16px;
-      font-style: italic;
-      font-weight: bold; }
-      .sr5.chat-card .card-buttons .button:hover {
-        box-shadow: 0 0 0.25em 0.15em black; }
-  .sr5.chat-card .card-footer {
-    padding: 0.25em 0 0;
-    border-top: 1px solid #4d4d4d; }
-    .sr5.chat-card .card-footer span {
-      border-right: 1px solid #4d4d4d;
-      padding: 0;
-      padding-right: 0.3em;
-      font-size: 0.75em; }
-      .sr5.chat-card .card-footer span:last-child {
-        border-right: none;
-        padding-right: 0; }
+  .sr5.chat-card .card-buttons .button {
+    box-shadow: 0 0 0.25em 0.15em #4d4d4d;
+    cursor: pointer;
+    border: 1px solid #4d4d4d;
+    background: grey;
+    margin-top: 0.5em;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    font-size: 16px;
+    font-style: italic;
+    font-weight: bold; }
+    .sr5.chat-card .card-buttons .button:hover {
+      box-shadow: 0 0 0.25em 0.15em black; }
+  .sr5.chat-card .card-description span {
+    border-right: 1px solid #4d4d4d;
+    padding: 0;
+    padding-right: 0.3em;
+    font-size: 0.75em; }
+    .sr5.chat-card .card-description span:last-child {
+      border-right: none;
+      padding-right: 0; }
+  .sr5.chat-card .card-description .card-description-content {
+    border-bottom: 1px solid #4d4d4d; }
 
 .sr5.roll-card {
   margin: 0.15em; }
   .sr5.roll-card .card-title {
+    display: flex;
     font-size: 14px;
     border-bottom: 1px solid #4d4d4d;
-    justify-content: left;
+    justify-content: flex-start;
     align-content: center;
     align-items: flex-end; }
     .sr5.roll-card .card-title > * {
       margin-left: 0.15em;
       margin-right: 0.15em; }
-    .sr5.roll-card .card-title .header-name:hover {
-      text-shadow: -1px -1px 0 #6495ed, 1px -1px 0 #6495ed, -1px 1px 0 #6495ed, 1px 1px 0 #6495ed; }
+    .sr5.roll-card .card-title .header-name {
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap; }
+      .sr5.roll-card .card-title .header-name:hover {
+        text-shadow: -1px -1px 0 #6495ed, 1px -1px 0 #6495ed, -1px 1px 0 #6495ed, 1px 1px 0 #6495ed; }
+    .sr5.roll-card .card-title .show-display-description,
+    .sr5.roll-card .card-title .hide-display-description {
+      border: none;
+      cursor: pointer;
+      height: 32px;
+      width: 32px; }
+    .sr5.roll-card .card-title .hide-display-description {
+      display: none; }
   .sr5.roll-card .test-line {
     margin-top: 0.25em;
     display: flex;
@@ -384,7 +398,10 @@
   .sr5.roll-card .card-description {
     padding: 0.25em;
     font-size: 14px;
-    border-bottom: 1px solid #4d4d4d; }
+    border-bottom: 1px solid #4d4d4d;
+    display: none; }
+  .sr5.roll-card .show-card-description {
+    display: block; }
   .sr5.roll-card .card-content {
     font-size: 14px;
     padding: 0 0.25em;
@@ -432,6 +449,9 @@
         margin-right: 0.1em; }
       .sr5.roll-card .card-content .damage-line .icon {
         font-style: italic; }
+  .sr5.roll-card .dice-rolls {
+    display: none;
+    border-bottom: 1px solid #4d4d4d; }
   .sr5.roll-card .dice-roll-content {
     padding: 0.5em 0.5em;
     display: flex;
@@ -454,7 +474,7 @@
   .sr5.roll-card .glitch-content {
     display: flex;
     flex-flow: column;
-    border-top: 1px solid #4d4d4d; }
+    border-bottom: 1px solid #4d4d4d; }
     .sr5.roll-card .glitch-content .glitch {
       position: relative;
       text-decoration: none;
@@ -515,10 +535,9 @@
   to {
     transform: translate(0); } }
 
-.sr5 .entity-selectable {
-  background: linear-gradient(to right, black 1px, transparent 1px) 0 0, linear-gradient(to right, black 1px, transparent 1px) 0 100%, linear-gradient(to left, black 1px, transparent 1px) 100% 0, linear-gradient(to left, black 1px, transparent 1px) 100% 100%, linear-gradient(to bottom, black 1px, transparent 1px) 0 0, linear-gradient(to bottom, black 1px, transparent 1px) 100% 0, linear-gradient(to top, black 1px, transparent 1px) 0 100%, linear-gradient(to top, black 1px, transparent 1px) 100% 100%;
-  background-repeat: no-repeat;
-  background-size: 36px 36px; }
+.sr5 .chat-select-link img:hover {
+  padding: 0;
+  border: 1px solid #4d4d4d; }
 
 @font-face {
   font-family: 'Nodesto';
@@ -771,9 +790,7 @@ select.display {
 
 .sr5 .profile-img {
   padding: 0.25em;
-  max-width: 100px;
-  border-right: 1px solid #4d4d4d;
-  border-bottom: 1px solid #4d4d4d; }
+  max-width: 100px; }
 
 .sr5 .tabs {
   flex: 0;

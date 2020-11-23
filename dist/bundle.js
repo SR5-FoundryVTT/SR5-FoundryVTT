@@ -13240,6 +13240,8 @@ const helpers_1 = require("../helpers");
 const constants_1 = require("../constants");
 const PartsList_1 = require("../parts/PartsList");
 const ActorPrepFactory_1 = require("./prep/ActorPrepFactory");
+const ShadowrunActorDialogs_1 = require("../apps/dialogs/ShadowrunActorDialogs");
+const chat_1 = require("../chat");
 class SR5Actor extends Actor {
     getOverwatchScore() {
         const os = this.getFlag(constants_1.SYSTEM_NAME, 'overwatchScore');
@@ -13335,6 +13337,20 @@ class SR5Actor extends Actor {
     }
     getDeviceRating() {
         return this.data.data.matrix.rating;
+    }
+    getAttributes() {
+        return this.data.data.attributes;
+    }
+    getAttribute(name) {
+        const attributes = this.getAttributes();
+        return attributes[name];
+    }
+    getLimits() {
+        return this.data.data.limits;
+    }
+    getLimit(name) {
+        const limits = this.getLimits();
+        return limits[name];
     }
     isVehicle() {
         return this.data.type === 'vehicle';
@@ -13454,7 +13470,7 @@ class SR5Actor extends Actor {
             label: 'SR5.Fade',
             value: incoming,
         };
-        return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
+        const roll = ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
             event: options.event,
             parts: parts.list,
             actor: this,
@@ -13462,6 +13478,10 @@ class SR5Actor extends Actor {
             wounds: false,
             incomingDrain,
         });
+        if (!roll)
+            return;
+        // TODO: Reduce damage by fade resist
+        return roll;
     }
     rollDrain(options = {}, incoming = -1) {
         const wil = duplicate(this.data.data.attributes.willpower);
@@ -13476,14 +13496,18 @@ class SR5Actor extends Actor {
             label: 'SR5.Drain',
             value: incoming,
         };
-        return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
+        const roll = ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
             event: options.event,
             parts: parts.list,
             actor: this,
             title: title,
             wounds: false,
-            incomingDrain,
+            incomingDrain
         });
+        if (!roll)
+            return;
+        // TODO: Reduce damage by drain resist
+        return roll;
     }
     rollArmor(options = {}, partsProps = []) {
         const parts = new PartsList_1.PartsList(partsProps);
@@ -13497,209 +13521,68 @@ class SR5Actor extends Actor {
         });
     }
     rollDefense(options = {}, partsProps = []) {
-        var _a, _b, _c, _d;
         return __awaiter(this, void 0, void 0, function* () {
-            const parts = new PartsList_1.PartsList(partsProps);
-            this._addDefenseParts(parts);
-            // full defense is always added
-            const activeDefenses = {
-                full_defense: {
-                    label: 'SR5.FullDefense',
-                    value: (_a = this.getFullDefenseAttribute()) === null || _a === void 0 ? void 0 : _a.value,
-                    initMod: -10,
-                },
-                dodge: {
-                    label: 'SR5.Dodge',
-                    value: (_b = this.findActiveSkill('gymnastics')) === null || _b === void 0 ? void 0 : _b.value,
-                    initMod: -5,
-                },
-                block: {
-                    label: 'SR5.Block',
-                    value: (_c = this.findActiveSkill('unarmed_combat')) === null || _c === void 0 ? void 0 : _c.value,
-                    initMod: -5,
-                },
-            };
-            const equippedMeleeWeapons = this.getEquippedWeapons().filter((w) => w.isMeleeWeapon());
-            let defenseReach = 0;
-            equippedMeleeWeapons.forEach((weapon) => {
-                var _a;
-                activeDefenses[`parry-${weapon.name}`] = {
-                    label: 'SR5.Parry',
-                    weapon: weapon.name,
-                    value: (_a = this.findActiveSkill(weapon.getActionSkill())) === null || _a === void 0 ? void 0 : _a.value,
-                    init: -5,
-                };
-                defenseReach = Math.max(defenseReach, weapon.getReach());
+            // TODO: Check melee weapon reach display...
+            // TODO: Check incomingAttack stuffy
+            const { incomingAttack } = options;
+            const defenseDialog = yield ShadowrunActorDialogs_1.ShadowrunActorDialogs.createDefenseDialog(this, options, partsProps);
+            const defenseActionData = yield defenseDialog.select();
+            if (defenseDialog.canceled)
+                return;
+            const roll = yield ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
+                event: options.event,
+                actor: this,
+                parts: defenseActionData.parts.list,
+                title: game.i18n.localize('SR5.DefenseTest'),
+                incomingAttack
             });
-            // if we are defending a melee attack
-            if ((_d = options.incomingAttack) === null || _d === void 0 ? void 0 : _d.reach) {
-                const incomingReach = options.incomingAttack.reach;
-                const netReach = defenseReach - incomingReach;
-                if (netReach !== 0) {
-                    parts.addUniquePart('SR5.Reach', netReach);
-                }
-            }
-            let dialogData = {
-                parts: parts.getMessageOutput(),
-                cover: options.cover,
-                activeDefenses,
+            if (!roll)
+                return;
+            if (!incomingAttack)
+                return;
+            // Collect defense information.
+            let defenderHits = roll.total;
+            let attackerHits = incomingAttack.hits || 0;
+            let netHits = attackerHits - defenderHits;
+            if (netHits === 0)
+                return;
+            const damage = incomingAttack.damage;
+            damage.mod = PartsList_1.PartsList.AddUniquePart(damage.mod, 'SR5.NetHits', netHits);
+            damage.value = helpers_1.Helpers.calcTotal(damage);
+            const soakRollOptions = {
+                event: options.event,
+                damage,
             };
-            let template = 'systems/shadowrun5e/dist/templates/rolls/roll-defense.html';
-            let cancel = true;
-            const incomingAttack = options.incomingAttack;
-            const event = options.event;
-            // Show Defense Test input dialog before Defense Test.
-            const content = yield renderTemplate(template, dialogData);
-            const dialog = yield new Dialog({
-                title: game.i18n.localize('SR5.Defense'),
-                content,
-                buttons: {
-                    continue: {
-                        label: game.i18n.localize('SR5.Continue'),
-                        callback: () => (cancel = false),
-                    },
-                },
-                default: 'normal',
-                close: (html) => __awaiter(this, void 0, void 0, function* () {
-                    if (cancel)
-                        return;
-                    let cover = helpers_1.Helpers.parseInputToNumber($(html).find('[name=cover]').val());
-                    let special = helpers_1.Helpers.parseInputToString($(html).find('[name=activeDefense]').val());
-                    if (special) {
-                        // TODO subtract initiative score when Foundry updates to 0.7.0
-                        const defense = activeDefenses[special];
-                        parts.addUniquePart(defense.label, defense.value);
-                    }
-                    if (cover) {
-                        parts.addUniquePart('SR5.Cover', cover);
-                    }
-                    // Show actual Defense Test.
-                    const roll = yield ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
-                        event: event,
-                        actor: this,
-                        parts: parts.list,
-                        title: game.i18n.localize('SR5.DefenseTest'),
-                        incomingAttack,
-                    });
-                    // Prepare Soak Test.
-                    if (incomingAttack && roll) {
-                        let defenderHits = roll.total;
-                        let attackerHits = incomingAttack.hits || 0;
-                        let netHits = attackerHits - defenderHits;
-                        if (netHits >= 0) {
-                            const damage = incomingAttack.damage;
-                            damage.mod = PartsList_1.PartsList.AddUniquePart(damage.mod, 'SR5.NetHits', netHits);
-                            damage.value = helpers_1.Helpers.calcTotal(damage);
-                            const soakRollOptions = {
-                                event: event,
-                                damage: damage,
-                            };
-                            yield this.rollSoak(soakRollOptions);
-                        }
-                    }
-                })
-            });
-            return yield dialog.render(true);
+            yield this.rollSoak(soakRollOptions);
         });
     }
+    // TODO: Abstract handling of const damage : ModifiedDamageData
     rollSoak(options, partsProps = []) {
         return __awaiter(this, void 0, void 0, function* () {
-            const parts = new PartsList_1.PartsList(partsProps);
-            this._addSoakParts(parts);
-            let dialogData = {
-                damage: options === null || options === void 0 ? void 0 : options.damage,
-                parts: parts.getMessageOutput(),
-                elementTypes: CONFIG.SR5.elementTypes,
-            };
-            let id = '';
-            let cancel = true;
-            let template = 'systems/shadowrun5e/dist/templates/rolls/roll-soak.html';
-            // Show Soak Test input field dialog before actual Soak Test.
-            const content = yield renderTemplate(template, dialogData);
-            const dialog = yield new Dialog({
-                title: game.i18n.localize('SR5.DamageResistanceTest'),
-                content,
-                buttons: {
-                    continue: {
-                        label: game.i18n.localize('SR5.Continue'),
-                        callback: () => {
-                            id = 'default';
-                            cancel = false;
-                        },
-                    },
-                },
-                close: (html) => __awaiter(this, void 0, void 0, function* () {
-                    var _a;
-                    if (cancel)
-                        return;
-                    const soak = (options === null || options === void 0 ? void 0 : options.damage) ? options.damage
-                        : {
-                            base: 0,
-                            value: 0,
-                            mod: [],
-                            ap: {
-                                base: 0,
-                                value: 0,
-                                mod: [],
-                            },
-                            attribute: '',
-                            type: {
-                                base: '',
-                                value: '',
-                            },
-                            element: {
-                                base: '',
-                                value: '',
-                            },
-                        };
-                    const armor = this.getArmor();
-                    // handle element changes
-                    const element = helpers_1.Helpers.parseInputToString($(html).find('[name=element]').val());
-                    if (element) {
-                        soak.element.value = element;
-                    }
-                    const bonusArmor = (_a = armor[element]) !== null && _a !== void 0 ? _a : 0;
-                    if (bonusArmor) {
-                        parts.addUniquePart(CONFIG.SR5.elementTypes[element], bonusArmor);
-                    }
-                    // handle ap changes
-                    const ap = helpers_1.Helpers.parseInputToNumber($(html).find('[name=ap]').val());
-                    if (ap) {
-                        let armorVal = armor.value + bonusArmor;
-                        // don't take more AP than armor
-                        parts.addUniquePart('SR5.AP', Math.max(ap, -armorVal));
-                    }
-                    // handle incoming damage changes
-                    const incomingDamage = helpers_1.Helpers.parseInputToNumber($(html).find('[name=incomingDamage]').val());
-                    if (incomingDamage) {
-                        const totalDamage = helpers_1.Helpers.calcTotal(soak);
-                        if (totalDamage !== incomingDamage) {
-                            const diff = incomingDamage - totalDamage;
-                            // add part and calc total again
-                            soak.mod = PartsList_1.PartsList.AddUniquePart(soak.mod, 'SR5.UserInput', diff);
-                            soak.value = helpers_1.Helpers.calcTotal(soak);
-                        }
-                        const totalAp = helpers_1.Helpers.calcTotal(soak.ap);
-                        if (totalAp !== ap) {
-                            const diff = ap - totalAp;
-                            // add part and calc total
-                            soak.ap.mod = PartsList_1.PartsList.AddUniquePart(soak.ap.mod, 'SR5.UserInput', diff);
-                            soak.ap.value = helpers_1.Helpers.calcTotal(soak.ap);
-                        }
-                    }
-                    // Show the actual Soak Test.
-                    let title = game.i18n.localize('SR5.SoakTest');
-                    yield ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
-                        event: options === null || options === void 0 ? void 0 : options.event,
-                        actor: this,
-                        incomingSoak: soak,
-                        parts: parts.list,
-                        title,
-                        wounds: false,
-                    });
-                })
+            const soakDialog = yield ShadowrunActorDialogs_1.ShadowrunActorDialogs.createSoakDialog(this, options, partsProps);
+            const soakActionData = yield soakDialog.select();
+            if (soakDialog.canceled)
+                return;
+            // Show the actual Soak Test.
+            const title = game.i18n.localize('SR5.SoakTest');
+            const actor = this;
+            const roll = yield ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
+                event: options === null || options === void 0 ? void 0 : options.event,
+                actor,
+                parts: soakActionData.parts.list,
+                title,
+                wounds: false,
+                hideRollMessage: true
             });
-            return yield dialog.render(true);
+            if (!roll)
+                return;
+            // Reduce damage by damage resist
+            const incoming = soakActionData.soak;
+            const modified = Object.assign({}, incoming);
+            modified.mod = PartsList_1.PartsList.AddUniquePart(modified.mod, 'SR5.SoakTest', -roll.hits);
+            modified.value = helpers_1.Helpers.calcTotal(modified);
+            const damage = { incoming, modified };
+            yield chat_1.createRollChatMessage({ title, roll, actor, damage });
         });
     }
     rollSingleAttribute(attId, options) {
@@ -13891,81 +13774,46 @@ class SR5Actor extends Actor {
         });
     }
     rollSkill(skill, options) {
-        var _a;
-        let att = duplicate(this.data.data.attributes[skill.attribute]);
-        let title = game.i18n.localize(skill.label);
-        if (options === null || options === void 0 ? void 0 : options.attribute)
-            att = this.data.data.attributes[options.attribute];
-        let limit = this.data.data.limits[att.limit];
-        const parts = new PartsList_1.PartsList();
-        parts.addUniquePart(skill.label, skill.value);
-        if ((options === null || options === void 0 ? void 0 : options.event) && helpers_1.Helpers.hasModifiers(options === null || options === void 0 ? void 0 : options.event)) {
-            parts.addUniquePart(att.label, att.value);
-            if (options.event[CONFIG.SR5.kbmod.SPEC])
-                parts.addUniquePart('SR5.Specialization', 2);
+        return __awaiter(this, void 0, void 0, function* () {
+            let title = game.i18n.localize(skill.label);
+            const attributeName = (options === null || options === void 0 ? void 0 : options.attribute) ? options.attribute : skill.attribute;
+            const att = this.getAttribute(attributeName);
+            // @ts-ignore // att can't really be undefined here... ?
+            let limit = this.getLimit(att.limit);
+            // Initialize parts with always needed skill data.
+            const parts = new PartsList_1.PartsList();
+            parts.addUniquePart(skill.label, skill.value);
             this._addMatrixParts(parts, [att, skill]);
             this._addGlobalParts(parts);
-            return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
-                event: options.event,
+            // Directly test, without further skill dialog.
+            if ((options === null || options === void 0 ? void 0 : options.event) && helpers_1.Helpers.hasModifiers(options === null || options === void 0 ? void 0 : options.event)) {
+                parts.addUniquePart(att.label, att.value);
+                if (options.event[CONFIG.SR5.kbmod.SPEC])
+                    parts.addUniquePart('SR5.Specialization', 2);
+                return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
+                    event: options.event,
+                    actor: this,
+                    parts: parts.list,
+                    limit,
+                    title: `${title} ${game.i18n.localize('SR5.Test')}`,
+                });
+            }
+            // First ask user about skill details.
+            const skillRollDialogOptions = {
+                skill,
+                attribute: attributeName
+            };
+            const skillDialog = yield ShadowrunActorDialogs_1.ShadowrunActorDialogs.createSkillDialog(this, skillRollDialogOptions, parts);
+            const skillActionData = yield skillDialog.select();
+            if (skillDialog.canceled)
+                return;
+            return yield ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
+                event: options === null || options === void 0 ? void 0 : options.event,
                 actor: this,
-                parts: parts.list,
-                limit,
-                title: `${title} Test`,
+                parts: skillActionData.parts.list,
+                limit: skillActionData.limit,
+                title: skillActionData.title,
             });
-        }
-        let dialogData = {
-            attribute: skill.attribute,
-            attributes: helpers_1.Helpers.filter(this.data.data.attributes, ([, value]) => value.value > 0),
-            limit: att.limit,
-            limits: this.data.data.limits,
-        };
-        let cancel = true;
-        let spec = '';
-        let buttons = {
-            roll: {
-                label: 'Normal',
-                callback: () => (cancel = false),
-            },
-        };
-        // add specializations to dialog as buttons
-        if ((_a = skill.specs) === null || _a === void 0 ? void 0 : _a.length) {
-            skill.specs.forEach((s) => (buttons[s] = {
-                label: s,
-                callback: () => {
-                    cancel = false;
-                    spec = s;
-                },
-            }));
-        }
-        renderTemplate('systems/shadowrun5e/dist/templates/rolls/skill-roll.html', dialogData).then((dlg) => {
-            new Dialog({
-                title: `${title} Test`,
-                content: dlg,
-                buttons,
-                close: (html) => __awaiter(this, void 0, void 0, function* () {
-                    if (cancel)
-                        return;
-                    const newAtt = helpers_1.Helpers.parseInputToString($(html).find('[name="attribute"]').val());
-                    const newLimit = helpers_1.Helpers.parseInputToString($(html).find('[name="attribute.limit"]').val());
-                    att = this.data.data.attributes[newAtt];
-                    title += ` + ${game.i18n.localize(CONFIG.SR5.attributes[newAtt])}`;
-                    limit = this.data.data.limits[newLimit];
-                    parts.addUniquePart(att.label, att.value);
-                    if (skill.value === 0)
-                        parts.addUniquePart('SR5.Defaulting', -1);
-                    if (spec)
-                        parts.addUniquePart('SR5.Specialization', 2);
-                    this._addMatrixParts(parts, [att, skill]);
-                    this._addGlobalParts(parts);
-                    return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
-                        event: options === null || options === void 0 ? void 0 : options.event,
-                        actor: this,
-                        parts: parts.list,
-                        limit,
-                        title: `${title} Test`,
-                    });
-                }),
-            }).render(true);
         });
     }
     rollDronePerception(options) {
@@ -14295,7 +14143,7 @@ class SR5Actor extends Actor {
             // This assumes for a token to exist and should fail if not.
             return tokens[0];
         }
-        // Unlinked actors can have multiple active token and is stored within actor data...
+        // Unlinked actors can have multiple active token but each have theirs directly attached...
         return this.token;
     }
     /**
@@ -14303,14 +14151,40 @@ class SR5Actor extends Actor {
      */
     _isLinkedToToken() {
         //@ts-ignore
-        return this.data.token.actorLink;
+        // If an actor is linked, all it's copies also contain this linked status, even if they're not.
+        return this.data.token.actorLink && !this.token;
     }
     hasToken() {
         return this.getActiveTokens().length > 0;
     }
+    hasActivePlayerOwner() {
+        const players = this.getActivePlayerOwners();
+        return players.length > 0;
+    }
+    getActivePlayer() {
+        //@ts-ignore
+        if (!this.hasPlayerOwner) {
+            return null;
+        }
+        for (const user of game.users.entities) {
+            if (!user.active || user.isGM) {
+                continue;
+            }
+            if (this.id === user.character.id) {
+                return user;
+            }
+        }
+        return null;
+    }
+    getActivePlayerOwners() {
+        //@ts-ignore
+        const users = this.getUsers('OWNER');
+        return users.filter(user => user.active);
+    }
 }
 exports.SR5Actor = SR5Actor;
-},{"../constants":114,"../helpers":123,"../parts/PartsList":170,"../rolls/ShadowrunRoller":171,"./prep/ActorPrepFactory":87}],86:[function(require,module,exports){
+
+},{"../apps/dialogs/ShadowrunActorDialogs":106,"../chat":114,"../constants":117,"../helpers":126,"../parts/PartsList":173,"../rolls/ShadowrunRoller":174,"./prep/ActorPrepFactory":87}],86:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -15196,7 +15070,8 @@ class SR5ActorSheet extends ActorSheet {
     }
 }
 exports.SR5ActorSheet = SR5ActorSheet;
-},{"../apps/chummer-import-form":104,"../apps/skills/KnowledgeSkillEditForm":107,"../apps/skills/LanguageSkillEditForm":108,"../apps/skills/SkillEditForm":109,"../config":113,"../helpers":123}],87:[function(require,module,exports){
+
+},{"../apps/chummer-import-form":104,"../apps/skills/KnowledgeSkillEditForm":110,"../apps/skills/LanguageSkillEditForm":111,"../apps/skills/SkillEditForm":112,"../config":116,"../helpers":126}],87:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ActorPrepFactory = void 0;
@@ -15221,6 +15096,7 @@ class ActorPrepFactory {
     }
 }
 exports.ActorPrepFactory = ActorPrepFactory;
+
 },{"./CharacterPrep":89,"./SpiritPrep":90,"./SpritePrep":91,"./VehiclePrep":92}],88:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -15233,7 +15109,8 @@ class BaseActorPrep {
     }
 }
 exports.BaseActorPrep = BaseActorPrep;
-},{"../../item/SR5ItemDataWrapper":160}],89:[function(require,module,exports){
+
+},{"../../item/SR5ItemDataWrapper":163}],89:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CharacterPrep = void 0;
@@ -15279,6 +15156,7 @@ class CharacterPrep extends BaseActorPrep_1.BaseActorPrep {
     }
 }
 exports.CharacterPrep = CharacterPrep;
+
 },{"./BaseActorPrep":88,"./functions/AttributesPrep":93,"./functions/ConditionMonitorsPrep":94,"./functions/InitiativePrep":95,"./functions/ItemPrep":96,"./functions/LimitsPrep":97,"./functions/MatrixPrep":98,"./functions/ModifiersPrep":99,"./functions/MovementPrep":100,"./functions/NPCPrep":101,"./functions/SkillsPrep":102,"./functions/WoundsPrep":103}],90:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -15592,7 +15470,8 @@ class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
     }
 }
 exports.SpiritPrep = SpiritPrep;
-},{"../../helpers":123,"./BaseActorPrep":88,"./functions/AttributesPrep":93,"./functions/ConditionMonitorsPrep":94,"./functions/InitiativePrep":95,"./functions/LimitsPrep":97,"./functions/ModifiersPrep":99,"./functions/MovementPrep":100,"./functions/SkillsPrep":102,"./functions/WoundsPrep":103}],91:[function(require,module,exports){
+
+},{"../../helpers":126,"./BaseActorPrep":88,"./functions/AttributesPrep":93,"./functions/ConditionMonitorsPrep":94,"./functions/InitiativePrep":95,"./functions/LimitsPrep":97,"./functions/ModifiersPrep":99,"./functions/MovementPrep":100,"./functions/SkillsPrep":102,"./functions/WoundsPrep":103}],91:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpritePrep = void 0;
@@ -15717,7 +15596,8 @@ class SpritePrep extends BaseActorPrep_1.BaseActorPrep {
     }
 }
 exports.SpritePrep = SpritePrep;
-},{"../../helpers":123,"../../parts/PartsList":170,"./BaseActorPrep":88,"./functions/AttributesPrep":93,"./functions/InitiativePrep":95,"./functions/LimitsPrep":97,"./functions/MatrixPrep":98,"./functions/ModifiersPrep":99,"./functions/SkillsPrep":102}],92:[function(require,module,exports){
+
+},{"../../helpers":126,"../../parts/PartsList":173,"./BaseActorPrep":88,"./functions/AttributesPrep":93,"./functions/InitiativePrep":95,"./functions/LimitsPrep":97,"./functions/MatrixPrep":98,"./functions/ModifiersPrep":99,"./functions/SkillsPrep":102}],92:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VehiclePrep = void 0;
@@ -15835,7 +15715,8 @@ class VehiclePrep extends BaseActorPrep_1.BaseActorPrep {
     }
 }
 exports.VehiclePrep = VehiclePrep;
-},{"../../helpers":123,"../../parts/PartsList":170,"./BaseActorPrep":88,"./functions/AttributesPrep":93,"./functions/InitiativePrep":95,"./functions/LimitsPrep":97,"./functions/MatrixPrep":98,"./functions/ModifiersPrep":99,"./functions/SkillsPrep":102}],93:[function(require,module,exports){
+
+},{"../../helpers":126,"../../parts/PartsList":173,"./BaseActorPrep":88,"./functions/AttributesPrep":93,"./functions/InitiativePrep":95,"./functions/LimitsPrep":97,"./functions/MatrixPrep":98,"./functions/ModifiersPrep":99,"./functions/SkillsPrep":102}],93:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AttributesPrep = void 0;
@@ -15867,7 +15748,8 @@ class AttributesPrep {
     }
 }
 exports.AttributesPrep = AttributesPrep;
-},{"../../../helpers":123,"../../../parts/PartsList":170}],94:[function(require,module,exports){
+
+},{"../../../helpers":126,"../../../parts/PartsList":173}],94:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConditionMonitorsPrep = void 0;
@@ -15904,6 +15786,7 @@ class ConditionMonitorsPrep {
     }
 }
 exports.ConditionMonitorsPrep = ConditionMonitorsPrep;
+
 },{}],95:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -15953,7 +15836,8 @@ class InitiativePrep {
     }
 }
 exports.InitiativePrep = InitiativePrep;
-},{"../../../helpers":123,"../../../parts/PartsList":170}],96:[function(require,module,exports){
+
+},{"../../../helpers":126,"../../../parts/PartsList":173}],96:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemPrep = void 0;
@@ -16018,7 +15902,8 @@ class ItemPrep {
     }
 }
 exports.ItemPrep = ItemPrep;
-},{"../../../helpers":123,"../../../parts/PartsList":170}],97:[function(require,module,exports){
+
+},{"../../../helpers":126,"../../../parts/PartsList":173}],97:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LimitsPrep = void 0;
@@ -16045,7 +15930,8 @@ class LimitsPrep {
     }
 }
 exports.LimitsPrep = LimitsPrep;
-},{"../../../helpers":123,"../../../parts/PartsList":170}],98:[function(require,module,exports){
+
+},{"../../../helpers":126,"../../../parts/PartsList":173}],98:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatrixPrep = void 0;
@@ -16164,7 +16050,8 @@ class MatrixPrep {
     }
 }
 exports.MatrixPrep = MatrixPrep;
-},{"../../../helpers":123,"../../../parts/PartsList":170}],99:[function(require,module,exports){
+
+},{"../../../helpers":126,"../../../parts/PartsList":173}],99:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ModifiersPrep = void 0;
@@ -16218,6 +16105,7 @@ class ModifiersPrep {
     }
 }
 exports.ModifiersPrep = ModifiersPrep;
+
 },{}],100:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -16232,6 +16120,7 @@ class MovementPrep {
     }
 }
 exports.MovementPrep = MovementPrep;
+
 },{}],101:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -16279,7 +16168,8 @@ class NPCPrep {
     }
 }
 exports.NPCPrep = NPCPrep;
-},{"../../../constants":114,"../../../dataTemplates":115,"../../../helpers":123,"../../../parts/PartsList":170}],102:[function(require,module,exports){
+
+},{"../../../constants":117,"../../../dataTemplates":118,"../../../helpers":126,"../../../parts/PartsList":173}],102:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SkillsPrep = void 0;
@@ -16343,7 +16233,8 @@ class SkillsPrep {
     }
 }
 exports.SkillsPrep = SkillsPrep;
-},{"../../../helpers":123,"../../../parts/PartsList":170}],103:[function(require,module,exports){
+
+},{"../../../helpers":126,"../../../parts/PartsList":173}],103:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WoundsPrep = void 0;
@@ -16361,6 +16252,7 @@ class WoundsPrep {
     }
 }
 exports.WoundsPrep = WoundsPrep;
+
 },{}],104:[function(require,module,exports){
 "use strict";
 
@@ -17171,44 +17063,423 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.FormDialog = void 0;
+/** TODO: Documentation with usage example
+ *
+ */
+class FormDialog extends Dialog {
+    constructor(dialogData, options) {
+        super(dialogData, options);
+        const { templateData, templatePath } = dialogData;
+        this._templateData = templateData;
+        this._templatePath = templatePath;
+        this._onAfterClose = dialogData.onAfterClose;
+        this.selection = this._emptySelection();
+        this._selectionPromise = new Promise((resolve, reject) => {
+            this._selectionResolve = resolve;
+            // Reject is stored, but never used in favor of FormDialog.canceled
+            this._selectionReject = reject;
+        });
+    }
+    close() {
+        const _super = Object.create(null, {
+            close: { get: () => super.close }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            yield _super.close.call(this);
+            if (this.canceled) {
+                this._selectionResolve(this.selection);
+            }
+        });
+    }
+    submit(button) {
+        const _super = Object.create(null, {
+            submit: { get: () => super.submit }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            this.selectedButton = button.label;
+            //@ts-ignore
+            _super.submit.call(this, button);
+            yield this.afterSubmit(this.options.jQuery ? this.element : this.element[0]);
+        });
+    }
+    afterSubmit(html) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // Await in case of a possible async handler.
+            this.selection = yield this._onAfterClose(html, this.selectedButton);
+            this._selectionResolve(this.selection);
+        });
+    }
+    getData(options) {
+        const _super = Object.create(null, {
+            getData: { get: () => super.getData }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            const content = yield renderTemplate(this._templatePath, this._templateData);
+            return mergeObject(_super.getData.call(this), {
+                content
+            });
+        });
+    }
+    select() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.render(true);
+            if (this._selectionPromise === undefined || this.selection === undefined) {
+                return this._emptySelection();
+            }
+            return yield this._selectionPromise;
+        });
+    }
+    _emptySelection() {
+        return {};
+    }
+    /** Dialog has been confirmed and something has been selected.
+     */
+    get selected() {
+        return !this.canceled;
+    }
+    /** Dialog has been canceled and nothing has been selected
+     */
+    get canceled() {
+        return !this.selectedButton;
+    }
+    /** @override */
+    static getButtons() {
+        return {};
+    }
+}
+exports.FormDialog = FormDialog;
+
+},{}],106:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ShadowrunActorDialogs = void 0;
+const FormDialog_1 = require("./FormDialog");
+const PartsList_1 = require("../../parts/PartsList");
+const helpers_1 = require("../../helpers");
+class ShadowrunActorDialogs {
+    static createDefenseDialog(actor, options, partsProps) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const defenseDialogData = ShadowrunActorDialogs.getDefenseDialogData(actor, options, partsProps);
+            return new FormDialog_1.FormDialog(defenseDialogData);
+        });
+    }
+    static createSoakDialog(actor, options, partsProps) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const soakDialogData = ShadowrunActorDialogs.getSoakDialogData(actor, options, partsProps);
+            return new FormDialog_1.FormDialog(soakDialogData);
+        });
+    }
+    static createSkillDialog(actor, options, partsProps) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const skillDialogData = ShadowrunActorDialogs.getSkillDialogData(actor, options, partsProps);
+            return new FormDialog_1.FormDialog(skillDialogData);
+        });
+    }
+    static getDefenseDialogData(actor, options, partsProps) {
+        var _a, _b, _c, _d;
+        const title = game.i18n.localize('SR5.Defense');
+        const activeDefenses = {
+            full_defense: {
+                label: 'SR5.FullDefense',
+                value: (_a = actor.getFullDefenseAttribute()) === null || _a === void 0 ? void 0 : _a.value,
+                initMod: -10,
+            },
+            dodge: {
+                label: 'SR5.Dodge',
+                value: (_b = actor.findActiveSkill('gymnastics')) === null || _b === void 0 ? void 0 : _b.value,
+                initMod: -5,
+            },
+            block: {
+                label: 'SR5.Block',
+                value: (_c = actor.findActiveSkill('unarmed_combat')) === null || _c === void 0 ? void 0 : _c.value,
+                initMod: -5,
+            },
+        };
+        const equippedMeleeWeapons = actor.getEquippedWeapons().filter((w) => w.isMeleeWeapon());
+        let defenseReach = 0;
+        equippedMeleeWeapons.forEach((weapon) => {
+            var _a;
+            activeDefenses[`parry-${weapon.name}`] = {
+                label: 'SR5.Parry',
+                weapon: weapon.name,
+                value: (_a = actor.findActiveSkill(weapon.getActionSkill())) === null || _a === void 0 ? void 0 : _a.value,
+                init: -5,
+            };
+            defenseReach = Math.max(defenseReach, weapon.getReach());
+        });
+        const parts = new PartsList_1.PartsList(partsProps);
+        actor._addDefenseParts(parts);
+        // if we are defending a melee attack
+        if ((_d = options.incomingAttack) === null || _d === void 0 ? void 0 : _d.reach) {
+            const incomingReach = options.incomingAttack.reach;
+            const netReach = defenseReach - incomingReach;
+            if (netReach !== 0) {
+                parts.addUniquePart('SR5.Reach', netReach);
+            }
+        }
+        const buttons = {
+            continue: {
+                label: game.i18n.localize('SR5.Continue'),
+                callback: () => { },
+            },
+        };
+        const onAfterClose = (html) => {
+            const cover = helpers_1.Helpers.parseInputToNumber($(html).find('[name=cover]').val());
+            const special = helpers_1.Helpers.parseInputToString($(html).find('[name=activeDefense]').val());
+            if (cover) {
+                parts.addUniquePart('SR5.Cover', cover);
+            }
+            if (special) {
+                // TODO subtract initiative score when Foundry updates to 0.7.0
+                const defense = activeDefenses[special];
+                parts.addUniquePart(defense.label, defense.value);
+            }
+            return { cover, special, parts };
+        };
+        const templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-defense.html';
+        const templateData = {
+            parts: parts.getMessageOutput(),
+            cover: options.cover,
+            activeDefenses
+        };
+        return {
+            title,
+            templateData,
+            templatePath,
+            buttons,
+            onAfterClose
+        };
+    }
+    static getSoakDialogData(actor, options, partsProps) {
+        const title = game.i18n.localize('SR5.DamageResistanceTest');
+        const parts = new PartsList_1.PartsList(partsProps);
+        actor._addSoakParts(parts);
+        const templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-soak.html';
+        const templateData = {
+            damage: options === null || options === void 0 ? void 0 : options.damage,
+            parts: parts.getMessageOutput(),
+            elementTypes: CONFIG.SR5.elementTypes,
+        };
+        const buttons = {
+            continue: {
+                label: game.i18n.localize('SR5.Continue'),
+                callback: () => { },
+            },
+        };
+        const onAfterClose = (html) => {
+            var _a;
+            const soak = (options === null || options === void 0 ? void 0 : options.damage) ? options.damage
+                : {
+                    base: 0,
+                    value: 0,
+                    mod: [],
+                    ap: {
+                        base: 0,
+                        value: 0,
+                        mod: [],
+                    },
+                    attribute: '',
+                    type: {
+                        base: '',
+                        value: '',
+                    },
+                    element: {
+                        base: '',
+                        value: '',
+                    },
+                };
+            const armor = actor.getArmor();
+            // handle element changes
+            const element = helpers_1.Helpers.parseInputToString($(html).find('[name=element]').val());
+            if (element) {
+                soak.element.value = element;
+            }
+            const bonusArmor = (_a = armor[element]) !== null && _a !== void 0 ? _a : 0;
+            if (bonusArmor) {
+                parts.addUniquePart(CONFIG.SR5.elementTypes[element], bonusArmor);
+            }
+            // handle ap changes
+            const ap = helpers_1.Helpers.parseInputToNumber($(html).find('[name=ap]').val());
+            if (ap) {
+                let armorVal = armor.value + bonusArmor;
+                // don't take more AP than armor
+                parts.addUniquePart('SR5.AP', Math.max(ap, -armorVal));
+            }
+            // handle incoming damage changes
+            const incomingDamage = helpers_1.Helpers.parseInputToNumber($(html).find('[name=incomingDamage]').val());
+            if (incomingDamage) {
+                const totalDamage = helpers_1.Helpers.calcTotal(soak);
+                if (totalDamage !== incomingDamage) {
+                    const diff = incomingDamage - totalDamage;
+                    // add part and calc total again
+                    soak.mod = PartsList_1.PartsList.AddUniquePart(soak.mod, 'SR5.UserInput', diff);
+                    soak.value = helpers_1.Helpers.calcTotal(soak);
+                }
+                const totalAp = helpers_1.Helpers.calcTotal(soak.ap);
+                if (totalAp !== ap) {
+                    const diff = ap - totalAp;
+                    // add part and calc total
+                    soak.ap.mod = PartsList_1.PartsList.AddUniquePart(soak.ap.mod, 'SR5.UserInput', diff);
+                    soak.ap.value = helpers_1.Helpers.calcTotal(soak.ap);
+                }
+            }
+            return { soak, parts };
+        };
+        return {
+            title,
+            templatePath,
+            templateData,
+            buttons,
+            onAfterClose
+        };
+    }
+    static getSkillDialogData(actor, options, partsProps) {
+        var _a;
+        const title = game.i18n.localize(options.skill.label);
+        const templatePath = 'systems/shadowrun5e/dist/templates/rolls/skill-roll.html';
+        const attributes = actor.getAttributes();
+        const attribute = actor.getAttribute(options.attribute ? options.attribute : options.skill.attribute);
+        const limits = actor.getLimits();
+        const templateData = {
+            attribute: options.skill.attribute,
+            attributes: helpers_1.Helpers.filter(attributes, ([, value]) => value.value > 0),
+            limit: attribute.limit,
+            limits
+        };
+        const buttons = {
+            roll: {
+                label: game.i18n.localize('SR5.NormalSkillButton'),
+                callback: () => { },
+            },
+        };
+        // add specializations to dialog as buttons
+        if ((_a = options.skill.specs) === null || _a === void 0 ? void 0 : _a.length) {
+            options.skill.specs.forEach((spec) => (buttons[spec] = {
+                label: spec,
+                callback: () => { },
+            }));
+        }
+        const onAfterClose = (html, selectedButton) => {
+            const newAtt = helpers_1.Helpers.parseInputToString($(html).find('[name="attribute"]').val());
+            const newLimit = helpers_1.Helpers.parseInputToString($(html).find('[name="attribute.limit"]').val());
+            const attribute = actor.getAttribute(newAtt);
+            const limit = actor.getLimit(newLimit);
+            const skillLabel = game.i18n.localize(options.skill.label);
+            const attributeLabel = game.i18n.localize(CONFIG.SR5.attributes[newAtt]);
+            const testLabel = game.i18n.localize('SR5.Test');
+            const skillTestTitle = `${skillLabel} + ${attributeLabel} ${testLabel}`;
+            partsProps.addUniquePart(attribute.label, attribute.value);
+            const isDefaulting = options.skill.value === 0;
+            if (isDefaulting) {
+                partsProps.addUniquePart('SR5.Defaulting', -1);
+            }
+            // Possible specialization based on button label.
+            const isSpecialization = options.skill.specs.includes(selectedButton);
+            if (isSpecialization) {
+                partsProps.addUniquePart('SR5.Specialization', 2);
+            }
+            return {
+                title: skillTestTitle,
+                attribute,
+                limit,
+                skill: options.skill,
+                parts: partsProps
+            };
+        };
+        return {
+            title,
+            templatePath,
+            templateData,
+            buttons,
+            onAfterClose
+        };
+    }
+}
+exports.ShadowrunActorDialogs = ShadowrunActorDialogs;
+
+},{"../../helpers":126,"../../parts/PartsList":173,"./FormDialog":105}],107:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.ShadowrunItemDialog = void 0;
 const helpers_1 = require("../../helpers");
 const constants_1 = require("../../constants");
-// TODO: Why extend dialog when internal dialog structures aren't used? Could resolve the whole flag / data flow issue.
-class ShadowrunItemDialog extends Dialog {
-    static fromItem(item, event) {
+const FormDialog_1 = require("./FormDialog");
+class ShadowrunItemDialog {
+    static create(item, event) {
         return __awaiter(this, void 0, void 0, function* () {
-            const dialogData = {
-                title: item.name,
-                buttons: {},
-            };
-            if (event)
-                dialogData['event'] = event;
-            const templateData = {};
-            let templatePath = '';
-            const itemData = {
-                dialogData: undefined,
-                getActionTestData: undefined,
-                itemHasNoDialog: true
-            };
             if (item.isRangedWeapon()) {
-                itemData.getActionTestData = ShadowrunItemDialog.addRangedWeaponData(templateData, dialogData, item);
-                templatePath = 'systems/shadowrun5e/dist/templates/rolls/range-weapon-roll.html';
+                return ShadowrunItemDialog.createRangedWeaponDialog(item, event);
             }
-            else if (item.isSpell()) {
-                itemData.getActionTestData = ShadowrunItemDialog.addSpellData(templateData, dialogData, item);
-                templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-spell.html';
+            if (item.isSpell()) {
+                return ShadowrunItemDialog.createSpellDialog(item, event);
             }
-            else if (item.isComplexForm()) {
-                itemData.getActionTestData = ShadowrunItemDialog.addComplexFormData(templateData, dialogData, item);
-                templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-complex-form.html';
+            if (item.isComplexForm()) {
+                return ShadowrunItemDialog.createComplexFormDialog(item, event);
             }
-            if (templatePath) {
-                const content = yield renderTemplate(templatePath, templateData);
-                itemData.dialogData = mergeObject(dialogData, { content });
-                itemData.itemHasNoDialog = false;
-            }
-            return itemData;
+        });
+    }
+    static createRangedWeaponDialog(item, event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const dialogData = { title: item.name,
+                event,
+            };
+            const templatePath = 'systems/shadowrun5e/dist/templates/rolls/range-weapon-roll.html';
+            const templateData = {};
+            const onAfterClose = ShadowrunItemDialog.addRangedWeaponData(templateData, dialogData, item);
+            dialogData['templateData'] = templateData;
+            dialogData['templatePath'] = templatePath;
+            dialogData['onAfterClose'] = onAfterClose;
+            //@ts-ignore
+            return new FormDialog_1.FormDialog(dialogData);
+        });
+    }
+    static createSpellDialog(item, event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const dialogData = { title: item.name,
+                event,
+            };
+            const templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-spell.html';
+            const templateData = {};
+            const onAfterClose = ShadowrunItemDialog.addSpellData(templateData, dialogData, item);
+            dialogData['templateData'] = templateData;
+            dialogData['templatePath'] = templatePath;
+            dialogData['onAfterClose'] = onAfterClose;
+            //@ts-ignore
+            return new FormDialog_1.FormDialog(dialogData);
+        });
+    }
+    static createComplexFormDialog(item, event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const dialogData = { title: item.name,
+                event,
+            };
+            const templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-complex-form.html';
+            const templateData = {};
+            const onAfterClose = ShadowrunItemDialog.addComplexFormData(templateData, dialogData, item);
+            dialogData['templateData'] = templateData;
+            dialogData['templatePath'] = templatePath;
+            dialogData['onAfterClose'] = onAfterClose;
+            //@ts-ignore
+            return new FormDialog_1.FormDialog(dialogData);
         });
     }
     static addComplexFormData(templateData, dialogData, item) {
@@ -17315,9 +17586,13 @@ class ShadowrunItemDialog extends Dialog {
         templateData['title'] = title;
         templateData['ranges'] = templateRanges;
         templateData['targetRange'] = item.getLastFireRangeMod();
-        templateData['targetsSelected'] = helpers_1.Helpers.userHasTargets();
-        if (item.actor.hasToken() && helpers_1.Helpers.userHasTargets()) {
+        if (item.actor.getToken() && helpers_1.Helpers.userHasTargets()) {
+            templateData['targetsSelected'] = helpers_1.Helpers.userHasTargets();
             templateData['targets'] = ShadowrunItemDialog._getTargetRangeTemplateData(item.actor, templateRanges);
+        }
+        else if (!item.actor.getToken() && helpers_1.Helpers.userHasTargets()) {
+            // Inform user about usage of actors without tokens!
+            ui.notifications.warn(game.i18n.localize('SR5.TargetingNeedsActorWithToken'));
         }
         let cancel = true;
         dialogData.buttons = {
@@ -17368,12 +17643,13 @@ class ShadowrunItemDialog extends Dialog {
      *
      */
     static _getTargetRangeTemplateData(actor, ranges) {
-        if (!actor.hasToken() || !helpers_1.Helpers.userHasTargets()) {
+        const attacker = actor.getToken();
+        if (!attacker || !helpers_1.Helpers.userHasTargets()) {
+            ui.notifications.warn(game.i18n.localize('SR5.TargetingNeedsActorWithToken'));
             return [];
         }
-        const attacker = actor.getToken();
         const targets = helpers_1.Helpers.getUserTargets();
-        return targets.map(target => {
+        const targetsTemplateData = targets.map(target => {
             //@ts-ignore // undefined actor is okay
             const distance = helpers_1.Helpers.measureTokenDistance(attacker, target);
             const range = helpers_1.Helpers.getWeaponRange(distance, ranges);
@@ -17384,6 +17660,14 @@ class ShadowrunItemDialog extends Dialog {
                 unit: constants_1.LENGTH_UNIT,
                 distance
             };
+        });
+        //@ts-ignore
+        return targetsTemplateData.sort((a, b) => {
+            if (a.distance < b.distance)
+                return -1;
+            if (a.distance > b.distance)
+                return 1;
+            return 0;
         });
     }
     static _getSelectedTargetRangeModifier(html) {
@@ -17418,7 +17702,122 @@ class ShadowrunItemDialog extends Dialog {
     }
 }
 exports.ShadowrunItemDialog = ShadowrunItemDialog;
-},{"../../constants":114,"../../helpers":123}],106:[function(require,module,exports){
+
+},{"../../constants":117,"../../helpers":126,"./FormDialog":105}],108:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ShadowrunTestDialog = void 0;
+const FormDialog_1 = require("./FormDialog");
+const PartsList_1 = require("../../parts/PartsList");
+const constants_1 = require("../../constants");
+const helpers_1 = require("../../helpers");
+class ShadowrunTestDialog {
+    static create(actor, options, partsProps) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const testDialogData = ShadowrunTestDialog.getAdvancedTestData(actor, options, partsProps);
+            return new FormDialog_1.FormDialog(testDialogData);
+        });
+    }
+    static getAdvancedTestData(actor, options, partsProps) {
+        var _a;
+        const title = options.title;
+        const parts = new PartsList_1.PartsList(partsProps);
+        const templateData = {
+            options: options.dialogOptions,
+            extended: options.extended,
+            dice_pool: parts.total,
+            parts: parts.getMessageOutput(),
+            limitValue: (_a = options.limit) === null || _a === void 0 ? void 0 : _a.value,
+            wounds: options.wounds,
+            woundValue: actor === null || actor === void 0 ? void 0 : actor.getWoundModifier(),
+            rollMode: game.settings.get(constants_1.CORE_NAME, constants_1.CORE_FLAGS.RollMode),
+            rollModes: CONFIG.Dice.rollModes
+        };
+        let templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-dialog.html';
+        const rollButtonName = 'roll';
+        const buttons = {
+            [rollButtonName]: {
+                label: game.i18n.localize('SR5.Roll'),
+                icon: '<i class="fas fa-dice-six"></i>',
+                callback: () => {
+                },
+            },
+        };
+        if (actor) {
+            buttons['edge'] = {
+                label: `${game.i18n.localize('SR5.PushTheLimit')} (+${actor.getEdge().value})`,
+                icon: '<i class="fas fa-bomb"></i>',
+                callback: () => {
+                },
+            };
+        }
+        const onAfterClose = (html) => __awaiter(this, void 0, void 0, function* () {
+            var _b;
+            const dicePoolValue = helpers_1.Helpers.parseInputToNumber($(html).find('[name="dice_pool"]').val());
+            if ((_b = options.dialogOptions) === null || _b === void 0 ? void 0 : _b.prompt) {
+                parts.clear();
+                yield game.user.setFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.LastRollPromptValue, dicePoolValue);
+                parts.addUniquePart('SR5.Base', dicePoolValue);
+            }
+            const limitValue = helpers_1.Helpers.parseInputToNumber($(html).find('[name="limitValue"]').val());
+            const { limit } = options;
+            if (limit && limit.value !== limitValue) {
+                limit.value = limitValue;
+                limit.base = limitValue;
+                limit.label = 'SR5.Override';
+            }
+            const woundValue = helpers_1.Helpers.parseInputToNumber($(html).find('[name="wounds"]').val());
+            const situationMod = helpers_1.Helpers.parseInputToNumber($(html).find('[name="dp_mod"]').val());
+            const environmentMod = helpers_1.Helpers.parseInputToNumber($(html).find('[name="options.environmental"]').val());
+            let { wounds } = options;
+            if (wounds && woundValue !== 0) {
+                parts.addUniquePart('SR5.Wounds', woundValue);
+                wounds = true;
+            }
+            if (situationMod) {
+                parts.addUniquePart('SR5.SituationalModifier', situationMod);
+            }
+            const dialogOptions = {};
+            if (environmentMod) {
+                parts.addUniquePart('SR5.EnvironmentModifier', environmentMod);
+                if (options.dialogOptions) {
+                    dialogOptions['environmental'] = true;
+                }
+            }
+            const extendedString = helpers_1.Helpers.parseInputToString($(html).find('[name="extended"]').val());
+            const extended = extendedString === 'true';
+            const rollMode = helpers_1.Helpers.parseInputToString($(html).find('[name=rollMode]').val());
+            return {
+                limit,
+                wounds,
+                parts,
+                dialogOptions,
+                extended,
+                rollMode
+            };
+        });
+        return {
+            title,
+            templateData,
+            templatePath,
+            buttons,
+            default: rollButtonName,
+            onAfterClose
+        };
+    }
+}
+exports.ShadowrunTestDialog = ShadowrunTestDialog;
+
+},{"../../constants":117,"../../helpers":126,"../../parts/PartsList":173,"./FormDialog":105}],109:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -17612,7 +18011,7 @@ exports.OverwatchScoreTracker = OverwatchScoreTracker;
 (0, _defineProperty2["default"])(OverwatchScoreTracker, "MatrixOverwatchDiceCount", '2d6');
 (0, _defineProperty2["default"])(OverwatchScoreTracker, "addedActors", []);
 
-},{"../../helpers":123,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10}],107:[function(require,module,exports){
+},{"../../helpers":126,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10}],110:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KnowledgeSkillEditForm = void 0;
@@ -17627,7 +18026,8 @@ class KnowledgeSkillEditForm extends LanguageSkillEditForm_1.LanguageSkillEditFo
     }
 }
 exports.KnowledgeSkillEditForm = KnowledgeSkillEditForm;
-},{"./LanguageSkillEditForm":108}],108:[function(require,module,exports){
+
+},{"./LanguageSkillEditForm":111}],111:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LanguageSkillEditForm = void 0;
@@ -17650,7 +18050,8 @@ class LanguageSkillEditForm extends SkillEditForm_1.SkillEditForm {
     }
 }
 exports.LanguageSkillEditForm = LanguageSkillEditForm;
-},{"./SkillEditForm":109}],109:[function(require,module,exports){
+
+},{"./SkillEditForm":112}],112:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -17806,7 +18207,8 @@ class SkillEditForm extends BaseEntitySheet {
     }
 }
 exports.SkillEditForm = SkillEditForm;
-},{}],110:[function(require,module,exports){
+
+},{}],113:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.measureDistance = void 0;
@@ -17845,7 +18247,8 @@ exports.measureDistance = function (segments, options = {}) {
             return (ns + nd) * canvas.scene.data.gridDistance;
     });
 };
-},{}],111:[function(require,module,exports){
+
+},{}],114:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -17862,6 +18265,7 @@ const SR5Actor_1 = require("./actor/SR5Actor");
 const SR5Item_1 = require("./item/SR5Item");
 const template_1 = require("./template");
 const constants_1 = require("./constants");
+const helpers_1 = require("./helpers");
 function createChatMessage(templateData, options) {
     return __awaiter(this, void 0, void 0, function* () {
         const chatData = yield createChatData(templateData, options);
@@ -17877,7 +18281,6 @@ const createChatData = (templateData, options) => __awaiter(void 0, void 0, void
     const template = `systems/shadowrun5e/dist/templates/rolls/roll-card.html`;
     const actor = templateData.actor;
     const token = actor === null || actor === void 0 ? void 0 : actor.getToken();
-    console.error(actor, token);
     //@ts-ignore
     const enhancedTemplateData = Object.assign(Object.assign({}, templateData), { speaker: {
             actor, token
@@ -17892,7 +18295,7 @@ const createChatData = (templateData, options) => __awaiter(void 0, void 0, void
         speaker: {
             actor: actor === null || actor === void 0 ? void 0 : actor._id,
             token: actor === null || actor === void 0 ? void 0 : actor.getToken(),
-            alias: templateData.header.name
+            alias: game.user.name
         },
         flags: {
             shadowrun5e: {
@@ -17906,15 +18309,13 @@ const createChatData = (templateData, options) => __awaiter(void 0, void 0, void
     if (rollMode === 'blindroll')
         chatData['blind'] = true;
     if (options === null || options === void 0 ? void 0 : options.whisperTo) {
-        const { whisperTo } = options;
-        console.error('whsiper to', whisperTo);
-        chatData['whisper'] = ChatMessage.getWhisperRecipients(whisperTo.name);
+        chatData['whisper'] = ChatMessage.getWhisperRecipients(options.whisperTo.name);
     }
     return chatData;
 });
-function ifConfiguredCreateDefaultChatMessage(roll, { actor, title, rollMode }) {
+function ifConfiguredCreateDefaultChatMessage({ roll, actor, title, rollMode }) {
     return __awaiter(this, void 0, void 0, function* () {
-        if (game.settings.get(constants_1.SYSTEM_NAME, constants_1.FLAGS.DisplayDefaultRollCard)) {
+        if (game.settings.get(constants_1.SYSTEM_NAME, constants_1.FLAGS.DisplayDefaultRollCard) && roll) {
             yield roll.toMessage({
                 speaker: ChatMessage.getSpeaker({ actor: actor }),
                 flavor: title,
@@ -17926,9 +18327,8 @@ function ifConfiguredCreateDefaultChatMessage(roll, { actor, title, rollMode }) 
 exports.ifConfiguredCreateDefaultChatMessage = ifConfiguredCreateDefaultChatMessage;
 function createTargetChatMessage(options) {
     return __awaiter(this, void 0, void 0, function* () {
-        const { user, token } = options.target;
-        const rollChatOptions = Object.assign(Object.assign({}, options), { header: { name: token.name, img: token.data.img }, target: token });
-        const messageOptions = { whisperTo: user };
+        const rollChatOptions = Object.assign({}, options);
+        const messageOptions = { whisperTo: options.whisperTo };
         //@ts-ignore
         const templateData = getRollChatTemplateData(rollChatOptions);
         return yield createChatMessage(templateData, messageOptions);
@@ -17945,17 +18345,17 @@ exports.createItemChatMessage = createItemChatMessage;
 function createChatTemplateData(options) {
     // field extraction is explicit to enforce visible data flow to ensure clean data.
     // NOTE: As soon as clear data dynamic data flow can be established, this should be removed for a simple {...options}
-    let { actor, item, description, tests, header } = options;
+    let { actor, item, description, tests } = options;
     return {
         actor,
         item,
-        header,
         description,
         tests
     };
 }
 function createRollChatMessage(options) {
     return __awaiter(this, void 0, void 0, function* () {
+        yield ifConfiguredCreateDefaultChatMessage(options);
         const templateData = getRollChatTemplateData(options);
         // TODO: Double data is bad.
         const chatOptions = { roll: options.roll };
@@ -17967,17 +18367,14 @@ function getRollChatTemplateData(options) {
     var _a;
     // field extraction is explicit to enforce visible data flow to ensure clean data.
     // NOTE: As soon as clear data dynamic data flow can be established, this should be removed for a simple {...options}
-    let { roll, actor, item, name, img, target, description, title, previewTemplate, attack, incomingAttack, incomingDrain, incomingSoak, tests } = options;
+    let { roll, actor, item, target, description, title, previewTemplate, attack, incomingAttack, incomingDrain, damage, tests } = options;
     const rollMode = (_a = options.rollMode) !== null && _a !== void 0 ? _a : game.settings.get(constants_1.CORE_NAME, constants_1.CORE_FLAGS.RollMode);
-    const token = actor === null || actor === void 0 ? void 0 : actor.token;
-    [name, img] = getPreferedNameAndImageSource(name, img, actor, token);
-    const header = { name, img };
+    const token = actor === null || actor === void 0 ? void 0 : actor.getToken();
     const tokenId = getTokenSceneId(token);
     return {
         roll,
         actor,
         item,
-        header,
         tokenId,
         target,
         rollMode,
@@ -17987,24 +18384,9 @@ function getRollChatTemplateData(options) {
         attack,
         incomingAttack,
         incomingDrain,
-        incomingSoak,
+        damage,
         tests
     };
-}
-/** Use either the actor or the tokens name and image, depending on system settings.
- *
- * However don't change anything if a custom name or image has been given.
- */
-function getPreferedNameAndImageSource(name, img, actor, token) {
-    const namedAndImageMatchActor = name === (actor === null || actor === void 0 ? void 0 : actor.name) && img === (actor === null || actor === void 0 ? void 0 : actor.img);
-    const useTokenNameForChatOutput = game.settings.get(constants_1.SYSTEM_NAME, constants_1.FLAGS.ShowTokenNameForChatOutput);
-    if (namedAndImageMatchActor && useTokenNameForChatOutput && token) {
-        img = token === null || token === void 0 ? void 0 : token.data.img;
-        name = token === null || token === void 0 ? void 0 : token.data.name;
-    }
-    name = name ? name : '';
-    img = img ? img : '';
-    return [name, img];
 }
 function getTokenSceneId(token) {
     return token ? `${token.scene._id}.${token.id}` : undefined;
@@ -18015,12 +18397,12 @@ exports.addChatMessageContextOptions = (html, options) => {
         return msg.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.MessageCustomRoll);
     };
     options.push({
-        name: 'Push the Limit',
+        name: game.i18n.localize('SR5.PushTheLimit'),
         callback: (li) => SR5Actor_1.SR5Actor.pushTheLimit(li),
         condition: canRoll,
         icon: '<i class="fas fa-meteor"></i>',
     }, {
-        name: 'Second Chance',
+        name: game.i18n.localize('SR5.SecondChange'),
         callback: (li) => SR5Actor_1.SR5Actor.secondChance(li),
         condition: canRoll,
         icon: '<i class="fas fa-dice-d6"></i>',
@@ -18031,16 +18413,15 @@ exports.addRollListeners = (app, html) => {
     if (!app.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.MessageCustomRoll)) {
         return;
     }
-    const item = SR5Item_1.SR5Item.getItemFromMessage(html);
+    // const item = SR5Item.getItemFromMessage(html);
     // TODO: Move layout functionality into template
-    if ((item === null || item === void 0 ? void 0 : item.hasRoll) && app.isRoll)
-        $(html).find('.card-description').hide();
+    // if (item?.hasRoll && app.isRoll) $(html).find('.card-description').hide();
     html.on('click', '.test', (event) => __awaiter(void 0, void 0, void 0, function* () {
         event.preventDefault();
         const item = SR5Item_1.SR5Item.getItemFromMessage(html);
         const type = event.currentTarget.dataset.action;
         if (!item) {
-            console.error(`Test of type '${type}' can't be rolled without an item dataset. This is a bug.`);
+            ui.notifications.error(game.i18n.localize('SR5.MissingItemForOpposedTest'));
             return;
         }
         yield item.rollTestType(type, event);
@@ -18054,8 +18435,10 @@ exports.addRollListeners = (app, html) => {
             template === null || template === void 0 ? void 0 : template.drawPreview();
         }
     });
-    html.on('click', '.header-title', (event) => {
+    html.on('click', '.card-content', event => {
         event.preventDefault();
+        // NOTE: This depends on the exact card template HTML structure.
+        $(event.currentTarget).siblings('.dice-rolls').toggle();
         $(event.currentTarget).siblings('.card-description').toggle();
     });
     html.on('click', '.chat-entity-link', event => {
@@ -18063,11 +18446,25 @@ exports.addRollListeners = (app, html) => {
         const entityLink = $(event.currentTarget);
         const id = entityLink.data('id');
         const type = entityLink.data('entity');
-        // TODO: Refactor for multi entity type usability.
-        if (id && type === 'Token') {
+        if (!id)
+            return;
+        if (type === 'Token') {
             const token = canvas.tokens.get(id);
-            const sheet = token.actor.sheet;
-            sheet.render(true, { token: token });
+            token.actor.sheet.render(true, { token });
+        }
+        else if (type === 'Actor') {
+            const actor = game.actors.get(id);
+            actor.sheet.render(true);
+        }
+        else if (type === 'Item') {
+            const card = entityLink.closest('.chat-card');
+            const sceneTokenId = card.data('tokenId');
+            const token = helpers_1.Helpers.getSceneToken(sceneTokenId);
+            if (!token)
+                return;
+            const item = token.actor.getOwnedItem(id);
+            if (item)
+                item.sheet.render(true);
         }
     });
     html.on('click', '.chat-select-link', event => {
@@ -18078,9 +18475,13 @@ exports.addRollListeners = (app, html) => {
         if (token) {
             token.control();
         }
+        else {
+            ui.notifications.warn(game.i18n.localize('SR5.NoSelectableToken'));
+        }
     });
 };
-},{"./actor/SR5Actor":85,"./constants":114,"./item/SR5Item":159,"./template":173}],112:[function(require,module,exports){
+
+},{"./actor/SR5Actor":85,"./constants":117,"./helpers":126,"./item/SR5Item":162,"./template":176}],115:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -18309,7 +18710,8 @@ class SR5Combat extends Combat {
     }
 }
 exports.SR5Combat = SR5Combat;
-},{}],113:[function(require,module,exports){
+
+},{}],116:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5 = void 0;
@@ -18721,7 +19123,8 @@ exports.SR5 = {
         },
     },
 };
-},{}],114:[function(require,module,exports){
+
+},{}],117:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR = exports.LENGTH_UNIT = exports.DEFAULT_ROLL_NAME = exports.LENGTH_UNIT_TO_METERS_MULTIPLIERS = exports.METATYPEMODIFIER = exports.CORE_FLAGS = exports.CORE_NAME = exports.FLAGS = exports.SYSTEM_NAME = void 0;
@@ -18729,6 +19132,7 @@ exports.SYSTEM_NAME = 'shadowrun5e';
 exports.FLAGS = {
     ShowGlitchAnimation: 'showGlitchAnimation',
     ShowTokenNameForChatOutput: 'showTokenNameInsteadOfActor',
+    WhisperOpposedTestsToTargetedPlayers: 'whisperOpposedTestsToTargetedPlayers',
     MessageCustomRoll: 'customRoll',
     ApplyLimits: 'applyLimits',
     LastRollPromptValue: 'lastRollPromptValue',
@@ -18770,7 +19174,8 @@ exports.SR = {
         success: [5, 6]
     }
 };
-},{}],115:[function(require,module,exports){
+
+},{}],118:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataTemplates = void 0;
@@ -18819,7 +19224,8 @@ exports.DataTemplates = {
         }
     }
 };
-},{}],116:[function(require,module,exports){
+
+},{}],119:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataWrapper = void 0;
@@ -18829,7 +19235,8 @@ class DataWrapper {
     }
 }
 exports.DataWrapper = DataWrapper;
-},{}],117:[function(require,module,exports){
+
+},{}],120:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerBasicHelpers = void 0;
@@ -18953,7 +19360,8 @@ exports.registerBasicHelpers = () => {
         return new Handlebars.SafeString(helpers_1.Helpers.shortenAttributeLocalization(label, length));
     });
 };
-},{"../helpers":123}],118:[function(require,module,exports){
+
+},{"../helpers":126}],121:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HandlebarManager = void 0;
@@ -18974,7 +19382,8 @@ class HandlebarManager {
     }
 }
 exports.HandlebarManager = HandlebarManager;
-},{"./BasicHelpers":117,"./HandlebarTemplates":119,"./ItemLineHelpers":120,"./RollAndLabelHelpers":121,"./SkillLineHelpers":122}],119:[function(require,module,exports){
+
+},{"./BasicHelpers":120,"./HandlebarTemplates":122,"./ItemLineHelpers":123,"./RollAndLabelHelpers":124,"./SkillLineHelpers":125}],122:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -19056,6 +19465,7 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/dist/templates/item/parts/program.html',
         'systems/shadowrun5e/dist/templates/item/parts/critter_power.html',
         'systems/shadowrun5e/dist/templates/rolls/parts/parts-list.html',
+        'systems/shadowrun5e/dist/templates/rolls/parts/Damage.html',
         // to wrap the bodies of tabs
         'systems/shadowrun5e/dist/templates/common/TabWrapper.html',
         'systems/shadowrun5e/dist/templates/common/ValueInput.html',
@@ -19076,7 +19486,8 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
     ];
     return loadTemplates(templatePaths);
 });
-},{}],120:[function(require,module,exports){
+
+},{}],123:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerItemLineHelpers = void 0;
@@ -19475,11 +19886,13 @@ exports.registerItemLineHelpers = () => {
         return icons;
     });
 };
-},{"../item/SR5ItemDataWrapper":160}],121:[function(require,module,exports){
+
+},{"../item/SR5ItemDataWrapper":163}],124:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerRollAndLabelHelpers = void 0;
 const PartsList_1 = require("../parts/PartsList");
+const helpers_1 = require("../helpers");
 exports.registerRollAndLabelHelpers = () => {
     Handlebars.registerHelper('damageAbbreviation', function (damage) {
         if (damage === 'physical')
@@ -19539,8 +19952,10 @@ exports.registerRollAndLabelHelpers = () => {
             return `${value}`;
         }
     });
+    Handlebars.registerHelper('speakerName', helpers_1.Helpers.getChatSpeakerName);
 };
-},{"../parts/PartsList":170}],122:[function(require,module,exports){
+
+},{"../helpers":126,"../parts/PartsList":173}],125:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerSkillLineHelpers = void 0;
@@ -19637,7 +20052,8 @@ exports.registerSkillLineHelpers = () => {
         }
     });
 };
-},{"../helpers":123}],123:[function(require,module,exports){
+
+},{"../helpers":126}],126:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Helpers = void 0;
@@ -19875,6 +20291,24 @@ class Helpers {
             }
         }
     }
+    static getSceneToken(sceneTokenId) {
+        const [sceneId, tokenId] = sceneTokenId.split('.');
+        const isActiveScene = sceneId === (canvas === null || canvas === void 0 ? void 0 : canvas.scene._id);
+        if (isActiveScene) {
+            return canvas.tokens.get(tokenId);
+        }
+        // Build Token using it's data from the connected scene as a fallback.
+        const scene = game.scenes.get(sceneId);
+        if (!scene) {
+            return;
+        }
+        //@ts-ignore
+        const tokenData = scene.data.tokens.find((t) => t.id === Number(tokenId));
+        if (!tokenData) {
+            return;
+        }
+        return new Token(tokenData);
+    }
     static getUserTargets(user) {
         user = user ? user : game.user;
         if (user) {
@@ -19889,6 +20323,8 @@ class Helpers {
         return user.targets.size > 0;
     }
     static measureTokenDistance(tokenOrigin, tokenDest) {
+        if (!tokenOrigin || !tokenDest)
+            return 0;
         const origin = new PIXI.Point(...canvas.grid.getCenter(tokenOrigin.data.x, tokenOrigin.data.y));
         const dest = new PIXI.Point(...canvas.grid.getCenter(tokenDest.data.x, tokenDest.data.y));
         const distanceInGridUnits = canvas.grid.measureDistance(origin, dest, { gridSpaces: true });
@@ -19943,9 +20379,19 @@ class Helpers {
             return indexedObject[index];
         });
     }
+    static getChatSpeakerName(actor) {
+        if (!actor)
+            return '';
+        const useTokenNameForChatOutput = game.settings.get(constants_1.SYSTEM_NAME, constants_1.FLAGS.ShowTokenNameForChatOutput);
+        const token = actor.getToken();
+        if (useTokenNameForChatOutput && token)
+            return token.data.name;
+        return actor.name;
+    }
 }
 exports.Helpers = Helpers;
-},{"./constants":114,"./parts/PartsList":170}],124:[function(require,module,exports){
+
+},{"./constants":117,"./parts/PartsList":173}],127:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -20065,7 +20511,8 @@ class HooksManager {
     }
 }
 exports.HooksManager = HooksManager;
-},{"./actor/SR5Actor":85,"./actor/SR5ActorSheet":86,"./apps/gmtools/OverwatchScoreTracker":106,"./canvas":110,"./chat":111,"./combat/SR5Combat":112,"./config":113,"./constants":114,"./handlebars/HandlebarManager":118,"./helpers":123,"./importer/apps/import-form":125,"./item/SR5Item":159,"./item/SR5ItemSheet":161,"./macros":162,"./migrator/Migrator":164,"./rolls/ShadowrunRoller":171,"./settings":172}],125:[function(require,module,exports){
+
+},{"./actor/SR5Actor":85,"./actor/SR5ActorSheet":86,"./apps/gmtools/OverwatchScoreTracker":109,"./canvas":113,"./chat":114,"./combat/SR5Combat":115,"./config":116,"./constants":117,"./handlebars/HandlebarManager":121,"./helpers":126,"./importer/apps/import-form":128,"./item/SR5Item":162,"./item/SR5ItemSheet":164,"./macros":165,"./migrator/Migrator":167,"./rolls/ShadowrunRoller":174,"./settings":175}],128:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -20236,7 +20683,8 @@ Import.Importers = [
     new QualityImporter_1.QualityImporter(),
     new CyberwareImporter_1.CyberwareImporter(),
 ];
-},{"../helper/ImportHelper":126,"../importer/AmmoImporter":130,"../importer/ArmorImporter":131,"../importer/ComplexFormImporter":132,"../importer/CyberwareImporter":134,"../importer/DataImporter":135,"../importer/ModImporter":136,"../importer/QualityImporter":137,"../importer/SpellImporter":138,"../importer/WeaponImporter":139}],126:[function(require,module,exports){
+
+},{"../helper/ImportHelper":129,"../importer/AmmoImporter":133,"../importer/ArmorImporter":134,"../importer/ComplexFormImporter":135,"../importer/CyberwareImporter":137,"../importer/DataImporter":138,"../importer/ModImporter":139,"../importer/QualityImporter":140,"../importer/SpellImporter":141,"../importer/WeaponImporter":142}],129:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -20440,14 +20888,16 @@ class ImportHelper {
 exports.ImportHelper = ImportHelper;
 ImportHelper.CHAR_KEY = '_TEXT';
 ImportHelper.s_Strategy = new XMLStrategy_1.XMLStrategy();
-},{"../importer/Constants":133,"./JSONStrategy":128,"./XMLStrategy":129}],127:[function(require,module,exports){
+
+},{"../importer/Constants":136,"./JSONStrategy":131,"./XMLStrategy":132}],130:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ImportStrategy = void 0;
 class ImportStrategy {
 }
 exports.ImportStrategy = ImportStrategy;
-},{}],128:[function(require,module,exports){
+
+},{}],131:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JSONStrategy = void 0;
@@ -20464,7 +20914,8 @@ class JSONStrategy extends ImportStrategy_1.ImportStrategy {
     }
 }
 exports.JSONStrategy = JSONStrategy;
-},{"./ImportStrategy":127}],129:[function(require,module,exports){
+
+},{"./ImportStrategy":130}],132:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.XMLStrategy = void 0;
@@ -20512,7 +20963,8 @@ class XMLStrategy extends ImportStrategy_1.ImportStrategy {
     }
 }
 exports.XMLStrategy = XMLStrategy;
-},{"./ImportHelper":126,"./ImportStrategy":127}],130:[function(require,module,exports){
+
+},{"./ImportHelper":129,"./ImportStrategy":130}],133:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -20658,7 +21110,8 @@ class AmmoImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.AmmoImporter = AmmoImporter;
-},{"../helper/ImportHelper":126,"./Constants":133,"./DataImporter":135}],131:[function(require,module,exports){
+
+},{"../helper/ImportHelper":129,"./Constants":136,"./DataImporter":138}],134:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -20755,7 +21208,8 @@ class ArmorImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.ArmorImporter = ArmorImporter;
-},{"../helper/ImportHelper":126,"../parser/armor/ArmorParserBase":142,"./DataImporter":135}],132:[function(require,module,exports){
+
+},{"../helper/ImportHelper":129,"../parser/armor/ArmorParserBase":145,"./DataImporter":138}],135:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -20876,7 +21330,8 @@ class ComplexFormImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.ComplexFormImporter = ComplexFormImporter;
-},{"../helper/ImportHelper":126,"../parser/complex-form/ComplexFormParserBase":143,"./Constants":133,"./DataImporter":135}],133:[function(require,module,exports){
+
+},{"../helper/ImportHelper":129,"../parser/complex-form/ComplexFormParserBase":146,"./Constants":136,"./DataImporter":138}],136:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Constants = void 0;
@@ -21097,7 +21552,8 @@ Constants.WEAPON_RANGES = {
     },
 };
 Constants.ROOT_IMPORT_FOLDER_NAME = 'SR5e';
-},{}],134:[function(require,module,exports){
+
+},{}],137:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -21247,7 +21703,8 @@ class CyberwareImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.CyberwareImporter = CyberwareImporter;
-},{"../helper/ImportHelper":126,"../parser/cyberware/CyberwareParser":144,"./DataImporter":135}],135:[function(require,module,exports){
+
+},{"../helper/ImportHelper":129,"../parser/cyberware/CyberwareParser":147,"./DataImporter":138}],138:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -21296,7 +21753,8 @@ class DataImporter {
     }
 }
 exports.DataImporter = DataImporter;
-},{"../helper/ImportHelper":126,"xml2js":51}],136:[function(require,module,exports){
+
+},{"../helper/ImportHelper":129,"xml2js":51}],139:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -21396,7 +21854,8 @@ class ModImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.ModImporter = ModImporter;
-},{"../helper/ImportHelper":126,"../parser/mod/ModParserBase":147,"./Constants":133,"./DataImporter":135}],137:[function(require,module,exports){
+
+},{"../helper/ImportHelper":129,"../parser/mod/ModParserBase":150,"./Constants":136,"./DataImporter":138}],140:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -21516,7 +21975,8 @@ class QualityImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.QualityImporter = QualityImporter;
-},{"../helper/ImportHelper":126,"../parser/quality/QualityParserBase":148,"./DataImporter":135}],138:[function(require,module,exports){
+
+},{"../helper/ImportHelper":129,"../parser/quality/QualityParserBase":151,"./DataImporter":138}],141:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -21667,7 +22127,8 @@ class SpellImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.SpellImporter = SpellImporter;
-},{"../helper/ImportHelper":126,"../parser/ParserMap":141,"../parser/spell/CombatSpellParser":149,"../parser/spell/DetectionSpellImporter":150,"../parser/spell/IllusionSpellParser":151,"../parser/spell/ManipulationSpellParser":152,"../parser/spell/SpellParserBase":153,"./DataImporter":135}],139:[function(require,module,exports){
+
+},{"../helper/ImportHelper":129,"../parser/ParserMap":144,"../parser/spell/CombatSpellParser":152,"../parser/spell/DetectionSpellImporter":153,"../parser/spell/IllusionSpellParser":154,"../parser/spell/ManipulationSpellParser":155,"../parser/spell/SpellParserBase":156,"./DataImporter":138}],142:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -21858,14 +22319,16 @@ class WeaponImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.WeaponImporter = WeaponImporter;
-},{"../helper/ImportHelper":126,"../parser/ParserMap":141,"../parser/weapon/MeleeParser":154,"../parser/weapon/RangedParser":155,"../parser/weapon/ThrownParser":156,"../parser/weapon/WeaponParserBase":157,"./Constants":133,"./DataImporter":135}],140:[function(require,module,exports){
+
+},{"../helper/ImportHelper":129,"../parser/ParserMap":144,"../parser/weapon/MeleeParser":157,"../parser/weapon/RangedParser":158,"../parser/weapon/ThrownParser":159,"../parser/weapon/WeaponParserBase":160,"./Constants":136,"./DataImporter":138}],143:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
 class Parser {
 }
 exports.Parser = Parser;
-},{}],141:[function(require,module,exports){
+
+},{}],144:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ParserMap = void 0;
@@ -21898,7 +22361,8 @@ class ParserMap extends Parser_1.Parser {
     }
 }
 exports.ParserMap = ParserMap;
-},{"../helper/ImportHelper":126,"./Parser":140}],142:[function(require,module,exports){
+
+},{"../helper/ImportHelper":129,"./Parser":143}],145:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ArmorParserBase = void 0;
@@ -21913,7 +22377,8 @@ class ArmorParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBas
     }
 }
 exports.ArmorParserBase = ArmorParserBase;
-},{"../../helper/ImportHelper":126,"../item/TechnologyItemParserBase":146}],143:[function(require,module,exports){
+
+},{"../../helper/ImportHelper":129,"../item/TechnologyItemParserBase":149}],146:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ComplexFormParserBase = void 0;
@@ -21960,7 +22425,8 @@ class ComplexFormParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.ComplexFormParserBase = ComplexFormParserBase;
-},{"../../helper/ImportHelper":126,"../item/ItemParserBase":145}],144:[function(require,module,exports){
+
+},{"../../helper/ImportHelper":129,"../item/ItemParserBase":148}],147:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CyberwareParser = void 0;
@@ -21981,7 +22447,8 @@ class CyberwareParser extends TechnologyItemParserBase_1.TechnologyItemParserBas
     }
 }
 exports.CyberwareParser = CyberwareParser;
-},{"../../helper/ImportHelper":126,"../item/TechnologyItemParserBase":146}],145:[function(require,module,exports){
+
+},{"../../helper/ImportHelper":129,"../item/TechnologyItemParserBase":149}],148:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemParserBase = void 0;
@@ -22000,7 +22467,8 @@ class ItemParserBase extends Parser_1.Parser {
     }
 }
 exports.ItemParserBase = ItemParserBase;
-},{"../../helper/ImportHelper":126,"../Parser":140}],146:[function(require,module,exports){
+
+},{"../../helper/ImportHelper":129,"../Parser":143}],149:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TechnologyItemParserBase = void 0;
@@ -22016,7 +22484,8 @@ class TechnologyItemParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.TechnologyItemParserBase = TechnologyItemParserBase;
-},{"../../helper/ImportHelper":126,"./ItemParserBase":145}],147:[function(require,module,exports){
+
+},{"../../helper/ImportHelper":129,"./ItemParserBase":148}],150:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ModParserBase = void 0;
@@ -22034,7 +22503,8 @@ class ModParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBase 
     }
 }
 exports.ModParserBase = ModParserBase;
-},{"../../helper/ImportHelper":126,"../item/TechnologyItemParserBase":146}],148:[function(require,module,exports){
+
+},{"../../helper/ImportHelper":129,"../item/TechnologyItemParserBase":149}],151:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.QualityParserBase = void 0;
@@ -22054,7 +22524,8 @@ class QualityParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.QualityParserBase = QualityParserBase;
-},{"../../helper/ImportHelper":126,"../item/ItemParserBase":145}],149:[function(require,module,exports){
+
+},{"../../helper/ImportHelper":129,"../item/ItemParserBase":148}],152:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CombatSpellParser = void 0;
@@ -22092,7 +22563,8 @@ class CombatSpellParser extends SpellParserBase_1.SpellParserBase {
     }
 }
 exports.CombatSpellParser = CombatSpellParser;
-},{"../../helper/ImportHelper":126,"./SpellParserBase":153}],150:[function(require,module,exports){
+
+},{"../../helper/ImportHelper":129,"./SpellParserBase":156}],153:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DetectionSpellImporter = void 0;
@@ -22129,7 +22601,8 @@ class DetectionSpellImporter extends SpellParserBase_1.SpellParserBase {
     }
 }
 exports.DetectionSpellImporter = DetectionSpellImporter;
-},{"../../helper/ImportHelper":126,"./SpellParserBase":153}],151:[function(require,module,exports){
+
+},{"../../helper/ImportHelper":129,"./SpellParserBase":156}],154:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IllusionSpellParser = void 0;
@@ -22160,7 +22633,8 @@ class IllusionSpellParser extends SpellParserBase_1.SpellParserBase {
     }
 }
 exports.IllusionSpellParser = IllusionSpellParser;
-},{"../../helper/ImportHelper":126,"./SpellParserBase":153}],152:[function(require,module,exports){
+
+},{"../../helper/ImportHelper":129,"./SpellParserBase":156}],155:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ManipulationSpellParser = void 0;
@@ -22199,7 +22673,8 @@ class ManipulationSpellParser extends SpellParserBase_1.SpellParserBase {
     }
 }
 exports.ManipulationSpellParser = ManipulationSpellParser;
-},{"../../helper/ImportHelper":126,"./SpellParserBase":153}],153:[function(require,module,exports){
+
+},{"../../helper/ImportHelper":129,"./SpellParserBase":156}],156:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpellParserBase = void 0;
@@ -22259,7 +22734,8 @@ class SpellParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.SpellParserBase = SpellParserBase;
-},{"../../helper/ImportHelper":126,"../item/ItemParserBase":145}],154:[function(require,module,exports){
+
+},{"../../helper/ImportHelper":129,"../item/ItemParserBase":148}],157:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MeleeParser = void 0;
@@ -22327,7 +22803,8 @@ class MeleeParser extends WeaponParserBase_1.WeaponParserBase {
     }
 }
 exports.MeleeParser = MeleeParser;
-},{"../../helper/ImportHelper":126,"./WeaponParserBase":157}],155:[function(require,module,exports){
+
+},{"../../helper/ImportHelper":129,"./WeaponParserBase":160}],158:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RangedParser = void 0;
@@ -22409,7 +22886,8 @@ class RangedParser extends WeaponParserBase_1.WeaponParserBase {
     }
 }
 exports.RangedParser = RangedParser;
-},{"../../helper/ImportHelper":126,"../../importer/Constants":133,"./WeaponParserBase":157}],156:[function(require,module,exports){
+
+},{"../../helper/ImportHelper":129,"../../importer/Constants":136,"./WeaponParserBase":160}],159:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ThrownParser = void 0;
@@ -22523,7 +23001,8 @@ class ThrownParser extends WeaponParserBase_1.WeaponParserBase {
     }
 }
 exports.ThrownParser = ThrownParser;
-},{"../../helper/ImportHelper":126,"../../importer/Constants":133,"./WeaponParserBase":157}],157:[function(require,module,exports){
+
+},{"../../helper/ImportHelper":129,"../../importer/Constants":136,"./WeaponParserBase":160}],160:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WeaponParserBase = void 0;
@@ -22588,7 +23067,8 @@ class WeaponParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBa
     }
 }
 exports.WeaponParserBase = WeaponParserBase;
-},{"../../helper/ImportHelper":126,"../../importer/Constants":133,"../item/TechnologyItemParserBase":146}],158:[function(require,module,exports){
+
+},{"../../helper/ImportHelper":129,"../../importer/Constants":136,"../item/TechnologyItemParserBase":149}],161:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatData = void 0;
@@ -22916,7 +23396,8 @@ exports.ChatData = {
         }
     },
 };
-},{"../helpers":123}],159:[function(require,module,exports){
+
+},{"../helpers":126}],162:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -23165,10 +23646,6 @@ class SR5Item extends Item {
         return __awaiter(this, void 0, void 0, function* () {
             const tests = this.getActionTests();
             const options = {
-                header: {
-                    name: this.name,
-                    img: this.img,
-                },
                 actor: this.actor,
                 description: this.getChatData(),
                 item: this,
@@ -23183,29 +23660,17 @@ class SR5Item extends Item {
             if (!this.actor)
                 return;
             const dontRollTest = (event === null || event === void 0 ? void 0 : event.shiftKey) || !this.hasRoll;
-            if (dontRollTest) {
+            if (dontRollTest)
                 return yield this.postItemCard();
-            }
-            // Switch possible dialog content based on item type.
-            const { dialogData, getActionTestData, itemHasNoDialog } = yield ShadowrunItemDialog_1.ShadowrunItemDialog.fromItem(this, event);
-            if (itemHasNoDialog) {
+            const dialog = yield ShadowrunItemDialog_1.ShadowrunItemDialog.create(this, event);
+            // Some items might not have an additional dialog.
+            if (!dialog)
                 return yield this.rollTest(event);
-            }
-            // Allow different item types to utilize what's been selected in the items dialog.
-            if (dialogData && getActionTestData) {
-                dialogData.close = (html) => __awaiter(this, void 0, void 0, function* () {
-                    const actionTestData = yield getActionTestData(html);
-                    // No dialog selection means dialog has been closed and no roll is needed;
-                    if (!actionTestData) {
-                        return;
-                    }
-                    yield this.rollTest(event, undefined, actionTestData);
-                });
-            }
-            if (dialogData) {
-                return new Dialog(dialogData).render(true);
-            }
-            console.error('Item has no configuration for posting to chat or performing a roll.');
+            const actionTestData = yield dialog.select();
+            if (dialog.canceled)
+                return;
+            const options = undefined;
+            return yield this.rollTest(event, options, actionTestData);
         });
     }
     getChatData(htmlOptions) {
@@ -23213,6 +23678,9 @@ class SR5Item extends Item {
         const { labels } = this;
         if (!data.description)
             data.description = {};
+        // TextEditor.enrichHTML will return null as a string, making later handling difficult.
+        if (!data.description.value)
+            data.description.value = '';
         data.description.value = TextEditor.enrichHTML(data.description.value, htmlOptions);
         const props = [];
         const func = ChatData_1.ChatData[this.data.type];
@@ -23529,8 +23997,9 @@ class SR5Item extends Item {
      */
     rollTest(event, options, actionTestData) {
         return __awaiter(this, void 0, void 0, function* () {
-            // Cast Success Test for item Actions.
             const roll = yield ShadowrunRoller_1.ShadowrunRoller.itemRoll(event, this, options, actionTestData);
+            if (!roll)
+                return;
             yield this.setLastAttackForRoll(roll, actionTestData);
             yield ShadowrunRoller_1.ShadowrunRoller.resultingItemRolls(event, this, actionTestData);
             return roll;
@@ -23576,6 +24045,8 @@ class SR5Item extends Item {
         return targets;
     }
     getActionTests() {
+        if (!this.hasRoll)
+            return [];
         return [{
                 label: this.getActionTestName(),
                 type: 'action',
@@ -23977,7 +24448,8 @@ class SR5Item extends Item {
     }
 }
 exports.SR5Item = SR5Item;
-},{"../apps/dialogs/ShadowrunItemDialog":105,"../chat":111,"../constants":114,"../helpers":123,"../parts/PartsList":170,"../rolls/ShadowrunRoller":171,"./ChatData":158,"./SR5ItemDataWrapper":160}],160:[function(require,module,exports){
+
+},{"../apps/dialogs/ShadowrunItemDialog":107,"../chat":114,"../constants":117,"../helpers":126,"../parts/PartsList":173,"../rolls/ShadowrunRoller":174,"./ChatData":161,"./SR5ItemDataWrapper":163}],163:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ItemDataWrapper = void 0;
@@ -24184,7 +24656,8 @@ class SR5ItemDataWrapper extends DataWrapper_1.DataWrapper {
     }
 }
 exports.SR5ItemDataWrapper = SR5ItemDataWrapper;
-},{"../dataWrappers/DataWrapper":116}],161:[function(require,module,exports){
+
+},{"../dataWrappers/DataWrapper":119}],164:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -24512,7 +24985,8 @@ class SR5ItemSheet extends ItemSheet {
     }
 }
 exports.SR5ItemSheet = SR5ItemSheet;
-},{"../helpers":123}],162:[function(require,module,exports){
+
+},{"../helpers":126}],165:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -24568,10 +25042,11 @@ function rollItemMacro(itemName) {
         // @ts-ignore
         return ui.notifications.warn(`Your controlled Actor does not have an item named ${itemName}`);
     }
-    return item.postCard();
+    return item.castAction();
 }
 exports.rollItemMacro = rollItemMacro;
-},{}],163:[function(require,module,exports){
+
+},{}],166:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const HandlebarManager_1 = require("./handlebars/HandlebarManager");
@@ -24581,7 +25056,8 @@ const hooks_1 = require("./hooks");
 /* -------------------------------------------- */
 hooks_1.HooksManager.registerHooks();
 HandlebarManager_1.HandlebarManager.registerHelpers();
-},{"./handlebars/HandlebarManager":118,"./hooks":124}],164:[function(require,module,exports){
+
+},{"./handlebars/HandlebarManager":121,"./hooks":127}],167:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -24725,7 +25201,8 @@ Migrator.s_Versions = [
     { versionNumber: Version0_6_10_1.Version0_6_10.TargetVersion, migration: new Version0_6_10_1.Version0_6_10() },
     { versionNumber: Version0_7_2_1.Version0_7_2.TargetVersion, migration: new Version0_7_2_1.Version0_7_2() },
 ];
-},{"./VersionMigration":165,"./versions/LegacyMigration":166,"./versions/Version0_6_10":167,"./versions/Version0_6_5":168,"./versions/Version0_7_2":169}],165:[function(require,module,exports){
+
+},{"./VersionMigration":168,"./versions/LegacyMigration":169,"./versions/Version0_6_10":170,"./versions/Version0_6_5":171,"./versions/Version0_7_2":172}],168:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25154,7 +25631,8 @@ exports.VersionMigration = VersionMigration;
 VersionMigration.MODULE_NAME = 'shadowrun5e';
 VersionMigration.KEY_DATA_VERSION = 'systemMigrationVersion';
 VersionMigration.NO_VERSION = '0';
-},{}],166:[function(require,module,exports){
+
+},{}],169:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25383,7 +25861,8 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
     }
 }
 exports.LegacyMigration = LegacyMigration;
-},{"../VersionMigration":165}],167:[function(require,module,exports){
+
+},{"../VersionMigration":168}],170:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25443,7 +25922,8 @@ class Version0_6_10 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_6_10 = Version0_6_10;
-},{"../VersionMigration":165}],168:[function(require,module,exports){
+
+},{"../VersionMigration":168}],171:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25493,7 +25973,8 @@ class Version0_6_5 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_6_5 = Version0_6_5;
-},{"../VersionMigration":165}],169:[function(require,module,exports){
+
+},{"../VersionMigration":168}],172:[function(require,module,exports){
 "use strict";
 // TODO: How to trigger test migration.
 // TODO: How to test migration results?
@@ -25566,7 +26047,8 @@ class Version0_7_2 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_7_2 = Version0_7_2;
-},{"../../config":113,"../VersionMigration":165}],170:[function(require,module,exports){
+
+},{"../../config":116,"../VersionMigration":168}],173:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PartsList = void 0;
@@ -25669,7 +26151,8 @@ class PartsList {
     }
 }
 exports.PartsList = PartsList;
-},{}],171:[function(require,module,exports){
+
+},{}],174:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25680,23 +26163,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __rest = (this && this.__rest) || function (s, e) {
-    var t = {};
-    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
-        t[p] = s[p];
-    if (s != null && typeof Object.getOwnPropertySymbols === "function")
-        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
-            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
-                t[p[i]] = s[p[i]];
-        }
-    return t;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ShadowrunRoller = exports.ShadowrunRoll = void 0;
 const helpers_1 = require("../helpers");
 const chat_1 = require("../chat");
 const constants_1 = require("../constants");
 const PartsList_1 = require("../parts/PartsList");
+const ShadowrunTestDialog_1 = require("../apps/dialogs/ShadowrunTestDialog");
 class ShadowrunRoll extends Roll {
     // add class Roll to the json so dice-so-nice works
     toJSON() {
@@ -25754,14 +26227,11 @@ class ShadowrunRoll extends Roll {
 exports.ShadowrunRoll = ShadowrunRoll;
 class ShadowrunRoller {
     static itemRoll(event, item, options, actionTestData) {
-        const parts = item.getRollPartsList();
-        let limit = item.getLimit();
-        let title = item.getRollName();
+        // Create common data for all item types.
         const rollData = Object.assign(Object.assign({}, options), { event: event, dialogOptions: {
                 environmental: true,
-            }, parts, actor: item.actor, item,
-            limit,
-            title, name: item.name, img: item.img, previewTemplate: item.hasTemplate, attack: item.getAttackData(0, actionTestData), blast: item.getBlastData(actionTestData) });
+            }, item, actor: item.actor, parts: item.getRollPartsList(), limit: item.getLimit(), title: item.getRollName(), previewTemplate: item.hasTemplate, attack: item.getAttackData(0, actionTestData), blast: item.getBlastData(actionTestData), description: item.getChatData() });
+        // Add item type specific data.
         if (item.hasOpposedRoll) {
             rollData.tests = item.getOpposedTests();
         }
@@ -25773,10 +26243,10 @@ class ShadowrunRoller {
                 rollData.dialogOptions.environmental = actionTestData.rangedWeapon.environmental.range;
             }
         }
+        // Add target specific data.
         if (actionTestData && actionTestData.targetId) {
             rollData.target = helpers_1.Helpers.getToken(actionTestData.targetId);
         }
-        rollData.description = item.getChatData();
         return ShadowrunRoller.advancedRoll(rollData);
     }
     static resultingItemRolls(event, item, actionTestData) {
@@ -25828,55 +26298,57 @@ class ShadowrunRoller {
         formula += 'cs>=5';
         return formula;
     }
-    static basicRoll(_a) {
-        var { actor, item, title = constants_1.DEFAULT_ROLL_NAME, img = actor === null || actor === void 0 ? void 0 : actor.img, name = actor === null || actor === void 0 ? void 0 : actor.name, parts: partsProps = [], limit, explodeSixes = false, hideRollMessage = false, rollMode = CONFIG.Dice.rollModes.roll, previewTemplate = false, description, attack, incomingAttack, incomingDrain, incomingSoak, target, tests } = _a, props = __rest(_a, ["actor", "item", "title", "img", "name", "parts", "limit", "explodeSixes", "hideRollMessage", "rollMode", "previewTemplate", "description", "attack", "incomingAttack", "incomingDrain", "incomingSoak", "target", "tests"]);
+    static roll(props) {
+        const parts = new PartsList_1.PartsList(props.parts);
+        if (parts.isEmpty || parts.total < 1) {
+            ui.notifications.error(game.i18n.localize('SR5.RollOneDie'));
+            return;
+        }
+        ;
+        // Prepare SR Success Test with foundry formula.
+        const formulaOptions = { parts: parts.list, limit: props.limit, explode: props.explodeSixes };
+        const formula = this.shadowrunFormula(formulaOptions);
+        if (!formula) {
+            return;
+        }
+        // Execute the Success Test.
+        const rollData = { parts: parts.list, limit: props.limit, explodeSixes: props.explodeSixes };
+        const roll = new ShadowrunRoll(formula, rollData);
+        // Return roll reference instead roll() return to avoid typing issues.
+        roll.roll();
+        return roll;
+    }
+    static basicRoll(basicProps) {
         return __awaiter(this, void 0, void 0, function* () {
-            const parts = new PartsList_1.PartsList(partsProps);
-            // Abort on nothing to roll.
-            if (parts.isEmpty) {
+            const props = ShadowrunRoller.basicRollPropsDefaults(basicProps);
+            const roll = yield ShadowrunRoller.roll({ parts: props.parts, limit: props.limit, explodeSixes: props.explodeSixes });
+            if (!roll)
                 return;
-            }
-            // Prepare SR Success Test with foundry formula.
-            const formula = this.shadowrunFormula({ parts: parts.list, limit, explode: explodeSixes });
-            if (!formula) {
-                return;
-            }
-            // Execute the Success Test.
-            const rollData = { limit, explodeSixes, parts: parts.list };
-            const roll = new ShadowrunRoll(formula, rollData);
-            roll.roll();
-            yield chat_1.ifConfiguredCreateDefaultChatMessage(roll, { actor, title, rollMode });
-            // NOTE: Keep template data extraction to see basicProps that come through unused.
-            const templateData = Object.assign(Object.assign({ 
-                // tokenId: tokenSceneId,
-                actor, token: actor === null || actor === void 0 ? void 0 : actor.token, target, header: { name: name || '', img: img || '', }, title, description, rollMode, limit, previewTemplate,
-                attack, incomingAttack, incomingDrain, incomingSoak, item, tests }, props), { roll });
-            console.warn('basicProps unused', props);
-            if (!hideRollMessage) {
-                const rollChatMessageOptions = { roll, actor, target, item, name, img, rollMode, description, title, previewTemplate, attack, incomingAttack, incomingDrain, incomingSoak, tests };
-                yield chat_1.createRollChatMessage(rollChatMessageOptions);
-            }
-            if (target) {
-                console.error('target', target);
-                for (const user of game.users.entities) {
-                    if (!user.character) {
-                        continue;
-                    }
-                    console.error(user.character.id === target.actor.id);
-                    const targetChatMessage = {
-                        actor,
-                        target: {
-                            user, token: target
-                        },
-                        item,
-                        incomingAttack,
-                        tests
-                    };
-                    yield chat_1.createTargetChatMessage(targetChatMessage);
-                }
+            if (!props.hideRollMessage) {
+                yield ShadowrunRoller.rollChatMessage(roll, props);
             }
             return roll;
         });
+    }
+    /** Provide a clear interface of which value are guaranteed to be defined.
+     */
+    static basicRollPropsDefaults(props) {
+        var _a, _b, _c, _d, _e, _f;
+        props.title = (_a = props.title) !== null && _a !== void 0 ? _a : constants_1.DEFAULT_ROLL_NAME;
+        props.parts = (_b = props.parts) !== null && _b !== void 0 ? _b : [];
+        props.explodeSixes = (_c = props.explodeSixes) !== null && _c !== void 0 ? _c : false;
+        props.hideRollMessage = (_d = props.hideRollMessage) !== null && _d !== void 0 ? _d : false;
+        props.rollMode = (_e = props.rollMode) !== null && _e !== void 0 ? _e : CONFIG.Dice.rollModes.roll;
+        props.previewTemplate = (_f = props.previewTemplate) !== null && _f !== void 0 ? _f : false;
+        return Object.assign({}, props);
+    }
+    /** Provide a clear interface of which value are guaranteed to be defined.
+     */
+    static advancedRollPropsDefaults(props) {
+        var _a, _b;
+        props.parts = (_a = props.parts) !== null && _a !== void 0 ? _a : [];
+        props.wounds = (_b = props.wounds) !== null && _b !== void 0 ? _b : true;
+        return Object.assign({}, props);
     }
     /**
      * Prompt a roll for the user
@@ -25890,122 +26362,131 @@ class ShadowrunRoller {
     /**
      * Start an advanced roll
      * - Prompts the user for modifiers
+     */
+    static advancedRoll(advancedProps) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            // Remove after roll callback as to not move it further into other function calls.
+            const { after } = advancedProps;
+            const props = ShadowrunRoller.advancedRollPropsDefaults(advancedProps);
+            // remove limits if game settings is set
+            if (!game.settings.get(constants_1.SYSTEM_NAME, constants_1.FLAGS.ApplyLimits)) {
+                delete props.limit;
+            }
+            // Ask user for additional, general success test role modifiers.
+            const testDialogOptions = {
+                title: props.title,
+                dialogOptions: props.dialogOptions,
+                extended: props.extended,
+                limit: props.limit,
+                wounds: props.wounds,
+            };
+            const testDialog = yield ShadowrunTestDialog_1.ShadowrunTestDialog.create(props.actor, testDialogOptions, props.parts);
+            const testData = yield testDialog.select();
+            if (testDialog.canceled)
+                return;
+            // Prepare Test Roll.
+            const basicRollProps = Object.assign({}, props);
+            basicRollProps.wounds = testData.wounds;
+            basicRollProps.dialogOptions = testData.dialogOptions;
+            basicRollProps.rollMode = testData.rollMode;
+            if (testDialog.selectedButton === 'edge' && props.actor) {
+                basicRollProps.explodeSixes = true;
+                testData.parts.addUniquePart('SR5.PushTheLimit', props.actor.getEdge().value);
+                delete basicRollProps.limit;
+                // TODO: Edge usage doesn't seem to apply on actor sheet.
+                yield props.actor.update({
+                    'data.attributes.edge.uses': props.actor.data.data.attributes.edge.uses - 1,
+                });
+            }
+            basicRollProps.parts = testData.parts.list;
+            // Execute Test roll...
+            const roll = yield this.basicRoll(basicRollProps);
+            if (!roll)
+                return;
+            if (!props.hideRollMessage && props.target && props.tests) {
+                yield ShadowrunRoller.targetChatMessage(props);
+            }
+            else if (!props.hideRollMessage && helpers_1.Helpers.userHasTargets() && props.tests) {
+                yield ShadowrunRoller.targetsChatMessages(props);
+            }
+            if (testData.extended) {
+                const currentExtended = (_a = testData.parts.getPartValue('SR5.Extended')) !== null && _a !== void 0 ? _a : 0;
+                testData.parts.addUniquePart('SR5.Extended', currentExtended - 1);
+                // Prepare the next, extended test roll.
+                props.parts = testData.parts.list;
+                props.extended = true;
+                const delayInMs = 400;
+                setTimeout(() => this.advancedRoll(props), delayInMs);
+            }
+            if (after)
+                yield after(roll);
+            return roll;
+        });
+    }
+    static rollChatMessage(roll, props) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, incomingDrain, damage, tests } = props;
+            const rollChatMessageOptions = { roll, actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, incomingDrain, damage, tests };
+            yield chat_1.createRollChatMessage(rollChatMessageOptions);
+        });
+    }
+    /** Send a message to the specific targeted player given.
+     *
+     * Use targetsChatMessages for a simple way to send to all active player targets.
+     *
+     * Should a target have multiple user owners, each will get a message.
+     *
      * @param props
      */
-    static advancedRoll(props) {
-        // destructure what we need to use from props
-        // any value pulled out needs to be updated back in props if changed
-        const { title, actor, parts: partsProps = [], limit, extended, wounds = true, after, dialogOptions } = props;
-        const parts = new PartsList_1.PartsList(partsProps);
-        // remove limits if game settings is set
-        if (!game.settings.get(constants_1.SYSTEM_NAME, constants_1.FLAGS.ApplyLimits)) {
-            delete props.limit;
-        }
-        // TODO create "fast roll" option
-        const rollMode = game.settings.get(constants_1.CORE_NAME, constants_1.CORE_FLAGS.RollMode);
-        let dialogData = {
-            options: dialogOptions,
-            extended,
-            dice_pool: parts.total,
-            parts: parts.getMessageOutput(),
-            limit: limit === null || limit === void 0 ? void 0 : limit.value,
-            wounds,
-            woundValue: actor === null || actor === void 0 ? void 0 : actor.getWoundModifier(),
-            rollMode,
-            rollModes: CONFIG.Dice.rollModes,
-        };
-        let template = 'systems/shadowrun5e/dist/templates/rolls/roll-dialog.html';
-        let edge = false;
-        let cancel = true;
-        const buttons = {
-            roll: {
-                label: game.i18n.localize('SR5.Roll'),
-                icon: '<i class="fas fa-dice-six"></i>',
-                callback: () => (cancel = false),
-            },
-        };
-        if (actor) {
-            buttons['edge'] = {
-                label: `${game.i18n.localize('SR5.PushTheLimit')} (+${actor.getEdge().value})`,
-                icon: '<i class="fas fa-bomb"></i>',
-                callback: () => {
-                    edge = true;
-                    cancel = false;
-                },
-            };
-        }
-        return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
-            const content = yield renderTemplate(template, dialogData);
-            const dialog = new Dialog({
-                title: title,
-                content,
-                buttons,
-                default: 'roll',
-                close: (html) => __awaiter(this, void 0, void 0, function* () {
-                    var _a;
-                    if (cancel)
-                        return;
-                    // get the actual dice_pool from the difference of initial parts and value in the dialog
-                    const dicePoolValue = helpers_1.Helpers.parseInputToNumber($(html).find('[name="dice_pool"]').val());
-                    if (dialogOptions === null || dialogOptions === void 0 ? void 0 : dialogOptions.prompt) {
-                        parts.clear();
-                        yield game.user.setFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.LastRollPromptValue, dicePoolValue);
-                        parts.addUniquePart('SR5.Base', dicePoolValue);
-                    }
-                    const limitValue = helpers_1.Helpers.parseInputToNumber($(html).find('[name="limit"]').val());
-                    if (limit && limit.value !== limitValue) {
-                        limit.value = limitValue;
-                        limit.base = limitValue;
-                        limit.label = 'SR5.Override';
-                    }
-                    const woundValue = helpers_1.Helpers.parseInputToNumber($(html).find('[name="wounds"]').val());
-                    const situationMod = helpers_1.Helpers.parseInputToNumber($(html).find('[name="dp_mod"]').val());
-                    const environmentMod = helpers_1.Helpers.parseInputToNumber($(html).find('[name="options.environmental"]').val());
-                    if (wounds && woundValue !== 0) {
-                        parts.addUniquePart('SR5.Wounds', woundValue);
-                        props.wounds = true;
-                    }
-                    if (situationMod) {
-                        parts.addUniquePart('SR5.SituationalModifier', situationMod);
-                    }
-                    if (environmentMod) {
-                        parts.addUniquePart('SR5.EnvironmentModifier', environmentMod);
-                        if (!props.dialogOptions)
-                            props.dialogOptions = {};
-                        props.dialogOptions.environmental = true;
-                    }
-                    const extendedString = helpers_1.Helpers.parseInputToString($(html).find('[name="extended"]').val());
-                    const extended = extendedString === 'true';
-                    if (edge && actor) {
-                        props.explodeSixes = true;
-                        parts.addUniquePart('SR5.PushTheLimit', actor.getEdge().value);
-                        delete props.limit;
-                        // TODO: Edge usage doesn't seem to apply on actor sheet.
-                        yield actor.update({
-                            'data.attributes.edge.uses': actor.data.data.attributes.edge.uses - 1,
-                        });
-                    }
-                    props.rollMode = helpers_1.Helpers.parseInputToString($(html).find('[name=rollMode]').val());
-                    props.parts = parts.list;
-                    const r = this.basicRoll(Object.assign({}, props));
-                    if (extended && r) {
-                        const currentExtended = (_a = parts.getPartValue('SR5.Extended')) !== null && _a !== void 0 ? _a : 0;
-                        parts.addUniquePart('SR5.Extended', currentExtended - 1);
-                        props.parts = parts.list;
-                        // add a bit of a delay to roll again
-                        setTimeout(() => this.advancedRoll(props), 400);
-                    }
-                    resolve(r);
-                    if (after && r)
-                        r.then((roll) => after(roll));
-                }),
+    static targetChatMessage(props) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!game.settings.get(constants_1.SYSTEM_NAME, constants_1.FLAGS.WhisperOpposedTestsToTargetedPlayers))
+                return;
+            const rollMode = (_a = props.rollMode) !== null && _a !== void 0 ? _a : game.settings.get(constants_1.CORE_NAME, constants_1.CORE_FLAGS.RollMode);
+            if (rollMode === 'roll')
+                return;
+            // @ts-ignore // Token.actor is of type Actor instead of SR5Actor
+            const users = props.target.actor.getActivePlayerOwners();
+            for (const user of users) {
+                if (user.isGM)
+                    continue;
+                if (user === game.user)
+                    continue;
+                const targetChatMessage = { actor: props.actor, target: props.target, item: props.item,
+                    incomingAttack: props.incomingAttack, tests: props.tests, whisperTo: user
+                };
+                yield chat_1.createTargetChatMessage(targetChatMessage);
+            }
+        });
+    }
+    /** Send messages to ALL targets, no matter if specifically targeted in a action dialog.
+     *
+     * This can cause for multiple target whispers to happen, even if the active player only selected one
+     * during, for example, the ranged weapon dialog (which gives a selection and returns one)
+     *
+     *
+     * @param props
+     */
+    static targetsChatMessages(props) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!game.settings.get(constants_1.SYSTEM_NAME, constants_1.FLAGS.WhisperOpposedTestsToTargetedPlayers))
+                return;
+            const targets = helpers_1.Helpers.getUserTargets();
+            targets.forEach(target => {
+                // @ts-ignore // Token.actor is of type Actor instead of SR5Actor
+                if (!target.actor.hasActivePlayerOwner())
+                    return;
+                const advancedProps = Object.assign(Object.assign({}, props), { target });
+                ShadowrunRoller.targetChatMessage(advancedProps);
             });
-            dialog.render(true);
-        }));
+        });
     }
 }
 exports.ShadowrunRoller = ShadowrunRoller;
-},{"../chat":111,"../constants":114,"../helpers":123,"../parts/PartsList":170}],172:[function(require,module,exports){
+
+},{"../apps/dialogs/ShadowrunTestDialog":108,"../chat":114,"../constants":117,"../helpers":126,"../parts/PartsList":173}],175:[function(require,module,exports){
 "use strict";
 // game settings for shadowrun 5e
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -26075,8 +26556,17 @@ exports.registerSystemSettings = () => {
         type: Boolean,
         default: true,
     });
+    game.settings.register(constants_1.SYSTEM_NAME, constants_1.FLAGS.WhisperOpposedTestsToTargetedPlayers, {
+        name: 'SETTINGS.WhisperOpposedTestsToTargetedPlayers',
+        hint: 'SETTINGS.WhisperOpposedTestsToTargetedPlayersDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: true,
+    });
 };
-},{"./constants":114,"./migrator/VersionMigration":165}],173:[function(require,module,exports){
+
+},{"./constants":117,"./migrator/VersionMigration":168}],176:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Template extends MeasuredTemplate {
@@ -26167,6 +26657,7 @@ class Template extends MeasuredTemplate {
     }
 }
 exports.default = Template;
-},{}]},{},[163])
+
+},{}]},{},[166])
 
 //# sourceMappingURL=bundle.js.map
