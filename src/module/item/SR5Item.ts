@@ -247,10 +247,6 @@ export class SR5Item extends Item {
     async postItemCard() {
         const tests =  this.getActionTests();
         const options = {
-            header: {
-                name: this.name,
-                img: this.img,
-            },
             actor: this.actor,
             description: this.getChatData(),
             item: this,
@@ -645,6 +641,8 @@ export class SR5Item extends Item {
     }
 
     getActionTests(): Test[] {
+        if (!this.hasRoll) return []
+
         return [{
             label: this.getActionTestName(),
             type: 'action',

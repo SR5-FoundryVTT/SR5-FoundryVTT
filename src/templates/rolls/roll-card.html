@@ -19,7 +19,7 @@
     </div>
     {{/if}}
     {{#if description}}
-    <div class="card-description">
+    <div class="card-description {{#if (not (isDefined roll))}}show-card-description{{/if}}">
         {{#if description.description.value}}
         <div class="card-description-content">
             {{{description.description.value}}}

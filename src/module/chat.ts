@@ -21,10 +21,6 @@ export interface TargetChatMessageOptions {
 export interface ItemChatMessageOptions {
     actor: SR5Actor
     item: SR5Item
-    header: {
-        name: string
-        img: string
-    }
     description: object
     tests?: Test[]
 }
@@ -52,10 +48,6 @@ export interface RollChatMessageOptions {
 interface ItemChatTemplateData {
     actor: SR5Actor
     item: SR5Item
-    header: {
-        name: string
-        img: string
-    }
     description: object
     tests?: Test[]
 }
@@ -167,12 +159,11 @@ export async function createItemChatMessage(options: ItemChatMessageOptions) {
 function createChatTemplateData(options: ItemChatMessageOptions): ItemChatTemplateData {
     // field extraction is explicit to enforce visible data flow to ensure clean data.
     // NOTE: As soon as clear data dynamic data flow can be established, this should be removed for a simple {...options}
-    let {actor, item, description, tests, header} = options;
+    let {actor, item, description, tests} = options;
 
     return {
         actor,
         item,
-        header,
         description,
         tests
     }
