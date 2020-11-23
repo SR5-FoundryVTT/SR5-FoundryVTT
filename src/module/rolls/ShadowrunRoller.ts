@@ -381,8 +381,7 @@ export class ShadowrunRoller {
         const roll = await this.basicRoll(basicRollProps);
         if (!roll) return;
 
-        // @ts-ignore // Token.actor is of type Actor instead of SR5Actor
-        if (!props.hideRollMessage && props.target && props.target.actor.hasActivePlayer()) {
+        if (!props.hideRollMessage && props.target && props.tests) {
             await ShadowrunRoller.targetChatMessage(props);
         } else if (!props.hideRollMessage && Helpers.userHasTargets() && props.tests) {
             await ShadowrunRoller.targetsChatMessages(props);
@@ -428,6 +427,7 @@ export class ShadowrunRoller {
 
         for (const user of users) {
             if (user.isGM) continue;
+            if (user === game.user) continue;
 
             const targetChatMessage = {actor: props.actor, target: props.target, item: props.item,
                 incomingAttack: props.incomingAttack, tests: props.tests, whisperTo: user
