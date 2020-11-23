@@ -560,6 +560,8 @@
         "ShowGlitchAnimationDescription": "Should display the animation as part of the glitch text on the roll card",
         "ShowTokenNameForChatOutputName": "Use Token Name for Roll Card",
         "ShowTokenNameForChatOutputDescription": "Should the token name be used for roll card output instead of the actor name when available",
+        "WhisperOpposedTestsToTargetedPlayers": "Whisper tests to targeted players",
+        "WhisperOpposedTestsToTargetedPlayersDescription": "Rolls with opposed tests will be whispered to a online player target",
         "Euclidean": "Euclidean"
     },
 

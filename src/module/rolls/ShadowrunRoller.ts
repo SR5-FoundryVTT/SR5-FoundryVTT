@@ -409,6 +409,8 @@ export class ShadowrunRoller {
     }
 
     static async targetChatMessage(props: AdvancedRollPropsDefaulted) {
+        if (!game.settings.get(SYSTEM_NAME, FLAGS.WhisperOpposedTestsToTargetedPlayers)) return;
+
         // @ts-ignore // Token.actor is of type Actor instead of SR5Actor
         const user = props.target.actor.getActivePlayer();
 
