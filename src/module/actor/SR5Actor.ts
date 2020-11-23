@@ -21,7 +21,8 @@ import VehicleActorData = Shadowrun.VehicleActorData;
 import VehicleStat = Shadowrun.VehicleStat;
 import {ShadowrunActorDialogs} from "../apps/dialogs/ShadowrunActorDialogs";
 import {createRollChatMessage} from "../chat";
-import ModifiedDamageData = Shadowrun.ModifiedDamageData;
+import Attributes = Shadowrun.Attributes;
+import Limits = Shadowrun.Limits;
 
 export class SR5Actor extends Actor {
     getOverwatchScore() {
@@ -124,6 +125,24 @@ export class SR5Actor extends Actor {
 
     getDeviceRating(): number {
         return this.data.data.matrix.rating;
+    }
+
+    getAttributes(): Attributes {
+        return this.data.data.attributes;
+    }
+
+    getAttribute(name: string): AttributeField {
+        const attributes = this.getAttributes();
+        return attributes[name];
+    }
+
+    getLimits(): Limits {
+        return this.data.data.limits;
+    }
+
+    getLimit(name: string): LimitField {
+        const limits = this.getLimits();
+        return limits[name];
     }
 
     isVehicle() {
@@ -573,83 +592,51 @@ export class SR5Actor extends Actor {
         });
     }
 
-    rollSkill(skill: SkillField, options?: SkillRollOptions) {
-        let att = duplicate(this.data.data.attributes[skill.attribute]);
+    async rollSkill(skill: SkillField, options?: SkillRollOptions) {
         let title = game.i18n.localize(skill.label);
 
-        if (options?.attribute) att = this.data.data.attributes[options.attribute];
-        let limit = this.data.data.limits[att.limit];
+        const attributeName = options?.attribute ? options.attribute : skill.attribute;
+        const att = this.getAttribute(attributeName);
+        // @ts-ignore // att can't really be undefined here... ?
+        let limit = this.getLimit(att.limit);
+
+        // Initialize parts with always needed skill data.
         const parts = new PartsList<number>();
         parts.addUniquePart(skill.label, skill.value);
+        this._addMatrixParts(parts, [att, skill]);
+        this._addGlobalParts(parts);
 
+        // Directly test, without further skill dialog.
         if (options?.event && Helpers.hasModifiers(options?.event)) {
             parts.addUniquePart(att.label, att.value);
             if (options.event[CONFIG.SR5.kbmod.SPEC]) parts.addUniquePart('SR5.Specialization', 2);
 
-            this._addMatrixParts(parts, [att, skill]);
-            this._addGlobalParts(parts);
             return ShadowrunRoller.advancedRoll({
                 event: options.event,
                 actor: this,
                 parts: parts.list,
                 limit,
-                title: `${title} Test`,
+                title: `${title} ${game.i18n.localize('SR5.Test')}`,
             });
         }
-        let dialogData = {
-            attribute: skill.attribute,
-            attributes: Helpers.filter(this.data.data.attributes, ([, value]) => value.value > 0),
-            limit: att.limit,
-            limits: this.data.data.limits,
-        };
-        let cancel = true;
-        let spec = '';
 
-        let buttons = {
-            roll: {
-                label: 'Normal',
-                callback: () => (cancel = false),
-            },
-        };
-        // add specializations to dialog as buttons
-        if (skill.specs?.length) {
-            skill.specs.forEach(
-                (s) =>
-                    (buttons[s] = {
-                        label: s,
-                        callback: () => {
-                            cancel = false;
-                            spec = s;
-                        },
-                    }),
-            );
+        // First ask user about skill details.
+        const skillRollDialogOptions = {
+            skill,
+            attribute: attributeName
         }
-        renderTemplate('systems/shadowrun5e/dist/templates/rolls/skill-roll.html', dialogData).then((dlg) => {
-            new Dialog({
-                title: `${title} Test`,
-                content: dlg,
-                buttons,
-                close: async (html) => {
-                    if (cancel) return;
-                    const newAtt = Helpers.parseInputToString($(html).find('[name="attribute"]').val());
-                    const newLimit = Helpers.parseInputToString($(html).find('[name="attribute.limit"]').val());
-                    att = this.data.data.attributes[newAtt];
-                    title += ` + ${game.i18n.localize(CONFIG.SR5.attributes[newAtt])}`;
-                    limit = this.data.data.limits[newLimit];
-                    parts.addUniquePart(att.label, att.value);
-                    if (skill.value === 0) parts.addUniquePart('SR5.Defaulting', -1);
-                    if (spec) parts.addUniquePart('SR5.Specialization', 2);
-                    this._addMatrixParts(parts, [att, skill]);
-                    this._addGlobalParts(parts);
-                    return ShadowrunRoller.advancedRoll({
-                        event: options?.event,
-                        actor: this,
-                        parts: parts.list,
-                        limit,
-                        title: `${title} Test`,
-                    });
-                },
-            }).render(true);
+
+        const skillDialog = await ShadowrunActorDialogs.createSkillDialog(this, skillRollDialogOptions, parts);
+        const skillActionData = await skillDialog.select();
+
+        if (skillDialog.canceled) return;
+
+        return await ShadowrunRoller.advancedRoll({
+            event: options?.event,
+            actor: this,
+            parts: skillActionData.parts.list,
+            limit: skillActionData.limit,
+            title: skillActionData.title,
         });
     }
 

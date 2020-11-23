@@ -2,6 +2,7 @@ import { PartsList } from '../parts/PartsList';
 import ModList = Shadowrun.ModList;
 import {SR5Actor} from "../actor/SR5Actor";
 import {FLAGS, SYSTEM_NAME} from "../constants";
+import {Helpers} from "../helpers";
 
 export const registerRollAndLabelHelpers = () => {
     Handlebars.registerHelper('damageAbbreviation', function (damage) {
@@ -58,14 +59,5 @@ export const registerRollAndLabelHelpers = () => {
         }
     });
 
-    Handlebars.registerHelper('speakerName', function(actor: SR5Actor): string {
-        if (!actor) return '';
-
-        const useTokenNameForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
-        const token = actor.getToken();
-
-        if (useTokenNameForChatOutput && token) return token.data.name;
-
-        return actor.name;
-    });
+    Handlebars.registerHelper('speakerName', Helpers.getChatSpeakerName);
 };

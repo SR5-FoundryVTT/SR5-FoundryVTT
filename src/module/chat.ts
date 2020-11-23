@@ -100,10 +100,6 @@ const createChatData = async (templateData, options?: ChatDataOptions) => {
     const actor = templateData.actor;
     const token = actor?.getToken();
 
-    console.error('chatData');
-    console.error(actor.id, actor);
-    console.error(token.id, token);
-
     //@ts-ignore
     const enhancedTemplateData = {
         ...templateData,
@@ -114,8 +110,6 @@ const createChatData = async (templateData, options?: ChatDataOptions) => {
     };
     const html = await renderTemplate(template, enhancedTemplateData);
 
-
-
     const chatData = {
         user: game.user._id,
         type: options?.roll ? CONST.CHAT_MESSAGE_TYPES.ROLL : CONST.CHAT_MESSAGE_TYPES.OTHER,
@@ -125,7 +119,7 @@ const createChatData = async (templateData, options?: ChatDataOptions) => {
         speaker: {
             actor: actor?._id,
             token: actor?.getToken(),
-            //alias: templateData.header.name
+            alias: game.user.name
         },
         flags: {
             shadowrun5e: {

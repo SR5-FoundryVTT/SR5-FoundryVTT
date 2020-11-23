@@ -57,7 +57,6 @@ export class FormDialog extends Dialog {
 
     async afterSubmit(html: JQuery) {
         // Await in case of a possible async handler.
-        console.error('dialog', this.selectedButton, this);
         this.selection = await this._onAfterClose(html, this.selectedButton);
         this._selectionResolve(this.selection);
     }

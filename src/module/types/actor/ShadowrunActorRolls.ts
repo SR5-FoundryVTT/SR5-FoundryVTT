@@ -39,6 +39,11 @@ declare namespace Shadowrun {
     };
 
     type SkillRollOptions = ActorRollOptions & {
-        attribute?: ActorAttribute;
+        attribute?: ActorAttribute
     };
+
+    type SkillDialogOptions = {
+        skill: SkillField
+        attribute?: ActorAttribute
+    }
 }

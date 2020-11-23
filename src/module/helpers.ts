@@ -3,7 +3,7 @@ import SkillField = Shadowrun.SkillField;
 import ModifiableValue = Shadowrun.ModifiableValue;
 import { PartsList } from './parts/PartsList';
 import LabelField = Shadowrun.LabelField;
-import {LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SR} from "./constants";
+import {FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SR, SYSTEM_NAME} from "./constants";
 import {SR5Actor} from "./actor/SR5Actor";
 import RangesTemplateData = Shadowrun.RangesTemplateData;
 import RangeTemplateData = Shadowrun.RangeTemplateData;
@@ -335,5 +335,16 @@ export class Helpers {
             }
             return indexedObject[index];
         });
+    }
+
+    static getChatSpeakerName(actor: SR5Actor): string {
+        if (!actor) return '';
+
+        const useTokenNameForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
+        const token = actor.getToken();
+
+        if (useTokenNameForChatOutput && token) return token.data.name;
+
+        return actor.name;
     }
 }

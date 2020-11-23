@@ -44,6 +44,8 @@
     "SR5.Wounds": "Wounds",
     "SR5.Filter": "Filter",
 
+    "SR5.NormalSkillButton": "Normal",
+
     "SR5.Movement": "Movement",
     "SR5.Overflow": "Overflow",
     "SR5.Nuyen": "Nuyen",
@@ -140,6 +142,7 @@
     "SR5.AP": "AP",
     "SR5.OpposedType": "Type",
     "SR5.Extended": "Extended",
+    "SR5.Test": "Test",
 
     "SR5.CreateItem": "Create Item",
     "SR5.CreateItemWeapon": "Create Weapon",
