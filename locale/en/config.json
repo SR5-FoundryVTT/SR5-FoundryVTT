@@ -44,6 +44,8 @@
     "SR5.Wounds": "Wounds",
     "SR5.Filter": "Filter",
 
+    "SR5.NormalSkillButton": "Normal",
+
     "SR5.Movement": "Movement",
     "SR5.Overflow": "Overflow",
     "SR5.Nuyen": "Nuyen",
@@ -140,6 +142,7 @@
     "SR5.AP": "AP",
     "SR5.OpposedType": "Type",
     "SR5.Extended": "Extended",
+    "SR5.Test": "Test",
 
     "SR5.CreateItem": "Create Item",
     "SR5.CreateItemWeapon": "Create Weapon",
@@ -179,6 +182,7 @@
     "SR5.RecoilCompensation": "RC",
     "SR5.Equip": "Equip",
     "SR5.Damage": "Damage",
+    "SR5.OutOfRange": "Out of Range",
 
     "SR5.Spell": "Spell",
     "SR5.SpellCategory": "Category",
@@ -402,6 +406,9 @@
     "SR5.Bullets": "Rounds",
 
     "SR5.RollOneDie": "You can't roll less than 1 die, chummer",
+    "SR5.NoSelectableToken": "Actor has no selectable token on canvas",
+    "SR5.MissingItemForOpposedTest": "Opposed Test can't be rolled due to the acting item now missing",
+    "SR5.TargetingNeedsActorWithToken": "The current actor needs a linked token for targeting to work",
 
     "SR5.OverwatchScore": "Overwatch Score",
     "SR5.OverwatchScoreTrackerTitle": "Mr. Johnson's Baby Monitor",
@@ -423,11 +430,13 @@
     "SR5.Defaulting": "Defaulting",
     "SR5.NotExtended": "Not Extended",
     "SR5.Hits": "Hits",
+    "SR5.NetHits": "Net Hits",
 
     "SR5.NormalSpellButton": "Normal",
     "SR5.RecklessSpellButton": "Reckless",
     "SR5.DV": "DV",
     "SR5.PushTheLimit": "Push The Limit",
+    "SR5.SecondChange": "Second Change",
     "SR5.DuckOrCover": "Duck or Cover",
     "SR5.RangeWeaponAttack": "Range Weapon Attack",
     "SR5.MeleeWeaponAttack": "Melee Weapon Attack",
@@ -437,6 +446,7 @@
     "SR5.SoakTest": "Damage Resist Test",
     "SR5.AttackerHits": "Attacker Hits",
     "SR5.Incoming": "Incoming",
+    "SR5.Modified": "Modified",
     "SR5.Resist": "Resist",
     "SR5.Force": "Force",
     "SR5.Roll": "Roll",
@@ -502,6 +512,7 @@
     "SR5.ExtendedTest": "Extended Test",
     "SR5.IncomingDamage": "Incoming Damage",
     "SR5.Temporary": "Temporary",
+    "SR5.SelectedTargets": "Selected Targets",
 
     "SR5.ApplyWounds": "Apply Wounds",
     "SR5.DontApplyWounds": "Don't Apply Wounds",
@@ -552,6 +563,8 @@
         "ShowGlitchAnimationDescription": "Should display the animation as part of the glitch text on the roll card",
         "ShowTokenNameForChatOutputName": "Use Token Name for Roll Card",
         "ShowTokenNameForChatOutputDescription": "Should the token name be used for roll card output instead of the actor name when available",
+        "WhisperOpposedTestsToTargetedPlayers": "Whisper tests to targeted players",
+        "WhisperOpposedTestsToTargetedPlayersDescription": "Rolls with opposed tests will be whispered to a online player target",
         "Euclidean": "Euclidean"
     },
 

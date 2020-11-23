@@ -9,10 +9,10 @@
         <label>{{localize "SR5.SituationalModifier"}}</label>
         <input style="flex: 1;" type="text" name="dp_mod" size="3" maxlength="10" value="{{dp_mod}}" data-dtype="Number" placeholder="+/- mod" />
     </div>
-    {{#if limit}}
+    {{#if limitValue}}
     <div class="form-group">
         <label>{{localize 'SR5.Limit'}}</label>
-        <input style="flex: 1;" type="text" name="limit" size="3" maxlength="3" value="{{limit}}" data-dtype="Number" />
+        <input style="flex: 1;" type="text" name="limitValue" size="3" maxlength="3" value="{{limitValue}}" data-dtype="Number" />
     </div>
     {{/if}} {{#if wounds}} {{#if woundValue}}
     <div class="form-group">

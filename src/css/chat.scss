@@ -7,12 +7,13 @@
 
         .card-header {
             padding: 0.25em 0;
-            border-top: $groove;
             border-bottom: $groove;
 
             img {
                 flex: 0 0 36px;
                 margin-right: 0.5em;
+                padding: 1px 1px 1px 1px;
+                border: 0;
             }
 
             h3 {
@@ -23,9 +24,13 @@
                 @include nodesto;
             }
         }
+        .card-header:first-of-type {
+            border-top: $groove;
+        }
         .card-content {
             padding: 0.5em 0;
             border-bottom: $groove;
+            cursor: pointer;
             p {
                 font-size: 0.8em;
             }
@@ -37,7 +42,6 @@
         }
 
         .card-buttons {
-            border-top: $groove;
             .button {
                 box-shadow: 0 0 0.25em 0.15em $dark;
                 &:hover {
@@ -56,10 +60,7 @@
             }
         }
 
-        .card-footer {
-            padding: 0.25em 0 0;
-            border-top: $groove;
-
+        .card-description {
             span {
                 border-right: $groove;
                 padding: 0;
@@ -71,25 +72,45 @@
                     padding-right: 0;
                 }
             }
+            .card-description-content {
+                border-bottom: $groove;
+            }
         }
     }
     &.roll-card {
         margin: 0.15em;
         .card-title {
+            display: flex;
             font-size: 14px;
             border-bottom: $groove;
-            justify-content: left;
+            justify-content: flex-start;
             align-content: center;
             align-items: flex-end;
+
             > * {
                 margin-left: 0.15em;
                 margin-right: 0.15em;
             }
 
             .header-name {
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
+
                 &:hover {
                     text-shadow: -1px -1px 0 $cornflower, 1px -1px 0 $cornflower, -1px 1px 0 $cornflower, 1px 1px 0 $cornflower;
                 }
+            }
+
+            .show-display-description,
+            .hide-display-description {
+                border: none;
+                cursor: pointer;
+                height: 32px;
+                width: 32px;
+            }
+            .hide-display-description {
+                display: none;
             }
         }
         .test-line {
@@ -119,6 +140,10 @@
             padding: 0.25em;
             font-size: 14px;
             border-bottom: $groove;
+            display: none;
+        }
+        .show-card-description {
+            display: block;
         }
         .card-content {
             font-size: 14px;
@@ -180,6 +205,10 @@
                 }
             }
         }
+        .dice-rolls {
+            display: none;
+            border-bottom: $groove;
+        }
         .dice-roll-content {
             padding: 0.5em 0.5em;
             display: flex;
@@ -206,7 +235,7 @@
         .glitch-content {
             display: flex;
             flex-flow: column;
-            border-top: $groove;
+            border-bottom: $groove;
             .glitch {
                 position: relative;
                 text-decoration: none;
@@ -287,5 +316,9 @@
                 }
             }
         }
+    }
+    .chat-select-link img:hover {
+        padding: 0;
+        border: $groove;
     }
 }

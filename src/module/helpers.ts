@@ -3,6 +3,10 @@ import SkillField = Shadowrun.SkillField;
 import ModifiableValue = Shadowrun.ModifiableValue;
 import { PartsList } from './parts/PartsList';
 import LabelField = Shadowrun.LabelField;
+import {FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SR, SYSTEM_NAME} from "./constants";
+import {SR5Actor} from "./actor/SR5Actor";
+import RangesTemplateData = Shadowrun.RangesTemplateData;
+import RangeTemplateData = Shadowrun.RangeTemplateData;
 
 export class Helpers {
     /**
@@ -219,6 +223,111 @@ export class Helpers {
         return name.slice(0, length).toUpperCase();
     }
 
+    static getToken(id: string): Token|undefined {
+        for (const token of canvas.tokens.placeables) {
+            if (token.id === id) {
+                return token;
+            }
+        }
+    }
+
+    static getSceneToken(sceneTokenId: string): Token|undefined {
+        const [sceneId, tokenId] = sceneTokenId.split('.');
+
+        const isActiveScene = sceneId === canvas?.scene._id;
+        if (isActiveScene) {
+            return canvas.tokens.get(tokenId);
+        }
+
+        // Build Token using it's data from the connected scene as a fallback.
+        const scene = game.scenes.get(sceneId);
+        if (!scene) {
+            return;
+        }
+
+        //@ts-ignore
+        const tokenData = scene.data.tokens.find((t) => t.id === Number(tokenId));
+        if (!tokenData) {
+            return;
+        }
+
+        return new Token(tokenData);
+    }
+
+    static getUserTargets(user?: User): Token[] {
+        user = user ? user : game.user;
+
+        if (user) {
+            return Array.from(user.targets);
+        } else {
+            return [];
+        }
+    }
+
+    static userHasTargets(user?: User): boolean {
+        user = user ? user : game.user;
+
+        return user.targets.size > 0;
+    }
+
+    static measureTokenDistance(tokenOrigin: Token, tokenDest: Token): number {
+        if (!tokenOrigin || !tokenDest) return 0;
+
+        const origin = new PIXI.Point(...canvas.grid.getCenter(tokenOrigin.data.x, tokenOrigin.data.y));
+        const dest = new PIXI.Point(...canvas.grid.getCenter(tokenDest.data.x, tokenDest.data.y));
+
+        const distanceInGridUnits = canvas.grid.measureDistance(origin, dest, {gridSpaces: true});
+        const sceneUnit = canvas.scene.data.gridUnits;
+        // TODO: Define weapon range units somewhere (settings)
+        return Helpers.convertLengthUnit(distanceInGridUnits, sceneUnit);
+    }
+
+    static convertLengthUnit(length:number, fromUnit: string): number {
+        //@ts-ignore
+        fromUnit = fromUnit.toLowerCase();
+
+        if (!LENGTH_UNIT_TO_METERS_MULTIPLIERS.hasOwnProperty(fromUnit)) {
+            console.error(`Distance can't be converted from ${fromUnit} to ${LENGTH_UNIT}`);
+            return 0;
+        }
+
+        // Round down since X.8 will hit X and not X+1.
+        return Math.floor(length * LENGTH_UNIT_TO_METERS_MULTIPLIERS[fromUnit]);
+    }
+
+    static getWeaponRange(distance: number, ranges: RangesTemplateData): RangeTemplateData {
+        // Assume ranges to be in ASC order and to define their max range.
+        // Should no range be found, assume distance to be out of range.
+        const rangeKey = Object.keys(ranges).find(range => distance < ranges[range].distance);
+        if (rangeKey) {
+            return ranges[rangeKey];
+        } else {
+            const {extreme} = ranges;
+            return Helpers.createRangeDescription('SR5.OutOfRange', extreme.distance, SR.combat.environmental.range_modifiers.out_of_range);
+        }
+    }
+
+    static getControlledTokens(): Token[] {
+        return canvas.tokens.controlled;
+    }
+
+    static getSelectedActorsOrCharacter(): SR5Actor[] {
+        const tokens = Helpers.getControlledTokens();
+        const actors = tokens.map(token => token.actor) as SR5Actor[];
+
+        // Try to default to a users character.
+        if (actors.length === 0 && game.user?.character) {
+            actors.push(game.user.character as SR5Actor);
+        }
+
+        return actors;
+    }
+
+    static createRangeDescription(label: string, distance: number, modifier: number): RangeTemplateData {
+        label = game.i18n.localize(label);
+        return {label, distance, modifier}
+    }
+
     static convertIndexedObjectToArray(indexedObject: object): object[] {
         return Object.keys(indexedObject).map((index) => {
             if (Number.isNaN(index)) {
@@ -226,5 +335,16 @@ export class Helpers {
             }
             return indexedObject[index];
         });
+    }
+
+    static getChatSpeakerName(actor: SR5Actor): string {
+        if (!actor) return '';
+
+        const useTokenNameForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
+        const token = actor.getToken();
+
+        if (useTokenNameForChatOutput && token) return token.data.name;
+
+        return actor.name;
     }
 }

@@ -16,11 +16,13 @@ import { SYSTEM_NAME, FLAGS } from '../constants';
 import SR5ActorType = Shadowrun.SR5ActorType;
 import { PartsList } from '../parts/PartsList';
 import { ActorPrepFactory } from './prep/ActorPrepFactory';
-import DamageData = Shadowrun.DamageData;
-import DamageElement = Shadowrun.DamageElement;
 import EdgeAttributeField = Shadowrun.EdgeAttributeField;
 import VehicleActorData = Shadowrun.VehicleActorData;
 import VehicleStat = Shadowrun.VehicleStat;
+import {ShadowrunActorDialogs} from "../apps/dialogs/ShadowrunActorDialogs";
+import {createRollChatMessage} from "../chat";
+import Attributes = Shadowrun.Attributes;
+import Limits = Shadowrun.Limits;
 
 export class SR5Actor extends Actor {
     getOverwatchScore() {
@@ -123,6 +125,24 @@ export class SR5Actor extends Actor {
 
     getDeviceRating(): number {
         return this.data.data.matrix.rating;
+    }
+
+    getAttributes(): Attributes {
+        return this.data.data.attributes;
+    }
+
+    getAttribute(name: string): AttributeField {
+        const attributes = this.getAttributes();
+        return attributes[name];
+    }
+
+    getLimits(): Limits {
+        return this.data.data.limits;
+    }
+
+    getLimit(name: string): LimitField {
+        const limits = this.getLimits();
+        return limits[name];
     }
 
     isVehicle() {
@@ -264,7 +284,8 @@ export class SR5Actor extends Actor {
             label: 'SR5.Fade',
             value: incoming,
         };
-        return ShadowrunRoller.advancedRoll({
+
+        const roll = ShadowrunRoller.advancedRoll({
             event: options.event,
             parts: parts.list,
             actor: this,
@@ -272,6 +293,11 @@ export class SR5Actor extends Actor {
             wounds: false,
             incomingDrain,
         });
+
+        if (!roll) return;
+
+        // TODO: Reduce damage by fade resist
+        return roll;
     }
 
     rollDrain(options: ActorRollOptions = {}, incoming = -1) {
@@ -288,14 +314,19 @@ export class SR5Actor extends Actor {
             label: 'SR5.Drain',
             value: incoming,
         };
-        return ShadowrunRoller.advancedRoll({
+        const roll = ShadowrunRoller.advancedRoll({
             event: options.event,
             parts: parts.list,
             actor: this,
             title: title,
             wounds: false,
-            incomingDrain,
+            incomingDrain
         });
+
+        if (!roll) return;
+
+        // TODO: Reduce damage by drain resist
+        return roll;
     }
 
     rollArmor(options: ActorRollOptions = {}, partsProps: ModList<number> = []) {
@@ -310,218 +341,77 @@ export class SR5Actor extends Actor {
         });
     }
 
-    rollDefense(options: DefenseRollOptions = {}, partsProps: ModList<number> = []) {
-        const parts = new PartsList(partsProps);
-        this._addDefenseParts(parts);
-        // full defense is always added
-        const activeDefenses = {
-            full_defense: {
-                label: 'SR5.FullDefense',
-                value: this.getFullDefenseAttribute()?.value,
-                initMod: -10,
-            },
-            dodge: {
-                label: 'SR5.Dodge',
-                value: this.findActiveSkill('gymnastics')?.value,
-                initMod: -5,
-            },
-            block: {
-                label: 'SR5.Block',
-                value: this.findActiveSkill('unarmed_combat')?.value,
-                initMod: -5,
-            },
+    async rollDefense(options: DefenseRollOptions = {}, partsProps: ModList<number> = []) {
+        // TODO: Check melee weapon reach display...
+        // TODO: Check incomingAttack stuffy
+        const {incomingAttack} = options;
+
+        const defenseDialog = await ShadowrunActorDialogs.createDefenseDialog(this, options, partsProps);
+        const defenseActionData = await defenseDialog.select();
+
+        if (defenseDialog.canceled) return;
+
+
+        const roll = await ShadowrunRoller.advancedRoll({
+            event: options.event,
+            actor: this,
+            parts: defenseActionData.parts.list,
+            title: game.i18n.localize('SR5.DefenseTest'),
+            incomingAttack
+        });
+
+        if (!roll) return;
+        if (!incomingAttack) return;
+
+        // Collect defense information.
+        let defenderHits = roll.total;
+        let attackerHits = incomingAttack.hits || 0;
+        let netHits = attackerHits - defenderHits;
+
+        if (netHits === 0) return;
+
+        const damage = incomingAttack.damage;
+        damage.mod = PartsList.AddUniquePart(damage.mod, 'SR5.NetHits', netHits);
+        damage.value = Helpers.calcTotal(damage);
+
+        const soakRollOptions = {
+            event: options.event,
+            damage,
         };
 
-        const equippedMeleeWeapons = this.getEquippedWeapons().filter((w) => w.isMeleeWeapon());
-        let defenseReach = 0;
-        equippedMeleeWeapons.forEach((weapon) => {
-            activeDefenses[`parry-${weapon.name}`] = {
-                label: 'SR5.Parry',
-                weapon: weapon.name,
-                value: this.findActiveSkill(weapon.getActionSkill())?.value,
-                init: -5,
-            };
-            defenseReach = Math.max(defenseReach, weapon.getReach());
-        });
-        // if we are defending a melee attack
-        if (options.incomingAttack?.reach) {
-            const incomingReach = options.incomingAttack.reach;
-            const netReach = defenseReach - incomingReach;
-            if (netReach !== 0) {
-                parts.addUniquePart('SR5.Reach', netReach);
-            }
-        }
-        let dialogData = {
-            parts: parts.getMessageOutput(),
-            cover: options.cover,
-            activeDefenses,
-        };
-        let template = 'systems/shadowrun5e/dist/templates/rolls/roll-defense.html';
-        let cancel = true;
-        const incomingAttack = options.incomingAttack;
-        const event = options.event;
-        return new Promise((resolve) => {
-            renderTemplate(template, dialogData).then((dlg) => {
-                new Dialog({
-                    title: game.i18n.localize('SR5.Defense'),
-                    content: dlg,
-                    buttons: {
-                        continue: {
-                            label: game.i18n.localize('SR5.Continue'),
-                            callback: () => (cancel = false),
-                        },
-                    },
-                    default: 'normal',
-                    close: async (html) => {
-                        if (cancel) return;
-                        let cover = Helpers.parseInputToNumber($(html).find('[name=cover]').val());
-                        let special = Helpers.parseInputToString($(html).find('[name=activeDefense]').val());
-                        if (special) {
-                            // TODO subtract initiative score when Foundry updates to 0.7.0
-                            const defense = activeDefenses[special];
-                            parts.addUniquePart(defense.label, defense.value);
-                        }
-                        if (cover) parts.addUniquePart('SR5.Cover', cover);
-
-                        resolve(
-                            ShadowrunRoller.advancedRoll({
-                                event: event,
-                                actor: this,
-                                parts: parts.list,
-                                title: game.i18n.localize('SR5.DefenseTest'),
-                                incomingAttack,
-                            }).then(async (roll: Roll | undefined) => {
-                                if (incomingAttack && roll) {
-                                    let defenderHits = roll.total;
-                                    let attackerHits = incomingAttack.hits || 0;
-                                    let netHits = attackerHits - defenderHits;
-
-                                    if (netHits >= 0) {
-                                        const damage = incomingAttack.damage;
-                                        damage.mod = PartsList.AddUniquePart(damage.mod, 'SR5.NetHits', netHits);
-                                        damage.value = Helpers.calcTotal(damage);
-
-                                        const soakRollOptions = {
-                                            event: event,
-                                            damage: damage,
-                                        };
-                                        await this.rollSoak(soakRollOptions);
-                                    }
-                                }
-                            }),
-                        );
-                    },
-                }).render(true);
-            });
-        });
+        await this.rollSoak(soakRollOptions);
     }
 
-    rollSoak(options?: SoakRollOptions, partsProps: ModList<number> = []) {
-        const parts = new PartsList(partsProps);
-        this._addSoakParts(parts);
-        let dialogData = {
-            damage: options?.damage,
-            parts: parts.getMessageOutput(),
-            elementTypes: CONFIG.SR5.elementTypes,
-        };
-        let id = '';
-        let cancel = true;
-        let template = 'systems/shadowrun5e/dist/templates/rolls/roll-soak.html';
-        return new Promise((resolve) => {
-            renderTemplate(template, dialogData).then((dlg) => {
-                new Dialog({
-                    title: game.i18n.localize('SR5.DamageResistanceTest'),
-                    content: dlg,
-                    buttons: {
-                        continue: {
-                            label: game.i18n.localize('SR5.Continue'),
-                            callback: () => {
-                                id = 'default';
-                                cancel = false;
-                            },
-                        },
-                    },
-                    close: async (html) => {
-                        if (cancel) return;
+    // TODO: Abstract handling of const damage : ModifiedDamageData
+    async rollSoak(options: SoakRollOptions, partsProps: ModList<number> = []) {
+        const soakDialog = await ShadowrunActorDialogs.createSoakDialog(this, options, partsProps);
+        const soakActionData = await soakDialog.select();
 
-                        const soak: DamageData = options?.damage
-                            ? options.damage
-                            : {
-                                  base: 0,
-                                  value: 0,
-                                  mod: [],
-                                  ap: {
-                                      base: 0,
-                                      value: 0,
-                                      mod: [],
-                                  },
-                                  attribute: '' as const,
-                                  type: {
-                                      base: '',
-                                      value: '',
-                                  },
-                                  element: {
-                                      base: '',
-                                      value: '',
-                                  },
-                              };
+        if (soakDialog.canceled) return;
 
-                        const armor = this.getArmor();
-
-                        // handle element changes
-                        const element = Helpers.parseInputToString($(html).find('[name=element]').val());
-                        if (element) {
-                            soak.element.value = element as DamageElement;
-                        }
-                        const bonusArmor = armor[element] ?? 0;
-                        if (bonusArmor) {
-                            parts.addUniquePart(CONFIG.SR5.elementTypes[element], bonusArmor);
-                        }
-
-                        // handle ap changes
-                        const ap = Helpers.parseInputToNumber($(html).find('[name=ap]').val());
-                        if (ap) {
-                            let armorVal = armor.value + bonusArmor;
-
-                            // don't take more AP than armor
-                            parts.addUniquePart('SR5.AP', Math.max(ap, -armorVal));
-                        }
-
-                        // handle incoming damage changes
-                        const incomingDamage = Helpers.parseInputToNumber($(html).find('[name=incomingDamage]').val());
-                        if (incomingDamage) {
-                            const totalDamage = Helpers.calcTotal(soak);
-                            if (totalDamage !== incomingDamage) {
-                                const diff = incomingDamage - totalDamage;
-                                // add part and calc total again
-                                soak.mod = PartsList.AddUniquePart(soak.mod, 'SR5.UserInput', diff);
-                                soak.value = Helpers.calcTotal(soak);
-                            }
-
-                            const totalAp = Helpers.calcTotal(soak.ap);
-                            if (totalAp !== ap) {
-                                const diff = ap - totalAp;
-                                // add part and calc total
-                                soak.ap.mod = PartsList.AddUniquePart(soak.ap.mod, 'SR5.UserInput', diff);
-                                soak.ap.value = Helpers.calcTotal(soak.ap);
-                            }
-                        }
-
-                        let title = game.i18n.localize('SR5.SoakTest');
-                        resolve(
-                            ShadowrunRoller.advancedRoll({
-                                event: options?.event,
-                                actor: this,
-                                soak: soak,
-                                parts: parts.list,
-                                title: title,
-                                wounds: false,
-                            }),
-                        );
-                    },
-                }).render(true);
-            });
+        // Show the actual Soak Test.
+        const title = game.i18n.localize('SR5.SoakTest');
+        const actor = this;
+        const roll = await ShadowrunRoller.advancedRoll({
+            event: options?.event,
+            actor,
+            parts: soakActionData.parts.list,
+            title,
+            wounds: false,
+            hideRollMessage: true
         });
+
+        if (!roll) return;
+
+        // Reduce damage by damage resist
+        const incoming = soakActionData.soak;
+        const modified = {...incoming};
+        modified.mod = PartsList.AddUniquePart(modified.mod, 'SR5.SoakTest', -roll.hits);
+        modified.value = Helpers.calcTotal(modified);
+
+        const damage = {incoming, modified};
+
+        await createRollChatMessage({title, roll, actor, damage});
     }
 
     rollSingleAttribute(attId, options: ActorRollOptions) {
@@ -713,83 +603,51 @@ export class SR5Actor extends Actor {
         });
     }
 
-    rollSkill(skill: SkillField, options?: SkillRollOptions) {
-        let att = duplicate(this.data.data.attributes[skill.attribute]);
+    async rollSkill(skill: SkillField, options?: SkillRollOptions) {
         let title = game.i18n.localize(skill.label);
 
-        if (options?.attribute) att = this.data.data.attributes[options.attribute];
-        let limit = this.data.data.limits[att.limit];
+        const attributeName = options?.attribute ? options.attribute : skill.attribute;
+        const att = this.getAttribute(attributeName);
+        // @ts-ignore // att can't really be undefined here... ?
+        let limit = this.getLimit(att.limit);
+
+        // Initialize parts with always needed skill data.
         const parts = new PartsList<number>();
         parts.addUniquePart(skill.label, skill.value);
+        this._addMatrixParts(parts, [att, skill]);
+        this._addGlobalParts(parts);
 
+        // Directly test, without further skill dialog.
         if (options?.event && Helpers.hasModifiers(options?.event)) {
             parts.addUniquePart(att.label, att.value);
             if (options.event[CONFIG.SR5.kbmod.SPEC]) parts.addUniquePart('SR5.Specialization', 2);
 
-            this._addMatrixParts(parts, [att, skill]);
-            this._addGlobalParts(parts);
             return ShadowrunRoller.advancedRoll({
                 event: options.event,
                 actor: this,
                 parts: parts.list,
                 limit,
-                title: `${title} Test`,
+                title: `${title} ${game.i18n.localize('SR5.Test')}`,
             });
         }
-        let dialogData = {
-            attribute: skill.attribute,
-            attributes: Helpers.filter(this.data.data.attributes, ([, value]) => value.value > 0),
-            limit: att.limit,
-            limits: this.data.data.limits,
-        };
-        let cancel = true;
-        let spec = '';
 
-        let buttons = {
-            roll: {
-                label: 'Normal',
-                callback: () => (cancel = false),
-            },
-        };
-        // add specializations to dialog as buttons
-        if (skill.specs?.length) {
-            skill.specs.forEach(
-                (s) =>
-                    (buttons[s] = {
-                        label: s,
-                        callback: () => {
-                            cancel = false;
-                            spec = s;
-                        },
-                    }),
-            );
+        // First ask user about skill details.
+        const skillRollDialogOptions = {
+            skill,
+            attribute: attributeName
         }
-        renderTemplate('systems/shadowrun5e/dist/templates/rolls/skill-roll.html', dialogData).then((dlg) => {
-            new Dialog({
-                title: `${title} Test`,
-                content: dlg,
-                buttons,
-                close: async (html) => {
-                    if (cancel) return;
-                    const newAtt = Helpers.parseInputToString($(html).find('[name="attribute"]').val());
-                    const newLimit = Helpers.parseInputToString($(html).find('[name="attribute.limit"]').val());
-                    att = this.data.data.attributes[newAtt];
-                    title += ` + ${game.i18n.localize(CONFIG.SR5.attributes[newAtt])}`;
-                    limit = this.data.data.limits[newLimit];
-                    parts.addUniquePart(att.label, att.value);
-                    if (skill.value === 0) parts.addUniquePart('SR5.Defaulting', -1);
-                    if (spec) parts.addUniquePart('SR5.Specialization', 2);
-                    this._addMatrixParts(parts, [att, skill]);
-                    this._addGlobalParts(parts);
-                    return ShadowrunRoller.advancedRoll({
-                        event: options?.event,
-                        actor: this,
-                        parts: parts.list,
-                        limit,
-                        title: `${title} Test`,
-                    });
-                },
-            }).render(true);
+
+        const skillDialog = await ShadowrunActorDialogs.createSkillDialog(this, skillRollDialogOptions, parts);
+        const skillActionData = await skillDialog.select();
+
+        if (skillDialog.canceled) return;
+
+        return await ShadowrunRoller.advancedRoll({
+            event: options?.event,
+            actor: this,
+            parts: skillActionData.parts.list,
+            limit: skillActionData.limit,
+            title: skillActionData.title,
         });
     }
 
@@ -1030,12 +888,11 @@ export class SR5Actor extends Actor {
         if (msg.getFlag(SYSTEM_NAME, FLAGS.MessageCustomRoll)) {
             let actor = (msg.user.character as unknown) as SR5Actor;
             if (!actor) {
-                // get controlled tokens
-                const tokens = canvas.tokens.controlled;
+                const tokens = Helpers.getControlledTokens();
                 if (tokens.length > 0) {
                     for (let token of tokens) {
                         if (token.actor.owner) {
-                            actor = token.actor;
+                            actor = token.actor as SR5Actor;
                             break;
                         }
                     }
@@ -1074,12 +931,11 @@ export class SR5Actor extends Actor {
             if (!isNaN(pool) && !isNaN(hits)) {
                 let actor = (msg.user.character as unknown) as SR5Actor;
                 if (!actor) {
-                    // get controlled tokens
-                    const tokens = canvas.tokens.controlled;
+                    const tokens = Helpers.getControlledTokens();
                     if (tokens.length > 0) {
                         for (let token of tokens) {
                             if (token.actor.owner) {
-                                actor = token.actor;
+                                actor = token.actor as SR5Actor;
                                 break;
                             }
                         }
@@ -1126,5 +982,64 @@ export class SR5Actor extends Actor {
     getFlag(scope: string, key: string): any {
         const data = super.getFlag(scope, key);
         return Helpers.onGetFlag(data);
+    }
+
+    /** Return either the linked token or the token of the synthetic actor.
+     *
+     * @retrun Will return null should no token have been placed on scene.
+     */
+    getToken(): Token {
+        // Linked actors can only have one token, which isn't stored within actor data...
+        if (this._isLinkedToToken() && this.hasToken()) {
+            const linked = true;
+            const tokens = this.getActiveTokens(linked);
+            // This assumes for a token to exist and should fail if not.
+            return tokens[0];
+        }
+
+        // Unlinked actors can have multiple active token but each have theirs directly attached...
+        return this.token;
+    }
+
+    /**
+     * There is no need for a token to placed. The prototype token is enough.
+     */
+    _isLinkedToToken(): boolean {
+        //@ts-ignore
+        // If an actor is linked, all it's copies also contain this linked status, even if they're not.
+        return this.data.token.actorLink && !this.token;
+    }
+
+    hasToken(): boolean {
+        return this.getActiveTokens().length > 0;
+    }
+
+    hasActivePlayerOwner(): boolean {
+        const players = this.getActivePlayerOwners();
+        return players.length > 0;
+    }
+
+    getActivePlayer(): User|null {
+        //@ts-ignore
+        if (!this.hasPlayerOwner) {
+            return null;
+        }
+
+        for (const user of game.users.entities) {
+            if (!user.active || user.isGM) {
+                continue;
+            }
+            if (this.id === user.character.id) {
+                return user;
+            }
+        }
+
+        return null;
+    }
+
+    getActivePlayerOwners(): User[] {
+        //@ts-ignore
+        const users = this.getUsers('OWNER');
+        return users.filter(user => user.active);
     }
 }

@@ -71,4 +71,13 @@ export const registerSystemSettings = () => {
         type: Boolean,
         default: true,
     });
+
+    game.settings.register(SYSTEM_NAME, FLAGS.WhisperOpposedTestsToTargetedPlayers, {
+        name: 'SETTINGS.WhisperOpposedTestsToTargetedPlayers',
+        hint: 'SETTINGS.WhisperOpposedTestsToTargetedPlayersDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: true,
+    });
 };

@@ -1,5 +1,8 @@
 import { PartsList } from '../parts/PartsList';
 import ModList = Shadowrun.ModList;
+import {SR5Actor} from "../actor/SR5Actor";
+import {FLAGS, SYSTEM_NAME} from "../constants";
+import {Helpers} from "../helpers";
 
 export const registerRollAndLabelHelpers = () => {
     Handlebars.registerHelper('damageAbbreviation', function (damage) {
@@ -55,4 +58,6 @@ export const registerRollAndLabelHelpers = () => {
             return `${value}`;
         }
     });
+
+    Handlebars.registerHelper('speakerName', Helpers.getChatSpeakerName);
 };

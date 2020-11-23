@@ -7,33 +7,63 @@ import DamageData = Shadowrun.DamageData;
 import { Helpers } from '../helpers';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
-import { createChatData, TemplateData } from '../chat';
-import {FLAGS, GLITCH_DIE, SYSTEM_NAME} from '../constants';
+import {
+    createRollChatMessage, createTargetChatMessage,
+    TargetChatMessageOptions
+} from '../chat';
+import {CORE_FLAGS, CORE_NAME, DEFAULT_ROLL_NAME, FLAGS, SR, SYSTEM_NAME} from '../constants';
 import { PartsList } from '../parts/PartsList';
+import {ActionTestData} from "../apps/dialogs/ShadowrunItemDialog";
+import BlastData = Shadowrun.BlastData;
+import FireModeData = Shadowrun.FireModeData;
+import DrainData = Shadowrun.DrainData;
+import {ShadowrunTestDialog} from "../apps/dialogs/ShadowrunTestDialog";
+import ModifiedDamageData = Shadowrun.ModifiedDamageData;
 
+// TODO: Split up BasicRollProps into the different types of calls
+// item, actor, dicePool, attack, defense, spell, form
+export type Test =  {
+    label: string;
+    type: string;
+}
+
+interface RollProps {
+    parts?: ModList<number>,
+    limit?: any,
+    explodeSixes?: boolean
+}
+
+// TODO: Separate into 'roll data' and 'template data', which only passes through but isn't used.
 export interface BasicRollProps {
-    name?: string;
-    img?: string;
     parts?: ModList<number>;
     limit?: BaseValuePair<number> & LabelField;
     explodeSixes?: boolean;
     title?: string;
     actor?: SR5Actor;
+    target?: Token;
     item?: SR5Item;
-    attack?: AttackData;
+    // Personal attack
+    attack?: AttackData
+    // Incoming attack for a defense test
     incomingAttack?: AttackData;
-    incomingDrain?: LabelField & {
-        value: number;
-    };
-    soak?: DamageData;
-    tests?: {
-        label: string;
-        type: string;
-    }[];
+    incomingDrain?: DrainData;
+    damage?: ModifiedDamageData;
+    tests?: Test[];
     description?: object;
     previewTemplate?: boolean;
     hideRollMessage?: boolean;
     rollMode?: keyof typeof CONFIG.Dice.rollModes;
+}
+
+/** Provide a clear interface of which value are guaranteed to be defined.
+     */
+export interface BasicRollPropsDefaulted extends BasicRollProps {
+    title: string
+    parts: ModList<number>
+    explodeSixes: boolean
+    hideRollMessage: boolean
+    previewTemplate: boolean
+    rollMode: keyof typeof CONFIG.Dice.rollModes
 }
 
 export interface RollDialogOptions {
@@ -47,10 +77,27 @@ export interface AdvancedRollProps extends BasicRollProps {
     wounds?: boolean;
     after?: (roll: Roll | undefined) => void;
     dialogOptions?: RollDialogOptions;
+    attack?: AttackData;
+    blast?: BlastData;
+    reach?: number
+    fireMode?: FireModeData
 }
 
+/** Provide a clear interface of which value are guaranteed to be defined.
+     */
+export interface AdvancedRollPropsDefaulted extends AdvancedRollProps {
+    parts: ModList<number>;
+    wounds: boolean;
+}
+
+type ShadowrunRollData = {
+    limit: number
+    threshold: number
+    parts: ModList<number>
+    explodeSixes: boolean
+}
 export class ShadowrunRoll extends Roll {
-    templateData: TemplateData | undefined;
+    data: ShadowrunRollData
     // add class Roll to the json so dice-so-nice works
     toJSON(): any {
         const data = super.toJSON();
@@ -69,6 +116,22 @@ export class ShadowrunRoll extends Roll {
         //@ts-ignore
         // 0.6.x foundryVTT
         return this.parts[0].rolls.map(roll => roll.roll);
+    }
+
+    get limit(): number {
+        return this.data.limit;
+    }
+
+    get threshold(): number {
+        return this.data.threshold;
+    }
+
+    get parts(): ModList<number> {
+        return this.data.parts;
+    }
+
+    get explodeSixes(): boolean {
+        return this.data.explodeSixes;
     }
 
     count(side: number): number {
@@ -94,54 +157,81 @@ export class ShadowrunRoll extends Roll {
     }
 
     get glitched(): boolean {
-        return this.count(GLITCH_DIE) > Math.floor(this.pool / 2);
+        let glitched = 0;
+        SR.die.glitch.forEach(die => glitched += this.count(die));
+        return glitched > Math.floor(this.pool / 2);
     }
 }
 
 export class ShadowrunRoller {
-    static itemRoll(event, item: SR5Item, options?: Partial<AdvancedRollProps>): Promise<ShadowrunRoll | undefined> {
-        const parts = item.getRollPartsList();
-        let limit = item.getLimit();
-        let title = item.getRollName();
-
-        const rollData: AdvancedRollProps = {
+    static itemRoll(event, item: SR5Item, options?: Partial<AdvancedRollProps>, actionTestData?: ActionTestData): Promise<ShadowrunRoll | undefined> {
+        // Create common data for all item types.
+        const rollData = {
             ...options,
             event: event,
             dialogOptions: {
                 environmental: true,
             },
-            parts,
-            actor: item.actor,
             item,
-            limit,
-            title,
-            name: item.name,
-            img: item.img,
+            actor: item.actor,
+            parts: item.getRollPartsList(),
+            limit: item.getLimit(),
+            title: item.getRollName(),
             previewTemplate: item.hasTemplate,
-        };
-        rollData['attack'] = item.getAttackData(0);
-        rollData['blast'] = item.getBlastData();
+            attack:  item.getAttackData(0, actionTestData),
+            blast: item.getBlastData(actionTestData),
+            description: item.getChatData()
+        } as AdvancedRollProps;
 
+        // Add item type specific data.
         if (item.hasOpposedRoll) {
-            rollData['tests'] = [
-                {
-                    label: item.getOpposedTestName(),
-                    type: 'opposed',
-                },
-            ];
+            rollData.tests = item.getOpposedTests();
         }
         if (item.isMeleeWeapon()) {
-            rollData['reach'] = item.getReach();
+            rollData.reach = item.getReach();
         }
-        if (item.isRangedWeapon()) {
-            rollData['fireMode'] = item.getLastFireMode()?.label;
+        if (item.isRangedWeapon() && actionTestData?.rangedWeapon) {
             if (rollData.dialogOptions) {
-                rollData.dialogOptions.environmental = item.getLastFireRangeMod().value;
+                rollData.dialogOptions.environmental = actionTestData.rangedWeapon.environmental.range;
             }
         }
-        rollData.description = item.getChatData();
+        // Add target specific data.
+        if (actionTestData && actionTestData.targetId) {
+            rollData.target = Helpers.getToken(actionTestData.targetId);
+        }
 
         return ShadowrunRoller.advancedRoll(rollData);
+    }
+
+    static async resultingItemRolls(event, item: SR5Item, actionTestData? : ActionTestData) {
+        // Cast resulting tests from above Success Test depending on item type.
+        if (item.isComplexForm() && actionTestData?.complexForm) {
+            const level = actionTestData.complexForm.level;
+            const fade = item.getFade() + level;
+            const minFade = 2;
+            const totalFade = Math.max(fade, minFade);
+            await item.actor.rollFade({ event }, totalFade);
+        }
+        else if (item.isSpell()) {
+            // if (item.isCombatSpell() && roll) {
+            //     // TODO: isCombatSpell and roll does something but isn't handled.
+            // }
+            if (actionTestData?.spell) {
+                const force = actionTestData.spell.force;
+                const reckless = actionTestData.spell.reckless;
+                const drain = item.getDrain() + force + (reckless ? 3 : 0);
+                const minDrain = 2;
+                const totalDrain = Math.max(drain, minDrain);
+
+                await item.actor.rollDrain({ event }, totalDrain);
+            }
+        }
+        else if (item.isWeapon()) {
+            if (item.hasAmmo() && actionTestData?.rangedWeapon) {
+                const fireMode = actionTestData.rangedWeapon.fireMode.value || 1;
+                await item.useAmmo(fireMode);
+            }
+        }
     }
 
     static shadowrunFormula({
@@ -171,68 +261,63 @@ export class ShadowrunRoller {
         return formula;
     }
 
-    static async basicRoll({
-        parts: partsProps = [],
-        limit,
-        explodeSixes,
-        title,
-        actor,
-        img = actor?.img,
-        name = actor?.name,
-        hideRollMessage,
-        rollMode,
-        ...props
-    }: BasicRollProps): Promise<ShadowrunRoll | undefined> {
-        let roll;
-        const parts = new PartsList(partsProps);
-        if (parts.length) {
-            const formula = this.shadowrunFormula({ parts: parts.list, limit, explode: explodeSixes });
-            if (!formula) return;
-            roll = new ShadowrunRoll(formula);
-            roll.roll();
+    static roll(props: RollProps): ShadowrunRoll|undefined {
+        const parts = new PartsList(props.parts);
 
-            if (game.settings.get(SYSTEM_NAME, 'displayDefaultRollCard')) {
-                await roll.toMessage({
-                    speaker: ChatMessage.getSpeaker({ actor: actor }),
-                    flavor: title,
-                    rollMode: rollMode,
-                });
-            }
-        }
-        const token = actor?.token;
-
-        [name, img] = ShadowrunRoller.getPreferedNameAndImageSource(name, img, actor, token);
-
-        const templateData = {
-            actor: actor,
-            header: {
-                name: name || '',
-                img: img || '',
-            },
-            tokenId: token ? `${token.scene._id}.${token.id}` : undefined,
-            rollMode,
-            dice: roll.sides,
-            limit,
-            testName: title,
-            dicePool: roll.pool,
-            parts: parts.list,
-            hits: roll.hits,
-            glitch: roll.glitched,
-            ...props,
+        if (parts.isEmpty || parts.total < 1) {
+            ui.notifications.error(game.i18n.localize('SR5.RollOneDie'));
+            return
         };
 
-        // In what case would no roll be present? No parts? Why would this reach any logic then?
-        if (roll) {
-            roll.templateData = templateData;
+        // Prepare SR Success Test with foundry formula.
+        const formulaOptions = { parts: parts.list, limit: props.limit, explode: props.explodeSixes };
+        const formula = this.shadowrunFormula(formulaOptions);
+        if (!formula) {
+            return;
         }
 
-        if (!hideRollMessage) {
-            const chatData = await createChatData(templateData, roll);
-            ChatMessage.create(chatData, { displaySheet: false }).then((message) => {
-                console.log(message);
-            });
-        }
+        // Execute the Success Test.
+        const rollData = {parts: parts.list, limit: props.limit, explodeSixes: props.explodeSixes};
+        const roll = new ShadowrunRoll(formula, rollData);
+
+        // Return roll reference instead roll() return to avoid typing issues.
+        roll.roll();
         return roll;
+    }
+
+    static async basicRoll(basicProps: BasicRollProps): Promise<ShadowrunRoll | undefined> {
+        const props = ShadowrunRoller.basicRollPropsDefaults(basicProps);
+
+        const roll = await ShadowrunRoller.roll({parts: props.parts, limit: props.limit, explodeSixes: props.explodeSixes});
+        if (!roll) return;
+
+        if (!props.hideRollMessage) {
+            await ShadowrunRoller.rollChatMessage(roll, props);
+        }
+
+        return roll;
+    }
+
+    /** Provide a clear interface of which value are guaranteed to be defined.
+     */
+    static basicRollPropsDefaults(props: BasicRollProps): BasicRollPropsDefaulted {
+        props.title = props.title ?? DEFAULT_ROLL_NAME;
+        props.parts = props.parts ?? [];
+        props.explodeSixes = props.explodeSixes ?? false;
+        props.hideRollMessage = props.hideRollMessage ?? false;
+        props.rollMode = props.rollMode ?? CONFIG.Dice.rollModes.roll;
+        props.previewTemplate = props.previewTemplate ?? false;
+
+        return {...props} as BasicRollPropsDefaulted;
+    }
+
+    /** Provide a clear interface of which value are guaranteed to be defined.
+     */
+    static advancedRollPropsDefaults(props: AdvancedRollProps): AdvancedRollPropsDefaulted {
+        props.parts = props.parts ?? [];
+        props.wounds = props.wounds ?? true;
+
+        return {...props} as AdvancedRollPropsDefaulted;
     }
 
     /**
@@ -241,156 +326,134 @@ export class ShadowrunRoller {
     static promptRoll(): Promise<ShadowrunRoll | undefined> {
         const lastRoll = game.user.getFlag(SYSTEM_NAME, 'lastRollPromptValue') || 0;
         const parts = [{ name: 'SR5.LastRoll', value: lastRoll }];
-        return ShadowrunRoller.advancedRoll({ parts, title: 'Roll', dialogOptions: { prompt: true } });
+        const advancedRollProps = { parts, title: 'Roll', dialogOptions: { prompt: true } } as AdvancedRollProps;
+        return ShadowrunRoller.advancedRoll(advancedRollProps);
     }
 
     /**
      * Start an advanced roll
      * - Prompts the user for modifiers
-     * @param props
      */
-    static advancedRoll(props: AdvancedRollProps): Promise<ShadowrunRoll | undefined> {
-        // destructure what we need to use from props
-        // any value pulled out needs to be updated back in props if changed
-        const { title, actor, parts: partsProps = [], limit, extended, wounds = true, after, dialogOptions } = props;
-        const parts = new PartsList(partsProps);
+    static async advancedRoll(advancedProps: AdvancedRollProps): Promise<ShadowrunRoll | undefined> {
+        // Remove after roll callback as to not move it further into other function calls.
+        const {after} = advancedProps;
+
+        const props = ShadowrunRoller.advancedRollPropsDefaults(advancedProps);
 
         // remove limits if game settings is set
-        if (!game.settings.get(SYSTEM_NAME, 'applyLimits')) {
+        if (!game.settings.get(SYSTEM_NAME, FLAGS.ApplyLimits)) {
             delete props.limit;
         }
 
-        // TODO create "fast roll" option
-
-        const rollMode = game.settings.get('core', 'rollMode');
-
-        let dialogData = {
-            options: dialogOptions,
-            extended,
-            dice_pool: parts.total,
-            parts: parts.getMessageOutput(),
-            limit: limit?.value,
-            wounds,
-            woundValue: actor?.getWoundModifier(),
-            rollMode,
-            rollModes: CONFIG.Dice.rollModes,
+        // Ask user for additional, general success test role modifiers.
+        const testDialogOptions = {
+            title: props.title,
+            dialogOptions: props.dialogOptions,
+            extended: props.extended,
+            limit: props.limit,
+            wounds: props.wounds,
         };
-        let template = 'systems/shadowrun5e/dist/templates/rolls/roll-dialog.html';
-        let edge = false;
-        let cancel = true;
+        const testDialog = await ShadowrunTestDialog.create(props.actor, testDialogOptions, props.parts);
+        const testData = await testDialog.select();
 
-        const buttons = {
-            roll: {
-                label: game.i18n.localize('SR5.Roll'),
-                icon: '<i class="fas fa-dice-six"></i>',
-                callback: () => (cancel = false),
-            },
-        };
-        if (actor) {
-            buttons['edge'] = {
-                label: `${game.i18n.localize('SR5.PushTheLimit')} (+${actor.getEdge().value})`,
-                icon: '<i class="fas fa-bomb"></i>',
-                callback: () => {
-                    edge = true;
-                    cancel = false;
-                },
-            };
+        if (testDialog.canceled) return;
+
+
+        // Prepare Test Roll.
+        const basicRollProps = {...props};
+        basicRollProps.wounds = testData.wounds;
+        basicRollProps.dialogOptions = testData.dialogOptions;
+        basicRollProps.rollMode = testData.rollMode;
+
+        if (testDialog.selectedButton === 'edge' && props.actor) {
+            basicRollProps.explodeSixes = true;
+            testData.parts.addUniquePart('SR5.PushTheLimit', props.actor.getEdge().value);
+            delete basicRollProps.limit;
+            // TODO: Edge usage doesn't seem to apply on actor sheet.
+            await props.actor.update({
+                'data.attributes.edge.uses': props.actor.data.data.attributes.edge.uses - 1,
+            });
         }
 
-        return new Promise((resolve) => {
-            renderTemplate(template, dialogData).then((dlg) => {
-                new Dialog({
-                    title: title,
-                    content: dlg,
-                    buttons,
-                    default: 'roll',
+        basicRollProps.parts = testData.parts.list;
 
-                    close: async (html) => {
-                        if (cancel) return;
-                        // get the actual dice_pool from the difference of initial parts and value in the dialog
+        // Execute Test roll...
+        const roll = await this.basicRoll(basicRollProps);
+        if (!roll) return;
 
-                        const dicePoolValue = Helpers.parseInputToNumber($(html).find('[name="dice_pool"]').val());
+        if (!props.hideRollMessage && props.target && props.tests) {
+            await ShadowrunRoller.targetChatMessage(props);
+        } else if (!props.hideRollMessage && Helpers.userHasTargets() && props.tests) {
+            await ShadowrunRoller.targetsChatMessages(props);
+        }
 
-                        if (dialogOptions?.prompt) {
-                            parts.clear();
-                            await game.user.setFlag(SYSTEM_NAME, 'lastRollPromptValue', dicePoolValue);
-                            parts.addUniquePart('SR5.Base', dicePoolValue);
-                        }
+        if (testData.extended) {
+            const currentExtended = testData.parts.getPartValue('SR5.Extended') ?? 0;
+            testData.parts.addUniquePart('SR5.Extended', currentExtended - 1);
 
-                        const limitValue = Helpers.parseInputToNumber($(html).find('[name="limit"]').val());
+            // Prepare the next, extended test roll.
+            props.parts = testData.parts.list;
+            props.extended = true;
+            const delayInMs = 400;
+            setTimeout(() => this.advancedRoll(props), delayInMs);
+        }
 
-                        if (limit && limit.value !== limitValue) {
-                            limit.value = limitValue;
-                            limit.base = limitValue;
-                            limit.label = 'SR5.Override';
-                        }
+        if (after) await after(roll);
 
-                        const woundValue = Helpers.parseInputToNumber($(html).find('[name="wounds"]').val());
-                        const situationMod = Helpers.parseInputToNumber($(html).find('[name="dp_mod"]').val());
-                        const environmentMod = Helpers.parseInputToNumber($(html).find('[name="options.environmental"]').val());
-
-                        if (wounds && woundValue !== 0) {
-                            parts.addUniquePart('SR5.Wounds', woundValue);
-                            props.wounds = true;
-                        }
-                        if (situationMod) {
-                            parts.addUniquePart('SR5.SituationalModifier', situationMod);
-                        }
-                        if (environmentMod) {
-                            parts.addUniquePart('SR5.EnvironmentModifier', environmentMod);
-                            if (!props.dialogOptions) props.dialogOptions = {};
-                            props.dialogOptions.environmental = true;
-                        }
-
-                        const extendedString = Helpers.parseInputToString($(html).find('[name="extended"]').val());
-                        const extended = extendedString === 'true';
-
-                        if (edge && actor) {
-                            props.explodeSixes = true;
-                            parts.addUniquePart('SR5.PushTheLimit', actor.getEdge().value);
-                            delete props.limit;
-                            // TODO: Edge usage doesn't seem to apply on actor sheet.
-                            await actor.update({
-                                'data.attributes.edge.uses': actor.data.data.attributes.edge.uses - 1,
-                            });
-                        }
-
-                        props.rollMode = Helpers.parseInputToString($(html).find('[name=rollMode]').val());
-
-                        props.parts = parts.list;
-                        const r = this.basicRoll({
-                            ...props,
-                        });
-
-                        if (extended && r) {
-                            const currentExtended = parts.getPartValue('SR5.Extended') ?? 0;
-                            parts.addUniquePart('SR5.Extended', currentExtended - 1);
-                            props.parts = parts.list;
-                            // add a bit of a delay to roll again
-                            setTimeout(() => this.advancedRoll(props), 400);
-                        }
-                        resolve(r);
-                        if (after && r) r.then((roll) => after(roll));
-                    },
-                }).render(true);
-            });
-        });
+        return roll;
     }
 
-    /** Use either the actor or the tokens name and image, depending on system settings.
+    static async rollChatMessage(roll: ShadowrunRoll, props: BasicRollPropsDefaulted) {
+        const {actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, incomingDrain, damage, tests} = props;
+        const rollChatMessageOptions = {roll, actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, incomingDrain, damage, tests};
+        await createRollChatMessage(rollChatMessageOptions);
+    }
+
+    /** Send a message to the specific targeted player given.
      *
-     * However don't change anything if a custom name or image has been given.
+     * Use targetsChatMessages for a simple way to send to all active player targets.
+     *
+     * Should a target have multiple user owners, each will get a message.
+     *
+     * @param props
      */
-    static getPreferedNameAndImageSource(name?: string, img?: string, actor?: SR5Actor, token?: Token): [string|undefined, string|undefined] {
+    static async targetChatMessage(props: AdvancedRollPropsDefaulted) {
+        if (!game.settings.get(SYSTEM_NAME, FLAGS.WhisperOpposedTestsToTargetedPlayers)) return;
+        const rollMode = props.rollMode ?? game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
+        if (rollMode === 'roll') return;
 
-        const namedAndImageMatchActor = name === actor?.name && img === actor?.img;
-        const useTokenNameForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
+        // @ts-ignore // Token.actor is of type Actor instead of SR5Actor
+        const users = props.target.actor.getActivePlayerOwners();
 
-        if (namedAndImageMatchActor && useTokenNameForChatOutput && token) {
-            img = token?.data.img;
-            name = token?.data.name;
+        for (const user of users) {
+            if (user.isGM) continue;
+            if (user === game.user) continue;
+
+            const targetChatMessage = {actor: props.actor, target: props.target, item: props.item,
+                incomingAttack: props.incomingAttack, tests: props.tests, whisperTo: user
+            } as TargetChatMessageOptions;
+            await createTargetChatMessage(targetChatMessage);
         }
+    }
 
-        return [name, img];
+    /** Send messages to ALL targets, no matter if specifically targeted in a action dialog.
+     *
+     * This can cause for multiple target whispers to happen, even if the active player only selected one
+     * during, for example, the ranged weapon dialog (which gives a selection and returns one)
+     *
+     *
+     * @param props
+     */
+    static async targetsChatMessages(props: AdvancedRollPropsDefaulted) {
+        if (!game.settings.get(SYSTEM_NAME, FLAGS.WhisperOpposedTestsToTargetedPlayers)) return;
+
+        const targets = Helpers.getUserTargets();
+        targets.forEach(target => {
+            // @ts-ignore // Token.actor is of type Actor instead of SR5Actor
+            if (!target.actor.hasActivePlayerOwner()) return;
+
+            const advancedProps = {...props, target};
+            ShadowrunRoller.targetChatMessage(advancedProps);
+        })
     }
 }

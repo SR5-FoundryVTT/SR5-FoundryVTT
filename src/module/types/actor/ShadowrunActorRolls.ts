@@ -22,6 +22,15 @@ declare namespace Shadowrun {
         blast?: BlastData;
     };
 
+    type ModifiedDamageData = {
+        incoming: DamageData
+        modified?: DamageData
+    }
+
+    type DrainData = LabelField & {
+        value: number;
+    }
+
     type SoakRollOptions = ActorRollOptions & {
         damage?: DamageData;
         attackerHits?: number;
@@ -30,6 +39,11 @@ declare namespace Shadowrun {
     };
 
     type SkillRollOptions = ActorRollOptions & {
-        attribute?: ActorAttribute;
+        attribute?: ActorAttribute
     };
+
+    type SkillDialogOptions = {
+        skill: SkillField
+        attribute?: ActorAttribute
+    }
 }
