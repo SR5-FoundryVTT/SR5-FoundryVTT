@@ -48,6 +48,8 @@ export class FormDialog extends Dialog {
     }
 
     async submit(button) {
+        this.selectedButton = button.label;
+
         //@ts-ignore
         super.submit(button);
         await this.afterSubmit(this.options.jQuery ? this.element : this.element [0]);
@@ -55,6 +57,7 @@ export class FormDialog extends Dialog {
 
     async afterSubmit(html: JQuery) {
         // Await in case of a possible async handler.
+        console.error('dialog', this.selectedButton, this);
         this.selection = await this._onAfterClose(html, this.selectedButton);
         this._selectionResolve(this.selection);
     }
@@ -73,12 +76,6 @@ export class FormDialog extends Dialog {
             return this._emptySelection();
         }
         return await this._selectionPromise;
-    }
-
-    _onClickButton(event) {
-        //@ts-ignore
-        super._onClickButton(event);
-        this.selectedButton = event.currentTarget.dataset.button;
     }
 
     _emptySelection(): object {
