@@ -7,14 +7,6 @@ export class DiceError extends Error {
     }
 }
 
-/**
- * A six-sided Shadowrun die.
- */
-export class SR5Die extends Die {
-    constructor() {
-        super(6);
-    }
-}
 
 export class SR5Roll extends Roll {
     /**
@@ -88,11 +80,6 @@ export class SR5Roll extends Roll {
         return new SR5Roll(this.m_Count, this.m_Limit, this.m_Explode).roll();
     }
 
-    // Override type...
-    get dice(): SR5Die[] {
-        return super.dice;
-    }
-
     /**
      * The number of hits rolled.
      */
@@ -108,7 +95,8 @@ export class SR5Roll extends Roll {
     get glitches(): number {
         // Could also return undefined, null, 0, etc...
         if (!this._rolled) return NaN;
-        return this.dice[0].rolls.filter((die) => die.roll === 1).length;
+        //@ts-ignore
+        return this.dice[0].rolls.filter((die: Die) => die.roll === 1).length;
     }
 
     /**
