@@ -1014,9 +1014,9 @@ export class SR5Actor extends Actor {
         return this.getActiveTokens().length > 0;
     }
 
-    hasActivePlayer(): boolean {
-        const player = this.getActivePlayer();
-        return player !== null;
+    hasActivePlayerOwner(): boolean {
+        const players = this.getActivePlayerOwners();
+        return players.length > 0;
     }
 
     getActivePlayer(): User|null {
@@ -1035,5 +1035,11 @@ export class SR5Actor extends Actor {
         }
 
         return null;
+    }
+
+    getActivePlayerOwners(): User[] {
+        //@ts-ignore
+        const users = this.getUsers('OWNER');
+        return users.filter(user => user.active);
     }
 }

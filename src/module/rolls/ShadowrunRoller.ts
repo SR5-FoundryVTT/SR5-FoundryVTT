@@ -384,6 +384,8 @@ export class ShadowrunRoller {
         // @ts-ignore // Token.actor is of type Actor instead of SR5Actor
         if (!props.hideRollMessage && props.target && props.target.actor.hasActivePlayer()) {
             await ShadowrunRoller.targetChatMessage(props);
+        } else if (!props.hideRollMessage && Helpers.userHasTargets() && props.tests) {
+            await ShadowrunRoller.targetsChatMessages(props);
         }
 
         if (testData.extended) {
@@ -408,15 +410,48 @@ export class ShadowrunRoller {
         await createRollChatMessage(rollChatMessageOptions);
     }
 
+    /** Send a message to the specific targeted player given.
+     *
+     * Use targetsChatMessages for a simple way to send to all active player targets.
+     *
+     * Should a target have multiple user owners, each will get a message.
+     *
+     * @param props
+     */
     static async targetChatMessage(props: AdvancedRollPropsDefaulted) {
         if (!game.settings.get(SYSTEM_NAME, FLAGS.WhisperOpposedTestsToTargetedPlayers)) return;
 
         // @ts-ignore // Token.actor is of type Actor instead of SR5Actor
-        const user = props.target.actor.getActivePlayer();
+        const users = props.target.actor.getActivePlayerOwners();
 
-        const targetChatMessage = {actor: props.actor, target: props.target, item: props.item,
-            incomingAttack: props.incomingAttack, tests: props.tests, whisperTo: user
-        } as TargetChatMessageOptions;
-        await createTargetChatMessage(targetChatMessage);
+        for (const user of users) {
+            if (user.isGM) continue;
+
+            const targetChatMessage = {actor: props.actor, target: props.target, item: props.item,
+                incomingAttack: props.incomingAttack, tests: props.tests, whisperTo: user
+            } as TargetChatMessageOptions;
+            await createTargetChatMessage(targetChatMessage);
+        }
+    }
+
+    /** Send messages to ALL targets, no matter if specifically targeted in a action dialog.
+     *
+     * This can cause for multiple target whispers to happen, even if the active player only selected one
+     * during, for example, the ranged weapon dialog (which gives a selection and returns one)
+     *
+     *
+     * @param props
+     */
+    static async targetsChatMessages(props: AdvancedRollPropsDefaulted) {
+        if (!game.settings.get(SYSTEM_NAME, FLAGS.WhisperOpposedTestsToTargetedPlayers)) return;
+
+        const targets = Helpers.getUserTargets();
+        targets.forEach(target => {
+            // @ts-ignore // Token.actor is of type Actor instead of SR5Actor
+            if (!target.actor.hasActivePlayerOwner()) return;
+
+            const advancedProps = {...props, target};
+            ShadowrunRoller.targetChatMessage(advancedProps);
+        })
     }
 }
