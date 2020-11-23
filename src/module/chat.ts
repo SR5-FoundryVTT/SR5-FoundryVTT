@@ -100,6 +100,10 @@ const createChatData = async (templateData, options?: ChatDataOptions) => {
     const actor = templateData.actor;
     const token = actor?.getToken();
 
+    console.error('chatData');
+    console.error(actor.id, actor);
+    console.error(token.id, token);
+
     //@ts-ignore
     const enhancedTemplateData = {
         ...templateData,

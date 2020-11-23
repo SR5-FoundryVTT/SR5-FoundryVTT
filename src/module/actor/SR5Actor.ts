@@ -999,7 +999,7 @@ export class SR5Actor extends Actor {
             return tokens[0];
         }
 
-        // Unlinked actors can have multiple active token and is stored within actor data...
+        // Unlinked actors can have multiple active token but each have theirs directly attached...
         return this.token;
     }
 
@@ -1008,7 +1008,8 @@ export class SR5Actor extends Actor {
      */
     _isLinkedToToken(): boolean {
         //@ts-ignore
-        return this.data.token.actorLink;
+        // If an actor is linked, all it's copies also contain this linked status, even if they're not.
+        return this.data.token.actorLink && !this.token;
     }
 
     hasToken(): boolean {
