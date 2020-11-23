@@ -302,7 +302,7 @@ export class ShadowrunItemDialog {
 
         const targets = Helpers.getUserTargets();
 
-        return targets.map(target => {
+        const targetsTemplateData = targets.map(target => {
             //@ts-ignore // undefined actor is okay
             const distance = Helpers.measureTokenDistance(attacker, target);
             const range = Helpers.getWeaponRange(distance, ranges);
@@ -313,6 +313,13 @@ export class ShadowrunItemDialog {
                 unit: LENGTH_UNIT,
                 distance
             };
+        });
+
+        //@ts-ignore
+        return targetsTemplateData.sort((a, b) => {
+            if (a.distance < b.distance) return -1;
+            if (a.distance > b.distance) return 1;
+            return 0;
         });
     }
 

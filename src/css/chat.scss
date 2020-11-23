@@ -42,7 +42,6 @@
         }
 
         .card-buttons {
-            border-top: $groove;
             .button {
                 box-shadow: 0 0 0.25em 0.15em $dark;
                 &:hover {
@@ -205,6 +204,7 @@
         }
         .dice-rolls {
             display: none;
+            border-bottom: $groove;
         }
         .dice-roll-content {
             padding: 0.5em 0.5em;
@@ -232,7 +232,7 @@
         .glitch-content {
             display: flex;
             flex-flow: column;
-            border-top: $groove;
+            border-bottom: $groove;
             .glitch {
                 position: relative;
                 text-decoration: none;
