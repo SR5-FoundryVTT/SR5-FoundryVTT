@@ -11,7 +11,7 @@ import {
     createRollChatMessage, createTargetChatMessage,
     TargetChatMessageOptions
 } from '../chat';
-import {DEFAULT_ROLL_NAME, FLAGS, SR, SYSTEM_NAME} from '../constants';
+import {CORE_FLAGS, CORE_NAME, DEFAULT_ROLL_NAME, FLAGS, SR, SYSTEM_NAME} from '../constants';
 import { PartsList } from '../parts/PartsList';
 import {ActionTestData} from "../apps/dialogs/ShadowrunItemDialog";
 import BlastData = Shadowrun.BlastData;
@@ -420,6 +420,8 @@ export class ShadowrunRoller {
      */
     static async targetChatMessage(props: AdvancedRollPropsDefaulted) {
         if (!game.settings.get(SYSTEM_NAME, FLAGS.WhisperOpposedTestsToTargetedPlayers)) return;
+        const rollMode = props.rollMode ?? game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
+        if (rollMode === 'roll') return;
 
         // @ts-ignore // Token.actor is of type Actor instead of SR5Actor
         const users = props.target.actor.getActivePlayerOwners();
