@@ -284,7 +284,8 @@ export class SR5Actor extends Actor {
             label: 'SR5.Fade',
             value: incoming,
         };
-        return ShadowrunRoller.advancedRoll({
+
+        const roll = ShadowrunRoller.advancedRoll({
             event: options.event,
             parts: parts.list,
             actor: this,
@@ -292,6 +293,11 @@ export class SR5Actor extends Actor {
             wounds: false,
             incomingDrain,
         });
+
+        if (!roll) return;
+
+        // TODO: Reduce damage by fade resist
+        return roll;
     }
 
     rollDrain(options: ActorRollOptions = {}, incoming = -1) {
@@ -308,14 +314,19 @@ export class SR5Actor extends Actor {
             label: 'SR5.Drain',
             value: incoming,
         };
-        return ShadowrunRoller.advancedRoll({
+        const roll = ShadowrunRoller.advancedRoll({
             event: options.event,
             parts: parts.list,
             actor: this,
             title: title,
             wounds: false,
-            incomingDrain,
+            incomingDrain
         });
+
+        if (!roll) return;
+
+        // TODO: Reduce damage by drain resist
+        return roll;
     }
 
     rollArmor(options: ActorRollOptions = {}, partsProps: ModList<number> = []) {
@@ -392,7 +403,7 @@ export class SR5Actor extends Actor {
 
         if (!roll) return;
 
-        // Reduce damage by soak
+        // Reduce damage by damage resist
         const incoming = soakActionData.soak;
         const modified = {...incoming};
         modified.mod = PartsList.AddUniquePart(modified.mod, 'SR5.SoakTest', -roll.hits);
