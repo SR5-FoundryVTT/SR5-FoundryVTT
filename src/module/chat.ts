@@ -7,6 +7,7 @@ import {ShadowrunRoll, Test} from "./rolls/ShadowrunRoller";
 import DrainData = Shadowrun.DrainData;
 import {Helpers} from "./helpers";
 import ModifiedDamageData = Shadowrun.ModifiedDamageData;
+import DamageData = Shadowrun.DamageData;
 
 export interface TargetChatMessageOptions {
     actor: Actor
@@ -273,6 +274,8 @@ export const addRollListeners = (app: ChatMessage, html) => {
        $(event.currentTarget).siblings('.card-description').toggle();
     });
 
+    /** Open the sheets of different entity types based on the chat card.
+     */
     html.on('click', '.chat-entity-link', event => {
         event.preventDefault();
         const entityLink = $(event.currentTarget);
@@ -302,6 +305,8 @@ export const addRollListeners = (app: ChatMessage, html) => {
        }
     });
 
+    /** Select a Token on the current scene based on the link id.
+     */
     html.on('click', '.chat-select-link', event => {
         event.preventDefault();
 
@@ -314,5 +319,33 @@ export const addRollListeners = (app: ChatMessage, html) => {
         } else {
             ui.notifications.warn(game.i18n.localize('SR5.NoSelectableToken'))
         }
+    });
+
+    /** Apply damage to the actor speaking the chat card.
+     */
+    html.on('click', '.apply-damage', event => {
+        event.stopPropagation();
+        const applyDamage = $(event.currentTarget);
+        const card = html.find('.chat-card');
+
+        const value = Number(applyDamage.data('damageValue'));
+        const type = String(applyDamage.data('damageType'));
+        const element = String(applyDamage.data('damageElement'));
+
+        // TODO: Create a damage Factory.
+        const damage = {
+            value, type: {value: type}, element: {value: element}
+        } as DamageData;
+
+        const actors = Helpers.getSelectedActorsOrCharacter();
+
+        // TODO: Query user about his intended actor to apply damage to
+        // if (actors.length === 0) {
+        //     const actorId = card.data('actorId');
+        //     const actor = game.actors.get(actorId) as SR5Actor;
+        //     actors.push(actor);
+        // }
+
+        actors.forEach(actor => actor.applyDamage(damage));
     });
 };
