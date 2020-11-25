@@ -4,7 +4,8 @@
     data-item-id="{{item._id}}"
     data-token-id="{{tokenId}}"
 >
-     <div class="card-title card-header">
+    {{#if speaker.actor}}
+    <div class="card-title card-header">
          <a class="chat-select-link" data-token-id="{{speaker.token.id}}"><img src="{{speaker.actor.img}}" class="entity-selectable" title="{{speakerName speaker.actor}}" width="36" height="36"/></a>
          {{#if speaker.token}}
          <h3 class="header-name"><a class="chat-entity-link" data-entity="Token" data-id="{{speaker.token.id}}">{{speakerName speaker.actor}}</a></h3>
@@ -12,7 +13,7 @@
          <h3 class="header-name"><a class="chat-entity-link" data-entity="Actor" data-id="{{speaker.actor.id}}">{{speakerName speaker.actor}}</a></h3>
          {{/if}}
     </div>
-    {{#if item}}
+    {{/if}} {{#if item}}
     <div class="card-title card-header">
         <img src="{{item.data.img}}" title="{{item.data.name}}" width="36" height="36" />
         <h3 class="header-name"><a class="chat-entity-link" data-entity="Item" data-id="{{item.id}}">{{item.data.name}}</a></h3>
