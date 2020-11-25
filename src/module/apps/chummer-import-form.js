@@ -1,3 +1,5 @@
+import {_mergeWithMissingSkillFields} from "../actor/prep/functions/SkillsPrep";
+
 export class ChummerImportForm extends FormApplication {
     static get defaultOptions() {
         const options = super.defaultOptions;
@@ -250,11 +252,14 @@ export class ChummerImportForm extends FormApplication {
                             if (skill) {
                                 if (group !== 'active') skill.name = s.name;
                                 skill.base = parseInt(s.rating);
+
                                 if (s.skillspecializations) {
                                     skill.specs = getArray(
                                         s.skillspecializations.skillspecialization.name
                                     );
                                 }
+
+                                skill = _mergeWithMissingSkillFields(skill);
                             }
                         }
                     } catch (e) {
