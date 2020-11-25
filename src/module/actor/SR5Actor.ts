@@ -1082,7 +1082,7 @@ export class SR5Actor extends Actor {
         if (track.value === track.max) return;
 
         //  Avoid cross referencing.
-        track = Helpers.cloneDeep(track);
+        track = duplicate(track);
 
         track.value += damage.value;
         if (track.value > track.max) {
@@ -1100,7 +1100,7 @@ export class SR5Actor extends Actor {
         if (track.overflow.value === track.overflow.max) return;
 
         //  Avoid cross referencing.
-        const overflow = Helpers.cloneDeep(track.overflow);
+        const overflow = duplicate(track.overflow);
 
         // Don't over apply damage to the track overflow.
         overflow.value += damage.value;
@@ -1160,8 +1160,8 @@ export class SR5Actor extends Actor {
         const restDamage = damage.value - overflowDamage;
 
         //  Avoid cross referencing.
-        const overflow = Helpers.cloneDeep(damage);
-        const rest = Helpers.cloneDeep(damage);
+        const overflow = duplicate(damage);
+        const rest = duplicate(damage);
 
         overflow.value = overflowDamage;
         rest.value = restDamage;

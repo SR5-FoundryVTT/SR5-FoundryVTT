@@ -347,10 +347,4 @@ export class Helpers {
 
         return actor.name;
     }
-
-    /** clone an object recursively using FoundryVTT mergeObject without inplace updating.
-     */
-    static cloneDeep(obj) {
-        return mergeObject(obj, {}, {inplace: false});
-    }
 }
