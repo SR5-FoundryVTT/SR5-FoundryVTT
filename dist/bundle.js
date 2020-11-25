@@ -16172,7 +16172,7 @@ exports.NPCPrep = NPCPrep;
 },{"../../../constants":117,"../../../dataTemplates":118,"../../../helpers":126,"../../../parts/PartsList":173}],102:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SkillsPrep = void 0;
+exports._mergeWithMissingSkillFields = exports.SkillsPrep = void 0;
 const helpers_1 = require("../../../helpers");
 const PartsList_1 = require("../../../parts/PartsList");
 class SkillsPrep {
@@ -16198,6 +16198,8 @@ class SkillsPrep {
                 }
             }
             skill.value = helpers_1.Helpers.calcTotal(skill);
+            // Older Chummer imports miss some fields.
+            exports._mergeWithMissingSkillFields(skill);
         };
         // setup active skills
         for (const skill of Object.values(active)) {
@@ -16233,6 +16235,29 @@ class SkillsPrep {
     }
 }
 exports.SkillsPrep = SkillsPrep;
+/** Just a quick, semi hacky way of setting up a complete skill data structure, while still allowing
+ *  fields to be added at need.
+ *
+ * @param givenSkill
+ * @return merge default skill fields with fields of the given field, only adding new fields in the process.
+ */
+exports._mergeWithMissingSkillFields = (givenSkill) => {
+    // Only the absolute most necessary fields, not datatype complete to SkillField
+    const template = {
+        name: "",
+        base: "",
+        value: 0,
+        attribute: "",
+        mod: [],
+        specs: [],
+        hidden: false
+    };
+    // Use mergeObject to reserve original object instance in case replacing it
+    // causes problems down the line with active skills taken from a preexisting
+    // data structure.
+    // overwrite false to prohibit existing values to be overwritten with empty values.
+    mergeObject(givenSkill, template, { overwrite: false });
+};
 
 },{"../../../helpers":126,"../../../parts/PartsList":173}],103:[function(require,module,exports){
 "use strict";
@@ -16278,6 +16303,8 @@ var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits
 var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
 
 var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _SkillsPrep = require("../actor/prep/functions/SkillsPrep");
 
 function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
 
@@ -16575,6 +16602,8 @@ var ChummerImportForm = /*#__PURE__*/function (_FormApplication) {
                             if (s.skillspecializations) {
                               skill.specs = getArray(s.skillspecializations.skillspecialization.name);
                             }
+
+                            skill = (0, _SkillsPrep._mergeWithMissingSkillFields)(skill);
                           }
                         }
                       } catch (e) {
@@ -17051,7 +17080,7 @@ var ChummerImportForm = /*#__PURE__*/function (_FormApplication) {
 
 exports.ChummerImportForm = ChummerImportForm;
 
-},{"@babel/runtime/helpers/asyncToGenerator":2,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10,"@babel/runtime/regenerator":14}],105:[function(require,module,exports){
+},{"../actor/prep/functions/SkillsPrep":102,"@babel/runtime/helpers/asyncToGenerator":2,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10,"@babel/runtime/regenerator":14}],105:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
