@@ -1,6 +1,7 @@
 import SR5ActorData = Shadowrun.SR5ActorData;
 import { Helpers } from '../../../helpers';
 import { PartsList } from '../../../parts/PartsList';
+import SkillField = Shadowrun.SkillField;
 
 export class SkillsPrep {
     /**
@@ -23,6 +24,9 @@ export class SkillsPrep {
                 }
             }
             skill.value = Helpers.calcTotal(skill);
+
+            // Older Chummer imports miss some fields.
+            _mergeWithMissingSkillFields(skill);
         };
 
         // setup active skills
@@ -62,4 +66,29 @@ export class SkillsPrep {
             skillValue.label = CONFIG.SR5.activeSkills[skillKey];
         }
     }
+}
+
+/** Just a quick, semi hacky way of setting up a complete skill data structure, while still allowing
+ *  fields to be added at need.
+ *
+ * @param givenSkill
+ * @return merge default skill fields with fields of the given field, only adding new fields in the process.
+ */
+export const _mergeWithMissingSkillFields = (givenSkill) => {
+    // Only the absolute most necessary fields, not datatype complete to SkillField
+    const template = {
+        name: "",
+        base: "",
+        value: 0,
+        attribute: "",
+        mod: [],
+        specs: [],
+        hidden: false
+    };
+
+    // Use mergeObject to reserve original object instance in case replacing it
+    // causes problems down the line with active skills taken from a preexisting
+    // data structure.
+    // overwrite false to prohibit existing values to be overwritten with empty values.
+    mergeObject(givenSkill, template, {overwrite: false});
 }
