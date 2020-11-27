@@ -13543,7 +13543,7 @@ class SR5Actor extends Actor {
             // Collect defense information.
             let defenderHits = roll.total;
             let attackerHits = incomingAttack.hits || 0;
-            let netHits = attackerHits - defenderHits;
+            let netHits = Math.max(attackerHits - defenderHits, 0);
             if (netHits === 0)
                 return;
             const damage = incomingAttack.damage;
@@ -13580,8 +13580,9 @@ class SR5Actor extends Actor {
             const incoming = soakActionData.soak;
             const modified = Object.assign({}, incoming);
             modified.mod = PartsList_1.PartsList.AddUniquePart(modified.mod, 'SR5.SoakTest', -roll.hits);
-            modified.value = helpers_1.Helpers.calcTotal(modified);
+            modified.value = helpers_1.Helpers.calcTotal(modified, { min: 0 });
             const damage = { incoming, modified };
+            console.error(damage);
             yield chat_1.createRollChatMessage({ title, roll, actor, damage });
         });
     }
@@ -20093,8 +20094,9 @@ class Helpers {
      * Calculate the total value for a data object
      * - stores the total value and returns it
      * @param data
+     * @param options
      */
-    static calcTotal(data) {
+    static calcTotal(data, options) {
         if (data.mod === undefined)
             data.mod = [];
         const parts = new PartsList_1.PartsList(data.mod);
@@ -20106,6 +20108,13 @@ class Helpers {
         const mult = Math.pow(10, decimalCount);
         data.value = Math.round((parts.total + data.base) * mult) / mult;
         data.mod = parts.list;
+        // Apply possible range restrictions, including zero...
+        if (typeof (options === null || options === void 0 ? void 0 : options.min) === 'number') {
+            data.value = Math.max(options.min, data.value);
+        }
+        if (typeof (options === null || options === void 0 ? void 0 : options.max) === 'number') {
+            data.value = Math.min(options.max, data.value);
+        }
         return data.value;
     }
     static listItemId(event) {

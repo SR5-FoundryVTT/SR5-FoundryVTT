@@ -1,5 +1,4 @@
 <div class="damage-line">
-    {{#if damage.value}}
     <div>
         <span class="key">{{name}}: </span>
         <span class="value apply-damage"
@@ -7,7 +6,7 @@
               data-damage-type="{{damage.type.value}}"
               data-damage-element="{{damage.element.value}}">{{damage.value}}{{damageAbbreviation damage.type.value}}</span>
     </div>
-    {{/if}} {{#if damage.element.value}}
+    {{#if damage.element.value}}
     <div>
         <i class="{{elementIcon damage.element.value}} icon"
            title="{{localize damage.element.value}}"></i>

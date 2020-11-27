@@ -369,7 +369,7 @@ export class SR5Actor extends Actor {
         // Collect defense information.
         let defenderHits = roll.total;
         let attackerHits = incomingAttack.hits || 0;
-        let netHits = attackerHits - defenderHits;
+        let netHits = Math.max(attackerHits - defenderHits, 0);
 
         if (netHits === 0) return;
 
@@ -410,9 +410,11 @@ export class SR5Actor extends Actor {
         const incoming = soakActionData.soak;
         const modified = {...incoming};
         modified.mod = PartsList.AddUniquePart(modified.mod, 'SR5.SoakTest', -roll.hits);
-        modified.value = Helpers.calcTotal(modified);
+        modified.value = Helpers.calcTotal(modified, {min: 0});
 
         const damage = {incoming, modified};
+
+        console.error(damage)
 
         await createRollChatMessage({title, roll, actor, damage});
     }

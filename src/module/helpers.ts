@@ -8,13 +8,18 @@ import {SR5Actor} from "./actor/SR5Actor";
 import RangesTemplateData = Shadowrun.RangesTemplateData;
 import RangeTemplateData = Shadowrun.RangeTemplateData;
 
+interface CalcTotalOptions {
+    min?: number,
+    max?: number
+}
 export class Helpers {
     /**
      * Calculate the total value for a data object
      * - stores the total value and returns it
      * @param data
+     * @param options
      */
-    static calcTotal(data: ModifiableValue): number {
+    static calcTotal(data: ModifiableValue, options?): number {
         if (data.mod === undefined) data.mod = [];
         const parts = new PartsList(data.mod);
         // if a temp field is found, add it as a unique part
@@ -26,6 +31,15 @@ export class Helpers {
 
         data.value = Math.round((parts.total + data.base) * mult) / mult;
         data.mod = parts.list;
+
+        // Apply possible range restrictions, including zero...
+        if (typeof options?.min === 'number') {
+            data.value = Math.max(options.min, data.value);
+        }
+        if (typeof options?.max === 'number') {
+            data.value = Math.min(options.max, data.value);
+        }
+
         return data.value;
     }
 
