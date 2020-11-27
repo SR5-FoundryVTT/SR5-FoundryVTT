@@ -8,6 +8,7 @@ import DrainData = Shadowrun.DrainData;
 import {Helpers} from "./helpers";
 import ModifiedDamageData = Shadowrun.ModifiedDamageData;
 import DamageData = Shadowrun.DamageData;
+import {DamageApplicationDialog} from "./apps/dialogs/DamageApplicationDialog";
 
 export interface TargetChatMessageOptions {
     actor: Actor
@@ -323,7 +324,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
 
     /** Apply damage to the actor speaking the chat card.
      */
-    html.on('click', '.apply-damage', event => {
+    html.on('click', '.apply-damage', async event => {
         event.stopPropagation();
         const applyDamage = $(event.currentTarget);
         const card = html.find('.chat-card');
@@ -333,11 +334,18 @@ export const addRollListeners = (app: ChatMessage, html) => {
         const element = String(applyDamage.data('damageElement'));
 
         // TODO: Create a damage Factory.
-        const damage = {
+        let damage = {
             value, type: {value: type}, element: {value: element}
         } as DamageData;
 
         const actors = Helpers.getSelectedActorsOrCharacter();
+
+        const damageApplicationDialog = await new DamageApplicationDialog(actors, damage);
+        await damageApplicationDialog.select();
+
+        if (damageApplicationDialog.canceled) return;
+
+        console.error('asd');
 
         // TODO: Query user about his intended actor to apply damage to
         // if (actors.length === 0) {

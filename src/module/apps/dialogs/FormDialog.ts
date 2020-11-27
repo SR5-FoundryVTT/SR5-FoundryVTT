@@ -1,10 +1,10 @@
 export interface FormDialogData {
     title?: string;
-	buttons?: Record<string, DialogButton>;
+	buttons: Record<string, DialogButton>;
 	default?: string;
 	templateData: object;
 	templatePath: string;
-	onAfterClose: Function;
+	onAfterClose?: Function;
 }
 
 /** TODO: Documentation with usage example
@@ -28,7 +28,7 @@ export class FormDialog extends Dialog {
         this._templateData = templateData;
         this._templatePath = templatePath;
 
-        this._onAfterClose = dialogData.onAfterClose;
+        this._onAfterClose = dialogData.onAfterClose ? dialogData.onAfterClose : () => {};
 
         this.selection = this._emptySelection();
 
