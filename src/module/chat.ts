@@ -340,20 +340,15 @@ export const addRollListeners = (app: ChatMessage, html) => {
 
         const actors = Helpers.getSelectedActorsOrCharacter();
 
+        if (actors.length === 0) return;
+
+        // Show user the token selection and resulting damage values
         const damageApplicationDialog = await new DamageApplicationDialog(actors, damage);
         await damageApplicationDialog.select();
 
         if (damageApplicationDialog.canceled) return;
 
-        console.error('asd');
-
-        // TODO: Query user about his intended actor to apply damage to
-        // if (actors.length === 0) {
-        //     const actorId = card.data('actorId');
-        //     const actor = game.actors.get(actorId) as SR5Actor;
-        //     actors.push(actor);
-        // }
-
+        // Apply the actual damage values. applyDamage will, again, calculate armor damage modification.
         actors.forEach(actor => actor.applyDamage(damage));
     });
 };

@@ -3,6 +3,8 @@ import ModList = Shadowrun.ModList;
 import {SR5Actor} from "../actor/SR5Actor";
 import {FLAGS, SYSTEM_NAME} from "../constants";
 import {Helpers} from "../helpers";
+import {SafeString} from "handlebars";
+import DamageData = Shadowrun.DamageData;
 
 export const registerRollAndLabelHelpers = () => {
     Handlebars.registerHelper('damageAbbreviation', function (damage) {
@@ -11,6 +13,16 @@ export const registerRollAndLabelHelpers = () => {
         if (damage === 'matrix') return 'M';
         return '';
     });
+
+    Handlebars.registerHelper('damageCode', function(damage: DamageData): SafeString {
+        const typeCode = Handlebars.helpers.damageAbbreviation(damage.type.value);
+        let code = `${damage.value}${typeCode}`;
+        if (damage.element.value) {
+           code = `${code} (${damage.element.value})`;
+        }
+        return new Handlebars.SafeString(code);
+    });
+
     Handlebars.registerHelper('diceIcon', function (side) {
         if (side) {
             switch (side) {

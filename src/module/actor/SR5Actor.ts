@@ -148,8 +148,27 @@ export class SR5Actor extends Actor {
         return limits[name];
     }
 
+    /** Return actor type, which can be different kind of actors from 'character' to 'vehicle'.
+     *  Please check SR5ActorType for reference.
+     */
+    getType(): string {
+        return this.data.type;
+    }
+
+    isCharacter(): boolean {
+        return this.getType() === 'character';
+    }
+
+    isSpirit(): boolean {
+        return this.getType() === 'spirit';
+    }
+
+    isSprite(): boolean {
+        return this.getType() === 'sprite';
+    }
+
     isVehicle() {
-        return this.data.type === 'vehicle';
+        return this.getType() === 'vehicle';
     }
 
     isGrunt() {
@@ -1055,6 +1074,8 @@ export class SR5Actor extends Actor {
     async applyDamage(damage: DamageData) {
         if (damage.value <= 0) return;
 
+        damage = this.applyDamageTypeChangeForArmor(damage);
+
         // TODO: Handle different actor types.
 
         // Apply damage and resulting overflow to the according track.
@@ -1184,4 +1205,26 @@ export class SR5Actor extends Actor {
     //
     // }
 
+    /**
+     *
+     * @param damage
+     */
+    applyDamageTypeChangeForArmor(damage: DamageData): DamageData {
+        // TODO: Damage modification should only really apply to characters, but double check ;)
+        if (!this.isCharacter()) return damage;
+
+        if (damage.type.value === 'physical') {
+            const armor = this.getArmor();
+
+            const armorWillChangeDamageType = armor.value > damage.value;
+            if (armorWillChangeDamageType) {
+                // Avoid cross referencing.
+                damage = duplicate(damage);
+
+                damage.type.value = 'stun';
+            }
+        }
+
+        return damage;
+    }
 }
