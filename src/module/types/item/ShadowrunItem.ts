@@ -28,6 +28,7 @@ declare namespace Shadowrun {
         Partial<ContactData> &
         Partial<CritterPowerData> &
         Partial<CyberwareData> &
+        Partial<BiowareData> &
         Partial<DeviceData> &
         Partial<EquipmentData> &
         Partial<LifestyleData> &

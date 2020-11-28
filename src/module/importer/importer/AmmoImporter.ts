@@ -6,7 +6,7 @@ import Ammo = Shadowrun.Ammo;
 export class AmmoImporter extends DataImporter {
     public categoryTranslations: any;
     public gearsTranslations: any;
-    public file: string = 'gear.xml';
+    public files = ['gear.xml'];
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('gears') && jsonObject['gears'].hasOwnProperty('gear');
@@ -64,7 +64,7 @@ export class AmmoImporter extends DataImporter {
             return;
         }
 
-        let jsonGeari18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.file);
+        let jsonGeari18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
         this.categoryTranslations = ImportHelper.ExtractCategoriesTranslation(jsonGeari18n);
         this.gearsTranslations = ImportHelper.ExtractItemTranslation(jsonGeari18n, 'gears', 'gear');
     }

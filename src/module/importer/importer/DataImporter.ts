@@ -3,7 +3,7 @@ import { ImportHelper } from '../helper/ImportHelper';
 const xml2js = require('xml2js');
 
 export abstract class DataImporter {
-    public abstract file: string;
+    public abstract files: string[];
     public static jsoni18n: any;
     /**
      * Get default data for constructing a TItem.
@@ -30,7 +30,7 @@ export abstract class DataImporter {
     /**
      * Implementing classes can use ExtractTranslation to only extract needed translations.
      */
-    public abstract ExtractTranslation();
+    public abstract ExtractTranslation(fileName?: string);
 
     /**
      * Validate if this importer is capable of parsing the provided JSON data.
