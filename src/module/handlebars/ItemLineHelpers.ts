@@ -60,6 +60,9 @@ export const registerItemLineHelpers = () => {
             case 'cyberware':
                 addIcon.title = game.i18n.localize('SR5.CreateItemCyberware');
                 return [addIcon];
+            case 'bioware':
+                addIcon.title = game.i18n.localize('SR5.CreateItemBioware');
+                return [addIcon];
             case 'critter_power':
                 addIcon.title = game.i18n.localize('SR5.CreateItemCritterPower');
                 return [addIcon];
@@ -111,6 +114,7 @@ export const registerItemLineHelpers = () => {
             case 'device':
             case 'equipment':
             case 'cyberware':
+            case 'bioware':
                 return [
                     {
                         text: {
@@ -247,6 +251,7 @@ export const registerItemLineHelpers = () => {
             case 'device':
             case 'equipment':
             case 'cyberware':
+            case 'bioware':
                 return [qtyInput];
             case 'weapon':
                 if (wrapper.isRangedWeapon()) {
@@ -396,6 +401,7 @@ export const registerItemLineHelpers = () => {
             case 'device':
             case 'equipment':
             case 'cyberware':
+            case 'bioware':
             case 'weapon':
                 icons.unshift(equipIcon);
         }

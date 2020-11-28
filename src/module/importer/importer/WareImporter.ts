@@ -16,11 +16,13 @@ export class WareImporter extends DataImporter {
     }
 
     GetDefaultCyberwareData(): Cyberware {
-        return {...this.GetDefaultData(), type: 'cyberware'} as unknown as Cyberware;
+        //@ts-ignore // Bio/Cyberware conflicts on 'type'...
+        return {...this.GetDefaultData(), type: 'cyberware'};
     }
 
     GetDefaultBiowareData(): Cyberware {
-        return {...this.GetDefaultData(), type: 'bioware'} as unknown as Bioware;
+        //@ts-ignore // Bio/Cyberware conflicts on 'type'...
+        return {...this.GetDefaultData(), type: 'bioware'};
     }
 
     GetDefaultData(): Ware {

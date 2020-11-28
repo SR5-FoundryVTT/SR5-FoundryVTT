@@ -9,6 +9,7 @@ declare namespace Shadowrun {
         | Contact
         | CritterPower
         | Cyberware
+        | Bioware
         | Device
         | Equipment
         | Lifestyle

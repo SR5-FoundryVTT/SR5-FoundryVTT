@@ -232,7 +232,7 @@ export class SR5ActorSheet extends ActorSheet {
     _prepareItems(data) {
         const inventory = {};
         inventory['weapon'] = {
-            label: game.i18n.localize('SR5.Weapon'),
+            label: game.i18n.localize('SR5.ItemTypes.Weapon'),
             items: [],
             dataset: {
                 type: 'weapon',
@@ -240,31 +240,38 @@ export class SR5ActorSheet extends ActorSheet {
         };
         if (this.actor.data.type === 'character') {
             inventory['armor'] = {
-                label: game.i18n.localize('SR5.Armor'),
+                label: game.i18n.localize('SR5.ItemTypes.Armor'),
                 items: [],
                 dataset: {
                     type: 'armor',
                 },
             };
             inventory['device'] = {
-                label: game.i18n.localize('SR5.Device'),
+                label: game.i18n.localize('SR5.ItemTypes.Device'),
                 items: [],
                 dataset: {
                     type: 'device',
                 },
             };
             inventory['equipment'] = {
-                label: game.i18n.localize('SR5.Equipment'),
+                label: game.i18n.localize('SR5.ItemTypes.Equipment'),
                 items: [],
                 dataset: {
                     type: 'equipment',
                 },
             };
             inventory['cyberware'] = {
-                label: game.i18n.localize('SR5.Cyberware'),
+                label: game.i18n.localize('SR5.ItemTypes.Cyberware'),
                 items: [],
                 dataset: {
                     type: 'cyberware',
+                },
+            };
+            inventory['bioware'] = {
+                label: game.i18n.localize('SR5.ItemTypes.Bioware'),
+                items: [],
+                dataset: {
+                    type: 'bioware',
                 },
             };
         }
