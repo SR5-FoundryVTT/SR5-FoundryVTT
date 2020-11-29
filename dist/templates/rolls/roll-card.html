@@ -124,16 +124,6 @@
                 <span class="key">{{localize "SR5.AttackerHits"}}</span>
                 <span class="value">{{incomingAttack.hits}}</span>
             </div>
-            {{/if}} {{#if incomingDrain}}
-            <div class="category-line">
-                {{localize "SR5.Incoming"}}
-            </div>
-            <div class="limit-line">
-                <span class="key">
-                    {{localize incomingDrain.label}}:
-                </span>
-                <span class="value">{{incomingDrain.value}}</span>
-            </div>
             {{/if}}
             {{#if opposed}}
             <div class="category-line">
