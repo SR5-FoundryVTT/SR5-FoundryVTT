@@ -1,18 +1,16 @@
-<form class="sr5">
-    <div class="form-group">
-        <label style="font-weight: bold;">{{localize "SR5.IncomingDamage"}}</label>
-        <span>{{damageCode damage}}</span>
+{{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.html'
+        name=(localize "SR5.IncomingDamage")
+        damage=damage
+        showAP=true
+}}
+
+<div class="modified-target-damage sunken">
+    {{#each actorDamage as |actorDamage|}}
+    <div class="modified-target-damage-cell">
+        <img src="{{actor.img}}" title="{{speakerName actorDamage.actor}}" width="36" height="36"/>
     </div>
-    <div>
-        <div class="modified-target-damage sunken">
-            {{#each actorDamage as |actorDamage|}}
-            <div class="modified-target-damage-cell">
-                <img src="{{actor.img}}" title="{{speakerName actorDamage.actor}}" width="36" height="36"/>
-            </div>
-            <div class="modified-target-damage-cell important">{{speakerName actorDamage.actor}}</div>
-            <div class="modified-target-damage-cell">Armor ({{actorDamage.armor.value}})</div>
-            <div class="modified-target-damage-cell important">{{damageCode actorDamage.damage}}</div>
-            {{/each}}
-        </div>
-    </div>
-</form>
+    <div class="modified-target-damage-cell important">{{speakerName actorDamage.actor}}</div>
+    <div class="modified-target-damage-cell">{{localize 'SR5.ModifiedArmor'}} ({{armor.value}})</div>
+    <div class="modified-target-damage-cell important">{{damageCode actorDamage.modified}}</div>
+    {{/each}}
+</div>

@@ -41,6 +41,8 @@ export class FormDialog extends Dialog {
             // Reject is stored, but never used in favor of FormDialog.canceled
             this._selectionReject = reject;
         });
+
+        this._amendButtonsWithName();
     }
 
     async close() {
@@ -52,7 +54,7 @@ export class FormDialog extends Dialog {
     }
 
     async submit(button) {
-        this.selectedButton = button.label;
+        this.selectedButton = button.name ?? button.label;
 
         //@ts-ignore
         super.submit(button);
@@ -100,5 +102,12 @@ export class FormDialog extends Dialog {
     /** @override */
     static getButtons(): Record<string, DialogButton> {
         return {};
+    }
+
+    /** Allow for the selected button to be addressed by it's key, not it's localized label.
+     */
+    _amendButtonsWithName() {
+        //@ts-ignore
+        Object.keys(this.data.buttons).forEach(name => this.data.buttons[name].name = name);
     }
 }

@@ -11,7 +11,8 @@ export class DamageApplicationDialog extends FormDialog {
     static get defaultOptions() {
         const options = super.defaultOptions;
         options.id = 'damage-application';
-        options.classes = ['sr5'];
+        // TODO: Class Dialog here is needed for dialog button styling.
+        options.classes = ['sr5', 'form-dialog'];
         options.resizable = true;
         options.height = 'auto';
         return options;
@@ -26,9 +27,8 @@ export class DamageApplicationDialog extends FormDialog {
         const actorDamage = actors.map(actor => {
             return {
                 actor,
-                incoming: damage,
-                damage: actor.applyDamageTypeChangeForArmor(damage),
-                armor: actor.getArmor()
+                modified: actor.applyDamageTypeChangeForArmor(damage),
+                armor: actor.getModifiedArmor(damage)
             }
         });
 
@@ -37,12 +37,16 @@ export class DamageApplicationDialog extends FormDialog {
             actorDamage,
         };
 
-        const onAfterClose = () => actorDamage;
         const buttons = {
             damage: {
-                label: game.i18n.localize('SR5.DamageApplication.Damage')
+                label: game.i18n.localize('SR5.DamageApplication.ApplyDamage')
+            },
+            unmodifiedDamage: {
+                label: game.i18n.localize('SR5.DamageApplication.ApplyUnmodifiedDamage')
             }
         }
+
+        const onAfterClose = () => actorDamage;
 
         return {
             title,
