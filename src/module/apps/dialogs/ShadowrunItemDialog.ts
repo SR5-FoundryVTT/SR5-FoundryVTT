@@ -130,6 +130,7 @@ export class ShadowrunItemDialog {
 
             mergeObject(actionTestData, ShadowrunItemDialog._getSelectedComplexFormLevel(html))
 
+            // TODO: Remnants of old style data flow. Look into RangedWeapon for newer style.
             await item.setLastComplexFormLevel({value: actionTestData.level});
 
             return {complexForm: actionTestData};

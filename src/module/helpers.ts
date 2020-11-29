@@ -7,6 +7,14 @@ import {FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SR, SYSTEM_NAME} 
 import {SR5Actor} from "./actor/SR5Actor";
 import RangesTemplateData = Shadowrun.RangesTemplateData;
 import RangeTemplateData = Shadowrun.RangeTemplateData;
+import DamageData = Shadowrun.DamageData;
+import {SR5Roll} from "./roll/SR5Roll";
+import ModifiedDamageData = Shadowrun.ModifiedDamageData;
+import {DataTemplates} from "./dataTemplates";
+import DamageType = Shadowrun.DamageType;
+import DamageElement = Shadowrun.DamageElement;
+import ActorAttribute = Shadowrun.ActorAttribute;
+import {ShadowrunRoll} from "./rolls/ShadowrunRoller";
 
 interface CalcTotalOptions {
     min?: number,
@@ -360,5 +368,25 @@ export class Helpers {
         if (useTokenNameForChatOutput && token) return token.data.name;
 
         return actor.name;
+    }
+
+    static createDamageData(value: number, type: DamageType, element: DamageElement = ''): DamageData {
+        const damage = duplicate(DataTemplates.damage);
+        damage.base = value;
+        damage.value = value;
+        damage.type.base = type;
+        damage.type.value = type;
+        damage.element.base = element;
+        damage.element.value = element;
+
+        return damage;
+    }
+
+    static modifyDamageBySoakRoll(incoming: DamageData, roll: ShadowrunRoll, modificationLabel: string): ModifiedDamageData {
+        const modified = duplicate(incoming);
+        modified.mod = PartsList.AddUniquePart(modified.mod, modificationLabel, -roll.hits);
+        modified.value = Helpers.calcTotal(modified, {min: 0});
+
+        return {incoming, modified};
     }
 }

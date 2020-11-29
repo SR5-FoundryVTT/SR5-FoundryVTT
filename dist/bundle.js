@@ -13472,57 +13472,59 @@ class SR5Actor extends Actor {
         this.update(updateData);
     }
     rollFade(options = {}, incoming = -1) {
-        const wil = duplicate(this.data.data.attributes.willpower);
-        const res = duplicate(this.data.data.attributes.resonance);
-        const data = this.data.data;
-        const parts = new PartsList_1.PartsList();
-        parts.addUniquePart(wil.label, wil.value);
-        parts.addUniquePart(res.label, res.value);
-        if (data.modifiers.fade)
-            parts.addUniquePart('SR5.Bonus', data.modifiers.fade);
-        let title = `${game.i18n.localize('SR5.Resist')} ${game.i18n.localize('SR5.Fade')}`;
-        const incomingDrain = {
-            label: 'SR5.Fade',
-            value: incoming,
-        };
-        const roll = ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
-            event: options.event,
-            parts: parts.list,
-            actor: this,
-            title: title,
-            wounds: false,
-            incomingDrain,
+        return __awaiter(this, void 0, void 0, function* () {
+            const wil = duplicate(this.data.data.attributes.willpower);
+            const res = duplicate(this.data.data.attributes.resonance);
+            const data = this.data.data;
+            const parts = new PartsList_1.PartsList();
+            parts.addUniquePart(wil.label, wil.value);
+            parts.addUniquePart(res.label, res.value);
+            if (data.modifiers.fade)
+                parts.addUniquePart('SR5.Bonus', data.modifiers.fade);
+            let title = `${game.i18n.localize('SR5.Resist')} ${game.i18n.localize('SR5.Fade')}`;
+            const actor = this;
+            const roll = yield ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
+                parts: parts.list,
+                actor,
+                title: title,
+                wounds: false,
+                hideRollMessage: true
+            });
+            if (!roll)
+                return;
+            // Reduce damage by soak roll and inform user.
+            const incomingDamage = helpers_1.Helpers.createDamageData(incoming, 'stun');
+            const damage = helpers_1.Helpers.modifyDamageBySoakRoll(incomingDamage, roll, 'SR5.Fade');
+            yield chat_1.createRollChatMessage({ title, roll, actor, damage });
+            return roll;
         });
-        if (!roll)
-            return;
-        // TODO: Reduce damage by fade resist
-        return roll;
     }
     rollDrain(options = {}, incoming = -1) {
-        const wil = duplicate(this.data.data.attributes.willpower);
-        const drainAtt = duplicate(this.data.data.attributes[this.data.data.magic.attribute]);
-        const parts = new PartsList_1.PartsList();
-        parts.addPart(wil.label, wil.value);
-        parts.addPart(drainAtt.label, drainAtt.value);
-        if (this.data.data.modifiers.drain)
-            parts.addUniquePart('SR5.Bonus', this.data.data.modifiers.drain);
-        let title = `${game.i18n.localize('SR5.Resist')} ${game.i18n.localize('SR5.Drain')}`;
-        const incomingDrain = {
-            label: 'SR5.Drain',
-            value: incoming,
-        };
-        const roll = ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
-            event: options.event,
-            parts: parts.list,
-            actor: this,
-            title: title,
-            wounds: false,
-            incomingDrain
+        return __awaiter(this, void 0, void 0, function* () {
+            const wil = duplicate(this.data.data.attributes.willpower);
+            const drainAtt = duplicate(this.data.data.attributes[this.data.data.magic.attribute]);
+            const parts = new PartsList_1.PartsList();
+            parts.addPart(wil.label, wil.value);
+            parts.addPart(drainAtt.label, drainAtt.value);
+            if (this.data.data.modifiers.drain)
+                parts.addUniquePart('SR5.Bonus', this.data.data.modifiers.drain);
+            let title = `${game.i18n.localize('SR5.Resist')} ${game.i18n.localize('SR5.Drain')}`;
+            const actor = this;
+            const roll = yield ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
+                parts: parts.list,
+                title,
+                actor,
+                wounds: false,
+                hideRollMessage: true
+            });
+            if (!roll)
+                return;
+            // Reduce damage by soak roll and inform user.
+            const incomingDamage = helpers_1.Helpers.createDamageData(incoming, 'stun');
+            const damage = helpers_1.Helpers.modifyDamageBySoakRoll(incomingDamage, roll, 'SR5.Drain');
+            yield chat_1.createRollChatMessage({ title, roll, actor, damage });
+            return roll;
         });
-        if (!roll)
-            return;
-        // TODO: Reduce damage by drain resist
-        return roll;
     }
     rollArmor(options = {}, partsProps = []) {
         const parts = new PartsList_1.PartsList(partsProps);
@@ -13593,12 +13595,14 @@ class SR5Actor extends Actor {
                 return;
             // Reduce damage by damage resist
             const incoming = soakActionData.soak;
-            const modified = Object.assign({}, incoming);
-            modified.mod = PartsList_1.PartsList.AddUniquePart(modified.mod, 'SR5.SoakTest', -roll.hits);
-            modified.value = helpers_1.Helpers.calcTotal(modified, { min: 0 });
-            const damage = { incoming, modified };
-            console.error(damage);
+            // Avoid cross referencing.
+            // const modified = duplicate(incoming);
+            // modified.mod = PartsList.AddUniquePart(modified.mod, 'SR5.SoakTest', -roll.hits);
+            // modified.value = Helpers.calcTotal(modified, {min: 0});
+            // const damage = {incoming, modified};
+            const damage = helpers_1.Helpers.modifyDamageBySoakRoll(incoming, roll, 'SR5.SoakTest');
             yield chat_1.createRollChatMessage({ title, roll, actor, damage });
+            return roll;
         });
     }
     rollSingleAttribute(attId, options) {
@@ -14220,7 +14224,10 @@ class SR5Actor extends Actor {
             if (damage.type.value === 'physical') {
                 yield this._addPhysicalDamage(damage);
             }
-            console.error(this);
+            // NOTE: Currently each damage type updates once. Should this cause issues for long latency, collect
+            //       and sum each damage type and update here globally.
+            // NOTE: For stuff like healing the last wound by magic, this might also be interesting to store and give
+            //       an overview of each damage/wound applied to select from.
             // await this.update({'data.track': this.data.data.track});
             // TODO: Handle changes in actor status (death and such)
         });
@@ -17748,6 +17755,7 @@ class ShadowrunItemDialog {
                 return;
             const actionTestData = {};
             mergeObject(actionTestData, ShadowrunItemDialog._getSelectedComplexFormLevel(html));
+            // TODO: Remnants of old style data flow. Look into RangedWeapon for newer style.
             yield item.setLastComplexFormLevel({ value: actionTestData.level });
             return { complexForm: actionTestData };
         });
@@ -19496,6 +19504,25 @@ exports.DataTemplates = {
                 }
             }
         }
+    },
+    damage: {
+        type: {
+            value: "",
+            base: ""
+        },
+        element: {
+            value: "",
+            base: ""
+        },
+        value: 0,
+        base: 0,
+        ap: {
+            value: 0,
+            base: 0,
+            mod: []
+        },
+        attribute: "",
+        mod: []
     }
 };
 
@@ -20340,6 +20367,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Helpers = void 0;
 const PartsList_1 = require("./parts/PartsList");
 const constants_1 = require("./constants");
+const dataTemplates_1 = require("./dataTemplates");
 class Helpers {
     /**
      * Calculate the total value for a data object
@@ -20677,10 +20705,26 @@ class Helpers {
             return token.data.name;
         return actor.name;
     }
+    static createDamageData(value, type, element = '') {
+        const damage = duplicate(dataTemplates_1.DataTemplates.damage);
+        damage.base = value;
+        damage.value = value;
+        damage.type.base = type;
+        damage.type.value = type;
+        damage.element.base = element;
+        damage.element.value = element;
+        return damage;
+    }
+    static modifyDamageBySoakRoll(incoming, roll, modificationLabel) {
+        const modified = duplicate(incoming);
+        modified.mod = PartsList_1.PartsList.AddUniquePart(modified.mod, modificationLabel, -roll.hits);
+        modified.value = Helpers.calcTotal(modified, { min: 0 });
+        return { incoming, modified };
+    }
 }
 exports.Helpers = Helpers;
 
-},{"./constants":118,"./parts/PartsList":174}],128:[function(require,module,exports){
+},{"./constants":118,"./dataTemplates":119,"./parts/PartsList":174}],128:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26662,6 +26706,9 @@ class ShadowrunRoller {
             if (!game.settings.get(constants_1.SYSTEM_NAME, constants_1.FLAGS.ApplyLimits)) {
                 delete props.limit;
             }
+            else {
+                ShadowrunRoller._errorOnInvalidLimit(props.limit);
+            }
             // Ask user for additional, general success test role modifiers.
             const testDialogOptions = {
                 title: props.title,
@@ -26715,8 +26762,8 @@ class ShadowrunRoller {
     }
     static rollChatMessage(roll, props) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, incomingDrain, damage, tests } = props;
-            const rollChatMessageOptions = { roll, actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, incomingDrain, damage, tests };
+            const { actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, damage, tests } = props;
+            const rollChatMessageOptions = { roll, actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, damage, tests };
             yield chat_1.createRollChatMessage(rollChatMessageOptions);
         });
     }
@@ -26771,6 +26818,11 @@ class ShadowrunRoller {
                 ShadowrunRoller.targetChatMessage(advancedProps);
             });
         });
+    }
+    static _errorOnInvalidLimit(limit) {
+        if (limit && limit.value <= 0) {
+            ui.notifications.warn(game.i18n.localize('SR5.Warnings.NegativeLimitValue'));
+        }
     }
 }
 exports.ShadowrunRoller = ShadowrunRoller;

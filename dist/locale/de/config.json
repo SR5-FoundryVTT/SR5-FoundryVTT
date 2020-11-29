@@ -738,5 +738,9 @@
     "SR5.DamageApplication": {
         "Title": "Schaden anwenden",
         "Damage": "Schaden anwenden"
+    },
+
+    "SR5.Warnings": {
+        "NegativeLimitValue": "Limit Werte müssen über Null liegen"
     }
 }
