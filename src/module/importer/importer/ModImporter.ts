@@ -7,7 +7,7 @@ import { ModParserBase } from '../parser/mod/ModParserBase';
 export class ModImporter extends DataImporter {
     public categoryTranslations: any;
     public accessoryTranslations: any;
-    public file: string = 'weapons.xml';
+    public files = ['weapons.xml'];
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('accessories') && jsonObject['accessories'].hasOwnProperty('accessory');
@@ -61,7 +61,7 @@ export class ModImporter extends DataImporter {
             return;
         }
 
-        let jsonWeaponsi18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.file);
+        let jsonWeaponsi18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
         // Parts of weapon accessory translations are within the application translation. Currently only data translation is used.
         this.accessoryTranslations = ImportHelper.ExtractItemTranslation(jsonWeaponsi18n, 'accessories', 'accessory');
     }

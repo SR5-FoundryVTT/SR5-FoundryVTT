@@ -1,28 +1,38 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
+import { CyberwareParser } from '../parser/ware/CyberwareParser';
+import Ware = Shadowrun.Ware;
 import Cyberware = Shadowrun.Cyberware;
-import { CyberwareParser } from '../parser/cyberware/CyberwareParser';
+import Bioware = Shadowrun.Bioware;
 
-export class CyberwareImporter extends DataImporter {
+export class WareImporter extends DataImporter {
     public categoryTranslations: any;
     public itemTranslations: any;
-    public file: string = 'cyberware.xml';
+    public files = ['cyberware.xml', 'bioware.xml'];
 
     CanParse(jsonObject: object): boolean {
-        return (
-            (jsonObject.hasOwnProperty('cyberwares') && jsonObject['cyberwares'].hasOwnProperty('cyberware')) ||
-            (jsonObject.hasOwnProperty('biowares') && jsonObject['biowares'].hasOwnProperty('bioware'))
-        );
+        return jsonObject.hasOwnProperty('cyberwares') && jsonObject['cyberwares'].hasOwnProperty('cyberware') ||
+               jsonObject.hasOwnProperty('biowares') && jsonObject['biowares'].hasOwnProperty('bioware');
     }
 
-    GetDefaultData(): Cyberware {
+    GetDefaultCyberwareData(): Cyberware {
+        //@ts-ignore // Bio/Cyberware conflicts on 'type'...
+        return {...this.GetDefaultData(), type: 'cyberware'};
+    }
+
+    GetDefaultBiowareData(): Cyberware {
+        //@ts-ignore // Bio/Cyberware conflicts on 'type'...
+        return {...this.GetDefaultData(), type: 'bioware'};
+    }
+
+    GetDefaultData(): Ware {
         return {
             name: 'Unnamed Form',
+            type: 'cyberware',
             _id: '',
             folder: null,
             img: 'icons/svg/mystery-man.svg',
             flags: {},
-            type: 'cyberware',
             data: {
                 description: {
                     value: '',
@@ -110,29 +120,42 @@ export class CyberwareImporter extends DataImporter {
             },
         };
     }
-    ExtractTranslation() {
+    ExtractTranslation(fileName) {
         if (!DataImporter.jsoni18n) {
             return;
         }
 
-        let jsonItemi18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.file);
+        let jsonItemi18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, fileName);
+         // TODO: Move ExtractTranslation phase before the parsing phase and initiate it with the filename to parse.
+            if (this.files.length !== 2) console.error('Lazily hacked code will fail for more or less than two files.');
+
         this.categoryTranslations = ImportHelper.ExtractCategoriesTranslation(jsonItemi18n);
-        this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonItemi18n, 'cyberwares', 'cyberware');
+
+        const {typeKey, listKey} = fileName === 'cyberware.xml' ?
+                {typeKey: 'cyberwares', listKey: 'cyberware'} :
+                {typeKey: 'biowares', listKey: 'bioware'};
+
+        this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonItemi18n, typeKey, listKey);
     }
 
     async Parse(jsonObject: object): Promise<Entity> {
-        const parser = new CyberwareParser();
+        const cyberParser = new CyberwareParser();
+
         let key = jsonObject.hasOwnProperty('cyberwares') ? 'Cyberware' : 'Bioware';
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, key);
-        key = key.toLowerCase();
 
-        let datas: Cyberware[] = [];
+        key = key.toLowerCase();
+        let datas: Ware[] = [];
         let jsonDatas = jsonObject[key + 's'][key];
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
 
-            let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
+            const defaultData = key === 'cyberware' ? this.GetDefaultCyberwareData() : this.GetDefaultBiowareData();
+            let data = cyberParser.Parse(jsonData, defaultData, this.itemTranslations);
             const category = ImportHelper.StringValue(jsonData, 'category');
+
+            // TODO: Does this type mixture cause later issues? Will it carry over?
+            //@ts-ignore
             data.folder = folders[category.toLowerCase()].id;
 
             // // TODO: Follow ComplexFormParserBase approach.

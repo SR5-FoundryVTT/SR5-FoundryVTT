@@ -11,7 +11,7 @@ import { WeaponParserBase } from '../parser/weapon/WeaponParserBase';
 export class WeaponImporter extends DataImporter {
     public categoryTranslations: any;
     public itemTranslations: any;
-    public file: string = 'weapons.xml';
+    public files = ['weapons.xml'];
 
     CanParse(jsonObject: object): boolean {
         return jsonObject.hasOwnProperty('weapons') && jsonObject['weapons'].hasOwnProperty('weapon');
@@ -154,7 +154,7 @@ export class WeaponImporter extends DataImporter {
             return;
         }
 
-        let jsonWeaponi18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.file);
+        let jsonWeaponi18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
         this.categoryTranslations = ImportHelper.ExtractCategoriesTranslation(jsonWeaponi18n);
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonWeaponi18n, 'weapons', 'weapon');
     }
