@@ -1,4 +1,4 @@
-import { ShadowrunRoller } from '../rolls/ShadowrunRoller';
+import {ShadowrunRoll, ShadowrunRoller} from '../rolls/ShadowrunRoller';
 import { Helpers } from '../helpers';
 import { SR5Item } from '../item/SR5Item';
 import ActorRollOptions = Shadowrun.ActorRollOptions;
@@ -291,7 +291,7 @@ export class SR5Actor extends Actor {
         this.update(updateData);
     }
 
-    rollFade(options: ActorRollOptions = {}, incoming = -1) {
+    async rollFade(options: ActorRollOptions = {}, incoming = -1): Promise<ShadowrunRoll|undefined> {
         const wil = duplicate(this.data.data.attributes.willpower);
         const res = duplicate(this.data.data.attributes.resonance);
         const data = this.data.data;
@@ -307,10 +307,12 @@ export class SR5Actor extends Actor {
             value: incoming,
         };
 
-        const roll = ShadowrunRoller.advancedRoll({
+        const actor = this;
+        console.error('Hallo');
+        const roll = await ShadowrunRoller.advancedRoll({
             event: options.event,
             parts: parts.list,
-            actor: this,
+            actor,
             title: title,
             wounds: false,
             incomingDrain,
@@ -318,11 +320,16 @@ export class SR5Actor extends Actor {
 
         if (!roll) return;
 
-        // TODO: Reduce damage by fade resist
+        // Reduce damage by soak roll and inform user.
+        const incomingDamage = Helpers.createDamageData(incoming, 'stun');
+        const damage = Helpers.modifyDamageBySoakRoll(incomingDamage, roll, 'SR5.Fade');
+
+        await createRollChatMessage({title, roll, actor, damage});
+
         return roll;
     }
 
-    rollDrain(options: ActorRollOptions = {}, incoming = -1) {
+    async rollDrain(options: ActorRollOptions = {}, incoming = -1): Promise<ShadowrunRoll|undefined> {
         const wil = duplicate(this.data.data.attributes.willpower);
         const drainAtt = duplicate(this.data.data.attributes[this.data.data.magic.attribute]);
 
@@ -332,22 +339,23 @@ export class SR5Actor extends Actor {
         if (this.data.data.modifiers.drain) parts.addUniquePart('SR5.Bonus', this.data.data.modifiers.drain);
 
         let title = `${game.i18n.localize('SR5.Resist')} ${game.i18n.localize('SR5.Drain')}`;
-        const incomingDrain = {
-            label: 'SR5.Drain',
-            value: incoming,
-        };
-        const roll = ShadowrunRoller.advancedRoll({
-            event: options.event,
+        const actor = this;
+        const roll = await ShadowrunRoller.advancedRoll({
             parts: parts.list,
-            actor: this,
-            title: title,
+            title,
+            actor,
             wounds: false,
-            incomingDrain
+            hideRollMessage: true
         });
 
         if (!roll) return;
 
-        // TODO: Reduce damage by drain resist
+        // Reduce damage by soak roll and inform user.
+        const incomingDamage = Helpers.createDamageData(incoming, 'stun');
+        const damage = Helpers.modifyDamageBySoakRoll(incomingDamage, roll, 'SR5.Drain');
+
+        await createRollChatMessage({title, roll, actor, damage});
+
         return roll;
     }
 
@@ -405,7 +413,7 @@ export class SR5Actor extends Actor {
     }
 
     // TODO: Abstract handling of const damage : ModifiedDamageData
-    async rollSoak(options: SoakRollOptions, partsProps: ModList<number> = []) {
+    async rollSoak(options: SoakRollOptions, partsProps: ModList<number> = []): Promise<ShadowrunRoll|undefined> {
         const soakDialog = await ShadowrunActorDialogs.createSoakDialog(this, options, partsProps);
         const soakActionData = await soakDialog.select();
 
@@ -427,15 +435,16 @@ export class SR5Actor extends Actor {
 
         // Reduce damage by damage resist
         const incoming = soakActionData.soak;
-        const modified = {...incoming};
-        modified.mod = PartsList.AddUniquePart(modified.mod, 'SR5.SoakTest', -roll.hits);
-        modified.value = Helpers.calcTotal(modified, {min: 0});
-
-        const damage = {incoming, modified};
-
-        console.error(damage)
+        // Avoid cross referencing.
+        // const modified = duplicate(incoming);
+        // modified.mod = PartsList.AddUniquePart(modified.mod, 'SR5.SoakTest', -roll.hits);
+        // modified.value = Helpers.calcTotal(modified, {min: 0});
+        // const damage = {incoming, modified};
+        const damage = Helpers.modifyDamageBySoakRoll(incoming, roll, 'SR5.SoakTest');
 
         await createRollChatMessage({title, roll, actor, damage});
+
+        return roll;
     }
 
     rollSingleAttribute(attId, options: ActorRollOptions) {
@@ -1094,9 +1103,12 @@ export class SR5Actor extends Actor {
             await this._addPhysicalDamage(damage);
         }
 
-        console.error(this);
-
+        // NOTE: Currently each damage type updates once. Should this cause issues for long latency, collect
+        //       and sum each damage type and update here globally.
+        // NOTE: For stuff like healing the last wound by magic, this might also be interesting to store and give
+        //       an overview of each damage/wound applied to select from.
         // await this.update({'data.track': this.data.data.track});
+
         // TODO: Handle changes in actor status (death and such)
     }
 
