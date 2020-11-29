@@ -5,8 +5,8 @@ import { registerItemLineHelpers } from './ItemLineHelpers';
 import { registerSkillLineHelpers } from './SkillLineHelpers';
 
 export class HandlebarManager {
-    static loadTemplates(): void {
-        preloadHandlebarsTemplates();
+    static async loadTemplates() {
+        await preloadHandlebarsTemplates();
     }
     static registerHelpers(): void {
         registerBasicHelpers();

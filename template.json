@@ -978,6 +978,7 @@
             "complex_form",
             "contact",
             "critter_power",
+            "bioware",
             "cyberware",
             "device",
             "equipment",
@@ -1180,6 +1181,12 @@
         },
         "weapon": {
             "templates": ["description", "action", "technology", "weapon"]
+        },
+        "bioware": {
+            "templates": ["description", "technology", "action", "armor"],
+            "essence": 0,
+            "grade": "standard",
+            "capacity": 0
         },
         "cyberware": {
             "templates": ["description", "technology", "action", "armor"],

@@ -6,7 +6,7 @@ import { ModImporter } from '../importer/ModImporter';
 import { SpellImporter } from '../importer/SpellImporter';
 import { QualityImporter } from '../importer/QualityImporter';
 import { ComplexFormImporter } from '../importer/ComplexFormImporter';
-import { CyberwareImporter } from '../importer/CyberwareImporter';
+import { WareImporter } from '../importer/WareImporter';
 import { ImportHelper, ImportMode } from '../helper/ImportHelper';
 
 export class Import extends Application {
@@ -55,12 +55,13 @@ export class Import extends Application {
     }
 
     private collectDataImporterFileSupport() {
+        console.error('collectDataImporterFileSupport');
         this.supportedDataFiles = [];
-        Import.Importers.forEach((importer) => {
-            if (this.supportedDataFiles.some((supported) => supported === importer.file)) {
+        Import.Importers.forEach(importer => {
+            if (this.supportedDataFiles.some(supported => importer.files.includes(supported))) {
                 return;
             }
-            this.supportedDataFiles.push(importer.file);
+            this.supportedDataFiles = this.supportedDataFiles.concat(importer.files);
         });
     }
 
@@ -77,16 +78,16 @@ export class Import extends Application {
         new SpellImporter(),
         new ComplexFormImporter(),
         new QualityImporter(),
-        new CyberwareImporter(),
+        new WareImporter(),
     ];
 
-    async parseXML(xmlSource) {
+    async parseXML(xmlSource, fileName) {
         let jsonSource = await DataImporter.xml2json(xmlSource);
         ImportHelper.SetMode(ImportMode.XML);
 
         for (const di of Import.Importers) {
             if (di.CanParse(jsonSource)) {
-                di.ExtractTranslation();
+                di.ExtractTranslation(fileName);
                 await di.Parse(jsonSource);
             }
         }
@@ -134,7 +135,7 @@ export class Import extends Application {
                 const dataFile = this.dataFiles.find((dataFile) => dataFile.name === supportedFile);
                 if (dataFile) {
                     const text = await dataFile.text();
-                    await this.parseXML(text);
+                    await this.parseXML(text, dataFile.name);
 
                     // Store status to show parsing progression.
                     if (!this.parsedFiles.some((parsedFileName) => parsedFileName === dataFile.name)) {

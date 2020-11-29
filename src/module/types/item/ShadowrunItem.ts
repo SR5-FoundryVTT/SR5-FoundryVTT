@@ -9,6 +9,7 @@ declare namespace Shadowrun {
         | Contact
         | CritterPower
         | Cyberware
+        | Bioware
         | Device
         | Equipment
         | Lifestyle
@@ -28,6 +29,7 @@ declare namespace Shadowrun {
         Partial<ContactData> &
         Partial<CritterPowerData> &
         Partial<CyberwareData> &
+        Partial<BiowareData> &
         Partial<DeviceData> &
         Partial<EquipmentData> &
         Partial<LifestyleData> &

@@ -1,9 +1,10 @@
-import Cyberware = Shadowrun.Cyberware;
 import { ImportHelper } from '../../helper/ImportHelper';
 import { TechnologyItemParserBase } from '../item/TechnologyItemParserBase';
+import Cyberware = Shadowrun.Cyberware;
+import Ware = Shadowrun.Ware;
 
-export class CyberwareParser extends TechnologyItemParserBase<Cyberware> {
-    Parse(jsonData: object, data: Cyberware, jsonTranslation?: object): Cyberware {
+export class CyberwareParser extends TechnologyItemParserBase<Ware> {
+    Parse(jsonData: object, data: Ware, jsonTranslation?: object): Ware {
         data = super.Parse(jsonData, data, jsonTranslation);
 
         const essence = ImportHelper.StringValue(jsonData, 'ess', '0').match(/[0-9]\.?[0-9]*/g);
