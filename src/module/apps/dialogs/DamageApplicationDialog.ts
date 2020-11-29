@@ -3,11 +3,18 @@ import DamageData = Shadowrun.DamageData;
 import {SR5Actor} from "../../actor/SR5Actor";
 
 export class DamageApplicationDialog extends FormDialog {
-
     constructor(actors: SR5Actor[], damage: DamageData, options?: ApplicationOptions) {
-
         const dialogData = DamageApplicationDialog.getDialogData(actors, damage);
         super(dialogData, options);
+    }
+
+    static get defaultOptions() {
+        const options = super.defaultOptions;
+        options.id = 'damage-application';
+        options.classes = ['sr5'];
+        options.resizable = true;
+        options.height = 'auto';
+        return options;
     }
 
     // TODO: check if 'getData' is what this is...

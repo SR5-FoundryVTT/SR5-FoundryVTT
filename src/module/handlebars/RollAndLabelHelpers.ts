@@ -17,9 +17,6 @@ export const registerRollAndLabelHelpers = () => {
     Handlebars.registerHelper('damageCode', function(damage: DamageData): SafeString {
         const typeCode = Handlebars.helpers.damageAbbreviation(damage.type.value);
         let code = `${damage.value}${typeCode}`;
-        if (damage.element.value) {
-           code = `${code} (${damage.element.value})`;
-        }
         return new Handlebars.SafeString(code);
     });
 

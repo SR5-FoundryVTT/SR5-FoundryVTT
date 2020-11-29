@@ -14,6 +14,7 @@ $light: darken($white, 10%);
 $light-1: darken($light, 10%);
 $light-2: darken($light-1, 10%);
 $dark: darken($grey, 20%);
+$dark-sunken: #414040;
 $matrix-green: rgb(7, 145, 35);
 $mce-background: #939393;
 
@@ -38,7 +39,12 @@ $groove-color: $dark;
 $groove: $groove-width solid $groove-color;
 $light-border: $dark;
 
+$dark-sunken-box-shadow: inset 0 0 3px 0 #000, 0 -2px 2px -1px #000, -2px 0 2px -2px #28221f, -2px 0 2px -2px #28221f, 2px 0 2px -2px #28221f, 2px 0 2px -2px #28221f, 0 3px 3px -3px #8f8c8b, 0 2px 2px -2px #8f8c8b, 0 1px 1px -1px #8f8c8b;
+
 $radius: 0.25em;
+$small-distance: 0.15em;
+$medium-distance: 0.25em;
+$large-distance: 0.5em;
 
 $border-under: 1px groove $groove-color;
 

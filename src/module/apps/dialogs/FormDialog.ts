@@ -8,7 +8,11 @@ export interface FormDialogData {
 }
 
 /** TODO: Documentation with usage example
- *
+ *  TODO: Rework getDialogData approach with the general getData Application style,
+ *        to allow rerender from within the Dialog instance without external data
+ *        reinitialization.
+ *        This would for things like updating a dialog based on currently selected tokens
+ *        without reopening.
  */
 export class FormDialog extends Dialog {
     selection: object;
