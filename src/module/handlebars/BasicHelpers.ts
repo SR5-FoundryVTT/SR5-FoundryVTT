@@ -1,5 +1,6 @@
 import { Helpers } from '../helpers';
 import {SafeString} from "handlebars";
+import DamageData = Shadowrun.DamageData;
 
 export const registerBasicHelpers = () => {
     Handlebars.registerHelper('localizeOb', function (strId, obj) {

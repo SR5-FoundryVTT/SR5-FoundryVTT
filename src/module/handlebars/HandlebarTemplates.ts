@@ -101,7 +101,10 @@ export const preloadHandlebarsTemplates = async () => {
 
         // list components
         'systems/shadowrun5e/dist/templates/common/List/ListItem.html',
-        'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+        'systems/shadowrun5e/dist/templates/common/List/ListHeader.html',
+
+        // dialogs
+        'systems/shadowrun5e/dist/templates/apps/dialogs/damage-application.html',
     ];
 
     return loadTemplates(templatePaths);

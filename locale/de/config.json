@@ -733,5 +733,10 @@
         "Modifiers": {
             "NPCMetatypeAttribute": "NPC Metatyp Attribute"
         }
+    },
+
+    "SR5.DamageApplication": {
+        "Title": "Schaden anwenden",
+        "Damage": "Schaden anwenden"
     }
 }

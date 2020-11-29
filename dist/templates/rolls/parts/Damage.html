@@ -1,7 +1,12 @@
 <div class="damage-line">
     <div>
         <span class="key">{{name}}: </span>
-        <span class="value">{{damage.value}}{{damageAbbreviation damage.type.value}}</span>
+        <span class="button value apply-damage"
+              data-damage-value="{{damage.value}}"
+              data-damage-type="{{damage.type.value}}"
+              data-damage-element="{{damage.element.value}}">
+            {{damageCode damage}}
+        </span>
     </div>
     {{#if damage.element.value}}
     <div>

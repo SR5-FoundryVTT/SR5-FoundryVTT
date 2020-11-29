@@ -23,6 +23,9 @@ import {ShadowrunActorDialogs} from "../apps/dialogs/ShadowrunActorDialogs";
 import {createRollChatMessage} from "../chat";
 import Attributes = Shadowrun.Attributes;
 import Limits = Shadowrun.Limits;
+import DamageData = Shadowrun.DamageData;
+import TrackType = Shadowrun.TrackType;
+import OverflowTrackType = Shadowrun.OverflowTrackType;
 
 export class SR5Actor extends Actor {
     getOverwatchScore() {
@@ -145,8 +148,27 @@ export class SR5Actor extends Actor {
         return limits[name];
     }
 
+    /** Return actor type, which can be different kind of actors from 'character' to 'vehicle'.
+     *  Please check SR5ActorType for reference.
+     */
+    getType(): string {
+        return this.data.type;
+    }
+
+    isCharacter(): boolean {
+        return this.getType() === 'character';
+    }
+
+    isSpirit(): boolean {
+        return this.getType() === 'spirit';
+    }
+
+    isSprite(): boolean {
+        return this.getType() === 'sprite';
+    }
+
     isVehicle() {
-        return this.data.type === 'vehicle';
+        return this.getType() === 'vehicle';
     }
 
     isGrunt() {
@@ -1043,5 +1065,166 @@ export class SR5Actor extends Actor {
         //@ts-ignore
         const users = this.getUsers('OWNER');
         return users.filter(user => user.active);
+    }
+
+    /** Apply all types of damage to the actor.
+     *
+     * @param damage
+     */
+    async applyDamage(damage: DamageData) {
+        if (damage.value <= 0) return;
+
+        damage = this.applyDamageTypeChangeForArmor(damage);
+
+        // TODO: Handle different actor types.
+
+        // Apply damage and resulting overflow to the according track.
+        // The amount and type damage can value in the process.
+        // NOTE: Execution order is important here.
+        if (damage.type.value === 'matrix') {
+            // TODO: Biofeedback damage model already integrated?
+            damage = await this._addMatrixDamage(damage);
+        }
+
+        if (damage.type.value === 'stun') {
+            damage = await this._addStunDamage(damage);
+        }
+
+        if (damage.type.value === 'physical') {
+            await this._addPhysicalDamage(damage);
+        }
+
+        console.error(this);
+
+        // await this.update({'data.track': this.data.data.track});
+        // TODO: Handle changes in actor status (death and such)
+    }
+
+    async _addDamageToTrack(damage: DamageData, track: TrackType|OverflowTrackType) {
+        if (damage.value === 0) return;
+        if (track.value === track.max) return;
+
+        //  Avoid cross referencing.
+        track = duplicate(track);
+
+        track.value += damage.value;
+        if (track.value > track.max) {
+            // dev error, not really meant to be ever seen by users. Therefore no localization.
+            console.error("Damage did overflow the track, which shouldn't happen at this stage. Damage has been set to max. Please use applyDamage.")
+            track.value = track.max;
+        }
+
+        const data = {[`data.track.${damage.type.value}`]: track};
+        await this.update(data);
+    }
+
+    async _addDamageToOverflow(damage: DamageData, track: OverflowTrackType) {
+        if (damage.value === 0) return;
+        if (track.overflow.value === track.overflow.max) return;
+
+        //  Avoid cross referencing.
+        const overflow = duplicate(track.overflow);
+
+        // Don't over apply damage to the track overflow.
+        overflow.value += damage.value;
+        overflow.value = Math.min(overflow.value, overflow.max);
+
+        const data = {[`data.track.${damage.type.value}.overflow`]: overflow};
+        await this.update(data);
+    }
+
+    /** Apply damage to the stun track and get overflow damage for the physical track.
+     */
+    async _addStunDamage(damage: DamageData): Promise<DamageData> {
+        if (damage.type.value !== 'stun') {
+            return damage;
+        }
+
+        const track = this.getStunTrack();
+        const {overflow, rest} = this._calcDamageOverflow(damage, track);
+
+        // Only change damage type when needed, in order to avoid confusion of callers.
+        if (overflow.value > 0) {
+            // Apply Stun overflow damage to physical track according to: SR5E#170
+            overflow.value = Math.floor(overflow.value / 2);
+            overflow.type.value = 'physical';
+        }
+
+        await this._addDamageToTrack(rest, track);
+        return overflow;
+    }
+
+    async _addPhysicalDamage(damage: DamageData) {
+        if (damage.type.value !== 'physical') {
+            return damage;
+        }
+        const track = this.getPhysicalTrack();
+        const {overflow, rest} = this._calcDamageOverflow(damage, track);
+
+        await this._addDamageToTrack(rest, track);
+        await this._addDamageToOverflow(overflow, track);
+    }
+
+    async _addMatrixDamage(damage: DamageData): Promise<DamageData> {
+        if (damage.type.value !== 'matrix') {
+            return damage;
+        }
+
+        return damage;
+    }
+
+    /** Calculate damage overflow only based on max and current track values.
+     */
+    _calcDamageOverflow(damage: DamageData, track: TrackType): {overflow: DamageData, rest: DamageData} {
+        const freeTrackDamage = track.max - track.value;
+        const overflowDamage = damage.value > freeTrackDamage ?
+            damage.value - freeTrackDamage :
+            0;
+        const restDamage = damage.value - overflowDamage;
+
+        //  Avoid cross referencing.
+        const overflow = duplicate(damage);
+        const rest = duplicate(damage);
+
+        overflow.value = overflowDamage;
+        rest.value = restDamage;
+
+        return {overflow, rest};
+    }
+
+    getStunTrack(): TrackType {
+        return this.data.data.track.stun;
+    }
+
+    getPhysicalTrack(): OverflowTrackType {
+        return this.data.data.track.physical;
+    }
+
+    // TODO: SR5Actor.getMatrixTrack implementation
+    // getMatrixTrack(): TrackType {
+    //
+    // }
+
+    /**
+     *
+     * @param damage
+     */
+    applyDamageTypeChangeForArmor(damage: DamageData): DamageData {
+        // TODO: Damage modification should only really apply to characters, but double check ;)
+        if (!this.isCharacter()) return damage;
+
+        if (damage.type.value === 'physical') {
+            const armor = this.getArmor();
+
+            const armorWillChangeDamageType = armor.value > damage.value;
+            if (armorWillChangeDamageType) {
+                // Avoid cross referencing.
+                damage = duplicate(damage);
+
+                damage.type.value = 'stun';
+            }
+        }
+
+        return damage;
     }
 }

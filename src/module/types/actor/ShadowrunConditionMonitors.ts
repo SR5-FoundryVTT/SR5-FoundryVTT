@@ -5,7 +5,7 @@ declare namespace Shadowrun {
         stun: TrackType;
     };
 
-    export type PhysicalTrack = TrackType & Overflow;
+    export type PhysicalTrack = OverflowTrackType;
     export type StunTrack = TrackType;
 
     export type TrackType = ValueMaxPair<number> &
@@ -14,6 +14,8 @@ declare namespace Shadowrun {
         DisableField & {
             wounds: number;
         };
+
+    export type OverflowTrackType = TrackType & Overflow;
 
     export type Overflow = {
         overflow: ValueMaxPair<number>;

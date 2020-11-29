@@ -1,14 +1,18 @@
 export interface FormDialogData {
     title?: string;
-	buttons?: Record<string, DialogButton>;
+	buttons: Record<string, DialogButton>;
 	default?: string;
 	templateData: object;
 	templatePath: string;
-	onAfterClose: Function;
+	onAfterClose?: Function;
 }
 
 /** TODO: Documentation with usage example
- *
+ *  TODO: Rework getDialogData approach with the general getData Application style,
+ *        to allow rerender from within the Dialog instance without external data
+ *        reinitialization.
+ *        This would for things like updating a dialog based on currently selected tokens
+ *        without reopening.
  */
 export class FormDialog extends Dialog {
     selection: object;
@@ -28,7 +32,7 @@ export class FormDialog extends Dialog {
         this._templateData = templateData;
         this._templatePath = templatePath;
 
-        this._onAfterClose = dialogData.onAfterClose;
+        this._onAfterClose = dialogData.onAfterClose ? dialogData.onAfterClose : () => {};
 
         this.selection = this._emptySelection();
 
