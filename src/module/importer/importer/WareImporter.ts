@@ -139,7 +139,6 @@ export class WareImporter extends DataImporter {
     }
 
     async Parse(jsonObject: object): Promise<Entity> {
-        console.error('Cyberwawre.Parse');
         const cyberParser = new CyberwareParser();
 
         let key = jsonObject.hasOwnProperty('cyberwares') ? 'Cyberware' : 'Bioware';
