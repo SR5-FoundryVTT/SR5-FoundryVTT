@@ -430,10 +430,6 @@ export class SR5Actor extends Actor {
         // Reduce damage by damage resist
         const incoming = soakActionData.soak;
         // Avoid cross referencing.
-        // const modified = duplicate(incoming);
-        // modified.mod = PartsList.AddUniquePart(modified.mod, 'SR5.SoakTest', -roll.hits);
-        // modified.value = Helpers.calcTotal(modified, {min: 0});
-        // const damage = {incoming, modified};
         const damage = Helpers.modifyDamageBySoakRoll(incoming, roll, 'SR5.SoakTest');
 
         await createRollChatMessage({title, roll, actor, damage});

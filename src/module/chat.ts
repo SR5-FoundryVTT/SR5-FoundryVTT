@@ -340,7 +340,10 @@ export const addRollListeners = (app: ChatMessage, html) => {
 
         const actors = Helpers.getSelectedActorsOrCharacter();
 
-        if (actors.length === 0) return;
+        if (actors.length === 0) {
+            ui.notifications.warn(game.i18n.localize('SR5.Warnings.TokenSelectionNeeded'));
+            return;
+        }
 
         // Show user the token selection and resulting damage values
         const damageApplicationDialog = await new DamageApplicationDialog(actors, damage);
