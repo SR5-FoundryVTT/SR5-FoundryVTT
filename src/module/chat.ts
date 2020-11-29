@@ -9,6 +9,8 @@ import {Helpers} from "./helpers";
 import ModifiedDamageData = Shadowrun.ModifiedDamageData;
 import DamageData = Shadowrun.DamageData;
 import {DamageApplicationDialog} from "./apps/dialogs/DamageApplicationDialog";
+import DamageType = Shadowrun.DamageType;
+import DamageElement = Shadowrun.DamageElement;
 
 export interface TargetChatMessageOptions {
     actor: Actor
@@ -262,7 +264,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
     html.on('click', '.place-template', (event) => {
         event.preventDefault();
         const item = SR5Item.getItemFromMessage(html);
-        console.error(item);
+
         if (item) {
             const template = Template.fromItem(item);
             template?.drawPreview();
@@ -327,18 +329,15 @@ export const addRollListeners = (app: ChatMessage, html) => {
     html.on('click', '.apply-damage', async event => {
         event.stopPropagation();
         const applyDamage = $(event.currentTarget);
-        const card = html.find('.chat-card');
 
         const value = Number(applyDamage.data('damageValue'));
-        const type = String(applyDamage.data('damageType'));
-        const element = String(applyDamage.data('damageElement'));
+        const type = String(applyDamage.data('damageType')) as DamageType;
+        const ap = Number(applyDamage.data('damageAp'));
+        const element = String(applyDamage.data('damageElement')) as DamageElement;
 
-        // TODO: Create a damage Factory.
-        let damage = {
-            value, type: {value: type}, element: {value: element}
-        } as DamageData;
 
-        const actors = Helpers.getSelectedActorsOrCharacter();
+        let damage = Helpers.createDamageData(value, type, ap, element);
+        let actors = Helpers.getSelectedActorsOrCharacter();
 
         if (actors.length === 0) {
             ui.notifications.warn(game.i18n.localize('SR5.Warnings.TokenSelectionNeeded'));
@@ -347,11 +346,19 @@ export const addRollListeners = (app: ChatMessage, html) => {
 
         // Show user the token selection and resulting damage values
         const damageApplicationDialog = await new DamageApplicationDialog(actors, damage);
-        await damageApplicationDialog.select();
+        const actorDamages = await damageApplicationDialog.select();
 
         if (damageApplicationDialog.canceled) return;
 
         // Apply the actual damage values. applyDamage will, again, calculate armor damage modification.
-        actors.forEach(actor => actor.applyDamage(damage));
+        actorDamages.forEach(({actor, modified}) => {
+            if (damageApplicationDialog.selectedButton === 'damage') {
+                actor.applyDamage(modified);
+            } else if (damageApplicationDialog.selectedButton === 'unmodifiedDamage') {
+                actor.applyDamage(damage);
+            } else {
+                console.error('Expected a dialog selection, but none known selection was made');
+            }
+        });
     });
 };

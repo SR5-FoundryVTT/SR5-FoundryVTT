@@ -204,6 +204,7 @@
 
   "SR5.Armor": "Panzerung",
   "SR5.ArmorValue": "Panzerungswert",
+  "SR5.ModifiedArmor": "Mod. Panzerung",
   "SR5.Accessory": "Zubehör",
 
   "SR5.DeviceType": "Typ",
@@ -739,7 +740,8 @@
 
     "SR5.DamageApplication": {
         "Title": "Schaden anwenden",
-        "Damage": "Schaden anwenden"
+        "ApplyDamage": "Schaden anwenden",
+        "ApplyUnmodifiedDamage": "Unmod. Schaden anwenden"
     },
 
     "SR5.Warnings": {

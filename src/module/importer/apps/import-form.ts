@@ -55,7 +55,6 @@ export class Import extends Application {
     }
 
     private collectDataImporterFileSupport() {
-        console.error('collectDataImporterFileSupport');
         this.supportedDataFiles = [];
         Import.Importers.forEach(importer => {
             if (this.supportedDataFiles.some(supported => importer.files.includes(supported))) {

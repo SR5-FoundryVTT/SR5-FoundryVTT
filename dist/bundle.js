@@ -14205,7 +14205,7 @@ class SR5Actor extends Actor {
         return __awaiter(this, void 0, void 0, function* () {
             if (damage.value <= 0)
                 return;
-            damage = this.applyDamageTypeChangeForArmor(damage);
+            // damage = this.applyDamageTypeChangeForArmor(damage);
             // TODO: Handle different actor types.
             // Apply damage and resulting overflow to the according track.
             // The amount and type damage can value in the process.
@@ -14333,8 +14333,8 @@ class SR5Actor extends Actor {
         if (!this.isCharacter())
             return damage;
         if (damage.type.value === 'physical') {
-            const armor = this.getArmor();
-            const armorWillChangeDamageType = armor.value > damage.value;
+            const modifiedArmor = this.getModifiedArmor(damage);
+            const armorWillChangeDamageType = modifiedArmor.value > damage.value;
             if (armorWillChangeDamageType) {
                 // Avoid cross referencing.
                 damage = duplicate(damage);
@@ -14342,6 +14342,17 @@ class SR5Actor extends Actor {
             }
         }
         return damage;
+    }
+    // TODO: modifiedArmor return datatype uses what's defined with getArmor, which doesn't use ArmorData (no label field)?
+    getModifiedArmor(damage) {
+        var _a;
+        if (!((_a = damage.ap) === null || _a === void 0 ? void 0 : _a.value)) {
+            return this.getArmor();
+        }
+        const modified = duplicate(this.getArmor());
+        modified.mod = PartsList_1.PartsList.AddUniquePart(modified.mod, 'SR5.DV', damage.ap.value);
+        modified.value = helpers_1.Helpers.calcTotal(modified, { min: 0 });
+        return modified;
     }
 }
 exports.SR5Actor = SR5Actor;
@@ -17262,7 +17273,8 @@ class DamageApplicationDialog extends FormDialog_1.FormDialog {
     static get defaultOptions() {
         const options = super.defaultOptions;
         options.id = 'damage-application';
-        options.classes = ['sr5'];
+        // TODO: Class Dialog here is needed for dialog button styling.
+        options.classes = ['sr5', 'form-dialog'];
         options.resizable = true;
         options.height = 'auto';
         return options;
@@ -17275,21 +17287,23 @@ class DamageApplicationDialog extends FormDialog_1.FormDialog {
         const actorDamage = actors.map(actor => {
             return {
                 actor,
-                incoming: damage,
-                damage: actor.applyDamageTypeChangeForArmor(damage),
-                armor: actor.getArmor()
+                modified: actor.applyDamageTypeChangeForArmor(damage),
+                armor: actor.getModifiedArmor(damage)
             };
         });
         const templateData = {
             damage,
             actorDamage,
         };
-        const onAfterClose = () => actorDamage;
         const buttons = {
             damage: {
-                label: game.i18n.localize('SR5.DamageApplication.Damage')
+                label: game.i18n.localize('SR5.DamageApplication.ApplyDamage')
+            },
+            unmodifiedDamage: {
+                label: game.i18n.localize('SR5.DamageApplication.ApplyUnmodifiedDamage')
             }
         };
+        const onAfterClose = () => actorDamage;
         return {
             title,
             templatePath,
@@ -17335,6 +17349,7 @@ class FormDialog extends Dialog {
             // Reject is stored, but never used in favor of FormDialog.canceled
             this._selectionReject = reject;
         });
+        this._amendButtonsWithName();
     }
     close() {
         const _super = Object.create(null, {
@@ -17351,8 +17366,9 @@ class FormDialog extends Dialog {
         const _super = Object.create(null, {
             submit: { get: () => super.submit }
         });
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            this.selectedButton = button.label;
+            this.selectedButton = (_a = button.name) !== null && _a !== void 0 ? _a : button.label;
             //@ts-ignore
             _super.submit.call(this, button);
             yield this.afterSubmit(this.options.jQuery ? this.element : this.element[0]);
@@ -17401,6 +17417,12 @@ class FormDialog extends Dialog {
     /** @override */
     static getButtons() {
         return {};
+    }
+    /** Allow for the selected button to be addressed by it's key, not it's localized label.
+     */
+    _amendButtonsWithName() {
+        //@ts-ignore
+        Object.keys(this.data.buttons).forEach(name => this.data.buttons[name].name = name);
     }
 }
 exports.FormDialog = FormDialog;
@@ -18686,7 +18708,6 @@ exports.addRollListeners = (app, html) => {
     html.on('click', '.place-template', (event) => {
         event.preventDefault();
         const item = SR5Item_1.SR5Item.getItemFromMessage(html);
-        console.error(item);
         if (item) {
             const template = template_1.default.fromItem(item);
             template === null || template === void 0 ? void 0 : template.drawPreview();
@@ -18745,26 +18766,33 @@ exports.addRollListeners = (app, html) => {
     html.on('click', '.apply-damage', (event) => __awaiter(void 0, void 0, void 0, function* () {
         event.stopPropagation();
         const applyDamage = $(event.currentTarget);
-        const card = html.find('.chat-card');
         const value = Number(applyDamage.data('damageValue'));
         const type = String(applyDamage.data('damageType'));
+        const ap = Number(applyDamage.data('damageAp'));
         const element = String(applyDamage.data('damageElement'));
-        // TODO: Create a damage Factory.
-        let damage = {
-            value, type: { value: type }, element: { value: element }
-        };
-        const actors = helpers_1.Helpers.getSelectedActorsOrCharacter();
+        let damage = helpers_1.Helpers.createDamageData(value, type, ap, element);
+        let actors = helpers_1.Helpers.getSelectedActorsOrCharacter();
         if (actors.length === 0) {
             ui.notifications.warn(game.i18n.localize('SR5.Warnings.TokenSelectionNeeded'));
             return;
         }
         // Show user the token selection and resulting damage values
         const damageApplicationDialog = yield new DamageApplicationDialog_1.DamageApplicationDialog(actors, damage);
-        yield damageApplicationDialog.select();
+        const actorDamages = yield damageApplicationDialog.select();
         if (damageApplicationDialog.canceled)
             return;
         // Apply the actual damage values. applyDamage will, again, calculate armor damage modification.
-        actors.forEach(actor => actor.applyDamage(damage));
+        actorDamages.forEach(({ actor, modified }) => {
+            if (damageApplicationDialog.selectedButton === 'damage') {
+                actor.applyDamage(modified);
+            }
+            else if (damageApplicationDialog.selectedButton === 'unmodifiedDamage') {
+                actor.applyDamage(damage);
+            }
+            else {
+                console.error('Expected a dialog selection, but none known selection was made');
+            }
+        });
     }));
 };
 
@@ -20727,12 +20755,14 @@ class Helpers {
             return token.data.name;
         return actor.name;
     }
-    static createDamageData(value, type, element = '') {
+    static createDamageData(value, type, ap = 0, element = '') {
         const damage = duplicate(dataTemplates_1.DataTemplates.damage);
         damage.base = value;
         damage.value = value;
         damage.type.base = type;
         damage.type.value = type;
+        damage.ap.base = ap;
+        damage.ap.value = ap;
         damage.element.base = element;
         damage.element.value = element;
         return damage;
@@ -20934,7 +20964,6 @@ class Import extends Application {
         return Object.assign({}, data);
     }
     collectDataImporterFileSupport() {
-        console.error('collectDataImporterFileSupport');
         this.supportedDataFiles = [];
         Import.Importers.forEach(importer => {
             if (this.supportedDataFiles.some(supported => importer.files.includes(supported))) {

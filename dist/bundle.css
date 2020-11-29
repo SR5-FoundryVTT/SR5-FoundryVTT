@@ -1075,4 +1075,15 @@ select.display {
     color: black;
     background: #e6e6e6; }
 
+/** Replicate Foundry .dialog stiling for flex row buttons. FormDialog sublcasses simply adding class dialog will
+ * otherwise cause issues with custom button styling.
+ */
+.form-dialog .window-content .dialog-buttons {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap; }
+
+.form-dialog .window-content .dialog-buttons > * {
+  flex: 1; }
+
 /*# sourceMappingURL=bundle.css.map */

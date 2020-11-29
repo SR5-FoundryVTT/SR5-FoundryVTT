@@ -26,6 +26,7 @@ import Limits = Shadowrun.Limits;
 import DamageData = Shadowrun.DamageData;
 import TrackType = Shadowrun.TrackType;
 import OverflowTrackType = Shadowrun.OverflowTrackType;
+import ArmorData = Shadowrun.ArmorData;
 
 export class SR5Actor extends Actor {
     getOverwatchScore() {
@@ -1073,7 +1074,7 @@ export class SR5Actor extends Actor {
     async applyDamage(damage: DamageData) {
         if (damage.value <= 0) return;
 
-        damage = this.applyDamageTypeChangeForArmor(damage);
+        // damage = this.applyDamageTypeChangeForArmor(damage);
 
         // TODO: Handle different actor types.
 
@@ -1216,9 +1217,9 @@ export class SR5Actor extends Actor {
         if (!this.isCharacter()) return damage;
 
         if (damage.type.value === 'physical') {
-            const armor = this.getArmor();
+            const modifiedArmor = this.getModifiedArmor(damage);
+            const armorWillChangeDamageType = modifiedArmor.value > damage.value;
 
-            const armorWillChangeDamageType = armor.value > damage.value;
             if (armorWillChangeDamageType) {
                 // Avoid cross referencing.
                 damage = duplicate(damage);
@@ -1228,5 +1229,18 @@ export class SR5Actor extends Actor {
         }
 
         return damage;
+    }
+
+    // TODO: modifiedArmor return datatype uses what's defined with getArmor, which doesn't use ArmorData (no label field)?
+    getModifiedArmor(damage: DamageData): BaseValuePair<number> & ModifiableValue & LabelField {
+        if (!damage.ap?.value) {
+            return this.getArmor();
+        }
+
+        const modified = duplicate(this.getArmor());
+        modified.mod = PartsList.AddUniquePart(modified.mod, 'SR5.DV', damage.ap.value);
+        modified.value = Helpers.calcTotal(modified, {min: 0});
+
+        return modified;
     }
 }

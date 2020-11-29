@@ -370,12 +370,14 @@ export class Helpers {
         return actor.name;
     }
 
-    static createDamageData(value: number, type: DamageType, element: DamageElement = ''): DamageData {
+    static createDamageData(value: number, type: DamageType, ap: number = 0, element: DamageElement = ''): DamageData {
         const damage = duplicate(DataTemplates.damage);
         damage.base = value;
         damage.value = value;
         damage.type.base = type;
         damage.type.value = type;
+        damage.ap.base = ap;
+        damage.ap.value = ap;
         damage.element.base = element;
         damage.element.value = element;
 
