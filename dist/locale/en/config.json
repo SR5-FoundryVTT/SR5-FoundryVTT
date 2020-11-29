@@ -203,6 +203,7 @@
 
     "SR5.Armor": "Armor",
     "SR5.ArmorValue": "Armor Value",
+    "SR5.ModifiedArmor": "Mod. Armor",
     "SR5.Accessory": "Accessory",
 
     "SR5.DeviceType": "Type",
@@ -752,7 +753,8 @@
 
     "SR5.DamageApplication": {
         "Title": "Damage Application",
-        "Damage": "Apply Damage"
+        "ApplyDamage": "Apply Damage",
+        "ApplyUnmodifiedDamage": "Apply Unmod. Damage"
     },
 
     "SR5.Warnings": {

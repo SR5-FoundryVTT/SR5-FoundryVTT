@@ -56,29 +56,13 @@
             </div>
             {{/if}}
             {{#if attack.damage}}
-            <div class="damage-line">
-                {{#if attack.damage.value}}
-                <div>
-                    <span class="key">{{localize "SR5.DV"}}: </span>
-                    <span class="value">
-                        {{attack.damage.value}}{{damageAbbreviation attack.damage.type.value}}
-                    </span>
-                </div>
-                {{/if}} {{#if attack.damage.ap.value}}
-                <div>
-                    <span class="key">{{localize "SR5.AP"}}: </span>
-                    <span class="value">{{attack.damage.ap.value}}</span>
-                </div>
-                {{/if}} {{#if attack.damage.element.value}}
-                <div>
-                    <i
-                        class="{{elementIcon attack.damage.element.value}} icon"
-                        title="{{localize attack.damage.element.value}}"
-                    ></i>
-                </div>
-                {{/if}}
-            </div>
-            {{/if}} {{#if attack.force}}
+                {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.html'
+                        name=(localize "SR5.DV")
+                        damage=attack.damage
+                        showAP=true
+                }}
+            {{/if}}
+            {{#if attack.force}}
             <div class="limit-line">
                 <span class="key">{{localize "SR5.Force"}}</span>
                 <span class="value">{{attack.force}}</span>
