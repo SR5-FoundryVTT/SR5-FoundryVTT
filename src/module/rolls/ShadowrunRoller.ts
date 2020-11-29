@@ -47,7 +47,6 @@ export interface BasicRollProps {
     attack?: AttackData
     // Incoming attack for a defense test
     incomingAttack?: AttackData;
-    incomingDrain?: DrainData;
     damage?: ModifiedDamageData;
     tests?: Test[];
     description?: object;
@@ -407,8 +406,8 @@ export class ShadowrunRoller {
     }
 
     static async rollChatMessage(roll: ShadowrunRoll, props: BasicRollPropsDefaulted) {
-        const {actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, incomingDrain, damage, tests} = props;
-        const rollChatMessageOptions = {roll, actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, incomingDrain, damage, tests};
+        const {actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, damage, tests} = props;
+        const rollChatMessageOptions = {roll, actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, damage, tests};
         await createRollChatMessage(rollChatMessageOptions);
     }
 

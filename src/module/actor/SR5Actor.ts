@@ -302,20 +302,14 @@ export class SR5Actor extends Actor {
         if (data.modifiers.fade) parts.addUniquePart('SR5.Bonus', data.modifiers.fade);
 
         let title = `${game.i18n.localize('SR5.Resist')} ${game.i18n.localize('SR5.Fade')}`;
-        const incomingDrain = {
-            label: 'SR5.Fade',
-            value: incoming,
-        };
 
         const actor = this;
-        console.error('Hallo');
         const roll = await ShadowrunRoller.advancedRoll({
-            event: options.event,
             parts: parts.list,
             actor,
             title: title,
             wounds: false,
-            incomingDrain,
+            hideRollMessage: true
         });
 
         if (!roll) return;
