@@ -13596,10 +13596,6 @@ class SR5Actor extends Actor {
             // Reduce damage by damage resist
             const incoming = soakActionData.soak;
             // Avoid cross referencing.
-            // const modified = duplicate(incoming);
-            // modified.mod = PartsList.AddUniquePart(modified.mod, 'SR5.SoakTest', -roll.hits);
-            // modified.value = Helpers.calcTotal(modified, {min: 0});
-            // const damage = {incoming, modified};
             const damage = helpers_1.Helpers.modifyDamageBySoakRoll(incoming, roll, 'SR5.SoakTest');
             yield chat_1.createRollChatMessage({ title, roll, actor, damage });
             return roll;
@@ -18751,8 +18747,10 @@ exports.addRollListeners = (app, html) => {
             value, type: { value: type }, element: { value: element }
         };
         const actors = helpers_1.Helpers.getSelectedActorsOrCharacter();
-        if (actors.length === 0)
+        if (actors.length === 0) {
+            ui.notifications.warn(game.i18n.localize('SR5.Warnings.TokenSelectionNeeded'));
             return;
+        }
         // Show user the token selection and resulting damage values
         const damageApplicationDialog = yield new DamageApplicationDialog_1.DamageApplicationDialog(actors, damage);
         yield damageApplicationDialog.select();
