@@ -754,6 +754,7 @@
     },
 
     "SR5.Warnings": {
-        "NegativeLimitValue": "Limit values must be above zero"
+        "NegativeLimitValue": "Limit values must be above zero",
+        "TokenSelectionNeeded": "One ore more tokens need to be selected"
     }
 }
