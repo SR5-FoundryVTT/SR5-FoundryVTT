@@ -1,3 +1,6 @@
+import ActorAttribute = Shadowrun.ActorAttribute;
+import DamageData = Shadowrun.DamageData;
+
 export const DataTemplates = {
     grunt: {
         metatype_modifiers: {
@@ -41,5 +44,24 @@ export const DataTemplates = {
                 }
             }
         }
-    }
+    },
+    damage: {
+        type: {
+            value: "",
+            base: ""
+        },
+        element: {
+            value: "",
+            base: ""
+        },
+        value: 0,
+        base: 0,
+        ap: {
+            value: 0,
+            base: 0,
+            mod: []
+        },
+        attribute: "",
+        mod: []
+    } as DamageData
 }

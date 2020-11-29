@@ -19,6 +19,7 @@ import FireModeData = Shadowrun.FireModeData;
 import DrainData = Shadowrun.DrainData;
 import {ShadowrunTestDialog} from "../apps/dialogs/ShadowrunTestDialog";
 import ModifiedDamageData = Shadowrun.ModifiedDamageData;
+import LimitField = Shadowrun.LimitField;
 
 // TODO: Split up BasicRollProps into the different types of calls
 // item, actor, dicePool, attack, defense, spell, form
@@ -36,7 +37,7 @@ interface RollProps {
 // TODO: Separate into 'roll data' and 'template data', which only passes through but isn't used.
 export interface BasicRollProps {
     parts?: ModList<number>;
-    limit?: BaseValuePair<number> & LabelField;
+    limit?: LimitField;
     explodeSixes?: boolean;
     title?: string;
     actor?: SR5Actor;
@@ -46,7 +47,6 @@ export interface BasicRollProps {
     attack?: AttackData
     // Incoming attack for a defense test
     incomingAttack?: AttackData;
-    incomingDrain?: DrainData;
     damage?: ModifiedDamageData;
     tests?: Test[];
     description?: object;
@@ -343,6 +343,8 @@ export class ShadowrunRoller {
         // remove limits if game settings is set
         if (!game.settings.get(SYSTEM_NAME, FLAGS.ApplyLimits)) {
             delete props.limit;
+        } else {
+            ShadowrunRoller._errorOnInvalidLimit(props.limit);
         }
 
         // Ask user for additional, general success test role modifiers.
@@ -404,8 +406,8 @@ export class ShadowrunRoller {
     }
 
     static async rollChatMessage(roll: ShadowrunRoll, props: BasicRollPropsDefaulted) {
-        const {actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, incomingDrain, damage, tests} = props;
-        const rollChatMessageOptions = {roll, actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, incomingDrain, damage, tests};
+        const {actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, damage, tests} = props;
+        const rollChatMessageOptions = {roll, actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, damage, tests};
         await createRollChatMessage(rollChatMessageOptions);
     }
 
@@ -455,5 +457,11 @@ export class ShadowrunRoller {
             const advancedProps = {...props, target};
             ShadowrunRoller.targetChatMessage(advancedProps);
         })
+    }
+
+    static _errorOnInvalidLimit(limit?: LimitField) {
+        if (limit && limit.value <= 0) {
+            ui.notifications.warn(game.i18n.localize('SR5.Warnings.NegativeLimitValue'));
+        }
     }
 }
