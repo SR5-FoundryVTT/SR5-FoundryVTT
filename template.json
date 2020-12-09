@@ -905,7 +905,7 @@
             "spiritType": ""
         },
         "critter": {
-            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "matrix", "movement", "condition_monitors"],
+            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "matrix", "movement", "condition_monitors"]
         },
         "sprite": {
             "templates": ["common", "skills", "attributes", "limits", "matrix"],
