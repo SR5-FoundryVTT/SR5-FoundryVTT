@@ -24,7 +24,8 @@
         "Character": "Character",
         "Spirit": "Spirit",
         "Sprite": "Sprite",
-        "Vehicle": "Vehicle"
+        "Vehicle": "Vehicle",
+        "Critter": "Critter"
     },
 
     "SR5.ActiveSkills": "Active Skills",
@@ -653,9 +654,11 @@
     },
 
     "SR5.CritterPower": {
+        "Category": "Category",
         "Type": "Type",
         "Duration": "Duration",
         "Range": "Range",
+        "Karma": "Karma",
         "Types": {
             "Mana": "Mana",
             "Physical": "Physical"
@@ -670,7 +673,19 @@
         "Ranges": {
             "LineOfSight": "Line Of Sight",
             "Touch": "Touch",
-            "Self": "Self"
+            "Self": "Self",
+            "LineOfSightArea": "Line Of Sight (A)"
+        },
+        "Categories": {
+            "Mundane": "Mundane",
+            "Paranormal": "Paranormal",
+            "FreeSpirit": "Free Spirit",
+            "Emergent": "Emergent",
+            "Shapeshifter": "Shapeshifter",
+            "Drake": "Drake",
+            "Echoes": "Echoes",
+            "ParanormalInfected": "Paranormal/Infected",
+            "Weakness": "Weakness"
         }
     },
 

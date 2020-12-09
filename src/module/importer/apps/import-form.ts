@@ -7,7 +7,9 @@ import { SpellImporter } from '../importer/SpellImporter';
 import { QualityImporter } from '../importer/QualityImporter';
 import { ComplexFormImporter } from '../importer/ComplexFormImporter';
 import { WareImporter } from '../importer/WareImporter';
+import { CritterPowerImporter } from '../importer/CritterPowerImporter';
 import { ImportHelper, ImportMode } from '../helper/ImportHelper';
+
 
 export class Import extends Application {
     private supportedDataFiles: string[] = [];
@@ -78,6 +80,7 @@ export class Import extends Application {
         new ComplexFormImporter(),
         new QualityImporter(),
         new WareImporter(),
+        new CritterPowerImporter(),
     ];
 
     async parseXML(xmlSource, fileName) {

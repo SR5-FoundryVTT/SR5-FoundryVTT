@@ -1,0 +1,117 @@
+<form class="{{cssClass}} wholesheet" autocomplete="off">
+    <header class="flexrow">
+        {{> 'systems/shadowrun5e/dist/templates/actor/parts/ProfileImage.html'
+            height='90px'
+            width='90px'
+        }}
+        <div class="flexcol flex-end border-right">
+            <div class="block">
+                {{> 'systems/shadowrun5e/dist/templates/actor/parts/NameInput.html' }}
+            </div>
+            <div class="attributes smooth">
+                <div class="block">
+                    {{#each data.track as |track id|}}
+                        {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
+                                name=(localize track.label)
+                                value=track.value
+                                max=track.max
+                                id=id
+                                tolerance=../woundTolerance
+                                disabled=track.disabled
+                        }}
+                        {{#if track.overflow}}
+                            {{#ife track.value track.max}}
+                                {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
+                                        name=(localize "SR5.Overflow")
+                                        value=track.overflow.value
+                                        max=track.overflow.max
+                                        id="overflow"
+                                }}
+                            {{/ife}}
+                        {{/if}}
+                    {{/each}}
+                </div>
+            </div>
+        </div>
+        <div class="flexcol flex-end">
+            <div class="attributes center">
+                {{> 'systems/shadowrun5e/dist/templates/actor/parts/Movement.html' }}
+                {{> 'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html' }}
+            </div>
+            <div class="attributes">
+                <div class="attribute">
+                    {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
+                            name=(localize "SR5.AttrEdge")
+                            value=data.attributes.edge.uses
+                            max=data.attributes.edge.value
+                            id="edge"
+                    }}
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="attributes no-border">
+        <div class="attribute row space-around">
+            <div class="Roll attribute-name" data-roll-id="composure">
+                {{localize "SR5.RollComposure"}}
+            </div>
+            <div class="Roll attribute-name" data-roll-id="judge-intentions">
+                {{localize "SR5.RollJudgeIntentions"}}
+            </div>
+            <div class="Roll attribute-name" data-roll-id="lift-carry">
+                {{localize "SR5.RollLiftCarry"}}
+            </div>
+            <div class="Roll attribute-name" data-roll-id="memory">
+                {{localize "SR5.RollMemory"}}
+            </div>
+            <div
+                    title="Roll"
+                    class="attribute-name Roll fas fa-dice-six"
+                    data-roll-id="prompt-roll"
+            ></div>
+            <div title="Defense" class="attribute-name Roll" data-roll-id="defense">
+                {{localize "SR5.RollDefense"}}
+            </div>
+            <div title="Soak" class="attribute-name Roll" data-roll-id="damage-resist">
+                {{localize "SR5.RollSoak"}}
+            </div>
+            <div class="attribute-name Roll" data-roll-id="armor">
+                {{localize "SR5.RollArmor"}} ({{data.armor.value}})
+            </div>
+
+            {{#if awakened}}
+                <div class="attribute-name Roll" data-roll-id="drain">
+                    {{localize "SR5.RollDrain"}}
+                </div>
+            {{/if}}
+
+            {{#if emerged}}
+                <div class="attribute-name Roll" data-roll-id="fade">
+                    {{localize "SR5.RollFade"}}
+                </div>
+            {{/if}}
+        </div>
+    </div>
+    <nav class="tabs" data-group="primary">
+        <a class="item" data-tab="actions">{{localize "SR5.Actions"}}</a>
+        <a class="item" data-tab="skills">{{localize "SR5.Skills"}}</a>
+        <a class="item" data-tab="critter_powers">{{localize "SR5.Labels.ActorSheet.CritterPowers"}}</a>
+        <a class="item active" data-tab="gear">{{localize "SR5.Gear"}}</a>
+        {{#ife data.special 'magic'}}
+        <a class="item" data-tab="magic">{{localize "SR5.Magic"}}</a>
+        {{/ife}}
+        <a class="item" data-tab="matrix">{{localize "SR5.Matrix"}}</a>
+        <a class="item" data-tab="bio">{{localize "SR5.Biography"}}</a>
+        <a class="item" data-tab="misc">{{localize "SR5.Miscellaneous"}}</a>
+    </nav>
+    <section class="sheetbody">
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/ActionsTab.html"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/SkillsTab.html"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/CritterPowersTab.html"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/MatrixTab.html"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/GearTab.html"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/MagicTab.html"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/BioTab.html"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/MiscTab.html"}}
+    </section>
+</form>
