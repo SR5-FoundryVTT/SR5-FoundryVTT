@@ -21956,7 +21956,7 @@ exports.CritterPowerImporter = void 0;
 const DataImporter_1 = require("./DataImporter");
 const ImportHelper_1 = require("../helper/ImportHelper");
 const CritterPowerParserBase_1 = require("../parser/critter-power/CritterPowerParserBase");
-const ParserMap_1 = require("../parser/ParserMap");
+const Constants_1 = require("./Constants");
 class CritterPowerImporter extends DataImporter_1.DataImporter {
     constructor() {
         super(...arguments);
@@ -22055,25 +22055,14 @@ class CritterPowerImporter extends DataImporter_1.DataImporter {
     }
     Parse(jsonObject) {
         return __awaiter(this, void 0, void 0, function* () {
-            const folders = yield ImportHelper_1.ImportHelper.MakeCategoryFolders(jsonObject, 'Critter Powers', this.categoryTranslations);
-            const parser = new ParserMap_1.ParserMap('category', [
-                { key: 'Drake', value: new CritterPowerParserBase_1.CritterPowerParserBase() },
-                { key: 'Echoes', value: new CritterPowerParserBase_1.CritterPowerParserBase() },
-                { key: 'Emergent', value: new CritterPowerParserBase_1.CritterPowerParserBase() },
-                { key: 'Free Spirit', value: new CritterPowerParserBase_1.CritterPowerParserBase() },
-                { key: 'Mundane', value: new CritterPowerParserBase_1.CritterPowerParserBase() },
-                { key: 'Paranormal', value: new CritterPowerParserBase_1.CritterPowerParserBase() },
-                { key: 'Paranormal/Infected', value: new CritterPowerParserBase_1.CritterPowerParserBase() },
-                { key: 'Weakness', value: new CritterPowerParserBase_1.CritterPowerParserBase() },
-                { key: 'Shapeshifter', value: new CritterPowerParserBase_1.CritterPowerParserBase() },
-            ]);
+            const parser = new CritterPowerParserBase_1.CritterPowerParserBase();
+            const folder = yield ImportHelper_1.ImportHelper.GetFolderAtPath(`${Constants_1.Constants.ROOT_IMPORT_FOLDER_NAME}/Critter Powers`, true);
             let datas = [];
             let jsonDatas = jsonObject['powers']['power'];
             for (let i = 0; i < jsonDatas.length; i++) {
                 let jsonData = jsonDatas[i];
                 let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
-                let category = ImportHelper_1.ImportHelper.StringValue(jsonData, 'category');
-                data.folder = folders[category.toLowerCase()].id;
+                data.folder = folder.id;
                 data.name = ImportHelper_1.ImportHelper.MapNameToTranslation(this.itemTranslations, data.name);
                 datas.push(data);
             }
@@ -22082,7 +22071,7 @@ class CritterPowerImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.CritterPowerImporter = CritterPowerImporter;
-},{"../helper/ImportHelper":131,"../parser/ParserMap":147,"../parser/critter-power/CritterPowerParserBase":150,"./DataImporter":140}],140:[function(require,module,exports){
+},{"../helper/ImportHelper":131,"../parser/critter-power/CritterPowerParserBase":150,"./Constants":138,"./DataImporter":140}],140:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22970,6 +22959,7 @@ const ImportHelper_1 = require("../../helper/ImportHelper");
 const ItemParserBase_1 = require("../item/ItemParserBase");
 class CritterPowerParserBase extends ItemParserBase_1.ItemParserBase {
     Parse(jsonData, data, jsonTranslation) {
+        console.log(jsonData);
         data.name = ImportHelper_1.ImportHelper.StringValue(jsonData, 'name');
         data.data.description.source = `${ImportHelper_1.ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper_1.ImportHelper.StringValue(jsonData, 'page')}`;
         data.data.category = ImportHelper_1.ImportHelper.StringValue(jsonData, 'category').toLowerCase();

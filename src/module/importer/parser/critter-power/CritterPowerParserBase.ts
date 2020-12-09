@@ -5,6 +5,9 @@ import { ItemParserBase } from '../item/ItemParserBase';
 
 export class CritterPowerParserBase extends ItemParserBase<CritterPower> {
     public Parse(jsonData: object, data: CritterPower, jsonTranslation?: object): CritterPower {
+
+        console.log(jsonData);
+
         data.name = ImportHelper.StringValue(jsonData, 'name');
 
         data.data.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;

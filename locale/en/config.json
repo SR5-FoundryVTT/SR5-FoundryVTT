@@ -674,7 +674,8 @@
             "LineOfSight": "Line Of Sight",
             "Touch": "Touch",
             "Self": "Self",
-            "LineOfSightArea": "Line Of Sight (A)"
+            "LineOfSightArea": "Line Of Sight (A)",
+            "Special": "Special"
         },
         "Categories": {
             "Mundane": "Mundane",

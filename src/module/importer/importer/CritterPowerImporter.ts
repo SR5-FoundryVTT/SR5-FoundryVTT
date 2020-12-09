@@ -3,6 +3,7 @@ import { ImportHelper } from '../helper/ImportHelper';
 import CritterPower = Shadowrun.CritterPower;
 import { CritterPowerParserBase } from '../parser/critter-power/CritterPowerParserBase';
 import { ParserMap } from '../parser/ParserMap';
+import { Constants } from './Constants';
 
 export class CritterPowerImporter extends DataImporter {
     public categoryTranslations: any;
@@ -105,33 +106,21 @@ export class CritterPowerImporter extends DataImporter {
     }
 
     async Parse(jsonObject: object): Promise<Entity> {
-        const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Critter Powers', this.categoryTranslations);
+      const parser = new CritterPowerParserBase();
+      const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Critter Powers`, true);
 
-        const parser = new ParserMap<CritterPower>('category', [
-            { key: 'Drake', value: new CritterPowerParserBase() },
-            { key: 'Echoes', value: new CritterPowerParserBase() },
-            { key: 'Emergent', value: new CritterPowerParserBase() },
-            { key: 'Free Spirit', value: new CritterPowerParserBase() },
-            { key: 'Mundane', value: new CritterPowerParserBase() },
-            { key: 'Paranormal', value: new CritterPowerParserBase() },
-            { key: 'Paranormal/Infected', value: new CritterPowerParserBase() },
-            { key: 'Weakness', value: new CritterPowerParserBase() },
-            { key: 'Shapeshifter', value: new CritterPowerParserBase() },
-        ]);
+      let datas: CritterPower[] = [];
+      let jsonDatas = jsonObject['powers']['power'];
+      for (let i = 0; i < jsonDatas.length; i++) {
+          let jsonData = jsonDatas[i];
 
-        let datas: CritterPower[] = [];
-        let jsonDatas = jsonObject['powers']['power'];
-        for (let i = 0; i < jsonDatas.length; i++) {
-            let jsonData = jsonDatas[i];
+          let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
+          data.folder = folder.id;
+          data.name = ImportHelper.MapNameToTranslation(this.itemTranslations, data.name);
 
-            let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
-            let category = ImportHelper.StringValue(jsonData, 'category');
-            data.folder = folders[category.toLowerCase()].id;
-            data.name = ImportHelper.MapNameToTranslation(this.itemTranslations, data.name);
+          datas.push(data);
+      }
 
-            datas.push(data);
-        }
-
-        return await Item.create(datas);
+      return await Item.create(datas);
     }
 }
