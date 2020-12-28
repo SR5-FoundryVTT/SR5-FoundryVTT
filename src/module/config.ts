@@ -8,6 +8,7 @@ export const SR5 = {
         contact: 'SR5.ItemTypes.Contact',
         critter_power: 'SR5.ItemTypes.CritterPower',
         cyberware: 'SR5.ItemTypes.Cyberware',
+        bioware: 'SR5.ItemTypes.Bioware',
         device: 'SR5.ItemTypes.Device',
         equipment: 'SR5.ItemTypes.Equipment',
         lifestyle: 'SR5.ItemTypes.Lifestyle',
