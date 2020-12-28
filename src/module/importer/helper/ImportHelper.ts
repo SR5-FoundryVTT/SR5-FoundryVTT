@@ -204,8 +204,9 @@ export class ImportHelper {
         return ImportHelper.MapNameToTranslationKey(translationMap, name, 'translate', name);
     }
 
-    public static MapNameToPageSource(translationMap, name): string {
-        return ImportHelper.MapNameToTranslationKey(translationMap, name, 'altpage', '?');
+    public static MapNameToPageSource(translationMap, name, fallback='?'): string {
+        console.error(translationMap, name, fallback);
+        return ImportHelper.MapNameToTranslationKey(translationMap, name, 'altpage', fallback);
     }
 }
 export type ItemComparer = (item: Item) => boolean;

@@ -5,6 +5,9 @@ const xml2js = require('xml2js');
 export abstract class DataImporter {
     public abstract files: string[];
     public static jsoni18n: any;
+    public categoryTranslations: any;
+    public entryTranslations: any;
+
     /**
      * Get default data for constructing a TItem.
      */
