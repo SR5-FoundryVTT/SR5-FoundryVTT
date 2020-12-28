@@ -16065,7 +16065,7 @@ class ItemPrep {
         const parts = new PartsList_1.PartsList();
         // add Items as values to lower the total value of essence
         items
-            .filter((item) => item.isCyberware() && item.isEquipped())
+            .filter((item) => item.isBodyware() && item.isEquipped())
             .forEach((item) => {
             if (item.getEssenceLoss()) {
                 parts.addUniquePart(item.getName(), -Number(item.getEssenceLoss()));
@@ -24893,6 +24893,12 @@ class SR5ItemDataWrapper extends DataWrapper_1.DataWrapper {
     }
     isCyberware() {
         return this.data.type === 'cyberware';
+    }
+    isBioware() {
+        return this.data.type === 'bioware';
+    }
+    isBodyware() {
+        return this.isCyberware() || this.isBioware();
     }
     isCombatSpell() {
         return this.isSpell() && this.getData().category === 'combat';
