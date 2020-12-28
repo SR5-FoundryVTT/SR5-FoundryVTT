@@ -90,7 +90,7 @@ export class DeviceImporter extends DataImporter {
         let cyberdecksFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatCyberdeck')}`, true);
 
         for (const commlink of commlinks) {
-            if (DeviceImporter.unsupportedDevice(commlink)) {
+            if (DeviceImporter.unsupportedEntry(commlink)) {
                 continue;
             }
             const data = this.GetDefaultData();
@@ -98,7 +98,6 @@ export class DeviceImporter extends DataImporter {
             data.name = ImportHelper.StringValue(commlink, 'name');
             data.name = ImportHelper.MapNameToTranslation(this.entryTranslations, data.name);
 
-            // TODO: i18n
             data.data.description.source = `${ImportHelper.StringValue(commlink, 'source')} ${ImportHelper.MapNameToPageSource(this.entryTranslations, ImportHelper.StringValue(commlink, 'name'), ImportHelper.StringValue(commlink, 'page'))}`;
             data.data.technology.rating = ImportHelper.IntValue(commlink, 'devicerating', 0);
             data.data.technology.availability = ImportHelper.StringValue(commlink, 'avail');
@@ -113,7 +112,7 @@ export class DeviceImporter extends DataImporter {
         }
 
         for (const cyberdeck of cyberdecks) {
-            if (DeviceImporter.unsupportedDevice(cyberdeck)) {
+            if (DeviceImporter.unsupportedEntry(cyberdeck)) {
                 continue;
             }
 
@@ -122,7 +121,6 @@ export class DeviceImporter extends DataImporter {
             data.data.category = 'cyberdeck';
             data.name = ImportHelper.StringValue(cyberdeck, 'name');
             data.name = ImportHelper.MapNameToTranslation(this.entryTranslations, data.name);
-            // TODO: i18n
 
             data.data.description.source = `${ImportHelper.StringValue(cyberdeck, 'source')} ${ImportHelper.MapNameToPageSource(this.entryTranslations, ImportHelper.StringValue(cyberdeck, 'name'), ImportHelper.StringValue(cyberdeck, 'page'))}`;
             data.data.technology.rating = ImportHelper.IntValue(cyberdeck, 'devicerating', 0);
@@ -162,7 +160,11 @@ export class DeviceImporter extends DataImporter {
 
     /* List of unsupported Commlinks, due to dynamics value calculations.
      */
-    static unsupportedDevice(jsonData): boolean {
+    static unsupportedEntry(jsonData): boolean {
+        if (super.unsupportedEntry(jsonData)) {
+            return true;
+        }
+
         const unsupportedIds = [
             'd63eb841-7b15-4539-9026-b90a4924aeeb',  // Dynamic rating value.
         ];

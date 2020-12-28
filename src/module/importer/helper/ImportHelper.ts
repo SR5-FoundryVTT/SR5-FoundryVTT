@@ -205,7 +205,6 @@ export class ImportHelper {
     }
 
     public static MapNameToPageSource(translationMap, name, fallback='?'): string {
-        console.error(translationMap, name, fallback);
         return ImportHelper.MapNameToTranslationKey(translationMap, name, 'altpage', fallback);
     }
 }
