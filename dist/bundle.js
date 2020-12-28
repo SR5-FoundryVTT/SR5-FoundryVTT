@@ -19040,6 +19040,7 @@ exports.SR5 = {
         contact: 'SR5.ItemTypes.Contact',
         critter_power: 'SR5.ItemTypes.CritterPower',
         cyberware: 'SR5.ItemTypes.Cyberware',
+        bioware: 'SR5.ItemTypes.Bioware',
         device: 'SR5.ItemTypes.Device',
         equipment: 'SR5.ItemTypes.Equipment',
         lifestyle: 'SR5.ItemTypes.Lifestyle',
@@ -20095,7 +20096,7 @@ exports.registerItemLineHelpers = () => {
                     const count = (_f = (_e = wrapper.getAmmo()) === null || _e === void 0 ? void 0 : _e.current.value) !== null && _f !== void 0 ? _f : 0;
                     const max = (_h = (_g = wrapper.getAmmo()) === null || _g === void 0 ? void 0 : _g.current.max) !== null && _h !== void 0 ? _h : 0;
                     const text = count < max ? `${game.i18n.localize('SR5.WeaponReload')} (${count}/${max})` : game.i18n.localize('SR5.AmmoFull');
-                    const cssClass = 'no-break' + (count < max ? ' reload-ammo roll' : ' faded');
+                    const cssClass = 'no-break' + (count < max ? ' reload-ammo roll' : 'faded');
                     return [
                         {
                             text: {
