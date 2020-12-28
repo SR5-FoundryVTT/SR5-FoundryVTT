@@ -114,15 +114,12 @@ export class SR5Item extends Item {
         }
     }
 
-    async update(data, options?) {
-        const ret = super.update(data, options);
-        ret.then(() => {
-            if (this.actor) {
-                this.actor.render(false);
-            }
-        });
-        return ret;
+    /** Overwrite to allow for options param to be skipped.
+     */
+    async update(data, options?): Promise<this> {
+        return super.update(data, options);
     }
+
     get hasOpposedRoll(): boolean {
         return !!(this.data.data.action && this.data.data.action.opposed.type);
     }
@@ -696,21 +693,32 @@ export class SR5Item extends Item {
     prepareEmbeddedEntities() {
         super.prepareEmbeddedEntities();
         let items = this.getEmbeddedItems();
+
+        // Templates and further logic need a items HashMap, yet the flag provides an array.
         if (items) {
+
             const existing = (this.items || []).reduce((object, i) => {
                 object[i.id] = i;
                 return object;
             }, {});
-            this.items = items.map((i) => {
-                if (i._id in existing) {
-                    const a = existing[i._id];
-                    a.data = i;
-                    a.prepareData();
-                    return a;
+
+            // Merge possible changes / new items from the flag into the current item instance.
+            this.items = items.map((item) => {
+                if (item._id in existing) {
+                    const currentItem = existing[item._id];
+
+                    // Patch .data isn't really anymore but do it for consistency.
+                    // Patch ._data is needed for Item.prepareData to work, as it's simply duplicating _data over data.
+                    // Otherwise old item data will be used for value preparation.
+                    currentItem.data = item;
+                    currentItem._data = item;
+                    currentItem.prepareData();
+                    return currentItem;
+
                 } else {
                     // dirty things done here
                     // @ts-ignore
-                    return Item.createOwned(i, this);
+                    return Item.createOwned(item, this);
                 }
             });
         }
