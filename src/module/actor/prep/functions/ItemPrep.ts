@@ -47,7 +47,7 @@ export class ItemPrep {
         const parts = new PartsList<number>();
         // add Items as values to lower the total value of essence
         items
-            .filter((item) => item.isCyberware() && item.isEquipped())
+            .filter((item) => item.isBodyware() && item.isEquipped())
             .forEach((item) => {
                 if (item.getEssenceLoss()) {
                     parts.addUniquePart(item.getName(), -Number(item.getEssenceLoss()));

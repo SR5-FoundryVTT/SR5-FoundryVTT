@@ -49,6 +49,14 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
         return this.data.type === 'cyberware';
     }
 
+    isBioware(): boolean {
+        return this.data.type === 'bioware';
+    }
+
+    isBodyware(): boolean {
+        return this.isCyberware() || this.isBioware();
+    }
+
     isCombatSpell(): boolean {
         return this.isSpell() && this.getData().category === 'combat';
     }
