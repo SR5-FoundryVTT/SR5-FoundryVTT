@@ -15311,7 +15311,7 @@ class CharacterPrep extends BaseActorPrep_1.BaseActorPrep {
         ModifiersPrep_1.ModifiersPrep.prepareModifiers(this.data);
         ModifiersPrep_1.ModifiersPrep.clearAttributeMods(this.data);
         ItemPrep_1.ItemPrep.prepareArmor(this.data, this.items);
-        ItemPrep_1.ItemPrep.prepareCyberware(this.data, this.items);
+        ItemPrep_1.ItemPrep.prepareBodyware(this.data, this.items);
         SkillsPrep_1.SkillsPrep.prepareSkills(this.data);
         AttributesPrep_1.AttributesPrep.prepareAttributes(this.data);
         LimitsPrep_1.LimitsPrep.prepareLimitBaseFromAttributes(this.data);
@@ -16057,15 +16057,15 @@ class ItemPrep {
         armor.value = helpers_1.Helpers.calcTotal(armor);
     }
     /**
-     * Prepare actor data for cyberware changes
+     * Prepare actor data for ware changes
      * - this calculates the actors essence
      */
-    static prepareCyberware(data, items) {
+    static prepareBodyware(data, items) {
         const { attributes } = data;
         const parts = new PartsList_1.PartsList();
         // add Items as values to lower the total value of essence
         items
-            .filter((item) => item.isCyberware() && item.isEquipped())
+            .filter((item) => item.isBodyware() && item.isEquipped())
             .forEach((item) => {
             if (item.getEssenceLoss()) {
                 parts.addUniquePart(item.getName(), -Number(item.getEssenceLoss()));
@@ -24895,6 +24895,12 @@ class SR5ItemDataWrapper extends DataWrapper_1.DataWrapper {
     }
     isCyberware() {
         return this.data.type === 'cyberware';
+    }
+    isBioware() {
+        return this.data.type === 'bioware';
+    }
+    isBodyware() {
+        return this.isCyberware() || this.isBioware();
     }
     isCombatSpell() {
         return this.isSpell() && this.getData().category === 'combat';

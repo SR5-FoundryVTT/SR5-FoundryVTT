@@ -39,15 +39,15 @@ export class ItemPrep {
         armor.value = Helpers.calcTotal(armor);
     }
     /**
-     * Prepare actor data for cyberware changes
+     * Prepare actor data for ware changes
      * - this calculates the actors essence
      */
-    static prepareCyberware(data: SR5ActorData, items: SR5ItemDataWrapper[]) {
+    static prepareBodyware(data: SR5ActorData, items: SR5ItemDataWrapper[]) {
         const { attributes } = data;
         const parts = new PartsList<number>();
         // add Items as values to lower the total value of essence
         items
-            .filter((item) => item.isCyberware() && item.isEquipped())
+            .filter((item) => item.isBodyware() && item.isEquipped())
             .forEach((item) => {
                 if (item.getEssenceLoss()) {
                     parts.addUniquePart(item.getName(), -Number(item.getEssenceLoss()));

@@ -19,7 +19,7 @@ export class CharacterPrep extends BaseActorPrep<SR5CharacterType, CharacterActo
         ModifiersPrep.clearAttributeMods(this.data);
 
         ItemPrep.prepareArmor(this.data, this.items);
-        ItemPrep.prepareCyberware(this.data, this.items);
+        ItemPrep.prepareBodyware(this.data, this.items);
 
         SkillsPrep.prepareSkills(this.data);
         AttributesPrep.prepareAttributes(this.data);
