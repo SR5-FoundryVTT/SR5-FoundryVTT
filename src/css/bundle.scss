@@ -589,6 +589,12 @@ select.display {
                 width: 16em;
             }
         }
+        .item-create,
+        .add-new-ammo,
+        .add-new-mod,
+        .add-new-license {
+            color: $color;
+        }
         .skill-item {
             width: 8em;
         }
