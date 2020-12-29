@@ -20,8 +20,12 @@
                 <div>
                     {{#if this.parsed}}
                         Imported
+                    {{else if this.parsing}}
+                        Importing...
+                    {{else if this.missing}}
+                        <b>Missing</b>
                     {{else}}
-                        {{#if this.missing}}<b>Missing</b>{{else}}Selected{{/if}}
+                        Selected
                     {{/if}}
                 </div>
                 {{/each}}
