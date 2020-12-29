@@ -814,18 +814,18 @@ export class SR5Item extends Item {
             return undefined;
         }
 
-        const action = duplicate(this.data.data.action); // TODO replace with getAction() when available
+        const {damage} = this.getAction();
 
         // add attribute value to the damage if we
-        if (action.damage.attribute) {
-            const { attribute } = action.damage;
+        if (damage.attribute) {
+            const { attribute } = damage;
             const att = this.actor.findAttribute(attribute);
             if (att) {
-                action.damage.mod = PartsList.AddUniquePart(action.damage.mod, att.label, att.value);
-                action.damage.value = Helpers.calcTotal(action.damage);
+                damage.mod = PartsList.AddUniquePart(damage.mod, att.label, att.value);
+                damage.value = Helpers.calcTotal(damage);
             }
         }
-        const {damage} = this.getAction();
+
         const data: AttackData = {
             hits,
             damage,
