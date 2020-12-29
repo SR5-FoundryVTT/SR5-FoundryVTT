@@ -742,6 +742,10 @@ select.display {
   cursor: pointer;
   color: #6495ed; }
 
+.sr5 .editor {
+  height: 95%;
+  width: 100%; }
+
 .sr5 .editor .tox-edit-area {
   background: #939393; }
 
