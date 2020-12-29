@@ -17,6 +17,7 @@ export class Import extends Application {
     private langDataFile: File;
     private parsedFiles: string[] = [];
     private disableImportButton: boolean = true;
+    private currentParsedFile: string;
 
     constructor() {
         super();
@@ -42,11 +43,13 @@ export class Import extends Application {
         this.supportedDataFiles.forEach((supportedFileName: string) => {
             const missing = !this.dataFiles.some((dataFile) => supportedFileName === dataFile.name);
             const parsed = this.parsedFiles.some((parsedFileName) => supportedFileName === parsedFileName);
+            const parsing = supportedFileName === this.currentParsedFile;
 
             data.dataFiles[supportedFileName] = {
                 name: supportedFileName,
                 missing,
                 parsed,
+                parsing
             };
         });
         data.langDataFile = this.langDataFile ? this.langDataFile.name : '';
@@ -138,6 +141,12 @@ export class Import extends Application {
                 const dataFile = this.dataFiles.find((dataFile) => dataFile.name === supportedFile);
                 if (dataFile) {
                     const text = await dataFile.text();
+
+                     // Show status for current parsing progression.
+                    this.currentParsedFile = dataFile.name;
+                    await this.render();
+
+
                     await this.parseXML(text, dataFile.name);
 
                     // Store status to show parsing progression.
