@@ -258,7 +258,7 @@ export const registerItemLineHelpers = () => {
                     const count = wrapper.getAmmo()?.current.value ?? 0;
                     const max = wrapper.getAmmo()?.current.max ?? 0;
                     const text = count < max ? `${game.i18n.localize('SR5.WeaponReload')} (${count}/${max})` : game.i18n.localize('SR5.AmmoFull');
-                    const cssClass = 'no-break' + (count < max ? ' reload-ammo roll' : ' faded');
+                    const cssClass = 'no-break' + (count < max ? ' reload-ammo roll' : 'faded');
                     return [
                         {
                             text: {

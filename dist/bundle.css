@@ -41,7 +41,7 @@
       font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
       flex: 0;
       padding: 0 0.5em;
-      color: #4d4d4d;
+      color: white;
       display: flex;
       flex-flow: column;
       align-content: center;
@@ -699,6 +699,8 @@ input[type='text'].display {
   border-color: black;
   text-align: center;
   min-height: 1em; }
+  input[type='text'].display::placeholder {
+    color: #b3b3b3; }
   input[type='text'].display.short {
     font-size: 0.75em;
     background: rgba(77, 77, 77, 0.1); }
@@ -771,7 +773,7 @@ select.display {
   color: white;
   overflow: hidden; }
 
-.sr5 .editor {
+.sr5 .description > .editor {
   height: 15em;
   width: 100%;
   color: white; }
@@ -1005,7 +1007,7 @@ select.display {
     height: 100%;
     border: #e6e6e6; }
     .sr5 .list-item .item-text.faded {
-      color: #4d4d4d; }
+      color: grey; }
     .sr5 .list-item .item-text.center {
       display: flex;
       flex-flow: row;
@@ -1030,6 +1032,11 @@ select.display {
       width: 9.5em; }
     .sr5 .list-item .item-text.desc {
       width: 16em; }
+  .sr5 .list-item .item-create,
+  .sr5 .list-item .add-new-ammo,
+  .sr5 .list-item .add-new-mod,
+  .sr5 .list-item .add-new-license {
+    color: white; }
   .sr5 .list-item .skill-item {
     width: 8em; }
   .sr5 .list-item .skill-spec-item {
