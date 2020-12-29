@@ -11,6 +11,7 @@ import { ModifiersPrep } from './functions/ModifiersPrep';
 import { InitiativePrep } from './functions/InitiativePrep';
 import SpiritType = Shadowrun.SpiritType;
 import { Helpers } from '../../helpers';
+import {PartsList} from "../../parts/PartsList";
 
 export class SpiritPrep extends BaseActorPrep<SR5SpiritType, SpiritActorData> {
     prepare() {
@@ -32,8 +33,6 @@ export class SpiritPrep extends BaseActorPrep<SR5SpiritType, SpiritActorData> {
         MovementPrep.prepareMovement(this.data);
         WoundsPrep.prepareWounds(this.data);
 
-        InitiativePrep.prepareMeatspaceInit(this.data);
-        InitiativePrep.prepareAstralInit(this.data);
         InitiativePrep.prepareCurrentInitiative(this.data);
 
         this.data.special = 'magic';
@@ -58,9 +57,14 @@ export class SpiritPrep extends BaseActorPrep<SR5SpiritType, SpiritActorData> {
 
             // prepare initiative data
             initiative.meatspace.base.base = force * 2 + overrides.init + Number(modifiers['astral_initiative']);
+            initiative.meatspace.base.mod = PartsList.AddUniquePart(initiative.meatspace.base.mod, "SR5.Bonus", Number(modifiers['meat_initiative']));
             initiative.meatspace.dice.base = 2;
+            initiative.meatspace.dice.mod = PartsList.AddUniquePart(initiative.meatspace.dice.mod, "SR5.Bonus", Number(modifiers['meat_initiative_dice']));
+
             initiative.astral.base.base = force * 2 + overrides.astral_init + Number(modifiers['astral_initiative_dice']);
+            initiative.astral.base.mod = PartsList.AddUniquePart(initiative.astral.base.mod, "SR5.Bonus", Number(modifiers['astral_initiative']));
             initiative.astral.dice.base = 3;
+            initiative.astral.dice.mod = PartsList.AddUniquePart(initiative.astral.dice.mod, "SR5.Bonus", Number(modifiers['astral_initiative_dice']));
         }
     }
 
@@ -146,7 +150,8 @@ export class SpiritPrep extends BaseActorPrep<SR5SpiritType, SpiritActorData> {
                 overrides.attributes.body = 1;
                 overrides.attributes.reaction = 2;
                 overrides.attributes.strength = -2;
-                overrides.attributes.logic = 1;
+                overrides.attributes.intuition = 1;
+                overrides.init = 2;
                 overrides.skills.push('assensing', 'astral_combat', 'perception', 'spellcasting', 'unarmed_combat');
                 break;
             case 'plant':

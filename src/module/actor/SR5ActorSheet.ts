@@ -131,7 +131,6 @@ export class SR5ActorSheet extends ActorSheet {
 
     _prepareActorTypeFields(data: SR5ActorSheetData) {
         data.isCharacter = this.actor.isCharacter();
-        console.error(data.isCharacter);
         data.isSpirit = this.actor.isSpirit();
     }
 

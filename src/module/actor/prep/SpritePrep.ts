@@ -28,7 +28,6 @@ export class SpritePrep extends BaseActorPrep<SR5SpriteType, SpriteActorData> {
 
         MatrixPrep.prepareMatrixToLimitsAndAttributes(this.data);
 
-        InitiativePrep.prepareMatrixInit(this.data);
         InitiativePrep.prepareCurrentInitiative(this.data);
 
         this.data.special = 'resonance';
