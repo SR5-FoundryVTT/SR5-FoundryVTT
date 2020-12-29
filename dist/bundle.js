@@ -14471,8 +14471,8 @@ class SR5ActorSheet extends ActorSheet {
         data.woundTolerance = 3 + (Number(mods['wound_tolerance']) || 0);
     }
     _prepareActorTypeFields(data) {
-        data.isCharacter = this.actor.data.type === 'character';
-        data.isSpirit = this.actor.data.type === 'spirit';
+        data.isCharacter = this.actor.isCharacter();
+        data.isSpirit = this.actor.isSpirit();
     }
     _prepareMatrixAttributes(data) {
         const { matrix } = data.data;
@@ -15351,6 +15351,7 @@ const WoundsPrep_1 = require("./functions/WoundsPrep");
 const ModifiersPrep_1 = require("./functions/ModifiersPrep");
 const InitiativePrep_1 = require("./functions/InitiativePrep");
 const helpers_1 = require("../../helpers");
+const PartsList_1 = require("../../parts/PartsList");
 class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
     prepare() {
         ModifiersPrep_1.ModifiersPrep.prepareModifiers(this.data);
@@ -15383,9 +15384,13 @@ class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
             }
             // prepare initiative data
             initiative.meatspace.base.base = force * 2 + overrides.init + Number(modifiers['astral_initiative']);
+            initiative.meatspace.base.mod = PartsList_1.PartsList.AddUniquePart(initiative.meatspace.base.mod, "SR5.Bonus", Number(modifiers['meat_initiative']));
             initiative.meatspace.dice.base = 2;
+            initiative.meatspace.dice.mod = PartsList_1.PartsList.AddUniquePart(initiative.meatspace.dice.mod, "SR5.Bonus", Number(modifiers['meat_initiative_dice']));
             initiative.astral.base.base = force * 2 + overrides.astral_init + Number(modifiers['astral_initiative_dice']);
+            initiative.astral.base.mod = PartsList_1.PartsList.AddUniquePart(initiative.astral.base.mod, "SR5.Bonus", Number(modifiers['astral_initiative']));
             initiative.astral.dice.base = 3;
+            initiative.astral.dice.mod = PartsList_1.PartsList.AddUniquePart(initiative.astral.dice.mod, "SR5.Bonus", Number(modifiers['astral_initiative_dice']));
         }
     }
     static prepareSpiritArmor(data) {
@@ -15470,7 +15475,8 @@ class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
                 overrides.attributes.body = 1;
                 overrides.attributes.reaction = 2;
                 overrides.attributes.strength = -2;
-                overrides.attributes.logic = 1;
+                overrides.attributes.intuition = 1;
+                overrides.init = 2;
                 overrides.skills.push('assensing', 'astral_combat', 'perception', 'spellcasting', 'unarmed_combat');
                 break;
             case 'plant':
@@ -15651,7 +15657,7 @@ class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
 }
 exports.SpiritPrep = SpiritPrep;
 
-},{"../../helpers":127,"./BaseActorPrep":88,"./functions/AttributesPrep":93,"./functions/ConditionMonitorsPrep":94,"./functions/InitiativePrep":95,"./functions/LimitsPrep":97,"./functions/ModifiersPrep":99,"./functions/MovementPrep":100,"./functions/SkillsPrep":102,"./functions/WoundsPrep":103}],91:[function(require,module,exports){
+},{"../../helpers":127,"../../parts/PartsList":176,"./BaseActorPrep":88,"./functions/AttributesPrep":93,"./functions/ConditionMonitorsPrep":94,"./functions/InitiativePrep":95,"./functions/LimitsPrep":97,"./functions/ModifiersPrep":99,"./functions/MovementPrep":100,"./functions/SkillsPrep":102,"./functions/WoundsPrep":103}],91:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpritePrep = void 0;
