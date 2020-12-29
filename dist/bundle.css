@@ -41,7 +41,7 @@
       font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
       flex: 0;
       padding: 0 0.5em;
-      color: #4d4d4d;
+      color: white;
       display: flex;
       flex-flow: column;
       align-content: center;
@@ -1032,6 +1032,11 @@ select.display {
       width: 9.5em; }
     .sr5 .list-item .item-text.desc {
       width: 16em; }
+  .sr5 .list-item .item-create,
+  .sr5 .list-item .add-new-ammo,
+  .sr5 .list-item .add-new-mod,
+  .sr5 .list-item .add-new-license {
+    color: white; }
   .sr5 .list-item .skill-item {
     width: 8em; }
   .sr5 .list-item .skill-spec-item {
