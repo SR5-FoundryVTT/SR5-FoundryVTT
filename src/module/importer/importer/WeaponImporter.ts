@@ -7,6 +7,7 @@ import { ThrownParser } from '../parser/weapon/ThrownParser';
 import { ParserMap } from '../parser/ParserMap';
 import Weapon = Shadowrun.Weapon;
 import { WeaponParserBase } from '../parser/weapon/WeaponParserBase';
+import {DeviceImporter} from "./DeviceImporter";
 
 export class WeaponImporter extends DataImporter {
     public categoryTranslations: any;
@@ -175,6 +176,10 @@ export class WeaponImporter extends DataImporter {
         let jsonDatas = jsonObject['weapons']['weapon'];
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
+
+            if (DataImporter.unsupportedEntry(jsonData)) {
+                continue;
+            }
 
             let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
             data.folder = folders[data.data.subcategory].id;
