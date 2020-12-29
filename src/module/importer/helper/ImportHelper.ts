@@ -117,6 +117,13 @@ export class ImportHelper {
         return result;
     }
 
+    public static TranslateCategory(name, jsonCategoryTranslations?) {
+        if (jsonCategoryTranslations && jsonCategoryTranslations.hasOwnProperty(name)) {
+            return jsonCategoryTranslations[name];
+        }
+
+        return name;
+    }
     //TODO
     public static async MakeCategoryFolders(
         jsonData: object,
@@ -130,9 +137,7 @@ export class ImportHelper {
             let categoryName = jsonCategories[i][ImportHelper.CHAR_KEY];
             // use untranslated category name for easier mapping during DataImporter.Parse implementations.
             let origCategoryName = categoryName;
-            if (jsonCategoryTranslations && jsonCategoryTranslations.hasOwnProperty(categoryName)) {
-                categoryName = jsonCategoryTranslations[categoryName];
-            }
+            categoryName = ImportHelper.TranslateCategory(categoryName, jsonCategoryTranslations);
             folders[origCategoryName.toLowerCase()] = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${path}/${categoryName}`, true);
         }
 
@@ -204,8 +209,8 @@ export class ImportHelper {
         return ImportHelper.MapNameToTranslationKey(translationMap, name, 'translate', name);
     }
 
-    public static MapNameToPageSource(translationMap, name): string {
-        return ImportHelper.MapNameToTranslationKey(translationMap, name, 'altpage', '?');
+    public static MapNameToPageSource(translationMap, name, fallback='?'): string {
+        return ImportHelper.MapNameToTranslationKey(translationMap, name, 'altpage', fallback);
     }
 }
 export type ItemComparer = (item: Item) => boolean;

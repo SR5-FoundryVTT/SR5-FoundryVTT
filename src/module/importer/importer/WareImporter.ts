@@ -4,6 +4,7 @@ import { CyberwareParser } from '../parser/ware/CyberwareParser';
 import Ware = Shadowrun.Ware;
 import Cyberware = Shadowrun.Cyberware;
 import Bioware = Shadowrun.Bioware;
+import {DeviceImporter} from "./DeviceImporter";
 
 export class WareImporter extends DataImporter {
     public categoryTranslations: any;
@@ -149,6 +150,10 @@ export class WareImporter extends DataImporter {
         let jsonDatas = jsonObject[key + 's'][key];
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
+
+            if (DataImporter.unsupportedEntry(jsonData)) {
+                continue;
+            }
 
             const defaultData = key === 'cyberware' ? this.GetDefaultCyberwareData() : this.GetDefaultBiowareData();
             let data = cyberParser.Parse(jsonData, defaultData, this.itemTranslations);

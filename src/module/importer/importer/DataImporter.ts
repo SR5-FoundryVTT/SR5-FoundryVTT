@@ -5,6 +5,10 @@ const xml2js = require('xml2js');
 export abstract class DataImporter {
     public abstract files: string[];
     public static jsoni18n: any;
+    public categoryTranslations: any;
+    public entryTranslations: any;
+    public static unsupportedBooks: string[] = ['2050'];
+
     /**
      * Get default data for constructing a TItem.
      */
@@ -59,5 +63,19 @@ export abstract class DataImporter {
         });
 
         return (await parser.parseStringPromise(xmlString))['chummer'];
+    }
+
+    public static unsupportedBookSource(jsonObject) {
+        if (!jsonObject.hasOwnProperty('source')) return false;
+        const source = ImportHelper.StringValue(jsonObject, 'source', '');
+        return DataImporter.unsupportedBooks.includes(source);
+    }
+
+    public static unsupportedEntry(jsonObject) {
+        if (DataImporter.unsupportedBookSource(jsonObject)) {
+            return true;
+        }
+
+        return false;
     }
 }
