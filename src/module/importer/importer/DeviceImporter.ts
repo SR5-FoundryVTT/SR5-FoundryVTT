@@ -66,10 +66,6 @@ export class DeviceImporter extends DataImporter {
         };
     }
 
-    // GetItemData(options) {
-    //     return Item.create({...options, type: 'device'});
-    // }
-
     ExtractTranslation(fileName?: string) {
         if (!DataImporter.jsoni18n) {
             return;
@@ -161,7 +157,6 @@ export class DeviceImporter extends DataImporter {
         let entries = [];
         const commlinks = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Commlinks');
         const cyberdecks = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Cyberdecks');
-
 
         let commlinksFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatCommlink')}`, true);
         let cyberdecksFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatCyberdeck')}`, true);

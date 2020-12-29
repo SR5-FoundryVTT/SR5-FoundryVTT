@@ -9,6 +9,7 @@ import { ComplexFormImporter } from '../importer/ComplexFormImporter';
 import { WareImporter } from '../importer/WareImporter';
 import { ImportHelper, ImportMode } from '../helper/ImportHelper';
 import {DeviceImporter} from "../importer/DeviceImporter";
+import {EquipmentImporter} from "../importer/EquipmentImporter";
 
 export class Import extends Application {
     private supportedDataFiles: string[] = [];
@@ -80,6 +81,7 @@ export class Import extends Application {
         new QualityImporter(),
         new WareImporter(),
         new DeviceImporter(),
+        new EquipmentImporter()
     ];
 
     async parseXML(xmlSource, fileName) {
