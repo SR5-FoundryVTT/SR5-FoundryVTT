@@ -32,6 +32,8 @@ export class SpiritPrep extends BaseActorPrep<SR5SpiritType, SpiritActorData> {
         MovementPrep.prepareMovement(this.data);
         WoundsPrep.prepareWounds(this.data);
 
+        InitiativePrep.prepareMeatspaceInit(this.data);
+        InitiativePrep.prepareAstralInit(this.data);
         InitiativePrep.prepareCurrentInitiative(this.data);
 
         this.data.special = 'magic';
