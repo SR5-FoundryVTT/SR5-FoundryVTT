@@ -80,17 +80,11 @@ export class DeviceImporter extends DataImporter {
         this.entryTranslations = ImportHelper.ExtractItemTranslation(jsonGeari18n, 'gears', 'gear');
     }
 
-    async Parse(jsonObject: object): Promise<Entity> {
-
-        const commlinks = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Commlinks');
-        const cyberdecks = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Cyberdecks');
+    ParseCommlinkDevices(commlinks, folder) {
         const entries = [];
 
-        let commlinksFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatCommlink')}`, true);
-        let cyberdecksFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatCyberdeck')}`, true);
-
         for (const commlink of commlinks) {
-            if (DeviceImporter.unsupportedEntry(commlink)) {
+            if (DataImporter.unsupportedEntry(commlink)) {
                 continue;
             }
             const data = this.GetDefaultData();
@@ -106,13 +100,19 @@ export class DeviceImporter extends DataImporter {
             data.data.atts.att4.value = ImportHelper.IntValue(commlink, 'firewall', 0);
 
             //@ts-ignore
-            data.folder = commlinksFolder.id;
+            data.folder = folder.id;
             //@ts-ignore
             entries.push(data);
         }
 
+        return entries;
+    }
+
+    ParseCyberdeckDevices(cyberdecks, folder) {
+        const entries = [];
+
         for (const cyberdeck of cyberdecks) {
-            if (DeviceImporter.unsupportedEntry(cyberdeck)) {
+            if (DataImporter.unsupportedEntry(cyberdeck)) {
                 continue;
             }
 
@@ -149,11 +149,25 @@ export class DeviceImporter extends DataImporter {
             }
 
             //@ts-ignore
-            data.folder = cyberdecksFolder.id;
+            data.folder = folder.id;
             //@ts-ignore
             entries.push(data);
         }
 
+        return entries;
+    }
+
+    async Parse(jsonObject: object): Promise<Entity> {
+        let entries = [];
+        const commlinks = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Commlinks');
+        const cyberdecks = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Cyberdecks');
+
+
+        let commlinksFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatCommlink')}`, true);
+        let cyberdecksFolder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/${game.i18n.localize('SR5.DeviceCatCyberdeck')}`, true);
+
+        entries = entries.concat(this.ParseCommlinkDevices(commlinks, commlinksFolder));
+        entries = entries.concat(this.ParseCyberdeckDevices(cyberdecks, cyberdecksFolder));
 
         return await Item.create(entries)
     }
@@ -161,7 +175,7 @@ export class DeviceImporter extends DataImporter {
     /* List of unsupported Commlinks, due to dynamics value calculations.
      */
     static unsupportedEntry(jsonData): boolean {
-        if (super.unsupportedEntry(jsonData)) {
+        if (DataImporter.unsupportedEntry(jsonData)) {
             return true;
         }
 

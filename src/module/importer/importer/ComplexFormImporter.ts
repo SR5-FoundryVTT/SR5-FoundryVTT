@@ -3,6 +3,7 @@ import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
 import { ComplexFormParserBase } from '../parser/complex-form/ComplexFormParserBase';
 import ComplexForm = Shadowrun.ComplexForm;
+import {DeviceImporter} from "./DeviceImporter";
 
 export class ComplexFormImporter extends DataImporter {
     public categoryTranslations: any;
@@ -101,6 +102,9 @@ export class ComplexFormImporter extends DataImporter {
         let jsonDatas = jsonObject['complexforms']['complexform'];
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
+            if (DataImporter.unsupportedEntry(jsonData)) {
+                continue;
+            }
 
             let data = parser.Parse(jsonData, this.GetDefaultData(), this.nameTranslations);
             data.folder = folder.id;

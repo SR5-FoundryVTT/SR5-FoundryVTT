@@ -2,6 +2,7 @@ import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { QualityParserBase } from '../parser/quality/QualityParserBase';
 import Quality = Shadowrun.Quality;
+import {DeviceImporter} from "./DeviceImporter";
 
 export class QualityImporter extends DataImporter {
     public categoryTranslations: any;
@@ -101,6 +102,11 @@ export class QualityImporter extends DataImporter {
         let jsonDatas = jsonObject['qualities']['quality'];
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
+
+            if (DataImporter.unsupportedEntry(jsonData)) {
+                continue;
+            }
+
             let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
 
             let category = ImportHelper.StringValue(jsonData, 'category');

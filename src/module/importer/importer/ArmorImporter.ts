@@ -2,6 +2,7 @@ import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import Armor = Shadowrun.Armor;
 import { ArmorParserBase } from '../parser/armor/ArmorParserBase';
+import {DeviceImporter} from "./DeviceImporter";
 
 export class ArmorImporter extends DataImporter {
     public armorTranslations: any;
@@ -78,6 +79,9 @@ export class ArmorImporter extends DataImporter {
         let jsonDatas = jsonObject['armors']['armor'];
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
+            if (DataImporter.unsupportedEntry(jsonData)) {
+                continue;
+            }
 
             let data = parser.Parse(jsonData, this.GetDefaultData());
             const category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
