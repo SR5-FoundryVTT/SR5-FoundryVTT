@@ -115,10 +115,11 @@ export class AmmoImporter extends DataImporter {
             // NOTE: Should either weapons or gear not have been imported with translation, this will fail.
             if (shouldLookForWeapons) {
                 let foundWeapon = ImportHelper.findItem((item) => {
-                    return item.name.toLowerCase() === nameLower;
+                    // Filter for weapon type due to possible double naming giving other item types.
+                    return item.type === 'weapon' && item.name.toLowerCase() === nameLower;
                 });
 
-                if (foundWeapon !== null) {
+                if (foundWeapon !== null && foundWeapon.data.data.action) {
                     console.log(foundWeapon);
                     data.data.damage = foundWeapon.data.data.action.damage.value;
                     data.data.ap = foundWeapon.data.data.action.damage.ap.value;
