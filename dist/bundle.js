@@ -14604,6 +14604,12 @@ class SR5ActorSheet extends ActorSheet {
             };
         }
         let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs, critter_powers, sprite_powers,] = data.items.reduce((arr, item) => {
+            // Duplicate to avoid later updates propagating changed item data.
+            item = duplicate(item);
+            const actorItem = this.actor.items.get(item._id);
+            // Show item properties (chatData) in the item list overviews.
+            //@ts-ignore
+            item.properties = actorItem.data.properties;
             item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
             if (item.type === 'spell')
                 arr[1].push(item);
