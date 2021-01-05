@@ -19,6 +19,8 @@ import FireRangeData = Shadowrun.FireRangeData;
 import BlastData = Shadowrun.BlastData;
 import ConditionData = Shadowrun.ConditionData;
 import SR5ItemType = Shadowrun.SR5ItemType;
+import ActionData = Shadowrun.ActionData;
+import ActionRollData = Shadowrun.ActionRollData;
 
 export class SR5Item extends Item {
     labels: {} = {};
@@ -802,11 +804,15 @@ export class SR5Item extends Item {
 
     _canDealDamage(): boolean {
         // NOTE: Double negation to force boolean comparison casting.
-        return !!this.data.data.action?.damage.type;
+        return !!this.data.data.action?.damage.type.base;
     }
 
-    getAction() {
+    getAction(): ActionRollData {
         return this.data.data.action;
+    }
+
+    getExtended(): boolean {
+        return this.getAction().extended;
     }
 
     getAttackData(hits: number, actionTestData?: ActionTestData): AttackData | undefined {
@@ -1042,7 +1048,7 @@ export class SR5Item extends Item {
     getActionLimit(): number | undefined {
         let limit = this.wrapper.getActionLimit();
         // get the limit modifiers from the actor if we have them
-        const action = this.wrapper.getData().action; // TODO replace with the getAction() when available
+        const action = this.wrapper.getAction();
         if (action?.limit.attribute && limit && this.actor) {
             const { attribute } = action.limit;
             const att = this.actor.findAttribute(attribute);

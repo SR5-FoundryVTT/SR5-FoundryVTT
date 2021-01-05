@@ -24956,10 +24956,13 @@ class SR5Item extends Item {
     _canDealDamage() {
         var _a;
         // NOTE: Double negation to force boolean comparison casting.
-        return !!((_a = this.data.data.action) === null || _a === void 0 ? void 0 : _a.damage.type);
+        return !!((_a = this.data.data.action) === null || _a === void 0 ? void 0 : _a.damage.type.base);
     }
     getAction() {
         return this.data.data.action;
+    }
+    getExtended() {
+        return this.getAction().extended;
     }
     getAttackData(hits, actionTestData) {
         var _a;
@@ -25159,7 +25162,7 @@ class SR5Item extends Item {
     getActionLimit() {
         let limit = this.wrapper.getActionLimit();
         // get the limit modifiers from the actor if we have them
-        const action = this.wrapper.getData().action; // TODO replace with the getAction() when available
+        const action = this.wrapper.getAction();
         if ((action === null || action === void 0 ? void 0 : action.limit.attribute) && limit && this.actor) {
             const { attribute } = action.limit;
             const att = this.actor.findAttribute(attribute);
@@ -25354,6 +25357,9 @@ class SR5ItemDataWrapper extends DataWrapper_1.DataWrapper {
     getQuantity() {
         var _a, _b;
         return ((_b = (_a = this.getData()) === null || _a === void 0 ? void 0 : _a.technology) === null || _b === void 0 ? void 0 : _b.quantity) || 1;
+    }
+    getAction() {
+        return this.getData().action;
     }
     getActionDicePoolMod() {
         var _a;
@@ -26989,7 +26995,7 @@ class ShadowrunRoller {
         // Create common data for all item types.
         const rollData = Object.assign(Object.assign({}, options), { event: event, dialogOptions: {
                 environmental: true,
-            }, item, actor: item.actor, parts: item.getRollPartsList(), limit: item.getLimit(), title: item.getRollName(), previewTemplate: item.hasTemplate, attack: item.getAttackData(0, actionTestData), blast: item.getBlastData(actionTestData), description: item.getChatData() });
+            }, item, actor: item.actor, parts: item.getRollPartsList(), limit: item.getLimit(), extended: item.getExtended(), title: item.getRollName(), previewTemplate: item.hasTemplate, attack: item.getAttackData(0, actionTestData), blast: item.getBlastData(actionTestData), description: item.getChatData() });
         // Add item type specific data.
         if (item.hasOpposedRoll) {
             rollData.tests = item.getOpposedTests();
@@ -27172,6 +27178,7 @@ class ShadowrunRoller {
             else if (!props.hideRollMessage && helpers_1.Helpers.userHasTargets() && props.tests) {
                 yield ShadowrunRoller.targetsChatMessages(props);
             }
+            // Roll further extended tests.
             if (testData.extended) {
                 const currentExtended = (_a = testData.parts.getPartValue('SR5.Extended')) !== null && _a !== void 0 ? _a : 0;
                 testData.parts.addUniquePart('SR5.Extended', currentExtended - 1);
@@ -27181,6 +27188,7 @@ class ShadowrunRoller {
                 const delayInMs = 400;
                 setTimeout(() => this.advancedRoll(props), delayInMs);
             }
+            // Call any provided callbacks to be executed after this roll.
             if (after)
                 yield after(roll);
             return roll;

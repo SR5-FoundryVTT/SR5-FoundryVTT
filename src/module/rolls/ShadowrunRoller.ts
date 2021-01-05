@@ -176,6 +176,7 @@ export class ShadowrunRoller {
             actor: item.actor,
             parts: item.getRollPartsList(),
             limit: item.getLimit(),
+            extended: item.getExtended(),
             title: item.getRollName(),
             previewTemplate: item.hasTemplate,
             attack:  item.getAttackData(0, actionTestData),
@@ -389,6 +390,7 @@ export class ShadowrunRoller {
             await ShadowrunRoller.targetsChatMessages(props);
         }
 
+        // Roll further extended tests.
         if (testData.extended) {
             const currentExtended = testData.parts.getPartValue('SR5.Extended') ?? 0;
             testData.parts.addUniquePart('SR5.Extended', currentExtended - 1);
@@ -400,6 +402,7 @@ export class ShadowrunRoller {
             setTimeout(() => this.advancedRoll(props), delayInMs);
         }
 
+        // Call any provided callbacks to be executed after this roll.
         if (after) await after(roll);
 
         return roll;
