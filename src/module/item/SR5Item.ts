@@ -19,6 +19,8 @@ import FireRangeData = Shadowrun.FireRangeData;
 import BlastData = Shadowrun.BlastData;
 import ConditionData = Shadowrun.ConditionData;
 import SR5ItemType = Shadowrun.SR5ItemType;
+import ActionData = Shadowrun.ActionData;
+import ActionRollData = Shadowrun.ActionRollData;
 
 export class SR5Item extends Item {
     labels: {} = {};
@@ -805,8 +807,12 @@ export class SR5Item extends Item {
         return !!this.data.data.action?.damage.type;
     }
 
-    getAction() {
+    getAction(): ActionRollData {
         return this.data.data.action;
+    }
+
+    getExtended(): boolean {
+        return this.getAction().extended;
     }
 
     getAttackData(hits: number, actionTestData?: ActionTestData): AttackData | undefined {

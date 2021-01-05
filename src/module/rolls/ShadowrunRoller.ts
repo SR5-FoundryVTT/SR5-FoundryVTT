@@ -176,6 +176,7 @@ export class ShadowrunRoller {
             actor: item.actor,
             parts: item.getRollPartsList(),
             limit: item.getLimit(),
+            extended: item.getExtended(),
             title: item.getRollName(),
             previewTemplate: item.hasTemplate,
             attack:  item.getAttackData(0, actionTestData),
