@@ -77,7 +77,6 @@ export class SR5ActorSheet extends ActorSheet {
         // General purpose fields...
         data.config = CONFIG.SR5;
         data.filters = this._filters;
-        console.error(this);
 
         this._prepareMatrixAttributes(data);
         this._prepareActorAttributes(data);
