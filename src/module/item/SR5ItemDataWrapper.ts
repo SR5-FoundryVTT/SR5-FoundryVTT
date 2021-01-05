@@ -3,6 +3,7 @@ import SR5ItemType = Shadowrun.SR5ItemType;
 import ConditionData = Shadowrun.ConditionData;
 import ModList = Shadowrun.ModList;
 import SR5ItemDataPartial = Shadowrun.SR5ItemDataPartial;
+import ActionRollData = Shadowrun.ActionRollData;
 
 export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
     getType() {
@@ -173,6 +174,10 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
 
     getQuantity(): number | undefined {
         return this.getData()?.technology?.quantity || 1;
+    }
+
+    getAction(): ActionRollData|undefined {
+        return this.getData().action;
     }
 
     getActionDicePoolMod(): number | undefined {

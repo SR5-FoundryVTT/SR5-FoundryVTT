@@ -804,7 +804,7 @@ export class SR5Item extends Item {
 
     _canDealDamage(): boolean {
         // NOTE: Double negation to force boolean comparison casting.
-        return !!this.data.data.action?.damage.type;
+        return !!this.data.data.action?.damage.type.base;
     }
 
     getAction(): ActionRollData {
@@ -1048,7 +1048,7 @@ export class SR5Item extends Item {
     getActionLimit(): number | undefined {
         let limit = this.wrapper.getActionLimit();
         // get the limit modifiers from the actor if we have them
-        const action = this.wrapper.getData().action; // TODO replace with the getAction() when available
+        const action = this.wrapper.getAction();
         if (action?.limit.attribute && limit && this.actor) {
             const { attribute } = action.limit;
             const att = this.actor.findAttribute(attribute);
