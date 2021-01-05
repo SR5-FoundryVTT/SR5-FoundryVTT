@@ -19,19 +19,22 @@ export class ItemPrep {
             armor[element] = 0;
         }
 
-        const equippedArmor = items.filter((item) => item.hasArmor() && item.isEquipped());
         const armorModParts = new PartsList<number>(armor.mod);
+        const equippedArmor = items.filter((item) => item.isArmor() && item.isEquipped());
         equippedArmor?.forEach((item) => {
-            // Apply armor base and accessory values.
-            if (item.hasArmorAccessory()) {
-                armorModParts.addUniquePart(item.getName(), item.getArmorValue());
-            }
-            else {
-                armor.base = item.getArmorValue();
-                armor.label = item.getName();
+            // Don't spam armor values with clothing.
+            if (item.hasArmor()) {
+                // Apply armor base and accessory values.
+                if (item.hasArmorAccessory()) {
+                    armorModParts.addUniquePart(item.getName(), item.getArmorValue());
+                }
+                else {
+                    armor.base = item.getArmorValue();
+                    armor.label = item.getName();
+                }
             }
 
-            // Apply elemental modifiers of all worn armor (and clothing, but I won't tell if you won't) SR5#169.
+            // Apply elemental modifiers of all worn armor and clothing SR5#169.
             for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
                 armor[element] += item.getArmorElements()[element];
             }
