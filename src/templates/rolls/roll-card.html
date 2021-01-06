@@ -115,6 +115,12 @@
                 <span class="value">{{opposed.netHits}}</span>
             </div>
             {{/if}}
+            {{#if combat}} {{#if combat.initiative}}
+            <div class="category-line">
+                <span class="key">{{localize "SR5.Initiative"}}</span>
+                <span class="value">{{combat.initiative}}</span>
+            </div>
+            {{/if}}{{/if}}
         </div>
         <div class="right-side">
             <div class="roll-parts">
