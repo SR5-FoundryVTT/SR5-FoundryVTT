@@ -27,6 +27,7 @@ import DamageData = Shadowrun.DamageData;
 import TrackType = Shadowrun.TrackType;
 import OverflowTrackType = Shadowrun.OverflowTrackType;
 import ArmorData = Shadowrun.ArmorData;
+import {SR5Combat} from "../combat/SR5Combat";
 
 export class SR5Actor extends Actor {
     getOverwatchScore() {
@@ -376,16 +377,23 @@ export class SR5Actor extends Actor {
 
         if (defenseDialog.canceled) return;
 
-
         const roll = await ShadowrunRoller.advancedRoll({
             event: options.event,
             actor: this,
             parts: defenseActionData.parts.list,
             title: game.i18n.localize('SR5.DefenseTest'),
-            incomingAttack
+            incomingAttack,
+            combat: defenseActionData.combat
         });
 
         if (!roll) return;
+
+        // Reduce initiative after a successful roll, but before attack handling, to allow for the standalone sheet
+        // defense action to still reduce the initiative.
+        if (defenseActionData.combat.initiative) {
+            await this.changeCombatInitiative(defenseActionData.combat.initiative);
+        }
+
         if (!incomingAttack) return;
 
         // Collect defense information.
@@ -1242,5 +1250,26 @@ export class SR5Actor extends Actor {
         modified.value = Helpers.calcTotal(modified, {min: 0});
 
         return modified;
+    }
+
+    /** Reduce the initiative of the actor in the currently open / selected combat.
+     * Should a tokens actor be in multiple combats it will also only affect the currently open combat,
+     * since that is what's set in game.combat
+     *
+     * TODO: There is an issue with linked actors that have multiple tokens placed, with each in different combats.
+     *       The defense test needs to be done using the correct token, not just by the actor (from the sidebar).
+     *       One could argue this to be correct behavior, just confusing with normal linked actor / token usage.
+     */
+    async changeCombatInitiative(modifier: number) {
+        // No change needed for nothing to change.
+        if (modifier === 0) return;
+
+        const combat: SR5Combat = game.combat as SR5Combat;
+        const combatant = combat.getActorCombatant(this);
+
+        // Token might not be part of active combat.
+        if (!combatant) return;
+
+        await combat.adjustInitiative(combatant, modifier);
     }
 }

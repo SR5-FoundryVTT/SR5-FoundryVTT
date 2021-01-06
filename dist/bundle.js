@@ -13551,10 +13551,16 @@ class SR5Actor extends Actor {
                 actor: this,
                 parts: defenseActionData.parts.list,
                 title: game.i18n.localize('SR5.DefenseTest'),
-                incomingAttack
+                incomingAttack,
+                combat: defenseActionData.combat
             });
             if (!roll)
                 return;
+            // Reduce initiative after a successful roll, but before attack handling, to allow for the standalone sheet
+            // defense action to still reduce the initiative.
+            if (defenseActionData.combat.initiative) {
+                yield this.changeCombatInitiative(defenseActionData.combat.initiative);
+            }
             if (!incomingAttack)
                 return;
             // Collect defense information.
@@ -14353,6 +14359,27 @@ class SR5Actor extends Actor {
         modified.mod = PartsList_1.PartsList.AddUniquePart(modified.mod, 'SR5.DV', damage.ap.value);
         modified.value = helpers_1.Helpers.calcTotal(modified, { min: 0 });
         return modified;
+    }
+    /** Reduce the initiative of the actor in the currently open / selected combat.
+     * Should a tokens actor be in multiple combats it will also only affect the currently open combat,
+     * since that is what's set in game.combat
+     *
+     * TODO: There is an issue with linked actors that have multiple tokens placed, with each in different combats.
+     *       The defense test needs to be done using the correct token, not just by the actor (from the sidebar).
+     *       One could argue this to be correct behavior, just confusing with normal linked actor / token usage.
+     */
+    changeCombatInitiative(modifier) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // No change needed for nothing to change.
+            if (modifier === 0)
+                return;
+            const combat = game.combat;
+            const combatant = combat.getActorCombatant(this);
+            // Token might not be part of active combat.
+            if (!combatant)
+                return;
+            yield combat.adjustInitiative(combatant, modifier);
+        });
     }
 }
 exports.SR5Actor = SR5Actor;
@@ -16051,18 +16078,23 @@ class ItemPrep {
         for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
             armor[element] = 0;
         }
-        const equippedArmor = items.filter((item) => item.hasArmor() && item.isEquipped());
         const armorModParts = new PartsList_1.PartsList(armor.mod);
+        const equippedArmor = items.filter((item) => item.isArmor() && item.isEquipped());
         equippedArmor === null || equippedArmor === void 0 ? void 0 : equippedArmor.forEach((item) => {
-            if (item.hasArmorAccessory()) {
-                armorModParts.addUniquePart(item.getName(), item.getArmorValue());
-            } // if not a mod, set armor.value to the items value
-            else {
-                armor.base = item.getArmorValue();
-                armor.label = item.getName();
-                for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
-                    armor[element] = item.getArmorElements()[element];
+            // Don't spam armor values with clothing.
+            if (item.hasArmor()) {
+                // Apply armor base and accessory values.
+                if (item.hasArmorAccessory()) {
+                    armorModParts.addUniquePart(item.getName(), item.getArmorValue());
                 }
+                else {
+                    armor.base = item.getArmorValue();
+                    armor.label = item.getName();
+                }
+            }
+            // Apply elemental modifiers of all worn armor and clothing SR5#169.
+            for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
+                armor[element] += item.getArmorElements()[element];
             }
         });
         if (data.modifiers['armor'])
@@ -17527,15 +17559,19 @@ class ShadowrunActorDialogs {
         const onAfterClose = (html) => {
             const cover = helpers_1.Helpers.parseInputToNumber($(html).find('[name=cover]').val());
             const special = helpers_1.Helpers.parseInputToString($(html).find('[name=activeDefense]').val());
+            // Zero to indicate no initiative result change.
+            const combat = {};
             if (cover) {
                 parts.addUniquePart('SR5.Cover', cover);
             }
             if (special) {
-                // TODO subtract initiative score when Foundry updates to 0.7.0
+                // Defense pool modifier
                 const defense = activeDefenses[special];
                 parts.addUniquePart(defense.label, defense.value);
+                // Combat initiative modifier
+                combat.initiative = defense.initMod;
             }
-            return { cover, special, parts };
+            return { cover, special, parts, combat };
         };
         const templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-defense.html';
         const templateData = {
@@ -18657,29 +18693,12 @@ function createRollChatMessage(options) {
 }
 exports.createRollChatMessage = createRollChatMessage;
 function getRollChatTemplateData(options) {
-    var _a;
-    // field extraction is explicit to enforce visible data flow to ensure clean data.
-    // NOTE: As soon as clear data dynamic data flow can be established, this should be removed for a simple {...options}
-    let { roll, actor, item, target, description, title, previewTemplate, attack, incomingAttack, incomingDrain, damage, tests } = options;
-    const rollMode = (_a = options.rollMode) !== null && _a !== void 0 ? _a : game.settings.get(constants_1.CORE_NAME, constants_1.CORE_FLAGS.RollMode);
-    const token = actor === null || actor === void 0 ? void 0 : actor.getToken();
+    var _a, _b;
+    const token = (_a = options.actor) === null || _a === void 0 ? void 0 : _a.getToken();
+    const rollMode = (_b = options.rollMode) !== null && _b !== void 0 ? _b : game.settings.get(constants_1.CORE_NAME, constants_1.CORE_FLAGS.RollMode);
     const tokenId = getTokenSceneId(token);
-    return {
-        roll,
-        actor,
-        item,
-        tokenId,
-        target,
-        rollMode,
-        title,
-        description,
-        previewTemplate,
-        attack,
-        incomingAttack,
-        incomingDrain,
-        damage,
-        tests
-    };
+    return Object.assign(Object.assign({}, options), { tokenId,
+        rollMode });
 }
 function getTokenSceneId(token) {
     return token ? `${token.scene._id}.${token.id}` : undefined;
@@ -18838,8 +18857,12 @@ class SR5Combat extends Combat {
         var _a;
         return ((_a = this.data) === null || _a === void 0 ? void 0 : _a.initiativePass) || 0;
     }
+    /** Use the given actors token to get the combatant.
+     * NOTE: The token must be used, instead of just the actor, as unlinked tokens will all use the same actor id.
+     */
     getActorCombatant(actor) {
-        return this.combatants.find((c) => c.actor._id === actor._id);
+        const token = actor.getToken();
+        return this.getCombatantByToken(token.id);
     }
     /**
      * Add ContextMenu options to CombatTracker Entries -- adds the basic Initiative Subtractions
@@ -27204,8 +27227,8 @@ class ShadowrunRoller {
     }
     static rollChatMessage(roll, props) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, damage, tests } = props;
-            const rollChatMessageOptions = { roll, actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, damage, tests };
+            const { actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, damage, tests, combat } = props;
+            const rollChatMessageOptions = { roll, actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, damage, tests, combat };
             yield chat_1.createRollChatMessage(rollChatMessageOptions);
         });
     }
