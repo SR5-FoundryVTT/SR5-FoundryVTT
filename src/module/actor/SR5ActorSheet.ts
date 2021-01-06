@@ -292,12 +292,14 @@ export class SR5ActorSheet extends ActorSheet {
         ] = data.items.reduce(
             (arr, item) => {
                 // Duplicate to avoid later updates propagating changed item data.
+                // NOTE: If no duplication is done, added fields will be stored in the database on updates!
                 item = duplicate(item);
                 const actorItem = this.actor.items.get(item._id);
                 // Show item properties (chatData) in the item list overviews.
                 //@ts-ignore
                 item.properties = actorItem.data.properties;
 
+                // TODO: isStack property isn't used elsewhere. Remove if unnecessary.
                 item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
                 if (item.type === 'spell') arr[1].push(item);
                 else if (item.type === 'quality') arr[2].push(item);
