@@ -22,6 +22,10 @@ declare namespace Shadowrun {
         blast?: BlastData;
     };
 
+    type CombatData = {
+        initiative?: number
+    }
+
     type ModifiedDamageData = {
         incoming: DamageData
         modified?: DamageData

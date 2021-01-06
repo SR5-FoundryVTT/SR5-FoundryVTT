@@ -9,6 +9,7 @@ import DamageData = Shadowrun.DamageData;
 import DamageElement = Shadowrun.DamageElement;
 import SkillRollOptions = Shadowrun.SkillRollOptions;
 import SkillDialogOptions = Shadowrun.SkillDialogOptions;
+import CombatData = Shadowrun.CombatData;
 
 
 export class ShadowrunActorDialogs {
@@ -85,17 +86,22 @@ export class ShadowrunActorDialogs {
         const onAfterClose = (html) => {
             const cover = Helpers.parseInputToNumber($(html).find('[name=cover]').val());
             const special = Helpers.parseInputToString($(html).find('[name=activeDefense]').val());
+            // Zero to indicate no initiative result change.
+            const combat: CombatData = {};
 
             if (cover) {
                 parts.addUniquePart('SR5.Cover', cover)
             }
             if (special) {
-                // TODO subtract initiative score when Foundry updates to 0.7.0
+                // Defense pool modifier
                 const defense = activeDefenses[special];
                 parts.addUniquePart(defense.label, defense.value);
+
+                // Combat initiative modifier
+                combat.initiative = defense.initMod;
             }
 
-            return {cover, special, parts};
+            return {cover, special, parts, combat};
         }
 
         const templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-defense.html';

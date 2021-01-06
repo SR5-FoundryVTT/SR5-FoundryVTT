@@ -11,6 +11,7 @@ import DamageData = Shadowrun.DamageData;
 import {DamageApplicationDialog} from "./apps/dialogs/DamageApplicationDialog";
 import DamageType = Shadowrun.DamageType;
 import DamageElement = Shadowrun.DamageElement;
+import CombatData = Shadowrun.CombatData;
 
 export interface TargetChatMessageOptions {
     actor: Actor
@@ -46,7 +47,8 @@ export interface RollChatMessageOptions {
     incomingAttack?: AttackData
     incomingDrain?: DrainData
     damage?: ModifiedDamageData
-    tests?: Test[];
+    tests?: Test[]
+    combat?: CombatData
 }
 
 interface ItemChatTemplateData {
@@ -56,26 +58,9 @@ interface ItemChatTemplateData {
     tests?: Test[]
 }
 
-interface RollChatTemplateData {
-    actor?: SR5Actor
+interface RollChatTemplateData extends RollChatMessageOptions {
     tokenId?: string
-    target?: Token
-    item?: SR5Item
-
-    title: string
-    description?: object;
-
-    roll: ShadowrunRoll
-
     rollMode: keyof typeof CONFIG.dice.rollModes
-    previewTemplate?: boolean
-
-    attack?: AttackData
-    // TODO: group 'incoming' with type field instead of multiple incoming types.
-    incomingAttack?: AttackData
-    incomingDrain?: DrainData
-    damage?: ModifiedDamageData
-    tests?: Test[];
 }
 
 async function createChatMessage(templateData, options?: ChatDataOptions): Promise<Entity<any>> {
@@ -184,32 +169,15 @@ export async function createRollChatMessage(options: RollChatMessageOptions): Pr
 
 
 function getRollChatTemplateData(options: RollChatMessageOptions): RollChatTemplateData {
-    // field extraction is explicit to enforce visible data flow to ensure clean data.
-    // NOTE: As soon as clear data dynamic data flow can be established, this should be removed for a simple {...options}
-    let {roll, actor, item, target, description, title, previewTemplate,
-        attack, incomingAttack, incomingDrain, damage, tests} = options;
+    const token = options.actor?.getToken();
 
     const rollMode = options.rollMode ?? game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
-
-    const token = actor?.getToken();
-
     const tokenId = getTokenSceneId(token);
 
     return {
-        roll,
-        actor,
-        item,
+       ...options,
         tokenId,
-        target,
         rollMode,
-        title,
-        description,
-        previewTemplate,
-        attack,
-        incomingAttack,
-        incomingDrain,
-        damage,
-        tests
     }
 }
 

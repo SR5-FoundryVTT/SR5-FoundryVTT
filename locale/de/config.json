@@ -369,6 +369,7 @@
     "SR5.InitCatMeatspace": "Initiative",
     "SR5.InitCatAstral": "Astrale Initiative",
     "SR5.InitCatMatrix": "Matrix-Initiative",
+  "SR5.Initiative": "Initiative",
 
   "SR5.CyberwareGrade": "Grad",
   "SR5.CyberwareGradeStandard": "Standard",
