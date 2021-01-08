@@ -51,6 +51,9 @@ export const registerItemLineHelpers = () => {
             case 'armor':
                 addIcon.title = game.i18n.localize('SR5.CreateItemArmor');
                 return [addIcon];
+            case 'ammo':
+                addIcon.title = game.i18n.localize('SR5.CreateItemAmmo');
+                return [addIcon];
             case 'device':
                 addIcon.title = game.i18n.localize('SR5.CreateItemDevice');
                 return [addIcon];
@@ -115,6 +118,7 @@ export const registerItemLineHelpers = () => {
             case 'equipment':
             case 'cyberware':
             case 'bioware':
+            case 'ammo':
                 return [
                     {
                         text: {

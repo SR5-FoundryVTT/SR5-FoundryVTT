@@ -131,6 +131,15 @@ export const ChatData = {
         }
     },
 
+    ammo: (data, labels, props) => {
+        if (data.damageType) props.push(`${game.i18n.localize("SR5.DamageType")} ${data.damageType}`);
+        if (data.damage) props.push(`${game.i18n.localize("SR5.DamageValue")} ${data.damage}`);
+        if (data.element) props.push(`${game.i18n.localize("SR5.Element")} ${data.element}`);
+        if (data.ap) props.push(`${game.i18n.localize("SR5.AP")} ${data.ap}`);
+        if (data.blast.radius) props.push(`${game.i18n.localize('SR5.BlastRadius')} ${data.blast.radius}m`);
+        if (data.blast.dropoff) props.push(`${game.i18n.localize('SR5.Dropoff')} ${data.blast.dropoff}/m`);
+    },
+
     program: (data, labels, props) => {
         props.push(game.i18n.localize(CONFIG.SR5.programTypes[data.type]));
     },
@@ -145,6 +154,12 @@ export const ChatData = {
     },
 
     cyberware: (data, labels, props) => {
+        ChatData.action(data, labels, props);
+        ChatData.armor(data, labels, props);
+        if (data.essence) props.push(`Ess ${data.essence}`);
+    },
+
+    bioware: (data, labels, props) => {
         ChatData.action(data, labels, props);
         ChatData.armor(data, labels, props);
         if (data.essence) props.push(`Ess ${data.essence}`);

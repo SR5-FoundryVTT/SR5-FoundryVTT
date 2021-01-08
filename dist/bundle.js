@@ -14676,6 +14676,13 @@ class SR5ActorSheet extends ActorSheet {
                     type: 'equipment',
                 },
             };
+            inventory['ammo'] = {
+                label: game.i18n.localize('SR5.ItemTypes.Ammo'),
+                items: [],
+                dataset: {
+                    type: 'ammo',
+                },
+            };
             inventory['cyberware'] = {
                 label: game.i18n.localize('SR5.ItemTypes.Cyberware'),
                 items: [],
@@ -19992,6 +19999,9 @@ exports.registerItemLineHelpers = () => {
             case 'armor':
                 addIcon.title = game.i18n.localize('SR5.CreateItemArmor');
                 return [addIcon];
+            case 'ammo':
+                addIcon.title = game.i18n.localize('SR5.CreateItemAmmo');
+                return [addIcon];
             case 'device':
                 addIcon.title = game.i18n.localize('SR5.CreateItemDevice');
                 return [addIcon];
@@ -20055,6 +20065,7 @@ exports.registerItemLineHelpers = () => {
             case 'equipment':
             case 'cyberware':
             case 'bioware':
+            case 'ammo':
                 return [
                     {
                         text: {
@@ -24064,6 +24075,20 @@ exports.ChatData = {
                 props.push(`Radiation ${data.armor.radiation}`);
         }
     },
+    ammo: (data, labels, props) => {
+        if (data.damageType)
+            props.push(`${game.i18n.localize("SR5.DamageType")} ${data.damageType}`);
+        if (data.damage)
+            props.push(`${game.i18n.localize("SR5.DamageValue")} ${data.damage}`);
+        if (data.element)
+            props.push(`${game.i18n.localize("SR5.Element")} ${data.element}`);
+        if (data.ap)
+            props.push(`${game.i18n.localize("SR5.AP")} ${data.ap}`);
+        if (data.blast.radius)
+            props.push(`${game.i18n.localize('SR5.BlastRadius')} ${data.blast.radius}m`);
+        if (data.blast.dropoff)
+            props.push(`${game.i18n.localize('SR5.Dropoff')} ${data.blast.dropoff}/m`);
+    },
     program: (data, labels, props) => {
         props.push(game.i18n.localize(CONFIG.SR5.programTypes[data.type]));
     },
@@ -24079,6 +24104,12 @@ exports.ChatData = {
             props.push('Fade L');
     },
     cyberware: (data, labels, props) => {
+        exports.ChatData.action(data, labels, props);
+        exports.ChatData.armor(data, labels, props);
+        if (data.essence)
+            props.push(`Ess ${data.essence}`);
+    },
+    bioware: (data, labels, props) => {
         exports.ChatData.action(data, labels, props);
         exports.ChatData.armor(data, labels, props);
         if (data.essence)
