@@ -19,20 +19,9 @@
         <h3 class="header-name"><a class="chat-entity-link" data-entity="Item" data-id="{{item.id}}">{{item.data.name}}</a></h3>
     </div>
     {{/if}}
-    {{#if description}}
-    <div class="card-description {{#if (not (isDefined roll))}}show-card-description{{/if}}">
-        {{#if description.description.value}}
-        <div class="card-description-content">
-            {{{description.description.value}}}
-        </div>
-        {{/if}}
-        {{#each description.properties}}
-        <span style="white-space: nowrap;">{{this}}</span>
-        {{/each}}
-    </div>
-    {{/if}}
     {{#if (isDefined title)}}
-    <div class="test-line">
+    <div class="card-main-content">
+        <div class="test-line">
         <span class="test-name {{#unless (isDefined roll.hits)}}test-roll{{/unless}}">
             {{title}}
         </span>
@@ -42,7 +31,7 @@
         </div>
         {{/if}}
     </div>
-    <div class="card-content">
+        <div class="card-content">
         <div class="left-side">
             {{#if (isDefined roll.hits)}}
             <div class="limit-line">
@@ -137,6 +126,22 @@
             </div>
         </div>
     </div>
+    </div>
+    {{/if}}
+    {{#if description}}
+    <div class="card-description {{#if (not (isDefined roll))}}show-card-description{{/if}}">
+        {{#if description.description.value}}
+        <div class="card-description-content">
+            {{{description.description.value}}}
+        </div>
+        {{/if}}
+        {{#each description.properties}}
+        <span style="white-space: nowrap;">{{this}}</span>
+        {{/each}}
+    </div>
+    {{/if}}
+
+    {{#if roll}}
     <div class="dice-rolls">
         <div class="dice-roll-content">
             {{#each roll.sides}}
@@ -147,6 +152,7 @@
         </div>
     </div>
     {{/if}}
+
     {{#if roll.glitched}}
     <div class="glitch-content">
         <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Glitch'}}" {{/if}}>
