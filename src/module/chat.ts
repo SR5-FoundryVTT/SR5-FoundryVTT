@@ -318,6 +318,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
 
         if (damageApplicationDialog.canceled) return;
 
+        console.error(this);
         // Apply the actual damage values. applyDamage will, again, calculate armor damage modification.
         actorDamages.forEach(({actor, modified}) => {
             if (damageApplicationDialog.selectedButton === 'damage') {
