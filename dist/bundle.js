@@ -18876,7 +18876,6 @@ exports.addRollListeners = (app, html) => {
         const actorDamages = yield damageApplicationDialog.select();
         if (damageApplicationDialog.canceled)
             return;
-        console.error(this);
         // Apply the actual damage values. applyDamage will, again, calculate armor damage modification.
         actorDamages.forEach(({ actor, modified }) => {
             if (damageApplicationDialog.selectedButton === 'damage') {
