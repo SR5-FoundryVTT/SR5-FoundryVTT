@@ -26,7 +26,6 @@ import Limits = Shadowrun.Limits;
 import DamageData = Shadowrun.DamageData;
 import TrackType = Shadowrun.TrackType;
 import OverflowTrackType = Shadowrun.OverflowTrackType;
-import ArmorData = Shadowrun.ArmorData;
 import {SR5Combat} from "../combat/SR5Combat";
 
 export class SR5Actor extends Actor {
@@ -1077,18 +1076,19 @@ export class SR5Actor extends Actor {
 
     /** Apply all types of damage to the actor.
      *
-     * @param damage
+     * @param changeDamageForActor can be changed to directly apply damage without further changes due to armor and more.
      */
-    async applyDamage(damage: DamageData) {
+    async applyDamage(damage: DamageData, changeDamageForActor: boolean = true) {
         if (damage.value <= 0) return;
 
-        // damage = this.applyDamageTypeChangeForArmor(damage);
+        // NOTE: Execution order is important here!
 
-        // TODO: Handle different actor types.
+        if (changeDamageForActor) {
+            damage = this._applyDamageTypeChangeForActor(damage);
+        }
 
         // Apply damage and resulting overflow to the according track.
         // The amount and type damage can value in the process.
-        // NOTE: Execution order is important here.
         if (damage.type.value === 'matrix') {
             // TODO: Biofeedback damage model already integrated?
             damage = await this._addMatrixDamage(damage);
@@ -1104,16 +1104,16 @@ export class SR5Actor extends Actor {
 
         // NOTE: Currently each damage type updates once. Should this cause issues for long latency, collect
         //       and sum each damage type and update here globally.
-        // NOTE: For stuff like healing the last wound by magic, this might also be interesting to store and give
+        // NOTE: For stuff like healing the last wound by magic, it might also be interesting to store and give
         //       an overview of each damage/wound applied to select from.
         // await this.update({'data.track': this.data.data.track});
 
         // TODO: Handle changes in actor status (death and such)
     }
 
-    async _addDamageToTrack(damage: DamageData, track: TrackType|OverflowTrackType) {
-        if (damage.value === 0) return;
-        if (track.value === track.max) return;
+    __addDamageToTrackValue(damage: DamageData, track: TrackType|OverflowTrackType): TrackType|OverflowTrackType {
+        if (damage.value === 0) return track;
+        if (track.value === track.max) return track;
 
         //  Avoid cross referencing.
         track = duplicate(track);
@@ -1124,6 +1124,38 @@ export class SR5Actor extends Actor {
             console.error("Damage did overflow the track, which shouldn't happen at this stage. Damage has been set to max. Please use applyDamage.")
             track.value = track.max;
         }
+
+        return track;
+    }
+
+    async _addDamageToDeviceTrack(damage: DamageData, device: SR5Item) {
+        if (!device) return;
+
+        let track = device.getTrack();
+
+        if (damage.value === 0) return;
+        if (track.value === track.max) return;
+
+        track = this.__addDamageToTrackValue(damage, track);
+
+        const data = {['data.technology.condition_monitor']: track};
+        await device.update(data);
+    }
+
+    async _addDamageToTrack(damage: DamageData, track: TrackType|OverflowTrackType) {
+        if (damage.value === 0) return;
+        if (track.value === track.max) return;
+
+        track = this.__addDamageToTrackValue(damage, track);
+        // //  Avoid cross referencing.
+        // track = duplicate(track);
+        //
+        // track.value += damage.value;
+        // if (track.value > track.max) {
+        //     // dev error, not really meant to be ever seen by users. Therefore no localization.
+        //     console.error("Damage did overflow the track, which shouldn't happen at this stage. Damage has been set to max. Please use applyDamage.")
+        //     track.value = track.max;
+        // }
 
         const data = {[`data.track.${damage.type.value}`]: track};
         await this.update(data);
@@ -1147,9 +1179,7 @@ export class SR5Actor extends Actor {
     /** Apply damage to the stun track and get overflow damage for the physical track.
      */
     async _addStunDamage(damage: DamageData): Promise<DamageData> {
-        if (damage.type.value !== 'stun') {
-            return damage;
-        }
+        if (damage.type.value !== 'stun') return damage;
 
         const track = this.getStunTrack();
         const {overflow, rest} = this._calcDamageOverflow(damage, track);
@@ -1166,9 +1196,8 @@ export class SR5Actor extends Actor {
     }
 
     async _addPhysicalDamage(damage: DamageData) {
-        if (damage.type.value !== 'physical') {
-            return damage;
-        }
+        if (damage.type.value !== 'physical') return damage;
+
         const track = this.getPhysicalTrack();
         const {overflow, rest} = this._calcDamageOverflow(damage, track);
 
@@ -1176,12 +1205,24 @@ export class SR5Actor extends Actor {
         await this._addDamageToOverflow(overflow, track);
     }
 
+    /** Adding damage to a device track instead of an actors track, as they contain their own track within their data.
+     */
     async _addMatrixDamage(damage: DamageData): Promise<DamageData> {
-        if (damage.type.value !== 'matrix') {
-            return damage;
-        }
+        if (damage.type.value !== 'matrix') return damage;
 
-        return damage;
+        const device = this.getMatrixDevice();
+        if (!device) return damage;
+
+        const track = this.getMatrixTrack();
+        // Actor might not have a commlink/cyberdeck equipped.
+        if (!track) return damage;
+
+        const {overflow, rest} = this._calcDamageOverflow(damage, track);
+
+        await this._addDamageToDeviceTrack(rest, device);
+
+        // Return overflow for consistency, yet nothing will take overflowing matrix damage.
+        return overflow;
     }
 
     /** Calculate damage overflow only based on max and current track values.
@@ -1211,16 +1252,41 @@ export class SR5Actor extends Actor {
         return this.data.data.track.physical;
     }
 
-    // TODO: SR5Actor.getMatrixTrack implementation
-    // getMatrixTrack(): TrackType {
-    //
-    // }
+    getMatrixTrack(): TrackType|undefined {
+        const device = this.getMatrixDevice();
+        if (!device) return undefined;
+
+        return device.getTrack();
+    }
+
+    /** Apply all damage type changes that need to happen for this Actor
+     *
+     * This doesn't include armor for simplicity reasons.
+     */
+    _applyDamageTypeChangeForActor(damage: DamageData): DamageData {
+        damage = this._applyDamageTypeChangeForGrunt(damage);
+
+        return damage;
+    }
+
+    _applyDamageTypeChangeForGrunt(damage: DamageData): DamageData {
+        if (!this.isGrunt()) return damage;
+
+        if (damage.type.value === 'stun') {
+            // Avoid cross referencing.
+            damage = duplicate(damage);
+
+            damage.type.value = 'physical';
+        }
+
+        return damage;
+    }
 
     /**
      *
      * @param damage
      */
-    applyDamageTypeChangeForArmor(damage: DamageData): DamageData {
+    _applyDamageTypeChangeForArmor(damage: DamageData): DamageData {
         // TODO: Damage modification should only really apply to characters, but double check ;)
         if (!this.isCharacter()) return damage;
 

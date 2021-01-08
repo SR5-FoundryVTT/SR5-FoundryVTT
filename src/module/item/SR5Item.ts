@@ -21,6 +21,7 @@ import ConditionData = Shadowrun.ConditionData;
 import SR5ItemType = Shadowrun.SR5ItemType;
 import ActionData = Shadowrun.ActionData;
 import ActionRollData = Shadowrun.ActionRollData;
+import TrackType = Shadowrun.TrackType;
 
 export class SR5Item extends Item {
     labels: {} = {};
@@ -1088,6 +1089,10 @@ export class SR5Item extends Item {
             return this.data.data.melee?.reach ?? 0;
         }
         return 0;
+    }
+
+    getTrack(): TrackType {
+        return this.data.data.technology.condition_monitor;
     }
 
     hasDefenseTest(): boolean {
