@@ -1,0 +1,21 @@
+{{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+        name=(localize 'SR5.Miscellaneous')
+        itemId='miscellaneous'
+        icons=(ItemHeaderIcons 'miscellaneous')
+}}
+<div class="list-item">
+        <div class="item-left">
+            <div class="item-text item-name">
+                {{localize "SR5.Spirit.Type"}}
+            </div>
+        </div>
+        <div class="item-right">
+            <div>
+            {{> "systems/shadowrun5e/dist/templates/common/Select.html"
+                    options=config.vehicle.types
+                    value=data.vehicleType
+                    path="data.vehicleType"
+            }}
+            </div>
+        </div>
+</div>
