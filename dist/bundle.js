@@ -14205,17 +14205,18 @@ class SR5Actor extends Actor {
     }
     /** Apply all types of damage to the actor.
      *
-     * @param damage
+     * @param changeDamageForActor can be changed to directly apply damage without further changes due to armor and more.
      */
-    applyDamage(damage) {
+    applyDamage(damage, changeDamageForActor = true) {
         return __awaiter(this, void 0, void 0, function* () {
             if (damage.value <= 0)
                 return;
-            // damage = this.applyDamageTypeChangeForArmor(damage);
-            // TODO: Handle different actor types.
+            // NOTE: Execution order is important here!
+            if (changeDamageForActor) {
+                damage = this._applyDamageTypeChangeForActor(damage);
+            }
             // Apply damage and resulting overflow to the according track.
             // The amount and type damage can value in the process.
-            // NOTE: Execution order is important here.
             if (damage.type.value === 'matrix') {
                 // TODO: Biofeedback damage model already integrated?
                 damage = yield this._addMatrixDamage(damage);
@@ -14228,10 +14229,39 @@ class SR5Actor extends Actor {
             }
             // NOTE: Currently each damage type updates once. Should this cause issues for long latency, collect
             //       and sum each damage type and update here globally.
-            // NOTE: For stuff like healing the last wound by magic, this might also be interesting to store and give
+            // NOTE: For stuff like healing the last wound by magic, it might also be interesting to store and give
             //       an overview of each damage/wound applied to select from.
             // await this.update({'data.track': this.data.data.track});
             // TODO: Handle changes in actor status (death and such)
+        });
+    }
+    __addDamageToTrackValue(damage, track) {
+        if (damage.value === 0)
+            return track;
+        if (track.value === track.max)
+            return track;
+        //  Avoid cross referencing.
+        track = duplicate(track);
+        track.value += damage.value;
+        if (track.value > track.max) {
+            // dev error, not really meant to be ever seen by users. Therefore no localization.
+            console.error("Damage did overflow the track, which shouldn't happen at this stage. Damage has been set to max. Please use applyDamage.");
+            track.value = track.max;
+        }
+        return track;
+    }
+    _addDamageToDeviceTrack(damage, device) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!device)
+                return;
+            let track = device.getTrack();
+            if (damage.value === 0)
+                return;
+            if (track.value === track.max)
+                return;
+            track = this.__addDamageToTrackValue(damage, track);
+            const data = { ['data.technology.condition_monitor']: track };
+            yield device.update(data);
         });
     }
     _addDamageToTrack(damage, track) {
@@ -14240,14 +14270,16 @@ class SR5Actor extends Actor {
                 return;
             if (track.value === track.max)
                 return;
-            //  Avoid cross referencing.
-            track = duplicate(track);
-            track.value += damage.value;
-            if (track.value > track.max) {
-                // dev error, not really meant to be ever seen by users. Therefore no localization.
-                console.error("Damage did overflow the track, which shouldn't happen at this stage. Damage has been set to max. Please use applyDamage.");
-                track.value = track.max;
-            }
+            track = this.__addDamageToTrackValue(damage, track);
+            // //  Avoid cross referencing.
+            // track = duplicate(track);
+            //
+            // track.value += damage.value;
+            // if (track.value > track.max) {
+            //     // dev error, not really meant to be ever seen by users. Therefore no localization.
+            //     console.error("Damage did overflow the track, which shouldn't happen at this stage. Damage has been set to max. Please use applyDamage.")
+            //     track.value = track.max;
+            // }
             const data = { [`data.track.${damage.type.value}`]: track };
             yield this.update(data);
         });
@@ -14271,9 +14303,8 @@ class SR5Actor extends Actor {
      */
     _addStunDamage(damage) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (damage.type.value !== 'stun') {
+            if (damage.type.value !== 'stun')
                 return damage;
-            }
             const track = this.getStunTrack();
             const { overflow, rest } = this._calcDamageOverflow(damage, track);
             // Only change damage type when needed, in order to avoid confusion of callers.
@@ -14288,21 +14319,31 @@ class SR5Actor extends Actor {
     }
     _addPhysicalDamage(damage) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (damage.type.value !== 'physical') {
+            if (damage.type.value !== 'physical')
                 return damage;
-            }
             const track = this.getPhysicalTrack();
             const { overflow, rest } = this._calcDamageOverflow(damage, track);
             yield this._addDamageToTrack(rest, track);
             yield this._addDamageToOverflow(overflow, track);
         });
     }
+    /** Adding damage to a device track instead of an actors track, as they contain their own track within their data.
+     */
     _addMatrixDamage(damage) {
         return __awaiter(this, void 0, void 0, function* () {
-            if (damage.type.value !== 'matrix') {
+            if (damage.type.value !== 'matrix')
                 return damage;
-            }
-            return damage;
+            const device = this.getMatrixDevice();
+            if (!device)
+                return damage;
+            const track = this.getMatrixTrack();
+            // Actor might not have a commlink/cyberdeck equipped.
+            if (!track)
+                return damage;
+            const { overflow, rest } = this._calcDamageOverflow(damage, track);
+            yield this._addDamageToDeviceTrack(rest, device);
+            // Return overflow for consistency, yet nothing will take overflowing matrix damage.
+            return overflow;
         });
     }
     /** Calculate damage overflow only based on max and current track values.
@@ -14326,15 +14367,35 @@ class SR5Actor extends Actor {
     getPhysicalTrack() {
         return this.data.data.track.physical;
     }
-    // TODO: SR5Actor.getMatrixTrack implementation
-    // getMatrixTrack(): TrackType {
-    //
-    // }
+    getMatrixTrack() {
+        const device = this.getMatrixDevice();
+        if (!device)
+            return undefined;
+        return device.getTrack();
+    }
+    /** Apply all damage type changes that need to happen for this Actor
+     *
+     * This doesn't include armor for simplicity reasons.
+     */
+    _applyDamageTypeChangeForActor(damage) {
+        damage = this._applyDamageTypeChangeForGrunt(damage);
+        return damage;
+    }
+    _applyDamageTypeChangeForGrunt(damage) {
+        if (!this.isGrunt())
+            return damage;
+        if (damage.type.value === 'stun') {
+            // Avoid cross referencing.
+            damage = duplicate(damage);
+            damage.type.value = 'physical';
+        }
+        return damage;
+    }
     /**
      *
      * @param damage
      */
-    applyDamageTypeChangeForArmor(damage) {
+    _applyDamageTypeChangeForArmor(damage) {
         // TODO: Damage modification should only really apply to characters, but double check ;)
         if (!this.isCharacter())
             return damage;
@@ -15349,6 +15410,8 @@ class CharacterPrep extends BaseActorPrep_1.BaseActorPrep {
         ItemPrep_1.ItemPrep.prepareBodyware(this.data, this.items);
         SkillsPrep_1.SkillsPrep.prepareSkills(this.data);
         AttributesPrep_1.AttributesPrep.prepareAttributes(this.data);
+        // NPCPrep is reliant to be called after AttributesPrep.
+        NPCPrep_1.NPCPrep.prepareNPCData(this.data);
         LimitsPrep_1.LimitsPrep.prepareLimitBaseFromAttributes(this.data);
         LimitsPrep_1.LimitsPrep.prepareLimits(this.data);
         MatrixPrep_1.MatrixPrep.prepareMatrix(this.data, this.items);
@@ -15366,8 +15429,6 @@ class CharacterPrep extends BaseActorPrep_1.BaseActorPrep {
         InitiativePrep_1.InitiativePrep.prepareAstralInit(this.data);
         InitiativePrep_1.InitiativePrep.prepareMatrixInit(this.data);
         InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(this.data);
-        // NPCPrep is reliant to be called after AttributesPrep.
-        NPCPrep_1.NPCPrep.prepareNPCData(this.data);
     }
 }
 exports.CharacterPrep = CharacterPrep;
@@ -17333,7 +17394,8 @@ class DamageApplicationDialog extends FormDialog_1.FormDialog {
         const actorDamage = actors.map(actor => {
             return {
                 actor,
-                modified: actor.applyDamageTypeChangeForArmor(damage),
+                // Don't change damage type for grunt to avoid confusing user.
+                modified: actor._applyDamageTypeChangeForArmor(damage),
                 armor: actor.getModifiedArmor(damage)
             };
         });
@@ -18814,6 +18876,7 @@ exports.addRollListeners = (app, html) => {
         const actorDamages = yield damageApplicationDialog.select();
         if (damageApplicationDialog.canceled)
             return;
+        console.error(this);
         // Apply the actual damage values. applyDamage will, again, calculate armor damage modification.
         actorDamages.forEach(({ actor, modified }) => {
             if (damageApplicationDialog.selectedButton === 'damage') {
@@ -25228,6 +25291,9 @@ class SR5Item extends Item {
             return (_b = (_a = this.data.data.melee) === null || _a === void 0 ? void 0 : _a.reach) !== null && _b !== void 0 ? _b : 0;
         }
         return 0;
+    }
+    getTrack() {
+        return this.data.data.technology.condition_monitor;
     }
     hasDefenseTest() {
         var _a, _b;
