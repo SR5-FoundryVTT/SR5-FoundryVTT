@@ -14705,10 +14705,11 @@ class SR5ActorSheet extends ActorSheet {
             // Duplicate to avoid later updates propagating changed item data.
             // NOTE: If no duplication is done, added fields will be stored in the database on updates!
             item = duplicate(item);
+            // Show item properties and description in the item list overviews.
             const actorItem = this.actor.items.get(item._id);
-            // Show item properties (chatData) in the item list overviews.
-            //@ts-ignore
-            item.properties = actorItem.data.properties;
+            const chatData = actorItem.getChatData();
+            item.description = chatData.description;
+            item.properties = chatData.properties;
             // TODO: isStack property isn't used elsewhere. Remove if unnecessary.
             item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
             if (item.type === 'spell')
@@ -20212,6 +20213,7 @@ exports.registerItemLineHelpers = () => {
                     },
                 ];
             case 'armor':
+            case 'ammo':
             case 'device':
             case 'equipment':
             case 'cyberware':
@@ -24528,7 +24530,6 @@ class SR5Item extends Item {
             item.data.type = ((_a = item.data.action) === null || _a === void 0 ? void 0 : _a.type) ? 'active' : 'passive';
         }
         this.labels = labels;
-        item['properties'] = this.getChatData().properties;
     }
     postItemCard() {
         return __awaiter(this, void 0, void 0, function* () {

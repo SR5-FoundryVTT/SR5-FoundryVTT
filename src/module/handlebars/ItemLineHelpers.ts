@@ -252,6 +252,7 @@ export const registerItemLineHelpers = () => {
                     },
                 ];
             case 'armor':
+            case 'ammo':
             case 'device':
             case 'equipment':
             case 'cyberware':

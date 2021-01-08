@@ -10,6 +10,7 @@ import { SR5Actor } from './SR5Actor';
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import { SR5 } from '../config';
 import SkillField = Shadowrun.SkillField;
+import {SR5Item} from "../item/SR5Item";
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditForm instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
@@ -306,10 +307,11 @@ export class SR5ActorSheet extends ActorSheet {
                 // Duplicate to avoid later updates propagating changed item data.
                 // NOTE: If no duplication is done, added fields will be stored in the database on updates!
                 item = duplicate(item);
-                const actorItem = this.actor.items.get(item._id);
-                // Show item properties (chatData) in the item list overviews.
-                //@ts-ignore
-                item.properties = actorItem.data.properties;
+                // Show item properties and description in the item list overviews.
+                const actorItem = this.actor.items.get(item._id) as SR5Item;
+                const chatData = actorItem.getChatData();
+                item.description = chatData.description;
+                item.properties = chatData.properties;
 
                 // TODO: isStack property isn't used elsewhere. Remove if unnecessary.
                 item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
