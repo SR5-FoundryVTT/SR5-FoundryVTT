@@ -260,6 +260,13 @@ export class SR5ActorSheet extends ActorSheet {
                     type: 'equipment',
                 },
             };
+            inventory['ammo'] = {
+                label: game.i18n.localize('SR5.ItemTypes.Ammo'),
+                items: [],
+                dataset: {
+                    type: 'ammo',
+                },
+            };
             inventory['cyberware'] = {
                 label: game.i18n.localize('SR5.ItemTypes.Cyberware'),
                 items: [],
