@@ -14504,8 +14504,11 @@ class SR5ActorSheet extends ActorSheet {
         });
     }
     get template() {
-        const path = 'systems/shadowrun5e/dist/templates/actor/';
-        return `${path}${this.actor.data.type}.html`;
+        const path = 'systems/shadowrun5e/dist/templates';
+        if (this.actor.hasPerm(game.user, 'LIMITED', true)) {
+            return `${path}/actor-limited/${this.actor.data.type}.html`;
+        }
+        return `${path}/actor/${this.actor.data.type}.html`;
     }
     /* -------------------------------------------- */
     /**
@@ -19899,6 +19902,16 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
         'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleStatsList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleSecondStatsList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleMovement.html',
+        // limited actor
+        'systems/shadowrun5e/dist/templates/actor-limited/character.html',
+        'systems/shadowrun5e/dist/templates/actor-limited/spirit.html',
+        'systems/shadowrun5e/dist/templates/actor-limited/sprite.html',
+        'systems/shadowrun5e/dist/templates/actor-limited/vehicle.html',
+        'systems/shadowrun5e/dist/templates/actor-limited/parts/Header.html',
+        'systems/shadowrun5e/dist/templates/actor-limited/parts/MiscCharacter.html',
+        'systems/shadowrun5e/dist/templates/actor-limited/parts/MiscSpirit.html',
+        'systems/shadowrun5e/dist/templates/actor-limited/parts/MiscSprite.html',
+        'systems/shadowrun5e/dist/templates/actor-limited/parts/MiscVehicle.html',
         'systems/shadowrun5e/dist/templates/item/parts/description.html',
         'systems/shadowrun5e/dist/templates/item/parts/technology.html',
         'systems/shadowrun5e/dist/templates/item/parts/header.html',
