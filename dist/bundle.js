@@ -18737,8 +18737,13 @@ function createChatTemplateData(options) {
     // field extraction is explicit to enforce visible data flow to ensure clean data.
     // NOTE: As soon as clear data dynamic data flow can be established, this should be removed for a simple {...options}
     let { actor, item, description, tests } = options;
+    const token = actor === null || actor === void 0 ? void 0 : actor.getToken();
+    const tokenId = getTokenSceneId(token);
+    const title = game.i18n.localize("SR5.Description");
     return {
+        title,
         actor,
+        tokenId,
         item,
         description,
         tests
@@ -18787,9 +18792,6 @@ exports.addRollListeners = (app, html) => {
     if (!app.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.MessageCustomRoll)) {
         return;
     }
-    // const item = SR5Item.getItemFromMessage(html);
-    // TODO: Move layout functionality into template
-    // if (item?.hasRoll && app.isRoll) $(html).find('.card-description').hide();
     html.on('click', '.test', (event) => __awaiter(void 0, void 0, void 0, function* () {
         event.preventDefault();
         const item = SR5Item_1.SR5Item.getItemFromMessage(html);
@@ -18808,11 +18810,12 @@ exports.addRollListeners = (app, html) => {
             template === null || template === void 0 ? void 0 : template.drawPreview();
         }
     });
-    html.on('click', '.card-content', event => {
+    html.on('click', '.card-main-content', event => {
         event.preventDefault();
         // NOTE: This depends on the exact card template HTML structure.
-        $(event.currentTarget).siblings('.dice-rolls').toggle();
-        $(event.currentTarget).siblings('.card-description').toggle();
+        const card = $(event.currentTarget).closest('.chat-card');
+        card.children('.dice-rolls').toggle();
+        card.children('.card-description').toggle();
     });
     /** Open the sheets of different entity types based on the chat card.
      */
