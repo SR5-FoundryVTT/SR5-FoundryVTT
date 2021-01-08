@@ -27,10 +27,13 @@
         .card-header:first-of-type {
             border-top: $groove;
         }
+        .card-main-content {
+            cursor: pointer;
+        }
         .card-content {
             padding: 0.5em 0;
             border-bottom: $groove;
-            cursor: pointer;
+
             p {
                 font-size: 0.8em;
             }

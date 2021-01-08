@@ -52,7 +52,9 @@ export interface RollChatMessageOptions {
 }
 
 interface ItemChatTemplateData {
+    title: string
     actor: SR5Actor
+    tokenId?: string
     item: SR5Item
     description: object
     tests?: Test[]
@@ -150,8 +152,14 @@ function createChatTemplateData(options: ItemChatMessageOptions): ItemChatTempla
     // NOTE: As soon as clear data dynamic data flow can be established, this should be removed for a simple {...options}
     let {actor, item, description, tests} = options;
 
+    const token = actor?.getToken();
+    const tokenId = getTokenSceneId(token);
+    const title = game.i18n.localize("SR5.Description");
+
     return {
+        title,
         actor,
+        tokenId,
         item,
         description,
         tests
@@ -214,10 +222,6 @@ export const addRollListeners = (app: ChatMessage, html) => {
         return
     }
 
-    // const item = SR5Item.getItemFromMessage(html);
-    // TODO: Move layout functionality into template
-    // if (item?.hasRoll && app.isRoll) $(html).find('.card-description').hide();
-
     html.on('click', '.test', async (event) => {
         event.preventDefault();
         const item = SR5Item.getItemFromMessage(html);
@@ -238,17 +242,21 @@ export const addRollListeners = (app: ChatMessage, html) => {
             template?.drawPreview();
         }
     });
-    html.on('click', '.card-content', event => {
-       event.preventDefault();
-       // NOTE: This depends on the exact card template HTML structure.
-       $(event.currentTarget).siblings('.dice-rolls').toggle();
-       $(event.currentTarget).siblings('.card-description').toggle();
+
+    html.on('click', '.card-main-content', event => {
+        event.preventDefault();
+        // NOTE: This depends on the exact card template HTML structure.
+        const card = $(event.currentTarget).closest('.chat-card');
+        card.children('.dice-rolls').toggle();
+        card.children('.card-description').toggle();
     });
+
 
     /** Open the sheets of different entity types based on the chat card.
      */
     html.on('click', '.chat-entity-link', event => {
         event.preventDefault();
+
         const entityLink = $(event.currentTarget);
         const id = entityLink.data('id');
         const type = entityLink.data('entity');
