@@ -35,16 +35,7 @@ export class HooksManager {
     }
 
     static init() {
-        console.log(`Loading Shadowrun 5e System
-___________________
- ___________ _____ 
-/  ___| ___ \\  ___|
-\\ \`--.| |_/ /___ \\ 
- \`--. \\    /    \\ \\
-/\\__/ / |\\ \\/\\__/ /
-\\____/\\_| \\_\\____/ 
-===================
-`);
+        console.log('Loading Shadowrun 5e System');
 
         // Create a shadowrun5e namespace within the game global
         game['shadowrun5e'] = {
