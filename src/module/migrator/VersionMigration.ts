@@ -47,9 +47,9 @@ export abstract class VersionMigration {
      */
     public async Migrate(game: Game) {
         // @ts-ignore TODO Unignore when Foundry Types updates
-        ui.notifications.info(`Beginning Shadowrun system migration from version ${this.SourceVersionFriendlyName} to ${this.TargetVersionFriendlyName}.`);
+        ui.notifications.info(`${game.i18n.localize('SR5.MIGRATION.BeginNotification')} ${this.SourceVersionFriendlyName} -> ${this.TargetVersionFriendlyName}.`);
         // @ts-ignore TODO Unignore when Foundry Types updates
-        ui.notifications.warn(`Please do not close your game or shutdown FoundryVTT.`, {
+        ui.notifications.warn(game.i18n.localize('SR5.MIGRATION.DoNotCloseNotification'), {
             permanent: true,
         });
 
@@ -95,7 +95,7 @@ export abstract class VersionMigration {
 
         await game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
         // @ts-ignore TODO Unignore when Foundry Types updates
-        ui.notifications.info(`Shadowrun system migration successfully migrated to version ${this.TargetVersion}.`, { permanent: true });
+        ui.notifications.info(`${game.i18n.localize('SR5.MIGRATION.SuccessNotification')} ${this.TargetVersion}.`, { permanent: true });
     }
 
     /**
