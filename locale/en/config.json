@@ -586,15 +586,12 @@
     "SR5.MIGRATION.WarningDescription": "Only the GM can perform the update and shutting down the server or closing your browser while the update is in progress may cause irreparable damage to your world.",
     "SR5.MIGRATION.WarningBackup": "If you have not backed up your world, do so before you press the 'Begin Migration' button below.",
     "SR5.MIGRATION.BeginMigration": "Begin Migration",
-    "SR5.MIGRATION.BeginNotification": "Beginning Shadowrun system migration from version",
-    "SR5.MIGRATION.DoNotCloseNotification": "Please do not close your game or shutdown FoundryVTT.",
 
     "SR5.MIGRATION.SuccessTitle": "Success",
     "SR5.MIGRATION.SuccessHeader": "Migration Complete",
     "SR5.MIGRATION.SuccessDescription": "Existing compendium packs belonging to this world have been updated in the process of this migration.",
     "SR5.MIGRATION.SuccessPacksInfo": "Due to current technical limitations with FoundryVTT, actor packs must be updated manually.",
     "SR5.MIGRATION.SuccessConfirm": "Close",
-    "SR5.MIGRATION.SuccessNotification": "Shadowrun system successfully migrated to version",
 
     "CONTROLS.SR5.OverwatchScoreTracker": "Overwatch Score Tracker",
 

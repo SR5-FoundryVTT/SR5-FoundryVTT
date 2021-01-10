@@ -569,15 +569,12 @@
     "SR5.MIGRATION.WarningDescription": "Somente o GM pode atualizar. Desligar o servidor ou fechar seu browser enquanto atualiza pode causar danos irreparaveis ao seu mundo.",
     "SR5.MIGRATION.WarningBackup": "Se voce nao fez backup do mundo, faca antes de apertar o botao de migracao abaixo.",
     "SR5.MIGRATION.BeginMigration": "Iniciar Migracao",
-    "SR5.MIGRATION.BeginNotification": "Beginning Shadowrun system migration from version",
-    "SR5.MIGRATION.DoNotCloseNotification": "Please do not close your game or shutdown FoundryVTT.",
 
     "SR5.MIGRATION.SuccessTitle": "Sucesso",
     "SR5.MIGRATION.SuccessHeader": "Migracao Completa",
     "SR5.MIGRATION.SuccessDescription": "Compendios existentes deste mundo foram atualizados no processo de migracao.",
     "SR5.MIGRATION.SuccessPacksInfo": "Devido a limitacoes tecnicas com FVTT, packs de atores devem ser atualizados manualmente",
     "SR5.MIGRATION.SuccessConfirm": "Fechar",
-    "SR5.MIGRATION.SuccessNotification": "Shadowrun system successfully migrated to version",
 
     "CONTROLS.SR5.OverwatchScoreTracker": "Monitor de Valor de Vigilancia",
 
