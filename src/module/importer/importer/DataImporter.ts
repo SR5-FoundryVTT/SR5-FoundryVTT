@@ -62,7 +62,7 @@ export abstract class DataImporter {
             charkey: ImportHelper.CHAR_KEY,
         });
 
-        return (await parser.parseStringPromise(xmlString))['chummer'];
+        return await parser.parseStringPromise(xmlString);
     }
 
     public static unsupportedBookSource(jsonObject) {
