@@ -88,7 +88,7 @@ export class Import extends Application {
     ];
 
     async parseXML(xmlSource, fileName) {
-        let jsonSource = await DataImporter.xml2json(xmlSource)['chummer'];
+        let jsonSource = await DataImporter.xml2json(xmlSource);
         ImportHelper.SetMode(ImportMode.XML);
 
         for (const di of Import.Importers) {
@@ -103,7 +103,7 @@ export class Import extends Application {
         if (!xmlSource) {
             return;
         }
-        let jsonSource = await DataImporter.xml2json(xmlSource)['chummer'];
+        let jsonSource = await DataImporter.xml2json(xmlSource);
 
         if (DataImporter.CanParseI18n(jsonSource)) {
             DataImporter.ParseTranslation(jsonSource);
