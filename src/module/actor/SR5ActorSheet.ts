@@ -1,5 +1,5 @@
 import { Helpers } from '../helpers';
-import { ChummerImportForm } from '../apps/chummer-import-form';
+import { CharacterImport } from '../importer/apps/character-form';
 import { SkillEditForm } from '../apps/skills/SkillEditForm';
 import { KnowledgeSkillEditForm } from '../apps/skills/KnowledgeSkillEditForm';
 import { LanguageSkillEditForm } from '../apps/skills/LanguageSkillEditForm';
@@ -941,6 +941,6 @@ export class SR5ActorSheet extends ActorSheet {
             name: 'chummer-import',
             title: 'Chummer Import',
         };
-        new ChummerImportForm(this.actor, options).render(true);
+        new CharacterImport(this.actor, options).render(true);
     }
 }

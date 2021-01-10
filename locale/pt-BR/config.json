@@ -25,6 +25,8 @@
         "Sprite": "Sprite",
         "Vehicle": "Veiculo"
     },
+    
+    "SR5.Upload": "Upload",
 
     "SR5.ActiveSkills": "Pericias Ativas",
     "SR5.Specializations": "Especializacoes",

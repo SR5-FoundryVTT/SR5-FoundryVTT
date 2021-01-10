@@ -26,6 +26,8 @@
         "Sprite": "Sprite",
         "Vehicle": "Vehicle"
     },
+    
+    "SR5.Upload": "Upload",
 
     "SR5.ActiveSkills": "Active Skills",
     "SR5.Specializations": "Specializations",
@@ -764,5 +766,11 @@
     "SR5.Warnings": {
         "NegativeLimitValue": "Limit values must be above zero",
         "TokenSelectionNeeded": "One ore more tokens need to be selected"
-    }
+    },
+
+    "SR5.ChummerImport.Title": "Chummer5 Import",
+    "SR5.ChummerImport.SelectedFile": "Selected file",
+    "SR5.ChummerImport.SelectedFileNone": "None",
+    "SR5.ChummerImport.Preview": "Preview",
+    "SR5.ChummerImport.Import": "Import"
 }
