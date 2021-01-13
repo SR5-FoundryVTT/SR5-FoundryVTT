@@ -27,7 +27,8 @@ export class DamageApplicationDialog extends FormDialog {
         const actorDamage = actors.map(actor => {
             return {
                 actor,
-                modified: actor.applyDamageTypeChangeForArmor(damage),
+                // Don't change damage type for grunt to avoid confusing user.
+                modified: actor._applyDamageTypeChangeForArmor(damage),
                 armor: actor.getModifiedArmor(damage)
             }
         });

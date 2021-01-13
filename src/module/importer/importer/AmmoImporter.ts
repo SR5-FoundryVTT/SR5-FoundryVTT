@@ -2,10 +2,9 @@ import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
 import Ammo = Shadowrun.Ammo;
+import {DeviceImporter} from "./DeviceImporter";
 
 export class AmmoImporter extends DataImporter {
-    public categoryTranslations: any;
-    public gearsTranslations: any;
     public files = ['gear.xml'];
 
     CanParse(jsonObject: object): boolean {
@@ -66,7 +65,7 @@ export class AmmoImporter extends DataImporter {
 
         let jsonGeari18n = ImportHelper.ExtractDataFileTranslation(DataImporter.jsoni18n, this.files[0]);
         this.categoryTranslations = ImportHelper.ExtractCategoriesTranslation(jsonGeari18n);
-        this.gearsTranslations = ImportHelper.ExtractItemTranslation(jsonGeari18n, 'gears', 'gear');
+        this.entryTranslations = ImportHelper.ExtractItemTranslation(jsonGeari18n, 'gears', 'gear');
     }
 
     async Parse(jsonObject: object): Promise<Entity> {
@@ -74,6 +73,9 @@ export class AmmoImporter extends DataImporter {
         let jsonAmmos = jsonObject['gears']['gear'];
         for (let i = 0; i < jsonAmmos.length; i++) {
             let jsonData = jsonAmmos[i];
+            if (DataImporter.unsupportedEntry(jsonData)) {
+                continue;
+            }
 
             if (ImportHelper.StringValue(jsonData, 'category', '') !== 'Ammunition') {
                 continue;
@@ -81,7 +83,7 @@ export class AmmoImporter extends DataImporter {
 
             let data = this.GetDefaultData();
             data.name = ImportHelper.StringValue(jsonData, 'name');
-            data.name = ImportHelper.MapNameToTranslation(this.gearsTranslations, data.name);
+            data.name = ImportHelper.MapNameToTranslation(this.entryTranslations, data.name);
 
             data.data.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;
             data.data.technology.rating = 2;
@@ -113,10 +115,11 @@ export class AmmoImporter extends DataImporter {
             // NOTE: Should either weapons or gear not have been imported with translation, this will fail.
             if (shouldLookForWeapons) {
                 let foundWeapon = ImportHelper.findItem((item) => {
-                    return item.name.toLowerCase() === nameLower;
+                    // Filter for weapon type due to possible double naming giving other item types.
+                    return item.type === 'weapon' && item.name.toLowerCase() === nameLower;
                 });
 
-                if (foundWeapon !== null) {
+                if (foundWeapon !== null && foundWeapon.data.data.action) {
                     console.log(foundWeapon);
                     data.data.damage = foundWeapon.data.data.action.damage.value;
                     data.data.ap = foundWeapon.data.data.action.damage.ap.value;

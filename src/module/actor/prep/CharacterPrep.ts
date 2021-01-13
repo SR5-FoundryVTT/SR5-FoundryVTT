@@ -19,10 +19,14 @@ export class CharacterPrep extends BaseActorPrep<SR5CharacterType, CharacterActo
         ModifiersPrep.clearAttributeMods(this.data);
 
         ItemPrep.prepareArmor(this.data, this.items);
-        ItemPrep.prepareCyberware(this.data, this.items);
+        ItemPrep.prepareBodyware(this.data, this.items);
 
         SkillsPrep.prepareSkills(this.data);
         AttributesPrep.prepareAttributes(this.data);
+
+        // NPCPrep is reliant to be called after AttributesPrep.
+        NPCPrep.prepareNPCData(this.data);
+
         LimitsPrep.prepareLimitBaseFromAttributes(this.data);
         LimitsPrep.prepareLimits(this.data);
 
@@ -44,7 +48,6 @@ export class CharacterPrep extends BaseActorPrep<SR5CharacterType, CharacterActo
         InitiativePrep.prepareMatrixInit(this.data);
         InitiativePrep.prepareCurrentInitiative(this.data);
 
-        // NPCPrep is reliant to be called after AttributesPrep.
-        NPCPrep.prepareNPCData(this.data);
+
     }
 }

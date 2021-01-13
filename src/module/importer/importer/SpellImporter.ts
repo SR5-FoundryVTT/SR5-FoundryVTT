@@ -7,6 +7,7 @@ import { ManipulationSpellParser } from '../parser/spell/ManipulationSpellParser
 import { IllusionSpellParser } from '../parser/spell/IllusionSpellParser';
 import { DetectionSpellImporter } from '../parser/spell/DetectionSpellImporter';
 import { ParserMap } from '../parser/ParserMap';
+import {DeviceImporter} from "./DeviceImporter";
 
 export class SpellImporter extends DataImporter {
     public categoryTranslations: any;
@@ -134,6 +135,9 @@ export class SpellImporter extends DataImporter {
         let jsonDatas = jsonObject['spells']['spell'];
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
+            if (DataImporter.unsupportedEntry(jsonData)) {
+                continue;
+            }
 
             let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
             data.folder = folders[data.data.category].id;

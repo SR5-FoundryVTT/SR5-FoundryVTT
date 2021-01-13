@@ -51,6 +51,9 @@ export const registerItemLineHelpers = () => {
             case 'armor':
                 addIcon.title = game.i18n.localize('SR5.CreateItemArmor');
                 return [addIcon];
+            case 'ammo':
+                addIcon.title = game.i18n.localize('SR5.CreateItemAmmo');
+                return [addIcon];
             case 'device':
                 addIcon.title = game.i18n.localize('SR5.CreateItemDevice');
                 return [addIcon];
@@ -115,6 +118,7 @@ export const registerItemLineHelpers = () => {
             case 'equipment':
             case 'cyberware':
             case 'bioware':
+            case 'ammo':
                 return [
                     {
                         text: {
@@ -248,6 +252,7 @@ export const registerItemLineHelpers = () => {
                     },
                 ];
             case 'armor':
+            case 'ammo':
             case 'device':
             case 'equipment':
             case 'cyberware':
@@ -258,7 +263,7 @@ export const registerItemLineHelpers = () => {
                     const count = wrapper.getAmmo()?.current.value ?? 0;
                     const max = wrapper.getAmmo()?.current.max ?? 0;
                     const text = count < max ? `${game.i18n.localize('SR5.WeaponReload')} (${count}/${max})` : game.i18n.localize('SR5.AmmoFull');
-                    const cssClass = 'no-break' + (count < max ? ' reload-ammo roll' : ' faded');
+                    const cssClass = 'no-break' + (count < max ? ' reload-ammo roll' : 'faded');
                     return [
                         {
                             text: {

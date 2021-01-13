@@ -20,6 +20,7 @@ import DrainData = Shadowrun.DrainData;
 import {ShadowrunTestDialog} from "../apps/dialogs/ShadowrunTestDialog";
 import ModifiedDamageData = Shadowrun.ModifiedDamageData;
 import LimitField = Shadowrun.LimitField;
+import CombatData = Shadowrun.CombatData;
 
 // TODO: Split up BasicRollProps into the different types of calls
 // item, actor, dicePool, attack, defense, spell, form
@@ -53,6 +54,7 @@ export interface BasicRollProps {
     previewTemplate?: boolean;
     hideRollMessage?: boolean;
     rollMode?: keyof typeof CONFIG.Dice.rollModes;
+    combat?: CombatData
 }
 
 /** Provide a clear interface of which value are guaranteed to be defined.
@@ -81,6 +83,7 @@ export interface AdvancedRollProps extends BasicRollProps {
     blast?: BlastData;
     reach?: number
     fireMode?: FireModeData
+    combat?: CombatData
 }
 
 /** Provide a clear interface of which value are guaranteed to be defined.
@@ -176,6 +179,7 @@ export class ShadowrunRoller {
             actor: item.actor,
             parts: item.getRollPartsList(),
             limit: item.getLimit(),
+            extended: item.getExtended(),
             title: item.getRollName(),
             previewTemplate: item.hasTemplate,
             attack:  item.getAttackData(0, actionTestData),
@@ -389,6 +393,7 @@ export class ShadowrunRoller {
             await ShadowrunRoller.targetsChatMessages(props);
         }
 
+        // Roll further extended tests.
         if (testData.extended) {
             const currentExtended = testData.parts.getPartValue('SR5.Extended') ?? 0;
             testData.parts.addUniquePart('SR5.Extended', currentExtended - 1);
@@ -400,14 +405,15 @@ export class ShadowrunRoller {
             setTimeout(() => this.advancedRoll(props), delayInMs);
         }
 
+        // Call any provided callbacks to be executed after this roll.
         if (after) await after(roll);
 
         return roll;
     }
 
     static async rollChatMessage(roll: ShadowrunRoll, props: BasicRollPropsDefaulted) {
-        const {actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, damage, tests} = props;
-        const rollChatMessageOptions = {roll, actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, damage, tests};
+        const {actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, damage, tests, combat} = props;
+        const rollChatMessageOptions = {roll, actor, target, item, rollMode, description, title, previewTemplate, attack, incomingAttack, damage, tests, combat};
         await createRollChatMessage(rollChatMessageOptions);
     }
 

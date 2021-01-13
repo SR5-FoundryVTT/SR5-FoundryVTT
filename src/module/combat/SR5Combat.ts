@@ -1,4 +1,5 @@
 import SR5CombatData = Shadowrun.SR5CombatData;
+import {SR5Actor} from "../actor/SR5Actor";
 
 export class SR5Combat extends Combat {
     get initiativePass(): number {
@@ -17,8 +18,12 @@ export class SR5Combat extends Combat {
         });
     }
 
-    getActorCombatant(actor: Actor): undefined | any {
-        return this.combatants.find((c) => c.actor._id === actor._id);
+    /** Use the given actors token to get the combatant.
+     * NOTE: The token must be used, instead of just the actor, as unlinked tokens will all use the same actor id.
+     */
+    getActorCombatant(actor: SR5Actor): undefined | any {
+        const token = actor.getToken();
+        return this.getCombatantByToken(token.id);
     }
 
     /**

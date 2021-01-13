@@ -369,6 +369,7 @@
     "SR5.InitCatMeatspace": "Initiative",
     "SR5.InitCatAstral": "Astrale Initiative",
     "SR5.InitCatMatrix": "Matrix-Initiative",
+  "SR5.Initiative": "Initiative",
 
   "SR5.CyberwareGrade": "Grad",
   "SR5.CyberwareGradeStandard": "Standard",
@@ -496,7 +497,7 @@
   "SR5.SelectTokenMessage": "Bitte zuerst ein Token auswählen",
 
   "SR5.MigrationComplete": "Migration vollständig",
-  "SR5.MigrationUpdateCompendiumUpdateMessage": "Alle in der Welt existieren Kommendiumpackete wurden auch aktualisiert",
+  "SR5.MigrationUpdateCompendiumUpdateMessage": "Alle in der Welt vorhandenen Kommendiumpakete wurden aktualisiert",
   "SR5.MigrationUpdateCompendiumNoUpdateActor": "Aufgrund technischer Limitierungen von FoundryVTT müssen Kommpendien vom Typ Actor manuell aktualisiert werden.",
   "SR5.Close": "Schließen",
 
@@ -566,16 +567,19 @@
 
   "SR5.MIGRATION.WarningTitle": "Alarm",
   "SR5.MIGRATION.WarningHeader": "Migrationswarnung",
-  "SR5.MIGRATION.WarningRequired": "Das Shadowrun 5E System muss ein notwendiges Update ausführen.",
-  "SR5.MIGRATION.WarningDescription": "Nur der SL can das Update durchführen und Herunterfahren des Servers oder Schließen des Browsers während dem Update kann zu nicht reparierbaren Schäden an deiner Welt führen.",
-  "SR5.MIGRATION.WarningBackup": "Erstelle ein Backup deiner Welt bevor du den Knopf 'Starte Migratin' drückst.",
-  "SR5.MIGRATION.BeginMigration": "Strarte Migration",
+  "SR5.MIGRATION.WarningRequired": "Das Shadowrun 5E System muss eine notwendige Aktualisierung ausführen.",
+  "SR5.MIGRATION.WarningDescription": "Nur der SL kann die Aktualisierung durchführen. Während der Aktualisierung darf der Browser nicht geschlossen oder der Server heruntergefahren werden, sonst können katastrophale Fehler in dieser Welt entstehen.",
+  "SR5.MIGRATION.WarningBackup": "Erstelle ein Backup deiner Welt bevor du die Migration startest!",
+  "SR5.MIGRATION.BeginMigration": "Starte Migration",
+  "SR5.MIGRATION.BeginNotification": "Starte Shadowrun System Migration von Version",
+  "SR5.MIGRATION.DoNotCloseNotification": "Bitte das nicht das Spiel schließen oder FoundryVTT herunterfahren.",
 
   "SR5.MIGRATION.SuccessTitle": "Erfolg",
   "SR5.MIGRATION.SuccessHeader": "Migration vollständig",
-  "SR5.MIGRATION.SuccessDescription": "Bestehende Kompendien Packete wurden aktualisiert.",
+  "SR5.MIGRATION.SuccessDescription": "Bestehende Kompendien Pakete wurden aktualisiert.",
   "SR5.MIGRATION.SuccessPacksInfo": "Aufgrund technischer Limitierungen von FoundryVTT müssen Kommpendien vom Typ Actor manuell aktualisiert werden.",
   "SR5.MIGRATION.SuccessConfirm": "Schließen",
+  "SR5.MIGRATION.SuccessNotification": "Shadowrun System erfolgreich migriert zu Version",
 
   "CONTROLS.SR5.OverwatchScoreTracker": "Overwatch Wert Übersicht",
 

@@ -90,6 +90,7 @@
         top: 2px;
         z-index: 9;
     }
+
 }
 
 label.checkbox {
@@ -173,6 +174,9 @@ input[type='text'].display {
     border-color: $black;
     text-align: center;
     min-height: 1em;
+    &::placeholder {
+        color: $light-2;
+    }
     &.short {
         font-size: 0.75em;
         background: rgba($dark, 0.1);
@@ -227,6 +231,10 @@ select.display {
     .roll {
         @include rollable;
     }
+    .editor {
+        height: 95%;
+        width: 100%;
+    }
     .editor .tox-edit-area {
         background: $mce-background;
     }
@@ -265,7 +273,8 @@ select.display {
         color: $color;
         overflow: hidden;
     }
-    .editor {
+    // Only alter editor height scaling for item descriptions, not actor bio where space is needed.
+    .description > .editor {
         height: 15em;
         width: 100%;
         color: $color;
@@ -548,7 +557,7 @@ select.display {
             height: 100%;
             border: $light;
             &.faded {
-                color: $dark;
+                color: $grey;
             }
             &.center {
                 display: flex;
@@ -583,6 +592,12 @@ select.display {
             &.desc {
                 width: 16em;
             }
+        }
+        .item-create,
+        .add-new-ammo,
+        .add-new-mod,
+        .add-new-license {
+            color: $color;
         }
         .skill-item {
             width: 8em;

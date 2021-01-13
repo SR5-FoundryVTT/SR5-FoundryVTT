@@ -11,6 +11,7 @@ import DamageData = Shadowrun.DamageData;
 import {DamageApplicationDialog} from "./apps/dialogs/DamageApplicationDialog";
 import DamageType = Shadowrun.DamageType;
 import DamageElement = Shadowrun.DamageElement;
+import CombatData = Shadowrun.CombatData;
 
 export interface TargetChatMessageOptions {
     actor: Actor
@@ -46,36 +47,22 @@ export interface RollChatMessageOptions {
     incomingAttack?: AttackData
     incomingDrain?: DrainData
     damage?: ModifiedDamageData
-    tests?: Test[];
+    tests?: Test[]
+    combat?: CombatData
 }
 
 interface ItemChatTemplateData {
+    title: string
     actor: SR5Actor
+    tokenId?: string
     item: SR5Item
     description: object
     tests?: Test[]
 }
 
-interface RollChatTemplateData {
-    actor?: SR5Actor
+interface RollChatTemplateData extends RollChatMessageOptions {
     tokenId?: string
-    target?: Token
-    item?: SR5Item
-
-    title: string
-    description?: object;
-
-    roll: ShadowrunRoll
-
     rollMode: keyof typeof CONFIG.dice.rollModes
-    previewTemplate?: boolean
-
-    attack?: AttackData
-    // TODO: group 'incoming' with type field instead of multiple incoming types.
-    incomingAttack?: AttackData
-    incomingDrain?: DrainData
-    damage?: ModifiedDamageData
-    tests?: Test[];
 }
 
 async function createChatMessage(templateData, options?: ChatDataOptions): Promise<Entity<any>> {
@@ -165,8 +152,14 @@ function createChatTemplateData(options: ItemChatMessageOptions): ItemChatTempla
     // NOTE: As soon as clear data dynamic data flow can be established, this should be removed for a simple {...options}
     let {actor, item, description, tests} = options;
 
+    const token = actor?.getToken();
+    const tokenId = getTokenSceneId(token);
+    const title = game.i18n.localize("SR5.Description");
+
     return {
+        title,
         actor,
+        tokenId,
         item,
         description,
         tests
@@ -184,32 +177,15 @@ export async function createRollChatMessage(options: RollChatMessageOptions): Pr
 
 
 function getRollChatTemplateData(options: RollChatMessageOptions): RollChatTemplateData {
-    // field extraction is explicit to enforce visible data flow to ensure clean data.
-    // NOTE: As soon as clear data dynamic data flow can be established, this should be removed for a simple {...options}
-    let {roll, actor, item, target, description, title, previewTemplate,
-        attack, incomingAttack, incomingDrain, damage, tests} = options;
+    const token = options.actor?.getToken();
 
     const rollMode = options.rollMode ?? game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
-
-    const token = actor?.getToken();
-
     const tokenId = getTokenSceneId(token);
 
     return {
-        roll,
-        actor,
-        item,
+       ...options,
         tokenId,
-        target,
         rollMode,
-        title,
-        description,
-        previewTemplate,
-        attack,
-        incomingAttack,
-        incomingDrain,
-        damage,
-        tests
     }
 }
 
@@ -246,10 +222,6 @@ export const addRollListeners = (app: ChatMessage, html) => {
         return
     }
 
-    // const item = SR5Item.getItemFromMessage(html);
-    // TODO: Move layout functionality into template
-    // if (item?.hasRoll && app.isRoll) $(html).find('.card-description').hide();
-
     html.on('click', '.test', async (event) => {
         event.preventDefault();
         const item = SR5Item.getItemFromMessage(html);
@@ -270,17 +242,21 @@ export const addRollListeners = (app: ChatMessage, html) => {
             template?.drawPreview();
         }
     });
-    html.on('click', '.card-content', event => {
-       event.preventDefault();
-       // NOTE: This depends on the exact card template HTML structure.
-       $(event.currentTarget).siblings('.dice-rolls').toggle();
-       $(event.currentTarget).siblings('.card-description').toggle();
+
+    html.on('click', '.card-main-content', event => {
+        event.preventDefault();
+        // NOTE: This depends on the exact card template HTML structure.
+        const card = $(event.currentTarget).closest('.chat-card');
+        card.children('.dice-rolls').toggle();
+        card.children('.card-description').toggle();
     });
+
 
     /** Open the sheets of different entity types based on the chat card.
      */
     html.on('click', '.chat-entity-link', event => {
         event.preventDefault();
+
         const entityLink = $(event.currentTarget);
         const id = entityLink.data('id');
         const type = entityLink.data('entity');

@@ -2,13 +2,13 @@
     "name": "shadowrun5e",
     "title": "Shadowrun 5th Edition [DEV]",
     "description": "Shadowrun 5th Edition game",
-    "version": "0.7.6",
+    "version": "0.7.8",
     "templateVersion": "1.4",
     "author": "Shawn Milligan [n3rf_herder#9026], Andrew Cuccinello [DJ#1982], Jan Schoska [taM#9507]",
     "esmodules": ["dist/bundle.js"],
     "styles": ["dist/bundle.css"],
     "minimumCoreVersion": "0.7.1",
-    "compatibleCoreVersion": "0.7.7",
+    "compatibleCoreVersion": "0.7.9",
     "languages": [
         {
             "lang": "en",
@@ -50,5 +50,6 @@
     "socket": true,
     "manifest": "https://raw.githubusercontent.com/ajwpark/SR5-FoundryVTT/critters/system.json",
     "url": "https://github.com/ajwpark/SR5-FoundryVTT/tree/critters",
-    "download": "https://github.com/ajwpark/SR5-FoundryVTT/archive/v0.7.6-ajwpark.1.zip"
+    "download": "https://github.com/ajwpark/SR5-FoundryVTT/archive/v0.7.8-ajwpark.1.zip"
+
 }

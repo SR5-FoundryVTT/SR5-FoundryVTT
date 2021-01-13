@@ -4,9 +4,7 @@ declare namespace Shadowrun {
     };
 
     export type ActionData = ActionPartData & DescriptionPartData;
-
-    export type ActionPartData = {
-        action: {
+    export type ActionRollData = {
             type: string;
             category: string;
             attribute: ActorAttribute;
@@ -22,6 +20,9 @@ declare namespace Shadowrun {
             alt_mod: number;
             dice_pool_mod: ModList<number>;
         };
+
+    export type ActionPartData = {
+        action: ActionRollData
     };
 
     /**

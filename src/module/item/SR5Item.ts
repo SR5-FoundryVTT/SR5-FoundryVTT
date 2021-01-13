@@ -19,6 +19,9 @@ import FireRangeData = Shadowrun.FireRangeData;
 import BlastData = Shadowrun.BlastData;
 import ConditionData = Shadowrun.ConditionData;
 import SR5ItemType = Shadowrun.SR5ItemType;
+import ActionData = Shadowrun.ActionData;
+import ActionRollData = Shadowrun.ActionRollData;
+import TrackType = Shadowrun.TrackType;
 
 export class SR5Item extends Item {
     labels: {} = {};
@@ -114,15 +117,12 @@ export class SR5Item extends Item {
         }
     }
 
-    async update(data, options?) {
-        const ret = super.update(data, options);
-        ret.then(() => {
-            if (this.actor) {
-                this.actor.render(false);
-            }
-        });
-        return ret;
+    /** Overwrite to allow for options param to be skipped.
+     */
+    async update(data, options?): Promise<this> {
+        return super.update(data, options);
     }
+
     get hasOpposedRoll(): boolean {
         return !!(this.data.data.action && this.data.data.action.opposed.type);
     }
@@ -241,7 +241,6 @@ export class SR5Item extends Item {
         }
 
         this.labels = labels;
-        item['properties'] = this.getChatData().properties;
     }
 
     async postItemCard() {
@@ -696,21 +695,32 @@ export class SR5Item extends Item {
     prepareEmbeddedEntities() {
         super.prepareEmbeddedEntities();
         let items = this.getEmbeddedItems();
+
+        // Templates and further logic need a items HashMap, yet the flag provides an array.
         if (items) {
+
             const existing = (this.items || []).reduce((object, i) => {
                 object[i.id] = i;
                 return object;
             }, {});
-            this.items = items.map((i) => {
-                if (i._id in existing) {
-                    const a = existing[i._id];
-                    a.data = i;
-                    a.prepareData();
-                    return a;
+
+            // Merge possible changes / new items from the flag into the current item instance.
+            this.items = items.map((item) => {
+                if (item._id in existing) {
+                    const currentItem = existing[item._id];
+
+                    // Patch .data isn't really anymore but do it for consistency.
+                    // Patch ._data is needed for Item.prepareData to work, as it's simply duplicating _data over data.
+                    // Otherwise old item data will be used for value preparation.
+                    currentItem.data = item;
+                    currentItem._data = item;
+                    currentItem.prepareData();
+                    return currentItem;
+
                 } else {
                     // dirty things done here
                     // @ts-ignore
-                    return Item.createOwned(i, this);
+                    return Item.createOwned(item, this);
                 }
             });
         }
@@ -794,11 +804,15 @@ export class SR5Item extends Item {
 
     _canDealDamage(): boolean {
         // NOTE: Double negation to force boolean comparison casting.
-        return !!this.data.data.action?.damage.type;
+        return !!this.data.data.action?.damage.type.base;
     }
 
-    getAction() {
+    getAction(): ActionRollData {
         return this.data.data.action;
+    }
+
+    getExtended(): boolean {
+        return this.getAction().extended;
     }
 
     getAttackData(hits: number, actionTestData?: ActionTestData): AttackData | undefined {
@@ -806,18 +820,18 @@ export class SR5Item extends Item {
             return undefined;
         }
 
-        const action = duplicate(this.data.data.action); // TODO replace with getAction() when available
+        const {damage} = this.getAction();
 
         // add attribute value to the damage if we
-        if (action.damage.attribute) {
-            const { attribute } = action.damage;
+        if (damage.attribute) {
+            const { attribute } = damage;
             const att = this.actor.findAttribute(attribute);
             if (att) {
-                action.damage.mod = PartsList.AddUniquePart(action.damage.mod, att.label, att.value);
-                action.damage.value = Helpers.calcTotal(action.damage);
+                damage.mod = PartsList.AddUniquePart(damage.mod, att.label, att.value);
+                damage.value = Helpers.calcTotal(damage);
             }
         }
-        const {damage} = this.getAction();
+
         const data: AttackData = {
             hits,
             damage,
@@ -1034,7 +1048,7 @@ export class SR5Item extends Item {
     getActionLimit(): number | undefined {
         let limit = this.wrapper.getActionLimit();
         // get the limit modifiers from the actor if we have them
-        const action = this.wrapper.getData().action; // TODO replace with the getAction() when available
+        const action = this.wrapper.getAction();
         if (action?.limit.attribute && limit && this.actor) {
             const { attribute } = action.limit;
             const att = this.actor.findAttribute(attribute);
@@ -1074,6 +1088,10 @@ export class SR5Item extends Item {
             return this.data.data.melee?.reach ?? 0;
         }
         return 0;
+    }
+
+    getTrack(): TrackType {
+        return this.data.data.technology.condition_monitor;
     }
 
     hasDefenseTest(): boolean {

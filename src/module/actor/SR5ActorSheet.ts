@@ -10,6 +10,7 @@ import { SR5Actor } from './SR5Actor';
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import { SR5 } from '../config';
 import SkillField = Shadowrun.SkillField;
+import {SR5Item} from "../item/SR5Item";
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditForm instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
@@ -61,8 +62,13 @@ export class SR5ActorSheet extends ActorSheet {
     }
 
     get template() {
-        const path = 'systems/shadowrun5e/dist/templates/actor/';
-        return `${path}${this.actor.data.type}.html`;
+        const path = 'systems/shadowrun5e/dist/templates';
+
+        if (this.actor.hasPerm(game.user, 'LIMITED', true)) {
+            return `${path}/actor-limited/${this.actor.data.type}.html`;
+        }
+
+        return `${path}/actor/${this.actor.data.type}.html`;
     }
 
     /* -------------------------------------------- */
@@ -130,8 +136,8 @@ export class SR5ActorSheet extends ActorSheet {
     }
 
     _prepareActorTypeFields(data: SR5ActorSheetData) {
-        data.isCharacter = this.actor.data.type === 'character';
-        data.isSpirit = this.actor.data.type === 'spirit';
+        data.isCharacter = this.actor.isCharacter();
+        data.isSpirit = this.actor.isSpirit();
     }
 
     _prepareMatrixAttributes(data) {
@@ -260,6 +266,13 @@ export class SR5ActorSheet extends ActorSheet {
                     type: 'equipment',
                 },
             };
+            inventory['ammo'] = {
+                label: game.i18n.localize('SR5.ItemTypes.Ammo'),
+                items: [],
+                dataset: {
+                    type: 'ammo',
+                },
+            };
             inventory['cyberware'] = {
                 label: game.i18n.localize('SR5.ItemTypes.Cyberware'),
                 items: [],
@@ -291,6 +304,16 @@ export class SR5ActorSheet extends ActorSheet {
             sprite_powers,
         ] = data.items.reduce(
             (arr, item) => {
+                // Duplicate to avoid later updates propagating changed item data.
+                // NOTE: If no duplication is done, added fields will be stored in the database on updates!
+                item = duplicate(item);
+                // Show item properties and description in the item list overviews.
+                const actorItem = this.actor.items.get(item._id) as SR5Item;
+                const chatData = actorItem.getChatData();
+                item.description = chatData.description;
+                item.properties = chatData.properties;
+
+                // TODO: isStack property isn't used elsewhere. Remove if unnecessary.
                 item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
                 if (item.type === 'spell') arr[1].push(item);
                 else if (item.type === 'quality') arr[2].push(item);
