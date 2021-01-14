@@ -381,7 +381,7 @@ export class SR5Item extends Item {
             const dropoff = ammo.data.data.blast.dropoff;
             return {
                 radius: distance,
-                dropoff,
+                dropoff: dropoff,
             };
         }
     }
