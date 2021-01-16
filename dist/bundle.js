@@ -16205,9 +16205,9 @@ class ItemPrep {
             armor[element] = 0;
         }
         const armorModParts = new PartsList_1.PartsList(armor.mod);
-        const equippedArmor = items.filter((item) => item.isArmor() && item.isEquipped());
+        const equippedArmor = items.filter((item) => item.couldHaveArmor() && item.isEquipped());
         equippedArmor === null || equippedArmor === void 0 ? void 0 : equippedArmor.forEach((item) => {
-            // Don't spam armor values with clothing.
+            // Don't spam armor values with clothing or armor like items without any actual armor.
             if (item.hasArmor()) {
                 // Apply armor base and accessory values.
                 if (item.hasArmorAccessory()) {
@@ -25640,8 +25640,18 @@ class SR5ItemDataWrapper extends DataWrapper_1.DataWrapper {
         // TODO figure out how to detect explosive ammo
         return this.isGrenade() || (this.isSpell() && this.getData().range === 'los_a'); //|| this.hasExplosiveAmmo();
     }
+    /** Should only be used to check for actual armor item type.
+     * NOTE: Should you only care about a possible armor value use couldHaveArmor instead.
+     */
     isArmor() {
         return this.data.type === 'armor';
+    }
+    /** Will give an indicator if an item provides an armor value, without locking into only the Armor item type.
+     * NOTE: Should you only care about the armor item type use isArmor instead.
+     */
+    couldHaveArmor() {
+        const armor = this.getData().armor;
+        return this.isArmor() || armor !== undefined;
     }
     hasArmorBase() {
         var _a;

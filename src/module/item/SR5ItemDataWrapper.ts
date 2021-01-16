@@ -18,8 +18,19 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
         return this.isGrenade() || (this.isSpell() && this.getData().range === 'los_a'); //|| this.hasExplosiveAmmo();
     }
 
+    /** Should only be used to check for actual armor item type.
+     * NOTE: Should you only care about a possible armor value use couldHaveArmor instead.
+     */
     isArmor(): boolean {
         return this.data.type === 'armor';
+    }
+
+    /** Will give an indicator if an item provides an armor value, without locking into only the Armor item type.
+     * NOTE: Should you only care about the armor item type use isArmor instead.
+     */
+    couldHaveArmor(): boolean {
+        const armor = this.getData().armor;
+        return this.isArmor() || armor !== undefined;
     }
 
     hasArmorBase(): boolean {
