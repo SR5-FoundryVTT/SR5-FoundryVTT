@@ -17,7 +17,7 @@ declare namespace Shadowrun {
         showUntrainedSkills
     };
 
-    export type SR5ActorType = SR5SpiritType | SR5CharacterType | SR5SpriteType | SR5VehicleType;
+    export type SR5ActorType = SR5SpiritType | SR5CharacterType | SR5SpriteType | SR5VehicleType | SR5CritterType;
 
     export type SR5ActorBase = ActorData & {
         name: string;
@@ -38,7 +38,7 @@ declare namespace Shadowrun {
         type: 'character';
     };
 
-    export type SR5ActorData = SpiritActorData | CharacterActorData | SpriteActorData | VehicleActorData;
+    export type SR5ActorData = SpiritActorData | CharacterActorData | SpriteActorData | VehicleActorData | CritterActorData;
 
 
     export type CharacterActorData = MatrixActorData &

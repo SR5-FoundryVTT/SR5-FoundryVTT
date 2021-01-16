@@ -1,6 +1,6 @@
 {
     "Actor": {
-        "types": ["character", "spirit", "sprite", "vehicle"],
+        "types": ["character", "spirit", "sprite", "vehicle", "critter"],
         "templates": {
             "matrix": {
                 "matrix": {
@@ -903,6 +903,9 @@
             "bound": false,
             "force": 0,
             "spiritType": ""
+        },
+        "critter": {
+            "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "matrix", "movement", "condition_monitors"]
         },
         "sprite": {
             "templates": ["common", "skills", "attributes", "limits", "matrix"],

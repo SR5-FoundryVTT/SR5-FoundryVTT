@@ -61,11 +61,13 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor-limited/spirit.html',
         'systems/shadowrun5e/dist/templates/actor-limited/sprite.html',
         'systems/shadowrun5e/dist/templates/actor-limited/vehicle.html',
+        'systems/shadowrun5e/dist/templates/actor-limited/critter.html',
         'systems/shadowrun5e/dist/templates/actor-limited/parts/Header.html',
         'systems/shadowrun5e/dist/templates/actor-limited/parts/MiscCharacter.html',
         'systems/shadowrun5e/dist/templates/actor-limited/parts/MiscSpirit.html',
         'systems/shadowrun5e/dist/templates/actor-limited/parts/MiscSprite.html',
         'systems/shadowrun5e/dist/templates/actor-limited/parts/MiscVehicle.html',
+        'systems/shadowrun5e/dist/templates/actor-limited/parts/MiscCritter.html',
 
 
         'systems/shadowrun5e/dist/templates/item/parts/description.html',
