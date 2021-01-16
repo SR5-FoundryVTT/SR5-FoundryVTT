@@ -24653,29 +24653,28 @@ class SR5Item extends Item {
         return '';
     }
     getBlastData(actionTestData) {
-        // can only handle spells and grenade right now
         if (this.isSpell() && this.isAreaOfEffect()) {
-            // distance on spells is equal to force
+            // By default spell distance is equal to it's Force.
             let distance = this.getLastSpellForce().value;
-            // overwrite last usage from test selection, when available.
+            // Except for predefined user test selection.
             if (actionTestData === null || actionTestData === void 0 ? void 0 : actionTestData.spell) {
                 distance = actionTestData.spell.force;
             }
-            // extended spells multiply by 10
+            // Extended spells have a longer range.
             if (this.data.data.extended)
                 distance *= 10;
+            const dropoff = 0;
             return {
                 radius: distance,
-                dropoff: 0,
+                dropoff
             };
         }
         else if (this.isGrenade()) {
-            // use blast radius
             const distance = this.data.data.thrown.blast.radius;
             const dropoff = this.data.data.thrown.blast.dropoff;
             return {
                 radius: distance,
-                dropoff: dropoff,
+                dropoff
             };
         }
         else if (this.hasExplosiveAmmo()) {
@@ -24684,7 +24683,7 @@ class SR5Item extends Item {
             const dropoff = ammo.data.data.blast.dropoff;
             return {
                 radius: distance,
-                dropoff,
+                dropoff
             };
         }
     }
