@@ -245,7 +245,7 @@ export class Helpers {
         return name.slice(0, length).toUpperCase();
     }
 
-    static getToken(id: string): Token|undefined {
+    static getToken(id?: string): Token|undefined {
         for (const token of canvas.tokens.placeables) {
             if (token.id === id) {
                 return token;

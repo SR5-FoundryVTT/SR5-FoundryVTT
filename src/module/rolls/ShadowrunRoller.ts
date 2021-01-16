@@ -167,26 +167,34 @@ export class ShadowrunRoll extends Roll {
 }
 
 export class ShadowrunRoller {
-    static itemRoll(event, item: SR5Item, options?: Partial<AdvancedRollProps>, actionTestData?: ActionTestData): Promise<ShadowrunRoll | undefined> {
+    static async itemRoll(event, item: SR5Item, options?: Partial<AdvancedRollProps>, actionTestData?: ActionTestData): Promise<ShadowrunRoll | undefined> {
         // Create common data for all item types.
+        const title = item.getRollName();
+        const actor = item.actor;
+        const attack =  item.getAttackData(0, actionTestData);
+        const parts = item.getRollPartsList();
+        const limit = item.getLimit();
+        const extended = item.getExtended();
+        const previewTemplate = item.hasTemplate;
+        const blast = item.getBlastData(actionTestData);
+        const description = item.getChatData();
+        const target = Helpers.getToken(actionTestData?.targetId);
+        const tests = item.getOpposedTests();
+
         const rollData = {
             ...options,
             event: event,
             dialogOptions: {
                 environmental: true,
             },
-            item,
-            actor: item.actor,
-            parts: item.getRollPartsList(),
-            limit: item.getLimit(),
-            extended: item.getExtended(),
-            title: item.getRollName(),
-            previewTemplate: item.hasTemplate,
-            attack:  item.getAttackData(0, actionTestData),
-            blast: item.getBlastData(actionTestData),
-            description: item.getChatData()
+            actor,
+            parts,
+            limit,
+            extended,
+            hideRollMessage: true
         } as AdvancedRollProps;
 
+        // TODO: Clear up these function.
         // Add item type specific data.
         if (item.hasOpposedRoll) {
             rollData.tests = item.getOpposedTests();
@@ -204,7 +212,24 @@ export class ShadowrunRoller {
             rollData.target = Helpers.getToken(actionTestData.targetId);
         }
 
-        return ShadowrunRoller.advancedRoll(rollData);
+        const roll = await ShadowrunRoller.advancedRoll(rollData);
+
+        if (!roll) return undefined;
+
+        if (attack) {
+            attack.hits = roll.hits;
+        }
+
+        if (attack && item.isCombatSpell()) {
+            const spellAttack = item.getAttackData(roll.hits, actionTestData);
+            if (spellAttack) attack.damage = spellAttack.damage;
+            console.error(spellAttack);
+        }
+
+        // TODO: Check if reach is ever used / shown...
+        const reach = item.isMeleeWeapon() ? item.getReach() : undefined;
+
+        await createRollChatMessage({title, roll, actor, item, attack, previewTemplate, target, description, tests, reach})
     }
 
     static async resultingItemRolls(event, item: SR5Item, actionTestData? : ActionTestData) {

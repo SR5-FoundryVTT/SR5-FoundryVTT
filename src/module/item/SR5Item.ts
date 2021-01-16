@@ -22,6 +22,7 @@ import SR5ItemType = Shadowrun.SR5ItemType;
 import ActionData = Shadowrun.ActionData;
 import ActionRollData = Shadowrun.ActionRollData;
 import TrackType = Shadowrun.TrackType;
+import DamageData = Shadowrun.DamageData;
 
 export class SR5Item extends Item {
     labels: {} = {};
@@ -826,7 +827,7 @@ export class SR5Item extends Item {
 
         const {damage} = this.getAction();
 
-        // add attribute value to the damage if we
+        // Add custom action damage value based on Attribute.
         if (damage.attribute) {
             const { attribute } = damage;
             const att = this.actor.findAttribute(attribute);
@@ -841,14 +842,19 @@ export class SR5Item extends Item {
             damage,
         };
 
+        // Modify action damage by spell damage.
         if (this.isCombatSpell() && actionTestData?.spell) {
             const force = actionTestData.spell.force;
             const damageParts = new PartsList(data.damage.mod);
-            data.force = force;
-            data.damage.base = force;
-            data.damage.value = force + damageParts.total;
-            data.damage.ap.value = -force + damageParts.total;
-            data.damage.ap.base = -force;
+            const spellDamage = this.getSpellDamage(force, hits);
+
+            if (spellDamage) {
+                data.force = force;
+                data.damage.base = spellDamage.base;
+                data.damage.value = spellDamage.base + damageParts.total;
+                data.damage.ap.value = spellDamage.ap.value + damageParts.total;
+                data.damage.ap.base = spellDamage.ap.value;
+            }
         }
 
         if (this.isComplexForm() && actionTestData?.complexForm) {
@@ -981,6 +987,14 @@ export class SR5Item extends Item {
         return this.wrapper.isCombatSpell();
     }
 
+    isDirectCombatSpell(): boolean {
+        return this.wrapper.isDirectCombatSpell();
+    }
+
+    isIndirectCombatSpell(): boolean {
+        return this.wrapper.isIndirectCombatSpell();
+    }
+
     isRangedWeapon(): boolean {
         return this.wrapper.isRangedWeapon();
     }
@@ -1100,5 +1114,26 @@ export class SR5Item extends Item {
 
     hasDefenseTest(): boolean {
         return this.data.data.action?.opposed?.type === 'defense';
+    }
+
+    /** Use this method to get the base damage of spell, before any opposing action
+     *
+     * NOTE: This will NOT give you modified damage for direct combat spells
+     */
+    getSpellDamage(force: number, hits: number): DamageData|undefined {
+        if (!this.isCombatSpell()) return;
+
+        const action = this.getAction();
+
+        if (this.isDirectCombatSpell()) {
+            const damage = hits;
+
+            return Helpers.createDamageData(damage, action.damage.type.value);
+        } else if (this.isIndirectCombatSpell()) {
+            const damage = force;
+            const ap = -force;
+
+            return Helpers.createDamageData(damage, action.damage.type.value, -ap)
+        }
     }
 }

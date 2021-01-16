@@ -73,6 +73,16 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
         return this.isSpell() && this.getData().category === 'combat';
     }
 
+    isDirectCombatSpell(): boolean {
+        if (!this.isCombatSpell()) return false;
+        return this.getData()?.combat?.type === 'direct';
+    }
+
+    isIndirectCombatSpell(): boolean {
+        if (!this.isCombatSpell()) return false;
+        return this.getData()?.combat?.type === 'indirect';
+    }
+
     isRangedWeapon(): boolean {
         return this.isWeapon() && this.getData().category === 'range';
     }

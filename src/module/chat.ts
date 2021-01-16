@@ -49,6 +49,7 @@ export interface RollChatMessageOptions {
     damage?: ModifiedDamageData
     tests?: Test[]
     combat?: CombatData
+    reach?: number
 }
 
 interface ItemChatTemplateData {
