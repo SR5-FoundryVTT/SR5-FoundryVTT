@@ -23,6 +23,8 @@ export class SR5Combat extends Combat {
      */
     getActorCombatant(actor: SR5Actor): undefined | any {
         const token = actor.getToken();
+        // Sidebar actors won't have a token to connect a combatant to.
+        if (!token) return;
         return this.getCombatantByToken(token.id);
     }
 
