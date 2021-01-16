@@ -3,6 +3,7 @@ import { CharacterPrep } from './CharacterPrep';
 import { SpiritPrep } from './SpiritPrep';
 import { SpritePrep } from './SpritePrep';
 import { VehiclePrep } from './VehiclePrep';
+import { CritterPrep } from './CritterPrep';
 
 export class ActorPrepFactory {
     static Create(data: SR5ActorType) {
@@ -14,6 +15,8 @@ export class ActorPrepFactory {
             return new SpritePrep(data);
         } else if (data.type === 'vehicle') {
             return new VehiclePrep(data);
+        } else if (data.type === 'critter') {
+              return new CritterPrep(data);
         }
     }
 }

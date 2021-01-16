@@ -24,7 +24,8 @@
         "Character": "Charakter",
         "Spirit": "Geist",
         "Sprite": "Sprite",
-        "Vehicle": "Fahrzeug"
+        "Vehicle": "Fahrzeug",
+        "Critter": "Critter'"
     },
 
     "SR5.ActiveSkills": "Aktive Fertigkeiten",
