@@ -20,9 +20,9 @@ export class ItemPrep {
         }
 
         const armorModParts = new PartsList<number>(armor.mod);
-        const equippedArmor = items.filter((item) => item.isArmor() && item.isEquipped());
+        const equippedArmor = items.filter((item) => item.couldHaveArmor() && item.isEquipped());
         equippedArmor?.forEach((item) => {
-            // Don't spam armor values with clothing.
+            // Don't spam armor values with clothing or armor like items without any actual armor.
             if (item.hasArmor()) {
                 // Apply armor base and accessory values.
                 if (item.hasArmorAccessory()) {
