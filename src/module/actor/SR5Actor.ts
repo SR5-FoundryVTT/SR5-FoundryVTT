@@ -86,6 +86,18 @@ export class SR5Actor extends Actor {
         return -1 * this.data.data.wounds?.value || 0;
     }
 
+    /** Use edge on actors that have an edge attribute.
+     */
+    async useEdge(by: number = 1) {
+        const edge = this.getEdge();
+        if (edge && edge.value === 0) return;
+        // NOTE: There used to be a bug which could lower edge usage below zero. Let's quietly ignore and reset. :)
+        const usesLeft = edge.uses > 0 ? edge.uses : 0;
+        const uses = Math.min(edge.value, usesLeft + by);
+
+        await this.update({'data.attributes.edge.uses': uses});
+    }
+
     getEdge(): EdgeAttributeField {
         return this.data.data.attributes.edge;
     }

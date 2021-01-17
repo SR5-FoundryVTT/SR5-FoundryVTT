@@ -202,10 +202,6 @@ export class ShadowrunRoller {
         } as AdvancedRollProps;
 
         // TODO: Clear up these function.
-        // // Add item type specific data.
-        // if (item.hasOpposedRoll) {
-        //     advancedRollProps.tests = item.getOpposedTests();
-        // }
         // if (item.isMeleeWeapon()) {
         //     advancedRollProps.reach = item.getReach();
         // }
@@ -410,31 +406,28 @@ export class ShadowrunRoller {
         // basicRollProps.wounds = testData.wounds;
         // basicRollProps.dialogOptions = testData.dialogOptions;
         basicRollProps.rollMode = testData.rollMode;
+        basicRollProps.parts = testData.parts.list;
+
 
         if (testDialog.selectedButton === 'edge' && props.actor) {
-            basicRollProps.explodeSixes = true;
-            testData.parts.addUniquePart('SR5.PushTheLimit', props.actor.getEdge().value);
-            delete basicRollProps.limit;
-            // TODO: Edge usage doesn't seem to apply on actor sheet.
-            await props.actor.update({
-                'data.attributes.edge.uses': props.actor.data.data.attributes.edge.uses - 1,
-            });
+            await ShadowrunRoller.handleExplodingSixes(props.actor, basicRollProps, testData);
         }
 
-        basicRollProps.parts = testData.parts.list;
 
         // Execute Test roll...
         const roll = await this.basicRoll(basicRollProps);
         if (!roll) return;
 
+
         if (!props.hideRollMessage) {
             await ShadowrunRoller.rollChatMessage(roll, basicRollProps);
         }
 
-        // Roll further extended tests.
+
         if (testData.extended) {
-            await ShadowrunRoller.handleExtendedRoll(props, testData);
+            ShadowrunRoller.handleExtendedRoll(props, testData);
         }
+
 
         // Call any provided callbacks to be executed after this roll.
         if (after) await after(roll);
@@ -512,5 +505,13 @@ export class ShadowrunRoller {
         advancedProps.extended = true;
         const delayInMs = 400;
         setTimeout(() => this.advancedRoll(advancedProps), delayInMs);
+    }
+
+    static async handleExplodingSixes(actor: SR5Actor, basicProps: BasicRollProps, testData: TestDialogData) {
+        basicProps.explodeSixes = true;
+        delete basicProps.limit;
+        testData.parts.addUniquePart('SR5.PushTheLimit', actor.getEdge().value);
+
+        await actor.useEdge(1);
     }
 }
