@@ -78,8 +78,11 @@ export interface BasicRollPropsDefaulted extends BasicRollProps {
 }
 
 export interface RollDialogOptions {
-    environmental?: number | boolean;
-    prompt?: boolean;
+    environmental?: number
+    pool?: boolean
+    extended?: boolean
+    limit?: boolean
+    wounds?: boolean
 }
 
 export interface AdvancedRollProps extends BasicRollProps {
@@ -87,7 +90,6 @@ export interface AdvancedRollProps extends BasicRollProps {
     extended?: boolean;
     wounds?: boolean;
     after?: (roll: Roll | undefined) => void;
-    dialogOptions?: RollDialogOptions;
     attack?: AttackData;
     fireMode?: FireModeData
     combat?: CombatData
@@ -187,36 +189,30 @@ export class ShadowrunRoller {
         const tests = item.getOpposedTests();
         const target = Helpers.getToken(actionTestData?.targetId);
 
+        // Prepare the roll and dialog.
         const advancedRollProps = {
+            hideRollMessage: true,
             event: event,
-            dialogOptions: {
-                environmental: true,
-            },
             actor,
             parts,
             limit,
             extended,
-            hideRollMessage: true,
             tests
         } as AdvancedRollProps;
 
-        // TODO: Clear up these function.
-        // if (item.isMeleeWeapon()) {
-        //     advancedRollProps.reach = item.getReach();
-        // }
-        // if (item.isRangedWeapon() && actionTestData?.rangedWeapon) {
-        //     if (advancedRollProps.dialogOptions) {
-        //         advancedRollProps.dialogOptions.environmental = actionTestData.rangedWeapon.environmental.range;
-        //     }
-        // }
-        // Add target specific data.
-        // if (actionTestData && actionTestData.targetId) {
-        //     advancedRollProps.target = Helpers.getToken(actionTestData.targetId);
-        // }
-        // TODO: Check if reach is ever used / shown...
-        // const reach = item.isMeleeWeapon() ? item.getReach() : undefined;
 
-        const roll = await ShadowrunRoller.advancedRoll(advancedRollProps);
+        const advancedDialogOptions = {
+            environmental: 0,
+        } as RollDialogOptions;
+
+        // Use environmental modifiers based on targeted token distance measurement from ItemDialog.
+        if (item.isRangedWeapon() && actionTestData?.rangedWeapon) {
+            if (advancedDialogOptions) {
+                advancedDialogOptions.environmental = actionTestData.rangedWeapon.environmental.range;
+            }
+        }
+
+        const roll = await ShadowrunRoller.advancedRoll(advancedRollProps, advancedDialogOptions);
 
         if (!roll) return;
 
@@ -363,17 +359,18 @@ export class ShadowrunRoller {
      * Prompt a roll for the user
      */
     static promptRoll(): Promise<ShadowrunRoll | undefined> {
-        const lastRoll = game.user.getFlag(SYSTEM_NAME, 'lastRollPromptValue') || 0;
-        const parts = [{ name: 'SR5.LastRoll', value: lastRoll }];
-        const advancedRollProps = { parts, title: 'Roll', dialogOptions: { prompt: true } } as AdvancedRollProps;
-        return ShadowrunRoller.advancedRoll(advancedRollProps);
+        const value = game.user.getFlag(SYSTEM_NAME, FLAGS.LastRollPromptValue) || 0;
+        const parts = [{ name: 'SR5.LastRoll', value }];
+        const advancedRollProps = { parts, title: game.i18n.localize("SR5.Test")} as AdvancedRollProps;
+        const dialogOptions = { pool: true }
+        return ShadowrunRoller.advancedRoll(advancedRollProps, dialogOptions);
     }
 
     /**
      * Start an advanced roll
      * - Prompts the user for modifiers
      */
-    static async advancedRoll(advancedProps: AdvancedRollProps): Promise<ShadowrunRoll | undefined> {
+    static async advancedRoll(advancedProps: AdvancedRollProps, dialogOptions?: RollDialogOptions): Promise<ShadowrunRoll | undefined> {
         // Remove after roll callback as to not move it further into other function calls.
         const {after} = advancedProps;
 
@@ -389,11 +386,12 @@ export class ShadowrunRoller {
         // Ask user for additional, general success test role modifiers.
         const testDialogOptions = {
             title: props.title,
-            dialogOptions: props.dialogOptions,
+            dialogOptions,
             extended: props.extended,
             limit: props.limit,
             wounds: props.wounds,
         };
+
         const testDialog = await ShadowrunTestDialog.create(props.actor, testDialogOptions, props.parts);
         const testData = await testDialog.select();
 

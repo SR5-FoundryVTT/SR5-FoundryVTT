@@ -587,15 +587,16 @@ export class SR5Actor extends Actor {
     }
 
     promptRoll(options?: ActorRollOptions) {
-        return ShadowrunRoller.advancedRoll({
+        const rollProps = {
             event: options?.event,
             title: 'Roll',
             parts: [],
-            actor: this,
-            dialogOptions: {
-                prompt: true,
-            },
-        });
+            actor: this
+        };
+        const dialogOptions = {
+            pool: true
+        }
+        return ShadowrunRoller.advancedRoll(rollProps, dialogOptions);
     }
 
     rollDeviceRating(options?: ActorRollOptions) {
