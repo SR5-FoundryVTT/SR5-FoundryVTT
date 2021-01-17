@@ -8,7 +8,7 @@ import { Helpers } from '../helpers';
 import { SR5Actor } from '../actor/SR5Actor';
 import { SR5Item } from '../item/SR5Item';
 import {
-    createRollChatMessage, createTargetChatMessage,
+    createRollChatMessage, createTargetChatMessage, RollTargetChatMessage,
     TargetChatMessageOptions
 } from '../chat';
 import {CORE_FLAGS, CORE_NAME, DEFAULT_ROLL_NAME, FLAGS, SR, SYSTEM_NAME} from '../constants';
@@ -27,6 +27,15 @@ import CombatData = Shadowrun.CombatData;
 export type Test =  {
     label: string;
     type: string;
+}
+
+// TODO: TestDialogData is a mess.
+export interface TestDialogData {
+    parts: PartsList<number>
+    limit: number
+    wounds: boolean
+    extended: boolean
+    rollMode: keyof typeof CONFIG.Dice.rollModes;
 }
 
 interface RollProps {
@@ -80,8 +89,6 @@ export interface AdvancedRollProps extends BasicRollProps {
     after?: (roll: Roll | undefined) => void;
     dialogOptions?: RollDialogOptions;
     attack?: AttackData;
-    blast?: BlastData;
-    reach?: number
     fireMode?: FireModeData
     combat?: CombatData
 }
@@ -89,8 +96,8 @@ export interface AdvancedRollProps extends BasicRollProps {
 /** Provide a clear interface of which value are guaranteed to be defined.
      */
 export interface AdvancedRollPropsDefaulted extends AdvancedRollProps {
-    parts: ModList<number>;
-    wounds: boolean;
+    parts: ModList<number>
+    wounds: boolean
 }
 
 type ShadowrunRollData = {
@@ -176,12 +183,11 @@ export class ShadowrunRoller {
         const limit = item.getLimit();
         const extended = item.getExtended();
         const previewTemplate = item.hasTemplate;
-        const blast = item.getBlastData(actionTestData);
         const description = item.getChatData();
-        const target = Helpers.getToken(actionTestData?.targetId);
         const tests = item.getOpposedTests();
+        const target = Helpers.getToken(actionTestData?.targetId);
 
-        const rollData = {
+        const advancedRollProps = {
             ...options,
             event: event,
             dialogOptions: {
@@ -191,45 +197,55 @@ export class ShadowrunRoller {
             parts,
             limit,
             extended,
-            hideRollMessage: true
+            hideRollMessage: true,
+            tests
         } as AdvancedRollProps;
 
         // TODO: Clear up these function.
-        // Add item type specific data.
-        if (item.hasOpposedRoll) {
-            rollData.tests = item.getOpposedTests();
-        }
-        if (item.isMeleeWeapon()) {
-            rollData.reach = item.getReach();
-        }
-        if (item.isRangedWeapon() && actionTestData?.rangedWeapon) {
-            if (rollData.dialogOptions) {
-                rollData.dialogOptions.environmental = actionTestData.rangedWeapon.environmental.range;
-            }
-        }
+        // // Add item type specific data.
+        // if (item.hasOpposedRoll) {
+        //     advancedRollProps.tests = item.getOpposedTests();
+        // }
+        // if (item.isMeleeWeapon()) {
+        //     advancedRollProps.reach = item.getReach();
+        // }
+        // if (item.isRangedWeapon() && actionTestData?.rangedWeapon) {
+        //     if (advancedRollProps.dialogOptions) {
+        //         advancedRollProps.dialogOptions.environmental = actionTestData.rangedWeapon.environmental.range;
+        //     }
+        // }
         // Add target specific data.
-        if (actionTestData && actionTestData.targetId) {
-            rollData.target = Helpers.getToken(actionTestData.targetId);
-        }
+        // if (actionTestData && actionTestData.targetId) {
+        //     advancedRollProps.target = Helpers.getToken(actionTestData.targetId);
+        // }
+        // TODO: Check if reach is ever used / shown...
+        // const reach = item.isMeleeWeapon() ? item.getReach() : undefined;
 
-        const roll = await ShadowrunRoller.advancedRoll(rollData);
+        const roll = await ShadowrunRoller.advancedRoll(advancedRollProps);
 
-        if (!roll) return undefined;
+        if (!roll) return;
 
         if (attack) {
             attack.hits = roll.hits;
         }
 
+        // TODO: Separation of concerns. 'Roller' should only roll and prepare to roll.
+        //       Rules should be handled elsewhere. Attack Handler? Ranged, Melee, DirectSpell, IndirectSpell...
         if (attack && item.isCombatSpell()) {
             const spellAttack = item.getAttackData(roll.hits, actionTestData);
             if (spellAttack) attack.damage = spellAttack.damage;
-            console.error(spellAttack);
         }
 
-        // TODO: Check if reach is ever used / shown...
-        const reach = item.isMeleeWeapon() ? item.getReach() : undefined;
+        const rollChatOptions = {title, roll, actor, item, attack, previewTemplate, target, description, tests};
+        await createRollChatMessage(rollChatOptions);
 
-        await createRollChatMessage({title, roll, actor, item, attack, previewTemplate, target, description, tests, reach})
+        if (tests) {
+            const targets = target ? [target] : Helpers.getUserTargets();
+            const targetChatOptions = {actor, target, item, tests, roll, attack}
+            await ShadowrunRoller.targetsChatMessages(targets, targetChatOptions);
+        }
+
+        return roll;
     }
 
     static async resultingItemRolls(event, item: SR5Item, actionTestData? : ActionTestData) {
@@ -295,8 +311,8 @@ export class ShadowrunRoller {
 
         if (parts.isEmpty || parts.total < 1) {
             ui.notifications.error(game.i18n.localize('SR5.RollOneDie'));
-            return
-        };
+            return;
+        }
 
         // Prepare SR Success Test with foundry formula.
         const formulaOptions = { parts: parts.list, limit: props.limit, explode: props.explodeSixes };
@@ -311,6 +327,7 @@ export class ShadowrunRoller {
 
         // Return roll reference instead roll() return to avoid typing issues.
         roll.roll();
+
         return roll;
     }
 
@@ -320,9 +337,7 @@ export class ShadowrunRoller {
         const roll = await ShadowrunRoller.roll({parts: props.parts, limit: props.limit, explodeSixes: props.explodeSixes});
         if (!roll) return;
 
-        if (!props.hideRollMessage) {
-            await ShadowrunRoller.rollChatMessage(roll, props);
-        }
+        // TODO: Check if message creation is needed anywhere?
 
         return roll;
     }
@@ -391,9 +406,9 @@ export class ShadowrunRoller {
 
 
         // Prepare Test Roll.
-        const basicRollProps = {...props};
-        basicRollProps.wounds = testData.wounds;
-        basicRollProps.dialogOptions = testData.dialogOptions;
+        const basicRollProps = {...props} as BasicRollPropsDefaulted;
+        // basicRollProps.wounds = testData.wounds;
+        // basicRollProps.dialogOptions = testData.dialogOptions;
         basicRollProps.rollMode = testData.rollMode;
 
         if (testDialog.selectedButton === 'edge' && props.actor) {
@@ -412,22 +427,13 @@ export class ShadowrunRoller {
         const roll = await this.basicRoll(basicRollProps);
         if (!roll) return;
 
-        if (!props.hideRollMessage && props.target && props.tests) {
-            await ShadowrunRoller.targetChatMessage(props);
-        } else if (!props.hideRollMessage && Helpers.userHasTargets() && props.tests) {
-            await ShadowrunRoller.targetsChatMessages(props);
+        if (!props.hideRollMessage) {
+            await ShadowrunRoller.rollChatMessage(roll, basicRollProps);
         }
 
         // Roll further extended tests.
         if (testData.extended) {
-            const currentExtended = testData.parts.getPartValue('SR5.Extended') ?? 0;
-            testData.parts.addUniquePart('SR5.Extended', currentExtended - 1);
-
-            // Prepare the next, extended test roll.
-            props.parts = testData.parts.list;
-            props.extended = true;
-            const delayInMs = 400;
-            setTimeout(() => this.advancedRoll(props), delayInMs);
+            await ShadowrunRoller.handleExtendedRoll(props, testData);
         }
 
         // Call any provided callbacks to be executed after this roll.
@@ -448,22 +454,24 @@ export class ShadowrunRoller {
      *
      * Should a target have multiple user owners, each will get a message.
      *
-     * @param props
+     * @param options
      */
-    static async targetChatMessage(props: AdvancedRollPropsDefaulted) {
+    static async targetChatMessage(options: RollTargetChatMessage) {
         if (!game.settings.get(SYSTEM_NAME, FLAGS.WhisperOpposedTestsToTargetedPlayers)) return;
-        const rollMode = props.rollMode ?? game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
+
+        const rollMode = options.rollMode ?? game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
         if (rollMode === 'roll') return;
 
         // @ts-ignore // Token.actor is of type Actor instead of SR5Actor
-        const users = props.target.actor.getActivePlayerOwners();
+        const users = options.target.actor.getActivePlayerOwners();
 
         for (const user of users) {
             if (user.isGM) continue;
             if (user === game.user) continue;
 
-            const targetChatMessage = {actor: props.actor, target: props.target, item: props.item,
-                incomingAttack: props.incomingAttack, tests: props.tests, whisperTo: user
+            const targetChatMessage = {
+                actor: options.actor, target: options.target, item: options.item,
+                tests: options.tests, whisperTo: user
             } as TargetChatMessageOptions;
             await createTargetChatMessage(targetChatMessage);
         }
@@ -475,18 +483,17 @@ export class ShadowrunRoller {
      * during, for example, the ranged weapon dialog (which gives a selection and returns one)
      *
      *
-     * @param props
+     * @param options
      */
-    static async targetsChatMessages(props: AdvancedRollPropsDefaulted) {
+    static async targetsChatMessages(targets: Token[], options: RollTargetChatMessage) {
         if (!game.settings.get(SYSTEM_NAME, FLAGS.WhisperOpposedTestsToTargetedPlayers)) return;
 
-        const targets = Helpers.getUserTargets();
         targets.forEach(target => {
             // @ts-ignore // Token.actor is of type Actor instead of SR5Actor
             if (!target.actor.hasActivePlayerOwner()) return;
 
-            const advancedProps = {...props, target};
-            ShadowrunRoller.targetChatMessage(advancedProps);
+            options = {...options, target};
+            ShadowrunRoller.targetChatMessage(options);
         })
     }
 
@@ -494,5 +501,16 @@ export class ShadowrunRoller {
         if (limit && limit.value <= 0) {
             ui.notifications.warn(game.i18n.localize('SR5.Warnings.NegativeLimitValue'));
         }
+    }
+
+    static handleExtendedRoll(advancedProps: AdvancedRollPropsDefaulted, testData: TestDialogData) {
+        const currentExtended = testData.parts.getPartValue('SR5.Extended') ?? 0;
+        testData.parts.addUniquePart('SR5.Extended', currentExtended - 1);
+
+        // Prepare the next, extended test roll.
+        advancedProps.parts = testData.parts.list;
+        advancedProps.extended = true;
+        const delayInMs = 400;
+        setTimeout(() => this.advancedRoll(advancedProps), delayInMs);
     }
 }

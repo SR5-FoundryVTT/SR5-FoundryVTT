@@ -11,6 +11,7 @@ declare namespace Shadowrun {
         incomingAttack?: AttackData;
     };
 
+    // Original attacks data (unmodified)
     type AttackData = {
         hits?: number;
         fireMode?: FireModeData;

@@ -13,12 +13,17 @@ import DamageType = Shadowrun.DamageType;
 import DamageElement = Shadowrun.DamageElement;
 import CombatData = Shadowrun.CombatData;
 
-export interface TargetChatMessageOptions {
-    actor: Actor
-    target: Token
+export interface RollTargetChatMessage {
+    actor: SR5Actor
+    target: Token|undefined
     item: SR5Item
-    incomingAttack: AttackData
     tests: Test[]
+    roll: ShadowrunRoll
+    attack?: AttackData
+    rollMode?: keyof typeof CONFIG.Dice.rollModes
+}
+
+export interface TargetChatMessageOptions extends RollTargetChatMessage{
     whisperTo: User
 }
 
@@ -173,7 +178,13 @@ export async function createRollChatMessage(options: RollChatMessageOptions): Pr
     const templateData = getRollChatTemplateData(options);
     // TODO: Double data is bad.
     const chatOptions = {roll: options.roll};
-    return await createChatMessage(templateData, chatOptions);
+    const message = await createChatMessage(templateData, chatOptions);
+
+    // Store data in chat message for later use (opposed tests)
+    if (options.roll) await message.setFlag(SYSTEM_NAME, FLAGS.Roll, options.roll);
+    if (options.attack) await message.setFlag(SYSTEM_NAME, FLAGS.Attack, options.attack);
+
+    return message;
 }
 
 
@@ -225,6 +236,9 @@ export const addRollListeners = (app: ChatMessage, html) => {
 
     html.on('click', '.test', async (event) => {
         event.preventDefault();
+        const messageId = html.data('messageId');
+        const message = game.messages.get(messageId);
+        const attack = message.getFlag(SYSTEM_NAME, FLAGS.Attack);
         const item = SR5Item.getItemFromMessage(html);
         const type = event.currentTarget.dataset.action;
         if (!item) {
@@ -232,7 +246,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
             return;
         }
 
-        await item.rollTestType(type, event);
+        await item.rollTestType(type, attack, event);
     });
     html.on('click', '.place-template', (event) => {
         event.preventDefault();

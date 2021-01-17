@@ -7,7 +7,13 @@ export const FLAGS = {
     ApplyLimits: 'applyLimits',
     LastRollPromptValue: 'lastRollPromptValue',
     DisplayDefaultRollCard: 'displayDefaultRollCard',
-    EmbeddedItems: 'embeddedItems'
+    EmbeddedItems: 'embeddedItems',
+    LastFireMode: 'lastFireMode',
+    LastSpellForce: 'lastSpellForce',
+    LastComplexFormLevel: 'lastComplexFormLevel',
+    LastFireRange: 'lastFireRange',
+    Attack: 'attack',
+    Roll: 'roll'
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {

@@ -89,12 +89,8 @@ export class ShadowrunTestDialog {
             if (situationMod) {
                 parts.addUniquePart('SR5.SituationalModifier', situationMod);
             }
-            const dialogOptions = {};
             if (environmentMod) {
                 parts.addUniquePart('SR5.EnvironmentModifier', environmentMod);
-                if (options.dialogOptions) {
-                    dialogOptions['environmental'] = true;
-                }
             }
 
             const extendedString = Helpers.parseInputToString($(html).find('[name="extended"]').val());
@@ -106,7 +102,6 @@ export class ShadowrunTestDialog {
                 limit,
                 wounds,
                 parts,
-                dialogOptions,
                 extended,
                 rollMode
             }

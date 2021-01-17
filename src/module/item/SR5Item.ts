@@ -36,28 +36,28 @@ export class SR5Item extends Item {
 
     // Flag Functions
     getLastFireMode(): FireModeData {
-        return this.getFlag(SYSTEM_NAME, 'lastFireMode') || { value: 0 };
+        return this.getFlag(SYSTEM_NAME, FLAGS.LastFireMode) || { value: 0 };
     }
     async setLastFireMode(fireMode: FireModeData) {
-        return this.setFlag(SYSTEM_NAME, 'lastFireMode', fireMode);
+        return this.setFlag(SYSTEM_NAME, FLAGS.LastFireMode, fireMode);
     }
     getLastSpellForce(): SpellForceData {
-        return this.getFlag(SYSTEM_NAME, 'lastSpellForce') || { value: 0 };
+        return this.getFlag(SYSTEM_NAME, FLAGS.LastSpellForce) || { value: 0 };
     }
     async setLastSpellForce(force: SpellForceData) {
-        return this.setFlag(SYSTEM_NAME, 'lastSpellForce', force);
+        return this.setFlag(SYSTEM_NAME, FLAGS.LastSpellForce, force);
     }
     getLastComplexFormLevel(): ComplexFormLevelData {
-        return this.getFlag(SYSTEM_NAME, 'lastComplexFormLevel') || { value: 0 };
+        return this.getFlag(SYSTEM_NAME, FLAGS.LastComplexFormLevel) || { value: 0 };
     }
     async setLastComplexFormLevel(level: ComplexFormLevelData) {
-        return this.setFlag(SYSTEM_NAME, 'lastComplexFormLevel', level);
+        return this.setFlag(SYSTEM_NAME, FLAGS.LastComplexFormLevel, level);
     }
     getLastFireRangeMod(): FireRangeData {
-        return this.getFlag(SYSTEM_NAME, 'lastFireRange') || { value: 0 };
+        return this.getFlag(SYSTEM_NAME, FLAGS.LastFireRange) || { value: 0 };
     }
     async setLastFireRangeMod(environmentalMod: FireRangeData) {
-        return this.setFlag(SYSTEM_NAME, 'lastFireRange', environmentalMod);
+        return this.setFlag(SYSTEM_NAME, FLAGS.LastFireRange, environmentalMod);
     }
 
     /**
@@ -101,22 +101,24 @@ export class SR5Item extends Item {
         await this.unsetFlag(SYSTEM_NAME, FLAGS.EmbeddedItems);
     }
 
-    getLastAttack(): AttackData | undefined {
-        return this.getFlag(SYSTEM_NAME, 'lastAttack');
-    }
-    async setLastAttack(attack: AttackData) {
-        // unset the flag first to clear old data, data can get weird if not done
-        await this.unsetFlag(SYSTEM_NAME, 'lastAttack');
-        return this.setFlag(SYSTEM_NAME, 'lastAttack', attack);
-    }
+    // TODO: Remove.
+    // getLastAttack(): AttackData | undefined {
+    //     return this.getFlag(SYSTEM_NAME, FLAGS.Attack);
+    // }
+    // async setLastAttack(attack: AttackData) {
+    //     // unset the flag first to clear old data, data can get weird if not done
+    //     await this.unsetFlag(SYSTEM_NAME, FLAGS.Attack);
+    //     return this.setFlag(SYSTEM_NAME, FLAGS.Attack, attack);
+    // }
 
-    async setLastAttackForRoll(roll: ShadowrunRoll|undefined, actionTestData?: ActionTestData) {
-        const hits = roll?.total ?? 0;
-        const attackData = this.getAttackData(hits, actionTestData);
-        if (attackData) {
-            await this.setLastAttack(attackData);
-        }
-    }
+    // TODO: Remove.
+    // async setLastAttackForRoll(roll: ShadowrunRoll|undefined, actionTestData?: ActionTestData) {
+    //     const hits = roll?.total ?? 0;
+    //     const attackData = this.getAttackData(hits, actionTestData);
+    //     if (attackData) {
+    //         await this.setLastAttack(attackData);
+    //     }
+    // }
 
     /** Overwrite to allow for options param to be skipped.
      */
@@ -538,7 +540,7 @@ export class SR5Item extends Item {
         this.update(data);
     }
 
-    async rollOpposedTest(target: SR5Actor, event) {
+    async rollOpposedTest(target: SR5Actor, attack: AttackData, event) {
         const itemData = this.data.data;
         const options = {
             event,
@@ -546,7 +548,8 @@ export class SR5Item extends Item {
             cover: false,
         };
 
-        const lastAttack = this.getLastAttack();
+        // const lastAttack = this.getLastAttack();
+        const lastAttack = attack;
         const parts = this.getOpposedTestMod();
         const { opposed } = itemData.action;
 
@@ -582,11 +585,12 @@ export class SR5Item extends Item {
         }
     }
 
-    async rollTestType(type: string, event) {
+    // TODO: attack is specific in focus. Can be broader?
+    async rollTestType(type: string, attack: AttackData, event) {
         if (type === 'opposed') {
             const targets = Helpers.getSelectedActorsOrCharacter();
             for (const target of targets) {
-                await this.rollOpposedTest(target, event);
+                await this.rollOpposedTest(target, attack, event);
             }
         }
         if (type === 'action') {
@@ -605,7 +609,10 @@ export class SR5Item extends Item {
         const roll = await ShadowrunRoller.itemRoll(event, this, options, actionTestData);
         if (!roll) return;
 
-        await this.setLastAttackForRoll(roll, actionTestData);
+        // Store test and attack data for later opposed tests.
+        // TODO: Store last attack on chat message, NOT item. This will allow to defend to each chat message instead
+        //       of whatever item it caused.
+        // await this.setLastAttackForRoll(roll, actionTestData);
         await ShadowrunRoller.resultingItemRolls(event, this, actionTestData);
 
         return roll;
