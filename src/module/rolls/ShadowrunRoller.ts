@@ -174,7 +174,7 @@ export class ShadowrunRoll extends Roll {
 }
 
 export class ShadowrunRoller {
-    static async itemRoll(event, item: SR5Item, options?: Partial<AdvancedRollProps>, actionTestData?: ActionTestData): Promise<ShadowrunRoll | undefined> {
+    static async itemRoll(event, item: SR5Item, actionTestData?: ActionTestData): Promise<ShadowrunRoll | undefined> {
         // Create common data for all item types.
         const title = item.getRollName();
         const actor = item.actor;
@@ -188,7 +188,6 @@ export class ShadowrunRoller {
         const target = Helpers.getToken(actionTestData?.targetId);
 
         const advancedRollProps = {
-            ...options,
             event: event,
             dialogOptions: {
                 environmental: true,

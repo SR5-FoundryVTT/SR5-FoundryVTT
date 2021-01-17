@@ -87,10 +87,12 @@
                 {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.html'
                         name=(localize "SR5.Incoming")
                         damage=damage.incoming
+                        showAP=true
                 }}
                 {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.html'
                         name=(localize "SR5.Modified")
                         damage=damage.modified
+                        showAP=true
                 }}
             {{/if}} {{#if (isDefined incomingAttack.hits)}}
             <div class="limit-line">

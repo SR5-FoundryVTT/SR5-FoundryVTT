@@ -271,8 +271,7 @@ export class SR5Item extends Item {
         const actionTestData = await dialog.select();
         if (dialog.canceled) return;
 
-        const options = undefined;
-        return await this.rollTest(event, options, actionTestData);
+        return await this.rollTest(event, actionTestData);
 }
 
     getChatData(htmlOptions?) {
@@ -604,9 +603,9 @@ export class SR5Item extends Item {
      * @param actionTestData
      * @param options - any additional roll options to pass along - note that currently the Item will overwrite -- WIP
      */
-    async rollTest(event, options?: Partial<AdvancedRollProps>, actionTestData?: ActionTestData): Promise<ShadowrunRoll | undefined> {
+    async rollTest(event, actionTestData?: ActionTestData): Promise<ShadowrunRoll | undefined> {
 
-        const roll = await ShadowrunRoller.itemRoll(event, this, options, actionTestData);
+        const roll = await ShadowrunRoller.itemRoll(event, this, actionTestData);
         if (!roll) return;
 
         // Store test and attack data for later opposed tests.
