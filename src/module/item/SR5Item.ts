@@ -539,32 +539,31 @@ export class SR5Item extends Item {
         this.update(data);
     }
 
+    // TODO: Rework that shit.
     async rollOpposedTest(target: SR5Actor, attack: AttackData, event) {
-        const itemData = this.data.data;
         const options = {
             event,
             fireModeDefense: 0,
             cover: false,
         };
 
-        // const lastAttack = this.getLastAttack();
-        const lastAttack = attack;
         const parts = this.getOpposedTestMod();
-        const { opposed } = itemData.action;
+        const { opposed } = this.getAction();
+        console.error(opposed);
 
         if (opposed.type === 'defense') {
-            if (lastAttack) {
-                options['incomingAttack'] = lastAttack;
+            if (attack) {
+                options['incomingAttack'] = attack;
                 options.cover = true;
-                if (lastAttack.fireMode?.defense) {
-                    options.fireModeDefense = +lastAttack.fireMode.defense;
+                if (attack.fireMode?.defense) {
+                    options.fireModeDefense = +attack.fireMode.defense;
                 }
             }
             return await target.rollDefense(options, parts.list);
 
         } else if (opposed.type === 'soak') {
-            options['damage'] = lastAttack?.damage;
-            options['attackerHits'] = lastAttack?.hits;
+            options['damage'] = attack?.damage;
+            options['attackerHits'] = attack?.hits;
             return await target.rollSoak(options, parts.list);
 
         } else if (opposed.type === 'armor') {
@@ -572,7 +571,12 @@ export class SR5Item extends Item {
 
         } else {
             if (opposed.skill && opposed.attribute) {
-                return target.rollSkill(opposed.skill, {
+                const skill = target.getSkill(opposed.skill);
+                if (!skill) {
+                    ui.notifications.error(game.i18n.localize("SR5.Errors.MissingSkill"));
+                    return;
+                }
+                return target.rollSkill(skill, {
                     ...options,
                     attribute: opposed.attribute,
                 });
@@ -608,10 +612,6 @@ export class SR5Item extends Item {
         const roll = await ShadowrunRoller.itemRoll(event, this, actionTestData);
         if (!roll) return;
 
-        // Store test and attack data for later opposed tests.
-        // TODO: Store last attack on chat message, NOT item. This will allow to defend to each chat message instead
-        //       of whatever item it caused.
-        // await this.setLastAttackForRoll(roll, actionTestData);
         await ShadowrunRoller.resultingItemRolls(event, this, actionTestData);
 
         return roll;

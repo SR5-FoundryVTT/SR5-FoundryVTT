@@ -38,7 +38,6 @@ export class ShadowrunTestDialog {
             rollMode: game.settings.get(CORE_NAME, CORE_FLAGS.RollMode),
             rollModes: CONFIG.Dice.rollModes
         }
-        console.error(options);
 
         let templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-dialog.html';
 

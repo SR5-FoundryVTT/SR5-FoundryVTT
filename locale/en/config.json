@@ -780,5 +780,9 @@
     "SR5.Warnings": {
         "NegativeLimitValue": "Limit values must be above zero",
         "TokenSelectionNeeded": "One ore more tokens need to be selected"
+    },
+
+    "SR5.Errors": {
+        "MissingSkill": "The actor doesn't have the requested skill."
     }
 }
