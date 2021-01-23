@@ -769,25 +769,33 @@ export class SR5ActorSheet extends ActorSheet {
     async _onClearCellInput(event) {
         const cmId = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
         const data = {};
-        if (cmId === 'stun' || cmId === 'physical') {
-            const property = `data.track.${cmId}.value`;
-            data[property] = 0;
+        if (cmId === 'stun') {
+            data[`data.track.stun.value`] = 0;
+        }
+        // Clearing the physical monitor should also clear the overflow.
+        else if (cmId === 'physical') {
+            data[`data.track.physical.value`] = 0;
+            data['data.track.physical.overflow.value'] = 0;
+
         } else if (cmId === 'edge') {
-            const property = `data.attributes.edge.uses`;
-            data[property] = 0;
+            data[`data.attributes.edge.uses`] = 0;
+
         } else if (cmId === 'overflow') {
-            const property = 'data.track.physical.overflow.value';
-            data[property] = 0;
+            data['data.track.physical.overflow.value'] = 0;
+
         } else if (cmId === 'matrix') {
             const matrixDevice = this.actor.getMatrixDevice();
+
             if (matrixDevice) {
                 const updateData = {};
                 updateData['data.technology.condition_monitor.value'] = 0;
                 await matrixDevice.update(updateData);
+
             } else {
                 data['data.matrix.condition_monitor.value'] = 0;
             }
         }
+
         await this.actor.update(data);
     }
 
