@@ -7,7 +7,6 @@ import { ThrownParser } from '../parser/weapon/ThrownParser';
 import { ParserMap } from '../parser/ParserMap';
 import Weapon = Shadowrun.Weapon;
 import { WeaponParserBase } from '../parser/weapon/WeaponParserBase';
-import {DeviceImporter} from "./DeviceImporter";
 
 export class WeaponImporter extends DataImporter {
     public categoryTranslations: any;
@@ -94,6 +93,7 @@ export class WeaponImporter extends DataImporter {
                         value: 0,
                         max: 0,
                     },
+                    wireless: true
                 },
                 ammo: {
                     spare_clips: {

@@ -9,6 +9,7 @@ declare namespace Shadowrun {
             equipped: boolean;
             conceal: ModifiableValue;
             condition_monitor?: ConditionData;
+            wireless: boolean;
         };
     };
 }

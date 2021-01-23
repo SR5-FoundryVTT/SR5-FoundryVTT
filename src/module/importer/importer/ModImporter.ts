@@ -3,7 +3,6 @@ import Mod = Shadowrun.Modification;
 import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
 import { ModParserBase } from '../parser/mod/ModParserBase';
-import {DeviceImporter} from "./DeviceImporter";
 
 export class ModImporter extends DataImporter {
     public categoryTranslations: any;
@@ -44,6 +43,7 @@ export class ModImporter extends DataImporter {
                         value: 0,
                         max: 0,
                     },
+                    wireless: true
                 },
                 type: '',
                 mount_point: '',

@@ -3,8 +3,6 @@ import { ImportHelper } from '../helper/ImportHelper';
 import { CyberwareParser } from '../parser/ware/CyberwareParser';
 import Ware = Shadowrun.Ware;
 import Cyberware = Shadowrun.Cyberware;
-import Bioware = Shadowrun.Bioware;
-import {DeviceImporter} from "./DeviceImporter";
 
 export class WareImporter extends DataImporter {
     public categoryTranslations: any;
@@ -56,6 +54,7 @@ export class WareImporter extends DataImporter {
                         value: 0,
                         max: 0,
                     },
+                    wireless: true
                 },
                 armor: {
                     value: 0,

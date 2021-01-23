@@ -2,7 +2,6 @@ import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
 import Ammo = Shadowrun.Ammo;
-import {DeviceImporter} from "./DeviceImporter";
 
 export class AmmoImporter extends DataImporter {
     public files = ['gear.xml'];
@@ -41,6 +40,7 @@ export class AmmoImporter extends DataImporter {
                         value: 0,
                         max: 0,
                     },
+                    wireless: true
                 },
 
                 element: '',
