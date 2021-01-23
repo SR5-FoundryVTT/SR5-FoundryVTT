@@ -23,6 +23,8 @@ import ActionData = Shadowrun.ActionData;
 import ActionRollData = Shadowrun.ActionRollData;
 import TrackType = Shadowrun.TrackType;
 import DamageData = Shadowrun.DamageData;
+import DefenseRollOptions = Shadowrun.DefenseRollOptions;
+import SpellDefenseOptions = Shadowrun.SpellDefenseOptions;
 
 export class SR5Item extends Item {
     labels: {} = {};
@@ -540,26 +542,19 @@ export class SR5Item extends Item {
     }
 
     // TODO: Rework that shit.
-    async rollOpposedTest(target: SR5Actor, attack: AttackData, event) {
+    async rollOpposedTest(target: SR5Actor, attack: AttackData, event):  Promise<ShadowrunRoll | undefined> {
         const options = {
             event,
             fireModeDefense: 0,
             cover: false,
+            attack
         };
 
         const parts = this.getOpposedTestMod();
         const { opposed } = this.getAction();
-        console.error(opposed);
 
         if (opposed.type === 'defense') {
-            if (attack) {
-                options['incomingAttack'] = attack;
-                options.cover = true;
-                if (attack.fireMode?.defense) {
-                    options.fireModeDefense = +attack.fireMode.defense;
-                }
-            }
-            return await target.rollDefense(options, parts.list);
+            return await this.rollDefense(target, options);
 
         } else if (opposed.type === 'soak') {
             options['damage'] = attack?.damage;
@@ -569,22 +564,25 @@ export class SR5Item extends Item {
         } else if (opposed.type === 'armor') {
             return target.rollArmor(options);
 
-        } else {
-            if (opposed.skill && opposed.attribute) {
-                const skill = target.getSkill(opposed.skill);
-                if (!skill) {
-                    ui.notifications.error(game.i18n.localize("SR5.Errors.MissingSkill"));
-                    return;
-                }
-                return target.rollSkill(skill, {
-                    ...options,
-                    attribute: opposed.attribute,
-                });
-            } else if (opposed.attribute && opposed.attribute2) {
-                return target.rollTwoAttributes([opposed.attribute, opposed.attribute2], options);
-            } else if (opposed.attribute) {
-                return target.rollSingleAttribute(opposed.attribute, options);
+        } else if (opposed.skill && opposed.attribute) {
+            const skill = target.getSkill(opposed.skill);
+
+            if (!skill) {
+                ui.notifications.error(game.i18n.localize("SR5.Errors.MissingSkill"));
+                return;
             }
+
+            return target.rollSkill(skill, {
+                ...options,
+                attribute: opposed.attribute,
+            });
+
+        } else if (opposed.attribute && opposed.attribute2) {
+            return target.rollTwoAttributes([opposed.attribute, opposed.attribute2], options);
+
+        } else if (opposed.attribute) {
+            return target.rollSingleAttribute(opposed.attribute, options);
+
         }
     }
 
@@ -858,8 +856,8 @@ export class SR5Item extends Item {
                 data.force = force;
                 data.damage.base = spellDamage.base;
                 data.damage.value = spellDamage.base + damageParts.total;
-                data.damage.ap.value = spellDamage.ap.value + damageParts.total;
-                data.damage.ap.base = spellDamage.ap.value;
+                data.damage.ap.value = -spellDamage.ap.value + damageParts.total;
+                data.damage.ap.base = -spellDamage.ap.value;
             }
         }
 
@@ -1001,6 +999,14 @@ export class SR5Item extends Item {
         return this.wrapper.isIndirectCombatSpell();
     }
 
+    isManaSpell(): boolean {
+        return this.wrapper.isManaSpell();
+    }
+
+    isPhysicalSpell(): boolean {
+        return this.wrapper.isPhysicalSpell();
+    }
+
     isRangedWeapon(): boolean {
         return this.wrapper.isRangedWeapon();
     }
@@ -1140,6 +1146,29 @@ export class SR5Item extends Item {
             const ap = -force;
 
             return Helpers.createDamageData(damage, action.damage.type.value, -ap)
+        }
+    }
+
+    // TODO: Move into a rule section.
+    async rollDefense(target: SR5Actor, options: DefenseRollOptions): Promise<ShadowrunRoll | undefined> {
+        // TODO: Maybe move into defense methods and give the actor access to the item.
+        const opposedParts = this.getOpposedTestMod();
+
+        if (this.isWeapon()) {
+            options.cover = true;
+            if (options.attack?.fireMode?.defense) {
+                options.fireModeDefense = +options.attack.fireMode.defense;
+            }
+
+            return await target.rollRangedDefense(options, opposedParts.list);
+        }
+
+        if (this.isDirectCombatSpell()) {
+            return await target.rollDirectSpellDefense(this, options as SpellDefenseOptions);
+        }
+
+        if (this.isIndirectCombatSpell()) {
+            return await target.rollIndirectSpellDefense(this, options as SpellDefenseOptions);
         }
     }
 }

@@ -3,13 +3,18 @@ declare namespace Shadowrun {
     export type RollEvent = MouseEvent | { shiftKey?: boolean; altKey?: boolean };
 
     type ActorRollOptions = {
-        event?: RollEvent;
+        event?: RollEvent
+        title?: string
+        hideRollMessage?: boolean
     };
     type DefenseRollOptions = ActorRollOptions & {
         fireModeDefense?: number;
         cover?: number | boolean;
-        incomingAttack?: AttackData;
+        attack?: AttackData;
     };
+    type SpellDefenseOptions = ActorRollOptions & {
+        attack: AttackData
+    }
 
     // Original attacks data (unmodified)
     type AttackData = {

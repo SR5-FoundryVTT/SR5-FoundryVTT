@@ -68,8 +68,8 @@ export class ShadowrunActorDialogs {
         actor._addDefenseParts(parts);
 
         // if we are defending a melee attack
-        if (options.incomingAttack?.reach) {
-            const incomingReach = options.incomingAttack.reach;
+        if (options.attack?.reach) {
+            const incomingReach = options.attack.reach;
             const netReach = defenseReach - incomingReach;
             if (netReach !== 0) {
                 parts.addUniquePart('SR5.Reach', netReach);

@@ -384,9 +384,9 @@ export class Helpers {
         return damage;
     }
 
-    static modifyDamageBySoakRoll(incoming: DamageData, roll: ShadowrunRoll, modificationLabel: string): ModifiedDamageData {
+    static modifyDamageByHits(incoming: DamageData, hits: number, modificationLabel: string): ModifiedDamageData {
         const modified = duplicate(incoming);
-        modified.mod = PartsList.AddUniquePart(modified.mod, modificationLabel, -roll.hits);
+        modified.mod = PartsList.AddUniquePart(modified.mod, modificationLabel, -hits);
         modified.value = Helpers.calcTotal(modified, {min: 0});
 
         return {incoming, modified};

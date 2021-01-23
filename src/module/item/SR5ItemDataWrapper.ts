@@ -4,6 +4,7 @@ import ConditionData = Shadowrun.ConditionData;
 import ModList = Shadowrun.ModList;
 import SR5ItemDataPartial = Shadowrun.SR5ItemDataPartial;
 import ActionRollData = Shadowrun.ActionRollData;
+import SpellData = Shadowrun.SpellData;
 
 export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
     getType() {
@@ -81,6 +82,20 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
     isIndirectCombatSpell(): boolean {
         if (!this.isCombatSpell()) return false;
         return this.getData()?.combat?.type === 'indirect';
+    }
+
+    isManaSpell(): boolean {
+        if (!this.isSpell()) return false;
+        // Cast as partial spelldata due to conflicting .type between differing item types.
+        const spellData = this.getData() as Partial<SpellData>;
+        return spellData.type === 'mana';
+    }
+
+    isPhysicalSpell(): boolean {
+        if (!this.isSpell()) return false;
+        // Cast as partial spelldata due to conflicting .type between differing item types.
+        const spellData = this.getData() as Partial<SpellData>;
+        return spellData.type === 'physical';
     }
 
     isRangedWeapon(): boolean {

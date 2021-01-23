@@ -12,7 +12,7 @@ import BaseValuePair = Shadowrun.BaseValuePair;
 import ModifiableValue = Shadowrun.ModifiableValue;
 import LabelField = Shadowrun.LabelField;
 import LimitField = Shadowrun.LimitField;
-import { SYSTEM_NAME, FLAGS } from '../constants';
+import {SYSTEM_NAME, FLAGS, SR} from '../constants';
 import SR5ActorType = Shadowrun.SR5ActorType;
 import { PartsList } from '../parts/PartsList';
 import { ActorPrepFactory } from './prep/ActorPrepFactory';
@@ -27,6 +27,7 @@ import DamageData = Shadowrun.DamageData;
 import TrackType = Shadowrun.TrackType;
 import OverflowTrackType = Shadowrun.OverflowTrackType;
 import {SR5Combat} from "../combat/SR5Combat";
+import SpellDefenseOptions = Shadowrun.SpellDefenseOptions;
 
 export class SR5Actor extends Actor {
     getOverwatchScore() {
@@ -329,7 +330,7 @@ export class SR5Actor extends Actor {
 
         // Reduce damage by soak roll and inform user.
         const incomingDamage = Helpers.createDamageData(incoming, 'stun');
-        const damage = Helpers.modifyDamageBySoakRoll(incomingDamage, roll, 'SR5.Fade');
+        const damage = Helpers.modifyDamageByHits(incomingDamage, roll.hits, 'SR5.Fade');
 
         await createRollChatMessage({title, roll, actor, damage});
 
@@ -359,7 +360,7 @@ export class SR5Actor extends Actor {
 
         // Reduce damage by soak roll and inform user.
         const incomingDamage = Helpers.createDamageData(incoming, 'stun');
-        const damage = Helpers.modifyDamageBySoakRoll(incomingDamage, roll, 'SR5.Drain');
+        const damage = Helpers.modifyDamageByHits(incomingDamage, roll.hits, 'SR5.Drain');
 
         await createRollChatMessage({title, roll, actor, damage});
 
@@ -378,10 +379,10 @@ export class SR5Actor extends Actor {
         });
     }
 
-    async rollDefense(options: DefenseRollOptions = {}, partsProps: ModList<number> = []) {
-        // TODO: Check melee weapon reach display...
-        // TODO: Check incomingAttack stuffy
-        const {incomingAttack} = options;
+    /** A ranged defense is anything against visible ranged attacks (ranged weapons, indirect spell attacks, ...)
+     */
+    async rollRangedDefense(options: DefenseRollOptions = {}, partsProps: ModList<number> = []): Promise<ShadowrunRoll | undefined> {
+        const {attack} = options;
 
         const defenseDialog = await ShadowrunActorDialogs.createDefenseDialog(this, options, partsProps);
         const defenseActionData = await defenseDialog.select();
@@ -393,7 +394,7 @@ export class SR5Actor extends Actor {
             actor: this,
             parts: defenseActionData.parts.list,
             title: game.i18n.localize('SR5.DefenseTest'),
-            incomingAttack,
+            incomingAttack: attack,
             combat: defenseActionData.combat
         });
 
@@ -405,16 +406,16 @@ export class SR5Actor extends Actor {
             await this.changeCombatInitiative(defenseActionData.combat.initiative);
         }
 
-        if (!incomingAttack) return;
+        if (!attack) return;
 
         // Collect defense information.
         let defenderHits = roll.total;
-        let attackerHits = incomingAttack.hits || 0;
+        let attackerHits = attack.hits || 0;
         let netHits = Math.max(attackerHits - defenderHits, 0);
 
         if (netHits === 0) return;
 
-        const damage = incomingAttack.damage;
+        const damage = attack.damage;
         damage.mod = PartsList.AddUniquePart(damage.mod, 'SR5.NetHits', netHits);
         damage.value = Helpers.calcTotal(damage);
 
@@ -424,6 +425,46 @@ export class SR5Actor extends Actor {
         };
 
         await this.rollSoak(soakRollOptions);
+    }
+
+    async rollDirectSpellDefense(spell: SR5Item, options: SpellDefenseOptions): Promise<ShadowrunRoll | undefined> {
+        if (!spell.isDirectCombatSpell()) return;
+
+        // Prepare the actual roll.
+        options.hideRollMessage = options.hideRollMessage ?? true;
+        const attribute = spell.isManaSpell() ?
+            SR.defense.spell.direct.mana :
+            SR.defense.spell.direct.physical;
+
+        const roll = await this.rollSingleAttribute(attribute, options);
+
+        // Only proceed on successful roles.
+        if (!roll || roll.hits <= 0) return;
+
+        // Prepare the resulting damage message.
+        const title = spell.isManaSpell() ?
+            game.i18n.localize('SR5.SpellDefenseDirectMana') :
+            game.i18n.localize('SR5.SpellDefenseDirectPhysical');
+        const modificationLabel = 'SR5.SpellDefense';
+        const actor = this;
+        const damage = Helpers.modifyDamageByHits(options.attack.damage, roll.hits, modificationLabel);
+
+        console.error('direct', options);
+
+        await createRollChatMessage({title, roll, actor, damage});
+
+        return roll;
+    }
+
+    async rollIndirectSpellDefense(spell: SR5Item, options: SpellDefenseOptions): Promise<ShadowrunRoll | undefined> {
+        if (!spell.isIndirectCombatSpell()) return;
+
+        const opposedParts = spell.getOpposedTestMod();
+
+        // TODO: indirect LOS spell defense works like a ranged weapon defense, but indirect LOS(A) spell defense
+        //       work like grenade attack (no defense, but soak, with the threshold net hits modifying damage.)
+        //       Grenades: SR5#181 Combat Spells: SR5#283
+        const roll = await this.rollRangedDefense(options, opposedParts.list);
     }
 
     // TODO: Abstract handling of const damage : ModifiedDamageData
@@ -450,7 +491,7 @@ export class SR5Actor extends Actor {
         // Reduce damage by damage resist
         const incoming = soakActionData.soak;
         // Avoid cross referencing.
-        const damage = Helpers.modifyDamageBySoakRoll(incoming, roll, 'SR5.SoakTest');
+        const damage = Helpers.modifyDamageByHits(incoming, roll.hits, 'SR5.SoakTest');
 
         await createRollChatMessage({title, roll, actor, damage});
 
@@ -463,11 +504,13 @@ export class SR5Actor extends Actor {
         parts.addUniquePart(attr.label, attr.value);
         this._addMatrixParts(parts, attr);
         this._addGlobalParts(parts);
+
         return ShadowrunRoller.advancedRoll({
-            event: options?.event,
             actor: this,
             parts: parts.list,
-            title: Helpers.label(attId),
+            event: options?.event,
+            title: options.title ?? Helpers.label(attId),
+            hideRollMessage: options.hideRollMessage
         });
     }
 
@@ -481,11 +524,13 @@ export class SR5Actor extends Actor {
         parts.addPart(attr2.label, attr2.value);
         this._addMatrixParts(parts, [attr1, attr2]);
         this._addGlobalParts(parts);
+
         return ShadowrunRoller.advancedRoll({
-            event: options?.event,
             actor: this,
             parts: parts.list,
-            title: `${label1} + ${label2}`,
+            event: options?.event,
+            title: options.title ?? `${label1} + ${label2}`,
+            hideRollMessage: options.hideRollMessage
         });
     }
 

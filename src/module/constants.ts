@@ -52,5 +52,13 @@ export const SR = {
     die: {
         glitch: [1],
         success: [5, 6]
+    },
+    defense: {
+        spell: {
+            direct: {
+                mana: 'willpower',
+                physical: 'body'
+            }
+        }
     }
 }
