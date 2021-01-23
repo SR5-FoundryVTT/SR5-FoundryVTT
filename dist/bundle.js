@@ -21632,6 +21632,7 @@ class AmmoImporter extends DataImporter_1.DataImporter {
                         value: 0,
                         max: 0,
                     },
+                    wireless: true
                 },
                 element: '',
                 ap: 0,
@@ -21783,6 +21784,7 @@ class ArmorImporter extends DataImporter_1.DataImporter {
                         value: 0,
                         max: 0,
                     },
+                    wireless: true
                 },
                 armor: {
                     value: 0,
@@ -22719,6 +22721,7 @@ class ModImporter extends DataImporter_1.DataImporter {
                         value: 0,
                         max: 0,
                     },
+                    wireless: true
                 },
                 type: '',
                 mount_point: '',
@@ -23110,6 +23113,7 @@ class WareImporter extends DataImporter_1.DataImporter {
                         value: 0,
                         max: 0,
                     },
+                    wireless: true
                 },
                 armor: {
                     value: 0,
@@ -23323,6 +23327,7 @@ class WeaponImporter extends DataImporter_1.DataImporter {
                         value: 0,
                         max: 0,
                     },
+                    wireless: true
                 },
                 ammo: {
                     spare_clips: {
