@@ -15,7 +15,8 @@ import CombatData = Shadowrun.CombatData;
 
 export interface RollTargetChatMessage {
     actor: SR5Actor
-    target: Token|undefined
+    target?: Token|undefined
+    targets?: Token[]
     item: SR5Item
     tests: Test[]
     roll: ShadowrunRoll
@@ -40,6 +41,7 @@ export interface RollChatMessageOptions {
     roll: ShadowrunRoll
     actor?: SR5Actor
     target?: Token
+    targets?: Token[]
 
     item?: SR5Item
 
@@ -68,12 +70,18 @@ interface ItemChatTemplateData {
 
 interface RollChatTemplateData extends RollChatMessageOptions {
     tokenId?: string
+    targetTokenId?: string
     rollMode: keyof typeof CONFIG.dice.rollModes
 }
 
 async function createChatMessage(templateData, options?: ChatDataOptions): Promise<Entity<any>> {
     const chatData = await createChatData(templateData, options);
     const message = await ChatMessage.create(chatData);
+
+    // Store data in chat message for later use (opposed tests)
+    if (templateData.roll) await message.setFlag(SYSTEM_NAME, FLAGS.Roll, templateData.roll);
+    if (templateData.attack) await message.setFlag(SYSTEM_NAME, FLAGS.Attack, templateData.attack);
+
     console.log('Chat Message', message, chatData);
     return message;
 }
@@ -176,13 +184,8 @@ export async function createRollChatMessage(options: RollChatMessageOptions): Pr
     await ifConfiguredCreateDefaultChatMessage(options);
 
     const templateData = getRollChatTemplateData(options);
-    // TODO: Double data is bad.
     const chatOptions = {roll: options.roll};
     const message = await createChatMessage(templateData, chatOptions);
-
-    // Store data in chat message for later use (opposed tests)
-    if (options.roll) await message.setFlag(SYSTEM_NAME, FLAGS.Roll, options.roll);
-    if (options.attack) await message.setFlag(SYSTEM_NAME, FLAGS.Attack, options.attack);
 
     return message;
 }
@@ -194,9 +197,12 @@ function getRollChatTemplateData(options: RollChatMessageOptions): RollChatTempl
     const rollMode = options.rollMode ?? game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
     const tokenId = getTokenSceneId(token);
 
+    const targetTokenId = getTokenSceneId(options.target);
+
     return {
        ...options,
         tokenId,
+        targetTokenId,
         rollMode,
     }
 }
@@ -240,13 +246,19 @@ export const addRollListeners = (app: ChatMessage, html) => {
         const message = game.messages.get(messageId);
         const attack = message.getFlag(SYSTEM_NAME, FLAGS.Attack);
         const item = SR5Item.getItemFromMessage(html);
+        const targetTokenId = html.find('.chat-card').data('targetTokenId');
+        const targetToken = Helpers.getSceneToken(targetTokenId);
+        const targetActor = targetToken?.actor as SR5Actor;
+
+        console.error('Test', item, attack, targetActor);
+
         const type = event.currentTarget.dataset.action;
         if (!item) {
             ui.notifications.error(game.i18n.localize('SR5.MissingItemForOpposedTest'));
             return;
         }
 
-        await item.rollTestType(type, attack, event);
+        await item.rollTestType(type, attack, event, targetActor);
     });
     html.on('click', '.place-template', (event) => {
         event.preventDefault();

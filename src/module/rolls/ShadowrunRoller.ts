@@ -187,7 +187,6 @@ export class ShadowrunRoller {
         const previewTemplate = item.hasTemplate;
         const description = item.getChatData();
         const tests = item.getOpposedTests();
-        const target = Helpers.getToken(actionTestData?.targetId);
 
         // Prepare the roll and dialog.
         const advancedRollProps = {
@@ -227,12 +226,17 @@ export class ShadowrunRoller {
             if (spellAttack) attack.damage = spellAttack.damage;
         }
 
-        const rollChatOptions = {title, roll, actor, item, attack, previewTemplate, target, description, tests};
+
+        // Handle user targeting for for targeted messages and display.
+        const targets: Token[] = Helpers.getUserTargets();
+        // Allow for direct defense without token selection for ONE token targeted.
+        const target = targets.length === 1 ? targets[0] : undefined;
+
+        const rollChatOptions = {title, roll, actor, item, attack, previewTemplate, targets, target, description, tests};
         await createRollChatMessage(rollChatOptions);
 
         if (tests) {
-            const targets = target ? [target] : Helpers.getUserTargets();
-            const targetChatOptions = {actor, target, item, tests, roll, attack}
+            const targetChatOptions = {actor, item, tests, roll, attack}
             await ShadowrunRoller.targetsChatMessages(targets, targetChatOptions);
         }
 
@@ -300,7 +304,7 @@ export class ShadowrunRoller {
     static roll(props: RollProps): ShadowrunRoll|undefined {
         const parts = new PartsList(props.parts);
 
-        if (parts.isEmpty || parts.total < 1) {
+        if (parts.isEmpty) {
             ui.notifications.error(game.i18n.localize('SR5.RollOneDie'));
             return;
         }
@@ -326,6 +330,7 @@ export class ShadowrunRoller {
         const props = ShadowrunRoller.basicRollPropsDefaults(basicProps);
 
         const roll = await ShadowrunRoller.roll({parts: props.parts, limit: props.limit, explodeSixes: props.explodeSixes});
+        console.error(roll);
         if (!roll) return;
 
         // TODO: Check if message creation is needed anywhere?
@@ -460,8 +465,8 @@ export class ShadowrunRoller {
             if (user === game.user) continue;
 
             const targetChatMessage = {
-                actor: options.actor, target: options.target, item: options.item,
-                tests: options.tests, whisperTo: user
+                actor: options.actor, target: options.target, targets: [options.target], item: options.item,
+                tests: options.tests, whisperTo: user, attack: options.attack
             } as TargetChatMessageOptions;
             await createTargetChatMessage(targetChatMessage);
         }

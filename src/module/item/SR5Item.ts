@@ -587,10 +587,17 @@ export class SR5Item extends Item {
     }
 
     // TODO: attack is specific in focus. Can be broader?
-    async rollTestType(type: string, attack: AttackData, event) {
+    async rollTestType(type: string, attack: AttackData, event, target?: SR5Actor) {
         if (type === 'opposed') {
+            // Either use selection or a singular target from the chat message.
             const targets = Helpers.getSelectedActorsOrCharacter();
+
+            if (targets.length === 0 && target) {
+                targets.push(target);
+            }
+
             for (const target of targets) {
+                console.error(target.name);
                 await this.rollOpposedTest(target, attack, event);
             }
         }
