@@ -13613,7 +13613,6 @@ class SR5Actor extends Actor {
             const modificationLabel = 'SR5.SpellDefense';
             const actor = this;
             const damage = helpers_1.Helpers.modifyDamageByHits(options.attack.damage, roll.hits, modificationLabel);
-            console.error('direct', options);
             yield chat_1.createRollChatMessage({ title, roll, actor, damage });
             return roll;
         });
@@ -13626,7 +13625,7 @@ class SR5Actor extends Actor {
             // TODO: indirect LOS spell defense works like a ranged weapon defense, but indirect LOS(A) spell defense
             //       work like grenade attack (no defense, but soak, with the threshold net hits modifying damage.)
             //       Grenades: SR5#181 Combat Spells: SR5#283
-            const roll = yield this.rollRangedDefense(options, opposedParts.list);
+            return yield this.rollRangedDefense(options, opposedParts.list);
         });
     }
     // TODO: Abstract handling of const damage : ModifiedDamageData
@@ -18926,20 +18925,31 @@ exports.addRollListeners = (app, html) => {
         const messageId = html.data('messageId');
         const message = game.messages.get(messageId);
         const attack = message.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.Attack);
-        const targetSceneIds = message.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.TargetsSceneTokenIds);
         const item = SR5Item_1.SR5Item.getItemFromMessage(html);
         const type = event.currentTarget.dataset.action;
         if (!item) {
             ui.notifications.error(game.i18n.localize('SR5.MissingItemForOpposedTest'));
             return;
         }
-        for (const targetSceneId of targetSceneIds) {
-            const token = helpers_1.Helpers.getSceneToken(targetSceneId);
-            if (!token)
-                return;
-            const actor = token.actor;
-            if (!actor)
-                return;
+        // Selection will overwrite chat specific targeting
+        const actors = helpers_1.Helpers.getSelectedActorsOrCharacter();
+        // No selection, fall back to targeting.
+        if (actors.length === 0) {
+            const targetSceneIds = message.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.TargetsSceneTokenIds);
+            for (const targetSceneId of targetSceneIds) {
+                const token = helpers_1.Helpers.getSceneToken(targetSceneId);
+                if (!token)
+                    continue;
+                const actor = token.actor;
+                if (!actor)
+                    continue;
+                actors.push(actor);
+            }
+        }
+        if (!actors)
+            return;
+        console.error(actors);
+        for (const actor of actors) {
             yield item.rollTestType(type, attack, event, actor);
         }
     }));
@@ -25214,7 +25224,6 @@ class SR5Item extends Item {
         licenses.splice(index, 1);
         this.update(data);
     }
-    // TODO: Rework that shit.
     rollOpposedTest(target, attack, event) {
         return __awaiter(this, void 0, void 0, function* () {
             const options = {
@@ -25252,18 +25261,10 @@ class SR5Item extends Item {
             }
         });
     }
-    // TODO: attack is specific in focus. Can be broader?
     rollTestType(type, attack, event, target) {
         return __awaiter(this, void 0, void 0, function* () {
             if (type === 'opposed') {
-                // Either use selection or a singular target from the chat message.
-                const targets = helpers_1.Helpers.getSelectedActorsOrCharacter();
-                if (targets.length === 0 && target) {
-                    targets.push(target);
-                }
-                for (const target of targets) {
-                    yield this.rollOpposedTest(target, attack, event);
-                }
+                yield this.rollOpposedTest(target, attack, event);
             }
             if (type === 'action') {
                 yield this.castAction(event);
@@ -27748,7 +27749,9 @@ class ShadowrunRoller {
             const roll = yield ShadowrunRoller.roll({ parts: props.parts, limit: props.limit, explodeSixes: props.explodeSixes });
             if (!roll)
                 return;
-            // TODO: Check if message creation is needed anywhere?
+            if (!props.hideRollMessage) {
+                yield ShadowrunRoller.rollChatMessage(roll, props);
+            }
             return roll;
         });
     }
@@ -27816,6 +27819,10 @@ class ShadowrunRoller {
             // basicRollProps.dialogOptions = testData.dialogOptions;
             basicRollProps.rollMode = testData.rollMode;
             basicRollProps.parts = testData.parts.list;
+            // TODO: This is needed a hotfix... basicRoll is used secondChance and pushTheLimit chat actions.
+            //       If those are handled by advancedRoll (without a dialog) basicRoll message creation can be removed
+            //       and this line as well...
+            basicRollProps.hideRollMessage = true;
             if (testDialog.selectedButton === 'edge' && props.actor) {
                 yield ShadowrunRoller.handleExplodingSixes(props.actor, basicRollProps, testData);
             }
