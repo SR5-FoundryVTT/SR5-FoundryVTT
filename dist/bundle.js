@@ -17835,7 +17835,9 @@ class ShadowrunActorDialogs {
             const testLabel = game.i18n.localize('SR5.Test');
             const skillTestTitle = `${skillLabel} + ${attributeLabel} ${testLabel}`;
             partsProps.addUniquePart(attribute.label, attribute.value);
-            const isDefaulting = options.skill.value === 0;
+            // Check for skill defaulting at the base, since modifiers or bonus can cause a positive pool, while
+            // still defaulting.
+            const isDefaulting = options.skill.base === 0;
             if (isDefaulting) {
                 partsProps.addUniquePart('SR5.Defaulting', -1);
             }
