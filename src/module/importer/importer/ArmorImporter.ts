@@ -2,7 +2,6 @@ import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import Armor = Shadowrun.Armor;
 import { ArmorParserBase } from '../parser/armor/ArmorParserBase';
-import {DeviceImporter} from "./DeviceImporter";
 
 export class ArmorImporter extends DataImporter {
     public armorTranslations: any;
@@ -43,6 +42,7 @@ export class ArmorImporter extends DataImporter {
                         value: 0,
                         max: 0,
                     },
+                    wireless: true
                 },
                 armor: {
                     value: 0,
