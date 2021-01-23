@@ -597,7 +597,6 @@ export class SR5Item extends Item {
             }
 
             for (const target of targets) {
-                console.error(target.name);
                 await this.rollOpposedTest(target, attack, event);
             }
         }

@@ -330,7 +330,6 @@ export class ShadowrunRoller {
         const props = ShadowrunRoller.basicRollPropsDefaults(basicProps);
 
         const roll = await ShadowrunRoller.roll({parts: props.parts, limit: props.limit, explodeSixes: props.explodeSixes});
-        console.error(roll);
         if (!roll) return;
 
         // TODO: Check if message creation is needed anywhere?

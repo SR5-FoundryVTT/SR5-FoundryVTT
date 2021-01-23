@@ -13,7 +13,8 @@ export const FLAGS = {
     LastComplexFormLevel: 'lastComplexFormLevel',
     LastFireRange: 'lastFireRange',
     Attack: 'attack',
-    Roll: 'roll'
+    Roll: 'roll',
+    TargetsSceneTokenIds: 'targetsSceneTokenIds',
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {
