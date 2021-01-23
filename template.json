@@ -1064,7 +1064,8 @@
                     "condition_monitor": {
                         "value": 0,
                         "max": 9
-                    }
+                    },
+                    "wireless": true
                 }
             },
             "action": {
