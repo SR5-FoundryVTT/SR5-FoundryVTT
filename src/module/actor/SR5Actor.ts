@@ -449,8 +449,6 @@ export class SR5Actor extends Actor {
         const actor = this;
         const damage = Helpers.modifyDamageByHits(options.attack.damage, roll.hits, modificationLabel);
 
-        console.error('direct', options);
-
         await createRollChatMessage({title, roll, actor, damage});
 
         return roll;
@@ -464,7 +462,7 @@ export class SR5Actor extends Actor {
         // TODO: indirect LOS spell defense works like a ranged weapon defense, but indirect LOS(A) spell defense
         //       work like grenade attack (no defense, but soak, with the threshold net hits modifying damage.)
         //       Grenades: SR5#181 Combat Spells: SR5#283
-        const roll = await this.rollRangedDefense(options, opposedParts.list);
+        return await this.rollRangedDefense(options, opposedParts.list);
     }
 
     // TODO: Abstract handling of const damage : ModifiedDamageData

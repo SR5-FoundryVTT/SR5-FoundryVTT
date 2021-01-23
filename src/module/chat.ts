@@ -246,7 +246,6 @@ export const addRollListeners = (app: ChatMessage, html) => {
         const messageId = html.data('messageId');
         const message = game.messages.get(messageId);
         const attack = message.getFlag(SYSTEM_NAME, FLAGS.Attack);
-        const targetSceneIds = message.getFlag(SYSTEM_NAME, FLAGS.TargetsSceneTokenIds);
         const item = SR5Item.getItemFromMessage(html);
 
         const type = event.currentTarget.dataset.action;
@@ -255,16 +254,30 @@ export const addRollListeners = (app: ChatMessage, html) => {
             return;
         }
 
-        for (const targetSceneId of targetSceneIds) {
-            const token = Helpers.getSceneToken(targetSceneId);
-            if (!token) return;
+        // Selection will overwrite chat specific targeting
+        const actors = Helpers.getSelectedActorsOrCharacter();
 
-            const actor = token.actor as SR5Actor;
-            if (!actor) return;
+        // No selection, fall back to targeting.
+        if (actors.length === 0) {
+            const targetSceneIds = message.getFlag(SYSTEM_NAME, FLAGS.TargetsSceneTokenIds);
 
-            await item.rollTestType(type, attack, event, actor);
+            for (const targetSceneId of targetSceneIds) {
+                const token = Helpers.getSceneToken(targetSceneId);
+                if (!token) continue;
+
+                const actor = token.actor as SR5Actor;
+                if (!actor) continue;
+
+                actors.push(actor);
+            }
         }
 
+        if (!actors) return;
+
+        console.error(actors);
+        for (const actor of actors) {
+            await item.rollTestType(type, attack, event, actor);
+        }
     });
     html.on('click', '.place-template', (event) => {
         event.preventDefault();

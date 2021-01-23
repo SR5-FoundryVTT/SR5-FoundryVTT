@@ -332,7 +332,9 @@ export class ShadowrunRoller {
         const roll = await ShadowrunRoller.roll({parts: props.parts, limit: props.limit, explodeSixes: props.explodeSixes});
         if (!roll) return;
 
-        // TODO: Check if message creation is needed anywhere?
+        if (!props.hideRollMessage) {
+            await ShadowrunRoller.rollChatMessage(roll, props);
+        }
 
         return roll;
     }
@@ -408,6 +410,10 @@ export class ShadowrunRoller {
         // basicRollProps.dialogOptions = testData.dialogOptions;
         basicRollProps.rollMode = testData.rollMode;
         basicRollProps.parts = testData.parts.list;
+        // TODO: This is needed a hotfix... basicRoll is used secondChance and pushTheLimit chat actions.
+        //       If those are handled by advancedRoll (without a dialog) basicRoll message creation can be removed
+        //       and this line as well...
+        basicRollProps.hideRollMessage = true;
 
 
         if (testDialog.selectedButton === 'edge' && props.actor) {

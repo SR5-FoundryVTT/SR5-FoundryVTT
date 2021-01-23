@@ -541,7 +541,6 @@ export class SR5Item extends Item {
         this.update(data);
     }
 
-    // TODO: Rework that shit.
     async rollOpposedTest(target: SR5Actor, attack: AttackData, event):  Promise<ShadowrunRoll | undefined> {
         const options = {
             event,
@@ -586,19 +585,9 @@ export class SR5Item extends Item {
         }
     }
 
-    // TODO: attack is specific in focus. Can be broader?
-    async rollTestType(type: string, attack: AttackData, event, target?: SR5Actor) {
+    async rollTestType(type: string, attack: AttackData, event, target: SR5Actor) {
         if (type === 'opposed') {
-            // Either use selection or a singular target from the chat message.
-            const targets = Helpers.getSelectedActorsOrCharacter();
-
-            if (targets.length === 0 && target) {
-                targets.push(target);
-            }
-
-            for (const target of targets) {
-                await this.rollOpposedTest(target, attack, event);
-            }
+            await this.rollOpposedTest(target, attack, event);
         }
         if (type === 'action') {
             await this.castAction(event);
