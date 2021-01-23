@@ -30,7 +30,7 @@ export class ShadowrunTestDialog {
         const templateData = {
             options: options.dialogOptions,
             extended: options.extended,
-            dice_pool: parts.total,
+            pool: parts.total,
             parts: parts.getMessageOutput(),
             limitValue: options.limit?.value,
             wounds: options.wounds,
@@ -60,9 +60,9 @@ export class ShadowrunTestDialog {
         }
 
         const onAfterClose = async (html: JQuery) => {
-            const dicePoolValue = Helpers.parseInputToNumber($(html).find('[name="dice_pool"]').val());
+            const dicePoolValue = Helpers.parseInputToNumber($(html).find('[name="pool"]').val());
 
-            if (options.dialogOptions?.prompt) {
+            if (options.dialogOptions?.pool) {
                 parts.clear();
                 await game.user.setFlag(SYSTEM_NAME, FLAGS.LastRollPromptValue, dicePoolValue);
                 parts.addUniquePart('SR5.Base', dicePoolValue);
@@ -89,12 +89,8 @@ export class ShadowrunTestDialog {
             if (situationMod) {
                 parts.addUniquePart('SR5.SituationalModifier', situationMod);
             }
-            const dialogOptions = {};
             if (environmentMod) {
                 parts.addUniquePart('SR5.EnvironmentModifier', environmentMod);
-                if (options.dialogOptions) {
-                    dialogOptions['environmental'] = true;
-                }
             }
 
             const extendedString = Helpers.parseInputToString($(html).find('[name="extended"]').val());
@@ -106,7 +102,6 @@ export class ShadowrunTestDialog {
                 limit,
                 wounds,
                 parts,
-                dialogOptions,
                 extended,
                 rollMode
             }

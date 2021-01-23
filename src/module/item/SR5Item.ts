@@ -22,6 +22,9 @@ import SR5ItemType = Shadowrun.SR5ItemType;
 import ActionData = Shadowrun.ActionData;
 import ActionRollData = Shadowrun.ActionRollData;
 import TrackType = Shadowrun.TrackType;
+import DamageData = Shadowrun.DamageData;
+import DefenseRollOptions = Shadowrun.DefenseRollOptions;
+import SpellDefenseOptions = Shadowrun.SpellDefenseOptions;
 
 export class SR5Item extends Item {
     labels: {} = {};
@@ -35,28 +38,28 @@ export class SR5Item extends Item {
 
     // Flag Functions
     getLastFireMode(): FireModeData {
-        return this.getFlag(SYSTEM_NAME, 'lastFireMode') || { value: 0 };
+        return this.getFlag(SYSTEM_NAME, FLAGS.LastFireMode) || { value: 0 };
     }
     async setLastFireMode(fireMode: FireModeData) {
-        return this.setFlag(SYSTEM_NAME, 'lastFireMode', fireMode);
+        return this.setFlag(SYSTEM_NAME, FLAGS.LastFireMode, fireMode);
     }
     getLastSpellForce(): SpellForceData {
-        return this.getFlag(SYSTEM_NAME, 'lastSpellForce') || { value: 0 };
+        return this.getFlag(SYSTEM_NAME, FLAGS.LastSpellForce) || { value: 0 };
     }
     async setLastSpellForce(force: SpellForceData) {
-        return this.setFlag(SYSTEM_NAME, 'lastSpellForce', force);
+        return this.setFlag(SYSTEM_NAME, FLAGS.LastSpellForce, force);
     }
     getLastComplexFormLevel(): ComplexFormLevelData {
-        return this.getFlag(SYSTEM_NAME, 'lastComplexFormLevel') || { value: 0 };
+        return this.getFlag(SYSTEM_NAME, FLAGS.LastComplexFormLevel) || { value: 0 };
     }
     async setLastComplexFormLevel(level: ComplexFormLevelData) {
-        return this.setFlag(SYSTEM_NAME, 'lastComplexFormLevel', level);
+        return this.setFlag(SYSTEM_NAME, FLAGS.LastComplexFormLevel, level);
     }
     getLastFireRangeMod(): FireRangeData {
-        return this.getFlag(SYSTEM_NAME, 'lastFireRange') || { value: 0 };
+        return this.getFlag(SYSTEM_NAME, FLAGS.LastFireRange) || { value: 0 };
     }
     async setLastFireRangeMod(environmentalMod: FireRangeData) {
-        return this.setFlag(SYSTEM_NAME, 'lastFireRange', environmentalMod);
+        return this.setFlag(SYSTEM_NAME, FLAGS.LastFireRange, environmentalMod);
     }
 
     /**
@@ -100,22 +103,24 @@ export class SR5Item extends Item {
         await this.unsetFlag(SYSTEM_NAME, FLAGS.EmbeddedItems);
     }
 
-    getLastAttack(): AttackData | undefined {
-        return this.getFlag(SYSTEM_NAME, 'lastAttack');
-    }
-    async setLastAttack(attack: AttackData) {
-        // unset the flag first to clear old data, data can get weird if not done
-        await this.unsetFlag(SYSTEM_NAME, 'lastAttack');
-        return this.setFlag(SYSTEM_NAME, 'lastAttack', attack);
-    }
+    // TODO: Remove.
+    // getLastAttack(): AttackData | undefined {
+    //     return this.getFlag(SYSTEM_NAME, FLAGS.Attack);
+    // }
+    // async setLastAttack(attack: AttackData) {
+    //     // unset the flag first to clear old data, data can get weird if not done
+    //     await this.unsetFlag(SYSTEM_NAME, FLAGS.Attack);
+    //     return this.setFlag(SYSTEM_NAME, FLAGS.Attack, attack);
+    // }
 
-    async setLastAttackForRoll(roll: ShadowrunRoll|undefined, actionTestData?: ActionTestData) {
-        const hits = roll?.total ?? 0;
-        const attackData = this.getAttackData(hits, actionTestData);
-        if (attackData) {
-            await this.setLastAttack(attackData);
-        }
-    }
+    // TODO: Remove.
+    // async setLastAttackForRoll(roll: ShadowrunRoll|undefined, actionTestData?: ActionTestData) {
+    //     const hits = roll?.total ?? 0;
+    //     const attackData = this.getAttackData(hits, actionTestData);
+    //     if (attackData) {
+    //         await this.setLastAttack(attackData);
+    //     }
+    // }
 
     /** Overwrite to allow for options param to be skipped.
      */
@@ -268,8 +273,7 @@ export class SR5Item extends Item {
         const actionTestData = await dialog.select();
         if (dialog.canceled) return;
 
-        const options = undefined;
-        return await this.rollTest(event, options, actionTestData);
+        return await this.rollTest(event, actionTestData);
 }
 
     getChatData(htmlOptions?) {
@@ -537,56 +541,53 @@ export class SR5Item extends Item {
         this.update(data);
     }
 
-    async rollOpposedTest(target: SR5Actor, event) {
-        const itemData = this.data.data;
+    async rollOpposedTest(target: SR5Actor, attack: AttackData, event):  Promise<ShadowrunRoll | undefined> {
         const options = {
             event,
             fireModeDefense: 0,
             cover: false,
+            attack
         };
 
-        const lastAttack = this.getLastAttack();
         const parts = this.getOpposedTestMod();
-        const { opposed } = itemData.action;
+        const { opposed } = this.getAction();
 
         if (opposed.type === 'defense') {
-            if (lastAttack) {
-                options['incomingAttack'] = lastAttack;
-                options.cover = true;
-                if (lastAttack.fireMode?.defense) {
-                    options.fireModeDefense = +lastAttack.fireMode.defense;
-                }
-            }
-            return await target.rollDefense(options, parts.list);
+            return await this.rollDefense(target, options);
 
         } else if (opposed.type === 'soak') {
-            options['damage'] = lastAttack?.damage;
-            options['attackerHits'] = lastAttack?.hits;
+            options['damage'] = attack?.damage;
+            options['attackerHits'] = attack?.hits;
             return await target.rollSoak(options, parts.list);
 
         } else if (opposed.type === 'armor') {
             return target.rollArmor(options);
 
-        } else {
-            if (opposed.skill && opposed.attribute) {
-                return target.rollSkill(opposed.skill, {
-                    ...options,
-                    attribute: opposed.attribute,
-                });
-            } else if (opposed.attribute && opposed.attribute2) {
-                return target.rollTwoAttributes([opposed.attribute, opposed.attribute2], options);
-            } else if (opposed.attribute) {
-                return target.rollSingleAttribute(opposed.attribute, options);
+        } else if (opposed.skill && opposed.attribute) {
+            const skill = target.getSkill(opposed.skill);
+
+            if (!skill) {
+                ui.notifications.error(game.i18n.localize("SR5.Errors.MissingSkill"));
+                return;
             }
+
+            return target.rollSkill(skill, {
+                ...options,
+                attribute: opposed.attribute,
+            });
+
+        } else if (opposed.attribute && opposed.attribute2) {
+            return target.rollTwoAttributes([opposed.attribute, opposed.attribute2], options);
+
+        } else if (opposed.attribute) {
+            return target.rollSingleAttribute(opposed.attribute, options);
+
         }
     }
 
-    async rollTestType(type: string, event) {
+    async rollTestType(type: string, attack: AttackData, event, target: SR5Actor) {
         if (type === 'opposed') {
-            const targets = Helpers.getSelectedActorsOrCharacter();
-            for (const target of targets) {
-                await this.rollOpposedTest(target, event);
-            }
+            await this.rollOpposedTest(target, attack, event);
         }
         if (type === 'action') {
             await this.castAction(event);
@@ -599,12 +600,11 @@ export class SR5Item extends Item {
      * @param actionTestData
      * @param options - any additional roll options to pass along - note that currently the Item will overwrite -- WIP
      */
-    async rollTest(event, options?: Partial<AdvancedRollProps>, actionTestData?: ActionTestData): Promise<ShadowrunRoll | undefined> {
+    async rollTest(event, actionTestData?: ActionTestData): Promise<ShadowrunRoll | undefined> {
 
-        const roll = await ShadowrunRoller.itemRoll(event, this, options, actionTestData);
+        const roll = await ShadowrunRoller.itemRoll(event, this, actionTestData);
         if (!roll) return;
 
-        await this.setLastAttackForRoll(roll, actionTestData);
         await ShadowrunRoller.resultingItemRolls(event, this, actionTestData);
 
         return roll;
@@ -826,7 +826,7 @@ export class SR5Item extends Item {
 
         const {damage} = this.getAction();
 
-        // add attribute value to the damage if we
+        // Add custom action damage value based on Attribute.
         if (damage.attribute) {
             const { attribute } = damage;
             const att = this.actor.findAttribute(attribute);
@@ -841,14 +841,19 @@ export class SR5Item extends Item {
             damage,
         };
 
+        // Modify action damage by spell damage.
         if (this.isCombatSpell() && actionTestData?.spell) {
             const force = actionTestData.spell.force;
             const damageParts = new PartsList(data.damage.mod);
-            data.force = force;
-            data.damage.base = force;
-            data.damage.value = force + damageParts.total;
-            data.damage.ap.value = -force + damageParts.total;
-            data.damage.ap.base = -force;
+            const spellDamage = this.getSpellDamage(force, hits);
+
+            if (spellDamage) {
+                data.force = force;
+                data.damage.base = spellDamage.base;
+                data.damage.value = spellDamage.base + damageParts.total;
+                data.damage.ap.value = -spellDamage.ap.value + damageParts.total;
+                data.damage.ap.base = -spellDamage.ap.value;
+            }
         }
 
         if (this.isComplexForm() && actionTestData?.complexForm) {
@@ -981,6 +986,22 @@ export class SR5Item extends Item {
         return this.wrapper.isCombatSpell();
     }
 
+    isDirectCombatSpell(): boolean {
+        return this.wrapper.isDirectCombatSpell();
+    }
+
+    isIndirectCombatSpell(): boolean {
+        return this.wrapper.isIndirectCombatSpell();
+    }
+
+    isManaSpell(): boolean {
+        return this.wrapper.isManaSpell();
+    }
+
+    isPhysicalSpell(): boolean {
+        return this.wrapper.isPhysicalSpell();
+    }
+
     isRangedWeapon(): boolean {
         return this.wrapper.isRangedWeapon();
     }
@@ -1100,5 +1121,49 @@ export class SR5Item extends Item {
 
     hasDefenseTest(): boolean {
         return this.data.data.action?.opposed?.type === 'defense';
+    }
+
+    /** Use this method to get the base damage of spell, before any opposing action
+     *
+     * NOTE: This will NOT give you modified damage for direct combat spells
+     */
+    getSpellDamage(force: number, hits: number): DamageData|undefined {
+        if (!this.isCombatSpell()) return;
+
+        const action = this.getAction();
+
+        if (this.isDirectCombatSpell()) {
+            const damage = hits;
+
+            return Helpers.createDamageData(damage, action.damage.type.value);
+        } else if (this.isIndirectCombatSpell()) {
+            const damage = force;
+            const ap = -force;
+
+            return Helpers.createDamageData(damage, action.damage.type.value, -ap)
+        }
+    }
+
+    // TODO: Move into a rule section.
+    async rollDefense(target: SR5Actor, options: DefenseRollOptions): Promise<ShadowrunRoll | undefined> {
+        // TODO: Maybe move into defense methods and give the actor access to the item.
+        const opposedParts = this.getOpposedTestMod();
+
+        if (this.isWeapon()) {
+            options.cover = true;
+            if (options.attack?.fireMode?.defense) {
+                options.fireModeDefense = +options.attack.fireMode.defense;
+            }
+
+            return await target.rollRangedDefense(options, opposedParts.list);
+        }
+
+        if (this.isDirectCombatSpell()) {
+            return await target.rollDirectSpellDefense(this, options as SpellDefenseOptions);
+        }
+
+        if (this.isIndirectCombatSpell()) {
+            return await target.rollIndirectSpellDefense(this, options as SpellDefenseOptions);
+        }
     }
 }

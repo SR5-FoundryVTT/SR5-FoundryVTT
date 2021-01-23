@@ -21,7 +21,7 @@ export class PartsList<TType> {
     }
 
     get isEmpty(): boolean {
-        return this.total === 0;
+        return this.length === 0;
     }
 
     getPartValue(name: string): TType | undefined {

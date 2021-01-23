@@ -7,18 +7,23 @@ import {ShadowrunRoll, Test} from "./rolls/ShadowrunRoller";
 import DrainData = Shadowrun.DrainData;
 import {Helpers} from "./helpers";
 import ModifiedDamageData = Shadowrun.ModifiedDamageData;
-import DamageData = Shadowrun.DamageData;
 import {DamageApplicationDialog} from "./apps/dialogs/DamageApplicationDialog";
 import DamageType = Shadowrun.DamageType;
 import DamageElement = Shadowrun.DamageElement;
 import CombatData = Shadowrun.CombatData;
 
-export interface TargetChatMessageOptions {
-    actor: Actor
-    target: Token
+export interface RollTargetChatMessage {
+    actor: SR5Actor
+    target?: Token|undefined
+    targets?: Token[]
     item: SR5Item
-    incomingAttack: AttackData
     tests: Test[]
+    roll: ShadowrunRoll
+    attack?: AttackData
+    rollMode?: keyof typeof CONFIG.Dice.rollModes
+}
+
+export interface TargetChatMessageOptions extends RollTargetChatMessage{
     whisperTo: User
 }
 
@@ -35,6 +40,7 @@ export interface RollChatMessageOptions {
     roll: ShadowrunRoll
     actor?: SR5Actor
     target?: Token
+    targets?: Token[]
 
     item?: SR5Item
 
@@ -49,6 +55,7 @@ export interface RollChatMessageOptions {
     damage?: ModifiedDamageData
     tests?: Test[]
     combat?: CombatData
+    reach?: number
 }
 
 interface ItemChatTemplateData {
@@ -62,12 +69,20 @@ interface ItemChatTemplateData {
 
 interface RollChatTemplateData extends RollChatMessageOptions {
     tokenId?: string
+    targetTokenId?: string
     rollMode: keyof typeof CONFIG.dice.rollModes
 }
 
 async function createChatMessage(templateData, options?: ChatDataOptions): Promise<Entity<any>> {
     const chatData = await createChatData(templateData, options);
     const message = await ChatMessage.create(chatData);
+
+    // Store data in chat message for later use (opposed tests)
+    if (templateData.roll) await message.setFlag(SYSTEM_NAME, FLAGS.Roll, templateData.roll);
+    if (templateData.attack) await message.setFlag(SYSTEM_NAME, FLAGS.Attack, templateData.attack);
+    // Convert targets into scene token ids.
+    if (templateData.targets) await message.setFlag(SYSTEM_NAME, FLAGS.TargetsSceneTokenIds, templateData.targets.map(target => getTokenSceneId(target)));
+
     console.log('Chat Message', message, chatData);
     return message;
 }
@@ -170,9 +185,10 @@ export async function createRollChatMessage(options: RollChatMessageOptions): Pr
     await ifConfiguredCreateDefaultChatMessage(options);
 
     const templateData = getRollChatTemplateData(options);
-    // TODO: Double data is bad.
     const chatOptions = {roll: options.roll};
-    return await createChatMessage(templateData, chatOptions);
+    const message = await createChatMessage(templateData, chatOptions);
+
+    return message;
 }
 
 
@@ -182,9 +198,12 @@ function getRollChatTemplateData(options: RollChatMessageOptions): RollChatTempl
     const rollMode = options.rollMode ?? game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
     const tokenId = getTokenSceneId(token);
 
+    const targetTokenId = getTokenSceneId(options.target);
+
     return {
        ...options,
         tokenId,
+        targetTokenId,
         rollMode,
     }
 }
@@ -224,14 +243,41 @@ export const addRollListeners = (app: ChatMessage, html) => {
 
     html.on('click', '.test', async (event) => {
         event.preventDefault();
+        const messageId = html.data('messageId');
+        const message = game.messages.get(messageId);
+        const attack = message.getFlag(SYSTEM_NAME, FLAGS.Attack);
         const item = SR5Item.getItemFromMessage(html);
+
         const type = event.currentTarget.dataset.action;
         if (!item) {
             ui.notifications.error(game.i18n.localize('SR5.MissingItemForOpposedTest'));
             return;
         }
 
-        await item.rollTestType(type, event);
+        // Selection will overwrite chat specific targeting
+        const actors = Helpers.getSelectedActorsOrCharacter();
+
+        // No selection, fall back to targeting.
+        if (actors.length === 0) {
+            const targetSceneIds = message.getFlag(SYSTEM_NAME, FLAGS.TargetsSceneTokenIds);
+
+            for (const targetSceneId of targetSceneIds) {
+                const token = Helpers.getSceneToken(targetSceneId);
+                if (!token) continue;
+
+                const actor = token.actor as SR5Actor;
+                if (!actor) continue;
+
+                actors.push(actor);
+            }
+        }
+
+        if (!actors) return;
+
+        console.error(actors);
+        for (const actor of actors) {
+            await item.rollTestType(type, attack, event, actor);
+        }
     });
     html.on('click', '.place-template', (event) => {
         event.preventDefault();
@@ -310,14 +356,39 @@ export const addRollListeners = (app: ChatMessage, html) => {
         const type = String(applyDamage.data('damageType')) as DamageType;
         const ap = Number(applyDamage.data('damageAp'));
         const element = String(applyDamage.data('damageElement')) as DamageElement;
-
-
         let damage = Helpers.createDamageData(value, type, ap, element);
+
         let actors = Helpers.getSelectedActorsOrCharacter();
 
+        // Should no selection be available try guessing.
         if (actors.length === 0) {
-            ui.notifications.warn(game.i18n.localize('SR5.Warnings.TokenSelectionNeeded'));
-            return;
+            const messageId = html.data('messageId');
+            const message = game.messages.get(messageId);
+            const targetIds = message.getFlag(SYSTEM_NAME, FLAGS.TargetsSceneTokenIds);
+
+            // If targeting is available, use that.
+            if (targetIds) {
+                targetIds.forEach(targetId => {
+                    const token = Helpers.getSceneToken(targetId);
+                    const actor = token?.actor as SR5Actor;
+                    if (!actor) return;
+                    actors.push(actor);
+                });
+
+            // Otherwise apply to the actor casting the damage.
+            } else {
+                const sceneTokenId = html.find('.chat-card').data('tokenId');
+                const token = Helpers.getSceneToken(sceneTokenId);
+                const actor = token?.actor as SR5Actor;
+                if (actor) {
+                    actors.push(actor);
+                }
+            }
+
+            if (actors.length === 0) {
+                ui.notifications.warn(game.i18n.localize("SR5.Warnings.TokenSelectionNeeded"));
+                return;
+            }
         }
 
         // Show user the token selection and resulting damage values

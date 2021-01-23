@@ -448,6 +448,9 @@
   "SR5.MeleeWeaponAttack": "Nahkampfwaffenangriff",
   "SR5.SpellAttack": "Zauberangriff",
   "SR5.SpellCast": "Zaubern",
+  "SR5.SpellDefense": "Zauberverteidigung",
+  "SR5.SpellDefenseDirectMana": "Zauberverteidigung (Direkt, Mana)",
+  "SR5.SpellDefenseDirectPhysical": "Zauberverteidgung (Direkt, Physisch)",
   "SR5.DefenseTest": "Verteidiungsprobe",
   "SR5.SoakTest": "Schadenswiderstandsprobe",
   "SR5.AttackerHits": "Angreifer Erfolge",
@@ -753,5 +756,9 @@
     "SR5.Warnings": {
         "NegativeLimitValue": "Limit Werte müssen über Null liegen",
         "TokenSelectionNeeded": "Ein oder mehrere Tokens müssen ausgewählt sein"
+    },
+
+    "SR5.Errors": {
+        "MissingSkill": "Der Charakter verfügt nicht über die benötigte Fertigkeit."
     }
 }

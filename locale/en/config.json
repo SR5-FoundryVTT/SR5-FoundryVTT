@@ -448,6 +448,9 @@
     "SR5.MeleeWeaponAttack": "Melee Weapon Attack",
     "SR5.SpellAttack": "Spell Attack",
     "SR5.SpellCast": "Spell Cast",
+    "SR5.SpellDefense": "Spell Defense",
+    "SR5.SpellDefenseDirectMana": "Spell Defense (direct, mana)",
+    "SR5.SpellDefenseDirectPhysical": "Spell Defense (direct, physical)",
     "SR5.DefenseTest": "Defense Test",
     "SR5.SoakTest": "Damage Resist Test",
     "SR5.AttackerHits": "Attacker Hits",
@@ -781,5 +784,9 @@
     "SR5.Warnings": {
         "NegativeLimitValue": "Limit values must be above zero",
         "TokenSelectionNeeded": "One ore more tokens need to be selected"
+    },
+
+    "SR5.Errors": {
+        "MissingSkill": "The actor doesn't have the requested skill."
     }
 }

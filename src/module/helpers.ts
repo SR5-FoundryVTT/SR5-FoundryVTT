@@ -245,7 +245,7 @@ export class Helpers {
         return name.slice(0, length).toUpperCase();
     }
 
-    static getToken(id: string): Token|undefined {
+    static getToken(id?: string): Token|undefined {
         for (const token of canvas.tokens.placeables) {
             if (token.id === id) {
                 return token;
@@ -384,9 +384,9 @@ export class Helpers {
         return damage;
     }
 
-    static modifyDamageBySoakRoll(incoming: DamageData, roll: ShadowrunRoll, modificationLabel: string): ModifiedDamageData {
+    static modifyDamageByHits(incoming: DamageData, hits: number, modificationLabel: string): ModifiedDamageData {
         const modified = duplicate(incoming);
-        modified.mod = PartsList.AddUniquePart(modified.mod, modificationLabel, -roll.hits);
+        modified.mod = PartsList.AddUniquePart(modified.mod, modificationLabel, -hits);
         modified.value = Helpers.calcTotal(modified, {min: 0});
 
         return {incoming, modified};

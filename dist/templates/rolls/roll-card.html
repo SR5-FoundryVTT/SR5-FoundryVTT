@@ -3,6 +3,7 @@
     data-actor-id="{{actor._id}}"
     data-item-id="{{item._id}}"
     data-token-id="{{tokenId}}"
+    data-target-token-id="{{targetTokenId}}"
 >
     {{#if speaker.actor}}
     <div class="card-title card-header">
@@ -87,10 +88,12 @@
                 {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.html'
                         name=(localize "SR5.Incoming")
                         damage=damage.incoming
+                        showAP=true
                 }}
                 {{> 'systems/shadowrun5e/dist/templates/rolls/parts/Damage.html'
                         name=(localize "SR5.Modified")
                         damage=damage.modified
+                        showAP=true
                 }}
             {{/if}} {{#if (isDefined incomingAttack.hits)}}
             <div class="limit-line">
@@ -160,12 +163,12 @@
         </div>
     </div>
     {{/if}}
-    {{#if target}}
-     <div class="card-title card-header">
+    {{#each targets as |target index|}}
+    <div class="card-title card-header">
          <a class="chat-select-link" data-token-id="{{target.id}}"><img src="{{target.data.img}}" title="{{target.name}}" width="36" height="36" /></a>
         <h3 class="header-name"><a class="chat-entity-link" draggable="false" data-entity="Token" data-id="{{target.id}}">{{target.name}}</a></h3>
     </div>
-    {{/if}}
+    {{/each}}
     {{#if tests}}
     <div class="card-buttons">
         {{#each tests as |test index|}}
