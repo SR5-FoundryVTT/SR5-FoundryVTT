@@ -11,6 +11,7 @@ import MatrixAttribute = Shadowrun.MatrixAttribute;
 import { SR5 } from '../config';
 import SkillField = Shadowrun.SkillField;
 import {SR5Item} from "../item/SR5Item";
+import DeviceData = Shadowrun.DeviceData;
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditForm instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
@@ -311,6 +312,7 @@ export class SR5ActorSheet extends ActorSheet {
                 const actorItem = this.actor.items.get(item._id) as SR5Item;
                 const chatData = actorItem.getChatData();
                 item.description = chatData.description;
+                // @ts-ignore // This is a hacky monkey patch solution to pass template data through duplicated item data.
                 item.properties = chatData.properties;
 
                 // TODO: isStack property isn't used elsewhere. Remove if unnecessary.
@@ -510,16 +512,16 @@ export class SR5ActorSheet extends ActorSheet {
         const options = { event };
         switch (split[0]) {
             case 'prompt-roll':
-                this.actor.promptRoll(options);
+                await this.actor.promptRoll(options);
                 break;
             case 'armor':
-                this.actor.rollArmor(options);
+                await this.actor.rollArmor(options);
                 break;
             case 'fade':
-                this.actor.rollFade(options);
+                await this.actor.rollFade(options);
                 break;
             case 'drain':
-                this.actor.rollDrain(options);
+                await this.actor.rollDrain(options);
                 break;
             case 'defense':
                 await this.actor.rollRangedDefense(options);
@@ -530,16 +532,16 @@ export class SR5ActorSheet extends ActorSheet {
 
             // attribute only rolls
             case 'composure':
-                this.actor.rollAttributesTest('composure');
+                await this.actor.rollAttributesTest('composure');
                 break;
             case 'judge-intentions':
-                this.actor.rollAttributesTest('judge_intentions');
+                await this.actor.rollAttributesTest('judge_intentions');
                 break;
             case 'lift-carry':
-                this.actor.rollAttributesTest('lift_carry');
+                await this.actor.rollAttributesTest('lift_carry');
                 break;
             case 'memory':
-                this.actor.rollAttributesTest('memory');
+                await this.actor.rollAttributesTest('memory');
                 break;
 
             case 'vehicle-stat':
@@ -550,7 +552,7 @@ export class SR5ActorSheet extends ActorSheet {
                 const prop = split[1]; // we expect another for "drone" category
                 switch (prop) {
                     case 'perception':
-                        this.actor.rollDronePerception(options);
+                        await this.actor.rollDronePerception(options);
                         break;
                     case 'infiltration':
                         this.actor.rollDroneInfiltration(options);
@@ -575,18 +577,18 @@ export class SR5ActorSheet extends ActorSheet {
                 switch (skillType) {
                     case 'active': {
                         const skillId = split[2];
-                        this.actor.rollActiveSkill(skillId, options);
+                        await this.actor.rollActiveSkill(skillId, options);
                         break;
                     }
                     case 'language': {
                         const skillId = split[2];
-                        this.actor.rollLanguageSkill(skillId, options);
+                        await this.actor.rollLanguageSkill(skillId, options);
                         break;
                     }
                     case 'knowledge': {
                         const category = split[2];
                         const skillId = split[3];
-                        this.actor.rollKnowledgeSkill(category, skillId, options);
+                        await this.actor.rollKnowledgeSkill(category, skillId, options);
                         break;
                     }
                 }
@@ -598,10 +600,10 @@ export class SR5ActorSheet extends ActorSheet {
                 switch (subkey) {
                     case 'attribute':
                         const attr = split[2];
-                        this.actor.rollMatrixAttribute(attr, options);
+                        await this.actor.rollMatrixAttribute(attr, options);
                         break;
                     case 'device-rating':
-                        this.actor.rollDeviceRating(options);
+                        await this.actor.rollDeviceRating(options);
                         break;
                 }
 
@@ -631,6 +633,8 @@ export class SR5ActorSheet extends ActorSheet {
     }
 
     async _onMatrixAttributeSelected(event) {
+        if (!("matrix" in this.actor.data.data)) return;
+
         let iid = this.actor.data.data.matrix.device;
         let item = this.actor.getOwnedSR5Item(iid);
         if (!item) {
@@ -643,7 +647,8 @@ export class SR5ActorSheet extends ActorSheet {
         let deviceAtt = event.currentTarget.value;
 
         // get current matrix attribute on the device
-        let oldVal = item.data.data.atts[deviceAtt].att;
+        const deviceData = item.data.data as DeviceData;
+        let oldVal = deviceData.atts[deviceAtt].att;
         let data = {
             _id: iid,
         };
@@ -654,7 +659,7 @@ export class SR5ActorSheet extends ActorSheet {
             let key = `data.atts.att${i}.att`;
             if (tmp === deviceAtt) {
                 data[key] = att;
-            } else if (item.data.data.atts[`att${i}`].att === att) {
+            } else if (deviceData.atts[`att${i}`].att === att) {
                 data[key] = oldVal;
             }
         }
@@ -685,13 +690,13 @@ export class SR5ActorSheet extends ActorSheet {
     async _onAddKnowledgeSkill(event) {
         event.preventDefault();
         const category = Helpers.listItemId(event);
-        this.actor.addKnowledgeSkill(category);
+        await this.actor.addKnowledgeSkill(category);
     }
 
     async _onRemoveKnowledgeSkill(event) {
         event.preventDefault();
         const [skillId, category] = Helpers.listItemId(event).split('.');
-        this.actor.removeKnowledgeSkill(skillId, category);
+        await this.actor.removeKnowledgeSkill(skillId, category);
     }
 
     async _onChangeRtg(event) {
@@ -707,7 +712,7 @@ export class SR5ActorSheet extends ActorSheet {
         const iid = Helpers.listItemId(event);
         const item = this.actor.getOwnedSR5Item(iid);
         const qty = parseInt(event.currentTarget.value);
-        if (item && qty) {
+        if (item && qty && "technology" in item.data.data) {
             item.data.data.technology.quantity = qty;
             item.update({ 'data.technology.quantity': qty });
         }
@@ -718,25 +723,27 @@ export class SR5ActorSheet extends ActorSheet {
         const iid = Helpers.listItemId(event);
         const item = this.actor.getOwnedSR5Item(iid);
         if (item) {
-            const itemData = item.data.data;
             const newItems = [] as any[];
-            if (item.type === 'device') {
-                // turn off all other devices than the one that is being equipped
-                // if clicking the equipped, toggle it
-                for (let ite of this.actor.items.filter((i) => i.type === 'device')) {
+            if (item.isDevice()) {
+                // Only allow one equipped device item. Unequip all other.
+                for (let ite of this.actor.items.filter((actorItem: SR5Item) => actorItem.isDevice())) {
                     newItems.push({
                         '_id': ite._id,
-                        'data.technology.equipped': ite._id === iid ? !itemData.technology.equipped : false,
+                        'data.technology.equipped': ite._id === iid,
                     });
                 }
+
             } else {
+                // Toggle equip status.
                 newItems.push({
                     '_id': iid,
-                    'data.technology.equipped': !itemData.technology.equipped,
+                    'data.technology.equipped': !item.isEquipped(),
                 });
             }
+            // @ts-ignore // TODO: foundry-pc-type defines Entity.updateEmbeddedEntity as static but it's not.
             await this.actor.updateEmbeddedEntity('OwnedItem', newItems);
-            this.actor.render();
+
+            this.actor.render(false);
         }
     }
 
@@ -918,6 +925,7 @@ export class SR5ActorSheet extends ActorSheet {
     _onShowEditKnowledgeSkill(event) {
         event.preventDefault();
         const [skill, category] = Helpers.listItemId(event).split('.');
+
         this._showSkillEditForm(
             KnowledgeSkillEditForm,
             this.actor,

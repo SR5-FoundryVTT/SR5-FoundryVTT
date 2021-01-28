@@ -9,6 +9,7 @@ declare namespace Shadowrun {
 
     export type EdgeAttributeField = AttributeField & {
         uses: number;
+        max: number;
     }
 
     export type AttributeField = BaseValuePair<number> &

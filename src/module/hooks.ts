@@ -55,17 +55,26 @@ ___________________
         };
 
         CONFIG.SR5 = SR5;
+        // @ts-ignore
         CONFIG.Actor.entityClass = SR5Actor;
+        // @ts-ignore
         CONFIG.Item.entityClass = SR5Item;
         CONFIG.Combat.entityClass = SR5Combat;
 
         registerSystemSettings();
 
         // Register sheet application classes
+        // NOTE: See dnd5e for a multi class approach for all actor types using the types array in Actors.registerSheet
         Actors.unregisterSheet('core', ActorSheet);
-        Actors.registerSheet(SYSTEM_NAME, SR5ActorSheet, { makeDefault: true });
+        Actors.registerSheet(SYSTEM_NAME, SR5ActorSheet, {
+            label: "SR5.SheetActor",
+            makeDefault: true
+        });
         Items.unregisterSheet('core', ItemSheet);
-        Items.registerSheet(SYSTEM_NAME, SR5ItemSheet, { makeDefault: true });
+        Items.registerSheet(SYSTEM_NAME, SR5ItemSheet, {
+            label: "SR5.SheetItem",
+            makeDefault: true
+        });
 
         ['renderSR5ActorSheet', 'renderSR5ItemSheet'].forEach((s) => {
             Hooks.on(s, (app, html) => Helpers.setupCustomCheckbox(app, html));

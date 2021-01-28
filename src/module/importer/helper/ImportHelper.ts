@@ -61,6 +61,7 @@ export class ImportHelper {
             last = null;
         let next = path.split('/');
         while (idx < next.length) {
+            // @ts-ignore // TODO: foundry-pc-type defines Folder without parent property, but it does exist.
             curr = game.folders.find((folder) => folder.parent === last && folder.name === next[idx]);
             if (curr === null) {
                 if (!mkdirs) {

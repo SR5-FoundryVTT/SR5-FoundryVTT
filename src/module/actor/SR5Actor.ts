@@ -8,9 +8,6 @@ import AttributeField = Shadowrun.AttributeField;
 import SkillRollOptions = Shadowrun.SkillRollOptions;
 import SkillField = Shadowrun.SkillField;
 import ModList = Shadowrun.ModList;
-import BaseValuePair = Shadowrun.BaseValuePair;
-import ModifiableValue = Shadowrun.ModifiableValue;
-import LabelField = Shadowrun.LabelField;
 import LimitField = Shadowrun.LimitField;
 import {SYSTEM_NAME, FLAGS, SR} from '../constants';
 import SR5ActorType = Shadowrun.SR5ActorType;
@@ -28,8 +25,17 @@ import TrackType = Shadowrun.TrackType;
 import OverflowTrackType = Shadowrun.OverflowTrackType;
 import {SR5Combat} from "../combat/SR5Combat";
 import SpellDefenseOptions = Shadowrun.SpellDefenseOptions;
+import NumberOrEmpty = Shadowrun.NumberOrEmpty;
+import CharacterActorData = Shadowrun.CharacterActorData;
+import SR5VehicleType = Shadowrun.SR5VehicleType;
+import VehicleStats = Shadowrun.VehicleStats;
+import SR5CharacterType = Shadowrun.SR5CharacterType;
+import ActorArmorData = Shadowrun.ActorArmorData;
+import ConditionData = Shadowrun.ConditionData;
 
 export class SR5Actor extends Actor {
+    data: SR5ActorType;
+
     getOverwatchScore() {
         const os = this.getFlag(SYSTEM_NAME, 'overwatchScore');
         return os !== undefined ? os : 0;
@@ -52,7 +58,7 @@ export class SR5Actor extends Actor {
         }
     }
 
-    getModifier(modifierName: string): number | undefined {
+    getModifier(modifierName: string): NumberOrEmpty {
         return this.data.data.modifiers[modifierName];
     }
 
@@ -67,8 +73,11 @@ export class SR5Actor extends Actor {
     }
 
     findVehicleStat(statName?: string): VehicleStat | undefined {
-        if (statName === undefined) return undefined;
-        return this.data.data.vehicle_stats[statName];
+        if (statName === undefined) return;
+
+        const vehicleStats = this.getVehicleStats();
+        if (vehicleStats)
+            return vehicleStats[statName];
     }
 
     findLimitFromAttribute(attributeName?: string): LimitField | undefined {
@@ -84,7 +93,8 @@ export class SR5Actor extends Actor {
     }
 
     getWoundModifier(): number {
-        return -1 * this.data.data.wounds?.value || 0;
+        if (!("wounds" in this.data.data)) return 0;
+        return -1 * this.data.data.wounds.value || 0;
     }
 
     /** Use edge on actors that have an edge attribute.
@@ -103,8 +113,13 @@ export class SR5Actor extends Actor {
         return this.data.data.attributes.edge;
     }
 
-    getArmor(): BaseValuePair<number> & ModifiableValue & LabelField {
-        return this.data.data.armor;
+    hasArmor(): boolean {
+        return "armor" in this.data.data;
+    }
+
+    getArmor(): ActorArmorData | undefined {
+        if ("armor" in this.data.data)
+            return this.data.data.armor;
     }
 
     getOwnedSR5Item(itemId: string): SR5Item | null {
@@ -112,23 +127,27 @@ export class SR5Actor extends Actor {
     }
 
     getMatrixDevice(): SR5Item | undefined | null {
+        if (!("matrix" in this.data.data)) return;
         const matrix = this.data.data.matrix;
         if (matrix.device) return this.getOwnedSR5Item(matrix.device);
-        return undefined;
     }
 
     getFullDefenseAttribute(): AttributeField | undefined {
         if (this.isVehicle()) {
             return this.findVehicleStat('pilot');
-        } else {
-            let att = this.data.data.full_defense_attribute;
-            if (!att) att = 'willpower';
-            return this.findAttribute(att);
+        } else if (this.isCharacter()) {
+            const character = this.asCharacter();
+            if (character) {
+                let att = character.data.full_defense_attribute;
+                if (!att) att = 'willpower';
+                return this.findAttribute(att);
+            }
         }
     }
 
     getEquippedWeapons(): SR5Item[] {
-        return this.items.filter((item) => item.isEquipped() && item.data.type === 'weapon');
+        // @ts-ignore // TODO: How to define SR5Actor.items as SR5Item[]?
+        return this.items.filter((item: SR5Item) => item.isEquipped() && item.isWeapon());
     }
 
     getRecoilCompensation(): number {
@@ -141,7 +160,9 @@ export class SR5Actor extends Actor {
     }
 
     getDeviceRating(): number {
-        return this.data.data.matrix.rating;
+        if (!("matrix" in this.data.data)) return 0;
+        // @ts-ignore // parseInt does indeed allow number types.
+        return parseInt(this.data.data.matrix.rating);
     }
 
     getAttributes(): Attributes {
@@ -186,11 +207,15 @@ export class SR5Actor extends Actor {
     }
 
     isGrunt() {
+        if (!("is_npc" in this.data.data) || !("npc" in this.data.data)) return false;
+
         return this.data.data.is_npc && this.data.data.npc.is_grunt;
     }
 
     getVehicleTypeSkill(): SkillField | undefined {
         let skill: SkillField | undefined;
+        if (!("vehicleType" in this.data.data)) return;
+
         switch (this.data.data.vehicleType) {
             case 'air':
                 skill = this.findActiveSkill('pilot_aircraft');
@@ -244,7 +269,7 @@ export class SR5Actor extends Actor {
         return skill.label ? skill.label : skill.name ? skill.name : '';
     }
 
-    addKnowledgeSkill(category, skill?) {
+    async addKnowledgeSkill(category, skill?) {
         const defaultSkill = {
             name: '',
             specs: [],
@@ -263,7 +288,8 @@ export class SR5Actor extends Actor {
         const fieldName = `data.skills.knowledge.${category}.value`;
         const updateData = {};
         updateData[fieldName] = value;
-        this.update(updateData);
+
+        await this.update(updateData);
     }
 
     removeLanguageSkill(skillId) {
@@ -272,7 +298,7 @@ export class SR5Actor extends Actor {
         this.update({ 'data.skills.language.value': value });
     }
 
-    addLanguageSkill(skill) {
+    async addLanguageSkill(skill) {
         const defaultSkill = {
             name: '',
             specs: [],
@@ -291,10 +317,11 @@ export class SR5Actor extends Actor {
         const fieldName = `data.skills.language.value`;
         const updateData = {};
         updateData[fieldName] = value;
-        this.update(updateData);
+
+        await this.update(updateData);
     }
 
-    removeKnowledgeSkill(skillId, category) {
+    async removeKnowledgeSkill(skillId, category) {
         const value = {};
         const updateData = {};
 
@@ -302,7 +329,7 @@ export class SR5Actor extends Actor {
         value[skillId] = { _delete: true };
         updateData[dataString] = value;
 
-        this.update(updateData);
+        await this.update(updateData);
     }
 
     async rollFade(options: ActorRollOptions = {}, incoming = -1): Promise<ShadowrunRoll|undefined> {
@@ -338,13 +365,17 @@ export class SR5Actor extends Actor {
     }
 
     async rollDrain(options: ActorRollOptions = {}, incoming = -1): Promise<ShadowrunRoll|undefined> {
-        const wil = duplicate(this.data.data.attributes.willpower);
-        const drainAtt = duplicate(this.data.data.attributes[this.data.data.magic.attribute]);
+        if (!this.isCharacter()) return;
+
+        const data = this.data.data as CharacterActorData;
+
+        const wil = duplicate(data.attributes.willpower);
+        const drainAtt = duplicate(data.attributes[data.magic.attribute]);
 
         const parts = new PartsList<number>();
         parts.addPart(wil.label, wil.value);
         parts.addPart(drainAtt.label, drainAtt.value);
-        if (this.data.data.modifiers.drain) parts.addUniquePart('SR5.Bonus', this.data.data.modifiers.drain);
+        if (data.modifiers.drain) parts.addUniquePart('SR5.Bonus', data.modifiers.drain);
 
         let title = `${game.i18n.localize('SR5.Resist')} ${game.i18n.localize('SR5.Drain')}`;
         const actor = this;
@@ -533,6 +564,8 @@ export class SR5Actor extends Actor {
     }
 
     rollNaturalRecovery(track, options?: ActorRollOptions) {
+        if (!this.isCharacter()) return;
+
         let id1 = 'body';
         let id2 = 'willpower';
         let title = 'Natural Recover';
@@ -557,7 +590,8 @@ export class SR5Actor extends Actor {
             after: async (roll: Roll | undefined) => {
                 if (!roll) return;
                 let hits = roll.total;
-                let current = this.data.data.track[track].value;
+                const data = this.data.data as CharacterActorData;
+                let current = data.track[track].value;
 
                 current = Math.max(current - hits, 0);
 
@@ -571,6 +605,8 @@ export class SR5Actor extends Actor {
     }
 
     async rollMatrixAttribute(attr, options?: ActorRollOptions) {
+        if (!("matrix" in this.data.data)) return;
+
         let matrix_att = duplicate(this.data.data.matrix[attr]);
         let title = game.i18n.localize(CONFIG.SR5.matrixAttributes[attr]);
         const parts = new PartsList<number>();
@@ -695,8 +731,7 @@ export class SR5Actor extends Actor {
 
         const attributeName = options?.attribute ? options.attribute : skill.attribute;
         const att = this.getAttribute(attributeName);
-        // @ts-ignore // att can't really be undefined here... ?
-        let limit = this.getLimit(att.limit);
+        let limit = att.limit ? this.getLimit(att.limit) : undefined;
 
         // Initialize parts with always needed skill data.
         const parts = new PartsList<number>();
@@ -738,10 +773,10 @@ export class SR5Actor extends Actor {
         });
     }
 
-    rollDronePerception(options?: ActorRollOptions) {
-        if (!this.isVehicle()) {
-            return undefined;
-        }
+    async rollDronePerception(options?: ActorRollOptions) {
+        if (!this.isVehicle())
+            return;
+
         const actorData = duplicate(this.data.data) as VehicleActorData;
         if (actorData.controlMode === 'autopilot') {
             const parts = new PartsList<number>();
@@ -766,7 +801,7 @@ export class SR5Actor extends Actor {
                 });
             }
         } else {
-            this.rollActiveSkill('perception', options);
+            await this.rollActiveSkill('perception', options);
         }
     }
 
@@ -908,9 +943,11 @@ export class SR5Actor extends Actor {
 
     _addMatrixParts(parts: PartsList<number>, atts) {
         if (Helpers.isMatrix(atts)) {
-            const m = this.data.data.matrix;
-            if (m.hot_sim) parts.addUniquePart('SR5.HotSim', 2);
-            if (m.running_silent) parts.addUniquePart('SR5.RunningSilent', -2);
+            if (!("matrix" in this.data.data)) return;
+
+            const matrix = this.data.data.matrix;
+            if (matrix.hot_sim) parts.addUniquePart('SR5.HotSim', 2);
+            if (matrix.running_silent) parts.addUniquePart('SR5.RunningSilent', -2);
         }
     }
     _addGlobalParts(parts: PartsList<number>) {
@@ -1056,7 +1093,7 @@ export class SR5Actor extends Actor {
      * @param key
      * @param value
      */
-    setFlag(scope: string, key: string, value: any): Promise<this> {
+    setFlag(scope: string, key: string, value: any): Promise<any> {
         const newValue = Helpers.onSetFlag(value);
         return super.setFlag(scope, key, newValue);
     }
@@ -1132,6 +1169,7 @@ export class SR5Actor extends Actor {
 
     /** Apply all types of damage to the actor.
      *
+     * @param damage
      * @param changeDamageForActor can be changed to directly apply damage without further changes due to armor and more.
      */
     async applyDamage(damage: DamageData, changeDamageForActor: boolean = true) {
@@ -1167,7 +1205,7 @@ export class SR5Actor extends Actor {
         // TODO: Handle changes in actor status (death and such)
     }
 
-    __addDamageToTrackValue(damage: DamageData, track: TrackType|OverflowTrackType): TrackType|OverflowTrackType {
+    __addDamageToTrackValue(damage: DamageData, track: TrackType|OverflowTrackType|ConditionData): TrackType|OverflowTrackType|ConditionData {
         if (damage.value === 0) return track;
         if (track.value === track.max) return track;
 
@@ -1187,18 +1225,19 @@ export class SR5Actor extends Actor {
     async _addDamageToDeviceTrack(damage: DamageData, device: SR5Item) {
         if (!device) return;
 
-        let track = device.getTrack();
+        let condition = device.getCondition();
+        if (!condition) return damage;
 
         if (damage.value === 0) return;
-        if (track.value === track.max) return;
+        if (condition.value === condition.max) return;
 
-        track = this.__addDamageToTrackValue(damage, track);
+        condition = this.__addDamageToTrackValue(damage, condition);
 
-        const data = {['data.technology.condition_monitor']: track};
+        const data = {['data.technology.condition_monitor']: condition};
         await device.update(data);
     }
 
-    async _addDamageToTrack(damage: DamageData, track: TrackType|OverflowTrackType) {
+    async _addDamageToTrack(damage: DamageData, track: TrackType|OverflowTrackType|ConditionData) {
         if (damage.value === 0) return;
         if (track.value === track.max) return;
 
@@ -1238,6 +1277,9 @@ export class SR5Actor extends Actor {
         if (damage.type.value !== 'stun') return damage;
 
         const track = this.getStunTrack();
+        if (!track)
+            return damage;
+
         const {overflow, rest} = this._calcDamageOverflow(damage, track);
 
         // Only change damage type when needed, in order to avoid confusion of callers.
@@ -1255,6 +1297,9 @@ export class SR5Actor extends Actor {
         if (damage.type.value !== 'physical') return damage;
 
         const track = this.getPhysicalTrack();
+        if (!track)
+            return damage;
+
         const {overflow, rest} = this._calcDamageOverflow(damage, track);
 
         await this._addDamageToTrack(rest, track);
@@ -1283,7 +1328,7 @@ export class SR5Actor extends Actor {
 
     /** Calculate damage overflow only based on max and current track values.
      */
-    _calcDamageOverflow(damage: DamageData, track: TrackType): {overflow: DamageData, rest: DamageData} {
+    _calcDamageOverflow(damage: DamageData, track: TrackType|ConditionData): {overflow: DamageData, rest: DamageData} {
         const freeTrackDamage = track.max - track.value;
         const overflowDamage = damage.value > freeTrackDamage ?
             damage.value - freeTrackDamage :
@@ -1300,19 +1345,21 @@ export class SR5Actor extends Actor {
         return {overflow, rest};
     }
 
-    getStunTrack(): TrackType {
-        return this.data.data.track.stun;
+    getStunTrack(): TrackType | undefined {
+        if ("track" in this.data.data && "stun" in this.data.data.track)
+            return this.data.data.track.stun;
     }
 
-    getPhysicalTrack(): OverflowTrackType {
-        return this.data.data.track.physical;
+    getPhysicalTrack(): OverflowTrackType | undefined {
+        if ("track" in this.data.data)
+            return this.data.data.track.physical;
     }
 
-    getMatrixTrack(): TrackType|undefined {
+    getMatrixTrack(): ConditionData|undefined {
         const device = this.getMatrixDevice();
         if (!device) return undefined;
 
-        return device.getTrack();
+        return device.getCondition();
     }
 
     /** Apply all damage type changes that need to happen for this Actor
@@ -1348,28 +1395,31 @@ export class SR5Actor extends Actor {
 
         if (damage.type.value === 'physical') {
             const modifiedArmor = this.getModifiedArmor(damage);
-            const armorWillChangeDamageType = modifiedArmor.value > damage.value;
+            if (modifiedArmor) {
+                const armorWillChangeDamageType = modifiedArmor.value > damage.value;
 
-            if (armorWillChangeDamageType) {
-                // Avoid cross referencing.
-                damage = duplicate(damage);
+                if (armorWillChangeDamageType) {
+                    // Avoid cross referencing.
+                    damage = duplicate(damage);
 
-                damage.type.value = 'stun';
+                    damage.type.value = 'stun';
+                }
             }
         }
 
         return damage;
     }
 
-    // TODO: modifiedArmor return datatype uses what's defined with getArmor, which doesn't use ArmorData (no label field)?
-    getModifiedArmor(damage: DamageData): BaseValuePair<number> & ModifiableValue & LabelField {
+    getModifiedArmor(damage: DamageData): ActorArmorData|undefined {
         if (!damage.ap?.value) {
             return this.getArmor();
         }
 
         const modified = duplicate(this.getArmor());
-        modified.mod = PartsList.AddUniquePart(modified.mod, 'SR5.DV', damage.ap.value);
-        modified.value = Helpers.calcTotal(modified, {min: 0});
+        if (modified) {
+            modified.mod = PartsList.AddUniquePart(modified.mod, 'SR5.DV', damage.ap.value);
+            modified.value = Helpers.calcTotal(modified, {min: 0});
+        }
 
         return modified;
     }
@@ -1393,5 +1443,25 @@ export class SR5Actor extends Actor {
         if (!combatant) return;
 
         await combat.adjustInitiative(combatant, modifier);
+    }
+
+    hasDamageTracks(): boolean {
+        return "track" in this.data.data;
+    }
+
+    asVehicle(): SR5VehicleType | undefined {
+        if (this.isVehicle())
+            return this.data as SR5VehicleType;
+    }
+
+    asCharacter(): SR5CharacterType | undefined {
+        if (this.isCharacter())
+            return this.data as SR5CharacterType;
+    }
+
+    getVehicleStats(): VehicleStats | undefined {
+        if (this.isVehicle() && "vehicle_stats" in this.data.data) {
+            return this.data.data.vehicle_stats;
+        }
     }
 }

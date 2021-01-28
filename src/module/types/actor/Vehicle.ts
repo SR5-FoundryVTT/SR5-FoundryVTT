@@ -23,15 +23,7 @@ declare namespace Shadowrun {
             isDrone: boolean;
             isOffRoad: boolean;
             environment: VehicleEnvironment;
-            vehicle_stats: {
-                pilot: VehicleStat;
-                handling: VehicleStat;
-                off_road_handling: VehicleStat;
-                speed: VehicleStat;
-                off_road_speed: VehicleStat;
-                acceleration: VehicleStat;
-                sensor: VehicleStat;
-            };
+            vehicle_stats: VehicleStats;
 
             attributes: Attributes;
             limits: Limits;
@@ -44,4 +36,14 @@ declare namespace Shadowrun {
             modifiers: Modifiers;
             special: SpecialTrait;
         };
+
+    export type VehicleStats = {
+        pilot: VehicleStat;
+        handling: VehicleStat;
+        off_road_handling: VehicleStat;
+        speed: VehicleStat;
+        off_road_speed: VehicleStat;
+        acceleration: VehicleStat;
+        sensor: VehicleStat;
+    };
 }

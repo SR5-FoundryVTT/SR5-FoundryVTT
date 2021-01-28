@@ -3,7 +3,7 @@ import DamageData = Shadowrun.DamageData;
 import {SR5Actor} from "../../actor/SR5Actor";
 
 export class DamageApplicationDialog extends FormDialog {
-    constructor(actors: SR5Actor[], damage: DamageData, options?: ApplicationOptions) {
+    constructor(actors: SR5Actor[], damage: DamageData, options?: Application.Options) {
         const dialogData = DamageApplicationDialog.getDialogData(actors, damage);
         super(dialogData, options);
     }

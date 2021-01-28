@@ -162,26 +162,28 @@ export class ShadowrunActorDialogs {
                         value: '',
                     },
                 };
-
-            const armor = actor.getArmor();
-
-            // handle element changes
-            const element = Helpers.parseInputToString($(html).find('[name=element]').val());
-            if (element) {
-                soak.element.value = element as DamageElement;
-            }
-            const bonusArmor = armor[element] ?? 0;
-            if (bonusArmor) {
-                parts.addUniquePart(CONFIG.SR5.elementTypes[element], bonusArmor);
-            }
-
             // handle ap changes
             const ap = Helpers.parseInputToNumber($(html).find('[name=ap]').val());
-            if (ap) {
-                let armorVal = armor.value + bonusArmor;
 
-                // don't take more AP than armor
-                parts.addUniquePart('SR5.AP', Math.max(ap, -armorVal));
+
+            const armor = actor.getArmor();
+            if (armor) {
+                // handle element changes
+                const element = Helpers.parseInputToString($(html).find('[name=element]').val());
+                if (element) {
+                    soak.element.value = element as DamageElement;
+                }
+                const bonusArmor = armor[element] ?? 0;
+                if (bonusArmor) {
+                    parts.addUniquePart(CONFIG.SR5.elementTypes[element], bonusArmor);
+                }
+
+                if (ap) {
+                    let armorVal = armor.value + bonusArmor;
+
+                    // don't take more AP than armor
+                    parts.addUniquePart('SR5.AP', Math.max(ap, -armorVal));
+                }
             }
 
             // handle incoming damage changes

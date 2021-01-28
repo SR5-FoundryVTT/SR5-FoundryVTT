@@ -1,7 +1,7 @@
 /// <reference path="../Shadowrun.ts" />
 
 declare namespace Shadowrun {
-    export type SR5ActorSheetData = ActorSheetData & {
+    export type SR5ActorSheetData = ActorSheet.Data & {
         config: typeof CONFIG.SR5;
         data: SR5ActorData;
         filters: SR5SheetFilters;
@@ -19,7 +19,8 @@ declare namespace Shadowrun {
 
     export type SR5ActorType = SR5SpiritType | SR5CharacterType | SR5SpriteType | SR5VehicleType | SR5CritterType;
 
-    export type SR5ActorBase = ActorData & {
+    // TODO: A lot of duplicate type definitions to what's in Actor.Data. Might cause problems during a FoundryVTT update
+    export type SR5ActorBase = Actor.Data & {
         name: string;
         _id: string;
         folder: string | null;
@@ -41,7 +42,8 @@ declare namespace Shadowrun {
     export type SR5ActorData = SpiritActorData | CharacterActorData | SpriteActorData | VehicleActorData | CritterActorData;
 
 
-    export type CharacterActorData = MatrixActorData &
+    export type CharacterActorData =
+        MatrixActorData &
         TwoTrackActorData &
         ArmorActorData &
         MagicActorData &
@@ -59,7 +61,8 @@ declare namespace Shadowrun {
             special: SpecialTrait;
             initiative: Initiative;
             recoil_compensation: number;
-            metatype: string | keyof typeof CONFIG.SR5.character.types
+            metatype: string | keyof typeof CONFIG.SR5.character.types;
+            full_defense_attribute: string;
         };
 
     export type PhysicalTrackActorData = {
@@ -127,7 +130,7 @@ declare namespace Shadowrun {
         edge?: boolean;
     };
 
-    export type SkillEditFormData = BaseEntitySheetData & {
+    export type SkillEditFormData = BaseEntitySheet.Data & {
         data?: SkillField;
         editable_name?: boolean;
     };

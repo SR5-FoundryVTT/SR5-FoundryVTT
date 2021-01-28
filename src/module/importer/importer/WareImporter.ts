@@ -29,7 +29,7 @@ export class WareImporter extends DataImporter {
             name: 'Unnamed Form',
             type: 'cyberware',
             _id: '',
-            folder: null,
+            folder: '',
             img: 'icons/svg/mystery-man.svg',
             flags: {},
             data: {
