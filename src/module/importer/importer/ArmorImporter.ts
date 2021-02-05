@@ -16,7 +16,7 @@ export class ArmorImporter extends DataImporter {
         return {
             name: 'Unnamed Armor',
             _id: '',
-            folder: null,
+            folder: '',
             img: 'icons/svg/mystery-man.svg',
             flags: {},
             type: 'armor',

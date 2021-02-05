@@ -18,7 +18,7 @@ export class ComplexFormImporter extends DataImporter {
         return {
             name: 'Unnamed Form',
             _id: '',
-            folder: null,
+            folder: '',
             img: 'icons/svg/mystery-man.svg',
             flags: {},
             type: 'complex_form',

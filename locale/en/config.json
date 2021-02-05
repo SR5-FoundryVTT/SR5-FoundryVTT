@@ -1,4 +1,7 @@
 {
+    "SR5.SheetActor": "Actor sheet",
+    "SR5.SheetItem": "Item sheet",
+
     "SR5.ItemTypes": {
         "Action": "Action",
         "AdeptPower": "Adept Power",

@@ -24,13 +24,16 @@ export class Version0_7_2 extends VersionMigration {
     }
 
     static NoNPCDataForCharacter(actorData: SR5ActorBase): boolean {
+        // Use in operator since TypeScript can handle that for union types instead of property usage.
         return actorData.type === 'character' && (
-            actorData?.data?.is_npc === undefined ||
-            actorData?.data?.npc === undefined
+            !("is_npc" in actorData?.data) ||
+            !("npc" in actorData?.data)
         );
     }
 
     static UnsupportedMetatype(actorData: SR5ActorBase): boolean {
+        // TODO: Check on CharacterActorData.metatype typing (see ts-ignore)
+        //@ts-ignore // in-operator doesn't work here, as the underlying typing for metatype will result in string | number | undefined
         const type = actorData.data.metatype?.toLowerCase() ?? '';
         return actorData.type === 'character' &&
             SR5.character.types.hasOwnProperty(type);
@@ -43,6 +46,8 @@ export class Version0_7_2 extends VersionMigration {
         } = {};
 
         if (Version0_7_2.UnsupportedMetatype(actorData)) {
+            // TODO: Check on CharacterActorData.metatype typing (see ts-ignore)
+            //@ts-ignore // in-operator doesn't work here, as the underlying typing for metatype will result in string | number | undefined
             const type = actorData.data.metatype?.toLowerCase() ?? '';
             // TODO: What to do with custom metatypes?
             const metatypeData = {metatype: SR5.character.types.hasOwnProperty(type) ? type : 'human'};

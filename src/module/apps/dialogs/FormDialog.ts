@@ -25,7 +25,7 @@ export class FormDialog extends Dialog {
     _templateData: object;
     _templatePath: string;
 
-    constructor(dialogData: FormDialogData, options?: ApplicationOptions) {
+    constructor(dialogData: FormDialogData, options?: Application.Options) {
         super(dialogData, options);
 
         const {templateData, templatePath} = dialogData;
@@ -58,7 +58,7 @@ export class FormDialog extends Dialog {
 
         //@ts-ignore
         super.submit(button);
-        await this.afterSubmit(this.options.jQuery ? this.element : this.element [0]);
+        await this.afterSubmit("jQuery" in this.options ? this.element : this.element [0]);
     }
 
     async afterSubmit(html: JQuery) {

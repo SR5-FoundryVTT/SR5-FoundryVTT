@@ -19,17 +19,45 @@ import FireRangeData = Shadowrun.FireRangeData;
 import BlastData = Shadowrun.BlastData;
 import ConditionData = Shadowrun.ConditionData;
 import SR5ItemType = Shadowrun.SR5ItemType;
-import ActionData = Shadowrun.ActionData;
 import ActionRollData = Shadowrun.ActionRollData;
 import TrackType = Shadowrun.TrackType;
 import DamageData = Shadowrun.DamageData;
 import DefenseRollOptions = Shadowrun.DefenseRollOptions;
 import SpellDefenseOptions = Shadowrun.SpellDefenseOptions;
+import SpellData = Shadowrun.SpellData;
+import WeaponData = Shadowrun.WeaponData;
+import AmmoData = Shadowrun.AmmoData;
+import TechnologyPartData = Shadowrun.TechnologyPartData;
+import Sin = Shadowrun.Sin;
+import Weapon = Shadowrun.Weapon;
+import Ammo = Shadowrun.Ammo;
+import TechnologyData = Shadowrun.TechnologyData;
+import RangeData = Shadowrun.RangeData;
+import RangeWeaponData = Shadowrun.RangeWeaponData;
+import SpellRange = Shadowrun.SpellRange;
+import CritterPowerRange = Shadowrun.CritterPowerRange;
+import AdeptPowerData = Shadowrun.AdeptPowerData;
+import AdeptPower = Shadowrun.AdeptPower;
+import Modification = Shadowrun.Modification;
+import Action = Shadowrun.Action;
+import Armor = Shadowrun.Armor;
+import ComplexForm = Shadowrun.ComplexForm;
+import Contact = Shadowrun.Contact;
+import CritterPower = Shadowrun.CritterPower;
+import Cyberware = Shadowrun.Cyberware;
+import Device = Shadowrun.Device;
+import Equipment = Shadowrun.Equipment;
+import Lifestyle = Shadowrun.Lifestyle;
+import Program = Shadowrun.Program;
+import Quality = Shadowrun.Quality;
+import Spell = Shadowrun.Spell;
+import SpritePower = Shadowrun.SpritePower;
 
 export class SR5Item extends Item {
     labels: {} = {};
     items: SR5Item[];
     actor: SR5Actor;
+    data: SR5ItemType;
 
     private get wrapper(): SR5ItemDataWrapper {
         // we need to cast here to unknown first to make ts happy
@@ -64,7 +92,7 @@ export class SR5Item extends Item {
 
     /**
      * Return an Array of the Embedded Item Data
-     * TODO properly types this
+     * TODO properly type this
      */
     getEmbeddedItems(): any[] {
         let items = this.getFlag(SYSTEM_NAME, FLAGS.EmbeddedItems);
@@ -72,8 +100,6 @@ export class SR5Item extends Item {
         items = items ? items : [];
 
         // moved this "hotfix" to here so that everywhere that accesses the flag just gets an array -- Shawn
-        //TODO: This is a hotfix. Items should either always be
-        // stored as an array or always be stored as a object.
         if (items && !Array.isArray(items)) {
             items = Helpers.convertIndexedObjectToArray(items);
         }
@@ -129,11 +155,13 @@ export class SR5Item extends Item {
     }
 
     get hasOpposedRoll(): boolean {
-        return !!(this.data.data.action && this.data.data.action.opposed.type);
+        const action = this.getAction();
+        if (!action) return false;
+        return !!action.opposed.type;
     }
 
     get hasRoll(): boolean {
-        const { action } = this.data.data;
+        const action = this.getAction();
         return !!(action && action.type !== '' && (action.skill || action.attribute));
     }
     get hasTemplate(): boolean {
@@ -147,38 +175,47 @@ export class SR5Item extends Item {
      */
     prepareData() {
         super.prepareData();
-        const labels = {};
-        const item = this.data;
 
-        if (item.type === 'sin') {
-            if (typeof item.data.licenses === 'object') {
-                item.data.licenses = Object.values(item.data.licenses);
+        // Description labels might have changed since last data prep.
+        this.labels = {};
+
+        if (this.data.type === 'sin') {
+            if (typeof this.data.data.licenses === 'object') {
+                //@ts-ignore // taMiF: This seems to be a hacky solution to some internal or Foundry issue with reading
+                //                      a object/HashMap when an array/iterable was expected
+                this.data.data.licenses = Object.values(this.data.data.licenses);
             }
         }
         const equippedMods = this.getEquippedMods();
         const equippedAmmo = this.getEquippedAmmo();
 
-        const { technology, range, action } = item.data;
-
+        const technology = this.getTechnology();
         if (technology) {
+            // taMiF: This migration code could be needed for items imported from an older compendium?
             if (technology.condition_monitor === undefined) {
-                technology.condition_monitor = { value: 0 };
+                technology.condition_monitor = { value: 0, max: 0, label: '' };
             }
-            technology.condition_monitor.max = 8 + Math.ceil(technology.rating / 2);
+            // Rating might be a string.
+            const rating = typeof technology.rating === 'string' ? 0 : technology.rating;
+            technology.condition_monitor.max = 8 + Math.ceil(rating / 2);
 
-            if (!technology.conceal) technology.conceal = {};
+            // Calculate conceal data.
+            if (!technology.conceal) technology.conceal = {base: 0, value: 0, mod: []};
 
             const concealParts = new PartsList<number>();
             equippedMods.forEach((mod) => {
-                if (mod.data.data.technology.conceal.value) {
-                    concealParts.addUniquePart(mod.name, mod.data.data.technology.conceal.value);
+                const technology = mod.getTechnology();
+
+                if (technology && technology.conceal.value) {
+                    concealParts.addUniquePart(mod.name, technology.conceal.value);
                 }
             });
-            technology.conceal.mod = concealParts.list;
 
+            technology.conceal.mod = concealParts.list;
             technology.conceal.value = Helpers.calcTotal(technology.conceal);
         }
 
+        const action = this.getAction();
         if (action) {
             action.alt_mod = 0;
             action.limit.mod = [];
@@ -189,30 +226,34 @@ export class SR5Item extends Item {
             const limitParts = new PartsList(action.limit.mod);
             const dpParts = new PartsList(action.dice_pool_mod);
             equippedMods.forEach((mod) => {
-                if (mod.data.data.accuracy) {
-                    limitParts.addUniquePart(mod.name, mod.data.data.accuracy);
+                const modification = mod.asModificationData();
+                if (!modification) return;
+
+                if (modification.data.accuracy) {
+                    limitParts.addUniquePart(mod.name, modification.data.accuracy);
                 }
-                if (mod.data.data.dice_pool) {
-                    dpParts.addUniquePart(mod.name, mod.data.data.dice_pool);
+                if (modification.data.dice_pool) {
+                    dpParts.addUniquePart(mod.name, modification.data.dice_pool);
                 }
             });
 
             if (equippedAmmo) {
+                const ammoData = equippedAmmo.data.data as AmmoData;
                 // add mods to damage from ammo
-                action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name, equippedAmmo.data.data.damage);
+                action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name, ammoData.damage);
                 // add mods to ap from ammo
-                action.damage.ap.mod = PartsList.AddUniquePart(action.damage.ap.mod, equippedAmmo.name, equippedAmmo.data.data.ap);
+                action.damage.ap.mod = PartsList.AddUniquePart(action.damage.ap.mod, equippedAmmo.name, ammoData.ap);
 
                 // override element
-                if (equippedAmmo.data.data.element) {
-                    action.damage.element.value = equippedAmmo.data.data.element;
+                if (ammoData.element) {
+                    action.damage.element.value = ammoData.element;
                 } else {
                     action.damage.element.value = action.damage.element.base;
                 }
 
                 // override damage type
-                if (equippedAmmo.data.data.damageType) {
-                    action.damage.type.value = equippedAmmo.data.data.damageType;
+                if (ammoData.damageType) {
+                    action.damage.type.value = ammoData.damageType;
                 } else {
                     action.damage.type.value = action.damage.type.base;
                 }
@@ -229,23 +270,26 @@ export class SR5Item extends Item {
             action.limit.value = Helpers.calcTotal(action.limit);
         }
 
+        const range = this.getWeaponRange();
         if (range) {
             if (range.rc) {
                 const rangeParts = new PartsList();
                 equippedMods.forEach((mod) => {
+                    //@ts-ignore // TypeScript doesn't like this.data.data Item.Data<DataType> possibly being all the things.
                     if (mod.data.data.rc) rangeParts.addUniquePart(mod.name, mod.data.data.rc);
                     // handle overrides from ammo
                 });
+                //@ts-ignore // TypeScript doesn't like this.data.data Item.Data<DataType> possibly being all the things.
                 range.rc.mod = rangeParts.list;
+                //@ts-ignore // TypeScript doesn't like this.data.data Item.Data<DataType> possibly being all the things.
                 if (range.rc) range.rc.value = Helpers.calcTotal(range.rc);
             }
         }
 
-        if (item.type === 'adept_power') {
-            item.data.type = item.data.action?.type ? 'active' : 'passive';
+        const adeptPower = this.asAdeptPowerData();
+        if (adeptPower) {
+            adeptPower.data.type = adeptPower.data.action.type ? 'active' : 'passive';
         }
-
-        this.labels = labels;
     }
 
     async postItemCard() {
@@ -279,6 +323,8 @@ export class SR5Item extends Item {
     getChatData(htmlOptions?) {
         const data = duplicate(this.data.data);
         const { labels } = this;
+        //@ts-ignore // This is a hacky monkey patch solution to add a property to the item data
+        //              that's not actually defined in any SR5Item typing.
         if (!data.description) data.description = {};
         // TextEditor.enrichHTML will return null as a string, making later handling difficult.
         if (!data.description.value) data.description.value = '';
@@ -289,6 +335,8 @@ export class SR5Item extends Item {
         const func = ChatData[this.data.type];
         if (func) func(duplicate(data), labels, props, this);
 
+        //@ts-ignore // This is a hacky monkey patch solution to add a property to the item data
+        //              that's not actually defined in any SR5Item typing.
         data.properties = props.filter((p) => !!p);
 
         return data;
@@ -301,8 +349,9 @@ export class SR5Item extends Item {
 
     getOpposedTestName(): string {
         let name = '';
-        if (this.data.data.action?.opposed?.type) {
-            const { opposed } = this.data.data.action;
+        const action = this.getAction();
+        if (action && action.opposed.type) {
+            const { opposed } = action;
             if (opposed.type !== 'custom') {
                 name = `${Helpers.label(opposed.type)}`;
             } else if (opposed.skill) {
@@ -313,6 +362,7 @@ export class SR5Item extends Item {
                 name = `${Helpers.label(opposed.attribute)}`;
             }
         }
+
         const mod = this.getOpposedTestModifier();
         if (mod) name += ` ${mod}`;
         return name;
@@ -356,6 +406,8 @@ export class SR5Item extends Item {
 
      getBlastData(actionTestData?: ActionTestData): BlastData | undefined {
         if (this.isSpell() && this.isAreaOfEffect()) {
+            const data = this.data.data as SpellData;
+
             // By default spell distance is equal to it's Force.
             let distance = this.getLastSpellForce().value;
 
@@ -365,7 +417,9 @@ export class SR5Item extends Item {
             }
 
             // Extended spells have a longer range.
-            if (this.data.data.extended) distance *= 10;
+            // TODO: data.extended is not defined in typing. It only exists under data.detection or data.action
+            // @ts-ignore
+            if (data.extended) distance *= 10;
             const dropoff = 0;
 
             return {
@@ -374,8 +428,10 @@ export class SR5Item extends Item {
             }
 
         } else if (this.isGrenade()) {
-            const distance = this.data.data.thrown.blast.radius;
-            const dropoff = this.data.data.thrown.blast.dropoff;
+            const data = this.data.data as WeaponData;
+
+            const distance = data.thrown.blast.radius;
+            const dropoff = data.thrown.blast.dropoff;
 
             return {
                 radius: distance,
@@ -383,9 +439,12 @@ export class SR5Item extends Item {
             }
 
         } else if (this.hasExplosiveAmmo()) {
+            const data = this.data.data as WeaponData;
+
             const ammo = this.getEquippedAmmo();
-            const distance = ammo.data.data.blast.radius;
-            const dropoff = ammo.data.data.blast.dropoff;
+            const ammoData = ammo.data as Ammo;
+            const distance = ammoData.data.blast.radius;
+            const dropoff = ammoData.data.blast.dropoff;
 
             return {
                 radius: distance,
@@ -394,43 +453,57 @@ export class SR5Item extends Item {
         }
     }
 
-    getEquippedAmmo() {
-        return (this.items || []).filter((item) => item.type === 'ammo' && item.data.data?.technology?.equipped)[0];
+    getEquippedAmmo(): SR5Item {
+        const equippedAmmos = (this.items || []).filter((item) =>
+            item.isAmmo() &&
+            item.isEquipped());
+
+        // Cast Typing isn't a mistake, so long as isAmmo is filtered.
+        return equippedAmmos[0];
     }
 
-    getEquippedMods() {
-        return (this.items || []).filter((item) => item.type === 'modification' && item.data.data.type === 'weapon' && item.data.data?.technology?.equipped);
+    getEquippedMods(): SR5Item[] {
+        return (this.items || []).filter((item) =>
+            item.isWeaponModification() &&
+            item.isEquipped());
     }
 
     hasExplosiveAmmo(): boolean {
         const ammo = this.getEquippedAmmo();
-        return ammo?.data?.data?.blast?.radius > 0;
+        if (!ammo) return false;
+        const data = ammo.data.data as AmmoData;
+        return data.blast.radius > 0;
     }
 
     async equipWeaponMod(iid) {
         const mod = this.getOwnedItem(iid);
         if (mod) {
             const dupData = duplicate(mod.data);
-            dupData.data.technology.equipped = !dupData.data.technology.equipped;
+            const data = dupData.data as TechnologyPartData;
+            data.technology.equipped = !this.isEquipped();
             await this.updateOwnedItem(dupData);
         }
     }
 
-    hasAmmo() {
-        return this.data.data.ammo !== undefined;
+    hasAmmo(): boolean {
+        return this.wrapper.hasAmmo();
     }
 
     async useAmmo(fireMode) {
-        const dupData = duplicate(this.data);
-        const { ammo } = dupData.data;
-        if (ammo) {
+        const weapon = duplicate(this.asWeaponData());
+        if (weapon) {
+            const { ammo } = weapon.data;
             ammo.current.value = Math.max(0, ammo.current.value - fireMode);
-            return this.update(dupData);
+
+            return await this.update(weapon);
         }
     }
 
     async reloadAmmo() {
-        const data = duplicate(this.data);
+        const data = duplicate(this.asWeaponData());
+
+        if (!data) return;
+
         const { ammo } = data.data;
         const diff = ammo.current.max - ammo.current.value;
         ammo.current.value = ammo.current.max;
@@ -438,53 +511,67 @@ export class SR5Item extends Item {
         if (ammo.spare_clips) {
             ammo.spare_clips.value = Math.max(0, ammo.spare_clips.value - 1);
         }
+
         await this.update(data);
 
         const newAmmunition = (this.items || [])
             .filter((i) => i.data.type === 'ammo')
-            .reduce((acc: EntityData[], item) => {
-                const { technology } = item.data.data;
-                if (technology.equipped) {
-                    const qty = technology.quantity;
+            .reduce((acc: Entity.Data[], item) => {
+                const ammoData = item.asAmmoData();
+
+                if (ammoData && ammoData.data.technology.equipped) {
+                    const { technology } = ammoData.data;
+                    const qty = typeof technology.quantity === 'string' ? 0 : technology.quantity;
                     technology.quantity = Math.max(0, qty - diff);
                     acc.push(item.data);
                 }
                 return acc;
             }, []);
-        if (newAmmunition.length) await this.updateOwnedItem(newAmmunition);
+
+        if (newAmmunition && newAmmunition.length) {
+            await this.updateOwnedItem(newAmmunition);
+        }
     }
 
     async equipAmmo(iid) {
         // only allow ammo that was just clicked to be equipped
         const ammo = this.items
-            ?.filter((item) => item.type === 'ammo')
+            .filter((item) => item.type === 'ammo')
             .map((item) => {
-                const i = this.getOwnedItem(item._id);
-                if (i) {
-                    i.data.data.technology.equipped = iid === item._id;
-                    return i.data;
+                const ownedItem = this.getOwnedItem(item._id);
+                const ammoData = ownedItem?.asAmmoData();
+
+                if (ownedItem && ammoData) {
+                    ammoData.data.technology.equipped = iid === item._id;
+                    return ownedItem.data;
                 }
             });
         await this.updateOwnedItem(ammo);
     }
 
-    addNewLicense() {
-        const data = duplicate(this.data);
-        const { licenses } = data.data;
-        if (typeof licenses === 'object') {
-            data.data.licenses = Object.values(licenses);
+    async addNewLicense() {
+        const sin = duplicate(this.asSinData());
+        if (!sin) return;
+
+        // NOTE: This might be related to Foundry data serialization sometimes returning arrays as ordered HashMaps...
+        if (typeof sin.data.licenses === 'object') {
+            // @ts-ignore
+            sin.data.licenses = Object.values(sin.data.licenses);
         }
-        data.data.licenses.push({
+
+        sin.data.licenses.push({
             name: '',
             rtg: '',
             description: '',
         });
-        this.update(data);
+
+        await this.update(sin);
     }
 
     getRollPartsList(): ModList<number> {
         // we only have a roll if we have an action or an actor
-        if (!this.data.data.action || !this.actor) return [];
+        const action = this.getAction();
+        if (!action || !this.actor) return [];
 
         const parts = new PartsList(duplicate(this.getModifierList()));
 
@@ -505,6 +592,7 @@ export class SR5Item extends Item {
         const spec = this.getActionSpecialization();
         if (spec) parts.addUniquePart(spec, 2);
 
+        //@ts-ignore parseInt does allow for number type parameter.
         const mod = parseInt(this.data.data.action.mod || 0);
         if (mod) parts.addUniquePart('SR5.ItemMod', mod);
 
@@ -534,12 +622,102 @@ export class SR5Item extends Item {
         }
     }
 
-    removeLicense(index) {
-        const data = duplicate(this.data);
-        const { licenses } = data.data;
-        licenses.splice(index, 1);
-        this.update(data);
+    isSin(): boolean {
+        return this.wrapper.isSin();
     }
+
+    asSinData(): Sin | undefined {
+        if (this.isSin()) {
+            return this.data as Sin;
+        }
+    }
+
+    isLifestyle(): boolean {
+        return this.wrapper.isLifestyle();
+    }
+
+    asLifestyleData(): Lifestyle | undefined {
+        if (this.isLifestyle()) {
+            return this.data as Lifestyle;
+        }
+    }
+
+    isAmmo(): boolean {
+        return this.wrapper.isAmmo();
+    }
+
+    asAmmoData(): Ammo | undefined {
+        if (this.isAmmo()) {
+            return this.data as Ammo;
+        }
+    }
+
+    isModification(): boolean {
+        return this.wrapper.isModification();
+    }
+
+    asModificationData(): Modification | undefined {
+        if (this.isModification()) {
+            return this.data as Modification;
+        }
+    }
+
+    isWeaponModification(): boolean {
+        return this.wrapper.isWeaponModification();
+    }
+
+    isArmorModification(): boolean {
+        return this.wrapper.isArmorModification();
+    }
+
+    isProgram(): boolean {
+        return this.wrapper.isProgram();
+    }
+
+    asProgramData(): Program | undefined {
+        if (this.isProgram()) {
+            return this.data as Program;
+        }
+    }
+
+    isQuality(): boolean {
+        return this.wrapper.isQuality();
+    }
+
+    asQualityData(): Quality | undefined {
+        if (this.isQuality()) {
+            return this.data as Quality;
+        }
+    }
+
+    isAdeptPower(): boolean {
+        return this.data.type === 'adept_power';
+    }
+
+    asAdeptPowerData(): AdeptPower|undefined {
+        if (this.isAdeptPower())
+            return this.data as AdeptPower;
+    }
+
+    async removeLicense(index) {
+        const data = duplicate(this.asSinData());
+        if (data) {
+            data.data.licenses.splice(index, 1);
+            await this.update(data);
+        }
+    }
+
+    isAction(): boolean {
+        return this.wrapper.isAction();
+    }
+
+    asActionData(): Action | undefined {
+        if (this.isAction()) {
+            return this.data as Action;
+        }
+    }
+
+
 
     async rollOpposedTest(target: SR5Actor, attack: AttackData, event):  Promise<ShadowrunRoll | undefined> {
         const options = {
@@ -550,7 +728,10 @@ export class SR5Item extends Item {
         };
 
         const parts = this.getOpposedTestMod();
-        const { opposed } = this.getAction();
+        const action = this.getAction();
+        if (!action) return;
+
+        const { opposed } = action;
 
         if (opposed.type === 'defense') {
             return await this.rollDefense(target, options);
@@ -730,7 +911,7 @@ export class SR5Item extends Item {
         }
     }
 
-    getOwnedItem(itemId) {
+    getOwnedItem(itemId): SR5Item | undefined {
         const items = this.items;
         if (!items) return;
         return items.find((i) => i._id === itemId);
@@ -808,23 +989,43 @@ export class SR5Item extends Item {
 
     _canDealDamage(): boolean {
         // NOTE: Double negation to force boolean comparison casting.
-        return !!this.data.data.action?.damage.type.base;
+        const action = this.getAction();
+        if (!action) return false;
+        return !!action.damage.type.base;
     }
 
-    getAction(): ActionRollData {
-        return this.data.data.action;
+    getAction(): ActionRollData|undefined {
+        return this.wrapper.getAction();
     }
 
     getExtended(): boolean {
-        return this.getAction().extended;
+        const action = this.getAction();
+        if (!action) return false;
+        return action.extended;
+    }
+
+    getTechnology(): TechnologyData|undefined {
+        return this.wrapper.getTechnology();
+    }
+
+    getRange(): CritterPowerRange|SpellRange|RangeWeaponData|undefined {
+        return this.wrapper.getRange();
+    }
+
+    getWeaponRange(): RangeWeaponData|undefined {
+        if (this.isRangedWeapon())
+            return this.getRange() as RangeWeaponData;
     }
 
     getAttackData(hits: number, actionTestData?: ActionTestData): AttackData | undefined {
         if (!this._canDealDamage()) {
-            return undefined;
+            return;
         }
 
-        const {damage} = this.getAction();
+        const action = this.getAction();
+        if (!action) return;
+
+        const {damage} = action;
 
         // Add custom action damage value based on Attribute.
         if (damage.attribute) {
@@ -897,6 +1098,7 @@ export class SR5Item extends Item {
     }
 
     getLimit(): LimitField | undefined {
+        // @ts-ignore // TODO: This should use this.getAction(). However action.limit doesn't contain label field.
         const limit = duplicate(this.data.data.action?.limit);
         if (!limit) return undefined;
         // go through and set the label correctly
@@ -932,7 +1134,7 @@ export class SR5Item extends Item {
      * @param key
      * @param value
      */
-    setFlag(scope: string, key: string, value: any): Promise<this> {
+    setFlag(scope: string, key: string, value: any): Promise<Entity> {
         const newValue = Helpers.onSetFlag(value);
         return super.setFlag(scope, key, newValue);
     }
@@ -958,6 +1160,12 @@ export class SR5Item extends Item {
         return this.wrapper.isArmor();
     }
 
+    asArmorData(): Armor | undefined {
+        if (this.isArmor()) {
+            return this.data as Armor;
+        }
+    }
+
     hasArmorBase(): boolean {
         return this.wrapper.hasArmorBase();
     }
@@ -978,8 +1186,20 @@ export class SR5Item extends Item {
         return this.wrapper.isWeapon();
     }
 
+    asWeaponData(): Weapon | undefined {
+        if (this.wrapper.isWeapon()) {
+            return this.data as Weapon;
+        }
+    }
+
     isCyberware(): boolean {
         return this.wrapper.isCyberware();
+    }
+
+    asCyberwareData(): Cyberware | undefined {
+        if (this.isCyberware()) {
+            return this.data as Cyberware;
+        }
     }
 
     isCombatSpell(): boolean {
@@ -1010,8 +1230,54 @@ export class SR5Item extends Item {
         return this.wrapper.isSpell();
     }
 
+    asSpellData(): Spell | undefined {
+        if (this.isSpell()) {
+            return this.data as Spell;
+        }
+    }
+
+    isSpritePower(): boolean {
+        return this.wrapper.isSpritePower();
+    }
+
+    asSpritePowerData(): SpritePower | undefined {
+        if (this.isSpritePower()) {
+            return this.data as SpritePower;
+        }
+    }
+
+    isBioware(): boolean {
+        return this.wrapper.isBioware();
+    }
+
     isComplexForm(): boolean {
         return this.wrapper.isComplexForm();
+    }
+
+    asComplexFormData(): ComplexForm | undefined {
+        if (this.isComplexForm()) {
+            return this.data as ComplexForm;
+        }
+    }
+
+    isContact(): boolean {
+        return this.wrapper.isContact();
+    }
+
+    asContactData(): Contact | undefined {
+        if (this.isContact()) {
+            return this.data as Contact;
+        }
+    }
+
+    isCritterPower(): boolean {
+        return this.wrapper.isCritterPower();
+    }
+
+    asCritterPowerData(): CritterPower | undefined {
+        if (this.isCritterPower()) {
+            return this.data as CritterPower;
+        }
     }
 
     isMeleeWeapon(): boolean {
@@ -1020,6 +1286,22 @@ export class SR5Item extends Item {
 
     isDevice(): boolean {
         return this.wrapper.isDevice();
+    }
+
+    asDeviceData(): Device | undefined {
+        if (this.isDevice()) {
+            return this.data as Device;
+        }
+    }
+
+    isEquipment(): boolean {
+        return this.wrapper.isEquipment();
+    }
+
+    asEquipmentData(): Equipment | undefined {
+        if (this.isEquipment()) {
+            return this.data as Equipment;
+        }
     }
 
     isEquipped(): boolean {
@@ -1110,17 +1392,23 @@ export class SR5Item extends Item {
 
     getReach(): number {
         if (this.isMeleeWeapon()) {
-            return this.data.data.melee?.reach ?? 0;
+            const data = this.data.data as WeaponData;
+            return data.melee.reach ?? 0;
         }
         return 0;
     }
 
-    getTrack(): TrackType {
-        return this.data.data.technology.condition_monitor;
+    getCondition(): ConditionData|undefined {
+        const technology = this.getTechnology();
+        if (technology && "condition_monitor" in technology)
+            return technology.condition_monitor;
     }
 
     hasDefenseTest(): boolean {
-        return this.data.data.action?.opposed?.type === 'defense';
+        if (!this.hasOpposedRoll) return false;
+        const action = this.getAction();
+        if (!action) return false;
+        return action.opposed.type === 'defense';
     }
 
     /** Use this method to get the base damage of spell, before any opposing action
@@ -1131,6 +1419,7 @@ export class SR5Item extends Item {
         if (!this.isCombatSpell()) return;
 
         const action = this.getAction();
+        if (!action) return;
 
         if (this.isDirectCombatSpell()) {
             const damage = hits;

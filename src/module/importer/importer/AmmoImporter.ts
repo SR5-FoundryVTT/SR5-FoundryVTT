@@ -2,6 +2,7 @@ import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
 import Ammo = Shadowrun.Ammo;
+import WeaponData = Shadowrun.WeaponData;
 
 export class AmmoImporter extends DataImporter {
     public files = ['gear.xml'];
@@ -14,7 +15,7 @@ export class AmmoImporter extends DataImporter {
         return {
             name: '',
             _id: '',
-            folder: null,
+            folder: '',
             img: 'icons/svg/mystery-man.svg',
             flags: {},
             type: 'ammo',
@@ -119,10 +120,12 @@ export class AmmoImporter extends DataImporter {
                     return item.type === 'weapon' && item.name.toLowerCase() === nameLower;
                 });
 
-                if (foundWeapon !== null && foundWeapon.data.data.action) {
+                if (foundWeapon !== null && "action" in foundWeapon.data.data) {
                     console.log(foundWeapon);
-                    data.data.damage = foundWeapon.data.data.action.damage.value;
-                    data.data.ap = foundWeapon.data.data.action.damage.ap.value;
+
+                    const weaponData = foundWeapon.data.data as WeaponData;
+                    data.data.damage = weaponData.action.damage.value;
+                    data.data.ap =weaponData.action.damage.ap.value;
                 }
             }
 

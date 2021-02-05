@@ -14,7 +14,7 @@ export class Version0_6_5 extends VersionMigration {
         return '0.6.5';
     }
 
-    protected async MigrateActorData(actorData: ActorData): Promise<any> {
+    protected async MigrateActorData(actorData: Actor.Data): Promise<any> {
         let updateData: any = {};
         if (updateData.data === undefined) updateData.data = {};
         updateData.data.full_defense_attribute = 'willpower';

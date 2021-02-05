@@ -1,6 +1,7 @@
 import { Helpers } from '../helpers';
 import DeviceData = Shadowrun.DeviceData;
 import { SR5Item } from './SR5Item';
+import AmmoData = Shadowrun.AmmoData;
 
 export const ChatData = {
     action: (data, labels, props) => {
@@ -252,10 +253,11 @@ export const ChatData = {
         const equippedAmmo = item.getEquippedAmmo();
         if (equippedAmmo && data.ammo && data.ammo.current?.max) {
             if (equippedAmmo) {
+                const ammoData = equippedAmmo.data.data as AmmoData;
                 const { current, spare_clips } = data.ammo;
                 if (equippedAmmo.name) props.push(`${equippedAmmo.name} (${current.value}/${current.max})`);
-                if (equippedAmmo.data.data.blast.radius) props.push(`${game.i18n.localize('SR5.BlastRadius')} ${equippedAmmo.data.data.blast.radius}m`);
-                if (equippedAmmo.data.data.blast.dropoff) props.push(`${game.i18n.localize('SR5.Dropoff')} ${equippedAmmo.data.data.blast.dropoff}/m`);
+                if (ammoData.blast.radius) props.push(`${game.i18n.localize('SR5.BlastRadius')} ${ammoData.blast.radius}m`);
+                if (ammoData.blast.dropoff) props.push(`${game.i18n.localize('SR5.Dropoff')} $ammoData.blast.dropoff}/m`);
                 if (spare_clips && spare_clips.max) props.push(`${game.i18n.localize('SR5.SpareClips')} (${spare_clips.value}/${spare_clips.max})`);
             }
         }

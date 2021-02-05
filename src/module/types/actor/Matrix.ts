@@ -15,6 +15,7 @@ declare namespace Shadowrun {
         device: string;
         is_cyberdeck: boolean;
         hot_sim: boolean;
+        running_silent: boolean;
         item?: any;
     };
 

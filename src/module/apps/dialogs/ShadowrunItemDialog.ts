@@ -6,6 +6,7 @@ import FireModeData = Shadowrun.FireModeData;
 import RangesTemplateData = Shadowrun.RangesTemplateData;
 import RangeData = Shadowrun.RangeData;
 import {FormDialog} from "./FormDialog";
+import WeaponData = Shadowrun.WeaponData;
 
 type ItemDialogData = {
     dialogData: DialogData | undefined,
@@ -196,7 +197,7 @@ export class ShadowrunItemDialog {
     static addRangedWeaponData(templateData: object, dialogData: DialogData, item: SR5Item): Function {
         let title = dialogData.title || item.name;
 
-        const itemData = item.data.data;
+        const itemData = item.data.data as WeaponData;
         const fireModes = {};
 
         const {modes, ranges} = itemData.range;

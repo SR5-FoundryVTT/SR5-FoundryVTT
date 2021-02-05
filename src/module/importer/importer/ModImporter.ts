@@ -17,7 +17,7 @@ export class ModImporter extends DataImporter {
         return {
             name: '',
             _id: '',
-            folder: null,
+            folder: '',
             img: 'icons/svg/mystery-man.svg',
             flags: {},
             type: 'modification',

@@ -30,7 +30,6 @@ export class CritterPrep extends BaseActorPrep<SR5CritterType, CritterActorData>
         MatrixPrep.prepareMatrixToLimitsAndAttributes(this.data);
 
         CritterPrep.prepareMonitors(this.data);
-        console.error(this.data);
 
         MovementPrep.prepareMovement(this.data);
         WoundsPrep.prepareWounds(this.data);

@@ -118,7 +118,8 @@ export abstract class VersionMigration {
      * @param entityUpdates
      */
     protected async IterateScenes(game: Game, entityUpdates: Map<Entity, EntityUpdate>) {
-        for (const scene of game.scenes.entities) {
+        //@ts-ignore  // TypeScript expects entries (Collection.entries) to be a call, yet it's a get property.
+        for (const scene of game.scenes.entries) {
             try {
                 if (!(await this.ShouldMigrateSceneData(scene))) {
                     continue;
@@ -247,7 +248,7 @@ export abstract class VersionMigration {
      * @param actorData The actor to iterate over
      * @param updateData The existing update data to merge into
      */
-    protected async IterateActorItems(actorData: ActorData, updateData) {
+    protected async IterateActorItems(actorData: Actor.Data, updateData) {
         let hasItemUpdates = false;
         // @ts-ignore
         if (actorData.items !== undefined) {
@@ -310,7 +311,7 @@ export abstract class VersionMigration {
      * @param item The item to check.
      * @return A promise that resolves true or false.
      */
-    protected async ShouldMigrateItemData(item: EntityData): Promise<boolean> {
+    protected async ShouldMigrateItemData(item: Entity.Data): Promise<boolean> {
         return false;
     }
     /**
@@ -318,7 +319,7 @@ export abstract class VersionMigration {
      * @param item The item to migrate.
      * @return A promise that resolves with the update data.
      */
-    protected async MigrateItemData(item: EntityData): Promise<any> {
+    protected async MigrateItemData(item: Entity.Data): Promise<any> {
         return {};
     }
     /**
@@ -339,7 +340,7 @@ export abstract class VersionMigration {
      * @param actor The actor to check.
      * @return A promise that resolves true or false.
      */
-    protected async ShouldMigrateActorData(actor: ActorData): Promise<boolean> {
+    protected async ShouldMigrateActorData(actor: Actor.Data): Promise<boolean> {
         return false;
     }
     /**
@@ -347,7 +348,7 @@ export abstract class VersionMigration {
      * @param actor The actor to migrate.
      * @return A promise that resolves with the update data.
      */
-    protected async MigrateActorData(actor: ActorData): Promise<any> {
+    protected async MigrateActorData(actor: Actor.Data): Promise<any> {
         return {};
     }
     /**

@@ -76,10 +76,10 @@ export class SR5ItemSheet extends ItemSheet {
         data['config'] = CONFIG.SR5;
         const items = this.getEmbeddedItems();
         const [ammunition, weaponMods, armorMods] = items.reduce(
-            (parts: [ItemData[], ItemData[], ItemData[]], item: SR5Item) => {
+            (parts: [Item.Data[], Item.Data[], Item.Data[]], item: SR5Item) => {
                 if (item.type === 'ammo') parts[0].push(item.data);
-                if (item.type === 'modification' && item.data.data.type === 'weapon') parts[1].push(item.data);
-                if (item.type === 'modification' && item.data.data.type === 'armor') parts[2].push(item.data);
+                if (item.type === 'modification' && "type" in item.data.data && item.data.data.type === 'weapon') parts[1].push(item.data);
+                if (item.type === 'modification' && "type" in item.data.data && item.data.data.type === 'armor') parts[2].push(item.data);
                 return parts;
             },
             [[], [], []],
@@ -103,7 +103,9 @@ export class SR5ItemSheet extends ItemSheet {
     activateListeners(html) {
         super.activateListeners(html);
         if (this.item.type === 'weapon') {
+            //@ts-ignore // TODO: Somehow Jquery doesn't have drag/drop in typing
             this.form.ondragover = (event) => this._onDragOver(event);
+            //@ts-ignore // TODO: Somehow Jquery doesn't have drag/drop in typing
             this.form.ondrop = (event) => this._onDrop(event);
         }
         html.find('.add-new-ammo').click(this._onAddNewAmmo.bind(this));
@@ -201,13 +203,13 @@ export class SR5ItemSheet extends ItemSheet {
 
     async _onAddLicense(event) {
         event.preventDefault();
-        this.item.addNewLicense();
+        await this.item.addNewLicense();
     }
 
     async _onRemoveLicense(event) {
         event.preventDefault();
         const index = event.currentTarget.dataset.index;
-        if (index >= 0) this.item.removeLicense(index);
+        if (index >= 0) await this.item.removeLicense(index);
     }
 
     async _onWeaponModRemove(event) {

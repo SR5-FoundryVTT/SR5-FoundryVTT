@@ -22,7 +22,7 @@ export class SpellImporter extends DataImporter {
         return {
             name: 'Unnamed Item',
             _id: '',
-            folder: null,
+            folder: '',
             img: 'icons/svg/mystery-man.svg',
             flags: {},
             type: 'spell',

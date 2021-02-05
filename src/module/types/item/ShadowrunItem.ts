@@ -41,7 +41,7 @@ declare namespace Shadowrun {
         Partial<SpritePowerData> &
         Partial<WeaponData>;
 
-    export type SR5ItemData<DataType> = ItemData<DataType> & {
+    export type SR5ItemData<DataType> = Item.Data<DataType> & {
         _id: string;
         folder?: string | null;
         permission?: {

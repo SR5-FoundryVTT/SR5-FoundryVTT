@@ -14,7 +14,7 @@ export class LegacyMigration extends VersionMigration {
         return '0.6.4';
     }
 
-    protected async MigrateActorData(actorData: ActorData): Promise<any> {
+    protected async MigrateActorData(actorData: Actor.Data): Promise<any> {
         let updateData: any = {};
         LegacyMigration.migrateActorOverflow(actorData, updateData);
         LegacyMigration.migrateActorSkills(actorData, updateData);
@@ -24,7 +24,7 @@ export class LegacyMigration extends VersionMigration {
         return updateData;
     }
 
-    protected async MigrateItemData(item: EntityData): Promise<any> {
+    protected async MigrateItemData(item: Entity.Data): Promise<any> {
         const updateData = {};
         LegacyMigration.migrateDamageTypeAndElement(item, updateData);
         LegacyMigration.migrateItemsAddActions(item, updateData);
@@ -39,11 +39,11 @@ export class LegacyMigration extends VersionMigration {
         return {};
     }
 
-    protected async ShouldMigrateActorData(actorData: ActorData): Promise<boolean> {
+    protected async ShouldMigrateActorData(actorData: Actor.Data): Promise<boolean> {
         return true;
     }
 
-    protected async ShouldMigrateItemData(item: EntityData): Promise<boolean> {
+    protected async ShouldMigrateItemData(item: Entity.Data): Promise<boolean> {
         return true;
     }
 

@@ -5,6 +5,16 @@ import ModList = Shadowrun.ModList;
 import SR5ItemDataPartial = Shadowrun.SR5ItemDataPartial;
 import ActionRollData = Shadowrun.ActionRollData;
 import SpellData = Shadowrun.SpellData;
+import SinData = Shadowrun.SinData;
+import Sin = Shadowrun.Sin;
+import SR5ItemData = Shadowrun.SR5ItemData;
+import ActionPartData = Shadowrun.ActionPartData;
+import Weapon = Shadowrun.Weapon;
+import Modification = Shadowrun.Modification;
+import TechnologyData = Shadowrun.TechnologyData;
+import CritterPowerRange = Shadowrun.CritterPowerRange;
+import SpellRange = Shadowrun.SpellRange;
+import RangeWeaponData = Shadowrun.RangeWeaponData;
 
 export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
     getType() {
@@ -58,6 +68,34 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
         return this.data.type === 'weapon';
     }
 
+    isModification(): boolean {
+        return this.data.type === 'modification';
+    }
+
+    isWeaponModification(): boolean {
+        if (!this.isModification()) return false;
+        const modification = this.data as Modification;
+        return modification.data.type === 'weapon';
+    }
+
+    isArmorModification(): boolean {
+        if (!this.isModification()) return false;
+        const modification = this.data as Modification;
+        return modification.data.type === 'armor';
+    }
+
+    isProgram(): boolean {
+        return this.data.type === 'program';
+    }
+
+    isQuality(): boolean {
+        return this.data.type === 'quality';
+    }
+
+    isAmmo(): boolean {
+        return this.data.type === 'ammo';
+    }
+
     isCyberware(): boolean {
         return this.data.type === 'cyberware';
     }
@@ -106,8 +144,20 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
         return this.data.type === 'spell';
     }
 
+    isSpritePower(): boolean {
+        return this.data.type === 'sprite_power';
+    }
+
     isComplexForm(): boolean {
         return this.data.type === 'complex_form';
+    }
+
+    isContact(): boolean {
+        return this.data.type === 'contact';
+    }
+
+    isCritterPower(): boolean {
+        return this.data.type === 'critter_power';
     }
 
     isMeleeWeapon(): boolean {
@@ -118,12 +168,24 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
         return this.data.type === 'device';
     }
 
+    isEquipment(): boolean {
+        return this.data.type === 'equipment';
+    }
+
     isEquipped(): boolean {
         return this.getData().technology?.equipped || false;
     }
 
     isCyberdeck(): boolean {
         return this.isDevice() && this.getData().category === 'cyberdeck';
+    }
+
+    isSin(): boolean {
+        return this.data.type === 'sin';
+    }
+
+    isLifestyle(): boolean {
+        return this.data.type === 'lifestyle';
     }
 
     getId(): string {
@@ -212,6 +274,10 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
         return this.getData()?.technology?.quantity || 1;
     }
 
+    isAction(): boolean {
+        return this.data.type === 'action';
+    }
+
     getAction(): ActionRollData|undefined {
         return this.getData().action;
     }
@@ -270,7 +336,30 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
         return 0;
     }
 
+    getTechnology(): TechnologyData|undefined {
+        if ("technology" in this.data.data)
+            return this.data.data.technology;
+    }
+
+    getRange(): CritterPowerRange|SpellRange|RangeWeaponData|undefined {
+        if (!("range" in this.data.data)) return;
+
+        if (this.data.type === 'critter_power')
+            return this.data.data.range as CritterPowerRange;
+
+        if (this.data.type === 'spell')
+            return this.data.data.range as SpellRange;
+
+        if (this.data.type === 'weapon')
+            return this.data.data.range as RangeWeaponData;
+    }
+
     hasDefenseTest(): boolean {
         return this.getData().action?.opposed?.type === 'defense';
+    }
+
+    hasAmmo(): boolean {
+        const ammo = this.getAmmo();
+        return !!ammo
     }
 }
