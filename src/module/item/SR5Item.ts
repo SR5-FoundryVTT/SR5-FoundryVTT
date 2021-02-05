@@ -39,6 +39,19 @@ import CritterPowerRange = Shadowrun.CritterPowerRange;
 import AdeptPowerData = Shadowrun.AdeptPowerData;
 import AdeptPower = Shadowrun.AdeptPower;
 import Modification = Shadowrun.Modification;
+import Action = Shadowrun.Action;
+import Armor = Shadowrun.Armor;
+import ComplexForm = Shadowrun.ComplexForm;
+import Contact = Shadowrun.Contact;
+import CritterPower = Shadowrun.CritterPower;
+import Cyberware = Shadowrun.Cyberware;
+import Device = Shadowrun.Device;
+import Equipment = Shadowrun.Equipment;
+import Lifestyle = Shadowrun.Lifestyle;
+import Program = Shadowrun.Program;
+import Quality = Shadowrun.Quality;
+import Spell = Shadowrun.Spell;
+import SpritePower = Shadowrun.SpritePower;
 
 export class SR5Item extends Item {
     labels: {} = {};
@@ -213,7 +226,7 @@ export class SR5Item extends Item {
             const limitParts = new PartsList(action.limit.mod);
             const dpParts = new PartsList(action.dice_pool_mod);
             equippedMods.forEach((mod) => {
-                const modification = mod.getModification();
+                const modification = mod.asModificationData();
                 if (!modification) return;
 
                 if (modification.data.accuracy) {
@@ -273,7 +286,7 @@ export class SR5Item extends Item {
             }
         }
 
-        const adeptPower = this.adeptPowerData;
+        const adeptPower = this.asAdeptPowerData();
         if (adeptPower) {
             adeptPower.data.type = adeptPower.data.action.type ? 'active' : 'passive';
         }
@@ -477,7 +490,7 @@ export class SR5Item extends Item {
     }
 
     async useAmmo(fireMode) {
-        const weapon = duplicate(this.weaponData);
+        const weapon = duplicate(this.asWeaponData());
         if (weapon) {
             const { ammo } = weapon.data;
             ammo.current.value = Math.max(0, ammo.current.value - fireMode);
@@ -487,7 +500,7 @@ export class SR5Item extends Item {
     }
 
     async reloadAmmo() {
-        const data = duplicate(this.weaponData);
+        const data = duplicate(this.asWeaponData());
 
         if (!data) return;
 
@@ -504,7 +517,7 @@ export class SR5Item extends Item {
         const newAmmunition = (this.items || [])
             .filter((i) => i.data.type === 'ammo')
             .reduce((acc: Entity.Data[], item) => {
-                const ammoData = item.ammoData;
+                const ammoData = item.asAmmoData();
 
                 if (ammoData && ammoData.data.technology.equipped) {
                     const { technology } = ammoData.data;
@@ -526,7 +539,7 @@ export class SR5Item extends Item {
             .filter((item) => item.type === 'ammo')
             .map((item) => {
                 const ownedItem = this.getOwnedItem(item._id);
-                const ammoData = ownedItem?.ammoData;
+                const ammoData = ownedItem?.asAmmoData();
 
                 if (ownedItem && ammoData) {
                     ammoData.data.technology.equipped = iid === item._id;
@@ -537,7 +550,7 @@ export class SR5Item extends Item {
     }
 
     async addNewLicense() {
-        const sin = duplicate(this.sinData);
+        const sin = duplicate(this.asSinData());
         if (!sin) return;
 
         // NOTE: This might be related to Foundry data serialization sometimes returning arrays as ordered HashMaps...
@@ -609,10 +622,23 @@ export class SR5Item extends Item {
         }
     }
 
-    // TODO: sinData vs getModification. Both do the same, naming is not clear.
-    get sinData(): Sin | undefined {
-        if (this.wrapper.isSin()) {
+    isSin(): boolean {
+        return this.wrapper.isSin();
+    }
+
+    asSinData(): Sin | undefined {
+        if (this.isSin()) {
             return this.data as Sin;
+        }
+    }
+
+    isLifestyle(): boolean {
+        return this.wrapper.isLifestyle();
+    }
+
+    asLifestyleData(): Lifestyle | undefined {
+        if (this.isLifestyle()) {
+            return this.data as Lifestyle;
         }
     }
 
@@ -620,8 +646,7 @@ export class SR5Item extends Item {
         return this.wrapper.isAmmo();
     }
 
-    // TODO: ammoData vs getModification. Both do the same, naming is not clear.
-    get ammoData(): Ammo | undefined {
+    asAmmoData(): Ammo | undefined {
         if (this.isAmmo()) {
             return this.data as Ammo;
         }
@@ -631,8 +656,10 @@ export class SR5Item extends Item {
         return this.wrapper.isModification();
     }
 
-    getModification(): Modification | undefined {
-        return this.wrapper.getModification();
+    asModificationData(): Modification | undefined {
+        if (this.isModification()) {
+            return this.data as Modification;
+        }
     }
 
     isWeaponModification(): boolean {
@@ -643,22 +670,54 @@ export class SR5Item extends Item {
         return this.wrapper.isArmorModification();
     }
 
+    isProgram(): boolean {
+        return this.wrapper.isProgram();
+    }
+
+    asProgramData(): Program | undefined {
+        if (this.isProgram()) {
+            return this.data as Program;
+        }
+    }
+
+    isQuality(): boolean {
+        return this.wrapper.isQuality();
+    }
+
+    asQualityData(): Quality | undefined {
+        if (this.isQuality()) {
+            return this.data as Quality;
+        }
+    }
+
     isAdeptPower(): boolean {
         return this.data.type === 'adept_power';
     }
 
-    get adeptPowerData(): AdeptPower|undefined {
+    asAdeptPowerData(): AdeptPower|undefined {
         if (this.isAdeptPower())
             return this.data as AdeptPower;
     }
 
     async removeLicense(index) {
-        const data = duplicate(this.sinData);
+        const data = duplicate(this.asSinData());
         if (data) {
             data.data.licenses.splice(index, 1);
             await this.update(data);
         }
     }
+
+    isAction(): boolean {
+        return this.wrapper.isAction();
+    }
+
+    asActionData(): Action | undefined {
+        if (this.isAction()) {
+            return this.data as Action;
+        }
+    }
+
+
 
     async rollOpposedTest(target: SR5Actor, attack: AttackData, event):  Promise<ShadowrunRoll | undefined> {
         const options = {
@@ -1101,6 +1160,12 @@ export class SR5Item extends Item {
         return this.wrapper.isArmor();
     }
 
+    asArmorData(): Armor | undefined {
+        if (this.isArmor()) {
+            return this.data as Armor;
+        }
+    }
+
     hasArmorBase(): boolean {
         return this.wrapper.hasArmorBase();
     }
@@ -1121,7 +1186,7 @@ export class SR5Item extends Item {
         return this.wrapper.isWeapon();
     }
 
-    get weaponData(): Weapon | undefined {
+    asWeaponData(): Weapon | undefined {
         if (this.wrapper.isWeapon()) {
             return this.data as Weapon;
         }
@@ -1129,6 +1194,12 @@ export class SR5Item extends Item {
 
     isCyberware(): boolean {
         return this.wrapper.isCyberware();
+    }
+
+    asCyberwareData(): Cyberware | undefined {
+        if (this.isCyberware()) {
+            return this.data as Cyberware;
+        }
     }
 
     isCombatSpell(): boolean {
@@ -1159,8 +1230,54 @@ export class SR5Item extends Item {
         return this.wrapper.isSpell();
     }
 
+    asSpellData(): Spell | undefined {
+        if (this.isSpell()) {
+            return this.data as Spell;
+        }
+    }
+
+    isSpritePower(): boolean {
+        return this.wrapper.isSpritePower();
+    }
+
+    asSpritePowerData(): SpritePower | undefined {
+        if (this.isSpritePower()) {
+            return this.data as SpritePower;
+        }
+    }
+
+    isBioware(): boolean {
+        return this.wrapper.isBioware();
+    }
+
     isComplexForm(): boolean {
         return this.wrapper.isComplexForm();
+    }
+
+    asComplexFormData(): ComplexForm | undefined {
+        if (this.isComplexForm()) {
+            return this.data as ComplexForm;
+        }
+    }
+
+    isContact(): boolean {
+        return this.wrapper.isContact();
+    }
+
+    asContactData(): Contact | undefined {
+        if (this.isContact()) {
+            return this.data as Contact;
+        }
+    }
+
+    isCritterPower(): boolean {
+        return this.wrapper.isCritterPower();
+    }
+
+    asCritterPowerData(): CritterPower | undefined {
+        if (this.isCritterPower()) {
+            return this.data as CritterPower;
+        }
     }
 
     isMeleeWeapon(): boolean {
@@ -1169,6 +1286,22 @@ export class SR5Item extends Item {
 
     isDevice(): boolean {
         return this.wrapper.isDevice();
+    }
+
+    asDeviceData(): Device | undefined {
+        if (this.isDevice()) {
+            return this.data as Device;
+        }
+    }
+
+    isEquipment(): boolean {
+        return this.wrapper.isEquipment();
+    }
+
+    asEquipmentData(): Equipment | undefined {
+        if (this.isEquipment()) {
+            return this.data as Equipment;
+        }
     }
 
     isEquipped(): boolean {

@@ -32,6 +32,9 @@ import VehicleStats = Shadowrun.VehicleStats;
 import SR5CharacterType = Shadowrun.SR5CharacterType;
 import ActorArmorData = Shadowrun.ActorArmorData;
 import ConditionData = Shadowrun.ConditionData;
+import SR5SpiritType = Shadowrun.SR5SpiritType;
+import SR5SpriteType = Shadowrun.SR5SpriteType;
+import SR5CritterType = Shadowrun.SR5CritterType;
 
 export class SR5Actor extends Actor {
     data: SR5ActorType;
@@ -136,7 +139,7 @@ export class SR5Actor extends Actor {
         if (this.isVehicle()) {
             return this.findVehicleStat('pilot');
         } else if (this.isCharacter()) {
-            const character = this.asCharacter();
+            const character = this.asCharacterData();
             if (character) {
                 let att = character.data.full_defense_attribute;
                 if (!att) att = 'willpower';
@@ -210,6 +213,10 @@ export class SR5Actor extends Actor {
         if (!("is_npc" in this.data.data) || !("npc" in this.data.data)) return false;
 
         return this.data.data.is_npc && this.data.data.npc.is_grunt;
+    }
+
+    isCritter() {
+        return this.getType() === 'critter';
     }
 
     getVehicleTypeSkill(): SkillField | undefined {
@@ -1449,14 +1456,32 @@ export class SR5Actor extends Actor {
         return "track" in this.data.data;
     }
 
-    asVehicle(): SR5VehicleType | undefined {
+    asVehicleData(): SR5VehicleType | undefined {
         if (this.isVehicle())
             return this.data as SR5VehicleType;
     }
 
-    asCharacter(): SR5CharacterType | undefined {
+    asCharacterData(): SR5CharacterType | undefined {
         if (this.isCharacter())
             return this.data as SR5CharacterType;
+    }
+
+    asSpiritData(): SR5SpiritType | undefined {
+        if (this.isSpirit()) {
+            return this.data as SR5SpiritType;
+        }
+    }
+
+    asSpriteData(): SR5SpriteType | undefined {
+        if (this.isSprite()) {
+            return this.data as SR5SpriteType;
+        }
+    }
+
+    asCritterData(): SR5CritterType | undefined {
+        if (this.isCritter()){
+            return this.data as SR5CritterType;
+        }
     }
 
     getVehicleStats(): VehicleStats | undefined {

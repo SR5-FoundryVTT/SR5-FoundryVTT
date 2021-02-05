@@ -84,6 +84,14 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
         return modification.data.type === 'armor';
     }
 
+    isProgram(): boolean {
+        return this.data.type === 'program';
+    }
+
+    isQuality(): boolean {
+        return this.data.type === 'quality';
+    }
+
     isAmmo(): boolean {
         return this.data.type === 'ammo';
     }
@@ -136,8 +144,20 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
         return this.data.type === 'spell';
     }
 
+    isSpritePower(): boolean {
+        return this.data.type === 'sprite_power';
+    }
+
     isComplexForm(): boolean {
         return this.data.type === 'complex_form';
+    }
+
+    isContact(): boolean {
+        return this.data.type === 'contact';
+    }
+
+    isCritterPower(): boolean {
+        return this.data.type === 'critter_power';
     }
 
     isMeleeWeapon(): boolean {
@@ -146,6 +166,10 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
 
     isDevice(): boolean {
         return this.data.type === 'device';
+    }
+
+    isEquipment(): boolean {
+        return this.data.type === 'equipment';
     }
 
     isEquipped(): boolean {
@@ -157,7 +181,11 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
     }
 
     isSin(): boolean {
-        return (this.data as Sin).type === 'sin';
+        return this.data.type === 'sin';
+    }
+
+    isLifestyle(): boolean {
+        return this.data.type === 'lifestyle';
     }
 
     getId(): string {
@@ -246,6 +274,10 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
         return this.getData()?.technology?.quantity || 1;
     }
 
+    isAction(): boolean {
+        return this.data.type === 'action';
+    }
+
     getAction(): ActionRollData|undefined {
         return this.getData().action;
     }
@@ -320,11 +352,6 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
 
         if (this.data.type === 'weapon')
             return this.data.data.range as RangeWeaponData;
-    }
-
-    getModification(): Modification | undefined {
-        if (this.isModification())
-            return this.data as Modification;
     }
 
     hasDefenseTest(): boolean {
