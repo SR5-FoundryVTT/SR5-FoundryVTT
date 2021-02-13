@@ -763,5 +763,14 @@
 
     "SR5.Errors": {
         "MissingSkill": "Der Charakter verfügt nicht über die benötigte Fertigkeit."
+    },
+
+    "SR5.ChangelogApplication": {
+        "Title": "Shadowrun5e Update",
+        "Reason": "Du hast die aktuellste Version installiert!",
+        "Changelog": "Für neue Funktionen und behobene Fehler",
+        "LatestChangelog": "Aktuelle Changelog",
+        "ReportIssues": "Bitte Fehler und gewünschte Funktionen hier melden",
+        "IssuesOverview": "Anfragen Übersicht"
     }
 }

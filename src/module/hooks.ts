@@ -16,6 +16,7 @@ import { createItemMacro, rollItemMacro } from './macros';
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
 import { SR5Combat } from './combat/SR5Combat';
 import { Import } from './importer/apps/import-form';
+import {ChangelogApplication} from "./apps/ChangelogApplication";
 
 export class HooksManager {
     static registerHooks() {
@@ -86,6 +87,11 @@ ___________________
     static async ready() {
         if (game.user.isGM) {
             await Migrator.BeginMigration();
+
+            if (ChangelogApplication.showApplication) {
+                await new ChangelogApplication().render(true);
+            }
+
         }
 
         // TODO make based on foundry version
@@ -93,6 +99,8 @@ ___________________
         $(document).on('click', diceIconSelector, () => ShadowrunRoller.promptRoll());
         const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
         $(document).on('click', diceIconSelectorNew, () => ShadowrunRoller.promptRoll());
+
+
     }
 
     static canvasInit() {
