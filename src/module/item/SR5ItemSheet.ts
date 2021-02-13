@@ -213,11 +213,11 @@ export class SR5ItemSheet extends ItemSheet {
     }
 
     async _onWeaponModRemove(event) {
-        this.item.deleteOwnedItem(this._eventId(event));
+        await this._onOwnedItemRemove(event);
     }
 
     async _onWeaponModEquip(event) {
-        this.item.equipWeaponMod(this._eventId(event));
+        await this.item.equipWeaponMod(this._eventId(event));
     }
 
     async _onAddWeaponMod(event) {
@@ -231,23 +231,23 @@ export class SR5ItemSheet extends ItemSheet {
         itemData.data.type = 'weapon';
         // @ts-ignore
         const item = Item.createOwned(itemData, this.item);
-        this.item.createOwnedItem(item.data);
+        await this.item.createOwnedItem(item.data);
     }
 
     async _onAmmoReload(event) {
         event.preventDefault();
-        this.item.reloadAmmo();
+        await this.item.reloadAmmo();
     }
 
     async _onAmmoRemove(event) {
-        this.item.deleteOwnedItem(this._eventId(event));
+        await this._onOwnedItemRemove(event);
     }
 
     async _onAmmoEquip(event) {
-        this.item.equipAmmo(this._eventId(event));
+        await this.item.equipAmmo(this._eventId(event));
     }
 
-    _onAddNewAmmo(event) {
+    async _onAddNewAmmo(event) {
         event.preventDefault();
         const type = 'ammo';
         const itemData = {
@@ -257,7 +257,16 @@ export class SR5ItemSheet extends ItemSheet {
         };
         // @ts-ignore
         const item = Item.createOwned(itemData, this.item);
-        this.item.createOwnedItem(item.data);
+        await this.item.createOwnedItem(item.data);
+    }
+
+    async _onOwnedItemRemove(event) {
+         event.preventDefault();
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        await this.item.deleteOwnedItem(this._eventId(event));
     }
 
     /**

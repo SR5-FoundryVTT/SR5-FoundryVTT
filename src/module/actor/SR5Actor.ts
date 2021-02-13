@@ -219,33 +219,32 @@ export class SR5Actor extends Actor {
         return this.getType() === 'critter';
     }
 
-    getVehicleTypeSkill(): SkillField | undefined {
-        let skill: SkillField | undefined;
+    getVehicleTypeSkillName(): string | undefined {
         if (!("vehicleType" in this.data.data)) return;
 
         switch (this.data.data.vehicleType) {
             case 'air':
-                skill = this.findActiveSkill('pilot_aircraft');
-                break;
+                return 'pilot_aircraft';
             case 'ground':
-                skill = this.findActiveSkill('pilot_ground_craft');
-                break;
+                return 'pilot_ground_craft';
             case 'water':
-                skill = this.findActiveSkill('pilot_water_craft');
-                break;
+                return 'pilot_water_craft';
             case 'aerospace':
-                skill = this.findActiveSkill('pilot_aerospace');
-                break;
+                return 'pilot_aerospace';
             case 'walker':
-                skill = this.findActiveSkill('pilot_walker');
-                break;
+                return 'pilot_walker';
             case 'exotic':
-                skill = this.findActiveSkill('pilot_exotic_vehicle');
-                break;
+                return'pilot_exotic_vehicle';
             default:
-                break;
+                return;
         }
-        return skill;
+    }
+
+    getVehicleTypeSkill(): SkillField | undefined {
+        if (this.isVehicle()) return;
+
+        const name = this.getVehicleTypeSkillName();
+        return this.findActiveSkill(name);
     }
 
     getSkill(skillId: string): SkillField | undefined {
@@ -751,7 +750,7 @@ export class SR5Actor extends Actor {
             parts.addUniquePart(att.label, att.value);
             if (options.event[CONFIG.SR5.kbmod.SPEC]) parts.addUniquePart('SR5.Specialization', 2);
 
-            return ShadowrunRoller.advancedRoll({
+            return await ShadowrunRoller.advancedRoll({
                 event: options.event,
                 actor: this,
                 parts: parts.list,
@@ -812,7 +811,7 @@ export class SR5Actor extends Actor {
         }
     }
 
-    rollPilotVehicle(options?: ActorRollOptions) {
+    async rollPilotVehicle(options?: ActorRollOptions) {
         if (!this.isVehicle()) {
             return undefined;
         }
@@ -832,7 +831,7 @@ export class SR5Actor extends Actor {
 
                 this._addGlobalParts(parts);
 
-                return ShadowrunRoller.advancedRoll({
+                return await ShadowrunRoller.advancedRoll({
                     event: options?.event,
                     actor: this,
                     parts: parts.list,
@@ -841,7 +840,9 @@ export class SR5Actor extends Actor {
                 });
             }
         } else {
-            this.rollActiveSkill('perception', options);
+            const skillName = this.getVehicleTypeSkillName();
+            if (!skillName) return;
+            return await this.rollActiveSkill(skillName, options);
         }
     }
 
