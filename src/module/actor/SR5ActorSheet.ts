@@ -555,10 +555,10 @@ export class SR5ActorSheet extends ActorSheet {
                         await this.actor.rollDronePerception(options);
                         break;
                     case 'infiltration':
-                        this.actor.rollDroneInfiltration(options);
+                        await this.actor.rollDroneInfiltration(options);
                         break;
                     case 'pilot-vehicle':
-                        this.actor.rollPilotVehicle(options);
+                        await this.actor.rollPilotVehicle(options);
                         break;
                 }
                 break;
@@ -567,7 +567,7 @@ export class SR5ActorSheet extends ActorSheet {
             case 'attribute':
                 const attribute = split[1];
                 if (attribute) {
-                    this.actor.rollAttribute(attribute, options);
+                    await this.actor.rollAttribute(attribute, options);
                 }
                 break;
             // end attribute
