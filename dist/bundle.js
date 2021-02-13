@@ -14580,7 +14580,7 @@ class SR5Actor extends Actor {
 }
 exports.SR5Actor = SR5Actor;
 
-},{"../apps/dialogs/ShadowrunActorDialogs":108,"../chat":116,"../constants":119,"../helpers":128,"../parts/PartsList":179,"../rolls/ShadowrunRoller":180,"./prep/ActorPrepFactory":87}],86:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunActorDialogs":109,"../chat":117,"../constants":120,"../helpers":129,"../parts/PartsList":180,"../rolls/ShadowrunRoller":181,"./prep/ActorPrepFactory":87}],86:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -15499,7 +15499,7 @@ class SR5ActorSheet extends ActorSheet {
 }
 exports.SR5ActorSheet = SR5ActorSheet;
 
-},{"../apps/chummer-import-form":105,"../apps/skills/KnowledgeSkillEditForm":112,"../apps/skills/LanguageSkillEditForm":113,"../apps/skills/SkillEditForm":114,"../config":118,"../helpers":128}],87:[function(require,module,exports){
+},{"../apps/chummer-import-form":106,"../apps/skills/KnowledgeSkillEditForm":113,"../apps/skills/LanguageSkillEditForm":114,"../apps/skills/SkillEditForm":115,"../config":119,"../helpers":129}],87:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ActorPrepFactory = void 0;
@@ -15544,7 +15544,7 @@ class BaseActorPrep {
 }
 exports.BaseActorPrep = BaseActorPrep;
 
-},{"../../item/SR5ItemDataWrapper":169}],89:[function(require,module,exports){
+},{"../../item/SR5ItemDataWrapper":170}],89:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CharacterPrep = void 0;
@@ -15960,7 +15960,7 @@ class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
 }
 exports.SpiritPrep = SpiritPrep;
 
-},{"../../helpers":128,"../../parts/PartsList":179,"./BaseActorPrep":88,"./functions/AttributesPrep":94,"./functions/ConditionMonitorsPrep":95,"./functions/InitiativePrep":96,"./functions/LimitsPrep":98,"./functions/ModifiersPrep":100,"./functions/MovementPrep":101,"./functions/SkillsPrep":103,"./functions/WoundsPrep":104}],92:[function(require,module,exports){
+},{"../../helpers":129,"../../parts/PartsList":180,"./BaseActorPrep":88,"./functions/AttributesPrep":94,"./functions/ConditionMonitorsPrep":95,"./functions/InitiativePrep":96,"./functions/LimitsPrep":98,"./functions/ModifiersPrep":100,"./functions/MovementPrep":101,"./functions/SkillsPrep":103,"./functions/WoundsPrep":104}],92:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpritePrep = void 0;
@@ -16086,7 +16086,7 @@ class SpritePrep extends BaseActorPrep_1.BaseActorPrep {
 }
 exports.SpritePrep = SpritePrep;
 
-},{"../../helpers":128,"../../parts/PartsList":179,"./BaseActorPrep":88,"./functions/AttributesPrep":94,"./functions/InitiativePrep":96,"./functions/LimitsPrep":98,"./functions/MatrixPrep":99,"./functions/ModifiersPrep":100,"./functions/SkillsPrep":103}],93:[function(require,module,exports){
+},{"../../helpers":129,"../../parts/PartsList":180,"./BaseActorPrep":88,"./functions/AttributesPrep":94,"./functions/InitiativePrep":96,"./functions/LimitsPrep":98,"./functions/MatrixPrep":99,"./functions/ModifiersPrep":100,"./functions/SkillsPrep":103}],93:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VehiclePrep = void 0;
@@ -16205,7 +16205,7 @@ class VehiclePrep extends BaseActorPrep_1.BaseActorPrep {
 }
 exports.VehiclePrep = VehiclePrep;
 
-},{"../../helpers":128,"../../parts/PartsList":179,"./BaseActorPrep":88,"./functions/AttributesPrep":94,"./functions/InitiativePrep":96,"./functions/LimitsPrep":98,"./functions/MatrixPrep":99,"./functions/ModifiersPrep":100,"./functions/SkillsPrep":103}],94:[function(require,module,exports){
+},{"../../helpers":129,"../../parts/PartsList":180,"./BaseActorPrep":88,"./functions/AttributesPrep":94,"./functions/InitiativePrep":96,"./functions/LimitsPrep":98,"./functions/MatrixPrep":99,"./functions/ModifiersPrep":100,"./functions/SkillsPrep":103}],94:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AttributesPrep = void 0;
@@ -16238,7 +16238,7 @@ class AttributesPrep {
 }
 exports.AttributesPrep = AttributesPrep;
 
-},{"../../../helpers":128,"../../../parts/PartsList":179}],95:[function(require,module,exports){
+},{"../../../helpers":129,"../../../parts/PartsList":180}],95:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConditionMonitorsPrep = void 0;
@@ -16326,7 +16326,7 @@ class InitiativePrep {
 }
 exports.InitiativePrep = InitiativePrep;
 
-},{"../../../helpers":128,"../../../parts/PartsList":179}],97:[function(require,module,exports){
+},{"../../../helpers":129,"../../../parts/PartsList":180}],97:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemPrep = void 0;
@@ -16397,7 +16397,7 @@ class ItemPrep {
 }
 exports.ItemPrep = ItemPrep;
 
-},{"../../../helpers":128,"../../../parts/PartsList":179}],98:[function(require,module,exports){
+},{"../../../helpers":129,"../../../parts/PartsList":180}],98:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LimitsPrep = void 0;
@@ -16425,7 +16425,7 @@ class LimitsPrep {
 }
 exports.LimitsPrep = LimitsPrep;
 
-},{"../../../helpers":128,"../../../parts/PartsList":179}],99:[function(require,module,exports){
+},{"../../../helpers":129,"../../../parts/PartsList":180}],99:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatrixPrep = void 0;
@@ -16545,7 +16545,7 @@ class MatrixPrep {
 }
 exports.MatrixPrep = MatrixPrep;
 
-},{"../../../helpers":128,"../../../parts/PartsList":179}],100:[function(require,module,exports){
+},{"../../../helpers":129,"../../../parts/PartsList":180}],100:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ModifiersPrep = void 0;
@@ -16663,7 +16663,7 @@ class NPCPrep {
 }
 exports.NPCPrep = NPCPrep;
 
-},{"../../../constants":119,"../../../dataTemplates":120,"../../../helpers":128,"../../../parts/PartsList":179}],103:[function(require,module,exports){
+},{"../../../constants":120,"../../../dataTemplates":121,"../../../helpers":129,"../../../parts/PartsList":180}],103:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports._mergeWithMissingSkillFields = exports.SkillsPrep = void 0;
@@ -16753,7 +16753,7 @@ exports._mergeWithMissingSkillFields = (givenSkill) => {
     mergeObject(givenSkill, template, { overwrite: false });
 };
 
-},{"../../../helpers":128,"../../../parts/PartsList":179}],104:[function(require,module,exports){
+},{"../../../helpers":129,"../../../parts/PartsList":180}],104:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WoundsPrep = void 0;
@@ -16773,6 +16773,40 @@ class WoundsPrep {
 exports.WoundsPrep = WoundsPrep;
 
 },{}],105:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ChangelogApplication = void 0;
+const constants_1 = require("../constants");
+class ChangelogApplication extends Application {
+    get template() {
+        return 'systems/shadowrun5e/dist/templates/apps/changelog.html';
+    }
+    static get defaultOptions() {
+        const options = super.defaultOptions;
+        options.classes = ['shadowrun5e'];
+        options.title = game.i18n.localize('SR5.ChangelogApplication.Title');
+        options.width = 500;
+        options.height = 'auto';
+        return options;
+    }
+    render(force, options) {
+        ChangelogApplication.setRenderForCurrentVersion();
+        return super.render(force, options);
+    }
+    // Let the async operation happen in background.
+    static setRenderForCurrentVersion() {
+        game.user.setFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.ChangelogShownForVersion, game.system.data.version);
+    }
+    static get showApplication() {
+        if (!game.user.isGM || !game.user.isTrusted)
+            return false;
+        const shownForVersion = game.user.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.ChangelogShownForVersion);
+        return shownForVersion !== game.system.data.version;
+    }
+}
+exports.ChangelogApplication = ChangelogApplication;
+
+},{"../constants":120}],106:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -17574,7 +17608,7 @@ var ChummerImportForm = /*#__PURE__*/function (_FormApplication) {
 
 exports.ChummerImportForm = ChummerImportForm;
 
-},{"../actor/prep/functions/SkillsPrep":103,"@babel/runtime/helpers/asyncToGenerator":2,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10,"@babel/runtime/regenerator":14}],106:[function(require,module,exports){
+},{"../actor/prep/functions/SkillsPrep":103,"@babel/runtime/helpers/asyncToGenerator":2,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10,"@babel/runtime/regenerator":14}],107:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DamageApplicationDialog = void 0;
@@ -17631,7 +17665,7 @@ class DamageApplicationDialog extends FormDialog_1.FormDialog {
 }
 exports.DamageApplicationDialog = DamageApplicationDialog;
 
-},{"./FormDialog":107}],107:[function(require,module,exports){
+},{"./FormDialog":108}],108:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -17742,7 +17776,7 @@ class FormDialog extends Dialog {
 }
 exports.FormDialog = FormDialog;
 
-},{}],108:[function(require,module,exports){
+},{}],109:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -18007,7 +18041,7 @@ class ShadowrunActorDialogs {
 }
 exports.ShadowrunActorDialogs = ShadowrunActorDialogs;
 
-},{"../../helpers":128,"../../parts/PartsList":179,"./FormDialog":107}],109:[function(require,module,exports){
+},{"../../helpers":129,"../../parts/PartsList":180,"./FormDialog":108}],110:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -18304,7 +18338,7 @@ class ShadowrunItemDialog {
 }
 exports.ShadowrunItemDialog = ShadowrunItemDialog;
 
-},{"../../constants":119,"../../helpers":128,"./FormDialog":107}],110:[function(require,module,exports){
+},{"../../constants":120,"../../helpers":129,"./FormDialog":108}],111:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -18413,7 +18447,7 @@ class ShadowrunTestDialog {
 }
 exports.ShadowrunTestDialog = ShadowrunTestDialog;
 
-},{"../../constants":119,"../../helpers":128,"../../parts/PartsList":179,"./FormDialog":107}],111:[function(require,module,exports){
+},{"../../constants":120,"../../helpers":129,"../../parts/PartsList":180,"./FormDialog":108}],112:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -18607,7 +18641,7 @@ exports.OverwatchScoreTracker = OverwatchScoreTracker;
 (0, _defineProperty2["default"])(OverwatchScoreTracker, "MatrixOverwatchDiceCount", '2d6');
 (0, _defineProperty2["default"])(OverwatchScoreTracker, "addedActors", []);
 
-},{"../../helpers":128,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10}],112:[function(require,module,exports){
+},{"../../helpers":129,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10}],113:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KnowledgeSkillEditForm = void 0;
@@ -18623,7 +18657,7 @@ class KnowledgeSkillEditForm extends LanguageSkillEditForm_1.LanguageSkillEditFo
 }
 exports.KnowledgeSkillEditForm = KnowledgeSkillEditForm;
 
-},{"./LanguageSkillEditForm":113}],113:[function(require,module,exports){
+},{"./LanguageSkillEditForm":114}],114:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LanguageSkillEditForm = void 0;
@@ -18647,7 +18681,7 @@ class LanguageSkillEditForm extends SkillEditForm_1.SkillEditForm {
 }
 exports.LanguageSkillEditForm = LanguageSkillEditForm;
 
-},{"./SkillEditForm":114}],114:[function(require,module,exports){
+},{"./SkillEditForm":115}],115:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -18808,7 +18842,7 @@ class SkillEditForm extends BaseEntitySheet {
 }
 exports.SkillEditForm = SkillEditForm;
 
-},{}],115:[function(require,module,exports){
+},{}],116:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.measureDistance = void 0;
@@ -18848,7 +18882,7 @@ exports.measureDistance = function (segments, options = {}) {
     });
 };
 
-},{}],116:[function(require,module,exports){
+},{}],117:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -19162,7 +19196,7 @@ exports.addRollListeners = (app, html) => {
     }));
 };
 
-},{"./actor/SR5Actor":85,"./apps/dialogs/DamageApplicationDialog":106,"./constants":119,"./helpers":128,"./item/SR5Item":168,"./template":182}],117:[function(require,module,exports){
+},{"./actor/SR5Actor":85,"./apps/dialogs/DamageApplicationDialog":107,"./constants":120,"./helpers":129,"./item/SR5Item":169,"./template":183}],118:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -19399,7 +19433,7 @@ class SR5Combat extends Combat {
 }
 exports.SR5Combat = SR5Combat;
 
-},{}],118:[function(require,module,exports){
+},{}],119:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5 = void 0;
@@ -19826,7 +19860,7 @@ exports.SR5 = {
     },
 };
 
-},{}],119:[function(require,module,exports){
+},{}],120:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR = exports.LENGTH_UNIT = exports.DEFAULT_ROLL_NAME = exports.LENGTH_UNIT_TO_METERS_MULTIPLIERS = exports.METATYPEMODIFIER = exports.CORE_FLAGS = exports.CORE_NAME = exports.FLAGS = exports.SYSTEM_NAME = void 0;
@@ -19847,6 +19881,7 @@ exports.FLAGS = {
     Attack: 'attack',
     Roll: 'roll',
     TargetsSceneTokenIds: 'targetsSceneTokenIds',
+    ChangelogShownForVersion: 'changelogShownForVersion'
 };
 exports.CORE_NAME = 'core';
 exports.CORE_FLAGS = {
@@ -19892,7 +19927,7 @@ exports.SR = {
     }
 };
 
-},{}],120:[function(require,module,exports){
+},{}],121:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataTemplates = void 0;
@@ -19961,7 +19996,7 @@ exports.DataTemplates = {
     }
 };
 
-},{}],121:[function(require,module,exports){
+},{}],122:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataWrapper = void 0;
@@ -19972,7 +20007,7 @@ class DataWrapper {
 }
 exports.DataWrapper = DataWrapper;
 
-},{}],122:[function(require,module,exports){
+},{}],123:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerBasicHelpers = void 0;
@@ -20097,7 +20132,7 @@ exports.registerBasicHelpers = () => {
     });
 };
 
-},{"../helpers":128}],123:[function(require,module,exports){
+},{"../helpers":129}],124:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -20130,7 +20165,7 @@ class HandlebarManager {
 }
 exports.HandlebarManager = HandlebarManager;
 
-},{"./BasicHelpers":122,"./HandlebarTemplates":124,"./ItemLineHelpers":125,"./RollAndLabelHelpers":126,"./SkillLineHelpers":127}],124:[function(require,module,exports){
+},{"./BasicHelpers":123,"./HandlebarTemplates":125,"./ItemLineHelpers":126,"./RollAndLabelHelpers":127,"./SkillLineHelpers":128}],125:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -20248,7 +20283,7 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
     return loadTemplates(templatePaths);
 });
 
-},{}],125:[function(require,module,exports){
+},{}],126:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerItemLineHelpers = void 0;
@@ -20659,7 +20694,7 @@ exports.registerItemLineHelpers = () => {
     });
 };
 
-},{"../item/SR5ItemDataWrapper":169}],126:[function(require,module,exports){
+},{"../item/SR5ItemDataWrapper":170}],127:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerRollAndLabelHelpers = void 0;
@@ -20732,7 +20767,7 @@ exports.registerRollAndLabelHelpers = () => {
     Handlebars.registerHelper('speakerName', helpers_1.Helpers.getChatSpeakerName);
 };
 
-},{"../helpers":128,"../parts/PartsList":179}],127:[function(require,module,exports){
+},{"../helpers":129,"../parts/PartsList":180}],128:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerSkillLineHelpers = void 0;
@@ -20830,7 +20865,7 @@ exports.registerSkillLineHelpers = () => {
     });
 };
 
-},{"../helpers":128}],128:[function(require,module,exports){
+},{"../helpers":129}],129:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Helpers = void 0;
@@ -21195,7 +21230,7 @@ class Helpers {
 }
 exports.Helpers = Helpers;
 
-},{"./constants":119,"./dataTemplates":120,"./parts/PartsList":179}],129:[function(require,module,exports){
+},{"./constants":120,"./dataTemplates":121,"./parts/PartsList":180}],130:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -21225,6 +21260,7 @@ const macros_1 = require("./macros");
 const OverwatchScoreTracker_1 = require("./apps/gmtools/OverwatchScoreTracker");
 const SR5Combat_1 = require("./combat/SR5Combat");
 const import_form_1 = require("./importer/apps/import-form");
+const ChangelogApplication_1 = require("./apps/ChangelogApplication");
 class HooksManager {
     static registerHooks() {
         // Register your highest level hook callbacks here for a quick overview of what's hooked into.
@@ -21285,6 +21321,9 @@ ___________________
         return __awaiter(this, void 0, void 0, function* () {
             if (game.user.isGM) {
                 yield Migrator_1.Migrator.BeginMigration();
+                if (ChangelogApplication_1.ChangelogApplication.showApplication) {
+                    yield new ChangelogApplication_1.ChangelogApplication().render(true);
+                }
             }
             // TODO make based on foundry version
             const diceIconSelector = '#chat-controls .roll-type-select .fa-dice-d20';
@@ -21334,7 +21373,7 @@ ___________________
 }
 exports.HooksManager = HooksManager;
 
-},{"./actor/SR5Actor":85,"./actor/SR5ActorSheet":86,"./apps/gmtools/OverwatchScoreTracker":111,"./canvas":115,"./chat":116,"./combat/SR5Combat":117,"./config":118,"./constants":119,"./handlebars/HandlebarManager":123,"./helpers":128,"./importer/apps/import-form":130,"./item/SR5Item":168,"./item/SR5ItemSheet":170,"./macros":171,"./migrator/Migrator":173,"./rolls/ShadowrunRoller":180,"./settings":181}],130:[function(require,module,exports){
+},{"./actor/SR5Actor":85,"./actor/SR5ActorSheet":86,"./apps/ChangelogApplication":105,"./apps/gmtools/OverwatchScoreTracker":112,"./canvas":116,"./chat":117,"./combat/SR5Combat":118,"./config":119,"./constants":120,"./handlebars/HandlebarManager":124,"./helpers":129,"./importer/apps/import-form":131,"./item/SR5Item":169,"./item/SR5ItemSheet":171,"./macros":172,"./migrator/Migrator":174,"./rolls/ShadowrunRoller":181,"./settings":182}],131:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -21517,7 +21556,7 @@ Import.Importers = [
     new EquipmentImporter_1.EquipmentImporter()
 ];
 
-},{"../helper/ImportHelper":131,"../importer/AmmoImporter":135,"../importer/ArmorImporter":136,"../importer/ComplexFormImporter":137,"../importer/CritterPowerImporter":139,"../importer/DataImporter":140,"../importer/DeviceImporter":141,"../importer/EquipmentImporter":142,"../importer/ModImporter":143,"../importer/QualityImporter":144,"../importer/SpellImporter":145,"../importer/WareImporter":146,"../importer/WeaponImporter":147}],131:[function(require,module,exports){
+},{"../helper/ImportHelper":132,"../importer/AmmoImporter":136,"../importer/ArmorImporter":137,"../importer/ComplexFormImporter":138,"../importer/CritterPowerImporter":140,"../importer/DataImporter":141,"../importer/DeviceImporter":142,"../importer/EquipmentImporter":143,"../importer/ModImporter":144,"../importer/QualityImporter":145,"../importer/SpellImporter":146,"../importer/WareImporter":147,"../importer/WeaponImporter":148}],132:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -21727,7 +21766,7 @@ exports.ImportHelper = ImportHelper;
 ImportHelper.CHAR_KEY = '_TEXT';
 ImportHelper.s_Strategy = new XMLStrategy_1.XMLStrategy();
 
-},{"../importer/Constants":138,"./JSONStrategy":133,"./XMLStrategy":134}],132:[function(require,module,exports){
+},{"../importer/Constants":139,"./JSONStrategy":134,"./XMLStrategy":135}],133:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ImportStrategy = void 0;
@@ -21735,7 +21774,7 @@ class ImportStrategy {
 }
 exports.ImportStrategy = ImportStrategy;
 
-},{}],133:[function(require,module,exports){
+},{}],134:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JSONStrategy = void 0;
@@ -21753,7 +21792,7 @@ class JSONStrategy extends ImportStrategy_1.ImportStrategy {
 }
 exports.JSONStrategy = JSONStrategy;
 
-},{"./ImportStrategy":132}],134:[function(require,module,exports){
+},{"./ImportStrategy":133}],135:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.XMLStrategy = void 0;
@@ -21802,7 +21841,7 @@ class XMLStrategy extends ImportStrategy_1.ImportStrategy {
 }
 exports.XMLStrategy = XMLStrategy;
 
-},{"./ImportHelper":131,"./ImportStrategy":132}],135:[function(require,module,exports){
+},{"./ImportHelper":132,"./ImportStrategy":133}],136:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -21955,7 +21994,7 @@ class AmmoImporter extends DataImporter_1.DataImporter {
 }
 exports.AmmoImporter = AmmoImporter;
 
-},{"../helper/ImportHelper":131,"./Constants":138,"./DataImporter":140}],136:[function(require,module,exports){
+},{"../helper/ImportHelper":132,"./Constants":139,"./DataImporter":141}],137:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22057,7 +22096,7 @@ class ArmorImporter extends DataImporter_1.DataImporter {
 }
 exports.ArmorImporter = ArmorImporter;
 
-},{"../helper/ImportHelper":131,"../parser/armor/ArmorParserBase":150,"./DataImporter":140}],137:[function(require,module,exports){
+},{"../helper/ImportHelper":132,"../parser/armor/ArmorParserBase":151,"./DataImporter":141}],138:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22182,7 +22221,7 @@ class ComplexFormImporter extends DataImporter_1.DataImporter {
 }
 exports.ComplexFormImporter = ComplexFormImporter;
 
-},{"../helper/ImportHelper":131,"../parser/complex-form/ComplexFormParserBase":151,"./Constants":138,"./DataImporter":140}],138:[function(require,module,exports){
+},{"../helper/ImportHelper":132,"../parser/complex-form/ComplexFormParserBase":152,"./Constants":139,"./DataImporter":141}],139:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Constants = void 0;
@@ -22404,7 +22443,7 @@ Constants.WEAPON_RANGES = {
 };
 Constants.ROOT_IMPORT_FOLDER_NAME = 'SR5e';
 
-},{}],139:[function(require,module,exports){
+},{}],140:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22536,7 +22575,7 @@ class CritterPowerImporter extends DataImporter_1.DataImporter {
 }
 exports.CritterPowerImporter = CritterPowerImporter;
 
-},{"../helper/ImportHelper":131,"../parser/critter-power/CritterPowerParserBase":152,"./Constants":138,"./DataImporter":140}],140:[function(require,module,exports){
+},{"../helper/ImportHelper":132,"../parser/critter-power/CritterPowerParserBase":153,"./Constants":139,"./DataImporter":141}],141:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22599,7 +22638,7 @@ class DataImporter {
 exports.DataImporter = DataImporter;
 DataImporter.unsupportedBooks = ['2050'];
 
-},{"../helper/ImportHelper":131,"xml2js":51}],141:[function(require,module,exports){
+},{"../helper/ImportHelper":132,"xml2js":51}],142:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22776,7 +22815,7 @@ class DeviceImporter extends DataImporter_1.DataImporter {
 }
 exports.DeviceImporter = DeviceImporter;
 
-},{"../helper/ImportHelper":131,"./Constants":138,"./DataImporter":140}],142:[function(require,module,exports){
+},{"../helper/ImportHelper":132,"./Constants":139,"./DataImporter":141}],143:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22891,7 +22930,7 @@ class EquipmentImporter extends DataImporter_1.DataImporter {
 }
 exports.EquipmentImporter = EquipmentImporter;
 
-},{"../helper/ImportHelper":131,"./Constants":138,"./DataImporter":140}],143:[function(require,module,exports){
+},{"../helper/ImportHelper":132,"./Constants":139,"./DataImporter":141}],144:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22996,7 +23035,7 @@ class ModImporter extends DataImporter_1.DataImporter {
 }
 exports.ModImporter = ModImporter;
 
-},{"../helper/ImportHelper":131,"../parser/mod/ModParserBase":155,"./Constants":138,"./DataImporter":140}],144:[function(require,module,exports){
+},{"../helper/ImportHelper":132,"../parser/mod/ModParserBase":156,"./Constants":139,"./DataImporter":141}],145:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -23120,7 +23159,7 @@ class QualityImporter extends DataImporter_1.DataImporter {
 }
 exports.QualityImporter = QualityImporter;
 
-},{"../helper/ImportHelper":131,"../parser/quality/QualityParserBase":156,"./DataImporter":140}],145:[function(require,module,exports){
+},{"../helper/ImportHelper":132,"../parser/quality/QualityParserBase":157,"./DataImporter":141}],146:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -23275,7 +23314,7 @@ class SpellImporter extends DataImporter_1.DataImporter {
 }
 exports.SpellImporter = SpellImporter;
 
-},{"../helper/ImportHelper":131,"../parser/ParserMap":149,"../parser/spell/CombatSpellParser":157,"../parser/spell/DetectionSpellImporter":158,"../parser/spell/IllusionSpellParser":159,"../parser/spell/ManipulationSpellParser":160,"../parser/spell/SpellParserBase":161,"./DataImporter":140}],146:[function(require,module,exports){
+},{"../helper/ImportHelper":132,"../parser/ParserMap":150,"../parser/spell/CombatSpellParser":158,"../parser/spell/DetectionSpellImporter":159,"../parser/spell/IllusionSpellParser":160,"../parser/spell/ManipulationSpellParser":161,"../parser/spell/SpellParserBase":162,"./DataImporter":141}],147:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -23447,7 +23486,7 @@ class WareImporter extends DataImporter_1.DataImporter {
 }
 exports.WareImporter = WareImporter;
 
-},{"../helper/ImportHelper":131,"../parser/ware/CyberwareParser":162,"./DataImporter":140}],147:[function(require,module,exports){
+},{"../helper/ImportHelper":132,"../parser/ware/CyberwareParser":163,"./DataImporter":141}],148:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -23643,7 +23682,7 @@ class WeaponImporter extends DataImporter_1.DataImporter {
 }
 exports.WeaponImporter = WeaponImporter;
 
-},{"../helper/ImportHelper":131,"../parser/ParserMap":149,"../parser/weapon/MeleeParser":163,"../parser/weapon/RangedParser":164,"../parser/weapon/ThrownParser":165,"../parser/weapon/WeaponParserBase":166,"./Constants":138,"./DataImporter":140}],148:[function(require,module,exports){
+},{"../helper/ImportHelper":132,"../parser/ParserMap":150,"../parser/weapon/MeleeParser":164,"../parser/weapon/RangedParser":165,"../parser/weapon/ThrownParser":166,"../parser/weapon/WeaponParserBase":167,"./Constants":139,"./DataImporter":141}],149:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
@@ -23651,7 +23690,7 @@ class Parser {
 }
 exports.Parser = Parser;
 
-},{}],149:[function(require,module,exports){
+},{}],150:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ParserMap = void 0;
@@ -23685,7 +23724,7 @@ class ParserMap extends Parser_1.Parser {
 }
 exports.ParserMap = ParserMap;
 
-},{"../helper/ImportHelper":131,"./Parser":148}],150:[function(require,module,exports){
+},{"../helper/ImportHelper":132,"./Parser":149}],151:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ArmorParserBase = void 0;
@@ -23701,7 +23740,7 @@ class ArmorParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBas
 }
 exports.ArmorParserBase = ArmorParserBase;
 
-},{"../../helper/ImportHelper":131,"../item/TechnologyItemParserBase":154}],151:[function(require,module,exports){
+},{"../../helper/ImportHelper":132,"../item/TechnologyItemParserBase":155}],152:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ComplexFormParserBase = void 0;
@@ -23749,7 +23788,7 @@ class ComplexFormParserBase extends ItemParserBase_1.ItemParserBase {
 }
 exports.ComplexFormParserBase = ComplexFormParserBase;
 
-},{"../../helper/ImportHelper":131,"../item/ItemParserBase":153}],152:[function(require,module,exports){
+},{"../../helper/ImportHelper":132,"../item/ItemParserBase":154}],153:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CritterPowerParserBase = void 0;
@@ -23810,7 +23849,7 @@ class CritterPowerParserBase extends ItemParserBase_1.ItemParserBase {
 }
 exports.CritterPowerParserBase = CritterPowerParserBase;
 
-},{"../../helper/ImportHelper":131,"../item/ItemParserBase":153}],153:[function(require,module,exports){
+},{"../../helper/ImportHelper":132,"../item/ItemParserBase":154}],154:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemParserBase = void 0;
@@ -23830,7 +23869,7 @@ class ItemParserBase extends Parser_1.Parser {
 }
 exports.ItemParserBase = ItemParserBase;
 
-},{"../../helper/ImportHelper":131,"../Parser":148}],154:[function(require,module,exports){
+},{"../../helper/ImportHelper":132,"../Parser":149}],155:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TechnologyItemParserBase = void 0;
@@ -23847,7 +23886,7 @@ class TechnologyItemParserBase extends ItemParserBase_1.ItemParserBase {
 }
 exports.TechnologyItemParserBase = TechnologyItemParserBase;
 
-},{"../../helper/ImportHelper":131,"./ItemParserBase":153}],155:[function(require,module,exports){
+},{"../../helper/ImportHelper":132,"./ItemParserBase":154}],156:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ModParserBase = void 0;
@@ -23866,7 +23905,7 @@ class ModParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBase 
 }
 exports.ModParserBase = ModParserBase;
 
-},{"../../helper/ImportHelper":131,"../item/TechnologyItemParserBase":154}],156:[function(require,module,exports){
+},{"../../helper/ImportHelper":132,"../item/TechnologyItemParserBase":155}],157:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.QualityParserBase = void 0;
@@ -23887,7 +23926,7 @@ class QualityParserBase extends ItemParserBase_1.ItemParserBase {
 }
 exports.QualityParserBase = QualityParserBase;
 
-},{"../../helper/ImportHelper":131,"../item/ItemParserBase":153}],157:[function(require,module,exports){
+},{"../../helper/ImportHelper":132,"../item/ItemParserBase":154}],158:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CombatSpellParser = void 0;
@@ -23926,7 +23965,7 @@ class CombatSpellParser extends SpellParserBase_1.SpellParserBase {
 }
 exports.CombatSpellParser = CombatSpellParser;
 
-},{"../../helper/ImportHelper":131,"./SpellParserBase":161}],158:[function(require,module,exports){
+},{"../../helper/ImportHelper":132,"./SpellParserBase":162}],159:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DetectionSpellImporter = void 0;
@@ -23964,7 +24003,7 @@ class DetectionSpellImporter extends SpellParserBase_1.SpellParserBase {
 }
 exports.DetectionSpellImporter = DetectionSpellImporter;
 
-},{"../../helper/ImportHelper":131,"./SpellParserBase":161}],159:[function(require,module,exports){
+},{"../../helper/ImportHelper":132,"./SpellParserBase":162}],160:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IllusionSpellParser = void 0;
@@ -23996,7 +24035,7 @@ class IllusionSpellParser extends SpellParserBase_1.SpellParserBase {
 }
 exports.IllusionSpellParser = IllusionSpellParser;
 
-},{"../../helper/ImportHelper":131,"./SpellParserBase":161}],160:[function(require,module,exports){
+},{"../../helper/ImportHelper":132,"./SpellParserBase":162}],161:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ManipulationSpellParser = void 0;
@@ -24036,7 +24075,7 @@ class ManipulationSpellParser extends SpellParserBase_1.SpellParserBase {
 }
 exports.ManipulationSpellParser = ManipulationSpellParser;
 
-},{"../../helper/ImportHelper":131,"./SpellParserBase":161}],161:[function(require,module,exports){
+},{"../../helper/ImportHelper":132,"./SpellParserBase":162}],162:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpellParserBase = void 0;
@@ -24097,7 +24136,7 @@ class SpellParserBase extends ItemParserBase_1.ItemParserBase {
 }
 exports.SpellParserBase = SpellParserBase;
 
-},{"../../helper/ImportHelper":131,"../item/ItemParserBase":153}],162:[function(require,module,exports){
+},{"../../helper/ImportHelper":132,"../item/ItemParserBase":154}],163:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CyberwareParser = void 0;
@@ -24119,7 +24158,7 @@ class CyberwareParser extends TechnologyItemParserBase_1.TechnologyItemParserBas
 }
 exports.CyberwareParser = CyberwareParser;
 
-},{"../../helper/ImportHelper":131,"../item/TechnologyItemParserBase":154}],163:[function(require,module,exports){
+},{"../../helper/ImportHelper":132,"../item/TechnologyItemParserBase":155}],164:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MeleeParser = void 0;
@@ -24188,7 +24227,7 @@ class MeleeParser extends WeaponParserBase_1.WeaponParserBase {
 }
 exports.MeleeParser = MeleeParser;
 
-},{"../../helper/ImportHelper":131,"./WeaponParserBase":166}],164:[function(require,module,exports){
+},{"../../helper/ImportHelper":132,"./WeaponParserBase":167}],165:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RangedParser = void 0;
@@ -24271,7 +24310,7 @@ class RangedParser extends WeaponParserBase_1.WeaponParserBase {
 }
 exports.RangedParser = RangedParser;
 
-},{"../../helper/ImportHelper":131,"../../importer/Constants":138,"./WeaponParserBase":166}],165:[function(require,module,exports){
+},{"../../helper/ImportHelper":132,"../../importer/Constants":139,"./WeaponParserBase":167}],166:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ThrownParser = void 0;
@@ -24386,7 +24425,7 @@ class ThrownParser extends WeaponParserBase_1.WeaponParserBase {
 }
 exports.ThrownParser = ThrownParser;
 
-},{"../../helper/ImportHelper":131,"../../importer/Constants":138,"./WeaponParserBase":166}],166:[function(require,module,exports){
+},{"../../helper/ImportHelper":132,"../../importer/Constants":139,"./WeaponParserBase":167}],167:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WeaponParserBase = void 0;
@@ -24452,7 +24491,7 @@ class WeaponParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBa
 }
 exports.WeaponParserBase = WeaponParserBase;
 
-},{"../../helper/ImportHelper":131,"../../importer/Constants":138,"../item/TechnologyItemParserBase":154}],167:[function(require,module,exports){
+},{"../../helper/ImportHelper":132,"../../importer/Constants":139,"../item/TechnologyItemParserBase":155}],168:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatData = void 0;
@@ -24802,7 +24841,7 @@ exports.ChatData = {
     },
 };
 
-},{"../helpers":128}],168:[function(require,module,exports){
+},{"../helpers":129}],169:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26114,7 +26153,7 @@ class SR5Item extends Item {
 }
 exports.SR5Item = SR5Item;
 
-},{"../apps/dialogs/ShadowrunItemDialog":109,"../chat":116,"../constants":119,"../helpers":128,"../parts/PartsList":179,"../rolls/ShadowrunRoller":180,"./ChatData":167,"./SR5ItemDataWrapper":169}],169:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunItemDialog":110,"../chat":117,"../constants":120,"../helpers":129,"../parts/PartsList":180,"../rolls/ShadowrunRoller":181,"./ChatData":168,"./SR5ItemDataWrapper":170}],170:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ItemDataWrapper = void 0;
@@ -26430,7 +26469,7 @@ class SR5ItemDataWrapper extends DataWrapper_1.DataWrapper {
 }
 exports.SR5ItemDataWrapper = SR5ItemDataWrapper;
 
-},{"../dataWrappers/DataWrapper":121}],170:[function(require,module,exports){
+},{"../dataWrappers/DataWrapper":122}],171:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26761,7 +26800,7 @@ class SR5ItemSheet extends ItemSheet {
 }
 exports.SR5ItemSheet = SR5ItemSheet;
 
-},{"../helpers":128}],171:[function(require,module,exports){
+},{"../helpers":129}],172:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26821,7 +26860,7 @@ function rollItemMacro(itemName) {
 }
 exports.rollItemMacro = rollItemMacro;
 
-},{}],172:[function(require,module,exports){
+},{}],173:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const HandlebarManager_1 = require("./handlebars/HandlebarManager");
@@ -26832,7 +26871,7 @@ const hooks_1 = require("./hooks");
 hooks_1.HooksManager.registerHooks();
 HandlebarManager_1.HandlebarManager.registerHelpers();
 
-},{"./handlebars/HandlebarManager":123,"./hooks":129}],173:[function(require,module,exports){
+},{"./handlebars/HandlebarManager":124,"./hooks":130}],174:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26977,7 +27016,7 @@ Migrator.s_Versions = [
     { versionNumber: Version0_7_2_1.Version0_7_2.TargetVersion, migration: new Version0_7_2_1.Version0_7_2() },
 ];
 
-},{"./VersionMigration":174,"./versions/LegacyMigration":175,"./versions/Version0_6_10":176,"./versions/Version0_6_5":177,"./versions/Version0_7_2":178}],174:[function(require,module,exports){
+},{"./VersionMigration":175,"./versions/LegacyMigration":176,"./versions/Version0_6_10":177,"./versions/Version0_6_5":178,"./versions/Version0_7_2":179}],175:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27408,7 +27447,7 @@ VersionMigration.MODULE_NAME = 'shadowrun5e';
 VersionMigration.KEY_DATA_VERSION = 'systemMigrationVersion';
 VersionMigration.NO_VERSION = '0';
 
-},{}],175:[function(require,module,exports){
+},{}],176:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27638,7 +27677,7 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
 }
 exports.LegacyMigration = LegacyMigration;
 
-},{"../VersionMigration":174}],176:[function(require,module,exports){
+},{"../VersionMigration":175}],177:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27699,7 +27738,7 @@ class Version0_6_10 extends VersionMigration_1.VersionMigration {
 }
 exports.Version0_6_10 = Version0_6_10;
 
-},{"../VersionMigration":174}],177:[function(require,module,exports){
+},{"../VersionMigration":175}],178:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27750,7 +27789,7 @@ class Version0_6_5 extends VersionMigration_1.VersionMigration {
 }
 exports.Version0_6_5 = Version0_6_5;
 
-},{"../VersionMigration":174}],178:[function(require,module,exports){
+},{"../VersionMigration":175}],179:[function(require,module,exports){
 "use strict";
 // TODO: How to trigger test migration.
 // TODO: How to test migration results?
@@ -27828,7 +27867,7 @@ class Version0_7_2 extends VersionMigration_1.VersionMigration {
 }
 exports.Version0_7_2 = Version0_7_2;
 
-},{"../../config":118,"../VersionMigration":174}],179:[function(require,module,exports){
+},{"../../config":119,"../VersionMigration":175}],180:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PartsList = void 0;
@@ -27932,7 +27971,7 @@ class PartsList {
 }
 exports.PartsList = PartsList;
 
-},{}],180:[function(require,module,exports){
+},{}],181:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -28315,7 +28354,7 @@ class ShadowrunRoller {
 }
 exports.ShadowrunRoller = ShadowrunRoller;
 
-},{"../apps/dialogs/ShadowrunTestDialog":110,"../chat":116,"../constants":119,"../helpers":128,"../parts/PartsList":179}],181:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunTestDialog":111,"../chat":117,"../constants":120,"../helpers":129,"../parts/PartsList":180}],182:[function(require,module,exports){
 "use strict";
 // game settings for shadowrun 5e
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -28395,7 +28434,7 @@ exports.registerSystemSettings = () => {
     });
 };
 
-},{"./constants":119,"./migrator/VersionMigration":174}],182:[function(require,module,exports){
+},{"./constants":120,"./migrator/VersionMigration":175}],183:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Template extends MeasuredTemplate {
@@ -28487,6 +28526,6 @@ class Template extends MeasuredTemplate {
 }
 exports.default = Template;
 
-},{}]},{},[172])
+},{}]},{},[173])
 
 //# sourceMappingURL=bundle.js.map

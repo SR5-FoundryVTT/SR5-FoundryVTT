@@ -791,5 +791,14 @@
 
     "SR5.Errors": {
         "MissingSkill": "The actor doesn't have the requested skill."
+    },
+
+    "SR5.ChangelogApplication": {
+        "Title": "Shadowrun5e Update",
+        "Reason": "You've updated to the latest versions!",
+        "Changelog": "Check out our GitHub for new features and fixes",
+        "LatestChangelog": "Latest Changelog",
+        "ReportIssues": "Please report bugs and feature requests",
+        "IssuesOverview": "Issues Overview"
     }
 }

@@ -15,6 +15,7 @@ export const FLAGS = {
     Attack: 'attack',
     Roll: 'roll',
     TargetsSceneTokenIds: 'targetsSceneTokenIds',
+    ChangelogShownForVersion: 'changelogShownForVersion'
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {
