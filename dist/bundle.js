@@ -13406,33 +13406,31 @@ class SR5Actor extends Actor {
     isCritter() {
         return this.getType() === 'critter';
     }
-    getVehicleTypeSkill() {
-        let skill;
+    getVehicleTypeSkillName() {
         if (!("vehicleType" in this.data.data))
             return;
         switch (this.data.data.vehicleType) {
             case 'air':
-                skill = this.findActiveSkill('pilot_aircraft');
-                break;
+                return 'pilot_aircraft';
             case 'ground':
-                skill = this.findActiveSkill('pilot_ground_craft');
-                break;
+                return 'pilot_ground_craft';
             case 'water':
-                skill = this.findActiveSkill('pilot_water_craft');
-                break;
+                return 'pilot_water_craft';
             case 'aerospace':
-                skill = this.findActiveSkill('pilot_aerospace');
-                break;
+                return 'pilot_aerospace';
             case 'walker':
-                skill = this.findActiveSkill('pilot_walker');
-                break;
+                return 'pilot_walker';
             case 'exotic':
-                skill = this.findActiveSkill('pilot_exotic_vehicle');
-                break;
+                return 'pilot_exotic_vehicle';
             default:
-                break;
+                return;
         }
-        return skill;
+    }
+    getVehicleTypeSkill() {
+        if (this.isVehicle())
+            return;
+        const name = this.getVehicleTypeSkillName();
+        return this.findActiveSkill(name);
     }
     getSkill(skillId) {
         const { skills } = this.data.data;
@@ -13901,7 +13899,7 @@ class SR5Actor extends Actor {
                 parts.addUniquePart(att.label, att.value);
                 if (options.event[CONFIG.SR5.kbmod.SPEC])
                     parts.addUniquePart('SR5.Specialization', 2);
-                return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
+                return yield ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
                     event: options.event,
                     actor: this,
                     parts: parts.list,
@@ -13957,33 +13955,38 @@ class SR5Actor extends Actor {
         });
     }
     rollPilotVehicle(options) {
-        if (!this.isVehicle()) {
-            return undefined;
-        }
-        const actorData = duplicate(this.data.data);
-        if (actorData.controlMode === 'autopilot') {
-            const parts = new PartsList_1.PartsList();
-            const pilot = helpers_1.Helpers.calcTotal(actorData.vehicle_stats.pilot);
-            let skill = this.getVehicleTypeSkill();
-            const environment = actorData.environment;
-            const limit = this.findLimit(environment);
-            if (skill && limit) {
-                parts.addPart('SR5.Vehicle.Stats.Pilot', pilot);
-                // TODO possibly look for autosoft item level?
-                parts.addPart('SR5.Vehicle.Maneuvering', helpers_1.Helpers.calcTotal(skill));
-                this._addGlobalParts(parts);
-                return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
-                    event: options === null || options === void 0 ? void 0 : options.event,
-                    actor: this,
-                    parts: parts.list,
-                    limit,
-                    title: game.i18n.localize('SR5.Labels.ActorSheet.RollPilotVehicleTest'),
-                });
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isVehicle()) {
+                return undefined;
             }
-        }
-        else {
-            this.rollActiveSkill('perception', options);
-        }
+            const actorData = duplicate(this.data.data);
+            if (actorData.controlMode === 'autopilot') {
+                const parts = new PartsList_1.PartsList();
+                const pilot = helpers_1.Helpers.calcTotal(actorData.vehicle_stats.pilot);
+                let skill = this.getVehicleTypeSkill();
+                const environment = actorData.environment;
+                const limit = this.findLimit(environment);
+                if (skill && limit) {
+                    parts.addPart('SR5.Vehicle.Stats.Pilot', pilot);
+                    // TODO possibly look for autosoft item level?
+                    parts.addPart('SR5.Vehicle.Maneuvering', helpers_1.Helpers.calcTotal(skill));
+                    this._addGlobalParts(parts);
+                    return yield ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
+                        event: options === null || options === void 0 ? void 0 : options.event,
+                        actor: this,
+                        parts: parts.list,
+                        limit,
+                        title: game.i18n.localize('SR5.Labels.ActorSheet.RollPilotVehicleTest'),
+                    });
+                }
+            }
+            else {
+                const skillName = this.getVehicleTypeSkillName();
+                if (!skillName)
+                    return;
+                return yield this.rollActiveSkill(skillName, options);
+            }
+        });
     }
     rollDroneInfiltration(options) {
         if (!this.isVehicle()) {
@@ -15086,10 +15089,10 @@ class SR5ActorSheet extends ActorSheet {
                             yield this.actor.rollDronePerception(options);
                             break;
                         case 'infiltration':
-                            this.actor.rollDroneInfiltration(options);
+                            yield this.actor.rollDroneInfiltration(options);
                             break;
                         case 'pilot-vehicle':
-                            this.actor.rollPilotVehicle(options);
+                            yield this.actor.rollPilotVehicle(options);
                             break;
                     }
                     break;
@@ -15097,7 +15100,7 @@ class SR5ActorSheet extends ActorSheet {
                 case 'attribute':
                     const attribute = split[1];
                     if (attribute) {
-                        this.actor.rollAttribute(attribute, options);
+                        yield this.actor.rollAttribute(attribute, options);
                     }
                     break;
                 // end attribute
