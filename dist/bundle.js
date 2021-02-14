@@ -13302,8 +13302,10 @@ class SR5Actor extends Actor {
         return -1 * this.data.data.wounds.value || 0;
     }
     /** Use edge on actors that have an edge attribute.
+     *
+     * NOTE: This doesn't only include characters but spirits, critters and more.
      */
-    useEdge(by = 1) {
+    useEdge(by = -1) {
         return __awaiter(this, void 0, void 0, function* () {
             const edge = this.getEdge();
             if (edge && edge.value === 0)
@@ -14216,9 +14218,7 @@ class SR5Actor extends Actor {
                             parts: parts.list,
                             actor: actor,
                         }).then(() => {
-                            actor.update({
-                                'data.attributes.edge.uses': actor.getEdge().uses - 1,
-                            });
+                            actor.useEdge();
                         });
                     }
                     else {
@@ -28443,7 +28443,7 @@ class ShadowrunRoller {
             basicProps.explodeSixes = true;
             delete basicProps.limit;
             testData.parts.addUniquePart('SR5.PushTheLimit', actor.getEdge().value);
-            yield actor.useEdge(1);
+            yield actor.useEdge();
         });
     }
 }
