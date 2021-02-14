@@ -800,5 +800,13 @@
         "LatestChangelog": "Latest Changelog",
         "ReportIssues": "Please report bugs and feature requests",
         "IssuesOverview": "Issues Overview"
+    },
+
+    "SR5.DeleteConfirmationApplication": {
+        "Title": "Delete item   ",
+        "Delete": "Yes",
+        "Cancel": "No",
+        "Consent": "Are you sure?",
+        "Description": "Deleting an item can't be reversed!"
     }
 }

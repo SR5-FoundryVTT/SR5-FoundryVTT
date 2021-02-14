@@ -8,13 +8,11 @@ import {SR5Actor} from "./actor/SR5Actor";
 import RangesTemplateData = Shadowrun.RangesTemplateData;
 import RangeTemplateData = Shadowrun.RangeTemplateData;
 import DamageData = Shadowrun.DamageData;
-import {SR5Roll} from "./roll/SR5Roll";
 import ModifiedDamageData = Shadowrun.ModifiedDamageData;
 import {DataTemplates} from "./dataTemplates";
 import DamageType = Shadowrun.DamageType;
 import DamageElement = Shadowrun.DamageElement;
-import ActorAttribute = Shadowrun.ActorAttribute;
-import {ShadowrunRoll} from "./rolls/ShadowrunRoller";
+import {DeleteConfirmationDialog} from "./apps/dialogs/DeleteConfirmationDialog";
 
 interface CalcTotalOptions {
     min?: number,
@@ -390,5 +388,11 @@ export class Helpers {
         modified.value = Helpers.calcTotal(modified, {min: 0});
 
         return {incoming, modified};
+    }
+
+    static async confirmDeletion(): Promise<boolean> {
+        const dialog = new DeleteConfirmationDialog();
+        await dialog.select();
+        return !dialog.canceled && dialog.selectedButton === 'delete';
     }
 }

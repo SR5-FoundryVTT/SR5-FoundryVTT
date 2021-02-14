@@ -484,13 +484,7 @@ export class SR5ActorSheet extends ActorSheet {
             if (item) item.sheet.render(true);
         });
         // Delete Inventory Item
-        html.find('.item-delete').click((event) => {
-            event.preventDefault();
-            const iid = Helpers.listItemId(event);
-            const el = $(event.currentTarget).parents('.list-item');
-            this.actor.deleteOwnedItem(iid);
-            el.slideUp(200, () => this.render(false));
-        });
+        html.find('.item-delete').click(event => this.deleteOwnedItem(event));
         // Drag inventory item
         let handler = (ev) => this._onDragStart(ev);
         html.find('.list-item').each((i, item) => {
@@ -499,6 +493,16 @@ export class SR5ActorSheet extends ActorSheet {
                 item.addEventListener('dragstart', handler, false);
             }
         });
+    }
+
+    async deleteOwnedItem(event) {
+        event.preventDefault();
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        const iid = Helpers.listItemId(event);
+        await this.actor.deleteOwnedItem(iid);
     }
 
     async _onRollFromSheet(event) {
