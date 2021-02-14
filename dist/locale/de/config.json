@@ -772,5 +772,13 @@
         "LatestChangelog": "Aktuelle Changelog",
         "ReportIssues": "Bitte Fehler und gewünschte Funktionen hier melden",
         "IssuesOverview": "Anfragen Übersicht"
+    },
+
+    "SR5.DeleteConfirmationApplication": {
+        "Titel": "Eintrag löschen",
+        "Delete": "Ja",
+        "Cancel": "Nein",
+        "Consent": "Bist du sicher?",
+        "Description": "Das Löschen eines Eintrags kann nicht rückgängig gemacht werden!"
     }
 }
