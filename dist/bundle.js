@@ -16867,7 +16867,7 @@ var ChummerImportForm = /*#__PURE__*/function (_FormApplication) {
 
       html.find('.submit-chummer-import').click( /*#__PURE__*/function () {
         var _ref = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(event) {
-          var chummerfile, weapons, armor, cyberware, equipment, qualities, powers, spells, parseAtt, parseDamage, getValues, getArray, updateData, update, items, error, c, attr, atts, skills, i, s, group, skill, id, category, skillCategory, cat, name, _qualities, _weapons, armors, cyberwares, _powers, gears, _spells;
+          var chummerfile, weapons, armor, cyberware, equipment, qualities, powers, spells, parseAttName, parseAttBaseValue, parseDamage, getValues, getArray, updateData, update, items, error, c, attr, atts, skills, i, s, group, skill, id, category, skillCategory, cat, name, _qualities, _weapons, armors, cyberwares, _powers, gears, _spells;
 
           return _regenerator["default"].wrap(function _callee$(_context) {
             while (1) {
@@ -16883,50 +16883,69 @@ var ChummerImportForm = /*#__PURE__*/function (_FormApplication) {
                   powers = $('.powers').is(':checked');
                   spells = $('.spells').is(':checked');
                   console.log(chummerfile);
+                  /**
+                   *  Maps the chummer attribute name to our sr5-foundry attribute name
+                   *  @param attName name of the chummer attribute
+                   */
 
-                  parseAtt = function parseAtt(att) {
-                    if (att.toLowerCase() === 'bod') {
+                  parseAttName = function parseAttName(attName) {
+                    if (attName.toLowerCase() === 'bod') {
                       return 'body';
                     }
 
-                    if (att.toLowerCase() === 'agi') {
+                    if (attName.toLowerCase() === 'agi') {
                       return 'agility';
                     }
 
-                    if (att.toLowerCase() === 'rea') {
+                    if (attName.toLowerCase() === 'rea') {
                       return 'reaction';
                     }
 
-                    if (att.toLowerCase() === 'str') {
+                    if (attName.toLowerCase() === 'str') {
                       return 'strength';
                     }
 
-                    if (att.toLowerCase() === 'cha') {
+                    if (attName.toLowerCase() === 'cha') {
                       return 'charisma';
                     }
 
-                    if (att.toLowerCase() === 'int') {
+                    if (attName.toLowerCase() === 'int') {
                       return 'intuition';
                     }
 
-                    if (att.toLowerCase() === 'log') {
+                    if (attName.toLowerCase() === 'log') {
                       return 'logic';
                     }
 
-                    if (att.toLowerCase() === 'wil') {
+                    if (attName.toLowerCase() === 'wil') {
                       return 'willpower';
                     }
 
-                    if (att.toLowerCase() === 'edg') {
+                    if (attName.toLowerCase() === 'edg') {
                       return 'edge';
                     }
 
-                    if (att.toLowerCase() === 'mag') {
+                    if (attName.toLowerCase() === 'mag') {
                       return 'magic';
                     }
 
-                    if (att.toLowerCase() === 'res') {
+                    if (attName.toLowerCase() === 'res') {
                       return 'resonance';
+                    }
+                  };
+                  /**
+                   *  Converts the chummer attribute value to our sr5-foundry attribute value
+                   *  @param att the chummer attribute
+                   */
+
+
+                  parseAttBaseValue = function parseAttBaseValue(att) {
+                    if (att.name.toLowerCase() === 'edg') {
+                      // The edge attribute value is stored in the "base" field instead of the total field
+                      // In chummer, the "total" field is used for the amount of edge remaining to a character
+                      return parseInt(att.base);
+                    } else {
+                      return parseInt(att.total);
                     }
                   };
 
@@ -17041,8 +17060,8 @@ var ChummerImportForm = /*#__PURE__*/function (_FormApplication) {
                         }
 
                         attr.forEach(function (att) {
-                          att = parseAtt(att);
-                          if (att !== 'willpower') update.magic.attribute = att;
+                          attName = parseAttName(att);
+                          if (attName !== 'willpower') update.magic.attribute = att;
                         });
                       }
 
@@ -17061,8 +17080,11 @@ var ChummerImportForm = /*#__PURE__*/function (_FormApplication) {
                     atts = chummerfile.characters.character.attributes[1].attribute;
                     atts.forEach(function (att) {
                       try {
-                        var newAtt = parseAtt(att.name);
-                        if (newAtt) update.attributes[newAtt].base = parseInt(att.total);
+                        var _attName = parseAttName(att.name);
+
+                        if (_attName) {
+                          update.attributes[_attName].base = parseAttBaseValue(att);
+                        }
                       } catch (e) {
                         error += "Error with attributes: ".concat(e, ". ");
                       }
@@ -17572,19 +17594,19 @@ var ChummerImportForm = /*#__PURE__*/function (_FormApplication) {
                     }
                   }
 
-                  _context.next = 21;
+                  _context.next = 22;
                   return _this.object.update(updateData);
 
-                case 21:
-                  _context.next = 23;
+                case 22:
+                  _context.next = 24;
                   return _this.object.createEmbeddedEntity('OwnedItem', items);
 
-                case 23:
+                case 24:
                   ui.notifications.info('Complete! Check everything. Notably: Ranged weapon mods and ammo; Strength based weapon damage; Specializations on all spells, powers, and weapons;');
 
                   _this.close();
 
-                case 25:
+                case 26:
                 case "end":
                   return _context.stop();
               }

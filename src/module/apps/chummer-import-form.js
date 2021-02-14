@@ -30,41 +30,60 @@ export class ChummerImportForm extends FormApplication {
 
             console.log(chummerfile);
 
-            const parseAtt = (att) => {
-                if (att.toLowerCase() === 'bod') {
+            /**
+             *  Maps the chummer attribute name to our sr5-foundry attribute name
+             *  @param attName name of the chummer attribute
+             */
+            const parseAttName = (attName) => {
+                if (attName.toLowerCase() === 'bod') {
                     return 'body';
                 }
-                if (att.toLowerCase() === 'agi') {
+                if (attName.toLowerCase() === 'agi') {
                     return 'agility';
                 }
-                if (att.toLowerCase() === 'rea') {
+                if (attName.toLowerCase() === 'rea') {
                     return 'reaction';
                 }
-                if (att.toLowerCase() === 'str') {
+                if (attName.toLowerCase() === 'str') {
                     return 'strength';
                 }
-                if (att.toLowerCase() === 'cha') {
+                if (attName.toLowerCase() === 'cha') {
                     return 'charisma';
                 }
-                if (att.toLowerCase() === 'int') {
+                if (attName.toLowerCase() === 'int') {
                     return 'intuition';
                 }
-                if (att.toLowerCase() === 'log') {
+                if (attName.toLowerCase() === 'log') {
                     return 'logic';
                 }
-                if (att.toLowerCase() === 'wil') {
+                if (attName.toLowerCase() === 'wil') {
                     return 'willpower';
                 }
-                if (att.toLowerCase() === 'edg') {
+                if (attName.toLowerCase() === 'edg') {
                     return 'edge';
                 }
-                if (att.toLowerCase() === 'mag') {
+                if (attName.toLowerCase() === 'mag') {
                     return 'magic';
                 }
-                if (att.toLowerCase() === 'res') {
+                if (attName.toLowerCase() === 'res') {
                     return 'resonance';
                 }
             };
+
+            /**
+             *  Converts the chummer attribute value to our sr5-foundry attribute value
+             *  @param att the chummer attribute
+             */
+            const parseAttBaseValue = (att) => {
+                if (att.name.toLowerCase() === 'edg') {
+                    // The edge attribute value is stored in the "base" field instead of the total field
+                    // In chummer, the "total" field is used for the amount of edge remaining to a character
+                    return parseInt(att.base);
+                }
+                else {
+                    return parseInt(att.total);
+                }
+            }
 
             const parseDamage = (val) => {
                 const damage = {
@@ -164,8 +183,8 @@ export class ChummerImportForm extends FormApplication {
                                 .map((item) => item.trim());
                         }
                         attr.forEach((att) => {
-                            att = parseAtt(att);
-                            if (att !== 'willpower') update.magic.attribute = att;
+                            attName = parseAttName(att);
+                            if (attName !== 'willpower') update.magic.attribute = att;
                         });
                     }
                     if (c.totaless) {
@@ -181,8 +200,11 @@ export class ChummerImportForm extends FormApplication {
                 const atts = chummerfile.characters.character.attributes[1].attribute;
                 atts.forEach((att) => {
                     try {
-                        const newAtt = parseAtt(att.name);
-                        if (newAtt) update.attributes[newAtt].base = parseInt(att.total);
+                        const attName = parseAttName(att.name);
+                        if (attName) { 
+                            update.attributes[attName].base = parseAttBaseValue(att);
+                        }
+                            
                     } catch (e) {
                         error += `Error with attributes: ${e}. `;
                     }
