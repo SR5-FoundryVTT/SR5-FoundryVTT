@@ -519,6 +519,6 @@ export class ShadowrunRoller {
         delete basicProps.limit;
         testData.parts.addUniquePart('SR5.PushTheLimit', actor.getEdge().value);
 
-        await actor.useEdge(1);
+        await actor.useEdge();
     }
 }
