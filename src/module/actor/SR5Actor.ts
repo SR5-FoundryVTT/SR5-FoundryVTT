@@ -452,11 +452,12 @@ export class SR5Actor extends Actor {
         let attackerHits = attack.hits || 0;
         let netHits = Math.max(attackerHits - defenderHits, 0);
 
-        if (netHits === 0) return;
-
         const damage = attack.damage;
-        damage.mod = PartsList.AddUniquePart(damage.mod, 'SR5.NetHits', netHits);
-        damage.value = Helpers.calcTotal(damage);
+
+        if (netHits > 0) {
+            damage.mod = PartsList.AddUniquePart(damage.mod, 'SR5.NetHits', netHits);
+            damage.value = Helpers.calcTotal(damage);
+        }
 
         const soakRollOptions = {
             event: options.event,
@@ -477,8 +478,7 @@ export class SR5Actor extends Actor {
 
         const roll = await this.rollSingleAttribute(attribute, options);
 
-        // Only proceed on successful roles.
-        if (!roll || roll.hits <= 0) return;
+        if (!roll) return;
 
         // Prepare the resulting damage message.
         const title = spell.isManaSpell() ?
