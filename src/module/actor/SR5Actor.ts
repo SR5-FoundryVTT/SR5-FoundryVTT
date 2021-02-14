@@ -101,8 +101,10 @@ export class SR5Actor extends Actor {
     }
 
     /** Use edge on actors that have an edge attribute.
+     *
+     * NOTE: This doesn't only include characters but spirits, critters and more.
      */
-    async useEdge(by: number = 1) {
+    async useEdge(by: number = -1) {
         const edge = this.getEdge();
         if (edge && edge.value === 0) return;
         // NOTE: There used to be a bug which could lower edge usage below zero. Let's quietly ignore and reset. :)
@@ -1083,9 +1085,7 @@ export class SR5Actor extends Actor {
                         parts: parts.list,
                         actor: actor,
                     }).then(() => {
-                        actor.update({
-                            'data.attributes.edge.uses': actor.getEdge().uses - 1,
-                        });
+                        actor.useEdge();
                     });
                 } else {
                     // @ts-ignore
