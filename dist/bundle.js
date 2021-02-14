@@ -24028,7 +24028,7 @@ class CombatSpellParser extends SpellParserBase_1.SpellParserBase {
         }
         data.data.combat.type = descriptor.includes('Indirect') ? 'indirect' : 'direct';
         if (data.data.combat.type === 'direct') {
-            data.data.action.opposed.type = 'custom';
+            data.data.action.opposed.type = 'defense';
             switch (data.data.type) {
                 case 'physical':
                     data.data.action.opposed.attribute = 'body';
