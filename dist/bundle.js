@@ -28231,8 +28231,7 @@ class ShadowrunRoller {
         const parts = new PartsList_1.PartsList(partsProps);
         const count = parts.total;
         if (count <= 0) {
-            // @ts-ignore
-            ui.notifications.error(game.i18n.localize('SR5.RollOneDie'));
+            ui.notifications.warn(game.i18n.localize('SR5.RollOneDie'));
             return '0d6cs>=5';
         }
         let formula = `${count}d6`;
@@ -28247,10 +28246,6 @@ class ShadowrunRoller {
     }
     static roll(props) {
         const parts = new PartsList_1.PartsList(props.parts);
-        if (parts.isEmpty) {
-            ui.notifications.error(game.i18n.localize('SR5.RollOneDie'));
-            return;
-        }
         // Prepare SR Success Test with foundry formula.
         const formulaOptions = { parts: parts.list, limit: props.limit, explode: props.explodeSixes };
         const formula = this.shadowrunFormula(formulaOptions);
