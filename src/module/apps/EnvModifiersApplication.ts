@@ -39,7 +39,7 @@ export class EnvModifiersApplication extends Application {
         options.classes = ['sr5', 'form-dialog'];
         options.id = 'env-modifiers-application';
         options.title = game.i18n.localize('SR5.EnvModifiersApplication.Title');
-        options.width = 700;
+        options.width = 'auto';
         options.height = 'auto';
         options.resizable = true;
         return options;

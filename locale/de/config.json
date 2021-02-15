@@ -708,37 +708,37 @@
   "SR5.EnvModifiersApplication": {
     "Title": "Environmental Modifiers",
     "Visibility": {
-      "Title": "Visibility",
-      "Good": "Clear",
-      "Light": "Light Rain/Fog/Smoke",
-      "Moderate": "Moderate Rain/Fog/Smoke",
-      "Heavy": "Heavy Rain/Fog/Smoke"
+      "Title": "Sichtverhältnisse",
+      "Good": "Freie Sicht",
+      "Light": "Leichte Regen/Nebel/Rauch",
+      "Moderate": "Mittlerer Regen/Nebel/Rauch",
+      "Heavy": "Starker Regen/Nebel/Rauch"
     },
     "LightGlare": {
-      "Title": "Light/Glare",
-      "Good": "Full Light/No Glare",
-      "Light": "Partial Light/Weak Glare",
-      "Moderate": "Dim Light/Moderate Glare",
-      "Heavy": "Total Darkness/Blinding Glare"
+      "Title": "Beleuchtung",
+      "Good": "Gute Beleuchtung/Keine Blendung",
+      "Light": "Teilbeleuchtung/Schwache Blendung",
+      "Moderate": "Schwache Beleuchtung/Mittlere Blendung",
+      "Heavy": "Völlige Dunkelheit/Starke Blendung"
     },
     "Wind": {
       "Title": "Wind",
-      "Good": "None or Light Breeze",
-      "Light": "Light Winds",
-      "Moderate": "Moderate Winds",
-      "Heavy": "Strong Winds"
+      "Good": "Bis leichte Brise",
+      "Light": "Leichter Wind",
+      "Moderate": "Steife Brise",
+      "Heavy": "Sturm"
     },
     "Range": {
-      "Title": "Range",
-      "Good": "Short",
-      "Light": "Medium",
-      "Moderate": "Long",
-      "Heavy": "Extreme"
+      "Title": "Entfernung",
+      "Good": "Kurz",
+      "Light": "Mittel",
+      "Moderate": "Lang",
+      "Heavy": "Maximal"
     },
     "Modifier": {
-      "Title": "Modifier"
+      "Title": "Modifikator"
     },
-    "Extreme": "Combination of two or more conditions at the heavy level row",
+    "Extreme": "Zwei oder mehr Modifikatoren der Kategorie Schwer",
     "Total": "Ergebnis"
   }
 }
