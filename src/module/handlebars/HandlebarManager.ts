@@ -3,6 +3,7 @@ import { registerBasicHelpers } from './BasicHelpers';
 import { registerRollAndLabelHelpers } from './RollAndLabelHelpers';
 import { registerItemLineHelpers } from './ItemLineHelpers';
 import { registerSkillLineHelpers } from './SkillLineHelpers';
+import {registerAppHelpers} from "./AppHelpers";
 
 export class HandlebarManager {
     static async loadTemplates() {
@@ -13,5 +14,6 @@ export class HandlebarManager {
         registerRollAndLabelHelpers();
         registerItemLineHelpers();
         registerSkillLineHelpers();
+        registerAppHelpers();
     }
 }

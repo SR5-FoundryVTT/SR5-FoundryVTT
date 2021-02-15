@@ -17,6 +17,7 @@ import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
 import { SR5Combat } from './combat/SR5Combat';
 import { Import } from './importer/apps/import-form';
 import {ChangelogApplication} from "./apps/ChangelogApplication";
+import {EnvModifiersApplication} from "./apps/EnvModifiersApplication";
 
 export class HooksManager {
     static registerHooks() {
@@ -100,7 +101,9 @@ ___________________
         const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
         $(document).on('click', diceIconSelectorNew, () => ShadowrunRoller.promptRoll());
 
-
+        const target = game.scenes.entries[0];
+        console.error(target);
+        await new EnvModifiersApplication(target).render(true);
     }
 
     static canvasInit() {

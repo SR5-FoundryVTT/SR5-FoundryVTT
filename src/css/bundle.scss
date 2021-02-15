@@ -650,6 +650,22 @@ select.display {
             background: $light;
         }
     }
+
+    /** CSS for the Environmental Modifier Application Window
+     *
+     */
+    button.env-modifier {
+        text-align: left;
+    }
+    .env-modifier-total {
+        font-weight: bold;
+    }
+    tr.env-modifier-category {
+        height: 45px;
+    }
+    td.env-modifier-level {
+        padding-right: 6px;
+    }
 }
 
 /** Replicate Foundry .dialog stiling for flex row buttons. FormDialog sublcasses simply adding class dialog will
