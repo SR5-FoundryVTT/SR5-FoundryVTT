@@ -119,8 +119,6 @@ export class ChummerImportForm extends FormApplication {
                 return Array.isArray(value) ? value : [value];
             };
 
-
-
             const updateData = duplicate(this.object.data);
             const update = updateData.data;
             const items = [];
