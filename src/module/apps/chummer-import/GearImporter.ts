@@ -13,8 +13,14 @@ export class GearImporter {
         let items : any[] = [];
 
         gears.forEach((g) => {
-            const itemsData = this.parseGearEntry(g);
-            items.push(itemsData);
+            try {
+                const itemsData = this.parseGearEntry(g);
+                items.push(itemsData);
+            }
+
+            catch (e) {
+                console.error(e);
+            }
         });
 
         return items;

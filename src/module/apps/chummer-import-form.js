@@ -118,7 +118,6 @@ export class ChummerImportForm extends FormApplication {
             const getArray = (value) => {
                 return Array.isArray(value) ? value : [value];
             };
-
             const updateData = duplicate(this.object.data);
             const update = updateData.data;
             const items = [];
@@ -558,16 +557,10 @@ export class ChummerImportForm extends FormApplication {
                 // gear
                 if (equipment && c.gears && c.gears.gear) {
                     console.log("Parsing gear");
-
-                    try {
-                        const gears = getArray(c.gears.gear);
-                        const gearImporter = new GearImporter();
-                        const allGearData = gearImporter.parseAllGear(gears);
-                        Array.prototype.push.apply(items, allGearData)
-                    }
-                    catch (e) {
-                        console.error(e);
-                    }
+                    const gears = getArray(c.gears.gear);
+                    const gearImporter = new GearImporter();
+                    const allGearData = gearImporter.parseAllGear(gears);
+                    Array.prototype.push.apply(items, allGearData)
                 }
                 // spells
                 if (spells && c.spells && c.spells.spell) {

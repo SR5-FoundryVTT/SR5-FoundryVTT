@@ -17411,15 +17411,10 @@ var ChummerImportForm = /*#__PURE__*/function (_FormApplication) {
 
                     if (equipment && c.gears && c.gears.gear) {
                       console.log("Parsing gear");
-
-                      try {
-                        gears = getArray(c.gears.gear);
-                        gearImporter = new _GearImporter.GearImporter();
-                        allGearData = gearImporter.parseAllGear(gears);
-                        Array.prototype.push.apply(items, allGearData);
-                      } catch (e) {
-                        console.error(e);
-                      }
+                      gears = getArray(c.gears.gear);
+                      gearImporter = new _GearImporter.GearImporter();
+                      allGearData = gearImporter.parseAllGear(gears);
+                      Array.prototype.push.apply(items, allGearData);
                     } // spells
 
 
@@ -17728,8 +17723,13 @@ class GearImporter {
     parseAllGear(gears) {
         let items = [];
         gears.forEach((g) => {
-            const itemsData = this.parseGearEntry(g);
-            items.push(itemsData);
+            try {
+                const itemsData = this.parseGearEntry(g);
+                items.push(itemsData);
+            }
+            catch (e) {
+                console.error(e);
+            }
         });
         return items;
     }
