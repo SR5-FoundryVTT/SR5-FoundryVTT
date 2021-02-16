@@ -556,7 +556,6 @@ export class ChummerImportForm extends FormApplication {
                 }
                 // gear
                 if (equipment && c.gears && c.gears.gear) {
-                    console.log("Parsing gear");
                     const gears = getArray(c.gears.gear);
                     const gearImporter = new GearImporter();
                     const allGearData = gearImporter.parseAllGear(gears);

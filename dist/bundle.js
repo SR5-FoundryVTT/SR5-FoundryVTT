@@ -17410,7 +17410,6 @@ var ChummerImportForm = /*#__PURE__*/function (_FormApplication) {
 
 
                     if (equipment && c.gears && c.gears.gear) {
-                      console.log("Parsing gear");
                       gears = getArray(c.gears.gear);
                       gearImporter = new _GearImporter.GearImporter();
                       allGearData = gearImporter.parseAllGear(gears);
