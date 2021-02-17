@@ -15636,7 +15636,7 @@ class CritterPrep extends BaseActorPrep_1.BaseActorPrep {
     static prepareMonitors(data) {
         const { track, modifiers } = data;
         track.stun.max = Number(modifiers['stun_track']);
-        track.stun.label = CONFIG.SR5.damageTypes.physical;
+        track.stun.label = CONFIG.SR5.damageTypes.stun;
         track.stun.disabled = false;
         track.physical.max = Number(modifiers['physical_track']);
         track.physical.overflow.max = 0;
