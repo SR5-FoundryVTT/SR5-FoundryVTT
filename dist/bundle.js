@@ -14039,7 +14039,7 @@ class SR5Actor extends Actor {
         const att = duplicate(this.data.data.attributes[attId]);
         const atts = duplicate(this.data.data.attributes);
         const parts = new PartsList_1.PartsList();
-        parts.addUniquePart(att.label, att.value);
+        parts.addPart(att.label, att.value);
         let dialogData = {
             attribute: att,
             attributes: atts,
@@ -14064,7 +14064,7 @@ class SR5Actor extends Actor {
                     if (att2Id !== 'none') {
                         att2 = atts[att2Id];
                         if (att2 === null || att2 === void 0 ? void 0 : att2.label) {
-                            parts.addUniquePart(att2.label, att2.value);
+                            parts.addPart(att2.label, att2.value);
                             const att2IdLabel = game.i18n.localize(CONFIG.SR5.attributes[att2Id]);
                             title += ` + ${att2IdLabel}`;
                         }
@@ -16236,8 +16236,10 @@ class AttributesPrep {
                 return;
             const parts = new PartsList_1.PartsList(attribute.mod);
             attribute.mod = parts.list;
-            helpers_1.Helpers.calcTotal(attribute);
-            // add labels
+            // Don't modify attribute below one.
+            // TODO: Use a SR5.Values.Attribute calculation to avoid duplication.
+            helpers_1.Helpers.calcTotal(attribute, { min: 1 });
+            // add i18n labels.
             attribute.label = CONFIG.SR5.attributes[key];
         }
     }
@@ -16656,7 +16658,9 @@ class NPCPrep {
                     parts.addPart(constants_1.METATYPEMODIFIER, modifyBy);
                 }
                 attribute.mod = parts.list;
-                helpers_1.Helpers.calcTotal(attribute);
+                // Don't modify attribute below one.
+                // TODO: Use a SR5.Values.Attribute calculation to avoid duplication.
+                helpers_1.Helpers.calcTotal(attribute, { min: 1 });
             }
         }
     }
@@ -25452,8 +25456,9 @@ class SR5Item extends Item {
                 parts.addUniquePart('SR5.Defaulting', -1);
             }
         }
-        else if (attribute2 && attribute2.label)
-            parts.addUniquePart(attribute2.label, attribute2.value);
+        else if (attribute2 && attribute2.label) {
+            parts.addPart(attribute2.label, attribute2.value);
+        }
         const spec = this.getActionSpecialization();
         if (spec)
             parts.addUniquePart(spec, 2);
