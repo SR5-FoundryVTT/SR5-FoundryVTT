@@ -15,7 +15,8 @@ export const FLAGS = {
     Attack: 'attack',
     Roll: 'roll',
     TargetsSceneTokenIds: 'targetsSceneTokenIds',
-    ChangelogShownForVersion: 'changelogShownForVersion'
+    ChangelogShownForVersion: 'changelogShownForVersion',
+    Modifier: 'modifier'
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {
@@ -48,6 +49,13 @@ export const SR = {
                 extreme: -6,
                 // A modifier of zero will allow for users/gm to still test oor targets with their own judgement.
                 out_of_range: 0
+            },
+            levels: {
+                good: 0,
+                light: -1,
+                moderate: -3,
+                heavy: -6,
+                extreme: -10,
             }
         }
     },

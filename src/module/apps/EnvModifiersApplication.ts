@@ -1,33 +1,16 @@
+import {FLAGS, SYSTEM_NAME} from "../constants";
+import {Modifiers} from "../sr5/Modifiers";
+
+// TODO: Add ways of modifying different category levels by steps up / down (infrared) or to specific levels.
 export class EnvModifiersApplication extends Application {
     target: Entity;
     modifiers;
 
-    constructor(target: Entity) {
+    constructor(target: Entity, modifiers) {
         super();
 
         this.target = target;
-        this.modifiers = {
-            environmental: {
-                total: 0,
-                active: {
-                    visibility: 0,
-                    light: 0,
-                    wind: 0,
-                    range: 0,
-                    value: 0,
-                },
-                // TODO: Is .value still needed here?
-                levels: {
-                    good: {value: 0},
-                    light: {value: -1},
-                    moderate: {value: -3},
-                    heavy: {value: -6},
-                    extreme: {value: -10},
-                }
-
-            }
-        }
-
+        this.modifiers = Modifiers.getDefaultModifiers();
     }
 
     get template() {
@@ -39,18 +22,16 @@ export class EnvModifiersApplication extends Application {
         options.classes = ['sr5', 'form-dialog'];
         options.id = 'env-modifiers-application';
         options.title = game.i18n.localize('SR5.EnvModifiersApplication.Title');
-        options.width = 'auto';
+        options.width = 'auto'; // auto is important for differing i18n text length.
         options.height = 'auto';
         options.resizable = true;
         return options;
     }
 
-    getData(options?: object): any {
+    async getData(options?: object): Promise<any> {
         const data = super.getData(options);
 
-        console.error('getData', this.modifiers.environmental.active);
-
-        data.modifiers = this.modifiers.environmental.levels;
+        data.modifiers = Modifiers.getEnvironmentalModifierLevels();
         data.active = this.modifiers.environmental.active;
         data.total = this.modifiers.environmental.total;
 
@@ -98,18 +79,18 @@ export class EnvModifiersApplication extends Application {
     /** Count the amount each value appears in the array of modifiers
      */
     _countModifierValues(values: Number[]) {
+        const modifiers = Modifiers.getEnvironmentalModifierLevels();
+
         return {
-            light: values.reduce((count: number, value: number) => (value === this.modifiers.environmental.levels.light.value ? count + 1 : count), 0),
-            moderate: values.reduce((count: number, value: number) => (value === this.modifiers.environmental.levels.moderate.value ? count + 1 : count), 0),
-            heavy: values.reduce((count: number, value: number) => (value === this.modifiers.environmental.levels.heavy.value ? count + 1 : count), 0),
-            extreme: values.reduce((count: number, value: number) => (value === this.modifiers.environmental.levels.extreme.value ? count + 1 : count), 0)
+            light: values.reduce((count: number, value: number) => (value === modifiers.light ? count + 1 : count), 0),
+            moderate: values.reduce((count: number, value: number) => (value === modifiers.moderate ? count + 1 : count), 0),
+            heavy: values.reduce((count: number, value: number) => (value === modifiers.heavy ? count + 1 : count), 0),
+            extreme: values.reduce((count: number, value: number) => (value === modifiers.extreme ? count + 1 : count), 0)
         }
     }
 
     // TODO: Move into separate shadowrun rule area
     _calcActiveModifierTotal() {
-        console.error('calculation', this.modifiers.environmental.active);
-
         // Manual selection will overwrite all else...
         const manual = this.modifiers.environmental.active.value;
         if (manual !== 0) {
@@ -124,32 +105,41 @@ export class EnvModifiersApplication extends Application {
         // TODO: Add typing to modifiers.env and remove local typing
         const active = Object.values(this.modifiers.environmental.active).filter(category => category !== 'value') as Number[];
 
-        // TODO: Move this into a clean little function as to not burden the reader
         const count = this._countModifierValues(active);
+
+        const modifiers = Modifiers.getEnvironmentalModifierLevels();
 
         // TODO: Add typing to modifiers.env and remove ts-ignore
         //@ts-ignore
         if (count.extreme > 0 || count.heavy >= 2) {
-            this.modifiers.environmental.total = this.modifiers.environmental.levels.extreme.value;
+            this.modifiers.environmental.total = modifiers.extreme;
         }
         //@ts-ignore
         else if (count.heavy === 1 || count.moderate >= 2) {
-            this.modifiers.environmental.total = this.modifiers.environmental.levels.heavy.value;
+            this.modifiers.environmental.total = modifiers.heavy;
         }
         //@ts-ignore
         else if (count.moderate === 1 || count.light >= 2) {
-            this.modifiers.environmental.total = this.modifiers.environmental.levels.moderate.value;
+            this.modifiers.environmental.total = modifiers.moderate;
         }
         //@ts-ignore
         else if (count.light === 1) {
-            this.modifiers.environmental.total = this.modifiers.environmental.levels.light.value;
+            this.modifiers.environmental.total = modifiers.light;
         } else {
-            this.modifiers.environmental.total = this.modifiers.environmental.levels.good.value;
+            this.modifiers.environmental.total = modifiers.good;
         }
     }
 
-    async storeModifiersOnTarget() {
+    async getModifiersFromTarget() {
+        return await this.target.getFlag(SYSTEM_NAME, FLAGS.Modifier) || Modifiers.getDefaultModifiers();
+    }
 
+    async storeModifiersOnTarget() {
+        // TODO: Add modifier typing
+        const modifiers = await this.getModifiersFromTarget();
+        modifiers.environmental = this.modifiers.environmental;
+
+        await this.target.setFlag(SYSTEM_NAME, FLAGS.Modifier, modifiers);
     }
 
 }
