@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  foundry:
+    image: felddy/foundryvtt:release
+    hostname: my_foundry_host
+    init: true
+    restart: "unless-stopped"
+    volumes:
+      - type: bind
+        source: ./data
+        target: /data
+        bind:
+          propagation: 'Z'
+      - type: bind
+        source: ./data/cache/
+        target: /cache/
+        bind:
+          propagation: 'Z'
+      - type: bind
+        source: .
+        target: /data/Data/systems/shadowrun5e/
+        bind:
+          propagation: 'Z'
+    environment:
+      - CONTAINER_CACHE=/cache/
+      - FOUNDRY_ADMIN_KEY=123456789
+      - FOUNDRY_LICENSE_KEY=''
+      - FOUNDRY_UID=0
+      - FOUNDRY_GID=0
+    ports:
+      - "30000:30000/tcp"
