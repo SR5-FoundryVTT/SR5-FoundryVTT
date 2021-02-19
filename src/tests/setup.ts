@@ -1,10 +1,9 @@
 import { Page } from "playwright";
 
-const BASEURL: String = "http://localhost:30000/"
-
 export const CONFIG = {
-    worldName: "test-world",
-    adminPassword: "123456789"
+    worldName: process.env.WORLD_NAME || "test-world",
+    foundryUrl: process.env.FOUNDRY_URL || "http://localhost:30000/",
+    adminPassword: process.env.FOUNDRY_ADMIN_PASSWORD || "123456789"
 }
 
 export abstract class FoundryPage {
@@ -22,7 +21,7 @@ export class PreSetupPage extends FoundryPage {
     static subpath: string = "setup"
 
     async login(password: string) {
-        await page.goto('http://localhost:30000/')
+        await page.goto(CONFIG.foundryUrl)
         await page.type("#key", password)
         await page.keyboard.press("Enter")
         await page.waitForNavigation()
@@ -61,6 +60,7 @@ export class GamePage extends FoundryPage {
             // Migration probably already ran
             return Promise.resolve(this)
         }
+        console.debug("Starting migration")
         // Start a migration
         await Promise.all(
             [this.page.click("button >> text=Begin Migration"),
@@ -72,6 +72,7 @@ export class GamePage extends FoundryPage {
              this.page.click("button >> text=Close"),
              this.page.waitForNavigation()]
         )
+        console.debug("Migration finished")
         return Promise.resolve(this)
     }
 
@@ -164,23 +165,24 @@ export class LoginPage extends FoundryPage {
 
 /** Find out which page is currently active */
 export async function detectPage(): Promise<FoundryPage|Error> {
+    console.log("Detecting current page")
     await Promise.all([
-        page.goto('http://localhost:30000/'),
+        page.goto(CONFIG.foundryUrl),
         page.waitForNavigation()
     ])
     console.log("Waited")
     let url = page.url()
     var currentPage;
     switch(url) {
-            case BASEURL + LoginPage.subpath: {
+            case CONFIG.foundryUrl + LoginPage.subpath: {
                 currentPage = new LoginPage(page)
                 break
             }
-            case BASEURL + GamePage.subpath: {
+            case CONFIG.foundryUrl + GamePage.subpath: {
                 currentPage = new GamePage(page)
                 break
             }
-            case BASEURL + SetupPage.subpath: {
+            case CONFIG.foundryUrl + SetupPage.subpath: {
                 let isLogin = await PreSetupPage.isLogin()
                 if (isLogin) {
                     currentPage = new PreSetupPage(page)
