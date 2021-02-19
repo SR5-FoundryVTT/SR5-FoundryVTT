@@ -38,6 +38,7 @@ describe('FoundryVTT', () => {
                     let actor = await page.evaluate(() => {
                         return game.actors.find(a => a.name == "Test Actor")
                     })
+                    if (actor === null) { throw new Error("Actor not created") }
                     expect(actor.name).toBe("Test Actor")
                 case Error: {
                     throw new Error("Wrong page")
