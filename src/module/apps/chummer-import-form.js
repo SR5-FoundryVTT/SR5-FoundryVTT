@@ -1,4 +1,5 @@
 import {_mergeWithMissingSkillFields} from "../actor/prep/functions/SkillsPrep";
+import {GearImporter} from "./chummer-import/GearImporter";
 
 export class ChummerImportForm extends FormApplication {
     static get defaultOptions() {
@@ -556,28 +557,9 @@ export class ChummerImportForm extends FormApplication {
                 // gear
                 if (equipment && c.gears && c.gears.gear) {
                     const gears = getArray(c.gears.gear);
-                    gears.forEach((g) => {
-                        try {
-                            const data = {};
-                            let { name } = g;
-                            if (g.extra) name += ` (${g.extra})`;
-                            data.technology = {
-                                rating: g.rating,
-                                quantity: g.qty,
-                            };
-                            data.description = {
-                                value: g.description,
-                            };
-                            const itemData = {
-                                name,
-                                type: 'equipment',
-                                data,
-                            };
-                            items.push(itemData);
-                        } catch (e) {
-                            console.error(e);
-                        }
-                    });
+                    const gearImporter = new GearImporter();
+                    const allGearData = gearImporter.parseAllGear(gears);
+                    Array.prototype.push.apply(items, allGearData)
                 }
                 // spells
                 if (spells && c.spells && c.spells.spell) {
