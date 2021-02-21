@@ -905,7 +905,7 @@ export class SR5Actor extends Actor {
         const att = duplicate(this.data.data.attributes[attId]);
         const atts = duplicate(this.data.data.attributes);
         const parts = new PartsList<number>();
-        parts.addUniquePart(att.label, att.value);
+        parts.addPart(att.label, att.value);
         let dialogData = {
             attribute: att,
             attributes: atts,
@@ -930,7 +930,7 @@ export class SR5Actor extends Actor {
                     if (att2Id !== 'none') {
                         att2 = atts[att2Id];
                         if (att2?.label) {
-                            parts.addUniquePart(att2.label, att2.value);
+                            parts.addPart(att2.label, att2.value);
                             const att2IdLabel = game.i18n.localize(CONFIG.SR5.attributes[att2Id]);
                             title += ` + ${att2IdLabel}`;
                         }

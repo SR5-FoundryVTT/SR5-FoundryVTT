@@ -587,7 +587,10 @@ export class SR5Item extends Item {
             if (skill.value === 0) {
                 parts.addUniquePart('SR5.Defaulting', -1);
             }
-        } else if (attribute2 && attribute2.label) parts.addUniquePart(attribute2.label, attribute2.value);
+        }
+        else if (attribute2 && attribute2.label) {
+            parts.addPart(attribute2.label, attribute2.value);
+        }
 
         const spec = this.getActionSpecialization();
         if (spec) parts.addUniquePart(spec, 2);

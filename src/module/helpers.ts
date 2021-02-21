@@ -25,7 +25,7 @@ export class Helpers {
      * @param data
      * @param options
      */
-    static calcTotal(data: ModifiableValue, options?): number {
+    static calcTotal(data: ModifiableValue, options?: CalcTotalOptions): number {
         if (data.mod === undefined) data.mod = [];
         const parts = new PartsList(data.mod);
         // if a temp field is found, add it as a unique part

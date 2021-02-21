@@ -23,8 +23,11 @@ export class AttributesPrep {
             const parts = new PartsList(attribute.mod);
 
             attribute.mod = parts.list;
-            Helpers.calcTotal(attribute);
-            // add labels
+            // Don't modify attribute below one.
+            // TODO: Use a SR5.Values.Attribute calculation to avoid duplication.
+            Helpers.calcTotal(attribute, {min: 1});
+
+            // add i18n labels.
             attribute.label = CONFIG.SR5.attributes[key];
         }
     }
