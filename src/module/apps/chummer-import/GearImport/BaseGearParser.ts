@@ -23,7 +23,12 @@ export class BaseGearParser implements GearParser {
 
         parsedGear.data.technology.rating = g.rating;
         parsedGear.data.technology.quantity = g.qty;
-        parsedGear.data.description = g.description;
+        parsedGear.data.description =
+        {
+            value: '',
+            chat: '',
+            source: `${g.source} ${g.page}`
+        };
 
         return parsedGear;
     }

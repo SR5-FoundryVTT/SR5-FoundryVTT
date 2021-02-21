@@ -1,5 +1,7 @@
 import {_mergeWithMissingSkillFields} from "../actor/prep/functions/SkillsPrep";
-import {GearImporter} from "./chummer-import/GearImporter";
+import {GearImporter} from "./chummer-import/GearImport/GearImporter";
+import {CharacterInfoImporter} from "./chummer-import/CharacterInfoImporter";
+import {parseAttName} from "./chummer-import/CommonParsers";
 
 export class ChummerImportForm extends FormApplication {
     static get defaultOptions() {
@@ -29,47 +31,8 @@ export class ChummerImportForm extends FormApplication {
             const powers = $('.powers').is(':checked');
             const spells = $('.spells').is(':checked');
 
+            console.log('Importing the following character file:');
             console.log(chummerfile);
-
-            /**
-             *  Maps the chummer attribute name to our sr5-foundry attribute name
-             *  @param attName name of the chummer attribute
-             */
-            const parseAttName = (attName) => {
-                if (attName.toLowerCase() === 'bod') {
-                    return 'body';
-                }
-                if (attName.toLowerCase() === 'agi') {
-                    return 'agility';
-                }
-                if (attName.toLowerCase() === 'rea') {
-                    return 'reaction';
-                }
-                if (attName.toLowerCase() === 'str') {
-                    return 'strength';
-                }
-                if (attName.toLowerCase() === 'cha') {
-                    return 'charisma';
-                }
-                if (attName.toLowerCase() === 'int') {
-                    return 'intuition';
-                }
-                if (attName.toLowerCase() === 'log') {
-                    return 'logic';
-                }
-                if (attName.toLowerCase() === 'wil') {
-                    return 'willpower';
-                }
-                if (attName.toLowerCase() === 'edg') {
-                    return 'edge';
-                }
-                if (attName.toLowerCase() === 'mag') {
-                    return 'magic';
-                }
-                if (attName.toLowerCase() === 'res') {
-                    return 'resonance';
-                }
-            };
 
             /**
              *  Converts the chummer attribute value to our sr5-foundry attribute value
@@ -84,6 +47,22 @@ export class ChummerImportForm extends FormApplication {
                 else {
                     return parseInt(att.total);
                 }
+            }
+
+            /**
+             *  Creates the item description object from the chummer entry
+             *  @param entry The chummer entry (the item, the quality..)
+             */
+            const parseDescription = (entry) => {
+                const parsedDescription = {
+                    source: `${entry.source} ${entry.page}`
+                };
+
+                if (entry.description) {
+                    parsedDescription.value = TextEditor.enrichHTML(q.description);
+                }
+
+                return parsedDescription
             }
 
             const parseDamage = (val) => {
@@ -121,82 +100,13 @@ export class ChummerImportForm extends FormApplication {
             const updateData = duplicate(this.object.data);
             const update = updateData.data;
             const items = [];
-            let error = '';
+
             // character info stuff, also techno/magic and essence
             if (chummerfile.characters && chummerfile.characters.character) {
                 const c = chummerfile.characters.character;
-                try {
-                    if (c.playername) {
-                        update.player_name = c.playername;
-                    }
-                    if (c.alias) {
-                        update.name = c.alias;
-                        updateData.name = c.alias;
-                    }
-                    if (c.metatype) {
-                        update.metatype = c.metatype;
-                    }
-                    if (c.sex) {
-                        update.sex = c.sex;
-                    }
-                    if (c.age) {
-                        update.age = c.age;
-                    }
-                    if (c.height) {
-                        update.height = c.height;
-                    }
-                    if (c.weight) {
-                        update.weight = c.weight;
-                    }
-                    if (c.calculatedstreetcred) {
-                        update.street_cred = c.calculatedstreetcred;
-                    }
-                    if (c.calculatednotoriety) {
-                        update.notoriety = c.calculatednotoriety;
-                    }
-                    if (c.calculatedpublicawareness) {
-                        update.public_awareness = c.calculatedpublicawareness;
-                    }
-                    if (c.karma) {
-                        update.karma.value = c.karma;
-                    }
-                    if (c.totalkarma) {
-                        update.karma.max = c.totalkarma;
-                    }
-                    if (c.technomancer && c.technomancer.toLowerCase() === 'true') {
-                        update.special = 'resonance';
-                    }
-                    if (
-                        (c.magician && c.magician.toLowerCase() === 'true') ||
-                        (c.adept && c.adept.toLowerCase() === 'true')
-                    ) {
-                        update.special = 'magic';
-                        let attr = [];
-                        if (
-                            c.tradition &&
-                            c.tradition.drainattribute &&
-                            c.tradition.drainattribute.attr
-                        ) {
-                            attr = c.tradition.drainattribute.attr;
-                        } else if (c.tradition && c.tradition.drainattributes) {
-                            attr = c.tradition.drainattributes
-                                .split('+')
-                                .map((item) => item.trim());
-                        }
-                        attr.forEach((att) => {
-                            attName = parseAttName(att);
-                            if (attName !== 'willpower') update.magic.attribute = att;
-                        });
-                    }
-                    if (c.totaless) {
-                        update.attributes.essence.value = c.totaless;
-                    }
-                    if (c.nuyen) {
-                        update.nuyen = parseInt(c.nuyen.replace(',', ''));
-                    }
-                } catch (e) {
-                    error += `Error with character info: ${e}. `;
-                }
+
+                new CharacterInfoImporter().import(updateData, c);
+
                 // update attributes
                 const atts = chummerfile.characters.character.attributes[1].attribute;
                 atts.forEach((att) => {
@@ -207,20 +117,18 @@ export class ChummerImportForm extends FormApplication {
                         }
                             
                     } catch (e) {
-                        error += `Error with attributes: ${e}. `;
+                        console.error(`Error while parsing attributes ${e}`);
                     }
                 });
-                // initiative stuff
+
+                // Meatspace and AR-matrix initiative
                 try {
-                    if (c.initbonus) {
-                        // not sure if this one is correct
-                        update.mods.initiative = c.initbonus;
-                    }
-                    if (c.initdice) {
-                        update.mods.initiative_dice = c.initdice - 1;
-                    }
+                    update.modifiers.meat_initiative = c.initbonus;
+
+                    // 'initdice' contains the total amount of initiative dice, not just the bonus.
+                    update.modifiers.meat_initiative_dice = c.initdice -1;
                 } catch (e) {
-                    error += `Error with initiative: ${e}. `;
+                    console.error(`Error while parsing initiative ${e}`);
                 }
                 // skills...
                 const skills = c.skills.skill;
@@ -296,10 +204,7 @@ export class ChummerImportForm extends FormApplication {
                         try {
                             const data = {};
                             data.type = q.qualitytype.toLowerCase();
-                            if (q.description)
-                                data.description = {
-                                    value: TextEditor.enrichHTML(q.description),
-                                };
+                            data.description = parseDescription(q);
 
                             const itemData = {
                                 name: q.name,
@@ -323,11 +228,7 @@ export class ChummerImportForm extends FormApplication {
                             action.damage = damage;
                             data.action = action;
 
-                            if (w.description) {
-                                data.description = {
-                                    value: TextEditor.enrichHTML(w.description),
-                                };
-                            }
+                            data.description = parseDescription(w);
 
                             damage.ap = {
                                 base: parseInt(getValues(w.ap)[0]),
@@ -493,9 +394,7 @@ export class ChummerImportForm extends FormApplication {
                                     equipped: true,
                                 };
                             }
-                            data.description = {
-                                value: TextEditor.enrichHTML(desc),
-                            };
+                            data.description = parseDescription(a);
 
                             const itemData = {
                                 name: a.name,
@@ -514,10 +413,10 @@ export class ChummerImportForm extends FormApplication {
                     cyberwares.forEach((cy) => {
                         try {
                             const data = {};
-                            data.description = {
-                                rating: cy.rating,
-                                value: cy.description,
-                            };
+                            data.description = parseDescription(cy);
+                            data.description.rating = cy.rating; 
+                            data.description.value = cy.description;
+
                             data.technology = {
                                 equipped: true,
                             };
@@ -539,10 +438,8 @@ export class ChummerImportForm extends FormApplication {
                     const powers = getArray(c.powers.power);
                     powers.forEach((p) => {
                         const data = {};
-                        if (p.description)
-                            data.description = {
-                                value: TextEditor.enrichHTML(p.description),
-                            };
+                        data.description = parseDescription(p);
+
                         data.level = parseInt(p.rating);
                         p.pp = parseInt(p.totalpoints);
 
@@ -582,10 +479,11 @@ export class ChummerImportForm extends FormApplication {
                                               .replace('(', '')
                                               .replace(')', '');
                                 data.drain = parseInt(s.dv.replace('F', ''));
+                                data.description = parseDescription(s);
+
                                 let description = '';
                                 if (s.descriptors) description = s.descriptors;
                                 if (s.description) description += `\n${s.description}`;
-                                data.description = {};
                                 data.description.value = TextEditor.enrichHTML(description);
 
                                 if (s.duration.toLowerCase() === 's') data.duration = 'sustained';
