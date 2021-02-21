@@ -25341,7 +25341,7 @@ class SR5Item extends Item {
     }
     get hasRoll() {
         const action = this.getAction();
-        return !!(action && action.type !== '' && (action.skill || action.attribute));
+        return !!(action && action.type !== '' && (action.skill || action.attribute || action.attribute2 || action.dice_pool_mod));
     }
     get hasTemplate() {
         return this.isAreaOfEffect();
@@ -25718,6 +25718,7 @@ class SR5Item extends Item {
         });
     }
     getRollPartsList() {
+        console.error('getRollPartsList');
         // we only have a roll if we have an action or an actor
         const action = this.getAction();
         if (!action || !this.actor)
