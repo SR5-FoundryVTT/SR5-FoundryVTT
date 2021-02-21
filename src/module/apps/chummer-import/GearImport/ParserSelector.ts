@@ -1,5 +1,5 @@
 import { GearParser, BaseGearParser } from "./BaseGearParser";
-import { SinParser } from "./sinparser";
+import { SinParser } from "./SinParser";
 import { DeviceParser } from "./DeviceParser";
 import { ProgramParser } from "./ProgramParser";
 
@@ -12,7 +12,7 @@ export class ParserSelector {
      * Selects the correct GearParser depending on the gear.
      * @param gearEntry The gear that needs to be parsed
      * The correct GearParser for this gear entry.
-     */ 
+     */
     select(gearEntry : any) : GearParser {
         if (gearEntry.issin === 'True')
         {
@@ -24,8 +24,8 @@ export class ParserSelector {
             return new DeviceParser();
         }
 
-        if (gearEntry.category === 'Common Programs' || 
-            gearEntry.category === 'Hacking Programs' || 
+        if (gearEntry.category === 'Common Programs' ||
+            gearEntry.category === 'Hacking Programs' ||
             gearEntry.category === 'Software')
         {
             return new ProgramParser();
