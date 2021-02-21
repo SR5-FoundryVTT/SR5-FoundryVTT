@@ -3,18 +3,18 @@ import { ParserSelector } from "./ParserSelector";
 /**
  * Parses all gear from a chummer character file and turns them into foundry sr item data objects
  */
-export class GearImporter {
+export class GearsParser {
 
     /**
      * Parses all chummer gear entries
-     * @param gears Array of chummer gear entries
+     * @param chummerGears Array of chummer gear entries
      */
-    parseAllGear(gears : any) : any {
+    parseAllGear(chummerGears : any) : any {
         let items : any[] = [];
 
-        gears.forEach((g) => {
+        chummerGears.forEach((chummerGear) => {
             try {
-                const itemsData = this.parseGearEntry(g);
+                const itemsData = this.parseGearEntry(chummerGear);
                 items.push(itemsData);
             }
 
@@ -26,9 +26,9 @@ export class GearImporter {
         return items;
     }
 
-    private parseGearEntry(g : any) : any {
+    private parseGearEntry(chummerGear : any) : any {
         const parserSelector = new ParserSelector();
-        const parser = parserSelector.select(g);
-        return parser.parse(g);
+        const parser = parserSelector.select(chummerGear);
+        return parser.parse(chummerGear);
     }
 }

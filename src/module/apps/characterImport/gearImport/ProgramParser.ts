@@ -4,19 +4,19 @@ import { BaseGearParser } from "./BaseGearParser"
  * Parses common, hacking and agent programs.
  */
 export class ProgramParser extends BaseGearParser {
-    parse(gearEntry : any) : any {
-        const parsedGear =  super.parse(gearEntry);
+    parse(chummerGear : any) : any {
+        const parsedGear =  super.parse(chummerGear);
         parsedGear.type = 'program';
 
-        if (gearEntry.category === 'Common Programs')
+        if (chummerGear.category === 'Common Programs')
         {
             parsedGear.data.type = 'common_program'
         }
-        else if (gearEntry.category === 'Hacking Programs')
+        else if (chummerGear.category === 'Hacking Programs')
         {
             parsedGear.data.type = 'hacking_program'
         } 
-        else if (gearEntry.category === 'Software')
+        else if (chummerGear.category === 'Software')
         {
             parsedGear.data.type = 'agent'
         }
