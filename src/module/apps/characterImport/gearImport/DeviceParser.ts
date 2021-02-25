@@ -5,54 +5,54 @@ import { BaseGearParser } from "./BaseGearParser"
  */
 export class DeviceParser extends BaseGearParser {
    
-    parse(gearEntry : any) : any {
-        const parsedGear =  super.parse(gearEntry);
+    parse(chummerGear : any) : any {
+        const parsedGear =  super.parse(chummerGear);
         parsedGear.type = 'device';
-        parsedGear.data.technology.rating = gearEntry.devicerating;
+        parsedGear.data.technology.rating = chummerGear.devicerating;
         parsedGear.data.technology.condition_monitor = 
         {
             value: 0,
-            max: Number(gearEntry.conditionmonitor),
+            max: Number(chummerGear.conditionmonitor),
             label: ''
         };
 
         parsedGear.data.atts = {
             att1:
             {
-                value: gearEntry.attack,
+                value: chummerGear.attack,
                 att: 'attack'
             },
 
             att2:
             {
-                value: gearEntry.sleaze,
+                value: chummerGear.sleaze,
                 att: 'sleaze'
             },
 
             att3:
             {
-                value: gearEntry.dataprocessing,
+                value: chummerGear.dataprocessing,
                 att: 'data_processing'
             },
 
             att4:
             {
-                value: gearEntry.firewall,
+                value: chummerGear.firewall,
                 att: 'firewall'
             } 
         };
 
-        if (gearEntry.category === 'Cyberdecks')
+        if (chummerGear.category === 'Cyberdecks')
         {
             parsedGear.data.category = 'cyberdeck';
         }
 
-        if (gearEntry.category === 'Commlinks')
+        if (chummerGear.category === 'Commlinks')
         {
             parsedGear.data.category = 'commlink';
         }
 
-        if (gearEntry.category === 'Rigger Command Consoles')
+        if (chummerGear.category === 'Rigger Command Consoles')
         {
             // We are handling rccs as commlinks for the moment since we have no support for rigger command consoles yet.
             parsedGear.data.category = 'commlink'; 

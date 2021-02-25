@@ -14581,8 +14581,7 @@ class SR5Actor extends Actor {
     }
 }
 exports.SR5Actor = SR5Actor;
-
-},{"../apps/dialogs/ShadowrunActorDialogs":118,"../chat":126,"../constants":129,"../helpers":138,"../parts/PartsList":189,"../rolls/ShadowrunRoller":190,"./prep/ActorPrepFactory":87}],86:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunActorDialogs":119,"../chat":127,"../constants":130,"../helpers":139,"../parts/PartsList":190,"../rolls/ShadowrunRoller":191,"./prep/ActorPrepFactory":87}],86:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -15504,8 +15503,7 @@ class SR5ActorSheet extends ActorSheet {
     }
 }
 exports.SR5ActorSheet = SR5ActorSheet;
-
-},{"../apps/chummer-import-form":106,"../apps/skills/KnowledgeSkillEditForm":122,"../apps/skills/LanguageSkillEditForm":123,"../apps/skills/SkillEditForm":124,"../config":128,"../helpers":138}],87:[function(require,module,exports){
+},{"../apps/chummer-import-form":115,"../apps/skills/KnowledgeSkillEditForm":123,"../apps/skills/LanguageSkillEditForm":124,"../apps/skills/SkillEditForm":125,"../config":129,"../helpers":139}],87:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ActorPrepFactory = void 0;
@@ -15534,7 +15532,6 @@ class ActorPrepFactory {
     }
 }
 exports.ActorPrepFactory = ActorPrepFactory;
-
 },{"./CharacterPrep":89,"./CritterPrep":90,"./SpiritPrep":91,"./SpritePrep":92,"./VehiclePrep":93}],88:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -15549,8 +15546,7 @@ class BaseActorPrep {
     }
 }
 exports.BaseActorPrep = BaseActorPrep;
-
-},{"../../item/SR5ItemDataWrapper":179}],89:[function(require,module,exports){
+},{"../../item/SR5ItemDataWrapper":180}],89:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CharacterPrep = void 0;
@@ -15596,7 +15592,6 @@ class CharacterPrep extends BaseActorPrep_1.BaseActorPrep {
     }
 }
 exports.CharacterPrep = CharacterPrep;
-
 },{"./BaseActorPrep":88,"./functions/AttributesPrep":94,"./functions/ConditionMonitorsPrep":95,"./functions/InitiativePrep":96,"./functions/ItemPrep":97,"./functions/LimitsPrep":98,"./functions/MatrixPrep":99,"./functions/ModifiersPrep":100,"./functions/MovementPrep":101,"./functions/NPCPrep":102,"./functions/SkillsPrep":103,"./functions/WoundsPrep":104}],90:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -15645,7 +15640,6 @@ class CritterPrep extends BaseActorPrep_1.BaseActorPrep {
     }
 }
 exports.CritterPrep = CritterPrep;
-
 },{"./BaseActorPrep":88,"./functions/AttributesPrep":94,"./functions/InitiativePrep":96,"./functions/ItemPrep":97,"./functions/LimitsPrep":98,"./functions/MatrixPrep":99,"./functions/ModifiersPrep":100,"./functions/MovementPrep":101,"./functions/SkillsPrep":103,"./functions/WoundsPrep":104}],91:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -15965,8 +15959,7 @@ class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
     }
 }
 exports.SpiritPrep = SpiritPrep;
-
-},{"../../helpers":138,"../../parts/PartsList":189,"./BaseActorPrep":88,"./functions/AttributesPrep":94,"./functions/ConditionMonitorsPrep":95,"./functions/InitiativePrep":96,"./functions/LimitsPrep":98,"./functions/ModifiersPrep":100,"./functions/MovementPrep":101,"./functions/SkillsPrep":103,"./functions/WoundsPrep":104}],92:[function(require,module,exports){
+},{"../../helpers":139,"../../parts/PartsList":190,"./BaseActorPrep":88,"./functions/AttributesPrep":94,"./functions/ConditionMonitorsPrep":95,"./functions/InitiativePrep":96,"./functions/LimitsPrep":98,"./functions/ModifiersPrep":100,"./functions/MovementPrep":101,"./functions/SkillsPrep":103,"./functions/WoundsPrep":104}],92:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpritePrep = void 0;
@@ -16091,8 +16084,7 @@ class SpritePrep extends BaseActorPrep_1.BaseActorPrep {
     }
 }
 exports.SpritePrep = SpritePrep;
-
-},{"../../helpers":138,"../../parts/PartsList":189,"./BaseActorPrep":88,"./functions/AttributesPrep":94,"./functions/InitiativePrep":96,"./functions/LimitsPrep":98,"./functions/MatrixPrep":99,"./functions/ModifiersPrep":100,"./functions/SkillsPrep":103}],93:[function(require,module,exports){
+},{"../../helpers":139,"../../parts/PartsList":190,"./BaseActorPrep":88,"./functions/AttributesPrep":94,"./functions/InitiativePrep":96,"./functions/LimitsPrep":98,"./functions/MatrixPrep":99,"./functions/ModifiersPrep":100,"./functions/SkillsPrep":103}],93:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VehiclePrep = void 0;
@@ -16210,8 +16202,7 @@ class VehiclePrep extends BaseActorPrep_1.BaseActorPrep {
     }
 }
 exports.VehiclePrep = VehiclePrep;
-
-},{"../../helpers":138,"../../parts/PartsList":189,"./BaseActorPrep":88,"./functions/AttributesPrep":94,"./functions/InitiativePrep":96,"./functions/LimitsPrep":98,"./functions/MatrixPrep":99,"./functions/ModifiersPrep":100,"./functions/SkillsPrep":103}],94:[function(require,module,exports){
+},{"../../helpers":139,"../../parts/PartsList":190,"./BaseActorPrep":88,"./functions/AttributesPrep":94,"./functions/InitiativePrep":96,"./functions/LimitsPrep":98,"./functions/MatrixPrep":99,"./functions/ModifiersPrep":100,"./functions/SkillsPrep":103}],94:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AttributesPrep = void 0;
@@ -16245,8 +16236,7 @@ class AttributesPrep {
     }
 }
 exports.AttributesPrep = AttributesPrep;
-
-},{"../../../helpers":138,"../../../parts/PartsList":189}],95:[function(require,module,exports){
+},{"../../../helpers":139,"../../../parts/PartsList":190}],95:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConditionMonitorsPrep = void 0;
@@ -16283,7 +16273,6 @@ class ConditionMonitorsPrep {
     }
 }
 exports.ConditionMonitorsPrep = ConditionMonitorsPrep;
-
 },{}],96:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -16333,8 +16322,7 @@ class InitiativePrep {
     }
 }
 exports.InitiativePrep = InitiativePrep;
-
-},{"../../../helpers":138,"../../../parts/PartsList":189}],97:[function(require,module,exports){
+},{"../../../helpers":139,"../../../parts/PartsList":190}],97:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemPrep = void 0;
@@ -16404,8 +16392,7 @@ class ItemPrep {
     }
 }
 exports.ItemPrep = ItemPrep;
-
-},{"../../../helpers":138,"../../../parts/PartsList":189}],98:[function(require,module,exports){
+},{"../../../helpers":139,"../../../parts/PartsList":190}],98:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LimitsPrep = void 0;
@@ -16432,8 +16419,7 @@ class LimitsPrep {
     }
 }
 exports.LimitsPrep = LimitsPrep;
-
-},{"../../../helpers":138,"../../../parts/PartsList":189}],99:[function(require,module,exports){
+},{"../../../helpers":139,"../../../parts/PartsList":190}],99:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatrixPrep = void 0;
@@ -16552,8 +16538,7 @@ class MatrixPrep {
     }
 }
 exports.MatrixPrep = MatrixPrep;
-
-},{"../../../helpers":138,"../../../parts/PartsList":189}],100:[function(require,module,exports){
+},{"../../../helpers":139,"../../../parts/PartsList":190}],100:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ModifiersPrep = void 0;
@@ -16607,7 +16592,6 @@ class ModifiersPrep {
     }
 }
 exports.ModifiersPrep = ModifiersPrep;
-
 },{}],101:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -16622,7 +16606,6 @@ class MovementPrep {
     }
 }
 exports.MovementPrep = MovementPrep;
-
 },{}],102:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -16672,8 +16655,7 @@ class NPCPrep {
     }
 }
 exports.NPCPrep = NPCPrep;
-
-},{"../../../constants":129,"../../../dataTemplates":130,"../../../helpers":138,"../../../parts/PartsList":189}],103:[function(require,module,exports){
+},{"../../../constants":130,"../../../dataTemplates":131,"../../../helpers":139,"../../../parts/PartsList":190}],103:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports._mergeWithMissingSkillFields = exports.SkillsPrep = void 0;
@@ -16762,8 +16744,7 @@ exports._mergeWithMissingSkillFields = (givenSkill) => {
     // overwrite false to prohibit existing values to be overwritten with empty values.
     mergeObject(givenSkill, template, { overwrite: false });
 };
-
-},{"../../../helpers":138,"../../../parts/PartsList":189}],104:[function(require,module,exports){
+},{"../../../helpers":139,"../../../parts/PartsList":190}],104:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WoundsPrep = void 0;
@@ -16781,7 +16762,6 @@ class WoundsPrep {
     }
 }
 exports.WoundsPrep = WoundsPrep;
-
 },{}],105:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -16815,8 +16795,7 @@ class ChangelogApplication extends Application {
     }
 }
 exports.ChangelogApplication = ChangelogApplication;
-
-},{"../constants":129}],106:[function(require,module,exports){
+},{"../constants":130}],106:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -16824,7 +16803,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.ChummerImportForm = void 0;
+exports.CharacterImporter = void 0;
 
 var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
 
@@ -16834,665 +16813,79 @@ var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/cl
 
 var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
 
-var _get2 = _interopRequireDefault(require("@babel/runtime/helpers/get"));
+var _CharacterInfoUpdater = require("./CharacterInfoUpdater");
 
-var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+var _ItemsParser = require("./ItemsParser");
 
-var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
-
-var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
-
-var _SkillsPrep = require("../actor/prep/functions/SkillsPrep");
-
-var _GearImporter = require("./chummer-import/GearImport/GearImporter");
-
-var _CharacterInfoImporter = require("./chummer-import/CharacterInfoImporter");
-
-var _CommonParsers = require("./chummer-import/CommonParsers");
-
-function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
-
-function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
-
-var ChummerImportForm = /*#__PURE__*/function (_FormApplication) {
-  (0, _inherits2["default"])(ChummerImportForm, _FormApplication);
-
-  var _super = _createSuper(ChummerImportForm);
-
-  function ChummerImportForm() {
-    (0, _classCallCheck2["default"])(this, ChummerImportForm);
-    return _super.apply(this, arguments);
+/**
+ * Imports characters from other tools into an existing foundry actor.
+ */
+var CharacterImporter = /*#__PURE__*/function () {
+  function CharacterImporter() {
+    (0, _classCallCheck2["default"])(this, CharacterImporter);
   }
 
-  (0, _createClass2["default"])(ChummerImportForm, [{
-    key: "getData",
-    value: function getData() {
-      return {};
-    }
-  }, {
-    key: "activateListeners",
-    value: function activateListeners(html) {
-      var _this = this;
-
-      html.find('.submit-chummer-import').click( /*#__PURE__*/function () {
-        var _ref = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(event) {
-          var chummerfile, weapons, armor, cyberware, equipment, qualities, powers, spells, parseAttBaseValue, parseDescription, parseDamage, getValues, getArray, updateData, update, items, c, atts, skills, i, s, group, skill, id, category, skillCategory, cat, name, _qualities, _weapons, armors, cyberwares, _powers, gears, gearImporter, allGearData, _spells;
-
-          return _regenerator["default"].wrap(function _callee$(_context) {
-            while (1) {
-              switch (_context.prev = _context.next) {
-                case 0:
-                  event.preventDefault();
-                  chummerfile = JSON.parse($('.chummer-text').val());
-                  weapons = $('.weapons').is(':checked');
-                  armor = $('.armor').is(':checked');
-                  cyberware = $('.cyberware').is(':checked');
-                  equipment = $('.gear').is(':checked');
-                  qualities = $('.qualities').is(':checked');
-                  powers = $('.powers').is(':checked');
-                  spells = $('.spells').is(':checked');
-                  console.log('Importing the following character file:');
-                  console.log(chummerfile);
-                  /**
-                   *  Converts the chummer attribute value to our sr5-foundry attribute value
-                   *  @param att the chummer attribute
-                   */
-
-                  parseAttBaseValue = function parseAttBaseValue(att) {
-                    if (att.name.toLowerCase() === 'edg') {
-                      // The edge attribute value is stored in the "base" field instead of the total field
-                      // In chummer, the "total" field is used for the amount of edge remaining to a character
-                      return parseInt(att.base);
-                    } else {
-                      return parseInt(att.total);
-                    }
-                  };
-                  /**
-                   *  Creates the item description object from the chummer entry
-                   *  @param entry The chummer entry (the item, the quality..)
-                   */
-
-
-                  parseDescription = function parseDescription(entry) {
-                    var parsedDescription = {
-                      source: "".concat(entry.source, " ").concat(entry.page)
-                    };
-
-                    if (entry.description) {
-                      parsedDescription.value = TextEditor.enrichHTML(q.description);
-                    }
-
-                    return parsedDescription;
-                  };
-
-                  parseDamage = function parseDamage(val) {
-                    var damage = {
-                      damage: 0,
-                      type: 'physical',
-                      radius: 0,
-                      dropoff: 0
-                    };
-                    var split = val.split(',');
-
-                    if (split.length > 0) {
-                      var l = split[0].match(/(\d+)(\w+)/);
-                      if (l && l[1]) damage.damage = parseInt(l[1]);
-                      if (l && l[2]) damage.type = l[2] === 'P' ? 'physical' : 'stun';
-                    }
-
-                    for (var i = 1; i < split.length; i++) {
-                      var _l = split[i].match(/(-?\d+)(.*)/);
-
-                      if (_l && _l[2]) {
-                        if (_l[2].toLowerCase().includes('/m')) damage.dropoff = parseInt(_l[1]);else damage.radius = parseInt(_l[1]);
-                      }
-                    }
-
-                    return damage;
-                  };
-
-                  getValues = function getValues(val) {
-                    var regex = /(-?[0-9]+)(?:([0-9]+))*/g;
-                    var l = val.match(regex);
-                    return l || ['0'];
-                  };
-
-                  getArray = function getArray(value) {
-                    return Array.isArray(value) ? value : [value];
-                  };
-
-                  updateData = duplicate(_this.object.data);
-                  update = updateData.data;
-                  items = []; // character info stuff, also techno/magic and essence
-
-                  if (chummerfile.characters && chummerfile.characters.character) {
-                    c = chummerfile.characters.character;
-                    new _CharacterInfoImporter.CharacterInfoImporter()["import"](updateData, c); // update attributes
-
-                    atts = chummerfile.characters.character.attributes[1].attribute;
-                    atts.forEach(function (att) {
-                      try {
-                        var attName = (0, _CommonParsers.parseAttName)(att.name);
-
-                        if (attName) {
-                          update.attributes[attName].base = parseAttBaseValue(att);
-                        }
-                      } catch (e) {
-                        console.error("Error while parsing attributes ".concat(e));
-                      }
-                    }); // Meatspace and AR-matrix initiative
-
-                    try {
-                      update.modifiers.meat_initiative = c.initbonus; // 'initdice' contains the total amount of initiative dice, not just the bonus.
-
-                      update.modifiers.meat_initiative_dice = c.initdice - 1;
-                    } catch (e) {
-                      console.error("Error while parsing initiative ".concat(e));
-                    } // skills...
-
-
-                    skills = c.skills.skill;
-
-                    for (i = 0; i < skills.length; i++) {
-                      try {
-                        s = skills[i];
-
-                        if (s.rating > 0 && s.islanguage) {
-                          group = 'active';
-                          skill = null;
-                          id = randomID(16);
-
-                          if (s.islanguage && s.islanguage.toLowerCase() === 'true') {
-                            skill = {};
-                            update.skills.language.value[id] = skill;
-                            group = 'language';
-                          } else if (s.knowledge && s.knowledge.toLowerCase() === 'true') {
-                            category = s.skillcategory_english;
-                            console.log(category);
-                            skill = {};
-                            skillCategory = void 0;
-
-                            if (category) {
-                              console.log('found category', category);
-                              cat = category.toLowerCase();
-                              if (cat === 'street') skillCategory = update.skills.knowledge.street.value;
-                              if (cat === 'academic') skillCategory = update.skills.knowledge.academic.value;
-                              if (cat === 'professional') skillCategory = update.skills.knowledge.professional.value;
-                              if (cat === 'interest') skillCategory = update.skills.knowledge.interests.value;
-                              if (skillCategory) skillCategory[id] = skill;
-                            } else {
-                              if (s.attribute.toLowerCase() === 'int') {
-                                update.skills.knowledge.street.value[id] = skill;
-                              }
-
-                              if (s.attribute.toLowerCase() === 'log') {
-                                update.skills.knowledge.professional.value[id] = skill;
-                              }
-                            }
-
-                            group = 'knowledge';
-                          } else {
-                            name = s.name.toLowerCase().trim().replace(/\s/g, '_').replace(/-/g, '_');
-                            if (name.includes('exotic') && name.includes('_weapon')) name = name.replace('_weapon', '');
-                            skill = update.skills.active[name];
-                          }
-
-                          if (!skill) console.error("Couldn't parse skill ".concat(s.name));
-
-                          if (skill) {
-                            if (group !== 'active') skill.name = s.name;
-                            skill.base = parseInt(s.rating);
-
-                            if (s.skillspecializations) {
-                              skill.specs = getArray(s.skillspecializations.skillspecialization.name);
-                            }
-
-                            skill = (0, _SkillsPrep._mergeWithMissingSkillFields)(skill);
-                          }
-                        }
-                      } catch (e) {
-                        console.error(e);
-                      }
-                    } // qualities
-
-
-                    if (qualities && c.qualities && c.qualities.quality) {
-                      _qualities = getArray(c.qualities.quality);
-
-                      _qualities.forEach(function (q) {
-                        try {
-                          var data = {};
-                          data.type = q.qualitytype.toLowerCase();
-                          data.description = parseDescription(q);
-                          var itemData = {
-                            name: q.name,
-                            type: 'quality',
-                            data: data
-                          };
-                          items.push(itemData);
-                        } catch (e) {
-                          console.error(e);
-                        }
-                      });
-                    } // weapons
-
-
-                    if (weapons && c.weapons != null && c.weapons.weapon != null) {
-                      _weapons = getArray(c.weapons.weapon);
-
-                      _weapons.forEach(function (w) {
-                        try {
-                          var data = {};
-                          var action = {};
-                          var damage = {};
-                          action.damage = damage;
-                          data.action = action;
-                          data.description = parseDescription(w);
-                          damage.ap = {
-                            base: parseInt(getValues(w.ap)[0])
-                          };
-                          action.type = 'varies';
-                          if (w.skill) action.skill = w.skill.toLowerCase().replace(/\s/g, '_');else if (w.category && w.category.toLowerCase().includes('exotic')) action.skill = w.category.toLowerCase().replace(' weapons', '').replace(/\s/g, '_');
-                          if (action.skill.includes('exotic')) action.skill = action.skill.replace('_weapon', '');
-                          action.attribute = 'agility';
-                          action.limit = {
-                            base: parseInt(getValues(w.accuracy)[0])
-                          };
-                          action.opposed = {
-                            type: 'defense'
-                          };
-
-                          if (w.type.toLowerCase() === 'melee') {
-                            action.type = 'complex';
-                            data.category = 'melee';
-                            var melee = {};
-                            data.melee = melee;
-                            melee.reach = parseInt(w.reach);
-                          } else if (w.type.toLowerCase() === 'ranged') {
-                            data.category = 'range';
-
-                            if (w.skill.toLowerCase().includes('throw')) {
-                              data.category = 'thrown'; // TODO clean this up
-                            }
-
-                            var range = {};
-                            data.range = range;
-                            range.rc = {
-                              base: parseInt(getValues(w.rc)[0])
-                            };
-
-                            if (w.mode) {
-                              // HeroLab export doesn't have mode
-                              var lower = w.mode.toLowerCase();
-                              range.modes = {
-                                single_shot: lower.includes('ss'),
-                                semi_auto: lower.includes('sa'),
-                                burst_fire: lower.includes('bf'),
-                                full_auto: lower.includes('fa')
-                              };
-                            }
-
-                            if (w.clips != null && w.clips.clip != null) {
-                              // HeroLab export doesn't have clips
-                              var clips = Array.isArray(w.clips.clip) ? w.clips.clip : [w.clips.clip];
-                              clips.forEach(function (clip) {
-                                console.log(clip);
-                              });
-                            }
-
-                            if (w.ranges && w.ranges["short"] && w.ranges.medium && w.ranges["long"] && w.ranges.extreme) {
-                              console.log(w.ranges);
-                              range.ranges = {
-                                "short": parseInt(w.ranges["short"].split('-')[1]),
-                                medium: parseInt(w.ranges.medium.split('-')[1]),
-                                "long": parseInt(w.ranges["long"].split('-')[1]),
-                                extreme: parseInt(w.ranges.extreme.split('-')[1])
-                              };
-                            } // TODO figure out how to add mods to weapons
-                            // if (w.accessories && w.accessories.accessory) {
-                            //     range.mods = [];
-                            //     const accessories = getArray(w.accessories.accessory);
-                            //     accessories.forEach((a) => {
-                            //         if (a) {
-                            //             range.mods.push({
-                            //                 name: a.name,
-                            //             });
-                            //         }
-                            //     });
-                            // }
-
-                          } else if (w.type.toLowerCase() === 'thrown') {
-                            data.category = 'thrown';
-                          }
-
-                          {
-                            // TODO handle raw damage if present
-                            var d = parseDamage(w.damage_english);
-                            damage.base = d.damage;
-                            damage.type = {};
-                            damage.type.base = d.type;
-
-                            if (d.dropoff || d.radius) {
-                              var thrown = {};
-                              data.thrown = thrown;
-                              thrown.blast = {
-                                radius: d.radius,
-                                dropoff: d.dropoff
-                              };
-                            }
-                          }
-                          var itemData = {
-                            name: w.name,
-                            type: 'weapon',
-                            data: data
-                          };
-                          items.push(itemData);
-                        } catch (e) {
-                          console.error(e);
-                        }
-                      });
-                    } // armors
-
-
-                    if (armor && c.armors && c.armors.armor) {
-                      armors = getArray(c.armors.armor);
-                      armors.forEach(function (a) {
-                        try {
-                          var data = {};
-                          var _armor = {};
-                          data.armor = _armor;
-                          var desc = '';
-                          _armor.mod = a.armor.includes('+');
-                          _armor.value = parseInt(a.armor.replace('+', ''));
-                          if (a.description) desc = a.description;
-                          console.log(a);
-
-                          if (a.armormods && a.armormods.armormod) {
-                            _armor.fire = 0;
-                            _armor.electricity = 0;
-                            _armor.cold = 0;
-                            _armor.acid = 0;
-                            _armor.radiation = 0;
-                            var modDesc = [];
-                            var mods = getArray(a.armormods.armormod);
-                            mods.forEach(function (mod) {
-                              if (mod.name.toLowerCase().includes('fire resistance')) {
-                                _armor.fire += parseInt(mod.rating);
-                              } else if (mod.name.toLowerCase().includes('nonconductivity')) {
-                                _armor.electricity += parseInt(mod.rating);
-                              } else if (mod.name.toLowerCase().includes('insulation')) {
-                                _armor.cold += parseInt(mod.rating);
-                              } else if (mod.name.toLowerCase().includes('radiation shielding')) {
-                                _armor.radiation += parseInt(mod.rating);
-                              }
-
-                              if (mod.rating !== '') {
-                                modDesc.push("".concat(mod.name, " R").concat(mod.rating));
-                              } else {
-                                modDesc.push(mod.name);
-                              }
-                            });
-
-                            if (modDesc.length > 0) {
-                              // add desc to beginning
-                              desc = "".concat(modDesc.join(','), "\n\n").concat(desc);
-                            }
-                          }
-
-                          if (a.equipped.toLowerCase() === 'true') {
-                            data.technology = {
-                              equipped: true
-                            };
-                          }
-
-                          data.description = parseDescription(a);
-                          var itemData = {
-                            name: a.name,
-                            type: 'armor',
-                            data: data
-                          };
-                          items.push(itemData);
-                        } catch (e) {
-                          console.error(e);
-                        }
-                      });
-                    } // cyberware
-
-
-                    if (cyberware && c.cyberwares && c.cyberwares.cyberware) {
-                      cyberwares = getArray(c.cyberwares.cyberware);
-                      cyberwares.forEach(function (cy) {
-                        try {
-                          var data = {};
-                          data.description = parseDescription(cy);
-                          data.description.rating = cy.rating;
-                          data.description.value = cy.description;
-                          data.technology = {
-                            equipped: true
-                          };
-                          data.essence = cy.ess;
-                          data.grade = cy.grade;
-                          var itemData = {
-                            name: cy.name,
-                            type: 'cyberware',
-                            data: data
-                          };
-                          items.push(itemData);
-                        } catch (e) {
-                          console.error(e);
-                        }
-                      });
-                    } // powers
-
-
-                    if (powers && c.powers && c.powers.power) {
-                      _powers = getArray(c.powers.power);
-
-                      _powers.forEach(function (p) {
-                        var data = {};
-                        data.description = parseDescription(p);
-                        data.level = parseInt(p.rating);
-                        p.pp = parseInt(p.totalpoints);
-                        var itemData = {
-                          name: p.name,
-                          type: 'adept_power',
-                          data: data
-                        };
-                        items.push(itemData);
-                      });
-                    } // gear
-
-
-                    if (equipment && c.gears && c.gears.gear) {
-                      gears = getArray(c.gears.gear);
-                      gearImporter = new _GearImporter.GearImporter();
-                      allGearData = gearImporter.parseAllGear(gears);
-                      Array.prototype.push.apply(items, allGearData);
-                    } // spells
-
-
-                    if (spells && c.spells && c.spells.spell) {
-                      _spells = getArray(c.spells.spell);
-
-                      _spells.forEach(function (s) {
-                        try {
-                          if (s.alchemy.toLowerCase() !== 'true') {
-                            var action = {};
-                            var data = {};
-                            data.action = action;
-                            data.category = s.category.toLowerCase().replace(/\s/g, '_');
-                            data.name = s.name;
-                            data.type = s.type === 'M' ? 'mana' : 'physical';
-                            data.range = s.range === 'T' ? 'touch' : s.range.toLowerCase().replace(/\s/g, '_').replace('(', '').replace(')', '');
-                            data.drain = parseInt(s.dv.replace('F', ''));
-                            data.description = parseDescription(s);
-                            var description = '';
-                            if (s.descriptors) description = s.descriptors;
-                            if (s.description) description += "\n".concat(s.description);
-                            data.description.value = TextEditor.enrichHTML(description);
-                            if (s.duration.toLowerCase() === 's') data.duration = 'sustained';else if (s.duration.toLowerCase() === 'i') data.duration = 'instant';else if (s.duration.toLowerCase() === 'p') data.duration = 'permanent';
-                            action.type = 'varies';
-                            action.skill = 'spellcasting';
-                            action.attribute = 'magic';
-
-                            if (s.descriptors) {
-                              var desc = s.descriptors.toLowerCase();
-
-                              if (s.category.toLowerCase() === 'combat') {
-                                data.combat = {};
-
-                                if (desc.includes('direct')) {
-                                  data.combat.type = 'indirect';
-                                  action.opposed = {
-                                    type: 'defense'
-                                  };
-                                } else {
-                                  data.combat.type = 'direct';
-
-                                  if (data.type === 'mana') {
-                                    action.opposed = {
-                                      type: 'custom',
-                                      attribute: 'willpower'
-                                    };
-                                  } else if (data.type === 'physical') {
-                                    action.opposed = {
-                                      type: 'custom',
-                                      attribute: 'body'
-                                    };
-                                  }
-                                }
-                              }
-
-                              if (s.category.toLowerCase() === 'detection') {
-                                data.detection = {};
-                                var split = desc.split(',');
-                                split.forEach(function (token) {
-                                  token = token || '';
-                                  token = token.replace(' detection spell', '');
-                                  if (!token) return;
-                                  if (token.includes('area')) return;
-                                  if (token.includes('passive')) data.detection.passive = true;else if (token.includes('active')) data.detection.passive = false;else if (token) data.detection.type = token.toLowerCase();
-                                });
-
-                                if (!data.detection.passive) {
-                                  action.opposed = {
-                                    type: 'custom',
-                                    attribute: 'willpower',
-                                    attribute2: 'logic'
-                                  };
-                                }
-                              }
-
-                              if (s.category.toLowerCase() === 'illusion') {
-                                data.illusion = {};
-
-                                var _split = desc.split(',');
-
-                                _split.forEach(function (token) {
-                                  token = token || '';
-                                  token = token.replace(' illusion spell', '');
-                                  if (!token) return;
-                                  if (token.includes('area')) return;
-                                  if (token.includes('sense')) data.illusion.sense = token.toLowerCase();else if (token) data.illusion.type = token.toLowerCase();
-                                });
-
-                                if (data.type === 'mana') {
-                                  action.opposed = {
-                                    type: 'custom',
-                                    attribute: 'willpower',
-                                    attribute2: 'logic'
-                                  };
-                                } else {
-                                  action.opposed = {
-                                    type: 'custom',
-                                    attribute: 'intuition',
-                                    attribute2: 'logic'
-                                  };
-                                }
-                              }
-
-                              if (s.category.toLowerCase() === 'manipulation') {
-                                data.manipulation = {};
-                                if (desc.includes('environmental')) data.manipulation.environmental = true;
-                                if (desc.includes('physical')) data.manipulation.physical = true;
-                                if (desc.includes('mental')) data.manipulation.mental = true; // TODO figure out how to parse damaging
-
-                                if (data.manipulation.mental) {
-                                  action.opposed = {
-                                    type: 'custom',
-                                    attribute: 'willpower',
-                                    attribute2: 'logic'
-                                  };
-                                }
-
-                                if (data.manipulation.physical) {
-                                  action.opposed = {
-                                    type: 'custom',
-                                    attribute: 'body',
-                                    attribute2: 'strength'
-                                  };
-                                }
-                              }
-                            }
-
-                            var itemData = {
-                              name: s.name,
-                              type: 'spell',
-                              data: data
-                            };
-                            items.push(itemData);
-                          }
-                        } catch (e) {
-                          console.error(e);
-                        }
-                      });
-                    }
-                  }
-
-                  _context.next = 22;
-                  return _this.object.update(updateData);
-
-                case 22:
-                  _context.next = 24;
-                  return _this.object.createEmbeddedEntity('OwnedItem', items);
-
-                case 24:
-                  ui.notifications.info('Complete! Check everything. Notably: Ranged weapon mods and ammo; Strength based weapon damage; Specializations on all spells, powers, and weapons;');
-
-                  _this.close();
-
-                case 26:
-                case "end":
-                  return _context.stop();
-              }
+  (0, _createClass2["default"])(CharacterImporter, [{
+    key: "importChummerCharacter",
+
+    /**
+     * Imports a chummer character into an existing actor. The actor will be updated. This might lead to duplicate items.
+     * @param {*} actor The actor that will be updated with the chummer character.
+     * @param {*} chummerFile The complete chummer file as json object. The first character will be selected for import.
+     * @param {*} importOptions Additional import option that specify what parts of the chummer file will be imported.
+     */
+    value: function () {
+      var _importChummerCharacter = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(actor, chummerFile, importOptions) {
+        var chummerCharacter, updatedActorData, items;
+        return _regenerator["default"].wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                console.log('Importing the following character file content:');
+                console.log(chummerFile);
+                console.log('Using the following import options:');
+                console.log(importOptions);
+
+                if (!(!chummerFile.characters || !chummerFile.characters.character)) {
+                  _context.next = 7;
+                  break;
+                }
+
+                console.log('Did not find a valid character to import  - aborting import');
+                return _context.abrupt("return");
+
+              case 7:
+                chummerCharacter = chummerFile.characters.character;
+                updatedActorData = new _CharacterInfoUpdater.CharacterInfoUpdater().update(actor.data, chummerCharacter);
+                items = new _ItemsParser.ItemsParser().parse(chummerCharacter, importOptions);
+                _context.next = 12;
+                return actor.update(updatedActorData);
+
+              case 12:
+                _context.next = 14;
+                return actor.createEmbeddedEntity('OwnedItem', items);
+
+              case 14:
+              case "end":
+                return _context.stop();
             }
-          }, _callee);
-        }));
+          }
+        }, _callee);
+      }));
 
-        return function (_x) {
-          return _ref.apply(this, arguments);
-        };
-      }());
-    }
-  }], [{
-    key: "defaultOptions",
-    get: function get() {
-      var options = (0, _get2["default"])((0, _getPrototypeOf2["default"])(ChummerImportForm), "defaultOptions", this);
-      options.id = 'chummer-import';
-      options.classes = ['shadowrun5e'];
-      options.title = 'Chummer/Hero Lab Import';
-      options.template = 'systems/shadowrun5e/dist/templates/apps/import.html';
-      options.width = 600;
-      options.height = 'auto';
-      return options;
-    }
+      function importChummerCharacter(_x, _x2, _x3) {
+        return _importChummerCharacter.apply(this, arguments);
+      }
+
+      return importChummerCharacter;
+    }()
   }]);
-  return ChummerImportForm;
-}(FormApplication);
+  return CharacterImporter;
+}();
 
-exports.ChummerImportForm = ChummerImportForm;
+exports.CharacterImporter = CharacterImporter;
 
-},{"../actor/prep/functions/SkillsPrep":103,"./chummer-import/CharacterInfoImporter":107,"./chummer-import/CommonParsers":108,"./chummer-import/GearImport/GearImporter":111,"@babel/runtime/helpers/asyncToGenerator":2,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10,"@babel/runtime/regenerator":14}],107:[function(require,module,exports){
+},{"./CharacterInfoUpdater":107,"./ItemsParser":108,"@babel/runtime/helpers/asyncToGenerator":2,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/regenerator":14}],107:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -17500,174 +16893,825 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.CharacterInfoImporter = void 0;
+exports.CharacterInfoUpdater = void 0;
 
 var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
 
 var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
 
-var _CommonParsers = require("./CommonParsers");
+var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
 
-var CharacterInfoImporter = /*#__PURE__*/function () {
-  function CharacterInfoImporter() {
-    (0, _classCallCheck2["default"])(this, CharacterInfoImporter);
+var _SkillsPrep = require("../../actor/prep/functions/SkillsPrep");
+
+/**
+ * Parses all non-item character information from a chummer character object.
+ */
+var CharacterInfoUpdater = /*#__PURE__*/function () {
+  function CharacterInfoUpdater() {
+    (0, _classCallCheck2["default"])(this, CharacterInfoUpdater);
+    (0, _defineProperty2["default"])(this, "parseAttName", function (attName) {
+      if (attName.toLowerCase() === 'bod') {
+        return 'body';
+      }
+
+      if (attName.toLowerCase() === 'agi') {
+        return 'agility';
+      }
+
+      if (attName.toLowerCase() === 'rea') {
+        return 'reaction';
+      }
+
+      if (attName.toLowerCase() === 'str') {
+        return 'strength';
+      }
+
+      if (attName.toLowerCase() === 'cha') {
+        return 'charisma';
+      }
+
+      if (attName.toLowerCase() === 'int') {
+        return 'intuition';
+      }
+
+      if (attName.toLowerCase() === 'log') {
+        return 'logic';
+      }
+
+      if (attName.toLowerCase() === 'wil') {
+        return 'willpower';
+      }
+
+      if (attName.toLowerCase() === 'edg') {
+        return 'edge';
+      }
+
+      if (attName.toLowerCase() === 'mag') {
+        return 'magic';
+      }
+
+      if (attName.toLowerCase() === 'res') {
+        return 'resonance';
+      }
+    });
+    (0, _defineProperty2["default"])(this, "getArray", function (value) {
+      return Array.isArray(value) ? value : [value];
+    });
+    (0, _defineProperty2["default"])(this, "parseAttBaseValue", function (att) {
+      if (att.name.toLowerCase() === 'edg') {
+        // The edge attribute value is stored in the "base" field instead of the total field
+        // In chummer, the "total" field is used for the amount of edge remaining to a character
+        return parseInt(att.base);
+      } else {
+        return parseInt(att.total);
+      }
+    });
   }
 
-  (0, _createClass2["default"])(CharacterInfoImporter, [{
-    key: "import",
-    value: function _import(updateData, chummerEntry) {
-      var update = updateData.data;
+  (0, _createClass2["default"])(CharacterInfoUpdater, [{
+    key: "update",
+
+    /**
+     * Parses the actor data from the chummer file and returns an updated clone of the actor data.
+     * @param {*} actorData The actor data (actor.data not actor.data.data) that is used as the basis for the import. Will not be changed.
+     * @param {*} chummerChar The chummer character to parse.
+     */
+    value: function update(actorData, chummerChar) {
+      var clonedActorData = duplicate(actorData); // Name is required, so we need to always set something (even if the chummer field is empty)
+
+      clonedActorData.name = chummerChar.alias ? chummerChar.alias : '[Name not found]';
+      this.importBasicData(clonedActorData.data, chummerChar);
+      this.importAttributes(clonedActorData.data, chummerChar);
+      this.importInitiative(clonedActorData.data, chummerChar);
+      this.importSkills(clonedActorData.data, chummerChar);
+      return clonedActorData;
+    }
+  }, {
+    key: "importBasicData",
+    value: function importBasicData(actorDataData, chummerChar) {
+      var _this = this;
 
       try {
-        if (chummerEntry.playername) {
-          update.player_name = chummerEntry.playername;
+        if (chummerChar.playername) {
+          actorDataData.player_name = chummerChar.playername;
         }
 
-        if (chummerEntry.alias) {
-          update.name = chummerEntry.alias;
-          updateData.name = chummerEntry.alias;
+        if (chummerChar.alias) {
+          actorDataData.name = chummerChar.alias;
         }
 
-        if (chummerEntry.metatype) {
-          update.metatype = chummerEntry.metatype;
+        if (chummerChar.metatype) {
+          actorDataData.metatype = chummerChar.metatype;
         }
 
-        if (chummerEntry.sex) {
-          update.sex = chummerEntry.sex;
+        if (chummerChar.sex) {
+          actorDataData.sex = chummerChar.sex;
         }
 
-        if (chummerEntry.age) {
-          update.age = chummerEntry.age;
+        if (chummerChar.age) {
+          actorDataData.age = chummerChar.age;
         }
 
-        if (chummerEntry.height) {
-          update.height = chummerEntry.height;
+        if (chummerChar.height) {
+          actorDataData.height = chummerChar.height;
         }
 
-        if (chummerEntry.weight) {
-          update.weight = chummerEntry.weight;
+        if (chummerChar.weight) {
+          actorDataData.weight = chummerChar.weight;
         }
 
-        if (chummerEntry.calculatedstreetcred) {
-          update.street_cred = chummerEntry.calculatedstreetcred;
+        if (chummerChar.calculatedstreetcred) {
+          actorDataData.street_cred = chummerChar.calculatedstreetcred;
         }
 
-        if (chummerEntry.calculatednotoriety) {
-          update.notoriety = chummerEntry.calculatednotoriety;
+        if (chummerChar.calculatednotoriety) {
+          actorDataData.notoriety = chummerChar.calculatednotoriety;
         }
 
-        if (chummerEntry.calculatedpublicawareness) {
-          update.public_awareness = chummerEntry.calculatedpublicawareness;
+        if (chummerChar.calculatedpublicawareness) {
+          actorDataData.public_awareness = chummerChar.calculatedpublicawareness;
         }
 
-        if (chummerEntry.karma) {
-          update.karma.value = chummerEntry.karma;
+        if (chummerChar.karma) {
+          actorDataData.karma.value = chummerChar.karma;
         }
 
-        if (chummerEntry.totalkarma) {
-          update.karma.max = chummerEntry.totalkarma;
+        if (chummerChar.totalkarma) {
+          actorDataData.karma.max = chummerChar.totalkarma;
         }
 
-        if (chummerEntry.technomancer && chummerEntry.technomancer.toLowerCase() === 'true') {
-          update.special = 'resonance';
+        if (chummerChar.technomancer && chummerChar.technomancer.toLowerCase() === 'true') {
+          actorDataData.special = 'resonance';
         }
 
-        if (chummerEntry.magician && chummerEntry.magician.toLowerCase() === 'true' || chummerEntry.adept && chummerEntry.adept.toLowerCase() === 'true') {
-          update.special = 'magic';
+        if (chummerChar.magician && chummerChar.magician.toLowerCase() === 'true' || chummerChar.adept && chummerChar.adept.toLowerCase() === 'true') {
+          actorDataData.special = 'magic';
           var attr = [];
 
-          if (chummerEntry.tradition && chummerEntry.tradition.drainattribute && chummerEntry.tradition.drainattribute.attr) {
-            attr = chummerEntry.tradition.drainattribute.attr;
-          } else if (chummerEntry.tradition && chummerEntry.tradition.drainattributes) {
-            attr = chummerEntry.tradition.drainattributes.split('+').map(function (item) {
+          if (chummerChar.tradition && chummerChar.tradition.drainattribute && chummerChar.tradition.drainattribute.attr) {
+            attr = chummerChar.tradition.drainattribute.attr;
+          } else if (chummerChar.tradition && chummerChar.tradition.drainattributes) {
+            attr = chummerChar.tradition.drainattributes.split('+').map(function (item) {
               return item.trim();
             });
           }
 
           attr.forEach(function (att) {
-            var attName = (0, _CommonParsers.parseAttName)(att);
-            if (attName !== 'willpower') update.magic.attribute = att;
+            var attName = _this.parseAttName(att);
+
+            if (attName !== 'willpower') actorDataData.magic.attribute = att;
           });
         }
 
-        if (chummerEntry.totaless) {
-          update.attributes.essence.value = chummerEntry.totaless;
+        if (chummerChar.totaless) {
+          actorDataData.attributes.essence.value = chummerChar.totaless;
         }
 
-        if (chummerEntry.nuyen) {
-          update.nuyen = parseInt(chummerEntry.nuyen.replace(',', ''));
+        if (chummerChar.nuyen) {
+          actorDataData.nuyen = parseInt(chummerChar.nuyen.replace(',', ''));
         }
       } catch (e) {
         console.error("Error while parsing character information ".concat(e));
       }
     }
+  }, {
+    key: "importAttributes",
+    value: function importAttributes(actorDataData, chummerChar) {
+      var _this2 = this;
+
+      var atts = chummerChar.attributes[1].attribute;
+      atts.forEach(function (att) {
+        try {
+          var attName = _this2.parseAttName(att.name);
+
+          if (attName) {
+            actorDataData.attributes[attName].base = _this2.parseAttBaseValue(att);
+          }
+        } catch (e) {
+          console.error("Error while parsing attributes ".concat(e));
+        }
+      });
+    }
+  }, {
+    key: "importInitiative",
+    value: function importInitiative(actorDataData, chummerChar) {
+      try {
+        actorDataData.modifiers.meat_initiative = chummerChar.initbonus; // 'initdice' contains the total amount of initiative dice, not just the bonus.
+
+        actorDataData.modifiers.meat_initiative_dice = chummerChar.initdice - 1;
+      } catch (e) {
+        console.error("Error while parsing initiative ".concat(e));
+      }
+    }
+  }, {
+    key: "importSkills",
+    value: function importSkills(actorDataData, chummerChar) {
+      var skills = chummerChar.skills.skill;
+
+      for (var i = 0; i < skills.length; i++) {
+        try {
+          var s = skills[i];
+
+          if (s.rating > 0 && s.islanguage) {
+            var group = 'active';
+            var skill = null;
+            var id = randomID(16);
+
+            if (s.islanguage && s.islanguage.toLowerCase() === 'true') {
+              skill = {};
+              actorDataData.skills.language.value[id] = skill;
+              group = 'language';
+            } else if (s.knowledge && s.knowledge.toLowerCase() === 'true') {
+              var category = s.skillcategory_english;
+              console.log(category);
+              skill = {};
+              var skillCategory = void 0;
+
+              if (category) {
+                console.log('found category', category);
+                var cat = category.toLowerCase();
+                if (cat === 'street') skillCategory = actorDataData.skills.knowledge.street.value;
+                if (cat === 'academic') skillCategory = actorDataData.skills.knowledge.academic.value;
+                if (cat === 'professional') skillCategory = actorDataData.skills.knowledge.professional.value;
+                if (cat === 'interest') skillCategory = actorDataData.skills.knowledge.interests.value;
+                if (skillCategory) skillCategory[id] = skill;
+              } else {
+                if (s.attribute.toLowerCase() === 'int') {
+                  actorDataData.skills.knowledge.street.value[id] = skill;
+                }
+
+                if (s.attribute.toLowerCase() === 'log') {
+                  actorDataData.skills.knowledge.professional.value[id] = skill;
+                }
+              }
+
+              group = 'knowledge';
+            } else {
+              var name = s.name.toLowerCase().trim().replace(/\s/g, '_').replace(/-/g, '_');
+              if (name.includes('exotic') && name.includes('_weapon')) name = name.replace('_weapon', '');
+              skill = actorDataData.skills.active[name];
+            }
+
+            if (!skill) console.error("Couldn't parse skill ".concat(s.name));
+
+            if (skill) {
+              if (group !== 'active') skill.name = s.name;
+              skill.base = parseInt(s.rating);
+
+              if (s.skillspecializations) {
+                skill.specs = this.getArray(s.skillspecializations.skillspecialization.name);
+              }
+
+              skill = (0, _SkillsPrep._mergeWithMissingSkillFields)(skill);
+            }
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
   }]);
-  return CharacterInfoImporter;
+  return CharacterInfoUpdater;
 }();
 
-exports.CharacterInfoImporter = CharacterInfoImporter;
+exports.CharacterInfoUpdater = CharacterInfoUpdater;
 
-},{"./CommonParsers":108,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],108:[function(require,module,exports){
+},{"../../actor/prep/functions/SkillsPrep":103,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/interopRequireDefault":9}],108:[function(require,module,exports){
 "use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.parseAttName = parseAttName;
+exports.ItemsParser = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
+
+var _SkillsPrep = require("../../actor/prep/functions/SkillsPrep");
+
+var _GearsParser = require("./gearImport/GearsParser");
 
 /**
- *  Maps the chummer attribute name to our sr5-foundry attribute name
- *  @param attName name of the chummer attribute
+ * Parses all items (qualities, weapons, gear, ...) from a chummer character.
  */
-function parseAttName(attName) {
-  if (attName.toLowerCase() === 'bod') {
-    return 'body';
+var ItemsParser = /*#__PURE__*/function () {
+  function ItemsParser() {
+    (0, _classCallCheck2["default"])(this, ItemsParser);
+    (0, _defineProperty2["default"])(this, "parseDescription", function (entry) {
+      var parsedDescription = {
+        source: "".concat(entry.source, " ").concat(entry.page)
+      };
+
+      if (entry.description) {
+        parsedDescription.value = TextEditor.enrichHTML(q.description);
+      }
+
+      return parsedDescription;
+    });
+    (0, _defineProperty2["default"])(this, "getValues", function (val) {
+      var regex = /(-?[0-9]+)(?:([0-9]+))*/g;
+      var l = val.match(regex);
+      return l || ['0'];
+    });
+    (0, _defineProperty2["default"])(this, "getArray", function (value) {
+      return Array.isArray(value) ? value : [value];
+    });
   }
 
-  if (attName.toLowerCase() === 'agi') {
-    return 'agility';
-  }
+  (0, _createClass2["default"])(ItemsParser, [{
+    key: "parse",
 
-  if (attName.toLowerCase() === 'rea') {
-    return 'reaction';
-  }
+    /**
+     * Parses all items from a chummer char and returns an array of the corresponding foundry items.
+     * @param {*} chummerChar The chummer char holding the items
+     * @param {*} importOptions Additional import option that specify what items will be imported.
+     */
+    value: function parse(chummerChar, importOptions) {
+      var parsedItems = [];
 
-  if (attName.toLowerCase() === 'str') {
-    return 'strength';
-  }
+      if (importOptions.qualities && chummerChar.qualities && chummerChar.qualities.quality) {
+        var parsedQualities = this.parseQualities(chummerChar);
+        Array.prototype.push.apply(parsedItems, parsedQualities);
+      }
 
-  if (attName.toLowerCase() === 'cha') {
-    return 'charisma';
-  }
+      if (importOptions.weapons && chummerChar.weapons != null && chummerChar.weapons.weapon != null) {
+        var parsedWeapons = this.parseWeapons(chummerChar);
+        Array.prototype.push.apply(parsedItems, parsedWeapons);
+      }
 
-  if (attName.toLowerCase() === 'int') {
-    return 'intuition';
-  }
+      if (importOptions.armor && chummerChar.armors && chummerChar.armors.armor) {
+        var parsedArmors = this.parseArmors(chummerChar);
+        Array.prototype.push.apply(parsedItems, parsedArmors);
+      }
 
-  if (attName.toLowerCase() === 'log') {
-    return 'logic';
-  }
+      if (importOptions.cyberware && chummerChar.cyberwares && chummerChar.cyberwares.cyberware) {
+        var parsedCyberware = this.parseCyberware(chummerChar);
+        Array.prototype.push.apply(parsedItems, parsedCyberware);
+      }
 
-  if (attName.toLowerCase() === 'wil') {
-    return 'willpower';
-  }
+      if (importOptions.powers && chummerChar.powers && chummerChar.powers.power) {
+        var parsedPowers = this.parsePowers(chummerChar);
+        Array.prototype.push.apply(parsedItems, parsedPowers);
+      }
 
-  if (attName.toLowerCase() === 'edg') {
-    return 'edge';
-  }
+      if (importOptions.equipment && chummerChar.gears && chummerChar.gears.gear) {
+        var gears = this.getArray(chummerChar.gears.gear);
+        var allGearData = new _GearsParser.GearsParser().parseAllGear(gears);
+        Array.prototype.push.apply(parsedItems, allGearData);
+      }
 
-  if (attName.toLowerCase() === 'mag') {
-    return 'magic';
-  }
+      if (importOptions.spells && chummerChar.spells && chummerChar.spells.spell) {
+        var parsedSpells = this.parseSpells(chummerChar);
+        Array.prototype.push.apply(parsedItems, parsedSpells);
+      }
 
-  if (attName.toLowerCase() === 'res') {
-    return 'resonance';
-  }
-}
+      return parsedItems;
+    }
+  }, {
+    key: "parseQualities",
+    value: function parseQualities(chummerChar) {
+      var _this = this;
 
-;
+      var qualities = this.getArray(chummerChar.qualities.quality);
+      var parsedQualities = [];
+      qualities.forEach(function (chummerQuality) {
+        try {
+          var data = {};
+          data.type = chummerQuality.qualitytype.toLowerCase();
+          data.description = _this.parseDescription(chummerQuality);
+          var itemData = {
+            name: chummerQuality.name,
+            type: 'quality',
+            data: data
+          };
+          parsedQualities.push(itemData);
+        } catch (e) {
+          console.error(e);
+        }
+      });
+      return parsedQualities;
+    }
+  }, {
+    key: "parseWeapons",
+    value: function parseWeapons(chummerChar) {
+      var _this2 = this;
 
-},{}],109:[function(require,module,exports){
+      var parseDamage = function parseDamage(val) {
+        var damage = {
+          damage: 0,
+          type: 'physical',
+          radius: 0,
+          dropoff: 0
+        };
+        var split = val.split(',');
+
+        if (split.length > 0) {
+          var l = split[0].match(/(\d+)(\w+)/);
+          if (l && l[1]) damage.damage = parseInt(l[1]);
+          if (l && l[2]) damage.type = l[2] === 'P' ? 'physical' : 'stun';
+        }
+
+        for (var i = 1; i < split.length; i++) {
+          var _l = split[i].match(/(-?\d+)(.*)/);
+
+          if (_l && _l[2]) {
+            if (_l[2].toLowerCase().includes('/m')) damage.dropoff = parseInt(_l[1]);else damage.radius = parseInt(_l[1]);
+          }
+        }
+
+        return damage;
+      };
+
+      var weapons = this.getArray(chummerChar.weapons.weapon);
+      var parsedWeapons = [];
+      weapons.forEach(function (chummerWeapon) {
+        try {
+          var data = {};
+          var action = {};
+          var damage = {};
+          action.damage = damage;
+          data.action = action;
+          data.description = _this2.parseDescription(chummerWeapon);
+          damage.ap = {
+            base: parseInt(_this2.getValues(chummerWeapon.ap)[0])
+          };
+          action.type = 'varies';
+          if (chummerWeapon.skill) action.skill = chummerWeapon.skill.toLowerCase().replace(/\s/g, '_');else if (chummerWeapon.category && chummerWeapon.category.toLowerCase().includes('exotic')) action.skill = chummerWeapon.category.toLowerCase().replace(' weapons', '').replace(/\s/g, '_');
+          if (action.skill.includes('exotic')) action.skill = action.skill.replace('_weapon', '');
+          action.attribute = 'agility';
+          action.limit = {
+            base: parseInt(_this2.getValues(chummerWeapon.accuracy)[0])
+          };
+          action.opposed = {
+            type: 'defense'
+          };
+
+          if (chummerWeapon.type.toLowerCase() === 'melee') {
+            action.type = 'complex';
+            data.category = 'melee';
+            var melee = {};
+            data.melee = melee;
+            melee.reach = parseInt(chummerWeapon.reach);
+          } else if (chummerWeapon.type.toLowerCase() === 'ranged') {
+            data.category = 'range';
+
+            if (chummerWeapon.skill.toLowerCase().includes('throw')) {
+              data.category = 'thrown'; // TODO clean this up
+            }
+
+            var range = {};
+            data.range = range;
+            range.rc = {
+              base: parseInt(_this2.getValues(chummerWeapon.rc)[0])
+            };
+
+            if (chummerWeapon.mode) {
+              // HeroLab export doesn't have mode
+              var lower = chummerWeapon.mode.toLowerCase();
+              range.modes = {
+                single_shot: lower.includes('ss'),
+                semi_auto: lower.includes('sa'),
+                burst_fire: lower.includes('bf'),
+                full_auto: lower.includes('fa')
+              };
+            }
+
+            if (chummerWeapon.clips != null && chummerWeapon.clips.clip != null) {
+              // HeroLab export doesn't have clips
+              var clips = Array.isArray(chummerWeapon.clips.clip) ? chummerWeapon.clips.clip : [chummerWeapon.clips.clip];
+              clips.forEach(function (clip) {
+                console.log(clip);
+              });
+            }
+
+            if (chummerWeapon.ranges && chummerWeapon.ranges["short"] && chummerWeapon.ranges.medium && chummerWeapon.ranges["long"] && chummerWeapon.ranges.extreme) {
+              console.log(chummerWeapon.ranges);
+              range.ranges = {
+                "short": parseInt(chummerWeapon.ranges["short"].split('-')[1]),
+                medium: parseInt(chummerWeapon.ranges.medium.split('-')[1]),
+                "long": parseInt(chummerWeapon.ranges["long"].split('-')[1]),
+                extreme: parseInt(chummerWeapon.ranges.extreme.split('-')[1])
+              };
+            } // TODO figure out how to add mods to weapons
+            // if (w.accessories && w.accessories.accessory) {
+            //     range.mods = [];
+            //     const accessories = this.getArray(w.accessories.accessory);
+            //     accessories.forEach((a) => {
+            //         if (a) {
+            //             range.mods.push({
+            //                 name: a.name,
+            //             });
+            //         }
+            //     });
+            // }
+
+          } else if (chummerWeapon.type.toLowerCase() === 'thrown') {
+            data.category = 'thrown';
+          }
+
+          {
+            // TODO handle raw damage if present
+            var d = parseDamage(chummerWeapon.damage_english);
+            damage.base = d.damage;
+            damage.type = {};
+            damage.type.base = d.type;
+
+            if (d.dropoff || d.radius) {
+              var thrown = {};
+              data.thrown = thrown;
+              thrown.blast = {
+                radius: d.radius,
+                dropoff: d.dropoff
+              };
+            }
+          }
+          var itemData = {
+            name: chummerWeapon.name,
+            type: 'weapon',
+            data: data
+          };
+          parsedWeapons.push(itemData);
+        } catch (e) {
+          console.error(e);
+        }
+      });
+      return parsedWeapons;
+    }
+  }, {
+    key: "parseArmors",
+    value: function parseArmors(chummerChar) {
+      var _this3 = this;
+
+      var armors = this.getArray(chummerChar.armors.armor);
+      var parsedArmors = [];
+      armors.forEach(function (chummerArmor) {
+        try {
+          var data = {};
+          var armor = {};
+          data.armor = armor;
+          var desc = '';
+          armor.mod = chummerArmor.armor.includes('+');
+          armor.value = parseInt(chummerArmor.armor.replace('+', ''));
+          if (chummerArmor.description) desc = chummerArmor.description;
+          console.log(chummerArmor);
+
+          if (chummerArmor.armormods && chummerArmor.armormods.armormod) {
+            armor.fire = 0;
+            armor.electricity = 0;
+            armor.cold = 0;
+            armor.acid = 0;
+            armor.radiation = 0;
+            var modDesc = [];
+
+            var mods = _this3.getArray(chummerArmor.armormods.armormod);
+
+            mods.forEach(function (mod) {
+              if (mod.name.toLowerCase().includes('fire resistance')) {
+                armor.fire += parseInt(mod.rating);
+              } else if (mod.name.toLowerCase().includes('nonconductivity')) {
+                armor.electricity += parseInt(mod.rating);
+              } else if (mod.name.toLowerCase().includes('insulation')) {
+                armor.cold += parseInt(mod.rating);
+              } else if (mod.name.toLowerCase().includes('radiation shielding')) {
+                armor.radiation += parseInt(mod.rating);
+              }
+
+              if (mod.rating !== '') {
+                modDesc.push("".concat(mod.name, " R").concat(mod.rating));
+              } else {
+                modDesc.push(mod.name);
+              }
+            });
+
+            if (modDesc.length > 0) {
+              // add desc to beginning
+              desc = "".concat(modDesc.join(','), "\n\n").concat(desc);
+            }
+          }
+
+          if (chummerArmor.equipped.toLowerCase() === 'true') {
+            data.technology = {
+              equipped: true
+            };
+          }
+
+          data.description = _this3.parseDescription(chummerArmor);
+          var itemData = {
+            name: chummerArmor.name,
+            type: 'armor',
+            data: data
+          };
+          parsedArmors.push(itemData);
+        } catch (e) {
+          console.error(e);
+        }
+      });
+      return parsedArmors;
+    }
+  }, {
+    key: "parseCyberware",
+    value: function parseCyberware(chummerChar) {
+      var _this4 = this;
+
+      var cyberwares = this.getArray(chummerChar.cyberwares.cyberware);
+      var parsedCyberware = [];
+      cyberwares.forEach(function (chummerCyber) {
+        try {
+          var data = {};
+          data.description = _this4.parseDescription(chummerCyber);
+          data.description.rating = chummerCyber.rating;
+          data.description.value = chummerCyber.description;
+          data.technology = {
+            equipped: true
+          };
+          data.essence = chummerCyber.ess;
+          data.grade = chummerCyber.grade;
+          var itemData = {
+            name: chummerCyber.name,
+            type: 'cyberware',
+            data: data
+          };
+          parsedCyberware.push(itemData);
+        } catch (e) {
+          console.error(e);
+        }
+      });
+      return parsedCyberware;
+    }
+  }, {
+    key: "parsePowers",
+    value: function parsePowers(chummerChar) {
+      var _this5 = this;
+
+      var powers = this.getArray(chummerChar.powers.power);
+      var parsedPowers = [];
+      powers.forEach(function (chummerPower) {
+        var data = {};
+        data.description = _this5.parseDescription(chummerPower);
+        data.level = parseInt(chummerPower.rating);
+        chummerPower.pp = parseInt(chummerPower.totalpoints);
+        var itemData = {
+          name: chummerPower.name,
+          type: 'adept_power',
+          data: data
+        };
+        parsedPowers.push(itemData);
+      });
+      return parsedPowers;
+    }
+  }, {
+    key: "parseSpells",
+    value: function parseSpells(chummerChar) {
+      var _this6 = this;
+
+      var spells = this.getArray(chummerChar.spells.spell);
+      var parsedSpells = [];
+      spells.forEach(function (chummerSpell) {
+        try {
+          if (chummerSpell.alchemy.toLowerCase() !== 'true') {
+            var action = {};
+            var data = {};
+            data.action = action;
+            data.category = chummerSpell.category.toLowerCase().replace(/\s/g, '_');
+            data.name = chummerSpell.name;
+            data.type = chummerSpell.type === 'M' ? 'mana' : 'physical';
+            data.range = chummerSpell.range === 'T' ? 'touch' : chummerSpell.range.toLowerCase().replace(/\s/g, '_').replace('(', '').replace(')', '');
+            data.drain = parseInt(chummerSpell.dv.replace('F', ''));
+            data.description = _this6.parseDescription(chummerSpell);
+            var description = '';
+            if (chummerSpell.descriptors) description = chummerSpell.descriptors;
+            if (chummerSpell.description) description += "\n".concat(chummerSpell.description);
+            data.description.value = TextEditor.enrichHTML(description);
+            if (chummerSpell.duration.toLowerCase() === 's') data.duration = 'sustained';else if (chummerSpell.duration.toLowerCase() === 'i') data.duration = 'instant';else if (chummerSpell.duration.toLowerCase() === 'p') data.duration = 'permanent';
+            action.type = 'varies';
+            action.skill = 'spellcasting';
+            action.attribute = 'magic';
+
+            if (chummerSpell.descriptors) {
+              var desc = chummerSpell.descriptors.toLowerCase();
+
+              if (chummerSpell.category.toLowerCase() === 'combat') {
+                data.combat = {};
+
+                if (desc.includes('direct')) {
+                  data.combat.type = 'indirect';
+                  action.opposed = {
+                    type: 'defense'
+                  };
+                } else {
+                  data.combat.type = 'direct';
+
+                  if (data.type === 'mana') {
+                    action.opposed = {
+                      type: 'custom',
+                      attribute: 'willpower'
+                    };
+                  } else if (data.type === 'physical') {
+                    action.opposed = {
+                      type: 'custom',
+                      attribute: 'body'
+                    };
+                  }
+                }
+              }
+
+              if (chummerSpell.category.toLowerCase() === 'detection') {
+                data.detection = {};
+                var split = desc.split(',');
+                split.forEach(function (token) {
+                  token = token || '';
+                  token = token.replace(' detection spell', '');
+                  if (!token) return;
+                  if (token.includes('area')) return;
+                  if (token.includes('passive')) data.detection.passive = true;else if (token.includes('active')) data.detection.passive = false;else if (token) data.detection.type = token.toLowerCase();
+                });
+
+                if (!data.detection.passive) {
+                  action.opposed = {
+                    type: 'custom',
+                    attribute: 'willpower',
+                    attribute2: 'logic'
+                  };
+                }
+              }
+
+              if (chummerSpell.category.toLowerCase() === 'illusion') {
+                data.illusion = {};
+
+                var _split = desc.split(',');
+
+                _split.forEach(function (token) {
+                  token = token || '';
+                  token = token.replace(' illusion spell', '');
+                  if (!token) return;
+                  if (token.includes('area')) return;
+                  if (token.includes('sense')) data.illusion.sense = token.toLowerCase();else if (token) data.illusion.type = token.toLowerCase();
+                });
+
+                if (data.type === 'mana') {
+                  action.opposed = {
+                    type: 'custom',
+                    attribute: 'willpower',
+                    attribute2: 'logic'
+                  };
+                } else {
+                  action.opposed = {
+                    type: 'custom',
+                    attribute: 'intuition',
+                    attribute2: 'logic'
+                  };
+                }
+              }
+
+              if (chummerSpell.category.toLowerCase() === 'manipulation') {
+                data.manipulation = {};
+                if (desc.includes('environmental')) data.manipulation.environmental = true;
+                if (desc.includes('physical')) data.manipulation.physical = true;
+                if (desc.includes('mental')) data.manipulation.mental = true; // TODO figure out how to parse damaging
+
+                if (data.manipulation.mental) {
+                  action.opposed = {
+                    type: 'custom',
+                    attribute: 'willpower',
+                    attribute2: 'logic'
+                  };
+                }
+
+                if (data.manipulation.physical) {
+                  action.opposed = {
+                    type: 'custom',
+                    attribute: 'body',
+                    attribute2: 'strength'
+                  };
+                }
+              }
+            }
+
+            var itemData = {
+              name: chummerSpell.name,
+              type: 'spell',
+              data: data
+            };
+            parsedSpells.push(itemData);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      });
+      return parsedSpells;
+    }
+  }]);
+  return ItemsParser;
+}();
+
+exports.ItemsParser = ItemsParser;
+
+},{"../../actor/prep/functions/SkillsPrep":103,"./gearImport/GearsParser":111,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/interopRequireDefault":9}],109:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BaseGearParser = void 0;
@@ -17675,19 +17719,19 @@ exports.BaseGearParser = void 0;
  * Base class for all gear parsers. Parses common information across all gear.
  */
 class BaseGearParser {
-    parse(g) {
+    parse(chummerGear) {
         const parsedGear = this.getDefaultData();
-        parsedGear.name = g.name;
-        if (g.extra) {
-            parsedGear.name += ` (${g.extra})`;
+        parsedGear.name = chummerGear.name;
+        if (chummerGear.extra) {
+            parsedGear.name += ` (${chummerGear.extra})`;
         }
-        parsedGear.data.technology.rating = g.rating;
-        parsedGear.data.technology.quantity = g.qty;
+        parsedGear.data.technology.rating = chummerGear.rating;
+        parsedGear.data.technology.quantity = chummerGear.qty;
         parsedGear.data.description =
             {
                 value: '',
                 chat: '',
-                source: `${g.source} ${g.page}`
+                source: `${chummerGear.source} ${chummerGear.page}`
             };
         return parsedGear;
     }
@@ -17729,7 +17773,6 @@ class BaseGearParser {
     }
 }
 exports.BaseGearParser = BaseGearParser;
-
 },{}],110:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -17739,41 +17782,41 @@ const BaseGearParser_1 = require("./BaseGearParser");
  * Parses devices (commlinks and decks)
  */
 class DeviceParser extends BaseGearParser_1.BaseGearParser {
-    parse(gearEntry) {
-        const parsedGear = super.parse(gearEntry);
+    parse(chummerGear) {
+        const parsedGear = super.parse(chummerGear);
         parsedGear.type = 'device';
-        parsedGear.data.technology.rating = gearEntry.devicerating;
+        parsedGear.data.technology.rating = chummerGear.devicerating;
         parsedGear.data.technology.condition_monitor =
             {
                 value: 0,
-                max: Number(gearEntry.conditionmonitor),
+                max: Number(chummerGear.conditionmonitor),
                 label: ''
             };
         parsedGear.data.atts = {
             att1: {
-                value: gearEntry.attack,
+                value: chummerGear.attack,
                 att: 'attack'
             },
             att2: {
-                value: gearEntry.sleaze,
+                value: chummerGear.sleaze,
                 att: 'sleaze'
             },
             att3: {
-                value: gearEntry.dataprocessing,
+                value: chummerGear.dataprocessing,
                 att: 'data_processing'
             },
             att4: {
-                value: gearEntry.firewall,
+                value: chummerGear.firewall,
                 att: 'firewall'
             }
         };
-        if (gearEntry.category === 'Cyberdecks') {
+        if (chummerGear.category === 'Cyberdecks') {
             parsedGear.data.category = 'cyberdeck';
         }
-        if (gearEntry.category === 'Commlinks') {
+        if (chummerGear.category === 'Commlinks') {
             parsedGear.data.category = 'commlink';
         }
-        if (gearEntry.category === 'Rigger Command Consoles') {
+        if (chummerGear.category === 'Rigger Command Consoles') {
             // We are handling rccs as commlinks for the moment since we have no support for rigger command consoles yet.
             parsedGear.data.category = 'commlink';
         }
@@ -17781,25 +17824,24 @@ class DeviceParser extends BaseGearParser_1.BaseGearParser {
     }
 }
 exports.DeviceParser = DeviceParser;
-
 },{"./BaseGearParser":109}],111:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.GearImporter = void 0;
+exports.GearsParser = void 0;
 const ParserSelector_1 = require("./ParserSelector");
 /**
  * Parses all gear from a chummer character file and turns them into foundry sr item data objects
  */
-class GearImporter {
+class GearsParser {
     /**
      * Parses all chummer gear entries
-     * @param gears Array of chummer gear entries
+     * @param chummerGears Array of chummer gear entries
      */
-    parseAllGear(gears) {
+    parseAllGear(chummerGears) {
         let items = [];
-        gears.forEach((g) => {
+        chummerGears.forEach((chummerGear) => {
             try {
-                const itemsData = this.parseGearEntry(g);
+                const itemsData = this.parseGearEntry(chummerGear);
                 items.push(itemsData);
             }
             catch (e) {
@@ -17808,14 +17850,13 @@ class GearImporter {
         });
         return items;
     }
-    parseGearEntry(g) {
+    parseGearEntry(chummerGear) {
         const parserSelector = new ParserSelector_1.ParserSelector();
-        const parser = parserSelector.select(g);
-        return parser.parse(g);
+        const parser = parserSelector.select(chummerGear);
+        return parser.parse(chummerGear);
     }
 }
-exports.GearImporter = GearImporter;
-
+exports.GearsParser = GearsParser;
 },{"./ParserSelector":112}],112:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -17830,26 +17871,25 @@ const ProgramParser_1 = require("./ProgramParser");
 class ParserSelector {
     /**
      * Selects the correct GearParser depending on the gear.
-     * @param gearEntry The gear that needs to be parsed
+     * @param chummerGear The gear that needs to be parsed
      * The correct GearParser for this gear entry.
      */
-    select(gearEntry) {
-        if (gearEntry.issin === 'True') {
+    select(chummerGear) {
+        if (chummerGear.issin === 'True') {
             return new SinParser_1.SinParser();
         }
-        if (gearEntry.iscommlink === 'True') {
+        if (chummerGear.iscommlink === 'True') {
             return new DeviceParser_1.DeviceParser();
         }
-        if (gearEntry.category === 'Common Programs' ||
-            gearEntry.category === 'Hacking Programs' ||
-            gearEntry.category === 'Software') {
+        if (chummerGear.category === 'Common Programs' ||
+            chummerGear.category === 'Hacking Programs' ||
+            chummerGear.category === 'Software') {
             return new ProgramParser_1.ProgramParser();
         }
         return new BaseGearParser_1.BaseGearParser();
     }
 }
 exports.ParserSelector = ParserSelector;
-
 },{"./BaseGearParser":109,"./DeviceParser":110,"./ProgramParser":113,"./SinParser":114}],113:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -17859,23 +17899,22 @@ const BaseGearParser_1 = require("./BaseGearParser");
  * Parses common, hacking and agent programs.
  */
 class ProgramParser extends BaseGearParser_1.BaseGearParser {
-    parse(gearEntry) {
-        const parsedGear = super.parse(gearEntry);
+    parse(chummerGear) {
+        const parsedGear = super.parse(chummerGear);
         parsedGear.type = 'program';
-        if (gearEntry.category === 'Common Programs') {
+        if (chummerGear.category === 'Common Programs') {
             parsedGear.data.type = 'common_program';
         }
-        else if (gearEntry.category === 'Hacking Programs') {
+        else if (chummerGear.category === 'Hacking Programs') {
             parsedGear.data.type = 'hacking_program';
         }
-        else if (gearEntry.category === 'Software') {
+        else if (chummerGear.category === 'Software') {
             parsedGear.data.type = 'agent';
         }
         return parsedGear;
     }
 }
 exports.ProgramParser = ProgramParser;
-
 },{"./BaseGearParser":109}],114:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -17886,30 +17925,30 @@ const BaseGearParser_1 = require("./BaseGearParser");
  * Licenses that are not attached to a SIN are not handled.
  */
 class SinParser extends BaseGearParser_1.BaseGearParser {
-    parse(gearEntry) {
-        const parsedGear = super.parse(gearEntry);
+    parse(chummerGear) {
+        const parsedGear = super.parse(chummerGear);
         parsedGear.type = 'sin';
         // Create licenses if there are any
-        if (gearEntry.children) {
+        if (chummerGear.children) {
             // "gear" is either  a single gear entry or an array of gear entries depending on the number of licenses
-            const licenseEntries = [];
-            if (!Array.isArray(gearEntry.children.gear)) {
-                licenseEntries.push(gearEntry.children.gear);
+            const chummerLicenses = [];
+            if (!Array.isArray(chummerGear.children.gear)) {
+                chummerLicenses.push(chummerGear.children.gear);
             }
             else {
-                licenseEntries.push(...gearEntry.children.gear);
+                chummerLicenses.push(...chummerGear.children.gear);
             }
-            parsedGear.data.licenses = this.parseLicenses(licenseEntries);
+            parsedGear.data.licenses = this.parseLicenses(chummerLicenses);
         }
         return parsedGear;
     }
-    parseLicenses(licenseEntries) {
+    parseLicenses(chummerLicenses) {
         const parsedLicenses = [];
-        licenseEntries.forEach(licenseEntry => {
-            if (licenseEntry.category === 'ID/Credsticks') {
+        chummerLicenses.forEach(chummerLicense => {
+            if (chummerLicense.category === 'ID/Credsticks') {
                 parsedLicenses.push({
-                    name: licenseEntry.extra,
-                    rtg: licenseEntry.rating,
+                    name: chummerLicense.extra,
+                    rtg: chummerLicense.rating,
                     description: ''
                 });
             }
@@ -17918,8 +17957,119 @@ class SinParser extends BaseGearParser_1.BaseGearParser {
     }
 }
 exports.SinParser = SinParser;
-
 },{"./BaseGearParser":109}],115:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ChummerImportForm = void 0;
+
+var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
+
+var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _get2 = _interopRequireDefault(require("@babel/runtime/helpers/get"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _SkillsPrep = require("../actor/prep/functions/SkillsPrep");
+
+var _CharacterImporter = require("./characterImport/CharacterImporter");
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+var ChummerImportForm = /*#__PURE__*/function (_FormApplication) {
+  (0, _inherits2["default"])(ChummerImportForm, _FormApplication);
+
+  var _super = _createSuper(ChummerImportForm);
+
+  function ChummerImportForm() {
+    (0, _classCallCheck2["default"])(this, ChummerImportForm);
+    return _super.apply(this, arguments);
+  }
+
+  (0, _createClass2["default"])(ChummerImportForm, [{
+    key: "getData",
+    value: function getData() {
+      return {};
+    }
+  }, {
+    key: "activateListeners",
+    value: function activateListeners(html) {
+      var _this = this;
+
+      html.find('.submit-chummer-import').click( /*#__PURE__*/function () {
+        var _ref = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(event) {
+          var chummerFile, importOptions, importer;
+          return _regenerator["default"].wrap(function _callee$(_context) {
+            while (1) {
+              switch (_context.prev = _context.next) {
+                case 0:
+                  event.preventDefault();
+                  chummerFile = JSON.parse($('.chummer-text').val());
+                  importOptions = {
+                    weapons: $('.weapons').is(':checked'),
+                    armor: $('.armor').is(':checked'),
+                    cyberware: $('.cyberware').is(':checked'),
+                    equipment: $('.gear').is(':checked'),
+                    qualities: $('.qualities').is(':checked'),
+                    powers: $('.powers').is(':checked'),
+                    spells: $('.spells').is(':checked')
+                  };
+                  importer = new _CharacterImporter.CharacterImporter();
+                  _context.next = 6;
+                  return importer.importChummerCharacter(_this.object, chummerFile, importOptions);
+
+                case 6:
+                  ui.notifications.info('Complete! Check everything. Notably: Ranged weapon mods and ammo; Strength based weapon damage; Specializations on all spells, powers, and weapons;');
+
+                  _this.close();
+
+                case 8:
+                case "end":
+                  return _context.stop();
+              }
+            }
+          }, _callee);
+        }));
+
+        return function (_x) {
+          return _ref.apply(this, arguments);
+        };
+      }());
+    }
+  }], [{
+    key: "defaultOptions",
+    get: function get() {
+      var options = (0, _get2["default"])((0, _getPrototypeOf2["default"])(ChummerImportForm), "defaultOptions", this);
+      options.id = 'chummer-import';
+      options.classes = ['shadowrun5e'];
+      options.title = 'Chummer/Hero Lab Import';
+      options.template = 'systems/shadowrun5e/dist/templates/apps/import.html';
+      options.width = 600;
+      options.height = 'auto';
+      return options;
+    }
+  }]);
+  return ChummerImportForm;
+}(FormApplication);
+
+exports.ChummerImportForm = ChummerImportForm;
+
+},{"../actor/prep/functions/SkillsPrep":103,"./characterImport/CharacterImporter":106,"@babel/runtime/helpers/asyncToGenerator":2,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10,"@babel/runtime/regenerator":14}],116:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DamageApplicationDialog = void 0;
@@ -17975,8 +18125,7 @@ class DamageApplicationDialog extends FormDialog_1.FormDialog {
     }
 }
 exports.DamageApplicationDialog = DamageApplicationDialog;
-
-},{"./FormDialog":117}],116:[function(require,module,exports){
+},{"./FormDialog":118}],117:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DeleteConfirmationDialog = void 0;
@@ -18013,8 +18162,7 @@ class DeleteConfirmationDialog extends FormDialog_1.FormDialog {
     }
 }
 exports.DeleteConfirmationDialog = DeleteConfirmationDialog;
-
-},{"./FormDialog":117}],117:[function(require,module,exports){
+},{"./FormDialog":118}],118:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -18124,8 +18272,7 @@ class FormDialog extends Dialog {
     }
 }
 exports.FormDialog = FormDialog;
-
-},{}],118:[function(require,module,exports){
+},{}],119:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -18389,8 +18536,7 @@ class ShadowrunActorDialogs {
     }
 }
 exports.ShadowrunActorDialogs = ShadowrunActorDialogs;
-
-},{"../../helpers":138,"../../parts/PartsList":189,"./FormDialog":117}],119:[function(require,module,exports){
+},{"../../helpers":139,"../../parts/PartsList":190,"./FormDialog":118}],120:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -18686,8 +18832,7 @@ class ShadowrunItemDialog {
     }
 }
 exports.ShadowrunItemDialog = ShadowrunItemDialog;
-
-},{"../../constants":129,"../../helpers":138,"./FormDialog":117}],120:[function(require,module,exports){
+},{"../../constants":130,"../../helpers":139,"./FormDialog":118}],121:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -18795,8 +18940,7 @@ class ShadowrunTestDialog {
     }
 }
 exports.ShadowrunTestDialog = ShadowrunTestDialog;
-
-},{"../../constants":129,"../../helpers":138,"../../parts/PartsList":189,"./FormDialog":117}],121:[function(require,module,exports){
+},{"../../constants":130,"../../helpers":139,"../../parts/PartsList":190,"./FormDialog":118}],122:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -18990,7 +19134,7 @@ exports.OverwatchScoreTracker = OverwatchScoreTracker;
 (0, _defineProperty2["default"])(OverwatchScoreTracker, "MatrixOverwatchDiceCount", '2d6');
 (0, _defineProperty2["default"])(OverwatchScoreTracker, "addedActors", []);
 
-},{"../../helpers":138,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10}],122:[function(require,module,exports){
+},{"../../helpers":139,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10}],123:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KnowledgeSkillEditForm = void 0;
@@ -19005,8 +19149,7 @@ class KnowledgeSkillEditForm extends LanguageSkillEditForm_1.LanguageSkillEditFo
     }
 }
 exports.KnowledgeSkillEditForm = KnowledgeSkillEditForm;
-
-},{"./LanguageSkillEditForm":123}],123:[function(require,module,exports){
+},{"./LanguageSkillEditForm":124}],124:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LanguageSkillEditForm = void 0;
@@ -19029,8 +19172,7 @@ class LanguageSkillEditForm extends SkillEditForm_1.SkillEditForm {
     }
 }
 exports.LanguageSkillEditForm = LanguageSkillEditForm;
-
-},{"./SkillEditForm":124}],124:[function(require,module,exports){
+},{"./SkillEditForm":125}],125:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -19190,8 +19332,7 @@ class SkillEditForm extends BaseEntitySheet {
     }
 }
 exports.SkillEditForm = SkillEditForm;
-
-},{}],125:[function(require,module,exports){
+},{}],126:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.measureDistance = void 0;
@@ -19230,8 +19371,7 @@ exports.measureDistance = function (segments, options = {}) {
             return (ns + nd) * canvas.scene.data.gridDistance;
     });
 };
-
-},{}],126:[function(require,module,exports){
+},{}],127:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -19544,8 +19684,7 @@ exports.addRollListeners = (app, html) => {
         });
     }));
 };
-
-},{"./actor/SR5Actor":85,"./apps/dialogs/DamageApplicationDialog":115,"./constants":129,"./helpers":138,"./item/SR5Item":178,"./template":192}],127:[function(require,module,exports){
+},{"./actor/SR5Actor":85,"./apps/dialogs/DamageApplicationDialog":116,"./constants":130,"./helpers":139,"./item/SR5Item":179,"./template":193}],128:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -19781,8 +19920,7 @@ class SR5Combat extends Combat {
     }
 }
 exports.SR5Combat = SR5Combat;
-
-},{}],128:[function(require,module,exports){
+},{}],129:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5 = void 0;
@@ -20208,8 +20346,7 @@ exports.SR5 = {
         },
     },
 };
-
-},{}],129:[function(require,module,exports){
+},{}],130:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR = exports.LENGTH_UNIT = exports.DEFAULT_ROLL_NAME = exports.LENGTH_UNIT_TO_METERS_MULTIPLIERS = exports.METATYPEMODIFIER = exports.CORE_FLAGS = exports.CORE_NAME = exports.FLAGS = exports.SYSTEM_NAME = void 0;
@@ -20275,8 +20412,7 @@ exports.SR = {
         }
     }
 };
-
-},{}],130:[function(require,module,exports){
+},{}],131:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataTemplates = void 0;
@@ -20344,8 +20480,7 @@ exports.DataTemplates = {
         mod: []
     }
 };
-
-},{}],131:[function(require,module,exports){
+},{}],132:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataWrapper = void 0;
@@ -20355,8 +20490,7 @@ class DataWrapper {
     }
 }
 exports.DataWrapper = DataWrapper;
-
-},{}],132:[function(require,module,exports){
+},{}],133:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerBasicHelpers = void 0;
@@ -20480,8 +20614,7 @@ exports.registerBasicHelpers = () => {
         return new Handlebars.SafeString(helpers_1.Helpers.shortenAttributeLocalization(label, length));
     });
 };
-
-},{"../helpers":138}],133:[function(require,module,exports){
+},{"../helpers":139}],134:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -20513,8 +20646,7 @@ class HandlebarManager {
     }
 }
 exports.HandlebarManager = HandlebarManager;
-
-},{"./BasicHelpers":132,"./HandlebarTemplates":134,"./ItemLineHelpers":135,"./RollAndLabelHelpers":136,"./SkillLineHelpers":137}],134:[function(require,module,exports){
+},{"./BasicHelpers":133,"./HandlebarTemplates":135,"./ItemLineHelpers":136,"./RollAndLabelHelpers":137,"./SkillLineHelpers":138}],135:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -20631,8 +20763,7 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
     ];
     return loadTemplates(templatePaths);
 });
-
-},{}],135:[function(require,module,exports){
+},{}],136:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerItemLineHelpers = void 0;
@@ -21042,8 +21173,7 @@ exports.registerItemLineHelpers = () => {
         return icons;
     });
 };
-
-},{"../item/SR5ItemDataWrapper":179}],136:[function(require,module,exports){
+},{"../item/SR5ItemDataWrapper":180}],137:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerRollAndLabelHelpers = void 0;
@@ -21115,8 +21245,7 @@ exports.registerRollAndLabelHelpers = () => {
     });
     Handlebars.registerHelper('speakerName', helpers_1.Helpers.getChatSpeakerName);
 };
-
-},{"../helpers":138,"../parts/PartsList":189}],137:[function(require,module,exports){
+},{"../helpers":139,"../parts/PartsList":190}],138:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerSkillLineHelpers = void 0;
@@ -21213,8 +21342,7 @@ exports.registerSkillLineHelpers = () => {
         }
     });
 };
-
-},{"../helpers":138}],138:[function(require,module,exports){
+},{"../helpers":139}],139:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -21595,8 +21723,7 @@ class Helpers {
     }
 }
 exports.Helpers = Helpers;
-
-},{"./apps/dialogs/DeleteConfirmationDialog":116,"./constants":129,"./dataTemplates":130,"./parts/PartsList":189}],139:[function(require,module,exports){
+},{"./apps/dialogs/DeleteConfirmationDialog":117,"./constants":130,"./dataTemplates":131,"./parts/PartsList":190}],140:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -21738,8 +21865,7 @@ ___________________
     }
 }
 exports.HooksManager = HooksManager;
-
-},{"./actor/SR5Actor":85,"./actor/SR5ActorSheet":86,"./apps/ChangelogApplication":105,"./apps/gmtools/OverwatchScoreTracker":121,"./canvas":125,"./chat":126,"./combat/SR5Combat":127,"./config":128,"./constants":129,"./handlebars/HandlebarManager":133,"./helpers":138,"./importer/apps/import-form":140,"./item/SR5Item":178,"./item/SR5ItemSheet":180,"./macros":181,"./migrator/Migrator":183,"./rolls/ShadowrunRoller":190,"./settings":191}],140:[function(require,module,exports){
+},{"./actor/SR5Actor":85,"./actor/SR5ActorSheet":86,"./apps/ChangelogApplication":105,"./apps/gmtools/OverwatchScoreTracker":122,"./canvas":126,"./chat":127,"./combat/SR5Combat":128,"./config":129,"./constants":130,"./handlebars/HandlebarManager":134,"./helpers":139,"./importer/apps/import-form":141,"./item/SR5Item":179,"./item/SR5ItemSheet":181,"./macros":182,"./migrator/Migrator":184,"./rolls/ShadowrunRoller":191,"./settings":192}],141:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -21921,8 +22047,7 @@ Import.Importers = [
     new DeviceImporter_1.DeviceImporter(),
     new EquipmentImporter_1.EquipmentImporter()
 ];
-
-},{"../helper/ImportHelper":141,"../importer/AmmoImporter":145,"../importer/ArmorImporter":146,"../importer/ComplexFormImporter":147,"../importer/CritterPowerImporter":149,"../importer/DataImporter":150,"../importer/DeviceImporter":151,"../importer/EquipmentImporter":152,"../importer/ModImporter":153,"../importer/QualityImporter":154,"../importer/SpellImporter":155,"../importer/WareImporter":156,"../importer/WeaponImporter":157}],141:[function(require,module,exports){
+},{"../helper/ImportHelper":142,"../importer/AmmoImporter":146,"../importer/ArmorImporter":147,"../importer/ComplexFormImporter":148,"../importer/CritterPowerImporter":150,"../importer/DataImporter":151,"../importer/DeviceImporter":152,"../importer/EquipmentImporter":153,"../importer/ModImporter":154,"../importer/QualityImporter":155,"../importer/SpellImporter":156,"../importer/WareImporter":157,"../importer/WeaponImporter":158}],142:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22131,16 +22256,14 @@ class ImportHelper {
 exports.ImportHelper = ImportHelper;
 ImportHelper.CHAR_KEY = '_TEXT';
 ImportHelper.s_Strategy = new XMLStrategy_1.XMLStrategy();
-
-},{"../importer/Constants":148,"./JSONStrategy":143,"./XMLStrategy":144}],142:[function(require,module,exports){
+},{"../importer/Constants":149,"./JSONStrategy":144,"./XMLStrategy":145}],143:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ImportStrategy = void 0;
 class ImportStrategy {
 }
 exports.ImportStrategy = ImportStrategy;
-
-},{}],143:[function(require,module,exports){
+},{}],144:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JSONStrategy = void 0;
@@ -22157,8 +22280,7 @@ class JSONStrategy extends ImportStrategy_1.ImportStrategy {
     }
 }
 exports.JSONStrategy = JSONStrategy;
-
-},{"./ImportStrategy":142}],144:[function(require,module,exports){
+},{"./ImportStrategy":143}],145:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.XMLStrategy = void 0;
@@ -22206,8 +22328,7 @@ class XMLStrategy extends ImportStrategy_1.ImportStrategy {
     }
 }
 exports.XMLStrategy = XMLStrategy;
-
-},{"./ImportHelper":141,"./ImportStrategy":142}],145:[function(require,module,exports){
+},{"./ImportHelper":142,"./ImportStrategy":143}],146:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22359,8 +22480,7 @@ class AmmoImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.AmmoImporter = AmmoImporter;
-
-},{"../helper/ImportHelper":141,"./Constants":148,"./DataImporter":150}],146:[function(require,module,exports){
+},{"../helper/ImportHelper":142,"./Constants":149,"./DataImporter":151}],147:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22461,8 +22581,7 @@ class ArmorImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.ArmorImporter = ArmorImporter;
-
-},{"../helper/ImportHelper":141,"../parser/armor/ArmorParserBase":160,"./DataImporter":150}],147:[function(require,module,exports){
+},{"../helper/ImportHelper":142,"../parser/armor/ArmorParserBase":161,"./DataImporter":151}],148:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22586,8 +22705,7 @@ class ComplexFormImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.ComplexFormImporter = ComplexFormImporter;
-
-},{"../helper/ImportHelper":141,"../parser/complex-form/ComplexFormParserBase":161,"./Constants":148,"./DataImporter":150}],148:[function(require,module,exports){
+},{"../helper/ImportHelper":142,"../parser/complex-form/ComplexFormParserBase":162,"./Constants":149,"./DataImporter":151}],149:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Constants = void 0;
@@ -22808,8 +22926,7 @@ Constants.WEAPON_RANGES = {
     },
 };
 Constants.ROOT_IMPORT_FOLDER_NAME = 'SR5e';
-
-},{}],149:[function(require,module,exports){
+},{}],150:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22940,8 +23057,7 @@ class CritterPowerImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.CritterPowerImporter = CritterPowerImporter;
-
-},{"../helper/ImportHelper":141,"../parser/critter-power/CritterPowerParserBase":162,"./Constants":148,"./DataImporter":150}],150:[function(require,module,exports){
+},{"../helper/ImportHelper":142,"../parser/critter-power/CritterPowerParserBase":163,"./Constants":149,"./DataImporter":151}],151:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -23003,8 +23119,7 @@ class DataImporter {
 }
 exports.DataImporter = DataImporter;
 DataImporter.unsupportedBooks = ['2050'];
-
-},{"../helper/ImportHelper":141,"xml2js":51}],151:[function(require,module,exports){
+},{"../helper/ImportHelper":142,"xml2js":51}],152:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -23180,8 +23295,7 @@ class DeviceImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.DeviceImporter = DeviceImporter;
-
-},{"../helper/ImportHelper":141,"./Constants":148,"./DataImporter":150}],152:[function(require,module,exports){
+},{"../helper/ImportHelper":142,"./Constants":149,"./DataImporter":151}],153:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -23295,8 +23409,7 @@ class EquipmentImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.EquipmentImporter = EquipmentImporter;
-
-},{"../helper/ImportHelper":141,"./Constants":148,"./DataImporter":150}],153:[function(require,module,exports){
+},{"../helper/ImportHelper":142,"./Constants":149,"./DataImporter":151}],154:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -23400,8 +23513,7 @@ class ModImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.ModImporter = ModImporter;
-
-},{"../helper/ImportHelper":141,"../parser/mod/ModParserBase":165,"./Constants":148,"./DataImporter":150}],154:[function(require,module,exports){
+},{"../helper/ImportHelper":142,"../parser/mod/ModParserBase":166,"./Constants":149,"./DataImporter":151}],155:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -23524,8 +23636,7 @@ class QualityImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.QualityImporter = QualityImporter;
-
-},{"../helper/ImportHelper":141,"../parser/quality/QualityParserBase":166,"./DataImporter":150}],155:[function(require,module,exports){
+},{"../helper/ImportHelper":142,"../parser/quality/QualityParserBase":167,"./DataImporter":151}],156:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -23679,8 +23790,7 @@ class SpellImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.SpellImporter = SpellImporter;
-
-},{"../helper/ImportHelper":141,"../parser/ParserMap":159,"../parser/spell/CombatSpellParser":167,"../parser/spell/DetectionSpellImporter":168,"../parser/spell/IllusionSpellParser":169,"../parser/spell/ManipulationSpellParser":170,"../parser/spell/SpellParserBase":171,"./DataImporter":150}],156:[function(require,module,exports){
+},{"../helper/ImportHelper":142,"../parser/ParserMap":160,"../parser/spell/CombatSpellParser":168,"../parser/spell/DetectionSpellImporter":169,"../parser/spell/IllusionSpellParser":170,"../parser/spell/ManipulationSpellParser":171,"../parser/spell/SpellParserBase":172,"./DataImporter":151}],157:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -23851,8 +23961,7 @@ class WareImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.WareImporter = WareImporter;
-
-},{"../helper/ImportHelper":141,"../parser/ware/CyberwareParser":172,"./DataImporter":150}],157:[function(require,module,exports){
+},{"../helper/ImportHelper":142,"../parser/ware/CyberwareParser":173,"./DataImporter":151}],158:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -24047,16 +24156,14 @@ class WeaponImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.WeaponImporter = WeaponImporter;
-
-},{"../helper/ImportHelper":141,"../parser/ParserMap":159,"../parser/weapon/MeleeParser":173,"../parser/weapon/RangedParser":174,"../parser/weapon/ThrownParser":175,"../parser/weapon/WeaponParserBase":176,"./Constants":148,"./DataImporter":150}],158:[function(require,module,exports){
+},{"../helper/ImportHelper":142,"../parser/ParserMap":160,"../parser/weapon/MeleeParser":174,"../parser/weapon/RangedParser":175,"../parser/weapon/ThrownParser":176,"../parser/weapon/WeaponParserBase":177,"./Constants":149,"./DataImporter":151}],159:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
 class Parser {
 }
 exports.Parser = Parser;
-
-},{}],159:[function(require,module,exports){
+},{}],160:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ParserMap = void 0;
@@ -24089,8 +24196,7 @@ class ParserMap extends Parser_1.Parser {
     }
 }
 exports.ParserMap = ParserMap;
-
-},{"../helper/ImportHelper":141,"./Parser":158}],160:[function(require,module,exports){
+},{"../helper/ImportHelper":142,"./Parser":159}],161:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ArmorParserBase = void 0;
@@ -24105,8 +24211,7 @@ class ArmorParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBas
     }
 }
 exports.ArmorParserBase = ArmorParserBase;
-
-},{"../../helper/ImportHelper":141,"../item/TechnologyItemParserBase":164}],161:[function(require,module,exports){
+},{"../../helper/ImportHelper":142,"../item/TechnologyItemParserBase":165}],162:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ComplexFormParserBase = void 0;
@@ -24153,8 +24258,7 @@ class ComplexFormParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.ComplexFormParserBase = ComplexFormParserBase;
-
-},{"../../helper/ImportHelper":141,"../item/ItemParserBase":163}],162:[function(require,module,exports){
+},{"../../helper/ImportHelper":142,"../item/ItemParserBase":164}],163:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CritterPowerParserBase = void 0;
@@ -24214,8 +24318,7 @@ class CritterPowerParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.CritterPowerParserBase = CritterPowerParserBase;
-
-},{"../../helper/ImportHelper":141,"../item/ItemParserBase":163}],163:[function(require,module,exports){
+},{"../../helper/ImportHelper":142,"../item/ItemParserBase":164}],164:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemParserBase = void 0;
@@ -24234,8 +24337,7 @@ class ItemParserBase extends Parser_1.Parser {
     }
 }
 exports.ItemParserBase = ItemParserBase;
-
-},{"../../helper/ImportHelper":141,"../Parser":158}],164:[function(require,module,exports){
+},{"../../helper/ImportHelper":142,"../Parser":159}],165:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TechnologyItemParserBase = void 0;
@@ -24251,8 +24353,7 @@ class TechnologyItemParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.TechnologyItemParserBase = TechnologyItemParserBase;
-
-},{"../../helper/ImportHelper":141,"./ItemParserBase":163}],165:[function(require,module,exports){
+},{"../../helper/ImportHelper":142,"./ItemParserBase":164}],166:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ModParserBase = void 0;
@@ -24270,8 +24371,7 @@ class ModParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBase 
     }
 }
 exports.ModParserBase = ModParserBase;
-
-},{"../../helper/ImportHelper":141,"../item/TechnologyItemParserBase":164}],166:[function(require,module,exports){
+},{"../../helper/ImportHelper":142,"../item/TechnologyItemParserBase":165}],167:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.QualityParserBase = void 0;
@@ -24291,8 +24391,7 @@ class QualityParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.QualityParserBase = QualityParserBase;
-
-},{"../../helper/ImportHelper":141,"../item/ItemParserBase":163}],167:[function(require,module,exports){
+},{"../../helper/ImportHelper":142,"../item/ItemParserBase":164}],168:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CombatSpellParser = void 0;
@@ -24330,8 +24429,7 @@ class CombatSpellParser extends SpellParserBase_1.SpellParserBase {
     }
 }
 exports.CombatSpellParser = CombatSpellParser;
-
-},{"../../helper/ImportHelper":141,"./SpellParserBase":171}],168:[function(require,module,exports){
+},{"../../helper/ImportHelper":142,"./SpellParserBase":172}],169:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DetectionSpellImporter = void 0;
@@ -24368,8 +24466,7 @@ class DetectionSpellImporter extends SpellParserBase_1.SpellParserBase {
     }
 }
 exports.DetectionSpellImporter = DetectionSpellImporter;
-
-},{"../../helper/ImportHelper":141,"./SpellParserBase":171}],169:[function(require,module,exports){
+},{"../../helper/ImportHelper":142,"./SpellParserBase":172}],170:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IllusionSpellParser = void 0;
@@ -24400,8 +24497,7 @@ class IllusionSpellParser extends SpellParserBase_1.SpellParserBase {
     }
 }
 exports.IllusionSpellParser = IllusionSpellParser;
-
-},{"../../helper/ImportHelper":141,"./SpellParserBase":171}],170:[function(require,module,exports){
+},{"../../helper/ImportHelper":142,"./SpellParserBase":172}],171:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ManipulationSpellParser = void 0;
@@ -24440,8 +24536,7 @@ class ManipulationSpellParser extends SpellParserBase_1.SpellParserBase {
     }
 }
 exports.ManipulationSpellParser = ManipulationSpellParser;
-
-},{"../../helper/ImportHelper":141,"./SpellParserBase":171}],171:[function(require,module,exports){
+},{"../../helper/ImportHelper":142,"./SpellParserBase":172}],172:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpellParserBase = void 0;
@@ -24501,8 +24596,7 @@ class SpellParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.SpellParserBase = SpellParserBase;
-
-},{"../../helper/ImportHelper":141,"../item/ItemParserBase":163}],172:[function(require,module,exports){
+},{"../../helper/ImportHelper":142,"../item/ItemParserBase":164}],173:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CyberwareParser = void 0;
@@ -24523,8 +24617,7 @@ class CyberwareParser extends TechnologyItemParserBase_1.TechnologyItemParserBas
     }
 }
 exports.CyberwareParser = CyberwareParser;
-
-},{"../../helper/ImportHelper":141,"../item/TechnologyItemParserBase":164}],173:[function(require,module,exports){
+},{"../../helper/ImportHelper":142,"../item/TechnologyItemParserBase":165}],174:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MeleeParser = void 0;
@@ -24592,8 +24685,7 @@ class MeleeParser extends WeaponParserBase_1.WeaponParserBase {
     }
 }
 exports.MeleeParser = MeleeParser;
-
-},{"../../helper/ImportHelper":141,"./WeaponParserBase":176}],174:[function(require,module,exports){
+},{"../../helper/ImportHelper":142,"./WeaponParserBase":177}],175:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RangedParser = void 0;
@@ -24675,8 +24767,7 @@ class RangedParser extends WeaponParserBase_1.WeaponParserBase {
     }
 }
 exports.RangedParser = RangedParser;
-
-},{"../../helper/ImportHelper":141,"../../importer/Constants":148,"./WeaponParserBase":176}],175:[function(require,module,exports){
+},{"../../helper/ImportHelper":142,"../../importer/Constants":149,"./WeaponParserBase":177}],176:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ThrownParser = void 0;
@@ -24790,8 +24881,7 @@ class ThrownParser extends WeaponParserBase_1.WeaponParserBase {
     }
 }
 exports.ThrownParser = ThrownParser;
-
-},{"../../helper/ImportHelper":141,"../../importer/Constants":148,"./WeaponParserBase":176}],176:[function(require,module,exports){
+},{"../../helper/ImportHelper":142,"../../importer/Constants":149,"./WeaponParserBase":177}],177:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WeaponParserBase = void 0;
@@ -24856,8 +24946,7 @@ class WeaponParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBa
     }
 }
 exports.WeaponParserBase = WeaponParserBase;
-
-},{"../../helper/ImportHelper":141,"../../importer/Constants":148,"../item/TechnologyItemParserBase":164}],177:[function(require,module,exports){
+},{"../../helper/ImportHelper":142,"../../importer/Constants":149,"../item/TechnologyItemParserBase":165}],178:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatData = void 0;
@@ -25206,8 +25295,7 @@ exports.ChatData = {
         }
     },
 };
-
-},{"../helpers":138}],178:[function(require,module,exports){
+},{"../helpers":139}],179:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26520,8 +26608,7 @@ class SR5Item extends Item {
     }
 }
 exports.SR5Item = SR5Item;
-
-},{"../apps/dialogs/ShadowrunItemDialog":119,"../chat":126,"../constants":129,"../helpers":138,"../parts/PartsList":189,"../rolls/ShadowrunRoller":190,"./ChatData":177,"./SR5ItemDataWrapper":179}],179:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunItemDialog":120,"../chat":127,"../constants":130,"../helpers":139,"../parts/PartsList":190,"../rolls/ShadowrunRoller":191,"./ChatData":178,"./SR5ItemDataWrapper":180}],180:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ItemDataWrapper = void 0;
@@ -26836,8 +26923,7 @@ class SR5ItemDataWrapper extends DataWrapper_1.DataWrapper {
     }
 }
 exports.SR5ItemDataWrapper = SR5ItemDataWrapper;
-
-},{"../dataWrappers/DataWrapper":131}],180:[function(require,module,exports){
+},{"../dataWrappers/DataWrapper":132}],181:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27178,8 +27264,7 @@ class SR5ItemSheet extends ItemSheet {
     }
 }
 exports.SR5ItemSheet = SR5ItemSheet;
-
-},{"../helpers":138}],181:[function(require,module,exports){
+},{"../helpers":139}],182:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27238,8 +27323,7 @@ function rollItemMacro(itemName) {
     return item.castAction();
 }
 exports.rollItemMacro = rollItemMacro;
-
-},{}],182:[function(require,module,exports){
+},{}],183:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const HandlebarManager_1 = require("./handlebars/HandlebarManager");
@@ -27249,8 +27333,7 @@ const hooks_1 = require("./hooks");
 /* -------------------------------------------- */
 hooks_1.HooksManager.registerHooks();
 HandlebarManager_1.HandlebarManager.registerHelpers();
-
-},{"./handlebars/HandlebarManager":133,"./hooks":139}],183:[function(require,module,exports){
+},{"./handlebars/HandlebarManager":134,"./hooks":140}],184:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27394,8 +27477,7 @@ Migrator.s_Versions = [
     { versionNumber: Version0_6_10_1.Version0_6_10.TargetVersion, migration: new Version0_6_10_1.Version0_6_10() },
     { versionNumber: Version0_7_2_1.Version0_7_2.TargetVersion, migration: new Version0_7_2_1.Version0_7_2() },
 ];
-
-},{"./VersionMigration":184,"./versions/LegacyMigration":185,"./versions/Version0_6_10":186,"./versions/Version0_6_5":187,"./versions/Version0_7_2":188}],184:[function(require,module,exports){
+},{"./VersionMigration":185,"./versions/LegacyMigration":186,"./versions/Version0_6_10":187,"./versions/Version0_6_5":188,"./versions/Version0_7_2":189}],185:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27825,8 +27907,7 @@ exports.VersionMigration = VersionMigration;
 VersionMigration.MODULE_NAME = 'shadowrun5e';
 VersionMigration.KEY_DATA_VERSION = 'systemMigrationVersion';
 VersionMigration.NO_VERSION = '0';
-
-},{}],185:[function(require,module,exports){
+},{}],186:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -28055,8 +28136,7 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
     }
 }
 exports.LegacyMigration = LegacyMigration;
-
-},{"../VersionMigration":184}],186:[function(require,module,exports){
+},{"../VersionMigration":185}],187:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -28116,8 +28196,7 @@ class Version0_6_10 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_6_10 = Version0_6_10;
-
-},{"../VersionMigration":184}],187:[function(require,module,exports){
+},{"../VersionMigration":185}],188:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -28167,8 +28246,7 @@ class Version0_6_5 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_6_5 = Version0_6_5;
-
-},{"../VersionMigration":184}],188:[function(require,module,exports){
+},{"../VersionMigration":185}],189:[function(require,module,exports){
 "use strict";
 // TODO: How to trigger test migration.
 // TODO: How to test migration results?
@@ -28245,8 +28323,7 @@ class Version0_7_2 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_7_2 = Version0_7_2;
-
-},{"../../config":128,"../VersionMigration":184}],189:[function(require,module,exports){
+},{"../../config":129,"../VersionMigration":185}],190:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PartsList = void 0;
@@ -28349,8 +28426,7 @@ class PartsList {
     }
 }
 exports.PartsList = PartsList;
-
-},{}],190:[function(require,module,exports){
+},{}],191:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -28727,8 +28803,7 @@ class ShadowrunRoller {
     }
 }
 exports.ShadowrunRoller = ShadowrunRoller;
-
-},{"../apps/dialogs/ShadowrunTestDialog":120,"../chat":126,"../constants":129,"../helpers":138,"../parts/PartsList":189}],191:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunTestDialog":121,"../chat":127,"../constants":130,"../helpers":139,"../parts/PartsList":190}],192:[function(require,module,exports){
 "use strict";
 // game settings for shadowrun 5e
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -28807,8 +28882,7 @@ exports.registerSystemSettings = () => {
         default: true,
     });
 };
-
-},{"./constants":129,"./migrator/VersionMigration":184}],192:[function(require,module,exports){
+},{"./constants":130,"./migrator/VersionMigration":185}],193:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Template extends MeasuredTemplate {
@@ -28899,7 +28973,6 @@ class Template extends MeasuredTemplate {
     }
 }
 exports.default = Template;
-
-},{}]},{},[182])
+},{}]},{},[183])
 
 //# sourceMappingURL=bundle.js.map
