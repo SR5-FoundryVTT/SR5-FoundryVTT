@@ -14,6 +14,11 @@ export class GearsParser {
 
         chummerGears.forEach((chummerGear) => {
             try {
+                // First filter out gear entries, that we do not want to handle.
+                if (!this.gearShouldBeParsed(chummerGear)) {
+                    return;
+                }
+
                 const itemsData = this.parseGearEntry(chummerGear);
                 items.push(itemsData);
             }
@@ -30,5 +35,18 @@ export class GearsParser {
         const parserSelector = new ParserSelector();
         const parser = parserSelector.select(chummerGear);
         return parser.parse(chummerGear);
+    }
+
+    private gearShouldBeParsed(chummerGear : any) : boolean {
+        // We do not handle grenades and rockets here since they are also in the weapons section with more info.
+        const englishGearName = (chummerGear.name_english as string).toLowerCase();
+        if (englishGearName.startsWith('grenade') || 
+            englishGearName.startsWith('minigrenade') || 
+            englishGearName.startsWith('rocket'))
+        {
+            return false;
+        }
+
+        return true;
     }
 }

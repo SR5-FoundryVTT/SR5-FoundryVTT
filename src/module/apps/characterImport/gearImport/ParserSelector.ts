@@ -2,6 +2,7 @@ import { GearParser, BaseGearParser } from "./BaseGearParser";
 import { SinParser } from "./SinParser";
 import { DeviceParser } from "./DeviceParser";
 import { ProgramParser } from "./ProgramParser";
+import { AmmoParser } from "./AmmoParser";
 
 /**
  * Responsible for selecting the correct GearParser depending on the gear.
@@ -22,6 +23,11 @@ export class ParserSelector {
         if (chummerGear.iscommlink === 'True')
         {
             return new DeviceParser();
+        }
+
+        if (chummerGear.isammo === 'True')
+        {
+            return new AmmoParser();
         }
 
         if (chummerGear.category === 'Common Programs' || 

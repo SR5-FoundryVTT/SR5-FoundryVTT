@@ -23,12 +23,18 @@ export class BaseGearParser implements GearParser {
 
         parsedGear.data.technology.rating = chummerGear.rating;
         parsedGear.data.technology.quantity = chummerGear.qty;
+        parsedGear.data.technology.availability = chummerGear.avail;
         parsedGear.data.description =
         {
             value: '',
             chat: '',
-            source: `${chummerGear.source} ${chummerGear.page}`
+            source: ''
         };
+
+        if (chummerGear.source && chummerGear.page)
+        {
+            parsedGear.data.description.source = `${chummerGear.source} ${chummerGear.page}`;
+        }
 
         return parsedGear;
     }
