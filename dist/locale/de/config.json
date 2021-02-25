@@ -5,10 +5,10 @@
   "SR5.ItemTypes": {
         "Action": "Aktion",
         "AdeptPower": "Adeptenkraft",
-        "Ammo": "Rüstung",
-        "Armor": "Komplexe Form",
+        "Ammo": "Munition",
+        "Armor": "Panzerung",
         "ComplexForm": "Komplexe Form",
-        "Contact": "Cyberware",
+        "Contact": "Kontakt",
         "CritterPower": "Critter Kraft",
         "Cyberware": "Cyberware",
         "Bioware": "Bioware",
@@ -771,7 +771,7 @@
         "Changelog": "Für neue Funktionen und behobene Fehler",
         "LatestChangelog": "Aktuelle Changelog",
         "ReportIssues": "Bitte Fehler und gewünschte Funktionen hier melden",
-        "IssuesOverview": "Anfragen Übersicht"
+        "IssuesOverview": "Anfragenübersicht"
     },
 
     "SR5.DeleteConfirmationApplication": {

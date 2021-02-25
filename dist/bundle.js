@@ -28880,8 +28880,8 @@ class ShadowrunRoller {
         });
     }
     static _errorOnInvalidLimit(limit) {
-        if (limit && limit.value <= 0) {
-            ui.notifications.warn(game.i18n.localize('SR5.Warnings.NegativeLimitValue'));
+        if (limit && limit.value < 0) {
+            ui.notifications.error(game.i18n.localize('SR5.Warnings.NegativeLimitValue'));
         }
     }
     static handleExtendedRoll(advancedProps, testData) {
