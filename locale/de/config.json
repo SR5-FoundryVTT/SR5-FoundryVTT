@@ -5,10 +5,10 @@
   "SR5.ItemTypes": {
         "Action": "Aktion",
         "AdeptPower": "Adeptenkraft",
-        "Ammo": "Rüstung",
-        "Armor": "Komplexe Form",
+        "Ammo": "Munition",
+        "Armor": "Panzerung",
         "ComplexForm": "Komplexe Form",
-        "Contact": "Cyberware",
+        "Contact": "Kontakt",
         "CritterPower": "Critter Kraft",
         "Cyberware": "Cyberware",
         "Bioware": "Bioware",
