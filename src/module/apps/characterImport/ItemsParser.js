@@ -1,5 +1,6 @@
 import {_mergeWithMissingSkillFields} from "../../actor/prep/functions/SkillsPrep";
 import {GearsParser} from "./gearImport/GearsParser"
+import {SR5} from "../../config"
 
 /**
  * Parses all items (qualities, weapons, gear, ...) from a chummer character.
@@ -11,9 +12,11 @@ export class ItemsParser {
      *  @param entry The chummer entry (the item, the quality..)
      */
     parseDescription = (entry) => {
-        const parsedDescription = {
-            source: `${entry.source} ${entry.page}`
-        };
+        const parsedDescription = {};
+
+        if (entry.source && entry.page) {
+            parsedDescription.source = `${entry.source} ${entry.page}`
+        }
 
         if (entry.description) {
             parsedDescription.value = TextEditor.enrichHTML(q.description);
@@ -74,6 +77,16 @@ export class ItemsParser {
         if (importOptions.spells && chummerChar.spells && chummerChar.spells.spell) {
             const parsedSpells = this.parseSpells(chummerChar);
             Array.prototype.push.apply(parsedItems, parsedSpells);
+        }
+
+        if (importOptions.contacts && chummerChar.contacts && chummerChar.contacts.contact) {
+            const parsedContacts = this.parseContacts(chummerChar);
+            Array.prototype.push.apply(parsedItems, parsedContacts);
+        }
+
+        if (importOptions.lifestyles && chummerChar.lifestyles && chummerChar.lifestyles.lifestyle) {
+            const parsedLifestyles = this.parseLifestyle(chummerChar);
+            Array.prototype.push.apply(parsedItems, parsedLifestyles);
         }
 
         return parsedItems;
@@ -361,10 +374,9 @@ export class ItemsParser {
             data.description = this.parseDescription(chummerPower);
 
             data.level = parseInt(chummerPower.rating);
-            chummerPower.pp = parseInt(chummerPower.totalpoints);
-
+            data.pp = parseFloat(chummerPower.totalpoints);
             const itemData = {
-                name: chummerPower.name,
+                name: chummerPower.fullname,
                 type: 'adept_power',
                 data,
             };
@@ -527,5 +539,91 @@ export class ItemsParser {
         });
 
         return parsedSpells;
+    }
+
+    parseLifestyle(chummerChar) {
+        
+        const chummerLifestyle = this.getArray(chummerChar.lifestyles.lifestyle);
+        const parsedLifestyle = [];
+
+        // Advanced lifetstyles and lifestyle qualities are not supported at the moment
+        chummerLifestyle.forEach((chummerLifestyle) => {
+            try {
+                const data = {};
+
+                // Map the chummer lifestyle type to our sr5 foundry type. 
+                const chummerLifestyleType = chummerLifestyle.baselifestyle.toLowerCase();
+                if ((chummerLifestyleType in SR5.lifestyleTypes)) {
+                    data.type = chummerLifestyleType;
+                }
+                else {
+                    // This is necessary because of a typo in SR5 config.
+                    if (chummerLifestyleType === 'luxury')
+                    {
+                        data.type = 'luxory';
+                    }
+                    else {
+                        data.type = 'other';
+                    }
+                }
+
+                data.cost = chummerLifestyle.totalmonthlycost; 
+                data.permanent = chummerLifestyle.purchased;
+                data.description = this.parseDescription(chummerLifestyle);
+                
+                const itemData = {
+                    // The name of the lifestyle is optional, so we use a fallback here.
+                    name: chummerLifestyle.name ? chummerLifestyle.name : chummerLifestyle.baselifestyle,
+                    type: 'lifestyle',
+                    data,
+                };
+                parsedLifestyle.push(itemData);
+            } catch (e) {
+                console.error(e);
+            }
+        });
+
+        return parsedLifestyle;
+    }
+
+    parseContacts(chummerChar) {
+        
+        const chummerContacts = this.getArray(chummerChar.contacts.contact);
+        const parsedContacts = [];
+
+        chummerContacts.forEach((chummerContact) => {
+            try {
+                const data = {};
+                data.type = chummerContact.role;
+
+                // Group contacts are stored in chummer as 'Group(connectionRating)', e.g. 'Group(5)'
+                // We handle group contacts as normal contacts until they are supported in the codebase.
+                if (chummerContact.connection.toLowerCase().includes('group')) {
+                    data.connection = chummerContact.connection
+                                        .toLowerCase()
+                                        .replace('group(', '')
+                                        .replace(')', '');
+                }
+                else {
+                    data.connection = chummerContact.connection;
+                }
+
+                data.loyalty = chummerContact.loyalty;
+                data.family = (chummerContact.family.toLowerCase() === 'true');
+                data.blackmail = (chummerContact.blackmail.toLowerCase() === 'true');
+                data.description = this.parseDescription(chummerContact);
+
+                const itemData = {
+                    name: chummerContact.name ? chummerContact.name : '[Unnamed connection]',
+                    type: 'contact',
+                    data,
+                };
+                parsedContacts.push(itemData);
+            } catch (e) {
+                console.error(e);
+            }
+        });
+
+        return parsedContacts;
     }
 }

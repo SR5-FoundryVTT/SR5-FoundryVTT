@@ -78,6 +78,7 @@ export class CharacterInfoUpdater {
         clonedActorData.name = chummerChar.alias ? chummerChar.alias : '[Name not found]';
         
         this.importBasicData(clonedActorData.data, chummerChar);
+        this.importBio(clonedActorData.data, chummerChar);
         this.importAttributes(clonedActorData.data, chummerChar)
         this.importInitiative(clonedActorData.data, chummerChar);
         this.importSkills(clonedActorData.data, chummerChar);
@@ -160,6 +161,28 @@ export class CharacterInfoUpdater {
         }
     }
 
+    importBio(actorDataData, chummerChar) {
+        actorDataData.description.value = '';
+
+        // Chummer outputs html and wraps every section in <p> tags, 
+        // so we just concat everything with an additional linebreak in between
+        if (chummerChar.description) {
+            actorDataData.description.value += TextEditor.enrichHTML(chummerChar.description + '<br/>');
+        }
+
+        if (chummerChar.background) {
+            actorDataData.description.value += TextEditor.enrichHTML(chummerChar.background + '<br/>');
+        }
+
+        if (chummerChar.concept) {
+            actorDataData.description.value += TextEditor.enrichHTML(chummerChar.concept + '<br/>');
+        }
+
+        if (chummerChar.notes) {
+            actorDataData.description.value += TextEditor.enrichHTML(chummerChar.notes + '<br/>');
+        }
+    }
+
     importAttributes(actorDataData, chummerChar) {
         const atts = chummerChar.attributes[1].attribute;
         atts.forEach((att) => {
@@ -187,25 +210,26 @@ export class CharacterInfoUpdater {
     }
 
     importSkills(actorDataData, chummerChar) {
-        const skills = chummerChar.skills.skill;
-        for (let i = 0; i < skills.length; i++) {
+        const chummerSkills = chummerChar.skills.skill;
+        for (let i = 0; i < chummerSkills.length; i++) {
             try {
-                const s = skills[i];
-                if (s.rating > 0 && s.islanguage) {
-                    let group = 'active';
-                    let skill = null;
+                const chummerSkill = chummerSkills[i];
+                if (chummerSkill.rating > 0 && chummerSkill.islanguage) {
+                    let determinedGroup = 'active';
+                    let parsedSkill = null;
                     const id = randomID(16);
-                    if (s.islanguage && s.islanguage.toLowerCase() === 'true') {
-                        skill = {};
-                        actorDataData.skills.language.value[id] = skill;
-                        group = 'language';
-                    } else if (s.knowledge && s.knowledge.toLowerCase() === 'true') {
-                        const category = s.skillcategory_english;
-                        console.log(category);
-                        skill = {};
+                    if (chummerSkill.islanguage && chummerSkill.islanguage.toLowerCase() === 'true') {
+                        parsedSkill = {};
+                        actorDataData.skills.language.value[id] = parsedSkill;
+                        determinedGroup = 'language';
+                    } 
+                    else if (chummerSkill.knowledge && chummerSkill.knowledge.toLowerCase() === 'true') {
+                        const category = chummerSkill.skillcategory_english;
+                        parsedSkill = {};
+
+                        // Determine the correct knowledge skill category and assign the skill to it
                         let skillCategory;
                         if (category) {
-                            console.log('found category', category);
                             const cat = category.toLowerCase();
                             if (cat === 'street')
                                 skillCategory = actorDataData.skills.knowledge.street.value;
@@ -216,40 +240,44 @@ export class CharacterInfoUpdater {
                             if (cat === 'interest')
                                 skillCategory = actorDataData.skills.knowledge.interests.value;
                             if (skillCategory)
-                                skillCategory[id] = skill;
-                        } else {
-                            if (s.attribute.toLowerCase() === 'int') {
-                                actorDataData.skills.knowledge.street.value[id] = skill;
+                                skillCategory[id] = parsedSkill;
+                        } 
+                        else {
+                            if (chummerSkill.attribute.toLowerCase() === 'int') {
+                                actorDataData.skills.knowledge.street.value[id] = parsedSkill;
                             }
-                            if (s.attribute.toLowerCase() === 'log') {
-                                actorDataData.skills.knowledge.professional.value[id] = skill;
+                            if (chummerSkill.attribute.toLowerCase() === 'log') {
+                                actorDataData.skills.knowledge.professional.value[id] = parsedSkill;
                             }
                         }
-                        group = 'knowledge';
-                    } else {
-                        let name = s.name
+                        determinedGroup = 'knowledge';
+                    } 
+                    else {
+                        let name = chummerSkill.name
                             .toLowerCase()
                             .trim()
                             .replace(/\s/g, '_')
                             .replace(/-/g, '_');
                         if (name.includes('exotic') && name.includes('_weapon'))
                             name = name.replace('_weapon', '');
-                        skill = actorDataData.skills.active[name];
+                        if (name === 'pilot_watercraft')
+                            name = 'pilot_water_craft';
+                        parsedSkill = actorDataData.skills.active[name];
                     }
-                    if (!skill)
-                        console.error(`Couldn't parse skill ${s.name}`);
-                    if (skill) {
-                        if (group !== 'active')
-                            skill.name = s.name;
-                        skill.base = parseInt(s.rating);
+                    if (!parsedSkill)
+                        console.error(`Couldn't parse skill ${chummerSkill.name}`);
+                    if (parsedSkill) {
+                        if (determinedGroup !== 'active')
+                            parsedSkill.name = chummerSkill.name;
+                        parsedSkill.base = parseInt(chummerSkill.rating);
 
-                        if (s.skillspecializations) {
-                            skill.specs = this.getArray(
-                                s.skillspecializations.skillspecialization.name
+                        if (chummerSkill.skillspecializations) {
+                            parsedSkill.specs = this.getArray(
+                                chummerSkill.skillspecializations.skillspecialization.name
                             );
                         }
 
-                        skill = _mergeWithMissingSkillFields(skill);
+                        parsedSkill = _mergeWithMissingSkillFields(parsedSkill);
                     }
                 }
             } catch (e) {
