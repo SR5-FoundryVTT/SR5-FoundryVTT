@@ -46,10 +46,6 @@ export class SR5ItemSheet extends ItemSheet {
         const itemData = data.data;
 
         if (itemData.action) {
-            // TODO: Remove
-            console.error(itemData.action.damage);
-            delete itemData.action.damage.formula;
-
             try {
                 const { action } = itemData;
                 if (action.mod === 0) delete action.mod;

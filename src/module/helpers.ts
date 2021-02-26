@@ -32,21 +32,39 @@ export class Helpers {
         if (data['temp'] !== undefined) {
             parts.addUniquePart('SR5.Temporary', data['temp']);
         }
-        const decimalCount = 3;
-        const mult = Math.pow(10, decimalCount);
 
-        data.value = Math.round((parts.total + data.base) * mult) / mult;
+        data.value = Helpers.roundTo(parts.total + data.base, 3);
         data.mod = parts.list;
 
-        // Apply possible range restrictions, including zero...
-        if (typeof options?.min === 'number') {
-            data.value = Math.max(options.min, data.value);
-        }
-        if (typeof options?.max === 'number') {
-            data.value = Math.min(options.max, data.value);
-        }
+        data.value = Helpers.applyValueRange(data.value, options);
 
         return data.value;
+    }
+
+    /** Round a number to a given degree.
+     *
+     * @param value Number to round with.
+     * @param decimals Amount of decimals after the decimal point.
+     */
+    static roundTo(value: number, decimals): number {
+        const multiplier = Math.pow(10, decimals);
+        return Math.round(value * multiplier) / multiplier;
+    }
+
+    /** Make sure a given value is in between a range.
+     *
+     * @param value
+     * @param options Define the range the given value must be in (or none)
+     */
+    static applyValueRange(value: number, options?: CalcTotalOptions): number {
+        if (typeof options?.min === 'number') {
+            value = Math.max(options.min, value);
+        }
+        if (typeof options?.max === 'number') {
+            value = Math.min(options.max, value);
+        }
+
+        return value;
     }
 
     static listItemId(event) {
