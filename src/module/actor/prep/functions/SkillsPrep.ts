@@ -10,7 +10,17 @@ export class SkillsPrep {
     static prepareSkills(data: SR5ActorData) {
         const { language, active, knowledge } = data.skills;
         if (language) {
-            if (!language.value) language.value = {};
+            if (!language.value) {
+                language.value = {};
+            }
+
+            // language.value is defined as an array in template.json 
+            // However what we actually want here is an object, so we set it manually
+            // The same is done for the other knowledge skillgroups 'value' properties below
+            if (Array.isArray(language.value) && language.value.length == 0) {
+                language.value = {};
+            }
+
             language.attribute = 'intuition';
         }
 
@@ -35,7 +45,7 @@ export class SkillsPrep {
                 prepareSkill(skill);
             }
         }
-
+  
         const entries = Object.entries(data.skills.language.value);
         // remove entries which are deleted TODO figure out how to delete these from the data
         entries.forEach(([key, val]: [string, { _delete?: boolean }]) => val._delete && delete data.skills.language.value[key]);
