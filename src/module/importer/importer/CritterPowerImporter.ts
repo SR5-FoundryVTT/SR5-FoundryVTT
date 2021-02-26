@@ -3,7 +3,7 @@ import { ImportHelper } from '../helper/ImportHelper';
 import CritterPower = Shadowrun.CritterPower;
 import { CritterPowerParserBase } from '../parser/critter-power/CritterPowerParserBase';
 import { Constants } from './Constants';
-import {DefaultValues} from "../helper/DefaultValues";
+import {DefaultValues} from "../../dataTemplates";
 
 export class CritterPowerImporter extends DataImporter {
     public categoryTranslations: any;

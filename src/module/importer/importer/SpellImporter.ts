@@ -7,8 +7,7 @@ import { ManipulationSpellParser } from '../parser/spell/ManipulationSpellParser
 import { IllusionSpellParser } from '../parser/spell/IllusionSpellParser';
 import { DetectionSpellImporter } from '../parser/spell/DetectionSpellImporter';
 import { ParserMap } from '../parser/ParserMap';
-import {DeviceImporter} from "./DeviceImporter";
-import {DefaultValues} from "../helper/DefaultValues";
+import {DefaultValues} from "../../dataTemplates";
 
 export class SpellImporter extends DataImporter {
     public categoryTranslations: any;

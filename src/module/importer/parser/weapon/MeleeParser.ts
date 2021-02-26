@@ -4,7 +4,7 @@ import ActorAttribute = Shadowrun.ActorAttribute;
 import DamageData = Shadowrun.DamageData;
 import DamageType = Shadowrun.DamageType;
 import Weapon = Shadowrun.Weapon;
-import {DefaultValues} from "../../helper/DefaultValues";
+import {DefaultValues} from "../../../dataTemplates";
 
 export class MeleeParser extends WeaponParserBase {
     GetDamage(jsonData: object): DamageData {

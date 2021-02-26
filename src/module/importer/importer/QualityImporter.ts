@@ -2,8 +2,7 @@ import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { QualityParserBase } from '../parser/quality/QualityParserBase';
 import Quality = Shadowrun.Quality;
-import {DeviceImporter} from "./DeviceImporter";
-import {DefaultValues} from "../helper/DefaultValues";
+import {DefaultValues} from "../../dataTemplates";
 
 export class QualityImporter extends DataImporter {
     public categoryTranslations: any;

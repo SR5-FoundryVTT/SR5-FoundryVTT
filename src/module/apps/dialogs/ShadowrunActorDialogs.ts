@@ -7,10 +7,9 @@ import ModList = Shadowrun.ModList;
 import SoakRollOptions = Shadowrun.SoakRollOptions;
 import DamageData = Shadowrun.DamageData;
 import DamageElement = Shadowrun.DamageElement;
-import SkillRollOptions = Shadowrun.SkillRollOptions;
 import SkillDialogOptions = Shadowrun.SkillDialogOptions;
 import CombatData = Shadowrun.CombatData;
-import {DefaultValues} from "../../importer/helper/DefaultValues";
+import {DefaultValues} from "../../dataTemplates";
 
 
 export class ShadowrunActorDialogs {

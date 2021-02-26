@@ -3,7 +3,7 @@ import { ImportHelper } from '../helper/ImportHelper';
 import { CyberwareParser } from '../parser/ware/CyberwareParser';
 import Ware = Shadowrun.Ware;
 import Cyberware = Shadowrun.Cyberware;
-import {DefaultValues} from "../helper/DefaultValues";
+import {DefaultValues} from "../../dataTemplates";
 
 export class WareImporter extends DataImporter {
     public categoryTranslations: any;

@@ -3,8 +3,7 @@ import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
 import { ComplexFormParserBase } from '../parser/complex-form/ComplexFormParserBase';
 import ComplexForm = Shadowrun.ComplexForm;
-import {DeviceImporter} from "./DeviceImporter";
-import {DefaultValues} from "../helper/DefaultValues";
+import {DefaultValues} from "../../dataTemplates";
 
 export class ComplexFormImporter extends DataImporter {
     public categoryTranslations: any;

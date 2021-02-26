@@ -7,7 +7,7 @@ import { ThrownParser } from '../parser/weapon/ThrownParser';
 import { ParserMap } from '../parser/ParserMap';
 import Weapon = Shadowrun.Weapon;
 import { WeaponParserBase } from '../parser/weapon/WeaponParserBase';
-import {DefaultValues} from "../helper/DefaultValues";
+import {DefaultValues} from "../../dataTemplates";
 
 export class WeaponImporter extends DataImporter {
     public categoryTranslations: any;
