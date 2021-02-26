@@ -261,6 +261,14 @@ export const SR5 = {
         varies: 'SR5.ActionTypeVaries',
     },
 
+    // Use within action damage calculation (base <operator> attribute) => value
+    actionDamageFormulaOperators: {
+        add: '+',
+        subtract: '-',
+        multiply: '*',
+        divide: '/'
+    },
+
     matrixAttributes: {
         attack: 'SR5.MatrixAttrAttack',
         sleaze: 'SR5.MatrixAttrSleaze',

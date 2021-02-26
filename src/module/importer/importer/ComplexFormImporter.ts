@@ -3,7 +3,7 @@ import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
 import { ComplexFormParserBase } from '../parser/complex-form/ComplexFormParserBase';
 import ComplexForm = Shadowrun.ComplexForm;
-import {DeviceImporter} from "./DeviceImporter";
+import {DefaultValues} from "../../dataTemplates";
 
 export class ComplexFormImporter extends DataImporter {
     public categoryTranslations: any;
@@ -37,25 +37,7 @@ export class ComplexFormImporter extends DataImporter {
                     spec: false,
                     mod: 0,
                     mod_description: '',
-                    damage: {
-                        type: {
-                            base: 'physical',
-                            value: 'physical',
-                        },
-                        element: {
-                            base: '',
-                            value: '',
-                        },
-                        base: 0,
-                        value: 0,
-                        ap: {
-                            base: 0,
-                            value: 0,
-                            mod: [],
-                        },
-                        attribute: '',
-                        mod: [],
-                    },
+                    damage: DefaultValues.damageData(),
                     limit: {
                         value: 0,
                         attribute: '',

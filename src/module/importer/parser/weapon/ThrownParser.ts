@@ -6,6 +6,7 @@ import ActorAttribute = Shadowrun.ActorAttribute;
 import DamageData = Shadowrun.DamageData;
 import DamageType = Shadowrun.DamageType;
 import Weapon = Shadowrun.Weapon;
+import {DefaultValues} from "../../../dataTemplates";
 
 export class ThrownParser extends WeaponParserBase {
     public GetDamage(jsonData: object): DamageData {
@@ -33,39 +34,23 @@ export class ThrownParser extends WeaponParserBase {
                     damageAmount = parseInt(amountMatch);
                 }
             } else {
-                return {
+                const partialDamageData = {
                     type: {
-                        base: 'physical',
-                        value: 'physical',
-                    },
-                    element: {
-                        base: '',
-                        value: '',
-                    },
-                    base: 0,
-                    value: 0,
-                    ap: {
-                        base: 0,
-                        value: 0,
-                        mod: [],
-                    },
-                    attribute: '',
-                    mod: [],
-                };
+                        base: 'physical' as DamageType,
+                        value: 'physical' as DamageType
+                    }
+                }
+                return DefaultValues.damageData(partialDamageData);
             }
         }
         damageType = jsonDamage.includes('P') ? 'physical' : 'stun';
 
         let damageAp = ImportHelper.IntValue(jsonData, 'ap', 0);
 
-        return {
+        const partialDamageData = {
             type: {
                 base: damageType as DamageType,
                 value: damageType as DamageType,
-            },
-            element: {
-                base: '',
-                value: '',
             },
             base: damageAmount,
             value: damageAmount,
@@ -75,8 +60,8 @@ export class ThrownParser extends WeaponParserBase {
                 mod: [],
             },
             attribute: damageAttribute as ActorAttribute,
-            mod: [],
-        };
+        }
+        return DefaultValues.damageData(partialDamageData);
     }
 
     public GetBlast(jsonData: object, data: Weapon): BlastData {

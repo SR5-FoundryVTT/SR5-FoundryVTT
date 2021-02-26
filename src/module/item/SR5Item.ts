@@ -52,6 +52,7 @@ import Program = Shadowrun.Program;
 import Quality = Shadowrun.Quality;
 import Spell = Shadowrun.Spell;
 import SpritePower = Shadowrun.SpritePower;
+import {ItemAction} from "./ItemAction";
 
 export class SR5Item extends Item {
     labels: {} = {};
@@ -569,7 +570,6 @@ export class SR5Item extends Item {
     }
 
     getRollPartsList(): ModList<number> {
-        console.error('getRollPartsList');
         // we only have a roll if we have an action or an actor
         const action = this.getAction();
         if (!action || !this.actor) return [];
@@ -1029,17 +1029,7 @@ export class SR5Item extends Item {
         const action = this.getAction();
         if (!action) return;
 
-        const {damage} = action;
-
-        // Add custom action damage value based on Attribute.
-        if (damage.attribute) {
-            const { attribute } = damage;
-            const att = this.actor.findAttribute(attribute);
-            if (att) {
-                damage.mod = PartsList.AddUniquePart(damage.mod, att.label, att.value);
-                damage.value = Helpers.calcTotal(damage);
-            }
-        }
+        const damage = ItemAction.calcDamage(action.damage, this.actor);
 
         const data: AttackData = {
             hits,

@@ -7,9 +7,9 @@ import ModList = Shadowrun.ModList;
 import SoakRollOptions = Shadowrun.SoakRollOptions;
 import DamageData = Shadowrun.DamageData;
 import DamageElement = Shadowrun.DamageElement;
-import SkillRollOptions = Shadowrun.SkillRollOptions;
 import SkillDialogOptions = Shadowrun.SkillDialogOptions;
 import CombatData = Shadowrun.CombatData;
+import {DefaultValues} from "../../dataTemplates";
 
 
 export class ShadowrunActorDialogs {
@@ -143,25 +143,7 @@ export class ShadowrunActorDialogs {
         const onAfterClose = (html: JQuery) => {
             const soak: DamageData = options?.damage
                     ? options.damage
-                : {
-                    base: 0,
-                    value: 0,
-                    mod: [],
-                    ap: {
-                        base: 0,
-                        value: 0,
-                        mod: [],
-                    },
-                    attribute: '' as const,
-                    type: {
-                        base: '',
-                        value: '',
-                    },
-                    element: {
-                        base: '',
-                        value: '',
-                    },
-                };
+                : DefaultValues.damageData({type: {base: '', value: ''}});
             // handle ap changes
             const ap = Helpers.parseInputToNumber($(html).find('[name=ap]').val());
 

@@ -2,8 +2,8 @@ import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import CritterPower = Shadowrun.CritterPower;
 import { CritterPowerParserBase } from '../parser/critter-power/CritterPowerParserBase';
-import { ParserMap } from '../parser/ParserMap';
 import { Constants } from './Constants';
+import {DefaultValues} from "../../dataTemplates";
 
 export class CritterPowerImporter extends DataImporter {
     public categoryTranslations: any;
@@ -37,25 +37,7 @@ export class CritterPowerImporter extends DataImporter {
                     spec: false,
                     mod: 0,
                     mod_description: '',
-                    damage: {
-                        type: {
-                            base: '',
-                            value: '',
-                        },
-                        element: {
-                            base: '',
-                            value: '',
-                        },
-                        base: 0,
-                        value: 0,
-                        ap: {
-                            base: 0,
-                            value: 0,
-                            mod: [],
-                        },
-                        attribute: '',
-                        mod: [],
-                    },
+                    damage: DefaultValues.damageData({type: {base: '', value: ''}}),
                     limit: {
                         value: 0,
                         attribute: '',

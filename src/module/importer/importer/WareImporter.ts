@@ -3,6 +3,7 @@ import { ImportHelper } from '../helper/ImportHelper';
 import { CyberwareParser } from '../parser/ware/CyberwareParser';
 import Ware = Shadowrun.Ware;
 import Cyberware = Shadowrun.Cyberware;
+import {DefaultValues} from "../../dataTemplates";
 
 export class WareImporter extends DataImporter {
     public categoryTranslations: any;
@@ -74,25 +75,7 @@ export class WareImporter extends DataImporter {
                     spec: false,
                     mod: 0,
                     mod_description: '',
-                    damage: {
-                        type: {
-                            base: '',
-                            value: '',
-                        },
-                        element: {
-                            base: '',
-                            value: '',
-                        },
-                        base: 0,
-                        value: 0,
-                        ap: {
-                            base: 0,
-                            value: 0,
-                            mod: [],
-                        },
-                        attribute: '',
-                        mod: [],
-                    },
+                    damage: DefaultValues.damageData({type: {base: '', value: ''}}),
                     limit: {
                         value: 0,
                         attribute: '',
