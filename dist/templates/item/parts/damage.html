@@ -29,7 +29,13 @@
                 data-dtype="Number"
                 placeholder="DV"
             />
-            +
+            <select name="data.action.damage.base_formula_operator">
+                {{#select data.action.damage.base_formula_operator}}
+                {{#each config.actionDamageFormulaOperators as |symbol name| }}
+                <option value="{{name}}">{{symbol}}</option>
+                {{/each}}
+                {{/select}}
+            </select>
             <select name="data.action.damage.attribute">
                 {{#select data.action.damage.attribute}}
                 <option value=""></option>

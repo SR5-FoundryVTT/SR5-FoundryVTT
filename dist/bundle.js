@@ -14582,7 +14582,7 @@ class SR5Actor extends Actor {
 }
 exports.SR5Actor = SR5Actor;
 
-},{"../apps/dialogs/ShadowrunActorDialogs":120,"../chat":128,"../constants":131,"../helpers":140,"../parts/PartsList":191,"../rolls/ShadowrunRoller":192,"./prep/ActorPrepFactory":87}],86:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunActorDialogs":120,"../chat":128,"../constants":131,"../helpers":140,"../parts/PartsList":192,"../rolls/ShadowrunRoller":193,"./prep/ActorPrepFactory":87}],86:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -15550,7 +15550,7 @@ class BaseActorPrep {
 }
 exports.BaseActorPrep = BaseActorPrep;
 
-},{"../../item/SR5ItemDataWrapper":181}],89:[function(require,module,exports){
+},{"../../item/SR5ItemDataWrapper":182}],89:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CharacterPrep = void 0;
@@ -15966,7 +15966,7 @@ class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
 }
 exports.SpiritPrep = SpiritPrep;
 
-},{"../../helpers":140,"../../parts/PartsList":191,"./BaseActorPrep":88,"./functions/AttributesPrep":94,"./functions/ConditionMonitorsPrep":95,"./functions/InitiativePrep":96,"./functions/LimitsPrep":98,"./functions/ModifiersPrep":100,"./functions/MovementPrep":101,"./functions/SkillsPrep":103,"./functions/WoundsPrep":104}],92:[function(require,module,exports){
+},{"../../helpers":140,"../../parts/PartsList":192,"./BaseActorPrep":88,"./functions/AttributesPrep":94,"./functions/ConditionMonitorsPrep":95,"./functions/InitiativePrep":96,"./functions/LimitsPrep":98,"./functions/ModifiersPrep":100,"./functions/MovementPrep":101,"./functions/SkillsPrep":103,"./functions/WoundsPrep":104}],92:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpritePrep = void 0;
@@ -16092,7 +16092,7 @@ class SpritePrep extends BaseActorPrep_1.BaseActorPrep {
 }
 exports.SpritePrep = SpritePrep;
 
-},{"../../helpers":140,"../../parts/PartsList":191,"./BaseActorPrep":88,"./functions/AttributesPrep":94,"./functions/InitiativePrep":96,"./functions/LimitsPrep":98,"./functions/MatrixPrep":99,"./functions/ModifiersPrep":100,"./functions/SkillsPrep":103}],93:[function(require,module,exports){
+},{"../../helpers":140,"../../parts/PartsList":192,"./BaseActorPrep":88,"./functions/AttributesPrep":94,"./functions/InitiativePrep":96,"./functions/LimitsPrep":98,"./functions/MatrixPrep":99,"./functions/ModifiersPrep":100,"./functions/SkillsPrep":103}],93:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VehiclePrep = void 0;
@@ -16211,7 +16211,7 @@ class VehiclePrep extends BaseActorPrep_1.BaseActorPrep {
 }
 exports.VehiclePrep = VehiclePrep;
 
-},{"../../helpers":140,"../../parts/PartsList":191,"./BaseActorPrep":88,"./functions/AttributesPrep":94,"./functions/InitiativePrep":96,"./functions/LimitsPrep":98,"./functions/MatrixPrep":99,"./functions/ModifiersPrep":100,"./functions/SkillsPrep":103}],94:[function(require,module,exports){
+},{"../../helpers":140,"../../parts/PartsList":192,"./BaseActorPrep":88,"./functions/AttributesPrep":94,"./functions/InitiativePrep":96,"./functions/LimitsPrep":98,"./functions/MatrixPrep":99,"./functions/ModifiersPrep":100,"./functions/SkillsPrep":103}],94:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AttributesPrep = void 0;
@@ -16246,7 +16246,7 @@ class AttributesPrep {
 }
 exports.AttributesPrep = AttributesPrep;
 
-},{"../../../helpers":140,"../../../parts/PartsList":191}],95:[function(require,module,exports){
+},{"../../../helpers":140,"../../../parts/PartsList":192}],95:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConditionMonitorsPrep = void 0;
@@ -16334,7 +16334,7 @@ class InitiativePrep {
 }
 exports.InitiativePrep = InitiativePrep;
 
-},{"../../../helpers":140,"../../../parts/PartsList":191}],97:[function(require,module,exports){
+},{"../../../helpers":140,"../../../parts/PartsList":192}],97:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemPrep = void 0;
@@ -16405,7 +16405,7 @@ class ItemPrep {
 }
 exports.ItemPrep = ItemPrep;
 
-},{"../../../helpers":140,"../../../parts/PartsList":191}],98:[function(require,module,exports){
+},{"../../../helpers":140,"../../../parts/PartsList":192}],98:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LimitsPrep = void 0;
@@ -16433,7 +16433,7 @@ class LimitsPrep {
 }
 exports.LimitsPrep = LimitsPrep;
 
-},{"../../../helpers":140,"../../../parts/PartsList":191}],99:[function(require,module,exports){
+},{"../../../helpers":140,"../../../parts/PartsList":192}],99:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatrixPrep = void 0;
@@ -16553,7 +16553,7 @@ class MatrixPrep {
 }
 exports.MatrixPrep = MatrixPrep;
 
-},{"../../../helpers":140,"../../../parts/PartsList":191}],100:[function(require,module,exports){
+},{"../../../helpers":140,"../../../parts/PartsList":192}],100:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ModifiersPrep = void 0;
@@ -16673,7 +16673,7 @@ class NPCPrep {
 }
 exports.NPCPrep = NPCPrep;
 
-},{"../../../constants":131,"../../../dataTemplates":132,"../../../helpers":140,"../../../parts/PartsList":191}],103:[function(require,module,exports){
+},{"../../../constants":131,"../../../dataTemplates":132,"../../../helpers":140,"../../../parts/PartsList":192}],103:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports._mergeWithMissingSkillFields = exports.SkillsPrep = void 0;
@@ -16770,7 +16770,7 @@ exports._mergeWithMissingSkillFields = (givenSkill) => {
     mergeObject(givenSkill, template, { overwrite: false });
 };
 
-},{"../../../helpers":140,"../../../parts/PartsList":191}],104:[function(require,module,exports){
+},{"../../../helpers":140,"../../../parts/PartsList":192}],104:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WoundsPrep = void 0;
@@ -18498,6 +18498,7 @@ exports.ShadowrunActorDialogs = void 0;
 const FormDialog_1 = require("./FormDialog");
 const PartsList_1 = require("../../parts/PartsList");
 const helpers_1 = require("../../helpers");
+const dataTemplates_1 = require("../../dataTemplates");
 class ShadowrunActorDialogs {
     static createDefenseDialog(actor, options, partsProps) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -18615,25 +18616,7 @@ class ShadowrunActorDialogs {
         const onAfterClose = (html) => {
             var _a;
             const soak = (options === null || options === void 0 ? void 0 : options.damage) ? options.damage
-                : {
-                    base: 0,
-                    value: 0,
-                    mod: [],
-                    ap: {
-                        base: 0,
-                        value: 0,
-                        mod: [],
-                    },
-                    attribute: '',
-                    type: {
-                        base: '',
-                        value: '',
-                    },
-                    element: {
-                        base: '',
-                        value: '',
-                    },
-                };
+                : dataTemplates_1.DefaultValues.damageData({ type: { base: '', value: '' } });
             // handle ap changes
             const ap = helpers_1.Helpers.parseInputToNumber($(html).find('[name=ap]').val());
             const armor = actor.getArmor();
@@ -18747,7 +18730,7 @@ class ShadowrunActorDialogs {
 }
 exports.ShadowrunActorDialogs = ShadowrunActorDialogs;
 
-},{"../../helpers":140,"../../parts/PartsList":191,"./FormDialog":119}],121:[function(require,module,exports){
+},{"../../dataTemplates":132,"../../helpers":140,"../../parts/PartsList":192,"./FormDialog":119}],121:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -19153,7 +19136,7 @@ class ShadowrunTestDialog {
 }
 exports.ShadowrunTestDialog = ShadowrunTestDialog;
 
-},{"../../constants":131,"../../helpers":140,"../../parts/PartsList":191,"./FormDialog":119}],123:[function(require,module,exports){
+},{"../../constants":131,"../../helpers":140,"../../parts/PartsList":192,"./FormDialog":119}],123:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -19902,7 +19885,7 @@ exports.addRollListeners = (app, html) => {
     }));
 };
 
-},{"./actor/SR5Actor":85,"./apps/dialogs/DamageApplicationDialog":117,"./constants":131,"./helpers":140,"./item/SR5Item":180,"./template":194}],129:[function(require,module,exports){
+},{"./actor/SR5Actor":85,"./apps/dialogs/DamageApplicationDialog":117,"./constants":131,"./helpers":140,"./item/SR5Item":181,"./template":195}],129:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -20381,6 +20364,13 @@ exports.SR5 = {
         complex: 'SR5.ActionTypeComplex',
         varies: 'SR5.ActionTypeVaries',
     },
+    // Use within action damage calculation (base <operator> attribute) => value
+    actionDamageFormulaOperators: {
+        add: '+',
+        subtract: '-',
+        multiply: '*',
+        divide: '/'
+    },
     matrixAttributes: {
         attack: 'SR5.MatrixAttrAttack',
         sleaze: 'SR5.MatrixAttrSleaze',
@@ -20636,7 +20626,39 @@ exports.SR = {
 },{}],132:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DataTemplates = void 0;
+exports.DataTemplates = exports.DefaultValues = void 0;
+/**
+ * TODO: Add unittesting to DefaultValues helper.
+ */
+class DefaultValues {
+    /**
+     *
+     * @param partialDamageData give partial DamageData fields to overwrite default values
+     */
+    static damageData(partialDamageData = {}) {
+        return mergeObject({
+            type: {
+                base: 'physical',
+                value: 'physical',
+            },
+            element: {
+                base: '',
+                value: '',
+            },
+            base: 0,
+            value: 0,
+            ap: {
+                base: 0,
+                value: 0,
+                mod: [],
+            },
+            attribute: '',
+            mod: [],
+            base_formula_operator: 'add'
+        }, partialDamageData);
+    }
+}
+exports.DefaultValues = DefaultValues;
 exports.DataTemplates = {
     grunt: {
         metatype_modifiers: {
@@ -20681,25 +20703,7 @@ exports.DataTemplates = {
             }
         }
     },
-    damage: {
-        type: {
-            value: "",
-            base: ""
-        },
-        element: {
-            value: "",
-            base: ""
-        },
-        value: 0,
-        base: 0,
-        ap: {
-            value: 0,
-            base: 0,
-            mod: []
-        },
-        attribute: "",
-        mod: []
-    }
+    damage: DefaultValues.damageData({ type: { base: '', value: '' } }),
 };
 
 },{}],133:[function(require,module,exports){
@@ -21400,7 +21404,7 @@ exports.registerItemLineHelpers = () => {
     });
 };
 
-},{"../item/SR5ItemDataWrapper":181}],138:[function(require,module,exports){
+},{"../item/SR5ItemDataWrapper":182}],138:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerRollAndLabelHelpers = void 0;
@@ -21473,7 +21477,7 @@ exports.registerRollAndLabelHelpers = () => {
     Handlebars.registerHelper('speakerName', helpers_1.Helpers.getChatSpeakerName);
 };
 
-},{"../helpers":140,"../parts/PartsList":191}],139:[function(require,module,exports){
+},{"../helpers":140,"../parts/PartsList":192}],139:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerSkillLineHelpers = void 0;
@@ -21603,18 +21607,33 @@ class Helpers {
         if (data['temp'] !== undefined) {
             parts.addUniquePart('SR5.Temporary', data['temp']);
         }
-        const decimalCount = 3;
-        const mult = Math.pow(10, decimalCount);
-        data.value = Math.round((parts.total + data.base) * mult) / mult;
+        data.value = Helpers.roundTo(parts.total + data.base, 3);
         data.mod = parts.list;
-        // Apply possible range restrictions, including zero...
+        data.value = Helpers.applyValueRange(data.value, options);
+        return data.value;
+    }
+    /** Round a number to a given degree.
+     *
+     * @param value Number to round with.
+     * @param decimals Amount of decimals after the decimal point.
+     */
+    static roundTo(value, decimals) {
+        const multiplier = Math.pow(10, decimals);
+        return Math.round(value * multiplier) / multiplier;
+    }
+    /** Make sure a given value is in between a range.
+     *
+     * @param value
+     * @param options Define the range the given value must be in (or none)
+     */
+    static applyValueRange(value, options) {
         if (typeof (options === null || options === void 0 ? void 0 : options.min) === 'number') {
-            data.value = Math.max(options.min, data.value);
+            value = Math.max(options.min, value);
         }
         if (typeof (options === null || options === void 0 ? void 0 : options.max) === 'number') {
-            data.value = Math.min(options.max, data.value);
+            value = Math.min(options.max, value);
         }
-        return data.value;
+        return value;
     }
     static listItemId(event) {
         return event.currentTarget.closest('.list-item').dataset.itemId;
@@ -21953,7 +21972,7 @@ class Helpers {
 }
 exports.Helpers = Helpers;
 
-},{"./apps/dialogs/DeleteConfirmationDialog":118,"./constants":131,"./dataTemplates":132,"./parts/PartsList":191}],141:[function(require,module,exports){
+},{"./apps/dialogs/DeleteConfirmationDialog":118,"./constants":131,"./dataTemplates":132,"./parts/PartsList":192}],141:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22096,7 +22115,7 @@ ___________________
 }
 exports.HooksManager = HooksManager;
 
-},{"./actor/SR5Actor":85,"./actor/SR5ActorSheet":86,"./apps/ChangelogApplication":105,"./apps/gmtools/OverwatchScoreTracker":123,"./canvas":127,"./chat":128,"./combat/SR5Combat":129,"./config":130,"./constants":131,"./handlebars/HandlebarManager":135,"./helpers":140,"./importer/apps/import-form":142,"./item/SR5Item":180,"./item/SR5ItemSheet":182,"./macros":183,"./migrator/Migrator":185,"./rolls/ShadowrunRoller":192,"./settings":193}],142:[function(require,module,exports){
+},{"./actor/SR5Actor":85,"./actor/SR5ActorSheet":86,"./apps/ChangelogApplication":105,"./apps/gmtools/OverwatchScoreTracker":123,"./canvas":127,"./chat":128,"./combat/SR5Combat":129,"./config":130,"./constants":131,"./handlebars/HandlebarManager":135,"./helpers":140,"./importer/apps/import-form":142,"./item/SR5Item":181,"./item/SR5ItemSheet":183,"./macros":184,"./migrator/Migrator":186,"./rolls/ShadowrunRoller":193,"./settings":194}],142:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22836,6 +22855,7 @@ const DataImporter_1 = require("./DataImporter");
 const ImportHelper_1 = require("../helper/ImportHelper");
 const Constants_1 = require("./Constants");
 const ComplexFormParserBase_1 = require("../parser/complex-form/ComplexFormParserBase");
+const dataTemplates_1 = require("../../dataTemplates");
 class ComplexFormImporter extends DataImporter_1.DataImporter {
     constructor() {
         super(...arguments);
@@ -22867,25 +22887,7 @@ class ComplexFormImporter extends DataImporter_1.DataImporter {
                     spec: false,
                     mod: 0,
                     mod_description: '',
-                    damage: {
-                        type: {
-                            base: 'physical',
-                            value: 'physical',
-                        },
-                        element: {
-                            base: '',
-                            value: '',
-                        },
-                        base: 0,
-                        value: 0,
-                        ap: {
-                            base: 0,
-                            value: 0,
-                            mod: [],
-                        },
-                        attribute: '',
-                        mod: [],
-                    },
+                    damage: dataTemplates_1.DefaultValues.damageData(),
                     limit: {
                         value: 0,
                         attribute: '',
@@ -22944,7 +22946,7 @@ class ComplexFormImporter extends DataImporter_1.DataImporter {
 }
 exports.ComplexFormImporter = ComplexFormImporter;
 
-},{"../helper/ImportHelper":143,"../parser/complex-form/ComplexFormParserBase":163,"./Constants":150,"./DataImporter":152}],150:[function(require,module,exports){
+},{"../../dataTemplates":132,"../helper/ImportHelper":143,"../parser/complex-form/ComplexFormParserBase":163,"./Constants":150,"./DataImporter":152}],150:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Constants = void 0;
@@ -23183,6 +23185,7 @@ const DataImporter_1 = require("./DataImporter");
 const ImportHelper_1 = require("../helper/ImportHelper");
 const CritterPowerParserBase_1 = require("../parser/critter-power/CritterPowerParserBase");
 const Constants_1 = require("./Constants");
+const dataTemplates_1 = require("../../dataTemplates");
 class CritterPowerImporter extends DataImporter_1.DataImporter {
     constructor() {
         super(...arguments);
@@ -23214,25 +23217,7 @@ class CritterPowerImporter extends DataImporter_1.DataImporter {
                     spec: false,
                     mod: 0,
                     mod_description: '',
-                    damage: {
-                        type: {
-                            base: '',
-                            value: '',
-                        },
-                        element: {
-                            base: '',
-                            value: '',
-                        },
-                        base: 0,
-                        value: 0,
-                        ap: {
-                            base: 0,
-                            value: 0,
-                            mod: [],
-                        },
-                        attribute: '',
-                        mod: [],
-                    },
+                    damage: dataTemplates_1.DefaultValues.damageData({ type: { base: '', value: '' } }),
                     limit: {
                         value: 0,
                         attribute: '',
@@ -23298,7 +23283,7 @@ class CritterPowerImporter extends DataImporter_1.DataImporter {
 }
 exports.CritterPowerImporter = CritterPowerImporter;
 
-},{"../helper/ImportHelper":143,"../parser/critter-power/CritterPowerParserBase":164,"./Constants":150,"./DataImporter":152}],152:[function(require,module,exports){
+},{"../../dataTemplates":132,"../helper/ImportHelper":143,"../parser/critter-power/CritterPowerParserBase":164,"./Constants":150,"./DataImporter":152}],152:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -23774,6 +23759,7 @@ exports.QualityImporter = void 0;
 const DataImporter_1 = require("./DataImporter");
 const ImportHelper_1 = require("../helper/ImportHelper");
 const QualityParserBase_1 = require("../parser/quality/QualityParserBase");
+const dataTemplates_1 = require("../../dataTemplates");
 class QualityImporter extends DataImporter_1.DataImporter {
     constructor() {
         super(...arguments);
@@ -23805,25 +23791,7 @@ class QualityImporter extends DataImporter_1.DataImporter {
                     spec: false,
                     mod: 0,
                     mod_description: '',
-                    damage: {
-                        type: {
-                            base: '',
-                            value: '',
-                        },
-                        element: {
-                            base: '',
-                            value: '',
-                        },
-                        base: 0,
-                        value: 0,
-                        ap: {
-                            base: 0,
-                            value: 0,
-                            mod: [],
-                        },
-                        attribute: '',
-                        mod: [],
-                    },
+                    damage: dataTemplates_1.DefaultValues.damageData({ type: { base: '', value: '' } }),
                     limit: {
                         value: 0,
                         attribute: '',
@@ -23882,7 +23850,7 @@ class QualityImporter extends DataImporter_1.DataImporter {
 }
 exports.QualityImporter = QualityImporter;
 
-},{"../helper/ImportHelper":143,"../parser/quality/QualityParserBase":168,"./DataImporter":152}],157:[function(require,module,exports){
+},{"../../dataTemplates":132,"../helper/ImportHelper":143,"../parser/quality/QualityParserBase":168,"./DataImporter":152}],157:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -23903,6 +23871,7 @@ const ManipulationSpellParser_1 = require("../parser/spell/ManipulationSpellPars
 const IllusionSpellParser_1 = require("../parser/spell/IllusionSpellParser");
 const DetectionSpellImporter_1 = require("../parser/spell/DetectionSpellImporter");
 const ParserMap_1 = require("../parser/ParserMap");
+const dataTemplates_1 = require("../../dataTemplates");
 class SpellImporter extends DataImporter_1.DataImporter {
     constructor() {
         super(...arguments);
@@ -23934,25 +23903,7 @@ class SpellImporter extends DataImporter_1.DataImporter {
                     spec: false,
                     mod: 0,
                     mod_description: '',
-                    damage: {
-                        type: {
-                            base: '',
-                            value: '',
-                        },
-                        element: {
-                            base: '',
-                            value: '',
-                        },
-                        base: 0,
-                        value: 0,
-                        ap: {
-                            base: 0,
-                            value: 0,
-                            mod: [],
-                        },
-                        attribute: '',
-                        mod: [],
-                    },
+                    damage: dataTemplates_1.DefaultValues.damageData({ type: { base: '', value: '' } }),
                     limit: {
                         value: 0,
                         attribute: '',
@@ -24037,7 +23988,7 @@ class SpellImporter extends DataImporter_1.DataImporter {
 }
 exports.SpellImporter = SpellImporter;
 
-},{"../helper/ImportHelper":143,"../parser/ParserMap":161,"../parser/spell/CombatSpellParser":169,"../parser/spell/DetectionSpellImporter":170,"../parser/spell/IllusionSpellParser":171,"../parser/spell/ManipulationSpellParser":172,"../parser/spell/SpellParserBase":173,"./DataImporter":152}],158:[function(require,module,exports){
+},{"../../dataTemplates":132,"../helper/ImportHelper":143,"../parser/ParserMap":161,"../parser/spell/CombatSpellParser":169,"../parser/spell/DetectionSpellImporter":170,"../parser/spell/IllusionSpellParser":171,"../parser/spell/ManipulationSpellParser":172,"../parser/spell/SpellParserBase":173,"./DataImporter":152}],158:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -24053,6 +24004,7 @@ exports.WareImporter = void 0;
 const DataImporter_1 = require("./DataImporter");
 const ImportHelper_1 = require("../helper/ImportHelper");
 const CyberwareParser_1 = require("../parser/ware/CyberwareParser");
+const dataTemplates_1 = require("../../dataTemplates");
 class WareImporter extends DataImporter_1.DataImporter {
     constructor() {
         super(...arguments);
@@ -24120,25 +24072,7 @@ class WareImporter extends DataImporter_1.DataImporter {
                     spec: false,
                     mod: 0,
                     mod_description: '',
-                    damage: {
-                        type: {
-                            base: '',
-                            value: '',
-                        },
-                        element: {
-                            base: '',
-                            value: '',
-                        },
-                        base: 0,
-                        value: 0,
-                        ap: {
-                            base: 0,
-                            value: 0,
-                            mod: [],
-                        },
-                        attribute: '',
-                        mod: [],
-                    },
+                    damage: dataTemplates_1.DefaultValues.damageData({ type: { base: '', value: '' } }),
                     limit: {
                         value: 0,
                         attribute: '',
@@ -24209,7 +24143,7 @@ class WareImporter extends DataImporter_1.DataImporter {
 }
 exports.WareImporter = WareImporter;
 
-},{"../helper/ImportHelper":143,"../parser/ware/CyberwareParser":174,"./DataImporter":152}],159:[function(require,module,exports){
+},{"../../dataTemplates":132,"../helper/ImportHelper":143,"../parser/ware/CyberwareParser":174,"./DataImporter":152}],159:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -24230,6 +24164,7 @@ const MeleeParser_1 = require("../parser/weapon/MeleeParser");
 const ThrownParser_1 = require("../parser/weapon/ThrownParser");
 const ParserMap_1 = require("../parser/ParserMap");
 const WeaponParserBase_1 = require("../parser/weapon/WeaponParserBase");
+const dataTemplates_1 = require("../../dataTemplates");
 class WeaponImporter extends DataImporter_1.DataImporter {
     constructor() {
         super(...arguments);
@@ -24261,25 +24196,7 @@ class WeaponImporter extends DataImporter_1.DataImporter {
                     spec: false,
                     mod: 0,
                     mod_description: '',
-                    damage: {
-                        type: {
-                            base: 'physical',
-                            value: 'physical',
-                        },
-                        element: {
-                            base: '',
-                            value: '',
-                        },
-                        base: 0,
-                        value: 0,
-                        ap: {
-                            base: 0,
-                            value: 0,
-                            mod: [],
-                        },
-                        attribute: '',
-                        mod: [],
-                    },
+                    damage: dataTemplates_1.DefaultValues.damageData(),
                     limit: {
                         value: 0,
                         attribute: '',
@@ -24405,7 +24322,7 @@ class WeaponImporter extends DataImporter_1.DataImporter {
 }
 exports.WeaponImporter = WeaponImporter;
 
-},{"../helper/ImportHelper":143,"../parser/ParserMap":161,"../parser/weapon/MeleeParser":175,"../parser/weapon/RangedParser":176,"../parser/weapon/ThrownParser":177,"../parser/weapon/WeaponParserBase":178,"./Constants":150,"./DataImporter":152}],160:[function(require,module,exports){
+},{"../../dataTemplates":132,"../helper/ImportHelper":143,"../parser/ParserMap":161,"../parser/weapon/MeleeParser":175,"../parser/weapon/RangedParser":176,"../parser/weapon/ThrownParser":177,"../parser/weapon/WeaponParserBase":178,"./Constants":150,"./DataImporter":152}],160:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
@@ -24887,31 +24804,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.MeleeParser = void 0;
 const ImportHelper_1 = require("../../helper/ImportHelper");
 const WeaponParserBase_1 = require("./WeaponParserBase");
+const dataTemplates_1 = require("../../../dataTemplates");
 class MeleeParser extends WeaponParserBase_1.WeaponParserBase {
     GetDamage(jsonData) {
         var _a;
         let jsonDamage = ImportHelper_1.ImportHelper.StringValue(jsonData, 'damage');
         let damageCode = (_a = jsonDamage.match(/(STR)([+-]?)([1-9]*)\)([PS])/g)) === null || _a === void 0 ? void 0 : _a[0];
         if (damageCode == null) {
-            return {
-                type: {
-                    base: 'physical',
-                    value: 'physical',
-                },
-                element: {
-                    base: '',
-                    value: '',
-                },
-                base: 0,
-                value: 0,
-                ap: {
-                    base: 0,
-                    value: 0,
-                    mod: [],
-                },
-                attribute: '',
-                mod: [],
-            };
+            return dataTemplates_1.DefaultValues.damageData();
         }
         let damageBase = 0;
         let damageAp = ImportHelper_1.ImportHelper.IntValue(jsonData, 'ap', 0);
@@ -24922,14 +24822,10 @@ class MeleeParser extends WeaponParserBase_1.WeaponParserBase {
             damageBase = parseInt(splitBaseCode[1], 0);
         }
         let damageAttribute = damageCode.includes('STR') ? 'strength' : '';
-        return {
+        const partialDamageData = {
             type: {
                 base: damageType,
                 value: damageType,
-            },
-            element: {
-                base: '',
-                value: '',
             },
             base: damageBase,
             value: damageBase,
@@ -24939,8 +24835,8 @@ class MeleeParser extends WeaponParserBase_1.WeaponParserBase {
                 mod: [],
             },
             attribute: damageAttribute,
-            mod: [],
         };
+        return dataTemplates_1.DefaultValues.damageData(partialDamageData);
     }
     Parse(jsonData, data, jsonTranslation) {
         data = super.Parse(jsonData, data, jsonTranslation);
@@ -24950,61 +24846,39 @@ class MeleeParser extends WeaponParserBase_1.WeaponParserBase {
 }
 exports.MeleeParser = MeleeParser;
 
-},{"../../helper/ImportHelper":143,"./WeaponParserBase":178}],176:[function(require,module,exports){
+},{"../../../dataTemplates":132,"../../helper/ImportHelper":143,"./WeaponParserBase":178}],176:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RangedParser = void 0;
 const ImportHelper_1 = require("../../helper/ImportHelper");
 const WeaponParserBase_1 = require("./WeaponParserBase");
 const Constants_1 = require("../../importer/Constants");
+const dataTemplates_1 = require("../../../dataTemplates");
 class RangedParser extends WeaponParserBase_1.WeaponParserBase {
     GetDamage(jsonData) {
         var _a;
         let jsonDamage = ImportHelper_1.ImportHelper.StringValue(jsonData, 'damage');
         let damageCode = (_a = jsonDamage.match(/[0-9]+[PS]/g)) === null || _a === void 0 ? void 0 : _a[0];
         if (damageCode == null) {
-            return {
-                type: {
-                    base: 'physical',
-                    value: '',
-                },
-                element: {
-                    base: '',
-                    value: '',
-                },
-                base: 0,
-                value: 0,
-                ap: {
-                    base: 0,
-                    value: 0,
-                    mod: [],
-                },
-                attribute: '',
-                mod: [],
-            };
+            return dataTemplates_1.DefaultValues.damageData();
         }
         let damageType = damageCode.includes('P') ? 'physical' : 'stun';
         let damageAmount = parseInt(damageCode.replace(damageType[0].toUpperCase(), ''));
         let damageAp = ImportHelper_1.ImportHelper.IntValue(jsonData, 'ap', 0);
-        return {
+        const partialDamageData = {
             type: {
                 base: damageType,
                 value: damageType,
             },
-            element: {
-                base: '',
-                value: '',
-            },
+            base: damageAmount,
             value: damageAmount,
             ap: {
                 base: damageAp,
                 value: damageAp,
-                mod: [],
-            },
-            attribute: '',
-            mod: [],
-            base: damageAmount,
+                mod: []
+            }
         };
+        return dataTemplates_1.DefaultValues.damageData(partialDamageData);
     }
     GetAmmo(weaponJson) {
         var _a;
@@ -25033,13 +24907,14 @@ class RangedParser extends WeaponParserBase_1.WeaponParserBase {
 }
 exports.RangedParser = RangedParser;
 
-},{"../../helper/ImportHelper":143,"../../importer/Constants":150,"./WeaponParserBase":178}],177:[function(require,module,exports){
+},{"../../../dataTemplates":132,"../../helper/ImportHelper":143,"../../importer/Constants":150,"./WeaponParserBase":178}],177:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ThrownParser = void 0;
 const ImportHelper_1 = require("../../helper/ImportHelper");
 const WeaponParserBase_1 = require("./WeaponParserBase");
 const Constants_1 = require("../../importer/Constants");
+const dataTemplates_1 = require("../../../dataTemplates");
 class ThrownParser extends WeaponParserBase_1.WeaponParserBase {
     GetDamage(jsonData) {
         var _a, _b, _c, _d;
@@ -25065,37 +24940,21 @@ class ThrownParser extends WeaponParserBase_1.WeaponParserBase {
                 }
             }
             else {
-                return {
+                const partialDamageData = {
                     type: {
                         base: 'physical',
-                        value: 'physical',
-                    },
-                    element: {
-                        base: '',
-                        value: '',
-                    },
-                    base: 0,
-                    value: 0,
-                    ap: {
-                        base: 0,
-                        value: 0,
-                        mod: [],
-                    },
-                    attribute: '',
-                    mod: [],
+                        value: 'physical'
+                    }
                 };
+                return dataTemplates_1.DefaultValues.damageData(partialDamageData);
             }
         }
         damageType = jsonDamage.includes('P') ? 'physical' : 'stun';
         let damageAp = ImportHelper_1.ImportHelper.IntValue(jsonData, 'ap', 0);
-        return {
+        const partialDamageData = {
             type: {
                 base: damageType,
                 value: damageType,
-            },
-            element: {
-                base: '',
-                value: '',
             },
             base: damageAmount,
             value: damageAmount,
@@ -25105,8 +24964,8 @@ class ThrownParser extends WeaponParserBase_1.WeaponParserBase {
                 mod: [],
             },
             attribute: damageAttribute,
-            mod: [],
         };
+        return dataTemplates_1.DefaultValues.damageData(partialDamageData);
     }
     GetBlast(jsonData, data) {
         var _a, _b, _c, _d;
@@ -25148,7 +25007,7 @@ class ThrownParser extends WeaponParserBase_1.WeaponParserBase {
 }
 exports.ThrownParser = ThrownParser;
 
-},{"../../helper/ImportHelper":143,"../../importer/Constants":150,"./WeaponParserBase":178}],178:[function(require,module,exports){
+},{"../../../dataTemplates":132,"../../helper/ImportHelper":143,"../../importer/Constants":150,"./WeaponParserBase":178}],178:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WeaponParserBase = void 0;
@@ -25566,6 +25425,39 @@ exports.ChatData = {
 
 },{"../helpers":140}],180:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ItemAction = void 0;
+const helpers_1 = require("../helpers");
+class ItemAction {
+    static calcDamage(damage, actor) {
+        // Avoid manipulation on original data, which might come from database values.
+        damage = duplicate(damage);
+        const attribute = actor.findAttribute(damage.attribute);
+        if (!attribute)
+            return damage;
+        switch (damage.base_formula_operator) {
+            case "add":
+                damage.value = damage.base + attribute.value;
+                break;
+            case "subtract":
+                damage.value = damage.base - attribute.value;
+                break;
+            case "multiply":
+                damage.value = damage.base * attribute.value;
+                break;
+            case "divide":
+                damage.value = damage.base / attribute.value;
+        }
+        // Rather reduce damage to the next full decimal.
+        damage.value = Math.floor(damage.value);
+        damage.value = helpers_1.Helpers.applyValueRange(damage.value, { min: 0 });
+        return damage;
+    }
+}
+exports.ItemAction = ItemAction;
+
+},{"../helpers":140}],181:[function(require,module,exports){
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -25585,6 +25477,7 @@ const chat_1 = require("../chat");
 const constants_1 = require("../constants");
 const SR5ItemDataWrapper_1 = require("./SR5ItemDataWrapper");
 const PartsList_1 = require("../parts/PartsList");
+const ItemAction_1 = require("./ItemAction");
 class SR5Item extends Item {
     constructor() {
         super(...arguments);
@@ -26075,7 +25968,6 @@ class SR5Item extends Item {
         });
     }
     getRollPartsList() {
-        console.error('getRollPartsList');
         // we only have a roll if we have an action or an actor
         const action = this.getAction();
         if (!action || !this.actor)
@@ -26509,16 +26401,7 @@ class SR5Item extends Item {
         const action = this.getAction();
         if (!action)
             return;
-        const { damage } = action;
-        // Add custom action damage value based on Attribute.
-        if (damage.attribute) {
-            const { attribute } = damage;
-            const att = this.actor.findAttribute(attribute);
-            if (att) {
-                damage.mod = PartsList_1.PartsList.AddUniquePart(damage.mod, att.label, att.value);
-                damage.value = helpers_1.Helpers.calcTotal(damage);
-            }
-        }
+        const damage = ItemAction_1.ItemAction.calcDamage(action.damage, this.actor);
         const data = {
             hits,
             damage,
@@ -26878,7 +26761,7 @@ class SR5Item extends Item {
 }
 exports.SR5Item = SR5Item;
 
-},{"../apps/dialogs/ShadowrunItemDialog":121,"../chat":128,"../constants":131,"../helpers":140,"../parts/PartsList":191,"../rolls/ShadowrunRoller":192,"./ChatData":179,"./SR5ItemDataWrapper":181}],181:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunItemDialog":121,"../chat":128,"../constants":131,"../helpers":140,"../parts/PartsList":192,"../rolls/ShadowrunRoller":193,"./ChatData":179,"./ItemAction":180,"./SR5ItemDataWrapper":182}],182:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ItemDataWrapper = void 0;
@@ -27194,7 +27077,7 @@ class SR5ItemDataWrapper extends DataWrapper_1.DataWrapper {
 }
 exports.SR5ItemDataWrapper = SR5ItemDataWrapper;
 
-},{"../dataWrappers/DataWrapper":133}],182:[function(require,module,exports){
+},{"../dataWrappers/DataWrapper":133}],183:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27536,7 +27419,7 @@ class SR5ItemSheet extends ItemSheet {
 }
 exports.SR5ItemSheet = SR5ItemSheet;
 
-},{"../helpers":140}],183:[function(require,module,exports){
+},{"../helpers":140}],184:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27596,7 +27479,7 @@ function rollItemMacro(itemName) {
 }
 exports.rollItemMacro = rollItemMacro;
 
-},{}],184:[function(require,module,exports){
+},{}],185:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const HandlebarManager_1 = require("./handlebars/HandlebarManager");
@@ -27607,7 +27490,7 @@ const hooks_1 = require("./hooks");
 hooks_1.HooksManager.registerHooks();
 HandlebarManager_1.HandlebarManager.registerHelpers();
 
-},{"./handlebars/HandlebarManager":135,"./hooks":141}],185:[function(require,module,exports){
+},{"./handlebars/HandlebarManager":135,"./hooks":141}],186:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27752,7 +27635,7 @@ Migrator.s_Versions = [
     { versionNumber: Version0_7_2_1.Version0_7_2.TargetVersion, migration: new Version0_7_2_1.Version0_7_2() },
 ];
 
-},{"./VersionMigration":186,"./versions/LegacyMigration":187,"./versions/Version0_6_10":188,"./versions/Version0_6_5":189,"./versions/Version0_7_2":190}],186:[function(require,module,exports){
+},{"./VersionMigration":187,"./versions/LegacyMigration":188,"./versions/Version0_6_10":189,"./versions/Version0_6_5":190,"./versions/Version0_7_2":191}],187:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -28183,7 +28066,7 @@ VersionMigration.MODULE_NAME = 'shadowrun5e';
 VersionMigration.KEY_DATA_VERSION = 'systemMigrationVersion';
 VersionMigration.NO_VERSION = '0';
 
-},{}],187:[function(require,module,exports){
+},{}],188:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -28413,7 +28296,7 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
 }
 exports.LegacyMigration = LegacyMigration;
 
-},{"../VersionMigration":186}],188:[function(require,module,exports){
+},{"../VersionMigration":187}],189:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -28474,7 +28357,7 @@ class Version0_6_10 extends VersionMigration_1.VersionMigration {
 }
 exports.Version0_6_10 = Version0_6_10;
 
-},{"../VersionMigration":186}],189:[function(require,module,exports){
+},{"../VersionMigration":187}],190:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -28525,7 +28408,7 @@ class Version0_6_5 extends VersionMigration_1.VersionMigration {
 }
 exports.Version0_6_5 = Version0_6_5;
 
-},{"../VersionMigration":186}],190:[function(require,module,exports){
+},{"../VersionMigration":187}],191:[function(require,module,exports){
 "use strict";
 // TODO: How to trigger test migration.
 // TODO: How to test migration results?
@@ -28603,7 +28486,7 @@ class Version0_7_2 extends VersionMigration_1.VersionMigration {
 }
 exports.Version0_7_2 = Version0_7_2;
 
-},{"../../config":130,"../VersionMigration":186}],191:[function(require,module,exports){
+},{"../../config":130,"../VersionMigration":187}],192:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PartsList = void 0;
@@ -28707,7 +28590,7 @@ class PartsList {
 }
 exports.PartsList = PartsList;
 
-},{}],192:[function(require,module,exports){
+},{}],193:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -29085,7 +28968,7 @@ class ShadowrunRoller {
 }
 exports.ShadowrunRoller = ShadowrunRoller;
 
-},{"../apps/dialogs/ShadowrunTestDialog":122,"../chat":128,"../constants":131,"../helpers":140,"../parts/PartsList":191}],193:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunTestDialog":122,"../chat":128,"../constants":131,"../helpers":140,"../parts/PartsList":192}],194:[function(require,module,exports){
 "use strict";
 // game settings for shadowrun 5e
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -29165,7 +29048,7 @@ exports.registerSystemSettings = () => {
     });
 };
 
-},{"./constants":131,"./migrator/VersionMigration":186}],194:[function(require,module,exports){
+},{"./constants":131,"./migrator/VersionMigration":187}],195:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class Template extends MeasuredTemplate {
@@ -29257,6 +29140,6 @@ class Template extends MeasuredTemplate {
 }
 exports.default = Template;
 
-},{}]},{},[184])
+},{}]},{},[185])
 
 //# sourceMappingURL=bundle.js.map
