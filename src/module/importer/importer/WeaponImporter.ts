@@ -7,6 +7,7 @@ import { ThrownParser } from '../parser/weapon/ThrownParser';
 import { ParserMap } from '../parser/ParserMap';
 import Weapon = Shadowrun.Weapon;
 import { WeaponParserBase } from '../parser/weapon/WeaponParserBase';
+import {DefaultValues} from "../helper/DefaultValues";
 
 export class WeaponImporter extends DataImporter {
     public categoryTranslations: any;
@@ -40,25 +41,7 @@ export class WeaponImporter extends DataImporter {
                     spec: false,
                     mod: 0,
                     mod_description: '',
-                    damage: {
-                        type: {
-                            base: 'physical',
-                            value: 'physical',
-                        },
-                        element: {
-                            base: '',
-                            value: '',
-                        },
-                        base: 0,
-                        value: 0,
-                        ap: {
-                            base: 0,
-                            value: 0,
-                            mod: [],
-                        },
-                        attribute: '',
-                        mod: [],
-                    },
+                    damage: DefaultValues.damageData(),
                     limit: {
                         value: 0,
                         attribute: '',

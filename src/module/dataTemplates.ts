@@ -1,5 +1,6 @@
 import ActorAttribute = Shadowrun.ActorAttribute;
 import DamageData = Shadowrun.DamageData;
+import {DefaultValues} from "./importer/helper/DefaultValues";
 
 export const DataTemplates = {
     grunt: {
@@ -45,23 +46,5 @@ export const DataTemplates = {
             }
         }
     },
-    damage: {
-        type: {
-            value: "",
-            base: ""
-        },
-        element: {
-            value: "",
-            base: ""
-        },
-        value: 0,
-        base: 0,
-        ap: {
-            value: 0,
-            base: 0,
-            mod: []
-        },
-        attribute: "",
-        mod: []
-    } as DamageData
+    damage: DefaultValues.damageData({type: {base: '', value: ''}}),
 }
