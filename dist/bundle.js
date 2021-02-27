@@ -16217,6 +16217,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AttributesPrep = void 0;
 const PartsList_1 = require("../../../parts/PartsList");
 const helpers_1 = require("../../../helpers");
+const constants_1 = require("../../../constants");
 class AttributesPrep {
     /**
      * Prepare actor data for attributes
@@ -16236,9 +16237,10 @@ class AttributesPrep {
                 return;
             const parts = new PartsList_1.PartsList(attribute.mod);
             attribute.mod = parts.list;
-            // Don't modify attribute below one.
-            // TODO: Use a SR5.Values.Attribute calculation to avoid duplication.
-            helpers_1.Helpers.calcTotal(attribute, { min: 1 });
+            // Each attribute can have a unique value range.
+            // TODO:  Implement metatype attribute value ranges for character actors.
+            const range = constants_1.SR.attributes.ranges[key];
+            helpers_1.Helpers.calcTotal(attribute, range);
             // add i18n labels.
             attribute.label = CONFIG.SR5.attributes[key];
         }
@@ -16246,7 +16248,7 @@ class AttributesPrep {
 }
 exports.AttributesPrep = AttributesPrep;
 
-},{"../../../helpers":140,"../../../parts/PartsList":192}],95:[function(require,module,exports){
+},{"../../../constants":131,"../../../helpers":140,"../../../parts/PartsList":192}],95:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConditionMonitorsPrep = void 0;
@@ -20619,6 +20621,26 @@ exports.SR = {
                 mana: 'willpower',
                 physical: 'body'
             }
+        }
+    },
+    attributes: {
+        ranges: {
+            magic: { min: 0 },
+            edge: { min: 0 },
+            resonance: { min: 0 },
+            essence: { min: 0 },
+            body: { min: 1 },
+            agility: { min: 1 },
+            reaction: { min: 1 },
+            strength: { min: 1 },
+            willpower: { min: 1 },
+            logic: { min: 1 },
+            intuition: { min: 1 },
+            charisma: { min: 1 },
+            attack: { min: 0 },
+            sleaze: { min: 0 },
+            data_processing: { min: 0 },
+            firewall: { min: 0 }
         }
     }
 };
