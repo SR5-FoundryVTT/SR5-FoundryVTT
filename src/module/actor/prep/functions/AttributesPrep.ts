@@ -1,6 +1,7 @@
 import SR5ActorData = Shadowrun.SR5ActorData;
 import { PartsList } from '../../../parts/PartsList';
 import { Helpers } from '../../../helpers';
+import {SR} from "../../../constants";
 
 export class AttributesPrep {
     /**
@@ -23,9 +24,11 @@ export class AttributesPrep {
             const parts = new PartsList(attribute.mod);
 
             attribute.mod = parts.list;
-            // Don't modify attribute below one.
-            // TODO: Use a SR5.Values.Attribute calculation to avoid duplication.
-            Helpers.calcTotal(attribute, {min: 1});
+
+            // Each attribute can have a unique value range.
+            // TODO:  Implement metatype attribute value ranges for character actors.
+            const range = SR.attributes.ranges[key];
+            Helpers.calcTotal(attribute, range);
 
             // add i18n labels.
             attribute.label = CONFIG.SR5.attributes[key];
