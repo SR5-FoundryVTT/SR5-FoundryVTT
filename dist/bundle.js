@@ -14579,6 +14579,40 @@ class SR5Actor extends Actor {
             return this.data.data.vehicle_stats;
         }
     }
+    /** Add another actor as the driver of a vehicle to allow for their values to be used in testing.
+     *
+     * @param id An actors id. Should be a character able to drive a vehicle
+     */
+    addVehicleDriver(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isVehicle())
+                return;
+            const driver = game.actors.get(id);
+            if (!driver)
+                return;
+            // NOTE: In THEORY almost all actor types can drive a vehicle.
+            // ... drek, in theory a drone could drive another vehicle even...
+            yield this.update({ 'data.driver': driver.id });
+        });
+    }
+    hasDriver() {
+        const data = this.asVehicleData();
+        if (!data)
+            return false;
+        return data.data.driver.length > 0;
+    }
+    getVehicleDriver() {
+        if (!this.hasDriver())
+            return;
+        const data = this.asVehicleData();
+        if (!data)
+            return;
+        const driver = game.actors.get(data.data.driver);
+        // If no driver id is set, we won't get an actor and should explicitly return undefined.
+        if (!driver)
+            return;
+        return driver;
+    }
 }
 exports.SR5Actor = SR5Actor;
 
@@ -14663,6 +14697,7 @@ class SR5ActorSheet extends ActorSheet {
         this._prepareSkillsWithFilters(data);
         this._prepareActorTypeFields(data);
         this._prepareCharacterFields(data);
+        this._prepareVehicleFields(data);
         return data;
     }
     _isSkillMagic(id, skill) {
@@ -14697,6 +14732,14 @@ class SR5ActorSheet extends ActorSheet {
         data.awakened = data.data.special === 'magic';
         data.emerged = data.data.special === 'resonance';
         data.woundTolerance = 3 + (Number(mods['wound_tolerance']) || 0);
+    }
+    _prepareVehicleFields(data) {
+        if (!this.actor.isVehicle())
+            return;
+        const driver = this.actor.getVehicleDriver();
+        data.vehicle = {
+            driver
+        };
     }
     _prepareActorTypeFields(data) {
         data.isCharacter = this.actor.isCharacter();
@@ -15028,6 +15071,30 @@ class SR5ActorSheet extends ActorSheet {
                 item.setAttribute('draggable', true);
                 item.addEventListener('dragstart', handler, false);
             }
+        });
+    }
+    /** Handle all entity drops onto all actor sheet types.
+     *
+     * @param event
+     */
+    _onDrop(event) {
+        const _super = Object.create(null, {
+            _onDrop: { get: () => super._onDrop }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            event.stopPropagation();
+            if (!event.dataTransfer)
+                return;
+            const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
+            // Handle specific system drop events.
+            switch (dropData.type) {
+                case "Actor":
+                    yield this.actor.addVehicleDriver(dropData.id);
+                    break;
+            }
+            // Handle none specific drop events.
+            yield _super._onDrop.call(this, event);
         });
     }
     deleteOwnedItem(event) {
