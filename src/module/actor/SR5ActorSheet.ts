@@ -514,8 +514,6 @@ export class SR5ActorSheet extends ActorSheet {
         event.preventDefault();
         event.stopPropagation();
 
-        console.error(event);
-
         if (!event.dataTransfer) return;
 
         const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
@@ -525,6 +523,8 @@ export class SR5ActorSheet extends ActorSheet {
                 await this.actor.addVehicleDriver(dropData.id)
                 break;
         }
+
+        await super._onDrop(event);
     }
 
 
