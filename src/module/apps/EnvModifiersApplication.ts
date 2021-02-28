@@ -35,7 +35,8 @@ export class EnvModifiersApplication extends Application {
         // TODO: getData is a bit unreadable.
         // TODO: SheetData for EnvModifiersApplication typing?
 
-        this.modifiers = await this.getModifiersFromTarget();
+        // Try target or fallback on default.
+        this.modifiers = await this.getModifiers();
 
         data.active = this.modifiers.environmental.active;
         data.total = this.modifiers.environmental.total;
@@ -50,12 +51,11 @@ export class EnvModifiersApplication extends Application {
 
     protected activateListeners(html: JQuery | HTMLElement) {
         $(html).find('button.env-modifier').on('click', this._handleModifierChange.bind(this));
+        $(html).find('button.remove-modifiers-from-target').on('click', this._handleRemoveModifiersFromTarget.bind(this));
     }
 
     async _handleModifierChange(event: Event) {
         event.preventDefault();
-
-        console.error('_handleModifierChange');
 
         // Handle data retrieval from HTML datasets.
         const element = event.currentTarget as HTMLElement;
@@ -70,6 +70,14 @@ export class EnvModifiersApplication extends Application {
         this._calcActiveModifierTotal();
 
         await this.storeModifiersOnTarget();
+
+        await this.render();
+    }
+
+    async _handleRemoveModifiersFromTarget(event: Event) {
+        event.preventDefault();
+
+        await this.clearModifiersOnTarget();
 
         await this.render();
     }
@@ -147,27 +155,43 @@ export class EnvModifiersApplication extends Application {
         }
     }
 
-    /** Depending on the state of the app differing sources for modifiers will be used:
-     * 1. What the app is already using.
-     * 2. What the target has stored on it.
-     * 3. What default modifiers are, should both fail.
-     */
+    async getModifiers() {
+        if (await this.targetHasEnvironmentalModifiers()) {
+            return await this.getModifiersFromTarget();
+        } else {
+            return Modifiers.getDefaultModifiers();
+        }
+    }
+
     async getModifiersFromTarget() {
-        return this.modifiers || await this.target.getFlag(SYSTEM_NAME, FLAGS.Modifier) || Modifiers.getDefaultModifiers();
+        return await this.target.getFlag(SYSTEM_NAME, FLAGS.Modifier);
     }
 
     async storeModifiersOnTarget() {
         // TODO: Add modifier typing
         const modifiers = await this.getModifiersFromTarget();
-        console.error('App', this.modifiers);
-        console.error('Target', modifiers);
+
         modifiers.environmental = this.modifiers.environmental;
 
-        // TODO: Ask league about this...
+        // TODO: Ask league about unsetFlag behavoir...
         // NOTE: Check if JSON stringifier works or not.
         await this.target.unsetFlag(SYSTEM_NAME, FLAGS.Modifier);
-        await this.target.setFlag(SYSTEM_NAME, FLAGS.Modifier, duplicate(modifiers));
-        console.error(this.target.id);
+        await this.target.setFlag(SYSTEM_NAME, FLAGS.Modifier, modifiers);
+
+    }
+
+    async targetHasEnvironmentalModifiers() {
+        const modifiers = await this.getModifiersFromTarget();
+        return modifiers && modifiers.environmental;
+    }
+
+    async clearModifiersOnTarget() {
+        const modifiers = await this.getModifiersFromTarget();
+
+        delete modifiers.environmental;
+
+        await this.target.unsetFlag(SYSTEM_NAME, FLAGS.Modifier);
+        await this.target.setFlag(SYSTEM_NAME, FLAGS.Modifier, modifiers);
     }
 
     _getTargetTypeLabel(): string {
