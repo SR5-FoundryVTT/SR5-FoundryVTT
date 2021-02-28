@@ -35,7 +35,9 @@ export class NPCPrep {
 
                 attribute.mod = parts.list;
 
-                Helpers.calcTotal(attribute);
+                // Don't modify attribute below one.
+                // TODO: Use a SR5.Values.Attribute calculation to avoid duplication.
+                Helpers.calcTotal(attribute, {min: 1});
             }
         }
     }

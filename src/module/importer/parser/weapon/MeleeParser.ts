@@ -4,6 +4,7 @@ import ActorAttribute = Shadowrun.ActorAttribute;
 import DamageData = Shadowrun.DamageData;
 import DamageType = Shadowrun.DamageType;
 import Weapon = Shadowrun.Weapon;
+import {DefaultValues} from "../../../dataTemplates";
 
 export class MeleeParser extends WeaponParserBase {
     GetDamage(jsonData: object): DamageData {
@@ -11,25 +12,7 @@ export class MeleeParser extends WeaponParserBase {
         let damageCode: any = jsonDamage.match(/(STR)([+-]?)([1-9]*)\)([PS])/g)?.[0];
 
         if (damageCode == null) {
-            return {
-                type: {
-                    base: 'physical',
-                    value: 'physical',
-                },
-                element: {
-                    base: '',
-                    value: '',
-                },
-                base: 0,
-                value: 0,
-                ap: {
-                    base: 0,
-                    value: 0,
-                    mod: [],
-                },
-                attribute: '',
-                mod: [],
-            };
+            return DefaultValues.damageData();
         }
 
         let damageBase = 0;
@@ -44,14 +27,10 @@ export class MeleeParser extends WeaponParserBase {
         }
         let damageAttribute = damageCode.includes('STR') ? 'strength' : '';
 
-        return {
+        const partialDamageData = {
             type: {
                 base: damageType as DamageType,
                 value: damageType as DamageType,
-            },
-            element: {
-                base: '',
-                value: '',
             },
             base: damageBase,
             value: damageBase,
@@ -61,8 +40,8 @@ export class MeleeParser extends WeaponParserBase {
                 mod: [],
             },
             attribute: damageAttribute as ActorAttribute,
-            mod: [],
-        };
+        }
+        return DefaultValues.damageData(partialDamageData);
     }
 
     Parse(jsonData: object, data: Weapon, jsonTranslation?: object): Weapon {

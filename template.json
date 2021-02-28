@@ -921,6 +921,7 @@
             "environment": "speed",
             "isDrone": false,
             "isOffRoad": false,
+            "driver": "",
             "vehicle_stats": {
                 "pilot": {
                     "base": 0,
@@ -1099,6 +1100,7 @@
                             "value": 0,
                             "base": 0
                         },
+                        "base_formula_operator": "+",
                         "attribute": ""
                     },
                     "opposed": {

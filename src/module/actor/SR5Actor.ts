@@ -300,10 +300,10 @@ export class SR5Actor extends Actor {
         await this.update(updateData);
     }
 
-    removeLanguageSkill(skillId) {
+    async removeLanguageSkill(skillId) {
         const value = {};
         value[skillId] = { _delete: true };
-        this.update({ 'data.skills.language.value': value });
+        await this.update({ 'data.skills.language.value': value });
     }
 
     async addLanguageSkill(skill) {
@@ -848,7 +848,7 @@ export class SR5Actor extends Actor {
         }
     }
 
-    rollDroneInfiltration(options?: ActorRollOptions) {
+    async rollDroneInfiltration(options?: ActorRollOptions) {
         if (!this.isVehicle()) {
             return undefined;
         }
@@ -876,7 +876,7 @@ export class SR5Actor extends Actor {
                 });
             }
         } else {
-            this.rollActiveSkill('sneaking', options);
+            await this.rollActiveSkill('sneaking', options);
         }
     }
 
@@ -905,7 +905,7 @@ export class SR5Actor extends Actor {
         const att = duplicate(this.data.data.attributes[attId]);
         const atts = duplicate(this.data.data.attributes);
         const parts = new PartsList<number>();
-        parts.addUniquePart(att.label, att.value);
+        parts.addPart(att.label, att.value);
         let dialogData = {
             attribute: att,
             attributes: atts,
@@ -930,7 +930,7 @@ export class SR5Actor extends Actor {
                     if (att2Id !== 'none') {
                         att2 = atts[att2Id];
                         if (att2?.label) {
-                            parts.addUniquePart(att2.label, att2.value);
+                            parts.addPart(att2.label, att2.value);
                             const att2IdLabel = game.i18n.localize(CONFIG.SR5.attributes[att2Id]);
                             title += ` + ${att2IdLabel}`;
                         }
@@ -1489,5 +1489,45 @@ export class SR5Actor extends Actor {
         if (this.isVehicle() && "vehicle_stats" in this.data.data) {
             return this.data.data.vehicle_stats;
         }
+    }
+
+    /** Add another actor as the driver of a vehicle to allow for their values to be used in testing.
+     *
+     * @param id An actors id. Should be a character able to drive a vehicle
+     */
+    async addVehicleDriver(id: string) {
+        if (!this.isVehicle()) return;
+
+        const driver = game.actors.get(id) as SR5Actor;
+        if (!driver) return;
+
+        // NOTE: In THEORY almost all actor types can drive a vehicle.
+        // ... drek, in theory a drone could drive another vehicle even...
+
+        await this.update({'data.driver': driver.id});
+    }
+
+    async removeVehicleDriver() {
+        if (!this.hasDriver()) return;
+
+        await this.update({'data.driver': ''});
+    }
+
+    hasDriver(): boolean {
+        const data = this.asVehicleData();
+
+        if (!data) return false;
+        return data.data.driver.length > 0;
+    }
+
+    getVehicleDriver(): SR5Actor|undefined {
+        if (!this.hasDriver()) return;
+        const data = this.asVehicleData();
+        if (!data) return;
+
+        const driver = game.actors.get(data.data.driver) as SR5Actor;
+        // If no driver id is set, we won't get an actor and should explicitly return undefined.
+        if (!driver) return;
+        return driver;
     }
 }

@@ -4,6 +4,7 @@ import { Constants } from '../../importer/Constants';
 import DamageData = Shadowrun.DamageData;
 import DamageType = Shadowrun.DamageType;
 import Weapon = Shadowrun.Weapon;
+import {DefaultValues} from "../../../dataTemplates";
 
 export class RangedParser extends WeaponParserBase {
     public GetDamage(jsonData: object): DamageData {
@@ -11,50 +12,27 @@ export class RangedParser extends WeaponParserBase {
         let damageCode = jsonDamage.match(/[0-9]+[PS]/g)?.[0];
 
         if (damageCode == null) {
-            return {
-                type: {
-                    base: 'physical',
-                    value: '',
-                },
-                element: {
-                    base: '',
-                    value: '',
-                },
-                base: 0,
-                value: 0,
-                ap: {
-                    base: 0,
-                    value: 0,
-                    mod: [],
-                },
-                attribute: '',
-                mod: [],
-            };
+            return DefaultValues.damageData();
         }
 
         let damageType = damageCode.includes('P') ? 'physical' : 'stun';
         let damageAmount = parseInt(damageCode.replace(damageType[0].toUpperCase(), ''));
         let damageAp = ImportHelper.IntValue(jsonData, 'ap', 0);
 
-        return {
+        const partialDamageData = {
             type: {
                 base: damageType as DamageType,
                 value: damageType as DamageType,
             },
-            element: {
-                base: '',
-                value: '',
-            },
+            base: damageAmount,
             value: damageAmount,
             ap: {
                 base: damageAp,
                 value: damageAp,
-                mod: [],
-            },
-            attribute: '',
-            mod: [],
-            base: damageAmount,
-        };
+                mod: []
+            }
+        }
+        return DefaultValues.damageData(partialDamageData);
     }
 
     protected GetAmmo(weaponJson: object) {

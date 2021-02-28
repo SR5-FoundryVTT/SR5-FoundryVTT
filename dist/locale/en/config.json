@@ -735,6 +735,8 @@
         "Clearsight": "Clearsight",
         "Stealth": "Stealth",
         "Maneuvering": "Maneuvering",
+        "Driver": "Driver",
+        "MissingDriver": "Drag&Drop an actor as a driver",
 
         "Stats": {
             "Handling": "Handling",
@@ -795,7 +797,7 @@
 
     "SR5.ChangelogApplication": {
         "Title": "Shadowrun5e Update",
-        "Reason": "You've updated to the latest versions!",
+        "Reason": "You've updated to the latest version!",
         "Changelog": "Check out our GitHub for new features and fixes",
         "LatestChangelog": "Latest Changelog",
         "ReportIssues": "Please report bugs and feature requests",

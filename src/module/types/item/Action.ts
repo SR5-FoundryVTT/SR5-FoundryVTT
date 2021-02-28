@@ -36,6 +36,8 @@ declare namespace Shadowrun {
         type: BaseValuePair<DamageType>;
         element: BaseValuePair<DamageElement>;
         ap: ModifiableValue;
+        // See config.actionDamageFormulaOperators for operator mapping.
+        base_formula_operator: 'add'|'subtract'|'multiply'|'divide';
     };
     /**
      * Action opposed test data.

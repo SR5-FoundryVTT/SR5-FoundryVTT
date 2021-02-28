@@ -1,3 +1,5 @@
+import {SR5} from "./config";
+
 export const SYSTEM_NAME = 'shadowrun5e';
 export const FLAGS = {
     ShowGlitchAnimation: 'showGlitchAnimation',
@@ -69,6 +71,26 @@ export const SR = {
                 mana: 'willpower',
                 physical: 'body'
             }
+        }
+    },
+    attributes: {
+        ranges: {
+            magic: {min: 0},
+            edge: {min: 0},
+            resonance: {min: 0},
+            essence: {min: 0},
+            body: {min: 1},
+            agility: {min: 1},
+            reaction: {min: 1},
+            strength: {min: 1},
+            willpower: {min: 1},
+            logic: {min: 1},
+            intuition: {min: 1},
+            charisma: {min: 1},
+            attack: {min: 0},
+            sleaze: {min: 0},
+            data_processing: {min: 0},
+            firewall: {min: 0}
         }
     }
 }

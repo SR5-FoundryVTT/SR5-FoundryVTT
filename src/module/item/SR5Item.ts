@@ -52,6 +52,7 @@ import Program = Shadowrun.Program;
 import Quality = Shadowrun.Quality;
 import Spell = Shadowrun.Spell;
 import SpritePower = Shadowrun.SpritePower;
+import {ItemAction} from "./ItemAction";
 
 export class SR5Item extends Item {
     labels: {} = {};
@@ -162,7 +163,7 @@ export class SR5Item extends Item {
 
     get hasRoll(): boolean {
         const action = this.getAction();
-        return !!(action && action.type !== '' && (action.skill || action.attribute));
+        return !!(action && action.type !== '' && (action.skill || action.attribute || action.attribute2 || action.dice_pool_mod));
     }
     get hasTemplate(): boolean {
         return this.isAreaOfEffect();
@@ -587,7 +588,10 @@ export class SR5Item extends Item {
             if (skill.value === 0) {
                 parts.addUniquePart('SR5.Defaulting', -1);
             }
-        } else if (attribute2 && attribute2.label) parts.addUniquePart(attribute2.label, attribute2.value);
+        }
+        else if (attribute2 && attribute2.label) {
+            parts.addPart(attribute2.label, attribute2.value);
+        }
 
         const spec = this.getActionSpecialization();
         if (spec) parts.addUniquePart(spec, 2);
@@ -1025,17 +1029,7 @@ export class SR5Item extends Item {
         const action = this.getAction();
         if (!action) return;
 
-        const {damage} = action;
-
-        // Add custom action damage value based on Attribute.
-        if (damage.attribute) {
-            const { attribute } = damage;
-            const att = this.actor.findAttribute(attribute);
-            if (att) {
-                damage.mod = PartsList.AddUniquePart(damage.mod, att.label, att.value);
-                damage.value = Helpers.calcTotal(damage);
-            }
-        }
+        const damage = ItemAction.calcDamage(action.damage, this.actor);
 
         const data: AttackData = {
             hits,

@@ -2,6 +2,16 @@
     {{> "systems/shadowrun5e/dist/templates/common/HeaderBlock.html"
             name=(localize "SR5.Labels.ActorSheet.VehicleConfiguration")
     }}
+    {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.Driver") }}
+        <div>
+            {{#if vehicle.driver}}
+            <a class="entity-link" draggable="true" data-entity="Actor" data-id="{{vehicle.driver.id}}"><i class="fas fa-user">{{vehicle.driver.name}}</i></a>
+            <a class="close driver-remove"><i class="fas fa-times"></i></a>
+            {{else}}
+            {{localize "SR5.Vehicle.MissingDriver"}}
+            {{/if}}
+        </div>
+    {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
     {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Vehicle.Type") }}
         <div>
             {{> "systems/shadowrun5e/dist/templates/common/Select.html"
