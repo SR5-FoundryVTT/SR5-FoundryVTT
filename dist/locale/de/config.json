@@ -708,7 +708,7 @@
         "Stealth": "Stealth",
         "Maneuvering": "Manövrieren",
         "Driver": "Fahrer",
-        "MissingDriver": "Actor als Fahrer per Drag&Drop",
+        "MissingDriver": "Fahrer per Drag&Drop zufügen",
 
         "Stats": {
             "Handling": "Handling",

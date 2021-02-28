@@ -13479,9 +13479,11 @@ class SR5Actor extends Actor {
         });
     }
     removeLanguageSkill(skillId) {
-        const value = {};
-        value[skillId] = { _delete: true };
-        this.update({ 'data.skills.language.value': value });
+        return __awaiter(this, void 0, void 0, function* () {
+            const value = {};
+            value[skillId] = { _delete: true };
+            yield this.update({ 'data.skills.language.value': value });
+        });
     }
     addLanguageSkill(skill) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -13990,32 +13992,34 @@ class SR5Actor extends Actor {
         });
     }
     rollDroneInfiltration(options) {
-        if (!this.isVehicle()) {
-            return undefined;
-        }
-        const actorData = duplicate(this.data.data);
-        if (actorData.controlMode === 'autopilot') {
-            const parts = new PartsList_1.PartsList();
-            const pilot = helpers_1.Helpers.calcTotal(actorData.vehicle_stats.pilot);
-            // TODO possibly look for autosoft item level?
-            const sneaking = this.findActiveSkill('sneaking');
-            const limit = this.findLimit('sensor');
-            if (sneaking && limit) {
-                parts.addPart('SR5.Vehicle.Stealth', helpers_1.Helpers.calcTotal(sneaking));
-                parts.addPart('SR5.Vehicle.Stats.Pilot', pilot);
-                this._addGlobalParts(parts);
-                return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
-                    event: options === null || options === void 0 ? void 0 : options.event,
-                    actor: this,
-                    parts: parts.list,
-                    limit,
-                    title: game.i18n.localize('SR5.Labels.ActorSheet.RollDroneInfiltration'),
-                });
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isVehicle()) {
+                return undefined;
             }
-        }
-        else {
-            this.rollActiveSkill('sneaking', options);
-        }
+            const actorData = duplicate(this.data.data);
+            if (actorData.controlMode === 'autopilot') {
+                const parts = new PartsList_1.PartsList();
+                const pilot = helpers_1.Helpers.calcTotal(actorData.vehicle_stats.pilot);
+                // TODO possibly look for autosoft item level?
+                const sneaking = this.findActiveSkill('sneaking');
+                const limit = this.findLimit('sensor');
+                if (sneaking && limit) {
+                    parts.addPart('SR5.Vehicle.Stealth', helpers_1.Helpers.calcTotal(sneaking));
+                    parts.addPart('SR5.Vehicle.Stats.Pilot', pilot);
+                    this._addGlobalParts(parts);
+                    return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
+                        event: options === null || options === void 0 ? void 0 : options.event,
+                        actor: this,
+                        parts: parts.list,
+                        limit,
+                        title: game.i18n.localize('SR5.Labels.ActorSheet.RollDroneInfiltration'),
+                    });
+                }
+            }
+            else {
+                yield this.rollActiveSkill('sneaking', options);
+            }
+        });
     }
     rollKnowledgeSkill(catId, skillId, options) {
         const category = duplicate(this.data.data.skills.knowledge[catId]);
@@ -14595,6 +14599,13 @@ class SR5Actor extends Actor {
             yield this.update({ 'data.driver': driver.id });
         });
     }
+    removeVehicleDriver() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.hasDriver())
+                return;
+            yield this.update({ 'data.driver': '' });
+        });
+    }
     hasDriver() {
         const data = this.asVehicleData();
         if (!data)
@@ -15072,6 +15083,7 @@ class SR5ActorSheet extends ActorSheet {
                 item.addEventListener('dragstart', handler, false);
             }
         });
+        html.find('.driver-remove').click(this.handleRemoveVehicleDriver.bind(this));
     }
     /** Handle all entity drops onto all actor sheet types.
      *
@@ -15568,6 +15580,12 @@ class SR5ActorSheet extends ActorSheet {
             title: 'Chummer Import',
         };
         new chummer_import_form_1.ChummerImportForm(this.actor, options).render(true);
+    }
+    handleRemoveVehicleDriver(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            yield this.actor.removeVehicleDriver();
+        });
     }
 }
 exports.SR5ActorSheet = SR5ActorSheet;
