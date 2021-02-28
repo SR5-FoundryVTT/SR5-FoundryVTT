@@ -33,14 +33,20 @@ export class EnvModifiersApplication extends Application {
     async getData(options?: object): Promise<any> {
         const data = super.getData(options);
 
+        // TODO: getData is a bit unreadable.
         // TODO: SheetData for EnvModifiersApplication typing?
-        data.modifiers = Modifiers.getEnvironmentalModifierLevels();
-        data.active = this.modifiers.environmental.active;
-        data.total = this.modifiers.environmental.total;
+
+        const targetModifiers = await this.getModifiersFromTarget();
+
+        data.active = targetModifiers.environmental.active;
+        data.total = targetModifiers.environmental.total;
+
+        data.levels = Modifiers.getEnvironmentalModifierLevels();
+
         data.targetType = this._getTargetTypeLabel();
         data.targetName = this.target.name;
 
-        console.error(this.target);
+        console.error('getData target', targetModifiers);
 
         return data;
     }
@@ -51,6 +57,8 @@ export class EnvModifiersApplication extends Application {
 
     async _handleModifierChange(event: Event) {
         event.preventDefault();
+
+        // Handle data retrieval from HTML datasets.
         const element = event.currentTarget as HTMLElement;
 
         if (!element.dataset.category || !element.dataset.value) return;
@@ -58,8 +66,11 @@ export class EnvModifiersApplication extends Application {
         const category = element.dataset.category;
         const value = Number(element.dataset.value);
 
+        // Handle modifier calculation
         this._toggleActiveModifierCategory(category, value);
         this._calcActiveModifierTotal();
+
+        await this.storeModifiersOnTarget();
 
         await this.render();
     }
@@ -144,9 +155,15 @@ export class EnvModifiersApplication extends Application {
     async storeModifiersOnTarget() {
         // TODO: Add modifier typing
         const modifiers = await this.getModifiersFromTarget();
+        console.error('App', this.modifiers);
+        console.error('Target', modifiers);
         modifiers.environmental = this.modifiers.environmental;
 
-        await this.target.setFlag(SYSTEM_NAME, FLAGS.Modifier, modifiers);
+        // TODO: Ask league about this...
+        // NOTE: Check if JSON stringifier works or not.
+        await this.target.unsetFlag(SYSTEM_NAME, FLAGS.Modifier);
+        await this.target.setFlag(SYSTEM_NAME, FLAGS.Modifier, duplicate(modifiers));
+        console.error(this.target.id);
     }
 
     _getTargetTypeLabel(): string {
