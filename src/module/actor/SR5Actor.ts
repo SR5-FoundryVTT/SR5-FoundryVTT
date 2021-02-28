@@ -1490,4 +1490,38 @@ export class SR5Actor extends Actor {
             return this.data.data.vehicle_stats;
         }
     }
+
+    /** Add another actor as the driver of a vehicle to allow for their values to be used in testing.
+     *
+     * @param id An actors id. Should be a character able to drive a vehicle
+     */
+    async addVehicleDriver(id: string) {
+        if (!this.isVehicle()) return;
+
+        const driver = game.actors.get(id) as SR5Actor;
+        if (!driver) return;
+
+        // NOTE: In THEORY almost all actor types can drive a vehicle.
+        // ... drek, in theory a drone could drive another vehicle even...
+
+        await this.update({'data.driver': driver.id});
+    }
+
+    hasDriver(): boolean {
+        const data = this.asVehicleData();
+
+        if (!data) return false;
+        return data.data.driver.length > 0;
+    }
+
+    getVehicleDriver(): SR5Actor|undefined {
+        if (!this.hasDriver()) return;
+        const data = this.asVehicleData();
+        if (!data) return;
+
+        const driver = game.actors.get(data.data.driver) as SR5Actor;
+        // If no driver id is set, we won't get an actor and should explicitly return undefined.
+        if (!driver) return;
+        return driver;
+    }
 }

@@ -9,8 +9,14 @@ declare namespace Shadowrun {
         isSpirit: boolean;
         awakened: boolean;
         emerged: boolean;
-        woundTolerance: number
+        woundTolerance: number;
+        vehicle: SR5VehicleSheetData;
     };
+
+     export type SR5VehicleSheetData = {
+        // TODO: SR5 Actor class, however conflicts between SR5Actor and SR5ActorBase prohibit this...
+        driver?: object
+    }
 
     export type SR5SheetFilters = {
         skills: string;

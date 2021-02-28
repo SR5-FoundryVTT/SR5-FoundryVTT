@@ -707,6 +707,8 @@
         "Clearsight": "Clearsight",
         "Stealth": "Stealth",
         "Maneuvering": "Manövrieren",
+        "Driver": "Fahrer",
+        "MissingDriver": "Actor als Fahrer per Drag&Drop",
 
         "Stats": {
             "Handling": "Handling",
