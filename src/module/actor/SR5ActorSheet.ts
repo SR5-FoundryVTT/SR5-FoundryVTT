@@ -518,12 +518,14 @@ export class SR5ActorSheet extends ActorSheet {
 
         const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
 
+        // Handle specific system drop events.
         switch (dropData.type) {
             case "Actor":
                 await this.actor.addVehicleDriver(dropData.id)
                 break;
         }
 
+        // Handle none specific drop events.
         await super._onDrop(event);
     }
 
