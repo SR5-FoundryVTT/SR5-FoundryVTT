@@ -17679,7 +17679,7 @@ var ItemsParser = /*#__PURE__*/function () {
       }
 
       if (importOptions.armor && chummerChar.armors && chummerChar.armors.armor) {
-        var parsedArmors = new _ArmorParser.ArmorParser().parsArmors(chummerChar);
+        var parsedArmors = new _ArmorParser.ArmorParser().parseArmors(chummerChar);
         Array.prototype.push.apply(parsedItems, parsedArmors);
       }
 
