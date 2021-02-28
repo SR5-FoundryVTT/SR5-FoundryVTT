@@ -504,6 +504,8 @@ export class SR5ActorSheet extends ActorSheet {
                 item.addEventListener('dragstart', handler, false);
             }
         });
+
+        html.find('.driver-remove').click(this.handleRemoveVehicleDriver.bind(this));
     }
 
     /** Handle all entity drops onto all actor sheet types.
@@ -998,5 +1000,10 @@ export class SR5ActorSheet extends ActorSheet {
             title: 'Chummer Import',
         };
         new ChummerImportForm(this.actor, options).render(true);
+    }
+
+    async handleRemoveVehicleDriver(event) {
+        event.preventDefault();
+        await this.actor.removeVehicleDriver();
     }
 }

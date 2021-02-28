@@ -300,10 +300,10 @@ export class SR5Actor extends Actor {
         await this.update(updateData);
     }
 
-    removeLanguageSkill(skillId) {
+    async removeLanguageSkill(skillId) {
         const value = {};
         value[skillId] = { _delete: true };
-        this.update({ 'data.skills.language.value': value });
+        await this.update({ 'data.skills.language.value': value });
     }
 
     async addLanguageSkill(skill) {
@@ -848,7 +848,7 @@ export class SR5Actor extends Actor {
         }
     }
 
-    rollDroneInfiltration(options?: ActorRollOptions) {
+    async rollDroneInfiltration(options?: ActorRollOptions) {
         if (!this.isVehicle()) {
             return undefined;
         }
@@ -876,7 +876,7 @@ export class SR5Actor extends Actor {
                 });
             }
         } else {
-            this.rollActiveSkill('sneaking', options);
+            await this.rollActiveSkill('sneaking', options);
         }
     }
 
@@ -1505,6 +1505,12 @@ export class SR5Actor extends Actor {
         // ... drek, in theory a drone could drive another vehicle even...
 
         await this.update({'data.driver': driver.id});
+    }
+
+    async removeVehicleDriver() {
+        if (!this.hasDriver()) return;
+
+        await this.update({'data.driver': ''});
     }
 
     hasDriver(): boolean {
