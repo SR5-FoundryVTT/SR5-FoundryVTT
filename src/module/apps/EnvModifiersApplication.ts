@@ -1,12 +1,14 @@
 import {FLAGS, SYSTEM_NAME} from "../constants";
 import {Modifiers} from "../sr5/Modifiers";
 
+export type EnvModifiersTarget = Scene|Token;
+
 // TODO: Add ways of modifying different category levels by steps up / down (infrared) or to specific levels.
 export class EnvModifiersApplication extends Application {
-    target: Entity;
+    target: EnvModifiersTarget;
     modifiers;
 
-    constructor(target: Entity, modifiers) {
+    constructor(target: EnvModifiersTarget) {
         super();
 
         this.target = target;
@@ -31,9 +33,14 @@ export class EnvModifiersApplication extends Application {
     async getData(options?: object): Promise<any> {
         const data = super.getData(options);
 
+        // TODO: SheetData for EnvModifiersApplication typing?
         data.modifiers = Modifiers.getEnvironmentalModifierLevels();
         data.active = this.modifiers.environmental.active;
         data.total = this.modifiers.environmental.total;
+        data.targetType = this._getTargetTypeLabel();
+        data.targetName = this.target.name;
+
+        console.error(this.target);
 
         return data;
     }
@@ -142,4 +149,14 @@ export class EnvModifiersApplication extends Application {
         await this.target.setFlag(SYSTEM_NAME, FLAGS.Modifier, modifiers);
     }
 
+    _getTargetTypeLabel(): string {
+        if (this.target instanceof Scene) {
+            return game.i18n.localize('ENTITY.Scene');
+        }
+        if (this.target instanceof Token) {
+            return game.i18n.localize('Token');
+        }
+
+        return '';
+    }
 }

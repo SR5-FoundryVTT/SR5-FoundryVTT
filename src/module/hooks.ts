@@ -102,8 +102,12 @@ ___________________
         $(document).on('click', diceIconSelectorNew, () => ShadowrunRoller.promptRoll());
 
         const target = game.scenes.entries[0];
-        console.error(target);
+        console.error('scene', target);
         await new EnvModifiersApplication(target).render(true);
+
+        const token = canvas.tokens.placeables[0];
+        console.error('token', token);
+        await new EnvModifiersApplication(token).render(true);
     }
 
     static canvasInit() {
