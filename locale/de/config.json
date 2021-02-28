@@ -707,6 +707,8 @@
         "Clearsight": "Clearsight",
         "Stealth": "Stealth",
         "Maneuvering": "Manövrieren",
+        "Driver": "Fahrer",
+        "MissingDriver": "Fahrer per Drag&Drop zufügen",
 
         "Stats": {
             "Handling": "Handling",

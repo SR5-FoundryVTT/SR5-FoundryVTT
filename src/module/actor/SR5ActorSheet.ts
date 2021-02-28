@@ -92,6 +92,7 @@ export class SR5ActorSheet extends ActorSheet {
         this._prepareSkillsWithFilters(data);
         this._prepareActorTypeFields(data);
         this._prepareCharacterFields(data);
+        this._prepareVehicleFields(data);
 
         return data;
     }
@@ -134,6 +135,16 @@ export class SR5ActorSheet extends ActorSheet {
         data.awakened = data.data.special === 'magic';
         data.emerged = data.data.special === 'resonance';
         data.woundTolerance = 3 + (Number(mods['wound_tolerance']) || 0);
+    }
+
+    _prepareVehicleFields(data: SR5ActorSheetData) {
+        if (!this.actor.isVehicle()) return;
+
+        const driver = this.actor.getVehicleDriver();
+
+        data.vehicle = {
+            driver
+        };
     }
 
     _prepareActorTypeFields(data: SR5ActorSheetData) {
@@ -493,7 +504,34 @@ export class SR5ActorSheet extends ActorSheet {
                 item.addEventListener('dragstart', handler, false);
             }
         });
+
+        html.find('.driver-remove').click(this.handleRemoveVehicleDriver.bind(this));
     }
+
+    /** Handle all entity drops onto all actor sheet types.
+     *
+     * @param event
+     */
+    async _onDrop(event: DragEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!event.dataTransfer) return;
+
+        const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
+
+        // Handle specific system drop events.
+        switch (dropData.type) {
+            case "Actor":
+                await this.actor.addVehicleDriver(dropData.id)
+                break;
+        }
+
+        // Handle none specific drop events.
+        await super._onDrop(event);
+    }
+
+
 
     async deleteOwnedItem(event) {
         event.preventDefault();
@@ -962,5 +1000,10 @@ export class SR5ActorSheet extends ActorSheet {
             title: 'Chummer Import',
         };
         new ChummerImportForm(this.actor, options).render(true);
+    }
+
+    async handleRemoveVehicleDriver(event) {
+        event.preventDefault();
+        await this.actor.removeVehicleDriver();
     }
 }

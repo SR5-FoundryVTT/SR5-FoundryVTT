@@ -22,6 +22,7 @@ declare namespace Shadowrun {
             controlMode: VehicleControlModeTypes;
             isDrone: boolean;
             isOffRoad: boolean;
+            driver: string;
             environment: VehicleEnvironment;
             vehicle_stats: VehicleStats;
 

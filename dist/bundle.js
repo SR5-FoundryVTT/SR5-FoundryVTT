@@ -13479,9 +13479,11 @@ class SR5Actor extends Actor {
         });
     }
     removeLanguageSkill(skillId) {
-        const value = {};
-        value[skillId] = { _delete: true };
-        this.update({ 'data.skills.language.value': value });
+        return __awaiter(this, void 0, void 0, function* () {
+            const value = {};
+            value[skillId] = { _delete: true };
+            yield this.update({ 'data.skills.language.value': value });
+        });
     }
     addLanguageSkill(skill) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -13990,32 +13992,34 @@ class SR5Actor extends Actor {
         });
     }
     rollDroneInfiltration(options) {
-        if (!this.isVehicle()) {
-            return undefined;
-        }
-        const actorData = duplicate(this.data.data);
-        if (actorData.controlMode === 'autopilot') {
-            const parts = new PartsList_1.PartsList();
-            const pilot = helpers_1.Helpers.calcTotal(actorData.vehicle_stats.pilot);
-            // TODO possibly look for autosoft item level?
-            const sneaking = this.findActiveSkill('sneaking');
-            const limit = this.findLimit('sensor');
-            if (sneaking && limit) {
-                parts.addPart('SR5.Vehicle.Stealth', helpers_1.Helpers.calcTotal(sneaking));
-                parts.addPart('SR5.Vehicle.Stats.Pilot', pilot);
-                this._addGlobalParts(parts);
-                return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
-                    event: options === null || options === void 0 ? void 0 : options.event,
-                    actor: this,
-                    parts: parts.list,
-                    limit,
-                    title: game.i18n.localize('SR5.Labels.ActorSheet.RollDroneInfiltration'),
-                });
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isVehicle()) {
+                return undefined;
             }
-        }
-        else {
-            this.rollActiveSkill('sneaking', options);
-        }
+            const actorData = duplicate(this.data.data);
+            if (actorData.controlMode === 'autopilot') {
+                const parts = new PartsList_1.PartsList();
+                const pilot = helpers_1.Helpers.calcTotal(actorData.vehicle_stats.pilot);
+                // TODO possibly look for autosoft item level?
+                const sneaking = this.findActiveSkill('sneaking');
+                const limit = this.findLimit('sensor');
+                if (sneaking && limit) {
+                    parts.addPart('SR5.Vehicle.Stealth', helpers_1.Helpers.calcTotal(sneaking));
+                    parts.addPart('SR5.Vehicle.Stats.Pilot', pilot);
+                    this._addGlobalParts(parts);
+                    return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
+                        event: options === null || options === void 0 ? void 0 : options.event,
+                        actor: this,
+                        parts: parts.list,
+                        limit,
+                        title: game.i18n.localize('SR5.Labels.ActorSheet.RollDroneInfiltration'),
+                    });
+                }
+            }
+            else {
+                yield this.rollActiveSkill('sneaking', options);
+            }
+        });
     }
     rollKnowledgeSkill(catId, skillId, options) {
         const category = duplicate(this.data.data.skills.knowledge[catId]);
@@ -14579,6 +14583,47 @@ class SR5Actor extends Actor {
             return this.data.data.vehicle_stats;
         }
     }
+    /** Add another actor as the driver of a vehicle to allow for their values to be used in testing.
+     *
+     * @param id An actors id. Should be a character able to drive a vehicle
+     */
+    addVehicleDriver(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isVehicle())
+                return;
+            const driver = game.actors.get(id);
+            if (!driver)
+                return;
+            // NOTE: In THEORY almost all actor types can drive a vehicle.
+            // ... drek, in theory a drone could drive another vehicle even...
+            yield this.update({ 'data.driver': driver.id });
+        });
+    }
+    removeVehicleDriver() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.hasDriver())
+                return;
+            yield this.update({ 'data.driver': '' });
+        });
+    }
+    hasDriver() {
+        const data = this.asVehicleData();
+        if (!data)
+            return false;
+        return data.data.driver.length > 0;
+    }
+    getVehicleDriver() {
+        if (!this.hasDriver())
+            return;
+        const data = this.asVehicleData();
+        if (!data)
+            return;
+        const driver = game.actors.get(data.data.driver);
+        // If no driver id is set, we won't get an actor and should explicitly return undefined.
+        if (!driver)
+            return;
+        return driver;
+    }
 }
 exports.SR5Actor = SR5Actor;
 
@@ -14663,6 +14708,7 @@ class SR5ActorSheet extends ActorSheet {
         this._prepareSkillsWithFilters(data);
         this._prepareActorTypeFields(data);
         this._prepareCharacterFields(data);
+        this._prepareVehicleFields(data);
         return data;
     }
     _isSkillMagic(id, skill) {
@@ -14697,6 +14743,14 @@ class SR5ActorSheet extends ActorSheet {
         data.awakened = data.data.special === 'magic';
         data.emerged = data.data.special === 'resonance';
         data.woundTolerance = 3 + (Number(mods['wound_tolerance']) || 0);
+    }
+    _prepareVehicleFields(data) {
+        if (!this.actor.isVehicle())
+            return;
+        const driver = this.actor.getVehicleDriver();
+        data.vehicle = {
+            driver
+        };
     }
     _prepareActorTypeFields(data) {
         data.isCharacter = this.actor.isCharacter();
@@ -15028,6 +15082,31 @@ class SR5ActorSheet extends ActorSheet {
                 item.setAttribute('draggable', true);
                 item.addEventListener('dragstart', handler, false);
             }
+        });
+        html.find('.driver-remove').click(this.handleRemoveVehicleDriver.bind(this));
+    }
+    /** Handle all entity drops onto all actor sheet types.
+     *
+     * @param event
+     */
+    _onDrop(event) {
+        const _super = Object.create(null, {
+            _onDrop: { get: () => super._onDrop }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            event.stopPropagation();
+            if (!event.dataTransfer)
+                return;
+            const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
+            // Handle specific system drop events.
+            switch (dropData.type) {
+                case "Actor":
+                    yield this.actor.addVehicleDriver(dropData.id);
+                    break;
+            }
+            // Handle none specific drop events.
+            yield _super._onDrop.call(this, event);
         });
     }
     deleteOwnedItem(event) {
@@ -15501,6 +15580,12 @@ class SR5ActorSheet extends ActorSheet {
             title: 'Chummer Import',
         };
         new chummer_import_form_1.ChummerImportForm(this.actor, options).render(true);
+    }
+    handleRemoveVehicleDriver(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            yield this.actor.removeVehicleDriver();
+        });
     }
 }
 exports.SR5ActorSheet = SR5ActorSheet;

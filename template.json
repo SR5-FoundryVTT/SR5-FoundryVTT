@@ -921,6 +921,7 @@
             "environment": "speed",
             "isDrone": false,
             "isOffRoad": false,
+            "driver": "",
             "vehicle_stats": {
                 "pilot": {
                     "base": 0,
