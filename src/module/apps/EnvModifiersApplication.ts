@@ -12,7 +12,6 @@ export class EnvModifiersApplication extends Application {
         super();
 
         this.target = target;
-        this.modifiers = Modifiers.getDefaultModifiers();
     }
 
     get template() {
@@ -36,17 +35,15 @@ export class EnvModifiersApplication extends Application {
         // TODO: getData is a bit unreadable.
         // TODO: SheetData for EnvModifiersApplication typing?
 
-        const targetModifiers = await this.getModifiersFromTarget();
+        this.modifiers = await this.getModifiersFromTarget();
 
-        data.active = targetModifiers.environmental.active;
-        data.total = targetModifiers.environmental.total;
+        data.active = this.modifiers.environmental.active;
+        data.total = this.modifiers.environmental.total;
 
         data.levels = Modifiers.getEnvironmentalModifierLevels();
 
         data.targetType = this._getTargetTypeLabel();
         data.targetName = this.target.name;
-
-        console.error('getData target', targetModifiers);
 
         return data;
     }
@@ -57,6 +54,8 @@ export class EnvModifiersApplication extends Application {
 
     async _handleModifierChange(event: Event) {
         event.preventDefault();
+
+        console.error('_handleModifierChange');
 
         // Handle data retrieval from HTML datasets.
         const element = event.currentTarget as HTMLElement;
@@ -148,8 +147,13 @@ export class EnvModifiersApplication extends Application {
         }
     }
 
+    /** Depending on the state of the app differing sources for modifiers will be used:
+     * 1. What the app is already using.
+     * 2. What the target has stored on it.
+     * 3. What default modifiers are, should both fail.
+     */
     async getModifiersFromTarget() {
-        return await this.target.getFlag(SYSTEM_NAME, FLAGS.Modifier) || Modifiers.getDefaultModifiers();
+        return this.modifiers || await this.target.getFlag(SYSTEM_NAME, FLAGS.Modifier) || Modifiers.getDefaultModifiers();
     }
 
     async storeModifiersOnTarget() {
