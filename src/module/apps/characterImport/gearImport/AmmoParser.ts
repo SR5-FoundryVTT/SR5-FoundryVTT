@@ -8,7 +8,6 @@ export class AmmoParser extends BaseGearParser {
     parse(chummerGear : any) : any {
         const parsedGear =  super.parse(chummerGear);
         parsedGear.type = 'ammo';
-        parsedGear.data.technology.rating = chummerGear.devicerating;
 
         if (chummerGear.weaponbonusap) {
             parsedGear.data.ap = parseInt(chummerGear.weaponbonusap);

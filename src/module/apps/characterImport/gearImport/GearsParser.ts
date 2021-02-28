@@ -9,7 +9,7 @@ export class GearsParser {
      * Parses all chummer gear entries
      * @param chummerGears Array of chummer gear entries
      */
-    parseAllGear(chummerGears : any) : any {
+    parseGears(chummerGears : any) : any {
         let items : any[] = [];
 
         chummerGears.forEach((chummerGear) => {
