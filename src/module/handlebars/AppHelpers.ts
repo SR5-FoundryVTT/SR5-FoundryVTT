@@ -7,7 +7,6 @@ export const registerAppHelpers = () => {
      * @param modifier A environmental modifier value (0, -1)
      */
     Handlebars.registerHelper('IsEnvModifierActive', (active, category: string, modifier: number) => {
-        // modifier of zero means none is active.
-        return modifier !== 0 && active[category] === modifier;
+        return active[category] === modifier;
     })
 }

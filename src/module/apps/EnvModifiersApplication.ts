@@ -69,6 +69,7 @@ export class EnvModifiersApplication extends Application {
         this._toggleActiveModifierCategory(category, value);
         this._calcActiveModifierTotal();
 
+        await this.clearModifiersOnTargetForNoSelection();
         await this.storeModifiersOnTarget();
 
         await this.render();
@@ -86,19 +87,21 @@ export class EnvModifiersApplication extends Application {
     _toggleActiveModifierCategory(category: string, value: number) {
         // Toggle active on/off based on last value.
         if (this.modifiers.environmental.active[category] === value) {
-            this.modifiers.environmental.active[category] = 0;
+            // Remove the inactive category instead of setting it zero, as a zero modifier is a valid choice!
+            delete this.modifiers.environmental.active[category];
         } else {
             this.modifiers.environmental.active[category] = value;
         }
 
         // Remove manual value selection on category selection.
+        // TODO: I'm not sure anymore what this even does...
         if (category !== 'value') {
             this.modifiers.environmental.active['value'] = 0;
         }
     }
 
     resetActiveModifiers() {
-        Object.keys(this.modifiers.environmental.active).forEach(category => this.modifiers.environmental.active[category] = 0);
+        Object.keys(this.modifiers.environmental.active).forEach(category => delete this.modifiers.environmental.active[category]);
     }
 
     /** Count the amount each value appears in the array of modifiers
@@ -183,6 +186,14 @@ export class EnvModifiersApplication extends Application {
     async targetHasEnvironmentalModifiers() {
         const modifiers = await this.getModifiersFromTarget();
         return modifiers && modifiers.environmental;
+    }
+
+    async clearModifiersOnTargetForNoSelection() {
+        console.error('Checking', this.modifiers.environmental);
+        if (!this.modifiers.environmental.active) {
+            console.error('Nothing active anymore');
+            await this.clearModifiersOnTarget();
+        }
     }
 
     async clearModifiersOnTarget() {
