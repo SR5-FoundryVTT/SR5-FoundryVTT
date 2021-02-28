@@ -1,3 +1,8 @@
+import { DefaultValues } from "../../../dataTemplates";
+import { parseDescription, getArray, getValues, parseTechnology, createItemData } from "../BaseParserFunctions.js"
+
+import Equipment = Shadowrun.Equipment;
+
 /**
  * Parses a certain class of gear (depending on the implementation).
  */
@@ -21,55 +26,21 @@ export class BaseGearParser implements GearParser {
             parsedGear.name += ` (${chummerGear.extra})`;
         }
 
-        parsedGear.data.technology.rating = chummerGear.rating;
-        parsedGear.data.technology.quantity = chummerGear.qty;
-        parsedGear.data.technology.availability = chummerGear.avail;
-        parsedGear.data.description =
-        {
-            value: '',
-            chat: '',
-            source: ''
-        };
-
-        if (chummerGear.source && chummerGear.page)
-        {
-            parsedGear.data.description.source = `${chummerGear.source} ${chummerGear.page}`;
-        }
+        parsedGear.data.technology = parseTechnology(chummerGear);
+        parsedGear.data.description = parseDescription(chummerGear);
 
         return parsedGear;
     }
 
-    private getDefaultData() {
+    private getDefaultData() : Equipment {
         return {
             name: '',
             _id: '',
             folder: '',
             flags: {},
+            img: 'icons/svg/mystery-man.svg',
             type: 'equipment',
-            data: {
-                description: {
-                    value: '',
-                    chat: '',
-                    source: '',
-                },
-                technology: {
-                    rating: 1,
-                    availability: '',
-                    quantity: 1,
-                    cost: 0,
-                    equipped: false,
-                    conceal: {
-                        base: 0,
-                        value: 0,
-                        mod: [],
-                    },
-                    condition_monitor: {
-                        label: '',
-                        value: 0,
-                        max: 0,
-                    },
-                }
-            },
+            data: DefaultValues.equipmentData(),
             permission: {
                 default: 2,
             },

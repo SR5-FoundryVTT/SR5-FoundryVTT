@@ -9,12 +9,6 @@ export class DeviceParser extends BaseGearParser {
         const parsedGear =  super.parse(chummerGear);
         parsedGear.type = 'device';
         parsedGear.data.technology.rating = chummerGear.devicerating;
-        parsedGear.data.technology.condition_monitor = 
-        {
-            value: 0,
-            max: Number(chummerGear.conditionmonitor),
-            label: ''
-        };
 
         parsedGear.data.atts = {
             att1:
