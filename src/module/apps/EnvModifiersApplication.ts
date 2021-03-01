@@ -14,6 +14,7 @@ export type EnvModifiersTarget = Scene|Token;
 // TODO: Add env modifier button to scene context menu
 // TODO: Show Scene modifier total in token app
 // TODO: Modifiers target hierarchy
+// TODO: Setting zero level overwrite doesn't toggle the other selections in the zero level
 export class EnvModifiersApplication extends Application {
     target: EnvModifiersTarget;
     modifiers;
@@ -46,7 +47,7 @@ export class EnvModifiersApplication extends Application {
         // TODO: SheetData for EnvModifiersApplication typing?
 
         // Try target or fallback on default.
-        this.modifiers = await this.getModifiers();
+        this.modifiers = await this._getModifiers();
 
         data.active = this.modifiers.environmental.active;
         data.total = this.modifiers.environmental.total;
@@ -79,8 +80,8 @@ export class EnvModifiersApplication extends Application {
         this._toggleActiveModifierCategory(category, value);
         this._calcActiveModifierTotal();
 
-        await this.clearModifiersOnTargetForNoSelection();
-        await this.storeModifiersOnTarget();
+        await this._clearModifiersOnTargetForNoSelection();
+        await this._storeModifiersOnTarget();
 
         await this.render();
     }
@@ -94,9 +95,16 @@ export class EnvModifiersApplication extends Application {
     }
 
     // TODO: Move into separate shadowrun rule area
+    /**
+     *
+     * @param category
+     * @param value
+     */
     _toggleActiveModifierCategory(category: string, value: number) {
         if (this._modifierIsActive(category, value)) {
             this._setModifierAsInactive(category);
+        } else if (category === 'value') {
+          this._setOverwriteModifierAsActive(value);
         } else {
             this._setModifierAsActive(category, value);
         }
@@ -112,6 +120,7 @@ export class EnvModifiersApplication extends Application {
     }
 
     _setOverwriteModifierAsActive(value: number) {
+        this._resetActiveModifiers();
         this._setModifierAsActive('value', value);
     }
 
@@ -137,13 +146,27 @@ export class EnvModifiersApplication extends Application {
         delete this.modifiers.environmental.active[category];
     }
 
-    resetActiveModifiers() {
+    _setTotal(value: number) {
+        this.modifiers.environmental.total = value;
+    }
+
+    get _hasActiveOverwriteModifier(): boolean {
+        return this.modifiers.environmental.active.value !== undefined;
+    }
+
+    _getActiveOverwriteModifier(): number|undefined {
+        return this.modifiers.environmental.active.value;
+    }
+
+    _resetActiveModifiers() {
         Object.keys(this.modifiers.environmental.active).forEach(category => delete this.modifiers.environmental.active[category]);
     }
 
-    /** Count the amount each value appears in the array of modifiers
+    /** Count the amount each level (modifier value) appears in the array of modifiers
+     *
+     * @param values Active environmental modifiers
      */
-    _countModifierValues(values: Number[]) {
+    _countActiveModifierLevels(values: Number[]) {
         const modifiers = Modifiers.getEnvironmentalModifierLevels();
 
         return {
@@ -160,59 +183,59 @@ export class EnvModifiersApplication extends Application {
      */
     _calcActiveModifierTotal() {
         // Manual selection will overwrite all else...
-        const manual = this.modifiers.environmental.active.value;
-        if (manual && manual !== 0) {
-            this.resetActiveModifiers();
-            this.modifiers.environmental.active.value = manual;
-            this.modifiers.environmental.total = manual;
+        if (this._hasActiveOverwriteModifier) {
+            const modifier = this._getActiveOverwriteModifier();
 
-            return;
-        }
+            if (modifier === undefined) {
+                console.error('An active overwrite modifier was returned as undefined');
+                return;
+            }
 
-        // Calculation based on active modifier categories, excluding manual selection (to avoid unexpected results)
-        // TODO: Add typing to modifiers.env and remove local typing
-        const active = Object.values(this.modifiers.environmental.active).filter(category => category !== 'value') as Number[];
+            this._resetActiveModifiers();
+            this._setOverwriteModifierAsActive(modifier);
+            this._setTotal(modifier);
 
-        const count = this._countModifierValues(active);
-
-        const modifiers = Modifiers.getEnvironmentalModifierLevels();
-
-        // TODO: Add typing to modifiers.env and remove ts-ignore
-        //@ts-ignore
-        if (count.extreme > 0 || count.heavy >= 2) {
-            this.modifiers.environmental.total = modifiers.extreme;
-        }
-        //@ts-ignore
-        else if (count.heavy === 1 || count.moderate >= 2) {
-            this.modifiers.environmental.total = modifiers.heavy;
-        }
-        //@ts-ignore
-        else if (count.moderate === 1 || count.light >= 2) {
-            this.modifiers.environmental.total = modifiers.moderate;
-        }
-        //@ts-ignore
-        else if (count.light === 1) {
-            this.modifiers.environmental.total = modifiers.light;
         } else {
-            this.modifiers.environmental.total = modifiers.good;
+            // Calculation based on active modifier categories, excluding manual overwrite.
+            // TODO: Add typing to modifiers.env and remove local typing
+            const active = Object.values(this.modifiers.environmental.active).filter(category => category !== 'value') as Number[];
+
+            const count = this._countActiveModifierLevels(active);
+
+            const modifiers = Modifiers.getEnvironmentalModifierLevels();
+
+            if (count.extreme > 0 || count.heavy >= 2) {
+                this._setTotal(modifiers.extreme);
+            }
+            else if (count.heavy === 1 || count.moderate >= 2) {
+                this._setTotal(modifiers.heavy);
+            }
+            else if (count.moderate === 1 || count.light >= 2) {
+                this._setTotal(modifiers.moderate);
+            }
+            else if (count.light === 1) {
+                this._setTotal(modifiers.light);
+            } else {
+                this._setTotal(modifiers.good);
+            }
         }
     }
 
-    async getModifiers() {
-        if (await this.targetHasEnvironmentalModifiers()) {
-            return await this.getModifiersFromTarget();
+    async _getModifiers() {
+        if (await this._targetHasEnvironmentalModifiers()) {
+            return await this._getModifiersFromTarget();
         } else {
             return Modifiers.getDefaultModifiers();
         }
     }
 
-    async getModifiersFromTarget() {
+    async _getModifiersFromTarget() {
         return await this.target.getFlag(SYSTEM_NAME, FLAGS.Modifier);
     }
 
-    async storeModifiersOnTarget() {
+    async _storeModifiersOnTarget() {
         // TODO: Add modifier typing
-        const modifiers = await this.getModifiersFromTarget();
+        const modifiers = await this._getModifiersFromTarget();
 
         modifiers.environmental = this.modifiers.environmental;
 
@@ -223,21 +246,21 @@ export class EnvModifiersApplication extends Application {
 
     }
 
-    async targetHasEnvironmentalModifiers() {
-        const modifiers = await this.getModifiersFromTarget();
+    async _targetHasEnvironmentalModifiers() {
+        const modifiers = await this._getModifiersFromTarget();
         return modifiers && modifiers.environmental;
     }
 
     /** Cleanup unused data in Entity flag.
      */
-    async clearModifiersOnTargetForNoSelection() {
+    async _clearModifiersOnTargetForNoSelection() {
         if (Object.keys(this.modifiers.environmental.active).length === 0) {
             await this.clearModifiersOnTarget();
         }
     }
 
     async clearModifiersOnTarget() {
-        const modifiers = await this.getModifiersFromTarget();
+        const modifiers = await this._getModifiersFromTarget();
 
         delete modifiers.environmental;
 
