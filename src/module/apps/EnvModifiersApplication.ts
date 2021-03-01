@@ -297,7 +297,23 @@ export class EnvModifiersApplication extends Application {
         await new EnvModifiersApplication(game.scenes.active).render(true);
     }
 
-    /** Left side tool window for control icon / interaction
+    // TODO: The premise between openForActiveScene and openForTokenHUD is vastly different, but both methods have the
+    //       same naming scheme... Quite confusing
+    static openForTokenHUD(tokenId: string) {
+        console.error(tokenId);
+        const token = Helpers.getToken(tokenId);
+
+        // Create an anonymous event handler
+        return (event) => {
+            event.preventDefault();
+
+            if (!token) return;
+
+            new EnvModifiersApplication(token).render(true);
+        }
+    }
+
+    /** Left side tool window control icon / interaction
      */
     static getControl() {
         return {
@@ -307,5 +323,21 @@ export class EnvModifiersApplication extends Application {
             onClick: EnvModifiersApplication.openForActiveScene,
             button: true
         }
+    }
+
+    static addTokenHUDFields(app: TokenHUD, html: JQuery, data) {
+        console.log(`${SYSTEM_NAME} | Environmental Modifier HUD on renderTokenHUD`);
+
+        console.error('register');
+        console.error(app);
+        console.error(html);
+        console.error(data);
+
+        // TODO: Implement system wide token HUD management...
+        // let srTokenHUD = $('<div class="sr5-token-hud-container">Test</div>');
+        const controlIcon = $('<div class="control-icon sr5-environmental-modifier"><img src="icons/svg/combat.svg" width="36" height="36" title="Environmental Modifiers"></div>');
+
+        html.find('.control-icon.combat').after(controlIcon);
+        html.find('.sr5-environmental-modifier').on('click', EnvModifiersApplication.openForTokenHUD(data._id));
     }
 }

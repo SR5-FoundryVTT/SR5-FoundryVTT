@@ -666,6 +666,15 @@ select.display {
     td.env-modifier-level {
         padding-right: 6px;
     }
+
+    .sr5-token-hud-container {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        align-items: center;
+        margin-right: 75px;
+        flex: 0 !important;
+    }
 }
 
 /** Replicate Foundry .dialog stiling for flex row buttons. FormDialog sublcasses simply adding class dialog will
