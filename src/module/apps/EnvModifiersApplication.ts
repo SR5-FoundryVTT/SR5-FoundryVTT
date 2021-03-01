@@ -328,15 +328,9 @@ export class EnvModifiersApplication extends Application {
     static addTokenHUDFields(app: TokenHUD, html: JQuery, data) {
         console.log(`${SYSTEM_NAME} | Environmental Modifier HUD on renderTokenHUD`);
 
-        console.error('register');
-        console.error(app);
-        console.error(html);
-        console.error(data);
-
         // TODO: Implement system wide token HUD management...
         // let srTokenHUD = $('<div class="sr5-token-hud-container">Test</div>');
-        const controlIcon = $('<div class="control-icon sr5-environmental-modifier"><img src="icons/svg/combat.svg" width="36" height="36" title="Environmental Modifiers"></div>');
-
+        const controlIcon = $('<div class="control-icon sr5-environmental-modifier"><i class="fas fa-list" title="Environmental Modifiers"></i></div>');
         html.find('.control-icon.combat').after(controlIcon);
         html.find('.sr5-environmental-modifier').on('click', EnvModifiersApplication.openForTokenHUD(data._id));
     }
