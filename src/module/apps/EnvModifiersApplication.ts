@@ -3,7 +3,17 @@ import {Modifiers} from "../sr5/Modifiers";
 
 export type EnvModifiersTarget = Scene|Token;
 
+/** Helper window for easy overview and selection of environmental modifiers and their calculated total.
+ *
+ */
 // TODO: Add ways of modifying different category levels by steps up / down (infrared) or to specific levels.
+// TODO: Not editable mode for GM only enitities
+// TODO: Set top row of modifiers to make sure it's CLEAR there is a modifier set, even if it's zero all the way
+// TODO: Check template for hardcoded labels
+// TODO: Add env modifier button to token context menu
+// TODO: Add env modifier button to scene context menu
+// TODO: Show Scene modifier total in token app
+// TODO: Modifiers target hierarchy
 export class EnvModifiersApplication extends Application {
     target: EnvModifiersTarget;
     modifiers;
@@ -85,19 +95,46 @@ export class EnvModifiersApplication extends Application {
 
     // TODO: Move into separate shadowrun rule area
     _toggleActiveModifierCategory(category: string, value: number) {
-        // Toggle active on/off based on last value.
-        if (this.modifiers.environmental.active[category] === value) {
-            // Remove the inactive category instead of setting it zero, as a zero modifier is a valid choice!
-            delete this.modifiers.environmental.active[category];
+        if (this._modifierIsActive(category, value)) {
+            this._setModifierAsInactive(category);
         } else {
-            this.modifiers.environmental.active[category] = value;
+            this._setModifierAsActive(category, value);
         }
 
-        // Remove manual value selection on category selection.
-        // TODO: I'm not sure anymore what this even does...
+        // Remove the manual overwrite, when the level is derived from selection of individual modifiers.
         if (category !== 'value') {
-            this.modifiers.environmental.active['value'] = 0;
+            this._setOverwriteModifierAsInactive();
         }
+    }
+
+    _modifierIsActive(category: string, value: number): boolean {
+        return this.modifiers.environmental.active[category] === value;
+    }
+
+    _setOverwriteModifierAsActive(value: number) {
+        this._setModifierAsActive('value', value);
+    }
+
+    _setOverwriteModifierAsInactive() {
+        this._setModifierAsInactive('value');
+    }
+
+    /** Only one category selection can be active at any time.
+     *
+     * @param category The environmental modifier category (wind, ...)
+     * @param value The modifier value (-1, 0, 10)
+     */
+    _setModifierAsActive(category: string, value: number) {
+         this.modifiers.environmental.active[category] = value;
+    }
+
+    /** Only one category selection can be active at any time.
+     *
+     * @param category The environmental modifier category (wind, ...)
+     */
+    _setModifierAsInactive(category: string) {
+        // Remove the inactive category instead of setting it zero, as a zero modifier is a valid choice!
+        delete this.modifiers.environmental.active[category];
     }
 
     resetActiveModifiers() {
@@ -118,10 +155,13 @@ export class EnvModifiersApplication extends Application {
     }
 
     // TODO: Move into separate shadowrun rule area
+    /** Active modifiers
+     *
+     */
     _calcActiveModifierTotal() {
         // Manual selection will overwrite all else...
         const manual = this.modifiers.environmental.active.value;
-        if (manual !== 0) {
+        if (manual && manual !== 0) {
             this.resetActiveModifiers();
             this.modifiers.environmental.active.value = manual;
             this.modifiers.environmental.total = manual;
@@ -188,10 +228,10 @@ export class EnvModifiersApplication extends Application {
         return modifiers && modifiers.environmental;
     }
 
+    /** Cleanup unused data in Entity flag.
+     */
     async clearModifiersOnTargetForNoSelection() {
-        console.error('Checking', this.modifiers.environmental);
-        if (!this.modifiers.environmental.active) {
-            console.error('Nothing active anymore');
+        if (Object.keys(this.modifiers.environmental.active).length === 0) {
             await this.clearModifiersOnTarget();
         }
     }
