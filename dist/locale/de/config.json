@@ -773,7 +773,8 @@
         "Changelog": "Für neue Funktionen und behobene Fehler",
         "LatestChangelog": "Aktuelle Changelog",
         "ReportIssues": "Bitte Fehler und gewünschte Funktionen hier melden",
-        "IssuesOverview": "Anfragenübersicht"
+        "IssuesOverview": "Anfragenübersicht",
+        "ReportUsingBugReporter": "Fehler und mehr können auch über das bug-reporter Modul direkt aus Foundry und ohne GitHub Konto erstellt werden!"
     },
 
     "SR5.DeleteConfirmationApplication": {

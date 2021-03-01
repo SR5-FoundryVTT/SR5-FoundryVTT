@@ -801,7 +801,8 @@
         "Changelog": "Check out our GitHub for new features and fixes",
         "LatestChangelog": "Latest Changelog",
         "ReportIssues": "Please report bugs and feature requests",
-        "IssuesOverview": "Issues Overview"
+        "IssuesOverview": "Issues Overview",
+        "ReportUsingBugReporter": "You can also use the bug-reporter module to report bugs directly from within your Foundry session and without a GitHub account!"
     },
 
     "SR5.DeleteConfirmationApplication": {
