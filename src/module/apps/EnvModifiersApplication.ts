@@ -239,7 +239,7 @@ export class EnvModifiersApplication extends Application {
 
     async _storeModifiersOnTarget() {
         // TODO: Add modifier typing
-        const modifiers = await this._getModifiersFromTarget();
+        const modifiers = await this._getModifiers();
 
         modifiers.environmental = this.modifiers.environmental;
 
@@ -289,5 +289,23 @@ export class EnvModifiersApplication extends Application {
     _disableInputsForUser(): boolean {
         const entity = this.target instanceof Token ? this.target.actor : this.target;
         return !(game.user.isGM || entity.owner);
+    }
+
+    static async openForActiveScene() {
+        console.error(game.scenes.active);
+        if (!game.scenes.active) return;
+        await new EnvModifiersApplication(game.scenes.active).render(true);
+    }
+
+    /** Left side tool window for control icon / interaction
+     */
+    static getControl() {
+        return {
+            name: 'environmental-modifiers-application',
+            title: 'CONTROLS.SR5.EnvironmentalModifiers',
+            icon: 'fas fa-list',
+            onClick: EnvModifiersApplication.openForActiveScene,
+            button: true
+        }
     }
 }

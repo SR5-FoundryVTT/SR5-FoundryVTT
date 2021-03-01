@@ -101,13 +101,13 @@ ___________________
         const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
         $(document).on('click', diceIconSelectorNew, () => ShadowrunRoller.promptRoll());
 
-        const target = game.scenes.entries[0];
-        console.error('scene', target);
-        await new EnvModifiersApplication(target).render(true);
-
-        const token = canvas.tokens.placeables[0];
-        console.error('token', token);
-        await new EnvModifiersApplication(token).render(true);
+        // const target = game.scenes.entries[0];
+        // console.error('scene', target);
+        // await new EnvModifiersApplication(target).render(true);
+        //
+        // const token = canvas.tokens.placeables[0];
+        // console.error('token', token);
+        // await new EnvModifiersApplication(token).render(true);
     }
 
     static canvasInit() {
@@ -132,14 +132,18 @@ ___________________
     }
 
     static getSceneControlButtons(controls) {
+        const tokenControls = controls.find((c) => c.name === 'token');
+
         if (game.user.isGM) {
-            const tokenControls = controls.find((c) => c.name === 'token');
             tokenControls.tools.push({
                 name: 'overwatch-score-tracker',
                 title: 'CONTROLS.SR5.OverwatchScoreTracker',
                 icon: 'fas fa-network-wired',
+                button: true
             });
         }
+
+        tokenControls.tools.push(EnvModifiersApplication.getControl());
     }
 
     static renderChatMessage(app, html) {
