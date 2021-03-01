@@ -1,5 +1,6 @@
 import {FLAGS, SYSTEM_NAME} from "../constants";
 import {Modifiers} from "../sr5/Modifiers";
+import {Helpers} from "../helpers";
 
 export type EnvModifiersTarget = Scene|Token;
 
@@ -14,7 +15,9 @@ export type EnvModifiersTarget = Scene|Token;
 // TODO: Add env modifier button to scene context menu
 // TODO: Show Scene modifier total in token app
 // TODO: Modifiers target hierarchy
-// TODO: Setting zero level overwrite doesn't toggle the other selections in the zero level
+// TODO: Give a input to display meters for an active weapon in the range column
+// TODO: Toggle display of the range column (scene type)
+// TODO: Update display for all users when a change is made
 export class EnvModifiersApplication extends Application {
     target: EnvModifiersTarget;
     modifiers;
@@ -56,6 +59,7 @@ export class EnvModifiersApplication extends Application {
 
         data.targetType = this._getTargetTypeLabel();
         data.targetName = this.target.name;
+        data.disableForm = this._disableInputsForUser();
 
         return data;
     }
@@ -277,5 +281,13 @@ export class EnvModifiersApplication extends Application {
         }
 
         return '';
+    }
+
+    /** Only allow interactions for user with appropriate permissions
+     *
+     */
+    _disableInputsForUser(): boolean {
+        const entity = this.target instanceof Token ? this.target.actor : this.target;
+        return !(game.user.isGM || entity.owner);
     }
 }
