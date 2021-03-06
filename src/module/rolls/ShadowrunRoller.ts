@@ -401,7 +401,6 @@ export class ShadowrunRoller {
         // basicRollProps.wounds = testData.wounds;
         // basicRollProps.dialogOptions = testData.dialogOptions;
         basicRollProps.rollMode = testData.rollMode;
-        basicRollProps.parts = testData.parts.list;
         // TODO: This is needed a hotfix... basicRoll is used secondChance and pushTheLimit chat actions.
         //       If those are handled by advancedRoll (without a dialog) basicRoll message creation can be removed
         //       and this line as well...
@@ -412,6 +411,8 @@ export class ShadowrunRoller {
             await ShadowrunRoller.handleExplodingSixes(props.actor, basicRollProps, testData);
         }
 
+        // Build basic roll parts as the LAST step, to avoid missing any parts.
+        basicRollProps.parts = testData.parts.list;
 
         // Execute Test roll...
         const roll = await this.basicRoll(basicRollProps);
