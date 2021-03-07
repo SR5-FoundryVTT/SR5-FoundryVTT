@@ -15703,6 +15703,7 @@ const MatrixPrep_1 = require("./functions/MatrixPrep");
 const ItemPrep_1 = require("./functions/ItemPrep");
 const SkillsPrep_1 = require("./functions/SkillsPrep");
 const LimitsPrep_1 = require("./functions/LimitsPrep");
+const ConditionMonitorsPrep_1 = require("./functions/ConditionMonitorsPrep");
 const MovementPrep_1 = require("./functions/MovementPrep");
 const WoundsPrep_1 = require("./functions/WoundsPrep");
 const AttributesPrep_1 = require("./functions/AttributesPrep");
@@ -15711,13 +15712,15 @@ class CritterPrep extends BaseActorPrep_1.BaseActorPrep {
         ModifiersPrep_1.ModifiersPrep.prepareModifiers(this.data);
         ModifiersPrep_1.ModifiersPrep.clearAttributeMods(this.data);
         ItemPrep_1.ItemPrep.prepareArmor(this.data, this.items);
+        ItemPrep_1.ItemPrep.prepareBodyware(this.data, this.items);
         SkillsPrep_1.SkillsPrep.prepareSkills(this.data);
         AttributesPrep_1.AttributesPrep.prepareAttributes(this.data);
         LimitsPrep_1.LimitsPrep.prepareLimitBaseFromAttributes(this.data);
         LimitsPrep_1.LimitsPrep.prepareLimits(this.data);
         MatrixPrep_1.MatrixPrep.prepareMatrix(this.data, this.items);
         MatrixPrep_1.MatrixPrep.prepareMatrixToLimitsAndAttributes(this.data);
-        CritterPrep.prepareMonitors(this.data);
+        ConditionMonitorsPrep_1.ConditionMonitorsPrep.preparePhysical(this.data);
+        ConditionMonitorsPrep_1.ConditionMonitorsPrep.prepareStun(this.data);
         MovementPrep_1.MovementPrep.prepareMovement(this.data);
         WoundsPrep_1.WoundsPrep.prepareWounds(this.data);
         InitiativePrep_1.InitiativePrep.prepareMeatspaceInit(this.data);
@@ -15725,25 +15728,10 @@ class CritterPrep extends BaseActorPrep_1.BaseActorPrep {
         InitiativePrep_1.InitiativePrep.prepareMatrixInit(this.data);
         InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(this.data);
     }
-    /** Critters use static monitors without any calculation.
-     * NOTE: As a workaround use only global modifiers to define track.
-     */
-    static prepareMonitors(data) {
-        // track.<>.base for monitor tracks is set by users and static!
-        // Therefore we can accept whatever it's value is
-        const { track, modifiers, attributes } = data;
-        track.stun.max = track.stun.base + Number(modifiers['stun_track']);
-        track.stun.label = CONFIG.SR5.damageTypes.stun;
-        track.stun.disabled = false;
-        track.physical.max = track.physical.base + Number(modifiers['physical_track']);
-        track.physical.overflow.max = attributes.body.value;
-        track.physical.label = CONFIG.SR5.damageTypes.physical;
-        track.physical.disabled = false;
-    }
 }
 exports.CritterPrep = CritterPrep;
 
-},{"./BaseActorPrep":88,"./functions/AttributesPrep":94,"./functions/InitiativePrep":96,"./functions/ItemPrep":97,"./functions/LimitsPrep":98,"./functions/MatrixPrep":99,"./functions/ModifiersPrep":100,"./functions/MovementPrep":101,"./functions/SkillsPrep":103,"./functions/WoundsPrep":104}],91:[function(require,module,exports){
+},{"./BaseActorPrep":88,"./functions/AttributesPrep":94,"./functions/ConditionMonitorsPrep":95,"./functions/InitiativePrep":96,"./functions/ItemPrep":97,"./functions/LimitsPrep":98,"./functions/MatrixPrep":99,"./functions/ModifiersPrep":100,"./functions/MovementPrep":101,"./functions/SkillsPrep":103,"./functions/WoundsPrep":104}],91:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpiritPrep = void 0;
