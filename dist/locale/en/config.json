@@ -616,7 +616,8 @@
             "RollDronePerception": "Drone Perception",
             "RollPilotVehicleTest": "Pilot Vehicle",
             "RollDroneInfiltration": "Drone Infiltration",
-            "VehicleConfiguration": "Vehicle Configuration"
+            "VehicleConfiguration": "Vehicle Configuration",
+            "SetMonitor": "Monitor must be set manually."
         }
     },
 
