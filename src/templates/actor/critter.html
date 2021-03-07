@@ -19,6 +19,7 @@
                                 tolerance=../woundTolerance
                                 disabled=track.disabled
                         }}
+                        {{#ifgt track.max 0}}
                         {{#if track.overflow}}
                             {{#ife track.value track.max}}
                                 {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
@@ -29,6 +30,7 @@
                                 }}
                             {{/ife}}
                         {{/if}}
+                        {{/ifgt}}
                     {{/each}}
                 </div>
             </div>

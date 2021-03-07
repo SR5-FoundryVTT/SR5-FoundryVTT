@@ -805,11 +805,13 @@
             "condition_monitors": {
                 "track": {
                     "stun": {
+                        "base": 0,
                         "value": 0,
                         "max": 0,
                         "disabled": false
                     },
                     "physical": {
+                        "base": 0,
                         "value": 0,
                         "max": 0,
                         "disabled": false,

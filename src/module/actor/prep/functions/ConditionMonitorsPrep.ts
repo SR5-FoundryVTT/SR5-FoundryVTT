@@ -7,7 +7,8 @@ export class ConditionMonitorsPrep {
     static prepareStun(data: SR5ActorData & StunTrackActorData) {
         const { track, attributes, modifiers } = data;
 
-        track.stun.max = 8 + Math.ceil(attributes.willpower.value / 2) + Number(modifiers['stun_track']);
+        track.stun.base = 8 + Math.ceil(attributes.willpower.value / 2);
+        track.stun.max = track.stun.base + Number(modifiers['stun_track']);
         track.stun.label = CONFIG.SR5.damageTypes.stun;
         track.stun.disabled = false;
     }
@@ -15,7 +16,8 @@ export class ConditionMonitorsPrep {
     static preparePhysical(data: SR5ActorData & PhysicalTrackActorData) {
         const { track, attributes, modifiers } = data;
 
-        track.physical.max = 8 + Math.ceil(attributes.body.value / 2) + Number(modifiers['physical_track']);
+        track.physical.base = 8 + Math.ceil(attributes.body.value / 2);
+        track.physical.max = track.physical.base + Number(modifiers['physical_track']);
         track.physical.overflow.max = attributes.body.value;
         track.physical.label = CONFIG.SR5.damageTypes.physical;
         track.physical.disabled = false;
@@ -35,8 +37,8 @@ export class ConditionMonitorsPrep {
             attributes.willpower:
             attributes.body;
 
-        // TODO: Should track modifiers switch according to used attribute?
-        track.physical.max = 8 + Math.ceil(attribute.value / 2) + Number(modifiers['physical_track']);
+        track.physical.base = 8 + Math.ceil(attribute.value / 2);
+        track.physical.max = track.physical.base + Number(modifiers['physical_track']);
         track.physical.overflow.max = attributes.body.value;
         track.physical.label = "SR5.ConditionMonitor";
         track.physical.disabled = false;

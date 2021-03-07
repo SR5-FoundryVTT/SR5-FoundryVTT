@@ -3,7 +3,7 @@
     "title": "Shadowrun 5th Edition",
     "description": "Shadowrun 5th Edition game",
     "version": "0.7.10",
-    "templateVersion": "1.6",
+    "templateVersion": "1.7",
     "author": "Shawn Milligan [n3rf_herder#9026], Andrew Cuccinello [DJ#1982], Jan Schoska [taM#9507]",
     "esmodules": ["dist/bundle.js"],
     "styles": ["dist/bundle.css"],

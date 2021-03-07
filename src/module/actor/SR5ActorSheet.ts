@@ -151,6 +151,7 @@ export class SR5ActorSheet extends ActorSheet {
     _prepareActorTypeFields(data: SR5ActorSheetData) {
         data.isCharacter = this.actor.isCharacter();
         data.isSpirit = this.actor.isSpirit();
+        data.isCritter = this.actor.isCritter();
     }
 
     _prepareMatrixAttributes(data) {
