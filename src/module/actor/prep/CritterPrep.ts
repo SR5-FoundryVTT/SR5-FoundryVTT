@@ -13,6 +13,7 @@ import SR5CritterType = Shadowrun.SR5CritterType;
 import CritterActorData = Shadowrun.CritterActorData;
 import SR5ActorData = Shadowrun.SR5ActorData;
 import TwoTrackActorData = Shadowrun.TwoTrackActorData;
+import {CharacterPrep} from "./CharacterPrep";
 
 export class CritterPrep extends BaseActorPrep<SR5CritterType, CritterActorData> {
     prepare() {
@@ -20,6 +21,7 @@ export class CritterPrep extends BaseActorPrep<SR5CritterType, CritterActorData>
         ModifiersPrep.clearAttributeMods(this.data);
 
         ItemPrep.prepareArmor(this.data, this.items);
+        ItemPrep.prepareBodyware(this.data, this.items);
 
         SkillsPrep.prepareSkills(this.data);
         AttributesPrep.prepareAttributes(this.data);
@@ -29,7 +31,8 @@ export class CritterPrep extends BaseActorPrep<SR5CritterType, CritterActorData>
         MatrixPrep.prepareMatrix(this.data, this.items);
         MatrixPrep.prepareMatrixToLimitsAndAttributes(this.data);
 
-        CritterPrep.prepareMonitors(this.data);
+        ConditionMonitorsPrep.preparePhysical(this.data);
+        ConditionMonitorsPrep.prepareStun(this.data);
 
         MovementPrep.prepareMovement(this.data);
         WoundsPrep.prepareWounds(this.data);
@@ -38,24 +41,5 @@ export class CritterPrep extends BaseActorPrep<SR5CritterType, CritterActorData>
         InitiativePrep.prepareAstralInit(this.data);
         InitiativePrep.prepareMatrixInit(this.data);
         InitiativePrep.prepareCurrentInitiative(this.data);
-
-    }
-
-    /** Critters use static monitors without any calculation.
-     * NOTE: As a workaround use only global modifiers to define track.
-     */
-    static prepareMonitors(data: CritterActorData & TwoTrackActorData) {
-        // track.<>.base for monitor tracks is set by users and static!
-        // Therefore we can accept whatever it's value is
-        const {track, modifiers, attributes} = data;
-
-        track.stun.max = track.stun.base + Number(modifiers['stun_track']);
-        track.stun.label = CONFIG.SR5.damageTypes.stun;
-        track.stun.disabled = false;
-
-        track.physical.max = track.physical.base + Number(modifiers['physical_track']);
-        track.physical.overflow.max = attributes.body.value;
-        track.physical.label = CONFIG.SR5.damageTypes.physical;
-        track.physical.disabled = false;
     }
 }

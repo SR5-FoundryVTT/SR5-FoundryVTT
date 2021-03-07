@@ -47,7 +47,5 @@ export class CharacterPrep extends BaseActorPrep<SR5CharacterType, CharacterActo
         InitiativePrep.prepareAstralInit(this.data);
         InitiativePrep.prepareMatrixInit(this.data);
         InitiativePrep.prepareCurrentInitiative(this.data);
-
-
     }
 }
