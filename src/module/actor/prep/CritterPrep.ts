@@ -45,15 +45,14 @@ export class CritterPrep extends BaseActorPrep<SR5CritterType, CritterActorData>
      * NOTE: As a workaround use only global modifiers to define track.
      */
     static prepareMonitors(data: CritterActorData & TwoTrackActorData) {
-
-        const {track, modifiers} = data;
+        const {track, modifiers, attributes} = data;
 
         track.stun.max = Number(modifiers['stun_track']);
         track.stun.label = CONFIG.SR5.damageTypes.stun;
         track.stun.disabled = false;
 
         track.physical.max = Number(modifiers['physical_track']);
-        track.physical.overflow.max = 0;
+        track.physical.overflow.max = attributes.body.value;
         track.physical.label = CONFIG.SR5.damageTypes.physical;
         track.physical.disabled = false;
     }
