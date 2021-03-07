@@ -1,10 +1,10 @@
 # Shadowrun5e for Foundry Virtual Tabletop
 Manifest: https://raw.githubusercontent.com/smilligan93/SR5-FoundryVTT/master/system.json
 
-I will always be happy to look at a Pull Request if there are features or bugs you'd like to work on.
+We will always be happy to look at a Pull Request if there are features or bugs you'd like to work on.
 
 ## General Information (read before playing)
-It's complicated, it's a work in progress, but it is _kinda_ stable. I try to break as little as possible.
+It's complicated, it's a work in progress, but it is _kinda_ stable. We try to break as little as possible.
 
 #### Currently Supported Actor Sheets 
 - Character
@@ -18,12 +18,14 @@ It's complicated, it's a work in progress, but it is _kinda_ stable. I try to br
 
 ## Learn more
 To learn more about the features of the system and how to use them, please visit our wiki: https://github.com/smilligan93/SR5-FoundryVTT/wiki
+If you want to improve our wiki and help us out, feel free to contact us on the FoundryVTT discord server.
 
 ## Report issues
 Found some problem? Please report it in our issue tracker or on discord.
 
 ## Want to help out?
 Great, thanks :) Please check this page for more information: https://github.com/smilligan93/SR5-FoundryVTT/wiki/How-to-help-out
+There is also the README-dev.md for development.
 
 ## Licences
 Icons provided by Font Awesome: https://fontawesome.com/license
