@@ -1542,8 +1542,18 @@ export class SR5Actor extends Actor {
     }
 
     /** TODO: method documentation
+     *
+     * @param scene Should a scene be used as a fallback, provide this here. Otherwise active scene will be used.
      */
-    async getModifiers(): Promise<SituationModifiers | undefined> {
-        return await Modifiers.getModifiersFromEntity(this);
+    async getModifiers(scene: Scene=game.scenes.active): Promise<Modifiers> {
+        const onActor = await Modifiers.getModifiersFromEntity(this);
+
+        if (onActor.hasActiveEnvironmental) {
+            return onActor;
+        } else if (!scene) {
+            return new Modifiers(Modifiers.getDefaultModifiers());
+        } else {
+            return await Modifiers.getModifiersFromEntity(scene);
+        }
     }
 }

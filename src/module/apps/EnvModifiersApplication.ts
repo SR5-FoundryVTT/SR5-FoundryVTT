@@ -156,6 +156,10 @@ export class EnvModifiersApplication extends Application {
         this.modifiers.environmental.total = value;
     }
 
+    get _hasActiveModifier(): boolean {
+        return Object.keys(this.modifiers.environmental.active).length > 0;
+    }
+
     get _hasActiveOverwriteModifier(): boolean {
         return this.modifiers.environmental.active.value !== undefined;
     }
@@ -261,7 +265,7 @@ export class EnvModifiersApplication extends Application {
     /** Cleanup unused data in Entity flag.
      */
     async _clearModifiersOnTargetForNoSelection() {
-        if (Object.keys(this.modifiers.environmental.active).length === 0) {
+        if (this._hasActiveModifier) {
             await this.clearModifiersOnTarget();
         }
     }

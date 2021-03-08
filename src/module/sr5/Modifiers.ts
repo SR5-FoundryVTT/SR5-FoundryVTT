@@ -7,11 +7,25 @@ export class Modifiers {
     data: SituationModifiers;
 
     constructor(data: SituationModifiers) {
+        // Fail gracefully for no modifiers given.
+        // This can happen as Foundry returns empty objects for no flags set.
+        if (!data || Object.keys(data).length === 0) {
+            data = Modifiers.getDefaultModifiers();
+        }
+
         this.data = data;
     }
 
-    calculateTotal() {
+    get hasActiveEnvironmental(): boolean {
+        return Object.keys(this.data.environmental.active).length > 0;
+    }
 
+    get modifiers(): SituationModifiers {
+        return this.data;
+    }
+
+    get environmental(): EnvironmentalModifiers {
+        return this.data.environmental;
     }
 
     // setActive
@@ -33,8 +47,9 @@ export class Modifiers {
         return SR.combat.environmental.levels;
     }
 
-    static async getModifiersFromEntity(entity: Entity) {
-        return await entity.getFlag(SYSTEM_NAME, FLAGS.Modifier);
+    static async getModifiersFromEntity(entity: Entity): Promise<Modifiers> {
+        const data = await entity.getFlag(SYSTEM_NAME, FLAGS.Modifier);
+        return new Modifiers(data);
     }
 
     static async setModifiersOnEntity(entity: Entity, modifiers: SituationModifiers) {

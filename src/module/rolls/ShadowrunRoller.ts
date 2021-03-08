@@ -185,6 +185,7 @@ export class ShadowrunRoller {
         const previewTemplate = item.hasTemplate;
         const description = item.getChatData();
         const tests = item.getOpposedTests();
+        const modifiers = await actor.getModifiers();
 
         // Prepare the roll and dialog.
         const advancedRollProps = {
@@ -203,9 +204,10 @@ export class ShadowrunRoller {
         } as RollDialogOptions;
 
         // Use environmental modifiers based on targeted token distance measurement from ItemDialog.
+        // TODO: Remove some of these checks?
         if (item.isRangedWeapon() && actionTestData?.rangedWeapon) {
             if (advancedDialogOptions) {
-                advancedDialogOptions.environmental = actionTestData.rangedWeapon.environmental.range;
+                advancedDialogOptions.environmental = modifiers.environmental.total;
             }
         }
 
