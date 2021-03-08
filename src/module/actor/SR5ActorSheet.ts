@@ -12,6 +12,7 @@ import { SR5 } from '../config';
 import SkillField = Shadowrun.SkillField;
 import {SR5Item} from "../item/SR5Item";
 import DeviceData = Shadowrun.DeviceData;
+import SR5ActorType = Shadowrun.SR5ActorType;
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditForm instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
@@ -150,6 +151,7 @@ export class SR5ActorSheet extends ActorSheet {
     _prepareActorTypeFields(data: SR5ActorSheetData) {
         data.isCharacter = this.actor.isCharacter();
         data.isSpirit = this.actor.isSpirit();
+        data.isCritter = this.actor.isCritter();
     }
 
     _prepareMatrixAttributes(data) {
@@ -249,6 +251,8 @@ export class SR5ActorSheet extends ActorSheet {
 
     _prepareItems(data) {
         const inventory = {};
+
+        // All acting entities should be allowed to carry some protection!
         inventory['weapon'] = {
             label: game.i18n.localize('SR5.ItemTypes.Weapon'),
             items: [],
@@ -256,7 +260,9 @@ export class SR5ActorSheet extends ActorSheet {
                 type: 'weapon',
             },
         };
-        if (this.actor.data.type === 'character') {
+
+        // Critters are people to... Support your local HMHVV support groups!
+        if (this.actor.matchesActorTypes(['character', 'critter', 'vehicle'])) {
             inventory['armor'] = {
                 label: game.i18n.localize('SR5.ItemTypes.Armor'),
                 items: [],

@@ -100,9 +100,11 @@ export class VehiclePrep extends BaseActorPrep<SR5VehicleType, VehicleActorData>
         const halfBody = Math.ceil(Helpers.calcTotal(attributes.body) / 2);
         // CRB pg 199 drone vs vehicle physical condition monitor rules
         if (isDrone) {
-            track.physical.max = 6 + halfBody + (Number(modifiers['physical_track']) || 0);
+            track.physical.base = 6 + halfBody;
+            track.physical.max = track.physical.base + (Number(modifiers['physical_track']) || 0);
         } else {
-            track.physical.max = 12 + halfBody + (Number(modifiers['physical_track']) || 0);
+            track.physical.base = 12 + halfBody;
+            track.physical.max =  track.physical.base + (Number(modifiers['physical_track']) || 0);
         }
         track.physical.label = CONFIG.SR5.damageTypes.physical;
 

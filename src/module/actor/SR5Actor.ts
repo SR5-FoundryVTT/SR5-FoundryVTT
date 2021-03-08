@@ -1530,4 +1530,12 @@ export class SR5Actor extends Actor {
         if (!driver) return;
         return driver;
     }
+
+    /** Check if this actor is of one or multiple given actor types
+     *
+     * @param types A list of actor types to check.
+     */
+    matchesActorTypes(types: string[]): boolean {
+        return types.includes(this.data.type);
+    }
 }

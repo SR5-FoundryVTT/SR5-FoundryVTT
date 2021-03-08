@@ -591,21 +591,22 @@
 
   "CONTROLS.SR5.OverwatchScoreTracker": "Overwatch Wert Übersicht",
 
-    "SR5.DIALOG.MissingModuleContent": "Um das Quell-PDF anzuzeigen, muss das Modul PDFoundry installiert sein und ein PDF mit passendem Code erstellt werden.",
+  "SR5.DIALOG.MissingModuleContent": "Um das Quell-PDF anzuzeigen, muss das Modul PDFoundry installiert sein und ein PDF mit passendem Code erstellt werden.",
 
-    "SR5.Labels": {
-        "ActorSheet": {
-            "SpiritConfiguration": "Geist Konfiguration",
-            "CritterPowers": "Critter Kräfte",
-            "Spells": "Zaubersprüche",
-            "SpritePowers": "Sprite Kräfte",
-            "DeviceRating": "Gerätestufe",
-            "RollDronePerception": "Drohnenwahrnehmung",
-            "RollPilotVehicleTest": "Fahrzeug steuern",
-            "RollDroneInfiltration": "Drohne infiltrieren",
-            "VehicleConfiguration": "Fahrzeug Konfiguration"
-        }
-    },
+  "SR5.Labels": {
+      "ActorSheet": {
+          "SpiritConfiguration": "Geist Konfiguration",
+          "CritterPowers": "Critter Kräfte",
+          "Spells": "Zaubersprüche",
+          "SpritePowers": "Sprite Kräfte",
+          "DeviceRating": "Gerätestufe",
+          "RollDronePerception": "Drohnenwahrnehmung",
+          "RollPilotVehicleTest": "Fahrzeug steuern",
+          "RollDroneInfiltration": "Drohne infiltrieren",
+          "VehicleConfiguration": "Fahrzeug Konfiguration",
+          "SetMonitor": "Monitor muss manuell gesetzt werden"
+      }
+  },
 
     "SR5.Spirit": {
         "Force": "Kraft",
@@ -773,7 +774,8 @@
         "Changelog": "Für neue Funktionen und behobene Fehler",
         "LatestChangelog": "Aktuelle Changelog",
         "ReportIssues": "Bitte Fehler und gewünschte Funktionen hier melden",
-        "IssuesOverview": "Anfragenübersicht"
+        "IssuesOverview": "Anfragenübersicht",
+        "ReportUsingBugReporter": "Fehler und mehr können auch über das bug-reporter Modul direkt aus Foundry und ohne GitHub Konto erstellt werden!"
     },
 
     "SR5.DeleteConfirmationApplication": {

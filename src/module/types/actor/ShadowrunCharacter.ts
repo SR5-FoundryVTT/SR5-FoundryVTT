@@ -7,6 +7,7 @@ declare namespace Shadowrun {
         filters: SR5SheetFilters;
         isCharacter: boolean;
         isSpirit: boolean;
+        isCritter: boolean;
         awakened: boolean;
         emerged: boolean;
         woundTolerance: number;

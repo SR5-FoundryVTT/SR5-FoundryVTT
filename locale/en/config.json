@@ -617,7 +617,8 @@
             "RollDronePerception": "Drone Perception",
             "RollPilotVehicleTest": "Pilot Vehicle",
             "RollDroneInfiltration": "Drone Infiltration",
-            "VehicleConfiguration": "Vehicle Configuration"
+            "VehicleConfiguration": "Vehicle Configuration",
+            "SetMonitor": "Monitor must be set manually."
         }
     },
 
@@ -802,7 +803,8 @@
         "Changelog": "Check out our GitHub for new features and fixes",
         "LatestChangelog": "Latest Changelog",
         "ReportIssues": "Please report bugs and feature requests",
-        "IssuesOverview": "Issues Overview"
+        "IssuesOverview": "Issues Overview",
+        "ReportUsingBugReporter": "You can also use the bug-reporter module to report bugs directly from within your Foundry session and without a GitHub account!"
     },
 
     "SR5.DeleteConfirmationApplication": {

@@ -14624,6 +14624,13 @@ class SR5Actor extends Actor {
             return;
         return driver;
     }
+    /** Check if this actor is of one or multiple given actor types
+     *
+     * @param types A list of actor types to check.
+     */
+    matchesActorTypes(types) {
+        return types.includes(this.data.type);
+    }
 }
 exports.SR5Actor = SR5Actor;
 
@@ -14755,6 +14762,7 @@ class SR5ActorSheet extends ActorSheet {
     _prepareActorTypeFields(data) {
         data.isCharacter = this.actor.isCharacter();
         data.isSpirit = this.actor.isSpirit();
+        data.isCritter = this.actor.isCritter();
     }
     _prepareMatrixAttributes(data) {
         const { matrix } = data.data;
@@ -14841,6 +14849,7 @@ class SR5ActorSheet extends ActorSheet {
     }
     _prepareItems(data) {
         const inventory = {};
+        // All acting entities should be allowed to carry some protection!
         inventory['weapon'] = {
             label: game.i18n.localize('SR5.ItemTypes.Weapon'),
             items: [],
@@ -14848,7 +14857,8 @@ class SR5ActorSheet extends ActorSheet {
                 type: 'weapon',
             },
         };
-        if (this.actor.data.type === 'character') {
+        // Critters are people to... Support your local HMHVV support groups!
+        if (this.actor.matchesActorTypes(['character', 'critter', 'vehicle'])) {
             inventory['armor'] = {
                 label: game.i18n.localize('SR5.ItemTypes.Armor'),
                 items: [],
@@ -15693,6 +15703,7 @@ const MatrixPrep_1 = require("./functions/MatrixPrep");
 const ItemPrep_1 = require("./functions/ItemPrep");
 const SkillsPrep_1 = require("./functions/SkillsPrep");
 const LimitsPrep_1 = require("./functions/LimitsPrep");
+const ConditionMonitorsPrep_1 = require("./functions/ConditionMonitorsPrep");
 const MovementPrep_1 = require("./functions/MovementPrep");
 const WoundsPrep_1 = require("./functions/WoundsPrep");
 const AttributesPrep_1 = require("./functions/AttributesPrep");
@@ -15701,13 +15712,15 @@ class CritterPrep extends BaseActorPrep_1.BaseActorPrep {
         ModifiersPrep_1.ModifiersPrep.prepareModifiers(this.data);
         ModifiersPrep_1.ModifiersPrep.clearAttributeMods(this.data);
         ItemPrep_1.ItemPrep.prepareArmor(this.data, this.items);
+        ItemPrep_1.ItemPrep.prepareBodyware(this.data, this.items);
         SkillsPrep_1.SkillsPrep.prepareSkills(this.data);
         AttributesPrep_1.AttributesPrep.prepareAttributes(this.data);
         LimitsPrep_1.LimitsPrep.prepareLimitBaseFromAttributes(this.data);
         LimitsPrep_1.LimitsPrep.prepareLimits(this.data);
         MatrixPrep_1.MatrixPrep.prepareMatrix(this.data, this.items);
         MatrixPrep_1.MatrixPrep.prepareMatrixToLimitsAndAttributes(this.data);
-        CritterPrep.prepareMonitors(this.data);
+        ConditionMonitorsPrep_1.ConditionMonitorsPrep.preparePhysical(this.data);
+        ConditionMonitorsPrep_1.ConditionMonitorsPrep.prepareStun(this.data);
         MovementPrep_1.MovementPrep.prepareMovement(this.data);
         WoundsPrep_1.WoundsPrep.prepareWounds(this.data);
         InitiativePrep_1.InitiativePrep.prepareMeatspaceInit(this.data);
@@ -15715,23 +15728,10 @@ class CritterPrep extends BaseActorPrep_1.BaseActorPrep {
         InitiativePrep_1.InitiativePrep.prepareMatrixInit(this.data);
         InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(this.data);
     }
-    /** Critters use static monitors without any calculation.
-     * NOTE: As a workaround use only global modifiers to define track.
-     */
-    static prepareMonitors(data) {
-        const { track, modifiers } = data;
-        track.stun.max = Number(modifiers['stun_track']);
-        track.stun.label = CONFIG.SR5.damageTypes.stun;
-        track.stun.disabled = false;
-        track.physical.max = Number(modifiers['physical_track']);
-        track.physical.overflow.max = 0;
-        track.physical.label = CONFIG.SR5.damageTypes.physical;
-        track.physical.disabled = false;
-    }
 }
 exports.CritterPrep = CritterPrep;
 
-},{"./BaseActorPrep":88,"./functions/AttributesPrep":94,"./functions/InitiativePrep":96,"./functions/ItemPrep":97,"./functions/LimitsPrep":98,"./functions/MatrixPrep":99,"./functions/ModifiersPrep":100,"./functions/MovementPrep":101,"./functions/SkillsPrep":103,"./functions/WoundsPrep":104}],91:[function(require,module,exports){
+},{"./BaseActorPrep":88,"./functions/AttributesPrep":94,"./functions/ConditionMonitorsPrep":95,"./functions/InitiativePrep":96,"./functions/ItemPrep":97,"./functions/LimitsPrep":98,"./functions/MatrixPrep":99,"./functions/ModifiersPrep":100,"./functions/MovementPrep":101,"./functions/SkillsPrep":103,"./functions/WoundsPrep":104}],91:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpiritPrep = void 0;
@@ -16262,10 +16262,12 @@ class VehiclePrep extends BaseActorPrep_1.BaseActorPrep {
         const halfBody = Math.ceil(helpers_1.Helpers.calcTotal(attributes.body) / 2);
         // CRB pg 199 drone vs vehicle physical condition monitor rules
         if (isDrone) {
-            track.physical.max = 6 + halfBody + (Number(modifiers['physical_track']) || 0);
+            track.physical.base = 6 + halfBody;
+            track.physical.max = track.physical.base + (Number(modifiers['physical_track']) || 0);
         }
         else {
-            track.physical.max = 12 + halfBody + (Number(modifiers['physical_track']) || 0);
+            track.physical.base = 12 + halfBody;
+            track.physical.max = track.physical.base + (Number(modifiers['physical_track']) || 0);
         }
         track.physical.label = CONFIG.SR5.damageTypes.physical;
         const rating = matrix.rating || 0;
@@ -16340,13 +16342,15 @@ exports.ConditionMonitorsPrep = void 0;
 class ConditionMonitorsPrep {
     static prepareStun(data) {
         const { track, attributes, modifiers } = data;
-        track.stun.max = 8 + Math.ceil(attributes.willpower.value / 2) + Number(modifiers['stun_track']);
+        track.stun.base = 8 + Math.ceil(attributes.willpower.value / 2);
+        track.stun.max = track.stun.base + Number(modifiers['stun_track']);
         track.stun.label = CONFIG.SR5.damageTypes.stun;
         track.stun.disabled = false;
     }
     static preparePhysical(data) {
         const { track, attributes, modifiers } = data;
-        track.physical.max = 8 + Math.ceil(attributes.body.value / 2) + Number(modifiers['physical_track']);
+        track.physical.base = 8 + Math.ceil(attributes.body.value / 2);
+        track.physical.max = track.physical.base + Number(modifiers['physical_track']);
         track.physical.overflow.max = attributes.body.value;
         track.physical.label = CONFIG.SR5.damageTypes.physical;
         track.physical.disabled = false;
@@ -16362,8 +16366,8 @@ class ConditionMonitorsPrep {
         const attribute = attributes.willpower.value > attributes.body.value ?
             attributes.willpower :
             attributes.body;
-        // TODO: Should track modifiers switch according to used attribute?
-        track.physical.max = 8 + Math.ceil(attribute.value / 2) + Number(modifiers['physical_track']);
+        track.physical.base = 8 + Math.ceil(attribute.value / 2);
+        track.physical.max = track.physical.base + Number(modifiers['physical_track']);
         track.physical.overflow.max = attributes.body.value;
         track.physical.label = "SR5.ConditionMonitor";
         track.physical.disabled = false;
@@ -29335,7 +29339,6 @@ class ShadowrunRoller {
             // basicRollProps.wounds = testData.wounds;
             // basicRollProps.dialogOptions = testData.dialogOptions;
             basicRollProps.rollMode = testData.rollMode;
-            basicRollProps.parts = testData.parts.list;
             // TODO: This is needed a hotfix... basicRoll is used secondChance and pushTheLimit chat actions.
             //       If those are handled by advancedRoll (without a dialog) basicRoll message creation can be removed
             //       and this line as well...
@@ -29343,6 +29346,8 @@ class ShadowrunRoller {
             if (testDialog.selectedButton === 'edge' && props.actor) {
                 yield ShadowrunRoller.handleExplodingSixes(props.actor, basicRollProps, testData);
             }
+            // Build basic roll parts as the LAST step, to avoid missing any parts.
+            basicRollProps.parts = testData.parts.list;
             // Execute Test roll...
             const roll = yield this.basicRoll(basicRollProps);
             if (!roll)
