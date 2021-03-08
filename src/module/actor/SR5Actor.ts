@@ -1543,17 +1543,22 @@ export class SR5Actor extends Actor {
 
     /** TODO: method documentation
      *
+     * @param ignoreScene Set to true to ignore modifiers set on active or given scene.
      * @param scene Should a scene be used as a fallback, provide this here. Otherwise active scene will be used.
      */
-    async getModifiers(scene: Scene=game.scenes.active): Promise<Modifiers> {
+    async getModifiers(ignoreScene: boolean=false, scene: Scene=game.scenes.active): Promise<Modifiers> {
         const onActor = await Modifiers.getModifiersFromEntity(this);
 
         if (onActor.hasActiveEnvironmental) {
             return onActor;
-        } else if (!scene) {
+        } else if (ignoreScene || !scene) {
             return new Modifiers(Modifiers.getDefaultModifiers());
         } else {
             return await Modifiers.getModifiersFromEntity(scene);
         }
+    }
+
+    async setModifiers(modifiers: Modifiers) {
+        await Modifiers.setModifiersOnEntity(this, modifiers.modifiers);
     }
 }

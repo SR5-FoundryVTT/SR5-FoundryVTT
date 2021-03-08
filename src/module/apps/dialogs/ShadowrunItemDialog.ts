@@ -7,6 +7,7 @@ import RangesTemplateData = Shadowrun.RangesTemplateData;
 import RangeData = Shadowrun.RangeData;
 import {FormDialog} from "./FormDialog";
 import WeaponData = Shadowrun.WeaponData;
+import {Modifiers} from "../../sr5/Modifiers";
 
 type ItemDialogData = {
     dialogData: DialogData | undefined,
@@ -59,8 +60,12 @@ export class ShadowrunItemDialog {
                             event,
         };
 
+        const modifiers = await item.actor.getModifiers(true);
+
         const templatePath = 'systems/shadowrun5e/dist/templates/rolls/range-weapon-roll.html';
-        const templateData = {};
+        const templateData = {
+            targetRange: modifiers.environmental.active.range
+        };
         const onAfterClose = ShadowrunItemDialog.addRangedWeaponData(templateData, dialogData, item);
 
         dialogData['templateData'] = templateData;
@@ -229,7 +234,6 @@ export class ShadowrunItemDialog {
         templateData['ammo'] = ammo;
         templateData['title'] = title;
         templateData['ranges'] = templateRanges;
-        templateData['targetRange'] = item.getLastFireRangeMod();
 
         if (item.actor.getToken() && Helpers.userHasTargets()) {
             templateData['targetsSelected'] = Helpers.userHasTargets();
@@ -267,7 +271,14 @@ export class ShadowrunItemDialog {
             const {targetId} = ShadowrunItemDialog._getSelectedTargetTokenId(html);
 
             // Store selections for next dialog.
-            if (actionTestData.environmental?.range) {
+
+            if (actionTestData.environmental.range !== undefined) {
+                // Change environmental modifiers for the actor.
+                const ignoreScene = true;
+                const modifiers = await item.actor.getModifiers(ignoreScene);
+                modifiers.activateEnvironmentalCategory('range', actionTestData.environmental.range);
+                await item.actor.setModifiers(modifiers);
+
                 await item.setLastFireRangeMod({value: actionTestData.environmental.range});
             }
             if (actionTestData.fireMode) {
