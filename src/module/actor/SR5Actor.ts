@@ -35,6 +35,8 @@ import ConditionData = Shadowrun.ConditionData;
 import SR5SpiritType = Shadowrun.SR5SpiritType;
 import SR5SpriteType = Shadowrun.SR5SpriteType;
 import SR5CritterType = Shadowrun.SR5CritterType;
+import SituationModifiers = Shadowrun.SituationModifiers;
+import {Modifiers} from "../sr5/Modifiers";
 
 export class SR5Actor extends Actor {
     data: SR5ActorType;
@@ -1537,5 +1539,11 @@ export class SR5Actor extends Actor {
      */
     matchesActorTypes(types: string[]): boolean {
         return types.includes(this.data.type);
+    }
+
+    /** TODO: method documentation
+     */
+    async getModifiers(): Promise<SituationModifiers | undefined> {
+        return await Modifiers.getModifiersFromEntity(this);
     }
 }

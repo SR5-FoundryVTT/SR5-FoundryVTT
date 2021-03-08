@@ -1,8 +1,10 @@
 import {FLAGS, SYSTEM_NAME} from "../constants";
-import {Modifiers} from "../sr5/Modifiers";
 import {Helpers} from "../helpers";
+import {SR5Actor} from "../actor/SR5Actor";
+import {Modifiers} from "../sr5/Modifiers";
+import SituationModifiers = Shadowrun.SituationModifiers;
 
-export type EnvModifiersTarget = Scene|Token;
+export type EnvModifiersTarget = Scene|SR5Actor;
 
 /** Helper window for easy overview and selection of environmental modifiers and their calculated total.
  *
@@ -20,7 +22,7 @@ export type EnvModifiersTarget = Scene|Token;
 // TODO: Update display for all users when a change is made
 export class EnvModifiersApplication extends Application {
     target: EnvModifiersTarget;
-    modifiers;
+    modifiers: SituationModifiers;
 
     constructor(target: EnvModifiersTarget) {
         super();
@@ -201,10 +203,11 @@ export class EnvModifiersApplication extends Application {
 
         } else {
             // Calculation based on active modifier categories, excluding manual overwrite.
-            // TODO: Add typing to modifiers.env and remove local typing
-            const active = Object.values(this.modifiers.environmental.active).filter(category => category !== 'value') as Number[];
+            const activeCategories = Object.entries(this.modifiers.environmental.active).filter(([category, level]) => category !== 'value');
+            // Should an active category miss a level set, ignore and fail gracefully.
+            const activeLevels = activeCategories.map(([category, level]) => level ? level : 0);
 
-            const count = this._countActiveModifierLevels(active);
+            const count = this._countActiveModifierLevels(activeLevels);
 
             const modifiers = Modifiers.getEnvironmentalModifierLevels();
 
@@ -276,8 +279,8 @@ export class EnvModifiersApplication extends Application {
         if (this.target instanceof Scene) {
             return game.i18n.localize('ENTITY.Scene');
         }
-        if (this.target instanceof Token) {
-            return game.i18n.localize('Token');
+        if (this.target instanceof SR5Actor) {
+            return game.i18n.localize('ENTITY.Actor');
         }
 
         return '';
@@ -287,7 +290,7 @@ export class EnvModifiersApplication extends Application {
      *
      */
     _disableInputsForUser(): boolean {
-        const entity = this.target instanceof Token ? this.target.actor : this.target;
+        const entity = this.target instanceof SR5Actor ? this.target : this.target;
         return !(game.user.isGM || entity.owner);
     }
 
@@ -300,16 +303,15 @@ export class EnvModifiersApplication extends Application {
     // TODO: The premise between openForActiveScene and openForTokenHUD is vastly different, but both methods have the
     //       same naming scheme... Quite confusing
     static openForTokenHUD(tokenId: string) {
-        console.error(tokenId);
         const token = Helpers.getToken(tokenId);
 
         // Create an anonymous event handler
         return (event) => {
             event.preventDefault();
 
-            if (!token) return;
+            if (!token || !token.actor) return;
 
-            new EnvModifiersApplication(token).render(true);
+            new EnvModifiersApplication(token.actor).render(true);
         }
     }
 
