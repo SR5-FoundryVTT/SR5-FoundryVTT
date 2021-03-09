@@ -1551,7 +1551,7 @@ export class SR5Actor extends Actor {
 
         if (onActor.hasActiveEnvironmental) {
             return onActor;
-        } else if (ignoreScene || !scene) {
+        } else if (ignoreScene) {
             return new Modifiers(Modifiers.getDefaultModifiers());
         } else {
             return await Modifiers.getModifiersFromEntity(scene);
