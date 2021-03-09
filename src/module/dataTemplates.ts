@@ -1,4 +1,5 @@
 import DamageData = Shadowrun.DamageData;
+import ActorArmorData = Shadowrun.ActorArmorData;
 import TechnologyData = Shadowrun.TechnologyData;
 import DescriptionData = Shadowrun.DescriptionData;
 import EquipmentData = Shadowrun.EquipmentData;
@@ -36,6 +37,15 @@ export class DefaultValues {
             mod: [],
             base_formula_operator: 'add'
         }, partialDamageData) as DamageData;
+    }
+
+    static actorArmorData(partialActorArmorData: Partial<ActorArmorData> = {}): ActorArmorData {
+        return mergeObject({
+            value: 0,
+            mod: [],
+            base: 0,
+            label: '',
+        }, partialActorArmorData) as ActorArmorData;
     }
 
     static equipmentData(partialEquipmentData: Partial<EquipmentData> = {}): EquipmentData {
