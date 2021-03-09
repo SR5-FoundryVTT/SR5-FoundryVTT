@@ -1,7 +1,8 @@
-import {FLAGS, SYSTEM_NAME} from "../constants";
+import {SYSTEM_NAME} from "../constants";
 import {Helpers} from "../helpers";
 import {SR5Actor} from "../actor/SR5Actor";
 import {Modifiers} from "../sr5/Modifiers";
+import EnvironmentalModifierCategories = Shadowrun.EnvironmentalModifierCategories;
 import SituationModifiers = Shadowrun.SituationModifiers;
 
 export type EnvModifiersTarget = Scene|SR5Actor;
@@ -22,7 +23,7 @@ export type EnvModifiersTarget = Scene|SR5Actor;
 // TODO: Update display for all users when a change is made
 export class EnvModifiersApplication extends Application {
     target: EnvModifiersTarget;
-    modifiers: SituationModifiers;
+    modifiers: Modifiers;
 
     constructor(target: EnvModifiersTarget) {
         super();
@@ -48,10 +49,6 @@ export class EnvModifiersApplication extends Application {
     async getData(options?: object): Promise<any> {
         const data = super.getData(options);
 
-        // TODO: getData is a bit unreadable.
-        // TODO: SheetData for EnvModifiersApplication typing?
-
-        // Try target or fallback on default.
         this.modifiers = await this._getModifiers();
 
         data.active = this.modifiers.environmental.active;
@@ -79,12 +76,11 @@ export class EnvModifiersApplication extends Application {
 
         if (!element.dataset.category || !element.dataset.value) return;
 
-        const category = element.dataset.category;
+        const category = element.dataset.category as keyof EnvironmentalModifierCategories;
         const value = Number(element.dataset.value);
 
         // Handle modifier calculation
         this._toggleActiveModifierCategory(category, value);
-        this._calcActiveModifierTotal();
 
         await this._clearModifiersOnTargetForNoSelection();
         await this._storeModifiersOnTarget();
@@ -102,181 +98,41 @@ export class EnvModifiersApplication extends Application {
 
     // TODO: Move into separate shadowrun rule area
     /**
-     *
-     * @param category
-     * @param value
      */
-    _toggleActiveModifierCategory(category: string, value: number) {
-        if (this._modifierIsActive(category, value)) {
-            this._setModifierAsInactive(category);
-        } else if (category === 'value') {
-          this._setOverwriteModifierAsActive(value);
-        } else {
-            this._setModifierAsActive(category, value);
-        }
-
-        // Remove the manual overwrite, when the level is derived from selection of individual modifiers.
-        if (category !== 'value') {
-            this._setOverwriteModifierAsInactive();
-        }
+    _toggleActiveModifierCategory(category: keyof EnvironmentalModifierCategories, level: number) {
+        this.modifiers.toggleEnvironmentalCategory(category, level);
     }
 
-    _modifierIsActive(category: string, value: number): boolean {
-        return this.modifiers.environmental.active[category] === value;
-    }
+    async _getModifiers(): Promise<Modifiers> {
+        // if (await this._targetHasEnvironmentalModifiers()) {
+        //     return await Modifiers.getModifiersFromEntity(this.target);
+        // } else {
+        //     console.error('should not happen');
+        //     return new Modifiers(Modifiers.getDefaultModifiers());
+        // }
 
-    _setOverwriteModifierAsActive(value: number) {
-        this._resetActiveModifiers();
-        this._setModifierAsActive('value', value);
-    }
-
-    _setOverwriteModifierAsInactive() {
-        this._setModifierAsInactive('value');
-    }
-
-    /** Only one category selection can be active at any time.
-     *
-     * @param category The environmental modifier category (wind, ...)
-     * @param value The modifier value (-1, 0, 10)
-     */
-    _setModifierAsActive(category: string, value: number) {
-         this.modifiers.environmental.active[category] = value;
-    }
-
-    /** Only one category selection can be active at any time.
-     *
-     * @param category The environmental modifier category (wind, ...)
-     */
-    _setModifierAsInactive(category: string) {
-        // Remove the inactive category instead of setting it zero, as a zero modifier is a valid choice!
-        delete this.modifiers.environmental.active[category];
-    }
-
-    _setTotal(value: number) {
-        this.modifiers.environmental.total = value;
-    }
-
-    get _hasActiveModifier(): boolean {
-        return Object.keys(this.modifiers.environmental.active).length > 0;
-    }
-
-    get _hasActiveOverwriteModifier(): boolean {
-        return this.modifiers.environmental.active.value !== undefined;
-    }
-
-    _getActiveOverwriteModifier(): number|undefined {
-        return this.modifiers.environmental.active.value;
-    }
-
-    _resetActiveModifiers() {
-        Object.keys(this.modifiers.environmental.active).forEach(category => delete this.modifiers.environmental.active[category]);
-    }
-
-    /** Count the amount each level (modifier value) appears in the array of modifiers
-     *
-     * @param values Active environmental modifiers
-     */
-    _countActiveModifierLevels(values: Number[]) {
-        const modifiers = Modifiers.getEnvironmentalModifierLevels();
-
-        return {
-            light: values.reduce((count: number, value: number) => (value === modifiers.light ? count + 1 : count), 0),
-            moderate: values.reduce((count: number, value: number) => (value === modifiers.moderate ? count + 1 : count), 0),
-            heavy: values.reduce((count: number, value: number) => (value === modifiers.heavy ? count + 1 : count), 0),
-            extreme: values.reduce((count: number, value: number) => (value === modifiers.extreme ? count + 1 : count), 0)
-        }
-    }
-
-    // TODO: Move into separate shadowrun rule area
-    /** Active modifiers
-     *
-     */
-    _calcActiveModifierTotal() {
-        // Manual selection will overwrite all else...
-        if (this._hasActiveOverwriteModifier) {
-            const modifier = this._getActiveOverwriteModifier();
-
-            if (modifier === undefined) {
-                console.error('An active overwrite modifier was returned as undefined');
-                return;
-            }
-
-            this._resetActiveModifiers();
-            this._setOverwriteModifierAsActive(modifier);
-            this._setTotal(modifier);
-
-        } else {
-            // Calculation based on active modifier categories, excluding manual overwrite.
-            const activeCategories = Object.entries(this.modifiers.environmental.active).filter(([category, level]) => category !== 'value');
-            // Should an active category miss a level set, ignore and fail gracefully.
-            const activeLevels = activeCategories.map(([category, level]) => level ? level : 0);
-
-            const count = this._countActiveModifierLevels(activeLevels);
-
-            const modifiers = Modifiers.getEnvironmentalModifierLevels();
-
-            if (count.extreme > 0 || count.heavy >= 2) {
-                this._setTotal(modifiers.extreme);
-            }
-            else if (count.heavy === 1 || count.moderate >= 2) {
-                this._setTotal(modifiers.heavy);
-            }
-            else if (count.moderate === 1 || count.light >= 2) {
-                this._setTotal(modifiers.moderate);
-            }
-            else if (count.light === 1) {
-                this._setTotal(modifiers.light);
-            } else {
-                this._setTotal(modifiers.good);
-            }
-        }
-    }
-
-    async _getModifiers() {
-        if (await this._targetHasEnvironmentalModifiers()) {
-            return await this._getModifiersFromTarget();
-        } else {
-            return Modifiers.getDefaultModifiers();
-        }
-    }
-
-    async _getModifiersFromTarget() {
-        return await this.target.getFlag(SYSTEM_NAME, FLAGS.Modifier);
+        return await Modifiers.getModifiersFromEntity(this.target);
     }
 
     async _storeModifiersOnTarget() {
-        // TODO: Add modifier typing
-        const modifiers = await this._getModifiers();
-
-        modifiers.environmental = this.modifiers.environmental;
-
-        // TODO: Ask league about unsetFlag behavoir...
-        // NOTE: Check if JSON stringifier works or not.
-        await this.target.unsetFlag(SYSTEM_NAME, FLAGS.Modifier);
-        await this.target.setFlag(SYSTEM_NAME, FLAGS.Modifier, modifiers);
-
-    }
-
-    async _targetHasEnvironmentalModifiers() {
-        const modifiers = await this._getModifiersFromTarget();
-        return modifiers && modifiers.environmental;
+        await Modifiers.setModifiersOnEntity(this.target, this.modifiers.data);
     }
 
     /** Cleanup unused data in Entity flag.
      */
     async _clearModifiersOnTargetForNoSelection() {
-        if (this._hasActiveModifier) {
-            await this.clearModifiersOnTarget();
+        if (!this.modifiers.hasActiveEnvironmental) {
+            this.modifiers = await Modifiers.clearEnvironmentalOnEntity(this.target);
         }
     }
 
+     async _targetHasEnvironmentalModifiers() {
+        const modifiers = await Modifiers.getModifiersFromEntity(this.target);
+        return !!modifiers.environmental;
+    }
+
     async clearModifiersOnTarget() {
-        const modifiers = await this._getModifiersFromTarget();
-
-        delete modifiers.environmental;
-
-        await this.target.unsetFlag(SYSTEM_NAME, FLAGS.Modifier);
-        await this.target.setFlag(SYSTEM_NAME, FLAGS.Modifier, modifiers);
+        this.modifiers = await Modifiers.clearEnvironmentalOnEntity(this.target);
     }
 
     _getTargetTypeLabel(): string {
@@ -299,7 +155,6 @@ export class EnvModifiersApplication extends Application {
     }
 
     static async openForActiveScene() {
-        console.error(game.scenes.active);
         if (!game.scenes.active) return;
         await new EnvModifiersApplication(game.scenes.active).render(true);
     }

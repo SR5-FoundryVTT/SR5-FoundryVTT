@@ -10,7 +10,7 @@ export class Modifiers {
     constructor(data: SituationModifiers) {
         // Fail gracefully for no modifiers given.
         // This can happen as Foundry returns empty objects for no flags set.
-        if (!data || Object.keys(data).length === 0) {
+        if (typeof data !== 'object' || !data.environmental) {
             data = Modifiers.getDefaultModifiers();
         }
 
@@ -18,15 +18,27 @@ export class Modifiers {
     }
 
     get hasActiveEnvironmental(): boolean {
-        return Object.keys(this.data.environmental.active).length > 0;
+        return Object.keys(this.environmental.active).length > 0;
     }
 
     get modifiers(): SituationModifiers {
         return this.data;
     }
 
+    set modifiers(modifiers: SituationModifiers) {
+        this.data = modifiers;
+    }
+
     get environmental(): EnvironmentalModifiers {
         return this.data.environmental;
+    }
+
+    set environmental(modifiers: EnvironmentalModifiers) {
+        this.data.environmental = modifiers;
+    }
+
+    _matchingActiveEnvironmental(category: keyof EnvironmentalModifierCategories, level: number): boolean {
+        return this.environmental.active[category] === level;
     }
 
     _setEnvironmentalCategoryActive(category: keyof EnvironmentalModifierCategories, level: number) {
@@ -47,14 +59,29 @@ export class Modifiers {
      * @param level
      */
     activateEnvironmentalCategory(category: keyof EnvironmentalModifierCategories, level: number) {
-        console.error(category, level);
         if (!this._environmentalCategoryIsOverwrite(category)) {
             this._disableEnvironmentalOverwrite();
         }
 
         this._setEnvironmentalCategoryActive(category, level);
         this.calcEnvironmentalTotal();
-        console.error(this.environmental);
+    }
+
+    toggleEnvironmentalCategory(category: keyof EnvironmentalModifierCategories, level: number) {
+        if (this._matchingActiveEnvironmental(category, level)) {
+            this._setEnvironmentalCategoryInactive(category);
+        } else if (this._environmentalCategoryIsOverwrite(category)) {
+            this._setEnvironmentalOverwriteActive(level);
+        } else {
+            this._setEnvironmentalCategoryActive(category, level);
+        }
+
+        // Remove a lingering overwrite if anything is set active.
+        if (!this._environmentalCategoryIsOverwrite(category)) {
+            this._setEnvironmentalOverwriteInactive();
+        }
+
+        this.calcEnvironmentalTotal();
     }
 
     calcEnvironmentalTotal() {
@@ -68,7 +95,7 @@ export class Modifiers {
             }
 
             this._resetEnvironmental();
-            this._setOverwriteModifierAsActive(modifier);
+            this._setEnvironmentalOverwriteActive(modifier);
             this._setEnvironmentalTotal(modifier);
 
         } else {
@@ -98,6 +125,21 @@ export class Modifiers {
         }
     }
 
+    static async clearOnEntity(entity: Entity): Promise<Modifiers> {
+        await entity.unsetFlag(SYSTEM_NAME, FLAGS.Modifier);
+        return new Modifiers(Modifiers.getDefaultModifiers());
+    }
+
+    static async clearEnvironmentalOnEntity(entity: Entity): Promise<Modifiers> {
+        const modifiers = await Modifiers.getModifiersFromEntity(entity);
+
+        modifiers.data.environmental = Modifiers.getDefaultEnvironmentalModifiers();
+
+        await Modifiers.setModifiersOnEntity(entity, modifiers.data);
+
+        return modifiers;
+    }
+
     _environmentalCategoryIsOverwrite(category: keyof EnvironmentalModifierCategories): boolean {
         return category === 'value';
     }
@@ -106,9 +148,13 @@ export class Modifiers {
         Object.keys(this.environmental.active).forEach(category => delete this.environmental.active[category]);
     }
 
-    _setOverwriteModifierAsActive(value: number) {
+    _setEnvironmentalOverwriteActive(value: number) {
         this._resetEnvironmental();
         this._setEnvironmentalCategoryActive('value', value);
+    }
+
+    _setEnvironmentalOverwriteInactive() {
+        this._setEnvironmentalCategoryInactive('value');
     }
 
     _setEnvironmentalTotal(value: number) {
@@ -161,6 +207,8 @@ export class Modifiers {
     }
 
     static async setModifiersOnEntity(entity: Entity, modifiers: SituationModifiers) {
+        // TODO: Ask league about unsetFlag behavoir...
+        // NOTE: Check if JSON stringifier works or not.
         await entity.unsetFlag(SYSTEM_NAME, FLAGS.Modifier);
         await entity.setFlag(SYSTEM_NAME, FLAGS.Modifier, modifiers);
     }
