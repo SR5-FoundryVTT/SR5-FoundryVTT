@@ -203,7 +203,8 @@ export class Modifiers {
 
     static async getModifiersFromEntity(entity: Entity): Promise<Modifiers> {
         const data = await entity.getFlag(SYSTEM_NAME, FLAGS.Modifier);
-        return new Modifiers(data);
+        // Duplicate data to avoid cross talk between different entities over different Modifier instances.
+        return new Modifiers(duplicate(data));
     }
 
     static async setModifiersOnEntity(entity: Entity, modifiers: SituationModifiers) {
