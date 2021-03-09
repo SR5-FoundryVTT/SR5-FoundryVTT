@@ -14,7 +14,8 @@ export class Modifiers {
             data = Modifiers.getDefaultModifiers();
         }
 
-        this.data = data;
+        // Duplicate data to avoid cross talk between different entities over different Modifier instances.
+        this.data = duplicate(data);
     }
 
     get hasActiveEnvironmental(): boolean {
@@ -203,8 +204,8 @@ export class Modifiers {
 
     static async getModifiersFromEntity(entity: Entity): Promise<Modifiers> {
         const data = await entity.getFlag(SYSTEM_NAME, FLAGS.Modifier);
-        // Duplicate data to avoid cross talk between different entities over different Modifier instances.
-        return new Modifiers(duplicate(data));
+
+        return new Modifiers(data);
     }
 
     static async setModifiersOnEntity(entity: Entity, modifiers: SituationModifiers) {
