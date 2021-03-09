@@ -59,7 +59,7 @@ export class Modifiers {
 
     calcEnvironmentalTotal() {
         // Manual selection will overwrite all else...
-        if (this._hasActiveOverwriteModifier) {
+        if (this.hasActiveEnvironmentalOverwrite) {
             const modifier = this._activeEnvironmentalOverwrite;
 
             if (modifier === undefined) {
@@ -119,7 +119,7 @@ export class Modifiers {
         return this.modifiers.environmental.active.value;
     }
 
-    get _hasActiveOverwriteModifier(): boolean {
+    get hasActiveEnvironmentalOverwrite(): boolean {
         return this.environmental.active.value !== undefined;
     }
 

@@ -850,5 +850,11 @@
     },
     "Extreme": "Combination of two or more conditions at the heavy level",
     "Total": "Result"
-  }
+  },
+
+    "SR5.Dialogs": {
+        "RangedWeaponTest": {
+            "EnvironmentalOverwriteSet": "Environmental modifiers have been manually set to a fixed value!"
+        }
+    }
 }

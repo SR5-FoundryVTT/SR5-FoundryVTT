@@ -60,11 +60,20 @@ export class ShadowrunItemDialog {
                             event,
         };
 
-        const modifiers = await item.actor.getModifiers(true);
-
         const templatePath = 'systems/shadowrun5e/dist/templates/rolls/range-weapon-roll.html';
+
+        // Prepare template data for display.
+        const modifiers = await item.actor.getModifiers();
+
+        // Disable manual range selection when a overwrite is set.
+        const targetRange = modifiers.environmental.active.range;
+        const disableTargetRange = modifiers.hasActiveEnvironmentalOverwrite;
+
+        console.error(modifiers);
+
         const templateData = {
-            targetRange: modifiers.environmental.active.range
+            targetRange,
+            disableTargetRange
         };
         const onAfterClose = ShadowrunItemDialog.addRangedWeaponData(templateData, dialogData, item);
 
@@ -274,10 +283,13 @@ export class ShadowrunItemDialog {
 
             if (actionTestData.environmental.range !== undefined) {
                 // Change environmental modifiers for the actor.
-                const ignoreScene = true;
-                const modifiers = await item.actor.getModifiers(ignoreScene);
-                modifiers.activateEnvironmentalCategory('range', actionTestData.environmental.range);
-                await item.actor.setModifiers(modifiers);
+                const modifiers = await item.actor.getModifiers();
+                if (!modifiers.hasActiveEnvironmentalOverwrite) {
+                    modifiers.activateEnvironmentalCategory('range', actionTestData.environmental.range);
+                    await item.actor.setModifiers(modifiers);
+                } else {
+                    console.error('The actor has an active environmental overwrite, yet could define a manual range selection.');
+                }
 
                 await item.setLastFireRangeMod({value: actionTestData.environmental.range});
             }
