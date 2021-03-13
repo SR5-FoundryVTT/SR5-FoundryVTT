@@ -29,6 +29,7 @@ declare namespace Shadowrun {
      * Action limit data.
      */
     export type LimitData = ModifiableValueLinked;
+    export type FormulaOperator = 'add'|'subtract'|'multiply'|'divide';
     /**
      * Action damage data.
      */
@@ -37,7 +38,7 @@ declare namespace Shadowrun {
         element: BaseValuePair<DamageElement>;
         ap: ModifiableValue;
         // See config.actionDamageFormulaOperators for operator mapping.
-        base_formula_operator: 'add'|'subtract'|'multiply'|'divide';
+        base_formula_operator: FormulaOperator;
     };
     /**
      * Action opposed test data.

@@ -20472,7 +20472,6 @@ exports.addRollListeners = (app, html) => {
         }
         if (!actors)
             return;
-        console.error(actors);
         for (const actor of actors) {
             yield item.rollTestType(type, attack, event, actor);
         }
@@ -26285,23 +26284,32 @@ class ItemAction {
         const attribute = actor.findAttribute(damage.attribute);
         if (!attribute)
             return damage;
-        switch (damage.base_formula_operator) {
-            case "add":
-                damage.value = damage.base + attribute.value;
-                break;
-            case "subtract":
-                damage.value = damage.base - attribute.value;
-                break;
-            case "multiply":
-                damage.value = damage.base * attribute.value;
-                break;
-            case "divide":
-                damage.value = damage.base / attribute.value;
-        }
+        damage.base = ItemAction._applyFormulaOperatorToValues(damage.base, attribute.value, damage.base_formula_operator);
         // Rather reduce damage to the next full decimal.
-        damage.value = Math.floor(damage.value);
-        damage.value = helpers_1.Helpers.applyValueRange(damage.value, { min: 0 });
+        damage.base = helpers_1.Helpers.applyValueRange(Math.floor(damage.base), { min: 0 });
+        damage.value = damage.base;
         return damage;
+    }
+    /** Calculate the result of operating on two values with basic formula operators.
+     *
+     * @param base The basic value operated opon.
+     * @param value The value doing the operation with. If order is important, this value will be after the operator.
+     * @param operator A formula operator (basic) to be used within a simple calculation.
+     */
+    static _applyFormulaOperatorToValues(base, value, operator) {
+        switch (operator) {
+            case "add":
+                return base + value;
+            case "subtract":
+                return base - value;
+            case "multiply":
+                return base * value;
+            case "divide":
+                return base / value;
+            default:
+                console.error(`Unsupported base damage formula operator: '${operator}' used. Falling back to 'add'.`);
+                return base + value;
+        }
     }
 }
 exports.ItemAction = ItemAction;
@@ -26406,23 +26414,6 @@ class SR5Item extends Item {
             yield this.unsetFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.EmbeddedItems);
         });
     }
-    // TODO: Remove.
-    // getLastAttack(): AttackData | undefined {
-    //     return this.getFlag(SYSTEM_NAME, FLAGS.Attack);
-    // }
-    // async setLastAttack(attack: AttackData) {
-    //     // unset the flag first to clear old data, data can get weird if not done
-    //     await this.unsetFlag(SYSTEM_NAME, FLAGS.Attack);
-    //     return this.setFlag(SYSTEM_NAME, FLAGS.Attack, attack);
-    // }
-    // TODO: Remove.
-    // async setLastAttackForRoll(roll: ShadowrunRoll|undefined, actionTestData?: ActionTestData) {
-    //     const hits = roll?.total ?? 0;
-    //     const attackData = this.getAttackData(hits, actionTestData);
-    //     if (attackData) {
-    //         await this.setLastAttack(attackData);
-    //     }
-    // }
     /** Overwrite to allow for options param to be skipped.
      */
     update(data, options) {
@@ -26493,6 +26484,11 @@ class SR5Item extends Item {
             action.damage.mod = [];
             action.damage.ap.mod = [];
             action.dice_pool_mod = [];
+            // @ts-ignore
+            // Due to faulty template value items without a set operator will have a operator literal instead since 0.7.10.
+            if (action.damage.base_formula_operator === '+') {
+                action.damage.base_formula_operator = 'add';
+            }
             // handle overrides from mods
             const limitParts = new PartsList_1.PartsList(action.limit.mod);
             const dpParts = new PartsList_1.PartsList(action.dice_pool_mod);
@@ -26736,7 +26732,7 @@ class SR5Item extends Item {
             if (mod) {
                 const dupData = duplicate(mod.data);
                 const data = dupData.data;
-                data.technology.equipped = !this.isEquipped();
+                data.technology.equipped = !data.technology.equipped;
                 yield this.updateOwnedItem(dupData);
             }
         });

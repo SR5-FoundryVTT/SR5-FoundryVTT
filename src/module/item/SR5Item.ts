@@ -130,25 +130,6 @@ export class SR5Item extends Item {
         await this.unsetFlag(SYSTEM_NAME, FLAGS.EmbeddedItems);
     }
 
-    // TODO: Remove.
-    // getLastAttack(): AttackData | undefined {
-    //     return this.getFlag(SYSTEM_NAME, FLAGS.Attack);
-    // }
-    // async setLastAttack(attack: AttackData) {
-    //     // unset the flag first to clear old data, data can get weird if not done
-    //     await this.unsetFlag(SYSTEM_NAME, FLAGS.Attack);
-    //     return this.setFlag(SYSTEM_NAME, FLAGS.Attack, attack);
-    // }
-
-    // TODO: Remove.
-    // async setLastAttackForRoll(roll: ShadowrunRoll|undefined, actionTestData?: ActionTestData) {
-    //     const hits = roll?.total ?? 0;
-    //     const attackData = this.getAttackData(hits, actionTestData);
-    //     if (attackData) {
-    //         await this.setLastAttack(attackData);
-    //     }
-    // }
-
     /** Overwrite to allow for options param to be skipped.
      */
     async update(data, options?): Promise<this> {
@@ -223,6 +204,13 @@ export class SR5Item extends Item {
             action.damage.mod = [];
             action.damage.ap.mod = [];
             action.dice_pool_mod = [];
+
+            // @ts-ignore
+            // Due to faulty template value items without a set operator will have a operator literal instead since 0.7.10.
+            if (action.damage.base_formula_operator === '+') {
+                action.damage.base_formula_operator = 'add';
+            }
+
             // handle overrides from mods
             const limitParts = new PartsList(action.limit.mod);
             const dpParts = new PartsList(action.dice_pool_mod);
@@ -237,6 +225,8 @@ export class SR5Item extends Item {
                     dpParts.addUniquePart(mod.name, modification.data.dice_pool);
                 }
             });
+
+
 
             if (equippedAmmo) {
                 const ammoData = equippedAmmo.data.data as AmmoData;
@@ -481,7 +471,7 @@ export class SR5Item extends Item {
         if (mod) {
             const dupData = duplicate(mod.data);
             const data = dupData.data as TechnologyPartData;
-            data.technology.equipped = !this.isEquipped();
+            data.technology.equipped = !data.technology.equipped;
             await this.updateOwnedItem(dupData);
         }
     }
