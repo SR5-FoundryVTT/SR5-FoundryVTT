@@ -849,7 +849,8 @@
       "Title": "Modifier"
     },
     "Extreme": "Combination of two or more conditions at the heavy level",
-    "Total": "Result"
+    "Total": "Result",
+    "ClearModifiers": "Clear modifiers"
   },
 
     "SR5.Dialogs": {

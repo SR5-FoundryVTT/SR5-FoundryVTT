@@ -787,7 +787,7 @@
         "Description": "Das Löschen eines Eintrags kann nicht rückgängig gemacht werden!"
     },
   "SR5.EnvModifiersApplication": {
-    "Title": "Environmental Modifiers",
+    "Title": "Umgebungsmodifikatoren",
     "Visibility": {
       "Title": "Sichtverhältnisse",
       "Good": "Freie Sicht",
@@ -820,7 +820,8 @@
       "Title": "Modifikator"
     },
     "Extreme": "Zwei oder mehr Modifikatoren der Kategorie Schwer",
-    "Total": "Ergebnis"
+    "Total": "Ergebnis",
+    "ClearModifiers": "Entferne Modifikatoren"
   },
 
   "SR5.Dialogs": {

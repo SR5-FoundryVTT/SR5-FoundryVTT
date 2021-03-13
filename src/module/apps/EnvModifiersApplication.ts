@@ -10,10 +10,7 @@ export type EnvModifiersTarget = Scene|SR5Actor;
 /** Helper window for easy overview and selection of environmental modifiers and their calculated total.
  *
  */
-// TODO: Add ways of modifying different category levels by steps up / down (infrared) or to specific levels.
-// TODO: Not editable mode for GM only enitities
-// TODO: Set top row of modifiers to make sure it's CLEAR there is a modifier set, even if it's zero all the way
-// TODO: Check template for hardcoded labels
+// TODO: Call / receive an 'update token' hook to propagate changes immediately.
 // TODO: Add env modifier button to token context menu
 // TODO: Add env modifier button to scene context menu
 // TODO: Show Scene modifier total in token app
