@@ -199,16 +199,12 @@ export class ShadowrunRoller {
         } as AdvancedRollProps;
 
 
+        // Reset dialog options to default values and set each according to item types.
         const advancedDialogOptions = {
             environmental: 0,
         } as RollDialogOptions;
-
-        // Use environmental modifiers based on targeted token distance measurement from ItemDialog.
-        // TODO: Remove some of these checks?
-        if (item.isRangedWeapon() && actionTestData?.rangedWeapon) {
-            if (advancedDialogOptions) {
-                advancedDialogOptions.environmental = modifiers.environmental.total;
-            }
+        if (item.applyEnvironmentalModifiers()) {
+            advancedDialogOptions.environmental = modifiers.environmental.total;
         }
 
         const roll = await ShadowrunRoller.advancedRoll(advancedRollProps, advancedDialogOptions);

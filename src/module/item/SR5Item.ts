@@ -1449,4 +1449,14 @@ export class SR5Item extends Item {
             return await target.rollIndirectSpellDefense(this, options as SpellDefenseOptions);
         }
     }
+
+    /** Should environmental modifiers apply an action by this item?
+     */
+    applyEnvironmentalModifiers(): boolean {
+        if (this.isRangedWeapon()) return true;
+        if (this.isMeleeWeapon()) return true;
+        if (this.isIndirectCombatSpell()) return true;
+
+        return false;
+    }
 }
