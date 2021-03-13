@@ -1102,7 +1102,7 @@
                             "value": 0,
                             "base": 0
                         },
-                        "base_formula_operator": "+",
+                        "base_formula_operator": "add",
                         "attribute": ""
                     },
                     "opposed": {

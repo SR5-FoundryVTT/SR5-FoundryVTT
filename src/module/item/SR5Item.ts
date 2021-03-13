@@ -204,6 +204,13 @@ export class SR5Item extends Item {
             action.damage.mod = [];
             action.damage.ap.mod = [];
             action.dice_pool_mod = [];
+
+            // @ts-ignore
+            // Due to faulty template value items without a set operator will have a operator literal instead since 0.7.10.
+            if (action.damage.base_formula_operator === '+') {
+                action.damage.base_formula_operator = 'add';
+            }
+
             // handle overrides from mods
             const limitParts = new PartsList(action.limit.mod);
             const dpParts = new PartsList(action.dice_pool_mod);
