@@ -274,7 +274,6 @@ export const addRollListeners = (app: ChatMessage, html) => {
 
         if (!actors) return;
 
-        console.error(actors);
         for (const actor of actors) {
             await item.rollTestType(type, attack, event, actor);
         }
