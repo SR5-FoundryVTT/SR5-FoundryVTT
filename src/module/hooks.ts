@@ -17,6 +17,7 @@ import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
 import { SR5Combat } from './combat/SR5Combat';
 import { Import } from './importer/apps/import-form';
 import {ChangelogApplication} from "./apps/ChangelogApplication";
+import {EnvModifiersApplication} from "./apps/EnvModifiersApplication";
 
 export class HooksManager {
     static registerHooks() {
@@ -33,6 +34,7 @@ export class HooksManager {
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons);
         Hooks.on('getCombatTrackerEntryContext', SR5Combat.addCombatTrackerContextOptions);
         Hooks.on('renderItemDirectory', HooksManager.renderItemDirectory);
+        Hooks.on('renderTokenHUD', EnvModifiersApplication.addTokenHUDFields);
     }
 
     static init() {
@@ -100,7 +102,13 @@ ___________________
         const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
         $(document).on('click', diceIconSelectorNew, () => ShadowrunRoller.promptRoll());
 
-
+        // const target = game.scenes.entries[0];
+        // console.error('scene', target);
+        // await new EnvModifiersApplication(target).render(true);
+        //
+        // const token = canvas.tokens.placeables[0];
+        // console.error('token', token);
+        // await new EnvModifiersApplication(token).render(true);
     }
 
     static canvasInit() {
@@ -125,14 +133,18 @@ ___________________
     }
 
     static getSceneControlButtons(controls) {
+        const tokenControls = controls.find((c) => c.name === 'token');
+
         if (game.user.isGM) {
-            const tokenControls = controls.find((c) => c.name === 'token');
             tokenControls.tools.push({
                 name: 'overwatch-score-tracker',
                 title: 'CONTROLS.SR5.OverwatchScoreTracker',
                 icon: 'fas fa-network-wired',
+                button: true
             });
         }
+
+        tokenControls.tools.push(EnvModifiersApplication.getControl());
     }
 
     static renderChatMessage(app, html) {

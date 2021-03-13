@@ -1,0 +1,58 @@
+<div>
+    <h2>{{targetType}}: {{targetName}}</h2>
+</div>
+<div class="sunken">
+    <table>
+        <tr class="env-modifier-category">
+            <th>{{localize "SR5.EnvModifiersApplication.Visibility.Title"}}</th>
+            <th>{{localize "SR5.EnvModifiersApplication.LightGlare.Title"}}</th>
+            <th>{{localize "SR5.EnvModifiersApplication.Wind.Title"}}</th>
+            <th>{{localize "SR5.EnvModifiersApplication.Range.Title"}}</th>
+            <th>{{localize "SR5.EnvModifiersApplication.Modifier.Title"}}</th>
+        </tr>
+        <tr class="env-modifier-category">
+            <td class="env-modifier-level"><button class="env-modifier {{#if (IsEnvModifierActive active 'visibility' levels.good)}}sunken env-modifier-active{{/if}}" data-category="visibility" data-value="{{levels.good}}" {{#if disableForm}}disabled{{/if}}>{{localize "SR5.EnvModifiersApplication.Visibility.Good"}}</button></td>
+            <td class="env-modifier-level"><button class="env-modifier {{#if (IsEnvModifierActive active 'light' levels.good)}}sunken env-modifier-active{{/if}}" data-category="light" data-value="{{levels.good}}" {{#if disableForm}}disabled{{/if}}>{{localize "SR5.EnvModifiersApplication.LightGlare.Good"}}</button></td>
+            <td class="env-modifier-level"><button class="env-modifier {{#if (IsEnvModifierActive active 'wind' levels.good)}}sunken env-modifier-active{{/if}}" data-category="wind" data-value="{{levels.good}}" {{#if disableForm}}disabled{{/if}}>{{localize "SR5.EnvModifiersApplication.Wind.Good"}}</button></td>
+            <td class="env-modifier-level"><button class="env-modifier {{#if (IsEnvModifierActive active 'range' levels.good)}}sunken env-modifier-active{{/if}}" data-category="range" data-value="{{levels.good}}" {{#if disableForm}}disabled{{/if}}>{{localize "SR5.EnvModifiersApplication.Range.Good"}}</button></td>
+            <td class="env-modifier-level"><button class="env-modifier {{#if (IsEnvModifierActive active 'value' levels.good)}}sunken env-modifier-active{{/if}}" data-category="value" data-value="{{levels.good}}" {{#if disableForm}}disabled{{/if}}>{{levels.good}}</button></td>
+        </tr>
+        <tr class="env-modifier-category">
+            <td class="env-modifier-level"><button class="env-modifier {{#if (IsEnvModifierActive active 'visibility' levels.light)}}sunken env-modifier-active{{/if}}" data-category="visibility" data-value="{{levels.light}}" {{#if disableForm}}disabled{{/if}}>{{localize "SR5.EnvModifiersApplication.Visibility.Light"}}</button></td>
+            <td class="env-modifier-level"><button class="env-modifier {{#if (IsEnvModifierActive active 'light' levels.light)}}sunken env-modifier-active{{/if}}" data-category="light" data-value="{{levels.light}}" {{#if disableForm}}disabled{{/if}}>{{localize "SR5.EnvModifiersApplication.LightGlare.Light"}}</button></td>
+            <td class="env-modifier-level"><button class="env-modifier {{#if (IsEnvModifierActive active 'wind' levels.light)}}sunken env-modifier-active{{/if}}" data-category="wind" data-value="{{levels.light}}" {{#if disableForm}}disabled{{/if}}>{{localize "SR5.EnvModifiersApplication.Wind.Light"}}</button></td>
+            <td class="env-modifier-level"><button class="env-modifier {{#if (IsEnvModifierActive active 'range' levels.light)}}sunken env-modifier-active{{/if}}" data-category="range" data-value="{{levels.light}}" {{#if disableForm}}disabled{{/if}}>{{localize "SR5.EnvModifiersApplication.Range.Light"}}</button></td>
+            <td class="env-modifier-level"><button class="env-modifier {{#if (IsEnvModifierActive active 'value' levels.light)}}sunken env-modifier-active{{/if}}" data-category="value" data-value="{{levels.light}}" {{#if disableForm}}disabled{{/if}}>{{levels.light}}</button></td>
+        </tr>
+        <tr class="env-modifier-category">
+            <td class="env-modifier-level"><button class="env-modifier {{#if (IsEnvModifierActive active 'visibility' levels.moderate)}}sunken env-modifier-active{{/if}}" data-category="visibility" data-value="{{levels.moderate}}" {{#if disableForm}}disabled{{/if}}>{{localize "SR5.EnvModifiersApplication.Visibility.Moderate"}}</button></td>
+            <td class="env-modifier-level"><button class="env-modifier {{#if (IsEnvModifierActive active 'light' levels.moderate)}}sunken env-modifier-active{{/if}}" data-category="light" data-value="{{levels.moderate}}" {{#if disableForm}}disabled{{/if}}>{{localize "SR5.EnvModifiersApplication.LightGlare.Moderate"}}</button></td>
+            <td class="env-modifier-level"><button class="env-modifier {{#if (IsEnvModifierActive active 'wind' levels.moderate)}}sunken env-modifier-active{{/if}}" data-category="wind" data-value="{{levels.moderate}}" {{#if disableForm}}disabled{{/if}}>{{localize "SR5.EnvModifiersApplication.Wind.Moderate"}}</button></td>
+            <td class="env-modifier-level"><button class="env-modifier {{#if (IsEnvModifierActive active 'range' levels.moderate)}}sunken env-modifier-active{{/if}}" data-category="range" data-value="{{levels.moderate}}" {{#if disableForm}}disabled{{/if}}>{{localize "SR5.EnvModifiersApplication.Range.Moderate"}}</button></td>
+            <td class="env-modifier-level"><button class="env-modifier {{#if (IsEnvModifierActive active 'value' levels.moderate)}}sunken env-modifier-active{{/if}}" data-category="value" data-value="{{levels.moderate}}" {{#if disableForm}}disabled{{/if}}>{{levels.moderate}}</button></td>
+        </tr>
+        <tr class="env-modifier-category">
+            <td class="env-modifier-level"><button class="env-modifier {{#if (IsEnvModifierActive active 'visibility' levels.heavy)}}sunken env-modifier-active{{/if}}" data-category="visibility" data-value="{{levels.heavy}}" {{#if disableForm}}disabled{{/if}}>{{localize "SR5.EnvModifiersApplication.Visibility.Heavy"}}</button></td>
+            <td class="env-modifier-level"><button class="env-modifier {{#if (IsEnvModifierActive active 'light' levels.heavy)}}sunken env-modifier-active{{/if}}" data-category="light" data-value="{{levels.heavy}}" {{#if disableForm}}disabled{{/if}}>{{localize "SR5.EnvModifiersApplication.LightGlare.Heavy"}}</button></td>
+            <td class="env-modifier-level"><button class="env-modifier {{#if (IsEnvModifierActive active 'wind' levels.heavy)}}sunken env-modifier-active{{/if}}" data-category="wind" data-value="{{levels.heavy}}" {{#if disableForm}}disabled{{/if}}>{{localize "SR5.EnvModifiersApplication.Wind.Heavy"}}</button></td>
+            <td class="env-modifier-level"><button class="env-modifier {{#if (IsEnvModifierActive active 'range' levels.heavy)}}sunken env-modifier-active{{/if}}" data-category="range" data-value="{{levels.heavy}}" {{#if disableForm}}disabled{{/if}}>{{localize "SR5.EnvModifiersApplication.Range.Heavy"}}</button></td>
+            <td class="env-modifier-level"><button class="env-modifier {{#if (IsEnvModifierActive active 'value' levels.heavy)}}sunken env-modifier-active{{/if}}" data-category="value" data-value="{{levels.heavy}}" {{#if disableForm}}disabled{{/if}}>{{levels.heavy}}</button></td>
+        </tr>
+        <tr class="env-modifier-category">
+            <td colspan="4">{{localize "SR5.EnvModifiersApplication.Extreme"}}</td>
+            <td class="env-modifier-level"><button class="env-modifier {{#if (IsEnvModifierActive active 'value' levels.extreme)}}sunken env-modifier-active{{/if}}" data-category="value" data-value="{{levels.extreme}}" {{#if disableForm}}disabled{{/if}}>{{levels.extreme}}</button></td>
+        </tr>
+        <tr class="env-modifier-category">
+            <td colspan="3"></td>
+            <td class="env-modifier-total">{{localize "SR5.EnvModifiersApplication.Total"}}</td>
+            <td class="sunken">{{total}}</td>
+        </tr>
+    </table>
+</div>
+<div>
+</div>
+<div class="dialog-buttons">
+    <button class="dialog-button remove-modifiers-from-target default" {{#if disableForm}}disabled{{/if}}>
+        {{localize "SR5.EnvModifiersApplication.ClearModifiers"}}
+    </button>
+</div>

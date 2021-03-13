@@ -590,6 +590,7 @@
   "SR5.MIGRATION.SuccessNotification": "Shadowrun System erfolgreich migriert zu Version",
 
   "CONTROLS.SR5.OverwatchScoreTracker": "Overwatch Wert Übersicht",
+  "CONTROLS.SR5.EnvironmentalModifiers": "Umgebungsmodifikatoren",
 
   "SR5.DIALOG.MissingModuleContent": "Um das Quell-PDF anzuzeigen, muss das Modul PDFoundry installiert sein und ein PDF mit passendem Code erstellt werden.",
 
@@ -784,5 +785,48 @@
         "Cancel": "Nein",
         "Consent": "Bist du sicher?",
         "Description": "Das Löschen eines Eintrags kann nicht rückgängig gemacht werden!"
+    },
+  "SR5.EnvModifiersApplication": {
+    "Title": "Umgebungsmodifikatoren",
+    "Visibility": {
+      "Title": "Sichtverhältnisse",
+      "Good": "Freie Sicht",
+      "Light": "Leichte Regen/Nebel/Rauch",
+      "Moderate": "Mittlerer Regen/Nebel/Rauch",
+      "Heavy": "Starker Regen/Nebel/Rauch"
+    },
+    "LightGlare": {
+      "Title": "Beleuchtung",
+      "Good": "Gute Beleuchtung/Keine Blendung",
+      "Light": "Teilbeleuchtung/Schwache Blendung",
+      "Moderate": "Schwache Beleuchtung/Mittlere Blendung",
+      "Heavy": "Völlige Dunkelheit/Starke Blendung"
+    },
+    "Wind": {
+      "Title": "Wind",
+      "Good": "Bis leichte Brise",
+      "Light": "Leichter Wind",
+      "Moderate": "Steife Brise",
+      "Heavy": "Sturm"
+    },
+    "Range": {
+      "Title": "Entfernung",
+      "Good": "Kurz",
+      "Light": "Mittel",
+      "Moderate": "Lang",
+      "Heavy": "Maximal"
+    },
+    "Modifier": {
+      "Title": "Modifikator"
+    },
+    "Extreme": "Zwei oder mehr Modifikatoren der Kategorie Schwer",
+    "Total": "Ergebnis",
+    "ClearModifiers": "Entferne eigene Modifikatoren"
+  },
+
+  "SR5.Dialogs": {
+        "RangedWeaponTest": {
+            "EnvironmentalOverwriteSet": "Umgebungsmodifikatoren wurden manuell auf einen fixen Wert gesetzt!"
+        }
     }
 }

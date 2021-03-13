@@ -603,6 +603,7 @@
     "SR5.MIGRATION.SuccessNotification": "Shadowrun system successfully migrated to version",
 
     "CONTROLS.SR5.OverwatchScoreTracker": "Overwatch Score Tracker",
+    "CONTROLS.SR5.EnvironmentalModifiers": "Environmental Modifiers",
 
     "SR5.DIALOG.MissingModuleContent": "In order for source PDFs to be shown, the PDFoundry module must be installed and a PDF matching the code created.",
 
@@ -812,5 +813,49 @@
         "Cancel": "No",
         "Consent": "Are you sure?",
         "Description": "Deleting an item can't be reversed!"
+    },
+
+  "SR5.EnvModifiersApplication": {
+    "Title": "Environmental Modifiers",
+    "Visibility": {
+      "Title": "Visibility",
+      "Good": "Clear",
+      "Light": "Light Rain/Fog/Smoke",
+      "Moderate": "Moderate Rain/Fog/Smoke",
+      "Heavy": "Heavy Rain/Fog/Smoke"
+    },
+    "LightGlare": {
+      "Title": "Light/Glare",
+      "Good": "Full Light/No Glare",
+      "Light": "Partial Light/Weak Glare",
+      "Moderate": "Dim Light/Moderate Glare",
+      "Heavy": "Total Darkness/Blinding Glare"
+    },
+    "Wind": {
+      "Title": "Wind",
+      "Good": "None or Light Breeze",
+      "Light": "Light Winds",
+      "Moderate": "Moderate Winds",
+      "Heavy": "Strong Winds"
+    },
+    "Range": {
+      "Title": "Range",
+      "Good": "Short",
+      "Light": "Medium",
+      "Moderate": "Long",
+      "Heavy": "Extreme"
+    },
+    "Modifier": {
+      "Title": "Modifier"
+    },
+    "Extreme": "Combination of two or more conditions at the heavy level",
+    "Total": "Result",
+    "ClearModifiers": "Clear personal modifiers"
+  },
+
+    "SR5.Dialogs": {
+        "RangedWeaponTest": {
+            "EnvironmentalOverwriteSet": "Environmental modifiers have been manually set to a fixed value!"
+        }
     }
 }

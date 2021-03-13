@@ -35,6 +35,8 @@ import ConditionData = Shadowrun.ConditionData;
 import SR5SpiritType = Shadowrun.SR5SpiritType;
 import SR5SpriteType = Shadowrun.SR5SpriteType;
 import SR5CritterType = Shadowrun.SR5CritterType;
+import SituationModifiers = Shadowrun.SituationModifiers;
+import {Modifiers} from "../sr5/Modifiers";
 import { SoakFlow } from './SoakFlow';
 import { DefaultValues } from '../dataTemplates';
 
@@ -1503,5 +1505,26 @@ export class SR5Actor extends Actor {
      */
     matchesActorTypes(types: string[]): boolean {
         return types.includes(this.data.type);
+    }
+
+    /** TODO: method documentation
+     *
+     * @param ignoreScene Set to true to ignore modifiers set on active or given scene.
+     * @param scene Should a scene be used as a fallback, provide this here. Otherwise current scene will be used.
+     */
+    async getModifiers(ignoreScene: boolean=false, scene: Scene=canvas.scene): Promise<Modifiers> {
+        const onActor = await Modifiers.getModifiersFromEntity(this);
+
+        if (onActor.hasActiveEnvironmental) {
+            return onActor;
+        } else if (ignoreScene) {
+            return new Modifiers(Modifiers.getDefaultModifiers());
+        } else {
+            return await Modifiers.getModifiersFromEntity(scene);
+        }
+    }
+
+    async setModifiers(modifiers: Modifiers) {
+        await Modifiers.setModifiersOnEntity(this, modifiers.modifiers);
     }
 }
