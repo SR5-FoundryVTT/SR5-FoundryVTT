@@ -9,7 +9,6 @@ export type EnvModifiersTarget = Scene | SR5Actor;
 /** Helper window for easy overview and selection of environmental modifiers and their calculated total.
  *
  */
-// TODO: Call / receive an 'update token' hook to propagate changes immediately.
 export class EnvModifiersApplication extends Application {
     target: EnvModifiersTarget;
     modifiers: Modifiers;
@@ -96,6 +95,8 @@ export class EnvModifiersApplication extends Application {
 
         await this.clearModifiersOnTarget();
 
+        this._updateTokenHUDTotalDisplay();
+
         await this.render();
     }
 
@@ -105,7 +106,15 @@ export class EnvModifiersApplication extends Application {
         this.modifiers.toggleEnvironmentalCategory(category, level);
     }
 
+    /** Return the modifiers that best match the current target type
+     */
     async _getModifiers(): Promise<Modifiers> {
+        // Actor targets might have no personal modifiers, but still see the scene modifiers then, and use those
+        // as a template for their local modifiers.
+        if (this.target instanceof SR5Actor) {
+            return await this.target.getModifiers();
+        }
+        // All other types are handled without special cases.
         return await Modifiers.getModifiersFromEntity(this.target);
     }
 
@@ -127,7 +136,9 @@ export class EnvModifiersApplication extends Application {
     }
 
     async clearModifiersOnTarget() {
-        this.modifiers = await Modifiers.clearEnvironmentalOnEntity(this.target);
+        await Modifiers.clearEnvironmentalOnEntity(this.target);
+        // Refresh modifiers. This can be necessary for Actor targets without modifiers when Scene modifiers are present.
+        this.modifiers = await this._getModifiers();
     }
 
     _getTargetTypeLabel(): string {
