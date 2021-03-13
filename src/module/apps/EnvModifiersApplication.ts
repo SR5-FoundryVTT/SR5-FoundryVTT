@@ -3,7 +3,6 @@ import {Helpers} from "../helpers";
 import {SR5Actor} from "../actor/SR5Actor";
 import {Modifiers} from "../sr5/Modifiers";
 import EnvironmentalModifierCategories = Shadowrun.EnvironmentalModifierCategories;
-import SituationModifiers = Shadowrun.SituationModifiers;
 
 export type EnvModifiersTarget = Scene|SR5Actor;
 
@@ -11,13 +10,6 @@ export type EnvModifiersTarget = Scene|SR5Actor;
  *
  */
 // TODO: Call / receive an 'update token' hook to propagate changes immediately.
-// TODO: Add env modifier button to token context menu
-// TODO: Add env modifier button to scene context menu
-// TODO: Show Scene modifier total in token app
-// TODO: Modifiers target hierarchy
-// TODO: Give a input to display meters for an active weapon in the range column
-// TODO: Toggle display of the range column (scene type)
-// TODO: Update display for all users when a change is made
 export class EnvModifiersApplication extends Application {
     target: EnvModifiersTarget;
     modifiers: Modifiers;
