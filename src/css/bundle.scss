@@ -657,6 +657,10 @@ select.display {
     button.env-modifier {
         text-align: left;
     }
+    .env-modifier-active {
+        box-shadow: 0 0 0.25em 0.15em $white;
+        border-radius: 8px;
+    }
     .env-modifier-total {
         font-weight: bold;
     }
