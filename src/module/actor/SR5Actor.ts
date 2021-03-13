@@ -37,6 +37,8 @@ import SR5SpriteType = Shadowrun.SR5SpriteType;
 import SR5CritterType = Shadowrun.SR5CritterType;
 import SituationModifiers = Shadowrun.SituationModifiers;
 import {Modifiers} from "../sr5/Modifiers";
+import { SoakFlow } from './SoakFlow';
+import { DefaultValues } from '../dataTemplates';
 
 export class SR5Actor extends Actor {
     data: SR5ActorType;
@@ -124,9 +126,11 @@ export class SR5Actor extends Actor {
         return "armor" in this.data.data;
     }
 
-    getArmor(): ActorArmorData | undefined {
+    getArmor(): ActorArmorData {
         if ("armor" in this.data.data)
             return this.data.data.armor;
+
+        return DefaultValues.actorArmorData();
     }
 
     getOwnedSR5Item(itemId: string): SR5Item | null {
@@ -508,33 +512,7 @@ export class SR5Actor extends Actor {
 
     // TODO: Abstract handling of const damage : ModifiedDamageData
     async rollSoak(options: SoakRollOptions, partsProps: ModList<number> = []): Promise<ShadowrunRoll|undefined> {
-        const soakDialog = await ShadowrunActorDialogs.createSoakDialog(this, options, partsProps);
-        const soakActionData = await soakDialog.select();
-
-        if (soakDialog.canceled) return;
-
-        // Show the actual Soak Test.
-        const title = game.i18n.localize('SR5.SoakTest');
-        const actor = this;
-        const roll = await ShadowrunRoller.advancedRoll({
-            event: options?.event,
-            actor,
-            parts: soakActionData.parts.list,
-            title,
-            wounds: false,
-            hideRollMessage: true
-        });
-
-        if (!roll) return;
-
-        // Reduce damage by damage resist
-        const incoming = soakActionData.soak;
-        // Avoid cross referencing.
-        const damage = Helpers.modifyDamageByHits(incoming, roll.hits, 'SR5.SoakTest');
-
-        await createRollChatMessage({title, roll, actor, damage});
-
-        return roll;
+        return new SoakFlow().run(this, options, partsProps);
     }
 
     rollSingleAttribute(attId, options: ActorRollOptions) {
@@ -1004,18 +982,6 @@ export class SR5Actor extends Actor {
                 parts.addUniquePart(part.name, part.value);
             }
         }
-    }
-
-    _addSoakParts(parts: PartsList<number>) {
-        const body = this.findAttribute('body');
-        if (body) {
-            parts.addUniquePart(body.label || 'SR5.Body', body.value);
-        }
-        const mod = this.getModifier('soak');
-        if (mod) {
-            parts.addUniquePart('SR5.Bonus', mod);
-        }
-        this._addArmorParts(parts);
     }
 
     static async pushTheLimit(li) {
