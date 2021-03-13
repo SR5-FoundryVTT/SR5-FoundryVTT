@@ -96,7 +96,6 @@ export class EnvModifiersApplication extends Application {
         await this.render();
     }
 
-    // TODO: Move into separate shadowrun rule area
     /**
      */
     _toggleActiveModifierCategory(category: keyof EnvironmentalModifierCategories, level: number) {
@@ -104,13 +103,6 @@ export class EnvModifiersApplication extends Application {
     }
 
     async _getModifiers(): Promise<Modifiers> {
-        // if (await this._targetHasEnvironmentalModifiers()) {
-        //     return await Modifiers.getModifiersFromEntity(this.target);
-        // } else {
-        //     console.error('should not happen');
-        //     return new Modifiers(Modifiers.getDefaultModifiers());
-        // }
-
         return await Modifiers.getModifiersFromEntity(this.target);
     }
 
@@ -154,23 +146,22 @@ export class EnvModifiersApplication extends Application {
         return !(game.user.isGM || entity.owner);
     }
 
-    static async openForActiveScene() {
-        if (!game.scenes.active) return;
-        await new EnvModifiersApplication(game.scenes.active).render(true);
+    static async openForCurrentScene() {
+        if (!canvas.scene) return;
+        await new EnvModifiersApplication(canvas.scene).render(true);
     }
 
-    // TODO: The premise between openForActiveScene and openForTokenHUD is vastly different, but both methods have the
-    //       same naming scheme... Quite confusing
+    // TODO: Check if tokenId is giveen via hook data
     static openForTokenHUD(tokenId: string) {
         const token = Helpers.getToken(tokenId);
 
         // Create an anonymous event handler
-        return (event) => {
+        return async (event) => {
             event.preventDefault();
 
             if (!token || !token.actor) return;
 
-            new EnvModifiersApplication(token.actor).render(true);
+            await new EnvModifiersApplication(token.actor).render(true);
         }
     }
 
@@ -181,7 +172,7 @@ export class EnvModifiersApplication extends Application {
             name: 'environmental-modifiers-application',
             title: 'CONTROLS.SR5.EnvironmentalModifiers',
             icon: 'fas fa-list',
-            onClick: EnvModifiersApplication.openForActiveScene,
+            onClick: EnvModifiersApplication.openForCurrentScene,
             button: true
         }
     }
