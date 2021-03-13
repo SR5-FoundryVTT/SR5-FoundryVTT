@@ -1072,19 +1072,15 @@ select.display {
       background: #e6e6e6; }
   .sr5 button.env-modifier {
     text-align: left; }
+  .sr5 .env-modifier-active {
+    box-shadow: 0 0 0.25em 0.15em white;
+    border-radius: 8px; }
   .sr5 .env-modifier-total {
     font-weight: bold; }
   .sr5 tr.env-modifier-category {
     height: 45px; }
   .sr5 td.env-modifier-level {
     padding-right: 6px; }
-  .sr5 .sr5-token-hud-container {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-end;
-    align-items: center;
-    margin-right: 75px;
-    flex: 0 !important; }
 
 /** Replicate Foundry .dialog stiling for flex row buttons. FormDialog sublcasses simply adding class dialog will
  * otherwise cause issues with custom button styling.
@@ -1096,5 +1092,37 @@ select.display {
 
 .form-dialog .window-content .dialog-buttons > * {
   flex: 1; }
+
+.far-right {
+  justify-content: center;
+  right: -150px; }
+
+.sr-modifier-container .modifier-column {
+  padding-top: 66px;
+  display: block;
+  font-weight: bold;
+  font-size: 18px; }
+
+.sr-modifier-container .modifier-row {
+  position: relative;
+  display: grid;
+  flex-wrap: wrap;
+  align-items: stretch;
+  width: 160px;
+  background: rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 15px #000;
+  border: 1px solid #333;
+  color: #DDD;
+  height: 40px;
+  line-height: 40px;
+  margin-bottom: 18px;
+  border-radius: 8px;
+  pointer-events: all;
+  grid-template-columns: 36px auto; }
+  .sr-modifier-container .modifier-row .open-environmental-modifier {
+    cursor: pointer; }
+    .sr-modifier-container .modifier-row .open-environmental-modifier:hover {
+      box-shadow: 0 0 0.25em 0.15em white;
+      border-radius: 8px; }
 
 /*# sourceMappingURL=bundle.css.map */
