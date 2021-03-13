@@ -4,7 +4,7 @@ import {SR5Actor} from "../actor/SR5Actor";
 import {Modifiers} from "../sr5/Modifiers";
 import EnvironmentalModifierCategories = Shadowrun.EnvironmentalModifierCategories;
 
-export type EnvModifiersTarget = Scene|SR5Actor;
+export type EnvModifiersTarget = Scene | SR5Actor;
 
 /** Helper window for easy overview and selection of environmental modifiers and their calculated total.
  *
@@ -74,7 +74,21 @@ export class EnvModifiersApplication extends Application {
         await this._clearModifiersOnTargetForNoSelection();
         await this._storeModifiersOnTarget();
 
+        this._updateTokenHUDTotalDisplay();
+
         await this.render();
+    }
+
+    /** Updates opened tokenHUD modifier values.
+     *
+     * Doing it this way is just easier as relying on any update / hook workflow.
+     */
+    _updateTokenHUDTotalDisplay() {
+        if (this.target instanceof SR5Actor) {
+            $('.modifier-value-environmental').each((index, element) => {
+                $(element).html(this.modifiers.environmental.total.toString());
+            });
+        }
     }
 
     async _handleRemoveModifiersFromTarget(event: Event) {
@@ -107,7 +121,7 @@ export class EnvModifiersApplication extends Application {
         }
     }
 
-     async _targetHasEnvironmentalModifiers() {
+    async _targetHasEnvironmentalModifiers() {
         const modifiers = await Modifiers.getModifiersFromEntity(this.target);
         return !!modifiers.environmental;
     }
@@ -185,7 +199,7 @@ export class EnvModifiersApplication extends Application {
         const container = $('<div class="col far-right sr-modifier-container"></div>');
         const column = $('<div class="col modifier-column"></div>');
         const modifier = $('<div class="modifier-row"></div>');
-        const modifierValue = $(`<div class="modifier-value">${modifiers.environmental.total}</div>`);
+        const modifierValue = $(`<div class="modifier-value modifier-value-environmental">${modifiers.environmental.total}</div>`);
         const modifierDescription = $(`<div class="modifier-description open-environmental-modifier">${game.i18n.localize("SR5.EnvironmentModifier")}</div>`);
         modifierDescription.on('click', EnvModifiersApplication.openForTokenHUD(data._id));
 
