@@ -666,15 +666,6 @@ select.display {
     td.env-modifier-level {
         padding-right: 6px;
     }
-
-    .sr5-token-hud-container {
-        display: flex;
-        flex-direction: row;
-        justify-content: flex-end;
-        align-items: center;
-        margin-right: 75px;
-        flex: 0 !important;
-    }
 }
 
 /** Replicate Foundry .dialog stiling for flex row buttons. FormDialog sublcasses simply adding class dialog will
@@ -687,4 +678,53 @@ select.display {
 }
 .form-dialog .window-content .dialog-buttons > * {
     flex: 1;
+}
+
+.far-right {
+    justify-content: center;
+    right: -150px;
+}
+
+.sr-modifier-container {
+
+    .modifier-column {
+        padding-top: 38px;
+        // Stop flexing.
+        display: block;
+        font-weight: bold;
+        font-size: 18px;
+    }
+
+    .modifier-row {
+        position: relative;
+        display: grid;
+        flex-wrap: wrap;
+        align-items: stretch;
+        width: 160px;
+        background: rgba(0, 0, 0, 0.6);
+        box-shadow: 0 0 15px #000;
+        border: 1px solid #333;
+        color: #DDD;
+        height: 40px;
+        line-height: 40px;
+        margin-bottom: 18px;
+        border-radius: 8px;
+        pointer-events: all;
+        grid-template-columns: 36px auto;
+
+        .modifier-value {
+        }
+
+        .modifier-description {
+        }
+
+        .open-environmental-modifier {
+            cursor: pointer;
+
+            &:hover {
+                box-shadow: 0 0 0.25em 0.15em $white;
+                border-radius: 8px;
+            }
+        }
+    }
 }

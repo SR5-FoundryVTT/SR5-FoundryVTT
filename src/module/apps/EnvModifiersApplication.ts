@@ -140,11 +140,14 @@ export class EnvModifiersApplication extends Application {
         await new EnvModifiersApplication(canvas.scene).render(true);
     }
 
-    // TODO: Check if tokenId is giveen via hook data
+    /** Part of the tokenHUD workflow makes it necessary to have the token id piped in
+     *
+     * @param tokenId
+     */
     static openForTokenHUD(tokenId: string) {
         const token = Helpers.getToken(tokenId);
 
-        // Create an anonymous event handler
+        // When the token hud control is activated, this inline handler will be called with it.
         return async (event) => {
             event.preventDefault();
 
@@ -166,13 +169,32 @@ export class EnvModifiersApplication extends Application {
         }
     }
 
-    static addTokenHUDFields(app: TokenHUD, html: JQuery, data) {
+    // TODO: Implement system wide token HUD management...
+    static async addTokenHUDFields(app: TokenHUD, html: JQuery, data) {
+        if (!data._id) return;
+
         console.log(`${SYSTEM_NAME} | Environmental Modifier HUD on renderTokenHUD`);
 
-        // TODO: Implement system wide token HUD management...
-        // let srTokenHUD = $('<div class="sr5-token-hud-container">Test</div>');
-        const controlIcon = $('<div class="control-icon sr5-environmental-modifier"><i class="fas fa-list" title="Environmental Modifiers"></i></div>');
-        html.find('.control-icon.combat').after(controlIcon);
-        html.find('.sr5-environmental-modifier').on('click', EnvModifiersApplication.openForTokenHUD(data._id));
+        const token = Helpers.getToken(data._id);
+        if (!token) return;
+
+        const actor = token.actor as SR5Actor;
+        const modifiers = await actor.getModifiers();
+
+        // Setup and connect tokenHUD elements.
+        const container = $('<div class="col far-right sr-modifier-container"></div>');
+        const column = $('<div class="col modifier-column"></div>');
+        const modifier = $('<div class="modifier-row"></div>');
+        const modifierValue = $(`<div class="modifier-value">${modifiers.environmental.total}</div>`);
+        const modifierDescription = $(`<div class="modifier-description open-environmental-modifier">${game.i18n.localize("SR5.EnvironmentModifier")}</div>`);
+        modifierDescription.on('click', EnvModifiersApplication.openForTokenHUD(data._id));
+
+        container.append(column);
+        column.append(modifier);
+        modifier.append(modifierValue);
+        modifier.append(modifierDescription);
+
+        // Connect SR-FoundryVTT tokenHUD elements to FoundryVTT tokenHUD column structure.
+        html.find('.col.right').after(container);
     }
 }
