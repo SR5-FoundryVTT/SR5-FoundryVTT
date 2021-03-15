@@ -35,6 +35,14 @@ export class HooksManager {
         Hooks.on('getCombatTrackerEntryContext', SR5Combat.addCombatTrackerContextOptions);
         Hooks.on('renderItemDirectory', HooksManager.renderItemDirectory);
         Hooks.on('renderTokenHUD', EnvModifiersApplication.addTokenHUDFields);
+
+        // if (process.env.NODE_ENV === 'development') {
+        import('../test/quench').then(({quenchRegister}) => {
+            console.error(quenchRegister);
+            Hooks.on('quenchReady', quenchRegister);
+        })
+        // }
+
     }
 
     static init() {

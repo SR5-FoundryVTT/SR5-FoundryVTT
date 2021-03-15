@@ -10,7 +10,7 @@ export class Modifiers {
     constructor(data: SituationModifiers) {
         // Fail gracefully for no modifiers given.
         // This can happen as Foundry returns empty objects for no flags set.
-        if (typeof data !== 'object' || !data.environmental) {
+        if (!data || typeof data !== 'object' || !("environmental" in data)) {
             data = Modifiers.getDefaultModifiers();
         }
 
