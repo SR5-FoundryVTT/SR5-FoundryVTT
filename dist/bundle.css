@@ -1118,7 +1118,11 @@ select.display {
   margin-bottom: 18px;
   border-radius: 8px;
   pointer-events: all;
-  grid-template-columns: 36px auto; }
+  grid-template-columns: 36px auto;
+  overflow: hidden; }
+  .sr-modifier-container .modifier-row .modifier-description {
+    text-overflow: clip;
+    white-space: nowrap; }
   .sr-modifier-container .modifier-row .open-environmental-modifier {
     cursor: pointer; }
     .sr-modifier-container .modifier-row .open-environmental-modifier:hover {

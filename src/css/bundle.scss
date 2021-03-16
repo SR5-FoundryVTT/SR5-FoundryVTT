@@ -715,11 +715,14 @@ select.display {
         border-radius: 8px;
         pointer-events: all;
         grid-template-columns: 36px auto;
+        overflow: hidden;
 
         .modifier-value {
         }
 
         .modifier-description {
+            text-overflow: clip;
+            white-space: nowrap;
         }
 
         .open-environmental-modifier {
