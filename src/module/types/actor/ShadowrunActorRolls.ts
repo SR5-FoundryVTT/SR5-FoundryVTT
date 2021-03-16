@@ -34,7 +34,7 @@ declare namespace Shadowrun {
 
     type ModifiedDamageData = {
         incoming: DamageData
-        modified?: DamageData
+        modified: DamageData
     }
 
     type DrainData = LabelField & {

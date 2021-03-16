@@ -400,12 +400,39 @@ export class Helpers {
         return damage;
     }
 
+    /** Modifies given damage value and returns both original and modified damage
+     *
+     * For better readability reduceDamageByHits wraps this method to avoid negative params in the call signature.
+     * so instead of
+     * > modifyDamageByHits(incoming, -hits, label)
+     * do this instead
+     * > reduceDamageByHits(incoming, hits, label)
+     *
+     * @param incoming A DamageData value to be modified from
+     * @param hits Positive or negative hits to change the damage value with.
+     * @param modificationLabel The translatable label for the modification
+     */
     static modifyDamageByHits(incoming: DamageData, hits: number, modificationLabel: string): ModifiedDamageData {
         const modified = duplicate(incoming);
-        modified.mod = PartsList.AddUniquePart(modified.mod, modificationLabel, -hits);
+        modified.mod = PartsList.AddUniquePart(modified.mod, modificationLabel, hits);
         modified.value = Helpers.calcTotal(modified, {min: 0});
 
         return {incoming, modified};
+    }
+
+    /** Reduces given damage value and returns both original and modified damage.
+     *
+     * Should you want RAISE the damage value, use modifyDamageByHits directly.
+     *
+     * @param incoming A DamageData value to be modified from
+     * @param hits Positive hits to reduce the damage value with! Should the hits amount be negative, use modifyDamageByHits.
+     * @param modificationLabel The translatable label for the modification
+     */
+    static reduceDamageByHits(incoming: DamageData, hits: number, modificationLabel: string): ModifiedDamageData {
+        if (hits < 0) {
+            console.warn('Helpers.reduceDamageByHits should only be called with positive hits values to avoid confusion');
+        }
+        return Helpers.modifyDamageByHits(incoming, -hits, modificationLabel);
     }
 
     static async confirmDeletion(): Promise<boolean> {

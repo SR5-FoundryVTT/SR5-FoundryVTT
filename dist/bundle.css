@@ -742,6 +742,8 @@ select.display {
   /** CSS for the Environmental Modifier Application Window
      *
      */ }
+  .sr5 .entity-link {
+    color: black; }
   .sr5 .roll:hover {
     text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
     cursor: pointer;
@@ -1118,7 +1120,11 @@ select.display {
   margin-bottom: 18px;
   border-radius: 8px;
   pointer-events: all;
-  grid-template-columns: 36px auto; }
+  grid-template-columns: 36px auto;
+  overflow: hidden; }
+  .sr-modifier-container .modifier-row .modifier-description {
+    text-overflow: clip;
+    white-space: nowrap; }
   .sr-modifier-container .modifier-row .open-environmental-modifier {
     cursor: pointer; }
     .sr-modifier-container .modifier-row .open-environmental-modifier:hover {

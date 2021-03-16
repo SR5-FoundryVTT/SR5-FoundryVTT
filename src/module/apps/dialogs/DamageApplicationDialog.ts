@@ -27,8 +27,7 @@ export class DamageApplicationDialog extends FormDialog {
         const actorDamage = actors.map(actor => {
             return {
                 actor,
-                // Don't change damage type for grunt to avoid confusing user.
-                modified: actor._applyDamageTypeChangeForArmor(damage),
+                modified: damage,
                 armor: actor.getModifiedArmor(damage)
             }
         });
@@ -41,9 +40,6 @@ export class DamageApplicationDialog extends FormDialog {
         const buttons = {
             damage: {
                 label: game.i18n.localize('SR5.DamageApplication.ApplyDamage')
-            },
-            unmodifiedDamage: {
-                label: game.i18n.localize('SR5.DamageApplication.ApplyUnmodifiedDamage')
             }
         }
 

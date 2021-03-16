@@ -13,7 +13,6 @@ export type ShadowrunTemplateData = {
 export default // @ts-ignore
 class Template extends MeasuredTemplate {
     data: ShadowrunTemplateData;
-    layer: PlaceablesLayer;
     x: number;
     y: number;
     item?: SR5Item;

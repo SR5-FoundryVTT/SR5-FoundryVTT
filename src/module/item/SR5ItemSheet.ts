@@ -1,11 +1,11 @@
 import { Helpers } from '../helpers';
 import { SR5Item } from './SR5Item';
+import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
  */
-export class SR5ItemSheet extends ItemSheet {
-    item: SR5Item;
+export class SR5ItemSheet extends ItemSheet<{}, SR5Item> {
     private _shownDesc: any[];
     private _scroll: string;
     constructor(...args) {
