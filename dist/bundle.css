@@ -742,6 +742,8 @@ select.display {
   /** CSS for the Environmental Modifier Application Window
      *
      */ }
+  .sr5 .entity-link {
+    color: black; }
   .sr5 .roll:hover {
     text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
     cursor: pointer;
