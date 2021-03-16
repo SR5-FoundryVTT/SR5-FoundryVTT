@@ -35,12 +35,14 @@ import ConditionData = Shadowrun.ConditionData;
 import SR5SpiritType = Shadowrun.SR5SpiritType;
 import SR5SpriteType = Shadowrun.SR5SpriteType;
 import SR5CritterType = Shadowrun.SR5CritterType;
-import SituationModifiers = Shadowrun.SituationModifiers;
 import {Modifiers} from "../sr5/Modifiers";
 import { SoakFlow } from './SoakFlow';
 import { DefaultValues } from '../dataTemplates';
+import SR5ActorData = Shadowrun.SR5ActorData;
 
-export class SR5Actor extends Actor {
+export class SR5Actor extends Actor<SR5ActorData> {
+    // NOTE: Overwrite Actor.data additionally to extends Actor<T as SR5Actortype.Data: SR5ActorData> to still have
+    //       access to Actor.data.type checks.
     data: SR5ActorType;
 
     getOverwatchScore() {
