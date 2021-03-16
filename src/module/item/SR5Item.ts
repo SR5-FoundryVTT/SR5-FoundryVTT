@@ -2,7 +2,7 @@ import {Helpers} from '../helpers';
 import {SR5Actor} from '../actor/SR5Actor';
 import {ActionTestData, ShadowrunItemDialog} from '../apps/dialogs/ShadowrunItemDialog';
 import {ChatData} from './ChatData';
-import {AdvancedRollProps, ShadowrunRoll, ShadowrunRoller, Test} from '../rolls/ShadowrunRoller';
+import {ShadowrunRoll, ShadowrunRoller, Test} from '../rolls/ShadowrunRoller';
 import {createItemChatMessage} from '../chat';
 import {DEFAULT_ROLL_NAME, FLAGS, SYSTEM_NAME} from '../constants';
 import {SR5ItemDataWrapper} from './SR5ItemDataWrapper';
@@ -20,7 +20,6 @@ import BlastData = Shadowrun.BlastData;
 import ConditionData = Shadowrun.ConditionData;
 import SR5ItemType = Shadowrun.SR5ItemType;
 import ActionRollData = Shadowrun.ActionRollData;
-import TrackType = Shadowrun.TrackType;
 import DamageData = Shadowrun.DamageData;
 import DefenseRollOptions = Shadowrun.DefenseRollOptions;
 import SpellDefenseOptions = Shadowrun.SpellDefenseOptions;
@@ -32,11 +31,9 @@ import Sin = Shadowrun.Sin;
 import Weapon = Shadowrun.Weapon;
 import Ammo = Shadowrun.Ammo;
 import TechnologyData = Shadowrun.TechnologyData;
-import RangeData = Shadowrun.RangeData;
 import RangeWeaponData = Shadowrun.RangeWeaponData;
 import SpellRange = Shadowrun.SpellRange;
 import CritterPowerRange = Shadowrun.CritterPowerRange;
-import AdeptPowerData = Shadowrun.AdeptPowerData;
 import AdeptPower = Shadowrun.AdeptPower;
 import Modification = Shadowrun.Modification;
 import Action = Shadowrun.Action;
@@ -55,9 +52,14 @@ import SpritePower = Shadowrun.SpritePower;
 import {ItemAction} from "./ItemAction";
 
 export class SR5Item extends Item {
-    labels: {} = {};
-    items: SR5Item[];
+    // NOTE: In contrast to SR5Actor we can only type Item.data as the typing structure for ItemData doesn't have
+    //       monolithic Item.data.data typing (SR5ActorData) but only one for each Item type. Therefore we can't
+    //       do extends Item<SR5ItemData> as we can with the SR5Actor class.
     data: SR5ItemType;
+    items: SR5Item[];
+
+    labels: {} = {};
+
 
     get actor(): SR5Actor {
         return super.actor as SR5Actor;
@@ -433,8 +435,6 @@ export class SR5Item extends Item {
             }
 
         } else if (this.hasExplosiveAmmo()) {
-            const data = this.data.data as WeaponData;
-
             const ammo = this.getEquippedAmmo();
             const ammoData = ammo.data as Ammo;
             const distance = ammoData.data.blast.radius;

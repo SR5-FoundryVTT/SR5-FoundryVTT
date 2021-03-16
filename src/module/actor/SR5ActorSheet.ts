@@ -20,6 +20,9 @@ let globalSkillAppId: number = -1;
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
+ *
+ * NOTE: ActorSheet<T, A> expects Actor.data.data typing, yet complains about it's general type being not compatible
+ *       with SR5ActorData
  */
 export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
     _shownDesc: string[];
