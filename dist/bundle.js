@@ -14654,6 +14654,9 @@ const config_1 = require("../config");
 let globalSkillAppId = -1;
 /**
  * Extend the basic ActorSheet with some very simple modifications
+ *
+ * NOTE: ActorSheet<T, A> expects Actor.data.data typing, yet complains about it's general type being not compatible
+ *       with SR5ActorData
  */
 class SR5ActorSheet extends ActorSheet {
     constructor(...args) {
@@ -15662,7 +15665,8 @@ class SoakFlow {
             if (damageDataDialog.canceled)
                 return;
             // Update damage with the user input
-            const initialDamageData = (soakRollOptions === null || soakRollOptions === void 0 ? void 0 : soakRollOptions.damage) ? soakRollOptions.damage
+            const initialDamageData = (soakRollOptions === null || soakRollOptions === void 0 ? void 0 : soakRollOptions.damage)
+                ? soakRollOptions.damage
                 : dataTemplates_1.DefaultValues.damageData();
             return this.updateDamageData(initialDamageData, userData.incomingDamage, userData.ap, userData.element);
         });
@@ -16975,7 +16979,7 @@ exports.SkillsPrep = SkillsPrep;
  * @param givenSkill
  * @return merge default skill fields with fields of the given field, only adding new fields in the process.
  */
-exports._mergeWithMissingSkillFields = (givenSkill) => {
+const _mergeWithMissingSkillFields = (givenSkill) => {
     // Only the absolute most necessary fields, not datatype complete to SkillField
     const template = {
         name: "",
@@ -16992,6 +16996,7 @@ exports._mergeWithMissingSkillFields = (givenSkill) => {
     // overwrite false to prohibit existing values to be overwritten with empty values.
     mergeObject(givenSkill, template, { overwrite: false });
 };
+exports._mergeWithMissingSkillFields = _mergeWithMissingSkillFields;
 
 },{"../../../helpers":153,"../../../parts/PartsList":205}],106:[function(require,module,exports){
 "use strict";
@@ -20245,7 +20250,7 @@ exports.SkillEditForm = SkillEditForm;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.measureDistance = void 0;
 // directly pulled from DND5e, just changed the
-exports.measureDistance = function (segments, options = {}) {
+const measureDistance = function (segments, options = {}) {
     //@ts-ignore
     // basegrid isn't typed, options aren't really important
     if (!options.gridSpaces)
@@ -20279,6 +20284,7 @@ exports.measureDistance = function (segments, options = {}) {
             return (ns + nd) * canvas.scene.data.gridDistance;
     });
 };
+exports.measureDistance = measureDistance;
 
 },{}],140:[function(require,module,exports){
 "use strict";
@@ -20422,7 +20428,7 @@ function getRollChatTemplateData(options) {
 function getTokenSceneId(token) {
     return token ? `${token.scene._id}.${token.id}` : undefined;
 }
-exports.addChatMessageContextOptions = (html, options) => {
+const addChatMessageContextOptions = (html, options) => {
     const canRoll = (li) => {
         const msg = game.messages.get(li.data().messageId);
         return msg.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.MessageCustomRoll);
@@ -20440,7 +20446,8 @@ exports.addChatMessageContextOptions = (html, options) => {
     });
     return options;
 };
-exports.addRollListeners = (app, html) => {
+exports.addChatMessageContextOptions = addChatMessageContextOptions;
+const addRollListeners = (app, html) => {
     if (!app.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.MessageCustomRoll)) {
         return;
     }
@@ -20592,6 +20599,7 @@ exports.addRollListeners = (app, html) => {
         });
     }));
 };
+exports.addRollListeners = addRollListeners;
 
 },{"./actor/SR5Actor":85,"./apps/dialogs/DamageApplicationDialog":129,"./constants":143,"./helpers":153,"./item/SR5Item":194,"./template":209}],141:[function(require,module,exports){
 "use strict";
@@ -21540,7 +21548,7 @@ exports.DataWrapper = DataWrapper;
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerAppHelpers = void 0;
-exports.registerAppHelpers = () => {
+const registerAppHelpers = () => {
     // TODO: Add modifiers.env typing and add missing type
     /** Determine if a environmental modifier of a specific category is active
      *
@@ -21552,13 +21560,14 @@ exports.registerAppHelpers = () => {
         return active[category] === modifier;
     });
 };
+exports.registerAppHelpers = registerAppHelpers;
 
 },{}],147:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerBasicHelpers = void 0;
 const helpers_1 = require("../helpers");
-exports.registerBasicHelpers = () => {
+const registerBasicHelpers = () => {
     Handlebars.registerHelper('localizeOb', function (strId, obj) {
         if (obj)
             strId = obj[strId];
@@ -21677,6 +21686,7 @@ exports.registerBasicHelpers = () => {
         return new Handlebars.SafeString(helpers_1.Helpers.shortenAttributeLocalization(label, length));
     });
 };
+exports.registerBasicHelpers = registerBasicHelpers;
 
 },{"../helpers":153}],148:[function(require,module,exports){
 "use strict";
@@ -21726,7 +21736,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.preloadHandlebarsTemplates = void 0;
-exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, function* () {
+const preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, function* () {
     const templatePaths = [
         // actor tabs
         'systems/shadowrun5e/dist/templates/actor/tabs/ActionsTab.html',
@@ -21830,13 +21840,14 @@ exports.preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, fun
     ];
     return loadTemplates(templatePaths);
 });
+exports.preloadHandlebarsTemplates = preloadHandlebarsTemplates;
 
 },{}],150:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerItemLineHelpers = void 0;
 const SR5ItemDataWrapper_1 = require("../item/SR5ItemDataWrapper");
-exports.registerItemLineHelpers = () => {
+const registerItemLineHelpers = () => {
     Handlebars.registerHelper('ItemHeaderIcons', function (id) {
         const PlusIcon = 'fas fa-plus';
         const AddText = game.i18n.localize('SR5.Add');
@@ -22241,6 +22252,7 @@ exports.registerItemLineHelpers = () => {
         return icons;
     });
 };
+exports.registerItemLineHelpers = registerItemLineHelpers;
 
 },{"../item/SR5ItemDataWrapper":195}],151:[function(require,module,exports){
 "use strict";
@@ -22248,7 +22260,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerRollAndLabelHelpers = void 0;
 const PartsList_1 = require("../parts/PartsList");
 const helpers_1 = require("../helpers");
-exports.registerRollAndLabelHelpers = () => {
+const registerRollAndLabelHelpers = () => {
     Handlebars.registerHelper('damageAbbreviation', function (damage) {
         if (damage === 'physical')
             return 'P';
@@ -22314,13 +22326,14 @@ exports.registerRollAndLabelHelpers = () => {
     });
     Handlebars.registerHelper('speakerName', helpers_1.Helpers.getChatSpeakerName);
 };
+exports.registerRollAndLabelHelpers = registerRollAndLabelHelpers;
 
 },{"../helpers":153,"../parts/PartsList":205}],152:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerSkillLineHelpers = void 0;
 const helpers_1 = require("../helpers");
-exports.registerSkillLineHelpers = () => {
+const registerSkillLineHelpers = () => {
     Handlebars.registerHelper('SkillHeaderIcons', function (id) {
         const addIcon = {
             icon: 'fas fa-plus',
@@ -22412,6 +22425,7 @@ exports.registerSkillLineHelpers = () => {
         }
     });
 };
+exports.registerSkillLineHelpers = registerSkillLineHelpers;
 
 },{"../helpers":153}],153:[function(require,module,exports){
 "use strict";
@@ -24365,7 +24379,7 @@ class DeviceImporter extends DataImporter_1.DataImporter {
             return true;
         }
         const unsupportedIds = [
-            'd63eb841-7b15-4539-9026-b90a4924aeeb',
+            'd63eb841-7b15-4539-9026-b90a4924aeeb', // Dynamic rating value.
         ];
         return unsupportedIds.includes(ImportHelper_1.ImportHelper.StringValue(jsonData, 'id'));
     }
@@ -26341,6 +26355,9 @@ class SR5Item extends Item {
         super(...arguments);
         this.labels = {};
     }
+    get actor() {
+        return super.actor;
+    }
     get wrapper() {
         // we need to cast here to unknown first to make ts happy
         return new SR5ItemDataWrapper_1.SR5ItemDataWrapper(this.data);
@@ -26698,7 +26715,6 @@ class SR5Item extends Item {
             };
         }
         else if (this.hasExplosiveAmmo()) {
-            const data = this.data.data;
             const ammo = this.getEquippedAmmo();
             const ammoData = ammo.data;
             const distance = ammoData.data.blast.radius;
@@ -29832,7 +29848,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerSystemSettings = void 0;
 const VersionMigration_1 = require("./migrator/VersionMigration");
 const constants_1 = require("./constants");
-exports.registerSystemSettings = () => {
+const registerSystemSettings = () => {
     /**
      * Register diagonal movement rule setting
      */
@@ -29904,6 +29920,7 @@ exports.registerSystemSettings = () => {
         default: true,
     });
 };
+exports.registerSystemSettings = registerSystemSettings;
 
 },{"./constants":143,"./migrator/VersionMigration":200}],208:[function(require,module,exports){
 "use strict";
