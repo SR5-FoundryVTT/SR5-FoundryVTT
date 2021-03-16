@@ -36,6 +36,7 @@ export class HooksManager {
         Hooks.on('renderItemDirectory', HooksManager.renderItemDirectory);
         Hooks.on('renderTokenHUD', EnvModifiersApplication.addTokenHUDFields);
 
+        console.error('env', process.env);
         // if (process.env.NODE_ENV === 'development') {
         import('../test/quench').then(({quenchRegister}) => {
             console.error(quenchRegister);

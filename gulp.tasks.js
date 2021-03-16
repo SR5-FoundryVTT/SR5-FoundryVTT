@@ -22,6 +22,7 @@ const source = require('vinyl-source-stream');
 const buffer = require('vinyl-buffer');
 const logger = require('gulplog');
 const sourcemaps = require('gulp-sourcemaps');
+const env = require("gulp-env");
 
 // Config
 const distName = 'dist';
@@ -166,7 +167,11 @@ async function linkUserData() {
 }
 
 async function setDevEnvironment() {
-    process.env.NODE_ENV = 'development';
+    env({
+        vars: {
+            NODE_ENV: 'development'
+        }
+    })
 }
 
 exports.clean = cleanDist;
