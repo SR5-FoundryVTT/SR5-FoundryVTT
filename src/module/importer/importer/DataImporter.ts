@@ -48,7 +48,7 @@ export abstract class DataImporter {
      * @param jsonObject The JSON data to parse.
      * @returns An array of created objects.
      */
-    public abstract async Parse(jsonObject: object): Promise<Entity>;
+    public abstract Parse(jsonObject: object): Promise<Entity>;
 
     /**
      * Parse an XML string into a JSON object.

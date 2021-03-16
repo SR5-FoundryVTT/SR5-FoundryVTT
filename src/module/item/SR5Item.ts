@@ -57,8 +57,11 @@ import {ItemAction} from "./ItemAction";
 export class SR5Item extends Item {
     labels: {} = {};
     items: SR5Item[];
-    actor: SR5Actor;
     data: SR5ItemType;
+
+    get actor(): SR5Actor {
+        return super.actor as SR5Actor;
+    }
 
     private get wrapper(): SR5ItemDataWrapper {
         // we need to cast here to unknown first to make ts happy
