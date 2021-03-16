@@ -1431,7 +1431,7 @@ export class SR5Item extends Item {
                 options.fireModeDefense = +options.attack.fireMode.defense;
             }
 
-            return await target.rollRangedDefense(options, opposedParts.list);
+            return await target.rollAttackDefense(options, opposedParts.list);
         }
 
         if (this.isDirectCombatSpell()) {

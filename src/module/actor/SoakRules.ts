@@ -40,6 +40,6 @@ export class SoakRules {
     }
 
     static reduceDamage(damageData : DamageData, hits : number) : ModifiedDamageData {
-        return Helpers.modifyDamageByHits(damageData, hits, 'SR5.SoakTest');
+        return Helpers.reduceDamageByHits(damageData, hits, 'SR5.SoakTest');
     }
 }

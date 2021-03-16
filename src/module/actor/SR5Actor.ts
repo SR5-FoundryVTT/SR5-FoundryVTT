@@ -373,7 +373,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
 
         // Reduce damage by soak roll and inform user.
         const incomingDamage = Helpers.createDamageData(incoming, 'stun');
-        const damage = Helpers.modifyDamageByHits(incomingDamage, roll.hits, 'SR5.Fade');
+        const damage = Helpers.reduceDamageByHits(incomingDamage, roll.hits, 'SR5.Fade');
 
         await createRollChatMessage({title, roll, actor, damage});
 
@@ -407,7 +407,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
 
         // Reduce damage by soak roll and inform user.
         const incomingDamage = Helpers.createDamageData(incoming, 'stun');
-        const damage = Helpers.modifyDamageByHits(incomingDamage, roll.hits, 'SR5.Drain');
+        const damage = Helpers.reduceDamageByHits(incomingDamage, roll.hits, 'SR5.Drain');
 
         await createRollChatMessage({title, roll, actor, damage});
 
@@ -426,9 +426,9 @@ export class SR5Actor extends Actor<SR5ActorData> {
         });
     }
 
-    /** A ranged defense is anything against visible ranged attacks (ranged weapons, indirect spell attacks, ...)
+    /** A attack defense is anything against visible attacks (ranged weapons, melee weapons, indirect spell attacks, ...)
      */
-    async rollRangedDefense(options: DefenseRollOptions = {}, partsProps: ModList<number> = []): Promise<ShadowrunRoll | undefined> {
+    async rollAttackDefense(options: DefenseRollOptions = {}, partsProps: ModList<number> = []): Promise<ShadowrunRoll | undefined> {
         const {attack} = options;
 
         const defenseDialog = await ShadowrunActorDialogs.createDefenseDialog(this, options, partsProps);
@@ -460,12 +460,17 @@ export class SR5Actor extends Actor<SR5ActorData> {
         let attackerHits = attack.hits || 0;
         let netHits = Math.max(attackerHits - defenderHits, 0);
 
-        const damage = attack.damage;
+        // Reduce damage flow.
+        let damage = attack.damage;
 
+        // modified damage value by netHits.
         if (netHits > 0) {
-            damage.mod = PartsList.AddUniquePart(damage.mod, 'SR5.NetHits', netHits);
-            damage.value = Helpers.calcTotal(damage);
+            const {modified} = Helpers.modifyDamageByHits(damage, netHits, "SR5.NetHits");
+            damage = modified;
         }
+
+        // modified damage type by modified armor value.
+        damage = this._applyDamageTypeChangeForArmor(damage);
 
         const soakRollOptions = {
             event: options.event,
@@ -494,7 +499,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
             game.i18n.localize('SR5.SpellDefenseDirectPhysical');
         const modificationLabel = 'SR5.SpellDefense';
         const actor = this;
-        const damage = Helpers.modifyDamageByHits(options.attack.damage, roll.hits, modificationLabel);
+        const damage = Helpers.reduceDamageByHits(options.attack.damage, roll.hits, modificationLabel);
 
         await createRollChatMessage({title, roll, actor, damage});
 
@@ -509,7 +514,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
         // TODO: indirect LOS spell defense works like a ranged weapon defense, but indirect LOS(A) spell defense
         //       work like grenade attack (no defense, but soak, with the threshold net hits modifying damage.)
         //       Grenades: SR5#181 Combat Spells: SR5#283
-        return await this.rollRangedDefense(options, opposedParts.list);
+        return await this.rollAttackDefense(options, opposedParts.list);
     }
 
     // TODO: Abstract handling of const damage : ModifiedDamageData
