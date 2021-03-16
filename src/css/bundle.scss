@@ -228,6 +228,10 @@ select.display {
 }
 
 .sr5 {
+    .entity-link {
+        color: $black;
+    }
+
     .roll {
         @include rollable;
     }
