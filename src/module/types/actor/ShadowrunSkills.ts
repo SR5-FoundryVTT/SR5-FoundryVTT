@@ -8,6 +8,8 @@ declare namespace Shadowrun {
         [name: string]: SkillField & RemovableField;
     };
 
+    export type SkillCategories = 'active'|'language'|'knowledge';
+
     export type SkillField = BaseValuePair<number> &
         NameField &
         CanHideFiled &

@@ -1,18 +1,20 @@
 import SkillField = Shadowrun.SkillField;
 import { Helpers } from '../helpers';
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
+import SkillCategories = Shadowrun.SkillCategories;
 
 export const registerSkillLineHelpers = () => {
-    Handlebars.registerHelper('SkillHeaderIcons', function (id) {
+    Handlebars.registerHelper('SkillHeaderIcons', function (category: SkillCategories) {
         const addIcon = {
             icon: 'fas fa-plus',
             title: game.i18n.localize('SR5.AddSkill'),
             text: game.i18n.localize('SR5.Add'),
             cssClass: '',
         };
-        switch (id) {
+        switch (category) {
             case 'active':
-                return [{}];
+                addIcon.cssClass = 'add-active';
+                return [addIcon];
             case 'language':
                 addIcon.cssClass = 'add-language';
                 return [addIcon];
