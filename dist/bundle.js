@@ -13541,7 +13541,7 @@ class SR5Actor extends Actor {
                 return;
             // Reduce damage by soak roll and inform user.
             const incomingDamage = helpers_1.Helpers.createDamageData(incoming, 'stun');
-            const damage = helpers_1.Helpers.modifyDamageByHits(incomingDamage, roll.hits, 'SR5.Fade');
+            const damage = helpers_1.Helpers.reduceDamageByHits(incomingDamage, roll.hits, 'SR5.Fade');
             yield chat_1.createRollChatMessage({ title, roll, actor, damage });
             return roll;
         });
@@ -13571,7 +13571,7 @@ class SR5Actor extends Actor {
                 return;
             // Reduce damage by soak roll and inform user.
             const incomingDamage = helpers_1.Helpers.createDamageData(incoming, 'stun');
-            const damage = helpers_1.Helpers.modifyDamageByHits(incomingDamage, roll.hits, 'SR5.Drain');
+            const damage = helpers_1.Helpers.reduceDamageByHits(incomingDamage, roll.hits, 'SR5.Drain');
             yield chat_1.createRollChatMessage({ title, roll, actor, damage });
             return roll;
         });
@@ -13587,9 +13587,9 @@ class SR5Actor extends Actor {
             wounds: false,
         });
     }
-    /** A ranged defense is anything against visible ranged attacks (ranged weapons, indirect spell attacks, ...)
+    /** A attack defense is anything against visible attacks (ranged weapons, melee weapons, indirect spell attacks, ...)
      */
-    rollRangedDefense(options = {}, partsProps = []) {
+    rollAttackDefense(options = {}, partsProps = []) {
         return __awaiter(this, void 0, void 0, function* () {
             const { attack } = options;
             const defenseDialog = yield ShadowrunActorDialogs_1.ShadowrunActorDialogs.createDefenseDialog(this, options, partsProps);
@@ -13617,11 +13617,15 @@ class SR5Actor extends Actor {
             let defenderHits = roll.total;
             let attackerHits = attack.hits || 0;
             let netHits = Math.max(attackerHits - defenderHits, 0);
-            const damage = attack.damage;
+            // Reduce damage flow.
+            let damage = attack.damage;
+            // modified damage value by netHits.
             if (netHits > 0) {
-                damage.mod = PartsList_1.PartsList.AddUniquePart(damage.mod, 'SR5.NetHits', netHits);
-                damage.value = helpers_1.Helpers.calcTotal(damage);
+                const { modified } = helpers_1.Helpers.modifyDamageByHits(damage, netHits, "SR5.NetHits");
+                damage = modified;
             }
+            // modified damage type by modified armor value.
+            damage = this._applyDamageTypeChangeForArmor(damage);
             const soakRollOptions = {
                 event: options.event,
                 damage,
@@ -13648,7 +13652,7 @@ class SR5Actor extends Actor {
                 game.i18n.localize('SR5.SpellDefenseDirectPhysical');
             const modificationLabel = 'SR5.SpellDefense';
             const actor = this;
-            const damage = helpers_1.Helpers.modifyDamageByHits(options.attack.damage, roll.hits, modificationLabel);
+            const damage = helpers_1.Helpers.reduceDamageByHits(options.attack.damage, roll.hits, modificationLabel);
             yield chat_1.createRollChatMessage({ title, roll, actor, damage });
             return roll;
         });
@@ -13661,7 +13665,7 @@ class SR5Actor extends Actor {
             // TODO: indirect LOS spell defense works like a ranged weapon defense, but indirect LOS(A) spell defense
             //       work like grenade attack (no defense, but soak, with the threshold net hits modifying damage.)
             //       Grenades: SR5#181 Combat Spells: SR5#283
-            return yield this.rollRangedDefense(options, opposedParts.list);
+            return yield this.rollAttackDefense(options, opposedParts.list);
         });
     }
     // TODO: Abstract handling of const damage : ModifiedDamageData
@@ -15151,7 +15155,7 @@ class SR5ActorSheet extends ActorSheet {
                     yield this.actor.rollDrain(options);
                     break;
                 case 'defense':
-                    yield this.actor.rollRangedDefense(options);
+                    yield this.actor.rollAttackDefense(options);
                     break;
                 case 'damage-resist':
                     yield this.actor.rollSoak(options);
@@ -15731,7 +15735,7 @@ class SoakRules {
         }
     }
     static reduceDamage(damageData, hits) {
-        return helpers_1.Helpers.modifyDamageByHits(damageData, hits, 'SR5.SoakTest');
+        return helpers_1.Helpers.reduceDamageByHits(damageData, hits, 'SR5.SoakTest');
     }
 }
 exports.SoakRules = SoakRules;
@@ -19041,8 +19045,7 @@ class DamageApplicationDialog extends FormDialog_1.FormDialog {
         const actorDamage = actors.map(actor => {
             return {
                 actor,
-                // Don't change damage type for grunt to avoid confusing user.
-                modified: actor._applyDamageTypeChangeForArmor(damage),
+                modified: damage,
                 armor: actor.getModifiedArmor(damage)
             };
         });
@@ -19053,9 +19056,6 @@ class DamageApplicationDialog extends FormDialog_1.FormDialog {
         const buttons = {
             damage: {
                 label: game.i18n.localize('SR5.DamageApplication.ApplyDamage')
-            },
-            unmodifiedDamage: {
-                label: game.i18n.localize('SR5.DamageApplication.ApplyUnmodifiedDamage')
             }
         };
         const onAfterClose = () => actorDamage;
@@ -22808,11 +22808,37 @@ class Helpers {
         damage.element.value = element;
         return damage;
     }
+    /** Modifies given damage value and returns both original and modified damage
+     *
+     * For better readability reduceDamageByHits wraps this method to avoid negative params in the call signature.
+     * so instead of
+     * > modifyDamageByHits(incoming, -hits, label)
+     * do this instead
+     * > reduceDamageByHits(incoming, hits, label)
+     *
+     * @param incoming A DamageData value to be modified from
+     * @param hits Positive or negative hits to change the damage value with.
+     * @param modificationLabel The translatable label for the modification
+     */
     static modifyDamageByHits(incoming, hits, modificationLabel) {
         const modified = duplicate(incoming);
-        modified.mod = PartsList_1.PartsList.AddUniquePart(modified.mod, modificationLabel, -hits);
+        modified.mod = PartsList_1.PartsList.AddUniquePart(modified.mod, modificationLabel, hits);
         modified.value = Helpers.calcTotal(modified, { min: 0 });
         return { incoming, modified };
+    }
+    /** Reduces given damage value and returns both original and modified damage.
+     *
+     * Should you want RAISE the damage value, use modifyDamageByHits directly.
+     *
+     * @param incoming A DamageData value to be modified from
+     * @param hits Positive hits to reduce the damage value with! Should the hits amount be negative, use modifyDamageByHits.
+     * @param modificationLabel The translatable label for the modification
+     */
+    static reduceDamageByHits(incoming, hits, modificationLabel) {
+        if (hits < 0) {
+            console.warn('Helpers.reduceDamageByHits should only be called with positive hits values to avoid confusion');
+        }
+        return Helpers.modifyDamageByHits(incoming, -hits, modificationLabel);
     }
     static confirmDeletion() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -27610,7 +27636,7 @@ class SR5Item extends Item {
                 if ((_b = (_a = options.attack) === null || _a === void 0 ? void 0 : _a.fireMode) === null || _b === void 0 ? void 0 : _b.defense) {
                     options.fireModeDefense = +options.attack.fireMode.defense;
                 }
-                return yield target.rollRangedDefense(options, opposedParts.list);
+                return yield target.rollAttackDefense(options, opposedParts.list);
             }
             if (this.isDirectCombatSpell()) {
                 return yield target.rollDirectSpellDefense(this, options);
