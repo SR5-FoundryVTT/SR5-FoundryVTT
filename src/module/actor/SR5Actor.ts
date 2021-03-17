@@ -9,7 +9,7 @@ import SkillRollOptions = Shadowrun.SkillRollOptions;
 import SkillField = Shadowrun.SkillField;
 import ModList = Shadowrun.ModList;
 import LimitField = Shadowrun.LimitField;
-import {SYSTEM_NAME, FLAGS, SR} from '../constants';
+import {SYSTEM_NAME, FLAGS, SR, SKILL_DEFAULT_NAME} from '../constants';
 import SR5ActorType = Shadowrun.SR5ActorType;
 import { PartsList } from '../parts/PartsList';
 import { ActorPrepFactory } from './prep/ActorPrepFactory';
@@ -308,6 +308,13 @@ export class SR5Actor extends Actor<SR5ActorData> {
         await this.update(updateData);
     }
 
+    async addActiveSkill(skillData: Partial<SkillField> = {name: SKILL_DEFAULT_NAME}) {
+        const skill = DefaultValues.skillData(skillData);
+
+        const newSkillData = Helpers.getRandomIdSkillFieldDataEntry('data.skills.active', skill);
+        await this.update(newSkillData as object);
+    }
+
     async removeLanguageSkill(skillId) {
         const value = {};
         value[skillId] = { _delete: true };
@@ -320,6 +327,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
             specs: [],
             base: 0,
             value: 0,
+            // TODO: BUG ModifiableValue is ModList<number>[] and not number
             mod: 0,
         };
         skill = {

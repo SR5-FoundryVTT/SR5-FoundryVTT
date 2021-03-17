@@ -15,7 +15,6 @@ declare namespace Shadowrun {
         CanHideFiled &
         ModifiableValue &
         LabelField &
-        NameField &
         HasBonus &
         HasAttribute & {
             specs: string[];

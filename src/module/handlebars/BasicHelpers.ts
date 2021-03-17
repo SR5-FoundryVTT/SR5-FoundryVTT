@@ -1,11 +1,16 @@
 import { Helpers } from '../helpers';
 import {SafeString} from "handlebars";
-import DamageData = Shadowrun.DamageData;
+import SkillField = Shadowrun.SkillField;
 
 export const registerBasicHelpers = () => {
     Handlebars.registerHelper('localizeOb', function (strId, obj) {
         if (obj) strId = obj[strId];
         return game.i18n.localize(strId);
+    });
+
+    Handlebars.registerHelper('localizeSkill', function (skill: SkillField): string {
+        if (skill.label) return game.i18n.localize(skill.label)
+        return game.i18n.localize(skill.name);
     });
 
     Handlebars.registerHelper('toHeaderCase', function (str) {

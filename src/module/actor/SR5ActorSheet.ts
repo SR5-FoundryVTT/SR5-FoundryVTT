@@ -427,7 +427,9 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
             }
         });
 
-        html.find('.skill-header').click(this._onFilterUntrainedSkills.bind(this));
+        html.find('.skill-header').find('.item-name').click(this._onFilterUntrainedSkills.bind(this));
+        html.find('.skill-header').find('.skill-spec-item').click(this._onFilterUntrainedSkills.bind(this));
+        html.find('.skill-header').find('.rtg').click(this._onFilterUntrainedSkills.bind(this));
 
         html.find('.cell-input-roll').click(this._onRollCellInput.bind(this));
         html.find('.attribute-roll').click(this._onRollAttribute.bind(this));
@@ -440,6 +442,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
         html.find('.add-knowledge').click(this._onAddKnowledgeSkill.bind(this));
         html.find('.add-language').click(this._onAddLanguageSkill.bind(this));
+        html.find('.add-active').click(this._onAddActiveSkill.bind(this));
         html.find('.remove-knowledge').click(this._onRemoveKnowledgeSkill.bind(this));
         html.find('.remove-language').click(this._onRemoveLanguageSkill.bind(this));
         html.find('.knowledge-skill').click(this._onRollKnowledgeSkill.bind(this));
@@ -727,13 +730,13 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
 
     async _onAddLanguageSkill(event) {
         event.preventDefault();
-        this.actor.addLanguageSkill({ name: '' });
+        await this.actor.addLanguageSkill({ name: '' });
     }
 
     async _onRemoveLanguageSkill(event) {
         event.preventDefault();
         const skillId = Helpers.listItemId(event);
-        this.actor.removeLanguageSkill(skillId);
+        await this.actor.removeLanguageSkill(skillId);
     }
 
     async _onAddKnowledgeSkill(event) {
@@ -746,6 +749,11 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         event.preventDefault();
         const [skillId, category] = Helpers.listItemId(event).split('.');
         await this.actor.removeKnowledgeSkill(skillId, category);
+    }
+
+     async _onAddActiveSkill(event) {
+        event.preventDefault();
+        await this.actor.addActiveSkill();
     }
 
     async _onChangeRtg(event) {

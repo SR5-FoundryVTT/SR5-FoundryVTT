@@ -3,7 +3,7 @@ import SkillField = Shadowrun.SkillField;
 import ModifiableValue = Shadowrun.ModifiableValue;
 import { PartsList } from './parts/PartsList';
 import LabelField = Shadowrun.LabelField;
-import {FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SR, SYSTEM_NAME} from "./constants";
+import {DEFAULT_ID_LENGTH, FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SR, SYSTEM_NAME} from "./constants";
 import {SR5Actor} from "./actor/SR5Actor";
 import RangesTemplateData = Shadowrun.RangesTemplateData;
 import RangeTemplateData = Shadowrun.RangeTemplateData;
@@ -439,5 +439,21 @@ export class Helpers {
         const dialog = new DeleteConfirmationDialog();
         await dialog.select();
         return !dialog.canceled && dialog.selectedButton === 'delete';
+    }
+
+    /** This can be used to create an SkillField into the Skills data path during the Skill creation process.
+     *
+     * @param skillDataPath Could be 'data.skills.active' or 'data.skill.language.value' or more
+     * @param skillField A SkillField with whatever values. You could use DefaultValues.skillData to create one.
+     * @param idLength How long should the id (GUID) be?
+     */
+    static getRandomIdSkillFieldDataEntry(skillDataPath: string, skillField: SkillField, idLength: number = DEFAULT_ID_LENGTH): {[skillDataPath: string]: {[id: string]: SkillField}}|undefined {
+        if (!skillDataPath || skillDataPath.length === 0) return;
+
+        const id = randomID(idLength);
+
+        return {
+            [skillDataPath]: {[id]: skillField}
+        }
     }
 }

@@ -7,6 +7,8 @@ import QualityData = Shadowrun.QualityData;
 import ActionRollData = Shadowrun.ActionRollData;
 import LimitData = Shadowrun.LimitData;
 import OpposedTestData = Shadowrun.OpposedTestData;
+import SkillField = Shadowrun.SkillField;
+import {SKILL_DEFAULT_NAME} from "./constants";
 
 /**
  * TODO: Add unittesting to DefaultValues helper.
@@ -129,8 +131,23 @@ export class DefaultValues {
             description: ''
         }, partialOpposedTestData) as OpposedTestData;
     }
+
+    static skillData(partialSkillData: Partial<SkillField> = {}): SkillField {
+        return mergeObject({
+            name: SKILL_DEFAULT_NAME,
+            base: 0,
+            value: 0,
+            hidden: false,
+            label: '',
+            bonus: [],
+            specs: [],
+            mod: [],
+            attribute: ''
+        }, partialSkillData) as SkillField;
+    }
 }
 
+// TODO: Move these into DefaultValues implementations.
 export const DataTemplates = {
     grunt: {
         metatype_modifiers: {

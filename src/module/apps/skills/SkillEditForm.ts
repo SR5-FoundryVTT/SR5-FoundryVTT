@@ -38,6 +38,10 @@ export class SkillEditForm extends BaseEntitySheet {
     }
 
     _onUpdateObject(event, formData, updateData) {
+        // get skill name.
+        // NOTE: This differs from the skill id, which is used to identify the skill internally.
+        const name = formData['data.name'];
+
         // get base value
         const base = formData['data.base'];
 
@@ -76,6 +80,7 @@ export class SkillEditForm extends BaseEntitySheet {
             base,
             specs,
             bonus,
+            name
         };
     }
 
@@ -151,6 +156,7 @@ export class SkillEditForm extends BaseEntitySheet {
         const data = super.getData();
         const actor = data.entity;
         data['data'] = actor ? getProperty(actor, this._updateString()) : {};
+        data['editable_name'] = true;
         return data;
     }
 }
