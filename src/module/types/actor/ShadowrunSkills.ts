@@ -1,11 +1,11 @@
 /// <reference path="../Shadowrun.ts" />
 declare namespace Shadowrun {
     export type Skills = {
-        [name: string]: SkillField;
+        [id: string]: SkillField;
     };
 
     export type RemovableSkills = {
-        [name: string]: SkillField & RemovableField;
+        [id: string]: SkillField & RemovableField;
     };
 
     export type SkillCategories = 'active'|'language'|'knowledge';

@@ -39,6 +39,7 @@ import {Modifiers} from "../sr5/Modifiers";
 import { SoakFlow } from './SoakFlow';
 import { DefaultValues } from '../dataTemplates';
 import SR5ActorData = Shadowrun.SR5ActorData;
+import Skills = Shadowrun.Skills;
 
 export class SR5Actor extends Actor<SR5ActorData> {
     // NOTE: Overwrite Actor.data additionally to extends Actor<T as SR5Actortype.Data: SR5ActorData> to still have
@@ -255,6 +256,10 @@ export class SR5Actor extends Actor<SR5ActorData> {
 
         const name = this.getVehicleTypeSkillName();
         return this.findActiveSkill(name);
+    }
+
+    getActiveSkills(): Skills {
+        return this.data.data.skills.active;
     }
 
     getSkill(skillId: string): SkillField | undefined {
