@@ -85,7 +85,7 @@ export class SkillEditForm extends BaseEntitySheet {
             specs,
             bonus,
             name,
-            attribute
+            attribute,
         };
     }
 

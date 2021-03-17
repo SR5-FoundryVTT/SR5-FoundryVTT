@@ -576,8 +576,8 @@ export class SR5Item extends Item {
         if (attribute && attribute.label) parts.addPart(attribute.label, attribute.value);
 
         // if we have a valid skill, don't look for a second attribute
-        if (skill && skill.label) {
-            parts.addUniquePart(skill.label, skill.value);
+        if (skill) {
+            parts.addUniquePart(skill.label || skill.name, skill.value);
             if (skill.value === 0) {
                 parts.addUniquePart('SR5.Defaulting', -1);
             }
