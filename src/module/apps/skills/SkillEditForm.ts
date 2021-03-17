@@ -1,5 +1,6 @@
 import SkillEditFormData = Shadowrun.SkillEditFormData;
 import {SR5Actor} from "../../actor/SR5Actor";
+import Attributes = Shadowrun.Attributes;
 
 export class SkillEditForm extends BaseEntitySheet {
     skillId: string;
@@ -42,6 +43,9 @@ export class SkillEditForm extends BaseEntitySheet {
         // NOTE: This differs from the skill id, which is used to identify the skill internally.
         const name = formData['data.name'];
 
+        // get attribute name
+        const attribute = formData['data.attribute'];
+
         // get base value
         const base = formData['data.base'];
 
@@ -80,7 +84,8 @@ export class SkillEditForm extends BaseEntitySheet {
             base,
             specs,
             bonus,
-            name
+            name,
+            attribute
         };
     }
 
@@ -152,11 +157,18 @@ export class SkillEditForm extends BaseEntitySheet {
         }
     }
 
+    /** Enhance attribute selection by an empty option to allow newly created skills to have no attribute selected.
+     */
+    _getSkillAttributesForSelect() {
+        return {...CONFIG.SR5.attributes, '': ''};
+    }
+
     getData(): SkillEditFormData {
         const data = super.getData();
         const actor = data.entity;
         data['data'] = actor ? getProperty(actor, this._updateString()) : {};
         data['editable_name'] = true;
+        data['attributes'] = this._getSkillAttributesForSelect();
         return data;
     }
 }

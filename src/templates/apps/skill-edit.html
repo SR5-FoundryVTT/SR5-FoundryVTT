@@ -17,6 +17,23 @@
         <div class="list-item item-section">
             <div class="item-left">
                 <div class="item-text item-name">
+                    {{localize "SR5.Attribute"}}
+                </div>
+            </div>
+            <div class="item-right">
+                <div class="item-text item-name">
+                    {{> "systems/shadowrun5e/dist/templates/common/Select.html"
+                            options=attributes
+                            value=data.attribute
+                            path="data.attribute"
+                    }}
+                </div>
+            </div>
+        </div>
+
+        <div class="list-item item-section">
+            <div class="item-left">
+                <div class="item-text item-name">
                     {{localize "SR5.Total"}} {{localize "SR5.Value"}}
                 </div>
             </div>

@@ -133,7 +133,7 @@ export class ShadowrunActorDialogs {
             },
         };
 
-        const onAfterClose = (html: JQuery) => {           
+        const onAfterClose = (html: JQuery) => {
             const incomingDamage = Helpers.parseInputToNumber($(html).find('[name=incomingDamage]').val());
             const ap = Helpers.parseInputToNumber($(html).find('[name=ap]').val());
             const element = Helpers.parseInputToString($(html).find('[name=element]').val());
@@ -151,7 +151,7 @@ export class ShadowrunActorDialogs {
     }
 
     static getSkillDialogData(actor: SR5Actor, options: SkillDialogOptions, partsProps: PartsList<number>): FormDialogData {
-        const title = game.i18n.localize(options.skill.label);
+        const title = game.i18n.localize(options.skill.label || options.skill.name);
         const templatePath = 'systems/shadowrun5e/dist/templates/rolls/skill-roll.html';
 
         const attributes = actor.getAttributes();
@@ -188,7 +188,8 @@ export class ShadowrunActorDialogs {
             const newLimit = Helpers.parseInputToString($(html).find('[name="attribute.limit"]').val());
             const attribute = actor.getAttribute(newAtt);
             const limit = actor.getLimit(newLimit);
-            const skillLabel = game.i18n.localize(options.skill.label);
+            // Legacy skills have a label, but no name. Custom skills have a name but no label.
+            const skillLabel = game.i18n.localize(options.skill.label || options.skill.name);
             const attributeLabel = game.i18n.localize(CONFIG.SR5.attributes[newAtt]);
             const testLabel = game.i18n.localize('SR5.Test')
 

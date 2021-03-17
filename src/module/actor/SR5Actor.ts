@@ -730,7 +730,9 @@ export class SR5Actor extends Actor<SR5ActorData> {
     }
 
     async rollSkill(skill: SkillField, options?: SkillRollOptions) {
-        let title = game.i18n.localize(skill.label);
+        // Legacy skills have a label, but no name. Custom skills have a name but no label.
+        const label = skill.label ? game.i18n.localize(skill.label) : skill.name;
+        const title = label;
 
         const attributeName = options?.attribute ? options.attribute : skill.attribute;
         const att = this.getAttribute(attributeName);
@@ -738,7 +740,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
 
         // Initialize parts with always needed skill data.
         const parts = new PartsList<number>();
-        parts.addUniquePart(skill.label, skill.value);
+        parts.addUniquePart(label, skill.value);
         this._addMatrixParts(parts, [att, skill]);
         this._addGlobalParts(parts);
 
