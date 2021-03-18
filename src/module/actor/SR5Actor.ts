@@ -317,11 +317,20 @@ export class SR5Actor extends Actor<SR5ActorData> {
         await this.update(updateData);
     }
 
-    async addActiveSkill(skillData: Partial<SkillField> = {name: SKILL_DEFAULT_NAME}) {
+    async addActiveSkill(skillData: Partial<SkillField> = {name: SKILL_DEFAULT_NAME}): Promise<string | undefined> {
         const skill = DefaultValues.skillData(skillData);
 
-        const newSkillData = Helpers.getRandomIdSkillFieldDataEntry('data.skills.active', skill);
-        await this.update(newSkillData as object);
+        const activeSkillsPath = 'data.skills.active';
+        const updateSkillDataResult = Helpers.getRandomIdSkillFieldDataEntry(activeSkillsPath, skill);
+
+        if (!updateSkillDataResult) return;
+
+        const {updateSkillData, id} = updateSkillDataResult;
+
+        await this.update(updateSkillData as object);
+
+        // Allow callers to do something with the resulting id
+        return id;
     }
 
     async removeLanguageSkill(skillId) {

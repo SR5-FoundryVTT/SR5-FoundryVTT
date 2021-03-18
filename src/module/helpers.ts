@@ -1,23 +1,24 @@
 import AttributeField = Shadowrun.AttributeField;
 import SkillField = Shadowrun.SkillField;
 import ModifiableValue = Shadowrun.ModifiableValue;
-import { PartsList } from './parts/PartsList';
 import LabelField = Shadowrun.LabelField;
-import {DEFAULT_ID_LENGTH, FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SR, SYSTEM_NAME} from "./constants";
-import {SR5Actor} from "./actor/SR5Actor";
 import RangesTemplateData = Shadowrun.RangesTemplateData;
 import RangeTemplateData = Shadowrun.RangeTemplateData;
 import DamageData = Shadowrun.DamageData;
 import ModifiedDamageData = Shadowrun.ModifiedDamageData;
-import {DataTemplates} from "./dataTemplates";
 import DamageType = Shadowrun.DamageType;
 import DamageElement = Shadowrun.DamageElement;
+import {PartsList} from './parts/PartsList';
+import {DEFAULT_ID_LENGTH, FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SR, SYSTEM_NAME} from "./constants";
+import {SR5Actor} from "./actor/SR5Actor";
+import {DataTemplates} from "./dataTemplates";
 import {DeleteConfirmationDialog} from "./apps/dialogs/DeleteConfirmationDialog";
 
 interface CalcTotalOptions {
     min?: number,
     max?: number
 }
+
 export class Helpers {
     /**
      * Calculate the total value for a data object
@@ -82,6 +83,7 @@ export class Helpers {
         }
         return newData;
     }
+
     // replace 'SR5_DOT_' with 'SR5.' on keys
     static onGetFlag(data) {
         if (typeof data !== 'object') return data;
@@ -261,7 +263,7 @@ export class Helpers {
         return name.slice(0, length).toUpperCase();
     }
 
-    static getToken(id?: string): Token|undefined {
+    static getToken(id?: string): Token | undefined {
         for (const token of canvas.tokens.placeables) {
             if (token.id === id) {
                 return token;
@@ -269,7 +271,7 @@ export class Helpers {
         }
     }
 
-    static getSceneToken(sceneTokenId: string): Token|undefined {
+    static getSceneToken(sceneTokenId: string): Token | undefined {
         const [sceneId, tokenId] = sceneTokenId.split('.');
 
         const isActiveScene = sceneId === canvas?.scene._id;
@@ -320,7 +322,7 @@ export class Helpers {
         return Helpers.convertLengthUnit(distanceInGridUnits, sceneUnit);
     }
 
-    static convertLengthUnit(length:number, fromUnit: string): number {
+    static convertLengthUnit(length: number, fromUnit: string): number {
         //@ts-ignore
         fromUnit = fromUnit.toLowerCase();
 
@@ -447,13 +449,17 @@ export class Helpers {
      * @param skillField A SkillField with whatever values. You could use DefaultValues.skillData to create one.
      * @param idLength How long should the id (GUID) be?
      */
-    static getRandomIdSkillFieldDataEntry(skillDataPath: string, skillField: SkillField, idLength: number = DEFAULT_ID_LENGTH): {[skillDataPath: string]: {[id: string]: SkillField}}|undefined {
+    static getRandomIdSkillFieldDataEntry(skillDataPath: string, skillField: SkillField, idLength: number = DEFAULT_ID_LENGTH): { id: string, updateSkillData: { [skillDataPath: string]: { [id: string]: SkillField } } } | undefined {
         if (!skillDataPath || skillDataPath.length === 0) return;
 
         const id = randomID(idLength);
+        const updateSkillData = {
+            [skillDataPath]: {[id]: skillField}
+        };
 
         return {
-            [skillDataPath]: {[id]: skillField}
+            id,
+            updateSkillData
         }
     }
 }

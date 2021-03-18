@@ -751,9 +751,16 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         await this.actor.removeKnowledgeSkill(skillId, category);
     }
 
+    /** Add an active skill and show the matching edit application afterwards.
+     *
+     * @param event The HTML event from which the action resulted.
+     */
      async _onAddActiveSkill(event) {
         event.preventDefault();
-        await this.actor.addActiveSkill();
+        const skillId = await this.actor.addActiveSkill();
+        if (!skillId) return;
+
+        await this._showSkillEditForm(SkillEditForm, this.actor, { event: event }, skillId);
     }
 
     async _onChangeRtg(event) {
@@ -761,7 +768,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         const item = this.actor.getOwnedSR5Item(iid);
         const rtg = parseInt(event.currentTarget.value);
         if (item && rtg) {
-            item.update({ 'data.technology.rating': rtg });
+            await item.update({ 'data.technology.rating': rtg });
         }
     }
 
@@ -771,7 +778,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         const qty = parseInt(event.currentTarget.value);
         if (item && qty && "technology" in item.data.data) {
             item.data.data.technology.quantity = qty;
-            item.update({ 'data.technology.quantity': qty });
+            await item.update({ 'data.technology.quantity': qty });
         }
     }
 
@@ -994,18 +1001,18 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         );
     }
 
-    _onShowEditLanguageSkill(event) {
+    async _onShowEditLanguageSkill(event) {
         event.preventDefault();
         const skill = Helpers.listItemId(event);
         // new LanguageSkillEditForm(this.actor, skill, { event: event }).render(true);
-        this._showSkillEditForm(LanguageSkillEditForm, this.actor, { event: event }, skill);
+        await this._showSkillEditForm(LanguageSkillEditForm, this.actor, { event: event }, skill);
     }
 
-    _onShowEditSkill(event) {
+    async _onShowEditSkill(event) {
         event.preventDefault();
         const skill = Helpers.listItemId(event);
         // new SkillEditForm(this.actor, skill, { event: event }).render(true);
-        this._showSkillEditForm(SkillEditForm, this.actor, { event: event }, skill);
+        await this._showSkillEditForm(SkillEditForm, this.actor, { event: event }, skill);
     }
 
     _onShowImportCharacter(event) {
