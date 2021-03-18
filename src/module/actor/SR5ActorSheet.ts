@@ -230,7 +230,8 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
     }
 
     _isSkillFiltered(skillId, skill) {
-        // a newly created skill should be filtered, no matter what.
+        // a newly created skill shouldn't be filtered, no matter what.
+        // Therefore disqualify empty skill labels/names from filtering and always show them.
         const isFilterable = this._getSkillLabelOrName(skill).length > 0;
         const isHiddenForText = !this._doesSkillContainText(skillId, skill, this._filters.skills);
         const isHiddenForUntrained = !this._filters.showUntrainedSkills && skill.value === 0;
