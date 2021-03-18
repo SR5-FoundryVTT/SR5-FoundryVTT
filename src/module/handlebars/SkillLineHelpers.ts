@@ -85,7 +85,8 @@ export const registerSkillLineHelpers = () => {
         switch (skillType) {
             case 'active':
                 editIcon.cssClass = 'skill-edit';
-                return [editIcon];
+                removeIcon.cssClass = 'remove-active'
+                return [editIcon, removeIcon];
             case 'language':
                 editIcon.cssClass = 'language-skill-edit';
                 removeIcon.cssClass = 'remove-language';

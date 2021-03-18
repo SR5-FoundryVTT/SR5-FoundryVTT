@@ -334,9 +334,8 @@ export class SR5Actor extends Actor<SR5ActorData> {
     }
 
     async removeLanguageSkill(skillId) {
-        const value = {};
-        value[skillId] = { _delete: true };
-        await this.update({ 'data.skills.language.value': value });
+        const updateData = Helpers.getDeleteDataEntry('data.skills.language.value', skillId);
+        await this.update(updateData);
     }
 
     async addLanguageSkill(skill) {
@@ -364,13 +363,19 @@ export class SR5Actor extends Actor<SR5ActorData> {
     }
 
     async removeKnowledgeSkill(skillId, category) {
-        const value = {};
-        const updateData = {};
+        const updateData = Helpers.getDeleteDataEntry(`data.skills.knowledge.${category}.value`, skillId);
+        await this.update(updateData);
+    }
 
-        const dataString = `data.skills.knowledge.${category}.value`;
-        value[skillId] = { _delete: true };
-        updateData[dataString] = value;
+    /** Delete the given active skill by it's id. It doesn't
+     *
+     * @param skillId Either a random id for custom skills or the skills name used as an id.
+     */
+    async removeActiveSkill(skillId: string) {
+        const activeSkills = this.getActiveSkills();
+        if (!activeSkills.hasOwnProperty(skillId)) return;
 
+        const updateData = Helpers.getDeleteDataEntry('data.skills.active', skillId);
         await this.update(updateData);
     }
 

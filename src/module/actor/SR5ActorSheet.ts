@@ -445,6 +445,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         html.find('.add-active').click(this._onAddActiveSkill.bind(this));
         html.find('.remove-knowledge').click(this._onRemoveKnowledgeSkill.bind(this));
         html.find('.remove-language').click(this._onRemoveLanguageSkill.bind(this));
+        html.find('.remove-active').click(this._onRemoveActiveSkill.bind(this));
         html.find('.knowledge-skill').click(this._onRollKnowledgeSkill.bind(this));
         html.find('.language-skill').click(this._onRollLanguageSkill.bind(this));
 
@@ -755,12 +756,18 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
      *
      * @param event The HTML event from which the action resulted.
      */
-     async _onAddActiveSkill(event) {
+     async _onAddActiveSkill(event: Event) {
         event.preventDefault();
         const skillId = await this.actor.addActiveSkill();
         if (!skillId) return;
 
         await this._showSkillEditForm(SkillEditForm, this.actor, { event: event }, skillId);
+    }
+
+    async _onRemoveActiveSkill(event: Event) {
+         event.preventDefault();
+         const skillId = Helpers.listItemId(event);
+        await this.actor.removeActiveSkill(skillId);
     }
 
     async _onChangeRtg(event) {
