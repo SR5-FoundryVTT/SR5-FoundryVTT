@@ -214,8 +214,39 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
                 filteredSkills[key] = skill;
             }
         }
-        Helpers.orderKeys(filteredSkills);
-        return filteredSkills;
+
+        return this._sortSkills(filteredSkills);
+    }
+
+    /**
+     * Alphabetically sort skills either by their translated label. Should a skill not have one, use the name as a
+     * fallback.
+     *
+     * Sorting should be aware of UTF-8, however please blame JavaScript if it's not. :)
+     *
+     * @param skills
+     * @param asc Set to true for ascending sorting order and to false for descending order.
+     * @return Sorted Skills given by the skills parameter
+     */
+    _sortSkills(skills: Skills, asc: boolean=true): Skills {
+        // Filter entries instead of values to have a store of ids for easy rebuild.
+        const sortedEntries = Object.entries(skills).sort(([aId, a], [bId, b]) => {
+            const comparatorA = a.label ? game.i18n.localize(a.label) : a.name;
+            const comparatorB = b.label ? game.i18n.localize(b.label) : b.name;
+            // Use String.localeCompare instead of the > Operator to support other alphabets.
+            if (asc)
+                return comparatorA.localeCompare(comparatorB) === 1 ? 1 : -1;
+            else
+                return comparatorA.localeCompare(comparatorB) === 1 ? 1 : -1;
+        });
+
+        // Rebuild the Skills type using the earlier entries.
+        const sortedAsObject = {};
+        for (const [id, skill] of sortedEntries) {
+            sortedAsObject[id] = skill;
+        }
+
+        return sortedAsObject;
     }
 
     _showSkill(key, skill, data) {
