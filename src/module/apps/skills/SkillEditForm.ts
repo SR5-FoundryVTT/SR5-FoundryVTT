@@ -1,6 +1,7 @@
 import SkillEditFormData = Shadowrun.SkillEditFormData;
 import {SR5Actor} from "../../actor/SR5Actor";
 import Attributes = Shadowrun.Attributes;
+import SkillField = Shadowrun.SkillField;
 
 export class SkillEditForm extends BaseEntitySheet {
     skillId: string;
@@ -163,11 +164,18 @@ export class SkillEditForm extends BaseEntitySheet {
         return {...CONFIG.SR5.attributes, '': ''};
     }
 
+    _allowSkillNameEditing(): boolean {
+        const skill = this.entity.getSkill(this.skillId);
+        // Typescript sees string here? Double negate for boolean type cast...
+        return !!((!skill?.name && !skill?.label) || (skill?.name && !skill?.label));
+    }
+
     getData(): SkillEditFormData {
         const data = super.getData();
         const actor = data.entity;
+
         data['data'] = actor ? getProperty(actor, this._updateString()) : {};
-        data['editable_name'] = true;
+        data['editable_name'] = this._allowSkillNameEditing();
         data['attributes'] = this._getSkillAttributesForSelect();
         return data;
     }
