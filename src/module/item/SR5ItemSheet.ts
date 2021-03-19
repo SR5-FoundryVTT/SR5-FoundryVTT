@@ -97,7 +97,7 @@ export class SR5ItemSheet extends ItemSheet<{}, SR5Item> {
 
     _getActiveSkillsForSelect() {
         if (!this.item.actor) return CONFIG.SR5.activeSkills;
-        const activeSkills = this.item.actor.getActiveSkills();
+        const activeSkills = Helpers.sortSkills(this.item.actor.getActiveSkills());
 
         const activeSkillsForSelect = {};
         for (const [id, skill] of Object.entries(activeSkills)) {

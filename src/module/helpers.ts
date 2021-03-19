@@ -13,6 +13,7 @@ import {DEFAULT_ID_LENGTH, FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS
 import {SR5Actor} from "./actor/SR5Actor";
 import {DataTemplates} from "./dataTemplates";
 import {DeleteConfirmationDialog} from "./apps/dialogs/DeleteConfirmationDialog";
+import Skills = Shadowrun.Skills;
 
 interface CalcTotalOptions {
     min?: number,
@@ -443,7 +444,8 @@ export class Helpers {
         return !dialog.canceled && dialog.selectedButton === 'delete';
     }
 
-    /** This can be used to create an SkillField into the Skills data path during the Skill creation process.
+    /**
+     * This can be used to create an SkillField into the Skills data path during the Skill creation process.
      *
      * @param skillDataPath Could be 'data.skills.active' or 'data.skill.language.value' or more
      * @param skillField A SkillField with whatever values. You could use DefaultValues.skillData to create one.
@@ -475,5 +477,36 @@ export class Helpers {
         // Entity.update utilizes the mergeObject function within Foundry.
         // That functions documentation allows property deletion using the -= prefix before property key.
         return {[path]: {[`-=${key}`]: null}};
+    }
+
+    /**
+     * Alphabetically sort skills either by their translated label. Should a skill not have one, use the name as a
+     * fallback.
+     *
+     * Sorting should be aware of UTF-8, however please blame JavaScript if it's not. :)
+     *
+     * @param skills
+     * @param asc Set to true for ascending sorting order and to false for descending order.
+     * @return Sorted Skills given by the skills parameter
+     */
+    static sortSkills(skills: Skills, asc: boolean=true): Skills {
+        // Filter entries instead of values to have a store of ids for easy rebuild.
+        const sortedEntries = Object.entries(skills).sort(([aId, a], [bId, b]) => {
+            const comparatorA = a.label ? game.i18n.localize(a.label) : a.name;
+            const comparatorB = b.label ? game.i18n.localize(b.label) : b.name;
+            // Use String.localeCompare instead of the > Operator to support other alphabets.
+            if (asc)
+                return comparatorA.localeCompare(comparatorB) === 1 ? 1 : -1;
+            else
+                return comparatorA.localeCompare(comparatorB) === 1 ? 1 : -1;
+        });
+
+        // Rebuild the Skills type using the earlier entries.
+        const sortedAsObject = {};
+        for (const [id, skill] of sortedEntries) {
+            sortedAsObject[id] = skill;
+        }
+
+        return sortedAsObject;
     }
 }
