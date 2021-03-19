@@ -294,7 +294,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
         return skill.label ? skill.label : skill.name ? skill.name : '';
     }
 
-    async addKnowledgeSkill(category, skill?) {
+    async addKnowledgeSkill(category, skill?): Promise<string> {
         const defaultSkill = {
             name: '',
             specs: [],
@@ -315,6 +315,8 @@ export class SR5Actor extends Actor<SR5ActorData> {
         updateData[fieldName] = value;
 
         await this.update(updateData);
+
+        return id;
     }
 
     async addActiveSkill(skillData: Partial<SkillField> = {name: SKILL_DEFAULT_NAME}): Promise<string | undefined> {
@@ -329,7 +331,6 @@ export class SR5Actor extends Actor<SR5ActorData> {
 
         await this.update(updateSkillData as object);
 
-        // Allow callers to do something with the resulting id
         return id;
     }
 
@@ -338,7 +339,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
         await this.update(updateData);
     }
 
-    async addLanguageSkill(skill) {
+    async addLanguageSkill(skill): Promise<string> {
         const defaultSkill = {
             name: '',
             specs: [],
@@ -360,6 +361,8 @@ export class SR5Actor extends Actor<SR5ActorData> {
         updateData[fieldName] = value;
 
         await this.update(updateData);
+
+        return id;
     }
 
     async removeKnowledgeSkill(skillId, category) {

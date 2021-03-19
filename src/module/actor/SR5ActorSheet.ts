@@ -763,7 +763,10 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
 
     async _onAddLanguageSkill(event) {
         event.preventDefault();
-        await this.actor.addLanguageSkill({ name: '' });
+        const skillId = await this.actor.addLanguageSkill({ name: '' });
+        if (!skillId) return;
+
+        await this._showSkillEditForm(LanguageSkillEditForm, this.actor, {event}, skillId);
     }
 
     async _onRemoveLanguageSkill(event) {
@@ -775,7 +778,10 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
     async _onAddKnowledgeSkill(event) {
         event.preventDefault();
         const category = Helpers.listItemId(event);
-        await this.actor.addKnowledgeSkill(category);
+        const skillId = await this.actor.addKnowledgeSkill(category);
+        if (!skillId) return;
+
+        await this._showSkillEditForm(KnowledgeSkillEditForm, this.actor, {event}, skillId);
     }
 
     async _onRemoveKnowledgeSkill(event) {
