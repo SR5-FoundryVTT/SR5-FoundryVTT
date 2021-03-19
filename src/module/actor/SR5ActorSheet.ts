@@ -1,16 +1,16 @@
-import { Helpers } from '../helpers';
-import { ChummerImportForm } from '../apps/chummer-import-form';
-import { SkillEditForm } from '../apps/skills/SkillEditForm';
-import { KnowledgeSkillEditForm } from '../apps/skills/KnowledgeSkillEditForm';
-import { LanguageSkillEditForm } from '../apps/skills/LanguageSkillEditForm';
+import {Helpers} from '../helpers';
+import {ChummerImportForm} from '../apps/chummer-import-form';
+import {SkillEditForm} from '../apps/skills/SkillEditForm';
+import {KnowledgeSkillEditForm} from '../apps/skills/KnowledgeSkillEditForm';
+import {LanguageSkillEditForm} from '../apps/skills/LanguageSkillEditForm';
+import {SR5Actor} from './SR5Actor';
+import {SR5} from '../config';
+import {SR5Item} from "../item/SR5Item";
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import Skills = Shadowrun.Skills;
-import { SR5Actor } from './SR5Actor';
 import MatrixAttribute = Shadowrun.MatrixAttribute;
-import { SR5 } from '../config';
 import SkillField = Shadowrun.SkillField;
-import {SR5Item} from "../item/SR5Item";
 import DeviceData = Shadowrun.DeviceData;
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditForm instance.
@@ -771,6 +771,10 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
 
     async _onRemoveLanguageSkill(event) {
         event.preventDefault();
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
         const skillId = Helpers.listItemId(event);
         await this.actor.removeLanguageSkill(skillId);
     }
@@ -786,6 +790,10 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
 
     async _onRemoveKnowledgeSkill(event) {
         event.preventDefault();
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
         const [skillId, category] = Helpers.listItemId(event).split('.');
         await this.actor.removeKnowledgeSkill(skillId, category);
     }
@@ -804,7 +812,11 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
 
     async _onRemoveActiveSkill(event: Event) {
          event.preventDefault();
-         const skillId = Helpers.listItemId(event);
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        const skillId = Helpers.listItemId(event);
         await this.actor.removeActiveSkill(skillId);
     }
 
