@@ -1,6 +1,8 @@
 import { Helpers } from '../helpers';
 import {SafeString} from "handlebars";
 import SkillField = Shadowrun.SkillField;
+import {SR5} from "../config";
+import {FLAGS, SR, SYSTEM_NAME} from "../constants";
 
 export const registerBasicHelpers = () => {
     Handlebars.registerHelper('localizeOb', function (strId, obj) {
@@ -9,8 +11,19 @@ export const registerBasicHelpers = () => {
     });
 
     Handlebars.registerHelper('localizeSkill', function (skill: SkillField): string {
-        if (skill.label) return game.i18n.localize(skill.label)
-        return game.i18n.localize(skill.name);
+        const translatedSkill = skill.label ? game.i18n.localize(skill.label) : skill.name;
+        if (!game.settings.get(SYSTEM_NAME, FLAGS.ShowSkillsWithDetails) || !translatedSkill || !skill.attribute)
+            return translatedSkill;
+
+        // Try showing the first three letters, or less.
+        const translatedAttribute = game.i18n.localize(SR5.attributes[skill.attribute]);
+        if (!translatedAttribute) return translatedSkill;
+
+        const cutToIndex = translatedAttribute.length < SR.attributes.SHORT_NAME_LENGTH ?
+            translatedAttribute.length -1 :
+            SR.attributes.SHORT_NAME_LENGTH;
+        const translatedAttributeShorthand = translatedAttribute.substring(0, cutToIndex).toUpperCase();
+        return `${translatedSkill} (${translatedAttributeShorthand})`;
     });
 
     Handlebars.registerHelper('toHeaderCase', function (str) {

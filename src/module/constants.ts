@@ -6,6 +6,7 @@ export const FLAGS = {
     ShowTokenNameForChatOutput: 'showTokenNameInsteadOfActor',
     WhisperOpposedTestsToTargetedPlayers: 'whisperOpposedTestsToTargetedPlayers',
     OnlyAllowRollOnDefaultableSkills: 'onlyAllowRollOnDefaultableSkills',
+    ShowSkillsWithDetails: 'showSkillsWithDetails',
     MessageCustomRoll: 'customRoll',
     ApplyLimits: 'applyLimits',
     LastRollPromptValue: 'lastRollPromptValue',
@@ -96,7 +97,8 @@ export const SR = {
             sleaze: {min: 0},
             data_processing: {min: 0},
             firewall: {min: 0}
-        }
+        },
+        SHORT_NAME_LENGTH: 3
     },
     skill: {
         // @PDF SR5#130

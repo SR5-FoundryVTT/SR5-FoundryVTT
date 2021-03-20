@@ -89,4 +89,13 @@ export const registerSystemSettings = () => {
         type: Boolean,
         default: true,
     });
+
+    game.settings.register(SYSTEM_NAME, FLAGS.ShowSkillsWithDetails, {
+         name: 'SETTINGS.ShowSkillsWithDetails',
+        hint: 'SETTINGS.ShowSkillsWithDetailsDescription',
+        scope: 'user',
+        config: true,
+        type: Boolean,
+        default: true,
+    });
 };

@@ -735,7 +735,8 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         const skillId = await this.actor.addLanguageSkill({ name: '' });
         if (!skillId) return;
 
-        await this._showSkillEditForm(LanguageSkillEditForm, this.actor, {event}, skillId);
+        // NOTE: Causes issues with adding knowledge skills (category undefined)
+        // await this._showSkillEditForm(LanguageSkillEditForm, this.actor, {event}, skillId);
     }
 
     async _onRemoveLanguageSkill(event) {
@@ -754,7 +755,8 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         const skillId = await this.actor.addKnowledgeSkill(category);
         if (!skillId) return;
 
-        await this._showSkillEditForm(KnowledgeSkillEditForm, this.actor, {event}, skillId);
+        // NOTE: Causes issues with adding knowledge skills (category undefined)
+        // await this._showSkillEditForm(KnowledgeSkillEditForm, this.actor, {event}, skillId);
     }
 
     async _onRemoveKnowledgeSkill(event) {

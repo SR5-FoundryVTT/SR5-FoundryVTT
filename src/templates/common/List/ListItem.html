@@ -8,6 +8,7 @@
         <div class="item-text item-name
             {{#if hasDesc}}has-desc{{/if}}
             {{#if itemNameCssClass}}{{itemNameCssClass}}{{/if}}
+            {{#each additionalCssClass}}{{this }}{{/each}}
             {{#unless img}}{{#if hasRoll}}roll{{/if}}{{/unless}}"
         >
             {{name}}
