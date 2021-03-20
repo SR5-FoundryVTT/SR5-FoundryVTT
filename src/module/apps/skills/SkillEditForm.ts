@@ -50,6 +50,9 @@ export class SkillEditForm extends BaseEntitySheet {
         // get base value
         const base = formData['data.base'];
 
+        // get can default
+        const canDefault = formData['data.canDefault'];
+
         // process specializations
         const specsRegex = /data\.specs\.(\d+)/;
         const specs = Object.entries(formData).reduce((running, [key, val]: [string, any]) => {
@@ -87,6 +90,7 @@ export class SkillEditForm extends BaseEntitySheet {
             bonus,
             name,
             attribute,
+            canDefault
         };
     }
 
@@ -176,7 +180,9 @@ export class SkillEditForm extends BaseEntitySheet {
 
         data['data'] = actor ? getProperty(actor, this._updateString()) : {};
         data['editable_name'] = this._allowSkillNameEditing();
+        data['editable_canDefault'] = true;
+        data['editable_attribute'] = true;
         data['attributes'] = this._getSkillAttributesForSelect();
-        return data;
+        return data as SkillEditFormData;
     }
 }
