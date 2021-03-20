@@ -20,7 +20,7 @@
     <div class="scroll-area left light-border-right">
         {{#each data.skills.active as |skill sid|}}
             {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
-                    name=(localizeOb sid ../config.activeSkills)
+                    name=(localizeSkill skill)
                     itemNameCssClass="skill-roll"
                     itemId=sid
                     icons=(SkillIcons 'active' skill)
