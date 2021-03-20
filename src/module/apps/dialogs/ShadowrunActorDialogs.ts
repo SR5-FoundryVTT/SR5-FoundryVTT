@@ -7,6 +7,8 @@ import ModList = Shadowrun.ModList;
 import SoakRollOptions = Shadowrun.SoakRollOptions;
 import SkillDialogOptions = Shadowrun.SkillDialogOptions;
 import CombatData = Shadowrun.CombatData;
+import {SkillRules} from "../../actor/SkillRules";
+import {SkillFlow} from "../../actor/SkillFlow";
 
 export class ShadowrunActorDialogs {
     static async createDefenseDialog(actor: SR5Actor, options: DefenseRollOptions, partsProps: ModList<number>): Promise<FormDialog> {
@@ -197,12 +199,7 @@ export class ShadowrunActorDialogs {
 
             partsProps.addUniquePart(attribute.label, attribute.value);
 
-            // Check for skill defaulting at the base, since modifiers or bonus can cause a positive pool, while
-            // still defaulting.
-            const isDefaulting = options.skill.base === 0;
-            if (isDefaulting) {
-                partsProps.addUniquePart('SR5.Defaulting', -1);
-            }
+            SkillFlow.handleDefaulting(options.skill, partsProps);
 
             // Possible specialization based on button label.
             const isSpecialization = options.skill.specs.includes(selectedButton);

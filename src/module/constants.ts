@@ -96,5 +96,9 @@ export const SR = {
             data_processing: {min: 0},
             firewall: {min: 0}
         }
+    },
+    skill: {
+        // @PDF SR5#130
+        DEFAULTING_MODIFIER: -1
     }
 }

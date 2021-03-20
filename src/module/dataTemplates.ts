@@ -138,6 +138,7 @@ export class DefaultValues {
             base: 0,
             value: 0,
             hidden: false,
+            canDefault: false,
             label: '',
             bonus: [],
             specs: [],

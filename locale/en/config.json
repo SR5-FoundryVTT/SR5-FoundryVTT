@@ -791,7 +791,8 @@
 
     "SR5.Warnings": {
         "NegativeLimitValue": "Limit values must be above zero",
-        "TokenSelectionNeeded": "One ore more tokens need to be selected"
+        "TokenSelectionNeeded": "One ore more tokens need to be selected",
+        "SkillCantBeDefault": "This skill can't be rolled on as it can't be defaulted"
     },
 
     "SR5.Errors": {

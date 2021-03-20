@@ -18,6 +18,7 @@ declare namespace Shadowrun {
         HasBonus &
         HasAttribute & {
             specs: string[];
+            canDefault: boolean
         };
 
     export type HasAttribute = {
