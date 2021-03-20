@@ -571,6 +571,8 @@
         "ShowTokenNameForChatOutputDescription": "Soll der Namen des Tokens für die Würfelkarte angezeigt werden anstelle dem Namen des Actors, wenn ein Token verfügbar ist",
         "WhisperOpposedTestsToTargetedPlayers": "Flüstere VS Anteil an anvisierte Spieler",
         "WhisperOpposedTestsToTargetedPlayersDescription": "Bei Proben mit VS Proben wird eine geflüsterte Nachricht an anvisierte Spieler (online) versendet",
+        "OnlyAllowRollOnDefaultableSkills": "Nur improvisierbare unbekannte Fertigkeitsproben",
+        "OnlyAllowRollOnDefaultableSkillsDescription": "Wenn deaktiviert können unbekannte Fertigkeiten auch getestet werden, wenn sie nicht improvisierbar sind",
         "Euclidean": "Euklidisch"
     },
 

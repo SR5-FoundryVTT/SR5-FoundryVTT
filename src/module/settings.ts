@@ -80,4 +80,13 @@ export const registerSystemSettings = () => {
         type: Boolean,
         default: true,
     });
+
+    game.settings.register(SYSTEM_NAME, FLAGS.OnlyAllowRollOnDefaultableSkills, {
+         name: 'SETTINGS.OnlyAllowRollOnDefaultableSkills',
+        hint: 'SETTINGS.OnlyAllowRollOnDefaultableSkillsDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: true,
+    });
 };

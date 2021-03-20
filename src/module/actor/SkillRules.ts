@@ -4,6 +4,10 @@ import {SR5} from "../config";
 import {SR} from "../constants";
 
 export class SkillRules {
+
+    static mustDefaultToRoll(skill: SkillField): boolean {
+        return skill.base === 0;
+    }
     /**
      * Allow defaulting a skill role.
      * @PDF SR5#130
@@ -13,7 +17,7 @@ export class SkillRules {
     static allowDefaultingRoll(skill: SkillField): boolean {
         // Check for skill defaulting at the base, since modifiers or bonus can cause a positive pool, while
         // still defaulting.
-        return skill.base === 0 && skill.canDefault;
+        return skill.canDefault;
     }
 
     /**
@@ -23,7 +27,7 @@ export class SkillRules {
      * @return true will allow for a SuccessTest / role to proceed.
      */
     static allowRoll(skill: SkillField): boolean {
-        return skill.base > 0 || SkillRules.allowDefaultingRoll(skill);
+        return !SkillRules.mustDefaultToRoll(skill) || SkillRules.allowDefaultingRoll(skill);
     }
 
     /**

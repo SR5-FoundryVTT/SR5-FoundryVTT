@@ -40,7 +40,7 @@ import { SoakFlow } from './SoakFlow';
 import { DefaultValues } from '../dataTemplates';
 import SR5ActorData = Shadowrun.SR5ActorData;
 import Skills = Shadowrun.Skills;
-import {SkillRules} from "./SkillRules";
+import {SkillFlow} from "./SkillFlow";
 
 export class SR5Actor extends Actor<SR5ActorData> {
     // NOTE: Overwrite Actor.data additionally to extends Actor<T as SR5Actortype.Data: SR5ActorData> to still have
@@ -759,7 +759,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
     async rollSkill(skill: SkillField, options?: SkillRollOptions) {
         // NOTE: Currently defaulting happens at multiple places, which is why SkillFlow.handleDefaulting isn't used
         //       here, yet. A general skill usage clean up between Skill, Attribute and Item action handling is needed.
-        if (!SkillRules.allowRoll(skill)) {
+        if (!SkillFlow.allowRoll(skill)) {
             ui.notifications.warn(game.i18n.localize('SR5.Warnings.SkillCantBeDefault'));
             return;
         }

@@ -578,6 +578,8 @@
         "ShowTokenNameForChatOutputDescription": "Should the token name be used for roll card output instead of the actor name when available",
         "WhisperOpposedTestsToTargetedPlayers": "Whisper tests to targeted players",
         "WhisperOpposedTestsToTargetedPlayersDescription": "Rolls with opposed tests will be whispered to a online player target",
+        "OnlyAllowRollOnDefaultableSkills": "Only defaultable unknown skill rolls",
+        "OnlyAllowRollOnDefaultableSkillsDescription": "When unset unknown skills can be rolled, even if they can't be defaulted.",
         "Euclidean": "Euclidean"
     },
 

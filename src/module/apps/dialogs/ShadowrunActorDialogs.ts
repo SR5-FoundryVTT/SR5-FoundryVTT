@@ -7,7 +7,6 @@ import ModList = Shadowrun.ModList;
 import SoakRollOptions = Shadowrun.SoakRollOptions;
 import SkillDialogOptions = Shadowrun.SkillDialogOptions;
 import CombatData = Shadowrun.CombatData;
-import {SkillRules} from "../../actor/SkillRules";
 import {SkillFlow} from "../../actor/SkillFlow";
 
 export class ShadowrunActorDialogs {

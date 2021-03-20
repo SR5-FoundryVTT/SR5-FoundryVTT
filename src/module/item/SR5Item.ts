@@ -50,7 +50,6 @@ import Quality = Shadowrun.Quality;
 import Spell = Shadowrun.Spell;
 import SpritePower = Shadowrun.SpritePower;
 import {ItemAction} from "./ItemAction";
-import {SkillRules} from "../actor/SkillRules";
 import {SkillFlow} from "../actor/SkillFlow";
 
 export class SR5Item extends Item {
