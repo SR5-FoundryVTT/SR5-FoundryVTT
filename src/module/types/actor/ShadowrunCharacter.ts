@@ -138,7 +138,10 @@ declare namespace Shadowrun {
     };
 
     export type SkillEditFormData = BaseEntitySheet.Data & {
-        data?: SkillField;
-        editable_name?: boolean;
+        data?: SkillField
+        editable_name?: boolean
+        editable_canDefault: boolean
+        editable_attribute: boolean
+        attributes: object
     };
 }

@@ -46,7 +46,7 @@
             <select name="data.action.skill">
                 {{#select data.action.skill}}
                 <option value=""></option>
-                {{#each config.activeSkills as |name type|}}
+                {{#each activeSkills as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
             </select>

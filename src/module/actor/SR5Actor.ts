@@ -9,7 +9,7 @@ import SkillRollOptions = Shadowrun.SkillRollOptions;
 import SkillField = Shadowrun.SkillField;
 import ModList = Shadowrun.ModList;
 import LimitField = Shadowrun.LimitField;
-import {SYSTEM_NAME, FLAGS, SR} from '../constants';
+import {SYSTEM_NAME, FLAGS, SR, SKILL_DEFAULT_NAME} from '../constants';
 import SR5ActorType = Shadowrun.SR5ActorType;
 import { PartsList } from '../parts/PartsList';
 import { ActorPrepFactory } from './prep/ActorPrepFactory';
@@ -39,6 +39,8 @@ import {Modifiers} from "../sr5/Modifiers";
 import { SoakFlow } from './SoakFlow';
 import { DefaultValues } from '../dataTemplates';
 import SR5ActorData = Shadowrun.SR5ActorData;
+import Skills = Shadowrun.Skills;
+import {SkillFlow} from "./SkillFlow";
 
 export class SR5Actor extends Actor<SR5ActorData> {
     // NOTE: Overwrite Actor.data additionally to extends Actor<T as SR5Actortype.Data: SR5ActorData> to still have
@@ -73,7 +75,11 @@ export class SR5Actor extends Actor<SR5ActorData> {
 
     findActiveSkill(skillName?: string): SkillField | undefined {
         if (skillName === undefined) return undefined;
-        return this.data.data.skills.active[skillName];
+        // Search for legacy skills with their name as id.
+        const skill = this.data.data.skills.active[skillName];
+        if (skill) return skill;
+        // Search for custom skills with a random id.
+        return Object.values(this.data.data.skills.active).find(skill => skill.name === skillName);
     }
 
     findAttribute(attributeName?: string): AttributeField | undefined {
@@ -257,6 +263,10 @@ export class SR5Actor extends Actor<SR5ActorData> {
         return this.findActiveSkill(name);
     }
 
+    getActiveSkills(): Skills {
+        return this.data.data.skills.active;
+    }
+
     getSkill(skillId: string): SkillField | undefined {
         const { skills } = this.data.data;
         if (skills.active.hasOwnProperty(skillId)) {
@@ -285,7 +295,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
         return skill.label ? skill.label : skill.name ? skill.name : '';
     }
 
-    async addKnowledgeSkill(category, skill?) {
+    async addKnowledgeSkill(category, skill?): Promise<string> {
         const defaultSkill = {
             name: '',
             specs: [],
@@ -306,20 +316,37 @@ export class SR5Actor extends Actor<SR5ActorData> {
         updateData[fieldName] = value;
 
         await this.update(updateData);
+
+        return id;
+    }
+
+    async addActiveSkill(skillData: Partial<SkillField> = {name: SKILL_DEFAULT_NAME}): Promise<string | undefined> {
+        const skill = DefaultValues.skillData(skillData);
+
+        const activeSkillsPath = 'data.skills.active';
+        const updateSkillDataResult = Helpers.getRandomIdSkillFieldDataEntry(activeSkillsPath, skill);
+
+        if (!updateSkillDataResult) return;
+
+        const {updateSkillData, id} = updateSkillDataResult;
+
+        await this.update(updateSkillData as object);
+
+        return id;
     }
 
     async removeLanguageSkill(skillId) {
-        const value = {};
-        value[skillId] = { _delete: true };
-        await this.update({ 'data.skills.language.value': value });
+        const updateData = Helpers.getDeleteDataEntry('data.skills.language.value', skillId);
+        await this.update(updateData);
     }
 
-    async addLanguageSkill(skill) {
+    async addLanguageSkill(skill): Promise<string> {
         const defaultSkill = {
             name: '',
             specs: [],
             base: 0,
             value: 0,
+            // TODO: BUG ModifiableValue is ModList<number>[] and not number
             mod: 0,
         };
         skill = {
@@ -335,16 +362,24 @@ export class SR5Actor extends Actor<SR5ActorData> {
         updateData[fieldName] = value;
 
         await this.update(updateData);
+
+        return id;
     }
 
     async removeKnowledgeSkill(skillId, category) {
-        const value = {};
-        const updateData = {};
+        const updateData = Helpers.getDeleteDataEntry(`data.skills.knowledge.${category}.value`, skillId);
+        await this.update(updateData);
+    }
 
-        const dataString = `data.skills.knowledge.${category}.value`;
-        value[skillId] = { _delete: true };
-        updateData[dataString] = value;
+    /** Delete the given active skill by it's id. It doesn't
+     *
+     * @param skillId Either a random id for custom skills or the skills name used as an id.
+     */
+    async removeActiveSkill(skillId: string) {
+        const activeSkills = this.getActiveSkills();
+        if (!activeSkills.hasOwnProperty(skillId)) return;
 
+        const updateData = Helpers.getDeleteDataEntry('data.skills.active', skillId);
         await this.update(updateData);
     }
 
@@ -722,7 +757,16 @@ export class SR5Actor extends Actor<SR5ActorData> {
     }
 
     async rollSkill(skill: SkillField, options?: SkillRollOptions) {
-        let title = game.i18n.localize(skill.label);
+        // NOTE: Currently defaulting happens at multiple places, which is why SkillFlow.handleDefaulting isn't used
+        //       here, yet. A general skill usage clean up between Skill, Attribute and Item action handling is needed.
+        if (!SkillFlow.allowRoll(skill)) {
+            ui.notifications.warn(game.i18n.localize('SR5.Warnings.SkillCantBeDefault'));
+            return;
+        }
+
+        // Legacy skills have a label, but no name. Custom skills have a name but no label.
+        const label = skill.label ? game.i18n.localize(skill.label) : skill.name;
+        const title = label;
 
         const attributeName = options?.attribute ? options.attribute : skill.attribute;
         const att = this.getAttribute(attributeName);
@@ -730,7 +774,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
 
         // Initialize parts with always needed skill data.
         const parts = new PartsList<number>();
-        parts.addUniquePart(skill.label, skill.value);
+        parts.addUniquePart(label, skill.value);
         this._addMatrixParts(parts, [att, skill]);
         this._addGlobalParts(parts);
 

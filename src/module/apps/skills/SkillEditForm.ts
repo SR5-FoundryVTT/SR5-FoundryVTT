@@ -1,5 +1,7 @@
 import SkillEditFormData = Shadowrun.SkillEditFormData;
 import {SR5Actor} from "../../actor/SR5Actor";
+import Attributes = Shadowrun.Attributes;
+import SkillField = Shadowrun.SkillField;
 
 export class SkillEditForm extends BaseEntitySheet {
     skillId: string;
@@ -38,8 +40,18 @@ export class SkillEditForm extends BaseEntitySheet {
     }
 
     _onUpdateObject(event, formData, updateData) {
+        // get skill name.
+        // NOTE: This differs from the skill id, which is used to identify the skill internally.
+        const name = formData['data.name'];
+
+        // get attribute name
+        const attribute = formData['data.attribute'];
+
         // get base value
         const base = formData['data.base'];
+
+        // get can default
+        const canDefault = formData['data.canDefault'];
 
         // process specializations
         const specsRegex = /data\.specs\.(\d+)/;
@@ -76,6 +88,9 @@ export class SkillEditForm extends BaseEntitySheet {
             base,
             specs,
             bonus,
+            name,
+            attribute,
+            canDefault
         };
     }
 
@@ -147,10 +162,27 @@ export class SkillEditForm extends BaseEntitySheet {
         }
     }
 
+    /** Enhance attribute selection by an empty option to allow newly created skills to have no attribute selected.
+     */
+    _getSkillAttributesForSelect() {
+        return {...CONFIG.SR5.attributes, '': ''};
+    }
+
+    _allowSkillNameEditing(): boolean {
+        const skill = this.entity.getSkill(this.skillId);
+        // Typescript sees string here? Double negate for boolean type cast...
+        return !!((!skill?.name && !skill?.label) || (skill?.name && !skill?.label));
+    }
+
     getData(): SkillEditFormData {
         const data = super.getData();
         const actor = data.entity;
+
         data['data'] = actor ? getProperty(actor, this._updateString()) : {};
-        return data;
+        data['editable_name'] = this._allowSkillNameEditing();
+        data['editable_canDefault'] = true;
+        data['editable_attribute'] = true;
+        data['attributes'] = this._getSkillAttributesForSelect();
+        return data as SkillEditFormData;
     }
 }

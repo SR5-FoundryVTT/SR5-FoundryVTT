@@ -5,6 +5,7 @@ export const FLAGS = {
     ShowGlitchAnimation: 'showGlitchAnimation',
     ShowTokenNameForChatOutput: 'showTokenNameInsteadOfActor',
     WhisperOpposedTestsToTargetedPlayers: 'whisperOpposedTestsToTargetedPlayers',
+    OnlyAllowRollOnDefaultableSkills: 'onlyAllowRollOnDefaultableSkills',
     MessageCustomRoll: 'customRoll',
     ApplyLimits: 'applyLimits',
     LastRollPromptValue: 'lastRollPromptValue',
@@ -39,6 +40,10 @@ export const LENGTH_UNIT_TO_METERS_MULTIPLIERS = {
 export const DEFAULT_ROLL_NAME = 'Roll';
 
 export const LENGTH_UNIT = 'm';
+
+export const SKILL_DEFAULT_NAME = '';
+
+export const DEFAULT_ID_LENGTH = 16;
 
 // Contain data regarding shadowrun rules, mostly whatever is stated in some table to be looked up in other places.
 export const SR = {
@@ -92,5 +97,9 @@ export const SR = {
             data_processing: {min: 0},
             firewall: {min: 0}
         }
+    },
+    skill: {
+        // @PDF SR5#130
+        DEFAULTING_MODIFIER: -1
     }
 }

@@ -14,6 +14,38 @@
             </div>
         </div>
         {{/if}}
+        {{#if editable_attribute}}
+        <div class="list-item item-section">
+            <div class="item-left">
+                <div class="item-text item-name">
+                    {{localize "SR5.Attribute"}}
+                </div>
+            </div>
+            <div class="item-right">
+                <div class="item-text item-name">
+                    {{> "systems/shadowrun5e/dist/templates/common/Select.html"
+                            options=attributes
+                            value=data.attribute
+                            path="data.attribute"
+                    }}
+                </div>
+            </div>
+        </div>
+        {{/if}}
+        {{#if editable_canDefault}}
+        <div class="list-item item-section">
+            <div class="item-left">
+                <div class="item-text item-name">
+                    {{localize "SR5.CanDefault"}}
+                </div>
+            </div>
+            <div class="item-right">
+                <div class="item-text item-name">
+                    <input type="checkbox" class="checkbox" name="data.canDefault" {{checked data.canDefault}}/>
+                </div>
+            </div>
+        </div>
+        {{/if}}
         <div class="list-item item-section">
             <div class="item-left">
                 <div class="item-text item-name">
