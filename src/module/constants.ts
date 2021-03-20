@@ -96,7 +96,8 @@ export const SR = {
             sleaze: {min: 0},
             data_processing: {min: 0},
             firewall: {min: 0}
-        }
+        },
+        SHORT_NAME_LENGTH: 3
     },
     skill: {
         // @PDF SR5#130

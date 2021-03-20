@@ -768,19 +768,24 @@ export class SR5Actor extends Actor<SR5ActorData> {
         const label = skill.label ? game.i18n.localize(skill.label) : skill.name;
         const title = label;
 
+        // Since options can provide an attribute, ignore incomplete sill attribute configuration.
         const attributeName = options?.attribute ? options.attribute : skill.attribute;
-        const att = this.getAttribute(attributeName);
-        let limit = att.limit ? this.getLimit(att.limit) : undefined;
+        const attribute = this.getAttribute(attributeName);
+        if (!attribute) {
+            ui.notifications.error(game.i18n.localize('SR5.Errors.SkillWithoutAttribute'));
+            return;
+        }
+        let limit = attribute.limit ? this.getLimit(attribute.limit) : undefined;
 
         // Initialize parts with always needed skill data.
         const parts = new PartsList<number>();
         parts.addUniquePart(label, skill.value);
-        this._addMatrixParts(parts, [att, skill]);
+        this._addMatrixParts(parts, [attribute, skill]);
         this._addGlobalParts(parts);
 
         // Directly test, without further skill dialog.
         if (options?.event && Helpers.hasModifiers(options?.event)) {
-            parts.addUniquePart(att.label, att.value);
+            parts.addUniquePart(attribute.label, attribute.value);
             if (options.event[CONFIG.SR5.kbmod.SPEC]) parts.addUniquePart('SR5.Specialization', 2);
 
             return await ShadowrunRoller.advancedRoll({

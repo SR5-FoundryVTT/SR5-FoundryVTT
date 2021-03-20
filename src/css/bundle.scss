@@ -674,6 +674,10 @@ select.display {
     td.env-modifier-level {
         padding-right: 6px;
     }
+
+    .skill-roll-not-defaultable {
+        font-style: italic;
+    }
 }
 
 /** Replicate Foundry .dialog stiling for flex row buttons. FormDialog sublcasses simply adding class dialog will
