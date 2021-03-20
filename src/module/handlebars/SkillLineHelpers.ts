@@ -3,6 +3,7 @@ import { Helpers } from '../helpers';
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import SkillCategories = Shadowrun.SkillCategories;
 import {SkillRules} from "../actor/SkillRules";
+import {FLAGS, SYSTEM_NAME} from "../constants";
 
 export const registerSkillLineHelpers = () => {
     Handlebars.registerHelper('SkillHeaderIcons', function (category: SkillCategories) {
@@ -76,7 +77,7 @@ export const registerSkillLineHelpers = () => {
         const classes: string[] = [];
 
         // @PDF SR5#151 not defaultable skills should be shown as italic.
-        if (!SkillRules.allowDefaultingRoll(skill)) {
+        if (game.settings.get(SYSTEM_NAME, FLAGS.ShowSkillsWithDetails) && !SkillRules.allowDefaultingRoll(skill)) {
             classes.push('skill-roll-not-defaultable');
         }
 

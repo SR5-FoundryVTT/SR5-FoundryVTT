@@ -6,6 +6,7 @@ export const FLAGS = {
     ShowTokenNameForChatOutput: 'showTokenNameInsteadOfActor',
     WhisperOpposedTestsToTargetedPlayers: 'whisperOpposedTestsToTargetedPlayers',
     OnlyAllowRollOnDefaultableSkills: 'onlyAllowRollOnDefaultableSkills',
+    ShowSkillsWithDetails: 'showSkillsWithDetails',
     MessageCustomRoll: 'customRoll',
     ApplyLimits: 'applyLimits',
     LastRollPromptValue: 'lastRollPromptValue',
