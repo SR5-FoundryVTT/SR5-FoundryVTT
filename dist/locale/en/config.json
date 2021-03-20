@@ -580,6 +580,8 @@
         "WhisperOpposedTestsToTargetedPlayersDescription": "Rolls with opposed tests will be whispered to a online player target",
         "OnlyAllowRollOnDefaultableSkills": "Only defaultable unknown skill rolls",
         "OnlyAllowRollOnDefaultableSkillsDescription": "When unset unknown skills can be rolled, even if they can't be defaulted.",
+        "ShowSkillsWithDetails": "Show more detailed skill lists",
+        "ShowSkillsWithDetailsDescription": "When set skills list display will mirror core rulebook style (italics, short attributes)",
         "Euclidean": "Euclidean"
     },
 
@@ -798,7 +800,8 @@
     },
 
     "SR5.Errors": {
-        "MissingSkill": "The actor doesn't have the requested skill."
+        "MissingSkill": "The actor doesn't have the requested skill.",
+        "SkillWithoutAttribute": "The skill has no attribute configured."
     },
 
     "SR5.ChangelogApplication": {

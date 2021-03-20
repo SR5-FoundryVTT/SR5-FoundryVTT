@@ -13915,17 +13915,22 @@ class SR5Actor extends Actor {
             // Legacy skills have a label, but no name. Custom skills have a name but no label.
             const label = skill.label ? game.i18n.localize(skill.label) : skill.name;
             const title = label;
+            // Since options can provide an attribute, ignore incomplete sill attribute configuration.
             const attributeName = (options === null || options === void 0 ? void 0 : options.attribute) ? options.attribute : skill.attribute;
-            const att = this.getAttribute(attributeName);
-            let limit = att.limit ? this.getLimit(att.limit) : undefined;
+            const attribute = this.getAttribute(attributeName);
+            if (!attribute) {
+                ui.notifications.error(game.i18n.localize('SR5.Errors.SkillWithoutAttribute'));
+                return;
+            }
+            let limit = attribute.limit ? this.getLimit(attribute.limit) : undefined;
             // Initialize parts with always needed skill data.
             const parts = new PartsList_1.PartsList();
             parts.addUniquePart(label, skill.value);
-            this._addMatrixParts(parts, [att, skill]);
+            this._addMatrixParts(parts, [attribute, skill]);
             this._addGlobalParts(parts);
             // Directly test, without further skill dialog.
             if ((options === null || options === void 0 ? void 0 : options.event) && helpers_1.Helpers.hasModifiers(options === null || options === void 0 ? void 0 : options.event)) {
-                parts.addUniquePart(att.label, att.value);
+                parts.addUniquePart(attribute.label, attribute.value);
                 if (options.event[CONFIG.SR5.kbmod.SPEC])
                     parts.addUniquePart('SR5.Specialization', 2);
                 return yield ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
@@ -15353,7 +15358,8 @@ class SR5ActorSheet extends ActorSheet {
             const skillId = yield this.actor.addLanguageSkill({ name: '' });
             if (!skillId)
                 return;
-            yield this._showSkillEditForm(LanguageSkillEditForm_1.LanguageSkillEditForm, this.actor, { event }, skillId);
+            // NOTE: Causes issues with adding knowledge skills (category undefined)
+            // await this._showSkillEditForm(LanguageSkillEditForm, this.actor, {event}, skillId);
         });
     }
     _onRemoveLanguageSkill(event) {
@@ -15373,7 +15379,8 @@ class SR5ActorSheet extends ActorSheet {
             const skillId = yield this.actor.addKnowledgeSkill(category);
             if (!skillId)
                 return;
-            yield this._showSkillEditForm(KnowledgeSkillEditForm_1.KnowledgeSkillEditForm, this.actor, { event }, skillId);
+            // NOTE: Causes issues with adding knowledge skills (category undefined)
+            // await this._showSkillEditForm(KnowledgeSkillEditForm, this.actor, {event}, skillId);
         });
     }
     _onRemoveKnowledgeSkill(event) {
@@ -21469,6 +21476,7 @@ exports.FLAGS = {
     ShowTokenNameForChatOutput: 'showTokenNameInsteadOfActor',
     WhisperOpposedTestsToTargetedPlayers: 'whisperOpposedTestsToTargetedPlayers',
     OnlyAllowRollOnDefaultableSkills: 'onlyAllowRollOnDefaultableSkills',
+    ShowSkillsWithDetails: 'showSkillsWithDetails',
     MessageCustomRoll: 'customRoll',
     ApplyLimits: 'applyLimits',
     LastRollPromptValue: 'lastRollPromptValue',
@@ -21553,7 +21561,8 @@ exports.SR = {
             sleaze: { min: 0 },
             data_processing: { min: 0 },
             firewall: { min: 0 }
-        }
+        },
+        SHORT_NAME_LENGTH: 3
     },
     skill: {
         // @PDF SR5#130
@@ -21777,6 +21786,8 @@ exports.registerAppHelpers = registerAppHelpers;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerBasicHelpers = void 0;
 const helpers_1 = require("../helpers");
+const config_1 = require("../config");
+const constants_1 = require("../constants");
 const registerBasicHelpers = () => {
     Handlebars.registerHelper('localizeOb', function (strId, obj) {
         if (obj)
@@ -21784,9 +21795,18 @@ const registerBasicHelpers = () => {
         return game.i18n.localize(strId);
     });
     Handlebars.registerHelper('localizeSkill', function (skill) {
-        if (skill.label)
-            return game.i18n.localize(skill.label);
-        return game.i18n.localize(skill.name);
+        const translatedSkill = skill.label ? game.i18n.localize(skill.label) : skill.name;
+        if (!game.settings.get(constants_1.SYSTEM_NAME, constants_1.FLAGS.ShowSkillsWithDetails) || !translatedSkill || !skill.attribute)
+            return translatedSkill;
+        // Try showing the first three letters, or less.
+        const translatedAttribute = game.i18n.localize(config_1.SR5.attributes[skill.attribute]);
+        if (!translatedAttribute)
+            return translatedSkill;
+        const cutToIndex = translatedAttribute.length < constants_1.SR.attributes.SHORT_NAME_LENGTH ?
+            translatedAttribute.length - 1 :
+            constants_1.SR.attributes.SHORT_NAME_LENGTH;
+        const translatedAttributeShorthand = translatedAttribute.substring(0, cutToIndex).toUpperCase();
+        return `${translatedSkill} (${translatedAttributeShorthand})`;
     });
     Handlebars.registerHelper('toHeaderCase', function (str) {
         if (str)
@@ -21903,7 +21923,7 @@ const registerBasicHelpers = () => {
 };
 exports.registerBasicHelpers = registerBasicHelpers;
 
-},{"../helpers":155}],150:[function(require,module,exports){
+},{"../config":144,"../constants":145,"../helpers":155}],150:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22548,6 +22568,8 @@ exports.registerRollAndLabelHelpers = registerRollAndLabelHelpers;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerSkillLineHelpers = void 0;
 const helpers_1 = require("../helpers");
+const SkillRules_1 = require("../actor/SkillRules");
+const constants_1 = require("../constants");
 const registerSkillLineHelpers = () => {
     Handlebars.registerHelper('SkillHeaderIcons', function (category) {
         const addIcon = {
@@ -22613,6 +22635,14 @@ const registerSkillLineHelpers = () => {
             },
         ];
     });
+    Handlebars.registerHelper('SkillAdditionCssClass', function (skill) {
+        const classes = [];
+        // @PDF SR5#151 not defaultable skills should be shown as italic.
+        if (game.settings.get(constants_1.SYSTEM_NAME, constants_1.FLAGS.ShowSkillsWithDetails) && !SkillRules_1.SkillRules.allowDefaultingRoll(skill)) {
+            classes.push('skill-roll-not-defaultable');
+        }
+        return classes;
+    });
     Handlebars.registerHelper('SkillIcons', function (skillType, skill) {
         const editIcon = {
             icon: 'fas fa-edit',
@@ -22644,7 +22674,7 @@ const registerSkillLineHelpers = () => {
 };
 exports.registerSkillLineHelpers = registerSkillLineHelpers;
 
-},{"../helpers":155}],155:[function(require,module,exports){
+},{"../actor/SkillRules":88,"../constants":145,"../helpers":155}],155:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -30240,6 +30270,14 @@ const registerSystemSettings = () => {
         name: 'SETTINGS.OnlyAllowRollOnDefaultableSkills',
         hint: 'SETTINGS.OnlyAllowRollOnDefaultableSkillsDescription',
         scope: 'world',
+        config: true,
+        type: Boolean,
+        default: true,
+    });
+    game.settings.register(constants_1.SYSTEM_NAME, constants_1.FLAGS.ShowSkillsWithDetails, {
+        name: 'SETTINGS.ShowSkillsWithDetails',
+        hint: 'SETTINGS.ShowSkillsWithDetailsDescription',
+        scope: 'user',
         config: true,
         type: Boolean,
         default: true,

@@ -770,7 +770,8 @@
     },
 
     "SR5.Errors": {
-        "MissingSkill": "Der Charakter verfügt nicht über die benötigte Fertigkeit."
+        "MissingSkill": "Der Charakter verfügt nicht über die benötigte Fertigkeit.",
+        "SkillWithoutAttribute": "The skill has no attribute configured."
     },
 
     "SR5.ChangelogApplication": {
