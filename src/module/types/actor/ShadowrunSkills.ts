@@ -4,10 +4,6 @@ declare namespace Shadowrun {
         [id: string]: SkillField;
     };
 
-    export type RemovableSkills = {
-        [id: string]: SkillField & RemovableField;
-    };
-
     export type SkillCategories = 'active'|'language'|'knowledge';
 
     export type SkillField = BaseValuePair<number> &
@@ -16,7 +12,8 @@ declare namespace Shadowrun {
         ModifiableValue &
         LabelField &
         HasBonus &
-        HasAttribute & {
+        HasAttribute &
+        RemovableField &{
             specs: string[];
             canDefault: boolean
         };
@@ -36,6 +33,6 @@ declare namespace Shadowrun {
 
     export type KnowledgeSkillList = {
         attribute: MentalAttribute;
-        value: RemovableSkills;
+        value: Skills;
     };
 }

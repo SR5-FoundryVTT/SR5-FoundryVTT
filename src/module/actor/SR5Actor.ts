@@ -41,6 +41,7 @@ import SR5SpriteType = Shadowrun.SR5SpriteType;
 import SR5CritterType = Shadowrun.SR5CritterType;
 import SR5ActorData = Shadowrun.SR5ActorData;
 import Skills = Shadowrun.Skills;
+import {SkillRules} from "./SkillRules";
 
 export class SR5Actor extends Actor<SR5ActorData> {
     // NOTE: Overwrite Actor.data additionally to extends Actor<T as SR5Actortype.Data: SR5ActorData> to still have
@@ -275,18 +276,25 @@ export class SR5Actor extends Actor<SR5ActorData> {
      *                The property specialization will trigger the pool value to be raised by a specialization modifier
      *                The property byLbale will cause the param skillId to be interpreted as the shown i18n label.
      */
-    getPool(skillId: string, options={specialization: false, byLabel: false}): number {
+    getPool(skillId: string, options= {specialization: false, byLabel: false}): number {
         const skill = options.byLabel ? this.getSkillByLabel(skillId) : this.getSkill(skillId);
         if (!skill || !skill.attribute) return 0;
+        if (!SkillFlow.allowRoll(skill)) return 0;
 
         const attribute = this.getAttribute(skill.attribute);
 
-        const specializationBonus = options.specialization ? SR.skill.SPECIALIZATION_MODIFIER : 0;
+        if (SkillRules.mustDefaultToRoll(skill) && SkillRules.allowDefaultingRoll(skill)) {
+            return SkillRules.getDefaultingModifier() + attribute.value;
+        }
 
+        const specializationBonus = options.specialization ? SR.skill.SPECIALIZATION_MODIFIER : 0;
         return skill.value + attribute.value + specializationBonus;
     }
 
-    getSkill(skillId: string): SkillField | undefined {
+    getSkill(skillId: string, options= {byLabel: false}): SkillField | undefined {
+        if (options.byLabel)
+            return this.getSkillByLabel(skillId);
+
         const { skills } = this.data.data;
         if (skills.active.hasOwnProperty(skillId)) {
             return skills.active[skillId];
@@ -332,12 +340,11 @@ export class SR5Actor extends Actor<SR5ActorData> {
         // Iterate over all different knowledge skill categories
         for (const categoryKey in skills.knowledge) {
             if (!skills.knowledge.hasOwnProperty(categoryKey)) continue;
-            const categorySkills = skills.knowledge[categoryKey].value;
-            // Knowledge skills are RemovableSkill instead of SkillField
-                // TODO: Fix this typing...
-            for (const skill of Object.values(categorySkills) as SkillField[]) {
+            // Typescript can't follow the flow here...
+            const categorySkills = skills.knowledge[categoryKey].value as SkillField[];
+            for (const skill of Object.values(categorySkills) ) {
                 if (searchedFor === possibleMatch(skill))
-                    return skill as SkillField;
+                    return skill;
             }
         }
     }
