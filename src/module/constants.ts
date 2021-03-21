@@ -17,6 +17,7 @@ export const FLAGS = {
     WhisperOpposedTestsToTargetedPlayers: 'whisperOpposedTestsToTargetedPlayers',
     OnlyAllowRollOnDefaultableSkills: 'onlyAllowRollOnDefaultableSkills',
     ShowSkillsWithDetails: 'showSkillsWithDetails',
+    OnlyAutoRollNPCInCombat: 'onlyAutoRollNPCInCombat',
     MessageCustomRoll: 'customRoll',
     ApplyLimits: 'applyLimits',
     LastRollPromptValue: 'lastRollPromptValue',

@@ -98,4 +98,13 @@ export const registerSystemSettings = () => {
         type: Boolean,
         default: true,
     });
+
+    game.settings.register(SYSTEM_NAME, FLAGS.OnlyAutoRollNPCInCombat, {
+         name: 'SETTINGS.OnlyAutoRollNPCInCombat',
+        hint: 'SETTINGS.OnlyAutoRollNPCInCombatDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: true,
+    });
 };

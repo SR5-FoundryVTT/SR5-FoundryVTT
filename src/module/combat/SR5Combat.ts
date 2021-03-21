@@ -1,6 +1,7 @@
 import SR5CombatData = Shadowrun.SR5CombatData;
 import {SR5Actor} from "../actor/SR5Actor";
 import {CombatRules} from "../sr5/Combat";
+import {FLAGS, SYSTEM_NAME} from "../constants";
 
 /**
  * Foundry combat implementation for Shadowrun5 rules.
@@ -107,6 +108,15 @@ export class SR5Combat extends Combat {
         await this.updateCombatant(newCombatant);
     }
 
+    /**
+     * Make sure Shadowrun initiative order is applied.
+     */
+    setupTurns(): any[] {
+        const turns = super.setupTurns();
+        console.error(turns);
+        return turns.sort(SR5Combat.sortByRERIC);
+    }
+
     static sortByRERIC(left, right): number {
         // First sort by initiative value if different
         const leftInit = Number(left.initiative);
@@ -120,7 +130,7 @@ export class SR5Combat extends Combat {
         const genData = (actor) => {
             // edge, reaction, intuition, coinflip
             return [
-                Number(actor.getEdge().max),
+                Number(actor.getEdge().value),
                 Number(actor.findAttribute('reaction')?.value),
                 Number(actor.findAttribute('intuition')?.value),
                 new Roll('1d2').roll().total,
@@ -139,25 +149,6 @@ export class SR5Combat extends Combat {
     }
 
     /**
-     * Return an array of combatants sorted by Shadowrun initiative order and maybe remove combatants with a zero ini.
-     * remove any turns that are less than 0
-     * @Override
-     */
-    setupTurns(): any[] {
-        return super.setupTurns();
-        // const turns = super.setupTurns().filter((turn) => {
-        //     if (turn.initiative === null) return true;
-        //
-        //     const init = Number(turn.initiative);
-        //     if (isNaN(init)) return true;
-        //     return init > 0;
-        // });
-        // // @ts-ignore
-        // this.turns = turns.sort(SR5Combat.sortByRERIC);
-        // return turns;
-    }
-
-    /**
      * Return the position in the current ini pass of the next undefeated combatant.
      */
     get nextUndefeatedTurnPosition(): number {
@@ -165,12 +156,26 @@ export class SR5Combat extends Combat {
             // Skipping is only interesting when moving forward.
             if (turnInPass <= this.turn) continue;
             // @ts-ignore
-            if (!combatant.defeated) {
+            if (!combatant.defeated && combatant.initiative > 0) {
                 return turnInPass;
             }
         }
         // The current turn is the last undefeated combatant. So go to the end and beeeeyooond.
         return this.turns.length;
+    }
+
+    /**
+     * Return the position in the current ini pass of the next combatant that has an action phase left.
+     */
+    get nextViableTurnPosition(): number {
+        // Start at the next position after the current one.
+        for (let n = this.turn + 1; n++; n < this.combatants.length) {
+            const combatant = this.combatants[n];
+            if (combatant.initiative > 0)
+                return n;
+        }
+        // If nothing is found, start at the top.
+        return 0
     }
 
     /**
@@ -197,9 +202,6 @@ export class SR5Combat extends Combat {
      *
      * Retrigger Initiative Rolls on each new Foundry round.
      *
-     * Handle these cases:
-     * 1. New Combat! New Start of all things! Roll initiative.
-     * 2. Current Combat. Go to the next Foundry turn / the next combatant
      *
      * * @Override
      */
@@ -210,23 +212,23 @@ export class SR5Combat extends Combat {
         // Get the next viable turn position.
         let nextTurn = this.settings.skipDefeated ?
             this.nextUndefeatedTurnPosition :
-            this.turn + 1;
+            this.nextViableTurnPosition;
 
         // Start of the combat Handling
         if (nextRound === 0 && initiativePass === 0) {
-            nextRound = 1;
-            initiativePass = 1;
-            nextTurn = 0;
-
-            await this.update({ round: nextRound, turn: nextTurn, initiativePass });
+            await this.startCombat();
             return;
         }
 
         // Just step from one combatant to the next!
         if (nextTurn < this.turns.length) {
-            await this.update({ round: nextRound, turn: nextTurn, initiativePass });
+            await this.update({ turn: nextTurn });
             return;
         }
+
+        // if (!game.user.isGM) {
+        //     return;
+        // }
 
         // Initiative Pass Handling.
         if (this.doIniPass(nextTurn)) {
@@ -253,15 +255,34 @@ export class SR5Combat extends Combat {
         return this.nextRound();
     }
 
-    async nextRound(): Promise<void> {
-        const nextRound = this.round + 1;
-        const initiativePass = 0;
+    async startCombat() {
+        const nextRound = 1;
+        const initiativePass = 1;
         // Start at the top!
         const nextTurn = 0;
 
-        await this.resetAll();
-        await this.rollAll();
+        if (game.settings.get(SYSTEM_NAME, FLAGS.OnlyAutoRollNPCInCombat)) {
+            await this.rollNPC();
+        } else {
+            await this.rollAll();
+        }
 
-        await this.update({ round: nextRound, turn: nextTurn, initiativePass });
+        return await this.update({ round: nextRound, turn: nextTurn, initiativePass });
+    }
+
+    async nextRound(): Promise<void> {
+        await super.nextRound();
+
+        const initiativePass = 0;
+
+        await this.resetAll();
+
+        if (game.settings.get(SYSTEM_NAME, FLAGS.OnlyAutoRollNPCInCombat)) {
+            await this.rollNPC();
+        } else {
+            await this.rollAll();
+        }
+
+        await this.update({ initiativePass });
     }
 }
