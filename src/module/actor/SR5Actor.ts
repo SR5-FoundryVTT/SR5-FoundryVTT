@@ -1,6 +1,16 @@
 import {ShadowrunRoll, ShadowrunRoller} from '../rolls/ShadowrunRoller';
-import { Helpers } from '../helpers';
-import { SR5Item } from '../item/SR5Item';
+import {Helpers} from '../helpers';
+import {SR5Item} from '../item/SR5Item';
+import {FLAGS, SKILL_DEFAULT_NAME, SR, SYSTEM_NAME} from '../constants';
+import {PartsList} from '../parts/PartsList';
+import {ActorPrepFactory} from './prep/ActorPrepFactory';
+import {ShadowrunActorDialogs} from "../apps/dialogs/ShadowrunActorDialogs";
+import {createRollChatMessage} from "../chat";
+import {SR5Combat} from "../combat/SR5Combat";
+import {Modifiers} from "../sr5/Modifiers";
+import {SoakFlow} from './SoakFlow';
+import {DefaultValues} from '../dataTemplates';
+import {SkillFlow} from "./SkillFlow";
 import ActorRollOptions = Shadowrun.ActorRollOptions;
 import DefenseRollOptions = Shadowrun.DefenseRollOptions;
 import SoakRollOptions = Shadowrun.SoakRollOptions;
@@ -9,21 +19,15 @@ import SkillRollOptions = Shadowrun.SkillRollOptions;
 import SkillField = Shadowrun.SkillField;
 import ModList = Shadowrun.ModList;
 import LimitField = Shadowrun.LimitField;
-import {SYSTEM_NAME, FLAGS, SR, SKILL_DEFAULT_NAME} from '../constants';
 import SR5ActorType = Shadowrun.SR5ActorType;
-import { PartsList } from '../parts/PartsList';
-import { ActorPrepFactory } from './prep/ActorPrepFactory';
 import EdgeAttributeField = Shadowrun.EdgeAttributeField;
 import VehicleActorData = Shadowrun.VehicleActorData;
 import VehicleStat = Shadowrun.VehicleStat;
-import {ShadowrunActorDialogs} from "../apps/dialogs/ShadowrunActorDialogs";
-import {createRollChatMessage} from "../chat";
 import Attributes = Shadowrun.Attributes;
 import Limits = Shadowrun.Limits;
 import DamageData = Shadowrun.DamageData;
 import TrackType = Shadowrun.TrackType;
 import OverflowTrackType = Shadowrun.OverflowTrackType;
-import {SR5Combat} from "../combat/SR5Combat";
 import SpellDefenseOptions = Shadowrun.SpellDefenseOptions;
 import NumberOrEmpty = Shadowrun.NumberOrEmpty;
 import CharacterActorData = Shadowrun.CharacterActorData;
@@ -35,12 +39,8 @@ import ConditionData = Shadowrun.ConditionData;
 import SR5SpiritType = Shadowrun.SR5SpiritType;
 import SR5SpriteType = Shadowrun.SR5SpriteType;
 import SR5CritterType = Shadowrun.SR5CritterType;
-import {Modifiers} from "../sr5/Modifiers";
-import { SoakFlow } from './SoakFlow';
-import { DefaultValues } from '../dataTemplates';
 import SR5ActorData = Shadowrun.SR5ActorData;
 import Skills = Shadowrun.Skills;
-import {SkillFlow} from "./SkillFlow";
 
 export class SR5Actor extends Actor<SR5ActorData> {
     // NOTE: Overwrite Actor.data additionally to extends Actor<T as SR5Actortype.Data: SR5ActorData> to still have
@@ -267,6 +267,25 @@ export class SR5Actor extends Actor<SR5ActorData> {
         return this.data.data.skills.active;
     }
 
+    /**
+     * Return the full pool of a skill including attribute and possible specialization bonus.
+     * @param skillId The ID of the skill. Note that this can differ from what is shown in the skill list. If you're
+     *                unsure about the id and want to search
+     * @param options An object to change the behaviour.
+     *                The property specialization will trigger the pool value to be raised by a specialization modifier
+     *                The property byLbale will cause the param skillId to be interpreted as the shown i18n label.
+     */
+    getPool(skillId: string, options={specialization: false, byLabel: false}): number {
+        const skill = options.byLabel ? this.getSkillByLabel(skillId) : this.getSkill(skillId);
+        if (!skill || !skill.attribute) return 0;
+
+        const attribute = this.getAttribute(skill.attribute);
+
+        const specializationBonus = options.specialization ? SR.skill.SPECIALIZATION_MODIFIER : 0;
+
+        return skill.value + attribute.value + specializationBonus;
+    }
+
     getSkill(skillId: string): SkillField | undefined {
         const { skills } = this.data.data;
         if (skills.active.hasOwnProperty(skillId)) {
@@ -282,6 +301,43 @@ export class SR5Actor extends Actor<SR5ActorData> {
                 if (category.value.hasOwnProperty(skillId)) {
                     return category.value[skillId];
                 }
+            }
+        }
+    }
+
+    /**
+     * Search all skills for a matching i18n translation label.
+     * NOTE: You should use getSkill if you have the skillId ready. Only use this for ease of use!
+     *
+     * @param searchedFor The translated output of either the skill label (after localize) or name of the skill in question.
+     * @return The first skill found with a matching translation or name.
+     */
+    getSkillByLabel(searchedFor: string): SkillField|undefined {
+        if (!searchedFor) return;
+
+        const possibleMatch = (skill: SkillField): string =>  skill.label ? game.i18n.localize(skill.label) : skill.name;
+
+        const {skills} = this.data.data;
+
+        for (const skill of Object.values(skills.active)) {
+            if (searchedFor === possibleMatch(skill))
+                return skill;
+        }
+
+        for (const skill of Object.values(skills.language.value)) {
+            if (searchedFor === possibleMatch(skill))
+                return skill;
+        }
+
+        // Iterate over all different knowledge skill categories
+        for (const categoryKey in skills.knowledge) {
+            if (!skills.knowledge.hasOwnProperty(categoryKey)) continue;
+            const categorySkills = skills.knowledge[categoryKey].value;
+            // Knowledge skills are RemovableSkill instead of SkillField
+                // TODO: Fix this typing...
+            for (const skill of Object.values(categorySkills) as SkillField[]) {
+                if (searchedFor === possibleMatch(skill))
+                    return skill as SkillField;
             }
         }
     }

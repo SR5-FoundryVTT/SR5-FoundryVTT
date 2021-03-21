@@ -102,6 +102,7 @@ export const SR = {
     },
     skill: {
         // @PDF SR5#130
-        DEFAULTING_MODIFIER: -1
+        DEFAULTING_MODIFIER: -1,
+        SPECIALIZATION_MODIFIER: 2
     }
 }
