@@ -13246,6 +13246,7 @@ const Modifiers_1 = require("../sr5/Modifiers");
 const SoakFlow_1 = require("./SoakFlow");
 const dataTemplates_1 = require("../dataTemplates");
 const SkillFlow_1 = require("./SkillFlow");
+const SkillRules_1 = require("./SkillRules");
 class SR5Actor extends Actor {
     getOverwatchScore() {
         const os = this.getFlag(constants_1.SYSTEM_NAME, 'overwatchScore');
@@ -13447,7 +13448,30 @@ class SR5Actor extends Actor {
     getActiveSkills() {
         return this.data.data.skills.active;
     }
-    getSkill(skillId) {
+    /**
+     * Return the full pool of a skill including attribute and possible specialization bonus.
+     * @param skillId The ID of the skill. Note that this can differ from what is shown in the skill list. If you're
+     *                unsure about the id and want to search
+     * @param options An object to change the behaviour.
+     *                The property specialization will trigger the pool value to be raised by a specialization modifier
+     *                The property byLbale will cause the param skillId to be interpreted as the shown i18n label.
+     */
+    getPool(skillId, options = { specialization: false, byLabel: false }) {
+        const skill = options.byLabel ? this.getSkillByLabel(skillId) : this.getSkill(skillId);
+        if (!skill || !skill.attribute)
+            return 0;
+        if (!SkillFlow_1.SkillFlow.allowRoll(skill))
+            return 0;
+        const attribute = this.getAttribute(skill.attribute);
+        if (SkillRules_1.SkillRules.mustDefaultToRoll(skill) && SkillRules_1.SkillRules.allowDefaultingRoll(skill)) {
+            return SkillRules_1.SkillRules.getDefaultingModifier() + attribute.value;
+        }
+        const specializationBonus = options.specialization ? constants_1.SR.skill.SPECIALIZATION_MODIFIER : 0;
+        return skill.value + attribute.value + specializationBonus;
+    }
+    getSkill(skillId, options = { byLabel: false }) {
+        if (options.byLabel)
+            return this.getSkillByLabel(skillId);
         const { skills } = this.data.data;
         if (skills.active.hasOwnProperty(skillId)) {
             return skills.active[skillId];
@@ -13462,6 +13486,38 @@ class SR5Actor extends Actor {
                 if (category.value.hasOwnProperty(skillId)) {
                     return category.value[skillId];
                 }
+            }
+        }
+    }
+    /**
+     * Search all skills for a matching i18n translation label.
+     * NOTE: You should use getSkill if you have the skillId ready. Only use this for ease of use!
+     *
+     * @param searchedFor The translated output of either the skill label (after localize) or name of the skill in question.
+     * @return The first skill found with a matching translation or name.
+     */
+    getSkillByLabel(searchedFor) {
+        if (!searchedFor)
+            return;
+        const possibleMatch = (skill) => skill.label ? game.i18n.localize(skill.label) : skill.name;
+        const { skills } = this.data.data;
+        for (const skill of Object.values(skills.active)) {
+            if (searchedFor === possibleMatch(skill))
+                return skill;
+        }
+        for (const skill of Object.values(skills.language.value)) {
+            if (searchedFor === possibleMatch(skill))
+                return skill;
+        }
+        // Iterate over all different knowledge skill categories
+        for (const categoryKey in skills.knowledge) {
+            if (!skills.knowledge.hasOwnProperty(categoryKey))
+                continue;
+            // Typescript can't follow the flow here...
+            const categorySkills = skills.knowledge[categoryKey].value;
+            for (const skill of Object.values(categorySkills)) {
+                if (searchedFor === possibleMatch(skill))
+                    return skill;
             }
         }
     }
@@ -14678,7 +14734,7 @@ class SR5Actor extends Actor {
 }
 exports.SR5Actor = SR5Actor;
 
-},{"../apps/dialogs/ShadowrunActorDialogs":134,"../chat":142,"../constants":145,"../dataTemplates":146,"../helpers":155,"../parts/PartsList":207,"../rolls/ShadowrunRoller":208,"../sr5/Modifiers":210,"./SkillFlow":87,"./SoakFlow":89,"./prep/ActorPrepFactory":91}],86:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunActorDialogs":134,"../chat":142,"../constants":145,"../dataTemplates":146,"../helpers":155,"../parts/PartsList":207,"../rolls/ShadowrunRoller":208,"../sr5/Modifiers":210,"./SkillFlow":87,"./SkillRules":88,"./SoakFlow":89,"./prep/ActorPrepFactory":91}],86:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -15768,7 +15824,10 @@ class SkillRules {
      * @param parts Should be a PartsList involved with skills.
      */
     static addDefaultingPart(parts) {
-        parts.addUniquePart('SR5.Defaulting', constants_1.SR.skill.DEFAULTING_MODIFIER);
+        parts.addUniquePart('SR5.Defaulting', SkillRules.getDefaultingModifier());
+    }
+    static getDefaultingModifier() {
+        return constants_1.SR.skill.DEFAULTING_MODIFIER;
     }
 }
 exports.SkillRules = SkillRules;
@@ -21566,7 +21625,8 @@ exports.SR = {
     },
     skill: {
         // @PDF SR5#130
-        DEFAULTING_MODIFIER: -1
+        DEFAULTING_MODIFIER: -1,
+        SPECIALIZATION_MODIFIER: 2
     }
 };
 
