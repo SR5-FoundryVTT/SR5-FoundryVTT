@@ -35,6 +35,10 @@ export class SkillRules {
      * @param parts Should be a PartsList involved with skills.
      */
     static addDefaultingPart(parts: PartsList<number>) {
-        parts.addUniquePart('SR5.Defaulting', SR.skill.DEFAULTING_MODIFIER);
+        parts.addUniquePart('SR5.Defaulting', SkillRules.getDefaultingModifier());
+    }
+
+    static getDefaultingModifier(): number {
+        return SR.skill.DEFAULTING_MODIFIER;
     }
 }
