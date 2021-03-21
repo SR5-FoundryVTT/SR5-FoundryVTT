@@ -582,6 +582,8 @@
         "OnlyAllowRollOnDefaultableSkillsDescription": "When unset unknown skills can be rolled, even if they can't be defaulted.",
         "ShowSkillsWithDetails": "Show more detailed skill lists",
         "ShowSkillsWithDetailsDescription": "When set skills list display will mirror core rulebook style (italics, short attributes)",
+        "OnlyAutoRollNPCInCombat": "Only auto roll NPC initiative",
+        "OnlyAutoRollNPCInCombatDescription": "Wen unset players must manually roll their ini on each new pass / round",
         "Euclidean": "Euclidean"
     },
 
