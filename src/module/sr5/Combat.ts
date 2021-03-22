@@ -22,4 +22,20 @@ export class CombatRules {
     static reduceIniResultAfterPass(score: number): number {
         return Math.max(score + SR.combat.INI_RESULT_MOD_AFTER_INI_PASS, 0);
     }
+
+    /**
+     * Reduce the initiative score according to the current initiative pass @PDF SR5#160.
+     * @param score
+     * @param pass The current initiative pass. Each combat round starts at the initiative pass of 1.
+     */
+    static reduceIniOnLateSpawn(score: number, pass: number): number {
+        // Assure valid score ranges.
+        // Shift initiative pass value range from min 1 to min 0 for multiplication.
+        pass = Math.max(pass - 1, 0);
+        score = Math.max(score, 0);
+
+        // Reduce the new score according to. NOTE: Modifier is negative
+        const reducedScore = score + pass * SR.combat.INI_RESULT_MOD_AFTER_INI_PASS;
+        return Math.max(reducedScore, 0);
+    }
 }

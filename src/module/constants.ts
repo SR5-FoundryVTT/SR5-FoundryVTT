@@ -11,6 +11,7 @@
  *
  */
 export const SYSTEM_NAME = 'shadowrun5e';
+export const SYSTEM_SOCKET = `system.${SYSTEM_NAME}`;
 export const FLAGS = {
     ShowGlitchAnimation: 'showGlitchAnimation',
     ShowTokenNameForChatOutput: 'showTokenNameInsteadOfActor',
@@ -22,6 +23,7 @@ export const FLAGS = {
     ApplyLimits: 'applyLimits',
     LastRollPromptValue: 'lastRollPromptValue',
     DisplayDefaultRollCard: 'displayDefaultRollCard',
+    CombatInitiativePass: 'combatInitiativePass',
     EmbeddedItems: 'embeddedItems',
     LastFireMode: 'lastFireMode',
     LastSpellForce: 'lastSpellForce',
@@ -31,7 +33,9 @@ export const FLAGS = {
     Roll: 'roll',
     TargetsSceneTokenIds: 'targetsSceneTokenIds',
     ChangelogShownForVersion: 'changelogShownForVersion',
-    Modifier: 'modifier'
+    Modifier: 'modifier',
+    DoInitPass: 'doInitPass',
+    DoNextRound: 'doNextRound',
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {
@@ -74,7 +78,9 @@ export const SR = {
             }
         },
 
-        INI_RESULT_MOD_AFTER_INI_PASS: -10
+        INI_RESULT_MOD_AFTER_INI_PASS: -10,
+        INITIAL_INI_PASS: 1,
+        INITIAL_INI_ROUND: 1
     },
     die: {
         glitch: [1],

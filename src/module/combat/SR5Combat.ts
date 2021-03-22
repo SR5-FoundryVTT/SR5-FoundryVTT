@@ -1,29 +1,29 @@
-import SR5CombatData = Shadowrun.SR5CombatData;
 import {SR5Actor} from "../actor/SR5Actor";
 import {CombatRules} from "../sr5/Combat";
-import {FLAGS, SYSTEM_NAME} from "../constants";
+import {FLAGS, SR, SYSTEM_NAME, SYSTEM_SOCKET} from "../constants";
 
 /**
  * Foundry combat implementation for Shadowrun5 rules.
+ *
+ * TODO: Store what combatants already acted and with what initiative base and dice they did. This can be used to alter
+ *       initiative score without fully rerolling and maintain propper turn order after an actor raised they ini while
+ *       stepping over other actors that already had their action phase in the current initiative pass.
+ *       @PDF SR5#160 'Chaning Initiative'
  */
 export class SR5Combat extends Combat {
-    data: SR5CombatData;
-
     get initiativePass(): number {
-        return this.data?.initiativePass || 0;
+        return this.getFlag(SYSTEM_NAME, FLAGS.CombatInitiativePass) || SR.combat.INITIAL_INI_PASS;
+    }
+
+    static async setInitiativePass(combat: SR5Combat, pass: number) {
+        await combat.setFlag(SYSTEM_NAME, FLAGS.CombatInitiativePass, pass);
     }
 
     constructor(...args) {
         // @ts-ignore
         super(...args);
 
-        // NOTE: This is currently handled during damage application in the Actor.
-        // Hooks.on('updateActor', (actor) => {
-        //     const combatant = this.getActorCombatant(actor);
-        //     if (combatant) {
-        //         // handle monitoring Wound changes
-        //     }
-        // });
+        this._registerSocketListeners();
     }
 
     /**
@@ -83,12 +83,6 @@ export class SR5Combat extends Combat {
         return options;
     }
 
-    protected _onUpdate(data: object, ...args) {
-        console.log(data);
-        // @ts-ignore
-        super._onUpdate(data, ...args);
-    }
-
     /**
      *
      * @param combatant
@@ -109,11 +103,56 @@ export class SR5Combat extends Combat {
     }
 
     /**
+     * Handle the change of an initiative pass. This needs owner permissions on the combat entity.
+     * @param combatId
+     */
+    static async handleIniPass(combatId: string) {
+        const combat = game.combats.get(combatId) as SR5Combat;
+        if (!combat) return;
+
+        const initiativePass = combat.initiativePass + 1;
+        // Start at the top!
+        const turn = 0;
+
+        const combatants: any[] = [];
+        for (const combatant of combat.combatants) {
+            const initiative = CombatRules.reduceIniResultAfterPass(Number(combatant.initiative));
+            combatants.push({_id: combatant._id, initiative});
+        }
+        if (combatants.length > 0)
+            // @ts-ignore
+            await combat.updateCombatant(combatants);
+
+        await SR5Combat.setInitiativePass(combat, initiativePass);
+        await combat.update({turn});
+        return;
+    }
+
+    /**
+     * Handle the change of a initiative round. This needs owner permission on the combat entity.
+     * @param combatId
+     */
+    static async handleNextRound(combatId: string) {
+        const combat = game.combats.get(combatId) as SR5Combat;
+        if (!combat) return;
+        await combat.resetAll();
+
+        if (game.settings.get(SYSTEM_NAME, FLAGS.OnlyAutoRollNPCInCombat)) {
+            await combat.rollNPC();
+        } else {
+            await combat.rollAll();
+        }
+
+        const turn = 0
+        await SR5Combat.setInitiativePass(combat, 0);
+        await combat.update({turn});
+    }
+
+    /**
      * Make sure Shadowrun initiative order is applied.
      */
     setupTurns(): any[] {
         const turns = super.setupTurns();
-        console.error(turns);
         return turns.sort(SR5Combat.sortByRERIC);
     }
 
@@ -128,7 +167,7 @@ export class SR5Combat extends Combat {
 
         // now we sort by ERIC
         const genData = (actor) => {
-            // edge, reaction, intuition, coinflip
+            // edge, reaction, intuition, coin flip
             return [
                 Number(actor.getEdge().value),
                 Number(actor.findAttribute('reaction')?.value),
@@ -222,31 +261,19 @@ export class SR5Combat extends Combat {
 
         // Just step from one combatant to the next!
         if (nextTurn < this.turns.length) {
-            await this.update({ turn: nextTurn });
+            await this.update({turn: nextTurn});
             return;
         }
 
-        // if (!game.user.isGM) {
-        //     return;
-        // }
+        // Initiative Pass Handling. Owner permissions are needed to change the initiative pass.
+        if (!game.user.isGM && this.doIniPass(nextTurn)) {
+            await this._createDoIniPassSocketMessage();
+            return;
+        }
 
-        // Initiative Pass Handling.
-        if (this.doIniPass(nextTurn)) {
-            initiativePass = initiativePass + 1;
-            // Start at the top!
-            nextTurn = 0;
-
-            const combatants: any[] = [];
-            for (const combatant of this.combatants) {
-                const initiative = CombatRules.reduceIniResultAfterPass(Number(combatant.initiative));
-                combatants.push({_id: combatant._id, initiative});
-            }
-            if (combatants.length > 0)
-                // @ts-ignore
-                await this.updateCombatant(combatants);
-
-             await this.update({ round: nextRound, turn: nextTurn, initiativePass });
-             return;
+        if (game.user.isGM && this.doIniPass(nextTurn)) {
+            await SR5Combat.handleIniPass(this.id)
+            return;
         }
 
         // Initiative Round Handling.
@@ -256,8 +283,8 @@ export class SR5Combat extends Combat {
     }
 
     async startCombat() {
-        const nextRound = 1;
-        const initiativePass = 1;
+        const nextRound = SR.combat.INITIAL_INI_ROUND;
+        const initiativePass = SR.combat.INITIAL_INI_PASS;
         // Start at the top!
         const nextTurn = 0;
 
@@ -266,23 +293,95 @@ export class SR5Combat extends Combat {
         } else {
             await this.rollAll();
         }
-
-        return await this.update({ round: nextRound, turn: nextTurn, initiativePass });
+         await SR5Combat.setInitiativePass(this, initiativePass);
+        return await this.update({round: nextRound, turn: nextTurn});
     }
 
     async nextRound(): Promise<void> {
+        // Let Foundry handle time and some other things.
         await super.nextRound();
 
-        const initiativePass = 0;
-
-        await this.resetAll();
-
-        if (game.settings.get(SYSTEM_NAME, FLAGS.OnlyAutoRollNPCInCombat)) {
-            await this.rollNPC();
+        // Owner permissions are needed to change the shadowrun initiative round.
+        if (!game.user.isGM) {
+            await this._createDoNextRoundSocketMessage();
         } else {
-            await this.rollAll();
+            await SR5Combat.handleNextRound(this.id);
         }
+    }
 
-        await this.update({ initiativePass });
+    /**
+     * use default behaviour but ALWAYS start at the top!
+     */
+    async rollAll(): Promise<SR5Combat> {
+        const combat = await super.rollAll() as SR5Combat;
+        if (combat.turn !== 0)
+            await combat.update({turn: 0});
+        return combat;
+    }
+
+    async updateNewCombatants(ids: string[]) {
+        const newCombatants = this.combatants.filter(combatant => ids.includes(combatant._id));
+        if (!newCombatants) return;
+
+        // Reduce initiative score for ongoing initiative passes.
+        const updateData = newCombatants.map(combatant => {
+            const initiative = CombatRules.reduceIniOnLateSpawn(combatant.initiative, this.initiativePass);
+            return {
+                _id: combatant._id,
+                initiative
+            }
+        })
+
+        // @ts-ignore
+        await this.updateCombatant(updateData);
+    }
+
+
+    /**
+     * Shadowrun starts at the top, except for subsequent initiative passes, then it depends on the new values.
+     */
+    async rollInitiative(ids, options): Promise<SR5Combat> {
+        const newIds = Array.isArray(ids) ? ids : [ids];
+        //@ts-ignore
+        const combat = await super.rollInitiative(ids, options) as SR5Combat;
+        // All combatants roll new initiative. Start at the top!
+        if (newIds.length === this.combatants.length)
+            await combat.update({turn: 0});
+        // Only some combatants roll new initiative. Start above the current turn or the current turn!
+        if (newIds.length < this.combatants.length)
+            await this.updateNewCombatants(newIds);
+        return combat;
+    }
+
+    _registerSocketListeners() {
+        // @ts-ignore
+        game.socket.on(SYSTEM_SOCKET, async (message) => {
+            switch (message.type) {
+                case (FLAGS.DoNextRound):
+                    if (!message.data.hasOwnProperty('id') && typeof message.data.id !== 'string') {
+                        console.error(`SR5Combat Socket Message ${FLAGS.DoNextRound} data.id must be a string (combat id) but is ${typeof message.data} (${message.data})!`);
+                        return;
+                    }
+
+                    return await SR5Combat.handleNextRound(message.data.id);
+                case (FLAGS.DoInitPass):
+                    if (!message.data.hasOwnProperty('id') && typeof message.data.id !== 'string') {
+                        console.error(`SR5Combat Socket Message ${FLAGS.DoInitPass} data.id must be a string (combat id) but is ${typeof message.data} (${message.data})!`);
+                        return;
+                    }
+
+                    return await SR5Combat.handleIniPass(message.data.id);
+            }
+        })
+    }
+
+    async _createDoNextRoundSocketMessage() {
+        //@ts-ignore
+        await game.socket.emit(`${SYSTEM_SOCKET}`, {type: FLAGS.DoNextRound, data: {id: this.id}});
+    }
+
+    async _createDoIniPassSocketMessage() {
+        //@ts-ignore
+        await game.socket.emit(`${SYSTEM_SOCKET}`, {type: FLAGS.DoInitPass, data: {id: this.id}});
     }
 }
