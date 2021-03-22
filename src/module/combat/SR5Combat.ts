@@ -16,6 +16,7 @@ export class SR5Combat extends Combat {
     }
 
     static async setInitiativePass(combat: SR5Combat, pass: number) {
+        await combat.unsetFlag(SYSTEM_NAME, FLAGS.CombatInitiativePass);
         await combat.setFlag(SYSTEM_NAME, FLAGS.CombatInitiativePass, pass);
     }
 
@@ -144,7 +145,6 @@ export class SR5Combat extends Combat {
         }
 
         const turn = 0
-        await SR5Combat.setInitiativePass(combat, 0);
         await combat.update({turn});
     }
 
@@ -288,18 +288,20 @@ export class SR5Combat extends Combat {
         // Start at the top!
         const nextTurn = 0;
 
+        await SR5Combat.setInitiativePass(this, initiativePass);
+        return await this.update({round: nextRound, turn: nextTurn});
+
         if (game.settings.get(SYSTEM_NAME, FLAGS.OnlyAutoRollNPCInCombat)) {
             await this.rollNPC();
         } else {
             await this.rollAll();
         }
-         await SR5Combat.setInitiativePass(this, initiativePass);
-        return await this.update({round: nextRound, turn: nextTurn});
     }
 
     async nextRound(): Promise<void> {
         // Let Foundry handle time and some other things.
         await super.nextRound();
+        await SR5Combat.setInitiativePass(this, SR.combat.INITIAL_INI_PASS);
 
         // Owner permissions are needed to change the shadowrun initiative round.
         if (!game.user.isGM) {
@@ -344,12 +346,13 @@ export class SR5Combat extends Combat {
         const newIds = Array.isArray(ids) ? ids : [ids];
         //@ts-ignore
         const combat = await super.rollInitiative(ids, options) as SR5Combat;
-        // All combatants roll new initiative. Start at the top!
-        if (newIds.length === this.combatants.length)
-            await combat.update({turn: 0});
-        // Only some combatants roll new initiative. Start above the current turn or the current turn!
-        if (newIds.length < this.combatants.length)
+
+        if (this.initiativePass > SR.combat.INITIAL_INI_PASS)
             await this.updateNewCombatants(newIds);
+
+        if (this.initiativePass === SR.combat.INITIAL_INI_PASS)
+            await combat.update({turn: 0});
+
         return combat;
     }
 
