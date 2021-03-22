@@ -347,13 +347,28 @@ export class SR5Combat extends Combat {
         //@ts-ignore
         const combat = await super.rollInitiative(ids, options) as SR5Combat;
 
-        if (this.initiativePass > SR.combat.INITIAL_INI_PASS)
-            await this.updateNewCombatants(newIds);
+        // if (this.initiativePass > SR.combat.INITIAL_INI_PASS)
+        //     await this.updateNewCombatants(newIds);
 
         if (this.initiativePass === SR.combat.INITIAL_INI_PASS)
             await combat.update({turn: 0});
 
         return combat;
+    }
+
+    /**
+     * Alter initiative formula to include initiative pass reduction.
+     *
+     * NOTE: Should this here fail or be buggy, there always is SR5Combat.updateNewCombatants which can be uncommented in SR5Combat.rollInitiative
+     * @param combatant
+     */
+    _getInitiativeFormula(combatant: Entity) {
+        if (this.initiativePass === SR.combat.INITIAL_INI_PASS) { // @ts-ignore
+            return super._getInitiativeFormula(combatant);
+        }
+
+        // Reduce for initiative passes until zero.
+        return `max(${game.system.data.initiative} -${(this.initiativePass - 1) * -SR.combat.INI_RESULT_MOD_AFTER_INI_PASS}, 0)`;
     }
 
     _registerSocketListeners() {
