@@ -20883,6 +20883,7 @@ class SR5Combat extends Combat {
     }
     static setInitiativePass(combat, pass) {
         return __awaiter(this, void 0, void 0, function* () {
+            yield combat.unsetFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.CombatInitiativePass);
             yield combat.setFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.CombatInitiativePass, pass);
         });
     }
@@ -21005,7 +21006,6 @@ class SR5Combat extends Combat {
                 yield combat.rollAll();
             }
             const turn = 0;
-            yield SR5Combat.setInitiativePass(combat, 0);
             yield combat.update({ turn });
         });
     }
@@ -21144,14 +21144,14 @@ class SR5Combat extends Combat {
             const initiativePass = constants_1.SR.combat.INITIAL_INI_PASS;
             // Start at the top!
             const nextTurn = 0;
+            yield SR5Combat.setInitiativePass(this, initiativePass);
+            return yield this.update({ round: nextRound, turn: nextTurn });
             if (game.settings.get(constants_1.SYSTEM_NAME, constants_1.FLAGS.OnlyAutoRollNPCInCombat)) {
                 yield this.rollNPC();
             }
             else {
                 yield this.rollAll();
             }
-            yield SR5Combat.setInitiativePass(this, initiativePass);
-            return yield this.update({ round: nextRound, turn: nextTurn });
         });
     }
     nextRound() {
@@ -21161,6 +21161,7 @@ class SR5Combat extends Combat {
         return __awaiter(this, void 0, void 0, function* () {
             // Let Foundry handle time and some other things.
             yield _super.nextRound.call(this);
+            yield SR5Combat.setInitiativePass(this, constants_1.SR.combat.INITIAL_INI_PASS);
             // Owner permissions are needed to change the shadowrun initiative round.
             if (!game.user.isGM) {
                 yield this._createDoNextRoundSocketMessage();
@@ -21212,14 +21213,25 @@ class SR5Combat extends Combat {
             const newIds = Array.isArray(ids) ? ids : [ids];
             //@ts-ignore
             const combat = yield _super.rollInitiative.call(this, ids, options);
-            // All combatants roll new initiative. Start at the top!
-            if (newIds.length === this.combatants.length)
+            // if (this.initiativePass > SR.combat.INITIAL_INI_PASS)
+            //     await this.updateNewCombatants(newIds);
+            if (this.initiativePass === constants_1.SR.combat.INITIAL_INI_PASS)
                 yield combat.update({ turn: 0 });
-            // Only some combatants roll new initiative. Start above the current turn or the current turn!
-            if (newIds.length < this.combatants.length)
-                yield this.updateNewCombatants(newIds);
             return combat;
         });
+    }
+    /**
+     * Alter initiative formula to include initiative pass reduction.
+     *
+     * NOTE: Should this here fail or be buggy, there always is SR5Combat.updateNewCombatants which can be uncommented in SR5Combat.rollInitiative
+     * @param combatant
+     */
+    _getInitiativeFormula(combatant) {
+        if (this.initiativePass === constants_1.SR.combat.INITIAL_INI_PASS) { // @ts-ignore
+            return super._getInitiativeFormula(combatant);
+        }
+        // Reduce for initiative passes until zero.
+        return `max(${game.system.data.initiative} -${(this.initiativePass - 1) * -constants_1.SR.combat.INI_RESULT_MOD_AFTER_INI_PASS}, 0)`;
     }
     _registerSocketListeners() {
         // @ts-ignore
