@@ -1,6 +1,5 @@
 import {DamageAndSoakPerActor, DamageApplicationDialog} from "../apps/dialogs/DamageApplicationDialog";
 import { SR5 } from "../config";
-import { SoakRules } from "./SoakRules";
 import {SR5Actor} from "./SR5Actor";
 import DamageData = Shadowrun.DamageData;
 import CharacterActorData = Shadowrun.CharacterActorData;
@@ -79,7 +78,6 @@ export class DamageApplicationFlow {
 
     private getDamageAndSoakForActor(actor : SR5Actor, damage : DamageData) : DamageAndSoakPerActor {
         const actorData = actor.data.data as CharacterActorData;
-        const updatedDamage = SoakRules.modifyDamageType(damage, actor);
         const perception = actorData.initiative.perception;
         const initCategory  = SR5.initiativeCategories[perception];
         let hotsim = false;
@@ -91,7 +89,7 @@ export class DamageApplicationFlow {
 
         return {
             actor,
-            modified: updatedDamage,
+            modified: damage,
             armor: actor.getModifiedArmor(damage),
             perception: initCategory,
             hotsim: hotsim,

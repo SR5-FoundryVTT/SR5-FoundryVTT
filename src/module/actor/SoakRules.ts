@@ -20,7 +20,6 @@ export class SoakRules {
      * @param damageData The damage
      */
     static applyAllSoakParts(soakParts: PartsList<number>, actor: SR5Actor, damageData: DamageData) {
-        console.log("All soak parts");
         if (damageData.type.base !== 'matrix') {
             SoakRules.applyMundaneAttackSoakParts(soakParts, actor, damageData);
         } else {
@@ -70,19 +69,18 @@ export class SoakRules {
 
         // All actors have the same soak rules when they are not active in the matrix
         // TODO Technomancer and Sprites special rules?
-        if (actorData.initiative.perception !== 'matrix') {
-            SoakRules.applyBiofeedbackParts(soakParts, actor, actorData);
+        if (actorData.initiative.perception === 'matrix') {
+            if (actor.isVehicle()){
+                // Vehicles can have a matrix initiative but do not take biofeedback
+                SoakRules.applyRatingAndFirewallParts(actorData, soakParts);     
+            }
+            else {
+                SoakRules.applyBiofeedbackParts(soakParts, actor, actorData);
+            }
         }
 
         else {
-            if (!actor.isVehicle()){
-                SoakRules.applyBiofeedbackParts(soakParts, actor, actorData);
-            }
-
-            else {
-                // Vehicles can have a matrix initiative but do not take biofeedback
-                SoakRules.applyRatingAndFirewallParts(actorData, soakParts);       
-            }
+            SoakRules.applyRatingAndFirewallParts(actorData, soakParts);       
         }
     }
 
@@ -122,16 +120,28 @@ export class SoakRules {
      * @returns The updated damage data
      */
     static reduceDamage(damageData: DamageData, hits: number): ModifiedDamageData {
-        return Helpers.modifyDamageByHits(damageData, hits, 'SR5.SoakTest');
+        return Helpers.reduceDamageByHits(damageData, hits, 'SR5.SoakTest');
     }
 
     /**
-     * Modifies the damage type based on the incoming damage and the actor type
+     * Changes the damage type based on the incoming damage type and the actor state (armor, matrix perception..)
      * @param damage The incoming damage
      * @param actor The actor affected by the damage 
      * @returns The updated damage data 
      */
-    static modifyDamageType(damage: DamageData, actor : SR5Actor): DamageData {
+    static modifyDamageType(damage: DamageData, actor : SR5Actor) : DamageData {
+        // Careful, order is very important
+        const updatedDamage = SoakRules.modifyPhysicalDamageForArmor(damage, actor);
+        return SoakRules.modifyMatrixDamageForBiofeedback(updatedDamage, actor);
+    }
+
+    /**
+     * Turns physical damage to stun damage based on the damage and armor
+     * @param damage The incoming damage
+     * @param actor The actor affected by the damage 
+     * @returns The updated damage data 
+     */
+     static modifyPhysicalDamageForArmor(damage: DamageData, actor : SR5Actor): DamageData {
         const updatedDamage = duplicate(damage);
 
         if (damage.type.value === 'physical') {
@@ -150,7 +160,19 @@ export class SoakRules {
             }
         }
 
-        else if (damage.type.value === 'matrix') {
+        return updatedDamage;
+    }
+
+    /**
+     * Turns matrix damage to biofeedback based on the actor state
+     * @param damage The incoming damage
+     * @param actor The actor affected by the damage 
+     * @returns The updated damage data 
+     */
+    static modifyMatrixDamageForBiofeedback(damage: DamageData, actor : SR5Actor): DamageData {
+        const updatedDamage = duplicate(damage);
+
+        if (damage.type.value === 'matrix') {
             const actorData = actor.data.data as CharacterActorData;
 
             // Only characters can receive biofeedback damage at the moment. 

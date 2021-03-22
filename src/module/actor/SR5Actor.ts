@@ -42,6 +42,7 @@ import SR5CritterType = Shadowrun.SR5CritterType;
 import SR5ActorData = Shadowrun.SR5ActorData;
 import Skills = Shadowrun.Skills;
 import {SkillRules} from "./SkillRules";
+import { SoakRules } from './SoakRules';
 
 export class SR5Actor extends Actor<SR5ActorData> {
     // NOTE: Overwrite Actor.data additionally to extends Actor<T as SR5Actortype.Data: SR5ActorData> to still have

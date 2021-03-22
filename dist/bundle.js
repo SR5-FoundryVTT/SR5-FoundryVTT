@@ -13237,7 +13237,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DamageApplicationFlow = void 0;
 const DamageApplicationDialog_1 = require("../apps/dialogs/DamageApplicationDialog");
 const config_1 = require("../config");
-const SoakRules_1 = require("./SoakRules");
 class DamageApplicationFlow {
     /**
      * Runs the flow to apply damage to multiple actors with user interaction
@@ -13300,7 +13299,6 @@ class DamageApplicationFlow {
     }
     getDamageAndSoakForActor(actor, damage) {
         const actorData = actor.data.data;
-        const updatedDamage = SoakRules_1.SoakRules.modifyDamageType(damage, actor);
         const perception = actorData.initiative.perception;
         const initCategory = config_1.SR5.initiativeCategories[perception];
         let hotsim = false;
@@ -13310,7 +13308,7 @@ class DamageApplicationFlow {
         }
         return {
             actor,
-            modified: updatedDamage,
+            modified: damage,
             armor: actor.getModifiedArmor(damage),
             perception: initCategory,
             hotsim: hotsim,
@@ -13329,7 +13327,7 @@ class DamageApplicationFlow {
     }
 }
 exports.DamageApplicationFlow = DamageApplicationFlow;
-},{"../apps/dialogs/DamageApplicationDialog":132,"../config":145,"./SoakRules":91}],86:[function(require,module,exports){
+},{"../apps/dialogs/DamageApplicationDialog":132,"../config":145}],86:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -15914,9 +15912,12 @@ class SoakFlow {
             });
             if (!roll)
                 return;
-            // Reduce damage by damage resist and show result
-            const modifiedDamage = SoakRules_1.SoakRules.reduceDamage(damageData, roll.hits);
-            yield chat_1.createRollChatMessage({ title, roll, actor, damage: modifiedDamage });
+            // Modify damage and reduce damage by net hits and show result
+            const incoming = duplicate(damageData);
+            let modified = SoakRules_1.SoakRules.modifyDamageType(incoming, actor);
+            modified = SoakRules_1.SoakRules.reduceDamage(modified, roll.hits).modified;
+            const incAndModDamage = { incoming, modified };
+            yield chat_1.createRollChatMessage({ title, roll, actor, damage: incAndModDamage });
             return roll;
         });
     }
@@ -15978,7 +15979,6 @@ class SoakRules {
      * @param damageData The damage
      */
     static applyAllSoakParts(soakParts, actor, damageData) {
-        console.log("All soak parts");
         if (damageData.type.base !== 'matrix') {
             SoakRules.applyMundaneAttackSoakParts(soakParts, actor, damageData);
         }
@@ -16021,17 +16021,17 @@ class SoakRules {
         const actorData = actor.data.data;
         // All actors have the same soak rules when they are not active in the matrix
         // TODO Technomancer and Sprites special rules?
-        if (actorData.initiative.perception !== 'matrix') {
-            SoakRules.applyBiofeedbackParts(soakParts, actor, actorData);
-        }
-        else {
-            if (!actor.isVehicle()) {
-                SoakRules.applyBiofeedbackParts(soakParts, actor, actorData);
-            }
-            else {
+        if (actorData.initiative.perception === 'matrix') {
+            if (actor.isVehicle()) {
                 // Vehicles can have a matrix initiative but do not take biofeedback
                 SoakRules.applyRatingAndFirewallParts(actorData, soakParts);
             }
+            else {
+                SoakRules.applyBiofeedbackParts(soakParts, actor, actorData);
+            }
+        }
+        else {
+            SoakRules.applyRatingAndFirewallParts(actorData, soakParts);
         }
     }
     static applyBiofeedbackParts(soakParts, actor, actorData) {
@@ -16063,15 +16063,26 @@ class SoakRules {
      * @returns The updated damage data
      */
     static reduceDamage(damageData, hits) {
-        return helpers_1.Helpers.modifyDamageByHits(damageData, hits, 'SR5.SoakTest');
+        return helpers_1.Helpers.reduceDamageByHits(damageData, hits, 'SR5.SoakTest');
     }
     /**
-     * Modifies the damage type based on the incoming damage and the actor type
+     * Changes the damage type based on the incoming damage type and the actor state (armor, matrix perception..)
      * @param damage The incoming damage
      * @param actor The actor affected by the damage
      * @returns The updated damage data
      */
     static modifyDamageType(damage, actor) {
+        // Careful, order is very important
+        const updatedDamage = SoakRules.modifyPhysicalDamageForArmor(damage, actor);
+        return SoakRules.modifyMatrixDamageForBiofeedback(updatedDamage, actor);
+    }
+    /**
+     * Turns physical damage to stun damage based on the damage and armor
+     * @param damage The incoming damage
+     * @param actor The actor affected by the damage
+     * @returns The updated damage data
+     */
+    static modifyPhysicalDamageForArmor(damage, actor) {
         const updatedDamage = duplicate(damage);
         if (damage.type.value === 'physical') {
             // Physical damage is only transformed for some actors (e.g. not vehicles) 
@@ -16086,7 +16097,17 @@ class SoakRules {
                 }
             }
         }
-        else if (damage.type.value === 'matrix') {
+        return updatedDamage;
+    }
+    /**
+     * Turns matrix damage to biofeedback based on the actor state
+     * @param damage The incoming damage
+     * @param actor The actor affected by the damage
+     * @returns The updated damage data
+     */
+    static modifyMatrixDamageForBiofeedback(damage, actor) {
+        const updatedDamage = duplicate(damage);
+        if (damage.type.value === 'matrix') {
             const actorData = actor.data.data;
             // Only characters can receive biofeedback damage at the moment. 
             // TODO Technomancer and Sprites special rules?

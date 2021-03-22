@@ -34,7 +34,7 @@ export class SoakFlow {
         const damageData = damageDataOrUndef;
         const finalSoakDefenseParts = new PartsList<number>(duplicate(partsProps));
         SoakRules.applyAllSoakParts(finalSoakDefenseParts, actor, damageData); 
-        
+
         // Query user for roll options and do the actual soak test.
         const title = game.i18n.localize('SR5.SoakTest');
         const roll = await ShadowrunRoller.advancedRoll({
@@ -49,9 +49,13 @@ export class SoakFlow {
 
         if (!roll) return;
 
-        // Reduce damage by damage resist and show result
-        const modifiedDamage = SoakRules.reduceDamage(damageData, roll.hits);
-        await createRollChatMessage({title, roll, actor, damage: modifiedDamage});
+        // Modify damage and reduce damage by net hits and show result
+        const incoming = duplicate(damageData);
+        let modified = SoakRules.modifyDamageType(incoming, actor);
+        modified = SoakRules.reduceDamage(modified, roll.hits).modified;
+        const incAndModDamage = {incoming, modified};
+
+        await createRollChatMessage({title, roll, actor, damage: incAndModDamage});
 
         return roll;
     }
