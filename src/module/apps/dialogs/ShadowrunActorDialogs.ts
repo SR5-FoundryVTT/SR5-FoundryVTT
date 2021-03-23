@@ -2,12 +2,13 @@ import {FormDialog, FormDialogData} from "./FormDialog";
 import {SR5Actor} from "../../actor/SR5Actor";
 import {PartsList} from "../../parts/PartsList";
 import {Helpers} from "../../helpers";
+import {SkillFlow} from "../../actor/SkillFlow";
 import DefenseRollOptions = Shadowrun.DefenseRollOptions;
 import ModList = Shadowrun.ModList;
 import SoakRollOptions = Shadowrun.SoakRollOptions;
 import SkillDialogOptions = Shadowrun.SkillDialogOptions;
 import CombatData = Shadowrun.CombatData;
-import {SkillFlow} from "../../actor/SkillFlow";
+import DamageType = Shadowrun.DamageType;
 
 export class ShadowrunActorDialogs {
     static async createDefenseDialog(actor: SR5Actor, options: DefenseRollOptions, partsProps: ModList<number>): Promise<FormDialog> {
@@ -125,6 +126,7 @@ export class ShadowrunActorDialogs {
             damage: soakRollOptions?.damage,
             parts: soakParts.getMessageOutput(),
             elementTypes: CONFIG.SR5.elementTypes,
+            damageTypes: CONFIG.SR5.damageTypes
         };
 
         const buttons =  {
@@ -138,8 +140,9 @@ export class ShadowrunActorDialogs {
             const incomingDamage = Helpers.parseInputToNumber($(html).find('[name=incomingDamage]').val());
             const ap = Helpers.parseInputToNumber($(html).find('[name=ap]').val());
             const element = Helpers.parseInputToString($(html).find('[name=element]').val());
+            const damageType = Helpers.parseInputToString($(html).find('[name=damageType]').val()) as DamageType;
 
-            return {incomingDamage: incomingDamage, ap: ap, element: element};
+            return {incomingDamage, damageType, ap, element};
         }
 
         return {

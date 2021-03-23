@@ -42,6 +42,7 @@ import SR5CritterType = Shadowrun.SR5CritterType;
 import SR5ActorData = Shadowrun.SR5ActorData;
 import Skills = Shadowrun.Skills;
 import {SkillRules} from "./SkillRules";
+import { SoakRules } from './SoakRules';
 
 export class SR5Actor extends Actor<SR5ActorData> {
     // NOTE: Overwrite Actor.data additionally to extends Actor<T as SR5Actortype.Data: SR5ActorData> to still have
@@ -567,9 +568,6 @@ export class SR5Actor extends Actor<SR5ActorData> {
             damage = modified;
         }
 
-        // modified damage type by modified armor value.
-        damage = this._applyDamageTypeChangeForArmor(damage);
-
         const soakRollOptions = {
             event: options.event,
             damage,
@@ -617,7 +615,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
 
     // TODO: Abstract handling of const damage : ModifiedDamageData
     async rollSoak(options: SoakRollOptions, partsProps: ModList<number> = []): Promise<ShadowrunRoll|undefined> {
-        return new SoakFlow().run(this, options, partsProps);
+        return new SoakFlow().runSoakTest(this, options, partsProps);
     }
 
     rollSingleAttribute(attId, options: ActorRollOptions) {
@@ -1262,44 +1260,6 @@ export class SR5Actor extends Actor<SR5ActorData> {
         return users.filter(user => user.active);
     }
 
-    /** Apply all types of damage to the actor.
-     *
-     * @param damage
-     * @param changeDamageForActor can be changed to directly apply damage without further changes due to armor and more.
-     */
-    async applyDamage(damage: DamageData, changeDamageForActor: boolean = true) {
-        if (damage.value <= 0) return;
-
-        // NOTE: Execution order is important here!
-
-        if (changeDamageForActor) {
-            damage = this._applyDamageTypeChangeForActor(damage);
-        }
-
-        // Apply damage and resulting overflow to the according track.
-        // The amount and type damage can value in the process.
-        if (damage.type.value === 'matrix') {
-            // TODO: Biofeedback damage model already integrated?
-            damage = await this._addMatrixDamage(damage);
-        }
-
-        if (damage.type.value === 'stun') {
-            damage = await this._addStunDamage(damage);
-        }
-
-        if (damage.type.value === 'physical') {
-            await this._addPhysicalDamage(damage);
-        }
-
-        // NOTE: Currently each damage type updates once. Should this cause issues for long latency, collect
-        //       and sum each damage type and update here globally.
-        // NOTE: For stuff like healing the last wound by magic, it might also be interesting to store and give
-        //       an overview of each damage/wound applied to select from.
-        // await this.update({'data.track': this.data.data.track});
-
-        // TODO: Handle changes in actor status (death and such)
-    }
-
     __addDamageToTrackValue(damage: DamageData, track: TrackType|OverflowTrackType|ConditionData): TrackType|OverflowTrackType|ConditionData {
         if (damage.value === 0) return track;
         if (track.value === track.max) return track;
@@ -1368,7 +1328,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
 
     /** Apply damage to the stun track and get overflow damage for the physical track.
      */
-    async _addStunDamage(damage: DamageData): Promise<DamageData> {
+    async addStunDamage(damage: DamageData): Promise<DamageData> {
         if (damage.type.value !== 'stun') return damage;
 
         const track = this.getStunTrack();
@@ -1388,7 +1348,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
         return overflow;
     }
 
-    async _addPhysicalDamage(damage: DamageData) {
+    async addPhysicalDamage(damage: DamageData) {
         if (damage.type.value !== 'physical') return damage;
 
         const track = this.getPhysicalTrack();
@@ -1403,7 +1363,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
 
     /** Adding damage to a device track instead of an actors track, as they contain their own track within their data.
      */
-    async _addMatrixDamage(damage: DamageData): Promise<DamageData> {
+    async addMatrixDamage(damage: DamageData): Promise<DamageData> {
         if (damage.type.value !== 'matrix') return damage;
 
         const device = this.getMatrixDevice();
@@ -1457,65 +1417,17 @@ export class SR5Actor extends Actor<SR5ActorData> {
         return device.getCondition();
     }
 
-    /** Apply all damage type changes that need to happen for this Actor
-     *
-     * This doesn't include armor for simplicity reasons.
-     */
-    _applyDamageTypeChangeForActor(damage: DamageData): DamageData {
-        damage = this._applyDamageTypeChangeForGrunt(damage);
-
-        return damage;
-    }
-
-    _applyDamageTypeChangeForGrunt(damage: DamageData): DamageData {
-        if (!this.isGrunt()) return damage;
-
-        if (damage.type.value === 'stun') {
-            // Avoid cross referencing.
-            damage = duplicate(damage);
-
-            damage.type.value = 'physical';
-        }
-
-        return damage;
-    }
-
-    /**
-     *
-     * @param damage
-     */
-    _applyDamageTypeChangeForArmor(damage: DamageData): DamageData {
-        // TODO: Damage modification should only really apply to characters, but double check ;)
-        if (!this.isCharacter()) return damage;
-
-        if (damage.type.value === 'physical') {
-            const modifiedArmor = this.getModifiedArmor(damage);
-            if (modifiedArmor) {
-                const armorWillChangeDamageType = modifiedArmor.value > damage.value;
-
-                if (armorWillChangeDamageType) {
-                    // Avoid cross referencing.
-                    damage = duplicate(damage);
-
-                    damage.type.value = 'stun';
-                }
-            }
-        }
-
-        return damage;
-    }
-
-    getModifiedArmor(damage: DamageData): ActorArmorData|undefined {
+    getModifiedArmor(damage: DamageData): ActorArmorData {
         if (!damage.ap?.value) {
             return this.getArmor();
-        }
+       }
 
         const modified = duplicate(this.getArmor());
         if (modified) {
             modified.mod = PartsList.AddUniquePart(modified.mod, 'SR5.DV', damage.ap.value);
             modified.value = Helpers.calcTotal(modified, {min: 0});
         }
-
+ 
         return modified;
     }
 
