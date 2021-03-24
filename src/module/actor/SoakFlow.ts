@@ -52,7 +52,7 @@ export class SoakFlow {
         // Modify damage and reduce damage by net hits and show result
         const incoming = duplicate(damageData);
         let modified = SoakRules.modifyDamageType(incoming, actor);
-        modified = SoakRules.reduceDamage(modified, roll.hits).modified;
+        modified = SoakRules.reduceDamage(actor, modified, roll.hits).modified;
         const incAndModDamage = {incoming, modified};
 
         await createRollChatMessage({title, roll, actor, damage: incAndModDamage});
