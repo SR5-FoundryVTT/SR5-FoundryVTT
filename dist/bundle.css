@@ -1048,7 +1048,7 @@ select.display {
     margin-top: 0.5em;
     margin-bottom: 0.5em;
     display: grid;
-    grid-template-columns: 40px auto auto auto; }
+    grid-template-columns: 40px auto auto; }
     .sr5 .modified-target-damage .modified-target-damage-cell {
       display: flex;
       align-items: center;
@@ -1083,6 +1083,8 @@ select.display {
     height: 45px; }
   .sr5 td.env-modifier-level {
     padding-right: 6px; }
+  .sr5 .skill-roll-not-defaultable {
+    font-style: italic; }
 
 /** Replicate Foundry .dialog stiling for flex row buttons. FormDialog sublcasses simply adding class dialog will
  * otherwise cause issues with custom button styling.

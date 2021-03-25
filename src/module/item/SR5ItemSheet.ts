@@ -90,8 +90,25 @@ export class SR5ItemSheet extends ItemSheet<{}, SR5Item> {
         // TODO set to the proper boolean for if the source PDF can be accessed
         // I'm thinking maybe check for the mod being installed?
         data['hasSourcePdfAvailable'] = true;
+        data['activeSkills'] = this._getActiveSkillsForSelect();
 
         return data;
+    }
+
+    _getActiveSkillsForSelect() {
+        if (!this.item.actor) return CONFIG.SR5.activeSkills;
+        const activeSkills = Helpers.sortSkills(this.item.actor.getActiveSkills());
+
+        const activeSkillsForSelect = {};
+        for (const [id, skill] of Object.entries(activeSkills)) {
+            // Legacy skills have no name, but their name is their id!
+            // Custom skills have a name and their id is random.
+            const key = skill.name || id;
+            const label = skill.label || skill.name;
+            activeSkillsForSelect[key] = label;
+        }
+
+        return activeSkillsForSelect;
     }
 
     /* -------------------------------------------- */

@@ -7,10 +7,10 @@ import {ShadowrunRoll, Test} from "./rolls/ShadowrunRoller";
 import DrainData = Shadowrun.DrainData;
 import {Helpers} from "./helpers";
 import ModifiedDamageData = Shadowrun.ModifiedDamageData;
-import {DamageApplicationDialog} from "./apps/dialogs/DamageApplicationDialog";
 import DamageType = Shadowrun.DamageType;
 import DamageElement = Shadowrun.DamageElement;
 import CombatData = Shadowrun.CombatData;
+import { DamageApplicationFlow } from './actor/DamageApplicationFlow';
 
 export interface RollTargetChatMessage {
     actor: SR5Actor
@@ -390,21 +390,6 @@ export const addRollListeners = (app: ChatMessage, html) => {
             }
         }
 
-        // Show user the token selection and resulting damage values
-        const damageApplicationDialog = await new DamageApplicationDialog(actors, damage);
-        const actorDamages = await damageApplicationDialog.select();
-
-        if (damageApplicationDialog.canceled) return;
-
-        // Apply the actual damage values. applyDamage will, again, calculate armor damage modification.
-        actorDamages.forEach(({actor, modified}) => {
-            if (damageApplicationDialog.selectedButton === 'damage') {
-                actor.applyDamage(modified);
-            } else if (damageApplicationDialog.selectedButton === 'unmodifiedDamage') {
-                actor.applyDamage(damage);
-            } else {
-                console.error('Expected a dialog selection, but none known selection was made');
-            }
-        });
+        new DamageApplicationFlow().runApplyDamage(actors, damage);
     });
 };

@@ -1,4 +1,5 @@
 import { SkillEditForm } from './SkillEditForm';
+import SkillEditFormData = Shadowrun.SkillEditFormData;
 
 export class LanguageSkillEditForm extends SkillEditForm {
     _updateString() {
@@ -8,7 +9,9 @@ export class LanguageSkillEditForm extends SkillEditForm {
     getData() {
         return mergeObject(super.getData(), {
             editable_name: true,
-        });
+            editable_canDefault: false,
+            editable_attribute: false
+        } as SkillEditFormData);
     }
 
     /** @override */

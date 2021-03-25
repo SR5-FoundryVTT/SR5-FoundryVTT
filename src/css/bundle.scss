@@ -623,7 +623,7 @@ select.display {
         margin-top: $large-distance;
         margin-bottom: $large-distance;
         display: grid;
-        grid-template-columns: 40px auto auto auto;
+        grid-template-columns: 40px auto auto;
 
         .modified-target-damage-cell {
             display:flex;
@@ -673,6 +673,10 @@ select.display {
     }
     td.env-modifier-level {
         padding-right: 6px;
+    }
+
+    .skill-roll-not-defaultable {
+        font-style: italic;
     }
 }
 

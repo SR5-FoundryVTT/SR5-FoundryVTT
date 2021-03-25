@@ -2,11 +2,13 @@ import {FormDialog, FormDialogData} from "./FormDialog";
 import {SR5Actor} from "../../actor/SR5Actor";
 import {PartsList} from "../../parts/PartsList";
 import {Helpers} from "../../helpers";
+import {SkillFlow} from "../../actor/SkillFlow";
 import DefenseRollOptions = Shadowrun.DefenseRollOptions;
 import ModList = Shadowrun.ModList;
 import SoakRollOptions = Shadowrun.SoakRollOptions;
 import SkillDialogOptions = Shadowrun.SkillDialogOptions;
 import CombatData = Shadowrun.CombatData;
+import DamageType = Shadowrun.DamageType;
 
 export class ShadowrunActorDialogs {
     static async createDefenseDialog(actor: SR5Actor, options: DefenseRollOptions, partsProps: ModList<number>): Promise<FormDialog> {
@@ -124,6 +126,7 @@ export class ShadowrunActorDialogs {
             damage: soakRollOptions?.damage,
             parts: soakParts.getMessageOutput(),
             elementTypes: CONFIG.SR5.elementTypes,
+            damageTypes: CONFIG.SR5.damageTypes
         };
 
         const buttons =  {
@@ -133,12 +136,13 @@ export class ShadowrunActorDialogs {
             },
         };
 
-        const onAfterClose = (html: JQuery) => {           
+        const onAfterClose = (html: JQuery) => {
             const incomingDamage = Helpers.parseInputToNumber($(html).find('[name=incomingDamage]').val());
             const ap = Helpers.parseInputToNumber($(html).find('[name=ap]').val());
             const element = Helpers.parseInputToString($(html).find('[name=element]').val());
+            const damageType = Helpers.parseInputToString($(html).find('[name=damageType]').val()) as DamageType;
 
-            return {incomingDamage: incomingDamage, ap: ap, element: element};
+            return {incomingDamage, damageType, ap, element};
         }
 
         return {
@@ -151,7 +155,7 @@ export class ShadowrunActorDialogs {
     }
 
     static getSkillDialogData(actor: SR5Actor, options: SkillDialogOptions, partsProps: PartsList<number>): FormDialogData {
-        const title = game.i18n.localize(options.skill.label);
+        const title = game.i18n.localize(options.skill.label || options.skill.name);
         const templatePath = 'systems/shadowrun5e/dist/templates/rolls/skill-roll.html';
 
         const attributes = actor.getAttributes();
@@ -188,7 +192,8 @@ export class ShadowrunActorDialogs {
             const newLimit = Helpers.parseInputToString($(html).find('[name="attribute.limit"]').val());
             const attribute = actor.getAttribute(newAtt);
             const limit = actor.getLimit(newLimit);
-            const skillLabel = game.i18n.localize(options.skill.label);
+            // Legacy skills have a label, but no name. Custom skills have a name but no label.
+            const skillLabel = game.i18n.localize(options.skill.label || options.skill.name);
             const attributeLabel = game.i18n.localize(CONFIG.SR5.attributes[newAtt]);
             const testLabel = game.i18n.localize('SR5.Test')
 
@@ -196,12 +201,7 @@ export class ShadowrunActorDialogs {
 
             partsProps.addUniquePart(attribute.label, attribute.value);
 
-            // Check for skill defaulting at the base, since modifiers or bonus can cause a positive pool, while
-            // still defaulting.
-            const isDefaulting = options.skill.base === 0;
-            if (isDefaulting) {
-                partsProps.addUniquePart('SR5.Defaulting', -1);
-            }
+            SkillFlow.handleDefaulting(options.skill, partsProps);
 
             // Possible specialization based on button label.
             const isSpecialization = options.skill.specs.includes(selectedButton);

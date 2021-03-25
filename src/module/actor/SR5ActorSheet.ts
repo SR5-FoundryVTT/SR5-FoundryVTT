@@ -1,16 +1,16 @@
-import { Helpers } from '../helpers';
-import { ChummerImportForm } from '../apps/chummer-import-form';
-import { SkillEditForm } from '../apps/skills/SkillEditForm';
-import { KnowledgeSkillEditForm } from '../apps/skills/KnowledgeSkillEditForm';
-import { LanguageSkillEditForm } from '../apps/skills/LanguageSkillEditForm';
+import {Helpers} from '../helpers';
+import {ChummerImportForm} from '../apps/chummer-import-form';
+import {SkillEditForm} from '../apps/skills/SkillEditForm';
+import {KnowledgeSkillEditForm} from '../apps/skills/KnowledgeSkillEditForm';
+import {LanguageSkillEditForm} from '../apps/skills/LanguageSkillEditForm';
+import {SR5Actor} from './SR5Actor';
+import {SR5} from '../config';
+import {SR5Item} from "../item/SR5Item";
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import Skills = Shadowrun.Skills;
-import { SR5Actor } from './SR5Actor';
 import MatrixAttribute = Shadowrun.MatrixAttribute;
-import { SR5 } from '../config';
 import SkillField = Shadowrun.SkillField;
-import {SR5Item} from "../item/SR5Item";
 import DeviceData = Shadowrun.DeviceData;
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditForm instance.
@@ -214,8 +214,8 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
                 filteredSkills[key] = skill;
             }
         }
-        Helpers.orderKeys(filteredSkills);
-        return filteredSkills;
+
+        return Helpers.sortSkills(filteredSkills);
     }
 
     _showSkill(key, skill, data) {
@@ -230,7 +230,8 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
     }
 
     _isSkillFiltered(skillId, skill) {
-        // a newly created skill should be filtered, no matter what.
+        // a newly created skill shouldn't be filtered, no matter what.
+        // Therefore disqualify empty skill labels/names from filtering and always show them.
         const isFilterable = this._getSkillLabelOrName(skill).length > 0;
         const isHiddenForText = !this._doesSkillContainText(skillId, skill, this._filters.skills);
         const isHiddenForUntrained = !this._filters.showUntrainedSkills && skill.value === 0;
@@ -427,7 +428,9 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
             }
         });
 
-        html.find('.skill-header').click(this._onFilterUntrainedSkills.bind(this));
+        html.find('.skill-header').find('.item-name').click(this._onFilterUntrainedSkills.bind(this));
+        html.find('.skill-header').find('.skill-spec-item').click(this._onFilterUntrainedSkills.bind(this));
+        html.find('.skill-header').find('.rtg').click(this._onFilterUntrainedSkills.bind(this));
 
         html.find('.cell-input-roll').click(this._onRollCellInput.bind(this));
         html.find('.attribute-roll').click(this._onRollAttribute.bind(this));
@@ -440,8 +443,10 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
         html.find('.add-knowledge').click(this._onAddKnowledgeSkill.bind(this));
         html.find('.add-language').click(this._onAddLanguageSkill.bind(this));
+        html.find('.add-active').click(this._onAddActiveSkill.bind(this));
         html.find('.remove-knowledge').click(this._onRemoveKnowledgeSkill.bind(this));
         html.find('.remove-language').click(this._onRemoveLanguageSkill.bind(this));
+        html.find('.remove-active').click(this._onRemoveActiveSkill.bind(this));
         html.find('.knowledge-skill').click(this._onRollKnowledgeSkill.bind(this));
         html.find('.language-skill').click(this._onRollLanguageSkill.bind(this));
 
@@ -727,25 +732,63 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
 
     async _onAddLanguageSkill(event) {
         event.preventDefault();
-        this.actor.addLanguageSkill({ name: '' });
+        const skillId = await this.actor.addLanguageSkill({ name: '' });
+        if (!skillId) return;
+
+        // NOTE: Causes issues with adding knowledge skills (category undefined)
+        // await this._showSkillEditForm(LanguageSkillEditForm, this.actor, {event}, skillId);
     }
 
     async _onRemoveLanguageSkill(event) {
         event.preventDefault();
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
         const skillId = Helpers.listItemId(event);
-        this.actor.removeLanguageSkill(skillId);
+        await this.actor.removeLanguageSkill(skillId);
     }
 
     async _onAddKnowledgeSkill(event) {
         event.preventDefault();
         const category = Helpers.listItemId(event);
-        await this.actor.addKnowledgeSkill(category);
+        const skillId = await this.actor.addKnowledgeSkill(category);
+        if (!skillId) return;
+
+        // NOTE: Causes issues with adding knowledge skills (category undefined)
+        // await this._showSkillEditForm(KnowledgeSkillEditForm, this.actor, {event}, skillId);
     }
 
     async _onRemoveKnowledgeSkill(event) {
         event.preventDefault();
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
         const [skillId, category] = Helpers.listItemId(event).split('.');
         await this.actor.removeKnowledgeSkill(skillId, category);
+    }
+
+    /** Add an active skill and show the matching edit application afterwards.
+     *
+     * @param event The HTML event from which the action resulted.
+     */
+     async _onAddActiveSkill(event: Event) {
+        event.preventDefault();
+        const skillId = await this.actor.addActiveSkill();
+        if (!skillId) return;
+
+        await this._showSkillEditForm(SkillEditForm, this.actor, { event: event }, skillId);
+    }
+
+    async _onRemoveActiveSkill(event: Event) {
+         event.preventDefault();
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        const skillId = Helpers.listItemId(event);
+        await this.actor.removeActiveSkill(skillId);
     }
 
     async _onChangeRtg(event) {
@@ -753,7 +796,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         const item = this.actor.getOwnedSR5Item(iid);
         const rtg = parseInt(event.currentTarget.value);
         if (item && rtg) {
-            item.update({ 'data.technology.rating': rtg });
+            await item.update({ 'data.technology.rating': rtg });
         }
     }
 
@@ -763,7 +806,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         const qty = parseInt(event.currentTarget.value);
         if (item && qty && "technology" in item.data.data) {
             item.data.data.technology.quantity = qty;
-            item.update({ 'data.technology.quantity': qty });
+            await item.update({ 'data.technology.quantity': qty });
         }
     }
 
@@ -986,18 +1029,18 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         );
     }
 
-    _onShowEditLanguageSkill(event) {
+    async _onShowEditLanguageSkill(event) {
         event.preventDefault();
         const skill = Helpers.listItemId(event);
         // new LanguageSkillEditForm(this.actor, skill, { event: event }).render(true);
-        this._showSkillEditForm(LanguageSkillEditForm, this.actor, { event: event }, skill);
+        await this._showSkillEditForm(LanguageSkillEditForm, this.actor, { event: event }, skill);
     }
 
-    _onShowEditSkill(event) {
+    async _onShowEditSkill(event) {
         event.preventDefault();
         const skill = Helpers.listItemId(event);
         // new SkillEditForm(this.actor, skill, { event: event }).render(true);
-        this._showSkillEditForm(SkillEditForm, this.actor, { event: event }, skill);
+        await this._showSkillEditForm(SkillEditForm, this.actor, { event: event }, skill);
     }
 
     _onShowImportCharacter(event) {

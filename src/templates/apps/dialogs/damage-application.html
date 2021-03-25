@@ -7,10 +7,9 @@
 <div class="modified-target-damage sunken">
     {{#each actorDamage as |actorDamage|}}
     <div class="modified-target-damage-cell">
-        <img src="{{actor.img}}" title="{{speakerName actorDamage.actor}}" width="36" height="36"/>
+        <img src="{{actor.img}}" title="{{speakerName actor}}" width="36" height="36"/>
     </div>
-    <div class="modified-target-damage-cell important">{{speakerName actorDamage.actor}}</div>
-    <div class="modified-target-damage-cell">{{#ifne modified.type.value 'matrix'}}{{localize 'SR5.ModifiedArmor'}} ({{armor.value}}){{/ifne}} </div>
-    <div class="modified-target-damage-cell important">{{damageCode actorDamage.modified}}</div>
+    <div class="modified-target-damage-cell important">{{speakerName actor}}</div>
+    <div class="modified-target-damage-cell important">{{damageCode ../damage}}</div>
     {{/each}}
 </div>

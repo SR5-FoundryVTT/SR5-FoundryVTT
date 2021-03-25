@@ -50,6 +50,7 @@ import Quality = Shadowrun.Quality;
 import Spell = Shadowrun.Spell;
 import SpritePower = Shadowrun.SpritePower;
 import {ItemAction} from "./ItemAction";
+import {SkillFlow} from "../actor/SkillFlow";
 
 export class SR5Item extends Item {
     // NOTE: In contrast to SR5Actor we can only type Item.data as the typing structure for ItemData doesn't have
@@ -576,11 +577,9 @@ export class SR5Item extends Item {
         if (attribute && attribute.label) parts.addPart(attribute.label, attribute.value);
 
         // if we have a valid skill, don't look for a second attribute
-        if (skill && skill.label) {
-            parts.addUniquePart(skill.label, skill.value);
-            if (skill.value === 0) {
-                parts.addUniquePart('SR5.Defaulting', -1);
-            }
+        if (skill) {
+            parts.addUniquePart(skill.label || skill.name, skill.value);
+            SkillFlow.handleDefaulting(skill, parts);
         }
         else if (attribute2 && attribute2.label) {
             parts.addPart(attribute2.label, attribute2.value);

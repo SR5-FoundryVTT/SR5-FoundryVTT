@@ -1,18 +1,22 @@
 import SkillField = Shadowrun.SkillField;
 import { Helpers } from '../helpers';
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
+import SkillCategories = Shadowrun.SkillCategories;
+import {SkillRules} from "../actor/SkillRules";
+import {FLAGS, SYSTEM_NAME} from "../constants";
 
 export const registerSkillLineHelpers = () => {
-    Handlebars.registerHelper('SkillHeaderIcons', function (id) {
+    Handlebars.registerHelper('SkillHeaderIcons', function (category: SkillCategories) {
         const addIcon = {
             icon: 'fas fa-plus',
             title: game.i18n.localize('SR5.AddSkill'),
             text: game.i18n.localize('SR5.Add'),
             cssClass: '',
         };
-        switch (id) {
+        switch (category) {
             case 'active':
-                return [{}];
+                addIcon.cssClass = 'add-active';
+                return [addIcon];
             case 'language':
                 addIcon.cssClass = 'add-language';
                 return [addIcon];
@@ -69,6 +73,17 @@ export const registerSkillLineHelpers = () => {
         ];
     });
 
+    Handlebars.registerHelper('SkillAdditionCssClass', function(skill: SkillField): string[] {
+        const classes: string[] = [];
+
+        // @PDF SR5#151 not defaultable skills should be shown as italic.
+        if (game.settings.get(SYSTEM_NAME, FLAGS.ShowSkillsWithDetails) && !SkillRules.allowDefaultingRoll(skill)) {
+            classes.push('skill-roll-not-defaultable');
+        }
+
+        return classes;
+    })
+
     Handlebars.registerHelper('SkillIcons', function (skillType: string, skill: SkillField) {
         const editIcon = {
             icon: 'fas fa-edit',
@@ -83,7 +98,8 @@ export const registerSkillLineHelpers = () => {
         switch (skillType) {
             case 'active':
                 editIcon.cssClass = 'skill-edit';
-                return [editIcon];
+                removeIcon.cssClass = 'remove-active'
+                return [editIcon, removeIcon];
             case 'language':
                 editIcon.cssClass = 'language-skill-edit';
                 removeIcon.cssClass = 'remove-language';

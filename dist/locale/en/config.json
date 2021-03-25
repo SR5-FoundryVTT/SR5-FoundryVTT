@@ -241,7 +241,7 @@
     "SR5.LimitSocial": "Social",
     "SR5.LimitMental": "Mental",
     "SR5.Mundane": "Mundane",
-    "SR5.Awakened": "Awakend",
+    "SR5.Awakened": "Awakened",
     "SR5.Emerged": "Emerged",
     "SR5.DmgTypePhysical": "Physical",
     "SR5.DmgTypeStun": "Stun",
@@ -396,6 +396,7 @@
     "SR5.FullDefense": "Full Defense",
     "SR5.Global": "Global",
     "SR5.EnvironmentModifier": "Environ. Mod",
+    "SR5.CanDefault": "Can Default",
 
     "SR5.Internal": "Internal",
     "SR5.Barrel": "Barrel",
@@ -577,6 +578,12 @@
         "ShowTokenNameForChatOutputDescription": "Should the token name be used for roll card output instead of the actor name when available",
         "WhisperOpposedTestsToTargetedPlayers": "Whisper tests to targeted players",
         "WhisperOpposedTestsToTargetedPlayersDescription": "Rolls with opposed tests will be whispered to a online player target",
+        "OnlyAllowRollOnDefaultableSkills": "Only defaultable unknown skill rolls",
+        "OnlyAllowRollOnDefaultableSkillsDescription": "When unset unknown skills can be rolled, even if they can't be defaulted.",
+        "ShowSkillsWithDetails": "Show more detailed skill lists",
+        "ShowSkillsWithDetailsDescription": "When set skills list display will mirror core rulebook style (italics, short attributes)",
+        "OnlyAutoRollNPCInCombat": "Only auto roll NPC initiative",
+        "OnlyAutoRollNPCInCombatDescription": "Wen unset players must manually roll their ini on each new pass / round",
         "Euclidean": "Euclidean"
     },
 
@@ -790,11 +797,13 @@
 
     "SR5.Warnings": {
         "NegativeLimitValue": "Limit values must be above zero",
-        "TokenSelectionNeeded": "One ore more tokens need to be selected"
+        "TokenSelectionNeeded": "One ore more tokens need to be selected",
+        "SkillCantBeDefault": "This skill can't be rolled on as it can't be defaulted"
     },
 
     "SR5.Errors": {
-        "MissingSkill": "The actor doesn't have the requested skill."
+        "MissingSkill": "The actor doesn't have the requested skill.",
+        "SkillWithoutAttribute": "The skill has no attribute configured."
     },
 
     "SR5.ChangelogApplication": {

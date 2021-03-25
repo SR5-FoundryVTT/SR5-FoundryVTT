@@ -1,6 +1,16 @@
 import {ShadowrunRoll, ShadowrunRoller} from '../rolls/ShadowrunRoller';
-import { Helpers } from '../helpers';
-import { SR5Item } from '../item/SR5Item';
+import {Helpers} from '../helpers';
+import {SR5Item} from '../item/SR5Item';
+import {FLAGS, SKILL_DEFAULT_NAME, SR, SYSTEM_NAME} from '../constants';
+import {PartsList} from '../parts/PartsList';
+import {ActorPrepFactory} from './prep/ActorPrepFactory';
+import {ShadowrunActorDialogs} from "../apps/dialogs/ShadowrunActorDialogs";
+import {createRollChatMessage} from "../chat";
+import {SR5Combat} from "../combat/SR5Combat";
+import {Modifiers} from "../sr5/Modifiers";
+import {SoakFlow} from './SoakFlow';
+import {DefaultValues} from '../dataTemplates';
+import {SkillFlow} from "./SkillFlow";
 import ActorRollOptions = Shadowrun.ActorRollOptions;
 import DefenseRollOptions = Shadowrun.DefenseRollOptions;
 import SoakRollOptions = Shadowrun.SoakRollOptions;
@@ -9,21 +19,15 @@ import SkillRollOptions = Shadowrun.SkillRollOptions;
 import SkillField = Shadowrun.SkillField;
 import ModList = Shadowrun.ModList;
 import LimitField = Shadowrun.LimitField;
-import {SYSTEM_NAME, FLAGS, SR} from '../constants';
 import SR5ActorType = Shadowrun.SR5ActorType;
-import { PartsList } from '../parts/PartsList';
-import { ActorPrepFactory } from './prep/ActorPrepFactory';
 import EdgeAttributeField = Shadowrun.EdgeAttributeField;
 import VehicleActorData = Shadowrun.VehicleActorData;
 import VehicleStat = Shadowrun.VehicleStat;
-import {ShadowrunActorDialogs} from "../apps/dialogs/ShadowrunActorDialogs";
-import {createRollChatMessage} from "../chat";
 import Attributes = Shadowrun.Attributes;
 import Limits = Shadowrun.Limits;
 import DamageData = Shadowrun.DamageData;
 import TrackType = Shadowrun.TrackType;
 import OverflowTrackType = Shadowrun.OverflowTrackType;
-import {SR5Combat} from "../combat/SR5Combat";
 import SpellDefenseOptions = Shadowrun.SpellDefenseOptions;
 import NumberOrEmpty = Shadowrun.NumberOrEmpty;
 import CharacterActorData = Shadowrun.CharacterActorData;
@@ -35,10 +39,10 @@ import ConditionData = Shadowrun.ConditionData;
 import SR5SpiritType = Shadowrun.SR5SpiritType;
 import SR5SpriteType = Shadowrun.SR5SpriteType;
 import SR5CritterType = Shadowrun.SR5CritterType;
-import {Modifiers} from "../sr5/Modifiers";
-import { SoakFlow } from './SoakFlow';
-import { DefaultValues } from '../dataTemplates';
 import SR5ActorData = Shadowrun.SR5ActorData;
+import Skills = Shadowrun.Skills;
+import {SkillRules} from "./SkillRules";
+import { SoakRules } from './SoakRules';
 
 export class SR5Actor extends Actor<SR5ActorData> {
     // NOTE: Overwrite Actor.data additionally to extends Actor<T as SR5Actortype.Data: SR5ActorData> to still have
@@ -73,7 +77,11 @@ export class SR5Actor extends Actor<SR5ActorData> {
 
     findActiveSkill(skillName?: string): SkillField | undefined {
         if (skillName === undefined) return undefined;
-        return this.data.data.skills.active[skillName];
+        // Search for legacy skills with their name as id.
+        const skill = this.data.data.skills.active[skillName];
+        if (skill) return skill;
+        // Search for custom skills with a random id.
+        return Object.values(this.data.data.skills.active).find(skill => skill.name === skillName);
     }
 
     findAttribute(attributeName?: string): AttributeField | undefined {
@@ -257,7 +265,37 @@ export class SR5Actor extends Actor<SR5ActorData> {
         return this.findActiveSkill(name);
     }
 
-    getSkill(skillId: string): SkillField | undefined {
+    getActiveSkills(): Skills {
+        return this.data.data.skills.active;
+    }
+
+    /**
+     * Return the full pool of a skill including attribute and possible specialization bonus.
+     * @param skillId The ID of the skill. Note that this can differ from what is shown in the skill list. If you're
+     *                unsure about the id and want to search
+     * @param options An object to change the behaviour.
+     *                The property specialization will trigger the pool value to be raised by a specialization modifier
+     *                The property byLbale will cause the param skillId to be interpreted as the shown i18n label.
+     */
+    getPool(skillId: string, options= {specialization: false, byLabel: false}): number {
+        const skill = options.byLabel ? this.getSkillByLabel(skillId) : this.getSkill(skillId);
+        if (!skill || !skill.attribute) return 0;
+        if (!SkillFlow.allowRoll(skill)) return 0;
+
+        const attribute = this.getAttribute(skill.attribute);
+
+        if (SkillRules.mustDefaultToRoll(skill) && SkillRules.allowDefaultingRoll(skill)) {
+            return SkillRules.getDefaultingModifier() + attribute.value;
+        }
+
+        const specializationBonus = options.specialization ? SR.skill.SPECIALIZATION_MODIFIER : 0;
+        return skill.value + attribute.value + specializationBonus;
+    }
+
+    getSkill(skillId: string, options= {byLabel: false}): SkillField | undefined {
+        if (options.byLabel)
+            return this.getSkillByLabel(skillId);
+
         const { skills } = this.data.data;
         if (skills.active.hasOwnProperty(skillId)) {
             return skills.active[skillId];
@@ -276,6 +314,42 @@ export class SR5Actor extends Actor<SR5ActorData> {
         }
     }
 
+    /**
+     * Search all skills for a matching i18n translation label.
+     * NOTE: You should use getSkill if you have the skillId ready. Only use this for ease of use!
+     *
+     * @param searchedFor The translated output of either the skill label (after localize) or name of the skill in question.
+     * @return The first skill found with a matching translation or name.
+     */
+    getSkillByLabel(searchedFor: string): SkillField|undefined {
+        if (!searchedFor) return;
+
+        const possibleMatch = (skill: SkillField): string =>  skill.label ? game.i18n.localize(skill.label) : skill.name;
+
+        const {skills} = this.data.data;
+
+        for (const skill of Object.values(skills.active)) {
+            if (searchedFor === possibleMatch(skill))
+                return skill;
+        }
+
+        for (const skill of Object.values(skills.language.value)) {
+            if (searchedFor === possibleMatch(skill))
+                return skill;
+        }
+
+        // Iterate over all different knowledge skill categories
+        for (const categoryKey in skills.knowledge) {
+            if (!skills.knowledge.hasOwnProperty(categoryKey)) continue;
+            // Typescript can't follow the flow here...
+            const categorySkills = skills.knowledge[categoryKey].value as SkillField[];
+            for (const skill of Object.values(categorySkills) ) {
+                if (searchedFor === possibleMatch(skill))
+                    return skill;
+            }
+        }
+    }
+
     getSkillLabel(skillId: string): string {
         const skill = this.getSkill(skillId);
         if (!skill) {
@@ -285,7 +359,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
         return skill.label ? skill.label : skill.name ? skill.name : '';
     }
 
-    async addKnowledgeSkill(category, skill?) {
+    async addKnowledgeSkill(category, skill?): Promise<string> {
         const defaultSkill = {
             name: '',
             specs: [],
@@ -306,20 +380,37 @@ export class SR5Actor extends Actor<SR5ActorData> {
         updateData[fieldName] = value;
 
         await this.update(updateData);
+
+        return id;
+    }
+
+    async addActiveSkill(skillData: Partial<SkillField> = {name: SKILL_DEFAULT_NAME}): Promise<string | undefined> {
+        const skill = DefaultValues.skillData(skillData);
+
+        const activeSkillsPath = 'data.skills.active';
+        const updateSkillDataResult = Helpers.getRandomIdSkillFieldDataEntry(activeSkillsPath, skill);
+
+        if (!updateSkillDataResult) return;
+
+        const {updateSkillData, id} = updateSkillDataResult;
+
+        await this.update(updateSkillData as object);
+
+        return id;
     }
 
     async removeLanguageSkill(skillId) {
-        const value = {};
-        value[skillId] = { _delete: true };
-        await this.update({ 'data.skills.language.value': value });
+        const updateData = Helpers.getDeleteDataEntry('data.skills.language.value', skillId);
+        await this.update(updateData);
     }
 
-    async addLanguageSkill(skill) {
+    async addLanguageSkill(skill): Promise<string> {
         const defaultSkill = {
             name: '',
             specs: [],
             base: 0,
             value: 0,
+            // TODO: BUG ModifiableValue is ModList<number>[] and not number
             mod: 0,
         };
         skill = {
@@ -335,16 +426,24 @@ export class SR5Actor extends Actor<SR5ActorData> {
         updateData[fieldName] = value;
 
         await this.update(updateData);
+
+        return id;
     }
 
     async removeKnowledgeSkill(skillId, category) {
-        const value = {};
-        const updateData = {};
+        const updateData = Helpers.getDeleteDataEntry(`data.skills.knowledge.${category}.value`, skillId);
+        await this.update(updateData);
+    }
 
-        const dataString = `data.skills.knowledge.${category}.value`;
-        value[skillId] = { _delete: true };
-        updateData[dataString] = value;
+    /** Delete the given active skill by it's id. It doesn't
+     *
+     * @param skillId Either a random id for custom skills or the skills name used as an id.
+     */
+    async removeActiveSkill(skillId: string) {
+        const activeSkills = this.getActiveSkills();
+        if (!activeSkills.hasOwnProperty(skillId)) return;
 
+        const updateData = Helpers.getDeleteDataEntry('data.skills.active', skillId);
         await this.update(updateData);
     }
 
@@ -469,9 +568,6 @@ export class SR5Actor extends Actor<SR5ActorData> {
             damage = modified;
         }
 
-        // modified damage type by modified armor value.
-        damage = this._applyDamageTypeChangeForArmor(damage);
-
         const soakRollOptions = {
             event: options.event,
             damage,
@@ -519,7 +615,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
 
     // TODO: Abstract handling of const damage : ModifiedDamageData
     async rollSoak(options: SoakRollOptions, partsProps: ModList<number> = []): Promise<ShadowrunRoll|undefined> {
-        return new SoakFlow().run(this, options, partsProps);
+        return new SoakFlow().runSoakTest(this, options, partsProps);
     }
 
     rollSingleAttribute(attId, options: ActorRollOptions) {
@@ -722,21 +818,35 @@ export class SR5Actor extends Actor<SR5ActorData> {
     }
 
     async rollSkill(skill: SkillField, options?: SkillRollOptions) {
-        let title = game.i18n.localize(skill.label);
+        // NOTE: Currently defaulting happens at multiple places, which is why SkillFlow.handleDefaulting isn't used
+        //       here, yet. A general skill usage clean up between Skill, Attribute and Item action handling is needed.
+        if (!SkillFlow.allowRoll(skill)) {
+            ui.notifications.warn(game.i18n.localize('SR5.Warnings.SkillCantBeDefault'));
+            return;
+        }
 
+        // Legacy skills have a label, but no name. Custom skills have a name but no label.
+        const label = skill.label ? game.i18n.localize(skill.label) : skill.name;
+        const title = label;
+
+        // Since options can provide an attribute, ignore incomplete sill attribute configuration.
         const attributeName = options?.attribute ? options.attribute : skill.attribute;
-        const att = this.getAttribute(attributeName);
-        let limit = att.limit ? this.getLimit(att.limit) : undefined;
+        const attribute = this.getAttribute(attributeName);
+        if (!attribute) {
+            ui.notifications.error(game.i18n.localize('SR5.Errors.SkillWithoutAttribute'));
+            return;
+        }
+        let limit = attribute.limit ? this.getLimit(attribute.limit) : undefined;
 
         // Initialize parts with always needed skill data.
         const parts = new PartsList<number>();
-        parts.addUniquePart(skill.label, skill.value);
-        this._addMatrixParts(parts, [att, skill]);
+        parts.addUniquePart(label, skill.value);
+        this._addMatrixParts(parts, [attribute, skill]);
         this._addGlobalParts(parts);
 
         // Directly test, without further skill dialog.
         if (options?.event && Helpers.hasModifiers(options?.event)) {
-            parts.addUniquePart(att.label, att.value);
+            parts.addUniquePart(attribute.label, attribute.value);
             if (options.event[CONFIG.SR5.kbmod.SPEC]) parts.addUniquePart('SR5.Specialization', 2);
 
             return await ShadowrunRoller.advancedRoll({
@@ -1150,44 +1260,6 @@ export class SR5Actor extends Actor<SR5ActorData> {
         return users.filter(user => user.active);
     }
 
-    /** Apply all types of damage to the actor.
-     *
-     * @param damage
-     * @param changeDamageForActor can be changed to directly apply damage without further changes due to armor and more.
-     */
-    async applyDamage(damage: DamageData, changeDamageForActor: boolean = true) {
-        if (damage.value <= 0) return;
-
-        // NOTE: Execution order is important here!
-
-        if (changeDamageForActor) {
-            damage = this._applyDamageTypeChangeForActor(damage);
-        }
-
-        // Apply damage and resulting overflow to the according track.
-        // The amount and type damage can value in the process.
-        if (damage.type.value === 'matrix') {
-            // TODO: Biofeedback damage model already integrated?
-            damage = await this._addMatrixDamage(damage);
-        }
-
-        if (damage.type.value === 'stun') {
-            damage = await this._addStunDamage(damage);
-        }
-
-        if (damage.type.value === 'physical') {
-            await this._addPhysicalDamage(damage);
-        }
-
-        // NOTE: Currently each damage type updates once. Should this cause issues for long latency, collect
-        //       and sum each damage type and update here globally.
-        // NOTE: For stuff like healing the last wound by magic, it might also be interesting to store and give
-        //       an overview of each damage/wound applied to select from.
-        // await this.update({'data.track': this.data.data.track});
-
-        // TODO: Handle changes in actor status (death and such)
-    }
-
     __addDamageToTrackValue(damage: DamageData, track: TrackType|OverflowTrackType|ConditionData): TrackType|OverflowTrackType|ConditionData {
         if (damage.value === 0) return track;
         if (track.value === track.max) return track;
@@ -1256,7 +1328,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
 
     /** Apply damage to the stun track and get overflow damage for the physical track.
      */
-    async _addStunDamage(damage: DamageData): Promise<DamageData> {
+    async addStunDamage(damage: DamageData): Promise<DamageData> {
         if (damage.type.value !== 'stun') return damage;
 
         const track = this.getStunTrack();
@@ -1276,7 +1348,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
         return overflow;
     }
 
-    async _addPhysicalDamage(damage: DamageData) {
+    async addPhysicalDamage(damage: DamageData) {
         if (damage.type.value !== 'physical') return damage;
 
         const track = this.getPhysicalTrack();
@@ -1291,7 +1363,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
 
     /** Adding damage to a device track instead of an actors track, as they contain their own track within their data.
      */
-    async _addMatrixDamage(damage: DamageData): Promise<DamageData> {
+    async addMatrixDamage(damage: DamageData): Promise<DamageData> {
         if (damage.type.value !== 'matrix') return damage;
 
         const device = this.getMatrixDevice();
@@ -1345,65 +1417,17 @@ export class SR5Actor extends Actor<SR5ActorData> {
         return device.getCondition();
     }
 
-    /** Apply all damage type changes that need to happen for this Actor
-     *
-     * This doesn't include armor for simplicity reasons.
-     */
-    _applyDamageTypeChangeForActor(damage: DamageData): DamageData {
-        damage = this._applyDamageTypeChangeForGrunt(damage);
-
-        return damage;
-    }
-
-    _applyDamageTypeChangeForGrunt(damage: DamageData): DamageData {
-        if (!this.isGrunt()) return damage;
-
-        if (damage.type.value === 'stun') {
-            // Avoid cross referencing.
-            damage = duplicate(damage);
-
-            damage.type.value = 'physical';
-        }
-
-        return damage;
-    }
-
-    /**
-     *
-     * @param damage
-     */
-    _applyDamageTypeChangeForArmor(damage: DamageData): DamageData {
-        // TODO: Damage modification should only really apply to characters, but double check ;)
-        if (!this.isCharacter()) return damage;
-
-        if (damage.type.value === 'physical') {
-            const modifiedArmor = this.getModifiedArmor(damage);
-            if (modifiedArmor) {
-                const armorWillChangeDamageType = modifiedArmor.value > damage.value;
-
-                if (armorWillChangeDamageType) {
-                    // Avoid cross referencing.
-                    damage = duplicate(damage);
-
-                    damage.type.value = 'stun';
-                }
-            }
-        }
-
-        return damage;
-    }
-
-    getModifiedArmor(damage: DamageData): ActorArmorData|undefined {
+    getModifiedArmor(damage: DamageData): ActorArmorData {
         if (!damage.ap?.value) {
             return this.getArmor();
-        }
+       }
 
         const modified = duplicate(this.getArmor());
         if (modified) {
             modified.mod = PartsList.AddUniquePart(modified.mod, 'SR5.DV', damage.ap.value);
             modified.value = Helpers.calcTotal(modified, {min: 0});
         }
-
+ 
         return modified;
     }
 

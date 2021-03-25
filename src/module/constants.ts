@@ -1,14 +1,29 @@
-import {SR5} from "./config";
-
+/**
+ * The constants file is a bit of a mess of stuff that doesn't change and some shadowrun specific rule values.
+ * Everything should be reused by someplace else. Try to avoid any magic values withing your code.
+ *
+ * The SR object contains initial values and constants. Constants are written in ALL_CAPS_CONSTANTS and should never be
+ * changed during runtime.
+ * Regarding Shadowrun modifier values: If the rules define a negative modifier, declare it here as such. Don't use a positive
+ * modifier and subtract at the place of use.
+ *
+ * Other than this file config.ts exists and only contains mappings between fixed names/ids and translation labels.
+ *
+ */
 export const SYSTEM_NAME = 'shadowrun5e';
+export const SYSTEM_SOCKET = `system.${SYSTEM_NAME}`;
 export const FLAGS = {
     ShowGlitchAnimation: 'showGlitchAnimation',
     ShowTokenNameForChatOutput: 'showTokenNameInsteadOfActor',
     WhisperOpposedTestsToTargetedPlayers: 'whisperOpposedTestsToTargetedPlayers',
+    OnlyAllowRollOnDefaultableSkills: 'onlyAllowRollOnDefaultableSkills',
+    ShowSkillsWithDetails: 'showSkillsWithDetails',
+    OnlyAutoRollNPCInCombat: 'onlyAutoRollNPCInCombat',
     MessageCustomRoll: 'customRoll',
     ApplyLimits: 'applyLimits',
     LastRollPromptValue: 'lastRollPromptValue',
     DisplayDefaultRollCard: 'displayDefaultRollCard',
+    CombatInitiativePass: 'combatInitiativePass',
     EmbeddedItems: 'embeddedItems',
     LastFireMode: 'lastFireMode',
     LastSpellForce: 'lastSpellForce',
@@ -18,7 +33,9 @@ export const FLAGS = {
     Roll: 'roll',
     TargetsSceneTokenIds: 'targetsSceneTokenIds',
     ChangelogShownForVersion: 'changelogShownForVersion',
-    Modifier: 'modifier'
+    Modifier: 'modifier',
+    DoInitPass: 'doInitPass',
+    DoNextRound: 'doNextRound',
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {
@@ -26,7 +43,6 @@ export const CORE_FLAGS = {
 }
 export const METATYPEMODIFIER = 'SR5.Character.Modifiers.NPCMetatypeAttribute';
 
-// TODO: Reduce duplication
 export const LENGTH_UNIT_TO_METERS_MULTIPLIERS = {
     'm': 1,
     'meter': 1,
@@ -37,8 +53,9 @@ export const LENGTH_UNIT_TO_METERS_MULTIPLIERS = {
 };
 
 export const DEFAULT_ROLL_NAME = 'Roll';
-
 export const LENGTH_UNIT = 'm';
+export const SKILL_DEFAULT_NAME = '';
+export const DEFAULT_ID_LENGTH = 16;
 
 // Contain data regarding shadowrun rules, mostly whatever is stated in some table to be looked up in other places.
 export const SR = {
@@ -59,7 +76,11 @@ export const SR = {
                 heavy: -6,
                 extreme: -10,
             }
-        }
+        },
+
+        INI_RESULT_MOD_AFTER_INI_PASS: -10,
+        INITIAL_INI_PASS: 1,
+        INITIAL_INI_ROUND: 1
     },
     die: {
         glitch: [1],
@@ -91,6 +112,12 @@ export const SR = {
             sleaze: {min: 0},
             data_processing: {min: 0},
             firewall: {min: 0}
-        }
+        },
+        SHORT_NAME_LENGTH: 3
+    },
+    skill: {
+        // @PDF SR5#130
+        DEFAULTING_MODIFIER: -1,
+        SPECIALIZATION_MODIFIER: 2
     }
 }
