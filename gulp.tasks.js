@@ -22,7 +22,6 @@ const source = require('vinyl-source-stream');
 const buffer = require('vinyl-buffer');
 const logger = require('gulplog');
 const sourcemaps = require('gulp-sourcemaps');
-const env = require("gulp-env");
 
 // Config
 const distName = 'dist';
@@ -166,18 +165,10 @@ async function linkUserData() {
 	}
 }
 
-async function setDevEnvironment() {
-    env({
-        vars: {
-            NODE_ENV: 'development'
-        }
-    })
-}
-
 exports.clean = cleanDist;
 exports.sass = buildSass;
 exports.assets = copyAssets;
 exports.build = gulp.series(copyAssets, buildSass, buildJS);
-exports.watch = gulp.series(setDevEnvironment, exports.build, watch);
+exports.watch = gulp.series(exports.build, watch);
 exports.rebuild = gulp.series(cleanDist, exports.build);
 exports.link = linkUserData;

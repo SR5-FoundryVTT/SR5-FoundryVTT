@@ -5,28 +5,20 @@
         "@babel/plugin-transform-runtime": "^7.11.5",
         "@babel/preset-env": "^7.11.5",
         "@babel/preset-typescript": "^7.10.4",
-        "@types/chai": "^4.2.15",
-        "@types/lodash": "^4.14.168",
-        "@types/mocha": "^8.2.1",
         "@types/node": "^14.10.0",
         "babel-core": "7.0.0-bridge.0",
         "babelify": "^10.0.0",
         "browserify": "^16.5.2",
-        "chai": "^4.3.4",
         "chalk": "^4.1.0",
         "del": "^5.1.0",
         "foundry-pc-types": "gitlab:foundry-projects/foundry-pc/foundry-pc-types",
         "fs-extra": "^9.0.1",
         "gulp": "^4.0.2",
-        "gulp-env": "^0.4.0",
         "gulp-sass": "^4.1.0",
         "gulp-sourcemaps": "^2.6.5",
         "gulplog": "^1.0.0",
-        "lodash": "^4.17.21",
         "lodash.assign": "^4.2.0",
-        "mocha": "^8.3.2",
         "node-sass": "^4.14.1",
-        "ts-mocha": "^8.0.0",
         "tsify": "^4.0.2",
         "typescript": "^4.1.4",
         "vinyl-buffer": "^1.0.1",
@@ -34,9 +26,5 @@
         "watchify": "^3.11.1",
         "xml2js": "^0.4.23"
     },
-    "dependencies": {},
-    "scripts": {
-        "test": "ts-mocha -p tsconfig.json src/**/*.spec.ts",
-        "gulp": "gulp watch"
-    }
+    "dependencies": {}
 }

@@ -7,10 +7,7 @@
     "module": "commonjs",
     "types": [
       "foundry-pc-types",
-      "node",
-      "mocha",
-      "chai",
-      "lodash"
+      "node"
     ]
   }
 }
