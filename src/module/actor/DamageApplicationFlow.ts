@@ -1,8 +1,6 @@
-import {DamageAndSoakPerActor, DamageApplicationDialog} from "../apps/dialogs/DamageApplicationDialog";
-import { SR5 } from "../config";
+import {DamageApplicationDialog} from "../apps/dialogs/DamageApplicationDialog";
 import {SR5Actor} from "./SR5Actor";
 import DamageData = Shadowrun.DamageData;
-import CharacterActorData = Shadowrun.CharacterActorData;
 
 export class DamageApplicationFlow {
 
@@ -13,33 +11,17 @@ export class DamageApplicationFlow {
      * @param damage The damage the actors will receive
      */
     async runApplyDamage(actors: SR5Actor[], damage : DamageData) {
- 
-        console.log("Run apply damage");
-        const actorDamage : DamageAndSoakPerActor[] = 
-            actors.map(actor => this.getDamageAndSoakForActor(actor, damage));
-
         // Show user the affected actors and the damage values
-        const damageApplicationDialog = await new DamageApplicationDialog(actorDamage, damage);
+        const damageApplicationDialog = await new DamageApplicationDialog(actors, damage);
         await damageApplicationDialog.select();
 
         if (damageApplicationDialog.canceled) {
             return;
         }
 
-        if (damageApplicationDialog.selectedButton === 'damage') {
-            actorDamage.forEach(({actor, modified }) => {
-                this.applyDamageToActor(actor, modified);
-            });
-        }
-        else if (damageApplicationDialog.selectedButton === 'unmodifiedDamage') {
-            actorDamage.forEach(({actor}) => {
-                this.applyDamageToActor(actor, damage);
-            });
-        }
-
-        else {
-            console.error('Expected a dialog selection, but none known selection was made');
-        }
+        actors.forEach((actor) => {
+            this.applyDamageToActor(actor, damage);
+        });
     }
 
     /** Apply all types of damage to the actor.
@@ -51,8 +33,9 @@ export class DamageApplicationFlow {
             return;
         }
 
-        // We change the damage type for grunts at the (they do not have stun) to avoid confusing the user in the dialog
-        damage = this.applyDamageTypeChangeForGrunt(actor, damage);
+        // We change the damage type from stun to physical for grunts (they do not have a stun track)
+        // We are not doing this earlier in the soak flow to avoid confusing the user 
+        damage = this.changeStunToPhysicalForGrunts(actor, damage);
 
         // Apply damage and resulting overflow to the according track.
         // The amount and type damage can value in the process.
@@ -74,29 +57,7 @@ export class DamageApplicationFlow {
         // TODO: Handle changes in actor status (death and such)
     }
 
-
-
-    private getDamageAndSoakForActor(actor : SR5Actor, damage : DamageData) : DamageAndSoakPerActor {
-        const actorData = actor.data.data as CharacterActorData;
-        const perception = actorData.initiative.perception;
-        const initCategory  = SR5.initiativeCategories[perception];
-        let hotsim = false;
-
-        // Not all characters have an equipped comlink / deck / rcc
-        if (actorData.matrix) {
-            hotsim = actorData.matrix.hot_sim;
-        }
-
-        return {
-            actor,
-            modified: damage,
-            armor: actor.getModifiedArmor(damage),
-            perception: initCategory,
-            hotsim: hotsim,
-        }
-    }
-
-    private applyDamageTypeChangeForGrunt(actor : SR5Actor, damage: DamageData): DamageData {
+    private changeStunToPhysicalForGrunts(actor : SR5Actor, damage: DamageData): DamageData {
         const updatedDamage = duplicate(damage);
         if (!actor.isGrunt()) {
             return updatedDamage;

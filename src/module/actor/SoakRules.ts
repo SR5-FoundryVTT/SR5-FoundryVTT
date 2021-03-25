@@ -113,13 +113,26 @@ export class SoakRules {
     }
 
     /**
-     * Reduces the damage value
-     * At the moment just reduces the damage by the number of hits.
+     * Reduces the damage value based on net hits and damage data and actor special rules
+     * 
+     * @remarks
+     * Make sure that you first call modifyDamageType before you call this method
+     * to determine the correct damage type (physical, stun, matrix)
+     *  
      * @param damageData The incoming damage
      * @param hits The number of hits on the soak tests
      * @returns The updated damage data
      */
-    static reduceDamage(damageData: DamageData, hits: number): ModifiedDamageData {
+    static reduceDamage(actor : SR5Actor, damageData: DamageData, hits: number): ModifiedDamageData {
+
+        // Vehicles are immune to stun damage (electricity stun damage is handled in a different place)
+        // Note: This also takes care of the vehicle immunity, since physical damage that does not exceed armor 
+        // will be converted to stun damage and then reduced to 0. This does not work with drones wearing armor
+        // but we do not support this. 
+        if (damageData.type.value === 'stun' && actor.isVehicle()) {
+            return Helpers.reduceDamageByHits(damageData, damageData.value, 'SR5.VehicleStunImmunity');
+        }
+
         return Helpers.reduceDamageByHits(damageData, hits, 'SR5.SoakTest');
     }
 
@@ -130,8 +143,14 @@ export class SoakRules {
      * @returns The updated damage data 
      */
     static modifyDamageType(damage: DamageData, actor : SR5Actor) : DamageData {
-        // Careful, order is very important
-        const updatedDamage = SoakRules.modifyPhysicalDamageForArmor(damage, actor);
+        // Careful, order of damage conversion is very important
+        // Electricity stun damage is considered physical for vehicles
+        let updatedDamage = duplicate(damage);
+        if (actor.isVehicle() && updatedDamage.element.value === 'electricity' && updatedDamage.type.value === 'stun') {
+            updatedDamage.type.value = 'physical';
+        }
+ 
+        updatedDamage = SoakRules.modifyPhysicalDamageForArmor(updatedDamage, actor);
         return SoakRules.modifyMatrixDamageForBiofeedback(updatedDamage, actor);
     }
 
@@ -145,8 +164,8 @@ export class SoakRules {
         const updatedDamage = duplicate(damage);
 
         if (damage.type.value === 'physical') {
-            // Physical damage is only transformed for some actors (e.g. not vehicles) 
-            if (!actor.isCharacter() && !actor.isSpirit() && !actor.isCritter()) {
+            // Physical damage is only transformed for some actors 
+            if (!actor.isCharacter() && !actor.isSpirit() && !actor.isCritter() && !actor.isVehicle()) {
                 return updatedDamage;
             }
 

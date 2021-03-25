@@ -1048,7 +1048,7 @@ select.display {
     margin-top: 0.5em;
     margin-bottom: 0.5em;
     display: grid;
-    grid-template-columns: 40px auto auto auto; }
+    grid-template-columns: 40px auto auto; }
     .sr5 .modified-target-damage .modified-target-damage-cell {
       display: flex;
       align-items: center;

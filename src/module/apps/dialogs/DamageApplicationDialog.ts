@@ -1,21 +1,11 @@
 import {FormDialog, FormDialogData} from "./FormDialog";
 import DamageData = Shadowrun.DamageData;
-import ActorArmorData = Shadowrun.ActorArmorData;
 import {SR5Actor} from "../../actor/SR5Actor";
-
-export type DamageAndSoakPerActor = {
-    actor: SR5Actor;
-    modified: DamageData;
-    armor: ActorArmorData;
-    perception?: string;
-    hotsim?: boolean;
-}
 
 export class DamageApplicationDialog extends FormDialog {
 
-    constructor(damagePerActor : DamageAndSoakPerActor[], damage: DamageData, options?: Application.Options) {
-
-        const dialogData = DamageApplicationDialog.getDialogData(damagePerActor, damage);
+    constructor(actors : SR5Actor[], damage: DamageData, options?: Application.Options) {
+        const dialogData = DamageApplicationDialog.getDialogData(actors, damage);
         super(dialogData, options);
     }
 
@@ -29,12 +19,12 @@ export class DamageApplicationDialog extends FormDialog {
         return options; 
     }
 
-    static getDialogData(damagePerActor : DamageAndSoakPerActor[], damage: DamageData): FormDialogData {
+    static getDialogData(actors : SR5Actor[], damage: DamageData): FormDialogData {
         const title = game.i18n.localize('SR5.DamageApplication.Title');
         const templatePath = 'systems/shadowrun5e/dist/templates/apps/dialogs/damage-application.html';
 
-        const actorDamage : any = damagePerActor;
-
+        // Simplify / refactor this
+        const actorDamage : any = actors.map(a => { return {actor:a} }) ;
         const templateData = {
             damage,
             actorDamage,
