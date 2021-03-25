@@ -23574,6 +23574,7 @@ const SR5Combat_1 = require("./combat/SR5Combat");
 const import_form_1 = require("./importer/apps/import-form");
 const ChangelogApplication_1 = require("./apps/ChangelogApplication");
 const EnvModifiersApplication_1 = require("./apps/EnvModifiersApplication");
+const quench_1 = require("../test/quench");
 class HooksManager {
     static registerHooks() {
         // Register your highest level hook callbacks here for a quick overview of what's hooked into.
@@ -23588,6 +23589,8 @@ class HooksManager {
         Hooks.on('getCombatTrackerEntryContext', SR5Combat_1.SR5Combat.addCombatTrackerContextOptions);
         Hooks.on('renderItemDirectory', HooksManager.renderItemDirectory);
         Hooks.on('renderTokenHUD', EnvModifiersApplication_1.EnvModifiersApplication.addTokenHUDFields);
+        // Foundry VTT Module 'quench': https://github.com/schultzcole/FVTT-Quench
+        Hooks.on('quenchReady', quench_1.quenchRegister);
     }
     static init() {
         console.log(`Loading Shadowrun 5e System
@@ -23644,13 +23647,6 @@ ___________________
             $(document).on('click', diceIconSelector, () => ShadowrunRoller_1.ShadowrunRoller.promptRoll());
             const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
             $(document).on('click', diceIconSelectorNew, () => ShadowrunRoller_1.ShadowrunRoller.promptRoll());
-            // const target = game.scenes.entries[0];
-            // console.error('scene', target);
-            // await new EnvModifiersApplication(target).render(true);
-            //
-            // const token = canvas.tokens.placeables[0];
-            // console.error('token', token);
-            // await new EnvModifiersApplication(token).render(true);
         });
     }
     static canvasInit() {
@@ -23696,7 +23692,7 @@ ___________________
 }
 exports.HooksManager = HooksManager;
 
-},{"./actor/SR5Actor":86,"./actor/SR5ActorSheet":87,"./apps/ChangelogApplication":110,"./apps/EnvModifiersApplication":111,"./apps/gmtools/OverwatchScoreTracker":138,"./canvas":142,"./chat":143,"./combat/SR5Combat":144,"./config":145,"./constants":146,"./handlebars/HandlebarManager":151,"./helpers":156,"./importer/apps/import-form":158,"./item/SR5Item":197,"./item/SR5ItemSheet":199,"./macros":200,"./migrator/Migrator":202,"./rolls/ShadowrunRoller":209,"./settings":210}],158:[function(require,module,exports){
+},{"../test/quench":214,"./actor/SR5Actor":86,"./actor/SR5ActorSheet":87,"./apps/ChangelogApplication":110,"./apps/EnvModifiersApplication":111,"./apps/gmtools/OverwatchScoreTracker":138,"./canvas":142,"./chat":143,"./combat/SR5Combat":144,"./config":145,"./constants":146,"./handlebars/HandlebarManager":151,"./helpers":156,"./importer/apps/import-form":158,"./item/SR5Item":197,"./item/SR5ItemSheet":199,"./macros":200,"./migrator/Migrator":202,"./rolls/ShadowrunRoller":209,"./settings":210}],158:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -30741,7 +30737,7 @@ class Modifiers {
     constructor(data) {
         // Fail gracefully for no modifiers given.
         // This can happen as Foundry returns empty objects for no flags set.
-        if (typeof data !== 'object' || !data.environmental) {
+        if (!data || typeof data !== 'object' || !("environmental" in data)) {
             data = Modifiers.getDefaultModifiers();
         }
         // Duplicate data to avoid cross talk between different entities over different Modifier instances.
@@ -31010,6 +31006,185 @@ class Template extends MeasuredTemplate {
 }
 exports.default = Template;
 
-},{}]},{},[201])
+},{}],214:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.quenchRegister = void 0;
+const sr5_Modifiers_spec_1 = require("./sr5.Modifiers.spec");
+const quenchRegister = quench => {
+    quench.registerBatch("shadowrun5e.rules.modifiers", sr5_Modifiers_spec_1.shadowrunRulesModifiers);
+};
+exports.quenchRegister = quenchRegister;
+
+},{"./sr5.Modifiers.spec":215}],215:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.shadowrunRulesModifiers = void 0;
+const Modifiers_1 = require("../module/sr5/Modifiers");
+const shadowrunRulesModifiers = context => {
+    const { describe, it, assert } = context;
+    const defaultModifiers = {
+        environmental: {
+            active: {},
+            total: 0
+        }
+    };
+    const activeModifiers = {
+        environmental: {
+            active: {
+                wind: -1,
+                light: -1
+            },
+            total: -3
+        }
+    };
+    describe('SR5 Modifiers', () => {
+        it('should create default modifier values', () => {
+            const modifiers = Modifiers_1.Modifiers.getDefaultModifiers();
+            assert.deepEqual(modifiers, defaultModifiers);
+        });
+        it('should use default modifiers for faulty constructor params', () => {
+            //@ts-ignore
+            assert.deepEqual(new Modifiers_1.Modifiers({}).data, defaultModifiers);
+            //@ts-ignore
+            assert.deepEqual(new Modifiers_1.Modifiers(undefined).data, defaultModifiers);
+            //@ts-ignore
+            assert.deepEqual(new Modifiers_1.Modifiers(null).data, defaultModifiers);
+            //@ts-ignore
+            assert.deepEqual(new Modifiers_1.Modifiers(0).data, defaultModifiers);
+            //@ts-ignore
+            assert.deepEqual(new Modifiers_1.Modifiers(1).data, defaultModifiers);
+            //@ts-ignore
+            assert.deepEqual(new Modifiers_1.Modifiers().data, defaultModifiers);
+        });
+        it('should set an environmental modifier active', () => {
+            const modifiers = new Modifiers_1.Modifiers(defaultModifiers);
+            modifiers._setEnvironmentalCategoryActive('wind', -1);
+            //@ts-ignore(modifiers.environmental.active).to.eql({wind: -1});
+        });
+        it('should set an environmental modifier inactive', () => {
+            const modifiers = new Modifiers_1.Modifiers({
+                environmental: {
+                    active: {
+                        wind: -1,
+                        light: -3
+                    },
+                    total: 0
+                }
+            });
+            modifiers._setEnvironmentalCategoryInactive('wind');
+            assert.deepEqual(modifiers.environmental.active, { light: -3 });
+        });
+        it('should understand active environmental modifiers', () => {
+            const modifiersActive = new Modifiers_1.Modifiers({
+                environmental: {
+                    active: {
+                        wind: -1,
+                        light: -3
+                    },
+                    total: 0
+                }
+            });
+            assert.equal(modifiersActive.hasActiveEnvironmental, true);
+            const modifiersInactive = new Modifiers_1.Modifiers({
+                environmental: {
+                    active: {},
+                    total: 0
+                }
+            });
+            assert.equal(modifiersInactive.hasActiveEnvironmental, false);
+        });
+        it('should calculate the total according to sr5 rules', () => {
+            const modifiers = new Modifiers_1.Modifiers(defaultModifiers);
+            assert.equal(modifiers.environmental.total, 0);
+            modifiers.environmental.active.wind = -1;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -1);
+            modifiers.environmental.active.light = -1;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -3);
+            modifiers.environmental.active.range = -1;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -3);
+            delete modifiers.environmental.active.light;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -3);
+            modifiers.environmental.active.light = 0;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -3);
+            modifiers.environmental.active.wind = -3;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -3);
+            modifiers.environmental.active.light = -3;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -6);
+            modifiers.environmental.active.range = -3;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -6);
+            delete modifiers.environmental.active.light;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -6);
+            modifiers.environmental.active.light = 0;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -6);
+            modifiers.environmental.active.wind = -6;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -6);
+            modifiers.environmental.active.light = -6;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -10);
+            modifiers.environmental.active.range = -6;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -10);
+            delete modifiers.environmental.active.light;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -10);
+            modifiers.environmental.active.light = 0;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -10);
+            modifiers.environmental.active.value = 0;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, 0);
+            modifiers.environmental.active.value = -1;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -1);
+            modifiers.environmental.active.value = -3;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -3);
+            modifiers.environmental.active.value = -6;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -6);
+            modifiers.environmental.active.value = -10;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -10);
+        });
+        it('should reset active environmental modifiers', () => {
+            const modifiers = new Modifiers_1.Modifiers(activeModifiers);
+            modifiers._resetEnvironmental();
+            assert.deepEqual(modifiers.environmental.active, {});
+        });
+        it('should calculate total for faulty active', () => {
+            const modifiers = new Modifiers_1.Modifiers({
+                environmental: {
+                    total: -1,
+                    active: {
+                        //@ts-ignore
+                        light: null,
+                        wind: undefined,
+                        //@ts-ignore
+                        range: '',
+                        //@ts-ignore
+                        visibility: 'string'
+                    }
+                }
+            });
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, 0);
+        });
+    });
+};
+exports.shadowrunRulesModifiers = shadowrunRulesModifiers;
+
+},{"../module/sr5/Modifiers":212}]},{},[201])
 
 //# sourceMappingURL=bundle.js.map

@@ -18,6 +18,7 @@ import { SR5Combat } from './combat/SR5Combat';
 import { Import } from './importer/apps/import-form';
 import {ChangelogApplication} from "./apps/ChangelogApplication";
 import {EnvModifiersApplication} from "./apps/EnvModifiersApplication";
+import {quenchRegister} from "../test/quench";
 
 export class HooksManager {
     static registerHooks() {
@@ -35,6 +36,9 @@ export class HooksManager {
         Hooks.on('getCombatTrackerEntryContext', SR5Combat.addCombatTrackerContextOptions);
         Hooks.on('renderItemDirectory', HooksManager.renderItemDirectory);
         Hooks.on('renderTokenHUD', EnvModifiersApplication.addTokenHUDFields);
+
+        // Foundry VTT Module 'quench': https://github.com/schultzcole/FVTT-Quench
+        Hooks.on('quenchReady', quenchRegister);
     }
 
     static init() {
@@ -101,14 +105,6 @@ ___________________
         $(document).on('click', diceIconSelector, () => ShadowrunRoller.promptRoll());
         const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
         $(document).on('click', diceIconSelectorNew, () => ShadowrunRoller.promptRoll());
-
-        // const target = game.scenes.entries[0];
-        // console.error('scene', target);
-        // await new EnvModifiersApplication(target).render(true);
-        //
-        // const token = canvas.tokens.placeables[0];
-        // console.error('token', token);
-        // await new EnvModifiersApplication(token).render(true);
     }
 
     static canvasInit() {
@@ -158,4 +154,5 @@ ___________________
             new Import().render(true);
         });
     }
+
 }
