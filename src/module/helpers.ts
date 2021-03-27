@@ -398,7 +398,7 @@ export class Helpers {
     }
 
     static createDamageData(value: number, type: DamageType, ap: number = 0, element: DamageElement = ''): DamageData {
-        const damage = duplicate(DataTemplates.damage);
+        const damage = duplicate(DataTemplates.damage) as DamageData;
         damage.base = value;
         damage.value = value;
         damage.type.base = type;
@@ -424,7 +424,7 @@ export class Helpers {
      * @param modificationLabel The translatable label for the modification
      */
     static modifyDamageByHits(incoming: DamageData, hits: number, modificationLabel: string): ModifiedDamageData {
-        const modified = duplicate(incoming);
+        const modified = duplicate(incoming) as DamageData;
         modified.mod = PartsList.AddUniquePart(modified.mod, modificationLabel, hits);
         modified.value = Helpers.calcTotal(modified, {min: 0});
 

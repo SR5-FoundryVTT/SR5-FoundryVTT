@@ -9,7 +9,7 @@ import FormulaOperator = Shadowrun.FormulaOperator;
 export class ItemAction {
     static calcDamage(damage: DamageData, actor: SR5Actor): DamageData {
         // Avoid manipulation on original data, which might come from database values.
-        damage = duplicate(damage);
+        damage = duplicate(damage) as DamageData;
 
         const attribute = actor.findAttribute(damage.attribute);
 

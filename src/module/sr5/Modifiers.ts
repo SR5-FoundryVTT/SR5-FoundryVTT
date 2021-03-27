@@ -15,6 +15,7 @@ export class Modifiers {
         }
 
         // Duplicate data to avoid cross talk between different entities over different Modifier instances.
+        // @ts-ignore
         this.data = duplicate(data);
     }
 

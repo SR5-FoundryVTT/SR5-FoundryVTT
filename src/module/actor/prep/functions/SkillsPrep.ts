@@ -2,6 +2,7 @@ import SR5ActorData = Shadowrun.SR5ActorData;
 import { Helpers } from '../../../helpers';
 import { PartsList } from '../../../parts/PartsList';
 import SkillField = Shadowrun.SkillField;
+import {SR5} from "../../../config";
 
 export class SkillsPrep {
     /**
@@ -73,7 +74,7 @@ export class SkillsPrep {
 
         // skill labels
         for (let [skillKey, skillValue] of Object.entries(active)) {
-            skillValue.label = SR5CONFIG.activeSkills[skillKey];
+            skillValue.label = SR5.activeSkills[skillKey];
         }
     }
 }

@@ -60,7 +60,7 @@ export class SoakRules {
     private static applyElementalArmor(soakParts: PartsList<number>, armor: ActorArmorData, element: string) {
         const bonusArmor = armor[element] ?? 0;
         if (bonusArmor) {
-            soakParts.addUniquePart(SR5CONFIG.elementTypes[element], bonusArmor);
+            soakParts.addUniquePart(SR5.elementTypes[element], bonusArmor);
         }
     }
 
@@ -145,7 +145,7 @@ export class SoakRules {
     static modifyDamageType(damage: DamageData, actor : SR5Actor) : DamageData {
         // Careful, order of damage conversion is very important
         // Electricity stun damage is considered physical for vehicles
-        let updatedDamage = duplicate(damage);
+        let updatedDamage = duplicate(damage) as DamageData;
         if (actor.isVehicle() && updatedDamage.element.value === 'electricity' && updatedDamage.type.value === 'stun') {
             updatedDamage.type.value = 'physical';
         }
@@ -161,7 +161,7 @@ export class SoakRules {
      * @returns The updated damage data
      */
      static modifyPhysicalDamageForArmor(damage: DamageData, actor : SR5Actor): DamageData {
-        const updatedDamage = duplicate(damage);
+        const updatedDamage = duplicate(damage) as DamageData;
 
         if (damage.type.value === 'physical') {
             // Physical damage is only transformed for some actors
@@ -189,7 +189,7 @@ export class SoakRules {
      * @returns The updated damage data
      */
     static modifyMatrixDamageForBiofeedback(damage: DamageData, actor : SR5Actor): DamageData {
-        const updatedDamage = duplicate(damage);
+        const updatedDamage = duplicate(damage) as DamageData;
 
         if (damage.type.value === 'matrix') {
             const actorData = actor.data.data as CharacterActorData;

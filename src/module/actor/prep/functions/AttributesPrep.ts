@@ -2,6 +2,7 @@ import SR5ActorData = Shadowrun.SR5ActorData;
 import { PartsList } from '../../../parts/PartsList';
 import { Helpers } from '../../../helpers';
 import {SR} from "../../../constants";
+import {SR5} from "../../../config";
 
 export class AttributesPrep {
     /**
@@ -31,7 +32,7 @@ export class AttributesPrep {
             Helpers.calcTotal(attribute, range);
 
             // add i18n labels.
-            attribute.label = SR5CONFIG.attributes[key];
+            attribute.label = SR5.attributes[key];
         }
     }
 }

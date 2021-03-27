@@ -51,12 +51,13 @@ import Spell = Shadowrun.Spell;
 import SpritePower = Shadowrun.SpritePower;
 import {ItemAction} from "./ItemAction";
 import {SkillFlow} from "../actor/SkillFlow";
+import {SR5} from "../config";
 
 export class SR5Item extends Item {
     // TODO: TYPE: In contrast to SR5Actor we can only type Item.data as the typing structure for ItemData doesn't have
     //       monolithic Item.data.data typing (SR5ActorData) but only one for each Item type. Therefore we can't
     //       do extends Item<SR5ItemData> as we can with the SR5Actor class.
-    data: SR5ItemType;
+    // data: SR5ItemType;
     items: SR5Item[];
 
     labels: {} = {};
@@ -64,6 +65,7 @@ export class SR5Item extends Item {
 
     // @ts-ignore // TODO: TYPE: Check foundry-vtt-types systems for how Items and Actors type.
     get actor(): SR5Actor {
+        this.data.data.skills
         return super.actor as unknown as SR5Actor;
     }
 
@@ -1098,7 +1100,7 @@ export class SR5Item extends Item {
         if (this.data.type === 'weapon') {
             limit.label = 'SR5.Accuracy';
         } else if (limit?.attribute) {
-            limit.label = SR5CONFIG.limits[limit.attribute];
+            limit.label = SR5.limits[limit.attribute];
         } else if (this.isSpell()) {
             limit.value = this.getLastSpellForce().value;
             limit.label = 'SR5.Force';

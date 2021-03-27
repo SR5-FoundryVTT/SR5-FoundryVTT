@@ -42,6 +42,7 @@ import SR5CritterType = Shadowrun.SR5CritterType;
 import Skills = Shadowrun.Skills;
 import {SkillRules} from "./SkillRules";
 import CharacterSkills = Shadowrun.CharacterSkills;
+import {SR5} from "../config";
 
 export class SR5Actor extends Actor<SR5ActorType> {
     // NOTE: Overwrite Actor.data additionally to extends Actor<T as SR5Actortype.Data: SR5ActorData> to still have
@@ -702,11 +703,11 @@ export class SR5Actor extends Actor<SR5ActorType> {
         if (!("matrix" in this.data.data)) return;
 
         let matrix_att = duplicate(this.data.data.matrix[attr]);
-        let title = game.i18n.localize(SR5CONFIG.matrixAttributes[attr]);
+        let title = game.i18n.localize(SR5.matrixAttributes[attr]);
         const parts = new PartsList<number>();
-        parts.addPart(SR5CONFIG.matrixAttributes[attr], matrix_att.value);
+        parts.addPart(SR5.matrixAttributes[attr], matrix_att.value);
 
-        if (options && options.event && options.event[SR5CONFIG.kbmod.SPEC]) parts.addUniquePart('SR5.Specialization', 2);
+        if (options && options.event && options.event[SR5.kbmod.SPEC]) parts.addUniquePart('SR5.Specialization', 2);
         if (Helpers.hasModifiers(options?.event)) {
             return ShadowrunRoller.advancedRoll({
                 event: options?.event,
@@ -742,7 +743,7 @@ export class SR5Actor extends Actor<SR5ActorType> {
                     let att: AttributeField | undefined = undefined;
                     if (newAtt) {
                         att = this.data.data.attributes[newAtt];
-                        title += ` + ${game.i18n.localize(SR5CONFIG.attributes[newAtt])}`;
+                        title += ` + ${game.i18n.localize(SR5.attributes[newAtt])}`;
                     }
                     if (att !== undefined) {
                         if (att.value && att.label) parts.addPart(att.label, att.value);
@@ -790,7 +791,7 @@ export class SR5Actor extends Actor<SR5ActorType> {
     }
 
     rollAttributesTest(rollId, options?: ActorRollOptions) {
-        const title = game.i18n.localize(SR5CONFIG.attributeRolls[rollId]);
+        const title = game.i18n.localize(SR5.attributeRolls[rollId]);
         const atts = this.data.data.attributes;
         const modifiers = this.data.data.modifiers;
         const parts = new PartsList<number>();
@@ -851,7 +852,7 @@ export class SR5Actor extends Actor<SR5ActorType> {
         // Directly test, without further skill dialog.
         if (options?.event && Helpers.hasModifiers(options?.event)) {
             parts.addUniquePart(attribute.label, attribute.value);
-            if (options.event[SR5CONFIG.kbmod.SPEC]) parts.addUniquePart('SR5.Specialization', 2);
+            if (options.event[SR5.kbmod.SPEC]) parts.addUniquePart('SR5.Specialization', 2);
 
             return await ShadowrunRoller.advancedRoll({
                 event: options.event,
@@ -1002,7 +1003,7 @@ export class SR5Actor extends Actor<SR5ActorType> {
     }
 
     rollAttribute(attId, options?: ActorRollOptions) {
-        let title = game.i18n.localize(SR5CONFIG.attributes[attId]);
+        let title = game.i18n.localize(SR5.attributes[attId]);
         const att = duplicate(this.data.data.attributes[attId]);
         const atts = duplicate(this.data.data.attributes);
         const parts = new PartsList<number>();
@@ -1032,7 +1033,7 @@ export class SR5Actor extends Actor<SR5ActorType> {
                         att2 = atts[att2Id];
                         if (att2?.label) {
                             parts.addPart(att2.label, att2.value);
-                            const att2IdLabel = game.i18n.localize(SR5CONFIG.attributes[att2Id]);
+                            const att2IdLabel = game.i18n.localize(SR5.attributes[att2Id]);
                             title += ` + ${att2IdLabel}`;
                         }
                     }

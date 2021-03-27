@@ -3,6 +3,7 @@ import { SR5Item } from './SR5Item';
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import {SR5Actor} from "../actor/SR5Actor";
 import SR5ItemType = Shadowrun.SR5ItemType;
+import {SR5} from "../config";
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -73,7 +74,7 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
             }
         }
 
-        data['config'] = SR5CONFIG;
+        data['config'] = SR5;
         const items = this.getEmbeddedItems();
         const [ammunition, weaponMods, armorMods] = items.reduce(
             (parts: [Item.Data[], Item.Data[], Item.Data[]], item: SR5Item) => {
@@ -96,7 +97,7 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
     }
 
     _getActiveSkillsForSelect() {
-        if (!this.item.actor) return SR5CONFIG.activeSkills;
+        if (!this.item.actor) return SR5.activeSkills;
         const activeSkills = Helpers.sortSkills(this.item.actor.getActiveSkills());
 
         const activeSkillsForSelect = {};

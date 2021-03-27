@@ -7,6 +7,7 @@ import RangesTemplateData = Shadowrun.RangesTemplateData;
 import RangeData = Shadowrun.RangeData;
 import {FormDialog} from "./FormDialog";
 import WeaponData = Shadowrun.WeaponData;
+import {SR5} from "../../config";
 
 type ItemDialogData = {
     dialogData: Dialog.Data | undefined,
@@ -305,7 +306,7 @@ export class ShadowrunItemDialog {
         const newRanges = {} as RangesTemplateData;
         for (const [key, value] of Object.entries(ranges)) {
             const distance = value as number;
-            newRanges[key] = Helpers.createRangeDescription(SR5CONFIG.weaponRanges[key], distance, range_modifiers[key]);
+            newRanges[key] = Helpers.createRangeDescription(SR5.weaponRanges[key], distance, range_modifiers[key]);
         }
         return newRanges;
     }

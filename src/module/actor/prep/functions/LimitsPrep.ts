@@ -1,6 +1,7 @@
 import SR5ActorData = Shadowrun.SR5ActorData;
 import { PartsList } from '../../../parts/PartsList';
 import { Helpers } from '../../../helpers';
+import {SR5} from "../../../config";
 
 export class LimitsPrep {
     static prepareLimits(data: SR5ActorData) {
@@ -14,7 +15,7 @@ export class LimitsPrep {
         // limit labels
         for (let [limitKey, limitValue] of Object.entries(limits)) {
             Helpers.calcTotal(limitValue);
-            limitValue.label = SR5CONFIG.limits[limitKey];
+            limitValue.label = SR5.limits[limitKey];
         }
     }
 

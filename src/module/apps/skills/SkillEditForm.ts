@@ -1,5 +1,6 @@
 import SkillEditFormData = Shadowrun.SkillEditFormData;
 import {SR5Actor} from "../../actor/SR5Actor";
+import {SR5} from "../../config";
 
 export class SkillEditForm extends BaseEntitySheet {
     skillId: string;
@@ -166,7 +167,7 @@ export class SkillEditForm extends BaseEntitySheet {
     /** Enhance attribute selection by an empty option to allow newly created skills to have no attribute selected.
      */
     _getSkillAttributesForSelect() {
-        return {...SR5CONFIG.attributes, '': ''};
+        return {...SR5.attributes, '': ''};
     }
 
     _allowSkillNameEditing(): boolean {

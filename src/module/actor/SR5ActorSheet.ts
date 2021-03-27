@@ -21,8 +21,6 @@ let globalSkillAppId: number = -1;
 /**
  * Extend the basic ActorSheet with some very simple modifications
  *
- * NOTE: ActorSheet<T, A> expects Actor.data.data typing, yet complains about it's general type being not compatible
- *       with SR5ActorData
  */
 export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
     _shownDesc: string[];
@@ -30,6 +28,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
     _scroll: string;
 
     constructor(actor, options?) {
+        console.error('constructor');
         super(actor, options);
 
         /**
@@ -50,6 +49,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
      * @returns {Object}
      */
     static get defaultOptions() {
+        console.error('defaultOptions');
         // @ts-ignore
         return mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'actor'],
@@ -68,8 +68,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
     get template() {
         const path = 'systems/shadowrun5e/dist/templates';
 
-        // @ts-ignore
-        if (this.actor.hasPerm(game.user, 'LIMITED', true)) {
+        if (this.actor.limited) {
             return `${path}/actor-limited/${this.actor.data.type}.html`;
         }
 
@@ -78,15 +77,46 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
 
     /* -------------------------------------------- */
 
+    superGetData() {
+        const isOwner = this.entity.owner;
+        const isEditable = this.isEditable;
+        const data = duplicate(this.object.data.data);
+
+        // Copy and sort Items
+        const items = this.object.items.map(item => duplicate(item.data));
+        items.sort((a, b) => (a.sort || 0) - (b.sort || 0));
+        // @ts-ignore
+        data.items = items;
+
+        // Copy Active Effects
+        const effects = this.object.effects.map(e => duplicate(e.data));
+        data.effects = effects;
+
+        // Return template data
+        return {
+          actor: this.object,
+          cssClass: isEditable ? "editable" : "locked",
+          data: data,
+          effects: effects,
+          items: items,
+          limited: this.object.limited,
+          options: this.options,
+          owner: isOwner,
+          title: this.title
+        };
+    }
+
     /**
      * Prepare data for rendering the Actor sheet
      * The prepared data object contains both the actor data as well as additional sheet options
      */
     getData() {
-        const data: SR5ActorSheetData = (super.getData() as unknown) as SR5ActorSheetData;
+        console.error('getData');
+        // const data: SR5ActorSheetData = (super.getData() as unknown) as SR5ActorSheetData;
+        const data = this.superGetData() as unknown as SR5ActorSheetData;
 
         // General purpose fields...
-        data.config = SR5CONFIG;
+        data.config = CONFIG.SR5;
         data.filters = this._filters;
 
         this._prepareMatrixAttributes(data);
@@ -1066,5 +1096,11 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
     async handleRemoveVehicleDriver(event) {
         event.preventDefault();
         await this.actor.removeVehicleDriver();
+    }
+
+    // @ts-ignore
+    async render(...args) {
+        console.error('render');
+        await super.render(...args);
     }
 }

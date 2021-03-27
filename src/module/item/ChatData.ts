@@ -2,6 +2,7 @@ import { Helpers } from '../helpers';
 import DeviceData = Shadowrun.DeviceData;
 import { SR5Item } from './SR5Item';
 import AmmoData = Shadowrun.AmmoData;
+import {SR5} from "../config";
 
 export const ChatData = {
     action: (data, labels, props) => {
@@ -43,7 +44,7 @@ export const ChatData = {
             }
             if (data.action.limit) {
                 const { limit } = data.action;
-                const attribute = limit.attribute ? `${game.i18n.localize(SR5CONFIG.limits[limit.attribute])}` : '';
+                const attribute = limit.attribute ? `${game.i18n.localize(SR5.limits[limit.attribute])}` : '';
                 const limitVal = limit.value ? limit.value : '';
                 let limitStr = '';
                 if (attribute) {
@@ -64,7 +65,7 @@ export const ChatData = {
                 const { damage } = data.action;
                 let damageString = '';
                 let elementString = '';
-                const attribute = damage.attribute ? `${game.i18n.localize(SR5CONFIG.attributes[damage.attribute])} + ` : '';
+                const attribute = damage.attribute ? `${game.i18n.localize(SR5.attributes[damage.attribute])} + ` : '';
                 if (damage.value || attribute) {
                     const type = damage.type.value ? damage.type.value.toUpperCase().charAt(0) : '';
                     damageString = `DV ${attribute}${damage.value}${type}`;
@@ -142,7 +143,7 @@ export const ChatData = {
     },
 
     program: (data, labels, props) => {
-        props.push(game.i18n.localize(SR5CONFIG.programTypes[data.type]));
+        props.push(game.i18n.localize(SR5.programTypes[data.type]));
     },
 
     complex_form: (data, labels, props) => {
@@ -191,11 +192,11 @@ export const ChatData = {
 
     critter_power: (data, labels, props) => {
         // power type
-        props.push(game.i18n.localize(SR5CONFIG.critterPower.types[data.powerType]));
+        props.push(game.i18n.localize(SR5.critterPower.types[data.powerType]));
         // duration
-        props.push(game.i18n.localize(SR5CONFIG.critterPower.durations[data.duration]));
+        props.push(game.i18n.localize(SR5.critterPower.durations[data.duration]));
         // range
-        props.push(game.i18n.localize(SR5CONFIG.critterPower.ranges[data.range]));
+        props.push(game.i18n.localize(SR5.critterPower.ranges[data.range]));
 
         // add action data
         ChatData.action(data, labels, props);

@@ -34,7 +34,7 @@ export class DamageApplicationFlow {
         }
 
         // We change the damage type from stun to physical for grunts (they do not have a stun track)
-        // We are not doing this earlier in the soak flow to avoid confusing the user 
+        // We are not doing this earlier in the soak flow to avoid confusing the user
         damage = this.changeStunToPhysicalForGrunts(actor, damage);
 
         // Apply damage and resulting overflow to the according track.
@@ -58,7 +58,7 @@ export class DamageApplicationFlow {
     }
 
     private changeStunToPhysicalForGrunts(actor : SR5Actor, damage: DamageData): DamageData {
-        const updatedDamage = duplicate(damage);
+        const updatedDamage = duplicate(damage) as DamageData;
         if (!actor.isGrunt()) {
             return updatedDamage;
         }

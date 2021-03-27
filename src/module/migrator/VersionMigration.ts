@@ -118,8 +118,8 @@ export abstract class VersionMigration {
      * @param entityUpdates
      */
     protected async IterateScenes(game: Game, entityUpdates: Map<Entity, EntityUpdate>) {
-        //@ts-ignore  // TypeScript expects entries (Collection.entries) to be a call, yet it's a get property.
-        for (const scene of game.scenes.entries) {
+        // @ts-ignore TODO: 0.8 .contents
+        for (const scene of game.scenes.contents) {
             try {
                 if (!(await this.ShouldMigrateSceneData(scene))) {
                     continue;
@@ -141,6 +141,7 @@ export abstract class VersionMigration {
                             return token;
                         }
 
+                        // @ts-ignore
                         let tokenDataUpdate = await this.MigrateActorData(token.actorData);
                         if (!isObjectEmpty(tokenDataUpdate)) {
                             hasTokenUpdates = true;

@@ -22,18 +22,18 @@ export class SoakFlow {
      */
     async runSoakTest(actor: SR5Actor, soakRollOptions: SoakRollOptions, partsProps: ModList<number> = []): Promise<ShadowrunRoll|undefined> {
         const initialDamageData = soakRollOptions.damage ? soakRollOptions.damage : DefaultValues.damageData();
-        const previewSoakDefenseParts = new PartsList<number>(duplicate(partsProps));
+        const previewSoakDefenseParts = new PartsList<number>(duplicate(partsProps) as ModList<number>);
         SoakRules.applyAllSoakParts(previewSoakDefenseParts, actor, initialDamageData);
 
-        // Ask the user for the damage data / update the incoming damage data 
-        const damageDataOrUndef = await this.promptDamageData(soakRollOptions, previewSoakDefenseParts); 
+        // Ask the user for the damage data / update the incoming damage data
+        const damageDataOrUndef = await this.promptDamageData(soakRollOptions, previewSoakDefenseParts);
         if (!damageDataOrUndef) {
             return;
-        } 
+        }
 
         const damageData = damageDataOrUndef;
-        const finalSoakDefenseParts = new PartsList<number>(duplicate(partsProps));
-        SoakRules.applyAllSoakParts(finalSoakDefenseParts, actor, damageData); 
+        const finalSoakDefenseParts = new PartsList<number>(duplicate(partsProps) as ModList<number>);
+        SoakRules.applyAllSoakParts(finalSoakDefenseParts, actor, damageData);
 
         // Query user for roll options and do the actual soak test.
         const title = game.i18n.localize('SR5.SoakTest');
@@ -50,7 +50,7 @@ export class SoakFlow {
         if (!roll) return;
 
         // Modify damage and reduce damage by net hits and show result
-        const incoming = duplicate(damageData);
+        const incoming = duplicate(damageData) as DamageData;
         let modified = SoakRules.modifyDamageType(incoming, actor);
         modified = SoakRules.reduceDamage(actor, modified, roll.hits).modified;
         const incAndModDamage = {incoming, modified};
@@ -60,7 +60,7 @@ export class SoakFlow {
         return roll;
     }
 
-    private async promptDamageData(soakRollOptions: SoakRollOptions, soakDefenseParts: PartsList<number>) 
+    private async promptDamageData(soakRollOptions: SoakRollOptions, soakDefenseParts: PartsList<number>)
         : Promise<DamageData | undefined> {
 
         // Ask user for incoming damage, ap and element
@@ -72,13 +72,13 @@ export class SoakFlow {
         const initialDamageData: DamageData = soakRollOptions?.damage
                 ? soakRollOptions.damage
                 : DefaultValues.damageData();
-        
+
         return this.updateDamageWithUserData(initialDamageData, userData.incomingDamage, userData.damageType, userData.ap, userData.element);
     }
 
 
     private updateDamageWithUserData(initialDamageData: DamageData, incomingDamage : number, damageType : DamageType, ap: number, element: string) {
-        const damageData: DamageData = duplicate(initialDamageData);
+        const damageData = duplicate(initialDamageData) as DamageData;
 
         // Update damage data, diff changes instead of simply replacing
         const totalDamage = Helpers.calcTotal(damageData);
