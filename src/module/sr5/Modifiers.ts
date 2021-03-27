@@ -7,7 +7,7 @@ import EnvironmentalModifierCategories = Shadowrun.EnvironmentalModifierCategori
 export class Modifiers {
     data: SituationModifiers;
 
-    constructor(data: SituationModifiers) {
+    constructor(data: SituationModifiers|undefined) {
         // Fail gracefully for no modifiers given.
         // This can happen as Foundry returns empty objects for no flags set.
         if (!data || typeof data !== 'object' || !("environmental" in data)) {
@@ -203,7 +203,7 @@ export class Modifiers {
     }
 
     static async getModifiersFromEntity(entity: Entity): Promise<Modifiers> {
-        const data = await entity.getFlag(SYSTEM_NAME, FLAGS.Modifier);
+        const data = await entity.getFlag(SYSTEM_NAME, FLAGS.Modifier) as SituationModifiers;
 
         return new Modifiers(data);
     }
