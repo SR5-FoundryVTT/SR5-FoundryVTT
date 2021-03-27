@@ -1,6 +1,7 @@
 import {SR5Actor} from "../actor/SR5Actor";
 import {CombatRules} from "../sr5/Combat";
 import {FLAGS, SR, SYSTEM_NAME, SYSTEM_SOCKET} from "../constants";
+import Combatant = Combat.Combatant;
 
 /**
  * Foundry combat implementation for Shadowrun5 rules.
@@ -11,20 +12,19 @@ import {FLAGS, SR, SYSTEM_NAME, SYSTEM_SOCKET} from "../constants";
  *       @PDF SR5#160 'Chaning Initiative'
  */
 export class SR5Combat extends Combat {
+    constructor(...args: any) {
+        super(...args);
+
+        this._registerSocketListeners();
+    }
+
     get initiativePass(): number {
-        return this.getFlag(SYSTEM_NAME, FLAGS.CombatInitiativePass) || SR.combat.INITIAL_INI_PASS;
+        return this.getFlag(SYSTEM_NAME, FLAGS.CombatInitiativePass) as number || SR.combat.INITIAL_INI_PASS;
     }
 
     static async setInitiativePass(combat: SR5Combat, pass: number) {
         await combat.unsetFlag(SYSTEM_NAME, FLAGS.CombatInitiativePass);
         await combat.setFlag(SYSTEM_NAME, FLAGS.CombatInitiativePass, pass);
-    }
-
-    constructor(...args) {
-        // @ts-ignore
-        super(...args);
-
-        this._registerSocketListeners();
     }
 
     /**
@@ -51,7 +51,7 @@ export class SR5Combat extends Combat {
                     // @ts-ignore
                     const combatant = await game.combat.getCombatant(li.data('combatant-id'));
                     if (combatant) {
-                        const combat: SR5Combat = game.combat as SR5Combat;
+                        const combat: SR5Combat = game.combat as unknown as SR5Combat;
                         await combat.adjustInitiative(combatant, -1);
                     }
                 },
@@ -63,7 +63,7 @@ export class SR5Combat extends Combat {
                     // @ts-ignore
                     const combatant = await game.combat.getCombatant(li.data('combatant-id'));
                     if (combatant) {
-                        const combat: SR5Combat = game.combat as SR5Combat;
+                        const combat: SR5Combat = game.combat as unknown as SR5Combat;
                         await combat.adjustInitiative(combatant, -5);
                     }
                 },
@@ -75,7 +75,7 @@ export class SR5Combat extends Combat {
                     // @ts-ignore
                     const combatant = await game.combat.getCombatant(li.data('combatant-id'));
                     if (combatant) {
-                        const combat: SR5Combat = game.combat as SR5Combat;
+                        const combat: SR5Combat = game.combat as unknown as SR5Combat;
                         await combat.adjustInitiative(combatant, -10);
                     }
                 },
@@ -108,7 +108,7 @@ export class SR5Combat extends Combat {
      * @param combatId
      */
     static async handleIniPass(combatId: string) {
-        const combat = game.combats.get(combatId) as SR5Combat;
+        const combat = game.combats?.get(combatId) as unknown as SR5Combat;
         if (!combat) return;
 
         const initiativePass = combat.initiativePass + 1;
@@ -134,7 +134,7 @@ export class SR5Combat extends Combat {
      * @param combatId
      */
     static async handleNextRound(combatId: string) {
-        const combat = game.combats.get(combatId) as SR5Combat;
+        const combat = game.combats?.get(combatId) as unknown as SR5Combat;
         if (!combat) return;
         await combat.resetAll();
 
@@ -166,13 +166,13 @@ export class SR5Combat extends Combat {
         if (leftInit < rightInit) return 1;
 
         // now we sort by ERIC
-        const genData = (actor) => {
+        const genData = (actor): number[] => {
             // edge, reaction, intuition, coin flip
             return [
                 Number(actor.getEdge().value),
                 Number(actor.findAttribute('reaction')?.value),
                 Number(actor.findAttribute('intuition')?.value),
-                new Roll('1d2').roll().total,
+                new Roll('1d2').roll().total as number,
             ];
         };
 
@@ -210,6 +210,8 @@ export class SR5Combat extends Combat {
         // Start at the next position after the current one.
         for (let n = this.turn + 1; n++; n < this.combatants.length) {
             const combatant = this.combatants[n];
+            if (combatant.initiative === null || combatant.initiative === undefined)
+                continue;
             if (combatant.initiative > 0)
                 return n;
         }
@@ -266,12 +268,12 @@ export class SR5Combat extends Combat {
         }
 
         // Initiative Pass Handling. Owner permissions are needed to change the initiative pass.
-        if (!game.user.isGM && this.doIniPass(nextTurn)) {
+        if (!game.user?.isGM && this.doIniPass(nextTurn)) {
             await this._createDoIniPassSocketMessage();
             return;
         }
 
-        if (game.user.isGM && this.doIniPass(nextTurn)) {
+        if (game.user?.isGM && this.doIniPass(nextTurn)) {
             await SR5Combat.handleIniPass(this.id)
             return;
         }
@@ -289,13 +291,15 @@ export class SR5Combat extends Combat {
         const nextTurn = 0;
 
         await SR5Combat.setInitiativePass(this, initiativePass);
-        return await this.update({round: nextRound, turn: nextTurn});
+        await this.update({round: nextRound, turn: nextTurn});
 
         if (game.settings.get(SYSTEM_NAME, FLAGS.OnlyAutoRollNPCInCombat)) {
             await this.rollNPC();
         } else {
             await this.rollAll();
         }
+
+        return this;
     }
 
     async nextRound(): Promise<void> {
@@ -304,7 +308,7 @@ export class SR5Combat extends Combat {
         await SR5Combat.setInitiativePass(this, SR.combat.INITIAL_INI_PASS);
 
         // Owner permissions are needed to change the shadowrun initiative round.
-        if (!game.user.isGM) {
+        if (!game.user?.isGM) {
             await this._createDoNextRoundSocketMessage();
         } else {
             await SR5Combat.handleNextRound(this.id);
@@ -315,19 +319,20 @@ export class SR5Combat extends Combat {
      * use default behaviour but ALWAYS start at the top!
      */
     async rollAll(): Promise<SR5Combat> {
-        const combat = await super.rollAll() as SR5Combat;
+        const combat = await super.rollAll() as unknown as SR5Combat;
         if (combat.turn !== 0)
             await combat.update({turn: 0});
         return combat;
     }
 
     async updateNewCombatants(ids: string[]) {
-        const newCombatants = this.combatants.filter(combatant => ids.includes(combatant._id));
+        const newCombatants = this.combatants.filter(combatant => combatant._id && ids.includes(combatant._id));
         if (!newCombatants) return;
 
         // Reduce initiative score for ongoing initiative passes.
         const updateData = newCombatants.map(combatant => {
-            const initiative = CombatRules.reduceIniOnLateSpawn(combatant.initiative, this.initiativePass);
+            // Cast initiative as number, since it should always be that way here.
+            const initiative = CombatRules.reduceIniOnLateSpawn(combatant.initiative as number, this.initiativePass);
             return {
                 _id: combatant._id,
                 initiative
@@ -343,8 +348,6 @@ export class SR5Combat extends Combat {
      * Shadowrun starts at the top, except for subsequent initiative passes, then it depends on the new values.
      */
     async rollInitiative(ids, options): Promise<SR5Combat> {
-        const newIds = Array.isArray(ids) ? ids : [ids];
-        //@ts-ignore
         const combat = await super.rollInitiative(ids, options) as SR5Combat;
 
         // if (this.initiativePass > SR.combat.INITIAL_INI_PASS)
@@ -362,12 +365,13 @@ export class SR5Combat extends Combat {
      * NOTE: Should this here fail or be buggy, there always is SR5Combat.updateNewCombatants which can be uncommented in SR5Combat.rollInitiative
      * @param combatant
      */
-    _getInitiativeFormula(combatant: Entity) {
+    _getInitiativeFormula(combatant: Combatant) {
         if (this.initiativePass === SR.combat.INITIAL_INI_PASS) { // @ts-ignore
             return super._getInitiativeFormula(combatant);
         }
 
         // Reduce for initiative passes until zero.
+        // @ts-ignore // TODO: System.Data should contain initiative...
         return `max(${game.system.data.initiative} -${(this.initiativePass - 1) * -SR.combat.INI_RESULT_MOD_AFTER_INI_PASS}, 0)`;
     }
 
