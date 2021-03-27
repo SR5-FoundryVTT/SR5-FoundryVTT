@@ -180,7 +180,7 @@ export class SR5ItemSheet extends ItemSheet<{}, SR5Item> {
             if (this.item.isOwned && data.actorId === this.item.actor?._id && data.data._id === this.item._id) {
                 console.log('Shadowrun5e | Cant drop item on itself');
                 // @ts-ignore
-                ui.notifications.error('Are you trying to break the game??');
+                ui.notifications?.error('Are you trying to break the game??');
             }
             item = data;
         } else if (data.pack) {

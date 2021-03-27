@@ -58,7 +58,7 @@ export class OverwatchScoreTracker extends Application {
         event.preventDefault();
         const tokens = Helpers.getControlledTokens();
         if (tokens.length === 0) {
-            ui.notifications.warn(game.i18n.localize('SR5.OverwatchScoreTracker.NotifyNoSelectedTokens'));
+            ui.notifications?.warn(game.i18n.localize('SR5.OverwatchScoreTracker.NotifyNoSelectedTokens'));
             return;
         }
         tokens.forEach((token) => {

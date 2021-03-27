@@ -38,7 +38,7 @@ export abstract class VersionMigration {
         this.m_Abort = true;
         this.m_AbortReason = reason;
         // @ts-ignore
-        ui.notifications.error(`Data migration has been aborted: ${reason}`, { permanent: true });
+        ui.notifications?.error(`Data migration has been aborted: ${reason}`, { permanent: true });
     }
 
     /**
@@ -47,9 +47,9 @@ export abstract class VersionMigration {
      */
     public async Migrate(game: Game) {
         // @ts-ignore TODO Unignore when Foundry Types updates
-        ui.notifications.info(`${game.i18n.localize('SR5.MIGRATION.BeginNotification')} ${this.SourceVersionFriendlyName} -> ${this.TargetVersionFriendlyName}.`);
+        ui.notifications?.info(`${game.i18n.localize('SR5.MIGRATION.BeginNotification')} ${this.SourceVersionFriendlyName} -> ${this.TargetVersionFriendlyName}.`);
         // @ts-ignore TODO Unignore when Foundry Types updates
-        ui.notifications.warn(game.i18n.localize('SR5.MIGRATION.DoNotCloseNotification'), {
+        ui.notifications?.warn(game.i18n.localize('SR5.MIGRATION.DoNotCloseNotification'), {
             permanent: true,
         });
 
@@ -95,7 +95,7 @@ export abstract class VersionMigration {
 
         await game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
         // @ts-ignore TODO Unignore when Foundry Types updates
-        ui.notifications.info(`${game.i18n.localize('SR5.MIGRATION.SuccessNotification')} ${this.TargetVersion}.`, { permanent: true });
+        ui.notifications?.info(`${game.i18n.localize('SR5.MIGRATION.SuccessNotification')} ${this.TargetVersion}.`, { permanent: true });
     }
 
     /**

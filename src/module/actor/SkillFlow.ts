@@ -13,7 +13,7 @@ export class SkillFlow {
         if (!SkillRules.mustDefaultToRoll(skill)) return;
 
         if (!SkillFlow.allowDefaultingRoll(skill)) {
-            ui.notifications.warn(game.i18n.localize('SR5.Warnings.SkillCantBeDefault'));
+            ui.notifications?.warn(game.i18n.localize('SR5.Warnings.SkillCantBeDefault'));
             return;
         }
 

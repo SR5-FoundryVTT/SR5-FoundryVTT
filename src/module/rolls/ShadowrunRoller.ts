@@ -87,7 +87,7 @@ export interface AdvancedRollProps extends BasicRollProps {
     event?: RollEvent;
     extended?: boolean;
     wounds?: boolean;
-    after?: (roll: Roll | undefined) => void;
+    after?: (roll: ShadowrunRoll | undefined) => void;
     attack?: AttackData;
     fireMode?: FireModeData
     combat?: CombatData
@@ -136,6 +136,7 @@ export class ShadowrunRoll extends Roll {
         return this.data.threshold;
     }
 
+    //@ts-ignore // TODO: This overwrites Roll.parts with very different return types...
     get parts(): ModList<number> {
         return this.data.parts;
     }
@@ -150,7 +151,7 @@ export class ShadowrunRoll extends Roll {
     }
 
     get hits(): number {
-        return this.total;
+        return this.total || 0;
     }
 
     get pool(): number {
@@ -282,7 +283,7 @@ export class ShadowrunRoller {
         const parts = new PartsList(partsProps);
         const count = parts.total;
         if (count <= 0) {
-            ui.notifications.warn(game.i18n.localize('SR5.RollOneDie'));
+            ui.notifications?.warn(game.i18n.localize('SR5.RollOneDie'));
             return '0d6cs>=5';
         }
         let formula = `${count}d6`;
@@ -490,7 +491,7 @@ export class ShadowrunRoller {
 
     static _errorOnInvalidLimit(limit?: LimitField) {
         if (limit && limit.value < 0) {
-            ui.notifications.error(game.i18n.localize('SR5.Warnings.NegativeLimitValue'));
+            ui.notifications?.error(game.i18n.localize('SR5.Warnings.NegativeLimitValue'));
         }
     }
 

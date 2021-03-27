@@ -744,7 +744,7 @@ export class SR5Item extends Item {
             const skill = target.getSkill(opposed.skill);
 
             if (!skill) {
-                ui.notifications.error(game.i18n.localize("SR5.Errors.MissingSkill"));
+                ui.notifications?.error(game.i18n.localize("SR5.Errors.MissingSkill"));
                 return;
             }
 
@@ -966,14 +966,14 @@ export class SR5Item extends Item {
     async openPdfSource() {
         // Check for PDFoundry module hook: https://github.com/Djphoenix719/PDFoundry
         if (!ui['PDFoundry']) {
-            ui.notifications.warn(game.i18n.localize('SR5.DIALOG.MissingModuleContent'));
+            ui.notifications?.warn(game.i18n.localize('SR5.DIALOG.MissingModuleContent'));
             return;
         }
 
         const source = this.getBookSource();
         if (source === '') {
             // @ts-ignore
-            ui.notifications.error(game.i18n.localize('SR5.SourceFieldEmptyError'));
+            ui.notifications?.error(game.i18n.localize('SR5.SourceFieldEmptyError'));
         }
         // TODO open PDF to correct location
         // parse however you need, all "buttons" will lead to this function

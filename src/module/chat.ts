@@ -250,7 +250,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
 
         const type = event.currentTarget.dataset.action;
         if (!item) {
-            ui.notifications.error(game.i18n.localize('SR5.MissingItemForOpposedTest'));
+            ui.notifications?.error(game.i18n.localize('SR5.MissingItemForOpposedTest'));
             return;
         }
 
@@ -341,7 +341,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
         if (token) {
             token.control();
         } else {
-            ui.notifications.warn(game.i18n.localize('SR5.NoSelectableToken'))
+            ui.notifications?.warn(game.i18n.localize('SR5.NoSelectableToken'))
         }
     });
 
@@ -385,7 +385,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
             }
 
             if (actors.length === 0) {
-                ui.notifications.warn(game.i18n.localize("SR5.Warnings.TokenSelectionNeeded"));
+                ui.notifications?.warn(game.i18n.localize("SR5.Warnings.TokenSelectionNeeded"));
                 return;
             }
         }

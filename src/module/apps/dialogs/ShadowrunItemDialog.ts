@@ -249,7 +249,7 @@ export class ShadowrunItemDialog {
             templateData['targets'] = ShadowrunItemDialog._getTargetRangeTemplateData(item.actor, templateRanges);
         } else if (!item.actor.getToken() && Helpers.userHasTargets()) {
             // Inform user about usage of actors without tokens!
-            ui.notifications.warn(game.i18n.localize('SR5.TargetingNeedsActorWithToken'));
+            ui.notifications?.warn(game.i18n.localize('SR5.TargetingNeedsActorWithToken'));
         }
 
         let cancel = true;
@@ -321,7 +321,7 @@ export class ShadowrunItemDialog {
         const attacker = actor.getToken();
 
         if (!attacker || !Helpers.userHasTargets()) {
-            ui.notifications.warn(game.i18n.localize('SR5.TargetingNeedsActorWithToken'));
+            ui.notifications?.warn(game.i18n.localize('SR5.TargetingNeedsActorWithToken'));
             return [];
         }
 
