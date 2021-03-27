@@ -1,20 +1,20 @@
-import { SR5Actor } from './actor/SR5Actor';
-import { SR5Item } from './item/SR5Item';
+import {SR5Actor} from './actor/SR5Actor';
+import {SR5Item} from './item/SR5Item';
 import Template from './template';
-import AttackData = Shadowrun.AttackData;
 import {CORE_FLAGS, CORE_NAME, FLAGS, SYSTEM_NAME} from './constants';
 import {ShadowrunRoll, Test} from "./rolls/ShadowrunRoller";
-import DrainData = Shadowrun.DrainData;
 import {Helpers} from "./helpers";
+import {DamageApplicationFlow} from './actor/DamageApplicationFlow';
+import AttackData = Shadowrun.AttackData;
+import DrainData = Shadowrun.DrainData;
 import ModifiedDamageData = Shadowrun.ModifiedDamageData;
 import DamageType = Shadowrun.DamageType;
 import DamageElement = Shadowrun.DamageElement;
 import CombatData = Shadowrun.CombatData;
-import { DamageApplicationFlow } from './actor/DamageApplicationFlow';
 
 export interface RollTargetChatMessage {
     actor: SR5Actor
-    target?: Token|undefined
+    target?: Token | undefined
     targets?: Token[]
     item: SR5Item
     tests: Test[]
@@ -23,7 +23,7 @@ export interface RollTargetChatMessage {
     rollMode?: keyof typeof CONFIG.Dice.rollModes
 }
 
-export interface TargetChatMessageOptions extends RollTargetChatMessage{
+export interface TargetChatMessageOptions extends RollTargetChatMessage {
     whisperTo: User
 }
 
@@ -46,6 +46,8 @@ export interface RollChatMessageOptions {
 
     description?: object
 
+
+    // @ts-ignore // TODO: TYPE: Remove this...
     rollMode?: keyof typeof CONFIG.dice.rollModes
     previewTemplate?: boolean
 
@@ -70,12 +72,15 @@ interface ItemChatTemplateData {
 interface RollChatTemplateData extends RollChatMessageOptions {
     tokenId?: string
     targetTokenId?: string
+    // @ts-ignore // TODO: TYPE: Remove this...
     rollMode: keyof typeof CONFIG.dice.rollModes
 }
 
-async function createChatMessage(templateData, options?: ChatDataOptions): Promise<Entity<any>> {
+async function createChatMessage(templateData, options?: ChatDataOptions): Promise<Entity<any>|null> {
     const chatData = await createChatData(templateData, options);
     const message = await ChatMessage.create(chatData);
+
+    if (!message) return null;
 
     // Store data in chat message for later use (opposed tests)
     if (templateData.roll) await message.setFlag(SYSTEM_NAME, FLAGS.Roll, templateData.roll);
@@ -91,6 +96,7 @@ interface ChatDataOptions {
     roll?: ShadowrunRoll,
     whisperTo?: User
 }
+
 // templateData has no datatype to pipe through whatever it's given.
 // Clean up your data within templateData creation functions!
 const createChatData = async (templateData, options?: ChatDataOptions) => {
@@ -139,10 +145,15 @@ const createChatData = async (templateData, options?: ChatDataOptions) => {
 };
 
 
-export async function ifConfiguredCreateDefaultChatMessage({roll, actor, title, rollMode}: Partial<RollChatMessageOptions>) {
+export async function ifConfiguredCreateDefaultChatMessage({
+                                                               roll,
+                                                               actor,
+                                                               title,
+                                                               rollMode
+                                                           }: Partial<RollChatMessageOptions>) {
     if (game.settings.get(SYSTEM_NAME, FLAGS.DisplayDefaultRollCard) && roll) {
         await roll.toMessage({
-            speaker: ChatMessage.getSpeaker({ actor: actor }),
+            speaker: ChatMessage.getSpeaker({actor: actor}),
             flavor: title,
             rollMode: rollMode,
         });
@@ -181,14 +192,12 @@ function createChatTemplateData(options: ItemChatMessageOptions): ItemChatTempla
     }
 }
 
-export async function createRollChatMessage(options: RollChatMessageOptions): Promise<Entity<any>> {
+export async function createRollChatMessage(options: RollChatMessageOptions): Promise<Entity<any>|null> {
     await ifConfiguredCreateDefaultChatMessage(options);
 
     const templateData = getRollChatTemplateData(options);
     const chatOptions = {roll: options.roll};
-    const message = await createChatMessage(templateData, chatOptions);
-
-    return message;
+    return await createChatMessage(templateData, chatOptions);
 }
 
 
@@ -201,22 +210,25 @@ function getRollChatTemplateData(options: RollChatMessageOptions): RollChatTempl
     const targetTokenId = getTokenSceneId(options.target);
 
     return {
-       ...options,
+        ...options,
         tokenId,
         targetTokenId,
+        // @ts-ignore // TODO: TYPE: Remove this...
         rollMode,
     }
 }
 
-function getTokenSceneId(token: Token|undefined): string|undefined {
+function getTokenSceneId(token: Token | undefined): string | undefined {
     return token ? `${token.scene._id}.${token.id}` : undefined;
 }
 
 export const addChatMessageContextOptions = (html, options) => {
     const canRoll = (li) => {
-        const msg = game.messages.get(li.data().messageId);
+        const message = game.messages?.get(li.data().messageId);
 
-        return msg.getFlag(SYSTEM_NAME, FLAGS.MessageCustomRoll);
+        if (!message) return;
+
+        return message.getFlag(SYSTEM_NAME, FLAGS.MessageCustomRoll);
     };
 
     options.push(
@@ -243,9 +255,12 @@ export const addRollListeners = (app: ChatMessage, html) => {
 
     html.on('click', '.test', async (event) => {
         event.preventDefault();
+        if (!game || !game.ready) return;
+
         const messageId = html.data('messageId');
-        const message = game.messages.get(messageId);
-        const attack = message.getFlag(SYSTEM_NAME, FLAGS.Attack);
+        const message = game.messages?.get(messageId);
+        if (!message) return;
+        const attack = message.getFlag(SYSTEM_NAME, FLAGS.Attack) as AttackData;
         const item = SR5Item.getItemFromMessage(html);
 
         const type = event.currentTarget.dataset.action;
@@ -259,7 +274,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
 
         // No selection, fall back to targeting.
         if (actors.length === 0) {
-            const targetSceneIds = message.getFlag(SYSTEM_NAME, FLAGS.TargetsSceneTokenIds);
+            const targetSceneIds = message.getFlag(SYSTEM_NAME, FLAGS.TargetsSceneTokenIds) as string[];
 
             for (const targetSceneId of targetSceneIds) {
                 const token = Helpers.getSceneToken(targetSceneId);
@@ -301,6 +316,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
      */
     html.on('click', '.chat-entity-link', event => {
         event.preventDefault();
+        if (!game || !game.ready || !canvas || !canvas.ready) return;
 
         const entityLink = $(event.currentTarget);
         const id = entityLink.data('id');
@@ -308,31 +324,37 @@ export const addRollListeners = (app: ChatMessage, html) => {
 
         if (!id) return;
 
-       if (type === 'Token') {
-           const token = canvas.tokens.get(id);
-           token.actor.sheet.render(true, {token});
-       }
-       else if (type === 'Actor') {
-           const actor = game.actors.get(id);
-           actor.sheet.render(true);
-       }
-       else if (type === 'Item') {
-           const card = entityLink.closest('.chat-card');
-           const sceneTokenId = card.data('tokenId');
+        if (type === 'Token') {
+            const token = canvas.tokens.get(id);
+            if (!token) return;
+            // @ts-ignore
+            token.actor.sheet.render(true, {token});
+        } else if (type === 'Actor') {
+            const actor = game.actors?.get(id);
+            if (!actor) return;
+            // @ts-ignore
+            actor.sheet.render(true);
+        } else if (type === 'Item') {
+            const card = entityLink.closest('.chat-card');
+            const sceneTokenId = card.data('tokenId');
 
-           const token = Helpers.getSceneToken(sceneTokenId)
+            const token = Helpers.getSceneToken(sceneTokenId)
 
-           if (!token) return;
+            if (!token) return;
 
-           const item = token.actor.getOwnedItem(id);
-           if (item) item.sheet.render(true);
-       }
+            const item = token.actor.getOwnedItem(id);
+            if (!item) return;
+            // @ts-ignore
+            item.sheet.render(true);
+        }
     });
 
     /** Select a Token on the current scene based on the link id.
      */
     html.on('click', '.chat-select-link', event => {
         event.preventDefault();
+
+        if (!game || !game.ready || !canvas || !canvas.ready) return;
 
         const selectLink = $(event.currentTarget);
         const tokenId = selectLink.data('tokenId');
@@ -362,8 +384,9 @@ export const addRollListeners = (app: ChatMessage, html) => {
         // Should no selection be available try guessing.
         if (actors.length === 0) {
             const messageId = html.data('messageId');
-            const message = game.messages.get(messageId);
-            const targetIds = message.getFlag(SYSTEM_NAME, FLAGS.TargetsSceneTokenIds);
+            const message = game.messages?.get(messageId);
+            if (!message) return;
+            const targetIds = message.getFlag(SYSTEM_NAME, FLAGS.TargetsSceneTokenIds) as string[];
 
             // If targeting is available, use that.
             if (targetIds) {
@@ -374,7 +397,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
                     actors.push(actor);
                 });
 
-            // Otherwise apply to the actor casting the damage.
+                // Otherwise apply to the actor casting the damage.
             } else {
                 const sceneTokenId = html.find('.chat-card').data('tokenId');
                 const token = Helpers.getSceneToken(sceneTokenId);
@@ -390,6 +413,6 @@ export const addRollListeners = (app: ChatMessage, html) => {
             }
         }
 
-        new DamageApplicationFlow().runApplyDamage(actors, damage);
+        await new DamageApplicationFlow().runApplyDamage(actors, damage);
     });
 };
