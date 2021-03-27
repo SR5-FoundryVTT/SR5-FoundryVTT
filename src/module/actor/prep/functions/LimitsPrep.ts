@@ -14,7 +14,7 @@ export class LimitsPrep {
         // limit labels
         for (let [limitKey, limitValue] of Object.entries(limits)) {
             Helpers.calcTotal(limitValue);
-            limitValue.label = CONFIG.SR5.limits[limitKey];
+            limitValue.label = SR5CONFIG.limits[limitKey];
         }
     }
 

@@ -220,26 +220,26 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.activeSkills[wrapper.getActionSkill() ?? '']),
+                            text: game.i18n.localize(SR5CONFIG.activeSkills[wrapper.getActionSkill() ?? '']),
                             cssClass: 'six',
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.attributes[wrapper.getActionAttribute() ?? '']),
+                            text: game.i18n.localize(SR5CONFIG.attributes[wrapper.getActionAttribute() ?? '']),
                             cssClass: 'six',
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.attributes[wrapper.getActionAttribute2() ?? '']),
+                            text: game.i18n.localize(SR5CONFIG.attributes[wrapper.getActionAttribute2() ?? '']),
                             cssClass: 'six',
                         },
                     },
                     {
                         text: {
                             text: wrapper.getLimitAttribute()
-                                ? game.i18n.localize(CONFIG.SR5.attributes[wrapper.getLimitAttribute() ?? ''])
+                                ? game.i18n.localize(SR5CONFIG.attributes[wrapper.getLimitAttribute() ?? ''])
                                 : wrapper.getActionLimit(),
                             cssClass: 'six',
                         },
@@ -287,7 +287,7 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.qualityTypes[item.data.type ?? '']),
+                            text: game.i18n.localize(SR5CONFIG.qualityTypes[item.data.type ?? '']),
                         },
                     },
                 ];
@@ -296,7 +296,7 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.adeptPower.types[item.data.type ?? '']),
+                            text: game.i18n.localize(SR5CONFIG.adeptPower.types[item.data.type ?? '']),
                         },
                     },
                 ];
@@ -304,17 +304,17 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.spellTypes[item.data.type ?? '']),
+                            text: game.i18n.localize(SR5CONFIG.spellTypes[item.data.type ?? '']),
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.spellRanges[item.data.range ?? '']),
+                            text: game.i18n.localize(SR5CONFIG.spellRanges[item.data.range ?? '']),
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.durations[item.data.duration ?? '']),
+                            text: game.i18n.localize(SR5CONFIG.durations[item.data.duration ?? '']),
                         },
                     },
                     {
@@ -327,17 +327,17 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.critterPower.types[item.data.powerType ?? '']),
+                            text: game.i18n.localize(SR5CONFIG.critterPower.types[item.data.powerType ?? '']),
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.critterPower.ranges[item.data.range ?? '']),
+                            text: game.i18n.localize(SR5CONFIG.critterPower.ranges[item.data.range ?? '']),
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.critterPower.durations[item.data.duration ?? '']),
+                            text: game.i18n.localize(SR5CONFIG.critterPower.durations[item.data.duration ?? '']),
                         },
                     },
                 ];
@@ -346,12 +346,12 @@ export const registerItemLineHelpers = () => {
                 return [
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.matrixTargets[item.data.target ?? '']),
+                            text: game.i18n.localize(SR5CONFIG.matrixTargets[item.data.target ?? '']),
                         },
                     },
                     {
                         text: {
-                            text: game.i18n.localize(CONFIG.SR5.durations[item.data.duration ?? '']),
+                            text: game.i18n.localize(SR5CONFIG.durations[item.data.duration ?? '']),
                         },
                     },
                     {

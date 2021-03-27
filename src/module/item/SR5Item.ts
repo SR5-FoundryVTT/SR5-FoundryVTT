@@ -1091,7 +1091,7 @@ export class SR5Item extends Item {
         if (this.data.type === 'weapon') {
             limit.label = 'SR5.Accuracy';
         } else if (limit?.attribute) {
-            limit.label = CONFIG.SR5.limits[limit.attribute];
+            limit.label = SR5CONFIG.limits[limit.attribute];
         } else if (this.isSpell()) {
             limit.value = this.getLastSpellForce().value;
             limit.label = 'SR5.Force';

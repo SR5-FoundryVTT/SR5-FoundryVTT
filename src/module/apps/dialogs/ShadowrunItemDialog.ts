@@ -306,7 +306,7 @@ export class ShadowrunItemDialog {
         const newRanges = {} as RangesTemplateData;
         for (const [key, value] of Object.entries(ranges)) {
             const distance = value as number;
-            newRanges[key] = Helpers.createRangeDescription(CONFIG.SR5.weaponRanges[key], distance, range_modifiers[key]);
+            newRanges[key] = Helpers.createRangeDescription(SR5CONFIG.weaponRanges[key], distance, range_modifiers[key]);
         }
         return newRanges;
     }

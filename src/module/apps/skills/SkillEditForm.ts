@@ -165,7 +165,7 @@ export class SkillEditForm extends BaseEntitySheet {
     /** Enhance attribute selection by an empty option to allow newly created skills to have no attribute selected.
      */
     _getSkillAttributesForSelect() {
-        return {...CONFIG.SR5.attributes, '': ''};
+        return {...SR5CONFIG.attributes, '': ''};
     }
 
     _allowSkillNameEditing(): boolean {

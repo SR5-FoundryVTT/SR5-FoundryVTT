@@ -2,7 +2,7 @@
 
 declare namespace Shadowrun {
     export type SR5ActorSheetData = ActorSheet.Data & {
-        config: typeof CONFIG.SR5;
+        config: typeof SR5CONFIG;
         data: SR5ActorData;
         filters: SR5SheetFilters;
         isCharacter: boolean;
@@ -68,7 +68,7 @@ declare namespace Shadowrun {
             special: SpecialTrait;
             initiative: Initiative;
             recoil_compensation: number;
-            metatype: string | keyof typeof CONFIG.SR5.character.types;
+            metatype: string | keyof typeof SR5CONFIG.character.types;
             full_defense_attribute: string;
         };
 

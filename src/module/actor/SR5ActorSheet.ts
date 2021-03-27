@@ -84,7 +84,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         const data: SR5ActorSheetData = (super.getData() as unknown) as SR5ActorSheetData;
 
         // General purpose fields...
-        data.config = CONFIG.SR5;
+        data.config = SR5CONFIG;
         data.filters = this._filters;
 
         this._prepareMatrixAttributes(data);

@@ -31,7 +31,7 @@ export class AttributesPrep {
             Helpers.calcTotal(attribute, range);
 
             // add i18n labels.
-            attribute.label = CONFIG.SR5.attributes[key];
+            attribute.label = SR5CONFIG.attributes[key];
         }
     }
 }

@@ -80,7 +80,7 @@ export class MatrixPrep {
         MatrixList.forEach((key) => {
             Helpers.calcTotal(matrix[key]);
             if (matrix[key]) {
-                const label = CONFIG.SR5.matrixAttributes[key];
+                const label = SR5CONFIG.matrixAttributes[key];
                 const { value, base, mod } = matrix[key];
                 const hidden = true;
 

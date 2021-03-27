@@ -6,12 +6,12 @@ declare namespace Shadowrun {
     export type CritterPowerData = CritterPowerPartData & ActionPartData & DescriptionPartData & ArmorPartData;
 
     export type CritterPowerPartData = {
-        category: keyof typeof CONFIG.SR5.critterPower.categories;
-        powerType: keyof typeof CONFIG.SR5.critterPower.types;
+        category: keyof typeof SR5CONFIG.critterPower.categories;
+        powerType: keyof typeof SR5CONFIG.critterPower.types;
         range: CritterPowerRange;
-        duration: keyof typeof CONFIG.SR5.critterPower.durations;
+        duration: keyof typeof SR5CONFIG.critterPower.durations;
         karma: number;
     };
 
-    export type CritterPowerRange = keyof typeof CONFIG.SR5.critterPower.ranges;
+    export type CritterPowerRange = keyof typeof SR5CONFIG.critterPower.ranges;
 }

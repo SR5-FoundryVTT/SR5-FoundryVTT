@@ -73,7 +73,7 @@ export class SR5ItemSheet extends ItemSheet<{}, SR5Item> {
             }
         }
 
-        data['config'] = CONFIG.SR5;
+        data['config'] = SR5CONFIG;
         const items = this.getEmbeddedItems();
         const [ammunition, weaponMods, armorMods] = items.reduce(
             (parts: [Item.Data[], Item.Data[], Item.Data[]], item: SR5Item) => {
@@ -96,7 +96,7 @@ export class SR5ItemSheet extends ItemSheet<{}, SR5Item> {
     }
 
     _getActiveSkillsForSelect() {
-        if (!this.item.actor) return CONFIG.SR5.activeSkills;
+        if (!this.item.actor) return SR5CONFIG.activeSkills;
         const activeSkills = Helpers.sortSkills(this.item.actor.getActiveSkills());
 
         const activeSkillsForSelect = {};

@@ -20,6 +20,10 @@ import {ChangelogApplication} from "./apps/ChangelogApplication";
 import {EnvModifiersApplication} from "./apps/EnvModifiersApplication";
 import {quenchRegister} from "../test/quench";
 
+// Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
+// TODO: Figure out how to change global CONFIG type
+export const SR5CONFIG = SR5;
+
 export class HooksManager {
     static registerHooks() {
         // Register your highest level hook callbacks here for a quick overview of what's hooked into.
@@ -61,7 +65,6 @@ ___________________
             rollItemMacro,
         };
 
-        CONFIG.SR5 = SR5;
         // @ts-ignore
         CONFIG.Actor.entityClass = SR5Actor;
         // @ts-ignore
