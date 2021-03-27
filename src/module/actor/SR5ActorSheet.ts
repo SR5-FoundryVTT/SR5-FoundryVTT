@@ -29,8 +29,8 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
     _filters: SR5SheetFilters;
     _scroll: string;
 
-    constructor(...args) {
-        super(...args);
+    constructor(actor, options?) {
+        super(actor, options);
 
         /**
          * Keep track of the currently active sheet tab
@@ -50,6 +50,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
      * @returns {Object}
      */
     static get defaultOptions() {
+        // @ts-ignore
         return mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'actor'],
             width: 880,
@@ -67,6 +68,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
     get template() {
         const path = 'systems/shadowrun5e/dist/templates';
 
+        // @ts-ignore
         if (this.actor.hasPerm(game.user, 'LIMITED', true)) {
             return `${path}/actor-limited/${this.actor.data.type}.html`;
         }
@@ -172,10 +174,12 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
 
     _prepareActorAttributes(data: SR5ActorSheetData) {
         // Clear visible, zero value attributes temporary modifiers so they appear blank.
-        const attrs = data.data.attributes;
-        for (let [, att] of Object.entries(attrs)) {
-            if (!att.hidden) {
-                if (att.temp === 0) delete att.temp;
+        const attributes = data.data.attributes;
+        for (let [, attribute] of Object.entries(attributes)) {
+            // @ts-ignore // TODO: TYPE: REmove this. Actor typing missing.
+            if (!attribute.hidden) {
+                // @ts-ignore // TODO: TYPE: REmove this. Actor typing missing.
+                if (attribute.temp === 0) delete attribute.temp;
             }
         }
     }
@@ -328,6 +332,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
                 // NOTE: If no duplication is done, added fields will be stored in the database on updates!
                 item = duplicate(item);
                 // Show item properties and description in the item list overviews.
+                // @ts-ignore // TODO: TYPE: REmove this. Actor typing missing.
                 const actorItem = this.actor.items.get(item._id) as SR5Item;
                 const chatData = actorItem.getChatData();
                 item.description = chatData.description;
@@ -504,7 +509,9 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
             event.preventDefault();
             const iid = Helpers.listItemId(event);
             const item = this.actor.getOwnedSR5Item(iid);
-            if (item) item.sheet.render(true);
+            if (!item) return;
+            // @ts-ignore
+            item.sheet.render(true);
         });
         // Delete Inventory Item
         html.find('.item-delete').click(event => this.deleteOwnedItem(event));
@@ -524,7 +531,8 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
      *
      * @param event
      */
-    async _onDrop(event: DragEvent) {
+    // @ts-ignore
+    async _onDrop(event) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -818,6 +826,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
             const newItems = [] as any[];
             if (item.isDevice()) {
                 // Only allow one equipped device item. Unequip all other.
+                // @ts-ignore // TODO: TYPE: Remove. Missing Actor Typing.
                 for (let ite of this.actor.items.filter((actorItem: SR5Item) => actorItem.isDevice())) {
                     newItems.push({
                         '_id': ite._id,
@@ -961,6 +970,8 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         this._restoreScrollPositions();
 
         if (focus && focus.name) {
+            if (!this.form) return;
+
             const element = this.form[focus.name];
             if (element) {
                 element.focus();

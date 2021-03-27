@@ -14,7 +14,7 @@ export class ChangelogApplication extends Application {
         return options;
     }
 
-    render(force?: boolean, options?: Application.RenderOptions): Application {
+    render(force?: boolean, options?: Application.RenderOptions) {
         ChangelogApplication.setRenderForCurrentVersion();
         return super.render(force, options);
     }

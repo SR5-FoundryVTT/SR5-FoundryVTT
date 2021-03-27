@@ -41,6 +41,7 @@ import SR5SpriteType = Shadowrun.SR5SpriteType;
 import SR5CritterType = Shadowrun.SR5CritterType;
 import Skills = Shadowrun.Skills;
 import {SkillRules} from "./SkillRules";
+import CharacterSkills = Shadowrun.CharacterSkills;
 
 export class SR5Actor extends Actor<SR5ActorType> {
     // NOTE: Overwrite Actor.data additionally to extends Actor<T as SR5Actortype.Data: SR5ActorData> to still have
@@ -75,10 +76,11 @@ export class SR5Actor extends Actor<SR5ActorType> {
     findActiveSkill(skillName?: string): SkillField | undefined {
         if (skillName === undefined) return undefined;
         // Search for legacy skills with their name as id.
-        const skill = this.data.data.skills.active[skillName];
+        const skills = this.getActiveSkills();
+        const skill = skills[skillName];
         if (skill) return skill;
         // Search for custom skills with a random id.
-        return Object.values(this.data.data.skills.active).find(skill => skill.name === skillName);
+        return Object.values(skills).find(skill => skill.name === skillName);
     }
 
     findAttribute(attributeName?: string): AttributeField | undefined {
@@ -262,6 +264,10 @@ export class SR5Actor extends Actor<SR5ActorType> {
         return this.findActiveSkill(name);
     }
 
+    getSkills(): CharacterSkills {
+        return this.data.data.skills;
+    }
+
     getActiveSkills(): Skills {
         return this.data.data.skills.active;
     }
@@ -323,7 +329,7 @@ export class SR5Actor extends Actor<SR5ActorType> {
 
         const possibleMatch = (skill: SkillField): string =>  skill.label ? game.i18n.localize(skill.label) : skill.name;
 
-        const {skills} = this.data.data;
+        const skills = this.getSkills();
 
         for (const skill of Object.values(skills.active)) {
             if (searchedFor === possibleMatch(skill))
@@ -675,7 +681,7 @@ export class SR5Actor extends Actor<SR5ActorType> {
             parts: parts.list,
             title: title,
             extended: true,
-            after: async (roll: Roll | undefined) => {
+            after: async (roll: ShadowrunRoll | undefined) => {
                 if (!roll) return;
                 let hits = roll.total;
                 const data = this.data.data as CharacterActorData;
@@ -725,6 +731,7 @@ export class SR5Actor extends Actor<SR5ActorType> {
 
         let cancel = true;
         renderTemplate('systems/shadowrun5e/dist/templates/rolls/matrix-roll.html', dialogData).then((dlg) => {
+            // @ts-ignore
             new Dialog({
                 title: `${title} Test`,
                 content: dlg,
@@ -1262,6 +1269,7 @@ export class SR5Actor extends Actor<SR5ActorType> {
         if (track.value === track.max) return track;
 
         //  Avoid cross referencing.
+        // @ts-ignore
         track = duplicate(track);
 
         track.value += damage.value;
@@ -1394,6 +1402,7 @@ export class SR5Actor extends Actor<SR5ActorType> {
         overflow.value = overflowDamage;
         rest.value = restDamage;
 
+        // @ts-ignore
         return {overflow, rest};
     }
 
@@ -1421,10 +1430,13 @@ export class SR5Actor extends Actor<SR5ActorType> {
 
         const modified = duplicate(this.getArmor());
         if (modified) {
+            // @ts-ignore
             modified.mod = PartsList.AddUniquePart(modified.mod, 'SR5.DV', damage.ap.value);
+            // @ts-ignore
             modified.value = Helpers.calcTotal(modified, {min: 0});
         }
 
+        // @ts-ignore
         return modified;
     }
 
@@ -1540,6 +1552,7 @@ export class SR5Actor extends Actor<SR5ActorType> {
      * @param ignoreScene Set to true to ignore modifiers set on active or given scene.
      * @param scene Should a scene be used as a fallback, provide this here. Otherwise current scene will be used.
      */
+    // @ts-ignore
     async getModifiers(ignoreScene: boolean=false, scene: Scene=canvas.scene): Promise<Modifiers> {
         const onActor = await Modifiers.getModifiersFromEntity(this);
 

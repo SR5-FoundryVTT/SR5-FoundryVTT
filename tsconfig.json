@@ -3,7 +3,6 @@
   "exclude": ["node_modules", "**/*.spec.ts"],
   "compilerOptions": {
     "target": "es6",
-    "strictNullChecks": true,
     "module": "commonjs",
     "moduleResolution": "node",
     "types": [
