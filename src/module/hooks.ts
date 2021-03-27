@@ -94,7 +94,7 @@ ___________________
     }
 
     static async ready() {
-        if (game.user.isGM) {
+        if (game.user?.isGM) {
             await Migrator.BeginMigration();
 
             if (ChangelogApplication.showApplication) {
@@ -111,6 +111,8 @@ ___________________
     }
 
     static canvasInit() {
+        if (!canvas?.ready) return;
+        // @ts-ignore // TODO: TYPE: diagonaleRule doesn't exist on foundry-vtt-types anymore... does this even work anymore?
         canvas.grid.diagonalRule = game.settings.get(SYSTEM_NAME, 'diagonalMovement');
         //@ts-ignore
         // SquareGrid isn't typed.
@@ -134,7 +136,7 @@ ___________________
     static getSceneControlButtons(controls) {
         const tokenControls = controls.find((c) => c.name === 'token');
 
-        if (game.user.isGM) {
+        if (game.user?.isGM) {
             tokenControls.tools.push({
                 name: 'overwatch-score-tracker',
                 title: 'CONTROLS.SR5.OverwatchScoreTracker',

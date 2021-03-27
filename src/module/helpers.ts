@@ -358,7 +358,7 @@ export class Helpers {
 
         // Try to default to a users character.
         if (actors.length === 0 && game.user?.character) {
-            actors.push(game.user.character as SR5Actor);
+            actors.push(game.user?.character as SR5Actor);
         }
 
         return actors;

@@ -20,7 +20,7 @@ export async function createItemMacro(item, slot) {
             { displaySheet: false },
         )) as Macro;
     }
-    if (macro) game.user.assignHotbarMacro(macro, slot);
+    if (macro) game.user?.assignHotbarMacro(macro, slot);
 }
 
 /**

@@ -109,7 +109,7 @@ const createChatData = async (templateData, options?: ChatDataOptions) => {
     const html = await renderTemplate(template, enhancedTemplateData);
 
     const chatData = {
-        user: game.user._id,
+        user: game.user?._id,
         type: options?.roll ? CONST.CHAT_MESSAGE_TYPES.ROLL : CONST.CHAT_MESSAGE_TYPES.OTHER,
         sound: options?.roll ? CONFIG.sounds.dice : undefined,
         content: html,
@@ -117,7 +117,7 @@ const createChatData = async (templateData, options?: ChatDataOptions) => {
         speaker: {
             actor: actor?._id,
             token: actor?.getToken(),
-            alias: game.user.name
+            alias: game.user?.name
         },
         flags: {
             shadowrun5e: {

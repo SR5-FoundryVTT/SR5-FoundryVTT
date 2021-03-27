@@ -64,7 +64,7 @@ export class ShadowrunTestDialog {
 
             if (options.dialogOptions?.pool) {
                 parts.clear();
-                await game.user.setFlag(SYSTEM_NAME, FLAGS.LastRollPromptValue, dicePoolValue);
+                await game.user?.setFlag(SYSTEM_NAME, FLAGS.LastRollPromptValue, dicePoolValue);
                 parts.addUniquePart('SR5.Base', dicePoolValue);
             }
 

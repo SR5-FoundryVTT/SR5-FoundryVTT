@@ -23,12 +23,12 @@ class Template extends MeasuredTemplate {
 
         const templateData = {
             t: templateShape,
-            user: game.user._id,
+            user: game.user?._id,
             direction: 0,
             x: 0,
             y: 0,
             // @ts-ignore
-            fillColor: game.user.color,
+            fillColor: game.user?.color,
         };
         const blast = item.getBlastData();
         templateData['distance'] = blast?.radius;
