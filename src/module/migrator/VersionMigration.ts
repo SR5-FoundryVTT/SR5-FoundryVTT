@@ -184,6 +184,7 @@ export abstract class VersionMigration {
      * @param entityUpdates The current map of entity updates.
      */
     protected async IterateItems(game: Game, entityUpdates: Map<Entity, EntityUpdate>) {
+        // @ts-ignore // TODO: TYPE game.items possibly undefined
         for (const item of game.items.entities) {
             try {
                 if (!(await this.ShouldMigrateItemData(item.data))) {
@@ -214,6 +215,7 @@ export abstract class VersionMigration {
      * @param entityUpdates The current map of entity updates.
      */
     protected async IterateActors(game: Game, entityUpdates: Map<Entity, EntityUpdate>) {
+        // @ts-ignore // TODO: TYPE: Possibly undefined
         for (const actor of game.actors.entities) {
             try {
                 if (!(await this.ShouldMigrateActorData(actor.data))) {
@@ -222,6 +224,7 @@ export abstract class VersionMigration {
 
                 console.log(`Migrating Actor ${actor.name}`);
                 console.log(actor);
+                // @ts-ignore // TODO: TYPE: Unsure, ignore for now.
                 const updateData = await this.MigrateActorData(duplicate(actor.data));
                 console.log(updateData);
                 let items = [];
