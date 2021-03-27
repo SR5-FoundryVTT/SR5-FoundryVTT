@@ -1,3 +1,4 @@
+// @ts-nocheck // TODO: Remove!
 import {Helpers} from '../helpers';
 import {SR5Actor} from '../actor/SR5Actor';
 import {ActionTestData, ShadowrunItemDialog} from '../apps/dialogs/ShadowrunItemDialog';
@@ -52,10 +53,11 @@ import SpritePower = Shadowrun.SpritePower;
 import {ItemAction} from "./ItemAction";
 import {SkillFlow} from "../actor/SkillFlow";
 
-export class SR5Item extends Item<SR5ItemType> {
+export class SR5Item extends Item<any> {
     // TODO: TYPE: In contrast to SR5Actor we can only type Item.data as the typing structure for ItemData doesn't have
     //       monolithic Item.data.data typing (SR5ActorData) but only one for each Item type. Therefore we can't
     //       do extends Item<SR5ItemData> as we can with the SR5Actor class.
+    data: SR5ItemType;
     items: SR5Item[];
 
     labels: {} = {};
@@ -941,8 +943,8 @@ export class SR5Item extends Item<SR5ItemType> {
         return true;
     }
 
-    async updateEmbeddedEntity(embeddedName: string, updateData: object | object[], options?: object) {
-        await this.updateOwnedItem(updateData);
+    async updateEmbeddedEntity(embeddedName, data, options?) {
+        await this.updateOwnedItem(data);
         return this;
     }
 

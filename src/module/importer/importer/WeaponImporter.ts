@@ -26,6 +26,8 @@ export class WeaponImporter extends DataImporter {
             img: 'icons/svg/mystery-man.svg',
             flags: {},
             type: 'weapon',
+            effects: [],
+            sort: 0,
             data: {
                 description: {
                     value: '',
@@ -170,6 +172,7 @@ export class WeaponImporter extends DataImporter {
             datas.push(data);
         }
 
+        // @ts-ignore // TODO: TYPE: This should be removed after typing of SR5Item
         return await Item.create(datas);
     }
 }

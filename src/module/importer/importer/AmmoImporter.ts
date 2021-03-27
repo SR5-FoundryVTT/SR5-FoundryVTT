@@ -19,6 +19,8 @@ export class AmmoImporter extends DataImporter {
             img: 'icons/svg/mystery-man.svg',
             flags: {},
             type: 'ammo',
+            effects: [],
+            sort: 0,
             data: {
                 description: {
                     value: '',
@@ -120,9 +122,11 @@ export class AmmoImporter extends DataImporter {
                     return item.type === 'weapon' && item.name.toLowerCase() === nameLower;
                 });
 
+                // @ts-ignore // TODO: TYPE: Remove this.
                 if (foundWeapon !== null && "action" in foundWeapon.data.data) {
                     console.log(foundWeapon);
 
+                    // @ts-ignore // TODO: TYPE: Remove this.
                     const weaponData = foundWeapon.data.data as WeaponData;
                     data.data.damage = weaponData.action.damage.value;
                     data.data.ap =weaponData.action.damage.ap.value;
@@ -150,6 +154,7 @@ export class AmmoImporter extends DataImporter {
             ammo.folder = folder.id;
         }
 
+        // @ts-ignore // TODO: TYPE: Remove this.
         return await Item.create(ammoDatas);
     }
 }

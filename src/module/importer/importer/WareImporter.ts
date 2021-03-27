@@ -33,6 +33,8 @@ export class WareImporter extends DataImporter {
             folder: '',
             img: 'icons/svg/mystery-man.svg',
             flags: {},
+            effects: [],
+            sort: 0,
             data: {
                 description: {
                     value: '',
@@ -151,6 +153,7 @@ export class WareImporter extends DataImporter {
             datas.push(data);
         }
 
+        // @ts-ignore // TODO: TYPE: Remove this.
         return await Item.create(datas);
     }
 }

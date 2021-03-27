@@ -265,6 +265,8 @@ export class Helpers {
     }
 
     static getToken(id?: string): Token | undefined {
+        if (!canvas || !canvas.ready) return;
+
         for (const token of canvas.tokens.placeables) {
             if (token.id === id) {
                 return token;
@@ -273,15 +275,17 @@ export class Helpers {
     }
 
     static getSceneToken(sceneTokenId: string): Token | undefined {
+        if (!canvas || !canvas.ready || !canvas.scene) return;
+
         const [sceneId, tokenId] = sceneTokenId.split('.');
 
-        const isActiveScene = sceneId === canvas?.scene._id;
+        const isActiveScene = sceneId === canvas.scene._id;
         if (isActiveScene) {
             return canvas.tokens.get(tokenId);
         }
 
         // Build Token using it's data from the connected scene as a fallback.
-        const scene = game.scenes.get(sceneId);
+        const scene = game.scenes?.get(sceneId);
         if (!scene) {
             return;
         }
@@ -295,31 +299,34 @@ export class Helpers {
         return new Token(tokenData);
     }
 
-    static getUserTargets(user?: User): Token[] {
+    static getUserTargets(user?: User|null): Token[] {
         user = user ? user : game.user;
 
-        if (user) {
-            return Array.from(user.targets);
-        } else {
-            return [];
-        }
+        if (!user) return []
+
+        return Array.from(user.targets);
     }
 
-    static userHasTargets(user?: User): boolean {
+    static userHasTargets(user?: User|null): boolean {
         user = user ? user : game.user;
+
+        if (!user) return false;
 
         return user.targets.size > 0;
     }
 
     static measureTokenDistance(tokenOrigin: Token, tokenDest: Token): number {
+        if (!canvas || !canvas.ready || !canvas.scene) return 0;
+
         if (!tokenOrigin || !tokenDest) return 0;
 
         const origin = new PIXI.Point(...canvas.grid.getCenter(tokenOrigin.data.x, tokenOrigin.data.y));
         const dest = new PIXI.Point(...canvas.grid.getCenter(tokenDest.data.x, tokenDest.data.y));
 
-        const distanceInGridUnits = canvas.grid.measureDistance(origin, dest, {gridSpaces: true});
+        // TODO: Used to be const distanceInGridUnits = canvas.grid.measureDistance(origin, dest, {gridSpaces: true});
+        //       Double Check for errors.
+        const distanceInGridUnits = canvas.grid.measureDistance(origin, dest);
         const sceneUnit = canvas.scene.data.gridUnits;
-        // TODO: Define weapon range units somewhere (settings)
         return Helpers.convertLengthUnit(distanceInGridUnits, sceneUnit);
     }
 
@@ -349,6 +356,7 @@ export class Helpers {
     }
 
     static getControlledTokens(): Token[] {
+        if (!canvas || !canvas.ready) return [];
         return canvas.tokens.controlled;
     }
 

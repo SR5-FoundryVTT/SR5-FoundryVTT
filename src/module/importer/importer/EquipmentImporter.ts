@@ -105,6 +105,7 @@ export class EquipmentImporter extends DataImporter {
 
         const entries = await this.ParseEquipments(equipments);
 
+        // @ts-ignore // TODO: TYPE: Remove this.
         return await Item.create(entries);
     }
 }

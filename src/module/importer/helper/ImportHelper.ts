@@ -41,7 +41,8 @@ export class ImportHelper {
      * @param parent The parent folder.
      * @returns {Promise<Folder>} A promise that resolves with the folder object when the folder is created.
      */
-    public static async NewFolder(name: string, parent: Folder | null = null): Promise<Folder> {
+    public static async NewFolder(name: string, parent: Folder | null = null): Promise< Folder | null> {
+        // @ts-ignore // TODO: TYPE: I'm unsure what the issue is.
         return await Folder.create({
             type: 'Item',
             parent: parent === null ? null : parent.id,
@@ -55,7 +56,7 @@ export class ImportHelper {
      * @param mkdirs If true, will make all folders along the hierarchy if they do not exist.
      * @returns A promise that will resolve with the found folder.
      */
-    public static async GetFolderAtPath(path: string, mkdirs: boolean = false): Promise<Entity> {
+    public static async GetFolderAtPath(path: string, mkdirs: boolean = false): Promise<Folder> {
         let idx = 0;
         let curr,
             last = null;
