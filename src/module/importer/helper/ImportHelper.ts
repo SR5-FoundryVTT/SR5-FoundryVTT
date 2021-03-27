@@ -111,9 +111,9 @@ export class ImportHelper {
     public static findItem(nameOrCmp: string | ItemComparer): Entity {
         let result: any | null;
         if (typeof nameOrCmp === 'string') {
-            result = game.items.find((item) => item.name == nameOrCmp);
+            result = game.items?.find((item) => item.name == nameOrCmp);
         } else {
-            result = game.items.find(nameOrCmp);
+            result = game.items?.find(nameOrCmp);
         }
         return result;
     }

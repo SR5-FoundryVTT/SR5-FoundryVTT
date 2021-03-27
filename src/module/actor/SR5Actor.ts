@@ -39,15 +39,12 @@ import ConditionData = Shadowrun.ConditionData;
 import SR5SpiritType = Shadowrun.SR5SpiritType;
 import SR5SpriteType = Shadowrun.SR5SpriteType;
 import SR5CritterType = Shadowrun.SR5CritterType;
-import SR5ActorData = Shadowrun.SR5ActorData;
 import Skills = Shadowrun.Skills;
 import {SkillRules} from "./SkillRules";
-import { SoakRules } from './SoakRules';
 
-export class SR5Actor extends Actor<SR5ActorData> {
+export class SR5Actor extends Actor<SR5ActorType> {
     // NOTE: Overwrite Actor.data additionally to extends Actor<T as SR5Actortype.Data: SR5ActorData> to still have
     //       access to Actor.data.type checks.
-    data: SR5ActorType;
 
     getOverwatchScore() {
         const os = this.getFlag(SYSTEM_NAME, 'overwatchScore');
@@ -64,7 +61,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
     prepareData() {
         super.prepareData();
 
-        const actorData = this.data as SR5ActorType;
+        const actorData = this.data;
         const prepper = ActorPrepFactory.Create(actorData);
         if (prepper) {
             prepper.prepare();

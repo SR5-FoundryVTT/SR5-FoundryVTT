@@ -52,18 +52,18 @@ import SpritePower = Shadowrun.SpritePower;
 import {ItemAction} from "./ItemAction";
 import {SkillFlow} from "../actor/SkillFlow";
 
-export class SR5Item extends Item {
-    // NOTE: In contrast to SR5Actor we can only type Item.data as the typing structure for ItemData doesn't have
+export class SR5Item extends Item<SR5ItemType> {
+    // TODO: TYPE: In contrast to SR5Actor we can only type Item.data as the typing structure for ItemData doesn't have
     //       monolithic Item.data.data typing (SR5ActorData) but only one for each Item type. Therefore we can't
     //       do extends Item<SR5ItemData> as we can with the SR5Actor class.
-    data: SR5ItemType;
     items: SR5Item[];
 
     labels: {} = {};
 
 
+    // @ts-ignore // TODO: TYPE: Check foundry-vtt-types systems for how Items and Actors type.
     get actor(): SR5Actor {
-        return super.actor as SR5Actor;
+        return super.actor as unknown as SR5Actor;
     }
 
     private get wrapper(): SR5ItemDataWrapper {
@@ -788,15 +788,17 @@ export class SR5Item extends Item {
     }
 
     static getItemFromMessage(html): SR5Item | undefined {
+        if (!game || !game.scenes || !game.ready || !canvas || !canvas.ready || !canvas.scene) return;
+
         const card = html.find('.chat-card');
         let actor;
         const tokenKey = card.data('tokenId');
         if (tokenKey) {
             const [sceneId, tokenId] = tokenKey.split('.');
             let token;
-            if (sceneId === canvas?.scene._id) token = canvas.tokens.get(tokenId);
+            if (sceneId === canvas.scene._id) token = canvas.tokens.get(tokenId);
             else {
-                const scene: Scene = game.scenes.get(sceneId);
+                const scene: Scene = game.scenes.get(sceneId) as Scene;
                 if (!scene) return;
                 // @ts-ignore
                 const tokenData = scene.data.tokens.find((t) => t.id === Number(tokenId));
@@ -804,7 +806,7 @@ export class SR5Item extends Item {
             }
             if (!token) return;
             actor = Actor.fromToken(token);
-        } else actor = game.actors.get(card.data('actorId'));
+        } else actor = game.actors?.get(card.data('actorId'));
 
         if (!actor) return;
         const itemId = card.data('itemId');
@@ -812,7 +814,9 @@ export class SR5Item extends Item {
     }
 
     static getTargets() {
+        if (!game.ready || !game.user) return;
         const { character } = game.user;
+        // @ts-ignore
         const { controlled } = canvas.tokens;
         const targets = controlled.reduce((arr, t) => (t.actor ? arr.concat([t.actor]) : arr), []);
         if (character && controlled.length === 0) targets.push(character);
@@ -1120,7 +1124,7 @@ export class SR5Item extends Item {
      * @param key
      * @param value
      */
-    setFlag(scope: string, key: string, value: any): Promise<Entity> {
+    setFlag(scope: string, key: string, value: any){
         const newValue = Helpers.onSetFlag(value);
         return super.setFlag(scope, key, newValue);
     }

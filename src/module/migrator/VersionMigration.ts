@@ -185,7 +185,7 @@ export abstract class VersionMigration {
      */
     protected async IterateItems(game: Game, entityUpdates: Map<Entity, EntityUpdate>) {
         // @ts-ignore // TODO: TYPE game.items possibly undefined
-        for (const item of game.items.entities) {
+        for (const item of game.items?.entities) {
             try {
                 if (!(await this.ShouldMigrateItemData(item.data))) {
                     continue;

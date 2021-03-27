@@ -1,17 +1,16 @@
 import { Helpers } from '../helpers';
 import { SR5Item } from './SR5Item';
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
+import {SR5Actor} from "../actor/SR5Actor";
+import SR5ItemType = Shadowrun.SR5ItemType;
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
  */
-export class SR5ItemSheet extends ItemSheet<{}, SR5Item> {
-    private _shownDesc: any[];
+// TODO: Check foundry-vtt-types systems for how to do typing...
+export class SR5ItemSheet extends ItemSheet<any, any> {
+    private _shownDesc: any[] = [];
     private _scroll: string;
-    constructor(...args) {
-        super(...args);
-        this._shownDesc = [];
-    }
 
     getEmbeddedItems() {
         return this.item.items || [];
@@ -22,6 +21,7 @@ export class SR5ItemSheet extends ItemSheet<{}, SR5Item> {
      * @returns {Object}
      */
     static get defaultOptions() {
+        // @ts-ignore // mergeObject breaks TypeScript typing. Should be fine.
         return mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'item'],
             width: 650,
@@ -41,8 +41,8 @@ export class SR5ItemSheet extends ItemSheet<{}, SR5Item> {
      * Prepare data for rendering the Item sheet
      * The prepared data object contains both the actor data as well as additional sheet options
      */
-    getData() {
-        const data = super.getData();
+    async getData() {
+        const data = await super.getData();
         const itemData = data.data;
 
         if (itemData.action) {
@@ -190,14 +190,15 @@ export class SR5ItemSheet extends ItemSheet<{}, SR5Item> {
             item = await this._getItemFromCollection(data.pack, data.id);
         } else {
             // Case 3 - From a World Entity
-            item = game.items.get(data.id);
+            item = game.items?.get(data.id);
         }
 
         this.item.createOwnedItem(item.data);
     }
 
     _getItemFromCollection(collection, itemId) {
-        const pack = game.packs.find((p) => p.collection === collection);
+        const pack = game.packs?.find((p) => p.collection === collection);
+        if (!pack) return;
         return pack.getEntity(itemId);
     }
 
@@ -240,11 +241,13 @@ export class SR5ItemSheet extends ItemSheet<{}, SR5Item> {
     async _onAddWeaponMod(event) {
         event.preventDefault();
         const type = 'modification';
+        // TODO: Move this into DefaultValues...
         const itemData = {
             name: `New ${Helpers.label(type)}`,
             type: type,
             data: duplicate(game.system.model.Item.modification),
         };
+        // @ts-ignore
         itemData.data.type = 'weapon';
         // @ts-ignore
         const item = Item.createOwned(itemData, this.item);
