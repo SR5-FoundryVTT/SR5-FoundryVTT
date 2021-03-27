@@ -1,7 +1,5 @@
 import SkillEditFormData = Shadowrun.SkillEditFormData;
 import {SR5Actor} from "../../actor/SR5Actor";
-import Attributes = Shadowrun.Attributes;
-import SkillField = Shadowrun.SkillField;
 
 export class SkillEditForm extends BaseEntitySheet {
     skillId: string;
@@ -22,6 +20,7 @@ export class SkillEditForm extends BaseEntitySheet {
 
     static get defaultOptions() {
         const options = super.defaultOptions;
+        // @ts-ignore
         return mergeObject(options, {
             id: 'skill-editor',
             classes: ['sr5', 'sheet', 'skill-edit-window'],
@@ -94,8 +93,10 @@ export class SkillEditForm extends BaseEntitySheet {
         };
     }
 
+
     /** @override */
-    async _updateObject(event, formData) {
+    // @ts-ignore // TODO: TYPE: Remove this...
+    async _updateObject(event: Event, formData: object) {
         const updateData = {};
         this._onUpdateObject(event, formData, updateData);
         await this.entity.update(updateData);
@@ -176,6 +177,7 @@ export class SkillEditForm extends BaseEntitySheet {
 
     getData(): SkillEditFormData {
         const data = super.getData();
+        // @ts-ignore
         const actor = data.entity;
 
         data['data'] = actor ? getProperty(actor, this._updateString()) : {};

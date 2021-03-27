@@ -28,6 +28,7 @@ export class EnvModifiersApplication extends Application {
         options.classes = ['sr5', 'form-dialog'];
         options.id = 'env-modifiers-application';
         options.title = game.i18n.localize('SR5.EnvModifiersApplication.Title');
+        // @ts-ignore
         options.width = 'auto'; // auto is important for differing i18n text length.
         options.height = 'auto';
         options.resizable = true;
@@ -35,7 +36,7 @@ export class EnvModifiersApplication extends Application {
     }
 
     async getData(options?: object): Promise<any> {
-        const data = super.getData(options);
+        const data = super.getData(options) as any;
 
         this.modifiers = await this._getModifiers();
 
@@ -51,7 +52,7 @@ export class EnvModifiersApplication extends Application {
         return data;
     }
 
-    protected activateListeners(html: JQuery | HTMLElement) {
+    activateListeners(html: JQuery | HTMLElement) {
         $(html).find('button.env-modifier').on('click', this._handleModifierChange.bind(this));
         $(html).find('button.remove-modifiers-from-target').on('click', this._handleRemoveModifiersFromTarget.bind(this));
     }
@@ -161,7 +162,7 @@ export class EnvModifiersApplication extends Application {
     }
 
     static async openForCurrentScene() {
-        if (!canvas.scene) return;
+        if (!canvas || !canvas.ready || !canvas.scene) return;
         await new EnvModifiersApplication(canvas.scene).render(true);
     }
 
@@ -177,7 +178,7 @@ export class EnvModifiersApplication extends Application {
             event.preventDefault();
 
             if (!token || !token.actor) return;
-
+            // @ts-ignore // TODO: TYPE: Remove this...
             await new EnvModifiersApplication(token.actor).render(true);
         }
     }
