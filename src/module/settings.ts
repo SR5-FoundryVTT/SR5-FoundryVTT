@@ -19,6 +19,7 @@ export const registerSystemSettings = () => {
             '1-2-1': 'SETTINGS.EstimateDiagonal',
             'EUCL': 'SETTINGS.Euclidean',
         },
+        // @ts-ignore // TODO: TYPE canvas can be null (in typing but in practive...)
         onChange: (rule) => (canvas.grid.diagonalRule = rule),
     });
 
