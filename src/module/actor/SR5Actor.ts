@@ -284,12 +284,16 @@ export class SR5Actor extends Actor<SR5ActorData> {
 
         const attribute = this.getAttribute(skill.attribute);
 
+        // An attribute can have a NaN value if no value has been set yet. Do the skill for consistency.
+        const attributeValue = Number.isNumeric(attribute.value) ? attribute.value : 0;
+        const skillValue = Number.isNumeric(skill.value) ? skill.value : 0;
+
         if (SkillRules.mustDefaultToRoll(skill) && SkillRules.allowDefaultingRoll(skill)) {
-            return SkillRules.getDefaultingModifier() + attribute.value;
+            return SkillRules.getDefaultingModifier() + attributeValue;
         }
 
         const specializationBonus = options.specialization ? SR.skill.SPECIALIZATION_MODIFIER : 0;
-        return skill.value + attribute.value + specializationBonus;
+        return skillValue + attributeValue + specializationBonus;
     }
 
     getSkill(skillId: string, options= {byLabel: false}): SkillField | undefined {
@@ -1427,7 +1431,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
             modified.mod = PartsList.AddUniquePart(modified.mod, 'SR5.DV', damage.ap.value);
             modified.value = Helpers.calcTotal(modified, {min: 0});
         }
- 
+
         return modified;
     }
 

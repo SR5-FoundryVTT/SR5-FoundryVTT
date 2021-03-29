@@ -13540,11 +13540,14 @@ class SR5Actor extends Actor {
         if (!SkillFlow_1.SkillFlow.allowRoll(skill))
             return 0;
         const attribute = this.getAttribute(skill.attribute);
+        // An attribute can have a NaN value if no value has been set yet. Do the skill for consistency.
+        const attributeValue = Number.isNumeric(attribute.value) ? attribute.value : 0;
+        const skillValue = Number.isNumeric(skill.value) ? skill.value : 0;
         if (SkillRules_1.SkillRules.mustDefaultToRoll(skill) && SkillRules_1.SkillRules.allowDefaultingRoll(skill)) {
-            return SkillRules_1.SkillRules.getDefaultingModifier() + attribute.value;
+            return SkillRules_1.SkillRules.getDefaultingModifier() + attributeValue;
         }
         const specializationBonus = options.specialization ? constants_1.SR.skill.SPECIALIZATION_MODIFIER : 0;
-        return skill.value + attribute.value + specializationBonus;
+        return skillValue + attributeValue + specializationBonus;
     }
     getSkill(skillId, options = { byLabel: false }) {
         if (options.byLabel)
