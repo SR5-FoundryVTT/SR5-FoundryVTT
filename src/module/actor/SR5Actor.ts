@@ -285,8 +285,8 @@ export class SR5Actor extends Actor<SR5ActorData> {
         const attribute = this.getAttribute(skill.attribute);
 
         // An attribute can have a NaN value if no value has been set yet. Do the skill for consistency.
-        const attributeValue = Number.isNumeric(attribute.value) ? attribute.value : 0;
-        const skillValue = Number.isNumeric(skill.value) ? skill.value : 0;
+        const attributeValue = typeof attribute.value === 'number' ? attribute.value : 0;
+        const skillValue = typeof skill.value === 'number' ? skill.value : 0;
 
         if (SkillRules.mustDefaultToRoll(skill) && SkillRules.allowDefaultingRoll(skill)) {
             return SkillRules.getDefaultingModifier() + attributeValue;
