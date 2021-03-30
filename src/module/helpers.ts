@@ -479,6 +479,10 @@ export class Helpers {
         return {[path]: {[`-=${key}`]: null}};
     }
 
+    static localizeSkill(skill: SkillField): string {
+        return skill.label ? game.i18n.localize(skill.label) : skill.name;
+    }
+
     /**
      * Alphabetically sort skills either by their translated label. Should a skill not have one, use the name as a
      * fallback.
@@ -492,13 +496,13 @@ export class Helpers {
     static sortSkills(skills: Skills, asc: boolean=true): Skills {
         // Filter entries instead of values to have a store of ids for easy rebuild.
         const sortedEntries = Object.entries(skills).sort(([aId, a], [bId, b]) => {
-            const comparatorA = a.label ? game.i18n.localize(a.label) : a.name;
-            const comparatorB = b.label ? game.i18n.localize(b.label) : b.name;
+            const comparatorA = Helpers.localizeSkill(a);
+            const comparatorB = Helpers.localizeSkill(b);
             // Use String.localeCompare instead of the > Operator to support other alphabets.
             if (asc)
                 return comparatorA.localeCompare(comparatorB) === 1 ? 1 : -1;
             else
-                return comparatorA.localeCompare(comparatorB) === 1 ? 1 : -1;
+                return comparatorA.localeCompare(comparatorB) === 1 ? -1 : 1;
         });
 
         // Rebuild the Skills type using the earlier entries.
@@ -507,6 +511,35 @@ export class Helpers {
             sortedAsObject[id] = skill;
         }
 
+        return sortedAsObject;
+    }
+
+    /**
+     * Alphabetically sort any SR5 config object with a key to label structure.
+     *
+     * Sorting should be aware of UTF-8, however please blame JavaScript if it's not. :)
+     *
+     * @param configValues The config value to be sorted
+     * @param asc Set to true for ascending sorting order and to false for descending order.
+     * @return Sorted config values given by the configValues parameter
+     */
+    static sortConfigValuesByTranslation(configValues: Record<string, string>, asc: boolean=true): Record<string, string> {
+        // Filter entries instead of values to have a store of ids for easy rebuild.
+        const sortedEntries = Object.entries(configValues).sort(([aId, a], [bId, b]) => {
+            const comparatorA = game.i18n.localize(a);
+            const comparatorB = game.i18n.localize(b);
+            // Use String.localeCompare instead of the > Operator to support other alphabets.
+            if (asc)
+                return comparatorA.localeCompare(comparatorB) === 1 ? 1 : -1;
+            else
+                return comparatorA.localeCompare(comparatorB) === 1 ? -1 : 1;
+        });
+
+        // Rebuild the skills type using the earlier entries.
+        const sortedAsObject = {};
+        for (const [key, translated] of sortedEntries) {
+            sortedAsObject[key] = translated;
+        }
         return sortedAsObject;
     }
 }

@@ -23514,6 +23514,9 @@ class Helpers {
         // That functions documentation allows property deletion using the -= prefix before property key.
         return { [path]: { [`-=${key}`]: null } };
     }
+    static localizeSkill(skill) {
+        return skill.label ? game.i18n.localize(skill.label) : skill.name;
+    }
     /**
      * Alphabetically sort skills either by their translated label. Should a skill not have one, use the name as a
      * fallback.
@@ -23527,18 +23530,45 @@ class Helpers {
     static sortSkills(skills, asc = true) {
         // Filter entries instead of values to have a store of ids for easy rebuild.
         const sortedEntries = Object.entries(skills).sort(([aId, a], [bId, b]) => {
-            const comparatorA = a.label ? game.i18n.localize(a.label) : a.name;
-            const comparatorB = b.label ? game.i18n.localize(b.label) : b.name;
+            const comparatorA = Helpers.localizeSkill(a);
+            const comparatorB = Helpers.localizeSkill(b);
             // Use String.localeCompare instead of the > Operator to support other alphabets.
             if (asc)
                 return comparatorA.localeCompare(comparatorB) === 1 ? 1 : -1;
             else
-                return comparatorA.localeCompare(comparatorB) === 1 ? 1 : -1;
+                return comparatorA.localeCompare(comparatorB) === 1 ? -1 : 1;
         });
         // Rebuild the Skills type using the earlier entries.
         const sortedAsObject = {};
         for (const [id, skill] of sortedEntries) {
             sortedAsObject[id] = skill;
+        }
+        return sortedAsObject;
+    }
+    /**
+     * Alphabetically sort any SR5 config object with a key to label structure.
+     *
+     * Sorting should be aware of UTF-8, however please blame JavaScript if it's not. :)
+     *
+     * @param configValues The config value to be sorted
+     * @param asc Set to true for ascending sorting order and to false for descending order.
+     * @return Sorted config values given by the configValues parameter
+     */
+    static sortConfigValuesByTranslation(configValues, asc = true) {
+        // Filter entries instead of values to have a store of ids for easy rebuild.
+        const sortedEntries = Object.entries(configValues).sort(([aId, a], [bId, b]) => {
+            const comparatorA = game.i18n.localize(a);
+            const comparatorB = game.i18n.localize(b);
+            // Use String.localeCompare instead of the > Operator to support other alphabets.
+            if (asc)
+                return comparatorA.localeCompare(comparatorB) === 1 ? 1 : -1;
+            else
+                return comparatorA.localeCompare(comparatorB) === 1 ? -1 : 1;
+        });
+        // Rebuild the skills type using the earlier entries.
+        const sortedAsObject = {};
+        for (const [key, translated] of sortedEntries) {
+            sortedAsObject[key] = translated;
         }
         return sortedAsObject;
     }
@@ -28680,6 +28710,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ItemSheet = void 0;
 const helpers_1 = require("../helpers");
+const config_1 = require("../config");
 /**
  * Extend the basic ItemSheet with some very simple modifications
  */
@@ -28765,15 +28796,26 @@ class SR5ItemSheet extends ItemSheet {
         data['ammunition'] = ammunition;
         data['weaponMods'] = weaponMods;
         data['armorMods'] = armorMods;
-        // TODO set to the proper boolean for if the source PDF can be accessed
-        // I'm thinking maybe check for the mod being installed?
-        data['hasSourcePdfAvailable'] = true;
-        data['activeSkills'] = this._getActiveSkillsForSelect();
+        data['activeSkills'] = this._getSortedActiveSkillsForSelect();
+        data['attributes'] = this._getSortedAttributesForSelect();
+        data['limits'] = this._getSortedLimitsForSelect();
         return data;
     }
-    _getActiveSkillsForSelect() {
+    /**
+     * Action limits currently contain limits for all action types. Be it matrix, magic or physical.
+     */
+    _getSortedLimitsForSelect() {
+        return helpers_1.Helpers.sortConfigValuesByTranslation(config_1.SR5.limits);
+    }
+    /**
+     * Only display
+     */
+    _getSortedAttributesForSelect() {
+        return helpers_1.Helpers.sortConfigValuesByTranslation(config_1.SR5.attributes);
+    }
+    _getSortedActiveSkillsForSelect() {
         if (!this.item.actor)
-            return CONFIG.SR5.activeSkills;
+            return config_1.SR5.activeSkills;
         const activeSkills = helpers_1.Helpers.sortSkills(this.item.actor.getActiveSkills());
         const activeSkillsForSelect = {};
         for (const [id, skill] of Object.entries(activeSkills)) {
@@ -29023,7 +29065,7 @@ class SR5ItemSheet extends ItemSheet {
 }
 exports.SR5ItemSheet = SR5ItemSheet;
 
-},{"../helpers":156}],200:[function(require,module,exports){
+},{"../config":145,"../helpers":156}],200:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }

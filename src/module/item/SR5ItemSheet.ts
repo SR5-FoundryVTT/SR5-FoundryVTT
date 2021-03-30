@@ -1,6 +1,7 @@
 import { Helpers } from '../helpers';
 import { SR5Item } from './SR5Item';
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
+import {SR5} from "../config";
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -87,16 +88,29 @@ export class SR5ItemSheet extends ItemSheet<{}, SR5Item> {
         data['ammunition'] = ammunition;
         data['weaponMods'] = weaponMods;
         data['armorMods'] = armorMods;
-        // TODO set to the proper boolean for if the source PDF can be accessed
-        // I'm thinking maybe check for the mod being installed?
-        data['hasSourcePdfAvailable'] = true;
-        data['activeSkills'] = this._getActiveSkillsForSelect();
+        data['activeSkills'] = this._getSortedActiveSkillsForSelect();
+        data['attributes'] = this._getSortedAttributesForSelect();
+        data['limits'] = this._getSortedLimitsForSelect();
 
         return data;
     }
 
-    _getActiveSkillsForSelect() {
-        if (!this.item.actor) return CONFIG.SR5.activeSkills;
+    /**
+     * Action limits currently contain limits for all action types. Be it matrix, magic or physical.
+     */
+    _getSortedLimitsForSelect(): Record<string, string> {
+        return Helpers.sortConfigValuesByTranslation(SR5.limits);
+    }
+
+    /**
+     * Only display
+     */
+    _getSortedAttributesForSelect(): Record<string, string> {
+        return Helpers.sortConfigValuesByTranslation(SR5.attributes);
+    }
+
+    _getSortedActiveSkillsForSelect() {
+        if (!this.item.actor) return SR5.activeSkills;
         const activeSkills = Helpers.sortSkills(this.item.actor.getActiveSkills());
 
         const activeSkillsForSelect = {};
