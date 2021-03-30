@@ -60,7 +60,7 @@
             <select name="data.action.attribute">
                 {{#select data.action.attribute}}
                 <option value=""></option>
-                {{#each config.attributes as |name type|}}
+                {{#each attributes as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
                 {{/each}} {{/select}}
             </select>
@@ -112,11 +112,10 @@
             <select name="data.action.limit.attribute">
                 {{#select data.action.limit.attribute}}
                 <option value=""></option>
-                {{#each config.limits as |name type|}}
+                {{#each limits as |name type|}}
                 <option value="{{type}}">{{localize name}}</option>
-                {{/each}} {{#each config.matrixAttributes as |name type|}}
-                <option value="{{type}}">{{localize name}}</option>
-                {{/each}} {{/select}}
+                {{/each}}
+                {{/select}}
             </select>
         </div>
     </div>
