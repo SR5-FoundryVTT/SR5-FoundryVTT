@@ -13522,6 +13522,9 @@ class SR5Actor extends Actor {
         const name = this.getVehicleTypeSkillName();
         return this.findActiveSkill(name);
     }
+    getSkills() {
+        return this.data.data.skills;
+    }
     getActiveSkills() {
         return this.data.data.skills.active;
     }
@@ -13549,22 +13552,36 @@ class SR5Actor extends Actor {
         const specializationBonus = options.specialization ? constants_1.SR.skill.SPECIALIZATION_MODIFIER : 0;
         return skillValue + attributeValue + specializationBonus;
     }
-    getSkill(skillId, options = { byLabel: false }) {
+    /**
+     * Find a skill either by id or label.
+     *
+     * Skills are mapped by an id, which can be a either a lower case name (legacy skills) or a short uid (custom, language, knowledge).
+     * Legacy skills use their name as the id, while not having a name set on the SkillField.
+     * Custom skills use an id and have their name set, however no label. This goes for active, language and knowledge.
+     *
+     * NOTE: Normalizing skill mapping from active, language and knowledge to a single skills with a type property would
+     *       clear this function up.
+     *
+     * @param id Either the searched id, name or translated label of a skill
+     * @param options .byLabel when true search will try to match given skillId with the translated label
+     */
+    getSkill(id, options = { byLabel: false }) {
         if (options.byLabel)
-            return this.getSkillByLabel(skillId);
+            return this.getSkillByLabel(id);
         const { skills } = this.data.data;
-        if (skills.active.hasOwnProperty(skillId)) {
-            return skills.active[skillId];
+        // Find skill by direct id to key matching.
+        if (skills.active.hasOwnProperty(id)) {
+            return skills.active[id];
         }
-        if (skills.language.value.hasOwnProperty(skillId)) {
-            return skills.language.value[skillId];
+        if (skills.language.value.hasOwnProperty(id)) {
+            return skills.language.value[id];
         }
         // Knowledge skills are de-normalized into categories (street, hobby, ...)
         for (const categoryKey in skills.knowledge) {
             if (skills.knowledge.hasOwnProperty(categoryKey)) {
                 const category = skills.knowledge[categoryKey];
-                if (category.value.hasOwnProperty(skillId)) {
-                    return category.value[skillId];
+                if (category.value.hasOwnProperty(id)) {
+                    return category.value[id];
                 }
             }
         }
@@ -13682,7 +13699,68 @@ class SR5Actor extends Actor {
             const activeSkills = this.getActiveSkills();
             if (!activeSkills.hasOwnProperty(skillId))
                 return;
+            const skill = this.getSkill(skillId);
+            if (!skill)
+                return;
+            // Don't delete legacy skills to allow prepared items to use them, should the user delete by accident.
+            if (skill.name === '' && skill.label !== '') {
+                yield this.hideSkill(skillId);
+                return;
+            }
+            // Remove custom skills without mercy!
             const updateData = helpers_1.Helpers.getDeleteDataEntry('data.skills.active', skillId);
+            yield this.update(updateData);
+        });
+    }
+    /**
+     * Mark the given skill as hidden.
+     *
+     * @param skillId The id of any type of skill.
+     */
+    hideSkill(skillId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!skillId)
+                return;
+            const skill = this.getSkill(skillId);
+            if (!skill)
+                return;
+            skill.hidden = true;
+            const updateData = helpers_1.Helpers.getUpdateDataEntry(`data.skills.active.${skillId}`, skill);
+            yield this.update(updateData);
+        });
+    }
+    /**
+     * mark the given skill as visible.
+     *
+     * @param skillId The id of any type of skill.
+     */
+    showSkill(skillId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!skillId)
+                return;
+            const skill = this.getSkill(skillId);
+            if (!skill)
+                return;
+            skill.hidden = false;
+            const updateData = helpers_1.Helpers.getUpdateDataEntry(`data.skills.active.${skillId}`, skill);
+            yield this.update(updateData);
+        });
+    }
+    /**
+     * Show all hidden skills.
+     */
+    showHiddenSkills() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const updateData = {};
+            const skills = this.getActiveSkills();
+            for (const [id, skill] of Object.entries(skills)) {
+                if (skill.hidden === true) {
+                    skill.hidden = false;
+                    updateData[`data.skills.active.${id}`] = skill;
+                }
+            }
+            if (!updateData)
+                return;
             yield this.update(updateData);
         });
     }
@@ -14924,6 +15002,11 @@ class SR5ActorSheet extends ActorSheet {
     _filterSkills(data, skills) {
         const filteredSkills = {};
         for (let [key, skill] of Object.entries(skills)) {
+            // Don't show hidden skills.
+            if (skill.hidden) {
+                continue;
+            }
+            // Filter visible skills.
             if (this._showSkill(key, skill, data)) {
                 filteredSkills[key] = skill;
             }
@@ -15153,6 +15236,7 @@ class SR5ActorSheet extends ActorSheet {
         html.find('.reload-ammo').click(this._onReloadAmmo.bind(this));
         html.find('.matrix-att-selector').change(this._onMatrixAttributeSelected.bind(this));
         html.find('.import-character').click(this._onShowImportCharacter.bind(this));
+        html.find('.show-hidden-skills').click(this._onShowHiddenSkills.bind(this));
         /**
          * Open the PDF for an item on the actor
          */
@@ -15744,6 +15828,12 @@ class SR5ActorSheet extends ActorSheet {
             title: 'Chummer Import',
         };
         new chummer_import_form_1.ChummerImportForm(this.actor, options).render(true);
+    }
+    _onShowHiddenSkills(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            yield this.actor.showHiddenSkills();
+        });
     }
     handleRemoveVehicleDriver(event) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -23501,7 +23591,18 @@ class Helpers {
             updateSkillData
         };
     }
-    /** A simple helper to delete existing entity data keys.
+    /**
+     * A simple helper to get an data entry for updating with Entity.update
+     *
+     * @param path The main data path as a doted string relative from the type data (not entity data).
+     * @param value Whatever needs to be stored.
+     *
+     */
+    static getUpdateDataEntry(path, value) {
+        return { [path]: value };
+    }
+    /**
+     * A simple helper to delete existing entity data keys with Entity.update
      *
      * @param path The main data path as doted string relative from the item type data (not entity data). data.skills.active
      * @param key The single sub property within the path that's meant to be deleted. 'test'

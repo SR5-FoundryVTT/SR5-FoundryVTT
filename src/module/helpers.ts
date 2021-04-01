@@ -465,7 +465,18 @@ export class Helpers {
         }
     }
 
-    /** A simple helper to delete existing entity data keys.
+    /**
+     * A simple helper to get an data entry for updating with Entity.update
+     *
+     * @param path The main data path as a doted string relative from the type data (not entity data).
+     * @param value Whatever needs to be stored.
+     *
+     */
+    static getUpdateDataEntry(path: string, value: any): {[path: string]: any} {
+        return {[path]: value};
+    }
+    /**
+     * A simple helper to delete existing entity data keys with Entity.update
      *
      * @param path The main data path as doted string relative from the item type data (not entity data). data.skills.active
      * @param key The single sub property within the path that's meant to be deleted. 'test'
