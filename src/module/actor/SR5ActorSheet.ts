@@ -210,6 +210,11 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
     _filterSkills(data: SR5ActorSheetData, skills: Skills) {
         const filteredSkills = {};
         for (let [key, skill] of Object.entries(skills)) {
+            // Don't show hidden skills.
+            if (skill.hidden) {
+                continue;
+            }
+            // Filter visible skills.
             if (this._showSkill(key, skill, data)) {
                 filteredSkills[key] = skill;
             }
@@ -459,6 +464,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         html.find('.matrix-att-selector').change(this._onMatrixAttributeSelected.bind(this));
 
         html.find('.import-character').click(this._onShowImportCharacter.bind(this));
+        html.find('.show-hidden-skills').click(this._onShowHiddenSkills.bind(this));
 
         /**
          * Open the PDF for an item on the actor
@@ -1051,6 +1057,13 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         };
         new ChummerImportForm(this.actor, options).render(true);
     }
+
+    async _onShowHiddenSkills(event) {
+        event.preventDefault();
+
+        await this.actor.showHiddenSkills();
+    }
+
 
     async handleRemoveVehicleDriver(event) {
         event.preventDefault();

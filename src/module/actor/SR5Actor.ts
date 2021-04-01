@@ -265,6 +265,9 @@ export class SR5Actor extends Actor<SR5ActorData> {
         return this.findActiveSkill(name);
     }
 
+    getSkills() {
+        return this.data.data.skills;
+    }
     getActiveSkills(): Skills {
         return this.data.data.skills.active;
     }
@@ -296,23 +299,38 @@ export class SR5Actor extends Actor<SR5ActorData> {
         return skillValue + attributeValue + specializationBonus;
     }
 
-    getSkill(skillId: string, options= {byLabel: false}): SkillField | undefined {
+    /**
+     * Find a skill either by id or label.
+     *
+     * Skills are mapped by an id, which can be a either a lower case name (legacy skills) or a short uid (custom, language, knowledge).
+     * Legacy skills use their name as the id, while not having a name set on the SkillField.
+     * Custom skills use an id and have their name set, however no label. This goes for active, language and knowledge.
+     *
+     * NOTE: Normalizing skill mapping from active, language and knowledge to a single skills with a type property would
+     *       clear this function up.
+     *
+     * @param id Either the searched id, name or translated label of a skill
+     * @param options .byLabel when true search will try to match given skillId with the translated label
+     */
+    getSkill(id: string, options= {byLabel: false}): SkillField | undefined {
         if (options.byLabel)
-            return this.getSkillByLabel(skillId);
+            return this.getSkillByLabel(id);
 
         const { skills } = this.data.data;
-        if (skills.active.hasOwnProperty(skillId)) {
-            return skills.active[skillId];
+
+        // Find skill by direct id to key matching.
+        if (skills.active.hasOwnProperty(id)) {
+            return skills.active[id];
         }
-        if (skills.language.value.hasOwnProperty(skillId)) {
-            return skills.language.value[skillId];
+        if (skills.language.value.hasOwnProperty(id)) {
+            return skills.language.value[id];
         }
         // Knowledge skills are de-normalized into categories (street, hobby, ...)
         for (const categoryKey in skills.knowledge) {
             if (skills.knowledge.hasOwnProperty(categoryKey)) {
                 const category = skills.knowledge[categoryKey];
-                if (category.value.hasOwnProperty(skillId)) {
-                    return category.value[skillId];
+                if (category.value.hasOwnProperty(id)) {
+                    return category.value[id];
                 }
             }
         }
@@ -446,8 +464,66 @@ export class SR5Actor extends Actor<SR5ActorData> {
     async removeActiveSkill(skillId: string) {
         const activeSkills = this.getActiveSkills();
         if (!activeSkills.hasOwnProperty(skillId)) return;
+        const skill = this.getSkill(skillId);
+        if (!skill) return;
 
+        // Don't delete legacy skills to allow prepared items to use them, should the user delete by accident.
+        if (skill.name === '' && skill.label !== '') {
+            await this.hideSkill(skillId);
+            return;
+        }
+
+        // Remove custom skills without mercy!
         const updateData = Helpers.getDeleteDataEntry('data.skills.active', skillId);
+        await this.update(updateData);
+    }
+
+    /**
+     * Mark the given skill as hidden.
+     *
+     * @param skillId The id of any type of skill.
+     */
+    async hideSkill(skillId: string) {
+        if (!skillId) return;
+        const skill = this.getSkill(skillId);
+        if (!skill) return;
+
+        skill.hidden = true;
+        const updateData = Helpers.getUpdateDataEntry(`data.skills.active.${skillId}`, skill);
+        await this.update(updateData);
+    }
+
+    /**
+     * mark the given skill as visible.
+     *
+     * @param skillId The id of any type of skill.
+     */
+    async showSkill(skillId: string) {
+        if (!skillId) return;
+        const skill = this.getSkill(skillId);
+        if (!skill) return;
+
+        skill.hidden = false;
+        const updateData = Helpers.getUpdateDataEntry(`data.skills.active.${skillId}`, skill);
+        await this.update(updateData);
+    }
+
+    /**
+     * Show all hidden skills.
+     */
+    async showHiddenSkills() {
+        const updateData = {};
+
+        const skills = this.getActiveSkills();
+        for (const [id, skill] of Object.entries(skills)) {
+            if (skill.hidden === true) {
+                skill.hidden = false;
+                updateData[`data.skills.active.${id}`] = skill;
+            }
+        }
+
+        if (!updateData) return;
+
         await this.update(updateData);
     }
 
