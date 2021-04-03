@@ -7,6 +7,7 @@ import ActorArmorData = Shadowrun.ActorArmorData;
 import ModifiedDamageData = Shadowrun.ModifiedDamageData;
 import ModifiableValue = Shadowrun.ModifiableValue;
 import CharacterActorData = Shadowrun.CharacterActorData;
+import Spell = Shadowrun.Spell;
 
 /**
  * Soaking rules for actors
@@ -21,18 +22,36 @@ export class SoakRules {
      */
     static applyAllSoakParts(soakParts: PartsList<number>, actor: SR5Actor, damageData: DamageData) {
         if (damageData.type.base !== 'matrix') {
-            SoakRules.applyMundaneAttackSoakParts(soakParts, actor, damageData);
+            SoakRules.applyPhysicalAndStunSoakParts(soakParts, actor, damageData);
         } else {
             SoakRules.applyMatrixSoakParts(soakParts, actor);
         }
     }
 
-    private static applyMundaneAttackSoakParts(soakParts: PartsList<number>, actor: SR5Actor, damageData: DamageData) {
+    private static applyPhysicalAndStunSoakParts(soakParts: PartsList<number>, actor: SR5Actor, damageData: DamageData) {
+        // Apply special rules for direct combat spells
+        const damageSourceItem = Helpers.findDamageSource(damageData); 
+        if (damageSourceItem && damageSourceItem.isCombatSpell()) {
+            return SoakRules.applyDirectCombatSpellParts(damageSourceItem.data as Spell, soakParts, actor);
+        }
+
         SoakRules.applyBodyAndArmorParts(soakParts, actor);
 
         const armor = actor.getArmor();
         SoakRules.applyArmorPenetration(soakParts, armor, damageData);
         SoakRules.applyElementalArmor(soakParts, armor, damageData.element.base);
+    }
+
+    private static applyDirectCombatSpellParts(spellItem: Spell, soakParts: PartsList<number>, actor: SR5Actor) {
+        if (spellItem.data.type === 'mana') {
+            SoakRules.addUniquePart(soakParts, actor.getAttribute('willpower'), SR5.attributes.willpower);
+        }
+
+        else {
+            SoakRules.addUniquePart(soakParts, actor.getAttribute('body'), SR5.attributes.body);
+        }
+
+        return;
     }
 
     private static applyBodyAndArmorParts(soakParts: PartsList<number>, actor: SR5Actor) {
@@ -150,6 +169,12 @@ export class SoakRules {
             updatedDamage.type.value = 'physical';
         }
  
+        const damageSourceItem = Helpers.findDamageSource(damage);
+        if (damageSourceItem && damageSourceItem.isCombatSpell()) {
+            // Damage from direct combat spells is never converted
+            return updatedDamage;
+        }
+
         updatedDamage = SoakRules.modifyPhysicalDamageForArmor(updatedDamage, actor);
         return SoakRules.modifyMatrixDamageForBiofeedback(updatedDamage, actor);
     }

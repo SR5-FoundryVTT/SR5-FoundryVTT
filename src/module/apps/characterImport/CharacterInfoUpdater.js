@@ -75,8 +75,13 @@ export class CharacterInfoUpdater {
         const clonedActorData = duplicate(actorData);
 
         // Name is required, so we need to always set something (even if the chummer field is empty)
-        clonedActorData.name = chummerChar.alias ? chummerChar.alias : '[Name not found]';
-        
+        if (chummerChar.alias) {
+            clonedActorData.name = chummerChar.alias;
+        } 
+        else {
+            clonedActorData.name = chummerChar.name ? chummerChar.name : '[Name not found]';
+        }
+
         this.importBasicData(clonedActorData.data, chummerChar);
         this.importBio(clonedActorData.data, chummerChar);
         this.importAttributes(clonedActorData.data, chummerChar)
