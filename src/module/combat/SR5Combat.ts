@@ -208,13 +208,16 @@ export class SR5Combat extends Combat {
      */
     get nextViableTurnPosition(): number {
         // Start at the next position after the current one.
-        for (let n = this.turn + 1; n++; n < this.combatants.length) {
-            const combatant = this.combatants[n];
-            if (combatant.initiative > 0)
-                return n;
+        for (let [turnInPass, combatant] of this.turns.entries()) {
+            // Skipping is only interesting when moving forward.
+            if (turnInPass <= this.turn) continue;
+            // @ts-ignore
+            if (combatant.initiative > 0) {
+                return turnInPass;
+            }
         }
-        // If nothing is found, start at the top.
-        return 0
+        // The current turn is the last undefeated combatant. So go to the end and beeeeyooond.
+        return this.turns.length;
     }
 
     /**
