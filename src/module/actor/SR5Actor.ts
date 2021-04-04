@@ -468,8 +468,12 @@ export class SR5Actor extends Actor<SR5ActorData> {
         if (!skill) return;
 
         // Don't delete legacy skills to allow prepared items to use them, should the user delete by accident.
-        if (skill.name === '' && skill.label !== '') {
+        // New custom skills won't have a label set also.
+        if (skill.name === '' && skill.label !== undefined && skill.label !== '') {
             await this.hideSkill(skillId);
+            // NOTE: For some reason unlinked token actors won't cause a render on update?
+            if (!this.data.token.actorLink)
+                await this.sheet.render();
             return;
         }
 
@@ -480,6 +484,8 @@ export class SR5Actor extends Actor<SR5ActorData> {
 
     /**
      * Mark the given skill as hidden.
+     *
+     * NOTE: Hiding skills has
      *
      * @param skillId The id of any type of skill.
      */
@@ -525,6 +531,9 @@ export class SR5Actor extends Actor<SR5ActorData> {
         if (!updateData) return;
 
         await this.update(updateData);
+        // NOTE: For some reason unlinked token actors won't cause a render on update?
+        if (!this.data.token.actorLink)
+                await this.sheet.render();
     }
 
     async rollFade(options: ActorRollOptions = {}, incoming = -1): Promise<ShadowrunRoll|undefined> {

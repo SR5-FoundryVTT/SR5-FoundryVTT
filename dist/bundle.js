@@ -13703,8 +13703,12 @@ class SR5Actor extends Actor {
             if (!skill)
                 return;
             // Don't delete legacy skills to allow prepared items to use them, should the user delete by accident.
-            if (skill.name === '' && skill.label !== '') {
+            // New custom skills won't have a label set also.
+            if (skill.name === '' && skill.label !== undefined && skill.label !== '') {
                 yield this.hideSkill(skillId);
+                // NOTE: For some reason unlinked token actors won't cause a render on update?
+                if (!this.data.token.actorLink)
+                    yield this.sheet.render();
                 return;
             }
             // Remove custom skills without mercy!
@@ -13714,6 +13718,8 @@ class SR5Actor extends Actor {
     }
     /**
      * Mark the given skill as hidden.
+     *
+     * NOTE: Hiding skills has
      *
      * @param skillId The id of any type of skill.
      */
@@ -13762,6 +13768,9 @@ class SR5Actor extends Actor {
             if (!updateData)
                 return;
             yield this.update(updateData);
+            // NOTE: For some reason unlinked token actors won't cause a render on update?
+            if (!this.data.token.actorLink)
+                yield this.sheet.render();
         });
     }
     rollFade(options = {}, incoming = -1) {
