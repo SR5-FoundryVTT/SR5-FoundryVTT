@@ -26,7 +26,7 @@ In general the application within FoundryVTT will use what's the build process p
 Since 0.7.13 there is unit testing support using the FVTT Quench module (https://github.com/schultzcole/FVTT-Quench). This module isn't available on the Foundry VTT module store and needs to be manually installed by developers in order to run unittests within a Foundry environment. It's encouraged to do some unit testing where possible. Rule modules should always contain some testing, while flow modules are encouraged to have some. Any application layers don't need testing. See the structure section for some broad overview over different layers / modules.
 
 ## Structure
-More and more parts of the system move to separtate different layers into different modules:
+More and more parts of the system move to separtate modules organized into these broad layers:
 * Rules layer. Shouldn't contain any references to Foundry objects. At best system objects should be used (like a PartsList)
 * Flow layer. Should use the rules modules to introduce an order of operations for them and collect and output information. This will contain Foundry objects.
 * Application layer. Handle interface operations. Dialogs. Application windows. Chat Message creation and so forth.
