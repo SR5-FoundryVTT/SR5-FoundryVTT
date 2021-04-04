@@ -137,6 +137,7 @@ export class SR5Combat extends Combat {
         const combat = game.combats.get(combatId) as SR5Combat;
         if (!combat) return;
         await combat.resetAll();
+        await SR5Combat.setInitiativePass(combat, SR.combat.INITIAL_INI_PASS);
 
         if (game.settings.get(SYSTEM_NAME, FLAGS.OnlyAutoRollNPCInCombat)) {
             await combat.rollNPC();
@@ -144,7 +145,7 @@ export class SR5Combat extends Combat {
             await combat.rollAll();
         }
 
-        const turn = 0
+        const turn = 0;
         await combat.update({turn});
     }
 
@@ -167,6 +168,8 @@ export class SR5Combat extends Combat {
 
         // now we sort by ERIC
         const genData = (actor) => {
+            // There are broken scenes out there, which will try setting up a combat without valid actors.
+            if (!actor) return [0, 0, 0, 0];
             // edge, reaction, intuition, coin flip
             return [
                 Number(actor.getEdge().value),
@@ -292,7 +295,7 @@ export class SR5Combat extends Combat {
         const nextTurn = 0;
 
         await SR5Combat.setInitiativePass(this, initiativePass);
-        return await this.update({round: nextRound, turn: nextTurn});
+        await this.update({round: nextRound, turn: nextTurn});
 
         if (game.settings.get(SYSTEM_NAME, FLAGS.OnlyAutoRollNPCInCombat)) {
             await this.rollNPC();
@@ -304,7 +307,6 @@ export class SR5Combat extends Combat {
     async nextRound(): Promise<void> {
         // Let Foundry handle time and some other things.
         await super.nextRound();
-        await SR5Combat.setInitiativePass(this, SR.combat.INITIAL_INI_PASS);
 
         // Owner permissions are needed to change the shadowrun initiative round.
         if (!game.user.isGM) {
