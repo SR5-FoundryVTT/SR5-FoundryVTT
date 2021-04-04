@@ -11,19 +11,21 @@ export const registerBasicHelpers = () => {
     });
 
     Handlebars.registerHelper('localizeSkill', function (skill: SkillField): string {
-        const translatedSkill = skill.label ? game.i18n.localize(skill.label) : skill.name;
-        if (!game.settings.get(SYSTEM_NAME, FLAGS.ShowSkillsWithDetails) || !translatedSkill || !skill.attribute)
-            return translatedSkill;
-
-        // Try showing the first three letters, or less.
-        const translatedAttribute = game.i18n.localize(SR5.attributes[skill.attribute]);
-        if (!translatedAttribute) return translatedSkill;
-
-        const cutToIndex = translatedAttribute.length < SR.attributes.SHORT_NAME_LENGTH ?
-            translatedAttribute.length -1 :
-            SR.attributes.SHORT_NAME_LENGTH;
-        const translatedAttributeShorthand = translatedAttribute.substring(0, cutToIndex).toUpperCase();
-        return `${translatedSkill} (${translatedAttributeShorthand})`;
+        return skill.label ? game.i18n.localize(skill.label) : skill.name;
+        // NOTE: Below is code to append a shortened attribute name to the skill name. It's been removed for readability.
+        //       But still might useful for someone.
+        // if (!game.settings.get(SYSTEM_NAME, FLAGS.ShowSkillsWithDetails) || !translatedSkill || !skill.attribute)
+        //     return translatedSkill;
+        //
+        // // Try showing the first three letters, or less.
+        // const translatedAttribute = game.i18n.localize(SR5.attributes[skill.attribute]);
+        // if (!translatedAttribute) return translatedSkill;
+        //
+        // const cutToIndex = translatedAttribute.length < SR.attributes.SHORT_NAME_LENGTH ?
+        //     translatedAttribute.length -1 :
+        //     SR.attributes.SHORT_NAME_LENGTH;
+        // const translatedAttributeShorthand = translatedAttribute.substring(0, cutToIndex).toUpperCase();
+        // return `${translatedSkill} (${translatedAttributeShorthand})`;
     });
 
     Handlebars.registerHelper('toHeaderCase', function (str) {
