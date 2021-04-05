@@ -1,6 +1,5 @@
 import { Helpers } from '../helpers';
 import { SR5Item } from './SR5Item';
-import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import {SR5} from "../config";
 
 /**
@@ -103,15 +102,21 @@ export class SR5ItemSheet extends ItemSheet<{}, SR5Item> {
     }
 
     /**
-     * Only display
+     * Sorted (by translation) actor attributes.
      */
     _getSortedAttributesForSelect(): Record<string, string> {
         return Helpers.sortConfigValuesByTranslation(SR5.attributes);
     }
 
+    /**
+     * Sorted (by translation) active skills either from the owning actor or general configuration.
+     */
     _getSortedActiveSkillsForSelect() {
-        if (!this.item.actor) return SR5.activeSkills;
-        const activeSkills = Helpers.sortSkills(this.item.actor.getActiveSkills());
+        // We need the actor owner, instead of the item owner. See actorOwner jsdoc for details.
+        const actor = this.item.actorOwner;
+        if (!actor) return Helpers.sortConfigValuesByTranslation(SR5.activeSkills);
+
+        const activeSkills = Helpers.sortSkills(actor.getActiveSkills());
 
         const activeSkillsForSelect = {};
         for (const [id, skill] of Object.entries(activeSkills)) {
