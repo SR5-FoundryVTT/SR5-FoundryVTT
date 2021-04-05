@@ -31223,12 +31223,14 @@ exports.default = Template;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.quenchRegister = void 0;
 const sr5_Modifiers_spec_1 = require("./sr5.Modifiers.spec");
+const sr5_SR5Item_spec_1 = require("./sr5.SR5Item.spec");
 const quenchRegister = quench => {
     quench.registerBatch("shadowrun5e.rules.modifiers", sr5_Modifiers_spec_1.shadowrunRulesModifiers);
+    quench.registerBatch("shadowrun5e.entities.items", sr5_SR5Item_spec_1.shadowrunSR5Item);
 };
 exports.quenchRegister = quenchRegister;
 
-},{"./sr5.Modifiers.spec":215}],215:[function(require,module,exports){
+},{"./sr5.Modifiers.spec":215,"./sr5.SR5Item.spec":216}],215:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shadowrunRulesModifiers = void 0;
@@ -31397,6 +31399,113 @@ const shadowrunRulesModifiers = context => {
 };
 exports.shadowrunRulesModifiers = shadowrunRulesModifiers;
 
-},{"../module/sr5/Modifiers":212}]},{},[201])
+},{"../module/sr5/Modifiers":212}],216:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.shadowrunSR5Item = void 0;
+const SR5Item_1 = require("../module/item/SR5Item");
+const shadowrunSR5Item = context => {
+    /**
+     * Setup handling for all items within this test.
+     */
+    class TestingItems {
+        constructor() {
+            this.items = {};
+        }
+        create(data) {
+            return __awaiter(this, void 0, void 0, function* () {
+                const item = yield Item.create(Object.assign({ name: '#QUENCH_TEST_ITEM_SHOULD_HAVE_BEEN_DELETED' }, data));
+                this.items[item.id] = item;
+                return item;
+            });
+        }
+        delete(id) {
+            return __awaiter(this, void 0, void 0, function* () {
+                const item = this.items[id];
+                if (!item)
+                    return;
+                yield Item.delete(item.data._id);
+                delete this.items[item.id];
+            });
+        }
+        teardown() {
+            return __awaiter(this, void 0, void 0, function* () {
+                Object.values(this.items).forEach(item => this.delete(item.id));
+            });
+        }
+    }
+    const { describe, it, assert, before, after } = context;
+    let testing;
+    before(() => __awaiter(void 0, void 0, void 0, function* () {
+        testing = new TestingItems();
+    }));
+    after(() => __awaiter(void 0, void 0, void 0, function* () {
+        yield testing.teardown();
+    }));
+    describe('SR5Items', () => {
+        it('Should create a naked item of any type', () => __awaiter(void 0, void 0, void 0, function* () {
+            const item = yield testing.create({ type: 'action' });
+            // Check basic foundry data integrity
+            assert.notStrictEqual(item.id, '');
+            assert.notStrictEqual(item.id, undefined);
+            assert.notStrictEqual(item.id, null);
+            // Check foundry item collection integrity
+            const itemFromCollection = game.items.get(item.id);
+            assert.notStrictEqual(itemFromCollection, null);
+            assert.strictEqual(item.id, itemFromCollection.id);
+        }));
+        it('Should update an item of any type', () => __awaiter(void 0, void 0, void 0, function* () {
+            const item = yield testing.create({ type: 'action' });
+            assert.notProperty(item.data.data, 'test');
+            yield item.update({ 'data.test': true });
+            assert.property(item.data.data, 'test');
+            assert.propertyVal(item.data.data, 'test', true);
+        }));
+        it('Should embedd an ammo into a weapon and not the global item collection', () => __awaiter(void 0, void 0, void 0, function* () {
+            const weapon = yield testing.create({ type: 'weapon' });
+            const ammo = yield testing.create({ type: 'ammo' });
+            yield weapon.createOwnedItem(ammo.data);
+            const embeddedItemDatas = weapon.getEmbeddedItems();
+            assert.isNotEmpty(embeddedItemDatas);
+            assert.lengthOf(embeddedItemDatas, 1);
+            const embeddedAmmoData = embeddedItemDatas[0];
+            assert.strictEqual(embeddedAmmoData.type, ammo.data.type);
+            // An embedded item should NOT appear in the items collection.
+            const embeddedAmmoInCollection = game.items.get(embeddedAmmoData._id);
+            assert.strictEqual(embeddedAmmoInCollection, null);
+        }));
+        it('Should update an embedded ammo', () => __awaiter(void 0, void 0, void 0, function* () {
+            const weapon = yield testing.create({ type: 'weapon' });
+            const ammo = yield testing.create({ type: 'ammo' });
+            // Embed the item and get
+            yield weapon.createOwnedItem(ammo.data);
+            const embeddedItemDatas = weapon.getEmbeddedItems();
+            assert.lengthOf(embeddedItemDatas, 1);
+            const embeddedAmmoData = embeddedItemDatas[0];
+            const embeddedAmmo = weapon.getOwnedItem(embeddedAmmoData._id);
+            assert.notStrictEqual(embeddedAmmo, undefined);
+            assert.instanceOf(embeddedAmmo, SR5Item_1.SR5Item);
+            if (!embeddedAmmo)
+                return; //type script gate...
+            // Set an testing property.
+            assert.notProperty(embeddedAmmo.data.data, 'test');
+            yield embeddedAmmo.update({ 'data.test': true });
+            assert.property(embeddedAmmo.data.data, 'test');
+            assert.propertyVal(embeddedAmmo.data.data, 'test', true);
+        }));
+    });
+};
+exports.shadowrunSR5Item = shadowrunSR5Item;
+
+},{"../module/item/SR5Item":197}]},{},[201])
 
 //# sourceMappingURL=bundle.js.map
