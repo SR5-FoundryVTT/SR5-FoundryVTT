@@ -27206,6 +27206,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5Item = void 0;
 const helpers_1 = require("../helpers");
+const SR5Actor_1 = require("../actor/SR5Actor");
 const ShadowrunItemDialog_1 = require("../apps/dialogs/ShadowrunItemDialog");
 const ChatData_1 = require("./ChatData");
 const ShadowrunRoller_1 = require("../rolls/ShadowrunRoller");
@@ -27215,6 +27216,20 @@ const SR5ItemDataWrapper_1 = require("./SR5ItemDataWrapper");
 const PartsList_1 = require("../parts/PartsList");
 const ItemAction_1 = require("./ItemAction");
 const SkillFlow_1 = require("../actor/SkillFlow");
+/**
+ * Implementation of Shadowrun5e items (owned, unowned and embedded).
+ *
+ * NOTE: taMiF here. It seems to me that the current approach to embedded items within items doesn't use foundry internal
+ *       approach but instead overwrites it with using flags and storing / creating item from that flag.
+ *       I'm not sure why the Foundry internal approach of Entity.createEmbeddedEntity didn't fit. However at the
+ *       moment this means, that this.actor can actually be an SR5Actor as well as an SR5Item, depending on who
+ *       'owns' the embedded item as they are created using Item.createOwned during the embedded item prep phase.
+ *
+ *       For this reason SR5Item.actorOwner has been introduced to allow access to the actual owning actor, no matter
+ *       how deep embedded into other items an item is.
+ *
+ *       Be wary of SR5Item.actor for this reason!
+ */
 class SR5Item extends Item {
     constructor() {
         super(...arguments);
@@ -27222,6 +27237,27 @@ class SR5Item extends Item {
     }
     get actor() {
         return super.actor;
+    }
+    /**
+     * Helper property to get an actual actor for an owned or embedded item. You'll need this for when you work with
+     * embeddedItems, as they have their .actor property set to the item they're embedded into.
+     *
+     * NOTE: This helper is necessary since we have setup embedded items with an item owner, due to the current embedding
+     *       workflow using item.update.isOwned condition within Item.update (foundry Item) to NOT trigger a global item
+     *       update within the ItemCollection but instead have this.actor.updateEmbeddedEntities actually trigger SR5Item.updateEmbeddedEntities
+     */
+    get actorOwner() {
+        // An unowned item won't have an actor.
+        if (!this.actor)
+            return;
+        // An owned item will have an actor.
+        if (this.actor instanceof SR5Actor_1.SR5Actor)
+            return this.actor;
+        // An embedded item will have an item as an actor, which might have an actor owner.
+        // NOTE: This is very likely wrong and should be fixed during embedded item prep / creation. this.actor will only
+        //       check what is set in the items options.actor during it's construction.
+        //@ts-ignore
+        return this.actor.actorOwner;
     }
     get wrapper() {
         // we need to cast here to unknown first to make ts happy
@@ -27881,7 +27917,6 @@ class SR5Item extends Item {
      * Rolls a test using the latest stored data on the item (force, fireMode, level)
      * @param event - mouse event
      * @param actionTestData
-     * @param options - any additional roll options to pass along - note that currently the Item will overwrite -- WIP
      */
     rollTest(event, actionTestData) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -27998,14 +28033,17 @@ class SR5Item extends Item {
                     // Patch .data isn't really anymore but do it for consistency.
                     // Patch ._data is needed for Item.prepareData to work, as it's simply duplicating _data over data.
                     // Otherwise old item data will be used for value preparation.
+                    // TODO: Foundry 0.8 does changes to .data / ._data. This MIGHT cause issues here, however I'm unsure.
                     currentItem.data = item;
                     currentItem._data = item;
                     currentItem.prepareData();
                     return currentItem;
                 }
                 else {
-                    // dirty things done here
-                    // @ts-ignore
+                    // NOTE: createdOwned expects an Actor instance as the second parameter.
+                    //       HOWEVER the legacy approach for embeddedItems in other items relies upon this.actor
+                    //       returning an SR5Item instance to call .updateEmbeddedEntities, when Foundry expects an actor
+                    //@ts-ignore
                     return Item.createOwned(item, this);
                 }
             });
@@ -28044,6 +28082,13 @@ class SR5Item extends Item {
             return true;
         });
     }
+    /**
+     * This method hooks into the Foundry Item.update approach and is called using this<Item>.actor.updateEmbeddedEntity.
+     *
+     * @param embeddedName
+     * @param updateData
+     * @param options
+     */
     updateEmbeddedEntity(embeddedName, updateData, options) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.updateOwnedItem(updateData);
@@ -28497,7 +28542,7 @@ class SR5Item extends Item {
 }
 exports.SR5Item = SR5Item;
 
-},{"../actor/SkillFlow":88,"../apps/dialogs/ShadowrunItemDialog":136,"../chat":143,"../constants":146,"../helpers":156,"../parts/PartsList":208,"../rolls/ShadowrunRoller":209,"./ChatData":195,"./ItemAction":196,"./SR5ItemDataWrapper":198}],198:[function(require,module,exports){
+},{"../actor/SR5Actor":86,"../actor/SkillFlow":88,"../apps/dialogs/ShadowrunItemDialog":136,"../chat":143,"../constants":146,"../helpers":156,"../parts/PartsList":208,"../rolls/ShadowrunRoller":209,"./ChatData":195,"./ItemAction":196,"./SR5ItemDataWrapper":198}],198:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ItemDataWrapper = void 0;
@@ -28925,15 +28970,20 @@ class SR5ItemSheet extends ItemSheet {
         return helpers_1.Helpers.sortConfigValuesByTranslation(config_1.SR5.limits);
     }
     /**
-     * Only display
+     * Sorted (by translation) actor attributes.
      */
     _getSortedAttributesForSelect() {
         return helpers_1.Helpers.sortConfigValuesByTranslation(config_1.SR5.attributes);
     }
+    /**
+     * Sorted (by translation) active skills either from the owning actor or general configuration.
+     */
     _getSortedActiveSkillsForSelect() {
-        if (!this.item.actor)
-            return config_1.SR5.activeSkills;
-        const activeSkills = helpers_1.Helpers.sortSkills(this.item.actor.getActiveSkills());
+        // We need the actor owner, instead of the item owner. See actorOwner jsdoc for details.
+        const actor = this.item.actorOwner;
+        if (!actor)
+            return helpers_1.Helpers.sortConfigValuesByTranslation(config_1.SR5.activeSkills);
+        const activeSkills = helpers_1.Helpers.sortSkills(actor.getActiveSkills());
         const activeSkillsForSelect = {};
         for (const [id, skill] of Object.entries(activeSkills)) {
             // Legacy skills have no name, but their name is their id!
