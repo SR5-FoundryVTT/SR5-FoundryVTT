@@ -5,10 +5,18 @@ export class ModifiersPrep {
      * Prepare the modifiers that are displayed in the Misc. tab
      */
     static prepareModifiers(data: SR5ActorData) {
-        if (!data.modifiers) data.modifiers = {};
-        const modifiers = {};
-        let miscTabModifiers = [
-            'soak',
+        let modifiers = ModifiersPrep.commonModifiers;
+        modifiers = modifiers.concat(ModifiersPrep.matrixModifiers);
+        modifiers = modifiers.concat(ModifiersPrep.characterModifiers)
+        ModifiersPrep.setupModifiers(data, modifiers);
+    }
+
+    static get commonModifiers() {
+        return ['soak', 'defense'];
+    }
+
+    static get characterModifiers() {
+        return [
             'drain',
             'armor',
             'physical_limit',
@@ -20,28 +28,44 @@ export class ModifiersPrep {
             'meat_initiative_dice',
             'astral_initiative',
             'astral_initiative_dice',
-            'matrix_initiative',
-            'matrix_initiative_dice',
             'composure',
             'lift_carry',
             'judge_intentions',
             'memory',
             'walk',
             'run',
-            'defense',
             'wound_tolerance',
             'essence',
             'fade',
         ];
-        miscTabModifiers.sort();
-        // force global to the top
-        miscTabModifiers.unshift('global');
+    }
 
-        for (let item of miscTabModifiers) {
-            modifiers[item] = Number(data.modifiers[item]) || 0;
+    static get matrixModifiers() {
+        return [
+            'matrix_initiative',
+            'matrix_initiative_dice',
+            'matrix_track'
+        ]
+    }
+
+    static setupModifiers(data, modifiers) {
+        if (!data.modifiers) {
+            data.modifiers = {};
         }
 
-        data.modifiers = modifiers;
+        // TODO: localize sorting of modifiers.
+        modifiers.sort();
+        // add and force global to the top
+        modifiers.unshift('global');
+
+        // Prepare sorted modifiers and merge with existing values when set.
+        // Unset modifier values will be null or not exist at all.
+        const sorted = {};
+        for (const modifier of modifiers) {
+            sorted[modifier] = Number(data.modifiers[modifier]) || 0;
+        }
+
+        data.modifiers = sorted;
     }
 
     static clearAttributeMods(data: SR5ActorData) {

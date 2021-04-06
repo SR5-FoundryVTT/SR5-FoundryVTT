@@ -327,6 +327,7 @@ export const SR5 = {
         astral_initiative_dice: 'SR5.AstralDice',
         matrix_initiative: 'SR5.MatrixInit',
         matrix_initiative_dice: 'SR5.MatrixDice',
+        matrix_track: 'SR5.MatrixTrack',
         composure: 'SR5.RollComposure',
         lift_carry: 'SR5.RollLiftCarry',
         judge_intentions: 'SR5.RollJudgeIntentions',

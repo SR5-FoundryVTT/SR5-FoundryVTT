@@ -977,7 +977,6 @@
         "ic": {
             "templates": ["common", "attributes", "limits", "matrix"],
             "icType": "",
-
             "host": {
                 "rating": 0
             }

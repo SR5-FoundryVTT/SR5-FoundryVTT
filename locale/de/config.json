@@ -487,6 +487,7 @@
   "SR5.Run": "Laufen",
   "SR5.PhysicalTrack": "Körperlicher Monitor",
   "SR5.StunTrack": "Geistiger Monitor",
+  "SR5.MatrixTrack": "Matrix Monitor",
   "SR5.WoundTolerance": "Schmerztolleranz",
 
   "SR5.Program": "Programm",
