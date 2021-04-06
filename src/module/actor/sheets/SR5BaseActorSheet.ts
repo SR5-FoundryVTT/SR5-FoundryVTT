@@ -86,6 +86,10 @@ export class SR5BaseActorSheet extends ActorSheet<{}, SR5Actor> {
         // General item testing...
         html.find('.item-roll').click(this._onItemRoll.bind(this));
         html.find('.Roll').on('click', this._onRoll.bind(this));
+
+        // Condition monitor track handling...
+        html.find('.horizontal-cell-input .cell').on('click', this._onSetConditionTrackCell.bind(this));
+        html.find('.horizontal-cell-input .cell').on('contextmenu', this._onClearConditionTrack.bind(this));
     }
 
     /**
@@ -243,6 +247,72 @@ export class SR5BaseActorSheet extends ActorSheet<{}, SR5Actor> {
                 break;
             // end matrix
         }
+    }
+
+    /**
+     * Set any kind of condition monitor to a specific cell value.
+     */
+    async _onSetConditionTrackCell(event) {
+        event.preventDefault();
+
+        const value = Number(event.currentTarget.dataset.value);
+        const cmId = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
+        const data = {};
+        if (cmId === 'stun' || cmId === 'physical') {
+            const property = `data.track.${cmId}.value`;
+            data[property] = value;
+        } else if (cmId === 'edge') {
+            const property = `data.attributes.edge.uses`;
+            data[property] = value;
+        } else if (cmId === 'overflow') {
+            const property = 'data.track.physical.overflow.value';
+            data[property] = value;
+        } else if (cmId === 'matrix') {
+            const matrixDevice = this.actor.getMatrixDevice();
+            if (matrixDevice && !isNaN(value)) {
+                const updateData = {};
+                updateData['data.technology.condition_monitor.value'] = value;
+                await matrixDevice.update(updateData);
+            } else {
+                data['data.matrix.condition_monitor.value'] = value;
+            }
+        }
+        await this.actor.update(data);
+    }
+
+    async _onClearConditionTrack(event) {
+        event.preventDefault();
+
+        const cmId = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
+        const data = {};
+        if (cmId === 'stun') {
+            data[`data.track.stun.value`] = 0;
+        }
+        // Clearing the physical monitor should also clear the overflow.
+        else if (cmId === 'physical') {
+            data[`data.track.physical.value`] = 0;
+            data['data.track.physical.overflow.value'] = 0;
+
+        } else if (cmId === 'edge') {
+            data[`data.attributes.edge.uses`] = 0;
+
+        } else if (cmId === 'overflow') {
+            data['data.track.physical.overflow.value'] = 0;
+
+        } else if (cmId === 'matrix') {
+            const matrixDevice = this.actor.getMatrixDevice();
+
+            if (matrixDevice) {
+                const updateData = {};
+                updateData['data.technology.condition_monitor.value'] = 0;
+                await matrixDevice.update(updateData);
+
+            } else {
+                data['data.matrix.condition_monitor.value'] = 0;
+            }
+        }
+
+        await this.actor.update(data);
     }
 
     /**
