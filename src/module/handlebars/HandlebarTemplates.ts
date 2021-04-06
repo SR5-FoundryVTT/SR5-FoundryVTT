@@ -19,6 +19,8 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/tabs/vehicle/VehicleSkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/vehicle/VehicleMatrixTab.html',
 
+        'systems/shadowrun5e/dist/templates/actor/tabs/ic/ICActorTab.html',
+
         // uncategorized lists
         'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html',
         'systems/shadowrun5e/dist/templates/actor/parts/Movement.html',
@@ -55,6 +57,10 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleStatsList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleSecondStatsList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleMovement.html',
+
+        // IC
+        'systems/shadowrun5e/dist/templates/actor/parts/ic/ICStats.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/ic/ICConfiguration.html',
 
         // limited actor
         'systems/shadowrun5e/dist/templates/actor-limited/character.html',

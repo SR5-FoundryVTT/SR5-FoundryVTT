@@ -28,7 +28,8 @@
         "Spirit": "Geist",
         "Sprite": "Sprite",
         "Vehicle": "Fahrzeug",
-        "Critter": "Critter'"
+        "Critter": "Critter",
+        "IC": "IC"
     },
 
     "SR5.ActiveSkills": "Aktive Fertigkeiten",
@@ -610,6 +611,7 @@
           "RollPilotVehicleTest": "Fahrzeug steuern",
           "RollDroneInfiltration": "Drohne infiltrieren",
           "VehicleConfiguration": "Fahrzeug Konfiguration",
+          "ICConfiguration": "IC Configuration",
           "SetMonitor": "Monitor muss manuell gesetzt werden"
       }
   },

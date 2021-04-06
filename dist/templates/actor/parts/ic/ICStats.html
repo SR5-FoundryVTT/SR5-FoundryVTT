@@ -1,0 +1,25 @@
+<div class="flexcol">
+    {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Limits.html" }}
+    <div class="attributes">
+        {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                label="SR5.MatrixAttrAttack"
+                attribute=data.matrix.attack
+                attributesPath="data.matrix"
+        }}
+        {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                label="SR5.MatrixAttrSleaze"
+                attribute=data.matrix.sleaze
+                attributesPath="data.matrix"
+        }}
+        {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                label="SR5.MatrixAttrDataProc"
+                attribute=data.matrix.data_processing
+                attributesPath="data.matrix"
+        }}
+        {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                label="SR5.MatrixAttrFirewall"
+                attribute=data.matrix.firewall
+                attributesPath="data.matrix"
+        }}
+    </div>
+</div>

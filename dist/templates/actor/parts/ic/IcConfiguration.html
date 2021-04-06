@@ -1,0 +1,14 @@
+<div class="flexcol">
+    {{> "systems/shadowrun5e/dist/templates/common/HeaderBlock.html"
+            name=(localize "SR5.Labels.ActorSheet.ICConfiguration")
+    }}
+    {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.IC.Type") }}
+        <div>
+            {{> "systems/shadowrun5e/dist/templates/common/Select.html"
+                    options=config.ic.types
+                    value=data.icType
+                    path="data.icType"
+            }}
+        </div>
+    {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
+</div>

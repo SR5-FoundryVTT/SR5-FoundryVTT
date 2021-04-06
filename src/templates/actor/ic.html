@@ -24,10 +24,12 @@
     </header>
     <nav class="tabs" data-group="primary">
         <a class="item" data-tab="actions">{{localize "SR5.Actions"}}</a>
+        <a class="item" data-tab="actor">{{localize "SR5.ActorTypes.IC"}}</a>
         <a class="item" data-tab="misc">{{localize "SR5.Miscellaneous"}}</a>
     </nav>
     <section class="sheetbody">
         {{> "systems/shadowrun5e/dist/templates/actor/tabs/ActionsTab.html"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/ic/ICActorTab.html"}}
         {{> "systems/shadowrun5e/dist/templates/actor/tabs/MiscTab.html"}}
     </section>
 </form>

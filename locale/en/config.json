@@ -28,7 +28,8 @@
         "Spirit": "Spirit",
         "Sprite": "Sprite",
         "Vehicle": "Vehicle",
-        "Critter": "Critter"
+        "Critter": "Critter",
+        "IC": "IC"
     },
 
     "SR5.ActiveSkills": "Active Skills",
@@ -627,6 +628,7 @@
             "RollPilotVehicleTest": "Pilot Vehicle",
             "RollDroneInfiltration": "Drone Infiltration",
             "VehicleConfiguration": "Vehicle Configuration",
+            "ICConfiguration": "IC Configuration",
             "SetMonitor": "Monitor must be set manually."
         }
     },
@@ -779,6 +781,7 @@
     },
 
     "SR5.IC": {
+        "Type": "Type",
         "Types": {
             "Acid": "Acid",
             "Binder": "Binder",

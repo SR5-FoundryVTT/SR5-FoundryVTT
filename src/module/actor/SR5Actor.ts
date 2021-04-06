@@ -43,6 +43,7 @@ import SR5ActorData = Shadowrun.SR5ActorData;
 import Skills = Shadowrun.Skills;
 import {SkillRules} from "./SkillRules";
 import { SoakRules } from './SoakRules';
+import SR5ICType = Shadowrun.SR5ICType;
 
 export class SR5Actor extends Actor<SR5ActorData> {
     // NOTE: Overwrite Actor.data additionally to extends Actor<T as SR5Actortype.Data: SR5ActorData> to still have
@@ -241,6 +242,10 @@ export class SR5Actor extends Actor<SR5ActorData> {
 
     isCritter() {
         return this.getType() === 'critter';
+    }
+
+    isIC() {
+        return this.getType() === 'ic';
     }
 
     getVehicleTypeSkillName(): string | undefined {
@@ -1594,6 +1599,12 @@ export class SR5Actor extends Actor<SR5ActorData> {
     asCritterData(): SR5CritterType | undefined {
         if (this.isCritter()){
             return this.data as SR5CritterType;
+        }
+    }
+
+    asICData(): SR5ICType | undefined {
+        if (this.isIC()) {
+            return this.data as SR5ICType;
         }
     }
 
