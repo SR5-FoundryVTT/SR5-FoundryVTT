@@ -745,6 +745,25 @@
         }
     },
 
+    "SR5.IC": {
+        "Types": {
+            "Acid": "Säure",
+            "Binder": "Bremse",
+            "BlackIC": "Schwarzes IC",
+            "Blaster": "Blaster",
+            "Crash": "Absturz",
+            "Jammer": "Störer",
+            "Killer": "Killer",
+            "Marker": "Leuchtspur",
+            "Patrol": "Patrouille",
+            "Probe": "Marker",
+            "Scramble": "Wirbel",
+            "Sparky": "Sparky",
+            "TarBaby": "Teer Baby",
+            "Track": "Aufspüren"
+        }
+    },
+
     "SR5.Character": {
         "Types": {
             "Human": "Mensch",

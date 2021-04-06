@@ -7,22 +7,13 @@ declare namespace Shadowrun {
         data: SpiritActorData;
         type: 'spirit';
     };
-    export type SpiritActorData = MagicActorData &
+    export type SpiritActorData = CommonActorData &
+        MagicActorData &
         TwoTrackActorData &
         ArmorActorData &
         WoundsActorData &
         MovementActorData & {
         spiritType: SpiritType;
         force: number;
-        attributes: Attributes;
-        limits: Limits;
-        skills: {
-            active: Skills;
-            language: KnowledgeSkillList;
-            knowledge: KnowledgeSkills;
-        };
-        modifiers: Modifiers;
-        special: SpecialTrait;
-        initiative: Initiative;
     };
 }

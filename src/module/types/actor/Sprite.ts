@@ -7,21 +7,11 @@ declare namespace Shadowrun {
         data: SpriteActorData;
         type: 'sprite';
     };
-    export type SpriteActorData = MatrixActorData & {
+    export type SpriteActorData = CommonActorData & MatrixActorData & {
         level: number;
         services: number;
         registered: boolean;
         spriteType: SpriteType;
-        attributes: Attributes;
-        limits: Limits;
-        skills: {
-            active: Skills;
-            language: KnowledgeSkillList;
-            knowledge: KnowledgeSkills;
-        };
-        special: SpecialTrait;
-        initiative: Initiative;
-        modifiers: Modifiers;
     };
 
 }

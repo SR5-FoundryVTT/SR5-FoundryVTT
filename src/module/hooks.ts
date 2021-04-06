@@ -19,6 +19,7 @@ import { Import } from './importer/apps/import-form';
 import {ChangelogApplication} from "./apps/ChangelogApplication";
 import {EnvModifiersApplication} from "./apps/EnvModifiersApplication";
 import {quenchRegister} from "../test/quench";
+import {SR5ICActorSheet} from "./actor/sheets/SR5ICActorSheet";
 
 export class HooksManager {
     static registerHooks() {
@@ -75,8 +76,16 @@ ___________________
         Actors.unregisterSheet('core', ActorSheet);
         Actors.registerSheet(SYSTEM_NAME, SR5ActorSheet, {
             label: "SR5.SheetActor",
-            makeDefault: true
+            makeDefault: true,
+            types: ['character', 'vehicle', 'critter', 'spirit', 'sprite']
         });
+        Actors.registerSheet(SYSTEM_NAME, SR5ICActorSheet, {
+            label: "SR5.SheetActor",
+            makeDefault: true,
+            types: ['ic']
+        });
+
+
         Items.unregisterSheet('core', ItemSheet);
         Items.registerSheet(SYSTEM_NAME, SR5ItemSheet, {
             label: "SR5.SheetItem",

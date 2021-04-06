@@ -14,7 +14,8 @@ declare namespace Shadowrun {
 
     export type VehicleEnvironment = 'speed' | 'handling';
 
-    export type VehicleActorData = ArmorActorData &
+    export type VehicleActorData = CommonActorData &
+        ArmorActorData &
         MatrixActorData &
         MovementActorData &
         PhysicalTrackActorData & {
@@ -25,17 +26,6 @@ declare namespace Shadowrun {
             driver: string;
             environment: VehicleEnvironment;
             vehicle_stats: VehicleStats;
-
-            attributes: Attributes;
-            limits: Limits;
-            skills: {
-                active: Skills;
-                language: KnowledgeSkillList;
-                knowledge: KnowledgeSkills;
-            };
-            initiative: Initiative;
-            modifiers: Modifiers;
-            special: SpecialTrait;
         };
 
     export type VehicleStats = {

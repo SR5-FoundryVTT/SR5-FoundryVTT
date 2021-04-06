@@ -1,6 +1,6 @@
 {
     "Actor": {
-        "types": ["character", "spirit", "sprite", "vehicle", "critter"],
+        "types": ["character", "spirit", "sprite", "vehicle", "critter", "ic"],
         "templates": {
             "matrix": {
                 "matrix": {
@@ -972,6 +972,14 @@
                         "max": 0
                     }
                 }
+            }
+        },
+        "ic": {
+            "templates": ["common", "attributes", "limits", "matrix"],
+            "icType": "",
+
+            "host": {
+                "rating": 0
             }
         }
     },

@@ -460,6 +460,25 @@ export const SR5 = {
         },
     },
 
+    ic: {
+        types: {
+            acid: "SR5.IC.Types.Acid",
+            binder: "SR5.IC.Types.Binder",
+            black_ic: "SR5.IC.Types.BlackIC",
+            blaster: "SR5.IC.Types.Blaster",
+            crash: "SR5.IC.Types.Crash",
+            jammer: "SR5.IC.Types.Jammer",
+            killer: "SR5.IC.Types.Killer",
+            marker: "SR5.IC.Types.Marker",
+            patrol: "SR5.IC.Types.Patrol",
+            probe: "SR5.IC.Types.Probe",
+            scramble: "SR5.IC.Types.Scramble",
+            sparky: "SR5.IC.Types.Sparky",
+            tar_baby: "SR5.IC.Types.TarBaby",
+            track: "SR5.IC.Types.Track"
+        }
+    },
+
     character: {
         types: {
             human: 'SR5.Character.Types.Human',

@@ -24,7 +24,7 @@ declare namespace Shadowrun {
         showUntrainedSkills
     };
 
-    export type SR5ActorType = SR5SpiritType | SR5CharacterType | SR5SpriteType | SR5VehicleType | SR5CritterType;
+    export type SR5ActorType = SR5SpiritType | SR5CharacterType | SR5SpriteType | SR5VehicleType | SR5CritterType | SR5ICType;
 
     // TODO: A lot of duplicate type definitions to what's in Actor.Data. Might cause problems during a FoundryVTT update
     export type SR5ActorBase = Actor.Data & {
@@ -46,7 +46,13 @@ declare namespace Shadowrun {
         type: 'character';
     };
 
-    export type SR5ActorData = SpiritActorData | CharacterActorData | SpriteActorData | VehicleActorData | CritterActorData;
+    export type SR5ActorData =
+        SpiritActorData |
+        CharacterActorData |
+        SpriteActorData |
+        VehicleActorData |
+        CritterActorData |
+        ICActorData;
 
 
     export type CharacterActorData =

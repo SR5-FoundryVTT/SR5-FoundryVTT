@@ -777,6 +777,25 @@
         }
     },
 
+    "SR5.IC": {
+        "Types": {
+            "Acid": "Acid",
+            "Binder": "Binder",
+            "BlackIC": "Black IC",
+            "Blaster": "Blaster",
+            "Crash": "Crash",
+            "Jammer": "Jammer",
+            "Killer": "Killer",
+            "Marker": "Marker",
+            "Patrol": "Patrol",
+            "Probe": "Probe",
+            "Scramble": "Scramble",
+            "Sparky": "Sparky",
+            "TarBaby": "Tar Baby",
+            "Track": "Track"
+        }
+    },
+
     "SR5.Character": {
         "Types": {
             "Human": "Human",

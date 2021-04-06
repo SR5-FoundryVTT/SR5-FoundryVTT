@@ -7,21 +7,12 @@ declare namespace Shadowrun {
         data: CritterActorData;
         type: 'critter';
     };
-    export type CritterActorData = MagicActorData &
+
+    export type CritterActorData = CommonActorData &
+        MagicActorData &
         TwoTrackActorData &
         ArmorActorData &
         WoundsActorData &
         MatrixActorData &
-        MovementActorData & {
-        attributes: Attributes;
-        limits: Limits;
-        skills: {
-            active: Skills;
-            language: KnowledgeSkillList;
-            knowledge: KnowledgeSkills;
-        };
-        modifiers: Modifiers;
-        special: SpecialTrait;
-        initiative: Initiative;
-    };
+        MovementActorData;
 }
