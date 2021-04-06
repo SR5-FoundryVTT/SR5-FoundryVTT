@@ -75,18 +75,24 @@ export class SR5Actor extends Actor<SR5ActorData> {
         return this.data.data.modifiers[modifierName];
     }
 
-    findActiveSkill(skillName?: string): SkillField | undefined {
-        if (skillName === undefined) return undefined;
+    findActiveSkill(idOrName?: string): SkillField | undefined {
+        if (idOrName === undefined) return;
         // Search for legacy skills with their name as id.
-        const skill = this.data.data.skills.active[skillName];
+        const skills = this.getSkills();
+        if (!skills) return;
+
+        const skill = skills.active[idOrName];
         if (skill) return skill;
+
         // Search for custom skills with a random id.
-        return Object.values(this.data.data.skills.active).find(skill => skill.name === skillName);
+        return Object.values(skills.active).find(skill => skill.name === idOrName);
     }
 
-    findAttribute(attributeName?: string): AttributeField | undefined {
-        if (attributeName === undefined) return undefined;
-        return this.data.data.attributes[attributeName];
+    findAttribute(id?: string): AttributeField | undefined {
+        if (id === undefined) return;
+        const attributes = this.getAttributes();
+        if (!attributes) return;
+        return attributes[id];
     }
 
     findVehicleStat(statName?: string): VehicleStat | undefined {
@@ -265,11 +271,29 @@ export class SR5Actor extends Actor<SR5ActorData> {
         return this.findActiveSkill(name);
     }
 
+    get hasSkills(): boolean {
+        return this.getSkills() !== undefined;
+    }
+
     getSkills() {
         return this.data.data.skills;
     }
     getActiveSkills(): Skills {
         return this.data.data.skills.active;
+    }
+
+    /**
+     * Determine if an actor can choose a special trait using the special field.
+     */
+    get hasSpecial(): boolean {
+        return this.data.type in ['character', 'sprite', 'spirit', 'critter'];
+    }
+
+    /**
+     * Determine if an actor can choose a full defense attribute
+     */
+    get hasFullDefense(): boolean {
+        return this.data.type in ['character', 'vehicle', 'sprite', 'spirit', 'critter'];
     }
 
     /**

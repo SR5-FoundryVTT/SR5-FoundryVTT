@@ -153,6 +153,9 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         data.isCharacter = this.actor.isCharacter();
         data.isSpirit = this.actor.isSpirit();
         data.isCritter = this.actor.isCritter();
+        data.hasSkills = this.actor.hasSkills;
+        data.hasSpecial = this.actor.hasSpecial;
+        data.hasFullDefense = this.actor.hasFullDefense;
     }
 
     _prepareMatrixAttributes(data) {
@@ -178,6 +181,10 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
                 if (att.temp === 0) delete att.temp;
             }
         }
+    }
+
+    _prepareActorTypeIndicators(data) {
+        data.hasSkills = this.actor.getSkills() !== undefined;
     }
 
     _prepareSkillsWithFilters(data: SR5ActorSheetData) {

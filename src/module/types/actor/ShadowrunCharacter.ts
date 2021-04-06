@@ -8,6 +8,9 @@ declare namespace Shadowrun {
         isCharacter: boolean;
         isSpirit: boolean;
         isCritter: boolean;
+        hasSkills: boolean;
+        hasSpecial: boolean;
+        hasFullDefense: boolean;
         awakened: boolean;
         emerged: boolean;
         woundTolerance: number;
