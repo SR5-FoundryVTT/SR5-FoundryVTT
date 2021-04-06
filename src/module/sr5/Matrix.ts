@@ -9,6 +9,7 @@ export class MatrixRules {
      * @return The condition max condition monitor value
      */
     static getConditionMonitor(deviceRating: number): number {
+        if (deviceRating < 0) deviceRating = 0;
         return Math.ceil(8 + (deviceRating / 2));
     }
 
@@ -18,6 +19,7 @@ export class MatrixRules {
      * @param hostRating
      */
     static getICDeviceRating(hostRating: number): number {
+        if (hostRating < 0) hostRating = 0;
         return hostRating;
     }
 }
