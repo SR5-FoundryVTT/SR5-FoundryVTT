@@ -5,19 +5,22 @@
             width='90px'
         }}
         <div class="flexcol flex-end border-right">
-            <div class="block">
-                {{> 'systems/shadowrun5e/dist/templates/actor/parts/NameInput.html' }}
+            <div class="flexrow">
+                <div class="block">
+                    {{> 'systems/shadowrun5e/dist/templates/actor/parts/NameInput.html' }}
+                </div>
+                <div class="attributes smooth">
+                    {{> 'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html' }}
+                </div>
             </div>
             <div class="attributes smooth">
                 <div class="block">
-                    <div class="block">
-                        {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
-                                name=(localize "SR5.ConditionMonitor")
-                                value=data.matrix.condition_monitor.value
-                                max=data.matrix.condition_monitor.max
-                                id="matrix"
-                        }}
-                </div>
+                    {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
+                            name=(localize "SR5.ConditionMonitor")
+                            value=data.matrix.condition_monitor.value
+                            max=data.matrix.condition_monitor.max
+                            id="matrix"
+                    }}
                 </div>
             </div>
         </div>

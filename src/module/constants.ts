@@ -111,7 +111,8 @@ export const SR = {
             attack: {min: 0},
             sleaze: {min: 0},
             data_processing: {min: 0},
-            firewall: {min: 0}
+            firewall: {min: 0},
+            host_rating: {min: 0, max: 12}
         },
         SHORT_NAME_LENGTH: 3
     },
@@ -123,6 +124,10 @@ export const SR = {
     initiatives: {
         ic: {
             dice: 4
+        },
+        ranges: {
+            base: {min: 0},
+            dice: {min: 0, max: 5}
         }
     }
 }

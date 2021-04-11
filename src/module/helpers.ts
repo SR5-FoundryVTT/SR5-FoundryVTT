@@ -34,8 +34,9 @@ export class Helpers {
         if (data['temp'] !== undefined) {
             parts.addUniquePart('SR5.Temporary', data['temp']);
         }
-
-        data.value = Helpers.roundTo(parts.total + data.base, 3);
+        // LEGACY: On new actors .base can be undefined, resulting in NaN .value
+        const base = data.base || 0;
+        data.value = Helpers.roundTo(parts.total + base, 3);
         data.mod = parts.list;
 
         data.value = Helpers.applyValueRange(data.value, options);

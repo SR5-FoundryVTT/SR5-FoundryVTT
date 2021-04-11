@@ -11,35 +11,41 @@ export class MatrixRules {
      * @return The condition max condition monitor value
      */
     static getConditionMonitor(deviceRating: number): number {
-        deviceRating = Math.max(deviceRating, 0);
+        deviceRating = Math.max(deviceRating, SR.attributes.ranges.host_rating.min);
         return Math.ceil(8 + (deviceRating / 2));
     }
 
     /**
      * Derive the IC device rating based of it's hosts rating based on SR5#247 'Intrusion Countermeasures'
      *
-     * @param hostRating
      */
     static getICDeviceRating(hostRating: number): number {
-        return Math.max(hostRating, 0);
+        return Math.max(hostRating, SR.attributes.ranges.host_rating.min);
     }
 
     /**
      * Derive the IC initiative base value of it's host based on SR5#230 'Hot-SIM VR' and SR5#247 'Intrusion Countermeasures'
      *
      * @param hostRating A positive host rating.
-     * @return Note, this value will be at least a zero.
      */
     static getICInitiativeBase(hostRating: number): number {
-        return Math.max(hostRating * 2, 0);
+        return Math.max(hostRating * 2, SR.attributes.ranges.host_rating.min);
     }
 
     /**
      * Get the amount of initiative dice IC has based on SR5#247 'Intrusion Countermeasures'
      *
-     * @returns Note, this value will be at least a zero.
      */
     static getICInitiativeDice(): number {
-        return Math.max(SR.initiatives.ic.dice, 0);
+        return Math.max(SR.initiatives.ic.dice, SR.initiatives.ranges.dice.min);
+    }
+
+    /**
+     * Derive the base value of any meat attribute an IC uses based on SR5#237 'Matrix actions', SR5#256 'Agents'
+     * and SR5#247 'Intrusion Countermeasures'
+     *
+     */
+    static getICMeatAttributeBase(hostRating: number): number {
+        return Math.max(hostRating, SR.attributes.ranges.host_rating.min);
     }
 }
