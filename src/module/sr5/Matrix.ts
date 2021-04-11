@@ -1,3 +1,5 @@
+import {SR} from "../constants";
+
 export class MatrixRules {
     /**
      * Calculate the matrix condition monitor based on SR5#228 'Matrix Damage'
@@ -9,7 +11,7 @@ export class MatrixRules {
      * @return The condition max condition monitor value
      */
     static getConditionMonitor(deviceRating: number): number {
-        if (deviceRating < 0) deviceRating = 0;
+        deviceRating = Math.max(deviceRating, 0);
         return Math.ceil(8 + (deviceRating / 2));
     }
 
@@ -19,7 +21,25 @@ export class MatrixRules {
      * @param hostRating
      */
     static getICDeviceRating(hostRating: number): number {
-        if (hostRating < 0) hostRating = 0;
-        return hostRating;
+        return Math.max(hostRating, 0);
+    }
+
+    /**
+     * Derive the IC initiative base value of it's host based on SR5#230 'Hot-SIM VR' and SR5#247 'Intrusion Countermeasures'
+     *
+     * @param hostRating A positive host rating.
+     * @return Note, this value will be at least a zero.
+     */
+    static getICInitiativeBase(hostRating: number): number {
+        return Math.max(hostRating * 2, 0);
+    }
+
+    /**
+     * Get the amount of initiative dice IC has based on SR5#247 'Intrusion Countermeasures'
+     *
+     * @returns Note, this value will be at least a zero.
+     */
+    static getICInitiativeDice(): number {
+        return Math.max(SR.initiatives.ic.dice, 0);
     }
 }

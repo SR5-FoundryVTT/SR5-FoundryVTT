@@ -11,4 +11,18 @@
             }}
         </div>
     {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
+    {{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=(localize "SR5.Host.Rating") }}
+        <div>
+            {{> "systems/shadowrun5e/dist/templates/common/ValueInput.html"
+                    cssClass="attribute-input"
+                    size="2"
+                    maxLength="2"
+                    value=data.host.rating
+                    name="data.host.rating"
+                    fieldType="Number"
+                    placeholder="0"
+            }}
+        </div>
+    {{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}
+
 </div>

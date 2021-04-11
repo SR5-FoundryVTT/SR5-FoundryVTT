@@ -119,5 +119,10 @@ export const SR = {
         // @PDF SR5#130
         DEFAULTING_MODIFIER: -1,
         SPECIALIZATION_MODIFIER: 2
+    },
+    initiatives: {
+        ic: {
+            dice: 4
+        }
     }
 }
