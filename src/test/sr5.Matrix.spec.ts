@@ -21,6 +21,32 @@ export const shadowrunMatrix = context => {
             assert.strictEqual(MatrixRules.getConditionMonitor(4), 10);
             // Negative values shouldn't break the system.
             assert.strictEqual(MatrixRules.getConditionMonitor(-1), 8);
-        })
+        });
+
+        it('Should calculate IC matrix initiative base', () => {
+            // 0 is the minimum value possible
+            assert.strictEqual(MatrixRules.getICInitiativeBase(0), 0);
+            assert.strictEqual(MatrixRules.getICInitiativeBase(-3), 0);
+            // Check expected value scaling
+            assert.strictEqual(MatrixRules.getICInitiativeBase(1), 2);
+            assert.strictEqual(MatrixRules.getICInitiativeBase(2), 4);
+            assert.strictEqual(MatrixRules.getICInitiativeBase(3), 6);
+            assert.strictEqual(MatrixRules.getICInitiativeBase(12), 24);
+        });
+
+        it('Should calculate IC matrix initiative dice', () => {
+            // 4 is the only value possible
+            assert.strictEqual(MatrixRules.getICInitiativeDice(), 4);
+        });
+
+        it('Should calculate meat attribute base with the host rating', () => {
+            // 0 is the minimum value possible
+            assert.strictEqual(MatrixRules.getICMeatAttributeBase(0), 0);
+            assert.strictEqual(MatrixRules.getICMeatAttributeBase(-3), 0);
+
+            // All other values should equal
+            assert.strictEqual(MatrixRules.getICMeatAttributeBase(3), 3);
+            assert.strictEqual(MatrixRules.getICMeatAttributeBase(27), 27);
+        });
     })
 };
