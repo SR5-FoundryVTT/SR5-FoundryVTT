@@ -10,6 +10,7 @@ import SR5ActorData = Shadowrun.SR5ActorData;
 import {AttributesPrep} from "./functions/AttributesPrep";
 import {PartsList} from "../../parts/PartsList";
 import {SR5} from "../../config";
+import {MatrixPrep} from "./functions/MatrixPrep";
 
 export class ICPrep extends BaseActorPrep<SR5ICType, ICActorData> {
     prepare() {
@@ -20,6 +21,7 @@ export class ICPrep extends BaseActorPrep<SR5ICType, ICActorData> {
         ICPrep.hideMeatAttributes(this.data);
         ICPrep.prepareMeatAttributes(this.data);
         ICPrep.prepareMatrixAttributes(this.data);
+        MatrixPrep.prepareMatrixToLimitsAndAttributes(this.data);
 
         // Derived value preparations
         ICPrep.prepareMatrix(this.data);
@@ -45,7 +47,9 @@ export class ICPrep extends BaseActorPrep<SR5ICType, ICActorData> {
     }
 
     static prepareMatrixTrack(data) {
-        data.matrix.condition_monitor.max = MatrixRules.getConditionMonitor(data.matrix.rating);
+        const { modifiers } = data;
+
+        data.matrix.condition_monitor.max = Number(modifiers['matrix_track']) + MatrixRules.getConditionMonitor(data.matrix.rating);
     }
 
     static prepareMatrixInit(data) {
