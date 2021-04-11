@@ -1479,21 +1479,28 @@ export class SR5Actor extends Actor<SR5ActorData> {
         await this._addDamageToOverflow(overflow, track);
     }
 
-    /** Adding damage to a device track instead of an actors track, as they contain their own track within their data.
+    /**
+     * Matrix damage can be added onto different tracks:
+     * - IC has a local matrix.condition_monitor
+     * - Characters have matrix devices (items) with their local track
      */
     async addMatrixDamage(damage: DamageData): Promise<DamageData> {
         if (damage.type.value !== 'matrix') return damage;
 
-        const device = this.getMatrixDevice();
-        if (!device) return damage;
 
+        const device = this.getMatrixDevice();
         const track = this.getMatrixTrack();
-        // Actor might not have a commlink/cyberdeck equipped.
         if (!track) return damage;
 
         const {overflow, rest} = this._calcDamageOverflow(damage, track);
 
-        await this._addDamageToDeviceTrack(rest, device);
+        if (device) {
+            await this._addDamageToDeviceTrack(rest, device);
+        }
+        if (this.isIC()) {
+            await this._addDamageToTrack(rest, track);
+        }
+
 
         // Return overflow for consistency, yet nothing will take overflowing matrix damage.
         return overflow;
@@ -1524,11 +1531,21 @@ export class SR5Actor extends Actor<SR5ActorData> {
     }
 
     getPhysicalTrack(): OverflowTrackType | undefined {
-        if ("track" in this.data.data)
+        if ("track" in this.data.data && "physical" in this.data.data.track)
             return this.data.data.track.physical;
     }
 
+    /**
+     * The matrix depends on actor type and possibly equipped matrix device.
+     *
+     */
     getMatrixTrack(): ConditionData|undefined {
+        // Some actors will have a direct matrix track.
+        if ("track" in this.data.data && "matrix" in this.data.data.track) {
+            return this.data.data.track.matrix;
+        }
+
+        // Fallback to equipped matrix device.
         const device = this.getMatrixDevice();
         if (!device) return undefined;
 

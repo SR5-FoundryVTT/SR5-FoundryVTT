@@ -11,9 +11,13 @@ import {AttributesPrep} from "./functions/AttributesPrep";
 import {PartsList} from "../../parts/PartsList";
 import {SR5} from "../../config";
 import {MatrixPrep} from "./functions/MatrixPrep";
+import {DefaultValues} from "../../dataTemplates";
 
 export class ICPrep extends BaseActorPrep<SR5ICType, ICActorData> {
     prepare() {
+        // Add missing values on actor creation
+        ICPrep.addMissingTracks(this.data);
+
         // Base value preparations.
         ICPrep.prepareModifiers(this.data);
         ModifiersPrep.clearAttributeMods(this.data);
@@ -33,6 +37,20 @@ export class ICPrep extends BaseActorPrep<SR5ICType, ICActorData> {
     }
 
     /**
+     * On initial actor creation the matrix track will be missing.
+     *
+     * This is intentional as not to pollute template.json with actor type specific data.
+     *
+     */
+    static addMissingTracks(data) {
+        // Newly created actors SHOULD have this by template.
+        // Legacy actors MIGHT not have it, therefore make sure it's their.
+        const track = data.track || {};
+        if (!track.matrix) track.matrix = DefaultValues.trackData();
+        data.track = track;
+    }
+
+    /**
      * Add IC modifiers only to the misc tab.
      * @param data
      */
@@ -47,9 +65,17 @@ export class ICPrep extends BaseActorPrep<SR5ICType, ICActorData> {
     }
 
     static prepareMatrixTrack(data) {
-        const { modifiers } = data;
+        const { modifiers, track, matrix } = data;
 
-        data.matrix.condition_monitor.max = Number(modifiers['matrix_track']) + MatrixRules.getConditionMonitor(data.matrix.rating);
+        // Prepare internal matrix condition monitor values
+        // LEGACY: matrix.condition_monitor is no TrackType. It will only be used as a info, should ever be needed anywhere
+        matrix.condition_monitor.max = Number(modifiers['matrix_track']) + MatrixRules.getConditionMonitor(matrix.rating);
+
+        // Prepare user visible matrix track values
+        track.matrix.base = MatrixRules.getConditionMonitor(matrix.rating);
+        track.matrix.mod = PartsList.AddUniquePart(track.matrix.mod, "SR5.Bonus", Number(modifiers['matrix_track']));
+        track.matrix.max = matrix.condition_monitor.max;
+        track.matrix.label = SR5.damageTypes.matrix;
     }
 
     static prepareMatrixInit(data) {

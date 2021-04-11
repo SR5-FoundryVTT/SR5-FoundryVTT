@@ -16,9 +16,9 @@
             <div class="attributes smooth">
                 <div class="block">
                     {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
-                            name=(localize "SR5.ConditionMonitor")
-                            value=data.matrix.condition_monitor.value
-                            max=data.matrix.condition_monitor.max
+                            name=(localize data.track.matrix.label)
+                            value=data.track.matrix.value
+                            max=data.track.matrix.max
                             id="matrix"
                     }}
                 </div>

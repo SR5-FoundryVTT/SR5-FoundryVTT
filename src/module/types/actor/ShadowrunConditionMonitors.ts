@@ -5,6 +5,10 @@ declare namespace Shadowrun {
         stun: TrackType;
     };
 
+    export type MatrixTracks = {
+        matrix: TrackType
+    }
+
     export type PhysicalTrack = OverflowTrackType;
     export type StunTrack = TrackType;
 

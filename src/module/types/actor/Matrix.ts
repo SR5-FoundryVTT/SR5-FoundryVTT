@@ -22,4 +22,8 @@ declare namespace Shadowrun {
     export type MatrixAttributeField = AttributeField & {
         device_att: string;
     }
+
+    export type MatrixTrackActorData = {
+        track: MatrixTracks
+    }
 }

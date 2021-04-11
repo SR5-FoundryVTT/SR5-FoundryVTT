@@ -9,6 +9,7 @@ import LimitData = Shadowrun.LimitData;
 import OpposedTestData = Shadowrun.OpposedTestData;
 import SkillField = Shadowrun.SkillField;
 import {SKILL_DEFAULT_NAME} from "./constants";
+import TrackType = Shadowrun.TrackType;
 
 /**
  * TODO: Add unittesting to DefaultValues helper.
@@ -145,6 +146,17 @@ export class DefaultValues {
             mod: [],
             attribute: ''
         }, partialSkillData) as SkillField;
+    }
+
+    static trackData(partialTrackData: Partial<TrackType> = {}): TrackType {
+        return mergeObject({
+            value: 0,
+            max: 0,
+            label: '',
+            mod: [],
+            disabled: false,
+            wounds: 0
+        }, partialTrackData) as TrackType;
     }
 }
 

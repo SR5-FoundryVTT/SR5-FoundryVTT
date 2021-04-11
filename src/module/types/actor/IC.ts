@@ -9,7 +9,8 @@ declare namespace Shadowrun {
     }
 
     export type ICActorData = CommonActorData &
-        MatrixActorData & {
+        MatrixActorData &
+        MatrixTrackActorData & {
         icType: ICType,
         host: {
             rating: number
