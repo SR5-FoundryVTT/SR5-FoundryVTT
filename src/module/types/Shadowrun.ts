@@ -89,4 +89,8 @@ declare namespace Shadowrun {
     export type ModifierField = {
         modifier: number;
     };
+
+    export type IDField = string;
+    export type ActorIDField = IDField;
+    export type ItemIDField = IDField;
 }

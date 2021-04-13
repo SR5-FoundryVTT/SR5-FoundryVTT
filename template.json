@@ -1003,7 +1003,8 @@
             "sin",
             "spell",
             "sprite_power",
-            "weapon"
+            "weapon",
+            "host"
         ],
         "templates": {
             "description": {
@@ -1133,6 +1134,27 @@
                     "electricity": 0,
                     "radiation": 0
                 }
+            },
+            "matrix": {
+                "category": "",
+                "atts": {
+                    "att1": {
+                        "value": 0,
+                        "att": "attack"
+                    },
+                    "att2": {
+                        "value": 0,
+                        "att": "sleaze"
+                    },
+                    "att3": {
+                        "value": 0,
+                        "att": "data_processing"
+                    },
+                    "att4": {
+                        "value": 0,
+                        "att": "firewall"
+                    }
+                }
             }
         },
         "armor": {
@@ -1251,26 +1273,7 @@
             "mods": []
         },
         "device": {
-            "templates": ["description", "technology"],
-            "category": "commlink",
-            "atts": {
-                "att1": {
-                    "value": 0,
-                    "att": "attack"
-                },
-                "att2": {
-                    "value": 0,
-                    "att": "sleaze"
-                },
-                "att3": {
-                    "value": 0,
-                    "att": "data_processing"
-                },
-                "att4": {
-                    "value": 0,
-                    "att": "firewall"
-                }
-            }
+            "templates": ["description", "technology", "matrix"]
         },
         "program": {
             "templates": ["description", "technology"],
@@ -1278,6 +1281,13 @@
         },
         "equipment": {
             "templates": ["description", "technology"]
+        },
+        "host": {
+            "templates": ["description", "matrix"],
+            "rating": 0,
+            "owners": [],
+            "spiders": [],
+            "ic": []
         }
     }
 }

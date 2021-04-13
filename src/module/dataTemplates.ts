@@ -8,8 +8,10 @@ import ActionRollData = Shadowrun.ActionRollData;
 import LimitData = Shadowrun.LimitData;
 import OpposedTestData = Shadowrun.OpposedTestData;
 import SkillField = Shadowrun.SkillField;
-import {SKILL_DEFAULT_NAME} from "./constants";
 import TrackType = Shadowrun.TrackType;
+import HostData = Shadowrun.HostData;
+import DevicePartData = Shadowrun.DevicePartData;
+import {SKILL_DEFAULT_NAME} from "./constants";
 
 /**
  * TODO: Add unittesting to DefaultValues helper.
@@ -94,6 +96,34 @@ export class DefaultValues {
         }, partialDescriptionData) as DescriptionData;
     }
 
+    static matrixData(partialMatrixData: Partial<DevicePartData> = {}): DevicePartData {
+        // Remove incomplete properties for ease of use of callers.
+        if (partialMatrixData.category === undefined) delete partialMatrixData.category;
+        if (partialMatrixData.atts === undefined) delete partialMatrixData.atts;
+
+        return mergeObject({
+            category: "",
+            atts: {
+                att1: {
+                    value: 0,
+                    att: "attack"
+                },
+                att2: {
+                    value: 0,
+                    att: "attack"
+                },
+                att3: {
+                    value: 0,
+                    att: "attack"
+                },
+                att4: {
+                    value: 0,
+                    att: "attack"
+                },
+            }
+        }, partialMatrixData) as DevicePartData;
+    }
+
     static actionRollData(partialActionRollData: Partial<ActionRollData> = {}): ActionRollData {
         return mergeObject({
             type: '',
@@ -157,6 +187,17 @@ export class DefaultValues {
             disabled: false,
             wounds: 0
         }, partialTrackData) as TrackType;
+    }
+
+    static hostData(partialHostData: Partial<HostData> = {}): HostData {
+        return mergeObject({
+            description: DefaultValues.descriptionData(partialHostData.description),
+            ...DefaultValues.matrixData({category: partialHostData.category, atts: partialHostData.atts}),
+            rating: 0,
+            owners: [],
+            spiders: [],
+            ic: []
+        }, partialHostData) as HostData;
     }
 }
 
