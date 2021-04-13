@@ -12,6 +12,7 @@ import TrackType = Shadowrun.TrackType;
 import HostData = Shadowrun.HostData;
 import DevicePartData = Shadowrun.DevicePartData;
 import {SKILL_DEFAULT_NAME} from "./constants";
+import SourceEntityField = Shadowrun.SourceEntityField;
 
 /**
  * TODO: Add unittesting to DefaultValues helper.
@@ -194,10 +195,18 @@ export class DefaultValues {
             description: DefaultValues.descriptionData(partialHostData.description),
             ...DefaultValues.matrixData({category: partialHostData.category, atts: partialHostData.atts}),
             rating: 0,
-            owners: [],
-            spiders: [],
             ic: []
         }, partialHostData) as HostData;
+    }
+
+    static sourceEntityData(partialSourceEntityData: Partial<SourceEntityField> = {}): SourceEntityField {
+        return mergeObject({
+            id: '',
+            name: '',
+            pack: null,
+            type: 'Actor',
+            icType: ''
+        }, partialSourceEntityData) as SourceEntityField;
     }
 }
 

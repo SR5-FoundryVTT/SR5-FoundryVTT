@@ -91,6 +91,15 @@ declare namespace Shadowrun {
     };
 
     export type IDField = string;
-    export type ActorIDField = IDField;
-    export type ItemIDField = IDField;
+    /*
+     * Meant for storing a connected actor while only storing it's id and source.
+     */
+    export type SourceEntityField = {
+        id: IDField
+        name: string
+        pack: string|null
+        type: 'Actor'|'Item'
+        // Custom data. Whatever you want.
+        data?: Record<string, any>
+    };
 }

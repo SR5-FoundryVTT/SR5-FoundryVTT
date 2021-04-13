@@ -19,7 +19,8 @@
     "Sin": "SIN",
     "Spell": "Spell",
     "SpritePower": "Sprite Power",
-    "Weapon": "Weapon"
+    "Weapon": "Weapon",
+    "Host": "Host"
   },
   "SR5.ActorTypes": {
     "Character": "Character",
@@ -727,7 +728,11 @@
     }
   },
   "SR5.Host": {
-    "Rating": "Host Rating"
+    "Rating": "Host Rating",
+    "Attributes": "Host Attributes",
+    "ICOrder": "IC Order",
+    "MissingIC": "Missing IC",
+    "DropICActor": "Drag&Drop an IC actor in order of security response"
   },
   "SR5.Character": {
     "Types": {
@@ -749,7 +754,8 @@
   "SR5.Warnings": {
     "NegativeLimitValue": "Limit values must be above zero",
     "TokenSelectionNeeded": "One ore more tokens need to be selected",
-    "SkillCantBeDefault": "This skill can't be rolled on as it can't be defaulted"
+    "SkillCantBeDefault": "This skill can't be rolled on as it can't be defaulted",
+    "HostItemOnlyAcceptIC": "Only IC actors can be added to hosts"
   },
   "SR5.Errors": {
     "MissingSkill": "The actor doesn't have the requested skill.",

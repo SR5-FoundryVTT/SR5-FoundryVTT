@@ -17,6 +17,7 @@ export const SR5 = {
         sin: 'SR5.ItemTypes.Sin',
         spell: 'SR5.ItemTypes.Spell',
         weapon: 'SR5.ItemTypes.Weapon',
+        host: 'SR5.ItemTypes.Host'
     },
 
     attributes: {

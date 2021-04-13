@@ -7,8 +7,6 @@ declare namespace Shadowrun {
 
     export type HostData = DevicePartData & DescriptionPartData & {
         rating: number,
-        owners: ActorIDField[],
-        spiders: ActorIDField[],
-        ic: ActorIDField[]
+        ic: SourceEntityField[]
     };
 }

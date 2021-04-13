@@ -19,7 +19,8 @@ declare namespace Shadowrun {
         | Sin
         | Spell
         | SpritePower
-        | Weapon;
+        | Weapon
+        | Host;
 
     export type SR5ItemDataPartial = Partial<ActionData> &
         Partial<AdeptPowerData> &
@@ -39,7 +40,8 @@ declare namespace Shadowrun {
         Partial<SinData> &
         Partial<SpellData> &
         Partial<SpritePowerData> &
-        Partial<WeaponData>;
+        Partial<WeaponData> &
+        Partial<HostData>;
 
     export type SR5ItemData<DataType> = Item.Data<DataType> & {
         _id: string;

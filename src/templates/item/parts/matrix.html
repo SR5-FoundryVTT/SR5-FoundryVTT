@@ -2,6 +2,7 @@
     <div class="header">
         {{header}}
     </div>
+    {{#ife data.type "device"}}
     <div class="form-line">
         <div class="label">
             {{localize "SR5.DeviceType"}}
@@ -14,7 +15,8 @@
             </select>
         </div>
     </div>
-    {{#ife data.category "cyberdeck"}}
+    {{/ife}}
+    {{#ifne data.category "commlink"}}
     <div class="form-line">
         <div class="label">
             <select name="data.atts.att1.att">
@@ -95,5 +97,5 @@
             />
         </div>
     </div>
-    {{/ife}}
+    {{/ifne}}
 </div>

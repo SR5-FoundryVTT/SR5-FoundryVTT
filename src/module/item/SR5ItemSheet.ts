@@ -1,6 +1,7 @@
 import { Helpers } from '../helpers';
 import { SR5Item } from './SR5Item';
 import {SR5} from "../config";
+import {SR5Actor} from "../actor/SR5Actor";
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -139,28 +140,19 @@ export class SR5ItemSheet extends ItemSheet<{}, SR5Item> {
      */
     activateListeners(html) {
         super.activateListeners(html);
-        if (this.item.type === 'weapon') {
-            //@ts-ignore // TODO: Somehow Jquery doesn't have drag/drop in typing
-            this.form.ondragover = (event) => this._onDragOver(event);
-            //@ts-ignore // TODO: Somehow Jquery doesn't have drag/drop in typing
-            this.form.ondrop = (event) => this._onDrop(event);
-        }
-        html.find('.add-new-ammo').click(this._onAddNewAmmo.bind(this));
-        html.find('.ammo-equip').click(this._onAmmoEquip.bind(this));
-        html.find('.ammo-delete').click(this._onAmmoRemove.bind(this));
-        html.find('.ammo-reload').click(this._onAmmoReload.bind(this));
 
+        /**
+         * Drag and Drop Handling
+         */
+        //@ts-ignore
+        this.form.ondragover = (event) => this._onDragOver(event);
+        //@ts-ignore
+        this.form.ondrop = (event) => this._onDrop(event);
+        /**
+         * General item handling
+         */
         html.find('.edit-item').click(this._onEditItem.bind(this));
-
-        html.find('.add-new-mod').click(this._onAddWeaponMod.bind(this));
-        html.find('.mod-equip').click(this._onWeaponModEquip.bind(this));
-        html.find('.mod-delete').click(this._onWeaponModRemove.bind(this));
-
-        html.find('.add-new-license').click(this._onAddLicense.bind(this));
-        html.find('.license-delete').on('click', this._onRemoveLicense.bind(this));
-
         html.find('.open-source-pdf').on('click', this._onOpenSourcePdf.bind(this));
-
         html.find('.has-desc').click((event) => {
             event.preventDefault();
             const item = $(event.currentTarget).parents('.list-item');
@@ -172,8 +164,26 @@ export class SR5ItemSheet extends ItemSheet<{}, SR5Item> {
                 else this._shownDesc = this._shownDesc.filter((val) => val !== iid);
             }
         });
-
         html.find('.hidden').hide();
+        html.find('.entity-remove').on('click', this._onEntityRemove.bind(this));
+
+        /**
+         * Weapon item specific
+         */
+        html.find('.add-new-ammo').click(this._onAddNewAmmo.bind(this));
+        html.find('.ammo-equip').click(this._onAmmoEquip.bind(this));
+        html.find('.ammo-delete').click(this._onAmmoRemove.bind(this));
+        html.find('.ammo-reload').click(this._onAmmoReload.bind(this));
+
+        html.find('.add-new-mod').click(this._onAddWeaponMod.bind(this));
+        html.find('.mod-equip').click(this._onWeaponModEquip.bind(this));
+        html.find('.mod-delete').click(this._onWeaponModRemove.bind(this));
+        /**
+         * SIN item specific
+         */
+        html.find('.add-new-license').click(this._onAddLicense.bind(this));
+        html.find('.license-delete').on('click', this._onRemoveLicense.bind(this));
+
     }
 
     _onDragOver(event) {
@@ -184,6 +194,8 @@ export class SR5ItemSheet extends ItemSheet<{}, SR5Item> {
     async _onDrop(event) {
         event.preventDefault();
         event.stopPropagation();
+
+        // Parse drop data.
         let data;
         try {
             data = JSON.parse(event.dataTransfer.getData('text/plain'));
@@ -192,33 +204,38 @@ export class SR5ItemSheet extends ItemSheet<{}, SR5Item> {
             }
         } catch (err) {
             console.log('Shadowrun5e | drop error');
+            return;
         }
-        let item;
-        // Case 1 - Data explicitly provided
-        if (data.data) {
-            // TODO test
-            if (this.item.isOwned && data.actorId === this.item.actor?._id && data.data._id === this.item._id) {
-                console.log('Shadowrun5e | Cant drop item on itself');
-                // @ts-ignore
-                ui.notifications.error('Are you trying to break the game??');
-            }
-            item = data;
-        } else if (data.pack) {
-            console.log(data);
+
+        if (!data) return;
+
+        if (this.item.isWeapon() && data.type === 'Item') {
+            let item;
+            // Case 1 - Data explicitly provided
+            if (data.data) {
+                // TODO test
+                if (this.item.isOwned && data.actorId === this.item.actor?._id && data.data._id === this.item._id) {
+                    // @ts-ignore
+                    ui.notifications.error('Are you trying to break the game??');
+                    return;
+                }
+                item = data;
             // Case 2 - From a Compendium Pack
-            // TODO test
-            item = await this._getItemFromCollection(data.pack, data.id);
-        } else {
+            } else if (data.pack) {
+                item = await Helpers.getEntityFromCollection(data.pack, data.id);
             // Case 3 - From a World Entity
-            item = game.items.get(data.id);
+            } else {
+                item = game.items.get(data.id);
+            }
+
+            await this.item.createOwnedItem(item.data);
+
+            return;
         }
 
-        this.item.createOwnedItem(item.data);
-    }
-
-    _getItemFromCollection(collection, itemId) {
-        const pack = game.packs.find((p) => p.collection === collection);
-        return pack.getEntity(itemId);
+        if (this.item.isHost() && data.type === 'Actor') {
+            await this.item.addIC(data.id, data.pack);
+        }
     }
 
     _eventId(event) {
@@ -235,6 +252,24 @@ export class SR5ItemSheet extends ItemSheet<{}, SR5Item> {
         const item = this.item.getOwnedItem(this._eventId(event));
         if (item) {
             item.sheet.render(true);
+        }
+    }
+
+    async _onEntityRemove(event) {
+        event.preventDefault();
+
+        // Grab the data position to remove the correct entity from the list.
+        const entityRemove = $(event.currentTarget).closest('.entity-remove');
+        const list = entityRemove.data('list');
+        const position = entityRemove.data('position');
+
+        if (!list) return;
+
+        switch (list) {
+            // Handle Host item lists...
+            case 'ic':
+                await this.item.removeIC(position);
+                break;
         }
     }
 

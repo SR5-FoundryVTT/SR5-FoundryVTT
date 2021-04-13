@@ -51,6 +51,8 @@ import Spell = Shadowrun.Spell;
 import SpritePower = Shadowrun.SpritePower;
 import {ItemAction} from "./ItemAction";
 import {SkillFlow} from "../actor/SkillFlow";
+import Host = Shadowrun.Host;
+import {DefaultValues} from "../dataTemplates";
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
@@ -320,6 +322,15 @@ export class SR5Item extends Item {
         const adeptPower = this.asAdeptPowerData();
         if (adeptPower) {
             adeptPower.data.type = adeptPower.data.action.type ? 'active' : 'passive';
+        }
+
+        /**
+         * Host Item Type
+         */
+        const host = this.asHostData();
+        if (host) {
+            // Host matrix 'devices' are always hosts and never commlink / cyberdecks.
+            host.data.category = 'host';
         }
     }
 
@@ -724,9 +735,19 @@ export class SR5Item extends Item {
         return this.data.type === 'adept_power';
     }
 
+    isHost(): boolean {
+        return this.data.type === 'host';
+    }
+
     asAdeptPowerData(): AdeptPower|undefined {
         if (this.isAdeptPower())
             return this.data as AdeptPower;
+    }
+
+    asHostData(): Host|undefined {
+        if (this.isHost()) {
+            return this.data as Host;
+        }
     }
 
     async removeLicense(index) {
@@ -1493,5 +1514,54 @@ export class SR5Item extends Item {
         if (this.isIndirectCombatSpell()) return true;
 
         return false;
+    }
+
+    /**
+     * A host type item can store IC actors to spawn in order, use this method to add into that.
+     * @param id An IC type actor id to fetch the actor with.
+     * @param pack Optional pack collection to fetch from
+     */
+    async addIC(id: string, pack: string|null = null) {
+        const hostData = this.asHostData();
+        if (!hostData || !id) return;
+
+        // Check if actor exists before adding.
+        const actor = (pack ? await Helpers.getEntityFromCollection(pack, id) : game.actors.get(id)) as SR5Actor;
+        if (!actor || !actor.isIC()) {
+            console.error(`Provided actor id ${id} doesn't exist (with pack collection '${pack}') or isn't an IC type`);
+            return;
+        }
+
+        const icData = actor.asICData();
+        if (!icData) return;
+
+        // Add IC to the hosts IC order
+        const sourceEntity = DefaultValues.sourceEntityData({
+            id: actor.id,
+            name: actor.name,
+            type: 'Actor',
+            pack,
+            // Custom fields for IC
+            data: {icType: icData.data.icType},
+        });
+        hostData.data.ic.push(sourceEntity);
+
+        await this.update({'data.ic': hostData.data.ic});
+    }
+
+    /**
+     * A host type item can contain IC in an order. Use this function remove IC at the said position
+     * @param index The position in the IC order to be removed
+     */
+    async removeIC(index: number) {
+        if (isNaN(index) || index < 0) return;
+
+        const hostData = this.asHostData();
+        if (!hostData) return;
+        if (hostData.data.ic.length <= index) return;
+
+        hostData.data.ic.splice(index, 1);
+
+        await this.update({'data.ic': hostData.data.ic});
     }
 }

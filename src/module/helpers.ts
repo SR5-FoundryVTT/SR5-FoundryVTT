@@ -554,4 +554,29 @@ export class Helpers {
         }
         return sortedAsObject;
     }
+
+    /**
+     * Fetch entities from global or pack collections using data acquired by Foundry Drag&Drop process
+     * @param data Foundry Drop Data
+     */
+    static async getEntityFromDropData(data: {type: 'Actor'|'Item', pack: string, id: string}): Promise<Entity | undefined> {
+        if (data.pack)
+            return await Helpers.getEntityFromCollection(data.pack, data.id);
+
+        if (data.type === 'Actor')
+            return game.actors.get(data.id);
+
+        if (data.type === 'Item')
+            return game.items.get(data.id);
+    }
+
+    /**
+     * Fetch entities from a pack collection
+     * @param collection The pack name as stored in the collection property
+     * @param id The entity id in that collection
+     */
+    static async getEntityFromCollection(collection: string, id: string): Promise<Entity> {
+        const pack = game.packs.find((p) => p.collection === collection);
+        return await pack.getEntity(id);
+    }
 }

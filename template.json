@@ -1285,8 +1285,6 @@
         "host": {
             "templates": ["description", "matrix"],
             "rating": 0,
-            "owners": [],
-            "spiders": [],
             "ic": []
         }
     }

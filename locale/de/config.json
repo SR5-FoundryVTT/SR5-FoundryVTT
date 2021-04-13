@@ -1,6 +1,6 @@
 {
   "SR5.SheetActor": "Actor Bogen",
-  "SR5.SheetItem": "Item sheet",
+  "SR5.SheetItem": "Item Bogen",
   "SR5.ItemTypes": {
     "Action": "Aktion",
     "AdeptPower": "Adeptenkraft",
@@ -19,7 +19,8 @@
     "Sin": "SIN",
     "Spell": "Zauberspruch",
     "SpritePower": "Sprite Kraft",
-    "Weapon": "Waffe"
+    "Weapon": "Waffe",
+    "Host": "Host"
   },
   "SR5.ActorTypes": {
     "Character": "Charakter",
@@ -718,7 +719,8 @@
   "SR5.Warnings": {
     "NegativeLimitValue": "Limit Werte müssen über Null liegen",
     "TokenSelectionNeeded": "Ein oder mehrere Tokens müssen ausgewählt sein",
-    "SkillCantBeDefault": "Auf diese Fertigkeit kann keine Probe abgelegt werden, da sie nicht improvisiert werden kann"
+    "SkillCantBeDefault": "Auf diese Fertigkeit kann keine Probe abgelegt werden, da sie nicht improvisiert werden kann",
+    "HostItemOnlyAcceptIC": "Nur IC Akteure können einem Host zugefügt werden"
   },
   "SR5.Errors": {
     "MissingSkill": "Der Charakter verfügt nicht über die benötigte Fertigkeit.",
