@@ -205,7 +205,7 @@ export class DefaultValues {
             name: '',
             pack: null,
             type: 'Actor',
-            icType: ''
+            data: partialSourceEntityData.data || undefined
         }, partialSourceEntityData) as SourceEntityField;
     }
 }
