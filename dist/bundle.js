@@ -16449,11 +16449,40 @@ class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
                 overrides.init = 4;
                 overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'unarmed_combat');
                 break;
+            case 'aircraft':
+                overrides.attributes.body = 2;
+                overrides.attributes.agility = 1;
+                overrides.attributes.strength = 1;
+                overrides.attributes.logic = -2;
+                overrides.skills.push('free_fall', 'navigation', 'perception', 'pilot_aircraft', 'unarmed_combat');
+                break;
+            case 'airwave':
+                overrides.attributes.body = 2;
+                overrides.attributes.agility = 3;
+                overrides.attributes.reaction = 4;
+                overrides.attributes.strength = -3;
+                overrides.init = 4;
+                overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'impersonation', 'perception', 'running', 'unarmed_combat');
+                break;
+            case 'automotive':
+                overrides.attributes.body = 1;
+                overrides.attributes.agility = 2;
+                overrides.attributes.reaction = 1;
+                overrides.attributes.logic = -2;
+                overrides.init = 1;
+                overrides.skills.push('navigation', 'perception', 'pilot_ground_craft', 'running', 'unarmed_combat');
+                break;
             case 'beasts':
                 overrides.attributes.body = 2;
                 overrides.attributes.agility = 1;
                 overrides.attributes.strength = 2;
                 overrides.skills.push('assensing', 'astral_combat', 'perception', 'unarmed_combat');
+                break;
+            case 'ceramic':
+                overrides.attributes.agility = 1;
+                overrides.attributes.reaction = 2;
+                overrides.init = 2;
+                overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'unarmed_combat');
                 break;
             case 'earth':
                 overrides.attributes.body = 4;
@@ -16462,6 +16491,15 @@ class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
                 overrides.attributes.strength = 4;
                 overrides.attributes.logic = -1;
                 overrides.init = -1;
+                overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'unarmed_combat');
+                break;
+            case 'energy':
+                overrides.attributes.body = 1;
+                overrides.attributes.agility = 2;
+                overrides.attributes.reaction = 3;
+                overrides.attributes.strength = -2;
+                overrides.attributes.intuition = 1;
+                overrides.init = 3;
                 overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'unarmed_combat');
                 break;
             case 'fire':
@@ -16496,6 +16534,15 @@ class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
                 overrides.init = 2;
                 overrides.skills.push('assensing', 'astral_combat', 'perception', 'spellcasting', 'unarmed_combat');
                 break;
+            case 'metal':
+                overrides.attributes.body = 4;
+                overrides.attributes.agility = -2;
+                overrides.attributes.reaction = -1;
+                overrides.attributes.strength = 4;
+                overrides.attributes.logic = -1;
+                overrides.init = -1;
+                overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'unarmed_combat');
+                break;
             case 'plant':
                 overrides.attributes.body = 2;
                 overrides.attributes.agility = -1;
@@ -16503,11 +16550,30 @@ class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
                 overrides.attributes.logic = -1;
                 overrides.skills.push('assensing', 'astral_combat', 'perception', 'exotic_range', 'unarmed_combat');
                 break;
+            case 'ship':
+                overrides.attributes.body = 4;
+                overrides.attributes.agility = -1;
+                overrides.attributes.reaction = -1;
+                overrides.attributes.strength = 2;
+                overrides.attributes.logic = -2;
+                overrides.init = -1;
+                overrides.skills.push('navigation', 'perception', 'pilot_water_craft', 'survival', 'swimming', 'unarmed_combat');
+                break;
             case 'task':
                 overrides.attributes.reaction = 2;
                 overrides.attributes.strength = 2;
                 overrides.init = 2;
                 overrides.skills.push('artisan', 'assensing', 'astral_combat', 'perception', 'unarmed_combat');
+                break;
+            case 'train':
+                overrides.attributes.body = 3;
+                overrides.attributes.agility = -1;
+                overrides.attributes.reaction = -1;
+                overrides.attributes.strength = 2;
+                overrides.attributes.willpower = 1;
+                overrides.attributes.logic = -2;
+                overrides.init = -1;
+                overrides.skills.push('intimidation', 'navigation', 'perception', 'pilot_ground_craft', 'unarmed_combat');
                 break;
             case 'water':
                 overrides.attributes.agility = 1;
@@ -21826,14 +21892,22 @@ exports.SR5 = {
     spiritTypes: {
         // base types
         air: 'SR5.Spirit.Types.Air',
+        aircraft: 'SR5.Spirit.Types.Aircraft',
+        airwave: 'SR5.Spirit.Types.Airwave',
+        automotive: 'SR5.Spirit.Types.Automotive',
         beasts: 'SR5.Spirit.Types.Beasts',
+        ceramic: 'SR5.Spirit.Types.Ceramic',
         earth: 'SR5.Spirit.Types.Earth',
+        energy: 'SR5.Spirit.Types.Energy',
         fire: 'SR5.Spirit.Types.Fire',
         guardian: 'SR5.Spirit.Types.Guardian',
         guidance: 'SR5.Spirit.Types.Guidance',
         man: 'SR5.Spirit.Types.Man',
+        metal: 'SR5.Spirit.Types.Metal',
         plant: 'SR5.Spirit.Types.Plant',
+        ship: 'SR5.Spirit.Types.Ship',
         task: 'SR5.Spirit.Types.Task',
+        train: 'SR5.Spirit.Types.Train',
         water: 'SR5.Spirit.Types.Water',
         // toxic types
         toxic_air: 'SR5.Spirit.Types.ToxicAir',
