@@ -107,11 +107,40 @@ export class SpiritPrep extends BaseActorPrep<SR5SpiritType, SpiritActorData> {
                 overrides.init = 4;
                 overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'unarmed_combat');
                 break;
+            case 'aircraft':
+                overrides.attributes.body = 2;
+                overrides.attributes.agility = 1;
+                overrides.attributes.strength = 1;
+                overrides.attributes.logic = -2;
+                overrides.skills.push('free_fall', 'navigation', 'perception', 'pilot_aircraft', 'unarmed_combat');
+                break;
+            case 'airwave':
+                overrides.attributes.body = 2;
+                overrides.attributes.agility = 3;
+                overrides.attributes.reaction = 4;
+                overrides.attributes.strength = -3;
+                overrides.init = 4;
+                overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'impersonation', 'perception', 'running', 'unarmed_combat');
+                break;
+            case 'automotive':
+                overrides.attributes.body = 1;
+                overrides.attributes.agility = 2;
+                overrides.attributes.reaction = 1;
+                overrides.attributes.logic = -2;
+                overrides.init = 1;
+                overrides.skills.push('navigation', 'perception', 'pilot_ground_craft', 'running', 'unarmed_combat');
+                break;
             case 'beasts':
                 overrides.attributes.body = 2;
                 overrides.attributes.agility = 1;
                 overrides.attributes.strength = 2;
                 overrides.skills.push('assensing', 'astral_combat', 'perception', 'unarmed_combat');
+                break;
+            case 'ceramic':
+                overrides.attributes.agility = 1;
+                overrides.attributes.reaction = 2;
+                overrides.init = 2;
+                overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'unarmed_combat');
                 break;
             case 'earth':
                 overrides.attributes.body = 4;
@@ -120,6 +149,15 @@ export class SpiritPrep extends BaseActorPrep<SR5SpiritType, SpiritActorData> {
                 overrides.attributes.strength = 4;
                 overrides.attributes.logic = -1;
                 overrides.init = -1;
+                overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'unarmed_combat');
+                break;
+            case 'energy':
+                overrides.attributes.body = 1;
+                overrides.attributes.agility = 2;
+                overrides.attributes.reaction = 3;
+                overrides.attributes.strength = -2;
+                overrides.attributes.intuition = 1;
+                overrides.init = 3;
                 overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'unarmed_combat');
                 break;
             case 'fire':
@@ -154,6 +192,15 @@ export class SpiritPrep extends BaseActorPrep<SR5SpiritType, SpiritActorData> {
                 overrides.init = 2;
                 overrides.skills.push('assensing', 'astral_combat', 'perception', 'spellcasting', 'unarmed_combat');
                 break;
+            case 'metal':
+                overrides.attributes.body = 4;
+                overrides.attributes.agility = -2;
+                overrides.attributes.reaction = -1;
+                overrides.attributes.strength = 4;
+                overrides.attributes.logic = -1;
+                overrides.init = -1;
+                overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'unarmed_combat');
+                break;
             case 'plant':
                 overrides.attributes.body = 2;
                 overrides.attributes.agility = -1;
@@ -161,11 +208,30 @@ export class SpiritPrep extends BaseActorPrep<SR5SpiritType, SpiritActorData> {
                 overrides.attributes.logic = -1;
                 overrides.skills.push('assensing', 'astral_combat', 'perception', 'exotic_range', 'unarmed_combat');
                 break;
+            case 'ship':
+                overrides.attributes.body = 4;
+                overrides.attributes.agility = -1;
+                overrides.attributes.reaction = -1;
+                overrides.attributes.strength = 2;
+                overrides.attributes.logic = -2;
+                overrides.init = -1;
+                overrides.skills.push('navigation', 'perception', 'pilot_water_craft', 'survival', 'swimming', 'unarmed_combat');
+                break;
             case 'task':
                 overrides.attributes.reaction = 2;
                 overrides.attributes.strength = 2;
                 overrides.init = 2;
                 overrides.skills.push('artisan', 'assensing', 'astral_combat', 'perception', 'unarmed_combat');
+                break;
+            case 'train':
+                overrides.attributes.body = 3;
+                overrides.attributes.agility = -1;
+                overrides.attributes.reaction = -1;
+                overrides.attributes.strength = 2;
+                overrides.attributes.willpower = 1;
+                overrides.attributes.logic = -2;
+                overrides.init = -1;
+                overrides.skills.push('intimidation', 'navigation', 'perception', 'pilot_ground_craft', 'unarmed_combat');
                 break;
             case 'water':
                 overrides.attributes.agility = 1;
