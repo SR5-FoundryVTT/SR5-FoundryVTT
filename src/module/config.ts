@@ -351,14 +351,22 @@ export const SR5 = {
     spiritTypes: {
         // base types
         air: 'SR5.Spirit.Types.Air',
+        aircraft: 'SR5.Spirit.Types.Aircraft',
+        airwave: 'SR5.Spirit.Types.Airwave',
+        automotive: 'SR5.Spirit.Types.Automotive',
         beasts: 'SR5.Spirit.Types.Beasts',
+        ceramic: 'SR5.Spirit.Types.Ceramic',
         earth: 'SR5.Spirit.Types.Earth',
+        energy: 'SR5.Spirit.Types.Energy',
         fire: 'SR5.Spirit.Types.Fire',
         guardian: 'SR5.Spirit.Types.Guardian',
         guidance: 'SR5.Spirit.Types.Guidance',
         man: 'SR5.Spirit.Types.Man',
+        metal: 'SR5.Spirit.Types.Metal',
         plant: 'SR5.Spirit.Types.Plant',
+        ship: 'SR5.Spirit.Types.Ship',
         task: 'SR5.Spirit.Types.Task',
+        train: 'SR5.Spirit.Types.Train',
         water: 'SR5.Spirit.Types.Water',
 
         // toxic types
