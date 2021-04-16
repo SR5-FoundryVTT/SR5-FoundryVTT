@@ -125,7 +125,7 @@ export const registerBasicHelpers = () => {
         const val = Boolean(value);
         return val ? val : undefined;
     });
-    // TODO: This helper doesn't work... Don't why, but it doesn't.
+    // TODO: This helper doesn't work... Don't know why, but it doesn't.
     Handlebars.registerHelper('localizeShortened', function (label: string, length: number, options: any): SafeString {
         return new Handlebars.SafeString(Helpers.shortenAttributeLocalization(label, length));
     });

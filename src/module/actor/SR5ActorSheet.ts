@@ -12,6 +12,7 @@ import Skills = Shadowrun.Skills;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import SkillField = Shadowrun.SkillField;
 import DeviceData = Shadowrun.DeviceData;
+import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditForm instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
@@ -95,6 +96,8 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         this._prepareActorTypeFields(data);
         this._prepareCharacterFields(data);
         this._prepareVehicleFields(data);
+
+        data['effects'] = prepareActiveEffectCategories(this.entity.effects);
 
         return data;
     }
@@ -439,6 +442,9 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
                 else this._shownDesc = this._shownDesc.filter((val) => val !== iid);
             }
         });
+
+        // Active Effect management
+        html.find(".effect-control").click(event => onManageActiveEffect(event, this.entity));
 
         html.find('.skill-header').find('.item-name').click(this._onFilterUntrainedSkills.bind(this));
         html.find('.skill-header').find('.skill-spec-item').click(this._onFilterUntrainedSkills.bind(this));

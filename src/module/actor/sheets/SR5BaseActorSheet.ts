@@ -2,6 +2,7 @@ import {SR5Actor} from "../SR5Actor";
 import {Helpers} from "../../helpers";
 import {SR5Item} from "../../item/SR5Item";
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
+import {onManageActiveEffect} from "../../effects";
 
 /**
  * This class should not be used directly but be extended for each actor type.
@@ -77,6 +78,9 @@ export class SR5BaseActorSheet extends ActorSheet<{}, SR5Actor> {
 
     activateListeners(html) {
         super.activateListeners(html);
+
+        // Active Effect management
+        html.find(".effect-control").click(event => onManageActiveEffect(event, this.entity));
 
         // General item CRUD management...
         html.find('.item-create').on('click', this._onItemCreate.bind(this));

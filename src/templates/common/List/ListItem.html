@@ -1,4 +1,4 @@
-<div class="list-item {{itemCssClass}}" {{#if itemId}}data-item-id="{{itemId}}"{{/if}}>
+<div class="list-item {{itemCssClass}}" {{#if itemId}}data-item-id="{{itemId}}"{{/if}} {{#each data}}data-{{@key}}="{{this}}"{{/each}}>
     <div class="item-left">
         {{#if img}}
             <div class="item-img {{#if hasRoll}}item-roll{{/if}} roll">
@@ -49,8 +49,8 @@
         {{#if icons}}
             <div class="item-text item-icons">
                 {{#each icons as |icon id|}}
-                    <a class="{{icon.cssClass}} roll" title="{{icon.title}}">
-                        <i class="{{icon.icon}}"></i>
+                    <a class="{{icon.cssClass}} roll" title="{{icon.title}}" {{#each icon.data}}data-{{@key}}="{{this}}"{{/each}}>
+                        <i class="item-icon {{icon.icon}}" {{#each icon.data}}data-{{@key}}="{{this}}"{{/each}}></i>
                         {{#if (isDefined icon.text)}}
                             {{icon.text}}
                         {{/if}}
