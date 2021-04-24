@@ -251,6 +251,15 @@ export class SR5Item extends Item {
                 action.damage.base_formula_operator = 'add';
             }
 
+            if (this.actor){
+                action.damage.source = {
+                    actorId: this.actor.id,
+                    itemId: this.id,
+                    itemName: this.name,
+                    itemType: this.data.type
+                };
+            }
+
             // handle overrides from mods
             const limitParts = new PartsList(action.limit.mod);
             const dpParts = new PartsList(action.dice_pool_mod);
@@ -1453,12 +1462,12 @@ export class SR5Item extends Item {
         if (this.isDirectCombatSpell()) {
             const damage = hits;
 
-            return Helpers.createDamageData(damage, action.damage.type.value);
+            return Helpers.createDamageData(damage, action.damage.type.value, 0, '', this);
         } else if (this.isIndirectCombatSpell()) {
             const damage = force;
             const ap = -force;
 
-            return Helpers.createDamageData(damage, action.damage.type.value, -ap)
+            return Helpers.createDamageData(damage, action.damage.type.value, -ap, '', this);
         }
     }
 
