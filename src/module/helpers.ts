@@ -13,6 +13,7 @@ import {DEFAULT_ID_LENGTH, FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS
 import {SR5Actor} from "./actor/SR5Actor";
 import {DataTemplates} from "./dataTemplates";
 import {DeleteConfirmationDialog} from "./apps/dialogs/DeleteConfirmationDialog";
+import { SR5Item } from './item/SR5Item';
 import Skills = Shadowrun.Skills;
 
 interface CalcTotalOptions {
@@ -389,7 +390,7 @@ export class Helpers {
         return actor.name;
     }
 
-    static createDamageData(value: number, type: DamageType, ap: number = 0, element: DamageElement = ''): DamageData {
+    static createDamageData(value: number, type: DamageType, ap: number = 0, element: DamageElement = '', sourceItem? : SR5Item): DamageData {
         const damage = duplicate(DataTemplates.damage);
         damage.base = value;
         damage.value = value;
@@ -400,7 +401,57 @@ export class Helpers {
         damage.element.base = element;
         damage.element.value = element;
 
+        if (sourceItem && sourceItem.actor) {
+            damage.source = {
+                actorId: sourceItem.actor.id,
+                itemType: sourceItem.type,
+                itemId: sourceItem.id,
+                itemName: sourceItem.name
+            };
+        }
+
         return damage;
+    }
+
+    /**
+     * Retrieves the item causing the damage, if there is any. 
+     * This only works for embedded items at the moment
+     */
+    static findDamageSource(damageData : DamageData) : SR5Item | undefined{
+        if (!damageData.source) {
+            return;
+        }
+        
+        const actorId = damageData.source.actorId;
+        const actorSource = game.actors.find(
+            actor => actor.id === actorId
+            );
+
+        if (!actorSource) {
+            return;
+        }
+
+        // First search the actor itself for the item
+        const itemId = damageData.source.itemId;
+        const actorItem = actorSource.getOwnedItem(itemId) as SR5Item;
+        if (actorItem)
+        {
+            return actorItem;
+        }
+
+        // If we did not find anything on the actor, search the active tokens (the item might only exist on a non linked token)
+        // This will not work if we are on a different scene or the token got deleted, which is expected when you put an
+        // item on a token without linking it.
+        const tokens = actorSource.getActiveTokens();
+        let tokenItem : SR5Item | undefined;
+        tokens.forEach(token => {
+            const foundItem = token.actor.items.find(i => i.id === itemId);
+            if (foundItem) {
+                tokenItem = foundItem as SR5Item;
+            }
+        });
+
+        return tokenItem;
     }
 
     /** Modifies given damage value and returns both original and modified damage
