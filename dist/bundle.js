@@ -13702,8 +13702,12 @@ class SR5Actor extends Actor {
             if (!skill)
                 return;
             // Don't delete legacy skills to allow prepared items to use them, should the user delete by accident.
-            if (skill.name === '' && skill.label !== '') {
+            // New custom skills won't have a label set also.
+            if (skill.name === '' && skill.label !== undefined && skill.label !== '') {
                 yield this.hideSkill(skillId);
+                // NOTE: For some reason unlinked token actors won't cause a render on update?
+                if (!this.data.token.actorLink)
+                    yield this.sheet.render();
                 return;
             }
             // Remove custom skills without mercy!
@@ -13713,6 +13717,8 @@ class SR5Actor extends Actor {
     }
     /**
      * Mark the given skill as hidden.
+     *
+     * NOTE: Hiding skills has
      *
      * @param skillId The id of any type of skill.
      */
@@ -13761,6 +13767,9 @@ class SR5Actor extends Actor {
             if (!updateData)
                 return;
             yield this.update(updateData);
+            // NOTE: For some reason unlinked token actors won't cause a render on update?
+            if (!this.data.token.actorLink)
+                yield this.sheet.render();
         });
     }
     rollFade(options = {}, incoming = -1) {
@@ -16448,11 +16457,40 @@ class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
                 overrides.init = 4;
                 overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'unarmed_combat');
                 break;
+            case 'aircraft':
+                overrides.attributes.body = 2;
+                overrides.attributes.agility = 1;
+                overrides.attributes.strength = 1;
+                overrides.attributes.logic = -2;
+                overrides.skills.push('free_fall', 'navigation', 'perception', 'pilot_aircraft', 'unarmed_combat');
+                break;
+            case 'airwave':
+                overrides.attributes.body = 2;
+                overrides.attributes.agility = 3;
+                overrides.attributes.reaction = 4;
+                overrides.attributes.strength = -3;
+                overrides.init = 4;
+                overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'impersonation', 'perception', 'running', 'unarmed_combat');
+                break;
+            case 'automotive':
+                overrides.attributes.body = 1;
+                overrides.attributes.agility = 2;
+                overrides.attributes.reaction = 1;
+                overrides.attributes.logic = -2;
+                overrides.init = 1;
+                overrides.skills.push('navigation', 'perception', 'pilot_ground_craft', 'running', 'unarmed_combat');
+                break;
             case 'beasts':
                 overrides.attributes.body = 2;
                 overrides.attributes.agility = 1;
                 overrides.attributes.strength = 2;
                 overrides.skills.push('assensing', 'astral_combat', 'perception', 'unarmed_combat');
+                break;
+            case 'ceramic':
+                overrides.attributes.agility = 1;
+                overrides.attributes.reaction = 2;
+                overrides.init = 2;
+                overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'unarmed_combat');
                 break;
             case 'earth':
                 overrides.attributes.body = 4;
@@ -16461,6 +16499,15 @@ class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
                 overrides.attributes.strength = 4;
                 overrides.attributes.logic = -1;
                 overrides.init = -1;
+                overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'unarmed_combat');
+                break;
+            case 'energy':
+                overrides.attributes.body = 1;
+                overrides.attributes.agility = 2;
+                overrides.attributes.reaction = 3;
+                overrides.attributes.strength = -2;
+                overrides.attributes.intuition = 1;
+                overrides.init = 3;
                 overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'unarmed_combat');
                 break;
             case 'fire':
@@ -16495,6 +16542,15 @@ class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
                 overrides.init = 2;
                 overrides.skills.push('assensing', 'astral_combat', 'perception', 'spellcasting', 'unarmed_combat');
                 break;
+            case 'metal':
+                overrides.attributes.body = 4;
+                overrides.attributes.agility = -2;
+                overrides.attributes.reaction = -1;
+                overrides.attributes.strength = 4;
+                overrides.attributes.logic = -1;
+                overrides.init = -1;
+                overrides.skills.push('assensing', 'astral_combat', 'exotic_range', 'perception', 'unarmed_combat');
+                break;
             case 'plant':
                 overrides.attributes.body = 2;
                 overrides.attributes.agility = -1;
@@ -16502,11 +16558,30 @@ class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
                 overrides.attributes.logic = -1;
                 overrides.skills.push('assensing', 'astral_combat', 'perception', 'exotic_range', 'unarmed_combat');
                 break;
+            case 'ship':
+                overrides.attributes.body = 4;
+                overrides.attributes.agility = -1;
+                overrides.attributes.reaction = -1;
+                overrides.attributes.strength = 2;
+                overrides.attributes.logic = -2;
+                overrides.init = -1;
+                overrides.skills.push('navigation', 'perception', 'pilot_water_craft', 'survival', 'swimming', 'unarmed_combat');
+                break;
             case 'task':
                 overrides.attributes.reaction = 2;
                 overrides.attributes.strength = 2;
                 overrides.init = 2;
                 overrides.skills.push('artisan', 'assensing', 'astral_combat', 'perception', 'unarmed_combat');
+                break;
+            case 'train':
+                overrides.attributes.body = 3;
+                overrides.attributes.agility = -1;
+                overrides.attributes.reaction = -1;
+                overrides.attributes.strength = 2;
+                overrides.attributes.willpower = 1;
+                overrides.attributes.logic = -2;
+                overrides.init = -1;
+                overrides.skills.push('intimidation', 'navigation', 'perception', 'pilot_ground_craft', 'unarmed_combat');
                 break;
             case 'water':
                 overrides.attributes.agility = 1;
@@ -19933,7 +20008,6 @@ class ShadowrunItemDialog {
             // Disable manual range selection when a overwrite is set.
             const targetRange = modifiers.environmental.active.range;
             const disableTargetRange = modifiers.hasActiveEnvironmentalOverwrite;
-            console.error(modifiers);
             const templateData = {
                 targetRange,
                 disableTargetRange
@@ -21213,6 +21287,7 @@ class SR5Combat extends Combat {
             if (!combat)
                 return;
             yield combat.resetAll();
+            yield SR5Combat.setInitiativePass(combat, constants_1.SR.combat.INITIAL_INI_PASS);
             if (game.settings.get(constants_1.SYSTEM_NAME, constants_1.FLAGS.OnlyAutoRollNPCInCombat)) {
                 yield combat.rollNPC();
             }
@@ -21245,6 +21320,9 @@ class SR5Combat extends Combat {
         // now we sort by ERIC
         const genData = (actor) => {
             var _a, _b;
+            // There are broken scenes out there, which will try setting up a combat without valid actors.
+            if (!actor)
+                return [0, 0, 0, 0];
             // edge, reaction, intuition, coin flip
             return [
                 Number(actor.getEdge().value),
@@ -21284,13 +21362,17 @@ class SR5Combat extends Combat {
      */
     get nextViableTurnPosition() {
         // Start at the next position after the current one.
-        for (let n = this.turn + 1; n++; n < this.combatants.length) {
-            const combatant = this.combatants[n];
-            if (combatant.initiative > 0)
-                return n;
+        for (let [turnInPass, combatant] of this.turns.entries()) {
+            // Skipping is only interesting when moving forward.
+            if (turnInPass <= this.turn)
+                continue;
+            // @ts-ignore
+            if (combatant.initiative > 0) {
+                return turnInPass;
+            }
         }
-        // If nothing is found, start at the top.
-        return 0;
+        // The current turn is the last undefeated combatant. So go to the end and beeeeyooond.
+        return this.turns.length;
     }
     /**
      * Determine wheter the current combat situation (current turn order) needs and can have an initiative pass applied.
@@ -21359,7 +21441,7 @@ class SR5Combat extends Combat {
             // Start at the top!
             const nextTurn = 0;
             yield SR5Combat.setInitiativePass(this, initiativePass);
-            return yield this.update({ round: nextRound, turn: nextTurn });
+            yield this.update({ round: nextRound, turn: nextTurn });
             if (game.settings.get(constants_1.SYSTEM_NAME, constants_1.FLAGS.OnlyAutoRollNPCInCombat)) {
                 yield this.rollNPC();
             }
@@ -21375,7 +21457,6 @@ class SR5Combat extends Combat {
         return __awaiter(this, void 0, void 0, function* () {
             // Let Foundry handle time and some other things.
             yield _super.nextRound.call(this);
-            yield SR5Combat.setInitiativePass(this, constants_1.SR.combat.INITIAL_INI_PASS);
             // Owner permissions are needed to change the shadowrun initiative round.
             if (!game.user.isGM) {
                 yield this._createDoNextRoundSocketMessage();
@@ -21801,14 +21882,22 @@ exports.SR5 = {
     spiritTypes: {
         // base types
         air: 'SR5.Spirit.Types.Air',
+        aircraft: 'SR5.Spirit.Types.Aircraft',
+        airwave: 'SR5.Spirit.Types.Airwave',
+        automotive: 'SR5.Spirit.Types.Automotive',
         beasts: 'SR5.Spirit.Types.Beasts',
+        ceramic: 'SR5.Spirit.Types.Ceramic',
         earth: 'SR5.Spirit.Types.Earth',
+        energy: 'SR5.Spirit.Types.Energy',
         fire: 'SR5.Spirit.Types.Fire',
         guardian: 'SR5.Spirit.Types.Guardian',
         guidance: 'SR5.Spirit.Types.Guidance',
         man: 'SR5.Spirit.Types.Man',
+        metal: 'SR5.Spirit.Types.Metal',
         plant: 'SR5.Spirit.Types.Plant',
+        ship: 'SR5.Spirit.Types.Ship',
         task: 'SR5.Spirit.Types.Task',
+        train: 'SR5.Spirit.Types.Train',
         water: 'SR5.Spirit.Types.Water',
         // toxic types
         toxic_air: 'SR5.Spirit.Types.ToxicAir',
@@ -22255,8 +22344,6 @@ exports.registerAppHelpers = registerAppHelpers;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerBasicHelpers = void 0;
 const helpers_1 = require("../helpers");
-const config_1 = require("../config");
-const constants_1 = require("../constants");
 const registerBasicHelpers = () => {
     Handlebars.registerHelper('localizeOb', function (strId, obj) {
         if (obj)
@@ -22264,18 +22351,21 @@ const registerBasicHelpers = () => {
         return game.i18n.localize(strId);
     });
     Handlebars.registerHelper('localizeSkill', function (skill) {
-        const translatedSkill = skill.label ? game.i18n.localize(skill.label) : skill.name;
-        if (!game.settings.get(constants_1.SYSTEM_NAME, constants_1.FLAGS.ShowSkillsWithDetails) || !translatedSkill || !skill.attribute)
-            return translatedSkill;
-        // Try showing the first three letters, or less.
-        const translatedAttribute = game.i18n.localize(config_1.SR5.attributes[skill.attribute]);
-        if (!translatedAttribute)
-            return translatedSkill;
-        const cutToIndex = translatedAttribute.length < constants_1.SR.attributes.SHORT_NAME_LENGTH ?
-            translatedAttribute.length - 1 :
-            constants_1.SR.attributes.SHORT_NAME_LENGTH;
-        const translatedAttributeShorthand = translatedAttribute.substring(0, cutToIndex).toUpperCase();
-        return `${translatedSkill} (${translatedAttributeShorthand})`;
+        return skill.label ? game.i18n.localize(skill.label) : skill.name;
+        // NOTE: Below is code to append a shortened attribute name to the skill name. It's been removed for readability.
+        //       But still might useful for someone.
+        // if (!game.settings.get(SYSTEM_NAME, FLAGS.ShowSkillsWithDetails) || !translatedSkill || !skill.attribute)
+        //     return translatedSkill;
+        //
+        // // Try showing the first three letters, or less.
+        // const translatedAttribute = game.i18n.localize(SR5.attributes[skill.attribute]);
+        // if (!translatedAttribute) return translatedSkill;
+        //
+        // const cutToIndex = translatedAttribute.length < SR.attributes.SHORT_NAME_LENGTH ?
+        //     translatedAttribute.length -1 :
+        //     SR.attributes.SHORT_NAME_LENGTH;
+        // const translatedAttributeShorthand = translatedAttribute.substring(0, cutToIndex).toUpperCase();
+        // return `${translatedSkill} (${translatedAttributeShorthand})`;
     });
     Handlebars.registerHelper('toHeaderCase', function (str) {
         if (str)
@@ -22391,7 +22481,7 @@ const registerBasicHelpers = () => {
     });
 };
 exports.registerBasicHelpers = registerBasicHelpers;
-},{"../config":145,"../constants":146,"../helpers":156}],151:[function(require,module,exports){
+},{"../helpers":156}],151:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27174,6 +27264,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5Item = void 0;
 const helpers_1 = require("../helpers");
+const SR5Actor_1 = require("../actor/SR5Actor");
 const ShadowrunItemDialog_1 = require("../apps/dialogs/ShadowrunItemDialog");
 const ChatData_1 = require("./ChatData");
 const ShadowrunRoller_1 = require("../rolls/ShadowrunRoller");
@@ -27183,6 +27274,20 @@ const SR5ItemDataWrapper_1 = require("./SR5ItemDataWrapper");
 const PartsList_1 = require("../parts/PartsList");
 const ItemAction_1 = require("./ItemAction");
 const SkillFlow_1 = require("../actor/SkillFlow");
+/**
+ * Implementation of Shadowrun5e items (owned, unowned and embedded).
+ *
+ * NOTE: taMiF here. It seems to me that the current approach to embedded items within items doesn't use foundry internal
+ *       approach but instead overwrites it with using flags and storing / creating item from that flag.
+ *       I'm not sure why the Foundry internal approach of Entity.createEmbeddedEntity didn't fit. However at the
+ *       moment this means, that this.actor can actually be an SR5Actor as well as an SR5Item, depending on who
+ *       'owns' the embedded item as they are created using Item.createOwned during the embedded item prep phase.
+ *
+ *       For this reason SR5Item.actorOwner has been introduced to allow access to the actual owning actor, no matter
+ *       how deep embedded into other items an item is.
+ *
+ *       Be wary of SR5Item.actor for this reason!
+ */
 class SR5Item extends Item {
     constructor() {
         super(...arguments);
@@ -27190,6 +27295,27 @@ class SR5Item extends Item {
     }
     get actor() {
         return super.actor;
+    }
+    /**
+     * Helper property to get an actual actor for an owned or embedded item. You'll need this for when you work with
+     * embeddedItems, as they have their .actor property set to the item they're embedded into.
+     *
+     * NOTE: This helper is necessary since we have setup embedded items with an item owner, due to the current embedding
+     *       workflow using item.update.isOwned condition within Item.update (foundry Item) to NOT trigger a global item
+     *       update within the ItemCollection but instead have this.actor.updateEmbeddedEntities actually trigger SR5Item.updateEmbeddedEntities
+     */
+    get actorOwner() {
+        // An unowned item won't have an actor.
+        if (!this.actor)
+            return;
+        // An owned item will have an actor.
+        if (this.actor instanceof SR5Actor_1.SR5Actor)
+            return this.actor;
+        // An embedded item will have an item as an actor, which might have an actor owner.
+        // NOTE: This is very likely wrong and should be fixed during embedded item prep / creation. this.actor will only
+        //       check what is set in the items options.actor during it's construction.
+        //@ts-ignore
+        return this.actor.actorOwner;
     }
     get wrapper() {
         // we need to cast here to unknown first to make ts happy
@@ -27857,7 +27983,6 @@ class SR5Item extends Item {
      * Rolls a test using the latest stored data on the item (force, fireMode, level)
      * @param event - mouse event
      * @param actionTestData
-     * @param options - any additional roll options to pass along - note that currently the Item will overwrite -- WIP
      */
     rollTest(event, actionTestData) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -27974,14 +28099,17 @@ class SR5Item extends Item {
                     // Patch .data isn't really anymore but do it for consistency.
                     // Patch ._data is needed for Item.prepareData to work, as it's simply duplicating _data over data.
                     // Otherwise old item data will be used for value preparation.
+                    // TODO: Foundry 0.8 does changes to .data / ._data. This MIGHT cause issues here, however I'm unsure.
                     currentItem.data = item;
                     currentItem._data = item;
                     currentItem.prepareData();
                     return currentItem;
                 }
                 else {
-                    // dirty things done here
-                    // @ts-ignore
+                    // NOTE: createdOwned expects an Actor instance as the second parameter.
+                    //       HOWEVER the legacy approach for embeddedItems in other items relies upon this.actor
+                    //       returning an SR5Item instance to call .updateEmbeddedEntities, when Foundry expects an actor
+                    //@ts-ignore
                     return Item.createOwned(item, this);
                 }
             });
@@ -28020,6 +28148,13 @@ class SR5Item extends Item {
             return true;
         });
     }
+    /**
+     * This method hooks into the Foundry Item.update approach and is called using this<Item>.actor.updateEmbeddedEntity.
+     *
+     * @param embeddedName
+     * @param updateData
+     * @param options
+     */
     updateEmbeddedEntity(embeddedName, updateData, options) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.updateOwnedItem(updateData);
@@ -28472,7 +28607,7 @@ class SR5Item extends Item {
     }
 }
 exports.SR5Item = SR5Item;
-},{"../actor/SkillFlow":88,"../apps/dialogs/ShadowrunItemDialog":136,"../chat":143,"../constants":146,"../helpers":156,"../parts/PartsList":208,"../rolls/ShadowrunRoller":209,"./ChatData":195,"./ItemAction":196,"./SR5ItemDataWrapper":198}],198:[function(require,module,exports){
+},{"../actor/SR5Actor":86,"../actor/SkillFlow":88,"../apps/dialogs/ShadowrunItemDialog":136,"../chat":143,"../constants":146,"../helpers":156,"../parts/PartsList":208,"../rolls/ShadowrunRoller":209,"./ChatData":195,"./ItemAction":196,"./SR5ItemDataWrapper":198}],198:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ItemDataWrapper = void 0;
@@ -28899,15 +29034,20 @@ class SR5ItemSheet extends ItemSheet {
         return helpers_1.Helpers.sortConfigValuesByTranslation(config_1.SR5.limits);
     }
     /**
-     * Only display
+     * Sorted (by translation) actor attributes.
      */
     _getSortedAttributesForSelect() {
         return helpers_1.Helpers.sortConfigValuesByTranslation(config_1.SR5.attributes);
     }
+    /**
+     * Sorted (by translation) active skills either from the owning actor or general configuration.
+     */
     _getSortedActiveSkillsForSelect() {
-        if (!this.item.actor)
-            return config_1.SR5.activeSkills;
-        const activeSkills = helpers_1.Helpers.sortSkills(this.item.actor.getActiveSkills());
+        // We need the actor owner, instead of the item owner. See actorOwner jsdoc for details.
+        const actor = this.item.actorOwner;
+        if (!actor)
+            return helpers_1.Helpers.sortConfigValuesByTranslation(config_1.SR5.activeSkills);
+        const activeSkills = helpers_1.Helpers.sortSkills(actor.getActiveSkills());
         const activeSkillsForSelect = {};
         for (const [id, skill] of Object.entries(activeSkills)) {
             // Legacy skills have no name, but their name is their id!
@@ -31132,11 +31272,13 @@ exports.default = Template;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.quenchRegister = void 0;
 const sr5_Modifiers_spec_1 = require("./sr5.Modifiers.spec");
+const sr5_SR5Item_spec_1 = require("./sr5.SR5Item.spec");
 const quenchRegister = quench => {
     quench.registerBatch("shadowrun5e.rules.modifiers", sr5_Modifiers_spec_1.shadowrunRulesModifiers);
+    quench.registerBatch("shadowrun5e.entities.items", sr5_SR5Item_spec_1.shadowrunSR5Item);
 };
 exports.quenchRegister = quenchRegister;
-},{"./sr5.Modifiers.spec":215}],215:[function(require,module,exports){
+},{"./sr5.Modifiers.spec":215,"./sr5.SR5Item.spec":216}],215:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shadowrunRulesModifiers = void 0;
@@ -31304,6 +31446,112 @@ const shadowrunRulesModifiers = context => {
     });
 };
 exports.shadowrunRulesModifiers = shadowrunRulesModifiers;
-},{"../module/sr5/Modifiers":212}]},{},[201])
+},{"../module/sr5/Modifiers":212}],216:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.shadowrunSR5Item = void 0;
+const SR5Item_1 = require("../module/item/SR5Item");
+const shadowrunSR5Item = context => {
+    /**
+     * Setup handling for all items within this test.
+     */
+    class TestingItems {
+        constructor() {
+            this.items = {};
+        }
+        create(data) {
+            return __awaiter(this, void 0, void 0, function* () {
+                const item = yield Item.create(Object.assign({ name: '#QUENCH_TEST_ITEM_SHOULD_HAVE_BEEN_DELETED' }, data));
+                this.items[item.id] = item;
+                return item;
+            });
+        }
+        delete(id) {
+            return __awaiter(this, void 0, void 0, function* () {
+                const item = this.items[id];
+                if (!item)
+                    return;
+                yield Item.delete(item.data._id);
+                delete this.items[item.id];
+            });
+        }
+        teardown() {
+            return __awaiter(this, void 0, void 0, function* () {
+                Object.values(this.items).forEach(item => this.delete(item.id));
+            });
+        }
+    }
+    const { describe, it, assert, before, after } = context;
+    let testing;
+    before(() => __awaiter(void 0, void 0, void 0, function* () {
+        testing = new TestingItems();
+    }));
+    after(() => __awaiter(void 0, void 0, void 0, function* () {
+        yield testing.teardown();
+    }));
+    describe('SR5Items', () => {
+        it('Should create a naked item of any type', () => __awaiter(void 0, void 0, void 0, function* () {
+            const item = yield testing.create({ type: 'action' });
+            // Check basic foundry data integrity
+            assert.notStrictEqual(item.id, '');
+            assert.notStrictEqual(item.id, undefined);
+            assert.notStrictEqual(item.id, null);
+            // Check foundry item collection integrity
+            const itemFromCollection = game.items.get(item.id);
+            assert.notStrictEqual(itemFromCollection, null);
+            assert.strictEqual(item.id, itemFromCollection.id);
+        }));
+        it('Should update an item of any type', () => __awaiter(void 0, void 0, void 0, function* () {
+            const item = yield testing.create({ type: 'action' });
+            assert.notProperty(item.data.data, 'test');
+            yield item.update({ 'data.test': true });
+            assert.property(item.data.data, 'test');
+            assert.propertyVal(item.data.data, 'test', true);
+        }));
+        it('Should embedd an ammo into a weapon and not the global item collection', () => __awaiter(void 0, void 0, void 0, function* () {
+            const weapon = yield testing.create({ type: 'weapon' });
+            const ammo = yield testing.create({ type: 'ammo' });
+            yield weapon.createOwnedItem(ammo.data);
+            const embeddedItemDatas = weapon.getEmbeddedItems();
+            assert.isNotEmpty(embeddedItemDatas);
+            assert.lengthOf(embeddedItemDatas, 1);
+            const embeddedAmmoData = embeddedItemDatas[0];
+            assert.strictEqual(embeddedAmmoData.type, ammo.data.type);
+            // An embedded item should NOT appear in the items collection.
+            const embeddedAmmoInCollection = game.items.get(embeddedAmmoData._id);
+            assert.strictEqual(embeddedAmmoInCollection, null);
+        }));
+        it('Should update an embedded ammo', () => __awaiter(void 0, void 0, void 0, function* () {
+            const weapon = yield testing.create({ type: 'weapon' });
+            const ammo = yield testing.create({ type: 'ammo' });
+            // Embed the item and get
+            yield weapon.createOwnedItem(ammo.data);
+            const embeddedItemDatas = weapon.getEmbeddedItems();
+            assert.lengthOf(embeddedItemDatas, 1);
+            const embeddedAmmoData = embeddedItemDatas[0];
+            const embeddedAmmo = weapon.getOwnedItem(embeddedAmmoData._id);
+            assert.notStrictEqual(embeddedAmmo, undefined);
+            assert.instanceOf(embeddedAmmo, SR5Item_1.SR5Item);
+            if (!embeddedAmmo)
+                return; //type script gate...
+            // Set an testing property.
+            assert.notProperty(embeddedAmmo.data.data, 'test');
+            yield embeddedAmmo.update({ 'data.test': true });
+            assert.property(embeddedAmmo.data.data, 'test');
+            assert.propertyVal(embeddedAmmo.data.data, 'test', true);
+        }));
+    });
+};
+exports.shadowrunSR5Item = shadowrunSR5Item;
+},{"../module/item/SR5Item":197}]},{},[201])
 
 //# sourceMappingURL=bundle.js.map
