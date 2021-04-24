@@ -155,6 +155,7 @@
   "SR5.CreateItemContact": "Create Contact",
   "SR5.CreateItemCritterPower": "Create Critter Power",
   "SR5.CreateEffect": "Create Effect",
+  "SR5.NewEffect": "New Effect",
   "SR5.Weapon": "Weapon",
   "SR5.Ammo": "Ammo",
   "SR5.WeaponMods": "Mods",
@@ -829,5 +830,13 @@
     "RangedWeaponTest": {
       "EnvironmentalOverwriteSet": "Environmental modifiers have been manually set to a fixed value!"
     }
-  }
+  },
+  "SR5.ActiveEffect": {
+      "New": "New Effect",
+      "Types": {
+        "Temporary": "Temporary Effects",
+        "Passive": "Passive Effects",
+        "Inactive": "Inactive Effects"
+      }
+    }
 }
