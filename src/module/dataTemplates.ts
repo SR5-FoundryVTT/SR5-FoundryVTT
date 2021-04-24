@@ -41,7 +41,13 @@ export class DefaultValues {
             },
             attribute: '',
             mod: [],
-            base_formula_operator: 'add'
+            base_formula_operator: 'add',
+            source: {
+                actorId: '',
+                itemId: '',
+                itemType: '',
+                itemName: ''
+            }
         }, partialDamageData) as DamageData;
     }
 

@@ -7,7 +7,7 @@ import ArmorActorData = Shadowrun.ArmorActorData;
 export class ItemPrep {
     /**
      * Prepare the armor data for the Item
-     * - will only allow one "Base" armor item to be used
+     * - will only allow one "Base" armor item to be used (automatically takes the best one if multiple are equipped)
      * - all "accessories" will be added to the armor
      */
     static prepareArmor(data: SR5ActorData & ArmorActorData, items: SR5ItemDataWrapper[]) {
@@ -24,13 +24,16 @@ export class ItemPrep {
         equippedArmor?.forEach((item) => {
             // Don't spam armor values with clothing or armor like items without any actual armor.
             if (item.hasArmor()) {
-                // Apply armor base and accessory values.
+                // We allow only one base armor but multiple armor accessories
                 if (item.hasArmorAccessory()) {
                     armorModParts.addUniquePart(item.getName(), item.getArmorValue());
                 }
                 else {
-                    armor.base = item.getArmorValue();
-                    armor.label = item.getName();
+                    const armorValue = item.getArmorValue();
+                    if (armorValue > armor.base) {
+                        armor.base = item.getArmorValue();
+                        armor.label = item.getName();
+                    }
                 }
             }
 

@@ -16059,17 +16059,31 @@ class SoakRules {
      */
     static applyAllSoakParts(soakParts, actor, damageData) {
         if (damageData.type.base !== 'matrix') {
-            SoakRules.applyMundaneAttackSoakParts(soakParts, actor, damageData);
+            SoakRules.applyPhysicalAndStunSoakParts(soakParts, actor, damageData);
         }
         else {
             SoakRules.applyMatrixSoakParts(soakParts, actor);
         }
     }
-    static applyMundaneAttackSoakParts(soakParts, actor, damageData) {
+    static applyPhysicalAndStunSoakParts(soakParts, actor, damageData) {
+        // Apply special rules for direct combat spells
+        const damageSourceItem = helpers_1.Helpers.findDamageSource(damageData);
+        if (damageSourceItem && damageSourceItem.isDirectCombatSpell()) {
+            return SoakRules.applyDirectCombatSpellParts(damageSourceItem.data, soakParts, actor);
+        }
         SoakRules.applyBodyAndArmorParts(soakParts, actor);
         const armor = actor.getArmor();
         SoakRules.applyArmorPenetration(soakParts, armor, damageData);
         SoakRules.applyElementalArmor(soakParts, armor, damageData.element.base);
+    }
+    static applyDirectCombatSpellParts(spellItem, soakParts, actor) {
+        if (spellItem.data.type === 'mana') {
+            SoakRules.addUniquePart(soakParts, actor.getAttribute('willpower'), config_1.SR5.attributes.willpower);
+        }
+        else {
+            SoakRules.addUniquePart(soakParts, actor.getAttribute('body'), config_1.SR5.attributes.body);
+        }
+        return;
     }
     static applyBodyAndArmorParts(soakParts, actor) {
         const body = actor.findAttribute('body');
@@ -16167,6 +16181,11 @@ class SoakRules {
         let updatedDamage = duplicate(damage);
         if (actor.isVehicle() && updatedDamage.element.value === 'electricity' && updatedDamage.type.value === 'stun') {
             updatedDamage.type.value = 'physical';
+        }
+        const damageSourceItem = helpers_1.Helpers.findDamageSource(damage);
+        if (damageSourceItem && damageSourceItem.isDirectCombatSpell()) {
+            // Damage from direct combat spells is never converted
+            return updatedDamage;
         }
         updatedDamage = SoakRules.modifyPhysicalDamageForArmor(updatedDamage, actor);
         return SoakRules.modifyMatrixDamageForBiofeedback(updatedDamage, actor);
@@ -17123,7 +17142,7 @@ const PartsList_1 = require("../../../parts/PartsList");
 class ItemPrep {
     /**
      * Prepare the armor data for the Item
-     * - will only allow one "Base" armor item to be used
+     * - will only allow one "Base" armor item to be used (automatically takes the best one if multiple are equipped)
      * - all "accessories" will be added to the armor
      */
     static prepareArmor(data, items) {
@@ -17139,13 +17158,16 @@ class ItemPrep {
         equippedArmor === null || equippedArmor === void 0 ? void 0 : equippedArmor.forEach((item) => {
             // Don't spam armor values with clothing or armor like items without any actual armor.
             if (item.hasArmor()) {
-                // Apply armor base and accessory values.
+                // We allow only one base armor but multiple armor accessories
                 if (item.hasArmorAccessory()) {
                     armorModParts.addUniquePart(item.getName(), item.getArmorValue());
                 }
                 else {
-                    armor.base = item.getArmorValue();
-                    armor.label = item.getName();
+                    const armorValue = item.getArmorValue();
+                    if (armorValue > armor.base) {
+                        armor.base = item.getArmorValue();
+                        armor.label = item.getName();
+                    }
                 }
             }
             // Apply elemental modifiers of all worn armor and clothing SR5#169.
@@ -18200,7 +18222,12 @@ var CharacterInfoUpdater = /*#__PURE__*/function () {
     value: function update(actorData, chummerChar) {
       var clonedActorData = duplicate(actorData); // Name is required, so we need to always set something (even if the chummer field is empty)
 
-      clonedActorData.name = chummerChar.alias ? chummerChar.alias : '[Name not found]';
+      if (chummerChar.alias) {
+        clonedActorData.name = chummerChar.alias;
+      } else {
+        clonedActorData.name = chummerChar.name ? chummerChar.name : '[Name not found]';
+      }
+
       this.importBasicData(clonedActorData.data, chummerChar);
       this.importBio(clonedActorData.data, chummerChar);
       this.importAttributes(clonedActorData.data, chummerChar);
@@ -18848,6 +18875,8 @@ var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/creat
 
 var _BaseParserFunctions = require("./BaseParserFunctions.js");
 
+var _dataTemplates = require("../../dataTemplates");
+
 var SpellParser = /*#__PURE__*/function () {
   function SpellParser() {
     (0, _classCallCheck2["default"])(this, SpellParser);
@@ -18893,6 +18922,9 @@ var SpellParser = /*#__PURE__*/function () {
       action.type = 'varies';
       action.skill = 'spellcasting';
       action.attribute = 'magic';
+      action.damage = _dataTemplates.DefaultValues.damageData();
+      action.damage.type.base = '';
+      action.damage.type.value = '';
 
       if (chummerSpell.descriptors) {
         var desc = chummerSpell.descriptors.toLowerCase();
@@ -18900,7 +18932,7 @@ var SpellParser = /*#__PURE__*/function () {
         if (chummerSpell.category.toLowerCase() === 'combat') {
           data.combat = {};
 
-          if (desc.includes('direct')) {
+          if (desc.includes('indirect')) {
             data.combat.type = 'indirect';
             action.opposed = {
               type: 'defense'
@@ -18909,13 +18941,17 @@ var SpellParser = /*#__PURE__*/function () {
             data.combat.type = 'direct';
 
             if (data.type === 'mana') {
+              action.damage.type.base = 'stun';
+              action.damage.type.value = 'stun';
               action.opposed = {
-                type: 'custom',
+                type: 'soak',
                 attribute: 'willpower'
               };
             } else if (data.type === 'physical') {
+              action.damage.type.base = 'physical';
+              action.damage.type.value = 'physical';
               action.opposed = {
-                type: 'custom',
+                type: 'soak',
                 attribute: 'body'
               };
             }
@@ -19002,7 +19038,7 @@ var SpellParser = /*#__PURE__*/function () {
 
 exports.SpellParser = SpellParser;
 
-},{"./BaseParserFunctions.js":113,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],123:[function(require,module,exports){
+},{"../../dataTemplates":147,"./BaseParserFunctions.js":113,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],123:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -22169,7 +22205,13 @@ class DefaultValues {
             },
             attribute: '',
             mod: [],
-            base_formula_operator: 'add'
+            base_formula_operator: 'add',
+            source: {
+                actorId: '',
+                itemId: '',
+                itemType: '',
+                itemName: ''
+            }
         }, partialDamageData);
     }
     static actorArmorData(partialActorArmorData = {}) {
@@ -23611,7 +23653,7 @@ class Helpers {
             return token.data.name;
         return actor.name;
     }
-    static createDamageData(value, type, ap = 0, element = '') {
+    static createDamageData(value, type, ap = 0, element = '', sourceItem) {
         const damage = duplicate(dataTemplates_1.DataTemplates.damage);
         damage.base = value;
         damage.value = value;
@@ -23621,7 +23663,47 @@ class Helpers {
         damage.ap.value = ap;
         damage.element.base = element;
         damage.element.value = element;
+        if (sourceItem && sourceItem.actor) {
+            damage.source = {
+                actorId: sourceItem.actor.id,
+                itemType: sourceItem.type,
+                itemId: sourceItem.id,
+                itemName: sourceItem.name
+            };
+        }
         return damage;
+    }
+    /**
+     * Retrieves the item causing the damage, if there is any.
+     * This only works for embedded items at the moment
+     */
+    static findDamageSource(damageData) {
+        if (!damageData.source) {
+            return;
+        }
+        const actorId = damageData.source.actorId;
+        const actorSource = game.actors.find(actor => actor.id === actorId);
+        if (!actorSource) {
+            return;
+        }
+        // First search the actor itself for the item
+        const itemId = damageData.source.itemId;
+        const actorItem = actorSource.getOwnedItem(itemId);
+        if (actorItem) {
+            return actorItem;
+        }
+        // If we did not find anything on the actor, search the active tokens (the item might only exist on a non linked token)
+        // This will not work if we are on a different scene or the token got deleted, which is expected when you put an
+        // item on a token without linking it.
+        const tokens = actorSource.getActiveTokens();
+        let tokenItem;
+        tokens.forEach(token => {
+            const foundItem = token.actor.items.find(i => i.id === itemId);
+            if (foundItem) {
+                tokenItem = foundItem;
+            }
+        });
+        return tokenItem;
     }
     /** Modifies given damage value and returns both original and modified damage
      *
@@ -26386,7 +26468,7 @@ class CombatSpellParser extends SpellParserBase_1.SpellParserBase {
         }
         data.data.combat.type = descriptor.includes('Indirect') ? 'indirect' : 'direct';
         if (data.data.combat.type === 'direct') {
-            data.data.action.opposed.type = 'defense';
+            data.data.action.opposed.type = 'soak';
             switch (data.data.type) {
                 case 'physical':
                     data.data.action.opposed.attribute = 'body';
@@ -27481,6 +27563,14 @@ class SR5Item extends Item {
             if (action.damage.base_formula_operator === '+') {
                 action.damage.base_formula_operator = 'add';
             }
+            if (this.actor) {
+                action.damage.source = {
+                    actorId: this.actor.id,
+                    itemId: this.id,
+                    itemName: this.name,
+                    itemType: this.data.type
+                };
+            }
             // handle overrides from mods
             const limitParts = new PartsList_1.PartsList(action.limit.mod);
             const dpParts = new PartsList_1.PartsList(action.dice_pool_mod);
@@ -28573,12 +28663,12 @@ class SR5Item extends Item {
             return;
         if (this.isDirectCombatSpell()) {
             const damage = hits;
-            return helpers_1.Helpers.createDamageData(damage, action.damage.type.value);
+            return helpers_1.Helpers.createDamageData(damage, action.damage.type.value, 0, '', this);
         }
         else if (this.isIndirectCombatSpell()) {
             const damage = force;
             const ap = -force;
-            return helpers_1.Helpers.createDamageData(damage, action.damage.type.value, -ap);
+            return helpers_1.Helpers.createDamageData(damage, action.damage.type.value, -ap, '', this);
         }
     }
     // TODO: Move into a rule section.
