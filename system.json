@@ -50,7 +50,7 @@
     "socket": true,
     "manifest": "https://raw.githubusercontent.com/smilligan93/SR5-FoundryVTT/master/system.json",
     "url": "https://github.com/smilligan93/SR5-FoundryVTT",
-    "download": "https://github.com/smilligan93/SR5-FoundryVTT/archive/v0.7.12.zip",
+    "download": "https://github.com/smilligan93/SR5-FoundryVTT/archive/v0.7.15.zip",
     "allowBugReporter": true,
     "bugs": "https://github.com/smilligan93/SR5-FoundryVTT/issues"
 }
