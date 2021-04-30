@@ -997,7 +997,8 @@ export class SR5Item extends Item {
      * @param updateData
      * @param options
      */
-    async updateEmbeddedEntity(embeddedName: string, updateData: object | object[], options?: object) {
+    // @ts-ignore
+    async updateEmbeddedEntity(embeddedName,updateData, options) {
         await this.updateOwnedItem(updateData);
         return this;
     }

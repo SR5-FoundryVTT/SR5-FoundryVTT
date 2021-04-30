@@ -441,7 +441,7 @@ export class Helpers {
 
         // First search the actor itself for the item
         const itemId = damageData.source.itemId;
-        const actorItem = actorSource.getOwnedItem(itemId) as SR5Item;
+        const actorItem = actorSource.getOwnedItem(itemId) as unknown as SR5Item;
         if (actorItem)
         {
             return actorItem;
@@ -455,7 +455,7 @@ export class Helpers {
         tokens.forEach(token => {
             const foundItem = token.actor.items.find(i => i.id === itemId);
             if (foundItem) {
-                tokenItem = foundItem as SR5Item;
+                tokenItem = foundItem as unknown as SR5Item;
             }
         });
 

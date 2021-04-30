@@ -28,7 +28,6 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
     _scroll: string;
 
     constructor(actor, options?) {
-        console.error('constructor');
         super(actor, options);
 
         /**
@@ -49,7 +48,6 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
      * @returns {Object}
      */
     static get defaultOptions() {
-        console.error('defaultOptions');
         // @ts-ignore
         return mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'actor'],
@@ -111,7 +109,6 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
      * The prepared data object contains both the actor data as well as additional sheet options
      */
     getData() {
-        console.error('getData');
         // const data: SR5ActorSheetData = (super.getData() as unknown) as SR5ActorSheetData;
         const data = this.superGetData() as unknown as SR5ActorSheetData;
 
@@ -1113,7 +1110,6 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
 
     // @ts-ignore
     async render(...args) {
-        console.error('render');
         await super.render(...args);
     }
 }

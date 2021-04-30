@@ -56,7 +56,6 @@ ___________________
 \\____/\\_| \\_\\____/ 
 ===================
 `);
-        console.error('Hallo');
         // Create a shadowrun5e namespace within the game global
         game['shadowrun5e'] = {
             SR5Actor,
