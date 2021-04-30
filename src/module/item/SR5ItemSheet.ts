@@ -44,6 +44,8 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
      */
     async getData() {
         const data = await super.getData();
+        // TODO: Foundry 0.8 will return data as an sheet data while Foundry 0.7 will return data as an item data. Therefore data is nested one deeper.
+        data.data = data.data.data;
         const itemData = data.data;
 
         if (itemData.action) {
@@ -336,7 +338,7 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
      */
     async _render(force = false, options = {}) {
         // NOTE: This is for a timing bug. See function doc for code removal. Good luck, there be dragons here. - taM
-        this.fixStaleRenderedState();
+        // this.fixStaleRenderedState();
 
         this._saveScrollPositions();
         await super._render(force, options);

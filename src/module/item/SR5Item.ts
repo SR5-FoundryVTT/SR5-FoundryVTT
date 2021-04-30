@@ -173,12 +173,6 @@ export class SR5Item extends Item {
         await this.unsetFlag(SYSTEM_NAME, FLAGS.EmbeddedItems);
     }
 
-    /** Overwrite to allow for options param to be skipped.
-     */
-    async update(data, options?): Promise<this> {
-        return super.update(data, options);
-    }
-
     get hasOpposedRoll(): boolean {
         const action = this.getAction();
         if (!action) return false;
