@@ -53,6 +53,20 @@ import {ItemAction} from "./ItemAction";
 import {SkillFlow} from "../actor/SkillFlow";
 import {SR5} from "../config";
 
+/**
+ * Implementation of Shadowrun5e items (owned, unowned and embedded).
+ *
+ * NOTE: taMiF here. It seems to me that the current approach to embedded items within items doesn't use foundry internal
+ *       approach but instead overwrites it with using flags and storing / creating item from that flag.
+ *       I'm not sure why the Foundry internal approach of Entity.createEmbeddedEntity didn't fit. However at the
+ *       moment this means, that this.actor can actually be an SR5Actor as well as an SR5Item, depending on who
+ *       'owns' the embedded item as they are created using Item.createOwned during the embedded item prep phase.
+ *
+ *       For this reason SR5Item.actorOwner has been introduced to allow access to the actual owning actor, no matter
+ *       how deep embedded into other items an item is.
+ *
+ *       Be wary of SR5Item.actor for this reason!
+ */
 export class SR5Item extends Item {
     // TODO: TYPE: In contrast to SR5Actor we can only type Item.data as the typing structure for ItemData doesn't have
     //       monolithic Item.data.data typing (SR5ActorData) but only one for each Item type. Therefore we can't
@@ -67,6 +81,26 @@ export class SR5Item extends Item {
     get actor(): SR5Actor {
         this.data.data.skills
         return super.actor as unknown as SR5Actor;
+    }
+
+    /**
+     * Helper property to get an actual actor for an owned or embedded item. You'll need this for when you work with
+     * embeddedItems, as they have their .actor property set to the item they're embedded into.
+     *
+     * NOTE: This helper is necessary since we have setup embedded items with an item owner, due to the current embedding
+     *       workflow using item.update.isOwned condition within Item.update (foundry Item) to NOT trigger a global item
+     *       update within the ItemCollection but instead have this.actor.updateEmbeddedEntities actually trigger SR5Item.updateEmbeddedEntities
+     */
+    get actorOwner(): SR5Actor | undefined {
+        // An unowned item won't have an actor.
+        if (!this.actor) return;
+        // An owned item will have an actor.
+        if (this.actor instanceof SR5Actor) return this.actor;
+        // An embedded item will have an item as an actor, which might have an actor owner.
+        // NOTE: This is very likely wrong and should be fixed during embedded item prep / creation. this.actor will only
+        //       check what is set in the items options.actor during it's construction.
+        //@ts-ignore
+        return this.actor.actorOwner;
     }
 
     private get wrapper(): SR5ItemDataWrapper {
@@ -218,6 +252,15 @@ export class SR5Item extends Item {
             // Due to faulty template value items without a set operator will have a operator literal instead since 0.7.10.
             if (action.damage.base_formula_operator === '+') {
                 action.damage.base_formula_operator = 'add';
+            }
+
+            if (this.actor){
+                action.damage.source = {
+                    actorId: this.actor.id,
+                    itemId: this.id,
+                    itemName: this.name,
+                    itemType: this.data.type
+                };
             }
 
             // handle overrides from mods
@@ -779,7 +822,6 @@ export class SR5Item extends Item {
      * Rolls a test using the latest stored data on the item (force, fireMode, level)
      * @param event - mouse event
      * @param actionTestData
-     * @param options - any additional roll options to pass along - note that currently the Item will overwrite -- WIP
      */
     async rollTest(event, actionTestData?: ActionTestData): Promise<ShadowrunRoll | undefined> {
 
@@ -901,14 +943,17 @@ export class SR5Item extends Item {
                     // Patch .data isn't really anymore but do it for consistency.
                     // Patch ._data is needed for Item.prepareData to work, as it's simply duplicating _data over data.
                     // Otherwise old item data will be used for value preparation.
+                    // TODO: Foundry 0.8 does changes to .data / ._data. This MIGHT cause issues here, however I'm unsure.
                     currentItem.data = item;
                     currentItem._data = item;
                     currentItem.prepareData();
                     return currentItem;
 
                 } else {
-                    // dirty things done here
-                    // @ts-ignore
+                    // NOTE: createdOwned expects an Actor instance as the second parameter.
+                    //       HOWEVER the legacy approach for embeddedItems in other items relies upon this.actor
+                    //       returning an SR5Item instance to call .updateEmbeddedEntities, when Foundry expects an actor
+                    //@ts-ignore
                     return Item.createOwned(item, this);
                 }
             });
@@ -945,9 +990,15 @@ export class SR5Item extends Item {
         return true;
     }
 
-    // @ts-ignore // TODO: TYPE: Remove after Item typing.
-    async updateEmbeddedEntity(embeddedName, data, options?) {
-        await this.updateOwnedItem(data);
+    /**
+     * This method hooks into the Foundry Item.update approach and is called using this<Item>.actor.updateEmbeddedEntity.
+     *
+     * @param embeddedName
+     * @param updateData
+     * @param options
+     */
+    async updateEmbeddedEntity(embeddedName: string, updateData: object | object[], options?: object) {
+        await this.updateOwnedItem(updateData);
         return this;
     }
 
@@ -1419,12 +1470,12 @@ export class SR5Item extends Item {
         if (this.isDirectCombatSpell()) {
             const damage = hits;
 
-            return Helpers.createDamageData(damage, action.damage.type.value);
+            return Helpers.createDamageData(damage, action.damage.type.value, 0, '', this);
         } else if (this.isIndirectCombatSpell()) {
             const damage = force;
             const ap = -force;
 
-            return Helpers.createDamageData(damage, action.damage.type.value, -ap)
+            return Helpers.createDamageData(damage, action.damage.type.value, -ap, '', this);
         }
     }
 

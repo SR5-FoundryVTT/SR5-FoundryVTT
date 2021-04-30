@@ -30,6 +30,16 @@ declare namespace Shadowrun {
      */
     export type LimitData = ModifiableValueLinked;
     export type FormulaOperator = 'add'|'subtract'|'multiply'|'divide';
+
+    /**
+     * Info about the embedded source item that caused the damage
+     */
+    export type DamageSource = {
+        actorId : string;
+        itemId : string;
+        itemName : string;
+        itemType : string;
+    }
     /**
      * Action damage data.
      */
@@ -39,6 +49,7 @@ declare namespace Shadowrun {
         ap: ModifiableValue;
         // See config.actionDamageFormulaOperators for operator mapping.
         base_formula_operator: FormulaOperator;
+        source?: DamageSource;
     };
     /**
      * Action opposed test data.

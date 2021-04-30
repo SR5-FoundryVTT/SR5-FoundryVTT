@@ -137,6 +137,7 @@ export class SR5Combat extends Combat {
         const combat = game.combats?.get(combatId) as unknown as SR5Combat;
         if (!combat) return;
         await combat.resetAll();
+        await SR5Combat.setInitiativePass(combat, SR.combat.INITIAL_INI_PASS);
 
         if (game.settings.get(SYSTEM_NAME, FLAGS.OnlyAutoRollNPCInCombat)) {
             await combat.rollNPC();
@@ -144,7 +145,7 @@ export class SR5Combat extends Combat {
             await combat.rollAll();
         }
 
-        const turn = 0
+        const turn = 0;
         await combat.update({turn});
     }
 
@@ -167,6 +168,8 @@ export class SR5Combat extends Combat {
 
         // now we sort by ERIC
         const genData = (actor): number[] => {
+            // There are broken scenes out there, which will try setting up a combat without valid actors.
+            if (!actor) return [0, 0, 0, 0];
             // edge, reaction, intuition, coin flip
             return [
                 Number(actor.getEdge().value),
@@ -208,15 +211,16 @@ export class SR5Combat extends Combat {
      */
     get nextViableTurnPosition(): number {
         // Start at the next position after the current one.
-        for (let n = this.turn + 1; n++; n < this.combatants.length) {
-            const combatant = this.combatants[n];
-            if (combatant.initiative === null || combatant.initiative === undefined)
-                continue;
-            if (combatant.initiative > 0)
-                return n;
+        for (let [turnInPass, combatant] of this.turns.entries()) {
+            // Skipping is only interesting when moving forward.
+            if (turnInPass <= this.turn) continue;
+            // @ts-ignore
+            if (combatant.initiative > 0) {
+                return turnInPass;
+            }
         }
-        // If nothing is found, start at the top.
-        return 0
+        // The current turn is the last undefeated combatant. So go to the end and beeeeyooond.
+        return this.turns.length;
     }
 
     /**
@@ -305,7 +309,6 @@ export class SR5Combat extends Combat {
     async nextRound(): Promise<void> {
         // Let Foundry handle time and some other things.
         await super.nextRound();
-        await SR5Combat.setInitiativePass(this, SR.combat.INITIAL_INI_PASS);
 
         // Owner permissions are needed to change the shadowrun initiative round.
         if (!game.user?.isGM) {

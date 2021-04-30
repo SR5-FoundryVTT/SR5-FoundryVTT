@@ -88,17 +88,36 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         data['ammunition'] = ammunition;
         data['weaponMods'] = weaponMods;
         data['armorMods'] = armorMods;
-        // TODO set to the proper boolean for if the source PDF can be accessed
-        // I'm thinking maybe check for the mod being installed?
-        data['hasSourcePdfAvailable'] = true;
-        data['activeSkills'] = this._getActiveSkillsForSelect();
+        data['activeSkills'] = this._getSortedActiveSkillsForSelect();
+        data['attributes'] = this._getSortedAttributesForSelect();
+        data['limits'] = this._getSortedLimitsForSelect();
 
         return data;
     }
 
-    _getActiveSkillsForSelect() {
-        if (!this.item.actor) return SR5.activeSkills;
-        const activeSkills = Helpers.sortSkills(this.item.actor.getActiveSkills());
+    /**
+     * Action limits currently contain limits for all action types. Be it matrix, magic or physical.
+     */
+    _getSortedLimitsForSelect(): Record<string, string> {
+        return Helpers.sortConfigValuesByTranslation(SR5.limits);
+    }
+
+    /**
+     * Sorted (by translation) actor attributes.
+     */
+    _getSortedAttributesForSelect(): Record<string, string> {
+        return Helpers.sortConfigValuesByTranslation(SR5.attributes);
+    }
+
+    /**
+     * Sorted (by translation) active skills either from the owning actor or general configuration.
+     */
+    _getSortedActiveSkillsForSelect() {
+        // We need the actor owner, instead of the item owner. See actorOwner jsdoc for details.
+        const actor = this.item.actorOwner;
+        if (!actor) return Helpers.sortConfigValuesByTranslation(SR5.activeSkills);
+
+        const activeSkills = Helpers.sortSkills(actor.getActiveSkills());
 
         const activeSkillsForSelect = {};
         for (const [id, skill] of Object.entries(activeSkills)) {

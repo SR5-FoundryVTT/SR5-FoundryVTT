@@ -69,8 +69,6 @@ export class ShadowrunItemDialog {
         const targetRange = modifiers.environmental.active.range;
         const disableTargetRange = modifiers.hasActiveEnvironmentalOverwrite;
 
-        console.error(modifiers);
-
         const templateData = {
             targetRange,
             disableTargetRange

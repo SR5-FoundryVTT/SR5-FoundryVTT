@@ -13,6 +13,7 @@ import {DEFAULT_ID_LENGTH, FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS
 import {SR5Actor} from "./actor/SR5Actor";
 import {DataTemplates} from "./dataTemplates";
 import {DeleteConfirmationDialog} from "./apps/dialogs/DeleteConfirmationDialog";
+import { SR5Item } from './item/SR5Item';
 import Skills = Shadowrun.Skills;
 
 interface CalcTotalOptions {
@@ -397,7 +398,7 @@ export class Helpers {
         return actor.name;
     }
 
-    static createDamageData(value: number, type: DamageType, ap: number = 0, element: DamageElement = ''): DamageData {
+    static createDamageData(value: number, type: DamageType, ap: number = 0, element: DamageElement = '', sourceItem? : SR5Item): DamageData {
         const damage = duplicate(DataTemplates.damage) as DamageData;
         damage.base = value;
         damage.value = value;
@@ -408,7 +409,57 @@ export class Helpers {
         damage.element.base = element;
         damage.element.value = element;
 
+        if (sourceItem && sourceItem.actor) {
+            damage.source = {
+                actorId: sourceItem.actor.id,
+                itemType: sourceItem.type,
+                itemId: sourceItem.id,
+                itemName: sourceItem.name
+            };
+        }
+
         return damage;
+    }
+
+    /**
+     * Retrieves the item causing the damage, if there is any.
+     * This only works for embedded items at the moment
+     */
+    static findDamageSource(damageData : DamageData) : SR5Item | undefined{
+        if (!damageData.source) {
+            return;
+        }
+
+        const actorId = damageData.source.actorId;
+        const actorSource = game.actors.find(
+            actor => actor.id === actorId
+            );
+
+        if (!actorSource) {
+            return;
+        }
+
+        // First search the actor itself for the item
+        const itemId = damageData.source.itemId;
+        const actorItem = actorSource.getOwnedItem(itemId) as SR5Item;
+        if (actorItem)
+        {
+            return actorItem;
+        }
+
+        // If we did not find anything on the actor, search the active tokens (the item might only exist on a non linked token)
+        // This will not work if we are on a different scene or the token got deleted, which is expected when you put an
+        // item on a token without linking it.
+        const tokens = actorSource.getActiveTokens();
+        let tokenItem : SR5Item | undefined;
+        tokens.forEach(token => {
+            const foundItem = token.actor.items.find(i => i.id === itemId);
+            if (foundItem) {
+                tokenItem = foundItem as SR5Item;
+            }
+        });
+
+        return tokenItem;
     }
 
     /** Modifies given damage value and returns both original and modified damage
@@ -473,7 +524,18 @@ export class Helpers {
         }
     }
 
-    /** A simple helper to delete existing entity data keys.
+    /**
+     * A simple helper to get an data entry for updating with Entity.update
+     *
+     * @param path The main data path as a doted string relative from the type data (not entity data).
+     * @param value Whatever needs to be stored.
+     *
+     */
+    static getUpdateDataEntry(path: string, value: any): {[path: string]: any} {
+        return {[path]: value};
+    }
+    /**
+     * A simple helper to delete existing entity data keys with Entity.update
      *
      * @param path The main data path as doted string relative from the item type data (not entity data). data.skills.active
      * @param key The single sub property within the path that's meant to be deleted. 'test'
@@ -485,6 +547,10 @@ export class Helpers {
         // Entity.update utilizes the mergeObject function within Foundry.
         // That functions documentation allows property deletion using the -= prefix before property key.
         return {[path]: {[`-=${key}`]: null}};
+    }
+
+    static localizeSkill(skill: SkillField): string {
+        return skill.label ? game.i18n.localize(skill.label) : skill.name;
     }
 
     /**
@@ -500,13 +566,13 @@ export class Helpers {
     static sortSkills(skills: Skills, asc: boolean=true): Skills {
         // Filter entries instead of values to have a store of ids for easy rebuild.
         const sortedEntries = Object.entries(skills).sort(([aId, a], [bId, b]) => {
-            const comparatorA = a.label ? game.i18n.localize(a.label) : a.name;
-            const comparatorB = b.label ? game.i18n.localize(b.label) : b.name;
+            const comparatorA = Helpers.localizeSkill(a);
+            const comparatorB = Helpers.localizeSkill(b);
             // Use String.localeCompare instead of the > Operator to support other alphabets.
             if (asc)
                 return comparatorA.localeCompare(comparatorB) === 1 ? 1 : -1;
             else
-                return comparatorA.localeCompare(comparatorB) === 1 ? 1 : -1;
+                return comparatorA.localeCompare(comparatorB) === 1 ? -1 : 1;
         });
 
         // Rebuild the Skills type using the earlier entries.
@@ -515,6 +581,35 @@ export class Helpers {
             sortedAsObject[id] = skill;
         }
 
+        return sortedAsObject;
+    }
+
+    /**
+     * Alphabetically sort any SR5 config object with a key to label structure.
+     *
+     * Sorting should be aware of UTF-8, however please blame JavaScript if it's not. :)
+     *
+     * @param configValues The config value to be sorted
+     * @param asc Set to true for ascending sorting order and to false for descending order.
+     * @return Sorted config values given by the configValues parameter
+     */
+    static sortConfigValuesByTranslation(configValues: Record<string, string>, asc: boolean=true): Record<string, string> {
+        // Filter entries instead of values to have a store of ids for easy rebuild.
+        const sortedEntries = Object.entries(configValues).sort(([aId, a], [bId, b]) => {
+            const comparatorA = game.i18n.localize(a);
+            const comparatorB = game.i18n.localize(b);
+            // Use String.localeCompare instead of the > Operator to support other alphabets.
+            if (asc)
+                return comparatorA.localeCompare(comparatorB) === 1 ? 1 : -1;
+            else
+                return comparatorA.localeCompare(comparatorB) === 1 ? -1 : 1;
+        });
+
+        // Rebuild the skills type using the earlier entries.
+        const sortedAsObject = {};
+        for (const [key, translated] of sortedEntries) {
+            sortedAsObject[key] = translated;
+        }
         return sortedAsObject;
     }
 }

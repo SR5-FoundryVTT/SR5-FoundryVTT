@@ -1,4 +1,5 @@
 import { parseDescription, getArray, createItemData } from "./BaseParserFunctions.js"
+import { DefaultValues } from "../../dataTemplates";
 
 export class SpellParser {
     parseSpells(chummerChar) {
@@ -50,12 +51,15 @@ export class SpellParser {
         action.type = 'varies';
         action.skill = 'spellcasting';
         action.attribute = 'magic';
+        action.damage = DefaultValues.damageData();
+        action.damage.type.base = '';
+        action.damage.type.value = '';
 
         if (chummerSpell.descriptors) {
             const desc = chummerSpell.descriptors.toLowerCase();
             if (chummerSpell.category.toLowerCase() === 'combat') {
                 data.combat = {};
-                if (desc.includes('direct')) {
+                if (desc.includes('indirect')) {
                     data.combat.type = 'indirect';
                     action.opposed = {
                         type: 'defense',
@@ -63,13 +67,17 @@ export class SpellParser {
                 } else {
                     data.combat.type = 'direct';
                     if (data.type === 'mana') {
+                        action.damage.type.base = 'stun';
+                        action.damage.type.value = 'stun';
                         action.opposed = {
-                            type: 'custom',
+                            type: 'soak',
                             attribute: 'willpower',
                         };
                     } else if (data.type === 'physical') {
+                        action.damage.type.base = 'physical';
+                        action.damage.type.value = 'physical';
                         action.opposed = {
-                            type: 'custom',
+                            type: 'soak',
                             attribute: 'body',
                         };
                     }

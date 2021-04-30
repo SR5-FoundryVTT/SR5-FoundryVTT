@@ -1103,7 +1103,13 @@
                             "base": 0
                         },
                         "base_formula_operator": "add",
-                        "attribute": ""
+                        "attribute": "",
+                        "itemSource": {
+                            "actorId": "",
+                            "itemId": "",
+                            "itemType": "",
+                            "itemName": ""
+                        }
                     },
                     "opposed": {
                         "type": "",
