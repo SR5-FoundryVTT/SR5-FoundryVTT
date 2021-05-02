@@ -939,9 +939,11 @@ export class SR5Item extends Item {
                     // Patch ._data is needed for Item.prepareData to work, as it's simply duplicating _data over data.
                     // Otherwise old item data will be used for value preparation.
                     // TODO: Foundry 0.8 does changes to .data / ._data. This MIGHT cause issues here, however I'm unsure.
-                    currentItem.data = item;
-                    currentItem._data = item;
-                    console.error('Items.prepareEmbeddedEntities', currentItem);
+                    // currentItem.data = item;
+                    // currentItem._data = item;
+                    console.error('Updating embedded items working correctly?')
+                    currentItem.data.update(item);
+                    // TODO: Foundry 0.8 Does data.update already handle the prepareData workflow?
                     currentItem.prepareData();
                     return currentItem;
 
@@ -962,6 +964,7 @@ export class SR5Item extends Item {
         return items.find((i) => i._id === itemId);
     }
 
+    // TODO: Foundry 0.8. Rework this method. It's complicated and obvious optimizations can be made. (find vs findIndex)
     async updateOwnedItem(changes) {
         const items = duplicate(this.getEmbeddedItems());
         if (!items) return;
@@ -971,6 +974,9 @@ export class SR5Item extends Item {
             const index = items.findIndex((i) => i._id === itemChanges._id);
             if (index === -1) return;
             const item = items[index];
+            // TODO: Foundry 0.8 made it necessary to add the _id field. Even so, don't change the id to avoid any byproducts.
+            delete itemChanges._id;
+
             if (item) {
                 itemChanges = expandObject(itemChanges);
                 mergeObject(item, itemChanges);
@@ -1478,6 +1484,10 @@ export class SR5Item extends Item {
 
     // TODO: Move into a rule section.
     async rollDefense(target: SR5Actor, options: DefenseRollOptions): Promise<ShadowrunRoll | undefined> {
+        if (!target) {
+            console.error("The targeted actor couldn't be fetched.");
+            return;
+        }
         // TODO: Maybe move into defense methods and give the actor access to the item.
         const opposedParts = this.getOpposedTestMod();
 
@@ -1507,5 +1517,20 @@ export class SR5Item extends Item {
         if (this.isIndirectCombatSpell()) return true;
 
         return false;
+    }
+
+    // TODO: Foundry 0.8 this method has been added for debugging
+    // @ts-ignore
+    async update(data, ...args) {
+        // @ts-ignore // TODO: Foundry 0.8 this.parent doesn't exist in 0.7 Foundry
+        if (this.hasOwnProperty('parent') && this.parent instanceof SR5Item) {
+            // Allow the parent to identify the item
+            // TODO: Foundry 0.8 Fetch the item from the parent and hand over data + the item.
+            data._id = this.id;
+            // @ts-ignore
+            return await this.parent.updateOwnedItem(data)
+        }
+        // @ts-ignore
+        return await super.update(data, ...args);
     }
 }

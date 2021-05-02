@@ -993,26 +993,40 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
     }
 
     /**
-     * @private
+     * Enhance Foundry state restore on rerender by more user interaction state.
+     * @override
      */
     async _render(...args) {
-        // const focusList = $(this.element).find(':focus');
-        // const focus: any = focusList.length ? focusList[0] : null;
-
+        const focus = this._saveInputCursorPosition();
         this._saveScrollPositions();
-        await super._render(...args);
-        this._restoreScrollPositions();
 
-        // if (focus && focus.name) {
-        //     if (!this.form) return;
-        //
-        //     const element = this.form[focus.name];
-        //     if (element) {
-        //         element.focus();
-        //         // set the selection range on the focus formed from before (keeps track of cursor in input)
-        //         element.setSelectionRange && element.setSelectionRange(focus.selectionStart, focus.selectionEnd);
-        //     }
-        // }
+        await super._render(...args);
+
+        this._restoreScrollPositions();
+        this._restoreInputCursorPosition(focus);
+    }
+
+    _saveInputCursorPosition(): any|null {
+        const focusList = $(this.element).find(':focus');
+        return focusList.length ? focusList[0] : null;
+    }
+
+    /**
+     * Restore the cursor position of focused input elements on top of Foundry restoring the general focus
+     * This is needed for char by char update caused by filtering skills.
+     */
+    _restoreInputCursorPosition(focus) {
+        if (focus && focus.name) {
+            if (!this.form) return;
+
+            const element = this.form[focus.name];
+            if (element) {
+                element.focus();
+                // set the selection range on the focus formed from before (keeps track of cursor in input)
+                element.setSelectionRange && element.setSelectionRange(focus.selectionStart, focus.selectionEnd);
+            }
+        }
+
     }
 
     /**
