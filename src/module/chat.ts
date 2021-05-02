@@ -219,7 +219,11 @@ function getRollChatTemplateData(options: RollChatMessageOptions): RollChatTempl
 }
 
 function getTokenSceneId(token: Token | undefined): string | undefined {
-    return token ? `${token.scene._id}.${token.id}` : undefined;
+    if (!token) return;
+    // TODO: Foundry 0.8 token.parent vs token.scene breaking change.
+    const scene = token.scene || token.parent;
+    // @ts-ignore
+    return scene._id;
 }
 
 export const addChatMessageContextOptions = (html, options) => {

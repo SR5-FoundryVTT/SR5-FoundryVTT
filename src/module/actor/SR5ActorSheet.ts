@@ -113,7 +113,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         const data = this.superGetData() as unknown as SR5ActorSheetData;
 
         // General purpose fields...
-        data.config = CONFIG.SR5;
+        data.config = SR5;
         data.filters = this._filters;
 
         this._prepareMatrixAttributes(data);
@@ -138,7 +138,8 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
 
     _getSkillLabelOrName(skill) {
         // Custom skills don't have labels, use their name instead.
-        return skill.label ? game.i18n.localize(skill.label) : skill.name;
+        // TODO: Foundry 0.8 Bug with template and missing data?
+        return skill.label ? game.i18n.localize(skill.label) : skill.name || '';
     }
 
     _doesSkillContainText(key, skill, text) {
@@ -995,23 +996,23 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
      * @private
      */
     async _render(...args) {
-        const focusList = $(this.element).find(':focus');
-        const focus: any = focusList.length ? focusList[0] : null;
+        // const focusList = $(this.element).find(':focus');
+        // const focus: any = focusList.length ? focusList[0] : null;
 
         this._saveScrollPositions();
         await super._render(...args);
         this._restoreScrollPositions();
 
-        if (focus && focus.name) {
-            if (!this.form) return;
-
-            const element = this.form[focus.name];
-            if (element) {
-                element.focus();
-                // set the selection range on the focus formed from before (keeps track of cursor in input)
-                element.setSelectionRange && element.setSelectionRange(focus.selectionStart, focus.selectionEnd);
-            }
-        }
+        // if (focus && focus.name) {
+        //     if (!this.form) return;
+        //
+        //     const element = this.form[focus.name];
+        //     if (element) {
+        //         element.focus();
+        //         // set the selection range on the focus formed from before (keeps track of cursor in input)
+        //         element.setSelectionRange && element.setSelectionRange(focus.selectionStart, focus.selectionEnd);
+        //     }
+        // }
     }
 
     /**
@@ -1102,14 +1103,8 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         await this.actor.showHiddenSkills();
     }
 
-
     async handleRemoveVehicleDriver(event) {
         event.preventDefault();
         await this.actor.removeVehicleDriver();
-    }
-
-    // @ts-ignore
-    async render(...args) {
-        await super.render(...args);
     }
 }

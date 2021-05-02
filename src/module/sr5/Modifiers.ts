@@ -204,8 +204,10 @@ export class Modifiers {
     }
 
     static async getModifiersFromEntity(entity: Entity): Promise<Modifiers> {
-        const data = await entity.getFlag(SYSTEM_NAME, FLAGS.Modifier) as SituationModifiers;
+        // It's possible for scene modifiers to chosen, while no scene is actually opened.
+        // if (!entity) return new Modifiers(Modifiers.getDefaultModifiers());
 
+        const data = await entity.getFlag(SYSTEM_NAME, FLAGS.Modifier) as SituationModifiers;
         return new Modifiers(data);
     }
 

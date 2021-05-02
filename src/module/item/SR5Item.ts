@@ -248,7 +248,8 @@ export class SR5Item extends Item {
                 action.damage.base_formula_operator = 'add';
             }
 
-            if (this.actor){
+            // Item.prepareData is called once (first) with an empty SR5Actor instance without .data and once (second) with .data.
+            if (this.actor?.data) {
                 action.damage.source = {
                     actorId: this.actor.id,
                     itemId: this.id,
@@ -940,6 +941,7 @@ export class SR5Item extends Item {
                     // TODO: Foundry 0.8 does changes to .data / ._data. This MIGHT cause issues here, however I'm unsure.
                     currentItem.data = item;
                     currentItem._data = item;
+                    console.error('Items.prepareEmbeddedEntities', currentItem);
                     currentItem.prepareData();
                     return currentItem;
 

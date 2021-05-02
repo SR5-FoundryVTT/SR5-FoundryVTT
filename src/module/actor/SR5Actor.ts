@@ -60,14 +60,37 @@ export class SR5Actor extends Actor<SR5ActorType> {
         }
     }
 
+    /**
+     * General data preparation order.
+     * Check base, embeddedEntities and derived methods (see super.prepareData implementation for order)
+     * Only implement data preparation here that doesn't fall into the other three categories.
+     */
     prepareData() {
         super.prepareData();
+    }
+
+    prepareBaseData() {
+        super.prepareBaseData();
 
         const actorData = this.data;
         const prepper = ActorPrepFactory.Create(actorData);
         if (prepper) {
             prepper.prepare();
         }
+    }
+
+    /**
+     * prepare embedded entities. Check ClientDocumentMixin.prepareData for order of data prep.
+     */
+    prepareEmbeddedEntities() {
+        super.prepareEmbeddedEntities();
+    }
+
+    /**
+     * prepare embedded entities. Check ClientDocumentMixin.prepareData for order of data prep.
+     */
+    prepareDerivedData() {
+        super.prepareDerivedData();
     }
 
     getModifier(modifierName: string): NumberOrEmpty {
@@ -144,7 +167,9 @@ export class SR5Actor extends Actor<SR5ActorType> {
     }
 
     getOwnedSR5Item(itemId: string): SR5Item | null {
-        return (super.getOwnedItem(itemId) as unknown) as SR5Item;
+        // TODO: Foundry 0.8 Owned Item management.
+        return this.items.get(itemId) as unknown as  SR5Item;
+        // return (super.getOwnedItem(itemId) as unknown) as SR5Item;
     }
 
     getMatrixDevice(): SR5Item | undefined | null {

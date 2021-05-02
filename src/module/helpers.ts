@@ -566,8 +566,9 @@ export class Helpers {
     static sortSkills(skills: Skills, asc: boolean=true): Skills {
         // Filter entries instead of values to have a store of ids for easy rebuild.
         const sortedEntries = Object.entries(skills).sort(([aId, a], [bId, b]) => {
-            const comparatorA = Helpers.localizeSkill(a);
-            const comparatorB = Helpers.localizeSkill(b);
+            // TODO: Foundry 0.8 After placing token sidebar actor has unprepared Data => no name or label, just the id.
+            const comparatorA = Helpers.localizeSkill(a) || aId;
+            const comparatorB = Helpers.localizeSkill(b) || bId;
             // Use String.localeCompare instead of the > Operator to support other alphabets.
             if (asc)
                 return comparatorA.localeCompare(comparatorB) === 1 ? 1 : -1;
