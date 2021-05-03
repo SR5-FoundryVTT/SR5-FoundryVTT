@@ -73,44 +73,18 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         return `${path}/actor/${this.actor.data.type}.html`;
     }
 
-    /* -------------------------------------------- */
-
-    superGetData() {
-        const isOwner = this.entity.owner;
-        const isEditable = this.isEditable;
-        const data = duplicate(this.object.data.data);
-
-        // Copy and sort Items
-        const items = this.object.items.map(item => duplicate(item.data));
-        items.sort((a, b) => (a.sort || 0) - (b.sort || 0));
-        // @ts-ignore
-        data.items = items;
-
-        // Copy Active Effects
-        const effects = this.object.effects.map(e => duplicate(e.data));
-        data.effects = effects;
-
-        // Return template data
-        return {
-          actor: this.object,
-          cssClass: isEditable ? "editable" : "locked",
-          data: data,
-          effects: effects,
-          items: items,
-          limited: this.object.limited,
-          options: this.options,
-          owner: isOwner,
-          title: this.title
-        };
-    }
-
     /**
      * Prepare data for rendering the Actor sheet
      * The prepared data object contains both the actor data as well as additional sheet options
      */
     getData() {
-        // const data: SR5ActorSheetData = (super.getData() as unknown) as SR5ActorSheetData;
-        const data = this.superGetData() as unknown as SR5ActorSheetData;
+        // Restructure redesigned Document.getData to contain all new fields, while keeping data.data as system data.
+        let data = super.getData() as unknown as SR5ActorSheetData;
+        data = {
+            ...data,
+            // @ts-ignore
+            data: data.data.data
+        }
 
         // General purpose fields...
         data.config = SR5;
