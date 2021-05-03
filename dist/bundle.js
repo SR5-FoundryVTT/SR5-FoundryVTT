@@ -24338,9 +24338,13 @@ class ImportHelper {
             let curr, last = null;
             let next = path.split('/');
             while (idx < next.length) {
-                // @ts-ignore // TODO: foundry-pc-type defines Folder without parent property, but it does exist.
-                curr = game.folders.find((folder) => folder.parent === last && folder.name === next[idx]);
-                if (curr === null) {
+                // Use truthy equal as data.parent will be null, when folder has no parent, yet last?.id will return undefined if last === null
+                let parent = null;
+                curr = game.folders.find((folder) => {
+                    parent = folder.parent;
+                    return folder.data.parent == (last === null || last === void 0 ? void 0 : last.id) && folder.name === next[idx];
+                });
+                if (!curr) {
                     if (!mkdirs) {
                         return Promise.reject(`Unable to find folder: ${path}`);
                     }
@@ -24679,7 +24683,6 @@ class AmmoImporter extends DataImporter_1.DataImporter {
                     });
                     // @ts-ignore // TODO: TYPE: Remove this.
                     if (foundWeapon !== null && "action" in foundWeapon.data.data) {
-                        console.log(foundWeapon);
                         // @ts-ignore // TODO: TYPE: Remove this.
                         const weaponData = foundWeapon.data.data;
                         data.data.damage = weaponData.action.damage.value;
@@ -25808,7 +25811,6 @@ class QualityImporter extends DataImporter_1.DataImporter {
         return __awaiter(this, void 0, void 0, function* () {
             const jsonNameTranslations = {};
             const folders = yield ImportHelper_1.ImportHelper.MakeCategoryFolders(jsonObject, 'Qualities', this.categoryTranslations);
-            console.log(folders);
             const parser = new QualityParserBase_1.QualityParserBase();
             let datas = [];
             let jsonDatas = jsonObject['qualities']['quality'];
@@ -26417,7 +26419,6 @@ const ImportHelper_1 = require("../../helper/ImportHelper");
 const ItemParserBase_1 = require("../item/ItemParserBase");
 class CritterPowerParserBase extends ItemParserBase_1.ItemParserBase {
     Parse(jsonData, data, jsonTranslation) {
-        console.log(jsonData);
         data.name = ImportHelper_1.ImportHelper.StringValue(jsonData, 'name');
         data.data.description.source = `${ImportHelper_1.ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper_1.ImportHelper.StringValue(jsonData, 'page')}`;
         data.data.category = ImportHelper_1.ImportHelper.StringValue(jsonData, 'category').toLowerCase();

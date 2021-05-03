@@ -62,9 +62,12 @@ export class ImportHelper {
             last = null;
         let next = path.split('/');
         while (idx < next.length) {
-            // @ts-ignore // TODO: foundry-pc-type defines Folder without parent property, but it does exist.
-            curr = game.folders.find((folder) => folder.parent === last && folder.name === next[idx]);
-            if (curr === null) {
+            // Use truthy equal as data.parent will be null, when folder has no parent, yet last?.id will return undefined if last === null
+            // TODO: Foundry 0.8 Folder.parent SHOULD work here, yet at the moment it doesn't. Even if data.parent is set, .parent will still return null.
+            curr = game.folders.find((folder) =>
+                folder.data.parent == last?.id && folder.name === next[idx]
+            );
+            if (!curr) {
                 if (!mkdirs) {
                     return Promise.reject(`Unable to find folder: ${path}`);
                 }

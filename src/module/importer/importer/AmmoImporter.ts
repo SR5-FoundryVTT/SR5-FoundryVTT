@@ -124,8 +124,6 @@ export class AmmoImporter extends DataImporter {
 
                 // @ts-ignore // TODO: TYPE: Remove this.
                 if (foundWeapon !== null && "action" in foundWeapon.data.data) {
-                    console.log(foundWeapon);
-
                     // @ts-ignore // TODO: TYPE: Remove this.
                     const weaponData = foundWeapon.data.data as WeaponData;
                     data.data.damage = weaponData.action.damage.value;

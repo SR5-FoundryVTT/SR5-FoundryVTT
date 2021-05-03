@@ -78,7 +78,6 @@ export class QualityImporter extends DataImporter {
     async Parse(jsonObject: object): Promise<Entity> {
         const jsonNameTranslations = {};
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Qualities', this.categoryTranslations);
-        console.log(folders);
 
         const parser = new QualityParserBase();
 
