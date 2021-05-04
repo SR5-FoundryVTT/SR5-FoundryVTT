@@ -64,11 +64,20 @@ ___________________
             rollItemMacro,
         };
 
-        // @ts-ignore
+        // @ts-ignore // TODO: Foundry 0.8 entityClass is deprecated but supported
         CONFIG.Actor.entityClass = SR5Actor;
-        // @ts-ignore
+        // @ts-ignore // TODO: Foundry 0.9 entityClass will be removed
+        // CONFIG.Actor.documentClass = SR5Actor;
+
+        // @ts-ignore // TODO: Foundry 0.8 entityClass is deprecated but supported
         CONFIG.Item.entityClass = SR5Item;
+        // @ts-ignore // TODO: Foundry 0.9 entityClass will be removed
+        // CONFIG.Item.documentClass = SR5Item;
+
+         //@gs-ignore // TODO: Foundry 0.8 entityClass is deprecated but supported
         CONFIG.Combat.entityClass = SR5Combat;
+        // @ts-ignore // TODO: Foundry 0.9 entityClass will be removed
+        // CONFIG.Combat.documentClass = SR5Combat;
 
         registerSystemSettings();
 
