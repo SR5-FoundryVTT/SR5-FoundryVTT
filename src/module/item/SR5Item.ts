@@ -851,8 +851,8 @@ export class SR5Item extends Item {
                 const scene: Scene = game.scenes.get(sceneId) as Scene;
                 if (!scene) return;
                 // @ts-ignore
-                const tokenData = scene.data.tokens.get(tokenId);
-                if (tokenData) token = new Token(tokenData);
+                const tokenDocument = scene.data.tokens.get(tokenId);
+                if (tokenDocument) token = new Token(tokenDocument);
             }
             if (!token) return;
 
