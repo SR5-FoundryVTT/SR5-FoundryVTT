@@ -14,7 +14,7 @@ import * as chat from './chat';
 import { createItemMacro, rollItemMacro } from './macros';
 
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
-import { SR5Combat } from './combat/SR5Combat';
+import {_combatantGetInitiativeFormula, SR5Combat} from './combat/SR5Combat';
 import { Import } from './importer/apps/import-form';
 import {ChangelogApplication} from "./apps/ChangelogApplication";
 import {EnvModifiersApplication} from "./apps/EnvModifiersApplication";
@@ -79,7 +79,9 @@ ___________________
         // @ts-ignore // TODO: Foundry 0.9 entityClass will be removed
         // CONFIG.Combat.documentClass = SR5Combat;
         // Register initiative directly (outside of system.json) as DnD5e does it.
-        CONFIG.Combat.initiative.formula =  "@initiative.current.base.value + @initiative.current.dice.text - @wounds.value";
+        CONFIG.Combat.initiative.formula =  "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
+        // @ts-ignore
+        Combatant.prototype._getInitiativeFormula = _combatantGetInitiativeFormula;
 
 
         registerSystemSettings();

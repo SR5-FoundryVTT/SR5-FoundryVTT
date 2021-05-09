@@ -115,14 +115,11 @@ export class SR5Combat extends Combat {
         // Start at the top!
         const turn = 0;
 
-        const combatants: any[] = [];
         for (const combatant of combat.combatants) {
             const initiative = CombatRules.reduceIniResultAfterPass(Number(combatant.initiative));
-            combatants.push({_id: combatant._id, initiative});
+            // TODO: Foundry 0.9 The Combat#updateCombatant method has been deprecated in favor of Combatant#update and will be removed in 0.9.0
+            await combat.updateCombatant({_id: combatant._id, initiative});
         }
-        if (combatants.length > 0)
-            // @ts-ignore
-            await combat.updateCombatant(combatants);
 
         await SR5Combat.setInitiativePass(combat, initiativePass);
         await combat.update({turn});
@@ -251,6 +248,7 @@ export class SR5Combat extends Combat {
      * * @Override
      */
     async nextTurn(): Promise<void> {
+        console.error('nextTurn', this);
         // Maybe advance to the next round/init pass
         let nextRound = this.round;
         let initiativePass = this.initiativePass;
@@ -366,6 +364,7 @@ export class SR5Combat extends Combat {
      * Alter initiative formula to include initiative pass reduction.
      *
      * NOTE: Should this here fail or be buggy, there always is SR5Combat.updateNewCombatants which can be uncommented in SR5Combat.rollInitiative
+     * @deprecated since Foundry 0.8. Kept for possible Foundry 0.7 support. Might just be not needed anymore during 0.8 lifecycle.
      * @param combatant
      */
     _getInitiativeFormula(combatant: Combatant) {
@@ -374,8 +373,19 @@ export class SR5Combat extends Combat {
         }
 
         // Reduce for initiative passes until zero.
-        // @ts-ignore // TODO: System.Data should contain initiative...
-        return `max(${game.system.data.initiative} -${(this.initiativePass - 1) * -SR.combat.INI_RESULT_MOD_AFTER_INI_PASS}, 0)`;
+        return SR5Combat._getSystemInitiativeFormula(this.initiativePass);
+    }
+
+    static _getSystemInitiativeBaseFormula() {
+        // @ts-ignore
+        return String(CONFIG.Combat.initiative.formula || game.system.data.initiative);
+    }
+
+    static _getSystemInitiativeFormula(initiativePass: number): string {
+        initiativePass = initiativePass > 1 ? initiativePass : 1;
+        const baseFormula = SR5Combat._getSystemInitiativeBaseFormula();
+        const ongoingIniPassModified = (initiativePass - 1) * -SR.combat.INI_RESULT_MOD_AFTER_INI_PASS;
+        return `max(${baseFormula} - ${ongoingIniPassModified}[Pass], 0)`;
     }
 
     _registerSocketListeners() {
@@ -409,4 +419,17 @@ export class SR5Combat extends Combat {
         //@ts-ignore
         await game.socket.emit(`${SYSTEM_SOCKET}`, {type: FLAGS.DoInitPass, data: {id: this.id}});
     }
+}
+
+/**
+ * Since Foundry 0.8 Combat._getInitiativeFormula has been moved to Combatant._getInitiativeFormula.
+ *
+ *  This method enhances Combatant#_getInitiativeFormula. Check hooks.ts#init for when it comes into play.
+ *
+ *  During initiative roll modify the initiative result depending on the current combats initiative pass.
+ */
+export function _combatantGetInitiativeFormula() {
+    const combat = this.parent;
+    const initiativePass = combat.data.flags.shadowrun5e.combatInitiativePass;
+    return SR5Combat._getSystemInitiativeFormula(initiativePass);
 }
