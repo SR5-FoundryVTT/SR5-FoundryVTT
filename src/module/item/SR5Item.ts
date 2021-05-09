@@ -828,6 +828,15 @@ export class SR5Item extends Item {
         return roll;
     }
 
+    /**
+     * The item can be stored on a token on the current or another, given, scene.
+     *
+     * The chat message must contain a data attribute containing a 'SceneId.TokenId' mapping.
+     * See chat.ts#getTokenSceneId for further context.
+     *
+     *
+     * @param html
+     */
     static getItemFromMessage(html): SR5Item | undefined {
         if (!game || !game.scenes || !game.ready || !canvas || !canvas.ready || !canvas.scene) return;
 
@@ -842,11 +851,14 @@ export class SR5Item extends Item {
                 const scene: Scene = game.scenes.get(sceneId) as Scene;
                 if (!scene) return;
                 // @ts-ignore
-                const tokenData = scene.data.tokens.find((t) => t.id === Number(tokenId));
+                const tokenData = scene.data.tokens.get(tokenId);
                 if (tokenData) token = new Token(tokenData);
             }
             if (!token) return;
-            actor = Actor.fromToken(token);
+
+            // actor = Actor.fromToken(token);
+            // TODO: Foundry 0.8 token.getActor() is
+            actor = token.document.getActor();
         } else actor = game.actors?.get(card.data('actorId'));
 
         if (!actor) return;

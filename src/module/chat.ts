@@ -218,12 +218,23 @@ function getRollChatTemplateData(options: RollChatMessageOptions): RollChatTempl
     }
 }
 
+/**
+ * Return a mixed Scene and Token id data pair, separated by a dot '.'.
+ *
+ * This is needed for later retrieval of token related data from a chat message, should the scene have been switched after
+ * the chat message has been created.
+ *
+ * TODO: Store the scene id in the chat message data or flag in it's OWN data property instead of a mixed special case.
+ *
+ * @param token What token the sceneTokenId must be created for.
+ * @return '<SceneId>.<TokenId>'
+ */
 function getTokenSceneId(token: Token | undefined): string | undefined {
     if (!token) return;
     // TODO: Foundry 0.8 token.parent vs token.scene breaking change.
     const scene = token.scene || token.parent;
     // @ts-ignore
-    return scene._id;
+    return `${scene._id}.${token.id}`;
 }
 
 export const addChatMessageContextOptions = (html, options) => {

@@ -161,8 +161,8 @@ ___________________
         tokenControls.tools.push(EnvModifiersApplication.getControl());
     }
 
-    static renderChatMessage(app, html) {
-        chat.addRollListeners(app, html);
+    static renderChatMessage(message, html, data) {
+        chat.addRollListeners(message, html);
     }
 
     static renderItemDirectory(app: Application, html: JQuery) {
