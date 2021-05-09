@@ -78,6 +78,9 @@ ___________________
         CONFIG.Combat.entityClass = SR5Combat;
         // @ts-ignore // TODO: Foundry 0.9 entityClass will be removed
         // CONFIG.Combat.documentClass = SR5Combat;
+        // Register initiative directly (outside of system.json) as DnD5e does it.
+        CONFIG.Combat.initiative.formula =  "@initiative.current.base.value + @initiative.current.dice.text - @wounds.value";
+
 
         registerSystemSettings();
 

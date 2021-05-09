@@ -42,7 +42,6 @@
             "entity": "Item"
         }
     ],
-    "initiative": "@initiative.current.base.value + @initiative.current.dice.text - @wounds.value",
     "primaryTokenAttribute": "track.physical",
     "secondaryTokenAttribute": "track.stun",
     "gridDistance": 1,
