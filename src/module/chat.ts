@@ -292,10 +292,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
             const targetSceneIds = message.getFlag(SYSTEM_NAME, FLAGS.TargetsSceneTokenIds) as string[];
 
             for (const targetSceneId of targetSceneIds) {
-                const token = Helpers.getSceneToken(targetSceneId);
-                if (!token) continue;
-
-                const actor = token.actor as SR5Actor;
+                const actor = Helpers.getSceneTokenActor(targetSceneId)
                 if (!actor) continue;
 
                 actors.push(actor);
@@ -353,11 +350,8 @@ export const addRollListeners = (app: ChatMessage, html) => {
             const card = entityLink.closest('.chat-card');
             const sceneTokenId = card.data('tokenId');
 
-            const token = Helpers.getSceneToken(sceneTokenId)
-
-            if (!token) return;
-
-            const item = token.actor.getOwnedItem(id);
+            const actor = Helpers.getSceneTokenActor(sceneTokenId);
+            const item = actor.getOwnedItem(id);
             if (!item) return;
             // @ts-ignore
             item.sheet.render(true);
@@ -406,8 +400,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
             // If targeting is available, use that.
             if (targetIds) {
                 targetIds.forEach(targetId => {
-                    const token = Helpers.getSceneToken(targetId);
-                    const actor = token?.actor as SR5Actor;
+                    const actor = Helpers.getSceneTokenActor(targetId);
                     if (!actor) return;
                     actors.push(actor);
                 });
@@ -415,8 +408,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
                 // Otherwise apply to the actor casting the damage.
             } else {
                 const sceneTokenId = html.find('.chat-card').data('tokenId');
-                const token = Helpers.getSceneToken(sceneTokenId);
-                const actor = token?.actor as SR5Actor;
+                const actor = Helpers.getSceneTokenActor(sceneTokenId)
                 if (actor) {
                     actors.push(actor);
                 }

@@ -265,6 +265,7 @@ export class Helpers {
         return name.slice(0, length).toUpperCase();
     }
 
+    // TODO: Foundry 0.9 Should TokenDocument be used instead of Token?
     static getToken(id?: string): Token | undefined {
         if (!canvas || !canvas.ready) return;
 
@@ -275,29 +276,18 @@ export class Helpers {
         }
     }
 
-    static getSceneToken(sceneTokenId: string): Token | undefined {
-        if (!canvas || !canvas.ready || !canvas.scene) return;
-
+    /**
+     * Use this helper to get a tokens actor from any given scene id, while the sceneTokenId is a mixed ID
+     * @param sceneTokenId A mixed id with the format '<sceneId>.<tokenid>
+     */
+    static getSceneTokenActor(sceneTokenId: string): SR5Actor | undefined {
         const [sceneId, tokenId] = sceneTokenId.split('.');
-
-        const isActiveScene = sceneId === canvas.scene._id;
-        if (isActiveScene) {
-            return canvas.tokens.get(tokenId);
-        }
-
-        // Build Token using it's data from the connected scene as a fallback.
-        const scene = game.scenes?.get(sceneId);
-        if (!scene) {
-            return;
-        }
-
-        //@ts-ignore
-        const tokenData = scene.data.tokens.find((t) => t.id === Number(tokenId));
-        if (!tokenData) {
-            return;
-        }
-
-        return new Token(tokenData);
+        const scene = game.scenes.get(sceneId);
+        if (!scene) return;
+        // @ts-ignore
+        const token = scene.tokens.get(tokenId);
+        if (!token) return;
+        return token.getActor();
     }
 
     static getUserTargets(user?: User|null): Token[] {

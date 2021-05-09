@@ -842,24 +842,9 @@ export class SR5Item extends Item {
 
         const card = html.find('.chat-card');
         let actor;
-        const tokenKey = card.data('tokenId');
-        if (tokenKey) {
-            const [sceneId, tokenId] = tokenKey.split('.');
-            let token;
-            if (sceneId === canvas.scene._id) token = canvas.tokens.get(tokenId);
-            else {
-                const scene: Scene = game.scenes.get(sceneId) as Scene;
-                if (!scene) return;
-                // @ts-ignore
-                const tokenDocument = scene.data.tokens.get(tokenId);
-                if (tokenDocument) token = new Token(tokenDocument);
-            }
-            if (!token) return;
-
-            // actor = Actor.fromToken(token);
-            // TODO: Foundry 0.8 token.getActor() is
-            actor = token.document.getActor();
-        } else actor = game.actors?.get(card.data('actorId'));
+        const sceneTokenId = card.data('tokenId');
+        if (sceneTokenId) actor = Helpers.getSceneTokenActor(sceneTokenId);
+        else actor = game.actors.get(card.data('actorId'));
 
         if (!actor) return;
         const itemId = card.data('itemId');
