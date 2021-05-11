@@ -568,7 +568,8 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         if (!userConsented) return;
 
         const iid = Helpers.listItemId(event);
-        await this.actor.deleteOwnedItem(iid);
+        const item = this.actor.items.get(iid);
+        await item.delete();
     }
 
     async _onRollFromSheet(event) {

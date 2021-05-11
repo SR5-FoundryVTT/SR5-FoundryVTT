@@ -69,14 +69,11 @@ export class SR5Actor extends Actor<SR5ActorType> {
         super.prepareData();
     }
 
+    /**
+     *  Prepare base data. Be careful that this ONLY included data not in need for item access. Check ClientDocumentMixin.prepareData for order of data prep.
+     */
     prepareBaseData() {
         super.prepareBaseData();
-
-        const actorData = this.data;
-        const prepper = ActorPrepFactory.Create(actorData);
-        if (prepper) {
-            prepper.prepare();
-        }
     }
 
     /**
@@ -91,6 +88,13 @@ export class SR5Actor extends Actor<SR5ActorType> {
      */
     prepareDerivedData() {
         super.prepareDerivedData();
+
+        // General actor data preparation has been moved to derived data, as it depends on prepared item data.
+        const actorData = this.data;
+        const prepper = ActorPrepFactory.Create(actorData);
+        if (prepper) {
+            prepper.prepare();
+        }
     }
 
     getModifier(modifierName: string): NumberOrEmpty {
