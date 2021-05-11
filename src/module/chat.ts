@@ -88,7 +88,6 @@ async function createChatMessage(templateData, options?: ChatDataOptions): Promi
     // Convert targets into scene token ids.
     if (templateData.targets) await message.setFlag(SYSTEM_NAME, FLAGS.TargetsSceneTokenIds, templateData.targets.map(target => getTokenSceneId(target)));
 
-    console.log('Chat Message', message, chatData);
     return message;
 }
 
