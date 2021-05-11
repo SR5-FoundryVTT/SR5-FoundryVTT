@@ -744,7 +744,8 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
             name: `New ${type}`,
             type: type,
         };
-        return this.actor.createOwnedItem(itemData, { renderSheet: true });
+        // @ts-ignore // TODO: foundry-vtt-types has no Document Support yet.
+        return this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
     }
 
     async _onAddLanguageSkill(event) {
