@@ -982,7 +982,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
     }
 
     _saveInputCursorPosition(): any|null {
-        const focusList = $(this.element).find(':focus');
+        const focusList = $(this.element).find('input:focus');
         return focusList.length ? focusList[0] : null;
     }
 
@@ -996,7 +996,11 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
 
             const element = this.form[focus.name];
             if (element) {
+                // Set general focus for allem input types.
                 element.focus();
+
+                // Set selection range for supported input types.
+                if (['checkbox', 'radio'].includes(element.type)) return;
                 // set the selection range on the focus formed from before (keeps track of cursor in input)
                 element.setSelectionRange && element.setSelectionRange(focus.selectionStart, focus.selectionEnd);
             }
