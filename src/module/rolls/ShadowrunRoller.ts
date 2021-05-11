@@ -312,7 +312,8 @@ export class ShadowrunRoller {
         const roll = new ShadowrunRoll(formula, rollData);
 
         // Return roll reference instead roll() return to avoid typing issues.
-        roll.roll();
+        // @ts-ignore // TODO: foundry-vtt-types 0.8.2 is missing Roll.evaluate parameter typing.
+        roll.evaluate({async: false});
 
         return roll;
     }
@@ -320,7 +321,7 @@ export class ShadowrunRoller {
     static async basicRoll(basicProps: BasicRollProps): Promise<ShadowrunRoll | undefined> {
         const props = ShadowrunRoller.basicRollPropsDefaults(basicProps);
 
-        const roll = await ShadowrunRoller.roll({parts: props.parts, limit: props.limit, explodeSixes: props.explodeSixes});
+        const roll = ShadowrunRoller.roll({parts: props.parts, limit: props.limit, explodeSixes: props.explodeSixes});
         if (!roll) return;
 
         if (!props.hideRollMessage) {

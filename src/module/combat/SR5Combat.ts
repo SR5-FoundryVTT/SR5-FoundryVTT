@@ -172,7 +172,8 @@ export class SR5Combat extends Combat {
                 Number(actor.getEdge().value),
                 Number(actor.findAttribute('reaction')?.value),
                 Number(actor.findAttribute('intuition')?.value),
-                new Roll('1d2').roll().total as number,
+                // @ts-ignore
+                new Roll('1d2').evaluate({async: false}).total as number,
             ];
         };
 
