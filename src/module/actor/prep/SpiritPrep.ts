@@ -44,7 +44,7 @@ export class SpiritPrep extends BaseActorPrep<SR5SpiritType, SpiritActorData> {
         if (overrides) {
             const { attributes, skills, initiative, force, modifiers } = data;
 
-            // set the base of attributes to the provided value
+            // set the base of attributes to the provided force
             for (const [attId, value] of Object.entries(overrides.attributes)) {
                 if (attributes[attId] !== undefined) {
                     attributes[attId].base = value + force;
@@ -52,6 +52,10 @@ export class SpiritPrep extends BaseActorPrep<SR5SpiritType, SpiritActorData> {
             }
 
             for (const [skillId, skill] of Object.entries(skills.active)) {
+                // Leave custom skills alone to allow users to change those at will.
+                if (skill.name !== '') continue;
+
+                // Change default skills to the force rating.
                 skill.base = overrides.skills.find((s) => s === skillId) ? force : 0;
             }
 
