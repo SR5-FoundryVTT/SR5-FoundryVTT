@@ -51,33 +51,34 @@ export class ImportHelper {
     }
 
     /**
-     * Get a folder at a path in the items directory.
+     * Get / create a folder at a path in the items directory.
+     *
+     * Traverse path and match folder structure to the last and current path segments.
+     *
      * @param path The absolute path of the folder.
      * @param mkdirs If true, will make all folders along the hierarchy if they do not exist.
      * @returns A promise that will resolve with the found folder.
      */
     public static async GetFolderAtPath(path: string, mkdirs: boolean = false): Promise<Folder> {
-        let idx = 0;
-        let curr,
-            last = null;
-        let next = path.split('/');
-        while (idx < next.length) {
-            // Use truthy equal as data.parent will be null, when folder has no parent, yet last?.id will return undefined if last === null
-            // TODO: Foundry 0.8 Folder.parent SHOULD work here, yet at the moment it doesn't. Even if data.parent is set, .parent will still return null.
-            curr = game.folders.find((folder) =>
-                folder.data.parent == last?.id && folder.name === next[idx]
-            );
-            if (!curr) {
-                if (!mkdirs) {
-                    return Promise.reject(`Unable to find folder: ${path}`);
-                }
+        let currentFolder,
+            lastFolder = undefined;
+        const pathSegments = path.split('/');
+        for (const pathSegment of pathSegments) {
+             // Check if the path structure matches the folder structure.
+            currentFolder = game.folders.find((folder) => {
+                // @ts-ignore // TODO: foundry-vtt-types 0.8.2 support missing.
+                return folder.parentFolder === lastFolder && folder.name === pathSegment
+            });
 
-                curr = await ImportHelper.NewFolder(next[idx], last);
-            }
-            last = curr;
-            idx++;
+            // Only create when allowed to. Otherwise abort with error.
+            if (!currentFolder && !mkdirs) return Promise.reject(`Unable to find folder: ${path}`);
+            // Create the missing folder for the current segment
+            if (!currentFolder) currentFolder = await ImportHelper.NewFolder(pathSegment, lastFolder);
+
+            lastFolder = currentFolder;
         }
-        return Promise.resolve(curr);
+
+        return Promise.resolve(currentFolder);
     }
 
     /**
