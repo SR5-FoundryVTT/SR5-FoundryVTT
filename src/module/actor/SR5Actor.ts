@@ -1371,9 +1371,7 @@ export class SR5Actor extends Actor<SR5ActorType> {
     }
 
     getActivePlayerOwners(): User[] {
-        //@ts-ignore
-        const users = this.getUsers('OWNER');
-        return users.filter(user => user.active);
+        return Helpers.getPlayersWithPermission(this, 'OWNER', true);
     }
 
     __addDamageToTrackValue(damage: DamageData, track: TrackType|OverflowTrackType|ConditionData): TrackType|OverflowTrackType|ConditionData {

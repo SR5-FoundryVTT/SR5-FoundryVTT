@@ -603,4 +603,24 @@ export class Helpers {
         }
         return sortedAsObject;
     }
+
+    /**
+     * Return a list of users with the given permission for the given document.
+     *
+     * @param document A foundry Document implementation.
+     * @param permission A foundry access permission
+     * @param active If true, will only return users that are also currently active.
+     */
+    static getPlayersWithPermission(document: Entity, permission: string, active: boolean = true): User[] {
+        return game.users.filter(user => {
+            if (user.isGM) return false;
+            // Check for permissions.
+            // @ts-ignore // TODO: foundry-vtt-types 0.8.2 missing testUserPermission for Documents (it's not DocumentClientMixin)
+            if (!document.testUserPermission(user, permission)) return false;
+            // Check for active state.
+            if (active && !user.active) return false;
+
+            return true;
+        });
+    }
 }
