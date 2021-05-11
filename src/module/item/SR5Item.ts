@@ -952,7 +952,7 @@ export class SR5Item extends Item {
     getOwnedItem(itemId): SR5Item | undefined {
         const items = this.items;
         if (!items) return;
-        return items.find((i) => i._id === itemId);
+        return items.find((item) => item.id === itemId);
     }
 
     // TODO: Foundry 0.8. Rework this method. It's complicated and obvious optimizations can be made. (find vs findIndex)
