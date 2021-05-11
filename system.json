@@ -48,7 +48,7 @@
     "gridDistance": 1,
     "gridUnits": "m",
     "socket": true,
-    "manifest": "https://raw.githubusercontent.com/smilligan93/SR5-FoundryVTT/master/system.json",
+    "manifest": "https://raw.githubusercontent.com/smilligan93/SR5-FoundryVTT/refactor_vtt_types_08/system.json",
     "url": "https://github.com/smilligan93/SR5-FoundryVTT",
     "download": "https://github.com/smilligan93/SR5-FoundryVTT/archive/t0.7.16.zip",
     "allowBugReporter": true,
