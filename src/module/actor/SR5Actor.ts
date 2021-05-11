@@ -1672,7 +1672,8 @@ export class SR5Actor extends Actor<SR5ActorType> {
 
         if (onActor.hasActiveEnvironmental) {
             return onActor;
-        } else if (ignoreScene) {
+        // No open scene, or scene ignored.
+        } else if (ignoreScene || scene === null) {
             return new Modifiers(Modifiers.getDefaultModifiers());
         } else {
             return await Modifiers.getModifiersFromEntity(scene);
