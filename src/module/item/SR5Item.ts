@@ -933,8 +933,8 @@ export class SR5Item extends Item {
                 if (item._id in existing) {
                     const currentItem = existing[item._id];
 
+                    // Update DocumentData directly, since we're not really having database items here.
                     currentItem.data.update(item);
-                    // TODO: Foundry 0.8 Does data.update already handle the prepareData workflow?
                     currentItem.prepareData();
                     return currentItem;
 
@@ -1510,17 +1510,38 @@ export class SR5Item extends Item {
         return false;
     }
 
+    get _isEmbeddedItem(): boolean {
+        // @ts-ignore // TODO: foundry-vtt-types Document hasn't be implemented yet
+        return this.hasOwnProperty('parent') && this.parent instanceof SR5Item;
+    }
+
+    /**
+     * Hook into the Item.update process for embedded items.
+     *
+     * @param data changes made to the SR5ItemData
+     */
+    async updateEmbeddedItem(data) {
+        // Inform the parent item about changes to one of it's embedded items.
+        // TODO: Foundry 0.8 updateOwnedItem needs the id of the update item. hand the item itself over, to the hack within updateOwnedItem for this.
+        data._id = this.id;
+        // @ts-ignore // TODO: foundry-vtt-types Document hasn't be implemented yet
+        await this.parent.updateOwnedItem(data)
+
+        // After updating all item embedded data, rerender the sheet to trigger the whole rerender workflow.
+        // Otherwise changes in the template of an hiddenItem will show for some fields, while not rerendering all
+        // #if statements (hidden fields for other values, won't show)
+        return this.sheet.render(false);
+    }
+
     // TODO: Foundry 0.8 this method has been added for debugging
     // @ts-ignore
     async update(data, ...args) {
-        // @ts-ignore // TODO: Foundry 0.8 this.parent doesn't exist in 0.7 Foundry
-        if (this.hasOwnProperty('parent') && this.parent instanceof SR5Item) {
-            // Allow the parent to identify the item
-            // TODO: Foundry 0.8 Fetch the item from the parent and hand over data + the item.
-            data._id = this.id;
-            // @ts-ignore
-            return await this.parent.updateOwnedItem(data)
+        // Item.item => Embedded item into another item!
+        if (this._isEmbeddedItem) {
+            return this.updateEmbeddedItem(data);
         }
+
+        // Actor.item => Directly owned item by an actor!
         // @ts-ignore
         return await super.update(data, ...args);
     }

@@ -118,14 +118,14 @@ export abstract class VersionMigration {
      * @param entityUpdates
      */
     protected async IterateScenes(game: Game, entityUpdates: Map<Entity, EntityUpdate>) {
-        // @ts-ignore TODO: 0.8 .contents
+        // @ts-ignore // TODO: foundry-vtt-types Does not support DocumentCollection yet.
         for (const scene of game.scenes.contents) {
             try {
                 if (!(await this.ShouldMigrateSceneData(scene))) {
                     continue;
                 }
 
-                if (scene._id === 'MAwSFhlXRipixOWw') {
+                if (scene.id === 'MAwSFhlXRipixOWw') {
                     console.log('Scene Pre-Update');
                     console.log(scene);
                 }
@@ -145,7 +145,7 @@ export abstract class VersionMigration {
                         let tokenDataUpdate = await this.MigrateActorData(token.actorData);
                         if (!isObjectEmpty(tokenDataUpdate)) {
                             hasTokenUpdates = true;
-                            tokenDataUpdate['_id'] = token._id;
+                            tokenDataUpdate['_id'] = token.id;
 
                             const newToken = duplicate(token);
                             newToken.actorData = await mergeObject(token.actorData, tokenDataUpdate, {
@@ -159,7 +159,7 @@ export abstract class VersionMigration {
                         }
                     }),
                 );
-                if (scene._id === 'MAwSFhlXRipixOWw') {
+                if (scene.id === 'MAwSFhlXRipixOWw') {
                     console.log('Scene Pre-Update');
                     console.log(scene);
                 }
@@ -186,7 +186,7 @@ export abstract class VersionMigration {
      */
     protected async IterateItems(game: Game, entityUpdates: Map<Entity, EntityUpdate>) {
         // @ts-ignore // TODO: TYPE game.items possibly undefined
-        for (const item of game.items?.entities) {
+        for (const item of game.items?.contents) {
             try {
                 if (!(await this.ShouldMigrateItemData(item.data))) {
                     continue;
@@ -217,7 +217,7 @@ export abstract class VersionMigration {
      */
     protected async IterateActors(game: Game, entityUpdates: Map<Entity, EntityUpdate>) {
         // @ts-ignore // TODO: TYPE: Possibly undefined
-        for (const actor of game.actors.entities) {
+        for (const actor of game.actors.contents) {
             try {
                 if (!(await this.ShouldMigrateActorData(actor.data))) {
                     continue;
@@ -258,18 +258,18 @@ export abstract class VersionMigration {
         if (actorData.items !== undefined) {
             const items = await Promise.all(
                 // @ts-ignore
-                actorData.items.map(async (item) => {
-                    let itemUpdate = await this.MigrateItemData(item);
+                actorData.items.map(async (itemData) => {
+                    let itemUpdate = await this.MigrateItemData(itemData);
 
                     if (!isObjectEmpty(itemUpdate)) {
                         hasItemUpdates = true;
-                        itemUpdate['_id'] = item._id;
-                        return await mergeObject(item, itemUpdate, {
+                        itemUpdate['_id'] = itemData._id;
+                        return await mergeObject(itemData, itemUpdate, {
                             enforceTypes: false,
                             inplace: false,
                         });
                     } else {
-                        return item;
+                        return itemData;
                     }
                 }),
             );
@@ -392,7 +392,7 @@ export abstract class VersionMigration {
                     }
 
                     expandObject(updateData);
-                    updateData['_id'] = ent._id;
+                    updateData['_id'] = ent.id;
                     await pack.updateEntity(updateData);
                     // TODO: Uncomment when foundry allows embeddeds to be updated in packs
                     // } else if (document === 'Actor') {
@@ -412,7 +412,7 @@ export abstract class VersionMigration {
                     }
 
                     expandObject(updateData);
-                    updateData['_id'] = ent._id;
+                    updateData['_id'] = ent.id;
                     await pack.updateEntity(updateData);
                 }
             } catch (err) {

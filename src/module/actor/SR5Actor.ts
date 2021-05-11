@@ -1361,7 +1361,8 @@ export class SR5Actor extends Actor<SR5ActorType> {
             return null;
         }
 
-        for (const user of game.users.entities) {
+        // @ts-ignore // TODO: foundry-vtt-types Does not support DocumentCollection yet.
+        for (const user of game.users.contents) {
             if (!user.active || user.isGM) {
                 continue;
             }
