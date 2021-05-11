@@ -115,13 +115,13 @@ const createChatData = async (templateData, options?: ChatDataOptions) => {
     const html = await renderTemplate(template, enhancedTemplateData);
 
     const chatData = {
-        user: game.user?._id,
+        user: game.user?.id,
         type: options?.roll ? CONST.CHAT_MESSAGE_TYPES.ROLL : CONST.CHAT_MESSAGE_TYPES.OTHER,
         sound: options?.roll ? CONFIG.sounds.dice : undefined,
         content: html,
         roll: options?.roll ? JSON.stringify(options?.roll) : undefined,
         speaker: {
-            actor: actor?._id,
+            actor: actor?.id,
             token: actor?.getToken(),
             alias: game.user?.name
         },
@@ -234,7 +234,7 @@ function getTokenSceneId(token: Token | undefined): string | undefined {
     // TODO: Foundry 0.8 token.parent vs token.scene breaking change.
     const scene = token.scene || token.parent;
     // @ts-ignore
-    return `${scene._id}.${token.id}`;
+    return `${scene.id}.${token.id}`;
 }
 
 export const addChatMessageContextOptions = (html, options) => {
