@@ -13347,13 +13347,11 @@ class SR5Actor extends Actor {
     prepareData() {
         super.prepareData();
     }
+    /**
+     *  Prepare base data. Be careful that this ONLY included data not in need for item access. Check ClientDocumentMixin.prepareData for order of data prep.
+     */
     prepareBaseData() {
         super.prepareBaseData();
-        const actorData = this.data;
-        const prepper = ActorPrepFactory_1.ActorPrepFactory.Create(actorData);
-        if (prepper) {
-            prepper.prepare();
-        }
     }
     /**
      * prepare embedded entities. Check ClientDocumentMixin.prepareData for order of data prep.
@@ -13366,6 +13364,12 @@ class SR5Actor extends Actor {
      */
     prepareDerivedData() {
         super.prepareDerivedData();
+        // General actor data preparation has been moved to derived data, as it depends on prepared item data.
+        const actorData = this.data;
+        const prepper = ActorPrepFactory_1.ActorPrepFactory.Create(actorData);
+        if (prepper) {
+            prepper.prepare();
+        }
     }
     getModifier(modifierName) {
         return this.data.data.modifiers[modifierName];
@@ -13437,10 +13441,9 @@ class SR5Actor extends Actor {
             return this.data.data.armor;
         return dataTemplates_1.DefaultValues.actorArmorData();
     }
+    // TODO: Foundry 0.9 Check if this can be replaced with this.items.get and correct typing.
     getOwnedSR5Item(itemId) {
-        // TODO: Foundry 0.8 Owned Item management.
         return this.items.get(itemId);
-        // return (super.getOwnedItem(itemId) as unknown) as SR5Item;
     }
     getMatrixDevice() {
         if (!("matrix" in this.data.data))
@@ -14564,9 +14567,7 @@ class SR5Actor extends Actor {
         return null;
     }
     getActivePlayerOwners() {
-        //@ts-ignore
-        const users = this.getUsers('OWNER');
-        return users.filter(user => user.active);
+        return helpers_1.Helpers.getPlayersWithPermission(this, 'OWNER', true);
     }
     __addDamageToTrackValue(damage, track) {
         if (damage.value === 0)
@@ -14873,13 +14874,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ActorSheet = void 0;
 const helpers_1 = require("../helpers");
 const chummer_import_form_1 = require("../apps/chummer-import-form");
-const SkillEditForm_1 = require("../apps/skills/SkillEditForm");
-const KnowledgeSkillEditForm_1 = require("../apps/skills/KnowledgeSkillEditForm");
-const LanguageSkillEditForm_1 = require("../apps/skills/LanguageSkillEditForm");
+const SkillEditSheet_1 = require("../apps/skills/SkillEditSheet");
+const KnowledgeSkillEditSheet_1 = require("../apps/skills/KnowledgeSkillEditSheet");
+const LanguageSkillEditSheet_1 = require("../apps/skills/LanguageSkillEditSheet");
 const config_1 = require("../config");
-// Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditForm instance.
+// Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
-// when opened in succession, causing SkillEditForm to wrongfully overwrite the wrong data.
+// when opened in succession, causing SkillEditSheet to wrongfully overwrite the wrong data.
 let globalSkillAppId = -1;
 /**
  * Extend the basic ActorSheet with some very simple modifications
@@ -15340,7 +15341,7 @@ class SR5ActorSheet extends ActorSheet {
         });
         html.find('.driver-remove').click(this.handleRemoveVehicleDriver.bind(this));
     }
-    /** Handle all entity drops onto all actor sheet types.
+    /** Handle all document drops onto all actor sheet types.
      *
      * @param event
      */
@@ -15372,7 +15373,8 @@ class SR5ActorSheet extends ActorSheet {
             if (!userConsented)
                 return;
             const iid = helpers_1.Helpers.listItemId(event);
-            yield this.actor.deleteOwnedItem(iid);
+            const item = this.actor.items.get(iid);
+            yield item.delete();
         });
     }
     _onRollFromSheet(event) {
@@ -15545,7 +15547,8 @@ class SR5ActorSheet extends ActorSheet {
             name: `New ${type}`,
             type: type,
         };
-        return this.actor.createOwnedItem(itemData, { renderSheet: true });
+        // @ts-ignore // TODO: foundry-vtt-types has no Document Support yet.
+        return this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
     }
     _onAddLanguageSkill(event) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -15554,7 +15557,7 @@ class SR5ActorSheet extends ActorSheet {
             if (!skillId)
                 return;
             // NOTE: Causes issues with adding knowledge skills (category undefined)
-            // await this._showSkillEditForm(LanguageSkillEditForm, this.actor, {event}, skillId);
+            // await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, {event}, skillId);
         });
     }
     _onRemoveLanguageSkill(event) {
@@ -15575,7 +15578,7 @@ class SR5ActorSheet extends ActorSheet {
             if (!skillId)
                 return;
             // NOTE: Causes issues with adding knowledge skills (category undefined)
-            // await this._showSkillEditForm(KnowledgeSkillEditForm, this.actor, {event}, skillId);
+            // await this._showSkillEditForm(KnowledgeSkillEditSheet, this.actor, {event}, skillId);
         });
     }
     _onRemoveKnowledgeSkill(event) {
@@ -15598,7 +15601,7 @@ class SR5ActorSheet extends ActorSheet {
             const skillId = yield this.actor.addActiveSkill();
             if (!skillId)
                 return;
-            yield this._showSkillEditForm(SkillEditForm_1.SkillEditForm, this.actor, { event: event }, skillId);
+            yield this._showSkillEditForm(SkillEditSheet_1.SkillEditSheet, this.actor, { event: event }, skillId);
         });
     }
     _onRemoveActiveSkill(event) {
@@ -15642,10 +15645,10 @@ class SR5ActorSheet extends ActorSheet {
                 if (item.isDevice()) {
                     // Only allow one equipped device item. Unequip all other.
                     // @ts-ignore // TODO: TYPE: Remove. Missing Actor Typing.
-                    for (let ite of this.actor.items.filter((actorItem) => actorItem.isDevice())) {
+                    for (const item of this.actor.items.filter((actorItem) => actorItem.isDevice())) {
                         newItems.push({
-                            '_id': ite._id,
-                            'data.technology.equipped': ite._id === iid,
+                            '_id': item.id,
+                            'data.technology.equipped': item.id === iid,
                         });
                     }
                 }
@@ -15656,8 +15659,8 @@ class SR5ActorSheet extends ActorSheet {
                         'data.technology.equipped': !item.isEquipped(),
                     });
                 }
-                // @ts-ignore // TODO: foundry-pc-type defines Entity.updateEmbeddedEntity as static but it's not.
-                yield this.actor.updateEmbeddedEntity('OwnedItem', newItems);
+                // @ts-ignore // TODO: foundry-vtt-types 0.8 has no Document support yet
+                yield this.actor.updateEmbeddedDocuments('Item', newItems);
                 this.actor.render(false);
             }
         });
@@ -15799,7 +15802,7 @@ class SR5ActorSheet extends ActorSheet {
         });
     }
     _saveInputCursorPosition() {
-        const focusList = $(this.element).find(':focus');
+        const focusList = $(this.element).find('input:focus');
         return focusList.length ? focusList[0] : null;
     }
     /**
@@ -15812,7 +15815,11 @@ class SR5ActorSheet extends ActorSheet {
                 return;
             const element = this.form[focus.name];
             if (element) {
+                // Set general focus for allem input types.
                 element.focus();
+                // Set selection range for supported input types.
+                if (['checkbox', 'radio'].includes(element.type))
+                    return;
                 // set the selection range on the focus formed from before (keeps track of cursor in input)
                 element.setSelectionRange && element.setSelectionRange(focus.selectionStart, focus.selectionEnd);
             }
@@ -15846,9 +15853,9 @@ class SR5ActorSheet extends ActorSheet {
             }
         });
     }
-    /** Keep track of each SkillEditForm instance and close before opening another.
+    /** Keep track of each SkillEditSheet instance and close before opening another.
      *
-     * @param skillEditFormImplementation Any extending class! of SkillEditForm
+     * @param skillEditFormImplementation Any extending class! of SkillEditSheet
      * @param actor
      * @param options
      * @param args Collect arguments of the different renderWithSkill implementations.
@@ -15864,7 +15871,7 @@ class SR5ActorSheet extends ActorSheet {
     _onShowEditKnowledgeSkill(event) {
         event.preventDefault();
         const [skill, category] = helpers_1.Helpers.listItemId(event).split('.');
-        this._showSkillEditForm(KnowledgeSkillEditForm_1.KnowledgeSkillEditForm, this.actor, {
+        this._showSkillEditForm(KnowledgeSkillEditSheet_1.KnowledgeSkillEditSheet, this.actor, {
             event: event,
         }, skill, category);
     }
@@ -15872,16 +15879,16 @@ class SR5ActorSheet extends ActorSheet {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
             const skill = helpers_1.Helpers.listItemId(event);
-            // new LanguageSkillEditForm(this.actor, skill, { event: event }).render(true);
-            yield this._showSkillEditForm(LanguageSkillEditForm_1.LanguageSkillEditForm, this.actor, { event: event }, skill);
+            // new LanguageSkillEditSheet(this.actor, skill, { event: event }).render(true);
+            yield this._showSkillEditForm(LanguageSkillEditSheet_1.LanguageSkillEditSheet, this.actor, { event: event }, skill);
         });
     }
     _onShowEditSkill(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
             const skill = helpers_1.Helpers.listItemId(event);
-            // new SkillEditForm(this.actor, skill, { event: event }).render(true);
-            yield this._showSkillEditForm(SkillEditForm_1.SkillEditForm, this.actor, { event: event }, skill);
+            // new SkillEditSheet(this.actor, skill, { event: event }).render(true);
+            yield this._showSkillEditForm(SkillEditSheet_1.SkillEditSheet, this.actor, { event: event }, skill);
         });
     }
     _onShowImportCharacter(event) {
@@ -15906,7 +15913,7 @@ class SR5ActorSheet extends ActorSheet {
     }
 }
 exports.SR5ActorSheet = SR5ActorSheet;
-},{"../apps/chummer-import-form":131,"../apps/skills/KnowledgeSkillEditForm":139,"../apps/skills/LanguageSkillEditForm":140,"../apps/skills/SkillEditForm":141,"../config":145,"../helpers":156}],88:[function(require,module,exports){
+},{"../apps/chummer-import-form":131,"../apps/skills/KnowledgeSkillEditSheet":139,"../apps/skills/LanguageSkillEditSheet":140,"../apps/skills/SkillEditSheet":141,"../config":145,"../helpers":156}],88:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SkillFlow = void 0;
@@ -16328,10 +16335,8 @@ exports.BaseActorPrep = void 0;
 const SR5ItemDataWrapper_1 = require("../../item/SR5ItemDataWrapper");
 class BaseActorPrep {
     constructor(data) {
-        // @ts-ignore
         this.data = data.data;
-        // @ts-ignore
-        this.items = data.items.map((item) => new SR5ItemDataWrapper_1.SR5ItemDataWrapper(item));
+        this.items = data.items.map((item) => new SR5ItemDataWrapper_1.SR5ItemDataWrapper(item.data));
     }
 }
 exports.BaseActorPrep = BaseActorPrep;
@@ -16455,13 +16460,17 @@ class SpiritPrep extends BaseActorPrep_1.BaseActorPrep {
         const overrides = this.getSpiritStatModifiers(data.spiritType);
         if (overrides) {
             const { attributes, skills, initiative, force, modifiers } = data;
-            // set the base of attributes to the provided value
+            // set the base of attributes to the provided force
             for (const [attId, value] of Object.entries(overrides.attributes)) {
                 if (attributes[attId] !== undefined) {
                     attributes[attId].base = value + force;
                 }
             }
             for (const [skillId, skill] of Object.entries(skills.active)) {
+                // Leave custom skills alone to allow users to change those at will.
+                if (skill.name !== '')
+                    continue;
+                // Change default skills to the force rating.
                 skill.base = overrides.skills.find((s) => s === skillId) ? force : 0;
             }
             // prepare initiative data
@@ -20629,7 +20638,9 @@ var OverwatchScoreTracker = /*#__PURE__*/function (_Application) {
       if (actor) {
         //  use static value so it can be modified in modules
         var roll = new Roll(OverwatchScoreTracker.MatrixOverwatchDiceCount);
-        roll.roll(); // use GM Roll Mode so players don't see
+        roll.evaluate({
+          async: false
+        }); // use GM Roll Mode so players don't see
         // const rollMode = CONFIG.Dice.rollModes.gmroll;
         // roll.toMessage({ rollMode });
 
@@ -20665,9 +20676,9 @@ exports.OverwatchScoreTracker = OverwatchScoreTracker;
 },{"../../helpers":156,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10}],139:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.KnowledgeSkillEditForm = void 0;
-const LanguageSkillEditForm_1 = require("./LanguageSkillEditForm");
-class KnowledgeSkillEditForm extends LanguageSkillEditForm_1.LanguageSkillEditForm {
+exports.KnowledgeSkillEditSheet = void 0;
+const LanguageSkillEditSheet_1 = require("./LanguageSkillEditSheet");
+class KnowledgeSkillEditSheet extends LanguageSkillEditSheet_1.LanguageSkillEditSheet {
     constructor(actor, options, skillId, category) {
         super(actor, options, skillId);
         this.category = category;
@@ -20676,13 +20687,13 @@ class KnowledgeSkillEditForm extends LanguageSkillEditForm_1.LanguageSkillEditFo
         return `data.skills.knowledge.${this.category}.value.${this.skillId}`;
     }
 }
-exports.KnowledgeSkillEditForm = KnowledgeSkillEditForm;
-},{"./LanguageSkillEditForm":140}],140:[function(require,module,exports){
+exports.KnowledgeSkillEditSheet = KnowledgeSkillEditSheet;
+},{"./LanguageSkillEditSheet":140}],140:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LanguageSkillEditForm = void 0;
-const SkillEditForm_1 = require("./SkillEditForm");
-class LanguageSkillEditForm extends SkillEditForm_1.SkillEditForm {
+exports.LanguageSkillEditSheet = void 0;
+const SkillEditSheet_1 = require("./SkillEditSheet");
+class LanguageSkillEditSheet extends SkillEditSheet_1.SkillEditSheet {
     _updateString() {
         return `data.skills.language.value.${this.skillId}`;
     }
@@ -20701,8 +20712,8 @@ class LanguageSkillEditForm extends SkillEditForm_1.SkillEditForm {
         updateData[this._updateString()] = Object.assign(Object.assign({}, currentData), { name });
     }
 }
-exports.LanguageSkillEditForm = LanguageSkillEditForm;
-},{"./SkillEditForm":141}],141:[function(require,module,exports){
+exports.LanguageSkillEditSheet = LanguageSkillEditSheet;
+},{"./SkillEditSheet":141}],141:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -20714,16 +20725,16 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SkillEditForm = void 0;
+exports.SkillEditSheet = void 0;
 const config_1 = require("../../config");
-class SkillEditForm extends BaseEntitySheet {
+// @ts-ignore // TODO: foundry-vtt-types 0.8.2 doesn't know about DocumentSheet.
+class SkillEditSheet extends DocumentSheet {
     constructor(actor, options, skillId) {
         super(actor, options);
         this.skillId = skillId;
     }
-    get entity() {
-        //@ts-ignore
-        return super.entity;
+    get document() {
+        return super.document;
     }
     _updateString() {
         return `data.skills.active.${this.skillId}`;
@@ -20743,7 +20754,7 @@ class SkillEditForm extends BaseEntitySheet {
         });
     }
     get title() {
-        const label = this.entity.getSkillLabel(this.skillId);
+        const label = this.document.getSkillLabel(this.skillId);
         return `${game.i18n.localize('SR5.EditSkill')} - ${game.i18n.localize(label)}`;
     }
     _onUpdateObject(event, formData, updateData) {
@@ -20799,7 +20810,7 @@ class SkillEditForm extends BaseEntitySheet {
         return __awaiter(this, void 0, void 0, function* () {
             const updateData = {};
             this._onUpdateObject(event, formData, updateData);
-            yield this.entity.update(updateData);
+            yield this.document.update(updateData);
         });
     }
     activateListeners(html) {
@@ -20819,7 +20830,7 @@ class SkillEditForm extends BaseEntitySheet {
             const { bonus = [] } = data;
             // add blank line for new bonus
             updateData[`${this._updateString()}.bonus`] = [...bonus, { key: '', value: 0 }];
-            yield this.entity.update(updateData);
+            yield this.document.update(updateData);
         });
     }
     _removeBonus(event) {
@@ -20833,7 +20844,7 @@ class SkillEditForm extends BaseEntitySheet {
                 if (index >= 0) {
                     bonus.splice(index, 1);
                     updateData[`${this._updateString()}.bonus`] = bonus;
-                    yield this.entity.update(updateData);
+                    yield this.document.update(updateData);
                 }
             }
         });
@@ -20848,7 +20859,7 @@ class SkillEditForm extends BaseEntitySheet {
                 const { specs } = data;
                 updateData[`${this._updateString()}.specs`] = [...specs, ''];
             }
-            yield this.entity.update(updateData);
+            yield this.document.update(updateData);
         });
     }
     _removeSpec(event) {
@@ -20862,7 +20873,7 @@ class SkillEditForm extends BaseEntitySheet {
                 if (index >= 0) {
                     specs.splice(index, 1);
                     updateData[`${this._updateString()}.specs`] = specs;
-                    yield this.entity.update(updateData);
+                    yield this.document.update(updateData);
                 }
             }
         });
@@ -20873,14 +20884,13 @@ class SkillEditForm extends BaseEntitySheet {
         return Object.assign(Object.assign({}, config_1.SR5.attributes), { '': '' });
     }
     _allowSkillNameEditing() {
-        const skill = this.entity.getSkill(this.skillId);
+        const skill = this.document.getSkill(this.skillId);
         // Typescript sees string here? Double negate for boolean type cast...
         return !!((!(skill === null || skill === void 0 ? void 0 : skill.name) && !(skill === null || skill === void 0 ? void 0 : skill.label)) || ((skill === null || skill === void 0 ? void 0 : skill.name) && !(skill === null || skill === void 0 ? void 0 : skill.label)));
     }
     getData() {
         const data = super.getData();
-        // @ts-ignore
-        const actor = data.entity;
+        const actor = data.data;
         data['data'] = actor ? getProperty(actor, this._updateString()) : {};
         data['editable_name'] = this._allowSkillNameEditing();
         data['editable_canDefault'] = true;
@@ -20889,7 +20899,7 @@ class SkillEditForm extends BaseEntitySheet {
         return data;
     }
 }
-exports.SkillEditForm = SkillEditForm;
+exports.SkillEditSheet = SkillEditSheet;
 },{"../../config":145}],142:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -21076,13 +21086,24 @@ function getRollChatTemplateData(options) {
         // @ts-ignore // TODO: TYPE: Remove this...
         rollMode });
 }
+/**
+ * Return a mixed Scene and Token id data pair, separated by a dot '.'.
+ *
+ * This is needed for later retrieval of token related data from a chat message, should the scene have been switched after
+ * the chat message has been created.
+ *
+ * TODO: Store the scene id in the chat message data or flag in it's OWN data property instead of a mixed special case.
+ *
+ * @param token What token the sceneTokenId must be created for.
+ * @return '<SceneId>.<TokenId>'
+ */
 function getTokenSceneId(token) {
     if (!token)
         return;
     // TODO: Foundry 0.8 token.parent vs token.scene breaking change.
     const scene = token.scene || token.parent;
     // @ts-ignore
-    return scene._id;
+    return `${scene._id}.${token.id}`;
 }
 const addChatMessageContextOptions = (html, options) => {
     const canRoll = (li) => {
@@ -21132,10 +21153,7 @@ const addRollListeners = (app, html) => {
         if (actors.length === 0) {
             const targetSceneIds = message.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.TargetsSceneTokenIds);
             for (const targetSceneId of targetSceneIds) {
-                const token = helpers_1.Helpers.getSceneToken(targetSceneId);
-                if (!token)
-                    continue;
-                const actor = token.actor;
+                const actor = helpers_1.Helpers.getSceneTokenActor(targetSceneId);
                 if (!actor)
                     continue;
                 actors.push(actor);
@@ -21162,16 +21180,16 @@ const addRollListeners = (app, html) => {
         card.children('.dice-rolls').toggle();
         card.children('.card-description').toggle();
     });
-    /** Open the sheets of different entity types based on the chat card.
+    /** Open the sheets of different document types based on the chat card.
      */
-    html.on('click', '.chat-entity-link', event => {
+    html.on('click', '.chat-document-link', event => {
         var _a;
         event.preventDefault();
         if (!game || !game.ready || !canvas || !canvas.ready)
             return;
-        const entityLink = $(event.currentTarget);
-        const id = entityLink.data('id');
-        const type = entityLink.data('entity');
+        const documentLink = $(event.currentTarget);
+        const id = documentLink.data('id');
+        const type = documentLink.data('entity');
         if (!id)
             return;
         if (type === 'Token') {
@@ -21189,12 +21207,10 @@ const addRollListeners = (app, html) => {
             actor.sheet.render(true);
         }
         else if (type === 'Item') {
-            const card = entityLink.closest('.chat-card');
+            const card = documentLink.closest('.chat-card');
             const sceneTokenId = card.data('tokenId');
-            const token = helpers_1.Helpers.getSceneToken(sceneTokenId);
-            if (!token)
-                return;
-            const item = token.actor.getOwnedItem(id);
+            const actor = helpers_1.Helpers.getSceneTokenActor(sceneTokenId);
+            const item = actor.getOwnedItem(id);
             if (!item)
                 return;
             // @ts-ignore
@@ -21240,8 +21256,7 @@ const addRollListeners = (app, html) => {
             // If targeting is available, use that.
             if (targetIds) {
                 targetIds.forEach(targetId => {
-                    const token = helpers_1.Helpers.getSceneToken(targetId);
-                    const actor = token === null || token === void 0 ? void 0 : token.actor;
+                    const actor = helpers_1.Helpers.getSceneTokenActor(targetId);
                     if (!actor)
                         return;
                     actors.push(actor);
@@ -21250,8 +21265,7 @@ const addRollListeners = (app, html) => {
             }
             else {
                 const sceneTokenId = html.find('.chat-card').data('tokenId');
-                const token = helpers_1.Helpers.getSceneToken(sceneTokenId);
-                const actor = token === null || token === void 0 ? void 0 : token.actor;
+                const actor = helpers_1.Helpers.getSceneTokenActor(sceneTokenId);
                 if (actor) {
                     actors.push(actor);
                 }
@@ -21277,7 +21291,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SR5Combat = void 0;
+exports._combatantGetInitiativeFormula = exports.SR5Combat = void 0;
 const Combat_1 = require("../sr5/Combat");
 const constants_1 = require("../constants");
 /**
@@ -21375,7 +21389,7 @@ class SR5Combat extends Combat {
         });
     }
     /**
-     * Handle the change of an initiative pass. This needs owner permissions on the combat entity.
+     * Handle the change of an initiative pass. This needs owner permissions on the combat document.
      * @param combatId
      */
     static handleIniPass(combatId) {
@@ -21387,21 +21401,18 @@ class SR5Combat extends Combat {
             const initiativePass = combat.initiativePass + 1;
             // Start at the top!
             const turn = 0;
-            const combatants = [];
             for (const combatant of combat.combatants) {
                 const initiative = Combat_1.CombatRules.reduceIniResultAfterPass(Number(combatant.initiative));
-                combatants.push({ _id: combatant._id, initiative });
+                // TODO: Foundry 0.9 The Combat#updateCombatant method has been deprecated in favor of Combatant#update and will be removed in 0.9.0
+                yield combat.updateCombatant({ _id: combatant._id, initiative });
             }
-            if (combatants.length > 0)
-                // @ts-ignore
-                yield combat.updateCombatant(combatants);
             yield SR5Combat.setInitiativePass(combat, initiativePass);
             yield combat.update({ turn });
             return;
         });
     }
     /**
-     * Handle the change of a initiative round. This needs owner permission on the combat entity.
+     * Handle the change of a initiative round. This needs owner permission on the combat document.
      * @param combatId
      */
     static handleNextRound(combatId) {
@@ -21452,7 +21463,8 @@ class SR5Combat extends Combat {
                 Number(actor.getEdge().value),
                 Number((_a = actor.findAttribute('reaction')) === null || _a === void 0 ? void 0 : _a.value),
                 Number((_b = actor.findAttribute('intuition')) === null || _b === void 0 ? void 0 : _b.value),
-                new Roll('1d2').roll().total,
+                // @ts-ignore
+                new Roll('1d2').evaluate({ async: false }).total,
             ];
         };
         const leftData = genData(left.actor);
@@ -21527,6 +21539,7 @@ class SR5Combat extends Combat {
     nextTurn() {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
+            console.error('nextTurn', this);
             // Maybe advance to the next round/init pass
             let nextRound = this.round;
             let initiativePass = this.initiativePass;
@@ -21645,6 +21658,7 @@ class SR5Combat extends Combat {
      * Alter initiative formula to include initiative pass reduction.
      *
      * NOTE: Should this here fail or be buggy, there always is SR5Combat.updateNewCombatants which can be uncommented in SR5Combat.rollInitiative
+     * @deprecated since Foundry 0.8. Kept for possible Foundry 0.7 support. Might just be not needed anymore during 0.8 lifecycle.
      * @param combatant
      */
     _getInitiativeFormula(combatant) {
@@ -21652,8 +21666,17 @@ class SR5Combat extends Combat {
             return super._getInitiativeFormula(combatant);
         }
         // Reduce for initiative passes until zero.
-        // @ts-ignore // TODO: System.Data should contain initiative...
-        return `max(${game.system.data.initiative} -${(this.initiativePass - 1) * -constants_1.SR.combat.INI_RESULT_MOD_AFTER_INI_PASS}, 0)`;
+        return SR5Combat._getSystemInitiativeFormula(this.initiativePass);
+    }
+    static _getSystemInitiativeBaseFormula() {
+        // @ts-ignore
+        return String(CONFIG.Combat.initiative.formula || game.system.data.initiative);
+    }
+    static _getSystemInitiativeFormula(initiativePass) {
+        initiativePass = initiativePass > 1 ? initiativePass : 1;
+        const baseFormula = SR5Combat._getSystemInitiativeBaseFormula();
+        const ongoingIniPassModified = (initiativePass - 1) * -constants_1.SR.combat.INI_RESULT_MOD_AFTER_INI_PASS;
+        return `max(${baseFormula} - ${ongoingIniPassModified}[Pass], 0)`;
     }
     _registerSocketListeners() {
         // @ts-ignore
@@ -21688,6 +21711,19 @@ class SR5Combat extends Combat {
     }
 }
 exports.SR5Combat = SR5Combat;
+/**
+ * Since Foundry 0.8 Combat._getInitiativeFormula has been moved to Combatant._getInitiativeFormula.
+ *
+ *  This method enhances Combatant#_getInitiativeFormula. Check hooks.ts#init for when it comes into play.
+ *
+ *  During initiative roll modify the initiative result depending on the current combats initiative pass.
+ */
+function _combatantGetInitiativeFormula() {
+    const combat = this.parent;
+    const initiativePass = combat.data.flags.shadowrun5e.combatInitiativePass;
+    return SR5Combat._getSystemInitiativeFormula(initiativePass);
+}
+exports._combatantGetInitiativeFormula = _combatantGetInitiativeFormula;
 },{"../constants":146,"../sr5/Combat":211}],145:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -23620,6 +23656,7 @@ class Helpers {
         }
         return name.slice(0, length).toUpperCase();
     }
+    // TODO: Foundry 0.9 Should TokenDocument be used instead of Token?
     static getToken(id) {
         if (!canvas || !canvas.ready)
             return;
@@ -23629,26 +23666,20 @@ class Helpers {
             }
         }
     }
-    static getSceneToken(sceneTokenId) {
-        var _a;
-        if (!canvas || !canvas.ready || !canvas.scene)
-            return;
+    /**
+     * Use this helper to get a tokens actor from any given scene id, while the sceneTokenId is a mixed ID
+     * @param sceneTokenId A mixed id with the format '<sceneId>.<tokenid>
+     */
+    static getSceneTokenActor(sceneTokenId) {
         const [sceneId, tokenId] = sceneTokenId.split('.');
-        const isActiveScene = sceneId === canvas.scene._id;
-        if (isActiveScene) {
-            return canvas.tokens.get(tokenId);
-        }
-        // Build Token using it's data from the connected scene as a fallback.
-        const scene = (_a = game.scenes) === null || _a === void 0 ? void 0 : _a.get(sceneId);
-        if (!scene) {
+        const scene = game.scenes.get(sceneId);
+        if (!scene)
             return;
-        }
-        //@ts-ignore
-        const tokenData = scene.data.tokens.find((t) => t.id === Number(tokenId));
-        if (!tokenData) {
+        // @ts-ignore
+        const token = scene.tokens.get(tokenId);
+        if (!token)
             return;
-        }
-        return new Token(tokenData);
+        return token.getActor();
     }
     static getUserTargets(user) {
         user = user ? user : game.user;
@@ -23846,7 +23877,7 @@ class Helpers {
     /**
      * A simple helper to get an data entry for updating with Entity.update
      *
-     * @param path The main data path as a doted string relative from the type data (not entity data).
+     * @param path The main data path as a doted string relative from the type data (not document data).
      * @param value Whatever needs to be stored.
      *
      */
@@ -23854,9 +23885,9 @@ class Helpers {
         return { [path]: value };
     }
     /**
-     * A simple helper to delete existing entity data keys with Entity.update
+     * A simple helper to delete existing document data keys with Entity.update
      *
-     * @param path The main data path as doted string relative from the item type data (not entity data). data.skills.active
+     * @param path The main data path as doted string relative from the item type data (not document data). data.skills.active
      * @param key The single sub property within the path that's meant to be deleted. 'test'
      *
      * @return An expected return object could look like this: {'data.skills.active': {'-=Pistols': null}} and would
@@ -23925,6 +23956,27 @@ class Helpers {
             sortedAsObject[key] = translated;
         }
         return sortedAsObject;
+    }
+    /**
+     * Return a list of users with the given permission for the given document.
+     *
+     * @param document A foundry Document implementation.
+     * @param permission A foundry access permission
+     * @param active If true, will only return users that are also currently active.
+     */
+    static getPlayersWithPermission(document, permission, active = true) {
+        return game.users.filter(user => {
+            if (user.isGM)
+                return false;
+            // Check for permissions.
+            // @ts-ignore // TODO: foundry-vtt-types 0.8.2 missing testUserPermission for Documents (it's not DocumentClientMixin)
+            if (!document.testUserPermission(user, permission))
+                return false;
+            // Check for active state.
+            if (active && !user.active)
+                return false;
+            return true;
+        });
     }
 }
 exports.Helpers = Helpers;
@@ -23999,11 +24051,16 @@ ___________________
             SR5Item: SR5Item_1.SR5Item,
             rollItemMacro: macros_1.rollItemMacro,
         };
+        // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
+        CONFIG.Actor.documentClass = SR5Actor_1.SR5Actor;
+        // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
+        CONFIG.Item.documentClass = SR5Item_1.SR5Item;
+        // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
+        CONFIG.Combat.documentClass = SR5Combat_1.SR5Combat;
+        // Register initiative directly (outside of system.json) as DnD5e does it.
+        CONFIG.Combat.initiative.formula = "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
         // @ts-ignore
-        CONFIG.Actor.entityClass = SR5Actor_1.SR5Actor;
-        // @ts-ignore
-        CONFIG.Item.entityClass = SR5Item_1.SR5Item;
-        CONFIG.Combat.entityClass = SR5Combat_1.SR5Combat;
+        Combatant.prototype._getInitiativeFormula = SR5Combat_1._combatantGetInitiativeFormula;
         settings_1.registerSystemSettings();
         // Register sheet application classes
         // NOTE: See dnd5e for a multi class approach for all actor types using the types array in Actors.registerSheet
@@ -24072,8 +24129,8 @@ ___________________
         }
         tokenControls.tools.push(EnvModifiersApplication_1.EnvModifiersApplication.getControl());
     }
-    static renderChatMessage(app, html) {
-        chat.addRollListeners(app, html);
+    static renderChatMessage(message, html, data) {
+        chat.addRollListeners(message, html);
     }
     static renderItemDirectory(app, html) {
         const button = $('<button>Import Chummer Data</button>');
@@ -24327,33 +24384,33 @@ class ImportHelper {
         });
     }
     /**
-     * Get a folder at a path in the items directory.
+     * Get / create a folder at a path in the items directory.
+     *
+     * Traverse path and match folder structure to the last and current path segments.
+     *
      * @param path The absolute path of the folder.
      * @param mkdirs If true, will make all folders along the hierarchy if they do not exist.
      * @returns A promise that will resolve with the found folder.
      */
     static GetFolderAtPath(path, mkdirs = false) {
         return __awaiter(this, void 0, void 0, function* () {
-            let idx = 0;
-            let curr, last = null;
-            let next = path.split('/');
-            while (idx < next.length) {
-                // Use truthy equal as data.parent will be null, when folder has no parent, yet last?.id will return undefined if last === null
-                let parent = null;
-                curr = game.folders.find((folder) => {
-                    parent = folder.parent;
-                    return folder.data.parent == (last === null || last === void 0 ? void 0 : last.id) && folder.name === next[idx];
+            let currentFolder, lastFolder = undefined;
+            const pathSegments = path.split('/');
+            for (const pathSegment of pathSegments) {
+                // Check if the path structure matches the folder structure.
+                currentFolder = game.folders.find((folder) => {
+                    // @ts-ignore // TODO: foundry-vtt-types 0.8.2 support missing.
+                    return folder.parentFolder === lastFolder && folder.name === pathSegment;
                 });
-                if (!curr) {
-                    if (!mkdirs) {
-                        return Promise.reject(`Unable to find folder: ${path}`);
-                    }
-                    curr = yield ImportHelper.NewFolder(next[idx], last);
-                }
-                last = curr;
-                idx++;
+                // Only create when allowed to. Otherwise abort with error.
+                if (!currentFolder && !mkdirs)
+                    return Promise.reject(`Unable to find folder: ${path}`);
+                // Create the missing folder for the current segment
+                if (!currentFolder)
+                    currentFolder = yield ImportHelper.NewFolder(pathSegment, lastFolder);
+                lastFolder = currentFolder;
             }
-            return Promise.resolve(curr);
+            return Promise.resolve(currentFolder);
         });
     }
     /**
@@ -27944,10 +28001,10 @@ class SR5Item extends Item {
             const ammo = this.items
                 .filter((item) => item.type === 'ammo')
                 .map((item) => {
-                const ownedItem = this.getOwnedItem(item._id);
+                const ownedItem = this.getOwnedItem(item.id);
                 const ammoData = ownedItem === null || ownedItem === void 0 ? void 0 : ownedItem.asAmmoData();
                 if (ownedItem && ammoData) {
-                    ammoData.data.technology.equipped = iid === item._id;
+                    ammoData.data.technology.equipped = iid === item.id;
                     return ownedItem.data;
                 }
             });
@@ -28171,33 +28228,25 @@ class SR5Item extends Item {
             return roll;
         });
     }
+    /**
+     * The item can be stored on a token on the current or another, given, scene.
+     *
+     * The chat message must contain a data attribute containing a 'SceneId.TokenId' mapping.
+     * See chat.ts#getTokenSceneId for further context.
+     *
+     *
+     * @param html
+     */
     static getItemFromMessage(html) {
-        var _a;
         if (!game || !game.scenes || !game.ready || !canvas || !canvas.ready || !canvas.scene)
             return;
         const card = html.find('.chat-card');
         let actor;
-        const tokenKey = card.data('tokenId');
-        if (tokenKey) {
-            const [sceneId, tokenId] = tokenKey.split('.');
-            let token;
-            if (sceneId === canvas.scene._id)
-                token = canvas.tokens.get(tokenId);
-            else {
-                const scene = game.scenes.get(sceneId);
-                if (!scene)
-                    return;
-                // @ts-ignore
-                const tokenData = scene.data.tokens.find((t) => t.id === Number(tokenId));
-                if (tokenData)
-                    token = new Token(tokenData);
-            }
-            if (!token)
-                return;
-            actor = Actor.fromToken(token);
-        }
+        const sceneTokenId = card.data('tokenId');
+        if (sceneTokenId)
+            actor = helpers_1.Helpers.getSceneTokenActor(sceneTokenId);
         else
-            actor = (_a = game.actors) === null || _a === void 0 ? void 0 : _a.get(card.data('actorId'));
+            actor = game.actors.get(card.data('actorId'));
         if (!actor)
             return;
         const itemId = card.data('itemId');
@@ -28277,16 +28326,10 @@ class SR5Item extends Item {
                 return object;
             }, {});
             // Merge possible changes / new items from the flag into the current item instance.
+            // TODO: Foundry 0.8/0.9 Item.items is a map in Foundry but overwritten as an array here...
             this.items = items.map((item) => {
                 if (item._id in existing) {
                     const currentItem = existing[item._id];
-                    // Patch .data isn't really anymore but do it for consistency.
-                    // Patch ._data is needed for Item.prepareData to work, as it's simply duplicating _data over data.
-                    // Otherwise old item data will be used for value preparation.
-                    // TODO: Foundry 0.8 does changes to .data / ._data. This MIGHT cause issues here, however I'm unsure.
-                    // currentItem.data = item;
-                    // currentItem._data = item;
-                    console.error('Updating embedded items working correctly?');
                     currentItem.data.update(item);
                     // TODO: Foundry 0.8 Does data.update already handle the prepareData workflow?
                     currentItem.prepareData();
@@ -28306,7 +28349,7 @@ class SR5Item extends Item {
         const items = this.items;
         if (!items)
             return;
-        return items.find((i) => i._id === itemId);
+        return items.find((item) => item.id === itemId);
     }
     // TODO: Foundry 0.8. Rework this method. It's complicated and obvious optimizations can be made. (find vs findIndex)
     updateOwnedItem(changes) {
@@ -29484,7 +29527,8 @@ class SR5ItemSheet extends ItemSheet {
      */
     fixStaleRenderedState() {
         if (this._state === Application.RENDER_STATES.RENDERED && ui.windows[this.appId] === undefined) {
-            console.warn(`SR5ItemSheet app for ${this.entity.name} is set as RENDERED but has no window registered. Fixing app internal render state. This is a known bug.`);
+            // @ts-ignore // TODO: foundry-vtt-types doesn't know of DocumentSheet.document yet.
+            console.warn(`SR5ItemSheet app for ${this.document.name} is set as RENDERED but has no window registered. Fixing app internal render state. This is a known bug.`);
             // Hotfixing instead of this.close() since FormApplication.close() expects form elements, which don't exist anymore.
             this._state = Application.RENDER_STATES.CLOSED;
         }
@@ -29843,7 +29887,7 @@ class VersionMigration {
     }
     /**
      * Applies the specified mapping of entities, iteratively updating each.
-     * @param entityUpdates A mapping of entity updateData pairs.
+     * @param entityUpdates A mapping of document updateData pairs.
      */
     Apply(entityUpdates) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -29922,7 +29966,7 @@ class VersionMigration {
     /**
      * Iterate through all items and migrate each if needed.
      * @param game The game to be updated.
-     * @param entityUpdates The current map of entity updates.
+     * @param entityUpdates The current map of document updates.
      */
     IterateItems(game, entityUpdates) {
         var _a;
@@ -29954,7 +29998,7 @@ class VersionMigration {
     /**
      * Iterate through all actors and migrate each if needed.
      * @param game The game to be updated.
-     * @param entityUpdates The current map of entity updates.
+     * @param entityUpdates The current map of document updates.
      */
     IterateActors(game, entityUpdates) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -30043,7 +30087,7 @@ class VersionMigration {
     /**
      * Do something right before scene data is migrated.
      * @param game The game to be updated.
-     * @param entityUpdates The current map of entity updates.
+     * @param entityUpdates The current map of document updates.
      */
     PreMigrateSceneData(game, entityUpdates) {
         return __awaiter(this, void 0, void 0, function* () { });
@@ -30051,7 +30095,7 @@ class VersionMigration {
     /**
      * Do something right before scene data is migrated.
      * @param game The game to be updated.
-     * @param entityUpdates The current map of entity updates.
+     * @param entityUpdates The current map of document updates.
      */
     PostMigrateSceneData(game, entityUpdates) {
         return __awaiter(this, void 0, void 0, function* () { });
@@ -30079,7 +30123,7 @@ class VersionMigration {
     /**
      * Do something right before item data is migrated.
      * @param game The game to be updated.
-     * @param entityUpdates The current map of entity updates.
+     * @param entityUpdates The current map of document updates.
      */
     PreMigrateItemData(game, entityUpdates) {
         return __awaiter(this, void 0, void 0, function* () { });
@@ -30087,7 +30131,7 @@ class VersionMigration {
     /**
      * Do something right before item data is migrated.
      * @param game The game to be updated.
-     * @param entityUpdates The current map of entity updates.
+     * @param entityUpdates The current map of document updates.
      */
     PostMigrateItemData(game, entityUpdates) {
         return __awaiter(this, void 0, void 0, function* () { });
@@ -30115,7 +30159,7 @@ class VersionMigration {
     /**
      * Do something right before actor data is migrated.
      * @param game The game to be updated.
-     * @param entityUpdates The current map of entity updates.
+     * @param entityUpdates The current map of document updates.
      */
     PreMigrateActorData(game, entityUpdates) {
         return __awaiter(this, void 0, void 0, function* () { });
@@ -30123,7 +30167,7 @@ class VersionMigration {
     /**
      * Do something right after actor data is migrated.
      * @param game The game to be updated.
-     * @param entityUpdates The current map of entity updates.
+     * @param entityUpdates The current map of document updates.
      */
     PostMigrateActorData(game, entityUpdates) {
         return __awaiter(this, void 0, void 0, function* () { });
@@ -30153,7 +30197,7 @@ class VersionMigration {
                         updateData['_id'] = ent._id;
                         yield pack.updateEntity(updateData);
                         // TODO: Uncomment when foundry allows embeddeds to be updated in packs
-                        // } else if (entity === 'Actor') {
+                        // } else if (document === 'Actor') {
                         //     updateData = await this.MigrateActorData(ent.data);
                         //
                         //     if (isObjectEmpty(updateData)) {
@@ -30896,13 +30940,14 @@ class ShadowrunRoller {
         const rollData = { parts: parts.list, limit: props.limit, explodeSixes: props.explodeSixes };
         const roll = new ShadowrunRoll(formula, rollData);
         // Return roll reference instead roll() return to avoid typing issues.
-        roll.roll();
+        // @ts-ignore // TODO: foundry-vtt-types 0.8.2 is missing Roll.evaluate parameter typing.
+        roll.evaluate({ async: false });
         return roll;
     }
     static basicRoll(basicProps) {
         return __awaiter(this, void 0, void 0, function* () {
             const props = ShadowrunRoller.basicRollPropsDefaults(basicProps);
-            const roll = yield ShadowrunRoller.roll({ parts: props.parts, limit: props.limit, explodeSixes: props.explodeSixes });
+            const roll = ShadowrunRoller.roll({ parts: props.parts, limit: props.limit, explodeSixes: props.explodeSixes });
             if (!roll)
                 return;
             if (!props.hideRollMessage) {
@@ -31416,7 +31461,7 @@ class Modifiers {
     static getModifiersFromEntity(entity) {
         return __awaiter(this, void 0, void 0, function* () {
             // It's possible for scene modifiers to chosen, while no scene is actually opened.
-            // if (!entity) return new Modifiers(Modifiers.getDefaultModifiers());
+            // if (!document) return new Modifiers(Modifiers.getDefaultModifiers());
             const data = yield entity.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.Modifier);
             return new Modifiers(data);
         });
