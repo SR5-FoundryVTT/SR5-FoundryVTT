@@ -324,15 +324,15 @@ export const addRollListeners = (app: ChatMessage, html) => {
     });
 
 
-    /** Open the sheets of different entity types based on the chat card.
+    /** Open the sheets of different document types based on the chat card.
      */
-    html.on('click', '.chat-entity-link', event => {
+    html.on('click', '.chat-document-link', event => {
         event.preventDefault();
         if (!game || !game.ready || !canvas || !canvas.ready) return;
 
-        const entityLink = $(event.currentTarget);
-        const id = entityLink.data('id');
-        const type = entityLink.data('entity');
+        const documentLink = $(event.currentTarget);
+        const id = documentLink.data('id');
+        const type = documentLink.data('entity');
 
         if (!id) return;
 
@@ -347,7 +347,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
             // @ts-ignore
             actor.sheet.render(true);
         } else if (type === 'Item') {
-            const card = entityLink.closest('.chat-card');
+            const card = documentLink.closest('.chat-card');
             const sceneTokenId = card.data('tokenId');
 
             const actor = Helpers.getSceneTokenActor(sceneTokenId);

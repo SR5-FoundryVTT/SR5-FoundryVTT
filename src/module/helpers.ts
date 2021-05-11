@@ -517,7 +517,7 @@ export class Helpers {
     /**
      * A simple helper to get an data entry for updating with Entity.update
      *
-     * @param path The main data path as a doted string relative from the type data (not entity data).
+     * @param path The main data path as a doted string relative from the type data (not document data).
      * @param value Whatever needs to be stored.
      *
      */
@@ -525,9 +525,9 @@ export class Helpers {
         return {[path]: value};
     }
     /**
-     * A simple helper to delete existing entity data keys with Entity.update
+     * A simple helper to delete existing document data keys with Entity.update
      *
-     * @param path The main data path as doted string relative from the item type data (not entity data). data.skills.active
+     * @param path The main data path as doted string relative from the item type data (not document data). data.skills.active
      * @param key The single sub property within the path that's meant to be deleted. 'test'
      *
      * @return An expected return object could look like this: {'data.skills.active': {'-=Pistols': null}} and would

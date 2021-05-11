@@ -2,12 +2,12 @@ import SkillEditFormData = Shadowrun.SkillEditFormData;
 import {SR5Actor} from "../../actor/SR5Actor";
 import {SR5} from "../../config";
 
-export class SkillEditForm extends BaseEntitySheet {
+// @ts-ignore // TODO: foundry-vtt-types 0.8.2 doesn't know about DocumentSheet.
+export class SkillEditSheet extends DocumentSheet {
     skillId: string;
 
-    get entity(): SR5Actor {
-        //@ts-ignore
-        return super.entity;
+    get document(): SR5Actor {
+        return super.document;
     }
 
     constructor(actor, options, skillId) {
@@ -35,7 +35,7 @@ export class SkillEditForm extends BaseEntitySheet {
     }
 
     get title(): string {
-        const label = this.entity.getSkillLabel(this.skillId);
+        const label = this.document.getSkillLabel(this.skillId);
         return `${game.i18n.localize('SR5.EditSkill')} - ${game.i18n.localize(label)}`;
     }
 
@@ -100,7 +100,7 @@ export class SkillEditForm extends BaseEntitySheet {
     async _updateObject(event: Event, formData: object) {
         const updateData = {};
         this._onUpdateObject(event, formData, updateData);
-        await this.entity.update(updateData);
+        await this.document.update(updateData);
     }
 
     activateListeners(html) {
@@ -119,7 +119,7 @@ export class SkillEditForm extends BaseEntitySheet {
         const { bonus = [] } = data;
         // add blank line for new bonus
         updateData[`${this._updateString()}.bonus`] = [...bonus, { key: '', value: 0 }];
-        await this.entity.update(updateData);
+        await this.document.update(updateData);
     }
 
     async _removeBonus(event) {
@@ -132,7 +132,7 @@ export class SkillEditForm extends BaseEntitySheet {
             if (index >= 0) {
                 bonus.splice(index, 1);
                 updateData[`${this._updateString()}.bonus`] = bonus;
-                await this.entity.update(updateData);
+                await this.document.update(updateData);
             }
         }
     }
@@ -146,7 +146,7 @@ export class SkillEditForm extends BaseEntitySheet {
             const { specs } = data;
             updateData[`${this._updateString()}.specs`] = [...specs, ''];
         }
-        await this.entity.update(updateData);
+        await this.document.update(updateData);
     }
 
     async _removeSpec(event) {
@@ -159,7 +159,7 @@ export class SkillEditForm extends BaseEntitySheet {
             if (index >= 0) {
                 specs.splice(index, 1);
                 updateData[`${this._updateString()}.specs`] = specs;
-                await this.entity.update(updateData);
+                await this.document.update(updateData);
             }
         }
     }
@@ -171,15 +171,14 @@ export class SkillEditForm extends BaseEntitySheet {
     }
 
     _allowSkillNameEditing(): boolean {
-        const skill = this.entity.getSkill(this.skillId);
+        const skill = this.document.getSkill(this.skillId);
         // Typescript sees string here? Double negate for boolean type cast...
         return !!((!skill?.name && !skill?.label) || (skill?.name && !skill?.label));
     }
 
     getData(): SkillEditFormData {
         const data = super.getData();
-        // @ts-ignore
-        const actor = data.entity;
+        const actor = data.data;
 
         data['data'] = actor ? getProperty(actor, this._updateString()) : {};
         data['editable_name'] = this._allowSkillNameEditing();

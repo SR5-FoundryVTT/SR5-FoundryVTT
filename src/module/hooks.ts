@@ -64,11 +64,11 @@ ___________________
             rollItemMacro,
         };
 
-        // @ts-ignore // TODO: Foundry 0.9 entityClass will be removed
+        // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
         CONFIG.Actor.documentClass = SR5Actor;
-        // @ts-ignore // TODO: Foundry 0.9 entityClass will be removed
+        // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
         CONFIG.Item.documentClass = SR5Item;
-        // @ts-ignore // TODO: Foundry 0.9 entityClass will be removed
+        // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
         CONFIG.Combat.documentClass = SR5Combat;
         // Register initiative directly (outside of system.json) as DnD5e does it.
         CONFIG.Combat.initiative.formula =  "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";

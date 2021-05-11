@@ -1,8 +1,8 @@
 import {Helpers} from '../helpers';
 import {ChummerImportForm} from '../apps/chummer-import-form';
-import {SkillEditForm} from '../apps/skills/SkillEditForm';
-import {KnowledgeSkillEditForm} from '../apps/skills/KnowledgeSkillEditForm';
-import {LanguageSkillEditForm} from '../apps/skills/LanguageSkillEditForm';
+import {SkillEditSheet} from '../apps/skills/SkillEditSheet';
+import {KnowledgeSkillEditSheet} from '../apps/skills/KnowledgeSkillEditSheet';
+import {LanguageSkillEditSheet} from '../apps/skills/LanguageSkillEditSheet';
 import {SR5Actor} from './SR5Actor';
 import {SR5} from '../config';
 import {SR5Item} from "../item/SR5Item";
@@ -13,9 +13,9 @@ import MatrixAttribute = Shadowrun.MatrixAttribute;
 import SkillField = Shadowrun.SkillField;
 import DeviceData = Shadowrun.DeviceData;
 
-// Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditForm instance.
+// Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
-// when opened in succession, causing SkillEditForm to wrongfully overwrite the wrong data.
+// when opened in succession, causing SkillEditSheet to wrongfully overwrite the wrong data.
 let globalSkillAppId: number = -1;
 
 /**
@@ -535,7 +535,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         html.find('.driver-remove').click(this.handleRemoveVehicleDriver.bind(this));
     }
 
-    /** Handle all entity drops onto all actor sheet types.
+    /** Handle all document drops onto all actor sheet types.
      *
      * @param event
      */
@@ -752,7 +752,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         if (!skillId) return;
 
         // NOTE: Causes issues with adding knowledge skills (category undefined)
-        // await this._showSkillEditForm(LanguageSkillEditForm, this.actor, {event}, skillId);
+        // await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, {event}, skillId);
     }
 
     async _onRemoveLanguageSkill(event) {
@@ -772,7 +772,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         if (!skillId) return;
 
         // NOTE: Causes issues with adding knowledge skills (category undefined)
-        // await this._showSkillEditForm(KnowledgeSkillEditForm, this.actor, {event}, skillId);
+        // await this._showSkillEditForm(KnowledgeSkillEditSheet, this.actor, {event}, skillId);
     }
 
     async _onRemoveKnowledgeSkill(event) {
@@ -794,7 +794,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         const skillId = await this.actor.addActiveSkill();
         if (!skillId) return;
 
-        await this._showSkillEditForm(SkillEditForm, this.actor, { event: event }, skillId);
+        await this._showSkillEditForm(SkillEditSheet, this.actor, { event: event }, skillId);
     }
 
     async _onRemoveActiveSkill(event: Event) {
@@ -1032,9 +1032,9 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         }
     }
 
-    /** Keep track of each SkillEditForm instance and close before opening another.
+    /** Keep track of each SkillEditSheet instance and close before opening another.
      *
-     * @param skillEditFormImplementation Any extending class! of SkillEditForm
+     * @param skillEditFormImplementation Any extending class! of SkillEditSheet
      * @param actor
      * @param options
      * @param args Collect arguments of the different renderWithSkill implementations.
@@ -1052,7 +1052,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         const [skill, category] = Helpers.listItemId(event).split('.');
 
         this._showSkillEditForm(
-            KnowledgeSkillEditForm,
+            KnowledgeSkillEditSheet,
             this.actor,
             {
                 event: event,
@@ -1065,15 +1065,15 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
     async _onShowEditLanguageSkill(event) {
         event.preventDefault();
         const skill = Helpers.listItemId(event);
-        // new LanguageSkillEditForm(this.actor, skill, { event: event }).render(true);
-        await this._showSkillEditForm(LanguageSkillEditForm, this.actor, { event: event }, skill);
+        // new LanguageSkillEditSheet(this.actor, skill, { event: event }).render(true);
+        await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, { event: event }, skill);
     }
 
     async _onShowEditSkill(event) {
         event.preventDefault();
         const skill = Helpers.listItemId(event);
-        // new SkillEditForm(this.actor, skill, { event: event }).render(true);
-        await this._showSkillEditForm(SkillEditForm, this.actor, { event: event }, skill);
+        // new SkillEditSheet(this.actor, skill, { event: event }).render(true);
+        await this._showSkillEditForm(SkillEditSheet, this.actor, { event: event }, skill);
     }
 
     _onShowImportCharacter(event) {

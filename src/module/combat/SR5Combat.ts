@@ -104,7 +104,7 @@ export class SR5Combat extends Combat {
     }
 
     /**
-     * Handle the change of an initiative pass. This needs owner permissions on the combat entity.
+     * Handle the change of an initiative pass. This needs owner permissions on the combat document.
      * @param combatId
      */
     static async handleIniPass(combatId: string) {
@@ -127,7 +127,7 @@ export class SR5Combat extends Combat {
     }
 
     /**
-     * Handle the change of a initiative round. This needs owner permission on the combat entity.
+     * Handle the change of a initiative round. This needs owner permission on the combat document.
      * @param combatId
      */
     static async handleNextRound(combatId: string) {

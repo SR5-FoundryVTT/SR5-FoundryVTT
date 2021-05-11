@@ -100,7 +100,7 @@ export abstract class VersionMigration {
 
     /**
      * Applies the specified mapping of entities, iteratively updating each.
-     * @param entityUpdates A mapping of entity updateData pairs.
+     * @param entityUpdates A mapping of document updateData pairs.
      */
     protected async Apply(entityUpdates: Map<Entity, EntityUpdate>) {
         for (const [entity, { updateData, embeddedItems }] of entityUpdates) {
@@ -182,7 +182,7 @@ export abstract class VersionMigration {
     /**
      * Iterate through all items and migrate each if needed.
      * @param game The game to be updated.
-     * @param entityUpdates The current map of entity updates.
+     * @param entityUpdates The current map of document updates.
      */
     protected async IterateItems(game: Game, entityUpdates: Map<Entity, EntityUpdate>) {
         // @ts-ignore // TODO: TYPE game.items possibly undefined
@@ -213,7 +213,7 @@ export abstract class VersionMigration {
     /**
      * Iterate through all actors and migrate each if needed.
      * @param game The game to be updated.
-     * @param entityUpdates The current map of entity updates.
+     * @param entityUpdates The current map of document updates.
      */
     protected async IterateActors(game: Game, entityUpdates: Map<Entity, EntityUpdate>) {
         // @ts-ignore // TODO: TYPE: Possibly undefined
@@ -300,13 +300,13 @@ export abstract class VersionMigration {
     /**
      * Do something right before scene data is migrated.
      * @param game The game to be updated.
-     * @param entityUpdates The current map of entity updates.
+     * @param entityUpdates The current map of document updates.
      */
     protected async PreMigrateSceneData(game: Game, entityUpdates: Map<Entity, EntityUpdate>): Promise<void> {}
     /**
      * Do something right before scene data is migrated.
      * @param game The game to be updated.
-     * @param entityUpdates The current map of entity updates.
+     * @param entityUpdates The current map of document updates.
      */
     protected async PostMigrateSceneData(game: Game, entityUpdates: Map<Entity, EntityUpdate>): Promise<void> {}
 
@@ -329,13 +329,13 @@ export abstract class VersionMigration {
     /**
      * Do something right before item data is migrated.
      * @param game The game to be updated.
-     * @param entityUpdates The current map of entity updates.
+     * @param entityUpdates The current map of document updates.
      */
     protected async PreMigrateItemData(game: Game, entityUpdates: Map<Entity, EntityUpdate>): Promise<void> {}
     /**
      * Do something right before item data is migrated.
      * @param game The game to be updated.
-     * @param entityUpdates The current map of entity updates.
+     * @param entityUpdates The current map of document updates.
      */
     protected async PostMigrateItemData(game: Game, entityUpdates: Map<Entity, EntityUpdate>): Promise<void> {}
 
@@ -358,13 +358,13 @@ export abstract class VersionMigration {
     /**
      * Do something right before actor data is migrated.
      * @param game The game to be updated.
-     * @param entityUpdates The current map of entity updates.
+     * @param entityUpdates The current map of document updates.
      */
     protected async PreMigrateActorData(game: Game, entityUpdates: Map<Entity, EntityUpdate>): Promise<void> {}
     /**
      * Do something right after actor data is migrated.
      * @param game The game to be updated.
-     * @param entityUpdates The current map of entity updates.
+     * @param entityUpdates The current map of document updates.
      */
     protected async PostMigrateActorData(game: Game, entityUpdates: Map<Entity, EntityUpdate>): Promise<void> {}
 
@@ -395,7 +395,7 @@ export abstract class VersionMigration {
                     updateData['_id'] = ent._id;
                     await pack.updateEntity(updateData);
                     // TODO: Uncomment when foundry allows embeddeds to be updated in packs
-                    // } else if (entity === 'Actor') {
+                    // } else if (document === 'Actor') {
                     //     updateData = await this.MigrateActorData(ent.data);
                     //
                     //     if (isObjectEmpty(updateData)) {
