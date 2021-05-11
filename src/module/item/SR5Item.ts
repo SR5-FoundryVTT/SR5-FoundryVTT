@@ -574,11 +574,11 @@ export class SR5Item extends Item {
         const ammo = this.items
             .filter((item) => item.type === 'ammo')
             .map((item) => {
-                const ownedItem = this.getOwnedItem(item._id);
+                const ownedItem = this.getOwnedItem(item.id);
                 const ammoData = ownedItem?.asAmmoData();
 
                 if (ownedItem && ammoData) {
-                    ammoData.data.technology.equipped = iid === item._id;
+                    ammoData.data.technology.equipped = iid === item.id;
                     return ownedItem.data;
                 }
             });
@@ -928,17 +928,11 @@ export class SR5Item extends Item {
             }, {});
 
             // Merge possible changes / new items from the flag into the current item instance.
+            // TODO: Foundry 0.8/0.9 Item.items is a map in Foundry but overwritten as an array here...
             this.items = items.map((item) => {
                 if (item._id in existing) {
                     const currentItem = existing[item._id];
 
-                    // Patch .data isn't really anymore but do it for consistency.
-                    // Patch ._data is needed for Item.prepareData to work, as it's simply duplicating _data over data.
-                    // Otherwise old item data will be used for value preparation.
-                    // TODO: Foundry 0.8 does changes to .data / ._data. This MIGHT cause issues here, however I'm unsure.
-                    // currentItem.data = item;
-                    // currentItem._data = item;
-                    console.error('Updating embedded items working correctly?')
                     currentItem.data.update(item);
                     // TODO: Foundry 0.8 Does data.update already handle the prepareData workflow?
                     currentItem.prepareData();

@@ -166,10 +166,9 @@ export class SR5Actor extends Actor<SR5ActorType> {
         return DefaultValues.actorArmorData();
     }
 
+    // TODO: Foundry 0.9 Check if this can be replaced with this.items.get and correct typing.
     getOwnedSR5Item(itemId: string): SR5Item | null {
-        // TODO: Foundry 0.8 Owned Item management.
         return this.items.get(itemId) as unknown as  SR5Item;
-        // return (super.getOwnedItem(itemId) as unknown) as SR5Item;
     }
 
     getMatrixDevice(): SR5Item | undefined | null {
