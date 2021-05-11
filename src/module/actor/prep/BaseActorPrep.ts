@@ -7,10 +7,8 @@ export abstract class BaseActorPrep<ActorType extends SR5ActorType, DataType ext
     items: SR5ItemDataWrapper[];
 
     constructor(data: ActorType) {
-        // @ts-ignore
         this.data = data.data;
-        // @ts-ignore
-        this.items = data.items.map((item) => new SR5ItemDataWrapper(item));
+        this.items = data.items.map((item) => new SR5ItemDataWrapper(item.data));
     }
 
     // override with the correct order and functions to prepare the actor

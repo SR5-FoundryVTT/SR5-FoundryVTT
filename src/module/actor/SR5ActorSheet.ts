@@ -835,10 +835,10 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
             if (item.isDevice()) {
                 // Only allow one equipped device item. Unequip all other.
                 // @ts-ignore // TODO: TYPE: Remove. Missing Actor Typing.
-                for (let ite of this.actor.items.filter((actorItem: SR5Item) => actorItem.isDevice())) {
+                for (const item of this.actor.items.filter((actorItem: SR5Item) => actorItem.isDevice())) {
                     newItems.push({
-                        '_id': ite._id,
-                        'data.technology.equipped': ite._id === iid,
+                        '_id': item.id,
+                        'data.technology.equipped': item.id === iid,
                     });
                 }
 
@@ -849,8 +849,8 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
                     'data.technology.equipped': !item.isEquipped(),
                 });
             }
-            // @ts-ignore // TODO: foundry-pc-type defines Entity.updateEmbeddedEntity as static but it's not.
-            await this.actor.updateEmbeddedEntity('OwnedItem', newItems);
+            // @ts-ignore // TODO: foundry-vtt-types 0.8 has no Document support yet
+            await this.actor.updateEmbeddedDocuments('Item', newItems);
 
             this.actor.render(false);
         }
