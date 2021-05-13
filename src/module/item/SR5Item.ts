@@ -848,7 +848,7 @@ export class SR5Item extends Item {
 
         if (!actor) return;
         const itemId = card.data('itemId');
-        return actor.getOwnedItem(itemId);
+        return actor.items.get(itemId);
     }
 
     static getTargets() {

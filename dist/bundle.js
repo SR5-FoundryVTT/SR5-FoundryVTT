@@ -14429,7 +14429,8 @@ class SR5Actor extends Actor {
                     const tokens = helpers_1.Helpers.getControlledTokens();
                     if (tokens.length > 0) {
                         for (let token of tokens) {
-                            if (token.actor.owner) {
+                            // @ts-ignore // TODO: foundry-vtt-types not yet on 0.8
+                            if (token.actor.isOwner) {
                                 actor = token.actor;
                                 break;
                             }
@@ -14475,7 +14476,8 @@ class SR5Actor extends Actor {
                         const tokens = helpers_1.Helpers.getControlledTokens();
                         if (tokens.length > 0) {
                             for (let token of tokens) {
-                                if (token.actor.owner) {
+                                // @ts-ignore // TODO: foundry-vtt-types not yet on 0.8
+                                if (token.actor.isOwner) {
                                     actor = token.actor;
                                     break;
                                 }
@@ -14556,7 +14558,8 @@ class SR5Actor extends Actor {
         if (!this.hasPlayerOwner) {
             return null;
         }
-        for (const user of game.users.entities) {
+        // @ts-ignore // TODO: foundry-vtt-types Does not support DocumentCollection yet.
+        for (const user of game.users.contents) {
             if (!user.active || user.isGM) {
                 continue;
             }
@@ -14843,8 +14846,9 @@ class SR5Actor extends Actor {
             const onActor = yield Modifiers_1.Modifiers.getModifiersFromEntity(this);
             if (onActor.hasActiveEnvironmental) {
                 return onActor;
+                // No open scene, or scene ignored.
             }
-            else if (ignoreScene) {
+            else if (ignoreScene || scene === null) {
                 return new Modifiers_1.Modifiers(Modifiers_1.Modifiers.getDefaultModifiers());
             }
             else {
@@ -20978,7 +20982,6 @@ function createChatMessage(templateData, options) {
         // Convert targets into scene token ids.
         if (templateData.targets)
             yield message.setFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.TargetsSceneTokenIds, templateData.targets.map(target => getTokenSceneId(target)));
-        console.log('Chat Message', message, chatData);
         return message;
     });
 }
@@ -20995,13 +20998,13 @@ const createChatData = (templateData, options) => __awaiter(void 0, void 0, void
         }, showGlitchAnimation: game.settings.get(constants_1.SYSTEM_NAME, constants_1.FLAGS.ShowGlitchAnimation) });
     const html = yield renderTemplate(template, enhancedTemplateData);
     const chatData = {
-        user: (_a = game.user) === null || _a === void 0 ? void 0 : _a._id,
+        user: (_a = game.user) === null || _a === void 0 ? void 0 : _a.id,
         type: (options === null || options === void 0 ? void 0 : options.roll) ? CONST.CHAT_MESSAGE_TYPES.ROLL : CONST.CHAT_MESSAGE_TYPES.OTHER,
         sound: (options === null || options === void 0 ? void 0 : options.roll) ? CONFIG.sounds.dice : undefined,
         content: html,
         roll: (options === null || options === void 0 ? void 0 : options.roll) ? JSON.stringify(options === null || options === void 0 ? void 0 : options.roll) : undefined,
         speaker: {
-            actor: actor === null || actor === void 0 ? void 0 : actor._id,
+            actor: actor === null || actor === void 0 ? void 0 : actor.id,
             token: actor === null || actor === void 0 ? void 0 : actor.getToken(),
             alias: (_b = game.user) === null || _b === void 0 ? void 0 : _b.name
         },
@@ -21103,7 +21106,7 @@ function getTokenSceneId(token) {
     // TODO: Foundry 0.8 token.parent vs token.scene breaking change.
     const scene = token.scene || token.parent;
     // @ts-ignore
-    return `${scene._id}.${token.id}`;
+    return `${scene.id}.${token.id}`;
 }
 const addChatMessageContextOptions = (html, options) => {
     const canRoll = (li) => {
@@ -23799,7 +23802,7 @@ class Helpers {
         }
         // First search the actor itself for the item
         const itemId = damageData.source.itemId;
-        const actorItem = actorSource.getOwnedItem(itemId);
+        const actorItem = actorSource.items.get(itemId);
         if (actorItem) {
             return actorItem;
         }
@@ -28250,7 +28253,7 @@ class SR5Item extends Item {
         if (!actor)
             return;
         const itemId = card.data('itemId');
-        return actor.getOwnedItem(itemId);
+        return actor.items.get(itemId);
     }
     static getTargets() {
         if (!game.ready || !game.user)
@@ -28330,8 +28333,8 @@ class SR5Item extends Item {
             this.items = items.map((item) => {
                 if (item._id in existing) {
                     const currentItem = existing[item._id];
+                    // Update DocumentData directly, since we're not really having database items here.
                     currentItem.data.update(item);
-                    // TODO: Foundry 0.8 Does data.update already handle the prepareData workflow?
                     currentItem.prepareData();
                     return currentItem;
                 }
@@ -28844,6 +28847,28 @@ class SR5Item extends Item {
             return true;
         return false;
     }
+    get _isEmbeddedItem() {
+        // @ts-ignore // TODO: foundry-vtt-types Document hasn't be implemented yet
+        return this.hasOwnProperty('parent') && this.parent instanceof SR5Item;
+    }
+    /**
+     * Hook into the Item.update process for embedded items.
+     *
+     * @param data changes made to the SR5ItemData
+     */
+    updateEmbeddedItem(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // Inform the parent item about changes to one of it's embedded items.
+            // TODO: Foundry 0.8 updateOwnedItem needs the id of the update item. hand the item itself over, to the hack within updateOwnedItem for this.
+            data._id = this.id;
+            // @ts-ignore // TODO: foundry-vtt-types Document hasn't be implemented yet
+            yield this.parent.updateOwnedItem(data);
+            // After updating all item embedded data, rerender the sheet to trigger the whole rerender workflow.
+            // Otherwise changes in the template of an hiddenItem will show for some fields, while not rerendering all
+            // #if statements (hidden fields for other values, won't show)
+            return this.sheet.render(false);
+        });
+    }
     // TODO: Foundry 0.8 this method has been added for debugging
     // @ts-ignore
     update(data, ...args) {
@@ -28851,14 +28876,11 @@ class SR5Item extends Item {
             update: { get: () => super.update }
         });
         return __awaiter(this, void 0, void 0, function* () {
-            // @ts-ignore // TODO: Foundry 0.8 this.parent doesn't exist in 0.7 Foundry
-            if (this.hasOwnProperty('parent') && this.parent instanceof SR5Item) {
-                // Allow the parent to identify the item
-                // TODO: Foundry 0.8 Fetch the item from the parent and hand over data + the item.
-                data._id = this.id;
-                // @ts-ignore
-                return yield this.parent.updateOwnedItem(data);
+            // Item.item => Embedded item into another item!
+            if (this._isEmbeddedItem) {
+                return this.updateEmbeddedItem(data);
             }
+            // Actor.item => Directly owned item by an actor!
             // @ts-ignore
             return yield _super.update.call(this, data, ...args);
         });
@@ -29594,7 +29616,8 @@ function createItemMacro(item, slot) {
         if (!game || !game.macros)
             return;
         const command = `game.shadowrun5e.rollItemMacro("${item.name}");`;
-        let macro = game.macros.entities.find((m) => m.name === item.name);
+        // @ts-ignore // TODO: foundry-vtt-types Does not support DocumentCollection yet.
+        let macro = game.macros.contents.find((m) => m.name === item.name);
         if (!macro) {
             macro = (yield Macro.create({
                 name: item.name,
@@ -29907,13 +29930,13 @@ class VersionMigration {
      */
     IterateScenes(game, entityUpdates) {
         return __awaiter(this, void 0, void 0, function* () {
-            // @ts-ignore TODO: 0.8 .contents
+            // @ts-ignore // TODO: foundry-vtt-types Does not support DocumentCollection yet.
             for (const scene of game.scenes.contents) {
                 try {
                     if (!(yield this.ShouldMigrateSceneData(scene))) {
                         continue;
                     }
-                    if (scene._id === 'MAwSFhlXRipixOWw') {
+                    if (scene.id === 'MAwSFhlXRipixOWw') {
                         console.log('Scene Pre-Update');
                         console.log(scene);
                     }
@@ -29930,7 +29953,7 @@ class VersionMigration {
                         let tokenDataUpdate = yield this.MigrateActorData(token.actorData);
                         if (!isObjectEmpty(tokenDataUpdate)) {
                             hasTokenUpdates = true;
-                            tokenDataUpdate['_id'] = token._id;
+                            tokenDataUpdate['_id'] = token.id;
                             const newToken = duplicate(token);
                             newToken.actorData = yield mergeObject(token.actorData, tokenDataUpdate, {
                                 enforceTypes: false,
@@ -29943,7 +29966,7 @@ class VersionMigration {
                             return token;
                         }
                     })));
-                    if (scene._id === 'MAwSFhlXRipixOWw') {
+                    if (scene.id === 'MAwSFhlXRipixOWw') {
                         console.log('Scene Pre-Update');
                         console.log(scene);
                     }
@@ -29972,7 +29995,7 @@ class VersionMigration {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
             // @ts-ignore // TODO: TYPE game.items possibly undefined
-            for (const item of (_a = game.items) === null || _a === void 0 ? void 0 : _a.entities) {
+            for (const item of (_a = game.items) === null || _a === void 0 ? void 0 : _a.contents) {
                 try {
                     if (!(yield this.ShouldMigrateItemData(item.data))) {
                         continue;
@@ -30003,7 +30026,7 @@ class VersionMigration {
     IterateActors(game, entityUpdates) {
         return __awaiter(this, void 0, void 0, function* () {
             // @ts-ignore // TODO: TYPE: Possibly undefined
-            for (const actor of game.actors.entities) {
+            for (const actor of game.actors.contents) {
                 try {
                     if (!(yield this.ShouldMigrateActorData(actor.data))) {
                         continue;
@@ -30043,18 +30066,18 @@ class VersionMigration {
             if (actorData.items !== undefined) {
                 const items = yield Promise.all(
                 // @ts-ignore
-                actorData.items.map((item) => __awaiter(this, void 0, void 0, function* () {
-                    let itemUpdate = yield this.MigrateItemData(item);
+                actorData.items.map((itemData) => __awaiter(this, void 0, void 0, function* () {
+                    let itemUpdate = yield this.MigrateItemData(itemData);
                     if (!isObjectEmpty(itemUpdate)) {
                         hasItemUpdates = true;
-                        itemUpdate['_id'] = item._id;
-                        return yield mergeObject(item, itemUpdate, {
+                        itemUpdate['_id'] = itemData._id;
+                        return yield mergeObject(itemData, itemUpdate, {
                             enforceTypes: false,
                             inplace: false,
                         });
                     }
                     else {
-                        return item;
+                        return itemData;
                     }
                 })));
                 if (hasItemUpdates) {
@@ -30194,7 +30217,7 @@ class VersionMigration {
                             continue;
                         }
                         expandObject(updateData);
-                        updateData['_id'] = ent._id;
+                        updateData['_id'] = ent.id;
                         yield pack.updateEntity(updateData);
                         // TODO: Uncomment when foundry allows embeddeds to be updated in packs
                         // } else if (document === 'Actor') {
@@ -30213,7 +30236,7 @@ class VersionMigration {
                             continue;
                         }
                         expandObject(updateData);
-                        updateData['_id'] = ent._id;
+                        updateData['_id'] = ent.id;
                         yield pack.updateEntity(updateData);
                     }
                 }

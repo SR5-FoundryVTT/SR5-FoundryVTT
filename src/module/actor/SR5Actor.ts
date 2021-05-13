@@ -1229,7 +1229,8 @@ export class SR5Actor extends Actor<SR5ActorType> {
                 const tokens = Helpers.getControlledTokens();
                 if (tokens.length > 0) {
                     for (let token of tokens) {
-                        if (token.actor.owner) {
+                        // @ts-ignore // TODO: foundry-vtt-types not yet on 0.8
+                        if (token.actor.isOwner) {
                             actor = token.actor as SR5Actor;
                             break;
                         }
@@ -1272,7 +1273,8 @@ export class SR5Actor extends Actor<SR5ActorType> {
                     const tokens = Helpers.getControlledTokens();
                     if (tokens.length > 0) {
                         for (let token of tokens) {
-                            if (token.actor.owner) {
+                            // @ts-ignore // TODO: foundry-vtt-types not yet on 0.8
+                            if (token.actor.isOwner) {
                                 actor = token.actor as SR5Actor;
                                 break;
                             }
