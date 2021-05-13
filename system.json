@@ -50,7 +50,7 @@
     "socket": true,
     "manifest": "https://raw.githubusercontent.com/smilligan93/SR5-FoundryVTT/refactor_vtt_types_08/system.json",
     "url": "https://github.com/smilligan93/SR5-FoundryVTT",
-    "download": "https://github.com/smilligan93/SR5-FoundryVTT/archive/t0.7.16.zip",
+    "download": "https://github.com/smilligan93/SR5-FoundryVTT/archive/t210513.zip",
     "allowBugReporter": true,
     "bugs": "https://github.com/smilligan93/SR5-FoundryVTT/issues"
 }
