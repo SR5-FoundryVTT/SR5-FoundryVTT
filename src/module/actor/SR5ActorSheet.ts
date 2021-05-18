@@ -111,9 +111,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
     }
 
     _getSkillLabelOrName(skill) {
-        // Custom skills don't have labels, use their name instead.
-        // TODO: Foundry 0.8 Bug with template and missing data?
-        return skill.label ? game.i18n.localize(skill.label) : skill.name || '';
+        return Helpers.getSkillLabelOrName(skill);
     }
 
     _doesSkillContainText(key, skill, text) {
@@ -523,16 +521,51 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         });
         // Delete Inventory Item
         html.find('.item-delete').click(event => this.deleteOwnedItem(event));
-        // Drag inventory item
-        let handler = (ev) => this._onDragStart(ev);
-        html.find('.list-item').each((i, item) => {
-            if (item.dataset && item.dataset.itemId) {
-                item.setAttribute('draggable', true);
-                item.addEventListener('dragstart', handler, false);
-            }
-        });
+
+        // Augment ListItem.html templates with drag support
+       this._addDragSupportToListItemTemplatePartial(html);
 
         html.find('.driver-remove').click(this.handleRemoveVehicleDriver.bind(this));
+    }
+
+    /**
+     * @override Default drag start handler to add Skill support
+     * @param event
+     */
+    async _onDragStart(event) {
+        if (!canvas.ready) return;
+
+        // Create drag data
+        const dragData = {
+            actorId: this.actor.id,
+            sceneId: this.actor.isToken ? canvas.scene?.id : null,
+            tokenId: this.actor.isToken ? this.actor.token.id : null,
+            type: null,
+            data: null
+        };
+
+        // Handle different item type data transfers.
+        const element = event.currentTarget;
+        switch (element.dataset.itemType) {
+            // Skill data transfer.
+            case 'skill':
+                // Prepare data transfer
+                dragData.type = 'Skill';
+                dragData.data = {
+                    skillId: element.dataset.itemId,
+                    skill: this.actor.getSkill(element.dataset.itemId)
+                };
+
+                // Set data transfer
+                event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+
+                return;
+
+            // All default Foundry data transfer.
+            default:
+                // Let default Foundry handler deal with default drag cases.
+                return super._onDragStart(event);
+        }
     }
 
     /** Handle all document drops onto all actor sheet types.
@@ -559,7 +592,18 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         await super._onDrop(event);
     }
 
-
+    /**
+     * Augment each item of the ListItem template partial with drag support.
+     * @param html
+     */
+    _addDragSupportToListItemTemplatePartial(html) {
+         html.find('.list-item').each((i, item) => {
+            if (item.dataset && item.dataset.itemId) {
+                item.setAttribute('draggable', true);
+                item.addEventListener('dragstart', this._onDragStart.bind(this), false);
+            }
+        });
+    }
 
     async deleteOwnedItem(event) {
         event.preventDefault();

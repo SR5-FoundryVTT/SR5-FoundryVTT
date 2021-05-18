@@ -11,7 +11,7 @@ import { Helpers } from './helpers';
 import { HandlebarManager } from './handlebars/HandlebarManager';
 import { measureDistance } from './canvas';
 import * as chat from './chat';
-import { createItemMacro, rollItemMacro } from './macros';
+import {createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro} from './macros';
 
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
 import {_combatantGetInitiativeFormula, SR5Combat} from './combat/SR5Combat';
@@ -62,6 +62,7 @@ ___________________
             ShadowrunRoller,
             SR5Item,
             rollItemMacro,
+            rollSkillMacro
         };
 
         // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
@@ -124,11 +125,25 @@ ___________________
         SquareGrid.prototype.measureDistances = measureDistance;
     }
 
-    static hotbarDrop(bar, data, slot) {
-        if (data.type !== 'Item') return;
-
-        createItemMacro(data.data, slot);
-        return false;
+    /**
+     * Hanlde drop events on the hotbar creating different macros
+     *
+     * @param bar
+     * @param data
+     * @param slot
+     * @return false NOTE: when the hook call propagation should be stopped.
+     */
+    static async hotbarDrop(bar, data, slot) {
+        switch (data.type) {
+            case 'Item':
+                await createItemMacro(data.data, slot);
+                return false;
+            case 'Skill':
+                await createSkillMacro(data.data, slot);
+                return false;
+            default:
+                return;
+        }
     }
 
     static renderSceneControls(controls, html) {

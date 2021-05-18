@@ -623,4 +623,15 @@ export class Helpers {
             return true;
         });
     }
+
+    /**
+     * Handle the special skill cases with id equals name and possible i18n
+     *
+     * @param skill
+     * @returns Either a translation or a name.
+     */
+    static getSkillLabelOrName(skill: SkillField): string {
+        // Custom skills don't have labels, use their name instead.
+        return skill.label ? game.i18n.localize(skill.label) : skill.name || '';
+    }
 }
