@@ -121,7 +121,7 @@ const createChatData = async (templateData, options?: ChatDataOptions) => {
         roll: options?.roll ? JSON.stringify(options?.roll) : undefined,
         speaker: {
             actor: actor?.id,
-            token: actor?.getToken(),
+            token: token?.id,
             alias: game.user?.name
         },
         flags: {

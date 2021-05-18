@@ -265,7 +265,8 @@ export class ShadowrunRoller {
         }
         else if (item.isWeapon()) {
             if (item.hasAmmo() && actionTestData?.rangedWeapon) {
-                const fireMode = actionTestData.rangedWeapon.fireMode.value || 1;
+                // Try using fire mode for ammunition consumption.
+                const fireMode = actionTestData?.rangedWeapon?.fireMode?.value || 0;
                 await item.useAmmo(fireMode);
             }
         }

@@ -525,11 +525,15 @@ export class SR5Item extends Item {
         return this.wrapper.hasAmmo();
     }
 
-    async useAmmo(fireMode) {
+    /**
+     * Use the weapons ammunition with the amount of bullets fired.
+     * @param fired Amount of bullets fired.
+     */
+    async useAmmo(fired) {
         const weapon = duplicate(this.asWeaponData());
         if (weapon) {
             const { ammo } = weapon.data;
-            ammo.current.value = Math.max(0, ammo.current.value - fireMode);
+            ammo.current.value = Math.max(0, ammo.current.value - fired);
 
             return await this.update(weapon);
         }
