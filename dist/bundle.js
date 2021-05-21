@@ -14959,9 +14959,7 @@ class SR5ActorSheet extends ActorSheet {
         return skill.attribute === 'resonance';
     }
     _getSkillLabelOrName(skill) {
-        // Custom skills don't have labels, use their name instead.
-        // TODO: Foundry 0.8 Bug with template and missing data?
-        return skill.label ? game.i18n.localize(skill.label) : skill.name || '';
+        return helpers_1.Helpers.getSkillLabelOrName(skill);
     }
     _doesSkillContainText(key, skill, text) {
         if (!text) {
@@ -15335,15 +15333,50 @@ class SR5ActorSheet extends ActorSheet {
         });
         // Delete Inventory Item
         html.find('.item-delete').click(event => this.deleteOwnedItem(event));
-        // Drag inventory item
-        let handler = (ev) => this._onDragStart(ev);
-        html.find('.list-item').each((i, item) => {
-            if (item.dataset && item.dataset.itemId) {
-                item.setAttribute('draggable', true);
-                item.addEventListener('dragstart', handler, false);
+        // Augment ListItem.html templates with drag support
+        this._addDragSupportToListItemTemplatePartial(html);
+        html.find('.driver-remove').click(this.handleRemoveVehicleDriver.bind(this));
+    }
+    /**
+     * @override Default drag start handler to add Skill support
+     * @param event
+     */
+    _onDragStart(event) {
+        const _super = Object.create(null, {
+            _onDragStart: { get: () => super._onDragStart }
+        });
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!canvas.ready)
+                return;
+            // Create drag data
+            const dragData = {
+                actorId: this.actor.id,
+                sceneId: this.actor.isToken ? (_a = canvas.scene) === null || _a === void 0 ? void 0 : _a.id : null,
+                tokenId: this.actor.isToken ? this.actor.token.id : null,
+                type: null,
+                data: null
+            };
+            // Handle different item type data transfers.
+            const element = event.currentTarget;
+            switch (element.dataset.itemType) {
+                // Skill data transfer.
+                case 'skill':
+                    // Prepare data transfer
+                    dragData.type = 'Skill';
+                    dragData.data = {
+                        skillId: element.dataset.itemId,
+                        skill: this.actor.getSkill(element.dataset.itemId)
+                    };
+                    // Set data transfer
+                    event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+                    return;
+                // All default Foundry data transfer.
+                default:
+                    // Let default Foundry handler deal with default drag cases.
+                    return _super._onDragStart.call(this, event);
             }
         });
-        html.find('.driver-remove').click(this.handleRemoveVehicleDriver.bind(this));
     }
     /** Handle all document drops onto all actor sheet types.
      *
@@ -15368,6 +15401,18 @@ class SR5ActorSheet extends ActorSheet {
             }
             // Handle none specific drop events.
             yield _super._onDrop.call(this, event);
+        });
+    }
+    /**
+     * Augment each item of the ListItem template partial with drag support.
+     * @param html
+     */
+    _addDragSupportToListItemTemplatePartial(html) {
+        html.find('.list-item').each((i, item) => {
+            if (item.dataset && item.dataset.itemId) {
+                item.setAttribute('draggable', true);
+                item.addEventListener('dragstart', this._onDragStart.bind(this), false);
+            }
         });
     }
     deleteOwnedItem(event) {
@@ -20999,13 +21044,15 @@ const createChatData = (templateData, options) => __awaiter(void 0, void 0, void
     const html = yield renderTemplate(template, enhancedTemplateData);
     const chatData = {
         user: (_a = game.user) === null || _a === void 0 ? void 0 : _a.id,
-        type: (options === null || options === void 0 ? void 0 : options.roll) ? CONST.CHAT_MESSAGE_TYPES.ROLL : CONST.CHAT_MESSAGE_TYPES.OTHER,
+        // NOTE: Type Roll used to make a whispered message visible with it's content being invisible. That's not the case
+        //       with Foundry 0.8 anymore. Should that have changed, just uncomment this line.
+        // type: options?.roll ? CONST.CHAT_MESSAGE_TYPES.ROLL : CONST.CHAT_MESSAGE_TYPES.OTHER,
         sound: (options === null || options === void 0 ? void 0 : options.roll) ? CONFIG.sounds.dice : undefined,
         content: html,
         roll: (options === null || options === void 0 ? void 0 : options.roll) ? JSON.stringify(options === null || options === void 0 ? void 0 : options.roll) : undefined,
         speaker: {
             actor: actor === null || actor === void 0 ? void 0 : actor.id,
-            token: actor === null || actor === void 0 ? void 0 : actor.getToken(),
+            token: token === null || token === void 0 ? void 0 : token.id,
             alias: (_b = game.user) === null || _b === void 0 ? void 0 : _b.name
         },
         flags: {
@@ -21014,11 +21061,15 @@ const createChatData = (templateData, options) => __awaiter(void 0, void 0, void
             },
         }
     };
+    // Applying roll mode will set correct whisper recipients.
     const rollMode = (_c = templateData.rollMode) !== null && _c !== void 0 ? _c : game.settings.get(constants_1.CORE_NAME, constants_1.CORE_FLAGS.RollMode);
-    if (['gmroll', 'blindroll'].includes(rollMode))
-        chatData['whisper'] = ChatMessage.getWhisperRecipients('GM');
-    if (rollMode === 'blindroll')
-        chatData['blind'] = true;
+    // @ts-ignore
+    ChatMessage.applyRollMode(chatData, rollMode);
+    // @ts-ignore
+    chatData.rollMode = rollMode;
+    // if (['gmroll', 'blindroll'].includes(rollMode as string)) chatData['whisper'] = ChatMessage.getWhisperRecipients('GM');
+    // if (rollMode === 'blindroll') chatData['blind'] = true;
+    // If a specific whisper recipient has been set, overwrite Foundry default.
     if (options === null || options === void 0 ? void 0 : options.whisperTo) {
         chatData['whisper'] = ChatMessage.getWhisperRecipients(options.whisperTo.name);
     }
@@ -23981,6 +24032,16 @@ class Helpers {
             return true;
         });
     }
+    /**
+     * Handle the special skill cases with id equals name and possible i18n
+     *
+     * @param skill
+     * @returns Either a translation or a name.
+     */
+    static getSkillLabelOrName(skill) {
+        // Custom skills don't have labels, use their name instead.
+        return skill.label ? game.i18n.localize(skill.label) : skill.name || '';
+    }
 }
 exports.Helpers = Helpers;
 },{"./apps/dialogs/DeleteConfirmationDialog":133,"./constants":146,"./dataTemplates":147,"./parts/PartsList":208}],157:[function(require,module,exports){
@@ -24053,6 +24114,7 @@ ___________________
             ShadowrunRoller: ShadowrunRoller_1.ShadowrunRoller,
             SR5Item: SR5Item_1.SR5Item,
             rollItemMacro: macros_1.rollItemMacro,
+            rollSkillMacro: macros_1.rollSkillMacro
         };
         // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
         CONFIG.Actor.documentClass = SR5Actor_1.SR5Actor;
@@ -24107,11 +24169,27 @@ ___________________
         // SquareGrid isn't typed.
         SquareGrid.prototype.measureDistances = canvas_1.measureDistance;
     }
+    /**
+     * Hanlde drop events on the hotbar creating different macros
+     *
+     * @param bar
+     * @param data
+     * @param slot
+     * @return false NOTE: when the hook call propagation should be stopped.
+     */
     static hotbarDrop(bar, data, slot) {
-        if (data.type !== 'Item')
-            return;
-        macros_1.createItemMacro(data.data, slot);
-        return false;
+        return __awaiter(this, void 0, void 0, function* () {
+            switch (data.type) {
+                case 'Item':
+                    yield macros_1.createItemMacro(data.data, slot);
+                    return false;
+                case 'Skill':
+                    yield macros_1.createSkillMacro(data.data, slot);
+                    return false;
+                default:
+                    return;
+            }
+        });
     }
     static renderSceneControls(controls, html) {
         html.find('[data-tool="overwatch-score-tracker"]').on('click', (event) => {
@@ -27959,12 +28037,16 @@ class SR5Item extends Item {
     hasAmmo() {
         return this.wrapper.hasAmmo();
     }
-    useAmmo(fireMode) {
+    /**
+     * Use the weapons ammunition with the amount of bullets fired.
+     * @param fired Amount of bullets fired.
+     */
+    useAmmo(fired) {
         return __awaiter(this, void 0, void 0, function* () {
             const weapon = duplicate(this.asWeaponData());
             if (weapon) {
                 const { ammo } = weapon.data;
-                ammo.current.value = Math.max(0, ammo.current.value - fireMode);
+                ammo.current.value = Math.max(0, ammo.current.value - fired);
                 return yield this.update(weapon);
             }
         });
@@ -29602,7 +29684,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.rollItemMacro = exports.createItemMacro = void 0;
+exports.rollSkillMacro = exports.createSkillMacro = exports.rollItemMacro = exports.createItemMacro = void 0;
 /**
  * Create a Macro from an Item drop.
  * Get an existing item macro if one exists, otherwise create a new one.
@@ -29610,6 +29692,7 @@ exports.rollItemMacro = exports.createItemMacro = void 0;
  * @param {number} slot     The hotbar slot to use
  * @returns {Promise}
  */
+const helpers_1 = require("./helpers");
 function createItemMacro(item, slot) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
@@ -29657,7 +29740,60 @@ function rollItemMacro(itemName) {
     return item.castAction();
 }
 exports.rollItemMacro = rollItemMacro;
-},{}],201:[function(require,module,exports){
+/**
+ * Create a macro from an skill drop.
+ *
+ * @param data A data object for skill macros.
+ * @param slot The hotbar slot to use.
+ */
+function createSkillMacro(data, slot) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!game || !game.macros)
+            return;
+        const { skillId, skill } = data;
+        // Abort when skill macro already exists. This is done for consistency with createItemMacro behavior.
+        const name = helpers_1.Helpers.getSkillLabelOrName(skill);
+        // @ts-ignore
+        const existingMacro = game.macros.contents.find(macro => macro.name === name);
+        if (existingMacro)
+            return;
+        // Setup macro data.
+        const command = `game.shadowrun5e.rollSkillMacro("${name}");`;
+        const macro = yield Macro.create({
+            name,
+            type: 'script',
+            command,
+            // TODO: Is flags needed here? See createItemMacro
+        });
+        if (macro)
+            yield game.user.assignHotbarMacro(macro, slot);
+    });
+}
+exports.createSkillMacro = createSkillMacro;
+/**
+ * Roll a skill test from a macro for an Actor.
+ *
+ * @param skillLabel Custom skill names must be supported and legacy skill names might be translated.
+ */
+function rollSkillMacro(skillLabel) {
+    return __awaiter(this, void 0, void 0, function* () {
+        if (!game || !game.actors)
+            return;
+        if (!skillLabel)
+            return;
+        // Fetch the actor from the current users token or the actor collection.
+        const speaker = ChatMessage.getSpeaker();
+        const actor = (game.actors.tokens[speaker.token] || game.actors.get(speaker.actor));
+        if (!actor)
+            return;
+        const skill = actor.getSkill(skillLabel, { byLabel: true });
+        if (!skill)
+            return ui.notifications.warn(game.i18n.localize('SR5.Warnings.MissingSkillOnActor'));
+        yield actor.rollSkill(skill);
+    });
+}
+exports.rollSkillMacro = rollSkillMacro;
+},{"./helpers":156}],201:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const HandlebarManager_1 = require("./handlebars/HandlebarManager");
@@ -30903,6 +31039,7 @@ class ShadowrunRoller {
         });
     }
     static resultingItemRolls(event, item, actionTestData) {
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
             // Cast resulting tests from above Success Test depending on item type.
             if (item.isComplexForm() && (actionTestData === null || actionTestData === void 0 ? void 0 : actionTestData.complexForm)) {
@@ -30927,7 +31064,8 @@ class ShadowrunRoller {
             }
             else if (item.isWeapon()) {
                 if (item.hasAmmo() && (actionTestData === null || actionTestData === void 0 ? void 0 : actionTestData.rangedWeapon)) {
-                    const fireMode = actionTestData.rangedWeapon.fireMode.value || 1;
+                    // Try using fire mode for ammunition consumption.
+                    const fireMode = ((_b = (_a = actionTestData === null || actionTestData === void 0 ? void 0 : actionTestData.rangedWeapon) === null || _a === void 0 ? void 0 : _a.fireMode) === null || _b === void 0 ? void 0 : _b.value) || 0;
                     yield item.useAmmo(fireMode);
                 }
             }

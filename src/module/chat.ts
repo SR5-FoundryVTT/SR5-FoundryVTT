@@ -109,13 +109,16 @@ const createChatData = async (templateData, options?: ChatDataOptions) => {
         speaker: {
             actor, token
         },
-        showGlitchAnimation: game.settings.get(SYSTEM_NAME, FLAGS.ShowGlitchAnimation),
+        showGlitchAnimation: game.settings.get(SYSTEM_NAME, FLAGS.ShowGlitchAnimation)
     };
+
     const html = await renderTemplate(template, enhancedTemplateData);
 
     const chatData = {
         user: game.user?.id,
-        type: options?.roll ? CONST.CHAT_MESSAGE_TYPES.ROLL : CONST.CHAT_MESSAGE_TYPES.OTHER,
+        // NOTE: Type Roll used to make a whispered message visible with it's content being invisible. That's not the case
+        //       with Foundry 0.8 anymore. Should that have changed, just uncomment this line.
+        // type: options?.roll ? CONST.CHAT_MESSAGE_TYPES.ROLL : CONST.CHAT_MESSAGE_TYPES.OTHER,
         sound: options?.roll ? CONFIG.sounds.dice : undefined,
         content: html,
         roll: options?.roll ? JSON.stringify(options?.roll) : undefined,
@@ -131,14 +134,21 @@ const createChatData = async (templateData, options?: ChatDataOptions) => {
         }
     };
 
+    // Applying roll mode will set correct whisper recipients.
     const rollMode = templateData.rollMode ?? game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
+    // @ts-ignore
+    ChatMessage.applyRollMode(chatData, rollMode);
+    // @ts-ignore
+    chatData.rollMode = rollMode;
+    // if (['gmroll', 'blindroll'].includes(rollMode as string)) chatData['whisper'] = ChatMessage.getWhisperRecipients('GM');
+    // if (rollMode === 'blindroll') chatData['blind'] = true;
 
-    if (['gmroll', 'blindroll'].includes(rollMode as string)) chatData['whisper'] = ChatMessage.getWhisperRecipients('GM');
-    if (rollMode === 'blindroll') chatData['blind'] = true;
-
+    // If a specific whisper recipient has been set, overwrite Foundry default.
     if (options?.whisperTo) {
         chatData['whisper'] = ChatMessage.getWhisperRecipients(options.whisperTo.name);
     }
+
+
 
     return chatData;
 };
