@@ -25,23 +25,23 @@ export class Helpers {
     /**
      * Calculate the total value for a data object
      * - stores the total value and returns it
-     * @param data
-     * @param options
+     * @param value
+     * @param options min will a apply a minimum value, max will apply a maximum value.
      */
-    static calcTotal(data: ModifiableValue, options?: CalcTotalOptions): number {
-        if (data.mod === undefined) data.mod = [];
-        const parts = new PartsList(data.mod);
+    static calcTotal(value: ModifiableValue, options?: CalcTotalOptions): number {
+        if (value.mod === undefined) value.mod = [];
+        const parts = new PartsList(value.mod);
         // if a temp field is found, add it as a unique part
-        if (data['temp'] !== undefined) {
-            parts.addUniquePart('SR5.Temporary', data['temp']);
+        if (value['temp'] !== undefined) {
+            parts.addUniquePart('SR5.Temporary', value['temp']);
         }
 
-        data.value = Helpers.roundTo(parts.total + data.base, 3);
-        data.mod = parts.list;
+        value.value = Helpers.roundTo(parts.total + value.base, 3);
+        value.mod = parts.list;
 
-        data.value = Helpers.applyValueRange(data.value, options);
+        value.value = Helpers.applyValueRange(value.value, options);
 
-        return data.value;
+        return value.value;
     }
 
     /** Round a number to a given degree.
