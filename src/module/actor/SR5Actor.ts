@@ -102,12 +102,15 @@ export class SR5Actor extends Actor<SR5ActorType> {
     }
 
     findActiveSkill(skillName?: string): SkillField | undefined {
-        if (skillName === undefined) return undefined;
-        // Search for legacy skills with their name as id.
+        // Check for faulty to catch empty names as well as missing parameters.
+        if (!skillName) return undefined;
+
+        // Handle legacy skills (name is id)
         const skills = this.getActiveSkills();
         const skill = skills[skillName];
         if (skill) return skill;
-        // Search for custom skills with a random id.
+
+        // Handle custom skills (name is not id)
         return Object.values(skills).find(skill => skill.name === skillName);
     }
 
