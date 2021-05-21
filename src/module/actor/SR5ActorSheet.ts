@@ -545,15 +545,32 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         };
 
         // Handle different item type data transfers.
+        // These handlers depend on behavior of the template partial ListItem.html.
         const element = event.currentTarget;
         switch (element.dataset.itemType) {
-            // Skill data transfer.
+            // Skill data transfer. (Active and language skills)
             case 'skill':
                 // Prepare data transfer
                 dragData.type = 'Skill';
                 dragData.data = {
                     skillId: element.dataset.itemId,
                     skill: this.actor.getSkill(element.dataset.itemId)
+                };
+
+                // Set data transfer
+                event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+
+                return;
+
+            // Knowlege skill data transfer
+            case 'knowledgeskill':
+                // Knowledge skills have a multi purpose id built: <id>.<knowledge_category>
+                const skillId = element.dataset.itemId.includes('.') ? element.dataset.itemId.split('.')[0] : element.dataset.itemId;
+
+                dragData.type = 'Skill';
+                dragData.data = {
+                    skillId,
+                    skill: this.actor.getSkill(skillId)
                 };
 
                 // Set data transfer
