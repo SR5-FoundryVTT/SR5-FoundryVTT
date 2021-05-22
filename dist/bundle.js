@@ -13375,14 +13375,15 @@ class SR5Actor extends Actor {
         return this.data.data.modifiers[modifierName];
     }
     findActiveSkill(skillName) {
-        if (skillName === undefined)
+        // Check for faulty to catch empty names as well as missing parameters.
+        if (!skillName)
             return undefined;
-        // Search for legacy skills with their name as id.
+        // Handle legacy skills (name is id)
         const skills = this.getActiveSkills();
         const skill = skills[skillName];
         if (skill)
             return skill;
-        // Search for custom skills with a random id.
+        // Handle custom skills (name is not id)
         return Object.values(skills).find(skill => skill.name === skillName);
     }
     findAttribute(attributeName) {
@@ -15358,15 +15359,28 @@ class SR5ActorSheet extends ActorSheet {
                 data: null
             };
             // Handle different item type data transfers.
+            // These handlers depend on behavior of the template partial ListItem.html.
             const element = event.currentTarget;
             switch (element.dataset.itemType) {
-                // Skill data transfer.
+                // Skill data transfer. (Active and language skills)
                 case 'skill':
                     // Prepare data transfer
                     dragData.type = 'Skill';
                     dragData.data = {
                         skillId: element.dataset.itemId,
                         skill: this.actor.getSkill(element.dataset.itemId)
+                    };
+                    // Set data transfer
+                    event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+                    return;
+                // Knowlege skill data transfer
+                case 'knowledgeskill':
+                    // Knowledge skills have a multi purpose id built: <id>.<knowledge_category>
+                    const skillId = element.dataset.itemId.includes('.') ? element.dataset.itemId.split('.')[0] : element.dataset.itemId;
+                    dragData.type = 'Skill';
+                    dragData.data = {
+                        skillId,
+                        skill: this.actor.getSkill(skillId)
                     };
                     // Set data transfer
                     event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
@@ -17128,20 +17142,29 @@ class AttributesPrep {
         attributes.edge.hidden = true;
         attributes.essence.hidden = true;
         // set the value for the attributes
-        for (let [key, attribute] of Object.entries(attributes)) {
+        for (let [name, attribute] of Object.entries(attributes)) {
             // don't manage the attribute if it is using the old method of edge tracking
             // needed to be able to migrate things correctly
-            if (key === 'edge' && attribute['uses'] === undefined)
+            if (name === 'edge' && attribute['uses'] === undefined)
                 return;
             const parts = new PartsList_1.PartsList(attribute.mod);
             attribute.mod = parts.list;
-            // Each attribute can have a unique value range.
-            // TODO:  Implement metatype attribute value ranges for character actors.
-            const range = constants_1.SR.attributes.ranges[key];
-            helpers_1.Helpers.calcTotal(attribute, range);
+            AttributesPrep.calculateAttribute(name, attribute);
             // add i18n labels.
-            attribute.label = config_1.SR5.attributes[key];
+            attribute.label = config_1.SR5.attributes[name];
         }
+    }
+    /**
+     * Calculate a single attributes value with all it's ranges and rules applied.
+     *
+     * @param name The attributes name / id
+     * @param attribute The attribute will be modified in place
+     */
+    static calculateAttribute(name, attribute) {
+        // Each attribute can have a unique value range.
+        // TODO:  Implement metatype attribute value ranges for character actors.
+        const range = constants_1.SR.attributes.ranges[name];
+        helpers_1.Helpers.calcTotal(attribute, range);
     }
 }
 exports.AttributesPrep = AttributesPrep;
@@ -17529,51 +17552,46 @@ exports.MovementPrep = MovementPrep;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NPCPrep = void 0;
 const dataTemplates_1 = require("../../../dataTemplates");
-const helpers_1 = require("../../../helpers");
 const constants_1 = require("../../../constants");
 const PartsList_1 = require("../../../parts/PartsList");
+const AttributesPrep_1 = require("./AttributesPrep");
 class NPCPrep {
     static prepareNPCData(data) {
         // Apply to NPC and none NPC to remove lingering modifiers after actor has been removed it's npc status.
         NPCPrep.applyMetatypeModifiers(data);
     }
-    /** Replace current metatype modifiers with, even if nothing has changed.
-     *
+    /**
+     * Apply modifiers that result from an NPCs metatype.
+     * This method also should still run on any none NPC to remove eventually lingering NPC metatype modifiers.
      */
     static applyMetatypeModifiers(data) {
         var _a;
-        const { metatype } = data;
-        let modifiers = dataTemplates_1.DataTemplates.grunt.metatype_modifiers[metatype];
-        modifiers = modifiers ? modifiers : {};
-        const { attributes } = data;
-        for (const [attId, attribute] of Object.entries(attributes)) {
+        // Extract needed data.
+        const { attributes, metatype } = data;
+        const metatypeModifier = dataTemplates_1.DataTemplates.grunt.metatype_modifiers[metatype] || {};
+        for (const [name, attribute] of Object.entries(attributes)) {
             // old-style object mod transformation is happening in AttributePrep and is needed here. Order is important.
             if (!Array.isArray(attribute.mod)) {
                 console.error('Actor data contains wrong data type for attribute.mod', attribute, !Array.isArray(attribute.mod));
             }
             else {
-                const modifyBy = (_a = modifiers === null || modifiers === void 0 ? void 0 : modifiers.attributes) === null || _a === void 0 ? void 0 : _a[attId];
+                // Remove lingering modifiers from NPC actors that aren't anymore.
                 const parts = new PartsList_1.PartsList(attribute.mod);
                 parts.removePart(constants_1.METATYPEMODIFIER);
+                // Apply NPC modifiers
+                const modifyBy = (_a = metatypeModifier.attributes) === null || _a === void 0 ? void 0 : _a[name];
                 if (data.is_npc && modifyBy) {
                     parts.addPart(constants_1.METATYPEMODIFIER, modifyBy);
                 }
+                // Prepare attribute modifiers
                 attribute.mod = parts.list;
-                // Don't modify attribute below one.
-                // TODO: Use a SR5.Values.Attribute calculation to avoid duplication.
-                helpers_1.Helpers.calcTotal(attribute, { min: 1 });
+                AttributesPrep_1.AttributesPrep.calculateAttribute(name, attribute);
             }
         }
     }
-    static AddNPCMetatypeAttributeModifier(value) {
-        return {
-            name: constants_1.METATYPEMODIFIER,
-            value: value
-        };
-    }
 }
 exports.NPCPrep = NPCPrep;
-},{"../../../constants":146,"../../../dataTemplates":147,"../../../helpers":156,"../../../parts/PartsList":208}],108:[function(require,module,exports){
+},{"../../../constants":146,"../../../dataTemplates":147,"../../../parts/PartsList":208,"./AttributesPrep":99}],108:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports._mergeWithMissingSkillFields = exports.SkillsPrep = void 0;
@@ -21390,8 +21408,8 @@ class SR5Combat extends Combat {
             name: game.i18n.localize('SR5.COMBAT.ReduceInitByOne'),
             icon: '<i class="fas fa-caret-down"></i>',
             callback: (li) => __awaiter(this, void 0, void 0, function* () {
-                // @ts-ignore
-                const combatant = yield game.combat.getCombatant(li.data('combatant-id'));
+                // @ts-ignore // foundry-vtt-types doesn't have DocumentCollection.get yet.
+                const combatant = yield game.combat.combatants.get(li.data('combatant-id'));
                 if (combatant) {
                     const combat = game.combat;
                     yield combat.adjustInitiative(combatant, -1);
@@ -21401,8 +21419,8 @@ class SR5Combat extends Combat {
             name: game.i18n.localize('SR5.COMBAT.ReduceInitByFive'),
             icon: '<i class="fas fa-angle-down"></i>',
             callback: (li) => __awaiter(this, void 0, void 0, function* () {
-                // @ts-ignore
-                const combatant = yield game.combat.getCombatant(li.data('combatant-id'));
+                // @ts-ignore // foundry-vtt-types doesn't have DocumentCollection.get yet.
+                const combatant = yield game.combat.combatants.get(li.data('combatant-id'));
                 if (combatant) {
                     const combat = game.combat;
                     yield combat.adjustInitiative(combatant, -5);
@@ -21412,8 +21430,8 @@ class SR5Combat extends Combat {
             name: game.i18n.localize('SR5.COMBAT.ReduceInitByTen'),
             icon: '<i class="fas fa-angle-double-down"></i>',
             callback: (li) => __awaiter(this, void 0, void 0, function* () {
-                // @ts-ignore
-                const combatant = yield game.combat.getCombatant(li.data('combatant-id'));
+                // @ts-ignore // foundry-vtt-types doesn't have DocumentCollection.get yet.
+                const combatant = yield game.combat.combatants.get(li.data('combatant-id'));
                 if (combatant) {
                     const combat = game.combat;
                     yield combat.adjustInitiative(combatant, -10);
@@ -21434,12 +21452,10 @@ class SR5Combat extends Combat {
                 console.error('Could not find combatant with id ', combatant);
                 return;
             }
-            const newCombatant = {
-                _id: combatant._id,
-                initiative: Number(combatant.initiative) + adjustment,
-            };
             // @ts-ignore
-            yield this.updateCombatant(newCombatant);
+            yield combatant.update({
+                initiative: Number(combatant.initiative) + adjustment,
+            });
         });
     }
     /**
@@ -21457,8 +21473,8 @@ class SR5Combat extends Combat {
             const turn = 0;
             for (const combatant of combat.combatants) {
                 const initiative = Combat_1.CombatRules.reduceIniResultAfterPass(Number(combatant.initiative));
-                // TODO: Foundry 0.9 The Combat#updateCombatant method has been deprecated in favor of Combatant#update and will be removed in 0.9.0
-                yield combat.updateCombatant({ _id: combatant._id, initiative });
+                // @ts-ignore
+                yield combatant.update({ initiative });
             }
             yield SR5Combat.setInitiativePass(combat, initiativePass);
             yield combat.update({ turn });
@@ -21593,7 +21609,6 @@ class SR5Combat extends Combat {
     nextTurn() {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
-            console.error('nextTurn', this);
             // Maybe advance to the next round/init pass
             let nextRound = this.round;
             let initiativePass = this.initiativePass;
@@ -21674,24 +21689,6 @@ class SR5Combat extends Combat {
             return combat;
         });
     }
-    updateNewCombatants(ids) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const newCombatants = this.combatants.filter(combatant => combatant._id && ids.includes(combatant._id));
-            if (!newCombatants)
-                return;
-            // Reduce initiative score for ongoing initiative passes.
-            const updateData = newCombatants.map(combatant => {
-                // Cast initiative as number, since it should always be that way here.
-                const initiative = Combat_1.CombatRules.reduceIniOnLateSpawn(combatant.initiative, this.initiativePass);
-                return {
-                    _id: combatant._id,
-                    initiative
-                };
-            });
-            // @ts-ignore
-            yield this.updateCombatant(updateData);
-        });
-    }
     /**
      * Shadowrun starts at the top, except for subsequent initiative passes, then it depends on the new values.
      */
@@ -21701,8 +21698,6 @@ class SR5Combat extends Combat {
         });
         return __awaiter(this, void 0, void 0, function* () {
             const combat = yield _super.rollInitiative.call(this, ids, options);
-            // if (this.initiativePass > SR.combat.INITIAL_INI_PASS)
-            //     await this.updateNewCombatants(newIds);
             if (this.initiativePass === constants_1.SR.combat.INITIAL_INI_PASS)
                 yield combat.update({ turn: 0 });
             return combat;
@@ -21774,8 +21769,7 @@ exports.SR5Combat = SR5Combat;
  */
 function _combatantGetInitiativeFormula() {
     const combat = this.parent;
-    const initiativePass = combat.data.flags.shadowrun5e.combatInitiativePass;
-    return SR5Combat._getSystemInitiativeFormula(initiativePass);
+    return SR5Combat._getSystemInitiativeFormula(combat.initiativePass);
 }
 exports._combatantGetInitiativeFormula = _combatantGetInitiativeFormula;
 },{"../constants":146,"../sr5/Combat":211}],145:[function(require,module,exports){
@@ -23466,21 +23460,21 @@ class Helpers {
     /**
      * Calculate the total value for a data object
      * - stores the total value and returns it
-     * @param data
-     * @param options
+     * @param value
+     * @param options min will a apply a minimum value, max will apply a maximum value.
      */
-    static calcTotal(data, options) {
-        if (data.mod === undefined)
-            data.mod = [];
-        const parts = new PartsList_1.PartsList(data.mod);
+    static calcTotal(value, options) {
+        if (value.mod === undefined)
+            value.mod = [];
+        const parts = new PartsList_1.PartsList(value.mod);
         // if a temp field is found, add it as a unique part
-        if (data['temp'] !== undefined) {
-            parts.addUniquePart('SR5.Temporary', data['temp']);
+        if (value['temp'] !== undefined) {
+            parts.addUniquePart('SR5.Temporary', value['temp']);
         }
-        data.value = Helpers.roundTo(parts.total + data.base, 3);
-        data.mod = parts.list;
-        data.value = Helpers.applyValueRange(data.value, options);
-        return data.value;
+        value.value = Helpers.roundTo(parts.total + value.base, 3);
+        value.mod = parts.list;
+        value.value = Helpers.applyValueRange(value.value, options);
+        return value.value;
     }
     /** Round a number to a given degree.
      *
