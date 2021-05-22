@@ -173,6 +173,7 @@
 
   "SR5.Weapon": "Waffen",
   "SR5.Ammo": "Munition",
+  "SR5.AmmoGelRounds": "Gelmunition",
   "SR5.WeaponMods": "Mods",
   "SR5.WeaponType": "Typ",
   "SR5.WeaponAmmoCount": "Munition",
@@ -467,6 +468,7 @@
   "SR5.Aoe": "Fläche",
   "SR5.Level": "Stufe",
   "SR5.Override": "Override",
+  "SR5.KnockedDown": "Niedergeschlagen",
 
   "SR5.Item": "Item",
   "SR5.Bonuses": "Boni",
