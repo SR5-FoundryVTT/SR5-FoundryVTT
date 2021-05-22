@@ -48,8 +48,8 @@ export class SR5Combat extends Combat {
                 name: game.i18n.localize('SR5.COMBAT.ReduceInitByOne'),
                 icon: '<i class="fas fa-caret-down"></i>',
                 callback: async (li) => {
-                    // @ts-ignore
-                    const combatant = await game.combat.getCombatant(li.data('combatant-id'));
+                    // @ts-ignore // foundry-vtt-types doesn't have DocumentCollection.get yet.
+                    const combatant = await game.combat.combatants.get(li.data('combatant-id'));
                     if (combatant) {
                         const combat: SR5Combat = game.combat as unknown as SR5Combat;
                         await combat.adjustInitiative(combatant, -1);
@@ -60,8 +60,8 @@ export class SR5Combat extends Combat {
                 name: game.i18n.localize('SR5.COMBAT.ReduceInitByFive'),
                 icon: '<i class="fas fa-angle-down"></i>',
                 callback: async (li) => {
-                    // @ts-ignore
-                    const combatant = await game.combat.getCombatant(li.data('combatant-id'));
+                    // @ts-ignore // foundry-vtt-types doesn't have DocumentCollection.get yet.
+                    const combatant = await game.combat.combatants.get(li.data('combatant-id'));
                     if (combatant) {
                         const combat: SR5Combat = game.combat as unknown as SR5Combat;
                         await combat.adjustInitiative(combatant, -5);
@@ -72,8 +72,8 @@ export class SR5Combat extends Combat {
                 name: game.i18n.localize('SR5.COMBAT.ReduceInitByTen'),
                 icon: '<i class="fas fa-angle-double-down"></i>',
                 callback: async (li) => {
-                    // @ts-ignore
-                    const combatant = await game.combat.getCombatant(li.data('combatant-id'));
+                    // @ts-ignore // foundry-vtt-types doesn't have DocumentCollection.get yet.
+                    const combatant = await game.combat.combatants.get(li.data('combatant-id'));
                     if (combatant) {
                         const combat: SR5Combat = game.combat as unknown as SR5Combat;
                         await combat.adjustInitiative(combatant, -10);
@@ -95,12 +95,10 @@ export class SR5Combat extends Combat {
             console.error('Could not find combatant with id ', combatant);
             return;
         }
-        const newCombatant = {
-            _id: combatant._id,
-            initiative: Number(combatant.initiative) + adjustment,
-        };
         // @ts-ignore
-        await this.updateCombatant(newCombatant);
+        await combatant.update({
+            initiative: Number(combatant.initiative) + adjustment,
+        });
     }
 
     /**
@@ -117,8 +115,8 @@ export class SR5Combat extends Combat {
 
         for (const combatant of combat.combatants) {
             const initiative = CombatRules.reduceIniResultAfterPass(Number(combatant.initiative));
-            // TODO: Foundry 0.9 The Combat#updateCombatant method has been deprecated in favor of Combatant#update and will be removed in 0.9.0
-            await combat.updateCombatant({_id: combatant._id, initiative});
+            // @ts-ignore
+            await combatant.update({initiative});
         }
 
         await SR5Combat.setInitiativePass(combat, initiativePass);
@@ -249,7 +247,6 @@ export class SR5Combat extends Combat {
      * * @Override
      */
     async nextTurn(): Promise<void> {
-        console.error('nextTurn', this);
         // Maybe advance to the next round/init pass
         let nextRound = this.round;
         let initiativePass = this.initiativePass;
@@ -327,33 +324,12 @@ export class SR5Combat extends Combat {
         return combat;
     }
 
-    async updateNewCombatants(ids: string[]) {
-        const newCombatants = this.combatants.filter(combatant => combatant._id && ids.includes(combatant._id));
-        if (!newCombatants) return;
-
-        // Reduce initiative score for ongoing initiative passes.
-        const updateData = newCombatants.map(combatant => {
-            // Cast initiative as number, since it should always be that way here.
-            const initiative = CombatRules.reduceIniOnLateSpawn(combatant.initiative as number, this.initiativePass);
-            return {
-                _id: combatant._id,
-                initiative
-            }
-        })
-
-        // @ts-ignore
-        await this.updateCombatant(updateData);
-    }
-
 
     /**
      * Shadowrun starts at the top, except for subsequent initiative passes, then it depends on the new values.
      */
     async rollInitiative(ids, options): Promise<SR5Combat> {
         const combat = await super.rollInitiative(ids, options) as SR5Combat;
-
-        // if (this.initiativePass > SR.combat.INITIAL_INI_PASS)
-        //     await this.updateNewCombatants(newIds);
 
         if (this.initiativePass === SR.combat.INITIAL_INI_PASS)
             await combat.update({turn: 0});
