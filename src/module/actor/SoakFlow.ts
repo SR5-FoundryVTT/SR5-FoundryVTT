@@ -11,6 +11,7 @@ import DamageType = Shadowrun.DamageType;
 import {PartsList} from "../parts/PartsList";
 import {DefaultValues} from "../dataTemplates";
 import { ShadowrunActorDialogs } from '../apps/dialogs/ShadowrunActorDialogs';
+import {SR5Item} from '../item/SR5Item';
 
 export class SoakFlow {
 
