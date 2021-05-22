@@ -431,6 +431,5 @@ export class SR5Combat extends Combat {
  */
 export function _combatantGetInitiativeFormula() {
     const combat = this.parent;
-    const initiativePass = combat.data.flags.shadowrun5e.combatInitiativePass;
-    return SR5Combat._getSystemInitiativeFormula(initiativePass);
+    return SR5Combat._getSystemInitiativeFormula(combat.initiativePass);
 }
