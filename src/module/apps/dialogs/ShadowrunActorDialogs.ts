@@ -9,6 +9,7 @@ import SoakRollOptions = Shadowrun.SoakRollOptions;
 import SkillDialogOptions = Shadowrun.SkillDialogOptions;
 import CombatData = Shadowrun.CombatData;
 import DamageType = Shadowrun.DamageType;
+import {SR5} from "../../config";
 
 export class ShadowrunActorDialogs {
     static async createDefenseDialog(actor: SR5Actor, options: DefenseRollOptions, partsProps: ModList<number>): Promise<FormDialog> {
@@ -125,8 +126,8 @@ export class ShadowrunActorDialogs {
         const templateData = {
             damage: soakRollOptions?.damage,
             parts: soakParts.getMessageOutput(),
-            elementTypes: CONFIG.SR5.elementTypes,
-            damageTypes: CONFIG.SR5.damageTypes
+            elementTypes: SR5.elementTypes,
+            damageTypes: SR5.damageTypes
         };
 
         const buttons =  {
@@ -194,7 +195,7 @@ export class ShadowrunActorDialogs {
             const limit = actor.getLimit(newLimit);
             // Legacy skills have a label, but no name. Custom skills have a name but no label.
             const skillLabel = game.i18n.localize(options.skill.label || options.skill.name);
-            const attributeLabel = game.i18n.localize(CONFIG.SR5.attributes[newAtt]);
+            const attributeLabel = game.i18n.localize(SR5.attributes[newAtt]);
             const testLabel = game.i18n.localize('SR5.Test')
 
             const skillTestTitle = `${skillLabel} + ${attributeLabel} ${testLabel}`;

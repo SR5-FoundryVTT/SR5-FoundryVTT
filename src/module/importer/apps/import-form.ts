@@ -38,8 +38,9 @@ export class Import extends Application {
         return options;
     }
 
-    getData(options?: any): any {
-        const data = super.getData(options);
+    getData(options?: any) {
+        // @ts-ignore // TODO: TYPE: Remove this.
+        const data = super.getData(options) as any;
 
         data.dataFiles = {};
         this.supportedDataFiles.forEach((supportedFileName: string) => {

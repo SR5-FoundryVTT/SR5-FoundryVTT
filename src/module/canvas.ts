@@ -1,5 +1,7 @@
 // directly pulled from DND5e, just changed the
 export const measureDistance = function (segments, options = {}) {
+    if (!game || !game.ready || !canvas || !canvas.ready) return 0;
+
     //@ts-ignore
     // basegrid isn't typed, options aren't really important
     if (!options.gridSpaces) return BaseGrid.prototype.measureDistances.call(this, segments, options);
@@ -7,7 +9,7 @@ export const measureDistance = function (segments, options = {}) {
     // Track the total number of diagonals
     let nDiagonal = 0;
     const rule = this.parent.diagonalRule;
-    const d = canvas.dimensions;
+    const d = canvas.dimensions as Canvas.Dimensions;
 
     // Iterate over measured segments
     return segments.map((s) => {
@@ -26,15 +28,18 @@ export const measureDistance = function (segments, options = {}) {
         if (rule === '1-2-1') {
             let nd10 = Math.floor(nDiagonal / 2) - Math.floor((nDiagonal - nd) / 2);
             let spaces = nd10 * 2 + (nd - nd10) + ns;
+            // @ts-ignore
             return spaces * canvas.dimensions.distance;
         }
 
         // Euclidean Measurement
         else if (rule === 'EUCL') {
+            // @ts-ignore
             return Math.round(Math.hypot(nx, ny) * canvas.scene.data.gridDistance);
         }
 
         // diag and straight are same space count
+        // @ts-ignore
         else return (ns + nd) * canvas.scene.data.gridDistance;
     });
 };

@@ -1,18 +1,7 @@
 import { SR5Item } from './item/SR5Item';
 
-export type ShadowrunTemplateData = {
-    t: string;
-    user: User | string;
-    distance: number;
-    x: number;
-    y: number;
-    fillColor: string;
-    direction: number;
-};
-
 export default // @ts-ignore
 class Template extends MeasuredTemplate {
-    data: ShadowrunTemplateData;
     x: number;
     y: number;
     item?: SR5Item;
@@ -23,12 +12,12 @@ class Template extends MeasuredTemplate {
 
         const templateData = {
             t: templateShape,
-            user: game.user._id,
+            user: game.user?._id,
             direction: 0,
             x: 0,
             y: 0,
             // @ts-ignore
-            fillColor: game.user.color,
+            fillColor: game.user?.color,
         };
         const blast = item.getBlastData();
         templateData['distance'] = blast?.radius;
@@ -41,18 +30,21 @@ class Template extends MeasuredTemplate {
         return template;
     }
 
-    drawPreview() {
+    async drawPreview() {
+        if (!canvas?.ready) return;
+
         const initialLayer = canvas.activeLayer;
-        // @ts-ignore
-        this.draw();
-        // @ts-ignore
+        if (!initialLayer) return;
+
+        await this.draw();
         this.layer.activate();
-        // @ts-ignore
         this.layer.preview.addChild(this);
         this.activatePreviewListeners(initialLayer);
     }
 
     activatePreviewListeners(initialLayer: CanvasLayer) {
+        if (canvas === null || !canvas.ready) return;
+
         const handlers = {};
         let moveTime = 0;
 
@@ -62,16 +54,18 @@ class Template extends MeasuredTemplate {
             let now = Date.now(); // Apply a 20ms throttle
             if (now - moveTime <= 20) return;
             const center = event.data.getLocalPosition(this.layer);
-            const snapped = canvas.grid.getSnappedPosition(center.x, center.y, 2);
+            // @ts-ignore // TODO: TYPE: canvas ready state is checked, but it's still complaining.
+            const snapped = canvas?.grid.getSnappedPosition(center.x, center.y, 2);
             this.data.x = snapped.x;
             this.data.y = snapped.y;
-            // @ts-ignore
             this.refresh();
             moveTime = now;
         };
 
         // Cancel the workflow (right-click)
         handlers['rc'] = () => {
+            if (canvas === null || !canvas.ready) return;
+
             this.layer.preview.removeChildren();
             canvas.stage.off('mousemove', handlers['mm']);
             canvas.stage.off('mousedown', handlers['lc']);
@@ -85,6 +79,7 @@ class Template extends MeasuredTemplate {
         // Confirm the workflow (left-click)
         handlers['lc'] = (event) => {
             handlers['rc'](event);
+            if (canvas === null || !canvas.ready) return;
 
             // Confirm final snapped position
             const destination = canvas.grid.getSnappedPosition(this.x, this.y, 2);
@@ -92,6 +87,7 @@ class Template extends MeasuredTemplate {
             this.data.y = destination.y;
 
             // Create the template
+            // @ts-ignore // TODO: TYPE: norrowed canvas away from null, yet it still complains about it.
             canvas.scene.createEmbeddedEntity('MeasuredTemplate', this.data);
         };
 
@@ -99,6 +95,8 @@ class Template extends MeasuredTemplate {
         handlers['mw'] = (event) => {
             if (event.ctrlKey) event.preventDefault(); // Avoid zooming the browser window
             event.stopPropagation();
+            if (canvas === null || !canvas.ready) return;
+
             let delta = canvas.grid.type > CONST.GRID_TYPES.SQUARE ? 30 : 15;
             let snap = event.shiftKey ? delta : 5;
             this.data.direction += snap * Math.sign(event.deltaY);

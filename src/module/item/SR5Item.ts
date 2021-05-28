@@ -51,6 +51,7 @@ import Spell = Shadowrun.Spell;
 import SpritePower = Shadowrun.SpritePower;
 import {ItemAction} from "./ItemAction";
 import {SkillFlow} from "../actor/SkillFlow";
+import {SR5} from "../config";
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
@@ -67,17 +68,19 @@ import {SkillFlow} from "../actor/SkillFlow";
  *       Be wary of SR5Item.actor for this reason!
  */
 export class SR5Item extends Item {
-    // NOTE: In contrast to SR5Actor we can only type Item.data as the typing structure for ItemData doesn't have
+    // TODO: TYPE: In contrast to SR5Actor we can only type Item.data as the typing structure for ItemData doesn't have
     //       monolithic Item.data.data typing (SR5ActorData) but only one for each Item type. Therefore we can't
     //       do extends Item<SR5ItemData> as we can with the SR5Actor class.
-    data: SR5ItemType;
+    // data: SR5ItemType;
     items: SR5Item[];
 
     labels: {} = {};
 
 
+    // @ts-ignore // TODO: TYPE: Check foundry-vtt-types systems for how Items and Actors type.
     get actor(): SR5Actor {
-        return super.actor as SR5Actor;
+        this.data.data.skills
+        return super.actor as unknown as SR5Actor;
     }
 
     /**
@@ -170,12 +173,6 @@ export class SR5Item extends Item {
         await this.unsetFlag(SYSTEM_NAME, FLAGS.EmbeddedItems);
     }
 
-    /** Overwrite to allow for options param to be skipped.
-     */
-    async update(data, options?): Promise<this> {
-        return super.update(data, options);
-    }
-
     get hasOpposedRoll(): boolean {
         const action = this.getAction();
         if (!action) return false;
@@ -251,7 +248,8 @@ export class SR5Item extends Item {
                 action.damage.base_formula_operator = 'add';
             }
 
-            if (this.actor){
+            // Item.prepareData is called once (first) with an empty SR5Actor instance without .data and once (second) with .data.
+            if (this.actor?.data) {
                 action.damage.source = {
                     actorId: this.actor.id,
                     itemId: this.id,
@@ -527,11 +525,15 @@ export class SR5Item extends Item {
         return this.wrapper.hasAmmo();
     }
 
-    async useAmmo(fireMode) {
+    /**
+     * Use the weapons ammunition with the amount of bullets fired.
+     * @param fired Amount of bullets fired.
+     */
+    async useAmmo(fired) {
         const weapon = duplicate(this.asWeaponData());
         if (weapon) {
             const { ammo } = weapon.data;
-            ammo.current.value = Math.max(0, ammo.current.value - fireMode);
+            ammo.current.value = Math.max(0, ammo.current.value - fired);
 
             return await this.update(weapon);
         }
@@ -576,11 +578,11 @@ export class SR5Item extends Item {
         const ammo = this.items
             .filter((item) => item.type === 'ammo')
             .map((item) => {
-                const ownedItem = this.getOwnedItem(item._id);
+                const ownedItem = this.getOwnedItem(item.id);
                 const ammoData = ownedItem?.asAmmoData();
 
                 if (ownedItem && ammoData) {
-                    ammoData.data.technology.equipped = iid === item._id;
+                    ammoData.data.technology.equipped = iid === item.id;
                     return ownedItem.data;
                 }
             });
@@ -611,6 +613,7 @@ export class SR5Item extends Item {
         const action = this.getAction();
         if (!action || !this.actor) return [];
 
+        // @ts-ignore
         const parts = new PartsList(duplicate(this.getModifierList()));
 
         const skill = this.actor.findActiveSkill(this.getActionSkill());
@@ -787,7 +790,7 @@ export class SR5Item extends Item {
             const skill = target.getSkill(opposed.skill);
 
             if (!skill) {
-                ui.notifications.error(game.i18n.localize("SR5.Errors.MissingSkill"));
+                ui.notifications?.error(game.i18n.localize("SR5.Errors.MissingSkill"));
                 return;
             }
 
@@ -829,32 +832,33 @@ export class SR5Item extends Item {
         return roll;
     }
 
+    /**
+     * The item can be stored on a token on the current or another, given, scene.
+     *
+     * The chat message must contain a data attribute containing a 'SceneId.TokenId' mapping.
+     * See chat.ts#getTokenSceneId for further context.
+     *
+     *
+     * @param html
+     */
     static getItemFromMessage(html): SR5Item | undefined {
+        if (!game || !game.scenes || !game.ready || !canvas || !canvas.ready || !canvas.scene) return;
+
         const card = html.find('.chat-card');
         let actor;
-        const tokenKey = card.data('tokenId');
-        if (tokenKey) {
-            const [sceneId, tokenId] = tokenKey.split('.');
-            let token;
-            if (sceneId === canvas?.scene._id) token = canvas.tokens.get(tokenId);
-            else {
-                const scene: Scene = game.scenes.get(sceneId);
-                if (!scene) return;
-                // @ts-ignore
-                const tokenData = scene.data.tokens.find((t) => t.id === Number(tokenId));
-                if (tokenData) token = new Token(tokenData);
-            }
-            if (!token) return;
-            actor = Actor.fromToken(token);
-        } else actor = game.actors.get(card.data('actorId'));
+        const sceneTokenId = card.data('tokenId');
+        if (sceneTokenId) actor = Helpers.getSceneTokenActor(sceneTokenId);
+        else actor = game.actors.get(card.data('actorId'));
 
         if (!actor) return;
         const itemId = card.data('itemId');
-        return actor.getOwnedItem(itemId);
+        return actor.items.get(itemId);
     }
 
     static getTargets() {
+        if (!game.ready || !game.user) return;
         const { character } = game.user;
+        // @ts-ignore
         const { controlled } = canvas.tokens;
         const targets = controlled.reduce((arr, t) => (t.actor ? arr.concat([t.actor]) : arr), []);
         if (character && controlled.length === 0) targets.push(character);
@@ -928,16 +932,13 @@ export class SR5Item extends Item {
             }, {});
 
             // Merge possible changes / new items from the flag into the current item instance.
+            // TODO: Foundry 0.8/0.9 Item.items is a map in Foundry but overwritten as an array here...
             this.items = items.map((item) => {
                 if (item._id in existing) {
                     const currentItem = existing[item._id];
 
-                    // Patch .data isn't really anymore but do it for consistency.
-                    // Patch ._data is needed for Item.prepareData to work, as it's simply duplicating _data over data.
-                    // Otherwise old item data will be used for value preparation.
-                    // TODO: Foundry 0.8 does changes to .data / ._data. This MIGHT cause issues here, however I'm unsure.
-                    currentItem.data = item;
-                    currentItem._data = item;
+                    // Update DocumentData directly, since we're not really having database items here.
+                    currentItem.data.update(item);
                     currentItem.prepareData();
                     return currentItem;
 
@@ -955,9 +956,10 @@ export class SR5Item extends Item {
     getOwnedItem(itemId): SR5Item | undefined {
         const items = this.items;
         if (!items) return;
-        return items.find((i) => i._id === itemId);
+        return items.find((item) => item.id === itemId);
     }
 
+    // TODO: Foundry 0.8. Rework this method. It's complicated and obvious optimizations can be made. (find vs findIndex)
     async updateOwnedItem(changes) {
         const items = duplicate(this.getEmbeddedItems());
         if (!items) return;
@@ -967,6 +969,9 @@ export class SR5Item extends Item {
             const index = items.findIndex((i) => i._id === itemChanges._id);
             if (index === -1) return;
             const item = items[index];
+            // TODO: Foundry 0.8 made it necessary to add the _id field. Even so, don't change the id to avoid any byproducts.
+            delete itemChanges._id;
+
             if (item) {
                 itemChanges = expandObject(itemChanges);
                 mergeObject(item, itemChanges);
@@ -989,7 +994,8 @@ export class SR5Item extends Item {
      * @param updateData
      * @param options
      */
-    async updateEmbeddedEntity(embeddedName: string, updateData: object | object[], options?: object) {
+    // @ts-ignore
+    async updateEmbeddedEntity(embeddedName,updateData, options) {
         await this.updateOwnedItem(updateData);
         return this;
     }
@@ -1018,14 +1024,14 @@ export class SR5Item extends Item {
     async openPdfSource() {
         // Check for PDFoundry module hook: https://github.com/Djphoenix719/PDFoundry
         if (!ui['PDFoundry']) {
-            ui.notifications.warn(game.i18n.localize('SR5.DIALOG.MissingModuleContent'));
+            ui.notifications?.warn(game.i18n.localize('SR5.DIALOG.MissingModuleContent'));
             return;
         }
 
         const source = this.getBookSource();
         if (source === '') {
             // @ts-ignore
-            ui.notifications.error(game.i18n.localize('SR5.SourceFieldEmptyError'));
+            ui.notifications?.error(game.i18n.localize('SR5.SourceFieldEmptyError'));
         }
         // TODO open PDF to correct location
         // parse however you need, all "buttons" will lead to this function
@@ -1143,7 +1149,7 @@ export class SR5Item extends Item {
         if (this.data.type === 'weapon') {
             limit.label = 'SR5.Accuracy';
         } else if (limit?.attribute) {
-            limit.label = CONFIG.SR5.limits[limit.attribute];
+            limit.label = SR5.limits[limit.attribute];
         } else if (this.isSpell()) {
             limit.value = this.getLastSpellForce().value;
             limit.label = 'SR5.Force';
@@ -1172,7 +1178,7 @@ export class SR5Item extends Item {
      * @param key
      * @param value
      */
-    setFlag(scope: string, key: string, value: any): Promise<Entity> {
+    setFlag(scope: string, key: string, value: any){
         const newValue = Helpers.onSetFlag(value);
         return super.setFlag(scope, key, newValue);
     }
@@ -1473,6 +1479,10 @@ export class SR5Item extends Item {
 
     // TODO: Move into a rule section.
     async rollDefense(target: SR5Actor, options: DefenseRollOptions): Promise<ShadowrunRoll | undefined> {
+        if (!target) {
+            console.error("The targeted actor couldn't be fetched.");
+            return;
+        }
         // TODO: Maybe move into defense methods and give the actor access to the item.
         const opposedParts = this.getOpposedTestMod();
 
@@ -1502,5 +1512,41 @@ export class SR5Item extends Item {
         if (this.isIndirectCombatSpell()) return true;
 
         return false;
+    }
+
+    get _isEmbeddedItem(): boolean {
+        // @ts-ignore // TODO: foundry-vtt-types Document hasn't be implemented yet
+        return this.hasOwnProperty('parent') && this.parent instanceof SR5Item;
+    }
+
+    /**
+     * Hook into the Item.update process for embedded items.
+     *
+     * @param data changes made to the SR5ItemData
+     */
+    async updateEmbeddedItem(data) {
+        // Inform the parent item about changes to one of it's embedded items.
+        // TODO: Foundry 0.8 updateOwnedItem needs the id of the update item. hand the item itself over, to the hack within updateOwnedItem for this.
+        data._id = this.id;
+        // @ts-ignore // TODO: foundry-vtt-types Document hasn't be implemented yet
+        await this.parent.updateOwnedItem(data)
+
+        // After updating all item embedded data, rerender the sheet to trigger the whole rerender workflow.
+        // Otherwise changes in the template of an hiddenItem will show for some fields, while not rerendering all
+        // #if statements (hidden fields for other values, won't show)
+        return this.sheet.render(false);
+    }
+
+    // TODO: Foundry 0.8 this method has been added for debugging
+    // @ts-ignore
+    async update(data, ...args) {
+        // Item.item => Embedded item into another item!
+        if (this._isEmbeddedItem) {
+            return this.updateEmbeddedItem(data);
+        }
+
+        // Actor.item => Directly owned item by an actor!
+        // @ts-ignore
+        return await super.update(data, ...args);
     }
 }

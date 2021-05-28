@@ -775,7 +775,8 @@
     "SR5.Warnings": {
         "NegativeLimitValue": "Limit Werte müssen über Null liegen",
         "TokenSelectionNeeded": "Ein oder mehrere Tokens müssen ausgewählt sein",
-        "SkillCantBeDefault": "Auf diese Fertigkeit kann keine Probe abgelegt werden, da sie nicht improvisiert werden kann"
+        "SkillCantBeDefault": "Auf diese Fertigkeit kann keine Probe abgelegt werden, da sie nicht improvisiert werden kann",
+        "MissingSkillOnActor": "Your controlled actor doesn't have this skill"
     },
 
     "SR5.Errors": {

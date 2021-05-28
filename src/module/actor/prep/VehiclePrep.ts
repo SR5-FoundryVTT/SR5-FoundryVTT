@@ -9,6 +9,7 @@ import { LimitsPrep } from './functions/LimitsPrep';
 import { MatrixPrep } from './functions/MatrixPrep';
 import { Helpers } from '../../helpers';
 import { PartsList } from '../../parts/PartsList';
+import {SR5} from "../../config";
 
 export class VehiclePrep extends BaseActorPrep<SR5VehicleType, VehicleActorData> {
     prepare() {
@@ -52,7 +53,7 @@ export class VehiclePrep extends BaseActorPrep<SR5VehicleType, VehicleActorData>
             stat.mod = parts.list;
             Helpers.calcTotal(stat);
             // add labels
-            stat.label = CONFIG.SR5.vehicle.stats[key];
+            stat.label = SR5.vehicle.stats[key];
         }
 
         // hide certain stats depending on if we're offroad
@@ -106,7 +107,7 @@ export class VehiclePrep extends BaseActorPrep<SR5VehicleType, VehicleActorData>
             track.physical.base = 12 + halfBody;
             track.physical.max =  track.physical.base + (Number(modifiers['physical_track']) || 0);
         }
-        track.physical.label = CONFIG.SR5.damageTypes.physical;
+        track.physical.label = SR5.damageTypes.physical;
 
         const rating = matrix.rating || 0;
         matrix.condition_monitor.max = 8 + Math.ceil(rating / 2);

@@ -44,6 +44,8 @@ export class BaseGearParser implements GearParser {
             permission: {
                 default: 2,
             },
+            effects: [],
+            sort: 0
         };
     }
 }

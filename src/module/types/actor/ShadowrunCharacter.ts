@@ -2,7 +2,7 @@
 
 declare namespace Shadowrun {
     export type SR5ActorSheetData = ActorSheet.Data & {
-        config: typeof CONFIG.SR5;
+        config: typeof SR5CONFIG;
         data: SR5ActorData;
         filters: SR5SheetFilters;
         isCharacter: boolean;
@@ -14,7 +14,7 @@ declare namespace Shadowrun {
         vehicle: SR5VehicleSheetData;
     };
 
-     export type SR5VehicleSheetData = {
+    export type SR5VehicleSheetData = {
         // TODO: SR5 Actor class, however conflicts between SR5Actor and SR5ActorBase prohibit this...
         driver?: object
     }
@@ -46,8 +46,18 @@ declare namespace Shadowrun {
         type: 'character';
     };
 
-    export type SR5ActorData = SpiritActorData | CharacterActorData | SpriteActorData | VehicleActorData | CritterActorData;
+    export type SR5ActorData =
+        SpiritActorData
+        | CharacterActorData
+        | SpriteActorData
+        | VehicleActorData
+        | CritterActorData;
 
+    export type CharacterSkills = {
+        active: Skills;
+        language: KnowledgeSkillList;
+        knowledge: KnowledgeSkills;
+    }
 
     export type CharacterActorData =
         MatrixActorData &
@@ -57,20 +67,16 @@ declare namespace Shadowrun {
         WoundsActorData &
         MovementActorData &
         NPCActorData & {
-            attributes: Attributes;
-            limits: Limits;
-            skills: {
-                active: Skills;
-                language: KnowledgeSkillList;
-                knowledge: KnowledgeSkills;
-            };
-            modifiers: Modifiers;
-            special: SpecialTrait;
-            initiative: Initiative;
-            recoil_compensation: number;
-            metatype: string | keyof typeof CONFIG.SR5.character.types;
-            full_defense_attribute: string;
-        };
+        attributes: Attributes;
+        limits: Limits;
+        skills: CharacterSkills;
+        modifiers: Modifiers;
+        special: SpecialTrait;
+        initiative: Initiative;
+        recoil_compensation: number;
+        metatype: string | keyof typeof SR5CONFIG.character.types;
+        full_defense_attribute: string;
+    };
 
     export type PhysicalTrackActorData = {
         track: {
@@ -124,8 +130,8 @@ declare namespace Shadowrun {
         base: BaseValuePair<number> & ModifiableValue;
         dice: BaseValuePair<number> &
             ModifiableValue & {
-                text: string;
-            };
+            text: string;
+        };
     };
 
     export type Initiative = {

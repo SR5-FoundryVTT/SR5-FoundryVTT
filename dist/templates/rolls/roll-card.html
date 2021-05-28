@@ -1,7 +1,7 @@
 <div
     class="sr5 chat-card roll-card"
-    data-actor-id="{{actor._id}}"
-    data-item-id="{{item._id}}"
+    data-actor-id="{{actor.id}}"
+    data-item-id="{{item.id}}"
     data-token-id="{{tokenId}}"
     data-target-token-id="{{targetTokenId}}"
 >
@@ -9,15 +9,15 @@
     <div class="card-title card-header">
          <a class="chat-select-link" data-token-id="{{speaker.token.id}}"><img src="{{speaker.actor.img}}" class="entity-selectable" title="{{speakerName speaker.actor}}" width="36" height="36"/></a>
          {{#if speaker.token}}
-         <h3 class="header-name"><a class="chat-entity-link" data-entity="Token" data-id="{{speaker.token.id}}">{{speakerName speaker.actor}}</a></h3>
+         <h3 class="header-name"><a class="chat-document-link" data-entity="Token" data-id="{{speaker.token.id}}">{{speakerName speaker.actor}}</a></h3>
          {{else}}
-         <h3 class="header-name"><a class="chat-entity-link" data-entity="Actor" data-id="{{speaker.actor.id}}">{{speakerName speaker.actor}}</a></h3>
+         <h3 class="header-name"><a class="chat-document-link" data-entity="Actor" data-id="{{speaker.actor.id}}">{{speakerName speaker.actor}}</a></h3>
          {{/if}}
     </div>
     {{/if}} {{#if item}}
     <div class="card-title card-header">
         <img src="{{item.data.img}}" title="{{item.data.name}}" width="36" height="36" />
-        <h3 class="header-name"><a class="chat-entity-link" data-entity="Item" data-id="{{item.id}}">{{item.data.name}}</a></h3>
+        <h3 class="header-name"><a class="chat-document-link" data-entity="Item" data-id="{{item.id}}">{{item.data.name}}</a></h3>
     </div>
     {{/if}}
     {{#if (isDefined title)}}
@@ -166,7 +166,7 @@
     {{#each targets as |target index|}}
     <div class="card-title card-header">
          <a class="chat-select-link" data-token-id="{{target.id}}"><img src="{{target.data.img}}" title="{{target.name}}" width="36" height="36" /></a>
-        <h3 class="header-name"><a class="chat-entity-link" draggable="false" data-entity="Token" data-id="{{target.id}}">{{target.name}}</a></h3>
+        <h3 class="header-name"><a class="chat-document-link" draggable="false" data-entity="Token" data-id="{{target.id}}">{{target.name}}</a></h3>
     </div>
     {{/each}}
     {{#if tests}}

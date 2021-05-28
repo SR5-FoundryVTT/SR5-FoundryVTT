@@ -19,7 +19,7 @@ export class Migrator {
 
     //TODO: Call on Init()
     public static async BeginMigration() {
-        let currentVersion = game.settings.get(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION);
+        let currentVersion = game.settings.get(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION) as string;
         if (currentVersion === undefined || currentVersion === null) {
             currentVersion = VersionMigration.NO_VERSION;
         }
@@ -109,7 +109,10 @@ export class Migrator {
      */
     private static async migrateCompendium(game: Game, migrations: VersionDefinition[]) {
         // Migrate World Compendium Packs
-        const packs = game.packs.filter((pack) => pack.metadata.package === 'world' && ['Actor', 'Item', 'Scene'].includes(pack.metadata.entity));
+        // @ts-ignore // TODO: TYPE: Possibly undefined
+        const packs = game.packs?.filter((pack) => pack.metadata.package === 'world' && ['Actor', 'Item', 'Scene'].includes(pack.metadata.entity));
+
+        if (!packs) return;
 
         // Run the migrations in order on each pack.
         for (const pack of packs) {

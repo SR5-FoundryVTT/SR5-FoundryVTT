@@ -3,6 +3,7 @@ import MatrixActorData = Shadowrun.MatrixActorData;
 import { Helpers } from '../../../helpers';
 import { SR5ItemDataWrapper } from '../../../item/SR5ItemDataWrapper';
 import { PartsList } from '../../../parts/PartsList';
+import {SR5} from "../../../config";
 
 export class MatrixPrep {
     /**
@@ -80,7 +81,7 @@ export class MatrixPrep {
         MatrixList.forEach((key) => {
             Helpers.calcTotal(matrix[key]);
             if (matrix[key]) {
-                const label = CONFIG.SR5.matrixAttributes[key];
+                const label = SR5.matrixAttributes[key];
                 const { value, base, mod } = matrix[key];
                 const hidden = true;
 

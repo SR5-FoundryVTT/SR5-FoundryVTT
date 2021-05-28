@@ -2,6 +2,7 @@ import SR5ActorData = Shadowrun.SR5ActorData;
 import { Helpers } from '../../../helpers';
 import { PartsList } from '../../../parts/PartsList';
 import SkillField = Shadowrun.SkillField;
+import {SR5} from "../../../config";
 
 export class SkillsPrep {
     /**
@@ -14,7 +15,7 @@ export class SkillsPrep {
                 language.value = {};
             }
 
-            // language.value is defined as an array in template.json 
+            // language.value is defined as an array in template.json
             // However what we actually want here is an object, so we set it manually
             // The same is done for the other knowledge skillgroups 'value' properties below
             if (Array.isArray(language.value) && language.value.length == 0) {
@@ -45,7 +46,7 @@ export class SkillsPrep {
                 prepareSkill(skill);
             }
         }
-  
+
         const entries = Object.entries(data.skills.language.value);
         // remove entries which are deleted TODO figure out how to delete these from the data
         entries.forEach(([key, val]: [string, { _delete?: boolean }]) => val._delete && delete data.skills.language.value[key]);
@@ -73,7 +74,7 @@ export class SkillsPrep {
 
         // skill labels
         for (let [skillKey, skillValue] of Object.entries(active)) {
-            skillValue.label = CONFIG.SR5.activeSkills[skillKey];
+            skillValue.label = SR5.activeSkills[skillKey];
         }
     }
 }

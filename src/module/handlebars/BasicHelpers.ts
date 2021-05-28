@@ -104,9 +104,10 @@ export const registerBasicHelpers = () => {
         return value !== undefined && value !== null;
     });
     /**
-     * Return a default value if the provided value is not defined (null or undefined)
+     * Return a fallback value if the provided value is not defined (null or undefined)
+     * NOTE: original helper 'default' caused incompatibilities with module AFK Ready Check, as both were overwriting it.
      */
-    Handlebars.registerHelper('default', function (value: string, defaultValue: string) {
+    Handlebars.registerHelper('fallbackValue', function (value: string, defaultValue: string) {
         return new Handlebars.SafeString(value ?? defaultValue);
     });
 

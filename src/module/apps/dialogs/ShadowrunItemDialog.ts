@@ -7,10 +7,10 @@ import RangesTemplateData = Shadowrun.RangesTemplateData;
 import RangeData = Shadowrun.RangeData;
 import {FormDialog} from "./FormDialog";
 import WeaponData = Shadowrun.WeaponData;
-import {Modifiers} from "../../sr5/Modifiers";
+import {SR5} from "../../config";
 
 type ItemDialogData = {
-    dialogData: DialogData | undefined,
+    dialogData: Dialog.Data | undefined,
     getActionTestData: Function | undefined,
     itemHasNoDialog: boolean
 };
@@ -58,7 +58,7 @@ export class ShadowrunItemDialog {
     static async createRangedWeaponDialog(item: SR5Item, event?: MouseEvent): Promise<FormDialog> {
         const dialogData = {title: item.name,
                             event,
-        };
+        } as unknown as Dialog.Data;
 
         const templatePath = 'systems/shadowrun5e/dist/templates/rolls/range-weapon-roll.html';
 
@@ -86,7 +86,7 @@ export class ShadowrunItemDialog {
     static async createSpellDialog(item: SR5Item, event?: MouseEvent): Promise<FormDialog> {
         const dialogData = {title: item.name,
                             event,
-        };
+        } as unknown as Dialog.Data;
 
         const templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-spell.html';
         const templateData = {};
@@ -103,7 +103,7 @@ export class ShadowrunItemDialog {
     static async createComplexFormDialog(item: SR5Item, event?: MouseEvent): Promise<FormDialog> {
         const dialogData = {title: item.name,
                             event,
-        };
+        } as unknown as Dialog.Data;
 
         const templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-complex-form.html';
         const templateData = {};
@@ -117,7 +117,7 @@ export class ShadowrunItemDialog {
         return new FormDialog(dialogData);
     }
 
-    static addComplexFormData(templateData: object, dialogData: DialogData, item: SR5Item): Function {
+    static addComplexFormData(templateData: object, dialogData: Dialog.Data, item: SR5Item): Function {
         const fade = item.getFade();
         const title = `${Helpers.label(item.name)} Level`;
 
@@ -155,7 +155,7 @@ export class ShadowrunItemDialog {
         return {level};
     }
 
-    static addSpellData(templateData: object, dialogData: DialogData, item: SR5Item): Function {
+    static addSpellData(templateData: object, dialogData: Dialog.Data, item: SR5Item): Function {
         const title = `${Helpers.label(item.name)} Force`;
         const drain = item.getDrain();
 
@@ -206,7 +206,7 @@ export class ShadowrunItemDialog {
         return {reckless}
     }
 
-    static addRangedWeaponData(templateData: object, dialogData: DialogData, item: SR5Item): Function {
+    static addRangedWeaponData(templateData: object, dialogData: Dialog.Data, item: SR5Item): Function {
         let title = dialogData.title || item.name;
 
         const itemData = item.data.data as WeaponData;
@@ -247,7 +247,7 @@ export class ShadowrunItemDialog {
             templateData['targets'] = ShadowrunItemDialog._getTargetRangeTemplateData(item.actor, templateRanges);
         } else if (!item.actor.getToken() && Helpers.userHasTargets()) {
             // Inform user about usage of actors without tokens!
-            ui.notifications.warn(game.i18n.localize('SR5.TargetingNeedsActorWithToken'));
+            ui.notifications?.warn(game.i18n.localize('SR5.TargetingNeedsActorWithToken'));
         }
 
         let cancel = true;
@@ -304,7 +304,7 @@ export class ShadowrunItemDialog {
         const newRanges = {} as RangesTemplateData;
         for (const [key, value] of Object.entries(ranges)) {
             const distance = value as number;
-            newRanges[key] = Helpers.createRangeDescription(CONFIG.SR5.weaponRanges[key], distance, range_modifiers[key]);
+            newRanges[key] = Helpers.createRangeDescription(SR5.weaponRanges[key], distance, range_modifiers[key]);
         }
         return newRanges;
     }
@@ -319,7 +319,7 @@ export class ShadowrunItemDialog {
         const attacker = actor.getToken();
 
         if (!attacker || !Helpers.userHasTargets()) {
-            ui.notifications.warn(game.i18n.localize('SR5.TargetingNeedsActorWithToken'));
+            ui.notifications?.warn(game.i18n.localize('SR5.TargetingNeedsActorWithToken'));
             return [];
         }
 
