@@ -26,6 +26,8 @@ export class SpellImporter extends DataImporter {
             img: 'icons/svg/mystery-man.svg',
             flags: {},
             type: 'spell',
+            effects: [],
+            sort: 0,
             data: {
                 description: {
                     value: '',
@@ -126,6 +128,7 @@ export class SpellImporter extends DataImporter {
             datas.push(data);
         }
 
+        // @ts-ignore // TODO: TYPE: Remove this.
         return await Item.create(datas);
     }
 }

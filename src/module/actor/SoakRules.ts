@@ -30,7 +30,7 @@ export class SoakRules {
 
     private static applyPhysicalAndStunSoakParts(soakParts: PartsList<number>, actor: SR5Actor, damageData: DamageData) {
         // Apply special rules for direct combat spells
-        const damageSourceItem = Helpers.findDamageSource(damageData); 
+        const damageSourceItem = Helpers.findDamageSource(damageData);
         if (damageSourceItem && damageSourceItem.isDirectCombatSpell()) {
             return SoakRules.applyDirectCombatSpellParts(damageSourceItem.data as Spell, soakParts, actor);
         }
@@ -79,7 +79,7 @@ export class SoakRules {
     private static applyElementalArmor(soakParts: PartsList<number>, armor: ActorArmorData, element: string) {
         const bonusArmor = armor[element] ?? 0;
         if (bonusArmor) {
-            soakParts.addUniquePart(CONFIG.SR5.elementTypes[element], bonusArmor);
+            soakParts.addUniquePart(SR5.elementTypes[element], bonusArmor);
         }
     }
 
@@ -91,7 +91,7 @@ export class SoakRules {
         if (actorData.initiative.perception === 'matrix') {
             if (actor.isVehicle()){
                 // Vehicles can have a matrix initiative but do not take biofeedback
-                SoakRules.applyRatingAndFirewallParts(actorData, soakParts);     
+                SoakRules.applyRatingAndFirewallParts(actorData, soakParts);
             }
             else {
                 SoakRules.applyBiofeedbackParts(soakParts, actor, actorData);
@@ -99,7 +99,7 @@ export class SoakRules {
         }
 
         else {
-            SoakRules.applyRatingAndFirewallParts(actorData, soakParts);       
+            SoakRules.applyRatingAndFirewallParts(actorData, soakParts);
         }
     }
 
@@ -133,11 +133,11 @@ export class SoakRules {
 
     /**
      * Reduces the damage value based on net hits and damage data and actor special rules
-     * 
+     *
      * @remarks
      * Make sure that you first call modifyDamageType before you call this method
      * to determine the correct damage type (physical, stun, matrix)
-     *  
+     *
      * @param damageData The incoming damage
      * @param hits The number of hits on the soak tests
      * @returns The updated damage data
@@ -145,9 +145,9 @@ export class SoakRules {
     static reduceDamage(actor : SR5Actor, damageData: DamageData, hits: number): ModifiedDamageData {
 
         // Vehicles are immune to stun damage (electricity stun damage is handled in a different place)
-        // Note: This also takes care of the vehicle immunity, since physical damage that does not exceed armor 
+        // Note: This also takes care of the vehicle immunity, since physical damage that does not exceed armor
         // will be converted to stun damage and then reduced to 0. This does not work with drones wearing armor
-        // but we do not support this. 
+        // but we do not support this.
         if (damageData.type.value === 'stun' && actor.isVehicle()) {
             return Helpers.reduceDamageByHits(damageData, damageData.value, 'SR5.VehicleStunImmunity');
         }
@@ -158,17 +158,17 @@ export class SoakRules {
     /**
      * Changes the damage type based on the incoming damage type and the actor state (armor, matrix perception..)
      * @param damage The incoming damage
-     * @param actor The actor affected by the damage 
-     * @returns The updated damage data 
+     * @param actor The actor affected by the damage
+     * @returns The updated damage data
      */
     static modifyDamageType(damage: DamageData, actor : SR5Actor) : DamageData {
         // Careful, order of damage conversion is very important
         // Electricity stun damage is considered physical for vehicles
-        let updatedDamage = duplicate(damage);
+        let updatedDamage = duplicate(damage) as DamageData;
         if (actor.isVehicle() && updatedDamage.element.value === 'electricity' && updatedDamage.type.value === 'stun') {
             updatedDamage.type.value = 'physical';
         }
- 
+
         const damageSourceItem = Helpers.findDamageSource(damage);
         if (damageSourceItem && damageSourceItem.isDirectCombatSpell()) {
             // Damage from direct combat spells is never converted
@@ -182,14 +182,14 @@ export class SoakRules {
     /**
      * Turns physical damage to stun damage based on the damage and armor
      * @param damage The incoming damage
-     * @param actor The actor affected by the damage 
-     * @returns The updated damage data 
+     * @param actor The actor affected by the damage
+     * @returns The updated damage data
      */
      static modifyPhysicalDamageForArmor(damage: DamageData, actor : SR5Actor): DamageData {
-        const updatedDamage = duplicate(damage);
+        const updatedDamage = duplicate(damage) as DamageData;
 
         if (damage.type.value === 'physical') {
-            // Physical damage is only transformed for some actors 
+            // Physical damage is only transformed for some actors
             if (!actor.isCharacter() && !actor.isSpirit() && !actor.isCritter() && !actor.isVehicle()) {
                 return updatedDamage;
             }
@@ -210,27 +210,27 @@ export class SoakRules {
     /**
      * Turns matrix damage to biofeedback based on the actor state
      * @param damage The incoming damage
-     * @param actor The actor affected by the damage 
-     * @returns The updated damage data 
+     * @param actor The actor affected by the damage
+     * @returns The updated damage data
      */
     static modifyMatrixDamageForBiofeedback(damage: DamageData, actor : SR5Actor): DamageData {
-        const updatedDamage = duplicate(damage);
+        const updatedDamage = duplicate(damage) as DamageData;
 
         if (damage.type.value === 'matrix') {
             const actorData = actor.data.data as CharacterActorData;
 
-            // Only characters can receive biofeedback damage at the moment. 
+            // Only characters can receive biofeedback damage at the moment.
             // TODO Technomancer and Sprites special rules?
             if (!actor.isCharacter()) {
                 return updatedDamage;
             }
-    
+
             if (actorData.initiative.perception === 'matrix') {
                 if (actorData.matrix.hot_sim) {
                     updatedDamage.type.value = 'physical';
                 }
                 else {
-                    updatedDamage.type.value = 'stun';    
+                    updatedDamage.type.value = 'stun';
                 }
             }
         }

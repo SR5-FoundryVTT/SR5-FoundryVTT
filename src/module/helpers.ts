@@ -25,23 +25,23 @@ export class Helpers {
     /**
      * Calculate the total value for a data object
      * - stores the total value and returns it
-     * @param data
-     * @param options
+     * @param value
+     * @param options min will a apply a minimum value, max will apply a maximum value.
      */
-    static calcTotal(data: ModifiableValue, options?: CalcTotalOptions): number {
-        if (data.mod === undefined) data.mod = [];
-        const parts = new PartsList(data.mod);
+    static calcTotal(value: ModifiableValue, options?: CalcTotalOptions): number {
+        if (value.mod === undefined) value.mod = [];
+        const parts = new PartsList(value.mod);
         // if a temp field is found, add it as a unique part
-        if (data['temp'] !== undefined) {
-            parts.addUniquePart('SR5.Temporary', data['temp']);
+        if (value['temp'] !== undefined) {
+            parts.addUniquePart('SR5.Temporary', value['temp']);
         }
 
-        data.value = Helpers.roundTo(parts.total + data.base, 3);
-        data.mod = parts.list;
+        value.value = Helpers.roundTo(parts.total + value.base, 3);
+        value.mod = parts.list;
 
-        data.value = Helpers.applyValueRange(data.value, options);
+        value.value = Helpers.applyValueRange(value.value, options);
 
-        return data.value;
+        return value.value;
     }
 
     /** Round a number to a given degree.
@@ -265,7 +265,10 @@ export class Helpers {
         return name.slice(0, length).toUpperCase();
     }
 
+    // TODO: Foundry 0.9 Should TokenDocument be used instead of Token?
     static getToken(id?: string): Token | undefined {
+        if (!canvas || !canvas.ready) return;
+
         for (const token of canvas.tokens.placeables) {
             if (token.id === id) {
                 return token;
@@ -273,54 +276,48 @@ export class Helpers {
         }
     }
 
-    static getSceneToken(sceneTokenId: string): Token | undefined {
+    /**
+     * Use this helper to get a tokens actor from any given scene id, while the sceneTokenId is a mixed ID
+     * @param sceneTokenId A mixed id with the format '<sceneId>.<tokenid>
+     */
+    static getSceneTokenActor(sceneTokenId: string): SR5Actor | undefined {
         const [sceneId, tokenId] = sceneTokenId.split('.');
-
-        const isActiveScene = sceneId === canvas?.scene._id;
-        if (isActiveScene) {
-            return canvas.tokens.get(tokenId);
-        }
-
-        // Build Token using it's data from the connected scene as a fallback.
         const scene = game.scenes.get(sceneId);
-        if (!scene) {
-            return;
-        }
-
-        //@ts-ignore
-        const tokenData = scene.data.tokens.find((t) => t.id === Number(tokenId));
-        if (!tokenData) {
-            return;
-        }
-
-        return new Token(tokenData);
+        if (!scene) return;
+        // @ts-ignore
+        const token = scene.tokens.get(tokenId);
+        if (!token) return;
+        return token.getActor();
     }
 
-    static getUserTargets(user?: User): Token[] {
+    static getUserTargets(user?: User|null): Token[] {
         user = user ? user : game.user;
 
-        if (user) {
-            return Array.from(user.targets);
-        } else {
-            return [];
-        }
+        if (!user) return []
+
+        return Array.from(user.targets);
     }
 
-    static userHasTargets(user?: User): boolean {
+    static userHasTargets(user?: User|null): boolean {
         user = user ? user : game.user;
+
+        if (!user) return false;
 
         return user.targets.size > 0;
     }
 
     static measureTokenDistance(tokenOrigin: Token, tokenDest: Token): number {
+        if (!canvas || !canvas.ready || !canvas.scene) return 0;
+
         if (!tokenOrigin || !tokenDest) return 0;
 
         const origin = new PIXI.Point(...canvas.grid.getCenter(tokenOrigin.data.x, tokenOrigin.data.y));
         const dest = new PIXI.Point(...canvas.grid.getCenter(tokenDest.data.x, tokenDest.data.y));
 
-        const distanceInGridUnits = canvas.grid.measureDistance(origin, dest, {gridSpaces: true});
+        // TODO: Used to be const distanceInGridUnits = canvas.grid.measureDistance(origin, dest, {gridSpaces: true});
+        //       Double Check for errors.
+        const distanceInGridUnits = canvas.grid.measureDistance(origin, dest);
         const sceneUnit = canvas.scene.data.gridUnits;
-        // TODO: Define weapon range units somewhere (settings)
         return Helpers.convertLengthUnit(distanceInGridUnits, sceneUnit);
     }
 
@@ -350,6 +347,7 @@ export class Helpers {
     }
 
     static getControlledTokens(): Token[] {
+        if (!canvas || !canvas.ready) return [];
         return canvas.tokens.controlled;
     }
 
@@ -359,7 +357,7 @@ export class Helpers {
 
         // Try to default to a users character.
         if (actors.length === 0 && game.user?.character) {
-            actors.push(game.user.character as SR5Actor);
+            actors.push(game.user?.character as SR5Actor);
         }
 
         return actors;
@@ -391,7 +389,7 @@ export class Helpers {
     }
 
     static createDamageData(value: number, type: DamageType, ap: number = 0, element: DamageElement = '', sourceItem? : SR5Item): DamageData {
-        const damage = duplicate(DataTemplates.damage);
+        const damage = duplicate(DataTemplates.damage) as DamageData;
         damage.base = value;
         damage.value = value;
         damage.type.base = type;
@@ -414,14 +412,14 @@ export class Helpers {
     }
 
     /**
-     * Retrieves the item causing the damage, if there is any. 
+     * Retrieves the item causing the damage, if there is any.
      * This only works for embedded items at the moment
      */
     static findDamageSource(damageData : DamageData) : SR5Item | undefined{
         if (!damageData.source) {
             return;
         }
-        
+
         const actorId = damageData.source.actorId;
         const actorSource = game.actors.find(
             actor => actor.id === actorId
@@ -433,7 +431,7 @@ export class Helpers {
 
         // First search the actor itself for the item
         const itemId = damageData.source.itemId;
-        const actorItem = actorSource.getOwnedItem(itemId) as SR5Item;
+        const actorItem = actorSource.items.get(itemId) as unknown as SR5Item;
         if (actorItem)
         {
             return actorItem;
@@ -447,7 +445,7 @@ export class Helpers {
         tokens.forEach(token => {
             const foundItem = token.actor.items.find(i => i.id === itemId);
             if (foundItem) {
-                tokenItem = foundItem as SR5Item;
+                tokenItem = foundItem as unknown as SR5Item;
             }
         });
 
@@ -467,7 +465,7 @@ export class Helpers {
      * @param modificationLabel The translatable label for the modification
      */
     static modifyDamageByHits(incoming: DamageData, hits: number, modificationLabel: string): ModifiedDamageData {
-        const modified = duplicate(incoming);
+        const modified = duplicate(incoming) as DamageData;
         modified.mod = PartsList.AddUniquePart(modified.mod, modificationLabel, hits);
         modified.value = Helpers.calcTotal(modified, {min: 0});
 
@@ -519,7 +517,7 @@ export class Helpers {
     /**
      * A simple helper to get an data entry for updating with Entity.update
      *
-     * @param path The main data path as a doted string relative from the type data (not entity data).
+     * @param path The main data path as a doted string relative from the type data (not document data).
      * @param value Whatever needs to be stored.
      *
      */
@@ -527,9 +525,9 @@ export class Helpers {
         return {[path]: value};
     }
     /**
-     * A simple helper to delete existing entity data keys with Entity.update
+     * A simple helper to delete existing document data keys with Entity.update
      *
-     * @param path The main data path as doted string relative from the item type data (not entity data). data.skills.active
+     * @param path The main data path as doted string relative from the item type data (not document data). data.skills.active
      * @param key The single sub property within the path that's meant to be deleted. 'test'
      *
      * @return An expected return object could look like this: {'data.skills.active': {'-=Pistols': null}} and would
@@ -558,8 +556,9 @@ export class Helpers {
     static sortSkills(skills: Skills, asc: boolean=true): Skills {
         // Filter entries instead of values to have a store of ids for easy rebuild.
         const sortedEntries = Object.entries(skills).sort(([aId, a], [bId, b]) => {
-            const comparatorA = Helpers.localizeSkill(a);
-            const comparatorB = Helpers.localizeSkill(b);
+            // TODO: Foundry 0.8 After placing token sidebar actor has unprepared Data => no name or label, just the id.
+            const comparatorA = Helpers.localizeSkill(a) || aId;
+            const comparatorB = Helpers.localizeSkill(b) || bId;
             // Use String.localeCompare instead of the > Operator to support other alphabets.
             if (asc)
                 return comparatorA.localeCompare(comparatorB) === 1 ? 1 : -1;
@@ -603,5 +602,36 @@ export class Helpers {
             sortedAsObject[key] = translated;
         }
         return sortedAsObject;
+    }
+
+    /**
+     * Return a list of users with the given permission for the given document.
+     *
+     * @param document A foundry Document implementation.
+     * @param permission A foundry access permission
+     * @param active If true, will only return users that are also currently active.
+     */
+    static getPlayersWithPermission(document: Entity, permission: string, active: boolean = true): User[] {
+        return game.users.filter(user => {
+            if (user.isGM) return false;
+            // Check for permissions.
+            // @ts-ignore // TODO: foundry-vtt-types 0.8.2 missing testUserPermission for Documents (it's not DocumentClientMixin)
+            if (!document.testUserPermission(user, permission)) return false;
+            // Check for active state.
+            if (active && !user.active) return false;
+
+            return true;
+        });
+    }
+
+    /**
+     * Handle the special skill cases with id equals name and possible i18n
+     *
+     * @param skill
+     * @returns Either a translation or a name.
+     */
+    static getSkillLabelOrName(skill: SkillField): string {
+        // Custom skills don't have labels, use their name instead.
+        return skill.label ? game.i18n.localize(skill.label) : skill.name || '';
     }
 }

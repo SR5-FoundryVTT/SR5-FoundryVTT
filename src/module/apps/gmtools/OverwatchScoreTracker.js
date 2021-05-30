@@ -58,7 +58,7 @@ export class OverwatchScoreTracker extends Application {
         event.preventDefault();
         const tokens = Helpers.getControlledTokens();
         if (tokens.length === 0) {
-            ui.notifications.warn(game.i18n.localize('SR5.OverwatchScoreTracker.NotifyNoSelectedTokens'));
+            ui.notifications?.warn(game.i18n.localize('SR5.OverwatchScoreTracker.NotifyNoSelectedTokens'));
             return;
         }
         tokens.forEach((token) => {
@@ -99,7 +99,7 @@ export class OverwatchScoreTracker extends Application {
         if (actor) {
             //  use static value so it can be modified in modules
             const roll = new Roll(OverwatchScoreTracker.MatrixOverwatchDiceCount);
-            roll.roll();
+            roll.evaluate({async: false});
 
             // use GM Roll Mode so players don't see
             // const rollMode = CONFIG.Dice.rollModes.gmroll;

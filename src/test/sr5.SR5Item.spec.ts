@@ -8,6 +8,7 @@ export const shadowrunSR5Item = context => {
     class TestingItems {
         items: Record<string, SR5Item> = {};
         async create(data) {
+            // @ts-ignore
             const item = await Item.create({name: '#QUENCH_TEST_ITEM_SHOULD_HAVE_BEEN_DELETED', ...data}) as SR5Item;
             this.items[item.id] = item;
             return item;

@@ -1,7 +1,7 @@
 /// <reference path="../Shadowrun.ts" />
 
 declare namespace Shadowrun {
-    export type CritterType = keyof typeof CONFIG.SR5.critterTypes;
+    export type CritterType = keyof typeof SR5CONFIG.critterTypes;
 
     export type SR5CritterType = SR5ActorBase & {
         data: CritterActorData;

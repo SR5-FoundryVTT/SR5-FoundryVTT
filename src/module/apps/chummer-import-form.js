@@ -37,7 +37,7 @@ export class ChummerImportForm extends FormApplication {
             const importer = new CharacterImporter();
             await importer.importChummerCharacter(this.object, chummerFile, importOptions);
 
-            ui.notifications.info(
+            ui.notifications?.info(
                 'Complete! Check everything. Notably: Ranged weapon mods and ammo; Strength based weapon damage; Specializations on all spells, powers, and weapons;'
             );
             this.close();

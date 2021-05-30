@@ -1,7 +1,7 @@
-import { SkillEditForm } from './SkillEditForm';
+import { SkillEditSheet } from './SkillEditSheet';
 import SkillEditFormData = Shadowrun.SkillEditFormData;
 
-export class LanguageSkillEditForm extends SkillEditForm {
+export class LanguageSkillEditSheet extends SkillEditSheet {
     _updateString() {
         return `data.skills.language.value.${this.skillId}`;
     }

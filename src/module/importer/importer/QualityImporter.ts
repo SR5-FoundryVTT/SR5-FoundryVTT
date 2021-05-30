@@ -21,6 +21,8 @@ export class QualityImporter extends DataImporter {
             img: 'icons/svg/mystery-man.svg',
             flags: {},
             type: 'quality',
+            effects: [],
+            sort: 0,
             data: {
                 description: {
                     value: '',
@@ -76,7 +78,6 @@ export class QualityImporter extends DataImporter {
     async Parse(jsonObject: object): Promise<Entity> {
         const jsonNameTranslations = {};
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Qualities', this.categoryTranslations);
-        console.log(folders);
 
         const parser = new QualityParserBase();
 
@@ -98,6 +99,7 @@ export class QualityImporter extends DataImporter {
             datas.push(data);
         }
 
+        // @ts-ignore // TODO: TYPE: Remove this.
         return await Item.create(datas);
     }
 }

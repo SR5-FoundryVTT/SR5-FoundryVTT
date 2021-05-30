@@ -705,6 +705,8 @@ select.display {
         display: block;
         font-weight: bold;
         font-size: 18px;
+        // Render below the open/closable token hud actions.
+        z-index: -1;
     }
 
     .modifier-row {

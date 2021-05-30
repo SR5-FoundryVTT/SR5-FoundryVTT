@@ -3,6 +3,7 @@ import { SR5ItemDataWrapper } from '../../../item/SR5ItemDataWrapper';
 import { Helpers } from '../../../helpers';
 import { PartsList } from '../../../parts/PartsList';
 import ArmorActorData = Shadowrun.ArmorActorData;
+import {SR5} from "../../../config";
 
 export class ItemPrep {
     /**
@@ -15,7 +16,7 @@ export class ItemPrep {
         armor.base = 0;
         armor.value = 0;
         armor.mod = [];
-        for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
+        for (const element of Object.keys(SR5.elementTypes)) {
             armor[element] = 0;
         }
 
@@ -38,7 +39,7 @@ export class ItemPrep {
             }
 
             // Apply elemental modifiers of all worn armor and clothing SR5#169.
-            for (const element of Object.keys(CONFIG.SR5.elementTypes)) {
+            for (const element of Object.keys(SR5.elementTypes)) {
                 armor[element] += item.getArmorElements()[element];
             }
         });

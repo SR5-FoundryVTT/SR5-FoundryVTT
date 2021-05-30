@@ -22,6 +22,8 @@ export class ComplexFormImporter extends DataImporter {
             img: 'icons/svg/mystery-man.svg',
             flags: {},
             type: 'complex_form',
+            effects: [],
+            sort: 0,
             data: {
                 description: {
                     value: '',
@@ -97,6 +99,7 @@ export class ComplexFormImporter extends DataImporter {
             datas.push(data);
         }
 
+        // @ts-ignore // TODO: TYPE: Remove this.
         return await Item.create(datas);
     }
 }

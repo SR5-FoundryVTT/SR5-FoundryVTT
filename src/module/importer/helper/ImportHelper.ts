@@ -41,7 +41,8 @@ export class ImportHelper {
      * @param parent The parent folder.
      * @returns {Promise<Folder>} A promise that resolves with the folder object when the folder is created.
      */
-    public static async NewFolder(name: string, parent: Folder | null = null): Promise<Folder> {
+    public static async NewFolder(name: string, parent: Folder | null = null): Promise< Folder | null> {
+        // @ts-ignore // TODO: TYPE: I'm unsure what the issue is.
         return await Folder.create({
             type: 'Item',
             parent: parent === null ? null : parent.id,
@@ -50,30 +51,34 @@ export class ImportHelper {
     }
 
     /**
-     * Get a folder at a path in the items directory.
+     * Get / create a folder at a path in the items directory.
+     *
+     * Traverse path and match folder structure to the last and current path segments.
+     *
      * @param path The absolute path of the folder.
      * @param mkdirs If true, will make all folders along the hierarchy if they do not exist.
      * @returns A promise that will resolve with the found folder.
      */
-    public static async GetFolderAtPath(path: string, mkdirs: boolean = false): Promise<Entity> {
-        let idx = 0;
-        let curr,
-            last = null;
-        let next = path.split('/');
-        while (idx < next.length) {
-            // @ts-ignore // TODO: foundry-pc-type defines Folder without parent property, but it does exist.
-            curr = game.folders.find((folder) => folder.parent === last && folder.name === next[idx]);
-            if (curr === null) {
-                if (!mkdirs) {
-                    return Promise.reject(`Unable to find folder: ${path}`);
-                }
+    public static async GetFolderAtPath(path: string, mkdirs: boolean = false): Promise<Folder> {
+        let currentFolder,
+            lastFolder = undefined;
+        const pathSegments = path.split('/');
+        for (const pathSegment of pathSegments) {
+             // Check if the path structure matches the folder structure.
+            currentFolder = game.folders.find((folder) => {
+                // @ts-ignore // TODO: foundry-vtt-types 0.8.2 support missing.
+                return folder.parentFolder === lastFolder && folder.name === pathSegment
+            });
 
-                curr = await ImportHelper.NewFolder(next[idx], last);
-            }
-            last = curr;
-            idx++;
+            // Only create when allowed to. Otherwise abort with error.
+            if (!currentFolder && !mkdirs) return Promise.reject(`Unable to find folder: ${path}`);
+            // Create the missing folder for the current segment
+            if (!currentFolder) currentFolder = await ImportHelper.NewFolder(pathSegment, lastFolder);
+
+            lastFolder = currentFolder;
         }
-        return Promise.resolve(curr);
+
+        return Promise.resolve(currentFolder);
     }
 
     /**
@@ -111,9 +116,9 @@ export class ImportHelper {
     public static findItem(nameOrCmp: string | ItemComparer): Entity {
         let result: any | null;
         if (typeof nameOrCmp === 'string') {
-            result = game.items.find((item) => item.name == nameOrCmp);
+            result = game.items?.find((item) => item.name == nameOrCmp);
         } else {
-            result = game.items.find(nameOrCmp);
+            result = game.items?.find(nameOrCmp);
         }
         return result;
     }

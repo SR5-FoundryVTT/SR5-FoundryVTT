@@ -809,7 +809,8 @@
     "SR5.Warnings": {
         "NegativeLimitValue": "Limit values must be above zero",
         "TokenSelectionNeeded": "One ore more tokens need to be selected",
-        "SkillCantBeDefault": "This skill can't be rolled on as it can't be defaulted"
+        "SkillCantBeDefault": "This skill can't be rolled on as it can't be defaulted",
+        "MissingSkillOnActor": "Your controlled actor doesn't have this skill"
     },
 
     "SR5.Errors": {

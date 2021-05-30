@@ -2,6 +2,7 @@ import SR5ActorData = Shadowrun.SR5ActorData;
 import PhysicalTrackActorData = Shadowrun.PhysicalTrackActorData;
 import StunTrackActorData = Shadowrun.StunTrackActorData;
 import TwoTrackActorData = Shadowrun.TwoTrackActorData;
+import {SR5} from "../../../config";
 
 export class ConditionMonitorsPrep {
     static prepareStun(data: SR5ActorData & StunTrackActorData) {
@@ -9,7 +10,7 @@ export class ConditionMonitorsPrep {
 
         track.stun.base = 8 + Math.ceil(attributes.willpower.value / 2);
         track.stun.max = track.stun.base + Number(modifiers['stun_track']);
-        track.stun.label = CONFIG.SR5.damageTypes.stun;
+        track.stun.label = SR5.damageTypes.stun;
         track.stun.disabled = false;
     }
 
@@ -19,7 +20,7 @@ export class ConditionMonitorsPrep {
         track.physical.base = 8 + Math.ceil(attributes.body.value / 2);
         track.physical.max = track.physical.base + Number(modifiers['physical_track']);
         track.physical.overflow.max = attributes.body.value;
-        track.physical.label = CONFIG.SR5.damageTypes.physical;
+        track.physical.label = SR5.damageTypes.physical;
         track.physical.disabled = false;
     }
 

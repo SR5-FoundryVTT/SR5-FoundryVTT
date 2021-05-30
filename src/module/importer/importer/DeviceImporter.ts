@@ -164,6 +164,7 @@ export class DeviceImporter extends DataImporter {
         entries = entries.concat(this.ParseCommlinkDevices(commlinks, commlinksFolder));
         entries = entries.concat(this.ParseCyberdeckDevices(cyberdecks, cyberdecksFolder));
 
+        // @ts-ignore // TODO: TYPE: Remove this.
         return await Item.create(entries)
     }
 
