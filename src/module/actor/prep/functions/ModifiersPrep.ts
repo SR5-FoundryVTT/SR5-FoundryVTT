@@ -1,10 +1,11 @@
 import SR5ActorData = Shadowrun.SR5ActorData;
+import ActorTypesData = Shadowrun.ActorTypesData;
 
 export class ModifiersPrep {
     /**
      * Prepare the modifiers that are displayed in the Misc. tab
      */
-    static prepareModifiers(data: SR5ActorData) {
+    static prepareModifiers(data: ActorTypesData) {
         if (!data.modifiers) data.modifiers = {};
         const modifiers = {};
         let miscTabModifiers = [

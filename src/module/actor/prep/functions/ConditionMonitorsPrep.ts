@@ -3,9 +3,10 @@ import PhysicalTrackActorData = Shadowrun.PhysicalTrackActorData;
 import StunTrackActorData = Shadowrun.StunTrackActorData;
 import TwoTrackActorData = Shadowrun.TwoTrackActorData;
 import {SR5} from "../../../config";
+import ActorTypesData = Shadowrun.ActorTypesData;
 
 export class ConditionMonitorsPrep {
-    static prepareStun(data: SR5ActorData & StunTrackActorData) {
+    static prepareStun(data: ActorTypesData & StunTrackActorData) {
         const { track, attributes, modifiers } = data;
 
         track.stun.base = 8 + Math.ceil(attributes.willpower.value / 2);
@@ -14,7 +15,7 @@ export class ConditionMonitorsPrep {
         track.stun.disabled = false;
     }
 
-    static preparePhysical(data: SR5ActorData & PhysicalTrackActorData) {
+    static preparePhysical(data: ActorTypesData & PhysicalTrackActorData) {
         const { track, attributes, modifiers } = data;
 
         track.physical.base = 8 + Math.ceil(attributes.body.value / 2);
@@ -24,7 +25,7 @@ export class ConditionMonitorsPrep {
         track.physical.disabled = false;
     }
 
-    static prepareGrunt(data: SR5ActorData & TwoTrackActorData) {
+    static prepareGrunt(data: ActorTypesData & TwoTrackActorData) {
         // Grunts use only one monitor, use physical to get overflow functionality.
         ConditionMonitorsPrep.prepareStun(data);
 

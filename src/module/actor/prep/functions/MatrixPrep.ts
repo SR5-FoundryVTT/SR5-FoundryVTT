@@ -4,6 +4,7 @@ import { Helpers } from '../../../helpers';
 import { SR5ItemDataWrapper } from '../../../item/SR5ItemDataWrapper';
 import { PartsList } from '../../../parts/PartsList';
 import {SR5} from "../../../config";
+import ActorTypesData = Shadowrun.ActorTypesData;
 
 export class MatrixPrep {
     /**
@@ -11,7 +12,7 @@ export class MatrixPrep {
      * - if an item is equipped, it will use that data
      * - if it isn't and player is technomancer, it will use that data
      */
-    static prepareMatrix(actorData: SR5ActorData & MatrixActorData, items: SR5ItemDataWrapper[]) {
+    static prepareMatrix(actorData: ActorTypesData & MatrixActorData, items: SR5ItemDataWrapper[]) {
         const { matrix, attributes } = actorData;
 
         const MatrixList = ['firewall', 'sleaze', 'data_processing', 'attack'];
@@ -107,7 +108,7 @@ export class MatrixPrep {
      * Prepare the mental attributes for a sheet that just has a device rating
      * @param data
      */
-    static prepareAttributesForDevice(data: SR5ActorData & MatrixActorData) {
+    static prepareAttributesForDevice(data: ActorTypesData & MatrixActorData) {
         const { matrix, attributes } = data;
         const rating = matrix.rating || 0;
         const mentalAttributes = ['intuition', 'logic', 'charisma', 'willpower'];

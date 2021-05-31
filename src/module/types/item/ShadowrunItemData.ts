@@ -36,6 +36,27 @@ declare namespace Shadowrun {
         SpritePowerItemData |
         WeaponItemData;
 
+    export type ItemTypesData =
+        ActionData |
+        AdeptPowerData |
+        AmmoData |
+        ArmorData |
+        BiowareData |
+        ComplexFormData |
+        ContactData |
+        CritterPowerData |
+        CyberwareData |
+        DeviceData |
+        EquipmentData |
+        LifestyleData |
+        ModificationData |
+        ProgramData |
+        QualityData |
+        SinData |
+        SpellData |
+        SpritePowerData |
+        WeaponData;
+
     // Setup your ItemData types below here. Try sorting your ItemData types alphabetically.
     export interface ActionItemData extends Item.Data<ActionData> {
         type: 'action'

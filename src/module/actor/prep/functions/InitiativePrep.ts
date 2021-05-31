@@ -3,9 +3,10 @@ import MagicActorData = Shadowrun.MagicActorData;
 import MatrixActorData = Shadowrun.MatrixActorData;
 import { Helpers } from '../../../helpers';
 import { PartsList } from '../../../parts/PartsList';
+import ActorTypesData = Shadowrun.ActorTypesData;
 
 export class InitiativePrep {
-    static prepareCurrentInitiative(data: SR5ActorData) {
+    static prepareCurrentInitiative(data: ActorTypesData) {
         const { initiative } = data;
 
         if (initiative.perception === 'matrix') initiative.current = initiative.matrix;
@@ -23,7 +24,7 @@ export class InitiativePrep {
         initiative.current.base.value = Helpers.calcTotal(initiative.current.base);
     }
 
-    static prepareMeatspaceInit(data: SR5ActorData) {
+    static prepareMeatspaceInit(data: ActorTypesData) {
         const { initiative, attributes, modifiers } = data;
 
         initiative.meatspace.base.base = attributes.intuition.value + attributes.reaction.value;
@@ -33,7 +34,7 @@ export class InitiativePrep {
         initiative.meatspace.dice.mod = PartsList.AddUniquePart(initiative.meatspace.dice.mod, "SR5.Bonus", Number(modifiers['meat_initiative_dice']));
     }
 
-    static prepareAstralInit(data: SR5ActorData & MagicActorData) {
+    static prepareAstralInit(data: ActorTypesData & MagicActorData) {
         const { initiative, attributes, modifiers } = data;
 
         initiative.astral.base.base = attributes.intuition.value * 2;
@@ -43,7 +44,7 @@ export class InitiativePrep {
         initiative.astral.dice.mod = PartsList.AddUniquePart(initiative.astral.dice.mod, "SR5.Bonus", Number(modifiers['astral_initiative_dice']));
     }
 
-    static prepareMatrixInit(data: SR5ActorData & MatrixActorData) {
+    static prepareMatrixInit(data: ActorTypesData & MatrixActorData) {
         const { initiative, attributes, modifiers, matrix } = data;
         if (matrix) {
 

@@ -1,5 +1,3 @@
-import { BaseActorPrep } from './BaseActorPrep';
-import SR5SpriteType = Shadowrun.SR5SpriteType;
 import SpriteActorData = Shadowrun.SpriteData;
 import { SkillsPrep } from './functions/SkillsPrep';
 import { ModifiersPrep } from './functions/ModifiersPrep';
@@ -10,29 +8,31 @@ import { MatrixPrep } from './functions/MatrixPrep';
 import SpriteType = Shadowrun.SpriteType;
 import { Helpers } from '../../helpers';
 import { PartsList } from '../../parts/PartsList';
+import SpriteData = Shadowrun.SpriteData;
+import {SR5ItemDataWrapper} from "../../item/SR5ItemDataWrapper";
 
+
+export function SpriteDataPrepare(data: SpriteData, items: SR5ItemDataWrapper[]) {
+    ModifiersPrep.prepareModifiers(data);
+    ModifiersPrep.clearAttributeMods(data);
+
+    SpritePrep.prepareSpriteData(data);
+    MatrixPrep.prepareAttributesForDevice(data);
+
+    SkillsPrep.prepareSkills(data);
+    AttributesPrep.prepareAttributes(data);
+    LimitsPrep.prepareLimits(data);
+
+    MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
+
+    InitiativePrep.prepareCurrentInitiative(data);
+
+    data.special = 'resonance';
+}
 /**
  * Prepare a Sprite Type of Actor
  */
-export class SpritePrep extends BaseActorPrep<SR5SpriteType, SpriteActorData> {
-    prepare() {
-        ModifiersPrep.prepareModifiers(this.data);
-        ModifiersPrep.clearAttributeMods(this.data);
-
-        SpritePrep.prepareSpriteData(this.data);
-        MatrixPrep.prepareAttributesForDevice(this.data);
-
-        SkillsPrep.prepareSkills(this.data);
-        AttributesPrep.prepareAttributes(this.data);
-        LimitsPrep.prepareLimits(this.data);
-
-        MatrixPrep.prepareMatrixToLimitsAndAttributes(this.data);
-
-        InitiativePrep.prepareCurrentInitiative(this.data);
-
-        this.data.special = 'resonance';
-    }
-
+export class SpritePrep {
     /**
      * Prepares basic Sprite specific data
      * - matrix attribute values

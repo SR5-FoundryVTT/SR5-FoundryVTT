@@ -10,8 +10,9 @@ import TechnologyData = Shadowrun.TechnologyData;
 import CritterPowerRange = Shadowrun.CritterPowerRange;
 import SpellRange = Shadowrun.SpellRange;
 import RangeWeaponData = Shadowrun.RangeWeaponData;
+import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 
-export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
+export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     getType() {
         return this.data.type;
     }

@@ -3,7 +3,6 @@ import {Helpers} from '../helpers';
 import {SR5Item} from '../item/SR5Item';
 import {FLAGS, SKILL_DEFAULT_NAME, SR, SYSTEM_NAME} from '../constants';
 import {PartsList} from '../parts/PartsList';
-import {ActorPrepFactory} from './prep/ActorPrepFactory';
 import {ShadowrunActorDialogs} from "../apps/dialogs/ShadowrunActorDialogs";
 import {createRollChatMessage} from "../chat";
 import {SR5Combat} from "../combat/SR5Combat";
@@ -19,7 +18,6 @@ import SkillRollOptions = Shadowrun.SkillRollOptions;
 import SkillField = Shadowrun.SkillField;
 import ModList = Shadowrun.ModList;
 import LimitField = Shadowrun.LimitField;
-import SR5ActorType = Shadowrun.SR5ActorType;
 import EdgeAttributeField = Shadowrun.EdgeAttributeField;
 import VehicleActorData = Shadowrun.VehicleData;
 import VehicleStat = Shadowrun.VehicleStat;
@@ -44,14 +42,17 @@ import {SkillRules} from "./SkillRules";
 import CharacterSkills = Shadowrun.CharacterSkills;
 import {SR5} from "../config";
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
+import {CharacterDataPrepare} from "./prep/CharacterPrep";
+import {SR5ItemDataWrapper} from "../item/SR5ItemDataWrapper";
+import {CritterDataPrepare} from "./prep/CritterPrep";
+import {SpiritDataPrepare} from "./prep/SpiritPrep";
+import {SpriteDataPrepare} from "./prep/SpritePrep";
+import {VehicleDataPreparation} from "./prep/VehiclePrep";
 
 
 export class SR5Actor2 extends Actor<ShadowrunActorData> {}
 
 export class SR5Actor extends Actor<ShadowrunActorData> {
-    // NOTE: Overwrite Actor.data additionally to extends Actor<T as SR5Actortype.Data: SR5ActorData> to still have
-    //       access to Actor.data.type checks.
-
     getOverwatchScore() {
         const os = this.getFlag(SYSTEM_NAME, 'overwatchScore');
         return os !== undefined ? os : 0;
@@ -94,10 +95,26 @@ export class SR5Actor extends Actor<ShadowrunActorData> {
         super.prepareDerivedData();
 
         // General actor data preparation has been moved to derived data, as it depends on prepared item data.
-        const actorData = this.data;
-        const prepper = ActorPrepFactory.Create(actorData);
-        if (prepper) {
-            prepper.prepare();
+
+        // @ts-ignore // TODO: foundry-vtt-types ShadowrunItemData comes in but isn't liked
+        const items = this.data.items.map((item) => new SR5ItemDataWrapper(item.data));
+        // TODO: TYPING: Test data prep for each actor type.
+        switch (this.data.type) {
+            case 'character':
+                CharacterDataPrepare(this.data.data, items);
+                break;
+            case "critter":
+                CritterDataPrepare(this.data.data, items);
+                break;
+            case "spirit":
+                SpiritDataPrepare(this.data.data, items);
+                break;
+            case "sprite":
+                SpriteDataPrepare(this.data.data, items);
+                break;
+            case "vehicle":
+                VehicleDataPreparation(this.data.data, items);
+                break;
         }
     }
 
@@ -159,6 +176,7 @@ export class SR5Actor extends Actor<ShadowrunActorData> {
         const usesLeft = edge.uses > 0 ? edge.uses : 0;
         const uses = Math.min(edge.value, usesLeft + by);
 
+        // @ts-ignore // TODO: foundry-vtt-types doesn't recognise Attributes.edge uses/max properties of EdgeAttributeField
         await this.update({'data.attributes.edge.uses': uses});
     }
 
@@ -1105,33 +1123,33 @@ export class SR5Actor extends Actor<ShadowrunActorData> {
 
     rollKnowledgeSkill(catId: string, skillId: string, options?: SkillRollOptions) {
         const category = duplicate(this.data.data.skills.knowledge[catId]);
-        const skill = duplicate(category.value[skillId]);
+        const skill = duplicate(category.value[skillId]) as SkillField;
         skill.attribute = category.attribute;
         skill.label = skill.name;
         return this.rollSkill(skill, options);
     }
 
     rollLanguageSkill(skillId: string, options?: SkillRollOptions) {
-        const skill = duplicate(this.data.data.skills.language.value[skillId]);
+        const skill = duplicate(this.data.data.skills.language.value[skillId]) as SkillField;
         skill.attribute = 'intuition';
         skill.label = skill.name;
         return this.rollSkill(skill, options);
     }
 
     rollActiveSkill(skillId: string, options?: SkillRollOptions) {
-        const skill = duplicate(this.data.data.skills.active[skillId]);
+        const skill = duplicate(this.data.data.skills.active[skillId]) as SkillField;
         return this.rollSkill(skill, options);
     }
 
     rollAttribute(attId, options?: ActorRollOptions) {
         let title = game.i18n.localize(SR5.attributes[attId]);
-        const att = duplicate(this.data.data.attributes[attId]);
-        const atts = duplicate(this.data.data.attributes);
+        const attribute = duplicate(this.data.data.attributes[attId]);
+        const attributes = duplicate(this.data.data.attributes) as Attributes;
         const parts = new PartsList<number>();
-        parts.addPart(att.label, att.value);
+        parts.addPart(attribute.label, attribute.value);
         let dialogData = {
-            attribute: att,
-            attributes: atts,
+            attribute: attribute,
+            attributes: attributes,
         };
         let cancel = true;
         renderTemplate('systems/shadowrun5e/dist/templates/rolls/single-attribute.html', dialogData).then((dlg) => {
@@ -1148,20 +1166,20 @@ export class SR5Actor extends Actor<ShadowrunActorData> {
                 close: async (html) => {
                     if (cancel) return;
 
-                    const att2Id: string = Helpers.parseInputToString($(html).find('[name=attribute2]').val());
-                    let att2: AttributeField | undefined = undefined;
-                    if (att2Id !== 'none') {
-                        att2 = atts[att2Id];
-                        if (att2?.label) {
-                            parts.addPart(att2.label, att2.value);
-                            const att2IdLabel = game.i18n.localize(SR5.attributes[att2Id]);
+                    const attribute2Id: string = Helpers.parseInputToString($(html).find('[name=attribute2]').val());
+                    let attribute2: AttributeField | undefined = undefined;
+                    if (attribute2Id !== 'none') {
+                        attribute2 = attributes[attribute2Id];
+                        if (attribute2?.label) {
+                            parts.addPart(attribute2.label, attribute2.value);
+                            const att2IdLabel = game.i18n.localize(SR5.attributes[attribute2Id]);
                             title += ` + ${att2IdLabel}`;
                         }
                     }
-                    if (att2Id === 'default') {
+                    if (attribute2Id === 'default') {
                         parts.addUniquePart('SR5.Defaulting', -1);
                     }
-                    this._addMatrixParts(parts, [att, att2]);
+                    this._addMatrixParts(parts, [attribute, attribute2]);
                     this._addGlobalParts(parts);
                     return ShadowrunRoller.advancedRoll({
                         event: options?.event,
@@ -1252,6 +1270,7 @@ export class SR5Actor extends Actor<ShadowrunActorData> {
                     parts: parts.list,
                     actor: actor,
                 }).then(() => {
+                    // @ts-ignore // TODO: foundry-vtt-types doesn't recognise Attributes.edge uses/max properties of EdgeAttributeField
                     actor.update({
                         'data.attributes.edge.uses': actor.getEdge().uses - 1,
                     });

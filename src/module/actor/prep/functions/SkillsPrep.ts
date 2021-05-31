@@ -3,12 +3,13 @@ import { Helpers } from '../../../helpers';
 import { PartsList } from '../../../parts/PartsList';
 import SkillField = Shadowrun.SkillField;
 import {SR5} from "../../../config";
+import ActorTypesData = Shadowrun.ActorTypesData;
 
 export class SkillsPrep {
     /**
      * Prepare actor data for skills
      */
-    static prepareSkills(data: SR5ActorData) {
+    static prepareSkills(data: ActorTypesData) {
         const { language, active, knowledge } = data.skills;
         if (language) {
             if (!language.value) {

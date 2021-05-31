@@ -1,4 +1,3 @@
-import { BaseActorPrep } from './BaseActorPrep';
 import { InitiativePrep } from './functions/InitiativePrep';
 import { ModifiersPrep } from './functions/ModifiersPrep';
 import { MatrixPrep } from './functions/MatrixPrep';
@@ -10,42 +9,40 @@ import { MovementPrep } from './functions/MovementPrep';
 import { WoundsPrep } from './functions/WoundsPrep';
 import { AttributesPrep } from './functions/AttributesPrep';
 import { NPCPrep } from './functions/NPCPrep';
-import SR5CharacterType = Shadowrun.SR5CharacterType;
-import CharacterActorData = Shadowrun.CharacterData;
+import CharacterData = Shadowrun.CharacterData;
+import {SR5ItemDataWrapper} from "../../item/SR5ItemDataWrapper";
 
-export class CharacterPrep extends BaseActorPrep<SR5CharacterType, CharacterActorData> {
-    prepare() {
-        ModifiersPrep.prepareModifiers(this.data);
-        ModifiersPrep.clearAttributeMods(this.data);
+export function CharacterDataPrepare(data: CharacterData, items: SR5ItemDataWrapper[]) {
+    ModifiersPrep.prepareModifiers(data);
+    ModifiersPrep.clearAttributeMods(data);
 
-        ItemPrep.prepareArmor(this.data, this.items);
-        ItemPrep.prepareBodyware(this.data, this.items);
+    ItemPrep.prepareArmor(data, items);
+    ItemPrep.prepareBodyware(data, items);
 
-        SkillsPrep.prepareSkills(this.data);
-        AttributesPrep.prepareAttributes(this.data);
+    SkillsPrep.prepareSkills(data);
+    AttributesPrep.prepareAttributes(data);
 
-        // NPCPrep is reliant to be called after AttributesPrep.
-        NPCPrep.prepareNPCData(this.data);
+    // NPCPrep is reliant to be called after AttributesPrep.
+    NPCPrep.prepareNPCData(data);
 
-        LimitsPrep.prepareLimitBaseFromAttributes(this.data);
-        LimitsPrep.prepareLimits(this.data);
+    LimitsPrep.prepareLimitBaseFromAttributes(data);
+    LimitsPrep.prepareLimits(data);
 
-        MatrixPrep.prepareMatrix(this.data, this.items);
-        MatrixPrep.prepareMatrixToLimitsAndAttributes(this.data);
+    MatrixPrep.prepareMatrix(data, items);
+    MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
 
-        if (this.data.is_npc && this.data.npc.is_grunt) {
-            ConditionMonitorsPrep.prepareGrunt(this.data);
-        } else {
-            ConditionMonitorsPrep.preparePhysical(this.data);
-            ConditionMonitorsPrep.prepareStun(this.data);
-        }
-
-        MovementPrep.prepareMovement(this.data);
-        WoundsPrep.prepareWounds(this.data);
-
-        InitiativePrep.prepareMeatspaceInit(this.data);
-        InitiativePrep.prepareAstralInit(this.data);
-        InitiativePrep.prepareMatrixInit(this.data);
-        InitiativePrep.prepareCurrentInitiative(this.data);
+    if (data.is_npc && data.npc.is_grunt) {
+        ConditionMonitorsPrep.prepareGrunt(data);
+    } else {
+        ConditionMonitorsPrep.preparePhysical(data);
+        ConditionMonitorsPrep.prepareStun(data);
     }
+
+    MovementPrep.prepareMovement(data);
+    WoundsPrep.prepareWounds(data);
+
+    InitiativePrep.prepareMeatspaceInit(data);
+    InitiativePrep.prepareAstralInit(data);
+    InitiativePrep.prepareMatrixInit(data);
+    InitiativePrep.prepareCurrentInitiative(data);
 }
