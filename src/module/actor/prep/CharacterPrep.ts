@@ -11,7 +11,7 @@ import { WoundsPrep } from './functions/WoundsPrep';
 import { AttributesPrep } from './functions/AttributesPrep';
 import { NPCPrep } from './functions/NPCPrep';
 import SR5CharacterType = Shadowrun.SR5CharacterType;
-import CharacterActorData = Shadowrun.CharacterActorData;
+import CharacterActorData = Shadowrun.CharacterData;
 
 export class CharacterPrep extends BaseActorPrep<SR5CharacterType, CharacterActorData> {
     prepare() {

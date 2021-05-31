@@ -2,7 +2,7 @@
 
 declare namespace Shadowrun {
     export type SR5VehicleType = SR5ActorBase & {
-        data: VehicleActorData;
+        data: VehicleData;
         type: 'vehicle';
     };
 
@@ -14,7 +14,7 @@ declare namespace Shadowrun {
 
     export type VehicleEnvironment = 'speed' | 'handling';
 
-    export type VehicleActorData = ArmorActorData &
+    export type VehicleData = ArmorActorData &
         MatrixActorData &
         MovementActorData &
         PhysicalTrackActorData & {

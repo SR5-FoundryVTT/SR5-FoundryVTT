@@ -1,5 +1,5 @@
 import { BaseActorPrep } from './BaseActorPrep';
-import SpiritActorData = Shadowrun.SpiritActorData;
+import SpiritActorData = Shadowrun.SpiritData;
 import SR5SpiritType = Shadowrun.SR5SpiritType;
 import { SkillsPrep } from './functions/SkillsPrep';
 import { AttributesPrep } from './functions/AttributesPrep';

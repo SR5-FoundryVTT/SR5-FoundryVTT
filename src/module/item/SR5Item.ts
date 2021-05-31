@@ -52,6 +52,11 @@ import SpritePower = Shadowrun.SpritePower;
 import {ItemAction} from "./ItemAction";
 import {SkillFlow} from "../actor/SkillFlow";
 import {SR5} from "../config";
+import ShadowrunItemData = Shadowrun.ShadowrunItemData;
+
+export class SR5Item2 extends Item<ShadowrunItemData> {
+
+}
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
@@ -67,19 +72,24 @@ import {SR5} from "../config";
  *
  *       Be wary of SR5Item.actor for this reason!
  */
-export class SR5Item extends Item {
-    // TODO: TYPE: In contrast to SR5Actor we can only type Item.data as the typing structure for ItemData doesn't have
-    //       monolithic Item.data.data typing (SR5ActorData) but only one for each Item type. Therefore we can't
-    //       do extends Item<SR5ItemData> as we can with the SR5Actor class.
-    // data: SR5ItemType;
+export class SR5Item extends Item<ShadowrunItemData> {
+    // Item.items isn't the Foundry default ItemCollection but is overwritten within prepareEmbeddedEntities
+    // to allow for embedded items in items in actors.
     items: SR5Item[];
 
+    // Item Sheet labels for quick info on an item dropdown.
     labels: {} = {};
 
 
+    /**
+     * Return the owner of this item, which can either be
+     * - an actor instance (Foundry default)
+     * - an item instance (shadowrun custom) for embedded items
+     *
+     * If you need the actual actor owner, no matter how deep into item embedding, this current item is use SR5item.actorOwner
+     */
     // @ts-ignore // TODO: TYPE: Check foundry-vtt-types systems for how Items and Actors type.
     get actor(): SR5Actor {
-        this.data.data.skills
         return super.actor as unknown as SR5Actor;
     }
 

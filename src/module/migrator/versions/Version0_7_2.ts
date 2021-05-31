@@ -32,7 +32,7 @@ export class Version0_7_2 extends VersionMigration {
     }
 
     static UnsupportedMetatype(actorData: SR5ActorBase): boolean {
-        // TODO: Check on CharacterActorData.metatype typing (see ts-ignore)
+        // TODO: Check on CharacterData.metatype typing (see ts-ignore)
         //@ts-ignore // in-operator doesn't work here, as the underlying typing for metatype will result in string | number | undefined
         const type = actorData.data.metatype?.toLowerCase() ?? '';
         return actorData.type === 'character' &&
@@ -46,7 +46,7 @@ export class Version0_7_2 extends VersionMigration {
         } = {};
 
         if (Version0_7_2.UnsupportedMetatype(actorData)) {
-            // TODO: Check on CharacterActorData.metatype typing (see ts-ignore)
+            // TODO: Check on CharacterData.metatype typing (see ts-ignore)
             //@ts-ignore // in-operator doesn't work here, as the underlying typing for metatype will result in string | number | undefined
             const type = actorData.data.metatype?.toLowerCase() ?? '';
             // TODO: What to do with custom metatypes?

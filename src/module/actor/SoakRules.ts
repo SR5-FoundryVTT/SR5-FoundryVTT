@@ -6,7 +6,7 @@ import DamageData = Shadowrun.DamageData;
 import ActorArmorData = Shadowrun.ActorArmorData;
 import ModifiedDamageData = Shadowrun.ModifiedDamageData;
 import ModifiableValue = Shadowrun.ModifiableValue;
-import CharacterActorData = Shadowrun.CharacterActorData;
+import CharacterActorData = Shadowrun.CharacterData;
 import Spell = Shadowrun.Spell;
 
 /**

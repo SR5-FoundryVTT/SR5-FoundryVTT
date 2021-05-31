@@ -4,10 +4,10 @@ declare namespace Shadowrun {
     export type CritterType = keyof typeof SR5CONFIG.critterTypes;
 
     export type SR5CritterType = SR5ActorBase & {
-        data: CritterActorData;
+        data: CritterData;
         type: 'critter';
     };
-    export type CritterActorData = MagicActorData &
+    export type CritterData = MagicActorData &
         TwoTrackActorData &
         ArmorActorData &
         WoundsActorData &

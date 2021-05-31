@@ -10,7 +10,7 @@ import { MovementPrep } from './functions/MovementPrep';
 import { WoundsPrep } from './functions/WoundsPrep';
 import { AttributesPrep } from './functions/AttributesPrep';
 import SR5CritterType = Shadowrun.SR5CritterType;
-import CritterActorData = Shadowrun.CritterActorData;
+import CritterActorData = Shadowrun.CritterData;
 import SR5ActorData = Shadowrun.SR5ActorData;
 import TwoTrackActorData = Shadowrun.TwoTrackActorData;
 import {CharacterPrep} from "./CharacterPrep";

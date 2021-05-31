@@ -1,6 +1,6 @@
 import { BaseActorPrep } from './BaseActorPrep';
 import SR5VehicleType = Shadowrun.SR5VehicleType;
-import VehicleActorData = Shadowrun.VehicleActorData;
+import VehicleActorData = Shadowrun.VehicleData;
 import { SkillsPrep } from './functions/SkillsPrep';
 import { ModifiersPrep } from './functions/ModifiersPrep';
 import { InitiativePrep } from './functions/InitiativePrep';

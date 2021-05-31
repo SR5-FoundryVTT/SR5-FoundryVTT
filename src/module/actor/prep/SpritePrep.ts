@@ -1,6 +1,6 @@
 import { BaseActorPrep } from './BaseActorPrep';
 import SR5SpriteType = Shadowrun.SR5SpriteType;
-import SpriteActorData = Shadowrun.SpriteActorData;
+import SpriteActorData = Shadowrun.SpriteData;
 import { SkillsPrep } from './functions/SkillsPrep';
 import { ModifiersPrep } from './functions/ModifiersPrep';
 import { InitiativePrep } from './functions/InitiativePrep';

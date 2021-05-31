@@ -21,7 +21,7 @@ import ModList = Shadowrun.ModList;
 import LimitField = Shadowrun.LimitField;
 import SR5ActorType = Shadowrun.SR5ActorType;
 import EdgeAttributeField = Shadowrun.EdgeAttributeField;
-import VehicleActorData = Shadowrun.VehicleActorData;
+import VehicleActorData = Shadowrun.VehicleData;
 import VehicleStat = Shadowrun.VehicleStat;
 import Attributes = Shadowrun.Attributes;
 import Limits = Shadowrun.Limits;
@@ -30,7 +30,7 @@ import TrackType = Shadowrun.TrackType;
 import OverflowTrackType = Shadowrun.OverflowTrackType;
 import SpellDefenseOptions = Shadowrun.SpellDefenseOptions;
 import NumberOrEmpty = Shadowrun.NumberOrEmpty;
-import CharacterActorData = Shadowrun.CharacterActorData;
+import CharacterActorData = Shadowrun.CharacterData;
 import SR5VehicleType = Shadowrun.SR5VehicleType;
 import VehicleStats = Shadowrun.VehicleStats;
 import SR5CharacterType = Shadowrun.SR5CharacterType;
@@ -43,8 +43,12 @@ import Skills = Shadowrun.Skills;
 import {SkillRules} from "./SkillRules";
 import CharacterSkills = Shadowrun.CharacterSkills;
 import {SR5} from "../config";
+import ShadowrunActorData = Shadowrun.ShadowrunActorData;
 
-export class SR5Actor extends Actor<SR5ActorType> {
+
+export class SR5Actor2 extends Actor<ShadowrunActorData> {}
+
+export class SR5Actor extends Actor<ShadowrunActorData> {
     // NOTE: Overwrite Actor.data additionally to extends Actor<T as SR5Actortype.Data: SR5ActorData> to still have
     //       access to Actor.data.type checks.
 

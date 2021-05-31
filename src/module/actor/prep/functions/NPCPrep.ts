@@ -1,4 +1,4 @@
-import CharacterActorData = Shadowrun.CharacterActorData;
+import CharacterActorData = Shadowrun.CharacterData;
 import {DataTemplates} from "../../../dataTemplates";
 import {METATYPEMODIFIER} from "../../../constants";
 import {PartsList} from "../../../parts/PartsList";

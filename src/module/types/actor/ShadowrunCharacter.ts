@@ -42,16 +42,16 @@ declare namespace Shadowrun {
 
 
     export type SR5CharacterType = SR5ActorBase & {
-        data: CharacterActorData;
+        data: CharacterData;
         type: 'character';
     };
 
     export type SR5ActorData =
-        SpiritActorData
-        | CharacterActorData
-        | SpriteActorData
-        | VehicleActorData
-        | CritterActorData;
+        SpiritData
+        | CharacterData
+        | SpriteData
+        | VehicleData
+        | CritterData;
 
     export type CharacterSkills = {
         active: Skills;
@@ -59,7 +59,7 @@ declare namespace Shadowrun {
         knowledge: KnowledgeSkills;
     }
 
-    export type CharacterActorData =
+    export type CharacterData =
         MatrixActorData &
         TwoTrackActorData &
         ArmorActorData &
