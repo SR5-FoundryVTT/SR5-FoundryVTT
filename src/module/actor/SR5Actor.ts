@@ -49,9 +49,6 @@ import {SpiritDataPrepare} from "./prep/SpiritPrep";
 import {SpriteDataPrepare} from "./prep/SpritePrep";
 import {VehicleDataPreparation} from "./prep/VehiclePrep";
 
-
-export class SR5Actor2 extends Actor<ShadowrunActorData> {}
-
 export class SR5Actor extends Actor<ShadowrunActorData> {
     getOverwatchScore() {
         const os = this.getFlag(SYSTEM_NAME, 'overwatchScore');
@@ -90,6 +87,9 @@ export class SR5Actor extends Actor<ShadowrunActorData> {
 
     /**
      * prepare embedded entities. Check ClientDocumentMixin.prepareData for order of data prep.
+     *
+     * At the moment general actor data preparation has been moved to derived data preparation, due it's dependence
+     * on prepareEmbeddedEntities and prepareEmbeddedItems for items modifying attribute values and more.
      */
     prepareDerivedData() {
         super.prepareDerivedData();
@@ -98,7 +98,6 @@ export class SR5Actor extends Actor<ShadowrunActorData> {
 
         // @ts-ignore // TODO: foundry-vtt-types ShadowrunItemData comes in but isn't liked
         const items = this.data.items.map((item) => new SR5ItemDataWrapper(item.data));
-        // TODO: TYPING: Test data prep for each actor type.
         switch (this.data.type) {
             case 'character':
                 CharacterDataPrepare(this.data.data, items);

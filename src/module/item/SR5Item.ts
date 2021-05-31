@@ -54,10 +54,6 @@ import {SkillFlow} from "../actor/SkillFlow";
 import {SR5} from "../config";
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 
-export class SR5Item2 extends Item<ShadowrunItemData> {
-
-}
-
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
  *
