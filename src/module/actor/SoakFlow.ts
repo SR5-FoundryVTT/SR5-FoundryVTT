@@ -11,6 +11,7 @@ import DamageType = Shadowrun.DamageType;
 import {PartsList} from "../parts/PartsList";
 import {DefaultValues} from "../dataTemplates";
 import { ShadowrunActorDialogs } from '../apps/dialogs/ShadowrunActorDialogs';
+import {SR5Item} from '../item/SR5Item';
 
 export class SoakFlow {
 
@@ -55,12 +56,46 @@ export class SoakFlow {
         modified = SoakRules.reduceDamage(actor, modified, roll.hits).modified;
         const incAndModDamage = {incoming, modified};
 
-        await createRollChatMessage({title, roll, actor, damage: incAndModDamage});
+        const options = {title, roll, actor, damage: incAndModDamage};
+        if (this.knocksDown(modified, actor)) {
+            options["knockedDown"] = true;
+        }
+        await createRollChatMessage(options);
 
         return roll;
     }
 
-    private async promptDamageData(soakRollOptions: SoakRollOptions, soakDefenseParts: PartsList<number>)
+    private knocksDown(damage: DamageData, actor:SR5Actor) {
+        // TODO: SR5 195 Called Shot Knock Down (Melee Only), requires attacker STR and actually announcing that called shot.
+        const gelRoundsEffect = this.isDamageFromGelRounds(damage) ? -2 : 0;  // SR5 434
+        const impactDispersionEffect = this.isDamageFromImpactDispersion(damage) ? -2 : 0  // FA 52
+        const limit = actor.getLimit('physical');
+        const effectiveLimit = limit.value + gelRoundsEffect + impactDispersionEffect
+        // SR5 194
+        return damage.value > effectiveLimit || damage.value >= 10;
+    }
+
+    private isDamageFromGelRounds(damage: DamageData) {
+        if (damage.source && damage.source.actorId && damage.source.itemId) {
+            const attacker = game.actors.find(actor => actor.id == damage.source?.actorId);
+            if (attacker) {
+                const item = attacker.items.find(item => item.id == damage.source?.itemId);
+                if (item) {
+                    return (item as SR5Item).items
+                        .filter(mod => mod.getTechnology()?.equipped)
+                        .filter(tech => tech.name == game.i18n.localize("SR5.AmmoGelRounds")).length > 0;
+                }
+            }
+        }
+        return false;
+    }
+
+    private isDamageFromImpactDispersion(damage: DamageData) {
+        // TODO: FA 52. Ammo currently cannot have mods, so not sure how to implement Alter Ballistics idiomatically.
+        return false;
+    }
+
+    private async promptDamageData(soakRollOptions: SoakRollOptions, soakDefenseParts: PartsList<number>) 
         : Promise<DamageData | undefined> {
 
         // Ask user for incoming damage, ap and element
@@ -75,7 +110,6 @@ export class SoakFlow {
 
         return this.updateDamageWithUserData(initialDamageData, userData.incomingDamage, userData.damageType, userData.ap, userData.element);
     }
-
 
     private updateDamageWithUserData(initialDamageData: DamageData, incomingDamage : number, damageType : DamageType, ap: number, element: string) {
         const damageData = duplicate(initialDamageData) as DamageData;
