@@ -79,9 +79,10 @@ export class SoakFlow {
         if (damage.source && damage.source.actorId && damage.source.itemId) {
             const attacker = game.actors.find(actor => actor.id == damage.source?.actorId);
             if (attacker) {
-                const item = attacker.items.find(item => item.id == damage.source?.itemId);
+                // TODO: foundry-vtt-types Resolve attacker.items not matching with SR5Item[].
+                const item = attacker.items.find(item => item.id == damage.source?.itemId) as unknown as SR5Item;
                 if (item) {
-                    return (item as SR5Item).items
+                    return item.items
                         .filter(mod => mod.getTechnology()?.equipped)
                         .filter(tech => tech.name == game.i18n.localize("SR5.AmmoGelRounds")).length > 0;
                 }
@@ -95,7 +96,7 @@ export class SoakFlow {
         return false;
     }
 
-    private async promptDamageData(soakRollOptions: SoakRollOptions, soakDefenseParts: PartsList<number>) 
+    private async promptDamageData(soakRollOptions: SoakRollOptions, soakDefenseParts: PartsList<number>)
         : Promise<DamageData | undefined> {
 
         // Ask user for incoming damage, ap and element
