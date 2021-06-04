@@ -28,7 +28,8 @@ export class CharacterImporter {
         const updatedActorData = new CharacterInfoUpdater().update(actor.data, chummerCharacter);
         const items = new ItemsParser().parse(chummerCharacter, importOptions);
 
+
         await actor.update(updatedActorData);
-        await actor.createEmbeddedEntity('OwnedItem', items);
+        await actor.createEmbeddedDocuments('Item', items);
     }
 }

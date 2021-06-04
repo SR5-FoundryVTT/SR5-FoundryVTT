@@ -365,10 +365,12 @@ export const addRollListeners = (app: ChatMessage, html) => {
             actor.sheet.render(true);
         } else if (type === 'Item') {
             const card = documentLink.closest('.chat-card');
+
+            // The item can either be owned by a Token actor or a Collection actor.
             const sceneTokenId = card.data('tokenId');
 
             const actor = Helpers.getSceneTokenActor(sceneTokenId);
-            const item = actor.getOwnedItem(id);
+            const item = actor?.items.get(id);
             if (!item) return;
             // @ts-ignore
             item.sheet.render(true);
