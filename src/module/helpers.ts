@@ -15,6 +15,7 @@ import {DataTemplates} from "./dataTemplates";
 import {DeleteConfirmationDialog} from "./apps/dialogs/DeleteConfirmationDialog";
 import { SR5Item } from './item/SR5Item';
 import Skills = Shadowrun.Skills;
+import {ShadowrunRoll} from "./rolls/ShadowrunRoller";
 
 interface CalcTotalOptions {
     min?: number,
@@ -633,5 +634,26 @@ export class Helpers {
     static getSkillLabelOrName(skill: SkillField): string {
         // Custom skills don't have labels, use their name instead.
         return skill.label ? game.i18n.localize(skill.label) : skill.name || '';
+    }
+
+
+    /**
+     * Support for the Dice So Nice module
+     *
+     * Dice So Nice Roll API: https://gitlab.com/riccisi/foundryvtt-dice-so-nice/-/wikis/API/Roll
+     *
+     * @param roll The roll thrown.
+     * @param whisper The user ids the roll should be shown to. Null for show all.
+     * @param blind Is the roll blind to current user?
+     *
+     */
+    static async showDiceSoNice(roll: ShadowrunRoll, whisper: string[] = null, blind: boolean = false) {
+        if (!game.dice3d) return;
+        // @ts-ignore
+        const synchronize = whisper?.length === 0 || whisper === null;
+        // @ts-ignore
+        whisper = whisper?.length > 0 ? whisper : null;
+        // @ts-ignore
+        await game.dice3d.showForRoll(roll, game.user, synchronize, whisper, blind);
     }
 }
