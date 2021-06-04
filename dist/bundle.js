@@ -16122,9 +16122,40 @@ class SoakFlow {
             let modified = SoakRules_1.SoakRules.modifyDamageType(incoming, actor);
             modified = SoakRules_1.SoakRules.reduceDamage(actor, modified, roll.hits).modified;
             const incAndModDamage = { incoming, modified };
-            yield chat_1.createRollChatMessage({ title, roll, actor, damage: incAndModDamage });
+            const options = { title, roll, actor, damage: incAndModDamage };
+            if (this.knocksDown(modified, actor)) {
+                options["knockedDown"] = true;
+            }
+            yield chat_1.createRollChatMessage(options);
             return roll;
         });
+    }
+    knocksDown(damage, actor) {
+        // TODO: SR5 195 Called Shot Knock Down (Melee Only), requires attacker STR and actually announcing that called shot.
+        const gelRoundsEffect = this.isDamageFromGelRounds(damage) ? -2 : 0; // SR5 434
+        const impactDispersionEffect = this.isDamageFromImpactDispersion(damage) ? -2 : 0; // FA 52
+        const limit = actor.getLimit('physical');
+        const effectiveLimit = limit.value + gelRoundsEffect + impactDispersionEffect;
+        // SR5 194
+        return damage.value > effectiveLimit || damage.value >= 10;
+    }
+    isDamageFromGelRounds(damage) {
+        if (damage.source && damage.source.actorId && damage.source.itemId) {
+            const attacker = game.actors.find(actor => { var _a; return actor.id == ((_a = damage.source) === null || _a === void 0 ? void 0 : _a.actorId); });
+            if (attacker) {
+                const item = attacker.items.find(item => { var _a; return item.id == ((_a = damage.source) === null || _a === void 0 ? void 0 : _a.itemId); });
+                if (item) {
+                    return item.items
+                        .filter(mod => { var _a; return (_a = mod.getTechnology()) === null || _a === void 0 ? void 0 : _a.equipped; })
+                        .filter(tech => tech.name == game.i18n.localize("SR5.AmmoGelRounds")).length > 0;
+                }
+            }
+        }
+        return false;
+    }
+    isDamageFromImpactDispersion(damage) {
+        // TODO: FA 52. Ammo currently cannot have mods, so not sure how to implement Alter Ballistics idiomatically.
+        return false;
     }
     promptDamageData(soakRollOptions, soakDefenseParts) {
         return __awaiter(this, void 0, void 0, function* () {

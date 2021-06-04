@@ -107,6 +107,12 @@
                 <span class="value">{{opposed.netHits}}</span>
             </div>
             {{/if}}
+            {{#if knockedDown}}
+            <div class="limit-line">
+                <span class="key">{{localize "SR5.Target"}}: </span>
+                <span class="value">{{localize "SR5.KnockedDown"}}</span>
+            </div>
+            {{/if}}
             {{#if combat}} {{#if combat.initiative}}
             <div class="category-line">
                 <span class="key">{{localize "SR5.Initiative"}}</span>
