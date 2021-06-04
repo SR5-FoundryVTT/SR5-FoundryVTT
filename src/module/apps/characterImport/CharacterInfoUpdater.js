@@ -77,7 +77,7 @@ export class CharacterInfoUpdater {
         // Name is required, so we need to always set something (even if the chummer field is empty)
         if (chummerChar.alias) {
             clonedActorData.name = chummerChar.alias;
-        } 
+        }
         else {
             clonedActorData.name = chummerChar.name ? chummerChar.name : '[Name not found]';
         }
@@ -169,7 +169,7 @@ export class CharacterInfoUpdater {
     importBio(actorDataData, chummerChar) {
         actorDataData.description.value = '';
 
-        // Chummer outputs html and wraps every section in <p> tags, 
+        // Chummer outputs html and wraps every section in <p> tags,
         // so we just concat everything with an additional linebreak in between
         if (chummerChar.description) {
             actorDataData.description.value += TextEditor.enrichHTML(chummerChar.description + '<br/>');
@@ -193,16 +193,17 @@ export class CharacterInfoUpdater {
         atts.forEach((att) => {
             try {
                 const attName = this.parseAttName(att.name);
-                if (attName) { 
+                if (attName) {
                     actorDataData.attributes[attName].base = this.parseAttBaseValue(att);
                 }
-                    
+
             } catch (e) {
                 console.error(`Error while parsing attributes ${e}`);
             }
         });
     }
 
+    // TODO: These modifiers are very unclear in how they're used here and where they come from.
     importInitiative(actorDataData, chummerChar) {
         try {
             actorDataData.modifiers.meat_initiative = chummerChar.initbonus;
@@ -227,7 +228,7 @@ export class CharacterInfoUpdater {
                         parsedSkill = {};
                         actorDataData.skills.language.value[id] = parsedSkill;
                         determinedGroup = 'language';
-                    } 
+                    }
                     else if (chummerSkill.knowledge && chummerSkill.knowledge.toLowerCase() === 'true') {
                         const category = chummerSkill.skillcategory_english;
                         parsedSkill = {};
@@ -246,7 +247,7 @@ export class CharacterInfoUpdater {
                                 skillCategory = actorDataData.skills.knowledge.interests.value;
                             if (skillCategory)
                                 skillCategory[id] = parsedSkill;
-                        } 
+                        }
                         else {
                             if (chummerSkill.attribute.toLowerCase() === 'int') {
                                 actorDataData.skills.knowledge.street.value[id] = parsedSkill;
@@ -256,7 +257,7 @@ export class CharacterInfoUpdater {
                             }
                         }
                         determinedGroup = 'knowledge';
-                    } 
+                    }
                     else {
                         let name = chummerSkill.name
                             .toLowerCase()

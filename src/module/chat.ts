@@ -82,6 +82,14 @@ async function createChatMessage(templateData, options?: ChatDataOptions): Promi
 
     if (!message) return null;
 
+    // Support for Dice So Nice module. This is necessary due to Foundry 0.8 removing support for hidden custom content
+    // roll type chat messages, which Dice So Nice hooks into for it's rolls.
+    // TODO: This might be removed if Foundry reverses the chat message type roll behavior of custom content being always visible.
+    if (game.dice3d && options.roll) {
+        // @ts-ignore // Note: While showDiceSoNice can be called async, where not doing so here to avoid stalling.
+        Helpers.showDiceSoNice(options.roll, chatData.whisper, chatData.blind);
+    }
+
     // Store data in chat message for later use (opposed tests)
     if (templateData.roll) await message.setFlag(SYSTEM_NAME, FLAGS.Roll, templateData.roll);
     if (templateData.attack) await message.setFlag(SYSTEM_NAME, FLAGS.Attack, templateData.attack);
@@ -351,16 +359,19 @@ export const addRollListeners = (app: ChatMessage, html) => {
             // @ts-ignore
             token.actor.sheet.render(true, {token});
         } else if (type === 'Actor') {
-            const actor = game.actors?.get(id);
+            const actor = game.actors.get(id);
             if (!actor) return;
             // @ts-ignore
             actor.sheet.render(true);
         } else if (type === 'Item') {
             const card = documentLink.closest('.chat-card');
-            const sceneTokenId = card.data('tokenId');
 
-            const actor = Helpers.getSceneTokenActor(sceneTokenId);
-            const item = actor.getOwnedItem(id);
+            // The item can either be owned by a Token actor or a Collection actor.
+            const sceneTokenId = card.data('tokenId');
+            const actorId = card.data('actorId');
+
+            const actor = sceneTokenId ? Helpers.getSceneTokenActor(sceneTokenId) : game.actors.get(actorId);
+            const item = actor?.items.get(id);
             if (!item) return;
             // @ts-ignore
             item.sheet.render(true);

@@ -18283,7 +18283,7 @@ var CharacterImporter = /*#__PURE__*/function () {
 
               case 12:
                 _context.next = 14;
-                return actor.createEmbeddedEntity('OwnedItem', items);
+                return actor.createEmbeddedDocuments('Item', items);
 
               case 14:
               case "end":
@@ -18503,7 +18503,7 @@ var CharacterInfoUpdater = /*#__PURE__*/function () {
   }, {
     key: "importBio",
     value: function importBio(actorDataData, chummerChar) {
-      actorDataData.description.value = ''; // Chummer outputs html and wraps every section in <p> tags, 
+      actorDataData.description.value = ''; // Chummer outputs html and wraps every section in <p> tags,
       // so we just concat everything with an additional linebreak in between
 
       if (chummerChar.description) {
@@ -18539,7 +18539,8 @@ var CharacterInfoUpdater = /*#__PURE__*/function () {
           console.error("Error while parsing attributes ".concat(e));
         }
       });
-    }
+    } // TODO: These modifiers are very unclear in how they're used here and where they come from.
+
   }, {
     key: "importInitiative",
     value: function importInitiative(actorDataData, chummerChar) {
@@ -21113,6 +21114,13 @@ function createChatMessage(templateData, options) {
         const message = yield ChatMessage.create(chatData);
         if (!message)
             return null;
+        // Support for Dice So Nice module. This is necessary due to Foundry 0.8 removing support for hidden custom content
+        // roll type chat messages, which Dice So Nice hooks into for it's rolls.
+        // TODO: This might be removed if Foundry reverses the chat message type roll behavior of custom content being always visible.
+        if (game.dice3d && options.roll) {
+            // @ts-ignore // Note: While showDiceSoNice can be called async, where not doing so here to avoid stalling.
+            helpers_1.Helpers.showDiceSoNice(options.roll, chatData.whisper, chatData.blind);
+        }
         // Store data in chat message for later use (opposed tests)
         if (templateData.roll)
             yield message.setFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.Roll, templateData.roll);
@@ -21331,7 +21339,6 @@ const addRollListeners = (app, html) => {
     /** Open the sheets of different document types based on the chat card.
      */
     html.on('click', '.chat-document-link', event => {
-        var _a;
         event.preventDefault();
         if (!game || !game.ready || !canvas || !canvas.ready)
             return;
@@ -21348,7 +21355,7 @@ const addRollListeners = (app, html) => {
             token.actor.sheet.render(true, { token });
         }
         else if (type === 'Actor') {
-            const actor = (_a = game.actors) === null || _a === void 0 ? void 0 : _a.get(id);
+            const actor = game.actors.get(id);
             if (!actor)
                 return;
             // @ts-ignore
@@ -21356,9 +21363,11 @@ const addRollListeners = (app, html) => {
         }
         else if (type === 'Item') {
             const card = documentLink.closest('.chat-card');
+            // The item can either be owned by a Token actor or a Collection actor.
             const sceneTokenId = card.data('tokenId');
-            const actor = helpers_1.Helpers.getSceneTokenActor(sceneTokenId);
-            const item = actor.getOwnedItem(id);
+            const actorId = card.data('actorId');
+            const actor = sceneTokenId ? helpers_1.Helpers.getSceneTokenActor(sceneTokenId) : game.actors.get(actorId);
+            const item = actor === null || actor === void 0 ? void 0 : actor.items.get(id);
             if (!item)
                 return;
             // @ts-ignore
@@ -24125,6 +24134,28 @@ class Helpers {
     static getSkillLabelOrName(skill) {
         // Custom skills don't have labels, use their name instead.
         return skill.label ? game.i18n.localize(skill.label) : skill.name || '';
+    }
+    /**
+     * Support for the Dice So Nice module
+     *
+     * Dice So Nice Roll API: https://gitlab.com/riccisi/foundryvtt-dice-so-nice/-/wikis/API/Roll
+     *
+     * @param roll The roll thrown.
+     * @param whisper The user ids the roll should be shown to. Null for show all.
+     * @param blind Is the roll blind to current user?
+     *
+     */
+    static showDiceSoNice(roll, whisper = null, blind = false) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!game.dice3d)
+                return;
+            // @ts-ignore
+            const synchronize = (whisper === null || whisper === void 0 ? void 0 : whisper.length) === 0 || whisper === null;
+            // @ts-ignore
+            whisper = (whisper === null || whisper === void 0 ? void 0 : whisper.length) > 0 ? whisper : null;
+            // @ts-ignore
+            yield game.dice3d.showForRoll(roll, game.user, synchronize, whisper, blind);
+        });
     }
 }
 exports.Helpers = Helpers;
@@ -27722,10 +27753,13 @@ const config_1 = require("../config");
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
  *
- * NOTE: taMiF here. It seems to me that the current approach to embedded items within items doesn't use foundry internal
- *       approach but instead overwrites it with using flags and storing / creating item from that flag.
- *       I'm not sure why the Foundry internal approach of Entity.createEmbeddedEntity didn't fit. However at the
- *       moment this means, that this.actor can actually be an SR5Actor as well as an SR5Item, depending on who
+ *       tamIf here: The current legacy embedded items approach has been cleaned up a bit but is still causing some issues
+ *       with typing and ease of use.
+ *
+ *       SR5Item.items currently overwrites foundries internal DocumentCollection mechanism of embedded documents. Partially
+ *       due to legacy reasons and since Foundry 0.8 SR5Item.update can't be used for embedded items in items anymore.
+ *
+ *        At the moment this means, that this.actor can actually be an SR5Actor as well as an SR5Item, depending on who
  *       'owns' the embedded item as they are created using Item.createOwned during the embedded item prep phase.
  *
  *       For this reason SR5Item.actorOwner has been introduced to allow access to the actual owning actor, no matter
@@ -31796,7 +31830,7 @@ class Template extends MeasuredTemplate {
         const templateShape = 'circle';
         const templateData = {
             t: templateShape,
-            user: (_a = game.user) === null || _a === void 0 ? void 0 : _a._id,
+            user: (_a = game.user) === null || _a === void 0 ? void 0 : _a.id,
             direction: 0,
             x: 0,
             y: 0,
@@ -31807,7 +31841,11 @@ class Template extends MeasuredTemplate {
         templateData['distance'] = blast === null || blast === void 0 ? void 0 : blast.radius;
         templateData['dropoff'] = blast === null || blast === void 0 ? void 0 : blast.dropoff;
         // @ts-ignore
-        const template = new this(templateData);
+        // TODO: Just trying stuff out.
+        // canvas.scene.createEmbeddedDocuments('MeasuredTemplate', [templateData]);
+        const document = new MeasuredTemplateDocument(templateData, { parent: canvas.scene });
+        // @ts-ignore
+        const template = new Template(document);
         template.item = item;
         template.onComplete = onComplete;
         return template;
@@ -31864,11 +31902,11 @@ class Template extends MeasuredTemplate {
                 return;
             // Confirm final snapped position
             const destination = canvas.grid.getSnappedPosition(this.x, this.y, 2);
-            this.data.x = destination.x;
-            this.data.y = destination.y;
+            // @ts-ignore // foundry-vtt-types 0.8 DocumentData support
+            this.data.update({ x: destination.x, y: destination.y });
             // Create the template
-            // @ts-ignore // TODO: TYPE: norrowed canvas away from null, yet it still complains about it.
-            canvas.scene.createEmbeddedEntity('MeasuredTemplate', this.data);
+            // @ts-ignore // foundry-vtt-types 0.8 support
+            canvas.scene.createEmbeddedDocuments('MeasuredTemplate', [this.data]);
         };
         // Rotate the template by 3 degree increments (mouse-wheel)
         handlers['mw'] = (event) => {
