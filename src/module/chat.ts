@@ -359,7 +359,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
             // @ts-ignore
             token.actor.sheet.render(true, {token});
         } else if (type === 'Actor') {
-            const actor = game.actors?.get(id);
+            const actor = game.actors.get(id);
             if (!actor) return;
             // @ts-ignore
             actor.sheet.render(true);
@@ -368,8 +368,9 @@ export const addRollListeners = (app: ChatMessage, html) => {
 
             // The item can either be owned by a Token actor or a Collection actor.
             const sceneTokenId = card.data('tokenId');
+            const actorId = card.data('actorId');
 
-            const actor = Helpers.getSceneTokenActor(sceneTokenId);
+            const actor = sceneTokenId ? Helpers.getSceneTokenActor(sceneTokenId) : game.actors.get(actorId);
             const item = actor?.items.get(id);
             if (!item) return;
             // @ts-ignore
