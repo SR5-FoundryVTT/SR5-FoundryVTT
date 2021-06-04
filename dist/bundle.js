@@ -16143,6 +16143,7 @@ class SoakFlow {
         if (damage.source && damage.source.actorId && damage.source.itemId) {
             const attacker = game.actors.find(actor => { var _a; return actor.id == ((_a = damage.source) === null || _a === void 0 ? void 0 : _a.actorId); });
             if (attacker) {
+                // TODO: foundry-vtt-types Resolve attacker.items not matching with SR5Item[].
                 const item = attacker.items.find(item => { var _a; return item.id == ((_a = damage.source) === null || _a === void 0 ? void 0 : _a.itemId); });
                 if (item) {
                     return item.items
