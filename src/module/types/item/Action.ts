@@ -3,8 +3,9 @@ declare namespace Shadowrun {
         type: 'action';
     };
 
-    export type ActionData = ActionPartData & DescriptionPartData;
-    export type ActionRollData = {
+    export interface ActionData extends ActionPartData, DescriptionPartData {}
+
+    export interface ActionRollData {
             type: string;
             category: string;
             attribute: ActorAttribute;
@@ -19,11 +20,11 @@ declare namespace Shadowrun {
             opposed: OpposedTestData;
             alt_mod: number;
             dice_pool_mod: ModList<number>;
-        };
+        }
 
-    export type ActionPartData = {
+    export interface ActionPartData {
         action: ActionRollData
-    };
+    }
 
     /**
      * Action limit data.

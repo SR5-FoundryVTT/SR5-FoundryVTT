@@ -370,7 +370,10 @@ export const addRollListeners = (app: ChatMessage, html) => {
             const sceneTokenId = card.data('tokenId');
             const actorId = card.data('actorId');
 
-            const actor = sceneTokenId ? Helpers.getSceneTokenActor(sceneTokenId) : game.actors.get(actorId);
+            // TODO: foundry-vtt-types SR5Actor doesn't fully mix between game.actors and actor.items
+            const actor = sceneTokenId ? 
+                Helpers.getSceneTokenActor(sceneTokenId) : 
+                game.actors.get(actorId) as SR5Actor;
             const item = actor?.items.get(id);
             if (!item) return;
             // @ts-ignore

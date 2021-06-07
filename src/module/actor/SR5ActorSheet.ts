@@ -12,6 +12,8 @@ import Skills = Shadowrun.Skills;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import SkillField = Shadowrun.SkillField;
 import DeviceData = Shadowrun.DeviceData;
+import ShadowrunActorData = Shadowrun.ShadowrunActorData;
+import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
@@ -22,7 +24,7 @@ let globalSkillAppId: number = -1;
  * Extend the basic ActorSheet with some very simple modifications
  *
  */
-export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
+export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
     _shownDesc: string[];
     _filters: SR5SheetFilters;
     _scroll: string;

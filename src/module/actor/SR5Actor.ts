@@ -42,6 +42,7 @@ import {SkillRules} from "./SkillRules";
 import CharacterSkills = Shadowrun.CharacterSkills;
 import {SR5} from "../config";
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
+import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import {CharacterDataPrepare} from "./prep/CharacterPrep";
 import {SR5ItemDataWrapper} from "../item/SR5ItemDataWrapper";
 import {CritterDataPrepare} from "./prep/CritterPrep";
@@ -49,6 +50,8 @@ import {SpiritDataPrepare} from "./prep/SpiritPrep";
 import {SpriteDataPrepare} from "./prep/SpritePrep";
 import {VehicleDataPreparation} from "./prep/VehiclePrep";
 
+// TODO: foundry-vtt-types Actor<ShadowrunActorData, ShadowrunItemData> will cause build errors for unclear reasons.
+//       However the SR5Actor.items collections still seems correctly typed.
 export class SR5Actor extends Actor<ShadowrunActorData> {
     getOverwatchScore() {
         const os = this.getFlag(SYSTEM_NAME, 'overwatchScore');
