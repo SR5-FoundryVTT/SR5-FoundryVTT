@@ -1,5 +1,6 @@
 import { SR5Item } from './item/SR5Item';
 
+
 export default // @ts-ignore
 class Template extends MeasuredTemplate {
     x: number;
@@ -12,7 +13,7 @@ class Template extends MeasuredTemplate {
 
         const templateData = {
             t: templateShape,
-            user: game.user?._id,
+            user: game.user?.id,
             direction: 0,
             x: 0,
             y: 0,
@@ -24,7 +25,12 @@ class Template extends MeasuredTemplate {
         templateData['dropoff'] = blast?.dropoff;
 
         // @ts-ignore
-        const template = new this(templateData);
+        // TODO: Just trying stuff out.
+        // canvas.scene.createEmbeddedDocuments('MeasuredTemplate', [templateData]);
+
+        const document = new MeasuredTemplateDocument(templateData, {parent: canvas.scene});
+        // @ts-ignore
+        const template = new Template(document);
         template.item = item;
         template.onComplete = onComplete;
         return template;
@@ -83,12 +89,12 @@ class Template extends MeasuredTemplate {
 
             // Confirm final snapped position
             const destination = canvas.grid.getSnappedPosition(this.x, this.y, 2);
-            this.data.x = destination.x;
-            this.data.y = destination.y;
+            // @ts-ignore // foundry-vtt-types 0.8 DocumentData support
+            this.data.update({x: destination.x, y: destination.y});
 
             // Create the template
-            // @ts-ignore // TODO: TYPE: norrowed canvas away from null, yet it still complains about it.
-            canvas.scene.createEmbeddedEntity('MeasuredTemplate', this.data);
+            // @ts-ignore // foundry-vtt-types 0.8 support
+            canvas.scene.createEmbeddedDocuments('MeasuredTemplate', [this.data]);
         };
 
         // Rotate the template by 3 degree increments (mouse-wheel)

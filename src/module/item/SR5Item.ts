@@ -57,10 +57,13 @@ import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
  *
- * NOTE: taMiF here. It seems to me that the current approach to embedded items within items doesn't use foundry internal
- *       approach but instead overwrites it with using flags and storing / creating item from that flag.
- *       I'm not sure why the Foundry internal approach of Entity.createEmbeddedEntity didn't fit. However at the
- *       moment this means, that this.actor can actually be an SR5Actor as well as an SR5Item, depending on who
+ *       tamIf here: The current legacy embedded items approach has been cleaned up a bit but is still causing some issues
+ *       with typing and ease of use.
+ *
+ *       SR5Item.items currently overwrites foundries internal DocumentCollection mechanism of embedded documents. Partially
+ *       due to legacy reasons and since Foundry 0.8 SR5Item.update can't be used for embedded items in items anymore.
+ *
+ *        At the moment this means, that this.actor can actually be an SR5Actor as well as an SR5Item, depending on who
  *       'owns' the embedded item as they are created using Item.createOwned during the embedded item prep phase.
  *
  *       For this reason SR5Item.actorOwner has been introduced to allow access to the actual owning actor, no matter
