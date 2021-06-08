@@ -74,7 +74,7 @@ import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 export class SR5Item extends Item<ShadowrunItemData> {
     // Item.items isn't the Foundry default ItemCollection but is overwritten within prepareEmbeddedEntities
     // to allow for embedded items in items in actors.
-    items: SR5Item[];
+    ownedItems: SR5Item[];
 
     // Item Sheet labels for quick info on an item dropdown.
     labels: {} = {};
@@ -499,7 +499,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
     }
 
     getEquippedAmmo(): SR5Item {
-        const equippedAmmos = (this.items || []).filter((item) =>
+        const equippedAmmos = (this.ownedItems || []).filter((item) =>
             item.isAmmo() &&
             item.isEquipped());
 
@@ -508,7 +508,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
     }
 
     getEquippedMods(): SR5Item[] {
-        return (this.items || []).filter((item) =>
+        return (this.ownedItems || []).filter((item) =>
             item.isWeaponModification() &&
             item.isEquipped());
     }
@@ -563,7 +563,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
 
         await this.update(data);
 
-        const newAmmunition = (this.items || [])
+        const newAmmunition = (this.ownedItems || [])
             .filter((i) => i.data.type === 'ammo')
             .reduce((acc: Entity.Data[], item) => {
                 const ammoData = item.asAmmoData();
@@ -584,7 +584,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
 
     async equipAmmo(iid) {
         // only allow ammo that was just clicked to be equipped
-        const ammo = this.items
+        const ammo = this.ownedItems
             .filter((item) => item.type === 'ammo')
             .map((item) => {
                 const ownedItem = this.getOwnedItem(item.id);
@@ -935,14 +935,14 @@ export class SR5Item extends Item<ShadowrunItemData> {
         // Templates and further logic need a items HashMap, yet the flag provides an array.
         if (items) {
 
-            const existing = (this.items || []).reduce((object, i) => {
+            const existing = (this.ownedItems || []).reduce((object, i) => {
                 object[i.id] = i;
                 return object;
             }, {});
 
             // Merge possible changes / new items from the flag into the current item instance.
             // TODO: Foundry 0.8/0.9 Item.items is a map in Foundry but overwritten as an array here...
-            this.items = items.map((item) => {
+            this.ownedItems = items.map((item) => {
                 if (item._id in existing) {
                     const currentItem = existing[item._id];
 
@@ -963,7 +963,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
     }
 
     getOwnedItem(itemId): SR5Item | undefined {
-        const items = this.items;
+        const items = this.ownedItems;
         if (!items) return;
         return items.find((item) => item.id === itemId);
     }
