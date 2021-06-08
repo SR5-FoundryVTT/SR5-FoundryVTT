@@ -82,7 +82,7 @@ export class SoakFlow {
                 // TODO: foundry-vtt-types Resolve attacker.items not matching with SR5Item[].
                 const item = attacker.items.find(item => item.id == damage.source?.itemId) as unknown as SR5Item;
                 if (item) {
-                    return item.ownedItems
+                    return item.items
                         .filter(mod => mod.getTechnology()?.equipped)
                         .filter(tech => tech.name == game.i18n.localize("SR5.AmmoGelRounds")).length > 0;
                 }
