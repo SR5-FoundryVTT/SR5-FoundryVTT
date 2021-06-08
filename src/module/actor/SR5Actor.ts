@@ -53,6 +53,8 @@ import {VehicleDataPreparation} from "./prep/VehiclePrep";
 // TODO: foundry-vtt-types Actor<ShadowrunActorData, ShadowrunItemData> will cause build errors for unclear reasons.
 //       However the SR5Actor.items collections still seems correctly typed.
 export class SR5Actor extends Actor<ShadowrunActorData> {
+    // items: Collection<SR5Item>;
+
     getOverwatchScore() {
         const os = this.getFlag(SYSTEM_NAME, 'overwatchScore');
         return os !== undefined ? os : 0;
@@ -98,24 +100,23 @@ export class SR5Actor extends Actor<ShadowrunActorData> {
         super.prepareDerivedData();
 
         // General actor data preparation has been moved to derived data, as it depends on prepared item data.
-
-        // @ts-ignore // TODO: foundry-vtt-types ShadowrunItemData comes in but isn't liked
-        const items = this.data.items.map((item) => new SR5ItemDataWrapper(item.data));
+        // TODO: This is actually giving SR5Item instances and SR5ItemDataWrapper should acceppt those.
+        const itemDataWrappers = this.items.map((item) => new SR5ItemDataWrapper(item.data));
         switch (this.data.type) {
             case 'character':
-                CharacterDataPrepare(this.data.data, items);
+                CharacterDataPrepare(this.data.data, itemDataWrappers);
                 break;
             case "critter":
-                CritterDataPrepare(this.data.data, items);
+                CritterDataPrepare(this.data.data, itemDataWrappers);
                 break;
             case "spirit":
-                SpiritDataPrepare(this.data.data, items);
+                SpiritDataPrepare(this.data.data, itemDataWrappers);
                 break;
             case "sprite":
-                SpriteDataPrepare(this.data.data, items);
+                SpriteDataPrepare(this.data.data, itemDataWrappers);
                 break;
             case "vehicle":
-                VehicleDataPreparation(this.data.data, items);
+                VehicleDataPreparation(this.data.data, itemDataWrappers);
                 break;
         }
     }

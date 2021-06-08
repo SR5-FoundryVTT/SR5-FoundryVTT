@@ -1,8 +1,8 @@
 import { Parser } from '../Parser';
 import { ImportHelper } from '../../helper/ImportHelper';
-import SR5ItemType = Shadowrun.SR5ItemType;
+import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 
-export abstract class ItemParserBase<TResult extends SR5ItemType> extends Parser<TResult> {
+export abstract class ItemParserBase<TResult extends ShadowrunItemData> extends Parser<TResult> {
     Parse(jsonData: object, data: TResult, jsonTranslation?: object): TResult {
         data.name = ImportHelper.StringValue(jsonData, 'name');
 

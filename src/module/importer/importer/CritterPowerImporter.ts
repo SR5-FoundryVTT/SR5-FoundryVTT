@@ -3,7 +3,7 @@ import {ImportHelper} from '../helper/ImportHelper';
 import {CritterPowerParserBase} from '../parser/critter-power/CritterPowerParserBase';
 import {Constants} from './Constants';
 import {DefaultValues} from "../../dataTemplates";
-import CritterPower = Shadowrun.CritterPower;
+import CritterPowerItemData = Shadowrun.CritterPowerItemData;
 
 export class CritterPowerImporter extends DataImporter {
     public categoryTranslations: any;
@@ -14,7 +14,7 @@ export class CritterPowerImporter extends DataImporter {
         return jsonObject.hasOwnProperty('powers') && jsonObject['powers'].hasOwnProperty('power');
     }
 
-    GetDefaultData(): CritterPower {
+    GetDefaultData(): CritterPowerItemData {
         return {
             name: 'Unnamed Item',
             _id: '',
@@ -93,7 +93,7 @@ export class CritterPowerImporter extends DataImporter {
         const parser = new CritterPowerParserBase();
         const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Critter Powers`, true);
 
-        let datas: CritterPower[] = [];
+        let datas: CritterPowerItemData[] = [];
         let jsonDatas = jsonObject['powers']['power'];
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];

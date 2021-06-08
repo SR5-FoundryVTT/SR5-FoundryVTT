@@ -18,7 +18,6 @@ import ComplexFormLevelData = Shadowrun.ComplexFormLevelData;
 import FireRangeData = Shadowrun.FireRangeData;
 import BlastData = Shadowrun.BlastData;
 import ConditionData = Shadowrun.ConditionData;
-import SR5ItemType = Shadowrun.SR5ItemType;
 import ActionRollData = Shadowrun.ActionRollData;
 import DamageData = Shadowrun.DamageData;
 import DefenseRollOptions = Shadowrun.DefenseRollOptions;
@@ -27,32 +26,32 @@ import SpellData = Shadowrun.SpellData;
 import WeaponData = Shadowrun.WeaponData;
 import AmmoData = Shadowrun.AmmoData;
 import TechnologyPartData = Shadowrun.TechnologyPartData;
-import Sin = Shadowrun.Sin;
 import Weapon = Shadowrun.Weapon;
-import Ammo = Shadowrun.Ammo;
 import TechnologyData = Shadowrun.TechnologyData;
 import RangeWeaponData = Shadowrun.RangeWeaponData;
 import SpellRange = Shadowrun.SpellRange;
 import CritterPowerRange = Shadowrun.CritterPowerRange;
-import AdeptPower = Shadowrun.AdeptPower;
-import Modification = Shadowrun.Modification;
-import Action = Shadowrun.Action;
-import Armor = Shadowrun.Armor;
-import ComplexForm = Shadowrun.ComplexForm;
-import Contact = Shadowrun.Contact;
-import CritterPower = Shadowrun.CritterPower;
-import Cyberware = Shadowrun.Cyberware;
-import Device = Shadowrun.Device;
-import Equipment = Shadowrun.Equipment;
-import Lifestyle = Shadowrun.Lifestyle;
-import Program = Shadowrun.Program;
-import Quality = Shadowrun.Quality;
-import Spell = Shadowrun.Spell;
-import SpritePower = Shadowrun.SpritePower;
 import {ItemAction} from "./ItemAction";
 import {SkillFlow} from "../actor/SkillFlow";
 import {SR5} from "../config";
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
+import ActionItemData = Shadowrun.ActionItemData;
+import AdeptPowerItemData = Shadowrun.AdeptPowerItemData;
+import AmmoItemData = Shadowrun.AmmoItemData;
+import ArmorItemData = Shadowrun.ArmorItemData;
+import ComplexFormItemData = Shadowrun.ComplexFormItemData;
+import ContactItemData = Shadowrun.ContactItemData;
+import CritterPowerItemData = Shadowrun.CritterPowerItemData;
+import CyberwareItemData = Shadowrun.CyberwareItemData;
+import DeviceItemData = Shadowrun.DeviceItemData;
+import EquipmentItemData = Shadowrun.EquipmentItemData;
+import LifestyleItemData = Shadowrun.LifestyleItemData;
+import ModificationItemData = Shadowrun.ModificationItemData;
+import ProgramItemData = Shadowrun.ProgramItemData;
+import QualityItemData = Shadowrun.QualityItemData;
+import SinItemData = Shadowrun.SinItemData;
+import SpellItemData = Shadowrun.SpellItemData;
+import SpritePowerItemData = Shadowrun.SpritePowerItemData;
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
@@ -114,7 +113,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
 
     private get wrapper(): SR5ItemDataWrapper {
         // we need to cast here to unknown first to make ts happy
-        return new SR5ItemDataWrapper((this.data as unknown) as SR5ItemType);
+        return new SR5ItemDataWrapper((this.data as unknown) as ShadowrunItemData);
     }
 
     // Flag Functions
@@ -487,7 +486,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
 
         } else if (this.hasExplosiveAmmo()) {
             const ammo = this.getEquippedAmmo();
-            const ammoData = ammo.data as Ammo;
+            const ammoData = ammo.asAmmoData();
             const distance = ammoData.data.blast.radius;
             const dropoff = ammoData.data.blast.dropoff;
 
@@ -677,9 +676,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
         return this.wrapper.isSin();
     }
 
-    asSinData(): Sin | undefined {
+    asSinData(): SinItemData | undefined {
         if (this.isSin()) {
-            return this.data as Sin;
+            return this.data as SinItemData;
         }
     }
 
@@ -687,9 +686,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
         return this.wrapper.isLifestyle();
     }
 
-    asLifestyleData(): Lifestyle | undefined {
+    asLifestyleData(): LifestyleItemData | undefined {
         if (this.isLifestyle()) {
-            return this.data as Lifestyle;
+            return this.data as LifestyleItemData;
         }
     }
 
@@ -697,9 +696,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
         return this.wrapper.isAmmo();
     }
 
-    asAmmoData(): Ammo | undefined {
+    asAmmoData(): AmmoItemData | undefined {
         if (this.isAmmo()) {
-            return this.data as Ammo;
+            return this.data as AmmoItemData;
         }
     }
 
@@ -707,9 +706,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
         return this.wrapper.isModification();
     }
 
-    asModificationData(): Modification | undefined {
+    asModificationData(): ModificationItemData | undefined {
         if (this.isModification()) {
-            return this.data as Modification;
+            return this.data as ModificationItemData;
         }
     }
 
@@ -725,9 +724,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
         return this.wrapper.isProgram();
     }
 
-    asProgramData(): Program | undefined {
+    asProgramData(): ProgramItemData | undefined {
         if (this.isProgram()) {
-            return this.data as Program;
+            return this.data as ProgramItemData;
         }
     }
 
@@ -735,9 +734,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
         return this.wrapper.isQuality();
     }
 
-    asQualityData(): Quality | undefined {
+    asQualityData(): QualityItemData | undefined {
         if (this.isQuality()) {
-            return this.data as Quality;
+            return this.data as QualityItemData;
         }
     }
 
@@ -745,9 +744,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
         return this.data.type === 'adept_power';
     }
 
-    asAdeptPowerData(): AdeptPower|undefined {
+    asAdeptPowerData(): AdeptPowerItemData|undefined {
         if (this.isAdeptPower())
-            return this.data as AdeptPower;
+            return this.data as AdeptPowerItemData;
     }
 
     async removeLicense(index) {
@@ -762,9 +761,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
         return this.wrapper.isAction();
     }
 
-    asActionData(): Action | undefined {
+    asActionData(): ActionItemData | undefined {
         if (this.isAction()) {
-            return this.data as Action;
+            return this.data as ActionItemData;
         }
     }
 
@@ -1213,9 +1212,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
         return this.wrapper.isArmor();
     }
 
-    asArmorData(): Armor | undefined {
+    asArmorData(): ArmorItemData | undefined {
         if (this.isArmor()) {
-            return this.data as Armor;
+            return this.data as ArmorItemData;
         }
     }
 
@@ -1249,9 +1248,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
         return this.wrapper.isCyberware();
     }
 
-    asCyberwareData(): Cyberware | undefined {
+    asCyberwareData(): CyberwareItemData | undefined {
         if (this.isCyberware()) {
-            return this.data as Cyberware;
+            return this.data as CyberwareItemData;
         }
     }
 
@@ -1283,9 +1282,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
         return this.wrapper.isSpell();
     }
 
-    asSpellData(): Spell | undefined {
+    asSpellData(): SpellItemData | undefined {
         if (this.isSpell()) {
-            return this.data as Spell;
+            return this.data as SpellItemData;
         }
     }
 
@@ -1293,9 +1292,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
         return this.wrapper.isSpritePower();
     }
 
-    asSpritePowerData(): SpritePower | undefined {
+    asSpritePowerData(): SpritePowerItemData | undefined {
         if (this.isSpritePower()) {
-            return this.data as SpritePower;
+            return this.data as SpritePowerItemData;
         }
     }
 
@@ -1307,9 +1306,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
         return this.wrapper.isComplexForm();
     }
 
-    asComplexFormData(): ComplexForm | undefined {
+    asComplexFormData(): ComplexFormItemData | undefined {
         if (this.isComplexForm()) {
-            return this.data as ComplexForm;
+            return this.data as ComplexFormItemData;
         }
     }
 
@@ -1317,9 +1316,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
         return this.wrapper.isContact();
     }
 
-    asContactData(): Contact | undefined {
+    asContactData(): ContactItemData | undefined {
         if (this.isContact()) {
-            return this.data as Contact;
+            return this.data as ContactItemData;
         }
     }
 
@@ -1327,9 +1326,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
         return this.wrapper.isCritterPower();
     }
 
-    asCritterPowerData(): CritterPower | undefined {
+    asCritterPowerData(): CritterPowerItemData | undefined {
         if (this.isCritterPower()) {
-            return this.data as CritterPower;
+            return this.data as CritterPowerItemData;
         }
     }
 
@@ -1341,9 +1340,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
         return this.wrapper.isDevice();
     }
 
-    asDeviceData(): Device | undefined {
+    asDeviceData(): DeviceItemData | undefined {
         if (this.isDevice()) {
-            return this.data as Device;
+            return this.data as DeviceItemData;
         }
     }
 
@@ -1351,9 +1350,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
         return this.wrapper.isEquipment();
     }
 
-    asEquipmentData(): Equipment | undefined {
+    asEquipmentData(): EquipmentItemData | undefined {
         if (this.isEquipment()) {
-            return this.data as Equipment;
+            return this.data as EquipmentItemData;
         }
     }
 

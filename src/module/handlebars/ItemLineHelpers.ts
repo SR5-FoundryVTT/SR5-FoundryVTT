@@ -1,6 +1,6 @@
-import SR5ItemType = Shadowrun.SR5ItemType;
 import { SR5ItemDataWrapper } from '../item/SR5ItemDataWrapper';
 import {SR5} from "../config";
+import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 
 export const registerItemLineHelpers = () => {
     Handlebars.registerHelper('ItemHeaderIcons', function (id) {
@@ -207,7 +207,7 @@ export const registerItemLineHelpers = () => {
         }
     });
 
-    Handlebars.registerHelper('ItemRightSide', function (item: SR5ItemType) {
+    Handlebars.registerHelper('ItemRightSide', function (item: ShadowrunItemData) {
         const wrapper = new SR5ItemDataWrapper(item);
         const qtyInput = {
             input: {
@@ -376,7 +376,7 @@ export const registerItemLineHelpers = () => {
         }
     });
 
-    Handlebars.registerHelper('ItemIcons', function (item: SR5ItemType) {
+    Handlebars.registerHelper('ItemIcons', function (item: ShadowrunItemData) {
         const wrapper = new SR5ItemDataWrapper(item);
         const editIcon = {
             icon: 'fas fa-edit item-edit',

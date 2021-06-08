@@ -1,8 +1,8 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
-import Ammo = Shadowrun.Ammo;
 import WeaponData = Shadowrun.WeaponData;
+import AmmoItemData = Shadowrun.AmmoItemData;
 
 export class AmmoImporter extends DataImporter {
     public files = ['gear.xml'];
@@ -11,7 +11,7 @@ export class AmmoImporter extends DataImporter {
         return jsonObject.hasOwnProperty('gears') && jsonObject['gears'].hasOwnProperty('gear');
     }
 
-    GetDefaultData(): Ammo {
+    GetDefaultData(): AmmoItemData {
         return {
             name: '',
             _id: '',
@@ -72,7 +72,7 @@ export class AmmoImporter extends DataImporter {
     }
 
     async Parse(jsonObject: object): Promise<Entity> {
-        let ammoDatas: Ammo[] = [];
+        let ammoDatas: AmmoItemData[] = [];
         let jsonAmmos = jsonObject['gears']['gear'];
         for (let i = 0; i < jsonAmmos.length; i++) {
             let jsonData = jsonAmmos[i];

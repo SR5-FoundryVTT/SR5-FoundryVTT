@@ -1,9 +1,8 @@
 declare namespace Shadowrun {
-    export type Spell = SR5ItemData<SpellData> & {
-        type: 'spell';
-    };
-
-    export type SpellData = SpellPartData & DescriptionPartData & ActionPartData;
+    export type SpellData =
+        SpellPartData &
+        DescriptionPartData &
+        ActionPartData;
 
     export type SpellCateogry = 'combat' | 'detection' | 'health' | 'illusion' | 'manipulation' | '';
     export type SpellType = 'physical' | 'mana' | '';

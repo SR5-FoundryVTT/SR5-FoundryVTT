@@ -36,26 +36,45 @@ declare namespace Shadowrun {
         SpritePowerItemData |
         WeaponItemData;
 
-    export type ItemTypesData =
-        ActionData |
-        AdeptPowerData |
-        AmmoData |
-        ArmorData |
-        BiowareData |
-        ComplexFormData |
-        ContactData |
-        CritterPowerData |
-        CyberwareData |
-        DeviceData |
-        EquipmentData |
-        LifestyleData |
-        ModificationData |
-        ProgramData |
-        QualityData |
-        SinData |
-        SpellData |
-        SpritePowerData |
-        WeaponData;
+    /**
+     * The subset of items with technology data part.
+     */
+    export type ShadowrunTechnologyItemData =
+        AmmoItemData |
+        ArmorItemData |
+        DeviceItemData |
+        EquipmentItemData |
+        ModificationItemData |
+        ProgramItemData |
+        SinItemData |
+        WareItemData |
+        WeaponItemData;
+
+    /**
+     * The whole item data data as an inclusive union.
+     *
+     * At the moment this is only used for ShadowrunItemDataWrapper.getData to work a type narrowing rework.
+     */
+    export type ShadowrunItemDataData =
+        Partial<ActionData> &
+        Partial<AdeptPowerData> &
+        Partial<AmmoData> &
+        Partial<ArmorData> &
+        Partial<BiowareData> &
+        Partial<ComplexFormData> &
+        Partial<ContactData> &
+        Partial<CritterPowerData> &
+        Partial<CyberwareData> &
+        Partial<DeviceData> &
+        Partial<EquipmentData> &
+        Partial<LifestyleData> &
+        Partial<ModificationData> &
+        Partial<ProgramData> &
+        Partial<QualityData> &
+        Partial<SinData> &
+        Partial<SpellData> &
+        Partial<SpritePowerData> &
+        Partial<WeaponData>;
 
     // Setup your ItemData types below here. Try sorting your ItemData types alphabetically.
     export interface ActionItemData extends Item.Data<ActionData> {

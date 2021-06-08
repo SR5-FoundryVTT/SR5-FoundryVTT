@@ -1,8 +1,5 @@
 import { Helpers } from '../helpers';
 import { SR5Item } from './SR5Item';
-import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
-import {SR5Actor} from "../actor/SR5Actor";
-import SR5ItemType = Shadowrun.SR5ItemType;
 import {SR5} from "../config";
 
 /**

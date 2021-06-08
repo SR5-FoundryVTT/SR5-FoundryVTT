@@ -1,9 +1,7 @@
 declare namespace Shadowrun {
-    export type Lifestyle = SR5ItemData<LifestyleData> & {
-        type: 'lifestyle';
-    };
-
-    export type LifestyleData = LifestylePartData & DescriptionPartData;
+    export type LifestyleData =
+        LifestylePartData &
+        DescriptionPartData;
 
     export type LifestylePartData = {
         type: string;

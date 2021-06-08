@@ -1,10 +1,9 @@
 /// <reference path="../Shadowrun.ts" />
 declare namespace Shadowrun {
-    export type Device = SR5ItemData<DeviceData> & {
-        type: 'device';
-    };
-
-    export type DeviceData = DevicePartData & DescriptionPartData & TechnologyPartData;
+    export type DeviceData =
+        DevicePartData &
+        DescriptionPartData &
+        TechnologyPartData;
 
     export type DeviceCategory = 'commlink' | 'cyberdeck';
 

@@ -2,8 +2,8 @@ import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
 import { ComplexFormParserBase } from '../parser/complex-form/ComplexFormParserBase';
-import ComplexForm = Shadowrun.ComplexForm;
 import {DefaultValues} from "../../dataTemplates";
+import ComplexFormItemData = Shadowrun.ComplexFormItemData;
 
 export class ComplexFormImporter extends DataImporter {
     public categoryTranslations: any;
@@ -14,7 +14,7 @@ export class ComplexFormImporter extends DataImporter {
         return jsonObject.hasOwnProperty('complexforms') && jsonObject['complexforms'].hasOwnProperty('complexform');
     }
 
-    GetDefaultData(): ComplexForm {
+    GetDefaultData(): ComplexFormItemData {
         return {
             name: 'Unnamed Form',
             _id: '',
@@ -82,7 +82,7 @@ export class ComplexFormImporter extends DataImporter {
         const parser = new ComplexFormParserBase();
         const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Complex Forms`, true);
 
-        let datas: ComplexForm[] = [];
+        let datas: ComplexFormItemData[] = [];
         let jsonDatas = jsonObject['complexforms']['complexform'];
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];

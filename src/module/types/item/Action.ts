@@ -1,8 +1,4 @@
 declare namespace Shadowrun {
-    export type Action = SR5ItemData<ActionData> & {
-        type: 'action';
-    };
-
     export interface ActionData extends ActionPartData, DescriptionPartData {}
 
     export interface ActionRollData {
