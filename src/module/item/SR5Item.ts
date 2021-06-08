@@ -114,6 +114,8 @@ export class SR5Item extends Item<ShadowrunItemData> {
 
     private get wrapper(): SR5ItemDataWrapper {
         // we need to cast here to unknown first to make ts happy
+        const item = this.items.find(i => true);
+
         return new SR5ItemDataWrapper((this.data as unknown) as SR5ItemType);
     }
 
