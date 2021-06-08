@@ -6,7 +6,6 @@ import {PartsList} from '../parts/PartsList';
 import {ShadowrunActorDialogs} from "../apps/dialogs/ShadowrunActorDialogs";
 import {createRollChatMessage} from "../chat";
 import {SR5Combat} from "../combat/SR5Combat";
-import {Modifiers} from "../sr5/Modifiers";
 import {SoakFlow} from './SoakFlow';
 import {DefaultValues} from '../dataTemplates';
 import {SkillFlow} from "./SkillFlow";
@@ -31,7 +30,7 @@ import VehicleStats = Shadowrun.VehicleStats;
 import ActorArmorData = Shadowrun.ActorArmorData;
 import ConditionData = Shadowrun.ConditionData;
 import Skills = Shadowrun.Skills;
-import {SkillRules} from "./SkillRules";
+import {SkillRules} from "../rules/SkillRules";
 import CharacterSkills = Shadowrun.CharacterSkills;
 import {SR5} from "../config";
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
@@ -48,6 +47,7 @@ import SpriteActorData = Shadowrun.SpriteActorData;
 import VehicleData = Shadowrun.VehicleData;
 import VehicleActorData = Shadowrun.VehicleActorData;
 import CritterActorData = Shadowrun.CritterActorData;
+import {Modifiers} from "../rules/Modifiers";
 
 // TODO: foundry-vtt-types Actor<ShadowrunActorData, ShadowrunItemData> will cause build errors for unclear reasons.
 //       However the SR5Actor.items collections still seems correctly typed.

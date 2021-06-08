@@ -2,7 +2,7 @@ import SkillField = Shadowrun.SkillField;
 import { Helpers } from '../helpers';
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import SkillCategories = Shadowrun.SkillCategories;
-import {SkillRules} from "../actor/SkillRules";
+import {SkillRules} from "../rules/SkillRules";
 import {FLAGS, SYSTEM_NAME} from "../constants";
 
 export const registerSkillLineHelpers = () => {

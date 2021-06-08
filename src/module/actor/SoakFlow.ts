@@ -1,6 +1,6 @@
 import {ShadowrunRoll, ShadowrunRoller} from '../rolls/ShadowrunRoller';
 import {SR5Actor} from "./SR5Actor";
-import {SoakRules} from "./SoakRules";
+import {SoakRules} from "../rules/SoakRules";
 import { Helpers } from '../helpers';
 import SoakRollOptions = Shadowrun.SoakRollOptions;
 import ModList = Shadowrun.ModList;

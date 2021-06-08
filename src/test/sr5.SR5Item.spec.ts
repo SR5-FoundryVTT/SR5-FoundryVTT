@@ -1,5 +1,4 @@
 import {SR5Item} from "../module/item/SR5Item";
-import {Test} from "../module/rolls/ShadowrunRoller";
 
 export const shadowrunSR5Item = context => {
     /**

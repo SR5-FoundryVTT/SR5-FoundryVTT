@@ -1,5 +1,4 @@
-import {Modifiers} from "../module/sr5/Modifiers";
-
+import {Modifiers} from "../module/rules/Modifiers";
 
 export const shadowrunRulesModifiers = context => {
     const {describe, it, assert} = context;

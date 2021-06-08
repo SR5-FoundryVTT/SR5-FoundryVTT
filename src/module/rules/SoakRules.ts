@@ -1,4 +1,4 @@
-import { SR5Actor } from './SR5Actor';
+import { SR5Actor } from '../actor/SR5Actor';
 import { SR5 } from '../config';
 import { Helpers } from '../helpers';
 import { PartsList } from '../parts/PartsList';

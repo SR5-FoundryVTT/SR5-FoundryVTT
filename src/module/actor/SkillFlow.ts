@@ -1,5 +1,5 @@
 import SkillField = Shadowrun.SkillField;
-import {SkillRules} from "./SkillRules";
+import {SkillRules} from "../rules/SkillRules";
 import {PartsList} from "../parts/PartsList";
 import {FLAGS, SYSTEM_NAME} from "../constants";
 

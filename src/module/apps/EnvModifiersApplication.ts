@@ -1,8 +1,8 @@
 import {SYSTEM_NAME} from "../constants";
 import {Helpers} from "../helpers";
 import {SR5Actor} from "../actor/SR5Actor";
-import {Modifiers} from "../sr5/Modifiers";
 import EnvironmentalModifierCategories = Shadowrun.EnvironmentalModifierCategories;
+import {Modifiers} from "../rules/Modifiers";
 
 export type EnvModifiersTarget = Scene | SR5Actor;
 
