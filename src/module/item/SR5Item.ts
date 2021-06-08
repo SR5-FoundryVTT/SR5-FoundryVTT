@@ -463,8 +463,6 @@ export class SR5Item extends Item<ShadowrunItemData> {
             }
 
             // Extended spells have a longer range.
-            // TODO: data.extended is not defined in typing. It only exists under data.detection or data.action
-            // @ts-ignore
             if (data.extended) distance *= 10;
             const dropoff = 0;
 
@@ -939,8 +937,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
                 return object;
             }, {});
 
-            // Merge possible changes / new items from the flag into the current item instance.
-            // TODO: Foundry 0.8/0.9 Item.items is a map in Foundry but overwritten as an array here...
+            // Merge and overwrite existing owned items with new changes.
             this.items = items.map((item) => {
                 if (item._id in existing) {
                     const currentItem = existing[item._id];
@@ -954,7 +951,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
                     // NOTE: createdOwned expects an Actor instance as the second parameter.
                     //       HOWEVER the legacy approach for embeddedItems in other items relies upon this.actor
                     //       returning an SR5Item instance to call .updateEmbeddedEntities, when Foundry expects an actor
-                    //@ts-ignore
+                    //@ts-ignore // this should be an Actor instance, but we deliberately use an Item instance.
                     return Item.createOwned(item, this);
                 }
             });
@@ -967,7 +964,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
         return items.find((item) => item.id === itemId);
     }
 
-    // TODO: Foundry 0.8. Rework this method. It's complicated and obvious optimizations can be made. (find vs findIndex)
+    // TODO: Rework this method. It's complicated and obvious optimizations can be made. (find vs findIndex)
     async updateOwnedItem(changes) {
         const items = duplicate(this.getEmbeddedItems());
         if (!items) return;
@@ -977,7 +974,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
             const index = items.findIndex((i) => i._id === itemChanges._id);
             if (index === -1) return;
             const item = items[index];
-            // TODO: Foundry 0.8 made it necessary to add the _id field. Even so, don't change the id to avoid any byproducts.
+            // TODO: The _id field has been added by the system. Even so, don't change the id to avoid any byproducts.
             delete itemChanges._id;
 
             if (item) {
@@ -1523,7 +1520,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
     }
 
     get _isEmbeddedItem(): boolean {
-        // @ts-ignore // TODO: foundry-vtt-types Document hasn't be implemented yet
+        // @ts-ignore // TODO: foundry-vtt-types 0.8 Document hasn't be implemented yet
         return this.hasOwnProperty('parent') && this.parent instanceof SR5Item;
     }
 
@@ -1534,9 +1531,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
      */
     async updateEmbeddedItem(data): Promise<this> {
         // Inform the parent item about changes to one of it's embedded items.
-        // TODO: Foundry 0.8 updateOwnedItem needs the id of the update item. hand the item itself over, to the hack within updateOwnedItem for this.
+        // TODO: updateOwnedItem needs the id of the update item. hand the item itself over, to the hack within updateOwnedItem for this.
         data._id = this.id;
-        // @ts-ignore // TODO: foundry-vtt-types Document hasn't be implemented yet
+        // @ts-ignore // TODO: foundry-vtt-types 0.8 Document hasn't be implemented yet
         await this.parent.updateOwnedItem(data)
 
         // After updating all item embedded data, rerender the sheet to trigger the whole rerender workflow.

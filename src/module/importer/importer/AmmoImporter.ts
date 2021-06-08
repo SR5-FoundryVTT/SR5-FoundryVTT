@@ -71,7 +71,7 @@ export class AmmoImporter extends DataImporter {
         this.entryTranslations = ImportHelper.ExtractItemTranslation(jsonGeari18n, 'gears', 'gear');
     }
 
-    async Parse(jsonObject: object): Promise<Entity> {
+    async Parse(jsonObject: object): Promise<Item> {
         let ammoDatas: AmmoItemData[] = [];
         let jsonAmmos = jsonObject['gears']['gear'];
         for (let i = 0; i < jsonAmmos.length; i++) {
@@ -122,9 +122,7 @@ export class AmmoImporter extends DataImporter {
                     return item.type === 'weapon' && item.name.toLowerCase() === nameLower;
                 });
 
-                // @ts-ignore // TODO: TYPE: Remove this.
                 if (foundWeapon !== null && "action" in foundWeapon.data.data) {
-                    // @ts-ignore // TODO: TYPE: Remove this.
                     const weaponData = foundWeapon.data.data as WeaponData;
                     data.data.damage = weaponData.action.damage.value;
                     data.data.ap =weaponData.action.damage.ap.value;
@@ -152,7 +150,7 @@ export class AmmoImporter extends DataImporter {
             ammo.folder = folder.id;
         }
 
-        // @ts-ignore // TODO: TYPE: Remove this.
+        //@ts-ignore // TODO: TYPING unclear.
         return await Item.create(ammoDatas);
     }
 }

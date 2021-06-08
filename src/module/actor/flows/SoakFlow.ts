@@ -79,8 +79,7 @@ export class SoakFlow {
         if (damage.source && damage.source.actorId && damage.source.itemId) {
             const attacker = game.actors.find(actor => actor.id == damage.source?.actorId);
             if (attacker) {
-                // TODO: foundry-vtt-types Resolve attacker.items not matching with SR5Item[].
-                const item = attacker.items.find(item => item.id == damage.source?.itemId) as unknown as SR5Item;
+                const item = attacker.items.find(item => item.id == damage.source?.itemId) as SR5Item;
                 if (item) {
                     return item.items
                         .filter(mod => mod.getTechnology()?.equipped)

@@ -118,10 +118,9 @@ ___________________
 
     static canvasInit() {
         if (!canvas?.ready) return;
-        // @ts-ignore // TODO: TYPE: diagonaleRule doesn't exist on foundry-vtt-types anymore... does this even work anymore?
+        // @ts-ignore // TODO: foundry-vtt-types 0.8 diagonaleRule doesn't exist on  anymore... does this even work anymore?
         canvas.grid.diagonalRule = game.settings.get(SYSTEM_NAME, 'diagonalMovement');
-        //@ts-ignore
-        // SquareGrid isn't typed.
+        //@ts-ignore // TODO: TYPE SquareGrid isn't typed.
         SquareGrid.prototype.measureDistances = measureDistance;
     }
 

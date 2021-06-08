@@ -10,8 +10,6 @@
  *
  * Don't put property definitions here. Keep the top level definitions clean.
  *
- * TODO: Remove all none foundry-vtt-types with naming collision to the interfaces like WeaponActorData2
- * TODO: Remove all 2 names
  */
 declare namespace Shadowrun {
     // Register your global ItemData types here.  Try sorting your ItemData types alphabetically.

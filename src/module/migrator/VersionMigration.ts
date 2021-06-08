@@ -37,8 +37,7 @@ export abstract class VersionMigration {
     protected abort(reason: string): void {
         this.m_Abort = true;
         this.m_AbortReason = reason;
-        // @ts-ignore
-        ui.notifications?.error(`Data migration has been aborted: ${reason}`, { permanent: true });
+        ui.notifications.error(`Data migration has been aborted: ${reason}`, { permanent: true });
     }
 
     /**
@@ -46,10 +45,8 @@ export abstract class VersionMigration {
      * @param game The world that should be migrated.
      */
     public async Migrate(game: Game) {
-        // @ts-ignore TODO Unignore when Foundry Types updates
-        ui.notifications?.info(`${game.i18n.localize('SR5.MIGRATION.BeginNotification')} ${this.SourceVersionFriendlyName} -> ${this.TargetVersionFriendlyName}.`);
-        // @ts-ignore TODO Unignore when Foundry Types updates
-        ui.notifications?.warn(game.i18n.localize('SR5.MIGRATION.DoNotCloseNotification'), {
+        ui.notifications.info(`${game.i18n.localize('SR5.MIGRATION.BeginNotification')} ${this.SourceVersionFriendlyName} -> ${this.TargetVersionFriendlyName}.`);
+        ui.notifications.warn(game.i18n.localize('SR5.MIGRATION.DoNotCloseNotification'), {
             permanent: true,
         });
 
@@ -94,8 +91,7 @@ export abstract class VersionMigration {
         await this.Apply(entityUpdates);
 
         await game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
-        // @ts-ignore TODO Unignore when Foundry Types updates
-        ui.notifications?.info(`${game.i18n.localize('SR5.MIGRATION.SuccessNotification')} ${this.TargetVersion}.`, { permanent: true });
+        ui.notifications.info(`${game.i18n.localize('SR5.MIGRATION.SuccessNotification')} ${this.TargetVersion}.`, { permanent: true });
     }
 
     /**
@@ -118,7 +114,7 @@ export abstract class VersionMigration {
      * @param entityUpdates
      */
     protected async IterateScenes(game: Game, entityUpdates: Map<Entity, EntityUpdate>) {
-        // @ts-ignore // TODO: foundry-vtt-types Does not support DocumentCollection yet.
+        // @ts-ignore // TODO: foundry-vtt-types 0.8 Does not support DocumentCollection yet.
         for (const scene of game.scenes.contents) {
             try {
                 if (!(await this.ShouldMigrateSceneData(scene))) {
@@ -185,8 +181,8 @@ export abstract class VersionMigration {
      * @param entityUpdates The current map of document updates.
      */
     protected async IterateItems(game: Game, entityUpdates: Map<Entity, EntityUpdate>) {
-        // @ts-ignore // TODO: TYPE game.items possibly undefined
-        for (const item of game.items?.contents) {
+        //@ts-ignore // TODO: foundry-vtt-types 0.8 Doesn't support Documents yet
+        for (const item of game.items.contents) {
             try {
                 if (!(await this.ShouldMigrateItemData(item.data))) {
                     continue;
@@ -216,7 +212,7 @@ export abstract class VersionMigration {
      * @param entityUpdates The current map of document updates.
      */
     protected async IterateActors(game: Game, entityUpdates: Map<Entity, EntityUpdate>) {
-        // @ts-ignore // TODO: TYPE: Possibly undefined
+        // @ts-ignore // TODO: foundry-vtt-types 0.8 Doesn't support Documents yet
         for (const actor of game.actors.contents) {
             try {
                 if (!(await this.ShouldMigrateActorData(actor.data))) {
@@ -225,7 +221,6 @@ export abstract class VersionMigration {
 
                 console.log(`Migrating Actor ${actor.name}`);
                 console.log(actor);
-                // @ts-ignore // TODO: TYPE: Unsure, ignore for now.
                 const updateData = await this.MigrateActorData(duplicate(actor.data));
                 console.log(updateData);
                 let items = [];

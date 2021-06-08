@@ -30,6 +30,7 @@ declare namespace Shadowrun {
         drain: number;
         range: SpellRange;
         duration: SpellDuration;
+        extended: boolean;
 
         combat: CombatSpellData;
         detection: DetectionSpellData;

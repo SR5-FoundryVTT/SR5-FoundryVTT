@@ -16,8 +16,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.data.type;
     }
     getData(): ShadowrunItemDataData {
-        // @ts-ignore // TODO: foundry-vtt-types Partial getData issue without type gating.
-        return this.data.data;
+        return this.data.data as ShadowrunItemDataData;
     }
 
     isAreaOfEffect(): boolean {

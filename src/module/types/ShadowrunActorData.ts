@@ -10,8 +10,6 @@
  *
  * * Don't put property definitions here. Keep the top level definitions clean.
  *
- * TODO: Remove all none foundry-vtt-types with naming collision to the interfaces like CharacterActorData2
- * TODO: Remove all 2 names
  */
 declare namespace Shadowrun {
     // Register your global ActorData types here. Try sorting your ActorData types alphabetically.
@@ -28,15 +26,6 @@ declare namespace Shadowrun {
         SpiritData |
         SpriteData |
         VehicleData;
-
-    // Replaced this: TODO: Maybe the typing order with | is relevant?
-    // export type SR5ActorData =
-    //         SpiritData
-    //         | CharacterData
-    //         | SpriteData
-    //         | VehicleData
-    //         | CritterData;
-
 
     // Setup your global ActorData types below here. Try sorting your ActorData types alphabetically.
     export interface CharacterActorData extends Actor.Data<CharacterData, ShadowrunItemData> {

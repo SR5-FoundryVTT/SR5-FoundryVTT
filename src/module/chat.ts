@@ -230,7 +230,7 @@ function getRollChatTemplateData(options: RollChatMessageOptions): RollChatTempl
         ...options,
         tokenId,
         targetTokenId,
-        // @ts-ignore // TODO: TYPE: Remove this...
+        // @ts-ignore
         rollMode,
     }
 }
@@ -248,9 +248,8 @@ function getRollChatTemplateData(options: RollChatMessageOptions): RollChatTempl
  */
 function getTokenSceneId(token: Token | undefined): string | undefined {
     if (!token) return;
-    // TODO: Foundry 0.8 token.parent vs token.scene breaking change.
-    const scene = token.scene || token.parent;
-    // @ts-ignore
+    const scene = token.parent;
+    // @ts-ignore // TODO: foundry-vtt-types 0.8 support not yet there.
     return `${scene.id}.${token.id}`;
 }
 
@@ -370,13 +369,11 @@ export const addRollListeners = (app: ChatMessage, html) => {
             const sceneTokenId = card.data('tokenId');
             const actorId = card.data('actorId');
 
-            // TODO: foundry-vtt-types SR5Actor doesn't fully mix between game.actors and actor.items
             const actor = sceneTokenId ?
                 Helpers.getSceneTokenActor(sceneTokenId) :
                 game.actors.get(actorId) as SR5Actor;
             const item = actor?.items.get(id);
             if (!item) return;
-            // @ts-ignore
             item.sheet.render(true);
         }
     });

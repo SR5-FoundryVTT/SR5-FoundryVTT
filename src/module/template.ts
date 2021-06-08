@@ -49,7 +49,7 @@ class Template extends MeasuredTemplate {
     }
 
     activatePreviewListeners(initialLayer: CanvasLayer) {
-        if (canvas === null || !canvas.ready) return;
+        if (!canvas.ready) return;
 
         const handlers = {};
         let moveTime = 0;
@@ -57,11 +57,11 @@ class Template extends MeasuredTemplate {
         // Update placement (mouse-move)
         handlers['mm'] = (event) => {
             event.stopPropagation();
+            if (!canvas.ready) return;
             let now = Date.now(); // Apply a 20ms throttle
             if (now - moveTime <= 20) return;
             const center = event.data.getLocalPosition(this.layer);
-            // @ts-ignore // TODO: TYPE: canvas ready state is checked, but it's still complaining.
-            const snapped = canvas?.grid.getSnappedPosition(center.x, center.y, 2);
+            const snapped = canvas.grid.getSnappedPosition(center.x, center.y, 2);
             this.data.x = snapped.x;
             this.data.y = snapped.y;
             this.refresh();
@@ -70,7 +70,7 @@ class Template extends MeasuredTemplate {
 
         // Cancel the workflow (right-click)
         handlers['rc'] = () => {
-            if (canvas === null || !canvas.ready) return;
+            if (!canvas.ready) return;
 
             this.layer.preview.removeChildren();
             canvas.stage.off('mousemove', handlers['mm']);
@@ -85,7 +85,7 @@ class Template extends MeasuredTemplate {
         // Confirm the workflow (left-click)
         handlers['lc'] = (event) => {
             handlers['rc'](event);
-            if (canvas === null || !canvas.ready) return;
+            if (!canvas.ready) return;
 
             // Confirm final snapped position
             const destination = canvas.grid.getSnappedPosition(this.x, this.y, 2);

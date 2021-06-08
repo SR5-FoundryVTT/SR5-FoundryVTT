@@ -5,6 +5,7 @@
 import {VersionMigration} from "../VersionMigration";
 import {SR5} from "../../config";
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
+import CharacterActorData = Shadowrun.CharacterActorData;
 
 /** NPC / Grunt feature set
  * - Add npc character data.
@@ -33,8 +34,8 @@ export class Version0_7_2 extends VersionMigration {
 
     static UnsupportedMetatype(actorData: ShadowrunActorData): boolean {
         // TODO: Check on CharacterData.metatype typing (see ts-ignore)
-        //@ts-ignore // in-operator doesn't work here, as the underlying typing for metatype will result in string | number | undefined
-        const type = actorData.data.metatype?.toLowerCase() ?? '';
+        // @ts-ignore // TODO: TYPING metatype can never be a number... but that's breaking
+        const type = (actorData as CharacterActorData).data.metatype?.toLowerCase() ?? '';
         return actorData.type === 'character' &&
             SR5.character.types.hasOwnProperty(type);
     }

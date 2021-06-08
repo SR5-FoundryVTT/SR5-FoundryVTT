@@ -48,7 +48,6 @@ import VehicleData = Shadowrun.VehicleData;
 import VehicleActorData = Shadowrun.VehicleActorData;
 import CritterActorData = Shadowrun.CritterActorData;
 import {Modifiers} from "../rules/Modifiers";
-import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -65,8 +64,6 @@ import ShadowrunItemData = Shadowrun.ShadowrunItemData;
  * </code></pre>
  *
  */
-// TODO: foundry-vtt-types Actor<ShadowrunActorData, ShadowrunItemData> will cause build errors for unclear reasons.
-//       However the SR5Actor.items collections still seems correctly typed.
 export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
     getOverwatchScore() {
         const os = this.getFlag(SYSTEM_NAME, 'overwatchScore');
@@ -113,7 +110,6 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         super.prepareDerivedData();
 
         // General actor data preparation has been moved to derived data, as it depends on prepared item data.
-        // TODO: This is actually giving SR5Item instances and SR5ItemDataWrapper should acceppt those.
         const itemDataWrappers = this.items.map((item) => new SR5ItemDataWrapper(item.data));
         switch (this.data.type) {
             case 'character':
@@ -192,7 +188,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         const usesLeft = edge.uses > 0 ? edge.uses : 0;
         const uses = Math.min(edge.value, usesLeft + by);
 
-        // @ts-ignore // TODO: foundry-vtt-types doesn't recognise Attributes.edge uses/max properties of EdgeAttributeField
+        // @ts-ignore
         await this.update({'data.attributes.edge.uses': uses});
     }
 
@@ -211,15 +207,10 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         return DefaultValues.actorArmorData();
     }
 
-    // TODO: Foundry 0.9 Check if this can be replaced with this.items.get and correct typing.
-    getOwnedSR5Item(itemId: string): SR5Item | null {
-        return this.items.get(itemId) as unknown as  SR5Item;
-    }
-
     getMatrixDevice(): SR5Item | undefined | null {
         if (!("matrix" in this.data.data)) return;
         const matrix = this.data.data.matrix;
-        if (matrix.device) return this.getOwnedSR5Item(matrix.device);
+        if (matrix.device) return this.items.get(matrix.device);
     }
 
     getFullDefenseAttribute(): AttributeField | undefined {
@@ -1286,7 +1277,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
                     parts: parts.list,
                     actor: actor,
                 }).then(() => {
-                    // @ts-ignore // TODO: foundry-vtt-types doesn't recognise Attributes.edge uses/max properties of EdgeAttributeField
+                    // @ts-ignore
                     actor.update({
                         'data.attributes.edge.uses': actor.getEdge().uses - 1,
                     });

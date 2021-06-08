@@ -67,6 +67,7 @@ export class SpellImporter extends DataImporter {
                 type: '',
                 range: '',
                 duration: '',
+                extended: false,
                 combat: {
                     type: '',
                 },

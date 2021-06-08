@@ -41,7 +41,8 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
      */
     async getData() {
         const data = await super.getData();
-        // TODO: Foundry 0.8 will return data as an sheet data while Foundry 0.7 will return data as an item data. Therefore data is nested one deeper.
+        // Foundry 0.8 will return data as an sheet data while Foundry 0.7 will return data as an item data.
+        // Therefore data is nested one deeper. The alternative would be to rework all references with one more data...
         data.data = data.data.data;
         const itemData = data.data;
 
@@ -324,7 +325,7 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
      */
     private fixStaleRenderedState() {
         if (this._state === Application.RENDER_STATES.RENDERED && ui.windows[this.appId] === undefined) {
-            // @ts-ignore // TODO: foundry-vtt-types doesn't know of DocumentSheet.document yet.
+            // @ts-ignore // TODO: 0.8 foundry-vtt-types doesn't know of DocumentSheet.document yet.
             console.warn(`SR5ItemSheet app for ${this.document.name} is set as RENDERED but has no window registered. Fixing app internal render state. This is a known bug.`);
             // Hotfixing instead of this.close() since FormApplication.close() expects form elements, which don't exist anymore.
             this._state = Application.RENDER_STATES.CLOSED;
