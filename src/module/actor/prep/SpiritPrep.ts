@@ -1,6 +1,3 @@
-import { BaseActorPrep } from './BaseActorPrep';
-import SpiritActorData = Shadowrun.SpiritActorData;
-import SR5SpiritType = Shadowrun.SR5SpiritType;
 import { SkillsPrep } from './functions/SkillsPrep';
 import { AttributesPrep } from './functions/AttributesPrep';
 import { LimitsPrep } from './functions/LimitsPrep';
@@ -12,33 +9,36 @@ import { InitiativePrep } from './functions/InitiativePrep';
 import SpiritType = Shadowrun.SpiritType;
 import { Helpers } from '../../helpers';
 import {PartsList} from "../../parts/PartsList";
+import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
+import SpiritData = Shadowrun.SpiritData;
 
-export class SpiritPrep extends BaseActorPrep<SR5SpiritType, SpiritActorData> {
-    prepare() {
-        ModifiersPrep.prepareModifiers(this.data);
-        ModifiersPrep.clearAttributeMods(this.data);
 
-        SpiritPrep.prepareSpiritBaseData(this.data);
+export function SpiritDataPrepare(data: SpiritData, items: SR5ItemDataWrapper[]) {
+    ModifiersPrep.prepareModifiers(data);
+    ModifiersPrep.clearAttributeMods(data);
 
-        SkillsPrep.prepareSkills(this.data);
-        AttributesPrep.prepareAttributes(this.data);
-        LimitsPrep.prepareLimitBaseFromAttributes(this.data);
-        LimitsPrep.prepareLimits(this.data);
+    SpiritPrep.prepareSpiritBaseData(data);
 
-        SpiritPrep.prepareSpiritArmor(this.data);
+    SkillsPrep.prepareSkills(data);
+    AttributesPrep.prepareAttributes(data);
+    LimitsPrep.prepareLimitBaseFromAttributes(data);
+    LimitsPrep.prepareLimits(data);
 
-        ConditionMonitorsPrep.prepareStun(this.data);
-        ConditionMonitorsPrep.preparePhysical(this.data);
+    SpiritPrep.prepareSpiritArmor(data);
 
-        MovementPrep.prepareMovement(this.data);
-        WoundsPrep.prepareWounds(this.data);
+    ConditionMonitorsPrep.prepareStun(data);
+    ConditionMonitorsPrep.preparePhysical(data);
 
-        InitiativePrep.prepareCurrentInitiative(this.data);
+    MovementPrep.prepareMovement(data);
+    WoundsPrep.prepareWounds(data);
 
-        this.data.special = 'magic';
-    }
+    InitiativePrep.prepareCurrentInitiative(data);
 
-    static prepareSpiritBaseData(data: SpiritActorData) {
+    this.data.special = 'magic';
+}
+
+export class SpiritPrep {
+    static prepareSpiritBaseData(data: SpiritData) {
         const overrides = this.getSpiritStatModifiers(data.spiritType);
 
         if (overrides) {
@@ -72,7 +72,7 @@ export class SpiritPrep extends BaseActorPrep<SR5SpiritType, SpiritActorData> {
         }
     }
 
-    static prepareSpiritArmor(data: SpiritActorData) {
+    static prepareSpiritArmor(data: SpiritData) {
         const { armor, attributes } = data;
         armor.base = (attributes.essence.value ?? 0) * 2;
         armor.value = Helpers.calcTotal(armor);

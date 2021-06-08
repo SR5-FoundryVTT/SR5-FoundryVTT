@@ -96,7 +96,6 @@ export class SkillEditSheet extends DocumentSheet {
 
 
     /** @override */
-    // @ts-ignore // TODO: TYPE: Remove this...
     async _updateObject(event: Event, formData: object) {
         const updateData = {};
         this._onUpdateObject(event, formData, updateData);

@@ -4,7 +4,7 @@ import Template from './template';
 import {CORE_FLAGS, CORE_NAME, FLAGS, SYSTEM_NAME} from './constants';
 import {ShadowrunRoll, Test} from "./rolls/ShadowrunRoller";
 import {Helpers} from "./helpers";
-import {DamageApplicationFlow} from './actor/DamageApplicationFlow';
+import {DamageApplicationFlow} from './actor/flows/DamageApplicationFlow';
 import AttackData = Shadowrun.AttackData;
 import DrainData = Shadowrun.DrainData;
 import ModifiedDamageData = Shadowrun.ModifiedDamageData;
@@ -230,7 +230,7 @@ function getRollChatTemplateData(options: RollChatMessageOptions): RollChatTempl
         ...options,
         tokenId,
         targetTokenId,
-        // @ts-ignore // TODO: TYPE: Remove this...
+        // @ts-ignore
         rollMode,
     }
 }
@@ -248,9 +248,8 @@ function getRollChatTemplateData(options: RollChatMessageOptions): RollChatTempl
  */
 function getTokenSceneId(token: Token | undefined): string | undefined {
     if (!token) return;
-    // TODO: Foundry 0.8 token.parent vs token.scene breaking change.
-    const scene = token.scene || token.parent;
-    // @ts-ignore
+    const scene = token.parent;
+    // @ts-ignore // TODO: foundry-vtt-types 0.8 support not yet there.
     return `${scene.id}.${token.id}`;
 }
 
@@ -370,10 +369,11 @@ export const addRollListeners = (app: ChatMessage, html) => {
             const sceneTokenId = card.data('tokenId');
             const actorId = card.data('actorId');
 
-            const actor = sceneTokenId ? Helpers.getSceneTokenActor(sceneTokenId) : game.actors.get(actorId);
+            const actor = sceneTokenId ?
+                Helpers.getSceneTokenActor(sceneTokenId) :
+                game.actors.get(actorId) as SR5Actor;
             const item = actor?.items.get(id);
             if (!item) return;
-            // @ts-ignore
             item.sheet.render(true);
         }
     });

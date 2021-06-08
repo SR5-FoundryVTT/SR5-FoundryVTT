@@ -1,13 +1,13 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
-import Spell = Shadowrun.Spell;
 import { SpellParserBase } from '../parser/spell/SpellParserBase';
 import { CombatSpellParser } from '../parser/spell/CombatSpellParser';
 import { ManipulationSpellParser } from '../parser/spell/ManipulationSpellParser';
 import { IllusionSpellParser } from '../parser/spell/IllusionSpellParser';
 import { DetectionSpellImporter } from '../parser/spell/DetectionSpellImporter';
 import { ParserMap } from '../parser/ParserMap';
-import {DefaultValues} from "../../dataTemplates";
+import {DefaultValues} from "../../data/DataDefaults";
+import SpellItemData = Shadowrun.SpellItemData;
 
 export class SpellImporter extends DataImporter {
     public categoryTranslations: any;
@@ -18,7 +18,7 @@ export class SpellImporter extends DataImporter {
         return jsonObject.hasOwnProperty('spells') && jsonObject['spells'].hasOwnProperty('spell');
     }
 
-    GetDefaultData(): Spell {
+    GetDefaultData(): SpellItemData {
         return {
             name: 'Unnamed Item',
             _id: '',
@@ -67,6 +67,7 @@ export class SpellImporter extends DataImporter {
                 type: '',
                 range: '',
                 duration: '',
+                extended: false,
                 combat: {
                     type: '',
                 },
@@ -105,7 +106,7 @@ export class SpellImporter extends DataImporter {
     async Parse(jsonObject: object): Promise<Entity> {
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Spells', this.categoryTranslations);
 
-        const parser = new ParserMap<Spell>('category', [
+        const parser = new ParserMap<SpellItemData>('category', [
             { key: 'Combat', value: new CombatSpellParser() },
             { key: 'Manipulation', value: new ManipulationSpellParser() },
             { key: 'Illusion', value: new IllusionSpellParser() },
@@ -115,7 +116,7 @@ export class SpellImporter extends DataImporter {
             { key: 'Rituals', value: new SpellParserBase() },
         ]);
 
-        let datas: Spell[] = [];
+        let datas: SpellItemData[] = [];
         let jsonDatas = jsonObject['spells']['spell'];
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];

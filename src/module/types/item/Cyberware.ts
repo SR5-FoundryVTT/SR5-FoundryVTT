@@ -1,14 +1,17 @@
 /// <reference path="../Shadowrun.ts" />
 declare namespace Shadowrun {
-    export type Cyberware = SR5ItemData<CyberwareData> & {
-        type: 'cyberware';
-    };
+    export interface CyberwareData extends
+        CyberwarePartData,
+        DescriptionPartData,
+        TechnologyPartData,
+        ActionPartData,
+        ArmorPartData {
 
-    export type CyberwareData = CyberwarePartData & DescriptionPartData & TechnologyPartData & ActionPartData & ArmorPartData;
+    }
 
-    export type CyberwarePartData = {
+    export interface CyberwarePartData {
         essence: number;
         capacity: number;
         grade: string;
-    };
+    }
 }

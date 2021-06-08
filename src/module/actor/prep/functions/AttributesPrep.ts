@@ -1,15 +1,15 @@
-import SR5ActorData = Shadowrun.SR5ActorData;
 import { PartsList } from '../../../parts/PartsList';
 import { Helpers } from '../../../helpers';
 import {SR} from "../../../constants";
 import {SR5} from "../../../config";
 import AttributeField = Shadowrun.AttributeField;
+import ActorTypesData = Shadowrun.ShadowrunActorDataData;
 
 export class AttributesPrep {
     /**
      * Prepare actor data for attributes
      */
-    static prepareAttributes(data: SR5ActorData) {
+    static prepareAttributes(data: ActorTypesData) {
         const {attributes} = data;
 
         // always have special attributes set to hidden

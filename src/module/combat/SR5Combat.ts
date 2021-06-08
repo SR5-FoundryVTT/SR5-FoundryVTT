@@ -1,7 +1,7 @@
 import {SR5Actor} from "../actor/SR5Actor";
-import {CombatRules} from "../sr5/Combat";
 import {FLAGS, SR, SYSTEM_NAME, SYSTEM_SOCKET} from "../constants";
 import Combatant = Combat.Combatant;
+import {CombatRules} from "../rules/CombatRules";
 
 /**
  * Foundry combat implementation for Shadowrun5 rules.

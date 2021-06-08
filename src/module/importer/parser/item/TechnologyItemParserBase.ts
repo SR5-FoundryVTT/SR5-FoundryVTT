@@ -1,9 +1,8 @@
-import SR5ItemType = Shadowrun.SR5ItemType;
 import { ItemParserBase } from './ItemParserBase';
 import { ImportHelper } from '../../helper/ImportHelper';
-import Technology = Shadowrun.Technology;
+import ShadowrunTechnologyItemData = Shadowrun.ShadowrunTechnologyItemData;
 
-export abstract class TechnologyItemParserBase<TResult extends Technology & SR5ItemType> extends ItemParserBase<TResult> {
+export abstract class TechnologyItemParserBase<TResult extends ShadowrunTechnologyItemData> extends ItemParserBase<TResult> {
     Parse(jsonData: object, data: TResult, jsonTranslation?: object): TResult {
         data = super.Parse(jsonData, data, jsonTranslation);
 

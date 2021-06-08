@@ -1,26 +1,25 @@
-import { DataWrapper } from '../dataWrappers/DataWrapper';
-import SR5ItemType = Shadowrun.SR5ItemType;
+import { DataWrapper } from './DataWrapper';
 import ConditionData = Shadowrun.ConditionData;
 import ModList = Shadowrun.ModList;
-import SR5ItemDataPartial = Shadowrun.SR5ItemDataPartial;
 import ActionRollData = Shadowrun.ActionRollData;
 import SpellData = Shadowrun.SpellData;
-import Modification = Shadowrun.Modification;
 import TechnologyData = Shadowrun.TechnologyData;
 import CritterPowerRange = Shadowrun.CritterPowerRange;
 import SpellRange = Shadowrun.SpellRange;
 import RangeWeaponData = Shadowrun.RangeWeaponData;
+import ShadowrunItemData = Shadowrun.ShadowrunItemData;
+import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
+import ModificationItemData = Shadowrun.ModificationItemData;
 
-export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
+export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     getType() {
         return this.data.type;
     }
-    getData(): SR5ItemDataPartial {
-        return (this.data.data as unknown) as SR5ItemDataPartial;
+    getData(): ShadowrunItemDataData {
+        return this.data.data as ShadowrunItemDataData;
     }
 
     isAreaOfEffect(): boolean {
-        // TODO figure out how to detect explosive ammo
         return this.isGrenade() || (this.isSpell() && this.getData().range === 'los_a'); //|| this.hasExplosiveAmmo();
     }
 
@@ -69,13 +68,13 @@ export class SR5ItemDataWrapper extends DataWrapper<SR5ItemType> {
 
     isWeaponModification(): boolean {
         if (!this.isModification()) return false;
-        const modification = this.data as Modification;
+        const modification = this.data as ModificationItemData;
         return modification.data.type === 'weapon';
     }
 
     isArmorModification(): boolean {
         if (!this.isModification()) return false;
-        const modification = this.data as Modification;
+        const modification = this.data as ModificationItemData;
         return modification.data.type === 'armor';
     }
 

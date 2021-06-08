@@ -1,10 +1,10 @@
 import { ImportHelper } from '../../helper/ImportHelper';
-import Spell = Shadowrun.Spell;
 import SpellCateogry = Shadowrun.SpellCateogry;
 import { ItemParserBase } from '../item/ItemParserBase';
+import SpellItemData = Shadowrun.SpellItemData;
 
-export class SpellParserBase extends ItemParserBase<Spell> {
-    public Parse(jsonData: object, data: Spell, jsonTranslation?: object): Spell {
+export class SpellParserBase extends ItemParserBase<SpellItemData> {
+    public Parse(jsonData: object, data: SpellItemData, jsonTranslation?: object): SpellItemData {
         data.name = ImportHelper.StringValue(jsonData, 'name');
 
         data.data.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;

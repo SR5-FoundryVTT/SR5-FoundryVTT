@@ -3,11 +3,7 @@
 declare namespace Shadowrun {
     export type SpiritType = keyof typeof SR5CONFIG.spiritTypes;
 
-    export type SR5SpiritType = SR5ActorBase & {
-        data: SpiritActorData;
-        type: 'spirit';
-    };
-    export type SpiritActorData = MagicActorData &
+    export type SpiritData = MagicActorData &
         TwoTrackActorData &
         ArmorActorData &
         WoundsActorData &

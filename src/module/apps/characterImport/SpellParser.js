@@ -1,5 +1,5 @@
 import { parseDescription, getArray, createItemData } from "./BaseParserFunctions.js"
-import { DefaultValues } from "../../dataTemplates";
+import { DefaultValues } from "../../data/DataDefaults";
 
 export class SpellParser {
     parseSpells(chummerChar) {

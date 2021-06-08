@@ -1,5 +1,5 @@
-import {DamageApplicationDialog} from "../apps/dialogs/DamageApplicationDialog";
-import {SR5Actor} from "./SR5Actor";
+import {DamageApplicationDialog} from "../../apps/dialogs/DamageApplicationDialog";
+import {SR5Actor} from "../SR5Actor";
 import DamageData = Shadowrun.DamageData;
 
 export class DamageApplicationFlow {

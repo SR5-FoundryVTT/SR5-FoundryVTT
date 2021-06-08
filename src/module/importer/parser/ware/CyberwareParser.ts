@@ -1,7 +1,6 @@
 import { ImportHelper } from '../../helper/ImportHelper';
 import { TechnologyItemParserBase } from '../item/TechnologyItemParserBase';
-import Cyberware = Shadowrun.Cyberware;
-import Ware = Shadowrun.Ware;
+import Ware = Shadowrun.WareItemData;
 
 export class CyberwareParser extends TechnologyItemParserBase<Ware> {
     Parse(jsonData: object, data: Ware, jsonTranslation?: object): Ware {

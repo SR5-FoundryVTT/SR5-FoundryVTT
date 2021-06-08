@@ -1,9 +1,9 @@
-import SR5ActorData = Shadowrun.SR5ActorData;
-import { SR5ItemDataWrapper } from '../../../item/SR5ItemDataWrapper';
+import { SR5ItemDataWrapper } from '../../../data/SR5ItemDataWrapper';
 import { Helpers } from '../../../helpers';
 import { PartsList } from '../../../parts/PartsList';
 import ArmorActorData = Shadowrun.ArmorActorData;
 import {SR5} from "../../../config";
+import ActorTypesData = Shadowrun.ShadowrunActorDataData;
 
 export class ItemPrep {
     /**
@@ -11,7 +11,7 @@ export class ItemPrep {
      * - will only allow one "Base" armor item to be used (automatically takes the best one if multiple are equipped)
      * - all "accessories" will be added to the armor
      */
-    static prepareArmor(data: SR5ActorData & ArmorActorData, items: SR5ItemDataWrapper[]) {
+    static prepareArmor(data: ActorTypesData & ArmorActorData, items: SR5ItemDataWrapper[]) {
         const { armor } = data;
         armor.base = 0;
         armor.value = 0;
@@ -52,7 +52,7 @@ export class ItemPrep {
      * Prepare actor data for ware changes
      * - this calculates the actors essence
      */
-    static prepareBodyware(data: SR5ActorData, items: SR5ItemDataWrapper[]) {
+    static prepareBodyware(data: ActorTypesData, items: SR5ItemDataWrapper[]) {
         const { attributes } = data;
         const parts = new PartsList<number>();
         // add Items as values to lower the total value of essence

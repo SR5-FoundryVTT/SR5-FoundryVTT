@@ -2,6 +2,7 @@ import { Constants } from '../importer/Constants';
 import { XMLStrategy } from './XMLStrategy';
 import { JSONStrategy } from './JSONStrategy';
 import { ImportStrategy } from './ImportStrategy';
+import {SR5Item} from "../../item/SR5Item";
 
 export enum ImportMode {
     XML = 1,
@@ -66,7 +67,7 @@ export class ImportHelper {
         for (const pathSegment of pathSegments) {
              // Check if the path structure matches the folder structure.
             currentFolder = game.folders.find((folder) => {
-                // @ts-ignore // TODO: foundry-vtt-types 0.8.2 support missing.
+                // @ts-ignore // TODO: foundry-vtt-types 0.8 support missing.
                 return folder.parentFolder === lastFolder && folder.name === pathSegment
             });
 
@@ -112,8 +113,7 @@ export class ImportHelper {
         return ImportHelper.s_Strategy.objectValue(jsonData, key, fallback);
     }
 
-    //TODO
-    public static findItem(nameOrCmp: string | ItemComparer): Entity {
+    public static findItem(nameOrCmp: string | ItemComparer): SR5Item {
         let result: any | null;
         if (typeof nameOrCmp === 'string') {
             result = game.items?.find((item) => item.name == nameOrCmp);
@@ -130,7 +130,6 @@ export class ImportHelper {
 
         return name;
     }
-    //TODO
     public static async MakeCategoryFolders(
         jsonData: object,
         path: string,

@@ -11,11 +11,11 @@ import DamageElement = Shadowrun.DamageElement;
 import {PartsList} from './parts/PartsList';
 import {DEFAULT_ID_LENGTH, FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SR, SYSTEM_NAME} from "./constants";
 import {SR5Actor} from "./actor/SR5Actor";
-import {DataTemplates} from "./dataTemplates";
 import {DeleteConfirmationDialog} from "./apps/dialogs/DeleteConfirmationDialog";
 import { SR5Item } from './item/SR5Item';
 import Skills = Shadowrun.Skills;
 import {ShadowrunRoll} from "./rolls/ShadowrunRoller";
+import {DataDefaults} from "./data/DataDefaults";
 
 interface CalcTotalOptions {
     min?: number,
@@ -267,6 +267,7 @@ export class Helpers {
     }
 
     // TODO: Foundry 0.9 Should TokenDocument be used instead of Token?
+    // TODO: Check canvas.scene.tokens
     static getToken(id?: string): Token | undefined {
         if (!canvas || !canvas.ready) return;
 
@@ -354,14 +355,14 @@ export class Helpers {
 
     static getSelectedActorsOrCharacter(): SR5Actor[] {
         const tokens = Helpers.getControlledTokens();
-        const actors = tokens.map(token => token.actor) as SR5Actor[];
+        const actors = tokens.map(token => token.actor);
 
         // Try to default to a users character.
         if (actors.length === 0 && game.user?.character) {
-            actors.push(game.user?.character as SR5Actor);
+            actors.push(game.user?.character);
         }
 
-        return actors;
+        return actors as SR5Actor[];
     }
 
     static createRangeDescription(label: string, distance: number, modifier: number): RangeTemplateData {
@@ -390,7 +391,7 @@ export class Helpers {
     }
 
     static createDamageData(value: number, type: DamageType, ap: number = 0, element: DamageElement = '', sourceItem? : SR5Item): DamageData {
-        const damage = duplicate(DataTemplates.damage) as DamageData;
+        const damage = duplicate(DataDefaults.damage) as DamageData;
         damage.base = value;
         damage.value = value;
         damage.type.base = type;
@@ -557,7 +558,6 @@ export class Helpers {
     static sortSkills(skills: Skills, asc: boolean=true): Skills {
         // Filter entries instead of values to have a store of ids for easy rebuild.
         const sortedEntries = Object.entries(skills).sort(([aId, a], [bId, b]) => {
-            // TODO: Foundry 0.8 After placing token sidebar actor has unprepared Data => no name or label, just the id.
             const comparatorA = Helpers.localizeSkill(a) || aId;
             const comparatorB = Helpers.localizeSkill(b) || bId;
             // Use String.localeCompare instead of the > Operator to support other alphabets.
@@ -616,7 +616,7 @@ export class Helpers {
         return game.users.filter(user => {
             if (user.isGM) return false;
             // Check for permissions.
-            // @ts-ignore // TODO: foundry-vtt-types 0.8.2 missing testUserPermission for Documents (it's not DocumentClientMixin)
+            // @ts-ignore // TODO: foundry-vtt-types 0.8 missing testUserPermission for Documents (it's not DocumentClientMixin)
             if (!document.testUserPermission(user, permission)) return false;
             // Check for active state.
             if (active && !user.active) return false;

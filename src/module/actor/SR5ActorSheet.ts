@@ -6,12 +6,13 @@ import {LanguageSkillEditSheet} from '../apps/skills/LanguageSkillEditSheet';
 import {SR5Actor} from './SR5Actor';
 import {SR5} from '../config';
 import {SR5Item} from "../item/SR5Item";
-import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import Skills = Shadowrun.Skills;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import SkillField = Shadowrun.SkillField;
 import DeviceData = Shadowrun.DeviceData;
+import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
+import Attributes = Shadowrun.Attributes;
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
@@ -22,7 +23,7 @@ let globalSkillAppId: number = -1;
  * Extend the basic ActorSheet with some very simple modifications
  *
  */
-export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
+export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
     _shownDesc: string[];
     _filters: SR5SheetFilters;
     _scroll: string;
@@ -174,11 +175,9 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
 
     _prepareActorAttributes(data: SR5ActorSheetData) {
         // Clear visible, zero value attributes temporary modifiers so they appear blank.
-        const attributes = data.data.attributes;
+        const attributes = data.data.attributes as Attributes;
         for (let [, attribute] of Object.entries(attributes)) {
-            // @ts-ignore // TODO: TYPE: REmove this. Actor typing missing.
             if (!attribute.hidden) {
-                // @ts-ignore // TODO: TYPE: REmove this. Actor typing missing.
                 if (attribute.temp === 0) delete attribute.temp;
             }
         }
@@ -337,8 +336,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
                 // NOTE: If no duplication is done, added fields will be stored in the database on updates!
                 item = duplicate(item);
                 // Show item properties and description in the item list overviews.
-                // @ts-ignore // TODO: TYPE: REmove this. Actor typing missing.
-                const actorItem = this.actor.items.get(item._id) as SR5Item;
+                const actorItem = this.actor.items.get(item._id);
                 const chatData = actorItem.getChatData();
                 item.description = chatData.description;
                 // @ts-ignore // This is a hacky monkey patch solution to pass template data through duplicated item data.
@@ -480,7 +478,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
                 event.preventDefault();
                 const field = $(event.currentTarget).parents('.list-item');
                 const iid = $(field).data().itemId;
-                const item = this.actor.getOwnedSR5Item(iid);
+                const item = this.actor.items.get(iid);
                 if (item) {
                     await item.openPdfSource();
                 }
@@ -514,7 +512,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         html.find('.item-edit').click((event) => {
             event.preventDefault();
             const iid = Helpers.listItemId(event);
-            const item = this.actor.getOwnedSR5Item(iid);
+            const item = this.actor.items.get(iid);
             if (!item) return;
             // @ts-ignore
             item.sheet.render(true);
@@ -760,7 +758,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
     async _onReloadAmmo(event) {
         event.preventDefault();
         const iid = Helpers.listItemId(event);
-        const item = this.actor.getOwnedSR5Item(iid);
+        const item = this.actor.items.get(iid);
         if (item) return item.reloadAmmo();
     }
 
@@ -768,7 +766,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         if (!("matrix" in this.actor.data.data)) return;
 
         let iid = this.actor.data.data.matrix.device;
-        let item = this.actor.getOwnedSR5Item(iid);
+        let item = this.actor.items.get(iid);
         if (!item) {
             console.error('could not find item');
             return;
@@ -872,7 +870,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
 
     async _onChangeRtg(event) {
         const iid = Helpers.listItemId(event);
-        const item = this.actor.getOwnedSR5Item(iid);
+        const item = this.actor.items.get(iid);
         const rtg = parseInt(event.currentTarget.value);
         if (item && rtg) {
             await item.update({ 'data.technology.rating': rtg });
@@ -881,7 +879,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
 
     async _onChangeQty(event) {
         const iid = Helpers.listItemId(event);
-        const item = this.actor.getOwnedSR5Item(iid);
+        const item = this.actor.items.get(iid);
         const qty = parseInt(event.currentTarget.value);
         if (item && qty && "technology" in item.data.data) {
             item.data.data.technology.quantity = qty;
@@ -892,13 +890,12 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
     async _onEquipItem(event) {
         event.preventDefault();
         const iid = Helpers.listItemId(event);
-        const item = this.actor.getOwnedSR5Item(iid);
+        const item = this.actor.items.get(iid);
         if (item) {
             const newItems = [] as any[];
             if (item.isDevice()) {
                 // Only allow one equipped device item. Unequip all other.
-                // @ts-ignore // TODO: TYPE: Remove. Missing Actor Typing.
-                for (const item of this.actor.items.filter((actorItem: SR5Item) => actorItem.isDevice())) {
+                for (const item of this.actor.items.filter(actorItem => actorItem.isDevice())) {
                     newItems.push({
                         '_id': item.id,
                         'data.technology.equipped': item.id === iid,
@@ -991,7 +988,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
     async _onRollItem(event) {
         event.preventDefault();
         const iid = Helpers.listItemId(event);
-        const item = this.actor.getOwnedSR5Item(iid);
+        const item = this.actor.items.get(iid);
         if (item) {
             await item.castAction(event);
         }

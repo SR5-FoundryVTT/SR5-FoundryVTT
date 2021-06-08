@@ -1,8 +1,8 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { QualityParserBase } from '../parser/quality/QualityParserBase';
-import Quality = Shadowrun.Quality;
-import {DefaultValues} from "../../dataTemplates";
+import {DefaultValues} from "../../data/DataDefaults";
+import QualityItemData = Shadowrun.QualityItemData;
 
 export class QualityImporter extends DataImporter {
     public categoryTranslations: any;
@@ -13,7 +13,7 @@ export class QualityImporter extends DataImporter {
         return jsonObject.hasOwnProperty('qualities') && jsonObject['qualities'].hasOwnProperty('quality');
     }
 
-    GetDefaultData(): Quality {
+    GetDefaultData(): QualityItemData {
         return {
             name: 'Unnamed Armor',
             _id: '',
@@ -81,7 +81,7 @@ export class QualityImporter extends DataImporter {
 
         const parser = new QualityParserBase();
 
-        let datas: Quality[] = [];
+        let datas: QualityItemData[] = [];
         let jsonDatas = jsonObject['qualities']['quality'];
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];

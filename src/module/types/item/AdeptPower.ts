@@ -1,14 +1,12 @@
 declare namespace Shadowrun {
-    export type AdeptPower = SR5ItemData<AdeptPowerData> & {
-        type: 'adept_power';
-    };
+    export interface AdeptPowerData extends AdeptPowerPartData, DescriptionPartData, ActionPartData, ArmorPartData {
 
-    export type AdeptPowerData = AdeptPowerPartData & DescriptionPartData & ActionPartData & ArmorPartData;
+    }
 
-    export type AdeptPowerPartData = {
+    export interface AdeptPowerPartData {
         pp: number;
         type: string;
         drain: boolean;
         level: number;
-    };
+    }
 }

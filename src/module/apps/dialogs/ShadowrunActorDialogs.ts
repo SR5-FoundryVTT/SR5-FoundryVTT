@@ -2,7 +2,7 @@ import {FormDialog, FormDialogData} from "./FormDialog";
 import {SR5Actor} from "../../actor/SR5Actor";
 import {PartsList} from "../../parts/PartsList";
 import {Helpers} from "../../helpers";
-import {SkillFlow} from "../../actor/SkillFlow";
+import {SkillFlow} from "../../actor/flows/SkillFlow";
 import DefenseRollOptions = Shadowrun.DefenseRollOptions;
 import ModList = Shadowrun.ModList;
 import SoakRollOptions = Shadowrun.SoakRollOptions;

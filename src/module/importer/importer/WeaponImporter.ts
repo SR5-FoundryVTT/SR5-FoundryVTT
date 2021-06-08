@@ -5,9 +5,9 @@ import { RangedParser } from '../parser/weapon/RangedParser';
 import { MeleeParser } from '../parser/weapon/MeleeParser';
 import { ThrownParser } from '../parser/weapon/ThrownParser';
 import { ParserMap } from '../parser/ParserMap';
-import Weapon = Shadowrun.Weapon;
 import { WeaponParserBase } from '../parser/weapon/WeaponParserBase';
-import {DefaultValues} from "../../dataTemplates";
+import {DefaultValues} from "../../data/DataDefaults";
+import WeaponItemData = Shadowrun.WeaponItemData;
 
 export class WeaponImporter extends DataImporter {
     public categoryTranslations: any;
@@ -18,7 +18,7 @@ export class WeaponImporter extends DataImporter {
         return jsonObject.hasOwnProperty('weapons') && jsonObject['weapons'].hasOwnProperty('weapon');
     }
 
-    GetDefaultData(): Weapon {
+    GetDefaultData(): WeaponItemData {
         return {
             name: 'Unnamed Item',
             _id: '',
@@ -151,13 +151,13 @@ export class WeaponImporter extends DataImporter {
         folders['gear'] = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Weapons/Gear`, true);
         folders['quality'] = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Weapons/Quality`, true);
 
-        const parser = new ParserMap<Weapon>(WeaponParserBase.GetWeaponType, [
+        const parser = new ParserMap<WeaponItemData>(WeaponParserBase.GetWeaponType, [
             { key: 'range', value: new RangedParser() },
             { key: 'melee', value: new MeleeParser() },
             { key: 'thrown', value: new ThrownParser() },
         ]);
 
-        let datas: Weapon[] = [];
+        let datas: WeaponItemData[] = [];
         let jsonDatas = jsonObject['weapons']['weapon'];
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];

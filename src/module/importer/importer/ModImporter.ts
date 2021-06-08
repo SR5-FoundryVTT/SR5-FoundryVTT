@@ -1,8 +1,8 @@
 import { DataImporter } from './DataImporter';
-import Mod = Shadowrun.Modification;
 import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
 import { ModParserBase } from '../parser/mod/ModParserBase';
+import ModificationItemData = Shadowrun.ModificationItemData;
 
 export class ModImporter extends DataImporter {
     public categoryTranslations: any;
@@ -13,7 +13,7 @@ export class ModImporter extends DataImporter {
         return jsonObject.hasOwnProperty('accessories') && jsonObject['accessories'].hasOwnProperty('accessory');
     }
 
-    GetDefaultData(): Mod {
+    GetDefaultData(): ModificationItemData {
         return {
             name: '',
             _id: '',
@@ -72,7 +72,7 @@ export class ModImporter extends DataImporter {
     async Parse(jsonObject: object): Promise<Entity> {
         const parser = new ModParserBase();
 
-        let datas: Mod[] = [];
+        let datas: ModificationItemData[] = [];
         let jsonDatas = jsonObject['accessories']['accessory'];
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];

@@ -1,17 +1,17 @@
-import {ShadowrunRoll, ShadowrunRoller} from '../rolls/ShadowrunRoller';
-import {SR5Actor} from "./SR5Actor";
-import {SoakRules} from "./SoakRules";
-import { Helpers } from '../helpers';
+import {ShadowrunRoll, ShadowrunRoller} from '../../rolls/ShadowrunRoller';
+import {SR5Actor} from "../SR5Actor";
+import {SoakRules} from "../../rules/SoakRules";
+import { Helpers } from '../../helpers';
 import SoakRollOptions = Shadowrun.SoakRollOptions;
 import ModList = Shadowrun.ModList;
-import {createRollChatMessage} from "../chat";
+import {createRollChatMessage} from "../../chat";
 import DamageData = Shadowrun.DamageData;
 import DamageElement = Shadowrun.DamageElement;
 import DamageType = Shadowrun.DamageType;
-import {PartsList} from "../parts/PartsList";
-import {DefaultValues} from "../dataTemplates";
-import { ShadowrunActorDialogs } from '../apps/dialogs/ShadowrunActorDialogs';
-import {SR5Item} from '../item/SR5Item';
+import {PartsList} from "../../parts/PartsList";
+import {DefaultValues} from "../../data/DataDefaults";
+import { ShadowrunActorDialogs } from '../../apps/dialogs/ShadowrunActorDialogs';
+import {SR5Item} from '../../item/SR5Item';
 
 export class SoakFlow {
 
@@ -79,8 +79,7 @@ export class SoakFlow {
         if (damage.source && damage.source.actorId && damage.source.itemId) {
             const attacker = game.actors.find(actor => actor.id == damage.source?.actorId);
             if (attacker) {
-                // TODO: foundry-vtt-types Resolve attacker.items not matching with SR5Item[].
-                const item = attacker.items.find(item => item.id == damage.source?.itemId) as unknown as SR5Item;
+                const item = attacker.items.find(item => item.id == damage.source?.itemId) as SR5Item;
                 if (item) {
                     return item.items
                         .filter(mod => mod.getTechnology()?.equipped)

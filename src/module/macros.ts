@@ -13,7 +13,7 @@ export async function createItemMacro(item, slot) {
     if (!game || !game.macros) return;
 
     const command = `game.shadowrun5e.rollItemMacro("${item.name}");`;
-    // @ts-ignore // TODO: foundry-vtt-types Does not support DocumentCollection yet.
+    // @ts-ignore // TODO: foundry-vtt-types 0.8 Does not support DocumentCollection yet.
     let macro = game.macros.contents.find((m) => m.name === item.name);
     if (!macro) {
         macro = (await Macro.create(

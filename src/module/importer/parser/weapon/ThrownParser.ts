@@ -5,8 +5,8 @@ import BlastData = Shadowrun.BlastData;
 import ActorAttribute = Shadowrun.ActorAttribute;
 import DamageData = Shadowrun.DamageData;
 import DamageType = Shadowrun.DamageType;
-import Weapon = Shadowrun.Weapon;
-import {DefaultValues} from "../../../dataTemplates";
+import {DefaultValues} from "../../../data/DataDefaults";
+import WeaponItemData = Shadowrun.WeaponItemData;
 
 export class ThrownParser extends WeaponParserBase {
     public GetDamage(jsonData: object): DamageData {
@@ -64,7 +64,7 @@ export class ThrownParser extends WeaponParserBase {
         return DefaultValues.damageData(partialDamageData);
     }
 
-    public GetBlast(jsonData: object, data: Weapon): BlastData {
+    public GetBlast(jsonData: object, data: WeaponItemData): BlastData {
         let blastData: BlastData = {
             radius: 0,
             dropoff: 0,
@@ -95,7 +95,7 @@ export class ThrownParser extends WeaponParserBase {
         return blastData;
     }
 
-    Parse(jsonData: object, data: Weapon, jsonTranslation?: object): Weapon {
+    Parse(jsonData: object, data: WeaponItemData, jsonTranslation?: object): WeaponItemData {
         data = super.Parse(jsonData, data, jsonTranslation);
 
         if (jsonData.hasOwnProperty('range')) {

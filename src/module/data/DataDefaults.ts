@@ -8,7 +8,7 @@ import ActionRollData = Shadowrun.ActionRollData;
 import LimitData = Shadowrun.LimitData;
 import OpposedTestData = Shadowrun.OpposedTestData;
 import SkillField = Shadowrun.SkillField;
-import {SKILL_DEFAULT_NAME} from "./constants";
+import {SKILL_DEFAULT_NAME} from "../constants";
 
 /**
  * TODO: Add unittesting to DefaultValues helper.
@@ -155,7 +155,7 @@ export class DefaultValues {
 }
 
 // TODO: Move these into DefaultValues implementations.
-export const DataTemplates = {
+export const DataDefaults = {
     grunt: {
         metatype_modifiers: {
             elf: {

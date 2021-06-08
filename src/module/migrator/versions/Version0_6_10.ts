@@ -1,5 +1,5 @@
 import { VersionMigration } from '../VersionMigration';
-import SR5ActorType = Shadowrun.SR5ActorType;
+import ShadowrunActorData = Shadowrun.ShadowrunActorData;
 
 /**
  * Add default value of willpower to the full_defense_attribute field
@@ -15,7 +15,7 @@ export class Version0_6_10 extends VersionMigration {
         return '0.6.10';
     }
 
-    protected async MigrateActorData(actorData: SR5ActorType): Promise<any> {
+    protected async MigrateActorData(actorData: ShadowrunActorData): Promise<any> {
         if (actorData.data?.attributes?.edge === undefined) return {};
         return {
             data: {
@@ -30,7 +30,7 @@ export class Version0_6_10 extends VersionMigration {
         };
     }
 
-    protected async ShouldMigrateActorData(actorData: SR5ActorType): Promise<boolean> {
+    protected async ShouldMigrateActorData(actorData: ShadowrunActorData): Promise<boolean> {
         return actorData.data.attributes.edge?.uses === undefined;
     }
 

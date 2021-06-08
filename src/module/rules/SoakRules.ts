@@ -1,4 +1,4 @@
-import { SR5Actor } from './SR5Actor';
+import { SR5Actor } from '../actor/SR5Actor';
 import { SR5 } from '../config';
 import { Helpers } from '../helpers';
 import { PartsList } from '../parts/PartsList';
@@ -6,8 +6,8 @@ import DamageData = Shadowrun.DamageData;
 import ActorArmorData = Shadowrun.ActorArmorData;
 import ModifiedDamageData = Shadowrun.ModifiedDamageData;
 import ModifiableValue = Shadowrun.ModifiableValue;
-import CharacterActorData = Shadowrun.CharacterActorData;
-import Spell = Shadowrun.Spell;
+import CharacterActorData = Shadowrun.CharacterData;
+import SpellItemData = Shadowrun.SpellItemData;
 
 /**
  * Soaking rules for actors
@@ -32,7 +32,7 @@ export class SoakRules {
         // Apply special rules for direct combat spells
         const damageSourceItem = Helpers.findDamageSource(damageData);
         if (damageSourceItem && damageSourceItem.isDirectCombatSpell()) {
-            return SoakRules.applyDirectCombatSpellParts(damageSourceItem.data as Spell, soakParts, actor);
+            return SoakRules.applyDirectCombatSpellParts(damageSourceItem.data as SpellItemData, soakParts, actor);
         }
 
         SoakRules.applyBodyAndArmorParts(soakParts, actor);
@@ -42,7 +42,7 @@ export class SoakRules {
         SoakRules.applyElementalArmor(soakParts, armor, damageData.element.base);
     }
 
-    private static applyDirectCombatSpellParts(spellItem: Spell, soakParts: PartsList<number>, actor: SR5Actor) {
+    private static applyDirectCombatSpellParts(spellItem: SpellItemData, soakParts: PartsList<number>, actor: SR5Actor) {
         if (spellItem.data.type === 'mana') {
             SoakRules.addUniquePart(soakParts, actor.getAttribute('willpower'), SR5.attributes.willpower);
         }
@@ -142,7 +142,7 @@ export class SoakRules {
      * @param hits The number of hits on the soak tests
      * @returns The updated damage data
      */
-    static reduceDamage(actor : SR5Actor, damageData: DamageData, hits: number): ModifiedDamageData {
+    static reduceDamage(actor: SR5Actor, damageData: DamageData, hits: number): ModifiedDamageData {
 
         // Vehicles are immune to stun damage (electricity stun damage is handled in a different place)
         // Note: This also takes care of the vehicle immunity, since physical damage that does not exceed armor
