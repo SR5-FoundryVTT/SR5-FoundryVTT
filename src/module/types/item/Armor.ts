@@ -1,11 +1,13 @@
 /// <reference path="../Shadowrun.ts" />
 declare namespace Shadowrun {
-    export type ArmorData =
-        ArmorPartData &
-        DescriptionPartData &
-        TechnologyPartData;
+    export interface ArmorData extends
+        ArmorPartData,
+        DescriptionPartData,
+        TechnologyPartData {
 
-    export type ArmorPartData = {
+    }
+
+    export interface ArmorPartData {
         armor: {
             mod: boolean;
             value: number;
@@ -15,5 +17,5 @@ declare namespace Shadowrun {
             electricity: number;
             radiation: number;
         };
-    };
+    }
 }

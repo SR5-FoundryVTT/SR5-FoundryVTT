@@ -1,9 +1,11 @@
 declare namespace Shadowrun {
-    export type LifestyleData =
-        LifestylePartData &
-        DescriptionPartData;
+    export interface LifestyleData extends
+        LifestylePartData,
+        DescriptionPartData {
 
-    export type LifestylePartData = {
+    }
+
+    export interface LifestylePartData {
         type: string;
         comforts: number;
         security: number;
@@ -12,5 +14,5 @@ declare namespace Shadowrun {
         permanent: boolean;
         cost: number;
         mods: [];
-    };
+    }
 }

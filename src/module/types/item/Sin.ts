@@ -1,14 +1,16 @@
 declare namespace Shadowrun {
-    export type SinData =
-        SinPartData &
-        DescriptionPartData &
-        TechnologyPartData;
+    export interface SinData extends
+        SinPartData,
+        DescriptionPartData,
+        TechnologyPartData {
 
-    export type SinPartData = {
+    }
+
+    export interface SinPartData {
         licenses: LicenseData[];
-    };
+    }
 
-    export type LicenseData = {
+    export interface LicenseData {
         name: string
         rtg: string
         description: string

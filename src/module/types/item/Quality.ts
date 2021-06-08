@@ -1,11 +1,13 @@
 /// <reference path="../Shadowrun.ts" />
 declare namespace Shadowrun {
-      export type QualityData =
-          QualityPartData &
-          DescriptionPartData &
-          ActionPartData;
+      export interface QualityData extends
+          QualityPartData,
+          DescriptionPartData,
+          ActionPartData {
 
-    export type QualityPartData = {
+      }
+
+    export interface QualityPartData {
         type: 'positive' | 'negative' | '';
-    };
+    }
 }

@@ -49,10 +49,28 @@ import VehicleActorData = Shadowrun.VehicleActorData;
 import CritterActorData = Shadowrun.CritterActorData;
 import {Modifiers} from "../rules/Modifiers";
 
+/**
+ * The general Shadowrun actor implementation, which currently handles all actor types.
+ *
+ * To easily access Actor.data without any typing issues us the SR5Actor.asCritterData helpers.
+ * They are set up in a way that will handle both error management and type narrowing.
+ * Example:
+ * <pre><code>
+ *     const actor = game.actors.get('randomId');
+ *     const critterData = actor.asCritterData();
+ *     if (!critterData) return;
+ *     // critterData.type === 'critter'
+ *     // critterData.data as CritterData
+ * </code></pre>
+ *
+ */
 // TODO: foundry-vtt-types Actor<ShadowrunActorData, ShadowrunItemData> will cause build errors for unclear reasons.
 //       However the SR5Actor.items collections still seems correctly typed.
+// @ts-ignore
 export class SR5Actor extends Actor<ShadowrunActorData> {
-    // items: Collection<SR5Item>;
+    // get items(): Collection<SR5Item> {
+    //     return super.items as unknown as Collection<SR5Item>;
+    // }
 
     getOverwatchScore() {
         const os = this.getFlag(SYSTEM_NAME, 'overwatchScore');

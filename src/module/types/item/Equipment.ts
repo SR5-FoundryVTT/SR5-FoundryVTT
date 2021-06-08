@@ -1,5 +1,7 @@
 declare namespace Shadowrun {
-    export type EquipmentData =
-        DescriptionPartData &
-        TechnologyPartData;
+    export interface EquipmentData extends
+        DescriptionPartData,
+        TechnologyPartData {
+
+    }
 }

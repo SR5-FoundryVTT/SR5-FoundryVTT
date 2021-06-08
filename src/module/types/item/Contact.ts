@@ -1,11 +1,13 @@
 declare namespace Shadowrun {
-    export type ContactData = ContactPartData & DescriptionPartData;
+    export interface ContactData extends ContactPartData, DescriptionPartData {
 
-    export type ContactPartData = {
+    }
+
+    export interface ContactPartData {
         type: string;
         connection: number;
         loyalty: number;
         family: boolean;
         blackmail: boolean;
-    };
+    }
 }

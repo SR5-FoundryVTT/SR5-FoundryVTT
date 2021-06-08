@@ -1,12 +1,14 @@
 /// <reference path="../Shadowrun.ts" />
 declare namespace Shadowrun {
-    export type AmmoData = AmmoPartData & DescriptionPartData & TechnologyPartData;
+    export interface AmmoData extends AmmoPartData, DescriptionPartData, TechnologyPartData {
 
-    export type AmmoPartData = {
+    }
+
+    export interface AmmoPartData {
         element: DamageElement;
         ap: number;
         damage: number;
         damageType: DamageType;
         blast: BlastData;
-    };
+    }
 }
