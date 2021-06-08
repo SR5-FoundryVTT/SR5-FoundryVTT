@@ -26,7 +26,6 @@ import SpellData = Shadowrun.SpellData;
 import WeaponData = Shadowrun.WeaponData;
 import AmmoData = Shadowrun.AmmoData;
 import TechnologyPartData = Shadowrun.TechnologyPartData;
-import Weapon = Shadowrun.Weapon;
 import TechnologyData = Shadowrun.TechnologyData;
 import RangeWeaponData = Shadowrun.RangeWeaponData;
 import SpellRange = Shadowrun.SpellRange;
@@ -52,6 +51,7 @@ import QualityItemData = Shadowrun.QualityItemData;
 import SinItemData = Shadowrun.SinItemData;
 import SpellItemData = Shadowrun.SpellItemData;
 import SpritePowerItemData = Shadowrun.SpritePowerItemData;
+import WeaponItemData = Shadowrun.WeaponItemData;
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
@@ -1238,9 +1238,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
         return this.wrapper.isWeapon();
     }
 
-    asWeaponData(): Weapon | undefined {
+    asWeaponData(): WeaponItemData | undefined {
         if (this.wrapper.isWeapon()) {
-            return this.data as Weapon;
+            return this.data as WeaponItemData;
         }
     }
 

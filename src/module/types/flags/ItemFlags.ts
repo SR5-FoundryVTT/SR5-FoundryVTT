@@ -1,4 +1,8 @@
 /// <reference path="../Shadowrun.ts" />
+/**
+ * Typing specifically for Item.setFlag / getFlag
+ *
+ */
 declare namespace Shadowrun {
     export type FireModeData = {
         value: number;

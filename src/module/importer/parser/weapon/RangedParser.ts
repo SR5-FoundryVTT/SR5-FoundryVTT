@@ -3,8 +3,8 @@ import { WeaponParserBase } from './WeaponParserBase';
 import { Constants } from '../../importer/Constants';
 import DamageData = Shadowrun.DamageData;
 import DamageType = Shadowrun.DamageType;
-import Weapon = Shadowrun.Weapon;
 import {DefaultValues} from "../../../dataTemplates";
+import WeaponItemData = Shadowrun.WeaponItemData;
 
 export class RangedParser extends WeaponParserBase {
     public GetDamage(jsonData: object): DamageData {
@@ -41,7 +41,7 @@ export class RangedParser extends WeaponParserBase {
         return match !== undefined ? parseInt(match) : 0;
     }
 
-    Parse(jsonData: object, data: Weapon, jsonTranslation?: object): Weapon {
+    Parse(jsonData: object, data: WeaponItemData, jsonTranslation?: object): WeaponItemData {
         data = super.Parse(jsonData, data, jsonTranslation);
 
         data.data.range.rc.base = ImportHelper.IntValue(jsonData, 'rc');

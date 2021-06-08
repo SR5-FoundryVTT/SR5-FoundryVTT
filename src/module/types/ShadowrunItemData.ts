@@ -1,4 +1,4 @@
-/// <reference path="../Shadowrun.ts" />
+/// <reference path="./Shadowrun.ts" />
 
 /**
  * Types for Item.data and Item.data.data with foundry-vtt-types pattern used:

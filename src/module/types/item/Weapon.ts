@@ -4,11 +4,11 @@ declare namespace Shadowrun {
      * A valid weapon with all associated fields. Weapons still have all possible fields, but some
      * may be ignored based on the value of @category.
      */
-    export type Weapon = SR5ItemData<WeaponData> & {
-        type: 'weapon';
-    };
-
-    export type WeaponData = WeaponPartData & ActionPartData & TechnologyPartData & DescriptionPartData;
+    export type WeaponData =
+        WeaponPartData &
+        ActionPartData &
+        TechnologyPartData &
+        DescriptionPartData;
 
     export type WeaponPartData = {
         category: WeaponCategory;

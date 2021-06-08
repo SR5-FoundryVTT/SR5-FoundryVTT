@@ -1,9 +1,8 @@
-import SR5ActorData = Shadowrun.SR5ActorData;
 import PhysicalTrackActorData = Shadowrun.PhysicalTrackActorData;
 import StunTrackActorData = Shadowrun.StunTrackActorData;
 import TwoTrackActorData = Shadowrun.TwoTrackActorData;
 import {SR5} from "../../../config";
-import ActorTypesData = Shadowrun.ActorTypesData;
+import ActorTypesData = Shadowrun.ShadowrunActorDataData;
 
 export class ConditionMonitorsPrep {
     static prepareStun(data: ActorTypesData & StunTrackActorData) {

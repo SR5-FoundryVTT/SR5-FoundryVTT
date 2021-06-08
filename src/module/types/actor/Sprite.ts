@@ -2,11 +2,6 @@
 
 declare namespace Shadowrun {
     export type SpriteType = keyof typeof SR5CONFIG.spriteTypes;
-
-    export type SR5SpriteType = SR5ActorBase & {
-        data: SpriteData;
-        type: 'sprite';
-    };
     export type SpriteData = MatrixActorData & {
         level: number;
         services: number;

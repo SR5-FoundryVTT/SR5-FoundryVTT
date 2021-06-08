@@ -1,4 +1,4 @@
-/// <reference path="../Shadowrun.ts" />
+/// <reference path="./Shadowrun.ts" />
 
 /**
  * Types for Actor.data and Actor.data.data with foundry-vtt-types pattern used:
@@ -22,7 +22,7 @@ declare namespace Shadowrun {
         SpriteActorData |
         VehicleActorData;
 
-    export type ActorTypesData =
+    export type ShadowrunActorDataData =
         CharacterData |
         CritterData |
         SpiritData |

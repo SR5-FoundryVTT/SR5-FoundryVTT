@@ -1,10 +1,9 @@
-import SR5ActorData = Shadowrun.SR5ActorData;
 import { SR5ItemDataWrapper } from '../../../item/SR5ItemDataWrapper';
 import { Helpers } from '../../../helpers';
 import { PartsList } from '../../../parts/PartsList';
 import ArmorActorData = Shadowrun.ArmorActorData;
 import {SR5} from "../../../config";
-import ActorTypesData = Shadowrun.ActorTypesData;
+import ActorTypesData = Shadowrun.ShadowrunActorDataData;
 
 export class ItemPrep {
     /**

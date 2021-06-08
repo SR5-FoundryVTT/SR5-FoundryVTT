@@ -1,5 +1,5 @@
-import SR5ActorData = Shadowrun.SR5ActorData;
-import ActorTypesData = Shadowrun.ActorTypesData;
+import ActorTypesData = Shadowrun.ShadowrunActorDataData;
+import ShadowrunActorDataData = Shadowrun.ShadowrunActorDataData;
 
 export class ModifiersPrep {
     /**
@@ -45,7 +45,7 @@ export class ModifiersPrep {
         data.modifiers = modifiers;
     }
 
-    static clearAttributeMods(data: SR5ActorData) {
+    static clearAttributeMods(data: ShadowrunActorDataData) {
         const { attributes } = data;
         for (const [, attribute] of Object.entries(attributes)) {
             attribute.mod = [];

@@ -6,14 +6,12 @@ import {LanguageSkillEditSheet} from '../apps/skills/LanguageSkillEditSheet';
 import {SR5Actor} from './SR5Actor';
 import {SR5} from '../config';
 import {SR5Item} from "../item/SR5Item";
-import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import Skills = Shadowrun.Skills;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import SkillField = Shadowrun.SkillField;
 import DeviceData = Shadowrun.DeviceData;
-import ShadowrunActorData = Shadowrun.ShadowrunActorData;
-import ShadowrunItemData = Shadowrun.ShadowrunItemData;
+import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,

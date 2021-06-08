@@ -19,7 +19,6 @@ import SkillField = Shadowrun.SkillField;
 import ModList = Shadowrun.ModList;
 import LimitField = Shadowrun.LimitField;
 import EdgeAttributeField = Shadowrun.EdgeAttributeField;
-import VehicleActorData = Shadowrun.VehicleData;
 import VehicleStat = Shadowrun.VehicleStat;
 import Attributes = Shadowrun.Attributes;
 import Limits = Shadowrun.Limits;
@@ -28,27 +27,27 @@ import TrackType = Shadowrun.TrackType;
 import OverflowTrackType = Shadowrun.OverflowTrackType;
 import SpellDefenseOptions = Shadowrun.SpellDefenseOptions;
 import NumberOrEmpty = Shadowrun.NumberOrEmpty;
-import CharacterActorData = Shadowrun.CharacterData;
-import SR5VehicleType = Shadowrun.SR5VehicleType;
 import VehicleStats = Shadowrun.VehicleStats;
-import SR5CharacterType = Shadowrun.SR5CharacterType;
 import ActorArmorData = Shadowrun.ActorArmorData;
 import ConditionData = Shadowrun.ConditionData;
-import SR5SpiritType = Shadowrun.SR5SpiritType;
-import SR5SpriteType = Shadowrun.SR5SpriteType;
-import SR5CritterType = Shadowrun.SR5CritterType;
 import Skills = Shadowrun.Skills;
 import {SkillRules} from "./SkillRules";
 import CharacterSkills = Shadowrun.CharacterSkills;
 import {SR5} from "../config";
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
-import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import {CharacterDataPrepare} from "./prep/CharacterPrep";
 import {SR5ItemDataWrapper} from "../item/SR5ItemDataWrapper";
 import {CritterDataPrepare} from "./prep/CritterPrep";
 import {SpiritDataPrepare} from "./prep/SpiritPrep";
 import {SpriteDataPrepare} from "./prep/SpritePrep";
 import {VehicleDataPreparation} from "./prep/VehiclePrep";
+import SpiritActorData = Shadowrun.SpiritActorData;
+import CharacterData = Shadowrun.CharacterData;
+import CharacterActorData = Shadowrun.CharacterActorData;
+import SpriteActorData = Shadowrun.SpriteActorData;
+import VehicleData = Shadowrun.VehicleData;
+import VehicleActorData = Shadowrun.VehicleActorData;
+import CritterActorData = Shadowrun.CritterActorData;
 
 // TODO: foundry-vtt-types Actor<ShadowrunActorData, ShadowrunItemData> will cause build errors for unclear reasons.
 //       However the SR5Actor.items collections still seems correctly typed.
@@ -628,7 +627,7 @@ export class SR5Actor extends Actor<ShadowrunActorData> {
     async rollDrain(options: ActorRollOptions = {}, incoming = -1): Promise<ShadowrunRoll|undefined> {
         if (!this.isCharacter()) return;
 
-        const data = this.data.data as CharacterActorData;
+        const data = this.data.data as CharacterData;
 
         const wil = duplicate(data.attributes.willpower);
         const drainAtt = duplicate(data.attributes[data.magic.attribute]);
@@ -827,7 +826,7 @@ export class SR5Actor extends Actor<ShadowrunActorData> {
             after: async (roll: ShadowrunRoll | undefined) => {
                 if (!roll) return;
                 let hits = roll.total;
-                const data = this.data.data as CharacterActorData;
+                const data = this.data.data as CharacterData;
                 let current = data.track[track].value;
 
                 current = Math.max(current - hits, 0);
@@ -1029,7 +1028,7 @@ export class SR5Actor extends Actor<ShadowrunActorData> {
         if (!this.isVehicle())
             return;
 
-        const actorData = duplicate(this.data.data) as VehicleActorData;
+        const actorData = duplicate(this.data.data) as VehicleData;
         if (actorData.controlMode === 'autopilot') {
             const parts = new PartsList<number>();
 
@@ -1061,7 +1060,7 @@ export class SR5Actor extends Actor<ShadowrunActorData> {
         if (!this.isVehicle()) {
             return undefined;
         }
-        const actorData = duplicate(this.data.data) as VehicleActorData;
+        const actorData = duplicate(this.data.data) as VehicleData;
         if (actorData.controlMode === 'autopilot') {
             const parts = new PartsList<number>();
 
@@ -1096,7 +1095,7 @@ export class SR5Actor extends Actor<ShadowrunActorData> {
         if (!this.isVehicle()) {
             return undefined;
         }
-        const actorData = duplicate(this.data.data) as VehicleActorData;
+        const actorData = duplicate(this.data.data) as VehicleData;
         if (actorData.controlMode === 'autopilot') {
             const parts = new PartsList<number>();
 
@@ -1610,31 +1609,31 @@ export class SR5Actor extends Actor<ShadowrunActorData> {
         return "track" in this.data.data;
     }
 
-    asVehicleData(): SR5VehicleType | undefined {
+    asVehicleData(): VehicleActorData | undefined {
         if (this.isVehicle())
-            return this.data as SR5VehicleType;
+            return this.data as VehicleActorData;
     }
 
-    asCharacterData(): SR5CharacterType | undefined {
+    asCharacterData(): CharacterActorData | undefined {
         if (this.isCharacter())
-            return this.data as SR5CharacterType;
+            return this.data as CharacterActorData;
     }
 
-    asSpiritData(): SR5SpiritType | undefined {
+    asSpiritData(): SpiritActorData | undefined {
         if (this.isSpirit()) {
-            return this.data as SR5SpiritType;
+            return this.data as SpiritActorData;
         }
     }
 
-    asSpriteData(): SR5SpriteType | undefined {
+    asSpriteData(): SpriteActorData | undefined {
         if (this.isSprite()) {
-            return this.data as SR5SpriteType;
+            return this.data as SpriteActorData;
         }
     }
 
-    asCritterData(): SR5CritterType | undefined {
+    asCritterData(): CritterActorData | undefined {
         if (this.isCritter()){
-            return this.data as SR5CritterType;
+            return this.data as CritterActorData;
         }
     }
 

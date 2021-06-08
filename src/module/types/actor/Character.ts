@@ -1,58 +1,6 @@
 /// <reference path="../Shadowrun.ts" />
 
 declare namespace Shadowrun {
-    export type SR5ActorSheetData = ActorSheet.Data & {
-        config: typeof SR5CONFIG;
-        data: SR5ActorData;
-        filters: SR5SheetFilters;
-        isCharacter: boolean;
-        isSpirit: boolean;
-        isCritter: boolean;
-        awakened: boolean;
-        emerged: boolean;
-        woundTolerance: number;
-        vehicle: SR5VehicleSheetData;
-    };
-
-    export type SR5VehicleSheetData = {
-        // TODO: SR5 Actor class, however conflicts between SR5Actor and SR5ActorBase prohibit this...
-        driver?: object
-    }
-
-    export type SR5SheetFilters = {
-        skills: string;
-        showUntrainedSkills
-    };
-
-    export type SR5ActorType = SR5SpiritType | SR5CharacterType | SR5SpriteType | SR5VehicleType | SR5CritterType;
-
-    // TODO: A lot of duplicate type definitions to what's in Actor.Data. Might cause problems during a FoundryVTT update
-    export type SR5ActorBase = Actor.Data & {
-        name: string;
-        _id: string;
-        folder: string | null;
-        data: SR5ActorData;
-        items: Collection<Item>;
-        flags: object;
-        type: string;
-        permission: {
-            default: string;
-        };
-    };
-
-
-    export type SR5CharacterType = SR5ActorBase & {
-        data: CharacterData;
-        type: 'character';
-    };
-
-    export type SR5ActorData =
-        SpiritData
-        | CharacterData
-        | SpriteData
-        | VehicleData
-        | CritterData;
-
     export type CharacterSkills = {
         active: Skills;
         language: KnowledgeSkillList;

@@ -1,8 +1,4 @@
 declare namespace Shadowrun {
-    export type ComplexForm = SR5ItemData<ComplexFormData> & {
-        type: 'complex_form';
-    };
-
     export type ComplexFormData =
         ComplexFormPartData &
         DescriptionPartData &

@@ -1,12 +1,7 @@
 /// <reference path="../Shadowrun.ts" />
 
 declare namespace Shadowrun {
-    export type SR5VehicleType = SR5ActorBase & {
-        data: VehicleData;
-        type: 'vehicle';
-    };
-
-    export type VehicleTypes = 'air' | 'aerospace' | 'ground' | 'water' | 'walker' | 'exotic';
+     export type VehicleTypes = 'air' | 'aerospace' | 'ground' | 'water' | 'walker' | 'exotic';
 
     export type VehicleControlModeTypes = 'manual' | 'remote' | 'rigger' | 'autopilot';
 
@@ -14,7 +9,8 @@ declare namespace Shadowrun {
 
     export type VehicleEnvironment = 'speed' | 'handling';
 
-    export type VehicleData = ArmorActorData &
+    export type VehicleData =
+        ArmorActorData &
         MatrixActorData &
         MovementActorData &
         PhysicalTrackActorData & {

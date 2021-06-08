@@ -1,7 +1,6 @@
-import SR5ActorData = Shadowrun.SR5ActorData;
 import TwoTrackActorData = Shadowrun.TwoTrackActorData;
 import WoundsActorData = Shadowrun.WoundsActorData;
-import ActorTypesData = Shadowrun.ActorTypesData;
+import ActorTypesData = Shadowrun.ShadowrunActorDataData;
 
 export class WoundsPrep {
     static prepareWounds(data: ActorTypesData & TwoTrackActorData & WoundsActorData) {

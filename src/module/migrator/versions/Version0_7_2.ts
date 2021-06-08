@@ -4,7 +4,7 @@
 
 import {VersionMigration} from "../VersionMigration";
 import {SR5} from "../../config";
-import SR5ActorBase = Shadowrun.SR5ActorBase;
+import ShadowrunActorData = Shadowrun.ShadowrunActorData;
 
 /** NPC / Grunt feature set
  * - Add npc character data.
@@ -23,7 +23,7 @@ export class Version0_7_2 extends VersionMigration {
         return '0.7.2';
     }
 
-    static NoNPCDataForCharacter(actorData: SR5ActorBase): boolean {
+    static NoNPCDataForCharacter(actorData: ShadowrunActorData): boolean {
         // Use in operator since TypeScript can handle that for union types instead of property usage.
         return actorData.type === 'character' && (
             !("is_npc" in actorData?.data) ||
@@ -31,7 +31,7 @@ export class Version0_7_2 extends VersionMigration {
         );
     }
 
-    static UnsupportedMetatype(actorData: SR5ActorBase): boolean {
+    static UnsupportedMetatype(actorData: ShadowrunActorData): boolean {
         // TODO: Check on CharacterData.metatype typing (see ts-ignore)
         //@ts-ignore // in-operator doesn't work here, as the underlying typing for metatype will result in string | number | undefined
         const type = actorData.data.metatype?.toLowerCase() ?? '';
@@ -39,7 +39,7 @@ export class Version0_7_2 extends VersionMigration {
             SR5.character.types.hasOwnProperty(type);
     }
 
-    protected async MigrateActorData(actorData: SR5ActorBase): Promise<any> {
+    protected async MigrateActorData(actorData: ShadowrunActorData): Promise<any> {
         const updateData: {
             data?: object,
             attributes?: object
@@ -69,7 +69,7 @@ export class Version0_7_2 extends VersionMigration {
         return updateData;
     }
 
-    protected async ShouldMigrateActorData(actorData: SR5ActorBase): Promise<boolean> {
+    protected async ShouldMigrateActorData(actorData: ShadowrunActorData): Promise<boolean> {
         return Version0_7_2.UnsupportedMetatype(actorData) || Version0_7_2.NoNPCDataForCharacter(actorData);
     }
 }

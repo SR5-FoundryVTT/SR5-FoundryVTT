@@ -1,10 +1,9 @@
-import SR5ActorData = Shadowrun.SR5ActorData;
 import { PartsList } from '../../../parts/PartsList';
 import { Helpers } from '../../../helpers';
 import {SR} from "../../../constants";
 import {SR5} from "../../../config";
 import AttributeField = Shadowrun.AttributeField;
-import ActorTypesData = Shadowrun.ActorTypesData;
+import ActorTypesData = Shadowrun.ShadowrunActorDataData;
 
 export class AttributesPrep {
     /**

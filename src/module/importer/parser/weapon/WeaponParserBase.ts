@@ -1,12 +1,12 @@
 import { ImportHelper } from '../../helper/ImportHelper';
 import { Constants } from '../../importer/Constants';
 import DamageData = Shadowrun.DamageData;
-import Weapon = Shadowrun.Weapon;
 import WeaponCategory = Shadowrun.WeaponCategory;
 import SkillName = Shadowrun.SkillName;
 import { TechnologyItemParserBase } from '../item/TechnologyItemParserBase';
+import WeaponItemData = Shadowrun.WeaponItemData;
 
-export abstract class WeaponParserBase extends TechnologyItemParserBase<Weapon> {
+export abstract class WeaponParserBase extends TechnologyItemParserBase<WeaponItemData> {
     public abstract GetDamage(jsonData: object): DamageData;
 
     protected GetSkill(weaponJson: object): SkillName {
@@ -47,7 +47,7 @@ export abstract class WeaponParserBase extends TechnologyItemParserBase<Weapon> 
         }
     }
 
-    public Parse(jsonData: object, data: Weapon, jsonTranslation?: object): Weapon {
+    public Parse(jsonData: object, data: WeaponItemData, jsonTranslation?: object): WeaponItemData {
         data = super.Parse(jsonData, data, jsonTranslation);
 
         let category = ImportHelper.StringValue(jsonData, 'category');

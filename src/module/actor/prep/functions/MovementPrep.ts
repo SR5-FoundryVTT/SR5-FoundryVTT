@@ -1,6 +1,5 @@
-import SR5ActorData = Shadowrun.SR5ActorData;
 import MovementActorData = Shadowrun.MovementActorData;
-import ActorTypesData = Shadowrun.ActorTypesData;
+import ActorTypesData = Shadowrun.ShadowrunActorDataData;
 
 export class MovementPrep {
     static prepareMovement(data: ActorTypesData & MovementActorData) {

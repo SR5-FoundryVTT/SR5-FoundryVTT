@@ -1,8 +1,7 @@
-import SR5ActorData = Shadowrun.SR5ActorData;
 import { PartsList } from '../../../parts/PartsList';
 import { Helpers } from '../../../helpers';
 import {SR5} from "../../../config";
-import ActorTypesData = Shadowrun.ActorTypesData;
+import ActorTypesData = Shadowrun.ShadowrunActorDataData;
 
 export class LimitsPrep {
     static prepareLimits(data: ActorTypesData) {

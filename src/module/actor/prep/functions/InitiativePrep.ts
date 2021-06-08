@@ -1,9 +1,8 @@
-import SR5ActorData = Shadowrun.SR5ActorData;
 import MagicActorData = Shadowrun.MagicActorData;
 import MatrixActorData = Shadowrun.MatrixActorData;
 import { Helpers } from '../../../helpers';
 import { PartsList } from '../../../parts/PartsList';
-import ActorTypesData = Shadowrun.ActorTypesData;
+import ActorTypesData = Shadowrun.ShadowrunActorDataData;
 
 export class InitiativePrep {
     static prepareCurrentInitiative(data: ActorTypesData) {
