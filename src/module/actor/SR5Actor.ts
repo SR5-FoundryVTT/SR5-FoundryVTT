@@ -48,6 +48,7 @@ import VehicleData = Shadowrun.VehicleData;
 import VehicleActorData = Shadowrun.VehicleActorData;
 import CritterActorData = Shadowrun.CritterActorData;
 import {Modifiers} from "../rules/Modifiers";
+import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -66,12 +67,7 @@ import {Modifiers} from "../rules/Modifiers";
  */
 // TODO: foundry-vtt-types Actor<ShadowrunActorData, ShadowrunItemData> will cause build errors for unclear reasons.
 //       However the SR5Actor.items collections still seems correctly typed.
-// @ts-ignore
-export class SR5Actor extends Actor<ShadowrunActorData> {
-    // get items(): Collection<SR5Item> {
-    //     return super.items as unknown as Collection<SR5Item>;
-    // }
-
+export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
     getOverwatchScore() {
         const os = this.getFlag(SYSTEM_NAME, 'overwatchScore');
         return os !== undefined ? os : 0;

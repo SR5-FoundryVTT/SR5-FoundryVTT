@@ -999,12 +999,12 @@ export class SR5Item extends Item<ShadowrunItemData> {
      * This method hooks into the Foundry Item.update approach and is called using this<Item>.actor.updateEmbeddedEntity.
      *
      * @param embeddedName
-     * @param updateData
+     * @param data
      * @param options
      */
     // @ts-ignore
-    async updateEmbeddedEntity(embeddedName,updateData, options) {
-        await this.updateOwnedItem(updateData);
+    async updateEmbeddedEntity(embeddedName,data, options?): Promise<any> {
+        await this.updateOwnedItem(data);
         return this;
     }
 
@@ -1532,7 +1532,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
      *
      * @param data changes made to the SR5ItemData
      */
-    async updateEmbeddedItem(data) {
+    async updateEmbeddedItem(data): Promise<this> {
         // Inform the parent item about changes to one of it's embedded items.
         // TODO: Foundry 0.8 updateOwnedItem needs the id of the update item. hand the item itself over, to the hack within updateOwnedItem for this.
         data._id = this.id;
@@ -1542,12 +1542,12 @@ export class SR5Item extends Item<ShadowrunItemData> {
         // After updating all item embedded data, rerender the sheet to trigger the whole rerender workflow.
         // Otherwise changes in the template of an hiddenItem will show for some fields, while not rerendering all
         // #if statements (hidden fields for other values, won't show)
-        return this.sheet.render(false);
+        await this.sheet.render(false);
+
+        return this;
     }
 
-    // TODO: Foundry 0.8 this method has been added for debugging
-    // @ts-ignore
-    async update(data, ...args) {
+    async update(data, options?): Promise<this> {
         // Item.item => Embedded item into another item!
         if (this._isEmbeddedItem) {
             return this.updateEmbeddedItem(data);
@@ -1555,6 +1555,6 @@ export class SR5Item extends Item<ShadowrunItemData> {
 
         // Actor.item => Directly owned item by an actor!
         // @ts-ignore
-        return await super.update(data, ...args);
+        return await super.update(data, options);
     }
 }
