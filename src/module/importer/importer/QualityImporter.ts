@@ -1,7 +1,7 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { QualityParserBase } from '../parser/quality/QualityParserBase';
-import {DefaultValues} from "../../dataTemplates";
+import {DefaultValues} from "../../data/DataDefaults";
 import QualityItemData = Shadowrun.QualityItemData;
 
 export class QualityImporter extends DataImporter {

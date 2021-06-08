@@ -6,7 +6,7 @@ import { ManipulationSpellParser } from '../parser/spell/ManipulationSpellParser
 import { IllusionSpellParser } from '../parser/spell/IllusionSpellParser';
 import { DetectionSpellImporter } from '../parser/spell/DetectionSpellImporter';
 import { ParserMap } from '../parser/ParserMap';
-import {DefaultValues} from "../../dataTemplates";
+import {DefaultValues} from "../../data/DataDefaults";
 import SpellItemData = Shadowrun.SpellItemData;
 
 export class SpellImporter extends DataImporter {

@@ -1,4 +1,4 @@
-import { SR5ItemDataWrapper } from '../../../item/SR5ItemDataWrapper';
+import { SR5ItemDataWrapper } from '../../../data/SR5ItemDataWrapper';
 import { Helpers } from '../../../helpers';
 import { PartsList } from '../../../parts/PartsList';
 import ArmorActorData = Shadowrun.ArmorActorData;

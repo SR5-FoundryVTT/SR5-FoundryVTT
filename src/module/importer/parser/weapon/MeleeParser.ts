@@ -3,7 +3,7 @@ import { WeaponParserBase } from './WeaponParserBase';
 import ActorAttribute = Shadowrun.ActorAttribute;
 import DamageData = Shadowrun.DamageData;
 import DamageType = Shadowrun.DamageType;
-import {DefaultValues} from "../../../dataTemplates";
+import {DefaultValues} from "../../../data/DataDefaults";
 import WeaponItemData = Shadowrun.WeaponItemData;
 
 export class MeleeParser extends WeaponParserBase {

@@ -9,7 +9,7 @@ import SpriteType = Shadowrun.SpriteType;
 import { Helpers } from '../../helpers';
 import { PartsList } from '../../parts/PartsList';
 import SpriteData = Shadowrun.SpriteData;
-import {SR5ItemDataWrapper} from "../../item/SR5ItemDataWrapper";
+import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 
 
 export function SpriteDataPrepare(data: SpriteData, items: SR5ItemDataWrapper[]) {

@@ -9,7 +9,7 @@ import { InitiativePrep } from './functions/InitiativePrep';
 import SpiritType = Shadowrun.SpiritType;
 import { Helpers } from '../../helpers';
 import {PartsList} from "../../parts/PartsList";
-import {SR5ItemDataWrapper} from "../../item/SR5ItemDataWrapper";
+import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 import SpiritData = Shadowrun.SpiritData;
 
 

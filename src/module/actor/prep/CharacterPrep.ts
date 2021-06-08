@@ -10,7 +10,7 @@ import { WoundsPrep } from './functions/WoundsPrep';
 import { AttributesPrep } from './functions/AttributesPrep';
 import { NPCPrep } from './functions/NPCPrep';
 import CharacterData = Shadowrun.CharacterData;
-import {SR5ItemDataWrapper} from "../../item/SR5ItemDataWrapper";
+import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 
 export function CharacterDataPrepare(data: CharacterData, items: SR5ItemDataWrapper[]) {
     ModifiersPrep.prepareModifiers(data);

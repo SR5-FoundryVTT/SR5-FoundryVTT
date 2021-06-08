@@ -1,4 +1,4 @@
-import { DataWrapper } from '../dataWrappers/DataWrapper';
+import { DataWrapper } from './DataWrapper';
 import ConditionData = Shadowrun.ConditionData;
 import ModList = Shadowrun.ModList;
 import ActionRollData = Shadowrun.ActionRollData;

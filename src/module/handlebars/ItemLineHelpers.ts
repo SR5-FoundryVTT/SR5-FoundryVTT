@@ -1,4 +1,4 @@
-import { SR5ItemDataWrapper } from '../item/SR5ItemDataWrapper';
+import { SR5ItemDataWrapper } from '../data/SR5ItemDataWrapper';
 import {SR5} from "../config";
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 

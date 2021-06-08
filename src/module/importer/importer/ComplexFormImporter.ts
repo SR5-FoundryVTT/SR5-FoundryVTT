@@ -2,7 +2,7 @@ import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
 import { ComplexFormParserBase } from '../parser/complex-form/ComplexFormParserBase';
-import {DefaultValues} from "../../dataTemplates";
+import {DefaultValues} from "../../data/DataDefaults";
 import ComplexFormItemData = Shadowrun.ComplexFormItemData;
 
 export class ComplexFormImporter extends DataImporter {

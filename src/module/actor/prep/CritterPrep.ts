@@ -9,7 +9,7 @@ import { MovementPrep } from './functions/MovementPrep';
 import { WoundsPrep } from './functions/WoundsPrep';
 import { AttributesPrep } from './functions/AttributesPrep';
 import CritterData = Shadowrun.CritterData;
-import {SR5ItemDataWrapper} from "../../item/SR5ItemDataWrapper";
+import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 
 export function CritterDataPrepare(data: CritterData, items: SR5ItemDataWrapper[]) {
     ModifiersPrep.prepareModifiers(data);

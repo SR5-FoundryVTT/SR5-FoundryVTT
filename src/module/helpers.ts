@@ -11,11 +11,11 @@ import DamageElement = Shadowrun.DamageElement;
 import {PartsList} from './parts/PartsList';
 import {DEFAULT_ID_LENGTH, FLAGS, LENGTH_UNIT, LENGTH_UNIT_TO_METERS_MULTIPLIERS, SR, SYSTEM_NAME} from "./constants";
 import {SR5Actor} from "./actor/SR5Actor";
-import {DataTemplates} from "./dataTemplates";
 import {DeleteConfirmationDialog} from "./apps/dialogs/DeleteConfirmationDialog";
 import { SR5Item } from './item/SR5Item';
 import Skills = Shadowrun.Skills;
 import {ShadowrunRoll} from "./rolls/ShadowrunRoller";
+import {DataDefaults} from "./data/DataDefaults";
 
 interface CalcTotalOptions {
     min?: number,
@@ -390,7 +390,7 @@ export class Helpers {
     }
 
     static createDamageData(value: number, type: DamageType, ap: number = 0, element: DamageElement = '', sourceItem? : SR5Item): DamageData {
-        const damage = duplicate(DataTemplates.damage) as DamageData;
+        const damage = duplicate(DataDefaults.damage) as DamageData;
         damage.base = value;
         damage.value = value;
         damage.type.base = type;

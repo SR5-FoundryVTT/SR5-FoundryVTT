@@ -2,7 +2,7 @@ import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { CyberwareParser } from '../parser/ware/CyberwareParser';
 import Ware = Shadowrun.WareItemData;
-import {DefaultValues} from "../../dataTemplates";
+import {DefaultValues} from "../../data/DataDefaults";
 import CyberwareItemData = Shadowrun.CyberwareItemData;
 
 export class WareImporter extends DataImporter {

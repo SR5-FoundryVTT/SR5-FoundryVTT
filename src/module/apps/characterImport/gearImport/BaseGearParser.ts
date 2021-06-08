@@ -1,6 +1,6 @@
-import { DefaultValues } from "../../../dataTemplates";
 import { parseDescription, parseTechnology } from "../BaseParserFunctions.js"
 import EquipmentItemData = Shadowrun.EquipmentItemData;
+import {DefaultValues} from "../../../data/DataDefaults";
 
 
 /**

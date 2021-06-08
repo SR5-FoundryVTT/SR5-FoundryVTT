@@ -1,6 +1,6 @@
 import MatrixActorData = Shadowrun.MatrixActorData;
 import { Helpers } from '../../../helpers';
-import { SR5ItemDataWrapper } from '../../../item/SR5ItemDataWrapper';
+import { SR5ItemDataWrapper } from '../../../data/SR5ItemDataWrapper';
 import { PartsList } from '../../../parts/PartsList';
 import {SR5} from "../../../config";
 import ActorTypesData = Shadowrun.ShadowrunActorDataData;

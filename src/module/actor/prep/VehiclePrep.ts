@@ -9,7 +9,7 @@ import { Helpers } from '../../helpers';
 import { PartsList } from '../../parts/PartsList';
 import {SR5} from "../../config";
 import VehicleData = Shadowrun.VehicleData;
-import {SR5ItemDataWrapper} from "../../item/SR5ItemDataWrapper";
+import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 
 export function VehicleDataPreparation(data: VehicleData, items: SR5ItemDataWrapper[]) {
     ModifiersPrep.prepareModifiers(data);

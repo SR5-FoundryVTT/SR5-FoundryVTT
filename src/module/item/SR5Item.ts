@@ -5,7 +5,7 @@ import {ChatData} from './ChatData';
 import {ShadowrunRoll, ShadowrunRoller, Test} from '../rolls/ShadowrunRoller';
 import {createItemChatMessage} from '../chat';
 import {DEFAULT_ROLL_NAME, FLAGS, SYSTEM_NAME} from '../constants';
-import {SR5ItemDataWrapper} from './SR5ItemDataWrapper';
+import {SR5ItemDataWrapper} from '../data/SR5ItemDataWrapper';
 import {PartsList} from '../parts/PartsList';
 import ModList = Shadowrun.ModList;
 import AttackData = Shadowrun.AttackData;
@@ -30,8 +30,8 @@ import TechnologyData = Shadowrun.TechnologyData;
 import RangeWeaponData = Shadowrun.RangeWeaponData;
 import SpellRange = Shadowrun.SpellRange;
 import CritterPowerRange = Shadowrun.CritterPowerRange;
-import {ItemAction} from "./ItemAction";
-import {SkillFlow} from "../actor/SkillFlow";
+import {ActionFlow} from "./flows/ActionFlow";
+import {SkillFlow} from "../actor/flows/SkillFlow";
 import {SR5} from "../config";
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import ActionItemData = Shadowrun.ActionItemData;
@@ -1087,7 +1087,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
         const action = this.getAction();
         if (!action) return;
 
-        const damage = ItemAction.calcDamage(action.damage, this.actor);
+        const damage = ActionFlow.calcDamage(action.damage, this.actor);
 
         const data: AttackData = {
             hits,

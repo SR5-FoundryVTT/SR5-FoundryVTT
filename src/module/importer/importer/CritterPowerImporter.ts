@@ -2,7 +2,7 @@ import {DataImporter} from './DataImporter';
 import {ImportHelper} from '../helper/ImportHelper';
 import {CritterPowerParserBase} from '../parser/critter-power/CritterPowerParserBase';
 import {Constants} from './Constants';
-import {DefaultValues} from "../../dataTemplates";
+import {DefaultValues} from "../../data/DataDefaults";
 import CritterPowerItemData = Shadowrun.CritterPowerItemData;
 
 export class CritterPowerImporter extends DataImporter {

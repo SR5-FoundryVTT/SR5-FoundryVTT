@@ -1,4 +1,4 @@
-import { DefaultValues } from "../../dataTemplates";
+import { DefaultValues } from "../../data/DataDefaults";
 
 export const getValues = (val) => {
     const regex = /(-?[0-9]+)(?:([0-9]+))*/g;
@@ -36,21 +36,21 @@ export const parseTechnology = (chummerEntry) => {
     const parsedTechnology = DefaultValues.technologyData();
 
     if (chummerEntry.rating) {
-        parsedTechnology.rating = chummerEntry.rating; 
+        parsedTechnology.rating = chummerEntry.rating;
     }
 
     if (chummerEntry.avail) {
-        parsedTechnology.availability = chummerEntry.avail; 
+        parsedTechnology.availability = chummerEntry.avail;
     }
 
     if (chummerEntry.qty) {
-        parsedTechnology.quantity = chummerEntry.qty; 
+        parsedTechnology.quantity = chummerEntry.qty;
     }
 
     if (chummerEntry.cost) {
         parsedTechnology.cost = parseFloat(chummerEntry.cost.replace(/[^\d\.\-]/g, ""));
     }
-    
+
     if (chummerEntry.equipped && chummerEntry.equipped.toLowerCase() === 'true') {
         parsedTechnology.equipped = true;
     }

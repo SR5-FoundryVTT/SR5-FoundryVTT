@@ -4,7 +4,7 @@ import Template from './template';
 import {CORE_FLAGS, CORE_NAME, FLAGS, SYSTEM_NAME} from './constants';
 import {ShadowrunRoll, Test} from "./rolls/ShadowrunRoller";
 import {Helpers} from "./helpers";
-import {DamageApplicationFlow} from './actor/DamageApplicationFlow';
+import {DamageApplicationFlow} from './actor/flows/DamageApplicationFlow';
 import AttackData = Shadowrun.AttackData;
 import DrainData = Shadowrun.DrainData;
 import ModifiedDamageData = Shadowrun.ModifiedDamageData;
@@ -371,8 +371,8 @@ export const addRollListeners = (app: ChatMessage, html) => {
             const actorId = card.data('actorId');
 
             // TODO: foundry-vtt-types SR5Actor doesn't fully mix between game.actors and actor.items
-            const actor = sceneTokenId ? 
-                Helpers.getSceneTokenActor(sceneTokenId) : 
+            const actor = sceneTokenId ?
+                Helpers.getSceneTokenActor(sceneTokenId) :
                 game.actors.get(actorId) as SR5Actor;
             const item = actor?.items.get(id);
             if (!item) return;
