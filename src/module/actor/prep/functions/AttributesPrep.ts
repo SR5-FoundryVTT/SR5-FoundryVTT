@@ -33,6 +33,7 @@ export class AttributesPrep {
      * @param attribute The AttributeField to prepare
      */
     static prepareAttribute(name: string, attribute: AttributeField) {
+        // Check for valid attributes. Active Effects can cause unexpected properties to appear.
         if (!SR5.attributes.hasOwnProperty(name) || !attribute) return;
 
         // TODO: IC-ACTOR Check this NOTE
@@ -55,6 +56,9 @@ export class AttributesPrep {
      * @param attribute The attribute will be modified in place
      */
     static calculateAttribute(name: string, attribute: AttributeField) {
+        // Check for valid attributes. Active Effects can cause unexpected properties to appear.
+        if (!SR5.attributes.hasOwnProperty(name) || !attribute) return;
+
         // Each attribute can have a unique value range.
         // TODO:  Implement metatype attribute value ranges for character actors.
         const range = SR.attributes.ranges[name];

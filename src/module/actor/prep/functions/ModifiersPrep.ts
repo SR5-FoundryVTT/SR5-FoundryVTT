@@ -1,5 +1,6 @@
 import ActorTypesData = Shadowrun.ShadowrunActorDataData;
 import ShadowrunActorDataData = Shadowrun.ShadowrunActorDataData;
+import {SR5} from "../../../config";
 
 export class ModifiersPrep {
     /**
@@ -71,7 +72,10 @@ export class ModifiersPrep {
 
     static clearAttributeMods(data: ShadowrunActorDataData) {
         const { attributes } = data;
-        for (const [, attribute] of Object.entries(attributes)) {
+        for (const [name, attribute] of Object.entries(attributes)) {
+            // Check for valid attributes. Active Effects can cause unexpected properties to appear.
+            if (!SR5.attributes.hasOwnProperty(name) || !attribute) return;
+
             attribute.mod = [];
         }
     }

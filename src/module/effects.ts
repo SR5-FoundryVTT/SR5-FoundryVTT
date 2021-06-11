@@ -14,6 +14,11 @@ import {SR5Item} from "./item/SR5Item";
  * @param {Actor|Item} owner      The owning entity which manages this effect
  */
 export function onManageActiveEffect(event, owner: SR5Actor|SR5Item) {
+    // NOTE: This here is temporary until FoundryVTT has built-in support for nested item updates.
+    //       I won't even translate it, since neither did DnD. ;)
+    if ( owner.isOwned )
+        return ui.notifications.warn("Managing Active Effects within an Owned Item is not currently supported and will be added in a subsequent update.");
+
     event.preventDefault();
     // These element grabs rely heavily on HTML structure within the templates.
     const icon = event.currentTarget;
