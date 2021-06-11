@@ -14,20 +14,20 @@ export class ChangelogApplication extends Application {
         return options;
     }
 
-    render(force?: boolean, options?: Application.RenderOptions): Application {
+    render(force?: boolean, options?: Application.RenderOptions) {
         ChangelogApplication.setRenderForCurrentVersion();
         return super.render(force, options);
     }
 
     // Let the async operation happen in background.
     private static setRenderForCurrentVersion() {
-        game.user.setFlag(SYSTEM_NAME, FLAGS.ChangelogShownForVersion, game.system.data.version);
+        game.user?.setFlag(SYSTEM_NAME, FLAGS.ChangelogShownForVersion, game.system.data.version);
     }
 
     static get showApplication(): boolean {
-        if (!game.user.isGM || !game.user.isTrusted) return false;
+        if (!game.user?.isGM || !game.user?.isTrusted) return false;
 
-        const shownForVersion = game.user.getFlag(SYSTEM_NAME, FLAGS.ChangelogShownForVersion);
+        const shownForVersion = game.user?.getFlag(SYSTEM_NAME, FLAGS.ChangelogShownForVersion);
         return shownForVersion !== game.system.data.version;
     }
 }

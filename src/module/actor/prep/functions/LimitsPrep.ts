@@ -1,9 +1,10 @@
-import SR5ActorData = Shadowrun.SR5ActorData;
 import { PartsList } from '../../../parts/PartsList';
 import { Helpers } from '../../../helpers';
+import {SR5} from "../../../config";
+import ActorTypesData = Shadowrun.ShadowrunActorDataData;
 
 export class LimitsPrep {
-    static prepareLimits(data: SR5ActorData) {
+    static prepareLimits(data: ActorTypesData) {
         const { limits, modifiers } = data;
 
         // SETUP LIMITS
@@ -14,11 +15,11 @@ export class LimitsPrep {
         // limit labels
         for (let [limitKey, limitValue] of Object.entries(limits)) {
             Helpers.calcTotal(limitValue);
-            limitValue.label = CONFIG.SR5.limits[limitKey];
+            limitValue.label = SR5.limits[limitKey];
         }
     }
 
-    static prepareLimitBaseFromAttributes(data: SR5ActorData) {
+    static prepareLimitBaseFromAttributes(data: ActorTypesData) {
 
         const { limits, attributes } = data;
 

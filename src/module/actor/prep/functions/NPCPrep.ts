@@ -1,8 +1,8 @@
-import CharacterActorData = Shadowrun.CharacterActorData;
-import {DataTemplates} from "../../../dataTemplates";
-import {Helpers} from "../../../helpers";
+import CharacterActorData = Shadowrun.CharacterData;
+import {DataDefaults} from "../../../data/DataDefaults";
 import {METATYPEMODIFIER} from "../../../constants";
 import {PartsList} from "../../../parts/PartsList";
+import {AttributesPrep} from "./AttributesPrep";
 
 export class NPCPrep {
     static prepareNPCData(data: CharacterActorData) {
@@ -10,42 +10,36 @@ export class NPCPrep {
         NPCPrep.applyMetatypeModifiers(data);
     }
 
-    /** Replace current metatype modifiers with, even if nothing has changed.
-     *
+    /**
+     * Apply modifiers that result from an NPCs metatype.
+     * This method also should still run on any none NPC to remove eventually lingering NPC metatype modifiers.
      */
     static applyMetatypeModifiers(data: CharacterActorData) {
-        const {metatype} = data;
-        let modifiers = DataTemplates.grunt.metatype_modifiers[metatype];
-        modifiers = modifiers ? modifiers : {};
+        // Extract needed data.
+        const {attributes, metatype} = data;
+        const metatypeModifier = DataDefaults.grunt.metatype_modifiers[metatype] || {};
 
-        const {attributes} = data;
-
-        for (const [attId, attribute] of Object.entries(attributes)) {
+        for (const [name, attribute] of Object.entries(attributes)) {
             // old-style object mod transformation is happening in AttributePrep and is needed here. Order is important.
             if (!Array.isArray(attribute.mod)) {
                     console.error('Actor data contains wrong data type for attribute.mod', attribute, !Array.isArray(attribute.mod));
             } else {
-                const modifyBy = modifiers?.attributes?.[attId];
+
+                // Remove lingering modifiers from NPC actors that aren't anymore.
                 const parts = new PartsList(attribute.mod);
                 parts.removePart(METATYPEMODIFIER);
 
+                // Apply NPC modifiers
+                const modifyBy = metatypeModifier.attributes?.[name];
                 if (data.is_npc && modifyBy) {
                     parts.addPart(METATYPEMODIFIER, modifyBy);
                 }
 
+                // Prepare attribute modifiers
                 attribute.mod = parts.list;
 
-                // Don't modify attribute below one.
-                // TODO: Use a SR5.Values.Attribute calculation to avoid duplication.
-                Helpers.calcTotal(attribute, {min: 1});
+                AttributesPrep.calculateAttribute(name, attribute);
             }
-        }
-    }
-
-    static AddNPCMetatypeAttributeModifier(value) {
-        return {
-            name: METATYPEMODIFIER,
-            value: value as number
         }
     }
 }

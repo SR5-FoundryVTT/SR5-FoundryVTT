@@ -1,9 +1,9 @@
-import Armor = Shadowrun.Armor;
 import { ImportHelper } from '../../helper/ImportHelper';
 import { TechnologyItemParserBase } from '../item/TechnologyItemParserBase';
+import ArmorItemData = Shadowrun.ArmorItemData;
 
-export class ArmorParserBase extends TechnologyItemParserBase<Armor> {
-    Parse(jsonData: object, data: Shadowrun.Armor): Shadowrun.Armor {
+export class ArmorParserBase extends TechnologyItemParserBase<ArmorItemData> {
+    Parse(jsonData: object, data: ArmorItemData): ArmorItemData {
         data = super.Parse(jsonData, data);
 
         data.data.armor.value = ImportHelper.IntValue(jsonData, 'armor', 0);

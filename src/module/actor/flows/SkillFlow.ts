@@ -1,7 +1,7 @@
 import SkillField = Shadowrun.SkillField;
-import {SkillRules} from "./SkillRules";
-import {PartsList} from "../parts/PartsList";
-import {FLAGS, SYSTEM_NAME} from "../constants";
+import {SkillRules} from "../../rules/SkillRules";
+import {PartsList} from "../../parts/PartsList";
+import {FLAGS, SYSTEM_NAME} from "../../constants";
 
 export class SkillFlow {
     /**
@@ -13,7 +13,7 @@ export class SkillFlow {
         if (!SkillRules.mustDefaultToRoll(skill)) return;
 
         if (!SkillFlow.allowDefaultingRoll(skill)) {
-            ui.notifications.warn(game.i18n.localize('SR5.Warnings.SkillCantBeDefault'));
+            ui.notifications?.warn(game.i18n.localize('SR5.Warnings.SkillCantBeDefault'));
             return;
         }
 

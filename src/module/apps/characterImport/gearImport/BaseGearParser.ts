@@ -1,7 +1,7 @@
-import { DefaultValues } from "../../../dataTemplates";
-import { parseDescription, getArray, getValues, parseTechnology, createItemData } from "../BaseParserFunctions.js"
+import { parseDescription, parseTechnology } from "../BaseParserFunctions.js"
+import EquipmentItemData = Shadowrun.EquipmentItemData;
+import {DefaultValues} from "../../../data/DataDefaults";
 
-import Equipment = Shadowrun.Equipment;
 
 /**
  * Parses a certain class of gear (depending on the implementation).
@@ -32,7 +32,7 @@ export class BaseGearParser implements GearParser {
         return parsedGear;
     }
 
-    private getDefaultData() : Equipment {
+    private getDefaultData() : EquipmentItemData {
         return {
             name: '',
             _id: '',
@@ -44,6 +44,8 @@ export class BaseGearParser implements GearParser {
             permission: {
                 default: 2,
             },
+            effects: [],
+            sort: 0
         };
     }
 }

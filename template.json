@@ -872,7 +872,8 @@
                             "value": 1
                         }
                     }
-                }
+                },
+                "modifiers": {}
             }
         },
         "character": {

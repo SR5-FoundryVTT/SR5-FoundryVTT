@@ -1,7 +1,7 @@
-import { LanguageSkillEditForm } from './LanguageSkillEditForm';
+import { LanguageSkillEditSheet } from './LanguageSkillEditSheet';
 import KnowledgeSkillCategory = Shadowrun.KnowledgeSkillCategory;
 
-export class KnowledgeSkillEditForm extends LanguageSkillEditForm {
+export class KnowledgeSkillEditSheet extends LanguageSkillEditSheet {
     category: KnowledgeSkillCategory;
     constructor(actor, options, skillId, category) {
         super(actor, options, skillId);

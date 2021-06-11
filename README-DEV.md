@@ -25,12 +25,6 @@ In general the application within FoundryVTT will use what's the build process p
 ## Unittesting
 Since 0.7.13 there is unit testing support using the FVTT Quench module (https://github.com/schultzcole/FVTT-Quench). This module isn't available on the Foundry VTT module store and needs to be manually installed by developers in order to run unittests within a Foundry environment. It's encouraged to do some unit testing where possible. Rule modules should always contain some testing, while flow modules are encouraged to have some. Any application layers don't need testing. See the structure section for some broad overview over different layers / modules.
 
-## Structure
-More and more parts of the system move to separtate modules organized into these broad layers:
-* Rules layer. Shouldn't contain any references to Foundry objects. At best system objects should be used (like a PartsList)
-* Flow layer. Should use the rules modules to introduce an order of operations for them and collect and output information. This will contain Foundry objects.
-* Application layer. Handle interface operations. Dialogs. Application windows. Chat Message creation and so forth.
-
 ### Linking the dev and system folder
 It's helpful, but not strictly necessary, to place your development folder separate from the FoundryVTT system folder as a system update will overwrite your development folder otherwise. This can be done with linking the two.
 
@@ -83,4 +77,25 @@ If you need to restart the instance:
 docker-compose down
 docker-compose up
 ```
+
+# System Architecture
+
+## Folder structure
+The system in general lives under 
+* src\module
+* src\css
+* src\templates
+
+The systems tests live under 
+* src\test
+
+## Design
+More and more parts of the system move to separtate modules organized into these broad layers:
+* Rules layer. Shouldn't contain any references to Foundry objects. At best system objects should be used (like a PartsList)
+  These live in the rules\ folder
+* Flow layer. Should use the rules modules to introduce an order of operations for them and collect and output information. This will contain Foundry objects. These live in item\flows and actor\flows.
+* Application layer. Handle interface operations. Dialogs. Application windows. Chat Message creation and so forth.
+
+Additional separations are made for
+* Initial data generation of items or template partials
 

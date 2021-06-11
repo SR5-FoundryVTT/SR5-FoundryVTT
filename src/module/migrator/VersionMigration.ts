@@ -37,7 +37,6 @@ export abstract class VersionMigration {
     protected abort(reason: string): void {
         this.m_Abort = true;
         this.m_AbortReason = reason;
-        // @ts-ignore
         ui.notifications.error(`Data migration has been aborted: ${reason}`, { permanent: true });
     }
 
@@ -46,9 +45,7 @@ export abstract class VersionMigration {
      * @param game The world that should be migrated.
      */
     public async Migrate(game: Game) {
-        // @ts-ignore TODO Unignore when Foundry Types updates
         ui.notifications.info(`${game.i18n.localize('SR5.MIGRATION.BeginNotification')} ${this.SourceVersionFriendlyName} -> ${this.TargetVersionFriendlyName}.`);
-        // @ts-ignore TODO Unignore when Foundry Types updates
         ui.notifications.warn(game.i18n.localize('SR5.MIGRATION.DoNotCloseNotification'), {
             permanent: true,
         });
@@ -94,13 +91,12 @@ export abstract class VersionMigration {
         await this.Apply(entityUpdates);
 
         await game.settings.set(VersionMigration.MODULE_NAME, VersionMigration.KEY_DATA_VERSION, this.TargetVersion);
-        // @ts-ignore TODO Unignore when Foundry Types updates
         ui.notifications.info(`${game.i18n.localize('SR5.MIGRATION.SuccessNotification')} ${this.TargetVersion}.`, { permanent: true });
     }
 
     /**
      * Applies the specified mapping of entities, iteratively updating each.
-     * @param entityUpdates A mapping of entity updateData pairs.
+     * @param entityUpdates A mapping of document updateData pairs.
      */
     protected async Apply(entityUpdates: Map<Entity, EntityUpdate>) {
         for (const [entity, { updateData, embeddedItems }] of entityUpdates) {
@@ -118,14 +114,14 @@ export abstract class VersionMigration {
      * @param entityUpdates
      */
     protected async IterateScenes(game: Game, entityUpdates: Map<Entity, EntityUpdate>) {
-        //@ts-ignore  // TypeScript expects entries (Collection.entries) to be a call, yet it's a get property.
-        for (const scene of game.scenes.entries) {
+        // @ts-ignore // TODO: foundry-vtt-types 0.8 Does not support DocumentCollection yet.
+        for (const scene of game.scenes.contents) {
             try {
                 if (!(await this.ShouldMigrateSceneData(scene))) {
                     continue;
                 }
 
-                if (scene._id === 'MAwSFhlXRipixOWw') {
+                if (scene.id === 'MAwSFhlXRipixOWw') {
                     console.log('Scene Pre-Update');
                     console.log(scene);
                 }
@@ -141,10 +137,11 @@ export abstract class VersionMigration {
                             return token;
                         }
 
+                        // @ts-ignore
                         let tokenDataUpdate = await this.MigrateActorData(token.actorData);
                         if (!isObjectEmpty(tokenDataUpdate)) {
                             hasTokenUpdates = true;
-                            tokenDataUpdate['_id'] = token._id;
+                            tokenDataUpdate['_id'] = token.id;
 
                             const newToken = duplicate(token);
                             newToken.actorData = await mergeObject(token.actorData, tokenDataUpdate, {
@@ -158,7 +155,7 @@ export abstract class VersionMigration {
                         }
                     }),
                 );
-                if (scene._id === 'MAwSFhlXRipixOWw') {
+                if (scene.id === 'MAwSFhlXRipixOWw') {
                     console.log('Scene Pre-Update');
                     console.log(scene);
                 }
@@ -181,10 +178,11 @@ export abstract class VersionMigration {
     /**
      * Iterate through all items and migrate each if needed.
      * @param game The game to be updated.
-     * @param entityUpdates The current map of entity updates.
+     * @param entityUpdates The current map of document updates.
      */
     protected async IterateItems(game: Game, entityUpdates: Map<Entity, EntityUpdate>) {
-        for (const item of game.items.entities) {
+        //@ts-ignore // TODO: foundry-vtt-types 0.8 Doesn't support Documents yet
+        for (const item of game.items.contents) {
             try {
                 if (!(await this.ShouldMigrateItemData(item.data))) {
                     continue;
@@ -211,10 +209,11 @@ export abstract class VersionMigration {
     /**
      * Iterate through all actors and migrate each if needed.
      * @param game The game to be updated.
-     * @param entityUpdates The current map of entity updates.
+     * @param entityUpdates The current map of document updates.
      */
     protected async IterateActors(game: Game, entityUpdates: Map<Entity, EntityUpdate>) {
-        for (const actor of game.actors.entities) {
+        // @ts-ignore // TODO: foundry-vtt-types 0.8 Doesn't support Documents yet
+        for (const actor of game.actors.contents) {
             try {
                 if (!(await this.ShouldMigrateActorData(actor.data))) {
                     continue;
@@ -254,18 +253,18 @@ export abstract class VersionMigration {
         if (actorData.items !== undefined) {
             const items = await Promise.all(
                 // @ts-ignore
-                actorData.items.map(async (item) => {
-                    let itemUpdate = await this.MigrateItemData(item);
+                actorData.items.map(async (itemData) => {
+                    let itemUpdate = await this.MigrateItemData(itemData);
 
                     if (!isObjectEmpty(itemUpdate)) {
                         hasItemUpdates = true;
-                        itemUpdate['_id'] = item._id;
-                        return await mergeObject(item, itemUpdate, {
+                        itemUpdate['_id'] = itemData._id;
+                        return await mergeObject(itemData, itemUpdate, {
                             enforceTypes: false,
                             inplace: false,
                         });
                     } else {
-                        return item;
+                        return itemData;
                     }
                 }),
             );
@@ -296,13 +295,13 @@ export abstract class VersionMigration {
     /**
      * Do something right before scene data is migrated.
      * @param game The game to be updated.
-     * @param entityUpdates The current map of entity updates.
+     * @param entityUpdates The current map of document updates.
      */
     protected async PreMigrateSceneData(game: Game, entityUpdates: Map<Entity, EntityUpdate>): Promise<void> {}
     /**
      * Do something right before scene data is migrated.
      * @param game The game to be updated.
-     * @param entityUpdates The current map of entity updates.
+     * @param entityUpdates The current map of document updates.
      */
     protected async PostMigrateSceneData(game: Game, entityUpdates: Map<Entity, EntityUpdate>): Promise<void> {}
 
@@ -325,13 +324,13 @@ export abstract class VersionMigration {
     /**
      * Do something right before item data is migrated.
      * @param game The game to be updated.
-     * @param entityUpdates The current map of entity updates.
+     * @param entityUpdates The current map of document updates.
      */
     protected async PreMigrateItemData(game: Game, entityUpdates: Map<Entity, EntityUpdate>): Promise<void> {}
     /**
      * Do something right before item data is migrated.
      * @param game The game to be updated.
-     * @param entityUpdates The current map of entity updates.
+     * @param entityUpdates The current map of document updates.
      */
     protected async PostMigrateItemData(game: Game, entityUpdates: Map<Entity, EntityUpdate>): Promise<void> {}
 
@@ -354,13 +353,13 @@ export abstract class VersionMigration {
     /**
      * Do something right before actor data is migrated.
      * @param game The game to be updated.
-     * @param entityUpdates The current map of entity updates.
+     * @param entityUpdates The current map of document updates.
      */
     protected async PreMigrateActorData(game: Game, entityUpdates: Map<Entity, EntityUpdate>): Promise<void> {}
     /**
      * Do something right after actor data is migrated.
      * @param game The game to be updated.
-     * @param entityUpdates The current map of entity updates.
+     * @param entityUpdates The current map of document updates.
      */
     protected async PostMigrateActorData(game: Game, entityUpdates: Map<Entity, EntityUpdate>): Promise<void> {}
 
@@ -388,10 +387,10 @@ export abstract class VersionMigration {
                     }
 
                     expandObject(updateData);
-                    updateData['_id'] = ent._id;
+                    updateData['_id'] = ent.id;
                     await pack.updateEntity(updateData);
                     // TODO: Uncomment when foundry allows embeddeds to be updated in packs
-                    // } else if (entity === 'Actor') {
+                    // } else if (document === 'Actor') {
                     //     updateData = await this.MigrateActorData(ent.data);
                     //
                     //     if (isObjectEmpty(updateData)) {
@@ -408,7 +407,7 @@ export abstract class VersionMigration {
                     }
 
                     expandObject(updateData);
-                    updateData['_id'] = ent._id;
+                    updateData['_id'] = ent.id;
                     await pack.updateEntity(updateData);
                 }
             } catch (err) {

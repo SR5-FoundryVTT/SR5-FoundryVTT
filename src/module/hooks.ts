@@ -11,15 +11,19 @@ import { Helpers } from './helpers';
 import { HandlebarManager } from './handlebars/HandlebarManager';
 import { measureDistance } from './canvas';
 import * as chat from './chat';
-import { createItemMacro, rollItemMacro } from './macros';
+import {createItemMacro, createSkillMacro, rollItemMacro, rollSkillMacro} from './macros';
 
 import { OverwatchScoreTracker } from './apps/gmtools/OverwatchScoreTracker';
-import { SR5Combat } from './combat/SR5Combat';
+import {_combatantGetInitiativeFormula, SR5Combat} from './combat/SR5Combat';
 import { Import } from './importer/apps/import-form';
 import {ChangelogApplication} from "./apps/ChangelogApplication";
 import {EnvModifiersApplication} from "./apps/EnvModifiersApplication";
 import {quenchRegister} from "../test/quench";
 import {SR5ICActorSheet} from "./actor/sheets/SR5ICActorSheet";
+
+// Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
+// TODO: Figure out how to change global CONFIG type
+export const SR5CONFIG = SR5;
 
 export class HooksManager {
     static registerHooks() {
@@ -53,21 +57,26 @@ ___________________
 \\____/\\_| \\_\\____/ 
 ===================
 `);
-
         // Create a shadowrun5e namespace within the game global
         game['shadowrun5e'] = {
             SR5Actor,
             ShadowrunRoller,
             SR5Item,
             rollItemMacro,
+            rollSkillMacro
         };
 
-        CONFIG.SR5 = SR5;
+        // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
+        CONFIG.Actor.documentClass = SR5Actor;
+        // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
+        CONFIG.Item.documentClass = SR5Item;
+        // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
+        CONFIG.Combat.documentClass = SR5Combat;
+        // Register initiative directly (outside of system.json) as DnD5e does it.
+        CONFIG.Combat.initiative.formula =  "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
         // @ts-ignore
-        CONFIG.Actor.entityClass = SR5Actor;
-        // @ts-ignore
-        CONFIG.Item.entityClass = SR5Item;
-        CONFIG.Combat.entityClass = SR5Combat;
+        Combatant.prototype._getInitiativeFormula = _combatantGetInitiativeFormula;
+
 
         registerSystemSettings();
 
@@ -100,7 +109,7 @@ ___________________
     }
 
     static async ready() {
-        if (game.user.isGM) {
+        if (game.user?.isGM) {
             await Migrator.BeginMigration();
 
             if (ChangelogApplication.showApplication) {
@@ -117,17 +126,32 @@ ___________________
     }
 
     static canvasInit() {
+        if (!canvas?.ready) return;
+        // @ts-ignore // TODO: foundry-vtt-types 0.8 diagonaleRule doesn't exist on  anymore... does this even work anymore?
         canvas.grid.diagonalRule = game.settings.get(SYSTEM_NAME, 'diagonalMovement');
-        //@ts-ignore
-        // SquareGrid isn't typed.
+        //@ts-ignore // TODO: TYPE SquareGrid isn't typed.
         SquareGrid.prototype.measureDistances = measureDistance;
     }
 
-    static hotbarDrop(bar, data, slot) {
-        if (data.type !== 'Item') return;
-
-        createItemMacro(data.data, slot);
-        return false;
+    /**
+     * Hanlde drop events on the hotbar creating different macros
+     *
+     * @param bar
+     * @param data
+     * @param slot
+     * @return false NOTE: when the hook call propagation should be stopped.
+     */
+    static async hotbarDrop(bar, data, slot) {
+        switch (data.type) {
+            case 'Item':
+                await createItemMacro(data.data, slot);
+                return false;
+            case 'Skill':
+                await createSkillMacro(data.data, slot);
+                return false;
+            default:
+                return;
+        }
     }
 
     static renderSceneControls(controls, html) {
@@ -140,7 +164,7 @@ ___________________
     static getSceneControlButtons(controls) {
         const tokenControls = controls.find((c) => c.name === 'token');
 
-        if (game.user.isGM) {
+        if (game.user?.isGM) {
             tokenControls.tools.push({
                 name: 'overwatch-score-tracker',
                 title: 'CONTROLS.SR5.OverwatchScoreTracker',
@@ -152,8 +176,8 @@ ___________________
         tokenControls.tools.push(EnvModifiersApplication.getControl());
     }
 
-    static renderChatMessage(app, html) {
-        chat.addRollListeners(app, html);
+    static renderChatMessage(message, html, data) {
+        chat.addRollListeners(message, html);
     }
 
     static renderItemDirectory(app: Application, html: JQuery) {

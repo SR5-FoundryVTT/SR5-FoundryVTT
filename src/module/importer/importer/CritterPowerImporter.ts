@@ -1,9 +1,9 @@
-import { DataImporter } from './DataImporter';
-import { ImportHelper } from '../helper/ImportHelper';
-import CritterPower = Shadowrun.CritterPower;
-import { CritterPowerParserBase } from '../parser/critter-power/CritterPowerParserBase';
-import { Constants } from './Constants';
-import {DefaultValues} from "../../dataTemplates";
+import {DataImporter} from './DataImporter';
+import {ImportHelper} from '../helper/ImportHelper';
+import {CritterPowerParserBase} from '../parser/critter-power/CritterPowerParserBase';
+import {Constants} from './Constants';
+import {DefaultValues} from "../../data/DataDefaults";
+import CritterPowerItemData = Shadowrun.CritterPowerItemData;
 
 export class CritterPowerImporter extends DataImporter {
     public categoryTranslations: any;
@@ -14,7 +14,7 @@ export class CritterPowerImporter extends DataImporter {
         return jsonObject.hasOwnProperty('powers') && jsonObject['powers'].hasOwnProperty('power');
     }
 
-    GetDefaultData(): CritterPower {
+    GetDefaultData(): CritterPowerItemData {
         return {
             name: 'Unnamed Item',
             _id: '',
@@ -22,6 +22,8 @@ export class CritterPowerImporter extends DataImporter {
             img: 'icons/svg/mystery-man.svg',
             flags: {},
             type: 'critter_power',
+            effects: [],
+            sort: 0,
             data: {
                 description: {
                     value: '',
@@ -88,21 +90,22 @@ export class CritterPowerImporter extends DataImporter {
     }
 
     async Parse(jsonObject: object): Promise<Entity> {
-      const parser = new CritterPowerParserBase();
-      const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Critter Powers`, true);
+        const parser = new CritterPowerParserBase();
+        const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Critter Powers`, true);
 
-      let datas: CritterPower[] = [];
-      let jsonDatas = jsonObject['powers']['power'];
-      for (let i = 0; i < jsonDatas.length; i++) {
-          let jsonData = jsonDatas[i];
+        let datas: CritterPowerItemData[] = [];
+        let jsonDatas = jsonObject['powers']['power'];
+        for (let i = 0; i < jsonDatas.length; i++) {
+            let jsonData = jsonDatas[i];
 
-          let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
-          data.folder = folder.id;
-          data.name = ImportHelper.MapNameToTranslation(this.itemTranslations, data.name);
+            let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
+            data.folder = folder.id;
+            data.name = ImportHelper.MapNameToTranslation(this.itemTranslations, data.name);
 
-          datas.push(data);
-      }
+            datas.push(data);
+        }
 
-      return await Item.create(datas);
+        // @ts-ignore // TODO: TYPE: Remove this.
+        return await Item.create(datas);
     }
 }

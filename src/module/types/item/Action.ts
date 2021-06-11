@@ -1,10 +1,9 @@
 declare namespace Shadowrun {
-    export type Action = SR5ItemData<ActionData> & {
-        type: 'action';
-    };
+    export interface ActionData extends ActionPartData, DescriptionPartData {
 
-    export type ActionData = ActionPartData & DescriptionPartData;
-    export type ActionRollData = {
+    }
+
+    export interface ActionRollData {
             type: string;
             category: string;
             attribute: ActorAttribute;
@@ -19,47 +18,48 @@ declare namespace Shadowrun {
             opposed: OpposedTestData;
             alt_mod: number;
             dice_pool_mod: ModList<number>;
-        };
+        }
 
-    export type ActionPartData = {
+    export interface ActionPartData {
         action: ActionRollData
-    };
+    }
 
     /**
      * Action limit data.
      */
-    export type LimitData = ModifiableValueLinked;
+    export interface LimitData extends ModifiableValueLinked {}
     export type FormulaOperator = 'add'|'subtract'|'multiply'|'divide';
 
     /**
      * Info about the embedded source item that caused the damage
      */
-    export type DamageSource = {
-        actorId : string;
-        itemId : string;
-        itemName : string;
-        itemType : string;
+    export interface DamageSource {
+        actorId: string;
+        itemId: string;
+        itemName: string;
+        itemType: string;
     }
     /**
      * Action damage data.
      */
-    export type DamageData = ModifiableValueLinked & {
+    export interface DamageData extends ModifiableValueLinked {
         type: BaseValuePair<DamageType>;
         element: BaseValuePair<DamageElement>;
         ap: ModifiableValue;
         // See config.actionDamageFormulaOperators for operator mapping.
         base_formula_operator: FormulaOperator;
         source?: DamageSource;
-    };
+    }
+
     /**
      * Action opposed test data.
      */
-    export type OpposedTestData = {
+    export interface OpposedTestData {
         type: OpposedType;
         attribute: ActorAttribute;
         attribute2: ActorAttribute;
         skill: SkillName;
         mod: number;
         description: string;
-    };
+    }
 }

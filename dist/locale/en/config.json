@@ -172,6 +172,7 @@
 
     "SR5.Weapon": "Weapon",
     "SR5.Ammo": "Ammo",
+    "SR5.AmmoGelRounds": "Gel rounds",
     "SR5.WeaponMods": "Mods",
     "SR5.WeaponType": "Type",
     "SR5.WeaponAmmoCount": "Ammo Count",
@@ -467,6 +468,7 @@
     "SR5.Aoe": "AoE",
     "SR5.Level": "Level",
     "SR5.Override": "Override",
+    "SR5.KnockedDown": "Knocked Down",
 
     "SR5.Item": "Item",
     "SR5.Bonuses": "Bonuses",
@@ -807,7 +809,8 @@
     "SR5.Warnings": {
         "NegativeLimitValue": "Limit values must be above zero",
         "TokenSelectionNeeded": "One ore more tokens need to be selected",
-        "SkillCantBeDefault": "This skill can't be rolled on as it can't be defaulted"
+        "SkillCantBeDefault": "This skill can't be rolled on as it can't be defaulted",
+        "MissingSkillOnActor": "Your controlled actor doesn't have this skill"
     },
 
     "SR5.Errors": {

@@ -18,7 +18,7 @@
                     size="2"
                     maxLength="2"
                     value=attribute.base
-                    name=(buildName part1=(default attributesPath "data.attributes") part2=attributeId part3="base")
+                    name=(buildName part1=(fallbackValue attributesPath "data.attributes") part2=attributeId part3="base")
                     disabled=(disabledHelper disableBase)
             }}
         </div>
@@ -30,7 +30,7 @@
                     size="2"
                     maxLength="2"
                     value=attribute.temp
-                    name=(buildName part1=(default attributesPath "data.attributes") part2=attributeId part3="temp")
+                    name=(buildName part1=(fallbackValue attributesPath "data.attributes") part2=attributeId part3="temp")
                     disabled=(disabledHelper disableManual)
             }}
         </div>

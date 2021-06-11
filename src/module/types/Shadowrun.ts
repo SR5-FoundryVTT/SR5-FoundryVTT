@@ -1,3 +1,5 @@
+declare const SR5CONFIG: any;
+
 declare namespace Shadowrun {
     export type PhysicalAttribute = 'body' | 'agility' | 'reaction' | 'strength';
     export type MentalAttribute = 'logic' | 'intuition' | 'charisma' | 'willpower';

@@ -4,20 +4,22 @@ declare namespace Shadowrun {
      * A valid weapon with all associated fields. Weapons still have all possible fields, but some
      * may be ignored based on the value of @category.
      */
-    export type Weapon = SR5ItemData<WeaponData> & {
-        type: 'weapon';
-    };
+    export interface WeaponData extends
+        WeaponPartData,
+        ActionPartData,
+        TechnologyPartData,
+        DescriptionPartData {
 
-    export type WeaponData = WeaponPartData & ActionPartData & TechnologyPartData & DescriptionPartData;
+    }
 
-    export type WeaponPartData = {
+    export interface WeaponPartData {
         category: WeaponCategory;
         subcategory: string;
         ammo: AmmunitionData;
         range: RangeWeaponData;
         melee: MeleeWeaponData;
         thrown: ThrownWeaponData;
-    };
+    }
 
     /**
      * Weapon categories.
@@ -27,59 +29,59 @@ declare namespace Shadowrun {
     /**
      * Ammunition data for an weapon.
      */
-    export type AmmunitionData = {
+    export interface AmmunitionData {
         spare_clips: ValueMaxPair<number>;
         current: ValueMaxPair<number>;
-    };
+    }
 
     /**
      * Ranged weapon specific data.
      */
-    export type RangeWeaponData = {
+    export interface RangeWeaponData {
         category: '';
         ranges: RangeData;
         rc: ModifiableValue;
         modes: FiringModeData;
-    };
+    }
     /**
      * Weapon ranges data.
      */
-    export type RangeData = {
+    export interface RangeData  {
         short: number;
         medium: number;
         long: number;
         extreme: number;
         attribute?: ActorAttribute;
-    };
+    }
     /**
      * Valid firing modes data.
      */
-    export type FiringModeData = {
+    export interface FiringModeData  {
         single_shot: boolean;
         semi_auto: boolean;
         burst_fire: boolean;
         full_auto: boolean;
-    };
+    }
 
     /**
      * Melee weapon specific data.
      */
-    export type MeleeWeaponData = {
+    export interface MeleeWeaponData  {
         reach: number;
-    };
+    }
 
     /**
      * Thrown weapon specific data.
      */
-    export type ThrownWeaponData = {
+    export interface ThrownWeaponData  {
         ranges: RangeData;
         blast: BlastData;
-    };
+    }
     /**
      * Blast data.
      */
-    export type BlastData = {
+    export interface BlastData  {
         radius: number;
         dropoff: number;
-    };
+    }
 }

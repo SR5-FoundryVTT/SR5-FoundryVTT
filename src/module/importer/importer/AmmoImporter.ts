@@ -1,8 +1,8 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
-import Ammo = Shadowrun.Ammo;
 import WeaponData = Shadowrun.WeaponData;
+import AmmoItemData = Shadowrun.AmmoItemData;
 
 export class AmmoImporter extends DataImporter {
     public files = ['gear.xml'];
@@ -11,7 +11,7 @@ export class AmmoImporter extends DataImporter {
         return jsonObject.hasOwnProperty('gears') && jsonObject['gears'].hasOwnProperty('gear');
     }
 
-    GetDefaultData(): Ammo {
+    GetDefaultData(): AmmoItemData {
         return {
             name: '',
             _id: '',
@@ -19,6 +19,8 @@ export class AmmoImporter extends DataImporter {
             img: 'icons/svg/mystery-man.svg',
             flags: {},
             type: 'ammo',
+            effects: [],
+            sort: 0,
             data: {
                 description: {
                     value: '',
@@ -69,8 +71,8 @@ export class AmmoImporter extends DataImporter {
         this.entryTranslations = ImportHelper.ExtractItemTranslation(jsonGeari18n, 'gears', 'gear');
     }
 
-    async Parse(jsonObject: object): Promise<Entity> {
-        let ammoDatas: Ammo[] = [];
+    async Parse(jsonObject: object): Promise<Item> {
+        let ammoDatas: AmmoItemData[] = [];
         let jsonAmmos = jsonObject['gears']['gear'];
         for (let i = 0; i < jsonAmmos.length; i++) {
             let jsonData = jsonAmmos[i];
@@ -121,8 +123,6 @@ export class AmmoImporter extends DataImporter {
                 });
 
                 if (foundWeapon !== null && "action" in foundWeapon.data.data) {
-                    console.log(foundWeapon);
-
                     const weaponData = foundWeapon.data.data as WeaponData;
                     data.data.damage = weaponData.action.damage.value;
                     data.data.ap =weaponData.action.damage.ap.value;
@@ -150,6 +150,7 @@ export class AmmoImporter extends DataImporter {
             ammo.folder = folder.id;
         }
 
+        //@ts-ignore // TODO: TYPING unclear.
         return await Item.create(ammoDatas);
     }
 }

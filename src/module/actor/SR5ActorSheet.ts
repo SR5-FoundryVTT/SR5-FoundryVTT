@@ -1,36 +1,35 @@
 import {Helpers} from '../helpers';
 import {ChummerImportForm} from '../apps/chummer-import-form';
-import {SkillEditForm} from '../apps/skills/SkillEditForm';
-import {KnowledgeSkillEditForm} from '../apps/skills/KnowledgeSkillEditForm';
-import {LanguageSkillEditForm} from '../apps/skills/LanguageSkillEditForm';
+import {SkillEditSheet} from '../apps/skills/SkillEditSheet';
+import {KnowledgeSkillEditSheet} from '../apps/skills/KnowledgeSkillEditSheet';
+import {LanguageSkillEditSheet} from '../apps/skills/LanguageSkillEditSheet';
 import {SR5Actor} from './SR5Actor';
 import {SR5} from '../config';
 import {SR5Item} from "../item/SR5Item";
-import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import Skills = Shadowrun.Skills;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import SkillField = Shadowrun.SkillField;
 import DeviceData = Shadowrun.DeviceData;
+import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
+import Attributes = Shadowrun.Attributes;
 
-// Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditForm instance.
+// Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
-// when opened in succession, causing SkillEditForm to wrongfully overwrite the wrong data.
+// when opened in succession, causing SkillEditSheet to wrongfully overwrite the wrong data.
 let globalSkillAppId: number = -1;
 
 /**
  * Extend the basic ActorSheet with some very simple modifications
  *
- * NOTE: ActorSheet<T, A> expects Actor.data.data typing, yet complains about it's general type being not compatible
- *       with SR5ActorData
  */
-export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
+export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
     _shownDesc: string[];
     _filters: SR5SheetFilters;
     _scroll: string;
 
-    constructor(...args) {
-        super(...args);
+    constructor(actor, options?) {
+        super(actor, options);
 
         /**
          * Keep track of the currently active sheet tab
@@ -50,6 +49,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
      * @returns {Object}
      */
     static get defaultOptions() {
+        // @ts-ignore
         return mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'actor'],
             width: 880,
@@ -67,24 +67,28 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
     get template() {
         const path = 'systems/shadowrun5e/dist/templates';
 
-        if (this.actor.hasPerm(game.user, 'LIMITED', true)) {
+        if (this.actor.limited) {
             return `${path}/actor-limited/${this.actor.data.type}.html`;
         }
 
         return `${path}/actor/${this.actor.data.type}.html`;
     }
 
-    /* -------------------------------------------- */
-
     /**
      * Prepare data for rendering the Actor sheet
      * The prepared data object contains both the actor data as well as additional sheet options
      */
     getData() {
-        const data: SR5ActorSheetData = (super.getData() as unknown) as SR5ActorSheetData;
+        // Restructure redesigned Document.getData to contain all new fields, while keeping data.data as system data.
+        let data = super.getData() as unknown as SR5ActorSheetData;
+        data = {
+            ...data,
+            // @ts-ignore
+            data: data.data.data
+        }
 
         // General purpose fields...
-        data.config = CONFIG.SR5;
+        data.config = SR5;
         data.filters = this._filters;
 
         this._prepareMatrixAttributes(data);
@@ -108,8 +112,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
     }
 
     _getSkillLabelOrName(skill) {
-        // Custom skills don't have labels, use their name instead.
-        return skill.label ? game.i18n.localize(skill.label) : skill.name;
+        return Helpers.getSkillLabelOrName(skill);
     }
 
     _doesSkillContainText(key, skill, text) {
@@ -175,10 +178,10 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
 
     _prepareActorAttributes(data: SR5ActorSheetData) {
         // Clear visible, zero value attributes temporary modifiers so they appear blank.
-        const attrs = data.data.attributes;
-        for (let [, att] of Object.entries(attrs)) {
-            if (!att.hidden) {
-                if (att.temp === 0) delete att.temp;
+        const attributes = data.data.attributes as Attributes;
+        for (let [, attribute] of Object.entries(attributes)) {
+            if (!attribute.hidden) {
+                if (attribute.temp === 0) delete attribute.temp;
             }
         }
     }
@@ -340,7 +343,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
                 // NOTE: If no duplication is done, added fields will be stored in the database on updates!
                 item = duplicate(item);
                 // Show item properties and description in the item list overviews.
-                const actorItem = this.actor.items.get(item._id) as SR5Item;
+                const actorItem = this.actor.items.get(item._id);
                 const chatData = actorItem.getChatData();
                 item.description = chatData.description;
                 // @ts-ignore // This is a hacky monkey patch solution to pass template data through duplicated item data.
@@ -482,7 +485,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
                 event.preventDefault();
                 const field = $(event.currentTarget).parents('.list-item');
                 const iid = $(field).data().itemId;
-                const item = this.actor.getOwnedSR5Item(iid);
+                const item = this.actor.items.get(iid);
                 if (item) {
                     await item.openPdfSource();
                 }
@@ -516,28 +519,83 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         html.find('.item-edit').click((event) => {
             event.preventDefault();
             const iid = Helpers.listItemId(event);
-            const item = this.actor.getOwnedSR5Item(iid);
-            if (item) item.sheet.render(true);
+            const item = this.actor.items.get(iid);
+            if (!item) return;
+            // @ts-ignore
+            item.sheet.render(true);
         });
         // Delete Inventory Item
         html.find('.item-delete').click(event => this.deleteOwnedItem(event));
-        // Drag inventory item
-        let handler = (ev) => this._onDragStart(ev);
-        html.find('.list-item').each((i, item) => {
-            if (item.dataset && item.dataset.itemId) {
-                item.setAttribute('draggable', true);
-                item.addEventListener('dragstart', handler, false);
-            }
-        });
+
+        // Augment ListItem.html templates with drag support
+       this._addDragSupportToListItemTemplatePartial(html);
 
         html.find('.driver-remove').click(this.handleRemoveVehicleDriver.bind(this));
     }
 
-    /** Handle all entity drops onto all actor sheet types.
+    /**
+     * @override Default drag start handler to add Skill support
+     * @param event
+     */
+    async _onDragStart(event) {
+        if (!canvas.ready) return;
+
+        // Create drag data
+        const dragData = {
+            actorId: this.actor.id,
+            sceneId: this.actor.isToken ? canvas.scene?.id : null,
+            tokenId: this.actor.isToken ? this.actor.token.id : null,
+            type: null,
+            data: null
+        };
+
+        // Handle different item type data transfers.
+        // These handlers depend on behavior of the template partial ListItem.html.
+        const element = event.currentTarget;
+        switch (element.dataset.itemType) {
+            // Skill data transfer. (Active and language skills)
+            case 'skill':
+                // Prepare data transfer
+                dragData.type = 'Skill';
+                dragData.data = {
+                    skillId: element.dataset.itemId,
+                    skill: this.actor.getSkill(element.dataset.itemId)
+                };
+
+                // Set data transfer
+                event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+
+                return;
+
+            // Knowlege skill data transfer
+            case 'knowledgeskill':
+                // Knowledge skills have a multi purpose id built: <id>.<knowledge_category>
+                const skillId = element.dataset.itemId.includes('.') ? element.dataset.itemId.split('.')[0] : element.dataset.itemId;
+
+                dragData.type = 'Skill';
+                dragData.data = {
+                    skillId,
+                    skill: this.actor.getSkill(skillId)
+                };
+
+                // Set data transfer
+                event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+
+                return;
+
+            // All default Foundry data transfer.
+            default:
+                // Let default Foundry handler deal with default drag cases.
+                return super._onDragStart(event);
+        }
+    }
+
+    /** Handle all document drops onto all actor sheet types.
      *
      * @param event
      */
-    async _onDrop(event: DragEvent) {
+    // @ts-ignore
+    async _onDrop(event) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -556,7 +614,18 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         await super._onDrop(event);
     }
 
-
+    /**
+     * Augment each item of the ListItem template partial with drag support.
+     * @param html
+     */
+    _addDragSupportToListItemTemplatePartial(html) {
+         html.find('.list-item').each((i, item) => {
+            if (item.dataset && item.dataset.itemId) {
+                item.setAttribute('draggable', true);
+                item.addEventListener('dragstart', this._onDragStart.bind(this), false);
+            }
+        });
+    }
 
     async deleteOwnedItem(event) {
         event.preventDefault();
@@ -565,7 +634,8 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         if (!userConsented) return;
 
         const iid = Helpers.listItemId(event);
-        await this.actor.deleteOwnedItem(iid);
+        const item = this.actor.items.get(iid);
+        await item.delete();
     }
 
     async _onRollFromSheet(event) {
@@ -695,7 +765,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
     async _onReloadAmmo(event) {
         event.preventDefault();
         const iid = Helpers.listItemId(event);
-        const item = this.actor.getOwnedSR5Item(iid);
+        const item = this.actor.items.get(iid);
         if (item) return item.reloadAmmo();
     }
 
@@ -703,7 +773,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         if (!("matrix" in this.actor.data.data)) return;
 
         let iid = this.actor.data.data.matrix.device;
-        let item = this.actor.getOwnedSR5Item(iid);
+        let item = this.actor.items.get(iid);
         if (!item) {
             console.error('could not find item');
             return;
@@ -740,7 +810,8 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
             name: `New ${type}`,
             type: type,
         };
-        return this.actor.createOwnedItem(itemData, { renderSheet: true });
+        // @ts-ignore // TODO: foundry-vtt-types has no Document Support yet.
+        return this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
     }
 
     async _onAddLanguageSkill(event) {
@@ -749,7 +820,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         if (!skillId) return;
 
         // NOTE: Causes issues with adding knowledge skills (category undefined)
-        // await this._showSkillEditForm(LanguageSkillEditForm, this.actor, {event}, skillId);
+        // await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, {event}, skillId);
     }
 
     async _onRemoveLanguageSkill(event) {
@@ -769,7 +840,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         if (!skillId) return;
 
         // NOTE: Causes issues with adding knowledge skills (category undefined)
-        // await this._showSkillEditForm(KnowledgeSkillEditForm, this.actor, {event}, skillId);
+        // await this._showSkillEditForm(KnowledgeSkillEditSheet, this.actor, {event}, skillId);
     }
 
     async _onRemoveKnowledgeSkill(event) {
@@ -791,7 +862,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         const skillId = await this.actor.addActiveSkill();
         if (!skillId) return;
 
-        await this._showSkillEditForm(SkillEditForm, this.actor, { event: event }, skillId);
+        await this._showSkillEditForm(SkillEditSheet, this.actor, { event: event }, skillId);
     }
 
     async _onRemoveActiveSkill(event: Event) {
@@ -806,7 +877,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
 
     async _onChangeRtg(event) {
         const iid = Helpers.listItemId(event);
-        const item = this.actor.getOwnedSR5Item(iid);
+        const item = this.actor.items.get(iid);
         const rtg = parseInt(event.currentTarget.value);
         if (item && rtg) {
             await item.update({ 'data.technology.rating': rtg });
@@ -815,7 +886,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
 
     async _onChangeQty(event) {
         const iid = Helpers.listItemId(event);
-        const item = this.actor.getOwnedSR5Item(iid);
+        const item = this.actor.items.get(iid);
         const qty = parseInt(event.currentTarget.value);
         if (item && qty && "technology" in item.data.data) {
             item.data.data.technology.quantity = qty;
@@ -826,15 +897,15 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
     async _onEquipItem(event) {
         event.preventDefault();
         const iid = Helpers.listItemId(event);
-        const item = this.actor.getOwnedSR5Item(iid);
+        const item = this.actor.items.get(iid);
         if (item) {
             const newItems = [] as any[];
             if (item.isDevice()) {
                 // Only allow one equipped device item. Unequip all other.
-                for (let ite of this.actor.items.filter((actorItem: SR5Item) => actorItem.isDevice())) {
+                for (const item of this.actor.items.filter(actorItem => actorItem.isDevice())) {
                     newItems.push({
-                        '_id': ite._id,
-                        'data.technology.equipped': ite._id === iid,
+                        '_id': item.id,
+                        'data.technology.equipped': item.id === iid,
                     });
                 }
 
@@ -845,8 +916,8 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
                     'data.technology.equipped': !item.isEquipped(),
                 });
             }
-            // @ts-ignore // TODO: foundry-pc-type defines Entity.updateEmbeddedEntity as static but it's not.
-            await this.actor.updateEmbeddedEntity('OwnedItem', newItems);
+            // @ts-ignore // TODO: foundry-vtt-types 0.8 has no Document support yet
+            await this.actor.updateEmbeddedDocuments('Item', newItems);
 
             this.actor.render(false);
         }
@@ -924,7 +995,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
     async _onRollItem(event) {
         event.preventDefault();
         const iid = Helpers.listItemId(event);
-        const item = this.actor.getOwnedSR5Item(iid);
+        const item = this.actor.items.get(iid);
         if (item) {
             await item.castAction(event);
         }
@@ -963,24 +1034,44 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
     }
 
     /**
-     * @private
+     * Enhance Foundry state restore on rerender by more user interaction state.
+     * @override
      */
     async _render(...args) {
-        const focusList = $(this.element).find(':focus');
-        const focus: any = focusList.length ? focusList[0] : null;
-
+        const focus = this._saveInputCursorPosition();
         this._saveScrollPositions();
-        await super._render(...args);
-        this._restoreScrollPositions();
 
+        await super._render(...args);
+
+        this._restoreScrollPositions();
+        this._restoreInputCursorPosition(focus);
+    }
+
+    _saveInputCursorPosition(): any|null {
+        const focusList = $(this.element).find('input:focus');
+        return focusList.length ? focusList[0] : null;
+    }
+
+    /**
+     * Restore the cursor position of focused input elements on top of Foundry restoring the general focus
+     * This is needed for char by char update caused by filtering skills.
+     */
+    _restoreInputCursorPosition(focus) {
         if (focus && focus.name) {
+            if (!this.form) return;
+
             const element = this.form[focus.name];
             if (element) {
+                // Set general focus for allem input types.
                 element.focus();
+
+                // Set selection range for supported input types.
+                if (['checkbox', 'radio'].includes(element.type)) return;
                 // set the selection range on the focus formed from before (keeps track of cursor in input)
                 element.setSelectionRange && element.setSelectionRange(focus.selectionStart, focus.selectionEnd);
             }
         }
+
     }
 
     /**
@@ -1012,9 +1103,9 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         }
     }
 
-    /** Keep track of each SkillEditForm instance and close before opening another.
+    /** Keep track of each SkillEditSheet instance and close before opening another.
      *
-     * @param skillEditFormImplementation Any extending class! of SkillEditForm
+     * @param skillEditFormImplementation Any extending class! of SkillEditSheet
      * @param actor
      * @param options
      * @param args Collect arguments of the different renderWithSkill implementations.
@@ -1032,7 +1123,7 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
         const [skill, category] = Helpers.listItemId(event).split('.');
 
         this._showSkillEditForm(
-            KnowledgeSkillEditForm,
+            KnowledgeSkillEditSheet,
             this.actor,
             {
                 event: event,
@@ -1045,15 +1136,15 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
     async _onShowEditLanguageSkill(event) {
         event.preventDefault();
         const skill = Helpers.listItemId(event);
-        // new LanguageSkillEditForm(this.actor, skill, { event: event }).render(true);
-        await this._showSkillEditForm(LanguageSkillEditForm, this.actor, { event: event }, skill);
+        // new LanguageSkillEditSheet(this.actor, skill, { event: event }).render(true);
+        await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, { event: event }, skill);
     }
 
     async _onShowEditSkill(event) {
         event.preventDefault();
         const skill = Helpers.listItemId(event);
-        // new SkillEditForm(this.actor, skill, { event: event }).render(true);
-        await this._showSkillEditForm(SkillEditForm, this.actor, { event: event }, skill);
+        // new SkillEditSheet(this.actor, skill, { event: event }).render(true);
+        await this._showSkillEditForm(SkillEditSheet, this.actor, { event: event }, skill);
     }
 
     _onShowImportCharacter(event) {
@@ -1070,7 +1161,6 @@ export class SR5ActorSheet extends ActorSheet<{}, SR5Actor> {
 
         await this.actor.showHiddenSkills();
     }
-
 
     async handleRemoveVehicleDriver(event) {
         event.preventDefault();

@@ -1,7 +1,7 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
-import Armor = Shadowrun.Armor;
 import { ArmorParserBase } from '../parser/armor/ArmorParserBase';
+import ArmorItemData = Shadowrun.ArmorItemData;
 
 export class ArmorImporter extends DataImporter {
     public armorTranslations: any;
@@ -12,7 +12,7 @@ export class ArmorImporter extends DataImporter {
         return jsonObject.hasOwnProperty('armors') && jsonObject['armors'].hasOwnProperty('armor');
     }
 
-    GetDefaultData(): Armor {
+    GetDefaultData(): ArmorItemData {
         return {
             name: 'Unnamed Armor',
             _id: '',
@@ -20,6 +20,8 @@ export class ArmorImporter extends DataImporter {
             img: 'icons/svg/mystery-man.svg',
             flags: {},
             type: 'armor',
+            effects: [],
+            sort: 0,
             data: {
                 description: {
                     value: '',
@@ -75,7 +77,7 @@ export class ArmorImporter extends DataImporter {
 
         const parser = new ArmorParserBase();
 
-        let datas: Armor[] = [];
+        let datas: ArmorItemData[] = [];
         let jsonDatas = jsonObject['armors']['armor'];
         for (let i = 0; i < jsonDatas.length; i++) {
             let jsonData = jsonDatas[i];
@@ -91,6 +93,7 @@ export class ArmorImporter extends DataImporter {
             datas.push(data);
         }
 
+        // @ts-ignore // TODO: TYPE: Remove this.
         return await Item.create(datas);
     }
 }

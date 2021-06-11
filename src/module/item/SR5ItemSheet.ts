@@ -6,8 +6,9 @@ import {SR5Actor} from "../actor/SR5Actor";
 /**
  * Extend the basic ItemSheet with some very simple modifications
  */
-export class SR5ItemSheet extends ItemSheet<{}, SR5Item> {
-    private _shownDesc: any[];
+// TODO: Check foundry-vtt-types systems for how to do typing...
+export class SR5ItemSheet extends ItemSheet<any, any> {
+    private _shownDesc: any[] = [];
     private _scroll: string;
     constructor(...args) {
         super(...args);
@@ -23,6 +24,7 @@ export class SR5ItemSheet extends ItemSheet<{}, SR5Item> {
      * @returns {Object}
      */
     static get defaultOptions() {
+        // @ts-ignore // mergeObject breaks TypeScript typing. Should be fine.
         return mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'item'],
             width: 650,
@@ -43,7 +45,10 @@ export class SR5ItemSheet extends ItemSheet<{}, SR5Item> {
      * The prepared data object contains both the actor data as well as additional sheet options
      */
     getData() {
-        const data = super.getData();
+        const data = await super.getData();
+        // Foundry 0.8 will return data as an sheet data while Foundry 0.7 will return data as an item data.
+        // Therefore data is nested one deeper. The alternative would be to rework all references with one more data...
+        data.data = data.data.data;
         const itemData = data.data;
 
         if (itemData.action) {
@@ -74,7 +79,7 @@ export class SR5ItemSheet extends ItemSheet<{}, SR5Item> {
             }
         }
 
-        data['config'] = CONFIG.SR5;
+        data['config'] = SR5;
         const items = this.getEmbeddedItems();
         const [ammunition, weaponMods, armorMods] = items.reduce(
             (parts: [Item.Data[], Item.Data[], Item.Data[]], item: SR5Item) => {
@@ -115,10 +120,9 @@ export class SR5ItemSheet extends ItemSheet<{}, SR5Item> {
     _getSortedActiveSkillsForSelect() {
         // We need the actor owner, instead of the item owner. See actorOwner jsdoc for details.
         const actor = this.item.actorOwner;
-        const skills = actor?.getSkills();
+        if (!actor) return Helpers.sortConfigValuesByTranslation(SR5.activeSkills);
 
-        if (!actor || !skills) return Helpers.sortConfigValuesByTranslation(SR5.activeSkills);
-        const activeSkills = Helpers.sortSkills(skills.active);
+        const activeSkills = Helpers.sortSkills(actor.getActiveSkills());
 
         const activeSkillsForSelect = {};
         for (const [id, skill] of Object.entries(activeSkills)) {
@@ -295,11 +299,13 @@ export class SR5ItemSheet extends ItemSheet<{}, SR5Item> {
     async _onAddWeaponMod(event) {
         event.preventDefault();
         const type = 'modification';
+        // TODO: Move this into DefaultValues...
         const itemData = {
             name: `New ${Helpers.label(type)}`,
             type: type,
             data: duplicate(game.system.model.Item.modification),
         };
+        // @ts-ignore
         itemData.data.type = 'weapon';
         // @ts-ignore
         const item = Item.createOwned(itemData, this.item);
@@ -357,7 +363,8 @@ export class SR5ItemSheet extends ItemSheet<{}, SR5Item> {
      */
     private fixStaleRenderedState() {
         if (this._state === Application.RENDER_STATES.RENDERED && ui.windows[this.appId] === undefined) {
-            console.warn(`SR5ItemSheet app for ${this.entity.name} is set as RENDERED but has no window registered. Fixing app internal render state. This is a known bug.`);
+            // @ts-ignore // TODO: 0.8 foundry-vtt-types doesn't know of DocumentSheet.document yet.
+            console.warn(`SR5ItemSheet app for ${this.document.name} is set as RENDERED but has no window registered. Fixing app internal render state. This is a known bug.`);
             // Hotfixing instead of this.close() since FormApplication.close() expects form elements, which don't exist anymore.
             this._state = Application.RENDER_STATES.CLOSED;
         }
@@ -368,7 +375,7 @@ export class SR5ItemSheet extends ItemSheet<{}, SR5Item> {
      */
     async _render(force = false, options = {}) {
         // NOTE: This is for a timing bug. See function doc for code removal. Good luck, there be dragons here. - taM
-        this.fixStaleRenderedState();
+        // this.fixStaleRenderedState();
 
         this._saveScrollPositions();
         await super._render(force, options);

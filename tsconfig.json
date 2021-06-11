@@ -3,10 +3,10 @@
   "exclude": ["node_modules", "**/*.spec.ts"],
   "compilerOptions": {
     "target": "es6",
-    "strictNullChecks": true,
     "module": "commonjs",
+    "moduleResolution": "node",
     "types": [
-      "foundry-pc-types",
+      "@league-of-foundry-developers/foundry-vtt-types",
       "node"
     ]
   }

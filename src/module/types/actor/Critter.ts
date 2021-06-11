@@ -1,18 +1,23 @@
 /// <reference path="../Shadowrun.ts" />
 
+// TODO: Check CommonActorData in last commit. Propably moves attributes. limits and so forth into one type.
 declare namespace Shadowrun {
-    export type CritterType = keyof typeof CONFIG.SR5.critterTypes;
-
-    export type SR5CritterType = SR5ActorBase & {
-        data: CritterActorData;
-        type: 'critter';
-    };
-
-    export type CritterActorData = CommonActorData &
-        MagicActorData &
+    export type CritterType = keyof typeof SR5CONFIG.critterTypes;
+    export type CritterData = MagicActorData &
         TwoTrackActorData &
         ArmorActorData &
         WoundsActorData &
         MatrixActorData &
-        MovementActorData;
+        MovementActorData & {
+        attributes: Attributes;
+        limits: Limits;
+        skills: {
+            active: Skills;
+            language: KnowledgeSkillList;
+            knowledge: KnowledgeSkills;
+        };
+        modifiers: Modifiers;
+        special: SpecialTrait;
+        initiative: Initiative;
+    };
 }

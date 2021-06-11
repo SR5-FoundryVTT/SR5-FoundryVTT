@@ -1,10 +1,11 @@
-import SR5ActorData = Shadowrun.SR5ActorData;
+import ActorTypesData = Shadowrun.ShadowrunActorDataData;
+import ShadowrunActorDataData = Shadowrun.ShadowrunActorDataData;
 
 export class ModifiersPrep {
     /**
      * Prepare the modifiers that are displayed in the Misc. tab
      */
-    static prepareModifiers(data: SR5ActorData) {
+    static prepareModifiers(data: ActorTypesData) {
         let modifiers = ModifiersPrep.commonModifiers;
         modifiers = modifiers.concat(ModifiersPrep.matrixModifiers);
         modifiers = modifiers.concat(ModifiersPrep.characterModifiers)
@@ -68,7 +69,7 @@ export class ModifiersPrep {
         data.modifiers = sorted;
     }
 
-    static clearAttributeMods(data: SR5ActorData) {
+    static clearAttributeMods(data: ShadowrunActorDataData) {
         const { attributes } = data;
         for (const [, attribute] of Object.entries(attributes)) {
             attribute.mod = [];

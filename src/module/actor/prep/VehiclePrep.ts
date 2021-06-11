@@ -1,6 +1,4 @@
-import { BaseActorPrep } from './BaseActorPrep';
-import SR5VehicleType = Shadowrun.SR5VehicleType;
-import VehicleActorData = Shadowrun.VehicleActorData;
+import VehicleActorData = Shadowrun.VehicleData;
 import { SkillsPrep } from './functions/SkillsPrep';
 import { ModifiersPrep } from './functions/ModifiersPrep';
 import { InitiativePrep } from './functions/InitiativePrep';
@@ -9,34 +7,37 @@ import { LimitsPrep } from './functions/LimitsPrep';
 import { MatrixPrep } from './functions/MatrixPrep';
 import { Helpers } from '../../helpers';
 import { PartsList } from '../../parts/PartsList';
+import {SR5} from "../../config";
+import VehicleData = Shadowrun.VehicleData;
+import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 
-export class VehiclePrep extends BaseActorPrep<SR5VehicleType, VehicleActorData> {
-    prepare() {
-        ModifiersPrep.prepareModifiers(this.data);
-        ModifiersPrep.clearAttributeMods(this.data);
+export function VehicleDataPreparation(data: VehicleData, items: SR5ItemDataWrapper[]) {
+    ModifiersPrep.prepareModifiers(data);
+    ModifiersPrep.clearAttributeMods(data);
 
-        VehiclePrep.prepareVehicleStats(this.data);
-        VehiclePrep.prepareAttributes(this.data);
-        VehiclePrep.prepareLimits(this.data);
+    VehiclePrep.prepareVehicleStats(data);
+    VehiclePrep.prepareAttributes(data);
+    VehiclePrep.prepareLimits(data);
 
-        SkillsPrep.prepareSkills(this.data);
-        AttributesPrep.prepareAttributes(this.data);
-        LimitsPrep.prepareLimits(this.data);
+    SkillsPrep.prepareSkills(data);
+    AttributesPrep.prepareAttributes(data);
+    LimitsPrep.prepareLimits(data);
 
-        VehiclePrep.prepareConditionMonitor(this.data);
+    VehiclePrep.prepareConditionMonitor(data);
 
-        MatrixPrep.prepareMatrixToLimitsAndAttributes(this.data);
-        MatrixPrep.prepareAttributesForDevice(this.data);
+    MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
+    MatrixPrep.prepareAttributesForDevice(data);
 
-        VehiclePrep.prepareMovement(this.data);
+    VehiclePrep.prepareMovement(data);
 
-        VehiclePrep.prepareMeatspaceInit(this.data);
-        InitiativePrep.prepareMatrixInit(this.data);
-        InitiativePrep.prepareCurrentInitiative(this.data);
+    VehiclePrep.prepareMeatspaceInit(data);
+    InitiativePrep.prepareMatrixInit(data);
+    InitiativePrep.prepareCurrentInitiative(data);
 
-        VehiclePrep.prepareArmor(this.data);
-    }
+    VehiclePrep.prepareArmor(data);
+}
 
+export class VehiclePrep {
     static prepareVehicleStats(data: VehicleActorData) {
         const { vehicle_stats, isOffRoad } = data;
         // set the value for the stats
@@ -52,7 +53,7 @@ export class VehiclePrep extends BaseActorPrep<SR5VehicleType, VehicleActorData>
             stat.mod = parts.list;
             Helpers.calcTotal(stat);
             // add labels
-            stat.label = CONFIG.SR5.vehicle.stats[key];
+            stat.label = SR5.vehicle.stats[key];
         }
 
         // hide certain stats depending on if we're offroad
@@ -106,7 +107,7 @@ export class VehiclePrep extends BaseActorPrep<SR5VehicleType, VehicleActorData>
             track.physical.base = 12 + halfBody;
             track.physical.max =  track.physical.base + (Number(modifiers['physical_track']) || 0);
         }
-        track.physical.label = CONFIG.SR5.damageTypes.physical;
+        track.physical.label = SR5.damageTypes.physical;
 
         const rating = matrix.rating || 0;
         matrix.condition_monitor.max = 8 + Math.ceil(rating / 2);

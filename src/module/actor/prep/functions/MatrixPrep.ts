@@ -1,8 +1,10 @@
-import SR5ActorData = Shadowrun.SR5ActorData;
 import MatrixActorData = Shadowrun.MatrixActorData;
 import { Helpers } from '../../../helpers';
-import { SR5ItemDataWrapper } from '../../../item/SR5ItemDataWrapper';
+import { SR5ItemDataWrapper } from '../../../data/SR5ItemDataWrapper';
 import { PartsList } from '../../../parts/PartsList';
+import {SR5} from "../../../config";
+import ActorTypesData = Shadowrun.ShadowrunActorDataData;
+import ShadowrunActorDataData = Shadowrun.ShadowrunActorDataData;
 
 export class MatrixPrep {
     /**
@@ -10,7 +12,7 @@ export class MatrixPrep {
      * - if an item is equipped, it will use that data
      * - if it isn't and player is technomancer, it will use that data
      */
-    static prepareMatrix(actorData: SR5ActorData & MatrixActorData, items: SR5ItemDataWrapper[]) {
+    static prepareMatrix(actorData: ActorTypesData & MatrixActorData, items: SR5ItemDataWrapper[]) {
         const { matrix, attributes } = actorData;
 
         const MatrixList = ['firewall', 'sleaze', 'data_processing', 'attack'];
@@ -72,7 +74,7 @@ export class MatrixPrep {
      * Add Matrix Attributes to Limits and Attributes
      * @param data
      */
-    static prepareMatrixToLimitsAndAttributes(data: SR5ActorData & MatrixActorData) {
+    static prepareMatrixToLimitsAndAttributes(data: ShadowrunActorDataData & MatrixActorData) {
         const { matrix, attributes, limits } = data;
         const MatrixList = ['firewall', 'sleaze', 'data_processing', 'attack'];
 
@@ -80,7 +82,7 @@ export class MatrixPrep {
         MatrixList.forEach((key) => {
             Helpers.calcTotal(matrix[key]);
             if (matrix[key]) {
-                const label = CONFIG.SR5.matrixAttributes[key];
+                const label = SR5.matrixAttributes[key];
                 const { value, base, mod } = matrix[key];
                 const hidden = true;
 
@@ -106,7 +108,7 @@ export class MatrixPrep {
      * Prepare the mental attributes for a sheet that just has a device rating
      * @param data
      */
-    static prepareAttributesForDevice(data: SR5ActorData & MatrixActorData) {
+    static prepareAttributesForDevice(data: ActorTypesData & MatrixActorData) {
         const { matrix, attributes } = data;
         const rating = matrix.rating || 0;
         const mentalAttributes = ['intuition', 'logic', 'charisma', 'willpower'];

@@ -87,7 +87,7 @@ export interface AdvancedRollProps extends BasicRollProps {
     event?: RollEvent;
     extended?: boolean;
     wounds?: boolean;
-    after?: (roll: Roll | undefined) => void;
+    after?: (roll: ShadowrunRoll | undefined) => void;
     attack?: AttackData;
     fireMode?: FireModeData
     combat?: CombatData
@@ -136,6 +136,7 @@ export class ShadowrunRoll extends Roll {
         return this.data.threshold;
     }
 
+    //@ts-ignore // TODO: This overwrites Roll.parts with very different return types...
     get parts(): ModList<number> {
         return this.data.parts;
     }
@@ -150,7 +151,7 @@ export class ShadowrunRoll extends Roll {
     }
 
     get hits(): number {
-        return this.total;
+        return this.total || 0;
     }
 
     get pool(): number {
@@ -264,7 +265,8 @@ export class ShadowrunRoller {
         }
         else if (item.isWeapon()) {
             if (item.hasAmmo() && actionTestData?.rangedWeapon) {
-                const fireMode = actionTestData.rangedWeapon.fireMode.value || 1;
+                // Try using fire mode for ammunition consumption.
+                const fireMode = actionTestData?.rangedWeapon?.fireMode?.value || 0;
                 await item.useAmmo(fireMode);
             }
         }
@@ -282,7 +284,7 @@ export class ShadowrunRoller {
         const parts = new PartsList(partsProps);
         const count = parts.total;
         if (count <= 0) {
-            ui.notifications.warn(game.i18n.localize('SR5.RollOneDie'));
+            ui.notifications?.warn(game.i18n.localize('SR5.RollOneDie'));
             return '0d6cs>=5';
         }
         let formula = `${count}d6`;
@@ -311,7 +313,8 @@ export class ShadowrunRoller {
         const roll = new ShadowrunRoll(formula, rollData);
 
         // Return roll reference instead roll() return to avoid typing issues.
-        roll.roll();
+        // @ts-ignore // TODO: foundry-vtt-types 0.8.2 is missing Roll.evaluate parameter typing.
+        roll.evaluate({async: false});
 
         return roll;
     }
@@ -319,7 +322,7 @@ export class ShadowrunRoller {
     static async basicRoll(basicProps: BasicRollProps): Promise<ShadowrunRoll | undefined> {
         const props = ShadowrunRoller.basicRollPropsDefaults(basicProps);
 
-        const roll = await ShadowrunRoller.roll({parts: props.parts, limit: props.limit, explodeSixes: props.explodeSixes});
+        const roll = ShadowrunRoller.roll({parts: props.parts, limit: props.limit, explodeSixes: props.explodeSixes});
         if (!roll) return;
 
         if (!props.hideRollMessage) {
@@ -355,7 +358,7 @@ export class ShadowrunRoller {
      * Prompt a roll for the user
      */
     static promptRoll(): Promise<ShadowrunRoll | undefined> {
-        const value = game.user.getFlag(SYSTEM_NAME, FLAGS.LastRollPromptValue) || 0;
+        const value = game.user?.getFlag(SYSTEM_NAME, FLAGS.LastRollPromptValue) || 0;
         const parts = [{ name: 'SR5.LastRoll', value }];
         const advancedRollProps = { parts, title: game.i18n.localize("SR5.Test")} as AdvancedRollProps;
         const dialogOptions = { pool: true }
@@ -490,7 +493,7 @@ export class ShadowrunRoller {
 
     static _errorOnInvalidLimit(limit?: LimitField) {
         if (limit && limit.value < 0) {
-            ui.notifications.error(game.i18n.localize('SR5.Warnings.NegativeLimitValue'));
+            ui.notifications?.error(game.i18n.localize('SR5.Warnings.NegativeLimitValue'));
         }
     }
 

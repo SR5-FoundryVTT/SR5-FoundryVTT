@@ -3,14 +3,12 @@ import {Helpers} from '../helpers';
 import {SR5Item} from '../item/SR5Item';
 import {FLAGS, SKILL_DEFAULT_NAME, SR, SYSTEM_NAME} from '../constants';
 import {PartsList} from '../parts/PartsList';
-import {ActorPrepFactory} from './prep/ActorPrepFactory';
 import {ShadowrunActorDialogs} from "../apps/dialogs/ShadowrunActorDialogs";
 import {createRollChatMessage} from "../chat";
 import {SR5Combat} from "../combat/SR5Combat";
-import {Modifiers} from "../sr5/Modifiers";
-import {SoakFlow} from './SoakFlow';
-import {DefaultValues} from '../dataTemplates';
-import {SkillFlow} from "./SkillFlow";
+import {SoakFlow} from './flows/SoakFlow';
+import {DefaultValues} from '../data/DataDefaults';
+import {SkillFlow} from "./flows/SkillFlow";
 import ActorRollOptions = Shadowrun.ActorRollOptions;
 import DefenseRollOptions = Shadowrun.DefenseRollOptions;
 import SoakRollOptions = Shadowrun.SoakRollOptions;
@@ -19,9 +17,7 @@ import SkillRollOptions = Shadowrun.SkillRollOptions;
 import SkillField = Shadowrun.SkillField;
 import ModList = Shadowrun.ModList;
 import LimitField = Shadowrun.LimitField;
-import SR5ActorType = Shadowrun.SR5ActorType;
 import EdgeAttributeField = Shadowrun.EdgeAttributeField;
-import VehicleActorData = Shadowrun.VehicleActorData;
 import VehicleStat = Shadowrun.VehicleStat;
 import Attributes = Shadowrun.Attributes;
 import Limits = Shadowrun.Limits;
@@ -30,26 +26,47 @@ import TrackType = Shadowrun.TrackType;
 import OverflowTrackType = Shadowrun.OverflowTrackType;
 import SpellDefenseOptions = Shadowrun.SpellDefenseOptions;
 import NumberOrEmpty = Shadowrun.NumberOrEmpty;
-import CharacterActorData = Shadowrun.CharacterActorData;
-import SR5VehicleType = Shadowrun.SR5VehicleType;
 import VehicleStats = Shadowrun.VehicleStats;
-import SR5CharacterType = Shadowrun.SR5CharacterType;
 import ActorArmorData = Shadowrun.ActorArmorData;
 import ConditionData = Shadowrun.ConditionData;
-import SR5SpiritType = Shadowrun.SR5SpiritType;
-import SR5SpriteType = Shadowrun.SR5SpriteType;
-import SR5CritterType = Shadowrun.SR5CritterType;
-import SR5ActorData = Shadowrun.SR5ActorData;
 import Skills = Shadowrun.Skills;
-import {SkillRules} from "./SkillRules";
-import { SoakRules } from './SoakRules';
+import {SkillRules} from "../rules/SkillRules";
 import SR5ICType = Shadowrun.SR5ICType;
+import {SkillRules} from "../rules/SkillRules";
+import CharacterSkills = Shadowrun.CharacterSkills;
+import {SR5} from "../config";
+import ShadowrunActorData = Shadowrun.ShadowrunActorData;
+import {CharacterDataPrepare} from "./prep/CharacterPrep";
+import {SR5ItemDataWrapper} from "../data/SR5ItemDataWrapper";
+import {CritterDataPrepare} from "./prep/CritterPrep";
+import {SpiritDataPrepare} from "./prep/SpiritPrep";
+import {SpriteDataPrepare} from "./prep/SpritePrep";
+import {VehicleDataPreparation} from "./prep/VehiclePrep";
+import SpiritActorData = Shadowrun.SpiritActorData;
+import CharacterData = Shadowrun.CharacterData;
+import CharacterActorData = Shadowrun.CharacterActorData;
+import SpriteActorData = Shadowrun.SpriteActorData;
+import VehicleData = Shadowrun.VehicleData;
+import VehicleActorData = Shadowrun.VehicleActorData;
+import CritterActorData = Shadowrun.CritterActorData;
+import {Modifiers} from "../rules/Modifiers";
 
-export class SR5Actor extends Actor<SR5ActorData> {
-    // NOTE: Overwrite Actor.data additionally to extends Actor<T as SR5Actortype.Data: SR5ActorData> to still have
-    //       access to Actor.data.type checks.
-    data: SR5ActorType;
-
+/**
+ * The general Shadowrun actor implementation, which currently handles all actor types.
+ *
+ * To easily access Actor.data without any typing issues us the SR5Actor.asCritterData helpers.
+ * They are set up in a way that will handle both error management and type narrowing.
+ * Example:
+ * <pre><code>
+ *     const actor = game.actors.get('randomId');
+ *     const critterData = actor.asCritterData();
+ *     if (!critterData) return;
+ *     // critterData.type === 'critter'
+ *     // critterData.data as CritterData
+ * </code></pre>
+ *
+ */
+export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
     getOverwatchScore() {
         const os = this.getFlag(SYSTEM_NAME, 'overwatchScore');
         return os !== undefined ? os : 0;
@@ -62,13 +79,56 @@ export class SR5Actor extends Actor<SR5ActorData> {
         }
     }
 
+    /**
+     * General data preparation order.
+     * Check base, embeddedEntities and derived methods (see super.prepareData implementation for order)
+     * Only implement data preparation here that doesn't fall into the other three categories.
+     */
     prepareData() {
         super.prepareData();
+    }
 
-        const actorData = this.data as SR5ActorType;
-        const prepper = ActorPrepFactory.Create(actorData);
-        if (prepper) {
-            prepper.prepare();
+    /**
+     *  Prepare base data. Be careful that this ONLY included data not in need for item access. Check ClientDocumentMixin.prepareData for order of data prep.
+     */
+    prepareBaseData() {
+        super.prepareBaseData();
+    }
+
+    /**
+     * prepare embedded entities. Check ClientDocumentMixin.prepareData for order of data prep.
+     */
+    prepareEmbeddedEntities() {
+        super.prepareEmbeddedEntities();
+    }
+
+    /**
+     * prepare embedded entities. Check ClientDocumentMixin.prepareData for order of data prep.
+     *
+     * At the moment general actor data preparation has been moved to derived data preparation, due it's dependence
+     * on prepareEmbeddedEntities and prepareEmbeddedItems for items modifying attribute values and more.
+     */
+    prepareDerivedData() {
+        super.prepareDerivedData();
+
+        // General actor data preparation has been moved to derived data, as it depends on prepared item data.
+        const itemDataWrappers = this.items.map((item) => new SR5ItemDataWrapper(item.data));
+        switch (this.data.type) {
+            case 'character':
+                CharacterDataPrepare(this.data.data, itemDataWrappers);
+                break;
+            case "critter":
+                CritterDataPrepare(this.data.data, itemDataWrappers);
+                break;
+            case "spirit":
+                SpiritDataPrepare(this.data.data, itemDataWrappers);
+                break;
+            case "sprite":
+                SpriteDataPrepare(this.data.data, itemDataWrappers);
+                break;
+            case "vehicle":
+                VehicleDataPreparation(this.data.data, itemDataWrappers);
+                break;
         }
     }
 
@@ -76,17 +136,17 @@ export class SR5Actor extends Actor<SR5ActorData> {
         return this.data.data.modifiers[modifierName];
     }
 
-    findActiveSkill(idOrName?: string): SkillField | undefined {
-        if (idOrName === undefined) return;
-        // Search for legacy skills with their name as id.
-        const skills = this.getSkills();
-        if (!skills) return;
+    findActiveSkill(skillName?: string): SkillField | undefined {
+        // Check for faulty to catch empty names as well as missing parameters.
+        if (!skillName) return undefined;
 
-        const skill = skills.active[idOrName];
+        // Handle legacy skills (name is id)
+        const skills = this.getActiveSkills();
+        const skill = skills[skillName];
         if (skill) return skill;
 
-        // Search for custom skills with a random id.
-        return Object.values(skills.active).find(skill => skill.name === idOrName);
+        // Handle custom skills (name is not id)
+        return Object.values(skills).find(skill => skill.name === skillName);
     }
 
     findAttribute(id?: string): AttributeField | undefined {
@@ -132,6 +192,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
         const usesLeft = edge.uses > 0 ? edge.uses : 0;
         const uses = Math.min(edge.value, usesLeft + by);
 
+        // @ts-ignore
         await this.update({'data.attributes.edge.uses': uses});
     }
 
@@ -150,14 +211,10 @@ export class SR5Actor extends Actor<SR5ActorData> {
         return DefaultValues.actorArmorData();
     }
 
-    getOwnedSR5Item(itemId: string): SR5Item | null {
-        return (super.getOwnedItem(itemId) as unknown) as SR5Item;
-    }
-
     getMatrixDevice(): SR5Item | undefined | null {
         if (!("matrix" in this.data.data)) return;
         const matrix = this.data.data.matrix;
-        if (matrix.device) return this.getOwnedSR5Item(matrix.device);
+        if (matrix.device) return this.items.get(matrix.device);
     }
 
     getFullDefenseAttribute(): AttributeField | undefined {
@@ -275,14 +332,15 @@ export class SR5Actor extends Actor<SR5ActorData> {
         const name = this.getVehicleTypeSkillName();
         return this.findActiveSkill(name);
     }
-
     get hasSkills(): boolean {
         return this.getSkills() !== undefined;
     }
 
-    getSkills() {
+
+    getSkills(): CharacterSkills {
         return this.data.data.skills;
     }
+
     getActiveSkills(): Skills {
         return this.data.data.skills.active;
     }
@@ -377,7 +435,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
 
         const possibleMatch = (skill: SkillField): string =>  skill.label ? game.i18n.localize(skill.label) : skill.name;
 
-        const {skills} = this.data.data;
+        const skills = this.getSkills();
 
         for (const skill of Object.values(skills.active)) {
             if (searchedFor === possibleMatch(skill))
@@ -600,7 +658,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
     async rollDrain(options: ActorRollOptions = {}, incoming = -1): Promise<ShadowrunRoll|undefined> {
         if (!this.isCharacter()) return;
 
-        const data = this.data.data as CharacterActorData;
+        const data = this.data.data as CharacterData;
 
         const wil = duplicate(data.attributes.willpower);
         const drainAtt = duplicate(data.attributes[data.magic.attribute]);
@@ -796,10 +854,10 @@ export class SR5Actor extends Actor<SR5ActorData> {
             parts: parts.list,
             title: title,
             extended: true,
-            after: async (roll: Roll | undefined) => {
+            after: async (roll: ShadowrunRoll | undefined) => {
                 if (!roll) return;
                 let hits = roll.total;
-                const data = this.data.data as CharacterActorData;
+                const data = this.data.data as CharacterData;
                 let current = data.track[track].value;
 
                 current = Math.max(current - hits, 0);
@@ -817,11 +875,11 @@ export class SR5Actor extends Actor<SR5ActorData> {
         if (!("matrix" in this.data.data)) return;
 
         let matrix_att = duplicate(this.data.data.matrix[attr]);
-        let title = game.i18n.localize(CONFIG.SR5.matrixAttributes[attr]);
+        let title = game.i18n.localize(SR5.matrixAttributes[attr]);
         const parts = new PartsList<number>();
-        parts.addPart(CONFIG.SR5.matrixAttributes[attr], matrix_att.value);
+        parts.addPart(SR5.matrixAttributes[attr], matrix_att.value);
 
-        if (options && options.event && options.event[CONFIG.SR5.kbmod.SPEC]) parts.addUniquePart('SR5.Specialization', 2);
+        if (options && options.event && options.event[SR5.kbmod.SPEC]) parts.addUniquePart('SR5.Specialization', 2);
         if (Helpers.hasModifiers(options?.event)) {
             return ShadowrunRoller.advancedRoll({
                 event: options?.event,
@@ -846,6 +904,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
 
         let cancel = true;
         renderTemplate('systems/shadowrun5e/dist/templates/rolls/matrix-roll.html', dialogData).then((dlg) => {
+            // @ts-ignore
             new Dialog({
                 title: `${title} Test`,
                 content: dlg,
@@ -856,7 +915,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
                     let att: AttributeField | undefined = undefined;
                     if (newAtt) {
                         att = this.data.data.attributes[newAtt];
-                        title += ` + ${game.i18n.localize(CONFIG.SR5.attributes[newAtt])}`;
+                        title += ` + ${game.i18n.localize(SR5.attributes[newAtt])}`;
                     }
                     if (att !== undefined) {
                         if (att.value && att.label) parts.addPart(att.label, att.value);
@@ -904,7 +963,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
     }
 
     rollAttributesTest(rollId, options?: ActorRollOptions) {
-        const title = game.i18n.localize(CONFIG.SR5.attributeRolls[rollId]);
+        const title = game.i18n.localize(SR5.attributeRolls[rollId]);
         const atts = this.data.data.attributes;
         const modifiers = this.data.data.modifiers;
         const parts = new PartsList<number>();
@@ -965,7 +1024,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
         // Directly test, without further skill dialog.
         if (options?.event && Helpers.hasModifiers(options?.event)) {
             parts.addUniquePart(attribute.label, attribute.value);
-            if (options.event[CONFIG.SR5.kbmod.SPEC]) parts.addUniquePart('SR5.Specialization', 2);
+            if (options.event[SR5.kbmod.SPEC]) parts.addUniquePart('SR5.Specialization', 2);
 
             return await ShadowrunRoller.advancedRoll({
                 event: options.event,
@@ -1000,7 +1059,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
         if (!this.isVehicle())
             return;
 
-        const actorData = duplicate(this.data.data) as VehicleActorData;
+        const actorData = duplicate(this.data.data) as VehicleData;
         if (actorData.controlMode === 'autopilot') {
             const parts = new PartsList<number>();
 
@@ -1032,7 +1091,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
         if (!this.isVehicle()) {
             return undefined;
         }
-        const actorData = duplicate(this.data.data) as VehicleActorData;
+        const actorData = duplicate(this.data.data) as VehicleData;
         if (actorData.controlMode === 'autopilot') {
             const parts = new PartsList<number>();
 
@@ -1067,7 +1126,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
         if (!this.isVehicle()) {
             return undefined;
         }
-        const actorData = duplicate(this.data.data) as VehicleActorData;
+        const actorData = duplicate(this.data.data) as VehicleData;
         if (actorData.controlMode === 'autopilot') {
             const parts = new PartsList<number>();
 
@@ -1097,33 +1156,33 @@ export class SR5Actor extends Actor<SR5ActorData> {
 
     rollKnowledgeSkill(catId: string, skillId: string, options?: SkillRollOptions) {
         const category = duplicate(this.data.data.skills.knowledge[catId]);
-        const skill = duplicate(category.value[skillId]);
+        const skill = duplicate(category.value[skillId]) as SkillField;
         skill.attribute = category.attribute;
         skill.label = skill.name;
         return this.rollSkill(skill, options);
     }
 
     rollLanguageSkill(skillId: string, options?: SkillRollOptions) {
-        const skill = duplicate(this.data.data.skills.language.value[skillId]);
+        const skill = duplicate(this.data.data.skills.language.value[skillId]) as SkillField;
         skill.attribute = 'intuition';
         skill.label = skill.name;
         return this.rollSkill(skill, options);
     }
 
     rollActiveSkill(skillId: string, options?: SkillRollOptions) {
-        const skill = duplicate(this.data.data.skills.active[skillId]);
+        const skill = duplicate(this.data.data.skills.active[skillId]) as SkillField;
         return this.rollSkill(skill, options);
     }
 
     rollAttribute(attId, options?: ActorRollOptions) {
-        let title = game.i18n.localize(CONFIG.SR5.attributes[attId]);
-        const att = duplicate(this.data.data.attributes[attId]);
-        const atts = duplicate(this.data.data.attributes);
+        let title = game.i18n.localize(SR5.attributes[attId]);
+        const attribute = duplicate(this.data.data.attributes[attId]);
+        const attributes = duplicate(this.data.data.attributes) as Attributes;
         const parts = new PartsList<number>();
-        parts.addPart(att.label, att.value);
+        parts.addPart(attribute.label, attribute.value);
         let dialogData = {
-            attribute: att,
-            attributes: atts,
+            attribute: attribute,
+            attributes: attributes,
         };
         let cancel = true;
         renderTemplate('systems/shadowrun5e/dist/templates/rolls/single-attribute.html', dialogData).then((dlg) => {
@@ -1140,20 +1199,20 @@ export class SR5Actor extends Actor<SR5ActorData> {
                 close: async (html) => {
                     if (cancel) return;
 
-                    const att2Id: string = Helpers.parseInputToString($(html).find('[name=attribute2]').val());
-                    let att2: AttributeField | undefined = undefined;
-                    if (att2Id !== 'none') {
-                        att2 = atts[att2Id];
-                        if (att2?.label) {
-                            parts.addPart(att2.label, att2.value);
-                            const att2IdLabel = game.i18n.localize(CONFIG.SR5.attributes[att2Id]);
+                    const attribute2Id: string = Helpers.parseInputToString($(html).find('[name=attribute2]').val());
+                    let attribute2: AttributeField | undefined = undefined;
+                    if (attribute2Id !== 'none') {
+                        attribute2 = attributes[attribute2Id];
+                        if (attribute2?.label) {
+                            parts.addPart(attribute2.label, attribute2.value);
+                            const att2IdLabel = game.i18n.localize(SR5.attributes[attribute2Id]);
                             title += ` + ${att2IdLabel}`;
                         }
                     }
-                    if (att2Id === 'default') {
+                    if (attribute2Id === 'default') {
                         parts.addUniquePart('SR5.Defaulting', -1);
                     }
-                    this._addMatrixParts(parts, [att, att2]);
+                    this._addMatrixParts(parts, [attribute, attribute2]);
                     this._addGlobalParts(parts);
                     return ShadowrunRoller.advancedRoll({
                         event: options?.event,
@@ -1228,7 +1287,8 @@ export class SR5Actor extends Actor<SR5ActorData> {
                 const tokens = Helpers.getControlledTokens();
                 if (tokens.length > 0) {
                     for (let token of tokens) {
-                        if (token.actor.owner) {
+                        // @ts-ignore // TODO: foundry-vtt-types not yet on 0.8
+                        if (token.actor.isOwner) {
                             actor = token.actor as SR5Actor;
                             break;
                         }
@@ -1243,6 +1303,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
                     parts: parts.list,
                     actor: actor,
                 }).then(() => {
+                    // @ts-ignore
                     actor.update({
                         'data.attributes.edge.uses': actor.getEdge().uses - 1,
                     });
@@ -1271,7 +1332,8 @@ export class SR5Actor extends Actor<SR5ActorData> {
                     const tokens = Helpers.getControlledTokens();
                     if (tokens.length > 0) {
                         for (let token of tokens) {
-                            if (token.actor.owner) {
+                            // @ts-ignore // TODO: foundry-vtt-types not yet on 0.8
+                            if (token.actor.isOwner) {
                                 actor = token.actor as SR5Actor;
                                 break;
                             }
@@ -1360,7 +1422,8 @@ export class SR5Actor extends Actor<SR5ActorData> {
             return null;
         }
 
-        for (const user of game.users.entities) {
+        // @ts-ignore // TODO: foundry-vtt-types Does not support DocumentCollection yet.
+        for (const user of game.users.contents) {
             if (!user.active || user.isGM) {
                 continue;
             }
@@ -1373,9 +1436,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
     }
 
     getActivePlayerOwners(): User[] {
-        //@ts-ignore
-        const users = this.getUsers('OWNER');
-        return users.filter(user => user.active);
+        return Helpers.getPlayersWithPermission(this, 'OWNER', true);
     }
 
     __addDamageToTrackValue(damage: DamageData, track: TrackType|OverflowTrackType|ConditionData): TrackType|OverflowTrackType|ConditionData {
@@ -1383,6 +1444,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
         if (track.value === track.max) return track;
 
         //  Avoid cross referencing.
+        // @ts-ignore
         track = duplicate(track);
 
         track.value += damage.value;
@@ -1522,6 +1584,7 @@ export class SR5Actor extends Actor<SR5ActorData> {
         overflow.value = overflowDamage;
         rest.value = restDamage;
 
+        // @ts-ignore
         return {overflow, rest};
     }
 
@@ -1559,10 +1622,13 @@ export class SR5Actor extends Actor<SR5ActorData> {
 
         const modified = duplicate(this.getArmor());
         if (modified) {
+            // @ts-ignore
             modified.mod = PartsList.AddUniquePart(modified.mod, 'SR5.DV', damage.ap.value);
+            // @ts-ignore
             modified.value = Helpers.calcTotal(modified, {min: 0});
         }
 
+        // @ts-ignore
         return modified;
     }
 
@@ -1591,31 +1657,31 @@ export class SR5Actor extends Actor<SR5ActorData> {
         return "track" in this.data.data;
     }
 
-    asVehicleData(): SR5VehicleType | undefined {
+    asVehicleData(): VehicleActorData | undefined {
         if (this.isVehicle())
-            return this.data as SR5VehicleType;
+            return this.data as VehicleActorData;
     }
 
-    asCharacterData(): SR5CharacterType | undefined {
+    asCharacterData(): CharacterActorData | undefined {
         if (this.isCharacter())
-            return this.data as SR5CharacterType;
+            return this.data as CharacterActorData;
     }
 
-    asSpiritData(): SR5SpiritType | undefined {
+    asSpiritData(): SpiritActorData | undefined {
         if (this.isSpirit()) {
-            return this.data as SR5SpiritType;
+            return this.data as SpiritActorData;
         }
     }
 
-    asSpriteData(): SR5SpriteType | undefined {
+    asSpriteData(): SpriteActorData | undefined {
         if (this.isSprite()) {
-            return this.data as SR5SpriteType;
+            return this.data as SpriteActorData;
         }
     }
 
-    asCritterData(): SR5CritterType | undefined {
+    asCritterData(): CritterActorData | undefined {
         if (this.isCritter()){
-            return this.data as SR5CritterType;
+            return this.data as CritterActorData;
         }
     }
 
@@ -1684,12 +1750,14 @@ export class SR5Actor extends Actor<SR5ActorData> {
      * @param ignoreScene Set to true to ignore modifiers set on active or given scene.
      * @param scene Should a scene be used as a fallback, provide this here. Otherwise current scene will be used.
      */
+    // @ts-ignore
     async getModifiers(ignoreScene: boolean=false, scene: Scene=canvas.scene): Promise<Modifiers> {
         const onActor = await Modifiers.getModifiersFromEntity(this);
 
         if (onActor.hasActiveEnvironmental) {
             return onActor;
-        } else if (ignoreScene) {
+        // No open scene, or scene ignored.
+        } else if (ignoreScene || scene === null) {
             return new Modifiers(Modifiers.getDefaultModifiers());
         } else {
             return await Modifiers.getModifiersFromEntity(scene);

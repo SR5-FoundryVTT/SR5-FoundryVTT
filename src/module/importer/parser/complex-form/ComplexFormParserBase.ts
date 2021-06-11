@@ -1,10 +1,10 @@
-import ComplexForm = Shadowrun.ComplexForm;
 import { ImportHelper } from '../../helper/ImportHelper';
 import { ItemParserBase } from '../item/ItemParserBase';
 import ComplexFormTarget = Shadowrun.ComplexFormTarget;
+import ComplexFormItemData = Shadowrun.ComplexFormItemData;
 
-export class ComplexFormParserBase extends ItemParserBase<ComplexForm> {
-    Parse(jsonData: object, data: Shadowrun.ComplexForm, jsonTranslation?: object): Shadowrun.ComplexForm {
+export class ComplexFormParserBase extends ItemParserBase<ComplexFormItemData> {
+    Parse(jsonData: object, data: ComplexFormItemData, jsonTranslation?: object): ComplexFormItemData {
         data.name = ImportHelper.StringValue(jsonData, 'name');
 
         data.data.description.source = `${ImportHelper.StringValue(jsonData, 'source')} ${ImportHelper.StringValue(jsonData, 'page')}`;

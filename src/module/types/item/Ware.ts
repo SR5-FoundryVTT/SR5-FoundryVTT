@@ -1,4 +1,4 @@
 /// <reference path="../Shadowrun.ts" />
 declare namespace Shadowrun {
-    export type Ware = Bioware | Cyberware;
+    export type WareItemData = BiowareItemData | CyberwareItemData;
 }

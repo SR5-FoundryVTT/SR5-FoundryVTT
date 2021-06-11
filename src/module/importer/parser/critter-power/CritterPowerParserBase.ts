@@ -1,12 +1,10 @@
 import { ImportHelper } from '../../helper/ImportHelper';
-import CritterPower = Shadowrun.CritterPower;
 import CritterPowerCategory = Shadowrun.CritterPowerCategory;
 import { ItemParserBase } from '../item/ItemParserBase';
+import CritterPowerItemData = Shadowrun.CritterPowerItemData;
 
-export class CritterPowerParserBase extends ItemParserBase<CritterPower> {
-    public Parse(jsonData: object, data: CritterPower, jsonTranslation?: object): CritterPower {
-
-        console.log(jsonData);
+export class CritterPowerParserBase extends ItemParserBase<CritterPowerItemData> {
+    public Parse(jsonData: object, data: CritterPowerItemData, jsonTranslation?: object): CritterPowerItemData {
 
         data.name = ImportHelper.StringValue(jsonData, 'name');
 

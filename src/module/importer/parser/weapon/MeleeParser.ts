@@ -3,8 +3,8 @@ import { WeaponParserBase } from './WeaponParserBase';
 import ActorAttribute = Shadowrun.ActorAttribute;
 import DamageData = Shadowrun.DamageData;
 import DamageType = Shadowrun.DamageType;
-import Weapon = Shadowrun.Weapon;
-import {DefaultValues} from "../../../dataTemplates";
+import {DefaultValues} from "../../../data/DataDefaults";
+import WeaponItemData = Shadowrun.WeaponItemData;
 
 export class MeleeParser extends WeaponParserBase {
     GetDamage(jsonData: object): DamageData {
@@ -44,7 +44,7 @@ export class MeleeParser extends WeaponParserBase {
         return DefaultValues.damageData(partialDamageData);
     }
 
-    Parse(jsonData: object, data: Weapon, jsonTranslation?: object): Weapon {
+    Parse(jsonData: object, data: WeaponItemData, jsonTranslation?: object): WeaponItemData {
         data = super.Parse(jsonData, data, jsonTranslation);
 
         data.data.melee.reach = ImportHelper.IntValue(jsonData, 'reach');

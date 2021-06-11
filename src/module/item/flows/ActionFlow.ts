@@ -1,21 +1,21 @@
 /**
  * Handle all things related to the action template (template.json)
  */
-import {SR5Actor} from "../actor/SR5Actor";
+import {SR5Actor} from "../../actor/SR5Actor";
 import DamageData = Shadowrun.DamageData;
-import {Helpers} from "../helpers";
+import {Helpers} from "../../helpers";
 import FormulaOperator = Shadowrun.FormulaOperator;
 
-export class ItemAction {
+export class ActionFlow {
     static calcDamage(damage: DamageData, actor: SR5Actor): DamageData {
         // Avoid manipulation on original data, which might come from database values.
-        damage = duplicate(damage);
+        damage = duplicate(damage) as DamageData;
 
         const attribute = actor.findAttribute(damage.attribute);
 
         if (!attribute) return damage;
 
-        damage.base = ItemAction._applyFormulaOperatorToValues(damage.base, attribute.value, damage.base_formula_operator);
+        damage.base = ActionFlow._applyFormulaOperatorToValues(damage.base, attribute.value, damage.base_formula_operator);
 
         // Rather reduce damage to the next full decimal.
         damage.base = Helpers.applyValueRange(Math.floor(damage.base), {min: 0});

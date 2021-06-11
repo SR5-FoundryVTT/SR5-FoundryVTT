@@ -1,9 +1,9 @@
 import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { CyberwareParser } from '../parser/ware/CyberwareParser';
-import Ware = Shadowrun.Ware;
-import Cyberware = Shadowrun.Cyberware;
-import {DefaultValues} from "../../dataTemplates";
+import Ware = Shadowrun.WareItemData;
+import {DefaultValues} from "../../data/DataDefaults";
+import CyberwareItemData = Shadowrun.CyberwareItemData;
 
 export class WareImporter extends DataImporter {
     public categoryTranslations: any;
@@ -15,12 +15,12 @@ export class WareImporter extends DataImporter {
                jsonObject.hasOwnProperty('biowares') && jsonObject['biowares'].hasOwnProperty('bioware');
     }
 
-    GetDefaultCyberwareData(): Cyberware {
+    GetDefaultCyberwareData(): CyberwareItemData {
         //@ts-ignore // Bio/Cyberware conflicts on 'type'...
         return {...this.GetDefaultData(), type: 'cyberware'};
     }
 
-    GetDefaultBiowareData(): Cyberware {
+    GetDefaultBiowareData(): CyberwareItemData {
         //@ts-ignore // Bio/Cyberware conflicts on 'type'...
         return {...this.GetDefaultData(), type: 'bioware'};
     }
@@ -33,6 +33,8 @@ export class WareImporter extends DataImporter {
             folder: '',
             img: 'icons/svg/mystery-man.svg',
             flags: {},
+            effects: [],
+            sort: 0,
             data: {
                 description: {
                     value: '',
@@ -151,6 +153,7 @@ export class WareImporter extends DataImporter {
             datas.push(data);
         }
 
+        // @ts-ignore // TODO: TYPE: Remove this.
         return await Item.create(datas);
     }
 }
