@@ -5,7 +5,6 @@ import {KnowledgeSkillEditSheet} from '../apps/skills/KnowledgeSkillEditSheet';
 import {LanguageSkillEditSheet} from '../apps/skills/LanguageSkillEditSheet';
 import {SR5Actor} from './SR5Actor';
 import {SR5} from '../config';
-import {SR5Item} from "../item/SR5Item";
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import Skills = Shadowrun.Skills;
@@ -169,7 +168,7 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
 
     _prepareActorAttributes(data: SR5ActorSheetData) {
         // Clear visible, zero value attributes temporary modifiers so they appear blank.
-        const attributes = data.data.attributes as Attributes;
+        const attributes = data.data.attributes;
         for (let [, attribute] of Object.entries(attributes)) {
             if (!attribute.hidden) {
                 if (attribute.temp === 0) delete attribute.temp;
