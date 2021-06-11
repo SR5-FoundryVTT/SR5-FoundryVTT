@@ -5,13 +5,14 @@ import {KnowledgeSkillEditSheet} from '../apps/skills/KnowledgeSkillEditSheet';
 import {LanguageSkillEditSheet} from '../apps/skills/LanguageSkillEditSheet';
 import {SR5Actor} from './SR5Actor';
 import {SR5} from '../config';
+import {SR5Item} from "../item/SR5Item";
+import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import Skills = Shadowrun.Skills;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import SkillField = Shadowrun.SkillField;
 import DeviceData = Shadowrun.DeviceData;
-import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
-import Attributes = Shadowrun.Attributes;
+import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
@@ -23,23 +24,12 @@ let globalSkillAppId: number = -1;
  *
  */
 export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
-    _shownDesc: string[];
-    _filters: SR5SheetFilters;
+    _shownDesc: string[] = [];
+    _filters: SR5SheetFilters = {
+        skills: '',
+        showUntrainedSkills: true,
+    };
     _scroll: string;
-
-    constructor(actor, options?) {
-        super(actor, options);
-
-        /**
-         * Keep track of the currently active sheet tab
-         * @type {string}
-         */
-        this._shownDesc = [];
-        this._filters = {
-            skills: '',
-            showUntrainedSkills: true,
-        };
-    }
 
     /* -------------------------------------------- */
 
@@ -98,6 +88,8 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         this._prepareActorTypeFields(data);
         this._prepareCharacterFields(data);
         this._prepareVehicleFields(data);
+
+        data['effects'] = prepareActiveEffectCategories(this.entity.effects);
 
         return data;
     }
@@ -441,6 +433,9 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
                 else this._shownDesc = this._shownDesc.filter((val) => val !== iid);
             }
         });
+
+        // Active Effect management
+        html.find(".effect-control").click(event => onManageActiveEffect(event, this.entity));
 
         html.find('.skill-header').find('.item-name').click(this._onFilterUntrainedSkills.bind(this));
         html.find('.skill-header').find('.skill-spec-item').click(this._onFilterUntrainedSkills.bind(this));

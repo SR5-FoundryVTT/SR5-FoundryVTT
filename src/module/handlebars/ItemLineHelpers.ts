@@ -11,6 +11,8 @@ export const registerItemLineHelpers = () => {
             text: AddText,
             title: game.i18n.localize('SR5.CreateItem'),
             cssClass: 'item-create',
+            // Add HTML data attributes using a key<string>:value<string> structure
+            data: {}
         };
         switch (id) {
             case 'lifestyle':
@@ -72,6 +74,11 @@ export const registerItemLineHelpers = () => {
                 return [addIcon];
             case 'sprite_power':
                 addIcon.title = game.i18n.localize('SR5.CreateItemSpritePower');
+                return [addIcon];
+            case 'effect':
+                addIcon.title = game.i18n.localize('SR5.CreateEffect');
+                addIcon.cssClass = 'effect-control';
+                addIcon.data = {action: 'create'};
                 return [addIcon];
             default:
                 return [];
@@ -413,5 +420,34 @@ export const registerItemLineHelpers = () => {
         }
 
         return icons;
+    });
+
+    /**
+     * Helper specifically for active effect icons.
+     *
+     * Add HTML data attributes using a key<string>:value<string> structure for each icon.
+     */
+    Handlebars.registerHelper('EffectIcons', function (effect) {
+        const editIcon = {
+            icon: 'fas fa-edit effect-control',
+            title: game.i18n.localize('SR5.EditItem'),
+            data: {action: 'edit'}
+        };
+        const removeIcon = {
+            icon: 'fas fa-trash effect-control',
+            title: game.i18n.localize('SR5.DeleteItem'),
+            data: {action: 'delete'}
+        };
+        const pdfIcon = {
+            icon: 'fas fa-file open-source-pdf',
+            title: game.i18n.localize('SR5.OpenSourcePdf'),
+        };
+        // TODO: Add source icon to open item / actor causing the effect
+
+        return [pdfIcon, editIcon, removeIcon];
+    });
+
+    Handlebars.registerHelper('EffectData', function(effectType: string) {
+        return {'effect-type': effectType};
     });
 };
