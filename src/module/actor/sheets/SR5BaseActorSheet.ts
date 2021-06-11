@@ -3,11 +3,12 @@ import {Helpers} from "../../helpers";
 import {SR5Item} from "../../item/SR5Item";
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import {onManageActiveEffect} from "../../effects";
+import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 
 /**
  * This class should not be used directly but be extended for each actor type.
  */
-export class SR5BaseActorSheet extends ActorSheet<{}, SR5Actor> {
+export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
     // TODO: What is this used for?
     _shownDesc: string[] = [];
     // If something needs filtering, store those filters here.
@@ -45,7 +46,7 @@ export class SR5BaseActorSheet extends ActorSheet<{}, SR5Actor> {
     get template() {
         const path = 'systems/shadowrun5e/dist/templates';
 
-        if (this.actor.hasPerm(game.user, 'LIMITED', true)) {
+        if (this.actor.limited) {
             return `${path}/actor-limited/${this.actor.data.type}.html`;
         }
 
