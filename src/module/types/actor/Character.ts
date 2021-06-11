@@ -1,30 +1,25 @@
 /// <reference path="../Shadowrun.ts" />
 
 declare namespace Shadowrun {
-    export type CharacterSkills = {
-        active: Skills;
-        language: KnowledgeSkillList;
-        knowledge: KnowledgeSkills;
+    export interface CharacterSkills {
+        active: Skills
+        language: KnowledgeSkillList
+        knowledge: KnowledgeSkills
     }
 
-    export type CharacterData =
-        MatrixActorData &
-        TwoTrackActorData &
-        ArmorActorData &
-        MagicActorData &
-        WoundsActorData &
-        MovementActorData &
-        NPCActorData & {
-        attributes: Attributes;
-        limits: Limits;
-        skills: CharacterSkills;
-        modifiers: Modifiers;
-        special: SpecialTrait;
-        initiative: Initiative;
-        recoil_compensation: number;
-        metatype: string | keyof typeof SR5CONFIG.character.types;
-        full_defense_attribute: string;
-    };
+    export interface CharacterData extends
+        CommonData,
+        MatrixActorData,
+        TwoTrackActorData,
+        ArmorActorData,
+        MagicActorData,
+        WoundsActorData,
+        MovementActorData,
+        NPCActorData {
+            recoil_compensation: number;
+            metatype: string | keyof typeof SR5CONFIG.character.types;
+            full_defense_attribute: string;
+    }
 
     export type PhysicalTrackActorData = {
         track: {
@@ -54,16 +49,16 @@ declare namespace Shadowrun {
     };
 
     export type MagicActorData = {
-        magic: Magic;
+        magic: MagicData;
     };
 
     export type MatrixActorData = {
-        matrix: ActorMatrix;
+        matrix: MatrixData;
     };
 
     export type NPCActorData = {
         is_npc: boolean;
-        npc: NPC
+        npc: NPCData
     }
 
     export type WoundType = {

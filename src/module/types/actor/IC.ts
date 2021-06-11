@@ -4,7 +4,7 @@ declare namespace Shadowrun {
     export type ICType = keyof typeof SR5CONFIG.ic.types
 
     export interface ICData extends
-        CommonActorData,
+        CommonData,
         MatrixActorData,
         MatrixTrackActorData {
             icType: ICType,
