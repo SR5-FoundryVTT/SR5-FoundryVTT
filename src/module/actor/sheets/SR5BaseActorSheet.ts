@@ -75,7 +75,8 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         super.activateListeners(html);
 
         // Active Effect management
-        html.find(".effect-control").click(event => onManageActiveEffect(event, this.entity));
+        // @ts-ignore // foundry-vtt-types 0.8 document support missing.
+        html.find(".effect-control").click(event => onManageActiveEffect(event, this.document));
 
         // General item CRUD management...
         html.find('.item-create').on('click', this._onItemCreate.bind(this));

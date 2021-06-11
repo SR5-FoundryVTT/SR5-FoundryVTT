@@ -5,6 +5,7 @@
         <a class="item" data-tab="weapon">{{localize "SR5.Weapon"}}</a>
         <a class="item" data-tab="ammo">{{localize "SR5.Ammo"}}</a>
         <a class="item" data-tab="mods">{{localize "SR5.WeaponMods"}}</a>
+        <a class="item" data-tab="effects">{{ localize "SR5.Effects" }}</a>
     </nav>
     <section class="sheetbody">
         <div class="tab" data-group="primary" data-tab="description">
@@ -36,5 +37,6 @@
                 {{> "systems/shadowrun5e/dist/templates/item/parts/weapon-mods-list.html"}}
             </div>
         </div>
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/EffectsTab.html"}}
     </section>
 </form>

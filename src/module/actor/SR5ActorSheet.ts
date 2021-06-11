@@ -88,7 +88,9 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         this._prepareCharacterFields(data);
         this._prepareVehicleFields(data);
 
-        data['effects'] = prepareActiveEffectCategories(this.entity.effects);
+        // Active Effects data.
+        // @ts-ignore // TODO: foundry-vtt-types 0.8 missing document support
+        data['effects'] = prepareActiveEffectCategories(this.document.effects);
 
         return data;
     }

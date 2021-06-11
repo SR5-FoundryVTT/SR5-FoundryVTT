@@ -2,6 +2,7 @@ import { Helpers } from '../helpers';
 import { SR5Item } from './SR5Item';
 import {SR5} from "../config";
 import {SR5Actor} from "../actor/SR5Actor";
+import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -93,6 +94,10 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         data['attributes'] = this._getSortedAttributesForSelect();
         data['limits'] = this._getSortedLimitsForSelect();
 
+        // Active Effects data.
+        // @ts-ignore // TODO: foundry-vtt-types 0.8 missing document support
+        data['effects'] = prepareActiveEffectCategories(this.document.effects);
+
         return data;
     }
 
@@ -148,6 +153,11 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         this.form.ondragover = (event) => this._onDragOver(event);
         //@ts-ignore
         this.form.ondrop = (event) => this._onDrop(event);
+
+        // Active Effect management
+        // @ts-ignore // foundry-vtt-types 0.8 document support missing.
+        html.find(".effect-control").click(event => onManageActiveEffect(event, this.document));
+
         /**
          * General item handling
          */
