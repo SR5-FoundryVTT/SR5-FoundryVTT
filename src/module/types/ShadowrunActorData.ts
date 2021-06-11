@@ -16,6 +16,7 @@ declare namespace Shadowrun {
     export type ShadowrunActorData =
         CharacterActorData |
         CritterActorData |
+        ICActorData |
         SpiritActorData |
         SpriteActorData |
         VehicleActorData;
@@ -23,6 +24,7 @@ declare namespace Shadowrun {
     export type ShadowrunActorDataData =
         CharacterData |
         CritterData |
+        ICData |
         SpiritData |
         SpriteData |
         VehicleData;
@@ -33,6 +35,9 @@ declare namespace Shadowrun {
     }
     export interface CritterActorData extends Actor.Data<CritterData, ShadowrunItemData> {
         type: 'critter';
+    }
+    export interface ICActorData extends Actor.Data<ICData, ShadowrunItemData> {
+        type: 'ic';
     }
     export interface SpiritActorData extends Actor.Data<SpiritData, ShadowrunItemData> {
         type: 'spirit';

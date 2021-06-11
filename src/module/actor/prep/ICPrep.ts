@@ -1,41 +1,39 @@
-import {BaseActorPrep} from "./BaseActorPrep";
 import {ModifiersPrep} from "./functions/ModifiersPrep";
-import SR5ICType = Shadowrun.SR5ICType;
-import ICActorData = Shadowrun.ICActorData;
-import {MatrixRules} from "../../sr5/Matrix";
-import {SkillsPrep} from "./functions/SkillsPrep";
 import {InitiativePrep} from "./functions/InitiativePrep";
-import AttributeField = Shadowrun.AttributeField;
-import SR5ActorData = Shadowrun.SR5ActorData;
 import {AttributesPrep} from "./functions/AttributesPrep";
 import {PartsList} from "../../parts/PartsList";
 import {SR5} from "../../config";
 import {MatrixPrep} from "./functions/MatrixPrep";
-import {DefaultValues} from "../../dataTemplates";
+import ICData = Shadowrun.ICData;
+import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
+import {DefaultValues} from "../../data/DataDefaults";
+import {MatrixRules} from "../../rules/Matrix";
 
-export class ICPrep extends BaseActorPrep<SR5ICType, ICActorData> {
-    prepare() {
-        // Add missing values on actor creation
-        ICPrep.addMissingTracks(this.data);
 
-        // Base value preparations.
-        ICPrep.prepareModifiers(this.data);
-        ModifiersPrep.clearAttributeMods(this.data);
+export function ICDataPrepare(data: ICData, items: SR5ItemDataWrapper[]) {
+    // Add missing values on actor creation
+    ICPrep.addMissingTracks(data);
 
-        ICPrep.hideMeatAttributes(this.data);
-        ICPrep.prepareMeatAttributes(this.data);
-        ICPrep.prepareMatrixAttributes(this.data);
-        MatrixPrep.prepareMatrixToLimitsAndAttributes(this.data);
+    // Base value preparations.
+    ICPrep.prepareModifiers(data);
+    ModifiersPrep.clearAttributeMods(data);
 
-        // Derived value preparations
-        ICPrep.prepareMatrix(this.data);
-        ICPrep.prepareMatrixTrack(this.data);
+    ICPrep.hideMeatAttributes(data);
+    ICPrep.prepareMeatAttributes(data);
+    ICPrep.prepareMatrixAttributes(data);
+    MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
 
-        // SkillsPrep.prepareSkills(this.data);
-        ICPrep.prepareMatrixInit(this.data);
-        InitiativePrep.prepareCurrentInitiative(this.data);
-    }
+    // Derived value preparations
+    ICPrep.prepareMatrix(data);
+    ICPrep.prepareMatrixTrack(data);
 
+    // SkillsPrep.prepareSkills(data);
+    ICPrep.prepareMatrixInit(data);
+    InitiativePrep.prepareCurrentInitiative(data);
+}
+
+
+export class ICPrep {
     /**
      * On initial actor creation the matrix track will be missing.
      *
@@ -94,7 +92,7 @@ export class ICPrep extends BaseActorPrep<SR5ICType, ICActorData> {
     /**
      * Hide all meat attributes from display
      */
-    static hideMeatAttributes(data: ICActorData) {
+    static hideMeatAttributes(data: ICData) {
         const { attributes } = data;
 
         for (const attribute of Object.values(attributes)) {
@@ -102,7 +100,7 @@ export class ICPrep extends BaseActorPrep<SR5ICType, ICActorData> {
         }
     }
 
-    static prepareMeatAttributes(data: ICActorData) {
+    static prepareMeatAttributes(data: ICData) {
         const { attributes, host } = data;
 
         for (const id of Object.keys(SR5.attributes)) {
@@ -127,7 +125,7 @@ export class ICPrep extends BaseActorPrep<SR5ICType, ICActorData> {
     /**
      * Calculate all matrix attributes without the meat attributes
      */
-    static prepareMatrixAttributes(data: ICActorData) {
+    static prepareMatrixAttributes(data: ICData) {
         const { matrix } = data;
 
         for (const id of Object.keys(SR5.matrixAttributes)) {

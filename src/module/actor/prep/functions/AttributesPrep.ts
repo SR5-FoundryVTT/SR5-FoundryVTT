@@ -1,4 +1,3 @@
-import { PartsList } from '../../../parts/PartsList';
 import { Helpers } from '../../../helpers';
 import {SR} from "../../../constants";
 import {SR5} from "../../../config";
@@ -34,7 +33,7 @@ export class AttributesPrep {
      * @param attribute The AttributeField to prepare
      */
     static prepareAttribute(name: string, attribute: AttributeField) {
-        if (!SR5.attributes.hasOwnProperty(id) || !attribute) return;
+        if (!SR5.attributes.hasOwnProperty(name) || !attribute) return;
 
         // TODO: IC-ACTOR Check this NOTE
         // NOTE: This is legacy code I suspect does nothing. Disabled on 0.7.15. Delete it on any newer version!
@@ -46,7 +45,7 @@ export class AttributesPrep {
         AttributesPrep.calculateAttribute(name, attribute);
 
         // add i18n labels.
-        attribute.label = SR5.attributes[id];
+        attribute.label = SR5.attributes[name];
     }
 
     /**

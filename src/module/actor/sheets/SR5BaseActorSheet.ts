@@ -8,27 +8,21 @@ import SR5SheetFilters = Shadowrun.SR5SheetFilters;
  */
 export class SR5BaseActorSheet extends ActorSheet<{}, SR5Actor> {
     // TODO: What is this used for?
-    _shownDesc: string[];
+    _shownDesc: string[] = [];
     // If something needs filtering, store those filters here.
-    _filters: SR5SheetFilters;
-    // Used to store the scroll position on rerender. Needed as Foundry fully rerenders on update.
-    _scroll: string;
-
-    constructor(...args) {
-        super(...args);
-
-        this._shownDesc = [];
-        this._filters = {
+    _filters: SR5SheetFilters = {
             skills: '',
             showUntrainedSkills: true,
         };
-    }
+    // Used to store the scroll position on rerender. Needed as Foundry fully rerenders on update.
+    _scroll: string;
 
     /**
      * Extend and override the default options used by the 5e Actor Sheet
      * @returns {Object}
      */
     static get defaultOptions() {
+        //@ts-ignore // TODO: foundry-vtt-types GENERAL no idea what's the issue here.
         return mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'actor'],
             width: 880,
@@ -109,7 +103,7 @@ export class SR5BaseActorSheet extends ActorSheet<{}, SR5Actor> {
     async _onItemEdit(event) {
         event.preventDefault();
         const iid = Helpers.listItemId(event);
-        const item = this.actor.getOwnedSR5Item(iid);
+        const item = this.actor.items.get(iid);
         if (item) await item.sheet.render(true);
     }
 
@@ -127,7 +121,7 @@ export class SR5BaseActorSheet extends ActorSheet<{}, SR5Actor> {
     async _onItemRoll(event) {
         event.preventDefault();
         const iid = Helpers.listItemId(event);
-        const item = this.actor.getOwnedSR5Item(iid);
+        const item = this.actor.items.get(iid);
         if (item) {
             await item.castAction(event);
         }

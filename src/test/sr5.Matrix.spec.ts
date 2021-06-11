@@ -1,4 +1,4 @@
-import {MatrixRules} from "../module/sr5/Matrix";
+import {MatrixRules} from "../module/rules/Matrix";
 
 export const shadowrunMatrix = context => {
     const {describe, it, assert, before, after} = context;

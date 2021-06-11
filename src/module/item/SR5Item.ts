@@ -52,6 +52,8 @@ import SinItemData = Shadowrun.SinItemData;
 import SpellItemData = Shadowrun.SpellItemData;
 import SpritePowerItemData = Shadowrun.SpritePowerItemData;
 import WeaponItemData = Shadowrun.WeaponItemData;
+import HostItemData = Shadowrun.HostItemData;
+import {DefaultValues} from "../data/DataDefaults";
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
@@ -761,9 +763,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
         return this.data.type === 'host';
     }
 
-    asHostData(): Host|undefined {
+    asHostData(): HostItemData|undefined {
         if (this.isHost()) {
-            return this.data as Host;
+            return this.data as HostItemData;
         }
     }
 

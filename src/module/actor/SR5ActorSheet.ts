@@ -5,7 +5,6 @@ import {KnowledgeSkillEditSheet} from '../apps/skills/KnowledgeSkillEditSheet';
 import {LanguageSkillEditSheet} from '../apps/skills/LanguageSkillEditSheet';
 import {SR5Actor} from './SR5Actor';
 import {SR5} from '../config';
-import {SR5Item} from "../item/SR5Item";
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import Skills = Shadowrun.Skills;
 import MatrixAttribute = Shadowrun.MatrixAttribute;

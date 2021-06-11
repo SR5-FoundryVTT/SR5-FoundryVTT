@@ -30,9 +30,6 @@ import VehicleStats = Shadowrun.VehicleStats;
 import ActorArmorData = Shadowrun.ActorArmorData;
 import ConditionData = Shadowrun.ConditionData;
 import Skills = Shadowrun.Skills;
-import {SkillRules} from "../rules/SkillRules";
-import SR5ICType = Shadowrun.SR5ICType;
-import {SkillRules} from "../rules/SkillRules";
 import CharacterSkills = Shadowrun.CharacterSkills;
 import {SR5} from "../config";
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
@@ -50,6 +47,8 @@ import VehicleData = Shadowrun.VehicleData;
 import VehicleActorData = Shadowrun.VehicleActorData;
 import CritterActorData = Shadowrun.CritterActorData;
 import {Modifiers} from "../rules/Modifiers";
+import ICActorData = Shadowrun.ICActorData;
+import {SkillRules} from "../rules/SkillRules";
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -1685,9 +1684,9 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         }
     }
 
-    asICData(): SR5ICType | undefined {
+    asICData(): ICActorData | undefined {
         if (this.isIC()) {
-            return this.data as SR5ICType;
+            return this.data as ICActorData;
         }
     }
 
