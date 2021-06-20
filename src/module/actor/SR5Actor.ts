@@ -49,6 +49,9 @@ import CritterActorData = Shadowrun.CritterActorData;
 import {Modifiers} from "../rules/Modifiers";
 import ICActorData = Shadowrun.ICActorData;
 import {SkillRules} from "../rules/SkillRules";
+import MatrixData = Shadowrun.MatrixData;
+import MatrixMarks = Shadowrun.MatrixMarks;
+import {MatrixRules} from "../rules/Matrix";
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -1765,5 +1768,94 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
 
     async setModifiers(modifiers: Modifiers) {
         await Modifiers.setModifiersOnEntity(this, modifiers.modifiers);
+    }
+
+    /**
+     * Check if the current actor has matrix capabilities.
+     */
+    get isMatrixActor(): boolean {
+        return 'matrix' in this.data.data;
+    }
+
+    get matrixData(): MatrixData|undefined {
+        if (!this.isMatrixActor) return;
+        // @ts-ignore // isMatrixActor handles it, TypeScript doesn't know.
+        return this.data.data.matrix as MatrixData;
+    }
+
+    /**
+     * @param target The Document the marks are placed on. This can be an actor (character, technomancer, IC) OR an item (Host)
+     * @param marks The amount of marks to be placed
+     * @param options Additional options that may be needed
+     * @param options.scene The scene the actor lives on. If empty, will be current active scene
+     */
+    async setMarks(target: SR5Actor|SR5Item, marks: number, options?: {scene?: Scene, item?: SR5Item}) {
+        if (!canvas.ready) return;
+
+        if (!this.isMatrixActor) {
+            ui.notifications.error(game.i18n.localize('SR5.Errors.MarkCouldNotBePlaced'));
+            console.error(`The actor type ${this.data.type} can't receive matrix marks!`);
+            return
+        }
+
+        if (!MatrixRules.isValidMarksCount(marks)) {
+            ui.notifications.error(game.i18n.localize('SR5.Errors.MarkCouldNotBePlaced'));
+            console.error('To many or to little matrix marks');
+            return
+        }
+
+        // Both scene and item are optional.
+        const scene = options?.scene || canvas.scene;
+        const item = options?.item;
+
+        // Build the markId string. If no item has been given, there still will be a third split element.
+        // Use Helpers.deconstructMarkId to get the elements.
+        const markId = Helpers.buildMarkId(scene?.id, target.id, item?.id);
+        const matrixData = this.matrixData;
+        matrixData.marks[markId] = marks;
+
+        await this.update({'data.matrix.marks': matrixData.marks});
+    }
+
+    /**
+     * Remove ALL marks placed by this actor
+     */
+    async clearMarks() {
+        if (!this.isMatrixActor) return;
+
+        const matrixData = this.matrixData;
+
+
+        // Delete all markId properties from ActorData
+        const updateData = {}
+        for (const markId of Object.keys(matrixData.marks)) {
+            updateData[`-=${markId}`] = null;
+        }
+
+        await this.update({'data.matrix.marks': updateData});
+    }
+
+    /**
+     * Return the amount of marks this actor has on another actor or one of their items.
+     *
+     * TODO: It's unclear what this method will be used for
+     *       What does the caller want?
+     * @param target
+     * @param item
+     * @param options
+     */
+    getMarks(target: SR5Actor|SR5Item, item?: SR5Item, options?: {scene?: Scene}): number {
+        if (!canvas.ready) return;
+        if (target instanceof SR5Item) {
+            console.error('Not yet supported');
+            return;
+        }
+        if (!target.isMatrixActor) return 0;
+
+        const scene = options.scene || canvas.scene;
+
+        const markId = Helpers.buildMarkId(scene.id, target.id, item?.id);
+
+        return this.matrixData.marks[markId];
     }
 }

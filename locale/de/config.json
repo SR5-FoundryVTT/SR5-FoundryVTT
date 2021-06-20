@@ -736,7 +736,8 @@
   },
   "SR5.Errors": {
     "MissingSkill": "Der Charakter verfügt nicht über die benötigte Fertigkeit.",
-    "SkillWithoutAttribute": "The skill has no attribute configured."
+    "SkillWithoutAttribute": "The skill has no attribute configured.",
+    "MarkCouldNotBePlaced": "Interner Fehler: Die Marken konnten nicht platziert werden."
   },
   "SR5.ChangelogApplication": {
     "Title": "Shadowrun5e Update",

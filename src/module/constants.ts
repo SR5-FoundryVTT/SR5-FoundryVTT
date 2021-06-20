@@ -35,7 +35,7 @@ export const FLAGS = {
     ChangelogShownForVersion: 'changelogShownForVersion',
     Modifier: 'modifier',
     DoInitPass: 'doInitPass',
-    DoNextRound: 'doNextRound',
+    DoNextRound: 'doNextRound'
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {

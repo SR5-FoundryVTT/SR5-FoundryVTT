@@ -18,6 +18,7 @@
                     "name": "",
                     "silent": false,
                     "hot_sim": false,
+                    "marks": {},
                     "firewall": {
                         "value": 0,
                         "mod": [],

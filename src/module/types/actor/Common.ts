@@ -16,7 +16,7 @@ declare namespace Shadowrun {
         drain: BaseValuePair<number> & ModifiableValue
     }
 
-     export interface MatrixData {
+    export interface MatrixData {
         dice: BaseValuePair<number> & ModifiableValue
         base: BaseValuePair<number> & ModifiableValue
 
@@ -33,6 +33,7 @@ declare namespace Shadowrun {
         hot_sim: boolean
         running_silent: boolean
         item?: any
+        marks: MatrixMarks
     }
 
     export interface MatrixAttributeField extends AttributeField {
@@ -47,4 +48,10 @@ declare namespace Shadowrun {
         is_grunt: boolean
         professional_rating: number
     }
+
+    /**
+     * Matrix Marks are stored using a single string to identify the target, scene and item id the marks have been placed
+     * on.
+     */
+    export interface MatrixMarks extends Record<string, number>{}
 }

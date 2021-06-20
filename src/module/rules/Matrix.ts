@@ -48,4 +48,12 @@ export class MatrixRules {
     static getICMeatAttributeBase(hostRating: number): number {
         return Math.max(hostRating, SR.attributes.ranges.host_rating.min);
     }
+
+    /**
+     * Determine if the count of marks (to be placed) is allowed within the rules. SR5#240 'Hack on the Fly'
+     * @param marks
+     */
+    static isValidMarksCount(marks: number): boolean {
+        return marks >= 0 && marks <= 3;
+    }
 }

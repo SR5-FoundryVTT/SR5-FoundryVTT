@@ -684,4 +684,41 @@ export class Helpers {
         const pack = game.packs.find((p) => p.collection === collection);
         return await pack.getEntity(id);
     }
+
+    /**
+     * Build a markId string. See Helpers.deconstructMarkId for usage.
+     *
+     * @param sceneId Optional id in a markId
+     * @param targetId Mandatory id in a markId
+     * @param itemId Optional id in a markId
+     * @param separator Should you want to change the default separator used
+     */
+    static buildMarkId(sceneId: string, targetId: string, itemId: string|undefined, separator='.'): string {
+        return [sceneId, targetId, itemId || ''].join(separator);
+    }
+
+    /**
+     * Deconstruct the given markId string.
+     *
+     * @param markId 'sceneId.targetId.itemId' with itemId being optional
+     * @param separator Should you want to change the default separator used
+     */
+    static deconstructMarkId(markId: string, separator='.'): {scene: Scene, target: SR5Actor|SR5Item, item?: SR5Item} {
+        const ids = markId.split(separator);
+
+        if (ids.length !== 3) {
+            console.error('A mark id must always be of length 3');
+            return;
+        }
+
+        const [sceneId, targetId, itemId] = ids;
+
+        const scene = game.scenes.get(sceneId);
+        const target = game.actors.get(targetId) as SR5Actor || game.items.get(targetId) as SR5Item;
+        const item = game.items.get(itemId) as SR5Item; // DocumentCollection will return undefined if needed
+
+        return {
+            scene, target, item
+        }
+    }
 }

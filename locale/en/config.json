@@ -772,7 +772,8 @@
   },
   "SR5.Errors": {
     "MissingSkill": "The actor doesn't have the requested skill.",
-    "SkillWithoutAttribute": "The skill has no attribute configured."
+    "SkillWithoutAttribute": "The skill has no attribute configured.",
+    "MarkCouldNotBePlaced": "Internal Error: Your marks couldn't be placed."
   },
   "SR5.ChangelogApplication": {
     "Title": "Shadowrun5e Update",
