@@ -216,9 +216,6 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         let data;
         try {
             data = JSON.parse(event.dataTransfer.getData('text/plain'));
-            if (data.type !== 'Item') {
-                console.log('Shadowrun5e | Can only drop Items');
-            }
         } catch (err) {
             console.log('Shadowrun5e | drop error');
             return;
