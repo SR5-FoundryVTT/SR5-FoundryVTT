@@ -34,6 +34,7 @@
                 value="{{data.atts.att1.value}}"
                 data-dtype="Number"
                 placeholder="1"
+                {{#if (not data.atts.att1.editable)}}disabled{{/if}}
             />
         </div>
     </div>
@@ -54,6 +55,7 @@
                 value="{{data.atts.att2.value}}"
                 data-dtype="Number"
                 placeholder="1"
+                {{#if (not data.atts.att2.editable)}}disabled{{/if}}
             />
         </div>
     </div>
@@ -74,6 +76,7 @@
                 value="{{data.atts.att3.value}}"
                 data-dtype="Number"
                 placeholder="1"
+                {{#if (not data.atts.att3.editable)}}disabled{{/if}}
             />
         </div>
     </div>
@@ -94,6 +97,7 @@
                 value="{{data.atts.att4.value}}"
                 data-dtype="Number"
                 placeholder="1"
+                {{#if (not data.atts.att4.editable)}}disabled{{/if}}
             />
         </div>
     </div>

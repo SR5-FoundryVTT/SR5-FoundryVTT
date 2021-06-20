@@ -1148,19 +1148,23 @@
                 "atts": {
                     "att1": {
                         "value": 0,
-                        "att": "attack"
+                        "att": "attack",
+                        "editable": true
                     },
                     "att2": {
                         "value": 0,
-                        "att": "sleaze"
+                        "att": "sleaze",
+                        "editable": true
                     },
                     "att3": {
                         "value": 0,
-                        "att": "data_processing"
+                        "att": "data_processing",
+                        "editable": true
                     },
                     "att4": {
                         "value": 0,
-                        "att": "firewall"
+                        "att": "firewall",
+                        "editable": true
                     }
                 }
             }

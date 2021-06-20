@@ -56,4 +56,12 @@ export class MatrixRules {
     static isValidMarksCount(marks: number): boolean {
         return marks >= 0 && marks <= 3;
     }
+
+    /**
+     * Derive a hosts attributes ratings based on it's host rating. SR5#247 'Host Attributes'
+     * @param hostRating
+     */
+    static hostMatrixAttributeRatings(hostRating): number[] {
+        return [1, 2, 3, 4].map(rating => rating + hostRating);
+    }
 }

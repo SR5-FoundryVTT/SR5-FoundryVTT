@@ -54,6 +54,7 @@ import SpritePowerItemData = Shadowrun.SpritePowerItemData;
 import WeaponItemData = Shadowrun.WeaponItemData;
 import HostItemData = Shadowrun.HostItemData;
 import {DefaultValues} from "../data/DataDefaults";
+import {HostDataPreparation} from "./prep/HostPrep";
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
@@ -339,13 +340,11 @@ export class SR5Item extends Item<ShadowrunItemData> {
             adeptPower.data.type = adeptPower.data.action.type ? 'active' : 'passive';
         }
 
-        /**
-         * Host Item Type
-         */
-        const host = this.asHostData();
-        if (host) {
-            // Host matrix 'devices' are always hosts and never commlink / cyberdecks.
-            host.data.category = 'host';
+        // Switch item data preparation between types...
+        // ... this is ongoing work to clean up SR5item.prepareData
+        switch (this.data.type) {
+            case 'host':
+                HostDataPreparation(this.data.data);
         }
     }
 
