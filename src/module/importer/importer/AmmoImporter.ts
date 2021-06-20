@@ -122,7 +122,7 @@ export class AmmoImporter extends DataImporter {
                     return item.type === 'weapon' && item.name.toLowerCase() === nameLower;
                 });
 
-                if (foundWeapon !== null && "action" in foundWeapon.data.data) {
+                if (foundWeapon != null && "action" in foundWeapon.data.data) {
                     const weaponData = foundWeapon.data.data as WeaponData;
                     data.data.damage = weaponData.action.damage.value;
                     data.data.ap =weaponData.action.damage.ap.value;
