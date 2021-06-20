@@ -1144,7 +1144,7 @@
                 }
             },
             "matrix": {
-                "category": "",
+                "category": "commlink",
                 "atts": {
                     "att1": {
                         "value": 0,

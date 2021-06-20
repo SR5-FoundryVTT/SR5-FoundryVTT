@@ -5,6 +5,8 @@ import { PartsList } from '../../../parts/PartsList';
 import {SR5} from "../../../config";
 import ActorTypesData = Shadowrun.ShadowrunActorDataData;
 import ShadowrunActorDataData = Shadowrun.ShadowrunActorDataData;
+import CommonData = Shadowrun.CommonData;
+import {AttributesPrep} from "./AttributesPrep";
 
 export class MatrixPrep {
     /**
@@ -74,33 +76,40 @@ export class MatrixPrep {
      * Add Matrix Attributes to Limits and Attributes
      * @param data
      */
-    static prepareMatrixToLimitsAndAttributes(data: ShadowrunActorDataData & MatrixActorData) {
+    static prepareMatrixToLimitsAndAttributes(data: CommonData & MatrixActorData) {
         const { matrix, attributes, limits } = data;
-        const MatrixList = ['firewall', 'sleaze', 'data_processing', 'attack'];
 
         // add matrix attributes to both limits and attributes as hidden entries
-        MatrixList.forEach((key) => {
-            Helpers.calcTotal(matrix[key]);
-            if (matrix[key]) {
-                const label = SR5.matrixAttributes[key];
-                const { value, base, mod } = matrix[key];
-                const hidden = true;
-
-                limits[key] = {
-                    value,
-                    base,
-                    mod,
-                    label,
-                    hidden,
-                };
-                attributes[key] = {
-                    value,
-                    base,
-                    mod,
-                    label,
-                    hidden,
-                };
+        Object.keys(SR5.matrixAttributes).forEach((attributeName) => {
+            if (!matrix.hasOwnProperty(attributeName)) {
+                return console.error(`SR5Actor matrix preparation failed due to missing matrix attributes`);
             }
+
+            const attribute = matrix[attributeName];
+            // Helpers.calcTotal(matrix[attributeName]);
+            // const label = SR5.matrixAttributes[attributeName];
+            // const { value, base, mod } = matrix[attributeName];
+            AttributesPrep.prepareAttribute(attributeName, attribute);
+            const { value, base, mod, label } = attribute;
+            const hidden = true;
+
+            // Each matrix attribute also functions as a limit.
+            limits[attributeName] = {
+                value,
+                base,
+                mod,
+                label,
+                hidden,
+            };
+
+            // Copy matrix attribute data into attributes for ease of access during testing.
+            attributes[attributeName] = {
+                value,
+                base,
+                mod,
+                label,
+                hidden,
+            };
         });
     }
 
@@ -108,7 +117,7 @@ export class MatrixPrep {
      * Prepare the mental attributes for a sheet that just has a device rating
      * @param data
      */
-    static prepareAttributesForDevice(data: ActorTypesData & MatrixActorData) {
+    static prepareAttributesForDevice(data: CommonData & MatrixActorData) {
         const { matrix, attributes } = data;
         const rating = matrix.rating || 0;
         const mentalAttributes = ['intuition', 'logic', 'charisma', 'willpower'];

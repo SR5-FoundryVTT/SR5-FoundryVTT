@@ -42,11 +42,18 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
      * The prepared data object contains both the actor data as well as additional sheet options
      */
     getData() {
-        const data = super.getData();
+        let data = super.getData();
         // Foundry 0.8 will return data as an sheet data while Foundry 0.7 will return data as an item data.
         // Therefore data is nested one deeper. The alternative would be to rework all references with one more data...
+        data.type = data.data.type;
         data.data = data.data.data;
         const itemData = data.data;
+        // data = {
+        //     ...data,
+        //     // @ts-ignore
+        //     data: data.data.data
+        // }
+
 
         if (itemData.action) {
             try {

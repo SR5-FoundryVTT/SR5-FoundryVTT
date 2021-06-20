@@ -7,10 +7,10 @@ import {MatrixPrep} from "./functions/MatrixPrep";
 import ICData = Shadowrun.ICData;
 import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 import {DefaultValues} from "../../data/DataDefaults";
-import {MatrixRules} from "../../rules/Matrix";
+import {MatrixRules} from "../../rules/MatrixRules";
 
 
-export function ICDataPrepare(data: ICData, items: SR5ItemDataWrapper[]) {
+export function ICDataPreparation(data: ICData, items: SR5ItemDataWrapper[]) {
     // Add missing values on actor creation
     ICPrep.addMissingTracks(data);
 
@@ -78,6 +78,8 @@ export class ICPrep {
 
     static prepareMatrixInit(data) {
         const { initiative, modifiers, host } = data;
+
+
         // Set current initiative to matrix
         initiative.perception = 'matrix';
 

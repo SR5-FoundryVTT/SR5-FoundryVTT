@@ -9,7 +9,7 @@ import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
  * This class should not be used directly but be extended for each actor type.
  */
 export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
-    // TODO: What is this used for?
+    // Store description to display on the sheet.
     _shownDesc: string[] = [];
     // If something needs filtering, store those filters here.
     _filters: SR5SheetFilters = {
@@ -40,6 +40,10 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
     }
 
     /**
+     * Decide which template to render both for actor types and user permissions.
+     *
+     * This could also be done within individual ActorType sheets, however, for ease of use, it's
+     * centralized here.
      *
      * @override
      */
@@ -57,8 +61,13 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
      * Data used by all actor types.
      */
     getData() {
-        // Return as any to avoid unnecessary typing. The handlebar template won't be using any type hints.
-        const data = super.getData() as any;
+        // Restructure redesigned Document.getData to contain all new fields, while keeping data.data as system data.
+        let data = super.getData() as any;
+        data = {
+            ...data,
+            // @ts-ignore
+            data: data.data.data
+        }
 
         // General purpose fields
         data.config = CONFIG.SR5;
@@ -472,6 +481,8 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         });
         data.qualities = qualities;
     }
+
+
 
     _prepareActorTypeFields(data) {
         data.isCharacter = this.actor.isCharacter();

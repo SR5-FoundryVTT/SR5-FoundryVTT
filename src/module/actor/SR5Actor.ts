@@ -50,8 +50,8 @@ import {Modifiers} from "../rules/Modifiers";
 import ICActorData = Shadowrun.ICActorData;
 import {SkillRules} from "../rules/SkillRules";
 import MatrixData = Shadowrun.MatrixData;
-import MatrixMarks = Shadowrun.MatrixMarks;
-import {MatrixRules} from "../rules/Matrix";
+import {MatrixRules} from "../rules/MatrixRules";
+import {ICDataPreparation} from "./prep/ICPrep";
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -130,6 +130,9 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
                 break;
             case "vehicle":
                 VehicleDataPreparation(this.data.data, itemDataWrappers);
+                break;
+            case "ic":
+                ICDataPreparation(this.data.data, itemDataWrappers);
                 break;
         }
     }

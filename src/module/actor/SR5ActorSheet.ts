@@ -19,7 +19,7 @@ import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
 let globalSkillAppId: number = -1;
 
 /**
- * Extend the basic ActorSheet with some very simple modifications
+ * See Hooks.init for which actor type this sheet handles.
  *
  */
 export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
