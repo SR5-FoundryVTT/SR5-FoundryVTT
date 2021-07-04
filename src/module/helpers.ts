@@ -16,6 +16,7 @@ import { SR5Item } from './item/SR5Item';
 import Skills = Shadowrun.Skills;
 import {ShadowrunRoll} from "./rolls/ShadowrunRoller";
 import {DataDefaults} from "./data/DataDefaults";
+import MatrixMarks = Shadowrun.MatrixMarks;
 
 interface CalcTotalOptions {
     min?: number,
@@ -691,9 +692,9 @@ export class Helpers {
      * @param sceneId Optional id in a markId
      * @param targetId Mandatory id in a markId
      * @param itemId Optional id in a markId
-     * @param separator Should you want to change the default separator used
+     * @param separator Should you want to change the default separator used. Make sure not to use a . since Foundry will split the key into objects.
      */
-    static buildMarkId(sceneId: string, targetId: string, itemId: string|undefined, separator='.'): string {
+    static buildMarkId(sceneId: string, targetId: string, itemId: string|undefined, separator=';'): string {
         return [sceneId, targetId, itemId || ''].join(separator);
     }
 
@@ -703,7 +704,7 @@ export class Helpers {
      * @param markId 'sceneId.targetId.itemId' with itemId being optional
      * @param separator Should you want to change the default separator used
      */
-    static deconstructMarkId(markId: string, separator='.'): {scene: Scene, target: SR5Actor|SR5Item, item?: SR5Item} {
+    static deconstructMarkId(markId: string, separator=';'): {scene: Scene, target: SR5Actor|SR5Item, item?: SR5Item} {
         const ids = markId.split(separator);
 
         if (ids.length !== 3) {

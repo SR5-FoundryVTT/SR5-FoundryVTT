@@ -55,6 +55,7 @@ import WeaponItemData = Shadowrun.WeaponItemData;
 import HostItemData = Shadowrun.HostItemData;
 import {DefaultValues} from "../data/DataDefaults";
 import {HostDataPreparation} from "./prep/HostPrep";
+import {MatrixRules} from "../rules/MatrixRules";
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
@@ -1624,5 +1625,88 @@ export class SR5Item extends Item<ShadowrunItemData> {
         // Actor.item => Directly owned item by an actor!
         // @ts-ignore
         return await super.update(data, options);
+    }
+
+    /**
+     * Place a Matrix Mark for this Item.
+     *
+     * @param target The Document the marks are placed on. This can be an actor (character, technomancer, IC) OR an item (Host)
+     * @param marks Amount of marks to be placed.
+     * @param options Additional options that may be needed.
+     * @param options.scene The scene the targeted actor lives on.
+     * @param options.item
+     *
+     * TODO: It might be useful to create a 'MatrixDocument' class sharing matrix methods to avoid duplication between
+     *       SR5Item and SR5Actor.
+     */
+    async setMarks(target: SR5Actor, marks: number, options?: {scene?: Scene, item?: Item}) {
+        if (!canvas.ready) return;
+
+        if (!this.isHost()) {
+            console.error('Only Host item types can place matrix marks!');
+            return;
+        }
+
+        if (!MatrixRules.isValidMarksCount(marks)) {
+            ui.notifications.error(game.i18n.localize('SR5.Errors.MarkCouldNotBePlaced'));
+            console.error('To many or to little matrix marks');
+            return
+        }
+
+        // Both scene and item are optional.
+        const scene = options?.scene || canvas.scene;
+        // TODO: IF no item given use the actor matrix item.
+        const item = options?.item || target.getMatrixDevice();
+
+        // Build the markId string. If no item has been given, there still will be a third split element.
+        // Use Helpers.deconstructMarkId to get the elements.
+        const markId = Helpers.buildMarkId(scene.id, target.id, item?.id);
+        const hostData = this.asHostData();
+        hostData.data.marks[markId] = marks;
+
+        await this.update({'data.marks': hostData.data.marks});
+    }
+
+    /**
+     * Receive the marks placed on either the given target as a whole or one it's owned items.
+     *
+     * @param target
+     * @param item
+     * @param options
+     *
+     * TODO: Check with technomancers....
+     *
+     * @return Will always return a number. At least zero, for no marks placed.
+     */
+    getMarks(target: SR5Actor, item?: SR5Item, options?: {scene?: Scene}): number {
+        if (!canvas.ready) return;
+        if (!this.isHost()) return 0;
+
+        // Scene is optional.
+        const scene = options?.scene || canvas.scene;
+        item = item || target.getMatrixDevice();
+
+        const markId = Helpers.buildMarkId(scene.id, target.id, item.id);
+        const hostData = this.asHostData();
+        return hostData.data.marks[markId] || 0;
+    }
+
+    /**
+     * Remove ALL marks placed by this item.
+     *
+     * TODO: Allow partial deletion based on target / item
+     */
+    async clearMarks() {
+        if (!this.isHost()) return;
+
+        const data = this.asHostData();
+
+        // Delete all markId properties from ActorData
+        const updateData = {}
+        for (const markId of Object.keys(data.data.marks)) {
+            updateData[`-=${markId}`] = null;
+        }
+
+        await this.update({'data.marks': updateData});
     }
 }

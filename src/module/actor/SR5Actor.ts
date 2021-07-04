@@ -1791,6 +1791,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
      * @param marks The amount of marks to be placed
      * @param options Additional options that may be needed
      * @param options.scene The scene the actor lives on. If empty, will be current active scene
+     * @param options.item The item that the mark is to be placed on
      */
     async setMarks(target: SR5Actor|SR5Item, marks: number, options?: {scene?: Scene, item?: SR5Item}) {
         if (!canvas.ready) return;
@@ -1811,9 +1812,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         const scene = options?.scene || canvas.scene;
         const item = options?.item;
 
-        // Build the markId string. If no item has been given, there still will be a third split element.
-        // Use Helpers.deconstructMarkId to get the elements.
-        const markId = Helpers.buildMarkId(scene?.id, target.id, item?.id);
+        const markId = Helpers.buildMarkId(scene.id, target.id, item?.id);
         const matrixData = this.matrixData;
         matrixData.marks[markId] = marks;
 
@@ -1843,6 +1842,9 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
      *
      * TODO: It's unclear what this method will be used for
      *       What does the caller want?
+     *
+     * TODO: Check with technomancers....
+     *
      * @param target
      * @param item
      * @param options
@@ -1855,10 +1857,14 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         }
         if (!target.isMatrixActor) return 0;
 
-        const scene = options.scene || canvas.scene;
+
+        const scene = options?.scene || canvas.scene;
+        // If an actor has been targeted, they might have a device. If an item / host has been targeted they don't.
+        item = item || target instanceof SR5Actor ? target.getMatrixDevice() : undefined;
 
         const markId = Helpers.buildMarkId(scene.id, target.id, item?.id);
+        const matrixData = this.matrixData;
 
-        return this.matrixData.marks[markId];
+        return matrixData.marks[markId] || 0;
     }
 }

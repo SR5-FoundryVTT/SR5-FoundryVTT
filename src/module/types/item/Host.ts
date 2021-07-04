@@ -5,6 +5,7 @@ declare namespace Shadowrun {
         DevicePartData,
         DescriptionPartData {
             rating: number,
+            marks: MatrixMarks,
             ic: SourceEntityField[]
     }
 }
