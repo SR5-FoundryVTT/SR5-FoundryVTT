@@ -13,6 +13,7 @@ import TrackType = Shadowrun.TrackType;
 import HostData = Shadowrun.HostData;
 import DevicePartData = Shadowrun.DevicePartData;
 import SourceEntityField = Shadowrun.SourceEntityField;
+import DeviceAttribute = Shadowrun.DeviceAttribute;
 
 /**
  * TODO: Add unittesting to DefaultValues helper.
@@ -113,19 +114,23 @@ export class DefaultValues {
             atts: {
                 att1: {
                     value: 0,
-                    att: "attack"
+                    att: "attack",
+                    editable: true
                 },
                 att2: {
                     value: 0,
-                    att: "attack"
+                    att: "attack",
+                    editable: true
                 },
                 att3: {
                     value: 0,
-                    att: "attack"
+                    att: "attack",
+                    editable: true
                 },
                 att4: {
                     value: 0,
-                    att: "attack"
+                    att: "attack",
+                    editable: true
                 },
             }
         }, partialMatrixData) as DevicePartData;
