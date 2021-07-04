@@ -25009,7 +25009,7 @@ class AmmoImporter extends DataImporter_1.DataImporter {
                         // Filter for weapon type due to possible double naming giving other item types.
                         return item.type === 'weapon' && item.name.toLowerCase() === nameLower;
                     });
-                    if (foundWeapon !== null && "action" in foundWeapon.data.data) {
+                    if (foundWeapon != null && "action" in foundWeapon.data.data) {
                         const weaponData = foundWeapon.data.data;
                         data.data.damage = weaponData.action.damage.value;
                         data.data.ap = weaponData.action.damage.ap.value;
