@@ -4,6 +4,7 @@ import {SR5Item} from "../../item/SR5Item";
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import {onManageActiveEffect} from "../../effects";
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
+import {SR5} from "../../config";
 
 /**
  * This class should not be used directly but be extended for each actor type.
@@ -70,7 +71,7 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         }
 
         // General purpose fields
-        data.config = CONFIG.SR5;
+        data.config = SR5;
         data.filters = this._filters;
 
         this._prepareItems(data);

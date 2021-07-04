@@ -77,6 +77,9 @@ ___________________
         // @ts-ignore
         Combatant.prototype._getInitiativeFormula = _combatantGetInitiativeFormula;
 
+        // Add Shadowrun configuration onto general Foundry config for module access.
+        CONFIG.SR5 = SR5;
+
 
         registerSystemSettings();
 
