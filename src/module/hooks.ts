@@ -20,6 +20,7 @@ import {ChangelogApplication} from "./apps/ChangelogApplication";
 import {EnvModifiersApplication} from "./apps/EnvModifiersApplication";
 import {quenchRegister} from "../test/quench";
 import {SR5ICActorSheet} from "./actor/sheets/SR5ICActorSheet";
+import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 // TODO: Figure out how to change global CONFIG type
@@ -41,6 +42,7 @@ export class HooksManager {
         Hooks.on('getCombatTrackerEntryContext', SR5Combat.addCombatTrackerContextOptions);
         Hooks.on('renderItemDirectory', HooksManager.renderItemDirectory);
         Hooks.on('renderTokenHUD', EnvModifiersApplication.addTokenHUDFields);
+        Hooks.on('updateItem', HooksManager.updateItem);
 
         // Foundry VTT Module 'quench': https://github.com/schultzcole/FVTT-Quench
         Hooks.on('quenchReady', quenchRegister);
@@ -191,4 +193,20 @@ ___________________
         });
     }
 
+    static async updateItem(item: SR5Item, data: ShadowrunItemDataData, id: string) {
+        if (item.isHost()) {
+            const connectedIC = game.actors.filter((actor: SR5Actor) => {
+            const icData = actor.asICData();
+            if (!icData) return false;
+                return !!icData.data.host.id;
+            }) as SR5Actor[];
+
+            // Update host data on the ic actor.
+            const hostData = item.asHostData();
+            for (const ic of connectedIC) {
+                console.error(hostData, ic);
+                await ic._updateICHostData(hostData);
+            }
+        }
+    }
 }

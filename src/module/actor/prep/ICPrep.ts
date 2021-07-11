@@ -8,6 +8,7 @@ import ICData = Shadowrun.ICData;
 import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 import {DefaultValues} from "../../data/DataDefaults";
 import {MatrixRules} from "../../rules/MatrixRules";
+import DeviceAttribute = Shadowrun.DeviceAttribute;
 
 
 export function ICDataPreparation(data: ICData, items: SR5ItemDataWrapper[]) {
@@ -18,6 +19,7 @@ export function ICDataPreparation(data: ICData, items: SR5ItemDataWrapper[]) {
     ICPrep.prepareModifiers(data);
     ModifiersPrep.clearAttributeMods(data);
 
+    ICPrep.prepareHostAttributes(data);
     ICPrep.hideMeatAttributes(data);
     ICPrep.prepareMeatAttributes(data);
     ICPrep.prepareMatrixAttributes(data);
@@ -89,6 +91,19 @@ export class ICPrep {
 
         initiative.matrix.dice.base = MatrixRules.getICInitiativeDice();
         initiative.matrix.dice.mod = PartsList.AddUniquePart(initiative.matrix.dice.mod, "SR5.Bonus", Number(modifiers['matrix_initiative_dice']));
+    }
+
+    /**
+     * For connected hosts overwrite matrix attributes with the hosts attributes, otherwise leave as is.
+     */
+    static prepareHostAttributes(data: ICData) {
+        if (!data.host.id || !data.host.atts) return;
+
+        Object.keys(data.host.atts).forEach(deviceAttribute => {
+            const attribute: DeviceAttribute = data.host.atts[deviceAttribute];
+            data.matrix[attribute.att].base = attribute.value;
+            data.matrix[attribute.att].device_att = deviceAttribute;
+        });
     }
 
     /**

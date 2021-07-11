@@ -12,13 +12,7 @@ declare namespace Shadowrun {
 
     export interface DevicePartData {
         category: DeviceCategory;
-        // A interchangeable list of device attributes.
-        atts: {
-            att1: DeviceAttribute;
-            att2: DeviceAttribute;
-            att3: DeviceAttribute;
-            att4: DeviceAttribute;
-        };
+        atts: MatrixAttributes
     }
 
     export interface DeviceAttribute {

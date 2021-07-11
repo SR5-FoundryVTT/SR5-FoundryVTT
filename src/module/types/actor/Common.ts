@@ -36,7 +36,16 @@ declare namespace Shadowrun {
         marks: MatrixMarks
     }
 
+    // A interchangeable list of device attributes.
+    export interface MatrixAttributes {
+        att1: DeviceAttribute;
+        att2: DeviceAttribute;
+        att3: DeviceAttribute;
+        att4: DeviceAttribute;
+    }
+
     export interface MatrixAttributeField extends AttributeField {
+        // Track which device attribute has been selected. Can be att1 through att4.
         device_att: string
     }
 

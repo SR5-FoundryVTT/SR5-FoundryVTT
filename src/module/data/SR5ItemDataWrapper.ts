@@ -244,15 +244,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         };
 
         if (this.isCyberdeck()) {
-            /**
-             * {
-             *     attN: {
-             *         value: number,
-             *         att: string (the ASDF attribute)
-             *     }
-             * }
-             */
-            const atts: { [key: string]: { value: number; att: string } } | undefined = this.getData().atts;
+            const atts = this.getData().atts;
             if (atts) {
                 for (let [key, att] of Object.entries(atts)) {
                     matrix[att.att].value = att.value;

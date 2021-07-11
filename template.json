@@ -981,8 +981,30 @@
             "track": {},
             "icType": "",
             "host": {
+                "id": null,
                 "rating": 0,
-                "id": null
+                "atts": {
+                    "att1": {
+                        "value": 0,
+                        "att": "attack",
+                        "editable": false
+                    },
+                    "att2": {
+                        "value": 0,
+                        "att": "sleaze",
+                        "editable": false
+                    },
+                    "att3": {
+                        "value": 0,
+                        "att": "data_processing",
+                        "editable": false
+                    },
+                    "att4": {
+                        "value": 0,
+                        "att": "firewall",
+                        "editable": false
+                    }
+                }
             }
         }
     },

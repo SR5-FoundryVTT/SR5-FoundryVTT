@@ -52,6 +52,7 @@ import {SkillRules} from "../rules/SkillRules";
 import MatrixData = Shadowrun.MatrixData;
 import {MatrixRules} from "../rules/MatrixRules";
 import {ICDataPreparation} from "./prep/ICPrep";
+import HostItemData = Shadowrun.HostItemData;
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -1757,7 +1758,18 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         const item = game.items.get(id) as SR5Item;
         if (!item || !item.isHost()) return;
 
-        await this.update({'data.host.id': id});
+        const hostData = item.asHostData();
+        await this._updateICHostData(hostData);
+    }
+
+    async _updateICHostData(hostData: HostItemData) {
+        const updateData = {
+            id: hostData._id,
+            rating: hostData.data.rating,
+            atts: duplicate(hostData.data.atts)
+        }
+
+        await this.update({'data.host': updateData});
     }
 
     /**
@@ -1766,7 +1778,13 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
     async removeICHost() {
         if (!this.isIC()) return;
 
-        await this.update({'data.host.id': null});
+        const updateData = {
+            id: null,
+            rating: 0,
+            atts: null
+        }
+
+        await this.update({'data.host': updateData});
     }
 
     /**
