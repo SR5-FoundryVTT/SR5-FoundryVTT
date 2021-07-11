@@ -40,13 +40,19 @@
                         {{#each data.ic as | ic |}}
                         {{> 'systems/shadowrun5e/dist/templates/common/List/ListEntityItem.html'
                                 id=ic.id
-                                lineName=ic.data.icType
                                 linkName=ic.name
                                 pack=pack
                                 type="Actor"
                                 list="ic"
                                 position=@index
                                 missingLabel="SR5.Host.MissingIC"
+                        }}
+                        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                            name=ic.name
+                            itemId=ic.id
+                            itemType="actor"
+                            hasRoll="true"
+                            itemNameCssClass="skill-roll"
                         }}
                         {{else}}
                         {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'

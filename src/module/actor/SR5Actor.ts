@@ -1724,7 +1724,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         await this.update({'data.driver': ''});
     }
 
-    hasDriver(): boolean {
+   hasDriver(): boolean {
         const data = this.asVehicleData();
 
         if (!data) return false;
@@ -1740,6 +1740,50 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         // If no driver id is set, we won't get an actor and should explicitly return undefined.
         if (!driver) return;
         return driver;
+    }
+
+     /**
+     * Add a host to this IC type actor.
+     *
+     * Currently compendium hosts aren't supported.
+     * Any other actor type has no use for this method.
+     *
+     * @param id The host item id
+     */
+    async addICHost(id: string) {
+        if (!this.isIC()) return;
+
+        // Check if the given item id is valid.
+        const item = game.items.get(id) as SR5Item;
+        if (!item || !item.isHost()) return;
+
+        await this.update({'data.host.id': id});
+    }
+
+    /**
+     * Remove a connect Host item from an ic type actor.
+     */
+    async removeICHost() {
+        if (!this.isIC()) return;
+
+        await this.update({'data.host.id': null});
+    }
+
+    /**
+     * Will return true if this ic type actor has been connected to a host.
+     */
+    hasHost(): boolean {
+        const icData = this.asICData();
+        return icData && !!icData.data.host.id;
+    }
+
+    /**
+     * Get the host item connect to this ic type actor.
+     */
+    getICHost(): SR5Item|undefined {
+        const icData = this.asICData();
+        if (!icData) return;
+        return this.items.get(icData?.data?.host.id);
     }
 
     /** Check if this actor is of one or multiple given actor types

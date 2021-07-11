@@ -1,7 +1,6 @@
-import { Helpers } from '../helpers';
-import { SR5Item } from './SR5Item';
+import {Helpers} from '../helpers';
+import {SR5Item} from './SR5Item';
 import {SR5} from "../config";
-import {SR5Actor} from "../actor/SR5Actor";
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
 
 /**

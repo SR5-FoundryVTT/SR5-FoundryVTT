@@ -83,6 +83,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/item/parts/weapon-ammo-list.html',
         'systems/shadowrun5e/dist/templates/item/parts/weapon-mods-list.html',
         'systems/shadowrun5e/dist/templates/item/parts/action.html',
+        'systems/shadowrun5e/dist/templates/item/parts/action_results.html',
         'systems/shadowrun5e/dist/templates/item/parts/damage.html',
         'systems/shadowrun5e/dist/templates/item/parts/opposed.html',
         'systems/shadowrun5e/dist/templates/item/parts/spell.html',

@@ -981,7 +981,8 @@
             "track": {},
             "icType": "",
             "host": {
-                "rating": 0
+                "rating": 0,
+                "id": null
             }
         }
     },
@@ -1132,6 +1133,15 @@
                     }
                 }
             },
+            "action_result": {
+                "result": {
+                    "success": {
+                        "matrix": {
+                            "placeMark": false
+                        }
+                    }
+                }
+            },
             "armor": {
                 "armor": {
                     "value": 0,
@@ -1256,7 +1266,7 @@
             "type": "positive"
         },
         "action": {
-            "templates": ["description", "action"]
+            "templates": ["description", "action", "action_results"]
         },
         "sprite_power": {
             "templates": ["description", "action"]
