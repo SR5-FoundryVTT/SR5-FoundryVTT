@@ -60,6 +60,8 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
 
     /**
      * Data used by all actor types.
+     *
+     * @override
      */
     getData() {
         // Restructure redesigned Document.getData to contain all new fields, while keeping data.data as system data.
@@ -74,8 +76,9 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         data.config = SR5;
         data.filters = this._filters;
 
+        // Pepare data fields
+        // TODO: This makes it really unclear what fields are present on the sheet.
         this._prepareItems(data);
-
         this._prepareActorTypeFields(data);
 
         return data;
@@ -103,7 +106,7 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
     }
 
     /**
-     * Listeners
+     * Sheet listeners
      */
     async _onItemCreate(event) {
         event.preventDefault();
@@ -144,8 +147,9 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
     }
 
     /**
-     * General roll api
-     * @param event
+     * Setup all general system rolls after clicking on their roll on the sheet.
+     *
+     * @param event Must contain a currentTarget with a rollId dataset
      */
     async _onRoll(event) {
         event.preventDefault();
@@ -261,6 +265,8 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
 
     /**
      * Set any kind of condition monitor to a specific cell value.
+     *
+     * @event Most return a currentTarget with a value dataset
      */
     async _onSetConditionTrackCell(event) {
         event.preventDefault();
@@ -291,6 +297,10 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         await this.actor.update(data);
     }
 
+    /**
+     * Reset all condition tracks to zero values.
+     * @param event
+     */
     async _onClearConditionTrack(event) {
         event.preventDefault();
 
@@ -327,7 +337,8 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
     }
 
     /**
-     * Data Handlers
+     * Prepare Actor Sheet data with item data.
+     * @param data An object containing Actor Sheet data, as would be returned by ActorSheet.getData
      */
     _prepareItems(data) {
         const inventory = {};
@@ -483,8 +494,10 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         data.qualities = qualities;
     }
 
-
-
+    /**
+     * TODO: This doesn't adhere to actor type separation. Maybe doesn't matter for ease of use.
+     * @param data An object containing Actor Sheet data, as would be returned by ActorSheet.getData
+     */
     _prepareActorTypeFields(data) {
         data.isCharacter = this.actor.isCharacter();
         data.isSpirit = this.actor.isSpirit();
