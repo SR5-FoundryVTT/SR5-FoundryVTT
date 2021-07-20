@@ -746,24 +746,24 @@
                     "knowledge": {
                         "street": {
                             "attribute": "intuition",
-                            "value": []
+                            "value": {}
                         },
                         "academic": {
                             "attribute": "logic",
-                            "value": []
+                            "value": {}
                         },
                         "professional": {
                             "attribute": "logic",
-                            "value": []
+                            "value": {}
                         },
                         "interests": {
                             "attribute": "intuition",
-                            "value": []
+                            "value": {}
                         }
                     },
                     "language": {
                         "attribute": "intuition",
-                        "value": []
+                        "value": {}
                     }
                 }
             },
