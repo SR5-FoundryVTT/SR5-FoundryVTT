@@ -248,7 +248,7 @@ function getRollChatTemplateData(options: RollChatMessageOptions): RollChatTempl
  */
 function getTokenSceneId(token: Token | undefined): string | undefined {
     if (!token) return;
-    const scene = token.parent;
+    const scene = token.scene;
     // @ts-ignore // TODO: foundry-vtt-types 0.8 support not yet there.
     return `${scene.id}.${token.id}`;
 }
