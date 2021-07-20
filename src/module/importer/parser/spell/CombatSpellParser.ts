@@ -15,22 +15,10 @@ export class CombatSpellParser extends SpellParserBase {
             descriptor = '';
         }
 
+        // Lower case is needed for the system.
         data.data.combat.type = descriptor.includes('Indirect') ? 'indirect' : 'direct';
-        if (data.data.combat.type === 'direct') {
-            data.data.action.opposed.type = 'soak';
-            switch (data.data.type) {
-                case 'physical':
-                    data.data.action.opposed.attribute = 'body';
-                    break;
-                case 'mana':
-                    data.data.action.opposed.attribute = 'willpower';
-                    break;
-                default:
-                    break;
-            }
-        } else if (data.data.combat.type === 'indirect') {
-            data.data.action.opposed.type = 'defense';
-        }
+        // Set up automatic spell defense support.
+        data.data.action.opposed.type = 'defense';
 
         return data;
     }
