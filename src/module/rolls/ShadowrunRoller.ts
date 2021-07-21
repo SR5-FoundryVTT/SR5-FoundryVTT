@@ -504,6 +504,7 @@ export class ShadowrunRoller {
         // Prepare the next, extended test roll.
         advancedProps.parts = testData.parts.list;
         advancedProps.extended = true;
+        advancedProps.hideRollMessage = false;
         const delayInMs = 400;
         setTimeout(() => this.advancedRoll(advancedProps), delayInMs);
     }

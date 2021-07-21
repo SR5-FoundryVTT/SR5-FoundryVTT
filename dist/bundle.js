@@ -14504,6 +14504,7 @@ class SR5Actor extends Actor {
     }
     /** Return either the linked token or the token of the synthetic actor.
      *
+     * TODO: Correctly type this method to return TokenDocument
      * @retrun Will return null should no token have been placed on scene.
      */
     getToken() {
@@ -14512,7 +14513,8 @@ class SR5Actor extends Actor {
             const linked = true;
             const tokens = this.getActiveTokens(linked);
             // This assumes for a token to exist and should fail if not.
-            return tokens[0];
+            // @ts-ignore // foundry-vtt-types 0.8 support
+            return tokens[0].document;
         }
         // Unlinked actors can have multiple active token but each have theirs directly attached...
         return this.token;
@@ -18316,18 +18318,22 @@ var CharacterInfoUpdater = /*#__PURE__*/function () {
 
       for (var i = 0; i < chummerSkills.length; i++) {
         try {
-          var chummerSkill = chummerSkills[i];
+          var chummerSkill = chummerSkills[i]; // NOTE: taMiF here: I have no idea what the general islanguage check has been added for.
+          //                   it MIGHT be in order to exclude skill groups or some such, but I haven't found a reason
+          //                   for it. Since it's working with it, I'll leave it to the pile. Warm your hands.
 
           if (chummerSkill.rating > 0 && chummerSkill.islanguage) {
             var determinedGroup = 'active';
-            var parsedSkill = null;
-            var id = randomID(16);
+            var parsedSkill = null; // Either find an active skill are prepare knowledge skills.
 
             if (chummerSkill.islanguage && chummerSkill.islanguage.toLowerCase() === 'true') {
+              var id = randomID(16);
               parsedSkill = {};
               actorDataData.skills.language.value[id] = parsedSkill;
               determinedGroup = 'language';
             } else if (chummerSkill.knowledge && chummerSkill.knowledge.toLowerCase() === 'true') {
+              var _id = randomID(16);
+
               var category = chummerSkill.skillcategory_english;
               parsedSkill = {}; // Determine the correct knowledge skill category and assign the skill to it
 
@@ -18339,14 +18345,14 @@ var CharacterInfoUpdater = /*#__PURE__*/function () {
                 if (cat === 'academic') skillCategory = actorDataData.skills.knowledge.academic.value;
                 if (cat === 'professional') skillCategory = actorDataData.skills.knowledge.professional.value;
                 if (cat === 'interest') skillCategory = actorDataData.skills.knowledge.interests.value;
-                if (skillCategory) skillCategory[id] = parsedSkill;
+                if (skillCategory) skillCategory[_id] = parsedSkill;
               } else {
                 if (chummerSkill.attribute.toLowerCase() === 'int') {
-                  actorDataData.skills.knowledge.street.value[id] = parsedSkill;
+                  actorDataData.skills.knowledge.street.value[_id] = parsedSkill;
                 }
 
                 if (chummerSkill.attribute.toLowerCase() === 'log') {
-                  actorDataData.skills.knowledge.professional.value[id] = parsedSkill;
+                  actorDataData.skills.knowledge.professional.value[_id] = parsedSkill;
                 }
               }
 
@@ -18356,19 +18362,21 @@ var CharacterInfoUpdater = /*#__PURE__*/function () {
               if (name.includes('exotic') && name.includes('_weapon')) name = name.replace('_weapon', '');
               if (name === 'pilot_watercraft') name = 'pilot_water_craft';
               parsedSkill = actorDataData.skills.active[name];
-            }
+            } // Fill the found skill with a base rating.
 
-            if (!parsedSkill) console.error("Couldn't parse skill ".concat(chummerSkill.name));
 
-            if (parsedSkill) {
+            if (!parsedSkill) {
+              console.error("Couldn't parse skill ".concat(chummerSkill.name));
+            } else {
               if (determinedGroup !== 'active') parsedSkill.name = chummerSkill.name;
               parsedSkill.base = parseInt(chummerSkill.rating);
 
               if (chummerSkill.skillspecializations) {
                 parsedSkill.specs = this.getArray(chummerSkill.skillspecializations.skillspecialization.name);
-              }
+              } // Precaution to later only deal with complete SkillField data models.
 
-              parsedSkill = (0, _SkillsPrep._mergeWithMissingSkillFields)(parsedSkill);
+
+              (0, _SkillsPrep._mergeWithMissingSkillFields)(parsedSkill);
             }
           }
         } catch (e) {
@@ -26909,23 +26917,10 @@ class CombatSpellParser extends SpellParserBase_1.SpellParserBase {
         if (descriptor === undefined) {
             descriptor = '';
         }
+        // Lower case is needed for the system.
         data.data.combat.type = descriptor.includes('Indirect') ? 'indirect' : 'direct';
-        if (data.data.combat.type === 'direct') {
-            data.data.action.opposed.type = 'soak';
-            switch (data.data.type) {
-                case 'physical':
-                    data.data.action.opposed.attribute = 'body';
-                    break;
-                case 'mana':
-                    data.data.action.opposed.attribute = 'willpower';
-                    break;
-                default:
-                    break;
-            }
-        }
-        else if (data.data.combat.type === 'indirect') {
-            data.data.action.opposed.type = 'defense';
-        }
+        // Set up automatic spell defense support.
+        data.data.action.opposed.type = 'defense';
         return data;
     }
 }
@@ -31196,6 +31191,7 @@ class ShadowrunRoller {
         // Prepare the next, extended test roll.
         advancedProps.parts = testData.parts.list;
         advancedProps.extended = true;
+        advancedProps.hideRollMessage = false;
         const delayInMs = 400;
         setTimeout(() => this.advancedRoll(advancedProps), delayInMs);
     }

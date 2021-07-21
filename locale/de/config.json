@@ -504,6 +504,8 @@
   "SR5.FullDefenseAttribute": "Attribut für Volle Verteidigung",
   "SR5.IsNPC": "NPC",
   "SR5.IsGrunt": "Scherge (Grunt)",
+  "SR5.IsCritter": "Critter",
+
   "SR5.Blackmail": "Erpressung",
   "SR5.Family": "Familie",
   "SR5.DamageResistanceTest": "Schadenswiderstandsprobe",

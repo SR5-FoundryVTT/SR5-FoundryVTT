@@ -19,6 +19,8 @@ declare namespace Shadowrun {
             recoil_compensation: number;
             metatype: string | keyof typeof SR5CONFIG.character.types;
             full_defense_attribute: string;
+            // Can a character have critter powers?
+            is_critter: boolean;
     }
 
     export type PhysicalTrackActorData = {
