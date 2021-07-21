@@ -99,6 +99,9 @@
         {{#ife data.special 'magic'}}
         <a class="item" data-tab="magic">{{localize "SR5.Magic"}}</a>
         {{/ife}}
+        {{#if data.is_critter}}
+        <a class="item" data-tab="critter_powers">{{localize "SR5.Labels.ActorSheet.CritterPowers"}}</a>
+        {{/if}}
         <a class="item" data-tab="matrix">{{localize "SR5.Matrix"}}</a>
         <a class="item" data-tab="bio">{{localize "SR5.Biography"}}</a>
         <a class="item" data-tab="social">{{localize "SR5.Social"}}</a>
@@ -110,6 +113,7 @@
         {{> "systems/shadowrun5e/dist/templates/actor/tabs/MatrixTab.html"}}
         {{> "systems/shadowrun5e/dist/templates/actor/tabs/GearTab.html"}}
         {{> "systems/shadowrun5e/dist/templates/actor/tabs/MagicTab.html"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/CritterPowersTab.html"}}
         {{> "systems/shadowrun5e/dist/templates/actor/tabs/BioTab.html"}}
         {{> "systems/shadowrun5e/dist/templates/actor/tabs/SocialTab.html"}}
         {{> "systems/shadowrun5e/dist/templates/actor/tabs/MiscTab.html"}}
