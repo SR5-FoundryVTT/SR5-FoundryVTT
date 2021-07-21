@@ -1357,6 +1357,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
 
     /** Return either the linked token or the token of the synthetic actor.
      *
+     * TODO: Correctly type this method to return TokenDocument
      * @retrun Will return null should no token have been placed on scene.
      */
     getToken(): Token {
@@ -1365,7 +1366,8 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
             const linked = true;
             const tokens = this.getActiveTokens(linked);
             // This assumes for a token to exist and should fail if not.
-            return tokens[0];
+            // @ts-ignore // foundry-vtt-types 0.8 support
+            return tokens[0].document;
         }
 
         // Unlinked actors can have multiple active token but each have theirs directly attached...

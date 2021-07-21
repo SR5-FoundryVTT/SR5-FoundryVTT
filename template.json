@@ -746,24 +746,24 @@
                     "knowledge": {
                         "street": {
                             "attribute": "intuition",
-                            "value": []
+                            "value": {}
                         },
                         "academic": {
                             "attribute": "logic",
-                            "value": []
+                            "value": {}
                         },
                         "professional": {
                             "attribute": "logic",
-                            "value": []
+                            "value": {}
                         },
                         "interests": {
                             "attribute": "intuition",
-                            "value": []
+                            "value": {}
                         }
                     },
                     "language": {
                         "attribute": "intuition",
-                        "value": []
+                        "value": {}
                     }
                 }
             },
@@ -887,6 +887,7 @@
             "notoriety": 0,
             "public_awareness": 0,
             "is_npc": false,
+            "is_critter": false,
             "karma": {
                 "value": 0,
                 "max": 0

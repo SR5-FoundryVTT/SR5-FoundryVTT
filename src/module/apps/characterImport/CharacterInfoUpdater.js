@@ -220,16 +220,22 @@ export class CharacterInfoUpdater {
         for (let i = 0; i < chummerSkills.length; i++) {
             try {
                 const chummerSkill = chummerSkills[i];
+                // NOTE: taMiF here: I have no idea what the general islanguage check has been added for.
+                //                   it MIGHT be in order to exclude skill groups or some such, but I haven't found a reason
+                //                   for it. Since it's working with it, I'll leave it to the pile. Warm your hands.
                 if (chummerSkill.rating > 0 && chummerSkill.islanguage) {
                     let determinedGroup = 'active';
                     let parsedSkill = null;
-                    const id = randomID(16);
+
+                    // Either find an active skill are prepare knowledge skills.
                     if (chummerSkill.islanguage && chummerSkill.islanguage.toLowerCase() === 'true') {
+                        const id = randomID(16);
                         parsedSkill = {};
                         actorDataData.skills.language.value[id] = parsedSkill;
                         determinedGroup = 'language';
                     }
                     else if (chummerSkill.knowledge && chummerSkill.knowledge.toLowerCase() === 'true') {
+                        const id = randomID(16);
                         const category = chummerSkill.skillcategory_english;
                         parsedSkill = {};
 
@@ -270,9 +276,12 @@ export class CharacterInfoUpdater {
                             name = 'pilot_water_craft';
                         parsedSkill = actorDataData.skills.active[name];
                     }
-                    if (!parsedSkill)
+
+                    // Fill the found skill with a base rating.
+                    if (!parsedSkill) {
                         console.error(`Couldn't parse skill ${chummerSkill.name}`);
-                    if (parsedSkill) {
+
+                    } else {
                         if (determinedGroup !== 'active')
                             parsedSkill.name = chummerSkill.name;
                         parsedSkill.base = parseInt(chummerSkill.rating);
@@ -283,7 +292,8 @@ export class CharacterInfoUpdater {
                             );
                         }
 
-                        parsedSkill = _mergeWithMissingSkillFields(parsedSkill);
+                        // Precaution to later only deal with complete SkillField data models.
+                        _mergeWithMissingSkillFields(parsedSkill);
                     }
                 }
             } catch (e) {
