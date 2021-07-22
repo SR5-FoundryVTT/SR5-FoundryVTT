@@ -2,6 +2,7 @@
     <div class="header">
         {{header}}
     </div>
+    {{#ife type "device"}}
     <div class="form-line">
         <div class="label">
             {{localize "SR5.DeviceType"}}
@@ -14,7 +15,8 @@
             </select>
         </div>
     </div>
-    {{#ife data.category "cyberdeck"}}
+    {{/ife}}
+    {{#ifne data.category "commlink"}}
     <div class="form-line">
         <div class="label">
             <select name="data.atts.att1.att">
@@ -32,6 +34,7 @@
                 value="{{data.atts.att1.value}}"
                 data-dtype="Number"
                 placeholder="1"
+                {{#if (not data.atts.att1.editable)}}disabled{{/if}}
             />
         </div>
     </div>
@@ -52,6 +55,7 @@
                 value="{{data.atts.att2.value}}"
                 data-dtype="Number"
                 placeholder="1"
+                {{#if (not data.atts.att2.editable)}}disabled{{/if}}
             />
         </div>
     </div>
@@ -72,6 +76,7 @@
                 value="{{data.atts.att3.value}}"
                 data-dtype="Number"
                 placeholder="1"
+                {{#if (not data.atts.att3.editable)}}disabled{{/if}}
             />
         </div>
     </div>
@@ -92,8 +97,9 @@
                 value="{{data.atts.att4.value}}"
                 data-dtype="Number"
                 placeholder="1"
+                {{#if (not data.atts.att4.editable)}}disabled{{/if}}
             />
         </div>
     </div>
-    {{/ife}}
+    {{/ifne}}
 </div>

@@ -43,6 +43,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/SpritePowerList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/DeviceRating.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/matrix/Marks.html',
 
         // attributes
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html',

@@ -6,6 +6,7 @@ import {ShadowrunRoll, Test} from "./rolls/ShadowrunRoller";
 import {Helpers} from "./helpers";
 import {DamageApplicationFlow} from './actor/flows/DamageApplicationFlow';
 import AttackData = Shadowrun.AttackData;
+import ActionRollData = Shadowrun.ActionRollData;
 import DrainData = Shadowrun.DrainData;
 import ModifiedDamageData = Shadowrun.ModifiedDamageData;
 import DamageType = Shadowrun.DamageType;
@@ -58,6 +59,7 @@ export interface RollChatMessageOptions {
     tests?: Test[]
     combat?: CombatData
     reach?: number
+    action?: ActionRollData
 }
 
 interface ItemChatTemplateData {
@@ -76,6 +78,13 @@ interface RollChatTemplateData extends RollChatMessageOptions {
     rollMode: keyof typeof CONFIG.dice.rollModes
 }
 
+/**
+ * The legacy chat message approach of the system uses a generic chat message to display roll and item information.
+ * 
+ * NOTE: This approach has been deprecated in Foundry 0.8 and should be replaced with custom Roll implementation for each kind of Roll (ActionRoll, AttackRoll, OpposedRoll, ...).
+ * 
+ * @param templateData An untyped object carrying data to display. The template should itself check for what properties are available and only renders what's given. 
+ */
 async function createChatMessage(templateData, options?: ChatDataOptions): Promise<Entity<any>|null> {
     const chatData = await createChatData(templateData, options);
     const message = await ChatMessage.create(chatData);
@@ -119,7 +128,7 @@ const createChatData = async (templateData, options?: ChatDataOptions) => {
         },
         showGlitchAnimation: game.settings.get(SYSTEM_NAME, FLAGS.ShowGlitchAnimation)
     };
-
+    console.error(enhancedTemplateData);
     const html = await renderTemplate(template, enhancedTemplateData);
 
     const chatData = {

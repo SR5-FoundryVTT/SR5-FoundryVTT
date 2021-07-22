@@ -1153,14 +1153,12 @@
                         "skill": "",
                         "mod": 0,
                         "description": ""
-                    }
-                }
-            },
-            "action_result": {
-                "result": {
-                    "success": {
-                        "matrix": {
-                            "placeMark": false
+                    },
+                    "result": {
+                        "success": {
+                            "matrix": {
+                                "placeMark": false
+                            }
                         }
                     }
                 }
@@ -1289,7 +1287,7 @@
             "type": "positive"
         },
         "action": {
-            "templates": ["description", "action", "action_results"]
+            "templates": ["description", "action"]
         },
         "sprite_power": {
             "templates": ["description", "action"]

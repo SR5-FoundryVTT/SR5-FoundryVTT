@@ -3,6 +3,7 @@
     <nav class="tabs" data-group="primary">
         <a class="item" data-tab="description">{{localize "SR5.Description"}}</a>
         <a class="item" data-tab="host">{{localize "SR5.ItemTypes.Host"}}</a>
+        <a class="item" data-tab="effects">{{ localize "SR5.Effects" }}</a>
     </nav>
     <section class="sheetbody">
         <div class="tab" data-group="primary" data-tab="description">
@@ -39,13 +40,19 @@
                         {{#each data.ic as | ic |}}
                         {{> 'systems/shadowrun5e/dist/templates/common/List/ListEntityItem.html'
                                 id=ic.id
-                                lineName=ic.data.icType
                                 linkName=ic.name
                                 pack=pack
                                 type="Actor"
                                 list="ic"
                                 position=@index
                                 missingLabel="SR5.Host.MissingIC"
+                        }}
+                        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                            name=ic.name
+                            itemId=ic.id
+                            itemType="actor"
+                            hasRoll="true"
+                            itemNameCssClass="skill-roll"
                         }}
                         {{else}}
                         {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
@@ -56,5 +63,6 @@
                 </div>
             </div>
         </div>
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/EffectsTab.html"}}
     </section>
 </form>

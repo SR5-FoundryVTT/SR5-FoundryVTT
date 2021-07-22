@@ -13259,6 +13259,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5Actor = void 0;
 const ShadowrunRoller_1 = require("../rolls/ShadowrunRoller");
 const helpers_1 = require("../helpers");
+const SR5Item_1 = require("../item/SR5Item");
 const constants_1 = require("../constants");
 const PartsList_1 = require("../parts/PartsList");
 const ShadowrunActorDialogs_1 = require("../apps/dialogs/ShadowrunActorDialogs");
@@ -13266,7 +13267,6 @@ const chat_1 = require("../chat");
 const SoakFlow_1 = require("./flows/SoakFlow");
 const DataDefaults_1 = require("../data/DataDefaults");
 const SkillFlow_1 = require("./flows/SkillFlow");
-const SkillRules_1 = require("../rules/SkillRules");
 const config_1 = require("../config");
 const CharacterPrep_1 = require("./prep/CharacterPrep");
 const SR5ItemDataWrapper_1 = require("../data/SR5ItemDataWrapper");
@@ -13275,6 +13275,9 @@ const SpiritPrep_1 = require("./prep/SpiritPrep");
 const SpritePrep_1 = require("./prep/SpritePrep");
 const VehiclePrep_1 = require("./prep/VehiclePrep");
 const Modifiers_1 = require("../rules/Modifiers");
+const SkillRules_1 = require("../rules/SkillRules");
+const MatrixRules_1 = require("../rules/MatrixRules");
+const ICPrep_1 = require("./prep/ICPrep");
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
  *
@@ -13349,6 +13352,9 @@ class SR5Actor extends Actor {
             case "vehicle":
                 VehiclePrep_1.VehicleDataPreparation(this.data.data, itemDataWrappers);
                 break;
+            case "ic":
+                ICPrep_1.ICDataPreparation(this.data.data, itemDataWrappers);
+                break;
         }
     }
     getModifier(modifierName) {
@@ -13366,10 +13372,13 @@ class SR5Actor extends Actor {
         // Handle custom skills (name is not id)
         return Object.values(skills).find(skill => skill.name === skillName);
     }
-    findAttribute(attributeName) {
-        if (attributeName === undefined)
-            return undefined;
-        return this.data.data.attributes[attributeName];
+    findAttribute(id) {
+        if (id === undefined)
+            return;
+        const attributes = this.getAttributes();
+        if (!attributes)
+            return;
+        return attributes[id];
     }
     findVehicleStat(statName) {
         if (statName === undefined)
@@ -13502,6 +13511,9 @@ class SR5Actor extends Actor {
     isCritter() {
         return this.getType() === 'critter';
     }
+    isIC() {
+        return this.getType() === 'ic';
+    }
     getVehicleTypeSkillName() {
         if (!("vehicleType" in this.data.data))
             return;
@@ -13528,11 +13540,26 @@ class SR5Actor extends Actor {
         const name = this.getVehicleTypeSkillName();
         return this.findActiveSkill(name);
     }
+    get hasSkills() {
+        return this.getSkills() !== undefined;
+    }
     getSkills() {
         return this.data.data.skills;
     }
     getActiveSkills() {
         return this.data.data.skills.active;
+    }
+    /**
+     * Determine if an actor can choose a special trait using the special field.
+     */
+    get hasSpecial() {
+        return this.data.type in ['character', 'sprite', 'spirit', 'critter'];
+    }
+    /**
+     * Determine if an actor can choose a full defense attribute
+     */
+    get hasFullDefense() {
+        return this.data.type in ['character', 'vehicle', 'sprite', 'spirit', 'critter'];
     }
     /**
      * Return the full pool of a skill including attribute and possible specialization bonus.
@@ -14652,21 +14679,26 @@ class SR5Actor extends Actor {
             yield this._addDamageToOverflow(overflow, track);
         });
     }
-    /** Adding damage to a device track instead of an actors track, as they contain their own track within their data.
+    /**
+     * Matrix damage can be added onto different tracks:
+     * - IC has a local matrix.condition_monitor
+     * - Characters have matrix devices (items) with their local track
      */
     addMatrixDamage(damage) {
         return __awaiter(this, void 0, void 0, function* () {
             if (damage.type.value !== 'matrix')
                 return damage;
             const device = this.getMatrixDevice();
-            if (!device)
-                return damage;
             const track = this.getMatrixTrack();
-            // Actor might not have a commlink/cyberdeck equipped.
             if (!track)
                 return damage;
             const { overflow, rest } = this._calcDamageOverflow(damage, track);
-            yield this._addDamageToDeviceTrack(rest, device);
+            if (device) {
+                yield this._addDamageToDeviceTrack(rest, device);
+            }
+            if (this.isIC()) {
+                yield this._addDamageToTrack(rest, track);
+            }
             // Return overflow for consistency, yet nothing will take overflowing matrix damage.
             return overflow;
         });
@@ -14692,10 +14724,19 @@ class SR5Actor extends Actor {
             return this.data.data.track.stun;
     }
     getPhysicalTrack() {
-        if ("track" in this.data.data)
+        if ("track" in this.data.data && "physical" in this.data.data.track)
             return this.data.data.track.physical;
     }
+    /**
+     * The matrix depends on actor type and possibly equipped matrix device.
+     *
+     */
     getMatrixTrack() {
+        // Some actors will have a direct matrix track.
+        if ("track" in this.data.data && "matrix" in this.data.data.track) {
+            return this.data.data.track.matrix;
+        }
+        // Fallback to equipped matrix device.
         const device = this.getMatrixDevice();
         if (!device)
             return undefined;
@@ -14763,6 +14804,11 @@ class SR5Actor extends Actor {
             return this.data;
         }
     }
+    asICData() {
+        if (this.isIC()) {
+            return this.data;
+        }
+    }
     getVehicleStats() {
         if (this.isVehicle() && "vehicle_stats" in this.data.data) {
             return this.data.data.vehicle_stats;
@@ -14809,6 +14855,68 @@ class SR5Actor extends Actor {
             return;
         return driver;
     }
+    /**
+    * Add a host to this IC type actor.
+    *
+    * Currently compendium hosts aren't supported.
+    * Any other actor type has no use for this method.
+    *
+    * @param id The host item id
+    */
+    addICHost(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isIC())
+                return;
+            // Check if the given item id is valid.
+            const item = game.items.get(id);
+            if (!item || !item.isHost())
+                return;
+            const hostData = item.asHostData();
+            yield this._updateICHostData(hostData);
+        });
+    }
+    _updateICHostData(hostData) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const updateData = {
+                id: hostData._id,
+                rating: hostData.data.rating,
+                atts: duplicate(hostData.data.atts)
+            };
+            yield this.update({ 'data.host': updateData });
+        });
+    }
+    /**
+     * Remove a connect Host item from an ic type actor.
+     */
+    removeICHost() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isIC())
+                return;
+            const updateData = {
+                id: null,
+                rating: 0,
+                atts: null
+            };
+            yield this.update({ 'data.host': updateData });
+        });
+    }
+    /**
+     * Will return true if this ic type actor has been connected to a host.
+     */
+    hasHost() {
+        const icData = this.asICData();
+        return icData && !!icData.data.host.id;
+    }
+    /**
+     * Get the host item connect to this ic type actor.
+     */
+    getICHost() {
+        var _a;
+        const icData = this.asICData();
+        if (!icData)
+            return;
+        return this.items.get((_a = icData === null || icData === void 0 ? void 0 : icData.data) === null || _a === void 0 ? void 0 : _a.host.id);
+    }
     /** Check if this actor is of one or multiple given actor types
      *
      * @param types A list of actor types to check.
@@ -14842,10 +14950,95 @@ class SR5Actor extends Actor {
             yield Modifiers_1.Modifiers.setModifiersOnEntity(this, modifiers.modifiers);
         });
     }
+    /**
+     * Check if the current actor has matrix capabilities.
+     */
+    get isMatrixActor() {
+        return 'matrix' in this.data.data;
+    }
+    get matrixData() {
+        if (!this.isMatrixActor)
+            return;
+        // @ts-ignore // isMatrixActor handles it, TypeScript doesn't know.
+        return this.data.data.matrix;
+    }
+    /**
+     * @param target The Document the marks are placed on. This can be an actor (character, technomancer, IC) OR an item (Host)
+     * @param marks The amount of marks to be placed
+     * @param options Additional options that may be needed
+     * @param options.scene The scene the actor lives on. If empty, will be current active scene
+     * @param options.item The item that the mark is to be placed on
+     */
+    setMarks(target, marks, options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!canvas.ready)
+                return;
+            if (!this.isMatrixActor) {
+                ui.notifications.error(game.i18n.localize('SR5.Errors.MarkCouldNotBePlaced'));
+                console.error(`The actor type ${this.data.type} can't receive matrix marks!`);
+                return;
+            }
+            if (!MatrixRules_1.MatrixRules.isValidMarksCount(marks)) {
+                ui.notifications.error(game.i18n.localize('SR5.Errors.MarkCouldNotBePlaced'));
+                console.error('To many or to little matrix marks');
+                return;
+            }
+            // Both scene and item are optional.
+            const scene = (options === null || options === void 0 ? void 0 : options.scene) || canvas.scene;
+            const item = options === null || options === void 0 ? void 0 : options.item;
+            const markId = helpers_1.Helpers.buildMarkId(scene.id, target.id, item === null || item === void 0 ? void 0 : item.id);
+            const matrixData = this.matrixData;
+            matrixData.marks[markId] = marks;
+            yield this.update({ 'data.matrix.marks': matrixData.marks });
+        });
+    }
+    /**
+     * Remove ALL marks placed by this actor
+     */
+    clearMarks() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isMatrixActor)
+                return;
+            const matrixData = this.matrixData;
+            // Delete all markId properties from ActorData
+            const updateData = {};
+            for (const markId of Object.keys(matrixData.marks)) {
+                updateData[`-=${markId}`] = null;
+            }
+            yield this.update({ 'data.matrix.marks': updateData });
+        });
+    }
+    /**
+     * Return the amount of marks this actor has on another actor or one of their items.
+     *
+     * TODO: It's unclear what this method will be used for
+     *       What does the caller want?
+     *
+     * TODO: Check with technomancers....
+     *
+     * @param target
+     * @param item
+     * @param options
+     */
+    getMarks(target, item, options) {
+        if (!canvas.ready)
+            return;
+        if (target instanceof SR5Item_1.SR5Item) {
+            console.error('Not yet supported');
+            return;
+        }
+        if (!target.isMatrixActor)
+            return 0;
+        const scene = (options === null || options === void 0 ? void 0 : options.scene) || canvas.scene;
+        // If an actor has been targeted, they might have a device. If an item / host has been targeted they don't.
+        item = item || target instanceof SR5Actor ? target.getMatrixDevice() : undefined;
+        const markId = helpers_1.Helpers.buildMarkId(scene.id, target.id, item === null || item === void 0 ? void 0 : item.id);
+        const matrixData = this.matrixData;
+        return matrixData.marks[markId] || 0;
+    }
 }
 exports.SR5Actor = SR5Actor;
-
-},{"../apps/dialogs/ShadowrunActorDialogs":131,"../chat":139,"../config":141,"../constants":142,"../data/DataDefaults":143,"../data/SR5ItemDataWrapper":145,"../helpers":153,"../parts/PartsList":204,"../rolls/ShadowrunRoller":205,"../rules/Modifiers":207,"../rules/SkillRules":208,"./flows/SkillFlow":88,"./flows/SoakFlow":89,"./prep/CharacterPrep":90,"./prep/CritterPrep":91,"./prep/SpiritPrep":92,"./prep/SpritePrep":93,"./prep/VehiclePrep":94}],86:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunActorDialogs":134,"../chat":142,"../config":144,"../constants":145,"../data/DataDefaults":146,"../data/SR5ItemDataWrapper":148,"../helpers":157,"../item/SR5Item":197,"../parts/PartsList":209,"../rolls/ShadowrunRoller":210,"../rules/MatrixRules":212,"../rules/Modifiers":213,"../rules/SkillRules":214,"./flows/SkillFlow":88,"./flows/SoakFlow":89,"./prep/CharacterPrep":90,"./prep/CritterPrep":91,"./prep/ICPrep":92,"./prep/SpiritPrep":93,"./prep/SpritePrep":94,"./prep/VehiclePrep":95}],86:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -14864,21 +15057,18 @@ const SkillEditSheet_1 = require("../apps/skills/SkillEditSheet");
 const KnowledgeSkillEditSheet_1 = require("../apps/skills/KnowledgeSkillEditSheet");
 const LanguageSkillEditSheet_1 = require("../apps/skills/LanguageSkillEditSheet");
 const config_1 = require("../config");
+const effects_1 = require("../effects");
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
 // when opened in succession, causing SkillEditSheet to wrongfully overwrite the wrong data.
 let globalSkillAppId = -1;
 /**
- * Extend the basic ActorSheet with some very simple modifications
+ * See Hooks.init for which actor type this sheet handles.
  *
  */
 class SR5ActorSheet extends ActorSheet {
-    constructor(actor, options) {
-        super(actor, options);
-        /**
-         * Keep track of the currently active sheet tab
-         * @type {string}
-         */
+    constructor() {
+        super(...arguments);
         this._shownDesc = [];
         this._filters = {
             skills: '',
@@ -14932,6 +15122,9 @@ class SR5ActorSheet extends ActorSheet {
         this._prepareActorTypeFields(data);
         this._prepareCharacterFields(data);
         this._prepareVehicleFields(data);
+        // Active Effects data.
+        // @ts-ignore // TODO: foundry-vtt-types 0.8 missing document support
+        data['effects'] = effects_1.prepareActiveEffectCategories(this.document.effects);
         return data;
     }
     _isSkillMagic(id, skill) {
@@ -14978,6 +15171,9 @@ class SR5ActorSheet extends ActorSheet {
         data.isCharacter = this.actor.isCharacter();
         data.isSpirit = this.actor.isSpirit();
         data.isCritter = this.actor.isCritter();
+        data.hasSkills = this.actor.hasSkills;
+        data.hasSpecial = this.actor.hasSpecial;
+        data.hasFullDefense = this.actor.hasFullDefense;
     }
     _prepareMatrixAttributes(data) {
         const { matrix } = data.data;
@@ -15003,6 +15199,9 @@ class SR5ActorSheet extends ActorSheet {
                     delete attribute.temp;
             }
         }
+    }
+    _prepareActorTypeIndicators(data) {
+        data.hasSkills = this.actor.getSkills() !== undefined;
     }
     _prepareSkillsWithFilters(data) {
         this._filterActiveSkills(data);
@@ -15238,6 +15437,8 @@ class SR5ActorSheet extends ActorSheet {
                     this._shownDesc = this._shownDesc.filter((val) => val !== iid);
             }
         });
+        // Active Effect management
+        html.find(".effect-control").click(event => effects_1.onManageActiveEffect(event, this.entity));
         html.find('.skill-header').find('.item-name').click(this._onFilterUntrainedSkills.bind(this));
         html.find('.skill-header').find('.skill-spec-item').click(this._onFilterUntrainedSkills.bind(this));
         html.find('.skill-header').find('.rtg').click(this._onFilterUntrainedSkills.bind(this));
@@ -15953,8 +16154,7 @@ class SR5ActorSheet extends ActorSheet {
     }
 }
 exports.SR5ActorSheet = SR5ActorSheet;
-
-},{"../apps/chummer-import-form":127,"../apps/skills/KnowledgeSkillEditSheet":135,"../apps/skills/LanguageSkillEditSheet":136,"../apps/skills/SkillEditSheet":137,"../config":141,"../helpers":153}],87:[function(require,module,exports){
+},{"../apps/chummer-import-form":130,"../apps/skills/KnowledgeSkillEditSheet":138,"../apps/skills/LanguageSkillEditSheet":139,"../apps/skills/SkillEditSheet":140,"../config":144,"../effects":149,"../helpers":157}],87:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -16030,8 +16230,7 @@ class DamageApplicationFlow {
     }
 }
 exports.DamageApplicationFlow = DamageApplicationFlow;
-
-},{"../../apps/dialogs/DamageApplicationDialog":128}],88:[function(require,module,exports){
+},{"../../apps/dialogs/DamageApplicationDialog":131}],88:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SkillFlow = void 0;
@@ -16073,8 +16272,7 @@ class SkillFlow {
     }
 }
 exports.SkillFlow = SkillFlow;
-
-},{"../../constants":142,"../../rules/SkillRules":208}],89:[function(require,module,exports){
+},{"../../constants":145,"../../rules/SkillRules":214}],89:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -16208,8 +16406,7 @@ class SoakFlow {
     }
 }
 exports.SoakFlow = SoakFlow;
-
-},{"../../apps/dialogs/ShadowrunActorDialogs":131,"../../chat":139,"../../data/DataDefaults":143,"../../helpers":153,"../../parts/PartsList":204,"../../rolls/ShadowrunRoller":205,"../../rules/SoakRules":209}],90:[function(require,module,exports){
+},{"../../apps/dialogs/ShadowrunActorDialogs":134,"../../chat":142,"../../data/DataDefaults":146,"../../helpers":157,"../../parts/PartsList":209,"../../rolls/ShadowrunRoller":210,"../../rules/SoakRules":215}],90:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CharacterDataPrepare = void 0;
@@ -16252,8 +16449,7 @@ function CharacterDataPrepare(data, items) {
     InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(data);
 }
 exports.CharacterDataPrepare = CharacterDataPrepare;
-
-},{"./functions/AttributesPrep":95,"./functions/ConditionMonitorsPrep":96,"./functions/InitiativePrep":97,"./functions/ItemPrep":98,"./functions/LimitsPrep":99,"./functions/MatrixPrep":100,"./functions/ModifiersPrep":101,"./functions/MovementPrep":102,"./functions/NPCPrep":103,"./functions/SkillsPrep":104,"./functions/WoundsPrep":105}],91:[function(require,module,exports){
+},{"./functions/AttributesPrep":96,"./functions/ConditionMonitorsPrep":97,"./functions/InitiativePrep":98,"./functions/ItemPrep":99,"./functions/LimitsPrep":100,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/MovementPrep":103,"./functions/NPCPrep":104,"./functions/SkillsPrep":105,"./functions/WoundsPrep":106}],91:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CritterDataPrepare = void 0;
@@ -16288,8 +16484,139 @@ function CritterDataPrepare(data, items) {
     InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(data);
 }
 exports.CritterDataPrepare = CritterDataPrepare;
-
-},{"./functions/AttributesPrep":95,"./functions/ConditionMonitorsPrep":96,"./functions/InitiativePrep":97,"./functions/ItemPrep":98,"./functions/LimitsPrep":99,"./functions/MatrixPrep":100,"./functions/ModifiersPrep":101,"./functions/MovementPrep":102,"./functions/SkillsPrep":104,"./functions/WoundsPrep":105}],92:[function(require,module,exports){
+},{"./functions/AttributesPrep":96,"./functions/ConditionMonitorsPrep":97,"./functions/InitiativePrep":98,"./functions/ItemPrep":99,"./functions/LimitsPrep":100,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/MovementPrep":103,"./functions/SkillsPrep":105,"./functions/WoundsPrep":106}],92:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ICPrep = exports.ICDataPreparation = void 0;
+const ModifiersPrep_1 = require("./functions/ModifiersPrep");
+const InitiativePrep_1 = require("./functions/InitiativePrep");
+const AttributesPrep_1 = require("./functions/AttributesPrep");
+const PartsList_1 = require("../../parts/PartsList");
+const config_1 = require("../../config");
+const MatrixPrep_1 = require("./functions/MatrixPrep");
+const DataDefaults_1 = require("../../data/DataDefaults");
+const MatrixRules_1 = require("../../rules/MatrixRules");
+function ICDataPreparation(data, items) {
+    // Add missing values on actor creation
+    ICPrep.addMissingTracks(data);
+    // Base value preparations.
+    ICPrep.prepareModifiers(data);
+    ModifiersPrep_1.ModifiersPrep.clearAttributeMods(data);
+    ICPrep.prepareHostAttributes(data);
+    ICPrep.hideMeatAttributes(data);
+    ICPrep.prepareMeatAttributes(data);
+    ICPrep.prepareMatrixAttributes(data);
+    MatrixPrep_1.MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
+    // Derived value preparations
+    ICPrep.prepareMatrix(data);
+    ICPrep.prepareMatrixTrack(data);
+    // SkillsPrep.prepareSkills(data);
+    ICPrep.prepareMatrixInit(data);
+    InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(data);
+}
+exports.ICDataPreparation = ICDataPreparation;
+class ICPrep {
+    /**
+     * On initial actor creation the matrix track will be missing.
+     *
+     * This is intentional as not to pollute template.json with actor type specific data.
+     *
+     */
+    static addMissingTracks(data) {
+        // Newly created actors SHOULD have this by template.
+        // Legacy actors MIGHT not have it, therefore make sure it's their.
+        const track = data.track || {};
+        if (!track.matrix)
+            track.matrix = DataDefaults_1.DefaultValues.trackData();
+        data.track = track;
+    }
+    /**
+     * Add IC modifiers only to the misc tab.
+     * @param data
+     */
+    static prepareModifiers(data) {
+        let modifiers = ModifiersPrep_1.ModifiersPrep.commonModifiers;
+        modifiers = modifiers.concat(ModifiersPrep_1.ModifiersPrep.matrixModifiers);
+        ModifiersPrep_1.ModifiersPrep.setupModifiers(data, modifiers);
+    }
+    static prepareMatrix(data) {
+        data.matrix.rating = MatrixRules_1.MatrixRules.getICDeviceRating(data.host.rating);
+    }
+    static prepareMatrixTrack(data) {
+        const { modifiers, track, matrix } = data;
+        // Prepare internal matrix condition monitor values
+        // LEGACY: matrix.condition_monitor is no TrackType. It will only be used as a info, should ever be needed anywhere
+        matrix.condition_monitor.max = Number(modifiers['matrix_track']) + MatrixRules_1.MatrixRules.getConditionMonitor(matrix.rating);
+        // Prepare user visible matrix track values
+        track.matrix.base = MatrixRules_1.MatrixRules.getConditionMonitor(matrix.rating);
+        track.matrix.mod = PartsList_1.PartsList.AddUniquePart(track.matrix.mod, "SR5.Bonus", Number(modifiers['matrix_track']));
+        track.matrix.max = matrix.condition_monitor.max;
+        track.matrix.label = config_1.SR5.damageTypes.matrix;
+    }
+    static prepareMatrixInit(data) {
+        const { initiative, modifiers, host } = data;
+        // Set current initiative to matrix
+        initiative.perception = 'matrix';
+        // Prepare used initiative parts
+        initiative.matrix.base.base = MatrixRules_1.MatrixRules.getICInitiativeBase(host.rating);
+        initiative.matrix.base.mod = PartsList_1.PartsList.AddUniquePart(initiative.matrix.base.mod, "SR5.Bonus", Number(modifiers['matrix_initiative']));
+        initiative.matrix.dice.base = MatrixRules_1.MatrixRules.getICInitiativeDice();
+        initiative.matrix.dice.mod = PartsList_1.PartsList.AddUniquePart(initiative.matrix.dice.mod, "SR5.Bonus", Number(modifiers['matrix_initiative_dice']));
+    }
+    /**
+     * For connected hosts overwrite matrix attributes with the hosts attributes, otherwise leave as is.
+     */
+    static prepareHostAttributes(data) {
+        if (!data.host.id || !data.host.atts)
+            return;
+        Object.keys(data.host.atts).forEach(deviceAttribute => {
+            const attribute = data.host.atts[deviceAttribute];
+            data.matrix[attribute.att].base = attribute.value;
+            data.matrix[attribute.att].device_att = deviceAttribute;
+        });
+    }
+    /**
+     * Hide all meat attributes from display
+     */
+    static hideMeatAttributes(data) {
+        const { attributes } = data;
+        for (const attribute of Object.values(attributes)) {
+            attribute.hidden = true;
+        }
+    }
+    static prepareMeatAttributes(data) {
+        const { attributes, host } = data;
+        for (const id of Object.keys(config_1.SR5.attributes)) {
+            if (!attributes.hasOwnProperty(id))
+                continue;
+            // Exclude invalid attributes for IC
+            if (['magic', 'edge', 'essence', 'resonance'].includes(id))
+                continue;
+            const attribute = attributes[id];
+            // Overwrite the base as it's missing on new actors and IC should only derive it's meat attributes
+            // from it's host attributes.
+            attribute.base = 0;
+            const parts = new PartsList_1.PartsList(attribute.mod);
+            parts.addPart('SR5.Host.Rating', MatrixRules_1.MatrixRules.getICMeatAttributeBase(host.rating));
+            attribute.mod = parts.list;
+            AttributesPrep_1.AttributesPrep.prepareAttribute(id, attribute);
+        }
+    }
+    /**
+     * Calculate all matrix attributes without the meat attributes
+     */
+    static prepareMatrixAttributes(data) {
+        const { matrix } = data;
+        for (const id of Object.keys(config_1.SR5.matrixAttributes)) {
+            if (!matrix.hasOwnProperty(id))
+                continue;
+            const attribute = matrix[id];
+            AttributesPrep_1.AttributesPrep.prepareAttribute(id, attribute);
+        }
+    }
+}
+exports.ICPrep = ICPrep;
+},{"../../config":144,"../../data/DataDefaults":146,"../../parts/PartsList":209,"../../rules/MatrixRules":212,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102}],93:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpiritPrep = exports.SpiritDataPrepare = void 0;
@@ -16678,8 +17005,7 @@ class SpiritPrep {
     }
 }
 exports.SpiritPrep = SpiritPrep;
-
-},{"../../helpers":153,"../../parts/PartsList":204,"./functions/AttributesPrep":95,"./functions/ConditionMonitorsPrep":96,"./functions/InitiativePrep":97,"./functions/LimitsPrep":99,"./functions/ModifiersPrep":101,"./functions/MovementPrep":102,"./functions/SkillsPrep":104,"./functions/WoundsPrep":105}],93:[function(require,module,exports){
+},{"../../helpers":157,"../../parts/PartsList":209,"./functions/AttributesPrep":96,"./functions/ConditionMonitorsPrep":97,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/ModifiersPrep":102,"./functions/MovementPrep":103,"./functions/SkillsPrep":105,"./functions/WoundsPrep":106}],94:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpritePrep = exports.SpriteDataPrepare = void 0;
@@ -16804,8 +17130,7 @@ class SpritePrep {
     }
 }
 exports.SpritePrep = SpritePrep;
-
-},{"../../helpers":153,"../../parts/PartsList":204,"./functions/AttributesPrep":95,"./functions/InitiativePrep":97,"./functions/LimitsPrep":99,"./functions/MatrixPrep":100,"./functions/ModifiersPrep":101,"./functions/SkillsPrep":104}],94:[function(require,module,exports){
+},{"../../helpers":157,"../../parts/PartsList":209,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/SkillsPrep":105}],95:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VehiclePrep = exports.VehicleDataPreparation = void 0;
@@ -16926,12 +17251,10 @@ class VehiclePrep {
     }
 }
 exports.VehiclePrep = VehiclePrep;
-
-},{"../../config":141,"../../helpers":153,"../../parts/PartsList":204,"./functions/AttributesPrep":95,"./functions/InitiativePrep":97,"./functions/LimitsPrep":99,"./functions/MatrixPrep":100,"./functions/ModifiersPrep":101,"./functions/SkillsPrep":104}],95:[function(require,module,exports){
+},{"../../config":144,"../../helpers":157,"../../parts/PartsList":209,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/SkillsPrep":105}],96:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AttributesPrep = void 0;
-const PartsList_1 = require("../../../parts/PartsList");
 const helpers_1 = require("../../../helpers");
 const constants_1 = require("../../../constants");
 const config_1 = require("../../../config");
@@ -16952,12 +17275,27 @@ class AttributesPrep {
             // needed to be able to migrate things correctly
             if (name === 'edge' && attribute['uses'] === undefined)
                 return;
-            const parts = new PartsList_1.PartsList(attribute.mod);
-            attribute.mod = parts.list;
-            AttributesPrep.calculateAttribute(name, attribute);
-            // add i18n labels.
-            attribute.label = config_1.SR5.attributes[name];
+            AttributesPrep.prepareAttribute(name, attribute);
         }
+    }
+    /**
+     * Prepare one single AttributeField
+     * @param name The key field (and name) of the attribute given
+     * @param attribute The AttributeField to prepare
+     */
+    static prepareAttribute(name, attribute) {
+        // Check for valid attributes. Active Effects can cause unexpected properties to appear.
+        if (!config_1.SR5.attributes.hasOwnProperty(name) || !attribute)
+            return;
+        // TODO: IC-ACTOR Check this NOTE
+        // NOTE: This is legacy code I suspect does nothing. Disabled on 0.7.15. Delete it on any newer version!
+        // const parts = new PartsList(attribute.mod);
+        // attribute.mod = parts.list;
+        // Each attribute can have a unique value range.
+        // TODO:  Implement metatype attribute value ranges for character actors.
+        AttributesPrep.calculateAttribute(name, attribute);
+        // add i18n labels.
+        attribute.label = config_1.SR5.attributes[name];
     }
     /**
      * Calculate a single attributes value with all it's ranges and rules applied.
@@ -16966,6 +17304,9 @@ class AttributesPrep {
      * @param attribute The attribute will be modified in place
      */
     static calculateAttribute(name, attribute) {
+        // Check for valid attributes. Active Effects can cause unexpected properties to appear.
+        if (!config_1.SR5.attributes.hasOwnProperty(name) || !attribute)
+            return;
         // Each attribute can have a unique value range.
         // TODO:  Implement metatype attribute value ranges for character actors.
         const range = constants_1.SR.attributes.ranges[name];
@@ -16973,8 +17314,7 @@ class AttributesPrep {
     }
 }
 exports.AttributesPrep = AttributesPrep;
-
-},{"../../../config":141,"../../../constants":142,"../../../helpers":153,"../../../parts/PartsList":204}],96:[function(require,module,exports){
+},{"../../../config":144,"../../../constants":145,"../../../helpers":157}],97:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConditionMonitorsPrep = void 0;
@@ -17014,8 +17354,7 @@ class ConditionMonitorsPrep {
     }
 }
 exports.ConditionMonitorsPrep = ConditionMonitorsPrep;
-
-},{"../../../config":141}],97:[function(require,module,exports){
+},{"../../../config":144}],98:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InitiativePrep = void 0;
@@ -17064,8 +17403,7 @@ class InitiativePrep {
     }
 }
 exports.InitiativePrep = InitiativePrep;
-
-},{"../../../helpers":153,"../../../parts/PartsList":204}],98:[function(require,module,exports){
+},{"../../../helpers":157,"../../../parts/PartsList":209}],99:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemPrep = void 0;
@@ -17139,8 +17477,7 @@ class ItemPrep {
     }
 }
 exports.ItemPrep = ItemPrep;
-
-},{"../../../config":141,"../../../helpers":153,"../../../parts/PartsList":204}],99:[function(require,module,exports){
+},{"../../../config":144,"../../../helpers":157,"../../../parts/PartsList":209}],100:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LimitsPrep = void 0;
@@ -17168,14 +17505,14 @@ class LimitsPrep {
     }
 }
 exports.LimitsPrep = LimitsPrep;
-
-},{"../../../config":141,"../../../helpers":153,"../../../parts/PartsList":204}],100:[function(require,module,exports){
+},{"../../../config":144,"../../../helpers":157,"../../../parts/PartsList":209}],101:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatrixPrep = void 0;
 const helpers_1 = require("../../../helpers");
 const PartsList_1 = require("../../../parts/PartsList");
 const config_1 = require("../../../config");
+const AttributesPrep_1 = require("./AttributesPrep");
 class MatrixPrep {
     /**
      * Prepare Matrix data on the actor
@@ -17240,29 +17577,34 @@ class MatrixPrep {
      */
     static prepareMatrixToLimitsAndAttributes(data) {
         const { matrix, attributes, limits } = data;
-        const MatrixList = ['firewall', 'sleaze', 'data_processing', 'attack'];
         // add matrix attributes to both limits and attributes as hidden entries
-        MatrixList.forEach((key) => {
-            helpers_1.Helpers.calcTotal(matrix[key]);
-            if (matrix[key]) {
-                const label = config_1.SR5.matrixAttributes[key];
-                const { value, base, mod } = matrix[key];
-                const hidden = true;
-                limits[key] = {
-                    value,
-                    base,
-                    mod,
-                    label,
-                    hidden,
-                };
-                attributes[key] = {
-                    value,
-                    base,
-                    mod,
-                    label,
-                    hidden,
-                };
+        Object.keys(config_1.SR5.matrixAttributes).forEach((attributeName) => {
+            if (!matrix.hasOwnProperty(attributeName)) {
+                return console.error(`SR5Actor matrix preparation failed due to missing matrix attributes`);
             }
+            const attribute = matrix[attributeName];
+            // Helpers.calcTotal(matrix[attributeName]);
+            // const label = SR5.matrixAttributes[attributeName];
+            // const { value, base, mod } = matrix[attributeName];
+            AttributesPrep_1.AttributesPrep.prepareAttribute(attributeName, attribute);
+            const { value, base, mod, label } = attribute;
+            const hidden = true;
+            // Each matrix attribute also functions as a limit.
+            limits[attributeName] = {
+                value,
+                base,
+                mod,
+                label,
+                hidden,
+            };
+            // Copy matrix attribute data into attributes for ease of access during testing.
+            attributes[attributeName] = {
+                value,
+                base,
+                mod,
+                label,
+                hidden,
+            };
         });
     }
     /**
@@ -17289,21 +17631,26 @@ class MatrixPrep {
     }
 }
 exports.MatrixPrep = MatrixPrep;
-
-},{"../../../config":141,"../../../helpers":153,"../../../parts/PartsList":204}],101:[function(require,module,exports){
+},{"../../../config":144,"../../../helpers":157,"../../../parts/PartsList":209,"./AttributesPrep":96}],102:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ModifiersPrep = void 0;
+const config_1 = require("../../../config");
 class ModifiersPrep {
     /**
      * Prepare the modifiers that are displayed in the Misc. tab
      */
     static prepareModifiers(data) {
-        if (!data.modifiers)
-            data.modifiers = {};
-        const modifiers = {};
-        let miscTabModifiers = [
-            'soak',
+        let modifiers = ModifiersPrep.commonModifiers;
+        modifiers = modifiers.concat(ModifiersPrep.matrixModifiers);
+        modifiers = modifiers.concat(ModifiersPrep.characterModifiers);
+        ModifiersPrep.setupModifiers(data, modifiers);
+    }
+    static get commonModifiers() {
+        return ['soak', 'defense'];
+    }
+    static get characterModifiers() {
+        return [
             'drain',
             'armor',
             'physical_limit',
@@ -17315,37 +17662,52 @@ class ModifiersPrep {
             'meat_initiative_dice',
             'astral_initiative',
             'astral_initiative_dice',
-            'matrix_initiative',
-            'matrix_initiative_dice',
             'composure',
             'lift_carry',
             'judge_intentions',
             'memory',
             'walk',
             'run',
-            'defense',
             'wound_tolerance',
             'essence',
             'fade',
         ];
-        miscTabModifiers.sort();
-        // force global to the top
-        miscTabModifiers.unshift('global');
-        for (let item of miscTabModifiers) {
-            modifiers[item] = Number(data.modifiers[item]) || 0;
+    }
+    static get matrixModifiers() {
+        return [
+            'matrix_initiative',
+            'matrix_initiative_dice',
+            'matrix_track'
+        ];
+    }
+    static setupModifiers(data, modifiers) {
+        if (!data.modifiers) {
+            data.modifiers = {};
         }
-        data.modifiers = modifiers;
+        // TODO: localize sorting of modifiers.
+        modifiers.sort();
+        // add and force global to the top
+        modifiers.unshift('global');
+        // Prepare sorted modifiers and merge with existing values when set.
+        // Unset modifier values will be null or not exist at all.
+        const sorted = {};
+        for (const modifier of modifiers) {
+            sorted[modifier] = Number(data.modifiers[modifier]) || 0;
+        }
+        data.modifiers = sorted;
     }
     static clearAttributeMods(data) {
         const { attributes } = data;
-        for (const [, attribute] of Object.entries(attributes)) {
+        for (const [name, attribute] of Object.entries(attributes)) {
+            // Check for valid attributes. Active Effects can cause unexpected properties to appear.
+            if (!config_1.SR5.attributes.hasOwnProperty(name) || !attribute)
+                return;
             attribute.mod = [];
         }
     }
 }
 exports.ModifiersPrep = ModifiersPrep;
-
-},{}],102:[function(require,module,exports){
+},{"../../../config":144}],103:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MovementPrep = void 0;
@@ -17359,8 +17721,7 @@ class MovementPrep {
     }
 }
 exports.MovementPrep = MovementPrep;
-
-},{}],103:[function(require,module,exports){
+},{}],104:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NPCPrep = void 0;
@@ -17404,8 +17765,7 @@ class NPCPrep {
     }
 }
 exports.NPCPrep = NPCPrep;
-
-},{"../../../constants":142,"../../../data/DataDefaults":143,"../../../parts/PartsList":204,"./AttributesPrep":95}],104:[function(require,module,exports){
+},{"../../../constants":145,"../../../data/DataDefaults":146,"../../../parts/PartsList":209,"./AttributesPrep":96}],105:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports._mergeWithMissingSkillFields = exports.SkillsPrep = void 0;
@@ -17503,8 +17863,7 @@ const _mergeWithMissingSkillFields = (givenSkill) => {
     mergeObject(givenSkill, template, { overwrite: false });
 };
 exports._mergeWithMissingSkillFields = _mergeWithMissingSkillFields;
-
-},{"../../../config":141,"../../../helpers":153,"../../../parts/PartsList":204}],105:[function(require,module,exports){
+},{"../../../config":144,"../../../helpers":157,"../../../parts/PartsList":209}],106:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WoundsPrep = void 0;
@@ -17522,8 +17881,558 @@ class WoundsPrep {
     }
 }
 exports.WoundsPrep = WoundsPrep;
-
-},{}],106:[function(require,module,exports){
+},{}],107:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SR5BaseActorSheet = void 0;
+const helpers_1 = require("../../helpers");
+const effects_1 = require("../../effects");
+const config_1 = require("../../config");
+/**
+ * This class should not be used directly but be extended for each actor type.
+ */
+class SR5BaseActorSheet extends ActorSheet {
+    constructor() {
+        super(...arguments);
+        // Store description to display on the sheet.
+        this._shownDesc = [];
+        // If something needs filtering, store those filters here.
+        this._filters = {
+            skills: '',
+            showUntrainedSkills: true,
+        };
+    }
+    /**
+     * Extend and override the default options used by the 5e Actor Sheet
+     * @returns {Object}
+     */
+    static get defaultOptions() {
+        //@ts-ignore // TODO: foundry-vtt-types GENERAL no idea what's the issue here.
+        return mergeObject(super.defaultOptions, {
+            classes: ['sr5', 'sheet', 'actor'],
+            width: 880,
+            height: 690,
+            tabs: [
+                {
+                    navSelector: '.tabs',
+                    contentSelector: '.sheetbody',
+                    initial: 'skills',
+                },
+            ],
+        });
+    }
+    /**
+     * Decide which template to render both for actor types and user permissions.
+     *
+     * This could also be done within individual ActorType sheets, however, for ease of use, it's
+     * centralized here.
+     *
+     * @override
+     */
+    get template() {
+        const path = 'systems/shadowrun5e/dist/templates';
+        if (this.actor.limited) {
+            return `${path}/actor-limited/${this.actor.data.type}.html`;
+        }
+        return `${path}/actor/${this.actor.data.type}.html`;
+    }
+    /**
+     * Data used by all actor types.
+     *
+     * @override
+     */
+    getData() {
+        // Restructure redesigned Document.getData to contain all new fields, while keeping data.data as system data.
+        let data = super.getData();
+        data = Object.assign(Object.assign({}, data), { 
+            // @ts-ignore
+            data: data.data.data });
+        // General purpose fields
+        data.config = config_1.SR5;
+        data.filters = this._filters;
+        // Pepare data fields
+        // TODO: This makes it really unclear what fields are present on the sheet.
+        this._prepareItems(data);
+        this._prepareActorTypeFields(data);
+        return data;
+    }
+    activateListeners(html) {
+        super.activateListeners(html);
+        // Active Effect management
+        // @ts-ignore // foundry-vtt-types 0.8 document support missing.
+        html.find(".effect-control").on('click', event => effects_1.onManageActiveEffect(event, this.document));
+        // General item CRUD management...
+        html.find('.item-create').on('click', this._onItemCreate.bind(this));
+        html.find('.item-edit').on('click', this._onItemEdit.bind(this));
+        html.find('.item-delete').on('click', this._onItemDelete.bind(this));
+        // General item testing...
+        html.find('.item-roll').click(this._onItemRoll.bind(this));
+        html.find('.Roll').on('click', this._onRoll.bind(this));
+        // Condition monitor track handling...
+        html.find('.horizontal-cell-input .cell').on('click', this._onSetConditionTrackCell.bind(this));
+        html.find('.horizontal-cell-input .cell').on('contextmenu', this._onClearConditionTrack.bind(this));
+    }
+    /**
+     * Sheet listeners
+     */
+    _onItemCreate(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const type = helpers_1.Helpers.listItemId(event);
+            // TODO: Add translation for item names...
+            const itemData = {
+                name: `New ${type}`,
+                type: type,
+            };
+            return yield this.actor.createOwnedItem(itemData, { renderSheet: true });
+        });
+    }
+    _onItemEdit(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const iid = helpers_1.Helpers.listItemId(event);
+            const item = this.actor.items.get(iid);
+            if (item)
+                yield item.sheet.render(true);
+        });
+    }
+    _onItemDelete(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const userConsented = yield helpers_1.Helpers.confirmDeletion();
+            if (!userConsented)
+                return;
+            const iid = helpers_1.Helpers.listItemId(event);
+            return yield this.actor.deleteOwnedItem(iid);
+        });
+    }
+    _onItemRoll(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const iid = helpers_1.Helpers.listItemId(event);
+            const item = this.actor.items.get(iid);
+            if (item) {
+                yield item.castAction(event);
+            }
+        });
+    }
+    /**
+     * Setup all general system rolls after clicking on their roll on the sheet.
+     *
+     * @param event Must contain a currentTarget with a rollId dataset
+     */
+    _onRoll(event) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            // look for roll id data in the current line
+            let rollId = (_a = $(event.currentTarget).data()) === null || _a === void 0 ? void 0 : _a.rollId;
+            // if that doesn't exist, look for a prent with RollId name
+            rollId = rollId !== null && rollId !== void 0 ? rollId : $(event.currentTarget).parent('.RollId').data().rollId;
+            const split = rollId.split('.');
+            const options = { event };
+            switch (split[0]) {
+                case 'prompt-roll':
+                    yield this.actor.promptRoll(options);
+                    break;
+                case 'armor':
+                    yield this.actor.rollArmor(options);
+                    break;
+                case 'fade':
+                    yield this.actor.rollFade(options);
+                    break;
+                case 'drain':
+                    yield this.actor.rollDrain(options);
+                    break;
+                case 'defense':
+                    yield this.actor.rollAttackDefense(options);
+                    break;
+                case 'damage-resist':
+                    yield this.actor.rollSoak(options);
+                    break;
+                // attribute only rolls
+                case 'composure':
+                    yield this.actor.rollAttributesTest('composure');
+                    break;
+                case 'judge-intentions':
+                    yield this.actor.rollAttributesTest('judge_intentions');
+                    break;
+                case 'lift-carry':
+                    yield this.actor.rollAttributesTest('lift_carry');
+                    break;
+                case 'memory':
+                    yield this.actor.rollAttributesTest('memory');
+                    break;
+                case 'vehicle-stat':
+                    console.log('roll vehicle stat', rollId);
+                    break;
+                case 'drone':
+                    const droneRoll = split[1];
+                    switch (droneRoll) {
+                        case 'perception':
+                            yield this.actor.rollDronePerception(options);
+                            break;
+                        case 'infiltration':
+                            yield this.actor.rollDroneInfiltration(options);
+                            break;
+                        case 'pilot-vehicle':
+                            yield this.actor.rollPilotVehicle(options);
+                            break;
+                    }
+                    break;
+                // end drone
+                case 'attribute':
+                    const attribute = split[1];
+                    if (attribute) {
+                        yield this.actor.rollAttribute(attribute, options);
+                    }
+                    break;
+                // end attribute
+                case 'skill':
+                    const skillType = split[1];
+                    switch (skillType) {
+                        case 'active': {
+                            const skillId = split[2];
+                            yield this.actor.rollActiveSkill(skillId, options);
+                            break;
+                        }
+                        case 'language': {
+                            const skillId = split[2];
+                            yield this.actor.rollLanguageSkill(skillId, options);
+                            break;
+                        }
+                        case 'knowledge': {
+                            const category = split[2];
+                            const skillId = split[3];
+                            yield this.actor.rollKnowledgeSkill(category, skillId, options);
+                            break;
+                        }
+                    }
+                    break;
+                // end skill
+                case 'matrix':
+                    const matrixRoll = split[1];
+                    switch (matrixRoll) {
+                        case 'attribute':
+                            const attr = split[2];
+                            yield this.actor.rollMatrixAttribute(attr, options);
+                            break;
+                        case 'device-rating':
+                            yield this.actor.rollDeviceRating(options);
+                            break;
+                    }
+                    break;
+                // end matrix
+            }
+        });
+    }
+    /**
+     * Set any kind of condition monitor to a specific cell value.
+     *
+     * @event Most return a currentTarget with a value dataset
+     */
+    _onSetConditionTrackCell(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const value = Number(event.currentTarget.dataset.value);
+            const cmId = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
+            const data = {};
+            if (cmId === 'stun' || cmId === 'physical') {
+                const property = `data.track.${cmId}.value`;
+                data[property] = value;
+            }
+            else if (cmId === 'edge') {
+                const property = `data.attributes.edge.uses`;
+                data[property] = value;
+            }
+            else if (cmId === 'overflow') {
+                const property = 'data.track.physical.overflow.value';
+                data[property] = value;
+            }
+            else if (cmId === 'matrix') {
+                const matrixDevice = this.actor.getMatrixDevice();
+                if (matrixDevice && !isNaN(value)) {
+                    const updateData = {};
+                    updateData['data.technology.condition_monitor.value'] = value;
+                    yield matrixDevice.update(updateData);
+                }
+                else {
+                    const property = `data.track.matrix.value`;
+                    data[property] = value;
+                }
+            }
+            yield this.actor.update(data);
+        });
+    }
+    /**
+     * Reset all condition tracks to zero values.
+     * @param event
+     */
+    _onClearConditionTrack(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const cmId = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
+            const data = {};
+            if (cmId === 'stun') {
+                data[`data.track.stun.value`] = 0;
+            }
+            // Clearing the physical monitor should also clear the overflow.
+            else if (cmId === 'physical') {
+                data[`data.track.physical.value`] = 0;
+                data['data.track.physical.overflow.value'] = 0;
+            }
+            else if (cmId === 'edge') {
+                data[`data.attributes.edge.uses`] = 0;
+            }
+            else if (cmId === 'overflow') {
+                data['data.track.physical.overflow.value'] = 0;
+            }
+            else if (cmId === 'matrix') {
+                const matrixDevice = this.actor.getMatrixDevice();
+                if (matrixDevice) {
+                    const updateData = {};
+                    updateData['data.technology.condition_monitor.value'] = 0;
+                    yield matrixDevice.update(updateData);
+                }
+                else {
+                    data['data.track.matrix.value'] = 0;
+                }
+            }
+            yield this.actor.update(data);
+        });
+    }
+    /**
+     * Prepare Actor Sheet data with item data.
+     * @param data An object containing Actor Sheet data, as would be returned by ActorSheet.getData
+     */
+    _prepareItems(data) {
+        const inventory = {};
+        // All acting entities should be allowed to carry some protection!
+        inventory['weapon'] = {
+            label: game.i18n.localize('SR5.ItemTypes.Weapon'),
+            items: [],
+            dataset: {
+                type: 'weapon',
+            },
+        };
+        // Critters are people to... Support your local HMHVV support groups!
+        if (this.actor.matchesActorTypes(['character', 'critter', 'vehicle'])) {
+            inventory['armor'] = {
+                label: game.i18n.localize('SR5.ItemTypes.Armor'),
+                items: [],
+                dataset: {
+                    type: 'armor',
+                },
+            };
+            inventory['device'] = {
+                label: game.i18n.localize('SR5.ItemTypes.Device'),
+                items: [],
+                dataset: {
+                    type: 'device',
+                },
+            };
+            inventory['equipment'] = {
+                label: game.i18n.localize('SR5.ItemTypes.Equipment'),
+                items: [],
+                dataset: {
+                    type: 'equipment',
+                },
+            };
+            inventory['ammo'] = {
+                label: game.i18n.localize('SR5.ItemTypes.Ammo'),
+                items: [],
+                dataset: {
+                    type: 'ammo',
+                },
+            };
+            inventory['cyberware'] = {
+                label: game.i18n.localize('SR5.ItemTypes.Cyberware'),
+                items: [],
+                dataset: {
+                    type: 'cyberware',
+                },
+            };
+            inventory['bioware'] = {
+                label: game.i18n.localize('SR5.ItemTypes.Bioware'),
+                items: [],
+                dataset: {
+                    type: 'bioware',
+                },
+            };
+        }
+        let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs, critter_powers, sprite_powers,] = data.items.reduce((arr, item) => {
+            // Duplicate to avoid later updates propagating changed item data.
+            // NOTE: If no duplication is done, added fields will be stored in the database on updates!
+            item = duplicate(item);
+            // Show item properties and description in the item list overviews.
+            const actorItem = this.actor.items.get(item._id);
+            const chatData = actorItem.getChatData();
+            item.description = chatData.description;
+            // @ts-ignore // This is a hacky monkey patch solution to pass template data through duplicated item data.
+            item.properties = chatData.properties;
+            // TODO: isStack property isn't used elsewhere. Remove if unnecessary.
+            item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
+            if (item.type === 'spell')
+                arr[1].push(item);
+            else if (item.type === 'quality')
+                arr[2].push(item);
+            else if (item.type === 'adept_power')
+                arr[3].push(item);
+            else if (item.type === 'action')
+                arr[4].push(item);
+            else if (item.type === 'complex_form')
+                arr[5].push(item);
+            else if (item.type === 'lifestyle')
+                arr[6].push(item);
+            else if (item.type === 'contact')
+                arr[7].push(item);
+            else if (item.type === 'sin')
+                arr[8].push(item);
+            else if (item.type === 'program')
+                arr[9].push(item);
+            else if (item.type === 'critter_power')
+                arr[10].push(item);
+            else if (item.type === 'sprite_power')
+                arr[11].push(item);
+            else if (Object.keys(inventory).includes(item.type))
+                arr[0].push(item);
+            return arr;
+        }, [[], [], [], [], [], [], [], [], [], [], [], []]);
+        const sortByName = (i1, i2) => {
+            if (i1.name > i2.name)
+                return 1;
+            if (i1.name < i2.name)
+                return -1;
+            return 0;
+        };
+        const sortByEquipped = (left, right) => {
+            var _a, _b, _c, _d;
+            const leftEquipped = (_b = (_a = left.data) === null || _a === void 0 ? void 0 : _a.technology) === null || _b === void 0 ? void 0 : _b.equipped;
+            const rightEquipped = (_d = (_c = right.data) === null || _c === void 0 ? void 0 : _c.technology) === null || _d === void 0 ? void 0 : _d.equipped;
+            if (leftEquipped && !rightEquipped)
+                return -1;
+            if (rightEquipped && !leftEquipped)
+                return 1;
+            if (left.name > right.name)
+                return 1;
+            if (left.name < right.name)
+                return -1;
+            return 0;
+        };
+        actions.sort(sortByName);
+        adept_powers.sort(sortByName);
+        complex_forms.sort(sortByName);
+        items.sort(sortByEquipped);
+        spells.sort(sortByName);
+        contacts.sort(sortByName);
+        lifestyles.sort(sortByName);
+        sins.sort(sortByName);
+        programs.sort(sortByEquipped);
+        critter_powers.sort(sortByName);
+        sprite_powers.sort(sortByName);
+        items.forEach((item) => {
+            inventory[item.type].items.push(item);
+        });
+        data.inventory = Object.values(inventory);
+        data.magic = {
+            spellbook: spells,
+            powers: adept_powers,
+        };
+        data.actions = actions;
+        data.complex_forms = complex_forms;
+        data.lifestyles = lifestyles;
+        data.contacts = contacts;
+        data.sins = sins;
+        data.programs = programs;
+        data.critter_powers = critter_powers;
+        data.sprite_powers = sprite_powers;
+        qualities.sort((a, b) => {
+            if (a.data.type === 'positive' && b.data.type === 'negative')
+                return -1;
+            if (a.data.type === 'negative' && b.data.type === 'positive')
+                return 1;
+            return a.name < b.name ? -1 : 1;
+        });
+        data.qualities = qualities;
+    }
+    /**
+     * TODO: This doesn't adhere to actor type separation. Maybe doesn't matter for ease of use.
+     * @param data An object containing Actor Sheet data, as would be returned by ActorSheet.getData
+     */
+    _prepareActorTypeFields(data) {
+        data.isCharacter = this.actor.isCharacter();
+        data.isSpirit = this.actor.isSpirit();
+        data.isCritter = this.actor.isCritter();
+        data.hasSkills = this.actor.hasSkills;
+        data.hasSpecial = this.actor.hasSpecial;
+    }
+}
+exports.SR5BaseActorSheet = SR5BaseActorSheet;
+},{"../../config":144,"../../effects":149,"../../helpers":157}],108:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SR5ICActorSheet = void 0;
+const SR5BaseActorSheet_1 = require("./SR5BaseActorSheet");
+class SR5ICActorSheet extends SR5BaseActorSheet_1.SR5BaseActorSheet {
+    getData() {
+        const data = super.getData();
+        // Fetch a connected host.
+        const icData = this.object.asICData();
+        data.host = game.items.get(icData.data.host.id);
+        return data;
+    }
+    activateListeners(html) {
+        super.activateListeners(html);
+        html.find('.entity-remove').on('click', this._removeHost.bind(this));
+    }
+    /**
+     * Remove a connected host from the shown IC actor type.
+     * @param event
+     */
+    _removeHost(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.stopPropagation();
+            yield this.object.removeICHost();
+        });
+    }
+    _onDrop(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        // Nothing to be dropped...
+        if (!event.dataTransfer)
+            return;
+        const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
+        // Handle IC type actor cases.
+        switch (dropData.type) {
+            case 'Item':
+                // We don't have to narrow down type here, the SR5Actor will handle this for us.
+                this.object.addICHost(dropData.id);
+                break;
+        }
+        // Let Foundry handle default cases.
+        return super._onDrop(event);
+    }
+}
+exports.SR5ICActorSheet = SR5ICActorSheet;
+},{"./SR5BaseActorSheet":107}],109:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChangelogApplication = void 0;
@@ -17558,8 +18467,7 @@ class ChangelogApplication extends Application {
     }
 }
 exports.ChangelogApplication = ChangelogApplication;
-
-},{"../constants":142}],107:[function(require,module,exports){
+},{"../constants":145}],110:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -17777,8 +18685,7 @@ class EnvModifiersApplication extends Application {
     }
 }
 exports.EnvModifiersApplication = EnvModifiersApplication;
-
-},{"../actor/SR5Actor":85,"../constants":142,"../helpers":153,"../rules/Modifiers":207}],108:[function(require,module,exports){
+},{"../actor/SR5Actor":85,"../constants":145,"../helpers":157,"../rules/Modifiers":213}],111:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -17871,7 +18778,7 @@ var ArmorParser = /*#__PURE__*/function () {
 
 exports.ArmorParser = ArmorParser;
 
-},{"./BaseParserFunctions.js":109,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],109:[function(require,module,exports){
+},{"./BaseParserFunctions.js":112,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],112:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -17974,7 +18881,7 @@ var createItemData = function createItemData(name, type, data) {
 
 exports.createItemData = createItemData;
 
-},{"../../data/DataDefaults":143}],110:[function(require,module,exports){
+},{"../../data/DataDefaults":146}],113:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -18064,7 +18971,7 @@ var CharacterImporter = /*#__PURE__*/function () {
 
 exports.CharacterImporter = CharacterImporter;
 
-},{"./CharacterInfoUpdater":111,"./ItemsParser":114,"@babel/runtime/helpers/asyncToGenerator":2,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/regenerator":14}],111:[function(require,module,exports){
+},{"./CharacterInfoUpdater":114,"./ItemsParser":117,"@babel/runtime/helpers/asyncToGenerator":2,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/regenerator":14}],114:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -18390,7 +19297,7 @@ var CharacterInfoUpdater = /*#__PURE__*/function () {
 
 exports.CharacterInfoUpdater = CharacterInfoUpdater;
 
-},{"../../actor/prep/functions/SkillsPrep":104,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/interopRequireDefault":9}],112:[function(require,module,exports){
+},{"../../actor/prep/functions/SkillsPrep":105,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/interopRequireDefault":9}],115:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -18456,7 +19363,7 @@ var ContactParser = /*#__PURE__*/function () {
 
 exports.ContactParser = ContactParser;
 
-},{"./BaseParserFunctions.js":109,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],113:[function(require,module,exports){
+},{"./BaseParserFunctions.js":112,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],116:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -18513,7 +19420,7 @@ var CyberwareParser = /*#__PURE__*/function () {
 
 exports.CyberwareParser = CyberwareParser;
 
-},{"./BaseParserFunctions.js":109,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],114:[function(require,module,exports){
+},{"./BaseParserFunctions.js":112,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],117:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -18620,7 +19527,7 @@ var ItemsParser = /*#__PURE__*/function () {
 
 exports.ItemsParser = ItemsParser;
 
-},{"./ArmorParser":108,"./BaseParserFunctions.js":109,"./ContactParser":112,"./CyberwareParser":113,"./LifestyleParser":115,"./PowerParser":116,"./QualityParser":117,"./SpellParser":118,"./WeaponParser":119,"./gearImport/GearsParser":123,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],115:[function(require,module,exports){
+},{"./ArmorParser":111,"./BaseParserFunctions.js":112,"./ContactParser":115,"./CyberwareParser":116,"./LifestyleParser":118,"./PowerParser":119,"./QualityParser":120,"./SpellParser":121,"./WeaponParser":122,"./gearImport/GearsParser":126,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],118:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -18694,7 +19601,7 @@ var LifestyleParser = /*#__PURE__*/function () {
 
 exports.LifestyleParser = LifestyleParser;
 
-},{"../../config":141,"./BaseParserFunctions.js":109,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],116:[function(require,module,exports){
+},{"../../config":144,"./BaseParserFunctions.js":112,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],119:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -18745,7 +19652,7 @@ var PowerParser = /*#__PURE__*/function () {
 
 exports.PowerParser = PowerParser;
 
-},{"./BaseParserFunctions.js":109,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],117:[function(require,module,exports){
+},{"./BaseParserFunctions.js":112,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],120:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -18802,7 +19709,7 @@ var QualityParser = /*#__PURE__*/function () {
 
 exports.QualityParser = QualityParser;
 
-},{"../../data/DataDefaults":143,"./BaseParserFunctions.js":109,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],118:[function(require,module,exports){
+},{"../../data/DataDefaults":146,"./BaseParserFunctions.js":112,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],121:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -18981,7 +19888,7 @@ var SpellParser = /*#__PURE__*/function () {
 
 exports.SpellParser = SpellParser;
 
-},{"../../data/DataDefaults":143,"./BaseParserFunctions.js":109,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],119:[function(require,module,exports){
+},{"../../data/DataDefaults":146,"./BaseParserFunctions.js":112,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],122:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -19159,7 +20066,7 @@ var WeaponParser = /*#__PURE__*/function () {
 
 exports.WeaponParser = WeaponParser;
 
-},{"./BaseParserFunctions.js":109,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/interopRequireDefault":9}],120:[function(require,module,exports){
+},{"./BaseParserFunctions.js":112,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/interopRequireDefault":9}],123:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AmmoParser = void 0;
@@ -19193,8 +20100,7 @@ class AmmoParser extends BaseGearParser_1.BaseGearParser {
     }
 }
 exports.AmmoParser = AmmoParser;
-
-},{"./BaseGearParser":121}],121:[function(require,module,exports){
+},{"./BaseGearParser":124}],124:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BaseGearParser = void 0;
@@ -19232,8 +20138,7 @@ class BaseGearParser {
     }
 }
 exports.BaseGearParser = BaseGearParser;
-
-},{"../../../data/DataDefaults":143,"../BaseParserFunctions.js":109}],122:[function(require,module,exports){
+},{"../../../data/DataDefaults":146,"../BaseParserFunctions.js":112}],125:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DeviceParser = void 0;
@@ -19278,8 +20183,7 @@ class DeviceParser extends BaseGearParser_1.BaseGearParser {
     }
 }
 exports.DeviceParser = DeviceParser;
-
-},{"./BaseGearParser":121}],123:[function(require,module,exports){
+},{"./BaseGearParser":124}],126:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GearsParser = void 0;
@@ -19326,8 +20230,7 @@ class GearsParser {
     }
 }
 exports.GearsParser = GearsParser;
-
-},{"./ParserSelector":124}],124:[function(require,module,exports){
+},{"./ParserSelector":127}],127:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ParserSelector = void 0;
@@ -19364,8 +20267,7 @@ class ParserSelector {
     }
 }
 exports.ParserSelector = ParserSelector;
-
-},{"./AmmoParser":120,"./BaseGearParser":121,"./DeviceParser":122,"./ProgramParser":125,"./SinParser":126}],125:[function(require,module,exports){
+},{"./AmmoParser":123,"./BaseGearParser":124,"./DeviceParser":125,"./ProgramParser":128,"./SinParser":129}],128:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProgramParser = void 0;
@@ -19390,8 +20292,7 @@ class ProgramParser extends BaseGearParser_1.BaseGearParser {
     }
 }
 exports.ProgramParser = ProgramParser;
-
-},{"./BaseGearParser":121}],126:[function(require,module,exports){
+},{"./BaseGearParser":124}],129:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SinParser = void 0;
@@ -19433,8 +20334,7 @@ class SinParser extends BaseGearParser_1.BaseGearParser {
     }
 }
 exports.SinParser = SinParser;
-
-},{"./BaseGearParser":121}],127:[function(require,module,exports){
+},{"./BaseGearParser":124}],130:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -19550,7 +20450,7 @@ var ChummerImportForm = /*#__PURE__*/function (_FormApplication) {
 
 exports.ChummerImportForm = ChummerImportForm;
 
-},{"../actor/prep/functions/SkillsPrep":104,"./characterImport/CharacterImporter":110,"@babel/runtime/helpers/asyncToGenerator":2,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10,"@babel/runtime/regenerator":14}],128:[function(require,module,exports){
+},{"../actor/prep/functions/SkillsPrep":105,"./characterImport/CharacterImporter":113,"@babel/runtime/helpers/asyncToGenerator":2,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10,"@babel/runtime/regenerator":14}],131:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DamageApplicationDialog = void 0;
@@ -19595,8 +20495,7 @@ class DamageApplicationDialog extends FormDialog_1.FormDialog {
     }
 }
 exports.DamageApplicationDialog = DamageApplicationDialog;
-
-},{"./FormDialog":130}],129:[function(require,module,exports){
+},{"./FormDialog":133}],132:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DeleteConfirmationDialog = void 0;
@@ -19633,8 +20532,7 @@ class DeleteConfirmationDialog extends FormDialog_1.FormDialog {
     }
 }
 exports.DeleteConfirmationDialog = DeleteConfirmationDialog;
-
-},{"./FormDialog":130}],130:[function(require,module,exports){
+},{"./FormDialog":133}],133:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -19747,8 +20645,7 @@ class FormDialog extends Dialog {
     }
 }
 exports.FormDialog = FormDialog;
-
-},{}],131:[function(require,module,exports){
+},{}],134:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -19955,8 +20852,7 @@ class ShadowrunActorDialogs {
     }
 }
 exports.ShadowrunActorDialogs = ShadowrunActorDialogs;
-
-},{"../../actor/flows/SkillFlow":88,"../../config":141,"../../helpers":153,"../../parts/PartsList":204,"./FormDialog":130}],132:[function(require,module,exports){
+},{"../../actor/flows/SkillFlow":88,"../../config":144,"../../helpers":157,"../../parts/PartsList":209,"./FormDialog":133}],135:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -20270,8 +21166,7 @@ class ShadowrunItemDialog {
     }
 }
 exports.ShadowrunItemDialog = ShadowrunItemDialog;
-
-},{"../../config":141,"../../constants":142,"../../helpers":153,"./FormDialog":130}],133:[function(require,module,exports){
+},{"../../config":144,"../../constants":145,"../../helpers":157,"./FormDialog":133}],136:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -20379,8 +21274,7 @@ class ShadowrunTestDialog {
     }
 }
 exports.ShadowrunTestDialog = ShadowrunTestDialog;
-
-},{"../../constants":142,"../../helpers":153,"../../parts/PartsList":204,"./FormDialog":130}],134:[function(require,module,exports){
+},{"../../constants":145,"../../helpers":157,"../../parts/PartsList":209,"./FormDialog":133}],137:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -20578,7 +21472,7 @@ exports.OverwatchScoreTracker = OverwatchScoreTracker;
 (0, _defineProperty2["default"])(OverwatchScoreTracker, "MatrixOverwatchDiceCount", '2d6');
 (0, _defineProperty2["default"])(OverwatchScoreTracker, "addedActors", []);
 
-},{"../../helpers":153,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10}],135:[function(require,module,exports){
+},{"../../helpers":157,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10}],138:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KnowledgeSkillEditSheet = void 0;
@@ -20593,8 +21487,7 @@ class KnowledgeSkillEditSheet extends LanguageSkillEditSheet_1.LanguageSkillEdit
     }
 }
 exports.KnowledgeSkillEditSheet = KnowledgeSkillEditSheet;
-
-},{"./LanguageSkillEditSheet":136}],136:[function(require,module,exports){
+},{"./LanguageSkillEditSheet":139}],139:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LanguageSkillEditSheet = void 0;
@@ -20619,8 +21512,7 @@ class LanguageSkillEditSheet extends SkillEditSheet_1.SkillEditSheet {
     }
 }
 exports.LanguageSkillEditSheet = LanguageSkillEditSheet;
-
-},{"./SkillEditSheet":137}],137:[function(require,module,exports){
+},{"./SkillEditSheet":140}],140:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -20806,8 +21698,7 @@ class SkillEditSheet extends DocumentSheet {
     }
 }
 exports.SkillEditSheet = SkillEditSheet;
-
-},{"../../config":141}],138:[function(require,module,exports){
+},{"../../config":144}],141:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.measureDistance = void 0;
@@ -20852,8 +21743,7 @@ const measureDistance = function (segments, options = {}) {
     });
 };
 exports.measureDistance = measureDistance;
-
-},{}],139:[function(require,module,exports){
+},{}],142:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -20872,6 +21762,13 @@ const template_1 = require("./template");
 const constants_1 = require("./constants");
 const helpers_1 = require("./helpers");
 const DamageApplicationFlow_1 = require("./actor/flows/DamageApplicationFlow");
+/**
+ * The legacy chat message approach of the system uses a generic chat message to display roll and item information.
+ *
+ * NOTE: This approach has been deprecated in Foundry 0.8 and should be replaced with custom Roll implementation for each kind of Roll (ActionRoll, AttackRoll, OpposedRoll, ...).
+ *
+ * @param templateData An untyped object carrying data to display. The template should itself check for what properties are available and only renders what's given.
+ */
 function createChatMessage(templateData, options) {
     return __awaiter(this, void 0, void 0, function* () {
         const chatData = yield createChatData(templateData, options);
@@ -20907,6 +21804,7 @@ const createChatData = (templateData, options) => __awaiter(void 0, void 0, void
     const enhancedTemplateData = Object.assign(Object.assign({}, templateData), { speaker: {
             actor, token
         }, showGlitchAnimation: game.settings.get(constants_1.SYSTEM_NAME, constants_1.FLAGS.ShowGlitchAnimation) });
+    console.error(enhancedTemplateData);
     const html = yield renderTemplate(template, enhancedTemplateData);
     const chatData = {
         user: (_a = game.user) === null || _a === void 0 ? void 0 : _a.id,
@@ -21200,8 +22098,7 @@ const addRollListeners = (app, html) => {
     }));
 };
 exports.addRollListeners = addRollListeners;
-
-},{"./actor/SR5Actor":85,"./actor/flows/DamageApplicationFlow":87,"./constants":142,"./helpers":153,"./item/SR5Item":193,"./template":211}],140:[function(require,module,exports){
+},{"./actor/SR5Actor":85,"./actor/flows/DamageApplicationFlow":87,"./constants":145,"./helpers":157,"./item/SR5Item":197,"./template":217}],143:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -21622,8 +22519,7 @@ function _combatantGetInitiativeFormula() {
     return SR5Combat._getSystemInitiativeFormula(combat.initiativePass);
 }
 exports._combatantGetInitiativeFormula = _combatantGetInitiativeFormula;
-
-},{"../constants":142,"../rules/CombatRules":206}],141:[function(require,module,exports){
+},{"../constants":145,"../rules/CombatRules":211}],144:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5 = void 0;
@@ -21646,6 +22542,7 @@ exports.SR5 = {
         sin: 'SR5.ItemTypes.Sin',
         spell: 'SR5.ItemTypes.Spell',
         weapon: 'SR5.ItemTypes.Weapon',
+        host: 'SR5.ItemTypes.Host'
     },
     attributes: {
         body: 'SR5.AttrBody',
@@ -21924,6 +22821,7 @@ exports.SR5 = {
         astral_initiative_dice: 'SR5.AstralDice',
         matrix_initiative: 'SR5.MatrixInit',
         matrix_initiative_dice: 'SR5.MatrixDice',
+        matrix_track: 'SR5.MatrixTrack',
         composure: 'SR5.RollComposure',
         lift_carry: 'SR5.RollLiftCarry',
         judge_intentions: 'SR5.RollJudgeIntentions',
@@ -22054,6 +22952,24 @@ exports.SR5 = {
             handling: 'SR5.Vehicle.Environments.Handling',
         },
     },
+    ic: {
+        types: {
+            acid: "SR5.IC.Types.Acid",
+            binder: "SR5.IC.Types.Binder",
+            black_ic: "SR5.IC.Types.BlackIC",
+            blaster: "SR5.IC.Types.Blaster",
+            crash: "SR5.IC.Types.Crash",
+            jammer: "SR5.IC.Types.Jammer",
+            killer: "SR5.IC.Types.Killer",
+            marker: "SR5.IC.Types.Marker",
+            patrol: "SR5.IC.Types.Patrol",
+            probe: "SR5.IC.Types.Probe",
+            scramble: "SR5.IC.Types.Scramble",
+            sparky: "SR5.IC.Types.Sparky",
+            tar_baby: "SR5.IC.Types.TarBaby",
+            track: "SR5.IC.Types.Track"
+        }
+    },
     character: {
         types: {
             human: 'SR5.Character.Types.Human',
@@ -22064,8 +22980,7 @@ exports.SR5 = {
         },
     },
 };
-
-},{}],142:[function(require,module,exports){
+},{}],145:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR = exports.DEFAULT_ID_LENGTH = exports.SKILL_DEFAULT_NAME = exports.LENGTH_UNIT = exports.DEFAULT_ROLL_NAME = exports.LENGTH_UNIT_TO_METERS_MULTIPLIERS = exports.METATYPEMODIFIER = exports.CORE_FLAGS = exports.CORE_NAME = exports.FLAGS = exports.SYSTEM_SOCKET = exports.SYSTEM_NAME = void 0;
@@ -22106,7 +23021,7 @@ exports.FLAGS = {
     ChangelogShownForVersion: 'changelogShownForVersion',
     Modifier: 'modifier',
     DoInitPass: 'doInitPass',
-    DoNextRound: 'doNextRound',
+    DoNextRound: 'doNextRound'
 };
 exports.CORE_NAME = 'core';
 exports.CORE_FLAGS = {
@@ -22178,7 +23093,8 @@ exports.SR = {
             attack: { min: 0 },
             sleaze: { min: 0 },
             data_processing: { min: 0 },
-            firewall: { min: 0 }
+            firewall: { min: 0 },
+            host_rating: { min: 0, max: 12 }
         },
         SHORT_NAME_LENGTH: 3
     },
@@ -22186,10 +23102,18 @@ exports.SR = {
         // @PDF SR5#130
         DEFAULTING_MODIFIER: -1,
         SPECIALIZATION_MODIFIER: 2
+    },
+    initiatives: {
+        ic: {
+            dice: 4
+        },
+        ranges: {
+            base: { min: 0 },
+            dice: { min: 0, max: 5 }
+        }
     }
 };
-
-},{}],143:[function(require,module,exports){
+},{}],146:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataDefaults = exports.DefaultValues = void 0;
@@ -22277,6 +23201,38 @@ class DefaultValues {
             source: ''
         }, partialDescriptionData);
     }
+    static matrixData(partialMatrixData = {}) {
+        // Remove incomplete properties for ease of use of callers.
+        if (partialMatrixData.category === undefined)
+            delete partialMatrixData.category;
+        if (partialMatrixData.atts === undefined)
+            delete partialMatrixData.atts;
+        return mergeObject({
+            category: "",
+            atts: {
+                att1: {
+                    value: 0,
+                    att: "attack",
+                    editable: true
+                },
+                att2: {
+                    value: 0,
+                    att: "attack",
+                    editable: true
+                },
+                att3: {
+                    value: 0,
+                    att: "attack",
+                    editable: true
+                },
+                att4: {
+                    value: 0,
+                    att: "attack",
+                    editable: true
+                },
+            }
+        }, partialMatrixData);
+    }
     static actionRollData(partialActionRollData = {}) {
         return mergeObject({
             type: '',
@@ -22327,6 +23283,28 @@ class DefaultValues {
             attribute: ''
         }, partialSkillData);
     }
+    static trackData(partialTrackData = {}) {
+        return mergeObject({
+            value: 0,
+            max: 0,
+            label: '',
+            mod: [],
+            disabled: false,
+            wounds: 0
+        }, partialTrackData);
+    }
+    static hostData(partialHostData = {}) {
+        return mergeObject(Object.assign(Object.assign({ description: DefaultValues.descriptionData(partialHostData.description) }, DefaultValues.matrixData({ category: partialHostData.category, atts: partialHostData.atts })), { rating: 0, ic: [] }), partialHostData);
+    }
+    static sourceEntityData(partialSourceEntityData = {}) {
+        return mergeObject({
+            id: '',
+            name: '',
+            pack: null,
+            type: 'Actor',
+            data: partialSourceEntityData.data || undefined
+        }, partialSourceEntityData);
+    }
 }
 exports.DefaultValues = DefaultValues;
 // TODO: Move these into DefaultValues implementations.
@@ -22376,8 +23354,7 @@ exports.DataDefaults = {
     },
     damage: DefaultValues.damageData({ type: { base: '', value: '' } }),
 };
-
-},{"../constants":142}],144:[function(require,module,exports){
+},{"../constants":145}],147:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataWrapper = void 0;
@@ -22387,8 +23364,7 @@ class DataWrapper {
     }
 }
 exports.DataWrapper = DataWrapper;
-
-},{}],145:[function(require,module,exports){
+},{}],148:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ItemDataWrapper = void 0;
@@ -22596,14 +23572,6 @@ class SR5ItemDataWrapper extends DataWrapper_1.DataWrapper {
             },
         };
         if (this.isCyberdeck()) {
-            /**
-             * {
-             *     attN: {
-             *         value: number,
-             *         att: string (the ASDF attribute)
-             *     }
-             * }
-             */
             const atts = this.getData().atts;
             if (atts) {
                 for (let [key, att] of Object.entries(atts)) {
@@ -22702,8 +23670,91 @@ class SR5ItemDataWrapper extends DataWrapper_1.DataWrapper {
     }
 }
 exports.SR5ItemDataWrapper = SR5ItemDataWrapper;
-
-},{"./DataWrapper":144}],146:[function(require,module,exports){
+},{"./DataWrapper":147}],149:[function(require,module,exports){
+"use strict";
+//@ts-nocheck // This is JavaScript code.
+/**
+ * All functions have been taken from : https://gitlab.com/foundrynet/dnd5e/-/blob/master/module/effects.js
+ *
+ * There have been some alterations made to fit the Shadowrun5e system.
+ */
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.prepareActiveEffectCategories = exports.onManageActiveEffect = void 0;
+/**
+ * Manage Active Effect instances through the Actor Sheet via effect control buttons.
+ * @param {MouseEvent} event      The left-click event on the effect control
+ * @param {Actor|Item} owner      The owning entity which manages this effect
+ */
+function onManageActiveEffect(event, owner) {
+    // NOTE: This here is temporary until FoundryVTT has built-in support for nested item updates.
+    //       I won't even translate it, since neither did DnD. ;)
+    if (owner.isOwned)
+        return ui.notifications.warn("Managing Active Effects within an Owned Item is not currently supported and will be added in a subsequent update.");
+    event.preventDefault();
+    // These element grabs rely heavily on HTML structure within the templates.
+    const icon = event.currentTarget;
+    const item = event.currentTarget.closest('.list-item');
+    const effect = item.dataset.itemId ? owner.effects.get(item.dataset.itemId) : null;
+    // The HTML dataset must be defined
+    switch (icon.dataset.action) {
+        case "create":
+            return owner.createEmbeddedDocuments('ActiveEffect', [{
+                    label: game.i18n.localize("SR5.ActiveEffect.New"),
+                    icon: "icons/svg/aura.svg",
+                    origin: owner.uuid,
+                    "duration.rounds": item.dataset.effectType === "temporary" ? 1 : undefined,
+                    disabled: item.dataset.effectType === "inactive"
+                }]);
+        case "edit":
+            return effect.sheet.render(true);
+        case "delete":
+            return effect.delete();
+        case "toggle":
+            return effect.update({ disabled: !effect.data.disabled });
+        default:
+            console.error(`An active effect with the id '${effect}' couldn't be managed as no action has been defined within the template.`);
+            return;
+    }
+}
+exports.onManageActiveEffect = onManageActiveEffect;
+/**
+ * Prepare the data structure for Active Effects which are currently applied to an Actor or Item.
+ * @param {ActiveEffect[]} effects    The array of Active Effect instances to prepare sheet data for
+ * @return {object}                   Data for rendering
+ */
+function prepareActiveEffectCategories(effects) {
+    // Define effect header categories
+    const categories = {
+        temporary: {
+            type: "temporary",
+            label: game.i18n.localize("SR5.ActiveEffect.Types.Temporary"),
+            effects: []
+        },
+        passive: {
+            type: "passive",
+            label: game.i18n.localize("SR5.ActiveEffect.Types.Passive"),
+            effects: []
+        },
+        inactive: {
+            type: "inactive",
+            label: game.i18n.localize("SR5.ActiveEffect.Types.Inactive"),
+            effects: []
+        }
+    };
+    // Iterate over active effects, classifying them into categories
+    for (let effect of effects) {
+        effect._getSourceName(); // Trigger a lookup for the source name
+        if (effect.data.disabled)
+            categories.inactive.effects.push(effect);
+        else if (effect.isTemporary)
+            categories.temporary.effects.push(effect);
+        else
+            categories.passive.effects.push(effect);
+    }
+    return categories;
+}
+exports.prepareActiveEffectCategories = prepareActiveEffectCategories;
+},{}],150:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerAppHelpers = void 0;
@@ -22720,8 +23771,7 @@ const registerAppHelpers = () => {
     });
 };
 exports.registerAppHelpers = registerAppHelpers;
-
-},{}],147:[function(require,module,exports){
+},{}],151:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerBasicHelpers = void 0;
@@ -22858,14 +23908,13 @@ const registerBasicHelpers = () => {
         const val = Boolean(value);
         return val ? val : undefined;
     });
-    // TODO: This helper doesn't work... Don't why, but it doesn't.
+    // TODO: This helper doesn't work... Don't know why, but it doesn't.
     Handlebars.registerHelper('localizeShortened', function (label, length, options) {
         return new Handlebars.SafeString(helpers_1.Helpers.shortenAttributeLocalization(label, length));
     });
 };
 exports.registerBasicHelpers = registerBasicHelpers;
-
-},{"../helpers":153}],148:[function(require,module,exports){
+},{"../helpers":157}],152:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22879,11 +23928,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HandlebarManager = void 0;
 const HandlebarTemplates_1 = require("./HandlebarTemplates");
-const BasicHelpers_1 = require("./BasicHelpers");
 const RollAndLabelHelpers_1 = require("./RollAndLabelHelpers");
 const ItemLineHelpers_1 = require("./ItemLineHelpers");
 const SkillLineHelpers_1 = require("./SkillLineHelpers");
 const AppHelpers_1 = require("./AppHelpers");
+const BasicHelpers_1 = require("./BasicHelpers");
 class HandlebarManager {
     static loadTemplates() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -22899,8 +23948,7 @@ class HandlebarManager {
     }
 }
 exports.HandlebarManager = HandlebarManager;
-
-},{"./AppHelpers":146,"./BasicHelpers":147,"./HandlebarTemplates":149,"./ItemLineHelpers":150,"./RollAndLabelHelpers":151,"./SkillLineHelpers":152}],149:[function(require,module,exports){
+},{"./AppHelpers":150,"./BasicHelpers":151,"./HandlebarTemplates":153,"./ItemLineHelpers":154,"./RollAndLabelHelpers":155,"./SkillLineHelpers":156}],153:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22925,11 +23973,13 @@ const preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, funct
         'systems/shadowrun5e/dist/templates/actor/tabs/SkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/SocialTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/SpellsTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/EffectsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/CritterPowersTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/spirit/SpiritSkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/matrix/SpriteSkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/vehicle/VehicleSkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/vehicle/VehicleMatrixTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/ic/ICActorTab.html',
         // uncategorized lists
         'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html',
         'systems/shadowrun5e/dist/templates/actor/parts/Movement.html',
@@ -22949,6 +23999,7 @@ const preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, funct
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/SpritePowerList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/DeviceRating.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/matrix/Marks.html',
         // attributes
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html',
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/AttributeList.html',
@@ -22961,6 +24012,9 @@ const preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, funct
         'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleStatsList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleSecondStatsList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleMovement.html',
+        // IC
+        'systems/shadowrun5e/dist/templates/actor/parts/ic/ICStats.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/ic/ICConfiguration.html',
         // limited actor
         'systems/shadowrun5e/dist/templates/actor-limited/character.html',
         'systems/shadowrun5e/dist/templates/actor-limited/spirit.html',
@@ -22979,6 +24033,7 @@ const preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, funct
         'systems/shadowrun5e/dist/templates/item/parts/weapon-ammo-list.html',
         'systems/shadowrun5e/dist/templates/item/parts/weapon-mods-list.html',
         'systems/shadowrun5e/dist/templates/item/parts/action.html',
+        'systems/shadowrun5e/dist/templates/item/parts/action_results.html',
         'systems/shadowrun5e/dist/templates/item/parts/damage.html',
         'systems/shadowrun5e/dist/templates/item/parts/opposed.html',
         'systems/shadowrun5e/dist/templates/item/parts/spell.html',
@@ -23011,6 +24066,7 @@ const preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, funct
         'systems/shadowrun5e/dist/templates/common/NameLineBlock.html',
         // list components
         'systems/shadowrun5e/dist/templates/common/List/ListItem.html',
+        'systems/shadowrun5e/dist/templates/common/List/ListEntityItem.html',
         'systems/shadowrun5e/dist/templates/common/List/ListHeader.html',
         // dialogs
         'systems/shadowrun5e/dist/templates/apps/dialogs/damage-application.html',
@@ -23018,8 +24074,7 @@ const preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, funct
     return loadTemplates(templatePaths);
 });
 exports.preloadHandlebarsTemplates = preloadHandlebarsTemplates;
-
-},{}],150:[function(require,module,exports){
+},{}],154:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerItemLineHelpers = void 0;
@@ -23034,6 +24089,8 @@ const registerItemLineHelpers = () => {
             text: AddText,
             title: game.i18n.localize('SR5.CreateItem'),
             cssClass: 'item-create',
+            // Add HTML data attributes using a key<string>:value<string> structure
+            data: {}
         };
         switch (id) {
             case 'lifestyle':
@@ -23095,6 +24152,11 @@ const registerItemLineHelpers = () => {
                 return [addIcon];
             case 'sprite_power':
                 addIcon.title = game.i18n.localize('SR5.CreateItemSpritePower');
+                return [addIcon];
+            case 'effect':
+                addIcon.title = game.i18n.localize('SR5.CreateEffect');
+                addIcon.cssClass = 'effect-control';
+                addIcon.data = { action: 'create' };
                 return [addIcon];
             default:
                 return [];
@@ -23429,10 +24491,35 @@ const registerItemLineHelpers = () => {
         }
         return icons;
     });
+    /**
+     * Helper specifically for active effect icons.
+     *
+     * Add HTML data attributes using a key<string>:value<string> structure for each icon.
+     */
+    Handlebars.registerHelper('EffectIcons', function (effect) {
+        const editIcon = {
+            icon: 'fas fa-edit effect-control',
+            title: game.i18n.localize('SR5.EditItem'),
+            data: { action: 'edit' }
+        };
+        const removeIcon = {
+            icon: 'fas fa-trash effect-control',
+            title: game.i18n.localize('SR5.DeleteItem'),
+            data: { action: 'delete' }
+        };
+        const pdfIcon = {
+            icon: 'fas fa-file open-source-pdf',
+            title: game.i18n.localize('SR5.OpenSourcePdf'),
+        };
+        // TODO: Add source icon to open item / actor causing the effect
+        return [pdfIcon, editIcon, removeIcon];
+    });
+    Handlebars.registerHelper('EffectData', function (effectType) {
+        return { 'effect-type': effectType };
+    });
 };
 exports.registerItemLineHelpers = registerItemLineHelpers;
-
-},{"../config":141,"../data/SR5ItemDataWrapper":145}],151:[function(require,module,exports){
+},{"../config":144,"../data/SR5ItemDataWrapper":148}],155:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerRollAndLabelHelpers = void 0;
@@ -23505,8 +24592,7 @@ const registerRollAndLabelHelpers = () => {
     Handlebars.registerHelper('speakerName', helpers_1.Helpers.getChatSpeakerName);
 };
 exports.registerRollAndLabelHelpers = registerRollAndLabelHelpers;
-
-},{"../helpers":153,"../parts/PartsList":204}],152:[function(require,module,exports){
+},{"../helpers":157,"../parts/PartsList":209}],156:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerSkillLineHelpers = void 0;
@@ -23616,8 +24702,7 @@ const registerSkillLineHelpers = () => {
     });
 };
 exports.registerSkillLineHelpers = registerSkillLineHelpers;
-
-},{"../constants":142,"../helpers":153,"../rules/SkillRules":208}],153:[function(require,module,exports){
+},{"../constants":145,"../helpers":157,"../rules/SkillRules":214}],157:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -23649,7 +24734,9 @@ class Helpers {
         if (value['temp'] !== undefined) {
             parts.addUniquePart('SR5.Temporary', value['temp']);
         }
-        value.value = Helpers.roundTo(parts.total + value.base, 3);
+        // LEGACY: On new actors .base can be undefined, resulting in NaN .value
+        const base = value.base || 0;
+        value.value = Helpers.roundTo(parts.total + base, 3);
         value.mod = parts.list;
         value.value = Helpers.applyValueRange(value.value, options);
         return value.value;
@@ -24236,10 +25323,65 @@ class Helpers {
             yield game.dice3d.showForRoll(roll, game.user, synchronize, whisper, blind);
         });
     }
+    /**
+     * Fetch entities from global or pack collections using data acquired by Foundry Drag&Drop process
+     * @param data Foundry Drop Data
+     */
+    static getEntityFromDropData(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (data.pack)
+                return yield Helpers.getEntityFromCollection(data.pack, data.id);
+            if (data.type === 'Actor')
+                return game.actors.get(data.id);
+            if (data.type === 'Item')
+                return game.items.get(data.id);
+        });
+    }
+    /**
+     * Fetch entities from a pack collection
+     * @param collection The pack name as stored in the collection property
+     * @param id The entity id in that collection
+     */
+    static getEntityFromCollection(collection, id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const pack = game.packs.find((p) => p.collection === collection);
+            return yield pack.getEntity(id);
+        });
+    }
+    /**
+     * Build a markId string. See Helpers.deconstructMarkId for usage.
+     *
+     * @param sceneId Optional id in a markId
+     * @param targetId Mandatory id in a markId
+     * @param itemId Optional id in a markId
+     * @param separator Should you want to change the default separator used. Make sure not to use a . since Foundry will split the key into objects.
+     */
+    static buildMarkId(sceneId, targetId, itemId, separator = ';') {
+        return [sceneId, targetId, itemId || ''].join(separator);
+    }
+    /**
+     * Deconstruct the given markId string.
+     *
+     * @param markId 'sceneId.targetId.itemId' with itemId being optional
+     * @param separator Should you want to change the default separator used
+     */
+    static deconstructMarkId(markId, separator = ';') {
+        const ids = markId.split(separator);
+        if (ids.length !== 3) {
+            console.error('A mark id must always be of length 3');
+            return;
+        }
+        const [sceneId, targetId, itemId] = ids;
+        const scene = game.scenes.get(sceneId);
+        const target = game.actors.get(targetId) || game.items.get(targetId);
+        const item = game.items.get(itemId); // DocumentCollection will return undefined if needed
+        return {
+            scene, target, item
+        };
+    }
 }
 exports.Helpers = Helpers;
-
-},{"./apps/dialogs/DeleteConfirmationDialog":129,"./constants":142,"./data/DataDefaults":143,"./parts/PartsList":204}],154:[function(require,module,exports){
+},{"./apps/dialogs/DeleteConfirmationDialog":132,"./constants":145,"./data/DataDefaults":146,"./parts/PartsList":209}],158:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -24272,6 +25414,7 @@ const import_form_1 = require("./importer/apps/import-form");
 const ChangelogApplication_1 = require("./apps/ChangelogApplication");
 const EnvModifiersApplication_1 = require("./apps/EnvModifiersApplication");
 const quench_1 = require("../test/quench");
+const SR5ICActorSheet_1 = require("./actor/sheets/SR5ICActorSheet");
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 // TODO: Figure out how to change global CONFIG type
 exports.SR5CONFIG = config_1.SR5;
@@ -24289,6 +25432,7 @@ class HooksManager {
         Hooks.on('getCombatTrackerEntryContext', SR5Combat_1.SR5Combat.addCombatTrackerContextOptions);
         Hooks.on('renderItemDirectory', HooksManager.renderItemDirectory);
         Hooks.on('renderTokenHUD', EnvModifiersApplication_1.EnvModifiersApplication.addTokenHUDFields);
+        Hooks.on('updateItem', HooksManager.updateItem);
         // Foundry VTT Module 'quench': https://github.com/schultzcole/FVTT-Quench
         Hooks.on('quenchReady', quench_1.quenchRegister);
     }
@@ -24321,13 +25465,21 @@ ___________________
         CONFIG.Combat.initiative.formula = "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
         // @ts-ignore
         Combatant.prototype._getInitiativeFormula = SR5Combat_1._combatantGetInitiativeFormula;
+        // Add Shadowrun configuration onto general Foundry config for module access.
+        CONFIG.SR5 = config_1.SR5;
         settings_1.registerSystemSettings();
         // Register sheet application classes
         // NOTE: See dnd5e for a multi class approach for all actor types using the types array in Actors.registerSheet
         Actors.unregisterSheet('core', ActorSheet);
         Actors.registerSheet(constants_1.SYSTEM_NAME, SR5ActorSheet_1.SR5ActorSheet, {
             label: "SR5.SheetActor",
-            makeDefault: true
+            makeDefault: true,
+            types: ['character', 'vehicle', 'critter', 'spirit', 'sprite']
+        });
+        Actors.registerSheet(constants_1.SYSTEM_NAME, SR5ICActorSheet_1.SR5ICActorSheet, {
+            label: "SR5.SheetActor",
+            makeDefault: true,
+            types: ['ic']
         });
         Items.unregisterSheet('core', ItemSheet);
         Items.registerSheet(constants_1.SYSTEM_NAME, SR5ItemSheet_1.SR5ItemSheet, {
@@ -24414,10 +25566,27 @@ ___________________
             new import_form_1.Import().render(true);
         });
     }
+    static updateItem(item, data, id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (item.isHost()) {
+                const connectedIC = game.actors.filter((actor) => {
+                    const icData = actor.asICData();
+                    if (!icData)
+                        return false;
+                    return !!icData.data.host.id;
+                });
+                // Update host data on the ic actor.
+                const hostData = item.asHostData();
+                for (const ic of connectedIC) {
+                    console.error(hostData, ic);
+                    yield ic._updateICHostData(hostData);
+                }
+            }
+        });
+    }
 }
 exports.HooksManager = HooksManager;
-
-},{"../test/quench":212,"./actor/SR5Actor":85,"./actor/SR5ActorSheet":86,"./apps/ChangelogApplication":106,"./apps/EnvModifiersApplication":107,"./apps/gmtools/OverwatchScoreTracker":134,"./canvas":138,"./chat":139,"./combat/SR5Combat":140,"./config":141,"./constants":142,"./handlebars/HandlebarManager":148,"./helpers":153,"./importer/apps/import-form":155,"./item/SR5Item":193,"./item/SR5ItemSheet":194,"./macros":196,"./migrator/Migrator":198,"./rolls/ShadowrunRoller":205,"./settings":210}],155:[function(require,module,exports){
+},{"../test/quench":218,"./actor/SR5Actor":85,"./actor/SR5ActorSheet":86,"./actor/sheets/SR5ICActorSheet":108,"./apps/ChangelogApplication":109,"./apps/EnvModifiersApplication":110,"./apps/gmtools/OverwatchScoreTracker":137,"./canvas":141,"./chat":142,"./combat/SR5Combat":143,"./config":144,"./constants":145,"./handlebars/HandlebarManager":152,"./helpers":157,"./importer/apps/import-form":159,"./item/SR5Item":197,"./item/SR5ItemSheet":198,"./macros":201,"./migrator/Migrator":203,"./rolls/ShadowrunRoller":210,"./settings":216}],159:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -24600,8 +25769,7 @@ Import.Importers = [
     new DeviceImporter_1.DeviceImporter(),
     new EquipmentImporter_1.EquipmentImporter()
 ];
-
-},{"../helper/ImportHelper":156,"../importer/AmmoImporter":160,"../importer/ArmorImporter":161,"../importer/ComplexFormImporter":162,"../importer/CritterPowerImporter":164,"../importer/DataImporter":165,"../importer/DeviceImporter":166,"../importer/EquipmentImporter":167,"../importer/ModImporter":168,"../importer/QualityImporter":169,"../importer/SpellImporter":170,"../importer/WareImporter":171,"../importer/WeaponImporter":172}],156:[function(require,module,exports){
+},{"../helper/ImportHelper":160,"../importer/AmmoImporter":164,"../importer/ArmorImporter":165,"../importer/ComplexFormImporter":166,"../importer/CritterPowerImporter":168,"../importer/DataImporter":169,"../importer/DeviceImporter":170,"../importer/EquipmentImporter":171,"../importer/ModImporter":172,"../importer/QualityImporter":173,"../importer/SpellImporter":174,"../importer/WareImporter":175,"../importer/WeaponImporter":176}],160:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -24814,16 +25982,14 @@ class ImportHelper {
 exports.ImportHelper = ImportHelper;
 ImportHelper.CHAR_KEY = '_TEXT';
 ImportHelper.s_Strategy = new XMLStrategy_1.XMLStrategy();
-
-},{"../importer/Constants":163,"./JSONStrategy":158,"./XMLStrategy":159}],157:[function(require,module,exports){
+},{"../importer/Constants":167,"./JSONStrategy":162,"./XMLStrategy":163}],161:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ImportStrategy = void 0;
 class ImportStrategy {
 }
 exports.ImportStrategy = ImportStrategy;
-
-},{}],158:[function(require,module,exports){
+},{}],162:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JSONStrategy = void 0;
@@ -24840,8 +26006,7 @@ class JSONStrategy extends ImportStrategy_1.ImportStrategy {
     }
 }
 exports.JSONStrategy = JSONStrategy;
-
-},{"./ImportStrategy":157}],159:[function(require,module,exports){
+},{"./ImportStrategy":161}],163:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.XMLStrategy = void 0;
@@ -24889,8 +26054,7 @@ class XMLStrategy extends ImportStrategy_1.ImportStrategy {
     }
 }
 exports.XMLStrategy = XMLStrategy;
-
-},{"./ImportHelper":156,"./ImportStrategy":157}],160:[function(require,module,exports){
+},{"./ImportHelper":160,"./ImportStrategy":161}],164:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25044,8 +26208,7 @@ class AmmoImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.AmmoImporter = AmmoImporter;
-
-},{"../helper/ImportHelper":156,"./Constants":163,"./DataImporter":165}],161:[function(require,module,exports){
+},{"../helper/ImportHelper":160,"./Constants":167,"./DataImporter":169}],165:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25149,8 +26312,7 @@ class ArmorImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.ArmorImporter = ArmorImporter;
-
-},{"../helper/ImportHelper":156,"../parser/armor/ArmorParserBase":175,"./DataImporter":165}],162:[function(require,module,exports){
+},{"../helper/ImportHelper":160,"../parser/armor/ArmorParserBase":179,"./DataImporter":169}],166:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25260,8 +26422,7 @@ class ComplexFormImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.ComplexFormImporter = ComplexFormImporter;
-
-},{"../../data/DataDefaults":143,"../helper/ImportHelper":156,"../parser/complex-form/ComplexFormParserBase":176,"./Constants":163,"./DataImporter":165}],163:[function(require,module,exports){
+},{"../../data/DataDefaults":146,"../helper/ImportHelper":160,"../parser/complex-form/ComplexFormParserBase":180,"./Constants":167,"./DataImporter":169}],167:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Constants = void 0;
@@ -25482,8 +26643,7 @@ Constants.WEAPON_RANGES = {
     },
 };
 Constants.ROOT_IMPORT_FOLDER_NAME = 'SR5e';
-
-},{}],164:[function(require,module,exports){
+},{}],168:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25600,8 +26760,7 @@ class CritterPowerImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.CritterPowerImporter = CritterPowerImporter;
-
-},{"../../data/DataDefaults":143,"../helper/ImportHelper":156,"../parser/critter-power/CritterPowerParserBase":177,"./Constants":163,"./DataImporter":165}],165:[function(require,module,exports){
+},{"../../data/DataDefaults":146,"../helper/ImportHelper":160,"../parser/critter-power/CritterPowerParserBase":181,"./Constants":167,"./DataImporter":169}],169:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25663,8 +26822,7 @@ class DataImporter {
 }
 exports.DataImporter = DataImporter;
 DataImporter.unsupportedBooks = ['2050'];
-
-},{"../helper/ImportHelper":156,"xml2js":51}],166:[function(require,module,exports){
+},{"../helper/ImportHelper":160,"xml2js":51}],170:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25841,8 +26999,7 @@ class DeviceImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.DeviceImporter = DeviceImporter;
-
-},{"../helper/ImportHelper":156,"./Constants":163,"./DataImporter":165}],167:[function(require,module,exports){
+},{"../helper/ImportHelper":160,"./Constants":167,"./DataImporter":169}],171:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25957,8 +27114,7 @@ class EquipmentImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.EquipmentImporter = EquipmentImporter;
-
-},{"../helper/ImportHelper":156,"./Constants":163,"./DataImporter":165}],168:[function(require,module,exports){
+},{"../helper/ImportHelper":160,"./Constants":167,"./DataImporter":169}],172:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26065,8 +27221,7 @@ class ModImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.ModImporter = ModImporter;
-
-},{"../helper/ImportHelper":156,"../parser/mod/ModParserBase":180,"./Constants":163,"./DataImporter":165}],169:[function(require,module,exports){
+},{"../helper/ImportHelper":160,"../parser/mod/ModParserBase":184,"./Constants":167,"./DataImporter":169}],173:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26174,8 +27329,7 @@ class QualityImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.QualityImporter = QualityImporter;
-
-},{"../../data/DataDefaults":143,"../helper/ImportHelper":156,"../parser/quality/QualityParserBase":181,"./DataImporter":165}],170:[function(require,module,exports){
+},{"../../data/DataDefaults":146,"../helper/ImportHelper":160,"../parser/quality/QualityParserBase":185,"./DataImporter":169}],174:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26316,8 +27470,7 @@ class SpellImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.SpellImporter = SpellImporter;
-
-},{"../../data/DataDefaults":143,"../helper/ImportHelper":156,"../parser/ParserMap":174,"../parser/spell/CombatSpellParser":182,"../parser/spell/DetectionSpellImporter":183,"../parser/spell/IllusionSpellParser":184,"../parser/spell/ManipulationSpellParser":185,"../parser/spell/SpellParserBase":186,"./DataImporter":165}],171:[function(require,module,exports){
+},{"../../data/DataDefaults":146,"../helper/ImportHelper":160,"../parser/ParserMap":178,"../parser/spell/CombatSpellParser":186,"../parser/spell/DetectionSpellImporter":187,"../parser/spell/IllusionSpellParser":188,"../parser/spell/ManipulationSpellParser":189,"../parser/spell/SpellParserBase":190,"./DataImporter":169}],175:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26474,8 +27627,7 @@ class WareImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.WareImporter = WareImporter;
-
-},{"../../data/DataDefaults":143,"../helper/ImportHelper":156,"../parser/ware/CyberwareParser":187,"./DataImporter":165}],172:[function(require,module,exports){
+},{"../../data/DataDefaults":146,"../helper/ImportHelper":160,"../parser/ware/CyberwareParser":191,"./DataImporter":169}],176:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26656,16 +27808,14 @@ class WeaponImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.WeaponImporter = WeaponImporter;
-
-},{"../../data/DataDefaults":143,"../helper/ImportHelper":156,"../parser/ParserMap":174,"../parser/weapon/MeleeParser":188,"../parser/weapon/RangedParser":189,"../parser/weapon/ThrownParser":190,"../parser/weapon/WeaponParserBase":191,"./Constants":163,"./DataImporter":165}],173:[function(require,module,exports){
+},{"../../data/DataDefaults":146,"../helper/ImportHelper":160,"../parser/ParserMap":178,"../parser/weapon/MeleeParser":192,"../parser/weapon/RangedParser":193,"../parser/weapon/ThrownParser":194,"../parser/weapon/WeaponParserBase":195,"./Constants":167,"./DataImporter":169}],177:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
 class Parser {
 }
 exports.Parser = Parser;
-
-},{}],174:[function(require,module,exports){
+},{}],178:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ParserMap = void 0;
@@ -26698,8 +27848,7 @@ class ParserMap extends Parser_1.Parser {
     }
 }
 exports.ParserMap = ParserMap;
-
-},{"../helper/ImportHelper":156,"./Parser":173}],175:[function(require,module,exports){
+},{"../helper/ImportHelper":160,"./Parser":177}],179:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ArmorParserBase = void 0;
@@ -26714,8 +27863,7 @@ class ArmorParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBas
     }
 }
 exports.ArmorParserBase = ArmorParserBase;
-
-},{"../../helper/ImportHelper":156,"../item/TechnologyItemParserBase":179}],176:[function(require,module,exports){
+},{"../../helper/ImportHelper":160,"../item/TechnologyItemParserBase":183}],180:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ComplexFormParserBase = void 0;
@@ -26762,8 +27910,7 @@ class ComplexFormParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.ComplexFormParserBase = ComplexFormParserBase;
-
-},{"../../helper/ImportHelper":156,"../item/ItemParserBase":178}],177:[function(require,module,exports){
+},{"../../helper/ImportHelper":160,"../item/ItemParserBase":182}],181:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CritterPowerParserBase = void 0;
@@ -26822,8 +27969,7 @@ class CritterPowerParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.CritterPowerParserBase = CritterPowerParserBase;
-
-},{"../../helper/ImportHelper":156,"../item/ItemParserBase":178}],178:[function(require,module,exports){
+},{"../../helper/ImportHelper":160,"../item/ItemParserBase":182}],182:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemParserBase = void 0;
@@ -26842,8 +27988,7 @@ class ItemParserBase extends Parser_1.Parser {
     }
 }
 exports.ItemParserBase = ItemParserBase;
-
-},{"../../helper/ImportHelper":156,"../Parser":173}],179:[function(require,module,exports){
+},{"../../helper/ImportHelper":160,"../Parser":177}],183:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TechnologyItemParserBase = void 0;
@@ -26859,8 +28004,7 @@ class TechnologyItemParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.TechnologyItemParserBase = TechnologyItemParserBase;
-
-},{"../../helper/ImportHelper":156,"./ItemParserBase":178}],180:[function(require,module,exports){
+},{"../../helper/ImportHelper":160,"./ItemParserBase":182}],184:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ModParserBase = void 0;
@@ -26878,8 +28022,7 @@ class ModParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBase 
     }
 }
 exports.ModParserBase = ModParserBase;
-
-},{"../../helper/ImportHelper":156,"../item/TechnologyItemParserBase":179}],181:[function(require,module,exports){
+},{"../../helper/ImportHelper":160,"../item/TechnologyItemParserBase":183}],185:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.QualityParserBase = void 0;
@@ -26899,8 +28042,7 @@ class QualityParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.QualityParserBase = QualityParserBase;
-
-},{"../../helper/ImportHelper":156,"../item/ItemParserBase":178}],182:[function(require,module,exports){
+},{"../../helper/ImportHelper":160,"../item/ItemParserBase":182}],186:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CombatSpellParser = void 0;
@@ -26925,8 +28067,7 @@ class CombatSpellParser extends SpellParserBase_1.SpellParserBase {
     }
 }
 exports.CombatSpellParser = CombatSpellParser;
-
-},{"../../helper/ImportHelper":156,"./SpellParserBase":186}],183:[function(require,module,exports){
+},{"../../helper/ImportHelper":160,"./SpellParserBase":190}],187:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DetectionSpellImporter = void 0;
@@ -26963,8 +28104,7 @@ class DetectionSpellImporter extends SpellParserBase_1.SpellParserBase {
     }
 }
 exports.DetectionSpellImporter = DetectionSpellImporter;
-
-},{"../../helper/ImportHelper":156,"./SpellParserBase":186}],184:[function(require,module,exports){
+},{"../../helper/ImportHelper":160,"./SpellParserBase":190}],188:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IllusionSpellParser = void 0;
@@ -26995,8 +28135,7 @@ class IllusionSpellParser extends SpellParserBase_1.SpellParserBase {
     }
 }
 exports.IllusionSpellParser = IllusionSpellParser;
-
-},{"../../helper/ImportHelper":156,"./SpellParserBase":186}],185:[function(require,module,exports){
+},{"../../helper/ImportHelper":160,"./SpellParserBase":190}],189:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ManipulationSpellParser = void 0;
@@ -27035,8 +28174,7 @@ class ManipulationSpellParser extends SpellParserBase_1.SpellParserBase {
     }
 }
 exports.ManipulationSpellParser = ManipulationSpellParser;
-
-},{"../../helper/ImportHelper":156,"./SpellParserBase":186}],186:[function(require,module,exports){
+},{"../../helper/ImportHelper":160,"./SpellParserBase":190}],190:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpellParserBase = void 0;
@@ -27096,8 +28234,7 @@ class SpellParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.SpellParserBase = SpellParserBase;
-
-},{"../../helper/ImportHelper":156,"../item/ItemParserBase":178}],187:[function(require,module,exports){
+},{"../../helper/ImportHelper":160,"../item/ItemParserBase":182}],191:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CyberwareParser = void 0;
@@ -27118,8 +28255,7 @@ class CyberwareParser extends TechnologyItemParserBase_1.TechnologyItemParserBas
     }
 }
 exports.CyberwareParser = CyberwareParser;
-
-},{"../../helper/ImportHelper":156,"../item/TechnologyItemParserBase":179}],188:[function(require,module,exports){
+},{"../../helper/ImportHelper":160,"../item/TechnologyItemParserBase":183}],192:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MeleeParser = void 0;
@@ -27166,8 +28302,7 @@ class MeleeParser extends WeaponParserBase_1.WeaponParserBase {
     }
 }
 exports.MeleeParser = MeleeParser;
-
-},{"../../../data/DataDefaults":143,"../../helper/ImportHelper":156,"./WeaponParserBase":191}],189:[function(require,module,exports){
+},{"../../../data/DataDefaults":146,"../../helper/ImportHelper":160,"./WeaponParserBase":195}],193:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RangedParser = void 0;
@@ -27227,8 +28362,7 @@ class RangedParser extends WeaponParserBase_1.WeaponParserBase {
     }
 }
 exports.RangedParser = RangedParser;
-
-},{"../../../data/DataDefaults":143,"../../helper/ImportHelper":156,"../../importer/Constants":163,"./WeaponParserBase":191}],190:[function(require,module,exports){
+},{"../../../data/DataDefaults":146,"../../helper/ImportHelper":160,"../../importer/Constants":167,"./WeaponParserBase":195}],194:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ThrownParser = void 0;
@@ -27327,8 +28461,7 @@ class ThrownParser extends WeaponParserBase_1.WeaponParserBase {
     }
 }
 exports.ThrownParser = ThrownParser;
-
-},{"../../../data/DataDefaults":143,"../../helper/ImportHelper":156,"../../importer/Constants":163,"./WeaponParserBase":191}],191:[function(require,module,exports){
+},{"../../../data/DataDefaults":146,"../../helper/ImportHelper":160,"../../importer/Constants":167,"./WeaponParserBase":195}],195:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WeaponParserBase = void 0;
@@ -27393,8 +28526,7 @@ class WeaponParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBa
     }
 }
 exports.WeaponParserBase = WeaponParserBase;
-
-},{"../../helper/ImportHelper":156,"../../importer/Constants":163,"../item/TechnologyItemParserBase":179}],192:[function(require,module,exports){
+},{"../../helper/ImportHelper":160,"../../importer/Constants":167,"../item/TechnologyItemParserBase":183}],196:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatData = void 0;
@@ -27744,8 +28876,7 @@ exports.ChatData = {
         }
     },
 };
-
-},{"../config":141,"../helpers":153}],193:[function(require,module,exports){
+},{"../config":144,"../helpers":157}],197:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27770,6 +28901,9 @@ const PartsList_1 = require("../parts/PartsList");
 const ActionFlow_1 = require("./flows/ActionFlow");
 const SkillFlow_1 = require("../actor/flows/SkillFlow");
 const config_1 = require("../config");
+const DataDefaults_1 = require("../data/DataDefaults");
+const HostPrep_1 = require("./prep/HostPrep");
+const MatrixRules_1 = require("../rules/MatrixRules");
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
  *
@@ -28038,6 +29172,12 @@ class SR5Item extends Item {
         const adeptPower = this.asAdeptPowerData();
         if (adeptPower) {
             adeptPower.data.type = adeptPower.data.action.type ? 'active' : 'passive';
+        }
+        // Switch item data preparation between types...
+        // ... this is ongoing work to clean up SR5item.prepareData
+        switch (this.data.type) {
+            case 'host':
+                HostPrep_1.HostDataPreparation(this.data.data);
         }
     }
     postItemCard() {
@@ -28414,6 +29554,14 @@ class SR5Item extends Item {
     asAdeptPowerData() {
         if (this.isAdeptPower())
             return this.data;
+    }
+    isHost() {
+        return this.data.type === 'host';
+    }
+    asHostData() {
+        if (this.isHost()) {
+            return this.data;
+        }
     }
     removeLicense(index) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -29112,6 +30260,55 @@ class SR5Item extends Item {
             return true;
         return false;
     }
+    /**
+     * A host type item can store IC actors to spawn in order, use this method to add into that.
+     * @param id An IC type actor id to fetch the actor with.
+     * @param pack Optional pack collection to fetch from
+     */
+    addIC(id, pack = null) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const hostData = this.asHostData();
+            if (!hostData || !id)
+                return;
+            // Check if actor exists before adding.
+            const actor = (pack ? yield helpers_1.Helpers.getEntityFromCollection(pack, id) : game.actors.get(id));
+            if (!actor || !actor.isIC()) {
+                console.error(`Provided actor id ${id} doesn't exist (with pack collection '${pack}') or isn't an IC type`);
+                return;
+            }
+            const icData = actor.asICData();
+            if (!icData)
+                return;
+            // Add IC to the hosts IC order
+            const sourceEntity = DataDefaults_1.DefaultValues.sourceEntityData({
+                id: actor.id,
+                name: actor.name,
+                type: 'Actor',
+                pack,
+                // Custom fields for IC
+                data: { icType: icData.data.icType },
+            });
+            hostData.data.ic.push(sourceEntity);
+            yield this.update({ 'data.ic': hostData.data.ic });
+        });
+    }
+    /**
+     * A host type item can contain IC in an order. Use this function remove IC at the said position
+     * @param index The position in the IC order to be removed
+     */
+    removeIC(index) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (isNaN(index) || index < 0)
+                return;
+            const hostData = this.asHostData();
+            if (!hostData)
+                return;
+            if (hostData.data.ic.length <= index)
+                return;
+            hostData.data.ic.splice(index, 1);
+            yield this.update({ 'data.ic': hostData.data.ic });
+        });
+    }
     get _isEmbeddedItem() {
         // @ts-ignore // TODO: foundry-vtt-types 0.8 Document hasn't be implemented yet
         return this.hasOwnProperty('parent') && this.parent instanceof SR5Item;
@@ -29149,10 +30346,87 @@ class SR5Item extends Item {
             return yield _super.update.call(this, data, options);
         });
     }
+    /**
+     * Place a Matrix Mark for this Item.
+     *
+     * @param target The Document the marks are placed on. This can be an actor (character, technomancer, IC) OR an item (Host)
+     * @param marks Amount of marks to be placed.
+     * @param options Additional options that may be needed.
+     * @param options.scene The scene the targeted actor lives on.
+     * @param options.item
+     *
+     * TODO: It might be useful to create a 'MatrixDocument' class sharing matrix methods to avoid duplication between
+     *       SR5Item and SR5Actor.
+     */
+    setMarks(target, marks, options) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!canvas.ready)
+                return;
+            if (!this.isHost()) {
+                console.error('Only Host item types can place matrix marks!');
+                return;
+            }
+            if (!MatrixRules_1.MatrixRules.isValidMarksCount(marks)) {
+                ui.notifications.error(game.i18n.localize('SR5.Errors.MarkCouldNotBePlaced'));
+                console.error('To many or to little matrix marks');
+                return;
+            }
+            // Both scene and item are optional.
+            const scene = (options === null || options === void 0 ? void 0 : options.scene) || canvas.scene;
+            // TODO: IF no item given use the actor matrix item.
+            const item = (options === null || options === void 0 ? void 0 : options.item) || target.getMatrixDevice();
+            // Build the markId string. If no item has been given, there still will be a third split element.
+            // Use Helpers.deconstructMarkId to get the elements.
+            const markId = helpers_1.Helpers.buildMarkId(scene.id, target.id, item === null || item === void 0 ? void 0 : item.id);
+            const hostData = this.asHostData();
+            hostData.data.marks[markId] = marks;
+            yield this.update({ 'data.marks': hostData.data.marks });
+        });
+    }
+    /**
+     * Receive the marks placed on either the given target as a whole or one it's owned items.
+     *
+     * @param target
+     * @param item
+     * @param options
+     *
+     * TODO: Check with technomancers....
+     *
+     * @return Will always return a number. At least zero, for no marks placed.
+     */
+    getMarks(target, item, options) {
+        if (!canvas.ready)
+            return;
+        if (!this.isHost())
+            return 0;
+        // Scene is optional.
+        const scene = (options === null || options === void 0 ? void 0 : options.scene) || canvas.scene;
+        item = item || target.getMatrixDevice();
+        const markId = helpers_1.Helpers.buildMarkId(scene.id, target.id, item.id);
+        const hostData = this.asHostData();
+        return hostData.data.marks[markId] || 0;
+    }
+    /**
+     * Remove ALL marks placed by this item.
+     *
+     * TODO: Allow partial deletion based on target / item
+     */
+    clearMarks() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isHost())
+                return;
+            const data = this.asHostData();
+            // Delete all markId properties from ActorData
+            const updateData = {};
+            for (const markId of Object.keys(data.data.marks)) {
+                updateData[`-=${markId}`] = null;
+            }
+            yield this.update({ 'data.marks': updateData });
+        });
+    }
 }
 exports.SR5Item = SR5Item;
-
-},{"../actor/SR5Actor":85,"../actor/flows/SkillFlow":88,"../apps/dialogs/ShadowrunItemDialog":132,"../chat":139,"../config":141,"../constants":142,"../data/SR5ItemDataWrapper":145,"../helpers":153,"../parts/PartsList":204,"../rolls/ShadowrunRoller":205,"./ChatData":192,"./flows/ActionFlow":195}],194:[function(require,module,exports){
+},{"../actor/SR5Actor":85,"../actor/flows/SkillFlow":88,"../apps/dialogs/ShadowrunItemDialog":135,"../chat":142,"../config":144,"../constants":145,"../data/DataDefaults":146,"../data/SR5ItemDataWrapper":148,"../helpers":157,"../parts/PartsList":209,"../rolls/ShadowrunRoller":210,"../rules/MatrixRules":212,"./ChatData":196,"./flows/ActionFlow":199,"./prep/HostPrep":200}],198:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -29167,6 +30441,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ItemSheet = void 0;
 const helpers_1 = require("../helpers");
 const config_1 = require("../config");
+const effects_1 = require("../effects");
 /**
  * Extend the basic ItemSheet with some very simple modifications
  */
@@ -29202,70 +30477,74 @@ class SR5ItemSheet extends ItemSheet {
      * The prepared data object contains both the actor data as well as additional sheet options
      */
     getData() {
-        const _super = Object.create(null, {
-            getData: { get: () => super.getData }
-        });
-        return __awaiter(this, void 0, void 0, function* () {
-            const data = yield _super.getData.call(this);
-            // Foundry 0.8 will return data as an sheet data while Foundry 0.7 will return data as an item data.
-            // Therefore data is nested one deeper. The alternative would be to rework all references with one more data...
-            data.data = data.data.data;
-            const itemData = data.data;
-            if (itemData.action) {
-                try {
-                    const { action } = itemData;
-                    if (action.mod === 0)
-                        delete action.mod;
-                    if (action.limit === 0)
-                        delete action.limit;
-                    if (action.damage) {
-                        if (action.damage.mod === 0)
-                            delete action.damage.mod;
-                        if (action.damage.ap.mod === 0)
-                            delete action.damage.ap.mod;
-                    }
-                    if (action.limit) {
-                        if (action.limit.mod === 0)
-                            delete action.limit.mod;
-                    }
+        let data = super.getData();
+        // Foundry 0.8 will return data as an sheet data while Foundry 0.7 will return data as an item data.
+        // Therefore data is nested one deeper. The alternative would be to rework all references with one more data...
+        data.type = data.data.type;
+        data.data = data.data.data;
+        const itemData = data.data;
+        // data = {
+        //     ...data,
+        //     // @ts-ignore
+        //     data: data.data.data
+        // }
+        if (itemData.action) {
+            try {
+                const { action } = itemData;
+                if (action.mod === 0)
+                    delete action.mod;
+                if (action.limit === 0)
+                    delete action.limit;
+                if (action.damage) {
+                    if (action.damage.mod === 0)
+                        delete action.damage.mod;
+                    if (action.damage.ap.mod === 0)
+                        delete action.damage.ap.mod;
                 }
-                catch (e) {
-                    console.error(e);
+                if (action.limit) {
+                    if (action.limit.mod === 0)
+                        delete action.limit.mod;
                 }
             }
-            if (itemData.technology) {
-                try {
-                    const tech = itemData.technology;
-                    if (tech.rating === 0)
-                        delete tech.rating;
-                    if (tech.quantity === 0)
-                        delete tech.quantity;
-                    if (tech.cost === 0)
-                        delete tech.cost;
-                }
-                catch (e) {
-                    console.log(e);
-                }
+            catch (e) {
+                console.error(e);
             }
-            data['config'] = config_1.SR5;
-            const items = this.getEmbeddedItems();
-            const [ammunition, weaponMods, armorMods] = items.reduce((parts, item) => {
-                if (item.type === 'ammo')
-                    parts[0].push(item.data);
-                if (item.type === 'modification' && "type" in item.data.data && item.data.data.type === 'weapon')
-                    parts[1].push(item.data);
-                if (item.type === 'modification' && "type" in item.data.data && item.data.data.type === 'armor')
-                    parts[2].push(item.data);
-                return parts;
-            }, [[], [], []]);
-            data['ammunition'] = ammunition;
-            data['weaponMods'] = weaponMods;
-            data['armorMods'] = armorMods;
-            data['activeSkills'] = this._getSortedActiveSkillsForSelect();
-            data['attributes'] = this._getSortedAttributesForSelect();
-            data['limits'] = this._getSortedLimitsForSelect();
-            return data;
-        });
+        }
+        if (itemData.technology) {
+            try {
+                const tech = itemData.technology;
+                if (tech.rating === 0)
+                    delete tech.rating;
+                if (tech.quantity === 0)
+                    delete tech.quantity;
+                if (tech.cost === 0)
+                    delete tech.cost;
+            }
+            catch (e) {
+                console.log(e);
+            }
+        }
+        data['config'] = config_1.SR5;
+        const items = this.getEmbeddedItems();
+        const [ammunition, weaponMods, armorMods] = items.reduce((parts, item) => {
+            if (item.type === 'ammo')
+                parts[0].push(item.data);
+            if (item.type === 'modification' && "type" in item.data.data && item.data.data.type === 'weapon')
+                parts[1].push(item.data);
+            if (item.type === 'modification' && "type" in item.data.data && item.data.data.type === 'armor')
+                parts[2].push(item.data);
+            return parts;
+        }, [[], [], []]);
+        data['ammunition'] = ammunition;
+        data['weaponMods'] = weaponMods;
+        data['armorMods'] = armorMods;
+        data['activeSkills'] = this._getSortedActiveSkillsForSelect();
+        data['attributes'] = this._getSortedAttributesForSelect();
+        data['limits'] = this._getSortedLimitsForSelect();
+        // Active Effects data.
+        // @ts-ignore // TODO: foundry-vtt-types 0.8 missing document support
+        data['effects'] = effects_1.prepareActiveEffectCategories(this.document.effects);
+        return data;
     }
     /**
      * Action limits currently contain limits for all action types. Be it matrix, magic or physical.
@@ -29305,22 +30584,20 @@ class SR5ItemSheet extends ItemSheet {
      */
     activateListeners(html) {
         super.activateListeners(html);
-        if (this.item.type === 'weapon') {
-            //@ts-ignore // TODO: Somehow Jquery doesn't have drag/drop in typing
-            this.form.ondragover = (event) => this._onDragOver(event);
-            //@ts-ignore // TODO: Somehow Jquery doesn't have drag/drop in typing
-            this.form.ondrop = (event) => this._onDrop(event);
-        }
-        html.find('.add-new-ammo').click(this._onAddNewAmmo.bind(this));
-        html.find('.ammo-equip').click(this._onAmmoEquip.bind(this));
-        html.find('.ammo-delete').click(this._onAmmoRemove.bind(this));
-        html.find('.ammo-reload').click(this._onAmmoReload.bind(this));
+        /**
+         * Drag and Drop Handling
+         */
+        //@ts-ignore
+        this.form.ondragover = (event) => this._onDragOver(event);
+        //@ts-ignore
+        this.form.ondrop = (event) => this._onDrop(event);
+        // Active Effect management
+        // @ts-ignore // foundry-vtt-types 0.8 document support missing.
+        html.find(".effect-control").click(event => effects_1.onManageActiveEffect(event, this.document));
+        /**
+         * General item handling
+         */
         html.find('.edit-item').click(this._onEditItem.bind(this));
-        html.find('.add-new-mod').click(this._onAddWeaponMod.bind(this));
-        html.find('.mod-equip').click(this._onWeaponModEquip.bind(this));
-        html.find('.mod-delete').click(this._onWeaponModRemove.bind(this));
-        html.find('.add-new-license').click(this._onAddLicense.bind(this));
-        html.find('.license-delete').on('click', this._onRemoveLicense.bind(this));
         html.find('.open-source-pdf').on('click', this._onOpenSourcePdf.bind(this));
         html.find('.has-desc').click((event) => {
             event.preventDefault();
@@ -29336,56 +30613,70 @@ class SR5ItemSheet extends ItemSheet {
             }
         });
         html.find('.hidden').hide();
+        html.find('.entity-remove').on('click', this._onEntityRemove.bind(this));
+        /**
+         * Weapon item specific
+         */
+        html.find('.add-new-ammo').click(this._onAddNewAmmo.bind(this));
+        html.find('.ammo-equip').click(this._onAmmoEquip.bind(this));
+        html.find('.ammo-delete').click(this._onAmmoRemove.bind(this));
+        html.find('.ammo-reload').click(this._onAmmoReload.bind(this));
+        html.find('.add-new-mod').click(this._onAddWeaponMod.bind(this));
+        html.find('.mod-equip').click(this._onWeaponModEquip.bind(this));
+        html.find('.mod-delete').click(this._onWeaponModRemove.bind(this));
+        /**
+         * SIN item specific
+         */
+        html.find('.add-new-license').click(this._onAddLicense.bind(this));
+        html.find('.license-delete').on('click', this._onRemoveLicense.bind(this));
     }
     _onDragOver(event) {
         event.preventDefault();
         return false;
     }
     _onDrop(event) {
-        var _a, _b, _c;
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
             event.stopPropagation();
+            // Parse drop data.
             let data;
             try {
                 data = JSON.parse(event.dataTransfer.getData('text/plain'));
-                if (data.type !== 'Item') {
-                    console.log('Shadowrun5e | Can only drop Items');
-                }
             }
             catch (err) {
                 console.log('Shadowrun5e | drop error');
+                return;
             }
-            let item;
-            // Case 1 - Data explicitly provided
-            if (data.data) {
-                // TODO test
-                if (this.item.isOwned && data.actorId === ((_a = this.item.actor) === null || _a === void 0 ? void 0 : _a._id) && data.data._id === this.item._id) {
-                    console.log('Shadowrun5e | Cant drop item on itself');
-                    // @ts-ignore
-                    (_b = ui.notifications) === null || _b === void 0 ? void 0 : _b.error('Are you trying to break the game??');
+            if (!data)
+                return;
+            if (this.item.isWeapon() && data.type === 'Item') {
+                let item;
+                // Case 1 - Data explicitly provided
+                if (data.data) {
+                    // TODO test
+                    if (this.item.isOwned && data.actorId === ((_a = this.item.actor) === null || _a === void 0 ? void 0 : _a._id) && data.data._id === this.item._id) {
+                        // @ts-ignore
+                        ui.notifications.error('Are you trying to break the game??');
+                        return;
+                    }
+                    item = data;
+                    // Case 2 - From a Compendium Pack
                 }
-                item = data;
+                else if (data.pack) {
+                    item = yield helpers_1.Helpers.getEntityFromCollection(data.pack, data.id);
+                    // Case 3 - From a World Entity
+                }
+                else {
+                    item = game.items.get(data.id);
+                }
+                yield this.item.createOwnedItem(item.data);
+                return;
             }
-            else if (data.pack) {
-                console.log(data);
-                // Case 2 - From a Compendium Pack
-                // TODO test
-                item = yield this._getItemFromCollection(data.pack, data.id);
+            if (this.item.isHost() && data.type === 'Actor') {
+                yield this.item.addIC(data.id, data.pack);
             }
-            else {
-                // Case 3 - From a World Entity
-                item = (_c = game.items) === null || _c === void 0 ? void 0 : _c.get(data.id);
-            }
-            this.item.createOwnedItem(item.data);
         });
-    }
-    _getItemFromCollection(collection, itemId) {
-        var _a;
-        const pack = (_a = game.packs) === null || _a === void 0 ? void 0 : _a.find((p) => p.collection === collection);
-        if (!pack)
-            return;
-        return pack.getEntity(itemId);
     }
     _eventId(event) {
         event.preventDefault();
@@ -29402,6 +30693,23 @@ class SR5ItemSheet extends ItemSheet {
             const item = this.item.getOwnedItem(this._eventId(event));
             if (item) {
                 item.sheet.render(true);
+            }
+        });
+    }
+    _onEntityRemove(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            // Grab the data position to remove the correct entity from the list.
+            const entityRemove = $(event.currentTarget).closest('.entity-remove');
+            const list = entityRemove.data('list');
+            const position = entityRemove.data('position');
+            if (!list)
+                return;
+            switch (list) {
+                // Handle Host item lists...
+                case 'ic':
+                    yield this.item.removeIC(position);
+                    break;
             }
         });
     }
@@ -29541,8 +30849,7 @@ class SR5ItemSheet extends ItemSheet {
     }
 }
 exports.SR5ItemSheet = SR5ItemSheet;
-
-},{"../config":141,"../helpers":153}],195:[function(require,module,exports){
+},{"../config":144,"../effects":149,"../helpers":157}],199:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ActionFlow = void 0;
@@ -29583,8 +30890,36 @@ class ActionFlow {
     }
 }
 exports.ActionFlow = ActionFlow;
-
-},{"../../helpers":153}],196:[function(require,module,exports){
+},{"../../helpers":157}],200:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.HostPrep = exports.HostDataPreparation = void 0;
+const MatrixRules_1 = require("../../rules/MatrixRules");
+function HostDataPreparation(data) {
+    HostPrep.setDeviceCategory(data);
+    HostPrep.prepareMatrixAttributes(data);
+}
+exports.HostDataPreparation = HostDataPreparation;
+class HostPrep {
+    static setDeviceCategory(data) {
+        // Host matrix 'devices' are always hosts and never commlink / cyberdecks.
+        data.category = 'host';
+    }
+    /**
+     * Apply host matrix attribute rating.
+     * @param data
+     */
+    static prepareMatrixAttributes(data) {
+        const hostAttributeRatings = MatrixRules_1.MatrixRules.hostMatrixAttributeRatings(data.rating);
+        Object.values(data.atts).forEach(attribute => {
+            attribute.value = hostAttributeRatings.pop();
+            // Disallow editing on the item sheet, since the value is derived.
+            attribute.editable = false;
+        });
+    }
+}
+exports.HostPrep = HostPrep;
+},{"../../rules/MatrixRules":212}],201:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -29705,8 +31040,7 @@ function rollSkillMacro(skillLabel) {
     });
 }
 exports.rollSkillMacro = rollSkillMacro;
-
-},{"./helpers":153}],197:[function(require,module,exports){
+},{"./helpers":157}],202:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const HandlebarManager_1 = require("./handlebars/HandlebarManager");
@@ -29716,8 +31050,7 @@ const hooks_1 = require("./hooks");
 /* -------------------------------------------- */
 hooks_1.HooksManager.registerHooks();
 HandlebarManager_1.HandlebarManager.registerHelpers();
-
-},{"./handlebars/HandlebarManager":148,"./hooks":154}],198:[function(require,module,exports){
+},{"./handlebars/HandlebarManager":152,"./hooks":158}],203:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -29865,8 +31198,7 @@ Migrator.s_Versions = [
     { versionNumber: Version0_6_10_1.Version0_6_10.TargetVersion, migration: new Version0_6_10_1.Version0_6_10() },
     { versionNumber: Version0_7_2_1.Version0_7_2.TargetVersion, migration: new Version0_7_2_1.Version0_7_2() },
 ];
-
-},{"./VersionMigration":199,"./versions/LegacyMigration":200,"./versions/Version0_6_10":201,"./versions/Version0_6_5":202,"./versions/Version0_7_2":203}],199:[function(require,module,exports){
+},{"./VersionMigration":204,"./versions/LegacyMigration":205,"./versions/Version0_6_10":206,"./versions/Version0_6_5":207,"./versions/Version0_7_2":208}],204:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -30295,8 +31627,7 @@ exports.VersionMigration = VersionMigration;
 VersionMigration.MODULE_NAME = 'shadowrun5e';
 VersionMigration.KEY_DATA_VERSION = 'systemMigrationVersion';
 VersionMigration.NO_VERSION = '0';
-
-},{}],200:[function(require,module,exports){
+},{}],205:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -30525,8 +31856,7 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
     }
 }
 exports.LegacyMigration = LegacyMigration;
-
-},{"../VersionMigration":199}],201:[function(require,module,exports){
+},{"../VersionMigration":204}],206:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -30586,8 +31916,7 @@ class Version0_6_10 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_6_10 = Version0_6_10;
-
-},{"../VersionMigration":199}],202:[function(require,module,exports){
+},{"../VersionMigration":204}],207:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -30637,8 +31966,7 @@ class Version0_6_5 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_6_5 = Version0_6_5;
-
-},{"../VersionMigration":199}],203:[function(require,module,exports){
+},{"../VersionMigration":204}],208:[function(require,module,exports){
 "use strict";
 // TODO: How to trigger test migration.
 // TODO: How to test migration results?
@@ -30715,8 +32043,7 @@ class Version0_7_2 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_7_2 = Version0_7_2;
-
-},{"../../config":141,"../VersionMigration":199}],204:[function(require,module,exports){
+},{"../../config":144,"../VersionMigration":204}],209:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PartsList = void 0;
@@ -30819,8 +32146,7 @@ class PartsList {
     }
 }
 exports.PartsList = PartsList;
-
-},{}],205:[function(require,module,exports){
+},{}],210:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -30907,6 +32233,7 @@ class ShadowrunRoller {
             const previewTemplate = item.hasTemplate;
             const description = item.getChatData();
             const tests = item.getOpposedTests();
+            const action = item.getAction();
             const modifiers = yield actor.getModifiers();
             // Prepare the roll and dialog.
             const advancedRollProps = {
@@ -30942,7 +32269,7 @@ class ShadowrunRoller {
             const targets = helpers_1.Helpers.getUserTargets();
             // Allow for direct defense without token selection for ONE token targeted.
             const target = targets.length === 1 ? targets[0] : undefined;
-            const rollChatOptions = { title, roll, actor, item, attack, previewTemplate, targets, target, description, tests };
+            const rollChatOptions = { title, roll, actor, item, attack, previewTemplate, targets, target, description, tests, action };
             yield chat_1.createRollChatMessage(rollChatOptions);
             if (tests) {
                 const targetChatOptions = { actor, item, tests, roll, attack };
@@ -31205,8 +32532,7 @@ class ShadowrunRoller {
     }
 }
 exports.ShadowrunRoller = ShadowrunRoller;
-
-},{"../apps/dialogs/ShadowrunTestDialog":133,"../chat":139,"../constants":142,"../helpers":153,"../parts/PartsList":204}],206:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunTestDialog":136,"../chat":142,"../constants":145,"../helpers":157,"../parts/PartsList":209}],211:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CombatRules = void 0;
@@ -31250,8 +32576,72 @@ class CombatRules {
     }
 }
 exports.CombatRules = CombatRules;
-
-},{"../constants":142}],207:[function(require,module,exports){
+},{"../constants":145}],212:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MatrixRules = void 0;
+const constants_1 = require("../constants");
+class MatrixRules {
+    /**
+     * Calculate the matrix condition monitor based on SR5#228 'Matrix Damage'
+     *
+     * The result is round up as for physical and stun monitor (SR5#101), even though it's not specified for
+     * matrix monitors specifically.
+     *
+     * @param deviceRating The device rating of the matrix device for the condition monitor.
+     * @return The condition max condition monitor value
+     */
+    static getConditionMonitor(deviceRating) {
+        deviceRating = Math.max(deviceRating, constants_1.SR.attributes.ranges.host_rating.min);
+        return Math.ceil(8 + (deviceRating / 2));
+    }
+    /**
+     * Derive the IC device rating based of it's hosts rating based on SR5#247 'Intrusion Countermeasures'
+     *
+     */
+    static getICDeviceRating(hostRating) {
+        return Math.max(hostRating, constants_1.SR.attributes.ranges.host_rating.min);
+    }
+    /**
+     * Derive the IC initiative base value of it's host based on SR5#230 'Hot-SIM VR' and SR5#247 'Intrusion Countermeasures'
+     *
+     * @param hostRating A positive host rating.
+     */
+    static getICInitiativeBase(hostRating) {
+        return Math.max(hostRating * 2, constants_1.SR.attributes.ranges.host_rating.min);
+    }
+    /**
+     * Get the amount of initiative dice IC has based on SR5#247 'Intrusion Countermeasures'
+     *
+     */
+    static getICInitiativeDice() {
+        return Math.max(constants_1.SR.initiatives.ic.dice, constants_1.SR.initiatives.ranges.dice.min);
+    }
+    /**
+     * Derive the base value of any meat attribute an IC uses based on SR5#237 'Matrix actions', SR5#256 'Agents'
+     * and SR5#247 'Intrusion Countermeasures'
+     *
+     */
+    static getICMeatAttributeBase(hostRating) {
+        return Math.max(hostRating, constants_1.SR.attributes.ranges.host_rating.min);
+    }
+    /**
+     * Determine if the count of marks (to be placed) is allowed within the rules. SR5#240 'Hack on the Fly'
+     * @param marks
+     */
+    static isValidMarksCount(marks) {
+        return marks >= 0 && marks <= 3;
+    }
+    /**
+     * Derive a hosts attributes ratings based on it's host rating. SR5#247 'Host Attributes'
+     * @param hostRating
+     */
+    static hostMatrixAttributeRatings(hostRating) {
+        return [1, 2, 3, 4].map(rating => rating + hostRating);
+    }
+}
+exports.MatrixRules = MatrixRules;
+},{"../constants":145}],213:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -31448,8 +32838,7 @@ class Modifiers {
     }
 }
 exports.Modifiers = Modifiers;
-
-},{"../constants":142}],208:[function(require,module,exports){
+},{"../constants":145}],214:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SkillRules = void 0;
@@ -31490,8 +32879,7 @@ class SkillRules {
     }
 }
 exports.SkillRules = SkillRules;
-
-},{"../constants":142}],209:[function(require,module,exports){
+},{"../constants":145}],215:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SoakRules = void 0;
@@ -31691,8 +33079,7 @@ class SoakRules {
     }
 }
 exports.SoakRules = SoakRules;
-
-},{"../config":141,"../helpers":153}],210:[function(require,module,exports){
+},{"../config":144,"../helpers":157}],216:[function(require,module,exports){
 "use strict";
 // game settings for shadowrun 5e
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -31801,8 +33188,7 @@ const registerSystemSettings = () => {
     });
 };
 exports.registerSystemSettings = registerSystemSettings;
-
-},{"./constants":142,"./migrator/VersionMigration":199}],211:[function(require,module,exports){
+},{"./constants":145,"./migrator/VersionMigration":204}],217:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -31920,20 +33306,70 @@ class Template extends MeasuredTemplate {
     }
 }
 exports.default = Template;
-
-},{}],212:[function(require,module,exports){
+},{}],218:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.quenchRegister = void 0;
 const sr5_Modifiers_spec_1 = require("./sr5.Modifiers.spec");
 const sr5_SR5Item_spec_1 = require("./sr5.SR5Item.spec");
+const sr5_Matrix_spec_1 = require("./sr5.Matrix.spec");
 const quenchRegister = quench => {
+    quench.registerBatch("shadowrun5e.rules.matrix", sr5_Matrix_spec_1.shadowrunMatrix);
     quench.registerBatch("shadowrun5e.rules.modifiers", sr5_Modifiers_spec_1.shadowrunRulesModifiers);
     quench.registerBatch("shadowrun5e.entities.items", sr5_SR5Item_spec_1.shadowrunSR5Item);
 };
 exports.quenchRegister = quenchRegister;
-
-},{"./sr5.Modifiers.spec":213,"./sr5.SR5Item.spec":214}],213:[function(require,module,exports){
+},{"./sr5.Matrix.spec":219,"./sr5.Modifiers.spec":220,"./sr5.SR5Item.spec":221}],219:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.shadowrunMatrix = void 0;
+const MatrixRules_1 = require("../module/rules/MatrixRules");
+const shadowrunMatrix = context => {
+    const { describe, it, assert, before, after } = context;
+    describe('Matrix Rules', () => {
+        it('Should calculate IC device rating', () => {
+            let hostRating = 5;
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICDeviceRating(hostRating), hostRating);
+            // Negative values shouldn't break the system.
+            hostRating = -1;
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICDeviceRating(hostRating), 0);
+        });
+        it('Should calculate IC condition monitor', () => {
+            // 8 is the minimum value possible
+            assert.strictEqual(MatrixRules_1.MatrixRules.getConditionMonitor(0), 8);
+            // Check round up
+            assert.strictEqual(MatrixRules_1.MatrixRules.getConditionMonitor(1), 9);
+            // Check no rounding
+            assert.strictEqual(MatrixRules_1.MatrixRules.getConditionMonitor(4), 10);
+            // Negative values shouldn't break the system.
+            assert.strictEqual(MatrixRules_1.MatrixRules.getConditionMonitor(-1), 8);
+        });
+        it('Should calculate IC matrix initiative base', () => {
+            // 0 is the minimum value possible
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICInitiativeBase(0), 0);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICInitiativeBase(-3), 0);
+            // Check expected value scaling
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICInitiativeBase(1), 2);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICInitiativeBase(2), 4);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICInitiativeBase(3), 6);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICInitiativeBase(12), 24);
+        });
+        it('Should calculate IC matrix initiative dice', () => {
+            // 4 is the only value possible
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICInitiativeDice(), 4);
+        });
+        it('Should calculate meat attribute base with the host rating', () => {
+            // 0 is the minimum value possible
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICMeatAttributeBase(0), 0);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICMeatAttributeBase(-3), 0);
+            // All other values should equal
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICMeatAttributeBase(3), 3);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICMeatAttributeBase(27), 27);
+        });
+    });
+};
+exports.shadowrunMatrix = shadowrunMatrix;
+},{"../module/rules/MatrixRules":212}],220:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shadowrunRulesModifiers = void 0;
@@ -32101,8 +33537,7 @@ const shadowrunRulesModifiers = context => {
     });
 };
 exports.shadowrunRulesModifiers = shadowrunRulesModifiers;
-
-},{"../module/rules/Modifiers":207}],214:[function(require,module,exports){
+},{"../module/rules/Modifiers":213}],221:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -32209,7 +33644,6 @@ const shadowrunSR5Item = context => {
     });
 };
 exports.shadowrunSR5Item = shadowrunSR5Item;
-
-},{"../module/item/SR5Item":193}]},{},[197])
+},{"../module/item/SR5Item":197}]},{},[202])
 
 //# sourceMappingURL=bundle.js.map
