@@ -34,7 +34,8 @@ export function SpiritDataPrepare(data: SpiritData, items: SR5ItemDataWrapper[])
 
     InitiativePrep.prepareCurrentInitiative(data);
 
-    this.data.special = 'magic';
+    // Spirits will always be awakened.
+    data.special = 'magic';
 }
 
 export class SpiritPrep {
