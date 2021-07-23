@@ -355,14 +355,14 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
      * Determine if an actor can choose a special trait using the special field.
      */
     get hasSpecial(): boolean {
-        return this.data.type in ['character', 'sprite', 'spirit', 'critter'];
+        return ['character', 'sprite', 'spirit', 'critter'].includes(this.data.type);
     }
 
     /**
      * Determine if an actor can choose a full defense attribute
      */
     get hasFullDefense(): boolean {
-        return this.data.type in ['character', 'vehicle', 'sprite', 'spirit', 'critter'];
+        return ['character', 'vehicle', 'sprite', 'spirit', 'critter'].includes(this.data.type);
     }
 
     /**
