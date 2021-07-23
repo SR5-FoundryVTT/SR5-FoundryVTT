@@ -53,8 +53,6 @@
   "SR5.Nuyen": "Nuyen",
   "SR5.Equipped": "Ausgerüstet",
   "SR5.Gear": "Ausrüstung",
-  "SR5.Matrix": "Matrix",
-  "SR5.Marks": "Marken",
   "SR5.PlaceMarks": "Platziere Marken",
   "SR5.Biography": "Persönliches",
   "SR5.Lifestyle": "Lebenstil",
@@ -556,6 +554,7 @@
       "SpiritConfiguration": "Geist Konfiguration",
       "CritterPowers": "Critter Kräfte",
       "Spells": "Zaubersprüche",
+      "Matrix": "Matrix",
       "SpritePowers": "Sprite Kräfte",
       "DeviceRating": "Gerätestufe",
       "RollDronePerception": "Drohnenwahrnehmung",
@@ -736,7 +735,8 @@
     "NegativeLimitValue": "Limit Werte müssen über Null liegen",
     "TokenSelectionNeeded": "Ein oder mehrere Tokens müssen ausgewählt sein",
     "SkillCantBeDefault": "Auf diese Fertigkeit kann keine Probe abgelegt werden, da sie nicht improvisiert werden kann",
-    "HostItemOnlyAcceptIC": "Nur IC Akteure können einem Host zugefügt werden"
+    "HostItemOnlyAcceptIC": "Nur IC Akteure können einem Host zugefügt werden",
+    "InvalidMarksCount": "You've trying to place a strange number of marks"
   },
   "SR5.Errors": {
     "MissingSkill": "Der Charakter verfügt nicht über die benötigte Fertigkeit.",
@@ -808,5 +808,6 @@
         "Inactive": "Inactive Effects"
       }
     }
-  }
+  },
+  "SR5.Marks": {}
 }

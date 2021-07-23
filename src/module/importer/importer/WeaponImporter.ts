@@ -60,7 +60,7 @@ export class WeaponImporter extends DataImporter {
                         description: '',
                     },
                     alt_mod: 0,
-                    dice_pool_mod: [],
+                    dice_pool_mod: []
                 },
                 technology: {
                     rating: 1,

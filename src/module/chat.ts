@@ -12,6 +12,9 @@ import ModifiedDamageData = Shadowrun.ModifiedDamageData;
 import DamageType = Shadowrun.DamageType;
 import DamageElement = Shadowrun.DamageElement;
 import CombatData = Shadowrun.CombatData;
+import ActionResultData = Shadowrun.ActionResultData;
+import {ActionTestData} from "./apps/dialogs/ShadowrunItemDialog";
+import {ActionResultFlow} from "./item/flows/ActionResultFlow";
 
 export interface RollTargetChatMessage {
     actor: SR5Actor
@@ -59,7 +62,8 @@ export interface RollChatMessageOptions {
     tests?: Test[]
     combat?: CombatData
     reach?: number
-    action?: ActionRollData
+    result?: ActionResultData
+    actionData?: ActionTestData
 }
 
 interface ItemChatTemplateData {
@@ -80,10 +84,10 @@ interface RollChatTemplateData extends RollChatMessageOptions {
 
 /**
  * The legacy chat message approach of the system uses a generic chat message to display roll and item information.
- * 
+ *
  * NOTE: This approach has been deprecated in Foundry 0.8 and should be replaced with custom Roll implementation for each kind of Roll (ActionRoll, AttackRoll, OpposedRoll, ...).
- * 
- * @param templateData An untyped object carrying data to display. The template should itself check for what properties are available and only renders what's given. 
+ *
+ * @param templateData An untyped object carrying data to display. The template should itself check for what properties are available and only renders what's given.
  */
 async function createChatMessage(templateData, options?: ChatDataOptions): Promise<Entity<any>|null> {
     const chatData = await createChatData(templateData, options);
@@ -102,8 +106,9 @@ async function createChatMessage(templateData, options?: ChatDataOptions): Promi
     // Store data in chat message for later use (opposed tests)
     if (templateData.roll) await message.setFlag(SYSTEM_NAME, FLAGS.Roll, templateData.roll);
     if (templateData.attack) await message.setFlag(SYSTEM_NAME, FLAGS.Attack, templateData.attack);
-    // Convert targets into scene token ids.
+    // Use Scene Token IDs in order to still receive tokens/items when the scene has changed when opening from chat.
     if (templateData.targets) await message.setFlag(SYSTEM_NAME, FLAGS.TargetsSceneTokenIds, templateData.targets.map(target => getTokenSceneId(target)));
+    if (templateData.actionTestData) await message.setFlag(SYSTEM_NAME, FLAGS.ActionTestData, templateData.actionTestData);
 
     return message;
 }
@@ -128,7 +133,6 @@ const createChatData = async (templateData, options?: ChatDataOptions) => {
         },
         showGlitchAnimation: game.settings.get(SYSTEM_NAME, FLAGS.ShowGlitchAnimation)
     };
-    console.error(enhancedTemplateData);
     const html = await renderTemplate(template, enhancedTemplateData);
 
     const chatData = {
@@ -450,5 +454,37 @@ export const addRollListeners = (app: ChatMessage, html) => {
         }
 
         await new DamageApplicationFlow().runApplyDamage(actors, damage);
+    });
+
+    /**
+     * Apply action results onto targets or selections.
+     */
+    html.on('click', '.result', async event => {
+        event.stopPropagation();
+
+        const messageId = html.data('messageId');
+        const message = game.messages.get(messageId);
+
+        if (!message) return;
+
+        const actionTestData = message.getFlag(SYSTEM_NAME, FLAGS.ActionTestData) as ActionTestData;
+
+        if (actionTestData.matrix) {
+            const sceneTokenId = html.find('.chat-card').data('tokenId');
+            const actor = Helpers.getSceneTokenActor(sceneTokenId);
+            // TODO: This is a placeholder for the MatrixPerceptionApp selection of Personas, Hosts or Icons...
+            const targets = Helpers.getSelectedActorsOrCharacter();
+            const {marks} = actionTestData.matrix;
+
+            if (actor === undefined) {
+                return console.error('No actor could be extracted from message data.');
+            }
+
+            if (targets.length === 0) {
+                return ui.notifications.warn(game.i18n.localize("SR5.Warnings.TokenSelectionNeeded"));
+            }
+
+            await ActionResultFlow.placeMatrixMarks(actor, targets, marks);
+        }
     });
 };

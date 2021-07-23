@@ -1891,7 +1891,6 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
 
         const matrixData = this.matrixData;
 
-
         // Delete all markId properties from ActorData
         const updateData = {}
         for (const markId of Object.keys(matrixData.marks)) {
@@ -1919,7 +1918,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
             console.error('Not yet supported');
             return;
         }
-        if (!target.isMatrixActor) return 0;
+        if (!target?.isMatrixActor) return 0;
 
 
         const scene = options?.scene || canvas.scene;
@@ -1930,5 +1929,17 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         const matrixData = this.matrixData;
 
         return matrixData.marks[markId] || 0;
+    }
+
+    // TODO: Deduplicate this method into SR5Item / Helpers
+    getAllMarkedDocuments(): { scene: Scene, target: SR5Actor|SR5Item, item: SR5Item, marks: number }[] {
+        const matrixData = this.matrixData;
+        if (!matrixData) return [];
+
+        // Deconstruct all mark ids into documents.
+        return Object.entries(matrixData.marks).map(([markId, marks]) => ({
+            ...Helpers.deconstructMarkId(markId),
+            marks
+        }))
     }
 }

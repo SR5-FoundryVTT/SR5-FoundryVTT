@@ -60,7 +60,7 @@ export class SpellImporter extends DataImporter {
                         description: '',
                     },
                     alt_mod: 0,
-                    dice_pool_mod: [],
+                    dice_pool_mod: []
                 },
                 drain: 0,
                 category: '',

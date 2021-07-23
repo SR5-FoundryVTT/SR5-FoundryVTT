@@ -1,6 +1,10 @@
 declare namespace Shadowrun {
-    export interface ActionData extends ActionPartData, DescriptionPartData {
 
+
+    export interface ActionData extends
+        ActionPartData,
+        DescriptionPartData {
+        result: ActionResultData
     }
 
     export interface ActionRollData {
@@ -61,5 +65,13 @@ declare namespace Shadowrun {
         skill: SkillName;
         mod: number;
         description: string;
+    }
+
+    export interface ActionResultData {
+        success: {
+            matrix: {
+                placeMarks: boolean
+            }
+        }
     }
 }

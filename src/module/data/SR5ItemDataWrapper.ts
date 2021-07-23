@@ -10,6 +10,7 @@ import RangeWeaponData = Shadowrun.RangeWeaponData;
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
 import ModificationItemData = Shadowrun.ModificationItemData;
+import ActionResultData = Shadowrun.ActionResultData;
 
 export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     getType() {
@@ -172,6 +173,10 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
 
     isCyberdeck(): boolean {
         return this.isDevice() && this.getData().category === 'cyberdeck';
+    }
+
+    isMatrixAction(): boolean {
+        return this.isAction() && this.getData().result.success.matrix.placeMarks;
     }
 
     isSin(): boolean {
@@ -347,5 +352,9 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     hasAmmo(): boolean {
         const ammo = this.getAmmo();
         return !!ammo
+    }
+
+    getActionResult(): ActionResultData {
+        return this.getData().result;
     }
 }

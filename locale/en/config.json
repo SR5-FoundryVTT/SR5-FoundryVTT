@@ -53,7 +53,6 @@
   "SR5.Nuyen": "Nuyen",
   "SR5.Equipped": "Equipped",
   "SR5.Gear": "Gear",
-  "SR5.Matrix": "Matrix",
   "SR5.Marks": "Marks",
   "SR5.PlaceMarks": "Place Marks",
   "SR5.Biography": "Bio",
@@ -571,6 +570,7 @@
       "SpiritConfiguration": "Spirit Configuration",
       "CritterPowers": "Critter Powers",
       "Spells": "Spells",
+      "Matrix": "Matrix",
       "SpritePowers": "Sprite Powers",
       "DeviceRating": "Device Rating",
       "RollDronePerception": "Drone Perception",
@@ -771,7 +771,9 @@
     "NegativeLimitValue": "Limit values must be above zero",
     "TokenSelectionNeeded": "One ore more tokens need to be selected",
     "SkillCantBeDefault": "This skill can't be rolled on as it can't be defaulted",
-    "HostItemOnlyAcceptIC": "Only IC actors can be added to hosts"
+    "HostItemOnlyAcceptIC": "Only IC actors can be added to hosts",
+    "InvalidMarksCount": "You've trying to place a strange number of marks"
+
   },
   "SR5.Errors": {
     "MissingSkill": "The actor doesn't have the requested skill.",
@@ -837,11 +839,12 @@
     }
   },
   "SR5.ActiveEffect": {
-      "New": "New Effect",
-      "Types": {
-        "Temporary": "Temporary Effects",
-        "Passive": "Passive Effects",
-        "Inactive": "Inactive Effects"
-      }
+    "New": "New Effect",
+    "Types": {
+      "Temporary": "Temporary Effects",
+      "Passive": "Passive Effects",
+      "Inactive": "Inactive Effects"
     }
+  },
+  "SR5.Matrix": {}
 }

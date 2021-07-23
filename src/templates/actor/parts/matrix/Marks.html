@@ -3,4 +3,11 @@
             name=(localize 'SR5.Marks')
             itemId='mark'
     }}
+    {{#each markedDocuments}}
+        {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                img=this.target.img
+                name=this.target.name
+                itemId=this.target.id
+        }}
+    {{/each}}
 </div>

@@ -186,7 +186,7 @@ export class ShadowrunRoller {
         const previewTemplate = item.hasTemplate;
         const description = item.getChatData();
         const tests = item.getOpposedTests();
-        const action = item.getAction();
+        const result = item.getActionResult();
         const modifiers = await actor.getModifiers();
 
         // Prepare the roll and dialog.
@@ -230,7 +230,7 @@ export class ShadowrunRoller {
         // Allow for direct defense without token selection for ONE token targeted.
         const target = targets.length === 1 ? targets[0] : undefined;
 
-        const rollChatOptions = {title, roll, actor, item, attack, previewTemplate, targets, target, description, tests, action};
+        const rollChatOptions = {title, roll, actor, item, attack, previewTemplate, targets, target, description, tests, result, actionTestData};
         await createRollChatMessage(rollChatOptions);
 
         if (tests) {

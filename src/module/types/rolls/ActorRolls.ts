@@ -16,7 +16,7 @@ declare namespace Shadowrun {
         attack: AttackData
     }
 
-    // Original attacks data (unmodified)
+    // Use for actions with attack content
     type AttackData = {
         hits?: number;
         fireMode?: FireModeData;
@@ -27,6 +27,11 @@ declare namespace Shadowrun {
         damage: DamageData;
         blast?: BlastData;
     };
+
+    // Use for actions with matrix content
+    type MatrixActionTestData = {
+        marks: number
+    }
 
     type CombatData = {
         initiative?: number

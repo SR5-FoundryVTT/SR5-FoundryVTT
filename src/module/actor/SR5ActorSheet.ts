@@ -91,6 +91,7 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         // Active Effects data.
         // @ts-ignore // TODO: foundry-vtt-types 0.8 missing document support
         data['effects'] = prepareActiveEffectCategories(this.document.effects);
+        data['markedDocuments'] = this.object.getAllMarkedDocuments();
 
         return data;
     }

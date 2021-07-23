@@ -31,6 +31,7 @@ export const FLAGS = {
     LastFireRange: 'lastFireRange',
     Attack: 'attack',
     Roll: 'roll',
+    ActionTestData: 'actionTestData',
     TargetsSceneTokenIds: 'targetsSceneTokenIds',
     ChangelogShownForVersion: 'changelogShownForVersion',
     Modifier: 'modifier',

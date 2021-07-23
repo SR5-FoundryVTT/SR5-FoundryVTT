@@ -94,7 +94,7 @@ export class WareImporter extends DataImporter {
                         description: '',
                     },
                     alt_mod: 0,
-                    dice_pool_mod: [],
+                    dice_pool_mod: []
                 },
                 grade: 'standard',
                 essence: 0,

@@ -8,12 +8,12 @@ import ActionRollData = Shadowrun.ActionRollData;
 import LimitData = Shadowrun.LimitData;
 import OpposedTestData = Shadowrun.OpposedTestData;
 import SkillField = Shadowrun.SkillField;
-import {SKILL_DEFAULT_NAME} from "../constants";
 import TrackType = Shadowrun.TrackType;
 import HostData = Shadowrun.HostData;
 import DevicePartData = Shadowrun.DevicePartData;
 import SourceEntityField = Shadowrun.SourceEntityField;
-import DeviceAttribute = Shadowrun.DeviceAttribute;
+import ActionResultData = Shadowrun.ActionResultData;
+import {SKILL_DEFAULT_NAME} from "../constants";
 
 /**
  * TODO: Add unittesting to DefaultValues helper.
@@ -153,6 +153,16 @@ export class DefaultValues {
             alt_mod: 0,
             dice_pool_mod: []
         }, partialActionRollData) as ActionRollData;
+    }
+
+    static actionResultData(partialActionResultData: Partial<ActionResultData> = {}): ActionResultData {
+        return mergeObject({
+            success: {
+                matrix: {
+                    placeMarks: false
+                }
+            }
+        })
     }
 
     static limitData(partialLimitData: Partial<LimitData> = {}): LimitData {

@@ -56,6 +56,7 @@ import HostItemData = Shadowrun.HostItemData;
 import {DefaultValues} from "../data/DataDefaults";
 import {HostDataPreparation} from "./prep/HostPrep";
 import {MatrixRules} from "../rules/MatrixRules";
+import ActionResultData = Shadowrun.ActionResultData;
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
@@ -903,6 +904,12 @@ export class SR5Item extends Item<ShadowrunItemData> {
         }];
     }
 
+    getActionResult(): ActionResultData|undefined {
+        if (!this.isAction()) return;
+
+        return this.wrapper.getActionResult();
+    }
+
     getOpposedTests(): Test[] {
         if (!this.hasOpposedRoll) {
             return [];
@@ -1381,6 +1388,10 @@ export class SR5Item extends Item<ShadowrunItemData> {
 
     isCyberdeck(): boolean {
         return this.wrapper.isCyberdeck();
+    }
+
+    isMatrixAction(): boolean {
+        return this.wrapper.isMatrixAction();
     }
 
     getBookSource(): string {
