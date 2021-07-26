@@ -593,6 +593,10 @@
   "CONTROLS.SR5.EnvironmentalModifiers": "Environmental Modifiers",
   "SR5.DIALOG.MissingModuleContent": "In order for source PDFs to be shown, the PDFoundry module must be installed and a PDF matching the code created.",
   "SR5.Labels": {
+    "Sheet": {
+      "AddOne": "Add One",
+      "SubtractOne": "Subtract One"
+    },
     "ActorSheet": {
       "SpiritConfiguration": "Spirit Configuration",
       "CritterPowers": "Critter Powers",
@@ -872,6 +876,5 @@
       "Passive": "Passive Effects",
       "Inactive": "Inactive Effects"
     }
-  },
-  "SR5.Matrix": {}
+  }
 }

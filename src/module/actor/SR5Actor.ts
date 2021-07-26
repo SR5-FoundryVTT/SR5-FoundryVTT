@@ -53,6 +53,7 @@ import MatrixData = Shadowrun.MatrixData;
 import {MatrixRules} from "../rules/MatrixRules";
 import {ICDataPreparation} from "./prep/ICPrep";
 import HostItemData = Shadowrun.HostItemData;
+import MarkedDocument = Shadowrun.MarkedDocument;
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -1860,6 +1861,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
     async setMarks(target: SR5Actor|SR5Item, marks: number, options?: {scene?: Scene, item?: SR5Item}) {
         if (!canvas.ready) return;
 
+        // TODO: Implement target matrix entity check.
         if (!this.isMatrixActor) {
             ui.notifications.error(game.i18n.localize('SR5.Errors.MarkCouldNotBePlaced'));
             console.error(`The actor type ${this.data.type} can't receive matrix marks!`);
@@ -1901,6 +1903,18 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
     }
 
     /**
+     * Remove ONE mark. If you want to delete all marks, use clearMarks instead.
+     */
+    async clearMark(markId: string) {
+        if (!this.isMatrixActor) return;
+
+        const updateData = {}
+        updateData[`-=${markId}`] = null;
+
+        await this.update({'data.matrix.marks': updateData});
+    }
+
+    /**
      * Return the amount of marks this actor has on another actor or one of their items.
      *
      * TODO: It's unclear what this method will be used for
@@ -1926,20 +1940,23 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         item = item || target instanceof SR5Actor ? target.getMatrixDevice() : undefined;
 
         const markId = Helpers.buildMarkId(scene.id, target.id, item?.id);
-        const matrixData = this.matrixData;
+        return this.getMarksById(markId);
+    }
 
-        return matrixData.marks[markId] || 0;
+    getMarksById(markId: string): number {
+        return this.matrixData.marks[markId] || 0;
     }
 
     // TODO: Deduplicate this method into SR5Item / Helpers
-    getAllMarkedDocuments(): { scene: Scene, target: SR5Actor|SR5Item, item: SR5Item, marks: number }[] {
+    getAllMarkedDocuments(): MarkedDocument[] {
         const matrixData = this.matrixData;
         if (!matrixData) return [];
 
         // Deconstruct all mark ids into documents.
         return Object.entries(matrixData.marks).map(([markId, marks]) => ({
             ...Helpers.deconstructMarkId(markId),
-            marks
+            marks,
+            markId
         }))
     }
 }

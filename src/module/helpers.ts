@@ -17,6 +17,7 @@ import Skills = Shadowrun.Skills;
 import {ShadowrunRoll} from "./rolls/ShadowrunRoller";
 import {DataDefaults} from "./data/DataDefaults";
 import MatrixMarks = Shadowrun.MatrixMarks;
+import TargetedDocument = Shadowrun.TargetedDocument;
 
 interface CalcTotalOptions {
     min?: number,
@@ -704,7 +705,7 @@ export class Helpers {
      * @param markId 'sceneId.targetId.itemId' with itemId being optional
      * @param separator Should you want to change the default separator used
      */
-    static deconstructMarkId(markId: string, separator='/'): {scene: Scene, target: SR5Actor|SR5Item, item: SR5Item|undefined} {
+    static deconstructMarkId(markId: string, separator='/'): TargetedDocument {
         const ids = markId.split(separator);
 
         if (ids.length !== 3) {

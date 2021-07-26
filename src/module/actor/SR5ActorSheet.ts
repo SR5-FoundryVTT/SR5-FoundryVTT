@@ -12,6 +12,7 @@ import MatrixAttribute = Shadowrun.MatrixAttribute;
 import SkillField = Shadowrun.SkillField;
 import DeviceData = Shadowrun.DeviceData;
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
+import {MatrixRules} from "../rules/MatrixRules";
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
@@ -467,7 +468,12 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         html.find('.item-rtg').change(this._onChangeRtg.bind(this));
         html.find('.item-create').click(this._onItemCreate.bind(this));
         html.find('.reload-ammo').click(this._onReloadAmmo.bind(this));
+
         html.find('.matrix-att-selector').change(this._onMatrixAttributeSelected.bind(this));
+        html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));
+        html.find('.marks-add-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, 1));
+        html.find('.marks-remove-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, -1));
+        html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
 
         html.find('.import-character').click(this._onShowImportCharacter.bind(this));
         html.find('.show-hidden-skills').click(this._onShowHiddenSkills.bind(this));
@@ -797,6 +803,49 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
             }
         }
         await this.actor.updateOwnedItem(data);
+    }
+
+    async _onMarksQuantityChange(event) {
+        event.stopPropagation();
+
+        const markId = event.currentTarget.dataset.markId;
+        if (!markId) return;
+
+        const {scene, target, item} = Helpers.deconstructMarkId(markId);
+        if (!scene || !target) return; // item can be undefined.
+
+        const marks = parseInt(event.currentTarget.value);
+        if (!MatrixRules.isValidMarksCount(marks)) {
+            return ui.notifications.warn(game.i18n.localize("SR5.Warnings.InvalidMarksCount"));
+        }
+
+        await this.object.setMarks(target, marks, {scene, item});
+    }
+
+    async _onMarksQuantityChangeBy(event, by: number) {
+        event.stopPropagation();
+
+        const markId = event.currentTarget.dataset.markId;
+        if (!markId) return;
+
+        const {scene, target, item} = Helpers.deconstructMarkId(markId);
+        if (!scene || !target) return; // item can be undefined.
+
+        const marks = this.object.getMarksById(markId) + by;
+        if (!MatrixRules.isValidMarksCount(marks)) {
+            return ui.notifications.warn(game.i18n.localize("SR5.Warnings.InvalidMarksCount"));
+        }
+
+        await this.object.setMarks(target, marks, {scene, item});
+    }
+
+    async _onMarksDelete(event) {
+        event.stopPropagation();
+
+        const markId = event.currentTarget.dataset.markId;
+        if (!markId) return;
+
+        await this.object.clearMark(markId);
     }
 
     _onItemCreate(event) {

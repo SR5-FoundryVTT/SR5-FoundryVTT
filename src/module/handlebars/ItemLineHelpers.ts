@@ -1,6 +1,7 @@
 import { SR5ItemDataWrapper } from '../data/SR5ItemDataWrapper';
 import {SR5} from "../config";
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
+import MarkedDocument = Shadowrun.MarkedDocument;
 
 export const registerItemLineHelpers = () => {
     Handlebars.registerHelper('ItemHeaderIcons', function (id) {
@@ -449,5 +450,33 @@ export const registerItemLineHelpers = () => {
 
     Handlebars.registerHelper('EffectData', function(effectType: string) {
         return {'effect-type': effectType};
+    });
+
+    // Allow Matrix Marks to be changed on the spot on a Sheet.
+    Handlebars.registerHelper('MarksRightSide', (marked: MarkedDocument) => {
+        const quantityInput = {
+            input: {
+                type: 'number',
+                value: marked.marks,
+                cssClass: 'marks-qty',
+            },
+        };
+        return [quantityInput]
+    });
+
+    // Matrix Mark interaction on a Sheet.
+    Handlebars.registerHelper('MarksIcons', (marked: MarkedDocument) => {
+        const incrementIcon = {
+            icon: 'fas fa-plus marks-add-one',
+            title: game.i18n.localize('SR5.Labels.Sheet.AddOne'),
+            data: {action: 'add-one'}
+        };
+        const decrementIcon = {
+            icon: 'fas fa-minus marks-remove-one',
+            title: game.i18n.localize('SR5.Labels.Sheet.SubtractOne'),
+            data: {action: 'remove-one'}
+        }
+
+        return [incrementIcon, decrementIcon];
     });
 };
