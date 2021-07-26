@@ -1860,7 +1860,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
      * @param options.scene The scene the actor lives on. If empty, will be current active scene
      * @param options.item The item that the mark is to be placed on
      */
-    async setMarks(target: SR5Actor|SR5Item, marks: number, options?: {scene?: Scene, item?: SR5Item}) {
+    async setMarks(target: Token, marks: number, options?: {scene?: Scene, item?: SR5Item}) {
         if (!canvas.ready) return;
 
         // TODO: Implement target matrix entity check.

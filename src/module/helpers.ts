@@ -283,17 +283,30 @@ export class Helpers {
     }
 
     /**
-     * Use this helper to get a tokens actor from any given scene id, while the sceneTokenId is a mixed ID
+     * Use this helper to get a tokens actor from any given scene id.
      * @param sceneTokenId A mixed id with the format '<sceneId>.<tokenid>
      */
     static getSceneTokenActor(sceneTokenId: string): SR5Actor | undefined {
-        const [sceneId, tokenId] = sceneTokenId.split('.');
+        const [sceneId, tokenId] = Helpers.deconstructSceneTokenId(sceneTokenId);
+        const token = Helpers.getSceneTokenDocument(sceneId, tokenId);
+        if (!token) return;
+        // @ts-ignore // TODO: foundry-vtt-types 0.8 TokenDocument
+        return token.getActor();
+    }
+
+    static deconstructSceneTokenId(sceneTokenId: string): [sceneId: string, tokenId: string] {
+        return sceneTokenId.split('.') as [sceneId: string, tokenId: string];
+    }
+
+    // @ts-ignore // TODO: foundry-vtt-types 0.8 TokenDocument
+    static getSceneTokenDocument(sceneId, tokenId): Token|undefined {
         const scene = game.scenes.get(sceneId);
         if (!scene) return;
         // @ts-ignore
         const token = scene.tokens.get(tokenId);
         if (!token) return;
-        return token.getActor();
+
+        return token;
     }
 
     static getUserTargets(user?: User|null): Token[] {
@@ -716,8 +729,9 @@ export class Helpers {
         const [sceneId, targetId, itemId] = ids;
 
         const scene = game.scenes.get(sceneId);
-        const target = game.actors.get(targetId) as SR5Actor || game.items.get(targetId) as SR5Item;
-        const item = game.items.get(itemId) as SR5Item; // DocumentCollection will return undefined if needed
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
+        const target = scene.tokens.get(targetId) || game.items.get(targetId) as SR5Item;
+        const item = target.actor.items.get(itemId) as SR5Item; // DocumentCollection will return undefined if needed
 
         return {
             scene, target, item

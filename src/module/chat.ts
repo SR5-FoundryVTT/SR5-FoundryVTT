@@ -478,11 +478,15 @@ export const addRollListeners = (app: ChatMessage, html) => {
                 return console.error('No actor could be extracted from message data.');
             }
 
-            const targets = Helpers.getSelectedActorsOrCharacter();
+            const targets = Helpers.getControlledTokens();
             // For no manual selection fall back to previous message targets.
             if (targets.length === 0) {
                 const targetSceneIds = message.getFlag(SYSTEM_NAME, FLAGS.TargetsSceneTokenIds) as string[];
-                targetSceneIds.forEach(targetSceneId => targets.push(Helpers.getSceneTokenActor(targetSceneId)))
+
+                targetSceneIds.forEach(targetSceneId => {
+                    const [sceneId, tokenId] = Helpers.deconstructSceneTokenId(targetSceneId);
+                    targets.push(Helpers.getSceneTokenDocument(sceneId, tokenId));
+                })
             }
 
             if (targets.length === 0) {
