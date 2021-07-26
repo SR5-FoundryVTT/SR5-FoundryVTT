@@ -18,7 +18,7 @@
                     "name": "",
                     "silent": false,
                     "hot_sim": false,
-                    "marks": [],
+                    "marks": {},
                     "firewall": {
                         "value": 0,
                         "mod": [],
@@ -978,7 +978,7 @@
             }
         },
         "ic": {
-            "templates": ["common", "attributes", "limits", "matrix"],
+            "templates": ["common",  "skills", "attributes", "limits", "matrix"],
             "track": {},
             "icType": "",
             "host": {
@@ -1329,7 +1329,7 @@
         },
         "host": {
             "templates": ["description", "matrix"],
-            "marks": [],
+            "marks": {},
             "rating": 0,
             "ic": []
         }

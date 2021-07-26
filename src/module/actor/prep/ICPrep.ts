@@ -9,6 +9,7 @@ import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 import {DefaultValues} from "../../data/DataDefaults";
 import {MatrixRules} from "../../rules/MatrixRules";
 import DeviceAttribute = Shadowrun.DeviceAttribute;
+import {SkillsPrep} from "./functions/SkillsPrep";
 
 
 export function ICDataPreparation(data: ICData, items: SR5ItemDataWrapper[]) {
@@ -29,9 +30,11 @@ export function ICDataPreparation(data: ICData, items: SR5ItemDataWrapper[]) {
     ICPrep.prepareMatrix(data);
     ICPrep.prepareMatrixTrack(data);
 
-    // SkillsPrep.prepareSkills(data);
     ICPrep.prepareMatrixInit(data);
     InitiativePrep.prepareCurrentInitiative(data);
+
+    // Common data preparations.
+    SkillsPrep.prepareSkills(data);
 }
 
 
@@ -152,4 +155,5 @@ export class ICPrep {
             AttributesPrep.prepareAttribute(id, attribute);
         }
     }
+
 }

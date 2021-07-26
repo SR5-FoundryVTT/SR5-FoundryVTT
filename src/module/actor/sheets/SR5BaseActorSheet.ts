@@ -2,9 +2,10 @@ import {SR5Actor} from "../SR5Actor";
 import {Helpers} from "../../helpers";
 import {SR5Item} from "../../item/SR5Item";
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
-import {onManageActiveEffect} from "../../effects";
+import {onManageActiveEffect, prepareActiveEffectCategories} from "../../effects";
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import {SR5} from "../../config";
+import {MatrixRules} from "../../rules/MatrixRules";
 
 /**
  * This class should not be used directly but be extended for each actor type.
@@ -77,9 +78,11 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         data.filters = this._filters;
 
         // Pepare data fields
-        // TODO: This makes it really unclear what fields are present on the sheet.
         this._prepareItems(data);
         this._prepareActorTypeFields(data);
+
+        // @ts-ignore // TODO: foundry-vtt-types 0.8 missing document support
+        data['effects'] = prepareActiveEffectCategories(this.document.effects);
 
         return data;
     }
@@ -103,6 +106,12 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         // Condition monitor track handling...
         html.find('.horizontal-cell-input .cell').on('click', this._onSetConditionTrackCell.bind(this));
         html.find('.horizontal-cell-input .cell').on('contextmenu', this._onClearConditionTrack.bind(this));
+
+        // Matrix data handling...
+        html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));
+        html.find('.marks-add-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, 1));
+        html.find('.marks-remove-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, -1));
+        html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
     }
 
     /**
@@ -504,5 +513,48 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         data.isCritter = this.actor.isCritter();
         data.hasSkills = this.actor.hasSkills;
         data.hasSpecial = this.actor.hasSpecial;
+    }
+
+    async _onMarksQuantityChange(event) {
+        event.stopPropagation();
+
+        const markId = event.currentTarget.dataset.markId;
+        if (!markId) return;
+
+        const {scene, target, item} = Helpers.deconstructMarkId(markId);
+        if (!scene || !target) return; // item can be undefined.
+
+        const marks = parseInt(event.currentTarget.value);
+        if (!MatrixRules.isValidMarksCount(marks)) {
+            return ui.notifications.warn(game.i18n.localize("SR5.Warnings.InvalidMarksCount"));
+        }
+
+        await this.object.setMarks(target, marks, {scene, item});
+    }
+
+    async _onMarksQuantityChangeBy(event, by: number) {
+        event.stopPropagation();
+
+        const markId = event.currentTarget.dataset.markId;
+        if (!markId) return;
+
+        const {scene, target, item} = Helpers.deconstructMarkId(markId);
+        if (!scene || !target) return; // item can be undefined.
+
+        const marks = this.object.getMarksById(markId) + by;
+        if (!MatrixRules.isValidMarksCount(marks)) {
+            return ui.notifications.warn(game.i18n.localize("SR5.Warnings.InvalidMarksCount"));
+        }
+
+        await this.object.setMarks(target, marks, {scene, item});
+    }
+
+    async _onMarksDelete(event) {
+        event.stopPropagation();
+
+        const markId = event.currentTarget.dataset.markId;
+        if (!markId) return;
+
+        await this.object.clearMark(markId);
     }
 }

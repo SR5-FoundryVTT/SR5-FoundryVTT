@@ -127,7 +127,8 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
     _getSortedActiveSkillsForSelect() {
         // We need the actor owner, instead of the item owner. See actorOwner jsdoc for details.
         const actor = this.item.actorOwner;
-        if (!actor) return Helpers.sortConfigValuesByTranslation(SR5.activeSkills);
+        // Fallback for actors without skills.
+        if (!actor || actor.isIC()) return Helpers.sortConfigValuesByTranslation(SR5.activeSkills);
 
         const activeSkills = Helpers.sortSkills(actor.getActiveSkills());
 

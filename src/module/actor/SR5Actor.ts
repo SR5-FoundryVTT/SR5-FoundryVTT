@@ -143,9 +143,12 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         return this.data.data.modifiers[modifierName];
     }
 
+    /**
+     * Some actors have skills, some don't. While others don't have skills but derive skill values from their ratings.
+     */
     findActiveSkill(skillName?: string): SkillField | undefined {
         // Check for faulty to catch empty names as well as missing parameters.
-        if (!skillName) return undefined;
+        if (!skillName) return;
 
         // Handle legacy skills (name is id)
         const skills = this.getActiveSkills();
@@ -342,7 +345,6 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
     get hasSkills(): boolean {
         return this.getSkills() !== undefined;
     }
-
 
     getSkills(): CharacterSkills {
         return this.data.data.skills;
@@ -1947,7 +1949,6 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         return this.matrixData.marks[markId] || 0;
     }
 
-    // TODO: Deduplicate this method into SR5Item / Helpers
     getAllMarkedDocuments(): MarkedDocument[] {
         const matrixData = this.matrixData;
         if (!matrixData) return [];
