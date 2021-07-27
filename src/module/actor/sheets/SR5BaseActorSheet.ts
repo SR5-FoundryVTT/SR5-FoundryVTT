@@ -525,8 +525,7 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         const {scene, target, item} = Helpers.getMarkIdDocuments(markId);
         if (!scene || !target) return; // item can be undefined.
 
-        const marks = MatrixRules.getValidMarksCount(parseInt(event.currentTarget.value));
-
+        const marks = parseInt(event.currentTarget.value);
         await this.object.setMarks(target, marks, {scene, item, overwrite: true});
     }
 

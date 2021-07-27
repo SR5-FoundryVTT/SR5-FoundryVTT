@@ -370,6 +370,12 @@ export class Helpers {
         return canvas.tokens.controlled;
     }
 
+    static getTargetedTokens(): Token[] {
+        if (!canvas.ready) return [];
+
+        return Array.from(game.user.targets);
+    }
+
     static getSelectedActorsOrCharacter(): SR5Actor[] {
         const tokens = Helpers.getControlledTokens();
         const actors = tokens.map(token => token.actor);

@@ -815,8 +815,7 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         const {scene, target, item} = Helpers.getMarkIdDocuments(markId);
         if (!scene || !target) return; // item can be undefined.
 
-        const marks = MatrixRules.getValidMarksCount(parseInt(event.currentTarget.value));
-
+        const marks = parseInt(event.currentTarget.value);
         await this.object.setMarks(target, marks, {scene, item, overwrite: true});
     }
 
@@ -829,9 +828,7 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         const {scene, target, item} = Helpers.getMarkIdDocuments(markId);
         if (!scene || !target) return; // item can be undefined.
 
-        const marks = MatrixRules.getValidMarksCount(this.object.getMarksById(markId) + by);
-
-        await this.object.setMarks(target, marks, {scene, item});
+        await this.object.setMarks(target, by, {scene, item});
     }
 
     async _onMarksDelete(event) {
