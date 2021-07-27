@@ -1866,8 +1866,15 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         if (!canvas.ready) return;
 
         if (!this.isMatrixActor) {
-            ui.notifications.error(game.i18n.localize('SR5.Errors.MarkCouldNotBePlaced'));
+            ui.notifications.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedBy'));
             console.error(`The actor type ${this.data.type} can't receive matrix marks!`);
+            return
+        }
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
+        if (!target.actor.isMatrixActor) {
+            ui.notifications.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedOn'));
+            // @ts-ignore
+            console.error(`The actor type ${target.actor.type} can't receive matrix marks!`);
             return
         }
 

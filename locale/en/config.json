@@ -809,7 +809,9 @@
   "SR5.Errors": {
     "MissingSkill": "The actor doesn't have the requested skill.",
     "SkillWithoutAttribute": "The skill has no attribute configured.",
-    "MarkCouldNotBePlaced": "Internal Error: Your marks couldn't be placed."
+    "MarkCouldNotBePlaced": "Internal Error: Your marks couldn't be placed.",
+    "MarksCantBePlacedBy": "The active actor can't place marks.",
+    "MarksCantBePlacedOn": "The chosen actor type can't receive any marks."
   },
   "SR5.ChangelogApplication": {
     "Title": "Shadowrun5e Update",
