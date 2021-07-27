@@ -811,7 +811,7 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
-        const {scene, target, item} = Helpers.deconstructMarkId(markId);
+        const {scene, target, item} = Helpers.getMarkIdDocuments(markId);
         if (!scene || !target) return; // item can be undefined.
 
         const marks = parseInt(event.currentTarget.value);
@@ -828,7 +828,7 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
-        const {scene, target, item} = Helpers.deconstructMarkId(markId);
+        const {scene, target, item} = Helpers.getMarkIdDocuments(markId);
         if (!scene || !target) return; // item can be undefined.
 
         const marks = this.object.getMarksById(markId) + by;

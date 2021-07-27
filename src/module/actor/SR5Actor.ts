@@ -1854,6 +1854,8 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
     }
 
     /**
+     * Change the amount of marks on the target by the amount of marks given, while adhering to min/max values.
+     *
      * @param target The Document the marks are placed on. This can be an actor (character, technomancer, IC) OR an item (Host)
      * @param marks The amount of marks to be placed
      * @param options Additional options that may be needed
@@ -1863,7 +1865,6 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
     async setMarks(target: Token, marks: number, options?: {scene?: Scene, item?: SR5Item}) {
         if (!canvas.ready) return;
 
-        // TODO: Implement target matrix entity check.
         if (!this.isMatrixActor) {
             ui.notifications.error(game.i18n.localize('SR5.Errors.MarkCouldNotBePlaced'));
             console.error(`The actor type ${this.data.type} can't receive matrix marks!`);
@@ -1882,7 +1883,9 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
 
         const markId = Helpers.buildMarkId(scene.id, target.id, item?.id);
         const matrixData = this.matrixData;
-        matrixData.marks[markId] = marks;
+
+        const currentMarks = this.getMarksById(markId);
+        matrixData.marks[markId] = MatrixRules.getValidMarksCount(currentMarks + marks);
 
         await this.update({'data.matrix.marks': matrixData.marks});
     }
@@ -1928,18 +1931,20 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
      * @param item
      * @param options
      */
-    getMarks(target: SR5Actor|SR5Item, item?: SR5Item, options?: {scene?: Scene}): number {
+    getMarks(target: Token, item?: SR5Item, options?: {scene?: Scene}): number {
         if (!canvas.ready) return;
         if (target instanceof SR5Item) {
             console.error('Not yet supported');
             return;
         }
-        if (!target?.isMatrixActor) return 0;
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
+        if (!target?.actor.isMatrixActor) return 0;
 
 
         const scene = options?.scene || canvas.scene;
         // If an actor has been targeted, they might have a device. If an item / host has been targeted they don't.
-        item = item || target instanceof SR5Actor ? target.getMatrixDevice() : undefined;
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
+        item = item || target instanceof SR5Actor ? target.actor.getMatrixDevice() : undefined;
 
         const markId = Helpers.buildMarkId(scene.id, target.id, item?.id);
         return this.getMarksById(markId);
@@ -1954,10 +1959,12 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         if (!matrixData) return [];
 
         // Deconstruct all mark ids into documents.
-        return Object.entries(matrixData.marks).map(([markId, marks]) => ({
-            ...Helpers.deconstructMarkId(markId),
-            marks,
-            markId
-        }))
+        return Object.entries(matrixData.marks)
+            .filter(([markId, marks]) => Helpers.isValidMarkId(markId))
+            .map(([markId, marks]) => ({
+                ...Helpers.getMarkIdDocuments(markId),
+                marks,
+                markId
+            }))
     }
 }

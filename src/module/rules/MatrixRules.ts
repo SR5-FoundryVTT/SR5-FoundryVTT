@@ -54,7 +54,20 @@ export class MatrixRules {
      * @param marks
      */
     static isValidMarksCount(marks: number): boolean {
-        return marks >= 0 && marks <= 3;
+        return marks >= MatrixRules.minMarksCount() && marks <= MatrixRules.maxMarksCount();
+    }
+
+    static maxMarksCount(): number {
+        return 3;
+    }
+
+    static minMarksCount(): number {
+        return 0;
+    }
+
+    static getValidMarksCount(marks: number): number {
+        marks = Math.min(marks, MatrixRules.maxMarksCount());
+        return Math.max(marks, MatrixRules.minMarksCount());
     }
 
     /**

@@ -701,6 +701,29 @@ export class Helpers {
     }
 
     /**
+     * A markId is valid if:
+     * - It's scene still exists
+     * - The token still exists on that scene
+     * - And a possible owned item still exists on that documents actor.
+     */
+    static isValidMarkId(markId: string): boolean {
+        const [sceneId, targetId, itemId] = Helpers.deconstructMarkId(markId);
+
+        const scene = game.scenes.get(sceneId);
+        if (!scene) return false;
+
+        // @ts-ignore // foundry-vtt-types 0.8
+        const tokenDocument = scene.tokens.get(targetId);
+        if (!tokenDocument) return false;
+
+        const actor = tokenDocument.actor;
+        // Some targets are allowed without a targeted owned item.
+        if (itemId && !actor.items.get(itemId)) return false;
+
+        return true;
+    }
+
+    /**
      * Build a markId string. See Helpers.deconstructMarkId for usage.
      *
      * @param sceneId Optional id in a markId
@@ -718,7 +741,7 @@ export class Helpers {
      * @param markId 'sceneId.targetId.itemId' with itemId being optional
      * @param separator Should you want to change the default separator used
      */
-    static deconstructMarkId(markId: string, separator='/'): TargetedDocument {
+    static deconstructMarkId(markId: string, separator='/'): [sceneId: string, targetId: string, itemId: string] {
         const ids = markId.split(separator);
 
         if (ids.length !== 3) {
@@ -726,12 +749,16 @@ export class Helpers {
             return;
         }
 
-        const [sceneId, targetId, itemId] = ids;
+        return ids as [string, string, string];
+    }
+
+    static getMarkIdDocuments(markId: string): TargetedDocument {
+        const [sceneId, targetId, itemId] = Helpers.deconstructMarkId(markId);
 
         const scene = game.scenes.get(sceneId);
         // @ts-ignore // TODO: foundry-vtt-types 0.8
         const target = scene.tokens.get(targetId) || game.items.get(targetId) as SR5Item;
-        const item = target.actor.items.get(itemId) as SR5Item; // DocumentCollection will return undefined if needed
+        const item = target?.actor?.items?.get(itemId) as SR5Item; // DocumentCollection will return undefined if needed
 
         return {
             scene, target, item
