@@ -26,6 +26,12 @@
   "ITEM.TypeWeapon": "Waffe",
   "ITEM.TypeHost": "Host",
 
+  "SR5.FOUNDRY": {
+    "Scene": "Szene",
+    "Item": "Gegenstand",
+    "Token": "Token"
+  },
+
   "SR5.SheetActor": "Actor Bogen",
   "SR5.SheetItem": "Item Bogen",
   "SR5.ItemTypes": {
@@ -64,6 +70,7 @@
   "SR5.RtgAboveZero": "Stf > 0",
   "SR5.Qty": "Menge",
   "SR5.Add": "Zufügen",
+  "SR5.Del": "Entf.",
   "SR5.Languages": "Sprachen",
   "SR5.Actions": "Aktionen",
   "SR5.Action": "Aktion",
@@ -80,7 +87,9 @@
   "SR5.Nuyen": "Nuyen",
   "SR5.Equipped": "Ausgerüstet",
   "SR5.Gear": "Ausrüstung",
+  "SR5.Marks": "Marken",
   "SR5.PlaceMarks": "Platziere Marken",
+  "SR5.ClearMarks": "Entferne alle Marken",
   "SR5.Biography": "Persönliches",
   "SR5.Lifestyle": "Lebenstil",
   "SR5.Miscellaneous": "Diverses",

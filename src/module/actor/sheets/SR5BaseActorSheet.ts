@@ -112,6 +112,7 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         html.find('.marks-add-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, 1));
         html.find('.marks-remove-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, -1));
         html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
+        html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
     }
 
     /**
@@ -524,12 +525,9 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         const {scene, target, item} = Helpers.getMarkIdDocuments(markId);
         if (!scene || !target) return; // item can be undefined.
 
-        const marks = parseInt(event.currentTarget.value);
-        if (!MatrixRules.isValidMarksCount(marks)) {
-            return ui.notifications.warn(game.i18n.localize("SR5.Warnings.InvalidMarksCount"));
-        }
+        const marks = MatrixRules.getValidMarksCount(parseInt(event.currentTarget.value));
 
-        await this.object.setMarks(target, marks, {scene, item});
+        await this.object.setMarks(target, marks, {scene, item, overwrite: true});
     }
 
     async _onMarksQuantityChangeBy(event, by: number) {
@@ -541,12 +539,7 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         const {scene, target, item} = Helpers.getMarkIdDocuments(markId);
         if (!scene || !target) return; // item can be undefined.
 
-        const marks = this.object.getMarksById(markId) + by;
-        if (!MatrixRules.isValidMarksCount(marks)) {
-            return ui.notifications.warn(game.i18n.localize("SR5.Warnings.InvalidMarksCount"));
-        }
-
-        await this.object.setMarks(target, marks, {scene, item});
+        await this.object.setMarks(target, by, {scene, item});
     }
 
     async _onMarksDelete(event) {
@@ -555,6 +548,18 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
         await this.object.clearMark(markId);
+    }
+
+    async _onMarksClearAll(event) {
+        event.stopPropagation();
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        await this.object.clearMarks();
     }
 }

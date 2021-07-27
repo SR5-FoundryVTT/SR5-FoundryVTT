@@ -2,6 +2,8 @@
     {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
             name=(localize 'SR5.Marks')
             itemId='mark'
+            rightSide=(MarkListHeaderRightSide)
+            icons=(MarkListHeaderIcons)
     }}
     {{#each markedDocuments}}
         {{!-- Don't use the ListItem Handlebar helper as to avoid it's item drag&drop functionality. --}}
@@ -16,6 +18,12 @@
                 <div class="item-text item-name">{{this.target.name}}</div>
             </div>
             <div class="item-right">
+                <div class="item-text">
+                    {{this.scene.name}}
+                </div>
+                <div class="item-text">
+                    {{this.item.name}}
+                </div>
                 <div class="item-text">
                     <input class="display marks-qty" size="1" type="text" data-dtype="Number" placeholder="1" value="{{this.marks}}" data-mark-id="{{this.markId}}"/>
                 </div>

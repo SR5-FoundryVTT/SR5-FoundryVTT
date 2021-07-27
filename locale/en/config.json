@@ -26,6 +26,12 @@
   "ITEM.TypeWeapon": "Weapon",
   "ITEM.TypeHost": "Host",
 
+  "SR5.FOUNDRY": {
+    "Scene": "Scene",
+    "Item": "Item",
+    "Token": "Token"
+  },
+
   "SR5.SheetActor": "Actor sheet",
   "SR5.SheetItem": "Item sheet",
   "SR5.ItemTypes": {
@@ -64,6 +70,7 @@
   "SR5.RtgAboveZero": "Rtg > 0",
   "SR5.Qty": "Qty",
   "SR5.Add": "Add",
+  "SR5.Del": "Del",
   "SR5.Languages": "Languages",
   "SR5.Actions": "Actions",
   "SR5.Action": "Action",
@@ -82,6 +89,7 @@
   "SR5.Gear": "Gear",
   "SR5.Marks": "Marks",
   "SR5.PlaceMarks": "Place Marks",
+  "SR5.ClearMarks": "Clear All Marks",
   "SR5.Biography": "Bio",
   "SR5.Lifestyle": "Lifestyle",
   "SR5.Miscellaneous": "Misc",

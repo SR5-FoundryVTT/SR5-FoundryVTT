@@ -474,6 +474,7 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         html.find('.marks-add-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, 1));
         html.find('.marks-remove-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, -1));
         html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
+        html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
 
         html.find('.import-character').click(this._onShowImportCharacter.bind(this));
         html.find('.show-hidden-skills').click(this._onShowHiddenSkills.bind(this));
@@ -806,7 +807,7 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
     }
 
     async _onMarksQuantityChange(event) {
-        event.stopPropagation();
+       event.stopPropagation();
 
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
@@ -814,12 +815,9 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         const {scene, target, item} = Helpers.getMarkIdDocuments(markId);
         if (!scene || !target) return; // item can be undefined.
 
-        const marks = parseInt(event.currentTarget.value);
-        if (!MatrixRules.isValidMarksCount(marks)) {
-            return ui.notifications.warn(game.i18n.localize("SR5.Warnings.InvalidMarksCount"));
-        }
+        const marks = MatrixRules.getValidMarksCount(parseInt(event.currentTarget.value));
 
-        await this.object.setMarks(target, marks, {scene, item});
+        await this.object.setMarks(target, marks, {scene, item, overwrite: true});
     }
 
     async _onMarksQuantityChangeBy(event, by: number) {
@@ -831,10 +829,7 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         const {scene, target, item} = Helpers.getMarkIdDocuments(markId);
         if (!scene || !target) return; // item can be undefined.
 
-        const marks = this.object.getMarksById(markId) + by;
-        if (!MatrixRules.isValidMarksCount(marks)) {
-            return ui.notifications.warn(game.i18n.localize("SR5.Warnings.InvalidMarksCount"));
-        }
+        const marks = MatrixRules.getValidMarksCount(this.object.getMarksById(markId) + by);
 
         await this.object.setMarks(target, marks, {scene, item});
     }
@@ -845,7 +840,19 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
         await this.object.clearMark(markId);
+    }
+
+    async _onMarksClearAll(event) {
+        event.stopPropagation();
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        await this.object.clearMarks();
     }
 
     _onItemCreate(event) {

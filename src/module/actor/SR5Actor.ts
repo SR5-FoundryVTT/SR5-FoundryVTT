@@ -1856,32 +1856,32 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
     /**
      * Change the amount of marks on the target by the amount of marks given, while adhering to min/max values.
      *
+     *
      * @param target The Document the marks are placed on. This can be an actor (character, technomancer, IC) OR an item (Host)
      * @param marks The amount of marks to be placed
      * @param options Additional options that may be needed
      * @param options.scene The scene the actor lives on. If empty, will be current active scene
      * @param options.item The item that the mark is to be placed on
+     * @param options.overwrite Replace the current marks amount instead of changing it
      */
-    async setMarks(target: Token, marks: number, options?: {scene?: Scene, item?: SR5Item}) {
+    async setMarks(target: Token, marks: number, options?: {scene?: Scene, item?: SR5Item, overwrite?: boolean}) {
         if (!canvas.ready) return;
 
         if (!this.isMatrixActor) {
             ui.notifications.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedBy'));
             console.error(`The actor type ${this.data.type} can't receive matrix marks!`);
-            return
+            return;
         }
         // @ts-ignore // TODO: foundry-vtt-types 0.8
         if (!target.actor.isMatrixActor) {
             ui.notifications.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedOn'));
             // @ts-ignore
             console.error(`The actor type ${target.actor.type} can't receive matrix marks!`);
-            return
+            return;
         }
-
-        if (!MatrixRules.isValidMarksCount(marks)) {
-            ui.notifications.error(game.i18n.localize('SR5.Errors.MarkCouldNotBePlaced'));
-            console.error('To many or to little matrix marks');
-            return
+        // It hurt itself in confusion.
+        if (this.id === target.actor.id) {
+            return;
         }
 
         // Both scene and item are optional.
@@ -1891,7 +1891,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         const markId = Helpers.buildMarkId(scene.id, target.id, item?.id);
         const matrixData = this.matrixData;
 
-        const currentMarks = this.getMarksById(markId);
+        const currentMarks = options?.overwrite ? 0 : this.getMarksById(markId);
         matrixData.marks[markId] = MatrixRules.getValidMarksCount(currentMarks + marks);
 
         await this.update({'data.matrix.marks': matrixData.marks});

@@ -1,4 +1,4 @@
-import { SR5ItemDataWrapper } from '../data/SR5ItemDataWrapper';
+import {SR5ItemDataWrapper} from '../data/SR5ItemDataWrapper';
 import {SR5} from "../config";
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import MarkedDocument = Shadowrun.MarkedDocument;
@@ -478,5 +478,33 @@ export const registerItemLineHelpers = () => {
         }
 
         return [incrementIcon, decrementIcon];
+    });
+
+    Handlebars.registerHelper('MarkListHeaderRightSide', () => {
+        return [
+            {
+                text: {
+                    text: game.i18n.localize('SR5.FOUNDRY.Scene'),
+                },
+            },
+            {
+                text: {
+                    text: game.i18n.localize('SR5.FOUNDRY.Item'),
+                },
+            },
+            {
+                text: {
+                    text: game.i18n.localize('SR5.Qty'),
+                },
+            }]
+    });
+
+    Handlebars.registerHelper('MarkListHeaderIcons', () => {
+        return [{
+            icon: 'fas fa-trash',
+            title: game.i18n.localize('SR5.ClearMarks'),
+            text: game.i18n.localize('SR5.Del'),
+            cssClass: 'marks-clear-all'
+        }];
     });
 };
