@@ -2,6 +2,8 @@ import {Helpers} from '../helpers';
 import {SR5Item} from './SR5Item';
 import {SR5} from "../config";
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
+import {SR5Actor} from "../actor/SR5Actor";
+import {DeviceFlow} from "./flows/DeviceFlow";
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -104,6 +106,10 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         // @ts-ignore // TODO: foundry-vtt-types 0.8 missing document support
         data['effects'] = prepareActiveEffectCategories(this.document.effects);
 
+        if (this.item.isHost() || this.item.isDevice()) {
+            data['networkDevices'] = this._getNetworkDevices();
+        }
+
         return data;
     }
 
@@ -142,6 +148,13 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         }
 
         return activeSkillsForSelect;
+    }
+
+    _getNetworkDevices(): SR5Item|SR5Actor[] {
+        const controllerData = this.item.asControllerData();
+        if (!controllerData) return [];
+
+        return controllerData.data.networkDevices.map(deviceLink => DeviceFlow.documentByNetworkDeviceLink(deviceLink));
     }
 
     /* -------------------------------------------- */

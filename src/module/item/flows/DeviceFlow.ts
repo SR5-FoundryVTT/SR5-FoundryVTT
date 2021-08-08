@@ -6,6 +6,7 @@ import NetworkDeviceType = Shadowrun.NetworkDeviceType;
 import NetworkDeviceLink = Shadowrun.NetworkDeviceLink;
 import SocketMessageData = Shadowrun.SocketMessageData;
 
+
 export class DeviceFlow {
     static networkDeviceType(target: SR5Item|SR5Actor, scene?: Scene): NetworkDeviceType {
         if (target instanceof SR5Item && target.isHost()) return 'Host';
@@ -31,10 +32,20 @@ export class DeviceFlow {
         }
     }
 
-    static documentByNetworkDeviceLink(link: NetworkDeviceLink): SR5Actor|SR5Item {
-        if (link.type === 'Actor') {
-            const actor = game.actors.get(link.ownerId);
-            return actor.items.get(link.targetId) as SR5Item;
+    static documentByNetworkDeviceLink(link: NetworkDeviceLink): SR5Actor|SR5Item|undefined {
+        switch (link.type) {
+            case 'Actor': {
+                const actor = game.actors.get(link.ownerId);
+                if (!actor) return;
+                return actor.items.get(link.targetId) as SR5Item;
+            }
+
+            case 'Token': {
+                const scene = game.scenes.get(link.sceneId);
+                if (!scene) return;
+                // const token = scene.tokens.get()
+                // return host.items.get(link.targetId)
+            }
         }
     }
 
@@ -54,7 +65,7 @@ export class DeviceFlow {
     }
 
     static async addNetworkController(controller, device, scene) {
-        const controllerLink = DeviceFlow.buildNetworkDeviceLink(controller)
+        const controllerLink = DeviceFlow.buildNetworkDeviceLink(controller);
         if (device instanceof SR5Item) {
             await device.update({'data.technology.networkController': controllerLink});
         }

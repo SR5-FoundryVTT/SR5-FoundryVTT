@@ -4,6 +4,10 @@
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
                 name=(localize "SR5.Labels.Sheet.NetworkDevices")
         }}
+        {{!-- Don't use the ListItem Handlebar helper as to avoid it's item drag&drop functionality. --}}
+        {{#each networkDevices}}
+        <div>{{this.name}}</div>
+        {{/each}}
     </div>
 </div>
 {{/'systems/shadowrun5e/dist/templates/common/TabWrapper.html'}}
