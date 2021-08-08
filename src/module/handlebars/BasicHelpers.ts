@@ -3,11 +3,20 @@ import {SafeString} from "handlebars";
 import SkillField = Shadowrun.SkillField;
 import {SR5} from "../config";
 import {FLAGS, SR, SYSTEM_NAME} from "../constants";
+import {SR5Actor} from "../actor/SR5Actor";
 
 export const registerBasicHelpers = () => {
     Handlebars.registerHelper('localizeOb', function (strId, obj) {
         if (obj) strId = obj[strId];
         return game.i18n.localize(strId);
+    });
+
+    Handlebars.registerHelper('localizeDocumentType', function (document) {
+        if (document.type.length < 1) return '';
+        const documentClass = document instanceof SR5Actor ? 'ACTOR' : 'ITEM';
+        const documentTypeLabel = document.type[0].toUpperCase() + document.type.slice(1);
+        const i18nTypeLabel = `${documentClass}.Type${documentTypeLabel}`;
+        return game.i18n.localize(i18nTypeLabel);
     });
 
     Handlebars.registerHelper('localizeSkill', function (skill: SkillField): string {

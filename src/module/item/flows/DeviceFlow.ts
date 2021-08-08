@@ -8,27 +8,34 @@ import SocketMessageData = Shadowrun.SocketMessageData;
 
 
 export class DeviceFlow {
-    static networkDeviceType(target: SR5Item|SR5Actor, scene?: Scene): NetworkDeviceType {
+    static networkDeviceType(target: SR5Item|SR5Actor): NetworkDeviceType {
         if (target instanceof SR5Item && target.isHost()) return 'Host';
-        // Decker token with a decking device.
-        if (target instanceof SR5Item && scene) return 'Token';
-        // Technomancer / Sprite token with any device.
-        if (target instanceof SR5Actor && scene) return 'Token';
-        // Decker sidebar actor with a decking device.
-        if (target instanceof SR5Item && !scene && target.actor) return 'Actor';
-
-        if (target instanceof SR5Actor && !scene) return 'Actor';
+        if (target instanceof SR5Item && target.actor.token) return 'Token'
+        if (target instanceof SR5Item && !target.actor.token) return 'Actor';
 
         console.error(`The given networking device doesn't fit any allowed category of networkable matrix device / actor`, target);
     }
 
-    static buildNetworkDeviceLink(target: SR5Item|SR5Actor, scene?: Scene): NetworkDeviceLink {
-        return {
-            sceneId: scene?.id,
-            // @ts-ignore // TODO: foundry-vtt-type 0.8
-            ownerId: target?.actor.id,
-            targetId: target.id,
-            type: DeviceFlow.networkDeviceType(target, scene)
+    static buildNetworkDeviceLink(target: SR5Item|SR5Actor): NetworkDeviceLink {
+        const type =  DeviceFlow.networkDeviceType(target);
+        const actor = target instanceof SR5Actor ? target : target.actor;
+
+        switch (type) {
+            case 'Actor':
+                return {
+                    sceneId: null,
+                    ownerId: actor.id,
+                    targetId: target.id,
+                    type
+                }
+            case 'Token':
+                return {
+                    // @ts-ignore
+                    sceneId: actor.token.parent.id,
+                    ownerId: actor.token.id,
+                    targetId: target.id,
+                    type
+                }
         }
     }
 
@@ -43,28 +50,28 @@ export class DeviceFlow {
             case 'Token': {
                 const scene = game.scenes.get(link.sceneId);
                 if (!scene) return;
-                // const token = scene.tokens.get()
-                // return host.items.get(link.targetId)
+                 // @ts-ignore // TODO: foundry-vtt-types 0.8
+                const token = scene.tokens.get(link.ownerId);
+                return token.actor.items.get(link.targetId) as SR5Item;
             }
         }
     }
 
-    static async emitAddControllerSocketMessage(controller, device, scene) {
-        const controllerLink = DeviceFlow.buildNetworkDeviceLink(controller, scene);
-        const deviceLink = DeviceFlow.buildNetworkDeviceLink(device, scene);
-        await SocketMessage.emitForGM(FLAGS.addNetworkController, {controllerLink, deviceLink, sceneId: scene?.id});
+    static async emitAddControllerSocketMessage(controller, device) {
+        const controllerLink = DeviceFlow.buildNetworkDeviceLink(controller);
+        const deviceLink = DeviceFlow.buildNetworkDeviceLink(device);
+        await SocketMessage.emitForGM(FLAGS.addNetworkController, {controllerLink, deviceLink});
     }
 
     static async handleAddNetworkControllerSocketMessage(message: SocketMessageData) {
-        const {controllerLink, deviceLink, sceneId} = message.data;
+        const {controllerLink, deviceLink} = message.data;
         const controller = DeviceFlow.documentByNetworkDeviceLink(controllerLink);
         const device = DeviceFlow.documentByNetworkDeviceLink(deviceLink);
-        const scene = game.scenes.get(sceneId);
 
-        await DeviceFlow.addNetworkController(controller, device, scene);
+        await DeviceFlow.addNetworkController(controller, device);
     }
 
-    static async addNetworkController(controller, device, scene) {
+    static async addNetworkController(controller, device) {
         const controllerLink = DeviceFlow.buildNetworkDeviceLink(controller);
         if (device instanceof SR5Item) {
             await device.update({'data.technology.networkController': controllerLink});

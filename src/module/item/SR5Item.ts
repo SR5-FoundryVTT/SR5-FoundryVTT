@@ -1734,7 +1734,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
      * Add a 'device' to a matrix network (PAN or WAN)
      *
      */
-    async addNetworkDevice(target: SR5Item|SR5Actor, scene?: Scene) {
+    async addNetworkDevice(target: SR5Item|SR5Actor) {
         // TODO: Add device to WAN network
         // TODO: Add IC actor to WAN network
         // TODO: setup networkController link on networked devices.
@@ -1746,8 +1746,8 @@ export class SR5Item extends Item<ShadowrunItemData> {
 
         if (DeviceFlow.invalidNetworkDevice(controller, target)) return;
 
-        const deviceLink = DeviceFlow.buildNetworkDeviceLink(target, scene);
-        const controllerLink = DeviceFlow.buildNetworkDeviceLink(controller, scene);
+        const deviceLink = DeviceFlow.buildNetworkDeviceLink(target);
+        const controllerLink = DeviceFlow.buildNetworkDeviceLink(controller);
         if (!deviceLink.type || !controllerLink.type) return console.error('Abort adding network device due to internal data error');
 
         if (DeviceFlow.connectedNetworkDevice(controller, deviceLink)) return;
@@ -1756,9 +1756,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
         networkDevices.push(deviceLink);
 
         if (game.user.isGM) {
-            await DeviceFlow.addNetworkController(controller, target, scene);
+            await DeviceFlow.addNetworkController(controller, target);
         } else {
-            await DeviceFlow.emitAddControllerSocketMessage(controller, target, scene);
+            await DeviceFlow.emitAddControllerSocketMessage(controller, target);
         }
 
         return await this.update({'data.networkDevices': networkDevices});

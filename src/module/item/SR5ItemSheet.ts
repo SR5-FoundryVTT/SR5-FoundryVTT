@@ -276,11 +276,16 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
                 const item = actor.items.get(data.data._id) as SR5Item;
 
                 await this.item.addNetworkDevice(item);
-                console.error(this.item.data.data.networkDevices);
             }
 
             else if (data.actorId && data.sceneId && data.tokenId) {
                 console.log('Shadowrun5e | Adding unlinked token actors item to the network', data);
+                const scene = game.scenes.get(data.sceneId);
+                // @ts-ignore // TODO: foundry-vtt-types 0.8
+                const token = scene.tokens.get(data.tokenId);
+                const item = token.actor.items.get(data.data._id) as SR5Item;
+
+                await this.item.addNetworkDevice(item);
             }
 
             else if (data.id && !data.actorId && !data.sceneId && !data.tokenId) {

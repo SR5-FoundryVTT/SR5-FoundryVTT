@@ -605,7 +605,9 @@
       "AddOne": "Add One",
       "SubtractOne": "Subtract One",
       "PAN": "PAN",
-      "NetworkDevices": "Networked Devices"
+      "NetworkDevices": "Networked Devices",
+      "MissingNetworkDevices": "Drag&Drop a network device to add it to the PAN",
+      "ClearNetwork": "Clear network from all devices"
     },
     "ActorSheet": {
       "SpiritConfiguration": "Spirit Configuration",

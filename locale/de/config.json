@@ -590,7 +590,9 @@
       "AddOne": "Add One",
       "SubtractOne": "Subtract One",
       "PAN": "PAN",
-      "NetworkDevices": "Networked Devices"
+      "NetworkDevices": "Networked Devices",
+      "MissingNetworkDevices": "Drag&Drop um ein Netzwerkgerät dem PAN zuzufügen.",
+      "ClearNetwork": "Entferne alle Geräte aus dem Netzwerk"
     },
     "ActorSheet": {
       "SpiritConfiguration": "Geist Konfiguration",
