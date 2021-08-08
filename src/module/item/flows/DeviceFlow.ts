@@ -103,11 +103,19 @@ export class DeviceFlow {
 
          const controllerData = controller.asControllerData();
 
-         return controllerData.data.networkDevices.some(connectedLink =>
-             connectedLink.type === unclearLink.type &&
-             connectedLink.ownerId === unclearLink.ownerId &&
-             connectedLink.sceneId === unclearLink.sceneId &&
-             connectedLink.targetId === unclearLink.targetId
+         return DeviceFlow.findNetworkDeviceLink(controller, unclearLink) >= 0;
+    }
+
+    static findNetworkDeviceLink(controller: SR5Item, needleLink: NetworkDeviceLink): number {
+        if (!controller.isHost() && !controller.isDevice()) return -1;
+
+        const controllerData = controller.asControllerData();
+
+         return controllerData.data.networkDevices.findIndex(connectedLink =>
+             connectedLink.type === needleLink.type &&
+             connectedLink.ownerId === needleLink.ownerId &&
+             connectedLink.sceneId === needleLink.sceneId &&
+             connectedLink.targetId === needleLink.targetId
          )
     }
 }

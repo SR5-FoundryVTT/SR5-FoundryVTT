@@ -27,6 +27,7 @@
   "ITEM.TypeHost": "Host",
 
   "SR5.FOUNDRY": {
+    "Actor": "Actor",
     "Scene": "Scene",
     "Item": "Item",
     "Token": "Token"

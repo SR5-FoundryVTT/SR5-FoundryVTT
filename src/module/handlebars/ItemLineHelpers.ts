@@ -508,12 +508,26 @@ export const registerItemLineHelpers = () => {
         }];
     });
 
+    Handlebars.registerHelper('NetworkDevicesListRightSide', () => {
+        return [
+            {
+                text: {
+                    text: game.i18n.localize('SR5.FOUNDRY.Actor'),
+                },
+            },
+            {
+                text: {
+                    text: game.i18n.localize('SR5.FOUNDRY.Item'),
+                },
+            }]
+    })
+
     Handlebars.registerHelper('NetworkDevicesListHeaderIcons', () => {
         return [{
             icon: 'fas fa-trash',
             title: game.i18n.localize('SR5.Labels.Sheet.ClearNetwork'),
             text: game.i18n.localize('SR5.Del'),
-            cssClass: 'marks-clear-all'
+            cssClass: 'network-clear'
         }];
     })
 };

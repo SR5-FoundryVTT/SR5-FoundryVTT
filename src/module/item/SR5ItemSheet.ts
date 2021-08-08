@@ -214,6 +214,8 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         html.find('.add-new-license').click(this._onAddLicense.bind(this));
         html.find('.license-delete').on('click', this._onRemoveLicense.bind(this));
 
+        html.find('.network-clear').on('click', this._onRemoveAllNetworkDevices.bind(this));
+        html.find('.network-device-remove').on('click', this._onRemoveNetworkDevice.bind(this));
     }
 
     _onDragOver(event) {
@@ -399,6 +401,37 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         if (!userConsented) return;
 
         await this.item.deleteOwnedItem(this._eventId(event));
+    }
+
+    async _onRemoveAllNetworkDevices(event) {
+        event.preventDefault();
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        await this.item.removeAllNetworkDevices();
+    }
+
+    async _onRemoveNetworkDevice(event) {
+        if (!canvas.ready) return;
+        event.preventDefault();
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        // const tokenId = event.currentTarget.closest('.list-item').dataset.tokenId;
+        // const actorId = event.currentTarget.closest('.list-item').dataset.actorId;
+        // const itemId = event.currentTarget.closest('.list-item').dataset.itemId;
+        //
+        // // Get the item from the token actor OR the collection actor.
+        // // A collection actor will not have a token on it's token property.
+        // const item = tokenId ?
+        //     // @ts-ignore // TODO: foundry-vtt-types 0.8
+        //     canvas.scene.tokens.get(tokenId).actor.items.get(itemId) :
+        //     game.actors.get(actorId).items.get(itemId);
+        const networkDeviceIndex = Helpers.parseInputToNumber(event.currentTarget.closest('.list-item').dataset.listItemIndex);
+
+        await this.item.removeNetworkDevice(networkDeviceIndex);
     }
 
     /**
