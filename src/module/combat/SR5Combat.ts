@@ -1,7 +1,9 @@
 import {SR5Actor} from "../actor/SR5Actor";
 import {FLAGS, SR, SYSTEM_NAME, SYSTEM_SOCKET} from "../constants";
-import Combatant = Combat.Combatant;
 import {CombatRules} from "../rules/CombatRules";
+import Combatant = Combat.Combatant;
+import {SocketMessage} from "../sockets";
+import SocketMessageData = Shadowrun.SocketMessageData;
 
 /**
  * Foundry combat implementation for Shadowrun5 rules.
@@ -12,12 +14,6 @@ import {CombatRules} from "../rules/CombatRules";
  *       @PDF SR5#160 'Chaning Initiative'
  */
 export class SR5Combat extends Combat {
-    constructor(...args: any) {
-        super(...args);
-
-        this._registerSocketListeners();
-    }
-
     get initiativePass(): number {
         return this.getFlag(SYSTEM_NAME, FLAGS.CombatInitiativePass) as number || SR.combat.INITIAL_INI_PASS;
     }
@@ -365,36 +361,30 @@ export class SR5Combat extends Combat {
         return `max(${baseFormula} - ${ongoingIniPassModified}[Pass], 0)`;
     }
 
-    _registerSocketListeners() {
-        // @ts-ignore
-        game.socket.on(SYSTEM_SOCKET, async (message) => {
-            switch (message.type) {
-                case (FLAGS.DoNextRound):
-                    if (!message.data.hasOwnProperty('id') && typeof message.data.id !== 'string') {
-                        console.error(`SR5Combat Socket Message ${FLAGS.DoNextRound} data.id must be a string (combat id) but is ${typeof message.data} (${message.data})!`);
-                        return;
-                    }
+    static async _handleDoNextRoundSocketMessage(message: SocketMessageData) {
+        if (!message.data.hasOwnProperty('id') && typeof message.data.id !== 'string') {
+            console.error(`SR5Combat Socket Message ${FLAGS.DoNextRound} data.id must be a string (combat id) but is ${typeof message.data} (${message.data})!`);
+            return;
+        }
 
-                    return await SR5Combat.handleNextRound(message.data.id);
-                case (FLAGS.DoInitPass):
-                    if (!message.data.hasOwnProperty('id') && typeof message.data.id !== 'string') {
-                        console.error(`SR5Combat Socket Message ${FLAGS.DoInitPass} data.id must be a string (combat id) but is ${typeof message.data} (${message.data})!`);
-                        return;
-                    }
+        return await SR5Combat.handleNextRound(message.data.id);
+    }
 
-                    return await SR5Combat.handleIniPass(message.data.id);
-            }
-        })
+    static async _handleDoInitPassSocketMessage(message: SocketMessageData) {
+        if (!message.data.hasOwnProperty('id') && typeof message.data.id !== 'string') {
+            console.error(`SR5Combat Socket Message ${FLAGS.DoInitPass} data.id must be a string (combat id) but is ${typeof message.data} (${message.data})!`);
+            return;
+        }
+
+        return await SR5Combat.handleIniPass(message.data.id);
     }
 
     async _createDoNextRoundSocketMessage() {
-        //@ts-ignore
-        await game.socket.emit(`${SYSTEM_SOCKET}`, {type: FLAGS.DoNextRound, data: {id: this.id}});
+        await SocketMessage.emitForGM(FLAGS.DoNextRound, {id: this.id});
     }
 
     async _createDoIniPassSocketMessage() {
-        //@ts-ignore
-        await game.socket.emit(`${SYSTEM_SOCKET}`, {type: FLAGS.DoInitPass, data: {id: this.id}});
+        await SocketMessage.emitForGM(FLAGS.DoInitPass, {id: this.id});
     }
 }
 

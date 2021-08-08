@@ -3,6 +3,7 @@ import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
 import WeaponData = Shadowrun.WeaponData;
 import AmmoItemData = Shadowrun.AmmoItemData;
+import {DefaultValues} from "../../data/DataDefaults";
 
 export class AmmoImporter extends DataImporter {
     public files = ['gear.xml'];
@@ -27,25 +28,7 @@ export class AmmoImporter extends DataImporter {
                     chat: '',
                     source: '',
                 },
-                technology: {
-                    rating: 1,
-                    availability: '',
-                    quantity: 1,
-                    cost: 0,
-                    equipped: true,
-                    conceal: {
-                        base: 0,
-                        value: 0,
-                        mod: [],
-                    },
-                    condition_monitor: {
-                        label: '',
-                        value: 0,
-                        max: 0,
-                    },
-                    wireless: true
-                },
-
+                technology: DefaultValues.technologyData({rating: 1, equipped: true, wireless: false}),
                 element: '',
                 ap: 0,
                 damage: 0,

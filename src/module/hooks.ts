@@ -1,7 +1,7 @@
 import { SR5 } from './config';
 import { Migrator } from './migrator/Migrator';
 import { registerSystemSettings } from './settings';
-import { SYSTEM_NAME } from './constants';
+import {FLAGS, SYSTEM_NAME, SYSTEM_SOCKET} from './constants';
 import { SR5Actor } from './actor/SR5Actor';
 import { SR5ActorSheet } from './actor/SR5ActorSheet';
 import { SR5Item } from './item/SR5Item';
@@ -21,6 +21,9 @@ import {EnvModifiersApplication} from "./apps/EnvModifiersApplication";
 import {quenchRegister} from "../test/quench";
 import {SR5ICActorSheet} from "./actor/sheets/SR5ICActorSheet";
 import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
+import SocketMessageHooks = Shadowrun.SocketMessageHooks;
+import SocketMessage = Shadowrun.SocketMessageData;
+import {DeviceFlow} from "./item/flows/DeviceFlow";
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 // TODO: Figure out how to change global CONFIG type
@@ -109,6 +112,8 @@ ___________________
         ['renderSR5ActorSheet', 'renderSR5ItemSheet'].forEach((s) => {
             Hooks.on(s, (app, html) => Helpers.setupCustomCheckbox(app, html));
         });
+
+        HooksManager.registerSocketListeners();
 
         HandlebarManager.loadTemplates();
     }
@@ -208,5 +213,34 @@ ___________________
                 await ic._updateICHostData(hostData);
             }
         }
+    }
+
+    /**
+     * This method is used as a simple place to register socket hook handlers for the system.
+     *
+     * You can use the SocketMessage
+     */
+    static registerSocketListeners() {
+        console.log('Registering Shadowrun5e system sockets...');
+        const hooks: SocketMessageHooks = {
+            [FLAGS.addNetworkController]: [DeviceFlow.handleAddNetworkControllerSocketMessage],
+            [FLAGS.DoNextRound]: [SR5Combat._handleDoNextRoundSocketMessage],
+            [FLAGS.DoInitPass]: [SR5Combat._handleDoInitPassSocketMessage]
+        }
+
+        game.socket.on(SYSTEM_SOCKET, async (message: SocketMessage) => {
+            console.log('Received Shadowrun5e system socket message.', message);
+
+            const handlers = hooks[message.type];
+            if (!handlers || handlers.length === 0) return console.warn('System socket message without handler!', message);
+            // In case of targeted socket message only execute with target user (intended for GM usage)
+            if (message.userId && game.user.id !== message.userId) return;
+            if (message.userId && game.user.id) console.log('GM is handling Shadowrun5e system socket message');
+
+            for (const handler of handlers) {
+                console.log('Handover Shadowrun5e system socket message to handler', handler);
+                await handler(message);
+            }
+        });
     }
 }

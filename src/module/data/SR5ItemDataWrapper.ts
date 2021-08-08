@@ -175,6 +175,10 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.isDevice() && this.getData().category === 'cyberdeck';
     }
 
+    isCommlink(): boolean {
+        return this.isDevice() && this.getData().category === 'commlink';
+    }
+
     isMatrixAction(): boolean {
         return this.isAction() && this.getData().result.success.matrix.placeMarks;
     }

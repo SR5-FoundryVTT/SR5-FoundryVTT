@@ -586,6 +586,12 @@
   "CONTROLS.SR5.EnvironmentalModifiers": "Umgebungsmodifikatoren",
   "SR5.DIALOG.MissingModuleContent": "Um das Quell-PDF anzuzeigen, muss das Modul PDFoundry installiert sein und ein PDF mit passendem Code erstellt werden.",
   "SR5.Labels": {
+    "Sheet": {
+      "AddOne": "Add One",
+      "SubtractOne": "Subtract One",
+      "PAN": "PAN",
+      "NetworkDevices": "Networked Devices"
+    },
     "ActorSheet": {
       "SpiritConfiguration": "Geist Konfiguration",
       "CritterPowers": "Critter Kräfte",

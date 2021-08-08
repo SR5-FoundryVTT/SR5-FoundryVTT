@@ -3,13 +3,14 @@ declare namespace Shadowrun {
         technology: TechnologyData
     };
     export type TechnologyData = {
-        rating: NumberOrEmpty;
-        availability: string;
-        quantity: NumberOrEmpty;
-        cost: NumberOrEmpty;
-        equipped: boolean;
-        conceal: ModifiableValue;
-        condition_monitor?: ConditionData;
-        wireless: boolean;
+        rating: NumberOrEmpty
+        availability: string
+        quantity: NumberOrEmpty
+        cost: NumberOrEmpty
+        equipped: boolean
+        conceal: ModifiableValue
+        condition_monitor?: ConditionData
+        wireless: boolean
     };
+
 }

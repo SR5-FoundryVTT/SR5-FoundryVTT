@@ -62,24 +62,7 @@ export class WeaponImporter extends DataImporter {
                     alt_mod: 0,
                     dice_pool_mod: []
                 },
-                technology: {
-                    rating: 1,
-                    availability: '',
-                    quantity: 1,
-                    cost: 0,
-                    equipped: true,
-                    conceal: {
-                        base: 0,
-                        value: 0,
-                        mod: [],
-                    },
-                    condition_monitor: {
-                        label: '',
-                        value: 0,
-                        max: 0,
-                    },
-                    wireless: true
-                },
+                technology: DefaultValues.technologyData({rating: 1}),
                 ammo: {
                     spare_clips: {
                         value: 0,

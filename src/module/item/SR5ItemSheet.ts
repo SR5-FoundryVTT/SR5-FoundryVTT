@@ -223,6 +223,7 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
 
         if (!data) return;
 
+        // Weapon parts...
         if (this.item.isWeapon() && data.type === 'Item') {
             let item;
             // Case 1 - Data explicitly provided
@@ -247,8 +248,33 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
             return;
         }
 
+        // TODO: Handle WAN
         if (this.item.isHost() && data.type === 'Actor') {
             await this.item.addIC(data.id, data.pack);
+
+            return;
+        }
+
+        // PAN Support...
+        if (this.item.isDevice() && data.type === 'Item') {
+            if (data.actorId && !data.sceneId && !data.tokenId) {
+                console.log('Shadowrun5e | Adding linked actors item to the network', data);
+                const actor = game.actors.get(data.actorId);
+                const item = actor.items.get(data.data._id) as SR5Item;
+
+                await this.item.addNetworkDevice(item);
+                console.error(this.item.data.data.networkDevices);
+            }
+
+            else if (data.actorId && data.sceneId && data.tokenId) {
+                console.log('Shadowrun5e | Adding unlinked token actors item to the network', data);
+            }
+
+            else if (data.id && !data.actorId && !data.sceneId && !data.tokenId) {
+                console.log('Shadowrun5e | Adding collection item without actor to the network', data);
+            }
+
+            return;
         }
     }
 

@@ -92,7 +92,8 @@ export class DefaultValues {
                 label: '',
                 value: 0,
                 max: 0,
-            }
+            },
+            wireless: true
         }, partialTechnologyData) as TechnologyData;
     }
 
@@ -131,8 +132,9 @@ export class DefaultValues {
                     value: 0,
                     att: "attack",
                     editable: true
-                },
-            }
+                }
+            },
+            networkDevices: []
         }, partialMatrixData) as DevicePartData;
     }
 

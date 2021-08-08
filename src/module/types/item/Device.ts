@@ -11,8 +11,10 @@ declare namespace Shadowrun {
     export type DeviceCategory = 'commlink' | 'cyberdeck' | 'host' | '';
 
     export interface DevicePartData {
-        category: DeviceCategory;
+        category: DeviceCategory
         atts: MatrixAttributes
+        // Will contain links for networked devices controlled by this device.
+        networkDevices: NetworkDeviceLink[]
     }
 
     export interface DeviceAttribute {
@@ -22,5 +24,14 @@ declare namespace Shadowrun {
         att: MatrixAttribute;
         // Is used to determine if a device attribute should be editable on the sheet.
         editable: boolean
+    }
+
+    // PAN / WAN networking
+    export type NetworkDeviceType = 'Token' | 'Actor' | 'Host';
+    export interface NetworkDeviceLink {
+        sceneId: string|undefined,
+        ownerId: string|undefined,
+        targetId: string,
+        type: NetworkDeviceType
     }
 }

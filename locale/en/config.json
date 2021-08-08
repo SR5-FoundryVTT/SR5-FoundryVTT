@@ -603,7 +603,9 @@
   "SR5.Labels": {
     "Sheet": {
       "AddOne": "Add One",
-      "SubtractOne": "Subtract One"
+      "SubtractOne": "Subtract One",
+      "PAN": "PAN",
+      "NetworkDevices": "Networked Devices"
     },
     "ActorSheet": {
       "SpiritConfiguration": "Spirit Configuration",

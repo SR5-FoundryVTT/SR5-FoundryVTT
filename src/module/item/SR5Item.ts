@@ -57,6 +57,7 @@ import {DefaultValues} from "../data/DataDefaults";
 import {HostDataPreparation} from "./prep/HostPrep";
 import {MatrixRules} from "../rules/MatrixRules";
 import ActionResultData = Shadowrun.ActionResultData;
+import {DeviceFlow} from "./flows/DeviceFlow";
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
@@ -1372,6 +1373,10 @@ export class SR5Item extends Item<ShadowrunItemData> {
         }
     }
 
+    asControllerData(): HostItemData | DeviceItemData | undefined {
+        return this.asHostData() || this.asDeviceData() || undefined;
+    }
+
     isEquipment(): boolean {
         return this.wrapper.isEquipment();
     }
@@ -1388,6 +1393,10 @@ export class SR5Item extends Item<ShadowrunItemData> {
 
     isCyberdeck(): boolean {
         return this.wrapper.isCyberdeck();
+    }
+
+    isCommlink(): boolean {
+        return this.wrapper.isCommlink();
     }
 
     isMatrixAction(): boolean {
@@ -1719,5 +1728,57 @@ export class SR5Item extends Item<ShadowrunItemData> {
         }
 
         await this.update({'data.marks': updateData});
+    }
+
+    /**
+     * Add a 'device' to a matrix network (PAN or WAN)
+     *
+     */
+    async addNetworkDevice(target: SR5Item|SR5Actor, scene?: Scene) {
+        // TODO: Add device to WAN network
+        // TODO: Add IC actor to WAN network
+        // TODO: setup networkController link on networked devices.
+
+        const deviceData = this.asDeviceData();
+        if (!target || !deviceData) return;
+
+        const controller = this;
+
+        if (DeviceFlow.invalidNetworkDevice(controller, target)) return;
+
+        const deviceLink = DeviceFlow.buildNetworkDeviceLink(target, scene);
+        const controllerLink = DeviceFlow.buildNetworkDeviceLink(controller, scene);
+        if (!deviceLink.type || !controllerLink.type) return console.error('Abort adding network device due to internal data error');
+
+        if (DeviceFlow.connectedNetworkDevice(controller, deviceLink)) return;
+
+        const networkDevices = duplicate(deviceData.data.networkDevices);
+        networkDevices.push(deviceLink);
+
+        if (game.user.isGM) {
+            await DeviceFlow.addNetworkController(controller, target, scene);
+        } else {
+            await DeviceFlow.emitAddControllerSocketMessage(controller, target, scene);
+        }
+
+        return await this.update({'data.networkDevices': networkDevices});
+    }
+
+    async removeNetworkDevice(index: number) {
+        const deviceData = this.asDeviceData();
+        if (!deviceData) return;
+
+        const networkDevices = duplicate(deviceData.data.networkDevices);
+        if (networkDevices[index] === undefined) return;
+        networkDevices.splice(index, 1);
+
+        return await this.update({'data.networkDevices': networkDevices});
+    }
+
+    async removeAllNetworkDevices() {
+        const deviceData = this.asDeviceData();
+        if (!deviceData) return;
+
+        return await this.update({'data.networkDevices': []});
     }
 }

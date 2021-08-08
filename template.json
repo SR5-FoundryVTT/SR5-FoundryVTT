@@ -1,6 +1,13 @@
 {
     "Actor": {
-        "types": ["character", "spirit", "sprite", "vehicle", "critter", "ic"],
+        "types": [
+            "character",
+            "spirit",
+            "sprite",
+            "vehicle",
+            "critter",
+            "ic"
+        ],
         "templates": {
             "matrix": {
                 "matrix": {
@@ -1103,7 +1110,8 @@
                         "value": 0,
                         "max": 9
                     },
-                    "wireless": true
+                    "wireless": true,
+                    "networkController": null
                 }
             },
             "action": {
@@ -1199,7 +1207,8 @@
                         "att": "firewall",
                         "editable": true
                     }
-                }
+                },
+                "networkDevices": []
             }
         },
         "armor": {
