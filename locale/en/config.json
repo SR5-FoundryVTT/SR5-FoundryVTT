@@ -785,7 +785,8 @@
       "Sparky": "Sparky",
       "TarBaby": "Tar Baby",
       "Track": "Track"
-    }
+    },
+    "MissingHost": "Host per Drag&Drop zufügen"
   },
   "SR5.Host": {
     "Rating": "Host Rating",

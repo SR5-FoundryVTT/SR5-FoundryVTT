@@ -754,7 +754,8 @@
       "Sparky": "Sparky",
       "TarBaby": "Teer Baby",
       "Track": "Aufspüren"
-    }
+    },
+    "MissingHost": "Drag&Drop a host item"
   },
   "SR5.Host": {
     "Rating": "Host Stufe"
