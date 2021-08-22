@@ -184,7 +184,14 @@
         {{/each}}
     </div>
     {{/if}}
-    {{#if action.result.success.matrix.placeMark }}
-    Markiere
+    {{#if result}}
+    <div class="card-buttons">
+        {{#if result.success.matrix.placeMarks }}
+        <div class="button test result" data-action="placeMarks">
+            {{localize "SR5.PlaceMarks"}} {{actionTestData.matrix.marks}}
+        </div>
+        {{/if}}
+    </div>
     {{/if}}
+
 </div>

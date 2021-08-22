@@ -7,10 +7,9 @@
   "url": "https://github.com/smilligan93/SR5-FoundryVTT",
   "bugs": "https://github.com/smilligan93/SR5-FoundryVTT/issues",
   "flags": {},
-  "version": "0.7.17",
+  "version": "0.7.18",
   "minimumCoreVersion": "0.8.6",
-  "compatibleCoreVersion": "0.8.9",
-  "templateVersion": "4",
+  "compatibleCoreVersion": "0.8.8",
   "scripts": [],
   "esmodules": [
     "dist/bundle.js"
@@ -37,12 +36,20 @@
   ],
   "packs": [
     {
+      "name": "Roles",
+      "label": "SR5e NPCs",
+      "path": "./packs/sr5e-npcs.db",
+      "private": false,
+      "entity": "Actor",
+      "system": "shadowrun5e"
+    },
+    {
       "name": "Matrix Actions",
       "label": "SR5e Matrix Actions",
-      "system": "shadowrun5e",
       "path": "./packs/sr5e-matrix-actions.db",
+      "private": false,
       "entity": "Item",
-      "private": false
+      "system": "shadowrun5e"
     }
   ],
   "system": [],

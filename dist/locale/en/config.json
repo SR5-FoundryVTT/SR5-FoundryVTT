@@ -1,4 +1,38 @@
 {
+  "ACTOR.TypeCharacter": "Character",
+  "ACTOR.TypeSpirit": "Spirit",
+  "ACTOR.TypeSprite": "Sprite",
+  "ACTOR.TypeVehicle": "Vehicle/Drone",
+  "ACTOR.TypeCritter": "Critter",
+  "ACTOR.TypeIc": "IC",
+  "ITEM.TypeAction": "Action",
+  "ITEM.TypeAdept_power": "Adept Power",
+  "ITEM.TypeAmmo": "Ammunition",
+  "ITEM.TypeArmor": "Armor",
+  "ITEM.TypeComplex_form": "Complex Form",
+  "ITEM.TypeContact": "Contact",
+  "ITEM.TypeCritter_power": "Critter Power",
+  "ITEM.TypeBioware": "Bioware",
+  "ITEM.TypeCyberware": "Cyberware",
+  "ITEM.TypeDevice": "Device",
+  "ITEM.TypeEquipment": "Equipment",
+  "ITEM.TypeLifestyle": "Lifestyle",
+  "ITEM.TypeModification": "Gear Modification",
+  "ITEM.TypeProgram": "Program",
+  "ITEM.TypeQuality": "Quality",
+  "ITEM.TypeSin": "SIN",
+  "ITEM.TypeSpell": "Spell",
+  "ITEM.TypeSprite_power": "Sprite Power",
+  "ITEM.TypeWeapon": "Weapon",
+  "ITEM.TypeHost": "Host",
+
+  "SR5.FOUNDRY": {
+    "Actor": "Actor",
+    "Scene": "Scene",
+    "Item": "Item",
+    "Token": "Token"
+  },
+
   "SR5.SheetActor": "Actor sheet",
   "SR5.SheetItem": "Item sheet",
   "SR5.ItemTypes": {
@@ -37,6 +71,7 @@
   "SR5.RtgAboveZero": "Rtg > 0",
   "SR5.Qty": "Qty",
   "SR5.Add": "Add",
+  "SR5.Del": "Del",
   "SR5.Languages": "Languages",
   "SR5.Actions": "Actions",
   "SR5.Action": "Action",
@@ -53,9 +88,9 @@
   "SR5.Nuyen": "Nuyen",
   "SR5.Equipped": "Equipped",
   "SR5.Gear": "Gear",
-  "SR5.Matrix": "Matrix",
   "SR5.Marks": "Marks",
   "SR5.PlaceMarks": "Place Marks",
+  "SR5.ClearMarks": "Clear All Marks",
   "SR5.Biography": "Bio",
   "SR5.Lifestyle": "Lifestyle",
   "SR5.Miscellaneous": "Misc",
@@ -567,10 +602,19 @@
   "CONTROLS.SR5.EnvironmentalModifiers": "Environmental Modifiers",
   "SR5.DIALOG.MissingModuleContent": "In order for source PDFs to be shown, the PDFoundry module must be installed and a PDF matching the code created.",
   "SR5.Labels": {
+    "Sheet": {
+      "AddOne": "Add One",
+      "SubtractOne": "Subtract One",
+      "PAN": "PAN",
+      "NetworkDevices": "Networked Devices",
+      "MissingNetworkDevices": "Drag&Drop a network device to add it to the PAN",
+      "ClearNetwork": "Clear network from all devices"
+    },
     "ActorSheet": {
       "SpiritConfiguration": "Spirit Configuration",
       "CritterPowers": "Critter Powers",
       "Spells": "Spells",
+      "Matrix": "Matrix",
       "SpritePowers": "Sprite Powers",
       "DeviceRating": "Device Rating",
       "RollDronePerception": "Drone Perception",
@@ -741,7 +785,8 @@
       "Sparky": "Sparky",
       "TarBaby": "Tar Baby",
       "Track": "Track"
-    }
+    },
+    "MissingHost": "Host per Drag&Drop zufügen"
   },
   "SR5.Host": {
     "Rating": "Host Rating",
@@ -771,12 +816,16 @@
     "NegativeLimitValue": "Limit values must be above zero",
     "TokenSelectionNeeded": "One ore more tokens need to be selected",
     "SkillCantBeDefault": "This skill can't be rolled on as it can't be defaulted",
-    "HostItemOnlyAcceptIC": "Only IC actors can be added to hosts"
+    "HostItemOnlyAcceptIC": "Only IC actors can be added to hosts",
+    "InvalidMarksCount": "You've trying to place a strange number of marks"
+
   },
   "SR5.Errors": {
     "MissingSkill": "The actor doesn't have the requested skill.",
     "SkillWithoutAttribute": "The skill has no attribute configured.",
-    "MarkCouldNotBePlaced": "Internal Error: Your marks couldn't be placed."
+    "MarkCouldNotBePlaced": "Internal Error: Your marks couldn't be placed.",
+    "MarksCantBePlacedBy": "The active actor can't place marks.",
+    "MarksCantBePlacedOn": "The chosen actor type can't receive any marks."
   },
   "SR5.ChangelogApplication": {
     "Title": "Shadowrun5e Update",
@@ -837,11 +886,11 @@
     }
   },
   "SR5.ActiveEffect": {
-      "New": "New Effect",
-      "Types": {
-        "Temporary": "Temporary Effects",
-        "Passive": "Passive Effects",
-        "Inactive": "Inactive Effects"
-      }
+    "New": "New Effect",
+    "Types": {
+      "Temporary": "Temporary Effects",
+      "Passive": "Passive Effects",
+      "Inactive": "Inactive Effects"
     }
+  }
 }

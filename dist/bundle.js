@@ -13360,10 +13360,13 @@ class SR5Actor extends Actor {
     getModifier(modifierName) {
         return this.data.data.modifiers[modifierName];
     }
+    /**
+     * Some actors have skills, some don't. While others don't have skills but derive skill values from their ratings.
+     */
     findActiveSkill(skillName) {
         // Check for faulty to catch empty names as well as missing parameters.
         if (!skillName)
-            return undefined;
+            return;
         // Handle legacy skills (name is id)
         const skills = this.getActiveSkills();
         const skill = skills[skillName];
@@ -13553,13 +13556,13 @@ class SR5Actor extends Actor {
      * Determine if an actor can choose a special trait using the special field.
      */
     get hasSpecial() {
-        return this.data.type in ['character', 'sprite', 'spirit', 'critter'];
+        return ['character', 'sprite', 'spirit', 'critter'].includes(this.data.type);
     }
     /**
      * Determine if an actor can choose a full defense attribute
      */
     get hasFullDefense() {
-        return this.data.type in ['character', 'vehicle', 'sprite', 'spirit', 'critter'];
+        return ['character', 'vehicle', 'sprite', 'spirit', 'critter'].includes(this.data.type);
     }
     /**
      * Return the full pool of a skill including attribute and possible specialization bonus.
@@ -14963,24 +14966,34 @@ class SR5Actor extends Actor {
         return this.data.data.matrix;
     }
     /**
+     * Change the amount of marks on the target by the amount of marks given, while adhering to min/max values.
+     *
+     *
      * @param target The Document the marks are placed on. This can be an actor (character, technomancer, IC) OR an item (Host)
      * @param marks The amount of marks to be placed
      * @param options Additional options that may be needed
      * @param options.scene The scene the actor lives on. If empty, will be current active scene
      * @param options.item The item that the mark is to be placed on
+     * @param options.overwrite Replace the current marks amount instead of changing it
      */
     setMarks(target, marks, options) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!canvas.ready)
                 return;
             if (!this.isMatrixActor) {
-                ui.notifications.error(game.i18n.localize('SR5.Errors.MarkCouldNotBePlaced'));
+                ui.notifications.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedBy'));
                 console.error(`The actor type ${this.data.type} can't receive matrix marks!`);
                 return;
             }
-            if (!MatrixRules_1.MatrixRules.isValidMarksCount(marks)) {
-                ui.notifications.error(game.i18n.localize('SR5.Errors.MarkCouldNotBePlaced'));
-                console.error('To many or to little matrix marks');
+            // @ts-ignore // TODO: foundry-vtt-types 0.8
+            if (!target.actor.isMatrixActor) {
+                ui.notifications.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedOn'));
+                // @ts-ignore
+                console.error(`The actor type ${target.actor.type} can't receive matrix marks!`);
+                return;
+            }
+            // It hurt itself in confusion.
+            if (this.id === target.actor.id) {
                 return;
             }
             // Both scene and item are optional.
@@ -14988,7 +15001,8 @@ class SR5Actor extends Actor {
             const item = options === null || options === void 0 ? void 0 : options.item;
             const markId = helpers_1.Helpers.buildMarkId(scene.id, target.id, item === null || item === void 0 ? void 0 : item.id);
             const matrixData = this.matrixData;
-            matrixData.marks[markId] = marks;
+            const currentMarks = (options === null || options === void 0 ? void 0 : options.overwrite) ? 0 : this.getMarksById(markId);
+            matrixData.marks[markId] = MatrixRules_1.MatrixRules.getValidMarksCount(currentMarks + marks);
             yield this.update({ 'data.matrix.marks': matrixData.marks });
         });
     }
@@ -15005,6 +15019,18 @@ class SR5Actor extends Actor {
             for (const markId of Object.keys(matrixData.marks)) {
                 updateData[`-=${markId}`] = null;
             }
+            yield this.update({ 'data.matrix.marks': updateData });
+        });
+    }
+    /**
+     * Remove ONE mark. If you want to delete all marks, use clearMarks instead.
+     */
+    clearMark(markId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isMatrixActor)
+                return;
+            const updateData = {};
+            updateData[`-=${markId}`] = null;
             yield this.update({ 'data.matrix.marks': updateData });
         });
     }
@@ -15027,18 +15053,32 @@ class SR5Actor extends Actor {
             console.error('Not yet supported');
             return;
         }
-        if (!target.isMatrixActor)
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
+        if (!(target === null || target === void 0 ? void 0 : target.actor.isMatrixActor))
             return 0;
         const scene = (options === null || options === void 0 ? void 0 : options.scene) || canvas.scene;
         // If an actor has been targeted, they might have a device. If an item / host has been targeted they don't.
-        item = item || target instanceof SR5Actor ? target.getMatrixDevice() : undefined;
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
+        item = item || target instanceof SR5Actor ? target.actor.getMatrixDevice() : undefined;
         const markId = helpers_1.Helpers.buildMarkId(scene.id, target.id, item === null || item === void 0 ? void 0 : item.id);
+        return this.getMarksById(markId);
+    }
+    getMarksById(markId) {
+        return this.matrixData.marks[markId] || 0;
+    }
+    getAllMarkedDocuments() {
         const matrixData = this.matrixData;
-        return matrixData.marks[markId] || 0;
+        if (!matrixData)
+            return [];
+        // Deconstruct all mark ids into documents.
+        return Object.entries(matrixData.marks)
+            .filter(([markId, marks]) => helpers_1.Helpers.isValidMarkId(markId))
+            .map(([markId, marks]) => (Object.assign(Object.assign({}, helpers_1.Helpers.getMarkIdDocuments(markId)), { marks,
+            markId })));
     }
 }
 exports.SR5Actor = SR5Actor;
-},{"../apps/dialogs/ShadowrunActorDialogs":134,"../chat":142,"../config":144,"../constants":145,"../data/DataDefaults":146,"../data/SR5ItemDataWrapper":148,"../helpers":157,"../item/SR5Item":197,"../parts/PartsList":209,"../rolls/ShadowrunRoller":210,"../rules/MatrixRules":212,"../rules/Modifiers":213,"../rules/SkillRules":214,"./flows/SkillFlow":88,"./flows/SoakFlow":89,"./prep/CharacterPrep":90,"./prep/CritterPrep":91,"./prep/ICPrep":92,"./prep/SpiritPrep":93,"./prep/SpritePrep":94,"./prep/VehiclePrep":95}],86:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunActorDialogs":134,"../chat":142,"../config":144,"../constants":145,"../data/DataDefaults":146,"../data/SR5ItemDataWrapper":148,"../helpers":157,"../item/SR5Item":197,"../parts/PartsList":211,"../rolls/ShadowrunRoller":212,"../rules/MatrixRules":214,"../rules/Modifiers":215,"../rules/SkillRules":216,"./flows/SkillFlow":88,"./flows/SoakFlow":89,"./prep/CharacterPrep":90,"./prep/CritterPrep":91,"./prep/ICPrep":92,"./prep/SpiritPrep":93,"./prep/SpritePrep":94,"./prep/VehiclePrep":95}],86:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -15125,6 +15165,7 @@ class SR5ActorSheet extends ActorSheet {
         // Active Effects data.
         // @ts-ignore // TODO: foundry-vtt-types 0.8 missing document support
         data['effects'] = effects_1.prepareActiveEffectCategories(this.document.effects);
+        data['markedDocuments'] = this.object.getAllMarkedDocuments();
         return data;
     }
     _isSkillMagic(id, skill) {
@@ -15464,6 +15505,11 @@ class SR5ActorSheet extends ActorSheet {
         html.find('.item-create').click(this._onItemCreate.bind(this));
         html.find('.reload-ammo').click(this._onReloadAmmo.bind(this));
         html.find('.matrix-att-selector').change(this._onMatrixAttributeSelected.bind(this));
+        html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));
+        html.find('.marks-add-one').on('click', (event) => __awaiter(this, void 0, void 0, function* () { return this._onMarksQuantityChangeBy(event, 1); }));
+        html.find('.marks-remove-one').on('click', (event) => __awaiter(this, void 0, void 0, function* () { return this._onMarksQuantityChangeBy(event, -1); }));
+        html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
+        html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
         html.find('.import-character').click(this._onShowImportCharacter.bind(this));
         html.find('.show-hidden-skills').click(this._onShowHiddenSkills.bind(this));
         /**
@@ -15780,6 +15826,52 @@ class SR5ActorSheet extends ActorSheet {
                 }
             }
             yield this.actor.updateOwnedItem(data);
+        });
+    }
+    _onMarksQuantityChange(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.stopPropagation();
+            const markId = event.currentTarget.dataset.markId;
+            if (!markId)
+                return;
+            const { scene, target, item } = helpers_1.Helpers.getMarkIdDocuments(markId);
+            if (!scene || !target)
+                return; // item can be undefined.
+            const marks = parseInt(event.currentTarget.value);
+            yield this.object.setMarks(target, marks, { scene, item, overwrite: true });
+        });
+    }
+    _onMarksQuantityChangeBy(event, by) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.stopPropagation();
+            const markId = event.currentTarget.dataset.markId;
+            if (!markId)
+                return;
+            const { scene, target, item } = helpers_1.Helpers.getMarkIdDocuments(markId);
+            if (!scene || !target)
+                return; // item can be undefined.
+            yield this.object.setMarks(target, by, { scene, item });
+        });
+    }
+    _onMarksDelete(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.stopPropagation();
+            const markId = event.currentTarget.dataset.markId;
+            if (!markId)
+                return;
+            const userConsented = yield helpers_1.Helpers.confirmDeletion();
+            if (!userConsented)
+                return;
+            yield this.object.clearMark(markId);
+        });
+    }
+    _onMarksClearAll(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.stopPropagation();
+            const userConsented = yield helpers_1.Helpers.confirmDeletion();
+            if (!userConsented)
+                return;
+            yield this.object.clearMarks();
         });
     }
     _onItemCreate(event) {
@@ -16272,7 +16364,7 @@ class SkillFlow {
     }
 }
 exports.SkillFlow = SkillFlow;
-},{"../../constants":145,"../../rules/SkillRules":214}],89:[function(require,module,exports){
+},{"../../constants":145,"../../rules/SkillRules":216}],89:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -16406,7 +16498,7 @@ class SoakFlow {
     }
 }
 exports.SoakFlow = SoakFlow;
-},{"../../apps/dialogs/ShadowrunActorDialogs":134,"../../chat":142,"../../data/DataDefaults":146,"../../helpers":157,"../../parts/PartsList":209,"../../rolls/ShadowrunRoller":210,"../../rules/SoakRules":215}],90:[function(require,module,exports){
+},{"../../apps/dialogs/ShadowrunActorDialogs":134,"../../chat":142,"../../data/DataDefaults":146,"../../helpers":157,"../../parts/PartsList":211,"../../rolls/ShadowrunRoller":212,"../../rules/SoakRules":217}],90:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CharacterDataPrepare = void 0;
@@ -16496,6 +16588,7 @@ const config_1 = require("../../config");
 const MatrixPrep_1 = require("./functions/MatrixPrep");
 const DataDefaults_1 = require("../../data/DataDefaults");
 const MatrixRules_1 = require("../../rules/MatrixRules");
+const SkillsPrep_1 = require("./functions/SkillsPrep");
 function ICDataPreparation(data, items) {
     // Add missing values on actor creation
     ICPrep.addMissingTracks(data);
@@ -16510,9 +16603,10 @@ function ICDataPreparation(data, items) {
     // Derived value preparations
     ICPrep.prepareMatrix(data);
     ICPrep.prepareMatrixTrack(data);
-    // SkillsPrep.prepareSkills(data);
     ICPrep.prepareMatrixInit(data);
     InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(data);
+    // Common data preparations.
+    SkillsPrep_1.SkillsPrep.prepareSkills(data);
 }
 exports.ICDataPreparation = ICDataPreparation;
 class ICPrep {
@@ -16616,7 +16710,7 @@ class ICPrep {
     }
 }
 exports.ICPrep = ICPrep;
-},{"../../config":144,"../../data/DataDefaults":146,"../../parts/PartsList":209,"../../rules/MatrixRules":212,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102}],93:[function(require,module,exports){
+},{"../../config":144,"../../data/DataDefaults":146,"../../parts/PartsList":211,"../../rules/MatrixRules":214,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/SkillsPrep":105}],93:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpiritPrep = exports.SpiritDataPrepare = void 0;
@@ -16644,7 +16738,8 @@ function SpiritDataPrepare(data, items) {
     MovementPrep_1.MovementPrep.prepareMovement(data);
     WoundsPrep_1.WoundsPrep.prepareWounds(data);
     InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(data);
-    this.data.special = 'magic';
+    // Spirits will always be awakened.
+    data.special = 'magic';
 }
 exports.SpiritDataPrepare = SpiritDataPrepare;
 class SpiritPrep {
@@ -17005,7 +17100,7 @@ class SpiritPrep {
     }
 }
 exports.SpiritPrep = SpiritPrep;
-},{"../../helpers":157,"../../parts/PartsList":209,"./functions/AttributesPrep":96,"./functions/ConditionMonitorsPrep":97,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/ModifiersPrep":102,"./functions/MovementPrep":103,"./functions/SkillsPrep":105,"./functions/WoundsPrep":106}],94:[function(require,module,exports){
+},{"../../helpers":157,"../../parts/PartsList":211,"./functions/AttributesPrep":96,"./functions/ConditionMonitorsPrep":97,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/ModifiersPrep":102,"./functions/MovementPrep":103,"./functions/SkillsPrep":105,"./functions/WoundsPrep":106}],94:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpritePrep = exports.SpriteDataPrepare = void 0;
@@ -17130,7 +17225,7 @@ class SpritePrep {
     }
 }
 exports.SpritePrep = SpritePrep;
-},{"../../helpers":157,"../../parts/PartsList":209,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/SkillsPrep":105}],95:[function(require,module,exports){
+},{"../../helpers":157,"../../parts/PartsList":211,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/SkillsPrep":105}],95:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VehiclePrep = exports.VehicleDataPreparation = void 0;
@@ -17251,7 +17346,7 @@ class VehiclePrep {
     }
 }
 exports.VehiclePrep = VehiclePrep;
-},{"../../config":144,"../../helpers":157,"../../parts/PartsList":209,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/SkillsPrep":105}],96:[function(require,module,exports){
+},{"../../config":144,"../../helpers":157,"../../parts/PartsList":211,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/SkillsPrep":105}],96:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AttributesPrep = void 0;
@@ -17403,7 +17498,7 @@ class InitiativePrep {
     }
 }
 exports.InitiativePrep = InitiativePrep;
-},{"../../../helpers":157,"../../../parts/PartsList":209}],99:[function(require,module,exports){
+},{"../../../helpers":157,"../../../parts/PartsList":211}],99:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemPrep = void 0;
@@ -17477,7 +17572,7 @@ class ItemPrep {
     }
 }
 exports.ItemPrep = ItemPrep;
-},{"../../../config":144,"../../../helpers":157,"../../../parts/PartsList":209}],100:[function(require,module,exports){
+},{"../../../config":144,"../../../helpers":157,"../../../parts/PartsList":211}],100:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LimitsPrep = void 0;
@@ -17505,7 +17600,7 @@ class LimitsPrep {
     }
 }
 exports.LimitsPrep = LimitsPrep;
-},{"../../../config":144,"../../../helpers":157,"../../../parts/PartsList":209}],101:[function(require,module,exports){
+},{"../../../config":144,"../../../helpers":157,"../../../parts/PartsList":211}],101:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatrixPrep = void 0;
@@ -17631,7 +17726,7 @@ class MatrixPrep {
     }
 }
 exports.MatrixPrep = MatrixPrep;
-},{"../../../config":144,"../../../helpers":157,"../../../parts/PartsList":209,"./AttributesPrep":96}],102:[function(require,module,exports){
+},{"../../../config":144,"../../../helpers":157,"../../../parts/PartsList":211,"./AttributesPrep":96}],102:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ModifiersPrep = void 0;
@@ -17765,7 +17860,7 @@ class NPCPrep {
     }
 }
 exports.NPCPrep = NPCPrep;
-},{"../../../constants":145,"../../../data/DataDefaults":146,"../../../parts/PartsList":209,"./AttributesPrep":96}],105:[function(require,module,exports){
+},{"../../../constants":145,"../../../data/DataDefaults":146,"../../../parts/PartsList":211,"./AttributesPrep":96}],105:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports._mergeWithMissingSkillFields = exports.SkillsPrep = void 0;
@@ -17863,7 +17958,7 @@ const _mergeWithMissingSkillFields = (givenSkill) => {
     mergeObject(givenSkill, template, { overwrite: false });
 };
 exports._mergeWithMissingSkillFields = _mergeWithMissingSkillFields;
-},{"../../../config":144,"../../../helpers":157,"../../../parts/PartsList":209}],106:[function(require,module,exports){
+},{"../../../config":144,"../../../helpers":157,"../../../parts/PartsList":211}],106:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WoundsPrep = void 0;
@@ -17960,9 +18055,10 @@ class SR5BaseActorSheet extends ActorSheet {
         data.config = config_1.SR5;
         data.filters = this._filters;
         // Pepare data fields
-        // TODO: This makes it really unclear what fields are present on the sheet.
         this._prepareItems(data);
         this._prepareActorTypeFields(data);
+        // @ts-ignore // TODO: foundry-vtt-types 0.8 missing document support
+        data['effects'] = effects_1.prepareActiveEffectCategories(this.document.effects);
         return data;
     }
     activateListeners(html) {
@@ -17980,6 +18076,12 @@ class SR5BaseActorSheet extends ActorSheet {
         // Condition monitor track handling...
         html.find('.horizontal-cell-input .cell').on('click', this._onSetConditionTrackCell.bind(this));
         html.find('.horizontal-cell-input .cell').on('contextmenu', this._onClearConditionTrack.bind(this));
+        // Matrix data handling...
+        html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));
+        html.find('.marks-add-one').on('click', (event) => __awaiter(this, void 0, void 0, function* () { return this._onMarksQuantityChangeBy(event, 1); }));
+        html.find('.marks-remove-one').on('click', (event) => __awaiter(this, void 0, void 0, function* () { return this._onMarksQuantityChangeBy(event, -1); }));
+        html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
+        html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
     }
     /**
      * Sheet listeners
@@ -18375,6 +18477,52 @@ class SR5BaseActorSheet extends ActorSheet {
         data.hasSkills = this.actor.hasSkills;
         data.hasSpecial = this.actor.hasSpecial;
     }
+    _onMarksQuantityChange(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.stopPropagation();
+            const markId = event.currentTarget.dataset.markId;
+            if (!markId)
+                return;
+            const { scene, target, item } = helpers_1.Helpers.getMarkIdDocuments(markId);
+            if (!scene || !target)
+                return; // item can be undefined.
+            const marks = parseInt(event.currentTarget.value);
+            yield this.object.setMarks(target, marks, { scene, item, overwrite: true });
+        });
+    }
+    _onMarksQuantityChangeBy(event, by) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.stopPropagation();
+            const markId = event.currentTarget.dataset.markId;
+            if (!markId)
+                return;
+            const { scene, target, item } = helpers_1.Helpers.getMarkIdDocuments(markId);
+            if (!scene || !target)
+                return; // item can be undefined.
+            yield this.object.setMarks(target, by, { scene, item });
+        });
+    }
+    _onMarksDelete(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.stopPropagation();
+            const markId = event.currentTarget.dataset.markId;
+            if (!markId)
+                return;
+            const userConsented = yield helpers_1.Helpers.confirmDeletion();
+            if (!userConsented)
+                return;
+            yield this.object.clearMark(markId);
+        });
+    }
+    _onMarksClearAll(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.stopPropagation();
+            const userConsented = yield helpers_1.Helpers.confirmDeletion();
+            if (!userConsented)
+                return;
+            yield this.object.clearMarks();
+        });
+    }
 }
 exports.SR5BaseActorSheet = SR5BaseActorSheet;
 },{"../../config":144,"../../effects":149,"../../helpers":157}],108:[function(require,module,exports){
@@ -18397,6 +18545,8 @@ class SR5ICActorSheet extends SR5BaseActorSheet_1.SR5BaseActorSheet {
         // Fetch a connected host.
         const icData = this.object.asICData();
         data.host = game.items.get(icData.data.host.id);
+        // Display Matrix Marks
+        data['markedDocuments'] = this.object.getAllMarkedDocuments();
         return data;
     }
     activateListeners(html) {
@@ -18685,7 +18835,7 @@ class EnvModifiersApplication extends Application {
     }
 }
 exports.EnvModifiersApplication = EnvModifiersApplication;
-},{"../actor/SR5Actor":85,"../constants":145,"../helpers":157,"../rules/Modifiers":213}],111:[function(require,module,exports){
+},{"../actor/SR5Actor":85,"../constants":145,"../helpers":157,"../rules/Modifiers":215}],111:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -20852,7 +21002,7 @@ class ShadowrunActorDialogs {
     }
 }
 exports.ShadowrunActorDialogs = ShadowrunActorDialogs;
-},{"../../actor/flows/SkillFlow":88,"../../config":144,"../../helpers":157,"../../parts/PartsList":209,"./FormDialog":133}],135:[function(require,module,exports){
+},{"../../actor/flows/SkillFlow":88,"../../config":144,"../../helpers":157,"../../parts/PartsList":211,"./FormDialog":133}],135:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -20880,6 +21030,9 @@ class ShadowrunItemDialog {
             }
             if (item.isComplexForm()) {
                 return ShadowrunItemDialog.createComplexFormDialog(item, event);
+            }
+            if (item.isMatrixAction()) {
+                return ShadowrunItemDialog.createMatrixActionFormDialog(item, event);
             }
         });
     }
@@ -20936,6 +21089,20 @@ class ShadowrunItemDialog {
             return new FormDialog_1.FormDialog(dialogData);
         });
     }
+    static createMatrixActionFormDialog(item, event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const dialogData = { title: item.name,
+                event };
+            const templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-matrix.html';
+            const templateData = {};
+            const onAfterClose = ShadowrunItemDialog.addMatrixActionData(templateData, dialogData, item);
+            dialogData['templateData'] = templateData;
+            dialogData['templatePath'] = templatePath;
+            dialogData['onAfterClose'] = onAfterClose;
+            // @ts-ignore
+            return new FormDialog_1.FormDialog(dialogData);
+        });
+    }
     static addComplexFormData(templateData, dialogData, item) {
         var _a;
         const fade = item.getFade();
@@ -20955,11 +21122,11 @@ class ShadowrunItemDialog {
         return (html) => __awaiter(this, void 0, void 0, function* () {
             if (cancel)
                 return;
-            const actionTestData = {};
-            mergeObject(actionTestData, ShadowrunItemDialog._getSelectedComplexFormLevel(html));
+            const complexFormTestData = {};
+            mergeObject(complexFormTestData, ShadowrunItemDialog._getSelectedComplexFormLevel(html));
             // TODO: Remnants of old style data flow. Look into RangedWeapon for newer style.
-            yield item.setLastComplexFormLevel({ value: actionTestData.level });
-            return { complexForm: actionTestData };
+            yield item.setLastComplexFormLevel({ value: complexFormTestData.level });
+            return { complexForm: complexFormTestData };
         });
     }
     static _getSelectedComplexFormLevel(html) {
@@ -21164,6 +21331,29 @@ class ShadowrunItemDialog {
         }
         return {};
     }
+    static addMatrixActionData(templateData, dialogData, item) {
+        // TODO: This needs to be configurable.
+        templateData['marks'] = 1;
+        let cancel = true;
+        dialogData.buttons = {
+            roll: {
+                label: 'Continue',
+                icon: '<i class="fas fa-dice-six"></i>',
+                callback: () => (cancel = false),
+            },
+        };
+        return (html) => __awaiter(this, void 0, void 0, function* () {
+            if (cancel)
+                return;
+            const matrixTestData = {
+                marks: ShadowrunItemDialog._getSelectedMatrixMarks(html)
+            };
+            return { matrix: matrixTestData };
+        });
+    }
+    static _getSelectedMatrixMarks(html) {
+        return helpers_1.Helpers.parseInputToNumber($(html).find('[name=marks]').val());
+    }
 }
 exports.ShadowrunItemDialog = ShadowrunItemDialog;
 },{"../../config":144,"../../constants":145,"../../helpers":157,"./FormDialog":133}],136:[function(require,module,exports){
@@ -21274,7 +21464,7 @@ class ShadowrunTestDialog {
     }
 }
 exports.ShadowrunTestDialog = ShadowrunTestDialog;
-},{"../../constants":145,"../../helpers":157,"../../parts/PartsList":209,"./FormDialog":133}],137:[function(require,module,exports){
+},{"../../constants":145,"../../helpers":157,"../../parts/PartsList":211,"./FormDialog":133}],137:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -21762,6 +21952,7 @@ const template_1 = require("./template");
 const constants_1 = require("./constants");
 const helpers_1 = require("./helpers");
 const DamageApplicationFlow_1 = require("./actor/flows/DamageApplicationFlow");
+const ActionResultFlow_1 = require("./item/flows/ActionResultFlow");
 /**
  * The legacy chat message approach of the system uses a generic chat message to display roll and item information.
  *
@@ -21787,9 +21978,11 @@ function createChatMessage(templateData, options) {
             yield message.setFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.Roll, templateData.roll);
         if (templateData.attack)
             yield message.setFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.Attack, templateData.attack);
-        // Convert targets into scene token ids.
+        // Use Scene Token IDs in order to still receive tokens/items when the scene has changed when opening from chat.
         if (templateData.targets)
-            yield message.setFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.TargetsSceneTokenIds, templateData.targets.map(target => getTokenSceneId(target)));
+            yield message.setFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.TargetsSceneTokenIds, templateData.targets.map(target => getTokenSceneId(target.document)));
+        if (templateData.actionTestData)
+            yield message.setFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.ActionTestData, templateData.actionTestData);
         return message;
     });
 }
@@ -21804,7 +21997,6 @@ const createChatData = (templateData, options) => __awaiter(void 0, void 0, void
     const enhancedTemplateData = Object.assign(Object.assign({}, templateData), { speaker: {
             actor, token
         }, showGlitchAnimation: game.settings.get(constants_1.SYSTEM_NAME, constants_1.FLAGS.ShowGlitchAnimation) });
-    console.error(enhancedTemplateData);
     const html = yield renderTemplate(template, enhancedTemplateData);
     const chatData = {
         user: (_a = game.user) === null || _a === void 0 ? void 0 : _a.id,
@@ -21894,11 +22086,12 @@ function createRollChatMessage(options) {
 }
 exports.createRollChatMessage = createRollChatMessage;
 function getRollChatTemplateData(options) {
-    var _a, _b;
+    var _a, _b, _c;
     const token = (_a = options.actor) === null || _a === void 0 ? void 0 : _a.getToken();
     const rollMode = (_b = options.rollMode) !== null && _b !== void 0 ? _b : game.settings.get(constants_1.CORE_NAME, constants_1.CORE_FLAGS.RollMode);
     const tokenId = getTokenSceneId(token);
-    const targetTokenId = getTokenSceneId(options.target);
+    // @ts-ignore // foundry-vtt-types 0.8 support
+    const targetTokenId = getTokenSceneId((_c = options.target) === null || _c === void 0 ? void 0 : _c.document);
     return Object.assign(Object.assign({}, options), { tokenId,
         targetTokenId,
         // @ts-ignore
@@ -22096,9 +22289,46 @@ const addRollListeners = (app, html) => {
         }
         yield new DamageApplicationFlow_1.DamageApplicationFlow().runApplyDamage(actors, damage);
     }));
+    /**
+     * Apply action results onto targets or selections.
+     */
+    html.on('click', '.result', (event) => __awaiter(void 0, void 0, void 0, function* () {
+        event.stopPropagation();
+        const messageId = html.data('messageId');
+        const message = game.messages.get(messageId);
+        if (!message)
+            return;
+        const actionTestData = message.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.ActionTestData);
+        if (actionTestData.matrix) {
+            const sceneTokenId = html.find('.chat-card').data('tokenId');
+            const actor = helpers_1.Helpers.getSceneTokenActor(sceneTokenId);
+            if (actor === undefined) {
+                return console.error('No actor could be extracted from message data.');
+            }
+            // Allow custom selection for GMs and users with enough permissions...
+            let targets = helpers_1.Helpers.getControlledTokens().filter(token => { var _a; return token.actor.id !== ((_a = game.user.character) === null || _a === void 0 ? void 0 : _a.id); });
+            // For users allow custom selection using targeting...
+            if (targets.length === 0) {
+                targets = helpers_1.Helpers.getTargetedTokens();
+            }
+            // For no manual selection fall back to previous message targets.
+            if (targets.length === 0) {
+                const targetSceneIds = message.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.TargetsSceneTokenIds);
+                targetSceneIds.forEach(targetSceneId => {
+                    const [sceneId, tokenId] = helpers_1.Helpers.deconstructSceneTokenId(targetSceneId);
+                    targets.push(helpers_1.Helpers.getSceneTokenDocument(sceneId, tokenId));
+                });
+            }
+            if (targets.length === 0) {
+                return ui.notifications.warn(game.i18n.localize("SR5.Warnings.TokenSelectionNeeded"));
+            }
+            const { marks } = actionTestData.matrix;
+            yield ActionResultFlow_1.ActionResultFlow.placeMatrixMarks(actor, targets, marks);
+        }
+    }));
 };
 exports.addRollListeners = addRollListeners;
-},{"./actor/SR5Actor":85,"./actor/flows/DamageApplicationFlow":87,"./constants":145,"./helpers":157,"./item/SR5Item":197,"./template":217}],143:[function(require,module,exports){
+},{"./actor/SR5Actor":85,"./actor/flows/DamageApplicationFlow":87,"./constants":145,"./helpers":157,"./item/SR5Item":197,"./item/flows/ActionResultFlow":200,"./template":220}],143:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22113,6 +22343,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports._combatantGetInitiativeFormula = exports.SR5Combat = void 0;
 const constants_1 = require("../constants");
 const CombatRules_1 = require("../rules/CombatRules");
+const sockets_1 = require("../sockets");
 /**
  * Foundry combat implementation for Shadowrun5 rules.
  *
@@ -22122,10 +22353,6 @@ const CombatRules_1 = require("../rules/CombatRules");
  *       @PDF SR5#160 'Chaning Initiative'
  */
 class SR5Combat extends Combat {
-    constructor(...args) {
-        super(...args);
-        this._registerSocketListeners();
-    }
     get initiativePass() {
         return this.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.CombatInitiativePass) || constants_1.SR.combat.INITIAL_INI_PASS;
     }
@@ -22474,35 +22701,32 @@ class SR5Combat extends Combat {
         const ongoingIniPassModified = (initiativePass - 1) * -constants_1.SR.combat.INI_RESULT_MOD_AFTER_INI_PASS;
         return `max(${baseFormula} - ${ongoingIniPassModified}[Pass], 0)`;
     }
-    _registerSocketListeners() {
-        // @ts-ignore
-        game.socket.on(constants_1.SYSTEM_SOCKET, (message) => __awaiter(this, void 0, void 0, function* () {
-            switch (message.type) {
-                case (constants_1.FLAGS.DoNextRound):
-                    if (!message.data.hasOwnProperty('id') && typeof message.data.id !== 'string') {
-                        console.error(`SR5Combat Socket Message ${constants_1.FLAGS.DoNextRound} data.id must be a string (combat id) but is ${typeof message.data} (${message.data})!`);
-                        return;
-                    }
-                    return yield SR5Combat.handleNextRound(message.data.id);
-                case (constants_1.FLAGS.DoInitPass):
-                    if (!message.data.hasOwnProperty('id') && typeof message.data.id !== 'string') {
-                        console.error(`SR5Combat Socket Message ${constants_1.FLAGS.DoInitPass} data.id must be a string (combat id) but is ${typeof message.data} (${message.data})!`);
-                        return;
-                    }
-                    return yield SR5Combat.handleIniPass(message.data.id);
+    static _handleDoNextRoundSocketMessage(message) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!message.data.hasOwnProperty('id') && typeof message.data.id !== 'string') {
+                console.error(`SR5Combat Socket Message ${constants_1.FLAGS.DoNextRound} data.id must be a string (combat id) but is ${typeof message.data} (${message.data})!`);
+                return;
             }
-        }));
+            return yield SR5Combat.handleNextRound(message.data.id);
+        });
+    }
+    static _handleDoInitPassSocketMessage(message) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!message.data.hasOwnProperty('id') && typeof message.data.id !== 'string') {
+                console.error(`SR5Combat Socket Message ${constants_1.FLAGS.DoInitPass} data.id must be a string (combat id) but is ${typeof message.data} (${message.data})!`);
+                return;
+            }
+            return yield SR5Combat.handleIniPass(message.data.id);
+        });
     }
     _createDoNextRoundSocketMessage() {
         return __awaiter(this, void 0, void 0, function* () {
-            //@ts-ignore
-            yield game.socket.emit(`${constants_1.SYSTEM_SOCKET}`, { type: constants_1.FLAGS.DoNextRound, data: { id: this.id } });
+            yield sockets_1.SocketMessage.emitForGM(constants_1.FLAGS.DoNextRound, { id: this.id });
         });
     }
     _createDoIniPassSocketMessage() {
         return __awaiter(this, void 0, void 0, function* () {
-            //@ts-ignore
-            yield game.socket.emit(`${constants_1.SYSTEM_SOCKET}`, { type: constants_1.FLAGS.DoInitPass, data: { id: this.id } });
+            yield sockets_1.SocketMessage.emitForGM(constants_1.FLAGS.DoInitPass, { id: this.id });
         });
     }
 }
@@ -22519,7 +22743,7 @@ function _combatantGetInitiativeFormula() {
     return SR5Combat._getSystemInitiativeFormula(combat.initiativePass);
 }
 exports._combatantGetInitiativeFormula = _combatantGetInitiativeFormula;
-},{"../constants":145,"../rules/CombatRules":211}],144:[function(require,module,exports){
+},{"../constants":145,"../rules/CombatRules":213,"../sockets":219}],144:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5 = void 0;
@@ -23017,11 +23241,13 @@ exports.FLAGS = {
     LastFireRange: 'lastFireRange',
     Attack: 'attack',
     Roll: 'roll',
+    ActionTestData: 'actionTestData',
     TargetsSceneTokenIds: 'targetsSceneTokenIds',
     ChangelogShownForVersion: 'changelogShownForVersion',
     Modifier: 'modifier',
     DoInitPass: 'doInitPass',
-    DoNextRound: 'doNextRound'
+    DoNextRound: 'doNextRound',
+    addNetworkController: 'addNetworkController'
 };
 exports.CORE_NAME = 'core';
 exports.CORE_FLAGS = {
@@ -23191,7 +23417,8 @@ class DefaultValues {
                 label: '',
                 value: 0,
                 max: 0,
-            }
+            },
+            wireless: true
         }, partialTechnologyData);
     }
     static descriptionData(partialDescriptionData = {}) {
@@ -23229,8 +23456,9 @@ class DefaultValues {
                     value: 0,
                     att: "attack",
                     editable: true
-                },
-            }
+                }
+            },
+            networkDevices: []
         }, partialMatrixData);
     }
     static actionRollData(partialActionRollData = {}) {
@@ -23250,6 +23478,15 @@ class DefaultValues {
             alt_mod: 0,
             dice_pool_mod: []
         }, partialActionRollData);
+    }
+    static actionResultData(partialActionResultData = {}) {
+        return mergeObject({
+            success: {
+                matrix: {
+                    placeMarks: false
+                }
+            }
+        });
     }
     static limitData(partialLimitData = {}) {
         return mergeObject({
@@ -23509,6 +23746,12 @@ class SR5ItemDataWrapper extends DataWrapper_1.DataWrapper {
     isCyberdeck() {
         return this.isDevice() && this.getData().category === 'cyberdeck';
     }
+    isCommlink() {
+        return this.isDevice() && this.getData().category === 'commlink';
+    }
+    isMatrixAction() {
+        return this.isAction() && this.getData().result.success.matrix.placeMarks;
+    }
     isSin() {
         return this.data.type === 'sin';
     }
@@ -23668,6 +23911,9 @@ class SR5ItemDataWrapper extends DataWrapper_1.DataWrapper {
         const ammo = this.getAmmo();
         return !!ammo;
     }
+    getActionResult() {
+        return this.getData().result;
+    }
 }
 exports.SR5ItemDataWrapper = SR5ItemDataWrapper;
 },{"./DataWrapper":147}],149:[function(require,module,exports){
@@ -23776,11 +24022,20 @@ exports.registerAppHelpers = registerAppHelpers;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerBasicHelpers = void 0;
 const helpers_1 = require("../helpers");
+const SR5Actor_1 = require("../actor/SR5Actor");
 const registerBasicHelpers = () => {
     Handlebars.registerHelper('localizeOb', function (strId, obj) {
         if (obj)
             strId = obj[strId];
         return game.i18n.localize(strId);
+    });
+    Handlebars.registerHelper('localizeDocumentType', function (document) {
+        if (document.type.length < 1)
+            return '';
+        const documentClass = document instanceof SR5Actor_1.SR5Actor ? 'ACTOR' : 'ITEM';
+        const documentTypeLabel = document.type[0].toUpperCase() + document.type.slice(1);
+        const i18nTypeLabel = `${documentClass}.Type${documentTypeLabel}`;
+        return game.i18n.localize(i18nTypeLabel);
     });
     Handlebars.registerHelper('localizeSkill', function (skill) {
         return skill.label ? game.i18n.localize(skill.label) : skill.name;
@@ -23914,7 +24169,7 @@ const registerBasicHelpers = () => {
     });
 };
 exports.registerBasicHelpers = registerBasicHelpers;
-},{"../helpers":157}],152:[function(require,module,exports){
+},{"../actor/SR5Actor":85,"../helpers":157}],152:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -23975,11 +24230,13 @@ const preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, funct
         'systems/shadowrun5e/dist/templates/actor/tabs/SpellsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/EffectsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/CritterPowersTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/PANTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/spirit/SpiritSkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/matrix/SpriteSkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/vehicle/VehicleSkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/vehicle/VehicleMatrixTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/ic/ICActorTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/ic/ICMiscTab.html',
         // uncategorized lists
         'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html',
         'systems/shadowrun5e/dist/templates/actor/parts/Movement.html',
@@ -24517,6 +24774,80 @@ const registerItemLineHelpers = () => {
     Handlebars.registerHelper('EffectData', function (effectType) {
         return { 'effect-type': effectType };
     });
+    // Allow Matrix Marks to be changed on the spot on a Sheet.
+    Handlebars.registerHelper('MarksRightSide', (marked) => {
+        const quantityInput = {
+            input: {
+                type: 'number',
+                value: marked.marks,
+                cssClass: 'marks-qty',
+            },
+        };
+        return [quantityInput];
+    });
+    // Matrix Mark interaction on a Sheet.
+    Handlebars.registerHelper('MarksIcons', (marked) => {
+        const incrementIcon = {
+            icon: 'fas fa-plus marks-add-one',
+            title: game.i18n.localize('SR5.Labels.Sheet.AddOne'),
+            data: { action: 'add-one' }
+        };
+        const decrementIcon = {
+            icon: 'fas fa-minus marks-remove-one',
+            title: game.i18n.localize('SR5.Labels.Sheet.SubtractOne'),
+            data: { action: 'remove-one' }
+        };
+        return [incrementIcon, decrementIcon];
+    });
+    Handlebars.registerHelper('MarkListHeaderRightSide', () => {
+        return [
+            {
+                text: {
+                    text: game.i18n.localize('SR5.FOUNDRY.Scene'),
+                },
+            },
+            {
+                text: {
+                    text: game.i18n.localize('SR5.FOUNDRY.Item'),
+                },
+            },
+            {
+                text: {
+                    text: game.i18n.localize('SR5.Qty'),
+                },
+            }
+        ];
+    });
+    Handlebars.registerHelper('MarkListHeaderIcons', () => {
+        return [{
+                icon: 'fas fa-trash',
+                title: game.i18n.localize('SR5.ClearMarks'),
+                text: game.i18n.localize('SR5.Del'),
+                cssClass: 'marks-clear-all'
+            }];
+    });
+    Handlebars.registerHelper('NetworkDevicesListRightSide', () => {
+        return [
+            {
+                text: {
+                    text: game.i18n.localize('SR5.FOUNDRY.Actor'),
+                },
+            },
+            {
+                text: {
+                    text: game.i18n.localize('SR5.FOUNDRY.Item'),
+                },
+            }
+        ];
+    });
+    Handlebars.registerHelper('NetworkDevicesListHeaderIcons', () => {
+        return [{
+                icon: 'fas fa-trash',
+                title: game.i18n.localize('SR5.Labels.Sheet.ClearNetwork'),
+                text: game.i18n.localize('SR5.Del'),
+                cssClass: 'network-clear'
+            }];
+    });
 };
 exports.registerItemLineHelpers = registerItemLineHelpers;
 },{"../config":144,"../data/SR5ItemDataWrapper":148}],155:[function(require,module,exports){
@@ -24592,7 +24923,7 @@ const registerRollAndLabelHelpers = () => {
     Handlebars.registerHelper('speakerName', helpers_1.Helpers.getChatSpeakerName);
 };
 exports.registerRollAndLabelHelpers = registerRollAndLabelHelpers;
-},{"../helpers":157,"../parts/PartsList":209}],156:[function(require,module,exports){
+},{"../helpers":157,"../parts/PartsList":211}],156:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerSkillLineHelpers = void 0;
@@ -24702,7 +25033,7 @@ const registerSkillLineHelpers = () => {
     });
 };
 exports.registerSkillLineHelpers = registerSkillLineHelpers;
-},{"../constants":145,"../helpers":157,"../rules/SkillRules":214}],157:[function(require,module,exports){
+},{"../constants":145,"../helpers":157,"../rules/SkillRules":216}],157:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -24981,11 +25312,22 @@ class Helpers {
         }
     }
     /**
-     * Use this helper to get a tokens actor from any given scene id, while the sceneTokenId is a mixed ID
+     * Use this helper to get a tokens actor from any given scene id.
      * @param sceneTokenId A mixed id with the format '<sceneId>.<tokenid>
      */
     static getSceneTokenActor(sceneTokenId) {
-        const [sceneId, tokenId] = sceneTokenId.split('.');
+        const [sceneId, tokenId] = Helpers.deconstructSceneTokenId(sceneTokenId);
+        const token = Helpers.getSceneTokenDocument(sceneId, tokenId);
+        if (!token)
+            return;
+        // @ts-ignore // TODO: foundry-vtt-types 0.8 TokenDocument
+        return token.getActor();
+    }
+    static deconstructSceneTokenId(sceneTokenId) {
+        return sceneTokenId.split('.');
+    }
+    // @ts-ignore // TODO: foundry-vtt-types 0.8 TokenDocument
+    static getSceneTokenDocument(sceneId, tokenId) {
         const scene = game.scenes.get(sceneId);
         if (!scene)
             return;
@@ -24993,7 +25335,7 @@ class Helpers {
         const token = scene.tokens.get(tokenId);
         if (!token)
             return;
-        return token.getActor();
+        return token;
     }
     static getUserTargets(user) {
         user = user ? user : game.user;
@@ -25046,6 +25388,11 @@ class Helpers {
         if (!canvas || !canvas.ready)
             return [];
         return canvas.tokens.controlled;
+    }
+    static getTargetedTokens() {
+        if (!canvas.ready)
+            return [];
+        return Array.from(game.user.targets);
     }
     static getSelectedActorsOrCharacter() {
         var _a, _b;
@@ -25349,6 +25696,27 @@ class Helpers {
         });
     }
     /**
+     * A markId is valid if:
+     * - It's scene still exists
+     * - The token still exists on that scene
+     * - And a possible owned item still exists on that documents actor.
+     */
+    static isValidMarkId(markId) {
+        const [sceneId, targetId, itemId] = Helpers.deconstructMarkId(markId);
+        const scene = game.scenes.get(sceneId);
+        if (!scene)
+            return false;
+        // @ts-ignore // foundry-vtt-types 0.8
+        const tokenDocument = scene.tokens.get(targetId);
+        if (!tokenDocument)
+            return false;
+        const actor = tokenDocument.actor;
+        // Some targets are allowed without a targeted owned item.
+        if (itemId && !actor.items.get(itemId))
+            return false;
+        return true;
+    }
+    /**
      * Build a markId string. See Helpers.deconstructMarkId for usage.
      *
      * @param sceneId Optional id in a markId
@@ -25356,7 +25724,7 @@ class Helpers {
      * @param itemId Optional id in a markId
      * @param separator Should you want to change the default separator used. Make sure not to use a . since Foundry will split the key into objects.
      */
-    static buildMarkId(sceneId, targetId, itemId, separator = ';') {
+    static buildMarkId(sceneId, targetId, itemId, separator = '/') {
         return [sceneId, targetId, itemId || ''].join(separator);
     }
     /**
@@ -25365,23 +25733,28 @@ class Helpers {
      * @param markId 'sceneId.targetId.itemId' with itemId being optional
      * @param separator Should you want to change the default separator used
      */
-    static deconstructMarkId(markId, separator = ';') {
+    static deconstructMarkId(markId, separator = '/') {
         const ids = markId.split(separator);
         if (ids.length !== 3) {
             console.error('A mark id must always be of length 3');
             return;
         }
-        const [sceneId, targetId, itemId] = ids;
+        return ids;
+    }
+    static getMarkIdDocuments(markId) {
+        var _a, _b;
+        const [sceneId, targetId, itemId] = Helpers.deconstructMarkId(markId);
         const scene = game.scenes.get(sceneId);
-        const target = game.actors.get(targetId) || game.items.get(targetId);
-        const item = game.items.get(itemId); // DocumentCollection will return undefined if needed
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
+        const target = scene.tokens.get(targetId) || game.items.get(targetId);
+        const item = (_b = (_a = target === null || target === void 0 ? void 0 : target.actor) === null || _a === void 0 ? void 0 : _a.items) === null || _b === void 0 ? void 0 : _b.get(itemId); // DocumentCollection will return undefined if needed
         return {
             scene, target, item
         };
     }
 }
 exports.Helpers = Helpers;
-},{"./apps/dialogs/DeleteConfirmationDialog":132,"./constants":145,"./data/DataDefaults":146,"./parts/PartsList":209}],158:[function(require,module,exports){
+},{"./apps/dialogs/DeleteConfirmationDialog":132,"./constants":145,"./data/DataDefaults":146,"./parts/PartsList":211}],158:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25415,6 +25788,7 @@ const ChangelogApplication_1 = require("./apps/ChangelogApplication");
 const EnvModifiersApplication_1 = require("./apps/EnvModifiersApplication");
 const quench_1 = require("../test/quench");
 const SR5ICActorSheet_1 = require("./actor/sheets/SR5ICActorSheet");
+const DeviceFlow_1 = require("./item/flows/DeviceFlow");
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 // TODO: Figure out how to change global CONFIG type
 exports.SR5CONFIG = config_1.SR5;
@@ -25489,6 +25863,7 @@ ___________________
         ['renderSR5ActorSheet', 'renderSR5ItemSheet'].forEach((s) => {
             Hooks.on(s, (app, html) => helpers_1.Helpers.setupCustomCheckbox(app, html));
         });
+        HooksManager.registerSocketListeners();
         HandlebarManager_1.HandlebarManager.loadTemplates();
     }
     static ready() {
@@ -25584,9 +25959,37 @@ ___________________
             }
         });
     }
+    /**
+     * This method is used as a simple place to register socket hook handlers for the system.
+     *
+     * You can use the SocketMessage
+     */
+    static registerSocketListeners() {
+        console.log('Registering Shadowrun5e system sockets...');
+        const hooks = {
+            [constants_1.FLAGS.addNetworkController]: [DeviceFlow_1.DeviceFlow.handleAddNetworkControllerSocketMessage],
+            [constants_1.FLAGS.DoNextRound]: [SR5Combat_1.SR5Combat._handleDoNextRoundSocketMessage],
+            [constants_1.FLAGS.DoInitPass]: [SR5Combat_1.SR5Combat._handleDoInitPassSocketMessage]
+        };
+        game.socket.on(constants_1.SYSTEM_SOCKET, (message) => __awaiter(this, void 0, void 0, function* () {
+            console.log('Received Shadowrun5e system socket message.', message);
+            const handlers = hooks[message.type];
+            if (!handlers || handlers.length === 0)
+                return console.warn('System socket message without handler!', message);
+            // In case of targeted socket message only execute with target user (intended for GM usage)
+            if (message.userId && game.user.id !== message.userId)
+                return;
+            if (message.userId && game.user.id)
+                console.log('GM is handling Shadowrun5e system socket message');
+            for (const handler of handlers) {
+                console.log('Handover Shadowrun5e system socket message to handler', handler);
+                yield handler(message);
+            }
+        }));
+    }
 }
 exports.HooksManager = HooksManager;
-},{"../test/quench":218,"./actor/SR5Actor":85,"./actor/SR5ActorSheet":86,"./actor/sheets/SR5ICActorSheet":108,"./apps/ChangelogApplication":109,"./apps/EnvModifiersApplication":110,"./apps/gmtools/OverwatchScoreTracker":137,"./canvas":141,"./chat":142,"./combat/SR5Combat":143,"./config":144,"./constants":145,"./handlebars/HandlebarManager":152,"./helpers":157,"./importer/apps/import-form":159,"./item/SR5Item":197,"./item/SR5ItemSheet":198,"./macros":201,"./migrator/Migrator":203,"./rolls/ShadowrunRoller":210,"./settings":216}],159:[function(require,module,exports){
+},{"../test/quench":221,"./actor/SR5Actor":85,"./actor/SR5ActorSheet":86,"./actor/sheets/SR5ICActorSheet":108,"./apps/ChangelogApplication":109,"./apps/EnvModifiersApplication":110,"./apps/gmtools/OverwatchScoreTracker":137,"./canvas":141,"./chat":142,"./combat/SR5Combat":143,"./config":144,"./constants":145,"./handlebars/HandlebarManager":152,"./helpers":157,"./importer/apps/import-form":159,"./item/SR5Item":197,"./item/SR5ItemSheet":198,"./item/flows/DeviceFlow":201,"./macros":203,"./migrator/Migrator":205,"./rolls/ShadowrunRoller":212,"./settings":218}],159:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26070,6 +26473,7 @@ exports.AmmoImporter = void 0;
 const DataImporter_1 = require("./DataImporter");
 const ImportHelper_1 = require("../helper/ImportHelper");
 const Constants_1 = require("./Constants");
+const DataDefaults_1 = require("../../data/DataDefaults");
 class AmmoImporter extends DataImporter_1.DataImporter {
     constructor() {
         super(...arguments);
@@ -26094,24 +26498,7 @@ class AmmoImporter extends DataImporter_1.DataImporter {
                     chat: '',
                     source: '',
                 },
-                technology: {
-                    rating: 1,
-                    availability: '',
-                    quantity: 1,
-                    cost: 0,
-                    equipped: true,
-                    conceal: {
-                        base: 0,
-                        value: 0,
-                        mod: [],
-                    },
-                    condition_monitor: {
-                        label: '',
-                        value: 0,
-                        max: 0,
-                    },
-                    wireless: true
-                },
+                technology: DataDefaults_1.DefaultValues.technologyData({ rating: 1, equipped: true, wireless: false }),
                 element: '',
                 ap: 0,
                 damage: 0,
@@ -26208,7 +26595,7 @@ class AmmoImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.AmmoImporter = AmmoImporter;
-},{"../helper/ImportHelper":160,"./Constants":167,"./DataImporter":169}],165:[function(require,module,exports){
+},{"../../data/DataDefaults":146,"../helper/ImportHelper":160,"./Constants":167,"./DataImporter":169}],165:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26224,6 +26611,7 @@ exports.ArmorImporter = void 0;
 const DataImporter_1 = require("./DataImporter");
 const ImportHelper_1 = require("../helper/ImportHelper");
 const ArmorParserBase_1 = require("../parser/armor/ArmorParserBase");
+const DataDefaults_1 = require("../../data/DataDefaults");
 class ArmorImporter extends DataImporter_1.DataImporter {
     constructor() {
         super(...arguments);
@@ -26248,24 +26636,7 @@ class ArmorImporter extends DataImporter_1.DataImporter {
                     chat: '',
                     source: '',
                 },
-                technology: {
-                    rating: 1,
-                    availability: '',
-                    quantity: 1,
-                    cost: 0,
-                    equipped: true,
-                    conceal: {
-                        base: 0,
-                        value: 0,
-                        mod: [],
-                    },
-                    condition_monitor: {
-                        label: '',
-                        value: 0,
-                        max: 0,
-                    },
-                    wireless: true
-                },
+                technology: DataDefaults_1.DefaultValues.technologyData({ rating: 1, equipped: true, wireless: false }),
                 armor: {
                     value: 0,
                     mod: false,
@@ -26312,7 +26683,7 @@ class ArmorImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.ArmorImporter = ArmorImporter;
-},{"../helper/ImportHelper":160,"../parser/armor/ArmorParserBase":179,"./DataImporter":169}],166:[function(require,module,exports){
+},{"../../data/DataDefaults":146,"../helper/ImportHelper":160,"../parser/armor/ArmorParserBase":179,"./DataImporter":169}],166:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27131,6 +27502,7 @@ const DataImporter_1 = require("./DataImporter");
 const ImportHelper_1 = require("../helper/ImportHelper");
 const Constants_1 = require("./Constants");
 const ModParserBase_1 = require("../parser/mod/ModParserBase");
+const DataDefaults_1 = require("../../data/DataDefaults");
 class ModImporter extends DataImporter_1.DataImporter {
     constructor() {
         super(...arguments);
@@ -27155,24 +27527,7 @@ class ModImporter extends DataImporter_1.DataImporter {
                     chat: '',
                     source: '',
                 },
-                technology: {
-                    rating: 1,
-                    availability: '',
-                    quantity: 1,
-                    cost: 0,
-                    equipped: true,
-                    conceal: {
-                        base: 0,
-                        value: 0,
-                        mod: [],
-                    },
-                    condition_monitor: {
-                        label: '',
-                        value: 0,
-                        max: 0,
-                    },
-                    wireless: true
-                },
+                technology: DataDefaults_1.DefaultValues.technologyData({ rating: 1, equipped: true }),
                 type: '',
                 mount_point: '',
                 dice_pool: 0,
@@ -27221,7 +27576,7 @@ class ModImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.ModImporter = ModImporter;
-},{"../helper/ImportHelper":160,"../parser/mod/ModParserBase":184,"./Constants":167,"./DataImporter":169}],173:[function(require,module,exports){
+},{"../../data/DataDefaults":146,"../helper/ImportHelper":160,"../parser/mod/ModParserBase":184,"./Constants":167,"./DataImporter":169}],173:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27401,7 +27756,7 @@ class SpellImporter extends DataImporter_1.DataImporter {
                         description: '',
                     },
                     alt_mod: 0,
-                    dice_pool_mod: [],
+                    dice_pool_mod: []
                 },
                 drain: 0,
                 category: '',
@@ -27520,24 +27875,7 @@ class WareImporter extends DataImporter_1.DataImporter {
                     chat: '',
                     source: '',
                 },
-                technology: {
-                    rating: 1,
-                    availability: '',
-                    quantity: 1,
-                    cost: 0,
-                    equipped: true,
-                    conceal: {
-                        base: 0,
-                        value: 0,
-                        mod: [],
-                    },
-                    condition_monitor: {
-                        label: '',
-                        value: 0,
-                        max: 0,
-                    },
-                    wireless: true
-                },
+                technology: DataDefaults_1.DefaultValues.technologyData({ rating: 1 }),
                 armor: {
                     value: 0,
                     mod: false,
@@ -27573,7 +27911,7 @@ class WareImporter extends DataImporter_1.DataImporter {
                         description: '',
                     },
                     alt_mod: 0,
-                    dice_pool_mod: [],
+                    dice_pool_mod: []
                 },
                 grade: 'standard',
                 essence: 0,
@@ -27699,26 +28037,9 @@ class WeaponImporter extends DataImporter_1.DataImporter {
                         description: '',
                     },
                     alt_mod: 0,
-                    dice_pool_mod: [],
+                    dice_pool_mod: []
                 },
-                technology: {
-                    rating: 1,
-                    availability: '',
-                    quantity: 1,
-                    cost: 0,
-                    equipped: true,
-                    conceal: {
-                        base: 0,
-                        value: 0,
-                        mod: [],
-                    },
-                    condition_monitor: {
-                        label: '',
-                        value: 0,
-                        max: 0,
-                    },
-                    wireless: true
-                },
+                technology: DataDefaults_1.DefaultValues.technologyData({ rating: 1 }),
                 ammo: {
                     spare_clips: {
                         value: 0,
@@ -28904,6 +29225,7 @@ const config_1 = require("../config");
 const DataDefaults_1 = require("../data/DataDefaults");
 const HostPrep_1 = require("./prep/HostPrep");
 const MatrixRules_1 = require("../rules/MatrixRules");
+const DeviceFlow_1 = require("./flows/DeviceFlow");
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
  *
@@ -29690,6 +30012,11 @@ class SR5Item extends Item {
                 type: 'action',
             }];
     }
+    getActionResult() {
+        if (!this.isAction())
+            return;
+        return this.wrapper.getActionResult();
+    }
     getOpposedTests() {
         if (!this.hasOpposedRoll) {
             return [];
@@ -30107,6 +30434,9 @@ class SR5Item extends Item {
             return this.data;
         }
     }
+    asControllerData() {
+        return this.asHostData() || this.asDeviceData() || undefined;
+    }
     isEquipment() {
         return this.wrapper.isEquipment();
     }
@@ -30120,6 +30450,12 @@ class SR5Item extends Item {
     }
     isCyberdeck() {
         return this.wrapper.isCyberdeck();
+    }
+    isCommlink() {
+        return this.wrapper.isCommlink();
+    }
+    isMatrixAction() {
+        return this.wrapper.isMatrixAction();
     }
     getBookSource() {
         return this.wrapper.getBookSource();
@@ -30424,9 +30760,61 @@ class SR5Item extends Item {
             yield this.update({ 'data.marks': updateData });
         });
     }
+    /**
+     * Add a 'device' to a matrix network (PAN or WAN)
+     *
+     */
+    addNetworkDevice(target) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // TODO: Add device to WAN network
+            // TODO: Add IC actor to WAN network
+            // TODO: setup networkController link on networked devices.
+            const deviceData = this.asDeviceData();
+            if (!target || !deviceData)
+                return;
+            const controller = this;
+            if (DeviceFlow_1.DeviceFlow.invalidNetworkDevice(controller, target))
+                return;
+            const deviceLink = DeviceFlow_1.DeviceFlow.buildNetworkDeviceLink(target);
+            const controllerLink = DeviceFlow_1.DeviceFlow.buildNetworkDeviceLink(controller);
+            if (!deviceLink.type || !controllerLink.type)
+                return console.error('Abort adding network device due to internal data error');
+            if (DeviceFlow_1.DeviceFlow.connectedNetworkDevice(controller, deviceLink))
+                return;
+            const networkDevices = duplicate(deviceData.data.networkDevices);
+            networkDevices.push(deviceLink);
+            if (game.user.isGM) {
+                yield DeviceFlow_1.DeviceFlow.addNetworkController(controller, target);
+            }
+            else {
+                yield DeviceFlow_1.DeviceFlow.emitAddControllerSocketMessage(controller, target);
+            }
+            return yield this.update({ 'data.networkDevices': networkDevices });
+        });
+    }
+    removeNetworkDevice(index) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const deviceData = this.asDeviceData();
+            if (!deviceData)
+                return;
+            const networkDevices = duplicate(deviceData.data.networkDevices);
+            if (networkDevices[index] === undefined)
+                return;
+            networkDevices.splice(index, 1);
+            return yield this.update({ 'data.networkDevices': networkDevices });
+        });
+    }
+    removeAllNetworkDevices() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const deviceData = this.asDeviceData();
+            if (!deviceData)
+                return;
+            return yield this.update({ 'data.networkDevices': [] });
+        });
+    }
 }
 exports.SR5Item = SR5Item;
-},{"../actor/SR5Actor":85,"../actor/flows/SkillFlow":88,"../apps/dialogs/ShadowrunItemDialog":135,"../chat":142,"../config":144,"../constants":145,"../data/DataDefaults":146,"../data/SR5ItemDataWrapper":148,"../helpers":157,"../parts/PartsList":209,"../rolls/ShadowrunRoller":210,"../rules/MatrixRules":212,"./ChatData":196,"./flows/ActionFlow":199,"./prep/HostPrep":200}],198:[function(require,module,exports){
+},{"../actor/SR5Actor":85,"../actor/flows/SkillFlow":88,"../apps/dialogs/ShadowrunItemDialog":135,"../chat":142,"../config":144,"../constants":145,"../data/DataDefaults":146,"../data/SR5ItemDataWrapper":148,"../helpers":157,"../parts/PartsList":211,"../rolls/ShadowrunRoller":212,"../rules/MatrixRules":214,"./ChatData":196,"./flows/ActionFlow":199,"./flows/DeviceFlow":201,"./prep/HostPrep":202}],198:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -30442,6 +30830,7 @@ exports.SR5ItemSheet = void 0;
 const helpers_1 = require("../helpers");
 const config_1 = require("../config");
 const effects_1 = require("../effects");
+const DeviceFlow_1 = require("./flows/DeviceFlow");
 /**
  * Extend the basic ItemSheet with some very simple modifications
  */
@@ -30544,6 +30933,9 @@ class SR5ItemSheet extends ItemSheet {
         // Active Effects data.
         // @ts-ignore // TODO: foundry-vtt-types 0.8 missing document support
         data['effects'] = effects_1.prepareActiveEffectCategories(this.document.effects);
+        if (this.item.isHost() || this.item.isDevice()) {
+            data['networkDevices'] = this._getNetworkDevices();
+        }
         return data;
     }
     /**
@@ -30564,7 +30956,8 @@ class SR5ItemSheet extends ItemSheet {
     _getSortedActiveSkillsForSelect() {
         // We need the actor owner, instead of the item owner. See actorOwner jsdoc for details.
         const actor = this.item.actorOwner;
-        if (!actor)
+        // Fallback for actors without skills.
+        if (!actor || actor.isIC())
             return helpers_1.Helpers.sortConfigValuesByTranslation(config_1.SR5.activeSkills);
         const activeSkills = helpers_1.Helpers.sortSkills(actor.getActiveSkills());
         const activeSkillsForSelect = {};
@@ -30576,6 +30969,12 @@ class SR5ItemSheet extends ItemSheet {
             activeSkillsForSelect[key] = label;
         }
         return activeSkillsForSelect;
+    }
+    _getNetworkDevices() {
+        const controllerData = this.item.asControllerData();
+        if (!controllerData)
+            return [];
+        return controllerData.data.networkDevices.map(deviceLink => DeviceFlow_1.DeviceFlow.documentByNetworkDeviceLink(deviceLink));
     }
     /* -------------------------------------------- */
     /**
@@ -30629,6 +31028,8 @@ class SR5ItemSheet extends ItemSheet {
          */
         html.find('.add-new-license').click(this._onAddLicense.bind(this));
         html.find('.license-delete').on('click', this._onRemoveLicense.bind(this));
+        html.find('.network-clear').on('click', this._onRemoveAllNetworkDevices.bind(this));
+        html.find('.network-device-remove').on('click', this._onRemoveNetworkDevice.bind(this));
     }
     _onDragOver(event) {
         event.preventDefault();
@@ -30650,6 +31051,7 @@ class SR5ItemSheet extends ItemSheet {
             }
             if (!data)
                 return;
+            // Weapon parts...
             if (this.item.isWeapon() && data.type === 'Item') {
                 let item;
                 // Case 1 - Data explicitly provided
@@ -30673,8 +31075,31 @@ class SR5ItemSheet extends ItemSheet {
                 yield this.item.createOwnedItem(item.data);
                 return;
             }
+            // TODO: Handle WAN
             if (this.item.isHost() && data.type === 'Actor') {
                 yield this.item.addIC(data.id, data.pack);
+                return;
+            }
+            // PAN Support...
+            if (this.item.isDevice() && data.type === 'Item') {
+                if (data.actorId && !data.sceneId && !data.tokenId) {
+                    console.log('Shadowrun5e | Adding linked actors item to the network', data);
+                    const actor = game.actors.get(data.actorId);
+                    const item = actor.items.get(data.data._id);
+                    yield this.item.addNetworkDevice(item);
+                }
+                else if (data.actorId && data.sceneId && data.tokenId) {
+                    console.log('Shadowrun5e | Adding unlinked token actors item to the network', data);
+                    const scene = game.scenes.get(data.sceneId);
+                    // @ts-ignore // TODO: foundry-vtt-types 0.8
+                    const token = scene.tokens.get(data.tokenId);
+                    const item = token.actor.items.get(data.data._id);
+                    yield this.item.addNetworkDevice(item);
+                }
+                else if (data.id && !data.actorId && !data.sceneId && !data.tokenId) {
+                    console.log('Shadowrun5e | Adding collection item without actor to the network', data);
+                }
+                return;
             }
         });
     }
@@ -30793,6 +31218,37 @@ class SR5ItemSheet extends ItemSheet {
             yield this.item.deleteOwnedItem(this._eventId(event));
         });
     }
+    _onRemoveAllNetworkDevices(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const userConsented = yield helpers_1.Helpers.confirmDeletion();
+            if (!userConsented)
+                return;
+            yield this.item.removeAllNetworkDevices();
+        });
+    }
+    _onRemoveNetworkDevice(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!canvas.ready)
+                return;
+            event.preventDefault();
+            const userConsented = yield helpers_1.Helpers.confirmDeletion();
+            if (!userConsented)
+                return;
+            // const tokenId = event.currentTarget.closest('.list-item').dataset.tokenId;
+            // const actorId = event.currentTarget.closest('.list-item').dataset.actorId;
+            // const itemId = event.currentTarget.closest('.list-item').dataset.itemId;
+            //
+            // // Get the item from the token actor OR the collection actor.
+            // // A collection actor will not have a token on it's token property.
+            // const item = tokenId ?
+            //     // @ts-ignore // TODO: foundry-vtt-types 0.8
+            //     canvas.scene.tokens.get(tokenId).actor.items.get(itemId) :
+            //     game.actors.get(actorId).items.get(itemId);
+            const networkDeviceIndex = helpers_1.Helpers.parseInputToNumber(event.currentTarget.closest('.list-item').dataset.listItemIndex);
+            yield this.item.removeNetworkDevice(networkDeviceIndex);
+        });
+    }
     /**
      * @private
      */
@@ -30849,7 +31305,7 @@ class SR5ItemSheet extends ItemSheet {
     }
 }
 exports.SR5ItemSheet = SR5ItemSheet;
-},{"../config":144,"../effects":149,"../helpers":157}],199:[function(require,module,exports){
+},{"../config":144,"../effects":149,"../helpers":157,"./flows/DeviceFlow":201}],199:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ActionFlow = void 0;
@@ -30892,6 +31348,159 @@ class ActionFlow {
 exports.ActionFlow = ActionFlow;
 },{"../../helpers":157}],200:[function(require,module,exports){
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ActionResultFlow = void 0;
+const MatrixRules_1 = require("../../rules/MatrixRules");
+class ActionResultFlow {
+    /**
+     * Matrix Marks are placed on either actors (persona, ic) or items (device, host, technology).
+     */
+    static placeMatrixMarks(active, targets, marks) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!MatrixRules_1.MatrixRules.isValidMarksCount(marks)) {
+                return ui.notifications.warn(game.i18n.localize("SR5.Warnings.InvalidMarksCount"));
+            }
+            for (const target of targets) {
+                yield active.setMarks(target, marks);
+            }
+        });
+    }
+}
+exports.ActionResultFlow = ActionResultFlow;
+},{"../../rules/MatrixRules":214}],201:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.DeviceFlow = void 0;
+const SR5Actor_1 = require("../../actor/SR5Actor");
+const SR5Item_1 = require("../SR5Item");
+const sockets_1 = require("../../sockets");
+const constants_1 = require("../../constants");
+class DeviceFlow {
+    static networkDeviceType(target) {
+        if (target instanceof SR5Item_1.SR5Item && target.isHost())
+            return 'Host';
+        if (target instanceof SR5Item_1.SR5Item && target.actor.token)
+            return 'Token';
+        if (target instanceof SR5Item_1.SR5Item && !target.actor.token)
+            return 'Actor';
+        console.error(`The given networking device doesn't fit any allowed category of networkable matrix device / actor`, target);
+    }
+    static buildNetworkDeviceLink(target) {
+        const type = DeviceFlow.networkDeviceType(target);
+        const actor = target instanceof SR5Actor_1.SR5Actor ? target : target.actor;
+        switch (type) {
+            case 'Actor':
+                return {
+                    sceneId: null,
+                    ownerId: actor.id,
+                    targetId: target.id,
+                    type
+                };
+            case 'Token':
+                return {
+                    // @ts-ignore
+                    sceneId: actor.token.parent.id,
+                    ownerId: actor.token.id,
+                    targetId: target.id,
+                    type
+                };
+        }
+    }
+    static documentByNetworkDeviceLink(link) {
+        switch (link.type) {
+            case 'Actor': {
+                const actor = game.actors.get(link.ownerId);
+                if (!actor)
+                    return;
+                return actor.items.get(link.targetId);
+            }
+            case 'Token': {
+                const scene = game.scenes.get(link.sceneId);
+                if (!scene)
+                    return;
+                // @ts-ignore // TODO: foundry-vtt-types 0.8
+                const token = scene.tokens.get(link.ownerId);
+                return token.actor.items.get(link.targetId);
+            }
+        }
+    }
+    static emitAddControllerSocketMessage(controller, device) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const controllerLink = DeviceFlow.buildNetworkDeviceLink(controller);
+            const deviceLink = DeviceFlow.buildNetworkDeviceLink(device);
+            yield sockets_1.SocketMessage.emitForGM(constants_1.FLAGS.addNetworkController, { controllerLink, deviceLink });
+        });
+    }
+    static handleAddNetworkControllerSocketMessage(message) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { controllerLink, deviceLink } = message.data;
+            const controller = DeviceFlow.documentByNetworkDeviceLink(controllerLink);
+            const device = DeviceFlow.documentByNetworkDeviceLink(deviceLink);
+            yield DeviceFlow.addNetworkController(controller, device);
+        });
+    }
+    static addNetworkController(controller, device) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const controllerLink = DeviceFlow.buildNetworkDeviceLink(controller);
+            if (device instanceof SR5Item_1.SR5Item) {
+                yield device.update({ 'data.technology.networkController': controllerLink });
+            }
+            if (device instanceof SR5Actor_1.SR5Actor) {
+                console.error('implement');
+            }
+        });
+    }
+    static invalidNetworkDevice(controller, target) {
+        if (controller.isHost() && target instanceof SR5Actor_1.SR5Actor) {
+            // A host only accepts IC as actor network devices.
+            return !target.isIC();
+        }
+        // Assume all technological items can be added to a PAN or WAN, not only devices.
+        if (target instanceof SR5Item_1.SR5Item) {
+            // Both hosts and devices accept all technology items as network devices.
+            return target.getTechnology() === undefined;
+        }
+        // Assume all other target types are invalid as a network device.
+        return true;
+    }
+    // TODO: Test with host controller.
+    static connectedNetworkDevice(controller, unclearLink) {
+        if (!controller.isHost() && !controller.isDevice())
+            return false;
+        const controllerData = controller.asControllerData();
+        return DeviceFlow.findNetworkDeviceLink(controller, unclearLink) >= 0;
+    }
+    static findNetworkDeviceLink(controller, needleLink) {
+        if (!controller.isHost() && !controller.isDevice())
+            return -1;
+        const controllerData = controller.asControllerData();
+        return controllerData.data.networkDevices.findIndex(connectedLink => connectedLink.type === needleLink.type &&
+            connectedLink.ownerId === needleLink.ownerId &&
+            connectedLink.sceneId === needleLink.sceneId &&
+            connectedLink.targetId === needleLink.targetId);
+    }
+}
+exports.DeviceFlow = DeviceFlow;
+},{"../../actor/SR5Actor":85,"../../constants":145,"../../sockets":219,"../SR5Item":197}],202:[function(require,module,exports){
+"use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HostPrep = exports.HostDataPreparation = void 0;
 const MatrixRules_1 = require("../../rules/MatrixRules");
@@ -30919,7 +31528,7 @@ class HostPrep {
     }
 }
 exports.HostPrep = HostPrep;
-},{"../../rules/MatrixRules":212}],201:[function(require,module,exports){
+},{"../../rules/MatrixRules":214}],203:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -31040,7 +31649,7 @@ function rollSkillMacro(skillLabel) {
     });
 }
 exports.rollSkillMacro = rollSkillMacro;
-},{"./helpers":157}],202:[function(require,module,exports){
+},{"./helpers":157}],204:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const HandlebarManager_1 = require("./handlebars/HandlebarManager");
@@ -31050,7 +31659,7 @@ const hooks_1 = require("./hooks");
 /* -------------------------------------------- */
 hooks_1.HooksManager.registerHooks();
 HandlebarManager_1.HandlebarManager.registerHelpers();
-},{"./handlebars/HandlebarManager":152,"./hooks":158}],203:[function(require,module,exports){
+},{"./handlebars/HandlebarManager":152,"./hooks":158}],205:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -31198,7 +31807,7 @@ Migrator.s_Versions = [
     { versionNumber: Version0_6_10_1.Version0_6_10.TargetVersion, migration: new Version0_6_10_1.Version0_6_10() },
     { versionNumber: Version0_7_2_1.Version0_7_2.TargetVersion, migration: new Version0_7_2_1.Version0_7_2() },
 ];
-},{"./VersionMigration":204,"./versions/LegacyMigration":205,"./versions/Version0_6_10":206,"./versions/Version0_6_5":207,"./versions/Version0_7_2":208}],204:[function(require,module,exports){
+},{"./VersionMigration":206,"./versions/LegacyMigration":207,"./versions/Version0_6_10":208,"./versions/Version0_6_5":209,"./versions/Version0_7_2":210}],206:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -31627,7 +32236,7 @@ exports.VersionMigration = VersionMigration;
 VersionMigration.MODULE_NAME = 'shadowrun5e';
 VersionMigration.KEY_DATA_VERSION = 'systemMigrationVersion';
 VersionMigration.NO_VERSION = '0';
-},{}],205:[function(require,module,exports){
+},{}],207:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -31856,7 +32465,7 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
     }
 }
 exports.LegacyMigration = LegacyMigration;
-},{"../VersionMigration":204}],206:[function(require,module,exports){
+},{"../VersionMigration":206}],208:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -31916,7 +32525,7 @@ class Version0_6_10 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_6_10 = Version0_6_10;
-},{"../VersionMigration":204}],207:[function(require,module,exports){
+},{"../VersionMigration":206}],209:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -31966,7 +32575,7 @@ class Version0_6_5 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_6_5 = Version0_6_5;
-},{"../VersionMigration":204}],208:[function(require,module,exports){
+},{"../VersionMigration":206}],210:[function(require,module,exports){
 "use strict";
 // TODO: How to trigger test migration.
 // TODO: How to test migration results?
@@ -32043,7 +32652,7 @@ class Version0_7_2 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_7_2 = Version0_7_2;
-},{"../../config":144,"../VersionMigration":204}],209:[function(require,module,exports){
+},{"../../config":144,"../VersionMigration":206}],211:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PartsList = void 0;
@@ -32146,7 +32755,7 @@ class PartsList {
     }
 }
 exports.PartsList = PartsList;
-},{}],210:[function(require,module,exports){
+},{}],212:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -32233,7 +32842,7 @@ class ShadowrunRoller {
             const previewTemplate = item.hasTemplate;
             const description = item.getChatData();
             const tests = item.getOpposedTests();
-            const action = item.getAction();
+            const result = item.getActionResult();
             const modifiers = yield actor.getModifiers();
             // Prepare the roll and dialog.
             const advancedRollProps = {
@@ -32269,7 +32878,7 @@ class ShadowrunRoller {
             const targets = helpers_1.Helpers.getUserTargets();
             // Allow for direct defense without token selection for ONE token targeted.
             const target = targets.length === 1 ? targets[0] : undefined;
-            const rollChatOptions = { title, roll, actor, item, attack, previewTemplate, targets, target, description, tests, action };
+            const rollChatOptions = { title, roll, actor, item, attack, previewTemplate, targets, target, description, tests, result, actionTestData };
             yield chat_1.createRollChatMessage(rollChatOptions);
             if (tests) {
                 const targetChatOptions = { actor, item, tests, roll, attack };
@@ -32532,7 +33141,7 @@ class ShadowrunRoller {
     }
 }
 exports.ShadowrunRoller = ShadowrunRoller;
-},{"../apps/dialogs/ShadowrunTestDialog":136,"../chat":142,"../constants":145,"../helpers":157,"../parts/PartsList":209}],211:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunTestDialog":136,"../chat":142,"../constants":145,"../helpers":157,"../parts/PartsList":211}],213:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CombatRules = void 0;
@@ -32576,7 +33185,7 @@ class CombatRules {
     }
 }
 exports.CombatRules = CombatRules;
-},{"../constants":145}],212:[function(require,module,exports){
+},{"../constants":145}],214:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatrixRules = void 0;
@@ -32630,7 +33239,17 @@ class MatrixRules {
      * @param marks
      */
     static isValidMarksCount(marks) {
-        return marks >= 0 && marks <= 3;
+        return marks >= MatrixRules.minMarksCount() && marks <= MatrixRules.maxMarksCount();
+    }
+    static maxMarksCount() {
+        return 3;
+    }
+    static minMarksCount() {
+        return 0;
+    }
+    static getValidMarksCount(marks) {
+        marks = Math.min(marks, MatrixRules.maxMarksCount());
+        return Math.max(marks, MatrixRules.minMarksCount());
     }
     /**
      * Derive a hosts attributes ratings based on it's host rating. SR5#247 'Host Attributes'
@@ -32641,7 +33260,7 @@ class MatrixRules {
     }
 }
 exports.MatrixRules = MatrixRules;
-},{"../constants":145}],213:[function(require,module,exports){
+},{"../constants":145}],215:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -32838,7 +33457,7 @@ class Modifiers {
     }
 }
 exports.Modifiers = Modifiers;
-},{"../constants":145}],214:[function(require,module,exports){
+},{"../constants":145}],216:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SkillRules = void 0;
@@ -32879,7 +33498,7 @@ class SkillRules {
     }
 }
 exports.SkillRules = SkillRules;
-},{"../constants":145}],215:[function(require,module,exports){
+},{"../constants":145}],217:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SoakRules = void 0;
@@ -33079,7 +33698,7 @@ class SoakRules {
     }
 }
 exports.SoakRules = SoakRules;
-},{"../config":144,"../helpers":157}],216:[function(require,module,exports){
+},{"../config":144,"../helpers":157}],218:[function(require,module,exports){
 "use strict";
 // game settings for shadowrun 5e
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -33188,7 +33807,49 @@ const registerSystemSettings = () => {
     });
 };
 exports.registerSystemSettings = registerSystemSettings;
-},{"./constants":145,"./migrator/VersionMigration":204}],217:[function(require,module,exports){
+},{"./constants":145,"./migrator/VersionMigration":206}],219:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SocketMessage = void 0;
+const constants_1 = require("./constants");
+/**
+ * TODO: Add simple documentation.
+ */
+class SocketMessage {
+    static _createMessage(type, data, userId) {
+        return { type, data, userId };
+    }
+    static emit(type, data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const message = SocketMessage._createMessage(type, data);
+            console.trace('Emiting Shadowrun5e system socket message', message);
+            yield game.socket.emit(constants_1.SYSTEM_SOCKET, message);
+        });
+    }
+    static emitForGM(type, data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (game.user.isGM)
+                return console.error('Active user is GM! Aborting socket message...');
+            const gmUser = game.users.find(user => user.isGM);
+            if (!gmUser)
+                return console.error('No active GM user! One GM must be active for this action to work.');
+            const message = SocketMessage._createMessage(type, data, gmUser.id);
+            console.trace('Emiting Shadowrun5e system socket message', message);
+            yield game.socket.emit(constants_1.SYSTEM_SOCKET, message);
+        });
+    }
+}
+exports.SocketMessage = SocketMessage;
+},{"./constants":145}],220:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -33306,20 +33967,27 @@ class Template extends MeasuredTemplate {
     }
 }
 exports.default = Template;
-},{}],218:[function(require,module,exports){
+},{}],221:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.quenchRegister = void 0;
 const sr5_Modifiers_spec_1 = require("./sr5.Modifiers.spec");
 const sr5_SR5Item_spec_1 = require("./sr5.SR5Item.spec");
 const sr5_Matrix_spec_1 = require("./sr5.Matrix.spec");
+/**
+ * Register FoundryVTT Quench test batches...
+ *
+ * https://github.com/schultzcole/FVTT-Quench
+ *
+ * NOTE: Unfortunately FVTT-Quench has no working FoundryVTT 0.8 support and will cause bugs within Foundry.
+ */
 const quenchRegister = quench => {
     quench.registerBatch("shadowrun5e.rules.matrix", sr5_Matrix_spec_1.shadowrunMatrix);
     quench.registerBatch("shadowrun5e.rules.modifiers", sr5_Modifiers_spec_1.shadowrunRulesModifiers);
     quench.registerBatch("shadowrun5e.entities.items", sr5_SR5Item_spec_1.shadowrunSR5Item);
 };
 exports.quenchRegister = quenchRegister;
-},{"./sr5.Matrix.spec":219,"./sr5.Modifiers.spec":220,"./sr5.SR5Item.spec":221}],219:[function(require,module,exports){
+},{"./sr5.Matrix.spec":222,"./sr5.Modifiers.spec":223,"./sr5.SR5Item.spec":224}],222:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shadowrunMatrix = void 0;
@@ -33369,7 +34037,7 @@ const shadowrunMatrix = context => {
     });
 };
 exports.shadowrunMatrix = shadowrunMatrix;
-},{"../module/rules/MatrixRules":212}],220:[function(require,module,exports){
+},{"../module/rules/MatrixRules":214}],223:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shadowrunRulesModifiers = void 0;
@@ -33537,7 +34205,7 @@ const shadowrunRulesModifiers = context => {
     });
 };
 exports.shadowrunRulesModifiers = shadowrunRulesModifiers;
-},{"../module/rules/Modifiers":213}],221:[function(require,module,exports){
+},{"../module/rules/Modifiers":215}],224:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -33644,6 +34312,6 @@ const shadowrunSR5Item = context => {
     });
 };
 exports.shadowrunSR5Item = shadowrunSR5Item;
-},{"../module/item/SR5Item":197}]},{},[202])
+},{"../module/item/SR5Item":197}]},{},[204])
 
 //# sourceMappingURL=bundle.js.map
