@@ -9,7 +9,8 @@
   "flags": {},
   "version": "0.7.17",
   "minimumCoreVersion": "0.8.6",
-  "compatibleCoreVersion": "0.8.8",
+  "compatibleCoreVersion": "0.8.9",
+  "templateVersion": "4",
   "scripts": [],
   "esmodules": [
     "dist/bundle.js"
@@ -35,14 +36,6 @@
     }
   ],
   "packs": [
-    {
-      "name": "Roles",
-      "label": "SR5e NPCs",
-      "system": "shadowrun5e",
-      "path": "./packs/sr5e-npcs.db",
-      "entity": "Actor",
-      "private": false
-    },
     {
       "name": "Matrix Actions",
       "label": "SR5e Matrix Actions",
