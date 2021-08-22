@@ -914,7 +914,8 @@
             "services": 0,
             "bound": false,
             "force": 0,
-            "spiritType": ""
+            "spiritType": "",
+            "special": "magic"
         },
         "critter": {
             "templates": ["common", "skills", "attributes", "limits", "armor", "magic", "matrix", "movement", "condition_monitors"]
@@ -924,7 +925,8 @@
             "services": 0,
             "registered": false,
             "level": 0,
-            "spriteType": ""
+            "spriteType": "",
+            "special": "resonance"
         },
         "vehicle": {
             "templates": ["common", "skills", "attributes", "limits", "armor", "matrix", "movement"],
