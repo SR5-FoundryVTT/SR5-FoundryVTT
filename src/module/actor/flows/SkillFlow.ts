@@ -40,4 +40,12 @@ export class SkillFlow {
         }
         return SkillRules.allowRoll(skill);
     }
+
+    static isCustomSkill(skill: SkillField): boolean {
+        return skill.name !== undefined && skill.name !== '';
+    }
+
+    static isLegacySkill(skill: SkillField): boolean {
+        return !SkillFlow.isCustomSkill(skill);
+    }
 }
