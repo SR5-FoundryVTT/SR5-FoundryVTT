@@ -32,6 +32,11 @@
       "lang": "pt-BR",
       "name": "Português (Brasil)",
       "path": "dist/locale/pt-BR/config.json"
+    },
+    {
+      "lang": "fr",
+      "name": "Français",
+      "path": "dist/locale/fr/config.json"
     }
   ],
   "packs": [
