@@ -16362,6 +16362,12 @@ class SkillFlow {
         }
         return SkillRules_1.SkillRules.allowRoll(skill);
     }
+    static isCustomSkill(skill) {
+        return skill.name !== undefined && skill.name !== '';
+    }
+    static isLegacySkill(skill) {
+        return !SkillFlow.isCustomSkill(skill);
+    }
 }
 exports.SkillFlow = SkillFlow;
 },{"../../constants":145,"../../rules/SkillRules":216}],89:[function(require,module,exports){
@@ -16724,6 +16730,7 @@ const ModifiersPrep_1 = require("./functions/ModifiersPrep");
 const InitiativePrep_1 = require("./functions/InitiativePrep");
 const helpers_1 = require("../../helpers");
 const PartsList_1 = require("../../parts/PartsList");
+const SkillFlow_1 = require("../flows/SkillFlow");
 function SpiritDataPrepare(data, items) {
     ModifiersPrep_1.ModifiersPrep.prepareModifiers(data);
     ModifiersPrep_1.ModifiersPrep.clearAttributeMods(data);
@@ -16753,9 +16760,10 @@ class SpiritPrep {
                     attributes[attId].base = value + force;
                 }
             }
+            // set base of skill according to force and spirit type
             for (const [skillId, skill] of Object.entries(skills.active)) {
                 // Leave custom skills alone to allow users to change those at will.
-                if (skill.name !== '')
+                if (SkillFlow_1.SkillFlow.isCustomSkill(skill))
                     continue;
                 // Change default skills to the force rating.
                 skill.base = overrides.skills.find((s) => s === skillId) ? force : 0;
@@ -17100,7 +17108,7 @@ class SpiritPrep {
     }
 }
 exports.SpiritPrep = SpiritPrep;
-},{"../../helpers":157,"../../parts/PartsList":211,"./functions/AttributesPrep":96,"./functions/ConditionMonitorsPrep":97,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/ModifiersPrep":102,"./functions/MovementPrep":103,"./functions/SkillsPrep":105,"./functions/WoundsPrep":106}],94:[function(require,module,exports){
+},{"../../helpers":157,"../../parts/PartsList":211,"../flows/SkillFlow":88,"./functions/AttributesPrep":96,"./functions/ConditionMonitorsPrep":97,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/ModifiersPrep":102,"./functions/MovementPrep":103,"./functions/SkillsPrep":105,"./functions/WoundsPrep":106}],94:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpritePrep = exports.SpriteDataPrepare = void 0;
