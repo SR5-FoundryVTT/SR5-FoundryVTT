@@ -34,6 +34,7 @@ export class HooksManager {
         // Register your highest level hook callbacks here for a quick overview of what's hooked into.
 
         Hooks.once('init', HooksManager.init);
+        Hooks.once('setup', HooksManager.setupAutocompleteInlinePropertiesSupport);
 
         Hooks.on('canvasInit', HooksManager.canvasInit);
         Hooks.on('ready', HooksManager.ready);
@@ -242,5 +243,35 @@ ___________________
                 await handler(message);
             }
         });
+    }
+
+    /**
+     * Add support for https://github.com/schultzcole/FVTT-Autocomplete-Inline-Properties module
+     * to give auto complete for active effect attribute keys.
+     *
+     * This is taken from: https://github.com/schultzcole/FVTT-Autocomplete-Inline-Properties/blob/master/CONTRIBUTING.md
+     * It partially uses: https://github.com/schultzcole/FVTT-Autocomplete-Inline-Properties/blob/master/package-config.mjs#L141
+     */
+    static setupAutocompleteInlinePropertiesSupport() {
+        // @ts-ignore
+        const api = game.modules.get("autocomplete-inline-properties").API;
+        if (!api) return;
+
+        console.log('Shadowrun5e - Registering support for autocomplete-inline-properties');
+        // @ts-ignore
+        const DATA_MODE = api.CONST.DATA_MODE;
+
+        const config = {
+            packageName: "shadowrun5e",
+            sheetClasses: [{
+                name: "ActiveEffectConfig",
+                fieldConfigs: [
+                    { selector: `.tab[data-tab="effects"] .key input[type="text"]`, defaultPath: "data", showButton: true, allowHotkey: true, dataMode: DATA_MODE.OWNING_ACTOR_DATA },
+                ]
+            }]
+        };
+
+        // @ts-ignore
+        api.PACKAGE_CONFIG.push(config);
     }
 }
