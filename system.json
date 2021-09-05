@@ -9,7 +9,7 @@
   "flags": {},
   "version": "0.7.18",
   "minimumCoreVersion": "0.8.6",
-  "compatibleCoreVersion": "0.8.8",
+  "compatibleCoreVersion": "0.8.9",
   "scripts": [],
   "esmodules": [
     "dist/bundle.js"
