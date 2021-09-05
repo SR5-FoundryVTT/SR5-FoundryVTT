@@ -41,24 +41,7 @@ export class WareImporter extends DataImporter {
                     chat: '',
                     source: '',
                 },
-                technology: {
-                    rating: 1,
-                    availability: '',
-                    quantity: 1,
-                    cost: 0,
-                    equipped: true,
-                    conceal: {
-                        base: 0,
-                        value: 0,
-                        mod: [],
-                    },
-                    condition_monitor: {
-                        label: '',
-                        value: 0,
-                        max: 0,
-                    },
-                    wireless: true
-                },
+                technology: DefaultValues.technologyData({rating: 1}),
                 armor: {
                     value: 0,
                     mod: false,
@@ -94,7 +77,7 @@ export class WareImporter extends DataImporter {
                         description: '',
                     },
                     alt_mod: 0,
-                    dice_pool_mod: [],
+                    dice_pool_mod: []
                 },
                 grade: 'standard',
                 essence: 0,

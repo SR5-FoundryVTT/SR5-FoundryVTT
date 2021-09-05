@@ -1,7 +1,7 @@
 {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.html' tabId='matrix'}}
     <div>
         {{> "systems/shadowrun5e/dist/templates/common/HeaderBlock.html"
-                name=(localize "SR5.Matrix")
+                name=(localize "SR5.Labels.ActorSheet.Matrix")
         }}
         <div class="attributes">
             {{> "systems/shadowrun5e/dist/templates/actor/parts/matrix/DeviceRating.html" }}
@@ -54,5 +54,6 @@
         {{else}}
             {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/ProgramList.html' }}
         {{/if}}
+        {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/Marks.html' }}
     </div>
 {{/ 'systems/shadowrun5e/dist/templates/common/TabWrapper.html'}}

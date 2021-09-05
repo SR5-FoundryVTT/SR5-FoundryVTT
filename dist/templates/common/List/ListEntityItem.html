@@ -1,0 +1,10 @@
+{{#> "systems/shadowrun5e/dist/templates/common/NameLineBlock.html" name=lineName}}
+  <div>
+      {{#ifne id undefined}}
+      <a class="entity-link" draggable="true" data-entity="{{type}}" data-id="{{id}}" {{#if pack}}data-pack="{{pack}}"{{/if}}><i class="fas fa-user">{{linkName}}</i></a>
+      <a class="close entity-remove" data-entity="{{type}}" data-list="{{list}}" data-position={{position}}><i class="fas fa-times"></i></a>
+      {{else}}
+      {{localize missingLabel}}
+      {{/ifne}}
+  </div>
+{{/"systems/shadowrun5e/dist/templates/common/NameLineBlock.html"}}

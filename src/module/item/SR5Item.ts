@@ -52,6 +52,12 @@ import SinItemData = Shadowrun.SinItemData;
 import SpellItemData = Shadowrun.SpellItemData;
 import SpritePowerItemData = Shadowrun.SpritePowerItemData;
 import WeaponItemData = Shadowrun.WeaponItemData;
+import HostItemData = Shadowrun.HostItemData;
+import {DefaultValues} from "../data/DataDefaults";
+import {HostDataPreparation} from "./prep/HostPrep";
+import {MatrixRules} from "../rules/MatrixRules";
+import ActionResultData = Shadowrun.ActionResultData;
+import {DeviceFlow} from "./flows/DeviceFlow";
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
@@ -335,6 +341,13 @@ export class SR5Item extends Item<ShadowrunItemData> {
         const adeptPower = this.asAdeptPowerData();
         if (adeptPower) {
             adeptPower.data.type = adeptPower.data.action.type ? 'active' : 'passive';
+        }
+
+        // Switch item data preparation between types...
+        // ... this is ongoing work to clean up SR5item.prepareData
+        switch (this.data.type) {
+            case 'host':
+                HostDataPreparation(this.data.data);
         }
     }
 
@@ -747,6 +760,17 @@ export class SR5Item extends Item<ShadowrunItemData> {
             return this.data as AdeptPowerItemData;
     }
 
+
+    isHost(): boolean {
+        return this.data.type === 'host';
+    }
+
+    asHostData(): HostItemData|undefined {
+        if (this.isHost()) {
+            return this.data as HostItemData;
+        }
+    }
+
     async removeLicense(index) {
         const data = duplicate(this.asSinData());
         if (data) {
@@ -879,6 +903,12 @@ export class SR5Item extends Item<ShadowrunItemData> {
             label: this.getActionTestName(),
             type: 'action',
         }];
+    }
+
+    getActionResult(): ActionResultData|undefined {
+        if (!this.isAction()) return;
+
+        return this.wrapper.getActionResult();
     }
 
     getOpposedTests(): Test[] {
@@ -1343,6 +1373,10 @@ export class SR5Item extends Item<ShadowrunItemData> {
         }
     }
 
+    asControllerData(): HostItemData | DeviceItemData | undefined {
+        return this.asHostData() || this.asDeviceData() || undefined;
+    }
+
     isEquipment(): boolean {
         return this.wrapper.isEquipment();
     }
@@ -1359,6 +1393,14 @@ export class SR5Item extends Item<ShadowrunItemData> {
 
     isCyberdeck(): boolean {
         return this.wrapper.isCyberdeck();
+    }
+
+    isCommlink(): boolean {
+        return this.wrapper.isCommlink();
+    }
+
+    isMatrixAction(): boolean {
+        return this.wrapper.isMatrixAction();
     }
 
     getBookSource(): string {
@@ -1519,6 +1561,56 @@ export class SR5Item extends Item<ShadowrunItemData> {
         return false;
     }
 
+
+    /**
+     * A host type item can store IC actors to spawn in order, use this method to add into that.
+     * @param id An IC type actor id to fetch the actor with.
+     * @param pack Optional pack collection to fetch from
+     */
+    async addIC(id: string, pack: string|null = null) {
+        const hostData = this.asHostData();
+        if (!hostData || !id) return;
+
+        // Check if actor exists before adding.
+        const actor = (pack ? await Helpers.getEntityFromCollection(pack, id) : game.actors.get(id)) as SR5Actor;
+        if (!actor || !actor.isIC()) {
+            console.error(`Provided actor id ${id} doesn't exist (with pack collection '${pack}') or isn't an IC type`);
+            return;
+        }
+
+        const icData = actor.asICData();
+        if (!icData) return;
+
+        // Add IC to the hosts IC order
+        const sourceEntity = DefaultValues.sourceEntityData({
+            id: actor.id,
+            name: actor.name,
+            type: 'Actor',
+            pack,
+            // Custom fields for IC
+            data: {icType: icData.data.icType},
+        });
+        hostData.data.ic.push(sourceEntity);
+
+        await this.update({'data.ic': hostData.data.ic});
+    }
+
+    /**
+     * A host type item can contain IC in an order. Use this function remove IC at the said position
+     * @param index The position in the IC order to be removed
+     */
+    async removeIC(index: number) {
+        if (isNaN(index) || index < 0) return;
+
+        const hostData = this.asHostData();
+        if (!hostData) return;
+        if (hostData.data.ic.length <= index) return;
+
+        hostData.data.ic.splice(index, 1);
+
+        await this.update({'data.ic': hostData.data.ic});
+    }
+
     get _isEmbeddedItem(): boolean {
         // @ts-ignore // TODO: foundry-vtt-types 0.8 Document hasn't be implemented yet
         return this.hasOwnProperty('parent') && this.parent instanceof SR5Item;
@@ -1553,5 +1645,140 @@ export class SR5Item extends Item<ShadowrunItemData> {
         // Actor.item => Directly owned item by an actor!
         // @ts-ignore
         return await super.update(data, options);
+    }
+
+    /**
+     * Place a Matrix Mark for this Item.
+     *
+     * @param target The Document the marks are placed on. This can be an actor (character, technomancer, IC) OR an item (Host)
+     * @param marks Amount of marks to be placed.
+     * @param options Additional options that may be needed.
+     * @param options.scene The scene the targeted actor lives on.
+     * @param options.item
+     *
+     * TODO: It might be useful to create a 'MatrixDocument' class sharing matrix methods to avoid duplication between
+     *       SR5Item and SR5Actor.
+     */
+    async setMarks(target: SR5Actor, marks: number, options?: {scene?: Scene, item?: Item}) {
+        if (!canvas.ready) return;
+
+        if (!this.isHost()) {
+            console.error('Only Host item types can place matrix marks!');
+            return;
+        }
+
+        if (!MatrixRules.isValidMarksCount(marks)) {
+            ui.notifications.error(game.i18n.localize('SR5.Errors.MarkCouldNotBePlaced'));
+            console.error('To many or to little matrix marks');
+            return
+        }
+
+        // Both scene and item are optional.
+        const scene = options?.scene || canvas.scene;
+        // TODO: IF no item given use the actor matrix item.
+        const item = options?.item || target.getMatrixDevice();
+
+        // Build the markId string. If no item has been given, there still will be a third split element.
+        // Use Helpers.deconstructMarkId to get the elements.
+        const markId = Helpers.buildMarkId(scene.id, target.id, item?.id);
+        const hostData = this.asHostData();
+        hostData.data.marks[markId] = marks;
+
+        await this.update({'data.marks': hostData.data.marks});
+    }
+
+    /**
+     * Receive the marks placed on either the given target as a whole or one it's owned items.
+     *
+     * @param target
+     * @param item
+     * @param options
+     *
+     * TODO: Check with technomancers....
+     *
+     * @return Will always return a number. At least zero, for no marks placed.
+     */
+    getMarks(target: SR5Actor, item?: SR5Item, options?: {scene?: Scene}): number {
+        if (!canvas.ready) return;
+        if (!this.isHost()) return 0;
+
+        // Scene is optional.
+        const scene = options?.scene || canvas.scene;
+        item = item || target.getMatrixDevice();
+
+        const markId = Helpers.buildMarkId(scene.id, target.id, item.id);
+        const hostData = this.asHostData();
+        return hostData.data.marks[markId] || 0;
+    }
+
+    /**
+     * Remove ALL marks placed by this item.
+     *
+     * TODO: Allow partial deletion based on target / item
+     */
+    async clearMarks() {
+        if (!this.isHost()) return;
+
+        const data = this.asHostData();
+
+        // Delete all markId properties from ActorData
+        const updateData = {}
+        for (const markId of Object.keys(data.data.marks)) {
+            updateData[`-=${markId}`] = null;
+        }
+
+        await this.update({'data.marks': updateData});
+    }
+
+    /**
+     * Add a 'device' to a matrix network (PAN or WAN)
+     *
+     */
+    async addNetworkDevice(target: SR5Item|SR5Actor) {
+        // TODO: Add device to WAN network
+        // TODO: Add IC actor to WAN network
+        // TODO: setup networkController link on networked devices.
+
+        const deviceData = this.asDeviceData();
+        if (!target || !deviceData) return;
+
+        const controller = this;
+
+        if (DeviceFlow.invalidNetworkDevice(controller, target)) return;
+
+        const deviceLink = DeviceFlow.buildNetworkDeviceLink(target);
+        const controllerLink = DeviceFlow.buildNetworkDeviceLink(controller);
+        if (!deviceLink.type || !controllerLink.type) return console.error('Abort adding network device due to internal data error');
+
+        if (DeviceFlow.connectedNetworkDevice(controller, deviceLink)) return;
+
+        const networkDevices = duplicate(deviceData.data.networkDevices);
+        networkDevices.push(deviceLink);
+
+        if (game.user.isGM) {
+            await DeviceFlow.addNetworkController(controller, target);
+        } else {
+            await DeviceFlow.emitAddControllerSocketMessage(controller, target);
+        }
+
+        return await this.update({'data.networkDevices': networkDevices});
+    }
+
+    async removeNetworkDevice(index: number) {
+        const deviceData = this.asDeviceData();
+        if (!deviceData) return;
+
+        const networkDevices = duplicate(deviceData.data.networkDevices);
+        if (networkDevices[index] === undefined) return;
+        networkDevices.splice(index, 1);
+
+        return await this.update({'data.networkDevices': networkDevices});
+    }
+
+    async removeAllNetworkDevices() {
+        const deviceData = this.asDeviceData();
+        if (!deviceData) return;
+
+        return await this.update({'data.networkDevices': []});
     }
 }

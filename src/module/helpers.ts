@@ -16,6 +16,8 @@ import { SR5Item } from './item/SR5Item';
 import Skills = Shadowrun.Skills;
 import {ShadowrunRoll} from "./rolls/ShadowrunRoller";
 import {DataDefaults} from "./data/DataDefaults";
+import MatrixMarks = Shadowrun.MatrixMarks;
+import TargetedDocument = Shadowrun.TargetedDocument;
 
 interface CalcTotalOptions {
     min?: number,
@@ -36,8 +38,10 @@ export class Helpers {
         if (value['temp'] !== undefined) {
             parts.addUniquePart('SR5.Temporary', value['temp']);
         }
+        // LEGACY: On new actors .base can be undefined, resulting in NaN .value
+        const base = value.base || 0;
 
-        value.value = Helpers.roundTo(parts.total + value.base, 3);
+        value.value = Helpers.roundTo(parts.total + base, 3);
         value.mod = parts.list;
 
         value.value = Helpers.applyValueRange(value.value, options);
@@ -279,17 +283,30 @@ export class Helpers {
     }
 
     /**
-     * Use this helper to get a tokens actor from any given scene id, while the sceneTokenId is a mixed ID
+     * Use this helper to get a tokens actor from any given scene id.
      * @param sceneTokenId A mixed id with the format '<sceneId>.<tokenid>
      */
     static getSceneTokenActor(sceneTokenId: string): SR5Actor | undefined {
-        const [sceneId, tokenId] = sceneTokenId.split('.');
+        const [sceneId, tokenId] = Helpers.deconstructSceneTokenId(sceneTokenId);
+        const token = Helpers.getSceneTokenDocument(sceneId, tokenId);
+        if (!token) return;
+        // @ts-ignore // TODO: foundry-vtt-types 0.8 TokenDocument
+        return token.getActor();
+    }
+
+    static deconstructSceneTokenId(sceneTokenId: string): [sceneId: string, tokenId: string] {
+        return sceneTokenId.split('.') as [sceneId: string, tokenId: string];
+    }
+
+    // @ts-ignore // TODO: foundry-vtt-types 0.8 TokenDocument
+    static getSceneTokenDocument(sceneId, tokenId): Token|undefined {
         const scene = game.scenes.get(sceneId);
         if (!scene) return;
         // @ts-ignore
         const token = scene.tokens.get(tokenId);
         if (!token) return;
-        return token.getActor();
+
+        return token;
     }
 
     static getUserTargets(user?: User|null): Token[] {
@@ -351,6 +368,12 @@ export class Helpers {
     static getControlledTokens(): Token[] {
         if (!canvas || !canvas.ready) return [];
         return canvas.tokens.controlled;
+    }
+
+    static getTargetedTokens(): Token[] {
+        if (!canvas.ready) return [];
+
+        return Array.from(game.user.targets);
     }
 
     static getSelectedActorsOrCharacter(): SR5Actor[] {
@@ -655,5 +678,96 @@ export class Helpers {
         whisper = whisper?.length > 0 ? whisper : null;
         // @ts-ignore
         await game.dice3d.showForRoll(roll, game.user, synchronize, whisper, blind);
+    }
+
+
+    /**
+     * Fetch entities from global or pack collections using data acquired by Foundry Drag&Drop process
+     * @param data Foundry Drop Data
+     */
+    static async getEntityFromDropData(data: {type: 'Actor'|'Item', pack: string, id: string}): Promise<Entity | undefined> {
+        if (data.pack)
+            return await Helpers.getEntityFromCollection(data.pack, data.id);
+
+        if (data.type === 'Actor')
+            return game.actors.get(data.id);
+
+        if (data.type === 'Item')
+            return game.items.get(data.id);
+    }
+
+    /**
+     * Fetch entities from a pack collection
+     * @param collection The pack name as stored in the collection property
+     * @param id The entity id in that collection
+     */
+    static async getEntityFromCollection(collection: string, id: string): Promise<Entity> {
+        const pack = game.packs.find((p) => p.collection === collection);
+        return await pack.getEntity(id);
+    }
+
+    /**
+     * A markId is valid if:
+     * - It's scene still exists
+     * - The token still exists on that scene
+     * - And a possible owned item still exists on that documents actor.
+     */
+    static isValidMarkId(markId: string): boolean {
+        const [sceneId, targetId, itemId] = Helpers.deconstructMarkId(markId);
+
+        const scene = game.scenes.get(sceneId);
+        if (!scene) return false;
+
+        // @ts-ignore // foundry-vtt-types 0.8
+        const tokenDocument = scene.tokens.get(targetId);
+        if (!tokenDocument) return false;
+
+        const actor = tokenDocument.actor;
+        // Some targets are allowed without a targeted owned item.
+        if (itemId && !actor.items.get(itemId)) return false;
+
+        return true;
+    }
+
+    /**
+     * Build a markId string. See Helpers.deconstructMarkId for usage.
+     *
+     * @param sceneId Optional id in a markId
+     * @param targetId Mandatory id in a markId
+     * @param itemId Optional id in a markId
+     * @param separator Should you want to change the default separator used. Make sure not to use a . since Foundry will split the key into objects.
+     */
+    static buildMarkId(sceneId: string, targetId: string, itemId: string|undefined, separator='/'): string {
+        return [sceneId, targetId, itemId || ''].join(separator);
+    }
+
+    /**
+     * Deconstruct the given markId string.
+     *
+     * @param markId 'sceneId.targetId.itemId' with itemId being optional
+     * @param separator Should you want to change the default separator used
+     */
+    static deconstructMarkId(markId: string, separator='/'): [sceneId: string, targetId: string, itemId: string] {
+        const ids = markId.split(separator);
+
+        if (ids.length !== 3) {
+            console.error('A mark id must always be of length 3');
+            return;
+        }
+
+        return ids as [string, string, string];
+    }
+
+    static getMarkIdDocuments(markId: string): TargetedDocument {
+        const [sceneId, targetId, itemId] = Helpers.deconstructMarkId(markId);
+
+        const scene = game.scenes.get(sceneId);
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
+        const target = scene.tokens.get(targetId) || game.items.get(targetId) as SR5Item;
+        const item = target?.actor?.items?.get(itemId) as SR5Item; // DocumentCollection will return undefined if needed
+
+        return {
+            scene, target, item
+        }
     }
 }

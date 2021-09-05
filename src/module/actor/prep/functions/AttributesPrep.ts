@@ -1,4 +1,3 @@
-import { PartsList } from '../../../parts/PartsList';
 import { Helpers } from '../../../helpers';
 import {SR} from "../../../constants";
 import {SR5} from "../../../config";
@@ -24,14 +23,30 @@ export class AttributesPrep {
             // needed to be able to migrate things correctly
             if (name === 'edge' && attribute['uses'] === undefined) return;
 
-            const parts = new PartsList(attribute.mod);
-            attribute.mod = parts.list;
-
-            AttributesPrep.calculateAttribute(name, attribute);
-
-            // add i18n labels.
-            attribute.label = SR5.attributes[name];
+            AttributesPrep.prepareAttribute(name, attribute)
         }
+    }
+
+    /**
+     * Prepare one single AttributeField
+     * @param name The key field (and name) of the attribute given
+     * @param attribute The AttributeField to prepare
+     */
+    static prepareAttribute(name: string, attribute: AttributeField) {
+        // Check for valid attributes. Active Effects can cause unexpected properties to appear.
+        if (!SR5.attributes.hasOwnProperty(name) || !attribute) return;
+
+        // TODO: IC-ACTOR Check this NOTE
+        // NOTE: This is legacy code I suspect does nothing. Disabled on 0.7.15. Delete it on any newer version!
+        // const parts = new PartsList(attribute.mod);
+        // attribute.mod = parts.list;
+
+        // Each attribute can have a unique value range.
+        // TODO:  Implement metatype attribute value ranges for character actors.
+        AttributesPrep.calculateAttribute(name, attribute);
+
+        // add i18n labels.
+        attribute.label = SR5.attributes[name];
     }
 
     /**
@@ -41,6 +56,9 @@ export class AttributesPrep {
      * @param attribute The attribute will be modified in place
      */
     static calculateAttribute(name: string, attribute: AttributeField) {
+        // Check for valid attributes. Active Effects can cause unexpected properties to appear.
+        if (!SR5.attributes.hasOwnProperty(name) || !attribute) return;
+
         // Each attribute can have a unique value range.
         // TODO:  Implement metatype attribute value ranges for character actors.
         const range = SR.attributes.ranges[name];

@@ -1,0 +1,38 @@
+<form class="{{cssClass}} wholesheet" autocomplete="off">
+    <header class="flexrow">
+        {{> 'systems/shadowrun5e/dist/templates/actor/parts/ProfileImage.html'
+            height='90px'
+            width='90px'
+        }}
+        <div class="flexcol flex-end border-right">
+            <div class="flexrow">
+                <div class="block">
+                    {{> 'systems/shadowrun5e/dist/templates/actor/parts/NameInput.html' }}
+                </div>
+                <div class="attributes smooth">
+                    {{> 'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html' }}
+                </div>
+            </div>
+            <div class="attributes smooth">
+                <div class="block">
+                    {{> 'systems/shadowrun5e/dist/templates/common/HorizontalCellInput.html'
+                            name=(localize data.track.matrix.label)
+                            value=data.track.matrix.value
+                            max=data.track.matrix.max
+                            id="matrix"
+                    }}
+                </div>
+            </div>
+        </div>
+    </header>
+    <nav class="tabs" data-group="primary">
+        <a class="item" data-tab="actions">{{localize "SR5.Actions"}}</a>
+        <a class="item" data-tab="actor">{{localize "SR5.ActorTypes.IC"}}</a>
+        <a class="item" data-tab="misc">{{localize "SR5.Miscellaneous"}}</a>
+    </nav>
+    <section class="sheetbody">
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/ActionsTab.html"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/ic/ICActorTab.html"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/ic/ICMiscTab.html"}}
+    </section>
+</form>

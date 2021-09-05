@@ -1,9 +1,9 @@
 import { preloadHandlebarsTemplates } from './HandlebarTemplates';
-import { registerBasicHelpers } from './BasicHelpers';
 import { registerRollAndLabelHelpers } from './RollAndLabelHelpers';
 import { registerItemLineHelpers } from './ItemLineHelpers';
 import { registerSkillLineHelpers } from './SkillLineHelpers';
 import {registerAppHelpers} from "./AppHelpers";
+import {registerBasicHelpers} from "./BasicHelpers";
 
 export class HandlebarManager {
     static async loadTemplates() {

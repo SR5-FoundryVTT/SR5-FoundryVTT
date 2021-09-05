@@ -17,6 +17,7 @@ export const SR5 = {
         sin: 'SR5.ItemTypes.Sin',
         spell: 'SR5.ItemTypes.Spell',
         weapon: 'SR5.ItemTypes.Weapon',
+        host: 'SR5.ItemTypes.Host'
     },
 
     attributes: {
@@ -327,6 +328,7 @@ export const SR5 = {
         astral_initiative_dice: 'SR5.AstralDice',
         matrix_initiative: 'SR5.MatrixInit',
         matrix_initiative_dice: 'SR5.MatrixDice',
+        matrix_track: 'SR5.MatrixTrack',
         composure: 'SR5.RollComposure',
         lift_carry: 'SR5.RollLiftCarry',
         judge_intentions: 'SR5.RollJudgeIntentions',
@@ -466,6 +468,25 @@ export const SR5 = {
             speed: 'SR5.Vehicle.Environments.Speed',
             handling: 'SR5.Vehicle.Environments.Handling',
         },
+    },
+
+    ic: {
+        types: {
+            acid: "SR5.IC.Types.Acid",
+            binder: "SR5.IC.Types.Binder",
+            black_ic: "SR5.IC.Types.BlackIC",
+            blaster: "SR5.IC.Types.Blaster",
+            crash: "SR5.IC.Types.Crash",
+            jammer: "SR5.IC.Types.Jammer",
+            killer: "SR5.IC.Types.Killer",
+            marker: "SR5.IC.Types.Marker",
+            patrol: "SR5.IC.Types.Patrol",
+            probe: "SR5.IC.Types.Probe",
+            scramble: "SR5.IC.Types.Scramble",
+            sparky: "SR5.IC.Types.Sparky",
+            tar_baby: "SR5.IC.Types.TarBaby",
+            track: "SR5.IC.Types.Track"
+        }
     },
 
     character: {

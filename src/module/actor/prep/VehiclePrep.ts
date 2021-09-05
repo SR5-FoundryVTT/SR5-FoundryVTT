@@ -38,7 +38,7 @@ export function VehicleDataPreparation(data: VehicleData, items: SR5ItemDataWrap
 }
 
 export class VehiclePrep {
-    static prepareVehicleStats(data: VehicleActorData) {
+    static prepareVehicleStats(data: VehicleData) {
         const { vehicle_stats, isOffRoad } = data;
         // set the value for the stats
         for (let [key, stat] of Object.entries(vehicle_stats)) {

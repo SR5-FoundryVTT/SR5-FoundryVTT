@@ -3,6 +3,7 @@ import { ImportHelper } from '../helper/ImportHelper';
 import { Constants } from './Constants';
 import { ModParserBase } from '../parser/mod/ModParserBase';
 import ModificationItemData = Shadowrun.ModificationItemData;
+import {DefaultValues} from "../../data/DataDefaults";
 
 export class ModImporter extends DataImporter {
     public categoryTranslations: any;
@@ -29,24 +30,7 @@ export class ModImporter extends DataImporter {
                     chat: '',
                     source: '',
                 },
-                technology: {
-                    rating: 1,
-                    availability: '',
-                    quantity: 1,
-                    cost: 0,
-                    equipped: true,
-                    conceal: {
-                        base: 0,
-                        value: 0,
-                        mod: [],
-                    },
-                    condition_monitor: {
-                        label: '',
-                        value: 0,
-                        max: 0,
-                    },
-                    wireless: true
-                },
+                technology: DefaultValues.technologyData({rating: 1, equipped: true}),
                 type: '',
                 mount_point: '',
                 dice_pool: 0,

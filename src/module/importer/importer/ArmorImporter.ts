@@ -2,6 +2,7 @@ import { DataImporter } from './DataImporter';
 import { ImportHelper } from '../helper/ImportHelper';
 import { ArmorParserBase } from '../parser/armor/ArmorParserBase';
 import ArmorItemData = Shadowrun.ArmorItemData;
+import {DefaultValues} from "../../data/DataDefaults";
 
 export class ArmorImporter extends DataImporter {
     public armorTranslations: any;
@@ -28,24 +29,7 @@ export class ArmorImporter extends DataImporter {
                     chat: '',
                     source: '',
                 },
-                technology: {
-                    rating: 1,
-                    availability: '',
-                    quantity: 1,
-                    cost: 0,
-                    equipped: true,
-                    conceal: {
-                        base: 0,
-                        value: 0,
-                        mod: [],
-                    },
-                    condition_monitor: {
-                        label: '',
-                        value: 0,
-                        max: 0,
-                    },
-                    wireless: true
-                },
+                technology: DefaultValues.technologyData({rating: 1, equipped: true, wireless: false}),
                 armor: {
                     value: 0,
                     mod: false,

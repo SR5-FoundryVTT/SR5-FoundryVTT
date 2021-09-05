@@ -1,9 +1,20 @@
 <form class="{{cssClass}} wholesheet" autocomplete="off">
     {{> "systems/shadowrun5e/dist/templates/item/parts/header.html" }}
+    <nav class="tabs" data-group="primary">
+        <a class="item" data-tab="description">{{localize "SR5.Description"}}</a>
+        <a class="item" data-tab="effects">{{ localize "SR5.Effects" }}</a>
+    </nav>
     <section class="sheetbody">
-        <div class="flexrow align-start">
-            {{> "systems/shadowrun5e/dist/templates/item/parts/technology.html" }} {{>
-            "systems/shadowrun5e/dist/templates/item/parts/description.html"}}
+        <div class="tab" data-group="primary" data-tab="action">
+            <div class="tabbody">
+                <div class="inventory">
+                    <div class="scroll-area">
+                        {{> "systems/shadowrun5e/dist/templates/item/parts/technology.html" }} {{>
+                        "systems/shadowrun5e/dist/templates/item/parts/description.html"}}
+                    </div>
+                </div>
+            </div>
         </div>
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/EffectsTab.html"}}
     </section>
 </form>

@@ -8,6 +8,11 @@ import ActionRollData = Shadowrun.ActionRollData;
 import LimitData = Shadowrun.LimitData;
 import OpposedTestData = Shadowrun.OpposedTestData;
 import SkillField = Shadowrun.SkillField;
+import TrackType = Shadowrun.TrackType;
+import HostData = Shadowrun.HostData;
+import DevicePartData = Shadowrun.DevicePartData;
+import SourceEntityField = Shadowrun.SourceEntityField;
+import ActionResultData = Shadowrun.ActionResultData;
 import {SKILL_DEFAULT_NAME} from "../constants";
 
 /**
@@ -87,7 +92,8 @@ export class DefaultValues {
                 label: '',
                 value: 0,
                 max: 0,
-            }
+            },
+            wireless: true
         }, partialTechnologyData) as TechnologyData;
     }
 
@@ -97,6 +103,39 @@ export class DefaultValues {
             chat: '',
             source: ''
         }, partialDescriptionData) as DescriptionData;
+    }
+
+    static matrixData(partialMatrixData: Partial<DevicePartData> = {}): DevicePartData {
+        // Remove incomplete properties for ease of use of callers.
+        if (partialMatrixData.category === undefined) delete partialMatrixData.category;
+        if (partialMatrixData.atts === undefined) delete partialMatrixData.atts;
+
+        return mergeObject({
+            category: "",
+            atts: {
+                att1: {
+                    value: 0,
+                    att: "attack",
+                    editable: true
+                },
+                att2: {
+                    value: 0,
+                    att: "attack",
+                    editable: true
+                },
+                att3: {
+                    value: 0,
+                    att: "attack",
+                    editable: true
+                },
+                att4: {
+                    value: 0,
+                    att: "attack",
+                    editable: true
+                }
+            },
+            networkDevices: []
+        }, partialMatrixData) as DevicePartData;
     }
 
     static actionRollData(partialActionRollData: Partial<ActionRollData> = {}): ActionRollData {
@@ -116,6 +155,16 @@ export class DefaultValues {
             alt_mod: 0,
             dice_pool_mod: []
         }, partialActionRollData) as ActionRollData;
+    }
+
+    static actionResultData(partialActionResultData: Partial<ActionResultData> = {}): ActionResultData {
+        return mergeObject({
+            success: {
+                matrix: {
+                    placeMarks: false
+                }
+            }
+        })
     }
 
     static limitData(partialLimitData: Partial<LimitData> = {}): LimitData {
@@ -151,6 +200,36 @@ export class DefaultValues {
             mod: [],
             attribute: ''
         }, partialSkillData) as SkillField;
+    }
+
+    static trackData(partialTrackData: Partial<TrackType> = {}): TrackType {
+        return mergeObject({
+            value: 0,
+            max: 0,
+            label: '',
+            mod: [],
+            disabled: false,
+            wounds: 0
+        }, partialTrackData) as TrackType;
+    }
+
+    static hostData(partialHostData: Partial<HostData> = {}): HostData {
+        return mergeObject({
+            description: DefaultValues.descriptionData(partialHostData.description),
+            ...DefaultValues.matrixData({category: partialHostData.category, atts: partialHostData.atts}),
+            rating: 0,
+            ic: []
+        }, partialHostData) as HostData;
+    }
+
+    static sourceEntityData(partialSourceEntityData: Partial<SourceEntityField> = {}): SourceEntityField {
+        return mergeObject({
+            id: '',
+            name: '',
+            pack: null,
+            type: 'Actor',
+            data: partialSourceEntityData.data || undefined
+        }, partialSourceEntityData) as SourceEntityField;
     }
 }
 

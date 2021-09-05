@@ -11,6 +11,7 @@ import { Helpers } from '../../helpers';
 import {PartsList} from "../../parts/PartsList";
 import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 import SpiritData = Shadowrun.SpiritData;
+import {SkillFlow} from "../flows/SkillFlow";
 
 
 export function SpiritDataPrepare(data: SpiritData, items: SR5ItemDataWrapper[]) {
@@ -34,7 +35,8 @@ export function SpiritDataPrepare(data: SpiritData, items: SR5ItemDataWrapper[])
 
     InitiativePrep.prepareCurrentInitiative(data);
 
-    this.data.special = 'magic';
+    // Spirits will always be awakened.
+    data.special = 'magic';
 }
 
 export class SpiritPrep {
@@ -51,9 +53,10 @@ export class SpiritPrep {
                 }
             }
 
+            // set base of skill according to force and spirit type
             for (const [skillId, skill] of Object.entries(skills.active)) {
                 // Leave custom skills alone to allow users to change those at will.
-                if (skill.name !== '') continue;
+                if (SkillFlow.isCustomSkill(skill)) continue;
 
                 // Change default skills to the force rating.
                 skill.base = overrides.skills.find((s) => s === skillId) ? force : 0;

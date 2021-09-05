@@ -5,14 +5,14 @@ import {KnowledgeSkillEditSheet} from '../apps/skills/KnowledgeSkillEditSheet';
 import {LanguageSkillEditSheet} from '../apps/skills/LanguageSkillEditSheet';
 import {SR5Actor} from './SR5Actor';
 import {SR5} from '../config';
-import {SR5Item} from "../item/SR5Item";
+import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import Skills = Shadowrun.Skills;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 import SkillField = Shadowrun.SkillField;
 import DeviceData = Shadowrun.DeviceData;
-import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
-import Attributes = Shadowrun.Attributes;
+import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
+import {MatrixRules} from "../rules/MatrixRules";
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
@@ -20,27 +20,16 @@ import Attributes = Shadowrun.Attributes;
 let globalSkillAppId: number = -1;
 
 /**
- * Extend the basic ActorSheet with some very simple modifications
+ * See Hooks.init for which actor type this sheet handles.
  *
  */
 export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
-    _shownDesc: string[];
-    _filters: SR5SheetFilters;
+    _shownDesc: string[] = [];
+    _filters: SR5SheetFilters = {
+        skills: '',
+        showUntrainedSkills: true,
+    };
     _scroll: string;
-
-    constructor(actor, options?) {
-        super(actor, options);
-
-        /**
-         * Keep track of the currently active sheet tab
-         * @type {string}
-         */
-        this._shownDesc = [];
-        this._filters = {
-            skills: '',
-            showUntrainedSkills: true,
-        };
-    }
 
     /* -------------------------------------------- */
 
@@ -100,6 +89,11 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         this._prepareCharacterFields(data);
         this._prepareVehicleFields(data);
 
+        // Active Effects data.
+        // @ts-ignore // TODO: foundry-vtt-types 0.8 missing document support
+        data['effects'] = prepareActiveEffectCategories(this.document.effects);
+        data['markedDocuments'] = this.object.getAllMarkedDocuments();
+
         return data;
     }
 
@@ -156,6 +150,9 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         data.isCharacter = this.actor.isCharacter();
         data.isSpirit = this.actor.isSpirit();
         data.isCritter = this.actor.isCritter();
+        data.hasSkills = this.actor.hasSkills;
+        data.hasSpecial = this.actor.hasSpecial;
+        data.hasFullDefense = this.actor.hasFullDefense;
     }
 
     _prepareMatrixAttributes(data) {
@@ -175,12 +172,16 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
 
     _prepareActorAttributes(data: SR5ActorSheetData) {
         // Clear visible, zero value attributes temporary modifiers so they appear blank.
-        const attributes = data.data.attributes as Attributes;
+        const attributes = data.data.attributes;
         for (let [, attribute] of Object.entries(attributes)) {
             if (!attribute.hidden) {
                 if (attribute.temp === 0) delete attribute.temp;
             }
         }
+    }
+
+    _prepareActorTypeIndicators(data) {
+        data.hasSkills = this.actor.getSkills() !== undefined;
     }
 
     _prepareSkillsWithFilters(data: SR5ActorSheetData) {
@@ -436,6 +437,9 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
             }
         });
 
+        // Active Effect management
+        html.find(".effect-control").click(event => onManageActiveEffect(event, this.entity));
+
         html.find('.skill-header').find('.item-name').click(this._onFilterUntrainedSkills.bind(this));
         html.find('.skill-header').find('.skill-spec-item').click(this._onFilterUntrainedSkills.bind(this));
         html.find('.skill-header').find('.rtg').click(this._onFilterUntrainedSkills.bind(this));
@@ -464,7 +468,13 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         html.find('.item-rtg').change(this._onChangeRtg.bind(this));
         html.find('.item-create').click(this._onItemCreate.bind(this));
         html.find('.reload-ammo').click(this._onReloadAmmo.bind(this));
+
         html.find('.matrix-att-selector').change(this._onMatrixAttributeSelected.bind(this));
+        html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));
+        html.find('.marks-add-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, 1));
+        html.find('.marks-remove-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, -1));
+        html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
+        html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
 
         html.find('.import-character').click(this._onShowImportCharacter.bind(this));
         html.find('.show-hidden-skills').click(this._onShowHiddenSkills.bind(this));
@@ -794,6 +804,52 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
             }
         }
         await this.actor.updateOwnedItem(data);
+    }
+
+    async _onMarksQuantityChange(event) {
+       event.stopPropagation();
+
+        const markId = event.currentTarget.dataset.markId;
+        if (!markId) return;
+
+        const {scene, target, item} = Helpers.getMarkIdDocuments(markId);
+        if (!scene || !target) return; // item can be undefined.
+
+        const marks = parseInt(event.currentTarget.value);
+        await this.object.setMarks(target, marks, {scene, item, overwrite: true});
+    }
+
+    async _onMarksQuantityChangeBy(event, by: number) {
+        event.stopPropagation();
+
+        const markId = event.currentTarget.dataset.markId;
+        if (!markId) return;
+
+        const {scene, target, item} = Helpers.getMarkIdDocuments(markId);
+        if (!scene || !target) return; // item can be undefined.
+
+        await this.object.setMarks(target, by, {scene, item});
+    }
+
+    async _onMarksDelete(event) {
+        event.stopPropagation();
+
+        const markId = event.currentTarget.dataset.markId;
+        if (!markId) return;
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        await this.object.clearMark(markId);
+    }
+
+    async _onMarksClearAll(event) {
+        event.stopPropagation();
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        await this.object.clearMarks();
     }
 
     _onItemCreate(event) {

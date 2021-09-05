@@ -1,0 +1,51 @@
+{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.html' tabId='misc'}}
+    <div class="inventory">
+        <div class="split-container">
+            <div>
+                {{> "systems/shadowrun5e/dist/templates/common/HeaderBlock.html"
+                        name=(localize "SR5.Description")
+                }}
+                {{> "systems/shadowrun5e/dist/templates/item/parts/description.html"}}
+            </div>
+            <div class="flexcol">
+                <div class="list-item item-section">
+                    <div class="item-left">
+                        <div class="item-text item-name">
+                            {{localize "SR5.Modifier"}}
+                        </div>
+                    </div>
+                    <div class="item-right">
+                        <div class="item-text rtg">
+                            {{localize "SR5.Value"}}
+                        </div>
+                    </div>
+                </div>
+                <div class="scroll-area mods">
+                    {{#each data.modifiers as |value id|}} {{#ifne id 'wound'}}
+                        <div class="list-item">
+                            <div class="item-left">
+                                <div class="item-text item-name">
+                                    {{localizeOb id ../config.actorModifiers}}
+                                </div>
+                            </div>
+                            <div class="item-right">
+                                <div class="item-text rtg">
+                                    <input
+                                            class="display attribute-input"
+                                            size="4"
+                                            maxlength="3"
+                                            type="text"
+                                            name="data.modifiers.{{id}}"
+                                            value="{{value}}"
+                                            placeholder="None"
+                                            data-dtype="Number"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    {{/ifne}} {{/each}}
+                </div>
+            </div>
+        </div>
+    </div>
+{{/'systems/shadowrun5e/dist/templates/common/TabWrapper.html'}}

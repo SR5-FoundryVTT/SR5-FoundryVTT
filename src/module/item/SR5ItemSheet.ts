@@ -1,6 +1,9 @@
-import { Helpers } from '../helpers';
-import { SR5Item } from './SR5Item';
+import {Helpers} from '../helpers';
+import {SR5Item} from './SR5Item';
 import {SR5} from "../config";
+import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
+import {SR5Actor} from "../actor/SR5Actor";
+import {DeviceFlow} from "./flows/DeviceFlow";
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -39,12 +42,19 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
      * Prepare data for rendering the Item sheet
      * The prepared data object contains both the actor data as well as additional sheet options
      */
-    async getData() {
-        const data = await super.getData();
+    getData() {
+        let data = super.getData();
         // Foundry 0.8 will return data as an sheet data while Foundry 0.7 will return data as an item data.
         // Therefore data is nested one deeper. The alternative would be to rework all references with one more data...
+        data.type = data.data.type;
         data.data = data.data.data;
         const itemData = data.data;
+        // data = {
+        //     ...data,
+        //     // @ts-ignore
+        //     data: data.data.data
+        // }
+
 
         if (itemData.action) {
             try {
@@ -92,6 +102,14 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         data['attributes'] = this._getSortedAttributesForSelect();
         data['limits'] = this._getSortedLimitsForSelect();
 
+        // Active Effects data.
+        // @ts-ignore // TODO: foundry-vtt-types 0.8 missing document support
+        data['effects'] = prepareActiveEffectCategories(this.document.effects);
+
+        if (this.item.isHost() || this.item.isDevice()) {
+            data['networkDevices'] = this._getNetworkDevices();
+        }
+
         return data;
     }
 
@@ -115,7 +133,8 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
     _getSortedActiveSkillsForSelect() {
         // We need the actor owner, instead of the item owner. See actorOwner jsdoc for details.
         const actor = this.item.actorOwner;
-        if (!actor) return Helpers.sortConfigValuesByTranslation(SR5.activeSkills);
+        // Fallback for actors without skills.
+        if (!actor || actor.isIC()) return Helpers.sortConfigValuesByTranslation(SR5.activeSkills);
 
         const activeSkills = Helpers.sortSkills(actor.getActiveSkills());
 
@@ -131,6 +150,13 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         return activeSkillsForSelect;
     }
 
+    _getNetworkDevices(): SR5Item|SR5Actor[] {
+        const controllerData = this.item.asControllerData();
+        if (!controllerData) return [];
+
+        return controllerData.data.networkDevices.map(deviceLink => DeviceFlow.documentByNetworkDeviceLink(deviceLink));
+    }
+
     /* -------------------------------------------- */
 
     /**
@@ -139,28 +165,24 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
      */
     activateListeners(html) {
         super.activateListeners(html);
-        if (this.item.type === 'weapon') {
-            //@ts-ignore // TODO: Somehow Jquery doesn't have drag/drop in typing
-            this.form.ondragover = (event) => this._onDragOver(event);
-            //@ts-ignore // TODO: Somehow Jquery doesn't have drag/drop in typing
-            this.form.ondrop = (event) => this._onDrop(event);
-        }
-        html.find('.add-new-ammo').click(this._onAddNewAmmo.bind(this));
-        html.find('.ammo-equip').click(this._onAmmoEquip.bind(this));
-        html.find('.ammo-delete').click(this._onAmmoRemove.bind(this));
-        html.find('.ammo-reload').click(this._onAmmoReload.bind(this));
 
+        /**
+         * Drag and Drop Handling
+         */
+        //@ts-ignore
+        this.form.ondragover = (event) => this._onDragOver(event);
+        //@ts-ignore
+        this.form.ondrop = (event) => this._onDrop(event);
+
+        // Active Effect management
+        // @ts-ignore // foundry-vtt-types 0.8 document support missing.
+        html.find(".effect-control").click(event => onManageActiveEffect(event, this.document));
+
+        /**
+         * General item handling
+         */
         html.find('.edit-item').click(this._onEditItem.bind(this));
-
-        html.find('.add-new-mod').click(this._onAddWeaponMod.bind(this));
-        html.find('.mod-equip').click(this._onWeaponModEquip.bind(this));
-        html.find('.mod-delete').click(this._onWeaponModRemove.bind(this));
-
-        html.find('.add-new-license').click(this._onAddLicense.bind(this));
-        html.find('.license-delete').on('click', this._onRemoveLicense.bind(this));
-
         html.find('.open-source-pdf').on('click', this._onOpenSourcePdf.bind(this));
-
         html.find('.has-desc').click((event) => {
             event.preventDefault();
             const item = $(event.currentTarget).parents('.list-item');
@@ -172,8 +194,28 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
                 else this._shownDesc = this._shownDesc.filter((val) => val !== iid);
             }
         });
-
         html.find('.hidden').hide();
+        html.find('.entity-remove').on('click', this._onEntityRemove.bind(this));
+
+        /**
+         * Weapon item specific
+         */
+        html.find('.add-new-ammo').click(this._onAddNewAmmo.bind(this));
+        html.find('.ammo-equip').click(this._onAmmoEquip.bind(this));
+        html.find('.ammo-delete').click(this._onAmmoRemove.bind(this));
+        html.find('.ammo-reload').click(this._onAmmoReload.bind(this));
+
+        html.find('.add-new-mod').click(this._onAddWeaponMod.bind(this));
+        html.find('.mod-equip').click(this._onWeaponModEquip.bind(this));
+        html.find('.mod-delete').click(this._onWeaponModRemove.bind(this));
+        /**
+         * SIN item specific
+         */
+        html.find('.add-new-license').click(this._onAddLicense.bind(this));
+        html.find('.license-delete').on('click', this._onRemoveLicense.bind(this));
+
+        html.find('.network-clear').on('click', this._onRemoveAllNetworkDevices.bind(this));
+        html.find('.network-device-remove').on('click', this._onRemoveNetworkDevice.bind(this));
     }
 
     _onDragOver(event) {
@@ -184,42 +226,76 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
     async _onDrop(event) {
         event.preventDefault();
         event.stopPropagation();
+
+        // Parse drop data.
         let data;
         try {
             data = JSON.parse(event.dataTransfer.getData('text/plain'));
-            if (data.type !== 'Item') {
-                console.log('Shadowrun5e | Can only drop Items');
-            }
         } catch (err) {
             console.log('Shadowrun5e | drop error');
+            return;
         }
-        let item;
-        // Case 1 - Data explicitly provided
-        if (data.data) {
-            // TODO test
-            if (this.item.isOwned && data.actorId === this.item.actor?._id && data.data._id === this.item._id) {
-                console.log('Shadowrun5e | Cant drop item on itself');
-                // @ts-ignore
-                ui.notifications?.error('Are you trying to break the game??');
-            }
-            item = data;
-        } else if (data.pack) {
-            console.log(data);
+
+        if (!data) return;
+
+        // Weapon parts...
+        if (this.item.isWeapon() && data.type === 'Item') {
+            let item;
+            // Case 1 - Data explicitly provided
+            if (data.data) {
+                // TODO test
+                if (this.item.isOwned && data.actorId === this.item.actor?._id && data.data._id === this.item._id) {
+                    // @ts-ignore
+                    ui.notifications.error('Are you trying to break the game??');
+                    return;
+                }
+                item = data;
             // Case 2 - From a Compendium Pack
-            // TODO test
-            item = await this._getItemFromCollection(data.pack, data.id);
-        } else {
+            } else if (data.pack) {
+                item = await Helpers.getEntityFromCollection(data.pack, data.id);
             // Case 3 - From a World Entity
-            item = game.items?.get(data.id);
+            } else {
+                item = game.items.get(data.id);
+            }
+
+            await this.item.createOwnedItem(item.data);
+
+            return;
         }
 
-        this.item.createOwnedItem(item.data);
-    }
+        // TODO: Handle WAN
+        if (this.item.isHost() && data.type === 'Actor') {
+            await this.item.addIC(data.id, data.pack);
 
-    _getItemFromCollection(collection, itemId) {
-        const pack = game.packs?.find((p) => p.collection === collection);
-        if (!pack) return;
-        return pack.getEntity(itemId);
+            return;
+        }
+
+        // PAN Support...
+        if (this.item.isDevice() && data.type === 'Item') {
+            if (data.actorId && !data.sceneId && !data.tokenId) {
+                console.log('Shadowrun5e | Adding linked actors item to the network', data);
+                const actor = game.actors.get(data.actorId);
+                const item = actor.items.get(data.data._id) as SR5Item;
+
+                await this.item.addNetworkDevice(item);
+            }
+
+            else if (data.actorId && data.sceneId && data.tokenId) {
+                console.log('Shadowrun5e | Adding unlinked token actors item to the network', data);
+                const scene = game.scenes.get(data.sceneId);
+                // @ts-ignore // TODO: foundry-vtt-types 0.8
+                const token = scene.tokens.get(data.tokenId);
+                const item = token.actor.items.get(data.data._id) as SR5Item;
+
+                await this.item.addNetworkDevice(item);
+            }
+
+            else if (data.id && !data.actorId && !data.sceneId && !data.tokenId) {
+                console.log('Shadowrun5e | Adding collection item without actor to the network', data);
+            }
+
+            return;
+        }
     }
 
     _eventId(event) {
@@ -236,6 +312,24 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         const item = this.item.getOwnedItem(this._eventId(event));
         if (item) {
             item.sheet.render(true);
+        }
+    }
+
+    async _onEntityRemove(event) {
+        event.preventDefault();
+
+        // Grab the data position to remove the correct entity from the list.
+        const entityRemove = $(event.currentTarget).closest('.entity-remove');
+        const list = entityRemove.data('list');
+        const position = entityRemove.data('position');
+
+        if (!list) return;
+
+        switch (list) {
+            // Handle Host item lists...
+            case 'ic':
+                await this.item.removeIC(position);
+                break;
         }
     }
 
@@ -307,6 +401,37 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         if (!userConsented) return;
 
         await this.item.deleteOwnedItem(this._eventId(event));
+    }
+
+    async _onRemoveAllNetworkDevices(event) {
+        event.preventDefault();
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        await this.item.removeAllNetworkDevices();
+    }
+
+    async _onRemoveNetworkDevice(event) {
+        if (!canvas.ready) return;
+        event.preventDefault();
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        // const tokenId = event.currentTarget.closest('.list-item').dataset.tokenId;
+        // const actorId = event.currentTarget.closest('.list-item').dataset.actorId;
+        // const itemId = event.currentTarget.closest('.list-item').dataset.itemId;
+        //
+        // // Get the item from the token actor OR the collection actor.
+        // // A collection actor will not have a token on it's token property.
+        // const item = tokenId ?
+        //     // @ts-ignore // TODO: foundry-vtt-types 0.8
+        //     canvas.scene.tokens.get(tokenId).actor.items.get(itemId) :
+        //     game.actors.get(actorId).items.get(itemId);
+        const networkDeviceIndex = Helpers.parseInputToNumber(event.currentTarget.closest('.list-item').dataset.listItemIndex);
+
+        await this.item.removeNetworkDevice(networkDeviceIndex);
     }
 
     /**

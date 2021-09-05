@@ -1,0 +1,26 @@
+{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.html' tabId='effects'}}
+    <div class="inventory">
+        <div class="scroll-area">
+        {{#each effects as |section sid|}}
+            {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+                name=(localize section.label)
+                icons=(ItemHeaderIcons 'effect')
+                rightSide=(ItemHeaderRightSide 'TODO')
+                data=(EffectData section.type)
+            }}
+
+            {{#each section.effects as |effect|}}
+                {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                    img=effect.data.icon
+                    name=effect.data.label
+                    itemId=effect.id
+                    icons=(EffectIcons effect)
+                    rightSide=[]
+                    hasDesc="false"
+                    hasRoll="false"
+                }}
+            {{/each}}
+        {{/each}}
+        </div>
+    </div>
+{{/'systems/shadowrun5e/dist/templates/common/TabWrapper.html'}}

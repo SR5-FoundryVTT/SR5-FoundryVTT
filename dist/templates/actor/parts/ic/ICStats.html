@@ -1,0 +1,33 @@
+<div class="flexcol">
+    <div class="list-item item-section space-evenly"></div>
+    <div class="attributes">
+        {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                label="SR5.MatrixAttrAttack"
+                attribute=data.matrix.attack
+                attributeId="attack"
+                attributesPath="data.matrix"
+                disableBase=(disabledHelper host)
+        }}
+        {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                label="SR5.MatrixAttrSleaze"
+                attribute=data.matrix.sleaze
+                attributeId="sleaze"
+                attributesPath="data.matrix"
+                disableBase=(disabledHelper host)
+        }}
+        {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                label="SR5.MatrixAttrDataProc"
+                attribute=data.matrix.data_processing
+                attributeId="data_processing"
+                attributesPath="data.matrix"
+                disableBase=(disabledHelper host)
+        }}
+        {{> "systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html"
+                label="SR5.MatrixAttrFirewall"
+                attribute=data.matrix.firewall
+                attributeId="firewall"
+                attributesPath="data.matrix"
+                disableBase=(disabledHelper host)
+        }}
+    </div>
+</div>

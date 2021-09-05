@@ -1,56 +1,71 @@
 {
-    "name": "shadowrun5e",
-    "title": "Shadowrun 5th Edition",
-    "description": "Shadowrun 5th Edition game",
-    "version": "0.7.17",
-    "templateVersion": "3",
-    "author": "Shawn Milligan [n3rf_herder#9026], Andrew Cuccinello [DJ#1982], Jan Schoska [taM#9507]",
-    "esmodules": ["dist/bundle.js"],
-    "styles": ["dist/bundle.css"],
-    "minimumCoreVersion": "0.8.6",
-    "compatibleCoreVersion": "0.8.6",
-    "languages": [
-        {
-            "lang": "en",
-            "name": "English",
-            "path": "dist/locale/en/config.json"
-        },
-        {
-            "lang": "de",
-            "name": "Deutsch",
-            "path": "dist/locale/de/config.json"
-        },
-        {
-            "lang": "pt-BR",
-            "name": "Português (Brasil)",
-            "path": "dist/locale/pt-BR/config.json"
-        }
-    ],
-    "packs": [
-        {
-            "name": "Roles",
-            "label": "SR5e NPCs",
-            "system": "shadowrun5e",
-            "path": "./packs/sr5e-npcs.db",
-            "entity": "Actor"
-        },
-        {
-            "name": "Matrix Actions",
-            "label": "SR5e Matrix Actions",
-            "system": "shadowrun5e",
-            "path": "./packs/sr5e-matrix-actions.db",
-            "entity": "Item"
-        }
-    ],
-    "initiative": "@initiative.current.base.value + @initiative.current.dice.text - @wounds.value",
-    "primaryTokenAttribute": "track.physical",
-    "secondaryTokenAttribute": "track.stun",
-    "gridDistance": 1,
-    "gridUnits": "m",
-    "socket": true,
-    "manifest": "https://raw.githubusercontent.com/smilligan93/SR5-FoundryVTT/master/system.json",
-    "url": "https://github.com/smilligan93/SR5-FoundryVTT",
-    "download": "https://github.com/smilligan93/SR5-FoundryVTT/archive/v0.7.17.zip",
-    "allowBugReporter": true,
-    "bugs": "https://github.com/smilligan93/SR5-FoundryVTT/issues"
+  "name": "shadowrun5e",
+  "title": "Shadowrun 5th Edition",
+  "description": "Shadowrun 5th Edition game",
+  "author": "Shawn Milligan [n3rf_herder#9026], Andrew Cuccinello [DJ#1982], Jan Schoska [taM#9507]",
+  "authors": [],
+  "url": "https://github.com/smilligan93/SR5-FoundryVTT",
+  "bugs": "https://github.com/smilligan93/SR5-FoundryVTT/issues",
+  "flags": {},
+  "version": "0.7.18",
+  "minimumCoreVersion": "0.8.6",
+  "compatibleCoreVersion": "0.8.8",
+  "scripts": [],
+  "esmodules": [
+    "dist/bundle.js"
+  ],
+  "styles": [
+    "dist/bundle.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "dist/locale/en/config.json"
+    },
+    {
+      "lang": "de",
+      "name": "Deutsch",
+      "path": "dist/locale/de/config.json"
+    },
+    {
+      "lang": "pt-BR",
+      "name": "Português (Brasil)",
+      "path": "dist/locale/pt-BR/config.json"
+    },
+    {
+      "lang": "fr",
+      "name": "Français",
+      "path": "dist/locale/fr/config.json"
+    }
+  ],
+  "packs": [
+    {
+      "name": "Roles",
+      "label": "SR5e NPCs",
+      "path": "./packs/sr5e-npcs.db",
+      "private": false,
+      "entity": "Actor",
+      "system": "shadowrun5e"
+    },
+    {
+      "name": "Matrix Actions",
+      "label": "SR5e Matrix Actions",
+      "path": "./packs/sr5e-matrix-actions.db",
+      "private": false,
+      "entity": "Item",
+      "system": "shadowrun5e"
+    }
+  ],
+  "system": [],
+  "dependencies": [],
+  "socket": true,
+  "manifest": "https://raw.githubusercontent.com/smilligan93/SR5-FoundryVTT/master/system.json",
+  "download": "https://github.com/smilligan93/SR5-FoundryVTT/archive/v0.7.18.zip",
+  "protected": false,
+  "initiative": "@initiative.current.base.value + @initiative.current.dice.text - @wounds.value",
+  "gridDistance": 1,
+  "gridUnits": "m",
+  "primaryTokenAttribute": "track.physical",
+  "secondaryTokenAttribute": "track.stun"
 }

@@ -1,6 +1,7 @@
-import { SR5ItemDataWrapper } from '../data/SR5ItemDataWrapper';
+import {SR5ItemDataWrapper} from '../data/SR5ItemDataWrapper';
 import {SR5} from "../config";
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
+import MarkedDocument = Shadowrun.MarkedDocument;
 
 export const registerItemLineHelpers = () => {
     Handlebars.registerHelper('ItemHeaderIcons', function (id) {
@@ -11,6 +12,8 @@ export const registerItemLineHelpers = () => {
             text: AddText,
             title: game.i18n.localize('SR5.CreateItem'),
             cssClass: 'item-create',
+            // Add HTML data attributes using a key<string>:value<string> structure
+            data: {}
         };
         switch (id) {
             case 'lifestyle':
@@ -72,6 +75,11 @@ export const registerItemLineHelpers = () => {
                 return [addIcon];
             case 'sprite_power':
                 addIcon.title = game.i18n.localize('SR5.CreateItemSpritePower');
+                return [addIcon];
+            case 'effect':
+                addIcon.title = game.i18n.localize('SR5.CreateEffect');
+                addIcon.cssClass = 'effect-control';
+                addIcon.data = {action: 'create'};
                 return [addIcon];
             default:
                 return [];
@@ -414,4 +422,112 @@ export const registerItemLineHelpers = () => {
 
         return icons;
     });
+
+    /**
+     * Helper specifically for active effect icons.
+     *
+     * Add HTML data attributes using a key<string>:value<string> structure for each icon.
+     */
+    Handlebars.registerHelper('EffectIcons', function (effect) {
+        const editIcon = {
+            icon: 'fas fa-edit effect-control',
+            title: game.i18n.localize('SR5.EditItem'),
+            data: {action: 'edit'}
+        };
+        const removeIcon = {
+            icon: 'fas fa-trash effect-control',
+            title: game.i18n.localize('SR5.DeleteItem'),
+            data: {action: 'delete'}
+        };
+        const pdfIcon = {
+            icon: 'fas fa-file open-source-pdf',
+            title: game.i18n.localize('SR5.OpenSourcePdf'),
+        };
+        // TODO: Add source icon to open item / actor causing the effect
+
+        return [pdfIcon, editIcon, removeIcon];
+    });
+
+    Handlebars.registerHelper('EffectData', function(effectType: string) {
+        return {'effect-type': effectType};
+    });
+
+    // Allow Matrix Marks to be changed on the spot on a Sheet.
+    Handlebars.registerHelper('MarksRightSide', (marked: MarkedDocument) => {
+        const quantityInput = {
+            input: {
+                type: 'number',
+                value: marked.marks,
+                cssClass: 'marks-qty',
+            },
+        };
+        return [quantityInput]
+    });
+
+    // Matrix Mark interaction on a Sheet.
+    Handlebars.registerHelper('MarksIcons', (marked: MarkedDocument) => {
+        const incrementIcon = {
+            icon: 'fas fa-plus marks-add-one',
+            title: game.i18n.localize('SR5.Labels.Sheet.AddOne'),
+            data: {action: 'add-one'}
+        };
+        const decrementIcon = {
+            icon: 'fas fa-minus marks-remove-one',
+            title: game.i18n.localize('SR5.Labels.Sheet.SubtractOne'),
+            data: {action: 'remove-one'}
+        }
+
+        return [incrementIcon, decrementIcon];
+    });
+
+    Handlebars.registerHelper('MarkListHeaderRightSide', () => {
+        return [
+            {
+                text: {
+                    text: game.i18n.localize('SR5.FOUNDRY.Scene'),
+                },
+            },
+            {
+                text: {
+                    text: game.i18n.localize('SR5.FOUNDRY.Item'),
+                },
+            },
+            {
+                text: {
+                    text: game.i18n.localize('SR5.Qty'),
+                },
+            }]
+    });
+
+    Handlebars.registerHelper('MarkListHeaderIcons', () => {
+        return [{
+            icon: 'fas fa-trash',
+            title: game.i18n.localize('SR5.ClearMarks'),
+            text: game.i18n.localize('SR5.Del'),
+            cssClass: 'marks-clear-all'
+        }];
+    });
+
+    Handlebars.registerHelper('NetworkDevicesListRightSide', () => {
+        return [
+            {
+                text: {
+                    text: game.i18n.localize('SR5.FOUNDRY.Actor'),
+                },
+            },
+            {
+                text: {
+                    text: game.i18n.localize('SR5.FOUNDRY.Item'),
+                },
+            }]
+    })
+
+    Handlebars.registerHelper('NetworkDevicesListHeaderIcons', () => {
+        return [{
+            icon: 'fas fa-trash',
+            title: game.i18n.localize('SR5.Labels.Sheet.ClearNetwork'),
+            text: game.i18n.localize('SR5.Del'),
+            cssClass: 'network-clear'
+        }];
+    })
 };

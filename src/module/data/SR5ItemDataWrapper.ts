@@ -10,6 +10,7 @@ import RangeWeaponData = Shadowrun.RangeWeaponData;
 import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
 import ModificationItemData = Shadowrun.ModificationItemData;
+import ActionResultData = Shadowrun.ActionResultData;
 
 export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     getType() {
@@ -174,6 +175,14 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         return this.isDevice() && this.getData().category === 'cyberdeck';
     }
 
+    isCommlink(): boolean {
+        return this.isDevice() && this.getData().category === 'commlink';
+    }
+
+    isMatrixAction(): boolean {
+        return this.isAction() && this.getData().result.success.matrix.placeMarks;
+    }
+
     isSin(): boolean {
         return this.data.type === 'sin';
     }
@@ -244,15 +253,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
         };
 
         if (this.isCyberdeck()) {
-            /**
-             * {
-             *     attN: {
-             *         value: number,
-             *         att: string (the ASDF attribute)
-             *     }
-             * }
-             */
-            const atts: { [key: string]: { value: number; att: string } } | undefined = this.getData().atts;
+            const atts = this.getData().atts;
             if (atts) {
                 for (let [key, att] of Object.entries(atts)) {
                     matrix[att.att].value = att.value;
@@ -355,5 +356,9 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     hasAmmo(): boolean {
         const ammo = this.getAmmo();
         return !!ammo
+    }
+
+    getActionResult(): ActionResultData {
+        return this.getData().result;
     }
 }

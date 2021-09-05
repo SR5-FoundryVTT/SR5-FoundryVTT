@@ -25,6 +25,7 @@ declare namespace Shadowrun {
         CyberwareItemData |
         DeviceItemData |
         EquipmentItemData |
+        HostItemData |
         LifestyleItemData |
         ModificationItemData |
         ProgramItemData |
@@ -65,6 +66,7 @@ declare namespace Shadowrun {
         Partial<CyberwareData> &
         Partial<DeviceData> &
         Partial<EquipmentData> &
+        Partial<HostData> &
         Partial<LifestyleData> &
         Partial<ModificationData> &
         Partial<ProgramData> &
@@ -107,6 +109,9 @@ declare namespace Shadowrun {
     }
     export interface EquipmentItemData extends Item.Data<EquipmentData> {
         type: 'equipment'
+    }
+    export interface HostItemData extends Item.Data<HostData> {
+        type: 'host'
     }
     export interface LifestyleItemData extends Item.Data<LifestyleData> {
         type: 'lifestyle'

@@ -10,7 +10,9 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/tabs/SkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/SocialTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/SpellsTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/EffectsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/CritterPowersTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/PANTab.html',
 
         'systems/shadowrun5e/dist/templates/actor/tabs/spirit/SpiritSkillsTab.html',
 
@@ -18,6 +20,9 @@ export const preloadHandlebarsTemplates = async () => {
 
         'systems/shadowrun5e/dist/templates/actor/tabs/vehicle/VehicleSkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/vehicle/VehicleMatrixTab.html',
+
+        'systems/shadowrun5e/dist/templates/actor/tabs/ic/ICActorTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/ic/ICMiscTab.html',
 
         // uncategorized lists
         'systems/shadowrun5e/dist/templates/actor/parts/Initiative.html',
@@ -40,6 +45,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/MatrixAttribute.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/SpritePowerList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/matrix/DeviceRating.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/matrix/Marks.html',
 
         // attributes
         'systems/shadowrun5e/dist/templates/actor/parts/attributes/Attribute.html',
@@ -55,6 +61,10 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleStatsList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleSecondStatsList.html',
         'systems/shadowrun5e/dist/templates/actor/parts/vehicle/VehicleMovement.html',
+
+        // IC
+        'systems/shadowrun5e/dist/templates/actor/parts/ic/ICStats.html',
+        'systems/shadowrun5e/dist/templates/actor/parts/ic/ICConfiguration.html',
 
         // limited actor
         'systems/shadowrun5e/dist/templates/actor-limited/character.html',
@@ -76,6 +86,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/item/parts/weapon-ammo-list.html',
         'systems/shadowrun5e/dist/templates/item/parts/weapon-mods-list.html',
         'systems/shadowrun5e/dist/templates/item/parts/action.html',
+        'systems/shadowrun5e/dist/templates/item/parts/action_results.html',
         'systems/shadowrun5e/dist/templates/item/parts/damage.html',
         'systems/shadowrun5e/dist/templates/item/parts/opposed.html',
         'systems/shadowrun5e/dist/templates/item/parts/spell.html',
@@ -115,6 +126,7 @@ export const preloadHandlebarsTemplates = async () => {
 
         // list components
         'systems/shadowrun5e/dist/templates/common/List/ListItem.html',
+        'systems/shadowrun5e/dist/templates/common/List/ListEntityItem.html',
         'systems/shadowrun5e/dist/templates/common/List/ListHeader.html',
 
         // dialogs

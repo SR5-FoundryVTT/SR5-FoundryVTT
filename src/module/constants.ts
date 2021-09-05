@@ -31,11 +31,13 @@ export const FLAGS = {
     LastFireRange: 'lastFireRange',
     Attack: 'attack',
     Roll: 'roll',
+    ActionTestData: 'actionTestData',
     TargetsSceneTokenIds: 'targetsSceneTokenIds',
     ChangelogShownForVersion: 'changelogShownForVersion',
     Modifier: 'modifier',
     DoInitPass: 'doInitPass',
     DoNextRound: 'doNextRound',
+    addNetworkController: 'addNetworkController'
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {
@@ -111,7 +113,8 @@ export const SR = {
             attack: {min: 0},
             sleaze: {min: 0},
             data_processing: {min: 0},
-            firewall: {min: 0}
+            firewall: {min: 0},
+            host_rating: {min: 0, max: 12}
         },
         SHORT_NAME_LENGTH: 3
     },
@@ -119,5 +122,14 @@ export const SR = {
         // @PDF SR5#130
         DEFAULTING_MODIFIER: -1,
         SPECIALIZATION_MODIFIER: 2
+    },
+    initiatives: {
+        ic: {
+            dice: 4
+        },
+        ranges: {
+            base: {min: 0},
+            dice: {min: 0, max: 5}
+        }
     }
 }

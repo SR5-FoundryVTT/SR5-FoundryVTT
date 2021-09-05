@@ -8,6 +8,7 @@ import RangeData = Shadowrun.RangeData;
 import {FormDialog} from "./FormDialog";
 import WeaponData = Shadowrun.WeaponData;
 import {SR5} from "../../config";
+import MatrixActionTestData = Shadowrun.MatrixActionTestData;
 
 type ItemDialogData = {
     dialogData: Dialog.Data | undefined,
@@ -36,6 +37,7 @@ export type ActionTestData = {
     spell?: SpellActionTestData,
     complexForm?: ComplexFormTestData,
     targetId?: string
+    matrix?: MatrixActionTestData
 }
 
 
@@ -52,6 +54,10 @@ export class ShadowrunItemDialog {
 
         if (item.isComplexForm()) {
             return ShadowrunItemDialog.createComplexFormDialog(item, event);
+        }
+
+        if (item.isMatrixAction()) {
+            return ShadowrunItemDialog.createMatrixActionFormDialog(item, event);
         }
     }
 
@@ -117,6 +123,22 @@ export class ShadowrunItemDialog {
         return new FormDialog(dialogData);
     }
 
+    static async createMatrixActionFormDialog(item: SR5Item, event?: MouseEvent): Promise<FormDialog> {
+        const dialogData = {title: item.name,
+                            event} as unknown as Dialog.Data;
+
+        const templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-matrix.html';
+        const templateData = {};
+        const onAfterClose = ShadowrunItemDialog.addMatrixActionData(templateData, dialogData, item);
+
+        dialogData['templateData'] = templateData;
+        dialogData['templatePath'] = templatePath;
+        dialogData['onAfterClose'] = onAfterClose;
+
+        // @ts-ignore
+        return new FormDialog(dialogData)
+    }
+
     static addComplexFormData(templateData: object, dialogData: Dialog.Data, item: SR5Item): Function {
         const fade = item.getFade();
         const title = `${Helpers.label(item.name)} Level`;
@@ -139,14 +161,14 @@ export class ShadowrunItemDialog {
         return async (html: JQuery): Promise<ActionTestData|undefined> => {
             if (cancel) return;
 
-            const actionTestData = {} as ComplexFormTestData;
+            const complexFormTestData = {} as ComplexFormTestData;
 
-            mergeObject(actionTestData, ShadowrunItemDialog._getSelectedComplexFormLevel(html))
+            mergeObject(complexFormTestData, ShadowrunItemDialog._getSelectedComplexFormLevel(html))
 
             // TODO: Remnants of old style data flow. Look into RangedWeapon for newer style.
-            await item.setLastComplexFormLevel({value: actionTestData.level});
+            await item.setLastComplexFormLevel({value: complexFormTestData.level});
 
-            return {complexForm: actionTestData};
+            return {complexForm: complexFormTestData};
         };
     }
 
@@ -383,5 +405,34 @@ export class ShadowrunItemDialog {
         }
 
         return {};
+    }
+
+    static addMatrixActionData(templateData: object, dialogData: Dialog.Data, item: SR5Item): Function {
+
+        // TODO: This needs to be configurable.
+        templateData['marks'] = 1;
+
+        let cancel = true;
+        dialogData.buttons = {
+            roll: {
+                label: 'Continue',
+                icon: '<i class="fas fa-dice-six"></i>',
+                callback: () => (cancel = false),
+            },
+        };
+
+        return async (html: JQuery): Promise<ActionTestData|undefined> => {
+            if (cancel) return;
+
+            const matrixTestData = {
+                marks: ShadowrunItemDialog._getSelectedMatrixMarks(html)
+            };
+
+            return {matrix: matrixTestData}
+        }
+    }
+
+    static _getSelectedMatrixMarks(html: JQuery): number {
+        return Helpers.parseInputToNumber($(html).find('[name=marks]').val());
     }
 }

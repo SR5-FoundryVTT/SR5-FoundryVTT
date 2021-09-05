@@ -6,11 +6,15 @@ import {ShadowrunRoll, Test} from "./rolls/ShadowrunRoller";
 import {Helpers} from "./helpers";
 import {DamageApplicationFlow} from './actor/flows/DamageApplicationFlow';
 import AttackData = Shadowrun.AttackData;
+import ActionRollData = Shadowrun.ActionRollData;
 import DrainData = Shadowrun.DrainData;
 import ModifiedDamageData = Shadowrun.ModifiedDamageData;
 import DamageType = Shadowrun.DamageType;
 import DamageElement = Shadowrun.DamageElement;
 import CombatData = Shadowrun.CombatData;
+import ActionResultData = Shadowrun.ActionResultData;
+import {ActionTestData} from "./apps/dialogs/ShadowrunItemDialog";
+import {ActionResultFlow} from "./item/flows/ActionResultFlow";
 
 export interface RollTargetChatMessage {
     actor: SR5Actor
@@ -58,6 +62,8 @@ export interface RollChatMessageOptions {
     tests?: Test[]
     combat?: CombatData
     reach?: number
+    result?: ActionResultData
+    actionData?: ActionTestData
 }
 
 interface ItemChatTemplateData {
@@ -76,6 +82,13 @@ interface RollChatTemplateData extends RollChatMessageOptions {
     rollMode: keyof typeof CONFIG.dice.rollModes
 }
 
+/**
+ * The legacy chat message approach of the system uses a generic chat message to display roll and item information.
+ *
+ * NOTE: This approach has been deprecated in Foundry 0.8 and should be replaced with custom Roll implementation for each kind of Roll (ActionRoll, AttackRoll, OpposedRoll, ...).
+ *
+ * @param templateData An untyped object carrying data to display. The template should itself check for what properties are available and only renders what's given.
+ */
 async function createChatMessage(templateData, options?: ChatDataOptions): Promise<Entity<any>|null> {
     const chatData = await createChatData(templateData, options);
     const message = await ChatMessage.create(chatData);
@@ -93,8 +106,9 @@ async function createChatMessage(templateData, options?: ChatDataOptions): Promi
     // Store data in chat message for later use (opposed tests)
     if (templateData.roll) await message.setFlag(SYSTEM_NAME, FLAGS.Roll, templateData.roll);
     if (templateData.attack) await message.setFlag(SYSTEM_NAME, FLAGS.Attack, templateData.attack);
-    // Convert targets into scene token ids.
-    if (templateData.targets) await message.setFlag(SYSTEM_NAME, FLAGS.TargetsSceneTokenIds, templateData.targets.map(target => getTokenSceneId(target)));
+    // Use Scene Token IDs in order to still receive tokens/items when the scene has changed when opening from chat.
+    if (templateData.targets) await message.setFlag(SYSTEM_NAME, FLAGS.TargetsSceneTokenIds, templateData.targets.map(target => getTokenSceneId(target.document)));
+    if (templateData.actionTestData) await message.setFlag(SYSTEM_NAME, FLAGS.ActionTestData, templateData.actionTestData);
 
     return message;
 }
@@ -119,7 +133,6 @@ const createChatData = async (templateData, options?: ChatDataOptions) => {
         },
         showGlitchAnimation: game.settings.get(SYSTEM_NAME, FLAGS.ShowGlitchAnimation)
     };
-
     const html = await renderTemplate(template, enhancedTemplateData);
 
     const chatData = {
@@ -224,7 +237,8 @@ function getRollChatTemplateData(options: RollChatMessageOptions): RollChatTempl
     const rollMode = options.rollMode ?? game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
     const tokenId = getTokenSceneId(token);
 
-    const targetTokenId = getTokenSceneId(options.target);
+    // @ts-ignore // foundry-vtt-types 0.8 support
+    const targetTokenId = getTokenSceneId(options.target?.document);
 
     return {
         ...options,
@@ -441,5 +455,52 @@ export const addRollListeners = (app: ChatMessage, html) => {
         }
 
         await new DamageApplicationFlow().runApplyDamage(actors, damage);
+    });
+
+    /**
+     * Apply action results onto targets or selections.
+     */
+    html.on('click', '.result', async event => {
+        event.stopPropagation();
+
+        const messageId = html.data('messageId');
+        const message = game.messages.get(messageId);
+
+        if (!message) return;
+
+        const actionTestData = message.getFlag(SYSTEM_NAME, FLAGS.ActionTestData) as ActionTestData;
+
+        if (actionTestData.matrix) {
+            const sceneTokenId = html.find('.chat-card').data('tokenId');
+            const actor = Helpers.getSceneTokenActor(sceneTokenId);
+
+            if (actor === undefined) {
+                return console.error('No actor could be extracted from message data.');
+            }
+
+            // Allow custom selection for GMs and users with enough permissions...
+            let targets = Helpers.getControlledTokens().filter(token => token.actor.id !== game.user.character?.id);
+
+            // For users allow custom selection using targeting...
+            if (targets.length === 0) {
+                targets = Helpers.getTargetedTokens();
+            }
+            // For no manual selection fall back to previous message targets.
+            if (targets.length === 0) {
+                const targetSceneIds = message.getFlag(SYSTEM_NAME, FLAGS.TargetsSceneTokenIds) as string[];
+
+                targetSceneIds.forEach(targetSceneId => {
+                    const [sceneId, tokenId] = Helpers.deconstructSceneTokenId(targetSceneId);
+                    targets.push(Helpers.getSceneTokenDocument(sceneId, tokenId));
+                })
+            }
+
+            if (targets.length === 0) {
+                return ui.notifications.warn(game.i18n.localize("SR5.Warnings.TokenSelectionNeeded"));
+            }
+
+            const {marks} = actionTestData.matrix;
+            await ActionResultFlow.placeMatrixMarks(actor, targets, marks);
+        }
     });
 };

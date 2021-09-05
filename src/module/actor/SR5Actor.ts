@@ -30,7 +30,6 @@ import VehicleStats = Shadowrun.VehicleStats;
 import ActorArmorData = Shadowrun.ActorArmorData;
 import ConditionData = Shadowrun.ConditionData;
 import Skills = Shadowrun.Skills;
-import {SkillRules} from "../rules/SkillRules";
 import CharacterSkills = Shadowrun.CharacterSkills;
 import {SR5} from "../config";
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
@@ -48,6 +47,13 @@ import VehicleData = Shadowrun.VehicleData;
 import VehicleActorData = Shadowrun.VehicleActorData;
 import CritterActorData = Shadowrun.CritterActorData;
 import {Modifiers} from "../rules/Modifiers";
+import ICActorData = Shadowrun.ICActorData;
+import {SkillRules} from "../rules/SkillRules";
+import MatrixData = Shadowrun.MatrixData;
+import {MatrixRules} from "../rules/MatrixRules";
+import {ICDataPreparation} from "./prep/ICPrep";
+import HostItemData = Shadowrun.HostItemData;
+import MarkedDocument = Shadowrun.MarkedDocument;
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -127,6 +133,9 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
             case "vehicle":
                 VehicleDataPreparation(this.data.data, itemDataWrappers);
                 break;
+            case "ic":
+                ICDataPreparation(this.data.data, itemDataWrappers);
+                break;
         }
     }
 
@@ -134,9 +143,12 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         return this.data.data.modifiers[modifierName];
     }
 
+    /**
+     * Some actors have skills, some don't. While others don't have skills but derive skill values from their ratings.
+     */
     findActiveSkill(skillName?: string): SkillField | undefined {
         // Check for faulty to catch empty names as well as missing parameters.
-        if (!skillName) return undefined;
+        if (!skillName) return;
 
         // Handle legacy skills (name is id)
         const skills = this.getActiveSkills();
@@ -147,9 +159,11 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         return Object.values(skills).find(skill => skill.name === skillName);
     }
 
-    findAttribute(attributeName?: string): AttributeField | undefined {
-        if (attributeName === undefined) return undefined;
-        return this.data.data.attributes[attributeName];
+    findAttribute(id?: string): AttributeField | undefined {
+        if (id === undefined) return;
+        const attributes = this.getAttributes();
+        if (!attributes) return;
+        return attributes[id];
     }
 
     findVehicleStat(statName?: string): VehicleStat | undefined {
@@ -297,6 +311,10 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         return this.getType() === 'critter';
     }
 
+    isIC() {
+        return this.getType() === 'ic';
+    }
+
     getVehicleTypeSkillName(): string | undefined {
         if (!("vehicleType" in this.data.data)) return;
 
@@ -324,6 +342,9 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         const name = this.getVehicleTypeSkillName();
         return this.findActiveSkill(name);
     }
+    get hasSkills(): boolean {
+        return this.getSkills() !== undefined;
+    }
 
     getSkills(): CharacterSkills {
         return this.data.data.skills;
@@ -331,6 +352,20 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
 
     getActiveSkills(): Skills {
         return this.data.data.skills.active;
+    }
+
+    /**
+     * Determine if an actor can choose a special trait using the special field.
+     */
+    get hasSpecial(): boolean {
+        return ['character', 'sprite', 'spirit', 'critter'].includes(this.data.type);
+    }
+
+    /**
+     * Determine if an actor can choose a full defense attribute
+     */
+    get hasFullDefense(): boolean {
+        return ['character', 'vehicle', 'sprite', 'spirit', 'critter'].includes(this.data.type);
     }
 
     /**
@@ -1517,21 +1552,28 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         await this._addDamageToOverflow(overflow, track);
     }
 
-    /** Adding damage to a device track instead of an actors track, as they contain their own track within their data.
+    /**
+     * Matrix damage can be added onto different tracks:
+     * - IC has a local matrix.condition_monitor
+     * - Characters have matrix devices (items) with their local track
      */
     async addMatrixDamage(damage: DamageData): Promise<DamageData> {
         if (damage.type.value !== 'matrix') return damage;
 
-        const device = this.getMatrixDevice();
-        if (!device) return damage;
 
+        const device = this.getMatrixDevice();
         const track = this.getMatrixTrack();
-        // Actor might not have a commlink/cyberdeck equipped.
         if (!track) return damage;
 
         const {overflow, rest} = this._calcDamageOverflow(damage, track);
 
-        await this._addDamageToDeviceTrack(rest, device);
+        if (device) {
+            await this._addDamageToDeviceTrack(rest, device);
+        }
+        if (this.isIC()) {
+            await this._addDamageToTrack(rest, track);
+        }
+
 
         // Return overflow for consistency, yet nothing will take overflowing matrix damage.
         return overflow;
@@ -1563,11 +1605,21 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
     }
 
     getPhysicalTrack(): OverflowTrackType | undefined {
-        if ("track" in this.data.data)
+        if ("track" in this.data.data && "physical" in this.data.data.track)
             return this.data.data.track.physical;
     }
 
+    /**
+     * The matrix depends on actor type and possibly equipped matrix device.
+     *
+     */
     getMatrixTrack(): ConditionData|undefined {
+        // Some actors will have a direct matrix track.
+        if ("track" in this.data.data && "matrix" in this.data.data.track) {
+            return this.data.data.track.matrix;
+        }
+
+        // Fallback to equipped matrix device.
         const device = this.getMatrixDevice();
         if (!device) return undefined;
 
@@ -1644,6 +1696,12 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         }
     }
 
+    asICData(): ICActorData | undefined {
+        if (this.isIC()) {
+            return this.data as ICActorData;
+        }
+    }
+
     getVehicleStats(): VehicleStats | undefined {
         if (this.isVehicle() && "vehicle_stats" in this.data.data) {
             return this.data.data.vehicle_stats;
@@ -1672,7 +1730,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         await this.update({'data.driver': ''});
     }
 
-    hasDriver(): boolean {
+   hasDriver(): boolean {
         const data = this.asVehicleData();
 
         if (!data) return false;
@@ -1688,6 +1746,67 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         // If no driver id is set, we won't get an actor and should explicitly return undefined.
         if (!driver) return;
         return driver;
+    }
+
+     /**
+     * Add a host to this IC type actor.
+     *
+     * Currently compendium hosts aren't supported.
+     * Any other actor type has no use for this method.
+     *
+     * @param id The host item id
+     */
+    async addICHost(id: string) {
+        if (!this.isIC()) return;
+
+        // Check if the given item id is valid.
+        const item = game.items.get(id) as SR5Item;
+        if (!item || !item.isHost()) return;
+
+        const hostData = item.asHostData();
+        await this._updateICHostData(hostData);
+    }
+
+    async _updateICHostData(hostData: HostItemData) {
+        const updateData = {
+            id: hostData._id,
+            rating: hostData.data.rating,
+            atts: duplicate(hostData.data.atts)
+        }
+
+        await this.update({'data.host': updateData});
+    }
+
+    /**
+     * Remove a connect Host item from an ic type actor.
+     */
+    async removeICHost() {
+        if (!this.isIC()) return;
+
+        const updateData = {
+            id: null,
+            rating: 0,
+            atts: null
+        }
+
+        await this.update({'data.host': updateData});
+    }
+
+    /**
+     * Will return true if this ic type actor has been connected to a host.
+     */
+    hasHost(): boolean {
+        const icData = this.asICData();
+        return icData && !!icData.data.host.id;
+    }
+
+    /**
+     * Get the host item connect to this ic type actor.
+     */
+    getICHost(): SR5Item|undefined {
+        const icData = this.asICData();
+        if (!icData) return;
+        return this.items.get(icData?.data?.host.id);
     }
 
     /** Check if this actor is of one or multiple given actor types
@@ -1719,5 +1838,140 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
 
     async setModifiers(modifiers: Modifiers) {
         await Modifiers.setModifiersOnEntity(this, modifiers.modifiers);
+    }
+
+    /**
+     * Check if the current actor has matrix capabilities.
+     */
+    get isMatrixActor(): boolean {
+        return 'matrix' in this.data.data;
+    }
+
+    get matrixData(): MatrixData|undefined {
+        if (!this.isMatrixActor) return;
+        // @ts-ignore // isMatrixActor handles it, TypeScript doesn't know.
+        return this.data.data.matrix as MatrixData;
+    }
+
+    /**
+     * Change the amount of marks on the target by the amount of marks given, while adhering to min/max values.
+     *
+     *
+     * @param target The Document the marks are placed on. This can be an actor (character, technomancer, IC) OR an item (Host)
+     * @param marks The amount of marks to be placed
+     * @param options Additional options that may be needed
+     * @param options.scene The scene the actor lives on. If empty, will be current active scene
+     * @param options.item The item that the mark is to be placed on
+     * @param options.overwrite Replace the current marks amount instead of changing it
+     */
+    async setMarks(target: Token, marks: number, options?: {scene?: Scene, item?: SR5Item, overwrite?: boolean}) {
+        if (!canvas.ready) return;
+
+        if (!this.isMatrixActor) {
+            ui.notifications.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedBy'));
+            console.error(`The actor type ${this.data.type} can't receive matrix marks!`);
+            return;
+        }
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
+        if (!target.actor.isMatrixActor) {
+            ui.notifications.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedOn'));
+            // @ts-ignore
+            console.error(`The actor type ${target.actor.type} can't receive matrix marks!`);
+            return;
+        }
+        // It hurt itself in confusion.
+        if (this.id === target.actor.id) {
+            return;
+        }
+
+        // Both scene and item are optional.
+        const scene = options?.scene || canvas.scene;
+        const item = options?.item;
+
+        const markId = Helpers.buildMarkId(scene.id, target.id, item?.id);
+        const matrixData = this.matrixData;
+
+        const currentMarks = options?.overwrite ? 0 : this.getMarksById(markId);
+        matrixData.marks[markId] = MatrixRules.getValidMarksCount(currentMarks + marks);
+
+        await this.update({'data.matrix.marks': matrixData.marks});
+    }
+
+    /**
+     * Remove ALL marks placed by this actor
+     */
+    async clearMarks() {
+        if (!this.isMatrixActor) return;
+
+        const matrixData = this.matrixData;
+
+        // Delete all markId properties from ActorData
+        const updateData = {}
+        for (const markId of Object.keys(matrixData.marks)) {
+            updateData[`-=${markId}`] = null;
+        }
+
+        await this.update({'data.matrix.marks': updateData});
+    }
+
+    /**
+     * Remove ONE mark. If you want to delete all marks, use clearMarks instead.
+     */
+    async clearMark(markId: string) {
+        if (!this.isMatrixActor) return;
+
+        const updateData = {}
+        updateData[`-=${markId}`] = null;
+
+        await this.update({'data.matrix.marks': updateData});
+    }
+
+    /**
+     * Return the amount of marks this actor has on another actor or one of their items.
+     *
+     * TODO: It's unclear what this method will be used for
+     *       What does the caller want?
+     *
+     * TODO: Check with technomancers....
+     *
+     * @param target
+     * @param item
+     * @param options
+     */
+    getMarks(target: Token, item?: SR5Item, options?: {scene?: Scene}): number {
+        if (!canvas.ready) return;
+        if (target instanceof SR5Item) {
+            console.error('Not yet supported');
+            return;
+        }
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
+        if (!target?.actor.isMatrixActor) return 0;
+
+
+        const scene = options?.scene || canvas.scene;
+        // If an actor has been targeted, they might have a device. If an item / host has been targeted they don't.
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
+        item = item || target instanceof SR5Actor ? target.actor.getMatrixDevice() : undefined;
+
+        const markId = Helpers.buildMarkId(scene.id, target.id, item?.id);
+        return this.getMarksById(markId);
+    }
+
+    getMarksById(markId: string): number {
+        return this.matrixData.marks[markId] || 0;
+    }
+
+    getAllMarkedDocuments(): MarkedDocument[] {
+        const matrixData = this.matrixData;
+        if (!matrixData) return [];
+
+        // Deconstruct all mark ids into documents.
+        return Object.entries(matrixData.marks)
+            .filter(([markId, marks]) => Helpers.isValidMarkId(markId))
+            .map(([markId, marks]) => ({
+                ...Helpers.getMarkIdDocuments(markId),
+                marks,
+                markId
+            }))
     }
 }
