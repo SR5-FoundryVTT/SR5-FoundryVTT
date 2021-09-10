@@ -36,7 +36,7 @@ export class WeaponParser {
                 console.error(e);
             }
         });
-    
+
         return parsedWeapons;
     }
 
@@ -54,15 +54,25 @@ export class WeaponParser {
             base: parseInt(getValues(chummerWeapon.ap)[0])
         };
         action.type = 'varies';
-        if (chummerWeapon.skill)
+
+        // Transform Chummer skill naming schema to shadowrun5e naming schema.
+        // NOTE: chummerWeapon.skill CAN be null. Don't rely on it.
+        if (chummerWeapon.skill) {
             action.skill = chummerWeapon.skill.toLowerCase().replace(/\s/g, '_');
-        else if (chummerWeapon.category && chummerWeapon.category.toLowerCase().includes('exotic'))
+        // Instead of direct skill, rely on a category mapping by the rules.
+        } else if (chummerWeapon.category && chummerWeapon.category.toLowerCase().includes('exotic')) {
             action.skill = chummerWeapon.category
                 .toLowerCase()
                 .replace(' weapons', '')
                 .replace(/\s/g, '_');
-        if (action.skill.includes('exotic'))
+        } else if (chummerWeapon.category && chummerWeapon.category.toLowerCase().includes('laser weapons')) {
+            action.skill = 'exotic_range';
+        }
+
+        if (action.skill.includes('exotic')) {
             action.skill = action.skill.replace('_weapon', '');
+        }
+
         action.attribute = 'agility';
         action.limit = {
             base: parseInt(getValues(chummerWeapon.accuracy)[0])
@@ -79,7 +89,7 @@ export class WeaponParser {
             melee.reach = parseInt(chummerWeapon.reach);
         } else if (chummerWeapon.type.toLowerCase() === 'ranged') {
             data.category = 'range';
-            if (chummerWeapon.skill.toLowerCase().includes('throw')) {
+            if (action.skill.toLowerCase().includes('throw')) {
                 data.category = 'thrown'; // TODO clean this up
             }
             const range = {};
