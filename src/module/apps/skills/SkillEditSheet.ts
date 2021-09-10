@@ -27,6 +27,7 @@ export class SkillEditSheet extends DocumentSheet {
             classes: ['sr5', 'sheet', 'skill-edit-window'],
             template: 'systems/shadowrun5e/dist/templates/apps/skill-edit.html',
             width: 300,
+            height: 'auto',
             submitOnClose: true,
             submitOnChange: true,
             closeOnSubmit: false,

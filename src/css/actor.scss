@@ -2,8 +2,10 @@
 .sr5.skill-edit-window {
     min-height: 200px;
     min-width: 200px;
+    display: inline-block;
+
     .wholesheet {
-        height: 100%;
+        height: auto;
         display: flex;
         flex-flow: column nowrap;
         overflow: hidden;
