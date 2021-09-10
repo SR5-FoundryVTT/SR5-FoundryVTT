@@ -1,4 +1,4 @@
-<div class="list-item {{itemCssClass}}" {{#if itemId}}data-item-id="{{itemId}}" data-item-type="{{itemType}}"{{/if}} {{#each data}}data-{{@key}}="{{this}}"{{/each}}>
+<div class="list-item {{itemCssClass}}" {{#if itemId}}data-item-id="{{itemId}}" data-item-type="{{itemType}}"{{/if}} {{#each itemData}}data-{{@key}}="{{this}}"{{/each}}>
     <div class="item-left">
         {{#if img}}
             <div class="item-img {{#if hasRoll}}item-roll{{/if}} roll">
