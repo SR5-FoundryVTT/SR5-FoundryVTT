@@ -41,7 +41,7 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         // @ts-ignore
         return mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'actor'],
-            width: 880,
+            width: 905,
             height: 690,
             tabs: [
                 {
