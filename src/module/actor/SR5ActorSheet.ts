@@ -949,6 +949,8 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         const item = this.actor.items.get(iid);
         if (item) {
             const newItems = [] as any[];
+
+            // Handle the equipped state.
             if (item.isDevice()) {
                 // Only allow one equipped device item. Unequip all other.
                 for (const item of this.actor.items.filter(actorItem => actorItem.isDevice())) {
@@ -965,6 +967,10 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
                     'data.technology.equipped': !item.isEquipped(),
                 });
             }
+
+            // Handle active effects based on equiped status.
+
+
             // @ts-ignore // TODO: foundry-vtt-types 0.8 has no Document support yet
             await this.actor.updateEmbeddedDocuments('Item', newItems);
 

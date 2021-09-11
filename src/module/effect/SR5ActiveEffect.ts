@@ -23,49 +23,9 @@ export class SR5ActiveEffect extends ActiveEffect {
      * Render the sheet of the active effect origin
      */
     public async renderOriginSheet() {
-        const path = this.data.origin.split('.');
-
-        if (path.length === 0) return;
-
-        switch (path[0]) {
-            case 'Actor':
-                const actorId = path[1];
-                const actor = game.actors.get(actorId);
-
-                switch (path.length) {
-                    case 2:
-                        return actor.sheet.render(true);
-                    case 4:
-                        const itemId = path[3];
-                        const item = actor.items.get(itemId);
-
-                        return item.sheet.render(true);
-                    default:
-                        return console.error('The active effect origin does not adhere to an know case', this.data, this.data.origin);
-                }
-
-            case 'Scene':
-                const sceneId = path[1];
-                const tokenId = path[3];
-
-                const scene = game.scenes.get(sceneId);
-                // @ts-ignore // foundry-vtt-types 0.8
-                const token = scene.tokens.get(tokenId);
-
-                switch (path.length) {
-                    case 4:
-                        return token.actor.sheet.render(true);
-
-                    case 6:
-                        const itemId = path[5];
-                        const item = token.actor.items.get(itemId);
-
-                        return item.sheet.render(true);
-
-                    default:
-                        return console.error('The active effect origin does not adhere to an know case', this.data, this.data.origin);
-                }
-        }
+        const document = await fromUuid(this.data.origin);
+        // @ts-ignore
+        return document?.sheet?.render(true);
     }
 
     update(data: ActiveEffect.Data, options?: Entity.UpdateOptions): Promise<ActiveEffect.Data> {
