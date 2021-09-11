@@ -478,6 +478,8 @@
   "SR5.Item": "Item",
   "SR5.Bonuses": "Bonuses",
   "SR5.EditSkill": "Edit Skill",
+  "SR5.EditItem": "Edit Item",
+  "SR5.DeleteItem": "Delete Item",
   "SR5.Name": "Name",
   "SR5.AstralInit": "Astral Init",
   "SR5.AstralDice": "Astral Init Dice",

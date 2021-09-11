@@ -476,6 +476,8 @@
   "SR5.Item": "Item",
   "SR5.Bonuses": "Boni",
   "SR5.EditSkill": "Fertigkeit anpassen",
+  "SR5.EditItem": "Gegenstand anpassen",
+  "SR5.DeleteItem": "Gegenstand löschen",
   "SR5.Name": "Name",
   "SR5.AstralInit": "Astrale Ini",
   "SR5.AstralDice": "Astrale Ini Würfel",
