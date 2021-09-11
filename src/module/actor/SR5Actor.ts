@@ -33,12 +33,12 @@ import Skills = Shadowrun.Skills;
 import CharacterSkills = Shadowrun.CharacterSkills;
 import {SR5} from "../config";
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
-import {CharacterDataPrepare} from "./prep/CharacterPrep";
+import {CharacterPrep} from "./prep/CharacterPrep";
 import {SR5ItemDataWrapper} from "../data/SR5ItemDataWrapper";
-import {CritterDataPrepare} from "./prep/CritterPrep";
-import {SpiritDataPrepare} from "./prep/SpiritPrep";
-import {SpriteDataPrepare} from "./prep/SpritePrep";
-import {VehicleDataPreparation} from "./prep/VehiclePrep";
+import {CritterPrepareDerivedData} from "./prep/CritterPrep";
+import {SpiritPrepareDerivedData} from "./prep/SpiritPrep";
+import {SpritePrepareDerivedData} from "./prep/SpritePrep";
+import {VehiclePrepareDerivedData} from "./prep/VehiclePrep";
 import SpiritActorData = Shadowrun.SpiritActorData;
 import CharacterData = Shadowrun.CharacterData;
 import CharacterActorData = Shadowrun.CharacterActorData;
@@ -51,7 +51,7 @@ import ICActorData = Shadowrun.ICActorData;
 import {SkillRules} from "../rules/SkillRules";
 import MatrixData = Shadowrun.MatrixData;
 import {MatrixRules} from "../rules/MatrixRules";
-import {ICDataPreparation} from "./prep/ICPrep";
+import {ICPrepareDerivedData} from "./prep/ICPrep";
 import HostItemData = Shadowrun.HostItemData;
 import MarkedDocument = Shadowrun.MarkedDocument;
 
@@ -93,10 +93,35 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
     }
 
     /**
-     *  Prepare base data. Be careful that this ONLY included data not in need for item access. Check Actor and ClientDocumentMixin.prepareData for order of data prep.
+     *  Prepare base data. Be careful that this ONLY included data not in need for item access.
+     *  Check Actor and ClientDocumentMixin.prepareData for order of data prep.
+     *
+     *  Shadowrun data preparation is separate from the actor entity see the different <>Prep classes like
+     *  CharacterPrep
      */
     prepareBaseData() {
         super.prepareBaseData();
+
+        switch (this.data.type) {
+            case 'character':
+                CharacterPrep.prepareBaseData(this.data.data);
+                break;
+            // case "critter":
+            //     CritterPrepareDerivedData(this.data.data);
+            //     break;
+            // case "spirit":
+            //     SpiritPrepareDerivedData(this.data.data);
+            //     break;
+            // case "sprite":
+            //     SpritePrepareDerivedData(this.data.data);
+            //     break;
+            // case "vehicle":
+            //     VehiclePrepareDerivedData(this.data.data);
+            //     break;
+            // case "ic":
+            //     ICPrepareDerivedData(this.data.data);
+            //     break;
+        }
     }
 
     /**
@@ -123,22 +148,22 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         const itemDataWrappers = this.items.map((item) => new SR5ItemDataWrapper(item.data));
         switch (this.data.type) {
             case 'character':
-                CharacterDataPrepare(this.data.data, itemDataWrappers);
+                CharacterPrep.prepareDerivedData(this.data.data, itemDataWrappers);
                 break;
             case "critter":
-                CritterDataPrepare(this.data.data, itemDataWrappers);
+                CritterPrepareDerivedData(this.data.data, itemDataWrappers);
                 break;
             case "spirit":
-                SpiritDataPrepare(this.data.data, itemDataWrappers);
+                SpiritPrepareDerivedData(this.data.data, itemDataWrappers);
                 break;
             case "sprite":
-                SpriteDataPrepare(this.data.data, itemDataWrappers);
+                SpritePrepareDerivedData(this.data.data, itemDataWrappers);
                 break;
             case "vehicle":
-                VehicleDataPreparation(this.data.data, itemDataWrappers);
+                VehiclePrepareDerivedData(this.data.data, itemDataWrappers);
                 break;
             case "ic":
-                ICDataPreparation(this.data.data, itemDataWrappers);
+                ICPrepareDerivedData(this.data.data, itemDataWrappers);
                 break;
         }
     }

@@ -12,37 +12,85 @@ import { NPCPrep } from './functions/NPCPrep';
 import CharacterData = Shadowrun.CharacterData;
 import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 
-export function CharacterDataPrepare(data: CharacterData, items: SR5ItemDataWrapper[]) {
-    ModifiersPrep.prepareModifiers(data);
-    ModifiersPrep.clearAttributeMods(data);
+export function CharacterPrepareDerivedData(data: CharacterData, items: SR5ItemDataWrapper[]) {
+    // ModifiersPrep.prepareModifiers(data);
+    // ModifiersPrep.clearAttributeMods(data);
 
-    ItemPrep.prepareArmor(data, items);
-    ItemPrep.prepareBodyware(data, items);
+    // ItemPrep.prepareArmor(data, items);
+    // ItemPrep.prepareBodyware(data, items);
 
-    SkillsPrep.prepareSkills(data);
-    AttributesPrep.prepareAttributes(data);
+    // SkillsPrep.prepareSkills(data);
+    // AttributesPrep.prepareAttributes(data);
 
     // NPCPrep is reliant to be called after AttributesPrep.
-    NPCPrep.prepareNPCData(data);
+    // NPCPrep.prepareNPCData(data);
 
-    LimitsPrep.prepareLimitBaseFromAttributes(data);
-    LimitsPrep.prepareLimits(data);
+    // LimitsPrep.prepareLimitBaseFromAttributes(data);
+    // LimitsPrep.prepareLimits(data);
 
-    MatrixPrep.prepareMatrix(data, items);
-    MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
+    // MatrixPrep.prepareMatrix(data, items);
+    // MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
 
-    if (data.is_npc && data.npc.is_grunt) {
-        ConditionMonitorsPrep.prepareGrunt(data);
-    } else {
-        ConditionMonitorsPrep.preparePhysical(data);
-        ConditionMonitorsPrep.prepareStun(data);
+    // if (data.is_npc && data.npc.is_grunt) {
+    //     ConditionMonitorsPrep.prepareGrunt(data);
+    // } else {
+    //     ConditionMonitorsPrep.preparePhysical(data);
+    //     ConditionMonitorsPrep.prepareStun(data);
+    // }
+    //
+    // MovementPrep.prepareMovement(data);
+    // WoundsPrep.prepareWounds(data);
+    //
+    // InitiativePrep.prepareMeatspaceInit(data);
+    // InitiativePrep.prepareAstralInit(data);
+    // InitiativePrep.prepareMatrixInit(data);
+    // InitiativePrep.prepareCurrentInitiative(data);
+}
+
+export class CharacterPrep {
+    static prepareBaseData(data: CharacterData) {
+        ModifiersPrep.prepareModifiers(data);
+        ModifiersPrep.clearAttributeMods(data);
+
+        AttributesPrep.prepareAttributes(data);
+        // NPCPrep is reliant to be called after AttributesPrep.
+        NPCPrep.prepareNPCData(data);
+
+        SkillsPrep.prepareSkills(data);
     }
 
-    MovementPrep.prepareMovement(data);
-    WoundsPrep.prepareWounds(data);
+    /**
+     * All derived data should depend on basic values like Attributes or Skills.
+     *
+     * It shouldn't be modified by Active Effects, which instead should modify the global modifiers.
+     *
+     * @param data
+     * @param items
+     */
+    static prepareDerivedData(data: CharacterData, items: SR5ItemDataWrapper[]) {
+        ItemPrep.prepareArmor(data, items);
+        ItemPrep.prepareBodyware(data, items);
 
-    InitiativePrep.prepareMeatspaceInit(data);
-    InitiativePrep.prepareAstralInit(data);
-    InitiativePrep.prepareMatrixInit(data);
-    InitiativePrep.prepareCurrentInitiative(data);
+        MatrixPrep.prepareMatrix(data, items);
+        MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
+
+        // Limits depend on attributes and active effects.
+        LimitsPrep.prepareLimitBaseFromAttributes(data);
+        LimitsPrep.prepareLimits(data);
+
+        if (data.is_npc && data.npc.is_grunt) {
+            ConditionMonitorsPrep.prepareGrunt(data);
+        } else {
+            ConditionMonitorsPrep.preparePhysical(data);
+            ConditionMonitorsPrep.prepareStun(data);
+        }
+
+        MovementPrep.prepareMovement(data);
+        WoundsPrep.prepareWounds(data);
+
+        InitiativePrep.prepareMeatspaceInit(data);
+        InitiativePrep.prepareAstralInit(data);
+        InitiativePrep.prepareMatrixInit(data);
+        InitiativePrep.prepareCurrentInitiative(data);
+    }
 }

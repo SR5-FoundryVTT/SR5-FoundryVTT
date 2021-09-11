@@ -11,7 +11,7 @@ import {SR5} from "../../config";
 import VehicleData = Shadowrun.VehicleData;
 import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 
-export function VehicleDataPreparation(data: VehicleData, items: SR5ItemDataWrapper[]) {
+export function VehiclePrepareDerivedData(data: VehicleData, items: SR5ItemDataWrapper[]) {
     ModifiersPrep.prepareModifiers(data);
     ModifiersPrep.clearAttributeMods(data);
 

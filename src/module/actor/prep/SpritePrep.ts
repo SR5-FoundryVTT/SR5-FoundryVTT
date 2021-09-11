@@ -12,7 +12,7 @@ import SpriteData = Shadowrun.SpriteData;
 import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 
 
-export function SpriteDataPrepare(data: SpriteData, items: SR5ItemDataWrapper[]) {
+export function SpritePrepareDerivedData(data: SpriteData, items: SR5ItemDataWrapper[]) {
     ModifiersPrep.prepareModifiers(data);
     ModifiersPrep.clearAttributeMods(data);
 

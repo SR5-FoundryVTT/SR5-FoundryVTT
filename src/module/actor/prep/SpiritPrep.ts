@@ -14,11 +14,11 @@ import SpiritData = Shadowrun.SpiritData;
 import {SkillFlow} from "../flows/SkillFlow";
 
 
-export function SpiritDataPrepare(data: SpiritData, items: SR5ItemDataWrapper[]) {
+export function SpiritPrepareDerivedData(data: SpiritData, items: SR5ItemDataWrapper[]) {
     ModifiersPrep.prepareModifiers(data);
     ModifiersPrep.clearAttributeMods(data);
 
-    SpiritPrep.prepareSpiritBaseData(data);
+    SpiritPrep.prepareBaseData(data);
 
     SkillsPrep.prepareSkills(data);
     AttributesPrep.prepareAttributes(data);
@@ -40,7 +40,7 @@ export function SpiritDataPrepare(data: SpiritData, items: SR5ItemDataWrapper[])
 }
 
 export class SpiritPrep {
-    static prepareSpiritBaseData(data: SpiritData) {
+    static prepareBaseData(data: SpiritData) {
         const overrides = this.getSpiritStatModifiers(data.spiritType);
 
         if (overrides) {

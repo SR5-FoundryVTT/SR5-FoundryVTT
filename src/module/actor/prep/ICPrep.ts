@@ -12,7 +12,7 @@ import DeviceAttribute = Shadowrun.DeviceAttribute;
 import {SkillsPrep} from "./functions/SkillsPrep";
 
 
-export function ICDataPreparation(data: ICData, items: SR5ItemDataWrapper[]) {
+export function ICPrepareDerivedData(data: ICData, items: SR5ItemDataWrapper[]) {
     // Add missing values on actor creation
     ICPrep.addMissingTracks(data);
 

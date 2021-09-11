@@ -11,7 +11,7 @@ import { AttributesPrep } from './functions/AttributesPrep';
 import CritterData = Shadowrun.CritterData;
 import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 
-export function CritterDataPrepare(data: CritterData, items: SR5ItemDataWrapper[]) {
+export function CritterPrepareDerivedData(data: CritterData, items: SR5ItemDataWrapper[]) {
     ModifiersPrep.prepareModifiers(data);
     ModifiersPrep.clearAttributeMods(data);
 
