@@ -794,7 +794,8 @@
     "SkillWithoutAttribute": "The skill has no attribute configured.",
     "MarkCouldNotBePlaced": "Interner Fehler: Die Marken konnten nicht platziert werden.",
     "MarksCantBePlacedBy": "Der aktive Akteur kann keine Marken platzieren.",
-    "MarksCantBePlacedOn": "Der als Ziel ausgewählte Akteur kann keine Marken empfangen."
+    "MarksCantBePlacedOn": "Der als Ziel ausgewählte Akteur kann keine Marken empfangen.",
+    "CantEditAppliedItemEffects": "Aktive Effekte, die über Items zugefügt wurden, können nicht direkt editiert werden."
   },
   "SR5.ChangelogApplication": {
     "Title": "Shadowrun5e Update",

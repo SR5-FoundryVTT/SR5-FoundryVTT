@@ -444,8 +444,13 @@ export const registerItemLineHelpers = () => {
             title: game.i18n.localize('SR5.ToggleActive'),
             data: {action: "toggle"}
         };
-
-        return [disableIcon, editIcon, removeIcon];
+        const openOriginIcon = {
+            icon: 'fas fa-file effect-control',
+            title: game.i18n.localize('SR5.OpenOrigin'),
+            data: {action: "open-origin"}
+        }
+        // Disallow changes to effects that aren't of direct origin.
+        return effect.isOriginOwned ? [openOriginIcon, editIcon] : [disableIcon, editIcon, removeIcon];
     });
 
     Handlebars.registerHelper('EffectData', function(effectType: string) {
