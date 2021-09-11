@@ -556,6 +556,8 @@
   "SR5.Attributes": "Attributes",
   "SR5.SpecialAttributes": "Special Attributes",
   "SR5.RightClickToClear": "Right Click to Clear",
+  "SR5.WalkingSpeed": "Walking",
+  "SR5.RunningSpeed": "Running",
   "SETTINGS": {
     "DiagonalMovementName": "Diagonal Movement",
     "DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
@@ -786,7 +788,7 @@
       "TarBaby": "Tar Baby",
       "Track": "Track"
     },
-    "MissingHost": "Host per Drag&Drop zufügen"
+    "MissingHost": "Drag&Drop a host item"
   },
   "SR5.Host": {
     "Rating": "Host Rating",

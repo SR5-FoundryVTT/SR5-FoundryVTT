@@ -13315,7 +13315,7 @@ class SR5Actor extends Actor {
         super.prepareData();
     }
     /**
-     *  Prepare base data. Be careful that this ONLY included data not in need for item access. Check ClientDocumentMixin.prepareData for order of data prep.
+     *  Prepare base data. Be careful that this ONLY included data not in need for item access. Check Actor and ClientDocumentMixin.prepareData for order of data prep.
      */
     prepareBaseData() {
         super.prepareBaseData();
@@ -13325,6 +13325,9 @@ class SR5Actor extends Actor {
      */
     prepareEmbeddedEntities() {
         super.prepareEmbeddedEntities();
+        // NOTE: Hello there! Should you ever be in need of calling the grand parents methods, maybe to avoid applyActiveEffects,
+        //       look at this beautiful piece of software and shiver in it's glory.
+        // ClientDocumentMixin(class {}).prototype.prepareEmbeddedEntities.apply(this);
     }
     /**
      * prepare embedded entities. Check ClientDocumentMixin.prepareData for order of data prep.
@@ -15125,7 +15128,7 @@ class SR5ActorSheet extends ActorSheet {
         // @ts-ignore
         return mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'actor'],
-            width: 880,
+            width: 905,
             height: 690,
             tabs: [
                 {
@@ -18044,7 +18047,7 @@ class SR5BaseActorSheet extends ActorSheet {
         //@ts-ignore // TODO: foundry-vtt-types GENERAL no idea what's the issue here.
         return mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'actor'],
-            width: 880,
+            width: 905,
             height: 690,
             tabs: [
                 {
@@ -20151,9 +20154,21 @@ var WeaponParser = /*#__PURE__*/function () {
       damage.ap = {
         base: parseInt((0, _BaseParserFunctions.getValues)(chummerWeapon.ap)[0])
       };
-      action.type = 'varies';
-      if (chummerWeapon.skill) action.skill = chummerWeapon.skill.toLowerCase().replace(/\s/g, '_');else if (chummerWeapon.category && chummerWeapon.category.toLowerCase().includes('exotic')) action.skill = chummerWeapon.category.toLowerCase().replace(' weapons', '').replace(/\s/g, '_');
-      if (action.skill.includes('exotic')) action.skill = action.skill.replace('_weapon', '');
+      action.type = 'varies'; // Transform Chummer skill naming schema to shadowrun5e naming schema.
+      // NOTE: chummerWeapon.skill CAN be null. Don't rely on it.
+
+      if (chummerWeapon.skill) {
+        action.skill = chummerWeapon.skill.toLowerCase().replace(/\s/g, '_'); // Instead of direct skill, rely on a category mapping by the rules.
+      } else if (chummerWeapon.category && chummerWeapon.category.toLowerCase().includes('exotic')) {
+        action.skill = chummerWeapon.category.toLowerCase().replace(' weapons', '').replace(/\s/g, '_');
+      } else if (chummerWeapon.category && chummerWeapon.category.toLowerCase().includes('laser weapons')) {
+        action.skill = 'exotic_range';
+      }
+
+      if (action.skill.includes('exotic')) {
+        action.skill = action.skill.replace('_weapon', '');
+      }
+
       action.attribute = 'agility';
       action.limit = {
         base: parseInt((0, _BaseParserFunctions.getValues)(chummerWeapon.accuracy)[0])
@@ -20171,7 +20186,7 @@ var WeaponParser = /*#__PURE__*/function () {
       } else if (chummerWeapon.type.toLowerCase() === 'ranged') {
         data.category = 'range';
 
-        if (chummerWeapon.skill.toLowerCase().includes('throw')) {
+        if (action.skill.toLowerCase().includes('throw')) {
           data.category = 'thrown'; // TODO clean this up
         }
 
@@ -21785,6 +21800,7 @@ class SkillEditSheet extends DocumentSheet {
             classes: ['sr5', 'sheet', 'skill-edit-window'],
             template: 'systems/shadowrun5e/dist/templates/apps/skill-edit.html',
             width: 300,
+            height: 'auto',
             submitOnClose: true,
             submitOnChange: true,
             closeOnSubmit: false,
@@ -21834,20 +21850,28 @@ class SkillEditSheet extends DocumentSheet {
             }
             return running;
         }, []);
-        const currentData = updateData[this._updateString()] || {};
-        updateData[this._updateString()] = Object.assign(Object.assign({}, currentData), { base,
+        updateData[this._updateString()] = {
             specs,
             bonus,
             name,
             attribute,
-            canDefault });
+            canDefault
+        };
+        // Avoid re-applying active effects without actual base level changes.
+        // An actual base level change will come without an active effect, since it's user input.
+        if (event.currentTarget.name === 'data.base')
+            updateData[this._updateString()].base = base;
     }
     /** @override */
     _updateObject(event, formData) {
         return __awaiter(this, void 0, void 0, function* () {
-            const updateData = {};
-            this._onUpdateObject(event, formData, updateData);
-            yield this.document.update(updateData);
+            // Without an actual input field used, avoid a unneeded update...
+            // ...the update would happen due to how _onUpdateObject works.
+            if (event.currentTarget) {
+                const updateData = {};
+                this._onUpdateObject(event, formData, updateData);
+                yield this.document.update(updateData);
+            }
         });
     }
     activateListeners(html) {

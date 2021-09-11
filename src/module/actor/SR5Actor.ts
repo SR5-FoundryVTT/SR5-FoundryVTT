@@ -93,7 +93,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
     }
 
     /**
-     *  Prepare base data. Be careful that this ONLY included data not in need for item access. Check ClientDocumentMixin.prepareData for order of data prep.
+     *  Prepare base data. Be careful that this ONLY included data not in need for item access. Check Actor and ClientDocumentMixin.prepareData for order of data prep.
      */
     prepareBaseData() {
         super.prepareBaseData();
@@ -104,6 +104,10 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
      */
     prepareEmbeddedEntities() {
         super.prepareEmbeddedEntities();
+
+        // NOTE: Hello there! Should you ever be in need of calling the grand parents methods, maybe to avoid applyActiveEffects,
+        //       look at this beautiful piece of software and shiver in it's glory.
+        // ClientDocumentMixin(class {}).prototype.prepareEmbeddedEntities.apply(this);
     }
 
     /**

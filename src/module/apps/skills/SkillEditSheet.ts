@@ -27,6 +27,7 @@ export class SkillEditSheet extends DocumentSheet {
             classes: ['sr5', 'sheet', 'skill-edit-window'],
             template: 'systems/shadowrun5e/dist/templates/apps/skill-edit.html',
             width: 300,
+            height: 'auto',
             submitOnClose: true,
             submitOnChange: true,
             closeOnSubmit: false,
@@ -82,24 +83,29 @@ export class SkillEditSheet extends DocumentSheet {
             return running;
         }, [] as any[]);
 
-        const currentData = updateData[this._updateString()] || {};
         updateData[this._updateString()] = {
-            ...currentData,
-            base,
             specs,
             bonus,
             name,
             attribute,
             canDefault
         };
+
+        // Avoid re-applying active effects without actual base level changes.
+        // An actual base level change will come without an active effect, since it's user input.
+        if (event.currentTarget.name === 'data.base') updateData[this._updateString()].base = base;
     }
 
 
     /** @override */
     async _updateObject(event: Event, formData: object) {
-        const updateData = {};
-        this._onUpdateObject(event, formData, updateData);
-        await this.document.update(updateData);
+        // Without an actual input field used, avoid a unneeded update...
+        // ...the update would happen due to how _onUpdateObject works.
+        if (event.currentTarget) {
+            const updateData = {};
+            this._onUpdateObject(event, formData, updateData);
+            await this.document.update(updateData);
+        }
     }
 
     activateListeners(html) {

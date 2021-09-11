@@ -542,6 +542,8 @@
   "SR5.IsNPC": "NPC",
   "SR5.IsGrunt": "Scherge (Grunt)",
   "SR5.IsCritter": "Critter",
+  "SR5.WalkingSpeed": "Gehen",
+  "SR5.RunningSpeed": "Rennen",
 
   "SR5.Blackmail": "Erpressung",
   "SR5.Family": "Familie",
