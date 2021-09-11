@@ -19,20 +19,27 @@ export class SR5ActiveEffect extends ActiveEffect {
         return false;
     }
 
+    public get source(): Promise<Document> {
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
+        return fromUuid(this.data.origin);
+    }
+
     /**
-     * Render the sheet of the active effect origin
+     * Render the sheet of the active effect source
      */
-    public async renderOriginSheet() {
-        const document = await fromUuid(this.data.origin);
+    public async renderSourceSheet() {
+        const document = await this.source;
         // @ts-ignore
         return document?.sheet?.render(true);
     }
 
-    update(data: ActiveEffect.Data, options?: Entity.UpdateOptions): Promise<ActiveEffect.Data> {
-        if (this.isOriginOwned) {
-            ui.notifications.error(game.i18n.localize('SR5.Error.CantEditAppliedItemEffects'))
-        }
+    async toggleDisabled() {
+        // @ts-ignore
+        return this.update({disabled: !this.data.disabled});
+    }
 
-        return super.update(data, options);
+    async disable(disabled) {
+        // @ts-ignore
+        return this.update({disabled});
     }
 }

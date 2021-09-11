@@ -13,6 +13,7 @@ import SkillField = Shadowrun.SkillField;
 import DeviceData = Shadowrun.DeviceData;
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
 import {MatrixRules} from "../rules/MatrixRules";
+import {SR5ActiveEffect} from "../effect/SR5ActiveEffect";
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
@@ -968,8 +969,13 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
                 });
             }
 
-            // Handle active effects based on equiped status.
+            // Handle active effects based on equipped status.
+            this.actor.effects.forEach(effect => {
+                if (effect.data.origin !== item.uuid) return;
 
+                // @ts-ignore
+                effect.disable(item.isEquipped());
+            })
 
             // @ts-ignore // TODO: foundry-vtt-types 0.8 has no Document support yet
             await this.actor.updateEmbeddedDocuments('Item', newItems);

@@ -45,10 +45,10 @@ export async function onManageActiveEffect(event, owner: SR5Actor|SR5Item) {
             return effect.delete();
 
         case "toggle":
-            return effect.update({disabled: !effect.data.disabled});
-
+            // return effect.update({disabled: !effect.data.disabled});
+            return effect.toggleDisabled();
         case "open-origin":
-            return effect.renderOriginSheet();
+            return effect.renderSourceSheet();
 
         default:
             console.error(`An active effect with the id '${effect}' couldn't be managed as no action has been defined within the template.`);
