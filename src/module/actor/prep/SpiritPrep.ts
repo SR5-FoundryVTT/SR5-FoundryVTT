@@ -25,7 +25,6 @@ export class SpiritPrep {
 
         AttributesPrep.prepareAttributes(data);
         SkillsPrep.prepareSkills(data);
-
     }
 
     static prepareDerivedData(data: SpiritData, items: SR5ItemDataWrapper[]) {

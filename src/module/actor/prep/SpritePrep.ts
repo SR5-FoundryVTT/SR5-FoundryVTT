@@ -37,6 +37,7 @@ export class SpritePrep {
         InitiativePrep.prepareCurrentInitiative(data);
 
         SpritePrep.prepareSpriteConditionMonitor(data);
+        SpritePrep.prepareSpriteInitiative(data);
     }
 
     static prepareSpriteSpecial(data: SpriteData) {

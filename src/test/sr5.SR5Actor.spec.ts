@@ -59,11 +59,5 @@ export const shadowrunSR5Actor = context => {
             const ownedInCollection = game.items.get(ownedItem.id);
             assert.isNotOk(ownedInCollection);
         });
-
-        describe('Active Effects', () => {
-            it('Should apply all owned items active effects', async () => {
-                assert.isOk(false);
-            });
-        })
     });
 }

@@ -62,13 +62,14 @@ export const DEFAULT_ID_LENGTH = 16;
 // Contain data regarding shadowrun rules, mostly whatever is stated in some table to be looked up in other places.
 export const SR = {
     combat: {
+        // Modifiers to use for the different levels / ranges for environmental modifiers.
         environmental: {
             range_modifiers: {
                 short: 0,
                 medium: -1,
                 long: -3,
                 extreme: -6,
-                // A modifier of zero will allow for users/gm to still test oor targets with their own judgement.
+                // A modifier of zero will allow for users/gm to still test for targets with their own judgement.
                 out_of_range: 0
             },
             levels: {
@@ -97,6 +98,8 @@ export const SR = {
         }
     },
     attributes: {
+        // Use for min/max value ranges (general). This will need expanding for different metatypes, should that ever
+        // come to  be.
         ranges: {
             magic: {min: 0},
             edge: {min: 0},
@@ -116,6 +119,11 @@ export const SR = {
             firewall: {min: 0},
             host_rating: {min: 0, max: 12}
         },
+        // Use for initial default values that aren't simply range.<>.min values.
+        defaults: {
+            essence: 6
+        },
+        // Reaction would be displayed as REA, when set to 3.
         SHORT_NAME_LENGTH: 3
     },
     skill: {
