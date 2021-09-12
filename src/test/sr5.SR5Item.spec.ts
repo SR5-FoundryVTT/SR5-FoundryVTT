@@ -15,7 +15,8 @@ export const shadowrunSR5Item = context => {
         async delete(id) {
             const item = this.items[id];
             if (!item) return;
-            await Item.delete(item.data._id);
+            // @ts-ignore // foundry-vtt-types 0.9
+            await Item.deleteDocuments([item.data._id]);
             delete this.items[item.id];
         }
 
@@ -61,7 +62,7 @@ export const shadowrunSR5Item = context => {
             assert.propertyVal(item.data.data, 'test', true);
         });
 
-        it('Should embedd an ammo into a weapon and not the global item collection', async () => {
+        it('Should embedd a ammo into a weapon and not the global item collection', async () => {
             const weapon = await testing.create({type: 'weapon'});
             const ammo = await testing.create({type: 'ammo'});
 
@@ -76,7 +77,7 @@ export const shadowrunSR5Item = context => {
 
             // An embedded item should NOT appear in the items collection.
             const embeddedAmmoInCollection = game.items.get(embeddedAmmoData._id);
-            assert.strictEqual(embeddedAmmoInCollection, null);
+            assert.strictEqual(embeddedAmmoInCollection, undefined);
         });
 
         it('Should update an embedded ammo', async () => {
