@@ -4,7 +4,7 @@ export const shadowrunSR5Item = context => {
     /**
      * Setup handling for all items within this test.
      */
-    class TestingItems {
+    class TestingItem {
         items: Record<string, SR5Item> = {};
         async create(data) {
             // @ts-ignore
@@ -27,19 +27,19 @@ export const shadowrunSR5Item = context => {
 
 
     const {describe, it, assert, before, after} = context;
-    let testing;
+    let testItem;
 
     before(async () => {
-        testing = new TestingItems();
+        testItem = new TestingItem();
     })
 
     after(async () => {
-        await testing.teardown();
+        await testItem.teardown();
     })
 
     describe('SR5Items', () => {
         it('Should create a naked item of any type', async () => {
-            const item = await testing.create({type: 'action'});
+            const item = await testItem.create({type: 'action'});
 
             // Check basic foundry data integrity
             assert.notStrictEqual(item.id, '');
@@ -53,7 +53,7 @@ export const shadowrunSR5Item = context => {
         });
 
         it('Should update an item of any type', async () => {
-            const item = await testing.create({type: 'action'});
+            const item = await testItem.create({type: 'action'});
 
             assert.notProperty(item.data.data, 'test');
             await item.update({'data.test': true});
@@ -63,8 +63,8 @@ export const shadowrunSR5Item = context => {
         });
 
         it('Should embedd a ammo into a weapon and not the global item collection', async () => {
-            const weapon = await testing.create({type: 'weapon'});
-            const ammo = await testing.create({type: 'ammo'});
+            const weapon = await testItem.create({type: 'weapon'});
+            const ammo = await testItem.create({type: 'ammo'});
 
             await weapon.createOwnedItem(ammo.data);
 
@@ -81,8 +81,8 @@ export const shadowrunSR5Item = context => {
         });
 
         it('Should update an embedded ammo', async () => {
-            const weapon = await testing.create({type: 'weapon'});
-            const ammo = await testing.create({type: 'ammo'});
+            const weapon = await testItem.create({type: 'weapon'});
+            const ammo = await testItem.create({type: 'ammo'});
 
             // Embed the item and get
             await weapon.createOwnedItem(ammo.data);
