@@ -1,36 +1,15 @@
 import {SR5Item} from "../module/item/SR5Item";
+import {SR5TestingDocuments} from "./utils";
 
 export const shadowrunSR5Item = context => {
     /**
      * Setup handling for all items within this test.
      */
-    class TestingItem {
-        items: Record<string, SR5Item> = {};
-        async create(data) {
-            // @ts-ignore
-            const item = await Item.create({name: '#QUENCH_TEST_ITEM_SHOULD_HAVE_BEEN_DELETED', ...data}) as SR5Item;
-            this.items[item.id] = item;
-            return item;
-        }
-        async delete(id) {
-            const item = this.items[id];
-            if (!item) return;
-            // @ts-ignore // foundry-vtt-types 0.9
-            await Item.deleteDocuments([item.data._id]);
-            delete this.items[item.id];
-        }
-
-        async teardown() {
-            Object.values(this.items).forEach(item => this.delete(item.id));
-        }
-    }
-
-
-    const {describe, it, assert, before, after} = context;
+        const {describe, it, assert, before, after} = context;
     let testItem;
 
     before(async () => {
-        testItem = new TestingItem();
+        testItem = new SR5TestingDocuments(SR5Item);
     })
 
     after(async () => {
