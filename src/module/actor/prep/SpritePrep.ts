@@ -1,4 +1,3 @@
-import SpriteActorData = Shadowrun.SpriteData;
 import { SkillsPrep } from './functions/SkillsPrep';
 import { ModifiersPrep } from './functions/ModifiersPrep';
 import { InitiativePrep } from './functions/InitiativePrep';
@@ -12,38 +11,51 @@ import SpriteData = Shadowrun.SpriteData;
 import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 
 
-export function SpritePrepareDerivedData(data: SpriteData, items: SR5ItemDataWrapper[]) {
-    ModifiersPrep.prepareModifiers(data);
-    ModifiersPrep.clearAttributeMods(data);
-
-    SpritePrep.prepareSpriteData(data);
-    MatrixPrep.prepareAttributesForDevice(data);
-
-    SkillsPrep.prepareSkills(data);
-    AttributesPrep.prepareAttributes(data);
-    LimitsPrep.prepareLimits(data);
-
-    MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
-
-    InitiativePrep.prepareCurrentInitiative(data);
-
-    data.special = 'resonance';
-}
 /**
  * Prepare a Sprite Type of Actor
  */
 export class SpritePrep {
-    /**
-     * Prepares basic Sprite specific data
-     * - matrix attribute values
-     * - device rating
-     * - matrix condition monitor
-     * - matrix initiative
-     * - skills
-     * @param data
-     */
-    static prepareSpriteData(data: SpriteActorData) {
-        const { level, skills, matrix, spriteType, initiative, attributes, modifiers } = data;
+    static prepareBaseData(data: SpriteData) {
+        SpritePrep.prepareSpriteSpecial(data);
+
+        ModifiersPrep.prepareModifiers(data);
+        ModifiersPrep.clearAttributeMods(data);
+
+        SpritePrep.prepareSpriteMatrixAttributes(data);
+        SpritePrep.prepareSpriteAttributes(data);
+        SpritePrep.prepareSpriteSkills(data);
+
+        AttributesPrep.prepareAttributes(data);
+        SkillsPrep.prepareSkills(data);
+    }
+
+    static prepareDerivedData(data: SpriteData, items: SR5ItemDataWrapper[]) {
+        LimitsPrep.prepareLimits(data);
+
+        MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
+
+        InitiativePrep.prepareCurrentInitiative(data);
+
+        SpritePrep.prepareSpriteConditionMonitor(data);
+    }
+
+    static prepareSpriteSpecial(data: SpriteData) {
+        // Sprites are always awakened
+        data.special = 'resonance';
+    }
+
+    static prepareSpriteAttributes(data: SpriteData) {
+        const {attributes, level, spriteType} = data;
+
+        const overrides = this.getSpriteStatModifiers(spriteType);
+
+        // calculate resonance value
+        attributes.resonance.base = level + overrides.resonance;
+        Helpers.calcTotal(attributes.resonance);
+    }
+
+    static prepareSpriteMatrixAttributes(data: SpriteData) {
+        const {level, matrix, spriteType} = data;
 
         const matrixAtts = ['attack', 'sleaze', 'data_processing', 'firewall'];
 
@@ -57,6 +69,35 @@ export class SpritePrep {
             }
         });
 
+        matrix.rating = level;
+    }
+
+    static prepareSpriteSkills(data: SpriteData) {
+        const {skills, level, spriteType} = data;
+
+        const overrides = this.getSpriteStatModifiers(spriteType);
+
+        // apply skill levels
+        // clear skills that we don't have
+        for (const [skillId, skill] of Object.entries(skills.active)) {
+            skill.base = overrides.skills.find((s) => s === skillId) ? level : 0;
+        }
+    }
+
+    static prepareSpriteConditionMonitor(data: SpriteData) {
+        const {matrix, level} = data;
+
+        matrix.condition_monitor.max = 8 + Math.ceil(level / 2);
+    }
+
+    static prepareSpriteInitiative(data: SpriteData) {
+        const {initiative, level, spriteType, modifiers} = data;
+
+        // always in matrix perception
+        initiative.perception = 'matrix';
+
+        const overrides = this.getSpriteStatModifiers(spriteType);
+
         // setup initiative from overrides
         initiative.matrix.base.base = level * 2 + overrides.init;
         PartsList.AddUniquePart(initiative.matrix.base.mod, 'SR5.Bonus', modifiers['matrix_initiative']);
@@ -65,22 +106,6 @@ export class SpritePrep {
         initiative.matrix.dice.base = 4;
         PartsList.AddUniquePart(initiative.matrix.dice.mod, 'SR5.Bonus', modifiers['matrix_initiative_dice']);
         Helpers.calcTotal(initiative.matrix.dice);
-
-        // always in matrix perception
-        initiative.perception = 'matrix';
-
-        // calculate resonance value
-        attributes.resonance.base = level + overrides.resonance;
-        Helpers.calcTotal(attributes.resonance);
-
-        // apply skill levels
-        // clear skills that we don't have
-        for (const [skillId, skill] of Object.entries(skills.active)) {
-            skill.base = overrides.skills.find((s) => s === skillId) ? level : 0;
-        }
-
-        matrix.rating = level;
-        matrix.condition_monitor.max = 8 + Math.ceil(level / 2);
     }
 
     /**

@@ -11,33 +11,36 @@ import {SR5} from "../../config";
 import VehicleData = Shadowrun.VehicleData;
 import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 
-export function VehiclePrepareDerivedData(data: VehicleData, items: SR5ItemDataWrapper[]) {
-    ModifiersPrep.prepareModifiers(data);
-    ModifiersPrep.clearAttributeMods(data);
-
-    VehiclePrep.prepareVehicleStats(data);
-    VehiclePrep.prepareAttributes(data);
-    VehiclePrep.prepareLimits(data);
-
-    SkillsPrep.prepareSkills(data);
-    AttributesPrep.prepareAttributes(data);
-    LimitsPrep.prepareLimits(data);
-
-    VehiclePrep.prepareConditionMonitor(data);
-
-    MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
-    MatrixPrep.prepareAttributesForDevice(data);
-
-    VehiclePrep.prepareMovement(data);
-
-    VehiclePrep.prepareMeatspaceInit(data);
-    InitiativePrep.prepareMatrixInit(data);
-    InitiativePrep.prepareCurrentInitiative(data);
-
-    VehiclePrep.prepareArmor(data);
-}
 
 export class VehiclePrep {
+    static prepareBaseData(data: VehicleData) {
+        ModifiersPrep.prepareModifiers(data);
+        ModifiersPrep.clearAttributeMods(data);
+
+        VehiclePrep.prepareVehicleStats(data);
+        VehiclePrep.prepareAttributes(data);
+        VehiclePrep.prepareLimits(data);
+
+        AttributesPrep.prepareAttributes(data);
+        SkillsPrep.prepareSkills(data);
+    }
+
+    static prepareDerivedData(data: VehicleData, items: SR5ItemDataWrapper[]) {
+        LimitsPrep.prepareLimits(data);
+        VehiclePrep.prepareConditionMonitor(data);
+
+        MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
+        MatrixPrep.prepareAttributesForDevice(data);
+
+        VehiclePrep.prepareMovement(data);
+
+        VehiclePrep.prepareMeatspaceInit(data);
+        InitiativePrep.prepareMatrixInit(data);
+        InitiativePrep.prepareCurrentInitiative(data);
+
+        VehiclePrep.prepareArmor(data);
+    }
+
     static prepareVehicleStats(data: VehicleData) {
         const { vehicle_stats, isOffRoad } = data;
         // set the value for the stats

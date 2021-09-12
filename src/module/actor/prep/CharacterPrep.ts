@@ -12,41 +12,6 @@ import { NPCPrep } from './functions/NPCPrep';
 import CharacterData = Shadowrun.CharacterData;
 import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
 
-export function CharacterPrepareDerivedData(data: CharacterData, items: SR5ItemDataWrapper[]) {
-    // ModifiersPrep.prepareModifiers(data);
-    // ModifiersPrep.clearAttributeMods(data);
-
-    // ItemPrep.prepareArmor(data, items);
-    // ItemPrep.prepareBodyware(data, items);
-
-    // SkillsPrep.prepareSkills(data);
-    // AttributesPrep.prepareAttributes(data);
-
-    // NPCPrep is reliant to be called after AttributesPrep.
-    // NPCPrep.prepareNPCData(data);
-
-    // LimitsPrep.prepareLimitBaseFromAttributes(data);
-    // LimitsPrep.prepareLimits(data);
-
-    // MatrixPrep.prepareMatrix(data, items);
-    // MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
-
-    // if (data.is_npc && data.npc.is_grunt) {
-    //     ConditionMonitorsPrep.prepareGrunt(data);
-    // } else {
-    //     ConditionMonitorsPrep.preparePhysical(data);
-    //     ConditionMonitorsPrep.prepareStun(data);
-    // }
-    //
-    // MovementPrep.prepareMovement(data);
-    // WoundsPrep.prepareWounds(data);
-    //
-    // InitiativePrep.prepareMeatspaceInit(data);
-    // InitiativePrep.prepareAstralInit(data);
-    // InitiativePrep.prepareMatrixInit(data);
-    // InitiativePrep.prepareCurrentInitiative(data);
-}
-
 export class CharacterPrep {
     static prepareBaseData(data: CharacterData) {
         ModifiersPrep.prepareModifiers(data);

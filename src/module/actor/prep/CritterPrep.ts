@@ -1,39 +1,45 @@
-import { InitiativePrep } from './functions/InitiativePrep';
-import { ModifiersPrep } from './functions/ModifiersPrep';
-import { MatrixPrep } from './functions/MatrixPrep';
-import { ItemPrep } from './functions/ItemPrep';
-import { SkillsPrep } from './functions/SkillsPrep';
-import { LimitsPrep } from './functions/LimitsPrep';
-import { ConditionMonitorsPrep } from './functions/ConditionMonitorsPrep';
-import { MovementPrep } from './functions/MovementPrep';
-import { WoundsPrep } from './functions/WoundsPrep';
-import { AttributesPrep } from './functions/AttributesPrep';
-import CritterData = Shadowrun.CritterData;
+import {InitiativePrep} from './functions/InitiativePrep';
+import {ModifiersPrep} from './functions/ModifiersPrep';
+import {MatrixPrep} from './functions/MatrixPrep';
+import {ItemPrep} from './functions/ItemPrep';
+import {SkillsPrep} from './functions/SkillsPrep';
+import {LimitsPrep} from './functions/LimitsPrep';
+import {ConditionMonitorsPrep} from './functions/ConditionMonitorsPrep';
+import {MovementPrep} from './functions/MovementPrep';
+import {WoundsPrep} from './functions/WoundsPrep';
+import {AttributesPrep} from './functions/AttributesPrep';
 import {SR5ItemDataWrapper} from "../../data/SR5ItemDataWrapper";
+import CritterData = Shadowrun.CritterData;
 
-export function CritterPrepareDerivedData(data: CritterData, items: SR5ItemDataWrapper[]) {
-    ModifiersPrep.prepareModifiers(data);
-    ModifiersPrep.clearAttributeMods(data);
 
-    ItemPrep.prepareArmor(data, items);
-    ItemPrep.prepareBodyware(data, items);
+export class CritterPrep {
+    static prepareBaseData(data: CritterData) {
+        ModifiersPrep.prepareModifiers(data);
+        ModifiersPrep.clearAttributeMods(data);
 
-    SkillsPrep.prepareSkills(data);
-    AttributesPrep.prepareAttributes(data);
-    LimitsPrep.prepareLimitBaseFromAttributes(data);
-    LimitsPrep.prepareLimits(data);
+        AttributesPrep.prepareAttributes(data);
+        SkillsPrep.prepareSkills(data);
+    }
 
-    MatrixPrep.prepareMatrix(data, items);
-    MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
+    static prepareDerivedData(data: CritterData, items: SR5ItemDataWrapper[]) {
+        ItemPrep.prepareArmor(data, items);
+        ItemPrep.prepareBodyware(data, items);
 
-    ConditionMonitorsPrep.preparePhysical(data);
-    ConditionMonitorsPrep.prepareStun(data);
+        MatrixPrep.prepareMatrix(data, items);
+        MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
 
-    MovementPrep.prepareMovement(data);
-    WoundsPrep.prepareWounds(data);
+        LimitsPrep.prepareLimitBaseFromAttributes(data);
+        LimitsPrep.prepareLimits(data);
 
-    InitiativePrep.prepareMeatspaceInit(data);
-    InitiativePrep.prepareAstralInit(data);
-    InitiativePrep.prepareMatrixInit(data);
-    InitiativePrep.prepareCurrentInitiative(data);
+        ConditionMonitorsPrep.preparePhysical(data);
+        ConditionMonitorsPrep.prepareStun(data);
+
+        MovementPrep.prepareMovement(data);
+        WoundsPrep.prepareWounds(data);
+
+        InitiativePrep.prepareMeatspaceInit(data);
+        InitiativePrep.prepareAstralInit(data);
+        InitiativePrep.prepareMatrixInit(data);
+        InitiativePrep.prepareCurrentInitiative(data);
+    }
 }

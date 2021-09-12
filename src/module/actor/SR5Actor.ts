@@ -35,10 +35,10 @@ import {SR5} from "../config";
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
 import {CharacterPrep} from "./prep/CharacterPrep";
 import {SR5ItemDataWrapper} from "../data/SR5ItemDataWrapper";
-import {CritterPrepareDerivedData} from "./prep/CritterPrep";
-import {SpiritPrepareDerivedData} from "./prep/SpiritPrep";
-import {SpritePrepareDerivedData} from "./prep/SpritePrep";
-import {VehiclePrepareDerivedData} from "./prep/VehiclePrep";
+import {CritterPrep} from "./prep/CritterPrep";
+import {SpiritPrep} from "./prep/SpiritPrep";
+import {SpritePrep} from "./prep/SpritePrep";
+import {VehiclePrep} from "./prep/VehiclePrep";
 import SpiritActorData = Shadowrun.SpiritActorData;
 import CharacterData = Shadowrun.CharacterData;
 import CharacterActorData = Shadowrun.CharacterActorData;
@@ -51,7 +51,7 @@ import ICActorData = Shadowrun.ICActorData;
 import {SkillRules} from "../rules/SkillRules";
 import MatrixData = Shadowrun.MatrixData;
 import {MatrixRules} from "../rules/MatrixRules";
-import {ICPrepareDerivedData} from "./prep/ICPrep";
+import {ICPrep} from "./prep/ICPrep";
 import HostItemData = Shadowrun.HostItemData;
 import MarkedDocument = Shadowrun.MarkedDocument;
 
@@ -106,21 +106,21 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
             case 'character':
                 CharacterPrep.prepareBaseData(this.data.data);
                 break;
-            // case "critter":
-            //     CritterPrepareDerivedData(this.data.data);
-            //     break;
-            // case "spirit":
-            //     SpiritPrepareDerivedData(this.data.data);
-            //     break;
-            // case "sprite":
-            //     SpritePrepareDerivedData(this.data.data);
-            //     break;
-            // case "vehicle":
-            //     VehiclePrepareDerivedData(this.data.data);
-            //     break;
-            // case "ic":
-            //     ICPrepareDerivedData(this.data.data);
-            //     break;
+            case "critter":
+                CritterPrep.prepareBaseData(this.data.data);
+                break;
+            case "spirit":
+                SpiritPrep.prepareBaseData(this.data.data);
+                break;
+            case "sprite":
+                SpritePrep.prepareBaseData(this.data.data);
+                break;
+            case "vehicle":
+                VehiclePrep.prepareBaseData(this.data.data);
+                break;
+            case "ic":
+                ICPrep.prepareBaseData(this.data.data);
+                break;
         }
     }
 
@@ -151,19 +151,19 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
                 CharacterPrep.prepareDerivedData(this.data.data, itemDataWrappers);
                 break;
             case "critter":
-                CritterPrepareDerivedData(this.data.data, itemDataWrappers);
+                CritterPrep.prepareDerivedData(this.data.data, itemDataWrappers);
                 break;
             case "spirit":
-                SpiritPrepareDerivedData(this.data.data, itemDataWrappers);
+                SpiritPrep.prepareDerivedData(this.data.data, itemDataWrappers);
                 break;
             case "sprite":
-                SpritePrepareDerivedData(this.data.data, itemDataWrappers);
+                SpritePrep.prepareDerivedData(this.data.data, itemDataWrappers);
                 break;
             case "vehicle":
-                VehiclePrepareDerivedData(this.data.data, itemDataWrappers);
+                VehiclePrep.prepareDerivedData(this.data.data, itemDataWrappers);
                 break;
             case "ic":
-                ICPrepareDerivedData(this.data.data, itemDataWrappers);
+                ICPrep.prepareDerivedData(this.data.data, itemDataWrappers);
                 break;
         }
     }

@@ -12,44 +12,45 @@ import DeviceAttribute = Shadowrun.DeviceAttribute;
 import {SkillsPrep} from "./functions/SkillsPrep";
 
 
-export function ICPrepareDerivedData(data: ICData, items: SR5ItemDataWrapper[]) {
-    // Add missing values on actor creation
-    ICPrep.addMissingTracks(data);
-
-    // Base value preparations.
-    ICPrep.prepareModifiers(data);
-    ModifiersPrep.clearAttributeMods(data);
-
-    ICPrep.prepareHostAttributes(data);
-    ICPrep.hideMeatAttributes(data);
-    ICPrep.prepareMeatAttributes(data);
-    ICPrep.prepareMatrixAttributes(data);
-    MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
-
-    // Derived value preparations
-    ICPrep.prepareMatrix(data);
-    ICPrep.prepareMatrixTrack(data);
-
-    ICPrep.prepareMatrixInit(data);
-    InitiativePrep.prepareCurrentInitiative(data);
-
-    // Common data preparations.
-    SkillsPrep.prepareSkills(data);
-}
-
-
 export class ICPrep {
+    static prepareBaseData(data: ICData) {
+        ICPrep.addMissingTracks(data);
+
+        ICPrep.prepareModifiers(data);
+        ModifiersPrep.clearAttributeMods(data);
+
+        ICPrep.hideMeatAttributes(data);
+        ICPrep.prepareMatrixAttributes(data);
+
+        SkillsPrep.prepareSkills(data);
+    }
+
+    static prepareDerivedData(data: ICData, items: SR5ItemDataWrapper[]) {
+        ICPrep.prepareHostAttributes(data);
+        ICPrep.prepareMeatAttributes(data);
+
+        MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
+
+        ICPrep.prepareMatrix(data);
+        ICPrep.prepareMatrixTrack(data);
+
+        ICPrep.prepareMatrixInit(data);
+        InitiativePrep.prepareCurrentInitiative(data);
+    }
+
     /**
      * On initial actor creation the matrix track will be missing.
      *
      * This is intentional as not to pollute template.json with actor type specific data.
      *
      */
-    static addMissingTracks(data) {
+    static addMissingTracks(data: ICData) {
         // Newly created actors SHOULD have this by template.
         // Legacy actors MIGHT not have it, therefore make sure it's their.
         const track = data.track || {};
+        // @ts-ignore
         if (!track.matrix) track.matrix = DefaultValues.trackData();
+        // @ts-ignore
         data.track = track;
     }
 
@@ -57,31 +58,31 @@ export class ICPrep {
      * Add IC modifiers only to the misc tab.
      * @param data
      */
-    static prepareModifiers(data) {
+    static prepareModifiers(data: ICData) {
         let modifiers = ModifiersPrep.commonModifiers;
         modifiers = modifiers.concat(ModifiersPrep.matrixModifiers);
         ModifiersPrep.setupModifiers(data, modifiers);
     }
 
-    static prepareMatrix(data) {
+    static prepareMatrix(data: ICData) {
         data.matrix.rating = MatrixRules.getICDeviceRating(data.host.rating);
     }
 
-    static prepareMatrixTrack(data) {
+    static prepareMatrixTrack(data: ICData) {
         const { modifiers, track, matrix } = data;
 
         // Prepare internal matrix condition monitor values
         // LEGACY: matrix.condition_monitor is no TrackType. It will only be used as a info, should ever be needed anywhere
-        matrix.condition_monitor.max = Number(modifiers['matrix_track']) + MatrixRules.getConditionMonitor(matrix.rating);
+        matrix.condition_monitor.max = Number(modifiers['matrix_track']) + MatrixRules.getConditionMonitor(matrix.rating as number);
 
         // Prepare user visible matrix track values
-        track.matrix.base = MatrixRules.getConditionMonitor(matrix.rating);
+        track.matrix.base = MatrixRules.getConditionMonitor(matrix.rating as number);
         track.matrix.mod = PartsList.AddUniquePart(track.matrix.mod, "SR5.Bonus", Number(modifiers['matrix_track']));
         track.matrix.max = matrix.condition_monitor.max;
         track.matrix.label = SR5.damageTypes.matrix;
     }
 
-    static prepareMatrixInit(data) {
+    static prepareMatrixInit(data: ICData) {
         const { initiative, modifiers, host } = data;
 
 
