@@ -13,7 +13,7 @@ const tsify = require('tsify');
 const babelify = require('babelify');
 
 // Sass
-const gulpsass = require('gulp-sass');
+const gulpsass = require('gulp-sass')(require('node-sass'));
 gulpsass.compiler = require('node-sass');
 
 // Gulp
@@ -142,27 +142,27 @@ async function linkUserData() {
     const projectConfig = fs.readJSONSync(path.resolve('.', 'system.json'));
 
     let name = projectConfig.name;
-	try {
-		let linkDir;
-		if (config.dataPath) {
-			if (!fs.existsSync(path.join(config.dataPath, 'Data')))
-				throw Error('User Data path invalid, no Data directory found');
+    try {
+        let linkDir;
+        if (config.dataPath) {
+            if (!fs.existsSync(path.join(config.dataPath, 'Data')))
+                throw Error('User Data path invalid, no Data directory found');
 
-			linkDir = path.join(config.dataPath, 'Data', 'systems', name);
-		} else {
-			throw Error('No User Data path defined in foundryconfig.json');
-		}
+            linkDir = path.join(config.dataPath, 'Data', 'systems', name);
+        } else {
+            throw Error('No User Data path defined in foundryconfig.json');
+        }
 
-		if (!fs.existsSync(linkDir)) {
-			console.log(
-				chalk.green(`Copying build to ${chalk.blueBright(linkDir)}`)
-			);
-			await fs.symlink(path.resolve('./'), linkDir);
-		}
-		return Promise.resolve();
-	} catch (err) {
-		Promise.reject(err);
-	}
+        if (!fs.existsSync(linkDir)) {
+            console.log(
+                chalk.green(`Copying build to ${chalk.blueBright(linkDir)}`)
+            );
+            await fs.symlink(path.resolve('./'), linkDir);
+        }
+        return Promise.resolve();
+    } catch (err) {
+        Promise.reject(err);
+    }
 }
 
 exports.clean = cleanDist;
