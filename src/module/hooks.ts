@@ -6,6 +6,7 @@ import { SR5Actor } from './actor/SR5Actor';
 import { SR5ActorSheet } from './actor/SR5ActorSheet';
 import { SR5Item } from './item/SR5Item';
 import { SR5ItemSheet } from './item/SR5ItemSheet';
+import { SR5Token } from './token/SR5Token';
 import { ShadowrunRoller } from './rolls/ShadowrunRoller';
 import { Helpers } from './helpers';
 import { HandlebarManager } from './handlebars/HandlebarManager';
@@ -78,6 +79,8 @@ ___________________
         CONFIG.Item.documentClass = SR5Item;
         // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
         CONFIG.Combat.documentClass = SR5Combat;
+        // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
+        CONFIG.Token.objectClass = SR5Token;
         // Register initiative directly (outside of system.json) as DnD5e does it.
         CONFIG.Combat.initiative.formula =  "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
         // @ts-ignore

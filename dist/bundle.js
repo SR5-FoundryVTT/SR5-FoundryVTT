@@ -25866,6 +25866,7 @@ const SR5Actor_1 = require("./actor/SR5Actor");
 const SR5ActorSheet_1 = require("./actor/SR5ActorSheet");
 const SR5Item_1 = require("./item/SR5Item");
 const SR5ItemSheet_1 = require("./item/SR5ItemSheet");
+const SR5Token_1 = require("./token/SR5Token");
 const ShadowrunRoller_1 = require("./rolls/ShadowrunRoller");
 const helpers_1 = require("./helpers");
 const HandlebarManager_1 = require("./handlebars/HandlebarManager");
@@ -25927,6 +25928,8 @@ ___________________
         CONFIG.Item.documentClass = SR5Item_1.SR5Item;
         // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
         CONFIG.Combat.documentClass = SR5Combat_1.SR5Combat;
+        // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
+        CONFIG.Token.objectClass = SR5Token_1.SR5Token;
         // Register initiative directly (outside of system.json) as DnD5e does it.
         CONFIG.Combat.initiative.formula = "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
         // @ts-ignore
@@ -26109,7 +26112,7 @@ ___________________
 }
 exports.HooksManager = HooksManager;
 
-},{"../test/quench":221,"./actor/SR5Actor":85,"./actor/SR5ActorSheet":86,"./actor/sheets/SR5ICActorSheet":108,"./apps/ChangelogApplication":109,"./apps/EnvModifiersApplication":110,"./apps/gmtools/OverwatchScoreTracker":137,"./canvas":141,"./chat":142,"./combat/SR5Combat":143,"./config":144,"./constants":145,"./handlebars/HandlebarManager":152,"./helpers":157,"./importer/apps/import-form":159,"./item/SR5Item":197,"./item/SR5ItemSheet":198,"./item/flows/DeviceFlow":201,"./macros":203,"./migrator/Migrator":205,"./rolls/ShadowrunRoller":212,"./settings":218}],159:[function(require,module,exports){
+},{"../test/quench":222,"./actor/SR5Actor":85,"./actor/SR5ActorSheet":86,"./actor/sheets/SR5ICActorSheet":108,"./apps/ChangelogApplication":109,"./apps/EnvModifiersApplication":110,"./apps/gmtools/OverwatchScoreTracker":137,"./canvas":141,"./chat":142,"./combat/SR5Combat":143,"./config":144,"./constants":145,"./handlebars/HandlebarManager":152,"./helpers":157,"./importer/apps/import-form":159,"./item/SR5Item":197,"./item/SR5ItemSheet":198,"./item/flows/DeviceFlow":201,"./macros":203,"./migrator/Migrator":205,"./rolls/ShadowrunRoller":212,"./settings":218,"./token/SR5Token":221}],159:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -34152,6 +34155,25 @@ exports.default = Template;
 },{}],221:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.SR5Token = void 0;
+class SR5Token extends Token {
+    _drawBar(number, bar, data) {
+        // FoundryVTT draws resource bars as full/good when the value is the
+        // same as the max and empty/bad at 0 (colored along a gradient).
+        // Shadowrun condition trackers count up from 0 to the maximum.
+        // We flip the values from Shadowrun format to FoundryVTT format here
+        // for drawing.
+        if (data.attribute.startsWith('track')) {
+            data.value = data.max - data.value;
+        }
+        super._drawBar(number, bar, data);
+    }
+}
+exports.SR5Token = SR5Token;
+
+},{}],222:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 exports.quenchRegister = void 0;
 const sr5_Modifiers_spec_1 = require("./sr5.Modifiers.spec");
 const sr5_SR5Item_spec_1 = require("./sr5.SR5Item.spec");
@@ -34170,7 +34192,7 @@ const quenchRegister = quench => {
 };
 exports.quenchRegister = quenchRegister;
 
-},{"./sr5.Matrix.spec":222,"./sr5.Modifiers.spec":223,"./sr5.SR5Item.spec":224}],222:[function(require,module,exports){
+},{"./sr5.Matrix.spec":223,"./sr5.Modifiers.spec":224,"./sr5.SR5Item.spec":225}],223:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shadowrunMatrix = void 0;
@@ -34221,7 +34243,7 @@ const shadowrunMatrix = context => {
 };
 exports.shadowrunMatrix = shadowrunMatrix;
 
-},{"../module/rules/MatrixRules":214}],223:[function(require,module,exports){
+},{"../module/rules/MatrixRules":214}],224:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shadowrunRulesModifiers = void 0;
@@ -34390,7 +34412,7 @@ const shadowrunRulesModifiers = context => {
 };
 exports.shadowrunRulesModifiers = shadowrunRulesModifiers;
 
-},{"../module/rules/Modifiers":215}],224:[function(require,module,exports){
+},{"../module/rules/Modifiers":215}],225:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
