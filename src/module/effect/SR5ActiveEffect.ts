@@ -48,10 +48,6 @@ export class SR5ActiveEffect extends ActiveEffect {
 
     /**
      * Apply a modification to a ModifiableValue (has a .mod property).
-     *
-     *
-     * @param actor
-     * @param change
      * @protected
      */
     protected _applyModify(actor: SR5Actor, change: ActiveEffect.Change) {
@@ -74,7 +70,11 @@ export class SR5ActiveEffect extends ActiveEffect {
         return update;
     }
 
-    protected _applyAdd(actor: Actor, change: ActiveEffect.Change) {
+    /**
+     * Keep the default foundry implementation for the ADD mode but hijack into a MODIFY mode in case of a ModifableValue
+     * @protected
+     */
+    protected _applyAdd(actor: SR5Actor, change: ActiveEffect.Change) {
         const {key, value} = change;
         // @ts-ignore
         const current = foundry.utils.getProperty(actor.data, key) ?? null;
@@ -82,34 +82,13 @@ export class SR5ActiveEffect extends ActiveEffect {
         const ct = foundry.utils.getType(current);
         let update = null;
 
-        // Handle different types of the current data
-        switch (ct) {
-            case "null":
-                update = value;
-                break;
-            case "string":
-                update = current + String(value);
-                break;
-            case "number":
-                if (Number.isNumeric(value)) update = current + Number(value);
-                break;
-            case "Array":
+        const nodes = key.split('.');
+        const isModArray = nodes[nodes.length - 1] === 'mod' && ct === 'Array';
 
-                const nodes = key.split('.');
-                const isModArray = nodes[nodes.length - 1] === 'mod';
-                if (isModArray) {
-                    const mod = {name: this.data.label, value: Number(value)};
-                    update = current.concat([mod]);
-                } else {
-                    // @ts-ignore
-                    const at = foundry.utils.getType(current[0]);
-                    // @ts-ignore
-                    if (!current.length || (foundry.utils.getType(value) === at)) update = current.concat([value]);
-                }
+        if (isModArray) {
+            return this._applyModify(actor, change);
+        } else {
+            return super._applyAdd(actor, change);
         }
-        if (update !== null) { // @ts-ignore
-            foundry.utils.setProperty(actor.data, key, update);
-        }
-        return update;
     }
 }
