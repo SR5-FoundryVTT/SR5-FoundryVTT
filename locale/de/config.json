@@ -860,6 +860,9 @@
         "Temporary": "Temporary Effects",
         "Passive": "Passive Effects",
         "Inactive": "Inactive Effects"
+      },
+      "Modes": {
+        "Modify": "Modifizieren"
       }
     }
   }

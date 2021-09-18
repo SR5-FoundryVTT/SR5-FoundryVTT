@@ -1,3 +1,5 @@
+import {SR5Actor} from "../actor/SR5Actor";
+
 export class SR5ActiveEffect extends ActiveEffect {
     /**
      * Can be used to determine if the origin of the effect is an document that is owned by another document.
@@ -38,6 +40,38 @@ export class SR5ActiveEffect extends ActiveEffect {
     async disable(disabled) {
         // @ts-ignore
         return this.update({disabled});
+    }
+
+    protected _applyCustom(actor: SR5Actor, change: ActiveEffect.Change) {
+        return this._applyModify(actor, change);
+    }
+
+    /**
+     * Apply a modification to a ModifiableValue (has a .mod property).
+     *
+     *
+     * @param actor
+     * @param change
+     * @protected
+     */
+    protected _applyModify(actor: SR5Actor, change: ActiveEffect.Change) {
+        const {key, value} = change;
+        // @ts-ignore
+        const current = foundry.utils.getProperty(actor.data, key) ?? null;
+        // @ts-ignore
+        const ct = foundry.utils.getType(current);
+        const nodes = key.split('.');
+        const isModArray = nodes[nodes.length - 1] === 'mod' && ct === 'Array';
+
+        const update = isModArray ?
+            current.concat([{name: this.data.label, value: Number(value)}]) :
+            null; // Foundry expects null for un-applied active effects.
+
+        // @ts-ignore
+        if (update !== null) foundry.utils.setProperty(actor.data, key, update);
+        else ui.notifications.error('ERROR');
+
+        return update;
     }
 
     protected _applyAdd(actor: Actor, change: ActiveEffect.Change) {
