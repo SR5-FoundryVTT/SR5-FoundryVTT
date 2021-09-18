@@ -16,16 +16,16 @@ export class VehiclePrep {
     static prepareBaseData(data: VehicleData) {
         ModifiersPrep.prepareModifiers(data);
         ModifiersPrep.clearAttributeMods(data);
+    }
 
+    static prepareDerivedData(data: VehicleData, items: SR5ItemDataWrapper[]) {
         VehiclePrep.prepareVehicleStats(data);
         VehiclePrep.prepareAttributes(data);
         VehiclePrep.prepareLimits(data);
 
         AttributesPrep.prepareAttributes(data);
         SkillsPrep.prepareSkills(data);
-    }
 
-    static prepareDerivedData(data: VehicleData, items: SR5ItemDataWrapper[]) {
         LimitsPrep.prepareLimits(data);
         VehiclePrep.prepareConditionMonitor(data);
 

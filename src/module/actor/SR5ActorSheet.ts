@@ -162,7 +162,7 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
             const cleanupAttribute = (attribute: MatrixAttribute) => {
                 const att = matrix[attribute];
                 if (att) {
-                    if (!att.mod) att.mod = {};
+                    if (!att.mod) att.mod = [];
                     if (att.temp === 0) delete att.temp;
                 }
             };

@@ -20,14 +20,14 @@ export class SpiritPrep {
 
         ModifiersPrep.prepareModifiers(data);
         ModifiersPrep.clearAttributeMods(data);
+    }
 
+    static prepareDerivedData(data: SpiritData, items: SR5ItemDataWrapper[]) {
         SpiritPrep.prepareSpiritBaseData(data);
 
         AttributesPrep.prepareAttributes(data);
         SkillsPrep.prepareSkills(data);
-    }
 
-    static prepareDerivedData(data: SpiritData, items: SR5ItemDataWrapper[]) {
         LimitsPrep.prepareLimitBaseFromAttributes(data);
         LimitsPrep.prepareLimits(data);
 

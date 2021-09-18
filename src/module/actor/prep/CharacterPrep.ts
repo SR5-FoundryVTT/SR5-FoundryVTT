@@ -16,12 +16,6 @@ export class CharacterPrep {
     static prepareBaseData(data: CharacterData) {
         ModifiersPrep.prepareModifiers(data);
         ModifiersPrep.clearAttributeMods(data);
-
-        AttributesPrep.prepareAttributes(data);
-        // NPCPrep is reliant to be called after AttributesPrep.
-        NPCPrep.prepareNPCData(data);
-
-        SkillsPrep.prepareSkills(data);
     }
 
     /**
@@ -33,6 +27,12 @@ export class CharacterPrep {
      * @param items
      */
     static prepareDerivedData(data: CharacterData, items: SR5ItemDataWrapper[]) {
+        AttributesPrep.prepareAttributes(data);
+        // NPCPrep is reliant to be called after AttributesPrep.
+        NPCPrep.prepareNPCData(data);
+
+        SkillsPrep.prepareSkills(data);
+
         ItemPrep.prepareArmor(data, items);
         ItemPrep.prepareBodyware(data, items);
 

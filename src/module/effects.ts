@@ -29,7 +29,7 @@ export async function onManageActiveEffect(event, owner: SR5Actor|SR5Item) {
         case "create":
             return owner.createEmbeddedDocuments('ActiveEffect', [{
                 label: game.i18n.localize("SR5.ActiveEffect.New"),
-                icon: "icons/svg/aura.svg",
+                // icon: "icons/svg/aura.svg",
                 origin: owner.uuid,
                 "duration.rounds": item.dataset.effectType === "temporary" ? 1 : undefined,
                 disabled: item.dataset.effectType === "inactive"

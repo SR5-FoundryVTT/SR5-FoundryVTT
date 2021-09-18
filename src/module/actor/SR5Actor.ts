@@ -122,6 +122,8 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
                 ICPrep.prepareBaseData(this.data.data);
                 break;
         }
+
+        // this.applyBaseDataActiveEffects();
     }
 
     /**
@@ -130,9 +132,14 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
     prepareEmbeddedEntities() {
         super.prepareEmbeddedEntities();
 
+        // @ts-ignore
         // NOTE: Hello there! Should you ever be in need of calling the grand parents methods, maybe to avoid applyActiveEffects,
         //       look at this beautiful piece of software and shiver in it's glory.
         // ClientDocumentMixin(class {}).prototype.prepareEmbeddedEntities.apply(this);
+    }
+
+    applyActiveEffects() {
+        super.applyActiveEffects();
     }
 
     /**
@@ -166,6 +173,61 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
                 ICPrep.prepareDerivedData(this.data.data, itemDataWrappers);
                 break;
         }
+
+        // this.applyDerivedDataActiveEffects();
+    }
+
+    // TODO: Remove these custom methods, when they aren't used anymore.
+    applyBaseDataActiveEffects() {
+        const baseData = ['data.attributes'];
+        this._applySomeActiveEffects(baseData);
+    }
+
+    applyDerivedDataActiveEffects() {
+        const derivedData = ['data.limits'];
+        this._applySomeActiveEffects(derivedData);
+    }
+
+    _applySomeActiveEffects(partialKeys: string[]) {
+        const changes = this._reduceEffectChangesByKeys(partialKeys);
+        this._applyActiveEffectChanges(changes);
+    }
+
+    _applyActiveEffectChanges(changes: ActiveEffectChange[]) {
+        const overrides = {};
+
+        for (const change of changes) {
+            // @ts-ignore
+            const result = change.effect.apply(this, change);
+            if (result !== null) overrides[change.key] = result;
+        }
+
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
+        this.overrides = {...this.overrides, ...foundry.utils.expandObject(overrides)};
+    }
+
+    _reduceEffectChangesByKeys(partialKeys: string[]): ActiveEffectChange[] {
+        // Collect only those changes matching the given partial keys.
+        const changes = this.effects.reduce((changes: ActiveEffectChange[], effect) => {
+            if (effect.data.disabled) return changes;
+
+            // include changes partially matching given keys.
+            return changes.concat(effect.data.changes
+                    .filter(change => partialKeys.some(partialKey => change.key.includes(partialKey)))
+                    .map(change => {
+                        // @ts-ignore // TODO: foundry-vtt-types 0.8
+                        change = foundry.utils.duplicate(change);
+                        // @ts-ignore
+                        change.effect = effect;
+                        change.priority = change.priority ?? (change.mode * 10);
+
+                        return change;
+                    }));
+        }, []);
+        // Sort changes according to priority, in case it's ever needed.
+        changes.sort((a, b) => a.priority - b.priority);
+
+        return changes;
     }
 
     getModifier(modifierName: string): NumberOrEmpty {

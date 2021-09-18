@@ -14,18 +14,18 @@ import {SkillsPrep} from "./functions/SkillsPrep";
 
 export class ICPrep {
     static prepareBaseData(data: ICData) {
-        ICPrep.addMissingTracks(data);
-
-        ICPrep.prepareModifiers(data);
         ModifiersPrep.clearAttributeMods(data);
 
+        ICPrep.addMissingTracks(data);
+        ICPrep.prepareModifiers(data);
         ICPrep.hideMeatAttributes(data);
-        ICPrep.prepareMatrixAttributes(data);
-
-        SkillsPrep.prepareSkills(data);
     }
 
     static prepareDerivedData(data: ICData, items: SR5ItemDataWrapper[]) {
+        ICPrep.prepareMatrixAttributes(data);
+
+        SkillsPrep.prepareSkills(data);
+
         ICPrep.prepareHostAttributes(data);
         ICPrep.prepareMeatAttributes(data);
 

@@ -20,16 +20,16 @@ export class SpritePrep {
 
         ModifiersPrep.prepareModifiers(data);
         ModifiersPrep.clearAttributeMods(data);
+    }
 
+    static prepareDerivedData(data: SpriteData, items: SR5ItemDataWrapper[]) {
         SpritePrep.prepareSpriteMatrixAttributes(data);
         SpritePrep.prepareSpriteAttributes(data);
         SpritePrep.prepareSpriteSkills(data);
 
         AttributesPrep.prepareAttributes(data);
         SkillsPrep.prepareSkills(data);
-    }
 
-    static prepareDerivedData(data: SpriteData, items: SR5ItemDataWrapper[]) {
         LimitsPrep.prepareLimits(data);
 
         MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
