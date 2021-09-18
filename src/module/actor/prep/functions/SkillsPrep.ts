@@ -26,7 +26,7 @@ export class SkillsPrep {
 
         // function that will set the total of a skill correctly
         const prepareSkill = (skill) => {
-            skill.mod = [];
+            // skill.mod = [];
             if (!skill.base) skill.base = 0;
             if (skill.bonus?.length) {
                 for (let bonus of skill.bonus) {

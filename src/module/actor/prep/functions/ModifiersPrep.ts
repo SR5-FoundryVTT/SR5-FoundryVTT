@@ -1,6 +1,10 @@
 import ActorTypesData = Shadowrun.ShadowrunActorDataData;
 import ShadowrunActorDataData = Shadowrun.ShadowrunActorDataData;
 import {SR5} from "../../../config";
+import CharacterData = Shadowrun.CharacterData;
+import CritterData = Shadowrun.CritterData;
+import SpiritData = Shadowrun.SpiritData;
+import VehicleData = Shadowrun.VehicleData;
 
 export class ModifiersPrep {
     /**
@@ -78,5 +82,11 @@ export class ModifiersPrep {
 
             attribute.mod = [];
         }
+    }
+
+    static clearArmorMods(data: CharacterData|CritterData|SpiritData|VehicleData) {
+        const {armor} = data;
+
+        armor.mod = [];
     }
 }

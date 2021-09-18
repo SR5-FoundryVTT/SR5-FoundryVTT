@@ -813,9 +813,11 @@
             "movement": {
                 "movement": {
                     "walk": {
+                        "mod": [],
                         "value": 1
                     },
                     "run": {
+                        "mod": [],
                         "value": 2
                     },
                     "sprint": 2,
@@ -1190,7 +1192,7 @@
             "armor": {
                 "armor": {
                     "value": 0,
-                    "mod": false,
+                    "mod": [],
                     "acid": 0,
                     "cold": 0,
                     "fire": 0,

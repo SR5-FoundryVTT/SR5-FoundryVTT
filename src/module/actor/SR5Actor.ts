@@ -175,6 +175,33 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         }
 
         // this.applyDerivedDataActiveEffects();
+        this.applyOverrideActiveEffects();
+    }
+
+    applyOverrideActiveEffects() {
+        const changes = this.effects.reduce((changes: ActiveEffectChange[], effect) => {
+            if (effect.data.disabled) return changes;
+
+            // include changes partially matching given keys.
+            return changes.concat(effect.data.changes
+                    .filter(change => change.mode === CONST.ACTIVE_EFFECT_MODES.OVERRIDE)
+                    .map(change => {
+                        // @ts-ignore // TODO: foundry-vtt-types 0.8
+                        change = foundry.utils.duplicate(change);
+                        // @ts-ignore
+                        change.effect = effect;
+                        change.priority = change.priority ?? (change.mode * 10);
+
+                        return change;
+                    }));
+        }, []);
+        // Sort changes according to priority, in case it's ever needed.
+        changes.sort((a, b) => a.priority - b.priority);
+
+        for (const change of changes) {
+            // @ts-ignore
+            change.effect.apply(this, change);
+        }
     }
 
     // TODO: Remove these custom methods, when they aren't used anymore.

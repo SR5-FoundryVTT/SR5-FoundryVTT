@@ -16,6 +16,7 @@ export class CharacterPrep {
     static prepareBaseData(data: CharacterData) {
         ModifiersPrep.prepareModifiers(data);
         ModifiersPrep.clearAttributeMods(data);
+        ModifiersPrep.clearArmorMods(data);
     }
 
     /**

@@ -16,6 +16,7 @@ export class VehiclePrep {
     static prepareBaseData(data: VehicleData) {
         ModifiersPrep.prepareModifiers(data);
         ModifiersPrep.clearAttributeMods(data);
+        ModifiersPrep.clearArmorMods(data);
     }
 
     static prepareDerivedData(data: VehicleData, items: SR5ItemDataWrapper[]) {

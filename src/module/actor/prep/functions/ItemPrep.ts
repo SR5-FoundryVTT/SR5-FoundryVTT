@@ -16,7 +16,10 @@ export class ItemPrep {
         const { armor } = data;
         armor.base = 0;
         armor.value = 0;
-        armor.mod = [];
+        // if (!isNaN(armor.mod)) {
+        //     armor.mod = [armor.mod]
+        // }
+        // armor.mod = [];
         for (const element of Object.keys(SR5.elementTypes)) {
             armor[element] = 0;
         }
