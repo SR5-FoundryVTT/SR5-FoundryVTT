@@ -65,7 +65,7 @@ export class SR5ActiveEffect extends ActiveEffect {
 
         // @ts-ignore
         if (update !== null) foundry.utils.setProperty(actor.data, key, update);
-        else ui.notifications.error('ERROR');
+        else console.error(`${game.i18n.localize('SR5.Errors.KeyNotModifyableByActiveEffect')} Actor: [${actor.name}] and Effect Key: [${change.key}]`);
 
         return update;
     }
