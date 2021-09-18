@@ -853,8 +853,9 @@
   "SR5.Dialogs": {
     "RangedWeaponTest": {
       "EnvironmentalOverwriteSet": "Umgebungsmodifikatoren wurden manuell auf einen fixen Wert gesetzt!"
-    },
-    "SR5.ActiveEffect": {
+    }
+  },
+  "SR5.ActiveEffect": {
       "New": "New Effect",
       "Types": {
         "Temporary": "Temporary Effects",
@@ -865,5 +866,4 @@
         "Modify": "Modifizieren"
       }
     }
-  }
 }
