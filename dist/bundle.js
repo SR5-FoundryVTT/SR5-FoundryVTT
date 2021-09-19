@@ -13315,19 +13315,48 @@ class SR5Actor extends Actor {
         super.prepareData();
     }
     /**
-     *  Prepare base data. Be careful that this ONLY included data not in need for item access. Check Actor and ClientDocumentMixin.prepareData for order of data prep.
+     *  Prepare base data. Be careful that this ONLY included data not in need for item access.
+     *  Check Actor and ClientDocumentMixin.prepareData for order of data prep.
+     *
+     *  Shadowrun data preparation is separate from the actor entity see the different <>Prep classes like
+     *  CharacterPrep
      */
     prepareBaseData() {
         super.prepareBaseData();
+        switch (this.data.type) {
+            case 'character':
+                CharacterPrep_1.CharacterPrep.prepareBaseData(this.data.data);
+                break;
+            case "critter":
+                CritterPrep_1.CritterPrep.prepareBaseData(this.data.data);
+                break;
+            case "spirit":
+                SpiritPrep_1.SpiritPrep.prepareBaseData(this.data.data);
+                break;
+            case "sprite":
+                SpritePrep_1.SpritePrep.prepareBaseData(this.data.data);
+                break;
+            case "vehicle":
+                VehiclePrep_1.VehiclePrep.prepareBaseData(this.data.data);
+                break;
+            case "ic":
+                ICPrep_1.ICPrep.prepareBaseData(this.data.data);
+                break;
+        }
+        // this.applyBaseDataActiveEffects();
     }
     /**
      * prepare embedded entities. Check ClientDocumentMixin.prepareData for order of data prep.
      */
     prepareEmbeddedEntities() {
         super.prepareEmbeddedEntities();
+        // @ts-ignore
         // NOTE: Hello there! Should you ever be in need of calling the grand parents methods, maybe to avoid applyActiveEffects,
         //       look at this beautiful piece of software and shiver in it's glory.
         // ClientDocumentMixin(class {}).prototype.prepareEmbeddedEntities.apply(this);
+    }
+    applyActiveEffects() {
+        super.applyActiveEffects();
     }
     /**
      * prepare embedded entities. Check ClientDocumentMixin.prepareData for order of data prep.
@@ -13341,24 +13370,96 @@ class SR5Actor extends Actor {
         const itemDataWrappers = this.items.map((item) => new SR5ItemDataWrapper_1.SR5ItemDataWrapper(item.data));
         switch (this.data.type) {
             case 'character':
-                CharacterPrep_1.CharacterDataPrepare(this.data.data, itemDataWrappers);
+                CharacterPrep_1.CharacterPrep.prepareDerivedData(this.data.data, itemDataWrappers);
                 break;
             case "critter":
-                CritterPrep_1.CritterDataPrepare(this.data.data, itemDataWrappers);
+                CritterPrep_1.CritterPrep.prepareDerivedData(this.data.data, itemDataWrappers);
                 break;
             case "spirit":
-                SpiritPrep_1.SpiritDataPrepare(this.data.data, itemDataWrappers);
+                SpiritPrep_1.SpiritPrep.prepareDerivedData(this.data.data, itemDataWrappers);
                 break;
             case "sprite":
-                SpritePrep_1.SpriteDataPrepare(this.data.data, itemDataWrappers);
+                SpritePrep_1.SpritePrep.prepareDerivedData(this.data.data, itemDataWrappers);
                 break;
             case "vehicle":
-                VehiclePrep_1.VehicleDataPreparation(this.data.data, itemDataWrappers);
+                VehiclePrep_1.VehiclePrep.prepareDerivedData(this.data.data, itemDataWrappers);
                 break;
             case "ic":
-                ICPrep_1.ICDataPreparation(this.data.data, itemDataWrappers);
+                ICPrep_1.ICPrep.prepareDerivedData(this.data.data, itemDataWrappers);
                 break;
         }
+        // this.applyDerivedDataActiveEffects();
+        this.applyOverrideActiveEffects();
+    }
+    applyOverrideActiveEffects() {
+        const changes = this.effects.reduce((changes, effect) => {
+            if (effect.data.disabled)
+                return changes;
+            // include changes partially matching given keys.
+            return changes.concat(effect.data.changes
+                .filter(change => change.mode === CONST.ACTIVE_EFFECT_MODES.OVERRIDE)
+                .map(change => {
+                var _a;
+                // @ts-ignore // TODO: foundry-vtt-types 0.8
+                change = foundry.utils.duplicate(change);
+                // @ts-ignore
+                change.effect = effect;
+                change.priority = (_a = change.priority) !== null && _a !== void 0 ? _a : (change.mode * 10);
+                return change;
+            }));
+        }, []);
+        // Sort changes according to priority, in case it's ever needed.
+        changes.sort((a, b) => a.priority - b.priority);
+        for (const change of changes) {
+            // @ts-ignore
+            change.effect.apply(this, change);
+        }
+    }
+    // TODO: Remove these custom methods, when they aren't used anymore.
+    applyBaseDataActiveEffects() {
+        const baseData = ['data.attributes'];
+        this._applySomeActiveEffects(baseData);
+    }
+    applyDerivedDataActiveEffects() {
+        const derivedData = ['data.limits'];
+        this._applySomeActiveEffects(derivedData);
+    }
+    _applySomeActiveEffects(partialKeys) {
+        const changes = this._reduceEffectChangesByKeys(partialKeys);
+        this._applyActiveEffectChanges(changes);
+    }
+    _applyActiveEffectChanges(changes) {
+        const overrides = {};
+        for (const change of changes) {
+            // @ts-ignore
+            const result = change.effect.apply(this, change);
+            if (result !== null)
+                overrides[change.key] = result;
+        }
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
+        this.overrides = Object.assign(Object.assign({}, this.overrides), foundry.utils.expandObject(overrides));
+    }
+    _reduceEffectChangesByKeys(partialKeys) {
+        // Collect only those changes matching the given partial keys.
+        const changes = this.effects.reduce((changes, effect) => {
+            if (effect.data.disabled)
+                return changes;
+            // include changes partially matching given keys.
+            return changes.concat(effect.data.changes
+                .filter(change => partialKeys.some(partialKey => change.key.includes(partialKey)))
+                .map(change => {
+                var _a;
+                // @ts-ignore // TODO: foundry-vtt-types 0.8
+                change = foundry.utils.duplicate(change);
+                // @ts-ignore
+                change.effect = effect;
+                change.priority = (_a = change.priority) !== null && _a !== void 0 ? _a : (change.mode * 10);
+                return change;
+            }));
+        }, []);
+        // Sort changes according to priority, in case it's ever needed.
+        changes.sort((a, b) => a.priority - b.priority);
+        return changes;
     }
     getModifier(modifierName) {
         return this.data.data.modifiers[modifierName];
@@ -15082,7 +15183,7 @@ class SR5Actor extends Actor {
 }
 exports.SR5Actor = SR5Actor;
 
-},{"../apps/dialogs/ShadowrunActorDialogs":134,"../chat":142,"../config":144,"../constants":145,"../data/DataDefaults":146,"../data/SR5ItemDataWrapper":148,"../helpers":157,"../item/SR5Item":197,"../parts/PartsList":211,"../rolls/ShadowrunRoller":212,"../rules/MatrixRules":214,"../rules/Modifiers":215,"../rules/SkillRules":216,"./flows/SkillFlow":88,"./flows/SoakFlow":89,"./prep/CharacterPrep":90,"./prep/CritterPrep":91,"./prep/ICPrep":92,"./prep/SpiritPrep":93,"./prep/SpritePrep":94,"./prep/VehiclePrep":95}],86:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunActorDialogs":134,"../chat":142,"../config":144,"../constants":145,"../data/DataDefaults":146,"../data/SR5ItemDataWrapper":148,"../helpers":159,"../item/SR5Item":199,"../parts/PartsList":213,"../rolls/ShadowrunRoller":214,"../rules/MatrixRules":216,"../rules/Modifiers":217,"../rules/SkillRules":218,"./flows/SkillFlow":88,"./flows/SoakFlow":89,"./prep/CharacterPrep":90,"./prep/CritterPrep":91,"./prep/ICPrep":92,"./prep/SpiritPrep":93,"./prep/SpritePrep":94,"./prep/VehiclePrep":95}],86:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -15227,7 +15328,7 @@ class SR5ActorSheet extends ActorSheet {
                 const att = matrix[attribute];
                 if (att) {
                     if (!att.mod)
-                        att.mod = {};
+                        att.mod = [];
                     if (att.temp === 0)
                         delete att.temp;
                 }
@@ -15980,6 +16081,7 @@ class SR5ActorSheet extends ActorSheet {
             const item = this.actor.items.get(iid);
             if (item) {
                 const newItems = [];
+                // Handle the equipped state.
                 if (item.isDevice()) {
                     // Only allow one equipped device item. Unequip all other.
                     for (const item of this.actor.items.filter(actorItem => actorItem.isDevice())) {
@@ -15996,6 +16098,13 @@ class SR5ActorSheet extends ActorSheet {
                         'data.technology.equipped': !item.isEquipped(),
                     });
                 }
+                // Handle active effects based on equipped status.
+                this.actor.effects.forEach(effect => {
+                    if (effect.data.origin !== item.uuid)
+                        return;
+                    // @ts-ignore
+                    effect.disable(item.isEquipped());
+                });
                 // @ts-ignore // TODO: foundry-vtt-types 0.8 has no Document support yet
                 yield this.actor.updateEmbeddedDocuments('Item', newItems);
                 this.actor.render(false);
@@ -16251,7 +16360,7 @@ class SR5ActorSheet extends ActorSheet {
 }
 exports.SR5ActorSheet = SR5ActorSheet;
 
-},{"../apps/chummer-import-form":130,"../apps/skills/KnowledgeSkillEditSheet":138,"../apps/skills/LanguageSkillEditSheet":139,"../apps/skills/SkillEditSheet":140,"../config":144,"../effects":149,"../helpers":157}],87:[function(require,module,exports){
+},{"../apps/chummer-import-form":130,"../apps/skills/KnowledgeSkillEditSheet":138,"../apps/skills/LanguageSkillEditSheet":139,"../apps/skills/SkillEditSheet":140,"../config":144,"../effects":151,"../helpers":159}],87:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -16377,7 +16486,7 @@ class SkillFlow {
 }
 exports.SkillFlow = SkillFlow;
 
-},{"../../constants":145,"../../rules/SkillRules":216}],89:[function(require,module,exports){
+},{"../../constants":145,"../../rules/SkillRules":218}],89:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -16512,10 +16621,10 @@ class SoakFlow {
 }
 exports.SoakFlow = SoakFlow;
 
-},{"../../apps/dialogs/ShadowrunActorDialogs":134,"../../chat":142,"../../data/DataDefaults":146,"../../helpers":157,"../../parts/PartsList":211,"../../rolls/ShadowrunRoller":212,"../../rules/SoakRules":217}],90:[function(require,module,exports){
+},{"../../apps/dialogs/ShadowrunActorDialogs":134,"../../chat":142,"../../data/DataDefaults":146,"../../helpers":159,"../../parts/PartsList":213,"../../rolls/ShadowrunRoller":214,"../../rules/SoakRules":219}],90:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CharacterDataPrepare = void 0;
+exports.CharacterPrep = void 0;
 const InitiativePrep_1 = require("./functions/InitiativePrep");
 const ModifiersPrep_1 = require("./functions/ModifiersPrep");
 const MatrixPrep_1 = require("./functions/MatrixPrep");
@@ -16527,39 +16636,53 @@ const MovementPrep_1 = require("./functions/MovementPrep");
 const WoundsPrep_1 = require("./functions/WoundsPrep");
 const AttributesPrep_1 = require("./functions/AttributesPrep");
 const NPCPrep_1 = require("./functions/NPCPrep");
-function CharacterDataPrepare(data, items) {
-    ModifiersPrep_1.ModifiersPrep.prepareModifiers(data);
-    ModifiersPrep_1.ModifiersPrep.clearAttributeMods(data);
-    ItemPrep_1.ItemPrep.prepareArmor(data, items);
-    ItemPrep_1.ItemPrep.prepareBodyware(data, items);
-    SkillsPrep_1.SkillsPrep.prepareSkills(data);
-    AttributesPrep_1.AttributesPrep.prepareAttributes(data);
-    // NPCPrep is reliant to be called after AttributesPrep.
-    NPCPrep_1.NPCPrep.prepareNPCData(data);
-    LimitsPrep_1.LimitsPrep.prepareLimitBaseFromAttributes(data);
-    LimitsPrep_1.LimitsPrep.prepareLimits(data);
-    MatrixPrep_1.MatrixPrep.prepareMatrix(data, items);
-    MatrixPrep_1.MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
-    if (data.is_npc && data.npc.is_grunt) {
-        ConditionMonitorsPrep_1.ConditionMonitorsPrep.prepareGrunt(data);
+class CharacterPrep {
+    static prepareBaseData(data) {
+        ModifiersPrep_1.ModifiersPrep.prepareModifiers(data);
+        ModifiersPrep_1.ModifiersPrep.clearAttributeMods(data);
+        ModifiersPrep_1.ModifiersPrep.clearArmorMods(data);
     }
-    else {
-        ConditionMonitorsPrep_1.ConditionMonitorsPrep.preparePhysical(data);
-        ConditionMonitorsPrep_1.ConditionMonitorsPrep.prepareStun(data);
+    /**
+     * All derived data should depend on basic values like Attributes or Skills.
+     *
+     * It shouldn't be modified by Active Effects, which instead should modify the global modifiers.
+     *
+     * @param data
+     * @param items
+     */
+    static prepareDerivedData(data, items) {
+        AttributesPrep_1.AttributesPrep.prepareAttributes(data);
+        // NPCPrep is reliant to be called after AttributesPrep.
+        NPCPrep_1.NPCPrep.prepareNPCData(data);
+        SkillsPrep_1.SkillsPrep.prepareSkills(data);
+        ItemPrep_1.ItemPrep.prepareArmor(data, items);
+        ItemPrep_1.ItemPrep.prepareBodyware(data, items);
+        MatrixPrep_1.MatrixPrep.prepareMatrix(data, items);
+        MatrixPrep_1.MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
+        // Limits depend on attributes and active effects.
+        LimitsPrep_1.LimitsPrep.prepareLimitBaseFromAttributes(data);
+        LimitsPrep_1.LimitsPrep.prepareLimits(data);
+        if (data.is_npc && data.npc.is_grunt) {
+            ConditionMonitorsPrep_1.ConditionMonitorsPrep.prepareGrunt(data);
+        }
+        else {
+            ConditionMonitorsPrep_1.ConditionMonitorsPrep.preparePhysical(data);
+            ConditionMonitorsPrep_1.ConditionMonitorsPrep.prepareStun(data);
+        }
+        MovementPrep_1.MovementPrep.prepareMovement(data);
+        WoundsPrep_1.WoundsPrep.prepareWounds(data);
+        InitiativePrep_1.InitiativePrep.prepareMeatspaceInit(data);
+        InitiativePrep_1.InitiativePrep.prepareAstralInit(data);
+        InitiativePrep_1.InitiativePrep.prepareMatrixInit(data);
+        InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(data);
     }
-    MovementPrep_1.MovementPrep.prepareMovement(data);
-    WoundsPrep_1.WoundsPrep.prepareWounds(data);
-    InitiativePrep_1.InitiativePrep.prepareMeatspaceInit(data);
-    InitiativePrep_1.InitiativePrep.prepareAstralInit(data);
-    InitiativePrep_1.InitiativePrep.prepareMatrixInit(data);
-    InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(data);
 }
-exports.CharacterDataPrepare = CharacterDataPrepare;
+exports.CharacterPrep = CharacterPrep;
 
 },{"./functions/AttributesPrep":96,"./functions/ConditionMonitorsPrep":97,"./functions/InitiativePrep":98,"./functions/ItemPrep":99,"./functions/LimitsPrep":100,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/MovementPrep":103,"./functions/NPCPrep":104,"./functions/SkillsPrep":105,"./functions/WoundsPrep":106}],91:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CritterDataPrepare = void 0;
+exports.CritterPrep = void 0;
 const InitiativePrep_1 = require("./functions/InitiativePrep");
 const ModifiersPrep_1 = require("./functions/ModifiersPrep");
 const MatrixPrep_1 = require("./functions/MatrixPrep");
@@ -16570,32 +16693,37 @@ const ConditionMonitorsPrep_1 = require("./functions/ConditionMonitorsPrep");
 const MovementPrep_1 = require("./functions/MovementPrep");
 const WoundsPrep_1 = require("./functions/WoundsPrep");
 const AttributesPrep_1 = require("./functions/AttributesPrep");
-function CritterDataPrepare(data, items) {
-    ModifiersPrep_1.ModifiersPrep.prepareModifiers(data);
-    ModifiersPrep_1.ModifiersPrep.clearAttributeMods(data);
-    ItemPrep_1.ItemPrep.prepareArmor(data, items);
-    ItemPrep_1.ItemPrep.prepareBodyware(data, items);
-    SkillsPrep_1.SkillsPrep.prepareSkills(data);
-    AttributesPrep_1.AttributesPrep.prepareAttributes(data);
-    LimitsPrep_1.LimitsPrep.prepareLimitBaseFromAttributes(data);
-    LimitsPrep_1.LimitsPrep.prepareLimits(data);
-    MatrixPrep_1.MatrixPrep.prepareMatrix(data, items);
-    MatrixPrep_1.MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
-    ConditionMonitorsPrep_1.ConditionMonitorsPrep.preparePhysical(data);
-    ConditionMonitorsPrep_1.ConditionMonitorsPrep.prepareStun(data);
-    MovementPrep_1.MovementPrep.prepareMovement(data);
-    WoundsPrep_1.WoundsPrep.prepareWounds(data);
-    InitiativePrep_1.InitiativePrep.prepareMeatspaceInit(data);
-    InitiativePrep_1.InitiativePrep.prepareAstralInit(data);
-    InitiativePrep_1.InitiativePrep.prepareMatrixInit(data);
-    InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(data);
+class CritterPrep {
+    static prepareBaseData(data) {
+        ModifiersPrep_1.ModifiersPrep.prepareModifiers(data);
+        ModifiersPrep_1.ModifiersPrep.clearAttributeMods(data);
+        ModifiersPrep_1.ModifiersPrep.clearArmorMods(data);
+    }
+    static prepareDerivedData(data, items) {
+        AttributesPrep_1.AttributesPrep.prepareAttributes(data);
+        SkillsPrep_1.SkillsPrep.prepareSkills(data);
+        ItemPrep_1.ItemPrep.prepareArmor(data, items);
+        ItemPrep_1.ItemPrep.prepareBodyware(data, items);
+        MatrixPrep_1.MatrixPrep.prepareMatrix(data, items);
+        MatrixPrep_1.MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
+        LimitsPrep_1.LimitsPrep.prepareLimitBaseFromAttributes(data);
+        LimitsPrep_1.LimitsPrep.prepareLimits(data);
+        ConditionMonitorsPrep_1.ConditionMonitorsPrep.preparePhysical(data);
+        ConditionMonitorsPrep_1.ConditionMonitorsPrep.prepareStun(data);
+        MovementPrep_1.MovementPrep.prepareMovement(data);
+        WoundsPrep_1.WoundsPrep.prepareWounds(data);
+        InitiativePrep_1.InitiativePrep.prepareMeatspaceInit(data);
+        InitiativePrep_1.InitiativePrep.prepareAstralInit(data);
+        InitiativePrep_1.InitiativePrep.prepareMatrixInit(data);
+        InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(data);
+    }
 }
-exports.CritterDataPrepare = CritterDataPrepare;
+exports.CritterPrep = CritterPrep;
 
 },{"./functions/AttributesPrep":96,"./functions/ConditionMonitorsPrep":97,"./functions/InitiativePrep":98,"./functions/ItemPrep":99,"./functions/LimitsPrep":100,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/MovementPrep":103,"./functions/SkillsPrep":105,"./functions/WoundsPrep":106}],92:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ICPrep = exports.ICDataPreparation = void 0;
+exports.ICPrep = void 0;
 const ModifiersPrep_1 = require("./functions/ModifiersPrep");
 const InitiativePrep_1 = require("./functions/InitiativePrep");
 const AttributesPrep_1 = require("./functions/AttributesPrep");
@@ -16605,27 +16733,24 @@ const MatrixPrep_1 = require("./functions/MatrixPrep");
 const DataDefaults_1 = require("../../data/DataDefaults");
 const MatrixRules_1 = require("../../rules/MatrixRules");
 const SkillsPrep_1 = require("./functions/SkillsPrep");
-function ICDataPreparation(data, items) {
-    // Add missing values on actor creation
-    ICPrep.addMissingTracks(data);
-    // Base value preparations.
-    ICPrep.prepareModifiers(data);
-    ModifiersPrep_1.ModifiersPrep.clearAttributeMods(data);
-    ICPrep.prepareHostAttributes(data);
-    ICPrep.hideMeatAttributes(data);
-    ICPrep.prepareMeatAttributes(data);
-    ICPrep.prepareMatrixAttributes(data);
-    MatrixPrep_1.MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
-    // Derived value preparations
-    ICPrep.prepareMatrix(data);
-    ICPrep.prepareMatrixTrack(data);
-    ICPrep.prepareMatrixInit(data);
-    InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(data);
-    // Common data preparations.
-    SkillsPrep_1.SkillsPrep.prepareSkills(data);
-}
-exports.ICDataPreparation = ICDataPreparation;
 class ICPrep {
+    static prepareBaseData(data) {
+        ModifiersPrep_1.ModifiersPrep.clearAttributeMods(data);
+        ICPrep.addMissingTracks(data);
+        ICPrep.prepareModifiers(data);
+        ICPrep.hideMeatAttributes(data);
+    }
+    static prepareDerivedData(data, items) {
+        ICPrep.prepareMatrixAttributes(data);
+        SkillsPrep_1.SkillsPrep.prepareSkills(data);
+        ICPrep.prepareHostAttributes(data);
+        ICPrep.prepareMeatAttributes(data);
+        MatrixPrep_1.MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
+        ICPrep.prepareMatrix(data);
+        ICPrep.prepareMatrixTrack(data);
+        ICPrep.prepareMatrixInit(data);
+        InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(data);
+    }
     /**
      * On initial actor creation the matrix track will be missing.
      *
@@ -16636,8 +16761,10 @@ class ICPrep {
         // Newly created actors SHOULD have this by template.
         // Legacy actors MIGHT not have it, therefore make sure it's their.
         const track = data.track || {};
+        // @ts-ignore
         if (!track.matrix)
             track.matrix = DataDefaults_1.DefaultValues.trackData();
+        // @ts-ignore
         data.track = track;
     }
     /**
@@ -16727,10 +16854,10 @@ class ICPrep {
 }
 exports.ICPrep = ICPrep;
 
-},{"../../config":144,"../../data/DataDefaults":146,"../../parts/PartsList":211,"../../rules/MatrixRules":214,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/SkillsPrep":105}],93:[function(require,module,exports){
+},{"../../config":144,"../../data/DataDefaults":146,"../../parts/PartsList":213,"../../rules/MatrixRules":216,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/SkillsPrep":105}],93:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SpiritPrep = exports.SpiritDataPrepare = void 0;
+exports.SpiritPrep = void 0;
 const SkillsPrep_1 = require("./functions/SkillsPrep");
 const AttributesPrep_1 = require("./functions/AttributesPrep");
 const LimitsPrep_1 = require("./functions/LimitsPrep");
@@ -16742,25 +16869,30 @@ const InitiativePrep_1 = require("./functions/InitiativePrep");
 const helpers_1 = require("../../helpers");
 const PartsList_1 = require("../../parts/PartsList");
 const SkillFlow_1 = require("../flows/SkillFlow");
-function SpiritDataPrepare(data, items) {
-    ModifiersPrep_1.ModifiersPrep.prepareModifiers(data);
-    ModifiersPrep_1.ModifiersPrep.clearAttributeMods(data);
-    SpiritPrep.prepareSpiritBaseData(data);
-    SkillsPrep_1.SkillsPrep.prepareSkills(data);
-    AttributesPrep_1.AttributesPrep.prepareAttributes(data);
-    LimitsPrep_1.LimitsPrep.prepareLimitBaseFromAttributes(data);
-    LimitsPrep_1.LimitsPrep.prepareLimits(data);
-    SpiritPrep.prepareSpiritArmor(data);
-    ConditionMonitorsPrep_1.ConditionMonitorsPrep.prepareStun(data);
-    ConditionMonitorsPrep_1.ConditionMonitorsPrep.preparePhysical(data);
-    MovementPrep_1.MovementPrep.prepareMovement(data);
-    WoundsPrep_1.WoundsPrep.prepareWounds(data);
-    InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(data);
-    // Spirits will always be awakened.
-    data.special = 'magic';
-}
-exports.SpiritDataPrepare = SpiritDataPrepare;
 class SpiritPrep {
+    static prepareBaseData(data) {
+        SpiritPrep.prepareSpiritSpecial(data);
+        ModifiersPrep_1.ModifiersPrep.prepareModifiers(data);
+        ModifiersPrep_1.ModifiersPrep.clearAttributeMods(data);
+        ModifiersPrep_1.ModifiersPrep.clearArmorMods(data);
+    }
+    static prepareDerivedData(data, items) {
+        SpiritPrep.prepareSpiritBaseData(data);
+        AttributesPrep_1.AttributesPrep.prepareAttributes(data);
+        SkillsPrep_1.SkillsPrep.prepareSkills(data);
+        LimitsPrep_1.LimitsPrep.prepareLimitBaseFromAttributes(data);
+        LimitsPrep_1.LimitsPrep.prepareLimits(data);
+        SpiritPrep.prepareSpiritArmor(data);
+        ConditionMonitorsPrep_1.ConditionMonitorsPrep.prepareStun(data);
+        ConditionMonitorsPrep_1.ConditionMonitorsPrep.preparePhysical(data);
+        MovementPrep_1.MovementPrep.prepareMovement(data);
+        WoundsPrep_1.WoundsPrep.prepareWounds(data);
+        InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(data);
+    }
+    static prepareSpiritSpecial(data) {
+        // Spirits will always be awakened.
+        data.special = 'magic';
+    }
     static prepareSpiritBaseData(data) {
         const overrides = this.getSpiritStatModifiers(data.spiritType);
         if (overrides) {
@@ -17120,10 +17252,10 @@ class SpiritPrep {
 }
 exports.SpiritPrep = SpiritPrep;
 
-},{"../../helpers":157,"../../parts/PartsList":211,"../flows/SkillFlow":88,"./functions/AttributesPrep":96,"./functions/ConditionMonitorsPrep":97,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/ModifiersPrep":102,"./functions/MovementPrep":103,"./functions/SkillsPrep":105,"./functions/WoundsPrep":106}],94:[function(require,module,exports){
+},{"../../helpers":159,"../../parts/PartsList":213,"../flows/SkillFlow":88,"./functions/AttributesPrep":96,"./functions/ConditionMonitorsPrep":97,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/ModifiersPrep":102,"./functions/MovementPrep":103,"./functions/SkillsPrep":105,"./functions/WoundsPrep":106}],94:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SpritePrep = exports.SpriteDataPrepare = void 0;
+exports.SpritePrep = void 0;
 const SkillsPrep_1 = require("./functions/SkillsPrep");
 const ModifiersPrep_1 = require("./functions/ModifiersPrep");
 const InitiativePrep_1 = require("./functions/InitiativePrep");
@@ -17132,34 +17264,40 @@ const LimitsPrep_1 = require("./functions/LimitsPrep");
 const MatrixPrep_1 = require("./functions/MatrixPrep");
 const helpers_1 = require("../../helpers");
 const PartsList_1 = require("../../parts/PartsList");
-function SpriteDataPrepare(data, items) {
-    ModifiersPrep_1.ModifiersPrep.prepareModifiers(data);
-    ModifiersPrep_1.ModifiersPrep.clearAttributeMods(data);
-    SpritePrep.prepareSpriteData(data);
-    MatrixPrep_1.MatrixPrep.prepareAttributesForDevice(data);
-    SkillsPrep_1.SkillsPrep.prepareSkills(data);
-    AttributesPrep_1.AttributesPrep.prepareAttributes(data);
-    LimitsPrep_1.LimitsPrep.prepareLimits(data);
-    MatrixPrep_1.MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
-    InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(data);
-    data.special = 'resonance';
-}
-exports.SpriteDataPrepare = SpriteDataPrepare;
 /**
  * Prepare a Sprite Type of Actor
  */
 class SpritePrep {
-    /**
-     * Prepares basic Sprite specific data
-     * - matrix attribute values
-     * - device rating
-     * - matrix condition monitor
-     * - matrix initiative
-     * - skills
-     * @param data
-     */
-    static prepareSpriteData(data) {
-        const { level, skills, matrix, spriteType, initiative, attributes, modifiers } = data;
+    static prepareBaseData(data) {
+        SpritePrep.prepareSpriteSpecial(data);
+        ModifiersPrep_1.ModifiersPrep.prepareModifiers(data);
+        ModifiersPrep_1.ModifiersPrep.clearAttributeMods(data);
+    }
+    static prepareDerivedData(data, items) {
+        SpritePrep.prepareSpriteMatrixAttributes(data);
+        SpritePrep.prepareSpriteAttributes(data);
+        SpritePrep.prepareSpriteSkills(data);
+        AttributesPrep_1.AttributesPrep.prepareAttributes(data);
+        SkillsPrep_1.SkillsPrep.prepareSkills(data);
+        LimitsPrep_1.LimitsPrep.prepareLimits(data);
+        MatrixPrep_1.MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
+        InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(data);
+        SpritePrep.prepareSpriteConditionMonitor(data);
+        SpritePrep.prepareSpriteInitiative(data);
+    }
+    static prepareSpriteSpecial(data) {
+        // Sprites are always awakened
+        data.special = 'resonance';
+    }
+    static prepareSpriteAttributes(data) {
+        const { attributes, level, spriteType } = data;
+        const overrides = this.getSpriteStatModifiers(spriteType);
+        // calculate resonance value
+        attributes.resonance.base = level + overrides.resonance;
+        helpers_1.Helpers.calcTotal(attributes.resonance);
+    }
+    static prepareSpriteMatrixAttributes(data) {
+        const { level, matrix, spriteType } = data;
         const matrixAtts = ['attack', 'sleaze', 'data_processing', 'firewall'];
         const overrides = this.getSpriteStatModifiers(spriteType);
         // apply the matrix overrides
@@ -17169,6 +17307,26 @@ class SpritePrep {
                 matrix[att].value = helpers_1.Helpers.calcTotal(matrix[att]);
             }
         });
+        matrix.rating = level;
+    }
+    static prepareSpriteSkills(data) {
+        const { skills, level, spriteType } = data;
+        const overrides = this.getSpriteStatModifiers(spriteType);
+        // apply skill levels
+        // clear skills that we don't have
+        for (const [skillId, skill] of Object.entries(skills.active)) {
+            skill.base = overrides.skills.find((s) => s === skillId) ? level : 0;
+        }
+    }
+    static prepareSpriteConditionMonitor(data) {
+        const { matrix, level } = data;
+        matrix.condition_monitor.max = 8 + Math.ceil(level / 2);
+    }
+    static prepareSpriteInitiative(data) {
+        const { initiative, level, spriteType, modifiers } = data;
+        // always in matrix perception
+        initiative.perception = 'matrix';
+        const overrides = this.getSpriteStatModifiers(spriteType);
         // setup initiative from overrides
         initiative.matrix.base.base = level * 2 + overrides.init;
         PartsList_1.PartsList.AddUniquePart(initiative.matrix.base.mod, 'SR5.Bonus', modifiers['matrix_initiative']);
@@ -17176,18 +17334,6 @@ class SpritePrep {
         initiative.matrix.dice.base = 4;
         PartsList_1.PartsList.AddUniquePart(initiative.matrix.dice.mod, 'SR5.Bonus', modifiers['matrix_initiative_dice']);
         helpers_1.Helpers.calcTotal(initiative.matrix.dice);
-        // always in matrix perception
-        initiative.perception = 'matrix';
-        // calculate resonance value
-        attributes.resonance.base = level + overrides.resonance;
-        helpers_1.Helpers.calcTotal(attributes.resonance);
-        // apply skill levels
-        // clear skills that we don't have
-        for (const [skillId, skill] of Object.entries(skills.active)) {
-            skill.base = overrides.skills.find((s) => s === skillId) ? level : 0;
-        }
-        matrix.rating = level;
-        matrix.condition_monitor.max = 8 + Math.ceil(level / 2);
     }
     /**
      * Get the stat modifiers for the specified type of sprite
@@ -17246,10 +17392,10 @@ class SpritePrep {
 }
 exports.SpritePrep = SpritePrep;
 
-},{"../../helpers":157,"../../parts/PartsList":211,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/SkillsPrep":105}],95:[function(require,module,exports){
+},{"../../helpers":159,"../../parts/PartsList":213,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/SkillsPrep":105}],95:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.VehiclePrep = exports.VehicleDataPreparation = void 0;
+exports.VehiclePrep = void 0;
 const SkillsPrep_1 = require("./functions/SkillsPrep");
 const ModifiersPrep_1 = require("./functions/ModifiersPrep");
 const InitiativePrep_1 = require("./functions/InitiativePrep");
@@ -17259,26 +17405,28 @@ const MatrixPrep_1 = require("./functions/MatrixPrep");
 const helpers_1 = require("../../helpers");
 const PartsList_1 = require("../../parts/PartsList");
 const config_1 = require("../../config");
-function VehicleDataPreparation(data, items) {
-    ModifiersPrep_1.ModifiersPrep.prepareModifiers(data);
-    ModifiersPrep_1.ModifiersPrep.clearAttributeMods(data);
-    VehiclePrep.prepareVehicleStats(data);
-    VehiclePrep.prepareAttributes(data);
-    VehiclePrep.prepareLimits(data);
-    SkillsPrep_1.SkillsPrep.prepareSkills(data);
-    AttributesPrep_1.AttributesPrep.prepareAttributes(data);
-    LimitsPrep_1.LimitsPrep.prepareLimits(data);
-    VehiclePrep.prepareConditionMonitor(data);
-    MatrixPrep_1.MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
-    MatrixPrep_1.MatrixPrep.prepareAttributesForDevice(data);
-    VehiclePrep.prepareMovement(data);
-    VehiclePrep.prepareMeatspaceInit(data);
-    InitiativePrep_1.InitiativePrep.prepareMatrixInit(data);
-    InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(data);
-    VehiclePrep.prepareArmor(data);
-}
-exports.VehicleDataPreparation = VehicleDataPreparation;
 class VehiclePrep {
+    static prepareBaseData(data) {
+        ModifiersPrep_1.ModifiersPrep.prepareModifiers(data);
+        ModifiersPrep_1.ModifiersPrep.clearAttributeMods(data);
+        ModifiersPrep_1.ModifiersPrep.clearArmorMods(data);
+    }
+    static prepareDerivedData(data, items) {
+        VehiclePrep.prepareVehicleStats(data);
+        VehiclePrep.prepareAttributes(data);
+        VehiclePrep.prepareLimits(data);
+        AttributesPrep_1.AttributesPrep.prepareAttributes(data);
+        SkillsPrep_1.SkillsPrep.prepareSkills(data);
+        LimitsPrep_1.LimitsPrep.prepareLimits(data);
+        VehiclePrep.prepareConditionMonitor(data);
+        MatrixPrep_1.MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
+        MatrixPrep_1.MatrixPrep.prepareAttributesForDevice(data);
+        VehiclePrep.prepareMovement(data);
+        VehiclePrep.prepareMeatspaceInit(data);
+        InitiativePrep_1.InitiativePrep.prepareMatrixInit(data);
+        InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(data);
+        VehiclePrep.prepareArmor(data);
+    }
     static prepareVehicleStats(data) {
         var _a;
         const { vehicle_stats, isOffRoad } = data;
@@ -17368,7 +17516,7 @@ class VehiclePrep {
 }
 exports.VehiclePrep = VehiclePrep;
 
-},{"../../config":144,"../../helpers":157,"../../parts/PartsList":211,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/SkillsPrep":105}],96:[function(require,module,exports){
+},{"../../config":144,"../../helpers":159,"../../parts/PartsList":213,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/SkillsPrep":105}],96:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AttributesPrep = void 0;
@@ -17432,7 +17580,7 @@ class AttributesPrep {
 }
 exports.AttributesPrep = AttributesPrep;
 
-},{"../../../config":144,"../../../constants":145,"../../../helpers":157}],97:[function(require,module,exports){
+},{"../../../config":144,"../../../constants":145,"../../../helpers":159}],97:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConditionMonitorsPrep = void 0;
@@ -17523,13 +17671,14 @@ class InitiativePrep {
 }
 exports.InitiativePrep = InitiativePrep;
 
-},{"../../../helpers":157,"../../../parts/PartsList":211}],99:[function(require,module,exports){
+},{"../../../helpers":159,"../../../parts/PartsList":213}],99:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemPrep = void 0;
 const helpers_1 = require("../../../helpers");
 const PartsList_1 = require("../../../parts/PartsList");
 const config_1 = require("../../../config");
+const constants_1 = require("../../../constants");
 class ItemPrep {
     /**
      * Prepare the armor data for the Item
@@ -17540,7 +17689,10 @@ class ItemPrep {
         const { armor } = data;
         armor.base = 0;
         armor.value = 0;
-        armor.mod = [];
+        // if (!isNaN(armor.mod)) {
+        //     armor.mod = [armor.mod]
+        // }
+        // armor.mod = [];
         for (const element of Object.keys(config_1.SR5.elementTypes)) {
             armor[element] = 0;
         }
@@ -17591,14 +17743,14 @@ class ItemPrep {
         if (essenceMod && !Number.isNaN(essenceMod)) {
             parts.addUniquePart('SR5.Bonus', Number(essenceMod));
         }
-        attributes.essence.base = 6;
+        attributes.essence.base = constants_1.SR.attributes.defaults.essence;
         attributes.essence.mod = parts.list;
         attributes.essence.value = helpers_1.Helpers.calcTotal(attributes.essence);
     }
 }
 exports.ItemPrep = ItemPrep;
 
-},{"../../../config":144,"../../../helpers":157,"../../../parts/PartsList":211}],100:[function(require,module,exports){
+},{"../../../config":144,"../../../constants":145,"../../../helpers":159,"../../../parts/PartsList":213}],100:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LimitsPrep = void 0;
@@ -17627,7 +17779,7 @@ class LimitsPrep {
 }
 exports.LimitsPrep = LimitsPrep;
 
-},{"../../../config":144,"../../../helpers":157,"../../../parts/PartsList":211}],101:[function(require,module,exports){
+},{"../../../config":144,"../../../helpers":159,"../../../parts/PartsList":213}],101:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatrixPrep = void 0;
@@ -17754,7 +17906,7 @@ class MatrixPrep {
 }
 exports.MatrixPrep = MatrixPrep;
 
-},{"../../../config":144,"../../../helpers":157,"../../../parts/PartsList":211,"./AttributesPrep":96}],102:[function(require,module,exports){
+},{"../../../config":144,"../../../helpers":159,"../../../parts/PartsList":213,"./AttributesPrep":96}],102:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ModifiersPrep = void 0;
@@ -17828,6 +17980,10 @@ class ModifiersPrep {
             attribute.mod = [];
         }
     }
+    static clearArmorMods(data) {
+        const { armor } = data;
+        armor.mod = [];
+    }
 }
 exports.ModifiersPrep = ModifiersPrep;
 
@@ -17835,18 +17991,19 @@ exports.ModifiersPrep = ModifiersPrep;
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MovementPrep = void 0;
+const PartsList_1 = require("../../../parts/PartsList");
 class MovementPrep {
     static prepareMovement(data) {
         const { attributes, modifiers } = data;
         const movement = data.movement;
         // default movement: WALK = AGI * 2, RUN = AGI * 4
-        movement.walk.value = attributes.agility.value * (2 + Number(modifiers['walk']));
-        movement.run.value = attributes.agility.value * (4 + Number(modifiers['run']));
+        movement.walk.value = attributes.agility.value * (2 + Number(modifiers['walk'])) + new PartsList_1.PartsList(movement.walk.mod).total;
+        movement.run.value = attributes.agility.value * (4 + Number(modifiers['run'])) + new PartsList_1.PartsList(movement.run.mod).total;
     }
 }
 exports.MovementPrep = MovementPrep;
 
-},{}],104:[function(require,module,exports){
+},{"../../../parts/PartsList":213}],104:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NPCPrep = void 0;
@@ -17891,7 +18048,7 @@ class NPCPrep {
 }
 exports.NPCPrep = NPCPrep;
 
-},{"../../../constants":145,"../../../data/DataDefaults":146,"../../../parts/PartsList":211,"./AttributesPrep":96}],105:[function(require,module,exports){
+},{"../../../constants":145,"../../../data/DataDefaults":146,"../../../parts/PartsList":213,"./AttributesPrep":96}],105:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports._mergeWithMissingSkillFields = exports.SkillsPrep = void 0;
@@ -17919,7 +18076,7 @@ class SkillsPrep {
         // function that will set the total of a skill correctly
         const prepareSkill = (skill) => {
             var _a;
-            skill.mod = [];
+            // skill.mod = [];
             if (!skill.base)
                 skill.base = 0;
             if ((_a = skill.bonus) === null || _a === void 0 ? void 0 : _a.length) {
@@ -17990,7 +18147,7 @@ const _mergeWithMissingSkillFields = (givenSkill) => {
 };
 exports._mergeWithMissingSkillFields = _mergeWithMissingSkillFields;
 
-},{"../../../config":144,"../../../helpers":157,"../../../parts/PartsList":211}],106:[function(require,module,exports){
+},{"../../../config":144,"../../../helpers":159,"../../../parts/PartsList":213}],106:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WoundsPrep = void 0;
@@ -18559,7 +18716,7 @@ class SR5BaseActorSheet extends ActorSheet {
 }
 exports.SR5BaseActorSheet = SR5BaseActorSheet;
 
-},{"../../config":144,"../../effects":149,"../../helpers":157}],108:[function(require,module,exports){
+},{"../../config":144,"../../effects":151,"../../helpers":159}],108:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -18872,7 +19029,7 @@ class EnvModifiersApplication extends Application {
 }
 exports.EnvModifiersApplication = EnvModifiersApplication;
 
-},{"../actor/SR5Actor":85,"../constants":145,"../helpers":157,"../rules/Modifiers":215}],111:[function(require,module,exports){
+},{"../actor/SR5Actor":85,"../constants":145,"../helpers":159,"../rules/Modifiers":217}],111:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -21062,7 +21219,7 @@ class ShadowrunActorDialogs {
 }
 exports.ShadowrunActorDialogs = ShadowrunActorDialogs;
 
-},{"../../actor/flows/SkillFlow":88,"../../config":144,"../../helpers":157,"../../parts/PartsList":211,"./FormDialog":133}],135:[function(require,module,exports){
+},{"../../actor/flows/SkillFlow":88,"../../config":144,"../../helpers":159,"../../parts/PartsList":213,"./FormDialog":133}],135:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -21417,7 +21574,7 @@ class ShadowrunItemDialog {
 }
 exports.ShadowrunItemDialog = ShadowrunItemDialog;
 
-},{"../../config":144,"../../constants":145,"../../helpers":157,"./FormDialog":133}],136:[function(require,module,exports){
+},{"../../config":144,"../../constants":145,"../../helpers":159,"./FormDialog":133}],136:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -21526,7 +21683,7 @@ class ShadowrunTestDialog {
 }
 exports.ShadowrunTestDialog = ShadowrunTestDialog;
 
-},{"../../constants":145,"../../helpers":157,"../../parts/PartsList":211,"./FormDialog":133}],137:[function(require,module,exports){
+},{"../../constants":145,"../../helpers":159,"../../parts/PartsList":213,"./FormDialog":133}],137:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -21724,7 +21881,7 @@ exports.OverwatchScoreTracker = OverwatchScoreTracker;
 (0, _defineProperty2["default"])(OverwatchScoreTracker, "MatrixOverwatchDiceCount", '2d6');
 (0, _defineProperty2["default"])(OverwatchScoreTracker, "addedActors", []);
 
-},{"../../helpers":157,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10}],138:[function(require,module,exports){
+},{"../../helpers":159,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10}],138:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KnowledgeSkillEditSheet = void 0;
@@ -22404,7 +22561,7 @@ const addRollListeners = (app, html) => {
 };
 exports.addRollListeners = addRollListeners;
 
-},{"./actor/SR5Actor":85,"./actor/flows/DamageApplicationFlow":87,"./constants":145,"./helpers":157,"./item/SR5Item":197,"./item/flows/ActionResultFlow":200,"./template":220}],143:[function(require,module,exports){
+},{"./actor/SR5Actor":85,"./actor/flows/DamageApplicationFlow":87,"./constants":145,"./helpers":159,"./item/SR5Item":199,"./item/flows/ActionResultFlow":202,"./template":222}],143:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22820,7 +22977,7 @@ function _combatantGetInitiativeFormula() {
 }
 exports._combatantGetInitiativeFormula = _combatantGetInitiativeFormula;
 
-},{"../constants":145,"../rules/CombatRules":213,"../sockets":219}],144:[function(require,module,exports){
+},{"../constants":145,"../rules/CombatRules":215,"../sockets":221}],144:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5 = void 0;
@@ -23347,13 +23504,14 @@ exports.DEFAULT_ID_LENGTH = 16;
 // Contain data regarding shadowrun rules, mostly whatever is stated in some table to be looked up in other places.
 exports.SR = {
     combat: {
+        // Modifiers to use for the different levels / ranges for environmental modifiers.
         environmental: {
             range_modifiers: {
                 short: 0,
                 medium: -1,
                 long: -3,
                 extreme: -6,
-                // A modifier of zero will allow for users/gm to still test oor targets with their own judgement.
+                // A modifier of zero will allow for users/gm to still test for targets with their own judgement.
                 out_of_range: 0
             },
             levels: {
@@ -23381,6 +23539,8 @@ exports.SR = {
         }
     },
     attributes: {
+        // Use for min/max value ranges (general). This will need expanding for different metatypes, should that ever
+        // come to  be.
         ranges: {
             magic: { min: 0 },
             edge: { min: 0 },
@@ -23400,6 +23560,11 @@ exports.SR = {
             firewall: { min: 0 },
             host_rating: { min: 0, max: 12 }
         },
+        // Use for initial default values that aren't simply range.<>.min values.
+        defaults: {
+            essence: 6
+        },
+        // Reaction would be displayed as REA, when set to 3.
         SHORT_NAME_LENGTH: 3
     },
     skill: {
@@ -24000,49 +24165,189 @@ exports.SR5ItemDataWrapper = SR5ItemDataWrapper;
 
 },{"./DataWrapper":147}],149:[function(require,module,exports){
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SR5ActiveEffect = void 0;
+class SR5ActiveEffect extends ActiveEffect {
+    /**
+     * Can be used to determine if the origin of the effect is an document that is owned by another document.
+     *
+     * A use case would be to check if the effect is applied by an actor owned item.
+     *
+     * The current approach is a bit simple, due to the limited effect use. Should there be a time of effects applied to
+     * items, this would need change.
+     */
+    get isOriginOwned() {
+        const path = this.data.origin.split('.');
+        if (path[0] === 'Scene' && path.length === 6)
+            return true;
+        if (path[0] === 'Actor' && path.length === 4)
+            return true;
+        return false;
+    }
+    get source() {
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
+        return fromUuid(this.data.origin);
+    }
+    /**
+     * Render the sheet of the active effect source
+     */
+    renderSourceSheet() {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            const document = yield this.source;
+            // @ts-ignore
+            return (_a = document === null || document === void 0 ? void 0 : document.sheet) === null || _a === void 0 ? void 0 : _a.render(true);
+        });
+    }
+    toggleDisabled() {
+        return __awaiter(this, void 0, void 0, function* () {
+            // @ts-ignore
+            return this.update({ disabled: !this.data.disabled });
+        });
+    }
+    disable(disabled) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // @ts-ignore
+            return this.update({ disabled });
+        });
+    }
+    _applyCustom(actor, change) {
+        return this._applyModify(actor, change);
+    }
+    /**
+     * Apply a modification to a ModifiableValue (has a .mod property).
+     * @protected
+     */
+    _applyModify(actor, change) {
+        var _a;
+        const { key, value } = change;
+        // @ts-ignore
+        const current = (_a = foundry.utils.getProperty(actor.data, key)) !== null && _a !== void 0 ? _a : null;
+        // @ts-ignore
+        const ct = foundry.utils.getType(current);
+        const nodes = key.split('.');
+        const isModArray = nodes[nodes.length - 1] === 'mod' && ct === 'Array';
+        const update = isModArray ?
+            current.concat([{ name: this.data.label, value: Number(value) }]) :
+            null; // Foundry expects null for un-applied active effects.
+        // @ts-ignore
+        if (update !== null)
+            foundry.utils.setProperty(actor.data, key, update);
+        else
+            console.error(`${game.i18n.localize('SR5.Errors.KeyNotModifyableByActiveEffect')} Actor: [${actor.name}] and Effect Key: [${change.key}]`);
+        return update;
+    }
+    /**
+     * Keep the default foundry implementation for the ADD mode but hijack into a MODIFY mode in case of a ModifableValue
+     * @protected
+     */
+    _applyAdd(actor, change) {
+        var _a;
+        const { key, value } = change;
+        // @ts-ignore
+        const current = (_a = foundry.utils.getProperty(actor.data, key)) !== null && _a !== void 0 ? _a : null;
+        // @ts-ignore
+        const ct = foundry.utils.getType(current);
+        let update = null;
+        const nodes = key.split('.');
+        const isModArray = nodes[nodes.length - 1] === 'mod' && ct === 'Array';
+        if (isModArray) {
+            return this._applyModify(actor, change);
+        }
+        else {
+            return super._applyAdd(actor, change);
+        }
+    }
+}
+exports.SR5ActiveEffect = SR5ActiveEffect;
+
+},{}],150:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SR5ActiveEffectSheet = void 0;
+class SR5ActiveEffectSheet extends ActiveEffectConfig {
+    get template() {
+        return 'systems/shadowrun5e/dist/templates/effect/active-effect-config.html';
+    }
+    getData(options) {
+        const data = super.getData(options);
+        data.modes = Object.assign(Object.assign({}, data.modes), { 0: game.i18n.localize('SR5.ActiveEffect.Modes.Modify') });
+        return data;
+    }
+}
+exports.SR5ActiveEffectSheet = SR5ActiveEffectSheet;
+
+},{}],151:[function(require,module,exports){
+"use strict";
 //@ts-nocheck // This is JavaScript code.
 /**
  * All functions have been taken from : https://gitlab.com/foundrynet/dnd5e/-/blob/master/module/effects.js
  *
  * There have been some alterations made to fit the Shadowrun5e system.
  */
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.prepareActiveEffectCategories = exports.onManageActiveEffect = void 0;
+const helpers_1 = require("./helpers");
 /**
  * Manage Active Effect instances through the Actor Sheet via effect control buttons.
  * @param {MouseEvent} event      The left-click event on the effect control
  * @param {Actor|Item} owner      The owning entity which manages this effect
  */
 function onManageActiveEffect(event, owner) {
-    // NOTE: This here is temporary until FoundryVTT has built-in support for nested item updates.
-    //       I won't even translate it, since neither did DnD. ;)
-    if (owner.isOwned)
-        return ui.notifications.warn("Managing Active Effects within an Owned Item is not currently supported and will be added in a subsequent update.");
-    event.preventDefault();
-    // These element grabs rely heavily on HTML structure within the templates.
-    const icon = event.currentTarget;
-    const item = event.currentTarget.closest('.list-item');
-    const effect = item.dataset.itemId ? owner.effects.get(item.dataset.itemId) : null;
-    // The HTML dataset must be defined
-    switch (icon.dataset.action) {
-        case "create":
-            return owner.createEmbeddedDocuments('ActiveEffect', [{
-                    label: game.i18n.localize("SR5.ActiveEffect.New"),
-                    icon: "icons/svg/aura.svg",
-                    origin: owner.uuid,
-                    "duration.rounds": item.dataset.effectType === "temporary" ? 1 : undefined,
-                    disabled: item.dataset.effectType === "inactive"
-                }]);
-        case "edit":
-            return effect.sheet.render(true);
-        case "delete":
-            return effect.delete();
-        case "toggle":
-            return effect.update({ disabled: !effect.data.disabled });
-        default:
-            console.error(`An active effect with the id '${effect}' couldn't be managed as no action has been defined within the template.`);
-            return;
-    }
+    return __awaiter(this, void 0, void 0, function* () {
+        // NOTE: This here is temporary until FoundryVTT has built-in support for nested item updates.
+        if (owner.isOwned)
+            return ui.notifications.warn("Managing Active Effects within an Owned Item is not currently supported and will be added in a subsequent update.");
+        event.preventDefault();
+        // These element grabs rely heavily on HTML structure within the templates.
+        const icon = event.currentTarget;
+        const item = event.currentTarget.closest('.list-item');
+        const effect = item.dataset.itemId ? owner.effects.get(item.dataset.itemId) : null;
+        // The HTML dataset must be defined
+        switch (icon.dataset.action) {
+            case "create":
+                return owner.createEmbeddedDocuments('ActiveEffect', [{
+                        label: game.i18n.localize("SR5.ActiveEffect.New"),
+                        // icon: "icons/svg/aura.svg",
+                        origin: owner.uuid,
+                        "duration.rounds": item.dataset.effectType === "temporary" ? 1 : undefined,
+                        disabled: item.dataset.effectType === "inactive"
+                    }]);
+            case "edit":
+                return effect.sheet.render(true);
+            case "delete":
+                const userConsented = yield helpers_1.Helpers.confirmDeletion();
+                if (!userConsented)
+                    return;
+                return effect.delete();
+            case "toggle":
+                // return effect.update({disabled: !effect.data.disabled});
+                return effect.toggleDisabled();
+            case "open-origin":
+                return effect.renderSourceSheet();
+            default:
+                console.error(`An active effect with the id '${effect}' couldn't be managed as no action has been defined within the template.`);
+                return;
+        }
+    });
 }
 exports.onManageActiveEffect = onManageActiveEffect;
 /**
@@ -24083,7 +24388,7 @@ function prepareActiveEffectCategories(effects) {
 }
 exports.prepareActiveEffectCategories = prepareActiveEffectCategories;
 
-},{}],150:[function(require,module,exports){
+},{"./helpers":159}],152:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerAppHelpers = void 0;
@@ -24101,7 +24406,7 @@ const registerAppHelpers = () => {
 };
 exports.registerAppHelpers = registerAppHelpers;
 
-},{}],151:[function(require,module,exports){
+},{}],153:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerBasicHelpers = void 0;
@@ -24254,7 +24559,7 @@ const registerBasicHelpers = () => {
 };
 exports.registerBasicHelpers = registerBasicHelpers;
 
-},{"../actor/SR5Actor":85,"../helpers":157}],152:[function(require,module,exports){
+},{"../actor/SR5Actor":85,"../helpers":159}],154:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -24289,7 +24594,7 @@ class HandlebarManager {
 }
 exports.HandlebarManager = HandlebarManager;
 
-},{"./AppHelpers":150,"./BasicHelpers":151,"./HandlebarTemplates":153,"./ItemLineHelpers":154,"./RollAndLabelHelpers":155,"./SkillLineHelpers":156}],153:[function(require,module,exports){
+},{"./AppHelpers":152,"./BasicHelpers":153,"./HandlebarTemplates":155,"./ItemLineHelpers":156,"./RollAndLabelHelpers":157,"./SkillLineHelpers":158}],155:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -24418,7 +24723,7 @@ const preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, funct
 });
 exports.preloadHandlebarsTemplates = preloadHandlebarsTemplates;
 
-},{}],154:[function(require,module,exports){
+},{}],156:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerItemLineHelpers = void 0;
@@ -24851,12 +25156,18 @@ const registerItemLineHelpers = () => {
             title: game.i18n.localize('SR5.DeleteItem'),
             data: { action: 'delete' }
         };
-        const pdfIcon = {
-            icon: 'fas fa-file open-source-pdf',
-            title: game.i18n.localize('SR5.OpenSourcePdf'),
+        const disableIcon = {
+            icon: `${effect.data.disabled ? 'far fa-circle' : 'fas fa-check-circle'} effect-control`,
+            title: game.i18n.localize('SR5.ToggleActive'),
+            data: { action: "toggle" }
         };
-        // TODO: Add source icon to open item / actor causing the effect
-        return [pdfIcon, editIcon, removeIcon];
+        const openOriginIcon = {
+            icon: 'fas fa-file effect-control',
+            title: game.i18n.localize('SR5.OpenOrigin'),
+            data: { action: "open-origin" }
+        };
+        // Disallow changes to effects that aren't of direct origin.
+        return effect.isOriginOwned ? [openOriginIcon, editIcon] : [disableIcon, editIcon, removeIcon];
     });
     Handlebars.registerHelper('EffectData', function (effectType) {
         return { 'effect-type': effectType };
@@ -24938,7 +25249,7 @@ const registerItemLineHelpers = () => {
 };
 exports.registerItemLineHelpers = registerItemLineHelpers;
 
-},{"../config":144,"../data/SR5ItemDataWrapper":148}],155:[function(require,module,exports){
+},{"../config":144,"../data/SR5ItemDataWrapper":148}],157:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerRollAndLabelHelpers = void 0;
@@ -25012,7 +25323,7 @@ const registerRollAndLabelHelpers = () => {
 };
 exports.registerRollAndLabelHelpers = registerRollAndLabelHelpers;
 
-},{"../helpers":157,"../parts/PartsList":211}],156:[function(require,module,exports){
+},{"../helpers":159,"../parts/PartsList":213}],158:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerSkillLineHelpers = void 0;
@@ -25123,7 +25434,7 @@ const registerSkillLineHelpers = () => {
 };
 exports.registerSkillLineHelpers = registerSkillLineHelpers;
 
-},{"../constants":145,"../helpers":157,"../rules/SkillRules":216}],157:[function(require,module,exports){
+},{"../constants":145,"../helpers":159,"../rules/SkillRules":218}],159:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25845,7 +26156,7 @@ class Helpers {
 }
 exports.Helpers = Helpers;
 
-},{"./apps/dialogs/DeleteConfirmationDialog":132,"./constants":145,"./data/DataDefaults":146,"./parts/PartsList":211}],158:[function(require,module,exports){
+},{"./apps/dialogs/DeleteConfirmationDialog":132,"./constants":145,"./data/DataDefaults":146,"./parts/PartsList":213}],160:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25881,6 +26192,8 @@ const EnvModifiersApplication_1 = require("./apps/EnvModifiersApplication");
 const quench_1 = require("../test/quench");
 const SR5ICActorSheet_1 = require("./actor/sheets/SR5ICActorSheet");
 const DeviceFlow_1 = require("./item/flows/DeviceFlow");
+const SR5ActiveEffect_1 = require("./effect/SR5ActiveEffect");
+const SR5ActiveEffectSheet_1 = require("./effect/SR5ActiveEffectSheet");
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 // TODO: Figure out how to change global CONFIG type
 exports.SR5CONFIG = config_1.SR5;
@@ -25928,6 +26241,9 @@ ___________________
         CONFIG.Item.documentClass = SR5Item_1.SR5Item;
         // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
         CONFIG.Combat.documentClass = SR5Combat_1.SR5Combat;
+        // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
+        CONFIG.ActiveEffect.documentClass = SR5ActiveEffect_1.SR5ActiveEffect;
+        CONFIG.ActiveEffect.sheetClass = SR5ActiveEffectSheet_1.SR5ActiveEffectSheet;
         // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
         CONFIG.Token.objectClass = SR5Token_1.SR5Token;
         // Register initiative directly (outside of system.json) as DnD5e does it.
@@ -26112,7 +26428,7 @@ ___________________
 }
 exports.HooksManager = HooksManager;
 
-},{"../test/quench":222,"./actor/SR5Actor":85,"./actor/SR5ActorSheet":86,"./actor/sheets/SR5ICActorSheet":108,"./apps/ChangelogApplication":109,"./apps/EnvModifiersApplication":110,"./apps/gmtools/OverwatchScoreTracker":137,"./canvas":141,"./chat":142,"./combat/SR5Combat":143,"./config":144,"./constants":145,"./handlebars/HandlebarManager":152,"./helpers":157,"./importer/apps/import-form":159,"./item/SR5Item":197,"./item/SR5ItemSheet":198,"./item/flows/DeviceFlow":201,"./macros":203,"./migrator/Migrator":205,"./rolls/ShadowrunRoller":212,"./settings":218,"./token/SR5Token":221}],159:[function(require,module,exports){
+},{"../test/quench":224,"./actor/SR5Actor":85,"./actor/SR5ActorSheet":86,"./actor/sheets/SR5ICActorSheet":108,"./apps/ChangelogApplication":109,"./apps/EnvModifiersApplication":110,"./apps/gmtools/OverwatchScoreTracker":137,"./canvas":141,"./chat":142,"./combat/SR5Combat":143,"./config":144,"./constants":145,"./effect/SR5ActiveEffect":149,"./effect/SR5ActiveEffectSheet":150,"./handlebars/HandlebarManager":154,"./helpers":159,"./importer/apps/import-form":161,"./item/SR5Item":199,"./item/SR5ItemSheet":200,"./item/flows/DeviceFlow":203,"./macros":205,"./migrator/Migrator":207,"./rolls/ShadowrunRoller":214,"./settings":220,"./token/SR5Token":223}],161:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26296,7 +26612,7 @@ Import.Importers = [
     new EquipmentImporter_1.EquipmentImporter()
 ];
 
-},{"../helper/ImportHelper":160,"../importer/AmmoImporter":164,"../importer/ArmorImporter":165,"../importer/ComplexFormImporter":166,"../importer/CritterPowerImporter":168,"../importer/DataImporter":169,"../importer/DeviceImporter":170,"../importer/EquipmentImporter":171,"../importer/ModImporter":172,"../importer/QualityImporter":173,"../importer/SpellImporter":174,"../importer/WareImporter":175,"../importer/WeaponImporter":176}],160:[function(require,module,exports){
+},{"../helper/ImportHelper":162,"../importer/AmmoImporter":166,"../importer/ArmorImporter":167,"../importer/ComplexFormImporter":168,"../importer/CritterPowerImporter":170,"../importer/DataImporter":171,"../importer/DeviceImporter":172,"../importer/EquipmentImporter":173,"../importer/ModImporter":174,"../importer/QualityImporter":175,"../importer/SpellImporter":176,"../importer/WareImporter":177,"../importer/WeaponImporter":178}],162:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26510,7 +26826,7 @@ exports.ImportHelper = ImportHelper;
 ImportHelper.CHAR_KEY = '_TEXT';
 ImportHelper.s_Strategy = new XMLStrategy_1.XMLStrategy();
 
-},{"../importer/Constants":167,"./JSONStrategy":162,"./XMLStrategy":163}],161:[function(require,module,exports){
+},{"../importer/Constants":169,"./JSONStrategy":164,"./XMLStrategy":165}],163:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ImportStrategy = void 0;
@@ -26518,7 +26834,7 @@ class ImportStrategy {
 }
 exports.ImportStrategy = ImportStrategy;
 
-},{}],162:[function(require,module,exports){
+},{}],164:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JSONStrategy = void 0;
@@ -26536,7 +26852,7 @@ class JSONStrategy extends ImportStrategy_1.ImportStrategy {
 }
 exports.JSONStrategy = JSONStrategy;
 
-},{"./ImportStrategy":161}],163:[function(require,module,exports){
+},{"./ImportStrategy":163}],165:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.XMLStrategy = void 0;
@@ -26585,7 +26901,7 @@ class XMLStrategy extends ImportStrategy_1.ImportStrategy {
 }
 exports.XMLStrategy = XMLStrategy;
 
-},{"./ImportHelper":160,"./ImportStrategy":161}],164:[function(require,module,exports){
+},{"./ImportHelper":162,"./ImportStrategy":163}],166:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26724,7 +27040,7 @@ class AmmoImporter extends DataImporter_1.DataImporter {
 }
 exports.AmmoImporter = AmmoImporter;
 
-},{"../../data/DataDefaults":146,"../helper/ImportHelper":160,"./Constants":167,"./DataImporter":169}],165:[function(require,module,exports){
+},{"../../data/DataDefaults":146,"../helper/ImportHelper":162,"./Constants":169,"./DataImporter":171}],167:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26813,7 +27129,7 @@ class ArmorImporter extends DataImporter_1.DataImporter {
 }
 exports.ArmorImporter = ArmorImporter;
 
-},{"../../data/DataDefaults":146,"../helper/ImportHelper":160,"../parser/armor/ArmorParserBase":179,"./DataImporter":169}],166:[function(require,module,exports){
+},{"../../data/DataDefaults":146,"../helper/ImportHelper":162,"../parser/armor/ArmorParserBase":181,"./DataImporter":171}],168:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26924,7 +27240,7 @@ class ComplexFormImporter extends DataImporter_1.DataImporter {
 }
 exports.ComplexFormImporter = ComplexFormImporter;
 
-},{"../../data/DataDefaults":146,"../helper/ImportHelper":160,"../parser/complex-form/ComplexFormParserBase":180,"./Constants":167,"./DataImporter":169}],167:[function(require,module,exports){
+},{"../../data/DataDefaults":146,"../helper/ImportHelper":162,"../parser/complex-form/ComplexFormParserBase":182,"./Constants":169,"./DataImporter":171}],169:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Constants = void 0;
@@ -27146,7 +27462,7 @@ Constants.WEAPON_RANGES = {
 };
 Constants.ROOT_IMPORT_FOLDER_NAME = 'SR5e';
 
-},{}],168:[function(require,module,exports){
+},{}],170:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27264,7 +27580,7 @@ class CritterPowerImporter extends DataImporter_1.DataImporter {
 }
 exports.CritterPowerImporter = CritterPowerImporter;
 
-},{"../../data/DataDefaults":146,"../helper/ImportHelper":160,"../parser/critter-power/CritterPowerParserBase":181,"./Constants":167,"./DataImporter":169}],169:[function(require,module,exports){
+},{"../../data/DataDefaults":146,"../helper/ImportHelper":162,"../parser/critter-power/CritterPowerParserBase":183,"./Constants":169,"./DataImporter":171}],171:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27327,7 +27643,7 @@ class DataImporter {
 exports.DataImporter = DataImporter;
 DataImporter.unsupportedBooks = ['2050'];
 
-},{"../helper/ImportHelper":160,"xml2js":51}],170:[function(require,module,exports){
+},{"../helper/ImportHelper":162,"xml2js":51}],172:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27505,7 +27821,7 @@ class DeviceImporter extends DataImporter_1.DataImporter {
 }
 exports.DeviceImporter = DeviceImporter;
 
-},{"../helper/ImportHelper":160,"./Constants":167,"./DataImporter":169}],171:[function(require,module,exports){
+},{"../helper/ImportHelper":162,"./Constants":169,"./DataImporter":171}],173:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27621,7 +27937,7 @@ class EquipmentImporter extends DataImporter_1.DataImporter {
 }
 exports.EquipmentImporter = EquipmentImporter;
 
-},{"../helper/ImportHelper":160,"./Constants":167,"./DataImporter":169}],172:[function(require,module,exports){
+},{"../helper/ImportHelper":162,"./Constants":169,"./DataImporter":171}],174:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27713,7 +28029,7 @@ class ModImporter extends DataImporter_1.DataImporter {
 }
 exports.ModImporter = ModImporter;
 
-},{"../../data/DataDefaults":146,"../helper/ImportHelper":160,"../parser/mod/ModParserBase":184,"./Constants":167,"./DataImporter":169}],173:[function(require,module,exports){
+},{"../../data/DataDefaults":146,"../helper/ImportHelper":162,"../parser/mod/ModParserBase":186,"./Constants":169,"./DataImporter":171}],175:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27822,7 +28138,7 @@ class QualityImporter extends DataImporter_1.DataImporter {
 }
 exports.QualityImporter = QualityImporter;
 
-},{"../../data/DataDefaults":146,"../helper/ImportHelper":160,"../parser/quality/QualityParserBase":185,"./DataImporter":169}],174:[function(require,module,exports){
+},{"../../data/DataDefaults":146,"../helper/ImportHelper":162,"../parser/quality/QualityParserBase":187,"./DataImporter":171}],176:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27964,7 +28280,7 @@ class SpellImporter extends DataImporter_1.DataImporter {
 }
 exports.SpellImporter = SpellImporter;
 
-},{"../../data/DataDefaults":146,"../helper/ImportHelper":160,"../parser/ParserMap":178,"../parser/spell/CombatSpellParser":186,"../parser/spell/DetectionSpellImporter":187,"../parser/spell/IllusionSpellParser":188,"../parser/spell/ManipulationSpellParser":189,"../parser/spell/SpellParserBase":190,"./DataImporter":169}],175:[function(require,module,exports){
+},{"../../data/DataDefaults":146,"../helper/ImportHelper":162,"../parser/ParserMap":180,"../parser/spell/CombatSpellParser":188,"../parser/spell/DetectionSpellImporter":189,"../parser/spell/IllusionSpellParser":190,"../parser/spell/ManipulationSpellParser":191,"../parser/spell/SpellParserBase":192,"./DataImporter":171}],177:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -28105,7 +28421,7 @@ class WareImporter extends DataImporter_1.DataImporter {
 }
 exports.WareImporter = WareImporter;
 
-},{"../../data/DataDefaults":146,"../helper/ImportHelper":160,"../parser/ware/CyberwareParser":191,"./DataImporter":169}],176:[function(require,module,exports){
+},{"../../data/DataDefaults":146,"../helper/ImportHelper":162,"../parser/ware/CyberwareParser":193,"./DataImporter":171}],178:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -28270,7 +28586,7 @@ class WeaponImporter extends DataImporter_1.DataImporter {
 }
 exports.WeaponImporter = WeaponImporter;
 
-},{"../../data/DataDefaults":146,"../helper/ImportHelper":160,"../parser/ParserMap":178,"../parser/weapon/MeleeParser":192,"../parser/weapon/RangedParser":193,"../parser/weapon/ThrownParser":194,"../parser/weapon/WeaponParserBase":195,"./Constants":167,"./DataImporter":169}],177:[function(require,module,exports){
+},{"../../data/DataDefaults":146,"../helper/ImportHelper":162,"../parser/ParserMap":180,"../parser/weapon/MeleeParser":194,"../parser/weapon/RangedParser":195,"../parser/weapon/ThrownParser":196,"../parser/weapon/WeaponParserBase":197,"./Constants":169,"./DataImporter":171}],179:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
@@ -28278,7 +28594,7 @@ class Parser {
 }
 exports.Parser = Parser;
 
-},{}],178:[function(require,module,exports){
+},{}],180:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ParserMap = void 0;
@@ -28312,7 +28628,7 @@ class ParserMap extends Parser_1.Parser {
 }
 exports.ParserMap = ParserMap;
 
-},{"../helper/ImportHelper":160,"./Parser":177}],179:[function(require,module,exports){
+},{"../helper/ImportHelper":162,"./Parser":179}],181:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ArmorParserBase = void 0;
@@ -28328,7 +28644,7 @@ class ArmorParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBas
 }
 exports.ArmorParserBase = ArmorParserBase;
 
-},{"../../helper/ImportHelper":160,"../item/TechnologyItemParserBase":183}],180:[function(require,module,exports){
+},{"../../helper/ImportHelper":162,"../item/TechnologyItemParserBase":185}],182:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ComplexFormParserBase = void 0;
@@ -28376,7 +28692,7 @@ class ComplexFormParserBase extends ItemParserBase_1.ItemParserBase {
 }
 exports.ComplexFormParserBase = ComplexFormParserBase;
 
-},{"../../helper/ImportHelper":160,"../item/ItemParserBase":182}],181:[function(require,module,exports){
+},{"../../helper/ImportHelper":162,"../item/ItemParserBase":184}],183:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CritterPowerParserBase = void 0;
@@ -28436,7 +28752,7 @@ class CritterPowerParserBase extends ItemParserBase_1.ItemParserBase {
 }
 exports.CritterPowerParserBase = CritterPowerParserBase;
 
-},{"../../helper/ImportHelper":160,"../item/ItemParserBase":182}],182:[function(require,module,exports){
+},{"../../helper/ImportHelper":162,"../item/ItemParserBase":184}],184:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemParserBase = void 0;
@@ -28456,7 +28772,7 @@ class ItemParserBase extends Parser_1.Parser {
 }
 exports.ItemParserBase = ItemParserBase;
 
-},{"../../helper/ImportHelper":160,"../Parser":177}],183:[function(require,module,exports){
+},{"../../helper/ImportHelper":162,"../Parser":179}],185:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TechnologyItemParserBase = void 0;
@@ -28473,7 +28789,7 @@ class TechnologyItemParserBase extends ItemParserBase_1.ItemParserBase {
 }
 exports.TechnologyItemParserBase = TechnologyItemParserBase;
 
-},{"../../helper/ImportHelper":160,"./ItemParserBase":182}],184:[function(require,module,exports){
+},{"../../helper/ImportHelper":162,"./ItemParserBase":184}],186:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ModParserBase = void 0;
@@ -28492,7 +28808,7 @@ class ModParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBase 
 }
 exports.ModParserBase = ModParserBase;
 
-},{"../../helper/ImportHelper":160,"../item/TechnologyItemParserBase":183}],185:[function(require,module,exports){
+},{"../../helper/ImportHelper":162,"../item/TechnologyItemParserBase":185}],187:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.QualityParserBase = void 0;
@@ -28513,7 +28829,7 @@ class QualityParserBase extends ItemParserBase_1.ItemParserBase {
 }
 exports.QualityParserBase = QualityParserBase;
 
-},{"../../helper/ImportHelper":160,"../item/ItemParserBase":182}],186:[function(require,module,exports){
+},{"../../helper/ImportHelper":162,"../item/ItemParserBase":184}],188:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CombatSpellParser = void 0;
@@ -28539,7 +28855,7 @@ class CombatSpellParser extends SpellParserBase_1.SpellParserBase {
 }
 exports.CombatSpellParser = CombatSpellParser;
 
-},{"../../helper/ImportHelper":160,"./SpellParserBase":190}],187:[function(require,module,exports){
+},{"../../helper/ImportHelper":162,"./SpellParserBase":192}],189:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DetectionSpellImporter = void 0;
@@ -28577,7 +28893,7 @@ class DetectionSpellImporter extends SpellParserBase_1.SpellParserBase {
 }
 exports.DetectionSpellImporter = DetectionSpellImporter;
 
-},{"../../helper/ImportHelper":160,"./SpellParserBase":190}],188:[function(require,module,exports){
+},{"../../helper/ImportHelper":162,"./SpellParserBase":192}],190:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IllusionSpellParser = void 0;
@@ -28609,7 +28925,7 @@ class IllusionSpellParser extends SpellParserBase_1.SpellParserBase {
 }
 exports.IllusionSpellParser = IllusionSpellParser;
 
-},{"../../helper/ImportHelper":160,"./SpellParserBase":190}],189:[function(require,module,exports){
+},{"../../helper/ImportHelper":162,"./SpellParserBase":192}],191:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ManipulationSpellParser = void 0;
@@ -28649,7 +28965,7 @@ class ManipulationSpellParser extends SpellParserBase_1.SpellParserBase {
 }
 exports.ManipulationSpellParser = ManipulationSpellParser;
 
-},{"../../helper/ImportHelper":160,"./SpellParserBase":190}],190:[function(require,module,exports){
+},{"../../helper/ImportHelper":162,"./SpellParserBase":192}],192:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpellParserBase = void 0;
@@ -28710,7 +29026,7 @@ class SpellParserBase extends ItemParserBase_1.ItemParserBase {
 }
 exports.SpellParserBase = SpellParserBase;
 
-},{"../../helper/ImportHelper":160,"../item/ItemParserBase":182}],191:[function(require,module,exports){
+},{"../../helper/ImportHelper":162,"../item/ItemParserBase":184}],193:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CyberwareParser = void 0;
@@ -28732,7 +29048,7 @@ class CyberwareParser extends TechnologyItemParserBase_1.TechnologyItemParserBas
 }
 exports.CyberwareParser = CyberwareParser;
 
-},{"../../helper/ImportHelper":160,"../item/TechnologyItemParserBase":183}],192:[function(require,module,exports){
+},{"../../helper/ImportHelper":162,"../item/TechnologyItemParserBase":185}],194:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MeleeParser = void 0;
@@ -28780,7 +29096,7 @@ class MeleeParser extends WeaponParserBase_1.WeaponParserBase {
 }
 exports.MeleeParser = MeleeParser;
 
-},{"../../../data/DataDefaults":146,"../../helper/ImportHelper":160,"./WeaponParserBase":195}],193:[function(require,module,exports){
+},{"../../../data/DataDefaults":146,"../../helper/ImportHelper":162,"./WeaponParserBase":197}],195:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RangedParser = void 0;
@@ -28841,7 +29157,7 @@ class RangedParser extends WeaponParserBase_1.WeaponParserBase {
 }
 exports.RangedParser = RangedParser;
 
-},{"../../../data/DataDefaults":146,"../../helper/ImportHelper":160,"../../importer/Constants":167,"./WeaponParserBase":195}],194:[function(require,module,exports){
+},{"../../../data/DataDefaults":146,"../../helper/ImportHelper":162,"../../importer/Constants":169,"./WeaponParserBase":197}],196:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ThrownParser = void 0;
@@ -28941,7 +29257,7 @@ class ThrownParser extends WeaponParserBase_1.WeaponParserBase {
 }
 exports.ThrownParser = ThrownParser;
 
-},{"../../../data/DataDefaults":146,"../../helper/ImportHelper":160,"../../importer/Constants":167,"./WeaponParserBase":195}],195:[function(require,module,exports){
+},{"../../../data/DataDefaults":146,"../../helper/ImportHelper":162,"../../importer/Constants":169,"./WeaponParserBase":197}],197:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WeaponParserBase = void 0;
@@ -29007,7 +29323,7 @@ class WeaponParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBa
 }
 exports.WeaponParserBase = WeaponParserBase;
 
-},{"../../helper/ImportHelper":160,"../../importer/Constants":167,"../item/TechnologyItemParserBase":183}],196:[function(require,module,exports){
+},{"../../helper/ImportHelper":162,"../../importer/Constants":169,"../item/TechnologyItemParserBase":185}],198:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatData = void 0;
@@ -29358,7 +29674,7 @@ exports.ChatData = {
     },
 };
 
-},{"../config":144,"../helpers":157}],197:[function(require,module,exports){
+},{"../config":144,"../helpers":159}],199:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -30976,7 +31292,7 @@ class SR5Item extends Item {
 }
 exports.SR5Item = SR5Item;
 
-},{"../actor/SR5Actor":85,"../actor/flows/SkillFlow":88,"../apps/dialogs/ShadowrunItemDialog":135,"../chat":142,"../config":144,"../constants":145,"../data/DataDefaults":146,"../data/SR5ItemDataWrapper":148,"../helpers":157,"../parts/PartsList":211,"../rolls/ShadowrunRoller":212,"../rules/MatrixRules":214,"./ChatData":196,"./flows/ActionFlow":199,"./flows/DeviceFlow":201,"./prep/HostPrep":202}],198:[function(require,module,exports){
+},{"../actor/SR5Actor":85,"../actor/flows/SkillFlow":88,"../apps/dialogs/ShadowrunItemDialog":135,"../chat":142,"../config":144,"../constants":145,"../data/DataDefaults":146,"../data/SR5ItemDataWrapper":148,"../helpers":159,"../parts/PartsList":213,"../rolls/ShadowrunRoller":214,"../rules/MatrixRules":216,"./ChatData":198,"./flows/ActionFlow":201,"./flows/DeviceFlow":203,"./prep/HostPrep":204}],200:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -31468,7 +31784,7 @@ class SR5ItemSheet extends ItemSheet {
 }
 exports.SR5ItemSheet = SR5ItemSheet;
 
-},{"../config":144,"../effects":149,"../helpers":157,"./flows/DeviceFlow":201}],199:[function(require,module,exports){
+},{"../config":144,"../effects":151,"../helpers":159,"./flows/DeviceFlow":203}],201:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ActionFlow = void 0;
@@ -31510,7 +31826,7 @@ class ActionFlow {
 }
 exports.ActionFlow = ActionFlow;
 
-},{"../../helpers":157}],200:[function(require,module,exports){
+},{"../../helpers":159}],202:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -31541,7 +31857,7 @@ class ActionResultFlow {
 }
 exports.ActionResultFlow = ActionResultFlow;
 
-},{"../../rules/MatrixRules":214}],201:[function(require,module,exports){
+},{"../../rules/MatrixRules":216}],203:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -31665,7 +31981,7 @@ class DeviceFlow {
 }
 exports.DeviceFlow = DeviceFlow;
 
-},{"../../actor/SR5Actor":85,"../../constants":145,"../../sockets":219,"../SR5Item":197}],202:[function(require,module,exports){
+},{"../../actor/SR5Actor":85,"../../constants":145,"../../sockets":221,"../SR5Item":199}],204:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HostPrep = exports.HostDataPreparation = void 0;
@@ -31695,7 +32011,7 @@ class HostPrep {
 }
 exports.HostPrep = HostPrep;
 
-},{"../../rules/MatrixRules":214}],203:[function(require,module,exports){
+},{"../../rules/MatrixRules":216}],205:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -31817,7 +32133,7 @@ function rollSkillMacro(skillLabel) {
 }
 exports.rollSkillMacro = rollSkillMacro;
 
-},{"./helpers":157}],204:[function(require,module,exports){
+},{"./helpers":159}],206:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const HandlebarManager_1 = require("./handlebars/HandlebarManager");
@@ -31828,7 +32144,7 @@ const hooks_1 = require("./hooks");
 hooks_1.HooksManager.registerHooks();
 HandlebarManager_1.HandlebarManager.registerHelpers();
 
-},{"./handlebars/HandlebarManager":152,"./hooks":158}],205:[function(require,module,exports){
+},{"./handlebars/HandlebarManager":154,"./hooks":160}],207:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -31977,7 +32293,7 @@ Migrator.s_Versions = [
     { versionNumber: Version0_7_2_1.Version0_7_2.TargetVersion, migration: new Version0_7_2_1.Version0_7_2() },
 ];
 
-},{"./VersionMigration":206,"./versions/LegacyMigration":207,"./versions/Version0_6_10":208,"./versions/Version0_6_5":209,"./versions/Version0_7_2":210}],206:[function(require,module,exports){
+},{"./VersionMigration":208,"./versions/LegacyMigration":209,"./versions/Version0_6_10":210,"./versions/Version0_6_5":211,"./versions/Version0_7_2":212}],208:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -32407,7 +32723,7 @@ VersionMigration.MODULE_NAME = 'shadowrun5e';
 VersionMigration.KEY_DATA_VERSION = 'systemMigrationVersion';
 VersionMigration.NO_VERSION = '0';
 
-},{}],207:[function(require,module,exports){
+},{}],209:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -32637,7 +32953,7 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
 }
 exports.LegacyMigration = LegacyMigration;
 
-},{"../VersionMigration":206}],208:[function(require,module,exports){
+},{"../VersionMigration":208}],210:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -32698,7 +33014,7 @@ class Version0_6_10 extends VersionMigration_1.VersionMigration {
 }
 exports.Version0_6_10 = Version0_6_10;
 
-},{"../VersionMigration":206}],209:[function(require,module,exports){
+},{"../VersionMigration":208}],211:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -32749,7 +33065,7 @@ class Version0_6_5 extends VersionMigration_1.VersionMigration {
 }
 exports.Version0_6_5 = Version0_6_5;
 
-},{"../VersionMigration":206}],210:[function(require,module,exports){
+},{"../VersionMigration":208}],212:[function(require,module,exports){
 "use strict";
 // TODO: How to trigger test migration.
 // TODO: How to test migration results?
@@ -32827,7 +33143,7 @@ class Version0_7_2 extends VersionMigration_1.VersionMigration {
 }
 exports.Version0_7_2 = Version0_7_2;
 
-},{"../../config":144,"../VersionMigration":206}],211:[function(require,module,exports){
+},{"../../config":144,"../VersionMigration":208}],213:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PartsList = void 0;
@@ -32931,7 +33247,7 @@ class PartsList {
 }
 exports.PartsList = PartsList;
 
-},{}],212:[function(require,module,exports){
+},{}],214:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -33318,7 +33634,7 @@ class ShadowrunRoller {
 }
 exports.ShadowrunRoller = ShadowrunRoller;
 
-},{"../apps/dialogs/ShadowrunTestDialog":136,"../chat":142,"../constants":145,"../helpers":157,"../parts/PartsList":211}],213:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunTestDialog":136,"../chat":142,"../constants":145,"../helpers":159,"../parts/PartsList":213}],215:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CombatRules = void 0;
@@ -33363,7 +33679,7 @@ class CombatRules {
 }
 exports.CombatRules = CombatRules;
 
-},{"../constants":145}],214:[function(require,module,exports){
+},{"../constants":145}],216:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatrixRules = void 0;
@@ -33417,7 +33733,7 @@ class MatrixRules {
      * @param marks
      */
     static isValidMarksCount(marks) {
-        return marks >= MatrixRules.minMarksCount() && marks <= MatrixRules.maxMarksCount();
+        return marks >= MatrixRules.minMarksCount() && marks <= MatrixRules.maxMarksCount() && marks % 1 === 0;
     }
     static maxMarksCount() {
         return 3;
@@ -33439,7 +33755,7 @@ class MatrixRules {
 }
 exports.MatrixRules = MatrixRules;
 
-},{"../constants":145}],215:[function(require,module,exports){
+},{"../constants":145}],217:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -33637,7 +33953,7 @@ class Modifiers {
 }
 exports.Modifiers = Modifiers;
 
-},{"../constants":145}],216:[function(require,module,exports){
+},{"../constants":145}],218:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SkillRules = void 0;
@@ -33679,7 +33995,7 @@ class SkillRules {
 }
 exports.SkillRules = SkillRules;
 
-},{"../constants":145}],217:[function(require,module,exports){
+},{"../constants":145}],219:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SoakRules = void 0;
@@ -33880,7 +34196,7 @@ class SoakRules {
 }
 exports.SoakRules = SoakRules;
 
-},{"../config":144,"../helpers":157}],218:[function(require,module,exports){
+},{"../config":144,"../helpers":159}],220:[function(require,module,exports){
 "use strict";
 // game settings for shadowrun 5e
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -33990,7 +34306,7 @@ const registerSystemSettings = () => {
 };
 exports.registerSystemSettings = registerSystemSettings;
 
-},{"./constants":145,"./migrator/VersionMigration":206}],219:[function(require,module,exports){
+},{"./constants":145,"./migrator/VersionMigration":208}],221:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -34033,7 +34349,7 @@ class SocketMessage {
 }
 exports.SocketMessage = SocketMessage;
 
-},{"./constants":145}],220:[function(require,module,exports){
+},{"./constants":145}],222:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -34152,7 +34468,7 @@ class Template extends MeasuredTemplate {
 }
 exports.default = Template;
 
-},{}],221:[function(require,module,exports){
+},{}],223:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5Token = void 0;
@@ -34171,13 +34487,16 @@ class SR5Token extends Token {
 }
 exports.SR5Token = SR5Token;
 
-},{}],222:[function(require,module,exports){
+},{}],224:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.quenchRegister = void 0;
 const sr5_Modifiers_spec_1 = require("./sr5.Modifiers.spec");
 const sr5_SR5Item_spec_1 = require("./sr5.SR5Item.spec");
 const sr5_Matrix_spec_1 = require("./sr5.Matrix.spec");
+const sr5_SR5Actor_spec_1 = require("./sr5.SR5Actor.spec");
+const sr5_ActorDataPrep_spec_1 = require("./sr5.ActorDataPrep.spec");
+const sr5_ActiveEffect_spec_1 = require("./sr5.ActiveEffect.spec");
 /**
  * Register FoundryVTT Quench test batches...
  *
@@ -34189,10 +34508,290 @@ const quenchRegister = quench => {
     quench.registerBatch("shadowrun5e.rules.matrix", sr5_Matrix_spec_1.shadowrunMatrix);
     quench.registerBatch("shadowrun5e.rules.modifiers", sr5_Modifiers_spec_1.shadowrunRulesModifiers);
     quench.registerBatch("shadowrun5e.entities.items", sr5_SR5Item_spec_1.shadowrunSR5Item);
+    quench.registerBatch("shadowrun5e.entities.actors", sr5_SR5Actor_spec_1.shadowrunSR5Actor);
+    quench.registerBatch("shadowrun5e.entities.effects", sr5_ActiveEffect_spec_1.shadowrunSR5ActiveEffect);
+    quench.registerBatch("shadowrun5e.data_prep.actor", sr5_ActorDataPrep_spec_1.shadowrunSR5ActorDataPrep);
 };
 exports.quenchRegister = quenchRegister;
 
-},{"./sr5.Matrix.spec":223,"./sr5.Modifiers.spec":224,"./sr5.SR5Item.spec":225}],223:[function(require,module,exports){
+},{"./sr5.ActiveEffect.spec":225,"./sr5.ActorDataPrep.spec":226,"./sr5.Matrix.spec":227,"./sr5.Modifiers.spec":228,"./sr5.SR5Actor.spec":229,"./sr5.SR5Item.spec":230}],225:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.shadowrunSR5ActiveEffect = void 0;
+const utils_1 = require("./utils");
+const SR5Actor_1 = require("../module/actor/SR5Actor");
+const SR5Item_1 = require("../module/item/SR5Item");
+const shadowrunSR5ActiveEffect = context => {
+    const { describe, it, assert, before, after } = context;
+    let testActor;
+    let testItem;
+    before(() => __awaiter(void 0, void 0, void 0, function* () {
+        testActor = new utils_1.SR5TestingDocuments(SR5Actor_1.SR5Actor);
+        testItem = new utils_1.SR5TestingDocuments(SR5Item_1.SR5Item);
+    }));
+    after(() => __awaiter(void 0, void 0, void 0, function* () {
+        yield testActor.teardown();
+        yield testItem.teardown();
+    }));
+    describe('SR5ActiveEffect', () => {
+        it('apply the custom modify mode', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const effect = yield actor.createEmbeddedDocuments('ActiveEffect', [{
+                    origin: actor.uuid,
+                    disabled: false,
+                    label: 'Test Effect'
+                }]);
+            yield effect[0].update({ 'changes': [{ key: 'data.attributes.body.mod', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }] });
+            assert.deepEqual(actor.data.data.attributes.body.mod, [{ name: 'Test Effect', value: 2 }]);
+            assert.strictEqual(actor.data.data.attributes.body.value, 2);
+            yield effect[0].update({ 'changes': [{ key: 'data.attributes.body.mod', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
+                    { key: 'data.attributes.body.mod', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }] });
+            assert.deepEqual(actor.data.data.attributes.body.mod, [{ name: 'Test Effect', value: 2 }, { name: 'Test Effect', value: 2 }]);
+            assert.strictEqual(actor.data.data.attributes.body.value, 4);
+        }));
+        it('apply the custom mode mode, when using ADD mode on a mod array', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const effect = yield actor.createEmbeddedDocuments('ActiveEffect', [{
+                    origin: actor.uuid,
+                    disabled: false,
+                    label: 'Test Effect'
+                }]);
+            yield effect[0].update({ 'changes': [{ key: 'data.attributes.body.mod', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.ADD }] });
+            assert.deepEqual(actor.data.data.attributes.body.mod, [{ name: 'Test Effect', value: 3 }]);
+            assert.strictEqual(actor.data.data.attributes.body.value, 3);
+            yield effect[0].update({ 'changes': [{ key: 'data.attributes.body.mod', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                    { key: 'data.attributes.body.mod', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.ADD }] });
+            assert.deepEqual(actor.data.data.attributes.body.mod, [{ name: 'Test Effect', value: 3 }, { name: 'Test Effect', value: 3 }]);
+            assert.strictEqual(actor.data.data.attributes.body.value, 6);
+        }));
+    });
+};
+exports.shadowrunSR5ActiveEffect = shadowrunSR5ActiveEffect;
+
+},{"../module/actor/SR5Actor":85,"../module/item/SR5Item":199,"./utils":231}],226:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.shadowrunSR5ActorDataPrep = void 0;
+const utils_1 = require("./utils");
+const SR5Actor_1 = require("../module/actor/SR5Actor");
+const SR5Item_1 = require("../module/item/SR5Item");
+const constants_1 = require("../module/constants");
+const shadowrunSR5ActorDataPrep = context => {
+    const { describe, it, assert, before, after } = context;
+    let testActor;
+    let testItem;
+    before(() => __awaiter(void 0, void 0, void 0, function* () {
+        testActor = new utils_1.SR5TestingDocuments(SR5Actor_1.SR5Actor);
+        testItem = new utils_1.SR5TestingDocuments(SR5Item_1.SR5Item);
+    }));
+    after(() => __awaiter(void 0, void 0, void 0, function* () {
+        yield testActor.teardown();
+        yield testItem.teardown();
+    }));
+    describe('CharacterDataPrep', () => {
+        it('Character default attribute values', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character', metatype: 'human' });
+            // Check for attribute min values;
+            console.log('Physical attributes');
+            assert.strictEqual(actor.data.data.attributes.body.value, constants_1.SR.attributes.ranges['body'].min);
+            assert.strictEqual(actor.data.data.attributes.agility.value, constants_1.SR.attributes.ranges['agility'].min);
+            assert.strictEqual(actor.data.data.attributes.reaction.value, constants_1.SR.attributes.ranges['reaction'].min);
+            assert.strictEqual(actor.data.data.attributes.strength.value, constants_1.SR.attributes.ranges['strength'].min);
+            assert.strictEqual(actor.data.data.attributes.willpower.value, constants_1.SR.attributes.ranges['willpower'].min);
+            assert.strictEqual(actor.data.data.attributes.logic.value, constants_1.SR.attributes.ranges['logic'].min);
+            assert.strictEqual(actor.data.data.attributes.intuition.value, constants_1.SR.attributes.ranges['intuition'].min);
+            assert.strictEqual(actor.data.data.attributes.charisma.value, constants_1.SR.attributes.ranges['charisma'].min);
+            console.log('Comon special attributes');
+            assert.strictEqual(actor.data.data.attributes.edge.value, constants_1.SR.attributes.ranges['edge'].min);
+            assert.strictEqual(actor.data.data.attributes.essence.value, constants_1.SR.attributes.defaults['essence']);
+            console.log('Special special attributes');
+            assert.strictEqual(actor.data.data.attributes.resonance.value, constants_1.SR.attributes.ranges['resonance'].min);
+            assert.strictEqual(actor.data.data.attributes.magic.value, constants_1.SR.attributes.ranges['magic'].min);
+        }));
+        it('Character monitor calculation', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            let data = actor.asCharacterData();
+            // Check default values.
+            assert.strictEqual(data.data.track.stun.max, 9); // 8 + round_up(1 / 2)
+            assert.strictEqual(data.data.track.physical.max, 9); // 8 + round_up(1 / 2)
+            assert.strictEqual(data.data.track.physical.overflow.max, constants_1.SR.attributes.ranges.body.min); // body value
+            // Check calculated values after update.
+            yield actor.update({
+                'data.attributes.body.base': 6,
+                'data.attributes.willpower.base': 6,
+            });
+            assert.strictEqual(data.data.track.stun.max, 11); // 8 + round_up(6 / 2)
+            assert.strictEqual(data.data.track.physical.max, 11); // 8 + round_up(6 / 2)
+            assert.strictEqual(data.data.track.physical.overflow.max, 6); // body value
+        }));
+        it('Character initiative calculation', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const data = actor.asCharacterData();
+            // Check default values.
+            console.log('Meatspace Ini');
+            assert.strictEqual(data.data.initiative.meatspace.base.base, 2); // REA+INT
+            assert.strictEqual(data.data.initiative.meatspace.dice.base, 1);
+            console.log('Matrix AR Ini');
+            assert.strictEqual(data.data.initiative.matrix.base.base, 1); // No matrix device
+            assert.strictEqual(data.data.initiative.matrix.dice.base, 3); // Cold SIM
+            console.log('Magic Ini');
+            assert.strictEqual(data.data.initiative.astral.base.base, 2); // INT+INT
+            assert.strictEqual(data.data.initiative.astral.dice.base, 2);
+        }));
+        it('Character limit calculation', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const data = actor.asCharacterData();
+            assert.strictEqual(data.data.limits.physical.value, 2); // (STR*2 + BOD + REA) / 3
+            assert.strictEqual(data.data.limits.mental.value, 2); // (LOG*2 + INT + WIL) / 3
+            assert.strictEqual(data.data.limits.social.value, 3); // (CHA*2 + WILL + ESS) / 3
+            yield actor.update({
+                'data.attributes.strength.base': 6,
+                'data.attributes.body.base': 6,
+                'data.attributes.reaction.base': 6,
+                'data.attributes.logic.base': 6,
+                'data.attributes.intuition.base': 6,
+                'data.attributes.willpower.base': 6,
+                'data.attributes.charisma.base': 6,
+                'data.attributes.essence.base': 6,
+            });
+            assert.strictEqual(data.data.limits.physical.value, 8);
+            assert.strictEqual(data.data.limits.mental.value, 8);
+            assert.strictEqual(data.data.limits.social.value, 8);
+        }));
+        it('Character movement calculation', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const data = actor.asCharacterData();
+            assert.strictEqual(data.data.movement.walk.value, 2); // AGI * 2
+            assert.strictEqual(data.data.movement.run.value, 4); // AGI * 4
+            yield actor.update({
+                'data.attributes.agility.base': 6
+            });
+            assert.strictEqual(data.data.movement.walk.value, 12);
+            assert.strictEqual(data.data.movement.run.value, 24);
+        }));
+        it('Character skill calculation', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const data = actor.asCharacterData();
+            yield actor.update({
+                'data.skills.active.arcana.base': 6,
+                'data.skills.active.arcana.bonus': [{ key: 'Test', value: 1 }],
+                'data.skills.active.arcana.specs': ['Test']
+            });
+            assert.strictEqual(data.data.skills.active.arcana.value, 7);
+        }));
+        it('Character damage application', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const data = actor.asCharacterData();
+            assert.strictEqual(data.data.track.stun.value, 0);
+            assert.strictEqual(data.data.track.stun.wounds, 0);
+            assert.strictEqual(data.data.track.physical.value, 0);
+            assert.strictEqual(data.data.track.physical.wounds, 0);
+            assert.strictEqual(data.data.wounds.value, 0);
+            yield actor.update({
+                'data.track.stun.value': 3,
+                'data.track.physical.value': 3,
+            });
+            assert.strictEqual(data.data.track.stun.value, 3);
+            assert.strictEqual(data.data.track.stun.wounds, 1);
+            assert.strictEqual(data.data.track.physical.value, 3);
+            assert.strictEqual(data.data.track.physical.wounds, 1);
+            assert.strictEqual(data.data.wounds.value, 2);
+        }));
+        it('Character damage application with high pain/wound tolerance', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const data = actor.asCharacterData();
+            yield actor.update({
+                'data.track.stun.value': 6,
+                'data.track.physical.value': 6,
+                'data.modifiers.wound_tolerance': 3
+            });
+            assert.strictEqual(data.data.track.stun.value, 6);
+            assert.strictEqual(data.data.track.stun.wounds, 1); // would normally be 2 (-2)
+            assert.strictEqual(data.data.track.physical.value, 6);
+            assert.strictEqual(data.data.track.physical.wounds, 1);
+            assert.strictEqual(data.data.wounds.value, 2); // would normally be 4 (-4)
+        }));
+    });
+    describe('SpiritDataPrep', () => {
+        it('Spirits are always magical', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'spirit' });
+            assert.strictEqual(actor.data.data.special, 'magic');
+        }));
+        it('Spirit default/overrides by example type', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'spirit', 'data.spiritType': 'air' });
+            const data = actor.asSpiritData();
+            // Without adequate force there will be negative base values with minimum attribute values.
+            assert.strictEqual(data.data.attributes.body.base, -2);
+            assert.strictEqual(data.data.attributes.agility.base, 3);
+            assert.strictEqual(data.data.attributes.reaction.base, 4);
+            assert.strictEqual(data.data.attributes.strength.base, -3);
+            assert.strictEqual(data.data.attributes.intuition.base, 0);
+            assert.strictEqual(data.data.initiative.meatspace.base.base, 4); // force * 2 + override;
+            assert.strictEqual(data.data.skills.active.assensing.base, 0);
+            yield actor.update({
+                'data.force': 6
+            });
+            assert.strictEqual(data.data.attributes.body.base, 4);
+            assert.strictEqual(data.data.attributes.agility.base, 9);
+            assert.strictEqual(data.data.attributes.reaction.base, 10);
+            assert.strictEqual(data.data.attributes.strength.base, 3);
+            assert.strictEqual(data.data.attributes.intuition.base, 6); // set by force without spirit type mods.
+            assert.strictEqual(data.data.initiative.meatspace.base.base, 16);
+            assert.strictEqual(data.data.skills.active.assensing.base, 6);
+            assert.strictEqual(data.data.skills.active.arcana.base, 0); // not for this spirit type.
+        }));
+    });
+    describe('SpriteDataPrep', () => {
+        it('Sprites are always awakened', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'sprite' });
+            assert.strictEqual(actor.data.data.special, 'resonance');
+        }));
+        it('Sprites default/override values by example type', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'sprite', 'data.spriteType': 'courier' });
+            const data = actor.asSpriteData();
+            assert.strictEqual(data.data.matrix.sleaze.base, 3);
+            assert.strictEqual(data.data.matrix.data_processing.base, 1);
+            assert.strictEqual(data.data.matrix.firewall.base, 2);
+            assert.strictEqual(data.data.matrix.sleaze.base, 3);
+            assert.strictEqual(data.data.initiative.matrix.base.base, 1);
+            assert.strictEqual(data.data.skills.active.hacking.base, 0);
+            yield actor.update({
+                'data.level': 6
+            });
+            assert.strictEqual(data.data.level, 6);
+            assert.strictEqual(data.data.matrix.sleaze.base, 9);
+            assert.strictEqual(data.data.matrix.data_processing.base, 7);
+            assert.strictEqual(data.data.matrix.firewall.base, 8);
+            assert.strictEqual(data.data.matrix.sleaze.base, 9);
+            assert.strictEqual(data.data.initiative.matrix.base.base, 13);
+            assert.strictEqual(data.data.initiative.matrix.dice.base, 4);
+            assert.strictEqual(data.data.skills.active.hacking.base, 6);
+            assert.strictEqual(data.data.skills.active.computer.base, 6); // all sprites
+            assert.strictEqual(data.data.skills.active.electronic_warfare.base, 0); // not set by sprite type.
+        }));
+    });
+};
+exports.shadowrunSR5ActorDataPrep = shadowrunSR5ActorDataPrep;
+
+},{"../module/actor/SR5Actor":85,"../module/constants":145,"../module/item/SR5Item":199,"./utils":231}],227:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shadowrunMatrix = void 0;
@@ -34239,11 +34838,33 @@ const shadowrunMatrix = context => {
             assert.strictEqual(MatrixRules_1.MatrixRules.getICMeatAttributeBase(3), 3);
             assert.strictEqual(MatrixRules_1.MatrixRules.getICMeatAttributeBase(27), 27);
         });
+        it('Should disallow invalid marks counters', () => {
+            assert.isTrue(MatrixRules_1.MatrixRules.isValidMarksCount(0));
+            assert.isTrue(MatrixRules_1.MatrixRules.isValidMarksCount(1));
+            assert.isTrue(MatrixRules_1.MatrixRules.isValidMarksCount(2));
+            assert.isTrue(MatrixRules_1.MatrixRules.isValidMarksCount(3));
+            assert.isFalse(MatrixRules_1.MatrixRules.isValidMarksCount(-1));
+            assert.isFalse(MatrixRules_1.MatrixRules.isValidMarksCount(4));
+            assert.isFalse(MatrixRules_1.MatrixRules.isValidMarksCount(1.5));
+        });
+        it('Should return valid marks counts', () => {
+            assert.strictEqual(MatrixRules_1.MatrixRules.getValidMarksCount(-1), MatrixRules_1.MatrixRules.minMarksCount());
+            assert.strictEqual(MatrixRules_1.MatrixRules.getValidMarksCount(0), 0);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getValidMarksCount(1), 1);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getValidMarksCount(2), 2);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getValidMarksCount(3), 3);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getValidMarksCount(4), MatrixRules_1.MatrixRules.maxMarksCount());
+        });
+        it('Should return expected host matrix attribute ratings', () => {
+            assert.deepEqual(MatrixRules_1.MatrixRules.hostMatrixAttributeRatings(1), [2, 3, 4, 5]);
+            assert.deepEqual(MatrixRules_1.MatrixRules.hostMatrixAttributeRatings(2), [3, 4, 5, 6]);
+            assert.deepEqual(MatrixRules_1.MatrixRules.hostMatrixAttributeRatings(10), [11, 12, 13, 14]);
+        });
     });
 };
 exports.shadowrunMatrix = shadowrunMatrix;
 
-},{"../module/rules/MatrixRules":214}],224:[function(require,module,exports){
+},{"../module/rules/MatrixRules":216}],228:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shadowrunRulesModifiers = void 0;
@@ -34412,7 +35033,71 @@ const shadowrunRulesModifiers = context => {
 };
 exports.shadowrunRulesModifiers = shadowrunRulesModifiers;
 
-},{"../module/rules/Modifiers":215}],225:[function(require,module,exports){
+},{"../module/rules/Modifiers":217}],229:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.shadowrunSR5Actor = void 0;
+const SR5Actor_1 = require("../module/actor/SR5Actor");
+const SR5Item_1 = require("../module/item/SR5Item");
+const utils_1 = require("./utils");
+const shadowrunSR5Actor = context => {
+    const { describe, it, assert, before, after } = context;
+    let testActor;
+    let testItem;
+    before(() => __awaiter(void 0, void 0, void 0, function* () {
+        testActor = new utils_1.SR5TestingDocuments(SR5Actor_1.SR5Actor);
+        testItem = new utils_1.SR5TestingDocuments(SR5Item_1.SR5Item);
+    }));
+    after(() => __awaiter(void 0, void 0, void 0, function* () {
+        yield testActor.teardown();
+        yield testItem.teardown();
+    }));
+    describe('SR5Actor', () => {
+        it('Should create a naked actor of any type', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            // Check basic foundry data integrity
+            assert.notStrictEqual(actor.id, '');
+            assert.notStrictEqual(actor.id, undefined);
+            assert.notStrictEqual(actor.id, null);
+            // Check foundry item collection integrity
+            const fromCollection = game.actors.get(actor.id);
+            assert.isOk(fromCollection);
+            assert.strictEqual(actor.id, fromCollection.id);
+        }));
+        it('Should update an actor of any time', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            assert.notProperty(actor.data.data, 'test');
+            yield actor.update({ 'data.test': true });
+            assert.property(actor.data.data, 'test');
+            assert.propertyVal(actor.data.data, 'test', true);
+        }));
+        it('Should embedd a weapon into an actor and not the global item colection', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const weapon = yield testItem.create({ type: 'weapon' });
+            yield actor.createOwnedItem(weapon.data);
+            const ownedItems = Array.from(actor.items);
+            assert.isNotEmpty(ownedItems);
+            assert.lengthOf(ownedItems, 1);
+            const ownedItem = ownedItems[0];
+            assert.strictEqual(ownedItem.type, weapon.data.type);
+            // An owned item should NOT appear in the items collection.
+            const ownedInCollection = game.items.get(ownedItem.id);
+            assert.isNotOk(ownedInCollection);
+        }));
+    });
+};
+exports.shadowrunSR5Actor = shadowrunSR5Actor;
+
+},{"../module/actor/SR5Actor":85,"../module/item/SR5Item":199,"./utils":231}],230:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -34426,48 +35111,22 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shadowrunSR5Item = void 0;
 const SR5Item_1 = require("../module/item/SR5Item");
+const utils_1 = require("./utils");
 const shadowrunSR5Item = context => {
     /**
      * Setup handling for all items within this test.
      */
-    class TestingItems {
-        constructor() {
-            this.items = {};
-        }
-        create(data) {
-            return __awaiter(this, void 0, void 0, function* () {
-                // @ts-ignore
-                const item = yield Item.create(Object.assign({ name: '#QUENCH_TEST_ITEM_SHOULD_HAVE_BEEN_DELETED' }, data));
-                this.items[item.id] = item;
-                return item;
-            });
-        }
-        delete(id) {
-            return __awaiter(this, void 0, void 0, function* () {
-                const item = this.items[id];
-                if (!item)
-                    return;
-                yield Item.delete(item.data._id);
-                delete this.items[item.id];
-            });
-        }
-        teardown() {
-            return __awaiter(this, void 0, void 0, function* () {
-                Object.values(this.items).forEach(item => this.delete(item.id));
-            });
-        }
-    }
     const { describe, it, assert, before, after } = context;
-    let testing;
+    let testItem;
     before(() => __awaiter(void 0, void 0, void 0, function* () {
-        testing = new TestingItems();
+        testItem = new utils_1.SR5TestingDocuments(SR5Item_1.SR5Item);
     }));
     after(() => __awaiter(void 0, void 0, void 0, function* () {
-        yield testing.teardown();
+        yield testItem.teardown();
     }));
     describe('SR5Items', () => {
         it('Should create a naked item of any type', () => __awaiter(void 0, void 0, void 0, function* () {
-            const item = yield testing.create({ type: 'action' });
+            const item = yield testItem.create({ type: 'action' });
             // Check basic foundry data integrity
             assert.notStrictEqual(item.id, '');
             assert.notStrictEqual(item.id, undefined);
@@ -34478,15 +35137,15 @@ const shadowrunSR5Item = context => {
             assert.strictEqual(item.id, itemFromCollection.id);
         }));
         it('Should update an item of any type', () => __awaiter(void 0, void 0, void 0, function* () {
-            const item = yield testing.create({ type: 'action' });
+            const item = yield testItem.create({ type: 'action' });
             assert.notProperty(item.data.data, 'test');
             yield item.update({ 'data.test': true });
             assert.property(item.data.data, 'test');
             assert.propertyVal(item.data.data, 'test', true);
         }));
-        it('Should embedd an ammo into a weapon and not the global item collection', () => __awaiter(void 0, void 0, void 0, function* () {
-            const weapon = yield testing.create({ type: 'weapon' });
-            const ammo = yield testing.create({ type: 'ammo' });
+        it('Should embedd a ammo into a weapon and not the global item collection', () => __awaiter(void 0, void 0, void 0, function* () {
+            const weapon = yield testItem.create({ type: 'weapon' });
+            const ammo = yield testItem.create({ type: 'ammo' });
             yield weapon.createOwnedItem(ammo.data);
             const embeddedItemDatas = weapon.getEmbeddedItems();
             assert.isNotEmpty(embeddedItemDatas);
@@ -34495,11 +35154,11 @@ const shadowrunSR5Item = context => {
             assert.strictEqual(embeddedAmmoData.type, ammo.data.type);
             // An embedded item should NOT appear in the items collection.
             const embeddedAmmoInCollection = game.items.get(embeddedAmmoData._id);
-            assert.strictEqual(embeddedAmmoInCollection, null);
+            assert.strictEqual(embeddedAmmoInCollection, undefined);
         }));
         it('Should update an embedded ammo', () => __awaiter(void 0, void 0, void 0, function* () {
-            const weapon = yield testing.create({ type: 'weapon' });
-            const ammo = yield testing.create({ type: 'ammo' });
+            const weapon = yield testItem.create({ type: 'weapon' });
+            const ammo = yield testItem.create({ type: 'ammo' });
             // Embed the item and get
             yield weapon.createOwnedItem(ammo.data);
             const embeddedItemDatas = weapon.getEmbeddedItems();
@@ -34520,6 +35179,51 @@ const shadowrunSR5Item = context => {
 };
 exports.shadowrunSR5Item = shadowrunSR5Item;
 
-},{"../module/item/SR5Item":197}]},{},[204])
+},{"../module/item/SR5Item":199,"./utils":231}],231:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SR5TestingDocuments = void 0;
+class SR5TestingDocuments {
+    constructor(documentClass) {
+        this.documents = {};
+        this.documentClass = documentClass;
+    }
+    create(data) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // @ts-ignore // TODO: foundry-vtt-types 0.8
+            const document = yield this.documentClass.create(Object.assign({ name: `#QUENCH_TEST_${this.documentClass.constructor}_SHOULD_HAVE_BEEN_DELETED` }, data));
+            this.documents[document.id] = document;
+            return document;
+        });
+    }
+    delete(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const document = this.documents[id];
+            if (!document)
+                return;
+            // @ts-ignore // foundry-vtt-types 0.9
+            yield this.documentClass.deleteDocuments([document.data._id]);
+            delete this.documents[document.id];
+        });
+    }
+    teardown() {
+        return __awaiter(this, void 0, void 0, function* () {
+            // @ts-ignore
+            Object.values(this.documents).forEach(document => this.delete(document.id));
+        });
+    }
+}
+exports.SR5TestingDocuments = SR5TestingDocuments;
+
+},{}]},{},[206])
 
 //# sourceMappingURL=bundle.js.map
