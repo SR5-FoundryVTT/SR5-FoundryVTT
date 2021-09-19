@@ -72,60 +72,70 @@
                     "body": {
                         "value": 1,
                         "min": 1,
+                        "temp": 0,
                         "mod": [],
                         "limit": "physical"
                     },
                     "agility": {
                         "value": 1,
                         "min": 1,
+                        "temp": 0,
                         "mod": [],
                         "limit": "physical"
                     },
                     "reaction": {
                         "value": 1,
                         "min": 1,
+                        "temp": 0,
                         "mod": [],
                         "limit": "physical"
                     },
                     "strength": {
                         "value": 1,
                         "min": 1,
+                        "temp": 0,
                         "mod": [],
                         "limit": "physical"
                     },
                     "willpower": {
                         "value": 1,
                         "min": 1,
+                        "temp": 0,
                         "mod": [],
                         "limit": "mental"
                     },
                     "logic": {
                         "value": 1,
                         "min": 1,
+                        "temp": 0,
                         "mod": [],
                         "limit": "mental"
                     },
                     "intuition": {
                         "value": 1,
                         "min": 1,
+                        "temp": 0,
                         "mod": [],
                         "limit": "mental"
                     },
                     "charisma": {
                         "value": 1,
                         "min": 1,
+                        "temp": 0,
                         "mod": [],
                         "limit": "social"
                     },
                     "magic": {
                         "value": 0,
                         "min": 0,
+                        "temp": 0,
                         "mod": [],
                         "limit": "mental"
                     },
                     "resonance": {
                         "value": 0,
                         "min": 0,
+                        "temp": 0,
                         "mod": [],
                         "limit": "mental"
                     },
@@ -133,12 +143,14 @@
                         "value": 0,
                         "uses": 0,
                         "min": 0,
+                        "temp": 0,
                         "mod": [],
                         "hidden": true
                     },
                     "essence": {
                         "value": 6,
                         "min": 0,
+                        "temp": 0,
                         "mod": [],
                         "hidden": true
                     }
@@ -801,9 +813,11 @@
             "movement": {
                 "movement": {
                     "walk": {
+                        "mod": [],
                         "value": 1
                     },
                     "run": {
+                        "mod": [],
                         "value": 2
                     },
                     "sprint": 2,
@@ -1178,7 +1192,7 @@
             "armor": {
                 "armor": {
                     "value": 0,
-                    "mod": false,
+                    "mod": [],
                     "acid": 0,
                     "cold": 0,
                     "fire": 0,

@@ -4,6 +4,7 @@ import { PartsList } from '../../../parts/PartsList';
 import ArmorActorData = Shadowrun.ArmorActorData;
 import {SR5} from "../../../config";
 import ActorTypesData = Shadowrun.ShadowrunActorDataData;
+import {SR} from "../../../constants";
 
 export class ItemPrep {
     /**
@@ -15,7 +16,10 @@ export class ItemPrep {
         const { armor } = data;
         armor.base = 0;
         armor.value = 0;
-        armor.mod = [];
+        // if (!isNaN(armor.mod)) {
+        //     armor.mod = [armor.mod]
+        // }
+        // armor.mod = [];
         for (const element of Object.keys(SR5.elementTypes)) {
             armor[element] = 0;
         }
@@ -69,7 +73,7 @@ export class ItemPrep {
             parts.addUniquePart('SR5.Bonus', Number(essenceMod));
         }
 
-        attributes.essence.base = 6;
+        attributes.essence.base = SR.attributes.defaults.essence;
         attributes.essence.mod = parts.list;
         attributes.essence.value = Helpers.calcTotal(attributes.essence);
     }

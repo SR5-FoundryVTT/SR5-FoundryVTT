@@ -439,13 +439,18 @@ export const registerItemLineHelpers = () => {
             title: game.i18n.localize('SR5.DeleteItem'),
             data: {action: 'delete'}
         };
-        const pdfIcon = {
-            icon: 'fas fa-file open-source-pdf',
-            title: game.i18n.localize('SR5.OpenSourcePdf'),
+        const disableIcon = {
+            icon: `${effect.data.disabled ? 'far fa-circle' : 'fas fa-check-circle'} effect-control`,
+            title: game.i18n.localize('SR5.ToggleActive'),
+            data: {action: "toggle"}
         };
-        // TODO: Add source icon to open item / actor causing the effect
-
-        return [pdfIcon, editIcon, removeIcon];
+        const openOriginIcon = {
+            icon: 'fas fa-file effect-control',
+            title: game.i18n.localize('SR5.OpenOrigin'),
+            data: {action: "open-origin"}
+        }
+        // Disallow changes to effects that aren't of direct origin.
+        return effect.isOriginOwned ? [openOriginIcon, editIcon] : [disableIcon, editIcon, removeIcon];
     });
 
     Handlebars.registerHelper('EffectData', function(effectType: string) {

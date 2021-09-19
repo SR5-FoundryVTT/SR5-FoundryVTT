@@ -33,12 +33,12 @@ import Skills = Shadowrun.Skills;
 import CharacterSkills = Shadowrun.CharacterSkills;
 import {SR5} from "../config";
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
-import {CharacterDataPrepare} from "./prep/CharacterPrep";
+import {CharacterPrep} from "./prep/CharacterPrep";
 import {SR5ItemDataWrapper} from "../data/SR5ItemDataWrapper";
-import {CritterDataPrepare} from "./prep/CritterPrep";
-import {SpiritDataPrepare} from "./prep/SpiritPrep";
-import {SpriteDataPrepare} from "./prep/SpritePrep";
-import {VehicleDataPreparation} from "./prep/VehiclePrep";
+import {CritterPrep} from "./prep/CritterPrep";
+import {SpiritPrep} from "./prep/SpiritPrep";
+import {SpritePrep} from "./prep/SpritePrep";
+import {VehiclePrep} from "./prep/VehiclePrep";
 import SpiritActorData = Shadowrun.SpiritActorData;
 import CharacterData = Shadowrun.CharacterData;
 import CharacterActorData = Shadowrun.CharacterActorData;
@@ -51,7 +51,7 @@ import ICActorData = Shadowrun.ICActorData;
 import {SkillRules} from "../rules/SkillRules";
 import MatrixData = Shadowrun.MatrixData;
 import {MatrixRules} from "../rules/MatrixRules";
-import {ICDataPreparation} from "./prep/ICPrep";
+import {ICPrep} from "./prep/ICPrep";
 import HostItemData = Shadowrun.HostItemData;
 import MarkedDocument = Shadowrun.MarkedDocument;
 
@@ -93,10 +93,37 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
     }
 
     /**
-     *  Prepare base data. Be careful that this ONLY included data not in need for item access. Check Actor and ClientDocumentMixin.prepareData for order of data prep.
+     *  Prepare base data. Be careful that this ONLY included data not in need for item access.
+     *  Check Actor and ClientDocumentMixin.prepareData for order of data prep.
+     *
+     *  Shadowrun data preparation is separate from the actor entity see the different <>Prep classes like
+     *  CharacterPrep
      */
     prepareBaseData() {
         super.prepareBaseData();
+
+        switch (this.data.type) {
+            case 'character':
+                CharacterPrep.prepareBaseData(this.data.data);
+                break;
+            case "critter":
+                CritterPrep.prepareBaseData(this.data.data);
+                break;
+            case "spirit":
+                SpiritPrep.prepareBaseData(this.data.data);
+                break;
+            case "sprite":
+                SpritePrep.prepareBaseData(this.data.data);
+                break;
+            case "vehicle":
+                VehiclePrep.prepareBaseData(this.data.data);
+                break;
+            case "ic":
+                ICPrep.prepareBaseData(this.data.data);
+                break;
+        }
+
+        // this.applyBaseDataActiveEffects();
     }
 
     /**
@@ -105,9 +132,14 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
     prepareEmbeddedEntities() {
         super.prepareEmbeddedEntities();
 
+        // @ts-ignore
         // NOTE: Hello there! Should you ever be in need of calling the grand parents methods, maybe to avoid applyActiveEffects,
         //       look at this beautiful piece of software and shiver in it's glory.
         // ClientDocumentMixin(class {}).prototype.prepareEmbeddedEntities.apply(this);
+    }
+
+    applyActiveEffects() {
+        super.applyActiveEffects();
     }
 
     /**
@@ -123,24 +155,106 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         const itemDataWrappers = this.items.map((item) => new SR5ItemDataWrapper(item.data));
         switch (this.data.type) {
             case 'character':
-                CharacterDataPrepare(this.data.data, itemDataWrappers);
+                CharacterPrep.prepareDerivedData(this.data.data, itemDataWrappers);
                 break;
             case "critter":
-                CritterDataPrepare(this.data.data, itemDataWrappers);
+                CritterPrep.prepareDerivedData(this.data.data, itemDataWrappers);
                 break;
             case "spirit":
-                SpiritDataPrepare(this.data.data, itemDataWrappers);
+                SpiritPrep.prepareDerivedData(this.data.data, itemDataWrappers);
                 break;
             case "sprite":
-                SpriteDataPrepare(this.data.data, itemDataWrappers);
+                SpritePrep.prepareDerivedData(this.data.data, itemDataWrappers);
                 break;
             case "vehicle":
-                VehicleDataPreparation(this.data.data, itemDataWrappers);
+                VehiclePrep.prepareDerivedData(this.data.data, itemDataWrappers);
                 break;
             case "ic":
-                ICDataPreparation(this.data.data, itemDataWrappers);
+                ICPrep.prepareDerivedData(this.data.data, itemDataWrappers);
                 break;
         }
+
+        // this.applyDerivedDataActiveEffects();
+        this.applyOverrideActiveEffects();
+    }
+
+    applyOverrideActiveEffects() {
+        const changes = this.effects.reduce((changes: ActiveEffectChange[], effect) => {
+            if (effect.data.disabled) return changes;
+
+            // include changes partially matching given keys.
+            return changes.concat(effect.data.changes
+                    .filter(change => change.mode === CONST.ACTIVE_EFFECT_MODES.OVERRIDE)
+                    .map(change => {
+                        // @ts-ignore // TODO: foundry-vtt-types 0.8
+                        change = foundry.utils.duplicate(change);
+                        // @ts-ignore
+                        change.effect = effect;
+                        change.priority = change.priority ?? (change.mode * 10);
+
+                        return change;
+                    }));
+        }, []);
+        // Sort changes according to priority, in case it's ever needed.
+        changes.sort((a, b) => a.priority - b.priority);
+
+        for (const change of changes) {
+            // @ts-ignore
+            change.effect.apply(this, change);
+        }
+    }
+
+    // TODO: Remove these custom methods, when they aren't used anymore.
+    applyBaseDataActiveEffects() {
+        const baseData = ['data.attributes'];
+        this._applySomeActiveEffects(baseData);
+    }
+
+    applyDerivedDataActiveEffects() {
+        const derivedData = ['data.limits'];
+        this._applySomeActiveEffects(derivedData);
+    }
+
+    _applySomeActiveEffects(partialKeys: string[]) {
+        const changes = this._reduceEffectChangesByKeys(partialKeys);
+        this._applyActiveEffectChanges(changes);
+    }
+
+    _applyActiveEffectChanges(changes: ActiveEffectChange[]) {
+        const overrides = {};
+
+        for (const change of changes) {
+            // @ts-ignore
+            const result = change.effect.apply(this, change);
+            if (result !== null) overrides[change.key] = result;
+        }
+
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
+        this.overrides = {...this.overrides, ...foundry.utils.expandObject(overrides)};
+    }
+
+    _reduceEffectChangesByKeys(partialKeys: string[]): ActiveEffectChange[] {
+        // Collect only those changes matching the given partial keys.
+        const changes = this.effects.reduce((changes: ActiveEffectChange[], effect) => {
+            if (effect.data.disabled) return changes;
+
+            // include changes partially matching given keys.
+            return changes.concat(effect.data.changes
+                    .filter(change => partialKeys.some(partialKey => change.key.includes(partialKey)))
+                    .map(change => {
+                        // @ts-ignore // TODO: foundry-vtt-types 0.8
+                        change = foundry.utils.duplicate(change);
+                        // @ts-ignore
+                        change.effect = effect;
+                        change.priority = change.priority ?? (change.mode * 10);
+
+                        return change;
+                    }));
+        }, []);
+        // Sort changes according to priority, in case it's ever needed.
+        changes.sort((a, b) => a.priority - b.priority);
+
+        return changes;
     }
 
     getModifier(modifierName: string): NumberOrEmpty {

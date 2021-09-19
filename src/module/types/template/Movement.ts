@@ -1,11 +1,11 @@
 declare namespace Shadowrun {
     export type Movement = {
-        walk: {
+        walk: ModifiableValue & {
             value: number;
             mult: number;
             base: number;
         };
-        run: {
+        run: ModifiableValue & {
             value: number;
             mult: number;
             base: number;

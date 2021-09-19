@@ -13,6 +13,7 @@ import SkillField = Shadowrun.SkillField;
 import DeviceData = Shadowrun.DeviceData;
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
 import {MatrixRules} from "../rules/MatrixRules";
+import {SR5ActiveEffect} from "../effect/SR5ActiveEffect";
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
@@ -161,7 +162,7 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
             const cleanupAttribute = (attribute: MatrixAttribute) => {
                 const att = matrix[attribute];
                 if (att) {
-                    if (!att.mod) att.mod = {};
+                    if (!att.mod) att.mod = [];
                     if (att.temp === 0) delete att.temp;
                 }
             };
@@ -949,6 +950,8 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         const item = this.actor.items.get(iid);
         if (item) {
             const newItems = [] as any[];
+
+            // Handle the equipped state.
             if (item.isDevice()) {
                 // Only allow one equipped device item. Unequip all other.
                 for (const item of this.actor.items.filter(actorItem => actorItem.isDevice())) {
@@ -965,6 +968,15 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
                     'data.technology.equipped': !item.isEquipped(),
                 });
             }
+
+            // Handle active effects based on equipped status.
+            this.actor.effects.forEach(effect => {
+                if (effect.data.origin !== item.uuid) return;
+
+                // @ts-ignore
+                effect.disable(item.isEquipped());
+            })
+
             // @ts-ignore // TODO: foundry-vtt-types 0.8 has no Document support yet
             await this.actor.updateEmbeddedDocuments('Item', newItems);
 

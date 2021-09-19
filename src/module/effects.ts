@@ -7,15 +7,15 @@
 
 import {SR5Actor} from "./actor/SR5Actor";
 import {SR5Item} from "./item/SR5Item";
+import {Helpers} from "./helpers";
 
 /**
  * Manage Active Effect instances through the Actor Sheet via effect control buttons.
  * @param {MouseEvent} event      The left-click event on the effect control
  * @param {Actor|Item} owner      The owning entity which manages this effect
  */
-export function onManageActiveEffect(event, owner: SR5Actor|SR5Item) {
+export async function onManageActiveEffect(event, owner: SR5Actor|SR5Item) {
     // NOTE: This here is temporary until FoundryVTT has built-in support for nested item updates.
-    //       I won't even translate it, since neither did DnD. ;)
     if ( owner.isOwned )
         return ui.notifications.warn("Managing Active Effects within an Owned Item is not currently supported and will be added in a subsequent update.");
 
@@ -29,17 +29,27 @@ export function onManageActiveEffect(event, owner: SR5Actor|SR5Item) {
         case "create":
             return owner.createEmbeddedDocuments('ActiveEffect', [{
                 label: game.i18n.localize("SR5.ActiveEffect.New"),
-                icon: "icons/svg/aura.svg",
+                // icon: "icons/svg/aura.svg",
                 origin: owner.uuid,
                 "duration.rounds": item.dataset.effectType === "temporary" ? 1 : undefined,
                 disabled: item.dataset.effectType === "inactive"
             }]);
+
         case "edit":
             return effect.sheet.render(true);
+
         case "delete":
+            const userConsented = await Helpers.confirmDeletion();
+            if (!userConsented) return;
+
             return effect.delete();
+
         case "toggle":
-            return effect.update({disabled: !effect.data.disabled});
+            // return effect.update({disabled: !effect.data.disabled});
+            return effect.toggleDisabled();
+        case "open-origin":
+            return effect.renderSourceSheet();
+
         default:
             console.error(`An active effect with the id '${effect}' couldn't be managed as no action has been defined within the template.`);
             return;

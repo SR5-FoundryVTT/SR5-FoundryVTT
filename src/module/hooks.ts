@@ -24,6 +24,8 @@ import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
 import SocketMessageHooks = Shadowrun.SocketMessageHooks;
 import SocketMessage = Shadowrun.SocketMessageData;
 import {DeviceFlow} from "./item/flows/DeviceFlow";
+import {SR5ActiveEffect} from "./effect/SR5ActiveEffect";
+import {SR5ActiveEffectSheet} from "./effect/SR5ActiveEffectSheet";
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 // TODO: Figure out how to change global CONFIG type
@@ -78,6 +80,9 @@ ___________________
         CONFIG.Item.documentClass = SR5Item;
         // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
         CONFIG.Combat.documentClass = SR5Combat;
+        // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
+        CONFIG.ActiveEffect.documentClass = SR5ActiveEffect;
+        CONFIG.ActiveEffect.sheetClass = SR5ActiveEffectSheet;
         // Register initiative directly (outside of system.json) as DnD5e does it.
         CONFIG.Combat.initiative.formula =  "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
         // @ts-ignore

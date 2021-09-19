@@ -48,5 +48,32 @@ export const shadowrunMatrix = context => {
             assert.strictEqual(MatrixRules.getICMeatAttributeBase(3), 3);
             assert.strictEqual(MatrixRules.getICMeatAttributeBase(27), 27);
         });
+
+        it('Should disallow invalid marks counters', () => {
+            assert.isTrue(MatrixRules.isValidMarksCount(0));
+            assert.isTrue(MatrixRules.isValidMarksCount(1));
+            assert.isTrue(MatrixRules.isValidMarksCount(2));
+            assert.isTrue(MatrixRules.isValidMarksCount(3));
+
+            assert.isFalse(MatrixRules.isValidMarksCount(-1));
+            assert.isFalse(MatrixRules.isValidMarksCount(4));
+
+            assert.isFalse(MatrixRules.isValidMarksCount(1.5));
+        });
+
+        it('Should return valid marks counts', () => {
+            assert.strictEqual(MatrixRules.getValidMarksCount(-1), MatrixRules.minMarksCount());
+            assert.strictEqual(MatrixRules.getValidMarksCount(0), 0);
+            assert.strictEqual(MatrixRules.getValidMarksCount(1), 1);
+            assert.strictEqual(MatrixRules.getValidMarksCount(2), 2);
+            assert.strictEqual(MatrixRules.getValidMarksCount(3), 3);
+            assert.strictEqual(MatrixRules.getValidMarksCount(4), MatrixRules.maxMarksCount());
+        });
+
+        it('Should return expected host matrix attribute ratings', () => {
+            assert.deepEqual(MatrixRules.hostMatrixAttributeRatings(1), [2, 3, 4, 5]);
+            assert.deepEqual(MatrixRules.hostMatrixAttributeRatings(2), [3, 4, 5, 6]);
+            assert.deepEqual(MatrixRules.hostMatrixAttributeRatings(10), [11, 12, 13, 14]);
+        });
     })
 };
