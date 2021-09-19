@@ -226,7 +226,8 @@
   "SR5.SpellManipulationPhysical": "Physisch",
   "SR5.PowerPoints": "Kraftpunkte",
   "SR5.PowerLevel": "Kraftstufe",
-  "SR5.ToggleEquip": "Toggle ausgestattet",
+  "SR5.ToggleEquip": "Anlegen/Ablegen",
+  "SR5.ToggleActive": "De/aktivieren",
   "SR5.Armor": "Panzerung",
   "SR5.ArmorValue": "Panzerungswert",
   "SR5.ModifiedArmor": "Mod. Panzerung",
@@ -475,6 +476,8 @@
   "SR5.Item": "Item",
   "SR5.Bonuses": "Boni",
   "SR5.EditSkill": "Fertigkeit anpassen",
+  "SR5.EditItem": "Gegenstand anpassen",
+  "SR5.DeleteItem": "Gegenstand löschen",
   "SR5.Name": "Name",
   "SR5.AstralInit": "Astrale Ini",
   "SR5.AstralDice": "Astrale Ini Würfel",
@@ -791,7 +794,9 @@
     "SkillWithoutAttribute": "The skill has no attribute configured.",
     "MarkCouldNotBePlaced": "Interner Fehler: Die Marken konnten nicht platziert werden.",
     "MarksCantBePlacedBy": "Der aktive Akteur kann keine Marken platzieren.",
-    "MarksCantBePlacedOn": "Der als Ziel ausgewählte Akteur kann keine Marken empfangen."
+    "MarksCantBePlacedOn": "Der als Ziel ausgewählte Akteur kann keine Marken empfangen.",
+    "CantEditAppliedItemEffects": "Aktive Effekte, die über Items zugefügt wurden, können nicht direkt editiert werden.",
+    "KeyNotModifyableByActiveEffect": "Der Aktive Effect Modus Modifizieren kann nur auf mod Felder angewendet werden."
   },
   "SR5.ChangelogApplication": {
     "Title": "Shadowrun5e Update",
@@ -849,14 +854,17 @@
   "SR5.Dialogs": {
     "RangedWeaponTest": {
       "EnvironmentalOverwriteSet": "Umgebungsmodifikatoren wurden manuell auf einen fixen Wert gesetzt!"
-    },
-    "SR5.ActiveEffect": {
+    }
+  },
+  "SR5.ActiveEffect": {
       "New": "New Effect",
       "Types": {
         "Temporary": "Temporary Effects",
         "Passive": "Passive Effects",
         "Inactive": "Inactive Effects"
+      },
+      "Modes": {
+        "Modify": "Modifizieren"
       }
     }
-  }
 }
