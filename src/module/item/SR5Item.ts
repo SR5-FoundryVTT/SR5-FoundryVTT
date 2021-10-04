@@ -982,7 +982,8 @@ export class SR5Item extends Item<ShadowrunItemData> {
                     //       HOWEVER the legacy approach for embeddedItems in other items relies upon this.actor
                     //       returning an SR5Item instance to call .updateEmbeddedEntities, when Foundry expects an actor
                     //@ts-ignore // this should be an Actor instance, but we deliberately use an Item instance.
-                    return Item.createOwned(item, this);
+                    // return Item.createOwned(item, this);
+                    return new SR5Item(item, {parent: this});
                 }
             });
         }
