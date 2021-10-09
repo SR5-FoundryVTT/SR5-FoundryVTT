@@ -185,51 +185,50 @@
         align-items: center;
         align-content: center;
     }
+}
+.sr5 .value {
+    > .value-modifiers-container {
+        display: none;
+        visibility: hidden;
 
-    .value {
-        > .value-modifiers-container {
-            display: none;
-            visibility: hidden;
+        position: absolute;
+        /* We WILL be on top! */
+        z-index: 2147483647;
 
-            position: absolute;
-            /* We WILL be on top! */
-            z-index: 2147483647;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
 
-            opacity: 0;
-            transition: opacity 0.3s;
+    &:hover .value-modifiers-container {
+        display: block;
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .value-modifiers {
+        display: grid;
+        grid-template-columns: 200px 50px;
+        background: $popupbackground;
+        border: 1px solid $light;
+        padding: 0.5em 0.5em 0.5em 0.5em;
+        text-align: left;
+        font-weight: normal;
+
+        > .value-modifier-name {
+            font-weight: bold;
         }
 
-        &:hover .value-modifiers-container {
-            display: block;
-            visibility: visible;
-            opacity: 1;
+        > .value-modifiers-base {
+            border-bottom: 1px solid $light;
         }
 
-        .value-modifiers {
-            display: grid;
-            grid-template-columns: 200px 50px;
-            background: $popupbackground;
-            border: 1px solid $light;
-            padding: 0.5em 0.5em 0.5em 0.5em;
-            text-align: left;
-            font-weight: normal;
+        > .value-modifiers-total {
+            font-weight: bold;
+            border-top: 1px double $light;
+        }
 
-            > .value-modifier-name {
-                font-weight: bold;
-            }
-
-            > .value-modifiers-base {
-                border-bottom: 1px solid $light;
-            }
-
-            > .value-modifiers-total {
-                font-weight: bold;
-                border-top: 1px double $light;
-            }
-
-            > .value-modifiers-invalid-total {
-                text-decoration: line-through;
-            }
+        > .value-modifiers-invalid-total {
+            text-decoration: line-through;
         }
     }
 }
