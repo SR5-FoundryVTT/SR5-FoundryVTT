@@ -359,12 +359,12 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         const itemData = {
             name: `New ${Helpers.label(type)}`,
             type: type,
-            data: duplicate(game.system.model.Item.modification),
+            data: {type: 'weapon'}
         };
         // @ts-ignore
-        itemData.data.type = 'weapon';
+        // itemData.data.type = 'weapon';
         // @ts-ignore
-        const item = Item.createOwned(itemData, this.item);
+        const item = new SR5Item(itemData, {parent: this.item});
         await this.item.createOwnedItem(item.data);
     }
 
@@ -386,11 +386,10 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         const type = 'ammo';
         const itemData = {
             name: `New ${Helpers.label(type)}`,
-            type: type,
-            data: duplicate(game.system.model.Item.ammo),
+            type: type
         };
         // @ts-ignore
-        const item = Item.createOwned(itemData, this.item);
+        const item = new SR5Item(itemData, {parent: this.item});
         await this.item.createOwnedItem(item.data);
     }
 

@@ -174,7 +174,6 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
                 break;
         }
 
-        // this.applyDerivedDataActiveEffects();
         this.applyOverrideActiveEffects();
     }
 
@@ -204,22 +203,19 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         }
     }
 
-    // TODO: Remove these custom methods, when they aren't used anymore.
-    applyBaseDataActiveEffects() {
-        const baseData = ['data.attributes'];
-        this._applySomeActiveEffects(baseData);
-    }
-
-    applyDerivedDataActiveEffects() {
-        const derivedData = ['data.limits'];
-        this._applySomeActiveEffects(derivedData);
-    }
-
+    /**
+     * A helper method to only apply a subset of keys instead of all.
+     * @param partialKeys Can either be complete keys or partial keys
+     */
     _applySomeActiveEffects(partialKeys: string[]) {
         const changes = this._reduceEffectChangesByKeys(partialKeys);
         this._applyActiveEffectChanges(changes);
     }
 
+    /**
+     * A helper method to apply a active effect changes collection (which might come from multiple active effects)
+     * @param changes
+     */
     _applyActiveEffectChanges(changes: ActiveEffectChange[]) {
         const overrides = {};
 
@@ -233,6 +229,10 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         this.overrides = {...this.overrides, ...foundry.utils.expandObject(overrides)};
     }
 
+    /**
+     * Reduce all changes across multiple active effects that match the given set of partial keys
+     * @param partialKeys Can either be complete keys or partial keys
+     */
     _reduceEffectChangesByKeys(partialKeys: string[]): ActiveEffectChange[] {
         // Collect only those changes matching the given partial keys.
         const changes = this.effects.reduce((changes: ActiveEffectChange[], effect) => {

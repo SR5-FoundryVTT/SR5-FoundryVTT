@@ -10,7 +10,7 @@ export class SR5TestingDocuments {
 
         async create(data): Promise<SR5Actor> {
             // @ts-ignore // TODO: foundry-vtt-types 0.8
-            const document = await this.documentClass.create({name: `#QUENCH_TEST_${this.documentClass.constructor}_SHOULD_HAVE_BEEN_DELETED`, ...data});
+            const document = await this.documentClass.create({name: `#QUENCH_TEST_DOCUMENT_SHOULD_HAVE_BEEN_DELETED`, ...data, ...{folder: this.folder}});
             this.documents[document.id] = document;
             return document;
         }
@@ -25,6 +25,6 @@ export class SR5TestingDocuments {
 
         async teardown() {
             // @ts-ignore
-            Object.values(this.documents).forEach(document => this.delete(document.id))
+            Object.values(this.documents).forEach(document => this.delete(document.id));
         }
     }

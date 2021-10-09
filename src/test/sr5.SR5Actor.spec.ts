@@ -46,7 +46,7 @@ export const shadowrunSR5Actor = context => {
             const actor = await testActor.create({type: 'character'});
             const weapon = await testItem.create({type: 'weapon'});
 
-            await actor.createOwnedItem(weapon.data);
+            await actor.createEmbeddedDocuments('Item', [weapon.data]);
 
             const ownedItems = Array.from(actor.items) as SR5Item[];
             assert.isNotEmpty(ownedItems);
