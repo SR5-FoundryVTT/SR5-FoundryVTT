@@ -13388,7 +13388,6 @@ class SR5Actor extends Actor {
                 ICPrep_1.ICPrep.prepareDerivedData(this.data.data, itemDataWrappers);
                 break;
         }
-        // this.applyDerivedDataActiveEffects();
         this.applyOverrideActiveEffects();
     }
     applyOverrideActiveEffects() {
@@ -13415,19 +13414,18 @@ class SR5Actor extends Actor {
             change.effect.apply(this, change);
         }
     }
-    // TODO: Remove these custom methods, when they aren't used anymore.
-    applyBaseDataActiveEffects() {
-        const baseData = ['data.attributes'];
-        this._applySomeActiveEffects(baseData);
-    }
-    applyDerivedDataActiveEffects() {
-        const derivedData = ['data.limits'];
-        this._applySomeActiveEffects(derivedData);
-    }
+    /**
+     * A helper method to only apply a subset of keys instead of all.
+     * @param partialKeys Can either be complete keys or partial keys
+     */
     _applySomeActiveEffects(partialKeys) {
         const changes = this._reduceEffectChangesByKeys(partialKeys);
         this._applyActiveEffectChanges(changes);
     }
+    /**
+     * A helper method to apply a active effect changes collection (which might come from multiple active effects)
+     * @param changes
+     */
     _applyActiveEffectChanges(changes) {
         const overrides = {};
         for (const change of changes) {
@@ -13439,6 +13437,10 @@ class SR5Actor extends Actor {
         // @ts-ignore // TODO: foundry-vtt-types 0.8
         this.overrides = Object.assign(Object.assign({}, this.overrides), foundry.utils.expandObject(overrides));
     }
+    /**
+     * Reduce all changes across multiple active effects that match the given set of partial keys
+     * @param partialKeys Can either be complete keys or partial keys
+     */
     _reduceEffectChangesByKeys(partialKeys) {
         // Collect only those changes matching the given partial keys.
         const changes = this.effects.reduce((changes, effect) => {
@@ -30556,11 +30558,10 @@ class SR5Item extends Item {
                     return currentItem;
                 }
                 else {
-                    // NOTE: createdOwned expects an Actor instance as the second parameter.
-                    //       HOWEVER the legacy approach for embeddedItems in other items relies upon this.actor
-                    //       returning an SR5Item instance to call .updateEmbeddedEntities, when Foundry expects an actor
-                    //@ts-ignore // this should be an Actor instance, but we deliberately use an Item instance.
-                    return Item.createOwned(item, this);
+                    // NOTE: It's important to deliver the item as the item parent document, even though this is meant for actor owners.
+                    //       The legacy approach for embeddedItems (within another item) relies upon this.actor
+                    //       returning an SR5Item instance to call .updateEmbeddedEntities, while Foundry expects an actor
+                    return new SR5Item(item, { parent: this });
                 }
             });
         }
@@ -31306,6 +31307,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ItemSheet = void 0;
 const helpers_1 = require("../helpers");
+const SR5Item_1 = require("./SR5Item");
 const config_1 = require("../config");
 const effects_1 = require("../effects");
 const DeviceFlow_1 = require("./flows/DeviceFlow");
@@ -31648,12 +31650,12 @@ class SR5ItemSheet extends ItemSheet {
             const itemData = {
                 name: `New ${helpers_1.Helpers.label(type)}`,
                 type: type,
-                data: duplicate(game.system.model.Item.modification),
+                data: { type: 'weapon' }
             };
             // @ts-ignore
-            itemData.data.type = 'weapon';
+            // itemData.data.type = 'weapon';
             // @ts-ignore
-            const item = Item.createOwned(itemData, this.item);
+            const item = new SR5Item_1.SR5Item(itemData, { parent: this.item });
             yield this.item.createOwnedItem(item.data);
         });
     }
@@ -31679,11 +31681,10 @@ class SR5ItemSheet extends ItemSheet {
             const type = 'ammo';
             const itemData = {
                 name: `New ${helpers_1.Helpers.label(type)}`,
-                type: type,
-                data: duplicate(game.system.model.Item.ammo),
+                type: type
             };
             // @ts-ignore
-            const item = Item.createOwned(itemData, this.item);
+            const item = new SR5Item_1.SR5Item(itemData, { parent: this.item });
             yield this.item.createOwnedItem(item.data);
         });
     }
@@ -31784,7 +31785,7 @@ class SR5ItemSheet extends ItemSheet {
 }
 exports.SR5ItemSheet = SR5ItemSheet;
 
-},{"../config":144,"../effects":151,"../helpers":159,"./flows/DeviceFlow":203}],201:[function(require,module,exports){
+},{"../config":144,"../effects":151,"../helpers":159,"./SR5Item":199,"./flows/DeviceFlow":203}],201:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ActionFlow = void 0;
@@ -35083,7 +35084,7 @@ const shadowrunSR5Actor = context => {
         it('Should embedd a weapon into an actor and not the global item colection', () => __awaiter(void 0, void 0, void 0, function* () {
             const actor = yield testActor.create({ type: 'character' });
             const weapon = yield testItem.create({ type: 'weapon' });
-            yield actor.createOwnedItem(weapon.data);
+            yield actor.createEmbeddedDocuments('Item', [weapon.data]);
             const ownedItems = Array.from(actor.items);
             assert.isNotEmpty(ownedItems);
             assert.lengthOf(ownedItems, 1);
@@ -35200,7 +35201,7 @@ class SR5TestingDocuments {
     create(data) {
         return __awaiter(this, void 0, void 0, function* () {
             // @ts-ignore // TODO: foundry-vtt-types 0.8
-            const document = yield this.documentClass.create(Object.assign({ name: `#QUENCH_TEST_${this.documentClass.constructor}_SHOULD_HAVE_BEEN_DELETED` }, data));
+            const document = yield this.documentClass.create(Object.assign(Object.assign({ name: `#QUENCH_TEST_DOCUMENT_SHOULD_HAVE_BEEN_DELETED` }, data), { folder: this.folder }));
             this.documents[document.id] = document;
             return document;
         });
