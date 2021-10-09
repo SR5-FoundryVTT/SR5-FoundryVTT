@@ -130,6 +130,6 @@ export class SR5ActiveEffect extends ActiveEffect {
 
     get minValueKeys(): string[] {
         // Match against these keys, as the exact ModifiableValue layout might be different from time to time.
-        return ['value', 'base', 'mod'];
+        return ['value', 'mod'];
     }
 }
