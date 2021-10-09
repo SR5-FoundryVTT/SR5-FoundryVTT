@@ -358,10 +358,11 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         // TODO: Move this into DefaultValues...
         const itemData = {
             name: `New ${Helpers.label(type)}`,
-            type: type
+            type: type,
+            data: {type: 'weapon'}
         };
         // @ts-ignore
-        itemData.data.type = 'weapon';
+        // itemData.data.type = 'weapon';
         // @ts-ignore
         const item = new SR5Item(itemData, {parent: this.item});
         await this.item.createOwnedItem(item.data);
