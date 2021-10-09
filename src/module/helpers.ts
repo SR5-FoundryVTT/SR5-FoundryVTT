@@ -45,13 +45,14 @@ export class Helpers {
 
         // If the given value has a override defined, use that as a value, while keeping the base and mod values.
         if (value.override) {
+            value.value = value.override.value;
             return value.override.value;
         }
 
         value.value = Helpers.roundTo(parts.total + value.base, 3);
-        value.mod = parts.list;
-
         value.value = Helpers.applyValueRange(value.value, options);
+
+        value.mod = parts.list;
 
         return value.value;
     }
