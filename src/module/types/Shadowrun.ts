@@ -49,7 +49,9 @@ declare namespace Shadowrun {
      */
     export type ModList<TType> = Array<ModListEntry<TType>>;
 
-    export type ModListEntry<TType> = { name: string; value: TType };
+    // A modifier value with a name string in FoundryVTT label format (SR5.<>) used during ActorPrep to collect modifying values.
+    // If override is set and true, this value is meant to represent a singular value overriding all else.
+    export type ModListEntry<TType> = { name: string; value: TType, override?: boolean };
     /**
      * A value that is modifiable, having a base and current value, along with associated mod list.
      */

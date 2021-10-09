@@ -1,4 +1,7 @@
 import {SR5Actor} from "../actor/SR5Actor";
+import ModifiableValue = Shadowrun.ModifiableValue;
+import ModListEntry = Shadowrun.ModListEntry;
+import ModList = Shadowrun.ModList;
 
 export class SR5ActiveEffect extends ActiveEffect {
     /**
@@ -52,9 +55,9 @@ export class SR5ActiveEffect extends ActiveEffect {
      */
     protected _applyModify(actor: SR5Actor, change: ActiveEffect.Change) {
         const {key, value} = change;
-        // @ts-ignore
-        const current = foundry.utils.getProperty(actor.data, key) ?? null;
-        // @ts-ignore
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
+        const current = foundry.utils.getProperty(actor.data, key) as ModList[] ?? null;
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
         const ct = foundry.utils.getType(current);
         const nodes = key.split('.');
         const isModArray = nodes[nodes.length - 1] === 'mod' && ct === 'Array';
@@ -76,11 +79,10 @@ export class SR5ActiveEffect extends ActiveEffect {
      */
     protected _applyAdd(actor: SR5Actor, change: ActiveEffect.Change) {
         const {key, value} = change;
-        // @ts-ignore
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
         const current = foundry.utils.getProperty(actor.data, key) ?? null;
-        // @ts-ignore
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
         const ct = foundry.utils.getType(current);
-        let update = null;
 
         const nodes = key.split('.');
         const isModArray = nodes[nodes.length - 1] === 'mod' && ct === 'Array';
@@ -90,5 +92,30 @@ export class SR5ActiveEffect extends ActiveEffect {
         } else {
             return super._applyAdd(actor, change);
         }
+    }
+
+    /**
+     * Override of a ModifiableValue will result in a modifier label to tell the user what's going on.
+     *
+     * @protected
+     */
+    protected _applyOverride(actor: SR5Actor, change: ActiveEffect.Change) {
+        const update = super._applyOverride(actor, change);
+
+
+        const nodes = change.key.split('.');
+        nodes.pop();
+        const valueKey = nodes.join('.');
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
+        const value = foundry.utils.getProperty(actor.data, valueKey) as ModifiableValue ?? null;
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
+        const isModifiableValue = value !== null & foundry.utils.getType(value.mod) === 'Array';
+
+        if (!isModifiableValue) return update;
+
+        // Remove all existing modifiers and only leave one (whatever is applied last).
+        value.mod = [{name: this.data.label, value: Number(change.value), override: true}];
+
+        return update;
     }
 }

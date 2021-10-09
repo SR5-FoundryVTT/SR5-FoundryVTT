@@ -138,6 +138,10 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         // ClientDocumentMixin(class {}).prototype.prepareEmbeddedEntities.apply(this);
     }
 
+    /**
+     * Should some ActiveEffects need to be excluded from the general application, do so here.
+     * @override
+     */
     applyActiveEffects() {
         super.applyActiveEffects();
     }

@@ -1,10 +1,9 @@
 import { PartsList } from '../parts/PartsList';
 import ModList = Shadowrun.ModList;
-import {SR5Actor} from "../actor/SR5Actor";
-import {FLAGS, SYSTEM_NAME} from "../constants";
 import {Helpers} from "../helpers";
 import {SafeString} from "handlebars";
 import DamageData = Shadowrun.DamageData;
+import ModListEntry = Shadowrun.ModListEntry;
 
 export const registerRollAndLabelHelpers = () => {
     Handlebars.registerHelper('damageAbbreviation', function (damage) {
@@ -60,12 +59,10 @@ export const registerRollAndLabelHelpers = () => {
         return parts.total;
     });
 
-    Handlebars.registerHelper('signedValue', function (value: number): string {
-        if (value > 0) {
-            return `+${value}`;
-        } else {
-            return `${value}`;
-        }
+    Handlebars.registerHelper('modifierValue', function (modifier: ModListEntry<number>) {
+        if (isNaN(modifier.value)) return modifier.value;
+        const signed = modifier.value > 0 ?  `+${modifier.value}`: `${modifier.value}`;
+        return modifier.override ? `= ${signed}` : signed;
     });
 
     Handlebars.registerHelper('speakerName', Helpers.getChatSpeakerName);
