@@ -78,29 +78,8 @@ export class SR5ActiveEffect extends ActiveEffect {
             return null;
         }
 
-        // Foundry always expects either null or a value for .override.
-        return null;
-    }
-
-    /**
-     * Keep the default foundry implementation for the ADD mode but hijack into a MODIFY mode in case of a ModifableValue
-     * @protected
-     */
-    protected _applyAdd(actor: SR5Actor, change: ActiveEffect.Change) {
-        const {key, value} = change;
-        // @ts-ignore // TODO: foundry-vtt-types 0.8
-        const current = foundry.utils.getProperty(actor.data, key) ?? null;
-        // @ts-ignore // TODO: foundry-vtt-types 0.8
-        const ct = foundry.utils.getType(current);
-
-        const nodes = key.split('.');
-        const isModArray = nodes[nodes.length - 1] === 'mod' && ct === 'Array';
-
-        if (isModArray) {
-            return this._applyModify(actor, change);
-        } else {
-            return super._applyAdd(actor, change);
-        }
+        // If both indirect or direct didn't provide a match, assume the user want's to add to whatever value choosen
+        return super._applyAdd(actor, change);
     }
 
     /**

@@ -561,6 +561,8 @@
   "SR5.RightClickToClear": "Right Click to Clear",
   "SR5.WalkingSpeed": "Walking",
   "SR5.RunningSpeed": "Running",
+  "SR5.Help": "Help",
+
   "SETTINGS": {
     "DiagonalMovementName": "Diagonal Movement",
     "DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
