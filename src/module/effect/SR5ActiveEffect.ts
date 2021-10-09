@@ -107,14 +107,13 @@ export class SR5ActiveEffect extends ActiveEffect {
         // Match against these keys, as the exact ModifiableValue layout might be different from time to time.
         const minValueKeys = ['value', 'base', 'mod'];
 
-
         // Check direct key.
         if (this._isKeyModifiableValue(actor, change.key, minValueKeys)) {
             // @ts-ignore // TODO: foundry-vtt-types 0.8
             const value = foundry.utils.getProperty(actor.data, change.key);
-            // value.mod = [];
             value.override = {name: this.data.label, value: Number(change.value)};
             value.value = change.value;
+
             // A direct match will override the whole value.
             return value;
         }
@@ -128,10 +127,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         if (this._isKeyModifiableValue(actor, indirectKey, minValueKeys)) {
             // @ts-ignore // TODO: foundry-vtt-types 0.8
             const value = foundry.utils.getProperty(actor.data, indirectKey);
-            // value.mod = [];
             value.override = {name: this.data.label, value: Number(change.value)};
-            // value.value = change.value;
-            // @ts-ignore // TODO: foundry-vtt-types 0.8
         }
 
         // Neither a direct nor an indirect ModifiableValue match.

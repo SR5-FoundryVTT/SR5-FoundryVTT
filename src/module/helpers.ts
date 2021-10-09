@@ -40,15 +40,15 @@ export class Helpers {
             parts.addUniquePart('SR5.Temporary', value['temp']);
         }
 
-        // LEGACY: On new actors .base can be undefined, resulting in NaN .value
-        const base = value.base || 0;
+        // On some values base might be undefined...
+        value.base = value.base || 0;
 
         // If the given value has a override defined, use that as a value, while keeping the base and mod values.
         if (value.override) {
             return value.override.value;
         }
 
-        value.value = Helpers.roundTo(parts.total + base, 3);
+        value.value = Helpers.roundTo(parts.total + value.base, 3);
         value.mod = parts.list;
 
         value.value = Helpers.applyValueRange(value.value, options);

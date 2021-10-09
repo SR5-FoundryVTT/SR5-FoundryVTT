@@ -7,15 +7,16 @@ export class LimitsPrep {
     static prepareLimits(data: ActorTypesData) {
         const { limits, modifiers } = data;
 
+
         // SETUP LIMITS
         limits.physical.mod = PartsList.AddUniquePart(limits.physical.mod, 'SR5.Bonus', Number(modifiers['physical_limit']));
         limits.mental.mod = PartsList.AddUniquePart(limits.mental.mod, 'SR5.Bonus', Number(modifiers['mental_limit']));
         limits.social.mod = PartsList.AddUniquePart(limits.social.mod, "SR5.Bonus", Number(modifiers['social_limit']));
 
         // limit labels
-        for (let [limitKey, limitValue] of Object.entries(limits)) {
-            Helpers.calcTotal(limitValue);
-            limitValue.label = SR5.limits[limitKey];
+        for (let [name, limit] of Object.entries(limits)) {
+            Helpers.calcTotal(limit);
+            limit.label = SR5.limits[name];
         }
     }
 

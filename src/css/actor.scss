@@ -115,51 +115,6 @@
                 }
             }
 
-            .value {
-                > .value-modifiers-container {
-                    display: none;
-                    visibility: hidden;
-
-                    position: absolute;
-                    /* We WILL be on top! */
-                    z-index: 2147483647;
-
-                    opacity: 0;
-                    transition: opacity 0.3s;
-                }
-
-                &:hover .value-modifiers-container {
-                    display: block;
-                    visibility: visible;
-                    opacity: 1;
-                }
-
-                .value-modifiers {
-                    display: grid;
-                    grid-template-columns: 200px 50px;
-                    background: $popupbackground;
-                    border: 1px solid $light;
-                    padding: 0.5em 0.5em 0.5em 0.5em;
-                    text-align: left;
-                    font-weight: normal;
-
-                    > .value-modifier-name {
-                        font-weight: bold;
-                    }
-                    > .value-modifiers-base {
-                        border-bottom: 1px solid $light;
-                    }
-                    > .value-modifiers-total {
-                        font-weight: bold;
-                        border-top: 1px double $light;
-                    }
-                    > .value-modifiers-invalid-total {
-                        text-decoration: line-through;
-                    }
-                }
-            }
-
-
             .attribute-input-container {
                 text-align: center;
                 position: relative;
@@ -229,5 +184,52 @@
         justify-content: center;
         align-items: center;
         align-content: center;
+    }
+
+    .value {
+        > .value-modifiers-container {
+            display: none;
+            visibility: hidden;
+
+            position: absolute;
+            /* We WILL be on top! */
+            z-index: 2147483647;
+
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        &:hover .value-modifiers-container {
+            display: block;
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .value-modifiers {
+            display: grid;
+            grid-template-columns: 200px 50px;
+            background: $popupbackground;
+            border: 1px solid $light;
+            padding: 0.5em 0.5em 0.5em 0.5em;
+            text-align: left;
+            font-weight: normal;
+
+            > .value-modifier-name {
+                font-weight: bold;
+            }
+
+            > .value-modifiers-base {
+                border-bottom: 1px solid $light;
+            }
+
+            > .value-modifiers-total {
+                font-weight: bold;
+                border-top: 1px double $light;
+            }
+
+            > .value-modifiers-invalid-total {
+                text-decoration: line-through;
+            }
+        }
     }
 }

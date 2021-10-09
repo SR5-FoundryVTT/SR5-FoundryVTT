@@ -21,6 +21,7 @@ export class SpiritPrep {
         ModifiersPrep.prepareModifiers(data);
         ModifiersPrep.clearAttributeMods(data);
         ModifiersPrep.clearArmorMods(data);
+        ModifiersPrep.clearLimitMods(data);
     }
 
     static prepareDerivedData(data: SpiritData, items: SR5ItemDataWrapper[]) {

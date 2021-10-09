@@ -17,6 +17,7 @@ export class VehiclePrep {
         ModifiersPrep.prepareModifiers(data);
         ModifiersPrep.clearAttributeMods(data);
         ModifiersPrep.clearArmorMods(data);
+        ModifiersPrep.clearLimitMods(data);
     }
 
     static prepareDerivedData(data: VehicleData, items: SR5ItemDataWrapper[]) {

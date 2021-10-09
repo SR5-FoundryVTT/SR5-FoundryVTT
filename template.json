@@ -51,16 +51,19 @@
             "limits": {
                 "limits": {
                     "physical": {
+                        "base": 0,
                         "value": 1,
                         "mod": [],
                         "min": 1
                     },
                     "social": {
+                        "base": 0,
                         "value": 1,
                         "mod": [],
                         "min": 1
                     },
                     "mental": {
+                        "base": 0,
                         "value": 1,
                         "mod": [],
                         "min": 1

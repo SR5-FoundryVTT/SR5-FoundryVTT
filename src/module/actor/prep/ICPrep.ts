@@ -15,6 +15,7 @@ import {SkillsPrep} from "./functions/SkillsPrep";
 export class ICPrep {
     static prepareBaseData(data: ICData) {
         ModifiersPrep.clearAttributeMods(data);
+        ModifiersPrep.clearLimitMods(data);
 
         ICPrep.addMissingTracks(data);
         ICPrep.prepareModifiers(data);

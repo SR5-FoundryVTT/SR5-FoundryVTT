@@ -20,6 +20,7 @@ export class SpritePrep {
 
         ModifiersPrep.prepareModifiers(data);
         ModifiersPrep.clearAttributeMods(data);
+        ModifiersPrep.clearLimitMods(data);
     }
 
     static prepareDerivedData(data: SpriteData, items: SR5ItemDataWrapper[]) {
