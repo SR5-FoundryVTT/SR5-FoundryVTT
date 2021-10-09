@@ -261,8 +261,12 @@ ___________________
      * It partially uses: https://github.com/schultzcole/FVTT-Autocomplete-Inline-Properties/blob/master/package-config.mjs#L141
      */
     static setupAutocompleteInlinePropertiesSupport() {
+        // Module might not be installed.
+        const aipModule = game.modules.get("autocomplete-inline-properties");
+        if (!aipModule) return;
         // @ts-ignore
-        const api = game.modules.get("autocomplete-inline-properties").API;
+        // API might be missing.
+        const api = aipModule.API;
         if (!api) return;
 
         console.log('Shadowrun5e - Registering support for autocomplete-inline-properties');
