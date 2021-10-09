@@ -59,10 +59,8 @@ export const registerRollAndLabelHelpers = () => {
         return parts.total;
     });
 
-    Handlebars.registerHelper('modifierValue', function (modifier: ModListEntry<number>) {
-        if (isNaN(modifier.value)) return modifier.value;
-        const signed = modifier.value > 0 ?  `+${modifier.value}`: `${modifier.value}`;
-        return modifier.override ? `= ${signed}` : signed;
+    Handlebars.registerHelper('signedValue', function (value: number) {
+        return value > 0 ?  `+${value}`: `${value}`;
     });
 
     Handlebars.registerHelper('speakerName', Helpers.getChatSpeakerName);

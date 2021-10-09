@@ -3,6 +3,7 @@ import {SR} from "../../../constants";
 import {SR5} from "../../../config";
 import AttributeField = Shadowrun.AttributeField;
 import ActorTypesData = Shadowrun.ShadowrunActorDataData;
+import {ModifiersPrep} from "./ModifiersPrep";
 
 export class AttributesPrep {
     /**
@@ -35,11 +36,6 @@ export class AttributesPrep {
     static prepareAttribute(name: string, attribute: AttributeField) {
         // Check for valid attributes. Active Effects can cause unexpected properties to appear.
         if (!SR5.attributes.hasOwnProperty(name) || !attribute) return;
-
-        // TODO: IC-ACTOR Check this NOTE
-        // NOTE: This is legacy code I suspect does nothing. Disabled on 0.7.15. Delete it on any newer version!
-        // const parts = new PartsList(attribute.mod);
-        // attribute.mod = parts.list;
 
         // Each attribute can have a unique value range.
         // TODO:  Implement metatype attribute value ranges for character actors.

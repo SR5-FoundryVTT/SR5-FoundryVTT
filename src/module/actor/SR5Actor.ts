@@ -177,11 +177,11 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
                 ICPrep.prepareDerivedData(this.data.data, itemDataWrappers);
                 break;
         }
-
-        // Override Effects will just replace calculated value but not trigger re-calculation for depended values.
-        this.applyOverrideActiveEffects();
     }
 
+    /**
+     * TODO: This method is unused at the moment, might be unneeded.
+     */
     applyOverrideActiveEffects() {
         const changes = this.effects.reduce((changes: ActiveEffectChange[], effect) => {
             if (effect.data.disabled) return changes;

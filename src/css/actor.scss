@@ -153,6 +153,9 @@
                         font-weight: bold;
                         border-top: 1px double $light;
                     }
+                    > .value-modifiers-invalid-total {
+                        text-decoration: line-through;
+                    }
                 }
             }
 

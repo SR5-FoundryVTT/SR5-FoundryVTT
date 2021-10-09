@@ -2,6 +2,7 @@ import {SR5Actor} from "../actor/SR5Actor";
 import ModifiableValue = Shadowrun.ModifiableValue;
 import ModListEntry = Shadowrun.ModListEntry;
 import ModList = Shadowrun.ModList;
+import {Helpers} from "../helpers";
 
 export class SR5ActiveEffect extends ActiveEffect {
     /**
@@ -95,27 +96,55 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     /**
-     * Override of a ModifiableValue will result in a modifier label to tell the user what's going on.
+     * Overriding can be tricky if the overwritten value is a ModifiableValue with derived values.
+     *
+     * To keep the ActiveEffect workflow simple and still allow to override values that aren't a ModifiableValue,
+     * check for such values and give the ActorDataPreparation flow some hints.
      *
      * @protected
      */
     protected _applyOverride(actor: SR5Actor, change: ActiveEffect.Change) {
-        const update = super._applyOverride(actor, change);
+        // Match against these keys, as the exact ModifiableValue layout might be different from time to time.
+        const minValueKeys = ['value', 'base', 'mod'];
 
 
+        // Check direct key.
+        if (this._isKeyModifiableValue(actor, change.key, minValueKeys)) {
+            // @ts-ignore // TODO: foundry-vtt-types 0.8
+            const value = foundry.utils.getProperty(actor.data, change.key);
+            // value.mod = [];
+            value.override = {name: this.data.label, value: Number(change.value)};
+            value.value = change.value;
+            // A direct match will override the whole value.
+            return value;
+        }
+
+        // Check indirect key.
         const nodes = change.key.split('.');
         nodes.pop();
-        const valueKey = nodes.join('.');
+        const indirectKey = nodes.join('.');
+
         // @ts-ignore // TODO: foundry-vtt-types 0.8
-        const value = foundry.utils.getProperty(actor.data, valueKey) as ModifiableValue ?? null;
-        // @ts-ignore // TODO: foundry-vtt-types 0.8
-        const isModifiableValue = value !== null & foundry.utils.getType(value.mod) === 'Array';
+        if (this._isKeyModifiableValue(actor, indirectKey, minValueKeys)) {
+            // @ts-ignore // TODO: foundry-vtt-types 0.8
+            const value = foundry.utils.getProperty(actor.data, indirectKey);
+            // value.mod = [];
+            value.override = {name: this.data.label, value: Number(change.value)};
+            // value.value = change.value;
+            // @ts-ignore // TODO: foundry-vtt-types 0.8
+        }
 
-        if (!isModifiableValue) return update;
-
-        // Remove all existing modifiers and only leave one (whatever is applied last).
-        value.mod = [{name: this.data.label, value: Number(change.value), override: true}];
-
-        return update;
+        // Neither a direct nor an indirect ModifiableValue match.
+        return super._applyOverride(actor, change);
     }
+
+    _isKeyModifiableValue(actor: SR5Actor, key: string, minValueKeys: string[]): boolean {
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
+        const possibleValue = foundry.utils.getProperty(actor.data, key);
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
+        const possibleValueType = foundry.utils.getType(possibleValue);
+
+        return possibleValue && possibleValueType === 'Object' && Helpers.objectHasKeys(possibleValue, minValueKeys);
+    }
+
 }
