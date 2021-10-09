@@ -29,6 +29,7 @@ export class CritterPrep {
         MatrixPrep.prepareMatrix(data, items);
         MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
 
+        // Limits depend on attributes and active effects.
         LimitsPrep.prepareLimitBaseFromAttributes(data);
         LimitsPrep.prepareLimits(data);
 

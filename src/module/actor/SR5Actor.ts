@@ -122,14 +122,14 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
                 ICPrep.prepareBaseData(this.data.data);
                 break;
         }
-
-        // this.applyBaseDataActiveEffects();
     }
 
     /**
      * prepare embedded entities. Check ClientDocumentMixin.prepareData for order of data prep.
      */
     prepareEmbeddedEntities() {
+        // This will apply ActiveEffects, which is okay for modify (custom) effects, however add/multiply on .value will be
+        // overwritten.
         super.prepareEmbeddedEntities();
 
         // @ts-ignore
@@ -174,6 +174,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
                 break;
         }
 
+        // Override Effects will just replace calculated value but not trigger re-calculation for depended values.
         this.applyOverrideActiveEffects();
     }
 
