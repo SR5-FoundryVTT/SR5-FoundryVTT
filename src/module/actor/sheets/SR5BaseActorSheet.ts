@@ -519,6 +519,10 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
     async _onMarksQuantityChange(event) {
         event.stopPropagation();
 
+        if (this.object.isIC() && this.object.hasHost()) {
+            return ui.notifications.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+        }
+
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
@@ -532,6 +536,10 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
     async _onMarksQuantityChangeBy(event, by: number) {
         event.stopPropagation();
 
+        if (this.object.isIC() && this.object.hasHost()) {
+            return ui.notifications.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+        }
+
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
@@ -544,6 +552,10 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
     async _onMarksDelete(event) {
         event.stopPropagation();
 
+        if (this.object.isIC() && this.object.hasHost()) {
+            return ui.notifications.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+        }
+
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
@@ -555,6 +567,10 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
 
     async _onMarksClearAll(event) {
         event.stopPropagation();
+
+        if (this.object.isIC() && this.object.hasHost()) {
+            return ui.notifications.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+        }
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
