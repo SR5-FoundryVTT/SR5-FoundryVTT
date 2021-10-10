@@ -59,6 +59,7 @@ import {MatrixRules} from "../rules/MatrixRules";
 import ActionResultData = Shadowrun.ActionResultData;
 import {DeviceFlow} from "./flows/DeviceFlow";
 import MatrixMarks = Shadowrun.MatrixMarks;
+import MarkedDocument = Shadowrun.MarkedDocument;
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
@@ -1667,12 +1668,6 @@ export class SR5Item extends Item<ShadowrunItemData> {
             return;
         }
 
-        if (!MatrixRules.isValidMarksCount(marks)) {
-            ui.notifications.error(game.i18n.localize('SR5.Errors.MarkCouldNotBePlaced'));
-            console.error('To many or to little matrix marks');
-            return;
-        }
-
         // Both scene and item are optional.
         const scene = options?.scene || canvas.scene;
         const item = options?.item;
@@ -1743,6 +1738,18 @@ export class SR5Item extends Item<ShadowrunItemData> {
     }
 
     /**
+     * Remove ONE mark. If you want to delete all marks, use clearMarks instead.
+     */
+    async clearMark(markId: string) {
+        if (!this.isHost()) return;
+
+        const updateData = {}
+        updateData[`-=${markId}`] = null;
+
+        await this.update({'data.marks': updateData});
+    }
+
+    /**
      * Add a 'device' to a matrix network (PAN or WAN)
      *
      */
@@ -1792,5 +1799,21 @@ export class SR5Item extends Item<ShadowrunItemData> {
         if (!deviceData) return;
 
         return await this.update({'data.networkDevices': []});
+    }
+
+    getAllMarkedDocuments(): MarkedDocument[] {
+        if (!this.isHost()) return [];
+
+        const marks = this.getAllMarks();
+        if (!marks) return [];
+
+        // Deconstruct all mark ids into documents.
+        return Object.entries(marks)
+            .filter(([markId, marks]) => Helpers.isValidMarkId(markId))
+            .map(([markId, marks]) => ({
+                ...Helpers.getMarkIdDocuments(markId),
+                marks,
+                markId
+            }))
     }
 }

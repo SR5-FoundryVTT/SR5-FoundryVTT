@@ -3,6 +3,7 @@
     <nav class="tabs" data-group="primary">
         <a class="item" data-tab="description">{{localize "SR5.Description"}}</a>
         <a class="item" data-tab="host">{{localize "SR5.ItemTypes.Host"}}</a>
+        <a class="item" data-tab="marks">{{localize "SR5.Marks"}}</a>
         <a class="item" data-tab="effects">{{ localize "SR5.Effects" }}</a>
     </nav>
     <section class="sheetbody">
@@ -64,6 +65,9 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="tab" data-group="primary" data-tab="marks">
+            {{> 'systems/shadowrun5e/dist/templates/actor/parts/matrix/Marks.html' }}
         </div>
         {{> "systems/shadowrun5e/dist/templates/actor/tabs/EffectsTab.html"}}
     </section>

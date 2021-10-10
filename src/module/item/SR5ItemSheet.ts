@@ -106,6 +106,10 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         // @ts-ignore // TODO: foundry-vtt-types 0.8 missing document support
         data['effects'] = prepareActiveEffectCategories(this.document.effects);
 
+        if (this.object.isHost()) {
+            data['markedDocuments'] = this.object.getAllMarkedDocuments();
+        }
+
         if (this.item.isHost() || this.item.isDevice()) {
             data['networkDevices'] = this._getNetworkDevices();
         }
@@ -216,6 +220,13 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
 
         html.find('.network-clear').on('click', this._onRemoveAllNetworkDevices.bind(this));
         html.find('.network-device-remove').on('click', this._onRemoveNetworkDevice.bind(this));
+
+        // Marks handling
+        html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));
+        html.find('.marks-add-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, 1));
+        html.find('.marks-remove-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, -1));
+        html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
+        html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
     }
 
     _onDragOver(event) {
@@ -486,5 +497,59 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         if (activeList.length) {
             this._scroll = activeList.prop('scrollTop');
         }
+    }
+
+    async _onMarksQuantityChange(event) {
+        event.stopPropagation();
+
+        if (!this.object.isHost()) return;
+
+        const markId = event.currentTarget.dataset.markId;
+        if (!markId) return;
+
+        const {scene, target, item} = Helpers.getMarkIdDocuments(markId);
+        if (!scene || !target) return; // item can be undefined.
+
+        const marks = parseInt(event.currentTarget.value);
+        await this.object.setMarks(target, marks, {scene, item, overwrite: true});
+    }
+
+    async _onMarksQuantityChangeBy(event, by: number) {
+        event.stopPropagation();
+
+        if (!this.object.isHost()) return;
+
+        const markId = event.currentTarget.dataset.markId;
+        if (!markId) return;
+
+        const {scene, target, item} = Helpers.getMarkIdDocuments(markId);
+        if (!scene || !target) return; // item can be undefined.
+
+        await this.object.setMarks(target, by, {scene, item});
+    }
+
+    async _onMarksDelete(event) {
+        event.stopPropagation();
+
+        if (!this.object.isHost()) return;
+
+        const markId = event.currentTarget.dataset.markId;
+        if (!markId) return;
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        await this.object.clearMark(markId);
+    }
+
+    async _onMarksClearAll(event) {
+        event.stopPropagation();
+
+        if (!this.object.isHost()) return;
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        await this.object.clearMarks();
     }
 }
