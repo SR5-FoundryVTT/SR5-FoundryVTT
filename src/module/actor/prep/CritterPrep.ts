@@ -17,6 +17,7 @@ export class CritterPrep {
         ModifiersPrep.prepareModifiers(data);
         ModifiersPrep.clearAttributeMods(data);
         ModifiersPrep.clearArmorMods(data);
+        ModifiersPrep.clearLimitMods(data);
     }
 
     static prepareDerivedData(data: CritterData, items: SR5ItemDataWrapper[]) {
@@ -29,6 +30,7 @@ export class CritterPrep {
         MatrixPrep.prepareMatrix(data, items);
         MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
 
+        // Limits depend on attributes and active effects.
         LimitsPrep.prepareLimitBaseFromAttributes(data);
         LimitsPrep.prepareLimits(data);
 

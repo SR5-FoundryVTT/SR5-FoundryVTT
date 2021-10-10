@@ -33,18 +33,26 @@ export class Helpers {
      */
     static calcTotal(value: ModifiableValue, options?: CalcTotalOptions): number {
         if (value.mod === undefined) value.mod = [];
+
         const parts = new PartsList(value.mod);
         // if a temp field is found, add it as a unique part
-        if (value['temp'] !== undefined) {
+        if (!isNaN(value.temp)) {
             parts.addUniquePart('SR5.Temporary', value['temp']);
         }
-        // LEGACY: On new actors .base can be undefined, resulting in NaN .value
-        const base = value.base || 0;
 
-        value.value = Helpers.roundTo(parts.total + base, 3);
-        value.mod = parts.list;
+        // On some values base might be undefined...
+        value.base = value.base || 0;
 
+        // If the given value has a override defined, use that as a value, while keeping the base and mod values.
+        if (value.override) {
+            value.value = value.override.value;
+            return value.override.value;
+        }
+
+        value.value = Helpers.roundTo(parts.total + value.base, 3);
         value.value = Helpers.applyValueRange(value.value, options);
+
+        value.mod = parts.list;
 
         return value.value;
     }
@@ -769,5 +777,20 @@ export class Helpers {
         return {
             scene, target, item
         }
+    }
+
+    /**
+     * Return true if all given keys are present in the given object.
+     * Values don't matter for this comparison.
+     *
+     * @param obj
+     * @param keys
+     */
+    static objectHasKeys(obj: object, keys: string[]): boolean {
+        for (const key of keys) {
+            if (!obj.hasOwnProperty(key)) return false;
+        }
+
+        return true;
     }
 }

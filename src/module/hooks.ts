@@ -49,7 +49,7 @@ export class HooksManager {
         Hooks.on('getCombatTrackerEntryContext', SR5Combat.addCombatTrackerContextOptions);
         Hooks.on('renderItemDirectory', HooksManager.renderItemDirectory);
         Hooks.on('renderTokenHUD', EnvModifiersApplication.addTokenHUDFields);
-        Hooks.on('updateItem', HooksManager.updateItem);
+        Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem);
 
         // Foundry VTT Module 'quench': https://github.com/schultzcole/FVTT-Quench
         Hooks.on('quenchReady', quenchRegister);
@@ -207,18 +207,28 @@ ___________________
         });
     }
 
-    static async updateItem(item: SR5Item, data: ShadowrunItemDataData, id: string) {
+    /**
+     * On each
+     * @param item
+     * @param data
+     * @param id
+     */
+    static async updateIcConnectedToHostItem(item: SR5Item, data: ShadowrunItemDataData, id: string) {
+        if (!canvas.ready) return;
+
         if (item.isHost()) {
-            const connectedIC = game.actors.filter((actor: SR5Actor) => {
-            const icData = actor.asICData();
-            if (!icData) return false;
-                return !!icData.data.host.id;
-            }) as SR5Actor[];
+            // Collect actors from sidebar and active scene to update / rerender
+            let connectedIC = [
+                // All sidebar actors should also include tokens with linked actors.
+                ...game.actors.filter((actor: SR5Actor) => actor.isIC() && actor.hasHost()) as SR5Actor[],
+                // All token actors that aren't linked.
+                // @ts-ignore // TODO: foundry-vtt-types 0.9
+                ...canvas.scene.tokens.filter(token => !token.data.actorLink && token.actor?.isIC() && token.actor?.hasHost()).map(t => t.actor)
+            ];
 
             // Update host data on the ic actor.
             const hostData = item.asHostData();
             for (const ic of connectedIC) {
-                console.error(hostData, ic);
                 await ic._updateICHostData(hostData);
             }
         }
@@ -261,8 +271,12 @@ ___________________
      * It partially uses: https://github.com/schultzcole/FVTT-Autocomplete-Inline-Properties/blob/master/package-config.mjs#L141
      */
     static setupAutocompleteInlinePropertiesSupport() {
+        // Module might not be installed.
+        const aipModule = game.modules.get("autocomplete-inline-properties");
+        if (!aipModule) return;
         // @ts-ignore
-        const api = game.modules.get("autocomplete-inline-properties").API;
+        // API might be missing.
+        const api = aipModule.API;
         if (!api) return;
 
         console.log('Shadowrun5e - Registering support for autocomplete-inline-properties');

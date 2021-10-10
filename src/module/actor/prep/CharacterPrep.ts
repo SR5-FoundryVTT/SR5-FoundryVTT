@@ -17,6 +17,7 @@ export class CharacterPrep {
         ModifiersPrep.prepareModifiers(data);
         ModifiersPrep.clearAttributeMods(data);
         ModifiersPrep.clearArmorMods(data);
+        ModifiersPrep.clearLimitMods(data);
     }
 
     /**

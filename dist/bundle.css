@@ -218,33 +218,6 @@
           text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
           cursor: pointer;
           color: #6495ed; }
-      .sr5.actor .attributes .attribute .value > .value-modifiers-container {
-        display: none;
-        visibility: hidden;
-        position: absolute;
-        /* We WILL be on top! */
-        z-index: 2147483647;
-        opacity: 0;
-        transition: opacity 0.3s; }
-      .sr5.actor .attributes .attribute .value:hover .value-modifiers-container {
-        display: block;
-        visibility: visible;
-        opacity: 1; }
-      .sr5.actor .attributes .attribute .value .value-modifiers {
-        display: grid;
-        grid-template-columns: 200px 50px;
-        background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("assets/brushed_metal.jpg") repeat;
-        border: 1px solid #e6e6e6;
-        padding: 0.5em 0.5em 0.5em 0.5em;
-        text-align: left;
-        font-weight: normal; }
-        .sr5.actor .attributes .attribute .value .value-modifiers > .value-modifier-name {
-          font-weight: bold; }
-        .sr5.actor .attributes .attribute .value .value-modifiers > .value-modifiers-base {
-          border-bottom: 1px solid #e6e6e6; }
-        .sr5.actor .attributes .attribute .value .value-modifiers > .value-modifiers-total {
-          font-weight: bold;
-          border-top: 1px double #e6e6e6; }
       .sr5.actor .attributes .attribute .attribute-input-container {
         text-align: center;
         position: relative;
@@ -297,6 +270,38 @@
     justify-content: center;
     align-items: center;
     align-content: center; }
+
+.sr5 .value > .value-modifiers-container {
+  display: none;
+  visibility: hidden;
+  position: absolute;
+  /* We WILL be on top! */
+  z-index: 2147483647;
+  opacity: 0;
+  transition: opacity 0.3s; }
+
+.sr5 .value:hover .value-modifiers-container {
+  display: block;
+  visibility: visible;
+  opacity: 1; }
+
+.sr5 .value .value-modifiers {
+  display: grid;
+  grid-template-columns: 200px 50px;
+  background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url("assets/brushed_metal.jpg") repeat;
+  border: 1px solid #e6e6e6;
+  padding: 0.5em 0.5em 0.5em 0.5em;
+  text-align: left;
+  font-weight: normal; }
+  .sr5 .value .value-modifiers > .value-modifier-name {
+    font-weight: bold; }
+  .sr5 .value .value-modifiers > .value-modifiers-base {
+    border-bottom: 1px solid #e6e6e6; }
+  .sr5 .value .value-modifiers > .value-modifiers-total {
+    font-weight: bold;
+    border-top: 1px double #e6e6e6; }
+  .sr5 .value .value-modifiers > .value-modifiers-invalid-total {
+    text-decoration: line-through; }
 
 .sr5.chat-card {
   font-style: normal;

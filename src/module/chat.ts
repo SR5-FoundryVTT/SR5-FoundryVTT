@@ -478,10 +478,11 @@ export const addRollListeners = (app: ChatMessage, html) => {
                 return console.error('No actor could be extracted from message data.');
             }
 
-            // Allow custom selection for GMs and users with enough permissions...
-            let targets = Helpers.getControlledTokens().filter(token => token.actor.id !== game.user.character?.id);
+            // Allow custom selection for GMs and users with enough permissions.
+            // token.actor can be undefined for tokens with removed actors.
+            let targets = Helpers.getControlledTokens().filter(token => token.actor?.id !== game.user.character?.id);
 
-            // For users allow custom selection using targeting...
+            // For users allow custom selection using targeting.
             if (targets.length === 0) {
                 targets = Helpers.getTargetedTokens();
             }

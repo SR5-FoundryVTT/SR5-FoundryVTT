@@ -58,6 +58,8 @@ import {HostDataPreparation} from "./prep/HostPrep";
 import {MatrixRules} from "../rules/MatrixRules";
 import ActionResultData = Shadowrun.ActionResultData;
 import {DeviceFlow} from "./flows/DeviceFlow";
+import MatrixMarks = Shadowrun.MatrixMarks;
+import MarkedDocument = Shadowrun.MarkedDocument;
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
@@ -1658,7 +1660,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
      * TODO: It might be useful to create a 'MatrixDocument' class sharing matrix methods to avoid duplication between
      *       SR5Item and SR5Actor.
      */
-    async setMarks(target: SR5Actor, marks: number, options?: {scene?: Scene, item?: Item}) {
+    async setMarks(target: Token, marks: number, options?: {scene?: Scene, item?: Item, overwrite?: boolean}) {
         if (!canvas.ready) return;
 
         if (!this.isHost()) {
@@ -1666,24 +1668,30 @@ export class SR5Item extends Item<ShadowrunItemData> {
             return;
         }
 
-        if (!MatrixRules.isValidMarksCount(marks)) {
-            ui.notifications.error(game.i18n.localize('SR5.Errors.MarkCouldNotBePlaced'));
-            console.error('To many or to little matrix marks');
-            return
-        }
-
         // Both scene and item are optional.
         const scene = options?.scene || canvas.scene;
-        // TODO: IF no item given use the actor matrix item.
-        const item = options?.item || target.getMatrixDevice();
+        const item = options?.item;
 
         // Build the markId string. If no item has been given, there still will be a third split element.
         // Use Helpers.deconstructMarkId to get the elements.
         const markId = Helpers.buildMarkId(scene.id, target.id, item?.id);
         const hostData = this.asHostData();
-        hostData.data.marks[markId] = marks;
+
+        const currentMarks = options?.overwrite ? 0 : this.getMarksById(markId);
+        hostData.data.marks[markId] = MatrixRules.getValidMarksCount(currentMarks + marks);
 
         await this.update({'data.marks': hostData.data.marks});
+    }
+
+    getMarksById(markId: string): number {
+        const hostData = this.asHostData();
+        return hostData ? hostData.data.marks[markId] : 0;
+    }
+
+    getAllMarks(): MatrixMarks|undefined {
+        const hostData = this.asHostData();
+        if (!hostData) return;
+        return hostData.data.marks;
     }
 
     /**
@@ -1725,6 +1733,18 @@ export class SR5Item extends Item<ShadowrunItemData> {
         for (const markId of Object.keys(data.data.marks)) {
             updateData[`-=${markId}`] = null;
         }
+
+        await this.update({'data.marks': updateData});
+    }
+
+    /**
+     * Remove ONE mark. If you want to delete all marks, use clearMarks instead.
+     */
+    async clearMark(markId: string) {
+        if (!this.isHost()) return;
+
+        const updateData = {}
+        updateData[`-=${markId}`] = null;
 
         await this.update({'data.marks': updateData});
     }
@@ -1779,5 +1799,21 @@ export class SR5Item extends Item<ShadowrunItemData> {
         if (!deviceData) return;
 
         return await this.update({'data.networkDevices': []});
+    }
+
+    getAllMarkedDocuments(): MarkedDocument[] {
+        if (!this.isHost()) return [];
+
+        const marks = this.getAllMarks();
+        if (!marks) return [];
+
+        // Deconstruct all mark ids into documents.
+        return Object.entries(marks)
+            .filter(([markId, marks]) => Helpers.isValidMarkId(markId))
+            .map(([markId, marks]) => ({
+                ...Helpers.getMarkIdDocuments(markId),
+                marks,
+                markId
+            }))
     }
 }

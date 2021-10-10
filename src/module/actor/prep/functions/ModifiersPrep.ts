@@ -89,4 +89,13 @@ export class ModifiersPrep {
 
         armor.mod = [];
     }
+
+    static clearLimitMods(data: ShadowrunActorDataData) {
+        const {limits} = data;
+        for (const [name, limit] of Object.entries(limits)) {
+            if (!SR5.limits.hasOwnProperty(name) || !limit) return;
+
+            limit.mod = [];
+        }
+    }
 }

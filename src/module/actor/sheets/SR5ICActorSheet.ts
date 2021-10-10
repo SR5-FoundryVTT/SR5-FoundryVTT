@@ -10,6 +10,7 @@ export class SR5ICActorSheet extends SR5BaseActorSheet {
 
         // Display Matrix Marks
         data['markedDocuments'] = this.object.getAllMarkedDocuments();
+        data['disableMarksEdit'] = this.object.hasHost();
 
         return data;
     }

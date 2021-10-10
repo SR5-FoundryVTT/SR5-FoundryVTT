@@ -547,7 +547,6 @@
   "SR5.IsCritter": "Critter",
   "SR5.WalkingSpeed": "Gehen",
   "SR5.RunningSpeed": "Rennen",
-
   "SR5.Blackmail": "Erpressung",
   "SR5.Family": "Familie",
   "SR5.DamageResistanceTest": "Schadenswiderstandsprobe",
@@ -555,6 +554,8 @@
   "SR5.RollMode": "Würfelmodus",
   "SR5.OpenSourcePdf": "Öffne PDF-Quelle für Objekt",
   "SR5.SourceFieldEmptyError": "Es wurde keine PDF-Quelle angegeben",
+  "SR5.Help": "Hilfe",
+
   "SETTINGS": {
     "DiagonalMovementName": "Diagonale Bewegung",
     "DiagonalMovementDescription": "Wie soll diagonale Bewegung auf dem Gitter gehandhabt werden?",
@@ -781,6 +782,9 @@
     "Title": "Schaden anwenden",
     "ApplyDamage": "Schaden anwenden",
     "ApplyUnmodifiedDamage": "Unmod. Schaden anwenden"
+  },
+  "SR5.Infos": {
+    "CantModifyHostContent": "Host daten können nicht von einem IC Akteur aus verändert werden"
   },
   "SR5.Warnings": {
     "NegativeLimitValue": "Limit Werte müssen über Null liegen",
