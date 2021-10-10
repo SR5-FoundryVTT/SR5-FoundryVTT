@@ -561,6 +561,8 @@
   "SR5.RightClickToClear": "Right Click to Clear",
   "SR5.WalkingSpeed": "Walking",
   "SR5.RunningSpeed": "Running",
+  "SR5.Help": "Help",
+
   "SETTINGS": {
     "DiagonalMovementName": "Diagonal Movement",
     "DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
@@ -817,13 +819,15 @@
     "ApplyDamage": "Apply Damage",
     "ApplyUnmodifiedDamage": "Apply Unmod. Damage"
   },
+  "SR5.Infos": {
+    "CantModifyHostContent": "Can't change host data from within an IC actor."
+  },
   "SR5.Warnings": {
     "NegativeLimitValue": "Limit values must be above zero",
     "TokenSelectionNeeded": "One ore more tokens need to be selected",
     "SkillCantBeDefault": "This skill can't be rolled on as it can't be defaulted",
     "HostItemOnlyAcceptIC": "Only IC actors can be added to hosts",
     "InvalidMarksCount": "You've trying to place a strange number of marks"
-
   },
   "SR5.Errors": {
     "MissingSkill": "The actor doesn't have the requested skill.",

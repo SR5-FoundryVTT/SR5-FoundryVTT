@@ -13343,18 +13343,23 @@ class SR5Actor extends Actor {
                 ICPrep_1.ICPrep.prepareBaseData(this.data.data);
                 break;
         }
-        // this.applyBaseDataActiveEffects();
     }
     /**
      * prepare embedded entities. Check ClientDocumentMixin.prepareData for order of data prep.
      */
     prepareEmbeddedEntities() {
+        // This will apply ActiveEffects, which is okay for modify (custom) effects, however add/multiply on .value will be
+        // overwritten.
         super.prepareEmbeddedEntities();
         // @ts-ignore
         // NOTE: Hello there! Should you ever be in need of calling the grand parents methods, maybe to avoid applyActiveEffects,
         //       look at this beautiful piece of software and shiver in it's glory.
         // ClientDocumentMixin(class {}).prototype.prepareEmbeddedEntities.apply(this);
     }
+    /**
+     * Should some ActiveEffects need to be excluded from the general application, do so here.
+     * @override
+     */
     applyActiveEffects() {
         super.applyActiveEffects();
     }
@@ -13388,8 +13393,10 @@ class SR5Actor extends Actor {
                 ICPrep_1.ICPrep.prepareDerivedData(this.data.data, itemDataWrappers);
                 break;
         }
-        this.applyOverrideActiveEffects();
     }
+    /**
+     * TODO: This method is unused at the moment, might be unneeded.
+     */
     applyOverrideActiveEffects() {
         const changes = this.effects.reduce((changes, effect) => {
             if (effect.data.disabled)
@@ -14991,7 +14998,9 @@ class SR5Actor extends Actor {
                 rating: hostData.data.rating,
                 atts: duplicate(hostData.data.atts)
             };
-            yield this.update({ 'data.host': updateData });
+            // Some host data isn't stored on the IC actor (marks) and won't cause an automatic render.
+            yield this.update({ 'data.host': updateData }, { render: false });
+            yield this.sheet.render();
         });
     }
     /**
@@ -15024,7 +15033,7 @@ class SR5Actor extends Actor {
         const icData = this.asICData();
         if (!icData)
             return;
-        return this.items.get((_a = icData === null || icData === void 0 ? void 0 : icData.data) === null || _a === void 0 ? void 0 : _a.host.id);
+        return game.items.get((_a = icData === null || icData === void 0 ? void 0 : icData.data) === null || _a === void 0 ? void 0 : _a.host.id);
     }
     /** Check if this actor is of one or multiple given actor types
      *
@@ -15086,6 +15095,9 @@ class SR5Actor extends Actor {
         return __awaiter(this, void 0, void 0, function* () {
             if (!canvas.ready)
                 return;
+            if (this.isIC() && this.hasHost()) {
+                return yield this.getICHost().setMarks(target, marks, options);
+            }
             if (!this.isMatrixActor) {
                 ui.notifications.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedBy'));
                 console.error(`The actor type ${this.data.type} can't receive matrix marks!`);
@@ -15140,6 +15152,12 @@ class SR5Actor extends Actor {
             yield this.update({ 'data.matrix.marks': updateData });
         });
     }
+    getAllMarks() {
+        const matrixData = this.matrixData;
+        if (!matrixData)
+            return;
+        return matrixData.marks;
+    }
     /**
      * Return the amount of marks this actor has on another actor or one of their items.
      *
@@ -15172,12 +15190,28 @@ class SR5Actor extends Actor {
     getMarksById(markId) {
         return this.matrixData.marks[markId] || 0;
     }
+    /**
+     * Return the actor or item that is the network controller of this actor.
+     * These cases are possible:
+     * - IC with a host connected will provide the host item
+     * - IC without a host will provide itself
+     * - A matrix actor within a PAN will provide the controlling actor
+     * - A matrix actor without a PAN will provide itself
+     */
+    get matrixController() {
+        // In case of a broken host connection, return the IC actor.
+        if (this.isIC() && this.hasHost())
+            return this.getICHost() || this;
+        // TODO: Implement PAN
+        // if (this.isMatrixActor && this.hasController()) return this.getController();
+        return this;
+    }
     getAllMarkedDocuments() {
-        const matrixData = this.matrixData;
-        if (!matrixData)
+        const marks = this.matrixController.getAllMarks();
+        if (!marks)
             return [];
         // Deconstruct all mark ids into documents.
-        return Object.entries(matrixData.marks)
+        return Object.entries(marks)
             .filter(([markId, marks]) => helpers_1.Helpers.isValidMarkId(markId))
             .map(([markId, marks]) => (Object.assign(Object.assign({}, helpers_1.Helpers.getMarkIdDocuments(markId)), { marks,
             markId })));
@@ -16643,6 +16677,7 @@ class CharacterPrep {
         ModifiersPrep_1.ModifiersPrep.prepareModifiers(data);
         ModifiersPrep_1.ModifiersPrep.clearAttributeMods(data);
         ModifiersPrep_1.ModifiersPrep.clearArmorMods(data);
+        ModifiersPrep_1.ModifiersPrep.clearLimitMods(data);
     }
     /**
      * All derived data should depend on basic values like Attributes or Skills.
@@ -16700,6 +16735,7 @@ class CritterPrep {
         ModifiersPrep_1.ModifiersPrep.prepareModifiers(data);
         ModifiersPrep_1.ModifiersPrep.clearAttributeMods(data);
         ModifiersPrep_1.ModifiersPrep.clearArmorMods(data);
+        ModifiersPrep_1.ModifiersPrep.clearLimitMods(data);
     }
     static prepareDerivedData(data, items) {
         AttributesPrep_1.AttributesPrep.prepareAttributes(data);
@@ -16708,6 +16744,7 @@ class CritterPrep {
         ItemPrep_1.ItemPrep.prepareBodyware(data, items);
         MatrixPrep_1.MatrixPrep.prepareMatrix(data, items);
         MatrixPrep_1.MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
+        // Limits depend on attributes and active effects.
         LimitsPrep_1.LimitsPrep.prepareLimitBaseFromAttributes(data);
         LimitsPrep_1.LimitsPrep.prepareLimits(data);
         ConditionMonitorsPrep_1.ConditionMonitorsPrep.preparePhysical(data);
@@ -16738,6 +16775,7 @@ const SkillsPrep_1 = require("./functions/SkillsPrep");
 class ICPrep {
     static prepareBaseData(data) {
         ModifiersPrep_1.ModifiersPrep.clearAttributeMods(data);
+        ModifiersPrep_1.ModifiersPrep.clearLimitMods(data);
         ICPrep.addMissingTracks(data);
         ICPrep.prepareModifiers(data);
         ICPrep.hideMeatAttributes(data);
@@ -16877,6 +16915,7 @@ class SpiritPrep {
         ModifiersPrep_1.ModifiersPrep.prepareModifiers(data);
         ModifiersPrep_1.ModifiersPrep.clearAttributeMods(data);
         ModifiersPrep_1.ModifiersPrep.clearArmorMods(data);
+        ModifiersPrep_1.ModifiersPrep.clearLimitMods(data);
     }
     static prepareDerivedData(data, items) {
         SpiritPrep.prepareSpiritBaseData(data);
@@ -17274,6 +17313,7 @@ class SpritePrep {
         SpritePrep.prepareSpriteSpecial(data);
         ModifiersPrep_1.ModifiersPrep.prepareModifiers(data);
         ModifiersPrep_1.ModifiersPrep.clearAttributeMods(data);
+        ModifiersPrep_1.ModifiersPrep.clearLimitMods(data);
     }
     static prepareDerivedData(data, items) {
         SpritePrep.prepareSpriteMatrixAttributes(data);
@@ -17412,6 +17452,7 @@ class VehiclePrep {
         ModifiersPrep_1.ModifiersPrep.prepareModifiers(data);
         ModifiersPrep_1.ModifiersPrep.clearAttributeMods(data);
         ModifiersPrep_1.ModifiersPrep.clearArmorMods(data);
+        ModifiersPrep_1.ModifiersPrep.clearLimitMods(data);
     }
     static prepareDerivedData(data, items) {
         VehiclePrep.prepareVehicleStats(data);
@@ -17554,10 +17595,6 @@ class AttributesPrep {
         // Check for valid attributes. Active Effects can cause unexpected properties to appear.
         if (!config_1.SR5.attributes.hasOwnProperty(name) || !attribute)
             return;
-        // TODO: IC-ACTOR Check this NOTE
-        // NOTE: This is legacy code I suspect does nothing. Disabled on 0.7.15. Delete it on any newer version!
-        // const parts = new PartsList(attribute.mod);
-        // attribute.mod = parts.list;
         // Each attribute can have a unique value range.
         // TODO:  Implement metatype attribute value ranges for character actors.
         AttributesPrep.calculateAttribute(name, attribute);
@@ -17767,9 +17804,9 @@ class LimitsPrep {
         limits.mental.mod = PartsList_1.PartsList.AddUniquePart(limits.mental.mod, 'SR5.Bonus', Number(modifiers['mental_limit']));
         limits.social.mod = PartsList_1.PartsList.AddUniquePart(limits.social.mod, "SR5.Bonus", Number(modifiers['social_limit']));
         // limit labels
-        for (let [limitKey, limitValue] of Object.entries(limits)) {
-            helpers_1.Helpers.calcTotal(limitValue);
-            limitValue.label = config_1.SR5.limits[limitKey];
+        for (let [name, limit] of Object.entries(limits)) {
+            helpers_1.Helpers.calcTotal(limit);
+            limit.label = config_1.SR5.limits[name];
         }
     }
     static prepareLimitBaseFromAttributes(data) {
@@ -17985,6 +18022,14 @@ class ModifiersPrep {
     static clearArmorMods(data) {
         const { armor } = data;
         armor.mod = [];
+    }
+    static clearLimitMods(data) {
+        const { limits } = data;
+        for (const [name, limit] of Object.entries(limits)) {
+            if (!config_1.SR5.limits.hasOwnProperty(name) || !limit)
+                return;
+            limit.mod = [];
+        }
     }
 }
 exports.ModifiersPrep = ModifiersPrep;
@@ -18672,6 +18717,9 @@ class SR5BaseActorSheet extends ActorSheet {
     _onMarksQuantityChange(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.stopPropagation();
+            if (this.object.isIC() && this.object.hasHost()) {
+                return ui.notifications.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            }
             const markId = event.currentTarget.dataset.markId;
             if (!markId)
                 return;
@@ -18685,6 +18733,9 @@ class SR5BaseActorSheet extends ActorSheet {
     _onMarksQuantityChangeBy(event, by) {
         return __awaiter(this, void 0, void 0, function* () {
             event.stopPropagation();
+            if (this.object.isIC() && this.object.hasHost()) {
+                return ui.notifications.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            }
             const markId = event.currentTarget.dataset.markId;
             if (!markId)
                 return;
@@ -18697,6 +18748,9 @@ class SR5BaseActorSheet extends ActorSheet {
     _onMarksDelete(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.stopPropagation();
+            if (this.object.isIC() && this.object.hasHost()) {
+                return ui.notifications.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            }
             const markId = event.currentTarget.dataset.markId;
             if (!markId)
                 return;
@@ -18709,6 +18763,9 @@ class SR5BaseActorSheet extends ActorSheet {
     _onMarksClearAll(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.stopPropagation();
+            if (this.object.isIC() && this.object.hasHost()) {
+                return ui.notifications.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            }
             const userConsented = yield helpers_1.Helpers.confirmDeletion();
             if (!userConsented)
                 return;
@@ -18740,6 +18797,7 @@ class SR5ICActorSheet extends SR5BaseActorSheet_1.SR5BaseActorSheet {
         data.host = game.items.get(icData.data.host.id);
         // Display Matrix Marks
         data['markedDocuments'] = this.object.getAllMarkedDocuments();
+        data['disableMarksEdit'] = this.object.hasHost();
         return data;
     }
     activateListeners(html) {
@@ -22539,9 +22597,10 @@ const addRollListeners = (app, html) => {
             if (actor === undefined) {
                 return console.error('No actor could be extracted from message data.');
             }
-            // Allow custom selection for GMs and users with enough permissions...
-            let targets = helpers_1.Helpers.getControlledTokens().filter(token => { var _a; return token.actor.id !== ((_a = game.user.character) === null || _a === void 0 ? void 0 : _a.id); });
-            // For users allow custom selection using targeting...
+            // Allow custom selection for GMs and users with enough permissions.
+            // token.actor can be undefined for tokens with removed actors.
+            let targets = helpers_1.Helpers.getControlledTokens().filter(token => { var _a, _b; return ((_a = token.actor) === null || _a === void 0 ? void 0 : _a.id) !== ((_b = game.user.character) === null || _b === void 0 ? void 0 : _b.id); });
+            // For users allow custom selection using targeting.
             if (targets.length === 0) {
                 targets = helpers_1.Helpers.getTargetedTokens();
             }
@@ -24178,6 +24237,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ActiveEffect = void 0;
+const helpers_1 = require("../helpers");
 class SR5ActiveEffect extends ActiveEffect {
     /**
      * Can be used to determine if the origin of the effect is an document that is owned by another document.
@@ -24226,53 +24286,79 @@ class SR5ActiveEffect extends ActiveEffect {
         return this._applyModify(actor, change);
     }
     /**
-     * Apply a modification to a ModifiableValue (has a .mod property).
+     * Apply a modification to a ModifiableValue.
+     * Both direct key matches to the whole value and indirect matches to a value property are supported.
+     *
      * @protected
      */
     _applyModify(actor, change) {
-        var _a;
-        const { key, value } = change;
-        // @ts-ignore
-        const current = (_a = foundry.utils.getProperty(actor.data, key)) !== null && _a !== void 0 ? _a : null;
-        // @ts-ignore
-        const ct = foundry.utils.getType(current);
-        const nodes = key.split('.');
-        const isModArray = nodes[nodes.length - 1] === 'mod' && ct === 'Array';
-        const update = isModArray ?
-            current.concat([{ name: this.data.label, value: Number(value) }]) :
-            null; // Foundry expects null for un-applied active effects.
-        // @ts-ignore
-        if (update !== null)
-            foundry.utils.setProperty(actor.data, key, update);
-        else
-            console.error(`${game.i18n.localize('SR5.Errors.KeyNotModifyableByActiveEffect')} Actor: [${actor.name}] and Effect Key: [${change.key}]`);
-        return update;
+        // Check direct key.
+        if (this._isKeyModifiableValue(actor, change.key)) {
+            // @ts-ignore // TODO: foundry-vtt-types 0.8
+            const value = foundry.utils.getProperty(actor.data, change.key);
+            value.mod.push({ name: this.data.label, value: Number(change.value) });
+            return null;
+        }
+        // Check indirect key.
+        const nodes = change.key.split('.');
+        nodes.pop();
+        const indirectKey = nodes.join('.');
+        // Don't apply any changes if it's also not a indirect match.
+        if (this._isKeyModifiableValue(actor, indirectKey)) {
+            // @ts-ignore // TODO: foundry-vtt-types 0.8
+            const value = foundry.utils.getProperty(actor.data, indirectKey);
+            value.mod.push({ name: this.data.label, value: Number(change.value) });
+            return null;
+        }
+        // If both indirect or direct didn't provide a match, assume the user want's to add to whatever value choosen
+        return super._applyAdd(actor, change);
     }
     /**
-     * Keep the default foundry implementation for the ADD mode but hijack into a MODIFY mode in case of a ModifableValue
+     * Overriding can be tricky if the overwritten value is a ModifiableValue with derived values.
+     *
+     * To keep the ActiveEffect workflow simple and still allow to override values that aren't a ModifiableValue,
+     * check for such values and give the ActorDataPreparation flow some hints.
+     *
      * @protected
      */
-    _applyAdd(actor, change) {
-        var _a;
-        const { key, value } = change;
-        // @ts-ignore
-        const current = (_a = foundry.utils.getProperty(actor.data, key)) !== null && _a !== void 0 ? _a : null;
-        // @ts-ignore
-        const ct = foundry.utils.getType(current);
-        let update = null;
-        const nodes = key.split('.');
-        const isModArray = nodes[nodes.length - 1] === 'mod' && ct === 'Array';
-        if (isModArray) {
-            return this._applyModify(actor, change);
+    _applyOverride(actor, change) {
+        // Check direct key.
+        if (this._isKeyModifiableValue(actor, change.key)) {
+            // @ts-ignore // TODO: foundry-vtt-types 0.8
+            const value = foundry.utils.getProperty(actor.data, change.key);
+            value.override = { name: this.data.label, value: Number(change.value) };
+            value.value = change.value;
+            return null;
         }
-        else {
-            return super._applyAdd(actor, change);
+        // Check indirect key.
+        const nodes = change.key.split('.');
+        nodes.pop();
+        const indirectKey = nodes.join('.');
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
+        if (this._isKeyModifiableValue(actor, indirectKey)) {
+            // @ts-ignore // TODO: foundry-vtt-types 0.8
+            const value = foundry.utils.getProperty(actor.data, indirectKey);
+            value.override = { name: this.data.label, value: Number(change.value) };
+            return null;
         }
+        // Neither a direct nor an indirect ModifiableValue match.
+        return super._applyOverride(actor, change);
+    }
+    _isKeyModifiableValue(actor, key) {
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
+        const possibleValue = foundry.utils.getProperty(actor.data, key);
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
+        const possibleValueType = foundry.utils.getType(possibleValue);
+        return possibleValue && possibleValueType === 'Object' && helpers_1.Helpers.objectHasKeys(possibleValue, this.minValueKeys);
+    }
+    get minValueKeys() {
+        // Match against these keys, as the exact ModifiableValue layout might be different from time to time.
+        return ['value', 'mod'];
     }
 }
 exports.SR5ActiveEffect = SR5ActiveEffect;
 
-},{}],150:[function(require,module,exports){
+},{"../helpers":159}],150:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ActiveEffectSheet = void 0;
@@ -25314,12 +25400,7 @@ const registerRollAndLabelHelpers = () => {
         return parts.total;
     });
     Handlebars.registerHelper('signedValue', function (value) {
-        if (value > 0) {
-            return `+${value}`;
-        }
-        else {
-            return `${value}`;
-        }
+        return value > 0 ? `+${value}` : `${value}`;
     });
     Handlebars.registerHelper('speakerName', helpers_1.Helpers.getChatSpeakerName);
 };
@@ -25465,14 +25546,19 @@ class Helpers {
             value.mod = [];
         const parts = new PartsList_1.PartsList(value.mod);
         // if a temp field is found, add it as a unique part
-        if (value['temp'] !== undefined) {
+        if (!isNaN(value.temp)) {
             parts.addUniquePart('SR5.Temporary', value['temp']);
         }
-        // LEGACY: On new actors .base can be undefined, resulting in NaN .value
-        const base = value.base || 0;
-        value.value = Helpers.roundTo(parts.total + base, 3);
-        value.mod = parts.list;
+        // On some values base might be undefined...
+        value.base = value.base || 0;
+        // If the given value has a override defined, use that as a value, while keeping the base and mod values.
+        if (value.override) {
+            value.value = value.override.value;
+            return value.override.value;
+        }
+        value.value = Helpers.roundTo(parts.total + value.base, 3);
         value.value = Helpers.applyValueRange(value.value, options);
+        value.mod = parts.list;
         return value.value;
     }
     /** Round a number to a given degree.
@@ -26155,6 +26241,20 @@ class Helpers {
             scene, target, item
         };
     }
+    /**
+     * Return true if all given keys are present in the given object.
+     * Values don't matter for this comparison.
+     *
+     * @param obj
+     * @param keys
+     */
+    static objectHasKeys(obj, keys) {
+        for (const key of keys) {
+            if (!obj.hasOwnProperty(key))
+                return false;
+        }
+        return true;
+    }
 }
 exports.Helpers = Helpers;
 
@@ -26214,7 +26314,7 @@ class HooksManager {
         Hooks.on('getCombatTrackerEntryContext', SR5Combat_1.SR5Combat.addCombatTrackerContextOptions);
         Hooks.on('renderItemDirectory', HooksManager.renderItemDirectory);
         Hooks.on('renderTokenHUD', EnvModifiersApplication_1.EnvModifiersApplication.addTokenHUDFields);
-        Hooks.on('updateItem', HooksManager.updateItem);
+        Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem);
         // Foundry VTT Module 'quench': https://github.com/schultzcole/FVTT-Quench
         Hooks.on('quenchReady', quench_1.quenchRegister);
     }
@@ -26354,19 +26454,28 @@ ___________________
             new import_form_1.Import().render(true);
         });
     }
-    static updateItem(item, data, id) {
+    /**
+     * On each
+     * @param item
+     * @param data
+     * @param id
+     */
+    static updateIcConnectedToHostItem(item, data, id) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (!canvas.ready)
+                return;
             if (item.isHost()) {
-                const connectedIC = game.actors.filter((actor) => {
-                    const icData = actor.asICData();
-                    if (!icData)
-                        return false;
-                    return !!icData.data.host.id;
-                });
+                // Collect actors from sidebar and active scene to update / rerender
+                let connectedIC = [
+                    // All sidebar actors should also include tokens with linked actors.
+                    ...game.actors.filter((actor) => actor.isIC() && actor.hasHost()),
+                    // All token actors that aren't linked.
+                    // @ts-ignore // TODO: foundry-vtt-types 0.9
+                    ...canvas.scene.tokens.filter(token => { var _a, _b; return !token.data.actorLink && ((_a = token.actor) === null || _a === void 0 ? void 0 : _a.isIC()) && ((_b = token.actor) === null || _b === void 0 ? void 0 : _b.hasHost()); }).map(t => t.actor)
+                ];
                 // Update host data on the ic actor.
                 const hostData = item.asHostData();
                 for (const ic of connectedIC) {
-                    console.error(hostData, ic);
                     yield ic._updateICHostData(hostData);
                 }
             }
@@ -26408,8 +26517,13 @@ ___________________
      * It partially uses: https://github.com/schultzcole/FVTT-Autocomplete-Inline-Properties/blob/master/package-config.mjs#L141
      */
     static setupAutocompleteInlinePropertiesSupport() {
+        // Module might not be installed.
+        const aipModule = game.modules.get("autocomplete-inline-properties");
+        if (!aipModule)
+            return;
         // @ts-ignore
-        const api = game.modules.get("autocomplete-inline-properties").API;
+        // API might be missing.
+        const api = aipModule.API;
         if (!api)
             return;
         console.log('Shadowrun5e - Registering support for autocomplete-inline-properties');
@@ -31180,22 +31294,27 @@ class SR5Item extends Item {
                 console.error('Only Host item types can place matrix marks!');
                 return;
             }
-            if (!MatrixRules_1.MatrixRules.isValidMarksCount(marks)) {
-                ui.notifications.error(game.i18n.localize('SR5.Errors.MarkCouldNotBePlaced'));
-                console.error('To many or to little matrix marks');
-                return;
-            }
             // Both scene and item are optional.
             const scene = (options === null || options === void 0 ? void 0 : options.scene) || canvas.scene;
-            // TODO: IF no item given use the actor matrix item.
-            const item = (options === null || options === void 0 ? void 0 : options.item) || target.getMatrixDevice();
+            const item = options === null || options === void 0 ? void 0 : options.item;
             // Build the markId string. If no item has been given, there still will be a third split element.
             // Use Helpers.deconstructMarkId to get the elements.
             const markId = helpers_1.Helpers.buildMarkId(scene.id, target.id, item === null || item === void 0 ? void 0 : item.id);
             const hostData = this.asHostData();
-            hostData.data.marks[markId] = marks;
+            const currentMarks = (options === null || options === void 0 ? void 0 : options.overwrite) ? 0 : this.getMarksById(markId);
+            hostData.data.marks[markId] = MatrixRules_1.MatrixRules.getValidMarksCount(currentMarks + marks);
             yield this.update({ 'data.marks': hostData.data.marks });
         });
+    }
+    getMarksById(markId) {
+        const hostData = this.asHostData();
+        return hostData ? hostData.data.marks[markId] : 0;
+    }
+    getAllMarks() {
+        const hostData = this.asHostData();
+        if (!hostData)
+            return;
+        return hostData.data.marks;
     }
     /**
      * Receive the marks placed on either the given target as a whole or one it's owned items.
@@ -31235,6 +31354,18 @@ class SR5Item extends Item {
             for (const markId of Object.keys(data.data.marks)) {
                 updateData[`-=${markId}`] = null;
             }
+            yield this.update({ 'data.marks': updateData });
+        });
+    }
+    /**
+     * Remove ONE mark. If you want to delete all marks, use clearMarks instead.
+     */
+    clearMark(markId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.isHost())
+                return;
+            const updateData = {};
+            updateData[`-=${markId}`] = null;
             yield this.update({ 'data.marks': updateData });
         });
     }
@@ -31289,6 +31420,18 @@ class SR5Item extends Item {
                 return;
             return yield this.update({ 'data.networkDevices': [] });
         });
+    }
+    getAllMarkedDocuments() {
+        if (!this.isHost())
+            return [];
+        const marks = this.getAllMarks();
+        if (!marks)
+            return [];
+        // Deconstruct all mark ids into documents.
+        return Object.entries(marks)
+            .filter(([markId, marks]) => helpers_1.Helpers.isValidMarkId(markId))
+            .map(([markId, marks]) => (Object.assign(Object.assign({}, helpers_1.Helpers.getMarkIdDocuments(markId)), { marks,
+            markId })));
     }
 }
 exports.SR5Item = SR5Item;
@@ -31413,6 +31556,9 @@ class SR5ItemSheet extends ItemSheet {
         // Active Effects data.
         // @ts-ignore // TODO: foundry-vtt-types 0.8 missing document support
         data['effects'] = effects_1.prepareActiveEffectCategories(this.document.effects);
+        if (this.object.isHost()) {
+            data['markedDocuments'] = this.object.getAllMarkedDocuments();
+        }
         if (this.item.isHost() || this.item.isDevice()) {
             data['networkDevices'] = this._getNetworkDevices();
         }
@@ -31510,6 +31656,12 @@ class SR5ItemSheet extends ItemSheet {
         html.find('.license-delete').on('click', this._onRemoveLicense.bind(this));
         html.find('.network-clear').on('click', this._onRemoveAllNetworkDevices.bind(this));
         html.find('.network-device-remove').on('click', this._onRemoveNetworkDevice.bind(this));
+        // Marks handling
+        html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));
+        html.find('.marks-add-one').on('click', (event) => __awaiter(this, void 0, void 0, function* () { return this._onMarksQuantityChangeBy(event, 1); }));
+        html.find('.marks-remove-one').on('click', (event) => __awaiter(this, void 0, void 0, function* () { return this._onMarksQuantityChangeBy(event, -1); }));
+        html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
+        html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
     }
     _onDragOver(event) {
         event.preventDefault();
@@ -31781,6 +31933,60 @@ class SR5ItemSheet extends ItemSheet {
         if (activeList.length) {
             this._scroll = activeList.prop('scrollTop');
         }
+    }
+    _onMarksQuantityChange(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.stopPropagation();
+            if (!this.object.isHost())
+                return;
+            const markId = event.currentTarget.dataset.markId;
+            if (!markId)
+                return;
+            const { scene, target, item } = helpers_1.Helpers.getMarkIdDocuments(markId);
+            if (!scene || !target)
+                return; // item can be undefined.
+            const marks = parseInt(event.currentTarget.value);
+            yield this.object.setMarks(target, marks, { scene, item, overwrite: true });
+        });
+    }
+    _onMarksQuantityChangeBy(event, by) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.stopPropagation();
+            if (!this.object.isHost())
+                return;
+            const markId = event.currentTarget.dataset.markId;
+            if (!markId)
+                return;
+            const { scene, target, item } = helpers_1.Helpers.getMarkIdDocuments(markId);
+            if (!scene || !target)
+                return; // item can be undefined.
+            yield this.object.setMarks(target, by, { scene, item });
+        });
+    }
+    _onMarksDelete(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.stopPropagation();
+            if (!this.object.isHost())
+                return;
+            const markId = event.currentTarget.dataset.markId;
+            if (!markId)
+                return;
+            const userConsented = yield helpers_1.Helpers.confirmDeletion();
+            if (!userConsented)
+                return;
+            yield this.object.clearMark(markId);
+        });
+    }
+    _onMarksClearAll(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.stopPropagation();
+            if (!this.object.isHost())
+                return;
+            const userConsented = yield helpers_1.Helpers.confirmDeletion();
+            if (!userConsented)
+                return;
+            yield this.object.clearMarks();
+        });
     }
 }
 exports.SR5ItemSheet = SR5ItemSheet;
@@ -34551,28 +34757,85 @@ const shadowrunSR5ActiveEffect = context => {
                     disabled: false,
                     label: 'Test Effect'
                 }]);
-            yield effect[0].update({ 'changes': [{ key: 'data.attributes.body.mod', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }] });
-            assert.deepEqual(actor.data.data.attributes.body.mod, [{ name: 'Test Effect', value: 2 }]);
-            assert.strictEqual(actor.data.data.attributes.body.value, 2);
-            yield effect[0].update({ 'changes': [{ key: 'data.attributes.body.mod', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
-                    { key: 'data.attributes.body.mod', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }] });
+            yield effect[0].update({
+                'changes': [{ key: 'data.attributes.body.mod', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
+                    { key: 'data.attributes.body', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
+            });
             assert.deepEqual(actor.data.data.attributes.body.mod, [{ name: 'Test Effect', value: 2 }, { name: 'Test Effect', value: 2 }]);
             assert.strictEqual(actor.data.data.attributes.body.value, 4);
+            yield effect[0].update({
+                'changes': [{ key: 'data.attributes.body.mod', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
+                    { key: 'data.attributes.body.mod', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
+            });
         }));
-        it('apply the custom mode mode, when using ADD mode on a mod array', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('apply custom modify mode, none ModifiableValue should work as the add mode', () => __awaiter(void 0, void 0, void 0, function* () {
             const actor = yield testActor.create({ type: 'character' });
             const effect = yield actor.createEmbeddedDocuments('ActiveEffect', [{
                     origin: actor.uuid,
                     disabled: false,
                     label: 'Test Effect'
                 }]);
-            yield effect[0].update({ 'changes': [{ key: 'data.attributes.body.mod', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.ADD }] });
-            assert.deepEqual(actor.data.data.attributes.body.mod, [{ name: 'Test Effect', value: 3 }]);
+            yield effect[0].update({
+                'changes': [{
+                        key: 'data.modifiers.global',
+                        value: 3,
+                        mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM
+                    }]
+            });
+            assert.strictEqual(actor.data.data.modifiers.global, 3);
+            assert.strictEqual(actor.data.data.modifiers.global.mod, undefined);
+            assert.strictEqual(actor.data.data.modifiers.global.override, undefined);
+        }));
+        it('apply the custom override mode', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const effect = yield actor.createEmbeddedDocuments('ActiveEffect', [{
+                    origin: actor.uuid,
+                    disabled: false,
+                    label: 'Test Effect'
+                }]);
+            yield effect[0].update({
+                'changes': [{ key: 'data.attributes.body', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE },
+                    { key: 'data.attributes.body.value', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE }]
+            });
+            assert.deepEqual(actor.data.data.attributes.body.override, { name: 'Test Effect', value: 3 });
+            assert.deepEqual(actor.data.data.attributes.body.mod, []);
             assert.strictEqual(actor.data.data.attributes.body.value, 3);
-            yield effect[0].update({ 'changes': [{ key: 'data.attributes.body.mod', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
-                    { key: 'data.attributes.body.mod', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.ADD }] });
-            assert.deepEqual(actor.data.data.attributes.body.mod, [{ name: 'Test Effect', value: 3 }, { name: 'Test Effect', value: 3 }]);
-            assert.strictEqual(actor.data.data.attributes.body.value, 6);
+        }));
+        it('apply custom override mode, should override all existing .mod values', () => __awaiter(void 0, void 0, void 0, function* () {
+            it('apply the custom override mode', () => __awaiter(void 0, void 0, void 0, function* () {
+                const actor = yield testActor.create({ type: 'character' });
+                const effect = yield actor.createEmbeddedDocuments('ActiveEffect', [{
+                        origin: actor.uuid,
+                        disabled: false,
+                        label: 'Test Effect'
+                    }]);
+                yield effect[0].update({
+                    'changes': [{ key: 'data.attributes.body.mod', value: 5, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                        { key: 'data.attributes.body.value', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE }]
+                });
+                assert.strictEqual(actor.data.data.attributes.body.mod.length, 1);
+                assert.deepEqual(actor.data.data.attributes.body.override, { name: 'Test Effect', value: 3 });
+                assert.deepEqual(actor.data.data.attributes.body.mod, [{ name: 'Test Effect', value: 5 }]);
+                assert.strictEqual(actor.data.data.attributes.body.value, 3);
+            }));
+        }));
+        it('apply custom override mode, none ModifiableValue should work without altering anything', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const effect = yield actor.createEmbeddedDocuments('ActiveEffect', [{
+                    origin: actor.uuid,
+                    disabled: false,
+                    label: 'Test Effect'
+                }]);
+            yield effect[0].update({
+                'changes': [{
+                        key: 'data.modifiers.global',
+                        value: 3,
+                        mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE
+                    }]
+            });
+            assert.strictEqual(actor.data.data.modifiers.global, 3);
+            assert.strictEqual(actor.data.data.modifiers.global.mod, undefined);
+            assert.strictEqual(actor.data.data.modifiers.global.override, undefined);
         }));
     });
 };

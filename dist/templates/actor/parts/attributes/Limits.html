@@ -2,9 +2,10 @@
 <div class="list-item item-section space-evenly">
     {{#each data.limits as |limit id|}} {{#unless limit.hidden}}
         <div class="limit">
-            <div class="limit-row">
+            <div class="limit-row value">
                 <span class="limit-title">{{localize limit.label}}</span>
                 <span class="limit-value" value="{{limit.value}}">{{limit.value}}</span>
+                {{> "systems/shadowrun5e/dist/templates/common/ValueModifiers.html" value=limit}}
             </div>
         </div>
     {{/unless}} {{/each}}

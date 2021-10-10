@@ -46,7 +46,7 @@
             </div>
         </div>
         {{/if}}
-        <div class="list-item item-section">
+        <div class="list-item item-section value">
             <div class="item-left">
                 <div class="item-text item-name">
                     {{localize "SR5.Total"}} {{localize "SR5.Value"}}
@@ -63,6 +63,7 @@
                     />
                 </div>
             </div>
+            {{> "systems/shadowrun5e/dist/templates/common/ValueModifiers.html" value=data}}
         </div>
         <div class="list-item">
             <div class="item-left">
