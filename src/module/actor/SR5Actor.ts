@@ -1898,7 +1898,9 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
             atts: duplicate(hostData.data.atts)
         }
 
-        await this.update({'data.host': updateData});
+        // Some host data isn't stored on the IC actor (marks) and won't cause an automatic render.
+        await this.update({'data.host': updateData}, {render: false});
+        await this.sheet.render();
     }
 
     /**
