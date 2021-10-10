@@ -9,6 +9,17 @@ import {SR5Combat} from "../combat/SR5Combat";
 import {SoakFlow} from './flows/SoakFlow';
 import {DefaultValues} from '../data/DataDefaults';
 import {SkillFlow} from "./flows/SkillFlow";
+import {SR5} from "../config";
+import {CharacterPrep} from "./prep/CharacterPrep";
+import {SR5ItemDataWrapper} from "../data/SR5ItemDataWrapper";
+import {CritterPrep} from "./prep/CritterPrep";
+import {SpiritPrep} from "./prep/SpiritPrep";
+import {SpritePrep} from "./prep/SpritePrep";
+import {VehiclePrep} from "./prep/VehiclePrep";
+import {Modifiers} from "../rules/Modifiers";
+import {SkillRules} from "../rules/SkillRules";
+import {MatrixRules} from "../rules/MatrixRules";
+import {ICPrep} from "./prep/ICPrep";
 import ActorRollOptions = Shadowrun.ActorRollOptions;
 import DefenseRollOptions = Shadowrun.DefenseRollOptions;
 import SoakRollOptions = Shadowrun.SoakRollOptions;
@@ -31,14 +42,7 @@ import ActorArmorData = Shadowrun.ActorArmorData;
 import ConditionData = Shadowrun.ConditionData;
 import Skills = Shadowrun.Skills;
 import CharacterSkills = Shadowrun.CharacterSkills;
-import {SR5} from "../config";
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
-import {CharacterPrep} from "./prep/CharacterPrep";
-import {SR5ItemDataWrapper} from "../data/SR5ItemDataWrapper";
-import {CritterPrep} from "./prep/CritterPrep";
-import {SpiritPrep} from "./prep/SpiritPrep";
-import {SpritePrep} from "./prep/SpritePrep";
-import {VehiclePrep} from "./prep/VehiclePrep";
 import SpiritActorData = Shadowrun.SpiritActorData;
 import CharacterData = Shadowrun.CharacterData;
 import CharacterActorData = Shadowrun.CharacterActorData;
@@ -46,14 +50,11 @@ import SpriteActorData = Shadowrun.SpriteActorData;
 import VehicleData = Shadowrun.VehicleData;
 import VehicleActorData = Shadowrun.VehicleActorData;
 import CritterActorData = Shadowrun.CritterActorData;
-import {Modifiers} from "../rules/Modifiers";
 import ICActorData = Shadowrun.ICActorData;
-import {SkillRules} from "../rules/SkillRules";
 import MatrixData = Shadowrun.MatrixData;
-import {MatrixRules} from "../rules/MatrixRules";
-import {ICPrep} from "./prep/ICPrep";
 import HostItemData = Shadowrun.HostItemData;
 import MarkedDocument = Shadowrun.MarkedDocument;
+import MatrixMarks = Shadowrun.MatrixMarks;
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -1929,7 +1930,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
     getICHost(): SR5Item|undefined {
         const icData = this.asICData();
         if (!icData) return;
-        return this.items.get(icData?.data?.host.id);
+        return game.items.get(icData?.data?.host.id);
     }
 
     /** Check if this actor is of one or multiple given actor types
@@ -1990,6 +1991,10 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
     async setMarks(target: Token, marks: number, options?: {scene?: Scene, item?: SR5Item, overwrite?: boolean}) {
         if (!canvas.ready) return;
 
+        if (this.isIC() && this.hasHost()) {
+            return await this.getICHost().setMarks(target, marks, options);
+        }
+
         if (!this.isMatrixActor) {
             ui.notifications.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedBy'));
             console.error(`The actor type ${this.data.type} can't receive matrix marks!`);
@@ -2049,6 +2054,12 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         await this.update({'data.matrix.marks': updateData});
     }
 
+    getAllMarks(): MatrixMarks|undefined {
+        const matrixData = this.matrixData;
+        if (!matrixData) return;
+        return matrixData.marks;
+    }
+
     /**
      * Return the amount of marks this actor has on another actor or one of their items.
      *
@@ -2084,12 +2095,29 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         return this.matrixData.marks[markId] || 0;
     }
 
+    /**
+     * Return the actor or item that is the network controller of this actor.
+     * These cases are possible:
+     * - IC with a host connected will provide the host item
+     * - IC without a host will provide itself
+     * - A matrix actor within a PAN will provide the controlling actor
+     * - A matrix actor without a PAN will provide itself
+     */
+    get matrixController(): SR5Actor|SR5Item {
+        // In case of a broken host connection, return the IC actor.
+        if (this.isIC() && this.hasHost()) return this.getICHost() || this;
+        // TODO: Implement PAN
+        // if (this.isMatrixActor && this.hasController()) return this.getController();
+
+        return this;
+    }
+
     getAllMarkedDocuments(): MarkedDocument[] {
-        const matrixData = this.matrixData;
-        if (!matrixData) return [];
+        const marks = this.matrixController.getAllMarks();
+        if (!marks) return [];
 
         // Deconstruct all mark ids into documents.
-        return Object.entries(matrixData.marks)
+        return Object.entries(marks)
             .filter(([markId, marks]) => Helpers.isValidMarkId(markId))
             .map(([markId, marks]) => ({
                 ...Helpers.getMarkIdDocuments(markId),
