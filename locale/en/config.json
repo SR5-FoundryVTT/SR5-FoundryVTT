@@ -584,7 +584,9 @@
     "ShowSkillsWithDetailsDescription": "When set skills list display will mirror core rulebook style (italics, short attributes)",
     "OnlyAutoRollNPCInCombat": "Only auto roll NPC initiative",
     "OnlyAutoRollNPCInCombatDescription": "Wen unset players must manually roll their ini on each new pass / round",
-    "Euclidean": "Euclidean"
+    "Euclidean": "Euclidean",
+    "TokenHealthBars": "Token health bars",
+    "TokenHealthBarsDescription": "A full damage track will show as an empty health bar on a Token instead of mirroring."
   },
   "SR5.COMBAT": {
     "ReduceInitByOne": "Initiative -1",
