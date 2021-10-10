@@ -439,7 +439,8 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         });
 
         // Active Effect management
-        html.find(".effect-control").click(event => onManageActiveEffect(event, this.entity));
+        // @ts-ignore // TODO: foundry-vtt-types 0.8
+        html.find(".effect-control").click(event => onManageActiveEffect(event, this.document));
 
         html.find('.skill-header').find('.item-name').click(this._onFilterUntrainedSkills.bind(this));
         html.find('.skill-header').find('.skill-spec-item').click(this._onFilterUntrainedSkills.bind(this));
