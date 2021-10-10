@@ -37,7 +37,8 @@ export const FLAGS = {
     Modifier: 'modifier',
     DoInitPass: 'doInitPass',
     DoNextRound: 'doNextRound',
-    addNetworkController: 'addNetworkController'
+    addNetworkController: 'addNetworkController',
+    TokenHealthBars: 'tokenHealthBars'
 };
 export const CORE_NAME = 'core';
 export const CORE_FLAGS = {

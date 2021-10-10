@@ -573,7 +573,9 @@
     "WhisperOpposedTestsToTargetedPlayersDescription": "Bei Proben mit VS Proben wird eine geflüsterte Nachricht an anvisierte Spieler (online) versendet",
     "OnlyAllowRollOnDefaultableSkills": "Nur improvisierbare unbekannte Fertigkeitsproben",
     "OnlyAllowRollOnDefaultableSkillsDescription": "Wenn deaktiviert können unbekannte Fertigkeiten auch getestet werden, wenn sie nicht improvisierbar sind",
-    "Euclidean": "Euklidisch"
+    "Euclidean": "Euklidisch",
+    "TokenHealthBars": "Token Lebensbalken",
+    "TokenHealthBarsDescription": "Ein voller Schadensmonitor resultiert in einem leeren Lebensbalken, anstelle der identische Anzeige"
   },
   "SR5.MIGRATION.WarningTitle": "Alarm",
   "SR5.MIGRATION.WarningHeader": "Migrationswarnung",

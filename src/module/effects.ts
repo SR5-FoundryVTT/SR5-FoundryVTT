@@ -45,7 +45,6 @@ export async function onManageActiveEffect(event, owner: SR5Actor|SR5Item) {
             return effect.delete();
 
         case "toggle":
-            // return effect.update({disabled: !effect.data.disabled});
             return effect.toggleDisabled();
         case "open-origin":
             return effect.renderSourceSheet();

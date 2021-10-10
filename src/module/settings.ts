@@ -112,4 +112,13 @@ export const registerSystemSettings = () => {
         type: Boolean,
         default: true,
     });
+
+    game.settings.register(SYSTEM_NAME, FLAGS.TokenHealthBars, {
+        name: 'SETTINGS.TokenHealthBars',
+        hint: 'SETTINGS.TokenHealthBarsDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: false,
+    });
 };
