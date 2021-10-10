@@ -16135,12 +16135,14 @@ class SR5ActorSheet extends ActorSheet {
                     });
                 }
                 // Handle active effects based on equipped status.
-                this.actor.effects.forEach(effect => {
-                    if (effect.data.origin !== item.uuid)
-                        return;
-                    // @ts-ignore
-                    effect.disable(item.isEquipped());
-                });
+                // NOTE: This is commented out for later ease of enabling effects based on equip status AND if they are
+                //       meant to enable on eqiup or not.
+                // this.actor.effects.forEach(effect => {
+                //     if (effect.data.origin !== item.uuid) return;
+                //
+                //     // @ts-ignore
+                //     effect.disable(item.isEquipped());
+                // })
                 // @ts-ignore // TODO: foundry-vtt-types 0.8 has no Document support yet
                 yield this.actor.updateEmbeddedDocuments('Item', newItems);
                 this.actor.render(false);
@@ -23543,7 +23545,8 @@ exports.FLAGS = {
     Modifier: 'modifier',
     DoInitPass: 'doInitPass',
     DoNextRound: 'doNextRound',
-    addNetworkController: 'addNetworkController'
+    addNetworkController: 'addNetworkController',
+    TokenHealthBars: 'tokenHealthBars'
 };
 exports.CORE_NAME = 'core';
 exports.CORE_FLAGS = {
@@ -24427,7 +24430,6 @@ function onManageActiveEffect(event, owner) {
                     return;
                 return effect.delete();
             case "toggle":
-                // return effect.update({disabled: !effect.data.disabled});
                 return effect.toggleDisabled();
             case "open-origin":
                 return effect.renderSourceSheet();
@@ -25255,7 +25257,10 @@ const registerItemLineHelpers = () => {
             data: { action: "open-origin" }
         };
         // Disallow changes to effects that aren't of direct origin.
-        return effect.isOriginOwned ? [openOriginIcon, editIcon] : [disableIcon, editIcon, removeIcon];
+        let icons = [disableIcon, editIcon, removeIcon];
+        if (effect.isOriginOwned)
+            icons = [openOriginIcon, ...icons];
+        return icons;
     });
     Handlebars.registerHelper('EffectData', function (effectType) {
         return { 'effect-type': effectType };
@@ -34510,6 +34515,14 @@ const registerSystemSettings = () => {
         type: Boolean,
         default: true,
     });
+    game.settings.register(constants_1.SYSTEM_NAME, constants_1.FLAGS.TokenHealthBars, {
+        name: 'SETTINGS.TokenHealthBars',
+        hint: 'SETTINGS.TokenHealthBarsDescription',
+        scope: 'world',
+        config: true,
+        type: Boolean,
+        default: false,
+    });
 };
 exports.registerSystemSettings = registerSystemSettings;
 
@@ -34679,14 +34692,16 @@ exports.default = Template;
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5Token = void 0;
+const constants_1 = require("../constants");
 class SR5Token extends Token {
     _drawBar(number, bar, data) {
+        const tokenHealthBars = game.settings.get(constants_1.SYSTEM_NAME, constants_1.FLAGS.TokenHealthBars);
         // FoundryVTT draws resource bars as full/good when the value is the
         // same as the max and empty/bad at 0 (colored along a gradient).
         // Shadowrun condition trackers count up from 0 to the maximum.
         // We flip the values from Shadowrun format to FoundryVTT format here
         // for drawing.
-        if (data.attribute.startsWith('track')) {
+        if (tokenHealthBars && data.attribute.startsWith('track')) {
             data.value = data.max - data.value;
         }
         super._drawBar(number, bar, data);
@@ -34694,7 +34709,7 @@ class SR5Token extends Token {
 }
 exports.SR5Token = SR5Token;
 
-},{}],224:[function(require,module,exports){
+},{"../constants":145}],224:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.quenchRegister = void 0;
