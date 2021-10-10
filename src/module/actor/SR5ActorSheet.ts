@@ -970,12 +970,14 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
             }
 
             // Handle active effects based on equipped status.
-            this.actor.effects.forEach(effect => {
-                if (effect.data.origin !== item.uuid) return;
-
-                // @ts-ignore
-                effect.disable(item.isEquipped());
-            })
+            // NOTE: This is commented out for later ease of enabling effects based on equip status AND if they are
+            //       meant to enable on eqiup or not.
+            // this.actor.effects.forEach(effect => {
+            //     if (effect.data.origin !== item.uuid) return;
+            //
+            //     // @ts-ignore
+            //     effect.disable(item.isEquipped());
+            // })
 
             // @ts-ignore // TODO: foundry-vtt-types 0.8 has no Document support yet
             await this.actor.updateEmbeddedDocuments('Item', newItems);

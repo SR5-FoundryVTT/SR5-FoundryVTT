@@ -450,7 +450,9 @@ export const registerItemLineHelpers = () => {
             data: {action: "open-origin"}
         }
         // Disallow changes to effects that aren't of direct origin.
-        return effect.isOriginOwned ? [openOriginIcon, editIcon] : [disableIcon, editIcon, removeIcon];
+        let icons = [disableIcon, editIcon, removeIcon];
+        if (effect.isOriginOwned) icons = [openOriginIcon, ...icons];
+        return icons;
     });
 
     Handlebars.registerHelper('EffectData', function(effectType: string) {
