@@ -1,5 +1,6 @@
 declare namespace Shadowrun {
-    export interface SR5ActorSheetData extends ActorSheet.Data {
+    // TODO: v9
+    export interface SR5ActorSheetData {
         config: typeof SR5CONFIG
         data: ShadowrunActorDataData
         filters: SR5SheetFilters

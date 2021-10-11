@@ -24,7 +24,7 @@ let globalSkillAppId: number = -1;
  * See Hooks.init for which actor type this sheet handles.
  *
  */
-export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
+export class SR5ActorSheet extends ActorSheet {
     _shownDesc: string[] = [];
     _filters: SR5SheetFilters = {
         skills: '',
@@ -64,38 +64,35 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         return `${path}/actor/${this.actor.data.type}.html`;
     }
 
-    /**
-     * Prepare data for rendering the Actor sheet
-     * The prepared data object contains both the actor data as well as additional sheet options
-     */
-    getData() {
-        // Restructure redesigned Document.getData to contain all new fields, while keeping data.data as system data.
-        let data = super.getData() as unknown as SR5ActorSheetData;
-        data = {
-            ...data,
-            // @ts-ignore
-            data: data.data.data
-        }
+    getData(options?: Application.RenderOptions): Promise<ActorSheet.Data<ActorSheet.Options>> | ActorSheet.Data<ActorSheet.Options> {
+        //     // Restructure redesigned Document.getData to contain all new fields, while keeping data.data as system data.
+            let data = super.getData() as unknown as SR5ActorSheetData;
+            data = {
+                ...data,
+                // @ts-ignore
+                data: data.data.data
+            }
 
-        // General purpose fields...
-        data.config = SR5;
-        data.filters = this._filters;
+            // General purpose fields...
+            data.config = SR5;
+            data.filters = this._filters;
 
-        this._prepareMatrixAttributes(data);
-        this._prepareActorAttributes(data);
+            this._prepareMatrixAttributes(data);
+            this._prepareActorAttributes(data);
 
-        this._prepareItems(data);
-        this._prepareSkillsWithFilters(data);
-        this._prepareActorTypeFields(data);
-        this._prepareCharacterFields(data);
-        this._prepareVehicleFields(data);
+            this._prepareItems(data);
+            this._prepareSkillsWithFilters(data);
+            this._prepareActorTypeFields(data);
+            this._prepareCharacterFields(data);
+            this._prepareVehicleFields(data);
 
-        // Active Effects data.
-        // @ts-ignore // TODO: foundry-vtt-types 0.8 missing document support
-        data['effects'] = prepareActiveEffectCategories(this.document.effects);
-        data['markedDocuments'] = this.object.getAllMarkedDocuments();
+            // Active Effects data.
+            // @ts-ignore // TODO: foundry-vtt-types 0.8 missing document support
+            data['effects'] = prepareActiveEffectCategories(this.document.effects);
+            data['markedDocuments'] = this.object.getAllMarkedDocuments();
 
-        return data;
+            // @ts-ignore // TODO: v9
+            return data;
     }
 
     _isSkillMagic(id, skill) {
@@ -339,6 +336,7 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
                 item = duplicate(item);
                 // Show item properties and description in the item list overviews.
                 const actorItem = this.actor.items.get(item._id);
+                if (!actorItem) return;
                 const chatData = actorItem.getChatData();
                 item.description = chatData.description;
                 // @ts-ignore // This is a hacky monkey patch solution to pass template data through duplicated item data.
@@ -549,9 +547,9 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         const dragData = {
             actorId: this.actor.id,
             sceneId: this.actor.isToken ? canvas.scene?.id : null,
-            tokenId: this.actor.isToken ? this.actor.token.id : null,
-            type: null,
-            data: null
+            tokenId: this.actor.isToken ? this.actor.token?.id : null,
+            type: '',
+            data: {}
         };
 
         // Handle different item type data transfers.
@@ -640,6 +638,7 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
 
         const iid = Helpers.listItemId(event);
         const item = this.actor.items.get(iid);
+        if (!item) return;
         await item.delete();
     }
 
@@ -805,6 +804,7 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
                 data[key] = oldVal;
             }
         }
+        // @ts-ignore TODO: foundry-vtt-types v9
         await this.actor.updateOwnedItem(data);
     }
 

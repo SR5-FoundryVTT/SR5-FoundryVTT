@@ -78,7 +78,7 @@ import MarkedDocument = Shadowrun.MarkedDocument;
  *
  *       Be wary of SR5Item.actor for this reason!
  */
-export class SR5Item extends Item<ShadowrunItemData> {
+export class SR5Item extends Item {
     // Item.items isn't the Foundry default ItemCollection but is overwritten within prepareEmbeddedEntities
     // to allow for embedded items in items in actors.
     items: SR5Item[];
@@ -242,7 +242,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
                 const technology = mod.getTechnology();
 
                 if (technology && technology.conceal.value) {
-                    concealParts.addUniquePart(mod.name, technology.conceal.value);
+                    concealParts.addUniquePart(mod.name as string, technology.conceal.value);
                 }
             });
 
@@ -267,9 +267,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
             // Item.prepareData is called once (first) with an empty SR5Actor instance without .data and once (second) with .data.
             if (this.actor?.data) {
                 action.damage.source = {
-                    actorId: this.actor.id,
-                    itemId: this.id,
-                    itemName: this.name,
+                    actorId: this.actor.id as string,
+                    itemId: this.id as string,
+                    itemName: this.name as string,
                     itemType: this.data.type
                 };
             }
@@ -282,10 +282,10 @@ export class SR5Item extends Item<ShadowrunItemData> {
                 if (!modification) return;
 
                 if (modification.data.accuracy) {
-                    limitParts.addUniquePart(mod.name, modification.data.accuracy);
+                    limitParts.addUniquePart(mod.name as string, modification.data.accuracy);
                 }
                 if (modification.data.dice_pool) {
-                    dpParts.addUniquePart(mod.name, modification.data.dice_pool);
+                    dpParts.addUniquePart(mod.name as string, modification.data.dice_pool);
                 }
             });
 
@@ -294,9 +294,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
             if (equippedAmmo) {
                 const ammoData = equippedAmmo.data.data as AmmoData;
                 // add mods to damage from ammo
-                action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name, ammoData.damage);
+                action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name as string, ammoData.damage);
                 // add mods to ap from ammo
-                action.damage.ap.mod = PartsList.AddUniquePart(action.damage.ap.mod, equippedAmmo.name, ammoData.ap);
+                action.damage.ap.mod = PartsList.AddUniquePart(action.damage.ap.mod, equippedAmmo.name as string, ammoData.ap);
 
                 // override element
                 if (ammoData.element) {
@@ -500,6 +500,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
         } else if (this.hasExplosiveAmmo()) {
             const ammo = this.getEquippedAmmo();
             const ammoData = ammo.asAmmoData();
+
+            if (!ammoData) return {radius: 0, dropoff: 0};
+
             const distance = ammoData.data.blast.radius;
             const dropoff = ammoData.data.blast.dropoff;
 
@@ -577,13 +580,14 @@ export class SR5Item extends Item<ShadowrunItemData> {
 
         const newAmmunition = (this.items || [])
             .filter((i) => i.data.type === 'ammo')
-            .reduce((acc: Entity.Data[], item) => {
+            .reduce((acc, item) => {
                 const ammoData = item.asAmmoData();
 
                 if (ammoData && ammoData.data.technology.equipped) {
                     const { technology } = ammoData.data;
                     const qty = typeof technology.quantity === 'string' ? 0 : technology.quantity;
                     technology.quantity = Math.max(0, qty - diff);
+                    // @ts-ignore
                     acc.push(item.data);
                 }
                 return acc;
@@ -880,7 +884,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
         let actor;
         const sceneTokenId = card.data('tokenId');
         if (sceneTokenId) actor = Helpers.getSceneTokenActor(sceneTokenId);
-        else actor = game.actors.get(card.data('actorId'));
+        else actor = game.actors?.get(card.data('actorId'));
 
         if (!actor) return;
         const itemId = card.data('itemId');
@@ -964,8 +968,8 @@ export class SR5Item extends Item<ShadowrunItemData> {
         // Templates and further logic need a items HashMap, yet the flag provides an array.
         if (items) {
 
-            const existing = (this.items || []).reduce((object, i) => {
-                object[i.id] = i;
+            const existing = (this.items || []).reduce((object, item) => {
+                object[item.id as string] = item;
                 return object;
             }, {});
 
@@ -983,7 +987,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
                     // NOTE: It's important to deliver the item as the item parent document, even though this is meant for actor owners.
                     //       The legacy approach for embeddedItems (within another item) relies upon this.actor
                     //       returning an SR5Item instance to call .updateEmbeddedEntities, while Foundry expects an actor
-                    return new SR5Item(item, {parent: this});
+                    return new SR5Item(item, {parent: this as unknown as SR5Actor});
                 }
             });
         }
@@ -1171,7 +1175,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
             return game.i18n.localize('SR5.SpellCast');
         }
         if (this.hasRoll) {
-            return this.name
+            return this.name as string;
         }
 
         return DEFAULT_ROLL_NAME;
@@ -1573,7 +1577,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
         if (!hostData || !id) return;
 
         // Check if actor exists before adding.
-        const actor = (pack ? await Helpers.getEntityFromCollection(pack, id) : game.actors.get(id)) as SR5Actor;
+        const actor = (pack ? await Helpers.getEntityFromCollection(pack, id) : game.actors?.get(id)) as SR5Actor;
         if (!actor || !actor.isIC()) {
             console.error(`Provided actor id ${id} doesn't exist (with pack collection '${pack}') or isn't an IC type`);
             return;
@@ -1584,8 +1588,8 @@ export class SR5Item extends Item<ShadowrunItemData> {
 
         // Add IC to the hosts IC order
         const sourceEntity = DefaultValues.sourceEntityData({
-            id: actor.id,
-            name: actor.name,
+            id: actor.id as string,
+            name: actor.name as string,
             type: 'Actor',
             pack,
             // Custom fields for IC
@@ -1632,7 +1636,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
         // After updating all item embedded data, rerender the sheet to trigger the whole rerender workflow.
         // Otherwise changes in the template of an hiddenItem will show for some fields, while not rerendering all
         // #if statements (hidden fields for other values, won't show)
-        await this.sheet.render(false);
+        await this.sheet?.render(false);
 
         return this;
     }
@@ -1669,13 +1673,15 @@ export class SR5Item extends Item<ShadowrunItemData> {
         }
 
         // Both scene and item are optional.
-        const scene = options?.scene || canvas.scene;
+        const scene = options?.scene || canvas.scene as Scene;
         const item = options?.item;
 
         // Build the markId string. If no item has been given, there still will be a third split element.
         // Use Helpers.deconstructMarkId to get the elements.
-        const markId = Helpers.buildMarkId(scene.id, target.id, item?.id);
+        const markId = Helpers.buildMarkId(scene.id as string, target.id, item?.id as string);
         const hostData = this.asHostData();
+
+        if (!hostData) return;
 
         const currentMarks = options?.overwrite ? 0 : this.getMarksById(markId);
         hostData.data.marks[markId] = MatrixRules.getValidMarksCount(currentMarks + marks);
@@ -1706,15 +1712,18 @@ export class SR5Item extends Item<ShadowrunItemData> {
      * @return Will always return a number. At least zero, for no marks placed.
      */
     getMarks(target: SR5Actor, item?: SR5Item, options?: {scene?: Scene}): number {
-        if (!canvas.ready) return;
+        if (!canvas.ready) return 0;
         if (!this.isHost()) return 0;
 
         // Scene is optional.
-        const scene = options?.scene || canvas.scene;
+        const scene = options?.scene || canvas.scene as Scene;
         item = item || target.getMatrixDevice();
 
-        const markId = Helpers.buildMarkId(scene.id, target.id, item.id);
+        const markId = Helpers.buildMarkId(scene.id as string, target.id as string, item?.id as string);
         const hostData = this.asHostData();
+
+        if (!hostData) return 0
+
         return hostData.data.marks[markId] || 0;
     }
 
@@ -1726,11 +1735,13 @@ export class SR5Item extends Item<ShadowrunItemData> {
     async clearMarks() {
         if (!this.isHost()) return;
 
-        const data = this.asHostData();
+        const hostData = this.asHostData();
+
+        if (!hostData) return;
 
         // Delete all markId properties from ActorData
         const updateData = {}
-        for (const markId of Object.keys(data.data.marks)) {
+        for (const markId of Object.keys(hostData.data.marks)) {
             updateData[`-=${markId}`] = null;
         }
 
@@ -1774,7 +1785,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
         const networkDevices = duplicate(deviceData.data.networkDevices);
         networkDevices.push(deviceLink);
 
-        if (game.user.isGM) {
+        if (game.user?.isGM) {
             await DeviceFlow.addNetworkController(controller, target);
         } else {
             await DeviceFlow.emitAddControllerSocketMessage(controller, target);

@@ -16,7 +16,6 @@ import { SR5Item } from './item/SR5Item';
 import Skills = Shadowrun.Skills;
 import {ShadowrunRoll} from "./rolls/ShadowrunRoller";
 import {DataDefaults} from "./data/DataDefaults";
-import MatrixMarks = Shadowrun.MatrixMarks;
 import TargetedDocument = Shadowrun.TargetedDocument;
 
 interface CalcTotalOptions {
@@ -36,7 +35,7 @@ export class Helpers {
 
         const parts = new PartsList(value.mod);
         // if a temp field is found, add it as a unique part
-        if (!isNaN(value.temp)) {
+        if (!isNaN(value.temp as number)) {
             parts.addUniquePart('SR5.Temporary', value['temp']);
         }
 
@@ -281,7 +280,7 @@ export class Helpers {
     // TODO: Foundry 0.9 Should TokenDocument be used instead of Token?
     // TODO: Check canvas.scene.tokens
     static getToken(id?: string): Token | undefined {
-        if (!canvas || !canvas.ready) return;
+        if (!canvas || !canvas.ready || !canvas.tokens) return;
 
         for (const token of canvas.tokens.placeables) {
             if (token.id === id) {
@@ -306,9 +305,8 @@ export class Helpers {
         return sceneTokenId.split('.') as [sceneId: string, tokenId: string];
     }
 
-    // @ts-ignore // TODO: foundry-vtt-types 0.8 TokenDocument
-    static getSceneTokenDocument(sceneId, tokenId): Token|undefined {
-        const scene = game.scenes.get(sceneId);
+    static getSceneTokenDocument(sceneId, tokenId): TokenDocument|undefined {
+        const scene = game.scenes?.get(sceneId);
         if (!scene) return;
         // @ts-ignore
         const token = scene.tokens.get(tokenId);
@@ -334,7 +332,7 @@ export class Helpers {
     }
 
     static measureTokenDistance(tokenOrigin: Token, tokenDest: Token): number {
-        if (!canvas || !canvas.ready || !canvas.scene) return 0;
+        if (!canvas || !canvas.ready || !canvas.scene || !canvas.grid) return 0;
 
         if (!tokenOrigin || !tokenDest) return 0;
 
@@ -374,23 +372,25 @@ export class Helpers {
     }
 
     static getControlledTokens(): Token[] {
-        if (!canvas || !canvas.ready) return [];
+        if (!canvas || !canvas.ready || !canvas.tokens) return [];
         return canvas.tokens.controlled;
     }
 
     static getTargetedTokens(): Token[] {
-        if (!canvas.ready) return [];
+        if (!canvas.ready || !game.user) return [];
 
         return Array.from(game.user.targets);
     }
 
     static getSelectedActorsOrCharacter(): SR5Actor[] {
+        if (!game.user) return [];
+
         const tokens = Helpers.getControlledTokens();
         const actors = tokens.map(token => token.actor);
 
         // Try to default to a users character.
-        if (actors.length === 0 && game.user?.character) {
-            actors.push(game.user?.character);
+        if (actors.length === 0 && game.user.character) {
+            actors.push(game.user.character);
         }
 
         return actors as SR5Actor[];
@@ -416,9 +416,9 @@ export class Helpers {
         const useTokenNameForChatOutput = game.settings.get(SYSTEM_NAME, FLAGS.ShowTokenNameForChatOutput);
         const token = actor.getToken();
 
-        if (useTokenNameForChatOutput && token) return token.data.name;
+        if (useTokenNameForChatOutput && token) return token.data.name as string;
 
-        return actor.name;
+        return actor.name as string;
     }
 
     static createDamageData(value: number, type: DamageType, ap: number = 0, element: DamageElement = '', sourceItem? : SR5Item): DamageData {
@@ -434,10 +434,10 @@ export class Helpers {
 
         if (sourceItem && sourceItem.actor) {
             damage.source = {
-                actorId: sourceItem.actor.id,
+                actorId: sourceItem.actor.id as string,
                 itemType: sourceItem.type,
-                itemId: sourceItem.id,
-                itemName: sourceItem.name
+                itemId: sourceItem.id as string,
+                itemName: sourceItem.name as string
             };
         }
 
@@ -449,6 +449,8 @@ export class Helpers {
      * This only works for embedded items at the moment
      */
     static findDamageSource(damageData : DamageData) : SR5Item | undefined{
+        if (!game.actors) return;
+
         if (!damageData.source) {
             return;
         }
@@ -476,6 +478,8 @@ export class Helpers {
         const tokens = actorSource.getActiveTokens();
         let tokenItem : SR5Item | undefined;
         tokens.forEach(token => {
+            if (!token.actor) return;
+
             const foundItem = token.actor.items.find(i => i.id === itemId);
             if (foundItem) {
                 tokenItem = foundItem as unknown as SR5Item;
@@ -643,7 +647,9 @@ export class Helpers {
      * @param permission A foundry access permission
      * @param active If true, will only return users that are also currently active.
      */
-    static getPlayersWithPermission(document: Entity, permission: string, active: boolean = true): User[] {
+    static getPlayersWithPermission(document: Document, permission: string, active: boolean = true): User[] {
+        if (!game.users) return [];
+
         return game.users.filter(user => {
             if (user.isGM) return false;
             // Check for permissions.
@@ -678,7 +684,8 @@ export class Helpers {
      * @param blind Is the roll blind to current user?
      *
      */
-    static async showDiceSoNice(roll: ShadowrunRoll, whisper: string[] = null, blind: boolean = false) {
+    static async showDiceSoNice(roll: ShadowrunRoll, whisper: string[], blind: boolean = false) {
+        // @ts-ignore // dice3d is a module
         if (!game.dice3d) return;
         // @ts-ignore
         const synchronize = whisper?.length === 0 || whisper === null;
@@ -693,9 +700,14 @@ export class Helpers {
      * Fetch entities from global or pack collections using data acquired by Foundry Drag&Drop process
      * @param data Foundry Drop Data
      */
-    static async getEntityFromDropData(data: {type: 'Actor'|'Item', pack: string, id: string}): Promise<Entity | undefined> {
-        if (data.pack)
-            return await Helpers.getEntityFromCollection(data.pack, data.id);
+    static async getEntityFromDropData(data: {type: 'Actor'|'Item', pack: string, id: string}): Promise<SR5Actor | SR5Item | undefined> {
+        if (!game.actors || !game.items) return;
+
+        if (data.pack && data.type === 'Actor')
+            return await Helpers.getEntityFromCollection(data.pack, data.id) as unknown as SR5Actor;
+
+        if (data.pack && data.type === 'Item')
+            return await Helpers.getEntityFromCollection(data.pack, data.id) as unknown as SR5Item;
 
         if (data.type === 'Actor')
             return game.actors.get(data.id);
@@ -709,9 +721,10 @@ export class Helpers {
      * @param collection The pack name as stored in the collection property
      * @param id The entity id in that collection
      */
-    static async getEntityFromCollection(collection: string, id: string): Promise<Entity> {
+    static async getEntityFromCollection(collection: string, id: string): Promise<Document> {
         const pack = game.packs.find((p) => p.collection === collection);
-        return await pack.getEntity(id);
+        // @ts-ignore // All Document types COULD be returned...
+        return await pack.getDocument(id);
     }
 
     /**
@@ -721,6 +734,8 @@ export class Helpers {
      * - And a possible owned item still exists on that documents actor.
      */
     static isValidMarkId(markId: string): boolean {
+        if (!game.scenes) return false;
+
         const [sceneId, targetId, itemId] = Helpers.deconstructMarkId(markId);
 
         const scene = game.scenes.get(sceneId);
@@ -732,7 +747,7 @@ export class Helpers {
 
         const actor = tokenDocument.actor;
         // Some targets are allowed without a targeted owned item.
-        if (itemId && !actor.items.get(itemId)) return false;
+        if (itemId && !actor?.items.get(itemId)) return false;
 
         return true;
     }
@@ -760,16 +775,18 @@ export class Helpers {
 
         if (ids.length !== 3) {
             console.error('A mark id must always be of length 3');
-            return;
         }
 
         return ids as [string, string, string];
     }
 
-    static getMarkIdDocuments(markId: string): TargetedDocument {
+    static getMarkIdDocuments(markId: string): TargetedDocument|undefined {
+        if (!game.scenes) return;
+
         const [sceneId, targetId, itemId] = Helpers.deconstructMarkId(markId);
 
         const scene = game.scenes.get(sceneId);
+        if (!scene) return;
         // @ts-ignore // TODO: foundry-vtt-types 0.8
         const target = scene.tokens.get(targetId) || game.items.get(targetId) as SR5Item;
         const item = target?.actor?.items?.get(itemId) as SR5Item; // DocumentCollection will return undefined if needed

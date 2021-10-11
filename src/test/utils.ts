@@ -1,8 +1,9 @@
 import {SR5Actor} from "../module/actor/SR5Actor";
+import {Document} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/abstract/module.mjs";
 
 export class SR5TestingDocuments {
-        documentClass: Entity;
-        documents: Record<string, Entity> = {};
+        documentClass: Document<any>;
+        documents: Record<string,  Document<any>> = {};
 
         constructor(documentClass) {
             this.documentClass = documentClass;
@@ -20,7 +21,7 @@ export class SR5TestingDocuments {
             if (!document) return;
             // @ts-ignore // foundry-vtt-types 0.9
             await this.documentClass.deleteDocuments([document.data._id]);
-            delete this.documents[document.id]
+            delete this.documents[document.id as string]
         }
 
         async teardown() {

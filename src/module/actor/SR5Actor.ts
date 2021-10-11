@@ -42,7 +42,6 @@ import ActorArmorData = Shadowrun.ActorArmorData;
 import ConditionData = Shadowrun.ConditionData;
 import Skills = Shadowrun.Skills;
 import CharacterSkills = Shadowrun.CharacterSkills;
-import ShadowrunActorData = Shadowrun.ShadowrunActorData;
 import SpiritActorData = Shadowrun.SpiritActorData;
 import CharacterData = Shadowrun.CharacterData;
 import CharacterActorData = Shadowrun.CharacterActorData;
@@ -55,6 +54,14 @@ import MatrixData = Shadowrun.MatrixData;
 import HostItemData = Shadowrun.HostItemData;
 import MarkedDocument = Shadowrun.MarkedDocument;
 import MatrixMarks = Shadowrun.MatrixMarks;
+import {EffectChangeData} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/effectChangeData";
+
+function getGame(): Game {
+  if(!(game instanceof Game)) {
+    throw new Error('game is not initialized yet!');
+  }
+  return game;
+}
 
 /**
  * The general Shadowrun actor implementation, which currently handles all actor types.
@@ -71,7 +78,8 @@ import MatrixMarks = Shadowrun.MatrixMarks;
  * </code></pre>
  *
  */
-export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
+// TODO: v9
+export class SR5Actor extends Actor {
     getOverwatchScore() {
         const os = this.getFlag(SYSTEM_NAME, 'overwatchScore');
         return os !== undefined ? os : 0;
@@ -184,7 +192,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
      * TODO: This method is unused at the moment, might be unneeded.
      */
     applyOverrideActiveEffects() {
-        const changes = this.effects.reduce((changes: ActiveEffectChange[], effect) => {
+        const changes = this.effects.reduce((changes: EffectChangeData[], effect) => {
             if (effect.data.disabled) return changes;
 
             // include changes partially matching given keys.
@@ -201,6 +209,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
                     }));
         }, []);
         // Sort changes according to priority, in case it's ever needed.
+        // @ts-ignore // TODO: v9
         changes.sort((a, b) => a.priority - b.priority);
 
         for (const change of changes) {
@@ -218,11 +227,12 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         this._applyActiveEffectChanges(changes);
     }
 
+
     /**
      * A helper method to apply a active effect changes collection (which might come from multiple active effects)
      * @param changes
      */
-    _applyActiveEffectChanges(changes: ActiveEffectChange[]) {
+    _applyActiveEffectChanges(changes: EffectChangeData[]) {
         const overrides = {};
 
         for (const change of changes) {
@@ -239,9 +249,9 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
      * Reduce all changes across multiple active effects that match the given set of partial keys
      * @param partialKeys Can either be complete keys or partial keys
      */
-    _reduceEffectChangesByKeys(partialKeys: string[]): ActiveEffectChange[] {
+    _reduceEffectChangesByKeys(partialKeys: string[]): EffectChangeData[] {
         // Collect only those changes matching the given partial keys.
-        const changes = this.effects.reduce((changes: ActiveEffectChange[], effect) => {
+        const changes = this.effects.reduce((changes: EffectChangeData[], effect) => {
             if (effect.data.disabled) return changes;
 
             // include changes partially matching given keys.
@@ -258,6 +268,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
                     }));
         }, []);
         // Sort changes according to priority, in case it's ever needed.
+        // @ts-ignore // TODO: v9
         changes.sort((a, b) => a.priority - b.priority);
 
         return changes;
@@ -345,7 +356,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         return DefaultValues.actorArmorData();
     }
 
-    getMatrixDevice(): SR5Item | undefined | null {
+    getMatrixDevice(): SR5Item | undefined {
         if (!("matrix" in this.data.data)) return;
         const matrix = this.data.data.matrix;
         if (matrix.device) return this.items.get(matrix.device);
@@ -693,7 +704,8 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
             await this.hideSkill(skillId);
             // NOTE: For some reason unlinked token actors won't cause a render on update?
             if (!this.data.token.actorLink)
-                await this.sheet.render();
+                // TODO: v9
+                await this.sheet?.render();
             return;
         }
 
@@ -753,7 +765,8 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         await this.update(updateData);
         // NOTE: For some reason unlinked token actors won't cause a render on update?
         if (!this.data.token.actorLink)
-                await this.sheet.render();
+                // TODO: v9
+                await this.sheet?.render();
     }
 
     async rollFade(options: ActorRollOptions = {}, incoming = -1): Promise<ShadowrunRoll|undefined> {
@@ -864,7 +877,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         if (!attack) return;
 
         // Collect defense information.
-        let defenderHits = roll.total;
+        let defenderHits = roll.total || 0;
         let attackerHits = attack.hits || 0;
         let netHits = Math.max(attackerHits - defenderHits, 0);
 
@@ -989,7 +1002,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
             extended: true,
             after: async (roll: ShadowrunRoll | undefined) => {
                 if (!roll) return;
-                let hits = roll.total;
+                let hits = roll.total || 0;
                 const data = this.data.data as CharacterData;
                 let current = data.track[track].value;
 
@@ -1131,7 +1144,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         // NOTE: Currently defaulting happens at multiple places, which is why SkillFlow.handleDefaulting isn't used
         //       here, yet. A general skill usage clean up between Skill, Attribute and Item action handling is needed.
         if (!SkillFlow.allowRoll(skill)) {
-            ui.notifications.warn(game.i18n.localize('SR5.Warnings.SkillCantBeDefault'));
+            ui.notifications?.warn(game.i18n.localize('SR5.Warnings.SkillCantBeDefault'));
             return;
         }
 
@@ -1143,7 +1156,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         const attributeName = options?.attribute ? options.attribute : skill.attribute;
         const attribute = this.getAttribute(attributeName);
         if (!attribute) {
-            ui.notifications.error(game.i18n.localize('SR5.Errors.SkillWithoutAttribute'));
+            ui.notifications?.error(game.i18n.localize('SR5.Errors.SkillWithoutAttribute'));
             return;
         }
         let limit = attribute.limit ? this.getLimit(attribute.limit) : undefined;
@@ -1412,7 +1425,9 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
     }
 
     static async pushTheLimit(li) {
-        let msg: ChatMessage = game.messages.get(li.data().messageId);
+        let msg = game.messages?.get(li.data().messageId);
+
+        if (!msg || !msg.user) return;
 
         if (msg.getFlag(SYSTEM_NAME, FLAGS.MessageCustomRoll)) {
             let actor = (msg.user.character as unknown) as SR5Actor;
@@ -1449,11 +1464,14 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
     }
 
     static async secondChance(li) {
-        let msg: ChatMessage = game.messages.get(li.data().messageId);
+        let msg = game.messages?.get(li.data().messageId);
+
+        if (!msg|| !msg.user) return;
+
         // @ts-ignore
         let roll: Roll = JSON.parse(msg.data?.roll);
         let formula = roll.formula;
-        let hits = roll.total;
+        let hits = roll.total || 0;
         let re = /(\d+)d6/;
         let matches = formula.match(re);
         if (matches && matches[1]) {
@@ -1519,7 +1537,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
      * TODO: Correctly type this method to return TokenDocument
      * @retrun Will return null should no token have been placed on scene.
      */
-    getToken(): Token {
+    getToken(): TokenDocument|null {
         // Linked actors can only have one token, which isn't stored within actor data...
         if (this._isLinkedToToken() && this.hasToken()) {
             const linked = true;
@@ -1562,7 +1580,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
             if (!user.active || user.isGM) {
                 continue;
             }
-            if (this.id === user.character.id) {
+            if (this.id === user.character?.id) {
                 return user;
             }
         }
@@ -1779,7 +1797,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         // No change needed for nothing to change.
         if (modifier === 0) return;
 
-        const combat: SR5Combat = game.combat as SR5Combat;
+        const combat: SR5Combat = game.combat as unknown as SR5Combat;
         const combatant = combat.getActorCombatant(this);
 
         // Token might not be part of active combat.
@@ -1839,7 +1857,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
     async addVehicleDriver(id: string) {
         if (!this.isVehicle()) return;
 
-        const driver = game.actors.get(id) as SR5Actor;
+        const driver = game.actors?.get(id) as SR5Actor;
         if (!driver) return;
 
         // NOTE: In THEORY almost all actor types can drive a vehicle.
@@ -1866,7 +1884,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         const data = this.asVehicleData();
         if (!data) return;
 
-        const driver = game.actors.get(data.data.driver) as SR5Actor;
+        const driver = game.actors?.get(data.data.driver) as SR5Actor;
         // If no driver id is set, we won't get an actor and should explicitly return undefined.
         if (!driver) return;
         return driver;
@@ -1884,15 +1902,17 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         if (!this.isIC()) return;
 
         // Check if the given item id is valid.
-        const item = game.items.get(id) as SR5Item;
+        const item = game.items?.get(id) as SR5Item;
         if (!item || !item.isHost()) return;
 
         const hostData = item.asHostData();
+        if (!hostData) return;
         await this._updateICHostData(hostData);
     }
 
     async _updateICHostData(hostData: HostItemData) {
         const updateData = {
+            // @ts-ignore // TODO: v9 FoundryFields
             id: hostData._id,
             rating: hostData.data.rating,
             atts: duplicate(hostData.data.atts)
@@ -1900,7 +1920,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
 
         // Some host data isn't stored on the IC actor (marks) and won't cause an automatic render.
         await this.update({'data.host': updateData}, {render: false});
-        await this.sheet.render();
+        await this.sheet?.render();
     }
 
     /**
@@ -1923,6 +1943,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
      */
     hasHost(): boolean {
         const icData = this.asICData();
+        if (!icData) return false;
         return icData && !!icData.data.host.id;
     }
 
@@ -1932,7 +1953,7 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
     getICHost(): SR5Item|undefined {
         const icData = this.asICData();
         if (!icData) return;
-        return game.items.get(icData?.data?.host.id);
+        return game.items?.get(icData?.data?.host.id);
     }
 
     /** Check if this actor is of one or multiple given actor types
@@ -1994,32 +2015,36 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
         if (!canvas.ready) return;
 
         if (this.isIC() && this.hasHost()) {
-            return await this.getICHost().setMarks(target, marks, options);
+            return await this.getICHost()?.setMarks(target, marks, options);
         }
 
         if (!this.isMatrixActor) {
-            ui.notifications.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedBy'));
-            console.error(`The actor type ${this.data.type} can't receive matrix marks!`);
-            return;
+            ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedBy'));
+            return console.error(`The actor type ${this.data.type} can't receive matrix marks!`);
         }
         // @ts-ignore // TODO: foundry-vtt-types 0.8
         if (!target.actor.isMatrixActor) {
-            ui.notifications.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedOn'));
+            ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedOn'));
             // @ts-ignore
-            console.error(`The actor type ${target.actor.type} can't receive matrix marks!`);
-            return;
+            return console.error(`The actor type ${target.actor.type} can't receive matrix marks!`);
         }
+        if (!target.actor) {
+            return console.error(`The token ${target.name} is missing it's actor`);
+        }
+
         // It hurt itself in confusion.
         if (this.id === target.actor.id) {
             return;
         }
 
         // Both scene and item are optional.
-        const scene = options?.scene || canvas.scene;
+        const scene = options?.scene || canvas.scene as Scene;
         const item = options?.item;
 
-        const markId = Helpers.buildMarkId(scene.id, target.id, item?.id);
+        const markId = Helpers.buildMarkId(scene.id as string, target.id, item?.id as string);
         const matrixData = this.matrixData;
+
+        if (!matrixData) return;
 
         const currentMarks = options?.overwrite ? 0 : this.getMarksById(markId);
         matrixData.marks[markId] = MatrixRules.getValidMarksCount(currentMarks + marks);
@@ -2031,9 +2056,8 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
      * Remove ALL marks placed by this actor
      */
     async clearMarks() {
-        if (!this.isMatrixActor) return;
-
         const matrixData = this.matrixData;
+        if (!matrixData) return;
 
         // Delete all markId properties from ActorData
         const updateData = {}
@@ -2075,26 +2099,26 @@ export class SR5Actor extends Actor<ShadowrunActorData, SR5Item> {
      * @param options
      */
     getMarks(target: Token, item?: SR5Item, options?: {scene?: Scene}): number {
-        if (!canvas.ready) return;
+        if (!canvas.ready) return 0;
         if (target instanceof SR5Item) {
             console.error('Not yet supported');
-            return;
+            return 0;
         }
         // @ts-ignore // TODO: foundry-vtt-types 0.8
         if (!target?.actor.isMatrixActor) return 0;
 
 
-        const scene = options?.scene || canvas.scene;
+        const scene = options?.scene || canvas.scene as Scene;
         // If an actor has been targeted, they might have a device. If an item / host has been targeted they don't.
         // @ts-ignore // TODO: foundry-vtt-types 0.8
         item = item || target instanceof SR5Actor ? target.actor.getMatrixDevice() : undefined;
 
-        const markId = Helpers.buildMarkId(scene.id, target.id, item?.id);
+        const markId = Helpers.buildMarkId(scene.id as string, target.id, item?.id as string);
         return this.getMarksById(markId);
     }
 
     getMarksById(markId: string): number {
-        return this.matrixData.marks[markId] || 0;
+        return this.matrixData?.marks[markId] || 0;
     }
 
     /**
