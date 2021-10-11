@@ -24,9 +24,9 @@ import {SR5ICActorSheet} from "./actor/sheets/SR5ICActorSheet";
 import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
 import SocketMessageHooks = Shadowrun.SocketMessageHooks;
 import SocketMessage = Shadowrun.SocketMessageData;
-import {DeviceFlow} from "./item/flows/DeviceFlow";
 import {SR5ActiveEffect} from "./effect/SR5ActiveEffect";
 import {SR5ActiveEffectSheet} from "./effect/SR5ActiveEffectSheet";
+import {NetworkDeviceFlow} from "./item/flows/NetworkDeviceFlow";
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 // TODO: Figure out how to change global CONFIG type
@@ -246,9 +246,9 @@ ___________________
         if (!game.socket || !game.user) return;
         console.log('Registering Shadowrun5e system sockets...');
         const hooks: SocketMessageHooks = {
-            [FLAGS.addNetworkController]: [DeviceFlow.handleAddNetworkControllerSocketMessage],
+            [FLAGS.addNetworkController]: [NetworkDeviceFlow._handleAddNetworkControllerSocketMessage],
             [FLAGS.DoNextRound]: [SR5Combat._handleDoNextRoundSocketMessage],
-            [FLAGS.DoInitPass]: [SR5Combat._handleDoInitPassSocketMessage]
+            [FLAGS.DoInitPass]: [SR5Combat._handleDoInitPassSocketMessage],
         }
 
         game.socket.on(SYSTEM_SOCKET, async (message: SocketMessage) => {

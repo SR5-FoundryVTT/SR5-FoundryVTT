@@ -14,6 +14,9 @@ import DevicePartData = Shadowrun.DevicePartData;
 import SourceEntityField = Shadowrun.SourceEntityField;
 import ActionResultData = Shadowrun.ActionResultData;
 import {SKILL_DEFAULT_NAME} from "../constants";
+import DeviceData = Shadowrun.DeviceData;
+import EquipmentItemData = Shadowrun.EquipmentItemData;
+import DeviceItemData = Shadowrun.DeviceItemData;
 
 /**
  * TODO: Add unittesting to DefaultValues helper.
@@ -93,7 +96,8 @@ export class DefaultValues {
                 value: 0,
                 max: 0,
             },
-            wireless: true
+            wireless: true,
+            networkController: undefined
         }, partialTechnologyData) as TechnologyData;
     }
 
@@ -231,6 +235,29 @@ export class DefaultValues {
             type: 'Actor',
             data: partialSourceEntityData.data || undefined
         }, partialSourceEntityData) as SourceEntityField;
+    }
+
+    static equipmentItemData(partialEquipmentItemData: Partial<EquipmentItemData> = {}): EquipmentItemData {
+        return  mergeObject({
+            name: '',
+            type: 'equipment',
+            data: {
+                description: DefaultValues.descriptionData(partialEquipmentItemData.data?.description || {}),
+                technology: DefaultValues.technologyData(partialEquipmentItemData.data?.technology || {})
+            }
+        }, partialEquipmentItemData) as EquipmentItemData;
+    }
+
+    static deviceItemData(partialDeviceItemData: Partial<DeviceItemData> = {}): DeviceItemData {
+        return mergeObject({
+            name: '',
+            type: 'device',
+            data: {
+                description: DefaultValues.descriptionData(partialDeviceItemData.data?.description || {}),
+                technology: DefaultValues.technologyData(partialDeviceItemData.data?.technology || {}),
+                ...DefaultValues.matrixData({category: partialDeviceItemData.data?.category, atts: partialDeviceItemData.data?.atts}),
+            }
+        }, partialDeviceItemData) as DeviceItemData;
     }
 }
 

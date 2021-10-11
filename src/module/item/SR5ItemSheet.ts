@@ -3,7 +3,6 @@ import {SR5Item} from './SR5Item';
 import {SR5} from "../config";
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
 import {SR5Actor} from "../actor/SR5Actor";
-import {DeviceFlow} from "./flows/DeviceFlow";
 import {ItemData} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs";
 
 /**
@@ -156,7 +155,7 @@ export class SR5ItemSheet extends ItemSheet {
         if (!controllerData) return [];
 
         // @ts-ignore
-        return controllerData.data.networkDevices.map(deviceLink => DeviceFlow.documentByNetworkDeviceLink(deviceLink));
+        return controllerData.data.networkDevices.map(deviceLink => NetworkDeviceFlow.documentByNetworkDeviceLink(deviceLink));
     }
 
     /* -------------------------------------------- */

@@ -57,9 +57,9 @@ import {DefaultValues} from "../data/DataDefaults";
 import {HostDataPreparation} from "./prep/HostPrep";
 import {MatrixRules} from "../rules/MatrixRules";
 import ActionResultData = Shadowrun.ActionResultData;
-import {DeviceFlow} from "./flows/DeviceFlow";
 import MatrixMarks = Shadowrun.MatrixMarks;
 import MarkedDocument = Shadowrun.MarkedDocument;
+import {NetworkDeviceFlow} from "./flows/NetworkDeviceFlow";
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
@@ -224,7 +224,7 @@ export class SR5Item extends Item {
         const equippedMods = this.getEquippedMods();
         const equippedAmmo = this.getEquippedAmmo();
 
-        const technology = this.getTechnology();
+        const technology = this.getTechnologyData();
         if (technology) {
             // taMiF: This migration code could be needed for items imported from an older compendium?
             if (technology.condition_monitor === undefined) {
@@ -239,7 +239,7 @@ export class SR5Item extends Item {
 
             const concealParts = new PartsList<number>();
             equippedMods.forEach((mod) => {
-                const technology = mod.getTechnology();
+                const technology = mod.getTechnologyData();
 
                 if (technology && technology.conceal.value) {
                     concealParts.addUniquePart(mod.name as string, technology.conceal.value);
@@ -1098,7 +1098,7 @@ export class SR5Item extends Item {
         return action.extended;
     }
 
-    getTechnology(): TechnologyData|undefined {
+    getTechnologyData(): TechnologyData|undefined {
         return this.wrapper.getTechnology();
     }
 
@@ -1495,7 +1495,7 @@ export class SR5Item extends Item {
     }
 
     getCondition(): ConditionData|undefined {
-        const technology = this.getTechnology();
+        const technology = this.getTechnologyData();
         if (technology && "condition_monitor" in technology)
             return technology.condition_monitor;
     }
@@ -1633,6 +1633,7 @@ export class SR5Item extends Item {
         data._id = this.id;
 
         // Shadowrun Items can contain other items, while Foundry Items can't. Use the system local implementation for items.
+        // @ts-ignore
         await this.parent.updateOwnedItem(data);
 
         // After updating all item embedded data, rerender the sheet to trigger the whole rerender workflow.
@@ -1766,35 +1767,12 @@ export class SR5Item extends Item {
      * Add a 'device' to a matrix network (PAN or WAN)
      *
      */
-    async addNetworkDevice(target: SR5Item|SR5Actor) {
+    async addNetworkDevice(target: SR5Item) {
         // TODO: Add device to WAN network
         // TODO: Add IC actor to WAN network
         // TODO: setup networkController link on networked devices.
 
-        const deviceData = this.asDeviceData();
-        if (!target || !deviceData) return;
-
-        const controller = this;
-
-        if (DeviceFlow.invalidNetworkDevice(controller, target)) return;
-
-        const deviceLink = DeviceFlow.buildNetworkDeviceLink(target);
-        const controllerLink = DeviceFlow.buildNetworkDeviceLink(controller);
-        if (!deviceLink || !controllerLink) return;
-        if (!deviceLink.type || !controllerLink.type) return console.error('Abort adding network device due to internal data error');
-
-        if (DeviceFlow.connectedNetworkDevice(controller, deviceLink)) return;
-
-        const networkDevices = duplicate(deviceData.data.networkDevices);
-        networkDevices.push(deviceLink);
-
-        if (game.user?.isGM) {
-            await DeviceFlow.addNetworkController(controller, target);
-        } else {
-            await DeviceFlow.emitAddControllerSocketMessage(controller, target);
-        }
-
-        return await this.update({'data.networkDevices': networkDevices});
+        await NetworkDeviceFlow.addNetworkDevice(this, target);
     }
 
     async removeNetworkDevice(index: number) {
@@ -1831,4 +1809,27 @@ export class SR5Item extends Item {
                 markId
             }))
     }
+
+    /**
+     * In case a technology item is part of a PAN/WAN it will return the controlling device of it's network.
+     */
+    async networkController(): Promise<SR5Item | undefined> {
+        const technologyData = this.getTechnologyData();
+        if (!technologyData) return;
+        if (!technologyData.networkController) return;
+
+        return await NetworkDeviceFlow.resolveLink(technologyData.networkController) as SR5Item;
+    }
+
+    async networkDevices(): Promise<SR5Item[] | undefined> {
+        const controllerData = this.asDeviceData() || this.asHostData();
+        if (!controllerData) return;
+
+        const devices: SR5Item[] = [];
+        for (const deviceLink of controllerData.data.networkDevices) {
+            devices.push(await NetworkDeviceFlow.resolveLink(deviceLink));
+        }
+        return devices;
+    }
+
 }

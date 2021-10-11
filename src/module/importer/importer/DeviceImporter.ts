@@ -2,6 +2,7 @@ import {DataImporter} from "./DataImporter";
 import {ImportHelper} from "../helper/ImportHelper";
 import {Constants} from "./Constants";
 import DeviceItemData = Shadowrun.DeviceItemData;
+import {DefaultValues} from "../../data/DataDefaults";
 
 export class DeviceImporter extends DataImporter {
     public files = ['gear.xml'];
@@ -11,60 +12,7 @@ export class DeviceImporter extends DataImporter {
     }
 
     GetDefaultData(): DeviceItemData {
-        return {
-            name: '',
-            type: 'device',
-            data: {
-                description: {
-                    value: '',
-                    chat: '',
-                    source: '',
-                },
-                technology: {
-                    rating: 1,
-                    availability: '',
-                    quantity: 1,
-                    cost: 0,
-                    equipped: true,
-                    conceal: {
-                        base: 0,
-                        value: 0,
-                        mod: [],
-                    },
-                    condition_monitor: {
-                        label: '',
-                        value: 0,
-                        max: 0,
-                    },
-                    wireless: true
-                },
-                category: 'commlink',
-                atts: {
-                    att1: {
-                        "value": 0,
-                        "att": "attack",
-                        editable: true
-                    },
-                    att2: {
-                        "value": 0,
-                        "att": "sleaze",
-                        editable: true
-                    },
-                    att3: {
-                        "value": 0,
-                        "att": "data_processing",
-                        editable: true
-                    },
-                    att4: {
-                        "value": 0,
-                        "att": "firewall",
-                        editable: true
-                    }
-                },
-                networkDevices: []
-
-            },
-        };
+        return DefaultValues.deviceItemData();
     }
 
     ExtractTranslation(fileName?: string) {

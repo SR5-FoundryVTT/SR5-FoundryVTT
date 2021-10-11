@@ -6,7 +6,9 @@
   "authors": [],
   "url": "https://github.com/smilligan93/SR5-FoundryVTT",
   "bugs": "https://github.com/smilligan93/SR5-FoundryVTT/issues",
-  "flags": {},
+  "flags": {
+    "allowBugReporter": true
+  },
   "version": "0.7.22",
   "minimumCoreVersion": "0.8.6",
   "compatibleCoreVersion": "0.8.9",
