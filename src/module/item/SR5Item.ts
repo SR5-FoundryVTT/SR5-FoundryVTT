@@ -1627,12 +1627,13 @@ export class SR5Item extends Item {
      * @param data changes made to the SR5ItemData
      */
     async updateEmbeddedItem(data): Promise<this> {
-        if (!this.parent) return this;
+        if (!this.parent || this.parent instanceof SR5Actor) return this;
         // Inform the parent item about changes to one of it's embedded items.
         // TODO: updateOwnedItem needs the id of the update item. hand the item itself over, to the hack within updateOwnedItem for this.
         data._id = this.id;
-        // I'm unsure if parent is an Actor, which is allowed by Foundry, or an item, which isn't allowed. If it's an item, this call is okay, otherwise it needs to be updateEmbeededDocuments
-        await this.parent.updateEmbeddedDocuments('Item', [data]);
+
+        // Shadowrun Items can contain other items, while Foundry Items can't. Use the system local implementation for items.
+        await this.parent.updateOwnedItem(data);
 
         // After updating all item embedded data, rerender the sheet to trigger the whole rerender workflow.
         // Otherwise changes in the template of an hiddenItem will show for some fields, while not rerendering all
