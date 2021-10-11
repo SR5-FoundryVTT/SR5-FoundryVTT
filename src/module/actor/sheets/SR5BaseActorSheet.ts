@@ -123,8 +123,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             name: `New ${type}`,
             type: type,
         };
-        //@ts-ignore // TODO: foundry-vtt-types v9
-        return await this.actor.createOwnedItem(itemData, {renderSheet: true});
+        return await this.actor.createEmbeddedDocuments('Item',  [itemData], {renderSheet: true});
     }
 
     async _onItemEdit(event) {
@@ -142,8 +141,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         if (!userConsented) return;
 
         const iid = Helpers.listItemId(event);
-        //@ts-ignore // TODO: foundry-vtt-types v9
-        return await this.actor.deleteOwnedItem(iid);
+        return await this.actor.deleteEmbeddedDocuments('Item', [iid]);
     }
 
     async _onItemRoll(event) {

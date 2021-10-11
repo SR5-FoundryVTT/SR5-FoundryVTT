@@ -107,9 +107,8 @@ export abstract class VersionMigration {
         for (const [entity, { updateData, embeddedItems }] of documentUpdates) {
             if (embeddedItems !== null) {
                 const actor = entity as SR5Actor;
-                // TODO: foundry-vtt-types v9
                 // @ts-ignore
-                await actor.updateOwnedItem(embeddedItems);
+                await actor.updateEmbeddedDocuments('Item', [embeddedItems]);
             }
             await entity.update(updateData, { enforceTypes: false });
         }

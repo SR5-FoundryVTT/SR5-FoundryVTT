@@ -12,8 +12,6 @@ import MatrixAttribute = Shadowrun.MatrixAttribute;
 import SkillField = Shadowrun.SkillField;
 import DeviceData = Shadowrun.DeviceData;
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
-import {MatrixRules} from "../rules/MatrixRules";
-import {SR5ActiveEffect} from "../effect/SR5ActiveEffect";
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
@@ -176,10 +174,6 @@ export class SR5ActorSheet extends ActorSheet {
                 if (attribute.temp === 0) delete attribute.temp;
             }
         }
-    }
-
-    _prepareActorTypeIndicators(data) {
-        data.hasSkills = this.actor.getSkills() !== undefined;
     }
 
     _prepareSkillsWithFilters(data: SR5ActorSheetData) {
@@ -804,8 +798,7 @@ export class SR5ActorSheet extends ActorSheet {
                 data[key] = oldVal;
             }
         }
-        // @ts-ignore TODO: foundry-vtt-types v9
-        await this.actor.updateOwnedItem(data);
+        await this.actor.updateEmbeddedDocuments('Item', [data]);
     }
 
     async _onMarksQuantityChange(event) {
