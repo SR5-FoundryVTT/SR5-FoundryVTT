@@ -17,13 +17,7 @@ export class ModImporter extends DataImporter {
     GetDefaultData(): ModificationItemData {
         return {
             name: '',
-            _id: '',
-            folder: '',
-            img: 'icons/svg/mystery-man.svg',
-            flags: {},
             type: 'modification',
-            effects: [],
-            sort: 0,
             data: {
                 description: {
                     value: '',
@@ -36,10 +30,7 @@ export class ModImporter extends DataImporter {
                 dice_pool: 0,
                 accuracy: 0,
                 rc: 0,
-            },
-            permission: {
-                default: 2,
-            },
+            }
         };
     }
 
@@ -53,7 +44,7 @@ export class ModImporter extends DataImporter {
         this.accessoryTranslations = ImportHelper.ExtractItemTranslation(jsonWeaponsi18n, 'accessories', 'accessory');
     }
 
-    async Parse(jsonObject: object): Promise<Entity> {
+    async Parse(jsonObject: object): Promise<Item> {
         const parser = new ModParserBase();
 
         let datas: ModificationItemData[] = [];
@@ -77,6 +68,7 @@ export class ModImporter extends DataImporter {
             }
 
             let folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Mods/${folderName}`, true);
+            //@ts-ignore TODO: Foundry Where is my foundry base data?
             data.folder = folder.id;
 
             datas.push(data);

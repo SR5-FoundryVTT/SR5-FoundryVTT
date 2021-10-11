@@ -1,6 +1,7 @@
 import {DataImporter} from "./DataImporter";
 import {ImportHelper} from "../helper/ImportHelper";
 import {Constants} from "./Constants";
+import EquipmentItemData = Shadowrun.EquipmentItemData;
 
 export class EquipmentImporter extends DataImporter {
     public files = ['gear.xml'];
@@ -9,13 +10,9 @@ export class EquipmentImporter extends DataImporter {
         return jsonObject.hasOwnProperty('gears') && jsonObject['gears'].hasOwnProperty('gear');
     }
 
-    GetDefaultData() {
+    GetDefaultData(): EquipmentItemData {
         return {
             name: '',
-            _id: '',
-            folder: '',
-            img: 'icons/svg/mystery-man.svg',
-            flags: {},
             type: 'equipment',
             data: {
                 description: {
@@ -39,10 +36,8 @@ export class EquipmentImporter extends DataImporter {
                         value: 0,
                         max: 0,
                     },
+                    wireless: true
                 }
-            },
-            permission: {
-                default: 2,
             },
         };
     }
@@ -100,7 +95,7 @@ export class EquipmentImporter extends DataImporter {
         return jsonObject['gears']['gear'].filter(gear => !unsupportedCategories.includes(ImportHelper.StringValue(gear, 'category', '')));
     }
 
-    async Parse(jsonObject: object): Promise<Entity> {
+    async Parse(jsonObject: object): Promise<Item> {
         const equipments = this.FilterJsonObjects(jsonObject);
 
         const entries = await this.ParseEquipments(equipments);

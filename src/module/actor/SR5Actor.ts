@@ -1589,6 +1589,7 @@ export class SR5Actor extends Actor {
     }
 
     getActivePlayerOwners(): User[] {
+        // @ts-ignore
         return Helpers.getPlayersWithPermission(this, 'OWNER', true);
     }
 
@@ -2143,6 +2144,7 @@ export class SR5Actor extends Actor {
         if (!marks) return [];
 
         // Deconstruct all mark ids into documents.
+        // @ts-ignore
         return Object.entries(marks)
             .filter(([markId, marks]) => Helpers.isValidMarkId(markId))
             .map(([markId, marks]) => ({

@@ -66,7 +66,7 @@ export class ImportHelper {
         const pathSegments = path.split('/');
         for (const pathSegment of pathSegments) {
              // Check if the path structure matches the folder structure.
-            currentFolder = game.folders.find((folder) => {
+            currentFolder = game.folders?.find((folder) => {
                 // @ts-ignore // TODO: foundry-vtt-types 0.8 support missing.
                 return folder.parentFolder === lastFolder && folder.name === pathSegment
             });

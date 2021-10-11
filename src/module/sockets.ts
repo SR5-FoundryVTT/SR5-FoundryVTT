@@ -10,12 +10,15 @@ export class SocketMessage {
     }
 
     static async emit(type, data) {
+        if (!game.socket) return;
+
         const message = SocketMessage._createMessage(type, data);
         console.trace('Emiting Shadowrun5e system socket message', message);
         await game.socket.emit(SYSTEM_SOCKET, message);
     }
 
     static async emitForGM(type, data) {
+        if (!game.socket || !game.user || !game.users) return;
         if (game.user.isGM) return console.error('Active user is GM! Aborting socket message...');
 
         const gmUser = game.users.find(user => user.isGM);

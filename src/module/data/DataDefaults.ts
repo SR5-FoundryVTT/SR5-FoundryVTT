@@ -158,6 +158,7 @@ export class DefaultValues {
     }
 
     static actionResultData(partialActionResultData: Partial<ActionResultData> = {}): ActionResultData {
+        // @ts-ignore
         return mergeObject({
             success: {
                 matrix: {

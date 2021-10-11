@@ -1,6 +1,7 @@
 import {DataImporter} from "./DataImporter";
 import {ImportHelper} from "../helper/ImportHelper";
 import {Constants} from "./Constants";
+import DeviceItemData = Shadowrun.DeviceItemData;
 
 export class DeviceImporter extends DataImporter {
     public files = ['gear.xml'];
@@ -9,13 +10,9 @@ export class DeviceImporter extends DataImporter {
         return jsonObject.hasOwnProperty('gears') && jsonObject['gears'].hasOwnProperty('gear');
     }
 
-    GetDefaultData() {
+    GetDefaultData(): DeviceItemData {
         return {
             name: '',
-            _id: '',
-            folder: '',
-            img: 'icons/svg/mystery-man.svg',
-            flags: {},
             type: 'device',
             data: {
                 description: {
@@ -39,29 +36,33 @@ export class DeviceImporter extends DataImporter {
                         value: 0,
                         max: 0,
                     },
+                    wireless: true
                 },
                 category: 'commlink',
-                "atts": {
-                    "att1": {
+                atts: {
+                    att1: {
                         "value": 0,
-                        "att": "attack"
+                        "att": "attack",
+                        editable: true
                     },
-                    "att2": {
+                    att2: {
                         "value": 0,
-                        "att": "sleaze"
+                        "att": "sleaze",
+                        editable: true
                     },
-                    "att3": {
+                    att3: {
                         "value": 0,
-                        "att": "data_processing"
+                        "att": "data_processing",
+                        editable: true
                     },
-                    "att4": {
+                    att4: {
                         "value": 0,
-                        "att": "firewall"
+                        "att": "firewall",
+                        editable: true
                     }
                 },
-            },
-            permission: {
-                default: 2,
+                networkDevices: []
+
             },
         };
     }
@@ -153,7 +154,7 @@ export class DeviceImporter extends DataImporter {
         return entries;
     }
 
-    async Parse(jsonObject: object): Promise<Entity> {
+    async Parse(jsonObject: object): Promise<Item> {
         let entries = [];
         const commlinks = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Commlinks');
         const cyberdecks = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Cyberdecks');

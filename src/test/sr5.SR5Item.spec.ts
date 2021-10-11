@@ -26,9 +26,9 @@ export const shadowrunSR5Item = context => {
             assert.notStrictEqual(item.id, null);
 
             // Check foundry item collection integrity
-            const itemFromCollection = game.items.get(item.id);
+            const itemFromCollection = game.items?.get(item.id);
             assert.notStrictEqual(itemFromCollection, null);
-            assert.strictEqual(item.id, itemFromCollection.id);
+            assert.strictEqual(item.id, itemFromCollection?.id);
         });
 
         it('Should update an item of any type', async () => {
@@ -55,7 +55,7 @@ export const shadowrunSR5Item = context => {
             assert.strictEqual(embeddedAmmoData.type, ammo.data.type);
 
             // An embedded item should NOT appear in the items collection.
-            const embeddedAmmoInCollection = game.items.get(embeddedAmmoData._id);
+            const embeddedAmmoInCollection = game.items?.get(embeddedAmmoData._id);
             assert.strictEqual(embeddedAmmoInCollection, undefined);
         });
 

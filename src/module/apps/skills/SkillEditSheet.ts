@@ -7,7 +7,7 @@ export class SkillEditSheet extends DocumentSheet {
     skillId: string;
 
     get document(): SR5Actor {
-        return super.document;
+        return super.document as SR5Actor;
     }
 
     constructor(actor, options, skillId) {
@@ -98,7 +98,8 @@ export class SkillEditSheet extends DocumentSheet {
 
 
     /** @override */
-    async _updateObject(event: Event, formData: object) {
+    // @ts-ignore TODO: v9
+    async _updateObject(event, formData) {
         // Without an actual input field used, avoid a unneeded update...
         // ...the update would happen due to how _onUpdateObject works.
         if (event.currentTarget) {
@@ -181,8 +182,10 @@ export class SkillEditSheet extends DocumentSheet {
         return !!((!skill?.name && !skill?.label) || (skill?.name && !skill?.label));
     }
 
+    // @ts-ignore // TODO: v9
     getData(): SkillEditFormData {
         const data = super.getData();
+        // @ts-ignore
         const actor = data.data;
 
         data['data'] = actor ? getProperty(actor, this._updateString()) : {};
@@ -190,6 +193,6 @@ export class SkillEditSheet extends DocumentSheet {
         data['editable_canDefault'] = true;
         data['editable_attribute'] = true;
         data['attributes'] = this._getSkillAttributesForSelect();
-        return data as SkillEditFormData;
+        return data as unknown as SkillEditFormData;
     }
 }

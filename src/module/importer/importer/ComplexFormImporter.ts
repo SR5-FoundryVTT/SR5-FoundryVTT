@@ -17,13 +17,7 @@ export class ComplexFormImporter extends DataImporter {
     GetDefaultData(): ComplexFormItemData {
         return {
             name: 'Unnamed Form',
-            _id: '',
-            folder: '',
-            img: 'icons/svg/mystery-man.svg',
-            flags: {},
             type: 'complex_form',
-            effects: [],
-            sort: 0,
             data: {
                 description: {
                     value: '',
@@ -62,9 +56,6 @@ export class ComplexFormImporter extends DataImporter {
                 duration: '',
                 fade: 0,
             },
-            permission: {
-                default: 2,
-            },
         };
     }
 
@@ -78,7 +69,7 @@ export class ComplexFormImporter extends DataImporter {
         this.nameTranslations = ImportHelper.ExtractItemTranslation(jsonItemi18n, 'complexforms', 'complexform');
     }
 
-    async Parse(jsonObject: object): Promise<Entity> {
+    async Parse(jsonObject: object): Promise<Item> {
         const parser = new ComplexFormParserBase();
         const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Complex Forms`, true);
 
@@ -91,6 +82,8 @@ export class ComplexFormImporter extends DataImporter {
             }
 
             let data = parser.Parse(jsonData, this.GetDefaultData(), this.nameTranslations);
+
+            // @ts-ignore TODO: Foundry Where is my foundry base data?
             data.folder = folder.id;
 
             // TODO: Follow ComplexFormParserBase approach.

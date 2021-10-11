@@ -37,7 +37,7 @@ class Template extends MeasuredTemplate {
     }
 
     async drawPreview() {
-        if (!canvas?.ready) return;
+        if (!canvas.ready || !this.layer.preview) return;
 
         const initialLayer = canvas.activeLayer;
         if (!initialLayer) return;
@@ -49,7 +49,7 @@ class Template extends MeasuredTemplate {
     }
 
     activatePreviewListeners(initialLayer: CanvasLayer) {
-        if (!canvas.ready) return;
+        if (!canvas.ready || !canvas.stage || !canvas.app) return;
 
         const handlers = {};
         let moveTime = 0;
@@ -57,7 +57,7 @@ class Template extends MeasuredTemplate {
         // Update placement (mouse-move)
         handlers['mm'] = (event) => {
             event.stopPropagation();
-            if (!canvas.ready) return;
+            if (!canvas.grid) return;
             let now = Date.now(); // Apply a 20ms throttle
             if (now - moveTime <= 20) return;
             const center = event.data.getLocalPosition(this.layer);
@@ -70,7 +70,7 @@ class Template extends MeasuredTemplate {
 
         // Cancel the workflow (right-click)
         handlers['rc'] = () => {
-            if (!canvas.ready) return;
+            if (!canvas.ready || !this.layer.preview || !canvas.stage || !canvas.app) return;
 
             this.layer.preview.removeChildren();
             canvas.stage.off('mousemove', handlers['mm']);
@@ -85,7 +85,7 @@ class Template extends MeasuredTemplate {
         // Confirm the workflow (left-click)
         handlers['lc'] = (event) => {
             handlers['rc'](event);
-            if (!canvas.ready) return;
+            if (!canvas.grid) return;
 
             // Confirm final snapped position
             const destination = canvas.grid.getSnappedPosition(this.x, this.y, 2);
@@ -101,7 +101,7 @@ class Template extends MeasuredTemplate {
         handlers['mw'] = (event) => {
             if (event.ctrlKey) event.preventDefault(); // Avoid zooming the browser window
             event.stopPropagation();
-            if (canvas === null || !canvas.ready) return;
+            if (!canvas.grid) return;
 
             let delta = canvas.grid.type > CONST.GRID_TYPES.SQUARE ? 30 : 15;
             let snap = event.shiftKey ? delta : 5;

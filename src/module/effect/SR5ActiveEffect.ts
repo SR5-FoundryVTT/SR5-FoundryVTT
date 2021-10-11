@@ -1,6 +1,7 @@
 import {SR5Actor} from "../actor/SR5Actor";
 import {Helpers} from "../helpers";
 import ModifiableValue = Shadowrun.ModifiableValue;
+import {EffectChangeData} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/effectChangeData";
 
 export class SR5ActiveEffect extends ActiveEffect {
     /**
@@ -12,6 +13,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * items, this would need change.
      */
     public get isOriginOwned(): boolean {
+        if (!this.data.origin) return false;
         const path = this.data.origin.split('.');
 
         if (path[0] === 'Scene' && path.length === 6) return true;
@@ -44,7 +46,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         return this.update({disabled});
     }
 
-    protected _applyCustom(actor: SR5Actor, change: ActiveEffect.Change) {
+    protected _applyCustom(actor: SR5Actor, change: EffectChangeData) {
         return this._applyModify(actor, change);
     }
 
@@ -54,7 +56,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      *
      * @protected
      */
-    protected _applyModify(actor: SR5Actor, change: ActiveEffect.Change) {
+    protected _applyModify(actor: SR5Actor, change: EffectChangeData) {
         // Check direct key.
         if (this._isKeyModifiableValue(actor, change.key)) {
             // @ts-ignore // TODO: foundry-vtt-types 0.8
@@ -90,7 +92,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      *
      * @protected
      */
-    protected _applyOverride(actor: SR5Actor, change: ActiveEffect.Change) {
+    protected _applyOverride(actor: SR5Actor, change: EffectChangeData) {
         // Check direct key.
         if (this._isKeyModifiableValue(actor, change.key)) {
             // @ts-ignore // TODO: foundry-vtt-types 0.8

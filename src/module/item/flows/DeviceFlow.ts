@@ -8,50 +8,56 @@ import SocketMessageData = Shadowrun.SocketMessageData;
 
 
 export class DeviceFlow {
-    static networkDeviceType(target: SR5Item|SR5Actor): NetworkDeviceType {
+    static networkDeviceType(target: SR5Item|SR5Actor): NetworkDeviceType|undefined {
         if (target instanceof SR5Item && target.isHost()) return 'Host';
         if (target instanceof SR5Item && target.actor.token) return 'Token'
         if (target instanceof SR5Item && !target.actor.token) return 'Actor';
 
         console.error(`The given networking device doesn't fit any allowed category of networkable matrix device / actor`, target);
+        return;
     }
 
-    static buildNetworkDeviceLink(target: SR5Item|SR5Actor): NetworkDeviceLink {
+    static buildNetworkDeviceLink(target: SR5Item|SR5Actor): NetworkDeviceLink|undefined {
         const type =  DeviceFlow.networkDeviceType(target);
         const actor = target instanceof SR5Actor ? target : target.actor;
 
         switch (type) {
             case 'Actor':
                 return {
-                    sceneId: null,
-                    ownerId: actor.id,
-                    targetId: target.id,
+                    sceneId: undefined,
+                    ownerId: actor.id as string,
+                    targetId: target.id as string,
                     type
                 }
             case 'Token':
                 return {
                     // @ts-ignore
                     sceneId: actor.token.parent.id,
-                    ownerId: actor.token.id,
-                    targetId: target.id,
+                    ownerId: actor.token?.id as string,
+                    targetId: target.id as string,
                     type
                 }
         }
+
+        return;
     }
 
     static documentByNetworkDeviceLink(link: NetworkDeviceLink): SR5Actor|SR5Item|undefined {
+        if (!game.actors || !game.scenes) return;
+
         switch (link.type) {
             case 'Actor': {
-                const actor = game.actors.get(link.ownerId);
+                const actor = game.actors.get(link.ownerId as string);
                 if (!actor) return;
                 return actor.items.get(link.targetId) as SR5Item;
             }
 
             case 'Token': {
-                const scene = game.scenes.get(link.sceneId);
+                const scene = game.scenes.get(link.sceneId as string);
                 if (!scene) return;
                  // @ts-ignore // TODO: foundry-vtt-types 0.8
                 const token = scene.tokens.get(link.ownerId);
+                if (!token || !token.actor) return;
                 return token.actor.items.get(link.targetId) as SR5Item;
             }
         }
@@ -110,7 +116,7 @@ export class DeviceFlow {
         if (!controller.isHost() && !controller.isDevice()) return -1;
 
         const controllerData = controller.asControllerData();
-
+        if (!controllerData) return -1;
          return controllerData.data.networkDevices.findIndex(connectedLink =>
              connectedLink.type === needleLink.type &&
              connectedLink.ownerId === needleLink.ownerId &&

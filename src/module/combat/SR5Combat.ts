@@ -1,9 +1,9 @@
 import {SR5Actor} from "../actor/SR5Actor";
 import {FLAGS, SR, SYSTEM_NAME, SYSTEM_SOCKET} from "../constants";
 import {CombatRules} from "../rules/CombatRules";
-import Combatant = Combat.Combatant;
 import {SocketMessage} from "../sockets";
 import SocketMessageData = Shadowrun.SocketMessageData;
+import {InitiativeOptions} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/foundry.js/clientDocuments/combat";
 
 /**
  * Foundry combat implementation for Shadowrun5 rules.
@@ -30,7 +30,7 @@ export class SR5Combat extends Combat {
     getActorCombatant(actor: SR5Actor): undefined | any {
         const token = actor.getToken();
         if (!token) return;
-        return this.getCombatantByToken(token.id);
+        return this.getCombatantByToken(token.id as string);
     }
 
     /**
@@ -242,7 +242,7 @@ export class SR5Combat extends Combat {
      *
      * * @Override
      */
-    async nextTurn(): Promise<void> {
+    async nextTurn(): Promise<this | undefined> {
         // Maybe advance to the next round/init pass
         let nextRound = this.round;
         let initiativePass = this.initiativePass;
@@ -270,7 +270,7 @@ export class SR5Combat extends Combat {
         }
 
         if (game.user?.isGM && this.doIniPass(nextTurn)) {
-            await SR5Combat.handleIniPass(this.id)
+            await SR5Combat.handleIniPass(this.id as string)
             return;
         }
 
@@ -298,7 +298,7 @@ export class SR5Combat extends Combat {
         return this;
     }
 
-    async nextRound(): Promise<void> {
+    async nextRound(): Promise<any> {
         // Let Foundry handle time and some other things.
         await super.nextRound();
 
@@ -306,25 +306,26 @@ export class SR5Combat extends Combat {
         if (!game.user?.isGM) {
             await this._createDoNextRoundSocketMessage();
         } else {
-            await SR5Combat.handleNextRound(this.id);
+            await SR5Combat.handleNextRound(this.id as string);
         }
     }
 
     /**
      * use default behaviour but ALWAYS start at the top!
      */
-    async rollAll(): Promise<SR5Combat> {
+    // @ts-ignore
+    async rollAll(options?): Promise<SR5Combat> {
         const combat = await super.rollAll() as unknown as SR5Combat;
         if (combat.turn !== 0)
             await combat.update({turn: 0});
         return combat;
     }
 
-
     /**
      * Shadowrun starts at the top, except for subsequent initiative passes, then it depends on the new values.
      */
-    async rollInitiative(ids, options): Promise<SR5Combat> {
+    // @ts-ignore
+    async rollInitiative(ids, options?): Promise<SR5Combat> {
         const combat = await super.rollInitiative(ids, options) as SR5Combat;
 
         if (this.initiativePass === SR.combat.INITIAL_INI_PASS)

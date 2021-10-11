@@ -92,6 +92,7 @@ ___________________
         Combatant.prototype._getInitiativeFormula = _combatantGetInitiativeFormula;
 
         // Add Shadowrun configuration onto general Foundry config for module access.
+        // @ts-ignore // TODO foundry-vtt-types v8
         CONFIG.SR5 = SR5;
 
 
@@ -214,7 +215,7 @@ ___________________
      * @param id
      */
     static async updateIcConnectedToHostItem(item: SR5Item, data: ShadowrunItemDataData, id: string) {
-        if (!canvas.ready) return;
+        if (!canvas.ready || !game.actors) return;
 
         if (item.isHost()) {
             // Collect actors from sidebar and active scene to update / rerender
@@ -228,7 +229,9 @@ ___________________
 
             // Update host data on the ic actor.
             const hostData = item.asHostData();
+            if (!hostData) return;
             for (const ic of connectedIC) {
+                if (!ic) continue;
                 await ic._updateICHostData(hostData);
             }
         }
@@ -240,6 +243,7 @@ ___________________
      * You can use the SocketMessage
      */
     static registerSocketListeners() {
+        if (!game.socket || !game.user) return;
         console.log('Registering Shadowrun5e system sockets...');
         const hooks: SocketMessageHooks = {
             [FLAGS.addNetworkController]: [DeviceFlow.handleAddNetworkControllerSocketMessage],
@@ -253,8 +257,8 @@ ___________________
             const handlers = hooks[message.type];
             if (!handlers || handlers.length === 0) return console.warn('System socket message without handler!', message);
             // In case of targeted socket message only execute with target user (intended for GM usage)
-            if (message.userId && game.user.id !== message.userId) return;
-            if (message.userId && game.user.id) console.log('GM is handling Shadowrun5e system socket message');
+            if (message.userId && game.user?.id !== message.userId) return;
+            if (message.userId && game.user?.id) console.log('GM is handling Shadowrun5e system socket message');
 
             for (const handler of handlers) {
                 console.log('Handover Shadowrun5e system socket message to handler', handler);

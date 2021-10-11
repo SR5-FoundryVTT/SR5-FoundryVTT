@@ -1,4 +1,5 @@
 import {FLAGS, SYSTEM_NAME} from "../constants";
+import TrackType = Shadowrun.TrackType;
 
 export class SR5Token extends Token {
     override _drawBar(number: number, bar: PIXI.Graphics, data: ReturnType<Token['getBarAttribute']>){
@@ -8,8 +9,9 @@ export class SR5Token extends Token {
         // Shadowrun condition trackers count up from 0 to the maximum.
         // We flip the values from Shadowrun format to FoundryVTT format here
         // for drawing.
-        if (tokenHealthBars && data.attribute.startsWith('track')) {
-            data.value = data.max - data.value;
+        if (tokenHealthBars && data && data.attribute.startsWith('track')) {
+            const track = data as unknown as TrackType;
+            track.value = track.max - track.value;
         }
         super._drawBar(number, bar, data);
     }

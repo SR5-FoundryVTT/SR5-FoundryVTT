@@ -4,12 +4,12 @@ import {SR5} from "../config";
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
 import {SR5Actor} from "../actor/SR5Actor";
 import {DeviceFlow} from "./flows/DeviceFlow";
+import {ItemData} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs";
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
  */
-// TODO: Check foundry-vtt-types systems for how to do typing...
-export class SR5ItemSheet extends ItemSheet<any, any> {
+export class SR5ItemSheet extends ItemSheet {
     private _shownDesc: any[] = [];
     private _scroll: string;
 
@@ -46,15 +46,12 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         let data = super.getData();
         // Foundry 0.8 will return data as an sheet data while Foundry 0.7 will return data as an item data.
         // Therefore data is nested one deeper. The alternative would be to rework all references with one more data...
+        // @ts-ignore // TODO: foundry-vtt-types confusion
         data.type = data.data.type;
+        // @ts-ignore // TODO: foundry-vtt-types confusion
         data.data = data.data.data;
+        // @ts-ignore // TODO: foundry-vtt-types confusion
         const itemData = data.data;
-        // data = {
-        //     ...data,
-        //     // @ts-ignore
-        //     data: data.data.data
-        // }
-
 
         if (itemData.action) {
             try {
@@ -87,7 +84,7 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         data['config'] = SR5;
         const items = this.getEmbeddedItems();
         const [ammunition, weaponMods, armorMods] = items.reduce(
-            (parts: [Item.Data[], Item.Data[], Item.Data[]], item: SR5Item) => {
+            (parts: [ItemData[], ItemData[], ItemData[]], item: SR5Item) => {
                 if (item.type === 'ammo') parts[0].push(item.data);
                 if (item.type === 'modification' && "type" in item.data.data && item.data.data.type === 'weapon') parts[1].push(item.data);
                 if (item.type === 'modification' && "type" in item.data.data && item.data.data.type === 'armor') parts[2].push(item.data);
@@ -158,6 +155,7 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         const controllerData = this.item.asControllerData();
         if (!controllerData) return [];
 
+        // @ts-ignore
         return controllerData.data.networkDevices.map(deviceLink => DeviceFlow.documentByNetworkDeviceLink(deviceLink));
     }
 
@@ -235,6 +233,8 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
     }
 
     async _onDrop(event) {
+        if (!game.items || !game.actors || !game.scenes) return;
+
         event.preventDefault();
         event.stopPropagation();
 
@@ -286,6 +286,7 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
             if (data.actorId && !data.sceneId && !data.tokenId) {
                 console.log('Shadowrun5e | Adding linked actors item to the network', data);
                 const actor = game.actors.get(data.actorId);
+                if (!actor) return;
                 const item = actor.items.get(data.data._id) as SR5Item;
 
                 await this.item.addNetworkDevice(item);
@@ -294,8 +295,10 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
             else if (data.actorId && data.sceneId && data.tokenId) {
                 console.log('Shadowrun5e | Adding unlinked token actors item to the network', data);
                 const scene = game.scenes.get(data.sceneId);
+                if (!scene) return;
                 // @ts-ignore // TODO: foundry-vtt-types 0.8
                 const token = scene.tokens.get(data.tokenId);
+                if (!token || !token.actor) return;
                 const item = token.actor.items.get(data.data._id) as SR5Item;
 
                 await this.item.addNetworkDevice(item);
@@ -322,7 +325,7 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
     async _onEditItem(event) {
         const item = this.item.getOwnedItem(this._eventId(event));
         if (item) {
-            item.sheet.render(true);
+            item.sheet?.render(true);
         }
     }
 
@@ -507,7 +510,9 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
-        const {scene, target, item} = Helpers.getMarkIdDocuments(markId);
+        const markedIdDocuments = Helpers.getMarkIdDocuments(markId);
+        if (!markedIdDocuments) return;
+        const {scene, target, item} = markedIdDocuments;
         if (!scene || !target) return; // item can be undefined.
 
         const marks = parseInt(event.currentTarget.value);
@@ -522,7 +527,9 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
-        const {scene, target, item} = Helpers.getMarkIdDocuments(markId);
+        const markedIdDocuments = Helpers.getMarkIdDocuments(markId);
+        if (!markedIdDocuments) return;
+        const {scene, target, item} = markedIdDocuments;
         if (!scene || !target) return; // item can be undefined.
 
         await this.object.setMarks(target, by, {scene, item});

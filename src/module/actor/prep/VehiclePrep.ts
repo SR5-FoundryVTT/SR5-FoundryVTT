@@ -144,7 +144,7 @@ export class VehiclePrep {
 
     static prepareArmor(data: VehicleActorData) {
         const { armor } = data;
-        armor.mod = PartsList.AddUniquePart(armor.mod, 'SR5.Temporary', armor['temp']);
+        armor.mod = PartsList.AddUniquePart<number>(armor.mod, 'SR5.Temporary', armor['temp'] as number);
         Helpers.calcTotal(armor);
     }
 }

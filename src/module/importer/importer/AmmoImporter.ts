@@ -15,13 +15,7 @@ export class AmmoImporter extends DataImporter {
     GetDefaultData(): AmmoItemData {
         return {
             name: '',
-            _id: '',
-            folder: '',
-            img: 'icons/svg/mystery-man.svg',
-            flags: {},
             type: 'ammo',
-            effects: [],
-            sort: 0,
             data: {
                 description: {
                     value: '',
@@ -37,10 +31,7 @@ export class AmmoImporter extends DataImporter {
                     radius: 0,
                     dropoff: 0,
                 },
-            },
-            permission: {
-                default: 2,
-            },
+            }
         };
     }
 
@@ -101,6 +92,7 @@ export class AmmoImporter extends DataImporter {
             // NOTE: Should either weapons or gear not have been imported with translation, this will fail.
             if (shouldLookForWeapons) {
                 let foundWeapon = ImportHelper.findItem((item) => {
+                    if (!item || !item.name) return false;
                     // Filter for weapon type due to possible double naming giving other item types.
                     return item.type === 'weapon' && item.name.toLowerCase() === nameLower;
                 });
@@ -129,7 +121,7 @@ export class AmmoImporter extends DataImporter {
             }
 
             let folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Ammo/${folderName}`, true);
-
+            // @ts-ignore TODO: Foundry Where is my foundry base data?
             ammo.folder = folder.id;
         }
 

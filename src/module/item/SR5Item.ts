@@ -1778,6 +1778,7 @@ export class SR5Item extends Item {
 
         const deviceLink = DeviceFlow.buildNetworkDeviceLink(target);
         const controllerLink = DeviceFlow.buildNetworkDeviceLink(controller);
+        if (!deviceLink || !controllerLink) return;
         if (!deviceLink.type || !controllerLink.type) return console.error('Abort adding network device due to internal data error');
 
         if (DeviceFlow.connectedNetworkDevice(controller, deviceLink)) return;
@@ -1819,6 +1820,7 @@ export class SR5Item extends Item {
         if (!marks) return [];
 
         // Deconstruct all mark ids into documents.
+        // @ts-ignore
         return Object.entries(marks)
             .filter(([markId, marks]) => Helpers.isValidMarkId(markId))
             .map(([markId, marks]) => ({

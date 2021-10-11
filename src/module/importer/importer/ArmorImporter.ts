@@ -16,13 +16,7 @@ export class ArmorImporter extends DataImporter {
     GetDefaultData(): ArmorItemData {
         return {
             name: 'Unnamed Armor',
-            _id: '',
-            folder: '',
-            img: 'icons/svg/mystery-man.svg',
-            flags: {},
             type: 'armor',
-            effects: [],
-            sort: 0,
             data: {
                 description: {
                     value: '',
@@ -40,9 +34,6 @@ export class ArmorImporter extends DataImporter {
                     radiation: 0,
                 },
             },
-            permission: {
-                default: 2,
-            },
         };
     }
 
@@ -56,7 +47,7 @@ export class ArmorImporter extends DataImporter {
         this.armorTranslations = ImportHelper.ExtractItemTranslation(jsonArmori18n, 'armors', 'armor');
     }
 
-    async Parse(jsonObject: object): Promise<Entity> {
+    async Parse(jsonObject: object): Promise<Item> {
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Armor', this.categoryTranslations);
 
         const parser = new ArmorParserBase();
@@ -72,6 +63,7 @@ export class ArmorImporter extends DataImporter {
             let data = parser.Parse(jsonData, this.GetDefaultData());
             const category = ImportHelper.StringValue(jsonData, 'category').toLowerCase();
             data.name = ImportHelper.MapNameToTranslation(this.armorTranslations, data.name);
+            // @ts-ignore TODO: Foundry Where is my foundry base data?
             data.folder = folders[category].id;
 
             datas.push(data);

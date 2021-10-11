@@ -1,6 +1,6 @@
 export interface FormDialogData {
     title?: string;
-	buttons: Record<string, DialogButton>;
+	buttons: Record<string, object>;
 	default?: string;
 	templateData: object;
 	templatePath: string;
@@ -103,7 +103,7 @@ export class FormDialog extends Dialog {
     }
 
     /** @override */
-    static getButtons(): Record<string, DialogButton> {
+    static getButtons(): Record<string, object> {
         return {};
     }
 

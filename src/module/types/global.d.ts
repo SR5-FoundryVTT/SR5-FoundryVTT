@@ -2,8 +2,6 @@ import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import ShadowrunActorData = Shadowrun.ShadowrunActorData;
 import {SR5Item} from "../item/SR5Item";
 import {SR5Actor} from "../actor/SR5Actor";
-import {ClientDocumentMixin} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/foundry.js/clientDocumentMixin";
-import {SR5ActorSheet} from "../actor/SR5ActorSheet";
 
 declare global {
     // Configuration of foundry-vtt-types
