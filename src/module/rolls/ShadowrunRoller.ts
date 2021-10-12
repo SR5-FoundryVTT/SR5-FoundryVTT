@@ -314,7 +314,6 @@ export class ShadowrunRoller {
         const roll = new ShadowrunRoll(formula, rollData);
 
         // Return roll reference instead roll() return to avoid typing issues.
-        // @ts-ignore // TODO: foundry-vtt-types 0.8.2 is missing Roll.evaluate parameter typing.
         roll.evaluate({async: false});
 
         return roll;

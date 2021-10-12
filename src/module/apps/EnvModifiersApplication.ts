@@ -178,7 +178,6 @@ export class EnvModifiersApplication extends Application {
             event.preventDefault();
 
             if (!token || !token.actor) return;
-            // @ts-ignore // TODO: TYPE: Remove this...
             await new EnvModifiersApplication(token.actor).render(true);
         }
     }

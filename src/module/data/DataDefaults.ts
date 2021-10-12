@@ -18,9 +18,7 @@ import DeviceData = Shadowrun.DeviceData;
 import EquipmentItemData = Shadowrun.EquipmentItemData;
 import DeviceItemData = Shadowrun.DeviceItemData;
 
-/**
- * TODO: Add unittesting to DefaultValues helper.
- */
+
 export class DefaultValues {
     /**
      *

@@ -78,7 +78,6 @@ function getGame(): Game {
  * </code></pre>
  *
  */
-// TODO: v9
 export class SR5Actor extends Actor {
     getOverwatchScore() {
         const os = this.getFlag(SYSTEM_NAME, 'overwatchScore');
@@ -189,7 +188,7 @@ export class SR5Actor extends Actor {
     }
 
     /**
-     * TODO: This method is unused at the moment, might be unneeded.
+     * NOTE: This method is unused at the moment, keep it for future inspiration.
      */
     applyOverrideActiveEffects() {
         const changes = this.effects.reduce((changes: EffectChangeData[], effect) => {
@@ -199,7 +198,7 @@ export class SR5Actor extends Actor {
             return changes.concat(effect.data.changes
                     .filter(change => change.mode === CONST.ACTIVE_EFFECT_MODES.OVERRIDE)
                     .map(change => {
-                        // @ts-ignore // TODO: foundry-vtt-types 0.8
+                        // @ts-ignore // Foundry internal code, duplicate doesn't like EffectChangeData
                         change = foundry.utils.duplicate(change);
                         // @ts-ignore
                         change.effect = effect;
@@ -209,7 +208,7 @@ export class SR5Actor extends Actor {
                     }));
         }, []);
         // Sort changes according to priority, in case it's ever needed.
-        // @ts-ignore // TODO: v9
+        // @ts-ignore // a / b can't be null here...
         changes.sort((a, b) => a.priority - b.priority);
 
         for (const change of changes) {
@@ -241,7 +240,6 @@ export class SR5Actor extends Actor {
             if (result !== null) overrides[change.key] = result;
         }
 
-        // @ts-ignore // TODO: foundry-vtt-types 0.8
         this.overrides = {...this.overrides, ...foundry.utils.expandObject(overrides)};
     }
 
@@ -258,7 +256,7 @@ export class SR5Actor extends Actor {
             return changes.concat(effect.data.changes
                     .filter(change => partialKeys.some(partialKey => change.key.includes(partialKey)))
                     .map(change => {
-                        // @ts-ignore // TODO: foundry-vtt-types 0.8
+                        // @ts-ignore // Foundry internal code, duplicate doesn't like EffectChangeData
                         change = foundry.utils.duplicate(change);
                         // @ts-ignore
                         change.effect = effect;
@@ -376,7 +374,6 @@ export class SR5Actor extends Actor {
     }
 
     getEquippedWeapons(): SR5Item[] {
-        // @ts-ignore // TODO: How to define SR5Actor.items as SR5Item[]?
         return this.items.filter((item: SR5Item) => item.isEquipped() && item.isWeapon());
     }
 
@@ -704,7 +701,6 @@ export class SR5Actor extends Actor {
             await this.hideSkill(skillId);
             // NOTE: For some reason unlinked token actors won't cause a render on update?
             if (!this.data.token.actorLink)
-                // TODO: v9
                 await this.sheet?.render();
             return;
         }
@@ -765,7 +761,6 @@ export class SR5Actor extends Actor {
         await this.update(updateData);
         // NOTE: For some reason unlinked token actors won't cause a render on update?
         if (!this.data.token.actorLink)
-                // TODO: v9
                 await this.sheet?.render();
     }
 
@@ -1435,8 +1430,7 @@ export class SR5Actor extends Actor {
                 const tokens = Helpers.getControlledTokens();
                 if (tokens.length > 0) {
                     for (let token of tokens) {
-                        // @ts-ignore // TODO: foundry-vtt-types not yet on 0.8
-                        if (token.actor.isOwner) {
+                        if (token.actor && token.actor.isOwner) {
                             actor = token.actor as SR5Actor;
                             break;
                         }
@@ -1483,8 +1477,7 @@ export class SR5Actor extends Actor {
                     const tokens = Helpers.getControlledTokens();
                     if (tokens.length > 0) {
                         for (let token of tokens) {
-                            // @ts-ignore // TODO: foundry-vtt-types not yet on 0.8
-                            if (token.actor.isOwner) {
+                            if (token.actor && token.actor.isOwner) {
                                 actor = token.actor as SR5Actor;
                                 break;
                             }
@@ -1534,16 +1527,14 @@ export class SR5Actor extends Actor {
 
     /** Return either the linked token or the token of the synthetic actor.
      *
-     * TODO: Correctly type this method to return TokenDocument
      * @retrun Will return null should no token have been placed on scene.
      */
     getToken(): TokenDocument|null {
         // Linked actors can only have one token, which isn't stored within actor data...
         if (this._isLinkedToToken() && this.hasToken()) {
             const linked = true;
-            const tokens = this.getActiveTokens(linked);
+            const tokens = this.getActiveTokens(linked) as unknown as Token[];
             // This assumes for a token to exist and should fail if not.
-            // @ts-ignore // foundry-vtt-types 0.8 support
             return tokens[0].document;
         }
 
@@ -1570,12 +1561,9 @@ export class SR5Actor extends Actor {
     }
 
     getActivePlayer(): User|null {
-        //@ts-ignore
-        if (!this.hasPlayerOwner) {
-            return null;
-        }
+        if (!game.users) return null;
+        if (!this.hasPlayerOwner) return null;
 
-        // @ts-ignore // TODO: foundry-vtt-types Does not support DocumentCollection yet.
         for (const user of game.users.contents) {
             if (!user.active || user.isGM) {
                 continue;
@@ -1913,7 +1901,7 @@ export class SR5Actor extends Actor {
 
     async _updateICHostData(hostData: HostItemData) {
         const updateData = {
-            // @ts-ignore // TODO: v9 FoundryFields
+            // @ts-ignore _id is missing on internal typing...
             id: hostData._id,
             rating: hostData.data.rating,
             atts: duplicate(hostData.data.atts)
@@ -2023,8 +2011,7 @@ export class SR5Actor extends Actor {
             ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedBy'));
             return console.error(`The actor type ${this.data.type} can't receive matrix marks!`);
         }
-        // @ts-ignore // TODO: foundry-vtt-types 0.8
-        if (!target.actor.isMatrixActor) {
+        if (target.actor && !target.actor.isMatrixActor) {
             ui.notifications?.error(game.i18n.localize('SR5.Errors.MarksCantBePlacedOn'));
             // @ts-ignore
             return console.error(`The actor type ${target.actor.type} can't receive matrix marks!`);
@@ -2105,13 +2092,11 @@ export class SR5Actor extends Actor {
             console.error('Not yet supported');
             return 0;
         }
-        // @ts-ignore // TODO: foundry-vtt-types 0.8
-        if (!target?.actor.isMatrixActor) return 0;
+        if (!target.actor || !target.actor.isMatrixActor) return 0;
 
 
         const scene = options?.scene || canvas.scene as Scene;
         // If an actor has been targeted, they might have a device. If an item / host has been targeted they don't.
-        // @ts-ignore // TODO: foundry-vtt-types 0.8
         item = item || target instanceof SR5Actor ? target.actor.getMatrixDevice() : undefined;
 
         const markId = Helpers.buildMarkId(scene.id as string, target.id, item?.id as string);

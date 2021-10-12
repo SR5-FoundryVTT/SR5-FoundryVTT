@@ -23,7 +23,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     public get source(): Promise<Document> {
-        // @ts-ignore // TODO: foundry-vtt-types 0.8
+        // @ts-ignore
         return fromUuid(this.data.origin);
     }
 
@@ -59,7 +59,6 @@ export class SR5ActiveEffect extends ActiveEffect {
     protected _applyModify(actor: SR5Actor, change: EffectChangeData) {
         // Check direct key.
         if (this._isKeyModifiableValue(actor, change.key)) {
-            // @ts-ignore // TODO: foundry-vtt-types 0.8
             const value = foundry.utils.getProperty(actor.data, change.key) as ModifiableValue;
             value.mod.push({name: this.data.label, value: Number(change.value)});
 
@@ -73,7 +72,6 @@ export class SR5ActiveEffect extends ActiveEffect {
 
         // Don't apply any changes if it's also not a indirect match.
         if (this._isKeyModifiableValue(actor, indirectKey)) {
-            // @ts-ignore // TODO: foundry-vtt-types 0.8
             const value = foundry.utils.getProperty(actor.data, indirectKey) as ModifiableValue;
             value.mod.push({name: this.data.label, value: Number(change.value)});
 
@@ -95,7 +93,6 @@ export class SR5ActiveEffect extends ActiveEffect {
     protected _applyOverride(actor: SR5Actor, change: EffectChangeData) {
         // Check direct key.
         if (this._isKeyModifiableValue(actor, change.key)) {
-            // @ts-ignore // TODO: foundry-vtt-types 0.8
             const value = foundry.utils.getProperty(actor.data, change.key);
             value.override = {name: this.data.label, value: Number(change.value)};
             value.value = change.value;
@@ -108,9 +105,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         nodes.pop();
         const indirectKey = nodes.join('.');
 
-        // @ts-ignore // TODO: foundry-vtt-types 0.8
         if (this._isKeyModifiableValue(actor, indirectKey)) {
-            // @ts-ignore // TODO: foundry-vtt-types 0.8
             const value = foundry.utils.getProperty(actor.data, indirectKey);
             value.override = {name: this.data.label, value: Number(change.value)};
 
@@ -122,9 +117,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     _isKeyModifiableValue(actor: SR5Actor, key: string): boolean {
-        // @ts-ignore // TODO: foundry-vtt-types 0.8
         const possibleValue = foundry.utils.getProperty(actor.data, key);
-        // @ts-ignore // TODO: foundry-vtt-types 0.8
         const possibleValueType = foundry.utils.getType(possibleValue);
 
         return possibleValue && possibleValueType === 'Object' && Helpers.objectHasKeys(possibleValue, this.minValueKeys);

@@ -23,7 +23,6 @@ export class SR5BaseActorSheet extends ActorSheet {
      * @returns {Object}
      */
     static get defaultOptions() {
-        //@ts-ignore // TODO: foundry-vtt-types GENERAL no idea what's the issue here.
         return mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'actor'],
             width: 905,
@@ -78,7 +77,6 @@ export class SR5BaseActorSheet extends ActorSheet {
         this._prepareItems(data);
         this._prepareActorTypeFields(data);
 
-        // @ts-ignore // TODO: foundry-vtt-types 0.8 missing document support
         data['effects'] = prepareActiveEffectCategories(this.document.effects);
 
         return data;
@@ -88,7 +86,6 @@ export class SR5BaseActorSheet extends ActorSheet {
         super.activateListeners(html);
 
         // Active Effect management
-        // @ts-ignore // foundry-vtt-types 0.8 document support missing.
         html.find(".effect-control").on('click',event => onManageActiveEffect(event, this.document));
 
         // General item CRUD management...
@@ -502,7 +499,6 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
 
     /**
-     * TODO: This doesn't adhere to actor type separation. Maybe doesn't matter for ease of use.
      * @param data An object containing Actor Sheet data, as would be returned by ActorSheet.getData
      */
     _prepareActorTypeFields(data) {

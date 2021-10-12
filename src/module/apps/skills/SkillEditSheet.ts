@@ -2,7 +2,6 @@ import SkillEditFormData = Shadowrun.SkillEditFormData;
 import {SR5Actor} from "../../actor/SR5Actor";
 import {SR5} from "../../config";
 
-// @ts-ignore // TODO: foundry-vtt-types 0.8.2 doesn't know about DocumentSheet.
 export class SkillEditSheet extends DocumentSheet {
     skillId: string;
 
@@ -98,7 +97,7 @@ export class SkillEditSheet extends DocumentSheet {
 
 
     /** @override */
-    // @ts-ignore TODO: v9
+    // @ts-ignore // SkillEditSheet vs DocumentSheet typing, I don't quite get it...
     async _updateObject(event, formData) {
         // Without an actual input field used, avoid a unneeded update...
         // ...the update would happen due to how _onUpdateObject works.
@@ -182,7 +181,7 @@ export class SkillEditSheet extends DocumentSheet {
         return !!((!skill?.name && !skill?.label) || (skill?.name && !skill?.label));
     }
 
-    // @ts-ignore // TODO: v9
+    // @ts-ignore // Missing DocumentSheetData typing
     getData(): SkillEditFormData {
         const data = super.getData();
         // @ts-ignore

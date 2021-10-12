@@ -214,7 +214,6 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     }
 
     getArmorElements(): { [key: string]: number } {
-        // TODO clean this up
         const { fire, electricity, cold, acid } = this.getData().armor || {};
         return { fire: fire ?? 0, electricity: electricity ?? 0, cold: cold ?? 0, acid: acid ?? 0 };
     }

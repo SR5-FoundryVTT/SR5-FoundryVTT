@@ -92,7 +92,7 @@ export class ComplexFormImporter extends DataImporter {
             datas.push(data);
         }
 
-        // @ts-ignore // TODO: TYPE: Remove this.
-        return await Item.create(datas);
+        // @ts-ignore
+        return await Item.create(datas) as Item;
     }
 }

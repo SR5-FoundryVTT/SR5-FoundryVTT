@@ -88,7 +88,6 @@ declare namespace Shadowrun {
         edge?: boolean;
     };
 
-    // TODO: v9
     export type SkillEditFormData = {
         data?: SkillField
         editable_name?: boolean

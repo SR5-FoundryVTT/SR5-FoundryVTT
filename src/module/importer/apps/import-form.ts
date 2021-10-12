@@ -39,7 +39,6 @@ export class Import extends Application {
     }
 
     getData(options?: any) {
-        // @ts-ignore // TODO: TYPE: Remove this.
         const data = super.getData(options) as any;
 
         data.dataFiles = {};

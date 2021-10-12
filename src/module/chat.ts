@@ -49,9 +49,7 @@ export interface RollChatMessageOptions {
 
     description?: object
 
-
-    // @ts-ignore // TODO: TYPE: Remove this...
-    rollMode?: keyof typeof CONFIG.dice.rollModes
+    rollMode?: keyof typeof CONFIG.Dice.rollModes
     previewTemplate?: boolean
 
     attack?: AttackData
@@ -77,8 +75,7 @@ interface ItemChatTemplateData {
 interface RollChatTemplateData extends RollChatMessageOptions {
     tokenId?: string
     targetTokenId?: string
-    // @ts-ignore // TODO: TYPE: Remove this...
-    rollMode: keyof typeof CONFIG.dice.rollModes
+    rollMode: keyof typeof CONFIG.Dice.rollModes
 }
 
 /**
@@ -237,7 +234,6 @@ function getRollChatTemplateData(options: RollChatMessageOptions): RollChatTempl
     const rollMode = options.rollMode ?? game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
     const tokenId = getTokenSceneId(token);
 
-    // @ts-ignore // foundry-vtt-types 0.8 support
     const targetTokenId = getTokenSceneId(options.target?.document);
 
     return {
@@ -261,9 +257,9 @@ function getRollChatTemplateData(options: RollChatMessageOptions): RollChatTempl
  * @return '<SceneId>.<TokenId>'
  */
 function getTokenSceneId(token: TokenDocument | undefined | null): string | undefined {
-    if (!token) return;
-    const scene = token.parent;
-    // @ts-ignore // TODO: foundry-vtt-types 0.8 support not yet there.
+    const scene = token?.parent;
+
+    if (!token || !scene) return;
     return `${scene.id}.${token.id}`;
 }
 
@@ -474,9 +470,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
             const sceneTokenId = html.find('.chat-card').data('tokenId');
             const actor = Helpers.getSceneTokenActor(sceneTokenId);
 
-            if (actor === undefined) {
-                return console.error('No actor could be extracted from message data.');
-            }
+            if (!actor) return console.error('No actor could be extracted from message data.');
 
             // Allow custom selection for GMs and users with enough permissions.
             // token.actor can be undefined for tokens with removed actors.
@@ -492,7 +486,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
 
                 targetSceneIds.forEach(targetSceneId => {
                     const [sceneId, tokenId] = Helpers.deconstructSceneTokenId(targetSceneId);
-                    // @ts-ignore // TODO: v9
+                    // @ts-ignore // TODO: Token vs TokenDocument... the workflow here is confusing.
                     targets.push(Helpers.getSceneTokenDocument(sceneId, tokenId));
                 })
             }

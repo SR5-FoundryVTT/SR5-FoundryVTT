@@ -29,7 +29,6 @@ import {SR5ActiveEffectSheet} from "./effect/SR5ActiveEffectSheet";
 import {NetworkDeviceFlow} from "./item/flows/NetworkDeviceFlow";
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
-// TODO: Figure out how to change global CONFIG type
 export const SR5CONFIG = SR5;
 
 export class HooksManager {
@@ -75,16 +74,12 @@ ___________________
             rollSkillMacro
         };
 
-        // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
         CONFIG.Actor.documentClass = SR5Actor;
-        // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
         CONFIG.Item.documentClass = SR5Item;
-        // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
+        // @ts-ignore // TODO: Compare Combat/SR5Combat typing.
         CONFIG.Combat.documentClass = SR5Combat;
-        // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
         CONFIG.ActiveEffect.documentClass = SR5ActiveEffect;
         CONFIG.ActiveEffect.sheetClass = SR5ActiveEffectSheet;
-        // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
         CONFIG.Token.objectClass = SR5Token;
         // Register initiative directly (outside of system.json) as DnD5e does it.
         CONFIG.Combat.initiative.formula =  "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
@@ -92,7 +87,7 @@ ___________________
         Combatant.prototype._getInitiativeFormula = _combatantGetInitiativeFormula;
 
         // Add Shadowrun configuration onto general Foundry config for module access.
-        // @ts-ignore // TODO foundry-vtt-types v8
+        // @ts-ignore // TODO: Add declaration merging
         CONFIG.SR5 = SR5;
 
 
@@ -147,7 +142,7 @@ ___________________
 
     static canvasInit() {
         if (!canvas?.ready) return;
-        // @ts-ignore // TODO: foundry-vtt-types 0.8 diagonaleRule doesn't exist on  anymore... does this even work anymore?
+        // @ts-ignore // TODO: canvas.grid.diagonaleRule doesn't exist on  anymore... does this even work anymore?
         canvas.grid.diagonalRule = game.settings.get(SYSTEM_NAME, 'diagonalMovement');
         //@ts-ignore // TODO: TYPE SquareGrid isn't typed.
         SquareGrid.prototype.measureDistances = measureDistance;
@@ -223,7 +218,7 @@ ___________________
                 // All sidebar actors should also include tokens with linked actors.
                 ...game.actors.filter((actor: SR5Actor) => actor.isIC() && actor.hasHost()) as SR5Actor[],
                 // All token actors that aren't linked.
-                // @ts-ignore // TODO: foundry-vtt-types 0.9
+                // @ts-ignore
                 ...canvas.scene.tokens.filter(token => !token.data.actorLink && token.actor?.isIC() && token.actor?.hasHost()).map(t => t.actor)
             ];
 

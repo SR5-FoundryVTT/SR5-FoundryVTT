@@ -293,11 +293,10 @@ export class Helpers {
      * Use this helper to get a tokens actor from any given scene id.
      * @param sceneTokenId A mixed id with the format '<sceneId>.<tokenid>
      */
-    static getSceneTokenActor(sceneTokenId: string): SR5Actor | undefined {
+    static getSceneTokenActor(sceneTokenId: string): SR5Actor | null {
         const [sceneId, tokenId] = Helpers.deconstructSceneTokenId(sceneTokenId);
         const token = Helpers.getSceneTokenDocument(sceneId, tokenId);
-        if (!token) return;
-        // @ts-ignore // TODO: foundry-vtt-types 0.8 TokenDocument
+        if (!token) return null;
         return token.getActor();
     }
 
@@ -647,13 +646,12 @@ export class Helpers {
      * @param permission A foundry access permission
      * @param active If true, will only return users that are also currently active.
      */
-    static getPlayersWithPermission(document: Document, permission: string, active: boolean = true): User[] {
+    static getPlayersWithPermission(document: foundry.abstract.Document<any>, permission: string, active: boolean = true): User[] {
         if (!game.users) return [];
 
         return game.users.filter(user => {
             if (user.isGM) return false;
-            // Check for permissions.
-            // @ts-ignore // TODO: foundry-vtt-types 0.8 missing testUserPermission for Documents (it's not DocumentClientMixin)
+            // @ts-ignore // Check for permissions. String is allowed
             if (!document.testUserPermission(user, permission)) return false;
             // Check for active state.
             if (active && !user.active) return false;
@@ -741,7 +739,6 @@ export class Helpers {
         const scene = game.scenes.get(sceneId);
         if (!scene) return false;
 
-        // @ts-ignore // foundry-vtt-types 0.8
         const tokenDocument = scene.tokens.get(targetId);
         if (!tokenDocument) return false;
 
@@ -781,13 +778,12 @@ export class Helpers {
     }
 
     static getMarkIdDocuments(markId: string): TargetedDocument|undefined {
-        if (!game.scenes) return;
+        if (!game.scenes || !game.items) return;
 
         const [sceneId, targetId, itemId] = Helpers.deconstructMarkId(markId);
 
         const scene = game.scenes.get(sceneId);
         if (!scene) return;
-        // @ts-ignore // TODO: foundry-vtt-types 0.8
         const target = scene.tokens.get(targetId) || game.items.get(targetId) as SR5Item;
         const item = target?.actor?.items?.get(itemId) as SR5Item; // DocumentCollection will return undefined if needed
 

@@ -94,7 +94,6 @@ export class SR5Item extends Item {
      *
      * If you need the actual actor owner, no matter how deep into item embedding, this current item is use SR5item.actorOwner
      */
-    // @ts-ignore // TODO: TYPE: Check foundry-vtt-types systems for how Items and Actors type.
     get actor(): SR5Actor {
         return super.actor as unknown as SR5Actor;
     }
@@ -152,7 +151,6 @@ export class SR5Item extends Item {
 
     /**
      * Return an Array of the Embedded Item Data
-     * TODO properly type this
      */
     getEmbeddedItems(): any[] {
         let items = this.getFlag(SYSTEM_NAME, FLAGS.EmbeddedItems);
@@ -1073,7 +1071,6 @@ export class SR5Item extends Item {
             // @ts-ignore
             ui.notifications?.error(game.i18n.localize('SR5.SourceFieldEmptyError'));
         }
-        // TODO open PDF to correct location
         // parse however you need, all "buttons" will lead to this function
         const [code, page] = source.split(' ');
 
@@ -1617,7 +1614,6 @@ export class SR5Item extends Item {
     }
 
     get _isEmbeddedItem(): boolean {
-        // @ts-ignore // TODO: foundry-vtt-types 0.8 Document hasn't be implemented yet
         return this.hasOwnProperty('parent') && this.parent instanceof SR5Item;
     }
 

@@ -85,11 +85,10 @@ export class SR5ActorSheet extends ActorSheet {
             this._prepareVehicleFields(data);
 
             // Active Effects data.
-            // @ts-ignore // TODO: foundry-vtt-types 0.8 missing document support
             data['effects'] = prepareActiveEffectCategories(this.document.effects);
             data['markedDocuments'] = this.object.getAllMarkedDocuments();
 
-            // @ts-ignore // TODO: v9
+            // @ts-ignore // TODO: ActorSheetData typing is missing
             return data;
     }
 
@@ -431,7 +430,6 @@ export class SR5ActorSheet extends ActorSheet {
         });
 
         // Active Effect management
-        // @ts-ignore // TODO: foundry-vtt-types 0.8
         html.find(".effect-control").click(event => onManageActiveEffect(event, this.document));
 
         html.find('.skill-header').find('.item-name').click(this._onFilterUntrainedSkills.bind(this));
@@ -858,7 +856,6 @@ export class SR5ActorSheet extends ActorSheet {
             name: `New ${type}`,
             type: type,
         };
-        // @ts-ignore // TODO: foundry-vtt-types has no Document Support yet.
         return this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
     }
 
@@ -977,7 +974,6 @@ export class SR5ActorSheet extends ActorSheet {
             //     effect.disable(item.isEquipped());
             // })
 
-            // @ts-ignore // TODO: foundry-vtt-types 0.8 has no Document support yet
             await this.actor.updateEmbeddedDocuments('Item', newItems);
 
             this.actor.render(false);

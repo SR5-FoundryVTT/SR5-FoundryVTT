@@ -120,7 +120,7 @@ export abstract class VersionMigration {
      * @param entityUpdates
      */
     protected async IterateScenes(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
-        // @ts-ignore // TODO: foundry-vtt-types 0.8 Does not support DocumentCollection yet.
+        // @ts-ignore // ignore null state
         for (const scene of game.scenes.contents) {
             try {
                 if (!(await this.ShouldMigrateSceneData(scene))) {
@@ -186,7 +186,7 @@ export abstract class VersionMigration {
      * @param entityUpdates The current map of document updates.
      */
     protected async IterateItems(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
-        //@ts-ignore // TODO: foundry-vtt-types 0.8 Doesn't support Documents yet
+        // @ts-ignore // ignore null state
         for (const item of game.items.contents) {
             try {
                 if (!(await this.ShouldMigrateItemData(item.data))) {
@@ -218,7 +218,7 @@ export abstract class VersionMigration {
      * @param entityUpdates The current map of document updates.
      */
     protected async IterateActors(game: Game, entityUpdates: Map<SystemMigrationDocuments, DocumentUpdate>) {
-        // @ts-ignore // TODO: foundry-vtt-types 0.8 Doesn't support Documents yet
+        // @ts-ignore // ignore null state
         for (const actor of game.actors.contents) {
             try {
                 if (!(await this.ShouldMigrateActorData(actor.data))) {

@@ -125,7 +125,7 @@ export class AmmoImporter extends DataImporter {
             ammo.folder = folder.id;
         }
 
-        //@ts-ignore // TODO: TYPING unclear.
-        return await Item.create(ammoDatas);
+        // @ts-ignore
+        return await Item.create(ammoDatas) as Item;
     }
 }

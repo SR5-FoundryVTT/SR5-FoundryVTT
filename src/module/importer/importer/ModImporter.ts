@@ -59,8 +59,8 @@ export class ModImporter extends DataImporter {
             let data = parser.Parse(jsonData, this.GetDefaultData());
             // TODO: Integrate into ModParserBase approach.
             data.name = ImportHelper.MapNameToTranslation(this.accessoryTranslations, data.name);
-            //TODO: Test this
 
+            //TODO: Test this
             let folderName = data.data.mount_point !== undefined ? data.data.mount_point : 'Other';
             if (folderName.includes('/')) {
                 let splitName = folderName.split('/');

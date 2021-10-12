@@ -99,7 +99,6 @@ export class SR5ItemSheet extends ItemSheet {
         data['limits'] = this._getSortedLimitsForSelect();
 
         // Active Effects data.
-        // @ts-ignore // TODO: foundry-vtt-types 0.8 missing document support
         data['effects'] = prepareActiveEffectCategories(this.document.effects);
 
         if (this.object.isHost()) {
@@ -176,7 +175,6 @@ export class SR5ItemSheet extends ItemSheet {
         this.form.ondrop = (event) => this._onDrop(event);
 
         // Active Effect management
-        // @ts-ignore // foundry-vtt-types 0.8 document support missing.
         html.find(".effect-control").click(event => onManageActiveEffect(event, this.document));
 
         /**
@@ -295,7 +293,6 @@ export class SR5ItemSheet extends ItemSheet {
                 console.log('Shadowrun5e | Adding unlinked token actors item to the network', data);
                 const scene = game.scenes.get(data.sceneId);
                 if (!scene) return;
-                // @ts-ignore // TODO: foundry-vtt-types 0.8
                 const token = scene.tokens.get(data.tokenId);
                 if (!token || !token.actor) return;
                 const item = token.actor.items.get(data.data._id) as SR5Item;
@@ -431,16 +428,6 @@ export class SR5ItemSheet extends ItemSheet {
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        // const tokenId = event.currentTarget.closest('.list-item').dataset.tokenId;
-        // const actorId = event.currentTarget.closest('.list-item').dataset.actorId;
-        // const itemId = event.currentTarget.closest('.list-item').dataset.itemId;
-        //
-        // // Get the item from the token actor OR the collection actor.
-        // // A collection actor will not have a token on it's token property.
-        // const item = tokenId ?
-        //     // @ts-ignore // TODO: foundry-vtt-types 0.8
-        //     canvas.scene.tokens.get(tokenId).actor.items.get(itemId) :
-        //     game.actors.get(actorId).items.get(itemId);
         const networkDeviceIndex = Helpers.parseInputToNumber(event.currentTarget.closest('.list-item').dataset.listItemIndex);
 
         await this.item.removeNetworkDevice(networkDeviceIndex);
@@ -462,7 +449,6 @@ export class SR5ItemSheet extends ItemSheet {
      */
     private fixStaleRenderedState() {
         if (this._state === Application.RENDER_STATES.RENDERED && ui.windows[this.appId] === undefined) {
-            // @ts-ignore // TODO: 0.8 foundry-vtt-types doesn't know of DocumentSheet.document yet.
             console.warn(`SR5ItemSheet app for ${this.document.name} is set as RENDERED but has no window registered. Fixing app internal render state. This is a known bug.`);
             // Hotfixing instead of this.close() since FormApplication.close() expects form elements, which don't exist anymore.
             this._state = Application.RENDER_STATES.CLOSED;

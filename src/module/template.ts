@@ -25,9 +25,6 @@ class Template extends MeasuredTemplate {
         templateData['dropoff'] = blast?.dropoff;
 
         // @ts-ignore
-        // TODO: Just trying stuff out.
-        // canvas.scene.createEmbeddedDocuments('MeasuredTemplate', [templateData]);
-
         const document = new MeasuredTemplateDocument(templateData, {parent: canvas.scene});
         // @ts-ignore
         const template = new Template(document);
@@ -89,12 +86,11 @@ class Template extends MeasuredTemplate {
 
             // Confirm final snapped position
             const destination = canvas.grid.getSnappedPosition(this.x, this.y, 2);
-            // @ts-ignore // foundry-vtt-types 0.8 DocumentData support
             this.data.update({x: destination.x, y: destination.y});
 
             // Create the template
-            // @ts-ignore // foundry-vtt-types 0.8 support
-            canvas.scene.createEmbeddedDocuments('MeasuredTemplate', [this.data]);
+            // @ts-ignore
+            canvas.scene?.createEmbeddedDocuments('MeasuredTemplate', [this.data]);
         };
 
         // Rotate the template by 3 degree increments (mouse-wheel)

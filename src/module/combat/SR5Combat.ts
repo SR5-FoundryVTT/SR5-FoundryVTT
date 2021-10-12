@@ -44,8 +44,7 @@ export class SR5Combat extends Combat {
                 name: game.i18n.localize('SR5.COMBAT.ReduceInitByOne'),
                 icon: '<i class="fas fa-caret-down"></i>',
                 callback: async (li) => {
-                    // @ts-ignore // foundry-vtt-types doesn't have DocumentCollection.get yet.
-                    const combatant = await game.combat.combatants.get(li.data('combatant-id'));
+                    const combatant = await game.combat?.combatants.get(li.data('combatant-id'));
                     if (combatant) {
                         const combat: SR5Combat = game.combat as unknown as SR5Combat;
                         await combat.adjustInitiative(combatant, -1);
@@ -56,8 +55,7 @@ export class SR5Combat extends Combat {
                 name: game.i18n.localize('SR5.COMBAT.ReduceInitByFive'),
                 icon: '<i class="fas fa-angle-down"></i>',
                 callback: async (li) => {
-                    // @ts-ignore // foundry-vtt-types doesn't have DocumentCollection.get yet.
-                    const combatant = await game.combat.combatants.get(li.data('combatant-id'));
+                    const combatant = await game.combat?.combatants.get(li.data('combatant-id'));
                     if (combatant) {
                         const combat: SR5Combat = game.combat as unknown as SR5Combat;
                         await combat.adjustInitiative(combatant, -5);
@@ -68,8 +66,7 @@ export class SR5Combat extends Combat {
                 name: game.i18n.localize('SR5.COMBAT.ReduceInitByTen'),
                 icon: '<i class="fas fa-angle-double-down"></i>',
                 callback: async (li) => {
-                    // @ts-ignore // foundry-vtt-types doesn't have DocumentCollection.get yet.
-                    const combatant = await game.combat.combatants.get(li.data('combatant-id'));
+                    const combatant = await game.combat?.combatants.get(li.data('combatant-id'));
                     if (combatant) {
                         const combat: SR5Combat = game.combat as unknown as SR5Combat;
                         await combat.adjustInitiative(combatant, -10);

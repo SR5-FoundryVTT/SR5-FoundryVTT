@@ -2,7 +2,12 @@ import {FLAGS, SYSTEM_SOCKET} from "./constants";
 import SocketMessageBody = Shadowrun.SocketMessageData;
 
 /**
- * TODO: Add simple documentation.
+ * Simple handling of creating and emiting socket messages
+ * Use emit for messages meant for all users
+ * > SocketMessage.emit(FLAGS.<yourFlag>, {yourDataField: 'yourData'})
+ *
+ * Use emitForGM for messages meant only for ONE gm
+ * > SocketMessage.emitGM(FLAGS.<yourFlag>, {yourDataField: 'yourData'})
  */
 export class SocketMessage {
     static _createMessage(type, data, userId?): SocketMessageBody {
