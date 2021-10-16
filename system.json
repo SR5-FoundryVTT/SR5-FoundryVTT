@@ -37,6 +37,11 @@
       "lang": "fr",
       "name": "Français",
       "path": "dist/locale/fr/config.json"
+    },
+    {
+      "lang": "ko",
+      "name": "Korean",
+      "path": "dist/locale/ko/config.json"
     }
   ],
   "packs": [
