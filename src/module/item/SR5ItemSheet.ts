@@ -4,6 +4,7 @@ import {SR5} from "../config";
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
 import {SR5Actor} from "../actor/SR5Actor";
 import {ItemData} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs";
+import {NetworkDeviceFlow} from "./flows/NetworkDeviceFlow";
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
@@ -106,7 +107,7 @@ export class SR5ItemSheet extends ItemSheet {
         }
 
         if (this.item.isHost() || this.item.isDevice()) {
-            data['networkDevices'] = this._getNetworkDevices();
+            data['networkDevices'] = this.item.networkDevices;
         }
 
         return data;
@@ -149,12 +150,9 @@ export class SR5ItemSheet extends ItemSheet {
         return activeSkillsForSelect;
     }
 
-    _getNetworkDevices(): SR5Item|SR5Actor[] {
-        const controllerData = this.item.asControllerData();
-        if (!controllerData) return [];
-
-        // @ts-ignore
-        return controllerData.data.networkDevices.map(deviceLink => NetworkDeviceFlow.documentByNetworkDeviceLink(deviceLink));
+    _getNetworkDevices(): SR5Item[] {
+        // return NetworkDeviceFlow.getNetworkDevices(this.document);
+        return [];
     }
 
     /* -------------------------------------------- */
@@ -246,7 +244,7 @@ export class SR5ItemSheet extends ItemSheet {
 
         if (!data) return;
 
-        // Weapon parts...
+        // Add items to a weapons modification / ammo
         if (this.item.isWeapon() && data.type === 'Item') {
             let item;
             // Case 1 - Data explicitly provided
@@ -271,38 +269,38 @@ export class SR5ItemSheet extends ItemSheet {
             return;
         }
 
-        // TODO: Handle WAN
+        // Add items to hosts WAN.
         if (this.item.isHost() && data.type === 'Actor') {
             await this.item.addIC(data.id, data.pack);
 
             return;
         }
 
-        // PAN Support...
+        // Add items to a devices PAN.
         if (this.item.isDevice() && data.type === 'Item') {
             if (data.actorId && !data.sceneId && !data.tokenId) {
-                console.log('Shadowrun5e | Adding linked actors item to the network', data);
                 const actor = game.actors.get(data.actorId);
                 if (!actor) return;
-                const item = actor.items.get(data.data._id) as SR5Item;
-
+                const item = actor.items.get(data.data._id);
+                if (!item) return;
                 await this.item.addNetworkDevice(item);
             }
-
-            else if (data.actorId && data.sceneId && data.tokenId) {
-                console.log('Shadowrun5e | Adding unlinked token actors item to the network', data);
-                const scene = game.scenes.get(data.sceneId);
-                if (!scene) return;
-                const token = scene.tokens.get(data.tokenId);
-                if (!token || !token.actor) return;
-                const item = token.actor.items.get(data.data._id) as SR5Item;
-
-                await this.item.addNetworkDevice(item);
-            }
-
-            else if (data.id && !data.actorId && !data.sceneId && !data.tokenId) {
-                console.log('Shadowrun5e | Adding collection item without actor to the network', data);
-            }
+            //
+            // else if (data.actorId && data.sceneId && data.tokenId) {
+            //     console.log('Shadowrun5e | Adding unlinked token actors item to the network', data);
+            //     const scene = game.scenes.get(data.sceneId);
+            //     if (!scene) return;
+            //     const token = scene.tokens.get(data.tokenId);
+            //     if (!token || !token.actor) return;
+            //     const item = token.actor.items.get(data.data._id) as SR5Item;
+            //
+            //     await this.item.addNetworkDevice(item);
+            // }
+            //
+            // // TODO: Collection item
+            // else if (data.id && !data.actorId && !data.sceneId && !data.tokenId) {
+            //     console.log('Shadowrun5e | Adding collection item without actor to the network', data);
+            // }
 
             return;
         }

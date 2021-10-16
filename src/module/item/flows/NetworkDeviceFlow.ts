@@ -1,46 +1,53 @@
 import {SR5Actor} from "../../actor/SR5Actor";
 import {SR5Item} from "../SR5Item";
-import SocketAddNetworkControllerMessageData = Shadowrun.SocketAddNetworkControllerMessageData;
 import {SocketMessage} from "../../sockets";
 import {FLAGS} from "../../constants";
+import SocketAddNetworkControllerMessageData = Shadowrun.SocketAddNetworkControllerMessageData;
 
 export class NetworkDeviceFlow {
-    // static networkDeviceType(target: SR5Item|SR5Actor): NetworkDeviceType|undefined {
-    //     if (target instanceof SR5Item && target.isHost()) return 'Host';
-    //     if (target instanceof SR5Item && target.actor.token) return 'Token'
-    //     if (target instanceof SR5Item && !target.actor.token) return 'Actor';
-    //
-    //     console.error(`The given networking device doesn't fit any allowed category of networkable matrix device / actor`, target);
-    //     return;
-    // }
+    /**
+     * Abstract away Foundry uuid system to allow for further implementation changes and typing restrictions.
+     *
+     * @param target Whatever Document you want to link to.
+     */
     static buildLink(target: SR5Item|SR5Actor|TokenDocument) {
         return target.uuid;
-        // const type =  DeviceFlow.networkDeviceType(target);
-        // const actor = target instanceof SR5Actor ? target : target.actor;
-        //
-        // switch (type) {
-        //     case 'Actor':
-        //         return {
-        //             sceneId: undefined,
-        //             ownerId: actor.id as string,
-        //             targetId: target.id as string,
-        //             type
-        //         }
-        //     case 'Token':
-        //         return {
-        //             // @ts-ignore
-        //             sceneId: actor.token.parent.id,
-        //             ownerId: actor.token?.id as string,
-        //             targetId: target.id as string,
-        //             type
-        //         }
-        // }
-        //
-        // return;
     }
 
-    static async resolveLink(link: string) {
-        return await fromUuid(link) as unknown as SR5Item;
+    /**
+     * Repacking FoundryVTT fromUuid without async promise to make it usable in sync functions.
+     *
+     * @param link
+     */
+    static resolveLink(link: string): SR5Item|undefined {
+        let parts = link.split(".");
+        let doc;
+
+        // Compendium Documents
+        if (parts[0] === "Compendium") {
+            parts.shift();
+            const [scope, packName, id] = parts.slice(0, 3);
+            parts = parts.slice(3);
+            const pack = game.packs.get(`${scope}.${packName}`);
+            if (!pack) return;
+            doc = pack.getDocument(id);
+        }
+
+        // World Documents
+        else {
+            const [docName, docId] = parts.slice(0, 2);
+            parts = parts.slice(2);
+            const collection = CONFIG[docName].collection.instance;
+            doc = collection.get(docId);
+        }
+
+        // Embedded Documents
+        while (doc && (parts.length > 1)) {
+            const [embeddedName, embeddedId] = parts.slice(0, 2);
+            doc = doc.getEmbeddedDocument(embeddedName, embeddedId);
+            parts = parts.slice(2);
+        }
+        return doc || null;
     }
 
     static async emitAddNetworkControllerSocketMessage(controller: SR5Item, networkDevice: SR5Item) {
@@ -51,8 +58,10 @@ export class NetworkDeviceFlow {
     }
 
     static async _handleAddNetworkControllerSocketMessage(message: SocketAddNetworkControllerMessageData) {
-        const controller = await NetworkDeviceFlow.resolveLink(message.data.controllerLink);
-        const device = await NetworkDeviceFlow.resolveLink(message.data.networkDeviceLink);
+        const controller = NetworkDeviceFlow.resolveLink(message.data.controllerLink);
+        const device = NetworkDeviceFlow.resolveLink(message.data.networkDeviceLink);
+
+        if (!controller || !device) return console.error('Shadowrun 5E | Either the networks controller or device did not resolve.');
 
         await NetworkDeviceFlow.addNetworkDevice(controller, device);
     }
@@ -90,23 +99,16 @@ export class NetworkDeviceFlow {
         await controller.update({'data.networkDevices': [...networkDevices, networkDeviceLink]});
     }
 
-    //
-    // static connectedNetworkDevice(controller: SR5Item, unclearLink: NetworkDeviceLink): boolean {
-    //      if (!controller.isHost() && !controller.isDevice()) return false;
-    //
-    //      return DeviceFlow.findNetworkDeviceLink(controller, unclearLink) >= 0;
-    // }
-    //
-    // static findNetworkDeviceLink(controller: SR5Item, needleLink: NetworkDeviceLink): number {
-    //     if (!controller.isHost() && !controller.isDevice()) return -1;
-    //
-    //     const controllerData = controller.asControllerData();
-    //     if (!controllerData) return -1;
-    //      return controllerData.data.networkDevices.findIndex(connectedLink =>
-    //          connectedLink.type === needleLink.type &&
-    //          connectedLink.ownerId === needleLink.ownerId &&
-    //          connectedLink.sceneId === needleLink.sceneId &&
-    //          connectedLink.targetId === needleLink.targetId
-    //      )
-    // }
+    static getNetworkDevices(controller: SR5Item): SR5Item[] {
+        const devices: SR5Item[] = [];
+        const controllerData = controller.asControllerData();
+        if (!controllerData) return devices;
+
+        controllerData.data.networkDevices.forEach(link => {
+            const device = NetworkDeviceFlow.resolveLink(link);
+            if (device) devices.push(device);
+        });
+
+        return devices;
+    }
 }

@@ -1760,17 +1760,26 @@ export class SR5Item extends Item {
     }
 
     /**
-     * Add a 'device' to a matrix network (PAN or WAN)
-     *
+     * Configure the given matrix item to be controlled by this item in a PAN/WAN.
+     * @param target The matrix item to be connected.
      */
     async addNetworkDevice(target: SR5Item) {
         // TODO: Add device to WAN network
         // TODO: Add IC actor to WAN network
         // TODO: setup networkController link on networked devices.
-
-        await NetworkDeviceFlow.addNetworkDevice(this, target);
+        console.log(`Shadowrun5e | Adding an the item ${target.name} to the controller ${this.name}`, this, target);
+        await NetworkDeviceFlow.addController(this, target);
     }
 
+    /**
+     * Alias method for addNetworkDevice, both do the same.
+     * @param target
+     */
+    async addNetworkController(target: SR5Item) {
+        await this.addNetworkDevice(target);
+    }
+
+    // TODO: Check this methods and move them over to NetworkDeviceFlow
     async removeNetworkDevice(index: number) {
         const deviceData = this.asDeviceData();
         if (!deviceData) return;
@@ -1817,15 +1826,11 @@ export class SR5Item extends Item {
         return await NetworkDeviceFlow.resolveLink(technologyData.networkController) as SR5Item;
     }
 
-    async networkDevices(): Promise<SR5Item[] | undefined> {
+    get networkDevices(): SR5Item[] {
         const controllerData = this.asDeviceData() || this.asHostData();
-        if (!controllerData) return;
+        if (!controllerData) return [];
 
-        const devices: SR5Item[] = [];
-        for (const deviceLink of controllerData.data.networkDevices) {
-            devices.push(await NetworkDeviceFlow.resolveLink(deviceLink));
-        }
-        return devices;
+        return NetworkDeviceFlow.getNetworkDevices(this)
     }
 
 }

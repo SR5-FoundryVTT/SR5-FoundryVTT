@@ -94,5 +94,29 @@ export const shadowrunNetworkDevices = context => {
 
             assert.deepEqual(controller.data.data.networkDevices, [device.uuid]);
         });
+
+        it('Should get all connected network devices of a controller as their Document', async () => {
+            const controller = await testItem.create({type: 'device'});
+            const devices = [
+                await testItem.create({type: 'weapon'}),
+                await testItem.create({type: 'weapon'}),
+                await testItem.create({type: 'weapon'})
+            ];
+
+            for (const device of devices) {
+                await NetworkDeviceFlow.addController(controller, device)
+            }
+
+            const fetchedDevices = await NetworkDeviceFlow.getNetworkDevices(controller);
+
+            // Check for structural equality.
+            assert.strictEqual(controller.data.data.networkDevices.length, 3);
+            assert.strictEqual(fetchedDevices.length, 3);
+
+            // Check for referential equality.
+            for (const fetched of fetchedDevices) {
+                assert.include(devices, fetched);
+            }
+        });
     });
 };
