@@ -22,9 +22,8 @@ export class SR5ActiveEffect extends ActiveEffect {
         return false;
     }
 
-    public get source(): Promise<Document> {
-        // @ts-ignore
-        return fromUuid(this.data.origin);
+    public get source() {
+        return this.data.origin ? fromUuid(this.data.origin) : null;
     }
 
     /**

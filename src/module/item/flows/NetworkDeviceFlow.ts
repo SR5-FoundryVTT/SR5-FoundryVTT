@@ -57,17 +57,27 @@ export class NetworkDeviceFlow {
         await SocketMessage.emitForGM(FLAGS.addNetworkController, {controllerLink, networkDeviceLink});
     }
 
+    /**
+     * Handle socket messages adding a device to the device list of netowrk
+     * @param message
+     */
     static async _handleAddNetworkControllerSocketMessage(message: SocketAddNetworkControllerMessageData) {
+        console.log('Shadowrun 5e | Handle add network controller socket message', message);
+        if (!game.user?.isGM) return console.error(`Shadowrun 5e | Abort handling of message. Current user isn't a GM`, game.user);
+
         const controller = NetworkDeviceFlow.resolveLink(message.data.controllerLink);
         const device = NetworkDeviceFlow.resolveLink(message.data.networkDeviceLink);
 
-        if (!controller || !device) return console.error('Shadowrun 5E | Either the networks controller or device did not resolve.');
+        if (!controller || !device) return console.error('Shadowrun 5e | Either the networks controller or device did not resolve.');
 
         await NetworkDeviceFlow.addNetworkDevice(controller, device);
     }
 
     /**
      * Connect a device to a network controller.
+     *
+     * A network controller is the device managing the PAN/WAN.
+     * A network device is to be added to the network managed by the controller.
      *
      * @param controller
      * @param device
