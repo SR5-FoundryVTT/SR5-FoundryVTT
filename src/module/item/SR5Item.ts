@@ -1767,8 +1767,7 @@ export class SR5Item extends Item {
         // TODO: Add device to WAN network
         // TODO: Add IC actor to WAN network
         // TODO: setup networkController link on networked devices.
-        console.log(`Shadowrun5e | Adding an the item ${target.name} to the controller ${this.name}`, this, target);
-        await NetworkDeviceFlow.addController(this, target);
+        await NetworkDeviceFlow.addDeviceToNetwork(this, target);
     }
 
     /**
@@ -1779,23 +1778,22 @@ export class SR5Item extends Item {
         await this.addNetworkDevice(target);
     }
 
-    // TODO: Check this methods and move them over to NetworkDeviceFlow
     async removeNetworkDevice(index: number) {
-        const deviceData = this.asDeviceData();
-        if (!deviceData) return;
+        const controllerData = this.asControllerData();
+        if (!controllerData) return;
 
-        const networkDevices = duplicate(deviceData.data.networkDevices);
-        if (networkDevices[index] === undefined) return;
-        networkDevices.splice(index, 1);
-
-        return await this.update({'data.networkDevices': networkDevices});
+        // Convert the index to a device link.
+        if (controllerData.data.networkDevices[index] === undefined) return;
+        const networkDeviceLink = controllerData.data.networkDevices[index];
+        const controller = this;
+        return await NetworkDeviceFlow.removeDeviceLinkFromNetwork(controller, networkDeviceLink);
     }
 
     async removeAllNetworkDevices() {
-        const deviceData = this.asDeviceData();
-        if (!deviceData) return;
+        const controllerData = this.asControllerData();
+        if (!controllerData) return;
 
-        return await this.update({'data.networkDevices': []});
+        return await NetworkDeviceFlow.removeAllDevicesFromNetwork(this);
     }
 
     getAllMarkedDocuments(): MarkedDocument[] {
@@ -1833,4 +1831,7 @@ export class SR5Item extends Item {
         return NetworkDeviceFlow.getNetworkDevices(this)
     }
 
+    get canBeNetworkController(): boolean {
+        return this.isDevice() || this.isHost();
+    }
 }

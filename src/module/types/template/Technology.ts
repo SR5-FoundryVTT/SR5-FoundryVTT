@@ -11,7 +11,7 @@ declare namespace Shadowrun {
         conceal: ModifiableValue
         condition_monitor?: ConditionData
         wireless: boolean
-        networkController: string|undefined
+        networkController: string
     };
 
 }

@@ -238,8 +238,7 @@ export class SR5ItemSheet extends ItemSheet {
         try {
             data = JSON.parse(event.dataTransfer.getData('text/plain'));
         } catch (err) {
-            console.log('Shadowrun5e | drop error');
-            return;
+            return console.log('Shadowrun5e | drop error');
         }
 
         if (!data) return;
@@ -251,9 +250,7 @@ export class SR5ItemSheet extends ItemSheet {
             if (data.data) {
                 // TODO test
                 if (this.item.isOwned && data.actorId === this.item.actor?._id && data.data._id === this.item._id) {
-                    // @ts-ignore
-                    ui.notifications.error('Are you trying to break the game??');
-                    return;
+                    return ui.notifications?.error('Are you trying to break the game??');
                 }
                 item = data;
             // Case 2 - From a Compendium Pack
@@ -264,26 +261,23 @@ export class SR5ItemSheet extends ItemSheet {
                 item = game.items.get(data.id);
             }
 
-            await this.item.createOwnedItem(item.data);
-
-            return;
+            return await this.item.createOwnedItem(item.data);
         }
 
         // Add items to hosts WAN.
         if (this.item.isHost() && data.type === 'Actor') {
-            await this.item.addIC(data.id, data.pack);
-
-            return;
+            return await this.item.addIC(data.id, data.pack);
         }
 
-        // Add items to a devices PAN.
-        if (this.item.isDevice() && data.type === 'Item') {
+        // Add items to a network (PAN/WAN).
+        if (this.item.canBeNetworkController && data.type === 'Item') {
             if (data.actorId && !data.sceneId && !data.tokenId) {
                 const actor = game.actors.get(data.actorId);
                 if (!actor) return;
                 const item = actor.items.get(data.data._id);
                 if (!item) return;
-                await this.item.addNetworkDevice(item);
+
+                return await this.item.addNetworkDevice(item);
             }
             //
             // else if (data.actorId && data.sceneId && data.tokenId) {
@@ -420,7 +414,6 @@ export class SR5ItemSheet extends ItemSheet {
     }
 
     async _onRemoveNetworkDevice(event) {
-        if (!canvas.ready) return;
         event.preventDefault();
 
         const userConsented = await Helpers.confirmDeletion();

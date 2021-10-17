@@ -2,6 +2,7 @@ import {SR5TestingDocuments} from "./utils";
 import {SR5Actor} from "../module/actor/SR5Actor";
 import {SR5Item} from "../module/item/SR5Item";
 import {NetworkDeviceFlow} from "../module/item/flows/NetworkDeviceFlow";
+import {networkInterfaces} from "os";
 
 export const shadowrunNetworkDevices = context => {
     const {describe, it, assert, should, before, after} = context;
@@ -75,7 +76,7 @@ export const shadowrunNetworkDevices = context => {
             const controller = await testItem.create({type: 'device'});
             const device = await testItem.create({type: 'weapon'});
 
-            await NetworkDeviceFlow.addController(controller, device);
+            await NetworkDeviceFlow.addDeviceToNetwork(controller, device);
 
             assert.strictEqual(device.data.data.technology.networkController, controller.uuid);
             assert.strictEqual(await NetworkDeviceFlow.resolveLink(device.data.data.technology.networkController), controller);
@@ -87,7 +88,7 @@ export const shadowrunNetworkDevices = context => {
             const controller = await testItem.create({type: 'host'});
             const device = await testItem.create({type: 'weapon'});
 
-            await NetworkDeviceFlow.addController(controller, device);
+            await NetworkDeviceFlow.addDeviceToNetwork(controller, device);
 
             assert.strictEqual(device.data.data.technology.networkController, controller.uuid);
             assert.strictEqual(await NetworkDeviceFlow.resolveLink(device.data.data.technology.networkController), controller);
@@ -104,10 +105,10 @@ export const shadowrunNetworkDevices = context => {
             ];
 
             for (const device of devices) {
-                await NetworkDeviceFlow.addController(controller, device)
+                await NetworkDeviceFlow.addDeviceToNetwork(controller, device);
             }
 
-            const fetchedDevices = await NetworkDeviceFlow.getNetworkDevices(controller);
+            const fetchedDevices = NetworkDeviceFlow.getNetworkDevices(controller);
 
             // Check for structural equality.
             assert.strictEqual(controller.data.data.networkDevices.length, 3);
@@ -116,6 +117,69 @@ export const shadowrunNetworkDevices = context => {
             // Check for referential equality.
             for (const fetched of fetchedDevices) {
                 assert.include(devices, fetched);
+            }
+        });
+
+        it('Should remove a device from a network', async () => {
+            const controller = await testItem.create({type: 'device'});
+            const device = await testItem.create({type: 'weapon'});
+
+            await NetworkDeviceFlow.addDeviceToNetwork(controller, device);
+            await NetworkDeviceFlow.removeDeviceLinkFromNetwork(controller, device.uuid);
+
+            assert.deepEqual(controller.data.data.networkDevices, []);
+            assert.strictEqual(device.data.data.technology.networkController, '');
+        });
+
+        it('Should remove a device from a network when it is added to a new one', async () => {
+            const controller = await testItem.create({type: 'device'});
+            const newController = await testItem.create({type: 'device'});
+            const device = await testItem.create({type: 'weapon'});
+
+            await NetworkDeviceFlow.addDeviceToNetwork(controller, device);
+            await NetworkDeviceFlow.addDeviceToNetwork(newController, device);
+
+            assert.deepEqual(controller.data.data.networkDevices, []);
+            assert.deepEqual(newController.data.data.networkDevices, [device.uuid]);
+            assert.strictEqual(device.data.data.technology.networkController, newController.uuid);
+        });
+
+        it('Should remove a network device that doesnt exist anymore', async () => {
+            const controller = await testItem.create({type: 'device'});
+            const device = await testItem.create({type: 'weapon'});
+            const deviceId = device.id;
+            await NetworkDeviceFlow.addDeviceToNetwork(controller, device);
+            // Simulate user deleting the network item.
+            await testItem.delete(deviceId);
+
+            // Make sure item is actually deleted.
+            const collectionItem = game.items?.get(deviceId);
+            assert.strictEqual(collectionItem, undefined);
+
+            // However the device is still connected to the controller.
+            assert.strictEqual(controller.data.data.networkDevices.length, 1);
+            await NetworkDeviceFlow.removeDeviceLinkFromNetwork(controller, controller.data.data.networkDevices[0]);
+
+            assert.deepEqual(controller.data.data.networkDevices, []);
+        });
+
+        it('Should remove all devices from a controller', async () => {
+            const controller = await testItem.create({type: 'device'});
+            const devices = [
+                await testItem.create({type: 'weapon'}),
+                await testItem.create({type: 'weapon'}),
+                await testItem.create({type: 'weapon'})
+            ];
+
+            for (const device of devices) {
+                await NetworkDeviceFlow.addDeviceToNetwork(controller, device);
+            }
+
+            await NetworkDeviceFlow.removeAllDevicesFromNetwork(controller);
+
+            assert.deepEqual(controller.data.data.networkDevices, []);
+            for (const device of devices) {
+                assert.strictEqual(device.data.data.technology.networkController, '');
             }
         });
     });
