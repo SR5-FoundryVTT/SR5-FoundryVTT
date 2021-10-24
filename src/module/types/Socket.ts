@@ -13,5 +13,11 @@ declare namespace Shadowrun {
         }
     }
 
+    export interface SocketRemoveControllerFromDeviceSocketMessageData extends SocketMessageData {
+        data: {
+            networkDeviceLink: string
+        }
+    }
+
     export type SocketMessageHooks = Record<string, Function[]>
 }

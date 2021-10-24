@@ -1834,4 +1834,9 @@ export class SR5Item extends Item {
     get canBeNetworkController(): boolean {
         return this.isDevice() || this.isHost();
     }
+
+    get canBeNetworkDevice(): boolean {
+        const technologyData = this.getTechnologyData();
+        return !!technologyData;
+    }
 }

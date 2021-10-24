@@ -222,11 +222,6 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
     }
 
-    _onDragOver(event) {
-        event.preventDefault();
-        return false;
-    }
-
     async _onDrop(event) {
         if (!game.items || !game.actors || !game.scenes) return;
 
@@ -272,9 +267,24 @@ export class SR5ItemSheet extends ItemSheet {
         // Add items to a network (PAN/WAN).
         if (this.item.canBeNetworkController && data.type === 'Item') {
             if (data.actorId && !data.sceneId && !data.tokenId) {
+                console.log('Shadowrun 5e | Dropped an item from a collection actor');
                 const actor = game.actors.get(data.actorId);
                 if (!actor) return;
                 const item = actor.items.get(data.data._id);
+                if (!item) return;
+
+                return await this.item.addNetworkDevice(item);
+            }
+
+            if (data.actorId && data.sceneId && data.tokenId) {
+                console.log('Shadowrun 5e | Dropped in an item from a scene token actor');
+                const scene = game.scenes.get(data.sceneId);
+                if (!scene) return;
+                const token = scene.tokens.get(data.tokenId);
+                if (!token) return;
+                const actor = token.actor;
+                if (!actor) return;
+                const item  = actor.items.get(data.data._id);
                 if (!item) return;
 
                 return await this.item.addNetworkDevice(item);

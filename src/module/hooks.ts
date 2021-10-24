@@ -49,6 +49,7 @@ export class HooksManager {
         Hooks.on('renderItemDirectory', HooksManager.renderItemDirectory);
         Hooks.on('renderTokenHUD', EnvModifiersApplication.addTokenHUDFields);
         Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem);
+        Hooks.on('deleteItem', HooksManager.removeDeletedItemsFromNetworks);
 
         // Foundry VTT Module 'quench': https://github.com/schultzcole/FVTT-Quench
         Hooks.on('quenchReady', quenchRegister);
@@ -232,6 +233,10 @@ ___________________
         }
     }
 
+    static async removeDeletedItemsFromNetworks(item: SR5Item, data: ShadowrunItemDataData, id: string) {
+        await NetworkDeviceFlow.handleOnDeleteItem(item, data, id);
+    }
+
     /**
      * This method is used as a simple place to register socket hook handlers for the system.
      *
@@ -239,7 +244,7 @@ ___________________
      */
     static registerSocketListeners() {
         if (!game.socket || !game.user) return;
-        console.log('Registering Shadowrun5e system sockets...');
+        console.log('Registering Shadowrun5e system socket messages...');
         const hooks: SocketMessageHooks = {
             [FLAGS.addNetworkController]: [NetworkDeviceFlow._handleAddNetworkControllerSocketMessage],
             [FLAGS.DoNextRound]: [SR5Combat._handleDoNextRoundSocketMessage],
