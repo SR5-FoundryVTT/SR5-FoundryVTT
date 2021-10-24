@@ -1814,29 +1814,43 @@ export class SR5Item extends Item {
     }
 
     /**
-     * In case a technology item is part of a PAN/WAN it will return the controlling device of it's network.
+     * Return the network controller item when connected to a PAN or WAN.
      */
-    async networkController(): Promise<SR5Item | undefined> {
+    get networkController(): SR5Item | undefined {
         const technologyData = this.getTechnologyData();
         if (!technologyData) return;
         if (!technologyData.networkController) return;
 
-        return await NetworkDeviceFlow.resolveLink(technologyData.networkController) as SR5Item;
+        return NetworkDeviceFlow.resolveLink(technologyData.networkController) as SR5Item;
     }
 
+    /**
+     * Return all network device items within a possible PAN or WAN.
+     */
     get networkDevices(): SR5Item[] {
         const controllerData = this.asDeviceData() || this.asHostData();
         if (!controllerData) return [];
 
-        return NetworkDeviceFlow.getNetworkDevices(this)
+        return NetworkDeviceFlow.getNetworkDevices(this);
     }
 
+    /**
+     * Only devices can control a network.
+     */
     get canBeNetworkController(): boolean {
         return this.isDevice() || this.isHost();
     }
 
+    /**
+     * Assume all items with that are technology (therefore have a rating) are active matrix devices.
+     */
     get canBeNetworkDevice(): boolean {
         const technologyData = this.getTechnologyData();
         return !!technologyData;
+    }
+
+    async disconnectFromNetwork() {
+        if (this.canBeNetworkController) await NetworkDeviceFlow.removeAllDevicesFromNetwork(this);
+        if (this.canBeNetworkDevice) await NetworkDeviceFlow.removeDeviceFromController(this);
     }
 }

@@ -554,6 +554,7 @@
   "SR5.RollMode": "Roll Mode",
   "SR5.SIN": "SIN",
   "SR5.OpenSourcePdf": "Open Source PDF to the item",
+  "SR5.OpenOrigin": "Open item",
   "SR5.SourceFieldEmptyError": "The Source field is empty, please enter valid text for the source",
   "SR5.TemporaryModifiers": "Temporary Modifiers",
   "SR5.Attributes": "Attributes",

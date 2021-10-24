@@ -106,8 +106,12 @@ export class SR5ItemSheet extends ItemSheet {
             data['markedDocuments'] = this.object.getAllMarkedDocuments();
         }
 
-        if (this.item.isHost() || this.item.isDevice()) {
+        if (this.item.canBeNetworkController) {
             data['networkDevices'] = this.item.networkDevices;
+        }
+
+        if (this.item.canBeNetworkDevice) {
+            data['networkController'] = this.item.networkController;
         }
 
         return data;
@@ -220,6 +224,10 @@ export class SR5ItemSheet extends ItemSheet {
         html.find('.marks-remove-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, -1));
         html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
         html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
+
+        // Origin Link handling
+        html.find('.origin-link').on('click', this._onOpenOriginLink.bind(this));
+        html.find('.controller-remove').on('click', this._onControllerRemove.bind(this));
     }
 
     async _onDrop(event) {
@@ -245,7 +253,7 @@ export class SR5ItemSheet extends ItemSheet {
             if (data.data) {
                 // TODO test
                 if (this.item.isOwned && data.actorId === this.item.actor?._id && data.data._id === this.item._id) {
-                    return ui.notifications?.error('Are you trying to break the game??');
+                    return console.warn('Shadowrun 5e | Cant drop items onto themselfs');
                 }
                 item = data;
             // Case 2 - From a Compendium Pack
@@ -544,5 +552,24 @@ export class SR5ItemSheet extends ItemSheet {
         if (!userConsented) return;
 
         await this.object.clearMarks();
+    }
+
+    async _onOpenOriginLink(event) {
+        event.preventDefault();
+
+        console.log('Shadowrun 5e | Opening PAN/WAN network controller');
+
+        const originLink = event.currentTarget.dataset.originLink;
+        const device = await fromUuid(originLink);
+        if (!device) return;
+
+        // @ts-ignore
+        device.sheet.render(true);
+    }
+
+    async _onControllerRemove(event) {
+        event.preventDefault();
+
+        await this.item.disconnectFromNetwork();
     }
 }
