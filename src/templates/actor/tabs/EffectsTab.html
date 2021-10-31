@@ -10,14 +10,14 @@
             }}
 
             {{#each section.effects as |effect|}}
-                {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                 {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
                     img=effect.data.icon
                     name=effect.data.label
                     itemId=effect.id
                     icons=(EffectIcons effect)
                     rightSide=[]
-                    hasDesc="false"
-                    hasRoll="false"
+                    hasDesc=false
+                    hasRoll=false
                 }}
             {{/each}}
         {{/each}}

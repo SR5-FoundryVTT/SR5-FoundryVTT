@@ -6,6 +6,8 @@ import {SR5} from "../../config";
 
 /**
  * This class should not be used directly but be extended for each actor type.
+ *
+ * TODO: Implement auto hiding of item description field in list-items (see effects tab and set hasDesc to true)
  */
 export class SR5BaseActorSheet extends ActorSheet {
     // Store description to display on the sheet.

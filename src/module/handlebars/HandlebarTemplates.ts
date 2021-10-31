@@ -17,6 +17,7 @@ export const preloadHandlebarsTemplates = async () => {
         'systems/shadowrun5e/dist/templates/actor/tabs/spirit/SpiritSkillsTab.html',
 
         'systems/shadowrun5e/dist/templates/actor/tabs/matrix/SpriteSkillsTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/matrix/SpritePowersTab.html',
 
         'systems/shadowrun5e/dist/templates/actor/tabs/vehicle/VehicleSkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/vehicle/VehicleMatrixTab.html',
