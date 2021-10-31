@@ -33,6 +33,7 @@ export const SR5CONFIG = SR5;
 
 export class HooksManager {
     static registerHooks() {
+        console.log('Shadowrun 5e | Registering system hooks');
         // Register your highest level hook callbacks here for a quick overview of what's hooked into.
 
         Hooks.once('init', HooksManager.init);
@@ -252,16 +253,16 @@ ___________________
         }
 
         game.socket.on(SYSTEM_SOCKET, async (message: SocketMessage) => {
-            console.log('Received Shadowrun5e system socket message.', message);
+            console.log('Shadowrun 5e | Received system socket message.', message);
 
             const handlers = hooks[message.type];
-            if (!handlers || handlers.length === 0) return console.warn('System socket message without handler!', message);
+            if (!handlers || handlers.length === 0) return console.warn('Shadowrun 5e | System socket message has no registered handler!', message);
             // In case of targeted socket message only execute with target user (intended for GM usage)
             if (message.userId && game.user?.id !== message.userId) return;
-            if (message.userId && game.user?.id) console.log('GM is handling Shadowrun5e system socket message');
+            if (message.userId && game.user?.id) console.log('Shadowrun 5e | GM is handling system socket message');
 
             for (const handler of handlers) {
-                console.log('Handover Shadowrun5e system socket message to handler', handler);
+                console.log('Shadowrun 5e | Handover system socket message to handler', handler);
                 await handler(message);
             }
         });
@@ -283,7 +284,7 @@ ___________________
         const api = aipModule.API;
         if (!api) return;
 
-        console.log('Shadowrun5e - Registering support for autocomplete-inline-properties');
+        console.log('Shadowrun 5e | Registering support for autocomplete-inline-properties');
         // @ts-ignore
         const DATA_MODE = api.CONST.DATA_MODE;
 
