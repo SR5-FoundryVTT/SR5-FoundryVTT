@@ -554,6 +554,7 @@
   "SR5.RollMode": "Roll Mode",
   "SR5.SIN": "SIN",
   "SR5.OpenSourcePdf": "Open Source PDF to the item",
+  "SR5.OpenOrigin": "Open item",
   "SR5.SourceFieldEmptyError": "The Source field is empty, please enter valid text for the source",
   "SR5.TemporaryModifiers": "Temporary Modifiers",
   "SR5.Attributes": "Attributes",
@@ -615,8 +616,9 @@
       "AddOne": "Add One",
       "SubtractOne": "Subtract One",
       "PAN": "PAN",
+      "WAN": "WAN",
       "NetworkDevices": "Networked Devices",
-      "MissingNetworkDevices": "Drag&Drop a network device to add it to the PAN",
+      "MissingNetworkDevices": "Drag&Drop a network device to add it",
       "ClearNetwork": "Clear network from all devices"
     },
     "ActorSheet": {
@@ -838,7 +840,8 @@
     "MarksCantBePlacedBy": "The active actor can't place marks.",
     "MarksCantBePlacedOn": "The chosen actor type can't receive any marks.",
     "CantEditAppliedItemEffects": "You can't edit an active effect that's been applied by an item.",
-    "KeyNotModifyableByActiveEffect": "The active effect mode modify can only affect mod properties."
+    "KeyNotModifyableByActiveEffect": "The active effect mode modify can only affect mod properties.",
+    "CanOnlyAddTechnologyItemsToANetwork": "Only technology items can be added to a network."
   },
   "SR5.ChangelogApplication": {
     "Title": "Shadowrun5e Update",
