@@ -29,12 +29,6 @@ export class WareImporter extends DataImporter {
         return {
             name: 'Unnamed Form',
             type: 'cyberware',
-            _id: '',
-            folder: '',
-            img: 'icons/svg/mystery-man.svg',
-            flags: {},
-            effects: [],
-            sort: 0,
             data: {
                 description: {
                     value: '',
@@ -83,9 +77,6 @@ export class WareImporter extends DataImporter {
                 essence: 0,
                 capacity: 0,
             },
-            permission: {
-                default: 2,
-            },
         };
     }
     ExtractTranslation(fileName) {
@@ -106,7 +97,7 @@ export class WareImporter extends DataImporter {
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonItemi18n, typeKey, listKey);
     }
 
-    async Parse(jsonObject: object): Promise<Entity> {
+    async Parse(jsonObject: object): Promise<Item> {
         const cyberParser = new CyberwareParser();
 
         let key = jsonObject.hasOwnProperty('cyberwares') ? 'Cyberware' : 'Bioware';

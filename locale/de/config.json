@@ -553,6 +553,7 @@
   "SR5.Glitch": "Patzer!",
   "SR5.RollMode": "Würfelmodus",
   "SR5.OpenSourcePdf": "Öffne PDF-Quelle für Objekt",
+  "SR5.OpenOrigin": "Öffne Gegenstand",
   "SR5.SourceFieldEmptyError": "Es wurde keine PDF-Quelle angegeben",
   "SR5.Help": "Hilfe",
 
@@ -599,8 +600,9 @@
       "AddOne": "Add One",
       "SubtractOne": "Subtract One",
       "PAN": "PAN",
+      "WAN": "WAN",
       "NetworkDevices": "Networked Devices",
-      "MissingNetworkDevices": "Drag&Drop um ein Netzwerkgerät dem PAN zuzufügen.",
+      "MissingNetworkDevices": "Drag&Drop um ein Netzwerkgerät zuzufügen.",
       "ClearNetwork": "Entferne alle Geräte aus dem Netzwerk"
     },
     "ActorSheet": {
@@ -802,7 +804,8 @@
     "MarksCantBePlacedBy": "Der aktive Akteur kann keine Marken platzieren.",
     "MarksCantBePlacedOn": "Der als Ziel ausgewählte Akteur kann keine Marken empfangen.",
     "CantEditAppliedItemEffects": "Aktive Effekte, die über Items zugefügt wurden, können nicht direkt editiert werden.",
-    "KeyNotModifyableByActiveEffect": "Der Aktive Effect Modus Modifizieren kann nur auf mod Felder angewendet werden."
+    "KeyNotModifyableByActiveEffect": "Der Aktive Effect Modus Modifizieren kann nur auf mod Felder angewendet werden.",
+    "CanOnlyAddTechnologyItemsToANetwork": "Nur technologische Gegenstände können einem Netzwerk zugefügt werden."
   },
   "SR5.ChangelogApplication": {
     "Title": "Shadowrun5e Update",

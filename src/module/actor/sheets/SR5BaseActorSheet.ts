@@ -1,16 +1,15 @@
-import {SR5Actor} from "../SR5Actor";
 import {Helpers} from "../../helpers";
 import {SR5Item} from "../../item/SR5Item";
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../../effects";
-import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import {SR5} from "../../config";
-import {MatrixRules} from "../../rules/MatrixRules";
 
 /**
  * This class should not be used directly but be extended for each actor type.
+ *
+ * TODO: Implement auto hiding of item description field in list-items (see effects tab and set hasDesc to true)
  */
-export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
+export class SR5BaseActorSheet extends ActorSheet {
     // Store description to display on the sheet.
     _shownDesc: string[] = [];
     // If something needs filtering, store those filters here.
@@ -26,7 +25,6 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
      * @returns {Object}
      */
     static get defaultOptions() {
-        //@ts-ignore // TODO: foundry-vtt-types GENERAL no idea what's the issue here.
         return mergeObject(super.defaultOptions, {
             classes: ['sr5', 'sheet', 'actor'],
             width: 905,
@@ -81,7 +79,6 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         this._prepareItems(data);
         this._prepareActorTypeFields(data);
 
-        // @ts-ignore // TODO: foundry-vtt-types 0.8 missing document support
         data['effects'] = prepareActiveEffectCategories(this.document.effects);
 
         return data;
@@ -91,7 +88,6 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         super.activateListeners(html);
 
         // Active Effect management
-        // @ts-ignore // foundry-vtt-types 0.8 document support missing.
         html.find(".effect-control").on('click',event => onManageActiveEffect(event, this.document));
 
         // General item CRUD management...
@@ -126,14 +122,14 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
             name: `New ${type}`,
             type: type,
         };
-        return await this.actor.createOwnedItem(itemData, {renderSheet: true});
+        return await this.actor.createEmbeddedDocuments('Item',  [itemData], {renderSheet: true});
     }
 
     async _onItemEdit(event) {
         event.preventDefault();
         const iid = Helpers.listItemId(event);
         const item = this.actor.items.get(iid);
-        if (item) await item.sheet.render(true);
+        if (item) await item.sheet?.render(true);
     }
 
 
@@ -144,7 +140,7 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         if (!userConsented) return;
 
         const iid = Helpers.listItemId(event);
-        return await this.actor.deleteOwnedItem(iid);
+        return await this.actor.deleteEmbeddedDocuments('Item', [iid]);
     }
 
     async _onItemRoll(event) {
@@ -505,7 +501,6 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
     }
 
     /**
-     * TODO: This doesn't adhere to actor type separation. Maybe doesn't matter for ease of use.
      * @param data An object containing Actor Sheet data, as would be returned by ActorSheet.getData
      */
     _prepareActorTypeFields(data) {
@@ -520,13 +515,15 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         event.stopPropagation();
 
         if (this.object.isIC() && this.object.hasHost()) {
-            return ui.notifications.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
         }
 
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
-        const {scene, target, item} = Helpers.getMarkIdDocuments(markId);
+        const markedDocuments = Helpers.getMarkIdDocuments(markId);
+        if (!markedDocuments) return;
+        const {scene, target, item} = markedDocuments;
         if (!scene || !target) return; // item can be undefined.
 
         const marks = parseInt(event.currentTarget.value);
@@ -537,13 +534,15 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         event.stopPropagation();
 
         if (this.object.isIC() && this.object.hasHost()) {
-            return ui.notifications.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
         }
 
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
-        const {scene, target, item} = Helpers.getMarkIdDocuments(markId);
+        const markedDocuments = Helpers.getMarkIdDocuments(markId);
+        if (!markedDocuments) return;
+        const {scene, target, item} = markedDocuments;
         if (!scene || !target) return; // item can be undefined.
 
         await this.object.setMarks(target, by, {scene, item});
@@ -553,7 +552,7 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         event.stopPropagation();
 
         if (this.object.isIC() && this.object.hasHost()) {
-            return ui.notifications.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
         }
 
         const markId = event.currentTarget.dataset.markId;
@@ -569,7 +568,7 @@ export class SR5BaseActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         event.stopPropagation();
 
         if (this.object.isIC() && this.object.hasHost()) {
-            return ui.notifications.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
+            return ui.notifications?.info(game.i18n.localize('SR5.Infos.CantModifyHostContent'));
         }
 
         const userConsented = await Helpers.confirmDeletion();

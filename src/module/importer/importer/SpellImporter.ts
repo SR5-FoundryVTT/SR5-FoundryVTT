@@ -21,13 +21,7 @@ export class SpellImporter extends DataImporter {
     GetDefaultData(): SpellItemData {
         return {
             name: 'Unnamed Item',
-            _id: '',
-            folder: '',
-            img: 'icons/svg/mystery-man.svg',
-            flags: {},
             type: 'spell',
-            effects: [],
-            sort: 0,
             data: {
                 description: {
                     value: '',
@@ -87,9 +81,6 @@ export class SpellImporter extends DataImporter {
                     physical: false,
                 },
             },
-            permission: {
-                default: 2,
-            },
         };
     }
 
@@ -103,7 +94,7 @@ export class SpellImporter extends DataImporter {
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonSpelli18n, 'spells', 'spell');
     }
 
-    async Parse(jsonObject: object): Promise<Entity> {
+    async Parse(jsonObject: object): Promise<Item> {
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Spells', this.categoryTranslations);
 
         const parser = new ParserMap<SpellItemData>('category', [
@@ -125,6 +116,7 @@ export class SpellImporter extends DataImporter {
             }
 
             let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
+            //@ts-ignore TODO: Foundry Where is my foundry base data?
             data.folder = folders[data.data.category].id;
             datas.push(data);
         }

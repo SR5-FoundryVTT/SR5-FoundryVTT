@@ -16,13 +16,7 @@ export class QualityImporter extends DataImporter {
     GetDefaultData(): QualityItemData {
         return {
             name: 'Unnamed Armor',
-            _id: '',
-            folder: '',
-            img: 'icons/svg/mystery-man.svg',
-            flags: {},
             type: 'quality',
-            effects: [],
-            sort: 0,
             data: {
                 description: {
                     value: '',
@@ -59,9 +53,6 @@ export class QualityImporter extends DataImporter {
                 },
                 type: '',
             },
-            permission: {
-                default: 2,
-            },
         };
     }
 
@@ -75,7 +66,7 @@ export class QualityImporter extends DataImporter {
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonQualityi18n, 'qualities', 'quality');
     }
 
-    async Parse(jsonObject: object): Promise<Entity> {
+    async Parse(jsonObject: object): Promise<Item> {
         const jsonNameTranslations = {};
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Qualities', this.categoryTranslations);
 
@@ -93,6 +84,7 @@ export class QualityImporter extends DataImporter {
             let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
 
             let category = ImportHelper.StringValue(jsonData, 'category');
+            //@ts-ignore TODO: Foundry Where is my foundry base data?
             data.folder = folders[category.toLowerCase()].id;
             data.name = ImportHelper.MapNameToTranslation(this.itemTranslations, data.name);
 

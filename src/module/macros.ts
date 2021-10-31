@@ -13,7 +13,6 @@ export async function createItemMacro(item, slot) {
     if (!game || !game.macros) return;
 
     const command = `game.shadowrun5e.rollItemMacro("${item.name}");`;
-    // @ts-ignore // TODO: foundry-vtt-types 0.8 Does not support DocumentCollection yet.
     let macro = game.macros.contents.find((m) => m.name === item.name);
     if (!macro) {
         macro = (await Macro.create(
@@ -24,7 +23,7 @@ export async function createItemMacro(item, slot) {
                 command: command,
                 flags: { 'shadowrun5e.itemMacro': true },
             },
-            { displaySheet: false },
+            { renderSheet: false },
         )) as Macro;
     }
 
@@ -60,7 +59,7 @@ export function rollItemMacro(itemName) {
  * @param slot The hotbar slot to use.
  */
 export async function createSkillMacro(data: {skillId: string, skill: SkillField}, slot) {
-    if (!game || !game.macros) return;
+    if (!game.macros || !game.user) return;
 
     const {skillId, skill} = data;
 
@@ -92,13 +91,14 @@ export async function rollSkillMacro(skillLabel) {
 
     // Fetch the actor from the current users token or the actor collection.
     const speaker = ChatMessage.getSpeaker();
-    const actor =  (game.actors.tokens[speaker.token] || game.actors.get(speaker.actor)) as SR5Actor
+    if (!speaker) return;
+    const actor =  (game.actors.tokens[speaker.token as string] || game.actors.get(speaker.actor as string)) as SR5Actor
 
     if (!actor) return;
 
     const skill = actor.getSkill(skillLabel, {byLabel: true});
 
-    if (!skill) return ui.notifications.warn(game.i18n.localize('SR5.Warnings.MissingSkillOnActor'))
+    if (!skill) return ui.notifications?.warn(game.i18n.localize('SR5.Warnings.MissingSkillOnActor'))
 
     await actor.rollSkill(skill);
 }

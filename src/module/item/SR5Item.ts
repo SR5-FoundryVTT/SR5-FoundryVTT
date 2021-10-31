@@ -57,9 +57,9 @@ import {DefaultValues} from "../data/DataDefaults";
 import {HostDataPreparation} from "./prep/HostPrep";
 import {MatrixRules} from "../rules/MatrixRules";
 import ActionResultData = Shadowrun.ActionResultData;
-import {DeviceFlow} from "./flows/DeviceFlow";
 import MatrixMarks = Shadowrun.MatrixMarks;
 import MarkedDocument = Shadowrun.MarkedDocument;
+import {NetworkDeviceFlow} from "./flows/NetworkDeviceFlow";
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
@@ -78,7 +78,7 @@ import MarkedDocument = Shadowrun.MarkedDocument;
  *
  *       Be wary of SR5Item.actor for this reason!
  */
-export class SR5Item extends Item<ShadowrunItemData> {
+export class SR5Item extends Item {
     // Item.items isn't the Foundry default ItemCollection but is overwritten within prepareEmbeddedEntities
     // to allow for embedded items in items in actors.
     items: SR5Item[];
@@ -94,7 +94,6 @@ export class SR5Item extends Item<ShadowrunItemData> {
      *
      * If you need the actual actor owner, no matter how deep into item embedding, this current item is use SR5item.actorOwner
      */
-    // @ts-ignore // TODO: TYPE: Check foundry-vtt-types systems for how Items and Actors type.
     get actor(): SR5Actor {
         return super.actor as unknown as SR5Actor;
     }
@@ -152,7 +151,6 @@ export class SR5Item extends Item<ShadowrunItemData> {
 
     /**
      * Return an Array of the Embedded Item Data
-     * TODO properly type this
      */
     getEmbeddedItems(): any[] {
         let items = this.getFlag(SYSTEM_NAME, FLAGS.EmbeddedItems);
@@ -224,7 +222,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
         const equippedMods = this.getEquippedMods();
         const equippedAmmo = this.getEquippedAmmo();
 
-        const technology = this.getTechnology();
+        const technology = this.getTechnologyData();
         if (technology) {
             // taMiF: This migration code could be needed for items imported from an older compendium?
             if (technology.condition_monitor === undefined) {
@@ -239,10 +237,10 @@ export class SR5Item extends Item<ShadowrunItemData> {
 
             const concealParts = new PartsList<number>();
             equippedMods.forEach((mod) => {
-                const technology = mod.getTechnology();
+                const technology = mod.getTechnologyData();
 
                 if (technology && technology.conceal.value) {
-                    concealParts.addUniquePart(mod.name, technology.conceal.value);
+                    concealParts.addUniquePart(mod.name as string, technology.conceal.value);
                 }
             });
 
@@ -267,9 +265,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
             // Item.prepareData is called once (first) with an empty SR5Actor instance without .data and once (second) with .data.
             if (this.actor?.data) {
                 action.damage.source = {
-                    actorId: this.actor.id,
-                    itemId: this.id,
-                    itemName: this.name,
+                    actorId: this.actor.id as string,
+                    itemId: this.id as string,
+                    itemName: this.name as string,
                     itemType: this.data.type
                 };
             }
@@ -282,10 +280,10 @@ export class SR5Item extends Item<ShadowrunItemData> {
                 if (!modification) return;
 
                 if (modification.data.accuracy) {
-                    limitParts.addUniquePart(mod.name, modification.data.accuracy);
+                    limitParts.addUniquePart(mod.name as string, modification.data.accuracy);
                 }
                 if (modification.data.dice_pool) {
-                    dpParts.addUniquePart(mod.name, modification.data.dice_pool);
+                    dpParts.addUniquePart(mod.name as string, modification.data.dice_pool);
                 }
             });
 
@@ -294,9 +292,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
             if (equippedAmmo) {
                 const ammoData = equippedAmmo.data.data as AmmoData;
                 // add mods to damage from ammo
-                action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name, ammoData.damage);
+                action.damage.mod = PartsList.AddUniquePart(action.damage.mod, equippedAmmo.name as string, ammoData.damage);
                 // add mods to ap from ammo
-                action.damage.ap.mod = PartsList.AddUniquePart(action.damage.ap.mod, equippedAmmo.name, ammoData.ap);
+                action.damage.ap.mod = PartsList.AddUniquePart(action.damage.ap.mod, equippedAmmo.name as string, ammoData.ap);
 
                 // override element
                 if (ammoData.element) {
@@ -500,6 +498,9 @@ export class SR5Item extends Item<ShadowrunItemData> {
         } else if (this.hasExplosiveAmmo()) {
             const ammo = this.getEquippedAmmo();
             const ammoData = ammo.asAmmoData();
+
+            if (!ammoData) return {radius: 0, dropoff: 0};
+
             const distance = ammoData.data.blast.radius;
             const dropoff = ammoData.data.blast.dropoff;
 
@@ -577,13 +578,14 @@ export class SR5Item extends Item<ShadowrunItemData> {
 
         const newAmmunition = (this.items || [])
             .filter((i) => i.data.type === 'ammo')
-            .reduce((acc: Entity.Data[], item) => {
+            .reduce((acc, item) => {
                 const ammoData = item.asAmmoData();
 
                 if (ammoData && ammoData.data.technology.equipped) {
                     const { technology } = ammoData.data;
                     const qty = typeof technology.quantity === 'string' ? 0 : technology.quantity;
                     technology.quantity = Math.max(0, qty - diff);
+                    // @ts-ignore
                     acc.push(item.data);
                 }
                 return acc;
@@ -880,7 +882,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
         let actor;
         const sceneTokenId = card.data('tokenId');
         if (sceneTokenId) actor = Helpers.getSceneTokenActor(sceneTokenId);
-        else actor = game.actors.get(card.data('actorId'));
+        else actor = game.actors?.get(card.data('actorId'));
 
         if (!actor) return;
         const itemId = card.data('itemId');
@@ -964,8 +966,8 @@ export class SR5Item extends Item<ShadowrunItemData> {
         // Templates and further logic need a items HashMap, yet the flag provides an array.
         if (items) {
 
-            const existing = (this.items || []).reduce((object, i) => {
-                object[i.id] = i;
+            const existing = (this.items || []).reduce((object, item) => {
+                object[item.id as string] = item;
                 return object;
             }, {});
 
@@ -983,7 +985,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
                     // NOTE: It's important to deliver the item as the item parent document, even though this is meant for actor owners.
                     //       The legacy approach for embeddedItems (within another item) relies upon this.actor
                     //       returning an SR5Item instance to call .updateEmbeddedEntities, while Foundry expects an actor
-                    return new SR5Item(item, {parent: this});
+                    return new SR5Item(item, {parent: this as unknown as SR5Actor});
                 }
             });
         }
@@ -1069,7 +1071,6 @@ export class SR5Item extends Item<ShadowrunItemData> {
             // @ts-ignore
             ui.notifications?.error(game.i18n.localize('SR5.SourceFieldEmptyError'));
         }
-        // TODO open PDF to correct location
         // parse however you need, all "buttons" will lead to this function
         const [code, page] = source.split(' ');
 
@@ -1094,7 +1095,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
         return action.extended;
     }
 
-    getTechnology(): TechnologyData|undefined {
+    getTechnologyData(): TechnologyData|undefined {
         return this.wrapper.getTechnology();
     }
 
@@ -1171,7 +1172,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
             return game.i18n.localize('SR5.SpellCast');
         }
         if (this.hasRoll) {
-            return this.name
+            return this.name as string;
         }
 
         return DEFAULT_ROLL_NAME;
@@ -1491,7 +1492,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
     }
 
     getCondition(): ConditionData|undefined {
-        const technology = this.getTechnology();
+        const technology = this.getTechnologyData();
         if (technology && "condition_monitor" in technology)
             return technology.condition_monitor;
     }
@@ -1573,7 +1574,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
         if (!hostData || !id) return;
 
         // Check if actor exists before adding.
-        const actor = (pack ? await Helpers.getEntityFromCollection(pack, id) : game.actors.get(id)) as SR5Actor;
+        const actor = (pack ? await Helpers.getEntityFromCollection(pack, id) : game.actors?.get(id)) as SR5Actor;
         if (!actor || !actor.isIC()) {
             console.error(`Provided actor id ${id} doesn't exist (with pack collection '${pack}') or isn't an IC type`);
             return;
@@ -1584,8 +1585,8 @@ export class SR5Item extends Item<ShadowrunItemData> {
 
         // Add IC to the hosts IC order
         const sourceEntity = DefaultValues.sourceEntityData({
-            id: actor.id,
-            name: actor.name,
+            id: actor.id as string,
+            name: actor.name as string,
             type: 'Actor',
             pack,
             // Custom fields for IC
@@ -1613,7 +1614,6 @@ export class SR5Item extends Item<ShadowrunItemData> {
     }
 
     get _isEmbeddedItem(): boolean {
-        // @ts-ignore // TODO: foundry-vtt-types 0.8 Document hasn't be implemented yet
         return this.hasOwnProperty('parent') && this.parent instanceof SR5Item;
     }
 
@@ -1623,16 +1623,19 @@ export class SR5Item extends Item<ShadowrunItemData> {
      * @param data changes made to the SR5ItemData
      */
     async updateEmbeddedItem(data): Promise<this> {
+        if (!this.parent || this.parent instanceof SR5Actor) return this;
         // Inform the parent item about changes to one of it's embedded items.
         // TODO: updateOwnedItem needs the id of the update item. hand the item itself over, to the hack within updateOwnedItem for this.
         data._id = this.id;
-        // @ts-ignore // TODO: foundry-vtt-types 0.8 Document hasn't be implemented yet
-        await this.parent.updateOwnedItem(data)
+
+        // Shadowrun Items can contain other items, while Foundry Items can't. Use the system local implementation for items.
+        // @ts-ignore
+        await this.parent.updateOwnedItem(data);
 
         // After updating all item embedded data, rerender the sheet to trigger the whole rerender workflow.
         // Otherwise changes in the template of an hiddenItem will show for some fields, while not rerendering all
         // #if statements (hidden fields for other values, won't show)
-        await this.sheet.render(false);
+        await this.sheet?.render(false);
 
         return this;
     }
@@ -1669,13 +1672,15 @@ export class SR5Item extends Item<ShadowrunItemData> {
         }
 
         // Both scene and item are optional.
-        const scene = options?.scene || canvas.scene;
+        const scene = options?.scene || canvas.scene as Scene;
         const item = options?.item;
 
         // Build the markId string. If no item has been given, there still will be a third split element.
         // Use Helpers.deconstructMarkId to get the elements.
-        const markId = Helpers.buildMarkId(scene.id, target.id, item?.id);
+        const markId = Helpers.buildMarkId(scene.id as string, target.id, item?.id as string);
         const hostData = this.asHostData();
+
+        if (!hostData) return;
 
         const currentMarks = options?.overwrite ? 0 : this.getMarksById(markId);
         hostData.data.marks[markId] = MatrixRules.getValidMarksCount(currentMarks + marks);
@@ -1706,15 +1711,18 @@ export class SR5Item extends Item<ShadowrunItemData> {
      * @return Will always return a number. At least zero, for no marks placed.
      */
     getMarks(target: SR5Actor, item?: SR5Item, options?: {scene?: Scene}): number {
-        if (!canvas.ready) return;
+        if (!canvas.ready) return 0;
         if (!this.isHost()) return 0;
 
         // Scene is optional.
-        const scene = options?.scene || canvas.scene;
+        const scene = options?.scene || canvas.scene as Scene;
         item = item || target.getMatrixDevice();
 
-        const markId = Helpers.buildMarkId(scene.id, target.id, item.id);
+        const markId = Helpers.buildMarkId(scene.id as string, target.id as string, item?.id as string);
         const hostData = this.asHostData();
+
+        if (!hostData) return 0
+
         return hostData.data.marks[markId] || 0;
     }
 
@@ -1726,11 +1734,13 @@ export class SR5Item extends Item<ShadowrunItemData> {
     async clearMarks() {
         if (!this.isHost()) return;
 
-        const data = this.asHostData();
+        const hostData = this.asHostData();
+
+        if (!hostData) return;
 
         // Delete all markId properties from ActorData
         const updateData = {}
-        for (const markId of Object.keys(data.data.marks)) {
+        for (const markId of Object.keys(hostData.data.marks)) {
             updateData[`-=${markId}`] = null;
         }
 
@@ -1750,55 +1760,40 @@ export class SR5Item extends Item<ShadowrunItemData> {
     }
 
     /**
-     * Add a 'device' to a matrix network (PAN or WAN)
-     *
+     * Configure the given matrix item to be controlled by this item in a PAN/WAN.
+     * @param target The matrix item to be connected.
      */
-    async addNetworkDevice(target: SR5Item|SR5Actor) {
+    async addNetworkDevice(target: SR5Item) {
         // TODO: Add device to WAN network
         // TODO: Add IC actor to WAN network
         // TODO: setup networkController link on networked devices.
+        await NetworkDeviceFlow.addDeviceToNetwork(this, target);
+    }
 
-        const deviceData = this.asDeviceData();
-        if (!target || !deviceData) return;
-
-        const controller = this;
-
-        if (DeviceFlow.invalidNetworkDevice(controller, target)) return;
-
-        const deviceLink = DeviceFlow.buildNetworkDeviceLink(target);
-        const controllerLink = DeviceFlow.buildNetworkDeviceLink(controller);
-        if (!deviceLink.type || !controllerLink.type) return console.error('Abort adding network device due to internal data error');
-
-        if (DeviceFlow.connectedNetworkDevice(controller, deviceLink)) return;
-
-        const networkDevices = duplicate(deviceData.data.networkDevices);
-        networkDevices.push(deviceLink);
-
-        if (game.user.isGM) {
-            await DeviceFlow.addNetworkController(controller, target);
-        } else {
-            await DeviceFlow.emitAddControllerSocketMessage(controller, target);
-        }
-
-        return await this.update({'data.networkDevices': networkDevices});
+    /**
+     * Alias method for addNetworkDevice, both do the same.
+     * @param target
+     */
+    async addNetworkController(target: SR5Item) {
+        await this.addNetworkDevice(target);
     }
 
     async removeNetworkDevice(index: number) {
-        const deviceData = this.asDeviceData();
-        if (!deviceData) return;
+        const controllerData = this.asControllerData();
+        if (!controllerData) return;
 
-        const networkDevices = duplicate(deviceData.data.networkDevices);
-        if (networkDevices[index] === undefined) return;
-        networkDevices.splice(index, 1);
-
-        return await this.update({'data.networkDevices': networkDevices});
+        // Convert the index to a device link.
+        if (controllerData.data.networkDevices[index] === undefined) return;
+        const networkDeviceLink = controllerData.data.networkDevices[index];
+        const controller = this;
+        return await NetworkDeviceFlow.removeDeviceLinkFromNetwork(controller, networkDeviceLink);
     }
 
     async removeAllNetworkDevices() {
-        const deviceData = this.asDeviceData();
-        if (!deviceData) return;
+        const controllerData = this.asControllerData();
+        if (!controllerData) return;
 
-        return await this.update({'data.networkDevices': []});
+        return await NetworkDeviceFlow.removeAllDevicesFromNetwork(this);
     }
 
     getAllMarkedDocuments(): MarkedDocument[] {
@@ -1808,6 +1803,7 @@ export class SR5Item extends Item<ShadowrunItemData> {
         if (!marks) return [];
 
         // Deconstruct all mark ids into documents.
+        // @ts-ignore
         return Object.entries(marks)
             .filter(([markId, marks]) => Helpers.isValidMarkId(markId))
             .map(([markId, marks]) => ({
@@ -1815,5 +1811,49 @@ export class SR5Item extends Item<ShadowrunItemData> {
                 marks,
                 markId
             }))
+    }
+
+    /**
+     * Return the network controller item when connected to a PAN or WAN.
+     */
+    get networkController(): SR5Item | undefined {
+        const technologyData = this.getTechnologyData();
+        if (!technologyData) return;
+        if (!technologyData.networkController) return;
+
+        return NetworkDeviceFlow.resolveLink(technologyData.networkController) as SR5Item;
+    }
+
+    /**
+     * Return all network device items within a possible PAN or WAN.
+     */
+    get networkDevices(): SR5Item[] {
+        const controllerData = this.asDeviceData() || this.asHostData();
+        if (!controllerData) return [];
+
+        return NetworkDeviceFlow.getNetworkDevices(this);
+    }
+
+    /**
+     * Only devices can control a network.
+     */
+    get canBeNetworkController(): boolean {
+        return this.isDevice() || this.isHost();
+    }
+
+    /**
+     * Assume all items with that are technology (therefore have a rating) are active matrix devices.
+     */
+    get canBeNetworkDevice(): boolean {
+        const technologyData = this.getTechnologyData();
+        return !!technologyData;
+    }
+
+    /**
+     * Disconnect any kind of item from a PAN or WAN.
+     */
+    async disconnectFromNetwork() {
+        if (this.canBeNetworkController) await NetworkDeviceFlow.removeAllDevicesFromNetwork(this);
+        if (this.canBeNetworkDevice) await NetworkDeviceFlow.removeDeviceFromController(this);
     }
 }

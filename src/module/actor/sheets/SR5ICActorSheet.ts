@@ -6,7 +6,7 @@ export class SR5ICActorSheet extends SR5BaseActorSheet {
 
         // Fetch a connected host.
         const icData = this.object.asICData();
-        data.host = game.items.get(icData.data.host.id);
+        data.host = game.items?.get(icData?.data.host.id as string);
 
         // Display Matrix Marks
         data['markedDocuments'] = this.object.getAllMarkedDocuments();

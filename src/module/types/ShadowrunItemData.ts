@@ -1,4 +1,5 @@
 /// <reference path="./Shadowrun.ts" />
+// NOTE: See https://github.com/League-of-Foundry-Developers/foundry-vtt-types/wiki/%5B0.8.x%5D-Actors-and-Items for reference
 
 /**
  * Types for Item.data and Item.data.data with foundry-vtt-types pattern used:
@@ -14,26 +15,26 @@
 declare namespace Shadowrun {
     // Register your global ItemData types here.  Try sorting your ItemData types alphabetically.
     export type ShadowrunItemData =
-        ActionItemData |
-        AdeptPowerItemData |
-        AmmoItemData |
-        ArmorItemData |
-        BiowareItemData |
-        ComplexFormItemData |
-        ContactItemData |
-        CritterPowerItemData |
-        CyberwareItemData |
-        DeviceItemData |
-        EquipmentItemData |
-        HostItemData |
-        LifestyleItemData |
-        ModificationItemData |
-        ProgramItemData |
-        QualityItemData |
-        SinItemData |
-        SpellItemData |
-        SpritePowerItemData |
-        WeaponItemData;
+        | ActionItemData
+        | AdeptPowerItemData
+        | AmmoItemData
+        | ArmorItemData
+        | BiowareItemData
+        | ComplexFormItemData
+        | ContactItemData
+        | CritterPowerItemData
+        | CyberwareItemData
+        | DeviceItemData
+        | EquipmentItemData
+        | HostItemData
+        | LifestyleItemData
+        | ModificationItemData
+        | ProgramItemData
+        | QualityItemData
+        | SinItemData
+        | SpellItemData
+        | SpritePowerItemData
+        | WeaponItemData;
 
     /**
      * The subset of items with technology data part.
@@ -77,64 +78,105 @@ declare namespace Shadowrun {
         Partial<WeaponData>;
 
     // Setup your ItemData types below here. Try sorting your ItemData types alphabetically.
-    export interface ActionItemData extends Item.Data<ActionData> {
-        type: 'action'
+    export interface ActionItemData {
+        type: 'action';
+        name: string;
+        data: ActionData;
     }
-    export interface AdeptPowerItemData extends Item.Data<AdeptPowerData> {
-        type: 'adept_power'
+
+    export interface AdeptPowerItemData {
+        type: 'adept_power';
+        name: string;
+        data: AdeptPowerData;
     }
-    export interface AmmoItemData extends Item.Data<AmmoData> {
-        type: 'ammo'
+    export interface AmmoItemData {
+        type: 'ammo';
+        name: string;
+        data: AmmoData;
     }
-    export interface ArmorItemData extends Item.Data<ArmorData> {
-        type: 'armor'
+    export interface ArmorItemData {
+        type: 'armor';
+        name: string;
+        data: ArmorData;
     }
-    export interface BiowareItemData extends Item.Data<BiowareData> {
-        type: 'bioware'
+    export interface BiowareItemData {
+        type: 'bioware';
+        name: string;
+        data:  BiowareData;
     }
-    export interface ComplexFormItemData extends Item.Data<ComplexFormData> {
-        type: 'complex_form'
+    export interface ComplexFormItemData {
+        type: 'complex_form';
+        name: string;
+        data: ComplexFormData;
     }
-    export interface ContactItemData extends Item.Data<ContactData> {
-        type: 'contact'
+    export interface ContactItemData {
+        type: 'contact';
+        name: string;
+        data: ContactData;
     }
-    export interface CritterPowerItemData extends Item.Data<CritterPowerData> {
-        type: 'critter_power'
+    export interface CritterPowerItemData {
+        type: 'critter_power';
+        name: string;
+        data: CritterPowerData;
     }
-    export interface CyberwareItemData extends Item.Data<CyberwareData> {
-        type: 'cyberware'
+    export interface CyberwareItemData {
+        type: 'cyberware';
+        name: string;
+        data: CyberwareData;
     }
-    export interface DeviceItemData extends Item.Data<DeviceData> {
-        type: 'device'
+    export interface DeviceItemData {
+        type: 'device';
+        name: string;
+        data: DeviceData;
     }
-    export interface EquipmentItemData extends Item.Data<EquipmentData> {
-        type: 'equipment'
+    export interface EquipmentItemData {
+        type: 'equipment';
+        name: string;
+        data: EquipmentData;
     }
-    export interface HostItemData extends Item.Data<HostData> {
-        type: 'host'
+    export interface HostItemData {
+        type: 'host';
+        name: string;
+        data: HostData;
     }
-    export interface LifestyleItemData extends Item.Data<LifestyleData> {
-        type: 'lifestyle'
+    export interface LifestyleItemData {
+        type: 'lifestyle';
+        name: string;
+        data: LifestyleData;
     }
-    export interface ModificationItemData extends Item.Data<ModificationData> {
-        type: 'modification'
+    export interface ModificationItemData {
+        type: 'modification';
+        name: string;
+        data: ModificationData;
     }
-    export interface ProgramItemData extends Item.Data<ProgramData> {
-        type: 'program'
+    export interface ProgramItemData {
+        type: 'program';
+        name: string;
+        data: ProgramData;
     }
-    export interface QualityItemData extends Item.Data<QualityData> {
-        type: 'quality'
+    export interface QualityItemData {
+        type: 'quality';
+        name: string;
+        data: QualityData;
     }
-    export interface SinItemData extends Item.Data<SinData> {
-        type: 'sin'
+    export interface SinItemData {
+        type: 'sin';
+        name: string;
+        data: SinData;
     }
-    export interface SpellItemData extends Item.Data<SpellData> {
-        type: 'spell'
+    export interface SpellItemData {
+        type: 'spell';
+        name: string;
+        data: SpellData;
     }
-    export interface SpritePowerItemData extends Item.Data<SpritePowerData> {
-        type: 'sprite_power'
+    export interface SpritePowerItemData {
+        type: 'sprite_power';
+        name: string;
+        data: SpritePowerData;
     }
-    export interface WeaponItemData extends Item.Data<WeaponData> {
-        type: 'weapon'
+    export interface WeaponItemData {
+        type: 'weapon';
+        name: string;
+        data: WeaponData;
     }
 }

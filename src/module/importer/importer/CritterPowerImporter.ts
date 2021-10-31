@@ -17,13 +17,7 @@ export class CritterPowerImporter extends DataImporter {
     GetDefaultData(): CritterPowerItemData {
         return {
             name: 'Unnamed Item',
-            _id: '',
-            folder: '',
-            img: 'icons/svg/mystery-man.svg',
-            flags: {},
             type: 'critter_power',
-            effects: [],
-            sort: 0,
             data: {
                 description: {
                     value: '',
@@ -73,9 +67,6 @@ export class CritterPowerImporter extends DataImporter {
                 duration: '',
                 karma: 0,
             },
-            permission: {
-                default: 2,
-            },
         };
     }
 
@@ -89,7 +80,7 @@ export class CritterPowerImporter extends DataImporter {
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonCritterPoweri18n, 'powers', 'power');
     }
 
-    async Parse(jsonObject: object): Promise<Entity> {
+    async Parse(jsonObject: object): Promise<Item> {
         const parser = new CritterPowerParserBase();
         const folder = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Critter Powers`, true);
 
@@ -99,6 +90,8 @@ export class CritterPowerImporter extends DataImporter {
             let jsonData = jsonDatas[i];
 
             let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
+
+            // @ts-ignore TODO: Foundry Where is my foundry base data?
             data.folder = folder.id;
             data.name = ImportHelper.MapNameToTranslation(this.itemTranslations, data.name);
 

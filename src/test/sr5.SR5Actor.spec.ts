@@ -27,9 +27,9 @@ export const shadowrunSR5Actor = context => {
             assert.notStrictEqual(actor.id, null);
 
             // Check foundry item collection integrity
-            const fromCollection = game.actors.get(actor.id);
+            const fromCollection = game.actors?.get(actor.id);
             assert.isOk(fromCollection);
-            assert.strictEqual(actor.id, fromCollection.id);
+            assert.strictEqual(actor.id, fromCollection?.id);
         });
 
         it('Should update an actor of any time', async () => {
@@ -56,7 +56,7 @@ export const shadowrunSR5Actor = context => {
             assert.strictEqual(ownedItem.type, weapon.data.type);
 
             // An owned item should NOT appear in the items collection.
-            const ownedInCollection = game.items.get(ownedItem.id);
+            const ownedInCollection = game.items?.get(ownedItem.id as string);
             assert.isNotOk(ownedInCollection);
         });
     });

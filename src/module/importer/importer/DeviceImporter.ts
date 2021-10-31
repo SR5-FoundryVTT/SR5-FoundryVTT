@@ -1,6 +1,8 @@
 import {DataImporter} from "./DataImporter";
 import {ImportHelper} from "../helper/ImportHelper";
 import {Constants} from "./Constants";
+import DeviceItemData = Shadowrun.DeviceItemData;
+import {DefaultValues} from "../../data/DataDefaults";
 
 export class DeviceImporter extends DataImporter {
     public files = ['gear.xml'];
@@ -9,61 +11,8 @@ export class DeviceImporter extends DataImporter {
         return jsonObject.hasOwnProperty('gears') && jsonObject['gears'].hasOwnProperty('gear');
     }
 
-    GetDefaultData() {
-        return {
-            name: '',
-            _id: '',
-            folder: '',
-            img: 'icons/svg/mystery-man.svg',
-            flags: {},
-            type: 'device',
-            data: {
-                description: {
-                    value: '',
-                    chat: '',
-                    source: '',
-                },
-                technology: {
-                    rating: 1,
-                    availability: '',
-                    quantity: 1,
-                    cost: 0,
-                    equipped: true,
-                    conceal: {
-                        base: 0,
-                        value: 0,
-                        mod: [],
-                    },
-                    condition_monitor: {
-                        label: '',
-                        value: 0,
-                        max: 0,
-                    },
-                },
-                category: 'commlink',
-                "atts": {
-                    "att1": {
-                        "value": 0,
-                        "att": "attack"
-                    },
-                    "att2": {
-                        "value": 0,
-                        "att": "sleaze"
-                    },
-                    "att3": {
-                        "value": 0,
-                        "att": "data_processing"
-                    },
-                    "att4": {
-                        "value": 0,
-                        "att": "firewall"
-                    }
-                },
-            },
-            permission: {
-                default: 2,
-            },
-        };
+    GetDefaultData(): DeviceItemData {
+        return DefaultValues.deviceItemData();
     }
 
     ExtractTranslation(fileName?: string) {
@@ -153,7 +102,7 @@ export class DeviceImporter extends DataImporter {
         return entries;
     }
 
-    async Parse(jsonObject: object): Promise<Entity> {
+    async Parse(jsonObject: object): Promise<Item> {
         let entries = [];
         const commlinks = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Commlinks');
         const cyberdecks = jsonObject['gears']['gear'].filter(gear => ImportHelper.StringValue(gear, 'category', '') === 'Cyberdecks');

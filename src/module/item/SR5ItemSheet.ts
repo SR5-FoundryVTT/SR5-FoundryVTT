@@ -3,13 +3,13 @@ import {SR5Item} from './SR5Item';
 import {SR5} from "../config";
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
 import {SR5Actor} from "../actor/SR5Actor";
-import {DeviceFlow} from "./flows/DeviceFlow";
+import {ItemData} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs";
+import {NetworkDeviceFlow} from "./flows/NetworkDeviceFlow";
 
 /**
  * Extend the basic ItemSheet with some very simple modifications
  */
-// TODO: Check foundry-vtt-types systems for how to do typing...
-export class SR5ItemSheet extends ItemSheet<any, any> {
+export class SR5ItemSheet extends ItemSheet {
     private _shownDesc: any[] = [];
     private _scroll: string;
 
@@ -46,15 +46,12 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         let data = super.getData();
         // Foundry 0.8 will return data as an sheet data while Foundry 0.7 will return data as an item data.
         // Therefore data is nested one deeper. The alternative would be to rework all references with one more data...
+        // @ts-ignore // TODO: foundry-vtt-types confusion
         data.type = data.data.type;
+        // @ts-ignore // TODO: foundry-vtt-types confusion
         data.data = data.data.data;
+        // @ts-ignore // TODO: foundry-vtt-types confusion
         const itemData = data.data;
-        // data = {
-        //     ...data,
-        //     // @ts-ignore
-        //     data: data.data.data
-        // }
-
 
         if (itemData.action) {
             try {
@@ -87,7 +84,7 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         data['config'] = SR5;
         const items = this.getEmbeddedItems();
         const [ammunition, weaponMods, armorMods] = items.reduce(
-            (parts: [Item.Data[], Item.Data[], Item.Data[]], item: SR5Item) => {
+            (parts: [ItemData[], ItemData[], ItemData[]], item: SR5Item) => {
                 if (item.type === 'ammo') parts[0].push(item.data);
                 if (item.type === 'modification' && "type" in item.data.data && item.data.data.type === 'weapon') parts[1].push(item.data);
                 if (item.type === 'modification' && "type" in item.data.data && item.data.data.type === 'armor') parts[2].push(item.data);
@@ -103,15 +100,18 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         data['limits'] = this._getSortedLimitsForSelect();
 
         // Active Effects data.
-        // @ts-ignore // TODO: foundry-vtt-types 0.8 missing document support
         data['effects'] = prepareActiveEffectCategories(this.document.effects);
 
         if (this.object.isHost()) {
             data['markedDocuments'] = this.object.getAllMarkedDocuments();
         }
 
-        if (this.item.isHost() || this.item.isDevice()) {
-            data['networkDevices'] = this._getNetworkDevices();
+        if (this.item.canBeNetworkController) {
+            data['networkDevices'] = this.item.networkDevices;
+        }
+
+        if (this.item.canBeNetworkDevice) {
+            data['networkController'] = this.item.networkController;
         }
 
         return data;
@@ -154,11 +154,9 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         return activeSkillsForSelect;
     }
 
-    _getNetworkDevices(): SR5Item|SR5Actor[] {
-        const controllerData = this.item.asControllerData();
-        if (!controllerData) return [];
-
-        return controllerData.data.networkDevices.map(deviceLink => DeviceFlow.documentByNetworkDeviceLink(deviceLink));
+    _getNetworkDevices(): SR5Item[] {
+        // return NetworkDeviceFlow.getNetworkDevices(this.document);
+        return [];
     }
 
     /* -------------------------------------------- */
@@ -179,7 +177,6 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         this.form.ondrop = (event) => this._onDrop(event);
 
         // Active Effect management
-        // @ts-ignore // foundry-vtt-types 0.8 document support missing.
         html.find(".effect-control").click(event => onManageActiveEffect(event, this.document));
 
         /**
@@ -227,14 +224,15 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         html.find('.marks-remove-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, -1));
         html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
         html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
-    }
 
-    _onDragOver(event) {
-        event.preventDefault();
-        return false;
+        // Origin Link handling
+        html.find('.origin-link').on('click', this._onOpenOriginLink.bind(this));
+        html.find('.controller-remove').on('click', this._onControllerRemove.bind(this));
     }
 
     async _onDrop(event) {
+        if (!game.items || !game.actors || !game.scenes) return;
+
         event.preventDefault();
         event.stopPropagation();
 
@@ -243,22 +241,19 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         try {
             data = JSON.parse(event.dataTransfer.getData('text/plain'));
         } catch (err) {
-            console.log('Shadowrun5e | drop error');
-            return;
+            return console.log('Shadowrun5e | drop error');
         }
 
         if (!data) return;
 
-        // Weapon parts...
+        // Add items to a weapons modification / ammo
         if (this.item.isWeapon() && data.type === 'Item') {
             let item;
             // Case 1 - Data explicitly provided
             if (data.data) {
                 // TODO test
                 if (this.item.isOwned && data.actorId === this.item.actor?._id && data.data._id === this.item._id) {
-                    // @ts-ignore
-                    ui.notifications.error('Are you trying to break the game??');
-                    return;
+                    return console.warn('Shadowrun 5e | Cant drop items onto themselfs');
                 }
                 item = data;
             // Case 2 - From a Compendium Pack
@@ -269,41 +264,55 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
                 item = game.items.get(data.id);
             }
 
-            await this.item.createOwnedItem(item.data);
-
-            return;
+            return await this.item.createOwnedItem(item.data);
         }
 
-        // TODO: Handle WAN
+        // Add items to hosts WAN.
         if (this.item.isHost() && data.type === 'Actor') {
-            await this.item.addIC(data.id, data.pack);
-
-            return;
+            return await this.item.addIC(data.id, data.pack);
         }
 
-        // PAN Support...
-        if (this.item.isDevice() && data.type === 'Item') {
+        // Add items to a network (PAN/WAN).
+        if (this.item.canBeNetworkController && data.type === 'Item') {
             if (data.actorId && !data.sceneId && !data.tokenId) {
-                console.log('Shadowrun5e | Adding linked actors item to the network', data);
+                console.log('Shadowrun 5e | Dropped an item from a collection actor');
                 const actor = game.actors.get(data.actorId);
-                const item = actor.items.get(data.data._id) as SR5Item;
+                if (!actor) return;
+                const item = actor.items.get(data.data._id);
+                if (!item) return;
 
-                await this.item.addNetworkDevice(item);
+                return await this.item.addNetworkDevice(item);
             }
 
-            else if (data.actorId && data.sceneId && data.tokenId) {
-                console.log('Shadowrun5e | Adding unlinked token actors item to the network', data);
+            if (data.actorId && data.sceneId && data.tokenId) {
+                console.log('Shadowrun 5e | Dropped in an item from a scene token actor');
                 const scene = game.scenes.get(data.sceneId);
-                // @ts-ignore // TODO: foundry-vtt-types 0.8
+                if (!scene) return;
                 const token = scene.tokens.get(data.tokenId);
-                const item = token.actor.items.get(data.data._id) as SR5Item;
+                if (!token) return;
+                const actor = token.actor;
+                if (!actor) return;
+                const item  = actor.items.get(data.data._id);
+                if (!item) return;
 
-                await this.item.addNetworkDevice(item);
+                return await this.item.addNetworkDevice(item);
             }
-
-            else if (data.id && !data.actorId && !data.sceneId && !data.tokenId) {
-                console.log('Shadowrun5e | Adding collection item without actor to the network', data);
-            }
+            //
+            // else if (data.actorId && data.sceneId && data.tokenId) {
+            //     console.log('Shadowrun5e | Adding unlinked token actors item to the network', data);
+            //     const scene = game.scenes.get(data.sceneId);
+            //     if (!scene) return;
+            //     const token = scene.tokens.get(data.tokenId);
+            //     if (!token || !token.actor) return;
+            //     const item = token.actor.items.get(data.data._id) as SR5Item;
+            //
+            //     await this.item.addNetworkDevice(item);
+            // }
+            //
+            // // TODO: Collection item
+            // else if (data.id && !data.actorId && !data.sceneId && !data.tokenId) {
+            //     console.log('Shadowrun5e | Adding collection item without actor to the network', data);
+            // }
 
             return;
         }
@@ -322,7 +331,7 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
     async _onEditItem(event) {
         const item = this.item.getOwnedItem(this._eventId(event));
         if (item) {
-            item.sheet.render(true);
+            item.sheet?.render(true);
         }
     }
 
@@ -423,22 +432,11 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
     }
 
     async _onRemoveNetworkDevice(event) {
-        if (!canvas.ready) return;
         event.preventDefault();
 
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        // const tokenId = event.currentTarget.closest('.list-item').dataset.tokenId;
-        // const actorId = event.currentTarget.closest('.list-item').dataset.actorId;
-        // const itemId = event.currentTarget.closest('.list-item').dataset.itemId;
-        //
-        // // Get the item from the token actor OR the collection actor.
-        // // A collection actor will not have a token on it's token property.
-        // const item = tokenId ?
-        //     // @ts-ignore // TODO: foundry-vtt-types 0.8
-        //     canvas.scene.tokens.get(tokenId).actor.items.get(itemId) :
-        //     game.actors.get(actorId).items.get(itemId);
         const networkDeviceIndex = Helpers.parseInputToNumber(event.currentTarget.closest('.list-item').dataset.listItemIndex);
 
         await this.item.removeNetworkDevice(networkDeviceIndex);
@@ -460,7 +458,6 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
      */
     private fixStaleRenderedState() {
         if (this._state === Application.RENDER_STATES.RENDERED && ui.windows[this.appId] === undefined) {
-            // @ts-ignore // TODO: 0.8 foundry-vtt-types doesn't know of DocumentSheet.document yet.
             console.warn(`SR5ItemSheet app for ${this.document.name} is set as RENDERED but has no window registered. Fixing app internal render state. This is a known bug.`);
             // Hotfixing instead of this.close() since FormApplication.close() expects form elements, which don't exist anymore.
             this._state = Application.RENDER_STATES.CLOSED;
@@ -507,7 +504,9 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
-        const {scene, target, item} = Helpers.getMarkIdDocuments(markId);
+        const markedIdDocuments = Helpers.getMarkIdDocuments(markId);
+        if (!markedIdDocuments) return;
+        const {scene, target, item} = markedIdDocuments;
         if (!scene || !target) return; // item can be undefined.
 
         const marks = parseInt(event.currentTarget.value);
@@ -522,7 +521,9 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
-        const {scene, target, item} = Helpers.getMarkIdDocuments(markId);
+        const markedIdDocuments = Helpers.getMarkIdDocuments(markId);
+        if (!markedIdDocuments) return;
+        const {scene, target, item} = markedIdDocuments;
         if (!scene || !target) return; // item can be undefined.
 
         await this.object.setMarks(target, by, {scene, item});
@@ -551,5 +552,24 @@ export class SR5ItemSheet extends ItemSheet<any, any> {
         if (!userConsented) return;
 
         await this.object.clearMarks();
+    }
+
+    async _onOpenOriginLink(event) {
+        event.preventDefault();
+
+        console.log('Shadowrun 5e | Opening PAN/WAN network controller');
+
+        const originLink = event.currentTarget.dataset.originLink;
+        const device = await fromUuid(originLink);
+        if (!device) return;
+
+        // @ts-ignore
+        device.sheet.render(true);
+    }
+
+    async _onControllerRemove(event) {
+        event.preventDefault();
+
+        await this.item.disconnectFromNetwork();
     }
 }

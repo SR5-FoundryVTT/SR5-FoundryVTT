@@ -232,6 +232,17 @@ select.display {
         color: $black;
     }
 
+    // An origin link is a uuid based entity link, without drag support.
+    .origin-link {
+          background: #DDD;
+          padding: 1px 4px;
+          border: 1px solid #4b4a44;
+          border-radius: 2px;
+          white-space: nowrap;
+          word-break: break-all;
+          color: $black;
+    }
+
     .roll {
         @include rollable;
     }
@@ -698,7 +709,6 @@ select.display {
 }
 
 .sr-modifier-container {
-
     .modifier-column {
         padding-top: 66px;
         // Stop flexing.

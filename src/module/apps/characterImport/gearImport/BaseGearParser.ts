@@ -35,17 +35,8 @@ export class BaseGearParser implements GearParser {
     private getDefaultData() : EquipmentItemData {
         return {
             name: '',
-            _id: '',
-            folder: '',
-            flags: {},
-            img: 'icons/svg/mystery-man.svg',
             type: 'equipment',
             data: DefaultValues.equipmentData(),
-            permission: {
-                default: 2,
-            },
-            effects: [],
-            sort: 0
         };
     }
 }

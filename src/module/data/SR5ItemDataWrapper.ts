@@ -180,6 +180,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     }
 
     isMatrixAction(): boolean {
+        // @ts-ignore
         return this.isAction() && this.getData().result.success.matrix.placeMarks;
     }
 
@@ -192,6 +193,7 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     }
 
     getId(): string {
+        // @ts-ignore // TODO: Foundry Where is my foundry base data?
         return this.data._id;
     }
 
@@ -212,7 +214,6 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     }
 
     getArmorElements(): { [key: string]: number } {
-        // TODO clean this up
         const { fire, electricity, cold, acid } = this.getData().armor || {};
         return { fire: fire ?? 0, electricity: electricity ?? 0, cold: cold ?? 0, acid: acid ?? 0 };
     }
@@ -354,11 +355,11 @@ export class SR5ItemDataWrapper extends DataWrapper<ShadowrunItemData> {
     }
 
     hasAmmo(): boolean {
-        const ammo = this.getAmmo();
-        return !!ammo
+        return !!this.getAmmo();
     }
 
     getActionResult(): ActionResultData {
+        // @ts-ignore
         return this.getData().result;
     }
 }

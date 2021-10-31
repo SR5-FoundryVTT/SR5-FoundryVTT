@@ -1,6 +1,7 @@
 import {SR5Actor} from "../actor/SR5Actor";
 import {Helpers} from "../helpers";
 import ModifiableValue = Shadowrun.ModifiableValue;
+import {EffectChangeData} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/effectChangeData";
 
 export class SR5ActiveEffect extends ActiveEffect {
     /**
@@ -12,6 +13,7 @@ export class SR5ActiveEffect extends ActiveEffect {
      * items, this would need change.
      */
     public get isOriginOwned(): boolean {
+        if (!this.data.origin) return false;
         const path = this.data.origin.split('.');
 
         if (path[0] === 'Scene' && path.length === 6) return true;
@@ -20,9 +22,8 @@ export class SR5ActiveEffect extends ActiveEffect {
         return false;
     }
 
-    public get source(): Promise<Document> {
-        // @ts-ignore // TODO: foundry-vtt-types 0.8
-        return fromUuid(this.data.origin);
+    public get source() {
+        return this.data.origin ? fromUuid(this.data.origin) : null;
     }
 
     /**
@@ -44,7 +45,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         return this.update({disabled});
     }
 
-    protected _applyCustom(actor: SR5Actor, change: ActiveEffect.Change) {
+    protected _applyCustom(actor: SR5Actor, change: EffectChangeData) {
         return this._applyModify(actor, change);
     }
 
@@ -54,10 +55,9 @@ export class SR5ActiveEffect extends ActiveEffect {
      *
      * @protected
      */
-    protected _applyModify(actor: SR5Actor, change: ActiveEffect.Change) {
+    protected _applyModify(actor: SR5Actor, change: EffectChangeData) {
         // Check direct key.
         if (this._isKeyModifiableValue(actor, change.key)) {
-            // @ts-ignore // TODO: foundry-vtt-types 0.8
             const value = foundry.utils.getProperty(actor.data, change.key) as ModifiableValue;
             value.mod.push({name: this.data.label, value: Number(change.value)});
 
@@ -71,7 +71,6 @@ export class SR5ActiveEffect extends ActiveEffect {
 
         // Don't apply any changes if it's also not a indirect match.
         if (this._isKeyModifiableValue(actor, indirectKey)) {
-            // @ts-ignore // TODO: foundry-vtt-types 0.8
             const value = foundry.utils.getProperty(actor.data, indirectKey) as ModifiableValue;
             value.mod.push({name: this.data.label, value: Number(change.value)});
 
@@ -90,10 +89,9 @@ export class SR5ActiveEffect extends ActiveEffect {
      *
      * @protected
      */
-    protected _applyOverride(actor: SR5Actor, change: ActiveEffect.Change) {
+    protected _applyOverride(actor: SR5Actor, change: EffectChangeData) {
         // Check direct key.
         if (this._isKeyModifiableValue(actor, change.key)) {
-            // @ts-ignore // TODO: foundry-vtt-types 0.8
             const value = foundry.utils.getProperty(actor.data, change.key);
             value.override = {name: this.data.label, value: Number(change.value)};
             value.value = change.value;
@@ -106,9 +104,7 @@ export class SR5ActiveEffect extends ActiveEffect {
         nodes.pop();
         const indirectKey = nodes.join('.');
 
-        // @ts-ignore // TODO: foundry-vtt-types 0.8
         if (this._isKeyModifiableValue(actor, indirectKey)) {
-            // @ts-ignore // TODO: foundry-vtt-types 0.8
             const value = foundry.utils.getProperty(actor.data, indirectKey);
             value.override = {name: this.data.label, value: Number(change.value)};
 
@@ -120,9 +116,7 @@ export class SR5ActiveEffect extends ActiveEffect {
     }
 
     _isKeyModifiableValue(actor: SR5Actor, key: string): boolean {
-        // @ts-ignore // TODO: foundry-vtt-types 0.8
         const possibleValue = foundry.utils.getProperty(actor.data, key);
-        // @ts-ignore // TODO: foundry-vtt-types 0.8
         const possibleValueType = foundry.utils.getType(possibleValue);
 
         return possibleValue && possibleValueType === 'Object' && Helpers.objectHasKeys(possibleValue, this.minValueKeys);

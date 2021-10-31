@@ -6,7 +6,6 @@ import {ShadowrunRoll, Test} from "./rolls/ShadowrunRoller";
 import {Helpers} from "./helpers";
 import {DamageApplicationFlow} from './actor/flows/DamageApplicationFlow';
 import AttackData = Shadowrun.AttackData;
-import ActionRollData = Shadowrun.ActionRollData;
 import DrainData = Shadowrun.DrainData;
 import ModifiedDamageData = Shadowrun.ModifiedDamageData;
 import DamageType = Shadowrun.DamageType;
@@ -50,9 +49,7 @@ export interface RollChatMessageOptions {
 
     description?: object
 
-
-    // @ts-ignore // TODO: TYPE: Remove this...
-    rollMode?: keyof typeof CONFIG.dice.rollModes
+    rollMode?: keyof typeof CONFIG.Dice.rollModes
     previewTemplate?: boolean
 
     attack?: AttackData
@@ -78,8 +75,7 @@ interface ItemChatTemplateData {
 interface RollChatTemplateData extends RollChatMessageOptions {
     tokenId?: string
     targetTokenId?: string
-    // @ts-ignore // TODO: TYPE: Remove this...
-    rollMode: keyof typeof CONFIG.dice.rollModes
+    rollMode: keyof typeof CONFIG.Dice.rollModes
 }
 
 /**
@@ -89,7 +85,7 @@ interface RollChatTemplateData extends RollChatMessageOptions {
  *
  * @param templateData An untyped object carrying data to display. The template should itself check for what properties are available and only renders what's given.
  */
-async function createChatMessage(templateData, options?: ChatDataOptions): Promise<Entity<any>|null> {
+async function createChatMessage(templateData, options?: ChatDataOptions): Promise<ChatMessage|null> {
     const chatData = await createChatData(templateData, options);
     const message = await ChatMessage.create(chatData);
 
@@ -98,6 +94,7 @@ async function createChatMessage(templateData, options?: ChatDataOptions): Promi
     // Support for Dice So Nice module. This is necessary due to Foundry 0.8 removing support for hidden custom content
     // roll type chat messages, which Dice So Nice hooks into for it's rolls.
     // TODO: This might be removed if Foundry reverses the chat message type roll behavior of custom content being always visible.
+    // @ts-ignore // dice3d is a module field of Dice So Nice
     if (game.dice3d && options.roll) {
         // @ts-ignore // Note: While showDiceSoNice can be called async, where not doing so here to avoid stalling.
         Helpers.showDiceSoNice(options.roll, chatData.whisper, chatData.blind);
@@ -166,7 +163,7 @@ const createChatData = async (templateData, options?: ChatDataOptions) => {
 
     // If a specific whisper recipient has been set, overwrite Foundry default.
     if (options?.whisperTo) {
-        chatData['whisper'] = ChatMessage.getWhisperRecipients(options.whisperTo.name);
+        chatData['whisper'] = ChatMessage.getWhisperRecipients(options.whisperTo.name as string);
     }
 
 
@@ -222,7 +219,7 @@ function createChatTemplateData(options: ItemChatMessageOptions): ItemChatTempla
     }
 }
 
-export async function createRollChatMessage(options: RollChatMessageOptions): Promise<Entity<any>|null> {
+export async function createRollChatMessage(options: RollChatMessageOptions): Promise<ChatMessage|null> {
     await ifConfiguredCreateDefaultChatMessage(options);
 
     const templateData = getRollChatTemplateData(options);
@@ -237,7 +234,6 @@ function getRollChatTemplateData(options: RollChatMessageOptions): RollChatTempl
     const rollMode = options.rollMode ?? game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
     const tokenId = getTokenSceneId(token);
 
-    // @ts-ignore // foundry-vtt-types 0.8 support
     const targetTokenId = getTokenSceneId(options.target?.document);
 
     return {
@@ -260,10 +256,10 @@ function getRollChatTemplateData(options: RollChatMessageOptions): RollChatTempl
  * @param token What token the sceneTokenId must be created for.
  * @return '<SceneId>.<TokenId>'
  */
-function getTokenSceneId(token: Token | undefined): string | undefined {
-    if (!token) return;
-    const scene = token.parent;
-    // @ts-ignore // TODO: foundry-vtt-types 0.8 support not yet there.
+function getTokenSceneId(token: TokenDocument | undefined | null): string | undefined {
+    const scene = token?.parent;
+
+    if (!token || !scene) return;
     return `${scene.id}.${token.id}`;
 }
 
@@ -367,12 +363,12 @@ export const addRollListeners = (app: ChatMessage, html) => {
         if (!id) return;
 
         if (type === 'Token') {
-            const token = canvas.tokens.get(id);
+            const token = canvas.tokens?.get(id);
             if (!token) return;
             // @ts-ignore
             token.actor.sheet.render(true, {token});
         } else if (type === 'Actor') {
-            const actor = game.actors.get(id);
+            const actor = game.actors?.get(id);
             if (!actor) return;
             // @ts-ignore
             actor.sheet.render(true);
@@ -385,10 +381,10 @@ export const addRollListeners = (app: ChatMessage, html) => {
 
             const actor = sceneTokenId ?
                 Helpers.getSceneTokenActor(sceneTokenId) :
-                game.actors.get(actorId) as SR5Actor;
+                game.actors?.get(actorId) as SR5Actor;
             const item = actor?.items.get(id);
             if (!item) return;
-            item.sheet.render(true);
+            item.sheet?.render(true);
         }
     });
 
@@ -401,7 +397,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
 
         const selectLink = $(event.currentTarget);
         const tokenId = selectLink.data('tokenId');
-        const token = canvas.tokens.get(tokenId);
+        const token = canvas.tokens?.get(tokenId);
 
         if (token) {
             token.control();
@@ -464,7 +460,7 @@ export const addRollListeners = (app: ChatMessage, html) => {
         event.stopPropagation();
 
         const messageId = html.data('messageId');
-        const message = game.messages.get(messageId);
+        const message = game.messages?.get(messageId);
 
         if (!message) return;
 
@@ -474,13 +470,11 @@ export const addRollListeners = (app: ChatMessage, html) => {
             const sceneTokenId = html.find('.chat-card').data('tokenId');
             const actor = Helpers.getSceneTokenActor(sceneTokenId);
 
-            if (actor === undefined) {
-                return console.error('No actor could be extracted from message data.');
-            }
+            if (!actor) return console.error('No actor could be extracted from message data.');
 
             // Allow custom selection for GMs and users with enough permissions.
             // token.actor can be undefined for tokens with removed actors.
-            let targets = Helpers.getControlledTokens().filter(token => token.actor?.id !== game.user.character?.id);
+            let targets = Helpers.getControlledTokens().filter(token => token.actor?.id !== game.user?.character?.id);
 
             // For users allow custom selection using targeting.
             if (targets.length === 0) {
@@ -492,12 +486,13 @@ export const addRollListeners = (app: ChatMessage, html) => {
 
                 targetSceneIds.forEach(targetSceneId => {
                     const [sceneId, tokenId] = Helpers.deconstructSceneTokenId(targetSceneId);
+                    // @ts-ignore // TODO: Token vs TokenDocument... the workflow here is confusing.
                     targets.push(Helpers.getSceneTokenDocument(sceneId, tokenId));
                 })
             }
 
             if (targets.length === 0) {
-                return ui.notifications.warn(game.i18n.localize("SR5.Warnings.TokenSelectionNeeded"));
+                return ui.notifications?.warn(game.i18n.localize("SR5.Warnings.TokenSelectionNeeded"));
             }
 
             const {marks} = actionTestData.matrix;

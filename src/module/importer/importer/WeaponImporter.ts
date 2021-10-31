@@ -21,13 +21,7 @@ export class WeaponImporter extends DataImporter {
     GetDefaultData(): WeaponItemData {
         return {
             name: 'Unnamed Item',
-            _id: '',
-            folder: '',
-            img: 'icons/svg/mystery-man.svg',
-            flags: {},
             type: 'weapon',
-            effects: [],
-            sort: 0,
             data: {
                 description: {
                     value: '',
@@ -112,9 +106,6 @@ export class WeaponImporter extends DataImporter {
                 category: 'range',
                 subcategory: '',
             },
-            permission: {
-                default: 2,
-            },
         };
     }
 
@@ -128,7 +119,7 @@ export class WeaponImporter extends DataImporter {
         this.itemTranslations = ImportHelper.ExtractItemTranslation(jsonWeaponi18n, 'weapons', 'weapon');
     }
 
-    async Parse(jsonObject: object): Promise<Entity> {
+    async Parse(jsonObject: object): Promise<Item> {
         const folders = await ImportHelper.MakeCategoryFolders(jsonObject, 'Weapons', this.categoryTranslations);
 
         folders['gear'] = await ImportHelper.GetFolderAtPath(`${Constants.ROOT_IMPORT_FOLDER_NAME}/Weapons/Gear`, true);
@@ -150,6 +141,7 @@ export class WeaponImporter extends DataImporter {
             }
 
             let data = parser.Parse(jsonData, this.GetDefaultData(), this.itemTranslations);
+            // @ts-ignore // TODO: Foundry Where is my foundry base data?
             data.folder = folders[data.data.subcategory].id;
 
             datas.push(data);

@@ -90,7 +90,7 @@ export class WeaponParser {
         } else if (chummerWeapon.type.toLowerCase() === 'ranged') {
             data.category = 'range';
             if (action.skill.toLowerCase().includes('throw')) {
-                data.category = 'thrown'; // TODO clean this up
+                data.category = 'thrown';
             }
             const range = {};
             data.range = range;
@@ -129,18 +129,7 @@ export class WeaponParser {
                     extreme: parseInt(chummerWeapon.ranges.extreme.split('-')[1]),
                 };
             }
-            // TODO figure out how to add mods to weapons
-            // if (w.accessories && w.accessories.accessory) {
-            //     range.mods = [];
-            //     const accessories = getArray(w.accessories.accessory);
-            //     accessories.forEach((a) => {
-            //         if (a) {
-            //             range.mods.push({
-            //                 name: a.name,
-            //             });
-            //         }
-            //     });
-            // }
+
         } else if (chummerWeapon.type.toLowerCase() === 'thrown') {
             data.category = 'thrown';
         }

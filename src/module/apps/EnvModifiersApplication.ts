@@ -4,16 +4,16 @@ import {SR5Actor} from "../actor/SR5Actor";
 import EnvironmentalModifierCategories = Shadowrun.EnvironmentalModifierCategories;
 import {Modifiers} from "../rules/Modifiers";
 
-export type EnvModifiersTarget = Scene | SR5Actor;
+export type ModifiableDocumentTypes = SR5Actor | Scene;
 
 /** Helper window for easy overview and selection of environmental modifiers and their calculated total.
  *
  */
 export class EnvModifiersApplication extends Application {
-    target: EnvModifiersTarget;
+    target: ModifiableDocumentTypes;
     modifiers: Modifiers;
 
-    constructor(target: EnvModifiersTarget) {
+    constructor(target: ModifiableDocumentTypes) {
         super();
 
         this.target = target;
@@ -178,7 +178,6 @@ export class EnvModifiersApplication extends Application {
             event.preventDefault();
 
             if (!token || !token.actor) return;
-            // @ts-ignore // TODO: TYPE: Remove this...
             await new EnvModifiersApplication(token.actor).render(true);
         }
     }

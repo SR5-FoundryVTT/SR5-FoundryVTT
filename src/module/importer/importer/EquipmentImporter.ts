@@ -1,6 +1,8 @@
 import {DataImporter} from "./DataImporter";
 import {ImportHelper} from "../helper/ImportHelper";
 import {Constants} from "./Constants";
+import EquipmentItemData = Shadowrun.EquipmentItemData;
+import {DefaultValues} from "../../data/DataDefaults";
 
 export class EquipmentImporter extends DataImporter {
     public files = ['gear.xml'];
@@ -9,42 +11,8 @@ export class EquipmentImporter extends DataImporter {
         return jsonObject.hasOwnProperty('gears') && jsonObject['gears'].hasOwnProperty('gear');
     }
 
-    GetDefaultData() {
-        return {
-            name: '',
-            _id: '',
-            folder: '',
-            img: 'icons/svg/mystery-man.svg',
-            flags: {},
-            type: 'equipment',
-            data: {
-                description: {
-                    value: '',
-                    chat: '',
-                    source: '',
-                },
-                technology: {
-                    rating: 1,
-                    availability: '',
-                    quantity: 1,
-                    cost: 0,
-                    equipped: true,
-                    conceal: {
-                        base: 0,
-                        value: 0,
-                        mod: [],
-                    },
-                    condition_monitor: {
-                        label: '',
-                        value: 0,
-                        max: 0,
-                    },
-                }
-            },
-            permission: {
-                default: 2,
-            },
-        };
+    GetDefaultData(): EquipmentItemData {
+        return DefaultValues.equipmentItemData();
     }
 
     ExtractTranslation(fileName?: string) {
@@ -100,7 +68,7 @@ export class EquipmentImporter extends DataImporter {
         return jsonObject['gears']['gear'].filter(gear => !unsupportedCategories.includes(ImportHelper.StringValue(gear, 'category', '')));
     }
 
-    async Parse(jsonObject: object): Promise<Entity> {
+    async Parse(jsonObject: object): Promise<Item> {
         const equipments = this.FilterJsonObjects(jsonObject);
 
         const entries = await this.ParseEquipments(equipments);

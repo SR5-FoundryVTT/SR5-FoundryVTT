@@ -145,5 +145,14 @@
                 data.technology.wireless}}
             />
         </div>
+        <div class="flexrow nowrap">
+            <span>PAN</span>
+            {{#if networkController}}
+            <span>
+                <a class="origin-link" draggable="false" data-origin-link="{{networkController.uuid}}">{{networkController.name}}</a>
+                <a class="close controller-remove"><i class="fas fa-times"></i></a>
+            </span>
+            {{/if}}
+        </div>
     </div>
 </div>

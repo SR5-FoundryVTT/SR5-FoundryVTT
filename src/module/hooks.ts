@@ -24,16 +24,16 @@ import {SR5ICActorSheet} from "./actor/sheets/SR5ICActorSheet";
 import ShadowrunItemDataData = Shadowrun.ShadowrunItemDataData;
 import SocketMessageHooks = Shadowrun.SocketMessageHooks;
 import SocketMessage = Shadowrun.SocketMessageData;
-import {DeviceFlow} from "./item/flows/DeviceFlow";
 import {SR5ActiveEffect} from "./effect/SR5ActiveEffect";
 import {SR5ActiveEffectSheet} from "./effect/SR5ActiveEffectSheet";
+import {NetworkDeviceFlow} from "./item/flows/NetworkDeviceFlow";
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
-// TODO: Figure out how to change global CONFIG type
 export const SR5CONFIG = SR5;
 
 export class HooksManager {
     static registerHooks() {
+        console.log('Shadowrun 5e | Registering system hooks');
         // Register your highest level hook callbacks here for a quick overview of what's hooked into.
 
         Hooks.once('init', HooksManager.init);
@@ -50,6 +50,7 @@ export class HooksManager {
         Hooks.on('renderItemDirectory', HooksManager.renderItemDirectory);
         Hooks.on('renderTokenHUD', EnvModifiersApplication.addTokenHUDFields);
         Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem);
+        Hooks.on('deleteItem', HooksManager.removeDeletedItemsFromNetworks);
 
         // Foundry VTT Module 'quench': https://github.com/schultzcole/FVTT-Quench
         Hooks.on('quenchReady', quenchRegister);
@@ -75,16 +76,12 @@ ___________________
             rollSkillMacro
         };
 
-        // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
         CONFIG.Actor.documentClass = SR5Actor;
-        // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
         CONFIG.Item.documentClass = SR5Item;
-        // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
+        // @ts-ignore // TODO: Compare Combat/SR5Combat typing.
         CONFIG.Combat.documentClass = SR5Combat;
-        // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
         CONFIG.ActiveEffect.documentClass = SR5ActiveEffect;
         CONFIG.ActiveEffect.sheetClass = SR5ActiveEffectSheet;
-        // @ts-ignore // foundry-vtt-types is missing CONFIG.<>.documentClass
         CONFIG.Token.objectClass = SR5Token;
         // Register initiative directly (outside of system.json) as DnD5e does it.
         CONFIG.Combat.initiative.formula =  "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
@@ -92,6 +89,7 @@ ___________________
         Combatant.prototype._getInitiativeFormula = _combatantGetInitiativeFormula;
 
         // Add Shadowrun configuration onto general Foundry config for module access.
+        // @ts-ignore // TODO: Add declaration merging
         CONFIG.SR5 = SR5;
 
 
@@ -146,7 +144,7 @@ ___________________
 
     static canvasInit() {
         if (!canvas?.ready) return;
-        // @ts-ignore // TODO: foundry-vtt-types 0.8 diagonaleRule doesn't exist on  anymore... does this even work anymore?
+        // @ts-ignore // TODO: canvas.grid.diagonaleRule doesn't exist on  anymore... does this even work anymore?
         canvas.grid.diagonalRule = game.settings.get(SYSTEM_NAME, 'diagonalMovement');
         //@ts-ignore // TODO: TYPE SquareGrid isn't typed.
         SquareGrid.prototype.measureDistances = measureDistance;
@@ -214,7 +212,7 @@ ___________________
      * @param id
      */
     static async updateIcConnectedToHostItem(item: SR5Item, data: ShadowrunItemDataData, id: string) {
-        if (!canvas.ready) return;
+        if (!canvas.ready || !game.actors) return;
 
         if (item.isHost()) {
             // Collect actors from sidebar and active scene to update / rerender
@@ -222,16 +220,22 @@ ___________________
                 // All sidebar actors should also include tokens with linked actors.
                 ...game.actors.filter((actor: SR5Actor) => actor.isIC() && actor.hasHost()) as SR5Actor[],
                 // All token actors that aren't linked.
-                // @ts-ignore // TODO: foundry-vtt-types 0.9
+                // @ts-ignore
                 ...canvas.scene.tokens.filter(token => !token.data.actorLink && token.actor?.isIC() && token.actor?.hasHost()).map(t => t.actor)
             ];
 
             // Update host data on the ic actor.
             const hostData = item.asHostData();
+            if (!hostData) return;
             for (const ic of connectedIC) {
+                if (!ic) continue;
                 await ic._updateICHostData(hostData);
             }
         }
+    }
+
+    static async removeDeletedItemsFromNetworks(item: SR5Item, data: ShadowrunItemDataData, id: string) {
+        await NetworkDeviceFlow.handleOnDeleteItem(item, data, id);
     }
 
     /**
@@ -240,24 +244,25 @@ ___________________
      * You can use the SocketMessage
      */
     static registerSocketListeners() {
-        console.log('Registering Shadowrun5e system sockets...');
+        if (!game.socket || !game.user) return;
+        console.log('Registering Shadowrun5e system socket messages...');
         const hooks: SocketMessageHooks = {
-            [FLAGS.addNetworkController]: [DeviceFlow.handleAddNetworkControllerSocketMessage],
+            [FLAGS.addNetworkController]: [NetworkDeviceFlow._handleAddNetworkControllerSocketMessage],
             [FLAGS.DoNextRound]: [SR5Combat._handleDoNextRoundSocketMessage],
-            [FLAGS.DoInitPass]: [SR5Combat._handleDoInitPassSocketMessage]
+            [FLAGS.DoInitPass]: [SR5Combat._handleDoInitPassSocketMessage],
         }
 
         game.socket.on(SYSTEM_SOCKET, async (message: SocketMessage) => {
-            console.log('Received Shadowrun5e system socket message.', message);
+            console.log('Shadowrun 5e | Received system socket message.', message);
 
             const handlers = hooks[message.type];
-            if (!handlers || handlers.length === 0) return console.warn('System socket message without handler!', message);
+            if (!handlers || handlers.length === 0) return console.warn('Shadowrun 5e | System socket message has no registered handler!', message);
             // In case of targeted socket message only execute with target user (intended for GM usage)
-            if (message.userId && game.user.id !== message.userId) return;
-            if (message.userId && game.user.id) console.log('GM is handling Shadowrun5e system socket message');
+            if (message.userId && game.user?.id !== message.userId) return;
+            if (message.userId && game.user?.id) console.log('Shadowrun 5e | GM is handling system socket message');
 
             for (const handler of handlers) {
-                console.log('Handover Shadowrun5e system socket message to handler', handler);
+                console.log('Shadowrun 5e | Handover system socket message to handler', handler);
                 await handler(message);
             }
         });
@@ -279,7 +284,7 @@ ___________________
         const api = aipModule.API;
         if (!api) return;
 
-        console.log('Shadowrun5e - Registering support for autocomplete-inline-properties');
+        console.log('Shadowrun 5e | Registering support for autocomplete-inline-properties');
         // @ts-ignore
         const DATA_MODE = api.CONST.DATA_MODE;
 

@@ -12,8 +12,6 @@ import MatrixAttribute = Shadowrun.MatrixAttribute;
 import SkillField = Shadowrun.SkillField;
 import DeviceData = Shadowrun.DeviceData;
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
-import {MatrixRules} from "../rules/MatrixRules";
-import {SR5ActiveEffect} from "../effect/SR5ActiveEffect";
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
@@ -24,7 +22,7 @@ let globalSkillAppId: number = -1;
  * See Hooks.init for which actor type this sheet handles.
  *
  */
-export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
+export class SR5ActorSheet extends ActorSheet {
     _shownDesc: string[] = [];
     _filters: SR5SheetFilters = {
         skills: '',
@@ -64,38 +62,34 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         return `${path}/actor/${this.actor.data.type}.html`;
     }
 
-    /**
-     * Prepare data for rendering the Actor sheet
-     * The prepared data object contains both the actor data as well as additional sheet options
-     */
-    getData() {
-        // Restructure redesigned Document.getData to contain all new fields, while keeping data.data as system data.
-        let data = super.getData() as unknown as SR5ActorSheetData;
-        data = {
-            ...data,
-            // @ts-ignore
-            data: data.data.data
-        }
+    getData(options?: Application.RenderOptions): Promise<ActorSheet.Data<ActorSheet.Options>> | ActorSheet.Data<ActorSheet.Options> {
+        //     // Restructure redesigned Document.getData to contain all new fields, while keeping data.data as system data.
+            let data = super.getData() as unknown as SR5ActorSheetData;
+            data = {
+                ...data,
+                // @ts-ignore
+                data: data.data.data
+            }
 
-        // General purpose fields...
-        data.config = SR5;
-        data.filters = this._filters;
+            // General purpose fields...
+            data.config = SR5;
+            data.filters = this._filters;
 
-        this._prepareMatrixAttributes(data);
-        this._prepareActorAttributes(data);
+            this._prepareMatrixAttributes(data);
+            this._prepareActorAttributes(data);
 
-        this._prepareItems(data);
-        this._prepareSkillsWithFilters(data);
-        this._prepareActorTypeFields(data);
-        this._prepareCharacterFields(data);
-        this._prepareVehicleFields(data);
+            this._prepareItems(data);
+            this._prepareSkillsWithFilters(data);
+            this._prepareActorTypeFields(data);
+            this._prepareCharacterFields(data);
+            this._prepareVehicleFields(data);
 
-        // Active Effects data.
-        // @ts-ignore // TODO: foundry-vtt-types 0.8 missing document support
-        data['effects'] = prepareActiveEffectCategories(this.document.effects);
-        data['markedDocuments'] = this.object.getAllMarkedDocuments();
+            // Active Effects data.
+            data['effects'] = prepareActiveEffectCategories(this.document.effects);
+            data['markedDocuments'] = this.object.getAllMarkedDocuments();
 
-        return data;
+            // @ts-ignore // TODO: ActorSheetData typing is missing
+            return data;
     }
 
     _isSkillMagic(id, skill) {
@@ -179,10 +173,6 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
                 if (attribute.temp === 0) delete attribute.temp;
             }
         }
-    }
-
-    _prepareActorTypeIndicators(data) {
-        data.hasSkills = this.actor.getSkills() !== undefined;
     }
 
     _prepareSkillsWithFilters(data: SR5ActorSheetData) {
@@ -339,6 +329,7 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
                 item = duplicate(item);
                 // Show item properties and description in the item list overviews.
                 const actorItem = this.actor.items.get(item._id);
+                if (!actorItem) return;
                 const chatData = actorItem.getChatData();
                 item.description = chatData.description;
                 // @ts-ignore // This is a hacky monkey patch solution to pass template data through duplicated item data.
@@ -439,7 +430,7 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         });
 
         // Active Effect management
-        html.find(".effect-control").click(event => onManageActiveEffect(event, this.entity));
+        html.find(".effect-control").click(event => onManageActiveEffect(event, this.document));
 
         html.find('.skill-header').find('.item-name').click(this._onFilterUntrainedSkills.bind(this));
         html.find('.skill-header').find('.skill-spec-item').click(this._onFilterUntrainedSkills.bind(this));
@@ -548,9 +539,9 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         const dragData = {
             actorId: this.actor.id,
             sceneId: this.actor.isToken ? canvas.scene?.id : null,
-            tokenId: this.actor.isToken ? this.actor.token.id : null,
-            type: null,
-            data: null
+            tokenId: this.actor.isToken ? this.actor.token?.id : null,
+            type: '',
+            data: {}
         };
 
         // Handle different item type data transfers.
@@ -639,6 +630,7 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
 
         const iid = Helpers.listItemId(event);
         const item = this.actor.items.get(iid);
+        if (!item) return;
         await item.delete();
     }
 
@@ -804,7 +796,7 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
                 data[key] = oldVal;
             }
         }
-        await this.actor.updateOwnedItem(data);
+        await this.actor.updateEmbeddedDocuments('Item', [data]);
     }
 
     async _onMarksQuantityChange(event) {
@@ -813,7 +805,9 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
-        const {scene, target, item} = Helpers.getMarkIdDocuments(markId);
+        const markedDocuments = Helpers.getMarkIdDocuments(markId);
+        if (!markedDocuments) return;
+        const {scene, target, item} = markedDocuments;
         if (!scene || !target) return; // item can be undefined.
 
         const marks = parseInt(event.currentTarget.value);
@@ -826,7 +820,9 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
         const markId = event.currentTarget.dataset.markId;
         if (!markId) return;
 
-        const {scene, target, item} = Helpers.getMarkIdDocuments(markId);
+        const markedDocuments = Helpers.getMarkIdDocuments(markId);
+        if (!markedDocuments) return;
+        const {scene, target, item} = markedDocuments;
         if (!scene || !target) return; // item can be undefined.
 
         await this.object.setMarks(target, by, {scene, item});
@@ -860,7 +856,6 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
             name: `New ${type}`,
             type: type,
         };
-        // @ts-ignore // TODO: foundry-vtt-types has no Document Support yet.
         return this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
     }
 
@@ -979,7 +974,6 @@ export class SR5ActorSheet extends ActorSheet<SR5ActorSheetData, SR5Actor> {
             //     effect.disable(item.isEquipped());
             // })
 
-            // @ts-ignore // TODO: foundry-vtt-types 0.8 has no Document support yet
             await this.actor.updateEmbeddedDocuments('Item', newItems);
 
             this.actor.render(false);

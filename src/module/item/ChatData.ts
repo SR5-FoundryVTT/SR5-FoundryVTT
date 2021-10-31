@@ -19,10 +19,6 @@ export const ChatData = {
             }
             if (data.action.mod) {
                 labelStringList.push(`${game.i18n.localize('SR5.ItemMod')} (${data.action.mod})`);
-                // TODO when all mods are modlists
-                // Object.entries(data.action.mod).forEach(([key, value]) =>
-                //     labelStringList.push(`${game.i18n.localize(key)} (${value})`)
-                // );
             }
             if (labelStringList.length) {
                 labels.roll = labelStringList.join(' + ');

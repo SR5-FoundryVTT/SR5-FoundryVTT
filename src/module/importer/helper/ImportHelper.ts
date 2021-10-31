@@ -42,8 +42,7 @@ export class ImportHelper {
      * @param parent The parent folder.
      * @returns {Promise<Folder>} A promise that resolves with the folder object when the folder is created.
      */
-    public static async NewFolder(name: string, parent: Folder | null = null): Promise< Folder | null> {
-        // @ts-ignore // TODO: TYPE: I'm unsure what the issue is.
+    public static async NewFolder(name: string, parent: Folder | null = null) {
         return await Folder.create({
             type: 'Item',
             parent: parent === null ? null : parent.id,
@@ -66,8 +65,7 @@ export class ImportHelper {
         const pathSegments = path.split('/');
         for (const pathSegment of pathSegments) {
              // Check if the path structure matches the folder structure.
-            currentFolder = game.folders.find((folder) => {
-                // @ts-ignore // TODO: foundry-vtt-types 0.8 support missing.
+            currentFolder = game.folders?.find((folder) => {
                 return folder.parentFolder === lastFolder && folder.name === pathSegment
             });
 
