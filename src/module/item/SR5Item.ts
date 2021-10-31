@@ -1849,6 +1849,9 @@ export class SR5Item extends Item {
         return !!technologyData;
     }
 
+    /**
+     * Disconnect any kind of item from a PAN or WAN.
+     */
     async disconnectFromNetwork() {
         if (this.canBeNetworkController) await NetworkDeviceFlow.removeAllDevicesFromNetwork(this);
         if (this.canBeNetworkDevice) await NetworkDeviceFlow.removeDeviceFromController(this);
