@@ -533,8 +533,6 @@ export class SR5ActorSheet extends ActorSheet {
      * @param event
      */
     async _onDragStart(event) {
-        if (!canvas.ready) return;
-
         // Create drag data
         const dragData = {
             actorId: this.actor.id,
