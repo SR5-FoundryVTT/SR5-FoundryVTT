@@ -9,9 +9,9 @@
   "flags": {
     "allowBugReporter": true
   },
-  "version": "0.7.23",
+  "version": "0.7.24",
   "minimumCoreVersion": "0.8.6",
-  "compatibleCoreVersion": "0.8.9",
+  "compatibleCoreVersion": "9.238",
   "scripts": [],
   "esmodules": [
     "dist/bundle.js"
@@ -68,7 +68,7 @@
   "dependencies": [],
   "socket": true,
   "manifest": "https://raw.githubusercontent.com/smilligan93/SR5-FoundryVTT/master/system.json",
-  "download": "https://github.com/smilligan93/SR5-FoundryVTT/archive/v0.7.23.zip",
+  "download": "https://github.com/smilligan93/SR5-FoundryVTT/archive/v0.7.24.zip",
   "protected": false,
   "initiative": "@initiative.current.base.value + @initiative.current.dice.text - @wounds.value",
   "gridDistance": 1,

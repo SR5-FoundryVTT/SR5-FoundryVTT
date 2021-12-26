@@ -79,7 +79,7 @@ import {NetworkDeviceFlow} from "./flows/NetworkDeviceFlow";
  *       Be wary of SR5Item.actor for this reason!
  */
 export class SR5Item extends Item {
-    // Item.items isn't the Foundry default ItemCollection but is overwritten within prepareEmbeddedEntities
+    // Item.items isn't the Foundry default ItemCollection but is overwritten within prepareNestedItems
     // to allow for embedded items in items in actors.
     items: SR5Item[];
 
@@ -152,7 +152,7 @@ export class SR5Item extends Item {
     /**
      * Return an Array of the Embedded Item Data
      */
-    getEmbeddedItems(): any[] {
+    getNestedItems(): any[] {
         let items = this.getFlag(SYSTEM_NAME, FLAGS.EmbeddedItems);
 
         items = items ? items : [];
@@ -177,13 +177,13 @@ export class SR5Item extends Item {
      * Set the embedded item data
      * @param items
      */
-    async setEmbeddedItems(items: any[]) {
+    async setNestedItems(items: any[]) {
         // clear the flag first to remove the previous items - if we don't do this then it doesn't actually "delete" any items
         // await this.unsetFlag(SYSTEM_NAME, 'embeddedItems');
         await this.setFlag(SYSTEM_NAME, FLAGS.EmbeddedItems, items);
     }
 
-    async clearEmbeddedItems() {
+    async clearNestedItems() {
         await this.unsetFlag(SYSTEM_NAME, FLAGS.EmbeddedItems);
     }
 
@@ -208,6 +208,7 @@ export class SR5Item extends Item {
      */
     prepareData() {
         super.prepareData();
+        this.prepareNestedItems();
 
         // Description labels might have changed since last data prep.
         this.labels = {};
@@ -934,7 +935,7 @@ export class SR5Item extends Item {
         if (!Array.isArray(itemData)) itemData = [itemData];
         // weapons accept items
         if (this.type === 'weapon') {
-            const currentItems = duplicate(this.getEmbeddedItems());
+            const currentItems = duplicate(this.getNestedItems());
 
             itemData.forEach((ogItem) => {
                 const item = duplicate(ogItem);
@@ -947,9 +948,9 @@ export class SR5Item extends Item {
                 }
             });
 
-            await this.setEmbeddedItems(currentItems);
+            await this.setNestedItems(currentItems);
         }
-        await this.prepareEmbeddedEntities();
+        await this.prepareNestedItems();
         await this.prepareData();
         await this.render(false);
 
@@ -959,9 +960,9 @@ export class SR5Item extends Item {
     /**
      * Prepare embeddedItems
      */
-    prepareEmbeddedEntities() {
-        super.prepareEmbeddedEntities();
-        let items = this.getEmbeddedItems();
+    prepareNestedItems() {
+        // super.prepareNestedItems();
+        let items = this.getNestedItems();
 
         // Templates and further logic need a items HashMap, yet the flag provides an array.
         if (items) {
@@ -973,19 +974,26 @@ export class SR5Item extends Item {
 
             // Merge and overwrite existing owned items with new changes.
             this.items = items.map((item) => {
+                // Set user permissions to owner, to allow none-GM users to edit their own nested items.
+                const data = game.user ? {permission: {[game.user.id]: CONST.ENTITY_PERMISSIONS.OWNER}} :
+                                          {};
+
+                // Case: MODIFY => Update existing item.
                 if (item._id in existing) {
                     const currentItem = existing[item._id];
 
                     // Update DocumentData directly, since we're not really having database items here.
-                    currentItem.data.update(item);
+                    currentItem.data.update({...item, ...data});
                     currentItem.prepareData();
                     return currentItem;
 
+                // Case: CREATE => Create new item.
                 } else {
+
                     // NOTE: It's important to deliver the item as the item parent document, even though this is meant for actor owners.
                     //       The legacy approach for embeddedItems (within another item) relies upon this.actor
                     //       returning an SR5Item instance to call .updateEmbeddedEntities, while Foundry expects an actor
-                    return new SR5Item(item, {parent: this as unknown as SR5Actor});
+                    return new SR5Item({...item, ...data}, {parent: this as unknown as SR5Actor});
                 }
             });
         }
@@ -999,7 +1007,7 @@ export class SR5Item extends Item {
 
     // TODO: Rework this method. It's complicated and obvious optimizations can be made. (find vs findIndex)
     async updateOwnedItem(changes) {
-        const items = duplicate(this.getEmbeddedItems());
+        const items = duplicate(this.getNestedItems());
         if (!items) return;
         changes = Array.isArray(changes) ? changes : [changes];
         if (!changes || changes.length === 0) return;
@@ -1018,8 +1026,8 @@ export class SR5Item extends Item {
             }
         });
 
-        await this.setEmbeddedItems(items);
-        await this.prepareEmbeddedEntities();
+        await this.setNestedItems(items);
+        await this.prepareNestedItems();
         await this.prepareData();
         await this.render(false);
         return true;
@@ -1044,16 +1052,16 @@ export class SR5Item extends Item {
      * @returns {Promise<boolean>}
      */
     async deleteOwnedItem(deleted) {
-        const items = duplicate(this.getEmbeddedItems());
+        const items = duplicate(this.getNestedItems());
         if (!items) return;
 
         const idx = items.findIndex((i) => i._id === deleted || Number(i._id) === deleted);
         if (idx === -1) throw new Error(`Shadowrun5e | Couldn't find owned item ${deleted}`);
         items.splice(idx, 1);
         // we need to clear the items when one is deleted or it won't actually be deleted
-        await this.clearEmbeddedItems();
-        await this.setEmbeddedItems(items);
-        await this.prepareEmbeddedEntities();
+        await this.clearNestedItems();
+        await this.setNestedItems(items);
+        await this.prepareNestedItems();
         await this.prepareData();
         await this.render(false);
         return true;

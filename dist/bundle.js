@@ -15732,8 +15732,6 @@ class SR5ActorSheet extends ActorSheet {
         });
         var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
-            if (!canvas.ready)
-                return;
             // Create drag data
             const dragData = {
                 actorId: this.actor.id,
@@ -29822,7 +29820,7 @@ class SR5Item extends Item {
     /**
      * Return an Array of the Embedded Item Data
      */
-    getEmbeddedItems() {
+    getNestedItems() {
         let items = this.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.EmbeddedItems);
         items = items ? items : [];
         // moved this "hotfix" to here so that everywhere that accesses the flag just gets an array -- Shawn
@@ -29842,14 +29840,14 @@ class SR5Item extends Item {
      * Set the embedded item data
      * @param items
      */
-    setEmbeddedItems(items) {
+    setNestedItems(items) {
         return __awaiter(this, void 0, void 0, function* () {
             // clear the flag first to remove the previous items - if we don't do this then it doesn't actually "delete" any items
             // await this.unsetFlag(SYSTEM_NAME, 'embeddedItems');
             yield this.setFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.EmbeddedItems, items);
         });
     }
-    clearEmbeddedItems() {
+    clearNestedItems() {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.unsetFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.EmbeddedItems);
         });
@@ -29875,6 +29873,7 @@ class SR5Item extends Item {
     prepareData() {
         var _a;
         super.prepareData();
+        this.prepareNestedItems();
         // Description labels might have changed since last data prep.
         this.labels = {};
         if (this.data.type === 'sin') {
@@ -30541,7 +30540,7 @@ class SR5Item extends Item {
                 itemData = [itemData];
             // weapons accept items
             if (this.type === 'weapon') {
-                const currentItems = duplicate(this.getEmbeddedItems());
+                const currentItems = duplicate(this.getNestedItems());
                 itemData.forEach((ogItem) => {
                     var _a, _b;
                     const item = duplicate(ogItem);
@@ -30553,9 +30552,9 @@ class SR5Item extends Item {
                         currentItems.push(item);
                     }
                 });
-                yield this.setEmbeddedItems(currentItems);
+                yield this.setNestedItems(currentItems);
             }
-            yield this.prepareEmbeddedEntities();
+            yield this.prepareNestedItems();
             yield this.prepareData();
             yield this.render(false);
             return true;
@@ -30564,9 +30563,9 @@ class SR5Item extends Item {
     /**
      * Prepare embeddedItems
      */
-    prepareEmbeddedEntities() {
-        super.prepareEmbeddedEntities();
-        let items = this.getEmbeddedItems();
+    prepareNestedItems() {
+        // super.prepareNestedItems();
+        let items = this.getNestedItems();
         // Templates and further logic need a items HashMap, yet the flag provides an array.
         if (items) {
             const existing = (this.items || []).reduce((object, item) => {
@@ -30575,18 +30574,23 @@ class SR5Item extends Item {
             }, {});
             // Merge and overwrite existing owned items with new changes.
             this.items = items.map((item) => {
+                // Set user permissions to owner, to allow none-GM users to edit their own nested items.
+                const data = game.user ? { permission: { [game.user.id]: CONST.ENTITY_PERMISSIONS.OWNER } } :
+                    {};
+                // Case: MODIFY => Update existing item.
                 if (item._id in existing) {
                     const currentItem = existing[item._id];
                     // Update DocumentData directly, since we're not really having database items here.
-                    currentItem.data.update(item);
+                    currentItem.data.update(Object.assign(Object.assign({}, item), data));
                     currentItem.prepareData();
                     return currentItem;
+                    // Case: CREATE => Create new item.
                 }
                 else {
                     // NOTE: It's important to deliver the item as the item parent document, even though this is meant for actor owners.
                     //       The legacy approach for embeddedItems (within another item) relies upon this.actor
                     //       returning an SR5Item instance to call .updateEmbeddedEntities, while Foundry expects an actor
-                    return new SR5Item(item, { parent: this });
+                    return new SR5Item(Object.assign(Object.assign({}, item), data), { parent: this });
                 }
             });
         }
@@ -30600,7 +30604,7 @@ class SR5Item extends Item {
     // TODO: Rework this method. It's complicated and obvious optimizations can be made. (find vs findIndex)
     updateOwnedItem(changes) {
         return __awaiter(this, void 0, void 0, function* () {
-            const items = duplicate(this.getEmbeddedItems());
+            const items = duplicate(this.getNestedItems());
             if (!items)
                 return;
             changes = Array.isArray(changes) ? changes : [changes];
@@ -30620,8 +30624,8 @@ class SR5Item extends Item {
                     // this.items[index].data = items[index];
                 }
             });
-            yield this.setEmbeddedItems(items);
-            yield this.prepareEmbeddedEntities();
+            yield this.setNestedItems(items);
+            yield this.prepareNestedItems();
             yield this.prepareData();
             yield this.render(false);
             return true;
@@ -30648,7 +30652,7 @@ class SR5Item extends Item {
      */
     deleteOwnedItem(deleted) {
         return __awaiter(this, void 0, void 0, function* () {
-            const items = duplicate(this.getEmbeddedItems());
+            const items = duplicate(this.getNestedItems());
             if (!items)
                 return;
             const idx = items.findIndex((i) => i._id === deleted || Number(i._id) === deleted);
@@ -30656,9 +30660,9 @@ class SR5Item extends Item {
                 throw new Error(`Shadowrun5e | Couldn't find owned item ${deleted}`);
             items.splice(idx, 1);
             // we need to clear the items when one is deleted or it won't actually be deleted
-            yield this.clearEmbeddedItems();
-            yield this.setEmbeddedItems(items);
-            yield this.prepareEmbeddedEntities();
+            yield this.clearNestedItems();
+            yield this.setNestedItems(items);
+            yield this.prepareNestedItems();
             yield this.prepareData();
             yield this.render(false);
             return true;
