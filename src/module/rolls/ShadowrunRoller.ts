@@ -21,6 +21,7 @@ import {ShadowrunTestDialog} from "../apps/dialogs/ShadowrunTestDialog";
 import ModifiedDamageData = Shadowrun.ModifiedDamageData;
 import LimitField = Shadowrun.LimitField;
 import CombatData = Shadowrun.CombatData;
+import {SR5Roll} from "./SR5Roll";
 
 // item, actor, dicePool, attack, defense, spell, form
 export type Test =  {
@@ -171,6 +172,17 @@ export class ShadowrunRoll extends Roll {
         let glitched = 0;
         SR.die.glitch.forEach(die => glitched += this.count(die));
         return glitched > Math.floor(this.pool / 2);
+    }
+
+    /**
+     *
+     * @param messageData
+     * @param rollMode
+     */
+    toMessage(messageData?, rollMode?): Promise<ChatMessage|undefined> {
+        console.error('message', messageData, rollMode);
+
+        return super.toMessage(messageData, rollMode);
     }
 }
 
@@ -363,6 +375,16 @@ export class ShadowrunRoller {
         const advancedRollProps = { parts, title: game.i18n.localize("SR5.Test")} as AdvancedRollProps;
         const dialogOptions = { pool: true }
         return ShadowrunRoller.advancedRoll(advancedRollProps, dialogOptions);
+    }
+
+    /*
+     * Flow should be handled by Roll class
+     * - dialog
+     * - roll
+     * - message
+     */
+    static async promptSuccessRoll(): Promise<ShadowrunRoll | undefined> {
+        return await SR5Roll.castByUser();
     }
 
     /**

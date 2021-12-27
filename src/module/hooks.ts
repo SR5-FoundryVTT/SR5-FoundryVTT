@@ -135,11 +135,11 @@ ___________________
 
         }
 
-        // TODO make based on foundry version
+        // Connect chat dice icon to shadowrun basic success test roll.
         const diceIconSelector = '#chat-controls .roll-type-select .fa-dice-d20';
-        $(document).on('click', diceIconSelector, () => ShadowrunRoller.promptRoll());
+        $(document).on('click', diceIconSelector, async () => await ShadowrunRoller.promptSuccessRoll());
         const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
-        $(document).on('click', diceIconSelectorNew, () => ShadowrunRoller.promptRoll());
+        $(document).on('click', diceIconSelectorNew, async () => await ShadowrunRoller.promptSuccessRoll());
     }
 
     static canvasInit() {
