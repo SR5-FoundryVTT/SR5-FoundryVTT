@@ -132,6 +132,9 @@ export const preloadHandlebarsTemplates = async () => {
 
         // dialogs
         'systems/shadowrun5e/dist/templates/apps/dialogs/damage-application.html',
+
+        // Rolls
+        'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.html',
     ];
 
     return loadTemplates(templatePaths);

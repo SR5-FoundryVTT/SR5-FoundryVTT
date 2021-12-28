@@ -1,12 +1,19 @@
 import {SR} from "../constants";
 import ModList = Shadowrun.ModList;
 
-
-type ShadowrunRollData = {
+// TODO: Data for casting actor / item (uuid)
+// TODO: maybe copy of the action data from the casting item / actor
+interface ShadowrunRollData {
     limit: number
     threshold: number
-    parts: ModList<number>
+    parts: ModList<number> // TODO: Is this useful?
     explodeSixes: boolean
+}
+
+interface ShadowrunChatMessageData {
+    title?: String
+    content?: String
+    roll?: SR5Roll
 }
 
 
@@ -15,14 +22,19 @@ type ShadowrunRollData = {
  *
  * TODO: This class should create a basic Success Test template and be extended
  *       for further Test templates (versus, action, weapon?, spell?)
+ *
+ * TODO: A chat message should contain all data needed to cast resulting actions.
  */
 export class SR5Roll extends Roll {
     data: ShadowrunRollData
 
-    // add class Roll to the json so dice-so-nice works
-    // TODO: Check if this is still necessary.
+    static CHAT_TEMPLATE = 'systems/shadowrun5e/dist/templates/rolls/success-test.html';
+
     toJSON(): any {
+        // TODO: Check if data includes custom ShadowrunRollData
         const data = super.toJSON();
+        // add class Roll to the json so dice-so-nice works
+        // TODO: Check if this is still necessary.
         data.class = 'Roll';
         return data;
     }
@@ -48,7 +60,6 @@ export class SR5Roll extends Roll {
         return this.data.threshold;
     }
 
-    //@ts-ignore // TODO: This overwrites Roll.parts with very different return types...
     get parts(): ModList<number> {
         return this.data.parts;
     }
@@ -67,15 +78,14 @@ export class SR5Roll extends Roll {
     }
 
     get pool(): number {
-        //@ts-ignore
-        // 0.7.x foundryVTT
+        // 0.7.x > FoundryVTT
         if (this.terms) {
             //@ts-ignore
             return this.dice[0].number;
         }
 
         //@ts-ignore
-        // 0.6.x foundryVTT
+        // till 0.6.x FoundryVTT
         return this.parts[0].rolls.length;
     }
 
@@ -85,15 +95,25 @@ export class SR5Roll extends Roll {
         return glitched > Math.floor(this.pool / 2);
     }
 
-    async toMessage(messageData?, rollMode?): Promise<ChatMessage|undefined> {
-        console.error('message', this, messageData, rollMode);
+    /**
+     * Overwrite default toMessage for custom message content.
+     *
+     * @param messageData
+     * @param options
+     */
+    async toMessage(messageData: ShadowrunChatMessageData = {}, options?): Promise<ChatMessage|undefined> {
+        console.error('message', this, messageData, options);
 
-        return super.toMessage(messageData, rollMode);
+        // Replace default chat message content.
+        // This content follows FoundryVTT rollMode visibility rules.
+        messageData.content = messageData.content ?? await renderTemplate(SR5Roll.CHAT_TEMPLATE, messageData);
+        messageData.roll = this;
+        return super.toMessage(messageData, options);
     }
 
     /**
      * Place holder for flow handling.
-     * TODO: Might need complete rework or removal. Will ne args at least.
+     * TODO: Might need complete rework or removal. Will need args at least.
      */
     static async castByUser(): Promise<SR5Roll | undefined> {
         console.error('promptSuccessRoll');
@@ -102,7 +122,7 @@ export class SR5Roll extends Roll {
         console.error('roll', roll);
         await roll.evaluate({async: true});
         console.error('evaluate', roll);
-        const message = await roll.toMessage();
+        const message = await roll.toMessage({title: 'Test'});
         console.error('message', roll, message);
 
         return roll;
