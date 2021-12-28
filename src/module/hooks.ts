@@ -27,6 +27,7 @@ import SocketMessage = Shadowrun.SocketMessageData;
 import {SR5ActiveEffect} from "./effect/SR5ActiveEffect";
 import {SR5ActiveEffectSheet} from "./effect/SR5ActiveEffectSheet";
 import {NetworkDeviceFlow} from "./item/flows/NetworkDeviceFlow";
+import {SR5VehicleActorSheet} from "./actor/sheets/SR5VehicleActorSheet";
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -101,12 +102,17 @@ ___________________
         Actors.registerSheet(SYSTEM_NAME, SR5ActorSheet, {
             label: "SR5.SheetActor",
             makeDefault: true,
-            types: ['character', 'vehicle', 'critter', 'spirit', 'sprite']
+            types: ['character', 'critter', 'spirit', 'sprite']
         });
         Actors.registerSheet(SYSTEM_NAME, SR5ICActorSheet, {
             label: "SR5.SheetActor",
             makeDefault: true,
             types: ['ic']
+        });
+        Actors.registerSheet(SYSTEM_NAME, SR5VehicleActorSheet, {
+            label: "SR5.SheetActor",
+            makeDefault: true,
+            types: ['vehicle']
         });
 
 

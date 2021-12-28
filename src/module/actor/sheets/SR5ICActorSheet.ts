@@ -30,7 +30,7 @@ export class SR5ICActorSheet extends SR5BaseActorSheet {
         await this.object.removeICHost();
     }
 
-    _onDrop(event: DragEvent) {
+    async _onDrop(event: DragEvent) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -43,8 +43,7 @@ export class SR5ICActorSheet extends SR5BaseActorSheet {
         switch(dropData.type) {
             case 'Item':
                 // We don't have to narrow down type here, the SR5Actor will handle this for us.
-                this.object.addICHost(dropData.id);
-                break;
+                return await this.object.addICHost(dropData.id);
         }
 
         // Let Foundry handle default cases.

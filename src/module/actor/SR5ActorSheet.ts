@@ -496,7 +496,7 @@ export class SR5ActorSheet extends ActorSheet {
          */
         $(html).find('.Roll').on('click', this._onRollFromSheet.bind(this));
 
-        // updates matrix condition monitor on the device the actor has equippe
+        // updates matrix condition monitor on the device the actor has equipped
         $(html)
             .find('[name="data.matrix.condition_monitor.value"]')
             .on('change', async (event: any) => {

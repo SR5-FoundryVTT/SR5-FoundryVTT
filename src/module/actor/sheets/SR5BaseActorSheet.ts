@@ -3,6 +3,18 @@ import {SR5Item} from "../../item/SR5Item";
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../../effects";
 import {SR5} from "../../config";
+import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
+import SkillField = Shadowrun.SkillField;
+import Skills = Shadowrun.Skills;
+import {SkillEditSheet} from "../../apps/skills/SkillEditSheet";
+import {SR5Actor} from "../SR5Actor";
+import {KnowledgeSkillEditSheet} from "../../apps/skills/KnowledgeSkillEditSheet";
+import {LanguageSkillEditSheet} from "../../apps/skills/LanguageSkillEditSheet";
+
+// Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
+// Should multiple instances be open, Foundry will cause cross talk between skills and actors,
+// when opened in succession, causing SkillEditSheet to wrongfully overwrite the wrong data.
+let globalSkillAppId: number = -1;
 
 /**
  * This class should not be used directly but be extended for each actor type.
@@ -10,14 +22,14 @@ import {SR5} from "../../config";
  * TODO: Implement auto hiding of item description field in list-items (see effects tab and set hasDesc to true)
  */
 export class SR5BaseActorSheet extends ActorSheet {
-    // Store description to display on the sheet.
+    // What document description is shown on sheet. Allow displaying multiple descriptions at the same time.
     _shownDesc: string[] = [];
     // If something needs filtering, store those filters here.
     _filters: SR5SheetFilters = {
-            skills: '',
-            showUntrainedSkills: true,
+            skills: '', // filter based on user input and skill name/label.
+            showUntrainedSkills: true, // filter based on pool size.
         };
-    // Used to store the scroll position on rerender. Needed as Foundry fully rerenders on update.
+    // Used to store the scroll position on rerender. Needed as Foundry fully re-renders on Document update.
     _scroll: string;
 
     /**
@@ -42,6 +54,7 @@ export class SR5BaseActorSheet extends ActorSheet {
     /**
      * Decide which template to render both for actor types and user permissions.
      *
+     *
      * This could also be done within individual ActorType sheets, however, for ease of use, it's
      * centralized here.
      *
@@ -57,13 +70,9 @@ export class SR5BaseActorSheet extends ActorSheet {
         return `${path}/actor/${this.actor.data.type}.html`;
     }
 
-    /**
-     * Data used by all actor types.
-     *
-     * @override
-     */
+    /** SheetData used by _all_ actor types! */
     getData() {
-        // Restructure redesigned Document.getData to contain all new fields, while keeping data.data as system data.
+        // Foundry v8 redesigned SheetData. To avoid restructuring all sheet templates, map new onto old and ignore it.
         let data = super.getData() as any;
         data = {
             ...data,
@@ -71,19 +80,20 @@ export class SR5BaseActorSheet extends ActorSheet {
             data: data.data.data
         }
 
-        // General purpose fields
+        // Sheet related general purpose fields. These aren't persistent.
         data.config = SR5;
         data.filters = this._filters;
 
-        // Pepare data fields
-        this._prepareItems(data);
-        this._prepareActorTypeFields(data);
-
-        data['effects'] = prepareActiveEffectCategories(this.document.effects);
+        // Valid data fields for all actor types.
+        this._prepareItems(data); // All actor types have items.
+        this._prepareActorTypeFields(data);  // Actor type fields can be generic.
+        this._prepareSkillsWithFilters(data); // All actor types have skills.
+        data['effects'] = prepareActiveEffectCategories(this.document.effects);  // All actor types have effects.
 
         return data;
     }
 
+    /** Listeners used by _all_ actor types! */
     activateListeners(html) {
         super.activateListeners(html);
 
@@ -95,9 +105,23 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.item-edit').on('click', this._onItemEdit.bind(this));
         html.find('.item-delete').on('click', this._onItemDelete.bind(this));
 
-        // General item testing...
-        html.find('.item-roll').click(this._onItemRoll.bind(this));
+        // General item test rolling...
+        html.find('.item-roll').on('click', this._onItemRoll.bind(this));
         html.find('.Roll').on('click', this._onRoll.bind(this));
+
+        // Item list description display handling...
+        html.find('.hidden').hide();
+        html.find('.has-desc').click((event) => {
+            event.preventDefault();
+            const item = $(event.currentTarget).parents('.list-item');
+            const iid = $(item).data().item;
+            const field = item.next();
+            field.toggle();
+            if (iid) {
+                if (field.is(':visible')) this._shownDesc.push(iid);
+                else this._shownDesc = this._shownDesc.filter((val) => val !== iid);
+            }
+        });
 
         // Condition monitor track handling...
         html.find('.horizontal-cell-input .cell').on('click', this._onSetConditionTrackCell.bind(this));
@@ -109,6 +133,106 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.marks-remove-one').on('click', async (event) => this._onMarksQuantityChangeBy(event, -1));
         html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
         html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
+
+        // Skill Filter handling...
+        html.find('.skill-header').find('.item-name').on('click', this._onFilterUntrainedSkills.bind(this));
+        html.find('.skill-header').find('.skill-spec-item').on('click', this._onFilterUntrainedSkills.bind(this));
+        html.find('.skill-header').find('.rtg').on('click', this._onFilterUntrainedSkills.bind(this));
+        html.find('#filter-skills').on('input', this._onFilterSkills.bind(this));
+
+        // Skill CRUD handling...
+        html.find('.skill-edit').on('click', this._onShowEditSkill.bind(this));
+        html.find('.knowledge-skill-edit').on('click', this._onShowEditKnowledgeSkill.bind(this));
+        html.find('.language-skill-edit').on('click', this._onShowEditLanguageSkill.bind(this));
+        html.find('.add-knowledge').on('click', this._onAddKnowledgeSkill.bind(this));
+        html.find('.add-language').on('click', this._onAddLanguageSkill.bind(this));
+        html.find('.add-active').on('click', this._onAddActiveSkill.bind(this));
+        html.find('.remove-knowledge').on('click', this._onRemoveKnowledgeSkill.bind(this));
+        html.find('.remove-language').on('click', this._onRemoveLanguageSkill.bind(this));
+        html.find('.remove-active').on('click', this._onRemoveActiveSkill.bind(this));
+
+        // Skill test rolling...
+        html.find('.skill-roll').on('click', this._onRollActiveSkill.bind(this));
+        html.find('.knowledge-skill').on('click', this._onRollKnowledgeSkill.bind(this));
+        html.find('.language-skill').on('click', this._onRollLanguageSkill.bind(this));
+
+        // Misc. actor actions...
+        html.find('.show-hidden-skills').on('click', this._onShowHiddenSkills.bind(this));
+        html.find('.open-source-pdf').on('click', this._onOpenSourcePDF.bind(this));
+        html.find('.list-item').each(this._addDragSupportToListItemTemplatePartial.bind(this));
+    }
+
+    /**
+     * @override Default drag start handler to add Skill support
+     * @param event
+     */
+    async _onDragStart(event) {
+        // Create drag data
+        const dragData = {
+            actorId: this.actor.id,
+            sceneId: this.actor.isToken ? canvas.scene?.id : null,
+            tokenId: this.actor.isToken ? this.actor.token?.id : null,
+            type: '',
+            data: {}
+        };
+
+        // Handle different item type data transfers.
+        // These handlers depend on behavior of the template partial ListItem.html.
+        const element = event.currentTarget;
+        switch (element.dataset.itemType) {
+            // Skill data transfer. (Active and language skills)
+            case 'skill':
+                // Prepare data transfer
+                dragData.type = 'Skill';
+                dragData.data = {
+                    skillId: element.dataset.itemId,
+                    skill: this.actor.getSkill(element.dataset.itemId)
+                };
+
+                // Set data transfer
+                event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+
+                return;
+
+            // Knowlege skill data transfer
+            case 'knowledgeskill':
+                // Knowledge skills have a multi purpose id built: <id>.<knowledge_category>
+                const skillId = element.dataset.itemId.includes('.') ? element.dataset.itemId.split('.')[0] : element.dataset.itemId;
+
+                dragData.type = 'Skill';
+                dragData.data = {
+                    skillId,
+                    skill: this.actor.getSkill(skillId)
+                };
+
+                // Set data transfer
+                event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+
+                return;
+
+            // All default Foundry data transfer.
+            default:
+                // Let default Foundry handler deal with default drag cases.
+                return super._onDragStart(event);
+        }
+    }
+
+    /** Handle all document drops onto all actor sheet types.
+     *
+     * @param event
+     */
+    // @ts-ignore
+    async _onDrop(event: DragEvent) {
+        event.preventDefault();
+        event.stopPropagation();
+
+        if (!event.dataTransfer) return;
+
+        // const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
+        // Handle specific system drop events.
+
+        // Handle none specific drop events.
+        return super._onDrop(event);
     }
 
     /**
@@ -576,4 +700,281 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         await this.object.clearMarks();
     }
+
+    _prepareSkillsWithFilters(data: SR5ActorSheetData) {
+        this._filterActiveSkills(data);
+        this._filterKnowledgeSkills(data);
+        this._filterLanguageSkills(data);
+    }
+
+    _filterSkills(data: SR5ActorSheetData, skills: Skills) {
+        const filteredSkills = {};
+        for (let [key, skill] of Object.entries(skills)) {
+            // Don't show hidden skills.
+            if (skill.hidden) {
+                continue;
+            }
+            // Filter visible skills.
+            if (this._showSkill(key, skill, data)) {
+                filteredSkills[key] = skill;
+            }
+        }
+
+        return Helpers.sortSkills(filteredSkills);
+    }
+
+     _showSkill(key, skill, data) {
+        if (this._showMagicSkills(key, skill, data)) {
+            return true;
+        }
+        if (this._showResonanceSkills(key, skill, data)) {
+            return true;
+        }
+
+        return this._showGeneralSkill(key, skill);
+    }
+
+    _showGeneralSkill(skillId, skill: SkillField) {
+        return !this._isSkillMagic(skillId, skill) && !this._isSkillResonance(skill) && this._isSkillFiltered(skillId, skill);
+    }
+
+    _showMagicSkills(skillId, skill: SkillField, data: SR5ActorSheetData) {
+        return this._isSkillMagic(skillId, skill) && data.data.special === 'magic' && this._isSkillFiltered(skillId, skill);
+    }
+
+    _showResonanceSkills(skillId, skill: SkillField, data: SR5ActorSheetData) {
+        return this._isSkillResonance(skill) && data.data.special === 'resonance' && this._isSkillFiltered(skillId, skill);
+    }
+
+    _isSkillFiltered(skillId, skill) {
+        // a newly created skill shouldn't be filtered, no matter what.
+        // Therefore disqualify empty skill labels/names from filtering and always show them.
+        const isFilterable = this._getSkillLabelOrName(skill).length > 0;
+        const isHiddenForText = !this._doesSkillContainText(skillId, skill, this._filters.skills);
+        const isHiddenForUntrained = !this._filters.showUntrainedSkills && skill.value === 0;
+
+        return !(isFilterable && (isHiddenForUntrained || isHiddenForText));
+    }
+
+    _getSkillLabelOrName(skill) {
+        return Helpers.getSkillLabelOrName(skill);
+    }
+
+    _doesSkillContainText(key, skill, text) {
+        if (!text) {
+            return true;
+        }
+
+        // Search both english keys, localized labels and all specializations.
+        const name = this._getSkillLabelOrName(skill);
+        const searchKey = skill.name === undefined ? key : '';
+        // some "specs" were a string from old code I think
+        const specs = skill.specs !== undefined && Array.isArray(skill.specs) ? skill.specs.join(' ') : '';
+        let searchString = `${searchKey} ${name} ${specs}`;
+
+        return searchString.toLowerCase().search(text.toLowerCase()) > -1;
+    }
+
+    _filterKnowledgeSkills(data: SR5ActorSheetData) {
+        // Knowledge skill have separate sub-categories.
+        Object.keys(SR5.knowledgeSkillCategories).forEach((category) => {
+            if (!data.data.skills.knowledge.hasOwnProperty(category)) {
+                console.warn(`Knowledge Skill doesn't provide configured category ${category}`);
+                return;
+            }
+            data.data.skills.knowledge[category].value = this._filterSkills(data, data.data.skills.knowledge[category].value);
+        });
+    }
+
+    _filterLanguageSkills(data: SR5ActorSheetData) {
+        // Language Skills have no sub-categories.
+        data.data.skills.language.value = this._filterSkills(data, data.data.skills.language.value);
+    }
+
+    _filterActiveSkills(data: SR5ActorSheetData) {
+        // Handle active skills directly, as it doesn't use sub-categories.
+        data.data.skills.active = this._filterSkills(data, data.data.skills.active);
+    }
+
+    _isSkillMagic(id, skill) {
+        return skill.attribute === 'magic' || id === 'astral_combat' || id === 'assensing';
+    }
+
+    _isSkillResonance(skill) {
+        return skill.attribute === 'resonance';
+    }
+
+    /** Setup untrained skill filter within getData */
+    async _onFilterUntrainedSkills(event) {
+        event.preventDefault();
+        this._filters.showUntrainedSkills = !this._filters.showUntrainedSkills;
+        await this.render();
+    }
+
+    /** Setup skill name filter within getData */
+    async _onFilterSkills(event) {
+        this._filters.skills = event.currentTarget.value;
+        await this.render();
+    }
+
+    async _onRollActiveSkill(event) {
+        event.preventDefault();
+        const skill = Helpers.listItemId(event);
+        return this.actor.rollActiveSkill(skill, { event: event });
+    }
+
+    async _onShowEditSkill(event) {
+        event.preventDefault();
+        const skill = Helpers.listItemId(event);
+        // new SkillEditSheet(this.actor, skill, { event: event }).render(true);
+        await this._showSkillEditForm(SkillEditSheet, this.actor, { event: event }, skill);
+    }
+
+    /** Keep track of each SkillEditSheet instance and close before opening another.
+     *
+     * @param skillEditFormImplementation Any extending class! of SkillEditSheet
+     * @param actor
+     * @param options
+     * @param args Collect arguments of the different renderWithSkill implementations.
+     */
+    async _showSkillEditForm(skillEditFormImplementation, actor: SR5Actor, options: object, ...args) {
+        await this._closeOpenSkillApp();
+
+        const skillEditForm = new skillEditFormImplementation(actor, options, ...args);
+        globalSkillAppId = skillEditForm.appId;
+        await skillEditForm.render(true);
+    }
+
+    _onShowEditKnowledgeSkill(event) {
+        event.preventDefault();
+        const [skill, category] = Helpers.listItemId(event).split('.');
+
+        this._showSkillEditForm(
+            KnowledgeSkillEditSheet,
+            this.actor,
+            {
+                event: event,
+            },
+            skill,
+            category,
+        );
+    }
+
+    async _onShowEditLanguageSkill(event) {
+        event.preventDefault();
+        const skill = Helpers.listItemId(event);
+        // new LanguageSkillEditSheet(this.actor, skill, { event: event }).render(true);
+        await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, { event: event }, skill);
+    }
+
+    async _closeOpenSkillApp() {
+        if (globalSkillAppId !== -1) {
+            if (ui.windows[globalSkillAppId]) {
+                await ui.windows[globalSkillAppId].close();
+            }
+            globalSkillAppId = -1;
+        }
+    }
+
+    async _onAddLanguageSkill(event) {
+        event.preventDefault();
+        const skillId = await this.actor.addLanguageSkill({ name: '' });
+        if (!skillId) return;
+
+        // NOTE: Causes issues with adding knowledge skills (category undefined)
+        // await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, {event}, skillId);
+    }
+
+    async _onRemoveLanguageSkill(event) {
+        event.preventDefault();
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        const skillId = Helpers.listItemId(event);
+        await this.actor.removeLanguageSkill(skillId);
+    }
+
+    async _onAddKnowledgeSkill(event) {
+        event.preventDefault();
+        const category = Helpers.listItemId(event);
+        const skillId = await this.actor.addKnowledgeSkill(category);
+        if (!skillId) return;
+
+        // NOTE: Causes issues with adding knowledge skills (category undefined)
+        // await this._showSkillEditForm(KnowledgeSkillEditSheet, this.actor, {event}, skillId);
+    }
+
+    async _onRemoveKnowledgeSkill(event) {
+        event.preventDefault();
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        const [skillId, category] = Helpers.listItemId(event).split('.');
+        await this.actor.removeKnowledgeSkill(skillId, category);
+    }
+
+    /** Add an active skill and show the matching edit application afterwards.
+     *
+     * @param event The HTML event from which the action resulted.
+     */
+     async _onAddActiveSkill(event: Event) {
+        event.preventDefault();
+        const skillId = await this.actor.addActiveSkill();
+        if (!skillId) return;
+
+        await this._showSkillEditForm(SkillEditSheet, this.actor, { event: event }, skillId);
+    }
+
+    async _onRemoveActiveSkill(event: Event) {
+         event.preventDefault();
+
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        const skillId = Helpers.listItemId(event);
+        await this.actor.removeActiveSkill(skillId);
+    }
+
+    async _onRollKnowledgeSkill(event) {
+        event.preventDefault();
+        const id = Helpers.listItemId(event);
+        const [skill, category] = id.split('.');
+        return this.actor.rollKnowledgeSkill(category, skill, { event: event });
+    }
+
+    async _onRollLanguageSkill(event) {
+        event.preventDefault();
+        const skill = Helpers.listItemId(event);
+        return this.actor.rollLanguageSkill(skill, { event: event });
+    }
+
+    async _onShowHiddenSkills(event) {
+        event.preventDefault();
+
+        await this.actor.showHiddenSkills();
+    }
+
+    async _onOpenSourcePDF(event) {
+        event.preventDefault();
+        const field = $(event.currentTarget).parents('.list-item');
+        const iid = $(field).data().itemId;
+        const item = this.actor.items.get(iid);
+        if (item) {
+            await item.openPdfSource();
+        }
+    }
+    /**
+     * Augment each item of the ListItem template partial with drag support.
+     * @param i
+     * @param item
+     */
+    _addDragSupportToListItemTemplatePartial(i, item) {
+            if (item.dataset && item.dataset.itemId) {
+                item.setAttribute('draggable', true);
+                item.addEventListener('dragstart', this._onDragStart.bind(this), false);
+            }
+    }
+
 }
