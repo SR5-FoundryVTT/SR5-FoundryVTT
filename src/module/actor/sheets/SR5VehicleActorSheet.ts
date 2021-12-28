@@ -25,12 +25,12 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
         super.activateListeners(html);
 
         // Vehicle Sheet related handlers...
-        html.find('.driver-remove').on('click', this.handleRemoveVehicleDriver.bind(this));
+        html.find('.driver-remove').on('click', this._handleRemoveVehicleDriver.bind(this));
     }
 
     /**
      * Vehicle specific drop events
-     * @param event
+     * @param event A DataTransferEvent containing some form of FoundryVTT Document / Data
      */
     async _onDrop(event) {
         event.preventDefault();
@@ -58,7 +58,7 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
         };
     }
 
-    async handleRemoveVehicleDriver(event) {
+    async _handleRemoveVehicleDriver(event) {
         event.preventDefault();
         await this.actor.removeVehicleDriver();
     }

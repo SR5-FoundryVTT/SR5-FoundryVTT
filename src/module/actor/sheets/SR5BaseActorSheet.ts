@@ -10,6 +10,8 @@ import {SkillEditSheet} from "../../apps/skills/SkillEditSheet";
 import {SR5Actor} from "../SR5Actor";
 import {KnowledgeSkillEditSheet} from "../../apps/skills/KnowledgeSkillEditSheet";
 import {LanguageSkillEditSheet} from "../../apps/skills/LanguageSkillEditSheet";
+import MatrixAttribute = Shadowrun.MatrixAttribute;
+import MarkedDocument = Shadowrun.MarkedDocument;
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
@@ -83,11 +85,14 @@ export class SR5BaseActorSheet extends ActorSheet {
         data.config = SR5;
         data.filters = this._filters;
 
+        this._prepareActorAttributes(data);
+
         // Valid data fields for all actor types.
         this._prepareItems(data); // All actor types have items.
         this._prepareActorTypeFields(data);  // Actor type fields can be generic.
         this._prepareSkillsWithFilters(data); // All actor types have skills.
-        data['effects'] = prepareActiveEffectCategories(this.document.effects);  // All actor types have effects.
+
+        data.effects = prepareActiveEffectCategories(this.document.effects);  // All actor types have effects.
 
         return data;
     }
@@ -539,6 +544,31 @@ export class SR5BaseActorSheet extends ActorSheet {
         }
 
         await this.actor.update(data);
+    }
+
+    _prepareActorAttributes(data: SR5ActorSheetData) {
+        // Clear visible, zero value attributes temporary modifiers so they appear blank.
+        const attributes = data.data.attributes;
+        for (let [, attribute] of Object.entries(attributes)) {
+            if (!attribute.hidden) {
+                if (attribute.temp === 0) delete attribute.temp;
+            }
+        }
+    }
+
+    _prepareMatrixAttributes(data) {
+        const { matrix } = data.data;
+        if (matrix) {
+            const cleanupAttribute = (attribute: MatrixAttribute) => {
+                const att = matrix[attribute];
+                if (att) {
+                    if (!att.mod) att.mod = [];
+                    if (att.temp === 0) delete att.temp;
+                }
+            };
+
+            ['firewall', 'data_processing', 'sleaze', 'attack'].forEach((att: MatrixAttribute) => cleanupAttribute(att));
+        }
     }
 
     /**
