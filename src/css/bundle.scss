@@ -315,6 +315,8 @@ select.display {
         margin: 0.25em;
         margin-bottom: -5px;
         border-bottom: 1px solid $light-border;
+        align-items: stretch; // Make tabs stretch instead of space horizontally.
+
         > a {
             margin: 0.25em;
             padding: 0.25em;
@@ -330,6 +332,10 @@ select.display {
                 @include rolloutline;
                 background-color: rgba($black, 0.4);
             }
+        }
+        > .item { // Make tabs stretch across horizontally.
+            flex: 1;
+            text-align: center;
         }
     }
     .tab {
