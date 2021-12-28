@@ -19,7 +19,6 @@ let globalSkillAppId: number = -1;
 /**
  * This class should not be used directly but be extended for each actor type.
  *
- * TODO: Implement auto hiding of item description field in list-items (see effects tab and set hasDesc to true)
  */
 export class SR5BaseActorSheet extends ActorSheet {
     // What document description is shown on sheet. Allow displaying multiple descriptions at the same time.
@@ -151,6 +150,12 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.remove-language').on('click', this._onRemoveLanguageSkill.bind(this));
         html.find('.remove-active').on('click', this._onRemoveActiveSkill.bind(this));
 
+        // Attribute test rolling...
+        html.find('.attribute-roll').on('click', this._onRollAttribute.bind(this));
+
+        // Conditon monitor test rolling...
+        html.find('.cell-input-roll').on('click', this._onRollCellInput.bind(this));
+
         // Skill test rolling...
         html.find('.skill-roll').on('click', this._onRollActiveSkill.bind(this));
         html.find('.knowledge-skill').on('click', this._onRollKnowledgeSkill.bind(this));
@@ -236,8 +241,79 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
 
     /**
-     * Sheet listeners
+     * Enhance Foundry state restore on rerender by more user interaction state.
+     * @override
      */
+    async _render(...args) {
+        const focus = this._saveInputCursorPosition();
+        this._saveScrollPositions();
+
+        await super._render(...args);
+
+        this._restoreScrollPositions();
+        this._restoreInputCursorPosition(focus);
+    }
+
+    /**
+     * Use together with _restoreInputCursorPosition during render calls.
+     * Without this the cursor will always be on the first character, causing writing in reverse.
+     */
+    _saveInputCursorPosition(): any|null {
+        const focusList = $(this.element).find('input:focus');
+        return focusList.length ? focusList[0] : null;
+    }
+
+    /**
+     * Use together with _restoreInputCursorPosition during render calls.
+     */
+    _restoreInputCursorPosition(focus) {
+        if (focus && focus.name) {
+            if (!this.form) return;
+
+            const element = this.form[focus.name];
+            if (element) {
+                // Set general focus for allem input types.
+                element.focus();
+
+                // Set selection range for supported input types.
+                if (['checkbox', 'radio'].includes(element.type)) return;
+                // set the selection range on the focus formed from before (keeps track of cursor in input)
+                element.setSelectionRange && element.setSelectionRange(focus.selectionStart, focus.selectionEnd);
+            }
+        }
+
+    }
+
+    /**
+     * Used together with _restoreScrollPositions during render calls.
+     * @private
+     */
+    _saveScrollPositions() {
+        const activeList = this._findActiveList();
+        if (activeList.length) {
+            this._scroll = activeList.prop('scrollTop');
+        }
+    }
+
+    /**
+     * Used together with _storeScrollPositions during render calls.
+     * @private
+     */
+    _restoreScrollPositions() {
+        const activeList = this._findActiveList();
+        if (activeList.length && this._scroll != null) {
+            activeList.prop('scrollTop', this._scroll);
+        }
+    }
+
+    /**
+     * Return scroll area of the currently opened tab.
+     * @private
+     */
+    _findActiveList() {
+        return $(this.element).find('.tab.active .scroll-area');
+    }
+
     async _onItemCreate(event) {
         event.preventDefault();
         const type = Helpers.listItemId(event);
@@ -255,7 +331,6 @@ export class SR5BaseActorSheet extends ActorSheet {
         const item = this.actor.items.get(iid);
         if (item) await item.sheet?.render(true);
     }
-
 
     async _onItemDelete(event) {
         event.preventDefault();
@@ -948,6 +1023,22 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.preventDefault();
         const skill = Helpers.listItemId(event);
         return this.actor.rollLanguageSkill(skill, { event: event });
+    }
+
+    async _onRollAttribute(event) {
+        event.preventDefault();
+        const attribute = event.currentTarget.closest('.attribute').dataset.attribute;
+        return this.actor.rollAttribute(attribute, {event: event});
+    }
+
+    async _onRollCellInput(event) {
+        event.preventDefault();
+        let track = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
+        if (track === 'stun' || track === 'physical') {
+            await this.actor.rollNaturalRecovery(track, event);
+        } else if (track === 'edge') {
+            await this.actor.rollAttribute('edge');
+        }
     }
 
     async _onShowHiddenSkills(event) {

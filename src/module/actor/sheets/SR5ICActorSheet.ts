@@ -1,16 +1,24 @@
 import {SR5BaseActorSheet} from "./SR5BaseActorSheet";
+import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
+import {SR5Item} from "../../item/SR5Item";
+import MarkedDocument = Shadowrun.MarkedDocument;
+
+interface ICActorSheetData extends SR5ActorSheetData {
+    host: SR5Item|undefined
+    markedDocuments: MarkedDocument[]
+    disableMarksEdit: boolean
+}
 
 export class SR5ICActorSheet extends SR5BaseActorSheet {
     getData(): any {
-        const data = super.getData();
+        const data = super.getData() as ICActorSheetData;
 
         // Fetch a connected host.
-        const icData = this.object.asICData();
-        data.host = game.items?.get(icData?.data.host.id as string);
+        data.host = this.object.getICHost();
 
         // Display Matrix Marks
-        data['markedDocuments'] = this.object.getAllMarkedDocuments();
-        data['disableMarksEdit'] = this.object.hasHost();
+        data.markedDocuments = this.object.getAllMarkedDocuments();
+        data.disableMarksEdit = this.object.hasHost();
 
         return data;
     }

@@ -109,6 +109,7 @@ ___________________
             makeDefault: true,
             types: ['ic']
         });
+        // @ts-ignore // getData typing doesn't match.
         Actors.registerSheet(SYSTEM_NAME, SR5VehicleActorSheet, {
             label: "SR5.SheetActor",
             makeDefault: true,

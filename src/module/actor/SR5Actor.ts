@@ -971,23 +971,30 @@ export class SR5Actor extends Actor {
         });
     }
 
+    /**
+     * Roll a recovery test appropriate for this actor type and condition track.
+     *
+     * @param track Condition Track/Monitor name to recover with
+     * @param options Change roll behaviour.
+     */
     rollNaturalRecovery(track, options?: ActorRollOptions) {
         if (!this.isCharacter()) return;
 
-        let id1 = 'body';
-        let id2 = 'willpower';
+        let attributeNameA = 'body';
+        let attributeNameB = 'willpower';
         let title = 'Natural Recover';
         if (track === 'physical') {
-            id2 = 'body';
+            attributeNameB = 'body';
             title += ' - Physical - 1 Day';
         } else {
             title += ' - Stun - 1 Hour';
         }
-        let att1 = duplicate(this.data.data.attributes[id1]);
-        let att2 = duplicate(this.data.data.attributes[id2]);
+        let attributeA = duplicate(this.data.data.attributes[attributeNameA]);
+        let attributeB = duplicate(this.data.data.attributes[attributeNameB]);
+
         const parts = new PartsList<number>();
-        parts.addPart(att1.label, att1.value);
-        parts.addPart(att2.label, att2.value);
+        parts.addPart(attributeA.label, attributeA.value);
+        parts.addPart(attributeB.label, attributeB.value);
 
         return ShadowrunRoller.advancedRoll({
             event: options?.event,
@@ -1315,9 +1322,15 @@ export class SR5Actor extends Actor {
         return this.rollSkill(skill, options);
     }
 
-    rollAttribute(attId, options?: ActorRollOptions) {
-        let title = game.i18n.localize(SR5.attributes[attId]);
-        const attribute = duplicate(this.data.data.attributes[attId]);
+    /**
+     * Roll a general attribute test with one or two attributes.
+     *
+     * @param name The attributes name as defined within data
+     * @param options Change general roll options.
+     */
+    rollAttribute(name, options?: ActorRollOptions) {
+        let title = game.i18n.localize(SR5.attributes[name]);
+        const attribute = duplicate(this.data.data.attributes[name]);
         const attributes = duplicate(this.data.data.attributes) as Attributes;
         const parts = new PartsList<number>();
         parts.addPart(attribute.label, attribute.value);

@@ -13,10 +13,10 @@ interface VehicleActorSheetData extends SR5ActorSheetData {
 
 export class SR5VehicleActorSheet extends SR5BaseActorSheet {
     getData() {
-        const data = super.getData();
+        const data = super.getData() as VehicleActorSheetData;
 
         // Vehicle actor type specific fields.
-        data.vehicle = this._prepareVehicleFields(data);
+        data.vehicle = this._prepareVehicleFields();
 
         return data;
     }
@@ -50,7 +50,7 @@ export class SR5VehicleActorSheet extends SR5BaseActorSheet {
         return super._onDrop(event);
     }
 
-    _prepareVehicleFields(data: SR5ActorSheetData): VehicleSheetDataFields {
+    _prepareVehicleFields(): VehicleSheetDataFields {
         const driver = this.actor.getVehicleDriver();
 
         return {
