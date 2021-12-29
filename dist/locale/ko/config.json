@@ -29,7 +29,7 @@
   "SR5.FOUNDRY": {
     "Actor": "액터",
     "Scene": "장면",
-    "Item": "아이템",
+    "Item": "물품",
     "Token": "토큰"
   },
 
@@ -206,7 +206,7 @@
   "SR5.WeaponRanges": "사거리",
   "SR5.WeaponReach": "길이",
   "SR5.Radius": "반경",
-  "SR5.Dropoff": "내려놓기",
+  "SR5.Dropoff": "감소",
   "SR5.WeaponMod": "부착물",
   "SR5.DP": "DP",
   "SR5.Accuracy": "정확도",
@@ -345,14 +345,14 @@
   "SR5.SkillAstralCombat": "아스트랄 전투",
   "SR5.SkillBanishing": "추방",
   "SR5.SkillBinding": "속박",
-  "SR5.SkillCounterspelling": "주문반사",
+  "SR5.SkillCounterspelling": "주문대항",
   "SR5.SkillDisenchanting": "인챈트 해제",
   "SR5.SkillRitualSpellcasting": "의식주문 시전",
   "SR5.SkillSpellcasting": "주문 시전",
   "SR5.SkillSummoning": "소환",
   "SR5.SkillCompiling": "컴파일링",
   "SR5.SkillDecompiling": "디컴파일링",
-  "SR5.SkillRegistering": "레지스트링",
+  "SR5.SkillRegistering": "레지스터링",
   "SR5.SkillAeronauticsMechanic": "항공정비",
   "SR5.SkillAutomotiveMechanic": "차량정비",
   "SR5.SkillIndustrialMechanic": "산업정비",
@@ -371,9 +371,9 @@
   "SR5.SkillForgery": "위조",
   "SR5.SkillHacking": "해킹",
   "SR5.SkillHardware": "하드웨어",
-  "SR5.SkillLocksmith": "열쇠공",
+  "SR5.SkillLocksmith": "자물쇠 따기",
   "SR5.SkillMedicine": "의술",
-  "SR5.SkillNavigation": "항해",
+  "SR5.SkillNavigation": "길찾기",
   "SR5.SkillSoftware": "소프트웨어",
   "SR5.SkillGunnery": "거치 무기",
   "SR5.SkillPilotAerospace": "우주선 조종",
@@ -555,7 +555,7 @@
   "SR5.SIN": "SIN",
   "SR5.OpenSourcePdf": "물품에 대한 PDF 자료 열기",
   "SR5.SourceFieldEmptyError": "자료 부분이 비어있으니 자료에 대한 유효한 문자를 입력해주시기 바랍니다.",
-  "SR5.OpenOrigin": "아이템 열기",
+  "SR5.OpenOrigin": "물품 열기",
   "SR5.TemporaryModifiers": "임시 수정치",
   "SR5.Attributes": "특성치",
   "SR5.SpecialAttributes": "특별 특성치",
@@ -728,7 +728,7 @@
       "Courier": "운반원",
       "Crack": "크랙",
       "Data": "데이터",
-      "Fault": "단점"
+      "Fault": "오류"
     }
   },
   "SR5.SpritePower": {
@@ -853,7 +853,7 @@
     "ReportUsingBugReporter": "bug-reporter 모듈로 파운드리 세션에서 GitHub 계정이 필요없이 직접 버그 보고를 할 수 있습니다."
   },
   "SR5.DeleteConfirmationApplication": {
-    "Title": "아이템 삭제   ",
+    "Title": "물품 삭제   ",
     "Delete": "예",
     "Cancel": "아니요",
     "Consent": "확실합니까?",
