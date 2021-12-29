@@ -93,6 +93,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         this._prepareSkillsWithFilters(data); // All actor types have skills.
 
         data.effects = prepareActiveEffectCategories(this.document.effects);  // All actor types have effects.
+        data.newInventory = this._prepareItemsInventory();
 
         return data;
     }
@@ -569,6 +570,71 @@ export class SR5BaseActorSheet extends ActorSheet {
 
             ['firewall', 'data_processing', 'sleaze', 'attack'].forEach((att: MatrixAttribute) => cleanupAttribute(att));
         }
+    }
+
+    /**
+     * Prepare Actor Sheet data with item data.
+     */
+    _prepareItemsInventory() {
+        const inventory = {};
+
+        // Build inventory for all item types.
+        Object.entries(CONFIG.Item.typeLabels).forEach(([type, label]) => {
+            // @ts-ignore // type is never undefined
+            inventory[type] = {
+                label,
+                items: [],
+                dataset: {
+                    type
+                }
+            }
+        });
+
+        // Fill inventory with all item types.
+        this.object.items.forEach(item => {
+            if (!inventory.hasOwnProperty(item.type)) return console.error(`Item ${item.name} of ${item.type} should have an inventory space, but doesn't, and won't be displayed.`);
+
+            // Since fields will be added, duplicate the item to avoid those propagating into #update calls.
+            const sheetItem = duplicate(item);
+
+            // Create ChatData to be displayed in chat and description.
+            const chatData = item.getChatData();
+            // TODO: Add ChatData and ItemSheetData typing.
+            // @ts-ignore
+            sheetItem.description = chatData.description;
+            // @ts-ignore
+            sheetItem.properties = chatData.properties;
+
+            // TODO: isStack property isn't used elsewhere. Remove if unnecessary.
+            // @ts-ignore
+            // sheetItem.isStack = sheetItem.data.quantity ? item.data.quantity > 1 : false;
+
+            // Add the item to its types inventory.
+            inventory[item.type].items.push(sheetItem);
+        });
+
+        // Prepared sorting methods.
+        const sortByName = (i1, i2) => {
+            if (i1.name > i2.name) return 1;
+            if (i1.name < i2.name) return -1;
+            return 0;
+        };
+        const sortByEquipped = (left, right) => {
+            const leftEquipped = left.data?.technology?.equipped;
+            const rightEquipped = right.data?.technology?.equipped;
+            if (leftEquipped && !rightEquipped) return -1;
+            if (rightEquipped && !leftEquipped) return 1;
+            if (left.name > right.name) return 1;
+            if (left.name < right.name) return -1;
+            return 0;
+        };
+
+        Object.values(inventory).forEach(({items}) => {
+            // TODO: Check if some / all should be sort by equipped.
+            items.sort(sortByName);
+        });
+
+        return inventory;
     }
 
     /**
