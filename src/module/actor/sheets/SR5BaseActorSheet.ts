@@ -1,17 +1,16 @@
 import {Helpers} from "../../helpers";
 import {SR5Item} from "../../item/SR5Item";
-import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../../effects";
 import {SR5} from "../../config";
-import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
-import SkillField = Shadowrun.SkillField;
-import Skills = Shadowrun.Skills;
 import {SkillEditSheet} from "../../apps/skills/SkillEditSheet";
 import {SR5Actor} from "../SR5Actor";
 import {KnowledgeSkillEditSheet} from "../../apps/skills/KnowledgeSkillEditSheet";
 import {LanguageSkillEditSheet} from "../../apps/skills/LanguageSkillEditSheet";
+import SR5SheetFilters = Shadowrun.SR5SheetFilters;
+import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
+import SkillField = Shadowrun.SkillField;
+import Skills = Shadowrun.Skills;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
-import MarkedDocument = Shadowrun.MarkedDocument;
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
@@ -32,6 +31,40 @@ export class SR5BaseActorSheet extends ActorSheet {
         };
     // Used to store the scroll position on rerender. Needed as Foundry fully re-renders on Document update.
     _scroll: string;
+
+    /**
+     * All actors will handle these item types specifically.
+     *
+     * All others will be collected somewhere.
+     *
+     * @return A string of item types from the template.json Item section.
+     */
+    getHandledItemTypes(): string[] {
+        return ['action'];
+    }
+
+    /**
+     * All actors will always show these in their 'inventory'.
+     * The inventory might be named differently for each actor.
+     *
+     * All other item types will only be shown when they've been added to that actor.
+     * This allows all players/GMs to add item types to each actor that the system may not find useful
+     * but the players/GMs might.
+     *
+     * @return An array of item types from the template.json Item section.
+     */
+    getInventoryItemTypes(): string[] {
+        return [];
+    }
+
+    /**
+     * These item types aren't allowed to be created on this actor sheet.
+     *
+     * This includes dropping them onto this actor.
+     */
+    getForbiddenItemTypes(): string[] {
+        return [];
+    }
 
     /**
      * Extend and override the default options used by the 5e Actor Sheet
@@ -93,7 +126,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         this._prepareSkillsWithFilters(data); // All actor types have skills.
 
         data.effects = prepareActiveEffectCategories(this.document.effects);  // All actor types have effects.
-        data.newInventory = this._prepareItemsInventory();
+        data.inventory = this._prepareItemsInventory();
 
         return data;
     }
@@ -110,23 +143,19 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.item-edit').on('click', this._onItemEdit.bind(this));
         html.find('.item-delete').on('click', this._onItemDelete.bind(this));
 
+        // General item header/list actions...
+        html.find('.item-qty').on('change', this._onListItemChangeQuantity.bind(this));
+        html.find('.item-rtg').on('change', this._onListItemChangeRating.bind(this));
+        html.find('.item-equip-toggle').on('click', this._onListItemToggleEquipped.bind(this));
+
+        // Item list description display handling...
+        html.find('.hidden').hide();
+        html.find('.has-desc').on('click', this._onListItemToggleDescriptionVisibility.bind(this));
+
         // General item test rolling...
         html.find('.item-roll').on('click', this._onItemRoll.bind(this));
         html.find('.Roll').on('click', this._onRoll.bind(this));
 
-        // Item list description display handling...
-        html.find('.hidden').hide();
-        html.find('.has-desc').click((event) => {
-            event.preventDefault();
-            const item = $(event.currentTarget).parents('.list-item');
-            const iid = $(item).data().item;
-            const field = item.next();
-            field.toggle();
-            if (iid) {
-                if (field.is(':visible')) this._shownDesc.push(iid);
-                else this._shownDesc = this._shownDesc.filter((val) => val !== iid);
-            }
-        });
 
         // Condition monitor track handling...
         html.find('.horizontal-cell-input .cell').on('click', this._onSetConditionTrackCell.bind(this));
@@ -171,6 +200,30 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.show-hidden-skills').on('click', this._onShowHiddenSkills.bind(this));
         html.find('.open-source-pdf').on('click', this._onOpenSourcePDF.bind(this));
         html.find('.list-item').each(this._addDragSupportToListItemTemplatePartial.bind(this));
+    }
+
+    /**
+     * Handle display of item types within the actors inventory section.
+     *
+     * Handled means there is some place specific the actor sheet want's these items displayed.
+     * Inventory types means they should always be shown, even if there are none.
+     * All other item types will be collected at some tab / place on the sheet.
+     */
+    _removeHandledInventory(inventory) {
+        // Show item types that aren't handled elsewhere.
+        const handledTypes = this.getHandledItemTypes();
+        for (const type of handledTypes) {
+            delete inventory[type];
+        }
+
+        // Show item types that have no use on the actor.
+        const inventoryTypes = this.getInventoryItemTypes();
+        for (const type of Object.keys(inventory)) {
+            if (inventoryTypes.includes(type)) continue;
+            if (inventory[type].items.length === 0) delete inventory[type];
+        }
+
+        return inventory;
     }
 
     /**
@@ -633,6 +686,9 @@ export class SR5BaseActorSheet extends ActorSheet {
             // TODO: Check if some / all should be sort by equipped.
             items.sort(sortByName);
         });
+
+
+        this._removeHandledInventory(inventory);
 
         return inventory;
     }
@@ -1158,10 +1214,93 @@ export class SR5BaseActorSheet extends ActorSheet {
      * @param item
      */
     _addDragSupportToListItemTemplatePartial(i, item) {
-            if (item.dataset && item.dataset.itemId) {
-                item.setAttribute('draggable', true);
-                item.addEventListener('dragstart', this._onDragStart.bind(this), false);
-            }
+        if (item.dataset && item.dataset.itemId) {
+            item.setAttribute('draggable', true);
+            item.addEventListener('dragstart', this._onDragStart.bind(this), false);
+        }
     }
 
+    /**
+     * Change the quantity on an item shown within a sheet item list.
+     */
+    async _onListItemChangeQuantity(event) {
+        const iid = Helpers.listItemId(event);
+        const item = this.actor.items.get(iid);
+        const qty = parseInt(event.currentTarget.value);
+        if (item && qty && "technology" in item.data.data) {
+            item.data.data.technology.quantity = qty;
+            await item.update({ 'data.technology.quantity': qty });
+        }
+    }
+
+    /**
+     * Change the rating on an item shown within a sheet item list.
+     */
+    async _onListItemChangeRating(event) {
+        const iid = Helpers.listItemId(event);
+        const item = this.actor.items.get(iid);
+        const rtg = parseInt(event.currentTarget.value);
+        if (item && rtg) {
+            await item.update({ 'data.technology.rating': rtg });
+        }
+    }
+
+    /**
+     * Change the equipped status of an item shown within a sheet item list.
+     */
+    async _onListItemToggleEquipped(event) {
+        event.preventDefault();
+        const iid = Helpers.listItemId(event);
+        const item = this.actor.items.get(iid);
+        if (item) {
+            const newItems = [] as any[];
+
+            // Handle the equipped state.
+            if (item.isDevice()) {
+                // Only allow one equipped device item. Unequip all other.
+                for (const item of this.actor.items.filter(actorItem => actorItem.isDevice())) {
+                    newItems.push({
+                        '_id': item.id,
+                        'data.technology.equipped': item.id === iid,
+                    });
+                }
+
+            } else {
+                // Toggle equip status.
+                newItems.push({
+                    '_id': iid,
+                    'data.technology.equipped': !item.isEquipped(),
+                });
+            }
+
+            // Handle active effects based on equipped status.
+            // NOTE: This is commented out for later ease of enabling effects based on equip status AND if they are
+            //       meant to enable on eqiup or not.
+            // this.actor.effects.forEach(effect => {
+            //     if (effect.data.origin !== item.uuid) return;
+            //
+            //     // @ts-ignore
+            //     effect.disable(item.isEquipped());
+            // })
+
+            await this.actor.updateEmbeddedDocuments('Item', newItems);
+
+            this.actor.render(false);
+        }
+    }
+
+    /**
+     * Show / hide the items description within a sheet item l ist.
+     */
+    async _onListItemToggleDescriptionVisibility(event) {
+        event.preventDefault();
+        const item = $(event.currentTarget).parents('.list-item');
+        const iid = $(item).data().item;
+        const field = item.next();
+        field.toggle();
+        if (iid) {
+            if (field.is(':visible')) this._shownDesc.push(iid);
+            else this._shownDesc = this._shownDesc.filter((val) => val !== iid);
+        }
+    }
 }

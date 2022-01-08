@@ -22,6 +22,7 @@ let globalSkillAppId: number = -1;
  * See Hooks.init for which actor type this sheet handles.
  *
  */
+console.warn('Shadowrun5e | The SR5ActorSheet class is deprecated and will be removed');
 export class SR5ActorSheet extends ActorSheet {
     _shownDesc: string[] = [];
     _filters: SR5SheetFilters = {

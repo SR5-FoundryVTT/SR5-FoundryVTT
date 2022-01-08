@@ -10,6 +10,18 @@ interface ICActorSheetData extends SR5ActorSheetData {
 }
 
 export class SR5ICActorSheet extends SR5BaseActorSheet {
+    /**
+     * IC actors will handle these item types specifically.
+     *
+     * All others will be collected within the gear tab.
+     *
+     * @returns An array of item types from the template.json Item section.
+     */
+    getHandledItemTypes(): string[] {
+        return super.getHandledItemTypes();
+    }
+
+
     getData(): any {
         const data = super.getData() as ICActorSheetData;
 

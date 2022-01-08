@@ -191,6 +191,8 @@
   "SR5.CreateItemLifestyle": "Erstelle Lebensstil",
   "SR5.CreateItemContact": "Erstelle Kontakt",
   "SR5.CreateItemCritterPower": "Erstelle Critterkraft",
+  "SR5.CreateItemAmmo": "Erstelle Munition",
+  "SR5.CreateItemModification": "Erstelle Modifikation",
   "SR5.CreateEffect": "Erstelle Effekt",
   "SR5.Weapon": "Waffen",
   "SR5.Ammo": "Munition",

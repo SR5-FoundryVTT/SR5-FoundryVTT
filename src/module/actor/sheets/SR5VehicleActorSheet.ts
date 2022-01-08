@@ -12,6 +12,45 @@ interface VehicleActorSheetData extends SR5ActorSheetData {
 
 
 export class SR5VehicleActorSheet extends SR5BaseActorSheet {
+    /**
+     * Vehicle actors will handle these item types specifically.
+     *
+     * All others will be collected within the gear tab.
+     *
+     * @returns An array of item types from the template.json Item section.
+     */
+    getHandledItemTypes(): string[] {
+        let itemTypes = super.getHandledItemTypes();
+
+        return [
+            ...itemTypes,
+            'program',
+        ];
+    }
+
+    /**
+     * Vehicle actors will always show these item types.
+     *
+     * For more info see into super.getInventoryItemTypes jsdoc.
+     *
+     * @returns An array of item types from the template.json Item section.
+     */
+    getInventoryItemTypes(): string[] {
+        const itemTypes = super.getInventoryItemTypes();
+
+        return [
+            ...itemTypes,
+            'weapon',
+            'ammo',
+            'armor',
+            'bioware',
+            'cyberware',
+            'device',
+            'equipment',
+            'modification'
+        ];
+    }
+
     getData() {
         const data = super.getData() as VehicleActorSheetData;
 

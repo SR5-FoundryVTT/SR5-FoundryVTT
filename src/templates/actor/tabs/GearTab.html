@@ -1,7 +1,7 @@
 {{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.html' tabId='gear'}}
     <div class="inventory">
         <div class="scroll-area">
-            {{#each newInventory as |section sid|}}
+            {{#each inventory as |section sid|}}
                 {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
                         name=(localize section.label)
                         itemId=section.dataset.type

@@ -4,7 +4,7 @@ import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import MarkedDocument = Shadowrun.MarkedDocument;
 
 export const registerItemLineHelpers = () => {
-    Handlebars.registerHelper('ItemHeaderIcons', function (id) {
+    Handlebars.registerHelper('ItemHeaderIcons', function (type) {
         const PlusIcon = 'fas fa-plus';
         const AddText = game.i18n.localize('SR5.Add');
         const addIcon = {
@@ -15,7 +15,7 @@ export const registerItemLineHelpers = () => {
             // Add HTML data attributes using a key<string>:value<string> structure
             data: {}
         };
-        switch (id) {
+        switch (type) {
             case 'lifestyle':
                 addIcon.title = game.i18n.localize('SR5.CreateItemLifestyle');
                 return [addIcon];
@@ -57,6 +57,9 @@ export const registerItemLineHelpers = () => {
                 return [addIcon];
             case 'ammo':
                 addIcon.title = game.i18n.localize('SR5.CreateItemAmmo');
+                return [addIcon];
+            case 'modification':
+                addIcon.title = game.i18n.localize('SR5.CreateItemModification');
                 return [addIcon];
             case 'device':
                 addIcon.title = game.i18n.localize('SR5.CreateItemDevice');
@@ -127,6 +130,7 @@ export const registerItemLineHelpers = () => {
             case 'equipment':
             case 'cyberware':
             case 'bioware':
+            case 'modification':
             case 'ammo':
                 return [
                     {
@@ -262,6 +266,7 @@ export const registerItemLineHelpers = () => {
                 ];
             case 'armor':
             case 'ammo':
+            case 'modification':
             case 'device':
             case 'equipment':
             case 'cyberware':
