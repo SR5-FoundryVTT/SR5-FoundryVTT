@@ -294,6 +294,8 @@ export const addRollListeners = (app: ChatMessage, html) => {
         return
     }
 
+    console.error('Registering message', app, html);
+
     html.on('click', '.test', async (event) => {
         event.preventDefault();
         if (!game || !game.ready) return;

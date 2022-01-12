@@ -1,4 +1,11 @@
 <div class="sr5 chat-card roll-card">
+    <div class="card-main-content">
     {{title}}
-    {{> 'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.html'}}
+        <div class="card-test-content">
+            Hits: {{roll.hits}}
+        </div>
+    </div>
+    <div class="card-rolls">
+        {{> 'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.html'}}
+    </div>
 </div>

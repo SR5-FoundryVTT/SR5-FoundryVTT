@@ -27,6 +27,8 @@ import SocketMessage = Shadowrun.SocketMessageData;
 import {SR5ActiveEffect} from "./effect/SR5ActiveEffect";
 import {SR5ActiveEffectSheet} from "./effect/SR5ActiveEffectSheet";
 import {NetworkDeviceFlow} from "./item/flows/NetworkDeviceFlow";
+import {SR5Roll} from "./rolls/SR5Roll";
+import {SuccessTest} from "./tests/SuccessTest";
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -73,7 +75,11 @@ ___________________
             ShadowrunRoller,
             SR5Item,
             rollItemMacro,
-            rollSkillMacro
+            rollSkillMacro,
+            SR5Roll,
+            tests: {
+                SuccessTest
+            }
         };
 
         CONFIG.Actor.documentClass = SR5Actor;
@@ -195,6 +201,7 @@ ___________________
 
     static renderChatMessage(message, html, data) {
         chat.addRollListeners(message, html);
+        SuccessTest.chatMessageListeners(message, html, data);
     }
 
     static renderItemDirectory(app: Application, html: JQuery) {

@@ -64,17 +64,25 @@ export class SR5Roll extends Roll {
         return this.data.parts;
     }
 
+    // TODO: Not needed anymore with complex Formula of SuccessTest
     get explodeSixes(): boolean {
         return this.data.explodeSixes;
     }
 
     count(side: number): number {
-        const results = this.sides;
-        return results.reduce((counted, result) => result === side ? counted + 1 : counted, 0);
+        return this.sides.reduce((counted, result) => result === side ? counted + 1 : counted,
+                                 0);
     }
 
+    // TODO: Rework this to work with the complex formula of SuccessTest.formula (total counts all cs and cf)
     get hits(): number {
-        return this.total || 0;
+        return this.sides.reduce((hits, result) => SR.die.success.includes(result) ? hits + 1 : hits,
+                                 0);
+    }
+
+    get glitches(): number {
+        return this.sides.reduce((glitches, result) => SR.die.glitch.includes(result) ? glitches + 1 : glitches,
+                                 0);
     }
 
     get pool(): number {
@@ -90,9 +98,11 @@ export class SR5Roll extends Roll {
     }
 
     get glitched(): boolean {
-        let glitched = 0;
-        SR.die.glitch.forEach(die => glitched += this.count(die));
-        return glitched > Math.floor(this.pool / 2);
+        return this.glitches > Math.floor(this.pool / 2);
+    }
+
+    get total(): number {
+        return this.hits;
     }
 
     /**
@@ -101,15 +111,15 @@ export class SR5Roll extends Roll {
      * @param messageData
      * @param options
      */
-    async toMessage(messageData: ShadowrunChatMessageData = {}, options?): Promise<ChatMessage|undefined> {
-        console.error('message', this, messageData, options);
-
-        // Replace default chat message content.
-        // This content follows FoundryVTT rollMode visibility rules.
-        messageData.content = messageData.content ?? await renderTemplate(SR5Roll.CHAT_TEMPLATE, messageData);
-        messageData.roll = this;
-        return super.toMessage(messageData, options);
-    }
+    // async toMessage(messageData: ShadowrunChatMessageData = {}, options?): Promise<ChatMessage|undefined> {
+    //     console.error('message', this, messageData, options);
+    //
+    //     // Replace default chat message content.
+    //     // This content follows FoundryVTT rollMode visibility rules.
+    //     messageData.content = messageData.content ?? await renderTemplate(SR5Roll.CHAT_TEMPLATE, messageData);
+    //     messageData.roll = this;
+    //     return super.toMessage(messageData, options);
+    // }
 
     /**
      * Place holder for flow handling.
