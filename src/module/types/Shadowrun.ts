@@ -51,6 +51,16 @@ declare namespace Shadowrun {
 
     // A modifier value with a name string in FoundryVTT label format (SR5.<>) used during ActorPrep to collect modifying values.
     export type ModListEntry<TType> = { name: string; value: TType };
+
+    /**
+     * A simple modifiable numerical value.
+     */
+    export type ValueField =
+        BaseValuePair<number> &
+        ModifiableValue &
+        LabelField &
+        ManualModField;
+
     /**
      * A value that is modifiable, having a base and current value, along with associated mod list.
      */

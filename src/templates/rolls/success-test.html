@@ -2,7 +2,12 @@
     <div class="card-main-content">
     {{title}}
         <div class="card-test-content">
-            Hits: {{roll.hits}}
+            <div>{{localize test.pool.label}}: {{test.pool.value}}</div>
+            {{#if test.hasLimit}}
+            <div>{{localize test.netHits.label}}: {{test.netHits.value}}</div>
+            {{else}}
+            <div>{{localize test.hits.label}}: {{test.hits.value}}</div>
+            {{/if}}
         </div>
     </div>
     <div class="card-rolls">

@@ -60,6 +60,7 @@ import ActionResultData = Shadowrun.ActionResultData;
 import MatrixMarks = Shadowrun.MatrixMarks;
 import MarkedDocument = Shadowrun.MarkedDocument;
 import {NetworkDeviceFlow} from "./flows/NetworkDeviceFlow";
+import {SuccessTestData} from "../tests/SuccessTest";
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
@@ -1863,39 +1864,5 @@ export class SR5Item extends Item {
     async disconnectFromNetwork() {
         if (this.canBeNetworkController) await NetworkDeviceFlow.removeAllDevicesFromNetwork(this);
         if (this.canBeNetworkDevice) await NetworkDeviceFlow.removeDeviceFromController(this);
-    }
-
-    /**
-     * Prepare Test pool values.
-     *
-     * These values are used to create a dice pool from and come in two variances:
-     * - flat values are defined within the action (see dice pool modifier)
-     * - actor values are referenced within the action (see attribute / skill)
-     *
-     * Flat values will be given as a value name with a corresponding numerical value.
-     * Actor values will be given as a data path with a null value, to be resolved by the caller.
-     *
-     * This method is designed to be used with FoundryVTT Roll TokenResolver and Roll.getRollData in mind.
-     *
-     * @returns An object of ActorData paths (set to null) or values with numbers.
-     */
-    getTestValues(): object {
-        const data = {};
-
-        const action = this.getAction();
-        if (!action) return data;
-
-        // Prepare skill.
-        // TODO: Check if knowledge / language skills can be used for actions.
-        if (action.skill) data[`skills.active.${action.skill}.value`] = null;
-
-        // Prepare attributes, depending on skill test status.
-        if (action.attribute) data[`attributes.${action.attribute}.value`] = null;
-        if (!action.skill && action.attribute2) data[`attributes.${action.attribute2}.value`] = null;
-
-        // Prepare flat values without actor data involvement.
-        if (action.mod) data['pool_modifier'] = action.mod;
-
-        return data;
     }
 }

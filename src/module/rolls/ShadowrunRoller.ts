@@ -22,6 +22,7 @@ import ModifiedDamageData = Shadowrun.ModifiedDamageData;
 import LimitField = Shadowrun.LimitField;
 import CombatData = Shadowrun.CombatData;
 import {SR5Roll} from "./SR5Roll";
+import {SuccessTest} from "../tests/SuccessTest";
 
 // item, actor, dicePool, attack, defense, spell, form
 export type Test =  {
@@ -383,8 +384,12 @@ export class ShadowrunRoller {
      * - roll
      * - message
      */
-    static async promptSuccessRoll(): Promise<ShadowrunRoll | undefined> {
-        return await SR5Roll.castByUser();
+    static async promptSuccessTest(): Promise<SuccessTest> {
+        // TODO: Handle dialog system.
+        const test = SuccessTest.fromPool(10);
+        await test.toMessage();
+
+        return test;
     }
 
     /**

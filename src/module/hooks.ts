@@ -143,9 +143,9 @@ ___________________
 
         // Connect chat dice icon to shadowrun basic success test roll.
         const diceIconSelector = '#chat-controls .roll-type-select .fa-dice-d20';
-        $(document).on('click', diceIconSelector, async () => await ShadowrunRoller.promptSuccessRoll());
+        $(document).on('click', diceIconSelector, async () => await ShadowrunRoller.promptSuccessTest());
         const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
-        $(document).on('click', diceIconSelectorNew, async () => await ShadowrunRoller.promptSuccessRoll());
+        $(document).on('click', diceIconSelectorNew, async () => await ShadowrunRoller.promptSuccessTest());
     }
 
     static canvasInit() {

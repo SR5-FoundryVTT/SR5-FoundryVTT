@@ -28,8 +28,6 @@ interface ShadowrunChatMessageData {
 export class SR5Roll extends Roll {
     data: ShadowrunRollData
 
-    static CHAT_TEMPLATE = 'systems/shadowrun5e/dist/templates/rolls/success-test.html';
-
     toJSON(): any {
         // TODO: Check if data includes custom ShadowrunRollData
         const data = super.toJSON();
@@ -103,38 +101,5 @@ export class SR5Roll extends Roll {
 
     get total(): number {
         return this.hits;
-    }
-
-    /**
-     * Overwrite default toMessage for custom message content.
-     *
-     * @param messageData
-     * @param options
-     */
-    // async toMessage(messageData: ShadowrunChatMessageData = {}, options?): Promise<ChatMessage|undefined> {
-    //     console.error('message', this, messageData, options);
-    //
-    //     // Replace default chat message content.
-    //     // This content follows FoundryVTT rollMode visibility rules.
-    //     messageData.content = messageData.content ?? await renderTemplate(SR5Roll.CHAT_TEMPLATE, messageData);
-    //     messageData.roll = this;
-    //     return super.toMessage(messageData, options);
-    // }
-
-    /**
-     * Place holder for flow handling.
-     * TODO: Might need complete rework or removal. Will need args at least.
-     */
-    static async castByUser(): Promise<SR5Roll | undefined> {
-        console.error('promptSuccessRoll');
-
-        const roll = new SR5Roll('10d6');
-        console.error('roll', roll);
-        await roll.evaluate({async: true});
-        console.error('evaluate', roll);
-        const message = await roll.toMessage({title: 'Test'});
-        console.error('message', roll, message);
-
-        return roll;
     }
 }

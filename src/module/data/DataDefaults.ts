@@ -17,6 +17,7 @@ import {SKILL_DEFAULT_NAME} from "../constants";
 import DeviceData = Shadowrun.DeviceData;
 import EquipmentItemData = Shadowrun.EquipmentItemData;
 import DeviceItemData = Shadowrun.DeviceItemData;
+import ValueField = Shadowrun.ValueField;
 
 
 export class DefaultValues {
@@ -256,6 +257,16 @@ export class DefaultValues {
                 ...DefaultValues.matrixData({category: partialDeviceItemData.data?.category, atts: partialDeviceItemData.data?.atts}),
             }
         }, partialDeviceItemData) as DeviceItemData;
+    }
+
+    static valueData(partialValueData: Partial<ValueField> = {}) {
+        return mergeObject({
+            base: 0,
+            value: 0,
+            temp: 0,
+            mod: [],
+            label: ''
+        }, partialValueData) as ValueField;
     }
 }
 
