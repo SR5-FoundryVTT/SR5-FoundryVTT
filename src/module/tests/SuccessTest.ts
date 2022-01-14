@@ -49,8 +49,9 @@ export class SuccessTest {
         this.data = data;
 
         // Store given document uuids to be fetched during evaluation.
-        data.sourceActorUuid = documents?.actor?.uuid;
-        data.sourceItemUuid = documents?.item?.uuid;
+        // TODO: Include all necessary sepaker / token info in SuccessTestData to allow items to be deleted.
+        data.sourceActorUuid = data.sourceActorUuid || documents?.actor?.uuid;
+        data.sourceItemUuid = data.sourceItemUuid || documents?.item?.uuid;
 
         // Store given documents to avoid later fetching.
         this.actor = documents?.actor;
@@ -85,7 +86,7 @@ export class SuccessTest {
         const data = SuccessTest.getTestData(item, actor);
 
         // Let the test handle value resolution for actor values.
-        return new SuccessTest(data, {actor});
+        return new SuccessTest(data, {item, actor}, options);
     }
 
     /**
@@ -233,11 +234,12 @@ export class SuccessTest {
     }
 
     /**
-     * Helper method to evaluate the internal SR5Roll.
+     * Helper method to evaluate the internal SR5Roll and SuccessTest values.
      *
      */
     async evaluate(): Promise<SuccessTest> {
-        if (!this.evaluated)
+        // @ts-ignore // foundry-vtt-types is missing _evaluated.
+        if (!this.roll._evaluated)
             await this.roll.evaluate({async: true});
 
         // Fetch documents, when no reference has been made yet.
@@ -252,16 +254,6 @@ export class SuccessTest {
         this.data.limit.value = Helpers.calcTotal(this.data.limit, {min: 0});
 
         return this;
-    }
-
-    /**
-     * Has the SuccessTest roll been evaluated.
-     *
-     * @returns true when the underlying roll has been evaluated.
-     */
-    get evaluated() {
-        // @ts-ignore  // foundry-vtt-types _evaluated is missing.
-        return this.roll._evaluated;
     }
 
     /**
@@ -372,15 +364,17 @@ export class SuccessTest {
      * Post this success test as a message to the chat log.
      */
     async toMessage(): Promise<ChatMessage|undefined> {
-        if (!this.evaluated) await this.evaluate();
+        await this.evaluate();
 
+        // Prepare message content.
         const templateData = this._prepareTemplateData();
         const content = await renderTemplate(SuccessTest.CHAT_TEMPLATE, templateData);
-        const messageData = this._prepareMessageData(content);
 
+        // Prepare the actual message.
+        const messageData = this._prepareMessageData(content);
         const message = await ChatMessage.create(messageData);
 
-        // Allow for the test instance to be reused for opposed actions.
+        // Prepare reuse of test data on subsequent tests after this one.
         await message?.setFlag(SYSTEM_NAME, FLAGS.Test, this.toJSON());
 
         return message;
