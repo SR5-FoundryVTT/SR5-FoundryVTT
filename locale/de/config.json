@@ -868,14 +868,17 @@
     }
   },
   "SR5.ActiveEffect": {
-      "New": "New Effect",
-      "Types": {
-        "Temporary": "Temporary Effects",
-        "Passive": "Passive Effects",
-        "Inactive": "Inactive Effects"
-      },
-      "Modes": {
-        "Modify": "Modifizieren"
-      }
+    "New": "New Effect",
+    "Types": {
+      "Temporary": "Temporary Effects",
+      "Passive": "Passive Effects",
+      "Inactive": "Inactive Effects"
+    },
+    "Modes": {
+      "Modify": "Modifizieren"
     }
+  },
+  "SR5.Tests": {
+    "SuccessTest": "Success Test"
+  }
 }

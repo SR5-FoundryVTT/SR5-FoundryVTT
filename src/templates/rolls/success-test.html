@@ -16,7 +16,11 @@
     </div>
     {{/if}}
     <div class="card-main-content">
-        <div>{{title}}</div>
+        <div class="test-line">
+            <span class="test-name {{#if roll}}test-roll{{/if}}">
+                {{localize title}}
+            </span>
+        </div>
         <div class="card-test-content">
             <div>{{localize test.pool.label}}: {{test.pool.value}}</div>
             {{#if test.hasLimit}}
@@ -24,6 +28,14 @@
             {{else}}
             <div>{{localize test.hits.label}}: {{test.hits.value}}</div>
             {{/if}}
+        </div>
+    </div>
+    <div class="card-content">
+        <div class="left-side">
+            left
+        </div>
+        <div class="right-side">
+            right
         </div>
     </div>
     <div class="card-rolls">

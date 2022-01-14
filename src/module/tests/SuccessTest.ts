@@ -58,7 +58,7 @@ export class SuccessTest {
         this.item = documents?.item;
 
         // Prepare general test information.
-        this.data.title = this.data.title || 'SR5.SuccessTestTitle';
+        this.data.title = this.data.title || 'SR5.Tests.SuccessTest';
 
         // Reuse an old roll or create a new one.
         this.roll = options?.roll || this.createRoll();
@@ -81,12 +81,12 @@ export class SuccessTest {
             console.warn("Shadowrun 5e | A SuccessTest can only be created with an explicit Actor or Item with an actor parent.")
             return;
         }
-
         // Any action item will return a list of values to create the test pool from.
-        const data = SuccessTest.getTestData(item, actor);
+        // @ts-ignore // Get test class from registry to allow custom module tests.
+        const cls = game.shadowrun5e.tests[item.getAction().test];
 
-        // Let the test handle value resolution for actor values.
-        return new SuccessTest(data, {item, actor}, options);
+        const data = cls.getTestData(item, actor);
+        return new cls(data, {item, actor}, options);
     }
 
     /**
@@ -111,8 +111,7 @@ export class SuccessTest {
      */
     static fromPool(pool: number, threshold: number = 0, limit: number = 0, options?: SuccessTestOptions): SuccessTest {
         const testData = {
-            title: 'SR5.SuccessTestTitle',
-            pool: DefaultValues.valueData({label: 'SR5.Pool', base: pool}),
+            pool: DefaultValues.valueData({label: 'SR5.DicePool', base: pool}),
             threshold: DefaultValues.valueData({label: 'SR5.Threshold', base: threshold}),
             limit: DefaultValues.valueData({label: 'SR5.Limit', base: limit})
         };
@@ -157,7 +156,6 @@ export class SuccessTest {
     static getTestData(item: SR5Item, actor: SR5Actor): SuccessTestData {
         // Prepare general data structure with labeling.
         const data = {
-            title: item.name || 'SR5.SuccessTestTitle',
             pool: DefaultValues.valueData({label: 'SR5.DicePool'}),
             limit: DefaultValues.valueData({label: 'SR5.Limit'}),
             threshold: DefaultValues.valueData({label: 'SR5.Threshold'})

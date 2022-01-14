@@ -37,17 +37,33 @@ export const shadowrunTesting = context => {
              * spec: false
              * type: "simple"
              */
-            const actionData = {'type': 'action',
-                                'data.action.type': 'simple',
-                                'data.action.attribute': 'body',
-                                'data.action.skill': 'automatics',
-                                'data.action.spec': false,
-                                'data.action.limit': {
-                                    base: 1,
-                                    value: 1,
-                                    attribute: 'physical',
-                                    mod: []
-                                }};
+            const actionData = {
+                // TODO: SuccessTest|RangedPhysicalAttack|RangedManaAttack
+                'data.action.test': 'SuccessTest',
+
+                'type': 'action',
+                'data.action.type': 'simple',
+                'data.action.attribute': 'body',
+                'data.action.skill': 'automatics',
+                'data.action.spec': false,
+                'data.action.limit': {
+                    base: 1,
+                    value: 1,
+                    attribute: 'physical',
+                    mod: []
+                },
+                'data.action.damage': {
+                    ap: {value: 5, base: 5, mod: Array(0)},
+                    attribute: "",
+                    base: 5,
+                    base_formula_operator: "add",
+                    element: {value: '', base: ''},
+                    itemSource: {actorId: '', itemId: '', itemType: '', itemName: ''},
+                    mod: [],
+                    type: {value: 'physical', base: 'physical'},
+                    value: 5
+                }
+            };
 
             const action = await testItem.create(actionData);
 
@@ -56,18 +72,15 @@ export const shadowrunTesting = context => {
                                'data.skills.active.automatics.base': 5};
             const actor = await testActor.create(actorData);
 
-            console.error('test');
             const test = SuccessTest.fromAction(action, actor);
 
+            console.error('Test.spec', action, actor, test)
             // For a broken test just fail.
             if (!test) assert.strictEqual(true, false);
 
             // Evaluate a working test.
             if (test) {
-                await test.evaluate();
-
-                const rollChat = await test.roll.toMessage();
-                const testChat = await test.toMessage();
+                await test.toMessage();
 
                 assert.strictEqual(test.pool.value, 10);
                 assert.strictEqual(test.threshold.value, 0);

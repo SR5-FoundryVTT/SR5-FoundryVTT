@@ -913,5 +913,8 @@
     "Modes": {
       "Modify": "Modify"
     }
+  },
+  "SR5.Tests": {
+    "SuccessTest": "Success Test"
   }
 }
