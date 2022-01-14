@@ -28,14 +28,14 @@ interface ShadowrunChatMessageData {
 export class SR5Roll extends Roll {
     data: ShadowrunRollData
 
-    toJSON(): any {
-        // TODO: Check if data includes custom ShadowrunRollData
-        const data = super.toJSON();
-        // add class Roll to the json so dice-so-nice works
-        // TODO: Check if this is still necessary.
-        data.class = 'Roll';
-        return data;
-    }
+    // toJSON(): any {
+    //     // TODO: Check if data includes custom ShadowrunRollData
+    //     const data = super.toJSON();
+    //     // add class Roll to the json so dice-so-nice works
+    //     // TODO: Check if this is still necessary.
+    //     // data.class = 'Roll';
+    //     return data;
+    // }
 
     get sides(): number[] {
         //@ts-ignore

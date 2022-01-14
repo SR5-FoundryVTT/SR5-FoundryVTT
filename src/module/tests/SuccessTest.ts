@@ -1,5 +1,5 @@
 import { SR5Actor } from "../actor/SR5Actor";
-import { SR } from "../constants";
+import { SR, SYSTEM_NAME, FLAGS } from "../constants";
 import { DefaultValues } from "../data/DataDefaults";
 import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
@@ -23,6 +23,7 @@ export interface SuccessTestData {
 
 export interface SuccessTestOptions {
     skipDialog?: boolean // skip dialog when given true.
+    roll?: SR5Roll
 }
 
 /**
@@ -36,24 +37,30 @@ export interface SuccessTestOptions {
  */
 export class SuccessTest {
     public data: SuccessTestData;
-    public actor: SR5Actor;
-    public item: SR5Item;
+    public actor: SR5Actor|undefined;
+    public item: SR5Item|undefined;
     public roll: SR5Roll;
 
     static CHAT_TEMPLATE = 'systems/shadowrun5e/dist/templates/rolls/success-test.html';
 
     // TODO: include modifiers
     // TODO: store options in data for later re roll with same options?
-    constructor(data, actor?, options?: SuccessTestOptions) {
+    constructor(data, documents?: {actor?: SR5Actor, item?: SR5Item}, options?: SuccessTestOptions) {
         this.data = data;
-        this.actor = actor;
-        this.roll = this.createRoll();
 
-        // Prepare actor related information.
-        this.data.sourceActorUuid = actor?.uuid || undefined;
+        // Store given document uuids to be fetched during evaluation.
+        data.sourceActorUuid = documents?.actor?.uuid;
+        data.sourceItemUuid = documents?.item?.uuid;
+
+        // Store given documents to avoid later fetching.
+        this.actor = documents?.actor;
+        this.item = documents?.item;
 
         // Prepare general test information.
         this.data.title = this.data.title || 'SR5.SuccessTestTitle';
+
+        // Reuse an old roll or create a new one.
+        this.roll = options?.roll || this.createRoll();
     }
 
     /**
@@ -78,7 +85,7 @@ export class SuccessTest {
         const data = SuccessTest.getTestData(item, actor);
 
         // Let the test handle value resolution for actor values.
-        return new SuccessTest(data, actor);
+        return new SuccessTest(data, {actor});
     }
 
     /**
@@ -88,11 +95,8 @@ export class SuccessTest {
      * @param options
      */
     static fromTestData(data: SuccessTestData, options?: SuccessTestOptions): SuccessTest {
-        // Fetch previously used documents.
-        // const item = data.sourceItemUuid ? fromUuid(data.sourceItemUuid) : undefined;
-        const actor = data.sourceActorUuid ? fromUuid(data.sourceActorUuid) : undefined;
-
-        return new SuccessTest(data, actor, options);
+        // Before used documents would be fetched during evaluation.
+        return new SuccessTest(data, {}, options);
     }
 
     /**
@@ -113,6 +117,21 @@ export class SuccessTest {
         };
 
         return new SuccessTest(testData);
+    }
+
+    static fromMessage(id: string): SuccessTest|undefined {
+        const message = game.messages?.get(id);
+        if (!message) return;
+
+        const testData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as SuccessTestData;
+        if (!testData) return;
+
+        const roll = message.roll as SR5Roll;
+        return SuccessTest.fromTestData(testData, {roll});
+    }
+
+    toJSON() {
+        return this.data;
     }
 
     /**
@@ -220,6 +239,12 @@ export class SuccessTest {
     async evaluate(): Promise<SuccessTest> {
         if (!this.evaluated)
             await this.roll.evaluate({async: true});
+
+        // Fetch documents, when no reference has been made yet.
+        if (!this.actor && this.data.sourceActorUuid)
+            this.actor = await fromUuid(this.data.sourceActorUuid) as SR5Actor || undefined;
+        if (!this.item && this.data.sourceItemUuid)
+            this.item = await fromUuid(this.data.sourceItemUuid) as SR5Item || undefined;
 
         // Calculate test values.
         this.data.pool.value = Helpers.calcTotal(this.data.pool, {min: 0});
@@ -349,32 +374,68 @@ export class SuccessTest {
     async toMessage(): Promise<ChatMessage|undefined> {
         if (!this.evaluated) await this.evaluate();
 
-        const templateData = {
+        const templateData = this._prepareTemplateData();
+        const content = await renderTemplate(SuccessTest.CHAT_TEMPLATE, templateData);
+        const messageData = this._prepareMessageData(content);
+
+        const message = await ChatMessage.create(messageData);
+
+        // Allow for the test instance to be reused for opposed actions.
+        await message?.setFlag(SYSTEM_NAME, FLAGS.Test, this.toJSON());
+
+        return message;
+    }
+
+    /**
+     * Prepare chat message content data for this success test card.
+     *
+     * @returns Chat Message template data.
+     */
+    _prepareTemplateData() {
+        // Either get the linked token by collection or synthetic actor.
+        // Unlinked collection actors will return multiple tokens and can't be resolved to a token.
+        const linkedTokens = this.actor?.getActiveTokens(true) || [];
+        const token = linkedTokens.length === 1 ? linkedTokens[0].id : undefined;
+
+        return {
             title: this.data.title,
             test: this,
-            roll: this.roll
+            roll: this.roll,
+            // Note: While ChatData uses ids, this uses full documents.
+            speaker: {
+                actor: this.actor,
+                token: token
+            },
+            item: this.item
         }
+    }
 
-        console.log('Shadowun 5e | Rendering test chat message', templateData);
-        const content = await renderTemplate(SuccessTest.CHAT_TEMPLATE, templateData);
+    /**
+     * Prepare chat message data for this success test card.
+     *
+     * @param content Pre rendered template content.
+     */
+    _prepareMessageData(content: string) {
+        // Either get the linked token by collection or synthetic actor.
+        // Unlinked collection actors will return multiple tokens and can't be resolved to a token.
+        const linkedTokens = this.actor?.getActiveTokens(true) || [];
+        const token = linkedTokens.length === 1 ? linkedTokens[0].id : undefined;
 
-        // TODO: The actual fully detailed SuccessTest card message.
-        const message = await ChatMessage.create({
+        const actor = this.actor?.id;
+        const alias = game.user?.name;
+
+        return {
             user: game.user?.id,
             speaker: {
-                actor: this.actor?.id,
-                alias: game.user?.name
-                // token: this.actor.
+                actor,
+                alias,
+                token
             },
             // TODO: message.isRoll reports as false. Do we need ChatMessage to be roll type?
             // type: CONST.CHAT_MESSAGE_TYPES.ROLL,
             content,
-            roll: this.roll.toJSON()
-        });
-
-        console.log('Shadowrun 5e | Showing test chat message', message);
-
-        return message;
+            roll: JSON.stringify(this.roll.toJSON())
+        }
     }
 
     /**

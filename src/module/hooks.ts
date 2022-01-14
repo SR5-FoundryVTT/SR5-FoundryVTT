@@ -94,6 +94,11 @@ ___________________
         // @ts-ignore
         Combatant.prototype._getInitiativeFormula = _combatantGetInitiativeFormula;
 
+        // Register general SR5Roll for JSON serialization support.
+        CONFIG.Dice.rolls.push(SR5Roll);
+        // @ts-ignore // Register the SR5Roll dnd5e style.
+        CONFIG.Dice.SR5oll = SR5Roll;
+
         // Add Shadowrun configuration onto general Foundry config for module access.
         // @ts-ignore // TODO: Add declaration merging
         CONFIG.SR5 = SR5;
