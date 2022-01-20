@@ -119,5 +119,21 @@
             </select>
         </div>
     </div>
+    <div class="form-line">
+        <div class="label">
+            {{localize "SR5.Threshold"}}
+        </div>
+        <div class="inputs">
+            <input
+                size="4"
+                maxlength="3"
+                type="text"
+                name="data.action.threshold.base"
+                value="{{data.action.threshold.base}}"
+                data-dtype="Number"
+                placeholder=""
+            />
+        </div>
+    </div>
     {{/ifne}} {{/ifne}} {{/if}}
 </div>

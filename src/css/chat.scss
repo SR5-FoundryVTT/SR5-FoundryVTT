@@ -95,12 +95,17 @@
                 font-weight: bold;
             }
         }
+
+        .reducedResult {
+            color: #aa0200;
+            filter: sepia(0.5) hue-rotate(-60deg);
+        }
     }
     &.roll-card {
         margin: 0.15em;
         .card-title {
             display: flex;
-            font-size: 14px;
+            font-size: 12px;
             border-bottom: $groove;
             justify-content: flex-start;
             align-content: center;

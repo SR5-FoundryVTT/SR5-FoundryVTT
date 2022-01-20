@@ -384,12 +384,10 @@ export class ShadowrunRoller {
      * - roll
      * - message
      */
-    static async promptSuccessTest(): Promise<SuccessTest> {
+    static async promptSuccessTest() {
         // TODO: Handle dialog system.
-        const test = SuccessTest.fromPool(10);
-        await test.toMessage();
-
-        return test;
+        const test = await SuccessTest.fromDialog();
+        if (test) await test.toMessage();
     }
 
     /**

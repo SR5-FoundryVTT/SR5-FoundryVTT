@@ -6,15 +6,18 @@ import { SR5Item } from "../item/SR5Item";
 import {SR5Roll} from "../rolls/SR5Roll";
 import ValueField = Shadowrun.ValueField;
 import {PartsList} from "../parts/PartsList";
+import {ShadowrunTestDialog} from "../apps/dialogs/ShadowrunTestDialog";
 
 export interface SuccessTestData {
     title?: string
     type?: string // TODO: implement typing method to apply effects to and for ations.
 
     // Shadowrun 5 related test values.
+    // TODO: Think about moving these into general values. This would allow ActiveEffects to only target .values
     pool: ValueField
     threshold: ValueField
     limit: ValueField
+    values: Record<string, ValueField>
 
     // Documents the test might have been derived from.
     sourceItemUuid?: string
@@ -45,8 +48,8 @@ export class SuccessTest {
 
     // TODO: include modifiers
     // TODO: store options in data for later re roll with same options?
-    constructor(data, documents?: {actor?: SR5Actor, item?: SR5Item}, options?: SuccessTestOptions) {
-        this.data = data;
+    constructor(data: SuccessTestData, documents?: {actor?: SR5Actor, item?: SR5Item}, options?: SuccessTestOptions) {
+        this.data = this._prepareData(data);
 
         // Store given document uuids to be fetched during evaluation.
         // TODO: Include all necessary sepaker / token info in SuccessTestData to allow items to be deleted.
@@ -62,6 +65,14 @@ export class SuccessTest {
 
         // Reuse an old roll or create a new one.
         this.roll = options?.roll || this.createRoll();
+    }
+
+    /**
+     * Give subclasses a way to alter default test data
+     * @param data
+     */
+    _prepareData(data: SuccessTestData) {
+        return data;
     }
 
     /**
@@ -113,7 +124,8 @@ export class SuccessTest {
         const testData = {
             pool: DefaultValues.valueData({label: 'SR5.DicePool', base: pool}),
             threshold: DefaultValues.valueData({label: 'SR5.Threshold', base: threshold}),
-            limit: DefaultValues.valueData({label: 'SR5.Limit', base: limit})
+            limit: DefaultValues.valueData({label: 'SR5.Limit', base: limit}),
+            values: {}
         };
 
         return new SuccessTest(testData);
@@ -128,6 +140,52 @@ export class SuccessTest {
 
         const roll = message.roll as SR5Roll;
         return SuccessTest.fromTestData(testData, {roll});
+    }
+
+    /**
+     *
+     */
+    static async fromDialog(): Promise<SuccessTest|undefined> {
+        // Ask user for additional, general success test role modifiers.
+        const testDialogOptions = {
+            // TODO: move to SuccessTest.label
+            title: game.i18n.localize('SR5.Tests.SuccessTest'),
+            limit: DefaultValues.valueData({label: 'SR5.Limit', value: 1}),
+            threshold: DefaultValues.valueData({label: 'SR5.Threshold', value: 1}),
+        };
+
+        // Get the last used pool size for simple SuccessTestDialogs
+        const lastPoolValue = game.user?.getFlag(SYSTEM_NAME, FLAGS.LastRollPromptValue) || 0;
+        // Prepare any predefined pool values.
+
+        const pool = DefaultValues.valueData();
+        // @ts-ignore // unkown[] vs number[]
+        pool.mod = PartsList.AddUniquePart(pool.mod, 'SR5.LastRoll', lastPoolValue);
+        const testDialog = await ShadowrunTestDialog.create(
+            undefined,
+            testDialogOptions,
+            pool.mod);
+
+        const dialogData = await testDialog.select();
+
+        if (testDialog.canceled) return;
+
+        console.error(dialogData);
+
+        // Extract simple test data from dialog user selection.
+        pool.mod = dialogData.parts.list;
+        pool.value = Helpers.calcTotal(pool, {min: 0});
+        const thresholdValue = dialogData.threshold.value || 0;
+        const limitValue = dialogData.limit.value || 0;
+
+        // Create and display SuccessTest.
+        const test = SuccessTest.fromPool(pool.value, thresholdValue, limitValue);
+        await test.toMessage();
+
+        // Store the last used pool size for the next simple SuccessTest
+        await game.user?.setFlag(SYSTEM_NAME, FLAGS.LastRollPromptValue, pool.value);
+
+        return test;
     }
 
     toJSON() {
@@ -158,7 +216,8 @@ export class SuccessTest {
         const data = {
             pool: DefaultValues.valueData({label: 'SR5.DicePool'}),
             limit: DefaultValues.valueData({label: 'SR5.Limit'}),
-            threshold: DefaultValues.valueData({label: 'SR5.Threshold'})
+            threshold: DefaultValues.valueData({label: 'SR5.Threshold'}),
+            values: {}
         };
 
         // Try fetching the items action data.
@@ -183,9 +242,8 @@ export class SuccessTest {
             const attribute = actor.getAttribute(action.attribute2);
             if (attribute) data.pool.mod = PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
         }
-        // Prepare a flat pool modifier.
         if (action.mod) {
-            data.pool.temp = Number(action.mod);
+            data.pool.base = Number(action.mod);
         }
 
         // Prepare limit values...
@@ -193,15 +251,14 @@ export class SuccessTest {
             const limit = actor.getLimit(action.limit.attribute);
             if (limit) data.limit.mod = PartsList.AddUniquePart(data.limit.mod, limit.label, limit.value, false);
         }
-        // Prepare a flat limit modifier.
         if (action.limit.base || action.limit.value) {
-            data.limit.temp = Number(action.limit.value);
+            data.limit.base = Number(action.limit.value);
         }
 
         // Prepare threshold values...
-        // if (action.threshold) {
-        //     data.threshold.base = action.threshold;
-        // }
+        if (action.threshold.base || action.threshold.value) {
+            data.threshold.base = Number(action.threshold.value);
+        }
 
         return data;
     }
@@ -251,6 +308,12 @@ export class SuccessTest {
         this.data.threshold.value = Helpers.calcTotal(this.data.threshold, {min: 0});
         this.data.limit.value = Helpers.calcTotal(this.data.limit, {min: 0});
 
+        // Calculate all dynamics values.
+        Object.values(this.data.values).forEach(field => {
+            // It's likely that most fields will lower out at zero.
+            field.value = Helpers.calcTotal(field, {min: 0})
+        });
+
         return this;
     }
 
@@ -276,6 +339,15 @@ export class SuccessTest {
     }
 
     /**
+     * Helper to determine if the hits have been lowered by the limit.
+     *
+     * This will compare actual roll hits, without applied limit.
+     */
+    get hasReducedHits(): boolean {
+        return this.roll.hits > this.limit.value;
+    }
+
+    /**
      * Helper to get the total threshold value for this success test.
      */
     get threshold(): ValueField {
@@ -293,10 +365,16 @@ export class SuccessTest {
      * Helper to get the net hits value for this success test with a possible threshold.
      */
     get netHits(): ValueField {
+        // Maybe lower hits by threshold to get the actual net hits.
+        const base = this.hasThreshold ?
+            Math.max(this.hits.value - this.threshold.value, 0) :
+            this.hits.value;
+
+        // Calculate a ValueField for standardisation.
         const netHits = DefaultValues.valueData({
             label: "SR5.NetHits",
-            base: this.hasThreshold ? Math.max(this.threshold.value, this.hits.value) : this.hits.value
-        })
+            base
+        });
         netHits.value = Helpers.calcTotal(netHits, {min: 0});
 
         return netHits;
@@ -345,12 +423,18 @@ export class SuccessTest {
 
     /**
      * Helper to check if the current test state is successful.
+     *
+     * Since a test can only really be a success when some threshold is met,
+     * only report success when there is one.
      */
     get success(): boolean {
-        return this.netHits.value > 0;
+        return this.hasThreshold && this.netHits.value > 0;
     }
 
-    // TODO: This method results in an ugly description.
+    /**
+     * TODO: This method results in an ugly description.
+     *
+     */
     get description(): string {
         const poolPart = this.pool.value;
         const thresholdPart = this.hasThreshold ? `(${this.threshold.value})` : '';

@@ -50,7 +50,10 @@ export const shadowrunTesting = context => {
                     base: 1,
                     value: 1,
                     attribute: 'physical',
-                    mod: []
+                },
+                'data.action.threshold': {
+                    base: 1,
+                    value: 1,
                 },
                 'data.action.damage': {
                     ap: {value: 5, base: 5, mod: Array(0)},
@@ -69,24 +72,27 @@ export const shadowrunTesting = context => {
 
             const actorData = {'type': 'character',
                                'data.attributes.body.base': 5,
-                               'data.skills.active.automatics.base': 5};
+                               'data.skills.active.automatics.base': 45};
             const actor = await testActor.create(actorData);
 
             const test = SuccessTest.fromAction(action, actor);
 
-            console.error('Test.spec', action, actor, test)
-            // For a broken test just fail.
+            // For a broken test just fail.v
             if (!test) assert.strictEqual(true, false);
 
             // Evaluate a working test.
             if (test) {
                 await test.toMessage();
 
-                assert.strictEqual(test.pool.value, 10);
-                assert.strictEqual(test.threshold.value, 0);
-                assert.strictEqual(test.limit.value, 4);
+                console.error(test.data);
 
-                assert.strictEqual(test.hasThreshold, false);
+                assert.strictEqual(test.pool.value, 50); // 5 body, 45 automatics
+                assert.strictEqual(test.threshold.value, 1); // 1
+                assert.strictEqual(test.limit.value, 4); // 4 Physical + 1
+                assert.strictEqual(test.netHits.value, 3) // limit - threshold
+
+                assert.strictEqual(test.hasReducedHits, true);
+                assert.strictEqual(test.hasThreshold, true);
                 assert.strictEqual(test.hasLimit, true);
             }
         });

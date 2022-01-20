@@ -44,6 +44,10 @@ export class WeaponImporter extends DataImporter {
                         mod: [],
                         base: 0,
                     },
+                    threshold: {
+                        value: 0,
+                        base: 0
+                    },
                     extended: false,
                     opposed: {
                         type: 'defense',

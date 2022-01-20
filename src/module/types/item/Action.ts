@@ -8,20 +8,21 @@ declare namespace Shadowrun {
     }
 
     export interface ActionRollData {
-            type: string;
-            category: string;
-            attribute: ActorAttribute;
-            attribute2: ActorAttribute;
-            skill: SkillName;
-            spec: boolean;
-            mod: number;
-            mod_description: string;
-            limit: LimitData;
-            extended: boolean;
-            damage: DamageData;
-            opposed: OpposedTestData;
-            alt_mod: number;
-            dice_pool_mod: ModList<number>;
+            type: string
+            category: string
+            attribute: ActorAttribute
+            attribute2: ActorAttribute
+            skill: SkillName
+            spec: boolean
+            mod: number
+            mod_description: string
+            limit: LimitData
+            threshold: BaseValuePair<number>
+            extended: boolean
+            damage: DamageData
+            opposed: OpposedTestData
+            alt_mod: number
+            dice_pool_mod: ModList<number>
         }
 
     export interface ActionPartData {

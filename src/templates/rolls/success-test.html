@@ -24,9 +24,38 @@
         <div class="card-test-content">
             <div>{{localize test.pool.label}}: {{test.pool.value}}</div>
             {{#if test.hasLimit}}
+            <div>{{localize test.limit.label}}: {{test.limit.value}}</div>
+            {{/if}}
+            {{#if test.hasThreshold}}
+            <div>{{localize test.threshold.label}}: {{test.threshold.value}}</div>
+            {{/if}}
             <div>{{localize test.netHits.label}}: {{test.netHits.value}}</div>
+            {{#if test.criticalGlitched}}
+            <div class="glitch-content">
+                <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.GlitchCritical'}}" {{/if}}>
+                    {{localize "SR5.GlitchCritical"}}
+                </div>
+            </div>
             {{else}}
-            <div>{{localize test.hits.label}}: {{test.hits.value}}</div>
+            {{#if test.success}}
+            <div class="glitch-content">
+                <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Success'}}" {{/if}}>
+                    {{localize "SR5.Success"}}
+                </div>
+            </div>
+            <div class="glitch-content">
+                <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Glitch'}}" {{/if}}>
+                    {{localize "SR5.Glitch"}}
+                </div>
+            </div>
+            {{/if}}
+            {{#if test.glitched}}
+            <div class="glitch-content">
+                <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Glitch'}}" {{/if}}>
+                    {{localize "SR5.Glitch"}}
+                </div>
+            </div>
+            {{/if}}
             {{/if}}
         </div>
     </div>

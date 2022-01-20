@@ -39,6 +39,10 @@ export class QualityImporter extends DataImporter {
                         mod: [],
                         base: 0,
                     },
+                    threshold: {
+                        base: 0,
+                        value: 0
+                    },
                     extended: false,
                     opposed: {
                         type: '',

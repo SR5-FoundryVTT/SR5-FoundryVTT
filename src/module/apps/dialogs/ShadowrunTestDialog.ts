@@ -7,13 +7,18 @@ import {Helpers} from "../../helpers";
 import ModList = Shadowrun.ModList;
 import BaseValuePair = Shadowrun.BaseValuePair;
 import LabelField = Shadowrun.LabelField;
+import ValueField = Shadowrun.ValueField;
 
 interface AdvancedTestRollOptions {
-    title?: string;
-    dialogOptions?: RollDialogOptions;
-    extended?: boolean;
-    limit?: BaseValuePair<number> & LabelField;
-    wounds?: boolean;
+    title?: string
+    dialogOptions?: RollDialogOptions
+
+    // SuccessTest values
+    limit?: BaseValuePair<number> & LabelField // when given, will allow setting a limit
+    threshold?: ValueField // when given, will allow setting a threshold
+
+    extended?: boolean // true - will mark the test as an extended success test
+    wounds?: boolean // true - will try to fetch wound modifier from a given actor
 }
 
 export class ShadowrunTestDialog {
@@ -33,6 +38,7 @@ export class ShadowrunTestDialog {
             pool: parts.total,
             parts: parts.getMessageOutput(),
             limitValue: options.limit?.value,
+            thresholdValue: options.threshold?.value,
             wounds: options.wounds,
             woundValue: actor?.getWoundModifier(),
             rollMode: game.settings.get(CORE_NAME, CORE_FLAGS.RollMode),
@@ -68,6 +74,7 @@ export class ShadowrunTestDialog {
                 parts.addUniquePart('SR5.Base', dicePoolValue);
             }
 
+            const thresholdValue = Helpers.parseInputToNumber($(html).find('[name="thresholdValue"]').val());
             const limitValue = Helpers.parseInputToNumber($(html).find('[name="limitValue"]').val());
 
             const {limit} = options;
@@ -75,6 +82,13 @@ export class ShadowrunTestDialog {
                 limit.value = limitValue;
                 limit.base = limitValue;
                 limit.label = 'SR5.Override';
+            }
+
+            const {threshold} = options;
+            if (threshold && threshold.value !== thresholdValue) {
+                threshold.label = 'SR5.Override';
+                threshold.base = thresholdValue;
+                threshold.value = Helpers.calcTotal(threshold, {min: 0});
             }
 
             const woundValue = Helpers.parseInputToNumber($(html).find('[name="wounds"]').val());
@@ -100,6 +114,7 @@ export class ShadowrunTestDialog {
 
             return {
                 limit,
+                threshold,
                 wounds,
                 parts,
                 extended,

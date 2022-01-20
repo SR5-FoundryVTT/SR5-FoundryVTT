@@ -1148,6 +1148,10 @@
                         "base": 0,
                         "attribute": ""
                     },
+                    "threshold": {
+                        "value": 0,
+                        "base": 0
+                    },
                     "extended": false,
                     "damage": {
                         "type": {
