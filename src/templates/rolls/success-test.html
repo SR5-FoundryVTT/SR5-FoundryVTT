@@ -30,32 +30,33 @@
             <div>{{localize test.threshold.label}}: {{test.threshold.value}}</div>
             {{/if}}
             <div>{{localize test.netHits.label}}: {{test.netHits.value}}</div>
-            {{#if test.criticalGlitched}}
-            <div class="glitch-content">
-                <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.GlitchCritical'}}" {{/if}}>
-                    {{localize "SR5.GlitchCritical"}}
-                </div>
-            </div>
-            {{else}}
             {{#if test.success}}
             <div class="glitch-content">
                 <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Success'}}" {{/if}}>
                     {{localize "SR5.Success"}}
                 </div>
             </div>
+                {{#if test.glitched}}
             <div class="glitch-content">
                 <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Glitch'}}" {{/if}}>
                     {{localize "SR5.Glitch"}}
                 </div>
             </div>
+                {{/if}}
             {{/if}}
-            {{#if test.glitched}}
+            {{#if test.failure}}
             <div class="glitch-content">
-                <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Glitch'}}" {{/if}}>
-                    {{localize "SR5.Glitch"}}
+                <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Failure'}}" {{/if}}>
+                    {{localize "SR5.Failure"}}
                 </div>
             </div>
             {{/if}}
+            {{#if test.criticalGlitched}}
+            <div class="glitch-content">
+                <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.GlitchCritical'}}" {{/if}}>
+                    {{localize "SR5.GlitchCritical"}}
+                </div>
+            </div>
             {{/if}}
         </div>
     </div>

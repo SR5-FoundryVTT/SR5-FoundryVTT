@@ -432,6 +432,16 @@ export class SuccessTest {
     }
 
     /**
+     * Helper to check if the current test state is unsuccessful.
+     *
+     * Since a test can only really be a failure when some threshold isn't met,
+     * only support failure when there is one.
+     */
+    get failure(): boolean {
+        return this.hasThreshold && this.netHits.value === 0;
+    }
+
+    /**
      * TODO: This method results in an ugly description.
      *
      */
