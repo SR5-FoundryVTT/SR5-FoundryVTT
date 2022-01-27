@@ -98,6 +98,11 @@ export class OpposedTest extends SuccessTest {
             against: againstData
         }
 
+        // An opposing test will oppose net hits of the opposed test.
+        // Register these as a threshold, which will trigger success/failure status
+        // and calculate netHits accordingly.
+        data.threshold.base = againstData.values.netHits.value;
+
         // Try fetching the opposed action data.
         const {opposed} = againstData;
 
