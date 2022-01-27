@@ -46,6 +46,7 @@ export class QualityImporter extends DataImporter {
                     extended: false,
                     opposed: {
                         type: '',
+                        test: '',
                         attribute: '',
                         attribute2: '',
                         skill: '',

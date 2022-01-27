@@ -29,6 +29,7 @@ import {SR5ActiveEffectSheet} from "./effect/SR5ActiveEffectSheet";
 import {NetworkDeviceFlow} from "./item/flows/NetworkDeviceFlow";
 import {SR5Roll} from "./rolls/SR5Roll";
 import {SuccessTest} from "./tests/SuccessTest";
+import {OpposedTest} from "./tests/OpposedTest";
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -77,8 +78,11 @@ ___________________
             rollItemMacro,
             rollSkillMacro,
             SR5Roll,
+            // Register action tests.
+            // These can be replaced and extended.
             tests: {
-                SuccessTest
+                SuccessTest,
+                OpposedTest
             }
         };
 
@@ -207,6 +211,7 @@ ___________________
     static renderChatMessage(message, html, data) {
         chat.addRollListeners(message, html);
         SuccessTest.chatMessageListeners(message, html, data);
+        OpposedTest.chatMessageListeners(message, html, data);
     }
 
     static renderItemDirectory(app: Application, html: JQuery) {

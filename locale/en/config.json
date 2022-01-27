@@ -918,6 +918,8 @@
     }
   },
   "SR5.Tests": {
-    "SuccessTest": "Success Test"
+    "SuccessTest": "Success Test",
+    "OpposedTest": "Opposed Test",
+    "ExtendedTest": "Extended Test"
   }
 }

@@ -60,12 +60,14 @@ declare namespace Shadowrun {
      * Action opposed test data.
      */
     export interface OpposedTestData {
-        type: OpposedType;
-        attribute: ActorAttribute;
-        attribute2: ActorAttribute;
-        skill: SkillName;
-        mod: number;
-        description: string;
+        type: OpposedType
+        // TODO: Add test string type SuccessTest|OpposedTest
+        test: string
+        attribute: ActorAttribute
+        attribute2: ActorAttribute
+        skill: SkillName
+        mod: number
+        description: string
     }
 
     export interface ActionResultData {

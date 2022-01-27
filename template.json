@@ -1179,6 +1179,7 @@
                     },
                     "opposed": {
                         "type": "",
+                        "test": "",
                         "attribute": "",
                         "attribute2": "",
                         "skill": "",

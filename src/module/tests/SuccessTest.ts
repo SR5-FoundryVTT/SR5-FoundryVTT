@@ -5,12 +5,20 @@ import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
 import {SR5Roll} from "../rolls/SR5Roll";
 import ValueField = Shadowrun.ValueField;
+import OpposedTestData = Shadowrun.OpposedTestData;
 import {PartsList} from "../parts/PartsList";
 import {ShadowrunTestDialog} from "../apps/dialogs/ShadowrunTestDialog";
 
+export interface TestDocuments {
+    actor?: SR5Actor,
+    item?: SR5Item
+}
+
 export interface SuccessTestData {
     title?: string
-    type?: string // TODO: implement typing method to apply effects to and for ations.
+    // TODO: implement typing method to apply effects to and for ations.
+    // TODO: Show set of test types here
+    type?: string
 
     // Shadowrun 5 related test values.
     // TODO: Think about moving these into general values. This would allow ActiveEffects to only target .values
@@ -18,6 +26,8 @@ export interface SuccessTestData {
     threshold: ValueField
     limit: ValueField
     values: Record<string, ValueField>
+
+    opposed?: OpposedTestData
 
     // Documents the test might have been derived from.
     sourceItemUuid?: string
@@ -48,7 +58,7 @@ export class SuccessTest {
 
     // TODO: include modifiers
     // TODO: store options in data for later re roll with same options?
-    constructor(data: SuccessTestData, documents?: {actor?: SR5Actor, item?: SR5Item}, options?: SuccessTestOptions) {
+    constructor(data: SuccessTestData, documents?: TestDocuments, options?: SuccessTestOptions) {
         this.data = this._prepareData(data);
 
         // Store given document uuids to be fetched during evaluation.
@@ -60,8 +70,8 @@ export class SuccessTest {
         this.actor = documents?.actor;
         this.item = documents?.item;
 
-        // Prepare general test information.
-        this.data.title = this.data.title || 'SR5.Tests.SuccessTest';
+        // @ts-ignore // Prepare general test information.
+        this.data.title = this.data.title || this.constructor.label;
 
         // Reuse an old roll or create a new one.
         this.roll = options?.roll || this.createRoll();
@@ -96,7 +106,7 @@ export class SuccessTest {
         // @ts-ignore // Get test class from registry to allow custom module tests.
         const cls = game.shadowrun5e.tests[item.getAction().test];
 
-        const data = cls.getTestData(item, actor);
+        const data = cls.getItemActionTestData(item, actor);
         return new cls(data, {item, actor}, options);
     }
 
@@ -104,9 +114,10 @@ export class SuccessTest {
      * Helper method to create a SuccessTest from given data.
      *
      * @param data
+     * @param documents
      * @param options
      */
-    static fromTestData(data: SuccessTestData, options?: SuccessTestOptions): SuccessTest {
+    static fromTestData(data: SuccessTestData, documents?: TestDocuments, options?: SuccessTestOptions): SuccessTest {
         // Before used documents would be fetched during evaluation.
         return new SuccessTest(data, {}, options);
     }
@@ -133,13 +144,19 @@ export class SuccessTest {
 
     static fromMessage(id: string): SuccessTest|undefined {
         const message = game.messages?.get(id);
-        if (!message) return;
+        if (!message) {
+            console.error(`Shadowrun 5e | Couldn't find a message for id ${id} to create a message action`);
+            return;
+        }
 
         const testData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as SuccessTestData;
-        if (!testData) return;
+        if (!testData) {
+            console.error(`Shadowrun 5e | Message with id ${id} doesn't have test data in it's flags.`);
+            return;
+        }
 
         const roll = message.roll as SR5Roll;
-        return SuccessTest.fromTestData(testData, {roll});
+        return this.fromTestData(testData,{},{roll});
     }
 
     /**
@@ -170,8 +187,6 @@ export class SuccessTest {
 
         if (testDialog.canceled) return;
 
-        console.error(dialogData);
-
         // Extract simple test data from dialog user selection.
         pool.mod = dialogData.parts.list;
         pool.value = Helpers.calcTotal(pool, {min: 0});
@@ -186,6 +201,40 @@ export class SuccessTest {
         await game.user?.setFlag(SYSTEM_NAME, FLAGS.LastRollPromptValue, pool.value);
 
         return test;
+    }
+
+    static async fromMessageAction(id: string, test: string): Promise<SuccessTest | undefined> {
+        const message = game.messages?.get(id);
+        if (!message) {
+            console.error(`Shadowrun 5e | Couldn't find a message for id ${id} to create a message action`);
+            return;
+        }
+
+        const testData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as SuccessTestData;
+        if (!testData) {
+            console.error(`Shadowrun 5e | Message with id ${id} doesn't have test data in it's flags.`);
+            return;
+        }
+
+        // @ts-ignore // TODO: Add typing by declaration merging
+        const testClass = game.shadowrun5e.tests[test];
+        if (!testClass) {
+            console.error(`Shadowrun 5e | Couldn't find a registered test implementation for ${test}`);
+            return;
+        }
+
+        // TODO: Handle token selection as target override.
+        const actors = Helpers.getSelectedActorsOrCharacter();
+
+        //
+        for (const actor of actors) {
+            const data = testClass.getMessageActionTestData(testData, actor, id);
+            if (!data) return;
+
+            const test = new testClass(data, {actor}, {});
+            // TODO: Doesn't ask for dialog. Should be based on options...
+            await test.toMessage();
+        }
     }
 
     toJSON() {
@@ -211,9 +260,9 @@ export class SuccessTest {
     /**
      * Test Data is structured around Values that can be modified.
      */
-    static getTestData(item: SR5Item, actor: SR5Actor): SuccessTestData {
+    static getItemActionTestData(item: SR5Item, actor: SR5Actor): SuccessTestData {
         // Prepare general data structure with labeling.
-        const data = {
+        const data: SuccessTestData = {
             pool: DefaultValues.valueData({label: 'SR5.DicePool'}),
             limit: DefaultValues.valueData({label: 'SR5.Limit'}),
             threshold: DefaultValues.valueData({label: 'SR5.Threshold'}),
@@ -260,7 +309,34 @@ export class SuccessTest {
             data.threshold.base = Number(action.threshold.value);
         }
 
+        // Prepare opposed tests...
+        if (action.opposed.type) {
+            data.opposed = action.opposed;
+        }
+
         return data;
+    }
+
+    /**
+     * Create test data from an opposed message action.
+     *
+     * This method is meant to be overridden if this testing class supports
+     * testing against an opposed message action.
+     *
+     * If this test class doesn't support this opposed message actions it will
+     * return undefined.
+     *
+     * @param testData The original test that's opposed.
+     * @param actor The actor for this opposing test.
+     * @param previousMessageId The id this message action is sourced from.
+     */
+    static getMessageActionTestData(testData, actor: SR5Actor, previousMessageId: string): SuccessTestData|undefined {
+        console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support opposed message actions`);
+        return;
+    }
+
+    static get label(): string {
+        return `SR5.Tests.${this.name}`;
     }
 
     /**
@@ -303,18 +379,25 @@ export class SuccessTest {
         if (!this.item && this.data.sourceItemUuid)
             this.item = await fromUuid(this.data.sourceItemUuid) as SR5Item || undefined;
 
-        // Calculate test values.
+        this.calculateValues();
+
+        return this;
+    }
+
+    calculateValues() {
         this.data.pool.value = Helpers.calcTotal(this.data.pool, {min: 0});
         this.data.threshold.value = Helpers.calcTotal(this.data.threshold, {min: 0});
         this.data.limit.value = Helpers.calcTotal(this.data.limit, {min: 0});
+
+        this.data.values.hits = this.calculateHits();
+        this.data.values.netHits = this.calculateNetHits();
+        this.data.values.glitches = this.calculateGlitches();
 
         // Calculate all dynamics values.
         Object.values(this.data.values).forEach(field => {
             // It's likely that most fields will lower out at zero.
             field.value = Helpers.calcTotal(field, {min: 0})
         });
-
-        return this;
     }
 
     /**
@@ -364,7 +447,7 @@ export class SuccessTest {
     /**
      * Helper to get the net hits value for this success test with a possible threshold.
      */
-    get netHits(): ValueField {
+    calculateNetHits(): ValueField {
         // Maybe lower hits by threshold to get the actual net hits.
         const base = this.hasThreshold ?
             Math.max(this.hits.value - this.threshold.value, 0) :
@@ -380,10 +463,14 @@ export class SuccessTest {
         return netHits;
     }
 
+    get netHits(): ValueField {
+        return this.data.values.netHits;
+    }
+
     /**
      * Helper to get the hits value for this success test with a possible limit.
      */
-    get hits(): ValueField {
+    calculateHits(): ValueField {
         const hits = DefaultValues.valueData({
             label: "SR5.Hits",
             base: this.hasLimit ?
@@ -394,10 +481,14 @@ export class SuccessTest {
         return hits;
     }
 
+    get hits(): ValueField {
+        return this.data.values.hits;
+    }
+
     /**
      * Helper to get the glitches values for this success test.
      */
-    get glitches(): ValueField {
+    calculateGlitches(): ValueField {
         const glitches = DefaultValues.valueData({
             label: "SR5.Glitches",
             base: this.roll.glitches
@@ -405,6 +496,10 @@ export class SuccessTest {
         glitches.value = Helpers.calcTotal(glitches, {min: 0});
 
         return glitches;
+    }
+
+    get glitches(): ValueField {
+        return this.data.values.glitches;
     }
 
     /**
@@ -442,6 +537,13 @@ export class SuccessTest {
     }
 
     /**
+     * Helper to check if opposing tests exist for this test.
+     */
+    get opposed(): boolean {
+        return this.data.opposed !== undefined;
+    }
+
+    /**
      * TODO: This method results in an ugly description.
      *
      */
@@ -461,7 +563,6 @@ export class SuccessTest {
         // Prepare message content.
         const templateData = this._prepareTemplateData();
         const content = await renderTemplate(SuccessTest.CHAT_TEMPLATE, templateData);
-
         // Prepare the actual message.
         const messageData = this._prepareMessageData(content);
         const message = await ChatMessage.create(messageData);
@@ -476,6 +577,8 @@ export class SuccessTest {
      * Prepare chat message content data for this success test card.
      *
      * @returns Chat Message template data.
+     *
+     * TODO: Add template data typing.
      */
     _prepareTemplateData() {
         // Either get the linked token by collection or synthetic actor.
@@ -492,8 +595,48 @@ export class SuccessTest {
                 actor: this.actor,
                 token: token
             },
-            item: this.item
+            item: this.item,
+            opposedActions: this._prepareOpposedActionsTemplateData()
         }
+    }
+
+    /**
+     * Prepare opposed test action buttons.
+     *
+     * Currently, one opposed action is supported, however the template
+     * is prepared to support multiple action buttons.
+     */
+    _prepareOpposedActionsTemplateData() {
+        if (!this.data.opposed) return [];
+
+        // @ts-ignore TODO: Move this into a helper
+        const testCls = game.shadowrun5e.tests[this.data.opposed.test];
+        if (!testCls) return console.error('Shadowrun 5e | Opposed Action has no test class registered.')
+
+        const action = {
+            // Store the test implementation registration name.
+            test: this.data.opposed.test,
+            // Use test implementation label or sensible default.
+            label: testCls.label || 'SR5.Tests.SuccessTest'
+        };
+
+        const { opposed } = this.data;
+        switch (this.data.opposed) {}
+        if (opposed.type !== 'custom') {
+            action.label = `${Helpers.label(opposed.type)}`;
+        } else if (opposed.skill) {
+            action.label = `${Helpers.label(opposed.skill)}+${Helpers.label(opposed.attribute)}`;
+        } else if (opposed.attribute2) {
+            action.label = `${Helpers.label(opposed.attribute)}+${Helpers.label(opposed.attribute2)}`;
+        } else if (opposed.attribute) {
+            action.label = `${Helpers.label(opposed.attribute)}`;
+        }
+
+        if (this.data.opposed.mod) {
+            action.label += ` ${this.data.opposed.mod}`;
+        }
+
+        return [action]
     }
 
     /**
@@ -524,6 +667,15 @@ export class SuccessTest {
         }
     }
 
+    static async _testDataFromMessage(id: string): Promise<SuccessTestData|undefined> {
+        const message = game.messages?.get(id);
+        if (!message) return;
+
+        const testData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as SuccessTestData;
+        if (!testData) return;
+        else return testData;
+    }
+
     /**
      * Register listeners for ChatMessage html created by a SuccessTest.
      *
@@ -543,13 +695,23 @@ export class SuccessTest {
      * This will hide / show them, when called with a card event.
      *
      * @param event Called from within a card html element.
-     * @param html A chat card html element.
+     * @param cardHtml A chat card html element.
      */
-    static _chatToggleCardRolls(event, html) {
+    static async _chatToggleCardRolls(event, cardHtml) {
         event.preventDefault();
 
-        const element = html.find('.dice-rolls');
+        const element = cardHtml.find('.dice-rolls');
         if (element.is(':visible')) element.slideUp(200);
         else element.slideDown(200);
+    }
+
+    static async _castOpposedAction(event, cardHtml) {
+        event.preventDefault();
+
+        // Collect information needed to create the opposed action test.
+        const messageId = cardHtml.data('messageId');
+        const opposedActionTest = $(event.currentTarget).data('action');
+
+        await SuccessTest.fromMessageAction(messageId, opposedActionTest);
     }
 }

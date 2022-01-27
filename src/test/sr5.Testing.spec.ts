@@ -37,6 +37,7 @@ export const shadowrunTesting = context => {
              * spec: false
              * type: "simple"
              */
+
             const actionData = {
                 // TODO: SuccessTest|RangedPhysicalAttack|RangedManaAttack
                 'data.action.test': 'SuccessTest',
@@ -82,7 +83,7 @@ export const shadowrunTesting = context => {
 
             // Evaluate a working test.
             if (test) {
-                await test.toMessage();
+                await test.evaluate();
 
                 console.error(test.data);
 
@@ -99,9 +100,52 @@ export const shadowrunTesting = context => {
 
         it('Should evaluate a roll from simple pool data', async () => {
             const test = SuccessTest.fromPool(10);
-            await test.toMessage();
+            await test.evaluate();
 
             assert.strictEqual(test.roll.pool, 10);
+        });
+
+        it('Should evaluate an opposed roll from a opposed action', async () => {
+            const actionData = {
+                'type': 'action',
+                'data.action.test': 'SuccessTest',
+
+                'data.action.type': 'simple',
+                'data.action.attribute': 'body',
+                'data.action.skill': 'automatics',
+                'data.action.spec': false,
+                'data.action.limit': {
+                    base: 1,
+                    value: 1,
+                    attribute: 'physical',
+                },
+                'data.action.threshold': {
+                    base: 1,
+                    value: 1,
+                },
+                'data.action.opposed': {
+                    "type": "custom",
+                    // TODO: This could maybe simply be SuccessTest?
+                    "test": "OpposedTest",
+                    "attribute": "reaction",
+                    "attribute2": "intuition",
+                    "skill": "",
+                    "mod": 0,
+                    "description": ""
+                }
+            };
+
+            const action = await testItem.create(actionData);
+            const actorData = {'type': 'character',
+                               'data.attributes.body.base': 5,
+                               'data.skills.active.automatics.base': 45};
+            const actor = await testActor.create(actorData);
+
+            const test = SuccessTest.fromAction(action, actor);
+
+            if (test) {
+                await test.toMessage();
+            }
         });
     })
 };

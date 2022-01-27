@@ -68,6 +68,7 @@ export class WareImporter extends DataImporter {
                     extended: false,
                     opposed: {
                         type: '',
+                        test: '',
                         attribute: '',
                         attribute2: '',
                         skill: '',

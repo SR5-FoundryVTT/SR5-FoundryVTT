@@ -51,6 +51,7 @@ export class SpellImporter extends DataImporter {
                     extended: false,
                     opposed: {
                         type: '',
+                        test: '',
                         attribute: '',
                         attribute2: '',
                         skill: '',

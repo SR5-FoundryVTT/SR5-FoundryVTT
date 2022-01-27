@@ -882,6 +882,8 @@
     }
   },
   "SR5.Tests": {
-    "SuccessTest": "Success Test"
+    "SuccessTest": "Erfolgs Probe",
+    "OpposedTest": "Vergleichende Probe",
+    "ExtendedTest": "Ausgedehnte Probe"
   }
 }

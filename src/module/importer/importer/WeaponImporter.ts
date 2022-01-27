@@ -51,6 +51,7 @@ export class WeaponImporter extends DataImporter {
                     extended: false,
                     opposed: {
                         type: 'defense',
+                        test: '',
                         attribute: '',
                         attribute2: '',
                         skill: '',

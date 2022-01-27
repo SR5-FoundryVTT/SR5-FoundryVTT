@@ -47,6 +47,7 @@ export class CritterPowerImporter extends DataImporter {
                     extended: false,
                     opposed: {
                         type: '',
+                        test: '',
                         attribute: '',
                         attribute2: '',
                         skill: '',

@@ -71,4 +71,18 @@
     <div class="card-rolls">
         {{> 'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.html'}}
     </div>
+    {{#if test.opposed}}
+    <div class="test-line">
+            <span class="test-name {{#if roll}}test-roll{{/if}}">
+                {{localize "SR5.Tests.OpposedTest"}}
+            </span>
+        </div>
+    <div class="card-buttons">
+        {{#each opposedActions}}
+        <div class="button opposed-action" data-action="{{this.test}}">
+            {{localize this.label}}
+        </div>
+        {{/each}}
+    </div>
+    {{/if}}
 </div>
