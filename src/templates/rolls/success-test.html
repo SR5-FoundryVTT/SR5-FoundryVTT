@@ -71,12 +71,25 @@
     <div class="card-rolls">
         {{> 'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.html'}}
     </div>
+    {{#if test.targets}}
+    <div class="test-line">
+        <span class="test-name {{#if roll}}test-roll{{/if}}">
+            {{localize "SR5.SelectedTargets"}}
+        </span>
+    </div>
+    {{#each test.targets}}
+    <div class="card-title card-header">
+         <a class="chat-select-link" data-token-id="{{this.id}}"><img src="{{this.data.img}}" title="{{this.name}}" width="36" height="36" /></a>
+        <h3 class="header-name"><a class="chat-document-link" draggable="false" data-entity="Token" data-id="{{this.id}}" data-uuid="{{this.uuid}}">{{this.name}}</a></h3>
+    </div>
+    {{/each}}
+    {{/if}}
     {{#if test.opposed}}
     <div class="test-line">
-            <span class="test-name {{#if roll}}test-roll{{/if}}">
-                {{localize "SR5.Tests.OpposedTest"}}
-            </span>
-        </div>
+        <span class="test-name {{#if roll}}test-roll{{/if}}">
+            {{localize "SR5.Tests.OpposedTest"}}
+        </span>
+    </div>
     <div class="card-buttons">
         {{#each opposedActions}}
         <div class="button opposed-action" data-action="{{this.test}}">

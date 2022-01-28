@@ -8,6 +8,7 @@ import ValueField = Shadowrun.ValueField;
 import OpposedTestData = Shadowrun.OpposedTestData;
 import {PartsList} from "../parts/PartsList";
 import {ShadowrunTestDialog} from "../apps/dialogs/ShadowrunTestDialog";
+import {OpposedTest} from "./OpposedTest";
 
 export interface TestDocuments {
     actor?: SR5Actor,
@@ -57,7 +58,7 @@ export class SuccessTest {
     public item: SR5Item|undefined;
     public roll: SR5Roll;
 
-    public targets: SR5Actor[]
+    public targets: TokenDocument[]
 
     static CHAT_TEMPLATE = 'systems/shadowrun5e/dist/templates/rolls/success-test.html';
 
@@ -119,8 +120,8 @@ export class SuccessTest {
         const action = item.getAction();
         if (!action) return;
         if (!action.test) {
-            action.test = SuccessTest.name;
-            console.warn(`Shadowrun 5e | An action without a defined test handler defaulted to ${SuccessTest.name}`);
+            action.test = 'SuccessTest';
+            console.warn(`Shadowrun 5e | An action without a defined test handler defaulted to ${'SuccessTest'}`);
         }
 
         // @ts-ignore // Check for test class registration.
@@ -404,10 +405,10 @@ export class SuccessTest {
             this.actor = await fromUuid(this.data.sourceActorUuid) as SR5Actor || undefined;
         if (!this.item && this.data.sourceItemUuid)
             this.item = await fromUuid(this.data.sourceItemUuid) as SR5Item || undefined;
-        if (!this.targets && this.data.targetActorsUuid) {
+        if (this.targets.length === 0 && this.data.targetActorsUuid) {
             this.targets = [];
             for (const uuid of this.data.targetActorsUuid) {
-                this.targets.push(await fromUuid(uuid) as SR5Actor);
+                this.targets.push(await fromUuid(uuid) as TokenDocument);
             }
         }
 
@@ -641,6 +642,11 @@ export class SuccessTest {
     _prepareOpposedActionsTemplateData() {
         if (!this.data.opposed) return [];
 
+        if (!this.data.opposed.test) {
+            // Be carefull not to reference the OpposedTest class due to circular imports.
+            console.warn(`Shadowrun 5e | An opposed action without a defined test handler defaulted to ${'OpposedTest'}`);
+            this.data.opposed.test = 'OpposedTest';
+        }
         // @ts-ignore TODO: Move this into a helper
         const testCls = game.shadowrun5e.tests[this.data.opposed.test];
         if (!testCls) return console.error('Shadowrun 5e | Opposed Action has no test class registered.')
