@@ -60,7 +60,7 @@ import ActionResultData = Shadowrun.ActionResultData;
 import MatrixMarks = Shadowrun.MatrixMarks;
 import MarkedDocument = Shadowrun.MarkedDocument;
 import {NetworkDeviceFlow} from "./flows/NetworkDeviceFlow";
-import {SuccessTestData} from "../tests/SuccessTest";
+import {SuccessTest, SuccessTestData} from "../tests/SuccessTest";
 
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
@@ -368,17 +368,21 @@ export class SR5Item extends Item {
     async castAction(event?) {
         if (!this.actor) return;
 
-        const dontRollTest = event?.shiftKey || !this.hasRoll;
-        if (dontRollTest) return await this.postItemCard();
+        const test = SuccessTest.fromAction(this, this.actor);
+        if (!test) return;
+        await test.toMessage();
 
-        const dialog = await ShadowrunItemDialog.create(this, event);
-        // Some items might not have an additional dialog.
-        if (!dialog) return await this.rollTest(event);
-
-        const actionTestData = await dialog.select();
-        if (dialog.canceled) return;
-
-        return await this.rollTest(event, actionTestData);
+        // const dontRollTest = event?.shiftKey || !this.hasRoll;
+        // if (dontRollTest) return await this.postItemCard();
+        //
+        // const dialog = await ShadowrunItemDialog.create(this, event);
+        // // Some items might not have an additional dialog.
+        // if (!dialog) return await this.rollTest(event);
+        //
+        // const actionTestData = await dialog.select();
+        // if (dialog.canceled) return;
+        //
+        // return await this.rollTest(event, actionTestData);
 }
 
     getChatData(htmlOptions?) {

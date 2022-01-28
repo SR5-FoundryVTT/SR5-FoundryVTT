@@ -32,6 +32,9 @@ export interface SuccessTestData {
     // Documents the test might have been derived from.
     sourceItemUuid?: string
     sourceActorUuid?: string
+
+    // Scene Token Ids marked as targets of this test.
+    targetActorsUuid?: string[]
 }
 
 export interface SuccessTestOptions {
@@ -54,34 +57,44 @@ export class SuccessTest {
     public item: SR5Item|undefined;
     public roll: SR5Roll;
 
+    public targets: SR5Actor[]
+
     static CHAT_TEMPLATE = 'systems/shadowrun5e/dist/templates/rolls/success-test.html';
 
     // TODO: include modifiers
     // TODO: store options in data for later re roll with same options?
     constructor(data: SuccessTestData, documents?: TestDocuments, options?: SuccessTestOptions) {
-        this.data = this._prepareData(data);
-
-        // Store given document uuids to be fetched during evaluation.
-        // TODO: Include all necessary sepaker / token info in SuccessTestData to allow items to be deleted.
-        data.sourceActorUuid = data.sourceActorUuid || documents?.actor?.uuid;
-        data.sourceItemUuid = data.sourceItemUuid || documents?.item?.uuid;
-
         // Store given documents to avoid later fetching.
         this.actor = documents?.actor;
         this.item = documents?.item;
+        this.targets = [];
 
-        // @ts-ignore // Prepare general test information.
-        this.data.title = this.data.title || this.constructor.label;
+        this.data = this._prepareData(data);
 
         // Reuse an old roll or create a new one.
         this.roll = options?.roll || this.createRoll();
+
+        console.info(`Shadowrun 5e | Created ${this.constructor.name} Test`, this);
     }
 
     /**
-     * Give subclasses a way to alter default test data
+     * Prepare TestData
+     *
      * @param data
      */
     _prepareData(data: SuccessTestData) {
+        // Store the current users targeted token ids for later use.
+        // @ts-ignore // undefined isn't allowed but it's excluded.
+        data.targetActorsUuid = data.targetActorsUuid || Helpers.getUserTargets().map(token => token.actor?.uuid).filter(uuid => !!uuid);
+
+        // Store given document uuids to be fetched during evaluation.
+        // TODO: Include all necessary sepaker / token info in SuccessTestData to allow items to be deleted.
+        data.sourceActorUuid = data.sourceActorUuid || this.actor?.uuid;
+        data.sourceItemUuid = data.sourceItemUuid || this.item?.uuid;
+
+        // @ts-ignore // Prepare general test information.
+        data.title = data.title || this.constructor.label;
+
         return data;
     }
 
@@ -99,13 +112,26 @@ export class SuccessTest {
         //@ts-ignore
         if (!actor) actor = item.parent;
         if (!(actor instanceof SR5Actor)) {
-            console.warn("Shadowrun 5e | A SuccessTest can only be created with an explicit Actor or Item with an actor parent.")
+            console.error("Shadowrun 5e | A SuccessTest can only be created with an explicit Actor or Item with an actor parent.")
             return;
         }
+
+        const action = item.getAction();
+        if (!action) return;
+        if (!action.test) {
+            action.test = SuccessTest.name;
+            console.warn(`Shadowrun 5e | An action without a defined test handler defaulted to ${SuccessTest.name}`);
+        }
+
+        // @ts-ignore // Check for test class registration.
+        if (!game.shadowrun5e.tests.hasOwnProperty(action.test)) {
+            console.error(`Shadowrun 5e | Test registration for test ${action.test} is missing`);
+            return;
+        }
+
         // Any action item will return a list of values to create the test pool from.
         // @ts-ignore // Get test class from registry to allow custom module tests.
-        const cls = game.shadowrun5e.tests[item.getAction().test];
-
+        const cls = game.shadowrun5e.tests[action.test];
         const data = cls.getItemActionTestData(item, actor);
         return new cls(data, {item, actor}, options);
     }
@@ -378,6 +404,12 @@ export class SuccessTest {
             this.actor = await fromUuid(this.data.sourceActorUuid) as SR5Actor || undefined;
         if (!this.item && this.data.sourceItemUuid)
             this.item = await fromUuid(this.data.sourceItemUuid) as SR5Item || undefined;
+        if (!this.targets && this.data.targetActorsUuid) {
+            this.targets = [];
+            for (const uuid of this.data.targetActorsUuid) {
+                this.targets.push(await fromUuid(uuid) as SR5Actor);
+            }
+        }
 
         this.calculateValues();
 

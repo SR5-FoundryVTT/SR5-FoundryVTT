@@ -18,6 +18,7 @@ import DeviceData = Shadowrun.DeviceData;
 import EquipmentItemData = Shadowrun.EquipmentItemData;
 import DeviceItemData = Shadowrun.DeviceItemData;
 import ValueField = Shadowrun.ValueField;
+import {SuccessTest} from "../tests/SuccessTest";
 
 
 export class DefaultValues {
@@ -267,6 +268,43 @@ export class DefaultValues {
             mod: [],
             label: ''
         }, partialValueData) as ValueField;
+    }
+
+    static actionData(partialActionData: Partial<ActionRollData> = {}) {
+        return mergeObject({
+            test: SuccessTest.name,
+            type: '',
+            category: '',
+            attribute: '',
+            attribute2: '',
+            skill: '',
+            spec: false,
+            mod: 0,
+            mod_description: '',
+            damage: DefaultValues.damageData(),
+            limit: {
+                value: 0,
+                attribute: '',
+                mod: [],
+                base: 0,
+            },
+            threshold: {
+                value: 0,
+                base: 0
+            },
+            extended: false,
+            opposed: {
+                type: 'defense',
+                test: '',
+                attribute: '',
+                attribute2: '',
+                skill: '',
+                mod: 0,
+                description: '',
+            },
+            alt_mod: 0,
+            dice_pool_mod: []
+        }, partialActionData) as ActionRollData;
     }
 }
 

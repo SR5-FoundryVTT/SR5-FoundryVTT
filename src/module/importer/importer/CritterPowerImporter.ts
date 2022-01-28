@@ -24,39 +24,9 @@ export class CritterPowerImporter extends DataImporter {
                     chat: '',
                     source: '',
                 },
-                action: {
-                    type: '',
-                    category: '',
-                    attribute: '',
-                    attribute2: '',
-                    skill: '',
-                    spec: false,
-                    mod: 0,
-                    mod_description: '',
+                action: DefaultValues.actionData({
                     damage: DefaultValues.damageData({type: {base: '', value: ''}}),
-                    limit: {
-                        value: 0,
-                        attribute: '',
-                        mod: [],
-                        base: 0,
-                    },
-                    threshold: {
-                        base: 0,
-                        value: 0
-                    },
-                    extended: false,
-                    opposed: {
-                        type: '',
-                        test: '',
-                        attribute: '',
-                        attribute2: '',
-                        skill: '',
-                        mod: 0,
-                        description: '',
-                    },
-                    alt_mod: 0,
-                    dice_pool_mod: [],
-                },
+                }),
                 armor: {
                     value: 0,
                     mod: false,

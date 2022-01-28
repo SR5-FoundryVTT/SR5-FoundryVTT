@@ -24,39 +24,11 @@ export class ComplexFormImporter extends DataImporter {
                     chat: '',
                     source: '',
                 },
-                action: {
+                action: DefaultValues.actionData({
                     type: 'complex',
-                    category: '',
                     attribute: 'resonance',
-                    attribute2: '',
-                    skill: 'compiling',
-                    spec: false,
-                    mod: 0,
-                    mod_description: '',
-                    damage: DefaultValues.damageData(),
-                    limit: {
-                        value: 0,
-                        attribute: '',
-                        mod: [],
-                        base: 0,
-                    },
-                    threshold: {
-                        base: 0,
-                        value: 0
-                    },
-                    extended: false,
-                    opposed: {
-                        type: 'defense',
-                        test: '',
-                        attribute: '',
-                        attribute2: '',
-                        skill: '',
-                        mod: 0,
-                        description: '',
-                    },
-                    alt_mod: 0,
-                    dice_pool_mod: [],
-                },
+                    skill: 'compiling'
+                }),
                 target: '',
                 duration: '',
                 fade: 0,

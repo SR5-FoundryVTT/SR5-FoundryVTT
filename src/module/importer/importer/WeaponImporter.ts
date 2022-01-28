@@ -28,39 +28,7 @@ export class WeaponImporter extends DataImporter {
                     chat: '',
                     source: '',
                 },
-                action: {
-                    type: 'varies',
-                    category: '',
-                    attribute: 'agility',
-                    attribute2: '',
-                    skill: '',
-                    spec: false,
-                    mod: 0,
-                    mod_description: '',
-                    damage: DefaultValues.damageData(),
-                    limit: {
-                        value: 0,
-                        attribute: '',
-                        mod: [],
-                        base: 0,
-                    },
-                    threshold: {
-                        value: 0,
-                        base: 0
-                    },
-                    extended: false,
-                    opposed: {
-                        type: 'defense',
-                        test: '',
-                        attribute: '',
-                        attribute2: '',
-                        skill: '',
-                        mod: 0,
-                        description: '',
-                    },
-                    alt_mod: 0,
-                    dice_pool_mod: []
-                },
+                action: DefaultValues.actionData({type: 'varies', attribute: 'agility'}),
                 technology: DefaultValues.technologyData({rating: 1}),
                 ammo: {
                     spare_clips: {
