@@ -2181,6 +2181,15 @@ export class SR5Actor extends Actor {
     }
 
     /**
+     * Does this actor have the given inventory already?
+     *
+     * @param name The inventory name/label.
+     */
+    hasInventory(name): boolean {
+        return this.data.data.inventories.hasOwnProperty(name);
+    }
+
+    /**
      * Create an item within an inventory.
      * @param inventoryName
      * @param itemType

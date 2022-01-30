@@ -6,7 +6,6 @@ import {SkillEditSheet} from "../../apps/skills/SkillEditSheet";
 import {SR5Actor} from "../SR5Actor";
 import {KnowledgeSkillEditSheet} from "../../apps/skills/KnowledgeSkillEditSheet";
 import {LanguageSkillEditSheet} from "../../apps/skills/LanguageSkillEditSheet";
-import {InventoryCreateItemDialog} from "../../apps/dialogs/InventoryCreateItemDialog";
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import SkillField = Shadowrun.SkillField;
@@ -141,6 +140,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         data.effects = prepareActiveEffectCategories(this.document.effects);  // All actor types have effects.
         data.inventories = this._prepareItemsInventory();
         data.inventory = this._prepareSelectedInventory(data);
+        data.selectedInventory = this.selectedInventory;
 
         return data;
     }
@@ -171,8 +171,11 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.Roll').on('click', this._onRoll.bind(this));
 
         // Actor inventory handling....
-        html.find('.inventory-create').on('click', this._onInventoryCreate.bind(this));
-        html.find('.inventory-item-create').on('click', this._onInventoryItemCreate.bind(this));
+        html.find('.inventory-inline-create').on('click', this._onInventoryCreate.bind(this));
+        html.find('.inventory-edit').on('click', this._onInplaceInventoryEdit.bind(this));
+        html.find('.inventory-input-cancel').on('click', this._onInplaceInventoryEditCancel.bind(this));
+        html.find('.inventory-input-save').on('click', this._onInplaceInventoryEditSave.bind(this));
+        html.find('#select-inventory').on('change', this._onSelectInventory.bind(this));
 
         // Condition monitor track handling...
         html.find('.horizontal-cell-input .cell').on('click', this._onSetConditionTrackCell.bind(this));
@@ -1366,7 +1369,10 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onInventoryCreate(event) {
         event.preventDefault();
 
-        await this.document.createInventory('Test');
+        // Overwrite currently selected inventory.
+        $('#input-inventory').val('');
+        await this._onInplaceInventoryEdit(event);
+        // await this.document.createInventory('Test');
     }
 
     /**
@@ -1375,17 +1381,82 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onInventoryItemCreate(event) {
         event.preventDefault();
 
-        // Get the inventory to create an item within.
-        const inventory = event.currentTarget.dataset.inventory;
-        if (!inventory) return console.error('Shadowrun 5e | Inventory creation aborted due to malformed inventory-item-create dataset');
 
-        // Ask user for item type to create.
-        const dialog = new InventoryCreateItemDialog();
-        const selectData = await dialog.select();
-        if (dialog.canceled) return;
+        return console.error('incomplete');
+        // // Get the inventory to create an item within.
+        // const inventory = event.currentTarget.dataset.inventory;
+        // if (!inventory) return console.error('Shadowrun 5e | Inventory creation aborted due to malformed inventory-item-create dataset');
+        //
+        // // Ask user for item type to create.
+        // const dialog = new InventoryCreateItemDialog();
+        // const selectData = await dialog.select();
+        // if (dialog.canceled) return;
+        //
+        // const {itemType} = selectData;
 
-        const {itemType} = selectData;
+        // await this.document.createInventoryItem(inventory, itemType);
+    }
 
-        await this.document.createInventoryItem(inventory, itemType);
+    /**
+     * Hide inventory selection and show inline editing instead.
+     *
+     * @param event
+     */
+    async _onInplaceInventoryEdit(event) {
+        event.preventDefault();
+
+        $('.selection-inventory').hide();
+        $('.inline-input-inventory').show();
+    }
+
+    /**
+     * Hide inline inventory editing and show inventory selection instead.
+     *
+     * Cancel edit workflow and do nothing.
+     * @param event
+     */
+    async _onInplaceInventoryEditCancel(event) {
+        event.preventDefault();
+
+        $('.selection-inventory').show();
+        $('.inline-input-inventory').hide();
+
+        // Reset to selected inventory for next try.
+        $('#input-inventory').val(this.selectedInventory);
+    }
+
+    /**
+     * Complete inline editing and either save changes or create a missing inventory.
+     *
+     * @param event
+     */
+    async _onInplaceInventoryEditSave(event) {
+        event.preventDefault();
+
+        const inputElement = $('#input-inventory');
+        const inventory = inputElement.val();
+
+        if (!this.document.hasInventory(inventory))
+            await this.document.createInventory(inventory);
+
+        await this._onInplaceInventoryEditCancel(event);
+
+        this.render();
+    }
+
+    /**
+     * Change selected inventory for this sheet.
+     *
+     * @param event
+     */
+    async _onSelectInventory(event) {
+        event.preventDefault();
+
+        const inventory = String($(event.currentTarget).val());
+
+        if (inventory)
+            this.selectedInventory = inventory;
+
+        this.render();
     }
 }
