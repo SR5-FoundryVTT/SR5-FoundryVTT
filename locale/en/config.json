@@ -25,14 +25,12 @@
   "ITEM.TypeSprite_power": "Sprite Power",
   "ITEM.TypeWeapon": "Weapon",
   "ITEM.TypeHost": "Host",
-
   "SR5.FOUNDRY": {
     "Actor": "Actor",
     "Scene": "Scene",
     "Item": "Item",
     "Token": "Token"
   },
-
   "SR5.SheetActor": "Actor sheet",
   "SR5.SheetItem": "Item sheet",
   "SR5.ItemTypes": {
@@ -564,7 +562,6 @@
   "SR5.WalkingSpeed": "Walking",
   "SR5.RunningSpeed": "Running",
   "SR5.Help": "Help",
-
   "SETTINGS": {
     "DiagonalMovementName": "Diagonal Movement",
     "DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
@@ -634,7 +631,13 @@
       "RollDroneInfiltration": "Drone Infiltration",
       "VehicleConfiguration": "Vehicle Configuration",
       "ICConfiguration": "IC Configuration",
-      "SetMonitor": "Monitor must be set manually."
+      "SetMonitor": "Monitor must be set manually.",
+      "PersonalInventory": "On Person",
+      "CreateInventory": "Create inventory place"
+    },
+    "Inventory": {
+      "OpenInventory": "Shown inventory",
+      "Carried": "Carried"
     }
   },
   "SR5.Spirit": {
@@ -643,44 +646,44 @@
     "Services": "Services",
     "Bound": "Bound",
     "Types": {
-        "Air": "Air",
-        "Aircraft": "Aircraft",
-        "Airwave": "Airwave",
-        "Automotive": "Automotive",
-        "Beasts": "Beasts",
-        "Ceramic": "Ceramic",
-        "Earth": "Earth",
-        "Energy": "Energy",
-        "Fire": "Fire",
-        "Guardian": "Guardian",
-        "Guidance": "Guidance",
-        "Man": "Man",
-        "Metal": "Metal",
-        "Plant": "Plant",
-        "Ship": "Ship",
-        "Task": "Task",
-        "Train": "Train",
-        "Water": "Water",
-        "ToxicAir": "Noxious",
-        "ToxicBeasts": "Abomination",
-        "ToxicEarth": "Barren",
-        "ToxicFire": "Nuclear",
-        "ToxicMan": "Plague",
-        "ToxicWater": "Sludge",
-        "Blood": "Blood",
-        "Muse": "Muse",
-        "Nightmare": "Nightmare",
-        "Shade": "Shade",
-        "Succubus": "Succubus",
-        "Wraith": "Wraith",
-        "Shedim": "Shedim",
-        "MasterShedim": "MasterShedim",
-        "Caretaker": "Insect Caretaker",
-        "Nymph": "Insect Nymph",
-        "Scout": "Insect Scout",
-        "Soldier": "Insect Soldier",
-        "Worker": "Insect Worker",
-        "Queen": "Insect Queen"
+      "Air": "Air",
+      "Aircraft": "Aircraft",
+      "Airwave": "Airwave",
+      "Automotive": "Automotive",
+      "Beasts": "Beasts",
+      "Ceramic": "Ceramic",
+      "Earth": "Earth",
+      "Energy": "Energy",
+      "Fire": "Fire",
+      "Guardian": "Guardian",
+      "Guidance": "Guidance",
+      "Man": "Man",
+      "Metal": "Metal",
+      "Plant": "Plant",
+      "Ship": "Ship",
+      "Task": "Task",
+      "Train": "Train",
+      "Water": "Water",
+      "ToxicAir": "Noxious",
+      "ToxicBeasts": "Abomination",
+      "ToxicEarth": "Barren",
+      "ToxicFire": "Nuclear",
+      "ToxicMan": "Plague",
+      "ToxicWater": "Sludge",
+      "Blood": "Blood",
+      "Muse": "Muse",
+      "Nightmare": "Nightmare",
+      "Shade": "Shade",
+      "Succubus": "Succubus",
+      "Wraith": "Wraith",
+      "Shedim": "Shedim",
+      "MasterShedim": "MasterShedim",
+      "Caretaker": "Insect Caretaker",
+      "Nymph": "Insect Nymph",
+      "Scout": "Insect Scout",
+      "Soldier": "Insect Soldier",
+      "Worker": "Insect Worker",
+      "Queen": "Insect Queen"
     }
   },
   "SR5.CritterPower": {
@@ -842,7 +845,8 @@
     "MarksCantBePlacedOn": "The chosen actor type can't receive any marks.",
     "CantEditAppliedItemEffects": "You can't edit an active effect that's been applied by an item.",
     "KeyNotModifyableByActiveEffect": "The active effect mode modify can only affect mod properties.",
-    "CanOnlyAddTechnologyItemsToANetwork": "Only technology items can be added to a network."
+    "CanOnlyAddTechnologyItemsToANetwork": "Only technology items can be added to a network.",
+    "InventoryAlreadyExists": "An inventory with this name already exists."
   },
   "SR5.ChangelogApplication": {
     "Title": "Shadowrun5e Update",

@@ -1,0 +1,50 @@
+{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.html' tabId='inventory'}}
+    <div class="inventory">
+        <div class="list-item item-section">
+            <div class="item-left">
+                <label for="select-inventory">{{localize 'SR5.Labels.Inventory.OpenInventory'}}</label>
+                <select id="select-inventory" selected="{{inventory.name}}" class="display">
+                    {{#each inventories as |inventory name|}}
+                    <option value="{{inventory.name}}">{{localize inventory.label}}</option>
+                    {{/each}}
+                </select>
+            </div>
+            <div class="item-right">
+                <div class="item-text item-icons">
+                    <a class="inventory-edit roll">
+                        <i class="fas fa-edit inventory-edit"></i>
+                    </a>
+                    <a class="inventory-remove roll">
+                        <i class="fas fa-trash inventory-remove"></i>
+                    </a>
+                    <a class="inventory-create roll" title="{{localize 'SR5.Labels.ActorSheet.CreateInventory'}}">
+                        <i class="item-icon fas fa-plus"></i>
+                        {{localize "SR5.Add"}}
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-area">
+            {{#each inventory.types as |section type|}}
+                {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+                        name=(localize section.label)
+                        itemId=section.type
+                        icons=(ItemHeaderIcons section.type)
+                        rightSide=(ItemHeaderRightSide section.type)
+                }}
+                {{#each section.items}}
+                    {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                            img=this.img
+                            name=this.name
+                            itemId=this._id
+                            icons=(ItemIcons this)
+                            rightSide=(ItemRightSide this)
+                            hasDesc="true"
+                            hasRoll="true"
+                            description=this.description.value
+                    }}
+                {{/each}}
+            {{/each}}
+        </div>
+    </div>
+{{/'systems/shadowrun5e/dist/templates/common/TabWrapper.html'}}

@@ -20,6 +20,9 @@ import {Modifiers} from "../rules/Modifiers";
 import {SkillRules} from "../rules/SkillRules";
 import {MatrixRules} from "../rules/MatrixRules";
 import {ICPrep} from "./prep/ICPrep";
+import {
+    EffectChangeData
+} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/effectChangeData";
 import ActorRollOptions = Shadowrun.ActorRollOptions;
 import DefenseRollOptions = Shadowrun.DefenseRollOptions;
 import SoakRollOptions = Shadowrun.SoakRollOptions;
@@ -54,7 +57,6 @@ import MatrixData = Shadowrun.MatrixData;
 import HostItemData = Shadowrun.HostItemData;
 import MarkedDocument = Shadowrun.MarkedDocument;
 import MatrixMarks = Shadowrun.MatrixMarks;
-import {EffectChangeData} from "@league-of-foundry-developers/foundry-vtt-types/src/foundry/common/data/data.mjs/effectChangeData";
 
 function getGame(): Game {
   if(!(game instanceof Game)) {
@@ -79,6 +81,12 @@ function getGame(): Game {
  *
  */
 export class SR5Actor extends Actor {
+    // This is the default inventory name and label for when no other inventory has been created.
+    defaultInventory: { name: string, label: string } = {
+        name: 'Carried',
+        label: 'SR5.Labels.Inventory.Carried'
+    }
+
     getOverwatchScore() {
         const os = this.getFlag(SYSTEM_NAME, 'overwatchScore');
         return os !== undefined ? os : 0;
@@ -2150,5 +2158,50 @@ export class SR5Actor extends Actor {
                 marks,
                 markId
             }))
+    }
+
+    /**
+     * Create an inventory place for gear organization.
+     * @param name How to name the inventory, will also be it's label for custom inventories.
+     *
+     * TODO: Add Typing to method.
+     */
+    async createInventory(name) {
+        if (this.data.data.inventories[name]) return ui.notifications?.warn(game.i18n.localize('SR5.Errors.InventoryAlreadyExists'));
+
+        return await this.update({
+            'data.inventories': {
+                [name]: {
+                    name,
+                    label: name,
+                    itemIds: []
+                }
+            }
+        })
+    }
+
+    /**
+     * Create an item within an inventory.
+     * @param inventoryName
+     * @param itemType
+     */
+    async createInventoryItem(inventoryName, itemType) {
+        const inventory = this.data.data.inventories[inventoryName];
+        if (inventoryName !== this.defaultInventory.name && !inventory) return console.error(`Shadowrun 5e | Inventory ${inventoryName} doesn't exist to create an item in.`);
+
+        const itemData = {
+            // @ts-ignore
+            name: game.i18n.localize(CONFIG.Item.typeLabels[itemType]),
+            type: itemType,
+        };
+
+        const items = await this.createEmbeddedDocuments('Item',  [itemData]);
+
+        if (inventoryName !== this.defaultInventory.name) {
+            for (const item of items) {
+                if (item.id) inventory.itemIds.push(item.id);
+            }
+            await this.update({[`data.inventories.${inventoryName}.itemIds`]: inventory.itemIds});
+        }
     }
 }

@@ -241,7 +241,7 @@ export class SR5ItemSheet extends ItemSheet {
         try {
             data = JSON.parse(event.dataTransfer.getData('text/plain'));
         } catch (err) {
-            return console.log('Shadowrun5e | drop error');
+            return console.log('Shadowrun 5e | drop error');
         }
 
         if (!data) return;
@@ -299,7 +299,7 @@ export class SR5ItemSheet extends ItemSheet {
             }
             //
             // else if (data.actorId && data.sceneId && data.tokenId) {
-            //     console.log('Shadowrun5e | Adding unlinked token actors item to the network', data);
+            //     console.log('Shadowrun 5e | Adding unlinked token actors item to the network', data);
             //     const scene = game.scenes.get(data.sceneId);
             //     if (!scene) return;
             //     const token = scene.tokens.get(data.tokenId);
@@ -311,7 +311,7 @@ export class SR5ItemSheet extends ItemSheet {
             //
             // // TODO: Collection item
             // else if (data.id && !data.actorId && !data.sceneId && !data.tokenId) {
-            //     console.log('Shadowrun5e | Adding collection item without actor to the network', data);
+            //     console.log('Shadowrun 5e | Adding collection item without actor to the network', data);
             // }
 
             return;

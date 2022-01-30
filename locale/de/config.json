@@ -619,7 +619,13 @@
       "RollDroneInfiltration": "Drohne infiltrieren",
       "VehicleConfiguration": "Fahrzeug Konfiguration",
       "ICConfiguration": "IC Configuration",
-      "SetMonitor": "Monitor muss manuell gesetzt werden"
+      "SetMonitor": "Monitor muss manuell gesetzt werden",
+      "PersonalInventory": "Am Körper",
+      "CreateInventory": "Erstelle Inventar Ort"
+    },
+    "Inventory": {
+      "OpenInventory": "Offenes Inventar",
+      "Carried": "Mitgeführt"
     }
   },
   "SR5.Spirit": {
@@ -807,7 +813,8 @@
     "MarksCantBePlacedOn": "Der als Ziel ausgewählte Akteur kann keine Marken empfangen.",
     "CantEditAppliedItemEffects": "Aktive Effekte, die über Items zugefügt wurden, können nicht direkt editiert werden.",
     "KeyNotModifyableByActiveEffect": "Der Aktive Effect Modus Modifizieren kann nur auf mod Felder angewendet werden.",
-    "CanOnlyAddTechnologyItemsToANetwork": "Nur technologische Gegenstände können einem Netzwerk zugefügt werden."
+    "CanOnlyAddTechnologyItemsToANetwork": "Nur technologische Gegenstände können einem Netzwerk zugefügt werden.",
+    "InventoryAlreadyExists": "Es existiert bereits ein Inventar mit diesem Namen"
   },
   "SR5.ChangelogApplication": {
     "Title": "Shadowrun5e Update",

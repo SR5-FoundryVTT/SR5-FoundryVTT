@@ -89,6 +89,19 @@ export const registerItemLineHelpers = () => {
         }
     });
 
+    Handlebars.registerHelper('InventoryIcons', function(name) {
+        const addItemIcon = {
+            icon: 'fas fa-plus',
+            text: game.i18n.localize('SR5.Add'),
+            title: game.i18n.localize('SR5.CreateItem'),
+            cssClass: 'inventory-item-create',
+            // Add HTML data attributes using a key<string>:value<string> structure
+            data: {inventory: name}
+        };
+
+        return [addItemIcon];
+    });
+
     Handlebars.registerHelper('ItemHeaderRightSide', function (id) {
         switch (id) {
             case 'action':

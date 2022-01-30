@@ -6,6 +6,7 @@ import {SkillEditSheet} from "../../apps/skills/SkillEditSheet";
 import {SR5Actor} from "../SR5Actor";
 import {KnowledgeSkillEditSheet} from "../../apps/skills/KnowledgeSkillEditSheet";
 import {LanguageSkillEditSheet} from "../../apps/skills/LanguageSkillEditSheet";
+import {InventoryCreateItemDialog} from "../../apps/dialogs/InventoryCreateItemDialog";
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import SkillField = Shadowrun.SkillField;
@@ -31,6 +32,17 @@ export class SR5BaseActorSheet extends ActorSheet {
         };
     // Used to store the scroll position on rerender. Needed as Foundry fully re-renders on Document update.
     _scroll: string;
+    // Store the currently selected inventory.
+    selectedInventory: string;
+
+
+    constructor(...args) {
+        // @ts-ignore // Since we don't need any actual data, don't define args to avoid breaking changes.
+        super(...args);
+
+        // Preselect default inventory.
+        this.selectedInventory = this.document.defaultInventory.name;
+    }
 
     /**
      * All actors will handle these item types specifically.
@@ -121,12 +133,14 @@ export class SR5BaseActorSheet extends ActorSheet {
         this._prepareActorAttributes(data);
 
         // Valid data fields for all actor types.
+        // TODO: Remove _prepareItems method.
         this._prepareItems(data); // All actor types have items.
         this._prepareActorTypeFields(data);  // Actor type fields can be generic.
         this._prepareSkillsWithFilters(data); // All actor types have skills.
 
         data.effects = prepareActiveEffectCategories(this.document.effects);  // All actor types have effects.
-        data.inventory = this._prepareItemsInventory();
+        data.inventories = this._prepareItemsInventory();
+        data.inventory = this._prepareSelectedInventory(data);
 
         return data;
     }
@@ -156,6 +170,9 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.item-roll').on('click', this._onItemRoll.bind(this));
         html.find('.Roll').on('click', this._onRoll.bind(this));
 
+        // Actor inventory handling....
+        html.find('.inventory-create').on('click', this._onInventoryCreate.bind(this));
+        html.find('.inventory-item-create').on('click', this._onInventoryItemCreate.bind(this));
 
         // Condition monitor track handling...
         html.find('.horizontal-cell-input .cell').on('click', this._onSetConditionTrackCell.bind(this));
@@ -206,21 +223,22 @@ export class SR5BaseActorSheet extends ActorSheet {
      * Handle display of item types within the actors inventory section.
      *
      * Handled means there is some place specific the actor sheet want's these items displayed.
+     * Unexpected means there is no use for this type but the user added it anyway.
      * Inventory types means they should always be shown, even if there are none.
      * All other item types will be collected at some tab / place on the sheet.
      */
     _removeHandledInventory(inventory) {
-        // Show item types that aren't handled elsewhere.
+        // Remove item types that are specifically handled outside the inventory.
         const handledTypes = this.getHandledItemTypes();
         for (const type of handledTypes) {
-            delete inventory[type];
+            delete inventory.types[type];
         }
 
-        // Show item types that have no use on the actor.
+        // Show all item types but remove empty unexpected item types.
         const inventoryTypes = this.getInventoryItemTypes();
-        for (const type of Object.keys(inventory)) {
+        for (const type of Object.keys(inventory.types)) {
             if (inventoryTypes.includes(type)) continue;
-            if (inventory[type].items.length === 0) delete inventory[type];
+            if (inventory.types[type].items.length === 0) delete inventory.types[type];
         }
 
         return inventory;
@@ -626,27 +644,41 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
 
     /**
-     * Prepare Actor Sheet data with item data.
+     * Prepare Actor Sheet Inventory display.
+     *
+     * Each item can  be in one custom inventory or the default inventory.
+     *
+     * TODO: Rebuild method to work with this.selectedInventory
      */
     _prepareItemsInventory() {
-        const inventory = {};
+        // All custom and default actor inventories.
+        const inventories = {};
+        // Simple item to inventory mapping.
+        const itemIdInventory = {};
 
-        // Build inventory for all item types.
-        Object.entries(CONFIG.Item.typeLabels).forEach(([type, label]) => {
-            // @ts-ignore // type is never undefined
-            inventory[type] = {
+        // Build all inventories, group items by their types.
+        Object.values(this.document.data.data.inventories).forEach(({name, label, itemIds}) => {
+            inventories[name] = {
+                name,
                 label,
-                items: [],
-                dataset: {
-                    type
-                }
+                types: {}
             }
+
+            itemIds.forEach(id => {
+                if (itemIdInventory[id]) console.warn(`Shadowrun5e | Item id ${id} has been added to both ${name} and ${itemIdInventory[id]}. Will only show in ${name}`);
+                itemIdInventory[id] = name;
+            });
         });
 
-        // Fill inventory with all item types.
-        this.object.items.forEach(item => {
-            if (!inventory.hasOwnProperty(item.type)) return console.error(`Item ${item.name} of ${item.type} should have an inventory space, but doesn't, and won't be displayed.`);
+        // Default inventory for items without a defined one.
+        inventories[this.document.defaultInventory.name] = {
+            name: this.document.defaultInventory.name,
+            label: this.document.defaultInventory.label,
+            types: {}
+        };
 
+        // Fill all inventories with items grouped by their type.
+        this.document.items.forEach(item => {
             // Since fields will be added, duplicate the item to avoid those propagating into #update calls.
             const sheetItem = duplicate(item);
 
@@ -662,8 +694,23 @@ export class SR5BaseActorSheet extends ActorSheet {
             // @ts-ignore
             // sheetItem.isStack = sheetItem.data.quantity ? item.data.quantity > 1 : false;
 
-            // Add the item to its types inventory.
-            inventory[item.type].items.push(sheetItem);
+            const inventoryName = itemIdInventory[item.id] || this.document.defaultInventory.name;
+            const inventory = inventories[inventoryName];
+
+            // Build item type structure per inventory
+            if (!inventory.types[item.type]) {
+                inventory.types[item.type] = {
+                    type: item.type,
+                    label: SR5.itemTypes[item.type],
+                    items: []
+                };
+            }
+
+            inventory.types[item.type].items.push(sheetItem);
+        });
+
+        Object.values(inventories).forEach(inventory => {
+            this._removeHandledInventory(inventory);
         });
 
         // Prepared sorting methods.
@@ -682,15 +729,24 @@ export class SR5BaseActorSheet extends ActorSheet {
             return 0;
         };
 
-        Object.values(inventory).forEach(({items}) => {
-            // TODO: Check if some / all should be sort by equipped.
-            items.sort(sortByName);
-        });
+        // Sort the items within each inventory.
+        Object.values(inventories).forEach(({types}) =>
+            Object.values(types).forEach((type: {items: []}) => {
+                // TODO: Check if some / all should be sort by equipped.
+                type.items.sort(sortByName);
+            })
+        );
 
+        return inventories;
+    }
 
-        this._removeHandledInventory(inventory);
-
-        return inventory;
+    /**
+     * Choose the selected inventory to actually display.
+     *
+     * @param data
+     */
+    _prepareSelectedInventory(data) {
+        return data.inventories[this.selectedInventory];
     }
 
     /**
@@ -1302,5 +1358,34 @@ export class SR5BaseActorSheet extends ActorSheet {
             if (field.is(':visible')) this._shownDesc.push(iid);
             else this._shownDesc = this._shownDesc.filter((val) => val !== iid);
         }
+    }
+
+    /**
+     * Create an inventory place on the actor for gear organization.
+     */
+    async _onInventoryCreate(event) {
+        event.preventDefault();
+
+        await this.document.createInventory('Test');
+    }
+
+    /**
+     * Create an item within an inventory place.
+     */
+    async _onInventoryItemCreate(event) {
+        event.preventDefault();
+
+        // Get the inventory to create an item within.
+        const inventory = event.currentTarget.dataset.inventory;
+        if (!inventory) return console.error('Shadowrun 5e | Inventory creation aborted due to malformed inventory-item-create dataset');
+
+        // Ask user for item type to create.
+        const dialog = new InventoryCreateItemDialog();
+        const selectData = await dialog.select();
+        if (dialog.canceled) return;
+
+        const {itemType} = selectData;
+
+        await this.document.createInventoryItem(inventory, itemType);
     }
 }
