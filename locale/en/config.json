@@ -846,7 +846,8 @@
     "CantEditAppliedItemEffects": "You can't edit an active effect that's been applied by an item.",
     "KeyNotModifyableByActiveEffect": "The active effect mode modify can only affect mod properties.",
     "CanOnlyAddTechnologyItemsToANetwork": "Only technology items can be added to a network.",
-    "InventoryAlreadyExists": "An inventory with this name already exists."
+    "InventoryAlreadyExists": "An inventory with this name already exists.",
+    "DefaultInventoryCantBeRemoved": "The default inventory can't be removed"
   },
   "SR5.ChangelogApplication": {
     "Title": "Shadowrun5e Update",

@@ -658,7 +658,7 @@ export class SR5Actor extends Actor {
     }
 
     async removeLanguageSkill(skillId) {
-        const updateData = Helpers.getDeleteDataEntry('data.skills.language.value', skillId);
+        const updateData = Helpers.getDeleteKeyUpdateData('data.skills.language.value', skillId);
         await this.update(updateData);
     }
 
@@ -689,7 +689,7 @@ export class SR5Actor extends Actor {
     }
 
     async removeKnowledgeSkill(skillId, category) {
-        const updateData = Helpers.getDeleteDataEntry(`data.skills.knowledge.${category}.value`, skillId);
+        const updateData = Helpers.getDeleteKeyUpdateData(`data.skills.knowledge.${category}.value`, skillId);
         await this.update(updateData);
     }
 
@@ -714,7 +714,7 @@ export class SR5Actor extends Actor {
         }
 
         // Remove custom skills without mercy!
-        const updateData = Helpers.getDeleteDataEntry('data.skills.active', skillId);
+        const updateData = Helpers.getDeleteKeyUpdateData('data.skills.active', skillId);
         await this.update(updateData);
     }
 
@@ -2178,6 +2178,39 @@ export class SR5Actor extends Actor {
                 }
             }
         })
+    }
+
+    /**
+     * Remove an actors inventory and maybe move the containing items over to another one.
+     *
+     * @param name The inventory name to be removed.
+     * @param moveTo The inventory name items need to moved over to, otherwise the default inventory.
+     */
+    // TODO: When an item has no inventory, it will be placed into default, no? Abort in that case.
+    async removeInventory(name: string, moveTo: string=this.defaultInventory.name) {
+        if (this.defaultInventory.name === name)
+            return ui.notifications?.error(game.i18n.localize('SR5.Errors.DefaultInventoryCantBeRemoved'));
+
+        if (!this.hasInventory(name))
+            return console.error(`Shadowrun 5e | Can't remove inventory ${name} or move its items over to inventory ${moveTo}`);
+
+        // Move items over to default in case of missing target inventory.
+        if (!this.hasInventory(moveTo))
+            moveTo = this.defaultInventory.name;
+
+        // Prepare deletion of inventory.
+        const updateData = Helpers.getDeleteKeyUpdateData('data.inventories', name);
+
+        // Default inventory is virtual, so only none default inventories need to have their items merged.
+        if (this.defaultInventory.name !== moveTo) {
+            // @ts-ignore
+            updateData[`data.inventories.${moveTo}.itemIds`] = [
+            ...this.data.data.inventories[name].itemIds,
+            ...this.data.data.inventories[moveTo].itemIds
+            ];
+        }
+
+        await this.update(updateData);
     }
 
     /**

@@ -172,6 +172,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         // Actor inventory handling....
         html.find('.inventory-inline-create').on('click', this._onInventoryCreate.bind(this));
+        html.find('.inventory-remove').on('click', this._onInventoryRemove.bind(this));
         html.find('.inventory-edit').on('click', this._onInplaceInventoryEdit.bind(this));
         html.find('.inventory-input-cancel').on('click', this._onInplaceInventoryEditCancel.bind(this));
         html.find('.inventory-input-save').on('click', this._onInplaceInventoryEditSave.bind(this));
@@ -650,9 +651,8 @@ export class SR5BaseActorSheet extends ActorSheet {
      * Prepare Actor Sheet Inventory display.
      *
      * Each item can  be in one custom inventory or the default inventory.
-     *
-     * TODO: Rebuild method to work with this.selectedInventory
      */
+    // TODO: Rebuild method to work with this.selectedInventory
     _prepareItemsInventory() {
         // All custom and default actor inventories.
         const inventories = {};
@@ -1372,29 +1372,24 @@ export class SR5BaseActorSheet extends ActorSheet {
         // Overwrite currently selected inventory.
         $('#input-inventory').val('');
         await this._onInplaceInventoryEdit(event);
-        // await this.document.createInventory('Test');
     }
 
     /**
-     * Create an item within an inventory place.
+     * Remove the currently selected inventory.
+     * @param event
      */
-    async _onInventoryItemCreate(event) {
+    async _onInventoryRemove(event) {
         event.preventDefault();
 
+        // TODO: Allow for options overwriting title/message and so forth.
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
 
-        return console.error('incomplete');
-        // // Get the inventory to create an item within.
-        // const inventory = event.currentTarget.dataset.inventory;
-        // if (!inventory) return console.error('Shadowrun 5e | Inventory creation aborted due to malformed inventory-item-create dataset');
-        //
-        // // Ask user for item type to create.
-        // const dialog = new InventoryCreateItemDialog();
-        // const selectData = await dialog.select();
-        // if (dialog.canceled) return;
-        //
-        // const {itemType} = selectData;
+        await this.document.removeInventory(this.selectedInventory);
 
-        // await this.document.createInventoryItem(inventory, itemType);
+        // Preselect default instead of none.
+        this.selectedInventory = this.document.defaultInventory.name;
+        this.render();
     }
 
     /**
@@ -1430,17 +1425,21 @@ export class SR5BaseActorSheet extends ActorSheet {
      *
      * @param event
      */
+    // TODO: Editing doesn't work, as it will assume that it must be created.
     async _onInplaceInventoryEditSave(event) {
         event.preventDefault();
 
         const inputElement = $('#input-inventory');
-        const inventory = inputElement.val();
+        const inventory = String(inputElement.val());
+        if (!inventory) return;
 
         if (!this.document.hasInventory(inventory))
             await this.document.createInventory(inventory);
 
         await this._onInplaceInventoryEditCancel(event);
 
+        // Preselect the new inventory.
+        this.selectedInventory = inventory;
         this.render();
     }
 
