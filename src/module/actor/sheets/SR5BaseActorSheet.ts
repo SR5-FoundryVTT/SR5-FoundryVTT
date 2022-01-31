@@ -249,6 +249,24 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
 
     /**
+     * Add any item type to the inventory display that's configured for this actor sheet type.
+     *
+     * @param inventory The inventory to check and add types to.
+     */
+    _addInventoryTypes(inventory) {
+        const inventoryTypes = this.getInventoryItemTypes();
+        for (const type of inventoryTypes) {
+            if (inventory.types.hasOwnProperty(type)) continue;
+
+            inventory.types[type] = {
+                type: type,
+                label: SR5.itemTypes[type],
+                items: []
+            };
+        }
+    }
+
+    /**
      * @override Default drag start handler to add Skill support
      * @param event
      */
@@ -714,6 +732,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         Object.values(inventories).forEach(inventory => {
             this._removeHandledInventory(inventory);
+            this._addInventoryTypes(inventory);
         });
 
         // Prepared sorting methods.
