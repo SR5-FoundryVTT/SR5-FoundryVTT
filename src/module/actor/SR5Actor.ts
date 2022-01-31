@@ -57,6 +57,7 @@ import MatrixData = Shadowrun.MatrixData;
 import HostItemData = Shadowrun.HostItemData;
 import MarkedDocument = Shadowrun.MarkedDocument;
 import MatrixMarks = Shadowrun.MatrixMarks;
+import InventoryData = Shadowrun.InventoryData;
 
 function getGame(): Game {
   if(!(game instanceof Game)) {
@@ -2223,27 +2224,26 @@ export class SR5Actor extends Actor {
     }
 
     /**
-     * Create an item within an inventory.
-     * @param inventoryName
-     * @param itemType
+     * Helper to get inventory data
+     *
+     * @param name The inventory name to return.
      */
-    async createInventoryItem(inventoryName, itemType) {
-        const inventory = this.data.data.inventories[inventoryName];
-        if (inventoryName !== this.defaultInventory.name && !inventory) return console.error(`Shadowrun 5e | Inventory ${inventoryName} doesn't exist to create an item in.`);
+    getInventory(name): InventoryData|undefined {
+        return this.data.data.inventories[name];
+    }
 
-        const itemData = {
-            // @ts-ignore
-            name: game.i18n.localize(CONFIG.Item.typeLabels[itemType]),
-            type: itemType,
-        };
+    /**
+     * Add an array of items to the given inventory.
+     *
+     * @param name The inventory to add the items to.
+     * @param items The items in question.
+     */
+    async addItemsToInventory(name: string, items: SR5Item[]) {
+        if (!this.hasInventory(name)) return;
 
-        const items = await this.createEmbeddedDocuments('Item',  [itemData]);
-
-        if (inventoryName !== this.defaultInventory.name) {
-            for (const item of items) {
-                if (item.id) inventory.itemIds.push(item.id);
-            }
-            await this.update({[`data.inventories.${inventoryName}.itemIds`]: inventory.itemIds});
+        for (const item of items) {
+            if (item.id) this.data.data.inventories[name].itemIds.push(item.id);
         }
+        await this.update({[`data.inventories.${name}.itemIds`]: this.data.data.inventories[name].itemIds});
     }
 }

@@ -335,6 +335,8 @@ export class SR5BaseActorSheet extends ActorSheet {
         // const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
         // Handle specific system drop events.
 
+        // TODO: Drop events should target the selected inventory.
+
         // Handle none specific drop events.
         return super._onDrop(event);
     }
@@ -416,12 +418,18 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onItemCreate(event) {
         event.preventDefault();
         const type = Helpers.listItemId(event);
+
         // TODO: Add translation for item names...
         const itemData = {
             name: `New ${type}`,
             type: type,
         };
-        return await this.actor.createEmbeddedDocuments('Item',  [itemData], {renderSheet: true});
+        const items = await this.actor.createEmbeddedDocuments('Item',  [itemData], {renderSheet: true}) as SR5Item[];
+        if (!items) return;
+
+        // Add the item to the selected inventory.
+        if (this.selectedInventory !== this.document.defaultInventory.name)
+            await this.document.addItemsToInventory(this.selectedInventory, items);
     }
 
     async _onItemEdit(event) {
