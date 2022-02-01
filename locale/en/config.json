@@ -836,7 +836,8 @@
     "TokenSelectionNeeded": "One ore more tokens need to be selected",
     "SkillCantBeDefault": "This skill can't be rolled on as it can't be defaulted",
     "HostItemOnlyAcceptIC": "Only IC actors can be added to hosts",
-    "InvalidMarksCount": "You've trying to place a strange number of marks"
+    "InvalidMarksCount": "You've trying to place a strange number of marks",
+    "AlreadyExistingInventory": "An inventory with this name alreayd exists"
   },
   "SR5.Errors": {
     "MissingSkill": "The actor doesn't have the requested skill.",

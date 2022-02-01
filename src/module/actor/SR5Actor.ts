@@ -2172,7 +2172,8 @@ export class SR5Actor extends Actor {
      * TODO: Add Typing to method.
      */
     async createInventory(name) {
-        if (this.data.data.inventories[name]) return ui.notifications?.warn(game.i18n.localize('SR5.Errors.InventoryAlreadyExists'));
+        if (this.hasInventory(name)) return ui.notifications?.warn(game.i18n.localize('SR5.Errors.InventoryAlreadyExists'));
+        if (this.defaultInventory.name === name) return;
 
         return await this.update({
             'data.inventories': {
@@ -2221,10 +2222,13 @@ export class SR5Actor extends Actor {
     /**
      * Does this actor have the given inventory already?
      *
-     * @param name The inventory name/label.
+     * Note: Comparisons will only be against lower case.
+     *
+     * @param name The inventory name.
      */
     hasInventory(name): boolean {
-        return this.data.data.inventories.hasOwnProperty(name);
+        return name === Object.keys(this.data.data.inventories)
+                              .find(inventory => inventory.toLowerCase() === name.toLowerCase());
     }
 
     /**

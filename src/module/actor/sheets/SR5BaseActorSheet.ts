@@ -1462,15 +1462,20 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.preventDefault();
 
         const inputElement = $('#input-inventory');
-        const inventory = String(inputElement.val());
+        let inventory = String(inputElement.val());
         if (!inventory) return;
 
-        if (!this.document.hasInventory(inventory))
+        if (this.document.hasInventory(inventory)) {
             await this.document.createInventory(inventory);
+        }
+        else {
+            inventory = this.selectedInventory;
+            await ui.notifications?.warn(game.i18n.localize('SR5.Warnings.AlreadyExistingInventory'));
+        }
 
         await this._onInplaceInventoryEditCancel(event);
 
-        // Preselect the new inventory.
+        // Preselect the new or previous inventory.
         this.selectedInventory = inventory;
         this.render();
     }
