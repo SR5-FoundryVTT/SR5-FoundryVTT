@@ -480,6 +480,7 @@
   "SR5.EditSkill": "Fertigkeit anpassen",
   "SR5.EditItem": "Gegenstand anpassen",
   "SR5.DeleteItem": "Gegenstand löschen",
+  "SR5.MoveItemInventory": "Inventar ändern",
   "SR5.Name": "Name",
   "SR5.AstralInit": "Astrale Ini",
   "SR5.AstralDice": "Astrale Ini Würfel",
@@ -869,6 +870,11 @@
     "Extreme": "Zwei oder mehr Modifikatoren der Kategorie Schwer",
     "Total": "Ergebnis",
     "ClearModifiers": "Entferne eigene Modifikatoren"
+  },
+  "SR5.MoveInventoryDialog" : {
+    "Title": "Inventar auswählen",
+    "Move": "Übertragen",
+    "Cancel": "Abbrechen"
   },
   "SR5.Dialogs": {
     "RangedWeaponTest": {

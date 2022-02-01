@@ -58,12 +58,13 @@ import HostItemData = Shadowrun.HostItemData;
 import MarkedDocument = Shadowrun.MarkedDocument;
 import MatrixMarks = Shadowrun.MatrixMarks;
 import InventoryData = Shadowrun.InventoryData;
+import InventoriesData = Shadowrun.InventoriesData;
 
 function getGame(): Game {
-  if(!(game instanceof Game)) {
-    throw new Error('game is not initialized yet!');
-  }
-  return game;
+    if (!(game instanceof Game)) {
+        throw new Error('game is not initialized yet!');
+    }
+    return game;
 }
 
 /**
@@ -83,9 +84,10 @@ function getGame(): Game {
  */
 export class SR5Actor extends Actor {
     // This is the default inventory name and label for when no other inventory has been created.
-    defaultInventory: { name: string, label: string } = {
+    defaultInventory: InventoryData = {
         name: 'Carried',
-        label: 'SR5.Labels.Inventory.Carried'
+        label: 'SR5.Labels.Inventory.Carried',
+        itemIds: []
     }
 
     getOverwatchScore() {
@@ -205,16 +207,16 @@ export class SR5Actor extends Actor {
 
             // include changes partially matching given keys.
             return changes.concat(effect.data.changes
-                    .filter(change => change.mode === CONST.ACTIVE_EFFECT_MODES.OVERRIDE)
-                    .map(change => {
-                        // @ts-ignore // Foundry internal code, duplicate doesn't like EffectChangeData
-                        change = foundry.utils.duplicate(change);
-                        // @ts-ignore
-                        change.effect = effect;
-                        change.priority = change.priority ?? (change.mode * 10);
+                .filter(change => change.mode === CONST.ACTIVE_EFFECT_MODES.OVERRIDE)
+                .map(change => {
+                    // @ts-ignore // Foundry internal code, duplicate doesn't like EffectChangeData
+                    change = foundry.utils.duplicate(change);
+                    // @ts-ignore
+                    change.effect = effect;
+                    change.priority = change.priority ?? (change.mode * 10);
 
-                        return change;
-                    }));
+                    return change;
+                }));
         }, []);
         // Sort changes according to priority, in case it's ever needed.
         // @ts-ignore // a / b can't be null here...
@@ -263,16 +265,16 @@ export class SR5Actor extends Actor {
 
             // include changes partially matching given keys.
             return changes.concat(effect.data.changes
-                    .filter(change => partialKeys.some(partialKey => change.key.includes(partialKey)))
-                    .map(change => {
-                        // @ts-ignore // Foundry internal code, duplicate doesn't like EffectChangeData
-                        change = foundry.utils.duplicate(change);
-                        // @ts-ignore
-                        change.effect = effect;
-                        change.priority = change.priority ?? (change.mode * 10);
+                .filter(change => partialKeys.some(partialKey => change.key.includes(partialKey)))
+                .map(change => {
+                    // @ts-ignore // Foundry internal code, duplicate doesn't like EffectChangeData
+                    change = foundry.utils.duplicate(change);
+                    // @ts-ignore
+                    change.effect = effect;
+                    change.priority = change.priority ?? (change.mode * 10);
 
-                        return change;
-                    }));
+                    return change;
+                }));
         }, []);
         // Sort changes according to priority, in case it's ever needed.
         // @ts-ignore // TODO: v9
@@ -471,7 +473,7 @@ export class SR5Actor extends Actor {
             case 'walker':
                 return 'pilot_walker';
             case 'exotic':
-                return'pilot_exotic_vehicle';
+                return 'pilot_exotic_vehicle';
             default:
                 return;
         }
@@ -483,6 +485,7 @@ export class SR5Actor extends Actor {
         const name = this.getVehicleTypeSkillName();
         return this.findActiveSkill(name);
     }
+
     get hasSkills(): boolean {
         return this.getSkills() !== undefined;
     }
@@ -517,7 +520,7 @@ export class SR5Actor extends Actor {
      *                The property specialization will trigger the pool value to be raised by a specialization modifier
      *                The property byLbale will cause the param skillId to be interpreted as the shown i18n label.
      */
-    getPool(skillId: string, options= {specialization: false, byLabel: false}): number {
+    getPool(skillId: string, options = {specialization: false, byLabel: false}): number {
         const skill = options.byLabel ? this.getSkillByLabel(skillId) : this.getSkill(skillId);
         if (!skill || !skill.attribute) return 0;
         if (!SkillFlow.allowRoll(skill)) return 0;
@@ -549,11 +552,11 @@ export class SR5Actor extends Actor {
      * @param id Either the searched id, name or translated label of a skill
      * @param options .byLabel when true search will try to match given skillId with the translated label
      */
-    getSkill(id: string, options= {byLabel: false}): SkillField | undefined {
+    getSkill(id: string, options = {byLabel: false}): SkillField | undefined {
         if (options.byLabel)
             return this.getSkillByLabel(id);
 
-        const { skills } = this.data.data;
+        const {skills} = this.data.data;
 
         // Find skill by direct id to key matching.
         if (skills.active.hasOwnProperty(id)) {
@@ -580,10 +583,10 @@ export class SR5Actor extends Actor {
      * @param searchedFor The translated output of either the skill label (after localize) or name of the skill in question.
      * @return The first skill found with a matching translation or name.
      */
-    getSkillByLabel(searchedFor: string): SkillField|undefined {
+    getSkillByLabel(searchedFor: string): SkillField | undefined {
         if (!searchedFor) return;
 
-        const possibleMatch = (skill: SkillField): string =>  skill.label ? game.i18n.localize(skill.label) : skill.name;
+        const possibleMatch = (skill: SkillField): string => skill.label ? game.i18n.localize(skill.label) : skill.name;
 
         const skills = this.getSkills();
 
@@ -602,7 +605,7 @@ export class SR5Actor extends Actor {
             if (!skills.knowledge.hasOwnProperty(categoryKey)) continue;
             // Typescript can't follow the flow here...
             const categorySkills = skills.knowledge[categoryKey].value as SkillField[];
-            for (const skill of Object.values(categorySkills) ) {
+            for (const skill of Object.values(categorySkills)) {
                 if (searchedFor === possibleMatch(skill))
                     return skill;
             }
@@ -770,10 +773,10 @@ export class SR5Actor extends Actor {
         await this.update(updateData);
         // NOTE: For some reason unlinked token actors won't cause a render on update?
         if (!this.data.token.actorLink)
-                await this.sheet?.render();
+            await this.sheet?.render();
     }
 
-    async rollFade(options: ActorRollOptions = {}, incoming = -1): Promise<ShadowrunRoll|undefined> {
+    async rollFade(options: ActorRollOptions = {}, incoming = -1): Promise<ShadowrunRoll | undefined> {
         const wil = duplicate(this.data.data.attributes.willpower);
         const res = duplicate(this.data.data.attributes.resonance);
         const data = this.data.data;
@@ -805,7 +808,7 @@ export class SR5Actor extends Actor {
         return roll;
     }
 
-    async rollDrain(options: ActorRollOptions = {}, incoming = -1): Promise<ShadowrunRoll|undefined> {
+    async rollDrain(options: ActorRollOptions = {}, incoming = -1): Promise<ShadowrunRoll | undefined> {
         if (!this.isCharacter()) return;
 
         const data = this.data.data as CharacterData;
@@ -940,7 +943,7 @@ export class SR5Actor extends Actor {
     }
 
     // TODO: Abstract handling of const damage : ModifiedDamageData
-    async rollSoak(options: SoakRollOptions, partsProps: ModList<number> = []): Promise<ShadowrunRoll|undefined> {
+    async rollSoak(options: SoakRollOptions, partsProps: ModList<number> = []): Promise<ShadowrunRoll | undefined> {
         return new SoakFlow().runSoakTest(this, options, partsProps);
     }
 
@@ -1397,6 +1400,7 @@ export class SR5Actor extends Actor {
             if (matrix.running_silent) parts.addUniquePart('SR5.RunningSilent', -2);
         }
     }
+
     _addGlobalParts(parts: PartsList<number>) {
         if (this.data.data.modifiers.global) {
             parts.addUniquePart('SR5.Global', this.data.data.modifiers.global);
@@ -1482,7 +1486,7 @@ export class SR5Actor extends Actor {
     static async secondChance(li) {
         let msg = game.messages?.get(li.data().messageId);
 
-        if (!msg|| !msg.user) return;
+        if (!msg || !msg.user) return;
 
         // @ts-ignore
         let roll: Roll = JSON.parse(msg.data?.roll);
@@ -1551,7 +1555,7 @@ export class SR5Actor extends Actor {
      *
      * @retrun Will return null should no token have been placed on scene.
      */
-    getToken(): TokenDocument|null {
+    getToken(): TokenDocument | null {
         // Linked actors can only have one token, which isn't stored within actor data...
         if (this._isLinkedToToken() && this.hasToken()) {
             const linked = true;
@@ -1582,7 +1586,7 @@ export class SR5Actor extends Actor {
         return players.length > 0;
     }
 
-    getActivePlayer(): User|null {
+    getActivePlayer(): User | null {
         if (!game.users) return null;
         if (!this.hasPlayerOwner) return null;
 
@@ -1603,7 +1607,7 @@ export class SR5Actor extends Actor {
         return Helpers.getPlayersWithPermission(this, 'OWNER', true);
     }
 
-    __addDamageToTrackValue(damage: DamageData, track: TrackType|OverflowTrackType|ConditionData): TrackType|OverflowTrackType|ConditionData {
+    __addDamageToTrackValue(damage: DamageData, track: TrackType | OverflowTrackType | ConditionData): TrackType | OverflowTrackType | ConditionData {
         if (damage.value === 0) return track;
         if (track.value === track.max) return track;
 
@@ -1636,7 +1640,7 @@ export class SR5Actor extends Actor {
         await device.update(data);
     }
 
-    async _addDamageToTrack(damage: DamageData, track: TrackType|OverflowTrackType|ConditionData) {
+    async _addDamageToTrack(damage: DamageData, track: TrackType | OverflowTrackType | ConditionData) {
         if (damage.value === 0) return;
         if (track.value === track.max) return;
 
@@ -1734,7 +1738,7 @@ export class SR5Actor extends Actor {
 
     /** Calculate damage overflow only based on max and current track values.
      */
-    _calcDamageOverflow(damage: DamageData, track: TrackType|ConditionData): {overflow: DamageData, rest: DamageData} {
+    _calcDamageOverflow(damage: DamageData, track: TrackType | ConditionData): { overflow: DamageData, rest: DamageData } {
         const freeTrackDamage = track.max - track.value;
         const overflowDamage = damage.value > freeTrackDamage ?
             damage.value - freeTrackDamage :
@@ -1766,7 +1770,7 @@ export class SR5Actor extends Actor {
      * The matrix depends on actor type and possibly equipped matrix device.
      *
      */
-    getMatrixTrack(): ConditionData|undefined {
+    getMatrixTrack(): ConditionData | undefined {
         // Some actors will have a direct matrix track.
         if ("track" in this.data.data && "matrix" in this.data.data.track) {
             return this.data.data.track.matrix;
@@ -1782,7 +1786,7 @@ export class SR5Actor extends Actor {
     getModifiedArmor(damage: DamageData): ActorArmorData {
         if (!damage.ap?.value) {
             return this.getArmor();
-       }
+        }
 
         const modified = duplicate(this.getArmor());
         if (modified) {
@@ -1844,7 +1848,7 @@ export class SR5Actor extends Actor {
     }
 
     asCritterData(): CritterActorData | undefined {
-        if (this.isCritter()){
+        if (this.isCritter()) {
             return this.data as CritterActorData;
         }
     }
@@ -1883,14 +1887,14 @@ export class SR5Actor extends Actor {
         await this.update({'data.driver': ''});
     }
 
-   hasDriver(): boolean {
+    hasDriver(): boolean {
         const data = this.asVehicleData();
 
         if (!data) return false;
         return data.data.driver.length > 0;
     }
 
-    getVehicleDriver(): SR5Actor|undefined {
+    getVehicleDriver(): SR5Actor | undefined {
         if (!this.hasDriver()) return;
         const data = this.asVehicleData();
         if (!data) return;
@@ -1901,7 +1905,7 @@ export class SR5Actor extends Actor {
         return driver;
     }
 
-     /**
+    /**
      * Add a host to this IC type actor.
      *
      * Currently compendium hosts aren't supported.
@@ -1961,7 +1965,7 @@ export class SR5Actor extends Actor {
     /**
      * Get the host item connect to this ic type actor.
      */
-    getICHost(): SR5Item|undefined {
+    getICHost(): SR5Item | undefined {
         const icData = this.asICData();
         if (!icData) return;
         return game.items?.get(icData?.data?.host.id);
@@ -1981,12 +1985,12 @@ export class SR5Actor extends Actor {
      * @param scene Should a scene be used as a fallback, provide this here. Otherwise current scene will be used.
      */
     // @ts-ignore
-    async getModifiers(ignoreScene: boolean=false, scene: Scene=canvas.scene): Promise<Modifiers> {
+    async getModifiers(ignoreScene: boolean = false, scene: Scene = canvas.scene): Promise<Modifiers> {
         const onActor = await Modifiers.getModifiersFromEntity(this);
 
         if (onActor.hasActiveEnvironmental) {
             return onActor;
-        // No open scene, or scene ignored.
+            // No open scene, or scene ignored.
         } else if (ignoreScene || scene === null) {
             return new Modifiers(Modifiers.getDefaultModifiers());
         } else {
@@ -2005,7 +2009,7 @@ export class SR5Actor extends Actor {
         return 'matrix' in this.data.data;
     }
 
-    get matrixData(): MatrixData|undefined {
+    get matrixData(): MatrixData | undefined {
         if (!this.isMatrixActor) return;
         // @ts-ignore // isMatrixActor handles it, TypeScript doesn't know.
         return this.data.data.matrix as MatrixData;
@@ -2022,7 +2026,7 @@ export class SR5Actor extends Actor {
      * @param options.item The item that the mark is to be placed on
      * @param options.overwrite Replace the current marks amount instead of changing it
      */
-    async setMarks(target: Token, marks: number, options?: {scene?: Scene, item?: SR5Item, overwrite?: boolean}) {
+    async setMarks(target: Token, marks: number, options?: { scene?: Scene, item?: SR5Item, overwrite?: boolean }) {
         if (!canvas.ready) return;
 
         if (this.isIC() && this.hasHost()) {
@@ -2090,7 +2094,7 @@ export class SR5Actor extends Actor {
         await this.update({'data.matrix.marks': updateData});
     }
 
-    getAllMarks(): MatrixMarks|undefined {
+    getAllMarks(): MatrixMarks | undefined {
         const matrixData = this.matrixData;
         if (!matrixData) return;
         return matrixData.marks;
@@ -2108,7 +2112,7 @@ export class SR5Actor extends Actor {
      * @param item
      * @param options
      */
-    getMarks(target: Token, item?: SR5Item, options?: {scene?: Scene}): number {
+    getMarks(target: Token, item?: SR5Item, options?: { scene?: Scene }): number {
         if (!canvas.ready) return 0;
         if (target instanceof SR5Item) {
             console.error('Not yet supported');
@@ -2137,7 +2141,7 @@ export class SR5Actor extends Actor {
      * - A matrix actor within a PAN will provide the controlling actor
      * - A matrix actor without a PAN will provide itself
      */
-    get matrixController(): SR5Actor|SR5Item {
+    get matrixController(): SR5Actor | SR5Item {
         // In case of a broken host connection, return the IC actor.
         if (this.isIC() && this.hasHost()) return this.getICHost() || this;
         // TODO: Implement PAN
@@ -2188,7 +2192,7 @@ export class SR5Actor extends Actor {
      * @param moveTo The inventory name items need to moved over to, otherwise the default inventory.
      */
     // TODO: When an item has no inventory, it will be placed into default, no? Abort in that case.
-    async removeInventory(name: string, moveTo: string=this.defaultInventory.name) {
+    async removeInventory(name: string, moveTo: string = this.defaultInventory.name) {
         if (this.defaultInventory.name === name)
             return ui.notifications?.error(game.i18n.localize('SR5.Errors.DefaultInventoryCantBeRemoved'));
 
@@ -2206,8 +2210,8 @@ export class SR5Actor extends Actor {
         if (this.defaultInventory.name !== moveTo) {
             // @ts-ignore
             updateData[`data.inventories.${moveTo}.itemIds`] = [
-            ...this.data.data.inventories[name].itemIds,
-            ...this.data.data.inventories[moveTo].itemIds
+                ...this.data.data.inventories[name].itemIds,
+                ...this.data.data.inventories[moveTo].itemIds
             ];
         }
 
@@ -2228,22 +2232,64 @@ export class SR5Actor extends Actor {
      *
      * @param name The inventory name to return.
      */
-    getInventory(name): InventoryData|undefined {
+    getInventory(name): InventoryData | undefined {
         return this.data.data.inventories[name];
+    }
+
+    /**
+     * Helper to get all inventories of this actor.
+     */
+    getInventories(): InventoriesData {
+        return this.data.data.inventories;
     }
 
     /**
      * Add an array of items to the given inventory.
      *
      * @param name The inventory to add the items to.
-     * @param items The items in question.
+     * @param items The items in question. A single item can be given.
+     * @param removeFromCurrent By default the item added will be removed from another inventory it might be in.
      */
-    async addItemsToInventory(name: string, items: SR5Item[]) {
-        if (!this.hasInventory(name)) return;
+    async addItemsToInventory(name: string, items: SR5Item[] | SR5Item, removeFromCurrent: boolean = true) {
+        // Default inventory is valid target here.
+        if (this.defaultInventory.name !== name && !this.hasInventory(name)) return;
+        if (items instanceof SR5Item) items = [items];
+
+        if (removeFromCurrent) {
+            for (const item of items) await this.removeItemFromInventory(item);
+        }
+
+        // Default inventory is no actual inventory that needs to be added to.
+        if (this.defaultInventory.name === name) return;
 
         for (const item of items) {
             if (item.id) this.data.data.inventories[name].itemIds.push(item.id);
         }
         await this.update({[`data.inventories.${name}.itemIds`]: this.data.data.inventories[name].itemIds});
+    }
+
+    /**
+     * Remove the given item from one or any inventory it might be in.
+     *
+     * @param item The item to be removed.
+     * @param name The one inventory to remove it from. If empty, will collect all inventories the item is in.
+     */
+    async removeItemFromInventory(item: SR5Item, name?: string) {
+        // The default inventory is not actual inventory.
+        if (this.defaultInventory.name === name) return;
+
+        // Collect affected inventories.
+        const inventories = name ?
+            [this.data.data.inventories[name]] :
+            Object.values(this.data.data.inventories).filter(({itemIds}) => itemIds.includes(item.id as string));
+
+        // Collect all inventories with remaining ids after the item's been removed.
+        const updateData = {};
+        for (const inventory of inventories) {
+            const itemIds = inventory.itemIds.filter(id => id !== item.id);
+            updateData[`data.inventories.${inventory.name}.itemIds`] = itemIds;
+        }
+
+        if (updateData) await this.update(updateData);
     }
 }

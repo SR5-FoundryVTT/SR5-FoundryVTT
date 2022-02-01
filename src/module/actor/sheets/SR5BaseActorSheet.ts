@@ -11,6 +11,7 @@ import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import SkillField = Shadowrun.SkillField;
 import Skills = Shadowrun.Skills;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
+import {MoveInventoryDialog} from "../../apps/dialogs/MoveInventoryDialog";
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
@@ -177,6 +178,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.inventory-input-cancel').on('click', this._onInplaceInventoryEditCancel.bind(this));
         html.find('.inventory-input-save').on('click', this._onInplaceInventoryEditSave.bind(this));
         html.find('#select-inventory').on('change', this._onSelectInventory.bind(this));
+        html.find('.inventory-item-move').on('click', this._onItemMoveToInventory.bind(this));
 
         // Condition monitor track handling...
         html.find('.horizontal-cell-input .cell').on('click', this._onSetConditionTrackCell.bind(this));
@@ -685,6 +687,14 @@ export class SR5BaseActorSheet extends ActorSheet {
         // Simple item to inventory mapping.
         const itemIdInventory = {};
 
+        // Default inventory for items without a defined one.
+        // Add first for display purposes on sheet.
+        inventories[this.document.defaultInventory.name] = {
+            name: this.document.defaultInventory.name,
+            label: this.document.defaultInventory.label,
+            types: {}
+        };
+
         // Build all inventories, group items by their types.
         Object.values(this.document.data.data.inventories).forEach(({name, label, itemIds}) => {
             inventories[name] = {
@@ -698,13 +708,6 @@ export class SR5BaseActorSheet extends ActorSheet {
                 itemIdInventory[id] = name;
             });
         });
-
-        // Default inventory for items without a defined one.
-        inventories[this.document.defaultInventory.name] = {
-            name: this.document.defaultInventory.name,
-            label: this.document.defaultInventory.label,
-            types: {}
-        };
 
         // Fill all inventories with items grouped by their type.
         this.document.items.forEach(item => {
@@ -1484,5 +1487,24 @@ export class SR5BaseActorSheet extends ActorSheet {
             this.selectedInventory = inventory;
 
         this.render();
+    }
+
+    /**
+     * Move an item between two inventories.
+     * @param event
+     */
+    async _onItemMoveToInventory(event) {
+        event.preventDefault();
+
+        const itemId = Helpers.listItemId(event);
+        const item = this.document.items.get(itemId);
+        if (!item) return;
+
+        // Ask user about what inventory to move the item to.
+        const dialog = new MoveInventoryDialog(this.document, this.selectedInventory);
+        const inventory = await dialog.select();
+        if (dialog.canceled) return;
+
+        await this.document.addItemsToInventory(inventory, item);
     }
 }

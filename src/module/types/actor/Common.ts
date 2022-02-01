@@ -11,7 +11,7 @@ declare namespace Shadowrun {
         /**
          * Actor inventories allow to show items separated out into different places / inventories.
          */
-        inventories: Record<string, InventoryData>
+        inventories: InventoriesData
     }
 
     export interface MagicData {
@@ -68,6 +68,7 @@ declare namespace Shadowrun {
      */
     export interface MatrixMarks extends Record<string, number>{}
 
+    export type InventoriesData = Record<string, InventoryData>
     /**
      * An inventory is a set of items with a name.
      */

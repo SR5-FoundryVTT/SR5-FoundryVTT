@@ -404,6 +404,10 @@ export const registerItemLineHelpers = () => {
 
     Handlebars.registerHelper('ItemIcons', function (item: ShadowrunItemData) {
         const wrapper = new SR5ItemDataWrapper(item);
+        const moveIcon = {
+            icon: 'fas fa-exchange-alt inventory-item-move',
+            title: game.i18n.localize('SR5.MoveItemInventory')
+        };
         const editIcon = {
             icon: 'fas fa-edit item-edit',
             title: game.i18n.localize('SR5.EditItem'),
@@ -421,7 +425,7 @@ export const registerItemLineHelpers = () => {
             title: game.i18n.localize('SR5.OpenSourcePdf'),
         };
 
-        const icons = [editIcon, removeIcon];
+        const icons = [moveIcon, editIcon, removeIcon];
 
         if (ui['PDFoundry']) {
             icons.unshift(pdfIcon);

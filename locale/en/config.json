@@ -479,6 +479,7 @@
   "SR5.EditSkill": "Edit Skill",
   "SR5.EditItem": "Edit Item",
   "SR5.DeleteItem": "Delete Item",
+  "SR5.MoveItemInventory": "Move Item to inventory",
   "SR5.Name": "Name",
   "SR5.AstralInit": "Astral Init",
   "SR5.AstralDice": "Astral Init Dice",
@@ -901,6 +902,11 @@
     "Extreme": "Combination of two or more conditions at the heavy level",
     "Total": "Result",
     "ClearModifiers": "Clear personal modifiers"
+  },
+  "SR5.MoveInventoryDialog" : {
+    "Title": "Choose an inventory",
+    "Move": "Move",
+    "Cancel": "Cancel"
   },
   "SR5.Dialogs": {
     "RangedWeaponTest": {
