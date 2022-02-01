@@ -705,6 +705,12 @@ select.display {
     .skill-roll-not-defaultable {
         font-style: italic;
     }
+
+    /** Input element for inventory name editing */
+    input#input-inventory {
+        // Otherwise the other classes used will break styling.
+        width: auto;
+    }
 }
 
 /** Replicate Foundry .dialog stiling for flex row buttons. FormDialog sublcasses simply adding class dialog will

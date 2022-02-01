@@ -1432,6 +1432,8 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         $('.selection-inventory').hide();
         $('.inline-input-inventory').show();
+
+        $('#input-inventory').select();
     }
 
     /**
