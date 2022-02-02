@@ -333,14 +333,19 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.stopPropagation();
 
         if (!event.dataTransfer) return;
+        // Keep upstream document created for actions base on it.
+        const documents = await super._onDrop(event);
 
-        // const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
         // Handle specific system drop events.
+        // const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
 
-        // TODO: Drop events should target the selected inventory.
+        // Add any created items to the selected inventory.
+        if (Array.isArray(documents)) {
+            const items = documents.filter(document => document instanceof SR5Item);
+            await this.document.addItemsToInventory(this.selectedInventory, items);
+        }
 
-        // Handle none specific drop events.
-        return super._onDrop(event);
+        return documents;
     }
 
     /**

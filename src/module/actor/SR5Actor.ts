@@ -2284,6 +2284,7 @@ export class SR5Actor extends Actor {
         // Default inventory is valid target here.
         if (this.defaultInventory.name !== name && !this.hasInventory(name)) return;
         if (items instanceof SR5Item) items = [items];
+        if (items.length === 0) return;
 
         if (removeFromCurrent) {
             for (const item of items) await this.removeItemFromInventory(item);
