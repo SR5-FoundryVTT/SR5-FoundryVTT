@@ -1401,7 +1401,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         // Overwrite currently selected inventory.
         $('#input-inventory').val('');
-        await this._onInplaceInventoryEdit(event);
+        await this._onInplaceInventoryEdit(event, 'create');
     }
 
     /**
@@ -1426,14 +1426,21 @@ export class SR5BaseActorSheet extends ActorSheet {
      * Hide inventory selection and show inline editing instead.
      *
      * @param event
+     * @param action What action to take during later saving event.
      */
-    async _onInplaceInventoryEdit(event) {
+    async _onInplaceInventoryEdit(event, action:'edit'|'create'='edit') {
         event.preventDefault();
+
+        // Disallow editing of default inventory.
+        if (action === 'edit' && this.selectedInventory === this.document.defaultInventory.name) return;
 
         $('.selection-inventory').hide();
         $('.inline-input-inventory').show();
 
-        $('#input-inventory').select();
+        // Mark action and pre-select.
+        $('#input-inventory')
+            .data('action', action)
+            .select();
     }
 
     /**
@@ -1449,7 +1456,9 @@ export class SR5BaseActorSheet extends ActorSheet {
         $('.inline-input-inventory').hide();
 
         // Reset to selected inventory for next try.
-        $('#input-inventory').val(this.selectedInventory);
+        $('#input-inventory')
+            .data('action', undefined)
+            .val(this.selectedInventory);
     }
 
     /**
@@ -1462,15 +1471,17 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.preventDefault();
 
         const inputElement = $('#input-inventory');
+        const action = inputElement.data('action');
         let inventory = String(inputElement.val());
         if (!inventory) return;
 
-        if (this.document.hasInventory(inventory)) {
-            await this.document.createInventory(inventory);
-        }
-        else {
-            inventory = this.selectedInventory;
-            await ui.notifications?.warn(game.i18n.localize('SR5.Warnings.AlreadyExistingInventory'));
+        switch (action) {
+            case 'edit':
+                await this.document.renameInventory(this.selectedInventory, inventory);
+                break;
+            case 'create':
+                await this.document.createInventory(inventory);
+                break;
         }
 
         await this._onInplaceInventoryEditCancel(event);

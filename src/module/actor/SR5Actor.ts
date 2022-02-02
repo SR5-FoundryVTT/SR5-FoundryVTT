@@ -2220,6 +2220,32 @@ export class SR5Actor extends Actor {
     }
 
     /**
+     * Rename an existing inventory to a new name.
+     *
+     * @param current The old name of the inventory.
+     * @param newName The new name of the inventory.
+     */
+    async renameInventory(current: string, newName: string) {
+        if (this.defaultInventory.name === current) return;
+        if (current === newName) return;
+
+        const inventory = this.getInventory(current);
+        if (!inventory) return;
+
+        // Change internal and display name.
+        inventory.name = newName;
+        inventory.label = newName;
+
+        const updateData = {
+            'data.inventories': {
+                [`-=${current}`]: null,
+                [newName]:  inventory
+            }
+        };
+        await this.update(updateData);
+    }
+
+    /**
      * Does this actor have the given inventory already?
      *
      * Note: Comparisons will only be against lower case.
