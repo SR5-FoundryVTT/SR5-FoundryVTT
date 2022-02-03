@@ -6,12 +6,32 @@ import {SkillEditSheet} from "../../apps/skills/SkillEditSheet";
 import {SR5Actor} from "../SR5Actor";
 import {KnowledgeSkillEditSheet} from "../../apps/skills/KnowledgeSkillEditSheet";
 import {LanguageSkillEditSheet} from "../../apps/skills/LanguageSkillEditSheet";
+import {MoveInventoryDialog} from "../../apps/dialogs/MoveInventoryDialog";
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import SkillField = Shadowrun.SkillField;
 import Skills = Shadowrun.Skills;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
-import {MoveInventoryDialog} from "../../apps/dialogs/MoveInventoryDialog";
+
+
+export interface SR5SheetItem extends SR5Item {
+    chatData: any,
+    description: any
+}
+
+export interface InventorySheetData {
+    name: string,
+    label: string,
+    types: {
+        [type: string]: {
+            type: string,
+            label: string,
+            items: SR5SheetItem[]
+        }
+    }
+}
+
+export type InventoriesSheetData = Record<string, InventorySheetData>;
 
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
@@ -256,8 +276,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      * @param inventory The inventory to check and add types to.
      */
     _addInventoryTypes(inventory) {
-        const inventoryTypes = this.getInventoryItemTypes();
-        for (const type of inventoryTypes) {
+        for (const type of this.getInventoryItemTypes()) {
             if (inventory.types.hasOwnProperty(type)) continue;
 
             inventory.types[type] = {
@@ -685,10 +704,9 @@ export class SR5BaseActorSheet extends ActorSheet {
      *
      * Each item can  be in one custom inventory or the default inventory.
      */
-    // TODO: Rebuild method to work with this.selectedInventory
     _prepareItemsInventory() {
         // All custom and default actor inventories.
-        const inventories = {};
+        const inventories: InventoriesSheetData = {};
         // Simple item to inventory mapping.
         const itemIdInventory = {};
 
@@ -699,6 +717,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             label: this.document.defaultInventory.label,
             types: {}
         };
+        this._addInventoryTypes(inventories[this.document.defaultInventory.name]);
 
         // Build all inventories, group items by their types.
         Object.values(this.document.data.data.inventories).forEach(({name, label, itemIds}) => {
@@ -707,6 +726,8 @@ export class SR5BaseActorSheet extends ActorSheet {
                 label,
                 types: {}
             }
+            // Add default inventory types for this sheet type first, so they appear on top.
+            this._addInventoryTypes(inventories[name]);
 
             itemIds.forEach(id => {
                 if (itemIdInventory[id]) console.warn(`Shadowrun5e | Item id ${id} has been added to both ${name} and ${itemIdInventory[id]}. Will only show in ${name}`);
@@ -731,10 +752,11 @@ export class SR5BaseActorSheet extends ActorSheet {
             // @ts-ignore
             // sheetItem.isStack = sheetItem.data.quantity ? item.data.quantity > 1 : false;
 
+            // Determine what inventory the item sits in.
             const inventoryName = itemIdInventory[item.id] || this.document.defaultInventory.name;
             const inventory = inventories[inventoryName];
 
-            // Build item type structure per inventory
+            // Should an item of an abnormal type have been added, build type structure.
             if (!inventory.types[item.type]) {
                 inventory.types[item.type] = {
                     type: item.type,
@@ -743,18 +765,16 @@ export class SR5BaseActorSheet extends ActorSheet {
                 };
             }
 
-            inventory.types[item.type].items.push(sheetItem);
+            // Add the item to this inventory.
+            // @ts-ignore
+            inventory.types[item.type].items.push(sheetItem as SR5SheetItem);
         });
 
-        Object.values(inventories).forEach(inventory => {
-            this._removeHandledInventory(inventory);
-            this._addInventoryTypes(inventory);
-        });
 
         // Prepared sorting methods.
         const sortByName = (i1, i2) => {
-            if (i1.name > i2.name) return 1;
-            if (i1.name < i2.name) return -1;
+            if (i1.name.toLowerCase() > i2.name.toLowerCase()) return 1;
+            if (i1.name.toLowerCase() < i2.name.toLowerCase()) return -1;
             return 0;
         };
         const sortByEquipped = (left, right) => {
@@ -767,13 +787,26 @@ export class SR5BaseActorSheet extends ActorSheet {
             return 0;
         };
 
-        // Sort the items within each inventory.
-        Object.values(inventories).forEach(({types}) =>
-            Object.values(types).forEach((type: {items: []}) => {
+        Object.values(inventories).forEach(inventory => {
+            this._removeHandledInventory(inventory);
+            // this._addInventoryTypes(inventory);
+
+            // inventory.types = Object.keys(inventory.types).sort().reduce(
+            //     (obj, key) => {
+            //         obj[key] = inventory.types[key];
+            //         return obj;
+            //     },
+            //     {}
+            // );
+
+            Object.values(inventory.types).forEach((type) => {
                 // TODO: Check if some / all should be sort by equipped.
                 type.items.sort(sortByName);
             })
-        );
+
+
+        });
+
 
         return inventories;
     }
