@@ -3,7 +3,7 @@
         <div class="list-item item-section">
             <div class="item-left">
                 <span class="selection-inventory">
-                    <label for="select-inventory">{{localize 'SR5.Labels.Inventory.OpenInventory'}}</label>
+                    <label class="item-text item-name" for="select-inventory">{{localize 'SR5.Labels.Inventory.OpenInventory'}}</label>
                     <select id="select-inventory" class="display">
                         {{#each inventories as |inventory name|}}
                         <option value="{{inventory.name}}" {{#ife ../selectedInventory inventory.name}}selected="selected"{{/ife}}>{{localize inventory.label}}</option>

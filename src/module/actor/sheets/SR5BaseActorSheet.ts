@@ -1470,7 +1470,9 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.preventDefault();
 
         // Disallow editing of default inventory.
-        if (action === 'edit' && this.selectedInventory === this.document.defaultInventory.name) return;
+        if (action === 'edit' && this.selectedInventory === this.document.defaultInventory.name)
+            return ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantEditDefaultInventory'));
+
 
         $('.selection-inventory').hide();
         $('.inline-input-inventory').show();

@@ -805,7 +805,8 @@
     "SkillCantBeDefault": "Auf diese Fertigkeit kann keine Probe abgelegt werden, da sie nicht improvisiert werden kann",
     "HostItemOnlyAcceptIC": "Nur IC Akteure können einem Host zugefügt werden",
     "InvalidMarksCount": "You've trying to place a strange number of marks",
-    "AlreadyExistingInventory": "Ein Inventar mit diesem Namen existiert bereits"
+    "AlreadyExistingInventory": "Ein Inventar mit diesem Namen existiert bereits",
+    "CantEditDefaultInventory": "Das Hauptinventar kann nicht umbenannt werden"
   },
   "SR5.Errors": {
     "MissingSkill": "Der Charakter verfügt nicht über die benötigte Fertigkeit.",

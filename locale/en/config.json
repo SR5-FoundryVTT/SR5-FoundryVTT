@@ -837,7 +837,8 @@
     "SkillCantBeDefault": "This skill can't be rolled on as it can't be defaulted",
     "HostItemOnlyAcceptIC": "Only IC actors can be added to hosts",
     "InvalidMarksCount": "You've trying to place a strange number of marks",
-    "AlreadyExistingInventory": "An inventory with this name alreayd exists"
+    "AlreadyExistingInventory": "An inventory with this name alreayd exists",
+    "CantEditDefaultInventory": "The default inventory can't be renamed"
   },
   "SR5.Errors": {
     "MissingSkill": "The actor doesn't have the requested skill.",
