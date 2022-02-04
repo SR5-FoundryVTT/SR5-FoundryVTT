@@ -44,6 +44,29 @@ export type InventoriesSheetData = Record<string, InventorySheetData>;
 // when opened in succession, causing SkillEditSheet to wrongfully overwrite the wrong data.
 let globalSkillAppId: number = -1;
 
+
+const sortByName = (i1, i2) => {
+            if (i1.name > i2.name) return 1;
+            if (i1.name < i2.name) return -1;
+            return 0;
+        };
+const sortByEquipped = (left, right) => {
+    const leftEquipped = left.data?.technology?.equipped;
+    const rightEquipped = right.data?.technology?.equipped;
+    if (leftEquipped && !rightEquipped) return -1;
+    if (rightEquipped && !leftEquipped) return 1;
+    if (left.name > right.name) return 1;
+    if (left.name < right.name) return -1;
+    return 0;
+};
+const sortyByQuality = (a: any, b: any) => {
+    if (a.data.type === 'positive' && b.data.type === 'negative') return -1;
+    if (a.data.type === 'negative' && b.data.type === 'positive') return 1;
+    return a.name < b.name ? -1 : 1;
+}
+
+
+
 /**
  * This class should not be used directly but be extended for each actor type.
  *
@@ -765,25 +788,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             inventory.types[item.type].items.push(sheetItem as SheetItemData);
         });
 
-
-        // Prepared sorting methods.
-        const sortByName = (i1, i2) => {
-            if (i1.name.toLowerCase() > i2.name.toLowerCase()) return 1;
-            if (i1.name.toLowerCase() < i2.name.toLowerCase()) return -1;
-            return 0;
-        };
-        const sortByEquipped = (left, right) => {
-            const leftEquipped = left.data?.technology?.equipped;
-            const rightEquipped = right.data?.technology?.equipped;
-            if (leftEquipped && !rightEquipped) return -1;
-            if (rightEquipped && !leftEquipped) return 1;
-            if (left.name > right.name) return 1;
-            if (left.name < right.name) return -1;
-            return 0;
-        };
-
         Object.values(inventories).forEach(inventory => {
-            // Add default inventory item types to each inventory.
             this._addInventoryItemTypes(inventory);
 
             // Sort the items.
@@ -792,7 +797,6 @@ export class SR5BaseActorSheet extends ActorSheet {
                 type.items.sort(sortByName);
             })
         });
-
 
         return inventories;
     }
@@ -856,26 +860,6 @@ export class SR5BaseActorSheet extends ActorSheet {
             const sheetItem = this._prepareSheetItem(item);
             itemType[sheetItem.type].push(sheetItem);
         });
-
-        const sortByName = (i1, i2) => {
-            if (i1.name > i2.name) return 1;
-            if (i1.name < i2.name) return -1;
-            return 0;
-        };
-        const sortByEquipped = (left, right) => {
-            const leftEquipped = left.data?.technology?.equipped;
-            const rightEquipped = right.data?.technology?.equipped;
-            if (leftEquipped && !rightEquipped) return -1;
-            if (rightEquipped && !leftEquipped) return 1;
-            if (left.name > right.name) return 1;
-            if (left.name < right.name) return -1;
-            return 0;
-        };
-        const sortyByQuality = (a: any, b: any) => {
-            if (a.data.type === 'positive' && b.data.type === 'negative') return -1;
-            if (a.data.type === 'negative' && b.data.type === 'positive') return 1;
-            return a.name < b.name ? -1 : 1;
-        }
 
         // Sort items for each type.
         Object.entries(itemType).forEach(([type, items]) => {
