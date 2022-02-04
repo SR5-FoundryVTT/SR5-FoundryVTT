@@ -15,7 +15,7 @@ import MatrixAttribute = Shadowrun.MatrixAttribute;
 
 
 export interface SR5SheetItem extends SR5Item {
-    chatData: any,
+    properties: any,
     description: any
 }
 
@@ -735,16 +735,7 @@ export class SR5BaseActorSheet extends ActorSheet {
             // Handled types are on the sheet outside the inventory.
             if (handledTypes.includes(item.type)) return;
 
-            // Since fields will be added, duplicate the item to avoid those propagating into #update calls.
-            const sheetItem = duplicate(item);
-
-            // Create ChatData to be displayed in chat and description.
-            const chatData = item.getChatData();
-            // TODO: Add ChatData and ItemSheetData typing.
-            // @ts-ignore
-            sheetItem.description = chatData.description;
-            // @ts-ignore
-            sheetItem.properties = chatData.properties;
+            const sheetItem = this._prepareSheetItem(item);
 
             // TODO: isStack property isn't used elsewhere. Remove if unnecessary.
             // @ts-ignore
@@ -828,52 +819,37 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
 
     /**
+     * Enhance an SR5Item by sheet data.
+     *
+     */
+    _prepareSheetItem(item: SR5Item): SR5SheetItem {
+        const sheetItem = item.toObject() as unknown as SR5SheetItem;
+
+        const chatData = item.getChatData();
+        sheetItem.description = chatData.description;
+        // @ts-ignore
+        sheetItem.properties = chatData.properties;
+
+        return sheetItem as unknown as SR5SheetItem;
+    }
+
+    /**
      * Prepare Actor Sheet data with item data.
      * @param data An object containing Actor Sheet data, as would be returned by ActorSheet.getData
      */
     _prepareItemTypes(data) {
-        let [
-            items,
-            spells,
-            qualities,
-            adept_powers,
-            actions,
-            complex_forms,
-            lifestyles,
-            contacts,
-            sins,
-            programs,
-            critter_powers,
-            sprite_powers,
-        ] = data.items.reduce(
-            (arr, item) => {
-                // Duplicate to avoid later updates propagating changed item data.
-                // NOTE: If no duplication is done, added fields will be stored in the database on updates!
-                item = duplicate(item);
-                // Show item properties and description in the item list overviews.
-                const actorItem = this.actor.items.get(item._id) as SR5Item;
-                const chatData = actorItem.getChatData();
-                item.description = chatData.description;
-                // @ts-ignore // This is a hacky monkey patch solution to pass template data through duplicated item data.
-                item.properties = chatData.properties;
+        const itemType: Record<string, SR5SheetItem[]> = {};
 
-                // TODO: isStack property isn't used elsewhere. Remove if unnecessary.
-                item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
-                if (item.type === 'spell') arr[1].push(item);
-                else if (item.type === 'quality') arr[2].push(item);
-                else if (item.type === 'adept_power') arr[3].push(item);
-                else if (item.type === 'action') arr[4].push(item);
-                else if (item.type === 'complex_form') arr[5].push(item);
-                else if (item.type === 'lifestyle') arr[6].push(item);
-                else if (item.type === 'contact') arr[7].push(item);
-                else if (item.type === 'sin') arr[8].push(item);
-                else if (item.type === 'program') arr[9].push(item);
-                else if (item.type === 'critter_power') arr[10].push(item);
-                else if (item.type === 'sprite_power') arr[11].push(item);
-                return arr;
-            },
-            [[], [], [], [], [], [], [], [], [], [], [], []],
-        );
+        // Add all item types in system.
+        Object.keys(CONFIG.Item.typeLabels).forEach(type => {
+            itemType[type] = [];
+        });
+
+        // Add existing items to their types as sheet items
+        this.document.items.forEach((item: SR5Item) => {
+            const sheetItem = this._prepareSheetItem(item);
+            itemType[sheetItem.type].push(sheetItem);
+        });
 
         const sortByName = (i1, i2) => {
             if (i1.name > i2.name) return 1;
@@ -889,36 +865,28 @@ export class SR5BaseActorSheet extends ActorSheet {
             if (left.name < right.name) return -1;
             return 0;
         };
-        actions.sort(sortByName);
-        adept_powers.sort(sortByName);
-        complex_forms.sort(sortByName);
-        items.sort(sortByEquipped);
-        spells.sort(sortByName);
-        contacts.sort(sortByName);
-        lifestyles.sort(sortByName);
-        sins.sort(sortByName);
-        programs.sort(sortByEquipped);
-        critter_powers.sort(sortByName);
-        sprite_powers.sort(sortByName);
-        qualities.sort((a, b) => {
+        const sortyByQuality = (a: any, b: any) => {
             if (a.data.type === 'positive' && b.data.type === 'negative') return -1;
             if (a.data.type === 'negative' && b.data.type === 'positive') return 1;
             return a.name < b.name ? -1 : 1;
+        }
+
+        // Sort items for each type.
+        Object.entries(itemType).forEach(([type, items]) => {
+            switch (type) {
+                case 'quality':
+                    items.sort(sortyByQuality);
+                    break;
+                case 'program':
+                    items.sort(sortByEquipped);
+                    break;
+                default:
+                    items.sort(sortByName);
+                    break;
+            }
         });
 
-        return {
-            spells,
-            adept_powers,
-            actions,
-            complex_forms,
-            lifestyles,
-            contacts,
-            sins,
-            programs,
-            critter_powers,
-            sprite_powers,
-            qualities
-        };
+        return itemType
     }
 
     /**

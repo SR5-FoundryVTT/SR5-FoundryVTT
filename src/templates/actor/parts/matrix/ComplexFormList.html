@@ -5,7 +5,7 @@
             icons=(ItemHeaderIcons 'complex_form')
             rightSide=(ItemHeaderRightSide 'complex_form')
     }}
-    {{#each itemType.complex_forms as |item iid|}}
+    {{#each itemType.complex_form as |item iid|}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
                 img=item.img
                 name=item.name
