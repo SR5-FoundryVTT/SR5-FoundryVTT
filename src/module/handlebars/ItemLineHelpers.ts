@@ -404,6 +404,46 @@ export const registerItemLineHelpers = () => {
 
     Handlebars.registerHelper('ItemIcons', function (item: ShadowrunItemData) {
         const wrapper = new SR5ItemDataWrapper(item);
+
+        const editIcon = {
+            icon: 'fas fa-edit item-edit',
+            title: game.i18n.localize('SR5.EditItem'),
+        };
+        const removeIcon = {
+            icon: 'fas fa-trash item-delete',
+            title: game.i18n.localize('SR5.DeleteItem'),
+        };
+        const equipIcon = {
+            icon: `${wrapper.isEquipped() ? 'fas fa-check-circle' : 'far fa-circle'} item-equip-toggle`,
+            title: game.i18n.localize('SR5.ToggleEquip'),
+        };
+        const pdfIcon = {
+            icon: 'fas fa-file open-source-pdf',
+            title: game.i18n.localize('SR5.OpenSourcePdf'),
+        };
+
+        const icons = [editIcon, removeIcon];
+
+        if (ui['PDFoundry']) {
+            icons.unshift(pdfIcon);
+        }
+
+        switch (wrapper.getType()) {
+            case 'program':
+            case 'armor':
+            case 'device':
+            case 'equipment':
+            case 'cyberware':
+            case 'bioware':
+            case 'weapon':
+                icons.unshift(equipIcon);
+        }
+
+        return icons;
+    });
+
+    Handlebars.registerHelper('InventoryItemIcons', function (item: ShadowrunItemData) {
+        const wrapper = new SR5ItemDataWrapper(item);
         const moveIcon = {
             icon: 'fas fa-exchange-alt inventory-item-move',
             title: game.i18n.localize('SR5.MoveItemInventory')

@@ -3,7 +3,6 @@ export const preloadHandlebarsTemplates = async () => {
         // actor tabs
         'systems/shadowrun5e/dist/templates/actor/tabs/ActionsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/BioTab.html',
-        'systems/shadowrun5e/dist/templates/actor/tabs/GearTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/MagicTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/MatrixTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/MiscTab.html',

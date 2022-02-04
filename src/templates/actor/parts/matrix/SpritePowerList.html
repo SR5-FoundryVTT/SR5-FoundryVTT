@@ -5,7 +5,7 @@
             icons=(ItemHeaderIcons 'sprite_power')
             rightSide=(ItemHeaderRightSide 'sprite_power')
     }}
-    {{#each newInventory.sprite_power.items as |item iid|}}
+    {{#each itemType.sprite_powers as |item iid|}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
                 img=item.img
                 name=item.name

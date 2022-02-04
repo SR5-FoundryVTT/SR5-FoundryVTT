@@ -5,7 +5,7 @@
             icons=(ItemHeaderIcons 'sin')
             rightSide=(ItemHeaderRightSide 'sin')
     }}
-    {{#each newInventory.sin.items as |item i|}}
+    {{#each itemType.sins as |item i|}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
                 img=item.img
                 name=item.name
@@ -23,7 +23,7 @@
             icons=(ItemHeaderIcons 'lifestyle')
             rightSide=(ItemHeaderRightSide 'lifestyle')
     }}
-    {{#each newInventory.lifestyle.items as |item i|}}
+    {{#each itemType.lifestyles as |item i|}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
                 img=item.img
                 name=item.name

@@ -17,7 +17,7 @@
                         icons=(ItemHeaderIcons 'quality')
                         rightSide=(ItemHeaderRightSide 'quality')
                 }}
-                {{#each qualities as |item i|}}
+                {{#each itemType.qualities as |item i|}}
                     {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
                             img=item.img
                             name=item.name

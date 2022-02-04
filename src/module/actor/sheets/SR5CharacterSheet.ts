@@ -3,7 +3,7 @@ import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import MarkedDocument = Shadowrun.MarkedDocument;
 
 
-interface CharacterSheetData extends SR5ActorSheetData {
+export interface CharacterSheetData extends SR5ActorSheetData {
     awakened: boolean
     emerged: boolean
     woundTolerance: number

@@ -153,11 +153,10 @@ export class SR5BaseActorSheet extends ActorSheet {
         this._prepareActorAttributes(data);
 
         // Valid data fields for all actor types.
-        // TODO: Remove _prepareItems method.
-        this._prepareItems(data); // All actor types have items.
-        this._prepareActorTypeFields(data);  // Actor type fields can be generic.
-        this._prepareSkillsWithFilters(data); // All actor types have skills.
+        this._prepareActorTypeFields(data);
+        this._prepareSkillsWithFilters(data);
 
+        data.itemType = this._prepareItemTypes(data);
         data.effects = prepareActiveEffectCategories(this.document.effects);  // All actor types have effects.
         data.inventories = this._prepareItemsInventory();
         data.inventory = this._prepareSelectedInventory(data.inventories);
@@ -249,18 +248,11 @@ export class SR5BaseActorSheet extends ActorSheet {
     /**
      * Handle display of item types within the actors inventory section.
      *
-     * Handled means there is some place specific the actor sheet want's these items displayed.
      * Unexpected means there is no use for this type but the user added it anyway.
      * Inventory types means they should always be shown, even if there are none.
      * All other item types will be collected at some tab / place on the sheet.
      */
-    _removeHandledInventory(inventory) {
-        // Remove item types that are specifically handled outside the inventory.
-        const handledTypes = this.getHandledItemTypes();
-        for (const type of handledTypes) {
-            delete inventory.types[type];
-        }
-
+    _addInventoryItemTypes(inventory) {
         // Show all item types but remove empty unexpected item types.
         const inventoryTypes = this.getInventoryItemTypes();
         for (const type of Object.keys(inventory.types)) {
@@ -736,8 +728,13 @@ export class SR5BaseActorSheet extends ActorSheet {
             });
         });
 
+        const handledTypes = this.getHandledItemTypes();
+
         // Fill all inventories with items grouped by their type.
         this.document.items.forEach(item => {
+            // Handled types are on the sheet outside the inventory.
+            if (handledTypes.includes(item.type)) return;
+
             // Since fields will be added, duplicate the item to avoid those propagating into #update calls.
             const sheetItem = duplicate(item);
 
@@ -789,8 +786,8 @@ export class SR5BaseActorSheet extends ActorSheet {
         };
 
         Object.values(inventories).forEach(inventory => {
-            // Remove item types that are handled outside of the inventory.
-            this._removeHandledInventory(inventory);
+            // Add default inventory item types to each inventory.
+            this._addInventoryItemTypes(inventory);
 
             // Sort the items.
             Object.values(inventory.types).forEach((type) => {
@@ -834,64 +831,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      * Prepare Actor Sheet data with item data.
      * @param data An object containing Actor Sheet data, as would be returned by ActorSheet.getData
      */
-    _prepareItems(data) {
-        const inventory = {};
-
-        // All acting entities should be allowed to carry some protection!
-        inventory['weapon'] = {
-            label: game.i18n.localize('SR5.ItemTypes.Weapon'),
-            items: [],
-            dataset: {
-                type: 'weapon',
-            },
-        };
-
-        // Critters are people to... Support your local HMHVV support groups!
-        if (this.actor.matchesActorTypes(['character', 'critter', 'vehicle'])) {
-            inventory['armor'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Armor'),
-                items: [],
-                dataset: {
-                    type: 'armor',
-                },
-            };
-            inventory['device'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Device'),
-                items: [],
-                dataset: {
-                    type: 'device',
-                },
-            };
-            inventory['equipment'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Equipment'),
-                items: [],
-                dataset: {
-                    type: 'equipment',
-                },
-            };
-            inventory['ammo'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Ammo'),
-                items: [],
-                dataset: {
-                    type: 'ammo',
-                },
-            };
-            inventory['cyberware'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Cyberware'),
-                items: [],
-                dataset: {
-                    type: 'cyberware',
-                },
-            };
-            inventory['bioware'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Bioware'),
-                items: [],
-                dataset: {
-                    type: 'bioware',
-                },
-            };
-        }
-
+    _prepareItemTypes(data) {
         let [
             items,
             spells,
@@ -930,7 +870,6 @@ export class SR5BaseActorSheet extends ActorSheet {
                 else if (item.type === 'program') arr[9].push(item);
                 else if (item.type === 'critter_power') arr[10].push(item);
                 else if (item.type === 'sprite_power') arr[11].push(item);
-                else if (Object.keys(inventory).includes(item.type)) arr[0].push(item);
                 return arr;
             },
             [[], [], [], [], [], [], [], [], [], [], [], []],
@@ -961,31 +900,25 @@ export class SR5BaseActorSheet extends ActorSheet {
         programs.sort(sortByEquipped);
         critter_powers.sort(sortByName);
         sprite_powers.sort(sortByName);
-
-        items.forEach((item) => {
-            inventory[item.type].items.push(item);
-        });
-
-        data.inventory = Object.values(inventory);
-        data.magic = {
-            spellbook: spells,
-            powers: adept_powers,
-        };
-        data.actions = actions;
-        data.complex_forms = complex_forms;
-        data.lifestyles = lifestyles;
-        data.contacts = contacts;
-        data.sins = sins;
-        data.programs = programs;
-        data.critter_powers = critter_powers;
-        data.sprite_powers = sprite_powers;
-
         qualities.sort((a, b) => {
             if (a.data.type === 'positive' && b.data.type === 'negative') return -1;
             if (a.data.type === 'negative' && b.data.type === 'positive') return 1;
             return a.name < b.name ? -1 : 1;
         });
-        data.qualities = qualities;
+
+        return {
+            spells,
+            adept_powers,
+            actions,
+            complex_forms,
+            lifestyles,
+            contacts,
+            sins,
+            programs,
+            critter_powers,
+            sprite_powers,
+            qualities
+        };
     }
 
     /**
