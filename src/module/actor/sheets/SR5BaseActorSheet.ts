@@ -160,7 +160,8 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         data.effects = prepareActiveEffectCategories(this.document.effects);  // All actor types have effects.
         data.inventories = this._prepareItemsInventory();
-        data.inventory = this._prepareSelectedInventory(data);
+        data.inventory = this._prepareSelectedInventory(data.inventories);
+        data.hasInventory = this._prepareHasInventory(data.inventories);
         data.selectedInventory = this.selectedInventory;
 
         return data;
@@ -788,23 +789,14 @@ export class SR5BaseActorSheet extends ActorSheet {
         };
 
         Object.values(inventories).forEach(inventory => {
+            // Remove item types that are handled outside of the inventory.
             this._removeHandledInventory(inventory);
-            // this._addInventoryTypes(inventory);
 
-            // inventory.types = Object.keys(inventory.types).sort().reduce(
-            //     (obj, key) => {
-            //         obj[key] = inventory.types[key];
-            //         return obj;
-            //     },
-            //     {}
-            // );
-
+            // Sort the items.
             Object.values(inventory.types).forEach((type) => {
                 // TODO: Check if some / all should be sort by equipped.
                 type.items.sort(sortByName);
             })
-
-
         });
 
 
@@ -814,10 +806,28 @@ export class SR5BaseActorSheet extends ActorSheet {
     /**
      * Choose the selected inventory to actually display.
      *
-     * @param data
+     * @param inventories
      */
-    _prepareSelectedInventory(data) {
-        return data.inventories[this.selectedInventory];
+    _prepareSelectedInventory(inventories: InventoriesSheetData) {
+        return inventories[this.selectedInventory];
+    }
+
+    /**
+     * Show if any items are in the inventory or if the actor is supposed to have an inventory.
+     *
+     * A sheet is supposed to show an inventory if there are item types defined or an item of some
+     * type exists in any of its inventories.
+     *
+     * @param inventories
+     */
+    _prepareHasInventory(inventories: InventoriesSheetData) {
+        if(this.getInventoryItemTypes().length > 0) return true;
+
+        for (const inventory of Object.values(inventories)) {
+            if (Object.keys(inventory.types).length > 0) return true;
+        }
+
+        return false;
     }
 
     /**
