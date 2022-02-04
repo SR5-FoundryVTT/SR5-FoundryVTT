@@ -637,7 +637,7 @@
       "CreateInventory": "Create inventory place"
     },
     "Inventory": {
-      "OpenInventory": "Shown inventory",
+      "OpenInventory": "Inventory",
       "Carried": "Carried"
     }
   },

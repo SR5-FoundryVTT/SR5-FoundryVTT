@@ -89,6 +89,7 @@
     <nav class="tabs" data-group="primary">
         <a class="item" data-tab="actions">{{localize "SR5.Actions"}}</a>
         <a class="item" data-tab="skills">{{localize "SR5.Skills"}}</a>
+        {{#if (not (empty inventory)) }}<a class="item" data-tab="gear">{{localize "SR5.Gear"}}</a>{{/if}}
         <a class="item" data-tab="critter_powers">{{localize "SR5.Labels.ActorSheet.CritterPowers"}}</a>
         <a class="item" data-tab="spells">{{localize "SR5.Labels.ActorSheet.Spells"}}</a>
         <a class="item" data-tab="bio">{{localize "SR5.Biography"}}</a>
@@ -98,6 +99,7 @@
     <section class="sheetbody">
         {{> "systems/shadowrun5e/dist/templates/actor/tabs/ActionsTab.html"}}
         {{> "systems/shadowrun5e/dist/templates/actor/tabs/spirit/SpiritSkillsTab.html"}}
+        {{> "systems/shadowrun5e/dist/templates/actor/tabs/GearTab.html"}}
         {{> "systems/shadowrun5e/dist/templates/actor/tabs/CritterPowersTab.html"}}
         {{> "systems/shadowrun5e/dist/templates/actor/tabs/SpellsTab.html"}}
         {{> "systems/shadowrun5e/dist/templates/actor/tabs/BioTab.html"}}

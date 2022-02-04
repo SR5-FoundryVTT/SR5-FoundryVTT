@@ -625,7 +625,7 @@
       "CreateInventory": "Erstelle Inventar Ort"
     },
     "Inventory": {
-      "OpenInventory": "Offenes Inventar",
+      "OpenInventory": "Inventar",
       "Carried": "Mitgeführt"
     }
   },

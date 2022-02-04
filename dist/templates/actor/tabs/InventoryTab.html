@@ -2,22 +2,33 @@
     <div class="inventory">
         <div class="list-item item-section">
             <div class="item-left">
-                <label for="select-inventory">{{localize 'SR5.Labels.Inventory.OpenInventory'}}</label>
-                <select id="select-inventory" selected="{{inventory.name}}" class="display">
-                    {{#each inventories as |inventory name|}}
-                    <option value="{{inventory.name}}">{{localize inventory.label}}</option>
-                    {{/each}}
-                </select>
+                <span class="selection-inventory">
+                    <label for="select-inventory">{{localize 'SR5.Labels.Inventory.OpenInventory'}}</label>
+                    <select id="select-inventory" class="display">
+                        {{#each inventories as |inventory name|}}
+                        <option value="{{inventory.name}}" {{#ife ../selectedInventory inventory.name}}selected="selected"{{/ife}}>{{localize inventory.label}}</option>
+                        {{/each}}
+                    </select>
+                    <a class="inventory-edit roll">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a class="inventory-remove roll">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </span>
+                <span class="inline-input-inventory">
+                    <input type="text" id="input-inventory" class="display text left" value="{{inventory.name}}"/>
+                    <a class="roll inventory-input-save">
+                        <i class="fas fa-check"></i>
+                    </a>
+                    <a class="roll inventory-input-cancel">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </span>
             </div>
             <div class="item-right">
                 <div class="item-text item-icons">
-                    <a class="inventory-edit roll">
-                        <i class="fas fa-edit inventory-edit"></i>
-                    </a>
-                    <a class="inventory-remove roll">
-                        <i class="fas fa-trash inventory-remove"></i>
-                    </a>
-                    <a class="inventory-create roll" title="{{localize 'SR5.Labels.ActorSheet.CreateInventory'}}">
+                    <a class="inventory-inline-create" title="{{localize 'SR5.Labels.ActorSheet.CreateInventory'}}">
                         <i class="item-icon fas fa-plus"></i>
                         {{localize "SR5.Add"}}
                     </a>
