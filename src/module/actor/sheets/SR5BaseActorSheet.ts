@@ -14,7 +14,13 @@ import Skills = Shadowrun.Skills;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 
 
-export interface SR5SheetItem extends SR5Item {
+/**
+ * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
+ */
+export interface SheetItemData {
+    type: string,
+    name: string,
+    data: Shadowrun.ShadowrunItemDataData
     properties: any,
     description: any
 }
@@ -26,7 +32,7 @@ export interface InventorySheetData {
         [type: string]: {
             type: string,
             label: string,
-            items: SR5SheetItem[]
+            items: SheetItemData[]
         }
     }
 }
@@ -756,7 +762,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
             // Add the item to this inventory.
             // @ts-ignore
-            inventory.types[item.type].items.push(sheetItem as SR5SheetItem);
+            inventory.types[item.type].items.push(sheetItem as SheetItemData);
         });
 
 
@@ -822,15 +828,15 @@ export class SR5BaseActorSheet extends ActorSheet {
      * Enhance an SR5Item by sheet data.
      *
      */
-    _prepareSheetItem(item: SR5Item): SR5SheetItem {
-        const sheetItem = item.toObject() as unknown as SR5SheetItem;
+    _prepareSheetItem(item: SR5Item): SheetItemData {
+        const sheetItem = item.toObject() as unknown as SheetItemData;
 
         const chatData = item.getChatData();
         sheetItem.description = chatData.description;
         // @ts-ignore
         sheetItem.properties = chatData.properties;
 
-        return sheetItem as unknown as SR5SheetItem;
+        return sheetItem as unknown as SheetItemData;
     }
 
     /**
@@ -838,7 +844,7 @@ export class SR5BaseActorSheet extends ActorSheet {
      * @param data An object containing Actor Sheet data, as would be returned by ActorSheet.getData
      */
     _prepareItemTypes(data) {
-        const itemType: Record<string, SR5SheetItem[]> = {};
+        const itemType: Record<string, SheetItemData[]> = {};
 
         // Add all item types in system.
         Object.keys(CONFIG.Item.typeLabels).forEach(type => {
