@@ -19,19 +19,20 @@ export class OverwatchScoreTracker extends Application {
 
     static addedActors = [];
 
-    getData() {
-        // get list of actors that belong to users
+    getData(options) {
+        // Get list of user character actors
         const actors = game.users.reduce((acc, user) => {
             if (!user.isGM && user.character) {
-                acc.push(user.character.data);
+                acc.push(user.character.toObject());
             }
             return acc;
         }, []);
 
+        // get actors manually added to the tracker by GM
         OverwatchScoreTracker.addedActors.forEach((id) => {
             const actor = game.actors.find((a) => a._id === id);
             if (actor) {
-                actors.push(actor.data);
+                actors.push(actor.toObject());
             }
         });
 
@@ -50,8 +51,8 @@ export class OverwatchScoreTracker extends Application {
 
     // returns the actor that this event is acting on
     _getActorFromEvent(event) {
-        const id = event.currentTarget.closest('.list-item').dataset.actorId;
-        if (id) return game.actors.find((a) => a._id === id);
+        const id = $(event.currentTarget).closest('.list-item').data('actorId');
+        if (id) return game.actors.get(id);
     }
 
     _onAddActor(event) {
