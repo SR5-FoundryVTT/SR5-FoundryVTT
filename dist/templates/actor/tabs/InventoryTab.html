@@ -1,0 +1,61 @@
+{{#> 'systems/shadowrun5e/dist/templates/common/TabWrapper.html' tabId='inventory'}}
+    <div class="inventory">
+        <div class="list-item item-section">
+            <div class="item-left">
+                <span class="selection-inventory">
+                    <label for="select-inventory">{{localize 'SR5.Labels.Inventory.OpenInventory'}}</label>
+                    <select id="select-inventory" class="display">
+                        {{#each inventories as |inventory name|}}
+                        <option value="{{inventory.name}}" {{#ife ../selectedInventory inventory.name}}selected="selected"{{/ife}}>{{localize inventory.label}}</option>
+                        {{/each}}
+                    </select>
+                    <a class="inventory-edit roll">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a class="inventory-remove roll">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </span>
+                <span class="inline-input-inventory">
+                    <input type="text" id="input-inventory" class="display text left" value="{{inventory.name}}"/>
+                    <a class="roll inventory-input-save">
+                        <i class="fas fa-check"></i>
+                    </a>
+                    <a class="roll inventory-input-cancel">
+                        <i class="fas fa-times"></i>
+                    </a>
+                </span>
+            </div>
+            <div class="item-right">
+                <div class="item-text item-icons">
+                    <a class="inventory-inline-create" title="{{localize 'SR5.Labels.ActorSheet.CreateInventory'}}">
+                        <i class="item-icon fas fa-plus"></i>
+                        {{localize "SR5.Add"}}
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="scroll-area">
+            {{#each inventory.types as |section type|}}
+                {{> 'systems/shadowrun5e/dist/templates/common/List/ListHeader.html'
+                        name=(localize section.label)
+                        itemId=section.type
+                        icons=(ItemHeaderIcons section.type)
+                        rightSide=(ItemHeaderRightSide section.type)
+                }}
+                {{#each section.items}}
+                    {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
+                            img=this.img
+                            name=this.name
+                            itemId=this._id
+                            icons=(ItemIcons this)
+                            rightSide=(ItemRightSide this)
+                            hasDesc="true"
+                            hasRoll="true"
+                            description=this.description.value
+                    }}
+                {{/each}}
+            {{/each}}
+        </div>
+    </div>
+{{/'systems/shadowrun5e/dist/templates/common/TabWrapper.html'}}

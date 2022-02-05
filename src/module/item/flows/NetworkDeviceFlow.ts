@@ -191,18 +191,18 @@ export class NetworkDeviceFlow {
      * @private
      */
     private static async _removeControllerFromDevice(device: SR5Item) {
-        if (!device.canBeNetworkDevice) return console.error('Shadowrun5e | Given device cant be part of a network', device);
+        if (!device.canBeNetworkDevice) return console.error('Shadowrun 5e | Given device cant be part of a network', device);
         if (!NetworkDeviceFlow._currentUserCanModifyDevice(device)) return;
         await device.update({'data.technology.networkController': ''})
     }
 
     private static async _setDevicesOnController(controller: SR5Item, deviceLinks: string[]) {
-        if (!controller.canBeNetworkController) return console.error('Shadowrun5e | Given device cant control a network', controller);
+        if (!controller.canBeNetworkController) return console.error('Shadowrun 5e | Given device cant control a network', controller);
         await controller.update({'data.networkDevices': deviceLinks});
     }
 
     private static async _removeAllDevicesFromController(controller: SR5Item) {
-        if (!controller.canBeNetworkController) return console.error('Shadowrun5e | Given device cant control a network', controller);
+        if (!controller.canBeNetworkController) return console.error('Shadowrun 5e | Given device cant control a network', controller);
         await controller.update({'data.networkDevices': []});
     }
 
@@ -212,7 +212,7 @@ export class NetworkDeviceFlow {
      * @private
      */
     private static async _removeDeviceFromController(device: SR5Item){
-        if (!device.canBeNetworkDevice) return console.error('Shadowrun5e | Given device cant be part of a network', device);
+        if (!device.canBeNetworkDevice) return console.error('Shadowrun 5e | Given device cant be part of a network', device);
         const technologyData = device.getTechnologyData();
         if (!technologyData) return;
 
@@ -231,7 +231,7 @@ export class NetworkDeviceFlow {
     }
 
     private static async _removeControllerFromAllDevices(controller: SR5Item) {
-        if (!controller.canBeNetworkController) return console.error('Shadowrun5e | Given device cant control a network', controller);
+        if (!controller.canBeNetworkController) return console.error('Shadowrun 5e | Given device cant control a network', controller);
         const controllerData = controller.asControllerData();
         if (!controllerData) return;
 

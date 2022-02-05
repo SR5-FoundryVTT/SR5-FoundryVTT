@@ -569,7 +569,7 @@ export class Helpers {
      * @return An expected return object could look like this: {'data.skills.active': {'-=Pistols': null}} and would
      *         remove the Pistols key from the 'data.skills.active' path within Entity.data.data.skills.active.
      */
-    static getDeleteDataEntry(path: string, key: string): {[path: string]: {[key: string]: null}} {
+    static getDeleteKeyUpdateData(path: string, key: string): {[path: string]: {[key: string]: null}} {
         // Entity.update utilizes the mergeObject function within Foundry.
         // That functions documentation allows property deletion using the -= prefix before property key.
         return {[path]: {[`-=${key}`]: null}};

@@ -228,6 +228,16 @@ select.display {
 }
 
 .sr5 {
+    /**
+     * Elements used for inline editing
+     */
+    .inline-input-inventory {
+        display: none;
+    }
+
+    /**
+     * Elements used for linkable documents / entities.
+     */
     .entity-link {
         color: $black;
     }
@@ -694,6 +704,12 @@ select.display {
 
     .skill-roll-not-defaultable {
         font-style: italic;
+    }
+
+    /** Input element for inventory name editing */
+    input#input-inventory {
+        // Otherwise the other classes used will break styling.
+        width: auto;
     }
 }
 

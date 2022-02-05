@@ -745,9 +745,18 @@ select.display {
     background-color: #4d4d4d; }
 
 .sr5 {
+  /**
+     * Elements used for inline editing
+     */
+  /**
+     * Elements used for linkable documents / entities.
+     */
   /** CSS for the Environmental Modifier Application Window
      *
-     */ }
+     */
+  /** Input element for inventory name editing */ }
+  .sr5 .inline-input-inventory {
+    display: none; }
   .sr5 .entity-link {
     color: black; }
   .sr5 .origin-link {
@@ -810,7 +819,8 @@ select.display {
     flex: 0;
     margin: 0.25em;
     margin-bottom: -5px;
-    border-bottom: 1px solid #4d4d4d; }
+    border-bottom: 1px solid #4d4d4d;
+    align-items: stretch; }
     .sr5 .tabs > a {
       margin: 0.25em;
       padding: 0.25em;
@@ -828,6 +838,9 @@ select.display {
       .sr5 .tabs > a.active {
         text-shadow: -1px -1px 0 darkblue, 1px -1px 0 darkblue, -1px 1px 0 darkblue, 1px 1px 0 darkblue;
         background-color: rgba(0, 0, 0, 0.4); }
+    .sr5 .tabs > .item {
+      flex: 1;
+      text-align: center; }
   .sr5 .tab {
     border-radius: 0.25em;
     margin-top: 0.25em;
@@ -1099,6 +1112,8 @@ select.display {
     padding-right: 6px; }
   .sr5 .skill-roll-not-defaultable {
     font-style: italic; }
+  .sr5 input#input-inventory {
+    width: auto; }
 
 /** Replicate Foundry .dialog stiling for flex row buttons. FormDialog sublcasses simply adding class dialog will
  * otherwise cause issues with custom button styling.

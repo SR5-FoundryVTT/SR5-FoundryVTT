@@ -1,7 +1,7 @@
 import {SR5BaseActorSheet} from "./SR5BaseActorSheet";
 
 
-export class SR5CharacterSheet extends SR5BaseActorSheet {
+export class SR5SpiritActorSheet extends SR5BaseActorSheet {
     /**
      * Spirit actors will handle these item types specifically.
      *
@@ -14,8 +14,8 @@ export class SR5CharacterSheet extends SR5BaseActorSheet {
 
         return [
             ...itemTypes,
-            'critter_powers',
-            'spells',
+            'critter_power',
+            'spell',
             'quality'
         ];
     }

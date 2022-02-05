@@ -1,7 +1,7 @@
 import {SR5BaseActorSheet} from "./SR5BaseActorSheet";
 
 
-export class SR5CharacterSheet extends SR5BaseActorSheet {
+export class SR5SpriteActorSheet extends SR5BaseActorSheet {
     /**
      * Sprite actors will handle these item types specifically.
      *

@@ -4,7 +4,7 @@
         icons=(ItemHeaderIcons 'spell')
         rightSide=(ItemHeaderRightSide 'spell')
 }}
-{{#each newInventory.spell.items as |item i|}}
+{{#each itemType.spell as |item i|}}
     {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
             img=item.img
             name=item.name

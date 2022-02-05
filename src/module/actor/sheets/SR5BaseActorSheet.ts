@@ -6,16 +6,66 @@ import {SkillEditSheet} from "../../apps/skills/SkillEditSheet";
 import {SR5Actor} from "../SR5Actor";
 import {KnowledgeSkillEditSheet} from "../../apps/skills/KnowledgeSkillEditSheet";
 import {LanguageSkillEditSheet} from "../../apps/skills/LanguageSkillEditSheet";
+import {MoveInventoryDialog} from "../../apps/dialogs/MoveInventoryDialog";
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import SkillField = Shadowrun.SkillField;
 import Skills = Shadowrun.Skills;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
 
+
+/**
+ * Designed to work with Item.toObject() but it's not fully implementing all ItemData fields.
+ */
+export interface SheetItemData {
+    type: string,
+    name: string,
+    data: Shadowrun.ShadowrunItemDataData
+    properties: any,
+    description: any
+}
+
+export interface InventorySheetData {
+    name: string,
+    label: string,
+    types: {
+        [type: string]: {
+            type: string,
+            label: string,
+            items: SheetItemData[]
+        }
+    }
+}
+
+export type InventoriesSheetData = Record<string, InventorySheetData>;
+
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
 // when opened in succession, causing SkillEditSheet to wrongfully overwrite the wrong data.
 let globalSkillAppId: number = -1;
+
+
+const sortByName = (i1, i2) => {
+            if (i1.name > i2.name) return 1;
+            if (i1.name < i2.name) return -1;
+            return 0;
+        };
+const sortByEquipped = (left, right) => {
+    const leftEquipped = left.data?.technology?.equipped;
+    const rightEquipped = right.data?.technology?.equipped;
+    if (leftEquipped && !rightEquipped) return -1;
+    if (rightEquipped && !leftEquipped) return 1;
+    if (left.name > right.name) return 1;
+    if (left.name < right.name) return -1;
+    return 0;
+};
+const sortyByQuality = (a: any, b: any) => {
+    if (a.data.type === 'positive' && b.data.type === 'negative') return -1;
+    if (a.data.type === 'negative' && b.data.type === 'positive') return 1;
+    return a.name < b.name ? -1 : 1;
+}
+
+
 
 /**
  * This class should not be used directly but be extended for each actor type.
@@ -31,6 +81,17 @@ export class SR5BaseActorSheet extends ActorSheet {
         };
     // Used to store the scroll position on rerender. Needed as Foundry fully re-renders on Document update.
     _scroll: string;
+    // Store the currently selected inventory.
+    selectedInventory: string;
+
+
+    constructor(...args) {
+        // @ts-ignore // Since we don't need any actual data, don't define args to avoid breaking changes.
+        super(...args);
+
+        // Preselect default inventory.
+        this.selectedInventory = this.document.defaultInventory.name;
+    }
 
     /**
      * All actors will handle these item types specifically.
@@ -121,12 +182,15 @@ export class SR5BaseActorSheet extends ActorSheet {
         this._prepareActorAttributes(data);
 
         // Valid data fields for all actor types.
-        this._prepareItems(data); // All actor types have items.
-        this._prepareActorTypeFields(data);  // Actor type fields can be generic.
-        this._prepareSkillsWithFilters(data); // All actor types have skills.
+        this._prepareActorTypeFields(data);
+        this._prepareSkillsWithFilters(data);
 
+        data.itemType = this._prepareItemTypes(data);
         data.effects = prepareActiveEffectCategories(this.document.effects);  // All actor types have effects.
-        data.inventory = this._prepareItemsInventory();
+        data.inventories = this._prepareItemsInventory();
+        data.inventory = this._prepareSelectedInventory(data.inventories);
+        data.hasInventory = this._prepareHasInventory(data.inventories);
+        data.selectedInventory = this.selectedInventory;
 
         return data;
     }
@@ -156,6 +220,14 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.item-roll').on('click', this._onItemRoll.bind(this));
         html.find('.Roll').on('click', this._onRoll.bind(this));
 
+        // Actor inventory handling....
+        html.find('.inventory-inline-create').on('click', this._onInventoryCreate.bind(this));
+        html.find('.inventory-remove').on('click', this._onInventoryRemove.bind(this));
+        html.find('.inventory-edit').on('click', this._onInplaceInventoryEdit.bind(this));
+        html.find('.inventory-input-cancel').on('click', this._onInplaceInventoryEditCancel.bind(this));
+        html.find('.inventory-input-save').on('click', this._onInplaceInventoryEditSave.bind(this));
+        html.find('#select-inventory').on('change', this._onSelectInventory.bind(this));
+        html.find('.inventory-item-move').on('click', this._onItemMoveToInventory.bind(this));
 
         // Condition monitor track handling...
         html.find('.horizontal-cell-input .cell').on('click', this._onSetConditionTrackCell.bind(this));
@@ -205,25 +277,36 @@ export class SR5BaseActorSheet extends ActorSheet {
     /**
      * Handle display of item types within the actors inventory section.
      *
-     * Handled means there is some place specific the actor sheet want's these items displayed.
+     * Unexpected means there is no use for this type but the user added it anyway.
      * Inventory types means they should always be shown, even if there are none.
      * All other item types will be collected at some tab / place on the sheet.
      */
-    _removeHandledInventory(inventory) {
-        // Show item types that aren't handled elsewhere.
-        const handledTypes = this.getHandledItemTypes();
-        for (const type of handledTypes) {
-            delete inventory[type];
-        }
-
-        // Show item types that have no use on the actor.
+    _addInventoryItemTypes(inventory) {
+        // Show all item types but remove empty unexpected item types.
         const inventoryTypes = this.getInventoryItemTypes();
-        for (const type of Object.keys(inventory)) {
+        for (const type of Object.keys(inventory.types)) {
             if (inventoryTypes.includes(type)) continue;
-            if (inventory[type].items.length === 0) delete inventory[type];
+            if (inventory.types[type].items.length === 0) delete inventory.types[type];
         }
 
         return inventory;
+    }
+
+    /**
+     * Add any item type to the inventory display that's configured for this actor sheet type.
+     *
+     * @param inventory The inventory to check and add types to.
+     */
+    _addInventoryTypes(inventory) {
+        for (const type of this.getInventoryItemTypes()) {
+            if (inventory.types.hasOwnProperty(type)) continue;
+
+            inventory.types[type] = {
+                type: type,
+                label: SR5.itemTypes[type],
+                items: []
+            };
+        }
     }
 
     /**
@@ -291,12 +374,19 @@ export class SR5BaseActorSheet extends ActorSheet {
         event.stopPropagation();
 
         if (!event.dataTransfer) return;
+        // Keep upstream document created for actions base on it.
+        const documents = await super._onDrop(event);
 
-        // const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
         // Handle specific system drop events.
+        // const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
 
-        // Handle none specific drop events.
-        return super._onDrop(event);
+        // Add any created items to the selected inventory.
+        if (Array.isArray(documents)) {
+            const items = documents.filter(document => document instanceof SR5Item);
+            await this.document.addItemsToInventory(this.selectedInventory, items);
+        }
+
+        return documents;
     }
 
     /**
@@ -376,12 +466,18 @@ export class SR5BaseActorSheet extends ActorSheet {
     async _onItemCreate(event) {
         event.preventDefault();
         const type = Helpers.listItemId(event);
+
         // TODO: Add translation for item names...
         const itemData = {
             name: `New ${type}`,
             type: type,
         };
-        return await this.actor.createEmbeddedDocuments('Item',  [itemData], {renderSheet: true});
+        const items = await this.actor.createEmbeddedDocuments('Item',  [itemData], {renderSheet: true}) as SR5Item[];
+        if (!items) return;
+
+        // Add the item to the selected inventory.
+        if (this.selectedInventory !== this.document.defaultInventory.name)
+            await this.document.addItemsToInventory(this.selectedInventory, items);
     }
 
     async _onItemEdit(event) {
@@ -626,229 +722,161 @@ export class SR5BaseActorSheet extends ActorSheet {
     }
 
     /**
-     * Prepare Actor Sheet data with item data.
+     * Prepare Actor Sheet Inventory display.
+     *
+     * Each item can  be in one custom inventory or the default inventory.
      */
     _prepareItemsInventory() {
-        const inventory = {};
+        // All custom and default actor inventories.
+        const inventories: InventoriesSheetData = {};
+        // Simple item to inventory mapping.
+        const itemIdInventory = {};
 
-        // Build inventory for all item types.
-        Object.entries(CONFIG.Item.typeLabels).forEach(([type, label]) => {
-            // @ts-ignore // type is never undefined
-            inventory[type] = {
+        // Default inventory for items without a defined one.
+        // Add first for display purposes on sheet.
+        inventories[this.document.defaultInventory.name] = {
+            name: this.document.defaultInventory.name,
+            label: this.document.defaultInventory.label,
+            types: {}
+        };
+        this._addInventoryTypes(inventories[this.document.defaultInventory.name]);
+
+        // Build all inventories, group items by their types.
+        Object.values(this.document.data.data.inventories).forEach(({name, label, itemIds}) => {
+            inventories[name] = {
+                name,
                 label,
-                items: [],
-                dataset: {
-                    type
-                }
+                types: {}
             }
+            // Add default inventory types for this sheet type first, so they appear on top.
+            this._addInventoryTypes(inventories[name]);
+
+            itemIds.forEach(id => {
+                if (itemIdInventory[id]) console.warn(`Shadowrun5e | Item id ${id} has been added to both ${name} and ${itemIdInventory[id]}. Will only show in ${name}`);
+                itemIdInventory[id] = name;
+            });
         });
 
-        // Fill inventory with all item types.
-        this.object.items.forEach(item => {
-            if (!inventory.hasOwnProperty(item.type)) return console.error(`Item ${item.name} of ${item.type} should have an inventory space, but doesn't, and won't be displayed.`);
+        const handledTypes = this.getHandledItemTypes();
 
-            // Since fields will be added, duplicate the item to avoid those propagating into #update calls.
-            const sheetItem = duplicate(item);
+        // Fill all inventories with items grouped by their type.
+        this.document.items.forEach(item => {
+            // Handled types are on the sheet outside the inventory.
+            if (handledTypes.includes(item.type)) return;
 
-            // Create ChatData to be displayed in chat and description.
-            const chatData = item.getChatData();
-            // TODO: Add ChatData and ItemSheetData typing.
-            // @ts-ignore
-            sheetItem.description = chatData.description;
-            // @ts-ignore
-            sheetItem.properties = chatData.properties;
+            const sheetItem = this._prepareSheetItem(item);
 
             // TODO: isStack property isn't used elsewhere. Remove if unnecessary.
             // @ts-ignore
             // sheetItem.isStack = sheetItem.data.quantity ? item.data.quantity > 1 : false;
 
-            // Add the item to its types inventory.
-            inventory[item.type].items.push(sheetItem);
+            // Determine what inventory the item sits in.
+            const inventoryName = itemIdInventory[item.id] || this.document.defaultInventory.name;
+            const inventory = inventories[inventoryName];
+
+            // Should an item of an abnormal type have been added, build type structure.
+            if (!inventory.types[item.type]) {
+                inventory.types[item.type] = {
+                    type: item.type,
+                    label: SR5.itemTypes[item.type],
+                    items: []
+                };
+            }
+
+            // Add the item to this inventory.
+            // @ts-ignore
+            inventory.types[item.type].items.push(sheetItem as SheetItemData);
         });
 
-        // Prepared sorting methods.
-        const sortByName = (i1, i2) => {
-            if (i1.name > i2.name) return 1;
-            if (i1.name < i2.name) return -1;
-            return 0;
-        };
-        const sortByEquipped = (left, right) => {
-            const leftEquipped = left.data?.technology?.equipped;
-            const rightEquipped = right.data?.technology?.equipped;
-            if (leftEquipped && !rightEquipped) return -1;
-            if (rightEquipped && !leftEquipped) return 1;
-            if (left.name > right.name) return 1;
-            if (left.name < right.name) return -1;
-            return 0;
-        };
+        Object.values(inventories).forEach(inventory => {
+            this._addInventoryItemTypes(inventory);
 
-        Object.values(inventory).forEach(({items}) => {
-            // TODO: Check if some / all should be sort by equipped.
-            items.sort(sortByName);
+            // Sort the items.
+            Object.values(inventory.types).forEach((type) => {
+                // TODO: Check if some / all should be sort by equipped.
+                type.items.sort(sortByName);
+            })
         });
 
+        return inventories;
+    }
 
-        this._removeHandledInventory(inventory);
+    /**
+     * Choose the selected inventory to actually display.
+     *
+     * @param inventories
+     */
+    _prepareSelectedInventory(inventories: InventoriesSheetData) {
+        return inventories[this.selectedInventory];
+    }
 
-        return inventory;
+    /**
+     * Show if any items are in the inventory or if the actor is supposed to have an inventory.
+     *
+     * A sheet is supposed to show an inventory if there are item types defined or an item of some
+     * type exists in any of its inventories.
+     *
+     * @param inventories
+     */
+    _prepareHasInventory(inventories: InventoriesSheetData) {
+        if(this.getInventoryItemTypes().length > 0) return true;
+
+        for (const inventory of Object.values(inventories)) {
+            if (Object.keys(inventory.types).length > 0) return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Enhance an SR5Item by sheet data.
+     *
+     */
+    _prepareSheetItem(item: SR5Item): SheetItemData {
+        const sheetItem = item.toObject() as unknown as SheetItemData;
+
+        const chatData = item.getChatData();
+        sheetItem.description = chatData.description;
+        // @ts-ignore
+        sheetItem.properties = chatData.properties;
+
+        return sheetItem as unknown as SheetItemData;
     }
 
     /**
      * Prepare Actor Sheet data with item data.
      * @param data An object containing Actor Sheet data, as would be returned by ActorSheet.getData
      */
-    _prepareItems(data) {
-        const inventory = {};
+    _prepareItemTypes(data) {
+        const itemType: Record<string, SheetItemData[]> = {};
 
-        // All acting entities should be allowed to carry some protection!
-        inventory['weapon'] = {
-            label: game.i18n.localize('SR5.ItemTypes.Weapon'),
-            items: [],
-            dataset: {
-                type: 'weapon',
-            },
-        };
-
-        // Critters are people to... Support your local HMHVV support groups!
-        if (this.actor.matchesActorTypes(['character', 'critter', 'vehicle'])) {
-            inventory['armor'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Armor'),
-                items: [],
-                dataset: {
-                    type: 'armor',
-                },
-            };
-            inventory['device'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Device'),
-                items: [],
-                dataset: {
-                    type: 'device',
-                },
-            };
-            inventory['equipment'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Equipment'),
-                items: [],
-                dataset: {
-                    type: 'equipment',
-                },
-            };
-            inventory['ammo'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Ammo'),
-                items: [],
-                dataset: {
-                    type: 'ammo',
-                },
-            };
-            inventory['cyberware'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Cyberware'),
-                items: [],
-                dataset: {
-                    type: 'cyberware',
-                },
-            };
-            inventory['bioware'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Bioware'),
-                items: [],
-                dataset: {
-                    type: 'bioware',
-                },
-            };
-        }
-
-        let [
-            items,
-            spells,
-            qualities,
-            adept_powers,
-            actions,
-            complex_forms,
-            lifestyles,
-            contacts,
-            sins,
-            programs,
-            critter_powers,
-            sprite_powers,
-        ] = data.items.reduce(
-            (arr, item) => {
-                // Duplicate to avoid later updates propagating changed item data.
-                // NOTE: If no duplication is done, added fields will be stored in the database on updates!
-                item = duplicate(item);
-                // Show item properties and description in the item list overviews.
-                const actorItem = this.actor.items.get(item._id) as SR5Item;
-                const chatData = actorItem.getChatData();
-                item.description = chatData.description;
-                // @ts-ignore // This is a hacky monkey patch solution to pass template data through duplicated item data.
-                item.properties = chatData.properties;
-
-                // TODO: isStack property isn't used elsewhere. Remove if unnecessary.
-                item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
-                if (item.type === 'spell') arr[1].push(item);
-                else if (item.type === 'quality') arr[2].push(item);
-                else if (item.type === 'adept_power') arr[3].push(item);
-                else if (item.type === 'action') arr[4].push(item);
-                else if (item.type === 'complex_form') arr[5].push(item);
-                else if (item.type === 'lifestyle') arr[6].push(item);
-                else if (item.type === 'contact') arr[7].push(item);
-                else if (item.type === 'sin') arr[8].push(item);
-                else if (item.type === 'program') arr[9].push(item);
-                else if (item.type === 'critter_power') arr[10].push(item);
-                else if (item.type === 'sprite_power') arr[11].push(item);
-                else if (Object.keys(inventory).includes(item.type)) arr[0].push(item);
-                return arr;
-            },
-            [[], [], [], [], [], [], [], [], [], [], [], []],
-        );
-
-        const sortByName = (i1, i2) => {
-            if (i1.name > i2.name) return 1;
-            if (i1.name < i2.name) return -1;
-            return 0;
-        };
-        const sortByEquipped = (left, right) => {
-            const leftEquipped = left.data?.technology?.equipped;
-            const rightEquipped = right.data?.technology?.equipped;
-            if (leftEquipped && !rightEquipped) return -1;
-            if (rightEquipped && !leftEquipped) return 1;
-            if (left.name > right.name) return 1;
-            if (left.name < right.name) return -1;
-            return 0;
-        };
-        actions.sort(sortByName);
-        adept_powers.sort(sortByName);
-        complex_forms.sort(sortByName);
-        items.sort(sortByEquipped);
-        spells.sort(sortByName);
-        contacts.sort(sortByName);
-        lifestyles.sort(sortByName);
-        sins.sort(sortByName);
-        programs.sort(sortByEquipped);
-        critter_powers.sort(sortByName);
-        sprite_powers.sort(sortByName);
-
-        items.forEach((item) => {
-            inventory[item.type].items.push(item);
+        // Add all item types in system.
+        Object.keys(CONFIG.Item.typeLabels).forEach(type => {
+            itemType[type] = [];
         });
 
-        data.inventory = Object.values(inventory);
-        data.magic = {
-            spellbook: spells,
-            powers: adept_powers,
-        };
-        data.actions = actions;
-        data.complex_forms = complex_forms;
-        data.lifestyles = lifestyles;
-        data.contacts = contacts;
-        data.sins = sins;
-        data.programs = programs;
-        data.critter_powers = critter_powers;
-        data.sprite_powers = sprite_powers;
-
-        qualities.sort((a, b) => {
-            if (a.data.type === 'positive' && b.data.type === 'negative') return -1;
-            if (a.data.type === 'negative' && b.data.type === 'positive') return 1;
-            return a.name < b.name ? -1 : 1;
+        // Add existing items to their types as sheet items
+        this.document.items.forEach((item: SR5Item) => {
+            const sheetItem = this._prepareSheetItem(item);
+            itemType[sheetItem.type].push(sheetItem);
         });
-        data.qualities = qualities;
+
+        // Sort items for each type.
+        Object.entries(itemType).forEach(([type, items]) => {
+            switch (type) {
+                case 'quality':
+                    items.sort(sortyByQuality);
+                    break;
+                case 'program':
+                    items.sort(sortByEquipped);
+                    break;
+                default:
+                    items.sort(sortByName);
+                    break;
+            }
+        });
+
+        return itemType
     }
 
     /**
@@ -1302,5 +1330,140 @@ export class SR5BaseActorSheet extends ActorSheet {
             if (field.is(':visible')) this._shownDesc.push(iid);
             else this._shownDesc = this._shownDesc.filter((val) => val !== iid);
         }
+    }
+
+    /**
+     * Create an inventory place on the actor for gear organization.
+     */
+    async _onInventoryCreate(event) {
+        event.preventDefault();
+
+        // Overwrite currently selected inventory.
+        $('#input-inventory').val('');
+        await this._onInplaceInventoryEdit(event, 'create');
+    }
+
+    /**
+     * Remove the currently selected inventory.
+     * @param event
+     */
+    async _onInventoryRemove(event) {
+        event.preventDefault();
+
+        // TODO: Allow for options overwriting title/message and so forth.
+        const userConsented = await Helpers.confirmDeletion();
+        if (!userConsented) return;
+
+        await this.document.removeInventory(this.selectedInventory);
+
+        // Preselect default instead of none.
+        this.selectedInventory = this.document.defaultInventory.name;
+        this.render();
+    }
+
+    /**
+     * Hide inventory selection and show inline editing instead.
+     *
+     * @param event
+     * @param action What action to take during later saving event.
+     */
+    async _onInplaceInventoryEdit(event, action:'edit'|'create'='edit') {
+        event.preventDefault();
+
+        // Disallow editing of default inventory.
+        if (action === 'edit' && this.selectedInventory === this.document.defaultInventory.name)
+            return ui.notifications?.warn(game.i18n.localize('SR5.Warnings.CantEditDefaultInventory'));
+
+
+        $('.selection-inventory').hide();
+        $('.inline-input-inventory').show();
+
+        // Mark action and pre-select.
+        $('#input-inventory')
+            .data('action', action)
+            .select();
+    }
+
+    /**
+     * Hide inline inventory editing and show inventory selection instead.
+     *
+     * Cancel edit workflow and do nothing.
+     * @param event
+     */
+    async _onInplaceInventoryEditCancel(event) {
+        event.preventDefault();
+
+        $('.selection-inventory').show();
+        $('.inline-input-inventory').hide();
+
+        // Reset to selected inventory for next try.
+        $('#input-inventory')
+            .data('action', undefined)
+            .val(this.selectedInventory);
+    }
+
+    /**
+     * Complete inline editing and either save changes or create a missing inventory.
+     *
+     * @param event
+     */
+    // TODO: Editing doesn't work, as it will assume that it must be created.
+    async _onInplaceInventoryEditSave(event) {
+        event.preventDefault();
+
+        const inputElement = $('#input-inventory');
+        const action = inputElement.data('action');
+        let inventory = String(inputElement.val());
+        if (!inventory) return;
+
+        switch (action) {
+            case 'edit':
+                await this.document.renameInventory(this.selectedInventory, inventory);
+                break;
+            case 'create':
+                await this.document.createInventory(inventory);
+                break;
+        }
+
+        await this._onInplaceInventoryEditCancel(event);
+
+        // Preselect the new or previous inventory.
+        this.selectedInventory = inventory;
+        this.render();
+    }
+
+    /**
+     * Change selected inventory for this sheet.
+     *
+     * @param event
+     */
+    async _onSelectInventory(event) {
+        event.preventDefault();
+
+        const inventory = String($(event.currentTarget).val());
+
+        if (inventory)
+            this.selectedInventory = inventory;
+
+        this.render();
+    }
+
+    /**
+     * Move an item between two inventories.
+     * @param event
+     */
+    async _onItemMoveToInventory(event) {
+        event.preventDefault();
+
+        const itemId = Helpers.listItemId(event);
+        const item = this.document.items.get(itemId);
+        if (!item) return;
+
+        // Ask user about what inventory to move the item to.
+        const dialog = new MoveInventoryDialog(this.document, this.selectedInventory);
+        const inventory = await dialog.select();
+        if (dialog.canceled) return;
+
+        await this.document.addItemsToInventory(inventory, item);
     }
 }

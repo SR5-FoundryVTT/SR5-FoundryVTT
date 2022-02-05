@@ -11,7 +11,7 @@
   },
   "version": "0.7.24",
   "minimumCoreVersion": "0.8.6",
-  "compatibleCoreVersion": "9.238",
+  "compatibleCoreVersion": "9",
   "scripts": [],
   "esmodules": [
     "dist/bundle.js"
