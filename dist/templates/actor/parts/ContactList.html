@@ -5,7 +5,7 @@
             icons=(ItemHeaderIcons 'contact')
             rightSide=(ItemHeaderRightSide 'contact')
     }}
-    {{#each newInventory.contact.items as |item i|}}
+    {{#each itemType.contact as |item i|}}
         {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
                 img=item.img
                 name=item.name

@@ -14631,7 +14631,7 @@ class SR5Actor extends Actor {
     }
 }
 exports.SR5Actor = SR5Actor;
-},{"../apps/dialogs/ShadowrunActorDialogs":113,"../chat":121,"../config":123,"../constants":124,"../data/DataDefaults":125,"../data/SR5ItemDataWrapper":127,"../helpers":138,"../item/SR5Item":178,"../parts/PartsList":192,"../rolls/ShadowrunRoller":193,"../rules/MatrixRules":195,"../rules/Modifiers":196,"../rules/SkillRules":197,"./flows/SkillFlow":84,"./flows/SoakFlow":85,"./prep/CharacterPrep":86,"./prep/CritterPrep":87,"./prep/ICPrep":88,"./prep/SpiritPrep":89,"./prep/SpritePrep":90,"./prep/VehiclePrep":91}],83:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunActorDialogs":115,"../chat":123,"../config":125,"../constants":126,"../data/DataDefaults":127,"../data/SR5ItemDataWrapper":129,"../helpers":140,"../item/SR5Item":180,"../parts/PartsList":194,"../rolls/ShadowrunRoller":195,"../rules/MatrixRules":197,"../rules/Modifiers":198,"../rules/SkillRules":199,"./flows/SkillFlow":84,"./flows/SoakFlow":85,"./prep/CharacterPrep":86,"./prep/CritterPrep":87,"./prep/ICPrep":88,"./prep/SpiritPrep":89,"./prep/SpritePrep":90,"./prep/VehiclePrep":91}],83:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -14707,7 +14707,7 @@ class DamageApplicationFlow {
     }
 }
 exports.DamageApplicationFlow = DamageApplicationFlow;
-},{"../../apps/dialogs/DamageApplicationDialog":109}],84:[function(require,module,exports){
+},{"../../apps/dialogs/DamageApplicationDialog":111}],84:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SkillFlow = void 0;
@@ -14755,7 +14755,7 @@ class SkillFlow {
     }
 }
 exports.SkillFlow = SkillFlow;
-},{"../../constants":124,"../../rules/SkillRules":197}],85:[function(require,module,exports){
+},{"../../constants":126,"../../rules/SkillRules":199}],85:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -14890,7 +14890,7 @@ class SoakFlow {
     }
 }
 exports.SoakFlow = SoakFlow;
-},{"../../apps/dialogs/ShadowrunActorDialogs":113,"../../chat":121,"../../data/DataDefaults":125,"../../helpers":138,"../../parts/PartsList":192,"../../rolls/ShadowrunRoller":193,"../../rules/SoakRules":198}],86:[function(require,module,exports){
+},{"../../apps/dialogs/ShadowrunActorDialogs":115,"../../chat":123,"../../data/DataDefaults":127,"../../helpers":140,"../../parts/PartsList":194,"../../rolls/ShadowrunRoller":195,"../../rules/SoakRules":200}],86:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CharacterPrep = void 0;
@@ -15124,7 +15124,7 @@ class ICPrep {
     }
 }
 exports.ICPrep = ICPrep;
-},{"../../config":123,"../../data/DataDefaults":125,"../../parts/PartsList":192,"../../rules/MatrixRules":195,"./functions/AttributesPrep":92,"./functions/InitiativePrep":94,"./functions/MatrixPrep":97,"./functions/ModifiersPrep":98,"./functions/SkillsPrep":101}],89:[function(require,module,exports){
+},{"../../config":125,"../../data/DataDefaults":127,"../../parts/PartsList":194,"../../rules/MatrixRules":197,"./functions/AttributesPrep":92,"./functions/InitiativePrep":94,"./functions/MatrixPrep":97,"./functions/ModifiersPrep":98,"./functions/SkillsPrep":101}],89:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpiritPrep = void 0;
@@ -15522,7 +15522,7 @@ class SpiritPrep {
     }
 }
 exports.SpiritPrep = SpiritPrep;
-},{"../../helpers":138,"../../parts/PartsList":192,"../flows/SkillFlow":84,"./functions/AttributesPrep":92,"./functions/ConditionMonitorsPrep":93,"./functions/InitiativePrep":94,"./functions/LimitsPrep":96,"./functions/ModifiersPrep":98,"./functions/MovementPrep":99,"./functions/SkillsPrep":101,"./functions/WoundsPrep":102}],90:[function(require,module,exports){
+},{"../../helpers":140,"../../parts/PartsList":194,"../flows/SkillFlow":84,"./functions/AttributesPrep":92,"./functions/ConditionMonitorsPrep":93,"./functions/InitiativePrep":94,"./functions/LimitsPrep":96,"./functions/ModifiersPrep":98,"./functions/MovementPrep":99,"./functions/SkillsPrep":101,"./functions/WoundsPrep":102}],90:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpritePrep = void 0;
@@ -15552,9 +15552,9 @@ class SpritePrep {
         SkillsPrep_1.SkillsPrep.prepareSkills(data);
         LimitsPrep_1.LimitsPrep.prepareLimits(data);
         MatrixPrep_1.MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
-        InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(data);
         SpritePrep.prepareSpriteConditionMonitor(data);
         SpritePrep.prepareSpriteInitiative(data);
+        InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(data);
     }
     static prepareSpriteSpecial(data) {
         // Sprites are always awakened
@@ -15601,10 +15601,10 @@ class SpritePrep {
         // setup initiative from overrides
         initiative.matrix.base.base = level * 2 + overrides.init;
         PartsList_1.PartsList.AddUniquePart(initiative.matrix.base.mod, 'SR5.Bonus', modifiers['matrix_initiative']);
-        helpers_1.Helpers.calcTotal(initiative.matrix.base);
+        helpers_1.Helpers.calcTotal(initiative.matrix.base, { min: 0 });
         initiative.matrix.dice.base = 4;
         PartsList_1.PartsList.AddUniquePart(initiative.matrix.dice.mod, 'SR5.Bonus', modifiers['matrix_initiative_dice']);
-        helpers_1.Helpers.calcTotal(initiative.matrix.dice);
+        helpers_1.Helpers.calcTotal(initiative.matrix.dice, { min: 0 });
     }
     /**
      * Get the stat modifiers for the specified type of sprite
@@ -15662,7 +15662,7 @@ class SpritePrep {
     }
 }
 exports.SpritePrep = SpritePrep;
-},{"../../helpers":138,"../../parts/PartsList":192,"./functions/AttributesPrep":92,"./functions/InitiativePrep":94,"./functions/LimitsPrep":96,"./functions/MatrixPrep":97,"./functions/ModifiersPrep":98,"./functions/SkillsPrep":101}],91:[function(require,module,exports){
+},{"../../helpers":140,"../../parts/PartsList":194,"./functions/AttributesPrep":92,"./functions/InitiativePrep":94,"./functions/LimitsPrep":96,"./functions/MatrixPrep":97,"./functions/ModifiersPrep":98,"./functions/SkillsPrep":101}],91:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VehiclePrep = void 0;
@@ -15789,7 +15789,7 @@ class VehiclePrep {
     }
 }
 exports.VehiclePrep = VehiclePrep;
-},{"../../config":123,"../../helpers":138,"../../parts/PartsList":192,"./functions/AttributesPrep":92,"./functions/InitiativePrep":94,"./functions/LimitsPrep":96,"./functions/MatrixPrep":97,"./functions/ModifiersPrep":98,"./functions/SkillsPrep":101}],92:[function(require,module,exports){
+},{"../../config":125,"../../helpers":140,"../../parts/PartsList":194,"./functions/AttributesPrep":92,"./functions/InitiativePrep":94,"./functions/LimitsPrep":96,"./functions/MatrixPrep":97,"./functions/ModifiersPrep":98,"./functions/SkillsPrep":101}],92:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AttributesPrep = void 0;
@@ -15848,7 +15848,7 @@ class AttributesPrep {
     }
 }
 exports.AttributesPrep = AttributesPrep;
-},{"../../../config":123,"../../../constants":124,"../../../helpers":138}],93:[function(require,module,exports){
+},{"../../../config":125,"../../../constants":126,"../../../helpers":140}],93:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConditionMonitorsPrep = void 0;
@@ -15888,7 +15888,7 @@ class ConditionMonitorsPrep {
     }
 }
 exports.ConditionMonitorsPrep = ConditionMonitorsPrep;
-},{"../../../config":123}],94:[function(require,module,exports){
+},{"../../../config":125}],94:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InitiativePrep = void 0;
@@ -15905,7 +15905,7 @@ class InitiativePrep {
             initiative.current = initiative.meatspace;
             initiative.perception = 'meatspace';
         }
-        initiative.current.dice.value = helpers_1.Helpers.calcTotal(initiative.current.dice);
+        initiative.current.dice.value = helpers_1.Helpers.calcTotal(initiative.current.dice, { min: 0, max: 5 });
         if (initiative.edge)
             initiative.current.dice.value = 5;
         initiative.current.dice.value = Math.min(5, initiative.current.dice.value); // maximum of 5d6 for initiative
@@ -15937,7 +15937,7 @@ class InitiativePrep {
     }
 }
 exports.InitiativePrep = InitiativePrep;
-},{"../../../helpers":138,"../../../parts/PartsList":192}],95:[function(require,module,exports){
+},{"../../../helpers":140,"../../../parts/PartsList":194}],95:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemPrep = void 0;
@@ -16015,7 +16015,7 @@ class ItemPrep {
     }
 }
 exports.ItemPrep = ItemPrep;
-},{"../../../config":123,"../../../constants":124,"../../../helpers":138,"../../../parts/PartsList":192}],96:[function(require,module,exports){
+},{"../../../config":125,"../../../constants":126,"../../../helpers":140,"../../../parts/PartsList":194}],96:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LimitsPrep = void 0;
@@ -16043,7 +16043,7 @@ class LimitsPrep {
     }
 }
 exports.LimitsPrep = LimitsPrep;
-},{"../../../config":123,"../../../helpers":138,"../../../parts/PartsList":192}],97:[function(require,module,exports){
+},{"../../../config":125,"../../../helpers":140,"../../../parts/PartsList":194}],97:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatrixPrep = void 0;
@@ -16169,7 +16169,7 @@ class MatrixPrep {
     }
 }
 exports.MatrixPrep = MatrixPrep;
-},{"../../../config":123,"../../../helpers":138,"../../../parts/PartsList":192,"./AttributesPrep":92}],98:[function(require,module,exports){
+},{"../../../config":125,"../../../helpers":140,"../../../parts/PartsList":194,"./AttributesPrep":92}],98:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ModifiersPrep = void 0;
@@ -16257,7 +16257,7 @@ class ModifiersPrep {
     }
 }
 exports.ModifiersPrep = ModifiersPrep;
-},{"../../../config":123}],99:[function(require,module,exports){
+},{"../../../config":125}],99:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MovementPrep = void 0;
@@ -16272,7 +16272,7 @@ class MovementPrep {
     }
 }
 exports.MovementPrep = MovementPrep;
-},{"../../../parts/PartsList":192}],100:[function(require,module,exports){
+},{"../../../parts/PartsList":194}],100:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NPCPrep = void 0;
@@ -16316,7 +16316,7 @@ class NPCPrep {
     }
 }
 exports.NPCPrep = NPCPrep;
-},{"../../../constants":124,"../../../data/DataDefaults":125,"../../../parts/PartsList":192,"./AttributesPrep":92}],101:[function(require,module,exports){
+},{"../../../constants":126,"../../../data/DataDefaults":127,"../../../parts/PartsList":194,"./AttributesPrep":92}],101:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports._mergeWithMissingSkillFields = exports.SkillsPrep = void 0;
@@ -16414,7 +16414,7 @@ const _mergeWithMissingSkillFields = (givenSkill) => {
     mergeObject(givenSkill, template, { overwrite: false });
 };
 exports._mergeWithMissingSkillFields = _mergeWithMissingSkillFields;
-},{"../../../config":123,"../../../helpers":138,"../../../parts/PartsList":192}],102:[function(require,module,exports){
+},{"../../../config":125,"../../../helpers":140,"../../../parts/PartsList":194}],102:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WoundsPrep = void 0;
@@ -16457,6 +16457,34 @@ const MoveInventoryDialog_1 = require("../../apps/dialogs/MoveInventoryDialog");
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
 // when opened in succession, causing SkillEditSheet to wrongfully overwrite the wrong data.
 let globalSkillAppId = -1;
+const sortByName = (i1, i2) => {
+    if (i1.name > i2.name)
+        return 1;
+    if (i1.name < i2.name)
+        return -1;
+    return 0;
+};
+const sortByEquipped = (left, right) => {
+    var _a, _b, _c, _d;
+    const leftEquipped = (_b = (_a = left.data) === null || _a === void 0 ? void 0 : _a.technology) === null || _b === void 0 ? void 0 : _b.equipped;
+    const rightEquipped = (_d = (_c = right.data) === null || _c === void 0 ? void 0 : _c.technology) === null || _d === void 0 ? void 0 : _d.equipped;
+    if (leftEquipped && !rightEquipped)
+        return -1;
+    if (rightEquipped && !leftEquipped)
+        return 1;
+    if (left.name > right.name)
+        return 1;
+    if (left.name < right.name)
+        return -1;
+    return 0;
+};
+const sortyByQuality = (a, b) => {
+    if (a.data.type === 'positive' && b.data.type === 'negative')
+        return -1;
+    if (a.data.type === 'negative' && b.data.type === 'positive')
+        return 1;
+    return a.name < b.name ? -1 : 1;
+};
 /**
  * This class should not be used directly but be extended for each actor type.
  *
@@ -16552,13 +16580,13 @@ class SR5BaseActorSheet extends ActorSheet {
         data.filters = this._filters;
         this._prepareActorAttributes(data);
         // Valid data fields for all actor types.
-        // TODO: Remove _prepareItems method.
-        this._prepareItems(data); // All actor types have items.
-        this._prepareActorTypeFields(data); // Actor type fields can be generic.
-        this._prepareSkillsWithFilters(data); // All actor types have skills.
+        this._prepareActorTypeFields(data);
+        this._prepareSkillsWithFilters(data);
+        data.itemType = this._prepareItemTypes(data);
         data.effects = (0, effects_1.prepareActiveEffectCategories)(this.document.effects); // All actor types have effects.
         data.inventories = this._prepareItemsInventory();
-        data.inventory = this._prepareSelectedInventory(data);
+        data.inventory = this._prepareSelectedInventory(data.inventories);
+        data.hasInventory = this._prepareHasInventory(data.inventories);
         data.selectedInventory = this.selectedInventory;
         return data;
     }
@@ -16629,17 +16657,11 @@ class SR5BaseActorSheet extends ActorSheet {
     /**
      * Handle display of item types within the actors inventory section.
      *
-     * Handled means there is some place specific the actor sheet want's these items displayed.
      * Unexpected means there is no use for this type but the user added it anyway.
      * Inventory types means they should always be shown, even if there are none.
      * All other item types will be collected at some tab / place on the sheet.
      */
-    _removeHandledInventory(inventory) {
-        // Remove item types that are specifically handled outside the inventory.
-        const handledTypes = this.getHandledItemTypes();
-        for (const type of handledTypes) {
-            delete inventory.types[type];
-        }
+    _addInventoryItemTypes(inventory) {
         // Show all item types but remove empty unexpected item types.
         const inventoryTypes = this.getInventoryItemTypes();
         for (const type of Object.keys(inventory.types)) {
@@ -17104,17 +17126,13 @@ class SR5BaseActorSheet extends ActorSheet {
                 itemIdInventory[id] = name;
             });
         });
+        const handledTypes = this.getHandledItemTypes();
         // Fill all inventories with items grouped by their type.
         this.document.items.forEach(item => {
-            // Since fields will be added, duplicate the item to avoid those propagating into #update calls.
-            const sheetItem = duplicate(item);
-            // Create ChatData to be displayed in chat and description.
-            const chatData = item.getChatData();
-            // TODO: Add ChatData and ItemSheetData typing.
-            // @ts-ignore
-            sheetItem.description = chatData.description;
-            // @ts-ignore
-            sheetItem.properties = chatData.properties;
+            // Handled types are on the sheet outside the inventory.
+            if (handledTypes.includes(item.type))
+                return;
+            const sheetItem = this._prepareSheetItem(item);
             // TODO: isStack property isn't used elsewhere. Remove if unnecessary.
             // @ts-ignore
             // sheetItem.isStack = sheetItem.data.quantity ? item.data.quantity > 1 : false;
@@ -17133,38 +17151,9 @@ class SR5BaseActorSheet extends ActorSheet {
             // @ts-ignore
             inventory.types[item.type].items.push(sheetItem);
         });
-        // Prepared sorting methods.
-        const sortByName = (i1, i2) => {
-            if (i1.name.toLowerCase() > i2.name.toLowerCase())
-                return 1;
-            if (i1.name.toLowerCase() < i2.name.toLowerCase())
-                return -1;
-            return 0;
-        };
-        const sortByEquipped = (left, right) => {
-            var _a, _b, _c, _d;
-            const leftEquipped = (_b = (_a = left.data) === null || _a === void 0 ? void 0 : _a.technology) === null || _b === void 0 ? void 0 : _b.equipped;
-            const rightEquipped = (_d = (_c = right.data) === null || _c === void 0 ? void 0 : _c.technology) === null || _d === void 0 ? void 0 : _d.equipped;
-            if (leftEquipped && !rightEquipped)
-                return -1;
-            if (rightEquipped && !leftEquipped)
-                return 1;
-            if (left.name > right.name)
-                return 1;
-            if (left.name < right.name)
-                return -1;
-            return 0;
-        };
         Object.values(inventories).forEach(inventory => {
-            this._removeHandledInventory(inventory);
-            // this._addInventoryTypes(inventory);
-            // inventory.types = Object.keys(inventory.types).sort().reduce(
-            //     (obj, key) => {
-            //         obj[key] = inventory.types[key];
-            //         return obj;
-            //     },
-            //     {}
-            // );
+            this._addInventoryItemTypes(inventory);
+            // Sort the items.
             Object.values(inventory.types).forEach((type) => {
                 // TODO: Check if some / all should be sort by equipped.
                 type.items.sort(sortByName);
@@ -17175,164 +17164,70 @@ class SR5BaseActorSheet extends ActorSheet {
     /**
      * Choose the selected inventory to actually display.
      *
-     * @param data
+     * @param inventories
      */
-    _prepareSelectedInventory(data) {
-        return data.inventories[this.selectedInventory];
+    _prepareSelectedInventory(inventories) {
+        return inventories[this.selectedInventory];
+    }
+    /**
+     * Show if any items are in the inventory or if the actor is supposed to have an inventory.
+     *
+     * A sheet is supposed to show an inventory if there are item types defined or an item of some
+     * type exists in any of its inventories.
+     *
+     * @param inventories
+     */
+    _prepareHasInventory(inventories) {
+        if (this.getInventoryItemTypes().length > 0)
+            return true;
+        for (const inventory of Object.values(inventories)) {
+            if (Object.keys(inventory.types).length > 0)
+                return true;
+        }
+        return false;
+    }
+    /**
+     * Enhance an SR5Item by sheet data.
+     *
+     */
+    _prepareSheetItem(item) {
+        const sheetItem = item.toObject();
+        const chatData = item.getChatData();
+        sheetItem.description = chatData.description;
+        // @ts-ignore
+        sheetItem.properties = chatData.properties;
+        return sheetItem;
     }
     /**
      * Prepare Actor Sheet data with item data.
      * @param data An object containing Actor Sheet data, as would be returned by ActorSheet.getData
      */
-    _prepareItems(data) {
-        const inventory = {};
-        // All acting entities should be allowed to carry some protection!
-        inventory['weapon'] = {
-            label: game.i18n.localize('SR5.ItemTypes.Weapon'),
-            items: [],
-            dataset: {
-                type: 'weapon',
-            },
-        };
-        // Critters are people to... Support your local HMHVV support groups!
-        if (this.actor.matchesActorTypes(['character', 'critter', 'vehicle'])) {
-            inventory['armor'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Armor'),
-                items: [],
-                dataset: {
-                    type: 'armor',
-                },
-            };
-            inventory['device'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Device'),
-                items: [],
-                dataset: {
-                    type: 'device',
-                },
-            };
-            inventory['equipment'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Equipment'),
-                items: [],
-                dataset: {
-                    type: 'equipment',
-                },
-            };
-            inventory['ammo'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Ammo'),
-                items: [],
-                dataset: {
-                    type: 'ammo',
-                },
-            };
-            inventory['cyberware'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Cyberware'),
-                items: [],
-                dataset: {
-                    type: 'cyberware',
-                },
-            };
-            inventory['bioware'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Bioware'),
-                items: [],
-                dataset: {
-                    type: 'bioware',
-                },
-            };
-        }
-        let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs, critter_powers, sprite_powers,] = data.items.reduce((arr, item) => {
-            // Duplicate to avoid later updates propagating changed item data.
-            // NOTE: If no duplication is done, added fields will be stored in the database on updates!
-            item = duplicate(item);
-            // Show item properties and description in the item list overviews.
-            const actorItem = this.actor.items.get(item._id);
-            const chatData = actorItem.getChatData();
-            item.description = chatData.description;
-            // @ts-ignore // This is a hacky monkey patch solution to pass template data through duplicated item data.
-            item.properties = chatData.properties;
-            // TODO: isStack property isn't used elsewhere. Remove if unnecessary.
-            item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
-            if (item.type === 'spell')
-                arr[1].push(item);
-            else if (item.type === 'quality')
-                arr[2].push(item);
-            else if (item.type === 'adept_power')
-                arr[3].push(item);
-            else if (item.type === 'action')
-                arr[4].push(item);
-            else if (item.type === 'complex_form')
-                arr[5].push(item);
-            else if (item.type === 'lifestyle')
-                arr[6].push(item);
-            else if (item.type === 'contact')
-                arr[7].push(item);
-            else if (item.type === 'sin')
-                arr[8].push(item);
-            else if (item.type === 'program')
-                arr[9].push(item);
-            else if (item.type === 'critter_power')
-                arr[10].push(item);
-            else if (item.type === 'sprite_power')
-                arr[11].push(item);
-            else if (Object.keys(inventory).includes(item.type))
-                arr[0].push(item);
-            return arr;
-        }, [[], [], [], [], [], [], [], [], [], [], [], []]);
-        const sortByName = (i1, i2) => {
-            if (i1.name > i2.name)
-                return 1;
-            if (i1.name < i2.name)
-                return -1;
-            return 0;
-        };
-        const sortByEquipped = (left, right) => {
-            var _a, _b, _c, _d;
-            const leftEquipped = (_b = (_a = left.data) === null || _a === void 0 ? void 0 : _a.technology) === null || _b === void 0 ? void 0 : _b.equipped;
-            const rightEquipped = (_d = (_c = right.data) === null || _c === void 0 ? void 0 : _c.technology) === null || _d === void 0 ? void 0 : _d.equipped;
-            if (leftEquipped && !rightEquipped)
-                return -1;
-            if (rightEquipped && !leftEquipped)
-                return 1;
-            if (left.name > right.name)
-                return 1;
-            if (left.name < right.name)
-                return -1;
-            return 0;
-        };
-        actions.sort(sortByName);
-        adept_powers.sort(sortByName);
-        complex_forms.sort(sortByName);
-        items.sort(sortByEquipped);
-        spells.sort(sortByName);
-        contacts.sort(sortByName);
-        lifestyles.sort(sortByName);
-        sins.sort(sortByName);
-        programs.sort(sortByEquipped);
-        critter_powers.sort(sortByName);
-        sprite_powers.sort(sortByName);
-        items.forEach((item) => {
-            inventory[item.type].items.push(item);
+    _prepareItemTypes(data) {
+        const itemType = {};
+        // Add all item types in system.
+        Object.keys(CONFIG.Item.typeLabels).forEach(type => {
+            itemType[type] = [];
         });
-        data.inventory = Object.values(inventory);
-        data.magic = {
-            spellbook: spells,
-            powers: adept_powers,
-        };
-        data.actions = actions;
-        data.complex_forms = complex_forms;
-        data.lifestyles = lifestyles;
-        data.contacts = contacts;
-        data.sins = sins;
-        data.programs = programs;
-        data.critter_powers = critter_powers;
-        data.sprite_powers = sprite_powers;
-        qualities.sort((a, b) => {
-            if (a.data.type === 'positive' && b.data.type === 'negative')
-                return -1;
-            if (a.data.type === 'negative' && b.data.type === 'positive')
-                return 1;
-            return a.name < b.name ? -1 : 1;
+        // Add existing items to their types as sheet items
+        this.document.items.forEach((item) => {
+            const sheetItem = this._prepareSheetItem(item);
+            itemType[sheetItem.type].push(sheetItem);
         });
-        data.qualities = qualities;
+        // Sort items for each type.
+        Object.entries(itemType).forEach(([type, items]) => {
+            switch (type) {
+                case 'quality':
+                    items.sort(sortyByQuality);
+                    break;
+                case 'program':
+                    items.sort(sortByEquipped);
+                    break;
+                default:
+                    items.sort(sortByName);
+                    break;
+            }
+        });
+        return itemType;
     }
     /**
      * @param data An object containing Actor Sheet data, as would be returned by ActorSheet.getData
@@ -17813,11 +17708,12 @@ class SR5BaseActorSheet extends ActorSheet {
      * @param action What action to take during later saving event.
      */
     _onInplaceInventoryEdit(event, action = 'edit') {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
             // Disallow editing of default inventory.
             if (action === 'edit' && this.selectedInventory === this.document.defaultInventory.name)
-                return;
+                return (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.warn(game.i18n.localize('SR5.Warnings.CantEditDefaultInventory'));
             $('.selection-inventory').hide();
             $('.inline-input-inventory').show();
             // Mark action and pre-select.
@@ -17906,7 +17802,7 @@ class SR5BaseActorSheet extends ActorSheet {
     }
 }
 exports.SR5BaseActorSheet = SR5BaseActorSheet;
-},{"../../apps/dialogs/MoveInventoryDialog":112,"../../apps/skills/KnowledgeSkillEditSheet":117,"../../apps/skills/LanguageSkillEditSheet":118,"../../apps/skills/SkillEditSheet":119,"../../config":123,"../../effects":130,"../../helpers":138,"../../item/SR5Item":178}],104:[function(require,module,exports){
+},{"../../apps/dialogs/MoveInventoryDialog":114,"../../apps/skills/KnowledgeSkillEditSheet":119,"../../apps/skills/LanguageSkillEditSheet":120,"../../apps/skills/SkillEditSheet":121,"../../config":125,"../../effects":132,"../../helpers":140,"../../item/SR5Item":180}],104:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5CharacterSheet = void 0;
@@ -18037,6 +17933,52 @@ class SR5ICActorSheet extends SR5BaseActorSheet_1.SR5BaseActorSheet {
 exports.SR5ICActorSheet = SR5ICActorSheet;
 },{"./SR5BaseActorSheet":103}],106:[function(require,module,exports){
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SR5SpiritActorSheet = void 0;
+const SR5BaseActorSheet_1 = require("./SR5BaseActorSheet");
+class SR5SpiritActorSheet extends SR5BaseActorSheet_1.SR5BaseActorSheet {
+    /**
+     * Spirit actors will handle these item types specifically.
+     *
+     * All others will be collected within the gear tab.
+     *
+     * @returns An array of item types from the template.json Item section.
+     */
+    getHandledItemTypes() {
+        let itemTypes = super.getHandledItemTypes();
+        return [
+            ...itemTypes,
+            'critter_power',
+            'spell',
+            'quality'
+        ];
+    }
+}
+exports.SR5SpiritActorSheet = SR5SpiritActorSheet;
+},{"./SR5BaseActorSheet":103}],107:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SR5SpriteActorSheet = void 0;
+const SR5BaseActorSheet_1 = require("./SR5BaseActorSheet");
+class SR5SpriteActorSheet extends SR5BaseActorSheet_1.SR5BaseActorSheet {
+    /**
+     * Sprite actors will handle these item types specifically.
+     *
+     * All others will be collected within the gear tab.
+     *
+     * @returns An array of item types from the template.json Item section.
+     */
+    getHandledItemTypes() {
+        let itemTypes = super.getHandledItemTypes();
+        return [
+            ...itemTypes,
+            'sprite_power'
+        ];
+    }
+}
+exports.SR5SpriteActorSheet = SR5SpriteActorSheet;
+},{"./SR5BaseActorSheet":103}],108:[function(require,module,exports){
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -18133,7 +18075,7 @@ class SR5VehicleActorSheet extends SR5BaseActorSheet_1.SR5BaseActorSheet {
     }
 }
 exports.SR5VehicleActorSheet = SR5VehicleActorSheet;
-},{"./SR5BaseActorSheet":103}],107:[function(require,module,exports){
+},{"./SR5BaseActorSheet":103}],109:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChangelogApplication = void 0;
@@ -18168,7 +18110,7 @@ class ChangelogApplication extends Application {
     }
 }
 exports.ChangelogApplication = ChangelogApplication;
-},{"../constants":124}],108:[function(require,module,exports){
+},{"../constants":126}],110:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -18385,7 +18327,7 @@ class EnvModifiersApplication extends Application {
     }
 }
 exports.EnvModifiersApplication = EnvModifiersApplication;
-},{"../actor/SR5Actor":82,"../constants":124,"../helpers":138,"../rules/Modifiers":196}],109:[function(require,module,exports){
+},{"../actor/SR5Actor":82,"../constants":126,"../helpers":140,"../rules/Modifiers":198}],111:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DamageApplicationDialog = void 0;
@@ -18430,7 +18372,7 @@ class DamageApplicationDialog extends FormDialog_1.FormDialog {
     }
 }
 exports.DamageApplicationDialog = DamageApplicationDialog;
-},{"./FormDialog":111}],110:[function(require,module,exports){
+},{"./FormDialog":113}],112:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DeleteConfirmationDialog = void 0;
@@ -18467,7 +18409,7 @@ class DeleteConfirmationDialog extends FormDialog_1.FormDialog {
     }
 }
 exports.DeleteConfirmationDialog = DeleteConfirmationDialog;
-},{"./FormDialog":111}],111:[function(require,module,exports){
+},{"./FormDialog":113}],113:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -18582,7 +18524,7 @@ class FormDialog extends Dialog {
     }
 }
 exports.FormDialog = FormDialog;
-},{}],112:[function(require,module,exports){
+},{}],114:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -18645,7 +18587,7 @@ class MoveInventoryDialog extends FormDialog_1.FormDialog {
     }
 }
 exports.MoveInventoryDialog = MoveInventoryDialog;
-},{"./FormDialog":111}],113:[function(require,module,exports){
+},{"./FormDialog":113}],115:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -18852,7 +18794,7 @@ class ShadowrunActorDialogs {
     }
 }
 exports.ShadowrunActorDialogs = ShadowrunActorDialogs;
-},{"../../actor/flows/SkillFlow":84,"../../config":123,"../../helpers":138,"../../parts/PartsList":192,"./FormDialog":111}],114:[function(require,module,exports){
+},{"../../actor/flows/SkillFlow":84,"../../config":125,"../../helpers":140,"../../parts/PartsList":194,"./FormDialog":113}],116:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -19206,7 +19148,7 @@ class ShadowrunItemDialog {
     }
 }
 exports.ShadowrunItemDialog = ShadowrunItemDialog;
-},{"../../config":123,"../../constants":124,"../../helpers":138,"./FormDialog":111}],115:[function(require,module,exports){
+},{"../../config":125,"../../constants":126,"../../helpers":140,"./FormDialog":113}],117:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -19314,7 +19256,7 @@ class ShadowrunTestDialog {
     }
 }
 exports.ShadowrunTestDialog = ShadowrunTestDialog;
-},{"../../constants":124,"../../helpers":138,"../../parts/PartsList":192,"./FormDialog":111}],116:[function(require,module,exports){
+},{"../../constants":126,"../../helpers":140,"../../parts/PartsList":194,"./FormDialog":113}],118:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -19356,27 +19298,34 @@ var OverwatchScoreTracker = /*#__PURE__*/function (_Application) {
 
   (0, _createClass2["default"])(OverwatchScoreTracker, [{
     key: "getData",
-    value: function getData() {
-      // get list of actors that belong to users
-      var actors = game.users.reduce(function (acc, user) {
+    value: function getData(options) {
+      // Get list of user character actors
+      var actors = this._prepareCharacterActorsData(); // get actors manually added to the tracker by GM
+
+
+      OverwatchScoreTracker.addedActors.forEach(function (id) {
+        var actor = game.actors.get(id);
+
+        if (actor) {
+          actors.push(actor.toObject());
+        }
+      }); // Reference the currently displayed actors for better access.
+
+      this.actors = actors;
+      return {
+        actors: actors
+      };
+    }
+  }, {
+    key: "_prepareCharacterActorsData",
+    value: function _prepareCharacterActorsData() {
+      return game.users.reduce(function (acc, user) {
         if (!user.isGM && user.character) {
-          acc.push(user.character.data);
+          acc.push(user.character.toObject());
         }
 
         return acc;
       }, []);
-      OverwatchScoreTracker.addedActors.forEach(function (id) {
-        var actor = game.actors.find(function (a) {
-          return a._id === id;
-        });
-
-        if (actor) {
-          actors.push(actor.data);
-        }
-      });
-      return {
-        actors: actors
-      };
     }
   }, {
     key: "activateListeners",
@@ -19391,10 +19340,8 @@ var OverwatchScoreTracker = /*#__PURE__*/function (_Application) {
   }, {
     key: "_getActorFromEvent",
     value: function _getActorFromEvent(event) {
-      var id = event.currentTarget.closest('.list-item').dataset.actorId;
-      if (id) return game.actors.find(function (a) {
-        return a._id === id;
-      });
+      var id = $(event.currentTarget).closest('.list-item').data('actorId');
+      if (id) return game.actors.get(id);
     }
   }, {
     key: "_onAddActor",
@@ -19408,16 +19355,43 @@ var OverwatchScoreTracker = /*#__PURE__*/function (_Application) {
       if (tokens.length === 0) {
         var _ui$notifications;
 
-        (_ui$notifications = ui.notifications) === null || _ui$notifications === void 0 ? void 0 : _ui$notifications.warn(game.i18n.localize('SR5.OverwatchScoreTracker.NotifyNoSelectedTokens'));
-        return;
-      }
+        return (_ui$notifications = ui.notifications) === null || _ui$notifications === void 0 ? void 0 : _ui$notifications.warn(game.i18n.localize('SR5.OverwatchScoreTracker.NotifyNoSelectedTokens'));
+      } // Warn user about selected unlinked token actors.
 
-      tokens.forEach(function (token) {
-        var actorId = token.data.actorId;
-        OverwatchScoreTracker.addedActors.push(actorId);
 
-        _this.render();
+      var unlinkedActor = tokens.find(function (token) {
+        return !token.data.actorLink;
       });
+
+      if (unlinkedActor !== undefined) {
+        ui.notifications.warn(game.i18n.localize('SR5.OverwatchScoreTracker.OnlyLinkedActorsSupported'));
+      } // Add linked token actors.
+
+
+      tokens.filter(function (token) {
+        return token.data.actorLink;
+      }).forEach(function (token) {
+        // Double check that the actor actually lives in the actors collection.
+        var actor = game.actors.get(token.data.actorId);
+        if (!actor) return;
+        if (_this._isActorOnTracker(actor)) return;
+        OverwatchScoreTracker.addedActors.push(actor.id);
+      });
+      this.render();
+    }
+    /**
+     * Check if the given actor is already added and displayed on the current tracker.
+     *
+     * @param actor A actors collection actor.
+     * @returns {boolean} Will return true when the given actor already exists.
+     */
+
+  }, {
+    key: "_isActorOnTracker",
+    value: function _isActorOnTracker(actor) {
+      return this.actors.find(function (actorData) {
+        return actorData._id === actor.id;
+      }) !== undefined;
     }
   }, {
     key: "_setOverwatchScore",
@@ -19512,7 +19486,7 @@ exports.OverwatchScoreTracker = OverwatchScoreTracker;
 (0, _defineProperty2["default"])(OverwatchScoreTracker, "MatrixOverwatchDiceCount", '2d6');
 (0, _defineProperty2["default"])(OverwatchScoreTracker, "addedActors", []);
 
-},{"../../helpers":138,"@babel/runtime/helpers/classCallCheck":2,"@babel/runtime/helpers/createClass":3,"@babel/runtime/helpers/defineProperty":4,"@babel/runtime/helpers/get":5,"@babel/runtime/helpers/getPrototypeOf":6,"@babel/runtime/helpers/inherits":7,"@babel/runtime/helpers/interopRequireDefault":8,"@babel/runtime/helpers/possibleConstructorReturn":9}],117:[function(require,module,exports){
+},{"../../helpers":140,"@babel/runtime/helpers/classCallCheck":2,"@babel/runtime/helpers/createClass":3,"@babel/runtime/helpers/defineProperty":4,"@babel/runtime/helpers/get":5,"@babel/runtime/helpers/getPrototypeOf":6,"@babel/runtime/helpers/inherits":7,"@babel/runtime/helpers/interopRequireDefault":8,"@babel/runtime/helpers/possibleConstructorReturn":9}],119:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KnowledgeSkillEditSheet = void 0;
@@ -19527,7 +19501,7 @@ class KnowledgeSkillEditSheet extends LanguageSkillEditSheet_1.LanguageSkillEdit
     }
 }
 exports.KnowledgeSkillEditSheet = KnowledgeSkillEditSheet;
-},{"./LanguageSkillEditSheet":118}],118:[function(require,module,exports){
+},{"./LanguageSkillEditSheet":120}],120:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LanguageSkillEditSheet = void 0;
@@ -19552,7 +19526,7 @@ class LanguageSkillEditSheet extends SkillEditSheet_1.SkillEditSheet {
     }
 }
 exports.LanguageSkillEditSheet = LanguageSkillEditSheet;
-},{"./SkillEditSheet":119}],119:[function(require,module,exports){
+},{"./SkillEditSheet":121}],121:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -19749,7 +19723,7 @@ class SkillEditSheet extends DocumentSheet {
     }
 }
 exports.SkillEditSheet = SkillEditSheet;
-},{"../../config":123}],120:[function(require,module,exports){
+},{"../../config":125}],122:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.measureDistance = void 0;
@@ -19794,7 +19768,7 @@ const measureDistance = function (segments, options = {}) {
     });
 };
 exports.measureDistance = measureDistance;
-},{}],121:[function(require,module,exports){
+},{}],123:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -20191,7 +20165,7 @@ const addRollListeners = (app, html) => {
     }));
 };
 exports.addRollListeners = addRollListeners;
-},{"./actor/SR5Actor":82,"./actor/flows/DamageApplicationFlow":83,"./constants":124,"./helpers":138,"./item/SR5Item":178,"./item/flows/ActionResultFlow":181,"./template":201}],122:[function(require,module,exports){
+},{"./actor/SR5Actor":82,"./actor/flows/DamageApplicationFlow":83,"./constants":126,"./helpers":140,"./item/SR5Item":180,"./item/flows/ActionResultFlow":183,"./template":203}],124:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -20608,7 +20582,7 @@ function _combatantGetInitiativeFormula() {
     return SR5Combat._getSystemInitiativeFormula(combat.initiativePass);
 }
 exports._combatantGetInitiativeFormula = _combatantGetInitiativeFormula;
-},{"../constants":124,"../rules/CombatRules":194,"../sockets":200}],123:[function(require,module,exports){
+},{"../constants":126,"../rules/CombatRules":196,"../sockets":202}],125:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5 = void 0;
@@ -21069,7 +21043,7 @@ exports.SR5 = {
         },
     },
 };
-},{}],124:[function(require,module,exports){
+},{}],126:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR = exports.DEFAULT_ID_LENGTH = exports.SKILL_DEFAULT_NAME = exports.LENGTH_UNIT = exports.DEFAULT_ROLL_NAME = exports.LENGTH_UNIT_TO_METERS_MULTIPLIERS = exports.METATYPEMODIFIER = exports.CORE_FLAGS = exports.CORE_NAME = exports.FLAGS = exports.SYSTEM_SOCKET = exports.SYSTEM_NAME = void 0;
@@ -21213,7 +21187,7 @@ exports.SR = {
         }
     }
 };
-},{}],125:[function(require,module,exports){
+},{}],127:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataDefaults = exports.DefaultValues = void 0;
@@ -21483,7 +21457,7 @@ exports.DataDefaults = {
     },
     damage: DefaultValues.damageData({ type: { base: '', value: '' } }),
 };
-},{"../constants":124}],126:[function(require,module,exports){
+},{"../constants":126}],128:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataWrapper = void 0;
@@ -21493,7 +21467,7 @@ class DataWrapper {
     }
 }
 exports.DataWrapper = DataWrapper;
-},{}],127:[function(require,module,exports){
+},{}],129:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ItemDataWrapper = void 0;
@@ -21809,7 +21783,7 @@ class SR5ItemDataWrapper extends DataWrapper_1.DataWrapper {
     }
 }
 exports.SR5ItemDataWrapper = SR5ItemDataWrapper;
-},{"./DataWrapper":126}],128:[function(require,module,exports){
+},{"./DataWrapper":128}],130:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -21936,7 +21910,7 @@ class SR5ActiveEffect extends ActiveEffect {
     }
 }
 exports.SR5ActiveEffect = SR5ActiveEffect;
-},{"../helpers":138}],129:[function(require,module,exports){
+},{"../helpers":140}],131:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ActiveEffectSheet = void 0;
@@ -21951,7 +21925,7 @@ class SR5ActiveEffectSheet extends ActiveEffectConfig {
     }
 }
 exports.SR5ActiveEffectSheet = SR5ActiveEffectSheet;
-},{}],130:[function(require,module,exports){
+},{}],132:[function(require,module,exports){
 "use strict";
 //@ts-nocheck // This is JavaScript code.
 /**
@@ -22051,7 +22025,7 @@ function prepareActiveEffectCategories(effects) {
     return categories;
 }
 exports.prepareActiveEffectCategories = prepareActiveEffectCategories;
-},{"./helpers":138}],131:[function(require,module,exports){
+},{"./helpers":140}],133:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerAppHelpers = void 0;
@@ -22068,7 +22042,7 @@ const registerAppHelpers = () => {
     });
 };
 exports.registerAppHelpers = registerAppHelpers;
-},{}],132:[function(require,module,exports){
+},{}],134:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerBasicHelpers = void 0;
@@ -22229,7 +22203,7 @@ const registerBasicHelpers = () => {
     });
 };
 exports.registerBasicHelpers = registerBasicHelpers;
-},{"../actor/SR5Actor":82,"../helpers":138}],133:[function(require,module,exports){
+},{"../actor/SR5Actor":82,"../helpers":140}],135:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22263,7 +22237,7 @@ class HandlebarManager {
     }
 }
 exports.HandlebarManager = HandlebarManager;
-},{"./AppHelpers":131,"./BasicHelpers":132,"./HandlebarTemplates":134,"./ItemLineHelpers":135,"./RollAndLabelHelpers":136,"./SkillLineHelpers":137}],134:[function(require,module,exports){
+},{"./AppHelpers":133,"./BasicHelpers":134,"./HandlebarTemplates":136,"./ItemLineHelpers":137,"./RollAndLabelHelpers":138,"./SkillLineHelpers":139}],136:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22281,7 +22255,6 @@ const preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, funct
         // actor tabs
         'systems/shadowrun5e/dist/templates/actor/tabs/ActionsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/BioTab.html',
-        'systems/shadowrun5e/dist/templates/actor/tabs/GearTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/MagicTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/MatrixTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/MiscTab.html',
@@ -22393,7 +22366,7 @@ const preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, funct
     return loadTemplates(templatePaths);
 });
 exports.preloadHandlebarsTemplates = preloadHandlebarsTemplates;
-},{}],135:[function(require,module,exports){
+},{}],137:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerItemLineHelpers = void 0;
@@ -22794,6 +22767,40 @@ const registerItemLineHelpers = () => {
     });
     Handlebars.registerHelper('ItemIcons', function (item) {
         const wrapper = new SR5ItemDataWrapper_1.SR5ItemDataWrapper(item);
+        const editIcon = {
+            icon: 'fas fa-edit item-edit',
+            title: game.i18n.localize('SR5.EditItem'),
+        };
+        const removeIcon = {
+            icon: 'fas fa-trash item-delete',
+            title: game.i18n.localize('SR5.DeleteItem'),
+        };
+        const equipIcon = {
+            icon: `${wrapper.isEquipped() ? 'fas fa-check-circle' : 'far fa-circle'} item-equip-toggle`,
+            title: game.i18n.localize('SR5.ToggleEquip'),
+        };
+        const pdfIcon = {
+            icon: 'fas fa-file open-source-pdf',
+            title: game.i18n.localize('SR5.OpenSourcePdf'),
+        };
+        const icons = [editIcon, removeIcon];
+        if (ui['PDFoundry']) {
+            icons.unshift(pdfIcon);
+        }
+        switch (wrapper.getType()) {
+            case 'program':
+            case 'armor':
+            case 'device':
+            case 'equipment':
+            case 'cyberware':
+            case 'bioware':
+            case 'weapon':
+                icons.unshift(equipIcon);
+        }
+        return icons;
+    });
+    Handlebars.registerHelper('InventoryItemIcons', function (item) {
+        const wrapper = new SR5ItemDataWrapper_1.SR5ItemDataWrapper(item);
         const moveIcon = {
             icon: 'fas fa-exchange-alt inventory-item-move',
             title: game.i18n.localize('SR5.MoveItemInventory')
@@ -22941,7 +22948,7 @@ const registerItemLineHelpers = () => {
     });
 };
 exports.registerItemLineHelpers = registerItemLineHelpers;
-},{"../config":123,"../data/SR5ItemDataWrapper":127}],136:[function(require,module,exports){
+},{"../config":125,"../data/SR5ItemDataWrapper":129}],138:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerRollAndLabelHelpers = void 0;
@@ -23009,7 +23016,7 @@ const registerRollAndLabelHelpers = () => {
     Handlebars.registerHelper('speakerName', helpers_1.Helpers.getChatSpeakerName);
 };
 exports.registerRollAndLabelHelpers = registerRollAndLabelHelpers;
-},{"../helpers":138,"../parts/PartsList":192}],137:[function(require,module,exports){
+},{"../helpers":140,"../parts/PartsList":194}],139:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerSkillLineHelpers = void 0;
@@ -23119,7 +23126,7 @@ const registerSkillLineHelpers = () => {
     });
 };
 exports.registerSkillLineHelpers = registerSkillLineHelpers;
-},{"../constants":124,"../helpers":138,"../rules/SkillRules":197}],138:[function(require,module,exports){
+},{"../constants":126,"../helpers":140,"../rules/SkillRules":199}],140:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -23873,7 +23880,7 @@ class Helpers {
     }
 }
 exports.Helpers = Helpers;
-},{"./apps/dialogs/DeleteConfirmationDialog":110,"./constants":124,"./data/DataDefaults":125,"./parts/PartsList":192}],139:[function(require,module,exports){
+},{"./apps/dialogs/DeleteConfirmationDialog":112,"./constants":126,"./data/DataDefaults":127,"./parts/PartsList":194}],141:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -23912,7 +23919,8 @@ const SR5ActiveEffectSheet_1 = require("./effect/SR5ActiveEffectSheet");
 const NetworkDeviceFlow_1 = require("./item/flows/NetworkDeviceFlow");
 const SR5VehicleActorSheet_1 = require("./actor/sheets/SR5VehicleActorSheet");
 const SR5CharacterSheet_1 = require("./actor/sheets/SR5CharacterSheet");
-const SR5BaseActorSheet_1 = require("./actor/sheets/SR5BaseActorSheet");
+const SR5SpiritActorSheet_1 = require("./actor/sheets/SR5SpiritActorSheet");
+const SR5SpriteActorSheet_1 = require("./actor/sheets/SR5SpriteActorSheet");
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 exports.SR5CONFIG = config_1.SR5;
 class HooksManager {
@@ -23973,26 +23981,30 @@ ___________________
         // Register sheet application classes
         // NOTE: See dnd5e for a multi class approach for all actor types using the types array in Actors.registerSheet
         Actors.unregisterSheet('core', ActorSheet);
-        Actors.registerSheet(constants_1.SYSTEM_NAME, SR5BaseActorSheet_1.SR5BaseActorSheet, {
-            label: "SR5.SheetActor",
-            makeDefault: true,
-            types: ['spirit', 'sprite']
-        });
         Actors.registerSheet(constants_1.SYSTEM_NAME, SR5CharacterSheet_1.SR5CharacterSheet, {
             label: "SR5.SheetActor",
             makeDefault: true,
-            types: ['character']
+            types: ['critter', 'character']
         });
         Actors.registerSheet(constants_1.SYSTEM_NAME, SR5ICActorSheet_1.SR5ICActorSheet, {
             label: "SR5.SheetActor",
             makeDefault: true,
             types: ['ic']
         });
-        // @ts-ignore // getData typing doesn't match.
         Actors.registerSheet(constants_1.SYSTEM_NAME, SR5VehicleActorSheet_1.SR5VehicleActorSheet, {
             label: "SR5.SheetActor",
             makeDefault: true,
             types: ['vehicle']
+        });
+        Actors.registerSheet(constants_1.SYSTEM_NAME, SR5SpiritActorSheet_1.SR5SpiritActorSheet, {
+            label: "SR5.SheetActor",
+            makeDefault: true,
+            types: ['spirit']
+        });
+        Actors.registerSheet(constants_1.SYSTEM_NAME, SR5SpriteActorSheet_1.SR5SpriteActorSheet, {
+            label: "SR5.SheetActor",
+            makeDefault: true,
+            types: ['sprite']
         });
         Items.unregisterSheet('core', ItemSheet);
         Items.registerSheet(constants_1.SYSTEM_NAME, SR5ItemSheet_1.SR5ItemSheet, {
@@ -24181,7 +24193,7 @@ ___________________
     }
 }
 exports.HooksManager = HooksManager;
-},{"../test/quench":203,"./actor/SR5Actor":82,"./actor/sheets/SR5BaseActorSheet":103,"./actor/sheets/SR5CharacterSheet":104,"./actor/sheets/SR5ICActorSheet":105,"./actor/sheets/SR5VehicleActorSheet":106,"./apps/ChangelogApplication":107,"./apps/EnvModifiersApplication":108,"./apps/gmtools/OverwatchScoreTracker":116,"./canvas":120,"./chat":121,"./combat/SR5Combat":122,"./config":123,"./constants":124,"./effect/SR5ActiveEffect":128,"./effect/SR5ActiveEffectSheet":129,"./handlebars/HandlebarManager":133,"./helpers":138,"./importer/apps/import-form":140,"./item/SR5Item":178,"./item/SR5ItemSheet":179,"./item/flows/NetworkDeviceFlow":182,"./macros":184,"./migrator/Migrator":186,"./rolls/ShadowrunRoller":193,"./settings":199,"./token/SR5Token":202}],140:[function(require,module,exports){
+},{"../test/quench":205,"./actor/SR5Actor":82,"./actor/sheets/SR5CharacterSheet":104,"./actor/sheets/SR5ICActorSheet":105,"./actor/sheets/SR5SpiritActorSheet":106,"./actor/sheets/SR5SpriteActorSheet":107,"./actor/sheets/SR5VehicleActorSheet":108,"./apps/ChangelogApplication":109,"./apps/EnvModifiersApplication":110,"./apps/gmtools/OverwatchScoreTracker":118,"./canvas":122,"./chat":123,"./combat/SR5Combat":124,"./config":125,"./constants":126,"./effect/SR5ActiveEffect":130,"./effect/SR5ActiveEffectSheet":131,"./handlebars/HandlebarManager":135,"./helpers":140,"./importer/apps/import-form":142,"./item/SR5Item":180,"./item/SR5ItemSheet":181,"./item/flows/NetworkDeviceFlow":184,"./macros":186,"./migrator/Migrator":188,"./rolls/ShadowrunRoller":195,"./settings":201,"./token/SR5Token":204}],142:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -24363,7 +24375,7 @@ Import.Importers = [
     new DeviceImporter_1.DeviceImporter(),
     new EquipmentImporter_1.EquipmentImporter()
 ];
-},{"../helper/ImportHelper":141,"../importer/AmmoImporter":145,"../importer/ArmorImporter":146,"../importer/ComplexFormImporter":147,"../importer/CritterPowerImporter":149,"../importer/DataImporter":150,"../importer/DeviceImporter":151,"../importer/EquipmentImporter":152,"../importer/ModImporter":153,"../importer/QualityImporter":154,"../importer/SpellImporter":155,"../importer/WareImporter":156,"../importer/WeaponImporter":157}],141:[function(require,module,exports){
+},{"../helper/ImportHelper":143,"../importer/AmmoImporter":147,"../importer/ArmorImporter":148,"../importer/ComplexFormImporter":149,"../importer/CritterPowerImporter":151,"../importer/DataImporter":152,"../importer/DeviceImporter":153,"../importer/EquipmentImporter":154,"../importer/ModImporter":155,"../importer/QualityImporter":156,"../importer/SpellImporter":157,"../importer/WareImporter":158,"../importer/WeaponImporter":159}],143:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -24575,14 +24587,14 @@ class ImportHelper {
 exports.ImportHelper = ImportHelper;
 ImportHelper.CHAR_KEY = '_TEXT';
 ImportHelper.s_Strategy = new XMLStrategy_1.XMLStrategy();
-},{"../importer/Constants":148,"./JSONStrategy":143,"./XMLStrategy":144}],142:[function(require,module,exports){
+},{"../importer/Constants":150,"./JSONStrategy":145,"./XMLStrategy":146}],144:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ImportStrategy = void 0;
 class ImportStrategy {
 }
 exports.ImportStrategy = ImportStrategy;
-},{}],143:[function(require,module,exports){
+},{}],145:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JSONStrategy = void 0;
@@ -24599,7 +24611,7 @@ class JSONStrategy extends ImportStrategy_1.ImportStrategy {
     }
 }
 exports.JSONStrategy = JSONStrategy;
-},{"./ImportStrategy":142}],144:[function(require,module,exports){
+},{"./ImportStrategy":144}],146:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.XMLStrategy = void 0;
@@ -24647,7 +24659,7 @@ class XMLStrategy extends ImportStrategy_1.ImportStrategy {
     }
 }
 exports.XMLStrategy = XMLStrategy;
-},{"./ImportHelper":141,"./ImportStrategy":142}],145:[function(require,module,exports){
+},{"./ImportHelper":143,"./ImportStrategy":144}],147:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -24779,7 +24791,7 @@ class AmmoImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.AmmoImporter = AmmoImporter;
-},{"../../data/DataDefaults":125,"../helper/ImportHelper":141,"./Constants":148,"./DataImporter":150}],146:[function(require,module,exports){
+},{"../../data/DataDefaults":127,"../helper/ImportHelper":143,"./Constants":150,"./DataImporter":152}],148:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -24859,7 +24871,7 @@ class ArmorImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.ArmorImporter = ArmorImporter;
-},{"../../data/DataDefaults":125,"../helper/ImportHelper":141,"../parser/armor/ArmorParserBase":160,"./DataImporter":150}],147:[function(require,module,exports){
+},{"../../data/DataDefaults":127,"../helper/ImportHelper":143,"../parser/armor/ArmorParserBase":162,"./DataImporter":152}],149:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -24961,7 +24973,7 @@ class ComplexFormImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.ComplexFormImporter = ComplexFormImporter;
-},{"../../data/DataDefaults":125,"../helper/ImportHelper":141,"../parser/complex-form/ComplexFormParserBase":161,"./Constants":148,"./DataImporter":150}],148:[function(require,module,exports){
+},{"../../data/DataDefaults":127,"../helper/ImportHelper":143,"../parser/complex-form/ComplexFormParserBase":163,"./Constants":150,"./DataImporter":152}],150:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Constants = void 0;
@@ -25182,7 +25194,7 @@ Constants.WEAPON_RANGES = {
     },
 };
 Constants.ROOT_IMPORT_FOLDER_NAME = 'SR5e';
-},{}],149:[function(require,module,exports){
+},{}],151:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25291,7 +25303,7 @@ class CritterPowerImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.CritterPowerImporter = CritterPowerImporter;
-},{"../../data/DataDefaults":125,"../helper/ImportHelper":141,"../parser/critter-power/CritterPowerParserBase":162,"./Constants":148,"./DataImporter":150}],150:[function(require,module,exports){
+},{"../../data/DataDefaults":127,"../helper/ImportHelper":143,"../parser/critter-power/CritterPowerParserBase":164,"./Constants":150,"./DataImporter":152}],152:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25353,7 +25365,7 @@ class DataImporter {
 }
 exports.DataImporter = DataImporter;
 DataImporter.unsupportedBooks = ['2050'];
-},{"../helper/ImportHelper":141,"xml2js":48}],151:[function(require,module,exports){
+},{"../helper/ImportHelper":143,"xml2js":48}],153:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25478,7 +25490,7 @@ class DeviceImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.DeviceImporter = DeviceImporter;
-},{"../../data/DataDefaults":125,"../helper/ImportHelper":141,"./Constants":148,"./DataImporter":150}],152:[function(require,module,exports){
+},{"../../data/DataDefaults":127,"../helper/ImportHelper":143,"./Constants":150,"./DataImporter":152}],154:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25560,7 +25572,7 @@ class EquipmentImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.EquipmentImporter = EquipmentImporter;
-},{"../../data/DataDefaults":125,"../helper/ImportHelper":141,"./Constants":148,"./DataImporter":150}],153:[function(require,module,exports){
+},{"../../data/DataDefaults":127,"../helper/ImportHelper":143,"./Constants":150,"./DataImporter":152}],155:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25643,7 +25655,7 @@ class ModImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.ModImporter = ModImporter;
-},{"../../data/DataDefaults":125,"../helper/ImportHelper":141,"../parser/mod/ModParserBase":165,"./Constants":148,"./DataImporter":150}],154:[function(require,module,exports){
+},{"../../data/DataDefaults":127,"../helper/ImportHelper":143,"../parser/mod/ModParserBase":167,"./Constants":150,"./DataImporter":152}],156:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25743,7 +25755,7 @@ class QualityImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.QualityImporter = QualityImporter;
-},{"../../data/DataDefaults":125,"../helper/ImportHelper":141,"../parser/quality/QualityParserBase":166,"./DataImporter":150}],155:[function(require,module,exports){
+},{"../../data/DataDefaults":127,"../helper/ImportHelper":143,"../parser/quality/QualityParserBase":168,"./DataImporter":152}],157:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25876,7 +25888,7 @@ class SpellImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.SpellImporter = SpellImporter;
-},{"../../data/DataDefaults":125,"../helper/ImportHelper":141,"../parser/ParserMap":159,"../parser/spell/CombatSpellParser":167,"../parser/spell/DetectionSpellImporter":168,"../parser/spell/IllusionSpellParser":169,"../parser/spell/ManipulationSpellParser":170,"../parser/spell/SpellParserBase":171,"./DataImporter":150}],156:[function(require,module,exports){
+},{"../../data/DataDefaults":127,"../helper/ImportHelper":143,"../parser/ParserMap":161,"../parser/spell/CombatSpellParser":169,"../parser/spell/DetectionSpellImporter":170,"../parser/spell/IllusionSpellParser":171,"../parser/spell/ManipulationSpellParser":172,"../parser/spell/SpellParserBase":173,"./DataImporter":152}],158:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26007,7 +26019,7 @@ class WareImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.WareImporter = WareImporter;
-},{"../../data/DataDefaults":125,"../helper/ImportHelper":141,"../parser/ware/CyberwareParser":172,"./DataImporter":150}],157:[function(require,module,exports){
+},{"../../data/DataDefaults":127,"../helper/ImportHelper":143,"../parser/ware/CyberwareParser":174,"./DataImporter":152}],159:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26163,14 +26175,14 @@ class WeaponImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.WeaponImporter = WeaponImporter;
-},{"../../data/DataDefaults":125,"../helper/ImportHelper":141,"../parser/ParserMap":159,"../parser/weapon/MeleeParser":173,"../parser/weapon/RangedParser":174,"../parser/weapon/ThrownParser":175,"../parser/weapon/WeaponParserBase":176,"./Constants":148,"./DataImporter":150}],158:[function(require,module,exports){
+},{"../../data/DataDefaults":127,"../helper/ImportHelper":143,"../parser/ParserMap":161,"../parser/weapon/MeleeParser":175,"../parser/weapon/RangedParser":176,"../parser/weapon/ThrownParser":177,"../parser/weapon/WeaponParserBase":178,"./Constants":150,"./DataImporter":152}],160:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
 class Parser {
 }
 exports.Parser = Parser;
-},{}],159:[function(require,module,exports){
+},{}],161:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ParserMap = void 0;
@@ -26203,7 +26215,7 @@ class ParserMap extends Parser_1.Parser {
     }
 }
 exports.ParserMap = ParserMap;
-},{"../helper/ImportHelper":141,"./Parser":158}],160:[function(require,module,exports){
+},{"../helper/ImportHelper":143,"./Parser":160}],162:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ArmorParserBase = void 0;
@@ -26218,7 +26230,7 @@ class ArmorParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBas
     }
 }
 exports.ArmorParserBase = ArmorParserBase;
-},{"../../helper/ImportHelper":141,"../item/TechnologyItemParserBase":164}],161:[function(require,module,exports){
+},{"../../helper/ImportHelper":143,"../item/TechnologyItemParserBase":166}],163:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ComplexFormParserBase = void 0;
@@ -26267,7 +26279,7 @@ class ComplexFormParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.ComplexFormParserBase = ComplexFormParserBase;
-},{"../../helper/ImportHelper":141,"../item/ItemParserBase":163}],162:[function(require,module,exports){
+},{"../../helper/ImportHelper":143,"../item/ItemParserBase":165}],164:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CritterPowerParserBase = void 0;
@@ -26328,7 +26340,7 @@ class CritterPowerParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.CritterPowerParserBase = CritterPowerParserBase;
-},{"../../helper/ImportHelper":141,"../item/ItemParserBase":163}],163:[function(require,module,exports){
+},{"../../helper/ImportHelper":143,"../item/ItemParserBase":165}],165:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemParserBase = void 0;
@@ -26349,7 +26361,7 @@ class ItemParserBase extends Parser_1.Parser {
     }
 }
 exports.ItemParserBase = ItemParserBase;
-},{"../../helper/ImportHelper":141,"../Parser":158}],164:[function(require,module,exports){
+},{"../../helper/ImportHelper":143,"../Parser":160}],166:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TechnologyItemParserBase = void 0;
@@ -26365,7 +26377,7 @@ class TechnologyItemParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.TechnologyItemParserBase = TechnologyItemParserBase;
-},{"../../helper/ImportHelper":141,"./ItemParserBase":163}],165:[function(require,module,exports){
+},{"../../helper/ImportHelper":143,"./ItemParserBase":165}],167:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ModParserBase = void 0;
@@ -26383,7 +26395,7 @@ class ModParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBase 
     }
 }
 exports.ModParserBase = ModParserBase;
-},{"../../helper/ImportHelper":141,"../item/TechnologyItemParserBase":164}],166:[function(require,module,exports){
+},{"../../helper/ImportHelper":143,"../item/TechnologyItemParserBase":166}],168:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.QualityParserBase = void 0;
@@ -26405,7 +26417,7 @@ class QualityParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.QualityParserBase = QualityParserBase;
-},{"../../helper/ImportHelper":141,"../item/ItemParserBase":163}],167:[function(require,module,exports){
+},{"../../helper/ImportHelper":143,"../item/ItemParserBase":165}],169:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CombatSpellParser = void 0;
@@ -26430,7 +26442,7 @@ class CombatSpellParser extends SpellParserBase_1.SpellParserBase {
     }
 }
 exports.CombatSpellParser = CombatSpellParser;
-},{"../../helper/ImportHelper":141,"./SpellParserBase":171}],168:[function(require,module,exports){
+},{"../../helper/ImportHelper":143,"./SpellParserBase":173}],170:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DetectionSpellImporter = void 0;
@@ -26467,7 +26479,7 @@ class DetectionSpellImporter extends SpellParserBase_1.SpellParserBase {
     }
 }
 exports.DetectionSpellImporter = DetectionSpellImporter;
-},{"../../helper/ImportHelper":141,"./SpellParserBase":171}],169:[function(require,module,exports){
+},{"../../helper/ImportHelper":143,"./SpellParserBase":173}],171:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IllusionSpellParser = void 0;
@@ -26498,7 +26510,7 @@ class IllusionSpellParser extends SpellParserBase_1.SpellParserBase {
     }
 }
 exports.IllusionSpellParser = IllusionSpellParser;
-},{"../../helper/ImportHelper":141,"./SpellParserBase":171}],170:[function(require,module,exports){
+},{"../../helper/ImportHelper":143,"./SpellParserBase":173}],172:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ManipulationSpellParser = void 0;
@@ -26537,7 +26549,7 @@ class ManipulationSpellParser extends SpellParserBase_1.SpellParserBase {
     }
 }
 exports.ManipulationSpellParser = ManipulationSpellParser;
-},{"../../helper/ImportHelper":141,"./SpellParserBase":171}],171:[function(require,module,exports){
+},{"../../helper/ImportHelper":143,"./SpellParserBase":173}],173:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpellParserBase = void 0;
@@ -26599,7 +26611,7 @@ class SpellParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.SpellParserBase = SpellParserBase;
-},{"../../helper/ImportHelper":141,"../item/ItemParserBase":163}],172:[function(require,module,exports){
+},{"../../helper/ImportHelper":143,"../item/ItemParserBase":165}],174:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CyberwareParser = void 0;
@@ -26620,7 +26632,7 @@ class CyberwareParser extends TechnologyItemParserBase_1.TechnologyItemParserBas
     }
 }
 exports.CyberwareParser = CyberwareParser;
-},{"../../helper/ImportHelper":141,"../item/TechnologyItemParserBase":164}],173:[function(require,module,exports){
+},{"../../helper/ImportHelper":143,"../item/TechnologyItemParserBase":166}],175:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MeleeParser = void 0;
@@ -26667,7 +26679,7 @@ class MeleeParser extends WeaponParserBase_1.WeaponParserBase {
     }
 }
 exports.MeleeParser = MeleeParser;
-},{"../../../data/DataDefaults":125,"../../helper/ImportHelper":141,"./WeaponParserBase":176}],174:[function(require,module,exports){
+},{"../../../data/DataDefaults":127,"../../helper/ImportHelper":143,"./WeaponParserBase":178}],176:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RangedParser = void 0;
@@ -26727,7 +26739,7 @@ class RangedParser extends WeaponParserBase_1.WeaponParserBase {
     }
 }
 exports.RangedParser = RangedParser;
-},{"../../../data/DataDefaults":125,"../../helper/ImportHelper":141,"../../importer/Constants":148,"./WeaponParserBase":176}],175:[function(require,module,exports){
+},{"../../../data/DataDefaults":127,"../../helper/ImportHelper":143,"../../importer/Constants":150,"./WeaponParserBase":178}],177:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ThrownParser = void 0;
@@ -26826,7 +26838,7 @@ class ThrownParser extends WeaponParserBase_1.WeaponParserBase {
     }
 }
 exports.ThrownParser = ThrownParser;
-},{"../../../data/DataDefaults":125,"../../helper/ImportHelper":141,"../../importer/Constants":148,"./WeaponParserBase":176}],176:[function(require,module,exports){
+},{"../../../data/DataDefaults":127,"../../helper/ImportHelper":143,"../../importer/Constants":150,"./WeaponParserBase":178}],178:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WeaponParserBase = void 0;
@@ -26891,7 +26903,7 @@ class WeaponParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBa
     }
 }
 exports.WeaponParserBase = WeaponParserBase;
-},{"../../helper/ImportHelper":141,"../../importer/Constants":148,"../item/TechnologyItemParserBase":164}],177:[function(require,module,exports){
+},{"../../helper/ImportHelper":143,"../../importer/Constants":150,"../item/TechnologyItemParserBase":166}],179:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatData = void 0;
@@ -27237,7 +27249,7 @@ exports.ChatData = {
         }
     },
 };
-},{"../config":123,"../helpers":138}],178:[function(require,module,exports){
+},{"../config":125,"../helpers":140}],180:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -28934,7 +28946,7 @@ class SR5Item extends Item {
     }
 }
 exports.SR5Item = SR5Item;
-},{"../actor/SR5Actor":82,"../actor/flows/SkillFlow":84,"../apps/dialogs/ShadowrunItemDialog":114,"../chat":121,"../config":123,"../constants":124,"../data/DataDefaults":125,"../data/SR5ItemDataWrapper":127,"../helpers":138,"../parts/PartsList":192,"../rolls/ShadowrunRoller":193,"../rules/MatrixRules":195,"./ChatData":177,"./flows/ActionFlow":180,"./flows/NetworkDeviceFlow":182,"./prep/HostPrep":183}],179:[function(require,module,exports){
+},{"../actor/SR5Actor":82,"../actor/flows/SkillFlow":84,"../apps/dialogs/ShadowrunItemDialog":116,"../chat":123,"../config":125,"../constants":126,"../data/DataDefaults":127,"../data/SR5ItemDataWrapper":129,"../helpers":140,"../parts/PartsList":194,"../rolls/ShadowrunRoller":195,"../rules/MatrixRules":197,"./ChatData":179,"./flows/ActionFlow":182,"./flows/NetworkDeviceFlow":184,"./prep/HostPrep":185}],181:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -29516,7 +29528,7 @@ class SR5ItemSheet extends ItemSheet {
     }
 }
 exports.SR5ItemSheet = SR5ItemSheet;
-},{"../config":123,"../effects":130,"../helpers":138,"./SR5Item":178}],180:[function(require,module,exports){
+},{"../config":125,"../effects":132,"../helpers":140,"./SR5Item":180}],182:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ActionFlow = void 0;
@@ -29557,7 +29569,7 @@ class ActionFlow {
     }
 }
 exports.ActionFlow = ActionFlow;
-},{"../../helpers":138}],181:[function(require,module,exports){
+},{"../../helpers":140}],183:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -29588,7 +29600,7 @@ class ActionResultFlow {
     }
 }
 exports.ActionResultFlow = ActionResultFlow;
-},{"../../rules/MatrixRules":195}],182:[function(require,module,exports){
+},{"../../rules/MatrixRules":197}],184:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -29905,7 +29917,7 @@ class NetworkDeviceFlow {
     }
 }
 exports.NetworkDeviceFlow = NetworkDeviceFlow;
-},{"../../constants":124,"../../sockets":200}],183:[function(require,module,exports){
+},{"../../constants":126,"../../sockets":202}],185:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HostPrep = exports.HostDataPreparation = void 0;
@@ -29934,7 +29946,7 @@ class HostPrep {
     }
 }
 exports.HostPrep = HostPrep;
-},{"../../rules/MatrixRules":195}],184:[function(require,module,exports){
+},{"../../rules/MatrixRules":197}],186:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -30057,7 +30069,7 @@ function rollSkillMacro(skillLabel) {
     });
 }
 exports.rollSkillMacro = rollSkillMacro;
-},{"./helpers":138}],185:[function(require,module,exports){
+},{"./helpers":140}],187:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const HandlebarManager_1 = require("./handlebars/HandlebarManager");
@@ -30067,7 +30079,7 @@ const hooks_1 = require("./hooks");
 /* -------------------------------------------- */
 hooks_1.HooksManager.registerHooks();
 HandlebarManager_1.HandlebarManager.registerHelpers();
-},{"./handlebars/HandlebarManager":133,"./hooks":139}],186:[function(require,module,exports){
+},{"./handlebars/HandlebarManager":135,"./hooks":141}],188:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -30213,7 +30225,7 @@ Migrator.s_Versions = [
     { versionNumber: Version0_6_10_1.Version0_6_10.TargetVersion, migration: new Version0_6_10_1.Version0_6_10() },
     { versionNumber: Version0_7_2_1.Version0_7_2.TargetVersion, migration: new Version0_7_2_1.Version0_7_2() },
 ];
-},{"./VersionMigration":187,"./versions/LegacyMigration":188,"./versions/Version0_6_10":189,"./versions/Version0_6_5":190,"./versions/Version0_7_2":191}],187:[function(require,module,exports){
+},{"./VersionMigration":189,"./versions/LegacyMigration":190,"./versions/Version0_6_10":191,"./versions/Version0_6_5":192,"./versions/Version0_7_2":193}],189:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -30648,7 +30660,7 @@ exports.VersionMigration = VersionMigration;
 VersionMigration.MODULE_NAME = 'shadowrun5e';
 VersionMigration.KEY_DATA_VERSION = 'systemMigrationVersion';
 VersionMigration.NO_VERSION = '0';
-},{}],188:[function(require,module,exports){
+},{}],190:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -30877,7 +30889,7 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
     }
 }
 exports.LegacyMigration = LegacyMigration;
-},{"../VersionMigration":187}],189:[function(require,module,exports){
+},{"../VersionMigration":189}],191:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -30937,7 +30949,7 @@ class Version0_6_10 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_6_10 = Version0_6_10;
-},{"../VersionMigration":187}],190:[function(require,module,exports){
+},{"../VersionMigration":189}],192:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -30987,7 +30999,7 @@ class Version0_6_5 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_6_5 = Version0_6_5;
-},{"../VersionMigration":187}],191:[function(require,module,exports){
+},{"../VersionMigration":189}],193:[function(require,module,exports){
 "use strict";
 // TODO: How to trigger test migration.
 // TODO: How to test migration results?
@@ -31064,7 +31076,7 @@ class Version0_7_2 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_7_2 = Version0_7_2;
-},{"../../config":123,"../VersionMigration":187}],192:[function(require,module,exports){
+},{"../../config":125,"../VersionMigration":189}],194:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PartsList = void 0;
@@ -31167,7 +31179,7 @@ class PartsList {
     }
 }
 exports.PartsList = PartsList;
-},{}],193:[function(require,module,exports){
+},{}],195:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -31552,7 +31564,7 @@ class ShadowrunRoller {
     }
 }
 exports.ShadowrunRoller = ShadowrunRoller;
-},{"../apps/dialogs/ShadowrunTestDialog":115,"../chat":121,"../constants":124,"../helpers":138,"../parts/PartsList":192}],194:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunTestDialog":117,"../chat":123,"../constants":126,"../helpers":140,"../parts/PartsList":194}],196:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CombatRules = void 0;
@@ -31596,7 +31608,7 @@ class CombatRules {
     }
 }
 exports.CombatRules = CombatRules;
-},{"../constants":124}],195:[function(require,module,exports){
+},{"../constants":126}],197:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatrixRules = void 0;
@@ -31671,7 +31683,7 @@ class MatrixRules {
     }
 }
 exports.MatrixRules = MatrixRules;
-},{"../constants":124}],196:[function(require,module,exports){
+},{"../constants":126}],198:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -31868,7 +31880,7 @@ class Modifiers {
     }
 }
 exports.Modifiers = Modifiers;
-},{"../constants":124}],197:[function(require,module,exports){
+},{"../constants":126}],199:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SkillRules = void 0;
@@ -31909,7 +31921,7 @@ class SkillRules {
     }
 }
 exports.SkillRules = SkillRules;
-},{"../constants":124}],198:[function(require,module,exports){
+},{"../constants":126}],200:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SoakRules = void 0;
@@ -32109,7 +32121,7 @@ class SoakRules {
     }
 }
 exports.SoakRules = SoakRules;
-},{"../config":123,"../helpers":138}],199:[function(require,module,exports){
+},{"../config":125,"../helpers":140}],201:[function(require,module,exports){
 "use strict";
 // game settings for shadowrun 5e
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -32226,7 +32238,7 @@ const registerSystemSettings = () => {
     });
 };
 exports.registerSystemSettings = registerSystemSettings;
-},{"./constants":124,"./migrator/VersionMigration":187}],200:[function(require,module,exports){
+},{"./constants":126,"./migrator/VersionMigration":189}],202:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -32277,7 +32289,7 @@ class SocketMessage {
     }
 }
 exports.SocketMessage = SocketMessage;
-},{"./constants":124}],201:[function(require,module,exports){
+},{"./constants":126}],203:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -32393,7 +32405,7 @@ class Template extends MeasuredTemplate {
     }
 }
 exports.default = Template;
-},{}],202:[function(require,module,exports){
+},{}],204:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5Token = void 0;
@@ -32414,7 +32426,7 @@ class SR5Token extends Token {
     }
 }
 exports.SR5Token = SR5Token;
-},{"../constants":124}],203:[function(require,module,exports){
+},{"../constants":126}],205:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.quenchRegister = void 0;
@@ -32436,7 +32448,7 @@ const quenchRegister = quench => {
     quench.registerBatch("shadowrun5e.flow.networkDevices", sr5_NetworkDevices_spec_1.shadowrunNetworkDevices);
 };
 exports.quenchRegister = quenchRegister;
-},{"./sr5.NetworkDevices.spec":204}],204:[function(require,module,exports){
+},{"./sr5.NetworkDevices.spec":206}],206:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -32594,7 +32606,7 @@ const shadowrunNetworkDevices = context => {
     });
 };
 exports.shadowrunNetworkDevices = shadowrunNetworkDevices;
-},{"../module/actor/SR5Actor":82,"../module/item/SR5Item":178,"../module/item/flows/NetworkDeviceFlow":182,"./utils":205}],205:[function(require,module,exports){
+},{"../module/actor/SR5Actor":82,"../module/item/SR5Item":180,"../module/item/flows/NetworkDeviceFlow":184,"./utils":207}],207:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -32638,6 +32650,6 @@ class SR5TestingDocuments {
     }
 }
 exports.SR5TestingDocuments = SR5TestingDocuments;
-},{}]},{},[185])
+},{}]},{},[187])
 
 //# sourceMappingURL=bundle.js.map

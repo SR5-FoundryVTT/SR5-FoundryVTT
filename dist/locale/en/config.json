@@ -430,6 +430,10 @@
   "SR5.NoSelectableToken": "Actor has no selectable token on canvas",
   "SR5.MissingItemForOpposedTest": "Opposed Test can't be rolled due to the acting item now missing",
   "SR5.TargetingNeedsActorWithToken": "The current actor needs a linked token for targeting to work",
+  "SR5.OverwatchScoreTracker": {
+    "NotifyNoSelectedTokens": "At least one linked token must be selected.",
+    "OnlyLinkedActorsSupported": "Only linked actors are supported. Selected tokens with unlinked actors will be ignored."
+  },
   "SR5.OverwatchScore": "Overwatch Score",
   "SR5.OverwatchScoreTrackerTitle": "Mr. Johnson's Baby Monitor",
   "SR5.PlusFifteenMinutes": "+15min",
@@ -837,7 +841,8 @@
     "SkillCantBeDefault": "This skill can't be rolled on as it can't be defaulted",
     "HostItemOnlyAcceptIC": "Only IC actors can be added to hosts",
     "InvalidMarksCount": "You've trying to place a strange number of marks",
-    "AlreadyExistingInventory": "An inventory with this name alreayd exists"
+    "AlreadyExistingInventory": "An inventory with this name alreayd exists",
+    "CantEditDefaultInventory": "The default inventory can't be renamed"
   },
   "SR5.Errors": {
     "MissingSkill": "The actor doesn't have the requested skill.",
