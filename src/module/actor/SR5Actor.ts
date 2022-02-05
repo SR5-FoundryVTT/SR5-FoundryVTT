@@ -2172,10 +2172,12 @@ export class SR5Actor extends Actor {
      * TODO: Add Typing to method.
      */
     async createInventory(name) {
+        console.log(`Shadowrun 5e | Creating inventory ${name}`);
+
         if (this.hasInventory(name)) return ui.notifications?.warn(game.i18n.localize('SR5.Errors.InventoryAlreadyExists'));
         if (this.defaultInventory.name === name) return;
 
-        return await this.update({
+        const updateData = {
             'data.inventories': {
                 [name]: {
                     name,
@@ -2183,7 +2185,10 @@ export class SR5Actor extends Actor {
                     itemIds: []
                 }
             }
-        })
+        };
+
+        console.log(`Shadowrun 5e | Executing update to create inventory`, updateData)
+        return await this.update(updateData)
     }
 
     /**
@@ -2194,6 +2199,8 @@ export class SR5Actor extends Actor {
      */
     // TODO: When an item has no inventory, it will be placed into default, no? Abort in that case.
     async removeInventory(name: string, moveTo: string = this.defaultInventory.name) {
+        console.log(`Shadowrun 5e | Removing inventory ${name}. Moving items over to ${moveTo}`);
+
         if (this.defaultInventory.name === name)
             return ui.notifications?.error(game.i18n.localize('SR5.Errors.DefaultInventoryCantBeRemoved'));
 
@@ -2216,6 +2223,7 @@ export class SR5Actor extends Actor {
             ];
         }
 
+        console.log(`Shadowrun 5e | Executing update to remove inventory`, updateData);
         await this.update(updateData);
     }
 
@@ -2226,6 +2234,8 @@ export class SR5Actor extends Actor {
      * @param newName The new name of the inventory.
      */
     async renameInventory(current: string, newName: string) {
+        console.log(`Shadowrun 5e | Renaming the inventory ${current} to ${newName}`);
+
         if (this.defaultInventory.name === current) return;
         if (current === newName) return;
 
@@ -2242,6 +2252,8 @@ export class SR5Actor extends Actor {
                 [newName]:  inventory
             }
         };
+
+        console.log(`Shadowrun 5e | Executing update to rename inventory`, updateData);
         await this.update(updateData);
     }
 
@@ -2281,6 +2293,8 @@ export class SR5Actor extends Actor {
      * @param removeFromCurrent By default the item added will be removed from another inventory it might be in.
      */
     async addItemsToInventory(name: string, items: SR5Item[] | SR5Item, removeFromCurrent: boolean = true) {
+        console.log(`Shadowrun 5e | Adding items to to inventory ${name}`, items);
+
         // Default inventory is valid target here.
         if (this.defaultInventory.name !== name && !this.hasInventory(name)) return;
         if (items instanceof SR5Item) items = [items];
@@ -2296,7 +2310,11 @@ export class SR5Actor extends Actor {
         for (const item of items) {
             if (item.id) this.data.data.inventories[name].itemIds.push(item.id);
         }
-        await this.update({[`data.inventories.${name}.itemIds`]: this.data.data.inventories[name].itemIds});
+
+        const updateData = {[`data.inventories.${name}.itemIds`]: this.data.data.inventories[name].itemIds};
+
+        console.log(`Shadowrun 5e | Executing adding items to inventory`, updateData);
+        await this.update();
     }
 
     /**
@@ -2306,6 +2324,8 @@ export class SR5Actor extends Actor {
      * @param name The one inventory to remove it from. If empty, will collect all inventories the item is in.
      */
     async removeItemFromInventory(item: SR5Item, name?: string) {
+        console.log(`Shadowrun 5e | Removing item from inventory (${name})`, item);
+
         // The default inventory is not actual inventory.
         if (this.defaultInventory.name === name) return;
 
@@ -2321,6 +2341,7 @@ export class SR5Actor extends Actor {
             updateData[`data.inventories.${inventory.name}.itemIds`] = itemIds;
         }
 
+        console.log(`Shadowrun 5e | Executing update to remove item`, updateData);
         if (updateData) await this.update(updateData);
     }
 }

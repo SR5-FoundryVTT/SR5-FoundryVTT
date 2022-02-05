@@ -226,6 +226,8 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.inventory-edit').on('click', this._onInplaceInventoryEdit.bind(this));
         html.find('.inventory-input-cancel').on('click', this._onInplaceInventoryEditCancel.bind(this));
         html.find('.inventory-input-save').on('click', this._onInplaceInventoryEditSave.bind(this));
+        html.find('input#input-inventory').on('keydown', this._onInplaceInventoryEditCancel.bind(this));
+        html.find('input#input-inventory').on('keydown', this._onInplaceInventoryEditSave.bind(this));
         html.find('#select-inventory').on('change', this._onSelectInventory.bind(this));
         html.find('.inventory-item-move').on('click', this._onItemMoveToInventory.bind(this));
 
@@ -1388,9 +1390,12 @@ export class SR5BaseActorSheet extends ActorSheet {
      * Hide inline inventory editing and show inventory selection instead.
      *
      * Cancel edit workflow and do nothing.
-     * @param event
+     *
+     * @param event Can be an event of type click or keydown.
      */
     async _onInplaceInventoryEditCancel(event) {
+        if (event.type === 'keydown' && event.code !== 'Escape') return;
+
         event.preventDefault();
 
         $('.selection-inventory').show();
@@ -1405,10 +1410,11 @@ export class SR5BaseActorSheet extends ActorSheet {
     /**
      * Complete inline editing and either save changes or create a missing inventory.
      *
-     * @param event
+     * @param event Either a click or keydown event.
      */
-    // TODO: Editing doesn't work, as it will assume that it must be created.
     async _onInplaceInventoryEditSave(event) {
+        if (event.type === 'keydown' && event.code !== 'Enter') return;
+
         event.preventDefault();
 
         const inputElement = $('#input-inventory');
