@@ -432,6 +432,10 @@
   "SR5.NoSelectableToken": "Actor has no selectable token on canvas",
   "SR5.MissingItemForOpposedTest": "Opposed Test can't be rolled due to the acting item now missing",
   "SR5.TargetingNeedsActorWithToken": "The current actor needs a linked token for targeting to work",
+  "SR5.OverwatchScoreTracker": {
+    "NotifyNoSelectedTokens": "At least one linked token must be selected.",
+    "OnlyLinkedActorsSupported": "Only linked actors are supported. Selected tokens with unlinked actors will be ignored."
+  },
   "SR5.OverwatchScore": "Overwatch Score",
   "SR5.OverwatchScoreTrackerTitle": "Mr. Johnson's Baby Monitor",
   "SR5.PlusFifteenMinutes": "+15min",
