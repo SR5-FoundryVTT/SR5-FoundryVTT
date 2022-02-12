@@ -385,7 +385,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         // Add any created items to the selected inventory.
         if (Array.isArray(documents)) {
             const items = documents.filter(document => document instanceof SR5Item);
-            await this.document.addItemsToInventory(this.selectedInventory, items);
+            await this.document.inventory.addItems(this.selectedInventory, items);
         }
 
         return documents;
@@ -479,7 +479,7 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         // Add the item to the selected inventory.
         if (this.selectedInventory !== this.document.defaultInventory.name)
-            await this.document.addItemsToInventory(this.selectedInventory, items);
+            await this.document.inventory.addItems(this.selectedInventory, items);
     }
 
     async _onItemEdit(event) {
@@ -1356,7 +1356,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         const userConsented = await Helpers.confirmDeletion();
         if (!userConsented) return;
 
-        await this.document.removeInventory(this.selectedInventory);
+        await this.document.inventory.remove(this.selectedInventory);
 
         // Preselect default instead of none.
         this.selectedInventory = this.document.defaultInventory.name;
@@ -1424,10 +1424,10 @@ export class SR5BaseActorSheet extends ActorSheet {
 
         switch (action) {
             case 'edit':
-                await this.document.renameInventory(this.selectedInventory, inventory);
+                await this.document.inventory.rename(this.selectedInventory, inventory);
                 break;
             case 'create':
-                await this.document.createInventory(inventory);
+                await this.document.inventory.create(inventory);
                 break;
         }
 
@@ -1470,6 +1470,6 @@ export class SR5BaseActorSheet extends ActorSheet {
         const inventory = await dialog.select();
         if (dialog.canceled) return;
 
-        await this.document.addItemsToInventory(inventory, item);
+        await this.document.inventory.addItems(inventory, item);
     }
 }

@@ -59,6 +59,7 @@ import MarkedDocument = Shadowrun.MarkedDocument;
 import MatrixMarks = Shadowrun.MatrixMarks;
 import InventoryData = Shadowrun.InventoryData;
 import InventoriesData = Shadowrun.InventoriesData;
+import {InventoryFlow} from "./flows/InventoryFlow";
 
 function getGame(): Game {
     if (!(game instanceof Game)) {
@@ -88,6 +89,15 @@ export class SR5Actor extends Actor {
         name: 'Carried',
         label: 'SR5.Labels.Inventory.Carried',
         itemIds: []
+    }
+
+    // Holds all operations related to this actors inventory.
+    inventory: InventoryFlow;
+
+    constructor(data, context?) {
+        super(data, context);
+
+        this.inventory = new InventoryFlow(this);
     }
 
     getOverwatchScore() {
@@ -2163,188 +2173,5 @@ export class SR5Actor extends Actor {
                 marks,
                 markId
             }))
-    }
-
-    /**
-     * Create an inventory place for gear organization.
-     * @param name How to name the inventory, will also be it's label for custom inventories.
-     *
-     * TODO: Add Typing to method.
-     */
-    async createInventory(name) {
-        console.log(`Shadowrun 5e | Creating inventory ${name}`);
-
-        if (this.hasInventory(name)) return ui.notifications?.warn(game.i18n.localize('SR5.Errors.InventoryAlreadyExists'));
-        if (this.defaultInventory.name === name) return;
-
-        const updateData = {
-            'data.inventories': {
-                [name]: {
-                    name,
-                    label: name,
-                    itemIds: []
-                }
-            }
-        };
-
-        console.log(`Shadowrun 5e | Executing update to create inventory`, updateData)
-        return await this.update(updateData)
-    }
-
-    /**
-     * Remove an actors inventory and maybe move the containing items over to another one.
-     *
-     * @param name The inventory name to be removed.
-     * @param moveTo The inventory name items need to moved over to, otherwise the default inventory.
-     */
-    // TODO: When an item has no inventory, it will be placed into default, no? Abort in that case.
-    async removeInventory(name: string, moveTo: string = this.defaultInventory.name) {
-        console.log(`Shadowrun 5e | Removing inventory ${name}. Moving items over to ${moveTo}`);
-
-        if (this.defaultInventory.name === name)
-            return ui.notifications?.error(game.i18n.localize('SR5.Errors.DefaultInventoryCantBeRemoved'));
-
-        if (!this.hasInventory(name))
-            return console.error(`Shadowrun 5e | Can't remove inventory ${name} or move its items over to inventory ${moveTo}`);
-
-        // Move items over to default in case of missing target inventory.
-        if (!this.hasInventory(moveTo))
-            moveTo = this.defaultInventory.name;
-
-        // Prepare deletion of inventory.
-        const updateData = Helpers.getDeleteKeyUpdateData('data.inventories', name);
-
-        // Default inventory is virtual, so only none default inventories need to have their items merged.
-        if (this.defaultInventory.name !== moveTo) {
-            // @ts-ignore
-            updateData[`data.inventories.${moveTo}.itemIds`] = [
-                ...this.data.data.inventories[name].itemIds,
-                ...this.data.data.inventories[moveTo].itemIds
-            ];
-        }
-
-        console.log(`Shadowrun 5e | Executing update to remove inventory`, updateData);
-        await this.update(updateData);
-    }
-
-    /**
-     * Rename an existing inventory to a new name.
-     *
-     * @param current The old name of the inventory.
-     * @param newName The new name of the inventory.
-     */
-    async renameInventory(current: string, newName: string) {
-        console.log(`Shadowrun 5e | Renaming the inventory ${current} to ${newName}`);
-
-        if (this.defaultInventory.name === current) return;
-        if (current === newName) return;
-
-        const inventory = this.getInventory(current);
-        if (!inventory) return;
-
-        // Change internal and display name.
-        inventory.name = newName;
-        inventory.label = newName;
-
-        const updateData = {
-            'data.inventories': {
-                [`-=${current}`]: null,
-                [newName]:  inventory
-            }
-        };
-
-        console.log(`Shadowrun 5e | Executing update to rename inventory`, updateData);
-        await this.update(updateData);
-    }
-
-    /**
-     * Does this actor have the given inventory already?
-     *
-     * Note: Comparisons will only be against lower case.
-     *
-     * @param name The inventory name.
-     */
-    hasInventory(name): boolean {
-        return name === Object.keys(this.data.data.inventories)
-                              .find(inventory => inventory.toLowerCase() === name.toLowerCase());
-    }
-
-    /**
-     * Helper to get inventory data
-     *
-     * @param name The inventory name to return.
-     */
-    getInventory(name): InventoryData | undefined {
-        return this.data.data.inventories[name];
-    }
-
-    /**
-     * Helper to get all inventories of this actor.
-     */
-    getInventories(): InventoriesData {
-        return this.data.data.inventories;
-    }
-
-    /**
-     * Add an array of items to the given inventory.
-     *
-     * @param name The inventory to add the items to.
-     * @param items The items in question. A single item can be given.
-     * @param removeFromCurrent By default the item added will be removed from another inventory it might be in.
-     */
-    async addItemsToInventory(name: string, items: SR5Item[] | SR5Item, removeFromCurrent: boolean = true) {
-        console.log(`Shadowrun 5e | Adding items to to inventory ${name}`, items);
-
-        // Default inventory is valid target here.
-        if (this.defaultInventory.name !== name && !this.hasInventory(name)) return;
-        if (items instanceof SR5Item) items = [items];
-        if (items.length === 0) return;
-
-        if (removeFromCurrent) {
-            for (const item of items) await this.removeItemFromInventory(item);
-        }
-
-        // Default inventory is no actual inventory that needs to be added to.
-        if (this.defaultInventory.name === name) return;
-
-        for (const item of items) {
-            if (item.id) this.data.data.inventories[name].itemIds.push(item.id);
-        }
-
-        const updateData = {[`data.inventories.${name}.itemIds`]: this.data.data.inventories[name].itemIds};
-
-        console.log(`Shadowrun 5e | Executing adding items to inventory`, updateData);
-        await this.update(updateData);
-    }
-
-    /**
-     * Remove the given item from one or any inventory it might be in.
-     *
-     * @param item The item to be removed.
-     * @param name The one inventory to remove it from. If empty, will search for inventory the item is in.
-     */
-    async removeItemFromInventory(item: SR5Item, name?: string) {
-        console.log(`Shadowrun 5e | Removing item from inventory (${name})`, item);
-
-        // The default inventory is not actual inventory.
-        if (this.defaultInventory.name === name) return;
-
-        // Collect affected inventories.
-        const inventories = name ?
-            [this.data.data.inventories[name]] :
-            Object.values(this.data.data.inventories).filter(({itemIds}) => itemIds.includes(item.id as string));
-
-        // No inventory found means, it's in the default inventory and no removal is needed.
-        if (inventories.length === 0) return;
-
-        // Collect all inventories with remaining ids after the item's been removed.
-        const updateData = {};
-        for (const inventory of inventories) {
-            const itemIds = inventory.itemIds.filter(id => id !== item.id);
-            updateData[`data.inventories.${inventory.name}.itemIds`] = itemIds;
-        }
-
-        console.log(`Shadowrun 5e | Executing update to remove item`, updateData);
-        if (updateData) await this.update(updateData);
     }
 }
