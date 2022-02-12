@@ -7,11 +7,13 @@ import {SR5Actor} from "../SR5Actor";
 import {KnowledgeSkillEditSheet} from "../../apps/skills/KnowledgeSkillEditSheet";
 import {LanguageSkillEditSheet} from "../../apps/skills/LanguageSkillEditSheet";
 import {MoveInventoryDialog} from "../../apps/dialogs/MoveInventoryDialog";
+import {ChummerImportForm} from '../../apps/chummer-import-form';
 import SR5SheetFilters = Shadowrun.SR5SheetFilters;
 import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
 import SkillField = Shadowrun.SkillField;
 import Skills = Shadowrun.Skills;
 import MatrixAttribute = Shadowrun.MatrixAttribute;
+import DeviceData = Shadowrun.DeviceData;
 
 
 /**
@@ -274,6 +276,11 @@ export class SR5BaseActorSheet extends ActorSheet {
         html.find('.show-hidden-skills').on('click', this._onShowHiddenSkills.bind(this));
         html.find('.open-source-pdf').on('click', this._onOpenSourcePDF.bind(this));
         html.find('.list-item').each(this._addDragSupportToListItemTemplatePartial.bind(this));
+        html.find('.import-character').on('click', this._onShowImportCharacter.bind(this));
+
+        // Misc. item type actions...
+        html.find('.reload-ammo').on('click', this._onReloadAmmo.bind(this));
+        html.find('.matrix-att-selector').on('change', this._onMatrixAttributeSelected.bind(this));
     }
 
     /**
@@ -894,6 +901,7 @@ export class SR5BaseActorSheet extends ActorSheet {
         data.isCritter = this.actor.isCritter();
         data.hasSkills = this.actor.hasSkills;
         data.hasSpecial = this.actor.hasSpecial;
+        data.hasFullDefense = this.actor.hasFullDefense;
     }
 
     async _onMarksQuantityChange(event) {
@@ -1475,5 +1483,69 @@ export class SR5BaseActorSheet extends ActorSheet {
         if (dialog.canceled) return;
 
         await this.document.inventory.addItems(inventory, item);
+    }
+
+    /**
+     * Initiative a reload from a sheet event.
+     *
+     * @param event
+     */
+     async _onReloadAmmo(event) {
+        event.preventDefault();
+        const iid = Helpers.listItemId(event);
+        const item = this.actor.items.get(iid);
+        if (item) return item.reloadAmmo();
+    }
+
+    /**
+     * Sync matrix attribute changes (order) made on the actor sheet into item data.
+     *
+     * @param event
+     */
+    async _onMatrixAttributeSelected(event) {
+        if (!("matrix" in this.actor.data.data)) return;
+
+        let iid = this.actor.data.data.matrix.device;
+        let item = this.actor.items.get(iid);
+        if (!item) {
+            console.error('could not find item');
+            return;
+        }
+        // grab matrix attribute (sleaze, attack, etc.)
+        let att = event.currentTarget.dataset.att;
+        // grab device attribute (att1, att2, ...)
+        let deviceAtt = event.currentTarget.value;
+
+        // get current matrix attribute on the device
+        const deviceData = item.data.data as DeviceData;
+        let oldVal = deviceData.atts[deviceAtt].att;
+        let data = {
+            _id: iid,
+        };
+
+        // go through atts on device, setup matrix attributes on it
+        for (let i = 1; i <= 4; i++) {
+            let tmp = `att${i}`;
+            let key = `data.atts.att${i}.att`;
+            if (tmp === deviceAtt) {
+                data[key] = att;
+            } else if (deviceData.atts[`att${i}`].att === att) {
+                data[key] = oldVal;
+            }
+        }
+        await this.actor.updateEmbeddedDocuments('Item', [data]);
+    }
+
+    /**
+     * Open the Chummer Character import handling.
+     * @param event
+     */
+    _onShowImportCharacter(event) {
+        event.preventDefault();
+        const options = {
+            name: 'chummer-import',
+            title: 'Chummer Import',
+        };
+        new ChummerImportForm(this.actor, options).render(true);
     }
 }
