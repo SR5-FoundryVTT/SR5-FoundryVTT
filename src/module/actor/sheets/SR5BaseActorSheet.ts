@@ -496,6 +496,10 @@ export class SR5BaseActorSheet extends ActorSheet {
         if (!userConsented) return;
 
         const iid = Helpers.listItemId(event);
+        const item = this.actor.items.get(iid);
+        if (!item) return;
+        await this.actor.inventory.removeItem(item);
+
         return await this.actor.deleteEmbeddedDocuments('Item', [iid]);
     }
 
