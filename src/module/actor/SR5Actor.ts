@@ -2314,14 +2314,14 @@ export class SR5Actor extends Actor {
         const updateData = {[`data.inventories.${name}.itemIds`]: this.data.data.inventories[name].itemIds};
 
         console.log(`Shadowrun 5e | Executing adding items to inventory`, updateData);
-        await this.update();
+        await this.update(updateData);
     }
 
     /**
      * Remove the given item from one or any inventory it might be in.
      *
      * @param item The item to be removed.
-     * @param name The one inventory to remove it from. If empty, will collect all inventories the item is in.
+     * @param name The one inventory to remove it from. If empty, will search for inventory the item is in.
      */
     async removeItemFromInventory(item: SR5Item, name?: string) {
         console.log(`Shadowrun 5e | Removing item from inventory (${name})`, item);
@@ -2333,6 +2333,9 @@ export class SR5Actor extends Actor {
         const inventories = name ?
             [this.data.data.inventories[name]] :
             Object.values(this.data.data.inventories).filter(({itemIds}) => itemIds.includes(item.id as string));
+
+        // No inventory found means, it's in the default inventory and no removal is needed.
+        if (inventories.length === 0) return;
 
         // Collect all inventories with remaining ids after the item's been removed.
         const updateData = {};
