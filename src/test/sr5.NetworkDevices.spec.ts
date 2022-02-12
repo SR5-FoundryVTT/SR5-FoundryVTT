@@ -23,7 +23,6 @@ export const shadowrunNetworkDevices = context => {
     })
 
     describe('Network Devices handling', () => {
-        console.warn('Shadowrun 5e | Network Device unittests can take a long time. When combined with an attached debugger, this might cause timeout errors...');
         // TODO: Redesign them with only necessary update methods in place. Instead start of with ActorData prefilled on create.
         it('Should give a network link to given document class', async () => {
             const actor = await testActor.create({'type': 'character'});
