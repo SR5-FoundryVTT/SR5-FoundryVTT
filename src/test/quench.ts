@@ -5,6 +5,7 @@ import {shadowrunSR5Actor} from "./sr5.SR5Actor.spec";
 import {shadowrunSR5ActorDataPrep} from "./sr5.ActorDataPrep.spec";
 import {shadowrunSR5ActiveEffect} from "./sr5.ActiveEffect.spec";
 import {shadowrunNetworkDevices} from "./sr5.NetworkDevices.spec";
+import {shadowrunInventoryFlow} from "./sr5.Inventory.spec";
 
 /**
  * Register FoundryVTT Quench test batches...
@@ -21,4 +22,5 @@ export const quenchRegister = quench => {
     quench.registerBatch("shadowrun5e.entities.effects", shadowrunSR5ActiveEffect);
     quench.registerBatch("shadowrun5e.data_prep.actor", shadowrunSR5ActorDataPrep);
     quench.registerBatch("shadowrun5e.flow.networkDevices", shadowrunNetworkDevices);
+    quench.registerBatch("shadowrun5e.flow.inventory", shadowrunInventoryFlow);
 };
