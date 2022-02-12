@@ -14,11 +14,11 @@ import {shadowrunNetworkDevices} from "./sr5.NetworkDevices.spec";
  * NOTE: Unfortunately FVTT-Quench has no working FoundryVTT 0.8 support and will cause bugs within Foundry.
  */
 export const quenchRegister = quench => {
-    // quench.registerBatch("shadowrun5e.rules.matrix", shadowrunMatrix);
-    // quench.registerBatch("shadowrun5e.rules.modifiers", shadowrunRulesModifiers);
-    // quench.registerBatch("shadowrun5e.entities.items", shadowrunSR5Item);
-    // quench.registerBatch("shadowrun5e.entities.actors", shadowrunSR5Actor);
-    // quench.registerBatch("shadowrun5e.entities.effects", shadowrunSR5ActiveEffect);
-    // quench.registerBatch("shadowrun5e.data_prep.actor", shadowrunSR5ActorDataPrep);
+    quench.registerBatch("shadowrun5e.rules.matrix", shadowrunMatrix);
+    quench.registerBatch("shadowrun5e.rules.modifiers", shadowrunRulesModifiers);
+    quench.registerBatch("shadowrun5e.entities.items", shadowrunSR5Item);
+    quench.registerBatch("shadowrun5e.entities.actors", shadowrunSR5Actor);
+    quench.registerBatch("shadowrun5e.entities.effects", shadowrunSR5ActiveEffect);
+    quench.registerBatch("shadowrun5e.data_prep.actor", shadowrunSR5ActorDataPrep);
     quench.registerBatch("shadowrun5e.flow.networkDevices", shadowrunNetworkDevices);
 };
