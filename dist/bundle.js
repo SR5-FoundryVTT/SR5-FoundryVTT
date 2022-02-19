@@ -10,6 +10,45 @@ function _assertThisInitialized(self) {
 module.exports = _assertThisInitialized;
 module.exports["default"] = module.exports, module.exports.__esModule = true;
 },{}],2:[function(require,module,exports){
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+  try {
+    var info = gen[key](arg);
+    var value = info.value;
+  } catch (error) {
+    reject(error);
+    return;
+  }
+
+  if (info.done) {
+    resolve(value);
+  } else {
+    Promise.resolve(value).then(_next, _throw);
+  }
+}
+
+function _asyncToGenerator(fn) {
+  return function () {
+    var self = this,
+        args = arguments;
+    return new Promise(function (resolve, reject) {
+      var gen = fn.apply(self, args);
+
+      function _next(value) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+      }
+
+      function _throw(err) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+      }
+
+      _next(undefined);
+    });
+  };
+}
+
+module.exports = _asyncToGenerator;
+module.exports["default"] = module.exports, module.exports.__esModule = true;
+},{}],3:[function(require,module,exports){
 function _classCallCheck(instance, Constructor) {
   if (!(instance instanceof Constructor)) {
     throw new TypeError("Cannot call a class as a function");
@@ -18,7 +57,7 @@ function _classCallCheck(instance, Constructor) {
 
 module.exports = _classCallCheck;
 module.exports["default"] = module.exports, module.exports.__esModule = true;
-},{}],3:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 function _defineProperties(target, props) {
   for (var i = 0; i < props.length; i++) {
     var descriptor = props[i];
@@ -37,7 +76,7 @@ function _createClass(Constructor, protoProps, staticProps) {
 
 module.exports = _createClass;
 module.exports["default"] = module.exports, module.exports.__esModule = true;
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 function _defineProperty(obj, key, value) {
   if (key in obj) {
     Object.defineProperty(obj, key, {
@@ -55,7 +94,7 @@ function _defineProperty(obj, key, value) {
 
 module.exports = _defineProperty;
 module.exports["default"] = module.exports, module.exports.__esModule = true;
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 var superPropBase = require("./superPropBase.js");
 
 function _get(target, property, receiver) {
@@ -83,7 +122,7 @@ function _get(target, property, receiver) {
 
 module.exports = _get;
 module.exports["default"] = module.exports, module.exports.__esModule = true;
-},{"./superPropBase.js":11}],6:[function(require,module,exports){
+},{"./superPropBase.js":12}],7:[function(require,module,exports){
 function _getPrototypeOf(o) {
   module.exports = _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) {
     return o.__proto__ || Object.getPrototypeOf(o);
@@ -94,7 +133,7 @@ function _getPrototypeOf(o) {
 
 module.exports = _getPrototypeOf;
 module.exports["default"] = module.exports, module.exports.__esModule = true;
-},{}],7:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 var setPrototypeOf = require("./setPrototypeOf.js");
 
 function _inherits(subClass, superClass) {
@@ -114,7 +153,7 @@ function _inherits(subClass, superClass) {
 
 module.exports = _inherits;
 module.exports["default"] = module.exports, module.exports.__esModule = true;
-},{"./setPrototypeOf.js":10}],8:[function(require,module,exports){
+},{"./setPrototypeOf.js":11}],9:[function(require,module,exports){
 function _interopRequireDefault(obj) {
   return obj && obj.__esModule ? obj : {
     "default": obj
@@ -123,7 +162,7 @@ function _interopRequireDefault(obj) {
 
 module.exports = _interopRequireDefault;
 module.exports["default"] = module.exports, module.exports.__esModule = true;
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 var _typeof = require("@babel/runtime/helpers/typeof")["default"];
 
 var assertThisInitialized = require("./assertThisInitialized.js");
@@ -138,7 +177,7 @@ function _possibleConstructorReturn(self, call) {
 
 module.exports = _possibleConstructorReturn;
 module.exports["default"] = module.exports, module.exports.__esModule = true;
-},{"./assertThisInitialized.js":1,"@babel/runtime/helpers/typeof":12}],10:[function(require,module,exports){
+},{"./assertThisInitialized.js":1,"@babel/runtime/helpers/typeof":13}],11:[function(require,module,exports){
 function _setPrototypeOf(o, p) {
   module.exports = _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) {
     o.__proto__ = p;
@@ -151,7 +190,7 @@ function _setPrototypeOf(o, p) {
 
 module.exports = _setPrototypeOf;
 module.exports["default"] = module.exports, module.exports.__esModule = true;
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 var getPrototypeOf = require("./getPrototypeOf.js");
 
 function _superPropBase(object, property) {
@@ -165,7 +204,7 @@ function _superPropBase(object, property) {
 
 module.exports = _superPropBase;
 module.exports["default"] = module.exports, module.exports.__esModule = true;
-},{"./getPrototypeOf.js":6}],12:[function(require,module,exports){
+},{"./getPrototypeOf.js":7}],13:[function(require,module,exports){
 function _typeof(obj) {
   "@babel/helpers - typeof";
 
@@ -188,7 +227,10 @@ function _typeof(obj) {
 
 module.exports = _typeof;
 module.exports["default"] = module.exports, module.exports.__esModule = true;
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
+module.exports = require("regenerator-runtime");
+
+},{"regenerator-runtime":39}],15:[function(require,module,exports){
 'use strict'
 
 exports.byteLength = byteLength
@@ -342,9 +384,9 @@ function fromByteArray (uint8) {
   return parts.join('')
 }
 
-},{}],14:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 
-},{}],15:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 (function (Buffer){
 /*!
  * The buffer module from node.js, for the browser.
@@ -2126,7 +2168,7 @@ function numberIsNaN (obj) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"base64-js":13,"buffer":15,"ieee754":18}],16:[function(require,module,exports){
+},{"base64-js":15,"buffer":17,"ieee754":20}],18:[function(require,module,exports){
 (function (Buffer){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -2238,7 +2280,7 @@ function objectToString(o) {
 
 }).call(this,{"isBuffer":require("../../is-buffer/index.js")})
 
-},{"../../is-buffer/index.js":20}],17:[function(require,module,exports){
+},{"../../is-buffer/index.js":22}],19:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -2763,7 +2805,7 @@ function functionBindPolyfill(context) {
   };
 }
 
-},{}],18:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 exports.read = function (buffer, offset, isLE, mLen, nBytes) {
   var e, m
   var eLen = (nBytes * 8) - mLen - 1
@@ -2849,7 +2891,7 @@ exports.write = function (buffer, value, offset, isLE, mLen, nBytes) {
   buffer[offset + i - d] |= s * 128
 }
 
-},{}],19:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -2878,7 +2920,7 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],20:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 /*!
  * Determine if an object is a Buffer
  *
@@ -2901,14 +2943,14 @@ function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
-},{}],21:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 var toString = {}.toString;
 
 module.exports = Array.isArray || function (arr) {
   return toString.call(arr) == '[object Array]';
 };
 
-},{}],22:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -2958,7 +3000,7 @@ function nextTick(fn, arg1, arg2, arg3) {
 
 }).call(this,require('_process'))
 
-},{"_process":23}],23:[function(require,module,exports){
+},{"_process":25}],25:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -3144,10 +3186,10 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],24:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 module.exports = require('./lib/_stream_duplex.js');
 
-},{"./lib/_stream_duplex.js":25}],25:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":27}],27:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -3279,7 +3321,7 @@ Duplex.prototype._destroy = function (err, cb) {
 
   pna.nextTick(cb, err);
 };
-},{"./_stream_readable":27,"./_stream_writable":29,"core-util-is":16,"inherits":19,"process-nextick-args":22}],26:[function(require,module,exports){
+},{"./_stream_readable":29,"./_stream_writable":31,"core-util-is":18,"inherits":21,"process-nextick-args":24}],28:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -3327,7 +3369,7 @@ function PassThrough(options) {
 PassThrough.prototype._transform = function (chunk, encoding, cb) {
   cb(null, chunk);
 };
-},{"./_stream_transform":28,"core-util-is":16,"inherits":19}],27:[function(require,module,exports){
+},{"./_stream_transform":30,"core-util-is":18,"inherits":21}],29:[function(require,module,exports){
 (function (process,global){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -4350,7 +4392,7 @@ function indexOf(xs, x) {
 }
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./_stream_duplex":25,"./internal/streams/BufferList":30,"./internal/streams/destroy":31,"./internal/streams/stream":32,"_process":23,"core-util-is":16,"events":17,"inherits":19,"isarray":21,"process-nextick-args":22,"safe-buffer":37,"string_decoder/":40,"util":14}],28:[function(require,module,exports){
+},{"./_stream_duplex":27,"./internal/streams/BufferList":32,"./internal/streams/destroy":33,"./internal/streams/stream":34,"_process":25,"core-util-is":18,"events":19,"inherits":21,"isarray":23,"process-nextick-args":24,"safe-buffer":40,"string_decoder/":43,"util":16}],30:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -4565,7 +4607,7 @@ function done(stream, er, data) {
 
   return stream.push(null);
 }
-},{"./_stream_duplex":25,"core-util-is":16,"inherits":19}],29:[function(require,module,exports){
+},{"./_stream_duplex":27,"core-util-is":18,"inherits":21}],31:[function(require,module,exports){
 (function (process,global,setImmediate){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -5256,7 +5298,7 @@ Writable.prototype._destroy = function (err, cb) {
 };
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {},require("timers").setImmediate)
 
-},{"./_stream_duplex":25,"./internal/streams/destroy":31,"./internal/streams/stream":32,"_process":23,"core-util-is":16,"inherits":19,"process-nextick-args":22,"safe-buffer":37,"timers":41,"util-deprecate":42}],30:[function(require,module,exports){
+},{"./_stream_duplex":27,"./internal/streams/destroy":33,"./internal/streams/stream":34,"_process":25,"core-util-is":18,"inherits":21,"process-nextick-args":24,"safe-buffer":40,"timers":44,"util-deprecate":45}],32:[function(require,module,exports){
 'use strict';
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -5336,7 +5378,7 @@ if (util && util.inspect && util.inspect.custom) {
     return this.constructor.name + ' ' + obj;
   };
 }
-},{"safe-buffer":37,"util":14}],31:[function(require,module,exports){
+},{"safe-buffer":40,"util":16}],33:[function(require,module,exports){
 'use strict';
 
 /*<replacement>*/
@@ -5411,13 +5453,13 @@ module.exports = {
   destroy: destroy,
   undestroy: undestroy
 };
-},{"process-nextick-args":22}],32:[function(require,module,exports){
+},{"process-nextick-args":24}],34:[function(require,module,exports){
 module.exports = require('events').EventEmitter;
 
-},{"events":17}],33:[function(require,module,exports){
+},{"events":19}],35:[function(require,module,exports){
 module.exports = require('./readable').PassThrough
 
-},{"./readable":34}],34:[function(require,module,exports){
+},{"./readable":36}],36:[function(require,module,exports){
 exports = module.exports = require('./lib/_stream_readable.js');
 exports.Stream = exports;
 exports.Readable = exports;
@@ -5426,13 +5468,763 @@ exports.Duplex = require('./lib/_stream_duplex.js');
 exports.Transform = require('./lib/_stream_transform.js');
 exports.PassThrough = require('./lib/_stream_passthrough.js');
 
-},{"./lib/_stream_duplex.js":25,"./lib/_stream_passthrough.js":26,"./lib/_stream_readable.js":27,"./lib/_stream_transform.js":28,"./lib/_stream_writable.js":29}],35:[function(require,module,exports){
+},{"./lib/_stream_duplex.js":27,"./lib/_stream_passthrough.js":28,"./lib/_stream_readable.js":29,"./lib/_stream_transform.js":30,"./lib/_stream_writable.js":31}],37:[function(require,module,exports){
 module.exports = require('./readable').Transform
 
-},{"./readable":34}],36:[function(require,module,exports){
+},{"./readable":36}],38:[function(require,module,exports){
 module.exports = require('./lib/_stream_writable.js');
 
-},{"./lib/_stream_writable.js":29}],37:[function(require,module,exports){
+},{"./lib/_stream_writable.js":31}],39:[function(require,module,exports){
+/**
+ * Copyright (c) 2014-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+var runtime = (function (exports) {
+  "use strict";
+
+  var Op = Object.prototype;
+  var hasOwn = Op.hasOwnProperty;
+  var undefined; // More compressible than void 0.
+  var $Symbol = typeof Symbol === "function" ? Symbol : {};
+  var iteratorSymbol = $Symbol.iterator || "@@iterator";
+  var asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator";
+  var toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag";
+
+  function define(obj, key, value) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+    return obj[key];
+  }
+  try {
+    // IE 8 has a broken Object.defineProperty that only works on DOM objects.
+    define({}, "");
+  } catch (err) {
+    define = function(obj, key, value) {
+      return obj[key] = value;
+    };
+  }
+
+  function wrap(innerFn, outerFn, self, tryLocsList) {
+    // If outerFn provided and outerFn.prototype is a Generator, then outerFn.prototype instanceof Generator.
+    var protoGenerator = outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator;
+    var generator = Object.create(protoGenerator.prototype);
+    var context = new Context(tryLocsList || []);
+
+    // The ._invoke method unifies the implementations of the .next,
+    // .throw, and .return methods.
+    generator._invoke = makeInvokeMethod(innerFn, self, context);
+
+    return generator;
+  }
+  exports.wrap = wrap;
+
+  // Try/catch helper to minimize deoptimizations. Returns a completion
+  // record like context.tryEntries[i].completion. This interface could
+  // have been (and was previously) designed to take a closure to be
+  // invoked without arguments, but in all the cases we care about we
+  // already have an existing method we want to call, so there's no need
+  // to create a new function object. We can even get away with assuming
+  // the method takes exactly one argument, since that happens to be true
+  // in every case, so we don't have to touch the arguments object. The
+  // only additional allocation required is the completion record, which
+  // has a stable shape and so hopefully should be cheap to allocate.
+  function tryCatch(fn, obj, arg) {
+    try {
+      return { type: "normal", arg: fn.call(obj, arg) };
+    } catch (err) {
+      return { type: "throw", arg: err };
+    }
+  }
+
+  var GenStateSuspendedStart = "suspendedStart";
+  var GenStateSuspendedYield = "suspendedYield";
+  var GenStateExecuting = "executing";
+  var GenStateCompleted = "completed";
+
+  // Returning this object from the innerFn has the same effect as
+  // breaking out of the dispatch switch statement.
+  var ContinueSentinel = {};
+
+  // Dummy constructor functions that we use as the .constructor and
+  // .constructor.prototype properties for functions that return Generator
+  // objects. For full spec compliance, you may wish to configure your
+  // minifier not to mangle the names of these two functions.
+  function Generator() {}
+  function GeneratorFunction() {}
+  function GeneratorFunctionPrototype() {}
+
+  // This is a polyfill for %IteratorPrototype% for environments that
+  // don't natively support it.
+  var IteratorPrototype = {};
+  IteratorPrototype[iteratorSymbol] = function () {
+    return this;
+  };
+
+  var getProto = Object.getPrototypeOf;
+  var NativeIteratorPrototype = getProto && getProto(getProto(values([])));
+  if (NativeIteratorPrototype &&
+      NativeIteratorPrototype !== Op &&
+      hasOwn.call(NativeIteratorPrototype, iteratorSymbol)) {
+    // This environment has a native %IteratorPrototype%; use it instead
+    // of the polyfill.
+    IteratorPrototype = NativeIteratorPrototype;
+  }
+
+  var Gp = GeneratorFunctionPrototype.prototype =
+    Generator.prototype = Object.create(IteratorPrototype);
+  GeneratorFunction.prototype = Gp.constructor = GeneratorFunctionPrototype;
+  GeneratorFunctionPrototype.constructor = GeneratorFunction;
+  GeneratorFunction.displayName = define(
+    GeneratorFunctionPrototype,
+    toStringTagSymbol,
+    "GeneratorFunction"
+  );
+
+  // Helper for defining the .next, .throw, and .return methods of the
+  // Iterator interface in terms of a single ._invoke method.
+  function defineIteratorMethods(prototype) {
+    ["next", "throw", "return"].forEach(function(method) {
+      define(prototype, method, function(arg) {
+        return this._invoke(method, arg);
+      });
+    });
+  }
+
+  exports.isGeneratorFunction = function(genFun) {
+    var ctor = typeof genFun === "function" && genFun.constructor;
+    return ctor
+      ? ctor === GeneratorFunction ||
+        // For the native GeneratorFunction constructor, the best we can
+        // do is to check its .name property.
+        (ctor.displayName || ctor.name) === "GeneratorFunction"
+      : false;
+  };
+
+  exports.mark = function(genFun) {
+    if (Object.setPrototypeOf) {
+      Object.setPrototypeOf(genFun, GeneratorFunctionPrototype);
+    } else {
+      genFun.__proto__ = GeneratorFunctionPrototype;
+      define(genFun, toStringTagSymbol, "GeneratorFunction");
+    }
+    genFun.prototype = Object.create(Gp);
+    return genFun;
+  };
+
+  // Within the body of any async function, `await x` is transformed to
+  // `yield regeneratorRuntime.awrap(x)`, so that the runtime can test
+  // `hasOwn.call(value, "__await")` to determine if the yielded value is
+  // meant to be awaited.
+  exports.awrap = function(arg) {
+    return { __await: arg };
+  };
+
+  function AsyncIterator(generator, PromiseImpl) {
+    function invoke(method, arg, resolve, reject) {
+      var record = tryCatch(generator[method], generator, arg);
+      if (record.type === "throw") {
+        reject(record.arg);
+      } else {
+        var result = record.arg;
+        var value = result.value;
+        if (value &&
+            typeof value === "object" &&
+            hasOwn.call(value, "__await")) {
+          return PromiseImpl.resolve(value.__await).then(function(value) {
+            invoke("next", value, resolve, reject);
+          }, function(err) {
+            invoke("throw", err, resolve, reject);
+          });
+        }
+
+        return PromiseImpl.resolve(value).then(function(unwrapped) {
+          // When a yielded Promise is resolved, its final value becomes
+          // the .value of the Promise<{value,done}> result for the
+          // current iteration.
+          result.value = unwrapped;
+          resolve(result);
+        }, function(error) {
+          // If a rejected Promise was yielded, throw the rejection back
+          // into the async generator function so it can be handled there.
+          return invoke("throw", error, resolve, reject);
+        });
+      }
+    }
+
+    var previousPromise;
+
+    function enqueue(method, arg) {
+      function callInvokeWithMethodAndArg() {
+        return new PromiseImpl(function(resolve, reject) {
+          invoke(method, arg, resolve, reject);
+        });
+      }
+
+      return previousPromise =
+        // If enqueue has been called before, then we want to wait until
+        // all previous Promises have been resolved before calling invoke,
+        // so that results are always delivered in the correct order. If
+        // enqueue has not been called before, then it is important to
+        // call invoke immediately, without waiting on a callback to fire,
+        // so that the async generator function has the opportunity to do
+        // any necessary setup in a predictable way. This predictability
+        // is why the Promise constructor synchronously invokes its
+        // executor callback, and why async functions synchronously
+        // execute code before the first await. Since we implement simple
+        // async functions in terms of async generators, it is especially
+        // important to get this right, even though it requires care.
+        previousPromise ? previousPromise.then(
+          callInvokeWithMethodAndArg,
+          // Avoid propagating failures to Promises returned by later
+          // invocations of the iterator.
+          callInvokeWithMethodAndArg
+        ) : callInvokeWithMethodAndArg();
+    }
+
+    // Define the unified helper method that is used to implement .next,
+    // .throw, and .return (see defineIteratorMethods).
+    this._invoke = enqueue;
+  }
+
+  defineIteratorMethods(AsyncIterator.prototype);
+  AsyncIterator.prototype[asyncIteratorSymbol] = function () {
+    return this;
+  };
+  exports.AsyncIterator = AsyncIterator;
+
+  // Note that simple async functions are implemented on top of
+  // AsyncIterator objects; they just return a Promise for the value of
+  // the final result produced by the iterator.
+  exports.async = function(innerFn, outerFn, self, tryLocsList, PromiseImpl) {
+    if (PromiseImpl === void 0) PromiseImpl = Promise;
+
+    var iter = new AsyncIterator(
+      wrap(innerFn, outerFn, self, tryLocsList),
+      PromiseImpl
+    );
+
+    return exports.isGeneratorFunction(outerFn)
+      ? iter // If outerFn is a generator, return the full iterator.
+      : iter.next().then(function(result) {
+          return result.done ? result.value : iter.next();
+        });
+  };
+
+  function makeInvokeMethod(innerFn, self, context) {
+    var state = GenStateSuspendedStart;
+
+    return function invoke(method, arg) {
+      if (state === GenStateExecuting) {
+        throw new Error("Generator is already running");
+      }
+
+      if (state === GenStateCompleted) {
+        if (method === "throw") {
+          throw arg;
+        }
+
+        // Be forgiving, per 25.3.3.3.3 of the spec:
+        // https://people.mozilla.org/~jorendorff/es6-draft.html#sec-generatorresume
+        return doneResult();
+      }
+
+      context.method = method;
+      context.arg = arg;
+
+      while (true) {
+        var delegate = context.delegate;
+        if (delegate) {
+          var delegateResult = maybeInvokeDelegate(delegate, context);
+          if (delegateResult) {
+            if (delegateResult === ContinueSentinel) continue;
+            return delegateResult;
+          }
+        }
+
+        if (context.method === "next") {
+          // Setting context._sent for legacy support of Babel's
+          // function.sent implementation.
+          context.sent = context._sent = context.arg;
+
+        } else if (context.method === "throw") {
+          if (state === GenStateSuspendedStart) {
+            state = GenStateCompleted;
+            throw context.arg;
+          }
+
+          context.dispatchException(context.arg);
+
+        } else if (context.method === "return") {
+          context.abrupt("return", context.arg);
+        }
+
+        state = GenStateExecuting;
+
+        var record = tryCatch(innerFn, self, context);
+        if (record.type === "normal") {
+          // If an exception is thrown from innerFn, we leave state ===
+          // GenStateExecuting and loop back for another invocation.
+          state = context.done
+            ? GenStateCompleted
+            : GenStateSuspendedYield;
+
+          if (record.arg === ContinueSentinel) {
+            continue;
+          }
+
+          return {
+            value: record.arg,
+            done: context.done
+          };
+
+        } else if (record.type === "throw") {
+          state = GenStateCompleted;
+          // Dispatch the exception by looping back around to the
+          // context.dispatchException(context.arg) call above.
+          context.method = "throw";
+          context.arg = record.arg;
+        }
+      }
+    };
+  }
+
+  // Call delegate.iterator[context.method](context.arg) and handle the
+  // result, either by returning a { value, done } result from the
+  // delegate iterator, or by modifying context.method and context.arg,
+  // setting context.delegate to null, and returning the ContinueSentinel.
+  function maybeInvokeDelegate(delegate, context) {
+    var method = delegate.iterator[context.method];
+    if (method === undefined) {
+      // A .throw or .return when the delegate iterator has no .throw
+      // method always terminates the yield* loop.
+      context.delegate = null;
+
+      if (context.method === "throw") {
+        // Note: ["return"] must be used for ES3 parsing compatibility.
+        if (delegate.iterator["return"]) {
+          // If the delegate iterator has a return method, give it a
+          // chance to clean up.
+          context.method = "return";
+          context.arg = undefined;
+          maybeInvokeDelegate(delegate, context);
+
+          if (context.method === "throw") {
+            // If maybeInvokeDelegate(context) changed context.method from
+            // "return" to "throw", let that override the TypeError below.
+            return ContinueSentinel;
+          }
+        }
+
+        context.method = "throw";
+        context.arg = new TypeError(
+          "The iterator does not provide a 'throw' method");
+      }
+
+      return ContinueSentinel;
+    }
+
+    var record = tryCatch(method, delegate.iterator, context.arg);
+
+    if (record.type === "throw") {
+      context.method = "throw";
+      context.arg = record.arg;
+      context.delegate = null;
+      return ContinueSentinel;
+    }
+
+    var info = record.arg;
+
+    if (! info) {
+      context.method = "throw";
+      context.arg = new TypeError("iterator result is not an object");
+      context.delegate = null;
+      return ContinueSentinel;
+    }
+
+    if (info.done) {
+      // Assign the result of the finished delegate to the temporary
+      // variable specified by delegate.resultName (see delegateYield).
+      context[delegate.resultName] = info.value;
+
+      // Resume execution at the desired location (see delegateYield).
+      context.next = delegate.nextLoc;
+
+      // If context.method was "throw" but the delegate handled the
+      // exception, let the outer generator proceed normally. If
+      // context.method was "next", forget context.arg since it has been
+      // "consumed" by the delegate iterator. If context.method was
+      // "return", allow the original .return call to continue in the
+      // outer generator.
+      if (context.method !== "return") {
+        context.method = "next";
+        context.arg = undefined;
+      }
+
+    } else {
+      // Re-yield the result returned by the delegate method.
+      return info;
+    }
+
+    // The delegate iterator is finished, so forget it and continue with
+    // the outer generator.
+    context.delegate = null;
+    return ContinueSentinel;
+  }
+
+  // Define Generator.prototype.{next,throw,return} in terms of the
+  // unified ._invoke helper method.
+  defineIteratorMethods(Gp);
+
+  define(Gp, toStringTagSymbol, "Generator");
+
+  // A Generator should always return itself as the iterator object when the
+  // @@iterator function is called on it. Some browsers' implementations of the
+  // iterator prototype chain incorrectly implement this, causing the Generator
+  // object to not be returned from this call. This ensures that doesn't happen.
+  // See https://github.com/facebook/regenerator/issues/274 for more details.
+  Gp[iteratorSymbol] = function() {
+    return this;
+  };
+
+  Gp.toString = function() {
+    return "[object Generator]";
+  };
+
+  function pushTryEntry(locs) {
+    var entry = { tryLoc: locs[0] };
+
+    if (1 in locs) {
+      entry.catchLoc = locs[1];
+    }
+
+    if (2 in locs) {
+      entry.finallyLoc = locs[2];
+      entry.afterLoc = locs[3];
+    }
+
+    this.tryEntries.push(entry);
+  }
+
+  function resetTryEntry(entry) {
+    var record = entry.completion || {};
+    record.type = "normal";
+    delete record.arg;
+    entry.completion = record;
+  }
+
+  function Context(tryLocsList) {
+    // The root entry object (effectively a try statement without a catch
+    // or a finally block) gives us a place to store values thrown from
+    // locations where there is no enclosing try statement.
+    this.tryEntries = [{ tryLoc: "root" }];
+    tryLocsList.forEach(pushTryEntry, this);
+    this.reset(true);
+  }
+
+  exports.keys = function(object) {
+    var keys = [];
+    for (var key in object) {
+      keys.push(key);
+    }
+    keys.reverse();
+
+    // Rather than returning an object with a next method, we keep
+    // things simple and return the next function itself.
+    return function next() {
+      while (keys.length) {
+        var key = keys.pop();
+        if (key in object) {
+          next.value = key;
+          next.done = false;
+          return next;
+        }
+      }
+
+      // To avoid creating an additional object, we just hang the .value
+      // and .done properties off the next function object itself. This
+      // also ensures that the minifier will not anonymize the function.
+      next.done = true;
+      return next;
+    };
+  };
+
+  function values(iterable) {
+    if (iterable) {
+      var iteratorMethod = iterable[iteratorSymbol];
+      if (iteratorMethod) {
+        return iteratorMethod.call(iterable);
+      }
+
+      if (typeof iterable.next === "function") {
+        return iterable;
+      }
+
+      if (!isNaN(iterable.length)) {
+        var i = -1, next = function next() {
+          while (++i < iterable.length) {
+            if (hasOwn.call(iterable, i)) {
+              next.value = iterable[i];
+              next.done = false;
+              return next;
+            }
+          }
+
+          next.value = undefined;
+          next.done = true;
+
+          return next;
+        };
+
+        return next.next = next;
+      }
+    }
+
+    // Return an iterator with no values.
+    return { next: doneResult };
+  }
+  exports.values = values;
+
+  function doneResult() {
+    return { value: undefined, done: true };
+  }
+
+  Context.prototype = {
+    constructor: Context,
+
+    reset: function(skipTempReset) {
+      this.prev = 0;
+      this.next = 0;
+      // Resetting context._sent for legacy support of Babel's
+      // function.sent implementation.
+      this.sent = this._sent = undefined;
+      this.done = false;
+      this.delegate = null;
+
+      this.method = "next";
+      this.arg = undefined;
+
+      this.tryEntries.forEach(resetTryEntry);
+
+      if (!skipTempReset) {
+        for (var name in this) {
+          // Not sure about the optimal order of these conditions:
+          if (name.charAt(0) === "t" &&
+              hasOwn.call(this, name) &&
+              !isNaN(+name.slice(1))) {
+            this[name] = undefined;
+          }
+        }
+      }
+    },
+
+    stop: function() {
+      this.done = true;
+
+      var rootEntry = this.tryEntries[0];
+      var rootRecord = rootEntry.completion;
+      if (rootRecord.type === "throw") {
+        throw rootRecord.arg;
+      }
+
+      return this.rval;
+    },
+
+    dispatchException: function(exception) {
+      if (this.done) {
+        throw exception;
+      }
+
+      var context = this;
+      function handle(loc, caught) {
+        record.type = "throw";
+        record.arg = exception;
+        context.next = loc;
+
+        if (caught) {
+          // If the dispatched exception was caught by a catch block,
+          // then let that catch block handle the exception normally.
+          context.method = "next";
+          context.arg = undefined;
+        }
+
+        return !! caught;
+      }
+
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        var record = entry.completion;
+
+        if (entry.tryLoc === "root") {
+          // Exception thrown outside of any try block that could handle
+          // it, so set the completion value of the entire function to
+          // throw the exception.
+          return handle("end");
+        }
+
+        if (entry.tryLoc <= this.prev) {
+          var hasCatch = hasOwn.call(entry, "catchLoc");
+          var hasFinally = hasOwn.call(entry, "finallyLoc");
+
+          if (hasCatch && hasFinally) {
+            if (this.prev < entry.catchLoc) {
+              return handle(entry.catchLoc, true);
+            } else if (this.prev < entry.finallyLoc) {
+              return handle(entry.finallyLoc);
+            }
+
+          } else if (hasCatch) {
+            if (this.prev < entry.catchLoc) {
+              return handle(entry.catchLoc, true);
+            }
+
+          } else if (hasFinally) {
+            if (this.prev < entry.finallyLoc) {
+              return handle(entry.finallyLoc);
+            }
+
+          } else {
+            throw new Error("try statement without catch or finally");
+          }
+        }
+      }
+    },
+
+    abrupt: function(type, arg) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.tryLoc <= this.prev &&
+            hasOwn.call(entry, "finallyLoc") &&
+            this.prev < entry.finallyLoc) {
+          var finallyEntry = entry;
+          break;
+        }
+      }
+
+      if (finallyEntry &&
+          (type === "break" ||
+           type === "continue") &&
+          finallyEntry.tryLoc <= arg &&
+          arg <= finallyEntry.finallyLoc) {
+        // Ignore the finally entry if control is not jumping to a
+        // location outside the try/catch block.
+        finallyEntry = null;
+      }
+
+      var record = finallyEntry ? finallyEntry.completion : {};
+      record.type = type;
+      record.arg = arg;
+
+      if (finallyEntry) {
+        this.method = "next";
+        this.next = finallyEntry.finallyLoc;
+        return ContinueSentinel;
+      }
+
+      return this.complete(record);
+    },
+
+    complete: function(record, afterLoc) {
+      if (record.type === "throw") {
+        throw record.arg;
+      }
+
+      if (record.type === "break" ||
+          record.type === "continue") {
+        this.next = record.arg;
+      } else if (record.type === "return") {
+        this.rval = this.arg = record.arg;
+        this.method = "return";
+        this.next = "end";
+      } else if (record.type === "normal" && afterLoc) {
+        this.next = afterLoc;
+      }
+
+      return ContinueSentinel;
+    },
+
+    finish: function(finallyLoc) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.finallyLoc === finallyLoc) {
+          this.complete(entry.completion, entry.afterLoc);
+          resetTryEntry(entry);
+          return ContinueSentinel;
+        }
+      }
+    },
+
+    "catch": function(tryLoc) {
+      for (var i = this.tryEntries.length - 1; i >= 0; --i) {
+        var entry = this.tryEntries[i];
+        if (entry.tryLoc === tryLoc) {
+          var record = entry.completion;
+          if (record.type === "throw") {
+            var thrown = record.arg;
+            resetTryEntry(entry);
+          }
+          return thrown;
+        }
+      }
+
+      // The context.catch method must only be called with a location
+      // argument that corresponds to a known catch block.
+      throw new Error("illegal catch attempt");
+    },
+
+    delegateYield: function(iterable, resultName, nextLoc) {
+      this.delegate = {
+        iterator: values(iterable),
+        resultName: resultName,
+        nextLoc: nextLoc
+      };
+
+      if (this.method === "next") {
+        // Deliberately forget the last sent value so that we don't
+        // accidentally pass it on to the delegate.
+        this.arg = undefined;
+      }
+
+      return ContinueSentinel;
+    }
+  };
+
+  // Regardless of whether this script is executing as a CommonJS module
+  // or not, return the runtime object so that we can declare the variable
+  // regeneratorRuntime in the outer scope, which allows this module to be
+  // injected easily by `bin/regenerator --include-runtime script.js`.
+  return exports;
+
+}(
+  // If this script is executing as a CommonJS module, use module.exports
+  // as the regeneratorRuntime namespace. Otherwise create a new empty
+  // object. Either way, the resulting object will be used to initialize
+  // the regeneratorRuntime variable at the top of this file.
+  typeof module === "object" ? module.exports : {}
+));
+
+try {
+  regeneratorRuntime = runtime;
+} catch (accidentalStrictMode) {
+  // This module should not be running in strict mode, so the above
+  // assignment should always work unless something is misconfigured. Just
+  // in case runtime.js accidentally runs in strict mode, we can escape
+  // strict mode using a global Function call. This could conceivably fail
+  // if a Content Security Policy forbids using Function, but in that case
+  // the proper solution is to fix the accidental strict mode problem. If
+  // you've misconfigured your bundler to force strict mode and applied a
+  // CSP to forbid Function, and you're not willing to fix either of those
+  // problems, please detail your unique predicament in a GitHub issue.
+  Function("r", "regeneratorRuntime = r")(runtime);
+}
+
+},{}],40:[function(require,module,exports){
 /* eslint-disable node/no-deprecated-api */
 var buffer = require('buffer')
 var Buffer = buffer.Buffer
@@ -5496,7 +6288,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
   return buffer.SlowBuffer(size)
 }
 
-},{"buffer":15}],38:[function(require,module,exports){
+},{"buffer":17}],41:[function(require,module,exports){
 (function (Buffer){
 ;(function (sax) { // wrapper for non-node envs
   sax.parser = function (strict, opt) { return new SAXParser(strict, opt) }
@@ -7066,7 +7858,7 @@ SafeBuffer.allocUnsafeSlow = function (size) {
 
 }).call(this,require("buffer").Buffer)
 
-},{"buffer":15,"stream":39,"string_decoder":40}],39:[function(require,module,exports){
+},{"buffer":17,"stream":42,"string_decoder":43}],42:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -7195,7 +7987,7 @@ Stream.prototype.pipe = function(dest, options) {
   return dest;
 };
 
-},{"events":17,"inherits":19,"readable-stream/duplex.js":24,"readable-stream/passthrough.js":33,"readable-stream/readable.js":34,"readable-stream/transform.js":35,"readable-stream/writable.js":36}],40:[function(require,module,exports){
+},{"events":19,"inherits":21,"readable-stream/duplex.js":26,"readable-stream/passthrough.js":35,"readable-stream/readable.js":36,"readable-stream/transform.js":37,"readable-stream/writable.js":38}],43:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -7492,7 +8284,7 @@ function simpleWrite(buf) {
 function simpleEnd(buf) {
   return buf && buf.length ? this.write(buf) : '';
 }
-},{"safe-buffer":37}],41:[function(require,module,exports){
+},{"safe-buffer":40}],44:[function(require,module,exports){
 (function (setImmediate,clearImmediate){
 var nextTick = require('process/browser.js').nextTick;
 var apply = Function.prototype.apply;
@@ -7572,7 +8364,7 @@ exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate :
 };
 }).call(this,require("timers").setImmediate,require("timers").clearImmediate)
 
-},{"process/browser.js":23,"timers":41}],42:[function(require,module,exports){
+},{"process/browser.js":25,"timers":44}],45:[function(require,module,exports){
 (function (global){
 
 /**
@@ -7644,7 +8436,7 @@ function config (name) {
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],43:[function(require,module,exports){
+},{}],46:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   "use strict";
@@ -7658,7 +8450,7 @@ function config (name) {
 
 }).call(this);
 
-},{}],44:[function(require,module,exports){
+},{}],47:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   "use strict";
@@ -7787,7 +8579,7 @@ function config (name) {
 
 }).call(this);
 
-},{"./defaults":45,"xmlbuilder":81}],45:[function(require,module,exports){
+},{"./defaults":48,"xmlbuilder":84}],48:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   exports.defaults = {
@@ -7861,7 +8653,7 @@ function config (name) {
 
 }).call(this);
 
-},{}],46:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   "use strict";
@@ -8244,7 +9036,7 @@ function config (name) {
 
 }).call(this);
 
-},{"./bom":43,"./defaults":45,"./processors":47,"events":17,"sax":38,"timers":41}],47:[function(require,module,exports){
+},{"./bom":46,"./defaults":48,"./processors":50,"events":19,"sax":41,"timers":44}],50:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   "use strict";
@@ -8280,7 +9072,7 @@ function config (name) {
 
 }).call(this);
 
-},{}],48:[function(require,module,exports){
+},{}],51:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   "use strict";
@@ -8321,7 +9113,7 @@ function config (name) {
 
 }).call(this);
 
-},{"./builder":44,"./defaults":45,"./parser":46,"./processors":47}],49:[function(require,module,exports){
+},{"./builder":47,"./defaults":48,"./parser":49,"./processors":50}],52:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   module.exports = {
@@ -8335,7 +9127,7 @@ function config (name) {
 
 }).call(this);
 
-},{}],50:[function(require,module,exports){
+},{}],53:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   module.exports = {
@@ -8360,7 +9152,7 @@ function config (name) {
 
 }).call(this);
 
-},{}],51:[function(require,module,exports){
+},{}],54:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var assign, getValue, isArray, isEmpty, isFunction, isObject, isPlainObject,
@@ -8445,7 +9237,7 @@ function config (name) {
 
 }).call(this);
 
-},{}],52:[function(require,module,exports){
+},{}],55:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   module.exports = {
@@ -8457,7 +9249,7 @@ function config (name) {
 
 }).call(this);
 
-},{}],53:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var NodeType, XMLAttribute, XMLNode;
@@ -8567,7 +9359,7 @@ function config (name) {
 
 }).call(this);
 
-},{"./NodeType":50,"./XMLNode":72}],54:[function(require,module,exports){
+},{"./NodeType":53,"./XMLNode":75}],57:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var NodeType, XMLCData, XMLCharacterData,
@@ -8605,7 +9397,7 @@ function config (name) {
 
 }).call(this);
 
-},{"./NodeType":50,"./XMLCharacterData":55}],55:[function(require,module,exports){
+},{"./NodeType":53,"./XMLCharacterData":58}],58:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var XMLCharacterData, XMLNode,
@@ -8686,7 +9478,7 @@ function config (name) {
 
 }).call(this);
 
-},{"./XMLNode":72}],56:[function(require,module,exports){
+},{"./XMLNode":75}],59:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var NodeType, XMLCharacterData, XMLComment,
@@ -8724,7 +9516,7 @@ function config (name) {
 
 }).call(this);
 
-},{"./NodeType":50,"./XMLCharacterData":55}],57:[function(require,module,exports){
+},{"./NodeType":53,"./XMLCharacterData":58}],60:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var XMLDOMConfiguration, XMLDOMErrorHandler, XMLDOMStringList;
@@ -8790,7 +9582,7 @@ function config (name) {
 
 }).call(this);
 
-},{"./XMLDOMErrorHandler":58,"./XMLDOMStringList":60}],58:[function(require,module,exports){
+},{"./XMLDOMErrorHandler":61,"./XMLDOMStringList":63}],61:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var XMLDOMErrorHandler;
@@ -8808,7 +9600,7 @@ function config (name) {
 
 }).call(this);
 
-},{}],59:[function(require,module,exports){
+},{}],62:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var XMLDOMImplementation;
@@ -8842,7 +9634,7 @@ function config (name) {
 
 }).call(this);
 
-},{}],60:[function(require,module,exports){
+},{}],63:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var XMLDOMStringList;
@@ -8872,7 +9664,7 @@ function config (name) {
 
 }).call(this);
 
-},{}],61:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var NodeType, XMLDTDAttList, XMLNode,
@@ -8929,7 +9721,7 @@ function config (name) {
 
 }).call(this);
 
-},{"./NodeType":50,"./XMLNode":72}],62:[function(require,module,exports){
+},{"./NodeType":53,"./XMLNode":75}],65:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var NodeType, XMLDTDElement, XMLNode,
@@ -8969,7 +9761,7 @@ function config (name) {
 
 }).call(this);
 
-},{"./NodeType":50,"./XMLNode":72}],63:[function(require,module,exports){
+},{"./NodeType":53,"./XMLNode":75}],66:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var NodeType, XMLDTDEntity, XMLNode, isObject,
@@ -9068,7 +9860,7 @@ function config (name) {
 
 }).call(this);
 
-},{"./NodeType":50,"./Utility":51,"./XMLNode":72}],64:[function(require,module,exports){
+},{"./NodeType":53,"./Utility":54,"./XMLNode":75}],67:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var NodeType, XMLDTDNotation, XMLNode,
@@ -9122,7 +9914,7 @@ function config (name) {
 
 }).call(this);
 
-},{"./NodeType":50,"./XMLNode":72}],65:[function(require,module,exports){
+},{"./NodeType":53,"./XMLNode":75}],68:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var NodeType, XMLDeclaration, XMLNode, isObject,
@@ -9167,7 +9959,7 @@ function config (name) {
 
 }).call(this);
 
-},{"./NodeType":50,"./Utility":51,"./XMLNode":72}],66:[function(require,module,exports){
+},{"./NodeType":53,"./Utility":54,"./XMLNode":75}],69:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var NodeType, XMLDTDAttList, XMLDTDElement, XMLDTDEntity, XMLDTDNotation, XMLDocType, XMLNamedNodeMap, XMLNode, isObject,
@@ -9355,7 +10147,7 @@ function config (name) {
 
 }).call(this);
 
-},{"./NodeType":50,"./Utility":51,"./XMLDTDAttList":61,"./XMLDTDElement":62,"./XMLDTDEntity":63,"./XMLDTDNotation":64,"./XMLNamedNodeMap":71,"./XMLNode":72}],67:[function(require,module,exports){
+},{"./NodeType":53,"./Utility":54,"./XMLDTDAttList":64,"./XMLDTDElement":65,"./XMLDTDEntity":66,"./XMLDTDNotation":67,"./XMLNamedNodeMap":74,"./XMLNode":75}],70:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var NodeType, XMLDOMConfiguration, XMLDOMImplementation, XMLDocument, XMLNode, XMLStringWriter, XMLStringifier, isPlainObject,
@@ -9599,7 +10391,7 @@ function config (name) {
 
 }).call(this);
 
-},{"./NodeType":50,"./Utility":51,"./XMLDOMConfiguration":57,"./XMLDOMImplementation":59,"./XMLNode":72,"./XMLStringWriter":77,"./XMLStringifier":78}],68:[function(require,module,exports){
+},{"./NodeType":53,"./Utility":54,"./XMLDOMConfiguration":60,"./XMLDOMImplementation":62,"./XMLNode":75,"./XMLStringWriter":80,"./XMLStringifier":81}],71:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var NodeType, WriterState, XMLAttribute, XMLCData, XMLComment, XMLDTDAttList, XMLDTDElement, XMLDTDEntity, XMLDTDNotation, XMLDeclaration, XMLDocType, XMLDocument, XMLDocumentCB, XMLElement, XMLProcessingInstruction, XMLRaw, XMLStringWriter, XMLStringifier, XMLText, getValue, isFunction, isObject, isPlainObject, ref,
@@ -10129,7 +10921,7 @@ function config (name) {
 
 }).call(this);
 
-},{"./NodeType":50,"./Utility":51,"./WriterState":52,"./XMLAttribute":53,"./XMLCData":54,"./XMLComment":56,"./XMLDTDAttList":61,"./XMLDTDElement":62,"./XMLDTDEntity":63,"./XMLDTDNotation":64,"./XMLDeclaration":65,"./XMLDocType":66,"./XMLDocument":67,"./XMLElement":70,"./XMLProcessingInstruction":74,"./XMLRaw":75,"./XMLStringWriter":77,"./XMLStringifier":78,"./XMLText":79}],69:[function(require,module,exports){
+},{"./NodeType":53,"./Utility":54,"./WriterState":55,"./XMLAttribute":56,"./XMLCData":57,"./XMLComment":59,"./XMLDTDAttList":64,"./XMLDTDElement":65,"./XMLDTDEntity":66,"./XMLDTDNotation":67,"./XMLDeclaration":68,"./XMLDocType":69,"./XMLDocument":70,"./XMLElement":73,"./XMLProcessingInstruction":77,"./XMLRaw":78,"./XMLStringWriter":80,"./XMLStringifier":81,"./XMLText":82}],72:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var NodeType, XMLDummy, XMLNode,
@@ -10162,7 +10954,7 @@ function config (name) {
 
 }).call(this);
 
-},{"./NodeType":50,"./XMLNode":72}],70:[function(require,module,exports){
+},{"./NodeType":53,"./XMLNode":75}],73:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var NodeType, XMLAttribute, XMLElement, XMLNamedNodeMap, XMLNode, getValue, isFunction, isObject, ref,
@@ -10462,7 +11254,7 @@ function config (name) {
 
 }).call(this);
 
-},{"./NodeType":50,"./Utility":51,"./XMLAttribute":53,"./XMLNamedNodeMap":71,"./XMLNode":72}],71:[function(require,module,exports){
+},{"./NodeType":53,"./Utility":54,"./XMLAttribute":56,"./XMLNamedNodeMap":74,"./XMLNode":75}],74:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var XMLNamedNodeMap;
@@ -10522,7 +11314,7 @@ function config (name) {
 
 }).call(this);
 
-},{}],72:[function(require,module,exports){
+},{}],75:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var DocumentPosition, NodeType, XMLCData, XMLComment, XMLDeclaration, XMLDocType, XMLDummy, XMLElement, XMLNamedNodeMap, XMLNode, XMLNodeList, XMLProcessingInstruction, XMLRaw, XMLText, getValue, isEmpty, isFunction, isObject, ref1,
@@ -11309,7 +12101,7 @@ function config (name) {
 
 }).call(this);
 
-},{"./DocumentPosition":49,"./NodeType":50,"./Utility":51,"./XMLCData":54,"./XMLComment":56,"./XMLDeclaration":65,"./XMLDocType":66,"./XMLDummy":69,"./XMLElement":70,"./XMLNamedNodeMap":71,"./XMLNodeList":73,"./XMLProcessingInstruction":74,"./XMLRaw":75,"./XMLText":79}],73:[function(require,module,exports){
+},{"./DocumentPosition":52,"./NodeType":53,"./Utility":54,"./XMLCData":57,"./XMLComment":59,"./XMLDeclaration":68,"./XMLDocType":69,"./XMLDummy":72,"./XMLElement":73,"./XMLNamedNodeMap":74,"./XMLNodeList":76,"./XMLProcessingInstruction":77,"./XMLRaw":78,"./XMLText":82}],76:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var XMLNodeList;
@@ -11339,7 +12131,7 @@ function config (name) {
 
 }).call(this);
 
-},{}],74:[function(require,module,exports){
+},{}],77:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var NodeType, XMLCharacterData, XMLProcessingInstruction,
@@ -11390,7 +12182,7 @@ function config (name) {
 
 }).call(this);
 
-},{"./NodeType":50,"./XMLCharacterData":55}],75:[function(require,module,exports){
+},{"./NodeType":53,"./XMLCharacterData":58}],78:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var NodeType, XMLNode, XMLRaw,
@@ -11427,7 +12219,7 @@ function config (name) {
 
 }).call(this);
 
-},{"./NodeType":50,"./XMLNode":72}],76:[function(require,module,exports){
+},{"./NodeType":53,"./XMLNode":75}],79:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var NodeType, WriterState, XMLStreamWriter, XMLWriterBase,
@@ -11605,7 +12397,7 @@ function config (name) {
 
 }).call(this);
 
-},{"./NodeType":50,"./WriterState":52,"./XMLWriterBase":80}],77:[function(require,module,exports){
+},{"./NodeType":53,"./WriterState":55,"./XMLWriterBase":83}],80:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var XMLStringWriter, XMLWriterBase,
@@ -11642,7 +12434,7 @@ function config (name) {
 
 }).call(this);
 
-},{"./XMLWriterBase":80}],78:[function(require,module,exports){
+},{"./XMLWriterBase":83}],81:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var XMLStringifier,
@@ -11884,7 +12676,7 @@ function config (name) {
 
 }).call(this);
 
-},{}],79:[function(require,module,exports){
+},{}],82:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var NodeType, XMLCharacterData, XMLText,
@@ -11955,7 +12747,7 @@ function config (name) {
 
 }).call(this);
 
-},{"./NodeType":50,"./XMLCharacterData":55}],80:[function(require,module,exports){
+},{"./NodeType":53,"./XMLCharacterData":58}],83:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var NodeType, WriterState, XMLCData, XMLComment, XMLDTDAttList, XMLDTDElement, XMLDTDEntity, XMLDTDNotation, XMLDeclaration, XMLDocType, XMLDummy, XMLElement, XMLProcessingInstruction, XMLRaw, XMLText, XMLWriterBase, assign,
@@ -12385,7 +13177,7 @@ function config (name) {
 
 }).call(this);
 
-},{"./NodeType":50,"./Utility":51,"./WriterState":52,"./XMLCData":54,"./XMLComment":56,"./XMLDTDAttList":61,"./XMLDTDElement":62,"./XMLDTDEntity":63,"./XMLDTDNotation":64,"./XMLDeclaration":65,"./XMLDocType":66,"./XMLDummy":69,"./XMLElement":70,"./XMLProcessingInstruction":74,"./XMLRaw":75,"./XMLText":79}],81:[function(require,module,exports){
+},{"./NodeType":53,"./Utility":54,"./WriterState":55,"./XMLCData":57,"./XMLComment":59,"./XMLDTDAttList":64,"./XMLDTDElement":65,"./XMLDTDEntity":66,"./XMLDTDNotation":67,"./XMLDeclaration":68,"./XMLDocType":69,"./XMLDummy":72,"./XMLElement":73,"./XMLProcessingInstruction":77,"./XMLRaw":78,"./XMLText":82}],84:[function(require,module,exports){
 // Generated by CoffeeScript 1.12.7
 (function() {
   var NodeType, WriterState, XMLDOMImplementation, XMLDocument, XMLDocumentCB, XMLStreamWriter, XMLStringWriter, assign, isFunction, ref;
@@ -12452,7 +13244,7 @@ function config (name) {
 
 }).call(this);
 
-},{"./NodeType":50,"./Utility":51,"./WriterState":52,"./XMLDOMImplementation":59,"./XMLDocument":67,"./XMLDocumentCB":68,"./XMLStreamWriter":76,"./XMLStringWriter":77}],82:[function(require,module,exports){
+},{"./NodeType":53,"./Utility":54,"./WriterState":55,"./XMLDOMImplementation":62,"./XMLDocument":70,"./XMLDocumentCB":71,"./XMLStreamWriter":79,"./XMLStringWriter":80}],85:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -12486,6 +13278,7 @@ const Modifiers_1 = require("../rules/Modifiers");
 const SkillRules_1 = require("../rules/SkillRules");
 const MatrixRules_1 = require("../rules/MatrixRules");
 const ICPrep_1 = require("./prep/ICPrep");
+const InventoryFlow_1 = require("./flows/InventoryFlow");
 function getGame() {
     if (!(game instanceof Game)) {
         throw new Error('game is not initialized yet!');
@@ -12508,14 +13301,15 @@ function getGame() {
  *
  */
 class SR5Actor extends Actor {
-    constructor() {
-        super(...arguments);
+    constructor(data, context) {
+        super(data, context);
         // This is the default inventory name and label for when no other inventory has been created.
         this.defaultInventory = {
             name: 'Carried',
             label: 'SR5.Labels.Inventory.Carried',
             itemIds: []
         };
+        this.inventory = new InventoryFlow_1.InventoryFlow(this);
     }
     getOverwatchScore() {
         const os = this.getFlag(constants_1.SYSTEM_NAME, 'overwatchScore');
@@ -12852,6 +13646,13 @@ class SR5Actor extends Actor {
     }
     isIC() {
         return this.getType() === 'ic';
+    }
+    /**
+     * Determine if this actor is able to have natural damage recovery.
+     * @returns true in case of possible natural recovery.
+     */
+    get hasNaturalRecovery() {
+        return this.isCharacter() || this.isCritter();
     }
     getVehicleTypeSkillName() {
         if (!("vehicleType" in this.data.data))
@@ -13342,7 +14143,7 @@ class SR5Actor extends Actor {
      * @param options Change roll behaviour.
      */
     rollNaturalRecovery(track, options) {
-        if (!this.isCharacter())
+        if (!this.hasNaturalRecovery)
             return;
         let attributeNameA = 'body';
         let attributeNameB = 'willpower';
@@ -14468,170 +15269,9 @@ class SR5Actor extends Actor {
             .map(([markId, marks]) => (Object.assign(Object.assign({}, helpers_1.Helpers.getMarkIdDocuments(markId)), { marks,
             markId })));
     }
-    /**
-     * Create an inventory place for gear organization.
-     * @param name How to name the inventory, will also be it's label for custom inventories.
-     *
-     * TODO: Add Typing to method.
-     */
-    createInventory(name) {
-        var _a;
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.hasInventory(name))
-                return (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.warn(game.i18n.localize('SR5.Errors.InventoryAlreadyExists'));
-            if (this.defaultInventory.name === name)
-                return;
-            return yield this.update({
-                'data.inventories': {
-                    [name]: {
-                        name,
-                        label: name,
-                        itemIds: []
-                    }
-                }
-            });
-        });
-    }
-    /**
-     * Remove an actors inventory and maybe move the containing items over to another one.
-     *
-     * @param name The inventory name to be removed.
-     * @param moveTo The inventory name items need to moved over to, otherwise the default inventory.
-     */
-    // TODO: When an item has no inventory, it will be placed into default, no? Abort in that case.
-    removeInventory(name, moveTo = this.defaultInventory.name) {
-        var _a;
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.defaultInventory.name === name)
-                return (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.error(game.i18n.localize('SR5.Errors.DefaultInventoryCantBeRemoved'));
-            if (!this.hasInventory(name))
-                return console.error(`Shadowrun 5e | Can't remove inventory ${name} or move its items over to inventory ${moveTo}`);
-            // Move items over to default in case of missing target inventory.
-            if (!this.hasInventory(moveTo))
-                moveTo = this.defaultInventory.name;
-            // Prepare deletion of inventory.
-            const updateData = helpers_1.Helpers.getDeleteKeyUpdateData('data.inventories', name);
-            // Default inventory is virtual, so only none default inventories need to have their items merged.
-            if (this.defaultInventory.name !== moveTo) {
-                // @ts-ignore
-                updateData[`data.inventories.${moveTo}.itemIds`] = [
-                    ...this.data.data.inventories[name].itemIds,
-                    ...this.data.data.inventories[moveTo].itemIds
-                ];
-            }
-            yield this.update(updateData);
-        });
-    }
-    /**
-     * Rename an existing inventory to a new name.
-     *
-     * @param current The old name of the inventory.
-     * @param newName The new name of the inventory.
-     */
-    renameInventory(current, newName) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (this.defaultInventory.name === current)
-                return;
-            if (current === newName)
-                return;
-            const inventory = this.getInventory(current);
-            if (!inventory)
-                return;
-            // Change internal and display name.
-            inventory.name = newName;
-            inventory.label = newName;
-            const updateData = {
-                'data.inventories': {
-                    [`-=${current}`]: null,
-                    [newName]: inventory
-                }
-            };
-            yield this.update(updateData);
-        });
-    }
-    /**
-     * Does this actor have the given inventory already?
-     *
-     * Note: Comparisons will only be against lower case.
-     *
-     * @param name The inventory name.
-     */
-    hasInventory(name) {
-        return name === Object.keys(this.data.data.inventories)
-            .find(inventory => inventory.toLowerCase() === name.toLowerCase());
-    }
-    /**
-     * Helper to get inventory data
-     *
-     * @param name The inventory name to return.
-     */
-    getInventory(name) {
-        return this.data.data.inventories[name];
-    }
-    /**
-     * Helper to get all inventories of this actor.
-     */
-    getInventories() {
-        return this.data.data.inventories;
-    }
-    /**
-     * Add an array of items to the given inventory.
-     *
-     * @param name The inventory to add the items to.
-     * @param items The items in question. A single item can be given.
-     * @param removeFromCurrent By default the item added will be removed from another inventory it might be in.
-     */
-    addItemsToInventory(name, items, removeFromCurrent = true) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // Default inventory is valid target here.
-            if (this.defaultInventory.name !== name && !this.hasInventory(name))
-                return;
-            if (items instanceof SR5Item_1.SR5Item)
-                items = [items];
-            if (items.length === 0)
-                return;
-            if (removeFromCurrent) {
-                for (const item of items)
-                    yield this.removeItemFromInventory(item);
-            }
-            // Default inventory is no actual inventory that needs to be added to.
-            if (this.defaultInventory.name === name)
-                return;
-            for (const item of items) {
-                if (item.id)
-                    this.data.data.inventories[name].itemIds.push(item.id);
-            }
-            yield this.update({ [`data.inventories.${name}.itemIds`]: this.data.data.inventories[name].itemIds });
-        });
-    }
-    /**
-     * Remove the given item from one or any inventory it might be in.
-     *
-     * @param item The item to be removed.
-     * @param name The one inventory to remove it from. If empty, will collect all inventories the item is in.
-     */
-    removeItemFromInventory(item, name) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // The default inventory is not actual inventory.
-            if (this.defaultInventory.name === name)
-                return;
-            // Collect affected inventories.
-            const inventories = name ?
-                [this.data.data.inventories[name]] :
-                Object.values(this.data.data.inventories).filter(({ itemIds }) => itemIds.includes(item.id));
-            // Collect all inventories with remaining ids after the item's been removed.
-            const updateData = {};
-            for (const inventory of inventories) {
-                const itemIds = inventory.itemIds.filter(id => id !== item.id);
-                updateData[`data.inventories.${inventory.name}.itemIds`] = itemIds;
-            }
-            if (updateData)
-                yield this.update(updateData);
-        });
-    }
 }
 exports.SR5Actor = SR5Actor;
-},{"../apps/dialogs/ShadowrunActorDialogs":115,"../chat":123,"../config":125,"../constants":126,"../data/DataDefaults":127,"../data/SR5ItemDataWrapper":129,"../helpers":140,"../item/SR5Item":180,"../parts/PartsList":194,"../rolls/ShadowrunRoller":195,"../rules/MatrixRules":197,"../rules/Modifiers":198,"../rules/SkillRules":199,"./flows/SkillFlow":84,"./flows/SoakFlow":85,"./prep/CharacterPrep":86,"./prep/CritterPrep":87,"./prep/ICPrep":88,"./prep/SpiritPrep":89,"./prep/SpritePrep":90,"./prep/VehiclePrep":91}],83:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunActorDialogs":139,"../chat":147,"../config":149,"../constants":150,"../data/DataDefaults":151,"../data/SR5ItemDataWrapper":153,"../helpers":164,"../item/SR5Item":204,"../parts/PartsList":218,"../rolls/ShadowrunRoller":219,"../rules/MatrixRules":221,"../rules/Modifiers":222,"../rules/SkillRules":223,"./flows/InventoryFlow":87,"./flows/SkillFlow":88,"./flows/SoakFlow":89,"./prep/CharacterPrep":90,"./prep/CritterPrep":91,"./prep/ICPrep":92,"./prep/SpiritPrep":93,"./prep/SpritePrep":94,"./prep/VehiclePrep":95}],86:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -14707,7 +15347,216 @@ class DamageApplicationFlow {
     }
 }
 exports.DamageApplicationFlow = DamageApplicationFlow;
-},{"../../apps/dialogs/DamageApplicationDialog":111}],84:[function(require,module,exports){
+},{"../../apps/dialogs/DamageApplicationDialog":135}],87:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.InventoryFlow = void 0;
+const helpers_1 = require("../../helpers");
+const SR5Item_1 = require("../../item/SR5Item");
+/**
+ * Handle all inventory related actions on an SR5Actor'.
+ *
+ * An inventory can store a set of items on a document, without actually altering the
+ * itemData directly, only going through the documentData and indirectly referencing the item.
+ *
+ * It expects the document to define a defaultInventory field of type InventoryData, which
+ * is where all items without an inventory will be placed. This default inventory won't be
+ * stored on the document. This allows for the inventory system to be drop in, without any
+ * migration needed.
+ */
+class InventoryFlow {
+    constructor(document) {
+        if (document.data.data.inventories === undefined)
+            console.error('Shawdorun 5e | Actor given does not have a inventory data structure. You will experience bugs.');
+        this.document = document;
+    }
+    /**
+     * Create an inventory place for gear organization.
+     *
+     * @param name How to name the inventory, will also be its label for custom inventories.
+     */
+    create(name) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(`Shadowrun 5e | Creating inventory ${name}`);
+            if (this.exists(name))
+                return (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.warn(game.i18n.localize('SR5.Errors.InventoryAlreadyExists'));
+            if (this.document.defaultInventory.name === name)
+                return;
+            const updateData = {
+                'data.inventories': {
+                    [name]: {
+                        name,
+                        label: name,
+                        itemIds: []
+                    }
+                }
+            };
+            console.log(`Shadowrun 5e | Executing update to create inventory`, updateData);
+            return yield this.document.update(updateData);
+        });
+    }
+    /**
+     * Remove an actors inventory and maybe move the containing items over to another one.
+     *
+     * @param name The inventory name to be removed.
+     * @param moveTo The inventory name items need to moved over to, otherwise the default inventory.
+     */
+    remove(name, moveTo = this.document.defaultInventory.name) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(`Shadowrun 5e | Removing inventory ${name}. Moving items over to ${moveTo}`);
+            if (this.document.defaultInventory.name === name)
+                return (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.error(game.i18n.localize('SR5.Errors.DefaultInventoryCantBeRemoved'));
+            if (!this.exists(name))
+                return console.error(`Shadowrun 5e | Can't remove inventory ${name} or move its items over to inventory ${moveTo}`);
+            // Move items over to default in case of missing target inventory.
+            if (!this.exists(moveTo))
+                moveTo = this.document.defaultInventory.name;
+            // Prepare deletion of inventory.
+            const updateData = helpers_1.Helpers.getDeleteKeyUpdateData('data.inventories', name);
+            // Default inventory is virtual, so only none default inventories need to have their items merged.
+            if (this.document.defaultInventory.name !== moveTo) {
+                // @ts-ignore
+                updateData[`data.inventories.${moveTo}.itemIds`] = [
+                    ...this.document.data.data.inventories[name].itemIds,
+                    ...this.document.data.data.inventories[moveTo].itemIds
+                ];
+            }
+            console.log(`Shadowrun 5e | Executing update to remove inventory`, updateData);
+            yield this.document.update(updateData);
+        });
+    }
+    /**
+ * Does this actor have the given inventory already?
+ *
+ * Note: Comparisons will only be against lower case.
+ *
+ * @param name The inventory name.
+ */
+    exists(name) {
+        return name === Object.keys(this.document.data.data.inventories)
+            .find(inventory => inventory.toLowerCase() === name.toLowerCase());
+    }
+    /**
+     * Helper to get a specifics inventory's data
+     *
+     * @param name The inventory name to return.
+     */
+    getOne(name) {
+        return this.document.data.data.inventories[name];
+    }
+    /**
+     * Helper to get all inventories.
+     */
+    getAll() {
+        return this.document.data.data.inventories;
+    }
+    /**
+     * Rename an existing inventory to a new name.
+     *
+     * @param current The old name of the inventory.
+     * @param newName The new name of the inventory.
+     */
+    rename(current, newName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(`Shadowrun 5e | Renaming the inventory ${current} to ${newName}`);
+            if (this.document.defaultInventory.name === current)
+                return;
+            if (current === newName)
+                return;
+            const inventory = this.getOne(current);
+            if (!inventory)
+                return;
+            // Change internal and display name.
+            inventory.name = newName;
+            inventory.label = newName;
+            const updateData = {
+                'data.inventories': {
+                    [`-=${current}`]: null,
+                    [newName]: inventory
+                }
+            };
+            console.log(`Shadowrun 5e | Executing update to rename inventory`, updateData);
+            yield this.document.update(updateData);
+        });
+    }
+    /**
+     * Add an array of items to the given inventory.
+     *
+     * @param name The inventory to add the items to.
+     * @param items The items in question. A single item can be given.
+     * @param removeFromCurrent By default the item added will be removed from another inventory it might be in.
+     */
+    addItems(name, items, removeFromCurrent = true) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(`Shadowrun 5e | Adding items to to inventory ${name}`, items);
+            // Default inventory is valid target here.
+            if (this.document.defaultInventory.name !== name && !this.exists(name))
+                return;
+            if (items instanceof SR5Item_1.SR5Item)
+                items = [items];
+            if (items.length === 0)
+                return;
+            if (removeFromCurrent) {
+                // This will cause at least one additional re-render, but make the code clearer.
+                for (const item of items)
+                    yield this.removeItem(item);
+            }
+            // Default inventory is no actual inventory that needs to be added to.
+            if (this.document.defaultInventory.name === name)
+                return;
+            for (const item of items) {
+                if (item.id)
+                    this.document.data.data.inventories[name].itemIds.push(item.id);
+            }
+            const updateData = { [`data.inventories.${name}.itemIds`]: this.document.data.data.inventories[name].itemIds };
+            console.log(`Shadowrun 5e | Executing adding items to inventory`, updateData);
+            yield this.document.update(updateData);
+        });
+    }
+    /**
+    * Remove the given item from one or any inventory it might be in.
+    *
+    * @param item The item to be removed.
+    * @param name The one inventory to remove it from. If empty, will search for inventory the item is in.
+    */
+    removeItem(item, name) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(`Shadowrun 5e | Removing item from inventory (${name || this.document.defaultInventory.name})`, item);
+            // The default inventory is not actual inventory.
+            if (this.document.defaultInventory.name === name)
+                return;
+            // Collect affected inventories.
+            const inventories = name ?
+                [this.document.data.data.inventories[name]] :
+                Object.values(this.document.data.data.inventories).filter(({ itemIds }) => itemIds.includes(item.id));
+            // No inventory found means, it's in the default inventory and no removal is needed.
+            if (inventories.length === 0)
+                return;
+            // Collect all inventories with remaining ids after the item's been removed.
+            const updateData = {};
+            for (const inventory of inventories) {
+                const itemIds = inventory.itemIds.filter(id => id !== item.id);
+                updateData[`data.inventories.${inventory.name}.itemIds`] = itemIds;
+            }
+            console.log(`Shadowrun 5e | Executing update to remove item`, updateData);
+            if (updateData)
+                yield this.document.update(updateData);
+        });
+    }
+}
+exports.InventoryFlow = InventoryFlow;
+},{"../../helpers":164,"../../item/SR5Item":204}],88:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SkillFlow = void 0;
@@ -14755,7 +15604,7 @@ class SkillFlow {
     }
 }
 exports.SkillFlow = SkillFlow;
-},{"../../constants":126,"../../rules/SkillRules":199}],85:[function(require,module,exports){
+},{"../../constants":150,"../../rules/SkillRules":223}],89:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -14890,7 +15739,7 @@ class SoakFlow {
     }
 }
 exports.SoakFlow = SoakFlow;
-},{"../../apps/dialogs/ShadowrunActorDialogs":115,"../../chat":123,"../../data/DataDefaults":127,"../../helpers":140,"../../parts/PartsList":194,"../../rolls/ShadowrunRoller":195,"../../rules/SoakRules":200}],86:[function(require,module,exports){
+},{"../../apps/dialogs/ShadowrunActorDialogs":139,"../../chat":147,"../../data/DataDefaults":151,"../../helpers":164,"../../parts/PartsList":218,"../../rolls/ShadowrunRoller":219,"../../rules/SoakRules":224}],90:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CharacterPrep = void 0;
@@ -14948,7 +15797,7 @@ class CharacterPrep {
     }
 }
 exports.CharacterPrep = CharacterPrep;
-},{"./functions/AttributesPrep":92,"./functions/ConditionMonitorsPrep":93,"./functions/InitiativePrep":94,"./functions/ItemPrep":95,"./functions/LimitsPrep":96,"./functions/MatrixPrep":97,"./functions/ModifiersPrep":98,"./functions/MovementPrep":99,"./functions/NPCPrep":100,"./functions/SkillsPrep":101,"./functions/WoundsPrep":102}],87:[function(require,module,exports){
+},{"./functions/AttributesPrep":96,"./functions/ConditionMonitorsPrep":97,"./functions/InitiativePrep":98,"./functions/ItemPrep":99,"./functions/LimitsPrep":100,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/MovementPrep":103,"./functions/NPCPrep":104,"./functions/SkillsPrep":105,"./functions/WoundsPrep":106}],91:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CritterPrep = void 0;
@@ -14990,7 +15839,7 @@ class CritterPrep {
     }
 }
 exports.CritterPrep = CritterPrep;
-},{"./functions/AttributesPrep":92,"./functions/ConditionMonitorsPrep":93,"./functions/InitiativePrep":94,"./functions/ItemPrep":95,"./functions/LimitsPrep":96,"./functions/MatrixPrep":97,"./functions/ModifiersPrep":98,"./functions/MovementPrep":99,"./functions/SkillsPrep":101,"./functions/WoundsPrep":102}],88:[function(require,module,exports){
+},{"./functions/AttributesPrep":96,"./functions/ConditionMonitorsPrep":97,"./functions/InitiativePrep":98,"./functions/ItemPrep":99,"./functions/LimitsPrep":100,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/MovementPrep":103,"./functions/SkillsPrep":105,"./functions/WoundsPrep":106}],92:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ICPrep = void 0;
@@ -15124,7 +15973,7 @@ class ICPrep {
     }
 }
 exports.ICPrep = ICPrep;
-},{"../../config":125,"../../data/DataDefaults":127,"../../parts/PartsList":194,"../../rules/MatrixRules":197,"./functions/AttributesPrep":92,"./functions/InitiativePrep":94,"./functions/MatrixPrep":97,"./functions/ModifiersPrep":98,"./functions/SkillsPrep":101}],89:[function(require,module,exports){
+},{"../../config":149,"../../data/DataDefaults":151,"../../parts/PartsList":218,"../../rules/MatrixRules":221,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/SkillsPrep":105}],93:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpiritPrep = void 0;
@@ -15522,7 +16371,7 @@ class SpiritPrep {
     }
 }
 exports.SpiritPrep = SpiritPrep;
-},{"../../helpers":140,"../../parts/PartsList":194,"../flows/SkillFlow":84,"./functions/AttributesPrep":92,"./functions/ConditionMonitorsPrep":93,"./functions/InitiativePrep":94,"./functions/LimitsPrep":96,"./functions/ModifiersPrep":98,"./functions/MovementPrep":99,"./functions/SkillsPrep":101,"./functions/WoundsPrep":102}],90:[function(require,module,exports){
+},{"../../helpers":164,"../../parts/PartsList":218,"../flows/SkillFlow":88,"./functions/AttributesPrep":96,"./functions/ConditionMonitorsPrep":97,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/ModifiersPrep":102,"./functions/MovementPrep":103,"./functions/SkillsPrep":105,"./functions/WoundsPrep":106}],94:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpritePrep = void 0;
@@ -15662,7 +16511,7 @@ class SpritePrep {
     }
 }
 exports.SpritePrep = SpritePrep;
-},{"../../helpers":140,"../../parts/PartsList":194,"./functions/AttributesPrep":92,"./functions/InitiativePrep":94,"./functions/LimitsPrep":96,"./functions/MatrixPrep":97,"./functions/ModifiersPrep":98,"./functions/SkillsPrep":101}],91:[function(require,module,exports){
+},{"../../helpers":164,"../../parts/PartsList":218,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/SkillsPrep":105}],95:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VehiclePrep = void 0;
@@ -15789,7 +16638,7 @@ class VehiclePrep {
     }
 }
 exports.VehiclePrep = VehiclePrep;
-},{"../../config":125,"../../helpers":140,"../../parts/PartsList":194,"./functions/AttributesPrep":92,"./functions/InitiativePrep":94,"./functions/LimitsPrep":96,"./functions/MatrixPrep":97,"./functions/ModifiersPrep":98,"./functions/SkillsPrep":101}],92:[function(require,module,exports){
+},{"../../config":149,"../../helpers":164,"../../parts/PartsList":218,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/SkillsPrep":105}],96:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AttributesPrep = void 0;
@@ -15848,7 +16697,7 @@ class AttributesPrep {
     }
 }
 exports.AttributesPrep = AttributesPrep;
-},{"../../../config":125,"../../../constants":126,"../../../helpers":140}],93:[function(require,module,exports){
+},{"../../../config":149,"../../../constants":150,"../../../helpers":164}],97:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConditionMonitorsPrep = void 0;
@@ -15888,7 +16737,7 @@ class ConditionMonitorsPrep {
     }
 }
 exports.ConditionMonitorsPrep = ConditionMonitorsPrep;
-},{"../../../config":125}],94:[function(require,module,exports){
+},{"../../../config":149}],98:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InitiativePrep = void 0;
@@ -15937,7 +16786,7 @@ class InitiativePrep {
     }
 }
 exports.InitiativePrep = InitiativePrep;
-},{"../../../helpers":140,"../../../parts/PartsList":194}],95:[function(require,module,exports){
+},{"../../../helpers":164,"../../../parts/PartsList":218}],99:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemPrep = void 0;
@@ -16015,7 +16864,7 @@ class ItemPrep {
     }
 }
 exports.ItemPrep = ItemPrep;
-},{"../../../config":125,"../../../constants":126,"../../../helpers":140,"../../../parts/PartsList":194}],96:[function(require,module,exports){
+},{"../../../config":149,"../../../constants":150,"../../../helpers":164,"../../../parts/PartsList":218}],100:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LimitsPrep = void 0;
@@ -16043,7 +16892,7 @@ class LimitsPrep {
     }
 }
 exports.LimitsPrep = LimitsPrep;
-},{"../../../config":125,"../../../helpers":140,"../../../parts/PartsList":194}],97:[function(require,module,exports){
+},{"../../../config":149,"../../../helpers":164,"../../../parts/PartsList":218}],101:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatrixPrep = void 0;
@@ -16169,7 +17018,7 @@ class MatrixPrep {
     }
 }
 exports.MatrixPrep = MatrixPrep;
-},{"../../../config":125,"../../../helpers":140,"../../../parts/PartsList":194,"./AttributesPrep":92}],98:[function(require,module,exports){
+},{"../../../config":149,"../../../helpers":164,"../../../parts/PartsList":218,"./AttributesPrep":96}],102:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ModifiersPrep = void 0;
@@ -16257,7 +17106,7 @@ class ModifiersPrep {
     }
 }
 exports.ModifiersPrep = ModifiersPrep;
-},{"../../../config":125}],99:[function(require,module,exports){
+},{"../../../config":149}],103:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MovementPrep = void 0;
@@ -16272,7 +17121,7 @@ class MovementPrep {
     }
 }
 exports.MovementPrep = MovementPrep;
-},{"../../../parts/PartsList":194}],100:[function(require,module,exports){
+},{"../../../parts/PartsList":218}],104:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NPCPrep = void 0;
@@ -16316,7 +17165,7 @@ class NPCPrep {
     }
 }
 exports.NPCPrep = NPCPrep;
-},{"../../../constants":126,"../../../data/DataDefaults":127,"../../../parts/PartsList":194,"./AttributesPrep":92}],101:[function(require,module,exports){
+},{"../../../constants":150,"../../../data/DataDefaults":151,"../../../parts/PartsList":218,"./AttributesPrep":96}],105:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports._mergeWithMissingSkillFields = exports.SkillsPrep = void 0;
@@ -16414,7 +17263,7 @@ const _mergeWithMissingSkillFields = (givenSkill) => {
     mergeObject(givenSkill, template, { overwrite: false });
 };
 exports._mergeWithMissingSkillFields = _mergeWithMissingSkillFields;
-},{"../../../config":125,"../../../helpers":140,"../../../parts/PartsList":194}],102:[function(require,module,exports){
+},{"../../../config":149,"../../../helpers":164,"../../../parts/PartsList":218}],106:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WoundsPrep = void 0;
@@ -16432,7 +17281,7 @@ class WoundsPrep {
     }
 }
 exports.WoundsPrep = WoundsPrep;
-},{}],103:[function(require,module,exports){
+},{}],107:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -16453,6 +17302,7 @@ const SkillEditSheet_1 = require("../../apps/skills/SkillEditSheet");
 const KnowledgeSkillEditSheet_1 = require("../../apps/skills/KnowledgeSkillEditSheet");
 const LanguageSkillEditSheet_1 = require("../../apps/skills/LanguageSkillEditSheet");
 const MoveInventoryDialog_1 = require("../../apps/dialogs/MoveInventoryDialog");
+const chummer_import_form_1 = require("../../apps/chummer-import-form");
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
 // when opened in succession, causing SkillEditSheet to wrongfully overwrite the wrong data.
@@ -16615,6 +17465,8 @@ class SR5BaseActorSheet extends ActorSheet {
         html.find('.inventory-edit').on('click', this._onInplaceInventoryEdit.bind(this));
         html.find('.inventory-input-cancel').on('click', this._onInplaceInventoryEditCancel.bind(this));
         html.find('.inventory-input-save').on('click', this._onInplaceInventoryEditSave.bind(this));
+        html.find('input#input-inventory').on('keydown', this._onInplaceInventoryEditCancel.bind(this));
+        html.find('input#input-inventory').on('keydown', this._onInplaceInventoryEditSave.bind(this));
         html.find('#select-inventory').on('change', this._onSelectInventory.bind(this));
         html.find('.inventory-item-move').on('click', this._onItemMoveToInventory.bind(this));
         // Condition monitor track handling...
@@ -16653,6 +17505,10 @@ class SR5BaseActorSheet extends ActorSheet {
         html.find('.show-hidden-skills').on('click', this._onShowHiddenSkills.bind(this));
         html.find('.open-source-pdf').on('click', this._onOpenSourcePDF.bind(this));
         html.find('.list-item').each(this._addDragSupportToListItemTemplatePartial.bind(this));
+        html.find('.import-character').on('click', this._onShowImportCharacter.bind(this));
+        // Misc. item type actions...
+        html.find('.reload-ammo').on('click', this._onReloadAmmo.bind(this));
+        html.find('.matrix-att-selector').on('change', this._onMatrixAttributeSelected.bind(this));
     }
     /**
      * Handle display of item types within the actors inventory section.
@@ -16761,7 +17617,7 @@ class SR5BaseActorSheet extends ActorSheet {
             // Add any created items to the selected inventory.
             if (Array.isArray(documents)) {
                 const items = documents.filter(document => document instanceof SR5Item_1.SR5Item);
-                yield this.document.addItemsToInventory(this.selectedInventory, items);
+                yield this.document.inventory.addItems(this.selectedInventory, items);
             }
             return documents;
         });
@@ -16850,7 +17706,7 @@ class SR5BaseActorSheet extends ActorSheet {
                 return;
             // Add the item to the selected inventory.
             if (this.selectedInventory !== this.document.defaultInventory.name)
-                yield this.document.addItemsToInventory(this.selectedInventory, items);
+                yield this.document.inventory.addItems(this.selectedInventory, items);
         });
     }
     _onItemEdit(event) {
@@ -16870,6 +17726,10 @@ class SR5BaseActorSheet extends ActorSheet {
             if (!userConsented)
                 return;
             const iid = helpers_1.Helpers.listItemId(event);
+            const item = this.actor.items.get(iid);
+            if (!item)
+                return;
+            yield this.actor.inventory.removeItem(item);
             return yield this.actor.deleteEmbeddedDocuments('Item', [iid]);
         });
     }
@@ -17238,6 +18098,7 @@ class SR5BaseActorSheet extends ActorSheet {
         data.isCritter = this.actor.isCritter();
         data.hasSkills = this.actor.hasSkills;
         data.hasSpecial = this.actor.hasSpecial;
+        data.hasFullDefense = this.actor.hasFullDefense;
     }
     _onMarksQuantityChange(event) {
         var _a;
@@ -17547,6 +18408,10 @@ class SR5BaseActorSheet extends ActorSheet {
             return this.actor.rollAttribute(attribute, { event: event });
         });
     }
+    /**
+     * Handle interaction with a damage track title.
+     * @param event
+     */
     _onRollCellInput(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
@@ -17695,7 +18560,7 @@ class SR5BaseActorSheet extends ActorSheet {
             const userConsented = yield helpers_1.Helpers.confirmDeletion();
             if (!userConsented)
                 return;
-            yield this.document.removeInventory(this.selectedInventory);
+            yield this.document.inventory.remove(this.selectedInventory);
             // Preselect default instead of none.
             this.selectedInventory = this.document.defaultInventory.name;
             this.render();
@@ -17726,10 +18591,13 @@ class SR5BaseActorSheet extends ActorSheet {
      * Hide inline inventory editing and show inventory selection instead.
      *
      * Cancel edit workflow and do nothing.
-     * @param event
+     *
+     * @param event Can be an event of type click or keydown.
      */
     _onInplaceInventoryEditCancel(event) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (event.type === 'keydown' && event.code !== 'Escape')
+                return;
             event.preventDefault();
             $('.selection-inventory').show();
             $('.inline-input-inventory').hide();
@@ -17742,11 +18610,12 @@ class SR5BaseActorSheet extends ActorSheet {
     /**
      * Complete inline editing and either save changes or create a missing inventory.
      *
-     * @param event
+     * @param event Either a click or keydown event.
      */
-    // TODO: Editing doesn't work, as it will assume that it must be created.
     _onInplaceInventoryEditSave(event) {
         return __awaiter(this, void 0, void 0, function* () {
+            if (event.type === 'keydown' && event.code !== 'Enter')
+                return;
             event.preventDefault();
             const inputElement = $('#input-inventory');
             const action = inputElement.data('action');
@@ -17755,10 +18624,10 @@ class SR5BaseActorSheet extends ActorSheet {
                 return;
             switch (action) {
                 case 'edit':
-                    yield this.document.renameInventory(this.selectedInventory, inventory);
+                    yield this.document.inventory.rename(this.selectedInventory, inventory);
                     break;
                 case 'create':
-                    yield this.document.createInventory(inventory);
+                    yield this.document.inventory.create(inventory);
                     break;
             }
             yield this._onInplaceInventoryEditCancel(event);
@@ -17797,12 +18666,77 @@ class SR5BaseActorSheet extends ActorSheet {
             const inventory = yield dialog.select();
             if (dialog.canceled)
                 return;
-            yield this.document.addItemsToInventory(inventory, item);
+            yield this.document.inventory.addItems(inventory, item);
         });
+    }
+    /**
+     * Initiative a reload from a sheet event.
+     *
+     * @param event
+     */
+    _onReloadAmmo(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const iid = helpers_1.Helpers.listItemId(event);
+            const item = this.actor.items.get(iid);
+            if (item)
+                return item.reloadAmmo();
+        });
+    }
+    /**
+     * Sync matrix attribute changes (order) made on the actor sheet into item data.
+     *
+     * @param event
+     */
+    _onMatrixAttributeSelected(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!("matrix" in this.actor.data.data))
+                return;
+            let iid = this.actor.data.data.matrix.device;
+            let item = this.actor.items.get(iid);
+            if (!item) {
+                console.error('could not find item');
+                return;
+            }
+            // grab matrix attribute (sleaze, attack, etc.)
+            let att = event.currentTarget.dataset.att;
+            // grab device attribute (att1, att2, ...)
+            let deviceAtt = event.currentTarget.value;
+            // get current matrix attribute on the device
+            const deviceData = item.data.data;
+            let oldVal = deviceData.atts[deviceAtt].att;
+            let data = {
+                _id: iid,
+            };
+            // go through atts on device, setup matrix attributes on it
+            for (let i = 1; i <= 4; i++) {
+                let tmp = `att${i}`;
+                let key = `data.atts.att${i}.att`;
+                if (tmp === deviceAtt) {
+                    data[key] = att;
+                }
+                else if (deviceData.atts[`att${i}`].att === att) {
+                    data[key] = oldVal;
+                }
+            }
+            yield this.actor.updateEmbeddedDocuments('Item', [data]);
+        });
+    }
+    /**
+     * Open the Chummer Character import handling.
+     * @param event
+     */
+    _onShowImportCharacter(event) {
+        event.preventDefault();
+        const options = {
+            name: 'chummer-import',
+            title: 'Chummer Import',
+        };
+        new chummer_import_form_1.ChummerImportForm(this.actor, options).render(true);
     }
 }
 exports.SR5BaseActorSheet = SR5BaseActorSheet;
-},{"../../apps/dialogs/MoveInventoryDialog":114,"../../apps/skills/KnowledgeSkillEditSheet":119,"../../apps/skills/LanguageSkillEditSheet":120,"../../apps/skills/SkillEditSheet":121,"../../config":125,"../../effects":132,"../../helpers":140,"../../item/SR5Item":180}],104:[function(require,module,exports){
+},{"../../apps/chummer-import-form":134,"../../apps/dialogs/MoveInventoryDialog":138,"../../apps/skills/KnowledgeSkillEditSheet":143,"../../apps/skills/LanguageSkillEditSheet":144,"../../apps/skills/SkillEditSheet":145,"../../config":149,"../../effects":156,"../../helpers":164,"../../item/SR5Item":204}],108:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5CharacterSheet = void 0;
@@ -17860,7 +18794,7 @@ class SR5CharacterSheet extends SR5BaseActorSheet_1.SR5BaseActorSheet {
     }
 }
 exports.SR5CharacterSheet = SR5CharacterSheet;
-},{"./SR5BaseActorSheet":103}],105:[function(require,module,exports){
+},{"./SR5BaseActorSheet":107}],109:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -17931,7 +18865,7 @@ class SR5ICActorSheet extends SR5BaseActorSheet_1.SR5BaseActorSheet {
     }
 }
 exports.SR5ICActorSheet = SR5ICActorSheet;
-},{"./SR5BaseActorSheet":103}],106:[function(require,module,exports){
+},{"./SR5BaseActorSheet":107}],110:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5SpiritActorSheet = void 0;
@@ -17955,7 +18889,7 @@ class SR5SpiritActorSheet extends SR5BaseActorSheet_1.SR5BaseActorSheet {
     }
 }
 exports.SR5SpiritActorSheet = SR5SpiritActorSheet;
-},{"./SR5BaseActorSheet":103}],107:[function(require,module,exports){
+},{"./SR5BaseActorSheet":107}],111:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5SpriteActorSheet = void 0;
@@ -17977,7 +18911,7 @@ class SR5SpriteActorSheet extends SR5BaseActorSheet_1.SR5BaseActorSheet {
     }
 }
 exports.SR5SpriteActorSheet = SR5SpriteActorSheet;
-},{"./SR5BaseActorSheet":103}],108:[function(require,module,exports){
+},{"./SR5BaseActorSheet":107}],112:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -18075,7 +19009,7 @@ class SR5VehicleActorSheet extends SR5BaseActorSheet_1.SR5BaseActorSheet {
     }
 }
 exports.SR5VehicleActorSheet = SR5VehicleActorSheet;
-},{"./SR5BaseActorSheet":103}],109:[function(require,module,exports){
+},{"./SR5BaseActorSheet":107}],113:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChangelogApplication = void 0;
@@ -18110,7 +19044,7 @@ class ChangelogApplication extends Application {
     }
 }
 exports.ChangelogApplication = ChangelogApplication;
-},{"../constants":126}],110:[function(require,module,exports){
+},{"../constants":150}],114:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -18327,7 +19261,1763 @@ class EnvModifiersApplication extends Application {
     }
 }
 exports.EnvModifiersApplication = EnvModifiersApplication;
-},{"../actor/SR5Actor":82,"../constants":126,"../helpers":140,"../rules/Modifiers":198}],111:[function(require,module,exports){
+},{"../actor/SR5Actor":85,"../constants":150,"../helpers":164,"../rules/Modifiers":222}],115:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ArmorParser = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _BaseParserFunctions = require("./BaseParserFunctions.js");
+
+var ArmorParser = /*#__PURE__*/function () {
+  function ArmorParser() {
+    (0, _classCallCheck2["default"])(this, ArmorParser);
+  }
+
+  (0, _createClass2["default"])(ArmorParser, [{
+    key: "parseArmors",
+    value: function parseArmors(chummerChar) {
+      var _this = this;
+
+      var armors = (0, _BaseParserFunctions.getArray)(chummerChar.armors.armor);
+      var parsedArmors = [];
+      armors.forEach(function (chummerArmor) {
+        try {
+          var itemData = _this.parseArmor(chummerArmor);
+
+          parsedArmors.push(itemData);
+        } catch (e) {
+          console.error(e);
+        }
+      });
+      return parsedArmors;
+    }
+  }, {
+    key: "parseArmor",
+    value: function parseArmor(chummerArmor) {
+      var data = {};
+      var armor = {};
+      data.armor = armor;
+      var desc = '';
+      armor.mod = chummerArmor.armor.includes('+');
+      armor.value = parseInt(chummerArmor.armor.replace('+', ''));
+      if (chummerArmor.description) desc = chummerArmor.description;
+      console.log(chummerArmor);
+
+      if (chummerArmor.armormods && chummerArmor.armormods.armormod) {
+        armor.fire = 0;
+        armor.electricity = 0;
+        armor.cold = 0;
+        armor.acid = 0;
+        armor.radiation = 0;
+        var modDesc = [];
+        var mods = (0, _BaseParserFunctions.getArray)(chummerArmor.armormods.armormod);
+        mods.forEach(function (mod) {
+          if (mod.name.toLowerCase().includes('fire resistance')) {
+            armor.fire += parseInt(mod.rating);
+          } else if (mod.name.toLowerCase().includes('nonconductivity')) {
+            armor.electricity += parseInt(mod.rating);
+          } else if (mod.name.toLowerCase().includes('insulation')) {
+            armor.cold += parseInt(mod.rating);
+          } else if (mod.name.toLowerCase().includes('radiation shielding')) {
+            armor.radiation += parseInt(mod.rating);
+          }
+
+          if (mod.rating !== '') {
+            modDesc.push("".concat(mod.name, " R").concat(mod.rating));
+          } else {
+            modDesc.push(mod.name);
+          }
+        });
+
+        if (modDesc.length > 0) {
+          // add desc to beginning
+          desc = "".concat(modDesc.join(','), "\n\n").concat(desc);
+        }
+      }
+
+      data.technology = (0, _BaseParserFunctions.parseTechnology)(chummerArmor);
+      data.description = (0, _BaseParserFunctions.parseDescription)(chummerArmor);
+      return (0, _BaseParserFunctions.createItemData)(chummerArmor.name, 'armor', data);
+    }
+  }]);
+  return ArmorParser;
+}();
+
+exports.ArmorParser = ArmorParser;
+
+},{"./BaseParserFunctions.js":116,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],116:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.createItemData = exports.parseTechnology = exports.parseDescription = exports.getArray = exports.getValues = void 0;
+
+var _DataDefaults = require("../../data/DataDefaults");
+
+var getValues = function getValues(val) {
+  var regex = /(-?[0-9]+)(?:([0-9]+))*/g;
+  var l = val.match(regex);
+  return l || ['0'];
+};
+
+exports.getValues = getValues;
+
+var getArray = function getArray(value) {
+  return Array.isArray(value) ? value : [value];
+};
+/**
+ *  Creates the description data from the chummer entry
+ *  @param chummerEntry The chummer entry (the item)
+ */
+
+
+exports.getArray = getArray;
+
+var parseDescription = function parseDescription(chummerEntry) {
+  var parsedDescription = _DataDefaults.DefaultValues.descriptionData();
+
+  if (chummerEntry.source && chummerEntry.page) {
+    parsedDescription.source = "".concat(chummerEntry.source, " ").concat(chummerEntry.page);
+  }
+
+  if (chummerEntry.description) {
+    parsedDescription.value = TextEditor.enrichHTML(chummerEntry.description);
+  }
+
+  return parsedDescription;
+};
+/**
+ *  Creates the technology data from the chummer entry
+ *  @param chummerEntry The chummer entry (the item)
+ */
+
+
+exports.parseDescription = parseDescription;
+
+var parseTechnology = function parseTechnology(chummerEntry) {
+  var parsedTechnology = _DataDefaults.DefaultValues.technologyData();
+
+  if (chummerEntry.rating) {
+    parsedTechnology.rating = chummerEntry.rating;
+  }
+
+  if (chummerEntry.avail) {
+    parsedTechnology.availability = chummerEntry.avail;
+  }
+
+  if (chummerEntry.qty) {
+    parsedTechnology.quantity = chummerEntry.qty;
+  }
+
+  if (chummerEntry.cost) {
+    parsedTechnology.cost = parseFloat(chummerEntry.cost.replace(/[^\d\.\-]/g, ""));
+  }
+
+  if (chummerEntry.equipped && chummerEntry.equipped.toLowerCase() === 'true') {
+    parsedTechnology.equipped = true;
+  }
+
+  if (chummerEntry.conditionmonitor) {
+    parsedTechnology.condition_monitor.max = Number(chummerEntry.conditionmonitor);
+  }
+
+  if (chummerEntry.conceal) {
+    parsedTechnology.conceal.base = Number(chummerEntry.conceal);
+  }
+
+  return parsedTechnology;
+};
+
+exports.parseTechnology = parseTechnology;
+
+var createItemData = function createItemData(name, type, data) {
+  return {
+    name: name,
+    _id: '',
+    folder: '',
+    flags: {},
+    img: 'icons/svg/mystery-man.svg',
+    type: type,
+    data: data,
+    permission: {
+      "default": 2
+    }
+  };
+};
+
+exports.createItemData = createItemData;
+
+},{"../../data/DataDefaults":151}],117:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.CharacterImporter = void 0;
+
+var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
+
+var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _CharacterInfoUpdater = require("./CharacterInfoUpdater");
+
+var _ItemsParser = require("./ItemsParser");
+
+/**
+ * Imports characters from other tools into an existing foundry actor.
+ */
+var CharacterImporter = /*#__PURE__*/function () {
+  function CharacterImporter() {
+    (0, _classCallCheck2["default"])(this, CharacterImporter);
+  }
+
+  (0, _createClass2["default"])(CharacterImporter, [{
+    key: "importChummerCharacter",
+    value:
+    /**
+     * Imports a chummer character into an existing actor. The actor will be updated. This might lead to duplicate items.
+     * @param {*} actor The actor that will be updated with the chummer character.
+     * @param {*} chummerFile The complete chummer file as json object. The first character will be selected for import.
+     * @param {*} importOptions Additional import option that specify what parts of the chummer file will be imported.
+     */
+    function () {
+      var _importChummerCharacter = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(actor, chummerFile, importOptions) {
+        var chummerCharacter, updatedActorData, items;
+        return _regenerator["default"].wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                console.log('Importing the following character file content:');
+                console.log(chummerFile);
+                console.log('Using the following import options:');
+                console.log(importOptions);
+
+                if (!(!chummerFile.characters || !chummerFile.characters.character)) {
+                  _context.next = 7;
+                  break;
+                }
+
+                console.log('Did not find a valid character to import  - aborting import');
+                return _context.abrupt("return");
+
+              case 7:
+                chummerCharacter = chummerFile.characters.character;
+                updatedActorData = new _CharacterInfoUpdater.CharacterInfoUpdater().update(actor.data, chummerCharacter);
+                items = new _ItemsParser.ItemsParser().parse(chummerCharacter, importOptions);
+                _context.next = 12;
+                return actor.update(updatedActorData);
+
+              case 12:
+                _context.next = 14;
+                return actor.createEmbeddedDocuments('Item', items);
+
+              case 14:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee);
+      }));
+
+      function importChummerCharacter(_x, _x2, _x3) {
+        return _importChummerCharacter.apply(this, arguments);
+      }
+
+      return importChummerCharacter;
+    }()
+  }]);
+  return CharacterImporter;
+}();
+
+exports.CharacterImporter = CharacterImporter;
+
+},{"./CharacterInfoUpdater":118,"./ItemsParser":121,"@babel/runtime/helpers/asyncToGenerator":2,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/regenerator":14}],118:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.CharacterInfoUpdater = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
+
+var _SkillsPrep = require("../../actor/prep/functions/SkillsPrep");
+
+/**
+ * Parses all non-item character information from a chummer character object.
+ */
+var CharacterInfoUpdater = /*#__PURE__*/function () {
+  function CharacterInfoUpdater() {
+    (0, _classCallCheck2["default"])(this, CharacterInfoUpdater);
+    (0, _defineProperty2["default"])(this, "parseAttName", function (attName) {
+      if (attName.toLowerCase() === 'bod') {
+        return 'body';
+      }
+
+      if (attName.toLowerCase() === 'agi') {
+        return 'agility';
+      }
+
+      if (attName.toLowerCase() === 'rea') {
+        return 'reaction';
+      }
+
+      if (attName.toLowerCase() === 'str') {
+        return 'strength';
+      }
+
+      if (attName.toLowerCase() === 'cha') {
+        return 'charisma';
+      }
+
+      if (attName.toLowerCase() === 'int') {
+        return 'intuition';
+      }
+
+      if (attName.toLowerCase() === 'log') {
+        return 'logic';
+      }
+
+      if (attName.toLowerCase() === 'wil') {
+        return 'willpower';
+      }
+
+      if (attName.toLowerCase() === 'edg') {
+        return 'edge';
+      }
+
+      if (attName.toLowerCase() === 'mag') {
+        return 'magic';
+      }
+
+      if (attName.toLowerCase() === 'res') {
+        return 'resonance';
+      }
+    });
+    (0, _defineProperty2["default"])(this, "getArray", function (value) {
+      return Array.isArray(value) ? value : [value];
+    });
+    (0, _defineProperty2["default"])(this, "parseAttBaseValue", function (att) {
+      if (att.name.toLowerCase() === 'edg') {
+        // The edge attribute value is stored in the "base" field instead of the total field
+        // In chummer, the "total" field is used for the amount of edge remaining to a character
+        return parseInt(att.base);
+      } else {
+        return parseInt(att.total);
+      }
+    });
+  }
+
+  (0, _createClass2["default"])(CharacterInfoUpdater, [{
+    key: "update",
+    value:
+    /**
+     * Parses the actor data from the chummer file and returns an updated clone of the actor data.
+     * @param {*} actorData The actor data (actor.data not actor.data.data) that is used as the basis for the import. Will not be changed.
+     * @param {*} chummerChar The chummer character to parse.
+     */
+    function update(actorData, chummerChar) {
+      var clonedActorData = duplicate(actorData); // Name is required, so we need to always set something (even if the chummer field is empty)
+
+      if (chummerChar.alias) {
+        clonedActorData.name = chummerChar.alias;
+      } else {
+        clonedActorData.name = chummerChar.name ? chummerChar.name : '[Name not found]';
+      }
+
+      this.importBasicData(clonedActorData.data, chummerChar);
+      this.importBio(clonedActorData.data, chummerChar);
+      this.importAttributes(clonedActorData.data, chummerChar);
+      this.importInitiative(clonedActorData.data, chummerChar);
+      this.importSkills(clonedActorData.data, chummerChar);
+      return clonedActorData;
+    }
+  }, {
+    key: "importBasicData",
+    value: function importBasicData(actorDataData, chummerChar) {
+      var _this = this;
+
+      try {
+        if (chummerChar.playername) {
+          actorDataData.player_name = chummerChar.playername;
+        }
+
+        if (chummerChar.alias) {
+          actorDataData.name = chummerChar.alias;
+        }
+
+        if (chummerChar.metatype) {
+          actorDataData.metatype = chummerChar.metatype;
+        }
+
+        if (chummerChar.sex) {
+          actorDataData.sex = chummerChar.sex;
+        }
+
+        if (chummerChar.age) {
+          actorDataData.age = chummerChar.age;
+        }
+
+        if (chummerChar.height) {
+          actorDataData.height = chummerChar.height;
+        }
+
+        if (chummerChar.weight) {
+          actorDataData.weight = chummerChar.weight;
+        }
+
+        if (chummerChar.calculatedstreetcred) {
+          actorDataData.street_cred = chummerChar.calculatedstreetcred;
+        }
+
+        if (chummerChar.calculatednotoriety) {
+          actorDataData.notoriety = chummerChar.calculatednotoriety;
+        }
+
+        if (chummerChar.calculatedpublicawareness) {
+          actorDataData.public_awareness = chummerChar.calculatedpublicawareness;
+        }
+
+        if (chummerChar.karma) {
+          actorDataData.karma.value = chummerChar.karma;
+        }
+
+        if (chummerChar.totalkarma) {
+          actorDataData.karma.max = chummerChar.totalkarma;
+        }
+
+        if (chummerChar.technomancer && chummerChar.technomancer.toLowerCase() === 'true') {
+          actorDataData.special = 'resonance';
+        }
+
+        if (chummerChar.magician && chummerChar.magician.toLowerCase() === 'true' || chummerChar.adept && chummerChar.adept.toLowerCase() === 'true') {
+          actorDataData.special = 'magic';
+          var attr = [];
+
+          if (chummerChar.tradition && chummerChar.tradition.drainattribute && chummerChar.tradition.drainattribute.attr) {
+            attr = chummerChar.tradition.drainattribute.attr;
+          } else if (chummerChar.tradition && chummerChar.tradition.drainattributes) {
+            attr = chummerChar.tradition.drainattributes.split('+').map(function (item) {
+              return item.trim();
+            });
+          }
+
+          attr.forEach(function (att) {
+            var attName = _this.parseAttName(att);
+
+            if (attName !== 'willpower') actorDataData.magic.attribute = att;
+          });
+        }
+
+        if (chummerChar.totaless) {
+          actorDataData.attributes.essence.value = chummerChar.totaless;
+        }
+
+        if (chummerChar.nuyen) {
+          actorDataData.nuyen = parseInt(chummerChar.nuyen.replace(',', ''));
+        }
+      } catch (e) {
+        console.error("Error while parsing character information ".concat(e));
+      }
+    }
+  }, {
+    key: "importBio",
+    value: function importBio(actorDataData, chummerChar) {
+      actorDataData.description.value = ''; // Chummer outputs html and wraps every section in <p> tags,
+      // so we just concat everything with an additional linebreak in between
+
+      if (chummerChar.description) {
+        actorDataData.description.value += TextEditor.enrichHTML(chummerChar.description + '<br/>');
+      }
+
+      if (chummerChar.background) {
+        actorDataData.description.value += TextEditor.enrichHTML(chummerChar.background + '<br/>');
+      }
+
+      if (chummerChar.concept) {
+        actorDataData.description.value += TextEditor.enrichHTML(chummerChar.concept + '<br/>');
+      }
+
+      if (chummerChar.notes) {
+        actorDataData.description.value += TextEditor.enrichHTML(chummerChar.notes + '<br/>');
+      }
+    }
+  }, {
+    key: "importAttributes",
+    value: function importAttributes(actorDataData, chummerChar) {
+      var _this2 = this;
+
+      var atts = chummerChar.attributes[1].attribute;
+      atts.forEach(function (att) {
+        try {
+          var attName = _this2.parseAttName(att.name);
+
+          if (attName) {
+            actorDataData.attributes[attName].base = _this2.parseAttBaseValue(att);
+          }
+        } catch (e) {
+          console.error("Error while parsing attributes ".concat(e));
+        }
+      });
+    } // TODO: These modifiers are very unclear in how they're used here and where they come from.
+
+  }, {
+    key: "importInitiative",
+    value: function importInitiative(actorDataData, chummerChar) {
+      try {
+        actorDataData.modifiers.meat_initiative = chummerChar.initbonus; // 'initdice' contains the total amount of initiative dice, not just the bonus.
+
+        actorDataData.modifiers.meat_initiative_dice = chummerChar.initdice - 1;
+      } catch (e) {
+        console.error("Error while parsing initiative ".concat(e));
+      }
+    }
+  }, {
+    key: "importSkills",
+    value: function importSkills(actorDataData, chummerChar) {
+      var chummerSkills = chummerChar.skills.skill;
+
+      for (var i = 0; i < chummerSkills.length; i++) {
+        try {
+          var chummerSkill = chummerSkills[i]; // NOTE: taMiF here: I have no idea what the general islanguage check has been added for.
+          //                   it MIGHT be in order to exclude skill groups or some such, but I haven't found a reason
+          //                   for it. Since it's working with it, I'll leave it to the pile. Warm your hands.
+
+          if (chummerSkill.rating > 0 && chummerSkill.islanguage) {
+            var determinedGroup = 'active';
+            var parsedSkill = null; // Either find an active skill are prepare knowledge skills.
+
+            if (chummerSkill.islanguage && chummerSkill.islanguage.toLowerCase() === 'true') {
+              var id = randomID(16);
+              parsedSkill = {};
+              actorDataData.skills.language.value[id] = parsedSkill;
+              determinedGroup = 'language';
+            } else if (chummerSkill.knowledge && chummerSkill.knowledge.toLowerCase() === 'true') {
+              var _id = randomID(16);
+
+              var category = chummerSkill.skillcategory_english;
+              parsedSkill = {}; // Determine the correct knowledge skill category and assign the skill to it
+
+              var skillCategory = void 0;
+
+              if (category) {
+                var cat = category.toLowerCase();
+                if (cat === 'street') skillCategory = actorDataData.skills.knowledge.street.value;
+                if (cat === 'academic') skillCategory = actorDataData.skills.knowledge.academic.value;
+                if (cat === 'professional') skillCategory = actorDataData.skills.knowledge.professional.value;
+                if (cat === 'interest') skillCategory = actorDataData.skills.knowledge.interests.value;
+                if (skillCategory) skillCategory[_id] = parsedSkill;
+              } else {
+                if (chummerSkill.attribute.toLowerCase() === 'int') {
+                  actorDataData.skills.knowledge.street.value[_id] = parsedSkill;
+                }
+
+                if (chummerSkill.attribute.toLowerCase() === 'log') {
+                  actorDataData.skills.knowledge.professional.value[_id] = parsedSkill;
+                }
+              }
+
+              determinedGroup = 'knowledge';
+            } else {
+              var name = chummerSkill.name.toLowerCase().trim().replace(/\s/g, '_').replace(/-/g, '_');
+              if (name.includes('exotic') && name.includes('_weapon')) name = name.replace('_weapon', '');
+              if (name === 'pilot_watercraft') name = 'pilot_water_craft';
+              parsedSkill = actorDataData.skills.active[name];
+            } // Fill the found skill with a base rating.
+
+
+            if (!parsedSkill) {
+              console.error("Couldn't parse skill ".concat(chummerSkill.name));
+            } else {
+              if (determinedGroup !== 'active') parsedSkill.name = chummerSkill.name;
+              parsedSkill.base = parseInt(chummerSkill.rating);
+
+              if (chummerSkill.skillspecializations) {
+                parsedSkill.specs = this.getArray(chummerSkill.skillspecializations.skillspecialization.name);
+              } // Precaution to later only deal with complete SkillField data models.
+
+
+              (0, _SkillsPrep._mergeWithMissingSkillFields)(parsedSkill);
+            }
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+  }]);
+  return CharacterInfoUpdater;
+}();
+
+exports.CharacterInfoUpdater = CharacterInfoUpdater;
+
+},{"../../actor/prep/functions/SkillsPrep":105,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/interopRequireDefault":9}],119:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ContactParser = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _BaseParserFunctions = require("./BaseParserFunctions.js");
+
+var ContactParser = /*#__PURE__*/function () {
+  function ContactParser() {
+    (0, _classCallCheck2["default"])(this, ContactParser);
+  }
+
+  (0, _createClass2["default"])(ContactParser, [{
+    key: "parseContacts",
+    value: function parseContacts(chummerChar) {
+      var _this = this;
+
+      var chummerContacts = (0, _BaseParserFunctions.getArray)(chummerChar.contacts.contact);
+      var parsedContacts = [];
+      chummerContacts.forEach(function (chummerContact) {
+        try {
+          var itemData = _this.parseContact(chummerContact);
+
+          parsedContacts.push(itemData);
+        } catch (e) {
+          console.error(e);
+        }
+      });
+      return parsedContacts;
+    }
+  }, {
+    key: "parseContact",
+    value: function parseContact(chummerContact) {
+      var data = {};
+      data.type = chummerContact.role; // Group contacts are stored in chummer as 'Group(connectionRating)', e.g. 'Group(5)'
+      // We handle group contacts as normal contacts until they are supported in the codebase.
+
+      if (chummerContact.connection.toLowerCase().includes('group')) {
+        data.connection = chummerContact.connection.toLowerCase().replace('group(', '').replace(')', '');
+      } else {
+        data.connection = chummerContact.connection;
+      }
+
+      data.loyalty = chummerContact.loyalty;
+      data.family = chummerContact.family.toLowerCase() === 'true';
+      data.blackmail = chummerContact.blackmail.toLowerCase() === 'true';
+      data.description = (0, _BaseParserFunctions.parseDescription)(chummerContact);
+      var itemName = chummerContact.name ? chummerContact.name : '[Unnamed connection]';
+      var itemData = (0, _BaseParserFunctions.createItemData)(itemName, 'contact', data);
+      return itemData;
+    }
+  }]);
+  return ContactParser;
+}();
+
+exports.ContactParser = ContactParser;
+
+},{"./BaseParserFunctions.js":116,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],120:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.CyberwareParser = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _BaseParserFunctions = require("./BaseParserFunctions.js");
+
+var CyberwareParser = /*#__PURE__*/function () {
+  function CyberwareParser() {
+    (0, _classCallCheck2["default"])(this, CyberwareParser);
+  }
+
+  (0, _createClass2["default"])(CyberwareParser, [{
+    key: "parseCyberwares",
+    value: function parseCyberwares(chummerChar) {
+      var _this = this;
+
+      var chummerCyberwares = (0, _BaseParserFunctions.getArray)(chummerChar.cyberwares.cyberware);
+      var parsedCyberware = [];
+      chummerCyberwares.forEach(function (chummerCyber) {
+        try {
+          var itemData = _this.parseCyberware(chummerCyber);
+
+          parsedCyberware.push(itemData);
+        } catch (e) {
+          console.error(e);
+        }
+      });
+      return parsedCyberware;
+    }
+  }, {
+    key: "parseCyberware",
+    value: function parseCyberware(chummerCyber) {
+      var data = {};
+      data.description = (0, _BaseParserFunctions.parseDescription)(chummerCyber);
+      data.technology = (0, _BaseParserFunctions.parseTechnology)(chummerCyber); // Cyberware has no equipped flag in chummer so it cannot be parsed - we consider it as always equipped
+
+      data.technology.equipped = true;
+      data.essence = chummerCyber.ess;
+      data.grade = chummerCyber.grade;
+      return (0, _BaseParserFunctions.createItemData)(chummerCyber.name, 'cyberware', data);
+    }
+  }]);
+  return CyberwareParser;
+}();
+
+exports.CyberwareParser = CyberwareParser;
+
+},{"./BaseParserFunctions.js":116,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],121:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ItemsParser = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _BaseParserFunctions = require("./BaseParserFunctions.js");
+
+var _GearsParser = require("./gearImport/GearsParser");
+
+var _ArmorParser = require("./ArmorParser");
+
+var _CyberwareParser = require("./CyberwareParser");
+
+var _QualityParser = require("./QualityParser");
+
+var _PowerParser = require("./PowerParser");
+
+var _SpellParser = require("./SpellParser");
+
+var _WeaponParser = require("./WeaponParser");
+
+var _LifestyleParser = require("./LifestyleParser");
+
+var _ContactParser = require("./ContactParser");
+
+/**
+ * Parses all items (qualities, weapons, gear, ...) from a chummer character.
+ */
+var ItemsParser = /*#__PURE__*/function () {
+  function ItemsParser() {
+    (0, _classCallCheck2["default"])(this, ItemsParser);
+  }
+
+  (0, _createClass2["default"])(ItemsParser, [{
+    key: "parse",
+    value:
+    /**
+     * Parses all items from a chummer char and returns an array of the corresponding foundry items.
+     * @param {*} chummerChar The chummer char holding the items
+     * @param {*} importOptions Additional import option that specify what items will be imported.
+     */
+    function parse(chummerChar, importOptions) {
+      var parsedItems = [];
+
+      if (importOptions.qualities && chummerChar.qualities && chummerChar.qualities.quality) {
+        var parsedQualities = new _QualityParser.QualityParser().parseQualities(chummerChar);
+        Array.prototype.push.apply(parsedItems, parsedQualities);
+      }
+
+      if (importOptions.weapons && chummerChar.weapons != null && chummerChar.weapons.weapon != null) {
+        var parsedWeapons = new _WeaponParser.WeaponParser().parseWeapons(chummerChar);
+        Array.prototype.push.apply(parsedItems, parsedWeapons);
+      }
+
+      if (importOptions.armor && chummerChar.armors && chummerChar.armors.armor) {
+        var parsedArmors = new _ArmorParser.ArmorParser().parseArmors(chummerChar);
+        Array.prototype.push.apply(parsedItems, parsedArmors);
+      }
+
+      if (importOptions.cyberware && chummerChar.cyberwares && chummerChar.cyberwares.cyberware) {
+        var parsedCyberware = new _CyberwareParser.CyberwareParser().parseCyberwares(chummerChar);
+        Array.prototype.push.apply(parsedItems, parsedCyberware);
+      }
+
+      if (importOptions.powers && chummerChar.powers && chummerChar.powers.power) {
+        var parsedPowers = new _PowerParser.PowerParser().parsePowers(chummerChar);
+        Array.prototype.push.apply(parsedItems, parsedPowers);
+      }
+
+      if (importOptions.equipment && chummerChar.gears && chummerChar.gears.gear) {
+        var gears = (0, _BaseParserFunctions.getArray)(chummerChar.gears.gear);
+        var allGearData = new _GearsParser.GearsParser().parseGears(gears);
+        Array.prototype.push.apply(parsedItems, allGearData);
+      }
+
+      if (importOptions.spells && chummerChar.spells && chummerChar.spells.spell) {
+        var parsedSpells = new _SpellParser.SpellParser().parseSpells(chummerChar);
+        Array.prototype.push.apply(parsedItems, parsedSpells);
+      }
+
+      if (importOptions.contacts && chummerChar.contacts && chummerChar.contacts.contact) {
+        var parsedContacts = new _ContactParser.ContactParser().parseContacts(chummerChar);
+        Array.prototype.push.apply(parsedItems, parsedContacts);
+      }
+
+      if (importOptions.lifestyles && chummerChar.lifestyles && chummerChar.lifestyles.lifestyle) {
+        var parsedLifestyles = new _LifestyleParser.LifestyleParser().parseLifestyles(chummerChar);
+        Array.prototype.push.apply(parsedItems, parsedLifestyles);
+      }
+
+      return parsedItems;
+    }
+  }]);
+  return ItemsParser;
+}();
+
+exports.ItemsParser = ItemsParser;
+
+},{"./ArmorParser":115,"./BaseParserFunctions.js":116,"./ContactParser":119,"./CyberwareParser":120,"./LifestyleParser":122,"./PowerParser":123,"./QualityParser":124,"./SpellParser":125,"./WeaponParser":126,"./gearImport/GearsParser":130,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],122:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.LifestyleParser = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _BaseParserFunctions = require("./BaseParserFunctions.js");
+
+var _config = require("../../config");
+
+var LifestyleParser = /*#__PURE__*/function () {
+  function LifestyleParser() {
+    (0, _classCallCheck2["default"])(this, LifestyleParser);
+  }
+
+  (0, _createClass2["default"])(LifestyleParser, [{
+    key: "parseLifestyles",
+    value: function parseLifestyles(chummerChar) {
+      var _this = this;
+
+      var chummerLifestyle = (0, _BaseParserFunctions.getArray)(chummerChar.lifestyles.lifestyle);
+      var parsedLifestyle = [];
+      chummerLifestyle.forEach(function (chummerLifestyle) {
+        try {
+          var itemData = _this.parseLifestyle(chummerLifestyle);
+
+          parsedLifestyle.push(itemData);
+        } catch (e) {
+          console.error(e);
+        }
+      });
+      return parsedLifestyle;
+    }
+  }, {
+    key: "parseLifestyle",
+    value: function parseLifestyle(chummerLifestyle) {
+      var data = {}; // Advanced lifestyles and lifestyle qualities are not supported at the moment
+      // Map the chummer lifestyle type to our sr5 foundry type. 
+
+      var chummerLifestyleType = chummerLifestyle.baselifestyle.toLowerCase();
+
+      if (chummerLifestyleType in _config.SR5.lifestyleTypes) {
+        data.type = chummerLifestyleType;
+      } else {
+        // This is necessary because of a typo in SR5 config.
+        if (chummerLifestyleType === 'luxury') {
+          data.type = 'luxory';
+        } else {
+          data.type = 'other';
+        }
+      }
+
+      data.cost = chummerLifestyle.totalmonthlycost;
+      data.permanent = chummerLifestyle.purchased;
+      data.description = (0, _BaseParserFunctions.parseDescription)(chummerLifestyle); // The name of the lifestyle is optional, so we use a fallback here.
+
+      var itemName = chummerLifestyle.name ? chummerLifestyle.name : chummerLifestyle.baselifestyle;
+      var itemData = (0, _BaseParserFunctions.createItemData)(itemName, 'lifestyle', data);
+      return itemData;
+    }
+  }]);
+  return LifestyleParser;
+}();
+
+exports.LifestyleParser = LifestyleParser;
+
+},{"../../config":149,"./BaseParserFunctions.js":116,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],123:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.PowerParser = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _BaseParserFunctions = require("./BaseParserFunctions.js");
+
+var PowerParser = /*#__PURE__*/function () {
+  function PowerParser() {
+    (0, _classCallCheck2["default"])(this, PowerParser);
+  }
+
+  (0, _createClass2["default"])(PowerParser, [{
+    key: "parsePowers",
+    value: function parsePowers(chummerChar) {
+      var _this = this;
+
+      var powers = (0, _BaseParserFunctions.getArray)(chummerChar.powers.power);
+      var parsedPowers = [];
+      powers.forEach(function (chummerPower) {
+        var itemData = _this.parsePower(chummerPower);
+
+        parsedPowers.push(itemData);
+      });
+      return parsedPowers;
+    }
+  }, {
+    key: "parsePower",
+    value: function parsePower(chummerPower) {
+      var data = {};
+      data.description = (0, _BaseParserFunctions.parseDescription)(chummerPower);
+      data.level = parseInt(chummerPower.rating);
+      data.pp = parseFloat(chummerPower.totalpoints);
+      var itemData = (0, _BaseParserFunctions.createItemData)(chummerPower.fullname, 'adept_power', data);
+      return itemData;
+    }
+  }]);
+  return PowerParser;
+}();
+
+exports.PowerParser = PowerParser;
+
+},{"./BaseParserFunctions.js":116,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],124:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.QualityParser = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _BaseParserFunctions = require("./BaseParserFunctions.js");
+
+var _DataDefaults = require("../../data/DataDefaults");
+
+var QualityParser = /*#__PURE__*/function () {
+  function QualityParser() {
+    (0, _classCallCheck2["default"])(this, QualityParser);
+  }
+
+  (0, _createClass2["default"])(QualityParser, [{
+    key: "parseQualities",
+    value: function parseQualities(chummerChar) {
+      var _this = this;
+
+      var qualities = (0, _BaseParserFunctions.getArray)(chummerChar.qualities.quality);
+      var parsedQualities = [];
+      qualities.forEach(function (chummerQuality) {
+        try {
+          var itemData = _this.parseQuality(chummerQuality);
+
+          parsedQualities.push(itemData);
+        } catch (e) {
+          console.error(e);
+        }
+      });
+      return parsedQualities;
+    }
+  }, {
+    key: "parseQuality",
+    value: function parseQuality(chummerQuality) {
+      var data = _DataDefaults.DefaultValues.qualityData();
+
+      data.type = chummerQuality.qualitytype.toLowerCase();
+      data.description = (0, _BaseParserFunctions.parseDescription)(chummerQuality);
+      var itemData = (0, _BaseParserFunctions.createItemData)(chummerQuality.name, 'quality', data);
+      return itemData;
+    }
+  }]);
+  return QualityParser;
+}();
+
+exports.QualityParser = QualityParser;
+
+},{"../../data/DataDefaults":151,"./BaseParserFunctions.js":116,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],125:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.SpellParser = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _BaseParserFunctions = require("./BaseParserFunctions.js");
+
+var _DataDefaults = require("../../data/DataDefaults");
+
+var SpellParser = /*#__PURE__*/function () {
+  function SpellParser() {
+    (0, _classCallCheck2["default"])(this, SpellParser);
+  }
+
+  (0, _createClass2["default"])(SpellParser, [{
+    key: "parseSpells",
+    value: function parseSpells(chummerChar) {
+      var _this = this;
+
+      var spells = (0, _BaseParserFunctions.getArray)(chummerChar.spells.spell);
+      var parsedSpells = [];
+      spells.forEach(function (chummerSpell) {
+        try {
+          if (chummerSpell.alchemy.toLowerCase() !== 'true') {
+            var itemData = _this.parseSpell(chummerSpell);
+
+            parsedSpells.push(itemData);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      });
+      return parsedSpells;
+    }
+  }, {
+    key: "parseSpell",
+    value: function parseSpell(chummerSpell) {
+      var action = {};
+      var data = {};
+      data.action = action;
+      data.category = chummerSpell.category.toLowerCase().replace(/\s/g, '_');
+      data.name = chummerSpell.name;
+      data.type = chummerSpell.type === 'M' ? 'mana' : 'physical';
+      data.range = chummerSpell.range === 'T' ? 'touch' : chummerSpell.range.toLowerCase().replace(/\s/g, '_').replace('(', '').replace(')', '');
+      data.drain = parseInt(chummerSpell.dv.replace('F', ''));
+      data.description = (0, _BaseParserFunctions.parseDescription)(chummerSpell);
+      var description = '';
+      if (chummerSpell.descriptors) description = chummerSpell.descriptors;
+      if (chummerSpell.description) description += "\n".concat(chummerSpell.description);
+      data.description.value = TextEditor.enrichHTML(description);
+      if (chummerSpell.duration.toLowerCase() === 's') data.duration = 'sustained';else if (chummerSpell.duration.toLowerCase() === 'i') data.duration = 'instant';else if (chummerSpell.duration.toLowerCase() === 'p') data.duration = 'permanent';
+      action.type = 'varies';
+      action.skill = 'spellcasting';
+      action.attribute = 'magic';
+      action.damage = _DataDefaults.DefaultValues.damageData();
+      action.damage.type.base = '';
+      action.damage.type.value = '';
+
+      if (chummerSpell.descriptors) {
+        var desc = chummerSpell.descriptors.toLowerCase();
+
+        if (chummerSpell.category.toLowerCase() === 'combat') {
+          data.combat = {};
+
+          if (desc.includes('indirect')) {
+            data.combat.type = 'indirect';
+            action.opposed = {
+              type: 'defense'
+            };
+          } else {
+            data.combat.type = 'direct';
+
+            if (data.type === 'mana') {
+              action.damage.type.base = 'stun';
+              action.damage.type.value = 'stun';
+              action.opposed = {
+                type: 'soak',
+                attribute: 'willpower'
+              };
+            } else if (data.type === 'physical') {
+              action.damage.type.base = 'physical';
+              action.damage.type.value = 'physical';
+              action.opposed = {
+                type: 'soak',
+                attribute: 'body'
+              };
+            }
+          }
+        }
+
+        if (chummerSpell.category.toLowerCase() === 'detection') {
+          data.detection = {};
+          var split = desc.split(',');
+          split.forEach(function (token) {
+            token = token || '';
+            token = token.replace(' detection spell', '');
+            if (!token) return;
+            if (token.includes('area')) return;
+            if (token.includes('passive')) data.detection.passive = true;else if (token.includes('active')) data.detection.passive = false;else if (token) data.detection.type = token.toLowerCase();
+          });
+
+          if (!data.detection.passive) {
+            action.opposed = {
+              type: 'custom',
+              attribute: 'willpower',
+              attribute2: 'logic'
+            };
+          }
+        }
+
+        if (chummerSpell.category.toLowerCase() === 'illusion') {
+          data.illusion = {};
+
+          var _split = desc.split(',');
+
+          _split.forEach(function (token) {
+            token = token || '';
+            token = token.replace(' illusion spell', '');
+            if (!token) return;
+            if (token.includes('area')) return;
+            if (token.includes('sense')) data.illusion.sense = token.toLowerCase();else if (token) data.illusion.type = token.toLowerCase();
+          });
+
+          if (data.type === 'mana') {
+            action.opposed = {
+              type: 'custom',
+              attribute: 'willpower',
+              attribute2: 'logic'
+            };
+          } else {
+            action.opposed = {
+              type: 'custom',
+              attribute: 'intuition',
+              attribute2: 'logic'
+            };
+          }
+        }
+
+        if (chummerSpell.category.toLowerCase() === 'manipulation') {
+          data.manipulation = {};
+          if (desc.includes('environmental')) data.manipulation.environmental = true;
+          if (desc.includes('physical')) data.manipulation.physical = true;
+          if (desc.includes('mental')) data.manipulation.mental = true; // TODO figure out how to parse damaging
+
+          if (data.manipulation.mental) {
+            action.opposed = {
+              type: 'custom',
+              attribute: 'willpower',
+              attribute2: 'logic'
+            };
+          }
+
+          if (data.manipulation.physical) {
+            action.opposed = {
+              type: 'custom',
+              attribute: 'body',
+              attribute2: 'strength'
+            };
+          }
+        }
+      }
+
+      return (0, _BaseParserFunctions.createItemData)(chummerSpell.name, 'spell', data);
+    }
+  }]);
+  return SpellParser;
+}();
+
+exports.SpellParser = SpellParser;
+
+},{"../../data/DataDefaults":151,"./BaseParserFunctions.js":116,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],126:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.WeaponParser = void 0;
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
+
+var _BaseParserFunctions = require("./BaseParserFunctions.js");
+
+var WeaponParser = /*#__PURE__*/function () {
+  function WeaponParser() {
+    (0, _classCallCheck2["default"])(this, WeaponParser);
+    (0, _defineProperty2["default"])(this, "parseDamage", function (val) {
+      var damage = {
+        damage: 0,
+        type: 'physical',
+        radius: 0,
+        dropoff: 0
+      };
+      var split = val.split(',');
+
+      if (split.length > 0) {
+        var l = split[0].match(/(\d+)(\w+)/);
+        if (l && l[1]) damage.damage = parseInt(l[1]);
+        if (l && l[2]) damage.type = l[2] === 'P' ? 'physical' : 'stun';
+      }
+
+      for (var i = 1; i < split.length; i++) {
+        var _l = split[i].match(/(-?\d+)(.*)/);
+
+        if (_l && _l[2]) {
+          if (_l[2].toLowerCase().includes('/m')) damage.dropoff = parseInt(_l[1]);else damage.radius = parseInt(_l[1]);
+        }
+      }
+
+      return damage;
+    });
+  }
+
+  (0, _createClass2["default"])(WeaponParser, [{
+    key: "parseWeapons",
+    value: function parseWeapons(chummerChar) {
+      var _this = this;
+
+      var weapons = (0, _BaseParserFunctions.getArray)(chummerChar.weapons.weapon);
+      var parsedWeapons = [];
+      weapons.forEach(function (chummerWeapon) {
+        try {
+          var itemData = _this.parseWeapon(chummerWeapon);
+
+          parsedWeapons.push(itemData);
+        } catch (e) {
+          console.error(e);
+        }
+      });
+      return parsedWeapons;
+    }
+  }, {
+    key: "parseWeapon",
+    value: function parseWeapon(chummerWeapon) {
+      var data = {};
+      var action = {};
+      var damage = {};
+      action.damage = damage;
+      data.action = action;
+      data.description = (0, _BaseParserFunctions.parseDescription)(chummerWeapon);
+      data.technology = (0, _BaseParserFunctions.parseTechnology)(chummerWeapon);
+      damage.ap = {
+        base: parseInt((0, _BaseParserFunctions.getValues)(chummerWeapon.ap)[0])
+      };
+      action.type = 'varies'; // Transform Chummer skill naming schema to shadowrun5e naming schema.
+      // NOTE: chummerWeapon.skill CAN be null. Don't rely on it.
+
+      if (chummerWeapon.skill) {
+        action.skill = chummerWeapon.skill.toLowerCase().replace(/\s/g, '_'); // Instead of direct skill, rely on a category mapping by the rules.
+      } else if (chummerWeapon.category && chummerWeapon.category.toLowerCase().includes('exotic')) {
+        action.skill = chummerWeapon.category.toLowerCase().replace(' weapons', '').replace(/\s/g, '_');
+      } else if (chummerWeapon.category && chummerWeapon.category.toLowerCase().includes('laser weapons')) {
+        action.skill = 'exotic_range';
+      }
+
+      if (action.skill.includes('exotic')) {
+        action.skill = action.skill.replace('_weapon', '');
+      }
+
+      action.attribute = 'agility';
+      action.limit = {
+        base: parseInt((0, _BaseParserFunctions.getValues)(chummerWeapon.accuracy)[0])
+      };
+      action.opposed = {
+        type: 'defense'
+      };
+
+      if (chummerWeapon.type.toLowerCase() === 'melee') {
+        action.type = 'complex';
+        data.category = 'melee';
+        var melee = {};
+        data.melee = melee;
+        melee.reach = parseInt(chummerWeapon.reach);
+      } else if (chummerWeapon.type.toLowerCase() === 'ranged') {
+        data.category = 'range';
+
+        if (action.skill.toLowerCase().includes('throw')) {
+          data.category = 'thrown';
+        }
+
+        var range = {};
+        data.range = range;
+        range.rc = {
+          base: parseInt((0, _BaseParserFunctions.getValues)(chummerWeapon.rc)[0])
+        };
+
+        if (chummerWeapon.mode) {
+          // HeroLab export doesn't have mode
+          var lower = chummerWeapon.mode.toLowerCase();
+          range.modes = {
+            single_shot: lower.includes('ss'),
+            semi_auto: lower.includes('sa'),
+            burst_fire: lower.includes('bf'),
+            full_auto: lower.includes('fa')
+          };
+        }
+
+        if (chummerWeapon.clips != null && chummerWeapon.clips.clip != null) {
+          // HeroLab export doesn't have clips
+          var clips = Array.isArray(chummerWeapon.clips.clip) ? chummerWeapon.clips.clip : [chummerWeapon.clips.clip];
+          clips.forEach(function (clip) {
+            console.log(clip);
+          });
+        }
+
+        if (chummerWeapon.ranges && chummerWeapon.ranges["short"] && chummerWeapon.ranges.medium && chummerWeapon.ranges["long"] && chummerWeapon.ranges.extreme) {
+          console.log(chummerWeapon.ranges);
+          range.ranges = {
+            "short": parseInt(chummerWeapon.ranges["short"].split('-')[1]),
+            medium: parseInt(chummerWeapon.ranges.medium.split('-')[1]),
+            "long": parseInt(chummerWeapon.ranges["long"].split('-')[1]),
+            extreme: parseInt(chummerWeapon.ranges.extreme.split('-')[1])
+          };
+        }
+      } else if (chummerWeapon.type.toLowerCase() === 'thrown') {
+        data.category = 'thrown';
+      }
+
+      {
+        // TODO handle raw damage if present
+        var d = this.parseDamage(chummerWeapon.damage_english);
+        damage.base = d.damage;
+        damage.type = {};
+        damage.type.base = d.type;
+
+        if (d.dropoff || d.radius) {
+          var thrown = {};
+          data.thrown = thrown;
+          thrown.blast = {
+            radius: d.radius,
+            dropoff: d.dropoff
+          };
+        }
+      }
+      var itemData = (0, _BaseParserFunctions.createItemData)(chummerWeapon.name, 'weapon', data);
+      return itemData;
+    }
+  }]);
+  return WeaponParser;
+}();
+
+exports.WeaponParser = WeaponParser;
+
+},{"./BaseParserFunctions.js":116,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/interopRequireDefault":9}],127:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.AmmoParser = void 0;
+const BaseGearParser_1 = require("./BaseGearParser");
+/**
+ * Parses ammunition
+ */
+class AmmoParser extends BaseGearParser_1.BaseGearParser {
+    parse(chummerGear) {
+        const parsedGear = super.parse(chummerGear);
+        parsedGear.type = 'ammo';
+        if (chummerGear.weaponbonusap) {
+            parsedGear.data.ap = parseInt(chummerGear.weaponbonusap);
+        }
+        if (chummerGear.weaponbonusdamage) {
+            parsedGear.data.damage = parseInt(chummerGear.weaponbonusdamage);
+            if (chummerGear.weaponbonusdamage.includes('P')) {
+                parsedGear.data.damageType = 'physical';
+            }
+            else if (chummerGear.weaponbonusdamage.includes('S')) {
+                parsedGear.data.damageType = 'stun';
+            }
+            else if (chummerGear.weaponbonusdamage.includes('M')) {
+                parsedGear.data.damageType = 'matrix';
+            }
+            else {
+                parsedGear.data.damageType = 'physical';
+            }
+        }
+        return parsedGear;
+    }
+}
+exports.AmmoParser = AmmoParser;
+},{"./BaseGearParser":128}],128:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.BaseGearParser = void 0;
+const BaseParserFunctions_js_1 = require("../BaseParserFunctions.js");
+const DataDefaults_1 = require("../../../data/DataDefaults");
+/**
+ * Base class for all gear parsers. Parses common information across all gear.
+ */
+class BaseGearParser {
+    parse(chummerGear) {
+        const parsedGear = this.getDefaultData();
+        parsedGear.name = chummerGear.name;
+        if (chummerGear.extra) {
+            parsedGear.name += ` (${chummerGear.extra})`;
+        }
+        parsedGear.data.technology = (0, BaseParserFunctions_js_1.parseTechnology)(chummerGear);
+        parsedGear.data.description = (0, BaseParserFunctions_js_1.parseDescription)(chummerGear);
+        return parsedGear;
+    }
+    getDefaultData() {
+        return {
+            name: '',
+            type: 'equipment',
+            data: DataDefaults_1.DefaultValues.equipmentData(),
+        };
+    }
+}
+exports.BaseGearParser = BaseGearParser;
+},{"../../../data/DataDefaults":151,"../BaseParserFunctions.js":116}],129:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.DeviceParser = void 0;
+const BaseGearParser_1 = require("./BaseGearParser");
+/**
+ * Parses devices (commlinks and decks)
+ */
+class DeviceParser extends BaseGearParser_1.BaseGearParser {
+    parse(chummerGear) {
+        const parsedGear = super.parse(chummerGear);
+        parsedGear.type = 'device';
+        parsedGear.data.technology.rating = chummerGear.devicerating;
+        parsedGear.data.atts = {
+            att1: {
+                value: chummerGear.attack,
+                att: 'attack'
+            },
+            att2: {
+                value: chummerGear.sleaze,
+                att: 'sleaze'
+            },
+            att3: {
+                value: chummerGear.dataprocessing,
+                att: 'data_processing'
+            },
+            att4: {
+                value: chummerGear.firewall,
+                att: 'firewall'
+            }
+        };
+        if (chummerGear.category === 'Cyberdecks') {
+            parsedGear.data.category = 'cyberdeck';
+        }
+        if (chummerGear.category === 'Commlinks') {
+            parsedGear.data.category = 'commlink';
+        }
+        if (chummerGear.category === 'Rigger Command Consoles') {
+            // We are handling rccs as commlinks for the moment since we have no support for rigger command consoles yet.
+            parsedGear.data.category = 'commlink';
+        }
+        return parsedGear;
+    }
+}
+exports.DeviceParser = DeviceParser;
+},{"./BaseGearParser":128}],130:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GearsParser = void 0;
+const ParserSelector_1 = require("./ParserSelector");
+/**
+ * Parses all gear from a chummer character file and turns them into foundry sr item data objects
+ */
+class GearsParser {
+    /**
+     * Parses all chummer gear entries
+     * @param chummerGears Array of chummer gear entries
+     */
+    parseGears(chummerGears) {
+        let items = [];
+        chummerGears.forEach((chummerGear) => {
+            try {
+                // First filter out gear entries, that we do not want to handle.
+                if (!this.gearShouldBeParsed(chummerGear)) {
+                    return;
+                }
+                const itemsData = this.parseGearEntry(chummerGear);
+                items.push(itemsData);
+            }
+            catch (e) {
+                console.error(e);
+            }
+        });
+        return items;
+    }
+    parseGearEntry(chummerGear) {
+        const parserSelector = new ParserSelector_1.ParserSelector();
+        const parser = parserSelector.select(chummerGear);
+        return parser.parse(chummerGear);
+    }
+    gearShouldBeParsed(chummerGear) {
+        // We do not handle grenades and rockets here since they are also in the weapons section with more info.
+        const englishGearName = chummerGear.name_english.toLowerCase();
+        if (englishGearName.startsWith('grenade') ||
+            englishGearName.startsWith('minigrenade') ||
+            englishGearName.startsWith('rocket')) {
+            return false;
+        }
+        return true;
+    }
+}
+exports.GearsParser = GearsParser;
+},{"./ParserSelector":131}],131:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ParserSelector = void 0;
+const BaseGearParser_1 = require("./BaseGearParser");
+const SinParser_1 = require("./SinParser");
+const DeviceParser_1 = require("./DeviceParser");
+const ProgramParser_1 = require("./ProgramParser");
+const AmmoParser_1 = require("./AmmoParser");
+/**
+ * Responsible for selecting the correct GearParser depending on the gear.
+ */
+class ParserSelector {
+    /**
+     * Selects the correct GearParser depending on the gear.
+     * @param chummerGear The gear that needs to be parsed
+     * The correct GearParser for this gear entry.
+     */
+    select(chummerGear) {
+        if (chummerGear.issin === 'True') {
+            return new SinParser_1.SinParser();
+        }
+        if (chummerGear.iscommlink === 'True') {
+            return new DeviceParser_1.DeviceParser();
+        }
+        if (chummerGear.isammo === 'True') {
+            return new AmmoParser_1.AmmoParser();
+        }
+        if (chummerGear.category === 'Common Programs' ||
+            chummerGear.category === 'Hacking Programs' ||
+            chummerGear.category === 'Software') {
+            return new ProgramParser_1.ProgramParser();
+        }
+        return new BaseGearParser_1.BaseGearParser();
+    }
+}
+exports.ParserSelector = ParserSelector;
+},{"./AmmoParser":127,"./BaseGearParser":128,"./DeviceParser":129,"./ProgramParser":132,"./SinParser":133}],132:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ProgramParser = void 0;
+const BaseGearParser_1 = require("./BaseGearParser");
+/**
+ * Parses common, hacking and agent programs.
+ */
+class ProgramParser extends BaseGearParser_1.BaseGearParser {
+    parse(chummerGear) {
+        const parsedGear = super.parse(chummerGear);
+        parsedGear.type = 'program';
+        if (chummerGear.category === 'Common Programs') {
+            parsedGear.data.type = 'common_program';
+        }
+        else if (chummerGear.category === 'Hacking Programs') {
+            parsedGear.data.type = 'hacking_program';
+        }
+        else if (chummerGear.category === 'Software') {
+            parsedGear.data.type = 'agent';
+        }
+        return parsedGear;
+    }
+}
+exports.ProgramParser = ProgramParser;
+},{"./BaseGearParser":128}],133:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SinParser = void 0;
+const BaseGearParser_1 = require("./BaseGearParser");
+/**
+ * Parses SINs and the attached licenses.
+ * Licenses that are not attached to a SIN are not handled.
+ */
+class SinParser extends BaseGearParser_1.BaseGearParser {
+    parse(chummerGear) {
+        const parsedGear = super.parse(chummerGear);
+        parsedGear.type = 'sin';
+        // Create licenses if there are any
+        if (chummerGear.children) {
+            // "gear" is either  a single gear entry or an array of gear entries depending on the number of licenses
+            const chummerLicenses = [];
+            if (!Array.isArray(chummerGear.children.gear)) {
+                chummerLicenses.push(chummerGear.children.gear);
+            }
+            else {
+                chummerLicenses.push(...chummerGear.children.gear);
+            }
+            parsedGear.data.licenses = this.parseLicenses(chummerLicenses);
+        }
+        return parsedGear;
+    }
+    parseLicenses(chummerLicenses) {
+        const parsedLicenses = [];
+        chummerLicenses.forEach(chummerLicense => {
+            if (chummerLicense.category === 'ID/Credsticks') {
+                parsedLicenses.push({
+                    name: chummerLicense.extra,
+                    rtg: chummerLicense.rating,
+                    description: ''
+                });
+            }
+        });
+        return parsedLicenses;
+    }
+}
+exports.SinParser = SinParser;
+},{"./BaseGearParser":128}],134:[function(require,module,exports){
+"use strict";
+
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.ChummerImportForm = void 0;
+
+var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
+
+var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
+
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
+
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
+
+var _get2 = _interopRequireDefault(require("@babel/runtime/helpers/get"));
+
+var _inherits2 = _interopRequireDefault(require("@babel/runtime/helpers/inherits"));
+
+var _possibleConstructorReturn2 = _interopRequireDefault(require("@babel/runtime/helpers/possibleConstructorReturn"));
+
+var _getPrototypeOf2 = _interopRequireDefault(require("@babel/runtime/helpers/getPrototypeOf"));
+
+var _SkillsPrep = require("../actor/prep/functions/SkillsPrep");
+
+var _CharacterImporter = require("./characterImport/CharacterImporter");
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = (0, _getPrototypeOf2["default"])(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = (0, _getPrototypeOf2["default"])(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return (0, _possibleConstructorReturn2["default"])(this, result); }; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Boolean.prototype.valueOf.call(Reflect.construct(Boolean, [], function () {})); return true; } catch (e) { return false; } }
+
+var ChummerImportForm = /*#__PURE__*/function (_FormApplication) {
+  (0, _inherits2["default"])(ChummerImportForm, _FormApplication);
+
+  var _super = _createSuper(ChummerImportForm);
+
+  function ChummerImportForm() {
+    (0, _classCallCheck2["default"])(this, ChummerImportForm);
+    return _super.apply(this, arguments);
+  }
+
+  (0, _createClass2["default"])(ChummerImportForm, [{
+    key: "getData",
+    value: function getData() {
+      return {};
+    }
+  }, {
+    key: "activateListeners",
+    value: function activateListeners(html) {
+      var _this = this;
+
+      html.find('.submit-chummer-import').click( /*#__PURE__*/function () {
+        var _ref = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee(event) {
+          var _ui$notifications;
+
+          var chummerFile, importOptions, importer;
+          return _regenerator["default"].wrap(function _callee$(_context) {
+            while (1) {
+              switch (_context.prev = _context.next) {
+                case 0:
+                  event.preventDefault();
+                  chummerFile = JSON.parse($('.chummer-text').val());
+                  importOptions = {
+                    weapons: $('.weapons').is(':checked'),
+                    armor: $('.armor').is(':checked'),
+                    cyberware: $('.cyberware').is(':checked'),
+                    equipment: $('.gear').is(':checked'),
+                    qualities: $('.qualities').is(':checked'),
+                    powers: $('.powers').is(':checked'),
+                    spells: $('.spells').is(':checked'),
+                    contacts: $('.contacts').is(':checked'),
+                    lifestyles: $('.lifestyles').is(':checked')
+                  };
+                  importer = new _CharacterImporter.CharacterImporter();
+                  _context.next = 6;
+                  return importer.importChummerCharacter(_this.object, chummerFile, importOptions);
+
+                case 6:
+                  (_ui$notifications = ui.notifications) === null || _ui$notifications === void 0 ? void 0 : _ui$notifications.info('Complete! Check everything. Notably: Ranged weapon mods and ammo; Strength based weapon damage; Specializations on all spells, powers, and weapons;');
+
+                  _this.close();
+
+                case 8:
+                case "end":
+                  return _context.stop();
+              }
+            }
+          }, _callee);
+        }));
+
+        return function (_x) {
+          return _ref.apply(this, arguments);
+        };
+      }());
+    }
+  }], [{
+    key: "defaultOptions",
+    get: function get() {
+      var options = (0, _get2["default"])((0, _getPrototypeOf2["default"])(ChummerImportForm), "defaultOptions", this);
+      options.id = 'chummer-import';
+      options.classes = ['shadowrun5e'];
+      options.title = 'Chummer/Hero Lab Import';
+      options.template = 'systems/shadowrun5e/dist/templates/apps/import.html';
+      options.width = 600;
+      options.height = 'auto';
+      return options;
+    }
+  }]);
+  return ChummerImportForm;
+}(FormApplication);
+
+exports.ChummerImportForm = ChummerImportForm;
+
+},{"../actor/prep/functions/SkillsPrep":105,"./characterImport/CharacterImporter":117,"@babel/runtime/helpers/asyncToGenerator":2,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10,"@babel/runtime/regenerator":14}],135:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DamageApplicationDialog = void 0;
@@ -18372,7 +21062,7 @@ class DamageApplicationDialog extends FormDialog_1.FormDialog {
     }
 }
 exports.DamageApplicationDialog = DamageApplicationDialog;
-},{"./FormDialog":113}],112:[function(require,module,exports){
+},{"./FormDialog":137}],136:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DeleteConfirmationDialog = void 0;
@@ -18409,7 +21099,7 @@ class DeleteConfirmationDialog extends FormDialog_1.FormDialog {
     }
 }
 exports.DeleteConfirmationDialog = DeleteConfirmationDialog;
-},{"./FormDialog":113}],113:[function(require,module,exports){
+},{"./FormDialog":137}],137:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -18524,7 +21214,7 @@ class FormDialog extends Dialog {
     }
 }
 exports.FormDialog = FormDialog;
-},{}],114:[function(require,module,exports){
+},{}],138:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -18587,7 +21277,7 @@ class MoveInventoryDialog extends FormDialog_1.FormDialog {
     }
 }
 exports.MoveInventoryDialog = MoveInventoryDialog;
-},{"./FormDialog":113}],115:[function(require,module,exports){
+},{"./FormDialog":137}],139:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -18794,7 +21484,7 @@ class ShadowrunActorDialogs {
     }
 }
 exports.ShadowrunActorDialogs = ShadowrunActorDialogs;
-},{"../../actor/flows/SkillFlow":84,"../../config":125,"../../helpers":140,"../../parts/PartsList":194,"./FormDialog":113}],116:[function(require,module,exports){
+},{"../../actor/flows/SkillFlow":88,"../../config":149,"../../helpers":164,"../../parts/PartsList":218,"./FormDialog":137}],140:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -19148,7 +21838,7 @@ class ShadowrunItemDialog {
     }
 }
 exports.ShadowrunItemDialog = ShadowrunItemDialog;
-},{"../../config":125,"../../constants":126,"../../helpers":140,"./FormDialog":113}],117:[function(require,module,exports){
+},{"../../config":149,"../../constants":150,"../../helpers":164,"./FormDialog":137}],141:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -19256,7 +21946,7 @@ class ShadowrunTestDialog {
     }
 }
 exports.ShadowrunTestDialog = ShadowrunTestDialog;
-},{"../../constants":126,"../../helpers":140,"../../parts/PartsList":194,"./FormDialog":113}],118:[function(require,module,exports){
+},{"../../constants":150,"../../helpers":164,"../../parts/PartsList":218,"./FormDialog":137}],142:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -19486,7 +22176,7 @@ exports.OverwatchScoreTracker = OverwatchScoreTracker;
 (0, _defineProperty2["default"])(OverwatchScoreTracker, "MatrixOverwatchDiceCount", '2d6');
 (0, _defineProperty2["default"])(OverwatchScoreTracker, "addedActors", []);
 
-},{"../../helpers":140,"@babel/runtime/helpers/classCallCheck":2,"@babel/runtime/helpers/createClass":3,"@babel/runtime/helpers/defineProperty":4,"@babel/runtime/helpers/get":5,"@babel/runtime/helpers/getPrototypeOf":6,"@babel/runtime/helpers/inherits":7,"@babel/runtime/helpers/interopRequireDefault":8,"@babel/runtime/helpers/possibleConstructorReturn":9}],119:[function(require,module,exports){
+},{"../../helpers":164,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10}],143:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KnowledgeSkillEditSheet = void 0;
@@ -19501,7 +22191,7 @@ class KnowledgeSkillEditSheet extends LanguageSkillEditSheet_1.LanguageSkillEdit
     }
 }
 exports.KnowledgeSkillEditSheet = KnowledgeSkillEditSheet;
-},{"./LanguageSkillEditSheet":120}],120:[function(require,module,exports){
+},{"./LanguageSkillEditSheet":144}],144:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LanguageSkillEditSheet = void 0;
@@ -19526,7 +22216,7 @@ class LanguageSkillEditSheet extends SkillEditSheet_1.SkillEditSheet {
     }
 }
 exports.LanguageSkillEditSheet = LanguageSkillEditSheet;
-},{"./SkillEditSheet":121}],121:[function(require,module,exports){
+},{"./SkillEditSheet":145}],145:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -19723,7 +22413,7 @@ class SkillEditSheet extends DocumentSheet {
     }
 }
 exports.SkillEditSheet = SkillEditSheet;
-},{"../../config":125}],122:[function(require,module,exports){
+},{"../../config":149}],146:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.measureDistance = void 0;
@@ -19768,7 +22458,7 @@ const measureDistance = function (segments, options = {}) {
     });
 };
 exports.measureDistance = measureDistance;
-},{}],123:[function(require,module,exports){
+},{}],147:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -20165,7 +22855,7 @@ const addRollListeners = (app, html) => {
     }));
 };
 exports.addRollListeners = addRollListeners;
-},{"./actor/SR5Actor":82,"./actor/flows/DamageApplicationFlow":83,"./constants":126,"./helpers":140,"./item/SR5Item":180,"./item/flows/ActionResultFlow":183,"./template":203}],124:[function(require,module,exports){
+},{"./actor/SR5Actor":85,"./actor/flows/DamageApplicationFlow":86,"./constants":150,"./helpers":164,"./item/SR5Item":204,"./item/flows/ActionResultFlow":207,"./template":227}],148:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -20582,7 +23272,7 @@ function _combatantGetInitiativeFormula() {
     return SR5Combat._getSystemInitiativeFormula(combat.initiativePass);
 }
 exports._combatantGetInitiativeFormula = _combatantGetInitiativeFormula;
-},{"../constants":126,"../rules/CombatRules":196,"../sockets":202}],125:[function(require,module,exports){
+},{"../constants":150,"../rules/CombatRules":220,"../sockets":226}],149:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5 = void 0;
@@ -21043,7 +23733,7 @@ exports.SR5 = {
         },
     },
 };
-},{}],126:[function(require,module,exports){
+},{}],150:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR = exports.DEFAULT_ID_LENGTH = exports.SKILL_DEFAULT_NAME = exports.LENGTH_UNIT = exports.DEFAULT_ROLL_NAME = exports.LENGTH_UNIT_TO_METERS_MULTIPLIERS = exports.METATYPEMODIFIER = exports.CORE_FLAGS = exports.CORE_NAME = exports.FLAGS = exports.SYSTEM_SOCKET = exports.SYSTEM_NAME = void 0;
@@ -21187,7 +23877,7 @@ exports.SR = {
         }
     }
 };
-},{}],127:[function(require,module,exports){
+},{}],151:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataDefaults = exports.DefaultValues = void 0;
@@ -21457,7 +24147,7 @@ exports.DataDefaults = {
     },
     damage: DefaultValues.damageData({ type: { base: '', value: '' } }),
 };
-},{"../constants":126}],128:[function(require,module,exports){
+},{"../constants":150}],152:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataWrapper = void 0;
@@ -21467,7 +24157,7 @@ class DataWrapper {
     }
 }
 exports.DataWrapper = DataWrapper;
-},{}],129:[function(require,module,exports){
+},{}],153:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ItemDataWrapper = void 0;
@@ -21783,7 +24473,7 @@ class SR5ItemDataWrapper extends DataWrapper_1.DataWrapper {
     }
 }
 exports.SR5ItemDataWrapper = SR5ItemDataWrapper;
-},{"./DataWrapper":128}],130:[function(require,module,exports){
+},{"./DataWrapper":152}],154:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -21910,7 +24600,7 @@ class SR5ActiveEffect extends ActiveEffect {
     }
 }
 exports.SR5ActiveEffect = SR5ActiveEffect;
-},{"../helpers":140}],131:[function(require,module,exports){
+},{"../helpers":164}],155:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ActiveEffectSheet = void 0;
@@ -21925,7 +24615,7 @@ class SR5ActiveEffectSheet extends ActiveEffectConfig {
     }
 }
 exports.SR5ActiveEffectSheet = SR5ActiveEffectSheet;
-},{}],132:[function(require,module,exports){
+},{}],156:[function(require,module,exports){
 "use strict";
 //@ts-nocheck // This is JavaScript code.
 /**
@@ -22025,7 +24715,7 @@ function prepareActiveEffectCategories(effects) {
     return categories;
 }
 exports.prepareActiveEffectCategories = prepareActiveEffectCategories;
-},{"./helpers":140}],133:[function(require,module,exports){
+},{"./helpers":164}],157:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerAppHelpers = void 0;
@@ -22042,7 +24732,7 @@ const registerAppHelpers = () => {
     });
 };
 exports.registerAppHelpers = registerAppHelpers;
-},{}],134:[function(require,module,exports){
+},{}],158:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerBasicHelpers = void 0;
@@ -22203,7 +24893,7 @@ const registerBasicHelpers = () => {
     });
 };
 exports.registerBasicHelpers = registerBasicHelpers;
-},{"../actor/SR5Actor":82,"../helpers":140}],135:[function(require,module,exports){
+},{"../actor/SR5Actor":85,"../helpers":164}],159:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22237,7 +24927,7 @@ class HandlebarManager {
     }
 }
 exports.HandlebarManager = HandlebarManager;
-},{"./AppHelpers":133,"./BasicHelpers":134,"./HandlebarTemplates":136,"./ItemLineHelpers":137,"./RollAndLabelHelpers":138,"./SkillLineHelpers":139}],136:[function(require,module,exports){
+},{"./AppHelpers":157,"./BasicHelpers":158,"./HandlebarTemplates":160,"./ItemLineHelpers":161,"./RollAndLabelHelpers":162,"./SkillLineHelpers":163}],160:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22366,7 +25056,7 @@ const preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, funct
     return loadTemplates(templatePaths);
 });
 exports.preloadHandlebarsTemplates = preloadHandlebarsTemplates;
-},{}],137:[function(require,module,exports){
+},{}],161:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerItemLineHelpers = void 0;
@@ -22948,7 +25638,7 @@ const registerItemLineHelpers = () => {
     });
 };
 exports.registerItemLineHelpers = registerItemLineHelpers;
-},{"../config":125,"../data/SR5ItemDataWrapper":129}],138:[function(require,module,exports){
+},{"../config":149,"../data/SR5ItemDataWrapper":153}],162:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerRollAndLabelHelpers = void 0;
@@ -23016,7 +25706,7 @@ const registerRollAndLabelHelpers = () => {
     Handlebars.registerHelper('speakerName', helpers_1.Helpers.getChatSpeakerName);
 };
 exports.registerRollAndLabelHelpers = registerRollAndLabelHelpers;
-},{"../helpers":140,"../parts/PartsList":194}],139:[function(require,module,exports){
+},{"../helpers":164,"../parts/PartsList":218}],163:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerSkillLineHelpers = void 0;
@@ -23126,7 +25816,7 @@ const registerSkillLineHelpers = () => {
     });
 };
 exports.registerSkillLineHelpers = registerSkillLineHelpers;
-},{"../constants":126,"../helpers":140,"../rules/SkillRules":199}],140:[function(require,module,exports){
+},{"../constants":150,"../helpers":164,"../rules/SkillRules":223}],164:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -23880,7 +26570,7 @@ class Helpers {
     }
 }
 exports.Helpers = Helpers;
-},{"./apps/dialogs/DeleteConfirmationDialog":112,"./constants":126,"./data/DataDefaults":127,"./parts/PartsList":194}],141:[function(require,module,exports){
+},{"./apps/dialogs/DeleteConfirmationDialog":136,"./constants":150,"./data/DataDefaults":151,"./parts/PartsList":218}],165:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -24193,7 +26883,7 @@ ___________________
     }
 }
 exports.HooksManager = HooksManager;
-},{"../test/quench":205,"./actor/SR5Actor":82,"./actor/sheets/SR5CharacterSheet":104,"./actor/sheets/SR5ICActorSheet":105,"./actor/sheets/SR5SpiritActorSheet":106,"./actor/sheets/SR5SpriteActorSheet":107,"./actor/sheets/SR5VehicleActorSheet":108,"./apps/ChangelogApplication":109,"./apps/EnvModifiersApplication":110,"./apps/gmtools/OverwatchScoreTracker":118,"./canvas":122,"./chat":123,"./combat/SR5Combat":124,"./config":125,"./constants":126,"./effect/SR5ActiveEffect":130,"./effect/SR5ActiveEffectSheet":131,"./handlebars/HandlebarManager":135,"./helpers":140,"./importer/apps/import-form":142,"./item/SR5Item":180,"./item/SR5ItemSheet":181,"./item/flows/NetworkDeviceFlow":184,"./macros":186,"./migrator/Migrator":188,"./rolls/ShadowrunRoller":195,"./settings":201,"./token/SR5Token":204}],142:[function(require,module,exports){
+},{"../test/quench":229,"./actor/SR5Actor":85,"./actor/sheets/SR5CharacterSheet":108,"./actor/sheets/SR5ICActorSheet":109,"./actor/sheets/SR5SpiritActorSheet":110,"./actor/sheets/SR5SpriteActorSheet":111,"./actor/sheets/SR5VehicleActorSheet":112,"./apps/ChangelogApplication":113,"./apps/EnvModifiersApplication":114,"./apps/gmtools/OverwatchScoreTracker":142,"./canvas":146,"./chat":147,"./combat/SR5Combat":148,"./config":149,"./constants":150,"./effect/SR5ActiveEffect":154,"./effect/SR5ActiveEffectSheet":155,"./handlebars/HandlebarManager":159,"./helpers":164,"./importer/apps/import-form":166,"./item/SR5Item":204,"./item/SR5ItemSheet":205,"./item/flows/NetworkDeviceFlow":208,"./macros":210,"./migrator/Migrator":212,"./rolls/ShadowrunRoller":219,"./settings":225,"./token/SR5Token":228}],166:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -24375,7 +27065,7 @@ Import.Importers = [
     new DeviceImporter_1.DeviceImporter(),
     new EquipmentImporter_1.EquipmentImporter()
 ];
-},{"../helper/ImportHelper":143,"../importer/AmmoImporter":147,"../importer/ArmorImporter":148,"../importer/ComplexFormImporter":149,"../importer/CritterPowerImporter":151,"../importer/DataImporter":152,"../importer/DeviceImporter":153,"../importer/EquipmentImporter":154,"../importer/ModImporter":155,"../importer/QualityImporter":156,"../importer/SpellImporter":157,"../importer/WareImporter":158,"../importer/WeaponImporter":159}],143:[function(require,module,exports){
+},{"../helper/ImportHelper":167,"../importer/AmmoImporter":171,"../importer/ArmorImporter":172,"../importer/ComplexFormImporter":173,"../importer/CritterPowerImporter":175,"../importer/DataImporter":176,"../importer/DeviceImporter":177,"../importer/EquipmentImporter":178,"../importer/ModImporter":179,"../importer/QualityImporter":180,"../importer/SpellImporter":181,"../importer/WareImporter":182,"../importer/WeaponImporter":183}],167:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -24587,14 +27277,14 @@ class ImportHelper {
 exports.ImportHelper = ImportHelper;
 ImportHelper.CHAR_KEY = '_TEXT';
 ImportHelper.s_Strategy = new XMLStrategy_1.XMLStrategy();
-},{"../importer/Constants":150,"./JSONStrategy":145,"./XMLStrategy":146}],144:[function(require,module,exports){
+},{"../importer/Constants":174,"./JSONStrategy":169,"./XMLStrategy":170}],168:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ImportStrategy = void 0;
 class ImportStrategy {
 }
 exports.ImportStrategy = ImportStrategy;
-},{}],145:[function(require,module,exports){
+},{}],169:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JSONStrategy = void 0;
@@ -24611,7 +27301,7 @@ class JSONStrategy extends ImportStrategy_1.ImportStrategy {
     }
 }
 exports.JSONStrategy = JSONStrategy;
-},{"./ImportStrategy":144}],146:[function(require,module,exports){
+},{"./ImportStrategy":168}],170:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.XMLStrategy = void 0;
@@ -24659,7 +27349,7 @@ class XMLStrategy extends ImportStrategy_1.ImportStrategy {
     }
 }
 exports.XMLStrategy = XMLStrategy;
-},{"./ImportHelper":143,"./ImportStrategy":144}],147:[function(require,module,exports){
+},{"./ImportHelper":167,"./ImportStrategy":168}],171:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -24791,7 +27481,7 @@ class AmmoImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.AmmoImporter = AmmoImporter;
-},{"../../data/DataDefaults":127,"../helper/ImportHelper":143,"./Constants":150,"./DataImporter":152}],148:[function(require,module,exports){
+},{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"./Constants":174,"./DataImporter":176}],172:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -24871,7 +27561,7 @@ class ArmorImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.ArmorImporter = ArmorImporter;
-},{"../../data/DataDefaults":127,"../helper/ImportHelper":143,"../parser/armor/ArmorParserBase":162,"./DataImporter":152}],149:[function(require,module,exports){
+},{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"../parser/armor/ArmorParserBase":186,"./DataImporter":176}],173:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -24973,7 +27663,7 @@ class ComplexFormImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.ComplexFormImporter = ComplexFormImporter;
-},{"../../data/DataDefaults":127,"../helper/ImportHelper":143,"../parser/complex-form/ComplexFormParserBase":163,"./Constants":150,"./DataImporter":152}],150:[function(require,module,exports){
+},{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"../parser/complex-form/ComplexFormParserBase":187,"./Constants":174,"./DataImporter":176}],174:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Constants = void 0;
@@ -25194,7 +27884,7 @@ Constants.WEAPON_RANGES = {
     },
 };
 Constants.ROOT_IMPORT_FOLDER_NAME = 'SR5e';
-},{}],151:[function(require,module,exports){
+},{}],175:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25303,7 +27993,7 @@ class CritterPowerImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.CritterPowerImporter = CritterPowerImporter;
-},{"../../data/DataDefaults":127,"../helper/ImportHelper":143,"../parser/critter-power/CritterPowerParserBase":164,"./Constants":150,"./DataImporter":152}],152:[function(require,module,exports){
+},{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"../parser/critter-power/CritterPowerParserBase":188,"./Constants":174,"./DataImporter":176}],176:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25365,7 +28055,7 @@ class DataImporter {
 }
 exports.DataImporter = DataImporter;
 DataImporter.unsupportedBooks = ['2050'];
-},{"../helper/ImportHelper":143,"xml2js":48}],153:[function(require,module,exports){
+},{"../helper/ImportHelper":167,"xml2js":51}],177:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25490,7 +28180,7 @@ class DeviceImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.DeviceImporter = DeviceImporter;
-},{"../../data/DataDefaults":127,"../helper/ImportHelper":143,"./Constants":150,"./DataImporter":152}],154:[function(require,module,exports){
+},{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"./Constants":174,"./DataImporter":176}],178:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25572,7 +28262,7 @@ class EquipmentImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.EquipmentImporter = EquipmentImporter;
-},{"../../data/DataDefaults":127,"../helper/ImportHelper":143,"./Constants":150,"./DataImporter":152}],155:[function(require,module,exports){
+},{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"./Constants":174,"./DataImporter":176}],179:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25655,7 +28345,7 @@ class ModImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.ModImporter = ModImporter;
-},{"../../data/DataDefaults":127,"../helper/ImportHelper":143,"../parser/mod/ModParserBase":167,"./Constants":150,"./DataImporter":152}],156:[function(require,module,exports){
+},{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"../parser/mod/ModParserBase":191,"./Constants":174,"./DataImporter":176}],180:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25755,7 +28445,7 @@ class QualityImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.QualityImporter = QualityImporter;
-},{"../../data/DataDefaults":127,"../helper/ImportHelper":143,"../parser/quality/QualityParserBase":168,"./DataImporter":152}],157:[function(require,module,exports){
+},{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"../parser/quality/QualityParserBase":192,"./DataImporter":176}],181:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -25888,7 +28578,7 @@ class SpellImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.SpellImporter = SpellImporter;
-},{"../../data/DataDefaults":127,"../helper/ImportHelper":143,"../parser/ParserMap":161,"../parser/spell/CombatSpellParser":169,"../parser/spell/DetectionSpellImporter":170,"../parser/spell/IllusionSpellParser":171,"../parser/spell/ManipulationSpellParser":172,"../parser/spell/SpellParserBase":173,"./DataImporter":152}],158:[function(require,module,exports){
+},{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"../parser/ParserMap":185,"../parser/spell/CombatSpellParser":193,"../parser/spell/DetectionSpellImporter":194,"../parser/spell/IllusionSpellParser":195,"../parser/spell/ManipulationSpellParser":196,"../parser/spell/SpellParserBase":197,"./DataImporter":176}],182:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26019,7 +28709,7 @@ class WareImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.WareImporter = WareImporter;
-},{"../../data/DataDefaults":127,"../helper/ImportHelper":143,"../parser/ware/CyberwareParser":174,"./DataImporter":152}],159:[function(require,module,exports){
+},{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"../parser/ware/CyberwareParser":198,"./DataImporter":176}],183:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26175,14 +28865,14 @@ class WeaponImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.WeaponImporter = WeaponImporter;
-},{"../../data/DataDefaults":127,"../helper/ImportHelper":143,"../parser/ParserMap":161,"../parser/weapon/MeleeParser":175,"../parser/weapon/RangedParser":176,"../parser/weapon/ThrownParser":177,"../parser/weapon/WeaponParserBase":178,"./Constants":150,"./DataImporter":152}],160:[function(require,module,exports){
+},{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"../parser/ParserMap":185,"../parser/weapon/MeleeParser":199,"../parser/weapon/RangedParser":200,"../parser/weapon/ThrownParser":201,"../parser/weapon/WeaponParserBase":202,"./Constants":174,"./DataImporter":176}],184:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
 class Parser {
 }
 exports.Parser = Parser;
-},{}],161:[function(require,module,exports){
+},{}],185:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ParserMap = void 0;
@@ -26215,7 +28905,7 @@ class ParserMap extends Parser_1.Parser {
     }
 }
 exports.ParserMap = ParserMap;
-},{"../helper/ImportHelper":143,"./Parser":160}],162:[function(require,module,exports){
+},{"../helper/ImportHelper":167,"./Parser":184}],186:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ArmorParserBase = void 0;
@@ -26230,7 +28920,7 @@ class ArmorParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBas
     }
 }
 exports.ArmorParserBase = ArmorParserBase;
-},{"../../helper/ImportHelper":143,"../item/TechnologyItemParserBase":166}],163:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"../item/TechnologyItemParserBase":190}],187:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ComplexFormParserBase = void 0;
@@ -26279,7 +28969,7 @@ class ComplexFormParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.ComplexFormParserBase = ComplexFormParserBase;
-},{"../../helper/ImportHelper":143,"../item/ItemParserBase":165}],164:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"../item/ItemParserBase":189}],188:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CritterPowerParserBase = void 0;
@@ -26340,7 +29030,7 @@ class CritterPowerParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.CritterPowerParserBase = CritterPowerParserBase;
-},{"../../helper/ImportHelper":143,"../item/ItemParserBase":165}],165:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"../item/ItemParserBase":189}],189:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemParserBase = void 0;
@@ -26361,7 +29051,7 @@ class ItemParserBase extends Parser_1.Parser {
     }
 }
 exports.ItemParserBase = ItemParserBase;
-},{"../../helper/ImportHelper":143,"../Parser":160}],166:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"../Parser":184}],190:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TechnologyItemParserBase = void 0;
@@ -26377,7 +29067,7 @@ class TechnologyItemParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.TechnologyItemParserBase = TechnologyItemParserBase;
-},{"../../helper/ImportHelper":143,"./ItemParserBase":165}],167:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"./ItemParserBase":189}],191:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ModParserBase = void 0;
@@ -26395,7 +29085,7 @@ class ModParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBase 
     }
 }
 exports.ModParserBase = ModParserBase;
-},{"../../helper/ImportHelper":143,"../item/TechnologyItemParserBase":166}],168:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"../item/TechnologyItemParserBase":190}],192:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.QualityParserBase = void 0;
@@ -26417,7 +29107,7 @@ class QualityParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.QualityParserBase = QualityParserBase;
-},{"../../helper/ImportHelper":143,"../item/ItemParserBase":165}],169:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"../item/ItemParserBase":189}],193:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CombatSpellParser = void 0;
@@ -26442,7 +29132,7 @@ class CombatSpellParser extends SpellParserBase_1.SpellParserBase {
     }
 }
 exports.CombatSpellParser = CombatSpellParser;
-},{"../../helper/ImportHelper":143,"./SpellParserBase":173}],170:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"./SpellParserBase":197}],194:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DetectionSpellImporter = void 0;
@@ -26479,7 +29169,7 @@ class DetectionSpellImporter extends SpellParserBase_1.SpellParserBase {
     }
 }
 exports.DetectionSpellImporter = DetectionSpellImporter;
-},{"../../helper/ImportHelper":143,"./SpellParserBase":173}],171:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"./SpellParserBase":197}],195:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IllusionSpellParser = void 0;
@@ -26510,7 +29200,7 @@ class IllusionSpellParser extends SpellParserBase_1.SpellParserBase {
     }
 }
 exports.IllusionSpellParser = IllusionSpellParser;
-},{"../../helper/ImportHelper":143,"./SpellParserBase":173}],172:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"./SpellParserBase":197}],196:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ManipulationSpellParser = void 0;
@@ -26549,7 +29239,7 @@ class ManipulationSpellParser extends SpellParserBase_1.SpellParserBase {
     }
 }
 exports.ManipulationSpellParser = ManipulationSpellParser;
-},{"../../helper/ImportHelper":143,"./SpellParserBase":173}],173:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"./SpellParserBase":197}],197:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpellParserBase = void 0;
@@ -26611,7 +29301,7 @@ class SpellParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.SpellParserBase = SpellParserBase;
-},{"../../helper/ImportHelper":143,"../item/ItemParserBase":165}],174:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"../item/ItemParserBase":189}],198:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CyberwareParser = void 0;
@@ -26632,7 +29322,7 @@ class CyberwareParser extends TechnologyItemParserBase_1.TechnologyItemParserBas
     }
 }
 exports.CyberwareParser = CyberwareParser;
-},{"../../helper/ImportHelper":143,"../item/TechnologyItemParserBase":166}],175:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"../item/TechnologyItemParserBase":190}],199:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MeleeParser = void 0;
@@ -26679,7 +29369,7 @@ class MeleeParser extends WeaponParserBase_1.WeaponParserBase {
     }
 }
 exports.MeleeParser = MeleeParser;
-},{"../../../data/DataDefaults":127,"../../helper/ImportHelper":143,"./WeaponParserBase":178}],176:[function(require,module,exports){
+},{"../../../data/DataDefaults":151,"../../helper/ImportHelper":167,"./WeaponParserBase":202}],200:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RangedParser = void 0;
@@ -26739,7 +29429,7 @@ class RangedParser extends WeaponParserBase_1.WeaponParserBase {
     }
 }
 exports.RangedParser = RangedParser;
-},{"../../../data/DataDefaults":127,"../../helper/ImportHelper":143,"../../importer/Constants":150,"./WeaponParserBase":178}],177:[function(require,module,exports){
+},{"../../../data/DataDefaults":151,"../../helper/ImportHelper":167,"../../importer/Constants":174,"./WeaponParserBase":202}],201:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ThrownParser = void 0;
@@ -26838,7 +29528,7 @@ class ThrownParser extends WeaponParserBase_1.WeaponParserBase {
     }
 }
 exports.ThrownParser = ThrownParser;
-},{"../../../data/DataDefaults":127,"../../helper/ImportHelper":143,"../../importer/Constants":150,"./WeaponParserBase":178}],178:[function(require,module,exports){
+},{"../../../data/DataDefaults":151,"../../helper/ImportHelper":167,"../../importer/Constants":174,"./WeaponParserBase":202}],202:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WeaponParserBase = void 0;
@@ -26903,7 +29593,7 @@ class WeaponParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBa
     }
 }
 exports.WeaponParserBase = WeaponParserBase;
-},{"../../helper/ImportHelper":143,"../../importer/Constants":150,"../item/TechnologyItemParserBase":166}],179:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"../../importer/Constants":174,"../item/TechnologyItemParserBase":190}],203:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatData = void 0;
@@ -27249,7 +29939,7 @@ exports.ChatData = {
         }
     },
 };
-},{"../config":125,"../helpers":140}],180:[function(require,module,exports){
+},{"../config":149,"../helpers":164}],204:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -28946,7 +31636,7 @@ class SR5Item extends Item {
     }
 }
 exports.SR5Item = SR5Item;
-},{"../actor/SR5Actor":82,"../actor/flows/SkillFlow":84,"../apps/dialogs/ShadowrunItemDialog":116,"../chat":123,"../config":125,"../constants":126,"../data/DataDefaults":127,"../data/SR5ItemDataWrapper":129,"../helpers":140,"../parts/PartsList":194,"../rolls/ShadowrunRoller":195,"../rules/MatrixRules":197,"./ChatData":179,"./flows/ActionFlow":182,"./flows/NetworkDeviceFlow":184,"./prep/HostPrep":185}],181:[function(require,module,exports){
+},{"../actor/SR5Actor":85,"../actor/flows/SkillFlow":88,"../apps/dialogs/ShadowrunItemDialog":140,"../chat":147,"../config":149,"../constants":150,"../data/DataDefaults":151,"../data/SR5ItemDataWrapper":153,"../helpers":164,"../parts/PartsList":218,"../rolls/ShadowrunRoller":219,"../rules/MatrixRules":221,"./ChatData":203,"./flows/ActionFlow":206,"./flows/NetworkDeviceFlow":208,"./prep/HostPrep":209}],205:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -29528,7 +32218,7 @@ class SR5ItemSheet extends ItemSheet {
     }
 }
 exports.SR5ItemSheet = SR5ItemSheet;
-},{"../config":125,"../effects":132,"../helpers":140,"./SR5Item":180}],182:[function(require,module,exports){
+},{"../config":149,"../effects":156,"../helpers":164,"./SR5Item":204}],206:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ActionFlow = void 0;
@@ -29569,7 +32259,7 @@ class ActionFlow {
     }
 }
 exports.ActionFlow = ActionFlow;
-},{"../../helpers":140}],183:[function(require,module,exports){
+},{"../../helpers":164}],207:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -29600,7 +32290,7 @@ class ActionResultFlow {
     }
 }
 exports.ActionResultFlow = ActionResultFlow;
-},{"../../rules/MatrixRules":197}],184:[function(require,module,exports){
+},{"../../rules/MatrixRules":221}],208:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -29917,7 +32607,7 @@ class NetworkDeviceFlow {
     }
 }
 exports.NetworkDeviceFlow = NetworkDeviceFlow;
-},{"../../constants":126,"../../sockets":202}],185:[function(require,module,exports){
+},{"../../constants":150,"../../sockets":226}],209:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HostPrep = exports.HostDataPreparation = void 0;
@@ -29946,7 +32636,7 @@ class HostPrep {
     }
 }
 exports.HostPrep = HostPrep;
-},{"../../rules/MatrixRules":197}],186:[function(require,module,exports){
+},{"../../rules/MatrixRules":221}],210:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -30069,7 +32759,7 @@ function rollSkillMacro(skillLabel) {
     });
 }
 exports.rollSkillMacro = rollSkillMacro;
-},{"./helpers":140}],187:[function(require,module,exports){
+},{"./helpers":164}],211:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const HandlebarManager_1 = require("./handlebars/HandlebarManager");
@@ -30079,7 +32769,7 @@ const hooks_1 = require("./hooks");
 /* -------------------------------------------- */
 hooks_1.HooksManager.registerHooks();
 HandlebarManager_1.HandlebarManager.registerHelpers();
-},{"./handlebars/HandlebarManager":135,"./hooks":141}],188:[function(require,module,exports){
+},{"./handlebars/HandlebarManager":159,"./hooks":165}],212:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -30225,7 +32915,7 @@ Migrator.s_Versions = [
     { versionNumber: Version0_6_10_1.Version0_6_10.TargetVersion, migration: new Version0_6_10_1.Version0_6_10() },
     { versionNumber: Version0_7_2_1.Version0_7_2.TargetVersion, migration: new Version0_7_2_1.Version0_7_2() },
 ];
-},{"./VersionMigration":189,"./versions/LegacyMigration":190,"./versions/Version0_6_10":191,"./versions/Version0_6_5":192,"./versions/Version0_7_2":193}],189:[function(require,module,exports){
+},{"./VersionMigration":213,"./versions/LegacyMigration":214,"./versions/Version0_6_10":215,"./versions/Version0_6_5":216,"./versions/Version0_7_2":217}],213:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -30660,7 +33350,7 @@ exports.VersionMigration = VersionMigration;
 VersionMigration.MODULE_NAME = 'shadowrun5e';
 VersionMigration.KEY_DATA_VERSION = 'systemMigrationVersion';
 VersionMigration.NO_VERSION = '0';
-},{}],190:[function(require,module,exports){
+},{}],214:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -30889,7 +33579,7 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
     }
 }
 exports.LegacyMigration = LegacyMigration;
-},{"../VersionMigration":189}],191:[function(require,module,exports){
+},{"../VersionMigration":213}],215:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -30949,7 +33639,7 @@ class Version0_6_10 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_6_10 = Version0_6_10;
-},{"../VersionMigration":189}],192:[function(require,module,exports){
+},{"../VersionMigration":213}],216:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -30999,7 +33689,7 @@ class Version0_6_5 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_6_5 = Version0_6_5;
-},{"../VersionMigration":189}],193:[function(require,module,exports){
+},{"../VersionMigration":213}],217:[function(require,module,exports){
 "use strict";
 // TODO: How to trigger test migration.
 // TODO: How to test migration results?
@@ -31076,7 +33766,7 @@ class Version0_7_2 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_7_2 = Version0_7_2;
-},{"../../config":125,"../VersionMigration":189}],194:[function(require,module,exports){
+},{"../../config":149,"../VersionMigration":213}],218:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PartsList = void 0;
@@ -31179,7 +33869,7 @@ class PartsList {
     }
 }
 exports.PartsList = PartsList;
-},{}],195:[function(require,module,exports){
+},{}],219:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -31564,7 +34254,7 @@ class ShadowrunRoller {
     }
 }
 exports.ShadowrunRoller = ShadowrunRoller;
-},{"../apps/dialogs/ShadowrunTestDialog":117,"../chat":123,"../constants":126,"../helpers":140,"../parts/PartsList":194}],196:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunTestDialog":141,"../chat":147,"../constants":150,"../helpers":164,"../parts/PartsList":218}],220:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CombatRules = void 0;
@@ -31608,7 +34298,7 @@ class CombatRules {
     }
 }
 exports.CombatRules = CombatRules;
-},{"../constants":126}],197:[function(require,module,exports){
+},{"../constants":150}],221:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatrixRules = void 0;
@@ -31683,7 +34373,7 @@ class MatrixRules {
     }
 }
 exports.MatrixRules = MatrixRules;
-},{"../constants":126}],198:[function(require,module,exports){
+},{"../constants":150}],222:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -31880,7 +34570,7 @@ class Modifiers {
     }
 }
 exports.Modifiers = Modifiers;
-},{"../constants":126}],199:[function(require,module,exports){
+},{"../constants":150}],223:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SkillRules = void 0;
@@ -31921,7 +34611,7 @@ class SkillRules {
     }
 }
 exports.SkillRules = SkillRules;
-},{"../constants":126}],200:[function(require,module,exports){
+},{"../constants":150}],224:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SoakRules = void 0;
@@ -32121,7 +34811,7 @@ class SoakRules {
     }
 }
 exports.SoakRules = SoakRules;
-},{"../config":125,"../helpers":140}],201:[function(require,module,exports){
+},{"../config":149,"../helpers":164}],225:[function(require,module,exports){
 "use strict";
 // game settings for shadowrun 5e
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -32238,7 +34928,7 @@ const registerSystemSettings = () => {
     });
 };
 exports.registerSystemSettings = registerSystemSettings;
-},{"./constants":126,"./migrator/VersionMigration":189}],202:[function(require,module,exports){
+},{"./constants":150,"./migrator/VersionMigration":213}],226:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -32289,7 +34979,7 @@ class SocketMessage {
     }
 }
 exports.SocketMessage = SocketMessage;
-},{"./constants":126}],203:[function(require,module,exports){
+},{"./constants":150}],227:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -32405,7 +35095,7 @@ class Template extends MeasuredTemplate {
     }
 }
 exports.default = Template;
-},{}],204:[function(require,module,exports){
+},{}],228:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5Token = void 0;
@@ -32426,11 +35116,18 @@ class SR5Token extends Token {
     }
 }
 exports.SR5Token = SR5Token;
-},{"../constants":126}],205:[function(require,module,exports){
+},{"../constants":150}],229:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.quenchRegister = void 0;
+const sr5_Modifiers_spec_1 = require("./sr5.Modifiers.spec");
+const sr5_SR5Item_spec_1 = require("./sr5.SR5Item.spec");
+const sr5_Matrix_spec_1 = require("./sr5.Matrix.spec");
+const sr5_SR5Actor_spec_1 = require("./sr5.SR5Actor.spec");
+const sr5_ActorDataPrep_spec_1 = require("./sr5.ActorDataPrep.spec");
+const sr5_ActiveEffect_spec_1 = require("./sr5.ActiveEffect.spec");
 const sr5_NetworkDevices_spec_1 = require("./sr5.NetworkDevices.spec");
+const sr5_Inventory_spec_1 = require("./sr5.Inventory.spec");
 /**
  * Register FoundryVTT Quench test batches...
  *
@@ -32439,16 +35136,662 @@ const sr5_NetworkDevices_spec_1 = require("./sr5.NetworkDevices.spec");
  * NOTE: Unfortunately FVTT-Quench has no working FoundryVTT 0.8 support and will cause bugs within Foundry.
  */
 const quenchRegister = quench => {
-    // quench.registerBatch("shadowrun5e.rules.matrix", shadowrunMatrix);
-    // quench.registerBatch("shadowrun5e.rules.modifiers", shadowrunRulesModifiers);
-    // quench.registerBatch("shadowrun5e.entities.items", shadowrunSR5Item);
-    // quench.registerBatch("shadowrun5e.entities.actors", shadowrunSR5Actor);
-    // quench.registerBatch("shadowrun5e.entities.effects", shadowrunSR5ActiveEffect);
-    // quench.registerBatch("shadowrun5e.data_prep.actor", shadowrunSR5ActorDataPrep);
+    console.error('Shadowrun 5e | Be aware that FoundryVTT will tank in update performance when a lot of documents are in collections. This is the case if you have all Chummer items imported and might cause tests to cross the 2000ms quench timeout threshold. Clear those collections in a test world. :)');
+    quench.registerBatch("shadowrun5e.rules.matrix", sr5_Matrix_spec_1.shadowrunMatrix);
+    quench.registerBatch("shadowrun5e.rules.modifiers", sr5_Modifiers_spec_1.shadowrunRulesModifiers);
+    quench.registerBatch("shadowrun5e.entities.items", sr5_SR5Item_spec_1.shadowrunSR5Item);
+    quench.registerBatch("shadowrun5e.entities.actors", sr5_SR5Actor_spec_1.shadowrunSR5Actor);
+    quench.registerBatch("shadowrun5e.entities.effects", sr5_ActiveEffect_spec_1.shadowrunSR5ActiveEffect);
+    quench.registerBatch("shadowrun5e.data_prep.actor", sr5_ActorDataPrep_spec_1.shadowrunSR5ActorDataPrep);
     quench.registerBatch("shadowrun5e.flow.networkDevices", sr5_NetworkDevices_spec_1.shadowrunNetworkDevices);
+    quench.registerBatch("shadowrun5e.flow.inventory", sr5_Inventory_spec_1.shadowrunInventoryFlow);
 };
 exports.quenchRegister = quenchRegister;
-},{"./sr5.NetworkDevices.spec":206}],206:[function(require,module,exports){
+},{"./sr5.ActiveEffect.spec":230,"./sr5.ActorDataPrep.spec":231,"./sr5.Inventory.spec":232,"./sr5.Matrix.spec":233,"./sr5.Modifiers.spec":234,"./sr5.NetworkDevices.spec":235,"./sr5.SR5Actor.spec":236,"./sr5.SR5Item.spec":237}],230:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.shadowrunSR5ActiveEffect = void 0;
+const utils_1 = require("./utils");
+const SR5Actor_1 = require("../module/actor/SR5Actor");
+const SR5Item_1 = require("../module/item/SR5Item");
+const shadowrunSR5ActiveEffect = context => {
+    const { describe, it, assert, before, after } = context;
+    let testActor;
+    let testItem;
+    before(() => __awaiter(void 0, void 0, void 0, function* () {
+        testActor = new utils_1.SR5TestingDocuments(SR5Actor_1.SR5Actor);
+        testItem = new utils_1.SR5TestingDocuments(SR5Item_1.SR5Item);
+    }));
+    after(() => __awaiter(void 0, void 0, void 0, function* () {
+        yield testActor.teardown();
+        yield testItem.teardown();
+    }));
+    describe('SR5ActiveEffect', () => {
+        it('apply the custom modify mode', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const effect = yield actor.createEmbeddedDocuments('ActiveEffect', [{
+                    origin: actor.uuid,
+                    disabled: false,
+                    label: 'Test Effect'
+                }]);
+            yield effect[0].update({
+                'changes': [{ key: 'data.attributes.body.mod', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
+                    { key: 'data.attributes.body', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
+            });
+            assert.deepEqual(actor.data.data.attributes.body.mod, [{ name: 'Test Effect', value: 2 }, { name: 'Test Effect', value: 2 }]);
+            assert.strictEqual(actor.data.data.attributes.body.value, 4);
+            yield effect[0].update({
+                'changes': [{ key: 'data.attributes.body.mod', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
+                    { key: 'data.attributes.body.mod', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
+            });
+        }));
+        it('apply custom modify mode, none ModifiableValue should work as the add mode', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const effect = yield actor.createEmbeddedDocuments('ActiveEffect', [{
+                    origin: actor.uuid,
+                    disabled: false,
+                    label: 'Test Effect'
+                }]);
+            yield effect[0].update({
+                'changes': [{
+                        key: 'data.modifiers.global',
+                        value: 3,
+                        mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM
+                    }]
+            });
+            assert.strictEqual(actor.data.data.modifiers.global, 3);
+            assert.strictEqual(actor.data.data.modifiers.global.mod, undefined);
+            assert.strictEqual(actor.data.data.modifiers.global.override, undefined);
+        }));
+        it('apply the custom override mode', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const effect = yield actor.createEmbeddedDocuments('ActiveEffect', [{
+                    origin: actor.uuid,
+                    disabled: false,
+                    label: 'Test Effect'
+                }]);
+            yield effect[0].update({
+                'changes': [{ key: 'data.attributes.body', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE },
+                    { key: 'data.attributes.body.value', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE }]
+            });
+            assert.deepEqual(actor.data.data.attributes.body.override, { name: 'Test Effect', value: 3 });
+            assert.deepEqual(actor.data.data.attributes.body.mod, []);
+            assert.strictEqual(actor.data.data.attributes.body.value, 3);
+        }));
+        it('apply custom override mode, should override all existing .mod values', () => __awaiter(void 0, void 0, void 0, function* () {
+            it('apply the custom override mode', () => __awaiter(void 0, void 0, void 0, function* () {
+                const actor = yield testActor.create({ type: 'character' });
+                const effect = yield actor.createEmbeddedDocuments('ActiveEffect', [{
+                        origin: actor.uuid,
+                        disabled: false,
+                        label: 'Test Effect'
+                    }]);
+                yield effect[0].update({
+                    'changes': [{ key: 'data.attributes.body.mod', value: 5, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                        { key: 'data.attributes.body.value', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE }]
+                });
+                assert.strictEqual(actor.data.data.attributes.body.mod.length, 1);
+                assert.deepEqual(actor.data.data.attributes.body.override, { name: 'Test Effect', value: 3 });
+                assert.deepEqual(actor.data.data.attributes.body.mod, [{ name: 'Test Effect', value: 5 }]);
+                assert.strictEqual(actor.data.data.attributes.body.value, 3);
+            }));
+        }));
+        it('apply custom override mode, none ModifiableValue should work without altering anything', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const effect = yield actor.createEmbeddedDocuments('ActiveEffect', [{
+                    origin: actor.uuid,
+                    disabled: false,
+                    label: 'Test Effect'
+                }]);
+            yield effect[0].update({
+                'changes': [{
+                        key: 'data.modifiers.global',
+                        value: 3,
+                        mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE
+                    }]
+            });
+            assert.strictEqual(actor.data.data.modifiers.global, 3);
+            assert.strictEqual(actor.data.data.modifiers.global.mod, undefined);
+            assert.strictEqual(actor.data.data.modifiers.global.override, undefined);
+        }));
+    });
+};
+exports.shadowrunSR5ActiveEffect = shadowrunSR5ActiveEffect;
+},{"../module/actor/SR5Actor":85,"../module/item/SR5Item":204,"./utils":238}],231:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.shadowrunSR5ActorDataPrep = void 0;
+const utils_1 = require("./utils");
+const SR5Actor_1 = require("../module/actor/SR5Actor");
+const SR5Item_1 = require("../module/item/SR5Item");
+const constants_1 = require("../module/constants");
+const shadowrunSR5ActorDataPrep = context => {
+    const { describe, it, assert, before, after } = context;
+    let testActor;
+    let testItem;
+    before(() => __awaiter(void 0, void 0, void 0, function* () {
+        testActor = new utils_1.SR5TestingDocuments(SR5Actor_1.SR5Actor);
+        testItem = new utils_1.SR5TestingDocuments(SR5Item_1.SR5Item);
+    }));
+    after(() => __awaiter(void 0, void 0, void 0, function* () {
+        yield testActor.teardown();
+        yield testItem.teardown();
+    }));
+    describe('CharacterDataPrep', () => {
+        it('Character default attribute values', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character', metatype: 'human' });
+            // Check for attribute min values;
+            console.log('Physical attributes');
+            assert.strictEqual(actor.data.data.attributes.body.value, constants_1.SR.attributes.ranges['body'].min);
+            assert.strictEqual(actor.data.data.attributes.agility.value, constants_1.SR.attributes.ranges['agility'].min);
+            assert.strictEqual(actor.data.data.attributes.reaction.value, constants_1.SR.attributes.ranges['reaction'].min);
+            assert.strictEqual(actor.data.data.attributes.strength.value, constants_1.SR.attributes.ranges['strength'].min);
+            assert.strictEqual(actor.data.data.attributes.willpower.value, constants_1.SR.attributes.ranges['willpower'].min);
+            assert.strictEqual(actor.data.data.attributes.logic.value, constants_1.SR.attributes.ranges['logic'].min);
+            assert.strictEqual(actor.data.data.attributes.intuition.value, constants_1.SR.attributes.ranges['intuition'].min);
+            assert.strictEqual(actor.data.data.attributes.charisma.value, constants_1.SR.attributes.ranges['charisma'].min);
+            console.log('Comon special attributes');
+            assert.strictEqual(actor.data.data.attributes.edge.value, constants_1.SR.attributes.ranges['edge'].min);
+            assert.strictEqual(actor.data.data.attributes.essence.value, constants_1.SR.attributes.defaults['essence']);
+            console.log('Special special attributes');
+            assert.strictEqual(actor.data.data.attributes.resonance.value, constants_1.SR.attributes.ranges['resonance'].min);
+            assert.strictEqual(actor.data.data.attributes.magic.value, constants_1.SR.attributes.ranges['magic'].min);
+        }));
+        it('Character monitor calculation', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            let data = actor.asCharacterData();
+            // Check default values.
+            assert.strictEqual(data.data.track.stun.max, 9); // 8 + round_up(1 / 2)
+            assert.strictEqual(data.data.track.physical.max, 9); // 8 + round_up(1 / 2)
+            assert.strictEqual(data.data.track.physical.overflow.max, constants_1.SR.attributes.ranges.body.min); // body value
+            // Check calculated values after update.
+            yield actor.update({
+                'data.attributes.body.base': 6,
+                'data.attributes.willpower.base': 6,
+            });
+            assert.strictEqual(data.data.track.stun.max, 11); // 8 + round_up(6 / 2)
+            assert.strictEqual(data.data.track.physical.max, 11); // 8 + round_up(6 / 2)
+            assert.strictEqual(data.data.track.physical.overflow.max, 6); // body value
+        }));
+        it('Character initiative calculation', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const data = actor.asCharacterData();
+            // Check default values.
+            console.log('Meatspace Ini');
+            assert.strictEqual(data.data.initiative.meatspace.base.base, 2); // REA+INT
+            assert.strictEqual(data.data.initiative.meatspace.dice.base, 1);
+            console.log('Matrix AR Ini');
+            assert.strictEqual(data.data.initiative.matrix.base.base, 1); // No matrix device
+            assert.strictEqual(data.data.initiative.matrix.dice.base, 3); // Cold SIM
+            console.log('Magic Ini');
+            assert.strictEqual(data.data.initiative.astral.base.base, 2); // INT+INT
+            assert.strictEqual(data.data.initiative.astral.dice.base, 2);
+        }));
+        it('Character limit calculation', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const data = actor.asCharacterData();
+            assert.strictEqual(data.data.limits.physical.value, 2); // (STR*2 + BOD + REA) / 3
+            assert.strictEqual(data.data.limits.mental.value, 2); // (LOG*2 + INT + WIL) / 3
+            assert.strictEqual(data.data.limits.social.value, 3); // (CHA*2 + WILL + ESS) / 3
+            yield actor.update({
+                'data.attributes.strength.base': 6,
+                'data.attributes.body.base': 6,
+                'data.attributes.reaction.base': 6,
+                'data.attributes.logic.base': 6,
+                'data.attributes.intuition.base': 6,
+                'data.attributes.willpower.base': 6,
+                'data.attributes.charisma.base': 6,
+                'data.attributes.essence.base': 6,
+            });
+            assert.strictEqual(data.data.limits.physical.value, 8);
+            assert.strictEqual(data.data.limits.mental.value, 8);
+            assert.strictEqual(data.data.limits.social.value, 8);
+        }));
+        it('Character movement calculation', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const data = actor.asCharacterData();
+            assert.strictEqual(data.data.movement.walk.value, 2); // AGI * 2
+            assert.strictEqual(data.data.movement.run.value, 4); // AGI * 4
+            yield actor.update({
+                'data.attributes.agility.base': 6
+            });
+            assert.strictEqual(data.data.movement.walk.value, 12);
+            assert.strictEqual(data.data.movement.run.value, 24);
+        }));
+        it('Character skill calculation', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const data = actor.asCharacterData();
+            yield actor.update({
+                'data.skills.active.arcana.base': 6,
+                'data.skills.active.arcana.bonus': [{ key: 'Test', value: 1 }],
+                'data.skills.active.arcana.specs': ['Test']
+            });
+            assert.strictEqual(data.data.skills.active.arcana.value, 7);
+        }));
+        it('Character damage application', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const data = actor.asCharacterData();
+            assert.strictEqual(data.data.track.stun.value, 0);
+            assert.strictEqual(data.data.track.stun.wounds, 0);
+            assert.strictEqual(data.data.track.physical.value, 0);
+            assert.strictEqual(data.data.track.physical.wounds, 0);
+            assert.strictEqual(data.data.wounds.value, 0);
+            yield actor.update({
+                'data.track.stun.value': 3,
+                'data.track.physical.value': 3,
+            });
+            assert.strictEqual(data.data.track.stun.value, 3);
+            assert.strictEqual(data.data.track.stun.wounds, 1);
+            assert.strictEqual(data.data.track.physical.value, 3);
+            assert.strictEqual(data.data.track.physical.wounds, 1);
+            assert.strictEqual(data.data.wounds.value, 2);
+        }));
+        it('Character damage application with high pain/wound tolerance', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const data = actor.asCharacterData();
+            yield actor.update({
+                'data.track.stun.value': 6,
+                'data.track.physical.value': 6,
+                'data.modifiers.wound_tolerance': 3
+            });
+            assert.strictEqual(data.data.track.stun.value, 6);
+            assert.strictEqual(data.data.track.stun.wounds, 1); // would normally be 2 (-2)
+            assert.strictEqual(data.data.track.physical.value, 6);
+            assert.strictEqual(data.data.track.physical.wounds, 1);
+            assert.strictEqual(data.data.wounds.value, 2); // would normally be 4 (-4)
+        }));
+    });
+    describe('SpiritDataPrep', () => {
+        it('Spirits are always magical', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'spirit' });
+            assert.strictEqual(actor.data.data.special, 'magic');
+        }));
+        it('Spirit default/overrides by example type', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'spirit', 'data.spiritType': 'air' });
+            const data = actor.asSpiritData();
+            // Without adequate force there will be negative base values with minimum attribute values.
+            assert.strictEqual(data.data.attributes.body.base, -2);
+            assert.strictEqual(data.data.attributes.agility.base, 3);
+            assert.strictEqual(data.data.attributes.reaction.base, 4);
+            assert.strictEqual(data.data.attributes.strength.base, -3);
+            assert.strictEqual(data.data.attributes.intuition.base, 0);
+            assert.strictEqual(data.data.initiative.meatspace.base.base, 4); // force * 2 + override;
+            assert.strictEqual(data.data.skills.active.assensing.base, 0);
+            yield actor.update({
+                'data.force': 6
+            });
+            assert.strictEqual(data.data.attributes.body.base, 4);
+            assert.strictEqual(data.data.attributes.agility.base, 9);
+            assert.strictEqual(data.data.attributes.reaction.base, 10);
+            assert.strictEqual(data.data.attributes.strength.base, 3);
+            assert.strictEqual(data.data.attributes.intuition.base, 6); // set by force without spirit type mods.
+            assert.strictEqual(data.data.initiative.meatspace.base.base, 16);
+            assert.strictEqual(data.data.skills.active.assensing.base, 6);
+            assert.strictEqual(data.data.skills.active.arcana.base, 0); // not for this spirit type.
+        }));
+    });
+    describe('SpriteDataPrep', () => {
+        it('Sprites are always awakened', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'sprite' });
+            assert.strictEqual(actor.data.data.special, 'resonance');
+        }));
+        it('Sprites default/override values by example type', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'sprite', 'data.spriteType': 'courier' });
+            const data = actor.asSpriteData();
+            assert.strictEqual(data.data.matrix.sleaze.base, 3);
+            assert.strictEqual(data.data.matrix.data_processing.base, 1);
+            assert.strictEqual(data.data.matrix.firewall.base, 2);
+            assert.strictEqual(data.data.matrix.sleaze.base, 3);
+            assert.strictEqual(data.data.initiative.matrix.base.base, 1);
+            assert.strictEqual(data.data.skills.active.hacking.base, 0);
+            yield actor.update({
+                'data.level': 6
+            });
+            assert.strictEqual(data.data.level, 6);
+            assert.strictEqual(data.data.matrix.sleaze.base, 9);
+            assert.strictEqual(data.data.matrix.data_processing.base, 7);
+            assert.strictEqual(data.data.matrix.firewall.base, 8);
+            assert.strictEqual(data.data.matrix.sleaze.base, 9);
+            assert.strictEqual(data.data.initiative.matrix.base.base, 13);
+            assert.strictEqual(data.data.initiative.matrix.dice.base, 4);
+            assert.strictEqual(data.data.skills.active.hacking.base, 6);
+            assert.strictEqual(data.data.skills.active.computer.base, 6); // all sprites
+            assert.strictEqual(data.data.skills.active.electronic_warfare.base, 0); // not set by sprite type.
+        }));
+    });
+};
+exports.shadowrunSR5ActorDataPrep = shadowrunSR5ActorDataPrep;
+},{"../module/actor/SR5Actor":85,"../module/constants":150,"../module/item/SR5Item":204,"./utils":238}],232:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.shadowrunInventoryFlow = void 0;
+const utils_1 = require("./utils");
+const SR5Actor_1 = require("../module/actor/SR5Actor");
+const SR5Item_1 = require("../module/item/SR5Item");
+const shadowrunInventoryFlow = context => {
+    const { describe, it, assert, should, before, after } = context;
+    let testActor;
+    let testItem;
+    before(() => __awaiter(void 0, void 0, void 0, function* () {
+        testActor = new utils_1.SR5TestingDocuments(SR5Actor_1.SR5Actor);
+        testItem = new utils_1.SR5TestingDocuments(SR5Item_1.SR5Item);
+    }));
+    after(() => __awaiter(void 0, void 0, void 0, function* () {
+        yield testActor.teardown();
+        yield testItem.teardown();
+    }));
+    describe('InventoryFlow testing', () => {
+        it('Should create a new inventory and know of its existance', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            yield actor.inventory.create('test');
+            assert.deepEqual(actor.data.data.inventories, {
+                'test': {
+                    name: 'test',
+                    label: 'test',
+                    itemIds: []
+                }
+            });
+            assert.strictEqual(actor.inventory.exists('test'), true);
+        }));
+        it('Should remove an inventory', () => __awaiter(void 0, void 0, void 0, function* () {
+            const inventoriesData = { test: { name: 'test', label: 'test', itemIds: [] } };
+            const actor = yield testActor.create({ type: 'character', 'data.inventories': inventoriesData });
+            yield actor.inventory.remove('test');
+            assert.deepEqual(actor.data.data.inventories, {});
+        }));
+        it('Should add and remove an item to and from an inventory', () => __awaiter(void 0, void 0, void 0, function* () {
+            const inventoriesData = { test: { name: 'test', label: 'test', itemIds: [] } };
+            const actor = yield testActor.create({ type: 'character', 'data.inventories': inventoriesData });
+            const item = yield actor.createEmbeddedDocuments('Item', [{ type: 'weapon', name: 'Test Weapon' }]);
+            yield actor.inventory.addItems('test', item);
+            const itemIds = item.map(item => item.id);
+            assert.deepEqual(actor.data.data.inventories.test.itemIds, itemIds);
+            yield actor.inventory.removeItem(item[0]);
+            assert.deepEqual(actor.data.data.inventories.test.itemIds, []);
+        }));
+        it('Should rename an existing inventory', () => __awaiter(void 0, void 0, void 0, function* () {
+            const inventoriesData = { test: { name: 'test', label: 'test', itemIds: ['asd'] } };
+            const actor = yield testActor.create({ type: 'character', 'data.inventories': inventoriesData });
+            yield actor.inventory.rename('test', 'betterTest');
+            assert.deepEqual(actor.data.data.inventories, {
+                'betterTest': {
+                    name: 'betterTest',
+                    label: 'betterTest',
+                    itemIds: ['asd']
+                }
+            });
+        }));
+    });
+};
+exports.shadowrunInventoryFlow = shadowrunInventoryFlow;
+},{"../module/actor/SR5Actor":85,"../module/item/SR5Item":204,"./utils":238}],233:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.shadowrunMatrix = void 0;
+const MatrixRules_1 = require("../module/rules/MatrixRules");
+const shadowrunMatrix = context => {
+    const { describe, it, assert, before, after } = context;
+    describe('Matrix Rules', () => {
+        it('Should calculate IC device rating', () => {
+            let hostRating = 5;
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICDeviceRating(hostRating), hostRating);
+            // Negative values shouldn't break the system.
+            hostRating = -1;
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICDeviceRating(hostRating), 0);
+        });
+        it('Should calculate IC condition monitor', () => {
+            // 8 is the minimum value possible
+            assert.strictEqual(MatrixRules_1.MatrixRules.getConditionMonitor(0), 8);
+            // Check round up
+            assert.strictEqual(MatrixRules_1.MatrixRules.getConditionMonitor(1), 9);
+            // Check no rounding
+            assert.strictEqual(MatrixRules_1.MatrixRules.getConditionMonitor(4), 10);
+            // Negative values shouldn't break the system.
+            assert.strictEqual(MatrixRules_1.MatrixRules.getConditionMonitor(-1), 8);
+        });
+        it('Should calculate IC matrix initiative base', () => {
+            // 0 is the minimum value possible
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICInitiativeBase(0), 0);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICInitiativeBase(-3), 0);
+            // Check expected value scaling
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICInitiativeBase(1), 2);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICInitiativeBase(2), 4);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICInitiativeBase(3), 6);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICInitiativeBase(12), 24);
+        });
+        it('Should calculate IC matrix initiative dice', () => {
+            // 4 is the only value possible
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICInitiativeDice(), 4);
+        });
+        it('Should calculate meat attribute base with the host rating', () => {
+            // 0 is the minimum value possible
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICMeatAttributeBase(0), 0);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICMeatAttributeBase(-3), 0);
+            // All other values should equal
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICMeatAttributeBase(3), 3);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICMeatAttributeBase(27), 27);
+        });
+        it('Should disallow invalid marks counters', () => {
+            assert.isTrue(MatrixRules_1.MatrixRules.isValidMarksCount(0));
+            assert.isTrue(MatrixRules_1.MatrixRules.isValidMarksCount(1));
+            assert.isTrue(MatrixRules_1.MatrixRules.isValidMarksCount(2));
+            assert.isTrue(MatrixRules_1.MatrixRules.isValidMarksCount(3));
+            assert.isFalse(MatrixRules_1.MatrixRules.isValidMarksCount(-1));
+            assert.isFalse(MatrixRules_1.MatrixRules.isValidMarksCount(4));
+            assert.isFalse(MatrixRules_1.MatrixRules.isValidMarksCount(1.5));
+        });
+        it('Should return valid marks counts', () => {
+            assert.strictEqual(MatrixRules_1.MatrixRules.getValidMarksCount(-1), MatrixRules_1.MatrixRules.minMarksCount());
+            assert.strictEqual(MatrixRules_1.MatrixRules.getValidMarksCount(0), 0);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getValidMarksCount(1), 1);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getValidMarksCount(2), 2);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getValidMarksCount(3), 3);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getValidMarksCount(4), MatrixRules_1.MatrixRules.maxMarksCount());
+        });
+        it('Should return expected host matrix attribute ratings', () => {
+            assert.deepEqual(MatrixRules_1.MatrixRules.hostMatrixAttributeRatings(1), [2, 3, 4, 5]);
+            assert.deepEqual(MatrixRules_1.MatrixRules.hostMatrixAttributeRatings(2), [3, 4, 5, 6]);
+            assert.deepEqual(MatrixRules_1.MatrixRules.hostMatrixAttributeRatings(10), [11, 12, 13, 14]);
+        });
+    });
+};
+exports.shadowrunMatrix = shadowrunMatrix;
+},{"../module/rules/MatrixRules":221}],234:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.shadowrunRulesModifiers = void 0;
+const Modifiers_1 = require("../module/rules/Modifiers");
+const shadowrunRulesModifiers = context => {
+    const { describe, it, assert } = context;
+    const defaultModifiers = {
+        environmental: {
+            active: {},
+            total: 0
+        }
+    };
+    const activeModifiers = {
+        environmental: {
+            active: {
+                wind: -1,
+                light: -1
+            },
+            total: -3
+        }
+    };
+    describe('SR5 Modifiers', () => {
+        it('should create default modifier values', () => {
+            const modifiers = Modifiers_1.Modifiers.getDefaultModifiers();
+            assert.deepEqual(modifiers, defaultModifiers);
+        });
+        it('should use default modifiers for faulty constructor params', () => {
+            //@ts-ignore
+            assert.deepEqual(new Modifiers_1.Modifiers({}).data, defaultModifiers);
+            //@ts-ignore
+            assert.deepEqual(new Modifiers_1.Modifiers(undefined).data, defaultModifiers);
+            //@ts-ignore
+            assert.deepEqual(new Modifiers_1.Modifiers(null).data, defaultModifiers);
+            //@ts-ignore
+            assert.deepEqual(new Modifiers_1.Modifiers(0).data, defaultModifiers);
+            //@ts-ignore
+            assert.deepEqual(new Modifiers_1.Modifiers(1).data, defaultModifiers);
+            //@ts-ignore
+            assert.deepEqual(new Modifiers_1.Modifiers().data, defaultModifiers);
+        });
+        it('should set an environmental modifier active', () => {
+            const modifiers = new Modifiers_1.Modifiers(defaultModifiers);
+            modifiers._setEnvironmentalCategoryActive('wind', -1);
+            //@ts-ignore(modifiers.environmental.active).to.eql({wind: -1});
+        });
+        it('should set an environmental modifier inactive', () => {
+            const modifiers = new Modifiers_1.Modifiers({
+                environmental: {
+                    active: {
+                        wind: -1,
+                        light: -3
+                    },
+                    total: 0
+                }
+            });
+            modifiers._setEnvironmentalCategoryInactive('wind');
+            assert.deepEqual(modifiers.environmental.active, { light: -3 });
+        });
+        it('should understand active environmental modifiers', () => {
+            const modifiersActive = new Modifiers_1.Modifiers({
+                environmental: {
+                    active: {
+                        wind: -1,
+                        light: -3
+                    },
+                    total: 0
+                }
+            });
+            assert.equal(modifiersActive.hasActiveEnvironmental, true);
+            const modifiersInactive = new Modifiers_1.Modifiers({
+                environmental: {
+                    active: {},
+                    total: 0
+                }
+            });
+            assert.equal(modifiersInactive.hasActiveEnvironmental, false);
+        });
+        it('should calculate the total according to sr5 rules', () => {
+            const modifiers = new Modifiers_1.Modifiers(defaultModifiers);
+            assert.equal(modifiers.environmental.total, 0);
+            modifiers.environmental.active.wind = -1;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -1);
+            modifiers.environmental.active.light = -1;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -3);
+            modifiers.environmental.active.range = -1;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -3);
+            delete modifiers.environmental.active.light;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -3);
+            modifiers.environmental.active.light = 0;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -3);
+            modifiers.environmental.active.wind = -3;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -3);
+            modifiers.environmental.active.light = -3;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -6);
+            modifiers.environmental.active.range = -3;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -6);
+            delete modifiers.environmental.active.light;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -6);
+            modifiers.environmental.active.light = 0;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -6);
+            modifiers.environmental.active.wind = -6;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -6);
+            modifiers.environmental.active.light = -6;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -10);
+            modifiers.environmental.active.range = -6;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -10);
+            delete modifiers.environmental.active.light;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -10);
+            modifiers.environmental.active.light = 0;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -10);
+            modifiers.environmental.active.value = 0;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, 0);
+            modifiers.environmental.active.value = -1;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -1);
+            modifiers.environmental.active.value = -3;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -3);
+            modifiers.environmental.active.value = -6;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -6);
+            modifiers.environmental.active.value = -10;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -10);
+        });
+        it('should reset active environmental modifiers', () => {
+            const modifiers = new Modifiers_1.Modifiers(activeModifiers);
+            modifiers._resetEnvironmental();
+            assert.deepEqual(modifiers.environmental.active, {});
+        });
+        it('should calculate total for faulty active', () => {
+            const modifiers = new Modifiers_1.Modifiers({
+                environmental: {
+                    total: -1,
+                    active: {
+                        //@ts-ignore
+                        light: null,
+                        wind: undefined,
+                        //@ts-ignore
+                        range: '',
+                        //@ts-ignore
+                        visibility: 'string'
+                    }
+                }
+            });
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, 0);
+        });
+    });
+};
+exports.shadowrunRulesModifiers = shadowrunRulesModifiers;
+},{"../module/rules/Modifiers":222}],235:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -32481,6 +35824,7 @@ const shadowrunNetworkDevices = context => {
         yield testScene.teardown();
     }));
     describe('Network Devices handling', () => {
+        // TODO: Redesign them with only necessary update methods in place. Instead start of with ActorData prefilled on create.
         it('Should give a network link to given document class', () => __awaiter(void 0, void 0, void 0, function* () {
             const actor = yield testActor.create({ 'type': 'character' });
             const link = NetworkDeviceFlow_1.NetworkDeviceFlow.buildLink(actor);
@@ -32537,8 +35881,6 @@ const shadowrunNetworkDevices = context => {
         it('Should get all connected network devices of a controller as their Document', () => __awaiter(void 0, void 0, void 0, function* () {
             const controller = yield testItem.create({ type: 'device' });
             const devices = [
-                yield testItem.create({ type: 'weapon' }),
-                yield testItem.create({ type: 'weapon' }),
                 yield testItem.create({ type: 'weapon' })
             ];
             for (const device of devices) {
@@ -32546,8 +35888,8 @@ const shadowrunNetworkDevices = context => {
             }
             const fetchedDevices = NetworkDeviceFlow_1.NetworkDeviceFlow.getNetworkDevices(controller);
             // Check for structural equality.
-            assert.strictEqual(controller.data.data.networkDevices.length, 3);
-            assert.strictEqual(fetchedDevices.length, 3);
+            assert.strictEqual(controller.data.data.networkDevices.length, 1);
+            assert.strictEqual(fetchedDevices.length, 1);
             // Check for referential equality.
             for (const fetched of fetchedDevices) {
                 assert.include(devices, fetched);
@@ -32590,8 +35932,6 @@ const shadowrunNetworkDevices = context => {
         it('Should remove all devices from a controller', () => __awaiter(void 0, void 0, void 0, function* () {
             const controller = yield testItem.create({ type: 'device' });
             const devices = [
-                yield testItem.create({ type: 'weapon' }),
-                yield testItem.create({ type: 'weapon' }),
                 yield testItem.create({ type: 'weapon' })
             ];
             for (const device of devices) {
@@ -32606,7 +35946,155 @@ const shadowrunNetworkDevices = context => {
     });
 };
 exports.shadowrunNetworkDevices = shadowrunNetworkDevices;
-},{"../module/actor/SR5Actor":82,"../module/item/SR5Item":180,"../module/item/flows/NetworkDeviceFlow":184,"./utils":207}],207:[function(require,module,exports){
+},{"../module/actor/SR5Actor":85,"../module/item/SR5Item":204,"../module/item/flows/NetworkDeviceFlow":208,"./utils":238}],236:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.shadowrunSR5Actor = void 0;
+const SR5Actor_1 = require("../module/actor/SR5Actor");
+const SR5Item_1 = require("../module/item/SR5Item");
+const utils_1 = require("./utils");
+const shadowrunSR5Actor = context => {
+    const { describe, it, assert, before, after } = context;
+    let testActor;
+    let testItem;
+    before(() => __awaiter(void 0, void 0, void 0, function* () {
+        testActor = new utils_1.SR5TestingDocuments(SR5Actor_1.SR5Actor);
+        testItem = new utils_1.SR5TestingDocuments(SR5Item_1.SR5Item);
+    }));
+    after(() => __awaiter(void 0, void 0, void 0, function* () {
+        yield testActor.teardown();
+        yield testItem.teardown();
+    }));
+    describe('SR5Actor', () => {
+        it('Should create a naked actor of any type', () => __awaiter(void 0, void 0, void 0, function* () {
+            var _a;
+            const actor = yield testActor.create({ type: 'character' });
+            // Check basic foundry data integrity
+            assert.notStrictEqual(actor.id, '');
+            assert.notStrictEqual(actor.id, undefined);
+            assert.notStrictEqual(actor.id, null);
+            // Check foundry item collection integrity
+            const fromCollection = (_a = game.actors) === null || _a === void 0 ? void 0 : _a.get(actor.id);
+            assert.isOk(fromCollection);
+            assert.strictEqual(actor.id, fromCollection === null || fromCollection === void 0 ? void 0 : fromCollection.id);
+        }));
+        it('Should update an actor of any time', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            assert.notProperty(actor.data.data, 'test');
+            yield actor.update({ 'data.test': true });
+            assert.property(actor.data.data, 'test');
+            assert.propertyVal(actor.data.data, 'test', true);
+        }));
+        it('Should embedd a weapon into an actor and not the global item colection', () => __awaiter(void 0, void 0, void 0, function* () {
+            var _b;
+            const actor = yield testActor.create({ type: 'character' });
+            const weapon = yield testItem.create({ type: 'weapon' });
+            yield actor.createEmbeddedDocuments('Item', [weapon.data]);
+            const ownedItems = Array.from(actor.items);
+            assert.isNotEmpty(ownedItems);
+            assert.lengthOf(ownedItems, 1);
+            const ownedItem = ownedItems[0];
+            assert.strictEqual(ownedItem.type, weapon.data.type);
+            // An owned item should NOT appear in the items collection.
+            const ownedInCollection = (_b = game.items) === null || _b === void 0 ? void 0 : _b.get(ownedItem.id);
+            assert.isNotOk(ownedInCollection);
+        }));
+    });
+};
+exports.shadowrunSR5Actor = shadowrunSR5Actor;
+},{"../module/actor/SR5Actor":85,"../module/item/SR5Item":204,"./utils":238}],237:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.shadowrunSR5Item = void 0;
+const SR5Item_1 = require("../module/item/SR5Item");
+const utils_1 = require("./utils");
+const shadowrunSR5Item = context => {
+    /**
+     * Setup handling for all items within this test.
+     */
+    const { describe, it, assert, before, after } = context;
+    let testItem;
+    before(() => __awaiter(void 0, void 0, void 0, function* () {
+        testItem = new utils_1.SR5TestingDocuments(SR5Item_1.SR5Item);
+    }));
+    after(() => __awaiter(void 0, void 0, void 0, function* () {
+        yield testItem.teardown();
+    }));
+    describe('SR5Items', () => {
+        it('Should create a naked item of any type', () => __awaiter(void 0, void 0, void 0, function* () {
+            var _a;
+            const item = yield testItem.create({ type: 'action' });
+            // Check basic foundry data integrity
+            assert.notStrictEqual(item.id, '');
+            assert.notStrictEqual(item.id, undefined);
+            assert.notStrictEqual(item.id, null);
+            // Check foundry item collection integrity
+            const itemFromCollection = (_a = game.items) === null || _a === void 0 ? void 0 : _a.get(item.id);
+            assert.notStrictEqual(itemFromCollection, null);
+            assert.strictEqual(item.id, itemFromCollection === null || itemFromCollection === void 0 ? void 0 : itemFromCollection.id);
+        }));
+        it('Should update an item of any type', () => __awaiter(void 0, void 0, void 0, function* () {
+            const item = yield testItem.create({ type: 'action' });
+            assert.notProperty(item.data.data, 'test');
+            yield item.update({ 'data.test': true });
+            assert.property(item.data.data, 'test');
+            assert.propertyVal(item.data.data, 'test', true);
+        }));
+        it('Should embedd a ammo into a weapon and not the global item collection', () => __awaiter(void 0, void 0, void 0, function* () {
+            var _b;
+            const weapon = yield testItem.create({ type: 'weapon' });
+            const ammo = yield testItem.create({ type: 'ammo' });
+            yield weapon.createOwnedItem(ammo.data);
+            const embeddedItemDatas = weapon.getNestedItems();
+            assert.isNotEmpty(embeddedItemDatas);
+            assert.lengthOf(embeddedItemDatas, 1);
+            const embeddedAmmoData = embeddedItemDatas[0];
+            assert.strictEqual(embeddedAmmoData.type, ammo.data.type);
+            // An embedded item should NOT appear in the items collection.
+            const embeddedAmmoInCollection = (_b = game.items) === null || _b === void 0 ? void 0 : _b.get(embeddedAmmoData._id);
+            assert.strictEqual(embeddedAmmoInCollection, undefined);
+        }));
+        it('Should update an embedded ammo', () => __awaiter(void 0, void 0, void 0, function* () {
+            const weapon = yield testItem.create({ type: 'weapon' });
+            const ammo = yield testItem.create({ type: 'ammo' });
+            // Embed the item and get
+            yield weapon.createOwnedItem(ammo.data);
+            const embeddedItemDatas = weapon.getNestedItems();
+            assert.lengthOf(embeddedItemDatas, 1);
+            const embeddedAmmoData = embeddedItemDatas[0];
+            const embeddedAmmo = weapon.getOwnedItem(embeddedAmmoData._id);
+            assert.notStrictEqual(embeddedAmmo, undefined);
+            assert.instanceOf(embeddedAmmo, SR5Item_1.SR5Item);
+            if (!embeddedAmmo)
+                return; //type script gate...
+            // Set an testing property.
+            assert.notProperty(embeddedAmmo.data.data, 'test');
+            yield embeddedAmmo.update({ 'data.test': true });
+            assert.property(embeddedAmmo.data.data, 'test');
+            assert.propertyVal(embeddedAmmo.data.data, 'test', true);
+        }));
+    });
+};
+exports.shadowrunSR5Item = shadowrunSR5Item;
+},{"../module/item/SR5Item":204,"./utils":238}],238:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -32650,6 +36138,6 @@ class SR5TestingDocuments {
     }
 }
 exports.SR5TestingDocuments = SR5TestingDocuments;
-},{}]},{},[187])
+},{}]},{},[211])
 
 //# sourceMappingURL=bundle.js.map
