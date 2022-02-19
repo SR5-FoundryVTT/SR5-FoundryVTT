@@ -3,7 +3,6 @@ import { Migrator } from './migrator/Migrator';
 import { registerSystemSettings } from './settings';
 import {FLAGS, SYSTEM_NAME, SYSTEM_SOCKET} from './constants';
 import { SR5Actor } from './actor/SR5Actor';
-import { SR5ActorSheet } from './actor/SR5ActorSheet';
 import { SR5Item } from './item/SR5Item';
 import { SR5ItemSheet } from './item/SR5ItemSheet';
 import { SR5Token } from './token/SR5Token';
@@ -30,6 +29,12 @@ import {NetworkDeviceFlow} from "./item/flows/NetworkDeviceFlow";
 import {SR5Roll} from "./rolls/SR5Roll";
 import {SuccessTest} from "./tests/SuccessTest";
 import {OpposedTest} from "./tests/OpposedTest";
+
+import {SR5VehicleActorSheet} from "./actor/sheets/SR5VehicleActorSheet";
+import {SR5CharacterSheet} from "./actor/sheets/SR5CharacterSheet";
+import {SR5BaseActorSheet} from "./actor/sheets/SR5BaseActorSheet";
+import {SR5SpiritActorSheet} from "./actor/sheets/SR5SpiritActorSheet";
+import {SR5SpriteActorSheet} from "./actor/sheets/SR5SpriteActorSheet";
 
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 export const SR5CONFIG = SR5;
@@ -113,15 +118,30 @@ ___________________
         // Register sheet application classes
         // NOTE: See dnd5e for a multi class approach for all actor types using the types array in Actors.registerSheet
         Actors.unregisterSheet('core', ActorSheet);
-        Actors.registerSheet(SYSTEM_NAME, SR5ActorSheet, {
+        Actors.registerSheet(SYSTEM_NAME, SR5CharacterSheet, {
             label: "SR5.SheetActor",
             makeDefault: true,
-            types: ['character', 'vehicle', 'critter', 'spirit', 'sprite']
+            types: ['critter', 'character']
         });
         Actors.registerSheet(SYSTEM_NAME, SR5ICActorSheet, {
             label: "SR5.SheetActor",
             makeDefault: true,
             types: ['ic']
+        });
+        Actors.registerSheet(SYSTEM_NAME, SR5VehicleActorSheet, {
+            label: "SR5.SheetActor",
+            makeDefault: true,
+            types: ['vehicle']
+        });
+        Actors.registerSheet(SYSTEM_NAME, SR5SpiritActorSheet, {
+            label: "SR5.SheetActor",
+            makeDefault: true,
+            types: ['spirit']
+        });
+         Actors.registerSheet(SYSTEM_NAME, SR5SpriteActorSheet, {
+            label: "SR5.SheetActor",
+            makeDefault: true,
+            types: ['sprite']
         });
 
 

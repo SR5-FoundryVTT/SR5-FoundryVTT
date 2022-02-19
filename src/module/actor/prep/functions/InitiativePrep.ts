@@ -15,7 +15,7 @@ export class InitiativePrep {
             initiative.perception = 'meatspace';
         }
 
-        initiative.current.dice.value = Helpers.calcTotal(initiative.current.dice);
+        initiative.current.dice.value = Helpers.calcTotal(initiative.current.dice, {min: 0, max: 5});
         if (initiative.edge) initiative.current.dice.value = 5;
         initiative.current.dice.value = Math.min(5, initiative.current.dice.value); // maximum of 5d6 for initiative
         initiative.current.dice.text = `${initiative.current.dice.value}d6`;

@@ -7,7 +7,7 @@
                     icons=(ItemHeaderIcons "critter_power")
                     rightSide=(ItemHeaderRightSide "critter_power")
             }}
-            {{#each critter_powers as |item i|}}
+            {{#each itemType.critter_power as |item i|}}
                 {{> 'systems/shadowrun5e/dist/templates/common/List/ListItem.html'
                         img=item.img
                         name=item.name

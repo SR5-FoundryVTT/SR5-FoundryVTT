@@ -19,25 +19,33 @@ export class OverwatchScoreTracker extends Application {
 
     static addedActors = [];
 
-    getData() {
-        // get list of actors that belong to users
-        const actors = game.users.reduce((acc, user) => {
-            if (!user.isGM && user.character) {
-                acc.push(user.character.data);
-            }
-            return acc;
-        }, []);
+    getData(options) {
+        // Get list of user character actors
+        const actors = this._prepareCharacterActorsData();
 
-        OverwatchScoreTracker.addedActors.forEach((id) => {
-            const actor = game.actors.find((a) => a._id === id);
+        // get actors manually added to the tracker by GM
+        OverwatchScoreTracker.addedActors.forEach(id => {
+            const actor = game.actors.get(id)
             if (actor) {
-                actors.push(actor.data);
+                actors.push(actor.toObject());
             }
         });
+
+        // Reference the currently displayed actors for better access.
+        this.actors = actors;
 
         return {
             actors,
         };
+    }
+
+    _prepareCharacterActorsData() {
+        return game.users.reduce((acc, user) => {
+            if (!user.isGM && user.character) {
+                acc.push(user.character.toObject());
+            }
+            return acc;
+        }, []);
     }
 
     activateListeners(html) {
@@ -50,22 +58,45 @@ export class OverwatchScoreTracker extends Application {
 
     // returns the actor that this event is acting on
     _getActorFromEvent(event) {
-        const id = event.currentTarget.closest('.list-item').dataset.actorId;
-        if (id) return game.actors.find((a) => a._id === id);
+        const id = $(event.currentTarget).closest('.list-item').data('actorId');
+        if (id) return game.actors.get(id);
     }
 
     _onAddActor(event) {
         event.preventDefault();
+
         const tokens = Helpers.getControlledTokens();
         if (tokens.length === 0) {
-            ui.notifications?.warn(game.i18n.localize('SR5.OverwatchScoreTracker.NotifyNoSelectedTokens'));
-            return;
+            return ui.notifications?.warn(game.i18n.localize('SR5.OverwatchScoreTracker.NotifyNoSelectedTokens'));
         }
-        tokens.forEach((token) => {
-            const actorId = token.data.actorId;
-            OverwatchScoreTracker.addedActors.push(actorId);
-            this.render();
+
+        // Warn user about selected unlinked token actors.
+        const unlinkedActor = tokens.find(token => !token.data.actorLink);
+        if (unlinkedActor !== undefined) {
+            ui.notifications.warn(game.i18n.localize('SR5.OverwatchScoreTracker.OnlyLinkedActorsSupported'));
+        }
+
+        // Add linked token actors.
+        tokens.filter(token => token.data.actorLink).forEach(token => {
+            // Double check that the actor actually lives in the actors collection.
+            const actor = game.actors.get(token.data.actorId);
+            if (!actor) return;
+            if (this._isActorOnTracker(actor)) return;
+
+            OverwatchScoreTracker.addedActors.push(actor.id);
         });
+
+        this.render();
+    }
+
+    /**
+     * Check if the given actor is already added and displayed on the current tracker.
+     *
+     * @param actor A actors collection actor.
+     * @returns {boolean} Will return true when the given actor already exists.
+     */
+    _isActorOnTracker(actor) {
+        return this.actors.find(actorData => actorData._id === actor.id) !== undefined;
     }
 
     _setOverwatchScore(event) {

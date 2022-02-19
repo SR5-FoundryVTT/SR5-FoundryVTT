@@ -898,7 +898,8 @@
                         }
                     }
                 },
-                "modifiers": {}
+                "modifiers": {},
+                "inventories": {}
             }
         },
         "character": {

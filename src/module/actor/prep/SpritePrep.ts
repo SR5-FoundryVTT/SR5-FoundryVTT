@@ -35,10 +35,10 @@ export class SpritePrep {
 
         MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
 
-        InitiativePrep.prepareCurrentInitiative(data);
-
         SpritePrep.prepareSpriteConditionMonitor(data);
         SpritePrep.prepareSpriteInitiative(data);
+
+        InitiativePrep.prepareCurrentInitiative(data);
     }
 
     static prepareSpriteSpecial(data: SpriteData) {
@@ -103,11 +103,11 @@ export class SpritePrep {
         // setup initiative from overrides
         initiative.matrix.base.base = level * 2 + overrides.init;
         PartsList.AddUniquePart(initiative.matrix.base.mod, 'SR5.Bonus', modifiers['matrix_initiative']);
-        Helpers.calcTotal(initiative.matrix.base);
+        Helpers.calcTotal(initiative.matrix.base, {min: 0});
 
         initiative.matrix.dice.base = 4;
         PartsList.AddUniquePart(initiative.matrix.dice.mod, 'SR5.Bonus', modifiers['matrix_initiative_dice']);
-        Helpers.calcTotal(initiative.matrix.dice);
+        Helpers.calcTotal(initiative.matrix.dice, {min: 0});
     }
 
     /**

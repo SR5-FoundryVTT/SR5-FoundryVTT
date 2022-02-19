@@ -13278,6 +13278,7 @@ const Modifiers_1 = require("../rules/Modifiers");
 const SkillRules_1 = require("../rules/SkillRules");
 const MatrixRules_1 = require("../rules/MatrixRules");
 const ICPrep_1 = require("./prep/ICPrep");
+const InventoryFlow_1 = require("./flows/InventoryFlow");
 function getGame() {
     if (!(game instanceof Game)) {
         throw new Error('game is not initialized yet!');
@@ -13300,6 +13301,16 @@ function getGame() {
  *
  */
 class SR5Actor extends Actor {
+    constructor(data, context) {
+        super(data, context);
+        // This is the default inventory name and label for when no other inventory has been created.
+        this.defaultInventory = {
+            name: 'Carried',
+            label: 'SR5.Labels.Inventory.Carried',
+            itemIds: []
+        };
+        this.inventory = new InventoryFlow_1.InventoryFlow(this);
+    }
     getOverwatchScore() {
         const os = this.getFlag(constants_1.SYSTEM_NAME, 'overwatchScore');
         return os !== undefined ? os : 0;
@@ -13636,6 +13647,13 @@ class SR5Actor extends Actor {
     isIC() {
         return this.getType() === 'ic';
     }
+    /**
+     * Determine if this actor is able to have natural damage recovery.
+     * @returns true in case of possible natural recovery.
+     */
+    get hasNaturalRecovery() {
+        return this.isCharacter() || this.isCritter();
+    }
     getVehicleTypeSkillName() {
         if (!("vehicleType" in this.data.data))
             return;
@@ -13814,7 +13832,7 @@ class SR5Actor extends Actor {
     }
     removeLanguageSkill(skillId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const updateData = helpers_1.Helpers.getDeleteDataEntry('data.skills.language.value', skillId);
+            const updateData = helpers_1.Helpers.getDeleteKeyUpdateData('data.skills.language.value', skillId);
             yield this.update(updateData);
         });
     }
@@ -13841,7 +13859,7 @@ class SR5Actor extends Actor {
     }
     removeKnowledgeSkill(skillId, category) {
         return __awaiter(this, void 0, void 0, function* () {
-            const updateData = helpers_1.Helpers.getDeleteDataEntry(`data.skills.knowledge.${category}.value`, skillId);
+            const updateData = helpers_1.Helpers.getDeleteKeyUpdateData(`data.skills.knowledge.${category}.value`, skillId);
             yield this.update(updateData);
         });
     }
@@ -13868,7 +13886,7 @@ class SR5Actor extends Actor {
                 return;
             }
             // Remove custom skills without mercy!
-            const updateData = helpers_1.Helpers.getDeleteDataEntry('data.skills.active', skillId);
+            const updateData = helpers_1.Helpers.getDeleteKeyUpdateData('data.skills.active', skillId);
             yield this.update(updateData);
         });
     }
@@ -14118,24 +14136,30 @@ class SR5Actor extends Actor {
             hideRollMessage: options.hideRollMessage
         });
     }
+    /**
+     * Roll a recovery test appropriate for this actor type and condition track.
+     *
+     * @param track Condition Track/Monitor name to recover with
+     * @param options Change roll behaviour.
+     */
     rollNaturalRecovery(track, options) {
-        if (!this.isCharacter())
+        if (!this.hasNaturalRecovery)
             return;
-        let id1 = 'body';
-        let id2 = 'willpower';
+        let attributeNameA = 'body';
+        let attributeNameB = 'willpower';
         let title = 'Natural Recover';
         if (track === 'physical') {
-            id2 = 'body';
+            attributeNameB = 'body';
             title += ' - Physical - 1 Day';
         }
         else {
             title += ' - Stun - 1 Hour';
         }
-        let att1 = duplicate(this.data.data.attributes[id1]);
-        let att2 = duplicate(this.data.data.attributes[id2]);
+        let attributeA = duplicate(this.data.data.attributes[attributeNameA]);
+        let attributeB = duplicate(this.data.data.attributes[attributeNameB]);
         const parts = new PartsList_1.PartsList();
-        parts.addPart(att1.label, att1.value);
-        parts.addPart(att2.label, att2.value);
+        parts.addPart(attributeA.label, attributeA.value);
+        parts.addPart(attributeB.label, attributeB.value);
         return ShadowrunRoller_1.ShadowrunRoller.advancedRoll({
             event: options === null || options === void 0 ? void 0 : options.event,
             actor: this,
@@ -14449,9 +14473,15 @@ class SR5Actor extends Actor {
         const skill = duplicate(this.data.data.skills.active[skillId]);
         return this.rollSkill(skill, options);
     }
-    rollAttribute(attId, options) {
-        let title = game.i18n.localize(config_1.SR5.attributes[attId]);
-        const attribute = duplicate(this.data.data.attributes[attId]);
+    /**
+     * Roll a general attribute test with one or two attributes.
+     *
+     * @param name The attributes name as defined within data
+     * @param options Change general roll options.
+     */
+    rollAttribute(name, options) {
+        let title = game.i18n.localize(config_1.SR5.attributes[name]);
+        const attribute = duplicate(this.data.data.attributes[name]);
         const attributes = duplicate(this.data.data.attributes);
         const parts = new PartsList_1.PartsList();
         parts.addPart(attribute.label, attribute.value);
@@ -14985,13 +15015,13 @@ class SR5Actor extends Actor {
         return driver;
     }
     /**
-    * Add a host to this IC type actor.
-    *
-    * Currently compendium hosts aren't supported.
-    * Any other actor type has no use for this method.
-    *
-    * @param id The host item id
-    */
+     * Add a host to this IC type actor.
+     *
+     * Currently compendium hosts aren't supported.
+     * Any other actor type has no use for this method.
+     *
+     * @param id The host item id
+     */
     addICHost(id) {
         var _a;
         return __awaiter(this, void 0, void 0, function* () {
@@ -15242,1185 +15272,7 @@ class SR5Actor extends Actor {
 }
 exports.SR5Actor = SR5Actor;
 
-},{"../apps/dialogs/ShadowrunActorDialogs":134,"../chat":142,"../config":144,"../constants":145,"../data/DataDefaults":146,"../data/SR5ItemDataWrapper":148,"../helpers":159,"../item/SR5Item":199,"../parts/PartsList":213,"../rolls/ShadowrunRoller":214,"../rules/MatrixRules":216,"../rules/Modifiers":217,"../rules/SkillRules":218,"./flows/SkillFlow":88,"./flows/SoakFlow":89,"./prep/CharacterPrep":90,"./prep/CritterPrep":91,"./prep/ICPrep":92,"./prep/SpiritPrep":93,"./prep/SpritePrep":94,"./prep/VehiclePrep":95}],86:[function(require,module,exports){
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.SR5ActorSheet = void 0;
-const helpers_1 = require("../helpers");
-const chummer_import_form_1 = require("../apps/chummer-import-form");
-const SkillEditSheet_1 = require("../apps/skills/SkillEditSheet");
-const KnowledgeSkillEditSheet_1 = require("../apps/skills/KnowledgeSkillEditSheet");
-const LanguageSkillEditSheet_1 = require("../apps/skills/LanguageSkillEditSheet");
-const config_1 = require("../config");
-const effects_1 = require("../effects");
-// Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
-// Should multiple instances be open, Foundry will cause cross talk between skills and actors,
-// when opened in succession, causing SkillEditSheet to wrongfully overwrite the wrong data.
-let globalSkillAppId = -1;
-/**
- * See Hooks.init for which actor type this sheet handles.
- *
- */
-class SR5ActorSheet extends ActorSheet {
-    constructor() {
-        super(...arguments);
-        this._shownDesc = [];
-        this._filters = {
-            skills: '',
-            showUntrainedSkills: true,
-        };
-    }
-    /* -------------------------------------------- */
-    /**
-     * Extend and override the default options used by the 5e Actor Sheet
-     * @returns {Object}
-     */
-    static get defaultOptions() {
-        // @ts-ignore
-        return mergeObject(super.defaultOptions, {
-            classes: ['sr5', 'sheet', 'actor'],
-            width: 905,
-            height: 690,
-            tabs: [
-                {
-                    navSelector: '.tabs',
-                    contentSelector: '.sheetbody',
-                    initial: 'skills',
-                },
-            ],
-        });
-    }
-    get template() {
-        const path = 'systems/shadowrun5e/dist/templates';
-        if (this.actor.limited) {
-            return `${path}/actor-limited/${this.actor.data.type}.html`;
-        }
-        return `${path}/actor/${this.actor.data.type}.html`;
-    }
-    getData(options) {
-        //     // Restructure redesigned Document.getData to contain all new fields, while keeping data.data as system data.
-        let data = super.getData();
-        data = Object.assign(Object.assign({}, data), { 
-            // @ts-ignore
-            data: data.data.data });
-        // General purpose fields...
-        data.config = config_1.SR5;
-        data.filters = this._filters;
-        this._prepareMatrixAttributes(data);
-        this._prepareActorAttributes(data);
-        this._prepareItems(data);
-        this._prepareSkillsWithFilters(data);
-        this._prepareActorTypeFields(data);
-        this._prepareCharacterFields(data);
-        this._prepareVehicleFields(data);
-        // Active Effects data.
-        data['effects'] = (0, effects_1.prepareActiveEffectCategories)(this.document.effects);
-        data['markedDocuments'] = this.object.getAllMarkedDocuments();
-        // @ts-ignore // TODO: ActorSheetData typing is missing
-        return data;
-    }
-    _isSkillMagic(id, skill) {
-        return skill.attribute === 'magic' || id === 'astral_combat' || id === 'assensing';
-    }
-    _isSkillResonance(skill) {
-        return skill.attribute === 'resonance';
-    }
-    _getSkillLabelOrName(skill) {
-        return helpers_1.Helpers.getSkillLabelOrName(skill);
-    }
-    _doesSkillContainText(key, skill, text) {
-        if (!text) {
-            return true;
-        }
-        // Search both english keys, localized labels and all specializations.
-        const name = this._getSkillLabelOrName(skill);
-        const searchKey = skill.name === undefined ? key : '';
-        // some "specs" were a string from old code I think
-        const specs = skill.specs !== undefined && Array.isArray(skill.specs) ? skill.specs.join(' ') : '';
-        let searchString = `${searchKey} ${name} ${specs}`;
-        return searchString.toLowerCase().search(text.toLowerCase()) > -1;
-    }
-    _prepareCharacterFields(data) {
-        // Empty zero value modifiers for display purposes.
-        const { modifiers: mods } = data.data;
-        for (let [key, value] of Object.entries(mods)) {
-            if (value === 0)
-                mods[key] = '';
-        }
-        data.awakened = data.data.special === 'magic';
-        data.emerged = data.data.special === 'resonance';
-        data.woundTolerance = 3 + (Number(mods['wound_tolerance']) || 0);
-    }
-    _prepareVehicleFields(data) {
-        if (!this.actor.isVehicle())
-            return;
-        const driver = this.actor.getVehicleDriver();
-        data.vehicle = {
-            driver
-        };
-    }
-    _prepareActorTypeFields(data) {
-        data.isCharacter = this.actor.isCharacter();
-        data.isSpirit = this.actor.isSpirit();
-        data.isCritter = this.actor.isCritter();
-        data.hasSkills = this.actor.hasSkills;
-        data.hasSpecial = this.actor.hasSpecial;
-        data.hasFullDefense = this.actor.hasFullDefense;
-    }
-    _prepareMatrixAttributes(data) {
-        const { matrix } = data.data;
-        if (matrix) {
-            const cleanupAttribute = (attribute) => {
-                const att = matrix[attribute];
-                if (att) {
-                    if (!att.mod)
-                        att.mod = [];
-                    if (att.temp === 0)
-                        delete att.temp;
-                }
-            };
-            ['firewall', 'data_processing', 'sleaze', 'attack'].forEach((att) => cleanupAttribute(att));
-        }
-    }
-    _prepareActorAttributes(data) {
-        // Clear visible, zero value attributes temporary modifiers so they appear blank.
-        const attributes = data.data.attributes;
-        for (let [, attribute] of Object.entries(attributes)) {
-            if (!attribute.hidden) {
-                if (attribute.temp === 0)
-                    delete attribute.temp;
-            }
-        }
-    }
-    _prepareSkillsWithFilters(data) {
-        this._filterActiveSkills(data);
-        this._filterKnowledgeSkills(data);
-        this._filterLanguageSkills(data);
-    }
-    _filterActiveSkills(data) {
-        // Handle active skills directly, as it doesn't use sub-categories.
-        data.data.skills.active = this._filterSkills(data, data.data.skills.active);
-    }
-    _filterKnowledgeSkills(data) {
-        // Knowledge skill have separate sub-categories.
-        Object.keys(config_1.SR5.knowledgeSkillCategories).forEach((category) => {
-            if (!data.data.skills.knowledge.hasOwnProperty(category)) {
-                console.warn(`Knowledge Skill doesn't provide configured category ${category}`);
-                return;
-            }
-            data.data.skills.knowledge[category].value = this._filterSkills(data, data.data.skills.knowledge[category].value);
-        });
-    }
-    _filterLanguageSkills(data) {
-        // Language Skills have no sub-categories.
-        data.data.skills.language.value = this._filterSkills(data, data.data.skills.language.value);
-    }
-    _filterSkills(data, skills) {
-        const filteredSkills = {};
-        for (let [key, skill] of Object.entries(skills)) {
-            // Don't show hidden skills.
-            if (skill.hidden) {
-                continue;
-            }
-            // Filter visible skills.
-            if (this._showSkill(key, skill, data)) {
-                filteredSkills[key] = skill;
-            }
-        }
-        return helpers_1.Helpers.sortSkills(filteredSkills);
-    }
-    _showSkill(key, skill, data) {
-        if (this._showMagicSkills(key, skill, data)) {
-            return true;
-        }
-        if (this._showResonanceSkills(key, skill, data)) {
-            return true;
-        }
-        return this._showGeneralSkill(key, skill);
-    }
-    _isSkillFiltered(skillId, skill) {
-        // a newly created skill shouldn't be filtered, no matter what.
-        // Therefore disqualify empty skill labels/names from filtering and always show them.
-        const isFilterable = this._getSkillLabelOrName(skill).length > 0;
-        const isHiddenForText = !this._doesSkillContainText(skillId, skill, this._filters.skills);
-        const isHiddenForUntrained = !this._filters.showUntrainedSkills && skill.value === 0;
-        return !(isFilterable && (isHiddenForUntrained || isHiddenForText));
-    }
-    _showGeneralSkill(skillId, skill) {
-        return !this._isSkillMagic(skillId, skill) && !this._isSkillResonance(skill) && this._isSkillFiltered(skillId, skill);
-    }
-    _showMagicSkills(skillId, skill, data) {
-        return this._isSkillMagic(skillId, skill) && data.data.special === 'magic' && this._isSkillFiltered(skillId, skill);
-    }
-    _showResonanceSkills(skillId, skill, data) {
-        return this._isSkillResonance(skill) && data.data.special === 'resonance' && this._isSkillFiltered(skillId, skill);
-    }
-    _prepareItems(data) {
-        const inventory = {};
-        // All acting entities should be allowed to carry some protection!
-        inventory['weapon'] = {
-            label: game.i18n.localize('SR5.ItemTypes.Weapon'),
-            items: [],
-            dataset: {
-                type: 'weapon',
-            },
-        };
-        // Critters are people to... Support your local HMHVV support groups!
-        if (this.actor.matchesActorTypes(['character', 'critter', 'vehicle'])) {
-            inventory['armor'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Armor'),
-                items: [],
-                dataset: {
-                    type: 'armor',
-                },
-            };
-            inventory['device'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Device'),
-                items: [],
-                dataset: {
-                    type: 'device',
-                },
-            };
-            inventory['equipment'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Equipment'),
-                items: [],
-                dataset: {
-                    type: 'equipment',
-                },
-            };
-            inventory['ammo'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Ammo'),
-                items: [],
-                dataset: {
-                    type: 'ammo',
-                },
-            };
-            inventory['cyberware'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Cyberware'),
-                items: [],
-                dataset: {
-                    type: 'cyberware',
-                },
-            };
-            inventory['bioware'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Bioware'),
-                items: [],
-                dataset: {
-                    type: 'bioware',
-                },
-            };
-        }
-        let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs, critter_powers, sprite_powers,] = data.items.reduce((arr, item) => {
-            // Duplicate to avoid later updates propagating changed item data.
-            // NOTE: If no duplication is done, added fields will be stored in the database on updates!
-            item = duplicate(item);
-            // Show item properties and description in the item list overviews.
-            const actorItem = this.actor.items.get(item._id);
-            if (!actorItem)
-                return;
-            const chatData = actorItem.getChatData();
-            item.description = chatData.description;
-            // @ts-ignore // This is a hacky monkey patch solution to pass template data through duplicated item data.
-            item.properties = chatData.properties;
-            // TODO: isStack property isn't used elsewhere. Remove if unnecessary.
-            item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
-            if (item.type === 'spell')
-                arr[1].push(item);
-            else if (item.type === 'quality')
-                arr[2].push(item);
-            else if (item.type === 'adept_power')
-                arr[3].push(item);
-            else if (item.type === 'action')
-                arr[4].push(item);
-            else if (item.type === 'complex_form')
-                arr[5].push(item);
-            else if (item.type === 'lifestyle')
-                arr[6].push(item);
-            else if (item.type === 'contact')
-                arr[7].push(item);
-            else if (item.type === 'sin')
-                arr[8].push(item);
-            else if (item.type === 'program')
-                arr[9].push(item);
-            else if (item.type === 'critter_power')
-                arr[10].push(item);
-            else if (item.type === 'sprite_power')
-                arr[11].push(item);
-            else if (Object.keys(inventory).includes(item.type))
-                arr[0].push(item);
-            return arr;
-        }, [[], [], [], [], [], [], [], [], [], [], [], []]);
-        const sortByName = (i1, i2) => {
-            if (i1.name > i2.name)
-                return 1;
-            if (i1.name < i2.name)
-                return -1;
-            return 0;
-        };
-        const sortByEquipped = (left, right) => {
-            var _a, _b, _c, _d;
-            const leftEquipped = (_b = (_a = left.data) === null || _a === void 0 ? void 0 : _a.technology) === null || _b === void 0 ? void 0 : _b.equipped;
-            const rightEquipped = (_d = (_c = right.data) === null || _c === void 0 ? void 0 : _c.technology) === null || _d === void 0 ? void 0 : _d.equipped;
-            if (leftEquipped && !rightEquipped)
-                return -1;
-            if (rightEquipped && !leftEquipped)
-                return 1;
-            if (left.name > right.name)
-                return 1;
-            if (left.name < right.name)
-                return -1;
-            return 0;
-        };
-        actions.sort(sortByName);
-        adept_powers.sort(sortByName);
-        complex_forms.sort(sortByName);
-        items.sort(sortByEquipped);
-        spells.sort(sortByName);
-        contacts.sort(sortByName);
-        lifestyles.sort(sortByName);
-        sins.sort(sortByName);
-        programs.sort(sortByEquipped);
-        critter_powers.sort(sortByName);
-        sprite_powers.sort(sortByName);
-        items.forEach((item) => {
-            inventory[item.type].items.push(item);
-        });
-        data.inventory = Object.values(inventory);
-        data.magic = {
-            spellbook: spells,
-            powers: adept_powers,
-        };
-        data.actions = actions;
-        data.complex_forms = complex_forms;
-        data.lifestyles = lifestyles;
-        data.contacts = contacts;
-        data.sins = sins;
-        data.programs = programs;
-        data.critter_powers = critter_powers;
-        data.sprite_powers = sprite_powers;
-        qualities.sort((a, b) => {
-            if (a.data.type === 'positive' && b.data.type === 'negative')
-                return -1;
-            if (a.data.type === 'negative' && b.data.type === 'positive')
-                return 1;
-            return a.name < b.name ? -1 : 1;
-        });
-        data.qualities = qualities;
-    }
-    /* -------------------------------------------- */
-    /**
-     * Activate event listeners using the prepared sheet HTML
-     * @param html The prepared HTML object ready to be rendered into the DOM
-     */
-    activateListeners(html) {
-        super.activateListeners(html);
-        html.find('.hidden').hide();
-        html.find('.has-desc').click((event) => {
-            event.preventDefault();
-            const item = $(event.currentTarget).parents('.list-item');
-            const iid = $(item).data().item;
-            const field = item.next();
-            field.toggle();
-            if (iid) {
-                if (field.is(':visible'))
-                    this._shownDesc.push(iid);
-                else
-                    this._shownDesc = this._shownDesc.filter((val) => val !== iid);
-            }
-        });
-        // Active Effect management
-        html.find(".effect-control").click(event => (0, effects_1.onManageActiveEffect)(event, this.document));
-        html.find('.skill-header').find('.item-name').click(this._onFilterUntrainedSkills.bind(this));
-        html.find('.skill-header').find('.skill-spec-item').click(this._onFilterUntrainedSkills.bind(this));
-        html.find('.skill-header').find('.rtg').click(this._onFilterUntrainedSkills.bind(this));
-        html.find('.cell-input-roll').click(this._onRollCellInput.bind(this));
-        html.find('.attribute-roll').click(this._onRollAttribute.bind(this));
-        html.find('.skill-roll').click(this._onRollActiveSkill.bind(this));
-        html.find('#filter-skills').on('input', this._onFilterSkills.bind(this));
-        html.find('.skill-edit').click(this._onShowEditSkill.bind(this));
-        html.find('.knowledge-skill-edit').click(this._onShowEditKnowledgeSkill.bind(this));
-        html.find('.language-skill-edit').click(this._onShowEditLanguageSkill.bind(this));
-        html.find('.add-knowledge').click(this._onAddKnowledgeSkill.bind(this));
-        html.find('.add-language').click(this._onAddLanguageSkill.bind(this));
-        html.find('.add-active').click(this._onAddActiveSkill.bind(this));
-        html.find('.remove-knowledge').click(this._onRemoveKnowledgeSkill.bind(this));
-        html.find('.remove-language').click(this._onRemoveLanguageSkill.bind(this));
-        html.find('.remove-active').click(this._onRemoveActiveSkill.bind(this));
-        html.find('.knowledge-skill').click(this._onRollKnowledgeSkill.bind(this));
-        html.find('.language-skill').click(this._onRollLanguageSkill.bind(this));
-        html.find('.item-roll').click(this._onRollItem.bind(this));
-        html.find('.item-equip-toggle').click(this._onEquipItem.bind(this));
-        html.find('.item-qty').change(this._onChangeQty.bind(this));
-        html.find('.item-rtg').change(this._onChangeRtg.bind(this));
-        html.find('.item-create').click(this._onItemCreate.bind(this));
-        html.find('.reload-ammo').click(this._onReloadAmmo.bind(this));
-        html.find('.matrix-att-selector').change(this._onMatrixAttributeSelected.bind(this));
-        html.find('.marks-qty').on('change', this._onMarksQuantityChange.bind(this));
-        html.find('.marks-add-one').on('click', (event) => __awaiter(this, void 0, void 0, function* () { return this._onMarksQuantityChangeBy(event, 1); }));
-        html.find('.marks-remove-one').on('click', (event) => __awaiter(this, void 0, void 0, function* () { return this._onMarksQuantityChangeBy(event, -1); }));
-        html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
-        html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
-        html.find('.import-character').click(this._onShowImportCharacter.bind(this));
-        html.find('.show-hidden-skills').click(this._onShowHiddenSkills.bind(this));
-        /**
-         * Open the PDF for an item on the actor
-         */
-        $(html)
-            .find('.open-source-pdf')
-            .on('click', (event) => __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            const field = $(event.currentTarget).parents('.list-item');
-            const iid = $(field).data().itemId;
-            const item = this.actor.items.get(iid);
-            if (item) {
-                yield item.openPdfSource();
-            }
-        }));
-        $(html).find('.horizontal-cell-input .cell').on('click', this._onSetCellInput.bind(this));
-        $(html).find('.horizontal-cell-input .cell').on('contextmenu', this._onClearCellInput.bind(this));
-        /**
-         * New API to use for rolling from the actor sheet
-         * the clickable label needs the css class Roll
-         * a parent of the label needs to have the css class RollId, and then have data-roll-id set
-         */
-        $(html).find('.Roll').on('click', this._onRollFromSheet.bind(this));
-        // updates matrix condition monitor on the device the actor has equippe
-        $(html)
-            .find('[name="data.matrix.condition_monitor.value"]')
-            .on('change', (event) => __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            const value = helpers_1.Helpers.parseInputToNumber(event.currentTarget.value);
-            const matrixDevice = this.actor.getMatrixDevice();
-            if (matrixDevice && !isNaN(value)) {
-                const updateData = {};
-                updateData['data.technology.condition_monitor.value'] = value;
-                yield matrixDevice.update(updateData);
-            }
-        }));
-        // Update Inventory Item
-        html.find('.item-edit').click((event) => {
-            event.preventDefault();
-            const iid = helpers_1.Helpers.listItemId(event);
-            const item = this.actor.items.get(iid);
-            if (!item)
-                return;
-            // @ts-ignore
-            item.sheet.render(true);
-        });
-        // Delete Inventory Item
-        html.find('.item-delete').click(event => this.deleteOwnedItem(event));
-        // Augment ListItem.html templates with drag support
-        this._addDragSupportToListItemTemplatePartial(html);
-        html.find('.driver-remove').click(this.handleRemoveVehicleDriver.bind(this));
-    }
-    /**
-     * @override Default drag start handler to add Skill support
-     * @param event
-     */
-    _onDragStart(event) {
-        const _super = Object.create(null, {
-            _onDragStart: { get: () => super._onDragStart }
-        });
-        var _a, _b;
-        return __awaiter(this, void 0, void 0, function* () {
-            // Create drag data
-            const dragData = {
-                actorId: this.actor.id,
-                sceneId: this.actor.isToken ? (_a = canvas.scene) === null || _a === void 0 ? void 0 : _a.id : null,
-                tokenId: this.actor.isToken ? (_b = this.actor.token) === null || _b === void 0 ? void 0 : _b.id : null,
-                type: '',
-                data: {}
-            };
-            // Handle different item type data transfers.
-            // These handlers depend on behavior of the template partial ListItem.html.
-            const element = event.currentTarget;
-            switch (element.dataset.itemType) {
-                // Skill data transfer. (Active and language skills)
-                case 'skill':
-                    // Prepare data transfer
-                    dragData.type = 'Skill';
-                    dragData.data = {
-                        skillId: element.dataset.itemId,
-                        skill: this.actor.getSkill(element.dataset.itemId)
-                    };
-                    // Set data transfer
-                    event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
-                    return;
-                // Knowlege skill data transfer
-                case 'knowledgeskill':
-                    // Knowledge skills have a multi purpose id built: <id>.<knowledge_category>
-                    const skillId = element.dataset.itemId.includes('.') ? element.dataset.itemId.split('.')[0] : element.dataset.itemId;
-                    dragData.type = 'Skill';
-                    dragData.data = {
-                        skillId,
-                        skill: this.actor.getSkill(skillId)
-                    };
-                    // Set data transfer
-                    event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
-                    return;
-                // All default Foundry data transfer.
-                default:
-                    // Let default Foundry handler deal with default drag cases.
-                    return _super._onDragStart.call(this, event);
-            }
-        });
-    }
-    /** Handle all document drops onto all actor sheet types.
-     *
-     * @param event
-     */
-    // @ts-ignore
-    _onDrop(event) {
-        const _super = Object.create(null, {
-            _onDrop: { get: () => super._onDrop }
-        });
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            event.stopPropagation();
-            if (!event.dataTransfer)
-                return;
-            const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
-            // Handle specific system drop events.
-            switch (dropData.type) {
-                case "Actor":
-                    yield this.actor.addVehicleDriver(dropData.id);
-                    break;
-            }
-            // Handle none specific drop events.
-            yield _super._onDrop.call(this, event);
-        });
-    }
-    /**
-     * Augment each item of the ListItem template partial with drag support.
-     * @param html
-     */
-    _addDragSupportToListItemTemplatePartial(html) {
-        html.find('.list-item').each((i, item) => {
-            if (item.dataset && item.dataset.itemId) {
-                item.setAttribute('draggable', true);
-                item.addEventListener('dragstart', this._onDragStart.bind(this), false);
-            }
-        });
-    }
-    deleteOwnedItem(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            const userConsented = yield helpers_1.Helpers.confirmDeletion();
-            if (!userConsented)
-                return;
-            const iid = helpers_1.Helpers.listItemId(event);
-            const item = this.actor.items.get(iid);
-            if (!item)
-                return;
-            yield item.delete();
-        });
-    }
-    _onRollFromSheet(event) {
-        var _a;
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            // look for roll id data in the current line
-            let rollId = (_a = $(event.currentTarget).data()) === null || _a === void 0 ? void 0 : _a.rollId;
-            // if that doesn't exist, look for a prent with RollId name
-            rollId = rollId !== null && rollId !== void 0 ? rollId : $(event.currentTarget).parent('.RollId').data().rollId;
-            const split = rollId.split('.');
-            const options = { event };
-            switch (split[0]) {
-                case 'prompt-roll':
-                    yield this.actor.promptRoll(options);
-                    break;
-                case 'armor':
-                    yield this.actor.rollArmor(options);
-                    break;
-                case 'fade':
-                    yield this.actor.rollFade(options);
-                    break;
-                case 'drain':
-                    yield this.actor.rollDrain(options);
-                    break;
-                case 'defense':
-                    yield this.actor.rollAttackDefense(options);
-                    break;
-                case 'damage-resist':
-                    yield this.actor.rollSoak(options);
-                    break;
-                // attribute only rolls
-                case 'composure':
-                    yield this.actor.rollAttributesTest('composure');
-                    break;
-                case 'judge-intentions':
-                    yield this.actor.rollAttributesTest('judge_intentions');
-                    break;
-                case 'lift-carry':
-                    yield this.actor.rollAttributesTest('lift_carry');
-                    break;
-                case 'memory':
-                    yield this.actor.rollAttributesTest('memory');
-                    break;
-                case 'vehicle-stat':
-                    console.log('roll vehicle stat', rollId);
-                    break;
-                case 'drone':
-                    const prop = split[1]; // we expect another for "drone" category
-                    switch (prop) {
-                        case 'perception':
-                            yield this.actor.rollDronePerception(options);
-                            break;
-                        case 'infiltration':
-                            yield this.actor.rollDroneInfiltration(options);
-                            break;
-                        case 'pilot-vehicle':
-                            yield this.actor.rollPilotVehicle(options);
-                            break;
-                    }
-                    break;
-                // end drone
-                case 'attribute':
-                    const attribute = split[1];
-                    if (attribute) {
-                        yield this.actor.rollAttribute(attribute, options);
-                    }
-                    break;
-                // end attribute
-                case 'skill':
-                    const skillType = split[1];
-                    switch (skillType) {
-                        case 'active': {
-                            const skillId = split[2];
-                            yield this.actor.rollActiveSkill(skillId, options);
-                            break;
-                        }
-                        case 'language': {
-                            const skillId = split[2];
-                            yield this.actor.rollLanguageSkill(skillId, options);
-                            break;
-                        }
-                        case 'knowledge': {
-                            const category = split[2];
-                            const skillId = split[3];
-                            yield this.actor.rollKnowledgeSkill(category, skillId, options);
-                            break;
-                        }
-                    }
-                    break;
-                // end skill
-                case 'matrix':
-                    const subkey = split[1];
-                    switch (subkey) {
-                        case 'attribute':
-                            const attr = split[2];
-                            yield this.actor.rollMatrixAttribute(attr, options);
-                            break;
-                        case 'device-rating':
-                            yield this.actor.rollDeviceRating(options);
-                            break;
-                    }
-                    break;
-                // end matrix
-            }
-        });
-    }
-    // Setup skill name filter within getData
-    _onFilterSkills(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            this._filters.skills = event.currentTarget.value;
-            yield this.render();
-        });
-    }
-    // Setup untrained skill filter within getData
-    _onFilterUntrainedSkills(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            this._filters.showUntrainedSkills = !this._filters.showUntrainedSkills;
-            yield this.render();
-        });
-    }
-    _onReloadAmmo(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            const iid = helpers_1.Helpers.listItemId(event);
-            const item = this.actor.items.get(iid);
-            if (item)
-                return item.reloadAmmo();
-        });
-    }
-    _onMatrixAttributeSelected(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (!("matrix" in this.actor.data.data))
-                return;
-            let iid = this.actor.data.data.matrix.device;
-            let item = this.actor.items.get(iid);
-            if (!item) {
-                console.error('could not find item');
-                return;
-            }
-            // grab matrix attribute (sleaze, attack, etc.)
-            let att = event.currentTarget.dataset.att;
-            // grab device attribute (att1, att2, ...)
-            let deviceAtt = event.currentTarget.value;
-            // get current matrix attribute on the device
-            const deviceData = item.data.data;
-            let oldVal = deviceData.atts[deviceAtt].att;
-            let data = {
-                _id: iid,
-            };
-            // go through atts on device, setup matrix attributes on it
-            for (let i = 1; i <= 4; i++) {
-                let tmp = `att${i}`;
-                let key = `data.atts.att${i}.att`;
-                if (tmp === deviceAtt) {
-                    data[key] = att;
-                }
-                else if (deviceData.atts[`att${i}`].att === att) {
-                    data[key] = oldVal;
-                }
-            }
-            yield this.actor.updateEmbeddedDocuments('Item', [data]);
-        });
-    }
-    _onMarksQuantityChange(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.stopPropagation();
-            const markId = event.currentTarget.dataset.markId;
-            if (!markId)
-                return;
-            const markedDocuments = helpers_1.Helpers.getMarkIdDocuments(markId);
-            if (!markedDocuments)
-                return;
-            const { scene, target, item } = markedDocuments;
-            if (!scene || !target)
-                return; // item can be undefined.
-            const marks = parseInt(event.currentTarget.value);
-            yield this.object.setMarks(target, marks, { scene, item, overwrite: true });
-        });
-    }
-    _onMarksQuantityChangeBy(event, by) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.stopPropagation();
-            const markId = event.currentTarget.dataset.markId;
-            if (!markId)
-                return;
-            const markedDocuments = helpers_1.Helpers.getMarkIdDocuments(markId);
-            if (!markedDocuments)
-                return;
-            const { scene, target, item } = markedDocuments;
-            if (!scene || !target)
-                return; // item can be undefined.
-            yield this.object.setMarks(target, by, { scene, item });
-        });
-    }
-    _onMarksDelete(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.stopPropagation();
-            const markId = event.currentTarget.dataset.markId;
-            if (!markId)
-                return;
-            const userConsented = yield helpers_1.Helpers.confirmDeletion();
-            if (!userConsented)
-                return;
-            yield this.object.clearMark(markId);
-        });
-    }
-    _onMarksClearAll(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.stopPropagation();
-            const userConsented = yield helpers_1.Helpers.confirmDeletion();
-            if (!userConsented)
-                return;
-            yield this.object.clearMarks();
-        });
-    }
-    _onItemCreate(event) {
-        event.preventDefault();
-        const type = helpers_1.Helpers.listItemId(event);
-        const itemData = {
-            name: `New ${type}`,
-            type: type,
-        };
-        return this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
-    }
-    _onAddLanguageSkill(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            const skillId = yield this.actor.addLanguageSkill({ name: '' });
-            if (!skillId)
-                return;
-            // NOTE: Causes issues with adding knowledge skills (category undefined)
-            // await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, {event}, skillId);
-        });
-    }
-    _onRemoveLanguageSkill(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            const userConsented = yield helpers_1.Helpers.confirmDeletion();
-            if (!userConsented)
-                return;
-            const skillId = helpers_1.Helpers.listItemId(event);
-            yield this.actor.removeLanguageSkill(skillId);
-        });
-    }
-    _onAddKnowledgeSkill(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            const category = helpers_1.Helpers.listItemId(event);
-            const skillId = yield this.actor.addKnowledgeSkill(category);
-            if (!skillId)
-                return;
-            // NOTE: Causes issues with adding knowledge skills (category undefined)
-            // await this._showSkillEditForm(KnowledgeSkillEditSheet, this.actor, {event}, skillId);
-        });
-    }
-    _onRemoveKnowledgeSkill(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            const userConsented = yield helpers_1.Helpers.confirmDeletion();
-            if (!userConsented)
-                return;
-            const [skillId, category] = helpers_1.Helpers.listItemId(event).split('.');
-            yield this.actor.removeKnowledgeSkill(skillId, category);
-        });
-    }
-    /** Add an active skill and show the matching edit application afterwards.
-     *
-     * @param event The HTML event from which the action resulted.
-     */
-    _onAddActiveSkill(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            const skillId = yield this.actor.addActiveSkill();
-            if (!skillId)
-                return;
-            yield this._showSkillEditForm(SkillEditSheet_1.SkillEditSheet, this.actor, { event: event }, skillId);
-        });
-    }
-    _onRemoveActiveSkill(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            const userConsented = yield helpers_1.Helpers.confirmDeletion();
-            if (!userConsented)
-                return;
-            const skillId = helpers_1.Helpers.listItemId(event);
-            yield this.actor.removeActiveSkill(skillId);
-        });
-    }
-    _onChangeRtg(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const iid = helpers_1.Helpers.listItemId(event);
-            const item = this.actor.items.get(iid);
-            const rtg = parseInt(event.currentTarget.value);
-            if (item && rtg) {
-                yield item.update({ 'data.technology.rating': rtg });
-            }
-        });
-    }
-    _onChangeQty(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const iid = helpers_1.Helpers.listItemId(event);
-            const item = this.actor.items.get(iid);
-            const qty = parseInt(event.currentTarget.value);
-            if (item && qty && "technology" in item.data.data) {
-                item.data.data.technology.quantity = qty;
-                yield item.update({ 'data.technology.quantity': qty });
-            }
-        });
-    }
-    _onEquipItem(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            const iid = helpers_1.Helpers.listItemId(event);
-            const item = this.actor.items.get(iid);
-            if (item) {
-                const newItems = [];
-                // Handle the equipped state.
-                if (item.isDevice()) {
-                    // Only allow one equipped device item. Unequip all other.
-                    for (const item of this.actor.items.filter(actorItem => actorItem.isDevice())) {
-                        newItems.push({
-                            '_id': item.id,
-                            'data.technology.equipped': item.id === iid,
-                        });
-                    }
-                }
-                else {
-                    // Toggle equip status.
-                    newItems.push({
-                        '_id': iid,
-                        'data.technology.equipped': !item.isEquipped(),
-                    });
-                }
-                // Handle active effects based on equipped status.
-                // NOTE: This is commented out for later ease of enabling effects based on equip status AND if they are
-                //       meant to enable on eqiup or not.
-                // this.actor.effects.forEach(effect => {
-                //     if (effect.data.origin !== item.uuid) return;
-                //
-                //     // @ts-ignore
-                //     effect.disable(item.isEquipped());
-                // })
-                yield this.actor.updateEmbeddedDocuments('Item', newItems);
-                this.actor.render(false);
-            }
-        });
-    }
-    _onSetCellInput(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const value = Number(event.currentTarget.dataset.value);
-            const cmId = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
-            const data = {};
-            if (cmId === 'stun' || cmId === 'physical') {
-                const property = `data.track.${cmId}.value`;
-                data[property] = value;
-            }
-            else if (cmId === 'edge') {
-                const property = `data.attributes.edge.uses`;
-                data[property] = value;
-            }
-            else if (cmId === 'overflow') {
-                const property = 'data.track.physical.overflow.value';
-                data[property] = value;
-            }
-            else if (cmId === 'matrix') {
-                const matrixDevice = this.actor.getMatrixDevice();
-                if (matrixDevice && !isNaN(value)) {
-                    const updateData = {};
-                    updateData['data.technology.condition_monitor.value'] = value;
-                    yield matrixDevice.update(updateData);
-                }
-                else {
-                    data['data.matrix.condition_monitor.value'] = value;
-                }
-            }
-            yield this.actor.update(data);
-        });
-    }
-    _onClearCellInput(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const cmId = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
-            const data = {};
-            if (cmId === 'stun') {
-                data[`data.track.stun.value`] = 0;
-            }
-            // Clearing the physical monitor should also clear the overflow.
-            else if (cmId === 'physical') {
-                data[`data.track.physical.value`] = 0;
-                data['data.track.physical.overflow.value'] = 0;
-            }
-            else if (cmId === 'edge') {
-                data[`data.attributes.edge.uses`] = 0;
-            }
-            else if (cmId === 'overflow') {
-                data['data.track.physical.overflow.value'] = 0;
-            }
-            else if (cmId === 'matrix') {
-                const matrixDevice = this.actor.getMatrixDevice();
-                if (matrixDevice) {
-                    const updateData = {};
-                    updateData['data.technology.condition_monitor.value'] = 0;
-                    yield matrixDevice.update(updateData);
-                }
-                else {
-                    data['data.matrix.condition_monitor.value'] = 0;
-                }
-            }
-            yield this.actor.update(data);
-        });
-    }
-    _onRollCellInput(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            let track = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
-            if (track === 'stun' || track === 'physical') {
-                yield this.actor.rollNaturalRecovery(track, event);
-            }
-            else if (track === 'edge') {
-                yield this.actor.rollAttribute('edge');
-            }
-        });
-    }
-    _onRollItem(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            const iid = helpers_1.Helpers.listItemId(event);
-            const item = this.actor.items.get(iid);
-            if (item) {
-                yield item.castAction(event);
-            }
-        });
-    }
-    _onRollKnowledgeSkill(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            const id = helpers_1.Helpers.listItemId(event);
-            const [skill, category] = id.split('.');
-            return this.actor.rollKnowledgeSkill(category, skill, { event: event });
-        });
-    }
-    _onRollLanguageSkill(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            const skill = helpers_1.Helpers.listItemId(event);
-            return this.actor.rollLanguageSkill(skill, { event: event });
-        });
-    }
-    _onRollActiveSkill(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            const skill = helpers_1.Helpers.listItemId(event);
-            return this.actor.rollActiveSkill(skill, { event: event });
-        });
-    }
-    _onRollAttribute(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            const attr = event.currentTarget.closest('.attribute').dataset.attribute;
-            return this.actor.rollAttribute(attr, { event: event });
-        });
-    }
-    /**
-     * @private
-     */
-    _findActiveList() {
-        return $(this.element).find('.tab.active .scroll-area');
-    }
-    /**
-     * Enhance Foundry state restore on rerender by more user interaction state.
-     * @override
-     */
-    _render(...args) {
-        const _super = Object.create(null, {
-            _render: { get: () => super._render }
-        });
-        return __awaiter(this, void 0, void 0, function* () {
-            const focus = this._saveInputCursorPosition();
-            this._saveScrollPositions();
-            yield _super._render.call(this, ...args);
-            this._restoreScrollPositions();
-            this._restoreInputCursorPosition(focus);
-        });
-    }
-    _saveInputCursorPosition() {
-        const focusList = $(this.element).find('input:focus');
-        return focusList.length ? focusList[0] : null;
-    }
-    /**
-     * Restore the cursor position of focused input elements on top of Foundry restoring the general focus
-     * This is needed for char by char update caused by filtering skills.
-     */
-    _restoreInputCursorPosition(focus) {
-        if (focus && focus.name) {
-            if (!this.form)
-                return;
-            const element = this.form[focus.name];
-            if (element) {
-                // Set general focus for allem input types.
-                element.focus();
-                // Set selection range for supported input types.
-                if (['checkbox', 'radio'].includes(element.type))
-                    return;
-                // set the selection range on the focus formed from before (keeps track of cursor in input)
-                element.setSelectionRange && element.setSelectionRange(focus.selectionStart, focus.selectionEnd);
-            }
-        }
-    }
-    /**
-     * @private
-     */
-    _restoreScrollPositions() {
-        const activeList = this._findActiveList();
-        if (activeList.length && this._scroll != null) {
-            activeList.prop('scrollTop', this._scroll);
-        }
-    }
-    /**
-     * @private
-     */
-    _saveScrollPositions() {
-        const activeList = this._findActiveList();
-        if (activeList.length) {
-            this._scroll = activeList.prop('scrollTop');
-        }
-    }
-    _closeOpenSkillApp() {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (globalSkillAppId !== -1) {
-                if (ui.windows[globalSkillAppId]) {
-                    yield ui.windows[globalSkillAppId].close();
-                }
-                globalSkillAppId = -1;
-            }
-        });
-    }
-    /** Keep track of each SkillEditSheet instance and close before opening another.
-     *
-     * @param skillEditFormImplementation Any extending class! of SkillEditSheet
-     * @param actor
-     * @param options
-     * @param args Collect arguments of the different renderWithSkill implementations.
-     */
-    _showSkillEditForm(skillEditFormImplementation, actor, options, ...args) {
-        return __awaiter(this, void 0, void 0, function* () {
-            yield this._closeOpenSkillApp();
-            const skillEditForm = new skillEditFormImplementation(actor, options, ...args);
-            globalSkillAppId = skillEditForm.appId;
-            yield skillEditForm.render(true);
-        });
-    }
-    _onShowEditKnowledgeSkill(event) {
-        event.preventDefault();
-        const [skill, category] = helpers_1.Helpers.listItemId(event).split('.');
-        this._showSkillEditForm(KnowledgeSkillEditSheet_1.KnowledgeSkillEditSheet, this.actor, {
-            event: event,
-        }, skill, category);
-    }
-    _onShowEditLanguageSkill(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            const skill = helpers_1.Helpers.listItemId(event);
-            // new LanguageSkillEditSheet(this.actor, skill, { event: event }).render(true);
-            yield this._showSkillEditForm(LanguageSkillEditSheet_1.LanguageSkillEditSheet, this.actor, { event: event }, skill);
-        });
-    }
-    _onShowEditSkill(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            const skill = helpers_1.Helpers.listItemId(event);
-            // new SkillEditSheet(this.actor, skill, { event: event }).render(true);
-            yield this._showSkillEditForm(SkillEditSheet_1.SkillEditSheet, this.actor, { event: event }, skill);
-        });
-    }
-    _onShowImportCharacter(event) {
-        event.preventDefault();
-        const options = {
-            name: 'chummer-import',
-            title: 'Chummer Import',
-        };
-        new chummer_import_form_1.ChummerImportForm(this.actor, options).render(true);
-    }
-    _onShowHiddenSkills(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            yield this.actor.showHiddenSkills();
-        });
-    }
-    handleRemoveVehicleDriver(event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            event.preventDefault();
-            yield this.actor.removeVehicleDriver();
-        });
-    }
-}
-exports.SR5ActorSheet = SR5ActorSheet;
-
-},{"../apps/chummer-import-form":130,"../apps/skills/KnowledgeSkillEditSheet":138,"../apps/skills/LanguageSkillEditSheet":139,"../apps/skills/SkillEditSheet":140,"../config":144,"../effects":151,"../helpers":159}],87:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunActorDialogs":139,"../chat":147,"../config":149,"../constants":150,"../data/DataDefaults":151,"../data/SR5ItemDataWrapper":153,"../helpers":164,"../item/SR5Item":204,"../parts/PartsList":218,"../rolls/ShadowrunRoller":219,"../rules/MatrixRules":221,"../rules/Modifiers":222,"../rules/SkillRules":223,"./flows/InventoryFlow":87,"./flows/SkillFlow":88,"./flows/SoakFlow":89,"./prep/CharacterPrep":90,"./prep/CritterPrep":91,"./prep/ICPrep":92,"./prep/SpiritPrep":93,"./prep/SpritePrep":94,"./prep/VehiclePrep":95}],86:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -16497,7 +15349,217 @@ class DamageApplicationFlow {
 }
 exports.DamageApplicationFlow = DamageApplicationFlow;
 
-},{"../../apps/dialogs/DamageApplicationDialog":131}],88:[function(require,module,exports){
+},{"../../apps/dialogs/DamageApplicationDialog":135}],87:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.InventoryFlow = void 0;
+const helpers_1 = require("../../helpers");
+const SR5Item_1 = require("../../item/SR5Item");
+/**
+ * Handle all inventory related actions on an SR5Actor'.
+ *
+ * An inventory can store a set of items on a document, without actually altering the
+ * itemData directly, only going through the documentData and indirectly referencing the item.
+ *
+ * It expects the document to define a defaultInventory field of type InventoryData, which
+ * is where all items without an inventory will be placed. This default inventory won't be
+ * stored on the document. This allows for the inventory system to be drop in, without any
+ * migration needed.
+ */
+class InventoryFlow {
+    constructor(document) {
+        if (document.data.data.inventories === undefined)
+            console.error('Shawdorun 5e | Actor given does not have a inventory data structure. You will experience bugs.');
+        this.document = document;
+    }
+    /**
+     * Create an inventory place for gear organization.
+     *
+     * @param name How to name the inventory, will also be its label for custom inventories.
+     */
+    create(name) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(`Shadowrun 5e | Creating inventory ${name}`);
+            if (this.exists(name))
+                return (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.warn(game.i18n.localize('SR5.Errors.InventoryAlreadyExists'));
+            if (this.document.defaultInventory.name === name)
+                return;
+            const updateData = {
+                'data.inventories': {
+                    [name]: {
+                        name,
+                        label: name,
+                        itemIds: []
+                    }
+                }
+            };
+            console.log(`Shadowrun 5e | Executing update to create inventory`, updateData);
+            return yield this.document.update(updateData);
+        });
+    }
+    /**
+     * Remove an actors inventory and maybe move the containing items over to another one.
+     *
+     * @param name The inventory name to be removed.
+     * @param moveTo The inventory name items need to moved over to, otherwise the default inventory.
+     */
+    remove(name, moveTo = this.document.defaultInventory.name) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(`Shadowrun 5e | Removing inventory ${name}. Moving items over to ${moveTo}`);
+            if (this.document.defaultInventory.name === name)
+                return (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.error(game.i18n.localize('SR5.Errors.DefaultInventoryCantBeRemoved'));
+            if (!this.exists(name))
+                return console.error(`Shadowrun 5e | Can't remove inventory ${name} or move its items over to inventory ${moveTo}`);
+            // Move items over to default in case of missing target inventory.
+            if (!this.exists(moveTo))
+                moveTo = this.document.defaultInventory.name;
+            // Prepare deletion of inventory.
+            const updateData = helpers_1.Helpers.getDeleteKeyUpdateData('data.inventories', name);
+            // Default inventory is virtual, so only none default inventories need to have their items merged.
+            if (this.document.defaultInventory.name !== moveTo) {
+                // @ts-ignore
+                updateData[`data.inventories.${moveTo}.itemIds`] = [
+                    ...this.document.data.data.inventories[name].itemIds,
+                    ...this.document.data.data.inventories[moveTo].itemIds
+                ];
+            }
+            console.log(`Shadowrun 5e | Executing update to remove inventory`, updateData);
+            yield this.document.update(updateData);
+        });
+    }
+    /**
+ * Does this actor have the given inventory already?
+ *
+ * Note: Comparisons will only be against lower case.
+ *
+ * @param name The inventory name.
+ */
+    exists(name) {
+        return name === Object.keys(this.document.data.data.inventories)
+            .find(inventory => inventory.toLowerCase() === name.toLowerCase());
+    }
+    /**
+     * Helper to get a specifics inventory's data
+     *
+     * @param name The inventory name to return.
+     */
+    getOne(name) {
+        return this.document.data.data.inventories[name];
+    }
+    /**
+     * Helper to get all inventories.
+     */
+    getAll() {
+        return this.document.data.data.inventories;
+    }
+    /**
+     * Rename an existing inventory to a new name.
+     *
+     * @param current The old name of the inventory.
+     * @param newName The new name of the inventory.
+     */
+    rename(current, newName) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(`Shadowrun 5e | Renaming the inventory ${current} to ${newName}`);
+            if (this.document.defaultInventory.name === current)
+                return;
+            if (current === newName)
+                return;
+            const inventory = this.getOne(current);
+            if (!inventory)
+                return;
+            // Change internal and display name.
+            inventory.name = newName;
+            inventory.label = newName;
+            const updateData = {
+                'data.inventories': {
+                    [`-=${current}`]: null,
+                    [newName]: inventory
+                }
+            };
+            console.log(`Shadowrun 5e | Executing update to rename inventory`, updateData);
+            yield this.document.update(updateData);
+        });
+    }
+    /**
+     * Add an array of items to the given inventory.
+     *
+     * @param name The inventory to add the items to.
+     * @param items The items in question. A single item can be given.
+     * @param removeFromCurrent By default the item added will be removed from another inventory it might be in.
+     */
+    addItems(name, items, removeFromCurrent = true) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(`Shadowrun 5e | Adding items to to inventory ${name}`, items);
+            // Default inventory is valid target here.
+            if (this.document.defaultInventory.name !== name && !this.exists(name))
+                return;
+            if (items instanceof SR5Item_1.SR5Item)
+                items = [items];
+            if (items.length === 0)
+                return;
+            if (removeFromCurrent) {
+                // This will cause at least one additional re-render, but make the code clearer.
+                for (const item of items)
+                    yield this.removeItem(item);
+            }
+            // Default inventory is no actual inventory that needs to be added to.
+            if (this.document.defaultInventory.name === name)
+                return;
+            for (const item of items) {
+                if (item.id)
+                    this.document.data.data.inventories[name].itemIds.push(item.id);
+            }
+            const updateData = { [`data.inventories.${name}.itemIds`]: this.document.data.data.inventories[name].itemIds };
+            console.log(`Shadowrun 5e | Executing adding items to inventory`, updateData);
+            yield this.document.update(updateData);
+        });
+    }
+    /**
+    * Remove the given item from one or any inventory it might be in.
+    *
+    * @param item The item to be removed.
+    * @param name The one inventory to remove it from. If empty, will search for inventory the item is in.
+    */
+    removeItem(item, name) {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(`Shadowrun 5e | Removing item from inventory (${name || this.document.defaultInventory.name})`, item);
+            // The default inventory is not actual inventory.
+            if (this.document.defaultInventory.name === name)
+                return;
+            // Collect affected inventories.
+            const inventories = name ?
+                [this.document.data.data.inventories[name]] :
+                Object.values(this.document.data.data.inventories).filter(({ itemIds }) => itemIds.includes(item.id));
+            // No inventory found means, it's in the default inventory and no removal is needed.
+            if (inventories.length === 0)
+                return;
+            // Collect all inventories with remaining ids after the item's been removed.
+            const updateData = {};
+            for (const inventory of inventories) {
+                const itemIds = inventory.itemIds.filter(id => id !== item.id);
+                updateData[`data.inventories.${inventory.name}.itemIds`] = itemIds;
+            }
+            console.log(`Shadowrun 5e | Executing update to remove item`, updateData);
+            if (updateData)
+                yield this.document.update(updateData);
+        });
+    }
+}
+exports.InventoryFlow = InventoryFlow;
+
+},{"../../helpers":164,"../../item/SR5Item":204}],88:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SkillFlow = void 0;
@@ -16546,7 +15608,7 @@ class SkillFlow {
 }
 exports.SkillFlow = SkillFlow;
 
-},{"../../constants":145,"../../rules/SkillRules":218}],89:[function(require,module,exports){
+},{"../../constants":150,"../../rules/SkillRules":223}],89:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -16682,7 +15744,7 @@ class SoakFlow {
 }
 exports.SoakFlow = SoakFlow;
 
-},{"../../apps/dialogs/ShadowrunActorDialogs":134,"../../chat":142,"../../data/DataDefaults":146,"../../helpers":159,"../../parts/PartsList":213,"../../rolls/ShadowrunRoller":214,"../../rules/SoakRules":219}],90:[function(require,module,exports){
+},{"../../apps/dialogs/ShadowrunActorDialogs":139,"../../chat":147,"../../data/DataDefaults":151,"../../helpers":164,"../../parts/PartsList":218,"../../rolls/ShadowrunRoller":219,"../../rules/SoakRules":224}],90:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CharacterPrep = void 0;
@@ -16919,7 +15981,7 @@ class ICPrep {
 }
 exports.ICPrep = ICPrep;
 
-},{"../../config":144,"../../data/DataDefaults":146,"../../parts/PartsList":213,"../../rules/MatrixRules":216,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/SkillsPrep":105}],93:[function(require,module,exports){
+},{"../../config":149,"../../data/DataDefaults":151,"../../parts/PartsList":218,"../../rules/MatrixRules":221,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/SkillsPrep":105}],93:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpiritPrep = void 0;
@@ -17318,7 +16380,7 @@ class SpiritPrep {
 }
 exports.SpiritPrep = SpiritPrep;
 
-},{"../../helpers":159,"../../parts/PartsList":213,"../flows/SkillFlow":88,"./functions/AttributesPrep":96,"./functions/ConditionMonitorsPrep":97,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/ModifiersPrep":102,"./functions/MovementPrep":103,"./functions/SkillsPrep":105,"./functions/WoundsPrep":106}],94:[function(require,module,exports){
+},{"../../helpers":164,"../../parts/PartsList":218,"../flows/SkillFlow":88,"./functions/AttributesPrep":96,"./functions/ConditionMonitorsPrep":97,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/ModifiersPrep":102,"./functions/MovementPrep":103,"./functions/SkillsPrep":105,"./functions/WoundsPrep":106}],94:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpritePrep = void 0;
@@ -17348,9 +16410,9 @@ class SpritePrep {
         SkillsPrep_1.SkillsPrep.prepareSkills(data);
         LimitsPrep_1.LimitsPrep.prepareLimits(data);
         MatrixPrep_1.MatrixPrep.prepareMatrixToLimitsAndAttributes(data);
-        InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(data);
         SpritePrep.prepareSpriteConditionMonitor(data);
         SpritePrep.prepareSpriteInitiative(data);
+        InitiativePrep_1.InitiativePrep.prepareCurrentInitiative(data);
     }
     static prepareSpriteSpecial(data) {
         // Sprites are always awakened
@@ -17397,10 +16459,10 @@ class SpritePrep {
         // setup initiative from overrides
         initiative.matrix.base.base = level * 2 + overrides.init;
         PartsList_1.PartsList.AddUniquePart(initiative.matrix.base.mod, 'SR5.Bonus', modifiers['matrix_initiative']);
-        helpers_1.Helpers.calcTotal(initiative.matrix.base);
+        helpers_1.Helpers.calcTotal(initiative.matrix.base, { min: 0 });
         initiative.matrix.dice.base = 4;
         PartsList_1.PartsList.AddUniquePart(initiative.matrix.dice.mod, 'SR5.Bonus', modifiers['matrix_initiative_dice']);
-        helpers_1.Helpers.calcTotal(initiative.matrix.dice);
+        helpers_1.Helpers.calcTotal(initiative.matrix.dice, { min: 0 });
     }
     /**
      * Get the stat modifiers for the specified type of sprite
@@ -17459,7 +16521,7 @@ class SpritePrep {
 }
 exports.SpritePrep = SpritePrep;
 
-},{"../../helpers":159,"../../parts/PartsList":213,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/SkillsPrep":105}],95:[function(require,module,exports){
+},{"../../helpers":164,"../../parts/PartsList":218,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/SkillsPrep":105}],95:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.VehiclePrep = void 0;
@@ -17569,22 +16631,25 @@ class VehiclePrep {
         movement.run.value = movement.run.base;
     }
     static prepareMeatspaceInit(data) {
-        const { vehicle_stats, initiative } = data;
+        const { vehicle_stats, initiative, modifiers } = data;
         const pilot = helpers_1.Helpers.calcTotal(vehicle_stats.pilot);
         initiative.meatspace.base.base = pilot * 2;
+        initiative.meatspace.base.mod = PartsList_1.PartsList.AddUniquePart(initiative.meatspace.base.mod, "SR5.Bonus", Number(modifiers['meat_initiative']));
         initiative.meatspace.dice.base = 4;
+        initiative.meatspace.dice.mod = PartsList_1.PartsList.AddUniquePart(initiative.meatspace.dice.mod, "SR5.Bonus", Number(modifiers['meat_initiative_dice']));
         helpers_1.Helpers.calcTotal(initiative.meatspace.base);
         helpers_1.Helpers.calcTotal(initiative.meatspace.dice);
     }
     static prepareArmor(data) {
-        const { armor } = data;
-        armor.mod = PartsList_1.PartsList.AddUniquePart(armor.mod, 'SR5.Temporary', armor['temp']);
+        const { armor, modifiers } = data;
+        armor.mod = PartsList_1.PartsList.AddUniquePart(armor.mod, 'SR5.Temporary', Number(armor['temp']));
+        armor.mod = PartsList_1.PartsList.AddUniquePart(armor.mod, 'SR5.Bonus', Number(modifiers['armor']));
         helpers_1.Helpers.calcTotal(armor);
     }
 }
 exports.VehiclePrep = VehiclePrep;
 
-},{"../../config":144,"../../helpers":159,"../../parts/PartsList":213,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/SkillsPrep":105}],96:[function(require,module,exports){
+},{"../../config":149,"../../helpers":164,"../../parts/PartsList":218,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/SkillsPrep":105}],96:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AttributesPrep = void 0;
@@ -17644,7 +16709,7 @@ class AttributesPrep {
 }
 exports.AttributesPrep = AttributesPrep;
 
-},{"../../../config":144,"../../../constants":145,"../../../helpers":159}],97:[function(require,module,exports){
+},{"../../../config":149,"../../../constants":150,"../../../helpers":164}],97:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ConditionMonitorsPrep = void 0;
@@ -17685,7 +16750,7 @@ class ConditionMonitorsPrep {
 }
 exports.ConditionMonitorsPrep = ConditionMonitorsPrep;
 
-},{"../../../config":144}],98:[function(require,module,exports){
+},{"../../../config":149}],98:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.InitiativePrep = void 0;
@@ -17702,7 +16767,7 @@ class InitiativePrep {
             initiative.current = initiative.meatspace;
             initiative.perception = 'meatspace';
         }
-        initiative.current.dice.value = helpers_1.Helpers.calcTotal(initiative.current.dice);
+        initiative.current.dice.value = helpers_1.Helpers.calcTotal(initiative.current.dice, { min: 0, max: 5 });
         if (initiative.edge)
             initiative.current.dice.value = 5;
         initiative.current.dice.value = Math.min(5, initiative.current.dice.value); // maximum of 5d6 for initiative
@@ -17735,7 +16800,7 @@ class InitiativePrep {
 }
 exports.InitiativePrep = InitiativePrep;
 
-},{"../../../helpers":159,"../../../parts/PartsList":213}],99:[function(require,module,exports){
+},{"../../../helpers":164,"../../../parts/PartsList":218}],99:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemPrep = void 0;
@@ -17814,7 +16879,7 @@ class ItemPrep {
 }
 exports.ItemPrep = ItemPrep;
 
-},{"../../../config":144,"../../../constants":145,"../../../helpers":159,"../../../parts/PartsList":213}],100:[function(require,module,exports){
+},{"../../../config":149,"../../../constants":150,"../../../helpers":164,"../../../parts/PartsList":218}],100:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LimitsPrep = void 0;
@@ -17843,7 +16908,7 @@ class LimitsPrep {
 }
 exports.LimitsPrep = LimitsPrep;
 
-},{"../../../config":144,"../../../helpers":159,"../../../parts/PartsList":213}],101:[function(require,module,exports){
+},{"../../../config":149,"../../../helpers":164,"../../../parts/PartsList":218}],101:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatrixPrep = void 0;
@@ -17970,7 +17035,7 @@ class MatrixPrep {
 }
 exports.MatrixPrep = MatrixPrep;
 
-},{"../../../config":144,"../../../helpers":159,"../../../parts/PartsList":213,"./AttributesPrep":96}],102:[function(require,module,exports){
+},{"../../../config":149,"../../../helpers":164,"../../../parts/PartsList":218,"./AttributesPrep":96}],102:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ModifiersPrep = void 0;
@@ -18059,7 +17124,7 @@ class ModifiersPrep {
 }
 exports.ModifiersPrep = ModifiersPrep;
 
-},{"../../../config":144}],103:[function(require,module,exports){
+},{"../../../config":149}],103:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MovementPrep = void 0;
@@ -18075,7 +17140,7 @@ class MovementPrep {
 }
 exports.MovementPrep = MovementPrep;
 
-},{"../../../parts/PartsList":213}],104:[function(require,module,exports){
+},{"../../../parts/PartsList":218}],104:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.NPCPrep = void 0;
@@ -18120,7 +17185,7 @@ class NPCPrep {
 }
 exports.NPCPrep = NPCPrep;
 
-},{"../../../constants":145,"../../../data/DataDefaults":146,"../../../parts/PartsList":213,"./AttributesPrep":96}],105:[function(require,module,exports){
+},{"../../../constants":150,"../../../data/DataDefaults":151,"../../../parts/PartsList":218,"./AttributesPrep":96}],105:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports._mergeWithMissingSkillFields = exports.SkillsPrep = void 0;
@@ -18219,7 +17284,7 @@ const _mergeWithMissingSkillFields = (givenSkill) => {
 };
 exports._mergeWithMissingSkillFields = _mergeWithMissingSkillFields;
 
-},{"../../../config":144,"../../../helpers":159,"../../../parts/PartsList":213}],106:[function(require,module,exports){
+},{"../../../config":149,"../../../helpers":164,"../../../parts/PartsList":218}],106:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WoundsPrep = void 0;
@@ -18252,23 +17317,94 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5BaseActorSheet = void 0;
 const helpers_1 = require("../../helpers");
+const SR5Item_1 = require("../../item/SR5Item");
 const effects_1 = require("../../effects");
 const config_1 = require("../../config");
+const SkillEditSheet_1 = require("../../apps/skills/SkillEditSheet");
+const KnowledgeSkillEditSheet_1 = require("../../apps/skills/KnowledgeSkillEditSheet");
+const LanguageSkillEditSheet_1 = require("../../apps/skills/LanguageSkillEditSheet");
+const MoveInventoryDialog_1 = require("../../apps/dialogs/MoveInventoryDialog");
+const chummer_import_form_1 = require("../../apps/chummer-import-form");
+// Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
+// Should multiple instances be open, Foundry will cause cross talk between skills and actors,
+// when opened in succession, causing SkillEditSheet to wrongfully overwrite the wrong data.
+let globalSkillAppId = -1;
+const sortByName = (i1, i2) => {
+    if (i1.name > i2.name)
+        return 1;
+    if (i1.name < i2.name)
+        return -1;
+    return 0;
+};
+const sortByEquipped = (left, right) => {
+    var _a, _b, _c, _d;
+    const leftEquipped = (_b = (_a = left.data) === null || _a === void 0 ? void 0 : _a.technology) === null || _b === void 0 ? void 0 : _b.equipped;
+    const rightEquipped = (_d = (_c = right.data) === null || _c === void 0 ? void 0 : _c.technology) === null || _d === void 0 ? void 0 : _d.equipped;
+    if (leftEquipped && !rightEquipped)
+        return -1;
+    if (rightEquipped && !leftEquipped)
+        return 1;
+    if (left.name > right.name)
+        return 1;
+    if (left.name < right.name)
+        return -1;
+    return 0;
+};
+const sortyByQuality = (a, b) => {
+    if (a.data.type === 'positive' && b.data.type === 'negative')
+        return -1;
+    if (a.data.type === 'negative' && b.data.type === 'positive')
+        return 1;
+    return a.name < b.name ? -1 : 1;
+};
 /**
  * This class should not be used directly but be extended for each actor type.
  *
- * TODO: Implement auto hiding of item description field in list-items (see effects tab and set hasDesc to true)
  */
 class SR5BaseActorSheet extends ActorSheet {
-    constructor() {
-        super(...arguments);
-        // Store description to display on the sheet.
+    constructor(...args) {
+        // @ts-ignore // Since we don't need any actual data, don't define args to avoid breaking changes.
+        super(...args);
+        // What document description is shown on sheet. Allow displaying multiple descriptions at the same time.
         this._shownDesc = [];
         // If something needs filtering, store those filters here.
         this._filters = {
             skills: '',
-            showUntrainedSkills: true,
+            showUntrainedSkills: true, // filter based on pool size.
         };
+        // Preselect default inventory.
+        this.selectedInventory = this.document.defaultInventory.name;
+    }
+    /**
+     * All actors will handle these item types specifically.
+     *
+     * All others will be collected somewhere.
+     *
+     * @return A string of item types from the template.json Item section.
+     */
+    getHandledItemTypes() {
+        return ['action'];
+    }
+    /**
+     * All actors will always show these in their 'inventory'.
+     * The inventory might be named differently for each actor.
+     *
+     * All other item types will only be shown when they've been added to that actor.
+     * This allows all players/GMs to add item types to each actor that the system may not find useful
+     * but the players/GMs might.
+     *
+     * @return An array of item types from the template.json Item section.
+     */
+    getInventoryItemTypes() {
+        return [];
+    }
+    /**
+     * These item types aren't allowed to be created on this actor sheet.
+     *
+     * This includes dropping them onto this actor.
+     */
+    getForbiddenItemTypes() {
+        return [];
     }
     /**
      * Extend and override the default options used by the 5e Actor Sheet
@@ -18291,6 +17427,7 @@ class SR5BaseActorSheet extends ActorSheet {
     /**
      * Decide which template to render both for actor types and user permissions.
      *
+     *
      * This could also be done within individual ActorType sheets, however, for ease of use, it's
      * centralized here.
      *
@@ -18303,26 +17440,29 @@ class SR5BaseActorSheet extends ActorSheet {
         }
         return `${path}/actor/${this.actor.data.type}.html`;
     }
-    /**
-     * Data used by all actor types.
-     *
-     * @override
-     */
+    /** SheetData used by _all_ actor types! */
     getData() {
-        // Restructure redesigned Document.getData to contain all new fields, while keeping data.data as system data.
+        // Foundry v8 redesigned SheetData. To avoid restructuring all sheet templates, map new onto old and ignore it.
         let data = super.getData();
         data = Object.assign(Object.assign({}, data), { 
             // @ts-ignore
             data: data.data.data });
-        // General purpose fields
+        // Sheet related general purpose fields. These aren't persistent.
         data.config = config_1.SR5;
         data.filters = this._filters;
-        // Pepare data fields
-        this._prepareItems(data);
+        this._prepareActorAttributes(data);
+        // Valid data fields for all actor types.
         this._prepareActorTypeFields(data);
-        data['effects'] = (0, effects_1.prepareActiveEffectCategories)(this.document.effects);
+        this._prepareSkillsWithFilters(data);
+        data.itemType = this._prepareItemTypes(data);
+        data.effects = (0, effects_1.prepareActiveEffectCategories)(this.document.effects); // All actor types have effects.
+        data.inventories = this._prepareItemsInventory();
+        data.inventory = this._prepareSelectedInventory(data.inventories);
+        data.hasInventory = this._prepareHasInventory(data.inventories);
+        data.selectedInventory = this.selectedInventory;
         return data;
     }
+    /** Listeners used by _all_ actor types! */
     activateListeners(html) {
         super.activateListeners(html);
         // Active Effect management
@@ -18331,9 +17471,26 @@ class SR5BaseActorSheet extends ActorSheet {
         html.find('.item-create').on('click', this._onItemCreate.bind(this));
         html.find('.item-edit').on('click', this._onItemEdit.bind(this));
         html.find('.item-delete').on('click', this._onItemDelete.bind(this));
-        // General item testing...
-        html.find('.item-roll').click(this._onItemRoll.bind(this));
+        // General item header/list actions...
+        html.find('.item-qty').on('change', this._onListItemChangeQuantity.bind(this));
+        html.find('.item-rtg').on('change', this._onListItemChangeRating.bind(this));
+        html.find('.item-equip-toggle').on('click', this._onListItemToggleEquipped.bind(this));
+        // Item list description display handling...
+        html.find('.hidden').hide();
+        html.find('.has-desc').on('click', this._onListItemToggleDescriptionVisibility.bind(this));
+        // General item test rolling...
+        html.find('.item-roll').on('click', this._onItemRoll.bind(this));
         html.find('.Roll').on('click', this._onRoll.bind(this));
+        // Actor inventory handling....
+        html.find('.inventory-inline-create').on('click', this._onInventoryCreate.bind(this));
+        html.find('.inventory-remove').on('click', this._onInventoryRemove.bind(this));
+        html.find('.inventory-edit').on('click', this._onInplaceInventoryEdit.bind(this));
+        html.find('.inventory-input-cancel').on('click', this._onInplaceInventoryEditCancel.bind(this));
+        html.find('.inventory-input-save').on('click', this._onInplaceInventoryEditSave.bind(this));
+        html.find('input#input-inventory').on('keydown', this._onInplaceInventoryEditCancel.bind(this));
+        html.find('input#input-inventory').on('keydown', this._onInplaceInventoryEditSave.bind(this));
+        html.find('#select-inventory').on('change', this._onSelectInventory.bind(this));
+        html.find('.inventory-item-move').on('click', this._onItemMoveToInventory.bind(this));
         // Condition monitor track handling...
         html.find('.horizontal-cell-input .cell').on('click', this._onSetConditionTrackCell.bind(this));
         html.find('.horizontal-cell-input .cell').on('contextmenu', this._onClearConditionTrack.bind(this));
@@ -18343,10 +17500,220 @@ class SR5BaseActorSheet extends ActorSheet {
         html.find('.marks-remove-one').on('click', (event) => __awaiter(this, void 0, void 0, function* () { return this._onMarksQuantityChangeBy(event, -1); }));
         html.find('.marks-delete').on('click', this._onMarksDelete.bind(this));
         html.find('.marks-clear-all').on('click', this._onMarksClearAll.bind(this));
+        // Skill Filter handling...
+        html.find('.skill-header').find('.item-name').on('click', this._onFilterUntrainedSkills.bind(this));
+        html.find('.skill-header').find('.skill-spec-item').on('click', this._onFilterUntrainedSkills.bind(this));
+        html.find('.skill-header').find('.rtg').on('click', this._onFilterUntrainedSkills.bind(this));
+        html.find('#filter-skills').on('input', this._onFilterSkills.bind(this));
+        // Skill CRUD handling...
+        html.find('.skill-edit').on('click', this._onShowEditSkill.bind(this));
+        html.find('.knowledge-skill-edit').on('click', this._onShowEditKnowledgeSkill.bind(this));
+        html.find('.language-skill-edit').on('click', this._onShowEditLanguageSkill.bind(this));
+        html.find('.add-knowledge').on('click', this._onAddKnowledgeSkill.bind(this));
+        html.find('.add-language').on('click', this._onAddLanguageSkill.bind(this));
+        html.find('.add-active').on('click', this._onAddActiveSkill.bind(this));
+        html.find('.remove-knowledge').on('click', this._onRemoveKnowledgeSkill.bind(this));
+        html.find('.remove-language').on('click', this._onRemoveLanguageSkill.bind(this));
+        html.find('.remove-active').on('click', this._onRemoveActiveSkill.bind(this));
+        // Attribute test rolling...
+        html.find('.attribute-roll').on('click', this._onRollAttribute.bind(this));
+        // Conditon monitor test rolling...
+        html.find('.cell-input-roll').on('click', this._onRollCellInput.bind(this));
+        // Skill test rolling...
+        html.find('.skill-roll').on('click', this._onRollActiveSkill.bind(this));
+        html.find('.knowledge-skill').on('click', this._onRollKnowledgeSkill.bind(this));
+        html.find('.language-skill').on('click', this._onRollLanguageSkill.bind(this));
+        // Misc. actor actions...
+        html.find('.show-hidden-skills').on('click', this._onShowHiddenSkills.bind(this));
+        html.find('.open-source-pdf').on('click', this._onOpenSourcePDF.bind(this));
+        html.find('.list-item').each(this._addDragSupportToListItemTemplatePartial.bind(this));
+        html.find('.import-character').on('click', this._onShowImportCharacter.bind(this));
+        // Misc. item type actions...
+        html.find('.reload-ammo').on('click', this._onReloadAmmo.bind(this));
+        html.find('.matrix-att-selector').on('change', this._onMatrixAttributeSelected.bind(this));
     }
     /**
-     * Sheet listeners
+     * Handle display of item types within the actors inventory section.
+     *
+     * Unexpected means there is no use for this type but the user added it anyway.
+     * Inventory types means they should always be shown, even if there are none.
+     * All other item types will be collected at some tab / place on the sheet.
      */
+    _addInventoryItemTypes(inventory) {
+        // Show all item types but remove empty unexpected item types.
+        const inventoryTypes = this.getInventoryItemTypes();
+        for (const type of Object.keys(inventory.types)) {
+            if (inventoryTypes.includes(type))
+                continue;
+            if (inventory.types[type].items.length === 0)
+                delete inventory.types[type];
+        }
+        return inventory;
+    }
+    /**
+     * Add any item type to the inventory display that's configured for this actor sheet type.
+     *
+     * @param inventory The inventory to check and add types to.
+     */
+    _addInventoryTypes(inventory) {
+        for (const type of this.getInventoryItemTypes()) {
+            if (inventory.types.hasOwnProperty(type))
+                continue;
+            inventory.types[type] = {
+                type: type,
+                label: config_1.SR5.itemTypes[type],
+                items: []
+            };
+        }
+    }
+    /**
+     * @override Default drag start handler to add Skill support
+     * @param event
+     */
+    _onDragStart(event) {
+        const _super = Object.create(null, {
+            _onDragStart: { get: () => super._onDragStart }
+        });
+        var _a, _b;
+        return __awaiter(this, void 0, void 0, function* () {
+            // Create drag data
+            const dragData = {
+                actorId: this.actor.id,
+                sceneId: this.actor.isToken ? (_a = canvas.scene) === null || _a === void 0 ? void 0 : _a.id : null,
+                tokenId: this.actor.isToken ? (_b = this.actor.token) === null || _b === void 0 ? void 0 : _b.id : null,
+                type: '',
+                data: {}
+            };
+            // Handle different item type data transfers.
+            // These handlers depend on behavior of the template partial ListItem.html.
+            const element = event.currentTarget;
+            switch (element.dataset.itemType) {
+                // Skill data transfer. (Active and language skills)
+                case 'skill':
+                    // Prepare data transfer
+                    dragData.type = 'Skill';
+                    dragData.data = {
+                        skillId: element.dataset.itemId,
+                        skill: this.actor.getSkill(element.dataset.itemId)
+                    };
+                    // Set data transfer
+                    event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+                    return;
+                // Knowlege skill data transfer
+                case 'knowledgeskill':
+                    // Knowledge skills have a multi purpose id built: <id>.<knowledge_category>
+                    const skillId = element.dataset.itemId.includes('.') ? element.dataset.itemId.split('.')[0] : element.dataset.itemId;
+                    dragData.type = 'Skill';
+                    dragData.data = {
+                        skillId,
+                        skill: this.actor.getSkill(skillId)
+                    };
+                    // Set data transfer
+                    event.dataTransfer.setData("text/plain", JSON.stringify(dragData));
+                    return;
+                // All default Foundry data transfer.
+                default:
+                    // Let default Foundry handler deal with default drag cases.
+                    return _super._onDragStart.call(this, event);
+            }
+        });
+    }
+    /** Handle all document drops onto all actor sheet types.
+     *
+     * @param event
+     */
+    // @ts-ignore
+    _onDrop(event) {
+        const _super = Object.create(null, {
+            _onDrop: { get: () => super._onDrop }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            event.stopPropagation();
+            if (!event.dataTransfer)
+                return;
+            // Keep upstream document created for actions base on it.
+            const documents = yield _super._onDrop.call(this, event);
+            // Handle specific system drop events.
+            // const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
+            // Add any created items to the selected inventory.
+            if (Array.isArray(documents)) {
+                const items = documents.filter(document => document instanceof SR5Item_1.SR5Item);
+                yield this.document.inventory.addItems(this.selectedInventory, items);
+            }
+            return documents;
+        });
+    }
+    /**
+     * Enhance Foundry state restore on rerender by more user interaction state.
+     * @override
+     */
+    _render(...args) {
+        const _super = Object.create(null, {
+            _render: { get: () => super._render }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            const focus = this._saveInputCursorPosition();
+            this._saveScrollPositions();
+            yield _super._render.call(this, ...args);
+            this._restoreScrollPositions();
+            this._restoreInputCursorPosition(focus);
+        });
+    }
+    /**
+     * Use together with _restoreInputCursorPosition during render calls.
+     * Without this the cursor will always be on the first character, causing writing in reverse.
+     */
+    _saveInputCursorPosition() {
+        const focusList = $(this.element).find('input:focus');
+        return focusList.length ? focusList[0] : null;
+    }
+    /**
+     * Use together with _restoreInputCursorPosition during render calls.
+     */
+    _restoreInputCursorPosition(focus) {
+        if (focus && focus.name) {
+            if (!this.form)
+                return;
+            const element = this.form[focus.name];
+            if (element) {
+                // Set general focus for allem input types.
+                element.focus();
+                // Set selection range for supported input types.
+                if (['checkbox', 'radio'].includes(element.type))
+                    return;
+                // set the selection range on the focus formed from before (keeps track of cursor in input)
+                element.setSelectionRange && element.setSelectionRange(focus.selectionStart, focus.selectionEnd);
+            }
+        }
+    }
+    /**
+     * Used together with _restoreScrollPositions during render calls.
+     * @private
+     */
+    _saveScrollPositions() {
+        const activeList = this._findActiveList();
+        if (activeList.length) {
+            this._scroll = activeList.prop('scrollTop');
+        }
+    }
+    /**
+     * Used together with _storeScrollPositions during render calls.
+     * @private
+     */
+    _restoreScrollPositions() {
+        const activeList = this._findActiveList();
+        if (activeList.length && this._scroll != null) {
+            activeList.prop('scrollTop', this._scroll);
+        }
+    }
+    /**
+     * Return scroll area of the currently opened tab.
+     * @private
+     */
+    _findActiveList() {
+        return $(this.element).find('.tab.active .scroll-area');
+    }
     _onItemCreate(event) {
         return __awaiter(this, void 0, void 0, function* () {
             event.preventDefault();
@@ -18356,7 +17723,12 @@ class SR5BaseActorSheet extends ActorSheet {
                 name: `New ${type}`,
                 type: type,
             };
-            return yield this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
+            const items = yield this.actor.createEmbeddedDocuments('Item', [itemData], { renderSheet: true });
+            if (!items)
+                return;
+            // Add the item to the selected inventory.
+            if (this.selectedInventory !== this.document.defaultInventory.name)
+                yield this.document.inventory.addItems(this.selectedInventory, items);
         });
     }
     _onItemEdit(event) {
@@ -18376,6 +17748,10 @@ class SR5BaseActorSheet extends ActorSheet {
             if (!userConsented)
                 return;
             const iid = helpers_1.Helpers.listItemId(event);
+            const item = this.actor.items.get(iid);
+            if (!item)
+                return;
+            yield this.actor.inventory.removeItem(item);
             return yield this.actor.deleteEmbeddedDocuments('Item', [iid]);
         });
     }
@@ -18574,159 +17950,166 @@ class SR5BaseActorSheet extends ActorSheet {
             yield this.actor.update(data);
         });
     }
+    _prepareActorAttributes(data) {
+        // Clear visible, zero value attributes temporary modifiers so they appear blank.
+        const attributes = data.data.attributes;
+        for (let [, attribute] of Object.entries(attributes)) {
+            if (!attribute.hidden) {
+                if (attribute.temp === 0)
+                    delete attribute.temp;
+            }
+        }
+    }
+    _prepareMatrixAttributes(data) {
+        const { matrix } = data.data;
+        if (matrix) {
+            const cleanupAttribute = (attribute) => {
+                const att = matrix[attribute];
+                if (att) {
+                    if (!att.mod)
+                        att.mod = [];
+                    if (att.temp === 0)
+                        delete att.temp;
+                }
+            };
+            ['firewall', 'data_processing', 'sleaze', 'attack'].forEach((att) => cleanupAttribute(att));
+        }
+    }
+    /**
+     * Prepare Actor Sheet Inventory display.
+     *
+     * Each item can  be in one custom inventory or the default inventory.
+     */
+    _prepareItemsInventory() {
+        // All custom and default actor inventories.
+        const inventories = {};
+        // Simple item to inventory mapping.
+        const itemIdInventory = {};
+        // Default inventory for items without a defined one.
+        // Add first for display purposes on sheet.
+        inventories[this.document.defaultInventory.name] = {
+            name: this.document.defaultInventory.name,
+            label: this.document.defaultInventory.label,
+            types: {}
+        };
+        this._addInventoryTypes(inventories[this.document.defaultInventory.name]);
+        // Build all inventories, group items by their types.
+        Object.values(this.document.data.data.inventories).forEach(({ name, label, itemIds }) => {
+            inventories[name] = {
+                name,
+                label,
+                types: {}
+            };
+            // Add default inventory types for this sheet type first, so they appear on top.
+            this._addInventoryTypes(inventories[name]);
+            itemIds.forEach(id => {
+                if (itemIdInventory[id])
+                    console.warn(`Shadowrun5e | Item id ${id} has been added to both ${name} and ${itemIdInventory[id]}. Will only show in ${name}`);
+                itemIdInventory[id] = name;
+            });
+        });
+        const handledTypes = this.getHandledItemTypes();
+        // Fill all inventories with items grouped by their type.
+        this.document.items.forEach(item => {
+            // Handled types are on the sheet outside the inventory.
+            if (handledTypes.includes(item.type))
+                return;
+            const sheetItem = this._prepareSheetItem(item);
+            // TODO: isStack property isn't used elsewhere. Remove if unnecessary.
+            // @ts-ignore
+            // sheetItem.isStack = sheetItem.data.quantity ? item.data.quantity > 1 : false;
+            // Determine what inventory the item sits in.
+            const inventoryName = itemIdInventory[item.id] || this.document.defaultInventory.name;
+            const inventory = inventories[inventoryName];
+            // Should an item of an abnormal type have been added, build type structure.
+            if (!inventory.types[item.type]) {
+                inventory.types[item.type] = {
+                    type: item.type,
+                    label: config_1.SR5.itemTypes[item.type],
+                    items: []
+                };
+            }
+            // Add the item to this inventory.
+            // @ts-ignore
+            inventory.types[item.type].items.push(sheetItem);
+        });
+        Object.values(inventories).forEach(inventory => {
+            this._addInventoryItemTypes(inventory);
+            // Sort the items.
+            Object.values(inventory.types).forEach((type) => {
+                // TODO: Check if some / all should be sort by equipped.
+                type.items.sort(sortByName);
+            });
+        });
+        return inventories;
+    }
+    /**
+     * Choose the selected inventory to actually display.
+     *
+     * @param inventories
+     */
+    _prepareSelectedInventory(inventories) {
+        return inventories[this.selectedInventory];
+    }
+    /**
+     * Show if any items are in the inventory or if the actor is supposed to have an inventory.
+     *
+     * A sheet is supposed to show an inventory if there are item types defined or an item of some
+     * type exists in any of its inventories.
+     *
+     * @param inventories
+     */
+    _prepareHasInventory(inventories) {
+        if (this.getInventoryItemTypes().length > 0)
+            return true;
+        for (const inventory of Object.values(inventories)) {
+            if (Object.keys(inventory.types).length > 0)
+                return true;
+        }
+        return false;
+    }
+    /**
+     * Enhance an SR5Item by sheet data.
+     *
+     */
+    _prepareSheetItem(item) {
+        const sheetItem = item.toObject();
+        const chatData = item.getChatData();
+        sheetItem.description = chatData.description;
+        // @ts-ignore
+        sheetItem.properties = chatData.properties;
+        return sheetItem;
+    }
     /**
      * Prepare Actor Sheet data with item data.
      * @param data An object containing Actor Sheet data, as would be returned by ActorSheet.getData
      */
-    _prepareItems(data) {
-        const inventory = {};
-        // All acting entities should be allowed to carry some protection!
-        inventory['weapon'] = {
-            label: game.i18n.localize('SR5.ItemTypes.Weapon'),
-            items: [],
-            dataset: {
-                type: 'weapon',
-            },
-        };
-        // Critters are people to... Support your local HMHVV support groups!
-        if (this.actor.matchesActorTypes(['character', 'critter', 'vehicle'])) {
-            inventory['armor'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Armor'),
-                items: [],
-                dataset: {
-                    type: 'armor',
-                },
-            };
-            inventory['device'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Device'),
-                items: [],
-                dataset: {
-                    type: 'device',
-                },
-            };
-            inventory['equipment'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Equipment'),
-                items: [],
-                dataset: {
-                    type: 'equipment',
-                },
-            };
-            inventory['ammo'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Ammo'),
-                items: [],
-                dataset: {
-                    type: 'ammo',
-                },
-            };
-            inventory['cyberware'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Cyberware'),
-                items: [],
-                dataset: {
-                    type: 'cyberware',
-                },
-            };
-            inventory['bioware'] = {
-                label: game.i18n.localize('SR5.ItemTypes.Bioware'),
-                items: [],
-                dataset: {
-                    type: 'bioware',
-                },
-            };
-        }
-        let [items, spells, qualities, adept_powers, actions, complex_forms, lifestyles, contacts, sins, programs, critter_powers, sprite_powers,] = data.items.reduce((arr, item) => {
-            // Duplicate to avoid later updates propagating changed item data.
-            // NOTE: If no duplication is done, added fields will be stored in the database on updates!
-            item = duplicate(item);
-            // Show item properties and description in the item list overviews.
-            const actorItem = this.actor.items.get(item._id);
-            const chatData = actorItem.getChatData();
-            item.description = chatData.description;
-            // @ts-ignore // This is a hacky monkey patch solution to pass template data through duplicated item data.
-            item.properties = chatData.properties;
-            // TODO: isStack property isn't used elsewhere. Remove if unnecessary.
-            item.isStack = item.data.quantity ? item.data.quantity > 1 : false;
-            if (item.type === 'spell')
-                arr[1].push(item);
-            else if (item.type === 'quality')
-                arr[2].push(item);
-            else if (item.type === 'adept_power')
-                arr[3].push(item);
-            else if (item.type === 'action')
-                arr[4].push(item);
-            else if (item.type === 'complex_form')
-                arr[5].push(item);
-            else if (item.type === 'lifestyle')
-                arr[6].push(item);
-            else if (item.type === 'contact')
-                arr[7].push(item);
-            else if (item.type === 'sin')
-                arr[8].push(item);
-            else if (item.type === 'program')
-                arr[9].push(item);
-            else if (item.type === 'critter_power')
-                arr[10].push(item);
-            else if (item.type === 'sprite_power')
-                arr[11].push(item);
-            else if (Object.keys(inventory).includes(item.type))
-                arr[0].push(item);
-            return arr;
-        }, [[], [], [], [], [], [], [], [], [], [], [], []]);
-        const sortByName = (i1, i2) => {
-            if (i1.name > i2.name)
-                return 1;
-            if (i1.name < i2.name)
-                return -1;
-            return 0;
-        };
-        const sortByEquipped = (left, right) => {
-            var _a, _b, _c, _d;
-            const leftEquipped = (_b = (_a = left.data) === null || _a === void 0 ? void 0 : _a.technology) === null || _b === void 0 ? void 0 : _b.equipped;
-            const rightEquipped = (_d = (_c = right.data) === null || _c === void 0 ? void 0 : _c.technology) === null || _d === void 0 ? void 0 : _d.equipped;
-            if (leftEquipped && !rightEquipped)
-                return -1;
-            if (rightEquipped && !leftEquipped)
-                return 1;
-            if (left.name > right.name)
-                return 1;
-            if (left.name < right.name)
-                return -1;
-            return 0;
-        };
-        actions.sort(sortByName);
-        adept_powers.sort(sortByName);
-        complex_forms.sort(sortByName);
-        items.sort(sortByEquipped);
-        spells.sort(sortByName);
-        contacts.sort(sortByName);
-        lifestyles.sort(sortByName);
-        sins.sort(sortByName);
-        programs.sort(sortByEquipped);
-        critter_powers.sort(sortByName);
-        sprite_powers.sort(sortByName);
-        items.forEach((item) => {
-            inventory[item.type].items.push(item);
+    _prepareItemTypes(data) {
+        const itemType = {};
+        // Add all item types in system.
+        Object.keys(CONFIG.Item.typeLabels).forEach(type => {
+            itemType[type] = [];
         });
-        data.inventory = Object.values(inventory);
-        data.magic = {
-            spellbook: spells,
-            powers: adept_powers,
-        };
-        data.actions = actions;
-        data.complex_forms = complex_forms;
-        data.lifestyles = lifestyles;
-        data.contacts = contacts;
-        data.sins = sins;
-        data.programs = programs;
-        data.critter_powers = critter_powers;
-        data.sprite_powers = sprite_powers;
-        qualities.sort((a, b) => {
-            if (a.data.type === 'positive' && b.data.type === 'negative')
-                return -1;
-            if (a.data.type === 'negative' && b.data.type === 'positive')
-                return 1;
-            return a.name < b.name ? -1 : 1;
+        // Add existing items to their types as sheet items
+        this.document.items.forEach((item) => {
+            const sheetItem = this._prepareSheetItem(item);
+            itemType[sheetItem.type].push(sheetItem);
         });
-        data.qualities = qualities;
+        // Sort items for each type.
+        Object.entries(itemType).forEach(([type, items]) => {
+            switch (type) {
+                case 'quality':
+                    items.sort(sortyByQuality);
+                    break;
+                case 'program':
+                    items.sort(sortByEquipped);
+                    break;
+                default:
+                    items.sort(sortByName);
+                    break;
+            }
+        });
+        return itemType;
     }
     /**
      * @param data An object containing Actor Sheet data, as would be returned by ActorSheet.getData
@@ -18737,6 +18120,7 @@ class SR5BaseActorSheet extends ActorSheet {
         data.isCritter = this.actor.isCritter();
         data.hasSkills = this.actor.hasSkills;
         data.hasSpecial = this.actor.hasSpecial;
+        data.hasFullDefense = this.actor.hasFullDefense;
     }
     _onMarksQuantityChange(event) {
         var _a;
@@ -18806,10 +18190,635 @@ class SR5BaseActorSheet extends ActorSheet {
             yield this.object.clearMarks();
         });
     }
+    _prepareSkillsWithFilters(data) {
+        this._filterActiveSkills(data);
+        this._filterKnowledgeSkills(data);
+        this._filterLanguageSkills(data);
+    }
+    _filterSkills(data, skills) {
+        const filteredSkills = {};
+        for (let [key, skill] of Object.entries(skills)) {
+            // Don't show hidden skills.
+            if (skill.hidden) {
+                continue;
+            }
+            // Filter visible skills.
+            if (this._showSkill(key, skill, data)) {
+                filteredSkills[key] = skill;
+            }
+        }
+        return helpers_1.Helpers.sortSkills(filteredSkills);
+    }
+    _showSkill(key, skill, data) {
+        if (this._showMagicSkills(key, skill, data)) {
+            return true;
+        }
+        if (this._showResonanceSkills(key, skill, data)) {
+            return true;
+        }
+        return this._showGeneralSkill(key, skill);
+    }
+    _showGeneralSkill(skillId, skill) {
+        return !this._isSkillMagic(skillId, skill) && !this._isSkillResonance(skill) && this._isSkillFiltered(skillId, skill);
+    }
+    _showMagicSkills(skillId, skill, data) {
+        return this._isSkillMagic(skillId, skill) && data.data.special === 'magic' && this._isSkillFiltered(skillId, skill);
+    }
+    _showResonanceSkills(skillId, skill, data) {
+        return this._isSkillResonance(skill) && data.data.special === 'resonance' && this._isSkillFiltered(skillId, skill);
+    }
+    _isSkillFiltered(skillId, skill) {
+        // a newly created skill shouldn't be filtered, no matter what.
+        // Therefore disqualify empty skill labels/names from filtering and always show them.
+        const isFilterable = this._getSkillLabelOrName(skill).length > 0;
+        const isHiddenForText = !this._doesSkillContainText(skillId, skill, this._filters.skills);
+        const isHiddenForUntrained = !this._filters.showUntrainedSkills && skill.value === 0;
+        return !(isFilterable && (isHiddenForUntrained || isHiddenForText));
+    }
+    _getSkillLabelOrName(skill) {
+        return helpers_1.Helpers.getSkillLabelOrName(skill);
+    }
+    _doesSkillContainText(key, skill, text) {
+        if (!text) {
+            return true;
+        }
+        // Search both english keys, localized labels and all specializations.
+        const name = this._getSkillLabelOrName(skill);
+        const searchKey = skill.name === undefined ? key : '';
+        // some "specs" were a string from old code I think
+        const specs = skill.specs !== undefined && Array.isArray(skill.specs) ? skill.specs.join(' ') : '';
+        let searchString = `${searchKey} ${name} ${specs}`;
+        return searchString.toLowerCase().search(text.toLowerCase()) > -1;
+    }
+    _filterKnowledgeSkills(data) {
+        // Knowledge skill have separate sub-categories.
+        Object.keys(config_1.SR5.knowledgeSkillCategories).forEach((category) => {
+            if (!data.data.skills.knowledge.hasOwnProperty(category)) {
+                console.warn(`Knowledge Skill doesn't provide configured category ${category}`);
+                return;
+            }
+            data.data.skills.knowledge[category].value = this._filterSkills(data, data.data.skills.knowledge[category].value);
+        });
+    }
+    _filterLanguageSkills(data) {
+        // Language Skills have no sub-categories.
+        data.data.skills.language.value = this._filterSkills(data, data.data.skills.language.value);
+    }
+    _filterActiveSkills(data) {
+        // Handle active skills directly, as it doesn't use sub-categories.
+        data.data.skills.active = this._filterSkills(data, data.data.skills.active);
+    }
+    _isSkillMagic(id, skill) {
+        return skill.attribute === 'magic' || id === 'astral_combat' || id === 'assensing';
+    }
+    _isSkillResonance(skill) {
+        return skill.attribute === 'resonance';
+    }
+    /** Setup untrained skill filter within getData */
+    _onFilterUntrainedSkills(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            this._filters.showUntrainedSkills = !this._filters.showUntrainedSkills;
+            yield this.render();
+        });
+    }
+    /** Setup skill name filter within getData */
+    _onFilterSkills(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this._filters.skills = event.currentTarget.value;
+            yield this.render();
+        });
+    }
+    _onRollActiveSkill(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const skill = helpers_1.Helpers.listItemId(event);
+            return this.actor.rollActiveSkill(skill, { event: event });
+        });
+    }
+    _onShowEditSkill(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const skill = helpers_1.Helpers.listItemId(event);
+            // new SkillEditSheet(this.actor, skill, { event: event }).render(true);
+            yield this._showSkillEditForm(SkillEditSheet_1.SkillEditSheet, this.actor, { event: event }, skill);
+        });
+    }
+    /** Keep track of each SkillEditSheet instance and close before opening another.
+     *
+     * @param skillEditFormImplementation Any extending class! of SkillEditSheet
+     * @param actor
+     * @param options
+     * @param args Collect arguments of the different renderWithSkill implementations.
+     */
+    _showSkillEditForm(skillEditFormImplementation, actor, options, ...args) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this._closeOpenSkillApp();
+            const skillEditForm = new skillEditFormImplementation(actor, options, ...args);
+            globalSkillAppId = skillEditForm.appId;
+            yield skillEditForm.render(true);
+        });
+    }
+    _onShowEditKnowledgeSkill(event) {
+        event.preventDefault();
+        const [skill, category] = helpers_1.Helpers.listItemId(event).split('.');
+        this._showSkillEditForm(KnowledgeSkillEditSheet_1.KnowledgeSkillEditSheet, this.actor, {
+            event: event,
+        }, skill, category);
+    }
+    _onShowEditLanguageSkill(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const skill = helpers_1.Helpers.listItemId(event);
+            // new LanguageSkillEditSheet(this.actor, skill, { event: event }).render(true);
+            yield this._showSkillEditForm(LanguageSkillEditSheet_1.LanguageSkillEditSheet, this.actor, { event: event }, skill);
+        });
+    }
+    _closeOpenSkillApp() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (globalSkillAppId !== -1) {
+                if (ui.windows[globalSkillAppId]) {
+                    yield ui.windows[globalSkillAppId].close();
+                }
+                globalSkillAppId = -1;
+            }
+        });
+    }
+    _onAddLanguageSkill(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const skillId = yield this.actor.addLanguageSkill({ name: '' });
+            if (!skillId)
+                return;
+            // NOTE: Causes issues with adding knowledge skills (category undefined)
+            // await this._showSkillEditForm(LanguageSkillEditSheet, this.actor, {event}, skillId);
+        });
+    }
+    _onRemoveLanguageSkill(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const userConsented = yield helpers_1.Helpers.confirmDeletion();
+            if (!userConsented)
+                return;
+            const skillId = helpers_1.Helpers.listItemId(event);
+            yield this.actor.removeLanguageSkill(skillId);
+        });
+    }
+    _onAddKnowledgeSkill(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const category = helpers_1.Helpers.listItemId(event);
+            const skillId = yield this.actor.addKnowledgeSkill(category);
+            if (!skillId)
+                return;
+            // NOTE: Causes issues with adding knowledge skills (category undefined)
+            // await this._showSkillEditForm(KnowledgeSkillEditSheet, this.actor, {event}, skillId);
+        });
+    }
+    _onRemoveKnowledgeSkill(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const userConsented = yield helpers_1.Helpers.confirmDeletion();
+            if (!userConsented)
+                return;
+            const [skillId, category] = helpers_1.Helpers.listItemId(event).split('.');
+            yield this.actor.removeKnowledgeSkill(skillId, category);
+        });
+    }
+    /** Add an active skill and show the matching edit application afterwards.
+     *
+     * @param event The HTML event from which the action resulted.
+     */
+    _onAddActiveSkill(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const skillId = yield this.actor.addActiveSkill();
+            if (!skillId)
+                return;
+            yield this._showSkillEditForm(SkillEditSheet_1.SkillEditSheet, this.actor, { event: event }, skillId);
+        });
+    }
+    _onRemoveActiveSkill(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const userConsented = yield helpers_1.Helpers.confirmDeletion();
+            if (!userConsented)
+                return;
+            const skillId = helpers_1.Helpers.listItemId(event);
+            yield this.actor.removeActiveSkill(skillId);
+        });
+    }
+    _onRollKnowledgeSkill(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const id = helpers_1.Helpers.listItemId(event);
+            const [skill, category] = id.split('.');
+            return this.actor.rollKnowledgeSkill(category, skill, { event: event });
+        });
+    }
+    _onRollLanguageSkill(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const skill = helpers_1.Helpers.listItemId(event);
+            return this.actor.rollLanguageSkill(skill, { event: event });
+        });
+    }
+    _onRollAttribute(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const attribute = event.currentTarget.closest('.attribute').dataset.attribute;
+            return this.actor.rollAttribute(attribute, { event: event });
+        });
+    }
+    /**
+     * Handle interaction with a damage track title.
+     * @param event
+     */
+    _onRollCellInput(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            let track = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
+            if (track === 'stun' || track === 'physical') {
+                yield this.actor.rollNaturalRecovery(track, event);
+            }
+            else if (track === 'edge') {
+                yield this.actor.rollAttribute('edge');
+            }
+        });
+    }
+    _onShowHiddenSkills(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            yield this.actor.showHiddenSkills();
+        });
+    }
+    _onOpenSourcePDF(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const field = $(event.currentTarget).parents('.list-item');
+            const iid = $(field).data().itemId;
+            const item = this.actor.items.get(iid);
+            if (item) {
+                yield item.openPdfSource();
+            }
+        });
+    }
+    /**
+     * Augment each item of the ListItem template partial with drag support.
+     * @param i
+     * @param item
+     */
+    _addDragSupportToListItemTemplatePartial(i, item) {
+        if (item.dataset && item.dataset.itemId) {
+            item.setAttribute('draggable', true);
+            item.addEventListener('dragstart', this._onDragStart.bind(this), false);
+        }
+    }
+    /**
+     * Change the quantity on an item shown within a sheet item list.
+     */
+    _onListItemChangeQuantity(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const iid = helpers_1.Helpers.listItemId(event);
+            const item = this.actor.items.get(iid);
+            const qty = parseInt(event.currentTarget.value);
+            if (item && qty && "technology" in item.data.data) {
+                item.data.data.technology.quantity = qty;
+                yield item.update({ 'data.technology.quantity': qty });
+            }
+        });
+    }
+    /**
+     * Change the rating on an item shown within a sheet item list.
+     */
+    _onListItemChangeRating(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const iid = helpers_1.Helpers.listItemId(event);
+            const item = this.actor.items.get(iid);
+            const rtg = parseInt(event.currentTarget.value);
+            if (item && rtg) {
+                yield item.update({ 'data.technology.rating': rtg });
+            }
+        });
+    }
+    /**
+     * Change the equipped status of an item shown within a sheet item list.
+     */
+    _onListItemToggleEquipped(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const iid = helpers_1.Helpers.listItemId(event);
+            const item = this.actor.items.get(iid);
+            if (item) {
+                const newItems = [];
+                // Handle the equipped state.
+                if (item.isDevice()) {
+                    // Only allow one equipped device item. Unequip all other.
+                    for (const item of this.actor.items.filter(actorItem => actorItem.isDevice())) {
+                        newItems.push({
+                            '_id': item.id,
+                            'data.technology.equipped': item.id === iid,
+                        });
+                    }
+                }
+                else {
+                    // Toggle equip status.
+                    newItems.push({
+                        '_id': iid,
+                        'data.technology.equipped': !item.isEquipped(),
+                    });
+                }
+                // Handle active effects based on equipped status.
+                // NOTE: This is commented out for later ease of enabling effects based on equip status AND if they are
+                //       meant to enable on eqiup or not.
+                // this.actor.effects.forEach(effect => {
+                //     if (effect.data.origin !== item.uuid) return;
+                //
+                //     // @ts-ignore
+                //     effect.disable(item.isEquipped());
+                // })
+                yield this.actor.updateEmbeddedDocuments('Item', newItems);
+                this.actor.render(false);
+            }
+        });
+    }
+    /**
+     * Show / hide the items description within a sheet item l ist.
+     */
+    _onListItemToggleDescriptionVisibility(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const item = $(event.currentTarget).parents('.list-item');
+            const iid = $(item).data().item;
+            const field = item.next();
+            field.toggle();
+            if (iid) {
+                if (field.is(':visible'))
+                    this._shownDesc.push(iid);
+                else
+                    this._shownDesc = this._shownDesc.filter((val) => val !== iid);
+            }
+        });
+    }
+    /**
+     * Create an inventory place on the actor for gear organization.
+     */
+    _onInventoryCreate(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            // Overwrite currently selected inventory.
+            $('#input-inventory').val('');
+            yield this._onInplaceInventoryEdit(event, 'create');
+        });
+    }
+    /**
+     * Remove the currently selected inventory.
+     * @param event
+     */
+    _onInventoryRemove(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            // TODO: Allow for options overwriting title/message and so forth.
+            const userConsented = yield helpers_1.Helpers.confirmDeletion();
+            if (!userConsented)
+                return;
+            yield this.document.inventory.remove(this.selectedInventory);
+            // Preselect default instead of none.
+            this.selectedInventory = this.document.defaultInventory.name;
+            this.render();
+        });
+    }
+    /**
+     * Hide inventory selection and show inline editing instead.
+     *
+     * @param event
+     * @param action What action to take during later saving event.
+     */
+    _onInplaceInventoryEdit(event, action = 'edit') {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            // Disallow editing of default inventory.
+            if (action === 'edit' && this.selectedInventory === this.document.defaultInventory.name)
+                return (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.warn(game.i18n.localize('SR5.Warnings.CantEditDefaultInventory'));
+            $('.selection-inventory').hide();
+            $('.inline-input-inventory').show();
+            // Mark action and pre-select.
+            $('#input-inventory')
+                .data('action', action)
+                .select();
+        });
+    }
+    /**
+     * Hide inline inventory editing and show inventory selection instead.
+     *
+     * Cancel edit workflow and do nothing.
+     *
+     * @param event Can be an event of type click or keydown.
+     */
+    _onInplaceInventoryEditCancel(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (event.type === 'keydown' && event.code !== 'Escape')
+                return;
+            event.preventDefault();
+            $('.selection-inventory').show();
+            $('.inline-input-inventory').hide();
+            // Reset to selected inventory for next try.
+            $('#input-inventory')
+                .data('action', undefined)
+                .val(this.selectedInventory);
+        });
+    }
+    /**
+     * Complete inline editing and either save changes or create a missing inventory.
+     *
+     * @param event Either a click or keydown event.
+     */
+    _onInplaceInventoryEditSave(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (event.type === 'keydown' && event.code !== 'Enter')
+                return;
+            event.preventDefault();
+            const inputElement = $('#input-inventory');
+            const action = inputElement.data('action');
+            let inventory = String(inputElement.val());
+            if (!inventory)
+                return;
+            switch (action) {
+                case 'edit':
+                    yield this.document.inventory.rename(this.selectedInventory, inventory);
+                    break;
+                case 'create':
+                    yield this.document.inventory.create(inventory);
+                    break;
+            }
+            yield this._onInplaceInventoryEditCancel(event);
+            // Preselect the new or previous inventory.
+            this.selectedInventory = inventory;
+            this.render();
+        });
+    }
+    /**
+     * Change selected inventory for this sheet.
+     *
+     * @param event
+     */
+    _onSelectInventory(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const inventory = String($(event.currentTarget).val());
+            if (inventory)
+                this.selectedInventory = inventory;
+            this.render();
+        });
+    }
+    /**
+     * Move an item between two inventories.
+     * @param event
+     */
+    _onItemMoveToInventory(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const itemId = helpers_1.Helpers.listItemId(event);
+            const item = this.document.items.get(itemId);
+            if (!item)
+                return;
+            // Ask user about what inventory to move the item to.
+            const dialog = new MoveInventoryDialog_1.MoveInventoryDialog(this.document, this.selectedInventory);
+            const inventory = yield dialog.select();
+            if (dialog.canceled)
+                return;
+            yield this.document.inventory.addItems(inventory, item);
+        });
+    }
+    /**
+     * Initiative a reload from a sheet event.
+     *
+     * @param event
+     */
+    _onReloadAmmo(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const iid = helpers_1.Helpers.listItemId(event);
+            const item = this.actor.items.get(iid);
+            if (item)
+                return item.reloadAmmo();
+        });
+    }
+    /**
+     * Sync matrix attribute changes (order) made on the actor sheet into item data.
+     *
+     * @param event
+     */
+    _onMatrixAttributeSelected(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!("matrix" in this.actor.data.data))
+                return;
+            let iid = this.actor.data.data.matrix.device;
+            let item = this.actor.items.get(iid);
+            if (!item) {
+                console.error('could not find item');
+                return;
+            }
+            // grab matrix attribute (sleaze, attack, etc.)
+            let att = event.currentTarget.dataset.att;
+            // grab device attribute (att1, att2, ...)
+            let deviceAtt = event.currentTarget.value;
+            // get current matrix attribute on the device
+            const deviceData = item.data.data;
+            let oldVal = deviceData.atts[deviceAtt].att;
+            let data = {
+                _id: iid,
+            };
+            // go through atts on device, setup matrix attributes on it
+            for (let i = 1; i <= 4; i++) {
+                let tmp = `att${i}`;
+                let key = `data.atts.att${i}.att`;
+                if (tmp === deviceAtt) {
+                    data[key] = att;
+                }
+                else if (deviceData.atts[`att${i}`].att === att) {
+                    data[key] = oldVal;
+                }
+            }
+            yield this.actor.updateEmbeddedDocuments('Item', [data]);
+        });
+    }
+    /**
+     * Open the Chummer Character import handling.
+     * @param event
+     */
+    _onShowImportCharacter(event) {
+        event.preventDefault();
+        const options = {
+            name: 'chummer-import',
+            title: 'Chummer Import',
+        };
+        new chummer_import_form_1.ChummerImportForm(this.actor, options).render(true);
+    }
 }
 exports.SR5BaseActorSheet = SR5BaseActorSheet;
 
-},{"../../config":144,"../../effects":151,"../../helpers":159}],108:[function(require,module,exports){
+},{"../../apps/chummer-import-form":134,"../../apps/dialogs/MoveInventoryDialog":138,"../../apps/skills/KnowledgeSkillEditSheet":143,"../../apps/skills/LanguageSkillEditSheet":144,"../../apps/skills/SkillEditSheet":145,"../../config":149,"../../effects":156,"../../helpers":164,"../../item/SR5Item":204}],108:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SR5CharacterSheet = void 0;
+const SR5BaseActorSheet_1 = require("./SR5BaseActorSheet");
+class SR5CharacterSheet extends SR5BaseActorSheet_1.SR5BaseActorSheet {
+    /**
+     * Character actors will handle these item types specifically.
+     *
+     * All others will be collected within the gear tab.
+     *
+     * @returns An array of item types from the template.json Item section.
+     */
+    getHandledItemTypes() {
+        let itemTypes = super.getHandledItemTypes();
+        return [
+            ...itemTypes,
+            'program',
+            'sin',
+            'lifestyle',
+            'contact',
+            'spell',
+            'adept_power',
+            'complex_form',
+            'quality',
+            'critter_power'
+        ];
+    }
+    /**
+     * Character actors will always show these item types.
+     *
+     * For more info see into super.getInventoryItemTypes jsdoc.
+     *
+     * @returns An array of item types from the template.json Item section.
+     */
+    getInventoryItemTypes() {
+        const itemTypes = super.getInventoryItemTypes();
+        return [
+            ...itemTypes,
+            'weapon',
+            'ammo',
+            'armor',
+            'bioware',
+            'cyberware',
+            'device',
+            'equipment',
+            'modification'
+        ];
+    }
+    getData() {
+        const data = super.getData();
+        // Character actor types are matrix actors.
+        super._prepareMatrixAttributes(data);
+        data['markedDocuments'] = this.object.getAllMarkedDocuments();
+        return data;
+    }
+}
+exports.SR5CharacterSheet = SR5CharacterSheet;
+
+},{"./SR5BaseActorSheet":107}],109:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -18824,15 +18833,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ICActorSheet = void 0;
 const SR5BaseActorSheet_1 = require("./SR5BaseActorSheet");
 class SR5ICActorSheet extends SR5BaseActorSheet_1.SR5BaseActorSheet {
+    /**
+     * IC actors will handle these item types specifically.
+     *
+     * All others will be collected within the gear tab.
+     *
+     * @returns An array of item types from the template.json Item section.
+     */
+    getHandledItemTypes() {
+        return super.getHandledItemTypes();
+    }
     getData() {
-        var _a;
         const data = super.getData();
         // Fetch a connected host.
-        const icData = this.object.asICData();
-        data.host = (_a = game.items) === null || _a === void 0 ? void 0 : _a.get(icData === null || icData === void 0 ? void 0 : icData.data.host.id);
+        data.host = this.object.getICHost();
         // Display Matrix Marks
-        data['markedDocuments'] = this.object.getAllMarkedDocuments();
-        data['disableMarksEdit'] = this.object.hasHost();
+        data.markedDocuments = this.object.getAllMarkedDocuments();
+        data.disableMarksEdit = this.object.hasHost();
         return data;
     }
     activateListeners(html) {
@@ -18850,26 +18867,177 @@ class SR5ICActorSheet extends SR5BaseActorSheet_1.SR5BaseActorSheet {
         });
     }
     _onDrop(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        // Nothing to be dropped...
-        if (!event.dataTransfer)
-            return;
-        const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
-        // Handle IC type actor cases.
-        switch (dropData.type) {
-            case 'Item':
-                // We don't have to narrow down type here, the SR5Actor will handle this for us.
-                this.object.addICHost(dropData.id);
-                break;
-        }
-        // Let Foundry handle default cases.
-        return super._onDrop(event);
+        const _super = Object.create(null, {
+            _onDrop: { get: () => super._onDrop }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            event.stopPropagation();
+            // Nothing to be dropped...
+            if (!event.dataTransfer)
+                return;
+            const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
+            // Handle IC type actor cases.
+            switch (dropData.type) {
+                case 'Item':
+                    // We don't have to narrow down type here, the SR5Actor will handle this for us.
+                    return yield this.object.addICHost(dropData.id);
+            }
+            // Let Foundry handle default cases.
+            return _super._onDrop.call(this, event);
+        });
     }
 }
 exports.SR5ICActorSheet = SR5ICActorSheet;
 
-},{"./SR5BaseActorSheet":107}],109:[function(require,module,exports){
+},{"./SR5BaseActorSheet":107}],110:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SR5SpiritActorSheet = void 0;
+const SR5BaseActorSheet_1 = require("./SR5BaseActorSheet");
+class SR5SpiritActorSheet extends SR5BaseActorSheet_1.SR5BaseActorSheet {
+    /**
+     * Spirit actors will handle these item types specifically.
+     *
+     * All others will be collected within the gear tab.
+     *
+     * @returns An array of item types from the template.json Item section.
+     */
+    getHandledItemTypes() {
+        let itemTypes = super.getHandledItemTypes();
+        return [
+            ...itemTypes,
+            'critter_power',
+            'spell',
+            'quality'
+        ];
+    }
+}
+exports.SR5SpiritActorSheet = SR5SpiritActorSheet;
+
+},{"./SR5BaseActorSheet":107}],111:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SR5SpriteActorSheet = void 0;
+const SR5BaseActorSheet_1 = require("./SR5BaseActorSheet");
+class SR5SpriteActorSheet extends SR5BaseActorSheet_1.SR5BaseActorSheet {
+    /**
+     * Sprite actors will handle these item types specifically.
+     *
+     * All others will be collected within the gear tab.
+     *
+     * @returns An array of item types from the template.json Item section.
+     */
+    getHandledItemTypes() {
+        let itemTypes = super.getHandledItemTypes();
+        return [
+            ...itemTypes,
+            'sprite_power'
+        ];
+    }
+}
+exports.SR5SpriteActorSheet = SR5SpriteActorSheet;
+
+},{"./SR5BaseActorSheet":107}],112:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SR5VehicleActorSheet = void 0;
+const SR5BaseActorSheet_1 = require("./SR5BaseActorSheet");
+class SR5VehicleActorSheet extends SR5BaseActorSheet_1.SR5BaseActorSheet {
+    /**
+     * Vehicle actors will handle these item types specifically.
+     *
+     * All others will be collected within the gear tab.
+     *
+     * @returns An array of item types from the template.json Item section.
+     */
+    getHandledItemTypes() {
+        let itemTypes = super.getHandledItemTypes();
+        return [
+            ...itemTypes,
+            'program',
+        ];
+    }
+    /**
+     * Vehicle actors will always show these item types.
+     *
+     * For more info see into super.getInventoryItemTypes jsdoc.
+     *
+     * @returns An array of item types from the template.json Item section.
+     */
+    getInventoryItemTypes() {
+        const itemTypes = super.getInventoryItemTypes();
+        return [
+            ...itemTypes,
+            'weapon',
+            'ammo',
+            'armor',
+            'bioware',
+            'cyberware',
+            'device',
+            'equipment',
+            'modification'
+        ];
+    }
+    getData() {
+        const data = super.getData();
+        // Vehicle actor type specific fields.
+        data.vehicle = this._prepareVehicleFields();
+        return data;
+    }
+    activateListeners(html) {
+        super.activateListeners(html);
+        // Vehicle Sheet related handlers...
+        html.find('.driver-remove').on('click', this._handleRemoveVehicleDriver.bind(this));
+    }
+    /**
+     * Vehicle specific drop events
+     * @param event A DataTransferEvent containing some form of FoundryVTT Document / Data
+     */
+    _onDrop(event) {
+        const _super = Object.create(null, {
+            _onDrop: { get: () => super._onDrop }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            event.stopPropagation();
+            if (!event.dataTransfer)
+                return;
+            const dropData = JSON.parse(event.dataTransfer.getData('text/plain'));
+            // Handle specific system drop events.
+            switch (dropData.type) {
+                case "Actor":
+                    return yield this.actor.addVehicleDriver(dropData.id);
+            }
+            // Handle none specific drop events.
+            return _super._onDrop.call(this, event);
+        });
+    }
+    _prepareVehicleFields() {
+        const driver = this.actor.getVehicleDriver();
+        return {
+            driver
+        };
+    }
+    _handleRemoveVehicleDriver(event) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            yield this.actor.removeVehicleDriver();
+        });
+    }
+}
+exports.SR5VehicleActorSheet = SR5VehicleActorSheet;
+
+},{"./SR5BaseActorSheet":107}],113:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChangelogApplication = void 0;
@@ -18905,7 +19073,7 @@ class ChangelogApplication extends Application {
 }
 exports.ChangelogApplication = ChangelogApplication;
 
-},{"../constants":145}],110:[function(require,module,exports){
+},{"../constants":150}],114:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -19123,7 +19291,7 @@ class EnvModifiersApplication extends Application {
 }
 exports.EnvModifiersApplication = EnvModifiersApplication;
 
-},{"../actor/SR5Actor":85,"../constants":145,"../helpers":159,"../rules/Modifiers":217}],111:[function(require,module,exports){
+},{"../actor/SR5Actor":85,"../constants":150,"../helpers":164,"../rules/Modifiers":222}],115:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -19216,7 +19384,7 @@ var ArmorParser = /*#__PURE__*/function () {
 
 exports.ArmorParser = ArmorParser;
 
-},{"./BaseParserFunctions.js":112,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],112:[function(require,module,exports){
+},{"./BaseParserFunctions.js":116,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],116:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -19319,7 +19487,7 @@ var createItemData = function createItemData(name, type, data) {
 
 exports.createItemData = createItemData;
 
-},{"../../data/DataDefaults":146}],113:[function(require,module,exports){
+},{"../../data/DataDefaults":151}],117:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -19409,7 +19577,7 @@ var CharacterImporter = /*#__PURE__*/function () {
 
 exports.CharacterImporter = CharacterImporter;
 
-},{"./CharacterInfoUpdater":114,"./ItemsParser":117,"@babel/runtime/helpers/asyncToGenerator":2,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/regenerator":14}],114:[function(require,module,exports){
+},{"./CharacterInfoUpdater":118,"./ItemsParser":121,"@babel/runtime/helpers/asyncToGenerator":2,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/regenerator":14}],118:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -19735,7 +19903,7 @@ var CharacterInfoUpdater = /*#__PURE__*/function () {
 
 exports.CharacterInfoUpdater = CharacterInfoUpdater;
 
-},{"../../actor/prep/functions/SkillsPrep":105,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/interopRequireDefault":9}],115:[function(require,module,exports){
+},{"../../actor/prep/functions/SkillsPrep":105,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/interopRequireDefault":9}],119:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -19801,7 +19969,7 @@ var ContactParser = /*#__PURE__*/function () {
 
 exports.ContactParser = ContactParser;
 
-},{"./BaseParserFunctions.js":112,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],116:[function(require,module,exports){
+},{"./BaseParserFunctions.js":116,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],120:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -19858,7 +20026,7 @@ var CyberwareParser = /*#__PURE__*/function () {
 
 exports.CyberwareParser = CyberwareParser;
 
-},{"./BaseParserFunctions.js":112,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],117:[function(require,module,exports){
+},{"./BaseParserFunctions.js":116,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],121:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -19965,7 +20133,7 @@ var ItemsParser = /*#__PURE__*/function () {
 
 exports.ItemsParser = ItemsParser;
 
-},{"./ArmorParser":111,"./BaseParserFunctions.js":112,"./ContactParser":115,"./CyberwareParser":116,"./LifestyleParser":118,"./PowerParser":119,"./QualityParser":120,"./SpellParser":121,"./WeaponParser":122,"./gearImport/GearsParser":126,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],118:[function(require,module,exports){
+},{"./ArmorParser":115,"./BaseParserFunctions.js":116,"./ContactParser":119,"./CyberwareParser":120,"./LifestyleParser":122,"./PowerParser":123,"./QualityParser":124,"./SpellParser":125,"./WeaponParser":126,"./gearImport/GearsParser":130,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],122:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -20039,7 +20207,7 @@ var LifestyleParser = /*#__PURE__*/function () {
 
 exports.LifestyleParser = LifestyleParser;
 
-},{"../../config":144,"./BaseParserFunctions.js":112,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],119:[function(require,module,exports){
+},{"../../config":149,"./BaseParserFunctions.js":116,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],123:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -20090,7 +20258,7 @@ var PowerParser = /*#__PURE__*/function () {
 
 exports.PowerParser = PowerParser;
 
-},{"./BaseParserFunctions.js":112,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],120:[function(require,module,exports){
+},{"./BaseParserFunctions.js":116,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],124:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -20147,7 +20315,7 @@ var QualityParser = /*#__PURE__*/function () {
 
 exports.QualityParser = QualityParser;
 
-},{"../../data/DataDefaults":146,"./BaseParserFunctions.js":112,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],121:[function(require,module,exports){
+},{"../../data/DataDefaults":151,"./BaseParserFunctions.js":116,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],125:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -20326,7 +20494,7 @@ var SpellParser = /*#__PURE__*/function () {
 
 exports.SpellParser = SpellParser;
 
-},{"../../data/DataDefaults":146,"./BaseParserFunctions.js":112,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],122:[function(require,module,exports){
+},{"../../data/DataDefaults":151,"./BaseParserFunctions.js":116,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/interopRequireDefault":9}],126:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -20504,7 +20672,7 @@ var WeaponParser = /*#__PURE__*/function () {
 
 exports.WeaponParser = WeaponParser;
 
-},{"./BaseParserFunctions.js":112,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/interopRequireDefault":9}],123:[function(require,module,exports){
+},{"./BaseParserFunctions.js":116,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/interopRequireDefault":9}],127:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AmmoParser = void 0;
@@ -20539,7 +20707,7 @@ class AmmoParser extends BaseGearParser_1.BaseGearParser {
 }
 exports.AmmoParser = AmmoParser;
 
-},{"./BaseGearParser":124}],124:[function(require,module,exports){
+},{"./BaseGearParser":128}],128:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.BaseGearParser = void 0;
@@ -20569,7 +20737,7 @@ class BaseGearParser {
 }
 exports.BaseGearParser = BaseGearParser;
 
-},{"../../../data/DataDefaults":146,"../BaseParserFunctions.js":112}],125:[function(require,module,exports){
+},{"../../../data/DataDefaults":151,"../BaseParserFunctions.js":116}],129:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DeviceParser = void 0;
@@ -20615,7 +20783,7 @@ class DeviceParser extends BaseGearParser_1.BaseGearParser {
 }
 exports.DeviceParser = DeviceParser;
 
-},{"./BaseGearParser":124}],126:[function(require,module,exports){
+},{"./BaseGearParser":128}],130:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GearsParser = void 0;
@@ -20663,7 +20831,7 @@ class GearsParser {
 }
 exports.GearsParser = GearsParser;
 
-},{"./ParserSelector":127}],127:[function(require,module,exports){
+},{"./ParserSelector":131}],131:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ParserSelector = void 0;
@@ -20701,7 +20869,7 @@ class ParserSelector {
 }
 exports.ParserSelector = ParserSelector;
 
-},{"./AmmoParser":123,"./BaseGearParser":124,"./DeviceParser":125,"./ProgramParser":128,"./SinParser":129}],128:[function(require,module,exports){
+},{"./AmmoParser":127,"./BaseGearParser":128,"./DeviceParser":129,"./ProgramParser":132,"./SinParser":133}],132:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ProgramParser = void 0;
@@ -20727,7 +20895,7 @@ class ProgramParser extends BaseGearParser_1.BaseGearParser {
 }
 exports.ProgramParser = ProgramParser;
 
-},{"./BaseGearParser":124}],129:[function(require,module,exports){
+},{"./BaseGearParser":128}],133:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SinParser = void 0;
@@ -20770,7 +20938,7 @@ class SinParser extends BaseGearParser_1.BaseGearParser {
 }
 exports.SinParser = SinParser;
 
-},{"./BaseGearParser":124}],130:[function(require,module,exports){
+},{"./BaseGearParser":128}],134:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -20886,7 +21054,7 @@ var ChummerImportForm = /*#__PURE__*/function (_FormApplication) {
 
 exports.ChummerImportForm = ChummerImportForm;
 
-},{"../actor/prep/functions/SkillsPrep":105,"./characterImport/CharacterImporter":113,"@babel/runtime/helpers/asyncToGenerator":2,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10,"@babel/runtime/regenerator":14}],131:[function(require,module,exports){
+},{"../actor/prep/functions/SkillsPrep":105,"./characterImport/CharacterImporter":117,"@babel/runtime/helpers/asyncToGenerator":2,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10,"@babel/runtime/regenerator":14}],135:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DamageApplicationDialog = void 0;
@@ -20932,7 +21100,7 @@ class DamageApplicationDialog extends FormDialog_1.FormDialog {
 }
 exports.DamageApplicationDialog = DamageApplicationDialog;
 
-},{"./FormDialog":133}],132:[function(require,module,exports){
+},{"./FormDialog":137}],136:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DeleteConfirmationDialog = void 0;
@@ -20970,7 +21138,7 @@ class DeleteConfirmationDialog extends FormDialog_1.FormDialog {
 }
 exports.DeleteConfirmationDialog = DeleteConfirmationDialog;
 
-},{"./FormDialog":133}],133:[function(require,module,exports){
+},{"./FormDialog":137}],137:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -21066,10 +21234,12 @@ class FormDialog extends Dialog {
     get selected() {
         return !this.canceled;
     }
-    /** Dialog has been canceled and nothing has been selected
+    /** Dialog has been canceled and nothing has been selected.
+     *
+     * Will also report cancel if a cancel button has been defined.
      */
     get canceled() {
-        return !this.selectedButton;
+        return !this.selectedButton || this.selectedButton === 'cancel';
     }
     /** @override */
     static getButtons() {
@@ -21084,7 +21254,71 @@ class FormDialog extends Dialog {
 }
 exports.FormDialog = FormDialog;
 
-},{}],134:[function(require,module,exports){
+},{}],138:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.MoveInventoryDialog = void 0;
+const FormDialog_1 = require("./FormDialog");
+/**
+ * Show a list of the SR5Actor inventories to the user and let them choose one.
+ *
+ * @returns The inventory name selected.
+ */
+class MoveInventoryDialog extends FormDialog_1.FormDialog {
+    /**
+     * @param actor Use this actor's inventories to select from.
+     * @param sourceInventory The currently selected inventory, which won't be displayed.
+     * @param options
+     */
+    constructor(actor, sourceInventory, options) {
+        const dialogData = MoveInventoryDialog.getDialogData(actor, sourceInventory);
+        super(dialogData, options);
+    }
+    static get defaultOptions() {
+        const options = super.defaultOptions;
+        options.id = 'move-inventory-application';
+        options.classes = ['sr5', 'form-dialog'];
+        options.height = 'auto';
+        return options;
+    }
+    static getDialogData(actor, sourceInventory) {
+        // Get all inventories, excluding the currently shown one.
+        const inventories = Object.values(actor.data.data.inventories)
+            .filter(inventory => inventory.name !== sourceInventory);
+        // Add the default inventories for selection when necessary.
+        if (sourceInventory !== actor.defaultInventory.name)
+            inventories.unshift(actor.defaultInventory);
+        return {
+            title: game.i18n.localize('SR5.MoveInventoryDialog.Title'),
+            buttons: {
+                move: {
+                    label: game.i18n.localize('SR5.MoveInventoryDialog.Move')
+                },
+                cancel: {
+                    label: game.i18n.localize('SR5.MoveInventoryDialog.Cancel')
+                }
+            },
+            default: 'cancel',
+            templateData: { inventories },
+            templatePath: 'systems/shadowrun5e/dist/templates/apps/dialogs/move-inventory-dialog.html',
+            onAfterClose: (html) => __awaiter(this, void 0, void 0, function* () {
+                return html.find('input[name="inventories"]:checked').val();
+            })
+        };
+    }
+}
+exports.MoveInventoryDialog = MoveInventoryDialog;
+
+},{"./FormDialog":137}],139:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -21292,7 +21526,7 @@ class ShadowrunActorDialogs {
 }
 exports.ShadowrunActorDialogs = ShadowrunActorDialogs;
 
-},{"../../actor/flows/SkillFlow":88,"../../config":144,"../../helpers":159,"../../parts/PartsList":213,"./FormDialog":133}],135:[function(require,module,exports){
+},{"../../actor/flows/SkillFlow":88,"../../config":149,"../../helpers":164,"../../parts/PartsList":218,"./FormDialog":137}],140:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -21647,7 +21881,7 @@ class ShadowrunItemDialog {
 }
 exports.ShadowrunItemDialog = ShadowrunItemDialog;
 
-},{"../../config":144,"../../constants":145,"../../helpers":159,"./FormDialog":133}],136:[function(require,module,exports){
+},{"../../config":149,"../../constants":150,"../../helpers":164,"./FormDialog":137}],141:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -21756,7 +21990,7 @@ class ShadowrunTestDialog {
 }
 exports.ShadowrunTestDialog = ShadowrunTestDialog;
 
-},{"../../constants":145,"../../helpers":159,"../../parts/PartsList":213,"./FormDialog":133}],137:[function(require,module,exports){
+},{"../../constants":150,"../../helpers":164,"../../parts/PartsList":218,"./FormDialog":137}],142:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -21798,27 +22032,34 @@ var OverwatchScoreTracker = /*#__PURE__*/function (_Application) {
 
   (0, _createClass2["default"])(OverwatchScoreTracker, [{
     key: "getData",
-    value: function getData() {
-      // get list of actors that belong to users
-      var actors = game.users.reduce(function (acc, user) {
+    value: function getData(options) {
+      // Get list of user character actors
+      var actors = this._prepareCharacterActorsData(); // get actors manually added to the tracker by GM
+
+
+      OverwatchScoreTracker.addedActors.forEach(function (id) {
+        var actor = game.actors.get(id);
+
+        if (actor) {
+          actors.push(actor.toObject());
+        }
+      }); // Reference the currently displayed actors for better access.
+
+      this.actors = actors;
+      return {
+        actors: actors
+      };
+    }
+  }, {
+    key: "_prepareCharacterActorsData",
+    value: function _prepareCharacterActorsData() {
+      return game.users.reduce(function (acc, user) {
         if (!user.isGM && user.character) {
-          acc.push(user.character.data);
+          acc.push(user.character.toObject());
         }
 
         return acc;
       }, []);
-      OverwatchScoreTracker.addedActors.forEach(function (id) {
-        var actor = game.actors.find(function (a) {
-          return a._id === id;
-        });
-
-        if (actor) {
-          actors.push(actor.data);
-        }
-      });
-      return {
-        actors: actors
-      };
     }
   }, {
     key: "activateListeners",
@@ -21833,10 +22074,8 @@ var OverwatchScoreTracker = /*#__PURE__*/function (_Application) {
   }, {
     key: "_getActorFromEvent",
     value: function _getActorFromEvent(event) {
-      var id = event.currentTarget.closest('.list-item').dataset.actorId;
-      if (id) return game.actors.find(function (a) {
-        return a._id === id;
-      });
+      var id = $(event.currentTarget).closest('.list-item').data('actorId');
+      if (id) return game.actors.get(id);
     }
   }, {
     key: "_onAddActor",
@@ -21850,16 +22089,43 @@ var OverwatchScoreTracker = /*#__PURE__*/function (_Application) {
       if (tokens.length === 0) {
         var _ui$notifications;
 
-        (_ui$notifications = ui.notifications) === null || _ui$notifications === void 0 ? void 0 : _ui$notifications.warn(game.i18n.localize('SR5.OverwatchScoreTracker.NotifyNoSelectedTokens'));
-        return;
-      }
+        return (_ui$notifications = ui.notifications) === null || _ui$notifications === void 0 ? void 0 : _ui$notifications.warn(game.i18n.localize('SR5.OverwatchScoreTracker.NotifyNoSelectedTokens'));
+      } // Warn user about selected unlinked token actors.
 
-      tokens.forEach(function (token) {
-        var actorId = token.data.actorId;
-        OverwatchScoreTracker.addedActors.push(actorId);
 
-        _this.render();
+      var unlinkedActor = tokens.find(function (token) {
+        return !token.data.actorLink;
       });
+
+      if (unlinkedActor !== undefined) {
+        ui.notifications.warn(game.i18n.localize('SR5.OverwatchScoreTracker.OnlyLinkedActorsSupported'));
+      } // Add linked token actors.
+
+
+      tokens.filter(function (token) {
+        return token.data.actorLink;
+      }).forEach(function (token) {
+        // Double check that the actor actually lives in the actors collection.
+        var actor = game.actors.get(token.data.actorId);
+        if (!actor) return;
+        if (_this._isActorOnTracker(actor)) return;
+        OverwatchScoreTracker.addedActors.push(actor.id);
+      });
+      this.render();
+    }
+    /**
+     * Check if the given actor is already added and displayed on the current tracker.
+     *
+     * @param actor A actors collection actor.
+     * @returns {boolean} Will return true when the given actor already exists.
+     */
+
+  }, {
+    key: "_isActorOnTracker",
+    value: function _isActorOnTracker(actor) {
+      return this.actors.find(function (actorData) {
+        return actorData._id === actor.id;
+      }) !== undefined;
     }
   }, {
     key: "_setOverwatchScore",
@@ -21954,7 +22220,7 @@ exports.OverwatchScoreTracker = OverwatchScoreTracker;
 (0, _defineProperty2["default"])(OverwatchScoreTracker, "MatrixOverwatchDiceCount", '2d6');
 (0, _defineProperty2["default"])(OverwatchScoreTracker, "addedActors", []);
 
-},{"../../helpers":159,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10}],138:[function(require,module,exports){
+},{"../../helpers":164,"@babel/runtime/helpers/classCallCheck":3,"@babel/runtime/helpers/createClass":4,"@babel/runtime/helpers/defineProperty":5,"@babel/runtime/helpers/get":6,"@babel/runtime/helpers/getPrototypeOf":7,"@babel/runtime/helpers/inherits":8,"@babel/runtime/helpers/interopRequireDefault":9,"@babel/runtime/helpers/possibleConstructorReturn":10}],143:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.KnowledgeSkillEditSheet = void 0;
@@ -21970,7 +22236,7 @@ class KnowledgeSkillEditSheet extends LanguageSkillEditSheet_1.LanguageSkillEdit
 }
 exports.KnowledgeSkillEditSheet = KnowledgeSkillEditSheet;
 
-},{"./LanguageSkillEditSheet":139}],139:[function(require,module,exports){
+},{"./LanguageSkillEditSheet":144}],144:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LanguageSkillEditSheet = void 0;
@@ -21996,7 +22262,7 @@ class LanguageSkillEditSheet extends SkillEditSheet_1.SkillEditSheet {
 }
 exports.LanguageSkillEditSheet = LanguageSkillEditSheet;
 
-},{"./SkillEditSheet":140}],140:[function(require,module,exports){
+},{"./SkillEditSheet":145}],145:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22194,7 +22460,7 @@ class SkillEditSheet extends DocumentSheet {
 }
 exports.SkillEditSheet = SkillEditSheet;
 
-},{"../../config":144}],141:[function(require,module,exports){
+},{"../../config":149}],146:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.measureDistance = void 0;
@@ -22240,7 +22506,7 @@ const measureDistance = function (segments, options = {}) {
 };
 exports.measureDistance = measureDistance;
 
-},{}],142:[function(require,module,exports){
+},{}],147:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -22638,7 +22904,7 @@ const addRollListeners = (app, html) => {
 };
 exports.addRollListeners = addRollListeners;
 
-},{"./actor/SR5Actor":85,"./actor/flows/DamageApplicationFlow":87,"./constants":145,"./helpers":159,"./item/SR5Item":199,"./item/flows/ActionResultFlow":202,"./template":222}],143:[function(require,module,exports){
+},{"./actor/SR5Actor":85,"./actor/flows/DamageApplicationFlow":86,"./constants":150,"./helpers":164,"./item/SR5Item":204,"./item/flows/ActionResultFlow":207,"./template":227}],148:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -23056,7 +23322,7 @@ function _combatantGetInitiativeFormula() {
 }
 exports._combatantGetInitiativeFormula = _combatantGetInitiativeFormula;
 
-},{"../constants":145,"../rules/CombatRules":215,"../sockets":221}],144:[function(require,module,exports){
+},{"../constants":150,"../rules/CombatRules":220,"../sockets":226}],149:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5 = void 0;
@@ -23518,7 +23784,7 @@ exports.SR5 = {
     },
 };
 
-},{}],145:[function(require,module,exports){
+},{}],150:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR = exports.DEFAULT_ID_LENGTH = exports.SKILL_DEFAULT_NAME = exports.LENGTH_UNIT = exports.DEFAULT_ROLL_NAME = exports.LENGTH_UNIT_TO_METERS_MULTIPLIERS = exports.METATYPEMODIFIER = exports.CORE_FLAGS = exports.CORE_NAME = exports.FLAGS = exports.SYSTEM_SOCKET = exports.SYSTEM_NAME = void 0;
@@ -23663,7 +23929,7 @@ exports.SR = {
     }
 };
 
-},{}],146:[function(require,module,exports){
+},{}],151:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataDefaults = exports.DefaultValues = void 0;
@@ -23934,7 +24200,7 @@ exports.DataDefaults = {
     damage: DefaultValues.damageData({ type: { base: '', value: '' } }),
 };
 
-},{"../constants":145}],147:[function(require,module,exports){
+},{"../constants":150}],152:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataWrapper = void 0;
@@ -23945,7 +24211,7 @@ class DataWrapper {
 }
 exports.DataWrapper = DataWrapper;
 
-},{}],148:[function(require,module,exports){
+},{}],153:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ItemDataWrapper = void 0;
@@ -24262,7 +24528,7 @@ class SR5ItemDataWrapper extends DataWrapper_1.DataWrapper {
 }
 exports.SR5ItemDataWrapper = SR5ItemDataWrapper;
 
-},{"./DataWrapper":147}],149:[function(require,module,exports){
+},{"./DataWrapper":152}],154:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -24390,7 +24656,7 @@ class SR5ActiveEffect extends ActiveEffect {
 }
 exports.SR5ActiveEffect = SR5ActiveEffect;
 
-},{"../helpers":159}],150:[function(require,module,exports){
+},{"../helpers":164}],155:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5ActiveEffectSheet = void 0;
@@ -24406,7 +24672,7 @@ class SR5ActiveEffectSheet extends ActiveEffectConfig {
 }
 exports.SR5ActiveEffectSheet = SR5ActiveEffectSheet;
 
-},{}],151:[function(require,module,exports){
+},{}],156:[function(require,module,exports){
 "use strict";
 //@ts-nocheck // This is JavaScript code.
 /**
@@ -24507,7 +24773,7 @@ function prepareActiveEffectCategories(effects) {
 }
 exports.prepareActiveEffectCategories = prepareActiveEffectCategories;
 
-},{"./helpers":159}],152:[function(require,module,exports){
+},{"./helpers":164}],157:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerAppHelpers = void 0;
@@ -24525,7 +24791,7 @@ const registerAppHelpers = () => {
 };
 exports.registerAppHelpers = registerAppHelpers;
 
-},{}],153:[function(require,module,exports){
+},{}],158:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerBasicHelpers = void 0;
@@ -24639,6 +24905,15 @@ const registerBasicHelpers = () => {
         else
             return options.inverse(this);
     });
+    // if empty (object, array, string)
+    Handlebars.registerHelper('empty', function (value) {
+        if (foundry.utils.getType(value) === 'Array')
+            return value.length === 0;
+        if (foundry.utils.getType(value) === 'Object')
+            return Object.keys(value).length === 0;
+        if (foundry.utils.getType(value) === 'String')
+            return value.length === 0;
+    });
     Handlebars.registerHelper('not', function (v1) {
         return !v1;
     });
@@ -24678,7 +24953,7 @@ const registerBasicHelpers = () => {
 };
 exports.registerBasicHelpers = registerBasicHelpers;
 
-},{"../actor/SR5Actor":85,"../helpers":159}],154:[function(require,module,exports){
+},{"../actor/SR5Actor":85,"../helpers":164}],159:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -24713,7 +24988,7 @@ class HandlebarManager {
 }
 exports.HandlebarManager = HandlebarManager;
 
-},{"./AppHelpers":152,"./BasicHelpers":153,"./HandlebarTemplates":155,"./ItemLineHelpers":156,"./RollAndLabelHelpers":157,"./SkillLineHelpers":158}],155:[function(require,module,exports){
+},{"./AppHelpers":157,"./BasicHelpers":158,"./HandlebarTemplates":160,"./ItemLineHelpers":161,"./RollAndLabelHelpers":162,"./SkillLineHelpers":163}],160:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -24731,7 +25006,6 @@ const preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, funct
         // actor tabs
         'systems/shadowrun5e/dist/templates/actor/tabs/ActionsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/BioTab.html',
-        'systems/shadowrun5e/dist/templates/actor/tabs/GearTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/MagicTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/MatrixTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/MiscTab.html',
@@ -24741,6 +25015,7 @@ const preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, funct
         'systems/shadowrun5e/dist/templates/actor/tabs/EffectsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/CritterPowersTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/NetworkTab.html',
+        'systems/shadowrun5e/dist/templates/actor/tabs/InventoryTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/spirit/SpiritSkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/matrix/SpriteSkillsTab.html',
         'systems/shadowrun5e/dist/templates/actor/tabs/matrix/SpritePowersTab.html',
@@ -24843,14 +25118,14 @@ const preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, funct
 });
 exports.preloadHandlebarsTemplates = preloadHandlebarsTemplates;
 
-},{}],156:[function(require,module,exports){
+},{}],161:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerItemLineHelpers = void 0;
 const SR5ItemDataWrapper_1 = require("../data/SR5ItemDataWrapper");
 const config_1 = require("../config");
 const registerItemLineHelpers = () => {
-    Handlebars.registerHelper('ItemHeaderIcons', function (id) {
+    Handlebars.registerHelper('ItemHeaderIcons', function (type) {
         const PlusIcon = 'fas fa-plus';
         const AddText = game.i18n.localize('SR5.Add');
         const addIcon = {
@@ -24861,7 +25136,7 @@ const registerItemLineHelpers = () => {
             // Add HTML data attributes using a key<string>:value<string> structure
             data: {}
         };
-        switch (id) {
+        switch (type) {
             case 'lifestyle':
                 addIcon.title = game.i18n.localize('SR5.CreateItemLifestyle');
                 return [addIcon];
@@ -24904,6 +25179,9 @@ const registerItemLineHelpers = () => {
             case 'ammo':
                 addIcon.title = game.i18n.localize('SR5.CreateItemAmmo');
                 return [addIcon];
+            case 'modification':
+                addIcon.title = game.i18n.localize('SR5.CreateItemModification');
+                return [addIcon];
             case 'device':
                 addIcon.title = game.i18n.localize('SR5.CreateItemDevice');
                 return [addIcon];
@@ -24930,6 +25208,17 @@ const registerItemLineHelpers = () => {
             default:
                 return [];
         }
+    });
+    Handlebars.registerHelper('InventoryIcons', function (name) {
+        const addItemIcon = {
+            icon: 'fas fa-plus',
+            text: game.i18n.localize('SR5.Add'),
+            title: game.i18n.localize('SR5.CreateItem'),
+            cssClass: 'inventory-item-create',
+            // Add HTML data attributes using a key<string>:value<string> structure
+            data: { inventory: name }
+        };
+        return [addItemIcon];
     });
     Handlebars.registerHelper('ItemHeaderRightSide', function (id) {
         switch (id) {
@@ -24972,6 +25261,7 @@ const registerItemLineHelpers = () => {
             case 'equipment':
             case 'cyberware':
             case 'bioware':
+            case 'modification':
             case 'ammo':
                 return [
                     {
@@ -25107,6 +25397,7 @@ const registerItemLineHelpers = () => {
                 ];
             case 'armor':
             case 'ammo':
+            case 'modification':
             case 'device':
             case 'equipment':
             case 'cyberware':
@@ -25260,6 +25551,44 @@ const registerItemLineHelpers = () => {
         }
         return icons;
     });
+    Handlebars.registerHelper('InventoryItemIcons', function (item) {
+        const wrapper = new SR5ItemDataWrapper_1.SR5ItemDataWrapper(item);
+        const moveIcon = {
+            icon: 'fas fa-exchange-alt inventory-item-move',
+            title: game.i18n.localize('SR5.MoveItemInventory')
+        };
+        const editIcon = {
+            icon: 'fas fa-edit item-edit',
+            title: game.i18n.localize('SR5.EditItem'),
+        };
+        const removeIcon = {
+            icon: 'fas fa-trash item-delete',
+            title: game.i18n.localize('SR5.DeleteItem'),
+        };
+        const equipIcon = {
+            icon: `${wrapper.isEquipped() ? 'fas fa-check-circle' : 'far fa-circle'} item-equip-toggle`,
+            title: game.i18n.localize('SR5.ToggleEquip'),
+        };
+        const pdfIcon = {
+            icon: 'fas fa-file open-source-pdf',
+            title: game.i18n.localize('SR5.OpenSourcePdf'),
+        };
+        const icons = [moveIcon, editIcon, removeIcon];
+        if (ui['PDFoundry']) {
+            icons.unshift(pdfIcon);
+        }
+        switch (wrapper.getType()) {
+            case 'program':
+            case 'armor':
+            case 'device':
+            case 'equipment':
+            case 'cyberware':
+            case 'bioware':
+            case 'weapon':
+                icons.unshift(equipIcon);
+        }
+        return icons;
+    });
     /**
      * Helper specifically for active effect icons.
      *
@@ -25372,7 +25701,7 @@ const registerItemLineHelpers = () => {
 };
 exports.registerItemLineHelpers = registerItemLineHelpers;
 
-},{"../config":144,"../data/SR5ItemDataWrapper":148}],157:[function(require,module,exports){
+},{"../config":149,"../data/SR5ItemDataWrapper":153}],162:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerRollAndLabelHelpers = void 0;
@@ -25441,7 +25770,7 @@ const registerRollAndLabelHelpers = () => {
 };
 exports.registerRollAndLabelHelpers = registerRollAndLabelHelpers;
 
-},{"../helpers":159,"../parts/PartsList":213}],158:[function(require,module,exports){
+},{"../helpers":164,"../parts/PartsList":218}],163:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.registerSkillLineHelpers = void 0;
@@ -25552,7 +25881,7 @@ const registerSkillLineHelpers = () => {
 };
 exports.registerSkillLineHelpers = registerSkillLineHelpers;
 
-},{"../constants":145,"../helpers":159,"../rules/SkillRules":218}],159:[function(require,module,exports){
+},{"../constants":150,"../helpers":164,"../rules/SkillRules":223}],164:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26082,7 +26411,7 @@ class Helpers {
      * @return An expected return object could look like this: {'data.skills.active': {'-=Pistols': null}} and would
      *         remove the Pistols key from the 'data.skills.active' path within Entity.data.data.skills.active.
      */
-    static getDeleteDataEntry(path, key) {
+    static getDeleteKeyUpdateData(path, key) {
         // Entity.update utilizes the mergeObject function within Foundry.
         // That functions documentation allows property deletion using the -= prefix before property key.
         return { [path]: { [`-=${key}`]: null } };
@@ -26307,7 +26636,7 @@ class Helpers {
 }
 exports.Helpers = Helpers;
 
-},{"./apps/dialogs/DeleteConfirmationDialog":132,"./constants":145,"./data/DataDefaults":146,"./parts/PartsList":213}],160:[function(require,module,exports){
+},{"./apps/dialogs/DeleteConfirmationDialog":136,"./constants":150,"./data/DataDefaults":151,"./parts/PartsList":218}],165:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26325,7 +26654,6 @@ const Migrator_1 = require("./migrator/Migrator");
 const settings_1 = require("./settings");
 const constants_1 = require("./constants");
 const SR5Actor_1 = require("./actor/SR5Actor");
-const SR5ActorSheet_1 = require("./actor/SR5ActorSheet");
 const SR5Item_1 = require("./item/SR5Item");
 const SR5ItemSheet_1 = require("./item/SR5ItemSheet");
 const SR5Token_1 = require("./token/SR5Token");
@@ -26345,6 +26673,10 @@ const SR5ICActorSheet_1 = require("./actor/sheets/SR5ICActorSheet");
 const SR5ActiveEffect_1 = require("./effect/SR5ActiveEffect");
 const SR5ActiveEffectSheet_1 = require("./effect/SR5ActiveEffectSheet");
 const NetworkDeviceFlow_1 = require("./item/flows/NetworkDeviceFlow");
+const SR5VehicleActorSheet_1 = require("./actor/sheets/SR5VehicleActorSheet");
+const SR5CharacterSheet_1 = require("./actor/sheets/SR5CharacterSheet");
+const SR5SpiritActorSheet_1 = require("./actor/sheets/SR5SpiritActorSheet");
+const SR5SpriteActorSheet_1 = require("./actor/sheets/SR5SpriteActorSheet");
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 exports.SR5CONFIG = config_1.SR5;
 class HooksManager {
@@ -26405,15 +26737,30 @@ ___________________
         // Register sheet application classes
         // NOTE: See dnd5e for a multi class approach for all actor types using the types array in Actors.registerSheet
         Actors.unregisterSheet('core', ActorSheet);
-        Actors.registerSheet(constants_1.SYSTEM_NAME, SR5ActorSheet_1.SR5ActorSheet, {
+        Actors.registerSheet(constants_1.SYSTEM_NAME, SR5CharacterSheet_1.SR5CharacterSheet, {
             label: "SR5.SheetActor",
             makeDefault: true,
-            types: ['character', 'vehicle', 'critter', 'spirit', 'sprite']
+            types: ['critter', 'character']
         });
         Actors.registerSheet(constants_1.SYSTEM_NAME, SR5ICActorSheet_1.SR5ICActorSheet, {
             label: "SR5.SheetActor",
             makeDefault: true,
             types: ['ic']
+        });
+        Actors.registerSheet(constants_1.SYSTEM_NAME, SR5VehicleActorSheet_1.SR5VehicleActorSheet, {
+            label: "SR5.SheetActor",
+            makeDefault: true,
+            types: ['vehicle']
+        });
+        Actors.registerSheet(constants_1.SYSTEM_NAME, SR5SpiritActorSheet_1.SR5SpiritActorSheet, {
+            label: "SR5.SheetActor",
+            makeDefault: true,
+            types: ['spirit']
+        });
+        Actors.registerSheet(constants_1.SYSTEM_NAME, SR5SpriteActorSheet_1.SR5SpriteActorSheet, {
+            label: "SR5.SheetActor",
+            makeDefault: true,
+            types: ['sprite']
         });
         Items.unregisterSheet('core', ItemSheet);
         Items.registerSheet(constants_1.SYSTEM_NAME, SR5ItemSheet_1.SR5ItemSheet, {
@@ -26603,7 +26950,7 @@ ___________________
 }
 exports.HooksManager = HooksManager;
 
-},{"../test/quench":224,"./actor/SR5Actor":85,"./actor/SR5ActorSheet":86,"./actor/sheets/SR5ICActorSheet":108,"./apps/ChangelogApplication":109,"./apps/EnvModifiersApplication":110,"./apps/gmtools/OverwatchScoreTracker":137,"./canvas":141,"./chat":142,"./combat/SR5Combat":143,"./config":144,"./constants":145,"./effect/SR5ActiveEffect":149,"./effect/SR5ActiveEffectSheet":150,"./handlebars/HandlebarManager":154,"./helpers":159,"./importer/apps/import-form":161,"./item/SR5Item":199,"./item/SR5ItemSheet":200,"./item/flows/NetworkDeviceFlow":203,"./macros":205,"./migrator/Migrator":207,"./rolls/ShadowrunRoller":214,"./settings":220,"./token/SR5Token":223}],161:[function(require,module,exports){
+},{"../test/quench":229,"./actor/SR5Actor":85,"./actor/sheets/SR5CharacterSheet":108,"./actor/sheets/SR5ICActorSheet":109,"./actor/sheets/SR5SpiritActorSheet":110,"./actor/sheets/SR5SpriteActorSheet":111,"./actor/sheets/SR5VehicleActorSheet":112,"./apps/ChangelogApplication":113,"./apps/EnvModifiersApplication":114,"./apps/gmtools/OverwatchScoreTracker":142,"./canvas":146,"./chat":147,"./combat/SR5Combat":148,"./config":149,"./constants":150,"./effect/SR5ActiveEffect":154,"./effect/SR5ActiveEffectSheet":155,"./handlebars/HandlebarManager":159,"./helpers":164,"./importer/apps/import-form":166,"./item/SR5Item":204,"./item/SR5ItemSheet":205,"./item/flows/NetworkDeviceFlow":208,"./macros":210,"./migrator/Migrator":212,"./rolls/ShadowrunRoller":219,"./settings":225,"./token/SR5Token":228}],166:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26786,7 +27133,7 @@ Import.Importers = [
     new EquipmentImporter_1.EquipmentImporter()
 ];
 
-},{"../helper/ImportHelper":162,"../importer/AmmoImporter":166,"../importer/ArmorImporter":167,"../importer/ComplexFormImporter":168,"../importer/CritterPowerImporter":170,"../importer/DataImporter":171,"../importer/DeviceImporter":172,"../importer/EquipmentImporter":173,"../importer/ModImporter":174,"../importer/QualityImporter":175,"../importer/SpellImporter":176,"../importer/WareImporter":177,"../importer/WeaponImporter":178}],162:[function(require,module,exports){
+},{"../helper/ImportHelper":167,"../importer/AmmoImporter":171,"../importer/ArmorImporter":172,"../importer/ComplexFormImporter":173,"../importer/CritterPowerImporter":175,"../importer/DataImporter":176,"../importer/DeviceImporter":177,"../importer/EquipmentImporter":178,"../importer/ModImporter":179,"../importer/QualityImporter":180,"../importer/SpellImporter":181,"../importer/WareImporter":182,"../importer/WeaponImporter":183}],167:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26999,7 +27346,7 @@ exports.ImportHelper = ImportHelper;
 ImportHelper.CHAR_KEY = '_TEXT';
 ImportHelper.s_Strategy = new XMLStrategy_1.XMLStrategy();
 
-},{"../importer/Constants":169,"./JSONStrategy":164,"./XMLStrategy":165}],163:[function(require,module,exports){
+},{"../importer/Constants":174,"./JSONStrategy":169,"./XMLStrategy":170}],168:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ImportStrategy = void 0;
@@ -27007,7 +27354,7 @@ class ImportStrategy {
 }
 exports.ImportStrategy = ImportStrategy;
 
-},{}],164:[function(require,module,exports){
+},{}],169:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.JSONStrategy = void 0;
@@ -27025,7 +27372,7 @@ class JSONStrategy extends ImportStrategy_1.ImportStrategy {
 }
 exports.JSONStrategy = JSONStrategy;
 
-},{"./ImportStrategy":163}],165:[function(require,module,exports){
+},{"./ImportStrategy":168}],170:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.XMLStrategy = void 0;
@@ -27074,7 +27421,7 @@ class XMLStrategy extends ImportStrategy_1.ImportStrategy {
 }
 exports.XMLStrategy = XMLStrategy;
 
-},{"./ImportHelper":162,"./ImportStrategy":163}],166:[function(require,module,exports){
+},{"./ImportHelper":167,"./ImportStrategy":168}],171:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27207,7 +27554,7 @@ class AmmoImporter extends DataImporter_1.DataImporter {
 }
 exports.AmmoImporter = AmmoImporter;
 
-},{"../../data/DataDefaults":146,"../helper/ImportHelper":162,"./Constants":169,"./DataImporter":171}],167:[function(require,module,exports){
+},{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"./Constants":174,"./DataImporter":176}],172:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27288,7 +27635,7 @@ class ArmorImporter extends DataImporter_1.DataImporter {
 }
 exports.ArmorImporter = ArmorImporter;
 
-},{"../../data/DataDefaults":146,"../helper/ImportHelper":162,"../parser/armor/ArmorParserBase":181,"./DataImporter":171}],168:[function(require,module,exports){
+},{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"../parser/armor/ArmorParserBase":186,"./DataImporter":176}],173:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27391,7 +27738,7 @@ class ComplexFormImporter extends DataImporter_1.DataImporter {
 }
 exports.ComplexFormImporter = ComplexFormImporter;
 
-},{"../../data/DataDefaults":146,"../helper/ImportHelper":162,"../parser/complex-form/ComplexFormParserBase":182,"./Constants":169,"./DataImporter":171}],169:[function(require,module,exports){
+},{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"../parser/complex-form/ComplexFormParserBase":187,"./Constants":174,"./DataImporter":176}],174:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Constants = void 0;
@@ -27613,7 +27960,7 @@ Constants.WEAPON_RANGES = {
 };
 Constants.ROOT_IMPORT_FOLDER_NAME = 'SR5e';
 
-},{}],170:[function(require,module,exports){
+},{}],175:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27723,7 +28070,7 @@ class CritterPowerImporter extends DataImporter_1.DataImporter {
 }
 exports.CritterPowerImporter = CritterPowerImporter;
 
-},{"../../data/DataDefaults":146,"../helper/ImportHelper":162,"../parser/critter-power/CritterPowerParserBase":183,"./Constants":169,"./DataImporter":171}],171:[function(require,module,exports){
+},{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"../parser/critter-power/CritterPowerParserBase":188,"./Constants":174,"./DataImporter":176}],176:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27786,7 +28133,7 @@ class DataImporter {
 exports.DataImporter = DataImporter;
 DataImporter.unsupportedBooks = ['2050'];
 
-},{"../helper/ImportHelper":162,"xml2js":51}],172:[function(require,module,exports){
+},{"../helper/ImportHelper":167,"xml2js":51}],177:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27912,7 +28259,7 @@ class DeviceImporter extends DataImporter_1.DataImporter {
 }
 exports.DeviceImporter = DeviceImporter;
 
-},{"../../data/DataDefaults":146,"../helper/ImportHelper":162,"./Constants":169,"./DataImporter":171}],173:[function(require,module,exports){
+},{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"./Constants":174,"./DataImporter":176}],178:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27995,7 +28342,7 @@ class EquipmentImporter extends DataImporter_1.DataImporter {
 }
 exports.EquipmentImporter = EquipmentImporter;
 
-},{"../../data/DataDefaults":146,"../helper/ImportHelper":162,"./Constants":169,"./DataImporter":171}],174:[function(require,module,exports){
+},{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"./Constants":174,"./DataImporter":176}],179:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -28079,7 +28426,7 @@ class ModImporter extends DataImporter_1.DataImporter {
 }
 exports.ModImporter = ModImporter;
 
-},{"../../data/DataDefaults":146,"../helper/ImportHelper":162,"../parser/mod/ModParserBase":186,"./Constants":169,"./DataImporter":171}],175:[function(require,module,exports){
+},{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"../parser/mod/ModParserBase":191,"./Constants":174,"./DataImporter":176}],180:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -28180,7 +28527,7 @@ class QualityImporter extends DataImporter_1.DataImporter {
 }
 exports.QualityImporter = QualityImporter;
 
-},{"../../data/DataDefaults":146,"../helper/ImportHelper":162,"../parser/quality/QualityParserBase":187,"./DataImporter":171}],176:[function(require,module,exports){
+},{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"../parser/quality/QualityParserBase":192,"./DataImporter":176}],181:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -28314,7 +28661,7 @@ class SpellImporter extends DataImporter_1.DataImporter {
 }
 exports.SpellImporter = SpellImporter;
 
-},{"../../data/DataDefaults":146,"../helper/ImportHelper":162,"../parser/ParserMap":180,"../parser/spell/CombatSpellParser":188,"../parser/spell/DetectionSpellImporter":189,"../parser/spell/IllusionSpellParser":190,"../parser/spell/ManipulationSpellParser":191,"../parser/spell/SpellParserBase":192,"./DataImporter":171}],177:[function(require,module,exports){
+},{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"../parser/ParserMap":185,"../parser/spell/CombatSpellParser":193,"../parser/spell/DetectionSpellImporter":194,"../parser/spell/IllusionSpellParser":195,"../parser/spell/ManipulationSpellParser":196,"../parser/spell/SpellParserBase":197,"./DataImporter":176}],182:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -28446,7 +28793,7 @@ class WareImporter extends DataImporter_1.DataImporter {
 }
 exports.WareImporter = WareImporter;
 
-},{"../../data/DataDefaults":146,"../helper/ImportHelper":162,"../parser/ware/CyberwareParser":193,"./DataImporter":171}],178:[function(require,module,exports){
+},{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"../parser/ware/CyberwareParser":198,"./DataImporter":176}],183:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -28603,7 +28950,7 @@ class WeaponImporter extends DataImporter_1.DataImporter {
 }
 exports.WeaponImporter = WeaponImporter;
 
-},{"../../data/DataDefaults":146,"../helper/ImportHelper":162,"../parser/ParserMap":180,"../parser/weapon/MeleeParser":194,"../parser/weapon/RangedParser":195,"../parser/weapon/ThrownParser":196,"../parser/weapon/WeaponParserBase":197,"./Constants":169,"./DataImporter":171}],179:[function(require,module,exports){
+},{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"../parser/ParserMap":185,"../parser/weapon/MeleeParser":199,"../parser/weapon/RangedParser":200,"../parser/weapon/ThrownParser":201,"../parser/weapon/WeaponParserBase":202,"./Constants":174,"./DataImporter":176}],184:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Parser = void 0;
@@ -28611,7 +28958,7 @@ class Parser {
 }
 exports.Parser = Parser;
 
-},{}],180:[function(require,module,exports){
+},{}],185:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ParserMap = void 0;
@@ -28645,7 +28992,7 @@ class ParserMap extends Parser_1.Parser {
 }
 exports.ParserMap = ParserMap;
 
-},{"../helper/ImportHelper":162,"./Parser":179}],181:[function(require,module,exports){
+},{"../helper/ImportHelper":167,"./Parser":184}],186:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ArmorParserBase = void 0;
@@ -28661,7 +29008,7 @@ class ArmorParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBas
 }
 exports.ArmorParserBase = ArmorParserBase;
 
-},{"../../helper/ImportHelper":162,"../item/TechnologyItemParserBase":185}],182:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"../item/TechnologyItemParserBase":190}],187:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ComplexFormParserBase = void 0;
@@ -28711,7 +29058,7 @@ class ComplexFormParserBase extends ItemParserBase_1.ItemParserBase {
 }
 exports.ComplexFormParserBase = ComplexFormParserBase;
 
-},{"../../helper/ImportHelper":162,"../item/ItemParserBase":184}],183:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"../item/ItemParserBase":189}],188:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CritterPowerParserBase = void 0;
@@ -28773,7 +29120,7 @@ class CritterPowerParserBase extends ItemParserBase_1.ItemParserBase {
 }
 exports.CritterPowerParserBase = CritterPowerParserBase;
 
-},{"../../helper/ImportHelper":162,"../item/ItemParserBase":184}],184:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"../item/ItemParserBase":189}],189:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ItemParserBase = void 0;
@@ -28795,7 +29142,7 @@ class ItemParserBase extends Parser_1.Parser {
 }
 exports.ItemParserBase = ItemParserBase;
 
-},{"../../helper/ImportHelper":162,"../Parser":179}],185:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"../Parser":184}],190:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TechnologyItemParserBase = void 0;
@@ -28812,7 +29159,7 @@ class TechnologyItemParserBase extends ItemParserBase_1.ItemParserBase {
 }
 exports.TechnologyItemParserBase = TechnologyItemParserBase;
 
-},{"../../helper/ImportHelper":162,"./ItemParserBase":184}],186:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"./ItemParserBase":189}],191:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ModParserBase = void 0;
@@ -28831,7 +29178,7 @@ class ModParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBase 
 }
 exports.ModParserBase = ModParserBase;
 
-},{"../../helper/ImportHelper":162,"../item/TechnologyItemParserBase":185}],187:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"../item/TechnologyItemParserBase":190}],192:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.QualityParserBase = void 0;
@@ -28854,7 +29201,7 @@ class QualityParserBase extends ItemParserBase_1.ItemParserBase {
 }
 exports.QualityParserBase = QualityParserBase;
 
-},{"../../helper/ImportHelper":162,"../item/ItemParserBase":184}],188:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"../item/ItemParserBase":189}],193:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CombatSpellParser = void 0;
@@ -28880,7 +29227,7 @@ class CombatSpellParser extends SpellParserBase_1.SpellParserBase {
 }
 exports.CombatSpellParser = CombatSpellParser;
 
-},{"../../helper/ImportHelper":162,"./SpellParserBase":192}],189:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"./SpellParserBase":197}],194:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DetectionSpellImporter = void 0;
@@ -28918,7 +29265,7 @@ class DetectionSpellImporter extends SpellParserBase_1.SpellParserBase {
 }
 exports.DetectionSpellImporter = DetectionSpellImporter;
 
-},{"../../helper/ImportHelper":162,"./SpellParserBase":192}],190:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"./SpellParserBase":197}],195:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.IllusionSpellParser = void 0;
@@ -28950,7 +29297,7 @@ class IllusionSpellParser extends SpellParserBase_1.SpellParserBase {
 }
 exports.IllusionSpellParser = IllusionSpellParser;
 
-},{"../../helper/ImportHelper":162,"./SpellParserBase":192}],191:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"./SpellParserBase":197}],196:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ManipulationSpellParser = void 0;
@@ -28990,7 +29337,7 @@ class ManipulationSpellParser extends SpellParserBase_1.SpellParserBase {
 }
 exports.ManipulationSpellParser = ManipulationSpellParser;
 
-},{"../../helper/ImportHelper":162,"./SpellParserBase":192}],192:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"./SpellParserBase":197}],197:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpellParserBase = void 0;
@@ -29053,7 +29400,7 @@ class SpellParserBase extends ItemParserBase_1.ItemParserBase {
 }
 exports.SpellParserBase = SpellParserBase;
 
-},{"../../helper/ImportHelper":162,"../item/ItemParserBase":184}],193:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"../item/ItemParserBase":189}],198:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CyberwareParser = void 0;
@@ -29075,7 +29422,7 @@ class CyberwareParser extends TechnologyItemParserBase_1.TechnologyItemParserBas
 }
 exports.CyberwareParser = CyberwareParser;
 
-},{"../../helper/ImportHelper":162,"../item/TechnologyItemParserBase":185}],194:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"../item/TechnologyItemParserBase":190}],199:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MeleeParser = void 0;
@@ -29123,7 +29470,7 @@ class MeleeParser extends WeaponParserBase_1.WeaponParserBase {
 }
 exports.MeleeParser = MeleeParser;
 
-},{"../../../data/DataDefaults":146,"../../helper/ImportHelper":162,"./WeaponParserBase":197}],195:[function(require,module,exports){
+},{"../../../data/DataDefaults":151,"../../helper/ImportHelper":167,"./WeaponParserBase":202}],200:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RangedParser = void 0;
@@ -29184,7 +29531,7 @@ class RangedParser extends WeaponParserBase_1.WeaponParserBase {
 }
 exports.RangedParser = RangedParser;
 
-},{"../../../data/DataDefaults":146,"../../helper/ImportHelper":162,"../../importer/Constants":169,"./WeaponParserBase":197}],196:[function(require,module,exports){
+},{"../../../data/DataDefaults":151,"../../helper/ImportHelper":167,"../../importer/Constants":174,"./WeaponParserBase":202}],201:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ThrownParser = void 0;
@@ -29284,7 +29631,7 @@ class ThrownParser extends WeaponParserBase_1.WeaponParserBase {
 }
 exports.ThrownParser = ThrownParser;
 
-},{"../../../data/DataDefaults":146,"../../helper/ImportHelper":162,"../../importer/Constants":169,"./WeaponParserBase":197}],197:[function(require,module,exports){
+},{"../../../data/DataDefaults":151,"../../helper/ImportHelper":167,"../../importer/Constants":174,"./WeaponParserBase":202}],202:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WeaponParserBase = void 0;
@@ -29350,7 +29697,7 @@ class WeaponParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBa
 }
 exports.WeaponParserBase = WeaponParserBase;
 
-},{"../../helper/ImportHelper":162,"../../importer/Constants":169,"../item/TechnologyItemParserBase":185}],198:[function(require,module,exports){
+},{"../../helper/ImportHelper":167,"../../importer/Constants":174,"../item/TechnologyItemParserBase":190}],203:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChatData = void 0;
@@ -29697,7 +30044,7 @@ exports.ChatData = {
     },
 };
 
-},{"../config":144,"../helpers":159}],199:[function(require,module,exports){
+},{"../config":149,"../helpers":164}],204:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -31395,7 +31742,7 @@ class SR5Item extends Item {
 }
 exports.SR5Item = SR5Item;
 
-},{"../actor/SR5Actor":85,"../actor/flows/SkillFlow":88,"../apps/dialogs/ShadowrunItemDialog":135,"../chat":142,"../config":144,"../constants":145,"../data/DataDefaults":146,"../data/SR5ItemDataWrapper":148,"../helpers":159,"../parts/PartsList":213,"../rolls/ShadowrunRoller":214,"../rules/MatrixRules":216,"./ChatData":198,"./flows/ActionFlow":201,"./flows/NetworkDeviceFlow":203,"./prep/HostPrep":204}],200:[function(require,module,exports){
+},{"../actor/SR5Actor":85,"../actor/flows/SkillFlow":88,"../apps/dialogs/ShadowrunItemDialog":140,"../chat":147,"../config":149,"../constants":150,"../data/DataDefaults":151,"../data/SR5ItemDataWrapper":153,"../helpers":164,"../parts/PartsList":218,"../rolls/ShadowrunRoller":219,"../rules/MatrixRules":221,"./ChatData":203,"./flows/ActionFlow":206,"./flows/NetworkDeviceFlow":208,"./prep/HostPrep":209}],205:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -31633,7 +31980,7 @@ class SR5ItemSheet extends ItemSheet {
                 data = JSON.parse(event.dataTransfer.getData('text/plain'));
             }
             catch (err) {
-                return console.log('Shadowrun5e | drop error');
+                return console.log('Shadowrun 5e | drop error');
             }
             if (!data)
                 return;
@@ -31692,7 +32039,7 @@ class SR5ItemSheet extends ItemSheet {
                 }
                 //
                 // else if (data.actorId && data.sceneId && data.tokenId) {
-                //     console.log('Shadowrun5e | Adding unlinked token actors item to the network', data);
+                //     console.log('Shadowrun 5e | Adding unlinked token actors item to the network', data);
                 //     const scene = game.scenes.get(data.sceneId);
                 //     if (!scene) return;
                 //     const token = scene.tokens.get(data.tokenId);
@@ -31704,7 +32051,7 @@ class SR5ItemSheet extends ItemSheet {
                 //
                 // // TODO: Collection item
                 // else if (data.id && !data.actorId && !data.sceneId && !data.tokenId) {
-                //     console.log('Shadowrun5e | Adding collection item without actor to the network', data);
+                //     console.log('Shadowrun 5e | Adding collection item without actor to the network', data);
                 // }
                 return;
             }
@@ -31978,7 +32325,7 @@ class SR5ItemSheet extends ItemSheet {
 }
 exports.SR5ItemSheet = SR5ItemSheet;
 
-},{"../config":144,"../effects":151,"../helpers":159,"./SR5Item":199}],201:[function(require,module,exports){
+},{"../config":149,"../effects":156,"../helpers":164,"./SR5Item":204}],206:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ActionFlow = void 0;
@@ -32020,7 +32367,7 @@ class ActionFlow {
 }
 exports.ActionFlow = ActionFlow;
 
-},{"../../helpers":159}],202:[function(require,module,exports){
+},{"../../helpers":164}],207:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -32052,7 +32399,7 @@ class ActionResultFlow {
 }
 exports.ActionResultFlow = ActionResultFlow;
 
-},{"../../rules/MatrixRules":216}],203:[function(require,module,exports){
+},{"../../rules/MatrixRules":221}],208:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -32259,7 +32606,7 @@ class NetworkDeviceFlow {
     static _removeControllerFromDevice(device) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!device.canBeNetworkDevice)
-                return console.error('Shadowrun5e | Given device cant be part of a network', device);
+                return console.error('Shadowrun 5e | Given device cant be part of a network', device);
             if (!NetworkDeviceFlow._currentUserCanModifyDevice(device))
                 return;
             yield device.update({ 'data.technology.networkController': '' });
@@ -32268,14 +32615,14 @@ class NetworkDeviceFlow {
     static _setDevicesOnController(controller, deviceLinks) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!controller.canBeNetworkController)
-                return console.error('Shadowrun5e | Given device cant control a network', controller);
+                return console.error('Shadowrun 5e | Given device cant control a network', controller);
             yield controller.update({ 'data.networkDevices': deviceLinks });
         });
     }
     static _removeAllDevicesFromController(controller) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!controller.canBeNetworkController)
-                return console.error('Shadowrun5e | Given device cant control a network', controller);
+                return console.error('Shadowrun 5e | Given device cant control a network', controller);
             yield controller.update({ 'data.networkDevices': [] });
         });
     }
@@ -32287,7 +32634,7 @@ class NetworkDeviceFlow {
     static _removeDeviceFromController(device) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!device.canBeNetworkDevice)
-                return console.error('Shadowrun5e | Given device cant be part of a network', device);
+                return console.error('Shadowrun 5e | Given device cant be part of a network', device);
             const technologyData = device.getTechnologyData();
             if (!technologyData)
                 return;
@@ -32309,7 +32656,7 @@ class NetworkDeviceFlow {
     static _removeControllerFromAllDevices(controller) {
         return __awaiter(this, void 0, void 0, function* () {
             if (!controller.canBeNetworkController)
-                return console.error('Shadowrun5e | Given device cant control a network', controller);
+                return console.error('Shadowrun 5e | Given device cant control a network', controller);
             const controllerData = controller.asControllerData();
             if (!controllerData)
                 return;
@@ -32370,7 +32717,7 @@ class NetworkDeviceFlow {
 }
 exports.NetworkDeviceFlow = NetworkDeviceFlow;
 
-},{"../../constants":145,"../../sockets":221}],204:[function(require,module,exports){
+},{"../../constants":150,"../../sockets":226}],209:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HostPrep = exports.HostDataPreparation = void 0;
@@ -32400,7 +32747,7 @@ class HostPrep {
 }
 exports.HostPrep = HostPrep;
 
-},{"../../rules/MatrixRules":216}],205:[function(require,module,exports){
+},{"../../rules/MatrixRules":221}],210:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -32524,7 +32871,7 @@ function rollSkillMacro(skillLabel) {
 }
 exports.rollSkillMacro = rollSkillMacro;
 
-},{"./helpers":159}],206:[function(require,module,exports){
+},{"./helpers":164}],211:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const HandlebarManager_1 = require("./handlebars/HandlebarManager");
@@ -32535,7 +32882,7 @@ const hooks_1 = require("./hooks");
 hooks_1.HooksManager.registerHooks();
 HandlebarManager_1.HandlebarManager.registerHelpers();
 
-},{"./handlebars/HandlebarManager":154,"./hooks":160}],207:[function(require,module,exports){
+},{"./handlebars/HandlebarManager":159,"./hooks":165}],212:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -32682,7 +33029,7 @@ Migrator.s_Versions = [
     { versionNumber: Version0_7_2_1.Version0_7_2.TargetVersion, migration: new Version0_7_2_1.Version0_7_2() },
 ];
 
-},{"./VersionMigration":208,"./versions/LegacyMigration":209,"./versions/Version0_6_10":210,"./versions/Version0_6_5":211,"./versions/Version0_7_2":212}],208:[function(require,module,exports){
+},{"./VersionMigration":213,"./versions/LegacyMigration":214,"./versions/Version0_6_10":215,"./versions/Version0_6_5":216,"./versions/Version0_7_2":217}],213:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -33118,7 +33465,7 @@ VersionMigration.MODULE_NAME = 'shadowrun5e';
 VersionMigration.KEY_DATA_VERSION = 'systemMigrationVersion';
 VersionMigration.NO_VERSION = '0';
 
-},{}],209:[function(require,module,exports){
+},{}],214:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -33348,7 +33695,7 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
 }
 exports.LegacyMigration = LegacyMigration;
 
-},{"../VersionMigration":208}],210:[function(require,module,exports){
+},{"../VersionMigration":213}],215:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -33409,7 +33756,7 @@ class Version0_6_10 extends VersionMigration_1.VersionMigration {
 }
 exports.Version0_6_10 = Version0_6_10;
 
-},{"../VersionMigration":208}],211:[function(require,module,exports){
+},{"../VersionMigration":213}],216:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -33460,7 +33807,7 @@ class Version0_6_5 extends VersionMigration_1.VersionMigration {
 }
 exports.Version0_6_5 = Version0_6_5;
 
-},{"../VersionMigration":208}],212:[function(require,module,exports){
+},{"../VersionMigration":213}],217:[function(require,module,exports){
 "use strict";
 // TODO: How to trigger test migration.
 // TODO: How to test migration results?
@@ -33538,7 +33885,7 @@ class Version0_7_2 extends VersionMigration_1.VersionMigration {
 }
 exports.Version0_7_2 = Version0_7_2;
 
-},{"../../config":144,"../VersionMigration":208}],213:[function(require,module,exports){
+},{"../../config":149,"../VersionMigration":213}],218:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.PartsList = void 0;
@@ -33642,7 +33989,7 @@ class PartsList {
 }
 exports.PartsList = PartsList;
 
-},{}],214:[function(require,module,exports){
+},{}],219:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -34028,7 +34375,7 @@ class ShadowrunRoller {
 }
 exports.ShadowrunRoller = ShadowrunRoller;
 
-},{"../apps/dialogs/ShadowrunTestDialog":136,"../chat":142,"../constants":145,"../helpers":159,"../parts/PartsList":213}],215:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunTestDialog":141,"../chat":147,"../constants":150,"../helpers":164,"../parts/PartsList":218}],220:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CombatRules = void 0;
@@ -34073,7 +34420,7 @@ class CombatRules {
 }
 exports.CombatRules = CombatRules;
 
-},{"../constants":145}],216:[function(require,module,exports){
+},{"../constants":150}],221:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatrixRules = void 0;
@@ -34149,7 +34496,7 @@ class MatrixRules {
 }
 exports.MatrixRules = MatrixRules;
 
-},{"../constants":145}],217:[function(require,module,exports){
+},{"../constants":150}],222:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -34347,7 +34694,7 @@ class Modifiers {
 }
 exports.Modifiers = Modifiers;
 
-},{"../constants":145}],218:[function(require,module,exports){
+},{"../constants":150}],223:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SkillRules = void 0;
@@ -34389,7 +34736,7 @@ class SkillRules {
 }
 exports.SkillRules = SkillRules;
 
-},{"../constants":145}],219:[function(require,module,exports){
+},{"../constants":150}],224:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SoakRules = void 0;
@@ -34590,7 +34937,7 @@ class SoakRules {
 }
 exports.SoakRules = SoakRules;
 
-},{"../config":144,"../helpers":159}],220:[function(require,module,exports){
+},{"../config":149,"../helpers":164}],225:[function(require,module,exports){
 "use strict";
 // game settings for shadowrun 5e
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -34708,7 +35055,7 @@ const registerSystemSettings = () => {
 };
 exports.registerSystemSettings = registerSystemSettings;
 
-},{"./constants":145,"./migrator/VersionMigration":208}],221:[function(require,module,exports){
+},{"./constants":150,"./migrator/VersionMigration":213}],226:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -34760,7 +35107,7 @@ class SocketMessage {
 }
 exports.SocketMessage = SocketMessage;
 
-},{"./constants":145}],222:[function(require,module,exports){
+},{"./constants":150}],227:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -34877,7 +35224,7 @@ class Template extends MeasuredTemplate {
 }
 exports.default = Template;
 
-},{}],223:[function(require,module,exports){
+},{}],228:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5Token = void 0;
@@ -34899,11 +35246,18 @@ class SR5Token extends Token {
 }
 exports.SR5Token = SR5Token;
 
-},{"../constants":145}],224:[function(require,module,exports){
+},{"../constants":150}],229:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.quenchRegister = void 0;
+const sr5_Modifiers_spec_1 = require("./sr5.Modifiers.spec");
+const sr5_SR5Item_spec_1 = require("./sr5.SR5Item.spec");
+const sr5_Matrix_spec_1 = require("./sr5.Matrix.spec");
+const sr5_SR5Actor_spec_1 = require("./sr5.SR5Actor.spec");
+const sr5_ActorDataPrep_spec_1 = require("./sr5.ActorDataPrep.spec");
+const sr5_ActiveEffect_spec_1 = require("./sr5.ActiveEffect.spec");
 const sr5_NetworkDevices_spec_1 = require("./sr5.NetworkDevices.spec");
+const sr5_Inventory_spec_1 = require("./sr5.Inventory.spec");
 /**
  * Register FoundryVTT Quench test batches...
  *
@@ -34912,17 +35266,668 @@ const sr5_NetworkDevices_spec_1 = require("./sr5.NetworkDevices.spec");
  * NOTE: Unfortunately FVTT-Quench has no working FoundryVTT 0.8 support and will cause bugs within Foundry.
  */
 const quenchRegister = quench => {
-    // quench.registerBatch("shadowrun5e.rules.matrix", shadowrunMatrix);
-    // quench.registerBatch("shadowrun5e.rules.modifiers", shadowrunRulesModifiers);
-    // quench.registerBatch("shadowrun5e.entities.items", shadowrunSR5Item);
-    // quench.registerBatch("shadowrun5e.entities.actors", shadowrunSR5Actor);
-    // quench.registerBatch("shadowrun5e.entities.effects", shadowrunSR5ActiveEffect);
-    // quench.registerBatch("shadowrun5e.data_prep.actor", shadowrunSR5ActorDataPrep);
+    console.error('Shadowrun 5e | Be aware that FoundryVTT will tank in update performance when a lot of documents are in collections. This is the case if you have all Chummer items imported and might cause tests to cross the 2000ms quench timeout threshold. Clear those collections in a test world. :)');
+    quench.registerBatch("shadowrun5e.rules.matrix", sr5_Matrix_spec_1.shadowrunMatrix);
+    quench.registerBatch("shadowrun5e.rules.modifiers", sr5_Modifiers_spec_1.shadowrunRulesModifiers);
+    quench.registerBatch("shadowrun5e.entities.items", sr5_SR5Item_spec_1.shadowrunSR5Item);
+    quench.registerBatch("shadowrun5e.entities.actors", sr5_SR5Actor_spec_1.shadowrunSR5Actor);
+    quench.registerBatch("shadowrun5e.entities.effects", sr5_ActiveEffect_spec_1.shadowrunSR5ActiveEffect);
+    quench.registerBatch("shadowrun5e.data_prep.actor", sr5_ActorDataPrep_spec_1.shadowrunSR5ActorDataPrep);
     quench.registerBatch("shadowrun5e.flow.networkDevices", sr5_NetworkDevices_spec_1.shadowrunNetworkDevices);
+    quench.registerBatch("shadowrun5e.flow.inventory", sr5_Inventory_spec_1.shadowrunInventoryFlow);
 };
 exports.quenchRegister = quenchRegister;
 
-},{"./sr5.NetworkDevices.spec":225}],225:[function(require,module,exports){
+},{"./sr5.ActiveEffect.spec":230,"./sr5.ActorDataPrep.spec":231,"./sr5.Inventory.spec":232,"./sr5.Matrix.spec":233,"./sr5.Modifiers.spec":234,"./sr5.NetworkDevices.spec":235,"./sr5.SR5Actor.spec":236,"./sr5.SR5Item.spec":237}],230:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.shadowrunSR5ActiveEffect = void 0;
+const utils_1 = require("./utils");
+const SR5Actor_1 = require("../module/actor/SR5Actor");
+const SR5Item_1 = require("../module/item/SR5Item");
+const shadowrunSR5ActiveEffect = context => {
+    const { describe, it, assert, before, after } = context;
+    let testActor;
+    let testItem;
+    before(() => __awaiter(void 0, void 0, void 0, function* () {
+        testActor = new utils_1.SR5TestingDocuments(SR5Actor_1.SR5Actor);
+        testItem = new utils_1.SR5TestingDocuments(SR5Item_1.SR5Item);
+    }));
+    after(() => __awaiter(void 0, void 0, void 0, function* () {
+        yield testActor.teardown();
+        yield testItem.teardown();
+    }));
+    describe('SR5ActiveEffect', () => {
+        it('apply the custom modify mode', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const effect = yield actor.createEmbeddedDocuments('ActiveEffect', [{
+                    origin: actor.uuid,
+                    disabled: false,
+                    label: 'Test Effect'
+                }]);
+            yield effect[0].update({
+                'changes': [{ key: 'data.attributes.body.mod', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
+                    { key: 'data.attributes.body', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
+            });
+            assert.deepEqual(actor.data.data.attributes.body.mod, [{ name: 'Test Effect', value: 2 }, { name: 'Test Effect', value: 2 }]);
+            assert.strictEqual(actor.data.data.attributes.body.value, 4);
+            yield effect[0].update({
+                'changes': [{ key: 'data.attributes.body.mod', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM },
+                    { key: 'data.attributes.body.mod', value: 2, mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM }]
+            });
+        }));
+        it('apply custom modify mode, none ModifiableValue should work as the add mode', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const effect = yield actor.createEmbeddedDocuments('ActiveEffect', [{
+                    origin: actor.uuid,
+                    disabled: false,
+                    label: 'Test Effect'
+                }]);
+            yield effect[0].update({
+                'changes': [{
+                        key: 'data.modifiers.global',
+                        value: 3,
+                        mode: CONST.ACTIVE_EFFECT_MODES.CUSTOM
+                    }]
+            });
+            assert.strictEqual(actor.data.data.modifiers.global, 3);
+            assert.strictEqual(actor.data.data.modifiers.global.mod, undefined);
+            assert.strictEqual(actor.data.data.modifiers.global.override, undefined);
+        }));
+        it('apply the custom override mode', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const effect = yield actor.createEmbeddedDocuments('ActiveEffect', [{
+                    origin: actor.uuid,
+                    disabled: false,
+                    label: 'Test Effect'
+                }]);
+            yield effect[0].update({
+                'changes': [{ key: 'data.attributes.body', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE },
+                    { key: 'data.attributes.body.value', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE }]
+            });
+            assert.deepEqual(actor.data.data.attributes.body.override, { name: 'Test Effect', value: 3 });
+            assert.deepEqual(actor.data.data.attributes.body.mod, []);
+            assert.strictEqual(actor.data.data.attributes.body.value, 3);
+        }));
+        it('apply custom override mode, should override all existing .mod values', () => __awaiter(void 0, void 0, void 0, function* () {
+            it('apply the custom override mode', () => __awaiter(void 0, void 0, void 0, function* () {
+                const actor = yield testActor.create({ type: 'character' });
+                const effect = yield actor.createEmbeddedDocuments('ActiveEffect', [{
+                        origin: actor.uuid,
+                        disabled: false,
+                        label: 'Test Effect'
+                    }]);
+                yield effect[0].update({
+                    'changes': [{ key: 'data.attributes.body.mod', value: 5, mode: CONST.ACTIVE_EFFECT_MODES.ADD },
+                        { key: 'data.attributes.body.value', value: 3, mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE }]
+                });
+                assert.strictEqual(actor.data.data.attributes.body.mod.length, 1);
+                assert.deepEqual(actor.data.data.attributes.body.override, { name: 'Test Effect', value: 3 });
+                assert.deepEqual(actor.data.data.attributes.body.mod, [{ name: 'Test Effect', value: 5 }]);
+                assert.strictEqual(actor.data.data.attributes.body.value, 3);
+            }));
+        }));
+        it('apply custom override mode, none ModifiableValue should work without altering anything', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const effect = yield actor.createEmbeddedDocuments('ActiveEffect', [{
+                    origin: actor.uuid,
+                    disabled: false,
+                    label: 'Test Effect'
+                }]);
+            yield effect[0].update({
+                'changes': [{
+                        key: 'data.modifiers.global',
+                        value: 3,
+                        mode: CONST.ACTIVE_EFFECT_MODES.OVERRIDE
+                    }]
+            });
+            assert.strictEqual(actor.data.data.modifiers.global, 3);
+            assert.strictEqual(actor.data.data.modifiers.global.mod, undefined);
+            assert.strictEqual(actor.data.data.modifiers.global.override, undefined);
+        }));
+    });
+};
+exports.shadowrunSR5ActiveEffect = shadowrunSR5ActiveEffect;
+
+},{"../module/actor/SR5Actor":85,"../module/item/SR5Item":204,"./utils":238}],231:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.shadowrunSR5ActorDataPrep = void 0;
+const utils_1 = require("./utils");
+const SR5Actor_1 = require("../module/actor/SR5Actor");
+const SR5Item_1 = require("../module/item/SR5Item");
+const constants_1 = require("../module/constants");
+const shadowrunSR5ActorDataPrep = context => {
+    const { describe, it, assert, before, after } = context;
+    let testActor;
+    let testItem;
+    before(() => __awaiter(void 0, void 0, void 0, function* () {
+        testActor = new utils_1.SR5TestingDocuments(SR5Actor_1.SR5Actor);
+        testItem = new utils_1.SR5TestingDocuments(SR5Item_1.SR5Item);
+    }));
+    after(() => __awaiter(void 0, void 0, void 0, function* () {
+        yield testActor.teardown();
+        yield testItem.teardown();
+    }));
+    describe('CharacterDataPrep', () => {
+        it('Character default attribute values', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character', metatype: 'human' });
+            // Check for attribute min values;
+            console.log('Physical attributes');
+            assert.strictEqual(actor.data.data.attributes.body.value, constants_1.SR.attributes.ranges['body'].min);
+            assert.strictEqual(actor.data.data.attributes.agility.value, constants_1.SR.attributes.ranges['agility'].min);
+            assert.strictEqual(actor.data.data.attributes.reaction.value, constants_1.SR.attributes.ranges['reaction'].min);
+            assert.strictEqual(actor.data.data.attributes.strength.value, constants_1.SR.attributes.ranges['strength'].min);
+            assert.strictEqual(actor.data.data.attributes.willpower.value, constants_1.SR.attributes.ranges['willpower'].min);
+            assert.strictEqual(actor.data.data.attributes.logic.value, constants_1.SR.attributes.ranges['logic'].min);
+            assert.strictEqual(actor.data.data.attributes.intuition.value, constants_1.SR.attributes.ranges['intuition'].min);
+            assert.strictEqual(actor.data.data.attributes.charisma.value, constants_1.SR.attributes.ranges['charisma'].min);
+            console.log('Comon special attributes');
+            assert.strictEqual(actor.data.data.attributes.edge.value, constants_1.SR.attributes.ranges['edge'].min);
+            assert.strictEqual(actor.data.data.attributes.essence.value, constants_1.SR.attributes.defaults['essence']);
+            console.log('Special special attributes');
+            assert.strictEqual(actor.data.data.attributes.resonance.value, constants_1.SR.attributes.ranges['resonance'].min);
+            assert.strictEqual(actor.data.data.attributes.magic.value, constants_1.SR.attributes.ranges['magic'].min);
+        }));
+        it('Character monitor calculation', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            let data = actor.asCharacterData();
+            // Check default values.
+            assert.strictEqual(data.data.track.stun.max, 9); // 8 + round_up(1 / 2)
+            assert.strictEqual(data.data.track.physical.max, 9); // 8 + round_up(1 / 2)
+            assert.strictEqual(data.data.track.physical.overflow.max, constants_1.SR.attributes.ranges.body.min); // body value
+            // Check calculated values after update.
+            yield actor.update({
+                'data.attributes.body.base': 6,
+                'data.attributes.willpower.base': 6,
+            });
+            assert.strictEqual(data.data.track.stun.max, 11); // 8 + round_up(6 / 2)
+            assert.strictEqual(data.data.track.physical.max, 11); // 8 + round_up(6 / 2)
+            assert.strictEqual(data.data.track.physical.overflow.max, 6); // body value
+        }));
+        it('Character initiative calculation', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const data = actor.asCharacterData();
+            // Check default values.
+            console.log('Meatspace Ini');
+            assert.strictEqual(data.data.initiative.meatspace.base.base, 2); // REA+INT
+            assert.strictEqual(data.data.initiative.meatspace.dice.base, 1);
+            console.log('Matrix AR Ini');
+            assert.strictEqual(data.data.initiative.matrix.base.base, 1); // No matrix device
+            assert.strictEqual(data.data.initiative.matrix.dice.base, 3); // Cold SIM
+            console.log('Magic Ini');
+            assert.strictEqual(data.data.initiative.astral.base.base, 2); // INT+INT
+            assert.strictEqual(data.data.initiative.astral.dice.base, 2);
+        }));
+        it('Character limit calculation', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const data = actor.asCharacterData();
+            assert.strictEqual(data.data.limits.physical.value, 2); // (STR*2 + BOD + REA) / 3
+            assert.strictEqual(data.data.limits.mental.value, 2); // (LOG*2 + INT + WIL) / 3
+            assert.strictEqual(data.data.limits.social.value, 3); // (CHA*2 + WILL + ESS) / 3
+            yield actor.update({
+                'data.attributes.strength.base': 6,
+                'data.attributes.body.base': 6,
+                'data.attributes.reaction.base': 6,
+                'data.attributes.logic.base': 6,
+                'data.attributes.intuition.base': 6,
+                'data.attributes.willpower.base': 6,
+                'data.attributes.charisma.base': 6,
+                'data.attributes.essence.base': 6,
+            });
+            assert.strictEqual(data.data.limits.physical.value, 8);
+            assert.strictEqual(data.data.limits.mental.value, 8);
+            assert.strictEqual(data.data.limits.social.value, 8);
+        }));
+        it('Character movement calculation', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const data = actor.asCharacterData();
+            assert.strictEqual(data.data.movement.walk.value, 2); // AGI * 2
+            assert.strictEqual(data.data.movement.run.value, 4); // AGI * 4
+            yield actor.update({
+                'data.attributes.agility.base': 6
+            });
+            assert.strictEqual(data.data.movement.walk.value, 12);
+            assert.strictEqual(data.data.movement.run.value, 24);
+        }));
+        it('Character skill calculation', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const data = actor.asCharacterData();
+            yield actor.update({
+                'data.skills.active.arcana.base': 6,
+                'data.skills.active.arcana.bonus': [{ key: 'Test', value: 1 }],
+                'data.skills.active.arcana.specs': ['Test']
+            });
+            assert.strictEqual(data.data.skills.active.arcana.value, 7);
+        }));
+        it('Character damage application', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const data = actor.asCharacterData();
+            assert.strictEqual(data.data.track.stun.value, 0);
+            assert.strictEqual(data.data.track.stun.wounds, 0);
+            assert.strictEqual(data.data.track.physical.value, 0);
+            assert.strictEqual(data.data.track.physical.wounds, 0);
+            assert.strictEqual(data.data.wounds.value, 0);
+            yield actor.update({
+                'data.track.stun.value': 3,
+                'data.track.physical.value': 3,
+            });
+            assert.strictEqual(data.data.track.stun.value, 3);
+            assert.strictEqual(data.data.track.stun.wounds, 1);
+            assert.strictEqual(data.data.track.physical.value, 3);
+            assert.strictEqual(data.data.track.physical.wounds, 1);
+            assert.strictEqual(data.data.wounds.value, 2);
+        }));
+        it('Character damage application with high pain/wound tolerance', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            const data = actor.asCharacterData();
+            yield actor.update({
+                'data.track.stun.value': 6,
+                'data.track.physical.value': 6,
+                'data.modifiers.wound_tolerance': 3
+            });
+            assert.strictEqual(data.data.track.stun.value, 6);
+            assert.strictEqual(data.data.track.stun.wounds, 1); // would normally be 2 (-2)
+            assert.strictEqual(data.data.track.physical.value, 6);
+            assert.strictEqual(data.data.track.physical.wounds, 1);
+            assert.strictEqual(data.data.wounds.value, 2); // would normally be 4 (-4)
+        }));
+    });
+    describe('SpiritDataPrep', () => {
+        it('Spirits are always magical', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'spirit' });
+            assert.strictEqual(actor.data.data.special, 'magic');
+        }));
+        it('Spirit default/overrides by example type', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'spirit', 'data.spiritType': 'air' });
+            const data = actor.asSpiritData();
+            // Without adequate force there will be negative base values with minimum attribute values.
+            assert.strictEqual(data.data.attributes.body.base, -2);
+            assert.strictEqual(data.data.attributes.agility.base, 3);
+            assert.strictEqual(data.data.attributes.reaction.base, 4);
+            assert.strictEqual(data.data.attributes.strength.base, -3);
+            assert.strictEqual(data.data.attributes.intuition.base, 0);
+            assert.strictEqual(data.data.initiative.meatspace.base.base, 4); // force * 2 + override;
+            assert.strictEqual(data.data.skills.active.assensing.base, 0);
+            yield actor.update({
+                'data.force': 6
+            });
+            assert.strictEqual(data.data.attributes.body.base, 4);
+            assert.strictEqual(data.data.attributes.agility.base, 9);
+            assert.strictEqual(data.data.attributes.reaction.base, 10);
+            assert.strictEqual(data.data.attributes.strength.base, 3);
+            assert.strictEqual(data.data.attributes.intuition.base, 6); // set by force without spirit type mods.
+            assert.strictEqual(data.data.initiative.meatspace.base.base, 16);
+            assert.strictEqual(data.data.skills.active.assensing.base, 6);
+            assert.strictEqual(data.data.skills.active.arcana.base, 0); // not for this spirit type.
+        }));
+    });
+    describe('SpriteDataPrep', () => {
+        it('Sprites are always awakened', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'sprite' });
+            assert.strictEqual(actor.data.data.special, 'resonance');
+        }));
+        it('Sprites default/override values by example type', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'sprite', 'data.spriteType': 'courier' });
+            const data = actor.asSpriteData();
+            assert.strictEqual(data.data.matrix.sleaze.base, 3);
+            assert.strictEqual(data.data.matrix.data_processing.base, 1);
+            assert.strictEqual(data.data.matrix.firewall.base, 2);
+            assert.strictEqual(data.data.matrix.sleaze.base, 3);
+            assert.strictEqual(data.data.initiative.matrix.base.base, 1);
+            assert.strictEqual(data.data.skills.active.hacking.base, 0);
+            yield actor.update({
+                'data.level': 6
+            });
+            assert.strictEqual(data.data.level, 6);
+            assert.strictEqual(data.data.matrix.sleaze.base, 9);
+            assert.strictEqual(data.data.matrix.data_processing.base, 7);
+            assert.strictEqual(data.data.matrix.firewall.base, 8);
+            assert.strictEqual(data.data.matrix.sleaze.base, 9);
+            assert.strictEqual(data.data.initiative.matrix.base.base, 13);
+            assert.strictEqual(data.data.initiative.matrix.dice.base, 4);
+            assert.strictEqual(data.data.skills.active.hacking.base, 6);
+            assert.strictEqual(data.data.skills.active.computer.base, 6); // all sprites
+            assert.strictEqual(data.data.skills.active.electronic_warfare.base, 0); // not set by sprite type.
+        }));
+    });
+};
+exports.shadowrunSR5ActorDataPrep = shadowrunSR5ActorDataPrep;
+
+},{"../module/actor/SR5Actor":85,"../module/constants":150,"../module/item/SR5Item":204,"./utils":238}],232:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.shadowrunInventoryFlow = void 0;
+const utils_1 = require("./utils");
+const SR5Actor_1 = require("../module/actor/SR5Actor");
+const SR5Item_1 = require("../module/item/SR5Item");
+const shadowrunInventoryFlow = context => {
+    const { describe, it, assert, should, before, after } = context;
+    let testActor;
+    let testItem;
+    before(() => __awaiter(void 0, void 0, void 0, function* () {
+        testActor = new utils_1.SR5TestingDocuments(SR5Actor_1.SR5Actor);
+        testItem = new utils_1.SR5TestingDocuments(SR5Item_1.SR5Item);
+    }));
+    after(() => __awaiter(void 0, void 0, void 0, function* () {
+        yield testActor.teardown();
+        yield testItem.teardown();
+    }));
+    describe('InventoryFlow testing', () => {
+        it('Should create a new inventory and know of its existance', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            yield actor.inventory.create('test');
+            assert.deepEqual(actor.data.data.inventories, {
+                'test': {
+                    name: 'test',
+                    label: 'test',
+                    itemIds: []
+                }
+            });
+            assert.strictEqual(actor.inventory.exists('test'), true);
+        }));
+        it('Should remove an inventory', () => __awaiter(void 0, void 0, void 0, function* () {
+            const inventoriesData = { test: { name: 'test', label: 'test', itemIds: [] } };
+            const actor = yield testActor.create({ type: 'character', 'data.inventories': inventoriesData });
+            yield actor.inventory.remove('test');
+            assert.deepEqual(actor.data.data.inventories, {});
+        }));
+        it('Should add and remove an item to and from an inventory', () => __awaiter(void 0, void 0, void 0, function* () {
+            const inventoriesData = { test: { name: 'test', label: 'test', itemIds: [] } };
+            const actor = yield testActor.create({ type: 'character', 'data.inventories': inventoriesData });
+            const item = yield actor.createEmbeddedDocuments('Item', [{ type: 'weapon', name: 'Test Weapon' }]);
+            yield actor.inventory.addItems('test', item);
+            const itemIds = item.map(item => item.id);
+            assert.deepEqual(actor.data.data.inventories.test.itemIds, itemIds);
+            yield actor.inventory.removeItem(item[0]);
+            assert.deepEqual(actor.data.data.inventories.test.itemIds, []);
+        }));
+        it('Should rename an existing inventory', () => __awaiter(void 0, void 0, void 0, function* () {
+            const inventoriesData = { test: { name: 'test', label: 'test', itemIds: ['asd'] } };
+            const actor = yield testActor.create({ type: 'character', 'data.inventories': inventoriesData });
+            yield actor.inventory.rename('test', 'betterTest');
+            assert.deepEqual(actor.data.data.inventories, {
+                'betterTest': {
+                    name: 'betterTest',
+                    label: 'betterTest',
+                    itemIds: ['asd']
+                }
+            });
+        }));
+    });
+};
+exports.shadowrunInventoryFlow = shadowrunInventoryFlow;
+
+},{"../module/actor/SR5Actor":85,"../module/item/SR5Item":204,"./utils":238}],233:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.shadowrunMatrix = void 0;
+const MatrixRules_1 = require("../module/rules/MatrixRules");
+const shadowrunMatrix = context => {
+    const { describe, it, assert, before, after } = context;
+    describe('Matrix Rules', () => {
+        it('Should calculate IC device rating', () => {
+            let hostRating = 5;
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICDeviceRating(hostRating), hostRating);
+            // Negative values shouldn't break the system.
+            hostRating = -1;
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICDeviceRating(hostRating), 0);
+        });
+        it('Should calculate IC condition monitor', () => {
+            // 8 is the minimum value possible
+            assert.strictEqual(MatrixRules_1.MatrixRules.getConditionMonitor(0), 8);
+            // Check round up
+            assert.strictEqual(MatrixRules_1.MatrixRules.getConditionMonitor(1), 9);
+            // Check no rounding
+            assert.strictEqual(MatrixRules_1.MatrixRules.getConditionMonitor(4), 10);
+            // Negative values shouldn't break the system.
+            assert.strictEqual(MatrixRules_1.MatrixRules.getConditionMonitor(-1), 8);
+        });
+        it('Should calculate IC matrix initiative base', () => {
+            // 0 is the minimum value possible
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICInitiativeBase(0), 0);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICInitiativeBase(-3), 0);
+            // Check expected value scaling
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICInitiativeBase(1), 2);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICInitiativeBase(2), 4);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICInitiativeBase(3), 6);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICInitiativeBase(12), 24);
+        });
+        it('Should calculate IC matrix initiative dice', () => {
+            // 4 is the only value possible
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICInitiativeDice(), 4);
+        });
+        it('Should calculate meat attribute base with the host rating', () => {
+            // 0 is the minimum value possible
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICMeatAttributeBase(0), 0);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICMeatAttributeBase(-3), 0);
+            // All other values should equal
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICMeatAttributeBase(3), 3);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getICMeatAttributeBase(27), 27);
+        });
+        it('Should disallow invalid marks counters', () => {
+            assert.isTrue(MatrixRules_1.MatrixRules.isValidMarksCount(0));
+            assert.isTrue(MatrixRules_1.MatrixRules.isValidMarksCount(1));
+            assert.isTrue(MatrixRules_1.MatrixRules.isValidMarksCount(2));
+            assert.isTrue(MatrixRules_1.MatrixRules.isValidMarksCount(3));
+            assert.isFalse(MatrixRules_1.MatrixRules.isValidMarksCount(-1));
+            assert.isFalse(MatrixRules_1.MatrixRules.isValidMarksCount(4));
+            assert.isFalse(MatrixRules_1.MatrixRules.isValidMarksCount(1.5));
+        });
+        it('Should return valid marks counts', () => {
+            assert.strictEqual(MatrixRules_1.MatrixRules.getValidMarksCount(-1), MatrixRules_1.MatrixRules.minMarksCount());
+            assert.strictEqual(MatrixRules_1.MatrixRules.getValidMarksCount(0), 0);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getValidMarksCount(1), 1);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getValidMarksCount(2), 2);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getValidMarksCount(3), 3);
+            assert.strictEqual(MatrixRules_1.MatrixRules.getValidMarksCount(4), MatrixRules_1.MatrixRules.maxMarksCount());
+        });
+        it('Should return expected host matrix attribute ratings', () => {
+            assert.deepEqual(MatrixRules_1.MatrixRules.hostMatrixAttributeRatings(1), [2, 3, 4, 5]);
+            assert.deepEqual(MatrixRules_1.MatrixRules.hostMatrixAttributeRatings(2), [3, 4, 5, 6]);
+            assert.deepEqual(MatrixRules_1.MatrixRules.hostMatrixAttributeRatings(10), [11, 12, 13, 14]);
+        });
+    });
+};
+exports.shadowrunMatrix = shadowrunMatrix;
+
+},{"../module/rules/MatrixRules":221}],234:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.shadowrunRulesModifiers = void 0;
+const Modifiers_1 = require("../module/rules/Modifiers");
+const shadowrunRulesModifiers = context => {
+    const { describe, it, assert } = context;
+    const defaultModifiers = {
+        environmental: {
+            active: {},
+            total: 0
+        }
+    };
+    const activeModifiers = {
+        environmental: {
+            active: {
+                wind: -1,
+                light: -1
+            },
+            total: -3
+        }
+    };
+    describe('SR5 Modifiers', () => {
+        it('should create default modifier values', () => {
+            const modifiers = Modifiers_1.Modifiers.getDefaultModifiers();
+            assert.deepEqual(modifiers, defaultModifiers);
+        });
+        it('should use default modifiers for faulty constructor params', () => {
+            //@ts-ignore
+            assert.deepEqual(new Modifiers_1.Modifiers({}).data, defaultModifiers);
+            //@ts-ignore
+            assert.deepEqual(new Modifiers_1.Modifiers(undefined).data, defaultModifiers);
+            //@ts-ignore
+            assert.deepEqual(new Modifiers_1.Modifiers(null).data, defaultModifiers);
+            //@ts-ignore
+            assert.deepEqual(new Modifiers_1.Modifiers(0).data, defaultModifiers);
+            //@ts-ignore
+            assert.deepEqual(new Modifiers_1.Modifiers(1).data, defaultModifiers);
+            //@ts-ignore
+            assert.deepEqual(new Modifiers_1.Modifiers().data, defaultModifiers);
+        });
+        it('should set an environmental modifier active', () => {
+            const modifiers = new Modifiers_1.Modifiers(defaultModifiers);
+            modifiers._setEnvironmentalCategoryActive('wind', -1);
+            //@ts-ignore(modifiers.environmental.active).to.eql({wind: -1});
+        });
+        it('should set an environmental modifier inactive', () => {
+            const modifiers = new Modifiers_1.Modifiers({
+                environmental: {
+                    active: {
+                        wind: -1,
+                        light: -3
+                    },
+                    total: 0
+                }
+            });
+            modifiers._setEnvironmentalCategoryInactive('wind');
+            assert.deepEqual(modifiers.environmental.active, { light: -3 });
+        });
+        it('should understand active environmental modifiers', () => {
+            const modifiersActive = new Modifiers_1.Modifiers({
+                environmental: {
+                    active: {
+                        wind: -1,
+                        light: -3
+                    },
+                    total: 0
+                }
+            });
+            assert.equal(modifiersActive.hasActiveEnvironmental, true);
+            const modifiersInactive = new Modifiers_1.Modifiers({
+                environmental: {
+                    active: {},
+                    total: 0
+                }
+            });
+            assert.equal(modifiersInactive.hasActiveEnvironmental, false);
+        });
+        it('should calculate the total according to sr5 rules', () => {
+            const modifiers = new Modifiers_1.Modifiers(defaultModifiers);
+            assert.equal(modifiers.environmental.total, 0);
+            modifiers.environmental.active.wind = -1;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -1);
+            modifiers.environmental.active.light = -1;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -3);
+            modifiers.environmental.active.range = -1;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -3);
+            delete modifiers.environmental.active.light;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -3);
+            modifiers.environmental.active.light = 0;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -3);
+            modifiers.environmental.active.wind = -3;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -3);
+            modifiers.environmental.active.light = -3;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -6);
+            modifiers.environmental.active.range = -3;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -6);
+            delete modifiers.environmental.active.light;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -6);
+            modifiers.environmental.active.light = 0;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -6);
+            modifiers.environmental.active.wind = -6;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -6);
+            modifiers.environmental.active.light = -6;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -10);
+            modifiers.environmental.active.range = -6;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -10);
+            delete modifiers.environmental.active.light;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -10);
+            modifiers.environmental.active.light = 0;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -10);
+            modifiers.environmental.active.value = 0;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, 0);
+            modifiers.environmental.active.value = -1;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -1);
+            modifiers.environmental.active.value = -3;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -3);
+            modifiers.environmental.active.value = -6;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -6);
+            modifiers.environmental.active.value = -10;
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, -10);
+        });
+        it('should reset active environmental modifiers', () => {
+            const modifiers = new Modifiers_1.Modifiers(activeModifiers);
+            modifiers._resetEnvironmental();
+            assert.deepEqual(modifiers.environmental.active, {});
+        });
+        it('should calculate total for faulty active', () => {
+            const modifiers = new Modifiers_1.Modifiers({
+                environmental: {
+                    total: -1,
+                    active: {
+                        //@ts-ignore
+                        light: null,
+                        wind: undefined,
+                        //@ts-ignore
+                        range: '',
+                        //@ts-ignore
+                        visibility: 'string'
+                    }
+                }
+            });
+            modifiers.calcEnvironmentalTotal();
+            assert.equal(modifiers.environmental.total, 0);
+        });
+    });
+};
+exports.shadowrunRulesModifiers = shadowrunRulesModifiers;
+
+},{"../module/rules/Modifiers":222}],235:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -34955,6 +35960,7 @@ const shadowrunNetworkDevices = context => {
         yield testScene.teardown();
     }));
     describe('Network Devices handling', () => {
+        // TODO: Redesign them with only necessary update methods in place. Instead start of with ActorData prefilled on create.
         it('Should give a network link to given document class', () => __awaiter(void 0, void 0, void 0, function* () {
             const actor = yield testActor.create({ 'type': 'character' });
             const link = NetworkDeviceFlow_1.NetworkDeviceFlow.buildLink(actor);
@@ -35011,8 +36017,6 @@ const shadowrunNetworkDevices = context => {
         it('Should get all connected network devices of a controller as their Document', () => __awaiter(void 0, void 0, void 0, function* () {
             const controller = yield testItem.create({ type: 'device' });
             const devices = [
-                yield testItem.create({ type: 'weapon' }),
-                yield testItem.create({ type: 'weapon' }),
                 yield testItem.create({ type: 'weapon' })
             ];
             for (const device of devices) {
@@ -35020,8 +36024,8 @@ const shadowrunNetworkDevices = context => {
             }
             const fetchedDevices = NetworkDeviceFlow_1.NetworkDeviceFlow.getNetworkDevices(controller);
             // Check for structural equality.
-            assert.strictEqual(controller.data.data.networkDevices.length, 3);
-            assert.strictEqual(fetchedDevices.length, 3);
+            assert.strictEqual(controller.data.data.networkDevices.length, 1);
+            assert.strictEqual(fetchedDevices.length, 1);
             // Check for referential equality.
             for (const fetched of fetchedDevices) {
                 assert.include(devices, fetched);
@@ -35064,8 +36068,6 @@ const shadowrunNetworkDevices = context => {
         it('Should remove all devices from a controller', () => __awaiter(void 0, void 0, void 0, function* () {
             const controller = yield testItem.create({ type: 'device' });
             const devices = [
-                yield testItem.create({ type: 'weapon' }),
-                yield testItem.create({ type: 'weapon' }),
                 yield testItem.create({ type: 'weapon' })
             ];
             for (const device of devices) {
@@ -35081,7 +36083,157 @@ const shadowrunNetworkDevices = context => {
 };
 exports.shadowrunNetworkDevices = shadowrunNetworkDevices;
 
-},{"../module/actor/SR5Actor":85,"../module/item/SR5Item":199,"../module/item/flows/NetworkDeviceFlow":203,"./utils":226}],226:[function(require,module,exports){
+},{"../module/actor/SR5Actor":85,"../module/item/SR5Item":204,"../module/item/flows/NetworkDeviceFlow":208,"./utils":238}],236:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.shadowrunSR5Actor = void 0;
+const SR5Actor_1 = require("../module/actor/SR5Actor");
+const SR5Item_1 = require("../module/item/SR5Item");
+const utils_1 = require("./utils");
+const shadowrunSR5Actor = context => {
+    const { describe, it, assert, before, after } = context;
+    let testActor;
+    let testItem;
+    before(() => __awaiter(void 0, void 0, void 0, function* () {
+        testActor = new utils_1.SR5TestingDocuments(SR5Actor_1.SR5Actor);
+        testItem = new utils_1.SR5TestingDocuments(SR5Item_1.SR5Item);
+    }));
+    after(() => __awaiter(void 0, void 0, void 0, function* () {
+        yield testActor.teardown();
+        yield testItem.teardown();
+    }));
+    describe('SR5Actor', () => {
+        it('Should create a naked actor of any type', () => __awaiter(void 0, void 0, void 0, function* () {
+            var _a;
+            const actor = yield testActor.create({ type: 'character' });
+            // Check basic foundry data integrity
+            assert.notStrictEqual(actor.id, '');
+            assert.notStrictEqual(actor.id, undefined);
+            assert.notStrictEqual(actor.id, null);
+            // Check foundry item collection integrity
+            const fromCollection = (_a = game.actors) === null || _a === void 0 ? void 0 : _a.get(actor.id);
+            assert.isOk(fromCollection);
+            assert.strictEqual(actor.id, fromCollection === null || fromCollection === void 0 ? void 0 : fromCollection.id);
+        }));
+        it('Should update an actor of any time', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actor = yield testActor.create({ type: 'character' });
+            assert.notProperty(actor.data.data, 'test');
+            yield actor.update({ 'data.test': true });
+            assert.property(actor.data.data, 'test');
+            assert.propertyVal(actor.data.data, 'test', true);
+        }));
+        it('Should embedd a weapon into an actor and not the global item colection', () => __awaiter(void 0, void 0, void 0, function* () {
+            var _b;
+            const actor = yield testActor.create({ type: 'character' });
+            const weapon = yield testItem.create({ type: 'weapon' });
+            yield actor.createEmbeddedDocuments('Item', [weapon.data]);
+            const ownedItems = Array.from(actor.items);
+            assert.isNotEmpty(ownedItems);
+            assert.lengthOf(ownedItems, 1);
+            const ownedItem = ownedItems[0];
+            assert.strictEqual(ownedItem.type, weapon.data.type);
+            // An owned item should NOT appear in the items collection.
+            const ownedInCollection = (_b = game.items) === null || _b === void 0 ? void 0 : _b.get(ownedItem.id);
+            assert.isNotOk(ownedInCollection);
+        }));
+    });
+};
+exports.shadowrunSR5Actor = shadowrunSR5Actor;
+
+},{"../module/actor/SR5Actor":85,"../module/item/SR5Item":204,"./utils":238}],237:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.shadowrunSR5Item = void 0;
+const SR5Item_1 = require("../module/item/SR5Item");
+const utils_1 = require("./utils");
+const shadowrunSR5Item = context => {
+    /**
+     * Setup handling for all items within this test.
+     */
+    const { describe, it, assert, before, after } = context;
+    let testItem;
+    before(() => __awaiter(void 0, void 0, void 0, function* () {
+        testItem = new utils_1.SR5TestingDocuments(SR5Item_1.SR5Item);
+    }));
+    after(() => __awaiter(void 0, void 0, void 0, function* () {
+        yield testItem.teardown();
+    }));
+    describe('SR5Items', () => {
+        it('Should create a naked item of any type', () => __awaiter(void 0, void 0, void 0, function* () {
+            var _a;
+            const item = yield testItem.create({ type: 'action' });
+            // Check basic foundry data integrity
+            assert.notStrictEqual(item.id, '');
+            assert.notStrictEqual(item.id, undefined);
+            assert.notStrictEqual(item.id, null);
+            // Check foundry item collection integrity
+            const itemFromCollection = (_a = game.items) === null || _a === void 0 ? void 0 : _a.get(item.id);
+            assert.notStrictEqual(itemFromCollection, null);
+            assert.strictEqual(item.id, itemFromCollection === null || itemFromCollection === void 0 ? void 0 : itemFromCollection.id);
+        }));
+        it('Should update an item of any type', () => __awaiter(void 0, void 0, void 0, function* () {
+            const item = yield testItem.create({ type: 'action' });
+            assert.notProperty(item.data.data, 'test');
+            yield item.update({ 'data.test': true });
+            assert.property(item.data.data, 'test');
+            assert.propertyVal(item.data.data, 'test', true);
+        }));
+        it('Should embedd a ammo into a weapon and not the global item collection', () => __awaiter(void 0, void 0, void 0, function* () {
+            var _b;
+            const weapon = yield testItem.create({ type: 'weapon' });
+            const ammo = yield testItem.create({ type: 'ammo' });
+            yield weapon.createOwnedItem(ammo.data);
+            const embeddedItemDatas = weapon.getNestedItems();
+            assert.isNotEmpty(embeddedItemDatas);
+            assert.lengthOf(embeddedItemDatas, 1);
+            const embeddedAmmoData = embeddedItemDatas[0];
+            assert.strictEqual(embeddedAmmoData.type, ammo.data.type);
+            // An embedded item should NOT appear in the items collection.
+            const embeddedAmmoInCollection = (_b = game.items) === null || _b === void 0 ? void 0 : _b.get(embeddedAmmoData._id);
+            assert.strictEqual(embeddedAmmoInCollection, undefined);
+        }));
+        it('Should update an embedded ammo', () => __awaiter(void 0, void 0, void 0, function* () {
+            const weapon = yield testItem.create({ type: 'weapon' });
+            const ammo = yield testItem.create({ type: 'ammo' });
+            // Embed the item and get
+            yield weapon.createOwnedItem(ammo.data);
+            const embeddedItemDatas = weapon.getNestedItems();
+            assert.lengthOf(embeddedItemDatas, 1);
+            const embeddedAmmoData = embeddedItemDatas[0];
+            const embeddedAmmo = weapon.getOwnedItem(embeddedAmmoData._id);
+            assert.notStrictEqual(embeddedAmmo, undefined);
+            assert.instanceOf(embeddedAmmo, SR5Item_1.SR5Item);
+            if (!embeddedAmmo)
+                return; //type script gate...
+            // Set an testing property.
+            assert.notProperty(embeddedAmmo.data.data, 'test');
+            yield embeddedAmmo.update({ 'data.test': true });
+            assert.property(embeddedAmmo.data.data, 'test');
+            assert.propertyVal(embeddedAmmo.data.data, 'test', true);
+        }));
+    });
+};
+exports.shadowrunSR5Item = shadowrunSR5Item;
+
+},{"../module/item/SR5Item":204,"./utils":238}],238:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35126,6 +36278,6 @@ class SR5TestingDocuments {
 }
 exports.SR5TestingDocuments = SR5TestingDocuments;
 
-},{}]},{},[206])
+},{}]},{},[211])
 
 //# sourceMappingURL=bundle.js.map

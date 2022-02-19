@@ -96,10 +96,12 @@ export class FormDialog extends Dialog {
         return !this.canceled;
     }
 
-    /** Dialog has been canceled and nothing has been selected
+    /** Dialog has been canceled and nothing has been selected.
+     *
+     * Will also report cancel if a cancel button has been defined.
      */
     get canceled(): boolean {
-        return !this.selectedButton;
+        return !this.selectedButton || this.selectedButton === 'cancel';
     }
 
     /** @override */

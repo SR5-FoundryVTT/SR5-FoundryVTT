@@ -8,6 +8,10 @@ declare namespace Shadowrun {
         special: SpecialTrait
         initiative: Initiative
         modifiers: Modifiers
+        /**
+         * Actor inventories allow to show items separated out into different places / inventories.
+         */
+        inventories: InventoriesData
     }
 
     export interface MagicData {
@@ -63,4 +67,14 @@ declare namespace Shadowrun {
      * on.
      */
     export interface MatrixMarks extends Record<string, number>{}
+
+    export type InventoriesData = Record<string, InventoryData>
+    /**
+     * An inventory is a set of items with a name.
+     */
+    export interface InventoryData {
+        name: string  // Internal name.
+        label: string // Displayed name, can be the same as 'name' when user created.
+        itemIds: string[] // Item ids to show within this inventory.
+    }
 }

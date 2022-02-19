@@ -191,6 +191,8 @@
   "SR5.CreateItemLifestyle": "Erstelle Lebensstil",
   "SR5.CreateItemContact": "Erstelle Kontakt",
   "SR5.CreateItemCritterPower": "Erstelle Critterkraft",
+  "SR5.CreateItemAmmo": "Erstelle Munition",
+  "SR5.CreateItemModification": "Erstelle Modifikation",
   "SR5.CreateEffect": "Erstelle Effekt",
   "SR5.Weapon": "Waffen",
   "SR5.Ammo": "Munition",
@@ -430,6 +432,10 @@
   "SR5.NoSelectableToken": "Charakter hat keine wählbare Figur auf der Karte",
   "SR5.MissingItemForOpposedTest": "Probe kann nicht durchgeführt werden, da der ausführende Gegenstand jetzt fehlt",
   "SR5.TargetingNeedsActorWithToken": "Charakter benötigt eine verbunde Figur, um ein Ziel auswählen zu können",
+  "SR5.OverwatchScoreTracker": {
+    "NotifyNoSelectedTokens": "Mindestens ein verbundenes Token muss ausgewählt werden.",
+    "OnlyLinkedActorsSupported": "Nur verbundene Akteure werden unterstützt. Tokens mit unverbundenen Akteuren werden ignoriert."
+  },
   "SR5.OverwatchScore": "Overwatch Wert",
   "SR5.OverwatchScoreTrackerTitle": "Mr. Johnsons Baby Monitor",
   "SR5.PlusFifteenMinutes": "+15min",
@@ -478,6 +484,7 @@
   "SR5.EditSkill": "Fertigkeit anpassen",
   "SR5.EditItem": "Gegenstand anpassen",
   "SR5.DeleteItem": "Gegenstand löschen",
+  "SR5.MoveItemInventory": "Inventar ändern",
   "SR5.Name": "Name",
   "SR5.AstralInit": "Astrale Ini",
   "SR5.AstralDice": "Astrale Ini Würfel",
@@ -617,7 +624,13 @@
       "RollDroneInfiltration": "Drohne infiltrieren",
       "VehicleConfiguration": "Fahrzeug Konfiguration",
       "ICConfiguration": "IC Configuration",
-      "SetMonitor": "Monitor muss manuell gesetzt werden"
+      "SetMonitor": "Monitor muss manuell gesetzt werden",
+      "PersonalInventory": "Am Körper",
+      "CreateInventory": "Erstelle Inventar Ort"
+    },
+    "Inventory": {
+      "OpenInventory": "Inventar",
+      "Carried": "Mitgeführt"
     }
   },
   "SR5.Spirit": {
@@ -795,7 +808,9 @@
     "TokenSelectionNeeded": "Ein oder mehrere Tokens müssen ausgewählt sein",
     "SkillCantBeDefault": "Auf diese Fertigkeit kann keine Probe abgelegt werden, da sie nicht improvisiert werden kann",
     "HostItemOnlyAcceptIC": "Nur IC Akteure können einem Host zugefügt werden",
-    "InvalidMarksCount": "You've trying to place a strange number of marks"
+    "InvalidMarksCount": "You've trying to place a strange number of marks",
+    "AlreadyExistingInventory": "Ein Inventar mit diesem Namen existiert bereits",
+    "CantEditDefaultInventory": "Das Hauptinventar kann nicht umbenannt werden"
   },
   "SR5.Errors": {
     "MissingSkill": "Der Charakter verfügt nicht über die benötigte Fertigkeit.",
@@ -805,7 +820,9 @@
     "MarksCantBePlacedOn": "Der als Ziel ausgewählte Akteur kann keine Marken empfangen.",
     "CantEditAppliedItemEffects": "Aktive Effekte, die über Items zugefügt wurden, können nicht direkt editiert werden.",
     "KeyNotModifyableByActiveEffect": "Der Aktive Effect Modus Modifizieren kann nur auf mod Felder angewendet werden.",
-    "CanOnlyAddTechnologyItemsToANetwork": "Nur technologische Gegenstände können einem Netzwerk zugefügt werden."
+    "CanOnlyAddTechnologyItemsToANetwork": "Nur technologische Gegenstände können einem Netzwerk zugefügt werden.",
+    "InventoryAlreadyExists": "Es existiert bereits ein Inventar mit diesem Namen",
+    "DefaultInventoryCantBeRemoved": "The default inventory can't be removed"
   },
   "SR5.ChangelogApplication": {
     "Title": "Shadowrun5e Update",
@@ -859,6 +876,11 @@
     "Extreme": "Zwei oder mehr Modifikatoren der Kategorie Schwer",
     "Total": "Ergebnis",
     "ClearModifiers": "Entferne eigene Modifikatoren"
+  },
+  "SR5.MoveInventoryDialog" : {
+    "Title": "Inventar auswählen",
+    "Move": "Übertragen",
+    "Cancel": "Abbrechen"
   },
   "SR5.Dialogs": {
     "RangedWeaponTest": {

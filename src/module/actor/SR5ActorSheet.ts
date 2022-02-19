@@ -13,6 +13,7 @@ import SkillField = Shadowrun.SkillField;
 import DeviceData = Shadowrun.DeviceData;
 import {onManageActiveEffect, prepareActiveEffectCategories} from "../effects";
 
+// TODO: Remove this the monoloithing SR5ActorSheet
 // Use SR5ActorSheet._showSkillEditForm to only ever render one SkillEditSheet instance.
 // Should multiple instances be open, Foundry will cause cross talk between skills and actors,
 // when opened in succession, causing SkillEditSheet to wrongfully overwrite the wrong data.
@@ -22,6 +23,7 @@ let globalSkillAppId: number = -1;
  * See Hooks.init for which actor type this sheet handles.
  *
  */
+console.warn('Shadowrun 5e | The SR5ActorSheet class is deprecated and will be removed');
 export class SR5ActorSheet extends ActorSheet {
     _shownDesc: string[] = [];
     _filters: SR5SheetFilters = {
@@ -496,7 +498,7 @@ export class SR5ActorSheet extends ActorSheet {
          */
         $(html).find('.Roll').on('click', this._onRollFromSheet.bind(this));
 
-        // updates matrix condition monitor on the device the actor has equippe
+        // updates matrix condition monitor on the device the actor has equipped
         $(html)
             .find('[name="data.matrix.condition_monitor.value"]')
             .on('change', async (event: any) => {

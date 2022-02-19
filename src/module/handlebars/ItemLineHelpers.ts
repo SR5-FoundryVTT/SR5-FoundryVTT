@@ -4,7 +4,7 @@ import ShadowrunItemData = Shadowrun.ShadowrunItemData;
 import MarkedDocument = Shadowrun.MarkedDocument;
 
 export const registerItemLineHelpers = () => {
-    Handlebars.registerHelper('ItemHeaderIcons', function (id) {
+    Handlebars.registerHelper('ItemHeaderIcons', function (type) {
         const PlusIcon = 'fas fa-plus';
         const AddText = game.i18n.localize('SR5.Add');
         const addIcon = {
@@ -15,7 +15,7 @@ export const registerItemLineHelpers = () => {
             // Add HTML data attributes using a key<string>:value<string> structure
             data: {}
         };
-        switch (id) {
+        switch (type) {
             case 'lifestyle':
                 addIcon.title = game.i18n.localize('SR5.CreateItemLifestyle');
                 return [addIcon];
@@ -58,6 +58,9 @@ export const registerItemLineHelpers = () => {
             case 'ammo':
                 addIcon.title = game.i18n.localize('SR5.CreateItemAmmo');
                 return [addIcon];
+            case 'modification':
+                addIcon.title = game.i18n.localize('SR5.CreateItemModification');
+                return [addIcon];
             case 'device':
                 addIcon.title = game.i18n.localize('SR5.CreateItemDevice');
                 return [addIcon];
@@ -84,6 +87,19 @@ export const registerItemLineHelpers = () => {
             default:
                 return [];
         }
+    });
+
+    Handlebars.registerHelper('InventoryIcons', function(name) {
+        const addItemIcon = {
+            icon: 'fas fa-plus',
+            text: game.i18n.localize('SR5.Add'),
+            title: game.i18n.localize('SR5.CreateItem'),
+            cssClass: 'inventory-item-create',
+            // Add HTML data attributes using a key<string>:value<string> structure
+            data: {inventory: name}
+        };
+
+        return [addItemIcon];
     });
 
     Handlebars.registerHelper('ItemHeaderRightSide', function (id) {
@@ -127,6 +143,7 @@ export const registerItemLineHelpers = () => {
             case 'equipment':
             case 'cyberware':
             case 'bioware':
+            case 'modification':
             case 'ammo':
                 return [
                     {
@@ -262,6 +279,7 @@ export const registerItemLineHelpers = () => {
                 ];
             case 'armor':
             case 'ammo':
+            case 'modification':
             case 'device':
             case 'equipment':
             case 'cyberware':
@@ -386,6 +404,7 @@ export const registerItemLineHelpers = () => {
 
     Handlebars.registerHelper('ItemIcons', function (item: ShadowrunItemData) {
         const wrapper = new SR5ItemDataWrapper(item);
+
         const editIcon = {
             icon: 'fas fa-edit item-edit',
             title: game.i18n.localize('SR5.EditItem'),
@@ -404,6 +423,49 @@ export const registerItemLineHelpers = () => {
         };
 
         const icons = [editIcon, removeIcon];
+
+        if (ui['PDFoundry']) {
+            icons.unshift(pdfIcon);
+        }
+
+        switch (wrapper.getType()) {
+            case 'program':
+            case 'armor':
+            case 'device':
+            case 'equipment':
+            case 'cyberware':
+            case 'bioware':
+            case 'weapon':
+                icons.unshift(equipIcon);
+        }
+
+        return icons;
+    });
+
+    Handlebars.registerHelper('InventoryItemIcons', function (item: ShadowrunItemData) {
+        const wrapper = new SR5ItemDataWrapper(item);
+        const moveIcon = {
+            icon: 'fas fa-exchange-alt inventory-item-move',
+            title: game.i18n.localize('SR5.MoveItemInventory')
+        };
+        const editIcon = {
+            icon: 'fas fa-edit item-edit',
+            title: game.i18n.localize('SR5.EditItem'),
+        };
+        const removeIcon = {
+            icon: 'fas fa-trash item-delete',
+            title: game.i18n.localize('SR5.DeleteItem'),
+        };
+        const equipIcon = {
+            icon: `${wrapper.isEquipped() ? 'fas fa-check-circle' : 'far fa-circle'} item-equip-toggle`,
+            title: game.i18n.localize('SR5.ToggleEquip'),
+        };
+        const pdfIcon = {
+            icon: 'fas fa-file open-source-pdf',
+            title: game.i18n.localize('SR5.OpenSourcePdf'),
+        };
+
+        const icons = [moveIcon, editIcon, removeIcon];
 
         if (ui['PDFoundry']) {
             icons.unshift(pdfIcon);

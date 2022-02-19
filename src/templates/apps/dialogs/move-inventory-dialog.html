@@ -1,0 +1,7 @@
+{{#each inventories}}
+<div>
+  <input type="radio" id="{{this.name}}" name="inventories" value="{{this.name}}"
+         checked>
+  <label for="{{this.name}}">{{localize this.label}}</label>
+</div>
+{{/each}}

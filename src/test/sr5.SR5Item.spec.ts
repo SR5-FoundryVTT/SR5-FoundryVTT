@@ -42,12 +42,12 @@ export const shadowrunSR5Item = context => {
         });
 
         it('Should embedd a ammo into a weapon and not the global item collection', async () => {
-            const weapon = await testItem.create({type: 'weapon'});
-            const ammo = await testItem.create({type: 'ammo'});
+            const weapon = await testItem.create({type: 'weapon'}) as SR5Item;
+            const ammo = await testItem.create({type: 'ammo'}) as SR5Item;
 
             await weapon.createOwnedItem(ammo.data);
 
-            const embeddedItemDatas = weapon.getEmbeddedItems();
+            const embeddedItemDatas = weapon.getNestedItems();
             assert.isNotEmpty(embeddedItemDatas);
             assert.lengthOf(embeddedItemDatas, 1);
 
@@ -60,12 +60,12 @@ export const shadowrunSR5Item = context => {
         });
 
         it('Should update an embedded ammo', async () => {
-            const weapon = await testItem.create({type: 'weapon'});
-            const ammo = await testItem.create({type: 'ammo'});
+            const weapon = await testItem.create({type: 'weapon'}) as SR5Item;
+            const ammo = await testItem.create({type: 'ammo'}) as SR5Item;
 
             // Embed the item and get
             await weapon.createOwnedItem(ammo.data);
-            const embeddedItemDatas = weapon.getEmbeddedItems();
+            const embeddedItemDatas = weapon.getNestedItems();
             assert.lengthOf(embeddedItemDatas, 1);
             const embeddedAmmoData = embeddedItemDatas[0];
             const embeddedAmmo = weapon.getOwnedItem(embeddedAmmoData._id);

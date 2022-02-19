@@ -8,6 +8,7 @@
 import {SR5Actor} from "./actor/SR5Actor";
 import {SR5Item} from "./item/SR5Item";
 import {Helpers} from "./helpers";
+import EffectsSheetData = Shadowrun.EffectsSheetData;
 
 /**
  * Manage Active Effect instances through the Actor Sheet via effect control buttons.
@@ -60,7 +61,7 @@ export async function onManageActiveEffect(event, owner: SR5Actor|SR5Item) {
  * @param {ActiveEffect[]} effects    The array of Active Effect instances to prepare sheet data for
  * @return {object}                   Data for rendering
  */
-export function prepareActiveEffectCategories(effects) {
+export function prepareActiveEffectCategories(effects): EffectsSheetData {
 
     // Define effect header categories
     const categories = {
