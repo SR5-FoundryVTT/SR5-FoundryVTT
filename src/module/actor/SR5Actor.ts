@@ -468,6 +468,14 @@ export class SR5Actor extends Actor {
         return this.getType() === 'ic';
     }
 
+    /**
+     * Determine if this actor is able to have natural damage recovery.
+     * @returns true in case of possible natural recovery.
+     */
+    get hasNaturalRecovery(): boolean {
+        return this.isCharacter() || this.isCritter();
+    }
+
     getVehicleTypeSkillName(): string | undefined {
         if (!("vehicleType" in this.data.data)) return;
 
@@ -1000,7 +1008,7 @@ export class SR5Actor extends Actor {
      * @param options Change roll behaviour.
      */
     rollNaturalRecovery(track, options?: ActorRollOptions) {
-        if (!this.isCharacter()) return;
+        if (!this.hasNaturalRecovery) return;
 
         let attributeNameA = 'body';
         let attributeNameB = 'willpower';

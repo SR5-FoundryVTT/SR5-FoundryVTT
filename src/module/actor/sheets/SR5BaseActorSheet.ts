@@ -1225,6 +1225,10 @@ export class SR5BaseActorSheet extends ActorSheet {
         return this.actor.rollAttribute(attribute, {event: event});
     }
 
+    /**
+     * Handle interaction with a damage track title.
+     * @param event
+     */
     async _onRollCellInput(event) {
         event.preventDefault();
         let track = $(event.currentTarget).closest('.horizontal-cell-input').data().id;
