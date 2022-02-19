@@ -1,16 +1,36 @@
 import {SR5BaseActorSheet} from "./SR5BaseActorSheet";
+import SR5ActorSheetData = Shadowrun.SR5ActorSheetData;
+import {SR5Item} from "../../item/SR5Item";
+import MarkedDocument = Shadowrun.MarkedDocument;
+
+interface ICActorSheetData extends SR5ActorSheetData {
+    host: SR5Item|undefined
+    markedDocuments: MarkedDocument[]
+    disableMarksEdit: boolean
+}
 
 export class SR5ICActorSheet extends SR5BaseActorSheet {
+    /**
+     * IC actors will handle these item types specifically.
+     *
+     * All others will be collected within the gear tab.
+     *
+     * @returns An array of item types from the template.json Item section.
+     */
+    getHandledItemTypes(): string[] {
+        return super.getHandledItemTypes();
+    }
+
+
     getData(): any {
-        const data = super.getData();
+        const data = super.getData() as ICActorSheetData;
 
         // Fetch a connected host.
-        const icData = this.object.asICData();
-        data.host = game.items?.get(icData?.data.host.id as string);
+        data.host = this.object.getICHost();
 
         // Display Matrix Marks
-        data['markedDocuments'] = this.object.getAllMarkedDocuments();
-        data['disableMarksEdit'] = this.object.hasHost();
+        data.markedDocuments = this.object.getAllMarkedDocuments();
+        data.disableMarksEdit = this.object.hasHost();
 
         return data;
     }
@@ -30,7 +50,7 @@ export class SR5ICActorSheet extends SR5BaseActorSheet {
         await this.object.removeICHost();
     }
 
-    _onDrop(event: DragEvent) {
+    async _onDrop(event: DragEvent) {
         event.preventDefault();
         event.stopPropagation();
 
@@ -43,8 +63,7 @@ export class SR5ICActorSheet extends SR5BaseActorSheet {
         switch(dropData.type) {
             case 'Item':
                 // We don't have to narrow down type here, the SR5Actor will handle this for us.
-                this.object.addICHost(dropData.id);
-                break;
+                return await this.object.addICHost(dropData.id);
         }
 
         // Let Foundry handle default cases.

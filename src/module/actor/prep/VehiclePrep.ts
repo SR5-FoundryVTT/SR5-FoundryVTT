@@ -132,19 +132,25 @@ export class VehiclePrep {
     }
 
     static prepareMeatspaceInit(data: VehicleActorData) {
-        const { vehicle_stats, initiative } = data;
+        const { vehicle_stats, initiative, modifiers } = data;
 
         const pilot = Helpers.calcTotal(vehicle_stats.pilot);
 
         initiative.meatspace.base.base = pilot * 2;
+        initiative.meatspace.base.mod = PartsList.AddUniquePart(initiative.meatspace.base.mod, "SR5.Bonus", Number(modifiers['meat_initiative']));
         initiative.meatspace.dice.base = 4;
+        initiative.meatspace.dice.mod = PartsList.AddUniquePart(initiative.meatspace.dice.mod, "SR5.Bonus", Number(modifiers['meat_initiative_dice']));
+
         Helpers.calcTotal(initiative.meatspace.base);
         Helpers.calcTotal(initiative.meatspace.dice);
     }
 
     static prepareArmor(data: VehicleActorData) {
-        const { armor } = data;
-        armor.mod = PartsList.AddUniquePart<number>(armor.mod, 'SR5.Temporary', armor['temp'] as number);
+        const { armor, modifiers } = data;
+
+        armor.mod = PartsList.AddUniquePart(armor.mod, 'SR5.Temporary', Number(armor['temp']));
+        armor.mod = PartsList.AddUniquePart(armor.mod, 'SR5.Bonus', Number(modifiers['armor']));
+
         Helpers.calcTotal(armor);
     }
 }

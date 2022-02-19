@@ -25,14 +25,12 @@
   "ITEM.TypeSprite_power": "Sprite Power",
   "ITEM.TypeWeapon": "Weapon",
   "ITEM.TypeHost": "Host",
-
   "SR5.FOUNDRY": {
     "Actor": "Actor",
     "Scene": "Scene",
     "Item": "Item",
     "Token": "Token"
   },
-
   "SR5.SheetActor": "Actor sheet",
   "SR5.SheetItem": "Item sheet",
   "SR5.ItemTypes": {
@@ -191,8 +189,9 @@
   "SR5.CreateItemLifestyle": "Create Lifestyle",
   "SR5.CreateItemContact": "Create Contact",
   "SR5.CreateItemCritterPower": "Create Critter Power",
+  "SR5.CreateItemAmmo": "Create Ammunition",
+  "SR5.CreateItemModification": "Create Gear Modification",
   "SR5.CreateEffect": "Create Effect",
-  "SR5.NewEffect": "New Effect",
   "SR5.Weapon": "Weapon",
   "SR5.Ammo": "Ammo",
   "SR5.WeaponMods": "Mods",
@@ -431,6 +430,10 @@
   "SR5.NoSelectableToken": "Actor has no selectable token on canvas",
   "SR5.MissingItemForOpposedTest": "Opposed Test can't be rolled due to the acting item now missing",
   "SR5.TargetingNeedsActorWithToken": "The current actor needs a linked token for targeting to work",
+  "SR5.OverwatchScoreTracker": {
+    "NotifyNoSelectedTokens": "At least one linked token must be selected.",
+    "OnlyLinkedActorsSupported": "Only linked actors are supported. Selected tokens with unlinked actors will be ignored."
+  },
   "SR5.OverwatchScore": "Overwatch Score",
   "SR5.OverwatchScoreTrackerTitle": "Mr. Johnson's Baby Monitor",
   "SR5.PlusFifteenMinutes": "+15min",
@@ -480,6 +483,7 @@
   "SR5.EditSkill": "Edit Skill",
   "SR5.EditItem": "Edit Item",
   "SR5.DeleteItem": "Delete Item",
+  "SR5.MoveItemInventory": "Move Item to inventory",
   "SR5.Name": "Name",
   "SR5.AstralInit": "Astral Init",
   "SR5.AstralDice": "Astral Init Dice",
@@ -563,7 +567,6 @@
   "SR5.WalkingSpeed": "Walking",
   "SR5.RunningSpeed": "Running",
   "SR5.Help": "Help",
-
   "SETTINGS": {
     "DiagonalMovementName": "Diagonal Movement",
     "DiagonalMovementDescription": "How should diagonal movement be handled when using a grid",
@@ -633,7 +636,13 @@
       "RollDroneInfiltration": "Drone Infiltration",
       "VehicleConfiguration": "Vehicle Configuration",
       "ICConfiguration": "IC Configuration",
-      "SetMonitor": "Monitor must be set manually."
+      "SetMonitor": "Monitor must be set manually.",
+      "PersonalInventory": "On Person",
+      "CreateInventory": "Create inventory place"
+    },
+    "Inventory": {
+      "OpenInventory": "Inventory",
+      "Carried": "Carried"
     }
   },
   "SR5.Spirit": {
@@ -642,44 +651,44 @@
     "Services": "Services",
     "Bound": "Bound",
     "Types": {
-        "Air": "Air",
-        "Aircraft": "Aircraft",
-        "Airwave": "Airwave",
-        "Automotive": "Automotive",
-        "Beasts": "Beasts",
-        "Ceramic": "Ceramic",
-        "Earth": "Earth",
-        "Energy": "Energy",
-        "Fire": "Fire",
-        "Guardian": "Guardian",
-        "Guidance": "Guidance",
-        "Man": "Man",
-        "Metal": "Metal",
-        "Plant": "Plant",
-        "Ship": "Ship",
-        "Task": "Task",
-        "Train": "Train",
-        "Water": "Water",
-        "ToxicAir": "Noxious",
-        "ToxicBeasts": "Abomination",
-        "ToxicEarth": "Barren",
-        "ToxicFire": "Nuclear",
-        "ToxicMan": "Plague",
-        "ToxicWater": "Sludge",
-        "Blood": "Blood",
-        "Muse": "Muse",
-        "Nightmare": "Nightmare",
-        "Shade": "Shade",
-        "Succubus": "Succubus",
-        "Wraith": "Wraith",
-        "Shedim": "Shedim",
-        "MasterShedim": "MasterShedim",
-        "Caretaker": "Insect Caretaker",
-        "Nymph": "Insect Nymph",
-        "Scout": "Insect Scout",
-        "Soldier": "Insect Soldier",
-        "Worker": "Insect Worker",
-        "Queen": "Insect Queen"
+      "Air": "Air",
+      "Aircraft": "Aircraft",
+      "Airwave": "Airwave",
+      "Automotive": "Automotive",
+      "Beasts": "Beasts",
+      "Ceramic": "Ceramic",
+      "Earth": "Earth",
+      "Energy": "Energy",
+      "Fire": "Fire",
+      "Guardian": "Guardian",
+      "Guidance": "Guidance",
+      "Man": "Man",
+      "Metal": "Metal",
+      "Plant": "Plant",
+      "Ship": "Ship",
+      "Task": "Task",
+      "Train": "Train",
+      "Water": "Water",
+      "ToxicAir": "Noxious",
+      "ToxicBeasts": "Abomination",
+      "ToxicEarth": "Barren",
+      "ToxicFire": "Nuclear",
+      "ToxicMan": "Plague",
+      "ToxicWater": "Sludge",
+      "Blood": "Blood",
+      "Muse": "Muse",
+      "Nightmare": "Nightmare",
+      "Shade": "Shade",
+      "Succubus": "Succubus",
+      "Wraith": "Wraith",
+      "Shedim": "Shedim",
+      "MasterShedim": "MasterShedim",
+      "Caretaker": "Insect Caretaker",
+      "Nymph": "Insect Nymph",
+      "Scout": "Insect Scout",
+      "Soldier": "Insect Soldier",
+      "Worker": "Insect Worker",
+      "Queen": "Insect Queen"
     }
   },
   "SR5.CritterPower": {
@@ -831,7 +840,9 @@
     "TokenSelectionNeeded": "One ore more tokens need to be selected",
     "SkillCantBeDefault": "This skill can't be rolled on as it can't be defaulted",
     "HostItemOnlyAcceptIC": "Only IC actors can be added to hosts",
-    "InvalidMarksCount": "You've trying to place a strange number of marks"
+    "InvalidMarksCount": "You've trying to place a strange number of marks",
+    "AlreadyExistingInventory": "An inventory with this name alreayd exists",
+    "CantEditDefaultInventory": "The default inventory can't be renamed"
   },
   "SR5.Errors": {
     "MissingSkill": "The actor doesn't have the requested skill.",
@@ -841,7 +852,9 @@
     "MarksCantBePlacedOn": "The chosen actor type can't receive any marks.",
     "CantEditAppliedItemEffects": "You can't edit an active effect that's been applied by an item.",
     "KeyNotModifyableByActiveEffect": "The active effect mode modify can only affect mod properties.",
-    "CanOnlyAddTechnologyItemsToANetwork": "Only technology items can be added to a network."
+    "CanOnlyAddTechnologyItemsToANetwork": "Only technology items can be added to a network.",
+    "InventoryAlreadyExists": "An inventory with this name already exists.",
+    "DefaultInventoryCantBeRemoved": "The default inventory can't be removed"
   },
   "SR5.ChangelogApplication": {
     "Title": "Shadowrun5e Update",
@@ -895,6 +908,11 @@
     "Extreme": "Combination of two or more conditions at the heavy level",
     "Total": "Result",
     "ClearModifiers": "Clear personal modifiers"
+  },
+  "SR5.MoveInventoryDialog" : {
+    "Title": "Choose an inventory",
+    "Move": "Move",
+    "Cancel": "Cancel"
   },
   "SR5.Dialogs": {
     "RangedWeaponTest": {

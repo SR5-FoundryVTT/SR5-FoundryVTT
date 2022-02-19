@@ -2,7 +2,6 @@ import {SR5TestingDocuments} from "./utils";
 import {SR5Actor} from "../module/actor/SR5Actor";
 import {SR5Item} from "../module/item/SR5Item";
 import {NetworkDeviceFlow} from "../module/item/flows/NetworkDeviceFlow";
-import {networkInterfaces} from "os";
 
 export const shadowrunNetworkDevices = context => {
     const {describe, it, assert, should, before, after} = context;
@@ -24,6 +23,7 @@ export const shadowrunNetworkDevices = context => {
     })
 
     describe('Network Devices handling', () => {
+        // TODO: Redesign them with only necessary update methods in place. Instead start of with ActorData prefilled on create.
         it('Should give a network link to given document class', async () => {
             const actor = await testActor.create({'type': 'character'});
             const link = NetworkDeviceFlow.buildLink(actor);
@@ -99,8 +99,6 @@ export const shadowrunNetworkDevices = context => {
         it('Should get all connected network devices of a controller as their Document', async () => {
             const controller = await testItem.create({type: 'device'});
             const devices = [
-                await testItem.create({type: 'weapon'}),
-                await testItem.create({type: 'weapon'}),
                 await testItem.create({type: 'weapon'})
             ];
 
@@ -111,8 +109,8 @@ export const shadowrunNetworkDevices = context => {
             const fetchedDevices = NetworkDeviceFlow.getNetworkDevices(controller);
 
             // Check for structural equality.
-            assert.strictEqual(controller.data.data.networkDevices.length, 3);
-            assert.strictEqual(fetchedDevices.length, 3);
+            assert.strictEqual(controller.data.data.networkDevices.length, 1);
+            assert.strictEqual(fetchedDevices.length, 1);
 
             // Check for referential equality.
             for (const fetched of fetchedDevices) {
@@ -166,8 +164,6 @@ export const shadowrunNetworkDevices = context => {
         it('Should remove all devices from a controller', async () => {
             const controller = await testItem.create({type: 'device'});
             const devices = [
-                await testItem.create({type: 'weapon'}),
-                await testItem.create({type: 'weapon'}),
                 await testItem.create({type: 'weapon'})
             ];
 
