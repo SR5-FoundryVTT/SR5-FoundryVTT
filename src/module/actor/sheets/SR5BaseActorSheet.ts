@@ -182,9 +182,11 @@ export class SR5BaseActorSheet extends ActorSheet {
         data.filters = this._filters;
 
         this._prepareActorAttributes(data);
+        this._prepareActorModifiers(data);
 
         // Valid data fields for all actor types.
         this._prepareActorTypeFields(data);
+        this._prepareSpecialFields(data);
         this._prepareSkillsWithFilters(data);
 
         data.itemType = this._prepareItemTypes(data);
@@ -200,6 +202,8 @@ export class SR5BaseActorSheet extends ActorSheet {
     /** Listeners used by _all_ actor types! */
     activateListeners(html) {
         super.activateListeners(html);
+
+        Helpers.setupCustomCheckbox(this, html)
 
         // Active Effect management
         html.find(".effect-control").on('click',event => onManageActiveEffect(event, this.document));
@@ -707,6 +711,32 @@ export class SR5BaseActorSheet extends ActorSheet {
         }
 
         await this.actor.update(data);
+    }
+
+    /**
+     * Special fields are shared across all actor types
+     *
+     * @param data
+     */
+    _prepareSpecialFields(data) {
+        const {modifiers} = data.data;
+
+        data.awakened = data.data.special === 'magic';
+        data.emerged = data.data.special === 'resonance';
+        data.woundTolerance = 3 + (Number(modifiers['wound_tolerance']) || 0);
+    }
+
+    /**
+     * Pretty up display of zero value actor modifiers.
+     *
+     * @param data
+     */
+    _prepareActorModifiers(data: SR5ActorSheetData) {
+         // Empty zero value modifiers for display purposes.
+        const { modifiers: mods } = data.data;
+        for (let [key, value] of Object.entries(mods)) {
+            if (value === 0) mods[key] = '';
+        }
     }
 
     _prepareActorAttributes(data: SR5ActorSheetData) {
@@ -1551,5 +1581,24 @@ export class SR5BaseActorSheet extends ActorSheet {
             title: 'Chummer Import',
         };
         new ChummerImportForm(this.actor, options).render(true);
+    }
+
+    _setupCustomCheckbox(html) {
+        const setContent = (el) => {
+            const checkbox = $(el).children('input[type=checkbox]');
+            const checkmark = $(el).children('.checkmark');
+            if ($(checkbox).prop('checked')) {
+                $(checkmark).addClass('fa-check-circle');
+                $(checkmark).removeClass('fa-circle');
+            } else {
+                $(checkmark).addClass('fa-circle');
+                $(checkmark).removeClass('fa-check-circle');
+            }
+        };
+        html.find('label.checkbox').each(function () {
+            setContent(this);
+        });
+        html.find('label.checkbox').click((event) => setContent(event.currentTarget));
+        html.find('.submit-checkbox').change((event) => this._onSubmit(event));
     }
 }
