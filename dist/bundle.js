@@ -15271,8 +15271,7 @@ class SR5Actor extends Actor {
     }
 }
 exports.SR5Actor = SR5Actor;
-
-},{"../apps/dialogs/ShadowrunActorDialogs":139,"../chat":147,"../config":149,"../constants":150,"../data/DataDefaults":151,"../data/SR5ItemDataWrapper":153,"../helpers":164,"../item/SR5Item":204,"../parts/PartsList":218,"../rolls/ShadowrunRoller":219,"../rules/MatrixRules":221,"../rules/Modifiers":222,"../rules/SkillRules":223,"./flows/InventoryFlow":87,"./flows/SkillFlow":88,"./flows/SoakFlow":89,"./prep/CharacterPrep":90,"./prep/CritterPrep":91,"./prep/ICPrep":92,"./prep/SpiritPrep":93,"./prep/SpritePrep":94,"./prep/VehiclePrep":95}],86:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunActorDialogs":139,"../chat":147,"../config":149,"../constants":150,"../data/DataDefaults":151,"../data/SR5ItemDataWrapper":153,"../helpers":164,"../item/SR5Item":204,"../parts/PartsList":218,"../rolls/ShadowrunRoller":220,"../rules/MatrixRules":222,"../rules/Modifiers":223,"../rules/SkillRules":224,"./flows/InventoryFlow":87,"./flows/SkillFlow":88,"./flows/SoakFlow":89,"./prep/CharacterPrep":90,"./prep/CritterPrep":91,"./prep/ICPrep":92,"./prep/SpiritPrep":93,"./prep/SpritePrep":94,"./prep/VehiclePrep":95}],86:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -15348,7 +15347,6 @@ class DamageApplicationFlow {
     }
 }
 exports.DamageApplicationFlow = DamageApplicationFlow;
-
 },{"../../apps/dialogs/DamageApplicationDialog":135}],87:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -15558,7 +15556,6 @@ class InventoryFlow {
     }
 }
 exports.InventoryFlow = InventoryFlow;
-
 },{"../../helpers":164,"../../item/SR5Item":204}],88:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -15607,8 +15604,7 @@ class SkillFlow {
     }
 }
 exports.SkillFlow = SkillFlow;
-
-},{"../../constants":150,"../../rules/SkillRules":223}],89:[function(require,module,exports){
+},{"../../constants":150,"../../rules/SkillRules":224}],89:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -15743,8 +15739,7 @@ class SoakFlow {
     }
 }
 exports.SoakFlow = SoakFlow;
-
-},{"../../apps/dialogs/ShadowrunActorDialogs":139,"../../chat":147,"../../data/DataDefaults":151,"../../helpers":164,"../../parts/PartsList":218,"../../rolls/ShadowrunRoller":219,"../../rules/SoakRules":224}],90:[function(require,module,exports){
+},{"../../apps/dialogs/ShadowrunActorDialogs":139,"../../chat":147,"../../data/DataDefaults":151,"../../helpers":164,"../../parts/PartsList":218,"../../rolls/ShadowrunRoller":220,"../../rules/SoakRules":225}],90:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CharacterPrep = void 0;
@@ -15802,7 +15797,6 @@ class CharacterPrep {
     }
 }
 exports.CharacterPrep = CharacterPrep;
-
 },{"./functions/AttributesPrep":96,"./functions/ConditionMonitorsPrep":97,"./functions/InitiativePrep":98,"./functions/ItemPrep":99,"./functions/LimitsPrep":100,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/MovementPrep":103,"./functions/NPCPrep":104,"./functions/SkillsPrep":105,"./functions/WoundsPrep":106}],91:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -15845,7 +15839,6 @@ class CritterPrep {
     }
 }
 exports.CritterPrep = CritterPrep;
-
 },{"./functions/AttributesPrep":96,"./functions/ConditionMonitorsPrep":97,"./functions/InitiativePrep":98,"./functions/ItemPrep":99,"./functions/LimitsPrep":100,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/MovementPrep":103,"./functions/SkillsPrep":105,"./functions/WoundsPrep":106}],92:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -15980,8 +15973,7 @@ class ICPrep {
     }
 }
 exports.ICPrep = ICPrep;
-
-},{"../../config":149,"../../data/DataDefaults":151,"../../parts/PartsList":218,"../../rules/MatrixRules":221,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/SkillsPrep":105}],93:[function(require,module,exports){
+},{"../../config":149,"../../data/DataDefaults":151,"../../parts/PartsList":218,"../../rules/MatrixRules":222,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/SkillsPrep":105}],93:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SpiritPrep = void 0;
@@ -16379,7 +16371,6 @@ class SpiritPrep {
     }
 }
 exports.SpiritPrep = SpiritPrep;
-
 },{"../../helpers":164,"../../parts/PartsList":218,"../flows/SkillFlow":88,"./functions/AttributesPrep":96,"./functions/ConditionMonitorsPrep":97,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/ModifiersPrep":102,"./functions/MovementPrep":103,"./functions/SkillsPrep":105,"./functions/WoundsPrep":106}],94:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -16520,7 +16511,6 @@ class SpritePrep {
     }
 }
 exports.SpritePrep = SpritePrep;
-
 },{"../../helpers":164,"../../parts/PartsList":218,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/SkillsPrep":105}],95:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -16648,7 +16638,6 @@ class VehiclePrep {
     }
 }
 exports.VehiclePrep = VehiclePrep;
-
 },{"../../config":149,"../../helpers":164,"../../parts/PartsList":218,"./functions/AttributesPrep":96,"./functions/InitiativePrep":98,"./functions/LimitsPrep":100,"./functions/MatrixPrep":101,"./functions/ModifiersPrep":102,"./functions/SkillsPrep":105}],96:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -16708,7 +16697,6 @@ class AttributesPrep {
     }
 }
 exports.AttributesPrep = AttributesPrep;
-
 },{"../../../config":149,"../../../constants":150,"../../../helpers":164}],97:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -16749,7 +16737,6 @@ class ConditionMonitorsPrep {
     }
 }
 exports.ConditionMonitorsPrep = ConditionMonitorsPrep;
-
 },{"../../../config":149}],98:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -16799,7 +16786,6 @@ class InitiativePrep {
     }
 }
 exports.InitiativePrep = InitiativePrep;
-
 },{"../../../helpers":164,"../../../parts/PartsList":218}],99:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -16878,7 +16864,6 @@ class ItemPrep {
     }
 }
 exports.ItemPrep = ItemPrep;
-
 },{"../../../config":149,"../../../constants":150,"../../../helpers":164,"../../../parts/PartsList":218}],100:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -16907,7 +16892,6 @@ class LimitsPrep {
     }
 }
 exports.LimitsPrep = LimitsPrep;
-
 },{"../../../config":149,"../../../helpers":164,"../../../parts/PartsList":218}],101:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -17034,7 +17018,6 @@ class MatrixPrep {
     }
 }
 exports.MatrixPrep = MatrixPrep;
-
 },{"../../../config":149,"../../../helpers":164,"../../../parts/PartsList":218,"./AttributesPrep":96}],102:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -17123,7 +17106,6 @@ class ModifiersPrep {
     }
 }
 exports.ModifiersPrep = ModifiersPrep;
-
 },{"../../../config":149}],103:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -17139,7 +17121,6 @@ class MovementPrep {
     }
 }
 exports.MovementPrep = MovementPrep;
-
 },{"../../../parts/PartsList":218}],104:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -17184,7 +17165,6 @@ class NPCPrep {
     }
 }
 exports.NPCPrep = NPCPrep;
-
 },{"../../../constants":150,"../../../data/DataDefaults":151,"../../../parts/PartsList":218,"./AttributesPrep":96}],105:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -17283,7 +17263,6 @@ const _mergeWithMissingSkillFields = (givenSkill) => {
     mergeObject(givenSkill, template, { overwrite: false });
 };
 exports._mergeWithMissingSkillFields = _mergeWithMissingSkillFields;
-
 },{"../../../config":149,"../../../helpers":164,"../../../parts/PartsList":218}],106:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -17302,7 +17281,6 @@ class WoundsPrep {
     }
 }
 exports.WoundsPrep = WoundsPrep;
-
 },{}],107:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -18758,7 +18736,6 @@ class SR5BaseActorSheet extends ActorSheet {
     }
 }
 exports.SR5BaseActorSheet = SR5BaseActorSheet;
-
 },{"../../apps/chummer-import-form":134,"../../apps/dialogs/MoveInventoryDialog":138,"../../apps/skills/KnowledgeSkillEditSheet":143,"../../apps/skills/LanguageSkillEditSheet":144,"../../apps/skills/SkillEditSheet":145,"../../config":149,"../../effects":156,"../../helpers":164,"../../item/SR5Item":204}],108:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -18817,7 +18794,6 @@ class SR5CharacterSheet extends SR5BaseActorSheet_1.SR5BaseActorSheet {
     }
 }
 exports.SR5CharacterSheet = SR5CharacterSheet;
-
 },{"./SR5BaseActorSheet":107}],109:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -18889,7 +18865,6 @@ class SR5ICActorSheet extends SR5BaseActorSheet_1.SR5BaseActorSheet {
     }
 }
 exports.SR5ICActorSheet = SR5ICActorSheet;
-
 },{"./SR5BaseActorSheet":107}],110:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -18914,7 +18889,6 @@ class SR5SpiritActorSheet extends SR5BaseActorSheet_1.SR5BaseActorSheet {
     }
 }
 exports.SR5SpiritActorSheet = SR5SpiritActorSheet;
-
 },{"./SR5BaseActorSheet":107}],111:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -18937,7 +18911,6 @@ class SR5SpriteActorSheet extends SR5BaseActorSheet_1.SR5BaseActorSheet {
     }
 }
 exports.SR5SpriteActorSheet = SR5SpriteActorSheet;
-
 },{"./SR5BaseActorSheet":107}],112:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -19036,7 +19009,6 @@ class SR5VehicleActorSheet extends SR5BaseActorSheet_1.SR5BaseActorSheet {
     }
 }
 exports.SR5VehicleActorSheet = SR5VehicleActorSheet;
-
 },{"./SR5BaseActorSheet":107}],113:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -19072,7 +19044,6 @@ class ChangelogApplication extends Application {
     }
 }
 exports.ChangelogApplication = ChangelogApplication;
-
 },{"../constants":150}],114:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -19290,8 +19261,7 @@ class EnvModifiersApplication extends Application {
     }
 }
 exports.EnvModifiersApplication = EnvModifiersApplication;
-
-},{"../actor/SR5Actor":85,"../constants":150,"../helpers":164,"../rules/Modifiers":222}],115:[function(require,module,exports){
+},{"../actor/SR5Actor":85,"../constants":150,"../helpers":164,"../rules/Modifiers":223}],115:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -20706,7 +20676,6 @@ class AmmoParser extends BaseGearParser_1.BaseGearParser {
     }
 }
 exports.AmmoParser = AmmoParser;
-
 },{"./BaseGearParser":128}],128:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -20736,7 +20705,6 @@ class BaseGearParser {
     }
 }
 exports.BaseGearParser = BaseGearParser;
-
 },{"../../../data/DataDefaults":151,"../BaseParserFunctions.js":116}],129:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -20782,7 +20750,6 @@ class DeviceParser extends BaseGearParser_1.BaseGearParser {
     }
 }
 exports.DeviceParser = DeviceParser;
-
 },{"./BaseGearParser":128}],130:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -20830,7 +20797,6 @@ class GearsParser {
     }
 }
 exports.GearsParser = GearsParser;
-
 },{"./ParserSelector":131}],131:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -20868,7 +20834,6 @@ class ParserSelector {
     }
 }
 exports.ParserSelector = ParserSelector;
-
 },{"./AmmoParser":127,"./BaseGearParser":128,"./DeviceParser":129,"./ProgramParser":132,"./SinParser":133}],132:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -20894,7 +20859,6 @@ class ProgramParser extends BaseGearParser_1.BaseGearParser {
     }
 }
 exports.ProgramParser = ProgramParser;
-
 },{"./BaseGearParser":128}],133:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -20937,7 +20901,6 @@ class SinParser extends BaseGearParser_1.BaseGearParser {
     }
 }
 exports.SinParser = SinParser;
-
 },{"./BaseGearParser":128}],134:[function(require,module,exports){
 "use strict";
 
@@ -21099,7 +21062,6 @@ class DamageApplicationDialog extends FormDialog_1.FormDialog {
     }
 }
 exports.DamageApplicationDialog = DamageApplicationDialog;
-
 },{"./FormDialog":137}],136:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -21137,7 +21099,6 @@ class DeleteConfirmationDialog extends FormDialog_1.FormDialog {
     }
 }
 exports.DeleteConfirmationDialog = DeleteConfirmationDialog;
-
 },{"./FormDialog":137}],137:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -21253,7 +21214,6 @@ class FormDialog extends Dialog {
     }
 }
 exports.FormDialog = FormDialog;
-
 },{}],138:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -21317,7 +21277,6 @@ class MoveInventoryDialog extends FormDialog_1.FormDialog {
     }
 }
 exports.MoveInventoryDialog = MoveInventoryDialog;
-
 },{"./FormDialog":137}],139:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -21525,363 +21484,7 @@ class ShadowrunActorDialogs {
     }
 }
 exports.ShadowrunActorDialogs = ShadowrunActorDialogs;
-
 },{"../../actor/flows/SkillFlow":88,"../../config":149,"../../helpers":164,"../../parts/PartsList":218,"./FormDialog":137}],140:[function(require,module,exports){
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ShadowrunItemDialog = void 0;
-const helpers_1 = require("../../helpers");
-const constants_1 = require("../../constants");
-const FormDialog_1 = require("./FormDialog");
-const config_1 = require("../../config");
-class ShadowrunItemDialog {
-    static create(item, event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            if (item.isRangedWeapon()) {
-                return ShadowrunItemDialog.createRangedWeaponDialog(item, event);
-            }
-            if (item.isSpell()) {
-                return ShadowrunItemDialog.createSpellDialog(item, event);
-            }
-            if (item.isComplexForm()) {
-                return ShadowrunItemDialog.createComplexFormDialog(item, event);
-            }
-            if (item.isMatrixAction()) {
-                return ShadowrunItemDialog.createMatrixActionFormDialog(item, event);
-            }
-        });
-    }
-    static createRangedWeaponDialog(item, event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const dialogData = { title: item.name,
-                event,
-            };
-            const templatePath = 'systems/shadowrun5e/dist/templates/rolls/range-weapon-roll.html';
-            // Prepare template data for display.
-            const modifiers = yield item.actor.getModifiers();
-            // Disable manual range selection when a overwrite is set.
-            const targetRange = modifiers.environmental.active.range;
-            const disableTargetRange = modifiers.hasActiveEnvironmentalOverwrite;
-            const templateData = {
-                targetRange,
-                disableTargetRange
-            };
-            const onAfterClose = ShadowrunItemDialog.addRangedWeaponData(templateData, dialogData, item);
-            dialogData['templateData'] = templateData;
-            dialogData['templatePath'] = templatePath;
-            dialogData['onAfterClose'] = onAfterClose;
-            //@ts-ignore
-            return new FormDialog_1.FormDialog(dialogData);
-        });
-    }
-    static createSpellDialog(item, event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const dialogData = { title: item.name,
-                event,
-            };
-            const templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-spell.html';
-            const templateData = {};
-            const onAfterClose = ShadowrunItemDialog.addSpellData(templateData, dialogData, item);
-            dialogData['templateData'] = templateData;
-            dialogData['templatePath'] = templatePath;
-            dialogData['onAfterClose'] = onAfterClose;
-            //@ts-ignore
-            return new FormDialog_1.FormDialog(dialogData);
-        });
-    }
-    static createComplexFormDialog(item, event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const dialogData = { title: item.name,
-                event,
-            };
-            const templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-complex-form.html';
-            const templateData = {};
-            const onAfterClose = ShadowrunItemDialog.addComplexFormData(templateData, dialogData, item);
-            dialogData['templateData'] = templateData;
-            dialogData['templatePath'] = templatePath;
-            dialogData['onAfterClose'] = onAfterClose;
-            //@ts-ignore
-            return new FormDialog_1.FormDialog(dialogData);
-        });
-    }
-    static createMatrixActionFormDialog(item, event) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const dialogData = { title: item.name,
-                event };
-            const templatePath = 'systems/shadowrun5e/dist/templates/rolls/roll-matrix.html';
-            const templateData = {};
-            const onAfterClose = ShadowrunItemDialog.addMatrixActionData(templateData, dialogData, item);
-            dialogData['templateData'] = templateData;
-            dialogData['templatePath'] = templatePath;
-            dialogData['onAfterClose'] = onAfterClose;
-            // @ts-ignore
-            return new FormDialog_1.FormDialog(dialogData);
-        });
-    }
-    static addComplexFormData(templateData, dialogData, item) {
-        var _a;
-        const fade = item.getFade();
-        const title = `${helpers_1.Helpers.label(item.name)} Level`;
-        const level = ((_a = item.getLastComplexFormLevel()) === null || _a === void 0 ? void 0 : _a.value) || 2 - fade;
-        templateData['fade'] = fade >= 0 ? `+${fade}` : fade;
-        templateData['level'] = level;
-        templateData['title'] = title;
-        let cancel = true;
-        dialogData.buttons = {
-            roll: {
-                label: 'Continue',
-                icon: '<i class="fas fa-dice-six"></i>',
-                callback: () => (cancel = false),
-            },
-        };
-        return (html) => __awaiter(this, void 0, void 0, function* () {
-            if (cancel)
-                return;
-            const complexFormTestData = {};
-            mergeObject(complexFormTestData, ShadowrunItemDialog._getSelectedComplexFormLevel(html));
-            // TODO: Remnants of old style data flow. Look into RangedWeapon for newer style.
-            yield item.setLastComplexFormLevel({ value: complexFormTestData.level });
-            return { complexForm: complexFormTestData };
-        });
-    }
-    static _getSelectedComplexFormLevel(html) {
-        const level = helpers_1.Helpers.parseInputToNumber($(html).find('[name=level]').val());
-        return { level };
-    }
-    static addSpellData(templateData, dialogData, item) {
-        var _a;
-        const title = `${helpers_1.Helpers.label(item.name)} Force`;
-        const drain = item.getDrain();
-        const force = ((_a = item.getLastSpellForce()) === null || _a === void 0 ? void 0 : _a.value) || 2 - drain;
-        templateData['drain'] = drain >= 0 ? `+${drain}` : `${drain}`;
-        templateData['force'] = force;
-        templateData['title'] = title;
-        dialogData.title = title;
-        let cancel = true;
-        let reckless = false;
-        dialogData.buttons = {
-            normal: {
-                label: game.i18n.localize('SR5.NormalSpellButton'),
-                callback: () => (cancel = false),
-            },
-            reckless: {
-                label: game.i18n.localize('SR5.RecklessSpellButton'),
-                callback: () => {
-                    reckless = true;
-                    cancel = false;
-                },
-            },
-        };
-        dialogData.default = 'normal';
-        return (html) => __awaiter(this, void 0, void 0, function* () {
-            if (cancel)
-                return;
-            const actionTestData = {};
-            mergeObject(actionTestData, ShadowrunItemDialog._getSelectedSpellForce(html));
-            mergeObject(actionTestData, ShadowrunItemDialog._getSelectedSpellReckless(reckless));
-            yield item.setLastSpellForce({ value: actionTestData.force, reckless: actionTestData.reckless });
-            return { spell: actionTestData };
-        });
-    }
-    static _getSelectedSpellForce(html) {
-        const force = helpers_1.Helpers.parseInputToNumber($(html).find('[name=force]').val());
-        return { force };
-    }
-    static _getSelectedSpellReckless(reckless) {
-        return { reckless };
-    }
-    static addRangedWeaponData(templateData, dialogData, item) {
-        var _a;
-        let title = dialogData.title || item.name;
-        const itemData = item.data.data;
-        const fireModes = {};
-        const { modes, ranges } = itemData.range;
-        const { ammo } = itemData;
-        // TODO: This should be moved into constants or some kind of 'rulesData'
-        if (modes.single_shot) {
-            fireModes['1'] = game.i18n.localize("SR5.WeaponModeSingleShotShort");
-        }
-        if (modes.semi_auto) {
-            fireModes['1'] = game.i18n.localize("SR5.WeaponModeSemiAutoShort");
-            fireModes['3'] = game.i18n.localize("SR5.WeaponModeSemiAutoBurst");
-        }
-        if (modes.burst_fire) {
-            fireModes['3'] = `${modes.semi_auto ? `${game.i18n.localize("SR5.WeaponModeSemiAutoBurst")}/` : ''}${game.i18n.localize("SR5.WeaponModeBurstFireShort")}`;
-            fireModes['6'] = game.i18n.localize("SR5.WeaponModeBurstFireLong");
-        }
-        if (modes.full_auto) {
-            fireModes['6'] = `${modes.burst_fire ? 'LB/' : ''}${game.i18n.localize("SR5.WeaponModeFullAutoShort")}(s)`;
-            fireModes['10'] = `${game.i18n.localize("SR5.WeaponModeFullAutoShort")}(c)`;
-            fireModes['20'] = game.i18n.localize('SR5.Suppressing');
-        }
-        const templateRanges = this._getRangeWeaponTemplateData(ranges);
-        const fireMode = item.getLastFireMode();
-        const rc = item.getRecoilCompensation(true);
-        templateData['fireModes'] = fireModes;
-        templateData['fireMode'] = fireMode === null || fireMode === void 0 ? void 0 : fireMode.value;
-        templateData['rc'] = rc;
-        templateData['ammo'] = ammo;
-        templateData['title'] = title;
-        templateData['ranges'] = templateRanges;
-        if (item.actor.getToken() && helpers_1.Helpers.userHasTargets()) {
-            templateData['targetsSelected'] = helpers_1.Helpers.userHasTargets();
-            templateData['targets'] = ShadowrunItemDialog._getTargetRangeTemplateData(item.actor, templateRanges);
-        }
-        else if (!item.actor.getToken() && helpers_1.Helpers.userHasTargets()) {
-            // Inform user about usage of actors without tokens!
-            (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.warn(game.i18n.localize('SR5.TargetingNeedsActorWithToken'));
-        }
-        let cancel = true;
-        dialogData.buttons = {
-            continue: {
-                label: game.i18n.localize('SR5.Continue'),
-                callback: () => (cancel = false),
-            },
-        };
-        // TODO: Move this selection handler to an appropriate place. Maybe split ShadowrunItemDialog into subclasses.
-        return (html) => __awaiter(this, void 0, void 0, function* () {
-            if (cancel) {
-                return;
-            }
-            const actionTestData = {};
-            if (helpers_1.Helpers.userHasTargets()) {
-                mergeObject(actionTestData, ShadowrunItemDialog._getSelectedTargetRangeModifier(html));
-            }
-            else {
-                mergeObject(actionTestData, ShadowrunItemDialog._getSelectedRangeModifier(html));
-                // Store lastFireRange for generic range selection.
-            }
-            mergeObject(actionTestData, ShadowrunItemDialog._getSelectedFireMode(html, fireModes));
-            const { targetId } = ShadowrunItemDialog._getSelectedTargetTokenId(html);
-            // Store selections for next dialog.
-            if (actionTestData.environmental.range !== undefined) {
-                // Change environmental modifiers for the actor.
-                const modifiers = yield item.actor.getModifiers();
-                if (!modifiers.hasActiveEnvironmentalOverwrite) {
-                    modifiers.activateEnvironmentalCategory('range', actionTestData.environmental.range);
-                    yield item.actor.setModifiers(modifiers);
-                }
-                else {
-                    console.error('The actor has an active environmental overwrite, yet could define a manual range selection.');
-                }
-                yield item.setLastFireRangeMod({ value: actionTestData.environmental.range });
-            }
-            if (actionTestData.fireMode) {
-                yield item.setLastFireMode(actionTestData.fireMode);
-            }
-            return { rangedWeapon: actionTestData, targetId };
-        });
-    }
-    static _getRangeWeaponTemplateData(ranges) {
-        const { range_modifiers } = constants_1.SR.combat.environmental;
-        const newRanges = {};
-        for (const [key, value] of Object.entries(ranges)) {
-            const distance = value;
-            newRanges[key] = helpers_1.Helpers.createRangeDescription(config_1.SR5.weaponRanges[key], distance, range_modifiers[key]);
-        }
-        return newRanges;
-    }
-    /** Build template data for target distances and resulting range modifiers
-     *
-     * It is mandatory for an actor to have token placed,
-     * so distance measurements can be taken.
-     *
-     */
-    static _getTargetRangeTemplateData(actor, ranges) {
-        var _a;
-        const attacker = actor.getToken();
-        if (!attacker || !helpers_1.Helpers.userHasTargets()) {
-            (_a = ui.notifications) === null || _a === void 0 ? void 0 : _a.warn(game.i18n.localize('SR5.TargetingNeedsActorWithToken'));
-            return [];
-        }
-        const targets = helpers_1.Helpers.getUserTargets();
-        const targetsTemplateData = targets.map(target => {
-            //@ts-ignore // undefined actor is okay
-            const distance = helpers_1.Helpers.measureTokenDistance(attacker, target);
-            const range = helpers_1.Helpers.getWeaponRange(distance, ranges);
-            return {
-                id: target.id,
-                name: target.name,
-                range: range,
-                unit: constants_1.LENGTH_UNIT,
-                distance
-            };
-        });
-        //@ts-ignore
-        return targetsTemplateData.sort((a, b) => {
-            if (a.distance < b.distance)
-                return -1;
-            if (a.distance > b.distance)
-                return 1;
-            return 0;
-        });
-    }
-    static _getSelectedTargetRangeModifier(html) {
-        const selectElement = $(html).find('[name="selected-target"]');
-        const range = helpers_1.Helpers.parseInputToNumber(selectElement.find(':selected').data('range-modifier'));
-        return {
-            environmental: { range }
-        };
-    }
-    static _getSelectedTargetTokenId(html) {
-        const selectElement = $(html).find('[name="selected-target"]');
-        const targetId = selectElement.val();
-        return { targetId };
-    }
-    static _getSelectedRangeModifier(html) {
-        const range = helpers_1.Helpers.parseInputToNumber($(html).find('[name="range"]').val());
-        return { environmental: { range } };
-    }
-    static _getSelectedFireMode(html, fireModes) {
-        const fireModeValue = helpers_1.Helpers.parseInputToNumber($(html).find('[name="fireMode"]').val());
-        if (fireModeValue) {
-            const fireModeString = fireModes[fireModeValue];
-            const defenseModifier = helpers_1.Helpers.mapRoundsToDefenseDesc(fireModeValue);
-            const fireMode = {
-                label: fireModeString,
-                value: fireModeValue,
-                defense: defenseModifier,
-            };
-            return { fireMode };
-        }
-        return {};
-    }
-    static addMatrixActionData(templateData, dialogData, item) {
-        // TODO: This needs to be configurable.
-        templateData['marks'] = 1;
-        let cancel = true;
-        dialogData.buttons = {
-            roll: {
-                label: 'Continue',
-                icon: '<i class="fas fa-dice-six"></i>',
-                callback: () => (cancel = false),
-            },
-        };
-        return (html) => __awaiter(this, void 0, void 0, function* () {
-            if (cancel)
-                return;
-            const matrixTestData = {
-                marks: ShadowrunItemDialog._getSelectedMatrixMarks(html)
-            };
-            return { matrix: matrixTestData };
-        });
-    }
-    static _getSelectedMatrixMarks(html) {
-        return helpers_1.Helpers.parseInputToNumber($(html).find('[name=marks]').val());
-    }
-}
-exports.ShadowrunItemDialog = ShadowrunItemDialog;
-
-},{"../../config":149,"../../constants":150,"../../helpers":164,"./FormDialog":137}],141:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -21906,7 +21509,7 @@ class ShadowrunTestDialog {
         });
     }
     static getAdvancedTestData(actor, options, partsProps) {
-        var _a;
+        var _a, _b;
         const title = options.title;
         const parts = new PartsList_1.PartsList(partsProps);
         const templateData = {
@@ -21915,6 +21518,7 @@ class ShadowrunTestDialog {
             pool: parts.total,
             parts: parts.getMessageOutput(),
             limitValue: (_a = options.limit) === null || _a === void 0 ? void 0 : _a.value,
+            thresholdValue: (_b = options.threshold) === null || _b === void 0 ? void 0 : _b.value,
             wounds: options.wounds,
             woundValue: actor === null || actor === void 0 ? void 0 : actor.getWoundModifier(),
             rollMode: game.settings.get(constants_1.CORE_NAME, constants_1.CORE_FLAGS.RollMode),
@@ -21939,19 +21543,26 @@ class ShadowrunTestDialog {
             };
         }
         const onAfterClose = (html) => __awaiter(this, void 0, void 0, function* () {
-            var _b, _c;
+            var _c, _d;
             const dicePoolValue = helpers_1.Helpers.parseInputToNumber($(html).find('[name="pool"]').val());
-            if ((_b = options.dialogOptions) === null || _b === void 0 ? void 0 : _b.pool) {
+            if ((_c = options.dialogOptions) === null || _c === void 0 ? void 0 : _c.pool) {
                 parts.clear();
-                yield ((_c = game.user) === null || _c === void 0 ? void 0 : _c.setFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.LastRollPromptValue, dicePoolValue));
+                yield ((_d = game.user) === null || _d === void 0 ? void 0 : _d.setFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.LastRollPromptValue, dicePoolValue));
                 parts.addUniquePart('SR5.Base', dicePoolValue);
             }
+            const thresholdValue = helpers_1.Helpers.parseInputToNumber($(html).find('[name="thresholdValue"]').val());
             const limitValue = helpers_1.Helpers.parseInputToNumber($(html).find('[name="limitValue"]').val());
             const { limit } = options;
             if (limit && limit.value !== limitValue) {
                 limit.value = limitValue;
                 limit.base = limitValue;
                 limit.label = 'SR5.Override';
+            }
+            const { threshold } = options;
+            if (threshold && threshold.value !== thresholdValue) {
+                threshold.label = 'SR5.Override';
+                threshold.base = thresholdValue;
+                threshold.value = helpers_1.Helpers.calcTotal(threshold, { min: 0 });
             }
             const woundValue = helpers_1.Helpers.parseInputToNumber($(html).find('[name="wounds"]').val());
             const situationMod = helpers_1.Helpers.parseInputToNumber($(html).find('[name="dp_mod"]').val());
@@ -21972,6 +21583,7 @@ class ShadowrunTestDialog {
             const rollMode = helpers_1.Helpers.parseInputToString($(html).find('[name=rollMode]').val());
             return {
                 limit,
+                threshold,
                 wounds,
                 parts,
                 extended,
@@ -21989,8 +21601,63 @@ class ShadowrunTestDialog {
     }
 }
 exports.ShadowrunTestDialog = ShadowrunTestDialog;
-
-},{"../../constants":150,"../../helpers":164,"../../parts/PartsList":218,"./FormDialog":137}],142:[function(require,module,exports){
+},{"../../constants":150,"../../helpers":164,"../../parts/PartsList":218,"./FormDialog":137}],141:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.TestDialog = void 0;
+const FormDialog_1 = require("./FormDialog");
+const constants_1 = require("../../constants");
+/**
+ * TODO: Add TestDialog JSDoc
+ */
+class TestDialog extends FormDialog_1.FormDialog {
+    constructor(actor, test, options) {
+        const dialogData = TestDialog.getDialogData(actor, test);
+        super(dialogData, options);
+    }
+    static get defaultOptions() {
+        const options = super.defaultOptions;
+        options.id = 'damage-application';
+        // TODO: Class Dialog here is needed for dialog button styling.
+        options.classes = ['sr5', 'form-dialog'];
+        options.resizable = true;
+        options.height = 'auto';
+        return options;
+    }
+    static getDialogData(actor, test) {
+        // @ts-ignore
+        const title = game.i18n.localize(test.constructor.label);
+        const templatePath = 'systems/shadowrun5e/dist/templates/apps/dialogs/test-dialog.html';
+        // roll mode handling.
+        const rollMode = game.settings.get(constants_1.CORE_NAME, constants_1.CORE_FLAGS.RollMode);
+        const rollModes = CONFIG.Dice.rollModes;
+        const templateData = {
+            test,
+            actor,
+            rollMode,
+            rollModes
+        };
+        const buttons = {
+            roll: {
+                label: 'TODO: Roll'
+            },
+            cancel: {
+                label: 'TODO: Cancel'
+            }
+        };
+        const onAfterClose = (html) => console.error('After Close', html);
+        return {
+            title,
+            templatePath,
+            templateData,
+            buttons,
+            default: 'roll',
+            onAfterClose
+        };
+    }
+}
+exports.TestDialog = TestDialog;
+},{"../../constants":150,"./FormDialog":137}],142:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -22235,7 +21902,6 @@ class KnowledgeSkillEditSheet extends LanguageSkillEditSheet_1.LanguageSkillEdit
     }
 }
 exports.KnowledgeSkillEditSheet = KnowledgeSkillEditSheet;
-
 },{"./LanguageSkillEditSheet":144}],144:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -22261,7 +21927,6 @@ class LanguageSkillEditSheet extends SkillEditSheet_1.SkillEditSheet {
     }
 }
 exports.LanguageSkillEditSheet = LanguageSkillEditSheet;
-
 },{"./SkillEditSheet":145}],145:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -22459,7 +22124,6 @@ class SkillEditSheet extends DocumentSheet {
     }
 }
 exports.SkillEditSheet = SkillEditSheet;
-
 },{"../../config":149}],146:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -22505,7 +22169,6 @@ const measureDistance = function (segments, options = {}) {
     });
 };
 exports.measureDistance = measureDistance;
-
 },{}],147:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -22713,6 +22376,7 @@ const addRollListeners = (app, html) => {
     if (!app.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.MessageCustomRoll)) {
         return;
     }
+    console.error('Registering message', app, html);
     html.on('click', '.test', (event) => __awaiter(void 0, void 0, void 0, function* () {
         var _a, _b;
         event.preventDefault();
@@ -22903,8 +22567,7 @@ const addRollListeners = (app, html) => {
     }));
 };
 exports.addRollListeners = addRollListeners;
-
-},{"./actor/SR5Actor":85,"./actor/flows/DamageApplicationFlow":86,"./constants":150,"./helpers":164,"./item/SR5Item":204,"./item/flows/ActionResultFlow":207,"./template":227}],148:[function(require,module,exports){
+},{"./actor/SR5Actor":85,"./actor/flows/DamageApplicationFlow":86,"./constants":150,"./helpers":164,"./item/SR5Item":204,"./item/flows/ActionResultFlow":207,"./template":228}],148:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -23321,8 +22984,7 @@ function _combatantGetInitiativeFormula() {
     return SR5Combat._getSystemInitiativeFormula(combat.initiativePass);
 }
 exports._combatantGetInitiativeFormula = _combatantGetInitiativeFormula;
-
-},{"../constants":150,"../rules/CombatRules":220,"../sockets":226}],149:[function(require,module,exports){
+},{"../constants":150,"../rules/CombatRules":221,"../sockets":227}],149:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5 = void 0;
@@ -23783,7 +23445,6 @@ exports.SR5 = {
         },
     },
 };
-
 },{}],150:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -23828,7 +23489,8 @@ exports.FLAGS = {
     DoInitPass: 'doInitPass',
     DoNextRound: 'doNextRound',
     addNetworkController: 'addNetworkController',
-    TokenHealthBars: 'tokenHealthBars'
+    TokenHealthBars: 'tokenHealthBars',
+    Test: 'TestData'
 };
 exports.CORE_NAME = 'core';
 exports.CORE_FLAGS = {
@@ -23928,12 +23590,12 @@ exports.SR = {
         }
     }
 };
-
 },{}],151:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataDefaults = exports.DefaultValues = void 0;
 const constants_1 = require("../constants");
+const SuccessTest_1 = require("../tests/SuccessTest");
 class DefaultValues {
     /**
      *
@@ -24150,6 +23812,51 @@ class DefaultValues {
             data: Object.assign({ description: DefaultValues.descriptionData(((_a = partialDeviceItemData.data) === null || _a === void 0 ? void 0 : _a.description) || {}), technology: DefaultValues.technologyData(((_b = partialDeviceItemData.data) === null || _b === void 0 ? void 0 : _b.technology) || {}) }, DefaultValues.matrixData({ category: (_c = partialDeviceItemData.data) === null || _c === void 0 ? void 0 : _c.category, atts: (_d = partialDeviceItemData.data) === null || _d === void 0 ? void 0 : _d.atts }))
         }, partialDeviceItemData);
     }
+    static valueData(partialValueData = {}) {
+        return mergeObject({
+            base: 0,
+            value: 0,
+            temp: 0,
+            mod: [],
+            label: ''
+        }, partialValueData);
+    }
+    static actionData(partialActionData = {}) {
+        return mergeObject({
+            test: SuccessTest_1.SuccessTest.name,
+            type: '',
+            category: '',
+            attribute: '',
+            attribute2: '',
+            skill: '',
+            spec: false,
+            mod: 0,
+            mod_description: '',
+            damage: DefaultValues.damageData(),
+            limit: {
+                value: 0,
+                attribute: '',
+                mod: [],
+                base: 0,
+            },
+            threshold: {
+                value: 0,
+                base: 0
+            },
+            extended: false,
+            opposed: {
+                type: 'defense',
+                test: '',
+                attribute: '',
+                attribute2: '',
+                skill: '',
+                mod: 0,
+                description: '',
+            },
+            alt_mod: 0,
+            dice_pool_mod: []
+        }, partialActionData);
+    }
 }
 exports.DefaultValues = DefaultValues;
 // TODO: Move these into DefaultValues implementations.
@@ -24199,8 +23906,7 @@ exports.DataDefaults = {
     },
     damage: DefaultValues.damageData({ type: { base: '', value: '' } }),
 };
-
-},{"../constants":150}],152:[function(require,module,exports){
+},{"../constants":150,"../tests/SuccessTest":230}],152:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DataWrapper = void 0;
@@ -24210,7 +23916,6 @@ class DataWrapper {
     }
 }
 exports.DataWrapper = DataWrapper;
-
 },{}],153:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -24527,7 +24232,6 @@ class SR5ItemDataWrapper extends DataWrapper_1.DataWrapper {
     }
 }
 exports.SR5ItemDataWrapper = SR5ItemDataWrapper;
-
 },{"./DataWrapper":152}],154:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -24655,7 +24359,6 @@ class SR5ActiveEffect extends ActiveEffect {
     }
 }
 exports.SR5ActiveEffect = SR5ActiveEffect;
-
 },{"../helpers":164}],155:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -24671,7 +24374,6 @@ class SR5ActiveEffectSheet extends ActiveEffectConfig {
     }
 }
 exports.SR5ActiveEffectSheet = SR5ActiveEffectSheet;
-
 },{}],156:[function(require,module,exports){
 "use strict";
 //@ts-nocheck // This is JavaScript code.
@@ -24772,7 +24474,6 @@ function prepareActiveEffectCategories(effects) {
     return categories;
 }
 exports.prepareActiveEffectCategories = prepareActiveEffectCategories;
-
 },{"./helpers":164}],157:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -24790,7 +24491,6 @@ const registerAppHelpers = () => {
     });
 };
 exports.registerAppHelpers = registerAppHelpers;
-
 },{}],158:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -24952,7 +24652,6 @@ const registerBasicHelpers = () => {
     });
 };
 exports.registerBasicHelpers = registerBasicHelpers;
-
 },{"../actor/SR5Actor":85,"../helpers":164}],159:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -24987,7 +24686,6 @@ class HandlebarManager {
     }
 }
 exports.HandlebarManager = HandlebarManager;
-
 },{"./AppHelpers":157,"./BasicHelpers":158,"./HandlebarTemplates":160,"./ItemLineHelpers":161,"./RollAndLabelHelpers":162,"./SkillLineHelpers":163}],160:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -25113,11 +24811,15 @@ const preloadHandlebarsTemplates = () => __awaiter(void 0, void 0, void 0, funct
         'systems/shadowrun5e/dist/templates/common/List/ListHeader.html',
         // dialogs
         'systems/shadowrun5e/dist/templates/apps/dialogs/damage-application.html',
+        'systems/shadowrun5e/dist/templates/apps/dialogs/test-dialog.html',
+        // Tests
+        'systems/shadowrun5e/dist/templates/rolls/success-test.html',
+        // Rolls
+        'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.html',
     ];
     return loadTemplates(templatePaths);
 });
 exports.preloadHandlebarsTemplates = preloadHandlebarsTemplates;
-
 },{}],161:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -25700,7 +25402,6 @@ const registerItemLineHelpers = () => {
     });
 };
 exports.registerItemLineHelpers = registerItemLineHelpers;
-
 },{"../config":149,"../data/SR5ItemDataWrapper":153}],162:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -25769,7 +25470,6 @@ const registerRollAndLabelHelpers = () => {
     Handlebars.registerHelper('speakerName', helpers_1.Helpers.getChatSpeakerName);
 };
 exports.registerRollAndLabelHelpers = registerRollAndLabelHelpers;
-
 },{"../helpers":164,"../parts/PartsList":218}],163:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -25880,8 +25580,7 @@ const registerSkillLineHelpers = () => {
     });
 };
 exports.registerSkillLineHelpers = registerSkillLineHelpers;
-
-},{"../constants":150,"../helpers":164,"../rules/SkillRules":223}],164:[function(require,module,exports){
+},{"../constants":150,"../helpers":164,"../rules/SkillRules":224}],164:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -26635,7 +26334,6 @@ class Helpers {
     }
 }
 exports.Helpers = Helpers;
-
 },{"./apps/dialogs/DeleteConfirmationDialog":136,"./constants":150,"./data/DataDefaults":151,"./parts/PartsList":218}],165:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -26673,10 +26371,14 @@ const SR5ICActorSheet_1 = require("./actor/sheets/SR5ICActorSheet");
 const SR5ActiveEffect_1 = require("./effect/SR5ActiveEffect");
 const SR5ActiveEffectSheet_1 = require("./effect/SR5ActiveEffectSheet");
 const NetworkDeviceFlow_1 = require("./item/flows/NetworkDeviceFlow");
+const SR5Roll_1 = require("./rolls/SR5Roll");
+const SuccessTest_1 = require("./tests/SuccessTest");
+const OpposedTest_1 = require("./tests/OpposedTest");
 const SR5VehicleActorSheet_1 = require("./actor/sheets/SR5VehicleActorSheet");
 const SR5CharacterSheet_1 = require("./actor/sheets/SR5CharacterSheet");
 const SR5SpiritActorSheet_1 = require("./actor/sheets/SR5SpiritActorSheet");
 const SR5SpriteActorSheet_1 = require("./actor/sheets/SR5SpriteActorSheet");
+const TestDialog_1 = require("./apps/dialogs/TestDialog");
 // Redeclare SR5config as a global as foundry-vtt-types CONFIG with SR5 property causes issues.
 exports.SR5CONFIG = config_1.SR5;
 class HooksManager {
@@ -26717,7 +26419,14 @@ ___________________
             ShadowrunRoller: ShadowrunRoller_1.ShadowrunRoller,
             SR5Item: SR5Item_1.SR5Item,
             rollItemMacro: macros_1.rollItemMacro,
-            rollSkillMacro: macros_1.rollSkillMacro
+            rollSkillMacro: macros_1.rollSkillMacro,
+            SR5Roll: SR5Roll_1.SR5Roll,
+            // Register action tests.
+            // These can be replaced and extended.
+            tests: {
+                SuccessTest: SuccessTest_1.SuccessTest,
+                OpposedTest: OpposedTest_1.OpposedTest
+            }
         };
         CONFIG.Actor.documentClass = SR5Actor_1.SR5Actor;
         CONFIG.Item.documentClass = SR5Item_1.SR5Item;
@@ -26730,6 +26439,10 @@ ___________________
         CONFIG.Combat.initiative.formula = "@initiative.current.base.value[Base] + @initiative.current.dice.text[Dice] - @wounds.value[Wounds]";
         // @ts-ignore
         Combatant.prototype._getInitiativeFormula = SR5Combat_1._combatantGetInitiativeFormula;
+        // Register general SR5Roll for JSON serialization support.
+        CONFIG.Dice.rolls.push(SR5Roll_1.SR5Roll);
+        // @ts-ignore // Register the SR5Roll dnd5e style.
+        CONFIG.Dice.SR5oll = SR5Roll_1.SR5Roll;
         // Add Shadowrun configuration onto general Foundry config for module access.
         // @ts-ignore // TODO: Add declaration merging
         CONFIG.SR5 = config_1.SR5;
@@ -26774,7 +26487,7 @@ ___________________
         HandlebarManager_1.HandlebarManager.loadTemplates();
     }
     static ready() {
-        var _a;
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
             if ((_a = game.user) === null || _a === void 0 ? void 0 : _a.isGM) {
                 yield Migrator_1.Migrator.BeginMigration();
@@ -26782,11 +26495,19 @@ ___________________
                     yield new ChangelogApplication_1.ChangelogApplication().render(true);
                 }
             }
-            // TODO make based on foundry version
+            // Connect chat dice icon to shadowrun basic success test roll.
             const diceIconSelector = '#chat-controls .roll-type-select .fa-dice-d20';
-            $(document).on('click', diceIconSelector, () => ShadowrunRoller_1.ShadowrunRoller.promptRoll());
+            $(document).on('click', diceIconSelector, () => __awaiter(this, void 0, void 0, function* () { return yield ShadowrunRoller_1.ShadowrunRoller.promptSuccessTest(); }));
             const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
-            $(document).on('click', diceIconSelectorNew, () => ShadowrunRoller_1.ShadowrunRoller.promptRoll());
+            $(document).on('click', diceIconSelectorNew, () => __awaiter(this, void 0, void 0, function* () { return yield ShadowrunRoller_1.ShadowrunRoller.promptSuccessTest(); }));
+            const test = SuccessTest_1.SuccessTest.fromPool(10, 2, 5);
+            const actor = (_b = game.actors) === null || _b === void 0 ? void 0 : _b.getName('Linked');
+            // @ts-ignore
+            const dialog = new TestDialog_1.TestDialog(actor, test);
+            const data = yield dialog.select();
+            if (dialog.canceled)
+                return console.warn('Canceld');
+            console.warn('Roll', data);
         });
     }
     static canvasInit() {
@@ -26840,6 +26561,8 @@ ___________________
     }
     static renderChatMessage(message, html, data) {
         chat.addRollListeners(message, html);
+        SuccessTest_1.SuccessTest.chatMessageListeners(message, html, data);
+        OpposedTest_1.OpposedTest.chatMessageListeners(message, html, data);
     }
     static renderItemDirectory(app, html) {
         const button = $('<button>Import Chummer Data</button>');
@@ -26949,8 +26672,7 @@ ___________________
     }
 }
 exports.HooksManager = HooksManager;
-
-},{"../test/quench":229,"./actor/SR5Actor":85,"./actor/sheets/SR5CharacterSheet":108,"./actor/sheets/SR5ICActorSheet":109,"./actor/sheets/SR5SpiritActorSheet":110,"./actor/sheets/SR5SpriteActorSheet":111,"./actor/sheets/SR5VehicleActorSheet":112,"./apps/ChangelogApplication":113,"./apps/EnvModifiersApplication":114,"./apps/gmtools/OverwatchScoreTracker":142,"./canvas":146,"./chat":147,"./combat/SR5Combat":148,"./config":149,"./constants":150,"./effect/SR5ActiveEffect":154,"./effect/SR5ActiveEffectSheet":155,"./handlebars/HandlebarManager":159,"./helpers":164,"./importer/apps/import-form":166,"./item/SR5Item":204,"./item/SR5ItemSheet":205,"./item/flows/NetworkDeviceFlow":208,"./macros":210,"./migrator/Migrator":212,"./rolls/ShadowrunRoller":219,"./settings":225,"./token/SR5Token":228}],166:[function(require,module,exports){
+},{"../test/quench":232,"./actor/SR5Actor":85,"./actor/sheets/SR5CharacterSheet":108,"./actor/sheets/SR5ICActorSheet":109,"./actor/sheets/SR5SpiritActorSheet":110,"./actor/sheets/SR5SpriteActorSheet":111,"./actor/sheets/SR5VehicleActorSheet":112,"./apps/ChangelogApplication":113,"./apps/EnvModifiersApplication":114,"./apps/dialogs/TestDialog":141,"./apps/gmtools/OverwatchScoreTracker":142,"./canvas":146,"./chat":147,"./combat/SR5Combat":148,"./config":149,"./constants":150,"./effect/SR5ActiveEffect":154,"./effect/SR5ActiveEffectSheet":155,"./handlebars/HandlebarManager":159,"./helpers":164,"./importer/apps/import-form":166,"./item/SR5Item":204,"./item/SR5ItemSheet":205,"./item/flows/NetworkDeviceFlow":208,"./macros":210,"./migrator/Migrator":212,"./rolls/SR5Roll":219,"./rolls/ShadowrunRoller":220,"./settings":226,"./tests/OpposedTest":229,"./tests/SuccessTest":230,"./token/SR5Token":231}],166:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -27132,7 +26854,6 @@ Import.Importers = [
     new DeviceImporter_1.DeviceImporter(),
     new EquipmentImporter_1.EquipmentImporter()
 ];
-
 },{"../helper/ImportHelper":167,"../importer/AmmoImporter":171,"../importer/ArmorImporter":172,"../importer/ComplexFormImporter":173,"../importer/CritterPowerImporter":175,"../importer/DataImporter":176,"../importer/DeviceImporter":177,"../importer/EquipmentImporter":178,"../importer/ModImporter":179,"../importer/QualityImporter":180,"../importer/SpellImporter":181,"../importer/WareImporter":182,"../importer/WeaponImporter":183}],167:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -27345,7 +27066,6 @@ class ImportHelper {
 exports.ImportHelper = ImportHelper;
 ImportHelper.CHAR_KEY = '_TEXT';
 ImportHelper.s_Strategy = new XMLStrategy_1.XMLStrategy();
-
 },{"../importer/Constants":174,"./JSONStrategy":169,"./XMLStrategy":170}],168:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -27353,7 +27073,6 @@ exports.ImportStrategy = void 0;
 class ImportStrategy {
 }
 exports.ImportStrategy = ImportStrategy;
-
 },{}],169:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -27371,7 +27090,6 @@ class JSONStrategy extends ImportStrategy_1.ImportStrategy {
     }
 }
 exports.JSONStrategy = JSONStrategy;
-
 },{"./ImportStrategy":168}],170:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -27420,7 +27138,6 @@ class XMLStrategy extends ImportStrategy_1.ImportStrategy {
     }
 }
 exports.XMLStrategy = XMLStrategy;
-
 },{"./ImportHelper":167,"./ImportStrategy":168}],171:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -27553,7 +27270,6 @@ class AmmoImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.AmmoImporter = AmmoImporter;
-
 },{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"./Constants":174,"./DataImporter":176}],172:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -27634,7 +27350,6 @@ class ArmorImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.ArmorImporter = ArmorImporter;
-
 },{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"../parser/armor/ArmorParserBase":186,"./DataImporter":176}],173:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -27671,34 +27386,11 @@ class ComplexFormImporter extends DataImporter_1.DataImporter {
                     chat: '',
                     source: '',
                 },
-                action: {
+                action: DataDefaults_1.DefaultValues.actionData({
                     type: 'complex',
-                    category: '',
                     attribute: 'resonance',
-                    attribute2: '',
-                    skill: 'compiling',
-                    spec: false,
-                    mod: 0,
-                    mod_description: '',
-                    damage: DataDefaults_1.DefaultValues.damageData(),
-                    limit: {
-                        value: 0,
-                        attribute: '',
-                        mod: [],
-                        base: 0,
-                    },
-                    extended: false,
-                    opposed: {
-                        type: 'defense',
-                        attribute: '',
-                        attribute2: '',
-                        skill: '',
-                        mod: 0,
-                        description: '',
-                    },
-                    alt_mod: 0,
-                    dice_pool_mod: [],
-                },
+                    skill: 'compiling'
+                }),
                 target: '',
                 duration: '',
                 fade: 0,
@@ -27737,7 +27429,6 @@ class ComplexFormImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.ComplexFormImporter = ComplexFormImporter;
-
 },{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"../parser/complex-form/ComplexFormParserBase":187,"./Constants":174,"./DataImporter":176}],174:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -27959,7 +27650,6 @@ Constants.WEAPON_RANGES = {
     },
 };
 Constants.ROOT_IMPORT_FOLDER_NAME = 'SR5e';
-
 },{}],175:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -27996,34 +27686,9 @@ class CritterPowerImporter extends DataImporter_1.DataImporter {
                     chat: '',
                     source: '',
                 },
-                action: {
-                    type: '',
-                    category: '',
-                    attribute: '',
-                    attribute2: '',
-                    skill: '',
-                    spec: false,
-                    mod: 0,
-                    mod_description: '',
+                action: DataDefaults_1.DefaultValues.actionData({
                     damage: DataDefaults_1.DefaultValues.damageData({ type: { base: '', value: '' } }),
-                    limit: {
-                        value: 0,
-                        attribute: '',
-                        mod: [],
-                        base: 0,
-                    },
-                    extended: false,
-                    opposed: {
-                        type: '',
-                        attribute: '',
-                        attribute2: '',
-                        skill: '',
-                        mod: 0,
-                        description: '',
-                    },
-                    alt_mod: 0,
-                    dice_pool_mod: [],
-                },
+                }),
                 armor: {
                     value: 0,
                     mod: false,
@@ -28069,7 +27734,6 @@ class CritterPowerImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.CritterPowerImporter = CritterPowerImporter;
-
 },{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"../parser/critter-power/CritterPowerParserBase":188,"./Constants":174,"./DataImporter":176}],176:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -28132,7 +27796,6 @@ class DataImporter {
 }
 exports.DataImporter = DataImporter;
 DataImporter.unsupportedBooks = ['2050'];
-
 },{"../helper/ImportHelper":167,"xml2js":51}],177:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -28258,7 +27921,6 @@ class DeviceImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.DeviceImporter = DeviceImporter;
-
 },{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"./Constants":174,"./DataImporter":176}],178:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -28341,7 +28003,6 @@ class EquipmentImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.EquipmentImporter = EquipmentImporter;
-
 },{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"./Constants":174,"./DataImporter":176}],179:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -28425,7 +28086,6 @@ class ModImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.ModImporter = ModImporter;
-
 },{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"../parser/mod/ModParserBase":191,"./Constants":174,"./DataImporter":176}],180:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -28453,7 +28113,7 @@ class QualityImporter extends DataImporter_1.DataImporter {
     }
     GetDefaultData() {
         return {
-            name: 'Unnamed Armor',
+            name: 'Unnamed Quality',
             type: 'quality',
             data: {
                 description: {
@@ -28461,34 +28121,9 @@ class QualityImporter extends DataImporter_1.DataImporter {
                     chat: '',
                     source: '',
                 },
-                action: {
-                    type: '',
-                    category: '',
-                    attribute: '',
-                    attribute2: '',
-                    skill: '',
-                    spec: false,
-                    mod: 0,
-                    mod_description: '',
+                action: DataDefaults_1.DefaultValues.actionData({
                     damage: DataDefaults_1.DefaultValues.damageData({ type: { base: '', value: '' } }),
-                    limit: {
-                        value: 0,
-                        attribute: '',
-                        mod: [],
-                        base: 0,
-                    },
-                    extended: false,
-                    opposed: {
-                        type: '',
-                        attribute: '',
-                        attribute2: '',
-                        skill: '',
-                        mod: 0,
-                        description: '',
-                    },
-                    alt_mod: 0,
-                    dice_pool_mod: [],
-                },
+                }),
                 type: '',
             },
         };
@@ -28526,7 +28161,6 @@ class QualityImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.QualityImporter = QualityImporter;
-
 },{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"../parser/quality/QualityParserBase":192,"./DataImporter":176}],181:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -28567,34 +28201,12 @@ class SpellImporter extends DataImporter_1.DataImporter {
                     chat: '',
                     source: '',
                 },
-                action: {
+                action: DataDefaults_1.DefaultValues.actionData({
                     type: 'varies',
-                    category: '',
                     attribute: 'magic',
-                    attribute2: '',
                     skill: 'spellcasting',
-                    spec: false,
-                    mod: 0,
-                    mod_description: '',
-                    damage: DataDefaults_1.DefaultValues.damageData({ type: { base: '', value: '' } }),
-                    limit: {
-                        value: 0,
-                        attribute: '',
-                        mod: [],
-                        base: 0,
-                    },
-                    extended: false,
-                    opposed: {
-                        type: '',
-                        attribute: '',
-                        attribute2: '',
-                        skill: '',
-                        mod: 0,
-                        description: '',
-                    },
-                    alt_mod: 0,
-                    dice_pool_mod: []
-                },
+                    damage: DataDefaults_1.DefaultValues.damageData({ type: { base: '', value: '' } })
+                }),
                 drain: 0,
                 category: '',
                 type: '',
@@ -28660,7 +28272,6 @@ class SpellImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.SpellImporter = SpellImporter;
-
 },{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"../parser/ParserMap":185,"../parser/spell/CombatSpellParser":193,"../parser/spell/DetectionSpellImporter":194,"../parser/spell/IllusionSpellParser":195,"../parser/spell/ManipulationSpellParser":196,"../parser/spell/SpellParserBase":197,"./DataImporter":176}],182:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -28715,34 +28326,7 @@ class WareImporter extends DataImporter_1.DataImporter {
                     electricity: 0,
                     radiation: 0,
                 },
-                action: {
-                    type: '',
-                    category: '',
-                    attribute: '',
-                    attribute2: '',
-                    skill: '',
-                    spec: false,
-                    mod: 0,
-                    mod_description: '',
-                    damage: DataDefaults_1.DefaultValues.damageData({ type: { base: '', value: '' } }),
-                    limit: {
-                        value: 0,
-                        attribute: '',
-                        mod: [],
-                        base: 0,
-                    },
-                    extended: false,
-                    opposed: {
-                        type: '',
-                        attribute: '',
-                        attribute2: '',
-                        skill: '',
-                        mod: 0,
-                        description: '',
-                    },
-                    alt_mod: 0,
-                    dice_pool_mod: []
-                },
+                action: DataDefaults_1.DefaultValues.actionData(),
                 grade: 'standard',
                 essence: 0,
                 capacity: 0,
@@ -28792,7 +28376,6 @@ class WareImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.WareImporter = WareImporter;
-
 },{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"../parser/ware/CyberwareParser":198,"./DataImporter":176}],183:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -28833,34 +28416,7 @@ class WeaponImporter extends DataImporter_1.DataImporter {
                     chat: '',
                     source: '',
                 },
-                action: {
-                    type: 'varies',
-                    category: '',
-                    attribute: 'agility',
-                    attribute2: '',
-                    skill: '',
-                    spec: false,
-                    mod: 0,
-                    mod_description: '',
-                    damage: DataDefaults_1.DefaultValues.damageData(),
-                    limit: {
-                        value: 0,
-                        attribute: '',
-                        mod: [],
-                        base: 0,
-                    },
-                    extended: false,
-                    opposed: {
-                        type: 'defense',
-                        attribute: '',
-                        attribute2: '',
-                        skill: '',
-                        mod: 0,
-                        description: '',
-                    },
-                    alt_mod: 0,
-                    dice_pool_mod: []
-                },
+                action: DataDefaults_1.DefaultValues.actionData({ type: 'varies', attribute: 'agility' }),
                 technology: DataDefaults_1.DefaultValues.technologyData({ rating: 1 }),
                 ammo: {
                     spare_clips: {
@@ -28949,7 +28505,6 @@ class WeaponImporter extends DataImporter_1.DataImporter {
     }
 }
 exports.WeaponImporter = WeaponImporter;
-
 },{"../../data/DataDefaults":151,"../helper/ImportHelper":167,"../parser/ParserMap":185,"../parser/weapon/MeleeParser":199,"../parser/weapon/RangedParser":200,"../parser/weapon/ThrownParser":201,"../parser/weapon/WeaponParserBase":202,"./Constants":174,"./DataImporter":176}],184:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -28957,7 +28512,6 @@ exports.Parser = void 0;
 class Parser {
 }
 exports.Parser = Parser;
-
 },{}],185:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -28991,7 +28545,6 @@ class ParserMap extends Parser_1.Parser {
     }
 }
 exports.ParserMap = ParserMap;
-
 },{"../helper/ImportHelper":167,"./Parser":184}],186:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -29007,7 +28560,6 @@ class ArmorParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBas
     }
 }
 exports.ArmorParserBase = ArmorParserBase;
-
 },{"../../helper/ImportHelper":167,"../item/TechnologyItemParserBase":190}],187:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -29057,7 +28609,6 @@ class ComplexFormParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.ComplexFormParserBase = ComplexFormParserBase;
-
 },{"../../helper/ImportHelper":167,"../item/ItemParserBase":189}],188:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -29119,7 +28670,6 @@ class CritterPowerParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.CritterPowerParserBase = CritterPowerParserBase;
-
 },{"../../helper/ImportHelper":167,"../item/ItemParserBase":189}],189:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -29141,7 +28691,6 @@ class ItemParserBase extends Parser_1.Parser {
     }
 }
 exports.ItemParserBase = ItemParserBase;
-
 },{"../../helper/ImportHelper":167,"../Parser":184}],190:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -29158,7 +28707,6 @@ class TechnologyItemParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.TechnologyItemParserBase = TechnologyItemParserBase;
-
 },{"../../helper/ImportHelper":167,"./ItemParserBase":189}],191:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -29177,7 +28725,6 @@ class ModParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBase 
     }
 }
 exports.ModParserBase = ModParserBase;
-
 },{"../../helper/ImportHelper":167,"../item/TechnologyItemParserBase":190}],192:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -29200,7 +28747,6 @@ class QualityParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.QualityParserBase = QualityParserBase;
-
 },{"../../helper/ImportHelper":167,"../item/ItemParserBase":189}],193:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -29226,7 +28772,6 @@ class CombatSpellParser extends SpellParserBase_1.SpellParserBase {
     }
 }
 exports.CombatSpellParser = CombatSpellParser;
-
 },{"../../helper/ImportHelper":167,"./SpellParserBase":197}],194:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -29264,7 +28809,6 @@ class DetectionSpellImporter extends SpellParserBase_1.SpellParserBase {
     }
 }
 exports.DetectionSpellImporter = DetectionSpellImporter;
-
 },{"../../helper/ImportHelper":167,"./SpellParserBase":197}],195:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -29296,7 +28840,6 @@ class IllusionSpellParser extends SpellParserBase_1.SpellParserBase {
     }
 }
 exports.IllusionSpellParser = IllusionSpellParser;
-
 },{"../../helper/ImportHelper":167,"./SpellParserBase":197}],196:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -29336,7 +28879,6 @@ class ManipulationSpellParser extends SpellParserBase_1.SpellParserBase {
     }
 }
 exports.ManipulationSpellParser = ManipulationSpellParser;
-
 },{"../../helper/ImportHelper":167,"./SpellParserBase":197}],197:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -29399,7 +28941,6 @@ class SpellParserBase extends ItemParserBase_1.ItemParserBase {
     }
 }
 exports.SpellParserBase = SpellParserBase;
-
 },{"../../helper/ImportHelper":167,"../item/ItemParserBase":189}],198:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -29421,7 +28962,6 @@ class CyberwareParser extends TechnologyItemParserBase_1.TechnologyItemParserBas
     }
 }
 exports.CyberwareParser = CyberwareParser;
-
 },{"../../helper/ImportHelper":167,"../item/TechnologyItemParserBase":190}],199:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -29469,7 +29009,6 @@ class MeleeParser extends WeaponParserBase_1.WeaponParserBase {
     }
 }
 exports.MeleeParser = MeleeParser;
-
 },{"../../../data/DataDefaults":151,"../../helper/ImportHelper":167,"./WeaponParserBase":202}],200:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -29530,7 +29069,6 @@ class RangedParser extends WeaponParserBase_1.WeaponParserBase {
     }
 }
 exports.RangedParser = RangedParser;
-
 },{"../../../data/DataDefaults":151,"../../helper/ImportHelper":167,"../../importer/Constants":174,"./WeaponParserBase":202}],201:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -29630,7 +29168,6 @@ class ThrownParser extends WeaponParserBase_1.WeaponParserBase {
     }
 }
 exports.ThrownParser = ThrownParser;
-
 },{"../../../data/DataDefaults":151,"../../helper/ImportHelper":167,"../../importer/Constants":174,"./WeaponParserBase":202}],202:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -29696,7 +29233,6 @@ class WeaponParserBase extends TechnologyItemParserBase_1.TechnologyItemParserBa
     }
 }
 exports.WeaponParserBase = WeaponParserBase;
-
 },{"../../helper/ImportHelper":167,"../../importer/Constants":174,"../item/TechnologyItemParserBase":190}],203:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -30043,7 +29579,6 @@ exports.ChatData = {
         }
     },
 };
-
 },{"../config":149,"../helpers":164}],204:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -30059,7 +29594,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5Item = void 0;
 const helpers_1 = require("../helpers");
 const SR5Actor_1 = require("../actor/SR5Actor");
-const ShadowrunItemDialog_1 = require("../apps/dialogs/ShadowrunItemDialog");
 const ChatData_1 = require("./ChatData");
 const ShadowrunRoller_1 = require("../rolls/ShadowrunRoller");
 const chat_1 = require("../chat");
@@ -30073,6 +29607,7 @@ const DataDefaults_1 = require("../data/DataDefaults");
 const HostPrep_1 = require("./prep/HostPrep");
 const MatrixRules_1 = require("../rules/MatrixRules");
 const NetworkDeviceFlow_1 = require("./flows/NetworkDeviceFlow");
+const SuccessTest_1 = require("../tests/SuccessTest");
 /**
  * Implementation of Shadowrun5e items (owned, unowned and embedded).
  *
@@ -30365,17 +29900,21 @@ class SR5Item extends Item {
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.actor)
                 return;
-            const dontRollTest = (event === null || event === void 0 ? void 0 : event.shiftKey) || !this.hasRoll;
-            if (dontRollTest)
-                return yield this.postItemCard();
-            const dialog = yield ShadowrunItemDialog_1.ShadowrunItemDialog.create(this, event);
-            // Some items might not have an additional dialog.
-            if (!dialog)
-                return yield this.rollTest(event);
-            const actionTestData = yield dialog.select();
-            if (dialog.canceled)
+            const test = SuccessTest_1.SuccessTest.fromAction(this, this.actor);
+            if (!test)
                 return;
-            return yield this.rollTest(event, actionTestData);
+            yield test.toMessage();
+            // const dontRollTest = event?.shiftKey || !this.hasRoll;
+            // if (dontRollTest) return await this.postItemCard();
+            //
+            // const dialog = await ShadowrunItemDialog.create(this, event);
+            // // Some items might not have an additional dialog.
+            // if (!dialog) return await this.rollTest(event);
+            //
+            // const actionTestData = await dialog.select();
+            // if (dialog.canceled) return;
+            //
+            // return await this.rollTest(event, actionTestData);
         });
     }
     getChatData(htmlOptions) {
@@ -31741,8 +31280,7 @@ class SR5Item extends Item {
     }
 }
 exports.SR5Item = SR5Item;
-
-},{"../actor/SR5Actor":85,"../actor/flows/SkillFlow":88,"../apps/dialogs/ShadowrunItemDialog":140,"../chat":147,"../config":149,"../constants":150,"../data/DataDefaults":151,"../data/SR5ItemDataWrapper":153,"../helpers":164,"../parts/PartsList":218,"../rolls/ShadowrunRoller":219,"../rules/MatrixRules":221,"./ChatData":203,"./flows/ActionFlow":206,"./flows/NetworkDeviceFlow":208,"./prep/HostPrep":209}],205:[function(require,module,exports){
+},{"../actor/SR5Actor":85,"../actor/flows/SkillFlow":88,"../chat":147,"../config":149,"../constants":150,"../data/DataDefaults":151,"../data/SR5ItemDataWrapper":153,"../helpers":164,"../parts/PartsList":218,"../rolls/ShadowrunRoller":220,"../rules/MatrixRules":222,"../tests/SuccessTest":230,"./ChatData":203,"./flows/ActionFlow":206,"./flows/NetworkDeviceFlow":208,"./prep/HostPrep":209}],205:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -32324,7 +31862,6 @@ class SR5ItemSheet extends ItemSheet {
     }
 }
 exports.SR5ItemSheet = SR5ItemSheet;
-
 },{"../config":149,"../effects":156,"../helpers":164,"./SR5Item":204}],206:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -32366,7 +31903,6 @@ class ActionFlow {
     }
 }
 exports.ActionFlow = ActionFlow;
-
 },{"../../helpers":164}],207:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -32398,8 +31934,7 @@ class ActionResultFlow {
     }
 }
 exports.ActionResultFlow = ActionResultFlow;
-
-},{"../../rules/MatrixRules":221}],208:[function(require,module,exports){
+},{"../../rules/MatrixRules":222}],208:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -32716,8 +32251,7 @@ class NetworkDeviceFlow {
     }
 }
 exports.NetworkDeviceFlow = NetworkDeviceFlow;
-
-},{"../../constants":150,"../../sockets":226}],209:[function(require,module,exports){
+},{"../../constants":150,"../../sockets":227}],209:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.HostPrep = exports.HostDataPreparation = void 0;
@@ -32746,8 +32280,7 @@ class HostPrep {
     }
 }
 exports.HostPrep = HostPrep;
-
-},{"../../rules/MatrixRules":221}],210:[function(require,module,exports){
+},{"../../rules/MatrixRules":222}],210:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -32870,7 +32403,6 @@ function rollSkillMacro(skillLabel) {
     });
 }
 exports.rollSkillMacro = rollSkillMacro;
-
 },{"./helpers":164}],211:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -32881,7 +32413,6 @@ const hooks_1 = require("./hooks");
 /* -------------------------------------------- */
 hooks_1.HooksManager.registerHooks();
 HandlebarManager_1.HandlebarManager.registerHelpers();
-
 },{"./handlebars/HandlebarManager":159,"./hooks":165}],212:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -33028,7 +32559,6 @@ Migrator.s_Versions = [
     { versionNumber: Version0_6_10_1.Version0_6_10.TargetVersion, migration: new Version0_6_10_1.Version0_6_10() },
     { versionNumber: Version0_7_2_1.Version0_7_2.TargetVersion, migration: new Version0_7_2_1.Version0_7_2() },
 ];
-
 },{"./VersionMigration":213,"./versions/LegacyMigration":214,"./versions/Version0_6_10":215,"./versions/Version0_6_5":216,"./versions/Version0_7_2":217}],213:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -33464,7 +32994,6 @@ exports.VersionMigration = VersionMigration;
 VersionMigration.MODULE_NAME = 'shadowrun5e';
 VersionMigration.KEY_DATA_VERSION = 'systemMigrationVersion';
 VersionMigration.NO_VERSION = '0';
-
 },{}],214:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -33694,7 +33223,6 @@ class LegacyMigration extends VersionMigration_1.VersionMigration {
     }
 }
 exports.LegacyMigration = LegacyMigration;
-
 },{"../VersionMigration":213}],215:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -33755,7 +33283,6 @@ class Version0_6_10 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_6_10 = Version0_6_10;
-
 },{"../VersionMigration":213}],216:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
@@ -33806,7 +33333,6 @@ class Version0_6_5 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_6_5 = Version0_6_5;
-
 },{"../VersionMigration":213}],217:[function(require,module,exports){
 "use strict";
 // TODO: How to trigger test migration.
@@ -33884,7 +33410,6 @@ class Version0_7_2 extends VersionMigration_1.VersionMigration {
     }
 }
 exports.Version0_7_2 = Version0_7_2;
-
 },{"../../config":149,"../VersionMigration":213}],218:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -33988,8 +33513,81 @@ class PartsList {
     }
 }
 exports.PartsList = PartsList;
-
 },{}],219:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SR5Roll = void 0;
+const constants_1 = require("../constants");
+/**
+ * Apply Shadowrun 5 rules to a FoundryVTT Roll.
+ *
+ * TODO: This class should create a basic Success Test template and be extended
+ *       for further Test templates (versus, action, weapon?, spell?)
+ *
+ * TODO: A chat message should contain all data needed to cast resulting actions.
+ */
+class SR5Roll extends Roll {
+    // toJSON(): any {
+    //     // TODO: Check if data includes custom ShadowrunRollData
+    //     const data = super.toJSON();
+    //     // add class Roll to the json so dice-so-nice works
+    //     // TODO: Check if this is still necessary.
+    //     // data.class = 'Roll';
+    //     return data;
+    // }
+    get sides() {
+        //@ts-ignore
+        // 0.7.x foundryVTT
+        if (this.terms) {
+            //@ts-ignore
+            return this.terms[0].results.map(result => result.result);
+        }
+        //@ts-ignore
+        // 0.6.x foundryVTT
+        return this.parts[0].rolls.map(roll => roll.roll);
+    }
+    get limit() {
+        return this.data.limit;
+    }
+    get threshold() {
+        return this.data.threshold;
+    }
+    get parts() {
+        return this.data.parts;
+    }
+    // TODO: Not needed anymore with complex Formula of SuccessTest
+    get explodeSixes() {
+        return this.data.explodeSixes;
+    }
+    count(side) {
+        return this.sides.reduce((counted, result) => result === side ? counted + 1 : counted, 0);
+    }
+    // TODO: Rework this to work with the complex formula of SuccessTest.formula (total counts all cs and cf)
+    get hits() {
+        return this.sides.reduce((hits, result) => constants_1.SR.die.success.includes(result) ? hits + 1 : hits, 0);
+    }
+    get glitches() {
+        return this.sides.reduce((glitches, result) => constants_1.SR.die.glitch.includes(result) ? glitches + 1 : glitches, 0);
+    }
+    get pool() {
+        // 0.7.x > FoundryVTT
+        if (this.terms) {
+            //@ts-ignore
+            return this.dice[0].number;
+        }
+        //@ts-ignore
+        // till 0.6.x FoundryVTT
+        return this.parts[0].rolls.length;
+    }
+    get glitched() {
+        return this.glitches > Math.floor(this.pool / 2);
+    }
+    get total() {
+        return this.hits;
+    }
+}
+exports.SR5Roll = SR5Roll;
+},{"../constants":150}],220:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -34007,6 +33605,7 @@ const chat_1 = require("../chat");
 const constants_1 = require("../constants");
 const PartsList_1 = require("../parts/PartsList");
 const ShadowrunTestDialog_1 = require("../apps/dialogs/ShadowrunTestDialog");
+const SuccessTest_1 = require("../tests/SuccessTest");
 class ShadowrunRoll extends Roll {
     // add class Roll to the json so dice-so-nice works
     toJSON() {
@@ -34060,6 +33659,15 @@ class ShadowrunRoll extends Roll {
         let glitched = 0;
         constants_1.SR.die.glitch.forEach(die => glitched += this.count(die));
         return glitched > Math.floor(this.pool / 2);
+    }
+    /**
+     *
+     * @param messageData
+     * @param rollMode
+     */
+    toMessage(messageData, rollMode) {
+        console.error('message', messageData, rollMode);
+        return super.toMessage(messageData, rollMode);
     }
 }
 exports.ShadowrunRoll = ShadowrunRoll;
@@ -34230,6 +33838,20 @@ class ShadowrunRoller {
         const dialogOptions = { pool: true };
         return ShadowrunRoller.advancedRoll(advancedRollProps, dialogOptions);
     }
+    /*
+     * Flow should be handled by Roll class
+     * - dialog
+     * - roll
+     * - message
+     */
+    static promptSuccessTest() {
+        return __awaiter(this, void 0, void 0, function* () {
+            // TODO: Handle dialog system.
+            const test = yield SuccessTest_1.SuccessTest.fromDialog();
+            if (test)
+                yield test.toMessage();
+        });
+    }
     /**
      * Start an advanced roll
      * - Prompts the user for modifiers
@@ -34374,8 +33996,7 @@ class ShadowrunRoller {
     }
 }
 exports.ShadowrunRoller = ShadowrunRoller;
-
-},{"../apps/dialogs/ShadowrunTestDialog":141,"../chat":147,"../constants":150,"../helpers":164,"../parts/PartsList":218}],220:[function(require,module,exports){
+},{"../apps/dialogs/ShadowrunTestDialog":140,"../chat":147,"../constants":150,"../helpers":164,"../parts/PartsList":218,"../tests/SuccessTest":230}],221:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CombatRules = void 0;
@@ -34419,8 +34040,7 @@ class CombatRules {
     }
 }
 exports.CombatRules = CombatRules;
-
-},{"../constants":150}],221:[function(require,module,exports){
+},{"../constants":150}],222:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MatrixRules = void 0;
@@ -34495,8 +34115,7 @@ class MatrixRules {
     }
 }
 exports.MatrixRules = MatrixRules;
-
-},{"../constants":150}],222:[function(require,module,exports){
+},{"../constants":150}],223:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -34693,8 +34312,7 @@ class Modifiers {
     }
 }
 exports.Modifiers = Modifiers;
-
-},{"../constants":150}],223:[function(require,module,exports){
+},{"../constants":150}],224:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SkillRules = void 0;
@@ -34735,8 +34353,7 @@ class SkillRules {
     }
 }
 exports.SkillRules = SkillRules;
-
-},{"../constants":150}],224:[function(require,module,exports){
+},{"../constants":150}],225:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SoakRules = void 0;
@@ -34936,8 +34553,7 @@ class SoakRules {
     }
 }
 exports.SoakRules = SoakRules;
-
-},{"../config":149,"../helpers":164}],225:[function(require,module,exports){
+},{"../config":149,"../helpers":164}],226:[function(require,module,exports){
 "use strict";
 // game settings for shadowrun 5e
 Object.defineProperty(exports, "__esModule", { value: true });
@@ -35054,8 +34670,7 @@ const registerSystemSettings = () => {
     });
 };
 exports.registerSystemSettings = registerSystemSettings;
-
-},{"./constants":150,"./migrator/VersionMigration":213}],226:[function(require,module,exports){
+},{"./constants":150,"./migrator/VersionMigration":213}],227:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35106,8 +34721,7 @@ class SocketMessage {
     }
 }
 exports.SocketMessage = SocketMessage;
-
-},{"./constants":150}],227:[function(require,module,exports){
+},{"./constants":150}],228:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35223,8 +34837,779 @@ class Template extends MeasuredTemplate {
     }
 }
 exports.default = Template;
-
-},{}],228:[function(require,module,exports){
+},{}],229:[function(require,module,exports){
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.OpposedTest = void 0;
+const SuccessTest_1 = require("./SuccessTest");
+const DataDefaults_1 = require("../data/DataDefaults");
+const PartsList_1 = require("../parts/PartsList");
+/**
+ * An opposed test results from a normal success test as an opposed action.
+ *
+ * TODO: Need's a way to get the actor (either from selection or target)
+ * TODO: What to actually overwrite?
+ */
+class OpposedTest extends SuccessTest_1.SuccessTest {
+    /**
+     * An opposed test assumes it's opposing another SuccessTest, which might have resulted from an item action
+     * or same or different actor.
+     *
+     * @param data
+     * @param documents
+     * @param options
+     */
+    // static fromTestData(data: SuccessTestData, documents, options?: SuccessTestOptions): OpposedTest {
+    //     const opposedData = {
+    //         // If the first test is a social test, the opposed would also be.
+    //         type: data.type,
+    //
+    //         // The active documents for this test, both item and actor
+    //         // For opposed tests the item might be sourced from a different actor.
+    //         sourceItemUuid: data.sourceItemUuid,
+    //         sourceActorUuid: documents?.actor?.uuid || data.sourceActorUuid,
+    //
+    //         against: data
+    //     };
+    //
+    //     return new OpposedTest(data, {}, options);
+    // }
+    // static getActionTestData(item, actor): OpposedTestData {
+    //     return {};
+    // }
+    /**
+     * Create test data for an Opposed Test message action.
+     *
+     * @param againstData The original test cast to test against.
+     * @param actor The actor to resolve values of the opposed action against.
+     * @param previousMessageId
+     */
+    static getMessageActionTestData(againstData, actor, previousMessageId) {
+        if (!againstData.opposed) {
+            console.error(`Shadowrun 5e | Supplied test data doesn't contain an opposed action`, againstData);
+            return;
+        }
+        // @ts-ignore // TODO: Typing here get's confused between boolean when it should be string.
+        if (againstData.opposed.type !== 'custom') {
+            console.error(`Shadowrun 5e | Supplied test defines a opposed test type ${againstData.opposed.type} but only type 'custom' is supported`);
+            return;
+        }
+        if (!actor) {
+            console.error(`Shadowrun 5e | Can't resolve opposed test values due to missing actor`);
+            return;
+        }
+        // Prepare testing data.
+        const data = {
+            // While not visible, when there is a description set, use it.
+            title: againstData.opposed.description || undefined,
+            previousMessageId,
+            pool: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.DicePool' }),
+            limit: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Limit' }),
+            threshold: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold' }),
+            values: {},
+            against: againstData
+        };
+        // An opposing test will oppose net hits of the opposed test.
+        // Register these as a threshold, which will trigger success/failure status
+        // and calculate netHits accordingly.
+        data.threshold.base = againstData.values.netHits.value;
+        // Try fetching the opposed action data.
+        const { opposed } = againstData;
+        if (opposed.skill && opposed.attribute) {
+            // TODO: Handle skill testing rules.
+            const skill = actor.getSkill(opposed.skill);
+            if (skill)
+                data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, skill.label, skill.value, false);
+            const attribute = actor.getAttribute(opposed.attribute);
+            if (attribute)
+                data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
+        }
+        if (!opposed.skill && opposed.attribute) {
+            const attribute = actor.getAttribute(opposed.attribute);
+            if (attribute)
+                data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
+        }
+        if (!opposed.skill && opposed.attribute2) {
+            const attribute = actor.getAttribute(opposed.attribute2);
+            if (attribute)
+                data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
+        }
+        if (opposed.mod) {
+            data.pool.base = Number(opposed.mod);
+        }
+        return data;
+    }
+    static chatMessageListeners(message, html, data) {
+        html.find('.opposed-action').on('click', (event) => OpposedTest._castOpposedAction(event, html));
+    }
+}
+exports.OpposedTest = OpposedTest;
+},{"../data/DataDefaults":151,"../parts/PartsList":218,"./SuccessTest":230}],230:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.SuccessTest = void 0;
+const SR5Actor_1 = require("../actor/SR5Actor");
+const constants_1 = require("../constants");
+const DataDefaults_1 = require("../data/DataDefaults");
+const helpers_1 = require("../helpers");
+const SR5Roll_1 = require("../rolls/SR5Roll");
+const PartsList_1 = require("../parts/PartsList");
+const ShadowrunTestDialog_1 = require("../apps/dialogs/ShadowrunTestDialog");
+/**
+ * General handling of Shadowrun 5e success tests.
+ *
+ * This class handles all Shadowrun 5 rules surround success tests,
+ * except for the dice rolling itself as well the flow handling of multi roll tests.
+ *
+ * TODO: Check if Actor.getRollData() can be used to better implement this
+ * TODO: Add unittesting.
+ */
+class SuccessTest {
+    // TODO: include modifiers
+    // TODO: store options in data for later re roll with same options?
+    constructor(data, documents, options) {
+        // Store given documents to avoid later fetching.
+        this.actor = documents === null || documents === void 0 ? void 0 : documents.actor;
+        this.item = documents === null || documents === void 0 ? void 0 : documents.item;
+        this.targets = [];
+        this.data = this._prepareData(data);
+        // Reuse an old roll or create a new one.
+        this.roll = (options === null || options === void 0 ? void 0 : options.roll) || this.createRoll();
+        console.info(`Shadowrun 5e | Created ${this.constructor.name} Test`, this);
+    }
+    /**
+     * Prepare TestData
+     *
+     * @param data
+     */
+    _prepareData(data) {
+        var _a, _b;
+        // Store the current users targeted token ids for later use.
+        // @ts-ignore // undefined isn't allowed but it's excluded.
+        data.targetActorsUuid = data.targetActorsUuid || helpers_1.Helpers.getUserTargets().map(token => { var _a; return (_a = token.actor) === null || _a === void 0 ? void 0 : _a.uuid; }).filter(uuid => !!uuid);
+        // Store given document uuids to be fetched during evaluation.
+        // TODO: Include all necessary sepaker / token info in SuccessTestData to allow items to be deleted.
+        data.sourceActorUuid = data.sourceActorUuid || ((_a = this.actor) === null || _a === void 0 ? void 0 : _a.uuid);
+        data.sourceItemUuid = data.sourceItemUuid || ((_b = this.item) === null || _b === void 0 ? void 0 : _b.uuid);
+        // @ts-ignore // Prepare general test information.
+        data.title = data.title || this.constructor.label;
+        return data;
+    }
+    /**
+     * A helper method to create a SuccessTest from action items.
+     *
+     * @param item Any item type that defines an action.
+     * @param actor The actor to use for the resulting SR5Roll,
+     *              will default to the items parent otherwise.
+     * @param options See SuccessTestOptions documentation.
+     *
+     * @returns Tries to create a SuccessTest from given action item or undefined if it failed.
+     */
+    static fromAction(item, actor, options) {
+        //@ts-ignore
+        if (!actor)
+            actor = item.parent;
+        if (!(actor instanceof SR5Actor_1.SR5Actor)) {
+            console.error("Shadowrun 5e | A SuccessTest can only be created with an explicit Actor or Item with an actor parent.");
+            return;
+        }
+        const action = item.getAction();
+        if (!action)
+            return;
+        if (!action.test) {
+            action.test = 'SuccessTest';
+            console.warn(`Shadowrun 5e | An action without a defined test handler defaulted to ${'SuccessTest'}`);
+        }
+        // @ts-ignore // Check for test class registration.
+        if (!game.shadowrun5e.tests.hasOwnProperty(action.test)) {
+            console.error(`Shadowrun 5e | Test registration for test ${action.test} is missing`);
+            return;
+        }
+        // Any action item will return a list of values to create the test pool from.
+        // @ts-ignore // Get test class from registry to allow custom module tests.
+        const cls = game.shadowrun5e.tests[action.test];
+        const data = cls.getItemActionTestData(item, actor);
+        return new cls(data, { item, actor }, options);
+    }
+    /**
+     * Helper method to create a SuccessTest from given data.
+     *
+     * @param data
+     * @param documents
+     * @param options
+     */
+    static fromTestData(data, documents, options) {
+        // Before used documents would be fetched during evaluation.
+        return new SuccessTest(data, {}, options);
+    }
+    /**
+     * A helper method to create a SuccessTest from a simple pool value, without
+     * actor / item involvement.
+     *
+     * @param pool
+     * @param threshold
+     * @param limit
+     * @param options
+     */
+    static fromPool(pool, threshold = 0, limit = 0, options) {
+        const testData = {
+            pool: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.DicePool', base: pool }),
+            threshold: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold', base: threshold }),
+            limit: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Limit', base: limit }),
+            values: {}
+        };
+        return new SuccessTest(testData);
+    }
+    static fromMessage(id) {
+        var _a;
+        const message = (_a = game.messages) === null || _a === void 0 ? void 0 : _a.get(id);
+        if (!message) {
+            console.error(`Shadowrun 5e | Couldn't find a message for id ${id} to create a message action`);
+            return;
+        }
+        const testData = message.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.Test);
+        if (!testData) {
+            console.error(`Shadowrun 5e | Message with id ${id} doesn't have test data in it's flags.`);
+            return;
+        }
+        const roll = message.roll;
+        return this.fromTestData(testData, {}, { roll });
+    }
+    /**
+     *
+     */
+    static fromDialog() {
+        var _a, _b;
+        return __awaiter(this, void 0, void 0, function* () {
+            // Ask user for additional, general success test role modifiers.
+            const testDialogOptions = {
+                // TODO: move to SuccessTest.label
+                title: game.i18n.localize('SR5.Tests.SuccessTest'),
+                limit: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Limit', value: 1 }),
+                threshold: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold', value: 1 }),
+            };
+            // Get the last used pool size for simple SuccessTestDialogs
+            const lastPoolValue = ((_a = game.user) === null || _a === void 0 ? void 0 : _a.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.LastRollPromptValue)) || 0;
+            // Prepare any predefined pool values.
+            const pool = DataDefaults_1.DefaultValues.valueData();
+            // @ts-ignore // unkown[] vs number[]
+            pool.mod = PartsList_1.PartsList.AddUniquePart(pool.mod, 'SR5.LastRoll', lastPoolValue);
+            const testDialog = yield ShadowrunTestDialog_1.ShadowrunTestDialog.create(undefined, testDialogOptions, pool.mod);
+            const dialogData = yield testDialog.select();
+            if (testDialog.canceled)
+                return;
+            // Extract simple test data from dialog user selection.
+            pool.mod = dialogData.parts.list;
+            pool.value = helpers_1.Helpers.calcTotal(pool, { min: 0 });
+            const thresholdValue = dialogData.threshold.value || 0;
+            const limitValue = dialogData.limit.value || 0;
+            // Create and display SuccessTest.
+            const test = SuccessTest.fromPool(pool.value, thresholdValue, limitValue);
+            yield test.toMessage();
+            // Store the last used pool size for the next simple SuccessTest
+            yield ((_b = game.user) === null || _b === void 0 ? void 0 : _b.setFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.LastRollPromptValue, pool.value));
+            return test;
+        });
+    }
+    static fromMessageAction(id, test) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            const message = (_a = game.messages) === null || _a === void 0 ? void 0 : _a.get(id);
+            if (!message) {
+                console.error(`Shadowrun 5e | Couldn't find a message for id ${id} to create a message action`);
+                return;
+            }
+            const testData = message.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.Test);
+            if (!testData) {
+                console.error(`Shadowrun 5e | Message with id ${id} doesn't have test data in it's flags.`);
+                return;
+            }
+            // @ts-ignore // TODO: Add typing by declaration merging
+            const testClass = game.shadowrun5e.tests[test];
+            if (!testClass) {
+                console.error(`Shadowrun 5e | Couldn't find a registered test implementation for ${test}`);
+                return;
+            }
+            // TODO: Handle token selection as target override.
+            const actors = helpers_1.Helpers.getSelectedActorsOrCharacter();
+            //
+            for (const actor of actors) {
+                const data = testClass.getMessageActionTestData(testData, actor, id);
+                if (!data)
+                    return;
+                const test = new testClass(data, { actor }, {});
+                // TODO: Doesn't ask for dialog. Should be based on options...
+                yield test.toMessage();
+            }
+        });
+    }
+    toJSON() {
+        return this.data;
+    }
+    /**
+     * Get the lowest side for a Shadowrun 5 die to count as a success
+     * TODO: Implement edge rules.
+     */
+    static get lowestSuccessSide() {
+        return Math.min(...constants_1.SR.die.success);
+    }
+    /**
+     * Get the lowest side for a Shadowrun 5 die to count as a glitch.
+     * TODO: Implement edge rules.
+     */
+    static get lowestGlitchSide() {
+        return Math.min(...constants_1.SR.die.glitch);
+    }
+    /**
+     * Test Data is structured around Values that can be modified.
+     */
+    static getItemActionTestData(item, actor) {
+        // Prepare general data structure with labeling.
+        const data = {
+            pool: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.DicePool' }),
+            limit: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Limit' }),
+            threshold: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold' }),
+            values: {}
+        };
+        // Try fetching the items action data.
+        const action = item.getAction();
+        if (!action || !actor)
+            return data;
+        // Prepare pool values.
+        // TODO: Check if knowledge / language skills can be used for actions.
+        if (action.skill) {
+            const skill = actor.getSkill(action.skill);
+            if (skill)
+                data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, skill.label, skill.value, false);
+            // TODO: Check if this is actuall skill specialization and for a +2 config for it instead of MagicValue.
+            if (action.spec)
+                data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, 'SR5.Specialization', 2);
+        }
+        // The first attribute is either used for skill or attribute only tests.
+        if (action.attribute) {
+            const attribute = actor.getAttribute(action.attribute);
+            if (attribute)
+                data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
+        }
+        // The second attribute is only used for attribute only tests.
+        if (!action.skill && action.attribute2) {
+            const attribute = actor.getAttribute(action.attribute2);
+            if (attribute)
+                data.pool.mod = PartsList_1.PartsList.AddUniquePart(data.pool.mod, attribute.label, attribute.value, false);
+        }
+        if (action.mod) {
+            data.pool.base = Number(action.mod);
+        }
+        // Prepare limit values...
+        if (action.limit.attribute) {
+            const limit = actor.getLimit(action.limit.attribute);
+            if (limit)
+                data.limit.mod = PartsList_1.PartsList.AddUniquePart(data.limit.mod, limit.label, limit.value, false);
+        }
+        if (action.limit.base || action.limit.value) {
+            data.limit.base = Number(action.limit.value);
+        }
+        // Prepare threshold values...
+        if (action.threshold.base || action.threshold.value) {
+            data.threshold.base = Number(action.threshold.value);
+        }
+        // Prepare opposed tests...
+        if (action.opposed.type) {
+            data.opposed = action.opposed;
+        }
+        return data;
+    }
+    /**
+     * Create test data from an opposed message action.
+     *
+     * This method is meant to be overridden if this testing class supports
+     * testing against an opposed message action.
+     *
+     * If this test class doesn't support this opposed message actions it will
+     * return undefined.
+     *
+     * @param testData The original test that's opposed.
+     * @param actor The actor for this opposing test.
+     * @param previousMessageId The id this message action is sourced from.
+     */
+    static getMessageActionTestData(testData, actor, previousMessageId) {
+        console.error(`Shadowrun 5e | Testing Class ${this.name} doesn't support opposed message actions`);
+        return;
+    }
+    static get label() {
+        return `SR5.Tests.${this.name}`;
+    }
+    /**
+     * Create a Shadowrun 5 pool formula which will count all hits.
+     *
+     * FoundryVTT documentation:
+     *  Dice:       https://foundryvtt.com/article/dice-advanced/
+     *  Modifiers:  https://foundryvtt.com/article/dice-modifiers/
+     * Shadowrun5e: SR5#44
+     *
+     * TODO: If edge is used use the rr6 modifier
+     */
+    get formula() {
+        const pool = helpers_1.Helpers.calcTotal(this.data.pool);
+        return `(${pool})d6cs>=${SuccessTest.lowestSuccessSide}`;
+    }
+    /**
+     * Helper method to create the internal SR5Roll.
+     * @private
+     */
+    createRoll() {
+        // TODO: Add typing for rolls?
+        // @ts-ignore
+        return new SR5Roll_1.SR5Roll(this.formula);
+    }
+    /**
+     * Helper method to evaluate the internal SR5Roll and SuccessTest values.
+     *
+     */
+    evaluate() {
+        return __awaiter(this, void 0, void 0, function* () {
+            // @ts-ignore // foundry-vtt-types is missing _evaluated.
+            if (!this.roll._evaluated)
+                yield this.roll.evaluate({ async: true });
+            // Fetch documents, when no reference has been made yet.
+            if (!this.actor && this.data.sourceActorUuid)
+                this.actor = (yield fromUuid(this.data.sourceActorUuid)) || undefined;
+            if (!this.item && this.data.sourceItemUuid)
+                this.item = (yield fromUuid(this.data.sourceItemUuid)) || undefined;
+            if (this.targets.length === 0 && this.data.targetActorsUuid) {
+                this.targets = [];
+                for (const uuid of this.data.targetActorsUuid) {
+                    this.targets.push(yield fromUuid(uuid));
+                }
+            }
+            this.calculateValues();
+            return this;
+        });
+    }
+    calculateValues() {
+        this.data.pool.value = helpers_1.Helpers.calcTotal(this.data.pool, { min: 0 });
+        this.data.threshold.value = helpers_1.Helpers.calcTotal(this.data.threshold, { min: 0 });
+        this.data.limit.value = helpers_1.Helpers.calcTotal(this.data.limit, { min: 0 });
+        this.data.values.hits = this.calculateHits();
+        this.data.values.netHits = this.calculateNetHits();
+        this.data.values.glitches = this.calculateGlitches();
+        // Calculate all dynamics values.
+        Object.values(this.data.values).forEach(field => {
+            // It's likely that most fields will lower out at zero.
+            field.value = helpers_1.Helpers.calcTotal(field, { min: 0 });
+        });
+    }
+    /**
+     * Helper to get the pool value for this success test.
+     */
+    get pool() {
+        return this.data.pool;
+    }
+    /**
+     * Helper to get the total limit value for this success test.
+     */
+    get limit() {
+        return this.data.limit;
+    }
+    /**
+     * Helper to determine if this success test uses a limit.
+     */
+    get hasLimit() {
+        return this.limit.value > 0;
+    }
+    /**
+     * Helper to determine if the hits have been lowered by the limit.
+     *
+     * This will compare actual roll hits, without applied limit.
+     */
+    get hasReducedHits() {
+        return this.roll.hits > this.limit.value;
+    }
+    /**
+     * Helper to get the total threshold value for this success test.
+     */
+    get threshold() {
+        return this.data.threshold;
+    }
+    /**
+     * Helper to determine if this success test uses a threshold.
+     */
+    get hasThreshold() {
+        return this.threshold.value > 0;
+    }
+    /**
+     * Helper to get the net hits value for this success test with a possible threshold.
+     */
+    calculateNetHits() {
+        // Maybe lower hits by threshold to get the actual net hits.
+        const base = this.hasThreshold ?
+            Math.max(this.hits.value - this.threshold.value, 0) :
+            this.hits.value;
+        // Calculate a ValueField for standardisation.
+        const netHits = DataDefaults_1.DefaultValues.valueData({
+            label: "SR5.NetHits",
+            base
+        });
+        netHits.value = helpers_1.Helpers.calcTotal(netHits, { min: 0 });
+        return netHits;
+    }
+    get netHits() {
+        return this.data.values.netHits;
+    }
+    /**
+     * Helper to get the hits value for this success test with a possible limit.
+     */
+    calculateHits() {
+        const hits = DataDefaults_1.DefaultValues.valueData({
+            label: "SR5.Hits",
+            base: this.hasLimit ?
+                Math.min(this.limit.value, this.roll.hits) :
+                this.roll.hits
+        });
+        hits.value = helpers_1.Helpers.calcTotal(hits, { min: 0 });
+        return hits;
+    }
+    get hits() {
+        return this.data.values.hits;
+    }
+    /**
+     * Helper to get the glitches values for this success test.
+     */
+    calculateGlitches() {
+        const glitches = DataDefaults_1.DefaultValues.valueData({
+            label: "SR5.Glitches",
+            base: this.roll.glitches
+        });
+        glitches.value = helpers_1.Helpers.calcTotal(glitches, { min: 0 });
+        return glitches;
+    }
+    get glitches() {
+        return this.data.values.glitches;
+    }
+    /**
+     * Helper to check if the current test state is glitched.
+     */
+    get glitched() {
+        return this.roll.glitched;
+    }
+    /**
+     * Helper to check if the current test state is critically glitched.
+     */
+    get criticalGlitched() {
+        return !this.success && this.glitched;
+    }
+    /**
+     * Helper to check if the current test state is successful.
+     *
+     * Since a test can only really be a success when some threshold is met,
+     * only report success when there is one.
+     */
+    get success() {
+        return this.hasThreshold && this.netHits.value > 0;
+    }
+    /**
+     * Helper to check if the current test state is unsuccessful.
+     *
+     * Since a test can only really be a failure when some threshold isn't met,
+     * only support failure when there is one.
+     */
+    get failure() {
+        return this.hasThreshold && this.netHits.value === 0;
+    }
+    /**
+     * Helper to check if opposing tests exist for this test.
+     */
+    get opposed() {
+        return this.data.opposed !== undefined;
+    }
+    /**
+     * TODO: This method results in an ugly description.
+     *
+     */
+    get description() {
+        const poolPart = this.pool.value;
+        const thresholdPart = this.hasThreshold ? `(${this.threshold.value})` : '';
+        const limitPart = this.hasLimit ? `[${this.limit.value}]` : '';
+        return `${poolPart} ${thresholdPart} ${limitPart}`;
+    }
+    /**
+     * Post this success test as a message to the chat log.
+     */
+    toMessage() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.evaluate();
+            // Prepare message content.
+            const templateData = this._prepareTemplateData();
+            const content = yield renderTemplate(SuccessTest.CHAT_TEMPLATE, templateData);
+            // Prepare the actual message.
+            const messageData = this._prepareMessageData(content);
+            const message = yield ChatMessage.create(messageData);
+            // Prepare reuse of test data on subsequent tests after this one.
+            yield (message === null || message === void 0 ? void 0 : message.setFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.Test, this.toJSON()));
+            return message;
+        });
+    }
+    /**
+     * Prepare chat message content data for this success test card.
+     *
+     * @returns Chat Message template data.
+     *
+     * TODO: Add template data typing.
+     */
+    _prepareTemplateData() {
+        var _a;
+        // Either get the linked token by collection or synthetic actor.
+        // Unlinked collection actors will return multiple tokens and can't be resolved to a token.
+        const linkedTokens = ((_a = this.actor) === null || _a === void 0 ? void 0 : _a.getActiveTokens(true)) || [];
+        const token = linkedTokens.length === 1 ? linkedTokens[0].id : undefined;
+        return {
+            title: this.data.title,
+            test: this,
+            roll: this.roll,
+            // Note: While ChatData uses ids, this uses full documents.
+            speaker: {
+                actor: this.actor,
+                token: token
+            },
+            item: this.item,
+            opposedActions: this._prepareOpposedActionsTemplateData()
+        };
+    }
+    /**
+     * Prepare opposed test action buttons.
+     *
+     * Currently, one opposed action is supported, however the template
+     * is prepared to support multiple action buttons.
+     */
+    _prepareOpposedActionsTemplateData() {
+        if (!this.data.opposed)
+            return [];
+        if (!this.data.opposed.test) {
+            // Be carefull not to reference the OpposedTest class due to circular imports.
+            console.warn(`Shadowrun 5e | An opposed action without a defined test handler defaulted to ${'OpposedTest'}`);
+            this.data.opposed.test = 'OpposedTest';
+        }
+        // @ts-ignore TODO: Move this into a helper
+        const testCls = game.shadowrun5e.tests[this.data.opposed.test];
+        if (!testCls)
+            return console.error('Shadowrun 5e | Opposed Action has no test class registered.');
+        const action = {
+            // Store the test implementation registration name.
+            test: this.data.opposed.test,
+            // Use test implementation label or sensible default.
+            label: testCls.label || 'SR5.Tests.SuccessTest'
+        };
+        const { opposed } = this.data;
+        switch (this.data.opposed) {
+        }
+        if (opposed.type !== 'custom') {
+            action.label = `${helpers_1.Helpers.label(opposed.type)}`;
+        }
+        else if (opposed.skill) {
+            action.label = `${helpers_1.Helpers.label(opposed.skill)}+${helpers_1.Helpers.label(opposed.attribute)}`;
+        }
+        else if (opposed.attribute2) {
+            action.label = `${helpers_1.Helpers.label(opposed.attribute)}+${helpers_1.Helpers.label(opposed.attribute2)}`;
+        }
+        else if (opposed.attribute) {
+            action.label = `${helpers_1.Helpers.label(opposed.attribute)}`;
+        }
+        if (this.data.opposed.mod) {
+            action.label += ` ${this.data.opposed.mod}`;
+        }
+        return [action];
+    }
+    /**
+     * Prepare chat message data for this success test card.
+     *
+     * @param content Pre rendered template content.
+     */
+    _prepareMessageData(content) {
+        var _a, _b, _c, _d;
+        // Either get the linked token by collection or synthetic actor.
+        // Unlinked collection actors will return multiple tokens and can't be resolved to a token.
+        const linkedTokens = ((_a = this.actor) === null || _a === void 0 ? void 0 : _a.getActiveTokens(true)) || [];
+        const token = linkedTokens.length === 1 ? linkedTokens[0].id : undefined;
+        const actor = (_b = this.actor) === null || _b === void 0 ? void 0 : _b.id;
+        const alias = (_c = game.user) === null || _c === void 0 ? void 0 : _c.name;
+        return {
+            user: (_d = game.user) === null || _d === void 0 ? void 0 : _d.id,
+            speaker: {
+                actor,
+                alias,
+                token
+            },
+            // TODO: message.isRoll reports as false. Do we need ChatMessage to be roll type?
+            // type: CONST.CHAT_MESSAGE_TYPES.ROLL,
+            content,
+            roll: JSON.stringify(this.roll.toJSON())
+        };
+    }
+    static _testDataFromMessage(id) {
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            const message = (_a = game.messages) === null || _a === void 0 ? void 0 : _a.get(id);
+            if (!message)
+                return;
+            const testData = message.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.Test);
+            if (!testData)
+                return;
+            else
+                return testData;
+        });
+    }
+    /**
+     * Register listeners for ChatMessage html created by a SuccessTest.
+     *
+     * This listener needs to be registered to the 'renderChatMessage' FoundryVTT hook.
+     *
+     * @param message
+     * @param html
+     * @param data
+     */
+    static chatMessageListeners(message, html, data) {
+        html.find('.card-main-content').on('click', (event) => SuccessTest._chatToggleCardRolls(event, html));
+    }
+    /**
+     * By default roll results are hidden in a chat card.
+     *
+     * This will hide / show them, when called with a card event.
+     *
+     * @param event Called from within a card html element.
+     * @param cardHtml A chat card html element.
+     */
+    static _chatToggleCardRolls(event, cardHtml) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            const element = cardHtml.find('.dice-rolls');
+            if (element.is(':visible'))
+                element.slideUp(200);
+            else
+                element.slideDown(200);
+        });
+    }
+    static _castOpposedAction(event, cardHtml) {
+        return __awaiter(this, void 0, void 0, function* () {
+            event.preventDefault();
+            // Collect information needed to create the opposed action test.
+            const messageId = cardHtml.data('messageId');
+            const opposedActionTest = $(event.currentTarget).data('action');
+            yield SuccessTest.fromMessageAction(messageId, opposedActionTest);
+        });
+    }
+}
+exports.SuccessTest = SuccessTest;
+SuccessTest.CHAT_TEMPLATE = 'systems/shadowrun5e/dist/templates/rolls/success-test.html';
+},{"../actor/SR5Actor":85,"../apps/dialogs/ShadowrunTestDialog":140,"../constants":150,"../data/DataDefaults":151,"../helpers":164,"../parts/PartsList":218,"../rolls/SR5Roll":219}],231:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SR5Token = void 0;
@@ -35245,8 +35630,7 @@ class SR5Token extends Token {
     }
 }
 exports.SR5Token = SR5Token;
-
-},{"../constants":150}],229:[function(require,module,exports){
+},{"../constants":150}],232:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.quenchRegister = void 0;
@@ -35257,6 +35641,7 @@ const sr5_SR5Actor_spec_1 = require("./sr5.SR5Actor.spec");
 const sr5_ActorDataPrep_spec_1 = require("./sr5.ActorDataPrep.spec");
 const sr5_ActiveEffect_spec_1 = require("./sr5.ActiveEffect.spec");
 const sr5_NetworkDevices_spec_1 = require("./sr5.NetworkDevices.spec");
+const sr5_Testing_spec_1 = require("./sr5.Testing.spec");
 const sr5_Inventory_spec_1 = require("./sr5.Inventory.spec");
 /**
  * Register FoundryVTT Quench test batches...
@@ -35275,10 +35660,10 @@ const quenchRegister = quench => {
     quench.registerBatch("shadowrun5e.data_prep.actor", sr5_ActorDataPrep_spec_1.shadowrunSR5ActorDataPrep);
     quench.registerBatch("shadowrun5e.flow.networkDevices", sr5_NetworkDevices_spec_1.shadowrunNetworkDevices);
     quench.registerBatch("shadowrun5e.flow.inventory", sr5_Inventory_spec_1.shadowrunInventoryFlow);
+    quench.registerBatch("shadowrun5e.flow.tests", sr5_Testing_spec_1.shadowrunTesting);
 };
 exports.quenchRegister = quenchRegister;
-
-},{"./sr5.ActiveEffect.spec":230,"./sr5.ActorDataPrep.spec":231,"./sr5.Inventory.spec":232,"./sr5.Matrix.spec":233,"./sr5.Modifiers.spec":234,"./sr5.NetworkDevices.spec":235,"./sr5.SR5Actor.spec":236,"./sr5.SR5Item.spec":237}],230:[function(require,module,exports){
+},{"./sr5.ActiveEffect.spec":233,"./sr5.ActorDataPrep.spec":234,"./sr5.Inventory.spec":235,"./sr5.Matrix.spec":236,"./sr5.Modifiers.spec":237,"./sr5.NetworkDevices.spec":238,"./sr5.SR5Actor.spec":239,"./sr5.SR5Item.spec":240,"./sr5.Testing.spec":241}],233:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35397,8 +35782,7 @@ const shadowrunSR5ActiveEffect = context => {
     });
 };
 exports.shadowrunSR5ActiveEffect = shadowrunSR5ActiveEffect;
-
-},{"../module/actor/SR5Actor":85,"../module/item/SR5Item":204,"./utils":238}],231:[function(require,module,exports){
+},{"../module/actor/SR5Actor":85,"../module/item/SR5Item":204,"./utils":242}],234:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35611,8 +35995,7 @@ const shadowrunSR5ActorDataPrep = context => {
     });
 };
 exports.shadowrunSR5ActorDataPrep = shadowrunSR5ActorDataPrep;
-
-},{"../module/actor/SR5Actor":85,"../module/constants":150,"../module/item/SR5Item":204,"./utils":238}],232:[function(require,module,exports){
+},{"../module/actor/SR5Actor":85,"../module/constants":150,"../module/item/SR5Item":204,"./utils":242}],235:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35684,8 +36067,7 @@ const shadowrunInventoryFlow = context => {
     });
 };
 exports.shadowrunInventoryFlow = shadowrunInventoryFlow;
-
-},{"../module/actor/SR5Actor":85,"../module/item/SR5Item":204,"./utils":238}],233:[function(require,module,exports){
+},{"../module/actor/SR5Actor":85,"../module/item/SR5Item":204,"./utils":242}],236:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shadowrunMatrix = void 0;
@@ -35757,8 +36139,7 @@ const shadowrunMatrix = context => {
     });
 };
 exports.shadowrunMatrix = shadowrunMatrix;
-
-},{"../module/rules/MatrixRules":221}],234:[function(require,module,exports){
+},{"../module/rules/MatrixRules":222}],237:[function(require,module,exports){
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.shadowrunRulesModifiers = void 0;
@@ -35926,8 +36307,7 @@ const shadowrunRulesModifiers = context => {
     });
 };
 exports.shadowrunRulesModifiers = shadowrunRulesModifiers;
-
-},{"../module/rules/Modifiers":222}],235:[function(require,module,exports){
+},{"../module/rules/Modifiers":223}],238:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36082,8 +36462,7 @@ const shadowrunNetworkDevices = context => {
     });
 };
 exports.shadowrunNetworkDevices = shadowrunNetworkDevices;
-
-},{"../module/actor/SR5Actor":85,"../module/item/SR5Item":204,"../module/item/flows/NetworkDeviceFlow":208,"./utils":238}],236:[function(require,module,exports){
+},{"../module/actor/SR5Actor":85,"../module/item/SR5Item":204,"../module/item/flows/NetworkDeviceFlow":208,"./utils":242}],239:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36148,8 +36527,7 @@ const shadowrunSR5Actor = context => {
     });
 };
 exports.shadowrunSR5Actor = shadowrunSR5Actor;
-
-},{"../module/actor/SR5Actor":85,"../module/item/SR5Item":204,"./utils":238}],237:[function(require,module,exports){
+},{"../module/actor/SR5Actor":85,"../module/item/SR5Item":204,"./utils":242}],240:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36232,8 +36610,151 @@ const shadowrunSR5Item = context => {
     });
 };
 exports.shadowrunSR5Item = shadowrunSR5Item;
-
-},{"../module/item/SR5Item":204,"./utils":238}],238:[function(require,module,exports){
+},{"../module/item/SR5Item":204,"./utils":242}],241:[function(require,module,exports){
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.shadowrunTesting = void 0;
+const utils_1 = require("./utils");
+const SR5Actor_1 = require("../module/actor/SR5Actor");
+const SR5Item_1 = require("../module/item/SR5Item");
+const SuccessTest_1 = require("../module/tests/SuccessTest");
+const shadowrunTesting = context => {
+    const { describe, it, assert, before, after } = context;
+    let testActor;
+    let testItem;
+    before(() => __awaiter(void 0, void 0, void 0, function* () {
+        testActor = new utils_1.SR5TestingDocuments(SR5Actor_1.SR5Actor);
+        testItem = new utils_1.SR5TestingDocuments(SR5Item_1.SR5Item);
+    }));
+    after(() => __awaiter(void 0, void 0, void 0, function* () {
+        yield testActor.teardown();
+        yield testItem.teardown();
+    }));
+    describe('SuccessTest', () => {
+        it('Should evaluate a roll from action data', () => __awaiter(void 0, void 0, void 0, function* () {
+            /**
+             * alt_mod: 0
+             * attribute: "agility"
+             * attribute2: "body"
+             * category: ""
+             * damage: {type: {…}, element: {…}, value: 5, base: 5, ap: {…}, …}
+             * dice_pool_mod: []
+             * extended: false
+             * limit: {value: 5, base: 5, attribute: 'physical', mod: Array(0)}
+             * mod: 5
+             * mod_description: ""
+             * opposed: {type: 'defense', attribute: '', attribute2: '', skill: '', mod: 0, …}
+             * skill: "automatics"
+             * spec: false
+             * type: "simple"
+             */
+            const actionData = {
+                // TODO: SuccessTest|RangedPhysicalAttack|RangedManaAttack
+                'data.action.test': 'SuccessTest',
+                'type': 'action',
+                'data.action.type': 'simple',
+                'data.action.attribute': 'body',
+                'data.action.skill': 'automatics',
+                'data.action.spec': false,
+                'data.action.limit': {
+                    base: 1,
+                    value: 1,
+                    attribute: 'physical',
+                },
+                'data.action.threshold': {
+                    base: 1,
+                    value: 1,
+                },
+                'data.action.damage': {
+                    ap: { value: 5, base: 5, mod: Array(0) },
+                    attribute: "",
+                    base: 5,
+                    base_formula_operator: "add",
+                    element: { value: '', base: '' },
+                    itemSource: { actorId: '', itemId: '', itemType: '', itemName: '' },
+                    mod: [],
+                    type: { value: 'physical', base: 'physical' },
+                    value: 5
+                }
+            };
+            const action = yield testItem.create(actionData);
+            const actorData = { 'type': 'character',
+                'data.attributes.body.base': 5,
+                'data.skills.active.automatics.base': 45 };
+            const actor = yield testActor.create(actorData);
+            const test = SuccessTest_1.SuccessTest.fromAction(action, actor);
+            // For a broken test just fail.v
+            if (!test)
+                assert.strictEqual(true, false);
+            // Evaluate a working test.
+            if (test) {
+                yield test.evaluate();
+                console.error(test.data);
+                assert.strictEqual(test.pool.value, 50); // 5 body, 45 automatics
+                assert.strictEqual(test.threshold.value, 1); // 1
+                assert.strictEqual(test.limit.value, 4); // 4 Physical + 1
+                assert.strictEqual(test.netHits.value, 3); // limit - threshold
+                assert.strictEqual(test.hasReducedHits, true);
+                assert.strictEqual(test.hasThreshold, true);
+                assert.strictEqual(test.hasLimit, true);
+            }
+        }));
+        it('Should evaluate a roll from simple pool data', () => __awaiter(void 0, void 0, void 0, function* () {
+            const test = SuccessTest_1.SuccessTest.fromPool(10);
+            yield test.evaluate();
+            assert.strictEqual(test.roll.pool, 10);
+        }));
+        it('Should evaluate an opposed roll from a opposed action', () => __awaiter(void 0, void 0, void 0, function* () {
+            const actionData = {
+                'type': 'action',
+                'data.action.test': 'SuccessTest',
+                'data.action.type': 'simple',
+                'data.action.attribute': 'body',
+                'data.action.skill': 'automatics',
+                'data.action.spec': false,
+                'data.action.limit': {
+                    base: 1,
+                    value: 1,
+                    attribute: 'physical',
+                },
+                'data.action.threshold': {
+                    base: 1,
+                    value: 1,
+                },
+                'data.action.opposed': {
+                    "type": "custom",
+                    // TODO: This could maybe simply be SuccessTest?
+                    "test": "OpposedTest",
+                    "attribute": "reaction",
+                    "attribute2": "intuition",
+                    "skill": "",
+                    "mod": 0,
+                    "description": ""
+                }
+            };
+            const action = yield testItem.create(actionData);
+            const actorData = { 'type': 'character',
+                'data.attributes.body.base': 5,
+                'data.skills.active.automatics.base': 45 };
+            const actor = yield testActor.create(actorData);
+            const test = SuccessTest_1.SuccessTest.fromAction(action, actor);
+            if (test) {
+                yield test.toMessage();
+            }
+        }));
+    });
+};
+exports.shadowrunTesting = shadowrunTesting;
+},{"../module/actor/SR5Actor":85,"../module/item/SR5Item":204,"../module/tests/SuccessTest":230,"./utils":242}],242:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -36277,7 +36798,6 @@ class SR5TestingDocuments {
     }
 }
 exports.SR5TestingDocuments = SR5TestingDocuments;
-
 },{}]},{},[211])
 
 //# sourceMappingURL=bundle.js.map

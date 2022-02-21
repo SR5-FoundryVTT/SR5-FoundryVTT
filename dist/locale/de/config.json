@@ -79,6 +79,7 @@
   "SR5.Skill": "Fertigkeit",
   "SR5.Attribute": "Attribute",
   "SR5.Limit": "Limit",
+  "SR5.Threshold": "Schwellenwert",
   "SR5.Modifier": "Modifikatoren",
   "SR5.Wounds": "Wunden",
   "SR5.Filter": "Filter",
@@ -557,7 +558,11 @@
   "SR5.Blackmail": "Erpressung",
   "SR5.Family": "Familie",
   "SR5.DamageResistanceTest": "Schadenswiderstandsprobe",
+  "SR5.Success": "Erfolg!",
   "SR5.Glitch": "Patzer!",
+  "SR5.GlitchCritical": "Kritischer Patzer!",
+  "SR5.Glitches": "Patzer:",
+  "SR5.Failure": "Misserfolg!",
   "SR5.RollMode": "Würfelmodus",
   "SR5.OpenSourcePdf": "Öffne PDF-Quelle für Objekt",
   "SR5.OpenOrigin": "Öffne Gegenstand",
@@ -888,14 +893,19 @@
     }
   },
   "SR5.ActiveEffect": {
-      "New": "New Effect",
-      "Types": {
-        "Temporary": "Temporary Effects",
-        "Passive": "Passive Effects",
-        "Inactive": "Inactive Effects"
-      },
-      "Modes": {
-        "Modify": "Modifizieren"
-      }
+    "New": "New Effect",
+    "Types": {
+      "Temporary": "Temporary Effects",
+      "Passive": "Passive Effects",
+      "Inactive": "Inactive Effects"
+    },
+    "Modes": {
+      "Modify": "Modifizieren"
     }
+  },
+  "SR5.Tests": {
+    "SuccessTest": "Erfolgs Probe",
+    "OpposedTest": "Vergleichende Probe",
+    "ExtendedTest": "Ausgedehnte Probe"
+  }
 }

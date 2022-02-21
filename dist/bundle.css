@@ -368,12 +368,15 @@
       font-weight: bold; }
       .sr5.chat-card .damage-line .button:hover {
         box-shadow: 0 0 0.25em 0.15em black; }
+  .sr5.chat-card .reducedResult {
+    color: #aa0200;
+    filter: sepia(0.5) hue-rotate(-60deg); }
 
 .sr5.roll-card {
   margin: 0.15em; }
   .sr5.roll-card .card-title {
     display: flex;
-    font-size: 14px;
+    font-size: 12px;
     border-bottom: 1px solid #4d4d4d;
     justify-content: flex-start;
     align-content: center;

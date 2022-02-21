@@ -77,6 +77,7 @@
   "SR5.Skill": "Skill",
   "SR5.Attribute": "Attribute",
   "SR5.Limit": "Limit",
+  "SR5.Threshold": "Threshold",
   "SR5.Modifier": "Modifier",
   "SR5.Wounds": "Wounds",
   "SR5.Filter": "Filter",
@@ -554,7 +555,11 @@
   "SR5.Blackmail": "Blackmail",
   "SR5.Family": "Family",
   "SR5.DamageResistanceTest": "Damage Resistance Test",
+  "SR5.Success": "Success!",
   "SR5.Glitch": "Glitch!",
+  "SR5.GlitchCritical": "Critical Glitch!",
+  "SR5.Failure": "Failure!",
+  "SR5.Glitches": "Glitches:",
   "SR5.RollMode": "Roll Mode",
   "SR5.SIN": "SIN",
   "SR5.OpenSourcePdf": "Open Source PDF to the item",
@@ -929,5 +934,10 @@
     "Modes": {
       "Modify": "Modify"
     }
+  },
+  "SR5.Tests": {
+    "SuccessTest": "Success Test",
+    "OpposedTest": "Opposed Test",
+    "ExtendedTest": "Extended Test"
   }
 }
