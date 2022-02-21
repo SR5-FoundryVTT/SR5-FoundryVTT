@@ -139,7 +139,7 @@ ___________________
             makeDefault: true,
             types: ['spirit']
         });
-         Actors.registerSheet(SYSTEM_NAME, SR5SpriteActorSheet, {
+        Actors.registerSheet(SYSTEM_NAME, SR5SpriteActorSheet, {
             label: "SR5.SheetActor",
             makeDefault: true,
             types: ['sprite']
@@ -152,12 +152,7 @@ ___________________
             makeDefault: true
         });
 
-        ['renderSR5ActorSheet', 'renderSR5ItemSheet'].forEach((s) => {
-            Hooks.on(s, (app, html) => Helpers.setupCustomCheckbox(app, html));
-        });
-
         HooksManager.registerSocketListeners();
-
         HandlebarManager.loadTemplates();
     }
 

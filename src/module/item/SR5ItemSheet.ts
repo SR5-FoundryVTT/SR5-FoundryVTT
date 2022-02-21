@@ -168,6 +168,8 @@ export class SR5ItemSheet extends ItemSheet {
     activateListeners(html) {
         super.activateListeners(html);
 
+        Helpers.setupCustomCheckbox(this, html);
+
         /**
          * Drag and Drop Handling
          */
