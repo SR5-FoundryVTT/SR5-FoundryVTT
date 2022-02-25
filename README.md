@@ -12,9 +12,7 @@ It's complicated, it's a work in progress, but it is _kinda_ stable. We try to b
 - Sprite
 - Vehicle
 - Critter
-
-#### Other Actor Sheet Plans
-- Host, IC, are planned.
+- IC
 
 ## Learn more
 To learn more about the features of the system and how to use them, please visit our wiki: https://github.com/smilligan93/SR5-FoundryVTT/wiki
