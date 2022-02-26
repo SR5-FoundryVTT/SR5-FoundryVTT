@@ -61,7 +61,6 @@ export class HooksManager {
         Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem);
         Hooks.on('deleteItem', HooksManager.removeDeletedItemsFromNetworks);
 
-        // Foundry VTT Module 'quench': https://github.com/schultzcole/FVTT-Quench
         Hooks.on('quenchReady', quenchRegister);
     }
 

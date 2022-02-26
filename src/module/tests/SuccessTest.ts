@@ -36,10 +36,13 @@ export interface SuccessTestData {
 
     // Scene Token Ids marked as targets of this test.
     targetActorsUuid?: string[]
+
+    // Options the test was created with.
+    options?: SuccessTestOptions
 }
 
 export interface SuccessTestOptions {
-    skipDialog?: boolean // skip dialog when given true.
+    showDialog?: boolean // Show dialog when defined as true.
     roll?: SR5Roll
 }
 
@@ -65,15 +68,19 @@ export class SuccessTest {
     // TODO: include modifiers
     // TODO: store options in data for later re roll with same options?
     constructor(data: SuccessTestData, documents?: TestDocuments, options?: SuccessTestOptions) {
+        // TODO: Move roll to documents (or name it context)
+        const roll = options?.roll;
+        if (options) delete options.roll;
+
         // Store given documents to avoid later fetching.
         this.actor = documents?.actor;
         this.item = documents?.item;
         this.targets = [];
 
-        this.data = this._prepareData(data);
+        this.data = this._prepareData(data, options);
 
         // Reuse an old roll or create a new one.
-        this.roll = options?.roll || this.createRoll();
+        this.roll = roll || this.createRoll();
 
         console.info(`Shadowrun 5e | Created ${this.constructor.name} Test`, this);
     }
@@ -82,8 +89,9 @@ export class SuccessTest {
      * Prepare TestData
      *
      * @param data
+     * @param options
      */
-    _prepareData(data: SuccessTestData) {
+    _prepareData(data: SuccessTestData, options?: SuccessTestOptions) {
         // Store the current users targeted token ids for later use.
         // @ts-ignore // undefined isn't allowed but it's excluded.
         data.targetActorsUuid = data.targetActorsUuid || Helpers.getUserTargets().map(token => token.actor?.uuid).filter(uuid => !!uuid);
@@ -95,6 +103,9 @@ export class SuccessTest {
 
         // @ts-ignore // Prepare general test information.
         data.title = data.title || this.constructor.label;
+
+        // Options will be used when a test is reused further on.
+        data.options = options;
 
         return data;
     }
@@ -166,7 +177,7 @@ export class SuccessTest {
             values: {}
         };
 
-        return new SuccessTest(testData);
+        return new SuccessTest(testData, undefined, options);
     }
 
     static fromMessage(id: string): SuccessTest|undefined {
