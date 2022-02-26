@@ -172,13 +172,14 @@ ___________________
         const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
         $(document).on('click', diceIconSelectorNew, async () => await ShadowrunRoller.promptSuccessTest());
 
-        const test = SuccessTest.fromPool(10, 2, 5);
-        const actor = game.actors?.getName('Linked');
-        // @ts-ignore
-        const dialog = new TestDialog(actor, test);
-        const data = await dialog.select();
-        if (dialog.canceled) return console.warn('Canceld');
-        console.warn('Roll', data);
+        const test = SuccessTest.fromPool({pool: 10});
+        await test.toMessage();
+        // const actor = game.actors?.getName('Linked');
+        // // @ts-ignore
+        // const dialog = new TestDialog(actor, test);
+        // const data = await dialog.select();
+        // if (dialog.canceled) return console.warn('Canceld');
+        // console.warn('Roll', data);
     }
 
     static canvasInit() {

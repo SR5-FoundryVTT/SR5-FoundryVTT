@@ -9,12 +9,14 @@ import OpposedTestData = Shadowrun.OpposedTestData;
 import {PartsList} from "../parts/PartsList";
 import {ShadowrunTestDialog} from "../apps/dialogs/ShadowrunTestDialog";
 import {OpposedTest} from "./OpposedTest";
+import {TestDialog} from "../apps/dialogs/TestDialog";
 
 export interface TestDocuments {
     actor?: SR5Actor,
     item?: SR5Item
 }
 
+// TODO: Separate types between SuccessTestData and parameter Data within constructor
 export interface SuccessTestData {
     title?: string
     // TODO: implement typing method to apply effects to and for ations.
@@ -164,18 +166,21 @@ export class SuccessTest {
      * A helper method to create a SuccessTest from a simple pool value, without
      * actor / item involvement.
      *
-     * @param pool
-     * @param threshold
-     * @param limit
+     * TODO: fromPool as a name for 'from values' doesn't quite describe the method anymore, since a pool doesn't need to be given.
+     * @param values
      * @param options
      */
-    static fromPool(pool: number, threshold: number = 0, limit: number = 0, options?: SuccessTestOptions): SuccessTest {
+    static fromPool(values?: {pool?: number, limit?: number, threshold?: number}, options?: SuccessTestOptions): SuccessTest {
         const testData = {
-            pool: DefaultValues.valueData({label: 'SR5.DicePool', base: pool}),
-            threshold: DefaultValues.valueData({label: 'SR5.Threshold', base: threshold}),
-            limit: DefaultValues.valueData({label: 'SR5.Limit', base: limit}),
+            pool: DefaultValues.valueData({label: 'SR5.DicePool', base: values?.pool || 0}),
+            threshold: DefaultValues.valueData({label: 'SR5.Threshold', base: values?.threshold || 0}),
+            limit: DefaultValues.valueData({label: 'SR5.Limit', base: values?.limit || 0}),
             values: {}
         };
+
+
+        options = options || {};
+        options.showDialog = options.showDialog || true;
 
         return new SuccessTest(testData, undefined, options);
     }
@@ -198,7 +203,7 @@ export class SuccessTest {
     }
 
     /**
-     *
+     * TODO: Check if this method is still usefull when a dialog is an inbetween and not an initator of a test.
      */
     static async fromDialog(): Promise<SuccessTest|undefined> {
         // Ask user for additional, general success test role modifiers.
@@ -232,7 +237,7 @@ export class SuccessTest {
         const limitValue = dialogData.limit.value || 0;
 
         // Create and display SuccessTest.
-        const test = SuccessTest.fromPool(pool.value, thresholdValue, limitValue);
+        const test = SuccessTest.fromPool({pool: pool.value, threshold: thresholdValue, limit: limitValue}, {showDialog: false});
         await test.toMessage();
 
         // Store the last used pool size for the next simple SuccessTest
@@ -400,6 +405,20 @@ export class SuccessTest {
         // TODO: Add typing for rolls?
         // @ts-ignore
         return new SR5Roll(this.formula) as unknown as SR5Roll;
+    }
+
+    /**
+     * Show the dialog class for this test type and alter test according to user selection.
+     */
+    async showDialog(): Promise<boolean> {
+        const dialog = new TestDialog(this);
+
+        const data = await dialog.select();
+        if (dialog.canceled) return false;
+
+        this.data = data;
+
+        return true;
     }
 
     /**
@@ -602,6 +621,11 @@ export class SuccessTest {
      * Post this success test as a message to the chat log.
      */
     async toMessage(): Promise<ChatMessage|undefined> {
+        if (this.data.options?.showDialog) {
+            const userConsented = await this.showDialog();
+            if (!userConsented) return;
+        }
+
         await this.evaluate();
 
         // Prepare message content.

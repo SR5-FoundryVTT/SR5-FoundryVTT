@@ -8,8 +8,8 @@ import {CORE_FLAGS, CORE_NAME} from "../../constants";
  * TODO: Add TestDialog JSDoc
  */
 export class TestDialog extends FormDialog {
-    constructor(actor: SR5Actor, test: SuccessTest, options?: ApplicationOptions) {
-        const dialogData = TestDialog.getDialogData(actor, test);
+    constructor(test: SuccessTest, options?: ApplicationOptions) {
+        const dialogData = TestDialog.getDialogData(test);
         super(dialogData, options);
     }
 
@@ -23,7 +23,7 @@ export class TestDialog extends FormDialog {
         return options;
     }
 
-    static getDialogData(actor: SR5Actor, test: SuccessTest): FormDialogData {
+    static getDialogData(test: SuccessTest): FormDialogData {
         // @ts-ignore
         const title = game.i18n.localize(test.constructor.label);
         const templatePath = 'systems/shadowrun5e/dist/templates/apps/dialogs/test-dialog.html';
@@ -34,21 +34,34 @@ export class TestDialog extends FormDialog {
 
         const templateData = {
             test,
-            actor,
             rollMode,
             rollModes
         };
 
         const buttons = {
             roll: {
-                label: 'TODO: Roll'
+                label: game.i18n.localize('SR5.Roll'),
+                icon: '<i class="fas fa-dice-six"></i>'
             },
             cancel: {
-                label: 'TODO: Cancel'
+                label: game.i18n.localize('SR5.Dialogs.Common.Cancel')
             }
         };
 
-        const onAfterClose = (html) => console.error('After Close', html);
+        const onAfterClose = (html) => {
+            const pool = Number(html.find('input[name=pool]').val());
+            const threshold = Number(html.find('input[name=threshold]').val());
+            const limit = Number(html.find('input[name=limit]').val());
+
+            const data = duplicate(test.data);
+            data.pool.base = pool;
+            data.threshold.base = threshold;
+            data.limit.base = limit;
+
+            console.warn('Test After Dialog', test.data);
+
+            return data;
+        };
 
         return {
             title,

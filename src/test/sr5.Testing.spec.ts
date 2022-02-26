@@ -99,7 +99,7 @@ export const shadowrunTesting = context => {
         });
 
         it('Should evaluate a roll from simple pool data', async () => {
-            const test = SuccessTest.fromPool(10);
+            const test = SuccessTest.fromPool({pool: 10});
             await test.evaluate();
 
             assert.strictEqual(test.roll.pool, 10);

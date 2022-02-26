@@ -1,8 +1,10 @@
 <div class="sunken">
+    {{#if test.actor}}
     <div class="form-group">
-        <img src="{{actor.img}}" width="36" height="36"/>
-        <a class="entity-link content-link" data-type="Actor" data-id="{{actor.id}}">{{actor.name}}</a>
+        <img src="{{test.actor.img}}" width="36" height="36"/>
+        <a class="entity-link content-link" data-type="Actor" data-id="{{test.actor.id}}">{{test.actor.name}}</a>
     </div>
+    {{/if}}
     <div class="form-group">
         <label style="font-weight: bold;">{{localize "SR5.DicePool"}}</label>
         <input style="color: white" type='text' name='pool' size='3' maxlength='3' value='{{test.pool.value}}' data-dtype="Number"/>
@@ -25,6 +27,7 @@
         </select>
     </div>
 </div>
+Targets:
 <div class="sunken">
     <div class="form-group">
         <img src="{{actor.img}}" width="36" height="36"/>
