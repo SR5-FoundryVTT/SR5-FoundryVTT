@@ -1,5 +1,5 @@
 import { SR5Actor } from "../actor/SR5Actor";
-import { SR, SYSTEM_NAME, FLAGS } from "../constants";
+import {SR, SYSTEM_NAME, FLAGS, CORE_NAME, CORE_FLAGS} from "../constants";
 import { DefaultValues } from "../data/DataDefaults";
 import { Helpers } from "../helpers";
 import { SR5Item } from "../item/SR5Item";
@@ -46,6 +46,7 @@ export interface SuccessTestData {
 export interface SuccessTestOptions {
     showDialog?: boolean // Show dialog when defined as true.
     roll?: SR5Roll
+    rollMode?: keyof typeof CONFIG.Dice.rollModes
 }
 
 /**
@@ -105,6 +106,11 @@ export class SuccessTest {
 
         // @ts-ignore // Prepare general test information.
         data.title = data.title || this.constructor.label;
+
+        options = options || {}
+        // @ts-ignore // In FoundryVTT core settings we shall trust.
+        options.rollMode = options.rollMode || game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
+        options.showDialog = options.showDialog || true;
 
         // Options will be used when a test is reused further on.
         data.options = options;
@@ -177,10 +183,6 @@ export class SuccessTest {
             limit: DefaultValues.valueData({label: 'SR5.Limit', base: values?.limit || 0}),
             values: {}
         };
-
-
-        options = options || {};
-        options.showDialog = options.showDialog || true;
 
         return new SuccessTest(testData, undefined, options);
     }
@@ -726,18 +728,24 @@ export class SuccessTest {
         const actor = this.actor?.id;
         const alias = game.user?.name;
 
-        return {
+        const messageData = {
             user: game.user?.id,
             speaker: {
                 actor,
                 alias,
                 token
             },
-            // TODO: message.isRoll reports as false. Do we need ChatMessage to be roll type?
-            // type: CONST.CHAT_MESSAGE_TYPES.ROLL,
             content,
-            roll: JSON.stringify(this.roll.toJSON())
+            // TODO: Do we need this roll serialization since test is serialized into the message flat?
+            roll: JSON.stringify(this.roll.toJSON()),
+            rollMode: this.data.options?.rollMode
         }
+
+        // Instead of manually applying whisper ids, let Foundry do it.
+        // @ts-ignore TODO: Types Provide propper SuccessTestData and SuccessTestOptions
+        ChatMessage.applyRollMode(messageData, this.data.options?.rollMode);
+
+        return messageData;
     }
 
     static async _testDataFromMessage(id: string): Promise<SuccessTestData|undefined> {

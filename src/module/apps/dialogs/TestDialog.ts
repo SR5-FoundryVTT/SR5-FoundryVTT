@@ -29,7 +29,7 @@ export class TestDialog extends FormDialog {
         const templatePath = 'systems/shadowrun5e/dist/templates/apps/dialogs/test-dialog.html';
 
         // roll mode handling.
-        const rollMode = game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
+        const rollMode = test.data.options?.rollMode;
         const rollModes = CONFIG.Dice.rollModes;
 
         const templateData = {

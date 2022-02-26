@@ -922,6 +922,9 @@
   "SR5.Dialogs": {
     "RangedWeaponTest": {
       "EnvironmentalOverwriteSet": "Environmental modifiers have been manually set to a fixed value!"
+    },
+    "Common": {
+      "Cancel": "Cancel"
     }
   },
   "SR5.ActiveEffect": {
