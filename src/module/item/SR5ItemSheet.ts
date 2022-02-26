@@ -253,9 +253,8 @@ export class SR5ItemSheet extends ItemSheet {
             let item;
             // Case 1 - Data explicitly provided
             if (data.data) {
-                // TODO test
-                if (this.item.isOwned && data.actorId === this.item.actor?._id && data.data._id === this.item._id) {
-                    return console.warn('Shadowrun 5e | Cant drop items onto themselfs');
+                if (this.item.isOwned && data.actorId === this.item.actor?.id && data.data._id === this.item.id) {
+                    return console.warn('Shadowrun 5e | Cant drop items onto themself');
                 }
                 item = data;
             // Case 2 - From a Compendium Pack

@@ -157,8 +157,8 @@ export class EnvModifiersApplication extends Application {
      *
      */
     _disableInputsForUser(): boolean {
-        const entity = this.target instanceof SR5Actor ? this.target : this.target;
-        return !(game.user?.isGM || entity.owner);
+        if (!game.user) return false;
+        return !(game.user?.isGM || this.target.testUserPermission(game.user, 'OWNER'));
     }
 
     static async openForCurrentScene() {

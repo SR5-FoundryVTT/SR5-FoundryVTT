@@ -1,7 +1,7 @@
 import {FormDialog} from "./FormDialog";
 
 export class DeleteConfirmationDialog extends FormDialog {
-    constructor(options?: Application.Options) {
+    constructor(options?: ApplicationOptions) {
         const dialogData = DeleteConfirmationDialog.getDialogData();
 
         super(dialogData, options)

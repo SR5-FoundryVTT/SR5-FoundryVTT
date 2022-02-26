@@ -352,7 +352,7 @@ export class ShadowrunRoller {
         props.parts = props.parts ?? [];
         props.explodeSixes = props.explodeSixes ?? false;
         props.hideRollMessage = props.hideRollMessage ?? false;
-        props.rollMode = props.rollMode ?? CONFIG.Dice.rollModes.roll;
+        props.rollMode = props.rollMode ?? game.settings.get("core", "rollMode");;
         props.previewTemplate = props.previewTemplate ?? false;
 
         return {...props} as BasicRollPropsDefaulted;

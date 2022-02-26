@@ -12,7 +12,7 @@ export class MoveInventoryDialog extends FormDialog {
      * @param sourceInventory The currently selected inventory, which won't be displayed.
      * @param options
      */
-    constructor(actor: SR5Actor, sourceInventory: string, options?: Application.Options) {
+    constructor(actor: SR5Actor, sourceInventory: string, options?: ApplicationOptions) {
         const dialogData = MoveInventoryDialog.getDialogData(actor, sourceInventory);
 
         super(dialogData, options);

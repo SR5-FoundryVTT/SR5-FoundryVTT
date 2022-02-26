@@ -15,7 +15,7 @@ export async function createItemMacro(item, slot) {
     const command = `game.shadowrun5e.rollItemMacro("${item.name}");`;
     let macro = game.macros.contents.find((m) => m.name === item.name);
     if (!macro) {
-        macro = (await Macro.create(
+        macro = await Macro.create(
             {
                 name: item.name,
                 type: 'script',
@@ -24,7 +24,7 @@ export async function createItemMacro(item, slot) {
                 flags: { 'shadowrun5e.itemMacro': true },
             },
             { renderSheet: false },
-        )) as Macro;
+        );
     }
 
     if (macro) game.user?.assignHotbarMacro(macro, slot);

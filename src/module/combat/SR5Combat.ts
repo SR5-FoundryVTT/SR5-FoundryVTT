@@ -14,6 +14,11 @@ import {InitiativeOptions} from "@league-of-foundry-developers/foundry-vtt-types
  *       @PDF SR5#160 'Chaning Initiative'
  */
 export class SR5Combat extends Combat {
+    // Overwrite foundry-vtt-types v9 combatTrackerSettings type definitions.
+    get settings() {
+        return super.settings as {resource: string, skipDefeated: boolean};
+    }
+
     get initiativePass(): number {
         return this.getFlag(SYSTEM_NAME, FLAGS.CombatInitiativePass) as number || SR.combat.INITIAL_INI_PASS;
     }
@@ -83,7 +88,7 @@ export class SR5Combat extends Combat {
      * @param adjustment
      */
     async adjustInitiative(combatant: string | any, adjustment: number): Promise<void> {
-        combatant = typeof combatant === 'string' ? this.combatants.find((c) => c._id === combatant) : combatant;
+        combatant = typeof combatant === 'string' ? this.combatants.find((c) => c.id === combatant) : combatant;
         if (!combatant || typeof combatant === 'string') {
             console.error('Could not find combatant with id ', combatant);
             return;
@@ -185,7 +190,7 @@ export class SR5Combat extends Combat {
     get nextUndefeatedTurnPosition(): number {
         for (let [turnInPass, combatant] of this.turns.entries()) {
             // Skipping is only interesting when moving forward.
-            if (turnInPass <= this.turn) continue;
+            if (this.turn !== null && turnInPass <= this.turn) continue;
             // @ts-ignore
             if (!combatant.defeated && combatant.initiative > 0) {
                 return turnInPass;
@@ -202,7 +207,7 @@ export class SR5Combat extends Combat {
         // Start at the next position after the current one.
         for (let [turnInPass, combatant] of this.turns.entries()) {
             // Skipping is only interesting when moving forward.
-            if (turnInPass <= this.turn) continue;
+            if (this.turn !== null && turnInPass <= this.turn) continue;
             // @ts-ignore
             if (combatant.initiative > 0) {
                 return turnInPass;
@@ -244,7 +249,7 @@ export class SR5Combat extends Combat {
         let nextRound = this.round;
         let initiativePass = this.initiativePass;
         // Get the next viable turn position.
-        let nextTurn = this.settings.skipDefeated ?
+        let nextTurn = this.settings?.skipDefeated ?
             this.nextUndefeatedTurnPosition :
             this.nextViableTurnPosition;
 

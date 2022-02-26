@@ -25,7 +25,7 @@ export class FormDialog extends Dialog {
     _templateData: object;
     _templatePath: string;
 
-    constructor(dialogData: FormDialogData, options?: Application.Options) {
+    constructor(dialogData: FormDialogData, options?: ApplicationOptions) {
         // @ts-ignore
         super(dialogData, options);
 

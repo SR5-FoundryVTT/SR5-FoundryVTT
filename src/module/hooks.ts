@@ -96,6 +96,7 @@ ___________________
         // @ts-ignore // TODO: Compare Combat/SR5Combat typing.
         CONFIG.Combat.documentClass = SR5Combat;
         CONFIG.ActiveEffect.documentClass = SR5ActiveEffect;
+        // @ts-ignore // ActiveEffect.sheetClass might be an old approach, since DnD5e isn't using it anymore.
         CONFIG.ActiveEffect.sheetClass = SR5ActiveEffectSheet;
         CONFIG.Token.objectClass = SR5Token;
         // Register initiative directly (outside of system.json) as DnD5e does it.

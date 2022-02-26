@@ -380,22 +380,24 @@ export abstract class VersionMigration {
 
         // Begin by requesting server-side data model migration and get the migrated content
         await pack.migrate({});
-        const content = await pack.getContent();
+        const documents = await pack.contents;
 
         // Iterate over compendium entries - applying fine-tuned migration functions
-        for (let ent of content) {
+        for (let document of documents) {
             try {
                 let updateData: any = null;
-                if (entity === 'Item') {
-                    updateData = await this.MigrateItemData(ent.data);
+                // @ts-ignore // TODO: vtt-types v9 ?.type should work, but doesn't?
+                if (pack.metadata.entity === 'Item' && document.data?.type === 'Item') {
+                    // @ts-ignore // TODO: vtt-types v9 document.data.type check added to type gate... but didn't work
+                    updateData = await this.MigrateItemData(document.data);
 
                     if (isObjectEmpty(updateData)) {
                         continue;
                     }
 
                     expandObject(updateData);
-                    updateData['_id'] = ent.id;
-                    await pack.updateEntity(updateData);
+                    updateData['_id'] = document.id;
+                    await pack.updateAll(updateData);
                     // TODO: Uncomment when foundry allows embeddeds to be updated in packs
                     // } else if (document === 'Actor') {
                     //     updateData = await this.MigrateActorData(ent.data);
@@ -407,15 +409,15 @@ export abstract class VersionMigration {
                     //     updateData['_id'] = ent._id;
                     //     await pack.updateEntity(updateData);
                 } else if (entity === 'Scene') {
-                    updateData = await this.MigrateSceneData(ent.data);
+                    updateData = await this.MigrateSceneData(document.data);
 
                     if (isObjectEmpty(updateData)) {
                         continue;
                     }
 
                     expandObject(updateData);
-                    updateData['_id'] = ent.id;
-                    await pack.updateEntity(updateData);
+                    updateData['_id'] = document.id;
+                    await pack.updateAll(updateData);
                 }
             } catch (err) {
                 console.error(err);

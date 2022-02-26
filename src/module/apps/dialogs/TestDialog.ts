@@ -8,7 +8,7 @@ import {CORE_FLAGS, CORE_NAME} from "../../constants";
  * TODO: Add TestDialog JSDoc
  */
 export class TestDialog extends FormDialog {
-    constructor(actor: SR5Actor, test: SuccessTest, options?: Application.Options) {
+    constructor(actor: SR5Actor, test: SuccessTest, options?: ApplicationOptions) {
         const dialogData = TestDialog.getDialogData(actor, test);
         super(dialogData, options);
     }
