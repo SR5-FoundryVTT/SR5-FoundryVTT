@@ -190,8 +190,12 @@ ___________________
         $(document).on('click', diceIconSelectorNew, async () => await ShadowrunRoller.promptSuccessTest());
 
         console.error('TODO: Remove this dev implementation');
-        const test = SuccessTest.fromPool({pool: 10});
-        await test.toMessage();
+        const item = game.items?.getName('Weapon (Ranged) Langer Titel');
+        const actor = game.actors?.getName('Char Linked Mit Langem namen');
+        if (!item || !actor) return;
+        const test = SuccessTest.fromAction(item, actor);
+        if (!test) console.warn('Didnt work');
+        await test?.toMessage();
     }
 
     static canvasInit() {

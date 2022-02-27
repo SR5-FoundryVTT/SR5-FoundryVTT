@@ -229,6 +229,17 @@ select.display {
 
 .sr5 {
     /**
+     * Overwrite FoundryVTT default styling within sheets.
+     */
+    .form-group {
+        label {
+            font-weight: bold;
+        }
+        input {
+            color: $white;
+        }
+    }
+    /**
      * Elements used for inline editing
      */
     .inline-input-inventory {
@@ -384,6 +395,53 @@ select.display {
             padding-right: 0.25em;
         }
     }
+
+    .container {
+        max-width: $sheet-max-width;
+        margin: 0 auto;
+        &--fluid {
+            margin: 0;
+            max-width: 100%;
+        }
+        &__row {
+            display: flex;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        // Auto create grid style classes for a fixed max column grid
+        @for $i from 1 through $grid__cols {
+            &__col-#{$i} {
+                flex-basis: (100 / ($grid__cols / $i) ) * 1%;
+                overflow: hidden;
+            }
+        }
+
+        &__col-half {
+            flex-basis: 50%;
+            overflow: hidden;
+        }
+
+        .element {
+            padding: 4px;
+        }
+    }
+
+    .document {
+        overflow: hidden;
+        white-space: nowrap;
+        display: flex;
+        align-content: center;
+
+        img {
+            height: 34px;
+        }
+
+        * {
+            display: inline-block;
+        }
+    }
+
     .block {
         display: flex;
         flex-flow: column;
@@ -409,6 +467,9 @@ select.display {
                 > :not(:last-child) {
                     margin-right: 4px;
                 }
+            }
+            &.block-half {
+
             }
         }
     }
@@ -645,7 +706,9 @@ select.display {
         box-shadow: $dark-sunken-box-shadow;
         padding: $medium-distance;
         background-color: $dark-sunken;
+
     }
+
     .modified-target-damage {
         margin-top: $large-distance;
         margin-bottom: $large-distance;

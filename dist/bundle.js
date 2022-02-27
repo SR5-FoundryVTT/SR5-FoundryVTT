@@ -26587,7 +26587,7 @@ ___________________
         HandlebarManager_1.HandlebarManager.loadTemplates();
     }
     static ready() {
-        var _a;
+        var _a, _b, _c;
         return __awaiter(this, void 0, void 0, function* () {
             if ((_a = game.user) === null || _a === void 0 ? void 0 : _a.isGM) {
                 yield Migrator_1.Migrator.BeginMigration();
@@ -26601,8 +26601,14 @@ ___________________
             const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
             $(document).on('click', diceIconSelectorNew, () => __awaiter(this, void 0, void 0, function* () { return yield ShadowrunRoller_1.ShadowrunRoller.promptSuccessTest(); }));
             console.error('TODO: Remove this dev implementation');
-            const test = SuccessTest_1.SuccessTest.fromPool({ pool: 10 });
-            yield test.toMessage();
+            const item = (_b = game.items) === null || _b === void 0 ? void 0 : _b.getName('Weapon (Ranged) Langer Titel');
+            const actor = (_c = game.actors) === null || _c === void 0 ? void 0 : _c.getName('Char Linked Mit Langem namen');
+            if (!item || !actor)
+                return;
+            const test = SuccessTest_1.SuccessTest.fromAction(item, actor);
+            if (!test)
+                console.warn('Didnt work');
+            yield (test === null || test === void 0 ? void 0 : test.toMessage());
         });
     }
     static canvasInit() {
@@ -35786,12 +35792,12 @@ const quenchRegister = () => {
         return;
     console.warn('Shadowrun 5e | Be aware that FoundryVTT will tank in update performance when a lot of documents are in collections. This is the case if you have all Chummer items imported and might cause tests to cross the 2000ms quench timeout threshold. Clear those collections in a test world. :)');
     quench.registerBatch("shadowrun5e.rules.matrix", sr5_Matrix_spec_1.shadowrunMatrix, { displayName: "SHADOWRUN5e: Matrix Test" });
-    quench.registerBatch("shadowrun5e.flow.networkDevices", sr5_NetworkDevices_spec_1.shadowrunNetworkDevices, { displayName: "SHADOWRUN5e: Matrix Network Devices Test" });
     quench.registerBatch("shadowrun5e.rules.modifiers", sr5_Modifiers_spec_1.shadowrunRulesModifiers, { displayName: "SHADOWRUN5e: Modifiers Test" });
     quench.registerBatch("shadowrun5e.entities.items", sr5_SR5Item_spec_1.shadowrunSR5Item, { displayName: "SHADOWRUN5e: SR5Item Test" });
     quench.registerBatch("shadowrun5e.entities.actors", sr5_SR5Actor_spec_1.shadowrunSR5Actor, { displayName: "SHADOWRUN5e: SR5Actor Test" });
     quench.registerBatch("shadowrun5e.entities.effects", sr5_ActiveEffect_spec_1.shadowrunSR5ActiveEffect, { displayName: "SHADOWRUN5e: SR5ActiveEffect Test" });
-    quench.registerBatch("shadowrun5e.data_prep.actor", sr5_ActorDataPrep_spec_1.shadowrunSR5ActorDataPrep, { displayName: "SHADOWRUN5e: SR5ActorDataPreperation Test" });
+    quench.registerBatch("shadowrun5e.data_prep.actor", sr5_ActorDataPrep_spec_1.shadowrunSR5ActorDataPrep, { displayName: "SHADOWRUN5e: SR5ActorDataPreparation Test" });
+    quench.registerBatch("shadowrun5e.flow.networkDevices", sr5_NetworkDevices_spec_1.shadowrunNetworkDevices, { displayName: "SHADOWRUN5e: Matrix Network Devices Test" });
     quench.registerBatch("shadowrun5e.flow.inventory", sr5_Inventory_spec_1.shadowrunInventoryFlow, { displayName: "SHADOWRUN5e: InventoryFlow Test" });
     quench.registerBatch("shadowrun5e.flow.tests", sr5_Testing_spec_1.shadowrunTesting, { displayName: "SHADOWRUN5e: SuccessTest Test" });
 };

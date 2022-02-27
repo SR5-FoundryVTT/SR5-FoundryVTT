@@ -1,37 +1,57 @@
-<div class="sunken">
-    {{#if test.actor}}
-    <div class="form-group">
-        <img src="{{test.actor.img}}" width="36" height="36"/>
-        <a class="entity-link content-link" data-type="Actor" data-id="{{test.actor.id}}">{{test.actor.name}}</a>
+<form>
+    {{#if test.item}}
+    <div class="container container--fluid sunken">
+        <div class="container__row">
+            <div class="container__col-half">
+                <div class="document">
+                    <img src="{{test.actor.img}}"/>
+                    <a class="entity-link content-link" data-type="Actor" data-id="{{test.actor.id}}">{{test.actor.name}}</a>
+                </div>
+            </div>
+            <div class="container__col-half">
+                <div class="document">
+                    <img src="{{test.item.img}}"/>
+                    <a class="entity-link content-link" data-type="Item"
+                       data-id="{{test.item.id}}">{{test.item.name}}</a>
+                </div>
+            </div>
+        </div>
     </div>
     {{/if}}
-    <div class="form-group">
-        <label style="font-weight: bold;">{{localize "SR5.DicePool"}}</label>
-        <input style="color: white" type='text' name='pool' size='3' maxlength='3' value='{{test.pool.value}}' data-dtype="Number"/>
-    </div>
-    <div class="form-group">
-        <label style="font-weight: bold;">{{localize "SR5.Limit"}}</label>
-        <input style="color: white" type='text' name='limit' size='3' maxlength='3' value='{{test.limit.value}}' data-dtype="Number"/>
-    </div>
-    <div class="form-group">
-        <label style="font-weight: bold;">{{localize "SR5.Threshold"}}</label>
-        <input style="color: white" type='text' name='threshold' size='3' maxlength='3' value='{{test.threshold.value}}' data-dtype="Number"/>
+
+    <div class="sunken">
+        <div class="form-group">
+            <label>{{localize "SR5.DicePool"}}</label>
+            <input type='text' name='pool' size='3' maxlength='3' value='{{test.pool.value}}' data-dtype="Number"/>
+        </div>
+        <div class="form-group">
+            <label>{{localize "SR5.Limit"}}</label>
+            <input type='text' name='limit' size='3' maxlength='3' value='{{test.limit.value}}' data-dtype="Number"/>
+        </div>
+        <div class="form-group">
+            <label>{{localize "SR5.Threshold"}}</label>
+            <input type='text' name='threshold' size='3' maxlength='3' value='{{test.threshold.value}}'
+                   data-dtype="Number"/>
+        </div>
     </div>
 
-    <div class="form-group">
-        <label>{{ localize "SR5.RollMode" }}</label>
-        <select style="color: white" name="rollMode">
-            {{#select rollMode}} {{#each rollModes as |label mode|}}
-            <option value="{{mode}}">{{localize label}}</option>
-            {{/each}} {{/select}}
-        </select>
+    <div class="sunken">
+        <div class="form-group">
+            <label>{{ localize "SR5.RollMode" }}</label>
+            <select style="color: white" name="rollMode">
+                {{#select rollMode}} {{#each rollModes as |label mode|}}
+                <option value="{{mode}}">{{localize label}}</option>
+                {{/each}} {{/select}}
+            </select>
+        </div>
     </div>
-</div>
-Targets:
-<div class="sunken">
-    <div class="form-group">
-        <img src="{{actor.img}}" width="36" height="36"/>
-        <a class="entity-link content-link" data-type="Actor" data-id="{{actor.id}}">{{actor.name}}</a>
+    <div class="sunken">
+        Targets:
+        <div class="sunken">
+            <div class="form-group">
+                <img src="{{actor.img}}" width="36" height="36"/>
+                <a class="entity-link content-link" data-type="Actor" data-id="{{actor.id}}">{{actor.name}}</a>
+            </div>
+        </div>
     </div>
-</div>
-
+</form>
