@@ -26485,7 +26485,7 @@ class HooksManager {
         Hooks.on('renderTokenHUD', EnvModifiersApplication_1.EnvModifiersApplication.addTokenHUDFields);
         Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem);
         Hooks.on('deleteItem', HooksManager.removeDeletedItemsFromNetworks);
-        Hooks.on('quenchReady', quench_1.quenchRegister);
+        Hooks.on('init', quench_1.quenchRegister);
     }
     static init() {
         console.log(`Loading Shadowrun 5e System
@@ -26500,14 +26500,31 @@ ___________________
 `);
         // Create a shadowrun5e namespace within the game global
         game['shadowrun5e'] = {
+            /**
+             * System level Document implementations.
+             */
             SR5Actor: SR5Actor_1.SR5Actor,
-            ShadowrunRoller: ShadowrunRoller_1.ShadowrunRoller,
             SR5Item: SR5Item_1.SR5Item,
+            SR5ActiveEffect: SR5ActiveEffect_1.SR5ActiveEffect,
+            /**
+             * Macro hooks used when something's dropped onto the hotbar.
+             */
             rollItemMacro: macros_1.rollItemMacro,
             rollSkillMacro: macros_1.rollSkillMacro,
+            /**
+             * Complex test support (legacy).
+             */
+            ShadowrunRoller: ShadowrunRoller_1.ShadowrunRoller,
+            /**
+             * Should you only really need dice handling, use this. If you need more complex testing behaviour,
+             * check the Test implementations.
+             */
             SR5Roll: SR5Roll_1.SR5Roll,
-            // Register action tests.
-            // These can be replaced and extended.
+            /**
+             * .tests define what test implementation to use for each test type (key).
+             * Should you want to override default behaviour for SuccessTest types, overwrite
+             * the SuccessTest class reference here.
+             */
             tests: {
                 SuccessTest: SuccessTest_1.SuccessTest,
                 OpposedTest: OpposedTest_1.OpposedTest
@@ -26583,6 +26600,7 @@ ___________________
             $(document).on('click', diceIconSelector, () => __awaiter(this, void 0, void 0, function* () { return yield ShadowrunRoller_1.ShadowrunRoller.promptSuccessTest(); }));
             const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
             $(document).on('click', diceIconSelectorNew, () => __awaiter(this, void 0, void 0, function* () { return yield ShadowrunRoller_1.ShadowrunRoller.promptSuccessTest(); }));
+            console.error('TODO: Remove this dev implementation');
             const test = SuccessTest_1.SuccessTest.fromPool({ pool: 10 });
             yield test.toMessage();
         });
@@ -31605,7 +31623,6 @@ class SR5ItemSheet extends ItemSheet {
                 let item;
                 // Case 1 - Data explicitly provided
                 if (data.data) {
-                    // TODO test
                     if (this.item.isOwned && data.actorId === ((_a = this.item.actor) === null || _a === void 0 ? void 0 : _a.id) && data.data._id === this.item.id) {
                         return console.warn('Shadowrun 5e | Cant drop items onto themself');
                     }
@@ -35764,7 +35781,9 @@ const sr5_Inventory_spec_1 = require("./sr5.Inventory.spec");
  *
  * https://github.com/Ethaks/FVTT-Quench
  */
-const quenchRegister = (quench) => {
+const quenchRegister = () => {
+    if (!quench)
+        return;
     console.warn('Shadowrun 5e | Be aware that FoundryVTT will tank in update performance when a lot of documents are in collections. This is the case if you have all Chummer items imported and might cause tests to cross the 2000ms quench timeout threshold. Clear those collections in a test world. :)');
     quench.registerBatch("shadowrun5e.rules.matrix", sr5_Matrix_spec_1.shadowrunMatrix);
     quench.registerBatch("shadowrun5e.rules.modifiers", sr5_Modifiers_spec_1.shadowrunRulesModifiers);

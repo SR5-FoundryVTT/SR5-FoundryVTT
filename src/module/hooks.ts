@@ -61,7 +61,7 @@ export class HooksManager {
         Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem);
         Hooks.on('deleteItem', HooksManager.removeDeletedItemsFromNetworks);
 
-        Hooks.on('quenchReady', quenchRegister);
+        Hooks.on('init', quenchRegister);
     }
 
     static init() {
@@ -77,14 +77,31 @@ ___________________
 `);
         // Create a shadowrun5e namespace within the game global
         game['shadowrun5e'] = {
+            /**
+             * System level Document implementations.
+             */
             SR5Actor,
-            ShadowrunRoller,
             SR5Item,
+            SR5ActiveEffect,
+            /**
+             * Macro hooks used when something's dropped onto the hotbar.
+             */
             rollItemMacro,
             rollSkillMacro,
+            /**
+             * Complex test support (legacy).
+             */
+            ShadowrunRoller,
+            /**
+             * Should you only really need dice handling, use this. If you need more complex testing behaviour,
+             * check the Test implementations.
+             */
             SR5Roll,
-            // Register action tests.
-            // These can be replaced and extended.
+            /**
+             * .tests define what test implementation to use for each test type (key).
+             * Should you want to override default behaviour for SuccessTest types, overwrite
+             * the SuccessTest class reference here.
+             */
             tests: {
                 SuccessTest,
                 OpposedTest
@@ -172,14 +189,9 @@ ___________________
         const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
         $(document).on('click', diceIconSelectorNew, async () => await ShadowrunRoller.promptSuccessTest());
 
+        console.error('TODO: Remove this dev implementation');
         const test = SuccessTest.fromPool({pool: 10});
         await test.toMessage();
-        // const actor = game.actors?.getName('Linked');
-        // // @ts-ignore
-        // const dialog = new TestDialog(actor, test);
-        // const data = await dialog.select();
-        // if (dialog.canceled) return console.warn('Canceld');
-        // console.warn('Roll', data);
     }
 
     static canvasInit() {
