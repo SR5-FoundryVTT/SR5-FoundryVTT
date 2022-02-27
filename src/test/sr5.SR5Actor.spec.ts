@@ -18,7 +18,7 @@ export const shadowrunSR5Actor = context => {
     })
 
     describe('SR5Actor', () => {
-        it('Should create a naked actor of any type', async () => {
+        it('create a naked actor of any type', async () => {
             const actor = await testActor.create({type: 'character'});
 
             // Check basic foundry data integrity
@@ -32,7 +32,7 @@ export const shadowrunSR5Actor = context => {
             assert.strictEqual(actor.id, fromCollection?.id);
         });
 
-        it('Should update an actor of any time', async () => {
+        it('update an actor of any time', async () => {
             const actor = await testActor.create({type: 'character'});
 
             assert.notProperty(actor.data.data, 'test');
@@ -42,7 +42,7 @@ export const shadowrunSR5Actor = context => {
             assert.propertyVal(actor.data.data, 'test', true);
         });
 
-        it('Should embedd a weapon into an actor and not the global item colection', async () => {
+        it('embedd a weapon into an actor and not the global item colection', async () => {
             const actor = await testActor.create({type: 'character'});
             const weapon = await testItem.create({type: 'weapon'});
 

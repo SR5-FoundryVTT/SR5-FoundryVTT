@@ -35785,15 +35785,15 @@ const quenchRegister = () => {
     if (!quench)
         return;
     console.warn('Shadowrun 5e | Be aware that FoundryVTT will tank in update performance when a lot of documents are in collections. This is the case if you have all Chummer items imported and might cause tests to cross the 2000ms quench timeout threshold. Clear those collections in a test world. :)');
-    quench.registerBatch("shadowrun5e.rules.matrix", sr5_Matrix_spec_1.shadowrunMatrix);
-    quench.registerBatch("shadowrun5e.rules.modifiers", sr5_Modifiers_spec_1.shadowrunRulesModifiers);
-    quench.registerBatch("shadowrun5e.entities.items", sr5_SR5Item_spec_1.shadowrunSR5Item);
-    quench.registerBatch("shadowrun5e.entities.actors", sr5_SR5Actor_spec_1.shadowrunSR5Actor);
-    quench.registerBatch("shadowrun5e.entities.effects", sr5_ActiveEffect_spec_1.shadowrunSR5ActiveEffect);
-    quench.registerBatch("shadowrun5e.data_prep.actor", sr5_ActorDataPrep_spec_1.shadowrunSR5ActorDataPrep);
-    quench.registerBatch("shadowrun5e.flow.networkDevices", sr5_NetworkDevices_spec_1.shadowrunNetworkDevices);
-    quench.registerBatch("shadowrun5e.flow.inventory", sr5_Inventory_spec_1.shadowrunInventoryFlow);
-    quench.registerBatch("shadowrun5e.flow.tests", sr5_Testing_spec_1.shadowrunTesting);
+    quench.registerBatch("shadowrun5e.rules.matrix", sr5_Matrix_spec_1.shadowrunMatrix, { displayName: "SHADOWRUN5e: Matrix Test" });
+    quench.registerBatch("shadowrun5e.flow.networkDevices", sr5_NetworkDevices_spec_1.shadowrunNetworkDevices, { displayName: "SHADOWRUN5e: Matrix Network Devices Test" });
+    quench.registerBatch("shadowrun5e.rules.modifiers", sr5_Modifiers_spec_1.shadowrunRulesModifiers, { displayName: "SHADOWRUN5e: Modifiers Test" });
+    quench.registerBatch("shadowrun5e.entities.items", sr5_SR5Item_spec_1.shadowrunSR5Item, { displayName: "SHADOWRUN5e: SR5Item Test" });
+    quench.registerBatch("shadowrun5e.entities.actors", sr5_SR5Actor_spec_1.shadowrunSR5Actor, { displayName: "SHADOWRUN5e: SR5Actor Test" });
+    quench.registerBatch("shadowrun5e.entities.effects", sr5_ActiveEffect_spec_1.shadowrunSR5ActiveEffect, { displayName: "SHADOWRUN5e: SR5ActiveEffect Test" });
+    quench.registerBatch("shadowrun5e.data_prep.actor", sr5_ActorDataPrep_spec_1.shadowrunSR5ActorDataPrep, { displayName: "SHADOWRUN5e: SR5ActorDataPreperation Test" });
+    quench.registerBatch("shadowrun5e.flow.inventory", sr5_Inventory_spec_1.shadowrunInventoryFlow, { displayName: "SHADOWRUN5e: InventoryFlow Test" });
+    quench.registerBatch("shadowrun5e.flow.tests", sr5_Testing_spec_1.shadowrunTesting, { displayName: "SHADOWRUN5e: SuccessTest Test" });
 };
 exports.quenchRegister = quenchRegister;
 },{"./sr5.ActiveEffect.spec":234,"./sr5.ActorDataPrep.spec":235,"./sr5.Inventory.spec":236,"./sr5.Matrix.spec":237,"./sr5.Modifiers.spec":238,"./sr5.NetworkDevices.spec":239,"./sr5.SR5Actor.spec":240,"./sr5.SR5Item.spec":241,"./sr5.Testing.spec":242}],234:[function(require,module,exports){
@@ -36157,7 +36157,7 @@ const shadowrunInventoryFlow = context => {
         yield testItem.teardown();
     }));
     describe('InventoryFlow testing', () => {
-        it('Should create a new inventory and know of its existance', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('create a new inventory and know of its existance', () => __awaiter(void 0, void 0, void 0, function* () {
             const actor = yield testActor.create({ type: 'character' });
             yield actor.inventory.create('test');
             assert.deepEqual(actor.data.data.inventories, {
@@ -36169,13 +36169,13 @@ const shadowrunInventoryFlow = context => {
             });
             assert.strictEqual(actor.inventory.exists('test'), true);
         }));
-        it('Should remove an inventory', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('remove an inventory', () => __awaiter(void 0, void 0, void 0, function* () {
             const inventoriesData = { test: { name: 'test', label: 'test', itemIds: [] } };
             const actor = yield testActor.create({ type: 'character', 'data.inventories': inventoriesData });
             yield actor.inventory.remove('test');
             assert.deepEqual(actor.data.data.inventories, {});
         }));
-        it('Should add and remove an item to and from an inventory', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('add and remove an item to and from an inventory', () => __awaiter(void 0, void 0, void 0, function* () {
             const inventoriesData = { test: { name: 'test', label: 'test', itemIds: [] } };
             const actor = yield testActor.create({ type: 'character', 'data.inventories': inventoriesData });
             const item = yield actor.createEmbeddedDocuments('Item', [{ type: 'weapon', name: 'Test Weapon' }]);
@@ -36185,7 +36185,7 @@ const shadowrunInventoryFlow = context => {
             yield actor.inventory.removeItem(item[0]);
             assert.deepEqual(actor.data.data.inventories.test.itemIds, []);
         }));
-        it('Should rename an existing inventory', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('rename an existing inventory', () => __awaiter(void 0, void 0, void 0, function* () {
             const inventoriesData = { test: { name: 'test', label: 'test', itemIds: ['asd'] } };
             const actor = yield testActor.create({ type: 'character', 'data.inventories': inventoriesData });
             yield actor.inventory.rename('test', 'betterTest');
@@ -36208,14 +36208,14 @@ const MatrixRules_1 = require("../module/rules/MatrixRules");
 const shadowrunMatrix = context => {
     const { describe, it, assert, before, after } = context;
     describe('Matrix Rules', () => {
-        it('Should calculate IC device rating', () => {
+        it('calculate IC device rating', () => {
             let hostRating = 5;
             assert.strictEqual(MatrixRules_1.MatrixRules.getICDeviceRating(hostRating), hostRating);
             // Negative values shouldn't break the system.
             hostRating = -1;
             assert.strictEqual(MatrixRules_1.MatrixRules.getICDeviceRating(hostRating), 0);
         });
-        it('Should calculate IC condition monitor', () => {
+        it('calculate IC condition monitor', () => {
             // 8 is the minimum value possible
             assert.strictEqual(MatrixRules_1.MatrixRules.getConditionMonitor(0), 8);
             // Check round up
@@ -36225,7 +36225,7 @@ const shadowrunMatrix = context => {
             // Negative values shouldn't break the system.
             assert.strictEqual(MatrixRules_1.MatrixRules.getConditionMonitor(-1), 8);
         });
-        it('Should calculate IC matrix initiative base', () => {
+        it('calculate IC matrix initiative base', () => {
             // 0 is the minimum value possible
             assert.strictEqual(MatrixRules_1.MatrixRules.getICInitiativeBase(0), 0);
             assert.strictEqual(MatrixRules_1.MatrixRules.getICInitiativeBase(-3), 0);
@@ -36235,11 +36235,11 @@ const shadowrunMatrix = context => {
             assert.strictEqual(MatrixRules_1.MatrixRules.getICInitiativeBase(3), 6);
             assert.strictEqual(MatrixRules_1.MatrixRules.getICInitiativeBase(12), 24);
         });
-        it('Should calculate IC matrix initiative dice', () => {
+        it('calculate IC matrix initiative dice', () => {
             // 4 is the only value possible
             assert.strictEqual(MatrixRules_1.MatrixRules.getICInitiativeDice(), 4);
         });
-        it('Should calculate meat attribute base with the host rating', () => {
+        it('calculate meat attribute base with the host rating', () => {
             // 0 is the minimum value possible
             assert.strictEqual(MatrixRules_1.MatrixRules.getICMeatAttributeBase(0), 0);
             assert.strictEqual(MatrixRules_1.MatrixRules.getICMeatAttributeBase(-3), 0);
@@ -36247,7 +36247,7 @@ const shadowrunMatrix = context => {
             assert.strictEqual(MatrixRules_1.MatrixRules.getICMeatAttributeBase(3), 3);
             assert.strictEqual(MatrixRules_1.MatrixRules.getICMeatAttributeBase(27), 27);
         });
-        it('Should disallow invalid marks counters', () => {
+        it('disallow invalid marks counters', () => {
             assert.isTrue(MatrixRules_1.MatrixRules.isValidMarksCount(0));
             assert.isTrue(MatrixRules_1.MatrixRules.isValidMarksCount(1));
             assert.isTrue(MatrixRules_1.MatrixRules.isValidMarksCount(2));
@@ -36256,7 +36256,7 @@ const shadowrunMatrix = context => {
             assert.isFalse(MatrixRules_1.MatrixRules.isValidMarksCount(4));
             assert.isFalse(MatrixRules_1.MatrixRules.isValidMarksCount(1.5));
         });
-        it('Should return valid marks counts', () => {
+        it('return valid marks counts', () => {
             assert.strictEqual(MatrixRules_1.MatrixRules.getValidMarksCount(-1), MatrixRules_1.MatrixRules.minMarksCount());
             assert.strictEqual(MatrixRules_1.MatrixRules.getValidMarksCount(0), 0);
             assert.strictEqual(MatrixRules_1.MatrixRules.getValidMarksCount(1), 1);
@@ -36264,7 +36264,7 @@ const shadowrunMatrix = context => {
             assert.strictEqual(MatrixRules_1.MatrixRules.getValidMarksCount(3), 3);
             assert.strictEqual(MatrixRules_1.MatrixRules.getValidMarksCount(4), MatrixRules_1.MatrixRules.maxMarksCount());
         });
-        it('Should return expected host matrix attribute ratings', () => {
+        it('return expected host matrix attribute ratings', () => {
             assert.deepEqual(MatrixRules_1.MatrixRules.hostMatrixAttributeRatings(1), [2, 3, 4, 5]);
             assert.deepEqual(MatrixRules_1.MatrixRules.hostMatrixAttributeRatings(2), [3, 4, 5, 6]);
             assert.deepEqual(MatrixRules_1.MatrixRules.hostMatrixAttributeRatings(10), [11, 12, 13, 14]);
@@ -36474,14 +36474,14 @@ const shadowrunNetworkDevices = context => {
     }));
     describe('Network Devices handling', () => {
         // TODO: Redesign them with only necessary update methods in place. Instead start of with ActorData prefilled on create.
-        it('Should give a network link to given document class', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('give a network link to given document class', () => __awaiter(void 0, void 0, void 0, function* () {
             const actor = yield testActor.create({ 'type': 'character' });
             const link = NetworkDeviceFlow_1.NetworkDeviceFlow.buildLink(actor);
             const nodes = link.split('.');
             assert.strictEqual(nodes[0], 'Actor');
             assert.strictEqual(nodes.length, 2); // Actor.<randomId>;
         }));
-        it('Should resolve a network link back to a sidebar document', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('resolve a network link back to a sidebar document', () => __awaiter(void 0, void 0, void 0, function* () {
             // Test collection Actor.
             const actor = yield testActor.create({ 'type': 'character' });
             const link = NetworkDeviceFlow_1.NetworkDeviceFlow.buildLink(actor);
@@ -36489,7 +36489,7 @@ const shadowrunNetworkDevices = context => {
             assert.isNotNull(resolvedActor);
             assert.strictEqual(resolvedActor === null || resolvedActor === void 0 ? void 0 : resolvedActor.id, actor.id);
         }));
-        it('Should resolve a network link back to a embedded collection document', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('resolve a network link back to a embedded collection document', () => __awaiter(void 0, void 0, void 0, function* () {
             const actor = yield testActor.create({ 'type': 'character' });
             const item = yield testItem.create({ type: 'weapon' });
             const embeddedItems = yield actor.createEmbeddedDocuments('Item', [item.data]);
@@ -36500,7 +36500,7 @@ const shadowrunNetworkDevices = context => {
             assert.isNotNull(resolvedItem);
             assert.strictEqual(resolvedItem === null || resolvedItem === void 0 ? void 0 : resolvedItem.id, embeddedItem === null || embeddedItem === void 0 ? void 0 : embeddedItem.id);
         }));
-        it('Should resolve a network link back to a token collection document', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('resolve a network link back to a token collection document', () => __awaiter(void 0, void 0, void 0, function* () {
             // Test TokenDokument Actor
             const scene = yield testScene.create({ name: 'Test' });
             const actor = yield testActor.create({ 'type': 'character' });
@@ -36511,7 +36511,7 @@ const shadowrunNetworkDevices = context => {
             assert.isNotNull(resolvedToken);
             assert.strictEqual(token === null || token === void 0 ? void 0 : token.id, resolvedToken === null || resolvedToken === void 0 ? void 0 : resolvedToken.id);
         }));
-        it('Should connect a device controller to a network device', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('connect a device controller to a network device', () => __awaiter(void 0, void 0, void 0, function* () {
             const controller = yield testItem.create({ type: 'device' });
             const device = yield testItem.create({ type: 'weapon' });
             yield NetworkDeviceFlow_1.NetworkDeviceFlow.addDeviceToNetwork(controller, device);
@@ -36519,7 +36519,7 @@ const shadowrunNetworkDevices = context => {
             assert.strictEqual(yield NetworkDeviceFlow_1.NetworkDeviceFlow.resolveLink(device.data.data.technology.networkController), controller);
             assert.deepEqual(controller.data.data.networkDevices, [device.uuid]);
         }));
-        it('Should connect a host controller to a network device', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('connect a host controller to a network device', () => __awaiter(void 0, void 0, void 0, function* () {
             const controller = yield testItem.create({ type: 'host' });
             const device = yield testItem.create({ type: 'weapon' });
             yield NetworkDeviceFlow_1.NetworkDeviceFlow.addDeviceToNetwork(controller, device);
@@ -36527,7 +36527,7 @@ const shadowrunNetworkDevices = context => {
             assert.strictEqual(yield NetworkDeviceFlow_1.NetworkDeviceFlow.resolveLink(device.data.data.technology.networkController), controller);
             assert.deepEqual(controller.data.data.networkDevices, [device.uuid]);
         }));
-        it('Should get all connected network devices of a controller as their Document', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('get all connected network devices of a controller as their Document', () => __awaiter(void 0, void 0, void 0, function* () {
             const controller = yield testItem.create({ type: 'device' });
             const devices = [
                 yield testItem.create({ type: 'weapon' })
@@ -36544,7 +36544,7 @@ const shadowrunNetworkDevices = context => {
                 assert.include(devices, fetched);
             }
         }));
-        it('Should remove a device from a network', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('remove a device from a network', () => __awaiter(void 0, void 0, void 0, function* () {
             const controller = yield testItem.create({ type: 'device' });
             const device = yield testItem.create({ type: 'weapon' });
             yield NetworkDeviceFlow_1.NetworkDeviceFlow.addDeviceToNetwork(controller, device);
@@ -36552,7 +36552,7 @@ const shadowrunNetworkDevices = context => {
             assert.deepEqual(controller.data.data.networkDevices, []);
             assert.strictEqual(device.data.data.technology.networkController, '');
         }));
-        it('Should remove a device from a network when it is added to a new one', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('remove a device from a network when it is added to a new one', () => __awaiter(void 0, void 0, void 0, function* () {
             const controller = yield testItem.create({ type: 'device' });
             const newController = yield testItem.create({ type: 'device' });
             const device = yield testItem.create({ type: 'weapon' });
@@ -36562,7 +36562,7 @@ const shadowrunNetworkDevices = context => {
             assert.deepEqual(newController.data.data.networkDevices, [device.uuid]);
             assert.strictEqual(device.data.data.technology.networkController, newController.uuid);
         }));
-        it('Should remove a network device that doesnt exist anymore', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('remove a network device that doesnt exist anymore', () => __awaiter(void 0, void 0, void 0, function* () {
             var _a;
             const controller = yield testItem.create({ type: 'device' });
             const device = yield testItem.create({ type: 'weapon' });
@@ -36578,7 +36578,7 @@ const shadowrunNetworkDevices = context => {
             yield NetworkDeviceFlow_1.NetworkDeviceFlow.removeDeviceLinkFromNetwork(controller, controller.data.data.networkDevices[0]);
             assert.deepEqual(controller.data.data.networkDevices, []);
         }));
-        it('Should remove all devices from a controller', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('remove all devices from a controller', () => __awaiter(void 0, void 0, void 0, function* () {
             const controller = yield testItem.create({ type: 'device' });
             const devices = [
                 yield testItem.create({ type: 'weapon' })
@@ -36624,7 +36624,7 @@ const shadowrunSR5Actor = context => {
         yield testItem.teardown();
     }));
     describe('SR5Actor', () => {
-        it('Should create a naked actor of any type', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('create a naked actor of any type', () => __awaiter(void 0, void 0, void 0, function* () {
             var _a;
             const actor = yield testActor.create({ type: 'character' });
             // Check basic foundry data integrity
@@ -36636,14 +36636,14 @@ const shadowrunSR5Actor = context => {
             assert.isOk(fromCollection);
             assert.strictEqual(actor.id, fromCollection === null || fromCollection === void 0 ? void 0 : fromCollection.id);
         }));
-        it('Should update an actor of any time', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('update an actor of any time', () => __awaiter(void 0, void 0, void 0, function* () {
             const actor = yield testActor.create({ type: 'character' });
             assert.notProperty(actor.data.data, 'test');
             yield actor.update({ 'data.test': true });
             assert.property(actor.data.data, 'test');
             assert.propertyVal(actor.data.data, 'test', true);
         }));
-        it('Should embedd a weapon into an actor and not the global item colection', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('embedd a weapon into an actor and not the global item colection', () => __awaiter(void 0, void 0, void 0, function* () {
             var _b;
             const actor = yield testActor.create({ type: 'character' });
             const weapon = yield testItem.create({ type: 'weapon' });
@@ -36688,7 +36688,7 @@ const shadowrunSR5Item = context => {
         yield testItem.teardown();
     }));
     describe('SR5Items', () => {
-        it('Should create a naked item of any type', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('create a naked item of any type', () => __awaiter(void 0, void 0, void 0, function* () {
             var _a;
             const item = yield testItem.create({ type: 'action' });
             // Check basic foundry data integrity
@@ -36700,14 +36700,14 @@ const shadowrunSR5Item = context => {
             assert.notStrictEqual(itemFromCollection, null);
             assert.strictEqual(item.id, itemFromCollection === null || itemFromCollection === void 0 ? void 0 : itemFromCollection.id);
         }));
-        it('Should update an item of any type', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('update an item of any type', () => __awaiter(void 0, void 0, void 0, function* () {
             const item = yield testItem.create({ type: 'action' });
             assert.notProperty(item.data.data, 'test');
             yield item.update({ 'data.test': true });
             assert.property(item.data.data, 'test');
             assert.propertyVal(item.data.data, 'test', true);
         }));
-        it('Should embedd a ammo into a weapon and not the global item collection', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('embedd a ammo into a weapon and not the global item collection', () => __awaiter(void 0, void 0, void 0, function* () {
             var _b;
             const weapon = yield testItem.create({ type: 'weapon' });
             const ammo = yield testItem.create({ type: 'ammo' });
@@ -36721,7 +36721,7 @@ const shadowrunSR5Item = context => {
             const embeddedAmmoInCollection = (_b = game.items) === null || _b === void 0 ? void 0 : _b.get(embeddedAmmoData._id);
             assert.strictEqual(embeddedAmmoInCollection, undefined);
         }));
-        it('Should update an embedded ammo', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('update an embedded ammo', () => __awaiter(void 0, void 0, void 0, function* () {
             const weapon = yield testItem.create({ type: 'weapon' });
             const ammo = yield testItem.create({ type: 'ammo' });
             // Embed the item and get
@@ -36773,7 +36773,7 @@ const shadowrunTesting = context => {
         yield testItem.teardown();
     }));
     describe('SuccessTest', () => {
-        it('Should evaluate a roll from action data', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('evaluate a roll from action data', () => __awaiter(void 0, void 0, void 0, function* () {
             /**
              * alt_mod: 0
              * attribute: "agility"
@@ -36841,12 +36841,12 @@ const shadowrunTesting = context => {
                 assert.strictEqual(test.hasLimit, true);
             }
         }));
-        it('Should evaluate a roll from simple pool data', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('evaluate a roll from simple pool data', () => __awaiter(void 0, void 0, void 0, function* () {
             const test = SuccessTest_1.SuccessTest.fromPool({ pool: 10 });
             yield test.evaluate();
             assert.strictEqual(test.roll.pool, 10);
         }));
-        it('Should evaluate an opposed roll from a opposed action', () => __awaiter(void 0, void 0, void 0, function* () {
+        it('evaluate an opposed roll from a opposed action', () => __awaiter(void 0, void 0, void 0, function* () {
             const actionData = {
                 'type': 'action',
                 'data.action.test': 'SuccessTest',
@@ -36884,6 +36884,8 @@ const shadowrunTesting = context => {
                 yield test.toMessage();
             }
         }));
+    });
+    describe('OpposedTest', () => {
     });
 };
 exports.shadowrunTesting = shadowrunTesting;

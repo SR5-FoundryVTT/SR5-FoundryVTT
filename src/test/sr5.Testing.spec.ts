@@ -20,7 +20,7 @@ export const shadowrunTesting = context => {
     })
 
     describe('SuccessTest', () => {
-        it('Should evaluate a roll from action data', async () => {
+        it('evaluate a roll from action data', async () => {
             /**
              * alt_mod: 0
              * attribute: "agility"
@@ -98,14 +98,14 @@ export const shadowrunTesting = context => {
             }
         });
 
-        it('Should evaluate a roll from simple pool data', async () => {
+        it('evaluate a roll from simple pool data', async () => {
             const test = SuccessTest.fromPool({pool: 10});
             await test.evaluate();
 
             assert.strictEqual(test.roll.pool, 10);
         });
 
-        it('Should evaluate an opposed roll from a opposed action', async () => {
+        it('evaluate an opposed roll from a opposed action', async () => {
             const actionData = {
                 'type': 'action',
                 'data.action.test': 'SuccessTest',
@@ -147,5 +147,9 @@ export const shadowrunTesting = context => {
                 await test.toMessage();
             }
         });
-    })
+    });
+
+    describe('OpposedTest', () => {
+
+    });
 };

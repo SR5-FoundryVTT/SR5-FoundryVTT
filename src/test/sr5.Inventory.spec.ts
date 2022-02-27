@@ -19,7 +19,7 @@ export const shadowrunInventoryFlow = context => {
     })
 
     describe('InventoryFlow testing', () => {
-        it('Should create a new inventory and know of its existance', async () => {
+        it('create a new inventory and know of its existance', async () => {
             const actor = await testActor.create({type: 'character'});
 
             await actor.inventory.create('test');
@@ -35,7 +35,7 @@ export const shadowrunInventoryFlow = context => {
             assert.strictEqual(actor.inventory.exists('test'), true);
         });
 
-        it('Should remove an inventory', async () => {
+        it('remove an inventory', async () => {
             const inventoriesData = {test: {name: 'test', label: 'test', itemIds: []}};
             const actor = await testActor.create({type: 'character', 'data.inventories': inventoriesData});
 
@@ -44,7 +44,7 @@ export const shadowrunInventoryFlow = context => {
             assert.deepEqual(actor.data.data.inventories, {});
         });
 
-        it('Should add and remove an item to and from an inventory', async () => {
+        it('add and remove an item to and from an inventory', async () => {
             const inventoriesData = {test: {name: 'test', label: 'test', itemIds: []}};
             const actor = await testActor.create({type: 'character', 'data.inventories': inventoriesData});
             const item = await actor.createEmbeddedDocuments('Item', [{type: 'weapon', name: 'Test Weapon'}]);
@@ -57,7 +57,7 @@ export const shadowrunInventoryFlow = context => {
             assert.deepEqual(actor.data.data.inventories.test.itemIds, []);
         });
 
-        it('Should rename an existing inventory', async () => {
+        it('rename an existing inventory', async () => {
             const inventoriesData = {test: {name: 'test', label: 'test', itemIds: ['asd']}};
             const actor = await testActor.create({type: 'character', 'data.inventories': inventoriesData});
 

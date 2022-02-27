@@ -24,7 +24,7 @@ export const shadowrunNetworkDevices = context => {
 
     describe('Network Devices handling', () => {
         // TODO: Redesign them with only necessary update methods in place. Instead start of with ActorData prefilled on create.
-        it('Should give a network link to given document class', async () => {
+        it('give a network link to given document class', async () => {
             const actor = await testActor.create({'type': 'character'});
             const link = NetworkDeviceFlow.buildLink(actor);
 
@@ -34,7 +34,7 @@ export const shadowrunNetworkDevices = context => {
             assert.strictEqual(nodes.length, 2); // Actor.<randomId>;
         });
 
-        it('Should resolve a network link back to a sidebar document', async () => {
+        it('resolve a network link back to a sidebar document', async () => {
             // Test collection Actor.
             const actor = await testActor.create({'type': 'character'});
 
@@ -45,7 +45,7 @@ export const shadowrunNetworkDevices = context => {
             assert.strictEqual(resolvedActor?.id, actor.id);
         });
 
-        it('Should resolve a network link back to a embedded collection document', async () => {
+        it('resolve a network link back to a embedded collection document', async () => {
             const actor = await testActor.create({'type': 'character'});
             const item = await testItem.create({type: 'weapon'});
             const embeddedItems = await actor.createEmbeddedDocuments('Item', [item.data]);
@@ -58,7 +58,7 @@ export const shadowrunNetworkDevices = context => {
             assert.strictEqual(resolvedItem?.id, embeddedItem?.id);
         });
 
-        it('Should resolve a network link back to a token collection document', async () => {
+        it('resolve a network link back to a token collection document', async () => {
             // Test TokenDokument Actor
             const scene = await testScene.create({name: 'Test'});
             const actor = await testActor.create({'type': 'character'});
@@ -72,7 +72,7 @@ export const shadowrunNetworkDevices = context => {
             assert.strictEqual(token?.id, resolvedToken?.id);
         });
 
-        it('Should connect a device controller to a network device', async () => {
+        it('connect a device controller to a network device', async () => {
             const controller = await testItem.create({type: 'device'});
             const device = await testItem.create({type: 'weapon'});
 
@@ -84,7 +84,7 @@ export const shadowrunNetworkDevices = context => {
             assert.deepEqual(controller.data.data.networkDevices, [device.uuid]);
         });
 
-        it('Should connect a host controller to a network device', async () => {
+        it('connect a host controller to a network device', async () => {
             const controller = await testItem.create({type: 'host'});
             const device = await testItem.create({type: 'weapon'});
 
@@ -96,7 +96,7 @@ export const shadowrunNetworkDevices = context => {
             assert.deepEqual(controller.data.data.networkDevices, [device.uuid]);
         });
 
-        it('Should get all connected network devices of a controller as their Document', async () => {
+        it('get all connected network devices of a controller as their Document', async () => {
             const controller = await testItem.create({type: 'device'});
             const devices = [
                 await testItem.create({type: 'weapon'})
@@ -118,7 +118,7 @@ export const shadowrunNetworkDevices = context => {
             }
         });
 
-        it('Should remove a device from a network', async () => {
+        it('remove a device from a network', async () => {
             const controller = await testItem.create({type: 'device'});
             const device = await testItem.create({type: 'weapon'});
 
@@ -129,7 +129,7 @@ export const shadowrunNetworkDevices = context => {
             assert.strictEqual(device.data.data.technology.networkController, '');
         });
 
-        it('Should remove a device from a network when it is added to a new one', async () => {
+        it('remove a device from a network when it is added to a new one', async () => {
             const controller = await testItem.create({type: 'device'});
             const newController = await testItem.create({type: 'device'});
             const device = await testItem.create({type: 'weapon'});
@@ -142,7 +142,7 @@ export const shadowrunNetworkDevices = context => {
             assert.strictEqual(device.data.data.technology.networkController, newController.uuid);
         });
 
-        it('Should remove a network device that doesnt exist anymore', async () => {
+        it('remove a network device that doesnt exist anymore', async () => {
             const controller = await testItem.create({type: 'device'});
             const device = await testItem.create({type: 'weapon'});
             const deviceId = device.id;
@@ -161,7 +161,7 @@ export const shadowrunNetworkDevices = context => {
             assert.deepEqual(controller.data.data.networkDevices, []);
         });
 
-        it('Should remove all devices from a controller', async () => {
+        it('remove all devices from a controller', async () => {
             const controller = await testItem.create({type: 'device'});
             const devices = [
                 await testItem.create({type: 'weapon'})
