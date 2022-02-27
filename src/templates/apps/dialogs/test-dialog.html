@@ -19,6 +19,12 @@
     </div>
     {{/if}}
 
+    {{#if test.hasCode}}
+    <div class="sunken" style="margin-bottom: 4px; margin-top: 4px;">
+        {{test.code}}
+    </div>
+    {{/if}}
+
     <div class="sunken">
         <div class="form-group">
             <label>{{localize "SR5.DicePool"}}</label>

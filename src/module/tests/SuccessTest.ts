@@ -400,6 +400,32 @@ export class SuccessTest {
     }
 
     /**
+     * Give a representation of this success test in the common Shadowrun 5 description style.
+     *
+     * Automatics + Agility (3) [Physical]
+     */
+    get code(): string {
+        const pool = this.pool.mod.map(mod => game.i18n.localize(mod.name)).join(' + ');
+        const threshold = this.threshold.mod.map(mod => game.i18n.localize(mod.name)).join(' + ');
+        const limit = this.limit.mod.map(mod => game.i18n.localize(mod.name)).join(' + ');
+
+        // Pool portion can be cynamic or static.
+        let code = pool || `${this.pool.value}`;
+
+        if (threshold) code = `${code} (${threshold})`;
+        if (limit) code = `${code} [${limit}]`;
+
+        return code;
+    }
+
+    /**
+     * All parts of the test code can be dynamic, any will do.
+     */
+    get hasCode(): boolean {
+        return this.pool.mod.length > 0 || this.threshold.mod.length > 0 || this.limit.mod.length > 0;
+    }
+
+    /**
      * Helper method to create the internal SR5Roll.
      * @private
      */

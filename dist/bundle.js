@@ -26609,6 +26609,7 @@ ___________________
             if (!test)
                 console.warn('Didnt work');
             yield (test === null || test === void 0 ? void 0 : test.toMessage());
+            console.error('Test Code', test === null || test === void 0 ? void 0 : test.code);
         });
     }
     static canvasInit() {
@@ -35377,6 +35378,29 @@ class SuccessTest {
     get formula() {
         const pool = helpers_1.Helpers.calcTotal(this.data.pool);
         return `(${pool})d6cs>=${SuccessTest.lowestSuccessSide}`;
+    }
+    /**
+     * Give a representation of this success test in the common Shadowrun 5 description style.
+     *
+     * Automatics + Agility (3) [Physical]
+     */
+    get code() {
+        const pool = this.pool.mod.map(mod => game.i18n.localize(mod.name)).join(' + ');
+        const threshold = this.threshold.mod.map(mod => game.i18n.localize(mod.name)).join(' + ');
+        const limit = this.limit.mod.map(mod => game.i18n.localize(mod.name)).join(' + ');
+        // Pool portion can be cynamic or static.
+        let code = pool || `${this.pool.value}`;
+        if (threshold)
+            code = `${code} (${threshold})`;
+        if (limit)
+            code = `${code} [${limit}]`;
+        return code;
+    }
+    /**
+     * All parts of the test code can be dynamic, any will do.
+     */
+    get hasCode() {
+        return this.pool.mod.length > 0 || this.threshold.mod.length > 0 || this.limit.mod.length > 0;
     }
     /**
      * Helper method to create the internal SR5Roll.
