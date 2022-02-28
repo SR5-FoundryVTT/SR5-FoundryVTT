@@ -21680,6 +21680,7 @@ exports.ShadowrunTestDialog = ShadowrunTestDialog;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TestDialog = void 0;
 const FormDialog_1 = require("./FormDialog");
+const DataDefaults_1 = require("../../data/DataDefaults");
 /**
  * TODO: Add TestDialog JSDoc
  */
@@ -21724,9 +21725,25 @@ class TestDialog extends FormDialog_1.FormDialog {
             const threshold = Number(html.find('input[name=threshold]').val());
             const limit = Number(html.find('input[name=limit]').val());
             const data = duplicate(test.data);
-            data.pool.base = pool;
-            data.threshold.base = threshold;
-            data.limit.base = limit;
+            // Manual changes change everything, so replace all data sources to a static value.
+            if (data.pool.value !== pool) {
+                data.pool = DataDefaults_1.DefaultValues.valueData({
+                    base: pool,
+                    label: data.pool.label
+                });
+            }
+            if (data.threshold.value !== threshold) {
+                data.threshold = DataDefaults_1.DefaultValues.valueData({
+                    base: threshold,
+                    label: data.threshold.label
+                });
+            }
+            if (data.limit.value !== limit) {
+                data.limit = DataDefaults_1.DefaultValues.valueData({
+                    base: limit,
+                    label: data.limit.label
+                });
+            }
             console.warn('Test After Dialog', test.data);
             return data;
         };
@@ -21741,7 +21758,7 @@ class TestDialog extends FormDialog_1.FormDialog {
     }
 }
 exports.TestDialog = TestDialog;
-},{"./FormDialog":138}],143:[function(require,module,exports){
+},{"../../data/DataDefaults":152,"./FormDialog":138}],143:[function(require,module,exports){
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -26609,7 +26626,6 @@ ___________________
             if (!test)
                 console.warn('Didnt work');
             yield (test === null || test === void 0 ? void 0 : test.toMessage());
-            console.error('Test Code', test === null || test === void 0 ? void 0 : test.code);
         });
     }
     static canvasInit() {
@@ -35466,11 +35482,17 @@ class SuccessTest {
             return this;
         });
     }
+    /**
+     * Calculate only the base test that can be calculated before the test has been evaluated.
+     */
     calculateBaseValues() {
         this.data.pool.value = helpers_1.Helpers.calcTotal(this.data.pool, { min: 0 });
         this.data.threshold.value = helpers_1.Helpers.calcTotal(this.data.threshold, { min: 0 });
         this.data.limit.value = helpers_1.Helpers.calcTotal(this.data.limit, { min: 0 });
     }
+    /**
+     * Calculate the total of all values.
+     */
     calculateValues() {
         this.calculateBaseValues();
         this.data.values.hits = this.calculateHits();
@@ -35761,7 +35783,7 @@ class SuccessTest {
      * @param data
      */
     static chatMessageListeners(message, html, data) {
-        html.find('.card-main-content').on('click', (event) => SuccessTest._chatToggleCardRolls(event, html));
+        html.find('.card-main-content').on('click', event => SuccessTest._chatToggleCardRolls(event, html));
     }
     /**
      * By default roll results are hidden in a chat card.
@@ -35783,6 +35805,7 @@ class SuccessTest {
     }
     static _castOpposedAction(event, cardHtml) {
         return __awaiter(this, void 0, void 0, function* () {
+            console.error('Cast Opposed Action', event);
             event.preventDefault();
             // Collect information needed to create the opposed action test.
             const messageId = cardHtml.data('messageId');

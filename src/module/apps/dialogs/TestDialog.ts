@@ -2,6 +2,8 @@ import { SR5Actor } from "../../actor/SR5Actor";
 import { FormDialog, FormDialogData } from "./FormDialog";
 import {SuccessTest} from "../../tests/SuccessTest";
 import {CORE_FLAGS, CORE_NAME} from "../../constants";
+import { PartsList } from "../../parts/PartsList";
+import {DefaultValues} from "../../data/DataDefaults";
 
 
 /**
@@ -54,9 +56,26 @@ export class TestDialog extends FormDialog {
             const limit = Number(html.find('input[name=limit]').val());
 
             const data = duplicate(test.data);
-            data.pool.base = pool;
-            data.threshold.base = threshold;
-            data.limit.base = limit;
+
+            // Manual changes change everything, so replace all data sources to a static value.
+            if (data.pool.value !== pool) {
+                data.pool = DefaultValues.valueData({
+                    base: pool,
+                    label: data.pool.label
+                });
+            }
+            if (data.threshold.value !== threshold) {
+                data.threshold = DefaultValues.valueData({
+                    base: threshold,
+                    label: data.threshold.label
+                });
+            }
+            if (data.limit.value !== limit) {
+                data.limit = DefaultValues.valueData({
+                    base: limit,
+                    label: data.limit.label
+                })
+            }
 
             console.warn('Test After Dialog', test.data);
 

@@ -491,12 +491,18 @@ export class SuccessTest {
         return this;
     }
 
+    /**
+     * Calculate only the base test that can be calculated before the test has been evaluated.
+     */
     calculateBaseValues() {
         this.data.pool.value = Helpers.calcTotal(this.data.pool, {min: 0});
         this.data.threshold.value = Helpers.calcTotal(this.data.threshold, {min: 0});
         this.data.limit.value = Helpers.calcTotal(this.data.limit, {min: 0});
     }
 
+    /**
+     * Calculate the total of all values.
+     */
     calculateValues() {
         this.calculateBaseValues();
 
@@ -813,7 +819,7 @@ export class SuccessTest {
      * @param data
      */
     static chatMessageListeners(message: ChatMessage, html, data) {
-        html.find('.card-main-content').on('click', (event) => SuccessTest._chatToggleCardRolls(event, html));
+        html.find('.card-main-content').on('click', event => SuccessTest._chatToggleCardRolls(event, html));
     }
 
     /**

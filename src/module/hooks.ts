@@ -196,7 +196,6 @@ ___________________
         const test = SuccessTest.fromAction(item, actor);
         if (!test) console.warn('Didnt work');
         await test?.toMessage();
-        console.error('Test Code', test?.code);
     }
 
     static canvasInit() {
