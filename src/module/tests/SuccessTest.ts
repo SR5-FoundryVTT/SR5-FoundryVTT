@@ -85,6 +85,8 @@ export class SuccessTest {
         // Reuse an old roll or create a new one.
         this.roll = roll || this.createRoll();
 
+        this.calculateBaseValues();
+
         console.info(`Shadowrun 5e | Created ${this.constructor.name} Test`, this);
     }
 
@@ -138,6 +140,7 @@ export class SuccessTest {
 
         const action = item.getAction();
         if (!action) return;
+        // Determine what initial test type to use.
         if (!action.test) {
             action.test = 'SuccessTest';
             console.warn(`Shadowrun 5e | An action without a defined test handler defaulted to ${'SuccessTest'}`);
@@ -153,6 +156,7 @@ export class SuccessTest {
         // @ts-ignore // Get test class from registry to allow custom module tests.
         const cls = game.shadowrun5e.tests[action.test];
         const data = cls.getItemActionTestData(item, actor);
+
         return new cls(data, {item, actor}, options);
     }
 
@@ -350,8 +354,8 @@ export class SuccessTest {
         }
 
         // Prepare threshold values...
-        if (action.threshold.base || action.threshold.value) {
-            data.threshold.base = Number(action.threshold.value);
+        if (action.threshold.base) {
+            data.threshold.base = Number(action.threshold.base);
         }
 
         // Prepare opposed tests...
@@ -402,18 +406,25 @@ export class SuccessTest {
     /**
      * Give a representation of this success test in the common Shadowrun 5 description style.
      *
-     * Automatics + Agility (3) [Physical]
+     * Automatics + Agility + 3 (3) [2 + Physical]
      */
     get code(): string {
-        const pool = this.pool.mod.map(mod => game.i18n.localize(mod.name)).join(' + ');
-        const threshold = this.threshold.mod.map(mod => game.i18n.localize(mod.name)).join(' + ');
-        const limit = this.limit.mod.map(mod => game.i18n.localize(mod.name)).join(' + ');
+        // Add action dynamic value sources as labels.
+        const pool = this.pool.mod.map(mod => game.i18n.localize(mod.name));
+        const threshold = this.threshold.mod.map(mod => game.i18n.localize(mod.name));
+        const limit = this.limit.mod.map(mod => game.i18n.localize(mod.name));
 
-        // Pool portion can be cynamic or static.
-        let code = pool || `${this.pool.value}`;
+        // Add action static value modifiers as numbers.
+        if (this.pool.base > 0) pool.push(String(this.pool.base));
+        if (this.threshold.base > 0) threshold.push(String(this.threshold.base));
+        if (this.limit.base > 0 ) limit.push(String(this.limit.base));
 
-        if (threshold) code = `${code} (${threshold})`;
-        if (limit) code = `${code} [${limit}]`;
+        // Pool portion can be dynamic or static.
+        let code = pool.join(' + ') || `${this.pool.value}`;
+
+        // Only add threshold / limit portions when appropriate.
+        if (this.threshold.value > 0) code = `${code} (${threshold.join(' + ')})`;
+        if (this.limit.value > 0) code = `${code} [${limit.join(' + ')}]`;
 
         return code;
     }
@@ -423,6 +434,11 @@ export class SuccessTest {
      */
     get hasCode(): boolean {
         return this.pool.mod.length > 0 || this.threshold.mod.length > 0 || this.limit.mod.length > 0;
+    }
+
+    get title(): string {
+        // @ts-ignore
+        return `${game.i18n.localize(this.constructor.label)} (${this.code})`
     }
 
     /**
@@ -475,10 +491,14 @@ export class SuccessTest {
         return this;
     }
 
-    calculateValues() {
+    calculateBaseValues() {
         this.data.pool.value = Helpers.calcTotal(this.data.pool, {min: 0});
         this.data.threshold.value = Helpers.calcTotal(this.data.threshold, {min: 0});
         this.data.limit.value = Helpers.calcTotal(this.data.limit, {min: 0});
+    }
+
+    calculateValues() {
+        this.calculateBaseValues();
 
         this.data.values.hits = this.calculateHits();
         this.data.values.netHits = this.calculateNetHits();

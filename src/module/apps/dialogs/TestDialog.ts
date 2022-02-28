@@ -25,7 +25,7 @@ export class TestDialog extends FormDialog {
 
     static getDialogData(test: SuccessTest): FormDialogData {
         // @ts-ignore
-        const title = game.i18n.localize(test.constructor.label);
+        const title = game.i18n.localize(test.title);
         const templatePath = 'systems/shadowrun5e/dist/templates/apps/dialogs/test-dialog.html';
 
         // roll mode handling.

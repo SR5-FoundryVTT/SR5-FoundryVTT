@@ -21700,7 +21700,7 @@ class TestDialog extends FormDialog_1.FormDialog {
     static getDialogData(test) {
         var _a;
         // @ts-ignore
-        const title = game.i18n.localize(test.constructor.label);
+        const title = game.i18n.localize(test.title);
         const templatePath = 'systems/shadowrun5e/dist/templates/apps/dialogs/test-dialog.html';
         // roll mode handling.
         const rollMode = (_a = test.data.options) === null || _a === void 0 ? void 0 : _a.rollMode;
@@ -25697,7 +25697,7 @@ class Helpers {
             value.mod = [];
         const parts = new PartsList_1.PartsList(value.mod);
         // if a temp field is found, add it as a unique part
-        if (!isNaN(value.temp)) {
+        if (!isNaN(value.temp) && Number(value.temp) > 0) {
             parts.addUniquePart('SR5.Temporary', value['temp']);
         }
         // On some values base might be undefined...
@@ -26601,8 +26601,8 @@ ___________________
             const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
             $(document).on('click', diceIconSelectorNew, () => __awaiter(this, void 0, void 0, function* () { return yield ShadowrunRoller_1.ShadowrunRoller.promptSuccessTest(); }));
             console.error('TODO: Remove this dev implementation');
-            const item = (_b = game.items) === null || _b === void 0 ? void 0 : _b.getName('Weapon (Ranged) Langer Titel');
-            const actor = (_c = game.actors) === null || _c === void 0 ? void 0 : _c.getName('Char Linked Mit Langem namen');
+            const item = (_b = game.items) === null || _b === void 0 ? void 0 : _b.getName('Weapon (Ranged)');
+            const actor = (_c = game.actors) === null || _c === void 0 ? void 0 : _c.getName('Char Linked');
             if (!item || !actor)
                 return;
             const test = SuccessTest_1.SuccessTest.fromAction(item, actor);
@@ -33592,8 +33592,11 @@ class PartsList {
             // recursively go through until we no longer have a part of this name
             this.addUniquePart(name, value);
         }
-        else if (value) {
+        else if (value !== undefined) {
             this.addPart(name, value);
+        }
+        else {
+            console.warn('Shadowrun 5e | PartsList cant add a none-numerical modifier.', name, value);
         }
     }
     removePart(name) {
@@ -35095,6 +35098,7 @@ class SuccessTest {
         this.data = this._prepareData(data, options);
         // Reuse an old roll or create a new one.
         this.roll = roll || this.createRoll();
+        this.calculateBaseValues();
         console.info(`Shadowrun 5e | Created ${this.constructor.name} Test`, this);
     }
     /**
@@ -35143,6 +35147,7 @@ class SuccessTest {
         const action = item.getAction();
         if (!action)
             return;
+        // Determine what initial test type to use.
         if (!action.test) {
             action.test = 'SuccessTest';
             console.warn(`Shadowrun 5e | An action without a defined test handler defaulted to ${'SuccessTest'}`);
@@ -35336,8 +35341,8 @@ class SuccessTest {
             data.limit.base = Number(action.limit.value);
         }
         // Prepare threshold values...
-        if (action.threshold.base || action.threshold.value) {
-            data.threshold.base = Number(action.threshold.value);
+        if (action.threshold.base) {
+            data.threshold.base = Number(action.threshold.base);
         }
         // Prepare opposed tests...
         if (action.opposed.type) {
@@ -35382,18 +35387,27 @@ class SuccessTest {
     /**
      * Give a representation of this success test in the common Shadowrun 5 description style.
      *
-     * Automatics + Agility (3) [Physical]
+     * Automatics + Agility + 3 (3) [2 + Physical]
      */
     get code() {
-        const pool = this.pool.mod.map(mod => game.i18n.localize(mod.name)).join(' + ');
-        const threshold = this.threshold.mod.map(mod => game.i18n.localize(mod.name)).join(' + ');
-        const limit = this.limit.mod.map(mod => game.i18n.localize(mod.name)).join(' + ');
-        // Pool portion can be cynamic or static.
-        let code = pool || `${this.pool.value}`;
-        if (threshold)
-            code = `${code} (${threshold})`;
-        if (limit)
-            code = `${code} [${limit}]`;
+        // Add action dynamic value sources as labels.
+        const pool = this.pool.mod.map(mod => game.i18n.localize(mod.name));
+        const threshold = this.threshold.mod.map(mod => game.i18n.localize(mod.name));
+        const limit = this.limit.mod.map(mod => game.i18n.localize(mod.name));
+        // Add action static value modifiers as numbers.
+        if (this.pool.base > 0)
+            pool.push(String(this.pool.base));
+        if (this.threshold.base > 0)
+            threshold.push(String(this.threshold.base));
+        if (this.limit.base > 0)
+            limit.push(String(this.limit.base));
+        // Pool portion can be dynamic or static.
+        let code = pool.join(' + ') || `${this.pool.value}`;
+        // Only add threshold / limit portions when appropriate.
+        if (this.threshold.value > 0)
+            code = `${code} (${threshold.join(' + ')})`;
+        if (this.limit.value > 0)
+            code = `${code} [${limit.join(' + ')}]`;
         return code;
     }
     /**
@@ -35401,6 +35415,10 @@ class SuccessTest {
      */
     get hasCode() {
         return this.pool.mod.length > 0 || this.threshold.mod.length > 0 || this.limit.mod.length > 0;
+    }
+    get title() {
+        // @ts-ignore
+        return `${game.i18n.localize(this.constructor.label)} (${this.code})`;
     }
     /**
      * Helper method to create the internal SR5Roll.
@@ -35448,10 +35466,13 @@ class SuccessTest {
             return this;
         });
     }
-    calculateValues() {
+    calculateBaseValues() {
         this.data.pool.value = helpers_1.Helpers.calcTotal(this.data.pool, { min: 0 });
         this.data.threshold.value = helpers_1.Helpers.calcTotal(this.data.threshold, { min: 0 });
         this.data.limit.value = helpers_1.Helpers.calcTotal(this.data.limit, { min: 0 });
+    }
+    calculateValues() {
+        this.calculateBaseValues();
         this.data.values.hits = this.calculateHits();
         this.data.values.netHits = this.calculateNetHits();
         this.data.values.glitches = this.calculateGlitches();

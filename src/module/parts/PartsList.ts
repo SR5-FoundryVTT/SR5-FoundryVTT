@@ -79,8 +79,10 @@ export class PartsList<TType> {
             if (value === undefined || value === null) return;
             // recursively go through until we no longer have a part of this name
             this.addUniquePart(name, value);
-        } else if (value) {
+        } else if (value !== undefined) {
             this.addPart(name, value);
+        } else {
+            console.warn('Shadowrun 5e | PartsList cant add a none-numerical modifier.', name, value);
         }
     }
 
