@@ -35156,8 +35156,6 @@ class SuccessTest {
         this.item = documents === null || documents === void 0 ? void 0 : documents.item;
         this.targets = [];
         this.data = this._prepareData(data, options);
-        console.error('Remove this');
-        this.data.values.pushTheLimit.value = true;
         this.calculateBaseValues();
         console.info(`Shadowrun 5e | Created ${this.constructor.name} Test`, this);
     }
@@ -35310,7 +35308,7 @@ class SuccessTest {
         });
     }
     static fromMessageAction(id, test) {
-        var _a;
+        var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
             const message = (_a = game.messages) === null || _a === void 0 ? void 0 : _a.get(id);
             if (!message) {
@@ -35330,7 +35328,8 @@ class SuccessTest {
             }
             // TODO: Handle token selection as target override.
             const actors = helpers_1.Helpers.getSelectedActorsOrCharacter();
-            //
+            if (actors.length === 0)
+                (_b = ui.notifications) === null || _b === void 0 ? void 0 : _b.warn(game.i18n.localize('SR5.Warnings.TokenSelectionNeeded'));
             for (const actor of actors) {
                 const data = testClass.getMessageActionTestData(testData, actor, id);
                 if (!data)
@@ -35882,6 +35881,7 @@ class SuccessTest {
      * @param data
      */
     static chatMessageListeners(message, html, data) {
+        // TODO: This only works in the current sessions but will break on refresh, since registered events aren't persistent.
         html.find('.card-main-content').on('click', event => SuccessTest._chatToggleCardRolls(event, html));
     }
     /**
@@ -35908,7 +35908,7 @@ class SuccessTest {
             // Collect information needed to create the opposed action test.
             const messageId = cardHtml.data('messageId');
             const opposedActionTest = $(event.currentTarget).data('action');
-            yield SuccessTest.fromMessageAction(messageId, opposedActionTest);
+            yield this.fromMessageAction(messageId, opposedActionTest);
         });
     }
 }

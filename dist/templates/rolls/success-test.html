@@ -21,15 +21,23 @@
                 {{localize title}}
             </span>
         </div>
+        <div class="card-content">
+            <div class="left-side">
+                <div>{{localize test.pool.label}}: {{test.pool.value}}</div>
+                {{#if test.hasLimit}}
+                <div>{{localize test.limit.label}}: {{test.limit.value}}</div>
+                {{/if}}
+                {{#if test.hasThreshold}}
+                <div>{{localize test.threshold.label}}: {{test.threshold.value}}</div>
+                {{/if}}
+                <div>{{localize test.netHits.label}}: {{test.netHits.value}}</div>
+            </div>
+            <div class="right-side">
+                {{#if test.data.values.pushTheLimit.value}}<div>{{localize 'SR5.PushTheLimit'}}</div>{{/if}}
+                <div>Test</div>
+            </div>
+        </div>
         <div class="card-test-content">
-            <div>{{localize test.pool.label}}: {{test.pool.value}}</div>
-            {{#if test.hasLimit}}
-            <div>{{localize test.limit.label}}: {{test.limit.value}}</div>
-            {{/if}}
-            {{#if test.hasThreshold}}
-            <div>{{localize test.threshold.label}}: {{test.threshold.value}}</div>
-            {{/if}}
-            <div>{{localize test.netHits.label}}: {{test.netHits.value}}</div>
             {{#if test.success}}
             <div class="glitch-content">
                 <div class="glitch" {{#if showGlitchAnimation}} data-glitch="{{localize 'SR5.Success'}}" {{/if}}>
@@ -58,14 +66,6 @@
                 </div>
             </div>
             {{/if}}
-        </div>
-    </div>
-    <div class="card-content">
-        <div class="left-side">
-            left
-        </div>
-        <div class="right-side">
-            right
         </div>
     </div>
     <div class="card-rolls">

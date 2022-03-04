@@ -40,7 +40,12 @@
                    data-dtype="Number"/>
         </div>
     </div>
-
+    <div class="sunken">
+        <div class="form-group">
+            <label>{{localize "SR5.PushTheLimit"}} ({{test.actor.data.data.attributes.edge.uses}}/{{test.actor.data.data.attributes.edge.value}})</label>
+            <input type="checkbox" name="pushTheLimit" {{#if test.hasPushTheLimit}}checked{{/if}} data-dtype="boolean"/>
+        </div>
+    </div>
     <div class="sunken">
         <div class="form-group">
             <label>{{ localize "SR5.RollMode" }}</label>

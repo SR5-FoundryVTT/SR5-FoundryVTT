@@ -287,7 +287,9 @@ export class SuccessTest {
         // TODO: Handle token selection as target override.
         const actors = Helpers.getSelectedActorsOrCharacter();
 
-        //
+        if (actors.length === 0)
+            ui.notifications?.warn(game.i18n.localize('SR5.Warnings.TokenSelectionNeeded'));
+
         for (const actor of actors) {
             const data = testClass.getMessageActionTestData(testData, actor, id);
             if (!data) return;
@@ -884,6 +886,7 @@ export class SuccessTest {
      * @param data
      */
     static chatMessageListeners(message: ChatMessage, html, data) {
+        // TODO: This only works in the current sessions but will break on refresh, since registered events aren't persistent.
         html.find('.card-main-content').on('click', event => SuccessTest._chatToggleCardRolls(event, html));
     }
 
@@ -910,6 +913,6 @@ export class SuccessTest {
         const messageId = cardHtml.data('messageId');
         const opposedActionTest = $(event.currentTarget).data('action');
 
-        await SuccessTest.fromMessageAction(messageId, opposedActionTest);
+        await this.fromMessageAction(messageId, opposedActionTest);
     }
 }
