@@ -62,6 +62,15 @@ declare namespace Shadowrun {
         ManualModField;
 
     /**
+     * A modifiable value of any type.
+     */
+    export type GenericValueField =
+        BaseValuePair<any> &
+        ModifiableValue &
+        LabelField &
+        ManualModField
+
+    /**
      * A value that is modifiable, having a base and current value, along with associated mod list.
      */
     export type ModifiableValue = BaseValuePair<number> & {

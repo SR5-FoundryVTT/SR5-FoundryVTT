@@ -21724,6 +21724,7 @@ class TestDialog extends FormDialog_1.FormDialog {
             const pool = Number(html.find('input[name=pool]').val());
             const threshold = Number(html.find('input[name=threshold]').val());
             const limit = Number(html.find('input[name=limit]').val());
+            const pushTheLimit = html.find('input[name=pushTheLimit]').is(':checked');
             const data = duplicate(test.data);
             // Manual changes change everything, so replace all data sources to a static value.
             if (data.pool.value !== pool) {
@@ -21743,6 +21744,9 @@ class TestDialog extends FormDialog_1.FormDialog {
                     base: limit,
                     label: data.limit.label
                 });
+            }
+            if (data.values.pushTheLimit.base !== pushTheLimit) {
+                data.values.pushTheLimit.base = pushTheLimit;
             }
             console.warn('Test After Dialog', test.data);
             return data;
@@ -25724,8 +25728,17 @@ class Helpers {
             value.value = value.override.value;
             return value.override.value;
         }
-        value.value = Helpers.roundTo(parts.total + value.base, 3);
-        value.value = Helpers.applyValueRange(value.value, options);
+        // Base on type change calculation behaviour.
+        switch (getType(value.base)) {
+            case 'number':
+                value.value = Helpers.roundTo(parts.total + value.base, 3);
+                value.value = Helpers.applyValueRange(value.value, options);
+                break;
+            // boolean / string values should be applied
+            default:
+                value.value = parts.last === undefined ? value.base : parts.last;
+                break;
+        }
         value.mod = parts.list;
         return value.value;
     }
@@ -26492,7 +26505,7 @@ class HooksManager {
         Hooks.once('setup', HooksManager.setupAutocompleteInlinePropertiesSupport);
         Hooks.on('canvasInit', HooksManager.canvasInit);
         Hooks.on('ready', HooksManager.ready);
-        Hooks.on('renderChatMessage', HooksManager.renderChatMessage);
+        // Hooks.on('renderChatMessage', HooksManager.renderChatMessage);
         Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
         Hooks.on('renderSceneControls', HooksManager.renderSceneControls);
@@ -26617,6 +26630,7 @@ ___________________
             $(document).on('click', diceIconSelector, () => __awaiter(this, void 0, void 0, function* () { return yield ShadowrunRoller_1.ShadowrunRoller.promptSuccessTest(); }));
             const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
             $(document).on('click', diceIconSelectorNew, () => __awaiter(this, void 0, void 0, function* () { return yield ShadowrunRoller_1.ShadowrunRoller.promptSuccessTest(); }));
+            HooksManager.renderChatMessage();
             console.error('TODO: Remove this dev implementation');
             const item = (_b = game.items) === null || _b === void 0 ? void 0 : _b.getName('Weapon (Ranged)');
             const actor = (_c = game.actors) === null || _c === void 0 ? void 0 : _c.getName('Char Linked');
@@ -26677,10 +26691,22 @@ ___________________
         }
         tokenControls.tools.push(EnvModifiersApplication_1.EnvModifiersApplication.getControl());
     }
-    static renderChatMessage(message, html, data) {
-        chat.addRollListeners(message, html);
-        SuccessTest_1.SuccessTest.chatMessageListeners(message, html, data);
-        OpposedTest_1.OpposedTest.chatMessageListeners(message, html, data);
+    /**
+     * Register renderChatMessage Hooks using FoundryVTT Hooks.on for each registered test type.
+     *
+     * This will avoid calling the same method on different types twice.
+     *
+     * Must be called on 'ready' or after game.shadowrun is registered.
+     */
+    static renderChatMessage() {
+        // TODO: Remove legacy chat message handling.
+        console.warn('Shadowrun 5e | Legacy Chat Message Handling is active');
+        Hooks.on('renderChatMessage', chat.addRollListeners);
+        // @ts-ignore // TODO: foundry-vtt-types Type Merging for game.shadowrun5e
+        Object.values(game.shadowrun5e.tests).forEach((test) => {
+            console.log(`Shadowrun 5e | Registering ${test.constructor.name} chat message handlers`);
+            Hooks.on('renderChatMessage', test.chatMessageListeners);
+        });
     }
     static renderItemDirectory(app, html) {
         const button = $('<button>Import Chummer Data</button>');
@@ -33570,6 +33596,11 @@ class PartsList {
     get length() {
         return this._list.length;
     }
+    /**
+     * Return the sum total of the list.
+     *
+     * This can be used for numerical lists, that need the sum of all their list elements.
+     */
     get total() {
         let total = 0;
         for (const part of this._list) {
@@ -33578,6 +33609,14 @@ class PartsList {
             }
         }
         return total;
+    }
+    /**
+     * Return the last element in the list.
+     *
+     * This can be used for none numerical parts lists, in which the latest value would be whatever the value is.
+     */
+    get last() {
+        return this._list[this._list.length - 1];
     }
     get isEmpty() {
         return this.length === 0;
@@ -34976,6 +35015,9 @@ const PartsList_1 = require("../parts/PartsList");
  * TODO: What to actually overwrite?
  */
 class OpposedTest extends SuccessTest_1.SuccessTest {
+    constructor(data, documents, options) {
+        super(data, documents, options);
+    }
     /**
      * An opposed test assumes it's opposing another SuccessTest, which might have resulted from an item action
      * or same or different actor.
@@ -35031,7 +35073,9 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
             pool: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.DicePool' }),
             limit: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Limit' }),
             threshold: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold' }),
-            values: {},
+            values: {
+                pushTheLimit: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.PushTheLimit' })
+            },
             against: againstData
         };
         // An opposing test will oppose net hits of the opposed test.
@@ -35112,8 +35156,8 @@ class SuccessTest {
         this.item = documents === null || documents === void 0 ? void 0 : documents.item;
         this.targets = [];
         this.data = this._prepareData(data, options);
-        // Reuse an old roll or create a new one.
-        this.roll = roll || this.createRoll();
+        console.error('Remove this');
+        this.data.values.pushTheLimit.value = true;
         this.calculateBaseValues();
         console.info(`Shadowrun 5e | Created ${this.constructor.name} Test`, this);
     }
@@ -35140,6 +35184,14 @@ class SuccessTest {
         options.showDialog = options.showDialog || true;
         // Options will be used when a test is reused further on.
         data.options = options;
+        // Set possible missing values.
+        data.pool = data.pool || DataDefaults_1.DefaultValues.valueData({ label: 'SR5.DicePool' });
+        data.threshold = data.threshold || DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold' });
+        data.limit = data.limit || DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Limit' });
+        data.values = data.values || {
+            pushTheLimit: DataDefaults_1.DefaultValues.valueData({ label: "SR5.PushTheLimit" })
+        };
+        data.opposed = data.opposed || undefined;
         return data;
     }
     /**
@@ -35203,7 +35255,6 @@ class SuccessTest {
             pool: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.DicePool', base: (values === null || values === void 0 ? void 0 : values.pool) || 0 }),
             threshold: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold', base: (values === null || values === void 0 ? void 0 : values.threshold) || 0 }),
             limit: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Limit', base: (values === null || values === void 0 ? void 0 : values.limit) || 0 }),
-            values: {}
         };
         return new SuccessTest(testData, undefined, options);
     }
@@ -35316,7 +35367,7 @@ class SuccessTest {
             pool: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.DicePool' }),
             limit: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Limit' }),
             threshold: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold' }),
-            values: {}
+            opposed: {}
         };
         // Try fetching the items action data.
         const action = item.getAction();
@@ -35394,11 +35445,11 @@ class SuccessTest {
      *  Modifiers:  https://foundryvtt.com/article/dice-modifiers/
      * Shadowrun5e: SR5#44
      *
-     * TODO: If edge is used use the rr6 modifier
      */
     get formula() {
         const pool = helpers_1.Helpers.calcTotal(this.data.pool);
-        return `(${pool})d6cs>=${SuccessTest.lowestSuccessSide}`;
+        const explode = this.hasPushTheLimit ? 'x6' : '';
+        return `(${pool})d6cs>=${SuccessTest.lowestSuccessSide}${explode}`;
     }
     /**
      * Give a representation of this success test in the common Shadowrun 5 description style.
@@ -35446,14 +35497,23 @@ class SuccessTest {
         return new SR5Roll_1.SR5Roll(this.formula);
     }
     /**
+     * What TestDialog class to use for this test type?
+     *
+     * @override This method if you want to use a different TestDialog.
+     */
+    _createTestDialog() {
+        return new TestDialog_1.TestDialog(this);
+    }
+    /**
      * Show the dialog class for this test type and alter test according to user selection.
      */
     showDialog() {
         return __awaiter(this, void 0, void 0, function* () {
-            const dialog = new TestDialog_1.TestDialog(this);
+            const dialog = this._createTestDialog();
             const data = yield dialog.select();
             if (dialog.canceled)
                 return false;
+            // Overwrite current test state with whatever the dialog gives.
             this.data = data;
             return true;
         });
@@ -35461,12 +35521,17 @@ class SuccessTest {
     /**
      * Helper method to evaluate the internal SR5Roll and SuccessTest values.
      *
+     * @param consumeActorResources When set to true will consume all resources spent on the active actor by this test.
      */
-    evaluate() {
+    evaluate(consumeActorResources = true) {
         return __awaiter(this, void 0, void 0, function* () {
+            // Prepare current test state.
+            this.applyPushTheLimit();
+            // Apply current test state to roll.
+            this.roll = this.createRoll();
             // @ts-ignore // foundry-vtt-types is missing _evaluated.
-            if (!this.roll._evaluated)
-                yield this.roll.evaluate({ async: true });
+            // if (!this.roll._evaluated)
+            yield this.roll.evaluate({ async: true });
             // Fetch documents, when no reference has been made yet.
             if (!this.actor && this.data.sourceActorUuid)
                 this.actor = (yield fromUuid(this.data.sourceActorUuid)) || undefined;
@@ -35479,6 +35544,8 @@ class SuccessTest {
                 }
             }
             this.calculateValues();
+            if (consumeActorResources)
+                yield this.consumeActorResources();
             return this;
         });
     }
@@ -35636,6 +35703,38 @@ class SuccessTest {
         const thresholdPart = this.hasThreshold ? `(${this.threshold.value})` : '';
         const limitPart = this.hasLimit ? `[${this.limit.value}]` : '';
         return `${poolPart} ${thresholdPart} ${limitPart}`;
+    }
+    get hasPushTheLimit() {
+        return this.data.values.pushTheLimit.value === true;
+    }
+    /**
+     * Handle Edge rule 'pushTheLimit' within this test.
+     */
+    applyPushTheLimit() {
+        if (!this.actor)
+            return;
+        const parts = new PartsList_1.PartsList(this.pool.mod);
+        if (this.hasPushTheLimit) {
+            const edge = this.actor.getEdge().value;
+            parts.addUniquePart('SR5.PushTheLimit', edge);
+        }
+        else {
+            parts.removePart('SR5.PushTheLimit');
+        }
+    }
+    /**
+     * Handle resulting actor resource consumption after this test.
+     *
+     * TODO: Maybe make this a hook and transfer resources to consume (edge, ammo)
+     */
+    consumeActorResources() {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.actor)
+                return;
+            if (this.hasPushTheLimit) {
+                yield this.actor.useEdge();
+            }
+        });
     }
     /**
      * Post this success test as a message to the chat log.
@@ -35805,7 +35904,6 @@ class SuccessTest {
     }
     static _castOpposedAction(event, cardHtml) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.error('Cast Opposed Action', event);
             event.preventDefault();
             // Collect information needed to create the opposed action test.
             const messageId = cardHtml.data('messageId');

@@ -48,8 +48,17 @@ export class Helpers {
             return value.override.value;
         }
 
-        value.value = Helpers.roundTo(parts.total + value.base, 3);
-        value.value = Helpers.applyValueRange(value.value, options);
+        // Base on type change calculation behaviour.
+        switch (getType(value.base)) {
+            case 'number':
+                value.value = Helpers.roundTo(parts.total + value.base, 3);
+                value.value = Helpers.applyValueRange(value.value, options);
+                break;
+            // boolean / string values should be applied
+            default:
+                value.value = parts.last === undefined ? value.base : parts.last;
+                break;
+        }
 
         value.mod = parts.list;
 

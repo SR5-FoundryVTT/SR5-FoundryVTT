@@ -19,6 +19,7 @@ import EquipmentItemData = Shadowrun.EquipmentItemData;
 import DeviceItemData = Shadowrun.DeviceItemData;
 import ValueField = Shadowrun.ValueField;
 import {SuccessTest} from "../tests/SuccessTest";
+import GenericValueField = Shadowrun.GenericValueField;
 
 
 export class DefaultValues {

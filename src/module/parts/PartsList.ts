@@ -10,6 +10,11 @@ export class PartsList<TType> {
         return this._list.length;
     }
 
+    /**
+     * Return the sum total of the list.
+     *
+     * This can be used for numerical lists, that need the sum of all their list elements.
+     */
     get total(): number {
         let total = 0;
         for (const part of this._list) {
@@ -18,6 +23,15 @@ export class PartsList<TType> {
             }
         }
         return total;
+    }
+
+    /**
+     * Return the last element in the list.
+     *
+     * This can be used for none numerical parts lists, in which the latest value would be whatever the value is.
+     */
+    get last(): any {
+        return this._list[this._list.length - 1];
     }
 
     get isEmpty(): boolean {

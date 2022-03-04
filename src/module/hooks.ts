@@ -50,7 +50,7 @@ export class HooksManager {
 
         Hooks.on('canvasInit', HooksManager.canvasInit);
         Hooks.on('ready', HooksManager.ready);
-        Hooks.on('renderChatMessage', HooksManager.renderChatMessage);
+        // Hooks.on('renderChatMessage', HooksManager.renderChatMessage);
         Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
         Hooks.on('renderSceneControls', HooksManager.renderSceneControls);
@@ -189,6 +189,7 @@ ___________________
         const diceIconSelectorNew = '#chat-controls .chat-control-icon .fa-dice-d20';
         $(document).on('click', diceIconSelectorNew, async () => await ShadowrunRoller.promptSuccessTest());
 
+        HooksManager.renderChatMessage();
         console.error('TODO: Remove this dev implementation');
         const item = game.items?.getName('Weapon (Ranged)');
         const actor = game.actors?.getName('Char Linked');
@@ -249,10 +250,22 @@ ___________________
         tokenControls.tools.push(EnvModifiersApplication.getControl());
     }
 
-    static renderChatMessage(message, html, data) {
-        chat.addRollListeners(message, html);
-        SuccessTest.chatMessageListeners(message, html, data);
-        OpposedTest.chatMessageListeners(message, html, data);
+    /**
+     * Register renderChatMessage Hooks using FoundryVTT Hooks.on for each registered test type.
+     *
+     * This will avoid calling the same method on different types twice.
+     *
+     * Must be called on 'ready' or after game.shadowrun is registered.
+     */
+    static renderChatMessage() {
+        // TODO: Remove legacy chat message handling.
+        console.warn('Shadowrun 5e | Legacy Chat Message Handling is active');
+        Hooks.on('renderChatMessage', chat.addRollListeners)
+        // @ts-ignore // TODO: foundry-vtt-types Type Merging for game.shadowrun5e
+        Object.values(game.shadowrun5e.tests).forEach((test: typeof SuccessTest) => {
+            console.log(`Shadowrun 5e | Registering ${test.constructor.name} chat message handlers`);
+            Hooks.on('renderChatMessage', test.chatMessageListeners)
+        });
     }
 
     static renderItemDirectory(app: Application, html: JQuery) {

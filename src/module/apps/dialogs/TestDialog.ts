@@ -54,6 +54,7 @@ export class TestDialog extends FormDialog {
             const pool = Number(html.find('input[name=pool]').val());
             const threshold = Number(html.find('input[name=threshold]').val());
             const limit = Number(html.find('input[name=limit]').val());
+            const pushTheLimit = html.find('input[name=pushTheLimit]').is(':checked');
 
             const data = duplicate(test.data);
 
@@ -75,6 +76,9 @@ export class TestDialog extends FormDialog {
                     base: limit,
                     label: data.limit.label
                 })
+            }
+            if (data.values.pushTheLimit.base !== pushTheLimit) {
+                data.values.pushTheLimit.base = pushTheLimit;
             }
 
             console.warn('Test After Dialog', test.data);

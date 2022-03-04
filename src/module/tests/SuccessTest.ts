@@ -10,10 +10,16 @@ import {PartsList} from "../parts/PartsList";
 import {ShadowrunTestDialog} from "../apps/dialogs/ShadowrunTestDialog";
 import {OpposedTest} from "./OpposedTest";
 import {TestDialog} from "../apps/dialogs/TestDialog";
+import GenericValueField = Shadowrun.GenericValueField;
 
 export interface TestDocuments {
     actor?: SR5Actor,
     item?: SR5Item
+}
+
+export interface SuccessTestValues {
+    pushTheLimit: GenericValueField
+    [name: string]: ValueField
 }
 
 // TODO: Separate types between SuccessTestData and parameter Data within constructor
@@ -28,7 +34,7 @@ export interface SuccessTestData {
     pool: ValueField
     threshold: ValueField
     limit: ValueField
-    values: Record<string, ValueField>
+    values: SuccessTestValues
 
     opposed?: OpposedTestData
 
@@ -70,7 +76,7 @@ export class SuccessTest {
 
     // TODO: include modifiers
     // TODO: store options in data for later re roll with same options?
-    constructor(data: SuccessTestData, documents?: TestDocuments, options?: SuccessTestOptions) {
+    constructor(data, documents?: TestDocuments, options?: SuccessTestOptions) {
         // TODO: Move roll to documents (or name it context)
         const roll = options?.roll;
         if (options) delete options.roll;
@@ -81,9 +87,6 @@ export class SuccessTest {
         this.targets = [];
 
         this.data = this._prepareData(data, options);
-
-        // Reuse an old roll or create a new one.
-        this.roll = roll || this.createRoll();
 
         this.calculateBaseValues();
 
@@ -96,7 +99,7 @@ export class SuccessTest {
      * @param data
      * @param options
      */
-    _prepareData(data: SuccessTestData, options?: SuccessTestOptions) {
+    _prepareData(data, options?: SuccessTestOptions) {
         // Store the current users targeted token ids for later use.
         // @ts-ignore // undefined isn't allowed but it's excluded.
         data.targetActorsUuid = data.targetActorsUuid || Helpers.getUserTargets().map(token => token.actor?.uuid).filter(uuid => !!uuid);
@@ -116,6 +119,16 @@ export class SuccessTest {
 
         // Options will be used when a test is reused further on.
         data.options = options;
+
+        // Set possible missing values.
+        data.pool = data.pool || DefaultValues.valueData({label: 'SR5.DicePool'});
+        data.threshold = data.threshold || DefaultValues.valueData({label: 'SR5.Threshold'});
+        data.limit = data.limit || DefaultValues.valueData({label: 'SR5.Limit'});
+
+        data.values = data.values || {
+            pushTheLimit: DefaultValues.valueData({label: "SR5.PushTheLimit"})
+        }
+        data.opposed = data.opposed || undefined;
 
         return data;
     }
@@ -185,7 +198,6 @@ export class SuccessTest {
             pool: DefaultValues.valueData({label: 'SR5.DicePool', base: values?.pool || 0}),
             threshold: DefaultValues.valueData({label: 'SR5.Threshold', base: values?.threshold || 0}),
             limit: DefaultValues.valueData({label: 'SR5.Limit', base: values?.limit || 0}),
-            values: {}
         };
 
         return new SuccessTest(testData, undefined, options);
@@ -309,13 +321,13 @@ export class SuccessTest {
     /**
      * Test Data is structured around Values that can be modified.
      */
-    static getItemActionTestData(item: SR5Item, actor: SR5Actor): SuccessTestData {
+    static getItemActionTestData(item: SR5Item, actor: SR5Actor) {
         // Prepare general data structure with labeling.
-        const data: SuccessTestData = {
+        const data = {
             pool: DefaultValues.valueData({label: 'SR5.DicePool'}),
             limit: DefaultValues.valueData({label: 'SR5.Limit'}),
             threshold: DefaultValues.valueData({label: 'SR5.Threshold'}),
-            values: {}
+            opposed: {}
         };
 
         // Try fetching the items action data.
@@ -396,11 +408,12 @@ export class SuccessTest {
      *  Modifiers:  https://foundryvtt.com/article/dice-modifiers/
      * Shadowrun5e: SR5#44
      *
-     * TODO: If edge is used use the rr6 modifier
      */
     get formula(): string {
         const pool = Helpers.calcTotal(this.data.pool);
-        return `(${pool})d6cs>=${SuccessTest.lowestSuccessSide}`;
+        const explode = this.hasPushTheLimit ? 'x6' : '';
+
+        return `(${pool})d6cs>=${SuccessTest.lowestSuccessSide}${explode}`;
     }
 
     /**
@@ -452,14 +465,24 @@ export class SuccessTest {
     }
 
     /**
+     * What TestDialog class to use for this test type?
+     *
+     * @override This method if you want to use a different TestDialog.
+     */
+    _createTestDialog() {
+        return new TestDialog(this);
+    }
+
+    /**
      * Show the dialog class for this test type and alter test according to user selection.
      */
     async showDialog(): Promise<boolean> {
-        const dialog = new TestDialog(this);
+        const dialog = this._createTestDialog();
 
         const data = await dialog.select();
         if (dialog.canceled) return false;
 
+        // Overwrite current test state with whatever the dialog gives.
         this.data = data;
 
         return true;
@@ -468,11 +491,18 @@ export class SuccessTest {
     /**
      * Helper method to evaluate the internal SR5Roll and SuccessTest values.
      *
+     * @param consumeActorResources When set to true will consume all resources spent on the active actor by this test.
      */
-    async evaluate(): Promise<SuccessTest> {
+    async evaluate(consumeActorResources:boolean=true): Promise<SuccessTest> {
+        // Prepare current test state.
+        this.applyPushTheLimit();
+
+        // Apply current test state to roll.
+        this.roll = this.createRoll();
+
         // @ts-ignore // foundry-vtt-types is missing _evaluated.
-        if (!this.roll._evaluated)
-            await this.roll.evaluate({async: true});
+        // if (!this.roll._evaluated)
+        await this.roll.evaluate({async: true});
 
         // Fetch documents, when no reference has been made yet.
         if (!this.actor && this.data.sourceActorUuid)
@@ -487,6 +517,9 @@ export class SuccessTest {
         }
 
         this.calculateValues();
+
+        if (consumeActorResources)
+            await this.consumeActorResources();
 
         return this;
     }
@@ -669,6 +702,38 @@ export class SuccessTest {
         const thresholdPart = this.hasThreshold ? `(${this.threshold.value})` : '';
         const limitPart = this.hasLimit ? `[${this.limit.value}]` : '';
         return `${poolPart} ${thresholdPart} ${limitPart}`
+    }
+
+    get hasPushTheLimit(): boolean {
+        return this.data.values.pushTheLimit.value === true;
+    }
+    /**
+     * Handle Edge rule 'pushTheLimit' within this test.
+     */
+    applyPushTheLimit() {
+        if (!this.actor) return;
+
+        const parts = new PartsList(this.pool.mod);
+
+        if (this.hasPushTheLimit) {
+            const edge = this.actor.getEdge().value;
+            parts.addUniquePart('SR5.PushTheLimit', edge);
+        } else {
+            parts.removePart('SR5.PushTheLimit');
+        }
+    }
+
+    /**
+     * Handle resulting actor resource consumption after this test.
+     *
+     * TODO: Maybe make this a hook and transfer resources to consume (edge, ammo)
+     */
+    async consumeActorResources() {
+        if (!this.actor) return;
+
+        if (this.hasPushTheLimit) {
+            await this.actor.useEdge();
+        }
     }
 
     /**

@@ -1,5 +1,5 @@
 import { SR5Actor } from "../actor/SR5Actor";
-import {SuccessTest, SuccessTestData, SuccessTestOptions} from "./SuccessTest";
+import {SuccessTest, SuccessTestData, SuccessTestOptions, SuccessTestValues, TestDocuments} from "./SuccessTest";
 import ValueField = Shadowrun.ValueField;
 import {DefaultValues} from "../data/DataDefaults";
 import {PartsList} from "../parts/PartsList";
@@ -20,7 +20,7 @@ interface OpposedTestData {
     pool: ValueField
     threshold: ValueField
     limit: ValueField
-    values: Record<string, ValueField>
+    values: SuccessTestValues
 
     against: SuccessTestData
 }
@@ -33,6 +33,9 @@ interface OpposedTestData {
 export class OpposedTest extends SuccessTest {
     public data: OpposedTestData;
 
+    constructor(data, documents?: TestDocuments, options?: SuccessTestOptions) {
+        super(data, documents, options);
+    }
     /**
      * An opposed test assumes it's opposing another SuccessTest, which might have resulted from an item action
      * or same or different actor.
@@ -93,7 +96,9 @@ export class OpposedTest extends SuccessTest {
             pool: DefaultValues.valueData({label: 'SR5.DicePool'}),
             limit: DefaultValues.valueData({label: 'SR5.Limit'}),
             threshold: DefaultValues.valueData({label: 'SR5.Threshold'}),
-            values: {},
+            values: {
+                pushTheLimit: DefaultValues.valueData({label: 'SR5.PushTheLimit'})
+            },
 
             against: againstData
         }
