@@ -21747,6 +21747,7 @@ class TestDialog extends FormDialog_1.FormDialog {
             }
             if (data.values.pushTheLimit.base !== pushTheLimit) {
                 data.values.pushTheLimit.base = pushTheLimit;
+                data.values.pushTheLimit.value = pushTheLimit;
             }
             console.warn('Test After Dialog', test.data);
             return data;
@@ -26476,7 +26477,6 @@ const SR5Token_1 = require("./token/SR5Token");
 const ShadowrunRoller_1 = require("./rolls/ShadowrunRoller");
 const HandlebarManager_1 = require("./handlebars/HandlebarManager");
 const canvas_1 = require("./canvas");
-const chat = require("./chat");
 const macros_1 = require("./macros");
 const OverwatchScoreTracker_1 = require("./apps/gmtools/OverwatchScoreTracker");
 const SR5Combat_1 = require("./combat/SR5Combat");
@@ -26505,8 +26505,9 @@ class HooksManager {
         Hooks.once('setup', HooksManager.setupAutocompleteInlinePropertiesSupport);
         Hooks.on('canvasInit', HooksManager.canvasInit);
         Hooks.on('ready', HooksManager.ready);
-        // Hooks.on('renderChatMessage', HooksManager.renderChatMessage);
-        Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);
+        console.warn('Shadowrun 5e | Legacy Chat Message Handling is active');
+        // Hooks.on('renderChatMessage', chat.addRollListeners)
+        // Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
         Hooks.on('renderSceneControls', HooksManager.renderSceneControls);
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons);
@@ -26515,6 +26516,7 @@ class HooksManager {
         Hooks.on('renderTokenHUD', EnvModifiersApplication_1.EnvModifiersApplication.addTokenHUDFields);
         Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem);
         Hooks.on('deleteItem', HooksManager.removeDeletedItemsFromNetworks);
+        Hooks.on('getChatLogEntryContext', SuccessTest_1.SuccessTest.chatMessageContextOptions);
         Hooks.on('init', quench_1.quenchRegister);
     }
     static init() {
@@ -26639,7 +26641,7 @@ ___________________
             const test = SuccessTest_1.SuccessTest.fromAction(item, actor);
             if (!test)
                 console.warn('Didnt work');
-            yield (test === null || test === void 0 ? void 0 : test.toMessage());
+            yield (test === null || test === void 0 ? void 0 : test.execute());
         });
     }
     static canvasInit() {
@@ -26700,8 +26702,6 @@ ___________________
      */
     static renderChatMessage() {
         // TODO: Remove legacy chat message handling.
-        console.warn('Shadowrun 5e | Legacy Chat Message Handling is active');
-        Hooks.on('renderChatMessage', chat.addRollListeners);
         // @ts-ignore // TODO: foundry-vtt-types Type Merging for game.shadowrun5e
         Object.values(game.shadowrun5e.tests).forEach((test) => {
             console.log(`Shadowrun 5e | Registering ${test.constructor.name} chat message handlers`);
@@ -26816,7 +26816,7 @@ ___________________
     }
 }
 exports.HooksManager = HooksManager;
-},{"../test/quench":233,"./actor/SR5Actor":86,"./actor/sheets/SR5CharacterSheet":109,"./actor/sheets/SR5ICActorSheet":110,"./actor/sheets/SR5SpiritActorSheet":111,"./actor/sheets/SR5SpriteActorSheet":112,"./actor/sheets/SR5VehicleActorSheet":113,"./apps/ChangelogApplication":114,"./apps/EnvModifiersApplication":115,"./apps/gmtools/OverwatchScoreTracker":143,"./canvas":147,"./chat":148,"./combat/SR5Combat":149,"./config":150,"./constants":151,"./effect/SR5ActiveEffect":155,"./effect/SR5ActiveEffectSheet":156,"./handlebars/HandlebarManager":160,"./importer/apps/import-form":167,"./item/SR5Item":205,"./item/SR5ItemSheet":206,"./item/flows/NetworkDeviceFlow":209,"./macros":211,"./migrator/Migrator":213,"./rolls/SR5Roll":220,"./rolls/ShadowrunRoller":221,"./settings":227,"./tests/OpposedTest":230,"./tests/SuccessTest":231,"./token/SR5Token":232}],167:[function(require,module,exports){
+},{"../test/quench":233,"./actor/SR5Actor":86,"./actor/sheets/SR5CharacterSheet":109,"./actor/sheets/SR5ICActorSheet":110,"./actor/sheets/SR5SpiritActorSheet":111,"./actor/sheets/SR5SpriteActorSheet":112,"./actor/sheets/SR5VehicleActorSheet":113,"./apps/ChangelogApplication":114,"./apps/EnvModifiersApplication":115,"./apps/gmtools/OverwatchScoreTracker":143,"./canvas":147,"./combat/SR5Combat":149,"./config":150,"./constants":151,"./effect/SR5ActiveEffect":155,"./effect/SR5ActiveEffectSheet":156,"./handlebars/HandlebarManager":160,"./importer/apps/import-form":167,"./item/SR5Item":205,"./item/SR5ItemSheet":206,"./item/flows/NetworkDeviceFlow":209,"./macros":211,"./migrator/Migrator":213,"./rolls/SR5Roll":220,"./rolls/ShadowrunRoller":221,"./settings":227,"./tests/OpposedTest":230,"./tests/SuccessTest":231,"./token/SR5Token":232}],167:[function(require,module,exports){
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -35074,7 +35074,8 @@ class OpposedTest extends SuccessTest_1.SuccessTest {
             limit: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Limit' }),
             threshold: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold' }),
             values: {
-                pushTheLimit: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.PushTheLimit' })
+                pushTheLimit: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.PushTheLimit' }),
+                secondChance: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.SecondChange' })
             },
             against: againstData
         };
@@ -35154,6 +35155,7 @@ class SuccessTest {
         // Store given documents to avoid later fetching.
         this.actor = documents === null || documents === void 0 ? void 0 : documents.actor;
         this.item = documents === null || documents === void 0 ? void 0 : documents.item;
+        this.rolls = (documents === null || documents === void 0 ? void 0 : documents.rolls) || [];
         this.targets = [];
         this.data = this._prepareData(data, options);
         this.calculateBaseValues();
@@ -35180,6 +35182,7 @@ class SuccessTest {
         // @ts-ignore // In FoundryVTT core settings we shall trust.
         options.rollMode = options.rollMode || game.settings.get(constants_1.CORE_NAME, constants_1.CORE_FLAGS.RollMode);
         options.showDialog = options.showDialog || true;
+        options.showMessage = options.showMessage || true;
         // Options will be used when a test is reused further on.
         data.options = options;
         // Set possible missing values.
@@ -35187,7 +35190,8 @@ class SuccessTest {
         data.threshold = data.threshold || DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Threshold' });
         data.limit = data.limit || DataDefaults_1.DefaultValues.valueData({ label: 'SR5.Limit' });
         data.values = data.values || {
-            pushTheLimit: DataDefaults_1.DefaultValues.valueData({ label: "SR5.PushTheLimit" })
+            pushTheLimit: DataDefaults_1.DefaultValues.valueData({ label: "SR5.PushTheLimit" }),
+            secondChange: DataDefaults_1.DefaultValues.valueData({ label: 'SR5.SecondChange' })
         };
         data.opposed = data.opposed || undefined;
         return data;
@@ -35232,13 +35236,15 @@ class SuccessTest {
     /**
      * Helper method to create a SuccessTest from given data.
      *
+     * TODO: Rework this method to restore test based on test type.
+     *
      * @param data
      * @param documents
      * @param options
      */
     static fromTestData(data, documents, options) {
         // Before used documents would be fetched during evaluation.
-        return new SuccessTest(data, {}, options);
+        return new SuccessTest(data, documents, options);
     }
     /**
      * A helper method to create a SuccessTest from a simple pool value, without
@@ -35256,20 +35262,33 @@ class SuccessTest {
         };
         return new SuccessTest(testData, undefined, options);
     }
+    /**
+     *
+     * @param id
+     */
     static fromMessage(id) {
         var _a;
-        const message = (_a = game.messages) === null || _a === void 0 ? void 0 : _a.get(id);
-        if (!message) {
-            console.error(`Shadowrun 5e | Couldn't find a message for id ${id} to create a message action`);
-            return;
-        }
-        const testData = message.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.Test);
-        if (!testData) {
-            console.error(`Shadowrun 5e | Message with id ${id} doesn't have test data in it's flags.`);
-            return;
-        }
-        const roll = message.roll;
-        return this.fromTestData(testData, {}, { roll });
+        return __awaiter(this, void 0, void 0, function* () {
+            const message = (_a = game.messages) === null || _a === void 0 ? void 0 : _a.get(id);
+            if (!message) {
+                console.error(`Shadowrun 5e | Couldn't find a message for id ${id} to create a message action`);
+                return;
+            }
+            const testData = message.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.Test);
+            if (!testData) {
+                console.error(`Shadowrun 5e | Message with id ${id} doesn't have test data in it's flags.`);
+                return;
+            }
+            // const roll = message.roll as SR5Roll;
+            const { data, rolls } = testData;
+            const actor = yield fromUuid(data.sourceActorUuid);
+            const item = yield fromUuid(data.sourceItemUuid);
+            const documents = {
+                rolls: rolls.map(roll => SR5Roll_1.SR5Roll.fromData(roll)),
+                actor, item
+            };
+            return this.fromTestData(data, documents, {});
+        });
     }
     /**
      * TODO: Check if this method is still usefull when a dialog is an inbetween and not an initator of a test.
@@ -35301,7 +35320,7 @@ class SuccessTest {
             const limitValue = dialogData.limit.value || 0;
             // Create and display SuccessTest.
             const test = SuccessTest.fromPool({ pool: pool.value, threshold: thresholdValue, limit: limitValue }, { showDialog: false });
-            yield test.toMessage();
+            yield test.execute();
             // Store the last used pool size for the next simple SuccessTest
             yield ((_b = game.user) === null || _b === void 0 ? void 0 : _b.setFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.LastRollPromptValue, pool.value));
             return test;
@@ -35336,12 +35355,13 @@ class SuccessTest {
                     return;
                 const test = new testClass(data, { actor }, {});
                 // TODO: Doesn't ask for dialog. Should be based on options...
-                yield test.toMessage();
+                yield test.execute();
             }
         });
     }
     toJSON() {
-        return this.data;
+        return { data: this.data,
+            rolls: this.rolls };
     }
     /**
      * Get the lowest side for a Shadowrun 5 die to count as a success
@@ -35518,19 +35538,24 @@ class SuccessTest {
         });
     }
     /**
-     * Helper method to evaluate the internal SR5Roll and SuccessTest values.
-     *
-     * @param consumeActorResources When set to true will consume all resources spent on the active actor by this test.
+     * Calculate only the base test that can be calculated before the test has been evaluated.
      */
-    evaluate(consumeActorResources = true) {
+    calculateBaseValues() {
+        this.data.pool.value = helpers_1.Helpers.calcTotal(this.data.pool, { min: 0 });
+        this.data.threshold.value = helpers_1.Helpers.calcTotal(this.data.threshold, { min: 0 });
+        this.data.limit.value = helpers_1.Helpers.calcTotal(this.data.limit, { min: 0 });
+    }
+    /**
+     * Helper method to evaluate the internal SR5Roll and SuccessTest values.
+     */
+    evaluate() {
         return __awaiter(this, void 0, void 0, function* () {
-            // Prepare current test state.
-            this.applyPushTheLimit();
-            // Apply current test state to roll.
-            this.roll = this.createRoll();
-            // @ts-ignore // foundry-vtt-types is missing _evaluated.
-            // if (!this.roll._evaluated)
-            yield this.roll.evaluate({ async: true });
+            // Evaluate all rolls.
+            for (const roll of this.rolls) {
+                // @ts-ignore // foundry-vtt-types is missing evaluated.
+                if (!roll._evaluated)
+                    yield roll.evaluate({ async: true });
+            }
             // Fetch documents, when no reference has been made yet.
             if (!this.actor && this.data.sourceActorUuid)
                 this.actor = (yield fromUuid(this.data.sourceActorUuid)) || undefined;
@@ -35543,18 +35568,8 @@ class SuccessTest {
                 }
             }
             this.calculateValues();
-            if (consumeActorResources)
-                yield this.consumeActorResources();
             return this;
         });
-    }
-    /**
-     * Calculate only the base test that can be calculated before the test has been evaluated.
-     */
-    calculateBaseValues() {
-        this.data.pool.value = helpers_1.Helpers.calcTotal(this.data.pool, { min: 0 });
-        this.data.threshold.value = helpers_1.Helpers.calcTotal(this.data.threshold, { min: 0 });
-        this.data.limit.value = helpers_1.Helpers.calcTotal(this.data.limit, { min: 0 });
     }
     /**
      * Calculate the total of all values.
@@ -35594,7 +35609,7 @@ class SuccessTest {
      * This will compare actual roll hits, without applied limit.
      */
     get hasReducedHits() {
-        return this.roll.hits > this.limit.value;
+        return this.hits.value > this.limit.value;
     }
     /**
      * Helper to get the total threshold value for this success test.
@@ -35631,11 +35646,12 @@ class SuccessTest {
      * Helper to get the hits value for this success test with a possible limit.
      */
     calculateHits() {
+        const rollHits = this.rolls.reduce((hits, roll) => hits + roll.hits, 0);
         const hits = DataDefaults_1.DefaultValues.valueData({
             label: "SR5.Hits",
             base: this.hasLimit ?
-                Math.min(this.limit.value, this.roll.hits) :
-                this.roll.hits
+                Math.min(this.limit.value, rollHits) :
+                rollHits
         });
         hits.value = helpers_1.Helpers.calcTotal(hits, { min: 0 });
         return hits;
@@ -35647,9 +35663,10 @@ class SuccessTest {
      * Helper to get the glitches values for this success test.
      */
     calculateGlitches() {
+        const rollGlitches = this.rolls.reduce((glitches, roll) => glitches + roll.glitches, 0);
         const glitches = DataDefaults_1.DefaultValues.valueData({
             label: "SR5.Glitches",
-            base: this.roll.glitches
+            base: rollGlitches
         });
         glitches.value = helpers_1.Helpers.calcTotal(glitches, { min: 0 });
         return glitches;
@@ -35661,7 +35678,7 @@ class SuccessTest {
      * Helper to check if the current test state is glitched.
      */
     get glitched() {
-        return this.roll.glitched;
+        return this.glitches.value > Math.floor(this.pool.value / 2);
     }
     /**
      * Helper to check if the current test state is critically glitched.
@@ -35708,6 +35725,8 @@ class SuccessTest {
     }
     /**
      * Handle Edge rule 'pushTheLimit' within this test.
+     * TODO: Is this actually pushTheLimit or is it 'explode sixes?'
+     * TODO: Maybe values.pushTheLimit isn't needed... just let the dialog call this
      */
     applyPushTheLimit() {
         if (!this.actor)
@@ -35720,6 +35739,32 @@ class SuccessTest {
         else {
             parts.removePart('SR5.PushTheLimit');
         }
+        // Avoid subsequent calls of this test to also apply push the limit
+        this.data.values.pushTheLimit.base = false;
+    }
+    /**
+     * TODO: Documentation.
+     */
+    applySecondChance() {
+        return __awaiter(this, void 0, void 0, function* () {
+            console.log(`Shadowrun 5e | ${this.constructor.name} will apply second chance rules`);
+            if (!this.actor)
+                return;
+            const dice = this.rolls.reduce((noneHits, roll) => noneHits + roll.pool - roll.hits, 0);
+            if (dice === 0)
+                return; // TODO: User info about no dice.;
+            // Alter dice pool value for glitch calculation.
+            this.pool.mod = PartsList_1.PartsList.AddUniquePart(this.pool.mod, 'SR5.SecondChance', dice);
+            this.calculateBaseValues();
+            const formula = `${dice}d6`;
+            const roll = new SR5Roll_1.SR5Roll(formula);
+            this.rolls.push(roll);
+            yield this.evaluate();
+            yield this.toMessage();
+        });
+    }
+    setSecondChance(active) {
+        this.data.values.secondChance.base = active;
     }
     /**
      * Handle resulting actor resource consumption after this test.
@@ -35733,20 +35778,37 @@ class SuccessTest {
             if (this.hasPushTheLimit) {
                 yield this.actor.useEdge();
             }
+            // TODO: Add second chance consumption
+        });
+    }
+    /**
+     * TODO: Documentation.
+     */
+    execute() {
+        var _a, _b;
+        return __awaiter(this, void 0, void 0, function* () {
+            if ((_a = this.data.options) === null || _a === void 0 ? void 0 : _a.showDialog) {
+                const userConsented = yield this.showDialog();
+                if (!userConsented)
+                    return this;
+            }
+            // Prepare current test state.
+            this.applyPushTheLimit();
+            const roll = this.createRoll();
+            this.rolls = [roll];
+            yield this.evaluate();
+            if ((_b = this.data.options) === null || _b === void 0 ? void 0 : _b.showMessage) {
+                yield this.toMessage();
+            }
+            yield this.consumeActorResources();
+            return this;
         });
     }
     /**
      * Post this success test as a message to the chat log.
      */
     toMessage() {
-        var _a;
         return __awaiter(this, void 0, void 0, function* () {
-            if ((_a = this.data.options) === null || _a === void 0 ? void 0 : _a.showDialog) {
-                const userConsented = yield this.showDialog();
-                if (!userConsented)
-                    return;
-            }
-            yield this.evaluate();
             // Prepare message content.
             const templateData = this._prepareTemplateData();
             const content = yield renderTemplate(SuccessTest.CHAT_TEMPLATE, templateData);
@@ -35774,7 +35836,6 @@ class SuccessTest {
         return {
             title: this.data.title,
             test: this,
-            roll: this.roll,
             // Note: While ChatData uses ids, this uses full documents.
             speaker: {
                 actor: this.actor,
@@ -35850,7 +35911,6 @@ class SuccessTest {
             },
             content,
             // TODO: Do we need this roll serialization since test is serialized into the message flat?
-            roll: JSON.stringify(this.roll.toJSON()),
             rollMode: (_e = this.data.options) === null || _e === void 0 ? void 0 : _e.rollMode
         };
         // Instead of manually applying whisper ids, let Foundry do it.
@@ -35883,6 +35943,28 @@ class SuccessTest {
     static chatMessageListeners(message, html, data) {
         // TODO: This only works in the current sessions but will break on refresh, since registered events aren't persistent.
         html.find('.card-main-content').on('click', event => SuccessTest._chatToggleCardRolls(event, html));
+    }
+    /**
+     *
+     * @param html
+     * @param options
+     */
+    static chatMessageContextOptions(html, options) {
+        const secondChance = (li) => __awaiter(this, void 0, void 0, function* () {
+            const messageId = li.data().messageId;
+            const test = yield SuccessTest.fromMessage(messageId);
+            if (!test)
+                return console.error('Shadowrun 5e | Could not restore test from message');
+            yield test.applySecondChance();
+            // await test.execute();
+        });
+        options.push({
+            name: game.i18n.localize('SR5.SecondChange'),
+            callback: secondChance,
+            condition: true,
+            icon: '<i class="fas fa-meteor"></i>'
+        });
+        return options;
     }
     /**
      * By default roll results are hidden in a chat card.
@@ -37016,7 +37098,7 @@ const shadowrunTesting = context => {
         it('evaluate a roll from simple pool data', () => __awaiter(void 0, void 0, void 0, function* () {
             const test = SuccessTest_1.SuccessTest.fromPool({ pool: 10 });
             yield test.evaluate();
-            assert.strictEqual(test.roll.pool, 10);
+            assert.strictEqual(test.pool.value, 10);
         }));
         it('evaluate an opposed roll from a opposed action', () => __awaiter(void 0, void 0, void 0, function* () {
             const actionData = {

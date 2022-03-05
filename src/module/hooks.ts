@@ -50,8 +50,9 @@ export class HooksManager {
 
         Hooks.on('canvasInit', HooksManager.canvasInit);
         Hooks.on('ready', HooksManager.ready);
-        // Hooks.on('renderChatMessage', HooksManager.renderChatMessage);
-        Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);
+        console.warn('Shadowrun 5e | Legacy Chat Message Handling is active');
+        // Hooks.on('renderChatMessage', chat.addRollListeners)
+        // Hooks.on('getChatLogEntryContext', chat.addChatMessageContextOptions);
         Hooks.on('hotbarDrop', HooksManager.hotbarDrop);
         Hooks.on('renderSceneControls', HooksManager.renderSceneControls);
         Hooks.on('getSceneControlButtons', HooksManager.getSceneControlButtons);
@@ -60,6 +61,7 @@ export class HooksManager {
         Hooks.on('renderTokenHUD', EnvModifiersApplication.addTokenHUDFields);
         Hooks.on('updateItem', HooksManager.updateIcConnectedToHostItem);
         Hooks.on('deleteItem', HooksManager.removeDeletedItemsFromNetworks);
+        Hooks.on('getChatLogEntryContext', SuccessTest.chatMessageContextOptions);
 
         Hooks.on('init', quenchRegister);
     }
@@ -196,7 +198,7 @@ ___________________
         if (!item || !actor) return;
         const test = SuccessTest.fromAction(item, actor);
         if (!test) console.warn('Didnt work');
-        await test?.toMessage();
+        await test?.execute();
     }
 
     static canvasInit() {
@@ -259,12 +261,10 @@ ___________________
      */
     static renderChatMessage() {
         // TODO: Remove legacy chat message handling.
-        console.warn('Shadowrun 5e | Legacy Chat Message Handling is active');
-        Hooks.on('renderChatMessage', chat.addRollListeners)
         // @ts-ignore // TODO: foundry-vtt-types Type Merging for game.shadowrun5e
         Object.values(game.shadowrun5e.tests).forEach((test: typeof SuccessTest) => {
             console.log(`Shadowrun 5e | Registering ${test.constructor.name} chat message handlers`);
-            Hooks.on('renderChatMessage', test.chatMessageListeners)
+            Hooks.on('renderChatMessage', test.chatMessageListeners);
         });
     }
 

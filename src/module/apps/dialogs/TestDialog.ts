@@ -79,6 +79,8 @@ export class TestDialog extends FormDialog {
             }
             if (data.values.pushTheLimit.base !== pushTheLimit) {
                 data.values.pushTheLimit.base = pushTheLimit;
+                data.values.pushTheLimit.value = pushTheLimit;
+
             }
 
             console.warn('Test After Dialog', test.data);

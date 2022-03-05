@@ -102,7 +102,7 @@ export const shadowrunTesting = context => {
             const test = SuccessTest.fromPool({pool: 10});
             await test.evaluate();
 
-            assert.strictEqual(test.roll.pool, 10);
+            assert.strictEqual(test.pool.value, 10);
         });
 
         it('evaluate an opposed roll from a opposed action', async () => {

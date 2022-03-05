@@ -97,7 +97,8 @@ export class OpposedTest extends SuccessTest {
             limit: DefaultValues.valueData({label: 'SR5.Limit'}),
             threshold: DefaultValues.valueData({label: 'SR5.Threshold'}),
             values: {
-                pushTheLimit: DefaultValues.valueData({label: 'SR5.PushTheLimit'})
+                pushTheLimit: DefaultValues.valueData({label: 'SR5.PushTheLimit'}),
+                secondChance: DefaultValues.valueData({label: 'SR5.SecondChange'})
             },
 
             against: againstData

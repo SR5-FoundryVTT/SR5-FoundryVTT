@@ -13,12 +13,14 @@ import {TestDialog} from "../apps/dialogs/TestDialog";
 import GenericValueField = Shadowrun.GenericValueField;
 
 export interface TestDocuments {
-    actor?: SR5Actor,
+    actor?: SR5Actor
     item?: SR5Item
+    rolls?: SR5Roll[]
 }
 
 export interface SuccessTestValues {
     pushTheLimit: GenericValueField
+    secondChance: GenericValueField
     [name: string]: ValueField
 }
 
@@ -51,6 +53,7 @@ export interface SuccessTestData {
 
 export interface SuccessTestOptions {
     showDialog?: boolean // Show dialog when defined as true.
+    showMessage?: boolean // Show message when defined as true.
     roll?: SR5Roll
     rollMode?: keyof typeof CONFIG.Dice.rollModes
 }
@@ -68,7 +71,7 @@ export class SuccessTest {
     public data: SuccessTestData;
     public actor: SR5Actor|undefined;
     public item: SR5Item|undefined;
-    public roll: SR5Roll;
+    public rolls: SR5Roll[];
 
     public targets: TokenDocument[]
 
@@ -84,6 +87,7 @@ export class SuccessTest {
         // Store given documents to avoid later fetching.
         this.actor = documents?.actor;
         this.item = documents?.item;
+        this.rolls = documents?.rolls || [];
         this.targets = [];
 
         this.data = this._prepareData(data, options);
@@ -116,6 +120,7 @@ export class SuccessTest {
         // @ts-ignore // In FoundryVTT core settings we shall trust.
         options.rollMode = options.rollMode || game.settings.get(CORE_NAME, CORE_FLAGS.RollMode);
         options.showDialog = options.showDialog || true;
+        options.showMessage = options.showMessage || true;
 
         // Options will be used when a test is reused further on.
         data.options = options;
@@ -126,7 +131,8 @@ export class SuccessTest {
         data.limit = data.limit || DefaultValues.valueData({label: 'SR5.Limit'});
 
         data.values = data.values || {
-            pushTheLimit: DefaultValues.valueData({label: "SR5.PushTheLimit"})
+            pushTheLimit: DefaultValues.valueData({label: "SR5.PushTheLimit"}),
+            secondChange: DefaultValues.valueData({label: 'SR5.SecondChange'})
         }
         data.opposed = data.opposed || undefined;
 
@@ -176,13 +182,15 @@ export class SuccessTest {
     /**
      * Helper method to create a SuccessTest from given data.
      *
+     * TODO: Rework this method to restore test based on test type.
+     *
      * @param data
      * @param documents
      * @param options
      */
-    static fromTestData(data: SuccessTestData, documents?: TestDocuments, options?: SuccessTestOptions): SuccessTest {
+    static fromTestData(data, documents?: TestDocuments, options?: SuccessTestOptions): SuccessTest {
         // Before used documents would be fetched during evaluation.
-        return new SuccessTest(data, {}, options);
+        return new SuccessTest(data, documents, options);
     }
 
     /**
@@ -203,21 +211,33 @@ export class SuccessTest {
         return new SuccessTest(testData, undefined, options);
     }
 
-    static fromMessage(id: string): SuccessTest|undefined {
+    /**
+     *
+     * @param id
+     */
+    static async fromMessage(id: string): Promise<SuccessTest | undefined> {
         const message = game.messages?.get(id);
         if (!message) {
             console.error(`Shadowrun 5e | Couldn't find a message for id ${id} to create a message action`);
             return;
         }
 
-        const testData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as SuccessTestData;
+        const testData = message.getFlag(SYSTEM_NAME, FLAGS.Test);
         if (!testData) {
             console.error(`Shadowrun 5e | Message with id ${id} doesn't have test data in it's flags.`);
             return;
         }
 
-        const roll = message.roll as SR5Roll;
-        return this.fromTestData(testData,{},{roll});
+        // const roll = message.roll as SR5Roll;
+        const {data, rolls} = testData as {data: SuccessTestData, rolls: any};
+
+        const actor = await fromUuid(data.sourceActorUuid as string) as SR5Actor;
+        const item = await fromUuid(data.sourceItemUuid as string) as SR5Item;
+
+        const documents = {
+            rolls: rolls.map(roll => SR5Roll.fromData(roll)),
+            actor, item};
+        return this.fromTestData(data, documents,{});
     }
 
     /**
@@ -256,7 +276,7 @@ export class SuccessTest {
 
         // Create and display SuccessTest.
         const test = SuccessTest.fromPool({pool: pool.value, threshold: thresholdValue, limit: limitValue}, {showDialog: false});
-        await test.toMessage();
+        await test.execute();
 
         // Store the last used pool size for the next simple SuccessTest
         await game.user?.setFlag(SYSTEM_NAME, FLAGS.LastRollPromptValue, pool.value);
@@ -296,12 +316,13 @@ export class SuccessTest {
 
             const test = new testClass(data, {actor}, {});
             // TODO: Doesn't ask for dialog. Should be based on options...
-            await test.toMessage();
+            await test.execute();
         }
     }
 
     toJSON() {
-        return this.data;
+        return {data: this.data,
+                rolls: this.rolls};
     }
 
     /**
@@ -491,20 +512,24 @@ export class SuccessTest {
     }
 
     /**
-     * Helper method to evaluate the internal SR5Roll and SuccessTest values.
-     *
-     * @param consumeActorResources When set to true will consume all resources spent on the active actor by this test.
+     * Calculate only the base test that can be calculated before the test has been evaluated.
      */
-    async evaluate(consumeActorResources:boolean=true): Promise<SuccessTest> {
-        // Prepare current test state.
-        this.applyPushTheLimit();
+    calculateBaseValues() {
+        this.data.pool.value = Helpers.calcTotal(this.data.pool, {min: 0});
+        this.data.threshold.value = Helpers.calcTotal(this.data.threshold, {min: 0});
+        this.data.limit.value = Helpers.calcTotal(this.data.limit, {min: 0});
+    }
 
-        // Apply current test state to roll.
-        this.roll = this.createRoll();
-
-        // @ts-ignore // foundry-vtt-types is missing _evaluated.
-        // if (!this.roll._evaluated)
-        await this.roll.evaluate({async: true});
+    /**
+     * Helper method to evaluate the internal SR5Roll and SuccessTest values.
+     */
+    async evaluate(): Promise<this> {
+        // Evaluate all rolls.
+        for (const roll of this.rolls) {
+            // @ts-ignore // foundry-vtt-types is missing evaluated.
+            if (!roll._evaluated)
+                await roll.evaluate({async: true});
+        }
 
         // Fetch documents, when no reference has been made yet.
         if (!this.actor && this.data.sourceActorUuid)
@@ -520,19 +545,7 @@ export class SuccessTest {
 
         this.calculateValues();
 
-        if (consumeActorResources)
-            await this.consumeActorResources();
-
         return this;
-    }
-
-    /**
-     * Calculate only the base test that can be calculated before the test has been evaluated.
-     */
-    calculateBaseValues() {
-        this.data.pool.value = Helpers.calcTotal(this.data.pool, {min: 0});
-        this.data.threshold.value = Helpers.calcTotal(this.data.threshold, {min: 0});
-        this.data.limit.value = Helpers.calcTotal(this.data.limit, {min: 0});
     }
 
     /**
@@ -579,7 +592,7 @@ export class SuccessTest {
      * This will compare actual roll hits, without applied limit.
      */
     get hasReducedHits(): boolean {
-        return this.roll.hits > this.limit.value;
+        return this.hits.value > this.limit.value;
     }
 
     /**
@@ -623,11 +636,12 @@ export class SuccessTest {
      * Helper to get the hits value for this success test with a possible limit.
      */
     calculateHits(): ValueField {
+        const rollHits = this.rolls.reduce((hits, roll) => hits + roll.hits, 0);
         const hits = DefaultValues.valueData({
             label: "SR5.Hits",
             base: this.hasLimit ?
-                Math.min(this.limit.value, this.roll.hits) :
-                this.roll.hits});
+                Math.min(this.limit.value, rollHits) :
+                rollHits});
         hits.value = Helpers.calcTotal(hits, {min: 0});
 
         return hits;
@@ -641,9 +655,10 @@ export class SuccessTest {
      * Helper to get the glitches values for this success test.
      */
     calculateGlitches(): ValueField {
+        const rollGlitches = this.rolls.reduce((glitches, roll) => glitches + roll.glitches, 0);
         const glitches = DefaultValues.valueData({
             label: "SR5.Glitches",
-            base: this.roll.glitches
+            base: rollGlitches
         })
         glitches.value = Helpers.calcTotal(glitches, {min: 0});
 
@@ -658,7 +673,7 @@ export class SuccessTest {
      * Helper to check if the current test state is glitched.
      */
     get glitched(): boolean {
-        return this.roll.glitched;
+        return this.glitches.value > Math.floor(this.pool.value / 2);
     }
 
     /**
@@ -711,6 +726,8 @@ export class SuccessTest {
     }
     /**
      * Handle Edge rule 'pushTheLimit' within this test.
+     * TODO: Is this actually pushTheLimit or is it 'explode sixes?'
+     * TODO: Maybe values.pushTheLimit isn't needed... just let the dialog call this
      */
     applyPushTheLimit() {
         if (!this.actor) return;
@@ -723,6 +740,36 @@ export class SuccessTest {
         } else {
             parts.removePart('SR5.PushTheLimit');
         }
+
+        // Avoid subsequent calls of this test to also apply push the limit
+        this.data.values.pushTheLimit.base = false;
+    }
+
+    /**
+     * TODO: Documentation.
+     */
+    async applySecondChance() {
+        console.log(`Shadowrun 5e | ${this.constructor.name} will apply second chance rules`);
+
+        if (!this.actor) return;
+
+        const dice = this.rolls.reduce((noneHits, roll) => noneHits + roll.pool - roll.hits, 0);
+        if (dice === 0) return; // TODO: User info about no dice.;
+
+        // Alter dice pool value for glitch calculation.
+        this.pool.mod = PartsList.AddUniquePart(this.pool.mod, 'SR5.SecondChance', dice);
+        this.calculateBaseValues();
+
+        const formula = `${dice}d6`;
+        const roll = new SR5Roll(formula);
+        this.rolls.push(roll);
+
+        await this.evaluate();
+        await this.toMessage();
+    }
+
+    setSecondChance(active: boolean) {
+        this.data.values.secondChance.base = active;
     }
 
     /**
@@ -736,19 +783,40 @@ export class SuccessTest {
         if (this.hasPushTheLimit) {
             await this.actor.useEdge();
         }
+
+        // TODO: Add second chance consumption
+    }
+
+    /**
+     * TODO: Documentation.
+     */
+    async execute(): Promise<this> {
+        if (this.data.options?.showDialog) {
+            const userConsented = await this.showDialog();
+            if (!userConsented) return this;
+        }
+
+        // Prepare current test state.
+        this.applyPushTheLimit();
+
+        const roll = this.createRoll();
+        this.rolls = [roll];
+
+        await this.evaluate();
+
+        if (this.data.options?.showMessage) {
+            await this.toMessage();
+        }
+
+        await this.consumeActorResources();
+
+        return this;
     }
 
     /**
      * Post this success test as a message to the chat log.
      */
     async toMessage(): Promise<ChatMessage|undefined> {
-        if (this.data.options?.showDialog) {
-            const userConsented = await this.showDialog();
-            if (!userConsented) return;
-        }
-
-        await this.evaluate();
-
         // Prepare message content.
         const templateData = this._prepareTemplateData();
         const content = await renderTemplate(SuccessTest.CHAT_TEMPLATE, templateData);
@@ -778,7 +846,6 @@ export class SuccessTest {
         return {
             title: this.data.title,
             test: this,
-            roll: this.roll,
             // Note: While ChatData uses ids, this uses full documents.
             speaker: {
                 actor: this.actor,
@@ -856,7 +923,6 @@ export class SuccessTest {
             },
             content,
             // TODO: Do we need this roll serialization since test is serialized into the message flat?
-            roll: JSON.stringify(this.roll.toJSON()),
             rollMode: this.data.options?.rollMode
         }
 
@@ -888,6 +954,30 @@ export class SuccessTest {
     static chatMessageListeners(message: ChatMessage, html, data) {
         // TODO: This only works in the current sessions but will break on refresh, since registered events aren't persistent.
         html.find('.card-main-content').on('click', event => SuccessTest._chatToggleCardRolls(event, html));
+    }
+
+    /**
+     *
+     * @param html
+     * @param options
+     */
+    static chatMessageContextOptions(html, options) {
+        const secondChance = async (li) => {
+            const messageId = li.data().messageId;
+            const test = await SuccessTest.fromMessage(messageId);
+            if (!test) return console.error('Shadowrun 5e | Could not restore test from message');
+
+            await test.applySecondChance();
+            // await test.execute();
+        };
+
+        options.push({
+            name: game.i18n.localize('SR5.SecondChange'),
+            callback: secondChance,
+            condition: true, // TODO: Disable when second chance has been used.
+            icon: '<i class="fas fa-meteor"></i>'
+        })
+        return options;
     }
 
     /**

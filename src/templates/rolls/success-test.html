@@ -34,7 +34,6 @@
             </div>
             <div class="right-side">
                 {{#if test.data.values.pushTheLimit.value}}<div>{{localize 'SR5.PushTheLimit'}}</div>{{/if}}
-                <div>Test</div>
             </div>
         </div>
         <div class="card-test-content">
@@ -69,7 +68,11 @@
         </div>
     </div>
     <div class="card-rolls">
-        {{> 'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.html'}}
+        {{#each test.rolls}}
+            {{> 'systems/shadowrun5e/dist/templates/rolls/parts/rolled-dice.html'
+                roll=this
+            }}
+        {{/each}}
     </div>
     {{#if test.targets}}
     <div class="test-line">
