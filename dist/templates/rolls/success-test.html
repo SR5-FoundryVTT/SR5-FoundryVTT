@@ -4,14 +4,24 @@
     </div>
     {{#if speaker.actor}}
     <div class="card-title card-header">
-         <a class="chat-select-link" data-token-id="{{speaker.token.id}}"><img src="{{speaker.actor.img}}" class="entity-selectable" title="{{speakerName speaker.actor}}"/></a>
-         <h3 class="header-name"><a class="chat-document-link" data-uuid="{{speaker.actor.uuid}}">{{speakerName speaker.actor}}</a></h3>
-    </div>
-    {{/if}}
-    {{#if item}}
-    <div class="card-title card-header">
-        <img src="{{item.data.img}}" title="{{item.data.name}}"/>
-        <h3 class="header-name"><a class="chat-document-link" data-entity="Item" data-id="{{item.id}}" data-uuid="{{item.uuid}}">{{item.data.name}}</a></h3>
+        <div class="container container--fluid">
+            <div class="container__row">
+                <div class="container__col-half">
+                    <div class="document">
+                        <a class="chat-select-link" data-token-id="{{speaker.token.id}}"><img src="{{speaker.actor.img}}" class="entity-selectable" title="{{speakerName speaker.actor}}"/></a>
+                         <h3 class="header-name"><a class="chat-document-link" data-uuid="{{speaker.actor.uuid}}">{{speakerName speaker.actor}}</a></h3>
+                    </div>
+                </div>
+                {{#if item}}
+                <div class="container__col-half">
+                    <div class="document">
+                        <img src="{{item.data.img}}" title="{{item.data.name}}"/>
+                        <h3 class="header-name"><a class="chat-document-link" data-entity="Item" data-id="{{item.id}}" data-uuid="{{item.uuid}}">{{item.data.name}}</a></h3>
+                    </div>
+                </div>
+                {{/if}}
+            </div>
+        </div>
     </div>
     {{/if}}
     <div class="card-main-content">

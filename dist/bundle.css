@@ -317,7 +317,7 @@
       height: 28px;
       width: 28px; }
     .sr5.chat-card .card-header h3 {
-      font-size: 1.6em;
+      font-size: 1.5em;
       align-self: center;
       flex: 1;
       margin: 0;
@@ -376,7 +376,15 @@
     align-items: flex-end; }
     .sr5.roll-card .card-title > * {
       margin-left: 0.15em;
-      margin-right: 0.15em; }
+      margin-right: 0.15em;
+      width: 100%; }
+    .sr5.roll-card .card-title .document {
+      overflow: hidden;
+      white-space: nowrap;
+      display: flex;
+      align-content: center; }
+      .sr5.roll-card .card-title .document * {
+        display: inline-block; }
     .sr5.roll-card .card-title .header-name {
       text-overflow: ellipsis;
       overflow: hidden;
@@ -418,7 +426,7 @@
     display: block; }
   .sr5.roll-card .card-content {
     border-bottom: 1px solid #4d4d4d;
-    padding: 0 0.25em;
+    padding: 0.25em 0.25em 0.25em;
     display: flex;
     flex-flow: row nowrap;
     justify-content: space-between; }
@@ -473,6 +481,9 @@
       .sr5.roll-card .card-content .test-value span {
         flex: 1;
         text-align: left; }
+    .sr5.roll-card .card-content .test-code {
+      font-family: "Nodesto", "Signika", "Palatino Linotype", serif;
+      font-size: 1.5em; }
   .sr5.roll-card .dice-rolls {
     display: none;
     border-bottom: 1px solid #4d4d4d; }
