@@ -58,6 +58,11 @@ export interface SuccessTestOptions {
     rollMode?: keyof typeof CONFIG.Dice.rollModes
 }
 
+export interface SuccessTestMessageData {
+    data: SuccessTestData,
+    rolls: SR5Roll[]
+}
+
 /**
  * General handling of Shadowrun 5e success tests.
  *
@@ -222,22 +227,15 @@ export class SuccessTest {
             return;
         }
 
-        const testData = message.getFlag(SYSTEM_NAME, FLAGS.Test);
+        const testData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as SuccessTestMessageData;
         if (!testData) {
             console.error(`Shadowrun 5e | Message with id ${id} doesn't have test data in it's flags.`);
             return;
         }
 
-        // const roll = message.roll as SR5Roll;
-        const {data, rolls} = testData as {data: SuccessTestData, rolls: any};
-
-        const actor = await fromUuid(data.sourceActorUuid as string) as SR5Actor;
-        const item = await fromUuid(data.sourceItemUuid as string) as SR5Item;
-
-        const documents = {
-            rolls: rolls.map(roll => SR5Roll.fromData(roll)),
-            actor, item};
-        return this.fromTestData(data, documents,{});
+        const rolls = testData.rolls.map(roll => SR5Roll.fromData(roll as any));
+        const documents = {rolls};
+        return this.fromTestData(testData.data, documents,{});
     }
 
     /**
@@ -291,9 +289,9 @@ export class SuccessTest {
             return;
         }
 
-        const testData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as SuccessTestData;
-        if (!testData) {
-            console.error(`Shadowrun 5e | Message with id ${id} doesn't have test data in it's flags.`);
+        const testData = message.getFlag(SYSTEM_NAME, FLAGS.Test) as SuccessTestMessageData;
+        if (!testData || !testData.data || !testData.rolls) {
+            console.error(`Shadowrun 5e | Message with id ${id} doesn't have valid test data in it's flags.`);
             return;
         }
 
@@ -311,10 +309,12 @@ export class SuccessTest {
             ui.notifications?.warn(game.i18n.localize('SR5.Warnings.TokenSelectionNeeded'));
 
         for (const actor of actors) {
-            const data = testClass.getMessageActionTestData(testData, actor, id);
+            const data = testClass.getMessageActionTestData(testData.data, actor, id);
             if (!data) return;
 
-            const test = new testClass(data, {actor}, {});
+            const rolls = testData.rolls.map(roll => SR5Roll.fromData(roll as any));
+            const documents = {actor, rolls};
+            const test = new testClass(data, documents);
             // TODO: Doesn't ask for dialog. Should be based on options...
             await test.execute();
         }
@@ -751,13 +751,13 @@ export class SuccessTest {
     async applySecondChance() {
         console.log(`Shadowrun 5e | ${this.constructor.name} will apply second chance rules`);
 
-        if (!this.actor) return;
+        if (!this.data.sourceActorUuid) return;
 
         const dice = this.rolls.reduce((noneHits, roll) => noneHits + roll.pool - roll.hits, 0);
         if (dice === 0) return; // TODO: User info about no dice.;
 
         // Alter dice pool value for glitch calculation.
-        this.pool.mod = PartsList.AddUniquePart(this.pool.mod, 'SR5.SecondChance', dice);
+        this.pool.mod = PartsList.AddUniquePart(this.pool.mod, 'SR5.SecondChange', dice);
         this.calculateBaseValues();
 
         const formula = `${dice}d6`;

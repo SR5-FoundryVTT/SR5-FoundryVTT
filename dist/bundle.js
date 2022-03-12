@@ -35279,15 +35279,9 @@ class SuccessTest {
                 console.error(`Shadowrun 5e | Message with id ${id} doesn't have test data in it's flags.`);
                 return;
             }
-            // const roll = message.roll as SR5Roll;
-            const { data, rolls } = testData;
-            const actor = yield fromUuid(data.sourceActorUuid);
-            const item = yield fromUuid(data.sourceItemUuid);
-            const documents = {
-                rolls: rolls.map(roll => SR5Roll_1.SR5Roll.fromData(roll)),
-                actor, item
-            };
-            return this.fromTestData(data, documents, {});
+            const rolls = testData.rolls.map(roll => SR5Roll_1.SR5Roll.fromData(roll));
+            const documents = { rolls };
+            return this.fromTestData(testData.data, documents, {});
         });
     }
     /**
@@ -35335,8 +35329,8 @@ class SuccessTest {
                 return;
             }
             const testData = message.getFlag(constants_1.SYSTEM_NAME, constants_1.FLAGS.Test);
-            if (!testData) {
-                console.error(`Shadowrun 5e | Message with id ${id} doesn't have test data in it's flags.`);
+            if (!testData || !testData.data || !testData.rolls) {
+                console.error(`Shadowrun 5e | Message with id ${id} doesn't have valid test data in it's flags.`);
                 return;
             }
             // @ts-ignore // TODO: Add typing by declaration merging
@@ -35350,10 +35344,12 @@ class SuccessTest {
             if (actors.length === 0)
                 (_b = ui.notifications) === null || _b === void 0 ? void 0 : _b.warn(game.i18n.localize('SR5.Warnings.TokenSelectionNeeded'));
             for (const actor of actors) {
-                const data = testClass.getMessageActionTestData(testData, actor, id);
+                const data = testClass.getMessageActionTestData(testData.data, actor, id);
                 if (!data)
                     return;
-                const test = new testClass(data, { actor }, {});
+                const rolls = testData.rolls.map(roll => SR5Roll_1.SR5Roll.fromData(roll));
+                const documents = { actor, rolls };
+                const test = new testClass(data, documents);
                 // TODO: Doesn't ask for dialog. Should be based on options...
                 yield test.execute();
             }
@@ -35748,13 +35744,13 @@ class SuccessTest {
     applySecondChance() {
         return __awaiter(this, void 0, void 0, function* () {
             console.log(`Shadowrun 5e | ${this.constructor.name} will apply second chance rules`);
-            if (!this.actor)
+            if (!this.data.sourceActorUuid)
                 return;
             const dice = this.rolls.reduce((noneHits, roll) => noneHits + roll.pool - roll.hits, 0);
             if (dice === 0)
                 return; // TODO: User info about no dice.;
             // Alter dice pool value for glitch calculation.
-            this.pool.mod = PartsList_1.PartsList.AddUniquePart(this.pool.mod, 'SR5.SecondChance', dice);
+            this.pool.mod = PartsList_1.PartsList.AddUniquePart(this.pool.mod, 'SR5.SecondChange', dice);
             this.calculateBaseValues();
             const formula = `${dice}d6`;
             const roll = new SR5Roll_1.SR5Roll(formula);
@@ -35957,7 +35953,6 @@ class SuccessTest {
             if (!test)
                 return console.error('Shadowrun 5e | Could not restore test from message');
             yield test.applySecondChance();
-            // await test.execute();
         });
         const deleteOption = options.pop();
         options.push({
