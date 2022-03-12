@@ -109,6 +109,8 @@ export class SuccessTest {
      * @param options
      */
     _prepareData(data, options?: SuccessTestOptions) {
+        data.type = data.type || this.constructor.name;
+
         // Store the current users targeted token ids for later use.
         // @ts-ignore // undefined isn't allowed but it's excluded.
         data.targetActorsUuid = data.targetActorsUuid || Helpers.getUserTargets().map(token => token.actor?.uuid).filter(uuid => !!uuid);
@@ -194,8 +196,11 @@ export class SuccessTest {
      * @param options
      */
     static fromTestData(data, documents?: TestDocuments, options?: SuccessTestOptions): SuccessTest {
+        const type = data.type || 'SuccessTest';
+        // @ts-ignore
+        const cls = game.shadowrun5e.tests[type];
         // Before used documents would be fetched during evaluation.
-        return new SuccessTest(data, documents, options);
+        return new cls(data, documents, options);
     }
 
     /**

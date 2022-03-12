@@ -1,5 +1,5 @@
 <form>
-    {{#if test.item}}
+    {{#if test.actor}}
     <div class="container container--fluid sunken">
         <div class="container__row">
             <div class="container__col-half">
@@ -8,6 +8,7 @@
                     <a class="entity-link content-link" data-type="Actor" data-id="{{test.actor.id}}">{{test.actor.name}}</a>
                 </div>
             </div>
+            {{#if test.item}}
             <div class="container__col-half">
                 <div class="document">
                     <img src="{{test.item.img}}"/>
@@ -15,6 +16,7 @@
                        data-id="{{test.item.id}}">{{test.item.name}}</a>
                 </div>
             </div>
+            {{/if}}
         </div>
     </div>
     {{/if}}
