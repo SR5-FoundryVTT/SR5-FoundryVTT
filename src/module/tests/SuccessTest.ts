@@ -954,6 +954,7 @@ export class SuccessTest {
     static chatMessageListeners(message: ChatMessage, html, data) {
         // TODO: This only works in the current sessions but will break on refresh, since registered events aren't persistent.
         html.find('.card-main-content').on('click', event => SuccessTest._chatToggleCardRolls(event, html));
+        html.find('.chat-document-link').on('click', SuccessTest._chatOpenDocumentLink);
     }
 
     /**
@@ -994,6 +995,21 @@ export class SuccessTest {
         const element = cardHtml.find('.dice-rolls');
         if (element.is(':visible')) element.slideUp(200);
         else element.slideDown(200);
+    }
+
+    /**
+     * Open a documents sheet when clicking on it's link.
+     * This is custom from FoundryVTT document links for mostly styling reasons (legacy).
+     */
+    static async _chatOpenDocumentLink(event) {
+        const element = $(event.currentTarget);
+        const uuid = element.data('uuid');
+        if (!uuid) return console.error("Shadowrun 5e | A chat document link didn't provide a document UUID.");
+        const document = await fromUuid(uuid);
+        if (!document) return console.error("Shadowrun 5e | A chat document links UUID couldn't be resolved to a document.")
+
+        // @ts-ignore
+        await document?.sheet.render(true);
     }
 
     static async _castOpposedAction(event, cardHtml) {

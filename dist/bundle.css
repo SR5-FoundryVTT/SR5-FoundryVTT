@@ -310,12 +310,14 @@
     padding: 0.25em 0;
     border-bottom: 1px solid #4d4d4d; }
     .sr5.chat-card .card-header img {
-      flex: 0 0 36px;
+      flex: 0 0;
       margin-right: 0.5em;
       padding: 1px 1px 1px 1px;
-      border: 0; }
+      border: 0;
+      height: 28px;
+      width: 28px; }
     .sr5.chat-card .card-header h3 {
-      font-size: 1.75em;
+      font-size: 1.6em;
       align-self: center;
       flex: 1;
       margin: 0;
@@ -324,15 +326,6 @@
     border-top: 1px solid #4d4d4d; }
   .sr5.chat-card .card-main-content {
     cursor: pointer; }
-  .sr5.chat-card .card-content {
-    padding: 0.5em 0;
-    border-bottom: 1px solid #4d4d4d; }
-    .sr5.chat-card .card-content p {
-      font-size: 0.8em; }
-    .sr5.chat-card .card-content h3 {
-      font-size: 1em;
-      margin: 0;
-      font-weight: bold; }
   .sr5.chat-card .card-buttons .button {
     box-shadow: 0 0 0.25em 0.15em #4d4d4d;
     cursor: pointer;
@@ -373,10 +366,10 @@
     filter: sepia(0.5) hue-rotate(-60deg); }
 
 .sr5.roll-card {
-  margin: 0.15em; }
+  margin: 0.15em;
+  font-size: 12px; }
   .sr5.roll-card .card-title {
     display: flex;
-    font-size: 12px;
     border-bottom: 1px solid #4d4d4d;
     justify-content: flex-start;
     align-content: center;
@@ -424,7 +417,7 @@
   .sr5.roll-card .show-card-description {
     display: block; }
   .sr5.roll-card .card-content {
-    font-size: 14px;
+    border-bottom: 1px solid #4d4d4d;
     padding: 0 0.25em;
     display: flex;
     flex-flow: row nowrap;
@@ -437,7 +430,6 @@
       display: flex;
       flex: 1;
       flex-flow: column;
-      font-size: 12px;
       text-align: right;
       align-content: flex-end; }
       .sr5.roll-card .card-content .right-side .limit-line {
@@ -470,6 +462,12 @@
         margin-right: 0.1em; }
       .sr5.roll-card .card-content .damage-line .icon {
         font-style: italic; }
+    .sr5.roll-card .card-content p {
+      font-size: 0.8em; }
+    .sr5.roll-card .card-content h3 {
+      font-size: 1em;
+      margin: 0;
+      font-weight: bold; }
   .sr5.roll-card .dice-rolls {
     display: none;
     border-bottom: 1px solid #4d4d4d; }
