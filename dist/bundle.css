@@ -468,6 +468,11 @@
       font-size: 1em;
       margin: 0;
       font-weight: bold; }
+    .sr5.roll-card .card-content .test-value {
+      display: flex; }
+      .sr5.roll-card .card-content .test-value span {
+        flex: 1;
+        text-align: left; }
   .sr5.roll-card .dice-rolls {
     display: none;
     border-bottom: 1px solid #4d4d4d; }

@@ -35959,12 +35959,14 @@ class SuccessTest {
             yield test.applySecondChance();
             // await test.execute();
         });
+        const deleteOption = options.pop();
         options.push({
             name: game.i18n.localize('SR5.SecondChange'),
             callback: secondChance,
             condition: true,
             icon: '<i class="fas fa-meteor"></i>'
         });
+        options.push(deleteOption);
         return options;
     }
     /**
@@ -35999,7 +36001,7 @@ class SuccessTest {
             if (!document)
                 return console.error("Shadowrun 5e | A chat document links UUID couldn't be resolved to a document.");
             // @ts-ignore
-            yield document.sheet.render(true);
+            yield (document === null || document === void 0 ? void 0 : document.sheet.render(true));
         });
     }
     static _castOpposedAction(event, cardHtml) {

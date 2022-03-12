@@ -969,8 +969,9 @@ export class SuccessTest {
             if (!test) return console.error('Shadowrun 5e | Could not restore test from message');
 
             await test.applySecondChance();
-            // await test.execute();
         };
+
+        const deleteOption = options.pop();
 
         options.push({
             name: game.i18n.localize('SR5.SecondChange'),
@@ -978,6 +979,9 @@ export class SuccessTest {
             condition: true, // TODO: Disable when second chance has been used.
             icon: '<i class="fas fa-meteor"></i>'
         })
+
+        options.push(deleteOption);
+
         return options;
     }
 

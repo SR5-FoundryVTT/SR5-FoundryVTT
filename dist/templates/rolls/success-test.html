@@ -17,22 +17,23 @@
     <div class="card-main-content">
         <div class="card-content">
             <div class="test-line">
-                <span class="test-name">{{test.code}}</span>
+                <div><span class="test-code">{{test.code}}</span></div>
+                {{#if test.data.values.pushTheLimit.value}}<div>{{localize 'SR5.PushTheLimit'}}</div>{{/if}}
             </div>
         </div>
         <div class="card-content">
             <div class="left-side">
                 {{#if test.hasLimit}}
-                <div>{{localize test.limit.label}}: {{test.limit.value}}</div>
+                <div class="test-value"><span class="value">{{localize test.limit.label}}:</span> <span>{{test.limit.value}}</span></div>
                 {{/if}}
                 {{#if test.hasThreshold}}
-                <div>{{localize test.threshold.label}}: {{test.threshold.value}}</div>
+                <div class="test-value"><span class="value">{{localize test.threshold.label}}:</span> <span>{{test.threshold.value}}</span></span></div>
                 {{/if}}
             </div>
             <div class="right-side">
-                <div><span class="value">{{localize test.pool.label}}:</span><span>{{test.pool.value}}</span></div>
-                {{#if test.data.values.pushTheLimit.value}}<div>{{localize 'SR5.PushTheLimit'}}</div>{{/if}}
-                {{#if test.hasTreshold}}<div>{{localize test.netHits.label}}: {{test.netHits.value}}</div>{{/if}}
+                <div class="test-value"><span class="value">{{localize test.pool.label}}:</span> <span>{{test.pool.value}}</span></div>
+                {{#if test.hasThreshold}}<div class="test-value"><span class="value">{{localize test.netHits.label}}:</span> <span>{{test.netHits.value}}</span></div>
+                {{else}}<div class="test-value"><span class="value">{{localize test.hits.label}}:</span> <span>{{test.hits.value}}</span></div>{{/if}}
             </div>
         </div>
         <div class="card-test-content">
